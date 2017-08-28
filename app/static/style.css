@@ -1,0 +1,160 @@
+@import url(fonts/gfonts.css);
+
+
+body { 
+
+  font-size: 12px;
+  font-family: 'Droid Sans', sans-serif !important;
+  background-color: #eee;
+}
+
+text{
+  font-family: 'Droid Sans', Helvetica, Arial, sans-serif;
+  font-weight: 300;
+}
+
+
+
+.background {
+  fill: #eee;
+  pointer-events: all;
+}
+
+.map-layer {
+  fill: #fff;
+  stroke: #aaa;
+}
+
+.effect-layer{
+  pointer-events:none;
+}
+
+text.big-text{
+  font-size: 30px;
+  font-weight: 400;
+}
+
+text.hover-value{
+  font-size: 13px;
+}
+
+.axis {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.effect-layer text, text.dummy-text{
+  font-size: 12px;
+}
+
+
+.dropdown-menu>li>a {
+    cursor: pointer;
+}
+
+
+div#label {
+    padding: 5px 0 0 0;
+}
+
+.bottom-buffer { margin-bottom: 40px; }
+
+.dropdown#metric-dropdown{
+  background:
+}
+
+.dropdown#metric-dropdown .btn{
+  background-color: rgba(121, 231, 121, 0.56);
+  border: none;
+}
+
+span#select2-metric-dropdown-container {
+
+}
+
+
+#year-dropdown{
+  margin-top:20px;
+}
+
+.select2-selection--single {
+  background-color: rgba(121, 231, 121, 0.56) !important;
+  border: none !important;
+
+      -webkit-box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
+    -moz-box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
+    box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
+}
+
+.metric.select2-selection--single {
+  height: 50px !important;
+}
+
+.select2-dropdown {
+    background-color: rgba(121, 231, 121, 0.80) !important;
+    color: #515151;
+    border: none !important;
+    -webkit-box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
+    -moz-box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
+    box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
+
+}
+
+.metric .select2-results__option[aria-selected=true] {
+    background-color: rgba(238, 238, 238, 0.80) !important;
+}
+
+.select2-results__option--highlighted[aria-selected] {
+    background-color: #4fa74f !important;
+}
+
+.metric.select2-selection--single .select2-selection__rendered {
+    color: #515151 !important;
+    line-height: 50px !important;
+
+    font-size: 18px;
+    font-weight: 300;
+
+}
+
+.metric.select2-selection--single .select2-selection__arrow {
+    height: 50px !important;
+}
+
+
+.metric.select2-selection--single .select2-selection__arrow b {
+    border-color: #7e7e7e transparent transparent transparent !important;
+}
+
+
+button#play {
+    background: rgba(121, 231, 121, 0.80);
+    color: #515151;
+    border: none;
+        -webkit-box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
+    -moz-box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
+    box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
+    padding: 0 15px;
+    height: 28px;
+}
+
+
+#timechart path {
+    stroke: #4fa74f;
+    stroke-width: 2;
+    fill: none;
+}
+
+#timechart .axis path,
+#timechart .axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
