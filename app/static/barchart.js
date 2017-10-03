@@ -1,3 +1,7 @@
+var myX
+var myY
+var myDomain
+
 function BarChart(selector) {
     var width = $(selector).width(),
         height = 600,
@@ -9,12 +13,11 @@ function BarChart(selector) {
         mouseover,
         mouseout,
         clicked,
-        margin = { top: 40, right: 10, bottom: 73, left: 100 };
+        margin = { top: 10, right: 10, bottom: 73, left: 100 };
 
 
 
     var createSVG = function(selector) {
-
         var svg = d3.select(selector).append('svg')
             .attr('width', width)
             .attr('height', height)
@@ -59,7 +62,6 @@ function BarChart(selector) {
 
         var x = d3.scale.linear().range([0, width]);
 
-
         var xAxis = d3.svg.axis()
             .scale(x)
             .orient("bottom")
@@ -72,7 +74,6 @@ function BarChart(selector) {
             .tickFormat(function(d) { return titleCase(d) })
             .ticks(10);
 
-
         var max = d3.max(features, function(d) { return d.dati.Dato })
         var min = d3.min(features, function(d) { return d.dati.Dato })
 
@@ -81,7 +82,6 @@ function BarChart(selector) {
 
         svg = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-
 
         svg.append("g")
             .attr("class", "x axis")
@@ -104,6 +104,8 @@ function BarChart(selector) {
             .attr("text-anchor", "middle") // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate(" + (width / 2) + "," + (height - margin.top / 2) + ")") // centre below axis
             .text(data[0].dati.UDM);
+
+
 
 
         mouseover = function(d) {
@@ -142,6 +144,8 @@ function BarChart(selector) {
             y.domain(data.map(function(d) { return d.dati.Regione; }));
             x.domain([min + (min - max) * 5 / 100, max]);
 
+            xAxis.tickFormat(function(d){ return formatUDM(d, features[0].dati.UDM) })
+
             svg.select(".y.axis")
                 .transition()
                 .duration(1000)
@@ -160,6 +164,7 @@ function BarChart(selector) {
 
 
             svg.selectAll("rect")
+                .data(data)
                 .transition()
                 .duration(1000)
                 .attr("width", function(d) { return ((x(d.dati.Dato) > 0) ? x(d.dati.Dato) : 0); })
@@ -185,8 +190,6 @@ function BarChart(selector) {
             .attr("height", y.rangeBand())
             .on("mouseover", mouseover)
             .on("mouseout", mouseout);
-
-
 
         return chart
     }
@@ -252,7 +255,7 @@ function TimeBarChart(selector) {
         height = 400,
         centered,
         data = [],
-        margin = { top: 10, right: 0, bottom: 20, left: 100 };
+        margin = { top: 30, right: 0, bottom: 20, left: 100 };
 
     var createSVG = function(selector) {
 
@@ -318,17 +321,20 @@ function TimeBarChart(selector) {
             .scale(y)
             .tickFormat(function(d){ return formatUDM(d, udm) })
             .orient("left")
-            .ticks(4);
+            .ticks(4)
+            .tickFormat(function(d){ return formatUDM(d, udm) });
 
         var max = d3.max(data, function(d) { return d.Dato })
         var min = d3.min(data, function(d) { return d.Dato })
+        min = min - (max-min)/2
 
         x.domain(data.map(function(d) { return d.Anno; }));
-        y.domain([max, min + (min - max) * 5 / 100]);
+        y.domain([min + (min - max) * 5 / 100, max]);
+
+        var container = svg
 
         svg = svg.append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-
 
         svg.append("g")
             .attr("class", "x axis")
@@ -355,60 +361,68 @@ function TimeBarChart(selector) {
 
 
         mouseover = function(d) {
-            /*            d3.select("path#"+d.Anno).style("fill", "#FF5B5B");
-                        svg.append("line")
-                            .attr("class", "grid-line")
-                            .attr("x1", x(d.dati.Dato)-1)
-                            .attr("y1", y(d.dati.Regione)+y.rangeBand())
-                            .attr("x2", x(d.dati.Dato)-1)
-                            .attr("y2", height )
-                            .attr("style", "stroke:#50d750;stroke-width:1");
 
-                        console.log(formatValue(d).toString().length*2.4)
-                        svg.append("text")
-                        .attr("class", "hover-value")
-                        .attr("transform", "translate("+ ((x(d.dati.Dato)<width-30-d.dati.Dato.toString().length*3.0) ? (x(d.dati.Dato)+10): x(d.dati.Dato)-30-formatValue(d).toString().length*4.5) + ","
-                            + (y(d.dati.Regione)+y.rangeBand()/1.4) + ")")
+            d3.select(this).style('fill', '#464647');
 
-                        .text(formatValue(d))*/
         }
 
 
         var mouseout = function(d) {
-            /*            d3.selectAll("line").remove()
-                        d3.selectAll("text.hover-value").remove()
-                        d3.select("path#"+d.dati.Regione).style("fill", function(d){ return Italy.color()(d.dati.Dato)});*/
+            d3.select(this).style("fill", "url(#svgGradient2)")
         }
 
         chart.update = function() {
-            data.forEach(function(d){console.log(d.Indicatore)})
+
             data.sort(function(x, y) {
                 return d3.ascending(x.Anno, y.Anno);
             })
+
             var max = d3.max(data, function(d) { return d.Dato })
             var min = d3.min(data, function(d) { return d.Dato })
+            min = min - (max-min)/2
+
 
             x.domain(data.map(function(d) { return d.Anno; }));
-            y.domain([max, min + (min - max) * 5 / 100]);
+            y.domain([min + (min - max) * 5 / 100, max]);
 
-            console.log(y.domain(), y.range())
+            yAxis.tickFormat(function(d){ return formatUDM(d, data[0].UDM) })
 
             svg.select(".y.axis")
                 .transition()
                 .duration(1000)
                 .call(yAxis)
 
+
+
             svg.select(".x.axis")
                 .transition()
                 .duration(1000)
                 .call(xAxis)
 
-            svg.selectAll("rect")
+            let bars = svg.selectAll("rect")
+            console.log(bars[0].length , x.domain().length)
+            if (bars[0].length > x.domain().length){
+                for(i = 0; i < bars[0].length-x.domain().length; i++){
+                    svg.select("g.bars rect").remove()
+                }
+            }
+            else if(bars[0].length < x.domain().length){
+                for(i = 0; i < x.domain().length-bars[0].length; i++){
+                    svg.select("g.bars").append("rect")
+                    .style("fill", "url(#svgGradient2)")
+                    .on("mouseover", mouseover)
+                    .on("mouseout", mouseout);
+
+
+                }
+            }
+
+            svg.selectAll("rect").data(data)
                 .transition()
                 .duration(1000)
                 .attr("x", function(d) { return x(d.Anno); })
                 .attr("width", x.rangeBand())
-                .attr("y", function(d) { console.log(y(d.Dato), d.Indicatore); return ((y(d.Dato)>0) ? y(d.Dato) : 0); })
+                .attr("y", function(d) { return ((y(d.Dato)>0) ? y(d.Dato) : 0); })
                 .attr("height", function(d) { return ((height - y(d.Dato)>0) ? height - y(d.Dato) : 0) ; });
 
 
@@ -417,21 +431,24 @@ function TimeBarChart(selector) {
                 .duration(1000)
                 .attr("d", line(data));
 
-            d3.select('.x-legend').text(data[0].UDM)
+
+            d3.select(".chart-title")
+                .text(data[0].Territorio);
 
             return chart;
         }
 
 
-        svg.selectAll(".bar")
+        svg
+        .append("g").attr("class", "bars").selectAll(".bar")
             .data(data)
             .enter().append("rect")
             .attr("class", "bar")
             .style("fill", "url(#svgGradient2)")
-            .attr("id", function(d) { return d.Anno })
+            .attr("id", function(d) { return 'y'+d.Anno })
             .attr("x", function(d) { return x(d.Anno); })
             .attr("width", x.rangeBand())
-            .attr("y", function(d) { console.log(y(d.Dato), d); return ((y(d.Dato)>0) ? y(d.Dato) : 0); })
+            .attr("y", function(d) { return ((y(d.Dato)>0) ? y(d.Dato) : 0); })
             .attr("height", function(d) { return ((height - y(d.Dato) > 0) ? height - y(d.Dato) : 0); })
             .on("mouseover", mouseover)
             .on("mouseout", mouseout);
@@ -440,6 +457,17 @@ function TimeBarChart(selector) {
             .attr('class', 'data-line')
             .style('opacity', 0.9)
             .attr("d", line(data));
+
+
+        container.append("text")
+            .attr("stroke-width","0.7")
+            .attr("stroke","#000")
+            .attr("class", "chart-title")
+            .attr("text-anchor", "middle")
+            .attr("transform", "translate(" + ((margin.left*2+width) / 2) + "," + (15) + ")") // centre below axis
+
+            .text(data[0].Territorio);
+
 
 
         return chart
@@ -479,16 +507,16 @@ function formatUDM(d, udm){
         return it_locale.numberFormat(".2f")(d)+"%"
     }
     else if(udm.indexOf('milioni di euro') != -1){
-        return it_locale.numberFormat(",.2f")(d) + " M €"
+        return it_locale.numberFormat(",")(d) + " M €"
     }
     else if(udm.indexOf('migliaia di euro') != -1){
-        return it_locale.numberFormat(",.2f")(d) + " K €"
+        return it_locale.numberFormat(",")(d) + " K €"
     }
     else if(udm.indexOf('euro') != -1){
         return it_locale.numberFormat(",.2f")(d) + " €"
     }
     else if (udm.indexOf('numero') != -1)
-        { return it_locale.numberFormat(",.0f")(d) }
+        { return it_locale.numberFormat(",")(d) }
 
     else { return it_locale.numberFormat(",.2f")(d) }
 }

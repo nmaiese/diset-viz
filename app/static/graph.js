@@ -190,6 +190,8 @@ d3.json('static/data/italian-regions.geo.json', function(error, mapData) {
         var fonte = dataset[0].dati.Fonte
         var udm = dataset[0].dati.UDM
         var archivio = dataset[0].dati.Archivio
+        var regioni = data.map(function(d){ return d.Regione })
+
         d3.select("span#fonte").text(fonte)
         d3.select("span#udm").text(udm)
         d3.select("span#archivio").text(archivio)
@@ -198,32 +200,15 @@ d3.json('static/data/italian-regions.geo.json', function(error, mapData) {
 
         Italy = ItalyMap('#map').features(dataset);
         Italy();
-        Bar = BarChart('#barchart').data(dataset)
+        Bar = BarChart('#barchart').data(dataset).height(400)
         Bar()
-        var TimeBar = TimeBarChart('#timechart').data(data.filter(function(d){ return d.Regione == 'piemonte' && d.Indicatore == indicatore })).height(200)
+        TimeBar = TimeBarChart('#timechart').data(data.filter(function(d){ return d.Regione == regioni[getRandomInt(0,regioni.length)] && d.Indicatore == indicatore })).height(200)
         TimeBar();
 
         $(function() {
 
 
-
-/*            <div class="dropdown" id="metric-dropdown">
-              Indicatore:
-              <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown">
-              Reddito Primario
-              <span class="caret"></span></button>
-              <ul class="dropdown-menu">
-                <li><a>Reddito Primario</a></li>
-                <li><a>Reddito disponibile</a></li>
-                <li><a>Distribuzione secondaria</a></li>
-                <li><a>PIL</a></li>
-                <li><a>PIL per abitante</a></li>
-              </ul>
-            </div>*/
-
-            //var menu_indicatori = create_green_dropdown('#metric-dropdown', indicatori, indicatore);
-
-            $('#indicatore').text(tema)
+    $('#indicatore').text(tema)
 
 
             create_green_select2('#metric-dropdown', indicatori, indicatore, search=true, myclass='metric');
@@ -233,8 +218,9 @@ d3.json('static/data/italian-regions.geo.json', function(error, mapData) {
                 indicatore = e.params.data.text
                 var anni = data.filter(function(d){ return d.Indicatore ==  indicatore }).map(function(f){return f.Anno }).unique();
                 var anno = anni[getRandomInt(0, anni.length-1)];
+                console.log(indicatore)
                 var dataset = get_dataset_and_map_geo(data, features, indicatore, anno)
-                var filtered = data.filter(function(d){ return d.Regione == 'piemonte' && d.Indicatore == indicatore })
+                var filtered = data.filter(function(d){ return d.Regione == regioni[getRandomInt(0,regioni.length)] && d.Indicatore == indicatore })
                 var fonte = dataset[0].dati.Fonte
                 var udm = dataset[0].dati.UDM
                 var archivio = dataset[0].dati.Archivio
@@ -247,7 +233,7 @@ d3.json('static/data/italian-regions.geo.json', function(error, mapData) {
                 create_green_select2('#year-dropdown', anni, anno);
                 $("#label").html(indicatore + " <i>"+anno+"</i>");
                 Bar.data(dataset).update();
-                TimeBar.data(filtered).update();
+                TimeBar.data(filtered).update()
             });
 
             $("#year-dropdown").on("select2:select", function (e) {
@@ -262,25 +248,38 @@ d3.json('static/data/italian-regions.geo.json', function(error, mapData) {
 
                 Italy.features(dataset).update();
                 Bar.data(dataset).update();
+                d3.selectAll('#timechart rect').style('fill', 'url(#svgGradient2)');
+                d3.select('#timechart rect#y'+anno).style('fill', '#464647')
                 $("#label").html(indicatore + " <i>"+anno+"</i>");
 
             });
             $('#play').on('click', function(d) {
-                $("#play").html("<i class='fa fa-space-shuttle faa-passing animated'></i>")
-                var anni = data.filter(function(d){ return d.Indicatore ==  indicatore }).map(function(f){return f.Anno }).unique();
-                var year = anni[0];
-                var playInterval = setInterval(function() {
+
+                function playYear(year){
                     if (year == anni[anni.length-1]) {
                         clearInterval(playInterval)
                         $("#play").html("<span class='glyphicon glyphicon-play-circle'></span> Play")
 
                     }
+                    d3.selectAll('#timechart rect').style('fill', 'url(#svgGradient2)');
+                    d3.select('#timechart rect#y'+year).style('fill', '#464647')
+
                     var dataset = get_dataset_and_map_geo(data, features, indicatore, year)
                     Italy.features(dataset).update();
+
                     Bar.data(dataset).update();
                     create_green_select2('#year-dropdown', anni, year);
                     $("#label").html(indicatore + " <i>"+year+"</i>");
                     year++
+                    return year
+
+                }
+                $("#play").html("<i class='fa fa-space-shuttle faa-passing animated'></i>")
+                var anni = data.filter(function(d){ return d.Indicatore ==  indicatore }).map(function(f){return f.Anno }).unique();
+                var year = anni[0];
+                year = playYear(year);
+                var playInterval = setInterval(function() {
+                    year = playYear(year);
                 }, 2000);
             })
 

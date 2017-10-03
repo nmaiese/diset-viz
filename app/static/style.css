@@ -4,12 +4,12 @@
 body { 
 
   font-size: 12px;
-  font-family: 'Droid Sans', sans-serif !important;
+  font-family: 'Mukta', sans-serif !important;
   background-color: #eee;
 }
 
 text{
-  font-family: 'Droid Sans', Helvetica, Arial, sans-serif;
+  font-family: 'Mukta', Helvetica, Arial, sans-serif;
   font-weight: 300;
 }
 
@@ -145,6 +145,7 @@ button#play {
 }
 
 
+
 #timechart path {
     stroke: #4fa74f;
     stroke-width: 2;
@@ -158,3 +159,4 @@ button#play {
     stroke-width: 1;
     shape-rendering: crispEdges;
 }
+

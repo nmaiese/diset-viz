@@ -91,17 +91,11 @@ function ItalyMap(selector){
         }
 
         var mouseover = function(d){
-          // Highlight hovered province
-          // d3.select("#stats-container").style("display", "inline")
-          // d3.select("#region-label").text(d.Regione)
-          // d3.select("#primary-label span").text(d[year]["Reddito Primario"])
-          // d3.select("#available-label span").text(d[year]["Reddito disponibile"])
-          // d3.select("#secondary-label span").text(d[year]["Distribuzione secondaria"])
-          // d3.select("#pil-label span").text(d3.format(".2s")(d[year]["PIL"]))
-          // d3.select("#pil-people-label span").text(d3.format(".2s")(d[year]["PIL per abitante"]))
-          d3.select(this).style('fill', '#FF5B5B');
-          d3.select("tr#"+d.Regione).style("background-color", "#a9ffa9");
-          //TimeBar().data(filter(function(d){ return d.dati.Regione == 'piemonte' && d.dati.Indicatore == indicatore })).update()
+
+          d3.select("#stats-container").style("display", "inline")
+          d3.select(this).style('fill', '#262727');
+          let region = this.id
+          TimeBar.data(myData.filter(function(d){ return d.Regione == region && d.Indicatore == indicatore })).update();
 
           // Draw effects
           if(text_art){textArt(nameFn(d));}
