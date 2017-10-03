@@ -399,7 +399,7 @@ function TimeBarChart(selector) {
                 .duration(1000)
                 .call(xAxis)
 
-            let bars = svg.selectAll("rect")
+/*            let bars = svg.selectAll("rect")
             console.log(bars[0].length , x.domain().length)
             if (bars[0].length > x.domain().length){
                 for(i = 0; i < bars[0].length-x.domain().length; i++){
@@ -416,8 +416,9 @@ function TimeBarChart(selector) {
 
                 }
             }
-
+*/
             svg.selectAll("rect").data(data)
+                .attr("height",0)
                 .transition()
                 .duration(1000)
                 .attr("x", function(d) { return x(d.Anno); })
