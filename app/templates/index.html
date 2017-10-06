@@ -61,7 +61,9 @@ fiscale. Un progetto realizzato in D3.js"/>
             <select class="metric" id="metric-dropdown" style="width: 100%;">
             </select>
             <div class="row" style="margin-bottom: 20px;"></div>
-            <b>Fonte</b>: <span id="fonte"></span> - <b>Archivio</b>: <span id="archivio"></span>
+            <b>Fonte</b>: <span id="fonte"></span><br>
+            <b>Unità di misura</b>: <span id="udm"></span><br>
+            <b>Archivio</b>: <span id="archivio"></span>
             <div class="row" style="margin-bottom: 20px;"></div>
             <b>Anno</b>:
             <select class="year" id="year-dropdown" style="width: 120px;">
@@ -74,22 +76,20 @@ fiscale. Un progetto realizzato in D3.js"/>
     </div>
 
   <div class="row">
-    <div class="col-md-7">
-      <div id="map"></div>
-    </div>
     <div class="col-md-5">
-              <div class="col-md-12">
-            <div id="timechart"></div>
-          </div>
-          <div class="col-md-12" >
-          </div>
+      <div class="col-md-12">
+        <div id="timechart"></div>
+      </div>
       <div class="col-md-12">
         <div class="panel-body" id="barchart"></div>
-        <div id="stats-table"></div>
       </div>
 
     </div>
+    <div class="col-md-7">
+      <div id="map"></div>
     </div>
+
+  </div>
 
   </div>
   <div class="row">
@@ -122,6 +122,7 @@ function titleCase(str) {
        return str.join(' ');
      }
 }
+
 
 </script>
 </body>

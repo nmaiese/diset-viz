@@ -7,13 +7,16 @@ function ItalyMap(selector){
     metric = "PIL",
     text_art = false,
     features = [],
+    indicatore,
+    tema,
+    anno,
     mouseover,
     mouseout,
     clicked;
 
     var color = d3.scale.linear()
       .clamp(true)
-      .range(['white', '#489E2D']);
+      .range(['red', 'white', '#489E2D']);
 
     var projection = d3.geo.mercator()
       .scale(3.6*width)
@@ -92,142 +95,17 @@ function ItalyMap(selector){
 
         var mouseover = function(d){
 
-          d3.select("#stats-container").style("display", "inline")
-          d3.select(this).style('fill', '#262727');
-          let region = this.id
-          TimeBar.data(myData.filter(function(d){ return d.Regione == region && d.Indicatore == indicatore })).update();
-
-          // Draw effects
-          if(text_art){textArt(nameFn(d));}
+          d3.select(this).style('fill', '#cacaca');
+          var regione = this.id
+          TimeBar.data(myData.filter(function(d){ return d.Regione == regione && d.Indicatore == indicatore })).update();
         }
+
 
         var mouseout = function(d){
-          // Reset province color
-          d3.select("#stats-container").style("display", "none")
           mapLayer.selectAll('path')
             .style('fill', function(d){return centered && d===centered ? '#D5708B' : fillFn(d);});
-
-          // Remove effect text
-          effectLayer.selectAll('text').transition()
-            .style('opacity', 0)
-            .remove();
-
-          // Clear province name
-          bigText.text('');
-          d3.select("tr#"+d.Regione).style("background-color", "white")
         }
 
-        // Gimmick
-        // Just me playing around.
-        // You won't need this for a regular map.
-        var BASE_FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
-
-        var FONTS = [
-          "Open Sans",
-          "Josefin Slab",
-          "Arvo",
-          "Lato",
-          "Vollkorn",
-          "Abril Fatface",
-          "Old StandardTT",
-          "Droid+Sans",
-          "Lobster",
-          "Inconsolata",
-          "Montserrat",
-          "Playfair Display",
-          "Karla",
-          "Alegreya",
-          "Libre Baskerville",
-          "Merriweather",
-          "Lora",
-          "Archivo Narrow",
-          "Neuton",
-          "Signika",
-          "Questrial",
-          "Fjalla One",
-          "Bitter",
-          "Varela Round"
-        ];
-
-        function textArt(text){
-          // Use random font
-          var fontIndex = Math.round(Math.random() * FONTS.length);
-          var fontFamily = FONTS[fontIndex] + ', ' + BASE_FONT;
-
-          bigText
-            .style('font-family', fontFamily)
-            .text(text);
-
-          // Use dummy text to compute actual width of the text
-          // getBBox() will return bounding box
-          dummyText
-            .style('font-family', fontFamily)
-            .text(text);
-          var bbox = dummyText.node().getBBox();
-
-          var textWidth = bbox.width;
-          var textHeight = bbox.height;
-          var xGap = 3;
-          var yGap = 1;
-
-          // Generate the positions of the text in the background
-          var xPtr = 0;
-          var yPtr = 0;
-          var positions = [];
-          var rowCount = 0;
-          while(yPtr < height){
-            while(xPtr < width){
-              var point = {
-                text: text,
-                index: positions.length,
-                x: xPtr,
-                y: yPtr
-              };
-              var dx = point.x - width/2 + textWidth/2;
-              var dy = point.y - height/2;
-              point.distance = dx*dx + dy*dy;
-
-              positions.push(point);
-              xPtr += textWidth + xGap;
-            }
-            rowCount++;
-            xPtr = rowCount%2===0 ? 0 : -textWidth/2;
-            xPtr += Math.random() * 10;
-            yPtr += textHeight + yGap;
-          }
-
-          var selection = effectLayer.selectAll('text')
-            .data(positions, function(d){return d.text+'/'+d.index;});
-
-          // Clear old ones
-          selection.exit().transition()
-            .style('opacity', 0)
-            .remove();
-
-          // Create text but set opacity to 0
-          selection.enter().append('text')
-            .text(function(d){return d.text;})
-            .attr('x', function(d){return d.x;})
-            .attr('y', function(d){return d.y;})
-            .style('font-family', fontFamily)
-            .style('fill', '#777')
-            .style('opacity', 0);
-
-          selection
-            .style('font-family', fontFamily)
-            .attr('x', function(d){return d.x;})
-            .attr('y', function(d){return d.y;});
-
-          // Create transtion to increase opacity from 0 to 0.1-0.5
-          // Add delay based on distance from the center of the <svg> and a bit more randomness.
-          selection.transition()
-            .delay(function(d){
-              return d.distance * 0.01 + Math.random()*1000;
-            })
-            .style('opacity', function(d){
-              return 0.1 + Math.random()*0.4;
-            });
-        }
 
         // Set svg width & height
 
@@ -256,8 +134,9 @@ function ItalyMap(selector){
 
         max = d3.max(features, function(d){ return d.dati.Dato })
         min = d3.min(features, function(d){ return d.dati.Dato })
+        avg = d3.sum(features, function(d){ return d.dati.Dato })/features.length
 
-        color.domain([min+(min-max)*5/100, max]);
+        color.domain([min, avg ,max]);
 
 
         // Draw each province as a path
@@ -273,9 +152,12 @@ function ItalyMap(selector){
           .on('click', clicked);
 
         chart.update = function(){
-            max = d3.max(features, function(d){ return d.dati.Dato })
-            min = d3.min(features, function(d){ return d.dati.Dato })
-            color.domain([min+(min-max)*5/100, max]);
+            var max = d3.max(features, function(d){ return d.dati.Dato })
+            var min = d3.min(features, function(d){ console.log(d.dati.Dato); return d.dati.Dato })
+            avg = d3.sum(features, function(d){ return d.dati.Dato })/features.length
+
+            color.domain([min+(min-max)*5/100,avg, max]);
+            console.log(color.domain())
             mapLayer.selectAll('path')
                  .transition()
                  .duration(1000)
@@ -341,6 +223,18 @@ function ItalyMap(selector){
     chart.geo_data = function(_) {
         if (!arguments.length) return geo_data;
             geo_data = _;
+            return chart;
+    };
+
+    chart.anno = function(_) {
+      if (!arguments.length) return anno;
+        anno = _;
+        return chart;
+    };
+
+    chart.indicatore = function(_) {
+        if (!arguments.length) return indicatore;
+            indicatore = _;
             return chart;
     };
     return chart

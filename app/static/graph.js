@@ -29,24 +29,44 @@ Array.prototype.unique = function() {
     return a;
 };
 
+
+
+function replace_missing_value(data, regione){
+    if (data.map(function(d){return d.Regione }).indexOf(regione)==-1){
+        var missing = Object();
+        Object.assign(missing, data[0]);
+        missing.Regione  = regione;
+        missing.Dato = null;
+        data.push(missing)
+    }
+    return data
+}
+
+
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-
-
-
+function getRandomValue(items){
+    return items[getRandomInt(0, items.length-1)];
+}
 
 function get_dataset_and_map_geo(data, geodata, indicatore, anno){
     data = data.filter(function(d){return (d.Indicatore == indicatore && d.Anno == anno)})
-        geodata.forEach(function(d) {
-            v = data.filter(function(f) {
-                return d.properties.name == f.Regione
-            })
+    geodata.forEach(function(d) {
+        data = replace_missing_value(data, d.properties.name)
+        v = data.filter(function(f) { return d.properties.name == f.Regione })
         d.dati = v[0]
     })
     return geodata
 }
+
+function delete_green_select2(selector){
+    $(selector).select2("destroy");
+    d3.selectAll(selector+" option").remove()
+}
+
+
 
 function create_green_select2(selector, item_list, selected, search=true, myclass='myclass'){
     var item_objects = []
@@ -59,9 +79,7 @@ function create_green_select2(selector, item_list, selected, search=true, myclas
     $(selector).select2("val",item_list.indexOf(selected).toString())
 
     if (!search){ $(selector).select2({minimumResultsForSearch: Infinity}) }
-
 }
-
 
 function create_green_dropdown(selector, item_list, selected){
     var menu = d3.select(selector);
@@ -80,7 +98,6 @@ function create_green_dropdown(selector, item_list, selected){
         .append('a')
         .text(function(d){return d})
     return menu
-
 }
 
 
@@ -105,151 +122,144 @@ function formatValue(d, udm){
 
 
 
+function formatData(data){
 
+    data.forEach(function(d) {
+        d['Dato'] = +d['Dato'].replace(',', '.');
+        d['Regione'] = d['Territorio'].replace(/'/g, ' ').replace(/ /g, '-').toLowerCase();
+        d['Anno'] = +d['Anno']
+        d['Indicatore'] = d['Indicatore'].replace(/"/g,  "'")
+    })
+
+    return data
+
+}
+
+function selectDataset(data, tema=false, indicatore=false, anno=false, regione=false){
+    data = ((tema) ? data.filter(function(d){return d.Tema == tema}) : data)
+    data = ((indicatore) ? data.filter(function(d){return d.Indicatore == indicatore}) : data)
+    data = ((anno) ? data.filter(function(d){return d.Anno == anno}) : data)
+    data = ((regione) ? data.filter(function(d){return d.Regione == regione}) : data)
+    return data
+}
+
+
+
+function getRandomParams(data, tema=null, indicatore=null, regione=null, anno=null){
+
+    var regioni = d3.set(data.map(function(f){return f.Regione })).values()
+    regione = ((!regione) ? getRandomValue(regioni) : regione)
+
+    var temi = d3.set(data.map(function(f){return f.Tema })).values()
+    tema = ((!tema) ? getRandomValue(temi) : tema)
+
+    data = selectDataset(data, tema=tema)
+    var indicatori = d3.set(data.map(function(f){return f.Indicatore })).values()
+
+    indicatore = ((!indicatore) ? getRandomValue(indicatori) : indicatore)
+
+    data = selectDataset(data, false, indicatore)
+
+    var anni = d3.set(data.map(function(f){return f.Anno })).values()
+    anno = ((!anno) ? getRandomValue(anni) : anno)
+
+    console.log(indicatore, anno, tema, regione)
+    return { 'tema': tema, 'temi':temi, 'indicatore': indicatore,
+            'anno': anno, 'regione': regione, 'regioni': regioni,
+            'indicatori': indicatori, 'anni':anni };
+}
+
+function updateInfo(data){
+    var fonte = data[0].dati.Fonte
+    var udm = data[0].dati.UDM
+    var archivio = data[0].dati.Archivio
+
+    d3.select("span#fonte").text(fonte)
+    d3.select("span#udm").text(udm)
+    d3.select("span#archivio").text(archivio)
+}
 
 d3.json('static/data/italian-regions.geo.json', function(error, mapData) {
     var ssv = d3.dsv(";", "text/plain");
     ssv('static/data/Assoluti_Regione.csv', function(errorb, data) {
 
-        temi = data.map(function(f){return f.Tema })
-        ran = getRandomInt(0, temi.length)
-        tema = temi[ran]
-        data = data.filter(function(d){ return d.Tema == tema })
+        data = formatData(data);
 
-        data.forEach(function(d) {
-            d['Dato'] = +d['Dato'].replace(',', '.');
-            d['Regione'] = d['Territorio'].replace(/'/g, ' ').replace(/ /g, '-').toLowerCase();
-            d['Anno'] = +d['Anno']
-            d['Indicatore'] = d['Indicatore'].replace(/"/g,  "'")
-        })
-
-
-        indicatori = data.map(function(f){return f.Indicatore }).unique()
-        indicatore = indicatori[getRandomInt(0, indicatori.length-1)]
-        anni = data.filter(function(d){ return d.Indicatore ==  indicatore}).map(function(f){return f.Anno }).unique()
-        anno = anni[getRandomInt(0, anni.length-1)]
+        var params = getRandomParams(data);
         features = mapData.features;
+
+        var temi = params.temi;
+        var tema = params.tema;
+        var indicatore = params.indicatore;
+        var indicatori = params.indicatori;
+        var anni = params.anni;
+        var anno = params.anno;
+        var regioni = params.regioni;
+        var regione = params.regione;
+
+
         features.forEach(function(d) {
             d.properties.name = d.properties.name.replace(/ /g, '-')
         })
 
-
-
-        var header_list = Object.keys(data[0])
-
-
-
-        function DrawTable(selector, features, year, metric) {
-
-
-            var table = d3.select(selector).append('table').attr('class', 'table table-bordered table-hover').attr("id", "data-table");
-            var thead = table.append('thead').append('tr');
-            thead.append('th').text('#')
-            thead.append('th').text('Regione')
-            thead.append('th').text('Reddito Primario')
-            thead.append('th').text('Reddito disponibile')
-            thead.append('th').text('Distribuzione secondaria')
-            thead.append('th').text('PIL')
-            thead.append('th').text('PIL per abitante')
-
-            var tbody = table.append('tbody')
-            var tablerow = tbody.selectAll("tr").data(features).enter().append("tr").attr("id", function(d) { return d.region })
-
-            tablerow.append("td");
-            tablerow.append("td").text(function(d) { return titleCase(d.region) })
-            tablerow.append("td").text(function(d) { return d[year]['Reddito Primario'] })
-            tablerow.append("td").text(function(d) { return d[year]['Reddito disponibile'] })
-            tablerow.append("td").text(function(d) { return d[year]['Distribuzione secondaria'] })
-            tablerow.append("td").text(function(d) { return d[year]['PIL'] })
-            tablerow.append("td").text(function(d) { return d[year]['PIL per abitante'] })
-
-            var dataTable = $('#data-table').DataTable({
-                paging: false,
-                searching: false,
-                order: [
-                    [header_list.indexOf(metric) + 1, 'desc']
-                ]
-            });
-
-
-            dataTable.on('order.dt search.dt', function() {
-                dataTable.column(0, { search: 'applied', order: 'applied' }).nodes().each(function(cell, i) {
-                    cell.innerHTML = i + 1;
-                });
-            }).draw();
-
-            return table
-        }
-
-
-
         myData = data;
 
-
         var dataset = get_dataset_and_map_geo(data, features, indicatore, anno)
-        var fonte = dataset[0].dati.Fonte
-        var udm = dataset[0].dati.UDM
-        var archivio = dataset[0].dati.Archivio
-        var regioni = data.map(function(d){ return d.Regione })
+        var dataset_regione = data.filter(function(d){ return d.Regione == regione && d.Indicatore == indicatore })
 
-        d3.select("span#fonte").text(fonte)
-        d3.select("span#udm").text(udm)
-        d3.select("span#archivio").text(archivio)
+        updateInfo(dataset);
 
-        console.log(anno, indicatore, fonte, udm, archivio)
+        Italy = new ItalyMap('#map').features(dataset).indicatore(indicatore);
+        Bar = new BarChart('#barchart').data(dataset).height(400);
+        TimeBar = new TimeBarChart('#timechart')
+            .data(dataset_regione)
+            .height(200)
+            .interpolate(true);
 
-        Italy = ItalyMap('#map').features(dataset);
         Italy();
-        Bar = BarChart('#barchart').data(dataset).height(400)
-        Bar()
-        TimeBar = TimeBarChart('#timechart').data(data.filter(function(d){ return d.Regione == regioni[getRandomInt(0,regioni.length)] && d.Indicatore == indicatore })).height(200)
-        TimeBar();
+        Bar();
+        TimeBar().update();
+
+        selectYearTimeChart(anno);
 
         $(function() {
 
-
-    $('#indicatore').text(tema)
-
+            $('#indicatore').text(tema);
 
             create_green_select2('#metric-dropdown', indicatori, indicatore, search=true, myclass='metric');
             create_green_select2('#year-dropdown', anni, anno, search=false, myclass='year');
 
             $("#metric-dropdown").on("select2:select", function (e) {
-                indicatore = e.params.data.text
-                var anni = data.filter(function(d){ return d.Indicatore ==  indicatore }).map(function(f){return f.Anno }).unique();
-                var anno = anni[getRandomInt(0, anni.length-1)];
-                console.log(indicatore)
-                var dataset = get_dataset_and_map_geo(data, features, indicatore, anno)
-                var filtered = data.filter(function(d){ return d.Regione == regioni[getRandomInt(0,regioni.length)] && d.Indicatore == indicatore })
-                var fonte = dataset[0].dati.Fonte
-                var udm = dataset[0].dati.UDM
-                var archivio = dataset[0].dati.Archivio
-                d3.select("span#fonte").text(fonte)
-                d3.select("span#udm").text(udm)
-                d3.select("span#archivio").text(archivio)
 
+                var indicatore = e.params.data.text;
+                var params = getRandomParams(data, tema=tema, indicatore=indicatore);
+                var map_dataset = get_dataset_and_map_geo(data, features, indicatore, params.anno)
+                var filtered = selectDataset(data,
+                                            tema=params.tema,
+                                            indicatore=params.indicatore,
+                                            anno=false,
+                                            regione=params.regione);
 
-                Italy.features(dataset).update();
-                create_green_select2('#year-dropdown', anni, anno);
+                updateInfo(map_dataset);
+                Italy.features(map_dataset).update();
+                delete_green_select2('#year-dropdown');
+                create_green_select2('#year-dropdown', params.anni, params.anno);
                 $("#label").html(indicatore + " <i>"+anno+"</i>");
-                Bar.data(dataset).update();
-                TimeBar.data(filtered).update()
+                Bar.data(map_dataset).update();
+                TimeBar.data(filtered).update();
+                selectYearTimeChart(params.anno);
+
             });
 
             $("#year-dropdown").on("select2:select", function (e) {
                 var anno = e.params.data.text
-                var dataset = get_dataset_and_map_geo(data, features, indicatore, anno)
-                var fonte = dataset[0].dati.Fonte
-                var udm = dataset[0].dati.UDM
-                var archivio = dataset[0].dati.Archivio
-                d3.select("span#fonte").text(fonte)
-                d3.select("span#udm").text(udm)
-                d3.select("span#archivio").text(archivio)
+                var  map_dataset = get_dataset_and_map_geo(data, features, indicatore, anno)
+                updateInfo(map_dataset);
 
-                Italy.features(dataset).update();
-                Bar.data(dataset).update();
-                d3.selectAll('#timechart rect').style('fill', 'url(#svgGradient2)');
-                d3.select('#timechart rect#y'+anno).style('fill', '#464647')
+                Italy.features(map_dataset).update();
+                Bar.data(map_dataset).update();
+
+                selectYearTimeChart(anno)
                 $("#label").html(indicatore + " <i>"+anno+"</i>");
 
             });
@@ -285,5 +295,8 @@ d3.json('static/data/italian-regions.geo.json', function(error, mapData) {
 
 
         });
+        console.timeEnd('Plot #3')
     })
 })
+
+

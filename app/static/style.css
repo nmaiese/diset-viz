@@ -160,3 +160,11 @@ button#play {
     shape-rendering: crispEdges;
 }
 
+
+#timechart .bar {
+  fill: "url(#svgGradient2)" !important;
+}
+
+#timechart .bar .selected { 
+  fill: "#464647";
+}
