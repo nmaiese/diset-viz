@@ -184,8 +184,8 @@ d3.json('static/data/italian-regions.geo.json', function(error, mapData) {
     ssv('static/data/Assoluti_Regione.csv', function(errorb, data) {
 
         data = formatData(data);
-
         var params = getRandomParams(data);
+
         features = mapData.features;
 
         var temi = params.temi;
