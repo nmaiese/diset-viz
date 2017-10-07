@@ -439,7 +439,7 @@ function TimeBarChart(selector) {
         chart.update = function() {
 
             data.sort(function(x, y) {
-                return d3.descending(x.Dato, y.Dato);
+                return d3.ascending(x.Anno, y.Anno);
             });
 
 
