@@ -173,6 +173,7 @@ d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
         map_data = format_geo_data(map_data);
 
         params = getRandomParams(data);
+
         var data_subset = get_data_subset(data, params);
         var data_charts = get_data_for_chart(data_subset, map_data, params);
 
@@ -189,19 +190,28 @@ d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
             $('#indicatore').text(params.tema);
 
             function apply_dropown(){
-
                 var data_subset = get_data_subset(data, params);
                 var data_charts = get_data_for_chart(data_subset, map_data, params);
-
-                updateInfo(data_charts.region);
-
                 var my_lst = add_filter_event_listner(Charts, data_subset, map_data, params);
                 update_charts(data_charts, Charts.Italy, Charts.RegionChart, Charts.YearChart);
+                updateInfo(data_charts.region);
             }
 
-            create_green_select2('#tema-dropdown', params.temi, params.tema, search=true, myclass='tema');
+            create_green_select2('#tema-dropdown', params.temi, params.tema, search=true, myclass='metric');
             create_green_select2('#metric-dropdown', params.indicatori, params.indicatore, search=true, myclass='metric');
             create_green_select2('#year-dropdown', params.anni, params.anno, search=false, myclass='year');
+
+            $("#tema-dropdown").on("select2:select", function (e) {
+                var tema = e.params.data.text;
+                console.log(params.tema, tema)
+                params = getRandomParams(data, tema=tema, indicatore=null, regione=params.regione);
+                console.log(params.tema)
+                delete_green_select2('#metric-dropdown');
+
+                create_green_select2('#metric-dropdown', params.indicatori, params.indicatore, search=true, myclass='metric');
+
+                apply_dropown();
+            });
 
             $("#metric-dropdown").on("select2:select", function (e) {
 
@@ -221,32 +231,29 @@ d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
                 apply_dropown();
             });
 
+
+
             $('#play').on('click', function(d) {
 
                 function showDataOverYear(year){
                     if (year == params.anni[params.anni.length-1]) {
                         clearInterval(playInterval)
-                        $("#play").html("<span class='glyphicon glyphicon-play-circle'></span> Play")
+                        $("#play").html("<span class='glyphicon glyphicon-play-circle'></span> Play").removeAttr("disabled");
                     }
                     my_lst.anno = year;
-                    console.log(year, params.anni)
                     create_green_select2('#year-dropdown', params.anni, year.toString());
                     year++
                     return year
-
                 }
-                $("#play").html("<i class='fa fa-space-shuttle faa-passing animated'></i>")
 
+                $("#play").html("<i class='fa fa-space-shuttle faa-passing animated'></i>").attr('disabled', 'disabled')
                 var year = params.anni[0];
                 year = showDataOverYear(year);
                 var playInterval = setInterval(function() {
                     year = showDataOverYear(year);
                 }, 2000);
             })
-
-
         });
-        console.timeEnd('Plot #3')
     })
 })
 

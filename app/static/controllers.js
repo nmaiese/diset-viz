@@ -43,7 +43,6 @@ function get_values_for_map(data, geo_data, params){
 }
 
 function get_data_subset(data, params){
-    console.log(params)
     return data.filter(function(d){return d.Indicatore == params.indicatore && d.Tema == params.tema });
 }
 

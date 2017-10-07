@@ -93,9 +93,17 @@ span#select2-metric-dropdown-container {
   height: 50px !important;
 }
 
+span#select2-tema-dropdown-container {
+    font-weight: 600;
+    font-size: 20px;
+}
+
+
 .select2-dropdown {
-    background-color: rgba(121, 231, 121, 0.80) !important;
+    background-color: rgba(121, 231, 121, 0.9) !important;
     color: #515151;
+    font-size: 16px;
+    text-align: center;
     border: none !important;
     -webkit-box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
     -moz-box-shadow: 3px 3px 5px -5px rgba(0,0,0,0.75);
