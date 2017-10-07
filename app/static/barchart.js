@@ -184,7 +184,7 @@ function BarChart(selector) {
                 .transition()
                 .duration(1000)
                 .attr("x", 10)
-                .attr("width", width - 10)
+                .attr("width", width)
                 .style('fill-opacity', 1e-6)
                 .remove();
 
@@ -192,7 +192,7 @@ function BarChart(selector) {
               .append("rect")
                 .attr("class", "bar")
                 .attr("x", 10)
-                .attr("width", width - 10)
+                .attr("width", width)
                 .style("fill", color)
                 .on("mouseover", mouseover)
                 .on("mouseout", mouseout)

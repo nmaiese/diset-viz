@@ -11,6 +11,13 @@ text{
 }
 
 
+.navbar-inverse .navbar-brand {
+    color: #dbdbdb;
+}
+
+.navbar-inverse .navbar-nav>li>a {
+    color: #dbdbdb;
+}
 
 .background {
   fill: #eee;
