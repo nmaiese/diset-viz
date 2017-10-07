@@ -7,14 +7,15 @@ function BarChart(selector) {
     var width = $(selector).width(),
         height = 600,
         centered,
-        year = 2015,
-        metric = "PIL",
-        text_art = false,
         data = [],
+        color = 'url(#svgGradient)',
+        color_selected = '#464647',
+        color_hover = '#CACACA',
         mouseover,
         mouseout,
         clicked,
-        margin = { top: 10, right: 10, bottom: 73, left: 100 };
+        event_listner = {},
+        margin = { top: 30, right: 10, bottom: 73, left: 100 };
 
 
 
@@ -28,7 +29,7 @@ function BarChart(selector) {
     function chart() {
 
         var svg = createSVG(selector);
-        var udm = data[0].dati.UDM;
+        var udm = data[0].UDM;
 
         var defs = svg.append("defs");
         var gradient = defs.append("linearGradient")
@@ -52,7 +53,7 @@ function BarChart(selector) {
 
 
         data.sort(function(x, y) {
-            return d3.descending(x.dati.Dato, y.dati.Dato);
+            return d3.descending(x.Dato, y.Dato);
         })
 
 
@@ -75,10 +76,10 @@ function BarChart(selector) {
             .tickFormat(function(d) { return titleCase(d) })
             .ticks(10);
 
-        var max = d3.max(data, function(d) { return d.dati.Dato })
-        var min = d3.min(data, function(d) { return d.dati.Dato })
+        var max = d3.max(data, function(d) { return d.Dato })
+        var min = d3.min(data, function(d) { return d.Dato })
 
-        y.domain(data.map(function(d) { return d.dati.Regione; }));
+        y.domain(data.map(function(d) { return d.Regione; }));
         x.domain([min + (min - max) * 5 / 100, max]);
 
         svg = svg.append("g")
@@ -104,53 +105,64 @@ function BarChart(selector) {
             .attr("class", "x-legend")
             .attr("text-anchor", "middle") // this makes it easy to centre the text as the transform is applied to the anchor
             .attr("transform", "translate(" + (width / 2) + "," + (height - margin.top / 2) + ")") // centre below axis
-            .text(data[0].dati.UDM);
+            .text(data[0].UDM);
 
 
 
+        svg.append("text")
+            .attr("stroke-width","0.7")
+            .attr("stroke","#000")
+            .attr("class", "chart-title")
+            .attr("text-anchor", "left")
+            //.attr("transform", "translate(" + (margin.left+margin.right*2) + "," + (-margin.top/2) + ")") // centre below axis
+            .attr("transform", "translate(" + (10) + "," + (0) + ")") // centre below axis
+            .text(data[0].Anno)
 
-        mouseover = function(d) {
-            d3.select("path#" + d.dati.Regione).style("fill", "#FF5B5B");
-            svg.append("line")
-                .attr("class", "grid-line")
-                .attr("x1", x(d.dati.Dato) - 1)
-                .attr("y1", y(d.dati.Regione) + y.rangeBand())
-                .attr("x2", x(d.dati.Dato) - 1)
-                .attr("y2", height)
-                .attr("style", "stroke:#50d750;stroke-width:1");
 
+        var mouseover = function(d) {
             svg.append("text")
                 .attr("class", "hover-value")
-                .attr("transform", "translate(" + ((x(d.dati.Dato) < width - 30 - d.dati.Dato.toString().length * 3.0) ? (x(d.dati.Dato) + 10) : x(d.dati.Dato) - 30 - formatValue(d, udm).toString().length * 4.5) + "," +
-                    (y(d.dati.Regione) + y.rangeBand() / 1.4) + ")")
-                .text(formatValue(d, udm))
+                .attr("transform", "translate(" + ((x(d.Dato) < width - 30 - d.Dato.toString().length * 3.0) ? (x(d.Dato) + 10) : x(d.Dato) - 30 - formatValue(d, udm).toString().length * 4.5) + "," +
+                    (y(d.Regione) + y.rangeBand() / 1.4) + ")")
+                .text(formatValue(d.Dato, udm))
+
+            d3.select(this).style("fill", color_hover);
         }
+
 
 
         var mouseout = function(d) {
             d3.selectAll("line").remove()
             d3.selectAll("text.hover-value").remove()
-            d3.select("path#" + d.dati.Regione).style("fill", function(d) { return Italy.color()(d.dati.Dato) });
-        }
+            d3.select("path#" + d.Regione).style("fill", function(d) { return Italy.color()(d.Dato) });
+            d3.select(this).style("fill", function(d){
+                return d3.select(this).classed('selected') ? color_selected : color
+            });
+        };
 
+
+
+        var clicked = function(d) {
+            event_listner.regione = d.Regione;
+        }
 
 
 
         chart.update = function() {
             data.sort(function(x, y) {
-                return d3.descending(x.dati.Dato, y.dati.Dato);
+                return d3.descending(x.Dato, y.Dato);
             })
 
 
-            var max = d3.max(data, function(d) { return d.dati.Dato })
-            var min = d3.min(data, function(d) { return d.dati.Dato })
 
+            var max = d3.max(data, function(d) { return d.Dato })
+            var min = d3.min(data, function(d) { return d.Dato })
 
-
-            y.domain(data.map(function(d) { return d.dati.Regione; }));
+            y.domain(data.map(function(d) { return d.Regione; }));
             x.domain([min + (min - max) * 5 / 100, max]);
 
-            xAxis.tickFormat(function(d){ return formatUDM(d, data[0].dati.UDM) })
+            xAxis.tickFormat(function(d){ return formatUDM(d, data[0].UDM) })
+
 
             svg.select(".y.axis")
                 .transition()
@@ -169,33 +181,71 @@ function BarChart(selector) {
                 .attr("transform", "rotate(-40)" );
 
 
-            svg.selectAll("rect")
+            var bars = svg.selectAll('rect').data(data)
+
+            bars.exit()
+                .transition()
+                .duration(1000)
+                .attr("x", 10)
+                .attr("width", width - 10)
+                .style('fill-opacity', 1e-6)
+                .remove();
+
+            bars.enter()
+              .append("rect")
+                .attr("class", "bar")
+                .attr("x", 10)
+                .attr("width", width - 10)
+                .style("fill", color)
+                .on("mouseover", mouseover)
+                .on("mouseout", mouseout)
+                .on("click", clicked);
+
+            bars
+                .transition()
+                .duration(1000)
+                .attr("y", function(d) { return y(d.Regione); })
+                .attr("width", function(d) { return ((x(d.Dato) > 0) ? x(d.Dato) : 0); })
+                .attr("x", 10)
+                .attr("height", y.rangeBand());
+
+
+            d3.select('.x-legend').text(data[0].UDM)
+
+
+/*            svg.selectAll("rect")
                 .data(data)
                 .transition()
                 .duration(1000)
-                .attr("width", function(d) { return ((x(d.dati.Dato) > 0) ? x(d.dati.Dato) : 0); })
+                .attr("id", function(d) { return d.Regione })
+                .attr("width", function(d) { return ((x(d.Dato) > 0) ? x(d.Dato) : 0); })
                 .attr("x", "1")
-                .attr("y", function(d) { return y(d.dati.Regione); })
-                .attr("height", y.rangeBand());
+                .attr("y", function(d) { return y(d.Regione); })
+                .attr("height", y.rangeBand());*/
 
-            d3.select('.x-legend').text(data[0].dati.UDM)
+            svg.select(".chart-title")
+                .text(data[0].Anno);
 
             return chart;
         }
 
 
+/*
+
         svg.selectAll(".bar")
             .data(data)
             .enter().append("rect")
             .attr("class", "bar")
-            .style("fill", "url(#svgGradient)")
+            .style("fill", color)
             .attr("id", function(d) { return d.Regione })
-            .attr("width", function(d) { return ((x(d.dati.Dato) > 0) ? x(d.dati.Dato) : 0); })
-            .attr("y", function(d) { return y(d.dati.Regione); })
+            .attr("width", function(d) { return ((x(d.Dato) > 0) ? x(d.Dato) : 0); })
+            .attr("y", function(d) { return y(d.Regione); })
             .attr("x", "1")
             .attr("height", y.rangeBand())
             .on("mouseover", mouseover)
-            .on("mouseout", mouseout);
+            .on("mouseout", mouseout)
+            .on("click", clicked);
+*/
 
 
         return chart
@@ -218,21 +268,18 @@ function BarChart(selector) {
         color = _;
         return chart;
     };
-    chart.year = function(_) {
-        if (!arguments.length) return year;
-        year = _;
+    chart.color_hover = function(_) {
+        if (!arguments.length) return color_hover;
+        color_hover = _;
         return chart;
     };
-    chart.metric = function(_) {
-        if (!arguments.length) return metric;
-        metric = _;
+
+    chart.color_selected = function(_) {
+        if (!arguments.length) return color_selected;
+        color_selected = _;
         return chart;
     };
-    chart.text_art = function(_) {
-        if (!arguments.length) return text_art;
-        text_art = _;
-        return chart;
-    };
+
     chart.mouseover = function(_) {
         if (!arguments.length) return mouseover;
         mouseover = _;
@@ -246,6 +293,12 @@ function BarChart(selector) {
     chart.clicked = function(_) {
         if (!arguments.length) return clicked;
         clicked = _;
+        return chart;
+    };
+
+    chart.event_listner = function(_) {
+        if (!arguments.length) return event_listner;
+        event_listner = _;
         return chart;
     };
     chart.data = function(_) {
@@ -270,9 +323,13 @@ function TimeBarChart(selector) {
         x_label = null,
         y_label = null,
         interpolate = false
-        mouseover = function(d) { d3.select(this).style('fill', '#cacaca');}
+        color = 'url(#svgGradient2)',
+        color_selected = '#464647',
+        color_hover = '#CACACA',
+        event_listner = {},
+        mouseover = function(d) { d3.select(this).style('fill', color_hover);}
         mouseout = function(d) { d3.select(this).style("fill",
-            function(d){ return d3.select(this).classed('selected') ? "#464647" : "url(#svgGradient2)"});};
+            function(d){ return d3.select(this).classed('selected') ? color_selected : color});};
 
 
     var addGradient = function(svg){
@@ -327,14 +384,7 @@ function TimeBarChart(selector) {
     }
 
     var clicked = function(d){
-        var sel = d3.select(this);
-        resetElement(d3.selectAll(selector + " .bar"));
-        sel.style("fill", "#464647");
-        sel.classed("selected", true);
-        var anno = this.id.slice(1  , )
-        var dataset = get_dataset_and_map_geo(myData, features, data[0].Indicatore, anno)
-            Bar.data(dataset).update();
-            Italy.features(dataset).update();
+        event_listner.anno = d.Anno;
     }
 
 
@@ -370,8 +420,9 @@ function TimeBarChart(selector) {
             .attr("stroke-width","0.7")
             .attr("stroke","#000")
             .attr("class", "chart-title")
-            .attr("text-anchor", "middle")
-            .attr("transform", "translate(" + (margin.left+margin.right) + "," + (-margin.top/2) + ")") // centre below axis
+            .attr("text-anchor", "left")
+            //.attr("transform", "translate(" + (margin.left+margin.right*2) + "," + (-margin.top/2) + ")") // centre below axis
+            .attr("transform", "translate(" + (margin.left) + "," + (-margin.top/2) + ")") // centre below axis
             .text(data[0].Territorio)
 
 
@@ -418,7 +469,7 @@ function TimeBarChart(selector) {
                 .attr("id", function(d){ return "y"+ d.Anno })
                 .attr("y", y(min))
                 .attr("height", height - y(min))
-                .style("fill", "url(#svgGradient2)")
+                .style("fill", color)
                 .on("mouseover", mouseover)
                 .on("mouseout", mouseout)
                 .on("click", clicked);
@@ -474,6 +525,20 @@ function TimeBarChart(selector) {
         color = _;
         return chart;
     };
+
+    chart.color_hover = function(_) {
+        if (!arguments.length) return color_hover;
+        color_hover = _;
+        return chart;
+    };
+
+    chart.color_selected = function(_) {
+        if (!arguments.length) return color_selected;
+        color_selected = _;
+        return chart;
+    };
+
+
     chart.data = function(_) {
         if (!arguments.length) return data;
         data = _;
@@ -512,6 +577,14 @@ function TimeBarChart(selector) {
         return chart;
     };
 
+
+    chart.event_listner = function(_) {
+        if (!arguments.length) return event_listner;
+        event_listner = _;
+        return chart;
+    };
+
+
     return chart
 }
 
@@ -544,7 +617,7 @@ function selectYearTimeChart(anno){
     d3.select('#timechart rect#y'+anno).style('fill', '#464647').classed("selected", true)
 }
 
-function resetElement(selected_elements){
+function resetElement(selected_elements, color){
     selected_elements.classed("selected", false);
-    selected_elements.style("fill", "url(#svgGradient2)");
+    selected_elements.style("fill", color);
 }

@@ -2,17 +2,17 @@ function ItalyMap(selector){
     var width = $(selector).width(),
     height = width-50,
     centered,
-    geo_data = [],
     year = 2015,
     metric = "PIL",
     text_art = false,
-    features = [],
+    data = [],
     indicatore,
     tema,
     anno,
     mouseover,
     mouseout,
-    clicked;
+    clicked,
+    event_listner;
 
     var color = d3.scale.linear()
       .clamp(true)
@@ -46,23 +46,17 @@ function ItalyMap(selector){
 
     function chart(){
 
-        // Get province name
         function nameFn(d){
           return d && d.properties ? d.properties.name : null;
         }
 
-        // Get province name length
         function nameLength(d){
           var n = nameFn(d);
           return n ? n.length : 0;
         }
 
-        // Get province color
         function fillFn(d){
-          //console.log(d.dati.Dato, d.dati.Regione)
-          return color(d.dati.Dato)
-
-          //return color(nameLength(d));
+          return color(d.Dato)
         }
 
         // When clicked, zoom in
@@ -85,25 +79,27 @@ function ItalyMap(selector){
 
           // Highlight the clicked province
           mapLayer.selectAll('path')
-            .style('fill', function(d){return centered && d===centered ? '#D5708B' : fillFn(d);});
+            .style('fill', function(d){return centered && d===centered ? '#464647' : fillFn(d);});
 
           // Zoom
           g.transition()
             .duration(750)
             .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')scale(' + k + ')translate(' + -x + ',' + -y + ')');
+
+          event_listner.regione = this.id;
         }
 
         var mouseover = function(d){
 
           d3.select(this).style('fill', '#cacaca');
           var regione = this.id
-          TimeBar.data(myData.filter(function(d){ return d.Regione == regione && d.Indicatore == indicatore })).update();
+          //TimeBar.data(myData.filter(function(d){ return d.Regione == regione && d.Indicatore == indicatore })).update();
         }
 
 
         var mouseout = function(d){
           mapLayer.selectAll('path')
-            .style('fill', function(d){return centered && d===centered ? '#D5708B' : fillFn(d);});
+            .style('fill', function(d){return centered && d===centered ? '#464647' : fillFn(d);});
         }
 
 
@@ -132,19 +128,19 @@ function ItalyMap(selector){
 
 
 
-        max = d3.max(features, function(d){ return d.dati.Dato })
-        min = d3.min(features, function(d){ return d.dati.Dato })
-        avg = d3.sum(features, function(d){ return d.dati.Dato })/features.length
+        var max = d3.max(data, function(d){ return d.Dato })
+        var min = d3.min(data, function(d){ return d.Dato })
+        var avg = d3.sum(data, function(d){ return d.Dato })/data.length
 
         color.domain([min, avg ,max]);
 
 
         // Draw each province as a path
         mapLayer.selectAll('path')
-          .data(features)
+          .data(data)
         .enter().append('path')
           .attr('d', path)
-          .attr('id', function(d){return d.dati.Regione })
+          .attr('id', function(d){return d.properties.name })
           .attr('vector-effect', 'non-scaling-stroke')
           .style('fill', fillFn)
           .on('mouseover', mouseover)
@@ -152,12 +148,11 @@ function ItalyMap(selector){
           .on('click', clicked);
 
         chart.update = function(){
-            var max = d3.max(features, function(d){ return d.dati.Dato })
-            var min = d3.min(features, function(d){ console.log(d.dati.Dato); return d.dati.Dato })
-            avg = d3.sum(features, function(d){ return d.dati.Dato })/features.length
+            var max = d3.max(data, function(d){ return d.Dato })
+            var min = d3.min(data, function(d){ return d.Dato })
+            var avg = d3.sum(data, function(d){ return d.Dato })/data.length
 
             color.domain([min+(min-max)*5/100,avg, max]);
-            console.log(color.domain())
             mapLayer.selectAll('path')
                  .transition()
                  .duration(1000)
@@ -215,17 +210,11 @@ function ItalyMap(selector){
             clicked = _;
             return chart;
     };
-    chart.features = function(_) {
-        if (!arguments.length) return features;
-            features = _;
+    chart.data = function(_) {
+        if (!arguments.length) return data;
+            data = _;
             return chart;
     };
-    chart.geo_data = function(_) {
-        if (!arguments.length) return geo_data;
-            geo_data = _;
-            return chart;
-    };
-
     chart.anno = function(_) {
       if (!arguments.length) return anno;
         anno = _;
@@ -236,6 +225,11 @@ function ItalyMap(selector){
         if (!arguments.length) return indicatore;
             indicatore = _;
             return chart;
+    };
+    chart.event_listner = function(_) {
+      if (!arguments.length) return event_listner;
+        event_listner = _;
+        return chart;
     };
     return chart
 }
