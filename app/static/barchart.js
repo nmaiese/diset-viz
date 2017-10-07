@@ -122,18 +122,16 @@ function BarChart(selector) {
         var mouseover = function(d) {
             svg.append("text")
                 .attr("class", "hover-value")
-                .attr("transform", "translate(" + ((x(d.Dato) < width - 30 - d.Dato.toString().length * 3.0) ? (x(d.Dato) + 10) : x(d.Dato) - 30 - formatValue(d, udm).toString().length * 4.5) + "," +
-                    (y(d.Regione) + y.rangeBand() / 1.4) + ")")
-                .text(formatValue(d.Dato, d.UDM))
+                .attr("transform", "translate(" + ((x(d.Dato) < width - 30 - d.Dato.toString().length * 3.0) ? (x(d.Dato) + 15) : x(d.Dato) - 30 - formatUDM(d, udm).toString().length * 4.5) + "," +
+                    (y(d.Regione) + y.rangeBand() / 1.3) + ")")
+                .text(formatUDM(d.Dato, d.UDM))
             d3.select(this).style("fill", color_hover);
         }
 
 
 
         var mouseout = function(d) {
-            d3.selectAll("line").remove()
-            d3.selectAll("text.hover-value").remove()
-            d3.select("path#" + d.Regione).style("fill", function(d) { return Italy.color()(d.Dato) });
+            svg.select("text.hover-value").remove()
             d3.select(this).style("fill", function(d){
                 return d3.select(this).classed('selected') ? color_selected : color
             });
@@ -317,19 +315,17 @@ function TimeBarChart(selector) {
     var width = $(selector).width(),
         height = 400,
         data = [],
-        margin = { top: 30, right: 20, bottom: 20, left: 100 }
+        margin = { top: 60, right: 20, bottom: 20, left: 100 },
         sorting = null,
         x_label = null,
         y_label = null,
-        interpolate = false
+        interpolate = false,
         color = 'url(#svgGradient2)',
         color_selected = '#464647',
         color_hover = '#CACACA',
         event_listner = {},
-        mouseover = function(d) { d3.select(this).style('fill', color_hover);}
-        mouseout = function(d) { d3.select(this).style("fill",
-            function(d){ return d3.select(this).classed('selected') ? color_selected : color});};
-
+        mouseover,
+        mouseout;
 
     var addGradient = function(svg){
 
@@ -419,11 +415,26 @@ function TimeBarChart(selector) {
             .attr("stroke-width","0.7")
             .attr("stroke","#000")
             .attr("class", "chart-title")
-            .attr("text-anchor", "left")
+            .attr("text-anchor", "bottom")
             //.attr("transform", "translate(" + (margin.left+margin.right*2) + "," + (-margin.top/2) + ")") // centre below axis
-            .attr("transform", "translate(" + (margin.left) + "," + (-margin.top/2) + ")") // centre below axis
+            .attr("transform", "translate(" + (18) + "," + (-margin.top*4/5) + ")") // centre below axis
             .text(data[0].Territorio)
 
+
+        mouseover = function(d) {
+                d3.select(this).style('fill', color_hover);
+                svg.append("text")
+                .attr("class", "hover-value")
+                .attr("transform", "translate(" + (x(d.Anno)+(x.rangeBand()/2)-d.Dato.toString().length/2) + "," + (y(d.Dato)-20)+ ")")
+                .text(formatUDM(d.Dato, d.UDM))
+        }
+
+
+
+        mouseout = function(d) {
+            d3.select(this).style("fill", color)
+            svg.select("text.hover-value").remove()
+        }
 
         chart.update = function() {
 
@@ -478,7 +489,7 @@ function TimeBarChart(selector) {
                 .duration(1000).attr("x", function(d) { return x(d.Anno); })
                 .attr("width", x.rangeBand())
                 .attr("y", function(d) { return y(d.Dato); })
-                .attr("height", function(d) { return height - y(d.Dato)-1; });
+                .attr("height", function(d) { return ((height - y(d.Dato)-1) >= 0) ? height - y(d.Dato)-1 : 0; });
 
 
             if(interpolate){
@@ -594,10 +605,10 @@ function formatUDM(d, udm){
         return it_locale.numberFormat(".2f")(d)+"%"
     }
     else if(udm.indexOf('milioni di euro') != -1){
-        return it_locale.numberFormat(",")(d) + " M €"
+        return it_locale.numberFormat(",.0f")(d) + " M €"
     }
     else if(udm.indexOf('migliaia di euro') != -1){
-        return it_locale.numberFormat(",")(d) + " K €"
+        return it_locale.numberFormat(",.0f")(d) + " K €"
     }
     else if(udm.indexOf('euro') != -1){
         return it_locale.numberFormat(",.2f")(d) + " €"

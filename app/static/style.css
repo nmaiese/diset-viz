@@ -138,7 +138,7 @@ span#select2-tema-dropdown-container {
 }
 
 
-button#play {
+button.istat {
     background: rgba(121, 231, 121, 0.80);
     color: #515151;
     border: none;

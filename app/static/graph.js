@@ -101,28 +101,6 @@ function create_green_dropdown(selector, item_list, selected){
 }
 
 
-function formatValue(d, udm){
-    if(udm.indexOf('percentuali') != -1){
-        return it_locale.numberFormat(".2f")(d)+"%"
-    }
-    else if(udm.indexOf('milioni di euro') != -1){
-        return it_locale.numberFormat(",")(d) + " M €"
-    }
-    else if(udm.indexOf('migliaia di euro') != -1){
-        return it_locale.numberFormat(",")(d) + " K €"
-    }
-    else if(udm.indexOf('euro') != -1){
-        return it_locale.numberFormat(",.2f")(d) + " €"
-    }
-    else if (udm.indexOf('numero') != -1)
-        { return it_locale.numberFormat(",")(d) }
-
-    else { return it_locale.numberFormat(",.2f")(d) }
-
-}
-
-
-
 function selectDataset(data, tema=false, indicatore=false, anno=false, regione=false){
     data = ((tema) ? data.filter(function(d){return d.Tema == tema}) : data)
     data = ((indicatore) ? data.filter(function(d){return d.Indicatore == indicatore}) : data)
@@ -198,6 +176,17 @@ d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
                 updateInfo(data_charts.region);
             }
 
+            function randomize_all(){
+                params = getRandomParams(data);
+                create_green_select2('#tema-dropdown', params.temi, params.tema, search=true, myclass='metric');
+                delete_green_select2('#metric-dropdown');
+                create_green_select2('#metric-dropdown', params.indicatori, params.indicatore, search=true, myclass='metric');
+                delete_green_select2('#year-dropdown');
+                create_green_select2('#year-dropdown', params.anni, params.anno);
+                apply_dropown();
+
+            }
+
             create_green_select2('#tema-dropdown', params.temi, params.tema, search=true, myclass='metric');
             create_green_select2('#metric-dropdown', params.indicatori, params.indicatore, search=true, myclass='metric');
             create_green_select2('#year-dropdown', params.anni, params.anno, search=false, myclass='year');
@@ -247,13 +236,22 @@ d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
                     return year
                 }
 
-                $("#play").html("<i class='fa fa-space-shuttle faa-passing animated'></i>").attr('disabled', 'disabled')
+                $("#play").html("<i class='fa fa-space-shuttle faa-passing animated'></i>").attr('disabled', 'disabled');
                 var year = params.anni[0];
                 year = showDataOverYear(year);
                 var playInterval = setInterval(function() {
                     year = showDataOverYear(year);
                 }, 2000);
             })
+            $('#random').on('click', function(d) {
+                randomize_all();
+                var btn = $(this);
+                btn.attr('disabled', 'disabled');
+                var disableClick = setTimeout(function(){
+                    $(btn).removeAttr('disabled');
+                }, 1000);
+            });
+
         });
     })
 })
