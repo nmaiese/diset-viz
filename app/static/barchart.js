@@ -438,7 +438,10 @@ function TimeBarChart(selector) {
 
         chart.update = function() {
 
-            data.sort(sorting)
+            data.sort(function(x, y) {
+                return d3.descending(x.Dato, y.Dato);
+            });
+
 
             var max = d3.max(data, function(d) { return d.Dato })
             var min = d3.min(data, function(d) { return d.Dato })

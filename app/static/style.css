@@ -1,5 +1,5 @@
 body { 
-
+  height: 100%;
   font-size: 12px;
   font-family: 'Mukta', sans-serif !important;
   background-color: #eee;
@@ -173,3 +173,5 @@ button.istat {
 #timechart .bar .selected { 
   fill: "#464647";
 }
+
+
