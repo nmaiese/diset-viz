@@ -118,6 +118,7 @@ function formatValue(d, udm){
         { return it_locale.numberFormat(",")(d) }
 
     else { return it_locale.numberFormat(",.2f")(d) }
+
 }
 
 

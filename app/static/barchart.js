@@ -124,8 +124,7 @@ function BarChart(selector) {
                 .attr("class", "hover-value")
                 .attr("transform", "translate(" + ((x(d.Dato) < width - 30 - d.Dato.toString().length * 3.0) ? (x(d.Dato) + 10) : x(d.Dato) - 30 - formatValue(d, udm).toString().length * 4.5) + "," +
                     (y(d.Regione) + y.rangeBand() / 1.4) + ")")
-                .text(formatValue(d.Dato, udm))
-
+                .text(formatValue(d.Dato, d.UDM))
             d3.select(this).style("fill", color_hover);
         }
 
