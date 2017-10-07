@@ -61,7 +61,7 @@ function ItalyMap(selector){
 
         // When clicked, zoom in
         var clicked = function(d) {
-          var x, y, k;
+/*          var x, y, k;
 
           // Compute centroid of the selected path
           if (d && centered !== d) {
@@ -85,7 +85,7 @@ function ItalyMap(selector){
           g.transition()
             .duration(750)
             .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')scale(' + k + ')translate(' + -x + ',' + -y + ')');
-
+*/
           event_listner.regione = this.id;
         }
 

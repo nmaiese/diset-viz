@@ -57,11 +57,14 @@ fiscale. Un progetto realizzato in D3.js"/>
 <div class="container">
     <div class="row bottom-buffer">
       <div class="col-md-12 text-center">
-
+            <div class="col-md-4">
             <select class="tema" id="tema-dropdown" style="width: 100%;"> </select>
-            <div class="row" style="margin-bottom: 20px;"></div>
+            </div>
+            <!-- <div class="row" style="margin-bottom: 20px;"></div> -->
+            <div class="col-md-8">
             <select class="metric" id="metric-dropdown" style="width: 100%;">
             </select>
+            </div>
             <div class="row" style="margin-bottom: 20px;"></div>
             <b>Fonte</b>: <span id="fonte"></span><br>
             <b>Unità di misura</b>: <span id="udm"></span><br>
@@ -70,7 +73,6 @@ fiscale. Un progetto realizzato in D3.js"/>
             <b>Anno</b>:
             <select class="year" id="year-dropdown" style="width: 120px;">
             </select>
-
             <button class="btn btn-success istat" type="button" id="play"> <span class="glyphicon glyphicon-play-circle"></span> Play
             </button>
 
@@ -82,13 +84,8 @@ fiscale. Un progetto realizzato in D3.js"/>
 
   <div class="row">
     <div class="col-md-5">
-      <div class="col-md-12">
         <div id="timechart"></div>
-      </div>
-      <div class="col-md-12">
         <div class="panel-body" id="barchart"></div>
-      </div>
-
     </div>
     <div class="col-md-7">
       <div id="map"></div>
