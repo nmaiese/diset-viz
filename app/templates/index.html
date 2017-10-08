@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-<title>Disuguaglianze, distribuzione della ricchezza e delle risorse finanziarie</title>
-<meta property="og:image" content="static/italy.png" />
-<meta name="twitter:card" content="summary" />
-<meta name="twitter:image" content="static/img/italy.png" />
-<meta name="description" content="Commissione parlamentare per l’attuazione del federalismo
-fiscale. Un progetto realizzato in D3.js"/>
-<link rel="stylesheet" href="static/css/bootstrap.min.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">>
-<link rel="stylesheet" type="text/css"
-  href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}"/>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome-animation.min.css') }}"/>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/select2.min.css') }}"/>
-<link href="https://fonts.googleapis.com/css?family=Mukta:300,400,500,600,700" rel="stylesheet">
-<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Disuguaglianze, distribuzione della ricchezza e delle risorse finanziarie</title>
+  <meta property="og:image" content="static/italy.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:image" content="static/img/italy.png" />
+  <meta name="description" content="Commissione parlamentare per l’attuazione del federalismo
+  fiscale. Un progetto realizzato in D3.js"/>
+  <link rel="stylesheet" href="static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome-animation.min.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/select2.min.css') }}" />
+  <link href="https://fonts.googleapis.com/css?family=Mukta:300,400,500,600,700" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
 
 </head>
 
@@ -116,8 +115,12 @@ fiscale. Un progetto realizzato in D3.js"/>
 <script type="text/javascript">
 
 d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
-      data = {{ data|safe }}
-      draw_charts(map_data, data)
+      d3.json("/data", function(errorb, data){
+
+        draw_charts(map_data, data)
+
+
+      })
 
 //    var ssv = d3.dsv(";", "text/plain");
 //    ssv('static/data/Assoluti_Regione.csv', function(errorb, data) {
