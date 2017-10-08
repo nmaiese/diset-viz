@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template
-
+import csv, io, os
 
 @app.route('/hello')
 def index():
@@ -8,5 +8,9 @@ def index():
 
 @app.route("/")
 def main():
-    return render_template('index.html')
+
+    filepath = os.path.join(os.path.dirname(__file__),'static/data/Assoluti_Regione.csv')
+    with io.open(filepath, 'rb') as f:
+        reader = csv.DictReader(f, delimiter=";")
+        return render_template('index.html', data=list(reader))
 

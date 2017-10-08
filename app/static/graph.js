@@ -144,9 +144,7 @@ function updateInfo(data){
     d3.select("span#archivio").text(archivio)
 }
 
-d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
-    var ssv = d3.dsv(";", "text/plain");
-    ssv('static/data/Assoluti_Regione.csv', function(errorb, data) {
+function draw_charts(map_data, data){
 
         data = format_data(data);
         map_data = format_geo_data(map_data);
@@ -253,7 +251,7 @@ d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
             });
 
         });
-    })
-})
+    }
+//})
 
 
