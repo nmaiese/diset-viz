@@ -7,17 +7,23 @@ from flask.json import jsonify
 import csv, os
 
 
-@cache.cached(300, key_prefix='data')
+
+@cache.memoize(timeout=100)
+def get_all_data():
+    filepath = os.path.join(os.path.dirname(__file__),'static/data/Assoluti_Regione.csv')
+    with open(filepath, 'r', encoding='utf8') as f:
+        reader = csv.DictReader(f, delimiter=";")
+        data = list(reader)
+    return data
+
+@cache.memoize(timeout=100)
 @app.route("/data")
 def data():
-    filepath = os.path.join(os.path.dirname(__file__),'static/data/Assoluti_Regione.csv')
-    with open(filepath, 'r', encoding='ISO-8859-1') as f:
-        reader = csv.DictReader(f, delimiter=";")
-        #data = [dict(x) for x in reader]
-        return jsonify(list(reader))
+    data = get_all_data()
+    return jsonify(data)
 
 
-@cache.cached(300, key_prefix='index')
+@cache.cached(timeout=300)
 @app.route("/")
 def main():
     return render_template('index.html')

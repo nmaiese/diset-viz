@@ -30,6 +30,25 @@ Array.prototype.unique = function() {
 };
 
 
+function titleCase(str) {
+     str = str.replace(/-/g, ' ')
+     if(str=="valle d aosta"){
+      return "Valle d'Aosta"
+     }
+     else{
+       str = str.toLowerCase().split(' ');
+       for(var i = 0; i < str.length; i++){
+            str[i] = str[i].split('');
+            str[i][0] = str[i][0].toUpperCase();
+            str[i] = str[i].join('');
+       }
+       return str.join(' ');
+     }
+}
+
+
+
+
 
 function replace_missing_value(data, regione){
     if (data.map(function(d){return d.Regione }).indexOf(regione)==-1){
