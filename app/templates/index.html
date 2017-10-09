@@ -16,9 +16,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
 
+
 </head>
 
 <body>
+
+
   <nav class="navbar navbar-inverse navbar-top">
     <div class="container">
       <div class="navbar-header">
@@ -53,6 +56,15 @@
     <br><i>Roma, 26 luglio 2017</i></p><p><a class="btn btn-success btn-lg" target="_blank" href="https://www.istat.it/it/archivio/202790" role="button">Vai alla fonte &raquo;</a></p>
   </div>
 </div> -->
+
+<div id="loading" class="se-pre-con">
+  <div class="content">
+    <img src="{{ url_for('static', filename='img/Forrest_T.gif') }}" />
+    <p> attendere...</p>
+  </div>
+</div>
+
+
 
 <div class="container">
     <div class="row bottom-buffer">
@@ -109,17 +121,31 @@
 <script src="static/barchart.js"></script>
 <script src="static/controllers.js"></script>
 <script src="static/graph.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.2/modernizr.js"></script>
+
+<script type="text/javascript">
+
+</script>
 
 
 <script type="text/javascript">
 
 
+
+
 d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
       d3.json("/data", function(errorb, data){
         draw_charts(map_data, data)
+        //remove spinner loader
+        $(".se-pre-con").fadeOut("slow")
       })
 })
+
 </script>
+
+
+
+
 </body>
 </html>
 
