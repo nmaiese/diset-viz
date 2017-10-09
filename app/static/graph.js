@@ -95,7 +95,7 @@ function create_green_select2(selector, item_list, selected, search=true, myclas
         containerCssClass: myclass,
         dropdownCssClass: myclass,
     });
-    $(selector).select2("val",item_list.indexOf(selected).toString())
+    $(selector).val(item_list.indexOf(selected)).trigger("change");
 
     if (!search){ $(selector).select2({minimumResultsForSearch: Infinity}) }
 }
@@ -161,7 +161,6 @@ function draw_charts(map_data, data){
         map_data = format_geo_data(map_data);
 
         params = getRandomParams(data);
-        console.log(params)
 
         var data_subset = get_data_subset(data, params);
         var data_charts = get_data_for_chart(data_subset, map_data, params);
@@ -218,9 +217,8 @@ function draw_charts(map_data, data){
                 updateInfo(data_charts.region);
             }
 
-            function randomize_all(data, params){
-                params = getRandomParams(data);
-                console.log(params)
+            function randomize_all(data){
+                var params = getRandomParams(data);
                 create_green_select2('#tema-dropdown', params.temi, params.tema, search=true, myclass='metric');
                 delete_green_select2('#metric-dropdown');
                 create_green_select2('#metric-dropdown', params.indicatori, params.indicatore, search=true, myclass='metric');
@@ -265,7 +263,7 @@ function draw_charts(map_data, data){
 
 
             $('#random').on('click', function(d) {
-                params = randomize_all(data, params);
+                params = randomize_all(data);
                 var btn = $(this);
                 btn.attr('disabled', 'disabled');
                 $('#year-dropdown').attr('disabled', 'disabled');
