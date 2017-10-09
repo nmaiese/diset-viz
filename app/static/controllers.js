@@ -90,6 +90,7 @@ function add_filter_event_listner(Charts, data, geo_data, params){
         set anno(value) {
             this._anno = value;
             params.anno = value;
+            console.log(params)
             var charts_dataset = get_data_for_chart(data, geo_data, params);
             update_charts(charts_dataset, Charts.Italy, Charts.RegionChart, Charts.YearChart);
             //selectCharts(params);
@@ -100,6 +101,7 @@ function add_filter_event_listner(Charts, data, geo_data, params){
         set regione(value) {
             this._regione = value;
             params.regione = value;
+            console.log(params)
             var charts_dataset = get_data_for_chart(data, geo_data, params);
             update_charts(charts_dataset, Charts.Italy, Charts.RegionChart, Charts.YearChart);
             //selectCharts(params);

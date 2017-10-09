@@ -446,7 +446,8 @@ function TimeBarChart(selector) {
             var max = d3.max(data, function(d) { return d.Dato })
             var min = d3.min(data, function(d) { return d.Dato })
 
-            min = min - (max-min)/2
+            min = (max == min) ? 0 : min - (max-min)/2;
+
 
             d_anni = data.map(function(d){return d.Anno})
 

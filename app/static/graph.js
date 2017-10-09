@@ -120,38 +120,30 @@ function create_green_dropdown(selector, item_list, selected){
 }
 
 
-function selectDataset(data, tema=false, indicatore=false, anno=false, regione=false){
-    data = ((tema) ? data.filter(function(d){return d.Tema == tema}) : data)
-    data = ((indicatore) ? data.filter(function(d){return d.Indicatore == indicatore}) : data)
-    data = ((anno) ? data.filter(function(d){return d.Anno == anno}) : data)
-    data = ((regione) ? data.filter(function(d){return d.Regione == regione}) : data)
-    return data
-}
-
-
-
 function getRandomParams(data, tema=null, indicatore=null, regione=null, anno=null){
-
-    var regioni = d3.set(data.map(function(f){return f.Regione })).values()
-    regione = ((!regione) ? getRandomValue(regioni) : regione)
 
     var temi = d3.set(data.map(function(f){return f.Tema })).values()
     tema = ((!tema) ? getRandomValue(temi) : tema)
 
-    data = selectDataset(data, tema=tema)
-    var indicatori = d3.set(data.map(function(f){return f.Indicatore })).values()
+    var filtred_data = data.filter(function(f){return f.Tema == tema; })
 
+    var indicatori = d3.set(filtred_data.map(function(f){return f.Indicatore })).values()
     indicatore = ((!indicatore) ? getRandomValue(indicatori) : indicatore)
 
-    data = selectDataset(data, false, indicatore)
+    filtred_data = data.filter(function(f){return f.Tema == tema && f.Indicatore == indicatore; })
 
-    var anni = d3.set(data.map(function(f){return f.Anno })).values()
+    var regioni = d3.set(filtred_data.map(function(f){return f.Regione })).values()
+    regione = ((!regione) ? getRandomValue(regioni) : regione)
+
+    var anni = d3.set(filtred_data.map(function(f){return f.Anno })).values()
     anno = ((!anno) ? getRandomValue(anni) : anno)
 
     return { 'tema': tema, 'temi':temi, 'indicatore': indicatore,
             'anno': anno, 'regione': regione, 'regioni': regioni,
             'indicatori': indicatori, 'anni':anni };
 }
+
+
 
 function updateInfo(data){
     var fonte = data[0].Fonte
@@ -169,10 +161,12 @@ function draw_charts(map_data, data){
         map_data = format_geo_data(map_data);
 
         params = getRandomParams(data);
+        console.log(params)
 
         var data_subset = get_data_subset(data, params);
         var data_charts = get_data_for_chart(data_subset, map_data, params);
 
+        myData = data;
         Data = data_charts;
         Geo = map_data;
 
@@ -183,9 +177,40 @@ function draw_charts(map_data, data){
 
         $(function() {
 
+            // $('#play').on('click', function(d) {
+
+            //     function showDataOverYear(index, anni){
+            //         if (index == anni.length-1) {
+            //             clearInterval(playInterval)
+            //             $("#play").html("<span class='glyphicon glyphicon-play-circle'></span> Play").removeAttr("disabled");
+            //             $('#random').removeAttr('disabled');
+            //             $('#year-dropdown').removeAttr('disabled');
+            //             $('#metric-dropdown').removeAttr('disabled');
+            //             $('#tema-dropdown').removeAttr('disabled');
+            //         }
+            //         my_lst.anno = anni[index];
+            //         create_green_select2('#year-dropdown', anni, anni[index].toString());
+            //         index++;
+            //         return index;
+            //     }
+
+            //     $("#play").html("<i class='fa fa-space-shuttle faa-passing animated'></i>").attr('disabled', 'disabled');
+            //     $('#random').attr('disabled', 'disabled');
+            //     $('#year-dropdown').attr('disabled', 'disabled');
+            //     $('#metric-dropdown').attr('disabled', 'disabled');
+            //     $('#tema-dropdown').attr('disabled', 'disabled');
+            //     var anni = params.anni;
+            //     var index = 0;
+            //     showDataOverYear(index, anni);
+            //     var playInterval = setInterval(function() {
+            //         index = showDataOverYear(index, anni);
+            //     }, 2000);
+            // })
+
+
             $('#indicatore').text(params.tema);
 
-            function apply_dropown(){
+            function apply_dropown(data, params){
                 var data_subset = get_data_subset(data, params);
                 var data_charts = get_data_for_chart(data_subset, map_data, params);
                 var my_lst = add_filter_event_listner(Charts, data_subset, map_data, params);
@@ -193,15 +218,16 @@ function draw_charts(map_data, data){
                 updateInfo(data_charts.region);
             }
 
-            function randomize_all(){
+            function randomize_all(data, params){
                 params = getRandomParams(data);
+                console.log(params)
                 create_green_select2('#tema-dropdown', params.temi, params.tema, search=true, myclass='metric');
                 delete_green_select2('#metric-dropdown');
                 create_green_select2('#metric-dropdown', params.indicatori, params.indicatore, search=true, myclass='metric');
                 delete_green_select2('#year-dropdown');
                 create_green_select2('#year-dropdown', params.anni, params.anno);
-                apply_dropown();
-
+                apply_dropown(data, params);
+                return params
             }
 
             create_green_select2('#tema-dropdown', params.temi, params.tema, search=true, myclass='metric');
@@ -210,14 +236,12 @@ function draw_charts(map_data, data){
 
             $("#tema-dropdown").on("select2:select", function (e) {
                 var tema = e.params.data.text;
-                console.log(params.tema, tema)
                 params = getRandomParams(data, tema=tema, indicatore=null, regione=params.regione);
-                console.log(params.tema)
                 delete_green_select2('#metric-dropdown');
-
                 create_green_select2('#metric-dropdown', params.indicatori, params.indicatore, search=true, myclass='metric');
-
-                apply_dropown();
+                delete_green_select2('#year-dropdown');
+                create_green_select2('#year-dropdown', params.anni, params.anno);
+                apply_dropown(data, params);
             });
 
             $("#metric-dropdown").on("select2:select", function (e) {
@@ -228,44 +252,31 @@ function draw_charts(map_data, data){
                 delete_green_select2('#year-dropdown');
                 create_green_select2('#year-dropdown', params.anni, params.anno);
 
-                apply_dropown();
+                apply_dropown(data, params);
 
             });
 
             $("#year-dropdown").on("select2:select", function (e) {
                 var anno = e.params.data.text
                 params = getRandomParams(data, tema=params.tema, indicatore=params.indicatore, regione=params.regione, anno=anno);
-                apply_dropown();
+                apply_dropown(data, params);
             });
 
 
 
-            $('#play').on('click', function(d) {
-
-                function showDataOverYear(year){
-                    if (year == params.anni[params.anni.length-1]) {
-                        clearInterval(playInterval)
-                        $("#play").html("<span class='glyphicon glyphicon-play-circle'></span> Play").removeAttr("disabled");
-                    }
-                    my_lst.anno = year;
-                    create_green_select2('#year-dropdown', params.anni, year.toString());
-                    year++
-                    return year
-                }
-
-                $("#play").html("<i class='fa fa-space-shuttle faa-passing animated'></i>").attr('disabled', 'disabled');
-                var year = params.anni[0];
-                year = showDataOverYear(year);
-                var playInterval = setInterval(function() {
-                    year = showDataOverYear(year);
-                }, 2000);
-            })
             $('#random').on('click', function(d) {
-                randomize_all();
+                params = randomize_all(data, params);
                 var btn = $(this);
                 btn.attr('disabled', 'disabled');
+                $('#year-dropdown').attr('disabled', 'disabled');
+                $('#metric-dropdown').attr('disabled', 'disabled');
+                $('#tema-dropdown').attr('disabled', 'disabled');
                 var disableClick = setTimeout(function(){
+                    $('#year-dropdown').removeAttr('disabled');
+                    $('#metric-dropdown').removeAttr('disabled');
+                    $('#tema-dropdown').removeAttr('disabled');
                     $(btn).removeAttr('disabled');
+
                 }, 1000);
             });
 
