@@ -34,9 +34,3 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'img/favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-
-@app.route('/google82b59e18493b4434.html')
-def gimage():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'img/google82b59e18493b4434.html')
-
