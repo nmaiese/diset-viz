@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TH3CV6L');
+</script>
+
+
   <title>DiSET Viz</title>
   <meta property="og:title" content="DiSET Viz" />
   <meta property="og:type" content="application" />
@@ -24,17 +32,6 @@
 
 <body>
 
-<!-- Global Site Tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-88531356-4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-88531356-4');
-</script>
-
-
   <nav class="navbar navbar-inverse navbar-top">
     <div class="container">
       <div class="navbar-header">
@@ -52,23 +49,15 @@
 
         </ul>
         <ul class="nav navbar-nav navbar-right">
+            <li><a href="http://aniellomaiese.it/" target="_blank">aniellomaiese.it</b>
             <li><a href="http://dati.italiaitalie.it/" target="_blank"> Fonte dati <b>DiSET</b>
             </a></li>
-            <li><a href="https://github.com/nmaiese/istatviz" target="_blank"><i class="fa fa-github fa-lg" aria-hidden="true"></i></a></li>
+            <li><a href="https://github.com/nmaiese/diset-viz" target="_blank"><i class="fa fa-github fa-lg" aria-hidden="true"></i></a></li>
             <li><a href="https://www.linkedin.com/in/aniellomaiese/" target="_blank"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
         </ul>
       </div><!--/.navbar-collapse -->
     </div>
   </nav>
-<!-- <div class="container">
-  <div class="jumbotron text-center">
-
-    <h2>Disuguaglianze, distribuzione della ricchezza e delle risorse finanziarie</h2>
-    <p>Commissione parlamentare per l’attuazione del federalismo fiscale<br>
-      Audizione del Presidente dell'Istituto nazionale di statistica Giorgio Alleva
-    <br><i>Roma, 26 luglio 2017</i></p><p><a class="btn btn-success btn-lg" target="_blank" href="https://www.istat.it/it/archivio/202790" role="button">Vai alla fonte &raquo;</a></p>
-  </div>
-</div> -->
 
 <div id="loading" class="se-pre-con">
   <div class="content">
@@ -126,8 +115,7 @@
 </div>
 
 <script src="static/js/jquery.min.js"></script>
-<!-- <script src="static/js/bootstrap.min.js"></script> -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="static/js/bootstrap.min.js"></script>
 <script src="static/js/d3.v3.min.js"></script>
 <script type="text/javascript" src="static/js/datatables.min.js"></script>
 <script type="text/javascript" src="static/js/select2.full.js"></script>
@@ -136,15 +124,8 @@
 <script src="static/controllers.js"></script>
 <script src="static/graph.js"></script>
 
-<script type="text/javascript">
-
-</script>
-
 
 <script type="text/javascript">
-
-
-
 
 d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
       d3.json("/data", function(errorb, data){
@@ -155,10 +136,6 @@ d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
 })
 
 </script>
-
-
-
-
 </body>
 </html>
 

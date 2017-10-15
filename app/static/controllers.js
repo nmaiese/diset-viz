@@ -114,5 +114,3 @@ function add_filter_event_listner(Charts, data, geo_data, params){
     return listner
 }
 
-
-
