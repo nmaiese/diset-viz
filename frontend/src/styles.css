@@ -445,7 +445,9 @@ h1, h2, h3 { font-family: var(--font-display); }
 
 /* ---------- Map ---------- */
 .map-wrap { display: grid; gap: 12px; }
-.italy-map { width: 100%; height: auto; display: block; }
+/* Cap the rendered height so the tall Italy shape doesn't push the rest of the
+   dashboard out of the viewport; width follows the aspect ratio and is centred. */
+.italy-map { display: block; margin: 0 auto; height: clamp(320px, 48vh, 500px); width: auto; max-width: 100%; }
 .italy-map path {
   stroke: rgba(21, 35, 59, 0.35);
   stroke-width: 1;

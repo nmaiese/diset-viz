@@ -633,16 +633,19 @@ function DataCard({ title, kicker, className, children }) {
 }
 
 function ItalyMap({ geo, values, selectedRegion, onSelect, unit }) {
-  const width = 680;
-  const height = 620;
+  const width = 560;
+  const height = 660;
   const valueByKey = useMemo(() => new Map(values.map((row) => [row.region_key, row])), [values]);
   const numericValues = values.map((row) => row.value).filter((value) => value !== null && Number.isFinite(value));
   const hasData = numericValues.length > 0;
   const min = hasData ? Math.min(...numericValues) : 0;
   const max = hasData ? Math.max(...numericValues) : 1;
   const color = d3.scaleSequential(MAP_RAMP).domain(min === max ? [min, min + 1] : [min, max]);
-  const projection = d3.geoMercator().scale(2500).center([12.5, 42.4]).translate([width / 2, height / 2]);
-  const path = d3.geoPath(projection);
+  // Fit the whole country to the viewBox so it is always centred and never clipped.
+  const path = useMemo(() => {
+    const projection = d3.geoMercator().fitExtent([[14, 14], [width - 14, height - 14]], geo);
+    return d3.geoPath(projection);
+  }, [geo]);
 
   return (
     <div className="map-wrap">
