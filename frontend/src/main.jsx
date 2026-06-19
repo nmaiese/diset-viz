@@ -81,7 +81,6 @@ function App() {
   useEffect(() => {
     if (initialPageView.current) {
       initialPageView.current = false;
-      trackPageView();
       return;
     }
     trackPageView();
