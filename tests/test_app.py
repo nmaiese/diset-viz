@@ -136,6 +136,9 @@ class AppSmokeTest(unittest.TestCase):
             loader_index = html.index("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
             self.assertLess(force_index, loader_index)
             self.assertIn("message.proceed(true)", html)
+            self.assertIn("window.__diUsesFundingChoicesCmp = true", html)
+            self.assertNotIn("gtag('consent', 'default'", html)
+            self.assertNotIn("window.diApplyGoogleConsent('denied')", html)
         finally:
             config.ADSENSE_CLIENT = original_client
             config.FORCE_FUNDING_CHOICES_CMP = original_force
