@@ -6,6 +6,7 @@ SITE_URL = os.getenv("SITE_URL", "https://divarioitalia.it").rstrip("/")
 GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "")
 ADSENSE_CLIENT = os.getenv("ADSENSE_CLIENT", "")
 ADSENSE_SLOT_BANNER = os.getenv("ADSENSE_SLOT_BANNER", "")
+FORCE_FUNDING_CHOICES_CMP = os.getenv("FORCE_FUNDING_CHOICES_CMP", "true").lower() == "true"
 GOOGLE_SITE_VERIFICATION = os.getenv("GOOGLE_SITE_VERIFICATION", "")
 BING_SITE_VERIFICATION = os.getenv("BING_SITE_VERIFICATION", "")
 

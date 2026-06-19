@@ -8,6 +8,15 @@
 <meta name="google-adsense-account" content="{{ ADSENSE_CLIENT }}">
 {% endif %}
 
+{% if ADSENSE_CLIENT and FORCE_FUNDING_CHOICES_CMP %}
+<script>
+  window.googlefc = window.googlefc || {};
+  googlefc.controlledMessagingFunction = function (message) {
+    message.proceed(true);
+  };
+</script>
+{% endif %}
+
 {% if GA_MEASUREMENT_ID or ADSENSE_CLIENT %}
 <script>
   window.dataLayer = window.dataLayer || [];
