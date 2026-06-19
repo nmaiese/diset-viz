@@ -70,6 +70,14 @@
 <script>
   gtag('js', new Date());
   gtag('config', '{{ GA_MEASUREMENT_ID }}', { anonymize_ip: true, send_page_view: false });
+  if (!window.__diSpaPageView && typeof window.diSendGoogleEvent === 'function') {
+    window.diSendGoogleEvent('page_view', {
+      page_location: window.location.href,
+      page_path: window.location.pathname + window.location.search,
+      page_title: document.title,
+      page_type: window.location.pathname.indexOf('/blog') === 0 ? 'blog' : 'server'
+    });
+  }
 </script>
 {% endif %}
 
