@@ -1043,10 +1043,12 @@ function formatCompact(value, unit = "") {
 
 function trackEvent(name, params = {}) {
   if (typeof window === "undefined") return;
+  const eventParams = buildAnalyticsParams(params);
+  pushDataLayerEvent(name, eventParams);
   if (typeof window.gtag === "function") {
-    window.gtag("event", name, params);
+    window.gtag("event", name, eventParams);
   }
-  trackInternalEvent(name, params);
+  trackInternalEvent(name, eventParams);
 }
 
 function trackPageView() {
@@ -1075,6 +1077,31 @@ function trackInternalEvent(name, params = {}) {
       credentials: "omit",
     }).catch(() => {});
   } catch (_) {}
+}
+
+function pushDataLayerEvent(name, params = {}) {
+  if (!Array.isArray(window.dataLayer)) return;
+  window.dataLayer.push({
+    event: name,
+    ...params,
+  });
+}
+
+function buildAnalyticsParams(params = {}) {
+  return {
+    page_type: currentPageType(),
+    page_path: `${window.location.pathname}${window.location.search}`,
+    page_title: document.title,
+    ...params,
+  };
+}
+
+function currentPageType() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("view") === "detail" || params.get("indicator")) return "indicator_detail";
+  if (window.location.pathname.startsWith("/blog")) return "blog";
+  if (window.location.pathname.startsWith("/legacy")) return "legacy";
+  return "atlas";
 }
 
 createRoot(document.getElementById("root")).render(<App />);
