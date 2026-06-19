@@ -120,6 +120,26 @@ class AppSmokeTest(unittest.TestCase):
         finally:
             config.ADSENSE_CLIENT = original_client
 
+    def test_funding_choices_force_script_precedes_adsense_loader(self):
+        from app import config
+
+        client = app.test_client()
+        original_client = config.ADSENSE_CLIENT
+        original_force = config.FORCE_FUNDING_CHOICES_CMP
+        try:
+            config.ADSENSE_CLIENT = "ca-pub-1234567890123456"
+            config.FORCE_FUNDING_CHOICES_CMP = True
+            home = client.get("/")
+            self.assertEqual(home.status_code, 200)
+            html = home.data.decode("utf-8")
+            force_index = html.index("googlefc.controlledMessagingFunction")
+            loader_index = html.index("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
+            self.assertLess(force_index, loader_index)
+            self.assertIn("message.proceed(true)", html)
+        finally:
+            config.ADSENSE_CLIENT = original_client
+            config.FORCE_FUNDING_CHOICES_CMP = original_force
+
     def test_internal_event_endpoint_accepts_anonymous_events(self):
         client = app.test_client()
 

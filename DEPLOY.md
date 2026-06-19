@@ -13,6 +13,7 @@ Sono variabili pubbliche, quindi non serve Secret Manager:
 | `GA_MEASUREMENT_ID` | `G-THTPZZ02QH` | Google Analytics 4 |
 | `ADSENSE_CLIENT` | `ca-pub-XXXXXXXXXXXXXXXX` | Google AdSense e `/ads.txt` |
 | `ADSENSE_SLOT_BANNER` | `1234567890` | Slot opzionale per banner futuri |
+| `FORCE_FUNDING_CHOICES_CMP` | `true` | Forza Funding Choices a procedere con il messaggio quando Google lo rende eleggibile |
 | `ENABLE_CONSENT_BANNER` | `true` | Banner consenso cookie |
 | `GOOGLE_SITE_VERIFICATION` | `...` | Verifica Search Console |
 | `BING_SITE_VERIFICATION` | `...` | Verifica Bing Webmaster Tools |
@@ -22,7 +23,7 @@ Impostale sul servizio Cloud Run con `--update-env-vars`, mai con
 
 ```bash
 gcloud run services update diset-viz --region europe-west1 \
-  --update-env-vars SITE_URL=https://divarioitalia.it,GA_MEASUREMENT_ID=G-THTPZZ02QH,ADSENSE_CLIENT=ca-pub-XXXXXXXXXXXXXXXX,ENABLE_CONSENT_BANNER=true
+  --update-env-vars SITE_URL=https://divarioitalia.it,GA_MEASUREMENT_ID=G-THTPZZ02QH,ADSENSE_CLIENT=ca-pub-XXXXXXXXXXXXXXXX,FORCE_FUNDING_CHOICES_CMP=true,ENABLE_CONSENT_BANNER=true
 ```
 
 ## Primo deploy
