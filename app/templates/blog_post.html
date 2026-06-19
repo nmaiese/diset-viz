@@ -1,0 +1,97 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'blog' %}
+{% set cover_abs = (site_url ~ post.cover) if post.cover else '' %}
+
+{% block title %}{{ post.title }} · {{ site_name }}{% endblock %}
+{% block description %}{{ post.description }}{% endblock %}
+
+{% block og %}
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ post.title }}">
+<meta property="og:description" content="{{ post.description }}">
+<meta property="og:url" content="{{ canonical }}">
+{% if cover_abs %}<meta property="og:image" content="{{ cover_abs }}">{% endif %}
+<meta property="article:published_time" content="{{ post.date.isoformat() }}">
+{% for tag in post.tags %}<meta property="article:tag" content="{{ tag }}">{% endfor %}
+{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": {{ post.title | tojson }},
+  "description": {{ post.description | tojson }},
+  {% if cover_abs %}"image": [{{ cover_abs | tojson }}],{% endif %}
+  "datePublished": "{{ post.date.isoformat() }}",
+  "dateModified": "{{ post.date.isoformat() }}",
+  "author": { "@type": "Organization", "name": {{ post.author | tojson }} },
+  "publisher": { "@type": "Organization", "name": {{ site_name | tojson }} },
+  "mainEntityOfPage": { "@type": "WebPage", "@id": {{ canonical | tojson }} },
+  "isAccessibleForFree": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Blog", "item": "{{ site_url }}/blog" },
+    { "@type": "ListItem", "position": 3, "name": {{ post.title | tojson }}, "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article>
+  <div class="prose-wrap article-hero">
+    <nav class="breadcrumb"><a href="/blog">Blog</a> / {% if post.tags %}{{ post.tags[0] }}{% else %}Articolo{% endif %}</nav>
+    <h1>{{ post.title }}</h1>
+    <div class="article-meta">
+      <span>{{ post.date.strftime('%d.%m.%Y') }}</span>
+      <span>{{ post.read_time }} min di lettura</span>
+      <span>{{ post.author }}</span>
+    </div>
+  </div>
+
+  {% if post.cover %}
+  <figure class="article-cover prose-wrap">
+    <img src="{{ post.cover }}" alt="{{ post.cover_alt }}" width="1200" height="630">
+    {% if post.cover_alt %}<figcaption>{{ post.cover_alt }}</figcaption>{% endif %}
+  </figure>
+  {% endif %}
+
+  <div class="prose prose-wrap">
+    {{ post.body_html | safe }}
+
+    {% if post.indicator %}
+    <aside class="indicator-cta">
+      <span>
+        <small>Esplora i dati</small>
+        <strong>{{ post.indicator_label or 'Apri questo indicatore nell\'atlante' }}</strong>
+      </span>
+      <a href="/?indicator={{ post.indicator }}">Apri nell'atlante →</a>
+    </aside>
+    {% endif %}
+  </div>
+
+  {% if related %}
+  <div class="prose-wrap related">
+    <h2>Altri articoli</h2>
+    <div class="post-grid">
+      {% for item in related %}
+      <a class="post-card" href="/blog/{{ item.slug }}">
+        <div class="post-card__cover">{% if item.cover %}<img src="{{ item.cover }}" alt="{{ item.cover_alt }}" loading="lazy">{% endif %}</div>
+        <div class="post-card__body">
+          <span class="post-card__meta">{{ item.date.strftime('%d.%m.%Y') }} · {{ item.read_time }} min</span>
+          <h2>{{ item.title }}</h2>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</article>
+{% endblock %}

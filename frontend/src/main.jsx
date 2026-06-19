@@ -175,15 +175,16 @@ function App() {
 function SiteHeader({ children }) {
   return (
     <header className="masthead">
-      <a className="brand" href="/" aria-label="DiSET Viz — home">
-        <span className="brand-mark">DV</span>
+      <a className="brand" href="/" aria-label="Divario Italia — home">
+        <span className="brand-mark">DI</span>
         <span className="brand-text">
-          <strong>DiSET</strong>
+          <strong>Divario Italia</strong>
           <small>Atlante degli indicatori territoriali</small>
         </span>
       </a>
       {children}
       <nav className="masthead__links" aria-label="Collegamenti">
+        <a href="/blog">Blog</a>
         <a href="/legacy">Versione storica</a>
         <a
           href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ site_name }}{% endblock %}</title>
+    <meta name="description" content="{% block description %}Dati e analisi sul divario territoriale italiano.{% endblock %}">
+    <link rel="canonical" href="{{ canonical }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <meta property="og:site_name" content="{{ site_name }}">
+    <meta property="og:locale" content="it_IT">
+    {% block og %}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ self.title() }}">
+    <meta property="og:description" content="{{ self.description() }}">
+    <meta property="og:url" content="{{ canonical }}">
+    {% endblock %}
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body>
+    <header class="masthead">
+      <a class="brand" href="/">
+        <span class="brand-mark">DI</span>
+        <span class="brand-text">
+          <strong>Divario Italia</strong>
+          <small>Atlante degli indicatori territoriali</small>
+        </span>
+      </a>
+      <nav>
+        <a href="/">Atlante</a>
+        <a href="/blog" class="{{ 'is-active' if active_nav == 'blog' else '' }}">Blog</a>
+        <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Fonte Istat</a>
+      </nav>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer class="site-footer">
+      <span>{{ site_name }} · dati <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Istat</a>, indicatori territoriali per le politiche di sviluppo</span>
+      <span><a href="/">Esplora l'atlante</a> · <a href="/blog">Tutti gli articoli</a></span>
+    </footer>
+  </body>
+</html>
