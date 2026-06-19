@@ -81,11 +81,7 @@ function App() {
   useEffect(() => {
     if (initialPageView.current) {
       initialPageView.current = false;
-      trackInternalEvent("page_view", {
-        page_location: window.location.href,
-        page_path: `${window.location.pathname}${window.location.search}`,
-        page_title: document.title,
-      });
+      trackPageView();
       return;
     }
     trackPageView();
