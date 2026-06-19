@@ -2,13 +2,26 @@ from app import app
 from app.cache import cache
 from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts
 from app.data import get_catalog, get_indicator, get_indicator_year, get_rows, search_indicators
+from app import profiles
 
-from flask import Response, abort, render_template, request, send_from_directory, url_for
+from flask import Response, abort, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
 import csv, json, os, re
 
 from app import config
+
+
+@app.template_filter("it_num")
+def it_num(value, decimals=1):
+    """Format a number Italian-style: dot thousands, comma decimals."""
+    if value is None:
+        return "n.d."
+    try:
+        formatted = f"{float(value):,.{decimals}f}"
+    except (TypeError, ValueError):
+        return str(value)
+    return formatted.replace(",", "§").replace(".", ",").replace("§", ".")
 
 
 @cache.memoize(timeout=100)
@@ -124,11 +137,135 @@ def privacy():
     )
 
 
+@app.route("/indicatore/<slug>")
+def indicator_page(slug):
+    match = re.match(r"^(\d+)(?:-.*)?$", slug)
+    if not match:
+        abort(404)
+    indicator_id = match.group(1)
+    payload = get_indicator(indicator_id)
+    if payload is None:
+        abort(404)
+
+    meta = payload["metadata"]
+    canonical_path = profiles.indicator_path(indicator_id, meta["name"])
+    if f"/indicatore/{slug}" != canonical_path:
+        return redirect(canonical_path, code=301)
+
+    year = meta["year_max"]
+    year_view = get_indicator_year(indicator_id, year)
+    trend = _national_trend(payload["series"], meta["years"])
+
+    # Order the ranking so #1 is the best-performing region for this indicator's
+    # direction; for contextual indicators "best" is undefined, so keep raw order.
+    direction = (meta.get("explain") or {}).get("direction")
+    values = year_view["values"]  # already sorted by value desc
+    if direction in ("lower_better", "higher_worse"):
+        values = list(reversed(values))
+    scoreable = direction in profiles.SCOREABLE_DIRECTIONS
+    best = values[0] if values and scoreable else None
+    worst = values[-1] if values and scoreable else None
+
+    return render_template(
+        "indicator_page.html",
+        meta=meta,
+        values=values,
+        best=best,
+        worst=worst,
+        year=year,
+        trend=trend,
+        theme_path=profiles.theme_path(meta["theme"]),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}{canonical_path}",
+    )
+
+
+@app.route("/regione/<region_key>")
+def region_page(region_key):
+    profile = profiles.region_profile(region_key)
+    if profile is None:
+        abort(404)
+    return render_template(
+        "region_page.html",
+        profile=profile,
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/regione/{region_key}",
+    )
+
+
+@app.route("/tema/<theme_slug>")
+def theme_page(theme_slug):
+    profile = profiles.theme_profile(theme_slug)
+    if profile is None:
+        abort(404)
+    return render_template(
+        "theme_page.html",
+        profile=profile,
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/tema/{theme_slug}",
+    )
+
+
+@app.route("/regioni")
+def regions_index():
+    return render_template(
+        "regions_index.html",
+        regions=profiles.all_regions_index(),
+        overview=profiles.regions_overview(),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/regioni",
+    )
+
+
+@app.route("/temi")
+def themes_index():
+    return render_template(
+        "themes_index.html",
+        themes=profiles.all_themes_index(),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/temi",
+    )
+
+
+def _national_trend(series, years):
+    """Direction of the national average between the first and last covered year."""
+    if len(years) < 2:
+        return None
+    first_year, last_year = years[0], years[-1]
+
+    def _avg(target):
+        vals = [r["value"] for r in series if r["year"] == target and r["value"] is not None]
+        return sum(vals) / len(vals) if vals else None
+
+    start, end = _avg(first_year), _avg(last_year)
+    if start is None or end is None:
+        return None
+    if start == 0:
+        change = None
+    else:
+        change = (end - start) / abs(start) * 100
+    return {
+        "first_year": first_year,
+        "last_year": last_year,
+        "start": round(start, 2),
+        "end": round(end, 2),
+        "change_pct": round(change, 1) if change is not None else None,
+        "rising": end > start,
+    }
+
+
 @app.route("/sitemap.xml")
 def sitemap():
     pages = [
         {"loc": f"{SITE_URL}/", "priority": "1.0"},
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
+        {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
     for post in get_posts():
@@ -136,6 +273,16 @@ def sitemap():
             "loc": post["url"],
             "lastmod": post["date"].isoformat(),
             "priority": "0.7",
+        })
+    for region in profiles.all_regions_index():
+        pages.append({"loc": f"{SITE_URL}{region['path']}", "priority": "0.7"})
+    for theme in profiles.all_themes_index():
+        pages.append({"loc": f"{SITE_URL}{theme['path']}", "priority": "0.5"})
+    for item in get_catalog()["indicators"]:
+        pages.append({
+            "loc": f"{SITE_URL}{profiles.indicator_path(item['id'], item['name'])}",
+            "lastmod": f"{item['year_max']}-12-31",
+            "priority": "0.6",
         })
     xml = render_template("sitemap.xml", pages=pages)
     return Response(xml, mimetype="application/xml")

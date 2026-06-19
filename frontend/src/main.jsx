@@ -232,6 +232,8 @@ function SiteHeader({ children }) {
       </a>
       {children}
       <nav className="masthead__links" aria-label="Collegamenti">
+        <a href="/regioni">Regioni</a>
+        <a href="/temi">Temi</a>
         <a href="/blog">Blog</a>
         <a href="/legacy">Versione storica</a>
         <a
@@ -264,7 +266,7 @@ function SiteFooter() {
         , indicatori territoriali per le politiche di sviluppo
       </span>
       <span>
-        <a href="/">Atlante</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
+        <a href="/">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
       </span>
       <button className="privacy-settings-link" type="button" hidden data-funding-choices-revoke>
         Gestisci preferenze cookie
@@ -618,11 +620,40 @@ function DetailView({
   );
 }
 
+function stripAccents(value) {
+  return (value || "").normalize("NFKD").replace(/[̀-ͯ]/g, "");
+}
+
+// Mirrors app/profiles.py indicator_slug. The server 301s to the canonical slug,
+// so minor differences still resolve.
+function indicatorSlug(name) {
+  return stripAccents(name)
+    .toLowerCase()
+    .replace(/'/g, " ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80)
+    .replace(/-+$/, "");
+}
+
+function indicatorPath(id, name) {
+  const slug = indicatorSlug(name);
+  return slug ? `/indicatore/${id}-${slug}` : `/indicatore/${id}`;
+}
+
+// Mirrors app/profiles.py region_key_for / data.py _slugify.
+function regionKey(region) {
+  return stripAccents(region).toLowerCase().replace(/'/g, " ").replace(/ /g, "-");
+}
+
 function IndicatorHeader({ metadata, regionCount }) {
   return (
     <div className="indicator-header">
       <span className="tag">{metadata.theme}</span>
       <h2>{metadata.name}</h2>
+      <p className="indicator-header__seo">
+        <a href={indicatorPath(metadata.id, metadata.name)}>Scheda completa e classifica regioni →</a>
+      </p>
       {metadata.explain && <IndicatorExplain explain={metadata.explain} />}
       {metadata.archive && (
         <p className="indicator-header__def">
@@ -687,6 +718,7 @@ function InsightPanel({ insights, unit, year, region }) {
             ? `${insights.regionRank}ª su ${insights.total} regioni`
             : "Dato non disponibile per quest'anno"}
         </span>
+        {region && <a className="insight__link" href={`/regione/${regionKey(region)}`}>Profilo di {region} →</a>}
       </div>
       <div className="insight">
         <small><Trophy size={13} /> Valore più alto · {year}</small>

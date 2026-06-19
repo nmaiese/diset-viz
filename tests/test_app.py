@@ -104,6 +104,97 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(privacy.status_code, 200)
         self.assertIn(b"Privacy e cookie", privacy.data)
 
+    def test_seo_landing_pages(self):
+        from app.data import get_catalog
+        from app import profiles
+
+        client = app.test_client()
+
+        catalog = get_catalog()
+        sample = catalog["indicators"][0]
+        path = profiles.indicator_path(sample["id"], sample["name"])
+
+        indicator = client.get(path)
+        self.assertEqual(indicator.status_code, 200)
+        self.assertIn(b"application/ld+json", indicator.data)
+        self.assertIn(b'"@type": "Dataset"', indicator.data)
+        self.assertIn(sample["name"].encode("utf-8"), indicator.data)
+
+        # Non-canonical slug 301s to the canonical path.
+        wrong = client.get(f"/indicatore/{sample['id']}-slug-sbagliato")
+        self.assertEqual(wrong.status_code, 301)
+        self.assertTrue(wrong.headers["Location"].endswith(path))
+
+        self.assertEqual(client.get("/indicatore/9999999").status_code, 404)
+        self.assertEqual(client.get("/indicatore/abc").status_code, 404)
+
+        region = client.get("/regione/lombardia")
+        self.assertEqual(region.status_code, 200)
+        self.assertIn(b"Lombardia", region.data)
+        self.assertIn(b"application/ld+json", region.data)
+        self.assertEqual(client.get("/regione/atlantide").status_code, 404)
+
+        theme_slug = next(iter(profiles._theme_slug_map()))
+        theme = client.get(f"/tema/{theme_slug}")
+        self.assertEqual(theme.status_code, 200)
+        self.assertIn(b"application/ld+json", theme.data)
+        self.assertEqual(client.get("/tema/non-esiste").status_code, 404)
+
+        self.assertEqual(client.get("/regioni").status_code, 200)
+        self.assertEqual(client.get("/temi").status_code, 200)
+
+        sitemap = client.get("/sitemap.xml").data
+        self.assertIn(b"/regione/lombardia", sitemap)
+        self.assertIn(b"/tema/", sitemap)
+        self.assertIn(b"/indicatore/", sitemap)
+
+    def test_region_profile_is_coherent(self):
+        from app import profiles
+
+        # Northern industrial regions should cluster together, southern ones too.
+        lombardia = profiles.region_profile("lombardia")
+        self.assertIsNotNone(lombardia)
+        self.assertGreater(lombardia["scored_count"], 0)
+        similar = {s["region_key"] for s in lombardia["similar_regions"]}
+        self.assertTrue(similar & {"piemonte", "veneto", "emilia-romagna"})
+        # Theme scores stay within the normalised 0..1 range.
+        for theme in lombardia["theme_table"]:
+            self.assertGreaterEqual(theme["score"], 0.0)
+            self.assertLessEqual(theme["score"], 1.0)
+
+    def test_core_set_is_complete_and_recent(self):
+        from app.data import get_catalog
+        from app import profiles
+
+        core = [i for i in get_catalog()["indicators"] if profiles.is_core(i)]
+        self.assertTrue(core)
+        for item in core:
+            self.assertTrue(item["complete"])
+            self.assertGreaterEqual(item["year_max"], profiles.CORE_MIN_YEAR)
+
+    def test_curated_direction_overrides_heuristic(self):
+        from app.indicator_notes import direction_for
+
+        # A gender employment gap: smaller is better, not "higher better".
+        self.assertEqual(direction_for("57", "Differenza tra tasso di occupazione maschile e femminile"), "lower_better")
+        # Energy covered by cogeneration is positive, not a pressure.
+        self.assertEqual(direction_for("378", "Consumi di energia coperti da cogenerazione"), "higher_better")
+        # Early school leaving is negative.
+        self.assertEqual(direction_for("102", "Giovani che abbandonano"), "lower_better")
+
+    def test_regions_map_data_matches_geometry(self):
+        from app import profiles
+
+        overview = profiles.regions_overview()
+        keys = {r["region_key"] for r in profiles.all_regions_index()}
+        self.assertEqual(set(overview), keys)
+        # The pre-projected SVG partial must cover exactly the same region keys.
+        from pathlib import Path
+        svg = (Path(app.root_path) / "templates" / "_italy_map.html").read_text(encoding="utf-8")
+        import re
+        svg_keys = set(re.findall(r'data-key="([^"]+)"', svg))
+        self.assertEqual(svg_keys, keys)
+
     def test_ads_txt_uses_adsense_env(self):
         from app import config
 

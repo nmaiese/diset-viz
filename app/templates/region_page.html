@@ -1,0 +1,118 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'regioni' %}
+{% set p = profile %}
+
+{% block title %}{{ p.region }}: punti di forza e debolezza negli indicatori territoriali · {{ site_name }}{% endblock %}
+{% block description %}Profilo di {{ p.region }} sugli indicatori territoriali Istat: in quali temi la regione eccelle, dove resta indietro e quali sono le regioni con un profilo simile.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Profilo territoriale di {{ p.region }}",
+  "description": {{ ('Punti di forza e di debolezza di ' ~ p.region ~ ' sugli indicatori territoriali Istat, con confronto tra le regioni italiane.') | tojson }},
+  "url": {{ canonical | tojson }},
+  "spatialCoverage": { "@type": "AdministrativeArea", "name": {{ p.region | tojson }} },
+  "creator": { "@type": "Organization", "name": "Istat" },
+  "isAccessibleForFree": true,
+  "keywords": [{{ p.region | tojson }}, "indicatori territoriali", "divario regionale", "Istat"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Regioni", "item": "{{ site_url }}/regioni" },
+    { "@type": "ListItem", "position": 3, "name": {{ p.region | tojson }}, "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page page-region wrap">
+  <nav class="breadcrumb"><a href="/regioni">Regioni</a></nav>
+  <h1>{{ p.region }}</h1>
+  <p class="page-lead">Dove {{ p.region }} si colloca rispetto alle altre regioni italiane, tema per tema. Il confronto usa {{ p.scored_count }} indicatori Istat con una direzione chiara, normalizzati in percentile (100 = migliore tra le regioni).</p>
+
+  <div class="profile-cols">
+    <section class="profile-card profile-strong">
+      <h2>Dove eccelle</h2>
+      {% if p.themes_strong %}
+      <ul class="theme-chips">
+        {% for t in p.themes_strong %}
+        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a> <span>{{ (t.score * 100) | round | int }}</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="page-note">Nessun tema emerge nettamente sopra la media.</p>{% endif %}
+      {% if p.top_excels %}
+      <ul class="profile-list">
+        {% for e in p.top_excels %}
+        <li><a href="{{ e.path }}">{{ e.name }}</a><small>{{ e.theme }}</small></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+
+    <section class="profile-card profile-weak">
+      <h2>Dove resta indietro</h2>
+      {% if p.themes_weak %}
+      <ul class="theme-chips">
+        {% for t in p.themes_weak %}
+        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a> <span>{{ (t.score * 100) | round | int }}</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="page-note">Nessun tema emerge nettamente sotto la media.</p>{% endif %}
+      {% if p.top_lags %}
+      <ul class="profile-list">
+        {% for e in p.top_lags %}
+        <li><a href="{{ e.path }}">{{ e.name }}</a><small>{{ e.theme }}</small></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+  </div>
+
+  <section class="profile-themes">
+    <h2>Tutti i temi valutabili</h2>
+    <p class="page-note">Punteggio medio di {{ p.region }} sugli indicatori direzionali di ciascun tema (0 = ultima, 100 = prima). I temi con meno di tre indicatori direzionali non vengono classificati.</p>
+    <table class="data-table">
+      <thead><tr><th>Tema</th><th class="num">Indicatori</th><th class="num">Punteggio</th></tr></thead>
+      <tbody>
+        {% for t in p.theme_table %}
+        <tr class="{{ 'is-unrated' if not t.rated else '' }}">
+          <td><a href="{{ t.theme_path }}">{{ t.theme }}</a></td>
+          <td class="num">{{ t.count }}</td>
+          <td class="num">
+            {% if t.rated %}
+            <span class="score-bar"><span style="width: {{ (t.score * 100) | round | int }}%"></span></span>{{ (t.score * 100) | round | int }}
+            {% else %}<span class="page-note">non valutabile</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="profile-similar">
+    <h2>Regioni con un profilo simile</h2>
+    <p class="page-note">Regioni più vicine a {{ p.region }} per andamento complessivo, calcolato sugli indicatori Istat completi e aggiornati (dati recenti su tutte e 20 le regioni).</p>
+    <div class="similar-grid">
+      {% for s in p.similar_regions %}
+      <a class="similar-card" href="/regione/{{ s.region_key }}">{{ s.region }}</a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <aside class="indicator-cta">
+    <span>
+      <small>Esplora i dati</small>
+      <strong>Mappa interattiva e classifiche per ogni indicatore</strong>
+    </span>
+    <a href="/">Apri l'atlante →</a>
+  </aside>
+</article>
+{% endblock %}

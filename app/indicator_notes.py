@@ -98,6 +98,62 @@ HIGHER_IS_BETTER = (
 )
 
 
+# Curated direction overrides keyed by indicator id, for the "core" set used in the
+# region profiles (complete + recent). The keyword heuristic in _direction() leaves
+# many of these "contextual" or, worse, mislabels them (a gender employment gap is
+# not "higher better"; energy covered by cogeneration/bioenergy is good, not bad).
+# This map encodes the intended reading so the scoring stays honest. "higher_worse"
+# and "lower_better" score identically (lower value = better); both are kept for the
+# accuracy of the reading text.
+CURATED_DIRECTION = {
+    # Competitività
+    "158": "higher_better", "167": "higher_better", "471": "higher_better", "419": "higher_better",
+    # Cultura (cultural participation / creative economy = positive; absence of offer = negative)
+    "600": "higher_better", "611": "higher_better", "612": "higher_better", "27": "higher_better",
+    "613": "higher_better", "610": "higher_better", "595": "higher_better", "614": "lower_better",
+    "596": "higher_better", "594": "higher_better", "593": "higher_better", "25": "higher_better",
+    # Demografia di impresa
+    "242": "higher_better", "54": "higher_better",
+    # Dinamiche settoriali (labour productivity / growth = positive)
+    "31": "higher_better", "1": "higher_better", "133": "higher_better", "130": "higher_better",
+    "107": "higher_better", "123": "higher_better", "124": "higher_better", "250": "higher_better",
+    # Energia (fix misclassification: energy covered by cogeneration/bioenergy is good)
+    "378": "higher_better", "379": "higher_better",
+    # Inclusione sociale (early school leaving = bad; accessible schools = good)
+    "200": "lower_better", "199": "lower_better", "102": "lower_better",
+    "641": "higher_better", "651": "higher_better", "647": "higher_better", "646": "higher_better",
+    "645": "higher_better", "642": "higher_better", "643": "higher_better", "644": "higher_better",
+    "650": "higher_better",
+    # Istruzione e formazione (education level / training participation = positive)
+    "198": "higher_better", "197": "higher_better", "99": "higher_better", "77": "higher_better",
+    "190": "higher_better", "189": "higher_better", "104": "higher_better", "67": "higher_better",
+    "188": "higher_better", "187": "higher_better", "63": "higher_better", "186": "higher_better",
+    "185": "higher_better",
+    # Lavoro (fix gender-gap indicators to lower_better; activity/entrepreneurship = positive)
+    "398": "higher_better", "466": "higher_better", "61": "lower_better", "57": "lower_better",
+    "402": "higher_better", "401": "higher_better", "203": "higher_better", "213": "higher_better",
+    # Ricerca ed innovazione
+    "396": "higher_better", "397": "higher_better",
+    # Mercato dei capitali (venture / "capitale di rischio" investment is positive;
+    # the word "rischio" otherwise trips the lower-is-better heuristic)
+    "163": "higher_better", "164": "higher_better",
+    # Rifiuti (composting = good)
+    "53": "higher_better",
+    # Servizi di cura (childcare availability/coverage = good)
+    "142": "higher_better", "414": "higher_better",
+    # Società dell'informazione (digital uptake = positive)
+    "426": "higher_better", "64": "higher_better", "72": "higher_better", "70": "higher_better",
+    "434": "higher_better",
+    # Trasporti e mobilità (rail / public transport use = positive)
+    "47": "higher_better", "268": "higher_better", "269": "higher_better",
+}
+
+
+def direction_for(indicator_id, name):
+    """Curated direction if available, otherwise the keyword heuristic."""
+    return CURATED_DIRECTION.get(str(indicator_id)) or _direction(name)
+
+
 def build_indicator_explain(item):
     name = _clean(item.get("indicator") or item.get("name"))
     theme = _clean(item.get("theme"))
@@ -106,13 +162,14 @@ def build_indicator_explain(item):
     indicator_id = str(item.get("id", ""))
     base_name = _display_name(name)
     lens = _lens(name)
+    direction = direction_for(indicator_id, name)
 
     return {
         "plain": _plain_text(base_name, theme, archive, unit, indicator_id),
         "example": _example_text(name, theme, lens),
-        "reading": _reading_text(name, theme, unit),
+        "reading": _reading_text(name, theme, unit, direction),
         "caveat": _caveat_text(name, theme, lens),
-        "direction": _direction(name),
+        "direction": direction,
     }
 
 
@@ -144,9 +201,10 @@ def _example_text(name, theme, lens):
     return text
 
 
-def _reading_text(name, theme, unit):
+def _reading_text(name, theme, unit, direction=None):
     lowered = name.lower()
-    direction = _direction(name)
+    if direction is None:
+        direction = _direction(name)
 
     if "differenza tra tasso" in lowered:
         return "Valori più alti indicano un divario più ampio tra uomini e donne. In questo caso la distanza conta più del livello complessivo del mercato del lavoro."

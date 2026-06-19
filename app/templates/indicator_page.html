@@ -1,0 +1,95 @@
+{% extends "blog_base.html" %}
+{% set explain = meta.explain %}
+{% set desc = explain.plain ~ ' ' ~ explain.reading %}
+
+{% block title %}{{ meta.name }} per regione ({{ meta.year_min }}-{{ meta.year_max }}) · {{ site_name }}{% endblock %}
+{% block description %}{{ explain.plain }} Dati Istat per le 20 regioni italiane, ultimo anno {{ meta.year_max }}. Fonte: {{ meta.source }}.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": {{ meta.name | tojson }},
+  "description": {{ desc | tojson }},
+  "url": {{ canonical | tojson }},
+  "temporalCoverage": "{{ meta.year_min }}/{{ meta.year_max }}",
+  "spatialCoverage": { "@type": "Country", "name": "Italia" },
+  "creator": { "@type": "Organization", "name": {{ meta.source | tojson }} },
+  "isAccessibleForFree": true,
+  "keywords": [{{ meta.theme | tojson }}, "indicatori territoriali", "regioni italiane", "Istat"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Temi", "item": "{{ site_url }}/temi" },
+    { "@type": "ListItem", "position": 3, "name": {{ meta.theme | tojson }}, "item": "{{ site_url }}{{ theme_path }}" },
+    { "@type": "ListItem", "position": 4, "name": {{ meta.name | tojson }}, "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page page-indicator wrap">
+  <nav class="breadcrumb"><a href="/temi">Temi</a> / <a href="{{ theme_path }}">{{ meta.theme }}</a></nav>
+  <h1>{{ meta.name }}</h1>
+  <p class="page-lead">{{ explain.plain }}</p>
+
+  <div class="page-facts">
+    <span><small>Tema</small><a href="{{ theme_path }}">{{ meta.theme }}</a></span>
+    <span><small>Unità di misura</small>{{ meta.unit or 'n.d.' }}</span>
+    <span><small>Copertura</small>{{ meta.year_min }}-{{ meta.year_max }}, {{ meta.regions | length }} regioni</span>
+    <span><small>Fonte</small>{{ meta.source }}</span>
+  </div>
+
+  <section class="prose">
+    <p>{{ explain.example }}</p>
+    <p>{{ explain.reading }}</p>
+    {% if best and worst %}
+    <p>Nel {{ year }} la posizione migliore è di <a href="/regione/{{ best.region_key }}">{{ best.region }}</a>
+      ({{ best.value | it_num(2) }} {{ meta.unit }}), mentre <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a>
+      segna il dato più sfavorevole ({{ worst.value | it_num(2) }} {{ meta.unit }}).</p>
+    {% endif %}
+    {% if trend and trend.change_pct is not none %}
+    <p>Tra il {{ trend.first_year }} e il {{ trend.last_year }} la media nazionale è passata da
+      {{ trend.start | it_num(2) }} a {{ trend.end | it_num(2) }}
+      ({% if trend.rising %}+{% endif %}{{ trend.change_pct | it_num(1) }}%).</p>
+    {% endif %}
+    <p class="page-caveat">{{ explain.caveat }}</p>
+  </section>
+
+  <section class="page-ranking">
+    <h2>Classifica delle regioni nel {{ year }}</h2>
+    <p class="page-note">
+      {% if explain.direction == 'higher_better' %}Valori più alti indicano una posizione migliore.
+      {% elif explain.direction in ('lower_better', 'higher_worse') %}Valori più bassi indicano una posizione migliore.
+      {% else %}La lettura dipende dal contesto del singolo indicatore.{% endif %}
+    </p>
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Regione</th><th class="num">{{ meta.unit or 'Valore' }}</th></tr></thead>
+      <tbody>
+        {% for row in values %}
+        <tr>
+          <td class="rank">{{ loop.index }}</td>
+          <td><a href="/regione/{{ row.region_key }}">{{ row.region }}</a></td>
+          <td class="num">{{ row.value | it_num(2) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <aside class="indicator-cta">
+    <span>
+      <small>Esplora i dati</small>
+      <strong>Mappa, serie storica e confronti interattivi</strong>
+    </span>
+    <a href="/?indicator={{ meta.id }}">Apri nell'atlante →</a>
+  </aside>
+</article>
+{% endblock %}

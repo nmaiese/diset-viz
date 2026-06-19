@@ -1,0 +1,20 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'temi' %}
+
+{% block title %}I temi degli indicatori territoriali · {{ site_name }}{% endblock %}
+{% block description %}Esplora i 377 indicatori territoriali Istat per tema: lavoro, istruzione, ambiente, salute, trasporti e altri ambiti del divario tra le regioni italiane.{% endblock %}
+
+{% block content %}
+<article class="page page-index wrap">
+  <h1>I temi</h1>
+  <p class="page-lead">Gli indicatori territoriali Istat sono organizzati per tema. Scegli un'area per vedere tutti gli indicatori disponibili.</p>
+  <div class="index-grid">
+    {% for t in themes %}
+    <a class="index-card index-card--theme" href="{{ t.path }}">
+      <strong>{{ t.theme }}</strong>
+      <small>{{ t.indicator_count }} indicatori</small>
+    </a>
+    {% endfor %}
+  </div>
+</article>
+{% endblock %}
