@@ -5,7 +5,7 @@ description: "Nel 2024 il Trentino-Alto Adige registra 33 volte le presenze turi
 date: 2026-06-19
 author: "Redazione Divario Italia"
 cover: /static/img/blog/divario-turismo.svg
-cover_alt: "Tasso di turisticità delle regioni italiane nel 2024: dal Trentino-Alto Adige (52,3) al Molise (1,6)"
+cover_alt: "Tasso di turisticità delle regioni italiane nel 2024, dal Trentino-Alto Adige (52,3) al Molise (1,6)"
 tags:
   - Turismo
   - Divario Nord-Sud
@@ -14,20 +14,21 @@ indicator: 105
 indicator_label: "Tasso di turisticità (2024)"
 ---
 
-Il turismo è uno dei settori dove il **divario territoriale italiano** si vede in
-modo più netto. Nel 2024 il **tasso di turisticità** — le giornate di presenza
-nelle strutture ricettive per abitante — varia di oltre trenta volte tra la prima
-e l'ultima regione. Non è una sfumatura: è una frattura strutturale.
+Il turismo è uno dei settori dove il divario tra le regioni italiane si vede
+meglio. Nel 2024 il tasso di turisticità, cioè le giornate di presenza nelle
+strutture ricettive per ogni abitante, cambia di oltre trenta volte tra la prima
+e l'ultima regione. Non è una piccola differenza. È una frattura che dura da
+decenni.
 
-Il dato chiave: **52,3 contro 1,6 giornate per abitante**, il rapporto tra il Trentino-Alto Adige (primo) e il Molise (ultimo). Un divario di **33 a 1**.
+Il dato da cui partire sono **52,3 contro 1,6 giornate per abitante**. Tanto separa il Trentino-Alto Adige, primo in classifica, dal Molise, ultimo. In pratica un rapporto di 33 a 1.
 {: .data-callout}
 
 ## Le regioni agli estremi
 
-Sopra tutti c'è il **Trentino-Alto Adige** con 52,3 giornate per abitante,
-seguito dalla **Valle d'Aosta** (30,1). Sono due territori a forte vocazione
-montana, dove il turismo pesa enormemente sull'economia locale. All'estremo
-opposto, il **Molise** (1,6) e gran parte del Mezzogiorno interno.
+In cima c'è il Trentino-Alto Adige con 52,3 giornate per abitante, seguito dalla
+Valle d'Aosta con 30,1. Sono due territori di montagna, dove il turismo pesa
+moltissimo sull'economia locale. All'estremo opposto troviamo il Molise, fermo a
+1,6, insieme a buona parte del Mezzogiorno interno.
 
 | Regione | Giornate per abitante (2024) |
 |---|---|
@@ -40,35 +41,33 @@ opposto, il **Molise** (1,6) e gran parte del Mezzogiorno interno.
 | Piemonte | 3,4 |
 | Molise | 1,6 |
 
-La **media nazionale** si ferma a 10,4 giornate per abitante: un valore che
-nasconde più di quanto riveli, perché poche regioni molto turistiche lo trainano
-verso l'alto mentre la maggioranza resta molto sotto.
+La media nazionale si ferma a 10,4 giornate per abitante. È un numero che dice
+poco da solo, perché poche regioni molto turistiche lo tirano in alto mentre la
+maggioranza resta parecchio sotto.
 
-## Non è solo Nord contro Sud
+## Non è solo questione di Nord e Sud
 
-Il divario più citato è quello tra Nord e Sud, e i numeri lo confermano: il
-**Centro-Nord** registra in media **14,2** giornate per abitante, contro le
-**4,8** del **Mezzogiorno** — circa il triplo. Ma la lettura è più ricca di così:
-anche al Nord ci sono regioni con valori contenuti (il Piemonte è a 3,4, sotto la
-media nazionale), mentre il vero motore è la montagna alpina più che la
-contrapposizione geografica in sé.
+Il divario più raccontato è quello tra Nord e Sud, e i numeri lo confermano. Il
+Centro-Nord segna in media 14,2 giornate per abitante, contro le 4,8 del
+Mezzogiorno, quindi circa il triplo. Ma la storia è un po' più sfumata. Anche al
+Nord ci sono regioni con valori bassi, come il Piemonte a 3,4, sotto la media
+nazionale. Il vero motore è la montagna alpina, più che la pura contrapposizione
+geografica.
 
-> Il divario turistico non separa semplicemente il Nord dal Sud: separa i
-> territori che hanno saputo costruire un'offerta dagli altri.
+> Il divario turistico non separa solo il Nord dal Sud. Separa i territori che
+> hanno saputo costruire un'offerta dagli altri.
 
 ## Perché conta
 
-Il turismo non è solo presenze: è occupazione, indotto, servizi, manutenzione del
-territorio. Dove il tasso di turisticità è alto e stabile, intere filiere
-economiche ci si appoggiano. Dove è basso, manca una leva di sviluppo che altrove
-è data per scontata. Leggere il divario turistico significa leggere una delle
-direttrici della disuguaglianza economica tra le regioni italiane.
+Il turismo non è fatto solo di presenze. Porta con sé lavoro, indotto, servizi,
+manutenzione del territorio. Dove il tasso di turisticità è alto e stabile, ci si
+appoggiano intere filiere economiche. Dove è basso, manca una leva di sviluppo
+che altrove viene data per scontata.
 
-Puoi esplorare l'indicatore anno per anno e regione per regione, con mappa,
-classifica e serie storica, direttamente nell'[atlante di Divario
-Italia](/?indicator=105&year=2024). Il confronto più interessante è guardare come
-il divario è cambiato dal 1981 a oggi: in molti casi si è **allargato**, non
-ridotto.
+Puoi guardare l'indicatore anno per anno e regione per regione, con mappa,
+classifica e serie storica, dentro l'[atlante di Divario
+Italia](/?indicator=105&year=2024). La cosa più interessante è seguire come il
+divario è cambiato dal 1981 a oggi. In molti casi si è allargato, non ridotto.
 
 *Dati: Istat, "Indicatori territoriali per le politiche di sviluppo". Le medie
 per ripartizione sono medie semplici tra le regioni, non pesate per popolazione.*

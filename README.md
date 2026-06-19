@@ -67,7 +67,9 @@ and link into the atlas with `[text](/?indicator=105&year=2024)`.
 ```
 
 See `content/posts/2026-06-19-divario-turistico-nord-sud-2024.md` for a full
-example.
+example, and [`content/STYLE.md`](content/STYLE.md) for the editorial style
+(human voice, no em-dashes/semicolons, real data only). Agents should also read
+`CLAUDE.md` / `AGENTS.md`.
 
 ## Data
 
