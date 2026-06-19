@@ -12,11 +12,12 @@
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
+  var diConsentDefault = '{{ "denied" if (ENABLE_CONSENT_BANNER or ADSENSE_CLIENT) else "granted" }}';
   gtag('consent', 'default', {
-    ad_storage: 'denied',
-    analytics_storage: 'denied',
-    ad_user_data: 'denied',
-    ad_personalization: 'denied',
+    ad_storage: diConsentDefault,
+    analytics_storage: diConsentDefault,
+    ad_user_data: diConsentDefault,
+    ad_personalization: diConsentDefault,
     wait_for_update: 500
   });
   try {

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import * as d3 from "d3";
 import {
@@ -67,6 +67,7 @@ function App() {
     view === "detail" ? "detail" : view === "atlas" ? "atlas" : selectedId ? "detail" : "atlas";
 
   const [activeTab, setActiveTab] = useState("map");
+  const initialPageView = useRef(true);
 
   useEffect(() => {
     Promise.all([fetchJson(API.catalog), fetchJson(API.map)])
@@ -76,6 +77,14 @@ function App() {
       })
       .catch(() => setError("Non è stato possibile caricare l'archivio degli indicatori."));
   }, []);
+
+  useEffect(() => {
+    if (initialPageView.current) {
+      initialPageView.current = false;
+      return;
+    }
+    trackPageView();
+  }, [activeView, selectedId, selectedYear, selectedRegion, theme, sort, showPartial]);
 
   // Load the selected indicator only when the detail view is active.
   useEffect(() => {
@@ -106,11 +115,17 @@ function App() {
     setThemeParam(item.theme);
     setQueryParam(null);
     setView("detail");
+    trackEvent("select_indicator", {
+      indicator_id: item.id,
+      indicator_name: item.name,
+      indicator_theme: item.theme,
+    });
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
   const backToAtlas = () => {
     setView("atlas");
+    trackEvent("back_to_atlas");
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
@@ -141,13 +156,25 @@ function App() {
         theme={theme}
         selectedId={selectedId}
         selectedYear={selectedYear}
-        setSelectedYear={setSelectedYear}
+        setSelectedYear={(value) => {
+          setSelectedYear(value);
+          trackEvent("change_year", { indicator_id: selectedId, year: value });
+        }}
         selectedRegion={selectedRegion}
-        setSelectedRegion={setSelectedRegion}
-        onSelectIndicator={(id) => setSelectedId(id)}
+        setSelectedRegion={(value) => {
+          setSelectedRegion(value);
+          trackEvent("change_region", { indicator_id: selectedId, region: value });
+        }}
+        onSelectIndicator={(id) => {
+          setSelectedId(id);
+          trackEvent("select_sibling_indicator", { indicator_id: id });
+        }}
         onBack={backToAtlas}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={(value) => {
+          setActiveTab(value);
+          trackEvent("change_visualization", { view_type: value, indicator_id: selectedId });
+        }}
       />
     );
   }
@@ -156,13 +183,22 @@ function App() {
     <AtlasView
       catalog={catalog}
       theme={theme}
-      setTheme={(value) => setThemeParam(value === "Tutti" ? null : value)}
+      setTheme={(value) => {
+        setThemeParam(value === "Tutti" ? null : value);
+        trackEvent("filter_theme", { theme: value });
+      }}
       query={query}
       setQuery={(value) => setQueryParam(value || null)}
       sort={sort}
-      setSort={(value) => setSortParam(value === "complete" ? null : value)}
+      setSort={(value) => {
+        setSortParam(value === "complete" ? null : value);
+        trackEvent("sort_indicators", { sort: value });
+      }}
       showPartial={showPartial}
-      setShowPartial={(value) => setPartialParam(value ? "1" : null)}
+      setShowPartial={(value) => {
+        setPartialParam(value ? "1" : null);
+        trackEvent("toggle_partial_data", { enabled: value });
+      }}
       onOpen={openIndicator}
     />
   );
@@ -998,6 +1034,20 @@ function formatCompact(value, unit = "") {
     maximumFractionDigits: 1,
   }).format(value);
   return isPercentUnit(unit) ? `${formatted}%` : formatted;
+}
+
+function trackEvent(name, params = {}) {
+  if (typeof window === "undefined" || typeof window.gtag !== "function") return;
+  window.gtag("event", name, params);
+}
+
+function trackPageView() {
+  if (typeof window === "undefined" || typeof window.gtag !== "function") return;
+  window.gtag("event", "page_view", {
+    page_location: window.location.href,
+    page_path: `${window.location.pathname}${window.location.search}`,
+    page_title: document.title,
+  });
 }
 
 createRoot(document.getElementById("root")).render(<App />);
