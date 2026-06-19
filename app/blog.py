@@ -19,7 +19,9 @@ SITE_NAME = "Divario Italia"
 
 POSTS_DIR = Path(__file__).resolve().parents[1] / "content" / "posts"
 
-_MD_EXTENSIONS = ["extra", "sane_lists", "smarty", "toc", "attr_list"]
+# No "smarty": it would auto-convert -- and ... into en/em dashes and ellipses,
+# exactly the typographic artifacts we want to keep out of the prose.
+_MD_EXTENSIONS = ["extra", "sane_lists", "toc", "attr_list"]
 
 
 def _slugify(value):
@@ -51,7 +53,9 @@ def _excerpt(meta, html):
         return meta["description"]
     text = re.sub(r"<[^>]+>", "", html)
     text = " ".join(text.split())
-    return (text[:157] + "…") if len(text) > 158 else text
+    if len(text) <= 158:
+        return text
+    return text[:157].rsplit(" ", 1)[0] + "..."
 
 
 def _load_post(path):
