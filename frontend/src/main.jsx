@@ -67,7 +67,8 @@ function App() {
     view === "detail" ? "detail" : view === "atlas" ? "atlas" : selectedId ? "detail" : "atlas";
 
   const [activeTab, setActiveTab] = useState("map");
-  const initialPageView = useRef(true);
+  const pageViewKey = activeView === "detail" ? `detail:${selectedId || ""}` : "atlas";
+  const lastPageViewKey = useRef(null);
 
   useEffect(() => {
     Promise.all([fetchJson(API.catalog), fetchJson(API.map)])
@@ -79,12 +80,21 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (initialPageView.current) {
-      initialPageView.current = false;
+    if (activeView === "detail" && !selectedId) return;
+    if (lastPageViewKey.current === pageViewKey) return;
+    lastPageViewKey.current = pageViewKey;
+    trackPageView({
+      view_type: activeView,
+      indicator_id: activeView === "detail" ? selectedId : undefined,
+    });
+  }, [activeView, selectedId, pageViewKey]);
+
+  useEffect(() => {
+    if (activeView !== "detail") {
+      setActiveTab("map");
       return;
     }
-    trackPageView();
-  }, [activeView, selectedId, selectedYear, selectedRegion, theme, sort, showPartial]);
+  }, [activeView, selectedId]);
 
   // Load the selected indicator only when the detail view is active.
   useEffect(() => {
@@ -1040,7 +1050,9 @@ function trackEvent(name, params = {}) {
   if (typeof window === "undefined") return;
   const eventParams = buildAnalyticsParams(params);
   pushDataLayerEvent(name, eventParams);
-  if (typeof window.gtag === "function") {
+  if (typeof window.diSendGoogleEvent === "function") {
+    window.diSendGoogleEvent(name, eventParams);
+  } else if (typeof window.gtag === "function") {
     window.gtag("event", name, eventParams);
   }
   trackInternalEvent(name, eventParams);

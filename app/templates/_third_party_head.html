@@ -12,6 +12,23 @@
 <script>
   window.dataLayer = window.dataLayer || [];
   window.__diGoogleConsentUpdated = false;
+  window.__diGoogleEventQueue = [];
+  window.diSendGoogleEvent = function (name, params) {
+    if (!window.__diGoogleConsentUpdated) {
+      window.__diGoogleEventQueue.push([name, params || {}]);
+      return;
+    }
+    if (typeof gtag === 'function') {
+      gtag('event', name, params || {});
+    }
+  };
+  window.diFlushGoogleEvents = function () {
+    var queue = window.__diGoogleEventQueue || [];
+    window.__diGoogleEventQueue = [];
+    for (var i = 0; i < queue.length; i += 1) {
+      window.diSendGoogleEvent(queue[i][0], queue[i][1]);
+    }
+  };
   function gtag(){
     if (arguments[0] === 'consent' && arguments[1] === 'update') {
       window.__diGoogleConsentUpdated = true;
@@ -25,6 +42,7 @@
       ad_user_data: state,
       ad_personalization: state
     });
+    window.diFlushGoogleEvents();
   };
   gtag('consent', 'default', {
     ad_storage: 'denied',
@@ -51,7 +69,7 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id={{ GA_MEASUREMENT_ID }}"></script>
 <script>
   gtag('js', new Date());
-  gtag('config', '{{ GA_MEASUREMENT_ID }}', { anonymize_ip: true });
+  gtag('config', '{{ GA_MEASUREMENT_ID }}', { anonymize_ip: true, send_page_view: false });
 </script>
 {% endif %}
 
