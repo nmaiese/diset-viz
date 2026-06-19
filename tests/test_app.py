@@ -11,6 +11,7 @@ class AppSmokeTest(unittest.TestCase):
 
         home = client.get("/")
         self.assertEqual(home.status_code, 200)
+        self.assertEqual(home.headers["Referrer-Policy"], "strict-origin-when-cross-origin")
         self.assertIn(b'id="root"', home.data)
 
         legacy = client.get("/legacy")
