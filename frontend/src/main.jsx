@@ -144,6 +144,7 @@ function App() {
       <main className="app-shell">
         <SiteHeader />
         <ErrorState message={error} />
+        <SiteFooter />
       </main>
     );
   }
@@ -153,6 +154,7 @@ function App() {
       <main className="app-shell">
         <SiteHeader />
         <LoadingState />
+        <SiteFooter />
       </main>
     );
   }
@@ -231,7 +233,6 @@ function SiteHeader({ children }) {
       {children}
       <nav className="masthead__links" aria-label="Collegamenti">
         <a href="/blog">Blog</a>
-        <a href="/privacy">Privacy</a>
         <a href="/legacy">Versione storica</a>
         <a
           href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
@@ -245,6 +246,30 @@ function SiteHeader({ children }) {
         </a>
       </nav>
     </header>
+  );
+}
+
+function SiteFooter() {
+  return (
+    <footer className="site-footer">
+      <span>
+        Divario Italia · dati{" "}
+        <a
+          href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Istat
+        </a>
+        , indicatori territoriali per le politiche di sviluppo
+      </span>
+      <span>
+        <a href="/">Atlante</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
+      </span>
+      <button className="privacy-settings-link" type="button" hidden data-funding-choices-revoke>
+        Gestisci preferenze cookie
+      </button>
+    </footer>
   );
 }
 
@@ -315,6 +340,7 @@ function AtlasView({ catalog, theme, setTheme, query, setQuery, sort, setSort, s
           <IndicatorIndex items={filtered} onOpen={onOpen} />
         </div>
       </section>
+      <SiteFooter />
     </main>
   );
 }
@@ -587,6 +613,7 @@ function DetailView({
           </section>
         </>
       )}
+      <SiteFooter />
     </main>
   );
 }
