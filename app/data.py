@@ -5,6 +5,7 @@ import unicodedata
 from collections import defaultdict
 
 from app.cache import cache
+from app.indicator_notes import build_indicator_explain
 
 
 DATASET_PATH = os.path.join(os.path.dirname(__file__), "static/data/Assoluti_Regione.csv")
@@ -123,6 +124,7 @@ def get_catalog():
                 "unit": first["unit"],
                 "source": first["source"],
                 "archive": first["archive"],
+                "explain": build_indicator_explain(first),
                 "years": years,
                 "year_min": years[0],
                 "year_max": latest_year,
@@ -175,6 +177,7 @@ def get_indicator(indicator_id):
             "unit": first["unit"],
             "source": first["source"],
             "archive": first["archive"],
+            "explain": build_indicator_explain(first),
             "years": years,
             "year_min": years[0],
             "year_max": years[-1],
