@@ -33,7 +33,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertGreater(len(catalog_payload["indicators"]), 0)
 
         sample = catalog_payload["indicators"][0]
-        for field in ("region_count", "completeness", "complete", "spark"):
+        for field in ("region_count", "completeness", "complete", "spark", "explain"):
             self.assertIn(field, sample)
         self.assertIsInstance(sample["complete"], bool)
         self.assertGreaterEqual(sample["completeness"], 0.0)
@@ -41,6 +41,11 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIsInstance(sample["spark"], list)
         self.assertLessEqual(len(sample["spark"]), 24)
         self.assertTrue(any(item["complete"] for item in catalog_payload["indicators"]))
+        for item in catalog_payload["indicators"]:
+            self.assertIn("explain", item)
+            for field in ("plain", "example", "reading", "caveat", "direction"):
+                self.assertIn(field, item["explain"])
+                self.assertTrue(item["explain"][field])
 
         indicator_id = catalog_payload["featured_indicator_id"]
         indicator = client.get(f"/api/indicator/{indicator_id}")
@@ -48,6 +53,7 @@ class AppSmokeTest(unittest.TestCase):
         indicator_payload = indicator.get_json()
         self.assertIn("metadata", indicator_payload)
         self.assertIn("series", indicator_payload)
+        self.assertIn("explain", indicator_payload["metadata"])
         self.assertLess(len(str(indicator_payload)), 500000)
 
         year = indicator_payload["metadata"]["year_max"]

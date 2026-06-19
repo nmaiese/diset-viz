@@ -380,6 +380,50 @@ h1, h2, h3 { font-family: var(--font-display); }
   letter-spacing: -0.01em;
   overflow-wrap: anywhere;
 }
+.indicator-explain {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 12px;
+  padding: 12px 13px;
+  background: var(--paper);
+  border-left: 3px solid var(--accent);
+}
+.indicator-explain p {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  line-height: 1.42;
+}
+.indicator-explain small {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.indicator-explain__lead {
+  color: var(--ink);
+}
+.indicator-explain__details {
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+.indicator-explain__details summary {
+  display: inline-flex;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+.indicator-explain__details div {
+  display: grid;
+  gap: 9px;
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--grid);
+}
 .indicator-header__def { display: grid; gap: 4px; margin: 0 0 4px; color: var(--ink-soft); line-height: 1.45; }
 .indicator-header__def small {
   font-family: var(--font-mono);

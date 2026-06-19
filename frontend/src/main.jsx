@@ -549,6 +549,7 @@ function IndicatorHeader({ metadata, regionCount }) {
     <div className="indicator-header">
       <span className="tag">{metadata.theme}</span>
       <h2>{metadata.name}</h2>
+      {metadata.explain && <IndicatorExplain explain={metadata.explain} />}
       {metadata.archive && (
         <p className="indicator-header__def">
           <small>Definizione</small>
@@ -562,6 +563,40 @@ function IndicatorHeader({ metadata, regionCount }) {
         <div><dt>Fonte</dt><dd>{metadata.source}</dd></div>
       </dl>
     </div>
+  );
+}
+
+function IndicatorExplain({ explain }) {
+  const detailRows = [
+    ["Esempio", explain.example?.replace(/^Esempio:\s*/, "")],
+    ["Come leggerlo", explain.reading],
+    ["Attenzione", explain.caveat],
+  ].filter(([, value]) => value);
+
+  if (!explain.plain && !detailRows.length) return null;
+
+  return (
+    <section className="indicator-explain" aria-label="Spiegazione dell'indicatore">
+      {explain.plain && (
+        <p className="indicator-explain__lead">
+          <small>In breve</small>
+          {explain.plain}
+        </p>
+      )}
+      {!!detailRows.length && (
+        <details className="indicator-explain__details">
+          <summary>Leggi esempio e avvertenze</summary>
+          <div>
+            {detailRows.map(([label, value]) => (
+              <p key={label}>
+                <small>{label}</small>
+                {value}
+              </p>
+            ))}
+          </div>
+        </details>
+      )}
+    </section>
   );
 }
 
