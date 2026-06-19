@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DiSET Viz</title>
+    <meta property="og:title" content="DiSET Viz">
+    <meta property="og:type" content="application">
+    <meta property="og:url" content="https://github.com/nmaiese/diset-viz">
+    <meta property="og:image" content="https://raw.githubusercontent.com/nmaiese/diset-viz/master/app/static/img/italy.png">
+    <meta name="description" content="Atlante interattivo dei 377 indicatori territoriali Istat: sfoglia per tema, regione e anno mappe, classifiche e serie storiche delle regioni italiane.">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+    <script type="module" crossorigin src="{{ url_for('static', filename='dist/assets/index.js') }}"></script>
+    <link rel="stylesheet" crossorigin href="{{ url_for('static', filename='dist/assets/index.css') }}">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
