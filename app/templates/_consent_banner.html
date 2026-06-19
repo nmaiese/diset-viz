@@ -1,4 +1,4 @@
-{% if ENABLE_CONSENT_BANNER and (GA_MEASUREMENT_ID or ADSENSE_CLIENT) %}
+{% if ENABLE_CONSENT_BANNER and (GA_MEASUREMENT_ID or ADSENSE_CLIENT) and not (ADSENSE_CLIENT and FORCE_FUNDING_CHOICES_CMP) %}
 <style>
   .cookie-banner {
     position: fixed;
