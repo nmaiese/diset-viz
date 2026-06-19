@@ -1,0 +1,49 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'temi' %}
+{% set p = profile %}
+
+{% block title %}{{ p.theme }}: indicatori territoriali delle regioni italiane · {{ site_name }}{% endblock %}
+{% block description %}Tutti gli indicatori Istat del tema {{ p.theme }} per le regioni italiane: {{ p.indicator_count }} indicatori con mappe, classifiche e serie storiche.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "{{ p.theme }} - indicatori territoriali",
+  "description": {{ ('Indicatori Istat del tema ' ~ p.theme ~ ' per le regioni italiane.') | tojson }},
+  "url": {{ canonical | tojson }}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Temi", "item": "{{ site_url }}/temi" },
+    { "@type": "ListItem", "position": 3, "name": {{ p.theme | tojson }}, "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page page-theme wrap">
+  <nav class="breadcrumb"><a href="/temi">Temi</a></nav>
+  <h1>{{ p.theme }}</h1>
+  <p class="page-lead">{{ p.indicator_count }} indicatori territoriali Istat in questo tema, confrontabili tra le 20 regioni italiane.</p>
+
+  <ul class="indicator-list">
+    {% for ind in p.indicators %}
+    <li>
+      <a href="{{ ind.path }}">
+        <strong>{{ ind.name }}</strong>
+        {% if ind.plain %}<span>{{ ind.plain }}</span>{% endif %}
+        <small>{{ ind.year_min }}-{{ ind.year_max }} · {{ ind.region_count }} regioni{% if ind.complete %} · copertura completa{% endif %}</small>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</article>
+{% endblock %}

@@ -662,3 +662,11 @@ h1, h2, h3 { font-family: var(--font-display); }
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
 }
+
+.indicator-header__seo { margin: 4px 0 0; font-size: 13.5px; }
+.insight__link { display: inline-block; margin-top: 8px; font-size: 12.5px; }
+
+/* Crawlable SSR footer below the React app (links to indexed hub pages). */
+.spa-seo-footer { padding: 24px 16px 40px; text-align: center; border-top: 1px solid var(--line, rgba(21,35,59,0.16)); }
+.spa-seo-footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: center; font-size: 13px; }
+.spa-seo-footer a { color: var(--muted, #6b7785); }

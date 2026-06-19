@@ -1,0 +1,27 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'regioni' %}
+
+{% block title %}Le regioni italiane a confronto · {{ site_name }}{% endblock %}
+{% block description %}Scegli una regione italiana e scopri il suo profilo sugli indicatori territoriali Istat: punti di forza, debolezze e regioni con un profilo simile.{% endblock %}
+
+{% block content %}
+<article class="page page-index wrap">
+  <h1>Le regioni a confronto</h1>
+  <p class="page-lead">Per ogni regione, una scheda con i temi in cui va meglio o peggio rispetto alle altre e le regioni dal profilo simile. Passa il mouse sulla mappa per un'anteprima, clicca per aprire la scheda.</p>
+
+  <div class="regions-layout">
+    <div class="regions-map-wrap">
+      {% include "_italy_map.html" %}
+      <div class="rmap-tooltip" hidden></div>
+    </div>
+    <div class="index-grid index-grid--regions">
+      {% for r in regions %}
+      <a class="index-card" href="{{ r.path }}">{{ r.region }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</article>
+
+<script id="regions-overview" type="application/json">{{ overview | tojson }}</script>
+<script src="{{ url_for('static', filename='js/regions-map.js') }}" defer></script>
+{% endblock %}
