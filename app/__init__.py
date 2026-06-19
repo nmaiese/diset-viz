@@ -10,6 +10,12 @@ Compress(app)
 cache.init_app(app)
 
 
+@app.after_request
+def add_security_headers(response):
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
+
 @app.context_processor
 def inject_site_config():
     return {
