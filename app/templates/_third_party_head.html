@@ -11,9 +11,35 @@
 {% if ADSENSE_CLIENT and FORCE_FUNDING_CHOICES_CMP %}
 <script>
   window.googlefc = window.googlefc || {};
+  googlefc.callbackQueue = googlefc.callbackQueue || [];
   googlefc.controlledMessagingFunction = function (message) {
     message.proceed(true);
   };
+  googlefc.callbackQueue.push({
+    CONSENT_API_READY: function () {
+      function bindRevocationLinks() {
+        var links = document.querySelectorAll('[data-funding-choices-revoke]');
+        for (var i = 0; i < links.length; i += 1) {
+          links[i].hidden = false;
+          if (links[i].getAttribute('data-funding-choices-bound') === 'true') {
+            continue;
+          }
+          links[i].setAttribute('data-funding-choices-bound', 'true');
+          links[i].addEventListener('click', function () {
+            if (window.googlefc && typeof window.googlefc.showRevocationMessage === 'function') {
+              window.googlefc.showRevocationMessage();
+            }
+          });
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindRevocationLinks);
+      } else {
+        bindRevocationLinks();
+      }
+    }
+  });
 </script>
 {% endif %}
 

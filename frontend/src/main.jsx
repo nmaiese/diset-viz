@@ -231,6 +231,7 @@ function SiteHeader({ children }) {
       {children}
       <nav className="masthead__links" aria-label="Collegamenti">
         <a href="/blog">Blog</a>
+        <a href="/privacy">Privacy</a>
         <a href="/legacy">Versione storica</a>
         <a
           href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"

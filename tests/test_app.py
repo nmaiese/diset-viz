@@ -143,6 +143,26 @@ class AppSmokeTest(unittest.TestCase):
             config.ADSENSE_CLIENT = original_client
             config.FORCE_FUNDING_CHOICES_CMP = original_force
 
+    def test_privacy_page_exposes_funding_choices_revocation(self):
+        from app import config
+
+        client = app.test_client()
+        original_client = config.ADSENSE_CLIENT
+        original_force = config.FORCE_FUNDING_CHOICES_CMP
+        try:
+            config.ADSENSE_CLIENT = "ca-pub-1234567890123456"
+            config.FORCE_FUNDING_CHOICES_CMP = True
+            privacy = client.get("/privacy")
+            self.assertEqual(privacy.status_code, 200)
+            html = privacy.data.decode("utf-8")
+            self.assertIn("data-funding-choices-revoke", html)
+            self.assertIn("Gestisci preferenze cookie", html)
+            self.assertIn("CONSENT_API_READY", html)
+            self.assertIn("showRevocationMessage", html)
+        finally:
+            config.ADSENSE_CLIENT = original_client
+            config.FORCE_FUNDING_CHOICES_CMP = original_force
+
     def test_internal_event_endpoint_accepts_anonymous_events(self):
         client = app.test_client()
 
