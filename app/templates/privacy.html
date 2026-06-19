@@ -1,0 +1,24 @@
+{% extends "blog_base.html" %}
+
+{% block title %}Privacy e cookie · {{ site_name }}{% endblock %}
+{% block description %}Informazioni su privacy, cookie, Google Analytics e Google AdSense per Divario Italia.{% endblock %}
+
+{% block content %}
+<main class="prose prose-wrap article-hero">
+  <nav class="breadcrumb"><a href="/">Atlante</a> / Privacy e cookie</nav>
+  <h1>Privacy e cookie</h1>
+  <p>Divario Italia è un progetto informativo basato su dati pubblici Istat. Il sito non richiede registrazione e non raccoglie dati inseriti dagli utenti tramite form personali.</p>
+
+  <h2>Statistiche</h2>
+  <p>Se configurato in produzione, il sito usa Google Analytics 4 per capire quali pagine vengono consultate e migliorare l'esperienza di navigazione. Il caricamento avviene con Consent Mode e resta subordinato alla scelta espressa nel banner cookie.</p>
+
+  <h2>Pubblicita</h2>
+  <p>Se configurato in produzione, il sito può caricare Google AdSense. Gli annunci e i relativi cookie dipendono dal consenso dell'utente e dalle impostazioni privacy gestite da Google.</p>
+
+  <h2>Contenuti incorporati e link esterni</h2>
+  <p>Alcune pagine possono includere link verso siti esterni, per esempio Istat o repository pubblici. Quei siti applicano le proprie informative.</p>
+
+  <h2>Scelta sul consenso</h2>
+  <p>Puoi accettare o rifiutare i cookie facoltativi dal banner. La scelta viene salvata nel browser e può essere modificata cancellando i dati locali del sito.</p>
+</main>
+{% endblock %}

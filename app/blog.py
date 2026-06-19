@@ -13,9 +13,7 @@ import frontmatter
 import markdown
 
 from app.cache import cache
-
-SITE_URL = "https://divarioitalia.it"
-SITE_NAME = "Divario Italia"
+from app.config import SITE_NAME, SITE_URL
 
 POSTS_DIR = Path(__file__).resolve().parents[1] / "content" / "posts"
 

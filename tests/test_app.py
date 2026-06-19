@@ -93,6 +93,26 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(robots.status_code, 200)
         self.assertIn(b"Sitemap:", robots.data)
 
+        privacy = client.get("/privacy")
+        self.assertEqual(privacy.status_code, 200)
+        self.assertIn(b"Privacy e cookie", privacy.data)
+
+    def test_ads_txt_uses_adsense_env(self):
+        from app import config
+
+        client = app.test_client()
+        original_client = config.ADSENSE_CLIENT
+        try:
+            config.ADSENSE_CLIENT = ""
+            self.assertEqual(client.get("/ads.txt").status_code, 404)
+
+            config.ADSENSE_CLIENT = "ca-pub-1234567890123456"
+            ads = client.get("/ads.txt")
+            self.assertEqual(ads.status_code, 200)
+            self.assertIn(b"google.com, pub-1234567890123456, DIRECT", ads.data)
+        finally:
+            config.ADSENSE_CLIENT = original_client
+
     def test_parse_number_rejects_non_finite(self):
         from app.data import _parse_number
 

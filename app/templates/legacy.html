@@ -1,14 +1,6 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-TH3CV6L');
-</script>
-
-
   <title>DiSET Viz</title>
   <meta property="og:title" content="DiSET Viz" />
   <meta property="og:type" content="application" />
@@ -26,6 +18,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <link href="https://fonts.googleapis.com/css?family=Mukta:300,400,500,600,700" rel="stylesheet" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+  {% include "_third_party_head.html" %}
 
 
 </head>
@@ -136,5 +129,6 @@ d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
 })
 
 </script>
+{% include "_consent_banner.html" %}
 </body>
 </html>

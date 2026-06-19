@@ -1,0 +1,33 @@
+# Build + deploy su Cloud Run a ogni push su master.
+#
+# Non impostare env var qui. SITE_URL, GA_MEASUREMENT_ID, ADSENSE_CLIENT e le
+# altre variabili pubbliche vivono sul servizio Cloud Run e vengono preservate
+# tra le revisioni. Per aggiornarne una sola usa `gcloud run services update`
+# con --update-env-vars, non --set-env-vars.
+substitutions:
+  _IMAGE: 'europe-west1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/diset-viz'
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_IMAGE}:latest', '-t', '${_IMAGE}:${SHORT_SHA}', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '--all-tags', '${_IMAGE}']
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'diset-viz'
+      - '--image=${_IMAGE}:${SHORT_SHA}'
+      - '--region=europe-west1'
+      - '--allow-unauthenticated'
+      - '--min-instances=0'
+      - '--memory=512Mi'
+
+images:
+  - '${_IMAGE}:latest'
+  - '${_IMAGE}:${SHORT_SHA}'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
