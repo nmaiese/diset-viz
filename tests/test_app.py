@@ -156,7 +156,9 @@ class AppSmokeTest(unittest.TestCase):
             self.assertEqual(privacy.status_code, 200)
             html = privacy.data.decode("utf-8")
             self.assertIn("data-funding-choices-revoke", html)
+            self.assertEqual(html.count("data-funding-choices-revoke"), 2)
             self.assertIn("Gestisci preferenze cookie", html)
+            self.assertEqual(html.count("Gestisci preferenze cookie"), 1)
             self.assertIn("CONSENT_API_READY", html)
             self.assertIn("showRevocationMessage", html)
         finally:
