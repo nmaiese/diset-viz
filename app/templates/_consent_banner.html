@@ -59,13 +59,8 @@
   })();
   function diConsent(accept) {
     try { localStorage.setItem('di_consent', accept ? 'granted' : 'denied'); } catch (e) {}
-    if (typeof gtag === 'function') {
-      gtag('consent', 'update', {
-        ad_storage: accept ? 'granted' : 'denied',
-        analytics_storage: accept ? 'granted' : 'denied',
-        ad_user_data: accept ? 'granted' : 'denied',
-        ad_personalization: accept ? 'granted' : 'denied'
-      });
+    if (typeof window.diApplyGoogleConsent === 'function') {
+      window.diApplyGoogleConsent(accept ? 'granted' : 'denied');
     }
     var banner = document.getElementById('cookie-banner');
     if (banner) banner.hidden = true;
