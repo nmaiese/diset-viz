@@ -119,6 +119,23 @@ class AppSmokeTest(unittest.TestCase):
         finally:
             config.ADSENSE_CLIENT = original_client
 
+    def test_internal_event_endpoint_accepts_anonymous_events(self):
+        client = app.test_client()
+
+        event = client.post("/api/events", json={
+            "name": "select_indicator",
+            "path": "/?indicator=105",
+            "title": "Divario Italia",
+            "params": {
+                "indicator_id": "105",
+                "enabled": True,
+                "nested": {"ignored": True},
+            },
+        })
+        self.assertEqual(event.status_code, 204)
+
+        self.assertEqual(client.post("/api/events", json={"name": "bad-name!"}).status_code, 400)
+
     def test_parse_number_rejects_non_finite(self):
         from app.data import _parse_number
 

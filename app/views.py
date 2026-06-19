@@ -6,7 +6,7 @@ from app.data import get_catalog, get_indicator, get_indicator_year, get_rows, s
 from flask import Response, abort, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
-import csv, os
+import csv, json, os, re
 
 from app import config
 
@@ -67,6 +67,23 @@ def indicator_year(indicator_id, year):
     if payload is None:
         abort(404)
     return jsonify(payload)
+
+
+@app.post("/api/events")
+def analytics_event():
+    payload = request.get_json(silent=True) or {}
+    name = _clean_event_name(payload.get("name"))
+    if not name:
+        abort(400)
+
+    event = {
+        "name": name,
+        "path": _clean_event_value(payload.get("path")),
+        "title": _clean_event_value(payload.get("title")),
+        "params": _clean_event_params(payload.get("params")),
+    }
+    app.logger.info("analytics_event %s", json.dumps(event, ensure_ascii=False, sort_keys=True))
+    return ("", 204)
 
 
 @app.route("/blog")
@@ -142,3 +159,34 @@ def ads_txt():
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'img/favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
+def _clean_event_name(value):
+    value = str(value or "")[:64]
+    return value if re.fullmatch(r"[a-zA-Z][a-zA-Z0-9_]*", value) else ""
+
+
+def _clean_event_params(value):
+    if not isinstance(value, dict):
+        return {}
+    params = {}
+    for key, raw in value.items():
+        clean_key = _clean_event_name(key)
+        if not clean_key:
+            continue
+        clean_value = _clean_event_value(raw)
+        if clean_value != "":
+            params[clean_key] = clean_value
+        if len(params) >= 12:
+            break
+    return params
+
+
+def _clean_event_value(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value
+    if value is None:
+        return ""
+    return " ".join(str(value).split())[:160]

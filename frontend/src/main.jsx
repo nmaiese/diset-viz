@@ -81,6 +81,11 @@ function App() {
   useEffect(() => {
     if (initialPageView.current) {
       initialPageView.current = false;
+      trackInternalEvent("page_view", {
+        page_location: window.location.href,
+        page_path: `${window.location.pathname}${window.location.search}`,
+        page_title: document.title,
+      });
       return;
     }
     trackPageView();
@@ -1037,17 +1042,39 @@ function formatCompact(value, unit = "") {
 }
 
 function trackEvent(name, params = {}) {
-  if (typeof window === "undefined" || typeof window.gtag !== "function") return;
-  window.gtag("event", name, params);
+  if (typeof window === "undefined") return;
+  if (typeof window.gtag === "function") {
+    window.gtag("event", name, params);
+  }
+  trackInternalEvent(name, params);
 }
 
 function trackPageView() {
-  if (typeof window === "undefined" || typeof window.gtag !== "function") return;
-  window.gtag("event", "page_view", {
+  if (typeof window === "undefined") return;
+  trackEvent("page_view", {
     page_location: window.location.href,
     page_path: `${window.location.pathname}${window.location.search}`,
     page_title: document.title,
   });
+}
+
+function trackInternalEvent(name, params = {}) {
+  const body = JSON.stringify({
+    name,
+    params,
+    path: `${window.location.pathname}${window.location.search}`,
+    title: document.title,
+  });
+
+  try {
+    fetch("/api/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+      keepalive: true,
+      credentials: "omit",
+    }).catch(() => {});
+  } catch (_) {}
 }
 
 createRoot(document.getElementById("root")).render(<App />);
