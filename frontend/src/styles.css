@@ -78,6 +78,35 @@ h1, h2, h3 { font-family: var(--font-display); }
 .masthead__links a { display: inline-flex; align-items: center; gap: 4px; }
 .masthead__links a:hover { color: var(--ink); }
 
+.site-footer {
+  margin-top: 64px;
+  padding: 32px clamp(16px, 4vw, 48px);
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13.5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  justify-content: space-between;
+}
+.site-footer a,
+.privacy-settings-link {
+  color: var(--accent);
+  text-decoration: none;
+}
+.site-footer a:hover,
+.privacy-settings-link:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+.privacy-settings-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
 .back-link {
   display: inline-flex;
   align-items: center;
