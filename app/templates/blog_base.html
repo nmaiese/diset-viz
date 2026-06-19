@@ -16,6 +16,7 @@
     <meta property="og:url" content="{{ canonical }}">
     {% endblock %}
     <meta name="twitter:card" content="summary_large_image">
+    {% include "_third_party_head.html" %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
@@ -42,7 +43,8 @@
 
     <footer class="site-footer">
       <span>{{ site_name }} · dati <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Istat</a>, indicatori territoriali per le politiche di sviluppo</span>
-      <span><a href="/">Esplora l'atlante</a> · <a href="/blog">Tutti gli articoli</a></span>
+      <span><a href="/">Esplora l'atlante</a> · <a href="/blog">Tutti gli articoli</a> · <a href="/privacy">Privacy e cookie</a></span>
     </footer>
+    {% include "_consent_banner.html" %}
   </body>
 </html>

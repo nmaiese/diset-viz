@@ -8,6 +8,7 @@ from flask.json import jsonify
 
 import csv, os
 
+from app import config
 
 
 @cache.memoize(timeout=100)
@@ -96,11 +97,22 @@ def blog_post(slug):
     )
 
 
+@app.route("/privacy")
+def privacy():
+    return render_template(
+        "privacy.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/privacy",
+    )
+
+
 @app.route("/sitemap.xml")
 def sitemap():
     pages = [
         {"loc": f"{SITE_URL}/", "priority": "1.0"},
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
+        {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
     for post in get_posts():
         pages.append({
@@ -116,6 +128,14 @@ def sitemap():
 def robots():
     body = f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n"
     return Response(body, mimetype="text/plain")
+
+
+@app.route("/ads.txt")
+def ads_txt():
+    if not config.ADSENSE_CLIENT:
+        abort(404)
+    pub = config.ADSENSE_CLIENT.replace("ca-", "")
+    return Response(f"google.com, {pub}, DIRECT, f08c47fec0942fa0\n", mimetype="text/plain")
 
 
 @app.route('/favicon.ico')
