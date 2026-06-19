@@ -61,6 +61,38 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(search.status_code, 200)
         self.assertIn("results", search.get_json())
 
+    def test_blog_routes(self):
+        from app.blog import get_posts
+
+        client = app.test_client()
+
+        listing = client.get("/blog")
+        self.assertEqual(listing.status_code, 200)
+        self.assertIn(b"Divario Italia", listing.data)
+
+        posts = get_posts()
+        self.assertGreater(len(posts), 0)
+        slug = posts[0]["slug"]
+
+        post = client.get(f"/blog/{slug}")
+        self.assertEqual(post.status_code, 200)
+        self.assertIn(b"application/ld+json", post.data)
+        self.assertIn(b'property="og:type" content="article"', post.data)
+
+        self.assertEqual(client.get("/blog/does-not-exist").status_code, 404)
+
+    def test_seo_routes(self):
+        client = app.test_client()
+
+        sitemap = client.get("/sitemap.xml")
+        self.assertEqual(sitemap.status_code, 200)
+        self.assertIn("xml", sitemap.headers["Content-Type"])
+        self.assertIn(b"/blog", sitemap.data)
+
+        robots = client.get("/robots.txt")
+        self.assertEqual(robots.status_code, 200)
+        self.assertIn(b"Sitemap:", robots.data)
+
     def test_parse_number_rejects_non_finite(self):
         from app.data import _parse_number
 

@@ -1,8 +1,9 @@
 from app import app
 from app.cache import cache
+from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts
 from app.data import get_catalog, get_indicator, get_indicator_year, get_rows, search_indicators
 
-from flask import abort, render_template, request, send_from_directory
+from flask import Response, abort, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
 import csv, os
@@ -65,6 +66,56 @@ def indicator_year(indicator_id, year):
     if payload is None:
         abort(404)
     return jsonify(payload)
+
+
+@app.route("/blog")
+def blog_index():
+    return render_template(
+        "blog_list.html",
+        posts=get_posts(),
+        tags=all_tags(),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/blog",
+    )
+
+
+@app.route("/blog/<slug>")
+def blog_post(slug):
+    post = get_post(slug)
+    if post is None:
+        abort(404)
+    related = [p for p in get_posts() if p["slug"] != slug][:3]
+    return render_template(
+        "blog_post.html",
+        post=post,
+        related=related,
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=post["url"],
+    )
+
+
+@app.route("/sitemap.xml")
+def sitemap():
+    pages = [
+        {"loc": f"{SITE_URL}/", "priority": "1.0"},
+        {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
+    ]
+    for post in get_posts():
+        pages.append({
+            "loc": post["url"],
+            "lastmod": post["date"].isoformat(),
+            "priority": "0.7",
+        })
+    xml = render_template("sitemap.xml", pages=pages)
+    return Response(xml, mimetype="application/xml")
+
+
+@app.route("/robots.txt")
+def robots():
+    body = f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n"
+    return Response(body, mimetype="text/plain")
 
 
 @app.route('/favicon.ico')

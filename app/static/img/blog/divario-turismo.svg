@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="Archivo, Arial, sans-serif">
+  <rect width="1200" height="630" fill="#fbfaf7"/>
+  <g stroke="rgba(21,35,59,0.07)">
+    <line x1="0" y1="28" x2="1200" y2="28"/><line x1="0" y1="56" x2="1200" y2="56"/>
+    <line x1="0" y1="84" x2="1200" y2="84"/><line x1="0" y1="112" x2="1200" y2="112"/>
+    <line x1="0" y1="140" x2="1200" y2="140"/>
+  </g>
+  <text x="56" y="92" font-size="22" font-family="'Space Mono', monospace" fill="#e4572e" letter-spacing="3">DIVARIO ITALIA · DATI 2024</text>
+  <text x="54" y="170" font-size="64" font-weight="800" fill="#15233b">Il divario turistico</text>
+  <text x="56" y="208" font-size="22" font-family="'Space Mono', monospace" fill="#6b7785">Tasso di turisticità · giornate di presenza per abitante</text>
+
+  <!-- bars -->
+  <g font-family="'Space Mono', monospace">
+    <!-- Trentino-Alto Adige 52.3 (max) -->
+    <text x="56" y="285" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Trentino-Alto Adige</text>
+    <rect x="360" y="266" width="779" height="26" fill="#e4572e"/>
+    <text x="1150" y="286" font-size="20" fill="#15233b" text-anchor="end">52,3</text>
+
+    <text x="56" y="343" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Valle d'Aosta</text>
+    <rect x="360" y="324" width="449" height="26" fill="#15233b"/>
+    <text x="825" y="344" font-size="20" fill="#15233b" text-anchor="start">30,1</text>
+
+    <text x="56" y="401" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Veneto</text>
+    <rect x="360" y="382" width="226" height="26" fill="#15233b"/>
+    <text x="602" y="402" font-size="20" fill="#15233b" text-anchor="start">15,1</text>
+
+    <text x="56" y="459" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Toscana</text>
+    <rect x="360" y="440" width="188" height="26" fill="#15233b"/>
+    <text x="564" y="460" font-size="20" fill="#15233b" text-anchor="start">12,6</text>
+
+    <!-- Molise 1.6 (min) -->
+    <text x="56" y="517" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Molise</text>
+    <rect x="360" y="498" width="24" height="26" fill="#fbfaf7" stroke="#e4572e" stroke-width="2"/>
+    <text x="396" y="518" font-size="20" fill="#e4572e" text-anchor="start">1,6</text>
+  </g>
+
+  <line x1="56" y1="560" x2="1144" y2="560" stroke="rgba(21,35,59,0.16)"/>
+  <text x="56" y="592" font-size="18" font-family="'Space Mono', monospace" fill="#6b7785">Fonte: Istat — Indicatori territoriali per le politiche di sviluppo</text>
+  <text x="1144" y="592" font-size="18" font-weight="700" fill="#15233b" text-anchor="end" font-family="Archivo, Arial, sans-serif">divarioitalia.it</text>
+</svg>

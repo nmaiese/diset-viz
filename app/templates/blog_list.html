@@ -1,0 +1,64 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'blog' %}
+
+{% block title %}Blog · {{ site_name }} — analisi sul divario territoriale{% endblock %}
+{% block description %}Articoli e analisi data-driven sul divario tra le regioni italiane: lavoro, istruzione, turismo, ambiente e altro, dagli indicatori territoriali Istat.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "{{ site_name }} — Blog",
+  "url": "{{ canonical }}",
+  "description": "Analisi data-driven sul divario territoriale italiano.",
+  "blogPost": [
+    {% for post in posts %}
+    {
+      "@type": "BlogPosting",
+      "headline": {{ post.title | tojson }},
+      "url": {{ post.url | tojson }},
+      "datePublished": "{{ post.date.isoformat() }}",
+      "author": { "@type": "Organization", "name": {{ post.author | tojson }} }
+    }{{ "," if not loop.last }}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="blog-hero">
+  <div class="wrap">
+    <p class="eyebrow">Il blog di Divario Italia</p>
+    <h1>Leggere i numeri del divario.</h1>
+    <p>Analisi brevi e basate sui dati: come cambiano le distanze tra le regioni italiane, tema per tema. Ogni articolo parte da un indicatore ufficiale e ti porta dentro l'atlante.</p>
+  </div>
+</section>
+
+<main class="wrap">
+  {% if posts %}
+  <div class="post-grid">
+    {% for post in posts %}
+    <a class="post-card" href="/blog/{{ post.slug }}">
+      <div class="post-card__cover">
+        {% if post.cover %}<img src="{{ post.cover }}" alt="{{ post.cover_alt }}" loading="lazy" width="640" height="360">{% endif %}
+      </div>
+      <div class="post-card__body">
+        <span class="post-card__meta">{{ post.date.strftime('%d.%m.%Y') }} · {{ post.read_time }} min{% if post.tags %} · {{ post.tags[0] }}{% endif %}</span>
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.description }}</p>
+        {% if post.tags %}
+        <div class="post-card__tags">
+          {% for tag in post.tags %}<span class="tag-pill">{{ tag }}</span>{% endfor %}
+        </div>
+        {% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="empty-note">Ancora nessun articolo pubblicato. Torna presto.</p>
+  {% endif %}
+</main>
+{% endblock %}

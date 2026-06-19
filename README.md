@@ -1,10 +1,11 @@
-# DiSET Viz
+# Divario Italia
 
-DiSET Viz is a Flask and D3.js dashboard for exploring socio-economic indicators
-about Italian regions from Istat territorial development indicators.
+**Divario Italia** ([divarioitalia.it](https://divarioitalia.it)) is a Flask + React
+atlas for exploring the territorial divide between Italian regions, built on the
+Istat territorial development indicators.
 
-The project combines maps, bar charts and metric selectors to make territorial
-statistics easier to inspect.
+It combines an interactive atlas (maps, rankings, time series) with a
+data-driven blog about regional disparities.
 
 ## Features
 
@@ -14,7 +15,11 @@ statistics easier to inspect.
 - **Indicator detail**: choropleth map, regional ranking and historical series,
   with year/region selectors, contextual insights (value + rank) and in-theme
   previous/next navigation.
-- Shareable URLs across both views (`view`, `indicator`, `year`, `region`,
+- **Blog**: server-rendered, SEO-oriented articles written in Markdown
+  (`content/posts/*.md`) — meant to be published automatically by an AI agent.
+  Includes per-article meta tags, Open Graph, JSON-LD, `sitemap.xml` and
+  `robots.txt`.
+- Shareable URLs across both atlas views (`view`, `indicator`, `year`, `region`,
   `theme`, `q`, `sort`, `partial`).
 - Flask backend serving a filtered API (no full dataset download in the SPA).
 
@@ -28,11 +33,41 @@ statistics easier to inspect.
 
 ## App Structure
 
-- `/` serves the new React data-magazine interface.
+- `/` serves the React atlas (single-page app).
+- `/blog` and `/blog/<slug>` are server-rendered (Jinja) for SEO.
+- `/sitemap.xml` and `/robots.txt` expose the site to crawlers.
 - `/legacy` keeps the original D3.js dashboard available as an archive view.
 - `/data` still returns the full legacy dataset for the archived D3 view.
 - `/api/catalog`, `/api/search`, `/api/indicator/<id>` and
-  `/api/indicator/<id>/year/<year>` power the new filtered interface.
+  `/api/indicator/<id>/year/<year>` power the atlas.
+
+## Writing blog articles
+
+Drop a Markdown file in `content/posts/` — it is published automatically. Use
+YAML frontmatter:
+
+```markdown
+---
+title: "Headline (keep it SEO-friendly)"
+slug: optional-custom-slug          # otherwise derived from the filename
+description: "Meta description, ~155 chars, used for SEO and Open Graph."
+date: 2026-06-19
+author: "Redazione Divario Italia"
+cover: /static/img/blog/your-cover.svg
+cover_alt: "Accessible description of the cover"
+tags: [Turismo, Divario Nord-Sud]
+indicator: 105                      # optional: links to /?indicator=105 in the atlas
+indicator_label: "Tasso di turisticità (2024)"
+draft: false                        # set true to hide
+---
+
+Body in Markdown. Tables, lists and `> blockquotes` are supported. Add
+`{: .data-callout}` after a paragraph to render it as a highlighted data box,
+and link into the atlas with `[text](/?indicator=105&year=2024)`.
+```
+
+See `content/posts/2026-06-19-divario-turistico-nord-sud-2024.md` for a full
+example.
 
 ## Data
 
