@@ -60,6 +60,16 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px;
   display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: space-between;
 }
+.privacy-settings-link {
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.privacy-settings-link:hover { color: var(--ink); }
 
 /* Blog listing */
 .blog-hero { padding: clamp(28px, 5vw, 64px) 0 clamp(16px, 3vw, 32px); border-bottom: 1px solid var(--line);
