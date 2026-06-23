@@ -2,7 +2,7 @@
 
 Stato verificato il 2026-06-23.
 
-Versione GTM live pubblicata: `6`, nome `Reduce duplicate page_view events 2026-06-23`.
+Versione GTM live pubblicata: `7`, nome `Disable automatic page_view 2026-06-23`.
 
 Questa specifica applica a Divario Italia la stessa gerarchia operativa usata su
 Vecchio Conio: consenso inizializzato in pagina, Google Tag Manager come router,
@@ -80,8 +80,8 @@ Tag principali:
 |---|---|---|---|
 | `iubenda Privacy Controls and Cookie Solution` | template Iubenda | `Consent Initialization - All Pages` | da collegare manualmente a Iubenda |
 | `Consent update - Google ads from Iubenda TCF` | Custom HTML | `Consent Initialization - All Pages` | stesso schema di Vecchio Conio, concede consenso ads solo se Iubenda/TCF lo permette |
-| `Google Tag` | Google tag | `Initialization - All Pages` | usa `G-THTPZZ02QH`, invia la pageview automatica iniziale |
-| `GA4 event - page_view` | GA4 event | `CE - page_view` | solo cambi logici della SPA dopo il primo caricamento |
+| `Google Tag` | Google tag | `Initialization - All Pages` | usa `G-THTPZZ02QH`, con `send_page_view=false` |
+| `GA4 event - page_view` | GA4 event | `CE - page_view` | pageview unica da `dataLayer`, SPA e pagine server |
 | `GA4 event - select_indicator` | GA4 event | `CE - select_indicator` | apertura indicatore |
 | `GA4 event - back_to_atlas` | GA4 event | `CE - back_to_atlas` | ritorno all'atlante |
 | `GA4 event - change_year` | GA4 event | `CE - change_year` | cambio anno |
@@ -111,6 +111,7 @@ Regole operative GTM:
 - non inviare eventi GA4 direttamente dal codice applicativo
 - il codice applicativo deve solo fare push nel `dataLayer`
 - non rieseguire il Google Tag su `iubenda_gtm_consent_event`, l'aggiornamento consenso passa dal tag dedicato
+- `send_page_view` sul Google Tag deve restare `false`, per evitare doppie pageview tra hit automatica e aggiornamenti consenso
 
 ## AdSense
 
@@ -131,14 +132,14 @@ google.com, pub-6806451730012282, DIRECT, f08c47fec0942fa0
 
 ## Eventi dataLayer
 
-Gli eventi SPA sono emessi da `frontend/src/main.jsx`. Le pageview iniziali,
-incluse le pagine server-rendered, sono gestite automaticamente dal Google Tag.
-La SPA emette `page_view` nel `dataLayer` solo dopo il primo caricamento, quando
-cambia vista logica tra atlante e dettaglio indicatore.
+Gli eventi SPA sono emessi da `frontend/src/main.jsx`. Le pagine server-rendered
+emettono `page_view` da `app/templates/_third_party_head.html`. La homepage SPA
+esclude la pageview server con `TRACK_SERVER_PAGE_VIEW=false`, quindi al primo
+accesso resta una sola pageview, quella emessa da React.
 
 | Evento | Quando parte | Uso |
 |---|---|---|
-| `page_view` | cambio vista logica SPA dopo il primo caricamento | navigazione |
+| `page_view` | apertura SPA, cambio vista SPA, apertura pagine server | navigazione |
 | `select_indicator` | apertura di un indicatore dall'atlante | interesse indicatore |
 | `back_to_atlas` | ritorno dalla scheda all'atlante | navigazione |
 | `change_year` | cambio anno nella scheda indicatore | esplorazione temporale |
@@ -175,6 +176,7 @@ Parametri applicativi:
 Configurazione richiesta:
 
 - usa il Google Tag con `G-THTPZZ02QH`
+- imposta `send_page_view=false` sul Google Tag
 - mantieni Enhanced Measurement attivo per scroll, outbound click, site search, video, download e form
 - mantieni disattivato `pageChangesEnabled`, perché questa SPA aggiorna l'URL anche per filtri, anno e regione
 - mantieni create le custom dimension evento per ogni parametro utile all'analisi
@@ -220,6 +222,7 @@ API dopo re-auth OAuth con scope `analytics.edit`,
 Verifica live eseguita con Chrome headless e API Google:
 
 - il container pubblico `GTM-PZ45BG7D` contiene `G-THTPZZ02QH`
+- il JavaScript GTM contiene `send_page_view=false` sul Google Tag
 - il JavaScript GTM non contiene piu `iubenda_gtm_consent_event` come trigger del Google Tag
 - la stream GA4 mantiene Enhanced Measurement attivo ma con `pageChangesEnabled` disattivato
-- il codice applicativo non emette piu `page_view` manuale al primo caricamento SPA o dalle pagine server-rendered
+- il codice applicativo emette una sola `page_view` manuale per SPA o pagina server-rendered
