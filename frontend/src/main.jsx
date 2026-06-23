@@ -68,6 +68,7 @@ function App() {
 
   const [activeTab, setActiveTab] = useState("map");
   const pageViewKey = activeView === "detail" ? `detail:${selectedId || ""}` : "atlas";
+  const initialPageViewHandled = useRef(false);
   const lastPageViewKey = useRef(null);
 
   useEffect(() => {
@@ -83,6 +84,10 @@ function App() {
     if (activeView === "detail" && !selectedId) return;
     if (lastPageViewKey.current === pageViewKey) return;
     lastPageViewKey.current = pageViewKey;
+    if (!initialPageViewHandled.current) {
+      initialPageViewHandled.current = true;
+      return;
+    }
     trackPageView({
       view_type: activeView,
       indicator_id: activeView === "detail" ? selectedId : undefined,

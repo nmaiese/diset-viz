@@ -242,8 +242,7 @@ class AppSmokeTest(unittest.TestCase):
             blog = client.get("/blog")
             self.assertEqual(blog.status_code, 200)
             blog_html = blog.data.decode("utf-8")
-            self.assertIn("event: 'page_view'", blog_html)
-            self.assertIn("page_type: window.location.pathname.indexOf('/blog') === 0 ? 'blog' : 'server'", blog_html)
+            self.assertNotIn("event: 'page_view'", blog_html)
         finally:
             config.ADSENSE_CLIENT = original_client
             config.GOOGLE_TAG_MANAGER_ID = original_gtm
