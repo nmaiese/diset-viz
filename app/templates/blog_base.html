@@ -25,6 +25,7 @@
     {% block head_extra %}{% endblock %}
   </head>
   <body>
+    {% include "_third_party_body.html" %}
     <header class="masthead">
       <a class="brand" href="/">
         <span class="brand-mark">DI</span>
@@ -51,6 +52,5 @@
       {% include "_funding_choices_revoke.html" %}
       {% endblock %}
     </footer>
-    {% include "_consent_banner.html" %}
   </body>
 </html>

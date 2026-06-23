@@ -10,11 +10,10 @@ Sono variabili pubbliche, quindi non serve Secret Manager:
 | Variabile | Esempio | A cosa serve |
 |---|---|---|
 | `SITE_URL` | `https://divarioitalia.it` | URL canonico per sitemap, canonical e blog |
-| `GA_MEASUREMENT_ID` | `G-THTPZZ02QH` | Google Analytics 4 |
-| `ADSENSE_CLIENT` | `ca-pub-XXXXXXXXXXXXXXXX` | Google AdSense e `/ads.txt` |
+| `GOOGLE_TAG_MANAGER_ID` | `GTM-PZ45BG7D` | Contenitore per Analytics, CMP e altri tag |
+| `GA_MEASUREMENT_ID` | `G-THTPZZ02QH` | Measurement ID GA4 da usare nei tag GTM |
+| `ADSENSE_CLIENT` | `ca-pub-6806451730012282` | Google AdSense e `/ads.txt` |
 | `ADSENSE_SLOT_BANNER` | `1234567890` | Slot opzionale per banner futuri |
-| `FORCE_FUNDING_CHOICES_CMP` | `true` | Forza Funding Choices a procedere con il messaggio quando Google lo rende eleggibile |
-| `ENABLE_CONSENT_BANNER` | `true` | Banner consenso cookie |
 | `GOOGLE_SITE_VERIFICATION` | `...` | Verifica Search Console |
 | `BING_SITE_VERIFICATION` | `...` | Verifica Bing Webmaster Tools |
 
@@ -23,8 +22,16 @@ Impostale sul servizio Cloud Run con `--update-env-vars`, mai con
 
 ```bash
 gcloud run services update diset-viz --region europe-west1 \
-  --update-env-vars SITE_URL=https://divarioitalia.it,GA_MEASUREMENT_ID=G-THTPZZ02QH,ADSENSE_CLIENT=ca-pub-XXXXXXXXXXXXXXXX,FORCE_FUNDING_CHOICES_CMP=true,ENABLE_CONSENT_BANNER=true
+  --update-env-vars SITE_URL=https://divarioitalia.it,GOOGLE_TAG_MANAGER_ID=GTM-PZ45BG7D,GA_MEASUREMENT_ID=G-THTPZZ02QH,ADSENSE_CLIENT=ca-pub-6806451730012282
 ```
+
+Il template imposta il default di Google Consent Mode prima di qualunque script
+Google, poi carica Google Tag Manager e, se configurato, il loader AdSense nel
+`<head>`. Non ci sono tag nativi GA4, dispatcher GA4 Custom HTML, banner CMP
+locale o tag Funding Choices nel codice del sito.
+
+La strategia completa, inclusi eventi e configurazione GTM/GA4, è in
+[`docs/tracking_spec.md`](docs/tracking_spec.md).
 
 ## Primo deploy
 

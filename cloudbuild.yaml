@@ -1,9 +1,9 @@
 # Build + deploy su Cloud Run a ogni push su master.
 #
-# Non impostare env var qui. SITE_URL, GA_MEASUREMENT_ID, ADSENSE_CLIENT e le
-# altre variabili pubbliche vivono sul servizio Cloud Run e vengono preservate
-# tra le revisioni. Per aggiornarne una sola usa `gcloud run services update`
-# con --update-env-vars, non --set-env-vars.
+# Non impostare env var qui. SITE_URL, GOOGLE_TAG_MANAGER_ID,
+# GA_MEASUREMENT_ID, ADSENSE_CLIENT e le altre variabili pubbliche vivono sul
+# servizio Cloud Run e vengono preservate tra le revisioni. Per aggiornarne una
+# sola usa `gcloud run services update` con --update-env-vars, non --set-env-vars.
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
