@@ -24,6 +24,7 @@
 </head>
 
 <body>
+  {% include "_third_party_body.html" %}
 
   <nav class="navbar navbar-inverse navbar-top">
     <div class="container">
@@ -129,6 +130,5 @@ d3.json('static/data/italian-regions.geo.json', function(error, map_data) {
 })
 
 </script>
-{% include "_consent_banner.html" %}
 </body>
 </html>

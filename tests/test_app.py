@@ -211,50 +211,59 @@ class AppSmokeTest(unittest.TestCase):
         finally:
             config.ADSENSE_CLIENT = original_client
 
-    def test_funding_choices_force_script_precedes_adsense_loader(self):
+    def test_gtm_consent_default_precedes_gtm_and_adsense(self):
         from app import config
 
         client = app.test_client()
         original_client = config.ADSENSE_CLIENT
-        original_force = config.FORCE_FUNDING_CHOICES_CMP
+        original_gtm = config.GOOGLE_TAG_MANAGER_ID
         try:
+            config.GOOGLE_TAG_MANAGER_ID = "GTM-PZ45BG7D"
             config.ADSENSE_CLIENT = "ca-pub-1234567890123456"
-            config.FORCE_FUNDING_CHOICES_CMP = True
             home = client.get("/")
             self.assertEqual(home.status_code, 200)
             html = home.data.decode("utf-8")
-            force_index = html.index("googlefc.controlledMessagingFunction")
+            consent_index = html.index("gtag('consent', 'default'")
+            gtm_index = html.index("googletagmanager.com/gtm.js?id=")
             loader_index = html.index("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
-            self.assertLess(force_index, loader_index)
-            self.assertIn("message.proceed(true)", html)
-            self.assertIn("window.__diUsesFundingChoicesCmp = true", html)
-            self.assertNotIn("gtag('consent', 'default'", html)
-            self.assertNotIn("window.diApplyGoogleConsent('denied')", html)
+            self.assertLess(consent_index, gtm_index)
+            self.assertLess(consent_index, loader_index)
+            self.assertIn("'analytics_storage': 'denied'", html)
+            self.assertIn("'wait_for_update': 2000", html)
+            self.assertIn("gtag('set', 'ads_data_redaction', true)", html)
+            self.assertIn("GTM-PZ45BG7D", html)
+            self.assertIn("googletagmanager.com/ns.html?id=GTM-PZ45BG7D", html)
+            self.assertNotIn("event: 'page_view'", html)
+            self.assertNotIn("googletagmanager.com/gtag/js", html)
+            self.assertNotIn("diSendGoogleEvent", html)
+            self.assertNotIn("googlefc.controlledMessagingFunction", html)
+            self.assertNotIn("diApplyGoogleConsent", html)
+
+            blog = client.get("/blog")
+            self.assertEqual(blog.status_code, 200)
+            blog_html = blog.data.decode("utf-8")
+            self.assertIn("event: 'page_view'", blog_html)
+            self.assertIn("page_type: window.location.pathname.indexOf('/blog') === 0 ? 'blog' : 'server'", blog_html)
         finally:
             config.ADSENSE_CLIENT = original_client
-            config.FORCE_FUNDING_CHOICES_CMP = original_force
+            config.GOOGLE_TAG_MANAGER_ID = original_gtm
 
-    def test_privacy_page_exposes_funding_choices_revocation(self):
+    def test_privacy_page_exposes_iubenda_preferences_button(self):
         from app import config
 
         client = app.test_client()
-        original_client = config.ADSENSE_CLIENT
-        original_force = config.FORCE_FUNDING_CHOICES_CMP
+        original_gtm = config.GOOGLE_TAG_MANAGER_ID
         try:
-            config.ADSENSE_CLIENT = "ca-pub-1234567890123456"
-            config.FORCE_FUNDING_CHOICES_CMP = True
+            config.GOOGLE_TAG_MANAGER_ID = "GTM-PZ45BG7D"
             privacy = client.get("/privacy")
             self.assertEqual(privacy.status_code, 200)
             html = privacy.data.decode("utf-8")
-            self.assertIn("data-funding-choices-revoke", html)
-            self.assertEqual(html.count("data-funding-choices-revoke"), 2)
+            self.assertIn("diOpenConsentPreferences", html)
             self.assertIn("Gestisci preferenze cookie", html)
-            self.assertEqual(html.count("Gestisci preferenze cookie"), 1)
-            self.assertIn("CONSENT_API_READY", html)
-            self.assertIn("showRevocationMessage", html)
+            self.assertNotIn("data-funding-choices-revoke", html)
+            self.assertNotIn("showRevocationMessage", html)
         finally:
-            config.ADSENSE_CLIENT = original_client
-            config.FORCE_FUNDING_CHOICES_CMP = original_force
+            config.GOOGLE_TAG_MANAGER_ID = original_gtm
 
     def test_internal_event_endpoint_accepts_anonymous_events(self):
         client = app.test_client()

@@ -1,5 +1,5 @@
-{% if ADSENSE_CLIENT and FORCE_FUNDING_CHOICES_CMP %}
-<button class="privacy-settings-link" type="button" hidden data-funding-choices-revoke>
+{% if GOOGLE_TAG_MANAGER_ID %}
+<button class="privacy-settings-link" type="button" onclick="diOpenConsentPreferences()">
   Gestisci preferenze cookie
 </button>
 {% endif %}

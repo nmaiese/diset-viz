@@ -252,6 +252,8 @@ function SiteHeader({ children }) {
 }
 
 function SiteFooter() {
+  const hasConsentPreferences = typeof window !== "undefined" && typeof window.diOpenConsentPreferences === "function";
+
   return (
     <footer className="site-footer">
       <span>
@@ -268,9 +270,11 @@ function SiteFooter() {
       <span>
         <a href="/">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
       </span>
-      <button className="privacy-settings-link" type="button" hidden data-funding-choices-revoke>
-        Gestisci preferenze cookie
-      </button>
+      {hasConsentPreferences && (
+        <button className="privacy-settings-link" type="button" onClick={() => window.diOpenConsentPreferences()}>
+          Gestisci preferenze cookie
+        </button>
+      )}
     </footer>
   );
 }
@@ -1110,11 +1114,6 @@ function trackEvent(name, params = {}) {
   if (typeof window === "undefined") return;
   const eventParams = buildAnalyticsParams(params);
   pushDataLayerEvent(name, eventParams);
-  if (typeof window.diSendGoogleEvent === "function") {
-    window.diSendGoogleEvent(name, eventParams);
-  } else if (typeof window.gtag === "function") {
-    window.gtag("event", name, eventParams);
-  }
   trackInternalEvent(name, eventParams);
 }
 
@@ -1147,7 +1146,7 @@ function trackInternalEvent(name, params = {}) {
 }
 
 function pushDataLayerEvent(name, params = {}) {
-  if (!Array.isArray(window.dataLayer)) return;
+  window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
     event: name,
     ...params,
