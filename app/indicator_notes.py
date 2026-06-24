@@ -18,6 +18,7 @@ THEME_EXAMPLES = {
     "Mercato dei capitali e finanza d'impresa": "Esempio: racconta quanto sia facile o rischioso finanziare imprese e investimenti in una regione.",
     "Pubblica Amministrazione": "Esempio: rende visibili tempi, trasparenza e capacità attuativa delle amministrazioni, cioè pezzi concreti della macchina pubblica.",
     "Qualità dell'aria": "Esempio: aiuta a confrontare l'impatto ambientale di attività produttive, trasporti e consumi energetici.",
+    "Reddito e ricchezza": "Esempio: misura quanta ricchezza un territorio produce e quanto reddito resta davvero nelle tasche delle famiglie, al netto della sua dimensione.",
     "Ricerca ed innovazione": "Esempio: mostra se università, imprese e istituzioni producono conoscenza, brevetti e innovazione in modo diffuso.",
     "Rifiuti": "Esempio: serve a leggere quanto il ciclo dei rifiuti sia orientato al recupero o ancora dipendente dallo smaltimento.",
     "Risorse idriche": "Esempio: fa emergere differenze molto concrete, come perdite di rete, qualità dell'acqua e continuità del servizio.",
@@ -45,6 +46,7 @@ THEME_CAVEATS = {
     "Mercato dei capitali e finanza d'impresa": "Il dato non dice tutto sulla salute delle imprese, ma illumina il rapporto con credito, rischio e capitale.",
     "Pubblica Amministrazione": "Un valore medio può nascondere amministrazioni molto diverse dentro la stessa regione.",
     "Qualità dell'aria": "Le emissioni dipendono anche da industria, traffico, agricoltura e produzione energetica: il dato non va letto come colpa unica dei residenti.",
+    "Reddito e ricchezza": "Il valore pro capite va letto insieme al costo della vita, alle disuguaglianze interne e alla redistribuzione, perché la media regionale nasconde differenze tra persone e tra aree.",
     "Ricerca ed innovazione": "Non tutta l'innovazione passa da spesa formale, brevetti o addetti R&S, ma questi segnali aiutano a vedere dove il sistema investe conoscenza.",
     "Rifiuti": "Il dato non racconta da solo prevenzione, qualità della raccolta o impianti disponibili, che possono cambiare molto il quadro.",
     "Risorse idriche": "Il confronto dipende da rete, morfologia, disponibilità naturale e investimenti storici nel servizio idrico.",
@@ -146,6 +148,8 @@ CURATED_DIRECTION = {
     "434": "higher_better",
     # Trasporti e mobilità (rail / public transport use = positive)
     "47": "higher_better", "268": "higher_better", "269": "higher_better",
+    # Reddito e ricchezza (conti economici territoriali: higher GDP/income per head = better)
+    "901": "higher_better", "902": "higher_better", "903": "higher_better",
 }
 
 
