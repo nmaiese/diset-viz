@@ -51,6 +51,12 @@ def legacy():
     return render_template('legacy.html')
 
 
+@cache.cached(timeout=300)
+@app.route("/legacy-reddito")
+def legacy_reddito():
+    return render_template('legacy_reddito.html')
+
+
 @app.route("/api/catalog")
 def catalog():
     return jsonify(get_catalog())

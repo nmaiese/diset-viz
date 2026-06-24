@@ -236,6 +236,7 @@ function SiteHeader({ children }) {
         <a href="/temi">Temi</a>
         <a href="/blog">Blog</a>
         <a href="/legacy">Versione storica</a>
+        <a href="/legacy-reddito">Redistribuzione 2017</a>
         <a
           href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
           target="_blank"

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Redistribuzione della ricchezza tra le regioni (2011-2015) | Divario Italia</title>
+  <meta property="og:title" content="Redistribuzione della ricchezza tra le regioni italiane (2011-2015)" />
+  <meta property="og:type" content="application" />
+  <meta property="og:image" content="{{ url_for('static', filename='legacy_reddito/italy.png') }}" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="description" content="Versione storica: reddito primario, reddito disponibile, distribuzione secondaria e PIL pro-capite delle regioni italiane (2011-2015), dai dati Istat dell'audizione sul federalismo fiscale del 2017." />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='legacy_reddito/style.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+  {% include "_third_party_head.html" %}
+</head>
+
+<body>
+  {% include "_third_party_body.html" %}
+
+  <nav class="navbar navbar-inverse navbar-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">Divario Italia</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-left">
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="/legacy">Versione storica DiSET</a></li>
+            <li><a href="https://www.istat.it/it/archivio/202790" target="_blank">Fonte <b>Istat</b></a></li>
+            <li><a href="https://github.com/nmaiese/ItalyRegionalDivide" target="_blank"><i class="fa fa-github fa-lg" aria-hidden="true"></i></a></li>
+            <li><a href="https://www.linkedin.com/in/aniellomaiese/" target="_blank"><i class="fa fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+        </ul>
+      </div><!--/.navbar-collapse -->
+    </div>
+  </nav>
+
+<div class="container-fluid">
+  <div class="jumbotron text-center">
+    <h2>Disuguaglianze, distribuzione della ricchezza e delle risorse finanziarie</h2>
+    <p>Commissione parlamentare per l'attuazione del federalismo fiscale<br>
+      Audizione del Presidente dell'Istituto nazionale di statistica Giorgio Alleva
+    <br><i>Roma, 26 luglio 2017</i></p>
+    <p><a class="btn btn-success btn-lg" target="_blank" href="https://www.istat.it/it/archivio/202790" role="button">Vai alla fonte &raquo;</a></p>
+    <p class="text-muted"><small>Versione storica, dati 2011-2015. Per gli indicatori aggiornati vai all'<a href="/">atlante Divario Italia</a>.</small></p>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="row mb-10">
+    <div class="col-md-12"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-5">
+      <div class="panel panel-default">
+        <div class="panel-heading controller clearfix">
+          <div class="btn-group pull-left">
+            <div class="dropdown" id="metric-dropdown">
+              Indicatore:
+              <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown">
+              Reddito Primario
+              <span class="caret"></span></button>
+              <ul class="dropdown-menu">
+                <li><a>Reddito Primario</a></li>
+                <li><a>Reddito disponibile</a></li>
+                <li><a>Distribuzione secondaria</a></li>
+                <li><a>PIL</a></li>
+                <li><a>PIL per abitante</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="btn-group pull-right">
+            <div class="dropdown" id="year-dropdown">
+              Anno:
+              <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown">
+              2015
+              <span class="caret"></span></button>
+              <ul class="dropdown-menu">
+                <li><a>2011</a></li>
+                <li><a>2012</a></li>
+                <li><a>2013</a></li>
+                <li><a>2014</a></li>
+                <li><a>2015</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body" id="map"></div>
+        <div class="panel-footer clearfix">
+          <div class="btn-group pull-right">
+            <button class="btn btn-success" type="button" id="play"> <span class="glyphicon glyphicon-play-circle"></span> Play
+            </button>
+          </div>
+          <div id="label" class="panel-title pull-left">Reddito Primario <i>2015</i></div>
+        </div>
+        <div class="panel-body" id="barchart"></div>
+      </div>
+    </div>
+    <div class="col-md-7">
+      <div id="stats-table"></div>
+    </div>
+  </div>
+  <div class="row"></div>
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/datatables.min.js') }}"></script>
+<script src="{{ url_for('static', filename='legacy_reddito/italymap.js') }}"></script>
+<script src="{{ url_for('static', filename='legacy_reddito/barchart.js') }}"></script>
+
+<script type="text/javascript">
+function titleCase(str) {
+     str = str.replace(/-/g, ' ')
+     if(str=="valle d aosta"){
+      return "Valle d'Aosta"
+     }
+     else{
+       str = str.toLowerCase().split(' ');
+       for(var i = 0; i < str.length; i++){
+            str[i] = str[i].split('');
+            str[i][0] = str[i][0].toUpperCase();
+            str[i] = str[i].join('');
+       }
+       return str.join(' ');
+     }
+}
+</script>
+
+<script src="{{ url_for('static', filename='legacy_reddito/graph.js') }}"></script>
+</body>
+</html>

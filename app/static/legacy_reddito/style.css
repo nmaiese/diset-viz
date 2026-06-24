@@ -1,0 +1,57 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Josefin+Slab|Arvo|Lato|Vollkorn|Abril+Fatface|Old+Standard+TT|Droid+Sans|Lobster|Inconsolata|Montserrat|Playfair+Display|Karla|Alegreya|Libre+Baskerville|Merriweather|Lora|Archivo+Narrow|Neuton|Signika|Questrial|Fjalla+One|Bitter|Varela+Round);
+
+
+body { 
+
+  font-size: 12px;
+  font-family: Lato, sans-serif;
+}
+
+.background {
+  fill: #eee;
+  pointer-events: all;
+}
+
+.map-layer {
+  fill: #fff;
+  stroke: #aaa;
+}
+
+.effect-layer{
+  pointer-events:none;
+}
+
+text{
+  font-family: 'Lato', Helvetica, Arial, sans-serif;
+  font-weight: 300;
+}
+
+text.big-text{
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.axis {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.effect-layer text, text.dummy-text{
+  font-size: 12px;
+}
+
+
+.dropdown-menu>li>a {
+    cursor: pointer;
+}
+
+
+div#label {
+    padding: 5px 0 0 0;
+}
