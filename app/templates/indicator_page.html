@@ -15,7 +15,8 @@
   "url": {{ canonical | tojson }},
   "temporalCoverage": "{{ meta.year_min }}/{{ meta.year_max }}",
   "spatialCoverage": { "@type": "Country", "name": "Italia" },
-  "creator": { "@type": "Organization", "name": {{ meta.source | tojson }} },
+  "creator": { "@type": "Organization", "name": {{ meta.source | tojson }}, "url": {{ meta.source_url | tojson }} },
+  "isBasedOn": {{ meta.source_url | tojson }},
   "isAccessibleForFree": true,
   "keywords": [{{ meta.theme | tojson }}, "indicatori territoriali", "regioni italiane", "Istat"]
 }
@@ -44,7 +45,7 @@
     <span><small>Tema</small><a href="{{ theme_path }}">{{ meta.theme }}</a></span>
     <span><small>Unità di misura</small>{{ meta.unit or 'n.d.' }}</span>
     <span><small>Copertura</small>{{ meta.year_min }}-{{ meta.year_max }}, {{ meta.regions | length }} regioni</span>
-    <span><small>Fonte</small>{{ meta.source }}</span>
+    <span><small>Fonte</small><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label or meta.source }}</a></span>
   </div>
 
   <section class="prose">
