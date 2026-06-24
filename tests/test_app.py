@@ -18,6 +18,10 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(legacy.status_code, 200)
         self.assertIn(b"draw_charts", legacy.data)
 
+        legacy_reddito = client.get("/legacy-reddito")
+        self.assertEqual(legacy_reddito.status_code, 200)
+        self.assertIn(b"federalismo fiscale", legacy_reddito.data)
+
         data = client.get("/data")
         self.assertEqual(data.status_code, 200)
         rows = data.get_json()
