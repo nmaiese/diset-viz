@@ -150,6 +150,7 @@ CURATED_DIRECTION = {
     "47": "higher_better", "268": "higher_better", "269": "higher_better",
     # Reddito e ricchezza (conti economici territoriali: higher GDP/income per head = better)
     "901": "higher_better", "902": "higher_better", "903": "higher_better",
+    "904": "higher_better", "905": "higher_better",
 }
 
 

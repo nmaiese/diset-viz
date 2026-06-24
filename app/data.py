@@ -33,6 +33,28 @@ REGION_ORDER = [
 ]
 
 
+# Verifiable source links per indicator. Most series come from the Banca dati
+# territoriale per le politiche di sviluppo (BDTPS); the "Reddito e ricchezza"
+# series are the Conti economici territoriali published on IstatData, so they
+# point to the Istat archive page for that release instead.
+SOURCE_BDTPS = {
+    "label": "Istat, Banca dati territoriale per le politiche di sviluppo",
+    "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/",
+}
+SOURCE_CONTI_TERRITORIALI = {
+    "label": "Istat, Conti economici territoriali",
+    "url": "https://www.istat.it/it/archivio/conti+territoriali",
+}
+CONTI_TERRITORIALI_IDS = {"901", "902", "903", "904", "905"}
+
+
+def source_for(indicator_id):
+    """Authoritative Istat source link for an indicator (label + url)."""
+    if str(indicator_id) in CONTI_TERRITORIALI_IDS:
+        return SOURCE_CONTI_TERRITORIALI
+    return SOURCE_BDTPS
+
+
 def _parse_number(value):
     if value is None or not value.strip():
         return None
@@ -123,6 +145,8 @@ def get_catalog():
                 "name": first["indicator"],
                 "unit": first["unit"],
                 "source": first["source"],
+                "source_label": source_for(indicator_id)["label"],
+                "source_url": source_for(indicator_id)["url"],
                 "archive": first["archive"],
                 "explain": build_indicator_explain(first),
                 "years": years,
@@ -176,6 +200,8 @@ def get_indicator(indicator_id):
             "name": first["indicator"],
             "unit": first["unit"],
             "source": first["source"],
+            "source_label": source_for(indicator_id)["label"],
+            "source_url": source_for(indicator_id)["url"],
             "archive": first["archive"],
             "explain": build_indicator_explain(first),
             "years": years,

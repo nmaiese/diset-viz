@@ -670,7 +670,7 @@ function IndicatorHeader({ metadata, regionCount }) {
         <div><dt>Unità di misura</dt><dd>{metadata.unit || "—"}</dd></div>
         <div><dt>Copertura</dt><dd>{metadata.year_min}–{metadata.year_max}</dd></div>
         <div><dt>Regioni</dt><dd>{regionCount || metadata.regions.length}/20</dd></div>
-        <div><dt>Fonte</dt><dd>{metadata.source}</dd></div>
+        <div><dt>Fonte</dt><dd>{metadata.source_url ? (<a href={metadata.source_url} target="_blank" rel="noreferrer">{metadata.source_label || metadata.source}</a>) : (metadata.source_label || metadata.source)}</dd></div>
       </dl>
     </div>
   );
