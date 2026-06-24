@@ -49,8 +49,13 @@ SOURCE_DEMOGRAFICI = {
     "label": "Istat, Indicatori demografici",
     "url": "https://www.istat.it/statistiche-per-temi/popolazione-e-famiglie/",
 }
+SOURCE_EUSILC = {
+    "label": "Istat, Reddito e condizioni di vita (Eu-Silc)",
+    "url": "https://www.istat.it/statistiche-per-temi/reddito-e-condizioni-di-vita/",
+}
 CONTI_TERRITORIALI_IDS = {"901", "902", "903", "904", "905"}
 DEMOGRAFICI_IDS = {"910", "911", "912", "913", "920", "921", "922", "923"}
+EUSILC_IDS = {"930"}
 
 
 def source_for(indicator_id):
@@ -60,6 +65,8 @@ def source_for(indicator_id):
         return SOURCE_CONTI_TERRITORIALI
     if iid in DEMOGRAFICI_IDS:
         return SOURCE_DEMOGRAFICI
+    if iid in EUSILC_IDS:
+        return SOURCE_EUSILC
     return SOURCE_BDTPS
 
 

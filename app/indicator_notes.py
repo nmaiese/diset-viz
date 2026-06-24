@@ -157,6 +157,8 @@ CURATED_DIRECTION = {
     "904": "higher_better", "905": "higher_better",
     # Salute (speranza di vita: piu alta e meglio)
     "910": "higher_better", "911": "higher_better", "912": "higher_better", "913": "higher_better",
+    # Disuguaglianza (indice di Gini: piu basso e meglio)
+    "930": "lower_better",
 }
 
 
