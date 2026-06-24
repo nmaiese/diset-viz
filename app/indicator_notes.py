@@ -154,7 +154,7 @@ CURATED_DIRECTION = {
     "47": "higher_better", "268": "higher_better", "269": "higher_better",
     # Reddito e ricchezza (conti economici territoriali: higher GDP/income per head = better)
     "901": "higher_better", "902": "higher_better", "903": "higher_better",
-    "904": "higher_better", "905": "higher_better",
+    "904": "higher_better", "905": "higher_better", "906": "higher_better",
     # Salute (speranza di vita: piu alta e meglio)
     "910": "higher_better", "911": "higher_better", "912": "higher_better", "913": "higher_better",
     # Disuguaglianza (indice di Gini: piu basso e meglio)

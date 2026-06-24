@@ -53,7 +53,7 @@ SOURCE_EUSILC = {
     "label": "Istat, Reddito e condizioni di vita (Eu-Silc)",
     "url": "https://www.istat.it/statistiche-per-temi/reddito-e-condizioni-di-vita/",
 }
-CONTI_TERRITORIALI_IDS = {"901", "902", "903", "904", "905"}
+CONTI_TERRITORIALI_IDS = {"901", "902", "903", "904", "905", "906", "907"}
 DEMOGRAFICI_IDS = {"910", "911", "912", "913", "920", "921", "922", "923"}
 EUSILC_IDS = {"930"}
 
