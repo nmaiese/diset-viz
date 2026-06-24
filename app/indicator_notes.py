@@ -7,6 +7,8 @@ THEME_EXAMPLES = {
     "Città": "Esempio: permette di confrontare la qualità della vita urbana, dai servizi quotidiani allo spazio pubblico disponibile.",
     "Competitività": "Esempio: serve a leggere quanto il sistema produttivo regionale usa risorse, tecnologia e lavoro per stare sul mercato.",
     "Cultura": "Esempio: fa vedere se musei, spettacoli e imprese culturali sono una parte viva dell'economia locale o restano marginali.",
+    "Demografia e popolazione": "Esempio: aiuta a leggere se una regione invecchia, si svuota o si rinnova, confrontando struttura per età, natalità e movimenti di popolazione.",
+    "Salute": "Esempio: traduce le condizioni di salute di un territorio in anni di vita attesi, un esito che riassume prevenzione, servizi e condizioni sociali.",
     "Demografia di impresa": "Esempio: aiuta a distinguere territori dove nascono nuove attività da quelli in cui il tessuto produttivo si rinnova meno.",
     "Dinamiche settoriali": "Esempio: mette a confronto la forza economica di un settore tra regioni, al netto della diversa dimensione dei territori.",
     "Energia": "Esempio: consente di leggere consumi, continuità dei servizi e peso delle fonti rinnovabili nella vita economica e quotidiana.",
@@ -35,6 +37,8 @@ THEME_CAVEATS = {
     "Città": "Il dato regionale può nascondere differenze forti tra capoluoghi, aree interne e cinture metropolitane.",
     "Competitività": "Non basta per dire se un'economia sta bene: va affiancato a lavoro, salari, investimenti e struttura produttiva.",
     "Cultura": "Non misura tutta la vita culturale informale, gratuita o locale, ma solo la parte intercettata dalla fonte statistica.",
+    "Demografia e popolazione": "I numeri vanno letti insieme: invecchiamento, fecondità e migrazioni si influenzano a vicenda e una sola cifra non racconta la traiettoria della popolazione.",
+    "Salute": "La speranza di vita è un esito medio: non dice nulla sulle disuguaglianze interne né sulla qualità degli anni vissuti, e va affiancata a indicatori di servizi e prevenzione.",
     "Demografia di impresa": "Una variazione alta non è sempre positiva: può indicare vivacità, ma anche instabilità del tessuto produttivo.",
     "Dinamiche settoriali": "Il confronto funziona meglio se si tiene conto della specializzazione economica di partenza di ogni regione.",
     "Energia": "Un valore va interpretato insieme a clima, struttura industriale e mix produttivo, perché i fabbisogni non sono uguali ovunque.",
@@ -151,6 +155,8 @@ CURATED_DIRECTION = {
     # Reddito e ricchezza (conti economici territoriali: higher GDP/income per head = better)
     "901": "higher_better", "902": "higher_better", "903": "higher_better",
     "904": "higher_better", "905": "higher_better",
+    # Salute (speranza di vita: piu alta e meglio)
+    "910": "higher_better", "911": "higher_better", "912": "higher_better", "913": "higher_better",
 }
 
 
