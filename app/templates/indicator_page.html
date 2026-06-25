@@ -56,20 +56,16 @@
       ({{ best.value | it_num(2) }} {{ meta.unit }}), mentre <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a>
       segna il dato più sfavorevole ({{ worst.value | it_num(2) }} {{ meta.unit }}).</p>
     {% endif %}
-    {% if trend and trend.change_pct is not none %}
-    <p>Tra il {{ trend.first_year }} e il {{ trend.last_year }} la media nazionale è passata da
-      {{ trend.start | it_num(2) }} a {{ trend.end | it_num(2) }}
-      ({% if trend.rising %}+{% endif %}{{ trend.change_pct | it_num(1) }}%).</p>
-    {% endif %}
     <p class="page-caveat">{{ explain.caveat }}</p>
   </section>
 
   <section class="page-ranking">
-    <h2>Classifica delle regioni nel {{ year }}</h2>
-    <p class="page-note">
-      {% if explain.direction == 'higher_better' %}Valori più alti indicano una posizione migliore.
-      {% elif explain.direction in ('lower_better', 'higher_worse') %}Valori più bassi indicano una posizione migliore.
-      {% else %}La lettura dipende dal contesto del singolo indicatore.{% endif %}
+    <h2>La classifica delle regioni nel {{ year }}</h2>
+    <p class="page-note">L'ultimo dato disponibile, regione per regione.
+      {% if explain.direction == 'higher_better' %}Più in alto nella lista, meglio è.
+      {% elif explain.direction in ('lower_better', 'higher_worse') %}Qui valori più bassi raccontano una situazione migliore.
+      {% else %}Come leggere i numeri dipende dal singolo indicatore, quindi confrontali con prudenza.{% endif %}
+      Per scorrere gli anni e vedere come è cambiato, apri l'indicatore nell'atlante.
     </p>
     <table class="data-table">
       <thead><tr><th>#</th><th>Regione</th><th class="num">{{ meta.unit or 'Valore' }}</th></tr></thead>
@@ -87,8 +83,8 @@
 
   <aside class="indicator-cta">
     <span>
-      <small>Esplora i dati</small>
-      <strong>Mappa, serie storica e confronti interattivi</strong>
+      <small>Esplora l'indicatore</small>
+      <strong>Mappa, serie storica anno per anno e confronti tra regioni nell'atlante</strong>
     </span>
     <a href="/?indicator={{ meta.id }}">Apri nell'atlante →</a>
   </aside>

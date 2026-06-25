@@ -5,7 +5,7 @@ import unicodedata
 from collections import defaultdict
 
 from app.cache import cache
-from app.indicator_notes import build_indicator_explain
+from app.indicator_notes import MACRO_AREA_ORDER, build_indicator_explain, macro_area_for
 
 
 DATASET_PATH = os.path.join(os.path.dirname(__file__), "static/data/Assoluti_Regione.csv")
@@ -157,6 +157,7 @@ def get_catalog():
             {
                 "id": indicator_id,
                 "theme": first["theme"],
+                "macro_area": macro_area_for(first["theme"]),
                 "name": first["indicator"],
                 "unit": first["unit"],
                 "source": first["source"],
@@ -178,14 +179,34 @@ def get_catalog():
 
     indicators.sort(key=lambda item: (item["theme"], item["name"]))
     theme_items = [
-        {"name": name, **payload}
+        {"name": name, "macro_area": macro_area_for(name), **payload}
         for name, payload in sorted(themes.items(), key=lambda item: item[0].lower())
+    ]
+
+    # Macro-area rollup: a coarse, non-destructive grouping over the Istat themes,
+    # following MACRO_AREA_ORDER and keeping any unmapped theme under "Altro".
+    macro = defaultdict(lambda: {"themes": [], "indicator_count": 0})
+    for theme in theme_items:
+        bucket = macro[theme["macro_area"]]
+        bucket["themes"].append(theme["name"])
+        bucket["indicator_count"] += theme["indicator_count"]
+    ordered_areas = [a for a in MACRO_AREA_ORDER if a in macro] + [
+        a for a in macro if a not in MACRO_AREA_ORDER
+    ]
+    macro_areas = [
+        {
+            "name": name,
+            "themes": macro[name]["themes"],
+            "indicator_count": macro[name]["indicator_count"],
+        }
+        for name in ordered_areas
     ]
 
     return {
         "featured_indicator_id": featured_id,
         "regions": REGION_ORDER,
         "themes": theme_items,
+        "macro_areas": macro_areas,
         "indicators": indicators,
     }
 

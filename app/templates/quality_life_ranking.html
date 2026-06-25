@@ -1,0 +1,90 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'qualita-della-vita' %}
+{% set p = data.profile %}
+{% set m = data.methodology %}
+
+{% block title %}Classifica qualità della vita per regione, profilo {{ p.name }} | {{ site_name }}{% endblock %}
+{% block description %}Classifica della qualità della vita nelle regioni italiane con il profilo {{ p.name }}. Punteggi da 0 a 100 su {{ m.total_indicators }} indicatori Istat, con punti di forza e debolezza per ogni regione.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Classifica qualità della vita per regione, profilo {{ p.name }}",
+  "description": {{ ('Punteggi di qualità della vita delle regioni italiane, profilo ' ~ p.name ~ ', su indicatori territoriali Istat.') | tojson }},
+  "url": {{ canonical | tojson }},
+  "creator": { "@type": "Organization", "name": "Istat" },
+  "isAccessibleForFree": true,
+  "keywords": ["qualità della vita", "regioni italiane", "indicatori territoriali", "Istat", "divario regionale"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Qualità della vita", "item": "{{ site_url }}/qualita-della-vita" },
+    { "@type": "ListItem", "position": 3, "name": "Classifica", "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page wrap quality-ranking">
+  <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a></nav>
+  <h1>Classifica della qualità della vita</h1>
+  <p class="page-lead">Profilo <strong>{{ p.name }}</strong>. {{ p.description }} Le 20 regioni a confronto su {{ m.total_indicators }} indicatori Istat, con punteggio da 0 (ultima in Italia) a 100 (prima).</p>
+
+  <nav class="quality-profile-tabs" aria-label="Profili di peso">
+    {% for profile in profiles %}
+    <a href="/qualita-della-vita/classifica{{ '' if profile.slug == default_profile else '?profilo=' ~ profile.slug }}"
+       class="{{ 'is-active' if profile.slug == active_profile else '' }}">{{ profile.name }}</a>
+    {% endfor %}
+  </nav>
+
+  <div class="quality-table-wrap">
+    <table class="data-table quality-rank-table">
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Regione</th>
+          <th>Punteggio</th>
+          <th>Punti di forza</th>
+          <th>Punti deboli</th>
+          <th class="num">Copertura</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data.ranking %}
+        <tr>
+          <td class="num quality-rank">{{ row.rank }}</td>
+          <td><a href="/regione/{{ row.region_key }}">{{ row.region }}</a></td>
+          <td class="quality-score-cell">
+            <span class="quality-score-bar"><span style="width: {{ row.score | round | int }}%"></span></span>
+            <span class="quality-score">{{ row.score | it_num }}</span>
+          </td>
+          <td>
+            {% for c in row.strongest_categories[:2] %}
+            <span class="quality-chip is-strong">{{ c.name }} <b class="quality-chip__score">{{ c.score | round | int }}</b></span>
+            {% endfor %}
+          </td>
+          <td>
+            {% for c in row.weakest_categories[:2] %}
+            <span class="quality-chip is-weak">{{ c.name }} <b class="quality-chip__score">{{ c.score | round | int }}</b></span>
+            {% endfor %}
+          </td>
+          <td class="num">{{ (row.coverage * 100) | round | int }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <p class="quality-note">Il punteggio finale è la media dei punteggi di categoria pesata secondo il profilo scelto. Quando una categoria non ha indicatori disponibili per una regione, i pesi vengono ridistribuiti sulle categorie rimaste e la copertura lo segnala. <a href="/qualita-della-vita/metodologia">Leggi la metodologia completa</a>.</p>
+
+  <p class="quality-note quality-disclaimer">La classifica Divario Italia è una sintesi autonoma sugli indicatori regionali Istat. Non è la classifica del Sole 24 Ore e non usa il dataset del Sole come fonte primaria.</p>
+</article>
+{% endblock %}

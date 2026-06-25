@@ -3,6 +3,7 @@ from app.cache import cache
 from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts
 from app.data import get_catalog, get_indicator, get_indicator_year, get_rows, search_indicators
 from app import profiles
+from app import quality_life as ql
 
 from flask import Response, abort, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -160,7 +161,6 @@ def indicator_page(slug):
 
     year = meta["year_max"]
     year_view = get_indicator_year(indicator_id, year)
-    trend = _national_trend(payload["series"], meta["years"])
 
     # Order the ranking so #1 is the best-performing region for this indicator's
     # direction; for contextual indicators "best" is undefined, so keep raw order.
@@ -179,7 +179,6 @@ def indicator_page(slug):
         best=best,
         worst=worst,
         year=year,
-        trend=trend,
         theme_path=profiles.theme_path(meta["theme"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
@@ -229,40 +228,101 @@ def regions_index():
 
 @app.route("/temi")
 def themes_index():
+    groups = profiles.themes_by_macro_area()
+    total = sum(group["indicator_count"] for group in groups)
     return render_template(
         "themes_index.html",
-        themes=profiles.all_themes_index(),
+        groups=groups,
+        total=total,
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/temi",
     )
 
 
-def _national_trend(series, years):
-    """Direction of the national average between the first and last covered year."""
-    if len(years) < 2:
-        return None
-    first_year, last_year = years[0], years[-1]
+def _quality_life_profile_arg():
+    """Resolve the requested profile slug from ?profilo= (or ?profile=)."""
+    return request.args.get("profilo") or request.args.get("profile") or ql.DEFAULT_PROFILE
 
-    def _avg(target):
-        vals = [r["value"] for r in series if r["year"] == target and r["value"] is not None]
-        return sum(vals) / len(vals) if vals else None
 
-    start, end = _avg(first_year), _avg(last_year)
-    if start is None or end is None:
-        return None
-    if start == 0:
-        change = None
-    else:
-        change = (end - start) / abs(start) * 100
-    return {
-        "first_year": first_year,
-        "last_year": last_year,
-        "start": round(start, 2),
-        "end": round(end, 2),
-        "change_pct": round(change, 1) if change is not None else None,
-        "rising": end > start,
-    }
+@app.route("/api/quality-life/profiles")
+def quality_life_profiles_api():
+    return jsonify({"profiles": ql.get_quality_life_profiles()})
+
+
+@app.route("/api/quality-life/categories")
+def quality_life_categories_api():
+    return jsonify({"categories": ql.get_quality_life_categories()})
+
+
+@app.route("/api/quality-life/rankings")
+def quality_life_rankings_api():
+    payload = ql.build_quality_life_ranking(_quality_life_profile_arg())
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+@app.route("/api/quality-life/rankings/<profile_slug>")
+def quality_life_ranking_profile_api(profile_slug):
+    payload = ql.build_quality_life_ranking(profile_slug)
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+@app.route("/api/quality-life/region/<region_key>")
+def quality_life_region_api(region_key):
+    payload = ql.build_quality_life_region_profile(region_key, _quality_life_profile_arg())
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+@app.route("/qualita-della-vita")
+def quality_life_index():
+    return render_template(
+        "quality_life_index.html",
+        categories=ql.get_quality_life_categories(),
+        profiles=ql.get_quality_life_profiles(),
+        default_profile=ql.DEFAULT_PROFILE,
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/qualita-della-vita",
+    )
+
+
+@app.route("/qualita-della-vita/classifica")
+def quality_life_ranking():
+    slug = _quality_life_profile_arg()
+    payload = ql.build_quality_life_ranking(slug)
+    if payload is None:
+        abort(404)
+    suffix = "" if slug == ql.DEFAULT_PROFILE else f"?profilo={slug}"
+    return render_template(
+        "quality_life_ranking.html",
+        data=payload,
+        profiles=ql.get_quality_life_profiles(),
+        active_profile=slug,
+        default_profile=ql.DEFAULT_PROFILE,
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/qualita-della-vita/classifica{suffix}",
+    )
+
+
+@app.route("/qualita-della-vita/metodologia")
+def quality_life_methodology():
+    payload = ql.build_quality_life_ranking(ql.DEFAULT_PROFILE)
+    return render_template(
+        "quality_life_methodology.html",
+        methodology=payload["methodology"],
+        categories=ql.get_quality_life_categories(),
+        profiles=ql.get_quality_life_profiles(),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/qualita-della-vita/metodologia",
+    )
 
 
 @app.route("/sitemap.xml")
@@ -272,6 +332,9 @@ def sitemap():
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
+        {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
+        {"loc": f"{SITE_URL}/qualita-della-vita/classifica", "priority": "0.8"},
+        {"loc": f"{SITE_URL}/qualita-della-vita/metodologia", "priority": "0.6"},
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
     for post in get_posts():

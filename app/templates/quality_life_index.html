@@ -1,0 +1,84 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'qualita-della-vita' %}
+
+{% block title %}Qualità della vita nelle regioni italiane | {{ site_name }}{% endblock %}
+{% block description %}Classifica trasparente della qualità della vita nelle regioni italiane basata su indicatori Istat. Confronta reddito, lavoro, salute, ambiente, sicurezza, istruzione e servizi.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Qualità della vita nelle regioni italiane",
+  "description": {{ 'Classifica trasparente della qualità della vita nelle regioni italiane basata su indicatori Istat.' | tojson }},
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
+  "creator": { "@type": "Organization", "name": "Istat" },
+  "isAccessibleForFree": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Qualità della vita", "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page wrap">
+  <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
+
+  <header class="quality-hero">
+    <h1>Qualità della vita nelle regioni italiane</h1>
+    <p class="page-lead">Una classifica non è mai neutrale. Divario Italia mostra come cambia la qualità della vita quando pesiamo reddito, lavoro, salute, istruzione, ambiente, sicurezza, servizi e cultura.</p>
+    <div class="quality-cta">
+      <a class="quality-btn quality-btn--primary" href="/qualita-della-vita/classifica">Vedi la classifica</a>
+      <a class="quality-btn" href="/qualita-della-vita/metodologia">Leggi la metodologia</a>
+    </div>
+  </header>
+
+  <p class="quality-note">Questa prima versione è regionale: confronta le 20 regioni italiane sugli indicatori territoriali Istat completi e aggiornati. La versione provinciale è in progettazione e arriverà solo con dati ufficiali dedicati, mai con numeri inventati.</p>
+
+  <section class="quality-section">
+    <h2>Scegli un punto di vista</h2>
+    <p class="page-note">Ogni profilo dà un peso diverso alle categorie. Cambiando profilo cambia la classifica. È proprio quello che vogliamo rendere visibile, quanto una graduatoria dipenda dalle scelte di chi la costruisce.</p>
+    <div class="quality-grid">
+      {% for profile in profiles %}
+      <a class="quality-card" href="/qualita-della-vita/classifica{{ '' if profile.slug == default_profile else '?profilo=' ~ profile.slug }}">
+        <h3>{{ profile.name }}</h3>
+        <p>{{ profile.description }}</p>
+        <span class="quality-card__cta">Vedi la classifica con questo profilo</span>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="quality-section">
+    <h2>Le categorie</h2>
+    <p class="page-note">Ogni categoria raccoglie temi Istat affini. Il punteggio di una categoria è la media dei suoi indicatori, normalizzati con un percentile orientato da 0 a 100.</p>
+    <ul class="quality-category-list">
+      {% for category in categories %}
+      <li>
+        <h3>{{ category.name }}</h3>
+        <p>{{ category.description }}</p>
+        <p class="quality-themes">{{ category.themes | join(', ') }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <aside class="indicator-cta">
+    <span>
+      <small>Vai oltre la classifica</small>
+      <strong>Esplora ogni indicatore e ogni regione nell'atlante</strong>
+    </span>
+    <a href="/">Apri l'atlante →</a>
+  </aside>
+  <p class="quality-note"><a href="/regioni">Sfoglia il profilo di ogni regione</a> oppure leggi <a href="/qualita-della-vita/metodologia">come è costruita la classifica</a>.</p>
+</article>
+{% endblock %}

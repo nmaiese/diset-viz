@@ -18,6 +18,7 @@ import {
   Minus,
   Search,
   Trophy,
+  X,
 } from "lucide-react";
 import "./styles.css";
 
@@ -57,11 +58,15 @@ function App() {
   const [queryParam, setQueryParam] = useUrlState("q");
   const [sortParam, setSortParam] = useUrlState("sort");
   const [partialParam, setPartialParam] = useUrlState("partial");
+  const [areaParam, setAreaParam] = useUrlState("area");
+  const [yearFromParam, setYearFromParam] = useUrlState("yfrom");
+  const [yearToParam, setYearToParam] = useUrlState("yto");
 
   const theme = themeParam || "Tutti";
   const query = queryParam || "";
   const sort = sortParam || "complete";
   const showPartial = partialParam === "1";
+  const macroArea = areaParam || "Tutte";
   // Default to atlas, but a shared ?indicator=… link (no explicit view) opens the detail.
   const activeView =
     view === "detail" ? "detail" : view === "atlas" ? "atlas" : selectedId ? "detail" : "atlas";
@@ -211,6 +216,19 @@ function App() {
         setPartialParam(value ? "1" : null);
         trackEvent("toggle_partial_data", { enabled: value });
       }}
+      macroArea={macroArea}
+      setMacroArea={(value) => {
+        setAreaParam(value === "Tutte" ? null : value);
+        setThemeParam(null);
+        trackEvent("filter_macro_area", { macro_area: value });
+      }}
+      yearFrom={yearFromParam ? Number(yearFromParam) : null}
+      yearTo={yearToParam ? Number(yearToParam) : null}
+      setYearRange={(from, to) => {
+        setYearFromParam(from === null ? null : String(from));
+        setYearToParam(to === null ? null : String(to));
+        trackEvent("filter_year_range", { year_from: from, year_to: to });
+      }}
       onOpen={openIndicator}
     />
   );
@@ -234,9 +252,8 @@ function SiteHeader({ children }) {
       <nav className="masthead__links" aria-label="Collegamenti">
         <a href="/regioni">Regioni</a>
         <a href="/temi">Temi</a>
+        <a href="/qualita-della-vita">Qualità della vita</a>
         <a href="/blog">Blog</a>
-        <a href="/legacy">Versione storica</a>
-        <a href="/legacy-reddito">Redistribuzione 2017</a>
         <a
           href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
           target="_blank"
@@ -269,7 +286,7 @@ function SiteFooter() {
         , indicatori territoriali per le politiche di sviluppo
       </span>
       <span>
-        <a href="/">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
+        <a href="/">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
       </span>
       {hasConsentPreferences && (
         <button className="privacy-settings-link" type="button" onClick={() => window.diOpenConsentPreferences()}>
@@ -284,11 +301,32 @@ function SiteFooter() {
 /* Atlas (browse) view                                                */
 /* ------------------------------------------------------------------ */
 
-function AtlasView({ catalog, theme, setTheme, query, setQuery, sort, setSort, showPartial, setShowPartial, onOpen }) {
-  const pool = useMemo(
-    () => (showPartial ? catalog.indicators : catalog.indicators.filter((i) => i.complete)),
-    [catalog, showPartial],
-  );
+function AtlasView({
+  catalog, theme, setTheme, query, setQuery, sort, setSort, showPartial, setShowPartial,
+  macroArea, setMacroArea, yearFrom, yearTo, setYearRange, onOpen,
+}) {
+  const [fullMin, fullMax] = useMemo(() => {
+    const mins = catalog.indicators.map((i) => i.year_min);
+    const maxs = catalog.indicators.map((i) => i.year_max);
+    return [Math.min(...mins), Math.max(...maxs)];
+  }, [catalog]);
+
+  // Themes belonging to the selected macro-area (the spine narrows with the area).
+  const areaThemes = useMemo(() => {
+    if (macroArea === "Tutte") return catalog.themes;
+    const inArea = new Set((catalog.macro_areas || []).find((a) => a.name === macroArea)?.themes || []);
+    return catalog.themes.filter((t) => inArea.has(t.name));
+  }, [catalog, macroArea]);
+
+  const pool = useMemo(() => {
+    let list = showPartial ? catalog.indicators : catalog.indicators.filter((i) => i.complete);
+    if (macroArea !== "Tutte") list = list.filter((i) => i.macro_area === macroArea);
+    // Year coverage: only the bounds the user actually set constrain the list.
+    // "Dal X" keeps series that reach back to X; "Al Y" keeps series that run up to Y.
+    if (yearFrom != null) list = list.filter((i) => i.year_min <= yearFrom);
+    if (yearTo != null) list = list.filter((i) => i.year_max >= yearTo);
+    return list;
+  }, [catalog, showPartial, macroArea, yearFrom, yearTo]);
 
   const themeCounts = useMemo(() => {
     const counts = new Map();
@@ -319,14 +357,21 @@ function AtlasView({ catalog, theme, setTheme, query, setQuery, sort, setSort, s
           regione per regione.
         </h1>
         <p className="atlas-hero__lead">
-          Sfoglia l'archivio degli indicatori territoriali per lo sviluppo. Scegli un tema, segui un
-          andamento, apri la scheda con mappa, classifica e serie storica.
+          Centinaia di indicatori Istat per capire dove l'Italia corre e dove resta indietro.
+          Filtra per area, tema o anni, poi apri la scheda di ogni indicatore con mappa,
+          classifica e andamento nel tempo.
         </p>
       </section>
 
+      <MacroSpine
+        areas={catalog.macro_areas || []}
+        selected={macroArea}
+        onSelect={setMacroArea}
+      />
+
       <section className="atlas">
         <ThemeSpine
-          themes={catalog.themes}
+          themes={areaThemes}
           counts={themeCounts}
           total={pool.length}
           selected={theme}
@@ -343,12 +388,42 @@ function AtlasView({ catalog, theme, setTheme, query, setQuery, sort, setSort, s
             setShowPartial={setShowPartial}
             count={filtered.length}
             completeTotal={completeTotal}
+            fullMin={fullMin}
+            fullMax={fullMax}
+            yearFrom={yearFrom}
+            yearTo={yearTo}
+            setYearRange={setYearRange}
           />
           <IndicatorIndex items={filtered} onOpen={onOpen} />
         </div>
       </section>
       <SiteFooter />
     </main>
+  );
+}
+
+function MacroSpine({ areas, selected, onSelect }) {
+  if (!areas.length) return null;
+  return (
+    <nav className="macro-spine wrap" aria-label="Filtra per area">
+      <button
+        type="button"
+        className={selected === "Tutte" ? "macro-tab is-active" : "macro-tab"}
+        onClick={() => onSelect("Tutte")}
+      >
+        Tutte le aree
+      </button>
+      {areas.map((area) => (
+        <button
+          key={area.name}
+          type="button"
+          className={selected === area.name ? "macro-tab is-active" : "macro-tab"}
+          onClick={() => onSelect(area.name)}
+        >
+          {area.name} <em>{area.indicator_count}</em>
+        </button>
+      ))}
+    </nav>
   );
 }
 
@@ -385,7 +460,33 @@ function ThemeSpine({ themes, counts, total, selected, onSelect }) {
   );
 }
 
-function CommandBar({ query, setQuery, sort, setSort, showPartial, setShowPartial, count, completeTotal }) {
+function CommandBar({
+  query, setQuery, sort, setSort, showPartial, setShowPartial, count, completeTotal,
+  fullMin, fullMax, yearFrom, yearTo, setYearRange,
+}) {
+  const years = useMemo(() => {
+    const list = [];
+    for (let y = fullMin; y <= fullMax; y += 1) list.push(y);
+    return list;
+  }, [fullMin, fullMax]);
+
+  const yearActive = yearFrom != null || yearTo != null;
+  // Sentinel "" means no bound on that side. Keep the window coherent: if the two
+  // bounds cross, pull the other one along so you never ask for an empty interval.
+  const onFrom = (raw) => {
+    const value = raw === "" ? null : Number(raw);
+    setYearRange(value, value != null && yearTo != null && yearTo < value ? value : yearTo);
+  };
+  const onTo = (raw) => {
+    const value = raw === "" ? null : Number(raw);
+    setYearRange(value != null && yearFrom != null && yearFrom > value ? value : yearFrom, value);
+  };
+
+  let yearLabel = "";
+  if (yearFrom != null && yearTo != null) yearLabel = `con dati dal ${yearFrom} al ${yearTo}`;
+  else if (yearFrom != null) yearLabel = `con storico dal ${yearFrom}`;
+  else if (yearTo != null) yearLabel = `aggiornati al ${yearTo}`;
+
   return (
     <div className="command-bar">
       <label className="search-box">
@@ -398,6 +499,35 @@ function CommandBar({ query, setQuery, sort, setSort, showPartial, setShowPartia
         />
       </label>
       <div className="command-bar__controls">
+        <div className={yearActive ? "year-range is-active" : "year-range"}>
+          <span className="year-range__label">Anni</span>
+          <label className="select-field select-field--year">
+            <span>Dal</span>
+            <select value={yearFrom ?? ""} onChange={(event) => onFrom(event.target.value)}>
+              <option value="">Da sempre</option>
+              {years.map((y) => <option key={y} value={y}>{y}</option>)}
+            </select>
+            <ChevronDown className="select-icon" size={15} />
+          </label>
+          <label className="select-field select-field--year">
+            <span>Al</span>
+            <select value={yearTo ?? ""} onChange={(event) => onTo(event.target.value)}>
+              <option value="">A oggi</option>
+              {years.map((y) => <option key={y} value={y}>{y}</option>)}
+            </select>
+            <ChevronDown className="select-icon" size={15} />
+          </label>
+          {yearActive && (
+            <button
+              type="button"
+              className="year-range__reset"
+              onClick={() => setYearRange(null, null)}
+              aria-label="Azzera il filtro anni"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
         <label className="select-field">
           <span>Ordina</span>
           <select value={sort} onChange={(event) => setSort(event.target.value)}>
@@ -418,6 +548,7 @@ function CommandBar({ query, setQuery, sort, setSort, showPartial, setShowPartia
       </div>
       <p className="command-bar__count">
         <strong>{count}</strong> {count === 1 ? "indicatore" : "indicatori"}
+        {yearActive && <span> · {yearLabel}</span>}
         {!showPartial && <span> · solo dati completi ({completeTotal})</span>}
       </p>
     </div>

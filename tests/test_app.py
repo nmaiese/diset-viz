@@ -166,6 +166,50 @@ class AppSmokeTest(unittest.TestCase):
             self.assertGreaterEqual(theme["score"], 0.0)
             self.assertLessEqual(theme["score"], 1.0)
 
+    def test_macro_areas_cover_every_theme(self):
+        from app.data import get_catalog
+
+        catalog = get_catalog()
+        # Every theme is mapped to a real macro-area (never the "Altro" fallback).
+        for theme in catalog["themes"]:
+            self.assertTrue(theme["macro_area"])
+            self.assertNotEqual(theme["macro_area"], "Altro")
+        for item in catalog["indicators"]:
+            self.assertTrue(item["macro_area"])
+        # The rollup exists and its counts add up to the catalog total.
+        self.assertIn("macro_areas", catalog)
+        self.assertTrue(catalog["macro_areas"])
+        total = sum(area["indicator_count"] for area in catalog["macro_areas"])
+        self.assertEqual(total, len(catalog["indicators"]))
+
+    def test_region_explorer_and_movement(self):
+        from app import profiles
+
+        profile = profiles.region_profile("campania")
+        indicators = profile["all_indicators"]
+        self.assertTrue(indicators)
+        contextual_seen = False
+        for item in indicators:
+            if item["rank"] is not None:
+                self.assertGreaterEqual(item["rank"], 1)
+                self.assertLessEqual(item["rank"], item["region_count"])
+                self.assertIsNotNone(item["score"])
+            else:
+                # Contextual indicators stay visible but carry no score or movement.
+                contextual_seen = True
+                self.assertIsNone(item["score"])
+                self.assertIsNone(item["movement"])
+            if item["movement"] is not None:
+                self.assertGreaterEqual(item["movement"], -19)
+                self.assertLessEqual(item["movement"], 19)
+        self.assertTrue(contextual_seen)
+
+        gains, losses = profile["movement_gains"], profile["movement_losses"]
+        self.assertTrue(all(g["movement"] > 0 for g in gains))
+        self.assertTrue(all(l["movement"] < 0 for l in losses))
+        self.assertEqual(gains, sorted(gains, key=lambda g: g["movement"], reverse=True))
+        self.assertEqual(losses, sorted(losses, key=lambda l: l["movement"]))
+
     def test_core_set_is_complete_and_recent(self):
         from app.data import get_catalog
         from app import profiles

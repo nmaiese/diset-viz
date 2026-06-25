@@ -61,6 +61,18 @@ editorial voice. The non-negotiable rules:
 The Markdown engine has `smarty` disabled on purpose, so `--` and `...` are NOT
 converted into typographic dashes or ellipses. Keep the source text clean.
 
+## Adding indicators or datasets — READ THIS
+
+When you add indicators, themes, or a new dataset to
+`app/static/data/Assoluti_Regione.csv`, follow the checklist in
+[`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md). The short version: themes,
+theme scores, region profiles and macro-areas are all **derived** from the data
+and recomputed at runtime (cache 1h). For each new indicator id set its direction
+in `CURATED_DIRECTION` (`app/indicator_notes.py`), and for each new theme map it
+to a macro-area in `MACRO_AREAS` (same file). Then restart gunicorn to clear the
+cache, rebuild the frontend, run the tests, and re-check which themes are now
+"valutabili" vs descriptive with the diagnostic snippet in that doc.
+
 ## Constraints
 
 - Do not break `/legacy` or the data schema (`tests/test_app.py` guards both).
