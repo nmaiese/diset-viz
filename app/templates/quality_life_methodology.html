@@ -1,0 +1,103 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'qualita-della-vita' %}
+{% set m = methodology %}
+
+{% block title %}Metodologia della classifica qualità della vita | {{ site_name }}{% endblock %}
+{% block description %}Come Divario Italia costruisce la classifica della qualità della vita: fonti Istat, percentile orientato, categorie, profili di peso e limiti dichiarati.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Metodologia della classifica qualità della vita",
+  "description": {{ 'Fonti, calcolo dei punteggi, categorie, profili e limiti della classifica qualità della vita di Divario Italia.' | tojson }},
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Qualità della vita", "item": "{{ site_url }}/qualita-della-vita" },
+    { "@type": "ListItem", "position": 3, "name": "Metodologia", "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page wrap prose quality-methodology">
+  <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a></nav>
+  <h1>Come è costruita la classifica</h1>
+  <p class="page-lead">La priorità non è una classifica bella, ma una classifica auditabile. Ogni numero è tracciabile, ogni indicatore ha una direzione, ogni categoria è spiegabile, ogni profilo ha pesi espliciti. Qui trovi tutto il metodo.</p>
+
+  <h2>La fonte dei dati</h2>
+  <p>I dati arrivano da {{ m.source }}. Sono gli stessi indicatori regionali che alimentano l'atlante di Divario Italia, già pubblici e riusabili. Non aggiungiamo stime, non mescoliamo fonti diverse, non inventiamo valori. La cornice metodologica di riferimento è il Benessere equo e sostenibile (BES) dell'Istat, che ci aiuta a leggere il benessere come un fenomeno fatto di più dimensioni.</p>
+
+  <h2>Perché partiamo dalle regioni</h2>
+  <p>Il dataset oggi disponibile nel progetto è regionale. Per questo la prima versione confronta le {{ m.core_criteria.regions }} regioni italiane e non le province. Una classifica provinciale richiederebbe un altro dataset e un'altra pipeline, e la costruiremo solo con dati ufficiali dedicati. Trovi la roadmap più in basso.</p>
+
+  <h2>Cos'è un percentile orientato</h2>
+  <p>Gli indicatori hanno unità diverse, euro, anni, percentuali, indici. Non si possono sommare così come sono. Per renderli confrontabili normalizziamo ogni indicatore dentro se stesso: ordiniamo le regioni dall'ultima alla prima e assegniamo un percentile da 0 a 1. Poi applichiamo la direzione dell'indicatore. Per alcuni un valore alto è positivo, per esempio l'occupazione. Per altri un valore alto è negativo, per esempio la povertà. Il percentile orientato mette sempre l'1 dalla parte buona, così 0 vuol dire peggiore tra le regioni e 1 vuol dire migliore.</p>
+
+  <h2>Quali indicatori entrano</h2>
+  <p>Usiamo solo indicatori solidi. Devono essere completi su tutte le {{ m.core_criteria.regions }} regioni, recenti, con anno più aggiornato pari almeno al {{ m.core_criteria.min_year }}, e avere una direzione chiara. Gli indicatori puramente contestuali, quelli per cui non esiste un meglio o un peggio condiviso, restano fuori dal punteggio. In questa versione la classifica poggia su {{ m.total_indicators }} indicatori.</p>
+
+  <h2>Come sono scelte le categorie</h2>
+  <p>Raggruppiamo i temi Istat in categorie leggibili, ognuna con un significato preciso per la vita delle persone. Ecco quante misure compongono oggi ciascuna categoria.</p>
+  <table class="data-table">
+    <thead><tr><th>Categoria</th><th>Temi Istat</th><th class="num">Indicatori</th></tr></thead>
+    <tbody>
+      {% for category in categories %}
+      <tr>
+        <td><strong>{{ category.name }}</strong></td>
+        <td>{{ category.themes | join(', ') }}</td>
+        <td class="num">{{ m.indicator_counts[category.slug] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="page-note">Il turismo resta fuori dallo standard di proposito: più turismo può essere un'opportunità ma anche una pressione, quindi non vale sempre la regola del più è meglio.</p>
+
+  <h2>Come si calcola il punteggio</h2>
+  <p>Il calcolo è una catena semplice e verificabile.</p>
+  <ul>
+    <li><strong>Punteggio indicatore</strong>: percentile orientato moltiplicato per 100, da 0 a 100.</li>
+    <li><strong>Punteggio categoria</strong>: media dei punteggi degli indicatori che la compongono.</li>
+    <li><strong>Punteggio finale</strong>: media dei punteggi di categoria pesata secondo il profilo scelto.</li>
+  </ul>
+  <p>Se per una regione una categoria non ha indicatori disponibili, non blocchiamo la classifica. Ridistribuiamo i pesi sulle categorie rimaste e mostriamo la copertura, cioè la quota di categorie effettivamente disponibili. Se una categoria fosse vuota per tutte le regioni, la escludiamo e lo segnaliamo nei controlli di qualità.</p>
+
+  <h2>Come funzionano i profili</h2>
+  <p>Lo stesso insieme di dati può raccontare classifiche diverse a seconda di cosa conta di più. Per questo offriamo più profili di peso. Ognuno ha pesi espliciti, normalizzati in modo da sommare a 1.</p>
+  <ul class="quality-category-list">
+    {% for profile in profiles %}
+    <li>
+      <h3>{{ profile.name }}</h3>
+      <p>{{ profile.description }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <h2>I limiti, dichiarati</h2>
+  <p>La media regionale nasconde le differenze interne. Una regione può avere un buon punteggio e contenere territori molto distanti tra loro. Il percentile misura una posizione relativa tra le venti regioni, non una distanza assoluta dai valori ideali. La scelta delle categorie e dei pesi è una scelta editoriale, resa trasparente proprio per poterla discutere. Alcuni temi, come {{ m.quality_checks.unmapped_themes | join(', ') }}, oggi restano fuori dalle categorie standard.</p>
+
+  <h2>La roadmap verso le province</h2>
+  <p>La versione provinciale è progettata ma non ancora pubblicata, perché nel progetto non esistono dati provinciali. Quando arriverà servirà un nuovo dataset, con l'Istat BES dei Territori come ossatura per le 107 province e città metropolitane, affiancato dalle tavole provinciali degli indicatori territoriali per le politiche di sviluppo per lavoro, sicurezza, servizi di cura, ambiente, acqua, rifiuti, trasporti, cultura, digitale e turismo. Serviranno la mappatura dei codici provincia Istat, la normalizzazione dei nomi, la gestione delle città metropolitane, le geometrie provinciali per le mappe e una pipeline dedicata. Solo in una fase avanzata valuteremo fonti verticali come OMI dell'Agenzia delle Entrate per la casa, ISPRA e SNPA per l'ambiente, INAIL per gli infortuni, il Ministero della Salute per la sanità, AGCOM e Infratel per il digitale, il Ministero dell'Interno per la sicurezza e il Ministero della Giustizia per la durata dei procedimenti.</p>
+
+  <h2>In cosa siamo diversi dal Sole 24 Ore e da ItaliaOggi</h2>
+  <p>La classifica Divario Italia è una sintesi autonoma sugli indicatori regionali Istat. Non è la classifica del Sole 24 Ore e non usa il dataset del Sole come fonte primaria. Il nostro obiettivo è diverso, più trasparente e più interattivo: vogliamo far vedere come cambia la classifica quando cambiano indicatori, categorie e pesi. Un eventuale confronto metodologico con le classifiche esistenti resterà una sezione separata, non la sostanza della graduatoria.</p>
+
+  <aside class="indicator-cta">
+    <span>
+      <small>Pronto a guardare i numeri</small>
+      <strong>Apri la classifica e cambia profilo</strong>
+    </span>
+    <a href="/qualita-della-vita/classifica">Vedi la classifica →</a>
+  </aside>
+</article>
+{% endblock %}

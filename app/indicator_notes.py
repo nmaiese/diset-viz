@@ -61,6 +61,65 @@ THEME_CAVEATS = {
 }
 
 
+# Non-destructive macro-area overlay over the 26 verbatim Istat themes. The themes
+# stay exactly as published (single source of truth: the CSV "Tema" column); this map
+# only groups them into ~6 higher-level areas used as a coarse filter in the atlas and
+# region pages. When a new theme is added to the dataset, add it here too (see
+# docs/DATA_PIPELINE.md), otherwise macro_area_for() falls back to "Altro".
+MACRO_AREAS = {
+    "Economia e produzione": (
+        "Competitività",
+        "Dinamiche settoriali",
+        "Demografia di impresa",
+        "Reddito e ricchezza",
+        "Mercato dei capitali e finanza d'impresa",
+        "Internazionalizzazione",
+        "Turismo",
+        "Ricerca ed innovazione",
+    ),
+    "Lavoro e istruzione": (
+        "Lavoro",
+        "Istruzione e formazione",
+    ),
+    "Società e inclusione": (
+        "Inclusione sociale",
+        "Servizi di cura",
+        "Cultura",
+        "Capitale sociale",
+        "Legalità e sicurezza",
+    ),
+    "Ambiente, energia e territorio": (
+        "Ambiente, altro",
+        "Energia",
+        "Qualità dell'aria",
+        "Rifiuti",
+        "Risorse idriche",
+        "Città",
+    ),
+    "Demografia e salute": (
+        "Demografia e popolazione",
+        "Salute",
+    ),
+    "Istituzioni e infrastrutture": (
+        "Pubblica Amministrazione",
+        "Trasporti e mobilità",
+        "Società dell'informazione",
+    ),
+}
+
+# Display order for the macro-areas (mirrors MACRO_AREAS insertion order).
+MACRO_AREA_ORDER = tuple(MACRO_AREAS.keys())
+
+_THEME_TO_MACRO = {
+    theme: area for area, themes in MACRO_AREAS.items() for theme in themes
+}
+
+
+def macro_area_for(theme):
+    """Macro-area label for a theme, or 'Altro' if the theme is not mapped yet."""
+    return _THEME_TO_MACRO.get(_clean(theme), "Altro")
+
+
 LOWER_IS_BETTER = (
     "abbandono",
     "criminal",

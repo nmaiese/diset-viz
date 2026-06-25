@@ -154,6 +154,32 @@ h1, h2, h3 { font-family: var(--font-display); }
   line-height: 1.45;
 }
 
+/* ---------- Macro-area tabs ---------- */
+.macro-spine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px clamp(16px, 4vw, 48px) 0;
+  margin: 0 auto;
+}
+.macro-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+}
+.macro-tab em { font-style: normal; color: var(--muted); }
+.macro-tab:hover { border-color: var(--accent); color: var(--ink); }
+.macro-tab.is-active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.macro-tab.is-active em { color: rgba(251, 250, 247, 0.7); }
+
 /* ---------- Atlas layout ---------- */
 .atlas {
   display: grid;
@@ -256,6 +282,40 @@ h1, h2, h3 { font-family: var(--font-display); }
 .command-bar__controls .select-field > span { margin: 0; }
 .select-icon { position: absolute; right: 12px; bottom: 13px; pointer-events: none; color: var(--muted); }
 .command-bar__controls .select-icon { bottom: auto; top: 50%; transform: translateY(-50%); }
+
+/* Year-coverage filter */
+.year-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 12px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+.year-range.is-active { border-color: var(--accent); }
+.year-range__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.year-range.is-active .year-range__label { color: var(--accent); }
+.command-bar__controls .select-field--year { gap: 6px; }
+.command-bar__controls .select-field--year > span { font-size: 11px; color: var(--muted); }
+.select-field--year select { min-width: 78px; padding: 7px 30px 7px 10px; font-family: var(--font-mono); }
+.select-field--year .select-icon { right: 9px; }
+.year-range__reset {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  background: var(--accent-soft);
+  color: var(--accent);
+  cursor: pointer;
+}
+.year-range__reset:hover { background: var(--accent); color: #fff; }
 
 .toggle {
   display: inline-flex;

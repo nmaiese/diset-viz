@@ -38,6 +38,16 @@ missed:
 The Markdown engine has `smarty` disabled, so `--`/`...` are not auto-converted.
 Keep the source clean.
 
+## Adding indicators or datasets
+
+When you change `app/static/data/Assoluti_Regione.csv` (new indicators, themes or
+a new dataset), follow [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md). Themes,
+theme scores, region profiles and macro-areas are derived from the data and
+recomputed at runtime (cache 1h). Set each new indicator's direction in
+`CURATED_DIRECTION` and map each new theme to a macro-area in `MACRO_AREAS`
+(both in `app/indicator_notes.py`), then restart gunicorn, rebuild the frontend
+and run the tests.
+
 ## Other constraints
 
 - Keep the cartographic identity (navy `#15233b`, paper `#fbfaf7`, accent

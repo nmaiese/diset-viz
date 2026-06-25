@@ -2,19 +2,25 @@
 {% set active_nav = 'temi' %}
 
 {% block title %}I temi degli indicatori territoriali · {{ site_name }}{% endblock %}
-{% block description %}Esplora i 377 indicatori territoriali Istat per tema: lavoro, istruzione, ambiente, salute, trasporti e altri ambiti del divario tra le regioni italiane.{% endblock %}
+{% block description %}Esplora {{ total }} indicatori territoriali Istat per tema: lavoro, istruzione, ambiente, salute, trasporti e gli altri ambiti del divario tra le regioni italiane.{% endblock %}
 
 {% block content %}
 <article class="page page-index wrap">
   <h1>I temi</h1>
-  <p class="page-lead">Gli indicatori territoriali Istat sono organizzati per tema. Scegli un'area per vedere tutti gli indicatori disponibili.</p>
-  <div class="index-grid">
-    {% for t in themes %}
-    <a class="index-card index-card--theme" href="{{ t.path }}">
-      <strong>{{ t.theme }}</strong>
-      <small>{{ t.indicator_count }} indicatori</small>
-    </a>
-    {% endfor %}
-  </div>
+  <p class="page-lead">{{ total }} indicatori Istat per leggere il divario tra le regioni italiane, raccolti in sei grandi aree. Scegli un tema per aprire tutti i suoi indicatori, con mappe, classifiche e andamenti negli anni.</p>
+
+  {% for group in groups %}
+  <section class="theme-group">
+    <h2>{{ group.macro_area }} <span class="theme-group__count">{{ group.indicator_count }} indicatori</span></h2>
+    <div class="index-grid">
+      {% for t in group.themes %}
+      <a class="index-card index-card--theme" href="{{ t.path }}">
+        <strong>{{ t.theme }}</strong>
+        <small>{{ t.indicator_count }} {{ 'indicatore' if t.indicator_count == 1 else 'indicatori' }}</small>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
 </article>
 {% endblock %}

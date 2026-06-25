@@ -30,9 +30,10 @@
 
 {% block content %}
 <article class="page page-theme wrap">
-  <nav class="breadcrumb"><a href="/temi">Temi</a></nav>
+  <nav class="breadcrumb"><a href="/temi">Temi</a>{% if p.macro_area %} / {{ p.macro_area }}{% endif %}</nav>
   <h1>{{ p.theme }}</h1>
-  <p class="page-lead">{{ p.indicator_count }} indicatori territoriali Istat in questo tema, confrontabili tra le 20 regioni italiane.</p>
+  <p class="page-lead">{% if p.example %}{{ p.example | replace('Esempio: ', '') | capitalize }}{% else %}Gli indicatori Istat che raccontano il tema {{ p.theme }}, regione per regione.{% endif %}</p>
+  <p class="page-intro">In questo tema trovi {{ p.indicator_count }} indicatori{% if p.complete_count %}, di cui {{ p.complete_count }} con dati completi e aggiornati su tutte e 20 le regioni{% endif %}. Apri una scheda per la classifica aggiornata, oppure esplora mappa e andamento negli anni nell'atlante.</p>
 
   <ul class="indicator-list">
     {% for ind in p.indicators %}
@@ -45,5 +46,9 @@
     </li>
     {% endfor %}
   </ul>
+
+  {% if p.caveat %}
+  <p class="page-caveat">{{ p.caveat }}</p>
+  {% endif %}
 </article>
 {% endblock %}
