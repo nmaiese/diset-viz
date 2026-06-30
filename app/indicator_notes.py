@@ -194,6 +194,10 @@ CURATED_DIRECTION = {
     "190": "higher_better", "189": "higher_better", "104": "higher_better", "67": "higher_better",
     "188": "higher_better", "187": "higher_better", "63": "higher_better", "186": "higher_better",
     "185": "higher_better",
+    # 104 misura la popolazione 25-64 con AL PIÙ la licenza media: un valore alto è
+    # sfavorevole (più adulti fermi a un titolo basso), quindi lower_better. Senza
+    # questo override il nome "livello di istruzione" lo farebbe leggere al contrario.
+    "104": "lower_better",
     # Lavoro (fix gender-gap indicators to lower_better; activity/entrepreneurship = positive)
     "398": "higher_better", "466": "higher_better", "61": "lower_better", "57": "lower_better",
     "402": "higher_better", "401": "higher_better", "203": "higher_better", "213": "higher_better",
