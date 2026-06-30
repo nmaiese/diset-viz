@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="Archivo, Arial, sans-serif">
+  <rect width="1200" height="630" fill="#fbfaf7"/>
+  <g stroke="rgba(21,35,59,0.07)"><line x1="0" y1="28" x2="1200" y2="28"/><line x1="0" y1="56" x2="1200" y2="56"/><line x1="0" y1="84" x2="1200" y2="84"/><line x1="0" y1="112" x2="1200" y2="112"/><line x1="0" y1="140" x2="1200" y2="140"/></g>
+  <text x="56" y="92" font-size="22" font-family="'Space Mono', monospace" fill="#e4572e" letter-spacing="3">DIVARIO ITALIA · DATI 2023</text>
+  <text x="54" y="170" font-size="60" font-weight="800" fill="#15233b">Servizi per l'infanzia</text>
+  <text x="56" y="208" font-size="22" font-family="'Space Mono', monospace" fill="#6b7785">Bambini 0-3 anni presi in carico · %</text>
+  <g>
+    <text x="56" y="286" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Friuli-Venezia Giulia</text>
+    <rect x="470" y="266" width="560" height="26" rx="2" fill="#15233b"/>
+    <text x="1042" y="286" font-size="20" fill="#15233b" text-anchor="start" font-family="'Space Mono', monospace">40,5%</text>
+    <text x="56" y="344" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Emilia-Romagna</text>
+    <rect x="470" y="324" width="476" height="26" rx="2" fill="#15233b"/>
+    <text x="958" y="344" font-size="20" fill="#15233b" text-anchor="start" font-family="'Space Mono', monospace">34,4%</text>
+    <text x="56" y="402" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Toscana</text>
+    <rect x="470" y="382" width="418" height="26" rx="2" fill="#15233b"/>
+    <text x="900" y="402" font-size="20" fill="#15233b" text-anchor="start" font-family="'Space Mono', monospace">30,2%</text>
+    <text x="56" y="460" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Campania</text>
+    <rect x="470" y="440" width="95" height="26" rx="2" fill="#15233b"/>
+    <text x="577" y="460" font-size="20" fill="#15233b" text-anchor="start" font-family="'Space Mono', monospace">6,9%</text>
+    <text x="56" y="518" font-size="22" fill="#15233b" font-family="Archivo, Arial, sans-serif">Calabria</text>
+    <rect x="470" y="498" width="82" height="26" rx="2" fill="#e4572e"/>
+    <text x="564" y="518" font-size="20" fill="#e4572e" text-anchor="start" font-family="'Space Mono', monospace">5,9%</text>
+  </g>
+  <line x1="56" y1="560" x2="1144" y2="560" stroke="rgba(21,35,59,0.16)"/>
+  <text x="56" y="592" font-size="18" font-family="'Space Mono', monospace" fill="#6b7785">Fonte: Istat — Indicatori territoriali per le politiche di sviluppo</text>
+  <text x="1144" y="592" font-size="18" font-weight="700" fill="#15233b" text-anchor="end">divarioitalia.it</text>
+</svg>
