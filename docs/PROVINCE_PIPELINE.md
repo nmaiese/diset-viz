@@ -118,11 +118,15 @@ I tre file sono versionati. La cache grezza (`data/istat_cache/`) no.
 
 ## Visualizzazione (già attiva)
 
-La classifica provinciale è online a **`/qualita-della-vita/province`**
-(con `?profilo=`), più le API
-`/api/quality-life/province/rankings[/<profilo>]` e
-`/api/quality-life/province/<province_key>`. Il motore è
-[`app/quality_life_province.py`](../app/quality_life_province.py): legge
+La classifica è online, unificata su BES per **regioni e province** con lo stesso
+motore: `/qualita-della-vita/classifica/regioni` e `…/classifica/province` (con
+`?profilo=`), API `/api/quality-life/<livello>/rankings[/<profilo>]` e
+`/api/quality-life/<livello>/<key>`. Il motore unico è
+[`app/quality_life_bes.py`](../app/quality_life_bes.py) (z-score orientato,
+delta-rank, campioni e classifiche per categoria), con loader
+[`app/bes_data.py`](../app/bes_data.py). La vecchia
+[`app/quality_life_province.py`](../app/quality_life_province.py) resta nel repo ma
+non è più collegata alle route. Storicamente leggeva
 `Assoluti_Provincia.csv` + `province_manifest.csv` tramite
 [`app/province_data.py`](../app/province_data.py), riusa profili, categorie e
 matematica di scoring di `app/quality_life.py`, e **non tocca** `app/data.py` né la
