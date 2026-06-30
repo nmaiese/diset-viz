@@ -3,8 +3,7 @@ from app.cache import cache
 from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts
 from app.data import get_catalog, get_indicator, get_indicator_year, get_rows, search_indicators
 from app import profiles
-from app import quality_life as ql
-from app import quality_life_province as qlp
+from app import quality_life_bes as qb
 
 from flask import Response, abort, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -241,128 +240,136 @@ def themes_index():
     )
 
 
+# User-facing URL level (plural) -> engine level (singular).
+URL_LEVEL = {"regioni": "regione", "province": "provincia"}
+
+
 def _quality_life_profile_arg():
     """Resolve the requested profile slug from ?profilo= (or ?profile=)."""
-    return request.args.get("profilo") or request.args.get("profile") or ql.DEFAULT_PROFILE
+    return request.args.get("profilo") or request.args.get("profile") or qb.DEFAULT_PROFILE
+
+
+def _profile_suffix(slug):
+    return "" if slug == qb.DEFAULT_PROFILE else f"?profilo={slug}"
 
 
 @app.route("/api/quality-life/profiles")
 def quality_life_profiles_api():
-    return jsonify({"profiles": ql.get_quality_life_profiles()})
+    return jsonify({"profiles": qb.get_quality_life_profiles()})
 
 
 @app.route("/api/quality-life/categories")
 def quality_life_categories_api():
-    return jsonify({"categories": ql.get_quality_life_categories()})
+    return jsonify({"categories": qb.get_quality_life_categories()})
 
 
-@app.route("/api/quality-life/rankings")
-def quality_life_rankings_api():
-    payload = ql.build_quality_life_ranking(_quality_life_profile_arg())
+@app.route("/api/quality-life/<url_level>/rankings")
+def quality_life_level_rankings_api(url_level):
+    level = URL_LEVEL.get(url_level)
+    if level is None:
+        abort(404)
+    payload = qb.build_bes_ranking(level, _quality_life_profile_arg())
     if payload is None:
         abort(404)
     return jsonify(payload)
+
+
+@app.route("/api/quality-life/<url_level>/rankings/<profile_slug>")
+def quality_life_level_ranking_profile_api(url_level, profile_slug):
+    level = URL_LEVEL.get(url_level)
+    if level is None:
+        abort(404)
+    payload = qb.build_bes_ranking(level, profile_slug)
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+@app.route("/api/quality-life/<url_level>/<territory_key>")
+def quality_life_level_territory_api(url_level, territory_key):
+    level = URL_LEVEL.get(url_level)
+    if level is None:
+        abort(404)
+    payload = qb.build_bes_territory(level, territory_key, _quality_life_profile_arg())
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+# Back-compat aliases for the previous regional API paths.
+@app.route("/api/quality-life/rankings")
+def quality_life_rankings_api_legacy():
+    payload = qb.build_bes_ranking("regione", _quality_life_profile_arg())
+    return jsonify(payload) if payload else abort(404)
 
 
 @app.route("/api/quality-life/rankings/<profile_slug>")
-def quality_life_ranking_profile_api(profile_slug):
-    payload = ql.build_quality_life_ranking(profile_slug)
-    if payload is None:
-        abort(404)
-    return jsonify(payload)
+def quality_life_rankings_profile_api_legacy(profile_slug):
+    payload = qb.build_bes_ranking("regione", profile_slug)
+    return jsonify(payload) if payload else abort(404)
 
 
 @app.route("/api/quality-life/region/<region_key>")
-def quality_life_region_api(region_key):
-    payload = ql.build_quality_life_region_profile(region_key, _quality_life_profile_arg())
-    if payload is None:
-        abort(404)
-    return jsonify(payload)
+def quality_life_region_api_legacy(region_key):
+    payload = qb.build_bes_territory("regione", region_key, _quality_life_profile_arg())
+    return jsonify(payload) if payload else abort(404)
 
 
 @app.route("/qualita-della-vita")
 def quality_life_index():
     return render_template(
         "quality_life_index.html",
-        categories=ql.get_quality_life_categories(),
-        profiles=ql.get_quality_life_profiles(),
-        default_profile=ql.DEFAULT_PROFILE,
+        categories=qb.get_quality_life_categories(),
+        profiles=qb.get_quality_life_profiles(),
+        default_profile=qb.DEFAULT_PROFILE,
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/qualita-della-vita",
     )
 
 
-@app.route("/qualita-della-vita/classifica")
-def quality_life_ranking():
+@app.route("/qualita-della-vita/classifica/<url_level>")
+def quality_life_classifica(url_level):
+    level = URL_LEVEL.get(url_level)
+    if level is None:
+        abort(404)
     slug = _quality_life_profile_arg()
-    payload = ql.build_quality_life_ranking(slug)
+    payload = qb.build_bes_ranking(level, slug)
     if payload is None:
         abort(404)
-    suffix = "" if slug == ql.DEFAULT_PROFILE else f"?profilo={slug}"
     return render_template(
-        "quality_life_ranking.html",
+        "quality_life_classifica.html",
         data=payload,
-        profiles=ql.get_quality_life_profiles(),
+        url_level=url_level,
+        profiles=qb.get_quality_life_profiles(),
         active_profile=slug,
-        default_profile=ql.DEFAULT_PROFILE,
+        default_profile=qb.DEFAULT_PROFILE,
         site_url=SITE_URL,
         site_name=SITE_NAME,
-        canonical=f"{SITE_URL}/qualita-della-vita/classifica{suffix}",
+        canonical=f"{SITE_URL}/qualita-della-vita/classifica/{url_level}{_profile_suffix(slug)}",
     )
 
 
-@app.route("/api/quality-life/province/rankings")
-def quality_life_province_rankings_api():
-    payload = qlp.build_province_ranking(_quality_life_profile_arg())
-    if payload is None:
-        abort(404)
-    return jsonify(payload)
-
-
-@app.route("/api/quality-life/province/rankings/<profile_slug>")
-def quality_life_province_ranking_profile_api(profile_slug):
-    payload = qlp.build_province_ranking(profile_slug)
-    if payload is None:
-        abort(404)
-    return jsonify(payload)
-
-
-@app.route("/api/quality-life/province/<province_key>")
-def quality_life_province_api(province_key):
-    payload = qlp.build_province_profile(province_key, _quality_life_profile_arg())
-    if payload is None:
-        abort(404)
-    return jsonify(payload)
+@app.route("/qualita-della-vita/classifica")
+def quality_life_classifica_redirect():
+    return redirect(f"/qualita-della-vita/classifica/regioni{_profile_suffix(_quality_life_profile_arg())}", code=301)
 
 
 @app.route("/qualita-della-vita/province")
-def quality_life_province_page():
-    slug = _quality_life_profile_arg()
-    payload = qlp.build_province_ranking(slug)
-    if payload is None:
-        abort(404)
-    suffix = "" if slug == ql.DEFAULT_PROFILE else f"?profilo={slug}"
-    return render_template(
-        "quality_life_province.html",
-        data=payload,
-        profiles=ql.get_quality_life_profiles(),
-        active_profile=slug,
-        default_profile=ql.DEFAULT_PROFILE,
-        site_url=SITE_URL,
-        site_name=SITE_NAME,
-        canonical=f"{SITE_URL}/qualita-della-vita/province{suffix}",
-    )
+def quality_life_province_redirect():
+    return redirect(f"/qualita-della-vita/classifica/province{_profile_suffix(_quality_life_profile_arg())}", code=301)
 
 
 @app.route("/qualita-della-vita/metodologia")
 def quality_life_methodology():
-    payload = ql.build_quality_life_ranking(ql.DEFAULT_PROFILE)
+    regioni = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
+    province = qb.build_bes_ranking("provincia", qb.DEFAULT_PROFILE)
     return render_template(
         "quality_life_methodology.html",
-        methodology=payload["methodology"],
-        categories=ql.get_quality_life_categories(),
-        profiles=ql.get_quality_life_profiles(),
+        methodology_regioni=regioni["methodology"] if regioni else None,
+        methodology_province=province["methodology"] if province else None,
+        categories=qb.get_quality_life_categories(),
+        profiles=qb.get_quality_life_profiles(),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/qualita-della-vita/metodologia",
@@ -377,12 +384,11 @@ def sitemap():
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
-        {"loc": f"{SITE_URL}/qualita-della-vita/classifica", "priority": "0.8"},
+        {"loc": f"{SITE_URL}/qualita-della-vita/classifica/regioni", "priority": "0.8"},
+        {"loc": f"{SITE_URL}/qualita-della-vita/classifica/province", "priority": "0.8"},
         {"loc": f"{SITE_URL}/qualita-della-vita/metodologia", "priority": "0.6"},
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
-    if qlp.has_province_data():
-        pages.append({"loc": f"{SITE_URL}/qualita-della-vita/province", "priority": "0.8"})
     for post in get_posts():
         pages.append({
             "loc": post["url"],

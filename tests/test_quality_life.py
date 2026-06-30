@@ -1,177 +1,124 @@
 import unittest
 
 from app import app
-from app import quality_life as ql
-from app import quality_life_province as qlp
-from app.province_data import has_province_data
+from app import quality_life_bes as qb
+from app.bes_data import has_bes_data
+from app.quality_life import normalize_weights
 from app.quality_life_config import QUALITY_LIFE_CATEGORIES, QUALITY_LIFE_PROFILES
 
 
-class QualityLifePagesTest(unittest.TestCase):
-    def test_quality_life_pages_respond(self):
+class QualityLifeStaticTest(unittest.TestCase):
+    def test_index_and_methodology_respond(self):
         client = app.test_client()
-
         index = client.get("/qualita-della-vita")
         self.assertEqual(index.status_code, 200)
-        self.assertIn(b"Qualit", index.data)
         self.assertIn(b"application/ld+json", index.data)
-
-        ranking = client.get("/qualita-della-vita/classifica")
-        self.assertEqual(ranking.status_code, 200)
-        self.assertIn(b"Lombardia", ranking.data)
-
-        ranking_profile = client.get("/qualita-della-vita/classifica?profilo=giovani")
-        self.assertEqual(ranking_profile.status_code, 200)
-
-        # Unknown profile on the HTML page is a 404, not a silent fallback.
-        self.assertEqual(client.get("/qualita-della-vita/classifica?profilo=nope").status_code, 404)
 
         methodology = client.get("/qualita-della-vita/metodologia")
         self.assertEqual(methodology.status_code, 200)
         self.assertIn("Sole 24 Ore".encode("utf-8"), methodology.data)
+        self.assertIn("z-score".encode("utf-8"), methodology.data)
 
-    def test_classifica_shows_category_scores(self):
-        # "score categorie principali" must be visible text, not only tooltips.
-        html = app.test_client().get("/qualita-della-vita/classifica").data.decode("utf-8")
-        self.assertIn("quality-chip__score", html)
-        top = ql.build_quality_life_ranking("standard")["ranking"][0]
-        strongest = top["strongest_categories"][0]
-        self.assertIn(strongest["name"], html)
-        self.assertIn(f">{round(strongest['score'])}</b>", html)
-
-    def test_quality_life_api_ranking_responds(self):
+    def test_api_profiles_and_categories(self):
         client = app.test_client()
-
-        rankings = client.get("/api/quality-life/rankings")
-        self.assertEqual(rankings.status_code, 200)
-        payload = rankings.get_json()
-        for key in ("ranking", "profile", "categories", "methodology"):
-            self.assertIn(key, payload)
-        self.assertEqual(payload["profile"]["slug"], "standard")
-        self.assertEqual(len(payload["ranking"]), 20)
-
-        # Every indicator surfaced is fully traceable.
-        sample = payload["ranking"][0]["top_positive_indicators"][0]
-        for field in ("id", "name", "theme", "score", "path", "year_max", "direction"):
-            self.assertIn(field, sample)
-
         profiles = client.get("/api/quality-life/profiles")
         self.assertEqual(profiles.status_code, 200)
         self.assertGreater(len(profiles.get_json()["profiles"]), 0)
-
         categories = client.get("/api/quality-life/categories")
         self.assertEqual(categories.status_code, 200)
-        self.assertGreater(len(categories.get_json()["categories"]), 0)
+        self.assertEqual(len(categories.get_json()["categories"]), len(QUALITY_LIFE_CATEGORIES))
 
-        named = client.get("/api/quality-life/rankings/opportunita")
-        self.assertEqual(named.status_code, 200)
-        self.assertEqual(named.get_json()["profile"]["slug"], "opportunita")
-        self.assertEqual(client.get("/api/quality-life/rankings/nope").status_code, 404)
-
-    def test_quality_life_region_profile_responds(self):
-        client = app.test_client()
-
-        region = client.get("/api/quality-life/region/lombardia")
-        self.assertEqual(region.status_code, 200)
-        payload = region.get_json()
-        self.assertEqual(payload["region"]["region_key"], "lombardia")
-        self.assertGreaterEqual(payload["region"]["rank"], 1)
-        self.assertLessEqual(payload["region"]["rank"], 20)
-
-        self.assertEqual(client.get("/api/quality-life/region/atlantide").status_code, 404)
-        self.assertEqual(
-            client.get("/api/quality-life/region/lombardia?profilo=nope").status_code, 404
-        )
-
-    def test_quality_life_profiles_have_valid_weights(self):
-        category_slugs = set(QUALITY_LIFE_CATEGORIES)
-        for slug, config in QUALITY_LIFE_PROFILES.items():
-            normalised = ql.normalize_weights(config["weights"])
+    def test_profiles_have_valid_weights(self):
+        for config in QUALITY_LIFE_PROFILES.values():
+            normalised = normalize_weights(config["weights"])
             self.assertAlmostEqual(sum(normalised.values()), 1.0, places=6)
-            # Every weighted category exists.
             for category in config["weights"]:
-                self.assertIn(category, category_slugs)
+                self.assertIn(category, QUALITY_LIFE_CATEGORIES)
 
-    def test_quality_life_scores_are_in_range(self):
-        payload = ql.build_quality_life_ranking("standard")
-        for row in payload["ranking"]:
-            self.assertGreaterEqual(row["score"], 0)
-            self.assertLessEqual(row["score"], 100)
-            self.assertGreaterEqual(row["coverage"], 0.0)
-            self.assertLessEqual(row["coverage"], 1.0)
-            for category_score in row["category_scores"].values():
-                self.assertGreaterEqual(category_score, 0)
-                self.assertLessEqual(category_score, 100)
+    def test_legacy_redirects(self):
+        client = app.test_client()
+        for path, target in [
+            ("/qualita-della-vita/classifica", "/qualita-della-vita/classifica/regioni"),
+            ("/qualita-della-vita/province", "/qualita-della-vita/classifica/province"),
+        ]:
+            resp = client.get(path)
+            self.assertEqual(resp.status_code, 301)
+            self.assertTrue(resp.headers["Location"].endswith(target))
 
-    def test_quality_life_ranking_is_sorted(self):
-        payload = ql.build_quality_life_ranking("standard")
-        scores = [row["score"] for row in payload["ranking"]]
-        self.assertEqual(scores, sorted(scores, reverse=True))
-        self.assertEqual([row["rank"] for row in payload["ranking"]], list(range(1, 21)))
-
-    def test_quality_life_categories_not_empty_for_standard_profile(self):
-        payload = ql.build_quality_life_ranking("standard")
-        counts = payload["methodology"]["indicator_counts"]
-        # The standard profile weights every category, so each must carry data.
-        for category in QUALITY_LIFE_CATEGORIES:
-            self.assertGreater(counts.get(category, 0), 0)
-        self.assertEqual(payload["methodology"]["quality_checks"]["empty_categories"], [])
-
-    def test_quality_life_sitemap_contains_pages(self):
+    def test_sitemap_contains_both_levels(self):
         sitemap = app.test_client().get("/sitemap.xml").data
-        self.assertIn(b"/qualita-della-vita", sitemap)
-        self.assertIn(b"/qualita-della-vita/classifica", sitemap)
-        self.assertIn(b"/qualita-della-vita/metodologia", sitemap)
+        self.assertIn(b"/qualita-della-vita/classifica/regioni", sitemap)
+        self.assertIn(b"/qualita-della-vita/classifica/province", sitemap)
+
+    def test_invalid_level_is_404(self):
+        client = app.test_client()
+        self.assertEqual(client.get("/qualita-della-vita/classifica/comuni").status_code, 404)
+        self.assertEqual(client.get("/api/quality-life/comuni/rankings").status_code, 404)
 
     def test_existing_routes_still_work(self):
         client = app.test_client()
         self.assertEqual(client.get("/legacy").status_code, 200)
-        self.assertEqual(client.get("/legacy-reddito").status_code, 200)
         self.assertEqual(client.get("/data").status_code, 200)
         self.assertEqual(client.get("/api/catalog").status_code, 200)
+        self.assertEqual(client.get("/regione/lombardia").status_code, 200)
 
 
-@unittest.skipUnless(has_province_data(), "provincial dataset not built")
-class QualityLifeProvinceTest(unittest.TestCase):
-    def test_province_page_and_api_respond(self):
+class QualityLifeBesEngineTest(unittest.TestCase):
+    LEVELS = {"regione": ("regioni", 20), "provincia": ("province", 103)}
+
+    def test_levels_present(self):
+        for level in self.LEVELS:
+            self.assertTrue(has_bes_data(level), f"missing BES data for {level}")
+
+    def test_ranking_payload_and_scores(self):
+        for level, (url_level, count) in self.LEVELS.items():
+            payload = qb.build_bes_ranking(level, "standard")
+            self.assertIsNotNone(payload)
+            for key in ("ranking", "profile", "categories", "champions",
+                        "category_rankings", "methodology", "level"):
+                self.assertIn(key, payload)
+            self.assertEqual(len(payload["ranking"]), count, level)
+            scores = [r["score"] for r in payload["ranking"]]
+            self.assertEqual(scores, sorted(scores, reverse=True))
+            self.assertEqual([r["rank"] for r in payload["ranking"]], list(range(1, count + 1)))
+            for row in payload["ranking"]:
+                self.assertGreaterEqual(row["score"], 0)
+                self.assertLessEqual(row["score"], 100)
+                self.assertIn("delta_rank", row)
+            self.assertTrue(payload["champions"])
+
+    def test_delta_rank_is_zero_for_standard_and_moves_otherwise(self):
+        # Standard vs itself: every delta is 0.
+        std = qb.build_bes_ranking("provincia", "standard")
+        self.assertTrue(all(r["delta_rank"] == 0 for r in std["ranking"]))
+        # A different profile must move at least one province.
+        servizi = qb.build_bes_ranking("provincia", "servizi")
+        self.assertTrue(any(r["delta_rank"] != 0 for r in servizi["ranking"]))
+        # Deltas net to zero (it is a re-ranking of the same set).
+        self.assertEqual(sum(r["delta_rank"] for r in servizi["ranking"]), 0)
+
+    def test_http_rankings_and_territory(self):
         client = app.test_client()
+        cases = [("regioni", "lombardia"), ("province", "milano")]
+        for url_level, key in cases:
+            page = client.get(f"/qualita-della-vita/classifica/{url_level}")
+            self.assertEqual(page.status_code, 200)
+            self.assertEqual(client.get(f"/qualita-della-vita/classifica/{url_level}?profilo=giovani").status_code, 200)
 
-        page = client.get("/qualita-della-vita/province")
-        self.assertEqual(page.status_code, 200)
-        self.assertEqual(client.get("/qualita-della-vita/province?profilo=giovani").status_code, 200)
+            api = client.get(f"/api/quality-life/{url_level}/rankings")
+            self.assertEqual(api.status_code, 200)
+            self.assertEqual(api.get_json()["level"], "regione" if url_level == "regioni" else "provincia")
+            self.assertEqual(client.get(f"/api/quality-life/{url_level}/rankings/nope").status_code, 404)
 
-        rankings = client.get("/api/quality-life/province/rankings")
-        self.assertEqual(rankings.status_code, 200)
-        payload = rankings.get_json()
-        for key in ("ranking", "profile", "categories", "methodology", "level"):
-            self.assertIn(key, payload)
-        self.assertEqual(payload["level"], "provincia")
+            one = client.get(f"/api/quality-life/{url_level}/{key}")
+            self.assertEqual(one.status_code, 200)
+            self.assertEqual(one.get_json()["territory"]["key"], key)
+            self.assertEqual(client.get(f"/api/quality-life/{url_level}/atlantide").status_code, 404)
 
-        named = client.get("/api/quality-life/province/rankings/opportunita")
-        self.assertEqual(named.status_code, 200)
-        self.assertEqual(client.get("/api/quality-life/province/rankings/nope").status_code, 404)
-
-    def test_province_single_profile(self):
+    def test_legacy_regional_api_alias(self):
         client = app.test_client()
-        one = client.get("/api/quality-life/province/milano")
-        self.assertEqual(one.status_code, 200)
-        self.assertEqual(one.get_json()["province"]["province_key"], "milano")
-        self.assertEqual(client.get("/api/quality-life/province/atlantide").status_code, 404)
-
-    def test_province_scores_and_sorting(self):
-        payload = qlp.build_province_ranking("standard")
-        scores = [row["score"] for row in payload["ranking"]]
-        self.assertEqual(scores, sorted(scores, reverse=True))
-        self.assertEqual([r["rank"] for r in payload["ranking"]], list(range(1, len(scores) + 1)))
-        for row in payload["ranking"]:
-            self.assertGreaterEqual(row["score"], 0)
-            self.assertLessEqual(row["score"], 100)
-            self.assertGreater(row["coverage"], 0.0)
-            self.assertLessEqual(row["coverage"], 1.0)
-
-    def test_province_sitemap_entry(self):
-        sitemap = app.test_client().get("/sitemap.xml").data
-        self.assertIn(b"/qualita-della-vita/province", sitemap)
+        self.assertEqual(client.get("/api/quality-life/rankings").status_code, 200)
+        self.assertEqual(client.get("/api/quality-life/region/lombardia").status_code, 200)
 
 
 if __name__ == "__main__":

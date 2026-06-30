@@ -150,6 +150,16 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 01SAL001;Toscana;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;83,2;;Regione
 01SAL001;Toscana;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2023;Livello;83,8;;Regione
 01SAL001;Toscana;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2024;Livello;84;;Regione
+01SAL001;Trentino-Alto Adige;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;83,35;;Regione
+01SAL001;Trentino-Alto Adige;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;83,65;;Regione
+01SAL001;Trentino-Alto Adige;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;83,8;;Regione
+01SAL001;Trentino-Alto Adige;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2018;Livello;84,05;;Regione
+01SAL001;Trentino-Alto Adige;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2019;Livello;84,1;;Regione
+01SAL001;Trentino-Alto Adige;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2020;Livello;82,8;;Regione
+01SAL001;Trentino-Alto Adige;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;83,65;;Regione
+01SAL001;Trentino-Alto Adige;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;83,8;;Regione
+01SAL001;Trentino-Alto Adige;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2023;Livello;84,35;;Regione
+01SAL001;Trentino-Alto Adige;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2024;Livello;84,65;;Regione
 01SAL001;Umbria;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;82,8;;Regione
 01SAL001;Umbria;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;83,4;;Regione
 01SAL001;Umbria;Salute;Speranza di vita alla nascita;anni (media);Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;83,3;;Regione
@@ -307,6 +317,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 01SAL004;Toscana;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2020;Livello;1,8;;Regione
 01SAL004;Toscana;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;1,6;;Regione
 01SAL004;Toscana;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;1,4;;Regione
+01SAL004;Trentino-Alto Adige;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;2,45;;Regione
+01SAL004;Trentino-Alto Adige;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;3,25;;Regione
+01SAL004;Trentino-Alto Adige;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;2,2;;Regione
+01SAL004;Trentino-Alto Adige;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2018;Livello;3,3;;Regione
+01SAL004;Trentino-Alto Adige;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2019;Livello;1,8;;Regione
+01SAL004;Trentino-Alto Adige;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2020;Livello;2,1;;Regione
+01SAL004;Trentino-Alto Adige;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;2,2;;Regione
 01SAL004;Umbria;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;4,6;;Regione
 01SAL004;Umbria;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;1,7;;Regione
 01SAL004;Umbria;Salute;Mortalità infantile;per 1.000 nati vivi;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;1,6;;Regione
@@ -447,6 +464,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 01SAL005;Toscana;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;0,5;;Regione
 01SAL005;Toscana;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;0,5;;Regione
 01SAL005;Toscana;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2023;Livello;0,5;;Regione
+01SAL005;Trentino-Alto Adige;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;0,75;;Regione
+01SAL005;Trentino-Alto Adige;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;0,7;;Regione
+01SAL005;Trentino-Alto Adige;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;0,3;;Regione
+01SAL005;Trentino-Alto Adige;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2018;Livello;0,45;;Regione
+01SAL005;Trentino-Alto Adige;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2019;Livello;0,75;;Regione
+01SAL005;Trentino-Alto Adige;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2020;Livello;0,65;;Regione
+01SAL005;Trentino-Alto Adige;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;0,5;;Regione
+01SAL005;Trentino-Alto Adige;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;0,65;;Regione
+01SAL005;Trentino-Alto Adige;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2023;Livello;0,8;;Regione
 01SAL005;Umbria;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;0,8;;Regione
 01SAL005;Umbria;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;0,4;;Regione
 01SAL005;Umbria;Salute;Mortalità per incidenti stradali (15-34 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;0,5;;Regione
@@ -596,6 +622,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 01SAL006;Toscana;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2020;Livello;7,7;;Regione
 01SAL006;Toscana;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;7,4;;Regione
 01SAL006;Toscana;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;6,9;;Regione
+01SAL006;Trentino-Alto Adige;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;7,55;;Regione
+01SAL006;Trentino-Alto Adige;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;7,8;;Regione
+01SAL006;Trentino-Alto Adige;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;6,9;;Regione
+01SAL006;Trentino-Alto Adige;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2018;Livello;6,75;;Regione
+01SAL006;Trentino-Alto Adige;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2019;Livello;7,05;;Regione
+01SAL006;Trentino-Alto Adige;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2020;Livello;6,5;;Regione
+01SAL006;Trentino-Alto Adige;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;6,1;;Regione
+01SAL006;Trentino-Alto Adige;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;6,1;;Regione
 01SAL006;Umbria;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;7,6;;Regione
 01SAL006;Umbria;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;7,8;;Regione
 01SAL006;Umbria;Salute;Mortalità per tumore (20-64 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;7,5;;Regione
@@ -748,6 +782,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 01SAL007;Toscana;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2020;Livello;34,4;;Regione
 01SAL007;Toscana;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;32,9;;Regione
 01SAL007;Toscana;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;35,8;;Regione
+01SAL007;Trentino-Alto Adige;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;31,45;;Regione
+01SAL007;Trentino-Alto Adige;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;35,2;;Regione
+01SAL007;Trentino-Alto Adige;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2018;Livello;36,8;;Regione
+01SAL007;Trentino-Alto Adige;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2019;Livello;35,9;;Regione
+01SAL007;Trentino-Alto Adige;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2020;Livello;38,4;;Regione
+01SAL007;Trentino-Alto Adige;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;34,0;;Regione
+01SAL007;Trentino-Alto Adige;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;38,95;;Regione
 01SAL007;Umbria;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;32;;Regione
 01SAL007;Umbria;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;32,6;;Regione
 01SAL007;Umbria;Salute;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;34,3;;Regione
@@ -900,6 +941,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 01SAL020;Toscana;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2020;Livello;16,5;;Regione
 01SAL020;Toscana;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;17;;Regione
 01SAL020;Toscana;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;15,3;;Regione
+01SAL020;Trentino-Alto Adige;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;16,1;;Regione
+01SAL020;Trentino-Alto Adige;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;16,35;;Regione
+01SAL020;Trentino-Alto Adige;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;14,7;;Regione
+01SAL020;Trentino-Alto Adige;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2018;Livello;14,2;;Regione
+01SAL020;Trentino-Alto Adige;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2019;Livello;13,95;;Regione
+01SAL020;Trentino-Alto Adige;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2020;Livello;16,45;;Regione
+01SAL020;Trentino-Alto Adige;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2021;Livello;15,1;;Regione
+01SAL020;Trentino-Alto Adige;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2022;Livello;14,7;;Regione
 01SAL020;Umbria;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2015;Livello;16,9;;Regione
 01SAL020;Umbria;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2016;Livello;15,6;;Regione
 01SAL020;Umbria;Salute;Mortalità evitabile (0-74 anni);tasso standardizzato per 10.000;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_01;2017;Livello;15,6;;Regione
@@ -1068,6 +1117,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 02IST001;Toscana;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;93;;Regione
 02IST001;Toscana;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;93,8;;Regione
 02IST001;Toscana;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;95;;Regione
+02IST001;Trentino-Alto Adige;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2015;Livello;96,8;;Regione
+02IST001;Trentino-Alto Adige;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2016;Livello;97,25;;Regione
+02IST001;Trentino-Alto Adige;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2017;Livello;97,7;;Regione
+02IST001;Trentino-Alto Adige;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;97,55;;Regione
+02IST001;Trentino-Alto Adige;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;96,85;;Regione
+02IST001;Trentino-Alto Adige;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;95,9;;Regione
+02IST001;Trentino-Alto Adige;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;93,95;;Regione
+02IST001;Trentino-Alto Adige;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;94,7;;Regione
 02IST001;Umbria;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2015;Livello;96,7;;Regione
 02IST001;Umbria;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2016;Livello;97,9;;Regione
 02IST001;Umbria;Istruzione e formazione;Partecipazione al sistema scolastico dei bambini di 4-5 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2017;Livello;97,5;;Regione
@@ -1207,6 +1264,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 02IST002-N22;Toscana;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;65,5;;Regione
 02IST002-N22;Toscana;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;66,4;;Regione
 02IST002-N22;Toscana;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;67,6;;Regione
+02IST002-N22;Trentino-Alto Adige;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;69,65;;Regione
+02IST002-N22;Trentino-Alto Adige;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;69,3;;Regione
+02IST002-N22;Trentino-Alto Adige;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;70,3;;Regione
+02IST002-N22;Trentino-Alto Adige;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;70,05;;Regione
+02IST002-N22;Trentino-Alto Adige;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;70,75;;Regione
+02IST002-N22;Trentino-Alto Adige;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;72,95;;Regione
+02IST002-N22;Trentino-Alto Adige;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;73,35;;Regione
 02IST002-N22;Umbria;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;68,3;;Regione
 02IST002-N22;Umbria;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;71,3;;Regione
 02IST002-N22;Umbria;Istruzione e formazione;Persone con almeno il diploma (25-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;71,2;;Regione
@@ -1340,6 +1404,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 02IST003P-N22;Toscana;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;29,7;;Regione
 02IST003P-N22;Toscana;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;30,6;;Regione
 02IST003P-N22;Toscana;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;32,6;;Regione
+02IST003P-N22;Trentino-Alto Adige;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;29,2;;Regione
+02IST003P-N22;Trentino-Alto Adige;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;28,75;;Regione
+02IST003P-N22;Trentino-Alto Adige;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;28,9;;Regione
+02IST003P-N22;Trentino-Alto Adige;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;28,0;;Regione
+02IST003P-N22;Trentino-Alto Adige;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;28,5;;Regione
+02IST003P-N22;Trentino-Alto Adige;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;29,7;;Regione
+02IST003P-N22;Trentino-Alto Adige;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;29,3;;Regione
 02IST003P-N22;Umbria;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;29,2;;Regione
 02IST003P-N22;Umbria;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;30,6;;Regione
 02IST003P-N22;Umbria;Istruzione e formazione;Laureati e altri titoli terziari (25-39 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;32,3;;Regione
@@ -1460,6 +1531,11 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 02IST004;Toscana;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;52,9;;Regione
 02IST004;Toscana;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;55,9;;Regione
 02IST004;Toscana;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;54,1;;Regione
+02IST004;Trentino-Alto Adige;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;33,15;;Regione
+02IST004;Trentino-Alto Adige;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;33,35;;Regione
+02IST004;Trentino-Alto Adige;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;34,7;;Regione
+02IST004;Trentino-Alto Adige;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;36,95;;Regione
+02IST004;Trentino-Alto Adige;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;36,9;;Regione
 02IST004;Umbria;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2017;Livello;54,3;;Regione
 02IST004;Umbria;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;54,9;;Regione
 02IST004;Umbria;Istruzione e formazione;Passaggio all'università;tasso specifico per coorte;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;57,4;;Regione
@@ -1588,6 +1664,12 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 02IST006-N22;Toscana;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;13,8;;Regione
 02IST006-N22;Toscana;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;11;;Regione
 02IST006-N22;Toscana;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;11;;Regione
+02IST006-N22;Trentino-Alto Adige;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;10,95;;Regione
+02IST006-N22;Trentino-Alto Adige;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;13,55;;Regione
+02IST006-N22;Trentino-Alto Adige;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;15,45;;Regione
+02IST006-N22;Trentino-Alto Adige;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;10,5;;Regione
+02IST006-N22;Trentino-Alto Adige;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;8,85;;Regione
+02IST006-N22;Trentino-Alto Adige;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;7,65;;Regione
 02IST006-N22;Umbria;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;18,9;;Regione
 02IST006-N22;Umbria;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;15;;Regione
 02IST006-N22;Umbria;Istruzione e formazione;Giovani che non lavorano e non studiano (NEET);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;19,2;;Regione
@@ -1721,6 +1803,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 02IST007-N22;Toscana;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;10,6;;Regione
 02IST007-N22;Toscana;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;12,7;;Regione
 02IST007-N22;Toscana;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;11,6;;Regione
+02IST007-N22;Trentino-Alto Adige;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;10,95;;Regione
+02IST007-N22;Trentino-Alto Adige;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;10,8;;Regione
+02IST007-N22;Trentino-Alto Adige;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;8,95;;Regione
+02IST007-N22;Trentino-Alto Adige;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;11,45;;Regione
+02IST007-N22;Trentino-Alto Adige;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;14,3;;Regione
+02IST007-N22;Trentino-Alto Adige;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;15,05;;Regione
+02IST007-N22;Trentino-Alto Adige;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;13,3;;Regione
 02IST007-N22;Umbria;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;9,3;;Regione
 02IST007-N22;Umbria;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;10,2;;Regione
 02IST007-N22;Umbria;Istruzione e formazione;Partecipazione alla formazione continua;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;8,1;;Regione
@@ -1838,6 +1927,12 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 02IST010P;Toscana;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;37,9;;Regione
 02IST010P;Toscana;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;39,4;;Regione
 02IST010P;Toscana;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;38,4;;Regione
+02IST010P;Trentino-Alto Adige;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;29,05;;Regione
+02IST010P;Trentino-Alto Adige;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;29,6;;Regione
+02IST010P;Trentino-Alto Adige;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;36,8;;Regione
+02IST010P;Trentino-Alto Adige;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;36,05;;Regione
+02IST010P;Trentino-Alto Adige;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;36,55;;Regione
+02IST010P;Trentino-Alto Adige;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;39,45;;Regione
 02IST010P;Umbria;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;31,2;;Regione
 02IST010P;Umbria;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;32,2;;Regione
 02IST010P;Umbria;Istruzione e formazione;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;38,2;;Regione
@@ -1952,6 +2047,12 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 02IST011P;Toscana;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;36;;Regione
 02IST011P;Toscana;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;37;;Regione
 02IST011P;Toscana;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;38,4;;Regione
+02IST011P;Trentino-Alto Adige;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;34,25;;Regione
+02IST011P;Trentino-Alto Adige;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;35,75;;Regione
+02IST011P;Trentino-Alto Adige;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;40,2;;Regione
+02IST011P;Trentino-Alto Adige;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;40,05;;Regione
+02IST011P;Trentino-Alto Adige;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2023;Livello;38,75;;Regione
+02IST011P;Trentino-Alto Adige;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2024;Livello;43,15;;Regione
 02IST011P;Umbria;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;28,5;;Regione
 02IST011P;Umbria;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;29,6;;Regione
 02IST011P;Umbria;Istruzione e formazione;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;32,6;;Regione
@@ -2082,6 +2183,12 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 03LAV001-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;73,7;;Regione
 03LAV001-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2023;Livello;74,5;;Regione
 03LAV001-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2024;Livello;76,1;;Regione
+03LAV001-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;76,55;;Regione
+03LAV001-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;76,75;;Regione
+03LAV001-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;74,45;;Regione
+03LAV001-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2021;Livello;74,15;;Regione
+03LAV001-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2023;Livello;77,6;;Regione
+03LAV001-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2024;Livello;78,4;;Regione
 03LAV001-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;67,4;;Regione
 03LAV001-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;69,1;;Regione
 03LAV001-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione (20-64 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;67,7;;Regione
@@ -2213,6 +2320,12 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 03LAV002-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;10,3;;Regione
 03LAV002-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2023;Livello;8,8;;Regione
 03LAV002-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2024;Livello;7,5;;Regione
+03LAV002-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;6,55;;Regione
+03LAV002-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;6,75;;Regione
+03LAV002-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;8,7;;Regione
+03LAV002-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2021;Livello;9,1;;Regione
+03LAV002-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;5,95;;Regione
+03LAV002-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2024;Livello;4,4;;Regione
 03LAV002-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;14,8;;Regione
 03LAV002-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;13,7;;Regione
 03LAV002-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;14,9;;Regione
@@ -2338,6 +2451,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 03LAV003P-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;39,5;;Regione
 03LAV003P-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2023;Livello;38,9;;Regione
 03LAV003P-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2024;Livello;40,8;;Regione
+03LAV003P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;45,9;;Regione
+03LAV003P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;47,3;;Regione
+03LAV003P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;45,05;;Regione
+03LAV003P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2021;Livello;44,4;;Regione
+03LAV003P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;48,35;;Regione
+03LAV003P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2023;Livello;48,5;;Regione
+03LAV003P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2024;Livello;47,5;;Regione
 03LAV003P-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;32;;Regione
 03LAV003P-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;34,4;;Regione
 03LAV003P-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di occupazione giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;30,6;;Regione
@@ -2502,6 +2622,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 03LAV004P;Toscana;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2021;Livello;76,2;;Regione
 03LAV004P;Toscana;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;79,2;;Regione
 03LAV004P;Toscana;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2023;Livello;79,9;;Regione
+03LAV004P;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2015;Livello;76,55;;Regione
+03LAV004P;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2016;Livello;77,0;;Regione
+03LAV004P;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2017;Livello;75,65;;Regione
+03LAV004P;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;75,45;;Regione
+03LAV004P;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;75,75;;Regione
+03LAV004P;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;70,45;;Regione
+03LAV004P;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2021;Livello;72,45;;Regione
+03LAV004P;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;75,4;;Regione
+03LAV004P;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2023;Livello;75,8;;Regione
 03LAV004P;Umbria;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2015;Livello;77,9;;Regione
 03LAV004P;Umbria;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2016;Livello;79,6;;Regione
 03LAV004P;Umbria;Lavoro e conciliazione dei tempi di vita;Giornate retribuite nell'anno (lavoratori dipendenti);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2017;Livello;78,9;;Regione
@@ -2641,6 +2770,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 03LAV006P-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;19,2;;Regione
 03LAV006P-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2023;Livello;19,2;;Regione
 03LAV006P-N22;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2024;Livello;15,7;;Regione
+03LAV006P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;13,75;;Regione
+03LAV006P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;12,7;;Regione
+03LAV006P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;15,4;;Regione
+03LAV006P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2021;Livello;16,65;;Regione
+03LAV006P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;10,2;;Regione
+03LAV006P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2023;Livello;10,05;;Regione
+03LAV006P-N22;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2024;Livello;8,9;;Regione
 03LAV006P-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;32;;Regione
 03LAV006P-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;25,7;;Regione
 03LAV006P-N22;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;34,6;;Regione
@@ -2742,6 +2878,11 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 03LAV007;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;12,9;;Regione
 03LAV007;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2021;Livello;13,9;;Regione
 03LAV007;Toscana;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;14,4;;Regione
+03LAV007;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;12,4;;Regione
+03LAV007;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;12,95;;Regione
+03LAV007;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;11,75;;Regione
+03LAV007;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2021;Livello;12,65;;Regione
+03LAV007;Trentino-Alto Adige;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2022;Livello;12,25;;Regione
 03LAV007;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2018;Livello;18,2;;Regione
 03LAV007;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2019;Livello;17,4;;Regione
 03LAV007;Umbria;Lavoro e conciliazione dei tempi di vita;Tasso di infortuni mortali e inabilità permanente;per 10.000 occupati;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_03;2020;Livello;15,7;;Regione
@@ -2792,6 +2933,8 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 04BEC001P;Sicilia;Benessere economico;Reddito medio disponibile pro capite;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;16906,9;;Regione
 04BEC001P;Toscana;Benessere economico;Reddito medio disponibile pro capite;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2022;Livello;22669,8;;Regione
 04BEC001P;Toscana;Benessere economico;Reddito medio disponibile pro capite;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;23494,2;;Regione
+04BEC001P;Trentino-Alto Adige;Benessere economico;Reddito medio disponibile pro capite;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2021;Livello;24978,6;;Regione
+04BEC001P;Trentino-Alto Adige;Benessere economico;Reddito medio disponibile pro capite;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;28148,25;;Regione
 04BEC001P;Umbria;Benessere economico;Reddito medio disponibile pro capite;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2021;Livello;19276,3;;Regione
 04BEC001P;Umbria;Benessere economico;Reddito medio disponibile pro capite;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2022;Livello;20607,9;;Regione
 04BEC001P;Umbria;Benessere economico;Reddito medio disponibile pro capite;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;21635,4;;Regione
@@ -2945,6 +3088,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 04BEC002P;Toscana;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2021;Livello;20705,5;;Regione
 04BEC002P;Toscana;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2022;Livello;21633,7;;Regione
 04BEC002P;Toscana;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;22388;;Regione
+04BEC002P;Trentino-Alto Adige;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2015;Livello;21818,0;;Regione
+04BEC002P;Trentino-Alto Adige;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2016;Livello;22034,55;;Regione
+04BEC002P;Trentino-Alto Adige;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2017;Livello;21657,55;;Regione
+04BEC002P;Trentino-Alto Adige;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2018;Livello;21885,75;;Regione
+04BEC002P;Trentino-Alto Adige;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2019;Livello;22289,1;;Regione
+04BEC002P;Trentino-Alto Adige;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2020;Livello;21231,4;;Regione
+04BEC002P;Trentino-Alto Adige;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2021;Livello;22106,05;;Regione
+04BEC002P;Trentino-Alto Adige;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2022;Livello;23256,8;;Regione
+04BEC002P;Trentino-Alto Adige;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;24227,6;;Regione
 04BEC002P;Umbria;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2015;Livello;18835;;Regione
 04BEC002P;Umbria;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2016;Livello;19169,7;;Regione
 04BEC002P;Umbria;Benessere economico;Retribuzione media annua dei lavoratori dipendenti;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2017;Livello;19014,9;;Regione
@@ -3100,6 +3252,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 04BEC005P;Toscana;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2020;Livello;20214,9;;Regione
 04BEC005P;Toscana;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2022;Livello;21072,3;;Regione
 04BEC005P;Toscana;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;22604;;Regione
+04BEC005P;Trentino-Alto Adige;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2015;Livello;17980,25;;Regione
+04BEC005P;Trentino-Alto Adige;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2016;Livello;18229,65;;Regione
+04BEC005P;Trentino-Alto Adige;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2017;Livello;18793,85;;Regione
+04BEC005P;Trentino-Alto Adige;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2018;Livello;19383,9;;Regione
+04BEC005P;Trentino-Alto Adige;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2019;Livello;19931,95;;Regione
+04BEC005P;Trentino-Alto Adige;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2020;Livello;20466,7;;Regione
+04BEC005P;Trentino-Alto Adige;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2021;Livello;20836,65;;Regione
+04BEC005P;Trentino-Alto Adige;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2022;Livello;21451,2;;Regione
+04BEC005P;Trentino-Alto Adige;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;23084,7;;Regione
 04BEC005P;Umbria;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2015;Livello;17773,4;;Regione
 04BEC005P;Umbria;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2016;Livello;18022,2;;Regione
 04BEC005P;Umbria;Benessere economico;Importo medio annuo pro-capite dei redditi pensionistici;euro;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2017;Livello;18324;;Regione
@@ -3268,6 +3429,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 04BEC006P;Toscana;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2021;Livello;7,3;;Regione
 04BEC006P;Toscana;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2022;Livello;7,1;;Regione
 04BEC006P;Toscana;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;6,7;;Regione
+04BEC006P;Trentino-Alto Adige;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2015;Livello;8,45;;Regione
+04BEC006P;Trentino-Alto Adige;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2016;Livello;8,4;;Regione
+04BEC006P;Trentino-Alto Adige;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2017;Livello;8,15;;Regione
+04BEC006P;Trentino-Alto Adige;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2018;Livello;7,85;;Regione
+04BEC006P;Trentino-Alto Adige;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2019;Livello;7,8;;Regione
+04BEC006P;Trentino-Alto Adige;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2020;Livello;7,45;;Regione
+04BEC006P;Trentino-Alto Adige;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2021;Livello;7,15;;Regione
+04BEC006P;Trentino-Alto Adige;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2022;Livello;6,85;;Regione
+04BEC006P;Trentino-Alto Adige;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;5,2;;Regione
 04BEC006P;Umbria;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2015;Livello;9,5;;Regione
 04BEC006P;Umbria;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2016;Livello;9,7;;Regione
 04BEC006P;Umbria;Benessere economico;Pensionati con reddito pensionistico di basso importo;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2017;Livello;9,8;;Regione
@@ -3455,6 +3625,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 04BEC009P;Toscana;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2022;Livello;0,4;;Regione
 04BEC009P;Toscana;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2023;Livello;0,5;;Regione
 04BEC009P;Toscana;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2024;Livello;0,5;;Regione
+04BEC009P;Trentino-Alto Adige;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2015;Livello;1,0;;Regione
+04BEC009P;Trentino-Alto Adige;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2016;Livello;0,95;;Regione
+04BEC009P;Trentino-Alto Adige;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2017;Livello;0,65;;Regione
+04BEC009P;Trentino-Alto Adige;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2018;Livello;0,5;;Regione
+04BEC009P;Trentino-Alto Adige;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2019;Livello;0,35;;Regione
+04BEC009P;Trentino-Alto Adige;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2020;Livello;0,2;;Regione
+04BEC009P;Trentino-Alto Adige;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2021;Livello;0,15;;Regione
+04BEC009P;Trentino-Alto Adige;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2022;Livello;0,15;;Regione
+04BEC009P;Trentino-Alto Adige;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2024;Livello;0,15;;Regione
 04BEC009P;Umbria;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2015;Livello;1,5;;Regione
 04BEC009P;Umbria;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2016;Livello;2;;Regione
 04BEC009P;Umbria;Benessere economico;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_04;2017;Livello;1,7;;Regione
@@ -3616,6 +3795,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 05REL008;Toscana;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2020;Livello;75,8;;Regione
 05REL008;Toscana;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2021;Livello;73,4;;Regione
 05REL008;Toscana;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2022;Livello;72,1;;Regione
+05REL008;Trentino-Alto Adige;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2015;Livello;107,05;;Regione
+05REL008;Trentino-Alto Adige;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2016;Livello;108,4;;Regione
+05REL008;Trentino-Alto Adige;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2017;Livello;111,1;;Regione
+05REL008;Trentino-Alto Adige;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2018;Livello;112,5;;Regione
+05REL008;Trentino-Alto Adige;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2019;Livello;113,75;;Regione
+05REL008;Trentino-Alto Adige;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2020;Livello;114,75;;Regione
+05REL008;Trentino-Alto Adige;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2021;Livello;113,45;;Regione
+05REL008;Trentino-Alto Adige;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2022;Livello;108,0;;Regione
 05REL008;Umbria;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2015;Livello;76,2;;Regione
 05REL008;Umbria;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2017;Livello;78,2;;Regione
 05REL008;Umbria;Relazioni sociali;Organizzazioni non profit;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_05;2018;Livello;81,1;;Regione
@@ -3669,6 +3856,8 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 06POL001;Sicilia;Politica e istituzioni;Partecipazione elettorale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2024;Livello;38;;Regione
 06POL001;Toscana;Politica e istituzioni;Partecipazione elettorale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;65,8;;Regione
 06POL001;Toscana;Politica e istituzioni;Partecipazione elettorale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2024;Livello;59,1;;Regione
+06POL001;Trentino-Alto Adige;Politica e istituzioni;Partecipazione elettorale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;60,05;;Regione
+06POL001;Trentino-Alto Adige;Politica e istituzioni;Partecipazione elettorale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2024;Livello;47,15;;Regione
 06POL001;Umbria;Politica e istituzioni;Partecipazione elettorale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;67,7;;Regione
 06POL001;Umbria;Politica e istituzioni;Partecipazione elettorale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2024;Livello;60,8;;Regione
 06POL001;Valle d'Aosta;Politica e istituzioni;Partecipazione elettorale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;51,9;;Regione
@@ -3707,6 +3896,8 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 06POL001P;Sicilia;Politica e istituzioni;Partecipazione elettorale (elezioni regionali);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;48,8;;Regione
 06POL001P;Toscana;Politica e istituzioni;Partecipazione elettorale (elezioni regionali);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;48,8;;Regione
 06POL001P;Toscana;Politica e istituzioni;Partecipazione elettorale (elezioni regionali);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2020;Livello;62,6;;Regione
+06POL001P;Trentino-Alto Adige;Politica e istituzioni;Partecipazione elettorale (elezioni regionali);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2018;Livello;67,15;;Regione
+06POL001P;Trentino-Alto Adige;Politica e istituzioni;Partecipazione elettorale (elezioni regionali);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2023;Livello;62,95;;Regione
 06POL001P;Umbria;Politica e istituzioni;Partecipazione elettorale (elezioni regionali);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;55,4;;Regione
 06POL001P;Umbria;Politica e istituzioni;Partecipazione elettorale (elezioni regionali);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;64,7;;Regione
 06POL001P;Umbria;Politica e istituzioni;Partecipazione elettorale (elezioni regionali);%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2024;Livello;52,3;;Regione
@@ -3874,6 +4065,16 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 06POL002P;Toscana;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;36,7;;Regione
 06POL002P;Toscana;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2023;Livello;35,4;;Regione
 06POL002P;Toscana;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2024;Livello;38,8;;Regione
+06POL002P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;28,0;;Regione
+06POL002P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2016;Livello;27,95;;Regione
+06POL002P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2017;Livello;28,0;;Regione
+06POL002P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2018;Livello;28,15;;Regione
+06POL002P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;28,3;;Regione
+06POL002P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2020;Livello;29,9;;Regione
+06POL002P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2021;Livello;29,15;;Regione
+06POL002P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;29,2;;Regione
+06POL002P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2023;Livello;35,1;;Regione
+06POL002P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2024;Livello;29,55;;Regione
 06POL002P;Umbria;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;29,3;;Regione
 06POL002P;Umbria;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2016;Livello;30,2;;Regione
 06POL002P;Umbria;Politica e istituzioni;Amministratori comunali donne;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2017;Livello;31;;Regione
@@ -4032,6 +4233,16 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 06POL003P;Toscana;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2021;Livello;27,5;;Regione
 06POL003P;Toscana;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;25;;Regione
 06POL003P;Toscana;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2023;Livello;19,3;;Regione
+06POL003P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;33,1;;Regione
+06POL003P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2016;Livello;31,75;;Regione
+06POL003P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2017;Livello;29,55;;Regione
+06POL003P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2018;Livello;27,0;;Regione
+06POL003P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;24,7;;Regione
+06POL003P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2020;Livello;32,95;;Regione
+06POL003P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2021;Livello;32,3;;Regione
+06POL003P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;30,05;;Regione
+06POL003P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2023;Livello;21,9;;Regione
+06POL003P;Trentino-Alto Adige;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2024;Livello;25,55;;Regione
 06POL003P;Umbria;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2016;Livello;31,8;;Regione
 06POL003P;Umbria;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2017;Livello;30,6;;Regione
 06POL003P;Umbria;Politica e istituzioni;Amministratori comunali con meno di 40 anni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2018;Livello;29,2;;Regione
@@ -4164,6 +4375,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 06POL007P;Toscana;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;81,1;;Regione
 06POL007P;Toscana;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2020;Livello;80,2;;Regione
 06POL007P;Toscana;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;82,7;;Regione
+06POL007P;Trentino-Alto Adige;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;80,3;;Regione
+06POL007P;Trentino-Alto Adige;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2016;Livello;89,6;;Regione
+06POL007P;Trentino-Alto Adige;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2017;Livello;90,6;;Regione
+06POL007P;Trentino-Alto Adige;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2018;Livello;92,85;;Regione
+06POL007P;Trentino-Alto Adige;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;93,45;;Regione
+06POL007P;Trentino-Alto Adige;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2020;Livello;93,85;;Regione
+06POL007P;Trentino-Alto Adige;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2021;Livello;94,25;;Regione
+06POL007P;Trentino-Alto Adige;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;94,35;;Regione
 06POL007P;Umbria;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;81,2;;Regione
 06POL007P;Umbria;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2016;Livello;76;;Regione
 06POL007P;Umbria;Politica e istituzioni;Amministrazioni provinciali: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2017;Livello;63,6;;Regione
@@ -4296,6 +4515,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 06POL009P;Toscana;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;79,4;;Regione
 06POL009P;Toscana;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2020;Livello;79,3;;Regione
 06POL009P;Toscana;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;75,8;;Regione
+06POL009P;Trentino-Alto Adige;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;72,1;;Regione
+06POL009P;Trentino-Alto Adige;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2016;Livello;73,25;;Regione
+06POL009P;Trentino-Alto Adige;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2017;Livello;71,4;;Regione
+06POL009P;Trentino-Alto Adige;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2018;Livello;72,75;;Regione
+06POL009P;Trentino-Alto Adige;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;71,8;;Regione
+06POL009P;Trentino-Alto Adige;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2020;Livello;71,95;;Regione
+06POL009P;Trentino-Alto Adige;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2021;Livello;72,25;;Regione
+06POL009P;Trentino-Alto Adige;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;72,5;;Regione
 06POL009P;Umbria;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;78;;Regione
 06POL009P;Umbria;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2016;Livello;81,5;;Regione
 06POL009P;Umbria;Politica e istituzioni;Comuni: capacità di riscossione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2017;Livello;81,8;;Regione
@@ -4477,6 +4704,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 06POL012P;Toscana;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;93,5;;Regione
 06POL012P;Toscana;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2023;Livello;97,8;;Regione
 06POL012P;Toscana;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2024;Livello;101,5;;Regione
+06POL012P;Trentino-Alto Adige;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;93,75;;Regione
+06POL012P;Trentino-Alto Adige;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2016;Livello;93,6;;Regione
+06POL012P;Trentino-Alto Adige;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2018;Livello;97,8;;Regione
+06POL012P;Trentino-Alto Adige;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2019;Livello;102,75;;Regione
+06POL012P;Trentino-Alto Adige;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2020;Livello;91,05;;Regione
+06POL012P;Trentino-Alto Adige;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2021;Livello;102,95;;Regione
+06POL012P;Trentino-Alto Adige;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2022;Livello;100,7;;Regione
+06POL012P;Trentino-Alto Adige;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2023;Livello;108,95;;Regione
+06POL012P;Trentino-Alto Adige;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2024;Livello;110,8;;Regione
 06POL012P;Umbria;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2015;Livello;93,6;;Regione
 06POL012P;Umbria;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2016;Livello;98,4;;Regione
 06POL012P;Umbria;Politica e istituzioni;Affollamento degli istituti di pena;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_06;2017;Livello;102,9;;Regione
@@ -4635,6 +4871,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 07SIC001P;Toscana;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;0,3;;Regione
 07SIC001P;Toscana;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2022;Livello;0,4;;Regione
 07SIC001P;Toscana;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;0,6;;Regione
+07SIC001P;Trentino-Alto Adige;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;0,5;;Regione
+07SIC001P;Trentino-Alto Adige;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;0,3;;Regione
+07SIC001P;Trentino-Alto Adige;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;0,45;;Regione
+07SIC001P;Trentino-Alto Adige;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2018;Livello;0,6;;Regione
+07SIC001P;Trentino-Alto Adige;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2019;Livello;0,4;;Regione
+07SIC001P;Trentino-Alto Adige;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2020;Livello;0,4;;Regione
+07SIC001P;Trentino-Alto Adige;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;0,4;;Regione
+07SIC001P;Trentino-Alto Adige;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2022;Livello;0,4;;Regione
+07SIC001P;Trentino-Alto Adige;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;0,5;;Regione
 07SIC001P;Umbria;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;0,5;;Regione
 07SIC001P;Umbria;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;0,1;;Regione
 07SIC001P;Umbria;Sicurezza;Omicidi volontari;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2018;Livello;0,6;;Regione
@@ -4803,6 +5048,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 07SIC004P;Toscana;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;299,9;;Regione
 07SIC004P;Toscana;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2022;Livello;317,6;;Regione
 07SIC004P;Toscana;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;384,6;;Regione
+07SIC004P;Trentino-Alto Adige;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;240,85;;Regione
+07SIC004P;Trentino-Alto Adige;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;231,8;;Regione
+07SIC004P;Trentino-Alto Adige;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;248,6;;Regione
+07SIC004P;Trentino-Alto Adige;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2018;Livello;234,25;;Regione
+07SIC004P;Trentino-Alto Adige;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2019;Livello;244,8;;Regione
+07SIC004P;Trentino-Alto Adige;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2020;Livello;115,0;;Regione
+07SIC004P;Trentino-Alto Adige;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;112,75;;Regione
+07SIC004P;Trentino-Alto Adige;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2022;Livello;164,2;;Regione
+07SIC004P;Trentino-Alto Adige;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;189,45;;Regione
 07SIC004P;Umbria;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;392,7;;Regione
 07SIC004P;Umbria;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;349,2;;Regione
 07SIC004P;Umbria;Sicurezza;Denunce di furto in abitazione;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;408,4;;Regione
@@ -4974,6 +5228,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 07SIC005P;Toscana;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;154;;Regione
 07SIC005P;Toscana;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2022;Livello;231,2;;Regione
 07SIC005P;Toscana;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;303,6;;Regione
+07SIC005P;Trentino-Alto Adige;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;205,1;;Regione
+07SIC005P;Trentino-Alto Adige;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;186,2;;Regione
+07SIC005P;Trentino-Alto Adige;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;154,0;;Regione
+07SIC005P;Trentino-Alto Adige;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2018;Livello;182,25;;Regione
+07SIC005P;Trentino-Alto Adige;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2019;Livello;129,8;;Regione
+07SIC005P;Trentino-Alto Adige;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2020;Livello;81,35;;Regione
+07SIC005P;Trentino-Alto Adige;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;89,15;;Regione
+07SIC005P;Trentino-Alto Adige;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2022;Livello;108,2;;Regione
+07SIC005P;Trentino-Alto Adige;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;98,9;;Regione
 07SIC005P;Umbria;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;193,3;;Regione
 07SIC005P;Umbria;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;172,2;;Regione
 07SIC005P;Umbria;Sicurezza;Denunce di borseggio;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;169,4;;Regione
@@ -5138,6 +5401,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 07SIC006P;Toscana;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;32,5;;Regione
 07SIC006P;Toscana;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2022;Livello;48,2;;Regione
 07SIC006P;Toscana;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;63,4;;Regione
+07SIC006P;Trentino-Alto Adige;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;21,0;;Regione
+07SIC006P;Trentino-Alto Adige;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;26,5;;Regione
+07SIC006P;Trentino-Alto Adige;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;24,55;;Regione
+07SIC006P;Trentino-Alto Adige;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2018;Livello;24,25;;Regione
+07SIC006P;Trentino-Alto Adige;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2019;Livello;21,0;;Regione
+07SIC006P;Trentino-Alto Adige;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2020;Livello;25,35;;Regione
+07SIC006P;Trentino-Alto Adige;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;25,95;;Regione
+07SIC006P;Trentino-Alto Adige;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2022;Livello;34,2;;Regione
+07SIC006P;Trentino-Alto Adige;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;30,4;;Regione
 07SIC006P;Umbria;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;26,6;;Regione
 07SIC006P;Umbria;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;26,5;;Regione
 07SIC006P;Umbria;Sicurezza;Denunce di rapina;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;23,1;;Regione
@@ -5292,6 +5564,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 07SIC007P;Toscana;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2020;Livello;2,2;;Regione
 07SIC007P;Toscana;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;2,4;;Regione
 07SIC007P;Toscana;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;2,3;;Regione
+07SIC007P;Trentino-Alto Adige;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;2,6;;Regione
+07SIC007P;Trentino-Alto Adige;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;3,2;;Regione
+07SIC007P;Trentino-Alto Adige;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;3,95;;Regione
+07SIC007P;Trentino-Alto Adige;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2018;Livello;2,7;;Regione
+07SIC007P;Trentino-Alto Adige;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2019;Livello;2,75;;Regione
+07SIC007P;Trentino-Alto Adige;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2020;Livello;2,85;;Regione
+07SIC007P;Trentino-Alto Adige;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;2,4;;Regione
+07SIC007P;Trentino-Alto Adige;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;1,95;;Regione
 07SIC007P;Umbria;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;2,9;;Regione
 07SIC007P;Umbria;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;1,7;;Regione
 07SIC007P;Umbria;Sicurezza;Altri delitti mortali denunciati;per 100.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;1,8;;Regione
@@ -5459,6 +5739,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 07SIC008P;Toscana;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;3,1;;Regione
 07SIC008P;Toscana;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2022;Livello;3,7;;Regione
 07SIC008P;Toscana;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;3,4;;Regione
+07SIC008P;Trentino-Alto Adige;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;5,1;;Regione
+07SIC008P;Trentino-Alto Adige;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;4,0;;Regione
+07SIC008P;Trentino-Alto Adige;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;2,95;;Regione
+07SIC008P;Trentino-Alto Adige;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2018;Livello;4,6;;Regione
+07SIC008P;Trentino-Alto Adige;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2019;Livello;4,35;;Regione
+07SIC008P;Trentino-Alto Adige;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2020;Livello;5,4;;Regione
+07SIC008P;Trentino-Alto Adige;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2021;Livello;3,35;;Regione
+07SIC008P;Trentino-Alto Adige;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2022;Livello;3,4;;Regione
+07SIC008P;Trentino-Alto Adige;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2023;Livello;3,8;;Regione
 07SIC008P;Umbria;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2015;Livello;5,3;;Regione
 07SIC008P;Umbria;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2016;Livello;2,6;;Regione
 07SIC008P;Umbria;Sicurezza;Mortalità stradale in ambito extraurbano;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_07;2017;Livello;4,4;;Regione
@@ -5582,6 +5871,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 09PAE002;Toscana;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2020;Livello;3,35;;Regione
 09PAE002;Toscana;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2021;Livello;3,28;;Regione
 09PAE002;Toscana;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2022;Livello;3,28;;Regione
+09PAE002;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2015;Livello;1,155;;Regione
+09PAE002;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2017;Livello;1,105;;Regione
+09PAE002;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2018;Livello;1,13;;Regione
+09PAE002;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2019;Livello;1,01;;Regione
+09PAE002;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2020;Livello;1,18;;Regione
+09PAE002;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2021;Livello;1,195;;Regione
+09PAE002;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2022;Livello;0,89;;Regione
 09PAE002;Umbria;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2015;Livello;0,89;;Regione
 09PAE002;Umbria;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2018;Livello;0,81;;Regione
 09PAE002;Umbria;Paesaggio e patrimonio culturale;Densità e rilevanza del patrimonio museale;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2019;Livello;0,65;;Regione
@@ -5744,6 +6040,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 09PAE008;Toscana;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2021;Livello;23,4;;Regione
 09PAE008;Toscana;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2022;Livello;24,5;;Regione
 09PAE008;Toscana;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2023;Livello;25,2;;Regione
+09PAE008;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2016;Livello;24,75;;Regione
+09PAE008;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2017;Livello;25,3;;Regione
+09PAE008;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2018;Livello;25,3;;Regione
+09PAE008;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2019;Livello;24,95;;Regione
+09PAE008;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2020;Livello;25,9;;Regione
+09PAE008;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2021;Livello;26,0;;Regione
+09PAE008;Trentino-Alto Adige;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2023;Livello;27,05;;Regione
 09PAE008;Umbria;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2015;Livello;15;;Regione
 09PAE008;Umbria;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2016;Livello;14,8;;Regione
 09PAE008;Umbria;Paesaggio e patrimonio culturale;Diffusione delle aziende agrituristiche;per 100 km2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2017;Livello;16,2;;Regione
@@ -5803,6 +6106,8 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 09PAE009-N25;Sicilia;Paesaggio e patrimonio culturale;09PAE009-N25;per 100 m2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2022;Livello;1,2;;Regione
 09PAE009-N25;Toscana;Paesaggio e patrimonio culturale;09PAE009-N25;per 100 m2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2021;Livello;1,2;;Regione
 09PAE009-N25;Toscana;Paesaggio e patrimonio culturale;09PAE009-N25;per 100 m2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2022;Livello;1,2;;Regione
+09PAE009-N25;Trentino-Alto Adige;Paesaggio e patrimonio culturale;09PAE009-N25;per 100 m2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2021;Livello;0,2;;Regione
+09PAE009-N25;Trentino-Alto Adige;Paesaggio e patrimonio culturale;09PAE009-N25;per 100 m2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2022;Livello;0,2;;Regione
 09PAE009-N25;Umbria;Paesaggio e patrimonio culturale;09PAE009-N25;per 100 m2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2021;Livello;4,7;;Regione
 09PAE009-N25;Umbria;Paesaggio e patrimonio culturale;09PAE009-N25;per 100 m2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2022;Livello;4,7;;Regione
 09PAE009-N25;Valle d'Aosta;Paesaggio e patrimonio culturale;09PAE009-N25;per 100 m2;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_09;2021;Livello;0,9;;Regione
@@ -5952,6 +6257,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB001P;Toscana;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;6;;Regione
 10AMB001P;Toscana;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;9;;Regione
 10AMB001P;Toscana;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;7;;Regione
+10AMB001P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;24,0;;Regione
+10AMB001P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;20,0;;Regione
+10AMB001P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;24,0;;Regione
+10AMB001P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2018;Livello;22,0;;Regione
+10AMB001P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2019;Livello;20,0;;Regione
+10AMB001P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;19,5;;Regione
+10AMB001P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;21,0;;Regione
+10AMB001P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;22,0;;Regione
+10AMB001P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;20,5;;Regione
 10AMB001P;Umbria;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;2;;Regione
 10AMB001P;Umbria;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;2;;Regione
 10AMB001P;Umbria;Ambiente;Concentrazione media annua di PM10;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;2;;Regione
@@ -6111,6 +6425,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB002P;Toscana;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;5;;Regione
 10AMB002P;Toscana;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;6;;Regione
 10AMB002P;Toscana;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;5;;Regione
+10AMB002P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;14,5;;Regione
+10AMB002P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;13,5;;Regione
+10AMB002P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;15,5;;Regione
+10AMB002P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2018;Livello;14,0;;Regione
+10AMB002P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2019;Livello;12,5;;Regione
+10AMB002P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;12,5;;Regione
+10AMB002P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;13,0;;Regione
+10AMB002P;Trentino-Alto Adige;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;14,0;;Regione
 10AMB002P;Umbria;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;2;;Regione
 10AMB002P;Umbria;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;2;;Regione
 10AMB002P;Umbria;Ambiente;Concentrazione media annua di PM2.5;microgrammi per m3;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;2;;Regione
@@ -6202,6 +6524,10 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB003;Toscana;Ambiente;Dispersione da rete idrica comunale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2018;Livello;42,8;;Regione
 10AMB003;Toscana;Ambiente;Dispersione da rete idrica comunale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;41,6;;Regione
 10AMB003;Toscana;Ambiente;Dispersione da rete idrica comunale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;40,9;;Regione
+10AMB003;Trentino-Alto Adige;Ambiente;Dispersione da rete idrica comunale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;29,15;;Regione
+10AMB003;Trentino-Alto Adige;Ambiente;Dispersione da rete idrica comunale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2018;Livello;30,4;;Regione
+10AMB003;Trentino-Alto Adige;Ambiente;Dispersione da rete idrica comunale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;31,1;;Regione
+10AMB003;Trentino-Alto Adige;Ambiente;Dispersione da rete idrica comunale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;32,95;;Regione
 10AMB003;Umbria;Ambiente;Dispersione da rete idrica comunale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;46,8;;Regione
 10AMB003;Umbria;Ambiente;Dispersione da rete idrica comunale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2018;Livello;54,6;;Regione
 10AMB003;Umbria;Ambiente;Dispersione da rete idrica comunale;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;49,1;;Regione
@@ -6358,6 +6684,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB008;Toscana;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;24,5;;Regione
 10AMB008;Toscana;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;25;;Regione
 10AMB008;Toscana;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;25,1;;Regione
+10AMB008;Trentino-Alto Adige;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;315,9;;Regione
+10AMB008;Trentino-Alto Adige;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;314,9;;Regione
+10AMB008;Trentino-Alto Adige;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;313,3;;Regione
+10AMB008;Trentino-Alto Adige;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2018;Livello;313,3;;Regione
+10AMB008;Trentino-Alto Adige;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2019;Livello;310,05;;Regione
+10AMB008;Trentino-Alto Adige;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;310,8;;Regione
+10AMB008;Trentino-Alto Adige;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;313,9;;Regione
+10AMB008;Trentino-Alto Adige;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;314,95;;Regione
+10AMB008;Trentino-Alto Adige;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;314,65;;Regione
 10AMB008;Umbria;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;98,1;;Regione
 10AMB008;Umbria;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;98,1;;Regione
 10AMB008;Umbria;Ambiente;Disponibilità di verde urbano;m2 per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;98,1;;Regione
@@ -6417,6 +6752,8 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB011;Sicilia;Ambiente;Popolazione esposta al rischio di frane;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;1,8;;Regione
 10AMB011;Toscana;Ambiente;Popolazione esposta al rischio di frane;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;3,8;;Regione
 10AMB011;Toscana;Ambiente;Popolazione esposta al rischio di frane;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;4,2;;Regione
+10AMB011;Trentino-Alto Adige;Ambiente;Popolazione esposta al rischio di frane;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;2,2;;Regione
+10AMB011;Trentino-Alto Adige;Ambiente;Popolazione esposta al rischio di frane;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;2,15;;Regione
 10AMB011;Umbria;Ambiente;Popolazione esposta al rischio di frane;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;1,9;;Regione
 10AMB011;Umbria;Ambiente;Popolazione esposta al rischio di frane;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;2;;Regione
 10AMB011;Valle d'Aosta;Ambiente;Popolazione esposta al rischio di frane;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;12,1;;Regione
@@ -6455,6 +6792,8 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB012;Sicilia;Ambiente;Popolazione esposta al rischio di alluvioni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;2,6;;Regione
 10AMB012;Toscana;Ambiente;Popolazione esposta al rischio di alluvioni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;26;;Regione
 10AMB012;Toscana;Ambiente;Popolazione esposta al rischio di alluvioni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;25,5;;Regione
+10AMB012;Trentino-Alto Adige;Ambiente;Popolazione esposta al rischio di alluvioni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;1,4;;Regione
+10AMB012;Trentino-Alto Adige;Ambiente;Popolazione esposta al rischio di alluvioni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;17,85;;Regione
 10AMB012;Umbria;Ambiente;Popolazione esposta al rischio di alluvioni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;6,3;;Regione
 10AMB012;Umbria;Ambiente;Popolazione esposta al rischio di alluvioni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;7,2;;Regione
 10AMB012;Valle d'Aosta;Ambiente;Popolazione esposta al rischio di alluvioni;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;10,2;;Regione
@@ -6493,6 +6832,8 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB014;Sicilia;Ambiente;Aree protette;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;20,3;;Regione
 10AMB014;Toscana;Ambiente;Aree protette;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;15,5;;Regione
 10AMB014;Toscana;Ambiente;Aree protette;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;15,5;;Regione
+10AMB014;Trentino-Alto Adige;Ambiente;Aree protette;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;26,6;;Regione
+10AMB014;Trentino-Alto Adige;Ambiente;Aree protette;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;26,6;;Regione
 10AMB014;Umbria;Ambiente;Aree protette;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;17,5;;Regione
 10AMB014;Umbria;Ambiente;Aree protette;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;17,5;;Regione
 10AMB014;Valle d'Aosta;Ambiente;Aree protette;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;30,3;;Regione
@@ -6643,6 +6984,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB016;Toscana;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;41,3;;Regione
 10AMB016;Toscana;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;38,5;;Regione
 10AMB016;Toscana;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;40,8;;Regione
+10AMB016;Trentino-Alto Adige;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;144,15;;Regione
+10AMB016;Trentino-Alto Adige;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;139,05;;Regione
+10AMB016;Trentino-Alto Adige;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;119,4;;Regione
+10AMB016;Trentino-Alto Adige;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2018;Livello;149,7;;Regione
+10AMB016;Trentino-Alto Adige;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2019;Livello;151,0;;Regione
+10AMB016;Trentino-Alto Adige;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;148,0;;Regione
+10AMB016;Trentino-Alto Adige;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;98,65;;Regione
+10AMB016;Trentino-Alto Adige;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;144,45;;Regione
 10AMB016;Umbria;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;39,2;;Regione
 10AMB016;Umbria;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;39,7;;Regione
 10AMB016;Umbria;Ambiente;Energia elettrica da fonti rinnovabili;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;37,2;;Regione
@@ -6798,6 +7147,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB017;Toscana;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;64,1;;Regione
 10AMB017;Toscana;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;65,6;;Regione
 10AMB017;Toscana;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;66,6;;Regione
+10AMB017;Trentino-Alto Adige;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;67,35;;Regione
+10AMB017;Trentino-Alto Adige;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;70,35;;Regione
+10AMB017;Trentino-Alto Adige;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;71,55;;Regione
+10AMB017;Trentino-Alto Adige;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2018;Livello;72,4;;Regione
+10AMB017;Trentino-Alto Adige;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;72,95;;Regione
+10AMB017;Trentino-Alto Adige;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;74,6;;Regione
+10AMB017;Trentino-Alto Adige;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;75,25;;Regione
 10AMB017;Umbria;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;48,9;;Regione
 10AMB017;Umbria;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;57,6;;Regione
 10AMB017;Umbria;Ambiente;Raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;61,7;;Regione
@@ -6950,6 +7306,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB018P;Toscana;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;6,15;;Regione
 10AMB018P;Toscana;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;6,16;;Regione
 10AMB018P;Toscana;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;6,19;;Regione
+10AMB018P;Trentino-Alto Adige;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;2,98;;Regione
+10AMB018P;Trentino-Alto Adige;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;2,99;;Regione
+10AMB018P;Trentino-Alto Adige;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;3,005;;Regione
+10AMB018P;Trentino-Alto Adige;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2018;Livello;3,015;;Regione
+10AMB018P;Trentino-Alto Adige;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2019;Livello;3,015;;Regione
+10AMB018P;Trentino-Alto Adige;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;3,025;;Regione
+10AMB018P;Trentino-Alto Adige;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;3,03;;Regione
+10AMB018P;Trentino-Alto Adige;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;3,04;;Regione
+10AMB018P;Trentino-Alto Adige;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;3,05;;Regione
 10AMB018P;Umbria;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;5,19;;Regione
 10AMB018P;Umbria;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;5,2;;Regione
 10AMB018P;Umbria;Ambiente;10AMB018P;numero;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;5,21;;Regione
@@ -7118,6 +7483,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 10AMB024P;Toscana;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;598;;Regione
 10AMB024P;Toscana;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;588;;Regione
 10AMB024P;Toscana;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;586;;Regione
+10AMB024P;Trentino-Alto Adige;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;462,0;;Regione
+10AMB024P;Trentino-Alto Adige;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;480,5;;Regione
+10AMB024P;Trentino-Alto Adige;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;487,0;;Regione
+10AMB024P;Trentino-Alto Adige;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2018;Livello;507,0;;Regione
+10AMB024P;Trentino-Alto Adige;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2019;Livello;508,0;;Regione
+10AMB024P;Trentino-Alto Adige;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2020;Livello;475,0;;Regione
+10AMB024P;Trentino-Alto Adige;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2021;Livello;504,5;;Regione
+10AMB024P;Trentino-Alto Adige;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2022;Livello;486,5;;Regione
+10AMB024P;Trentino-Alto Adige;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2023;Livello;490,0;;Regione
 10AMB024P;Umbria;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2015;Livello;522;;Regione
 10AMB024P;Umbria;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2016;Livello;533;;Regione
 10AMB024P;Umbria;Ambiente;Rifiuti urbani prodotti;kg per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_10;2017;Livello;513;;Regione
@@ -7273,6 +7647,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 11RIC002;Toscana;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2020;Livello;89,5;;Regione
 11RIC002;Toscana;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2021;Livello;82,1;;Regione
 11RIC002;Toscana;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2022;Livello;82,3;;Regione
+11RIC002;Trentino-Alto Adige;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2015;Livello;104,05;;Regione
+11RIC002;Trentino-Alto Adige;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2016;Livello;111,2;;Regione
+11RIC002;Trentino-Alto Adige;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2017;Livello;125,8;;Regione
+11RIC002;Trentino-Alto Adige;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2018;Livello;91,6;;Regione
+11RIC002;Trentino-Alto Adige;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2019;Livello;119,95;;Regione
+11RIC002;Trentino-Alto Adige;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2020;Livello;129,2;;Regione
+11RIC002;Trentino-Alto Adige;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2021;Livello;125,5;;Regione
+11RIC002;Trentino-Alto Adige;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2022;Livello;87,75;;Regione
 11RIC002;Umbria;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2015;Livello;44,4;;Regione
 11RIC002;Umbria;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2016;Livello;44,2;;Regione
 11RIC002;Umbria;Innovazione, ricerca e creatività;Propensione alla brevettazione;per milione di abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2017;Livello;46;;Regione
@@ -7425,6 +7807,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 11RIC004P;Toscana;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2020;Livello;1,3;;Regione
 11RIC004P;Toscana;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2021;Livello;1,5;;Regione
 11RIC004P;Toscana;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2022;Livello;1,6;;Regione
+11RIC004P;Trentino-Alto Adige;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2015;Livello;1,45;;Regione
+11RIC004P;Trentino-Alto Adige;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2016;Livello;1,35;;Regione
+11RIC004P;Trentino-Alto Adige;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2017;Livello;1,35;;Regione
+11RIC004P;Trentino-Alto Adige;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2018;Livello;1,35;;Regione
+11RIC004P;Trentino-Alto Adige;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2019;Livello;1,25;;Regione
+11RIC004P;Trentino-Alto Adige;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2020;Livello;1,4;;Regione
+11RIC004P;Trentino-Alto Adige;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2021;Livello;1,4;;Regione
+11RIC004P;Trentino-Alto Adige;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2022;Livello;1,45;;Regione
 11RIC004P;Umbria;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2015;Livello;1,2;;Regione
 11RIC004P;Umbria;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2016;Livello;1,2;;Regione
 11RIC004P;Umbria;Innovazione, ricerca e creatività;Addetti nelle imprese culturali;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2017;Livello;1,2;;Regione
@@ -7481,6 +7871,7 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 11RIC022;Sicilia;Innovazione, ricerca e creatività;Comuni con servizi per le famiglie interamente on line;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2022;Livello;37,5;;Regione
 11RIC022;Toscana;Innovazione, ricerca e creatività;Comuni con servizi per le famiglie interamente on line;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2018;Livello;39,1;;Regione
 11RIC022;Toscana;Innovazione, ricerca e creatività;Comuni con servizi per le famiglie interamente on line;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2022;Livello;75,5;;Regione
+11RIC022;Trentino-Alto Adige;Innovazione, ricerca e creatività;Comuni con servizi per le famiglie interamente on line;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2018;Livello;18,0;;Regione
 11RIC022;Umbria;Innovazione, ricerca e creatività;Comuni con servizi per le famiglie interamente on line;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2018;Livello;28,3;;Regione
 11RIC022;Umbria;Innovazione, ricerca e creatività;Comuni con servizi per le famiglie interamente on line;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2022;Livello;61;;Regione
 11RIC022;Valle d'Aosta;Innovazione, ricerca e creatività;Comuni con servizi per le famiglie interamente on line;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2018;Livello;21,6;;Regione
@@ -7567,6 +7958,11 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 11RIC025;Toscana;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2021;Livello;3,9;;Regione
 11RIC025;Toscana;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2022;Livello;4,7;;Regione
 11RIC025;Toscana;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2023;Livello;0,3;;Regione
+11RIC025;Trentino-Alto Adige;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2019;Livello;3,15;;Regione
+11RIC025;Trentino-Alto Adige;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2020;Livello;-0,55;;Regione
+11RIC025;Trentino-Alto Adige;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2021;Livello;2,9;;Regione
+11RIC025;Trentino-Alto Adige;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2022;Livello;-0,25;;Regione
+11RIC025;Trentino-Alto Adige;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2023;Livello;-0,6;;Regione
 11RIC025;Umbria;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2019;Livello;-9,2;;Regione
 11RIC025;Umbria;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2020;Livello;-11,4;;Regione
 11RIC025;Umbria;Innovazione, ricerca e creatività;Mobilità dei laureati italiani (25-39 anni);per 1.000 laureati residenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_11;2021;Livello;-7;;Regione
@@ -7710,6 +8106,13 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 12SER002;Toscana;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2020;Livello;24,5;;Regione
 12SER002;Toscana;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;26;;Regione
 12SER002;Toscana;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;28,4;;Regione
+12SER002;Trentino-Alto Adige;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2015;Livello;20,4;;Regione
+12SER002;Trentino-Alto Adige;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2016;Livello;21,15;;Regione
+12SER002;Trentino-Alto Adige;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2017;Livello;22,6;;Regione
+12SER002;Trentino-Alto Adige;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2018;Livello;23,9;;Regione
+12SER002;Trentino-Alto Adige;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2019;Livello;23,8;;Regione
+12SER002;Trentino-Alto Adige;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2021;Livello;26,55;;Regione
+12SER002;Trentino-Alto Adige;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2022;Livello;27,45;;Regione
 12SER002;Umbria;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2015;Livello;15,9;;Regione
 12SER002;Umbria;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2016;Livello;15,8;;Regione
 12SER002;Umbria;Istruzione e formazione;Bambini che hanno usufruito dei servizi comunali per l'infanzia;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_02;2017;Livello;16;;Regione
@@ -7878,6 +8281,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 12SER002P;Toscana;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;34,7;;Regione
 12SER002P;Toscana;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;36,7;;Regione
 12SER002P;Toscana;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2023;Livello;37,8;;Regione
+12SER002P;Trentino-Alto Adige;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;21,95;;Regione
+12SER002P;Trentino-Alto Adige;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;23,15;;Regione
+12SER002P;Trentino-Alto Adige;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;24,15;;Regione
+12SER002P;Trentino-Alto Adige;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2018;Livello;24,15;;Regione
+12SER002P;Trentino-Alto Adige;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2019;Livello;24,4;;Regione
+12SER002P;Trentino-Alto Adige;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2020;Livello;24,65;;Regione
+12SER002P;Trentino-Alto Adige;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;25,55;;Regione
+12SER002P;Trentino-Alto Adige;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;26,75;;Regione
+12SER002P;Trentino-Alto Adige;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2023;Livello;27,65;;Regione
 12SER002P;Umbria;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;31,4;;Regione
 12SER002P;Umbria;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;32,7;;Regione
 12SER002P;Umbria;Qualità dei servizi;Medici specialisti;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;33;;Regione
@@ -8033,6 +8445,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 12SER003P-N25;Toscana;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2020;Livello;31,7;;Regione
 12SER003P-N25;Toscana;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;32,2;;Regione
 12SER003P-N25;Toscana;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;31,4;;Regione
+12SER003P-N25;Trentino-Alto Adige;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;39,1;;Regione
+12SER003P-N25;Trentino-Alto Adige;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;38,9;;Regione
+12SER003P-N25;Trentino-Alto Adige;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;39,2;;Regione
+12SER003P-N25;Trentino-Alto Adige;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2018;Livello;39,35;;Regione
+12SER003P-N25;Trentino-Alto Adige;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2019;Livello;37,85;;Regione
+12SER003P-N25;Trentino-Alto Adige;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2020;Livello;37,8;;Regione
+12SER003P-N25;Trentino-Alto Adige;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;38,25;;Regione
+12SER003P-N25;Trentino-Alto Adige;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;37,7;;Regione
 12SER003P-N25;Umbria;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;34,4;;Regione
 12SER003P-N25;Umbria;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;34,8;;Regione
 12SER003P-N25;Umbria;Qualità dei servizi;12SER003P-N25;INHAB_5;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;34,2;;Regione
@@ -8201,6 +8621,15 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 12SER007;Toscana;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;1,5;;Regione
 12SER007;Toscana;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;1,6;;Regione
 12SER007;Toscana;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2023;Livello;1,9;;Regione
+12SER007;Trentino-Alto Adige;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;1,45;;Regione
+12SER007;Trentino-Alto Adige;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;1,2;;Regione
+12SER007;Trentino-Alto Adige;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;1,25;;Regione
+12SER007;Trentino-Alto Adige;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2018;Livello;1,6;;Regione
+12SER007;Trentino-Alto Adige;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2019;Livello;2,9;;Regione
+12SER007;Trentino-Alto Adige;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2020;Livello;1,6;;Regione
+12SER007;Trentino-Alto Adige;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;0,85;;Regione
+12SER007;Trentino-Alto Adige;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;0,85;;Regione
+12SER007;Trentino-Alto Adige;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2023;Livello;0,9;;Regione
 12SER007;Umbria;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;2,1;;Regione
 12SER007;Umbria;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;1,5;;Regione
 12SER007;Umbria;Qualità dei servizi;Irregolarità del servizio elettrico;numero medio di utenti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;1,5;;Regione
@@ -8372,6 +8801,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 12SER008;Toscana;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;2836;;Regione
 12SER008;Toscana;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;3032;;Regione
 12SER008;Toscana;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2023;Livello;3156;;Regione
+12SER008;Trentino-Alto Adige;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;3505,5;;Regione
+12SER008;Trentino-Alto Adige;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;3654,0;;Regione
+12SER008;Trentino-Alto Adige;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;3668,5;;Regione
+12SER008;Trentino-Alto Adige;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2018;Livello;3823,0;;Regione
+12SER008;Trentino-Alto Adige;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2019;Livello;3822,0;;Regione
+12SER008;Trentino-Alto Adige;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2020;Livello;3276,5;;Regione
+12SER008;Trentino-Alto Adige;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;4045,0;;Regione
+12SER008;Trentino-Alto Adige;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;4167,0;;Regione
 12SER008;Umbria;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;1952;;Regione
 12SER008;Umbria;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;2038;;Regione
 12SER008;Umbria;Qualità dei servizi;Posti-km offerti dal Tpl;valore per abitante;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;2094;;Regione
@@ -8479,6 +8916,9 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 12SER020;Toscana;Qualità dei servizi;Copertura della rete fissa di accesso ultra veloce a internet;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;50,1;;Regione
 12SER020;Toscana;Qualità dei servizi;Copertura della rete fissa di accesso ultra veloce a internet;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2023;Livello;55;;Regione
 12SER020;Toscana;Qualità dei servizi;Copertura della rete fissa di accesso ultra veloce a internet;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2024;Livello;62,2;;Regione
+12SER020;Trentino-Alto Adige;Qualità dei servizi;Copertura della rete fissa di accesso ultra veloce a internet;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2020;Livello;22,6;;Regione
+12SER020;Trentino-Alto Adige;Qualità dei servizi;Copertura della rete fissa di accesso ultra veloce a internet;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;32,25;;Regione
+12SER020;Trentino-Alto Adige;Qualità dei servizi;Copertura della rete fissa di accesso ultra veloce a internet;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;44,45;;Regione
 12SER020;Umbria;Qualità dei servizi;Copertura della rete fissa di accesso ultra veloce a internet;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2020;Livello;32,3;;Regione
 12SER020;Umbria;Qualità dei servizi;Copertura della rete fissa di accesso ultra veloce a internet;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;42;;Regione
 12SER020;Umbria;Qualità dei servizi;Copertura della rete fissa di accesso ultra veloce a internet;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;51;;Regione
@@ -8622,6 +9062,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 12SER022;Toscana;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2020;Livello;3,1;;Regione
 12SER022;Toscana;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;3,2;;Regione
 12SER022;Toscana;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;3;;Regione
+12SER022;Trentino-Alto Adige;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;2,25;;Regione
+12SER022;Trentino-Alto Adige;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;2,2;;Regione
+12SER022;Trentino-Alto Adige;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;2,15;;Regione
+12SER022;Trentino-Alto Adige;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2018;Livello;2,2;;Regione
+12SER022;Trentino-Alto Adige;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2019;Livello;2,25;;Regione
+12SER022;Trentino-Alto Adige;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2020;Livello;2,35;;Regione
+12SER022;Trentino-Alto Adige;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;2,9;;Regione
+12SER022;Trentino-Alto Adige;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;2,7;;Regione
 12SER022;Umbria;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;2,3;;Regione
 12SER022;Umbria;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;2,4;;Regione
 12SER022;Umbria;Qualità dei servizi;Posti letto per specialità ad elevata assistenza;per 10.000 abitanti;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;2,2;;Regione
@@ -8774,6 +9222,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 12SER024;Toscana;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;59,7;;Regione
 12SER024;Toscana;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;55,9;;Regione
 12SER024;Toscana;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2023;Livello;62,6;;Regione
+12SER024;Trentino-Alto Adige;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;55,65;;Regione
+12SER024;Trentino-Alto Adige;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;77,1;;Regione
+12SER024;Trentino-Alto Adige;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;80,4;;Regione
+12SER024;Trentino-Alto Adige;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2018;Livello;79,15;;Regione
+12SER024;Trentino-Alto Adige;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2020;Livello;83,25;;Regione
+12SER024;Trentino-Alto Adige;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;83,6;;Regione
+12SER024;Trentino-Alto Adige;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;84,45;;Regione
+12SER024;Trentino-Alto Adige;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2023;Livello;86,55;;Regione
 12SER024;Umbria;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;26,8;;Regione
 12SER024;Umbria;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;38,4;;Regione
 12SER024;Umbria;Qualità dei servizi;Servizio di raccolta differenziata dei rifiuti urbani;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2018;Livello;43,4;;Regione
@@ -8942,6 +9398,14 @@ idIndicatore;Territorio;Tema;Indicatore;UDM;Fonte;Archivio;Anno;Livello/Variazio
 12SER025;Toscana;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;5,9;;Regione
 12SER025;Toscana;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;6,3;;Regione
 12SER025;Toscana;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2023;Livello;6,8;;Regione
+12SER025;Trentino-Alto Adige;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;9,2;;Regione
+12SER025;Trentino-Alto Adige;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;9,9;;Regione
+12SER025;Trentino-Alto Adige;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;9,8;;Regione
+12SER025;Trentino-Alto Adige;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2018;Livello;9,7;;Regione
+12SER025;Trentino-Alto Adige;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2019;Livello;9,75;;Regione
+12SER025;Trentino-Alto Adige;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2021;Livello;8,85;;Regione
+12SER025;Trentino-Alto Adige;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2022;Livello;9,25;;Regione
+12SER025;Trentino-Alto Adige;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2023;Livello;10,1;;Regione
 12SER025;Umbria;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2015;Livello;10,9;;Regione
 12SER025;Umbria;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2016;Livello;11,6;;Regione
 12SER025;Umbria;Qualità dei servizi;Emigrazione ospedaliera in altra regione;%;Istat;BES dei Territori (Bes at local level), DF_BES_TERRIT_0T, dominio BES_12;2017;Livello;11,9;;Regione

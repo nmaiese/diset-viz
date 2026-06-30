@@ -65,6 +65,11 @@ UNIT_LABELS = {
     "": "numero",
 }
 
+# Trentino-Alto Adige is absent at NUTS2 in this BES dataflow; reconstruct it as the
+# mean of its two autonomous provinces. TRENTINO_CODE is a synthetic area code.
+TRENTINO_PARTS = ("ITD10", "ITD20")  # Bolzano, Trento (NUTS3)
+TRENTINO_CODE = "_TRENTINO"
+
 # The 14 metropolitan cities (città metropolitane), for a context flag.
 METRO_CITIES = {
     "Torino", "Genova", "Milano", "Venezia", "Bologna", "Firenze", "Roma",
@@ -143,6 +148,9 @@ def build(level="province"):
     latest = {}
     domain_of = {}
     unit_of = {}
+    # At NUTS2 the BES omits Trentino-Alto Adige entirely; we reconstruct it as the
+    # mean of its two autonomous provinces (Bolzano ITD10, Trento ITD20), captured here.
+    tn_parts = {}  # (data_type, year) -> {area_code: (edition, float value)}
     for domain in province_sources.BES_DOMAINS:
         try:
             rows = client.data(province_sources.BES_DATAFLOW,
@@ -155,19 +163,34 @@ def build(level="province"):
             if row["SEX"] not in province_sources.SEX_TOTAL_CODES:
                 continue
             area = row["REF_AREA"]
-            if not pattern.match(area):
+            is_tn_part = level == "region" and area in (TRENTINO_PARTS)
+            if not pattern.match(area) and not is_tn_part:
                 continue
             data_type = row["DATA_TYPE"]
             year = row["TIME_PERIOD"]
             value = row["OBS_VALUE"]
             if value in (None, ""):
                 continue
-            key = (data_type, area, year)
             edition = row.get("EDITION", "")
-            if key not in latest or edition > latest[key][0]:
-                latest[key] = (edition, row)
             domain_of[data_type] = domain
             unit_of[data_type] = row.get("UNIT_MEAS", "")
+            if is_tn_part and not pattern.match(area):
+                slot = tn_parts.setdefault((data_type, year), {})
+                if area not in slot or edition > slot[area][0]:
+                    slot[area] = (edition, float(value))
+                continue
+            key = (data_type, area, year)
+            if key not in latest or edition > latest[key][0]:
+                latest[key] = (edition, row)
+
+    if level == "region":
+        territory[TRENTINO_CODE] = {"name": "Trentino-Alto Adige", "parent": ""}
+        for (data_type, year), parts in tn_parts.items():
+            if all(code in parts for code in TRENTINO_PARTS):
+                mean = sum(parts[code][1] for code in TRENTINO_PARTS) / len(TRENTINO_PARTS)
+                latest[(data_type, TRENTINO_CODE, year)] = (
+                    "ZZZZ", {"OBS_VALUE": repr(round(mean, 6)), "UNIT_MEAS": unit_of.get(data_type, "")}
+                )
 
     # -- dataset rows --------------------------------------------------------
     defunct = province_sources.DEFUNCT_PROVINCES if level == "province" else set()

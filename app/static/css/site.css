@@ -331,6 +331,15 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .quality-chip.is-weak { border-color: var(--accent); color: var(--accent); }
 .quality-chip__score { font-family: var(--font-mono); font-weight: 700; }
 .quality-metro { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--paper); background: var(--ink); padding: 1px 4px; vertical-align: middle; }
+.quality-level-toggle { display: flex; width: max-content; margin: 18px 0 6px; border: 1px solid var(--line); }
+.quality-level-toggle a { padding: 8px 20px; font-weight: 700; font-size: 14px; color: var(--ink-soft); }
+.quality-level-toggle a:hover { text-decoration: none; background: var(--accent-soft); }
+.quality-level-toggle a + a { border-left: 1px solid var(--line); }
+.quality-level-toggle a.is-active { background: var(--ink); color: var(--paper); }
+.quality-level-toggle a.is-active:hover { background: var(--ink); }
+.quality-catrank { margin: 6px 0 4px; padding-left: 18px; font-size: 13.5px; }
+.quality-catrank li { margin: 1px 0; }
+.quality-catrank b { font-family: var(--font-mono); }
 
 .quality-methodology table { margin: 16px 0; }
 
