@@ -5,16 +5,22 @@ Guidance for Claude Code (and other agents) working in this repository.
 ## What this is
 
 **Divario Italia** (divarioitalia.it) is a Flask + React atlas of the Istat
-territorial development indicators, plus a server-rendered SEO blog about the
-territorial divide between Italian regions.
+territorial development indicators, plus a server-rendered SEO blog and a
+quality-of-life section for regions and provinces.
 
 - `/` — React/Vite single-page atlas (source in `frontend/`, built into
   `app/static/dist/`).
 - `/blog`, `/blog/<slug>` — server-rendered (Jinja) blog from Markdown in
   `content/posts/`.
+- `/qualita-della-vita`, `/qualita-della-vita/classifica`,
+  `/qualita-della-vita/metodologia` — regional quality-of-life pages.
+- `/qualita-della-vita/province` — provincial quality-of-life ranking from Istat
+  BES dei Territori, available when the provincial artifacts are present.
 - `/legacy` — original D3 dashboard (do not break it).
 - `/api/catalog`, `/api/search`, `/api/indicator/<id>`,
   `/api/indicator/<id>/year/<year>` — JSON API for the atlas.
+- `/api/quality-life/*` and `/api/quality-life/province/*` — JSON API for the
+  quality-of-life pages.
 - `/sitemap.xml`, `/robots.txt` — SEO.
 
 Data layer: `app/data.py` (reads `app/static/data/Assoluti_Regione.csv`).
@@ -72,6 +78,11 @@ in `CURATED_DIRECTION` (`app/indicator_notes.py`), and for each new theme map it
 to a macro-area in `MACRO_AREAS` (same file). Then restart gunicorn to clear the
 cache, rebuild the frontend, run the tests, and re-check which themes are now
 "valutabili" vs descriptive with the diagnostic snippet in that doc.
+
+Provincial data is separate. Follow
+[`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md), keep the SDMX cache out
+of git, commit only normalized CSV artifacts, and never mix provincial rows into
+the regional CSV or `app/data.py`.
 
 ## Constraints
 

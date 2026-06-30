@@ -2,6 +2,8 @@ import unittest
 
 from app import app
 from app import quality_life as ql
+from app import quality_life_province as qlp
+from app.province_data import has_province_data
 from app.quality_life_config import QUALITY_LIFE_CATEGORIES, QUALITY_LIFE_PROFILES
 
 
@@ -127,6 +129,49 @@ class QualityLifePagesTest(unittest.TestCase):
         self.assertEqual(client.get("/legacy-reddito").status_code, 200)
         self.assertEqual(client.get("/data").status_code, 200)
         self.assertEqual(client.get("/api/catalog").status_code, 200)
+
+
+@unittest.skipUnless(has_province_data(), "provincial dataset not built")
+class QualityLifeProvinceTest(unittest.TestCase):
+    def test_province_page_and_api_respond(self):
+        client = app.test_client()
+
+        page = client.get("/qualita-della-vita/province")
+        self.assertEqual(page.status_code, 200)
+        self.assertEqual(client.get("/qualita-della-vita/province?profilo=giovani").status_code, 200)
+
+        rankings = client.get("/api/quality-life/province/rankings")
+        self.assertEqual(rankings.status_code, 200)
+        payload = rankings.get_json()
+        for key in ("ranking", "profile", "categories", "methodology", "level"):
+            self.assertIn(key, payload)
+        self.assertEqual(payload["level"], "provincia")
+
+        named = client.get("/api/quality-life/province/rankings/opportunita")
+        self.assertEqual(named.status_code, 200)
+        self.assertEqual(client.get("/api/quality-life/province/rankings/nope").status_code, 404)
+
+    def test_province_single_profile(self):
+        client = app.test_client()
+        one = client.get("/api/quality-life/province/milano")
+        self.assertEqual(one.status_code, 200)
+        self.assertEqual(one.get_json()["province"]["province_key"], "milano")
+        self.assertEqual(client.get("/api/quality-life/province/atlantide").status_code, 404)
+
+    def test_province_scores_and_sorting(self):
+        payload = qlp.build_province_ranking("standard")
+        scores = [row["score"] for row in payload["ranking"]]
+        self.assertEqual(scores, sorted(scores, reverse=True))
+        self.assertEqual([r["rank"] for r in payload["ranking"]], list(range(1, len(scores) + 1)))
+        for row in payload["ranking"]:
+            self.assertGreaterEqual(row["score"], 0)
+            self.assertLessEqual(row["score"], 100)
+            self.assertGreater(row["coverage"], 0.0)
+            self.assertLessEqual(row["coverage"], 1.0)
+
+    def test_province_sitemap_entry(self):
+        sitemap = app.test_client().get("/sitemap.xml").data
+        self.assertIn(b"/qualita-della-vita/province", sitemap)
 
 
 if __name__ == "__main__":

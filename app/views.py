@@ -4,6 +4,7 @@ from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts
 from app.data import get_catalog, get_indicator, get_indicator_year, get_rows, search_indicators
 from app import profiles
 from app import quality_life as ql
+from app import quality_life_province as qlp
 
 from flask import Response, abort, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -311,6 +312,49 @@ def quality_life_ranking():
     )
 
 
+@app.route("/api/quality-life/province/rankings")
+def quality_life_province_rankings_api():
+    payload = qlp.build_province_ranking(_quality_life_profile_arg())
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+@app.route("/api/quality-life/province/rankings/<profile_slug>")
+def quality_life_province_ranking_profile_api(profile_slug):
+    payload = qlp.build_province_ranking(profile_slug)
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+@app.route("/api/quality-life/province/<province_key>")
+def quality_life_province_api(province_key):
+    payload = qlp.build_province_profile(province_key, _quality_life_profile_arg())
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+@app.route("/qualita-della-vita/province")
+def quality_life_province_page():
+    slug = _quality_life_profile_arg()
+    payload = qlp.build_province_ranking(slug)
+    if payload is None:
+        abort(404)
+    suffix = "" if slug == ql.DEFAULT_PROFILE else f"?profilo={slug}"
+    return render_template(
+        "quality_life_province.html",
+        data=payload,
+        profiles=ql.get_quality_life_profiles(),
+        active_profile=slug,
+        default_profile=ql.DEFAULT_PROFILE,
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/qualita-della-vita/province{suffix}",
+    )
+
+
 @app.route("/qualita-della-vita/metodologia")
 def quality_life_methodology():
     payload = ql.build_quality_life_ranking(ql.DEFAULT_PROFILE)
@@ -337,6 +381,8 @@ def sitemap():
         {"loc": f"{SITE_URL}/qualita-della-vita/metodologia", "priority": "0.6"},
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
+    if qlp.has_province_data():
+        pages.append({"loc": f"{SITE_URL}/qualita-della-vita/province", "priority": "0.8"})
     for post in get_posts():
         pages.append({
             "loc": post["url"],

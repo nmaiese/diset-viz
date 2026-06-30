@@ -1,0 +1,111 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'qualita-della-vita' %}
+{% set p = data.profile %}
+{% set m = data.methodology %}
+
+{% block title %}Classifica qualità della vita per provincia, profilo {{ p.name }} | {{ site_name }}{% endblock %}
+{% block description %}Classifica della qualità della vita nelle province italiane (BES dei Territori Istat) con il profilo {{ p.name }}. Punteggi da 0 a 100 su {{ m.total_indicators }} indicatori provinciali.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Classifica qualità della vita per provincia, profilo {{ p.name }}",
+  "description": {{ ('Punteggi di qualità della vita delle province italiane, profilo ' ~ p.name ~ ', su indicatori BES dei Territori Istat.') | tojson }},
+  "url": {{ canonical | tojson }},
+  "creator": { "@type": "Organization", "name": "Istat" },
+  "isAccessibleForFree": true,
+  "keywords": ["qualità della vita", "province italiane", "BES dei territori", "Istat", "divario territoriale"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Qualità della vita", "item": "{{ site_url }}/qualita-della-vita" },
+    { "@type": "ListItem", "position": 3, "name": "Province", "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page wrap quality-ranking">
+  <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a> / <a href="/qualita-della-vita/classifica">Regioni</a></nav>
+  <h1>Qualità della vita nelle province italiane</h1>
+  <p class="page-lead">Profilo <strong>{{ p.name }}</strong>. {{ p.description }} Le province italiane a confronto su {{ m.total_indicators }} indicatori del BES dei Territori Istat, con punteggio da 0 (ultima) a 100 (prima).</p>
+
+  <nav class="quality-profile-tabs" aria-label="Profili di peso">
+    {% for profile in profiles %}
+    <a href="/qualita-della-vita/province{{ '' if profile.slug == default_profile else '?profilo=' ~ profile.slug }}"
+       class="{{ 'is-active' if profile.slug == active_profile else '' }}">{{ profile.name }}</a>
+    {% endfor %}
+  </nav>
+
+  {% if data.champions %}
+  <section class="quality-section">
+    <h2>Campioni per categoria</h2>
+    <p class="page-note">La provincia che guida ogni categoria. Una classifica unica nasconde le specializzazioni: qui si vede chi vince dove.</p>
+    <div class="quality-grid">
+      {% for c in data.champions %}
+      <div class="quality-card">
+        <span class="quality-card__cta">{{ c.name }}</span>
+        <h3>{{ c.province }} <b class="quality-chip__score">{{ c.score | round | int }}</b></h3>
+        <p>{{ c.region }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <div class="quality-table-wrap">
+    <table class="data-table quality-rank-table">
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th>Provincia</th>
+          <th>Regione</th>
+          <th>Punteggio</th>
+          <th>Punti di forza</th>
+          <th>Punti deboli</th>
+          <th class="num">Copertura</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data.ranking %}
+        <tr>
+          <td class="num quality-rank">{{ row.rank }}</td>
+          <td>{{ row.province }}{% if row.metro_city %} <span class="quality-metro" title="Città metropolitana">cm</span>{% endif %}</td>
+          <td><small>{{ row.region }}</small></td>
+          <td class="quality-score-cell">
+            <span class="quality-score-bar"><span style="width: {{ row.score | round | int }}%"></span></span>
+            <span class="quality-score">{{ row.score | it_num }}</span>
+          </td>
+          <td>
+            {% for c in row.strongest_categories[:2] %}
+            <span class="quality-chip is-strong">{{ c.name }} <b class="quality-chip__score">{{ c.score | round | int }}</b></span>
+            {% endfor %}
+          </td>
+          <td>
+            {% for c in row.weakest_categories[:2] %}
+            <span class="quality-chip is-weak">{{ c.name }} <b class="quality-chip__score">{{ c.score | round | int }}</b></span>
+            {% endfor %}
+          </td>
+          <td class="num">{{ (row.coverage * 100) | round | int }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if data.unrated %}
+  <p class="quality-note">Non valutate per mancanza di dati recenti: {{ data.unrated | map(attribute='province') | join(', ') }}.</p>
+  {% endif %}
+  <p class="quality-note">Copertura: {{ data.ranking | length }} province. La provincia di Sud Sardegna non è presente in questa edizione del BES dei Territori, e le quattro province sarde soppresse prima del 2016 sono escluse.</p>
+
+  <p class="quality-note quality-disclaimer">Versione di lavoro. La fonte è il BES dei Territori Istat e i punteggi usano un percentile orientato tra le province. Le categorie e le direzioni degli indicatori sono ancora proposte automatiche, in fase di revisione, quindi la classifica può cambiare. Non è la classifica del Sole 24 Ore. <a href="/qualita-della-vita/metodologia">Leggi la metodologia</a>.</p>
+</article>
+{% endblock %}

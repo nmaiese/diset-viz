@@ -1,0 +1,37 @@
+[
+  {
+    "dataflow": "DF_DIPS_SIR_IND_TERR_DRT_MUN_1",
+    "name": "Indicatori e territorio",
+    "dsd": "DIPS_SIR_IND_TERR_DRT",
+    "dimensions": [
+      "FREQ",
+      "REF_AREA",
+      "DATA_TYPE"
+    ],
+    "territory_dimension": "REF_AREA",
+    "territory_codelist": "CL_ITTER107",
+    "nuts3_count": 101,
+    "nuts3_sample": [
+      {
+        "code": "ITC11",
+        "name": "Torino"
+      },
+      {
+        "code": "ITC12",
+        "name": "Vercelli"
+      },
+      {
+        "code": "ITC13",
+        "name": "Biella"
+      },
+      {
+        "code": "ITC14",
+        "name": "Verbano-Cusio-Ossola"
+      },
+      {
+        "code": "ITC15",
+        "name": "Novara"
+      }
+    ]
+  }
+]

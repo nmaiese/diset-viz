@@ -1,0 +1,26 @@
+code;name;parent
+BES_01;Salute;
+BES_02;Istruzione e formazione;
+BES_03;Lavoro e conciliazione dei tempi di vita;
+BES_04;Benessere economico;
+BES_05;Relazioni sociali;
+BES_06;Politica e istituzioni;
+BES_07;Sicurezza;
+BES_08;Subjective well-being;
+BES_09;Paesaggio e patrimonio culturale;
+BES_10;Ambiente;
+BES_11;Innovazione, ricerca e creatività;
+BES_12;Qualità dei servizi;
+COMP_FRAG_INDEX_DECILE;Indice composito di fragilità comunale - (decile);
+HIGH_EMISS_MOTOR_RATE;Tasso di motorizzazione ad alta emissione;
+UNDIF_COLL_URBAN_WASTE;Raccolta indifferenziata dei rifiuti urbani per abitante;
+PROTECTED_NAT_AREAS;Aree protette;
+LANDSLIDE_HAZARD_ZONES;Superficie a rischio di frane;
+LAND_CONSUMPTION;Consumo del suolo;
+INDEX_ACCES_ESSENT_SERVICES;Indice di accessibilità ai servizi essenziali;
+POP_DEPEN_INDEX_ADJ;Indice di dipendenza della popolazione aggiustato;
+POP_25_64_UNDER_DIP_LOW_SEC_EDU;Popolazione di età compresa fra 25 e 64 anni con titolo di studio non oltre la licenza di scuola media inferiore o di avviamento professionale;
+EMPL_RATE_20_64;Tasso di occupazione (20-64 anni);
+POP_GROWTH_RATE;Tasso di incremento della popolazione;
+DENS_LU_IND_SERV_VENTILE;Densità delle unità locali dell’industria e dei servizi - (ventile);
+PERSEMP_LU_LOW_PRO_INDSERV_VENTILE;Addetti in unità locali a bassa produttività di settore per l’industria e i servizi - (ventile);

@@ -14,3 +14,6 @@ client_secret_*.json
 *.env
 .env
 !.env.example
+
+# Raw Istat SDMX response cache (bulky; the normalized CSVs are committed instead)
+data/istat_cache/
