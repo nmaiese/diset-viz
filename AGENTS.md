@@ -6,9 +6,9 @@ Code reads `CLAUDE.md`; this file mirrors the essentials for everyone else.
 ## Project
 
 **Divario Italia** (divarioitalia.it): a Flask + React atlas of Istat territorial
-indicators plus a server-rendered SEO blog (`content/posts/*.md`, rendered at
-`/blog`). The React app lives in `frontend/` and builds into `app/static/dist/`.
-Do not break `/legacy`.
+indicators, a server-rendered SEO blog (`content/posts/*.md`, rendered at
+`/blog`) and a quality-of-life section for regions and provinces. The React app
+lives in `frontend/` and builds into `app/static/dist/`. Do not break `/legacy`.
 
 ## Commands
 
@@ -47,6 +47,11 @@ recomputed at runtime (cache 1h). Set each new indicator's direction in
 `CURATED_DIRECTION` and map each new theme to a macro-area in `MACRO_AREAS`
 (both in `app/indicator_notes.py`), then restart gunicorn, rebuild the frontend
 and run the tests.
+
+When working on provincial quality-of-life data, keep it separate from the
+regional atlas. Follow [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md),
+respect the Istat SDMX rate limit, and do not merge provincial rows into
+`Assoluti_Regione.csv` or `app/data.py`.
 
 ## Other constraints
 

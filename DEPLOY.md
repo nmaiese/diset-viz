@@ -65,3 +65,20 @@ cd frontend && npm run build
 gcloud run services describe diset-viz --region europe-west1 \
   --format='value(status.url,status.latestReadyRevisionName)'
 ```
+
+Verifiche HTTP minime dopo il deploy:
+
+```bash
+curl -I https://divarioitalia.it/
+curl -I https://divarioitalia.it/blog
+curl -I https://divarioitalia.it/qualita-della-vita
+curl -I https://divarioitalia.it/qualita-della-vita/classifica
+curl -I https://divarioitalia.it/qualita-della-vita/province
+curl -I https://divarioitalia.it/robots.txt
+curl -I https://divarioitalia.it/sitemap.xml
+curl -I https://divarioitalia.it/ads.txt
+```
+
+`/qualita-della-vita/province` esiste solo se i file BES provinciali sono
+presenti. Se la pagina risponde 404 in un ambiente pulito, rigenera o includi gli
+artefatti descritti in [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md).

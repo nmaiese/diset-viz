@@ -1,11 +1,11 @@
 # Divario Italia
 
-**Divario Italia** ([divarioitalia.it](https://divarioitalia.it)) is a Flask + React
-atlas for exploring the territorial divide between Italian regions, built on the
-Istat territorial development indicators.
+**Divario Italia** ([divarioitalia.it](https://divarioitalia.it)) is a Flask +
+React atlas for exploring territorial divides in Italy, built on Istat regional
+development indicators and BES territorial indicators.
 
 It combines an interactive atlas (maps, rankings, time series) with a
-data-driven blog about regional disparities.
+data-driven blog and quality-of-life rankings for regions and provinces.
 
 ## Features
 
@@ -19,6 +19,9 @@ data-driven blog about regional disparities.
   (`content/posts/*.md`) — meant to be published automatically by an AI agent.
   Includes per-article meta tags, Open Graph, JSON-LD, `sitemap.xml` and
   `robots.txt`.
+- **Quality of life**: regional rankings on the Istat territorial development
+  indicators, plus a work-in-progress provincial ranking from Istat BES dei
+  Territori.
 - Shareable URLs across both atlas views (`view`, `indicator`, `year`, `region`,
   `theme`, `q`, `sort`, `partial`).
 - Flask backend serving a filtered API (no full dataset download in the SPA).
@@ -35,11 +38,17 @@ data-driven blog about regional disparities.
 
 - `/` serves the React atlas (single-page app).
 - `/blog` and `/blog/<slug>` are server-rendered (Jinja) for SEO.
+- `/qualita-della-vita`, `/qualita-della-vita/classifica` and
+  `/qualita-della-vita/metodologia` serve the regional quality-of-life section.
+- `/qualita-della-vita/province` serves the provincial quality-of-life ranking
+  when the BES provincial dataset is present.
 - `/sitemap.xml` and `/robots.txt` expose the site to crawlers.
 - `/legacy` keeps the original D3.js dashboard available as an archive view.
 - `/data` still returns the full legacy dataset for the archived D3 view.
 - `/api/catalog`, `/api/search`, `/api/indicator/<id>` and
   `/api/indicator/<id>/year/<year>` power the atlas.
+- `/api/quality-life/*` powers the regional quality-of-life pages.
+- `/api/quality-life/province/*` powers the provincial quality-of-life pages.
 
 ## Writing blog articles
 
@@ -102,6 +111,25 @@ Regenerate the dataset with:
 python3 scripts/update_data.py
 ```
 
+### Quality-of-life datasets
+
+The regional quality-of-life pages use the same regional CSV and score complete,
+recent indicators by profile. The pipeline and checklist are documented in
+[`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md).
+
+The provincial ranking is a separate work stream based on Istat BES dei
+Territori through SDMX. It writes separate artifacts under `app/static/data/`:
+
+- `Assoluti_Provincia.csv`
+- `province_manifest.csv`
+- `province_codes.csv`
+
+It does not touch `Assoluti_Regione.csv` or the regional atlas data loader. The
+current provincial output covers 67 indicators, 107 province and metropolitan
+cities, and 2015-2024. Categories and directions in the manifest are still
+proposed and need manual review before treating the ranking as stable. See
+[`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md).
+
 ### Data source evaluation
 
 The Istat *Indicatori territoriali per le politiche di sviluppo* archive remains
@@ -156,8 +184,9 @@ npm run build
 
 ## Deploy
 
-The app can be deployed on any Python web host that supports gunicorn. For
-Render, the included `render.yaml` can be used as a blueprint.
+The current production path is Google Cloud Run with Cloud Build, documented in
+[`DEPLOY.md`](DEPLOY.md). The app can still run on any Python web host that
+supports gunicorn, but Cloud Run is the documented operational target.
 
 Manual settings:
 
@@ -167,9 +196,11 @@ Manual settings:
 
 ## Project Status
 
-This repository is a revived portfolio/archive project. The backend dependency
-set and the regional data pipeline have been updated, while the original D3
-interface has intentionally been kept close to the historical version.
+This repository is now an active public data site. The legacy D3 interface is
+kept as an archive, while the main surface is the React atlas, SEO blog and
+quality-of-life section. The provincial quality-of-life ranking is a working
+version and should be reviewed through the manifest before being presented as a
+stable ranking.
 
 ## License
 

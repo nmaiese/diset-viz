@@ -1,0 +1,104 @@
+code;name;province_key;region;metro_city
+ITG14;Agrigento;agrigento;Sicilia;
+ITC18;Alessandria;alessandria;Piemonte;
+ITE32;Ancona;ancona;Marche;
+ITC20;Aosta;aosta;Valle d'Aosta;
+ITE18;Arezzo;arezzo;Toscana;
+ITE34;Ascoli Piceno;ascoli-piceno;Marche;
+ITC17;Asti;asti;Piemonte;
+ITF34;Avellino;avellino;Campania;
+ITF42;Bari;bari;Puglia;1
+ITD33;Belluno;belluno;Veneto;
+ITF32;Benevento;benevento;Campania;
+ITC46;Bergamo;bergamo;Lombardia;
+ITC13;Biella;biella;Piemonte;
+ITD55;Bologna;bologna;Emilia-Romagna;1
+ITD10;Bolzano;bolzano;Provincia Autonoma Bolzano;
+ITC47;Brescia;brescia;Lombardia;
+ITF44;Brindisi;brindisi;Puglia;
+ITG27;Cagliari;cagliari;Sardegna;1
+ITG15;Caltanissetta;caltanissetta;Sicilia;
+ITF22;Campobasso;campobasso;Molise;
+ITF31;Caserta;caserta;Campania;
+ITG17;Catania;catania;Sicilia;1
+ITF63;Catanzaro;catanzaro;Calabria;
+ITF14;Chieti;chieti;Abruzzo;
+ITC42;Como;como;Lombardia;
+ITF61;Cosenza;cosenza;Calabria;
+ITC4A;Cremona;cremona;Lombardia;
+ITF62;Crotone;crotone;Calabria;
+ITC16;Cuneo;cuneo;Piemonte;
+ITG16;Enna;enna;Sicilia;
+ITD56;Ferrara;ferrara;Emilia-Romagna;
+ITE14;Firenze;firenze;Toscana;1
+ITF41;Foggia;foggia;Puglia;
+ITD58;Forlì-Cesena;forli-cesena;Emilia-Romagna;
+ITE45;Frosinone;frosinone;Lazio;
+ITC33;Genova;genova;Liguria;1
+ITD43;Gorizia;gorizia;Friuli-Venezia Giulia;
+ITE1A;Grosseto;grosseto;Toscana;
+ITC31;Imperia;imperia;Liguria;
+ITF21;Isernia;isernia;Molise;
+ITF11;L'Aquila;l-aquila;Abruzzo;
+ITC34;La Spezia;la-spezia;Liguria;
+ITE44;Latina;latina;Lazio;
+ITF45;Lecce;lecce;Puglia;
+ITC43;Lecco;lecco;Lombardia;
+ITE16;Livorno;livorno;Toscana;
+ITC49;Lodi;lodi;Lombardia;
+ITE12;Lucca;lucca;Toscana;
+ITE33;Macerata;macerata;Marche;
+ITC4B;Mantova;mantova;Lombardia;
+ITE11;Massa-Carrara;massa-carrara;Toscana;
+ITF52;Matera;matera;Basilicata;
+ITG13;Messina;messina;Sicilia;1
+ITC45;Milano;milano;Lombardia;1
+ITD54;Modena;modena;Emilia-Romagna;
+ITF33;Napoli;napoli;Campania;1
+ITC15;Novara;novara;Piemonte;
+ITG26;Nuoro;nuoro;Sardegna;
+ITG28;Oristano;oristano;Sardegna;
+ITD36;Padova;padova;Veneto;
+ITG12;Palermo;palermo;Sicilia;1
+ITD52;Parma;parma;Emilia-Romagna;
+ITC48;Pavia;pavia;Lombardia;
+ITE21;Perugia;perugia;Umbria;
+ITE31;Pesaro e Urbino;pesaro-e-urbino;Marche;
+ITF13;Pescara;pescara;Abruzzo;
+ITD51;Piacenza;piacenza;Emilia-Romagna;
+ITE17;Pisa;pisa;Toscana;
+ITE13;Pistoia;pistoia;Toscana;
+ITD41;Pordenone;pordenone;Friuli-Venezia Giulia;
+ITF51;Potenza;potenza;Basilicata;
+ITE15;Prato;prato;Toscana;
+ITG18;Ragusa;ragusa;Sicilia;
+ITD57;Ravenna;ravenna;Emilia-Romagna;
+ITF65;Reggio Calabria;reggio-calabria;Calabria;1
+ITD53;Reggio Emilia;reggio-emilia;Emilia-Romagna;
+ITE42;Rieti;rieti;Lazio;
+ITD59;Rimini;rimini;Emilia-Romagna;
+ITE43;Roma;roma;Lazio;1
+ITD37;Rovigo;rovigo;Veneto;
+ITF35;Salerno;salerno;Campania;
+ITG25;Sassari;sassari;Sardegna;
+ITC32;Savona;savona;Liguria;
+ITE19;Siena;siena;Toscana;
+ITG19;Siracusa;siracusa;Sicilia;
+ITC44;Sondrio;sondrio;Lombardia;
+ITF43;Taranto;taranto;Puglia;
+ITF12;Teramo;teramo;Abruzzo;
+ITE22;Terni;terni;Umbria;
+ITC11;Torino;torino;Piemonte;1
+ITG11;Trapani;trapani;Sicilia;
+ITD20;Trento;trento;Provincia Autonoma Trento;
+ITD34;Treviso;treviso;Veneto;
+ITD44;Trieste;trieste;Friuli-Venezia Giulia;
+ITD42;Udine;udine;Friuli-Venezia Giulia;
+ITC41;Varese;varese;Lombardia;
+ITD35;Venezia;venezia;Veneto;1
+ITC14;Verbano-Cusio-Ossola;verbano-cusio-ossola;Piemonte;
+ITC12;Vercelli;vercelli;Piemonte;
+ITD31;Verona;verona;Veneto;
+ITF64;Vibo Valentia;vibo-valentia;Calabria;
+ITD32;Vicenza;vicenza;Veneto;
+ITE41;Viterbo;viterbo;Lazio;
