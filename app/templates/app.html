@@ -4,18 +4,29 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Divario Italia — Atlante degli indicatori territoriali</title>
-    <meta name="description" content="Divario Italia: atlante interattivo dei 377 indicatori territoriali Istat. Sfoglia per tema, regione e anno mappe, classifiche e serie storiche delle regioni italiane.">
+    <meta name="description" content="Atlante di indicatori territoriali Istat: confronta regioni, temi, serie storiche e dati sullo sviluppo dei territori italiani.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
     <link rel="canonical" href="{{ SITE_URL }}/">
     <meta property="og:title" content="Divario Italia — Atlante degli indicatori territoriali">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ SITE_URL }}/">
-    <meta property="og:description" content="Atlante interattivo dei 377 indicatori territoriali Istat delle regioni italiane.">
+    <meta property="og:description" content="Atlante di indicatori territoriali Istat per confrontare regioni, temi e serie storiche.">
     <meta property="og:image" content="{{ SITE_URL }}/static/img/blog/divario-turismo.svg">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <script>window.__diSpaPageView = true;</script>
     {% set TRACK_SERVER_PAGE_VIEW = false %}
     {% include "_third_party_head.html" %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Divario Italia",
+      "url": "{{ SITE_URL }}/",
+      "inLanguage": "it-IT",
+      "description": "Atlante di indicatori territoriali Istat per confrontare regioni italiane, temi e serie storiche."
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
@@ -24,7 +35,18 @@
   </head>
   <body>
     {% include "_third_party_body.html" %}
-    <div id="root"></div>
+    <div id="root">
+      <main class="spa-seo-fallback">
+        <h1>Atlante degli indicatori territoriali italiani</h1>
+        <p>Divario Italia raccoglie indicatori territoriali Istat per confrontare regioni, temi e serie storiche sullo sviluppo dei territori italiani.</p>
+        <nav aria-label="Percorsi principali">
+          <a href="/regioni">Regioni italiane a confronto</a>
+          <a href="/temi">Indicatori per tema</a>
+          <a href="/blog">Analisi data-driven</a>
+          <a href="/qualita-della-vita">Qualità della vita</a>
+        </nav>
+      </main>
+    </div>
     <footer class="spa-seo-footer">
       <nav aria-label="Sezioni del sito">
         <a href="/regioni">Regioni italiane a confronto</a>

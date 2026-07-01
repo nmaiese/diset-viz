@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_compress import Compress
 
 from app import config
@@ -13,6 +13,13 @@ cache.init_app(app)
 @app.after_request
 def add_security_headers(response):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    request_path = request.path
+    if (
+        request_path == "/data"
+        or request_path.startswith("/api/")
+        or request_path in {"/legacy", "/legacy-reddito"}
+    ):
+        response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
     return response
 
 

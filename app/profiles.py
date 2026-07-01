@@ -43,6 +43,29 @@ def is_core(item):
     return item["complete"] and item["year_max"] >= CORE_MIN_YEAR
 
 
+def is_gender_variant(item):
+    name = (item.get("name") or item.get("indicator") or "").lower()
+    return "(maschi)" in name or "(femmine)" in name
+
+
+def is_search_indexable_indicator(item):
+    """Indicator pages worth exposing to organic search and sitemap discovery."""
+    if is_gender_variant(item):
+        return False
+    if item.get("region_count") is None or item.get("completeness") is None:
+        catalog_item = next(
+            (entry for entry in get_catalog()["indicators"] if entry["id"] == item.get("id")),
+            None,
+        )
+        if catalog_item:
+            item = {**item, **catalog_item}
+    if item.get("region_count", len(item.get("regions", []))) < 20:
+        return False
+    if item.get("completeness", 0) < 0.98:
+        return False
+    return item.get("year_max", 0) >= 2020
+
+
 def slugify(value):
     """Accent-stripped, hyphen-collapsed slug for indicator and theme names."""
     value = unicodedata.normalize("NFKD", value or "").encode("ascii", "ignore").decode("ascii")

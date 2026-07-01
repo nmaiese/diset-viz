@@ -72,6 +72,7 @@
         <small>Esplora i dati</small>
         <strong>{{ post.indicator_label or 'Apri questo indicatore nell\'atlante' }}</strong>
       </span>
+      {% if post.indicator_path %}<a href="{{ post.indicator_path }}">Scheda indicatore →</a>{% endif %}
       <a href="/?indicator={{ post.indicator }}">Apri nell'atlante →</a>
     </aside>
     {% endif %}

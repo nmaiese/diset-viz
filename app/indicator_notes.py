@@ -198,6 +198,16 @@ CURATED_DIRECTION = {
     # sfavorevole (più adulti fermi a un titolo basso), quindi lower_better. Senza
     # questo override il nome "livello di istruzione" lo farebbe leggere al contrario.
     "104": "lower_better",
+    # Competenze INVALSI/PISA: la quota di studenti che NON raggiungono un livello
+    # sufficiente (617-626) è negativa, quindi lower_better (come 106/110 "scarse
+    # competenze"); la quota con competenze elevate (111/112) è positiva. Senza
+    # questi override l'euristica li lascia "contextual" e le pagine/i profili non
+    # esprimono la direzione, pur essendo interpretabile senza ambiguità.
+    "617": "lower_better", "618": "lower_better", "619": "lower_better",
+    "620": "lower_better", "621": "lower_better", "622": "lower_better",
+    "623": "lower_better", "624": "lower_better", "625": "lower_better",
+    "626": "lower_better",
+    "111": "higher_better", "112": "higher_better",
     # Lavoro (fix gender-gap indicators to lower_better; activity/entrepreneurship = positive)
     "398": "higher_better", "466": "higher_better", "61": "lower_better", "57": "lower_better",
     "402": "higher_better", "401": "higher_better", "203": "higher_better", "213": "higher_better",
@@ -228,6 +238,108 @@ CURATED_DIRECTION = {
 def direction_for(indicator_id, name):
     """Curated direction if available, otherwise the keyword heuristic."""
     return CURATED_DIRECTION.get(str(indicator_id)) or _direction(name)
+
+
+# --- SEO metadata helpers -------------------------------------------------
+# Indicator names come verbatim from Istat and are often very long (up to ~180
+# chars). Concatenated with " per regione (anni) · site" they produce SERP
+# titles and descriptions well past the ~60/155 char budgets, so Google
+# truncates them. These helpers build a compact, still-unique title and a
+# specific (data-derived) description within budget. They are page-only: the
+# atlas API keeps consuming the full name and the explain text unchanged.
+
+_TITLE_MAX = 60
+_DESC_MAX = 155
+_TITLE_TAIL = " per regione"
+# Trailing connector words that must never end a truncated title (would read like
+# "...della per regione" or the double "per per regione").
+_TRAILING_STOP = {
+    "per", "di", "del", "della", "dei", "delle", "degli", "e", "ed", "a", "ad",
+    "da", "dal", "dalla", "in", "nel", "nella", "su", "sul", "con", "tra", "fra",
+    "il", "lo", "la", "i", "gli", "le", "un", "una", "uno", "che", "al", "allo",
+    "alla", "ai", "agli", "alle", "sui", "come", "non", "o",
+}
+
+
+def _truncate_words(text, budget, add_period=False):
+    """Trim to at most `budget` chars on a word boundary (no ellipsis char).
+
+    Drops trailing punctuation and dangling connector words so the cut reads as a
+    finished fragment rather than a mid-phrase stub.
+    """
+    text = (text or "").strip()
+    if len(text) <= budget:
+        cut = text
+    else:
+        cut = text[:budget].rsplit(" ", 1)[0]
+    cut = cut.rstrip(" ,.;:-(")
+    words = cut.split()
+    while words and words[-1].lower() in _TRAILING_STOP:
+        words.pop()
+    cut = " ".join(words).rstrip(" ,.;:-(")
+    if add_period and cut and not cut.endswith("."):
+        cut = cut + "."
+    return cut
+
+
+def _variant_marker(name):
+    """Gender/total marker kept distinct so sibling variant titles stay unique."""
+    low = (name or "").lower()
+    for marker in ("femmine", "maschi", "totale"):
+        if f"({marker})" in low:
+            return f" ({marker})"
+    return ""
+
+
+def _short_name_for_title(name):
+    n = re.sub(r"^TAVOLA DISMESSA\s*-\s*", "", name or "", flags=re.I).strip()
+    # Keep only the concise head before a colon ("Quota...: Indennità" -> "Quota...").
+    n = n.split(":", 1)[0].strip()
+    # Drop parentheticals; the gender/total marker is re-added separately so it
+    # survives truncation instead of being cut off with the tail of a long name.
+    n = re.sub(r"\s*\([^)]*\)", "", n)
+    return re.sub(r"\s+", " ", n).strip()
+
+
+def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX):
+    """Compact SERP title: shortened name + variant marker + 'per regione'."""
+    marker = _variant_marker(name)
+    core = _short_name_for_title(name) or (name or "").strip()
+    core = core.rstrip(" ,.;:-(")  # a trailing comma/colon must not sit before the tail
+    suffix = f" · {site_name}"
+    with_tail = f"{core}{marker}{_TITLE_TAIL}"
+    # Short names: keep the "per regione" intent cue, add the brand if it still fits.
+    if len(with_tail) + len(suffix) <= max_len:
+        return with_tail + suffix
+    if len(with_tail) <= max_len:
+        return with_tail
+    # Long names: the name itself already carries the intent and, for sibling
+    # indicators, the distinguishing tail (agricoltura vs industria, assenza vs
+    # presenza). Spend the budget on the name, not on the " per regione" boilerplate.
+    body = f"{core}{marker}"
+    if len(body) <= max_len:
+        return body
+    return f"{_truncate_words(core, max_len - len(marker))}{marker}"
+
+
+def seo_description(plain, year_max, region_count, max_len=_DESC_MAX):
+    """SERP description from the data-derived plain text: keep whole sentences that
+    fit, then append the data vintage. Never cut a sentence to a dangling stub."""
+    base = (plain or "").strip()
+    tail = f" Dati Istat, {region_count} regioni, ultimo anno {year_max}."
+    room = max_len - len(tail)
+    sentences = re.split(r"(?<=\.)\s+", base) if base else []
+    kept = ""
+    for sentence in sentences:
+        candidate = f"{kept} {sentence}".strip() if kept else sentence
+        if len(candidate) <= room:
+            kept = candidate
+        else:
+            break
+    if not kept:
+        first = sentences[0] if sentences else base
+        kept = _truncate_words(first, room, add_period=True)
+    return kept + tail
 
 
 def build_indicator_explain(item):

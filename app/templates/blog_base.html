@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{{ site_name }}{% endblock %}</title>
     <meta name="description" content="{% block description %}Dati e analisi sul divario territoriale italiano.{% endblock %}">
+    {% block robots_meta %}
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    {% endblock %}
     <link rel="canonical" href="{{ canonical }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <meta property="og:site_name" content="{{ site_name }}">
