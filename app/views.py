@@ -422,18 +422,63 @@ def sitemap():
     return Response(xml, mimetype="application/xml")
 
 
+# Content-Signals preamble + AI-bot blocklist. These were previously injected by
+# Cloudflare's managed robots.txt; kept here so robots.txt has a single source of
+# truth after the Cloudflare managed injection is disabled (2026-07-01). To change
+# the Content-Signal policy or the AI-bot list, edit these constants.
+_ROBOTS_CONTENT_SIGNALS_PREAMBLE = """\
+# As a condition of accessing this website, you agree to abide by the following
+# content signals:
+
+# (a)  If a Content-Signal = yes, you may collect content for the corresponding
+#      use.
+# (b)  If a Content-Signal = no, you may not collect content for the
+#      corresponding use.
+# (c)  If the website operator does not include a Content-Signal for a
+#      corresponding use, the website operator neither grants nor restricts
+#      permission via Content-Signal with respect to the corresponding use.
+
+# The content signals and their meanings are:
+
+# search:   building a search index and providing search results (e.g., returning
+#           hyperlinks and short excerpts from your website's contents). Search does not
+#           include providing AI-generated search summaries.
+# ai-input: inputting content into one or more AI models (e.g., retrieval
+#           augmented generation, grounding, or other real-time taking of content for
+#           generative AI search answers).
+# ai-train: training or fine-tuning AI models.
+
+# ANY RESTRICTIONS EXPRESSED VIA CONTENT SIGNALS ARE EXPRESS RESERVATIONS OF
+# RIGHTS UNDER ARTICLE 4 OF THE EUROPEAN UNION DIRECTIVE 2019/790 ON COPYRIGHT
+# AND RELATED RIGHTS IN THE DIGITAL SINGLE MARKET."""
+
+_ROBOTS_CONTENT_SIGNAL = "search=yes,ai-train=no"
+_ROBOTS_AI_BOTS = (
+    "Amazonbot",
+    "Applebot-Extended",
+    "Bytespider",
+    "CCBot",
+    "ClaudeBot",
+    "CloudflareBrowserRenderingCrawler",
+    "Google-Extended",
+    "GPTBot",
+    "meta-externalagent",
+)
+# Machine endpoints and duplicate legacy dashboards kept out of the crawl.
+_ROBOTS_DISALLOW_PATHS = ("/api/", "/data", "/legacy", "/legacy-reddito")
+
+
 @app.route("/robots.txt")
 def robots():
-    body = (
-        "User-agent: *\n"
-        "Allow: /\n"
-        "Disallow: /api/\n"
-        "Disallow: /data\n"
-        "Disallow: /legacy\n"
-        "Disallow: /legacy-reddito\n"
-        f"Sitemap: {SITE_URL}/sitemap.xml\n"
-    )
-    return Response(body, mimetype="text/plain")
+    lines = [_ROBOTS_CONTENT_SIGNALS_PREAMBLE, ""]
+    # Single crawler group: content signals, then the path rules for all crawlers.
+    lines += ["User-agent: *", f"Content-Signal: {_ROBOTS_CONTENT_SIGNAL}", "Allow: /"]
+    lines += [f"Disallow: {path}" for path in _ROBOTS_DISALLOW_PATHS]
+    lines.append("")
+    for bot in _ROBOTS_AI_BOTS:
+        lines += [f"User-agent: {bot}", "Disallow: /", ""]
+    lines.append(f"Sitemap: {SITE_URL}/sitemap.xml")
+    return Response("\n".join(lines) + "\n", mimetype="text/plain")
 
 
 @app.route("/ads.txt")
