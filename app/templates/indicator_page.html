@@ -2,8 +2,15 @@
 {% set explain = meta.explain %}
 {% set desc = explain.plain ~ ' ' ~ explain.reading %}
 
-{% block title %}{{ meta.name }} per regione ({{ meta.year_min }}-{{ meta.year_max }}) · {{ site_name }}{% endblock %}
-{% block description %}{{ explain.plain }} Dati Istat per le 20 regioni italiane, ultimo anno {{ meta.year_max }}. Fonte: {{ meta.source }}.{% endblock %}
+{% block title %}{{ seo_title }}{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
+{% block robots_meta %}
+{% if not is_indexable %}
+<meta name="robots" content="noindex, follow">
+{% else %}
+{{ super() }}
+{% endif %}
+{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">
@@ -40,6 +47,9 @@
   <nav class="breadcrumb"><a href="/temi">Temi</a> / <a href="{{ theme_path }}">{{ meta.theme }}</a></nav>
   <h1>{{ meta.name }}</h1>
   <p class="page-lead">{{ explain.plain }}</p>
+  {% if not is_indexable %}
+  <p class="page-note">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante demografica da leggere insieme alla pagina principale.</p>
+  {% endif %}
 
   <div class="page-facts">
     <span><small>Tema</small><a href="{{ theme_path }}">{{ meta.theme }}</a></span>
@@ -87,6 +97,13 @@
       <strong>Mappa, serie storica anno per anno e confronti tra regioni nell'atlante</strong>
     </span>
     <a href="/?indicator={{ meta.id }}">Apri nell'atlante →</a>
+  </aside>
+  <aside class="indicator-cta">
+    <span>
+      <small>Continua il percorso</small>
+      <strong>Confronta questo indicatore con il tema {{ meta.theme }} e con gli altri profili territoriali.</strong>
+    </span>
+    <a href="{{ theme_path }}">Vai al tema →</a>
   </aside>
 </article>
 {% endblock %}

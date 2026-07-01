@@ -3,6 +3,7 @@ from app.cache import cache
 from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts
 from app.data import get_catalog, get_indicator, get_indicator_year, get_rows, search_indicators
 from app import profiles
+from app import indicator_notes
 from app import quality_life_bes as qb
 
 from flask import Response, abort, redirect, render_template, request, send_from_directory, url_for
@@ -123,6 +124,12 @@ def blog_post(slug):
     post = get_post(slug)
     if post is None:
         abort(404)
+    post = dict(post)
+    if post.get("indicator"):
+        indicator_payload = get_indicator(post["indicator"])
+        if indicator_payload:
+            meta = indicator_payload["metadata"]
+            post["indicator_path"] = profiles.indicator_path(post["indicator"], meta["name"])
     related = [p for p in get_posts() if p["slug"] != slug][:3]
     return render_template(
         "blog_post.html",
@@ -172,6 +179,7 @@ def indicator_page(slug):
     best = values[0] if values and scoreable else None
     worst = values[-1] if values and scoreable else None
 
+    plain = (meta.get("explain") or {}).get("plain", "")
     return render_template(
         "indicator_page.html",
         meta=meta,
@@ -179,6 +187,9 @@ def indicator_page(slug):
         best=best,
         worst=worst,
         year=year,
+        is_indexable=profiles.is_search_indexable_indicator(meta),
+        seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
+        seo_description=indicator_notes.seo_description(plain, meta["year_max"], len(meta["regions"])),
         theme_path=profiles.theme_path(meta["theme"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
@@ -400,6 +411,8 @@ def sitemap():
     for theme in profiles.all_themes_index():
         pages.append({"loc": f"{SITE_URL}{theme['path']}", "priority": "0.5"})
     for item in get_catalog()["indicators"]:
+        if not profiles.is_search_indexable_indicator(item):
+            continue
         pages.append({
             "loc": f"{SITE_URL}{profiles.indicator_path(item['id'], item['name'])}",
             "lastmod": f"{item['year_max']}-12-31",
@@ -411,7 +424,15 @@ def sitemap():
 
 @app.route("/robots.txt")
 def robots():
-    body = f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n"
+    body = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /api/\n"
+        "Disallow: /data\n"
+        "Disallow: /legacy\n"
+        "Disallow: /legacy-reddito\n"
+        f"Sitemap: {SITE_URL}/sitemap.xml\n"
+    )
     return Response(body, mimetype="text/plain")
 
 

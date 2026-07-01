@@ -24,6 +24,7 @@ class AppSmokeTest(unittest.TestCase):
 
         data = client.get("/data")
         self.assertEqual(data.status_code, 200)
+        self.assertIn("noindex", data.headers["X-Robots-Tag"])
         rows = data.get_json()
         self.assertGreater(len(rows), 0)
         self.assertIn("Indicatore", rows[0])
@@ -33,6 +34,7 @@ class AppSmokeTest(unittest.TestCase):
 
         catalog = client.get("/api/catalog")
         self.assertEqual(catalog.status_code, 200)
+        self.assertIn("noindex", catalog.headers["X-Robots-Tag"])
         catalog_payload = catalog.get_json()
         self.assertIn("featured_indicator_id", catalog_payload)
         self.assertGreater(len(catalog_payload["indicators"]), 0)
@@ -99,10 +101,13 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(sitemap.status_code, 200)
         self.assertIn("xml", sitemap.headers["Content-Type"])
         self.assertIn(b"/blog", sitemap.data)
+        self.assertNotIn(b"/data", sitemap.data)
 
         robots = client.get("/robots.txt")
         self.assertEqual(robots.status_code, 200)
         self.assertIn(b"Sitemap:", robots.data)
+        self.assertIn(b"Disallow: /api/", robots.data)
+        self.assertIn(b"Disallow: /data", robots.data)
 
         privacy = client.get("/privacy")
         self.assertEqual(privacy.status_code, 200)
@@ -151,6 +156,11 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b"/regione/lombardia", sitemap)
         self.assertIn(b"/tema/", sitemap)
         self.assertIn(b"/indicatore/", sitemap)
+        self.assertNotIn(b"/indicatore/264-aree-terrestri-protette", sitemap)
+
+        stale = client.get("/indicatore/264-aree-terrestri-protette")
+        self.assertEqual(stale.status_code, 200)
+        self.assertIn(b'name="robots" content="noindex, follow"', stale.data)
 
     def test_region_profile_is_coherent(self):
         from app import profiles
@@ -229,6 +239,10 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(direction_for("378", "Consumi di energia coperti da cogenerazione"), "higher_better")
         # Early school leaving is negative.
         self.assertEqual(direction_for("102", "Giovani che abbandonano"), "lower_better")
+        # INVALSI: share of students NOT reaching a sufficient level is negative.
+        self.assertEqual(direction_for("623", "Competenza alfabetica non adeguata"), "lower_better")
+        # Share of students with high competence is positive.
+        self.assertEqual(direction_for("111", "Studenti con elevate competenze in lettura"), "higher_better")
 
     def test_regions_map_data_matches_geometry(self):
         from app import profiles
@@ -347,6 +361,36 @@ class AppSmokeTest(unittest.TestCase):
         # allow_nan=False raises if any NaN/Infinity slipped into the payload,
         # which would make the browser's JSON.parse fail.
         json.dumps(get_catalog(), allow_nan=False)
+
+    def test_seo_metadata_within_budget(self):
+        from app.data import get_catalog
+        from app.indicator_notes import seo_title, seo_description
+
+        indicators = get_catalog()["indicators"]
+        for item in indicators:
+            title = seo_title(item["name"], "Divario Italia")
+            desc = seo_description(item["explain"]["plain"], item["year_max"], len(item["regions"]))
+            # SERP budgets: titles stay readable, descriptions are not truncated by Google.
+            self.assertLessEqual(len(title), 60, f"title too long for {item['id']}: {title}")
+            self.assertGreaterEqual(len(title), 8, f"title too short for {item['id']}: {title}")
+            self.assertLessEqual(len(desc), 155, f"desc too long for {item['id']}: {desc}")
+            self.assertEqual(title, title.strip())
+            self.assertNotIn(" per per ", title)  # no doubled connector before the tail
+            self.assertNotIn(", per regione", title)  # no dangling comma before the tail
+            # Title must not end on a dangling connector word.
+            last = title.replace(" · Divario Italia", "").split()[-1].lower()
+            self.assertNotIn(last, {"di", "del", "della", "dei", "delle", "per", "e", "a", "da", "in"}, title)
+            # Description keeps whole sentences and ends with the data vintage.
+            self.assertIn("Dati Istat", desc)
+            self.assertTrue(desc.rstrip().endswith("."), desc)
+
+        by_id = {i["id"]: i for i in indicators}
+        # Gender siblings (189 maschi / 190 femmine) must not collapse to one title.
+        if {"189", "190"} <= set(by_id):
+            self.assertNotEqual(
+                seo_title(by_id["189"]["name"], "Divario Italia"),
+                seo_title(by_id["190"]["name"], "Divario Italia"),
+            )
 
     def test_dataset_schema(self):
         dataset = Path(app.root_path) / "static" / "data" / "Assoluti_Regione.csv"
