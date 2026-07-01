@@ -105,9 +105,17 @@ class AppSmokeTest(unittest.TestCase):
 
         robots = client.get("/robots.txt")
         self.assertEqual(robots.status_code, 200)
-        self.assertIn(b"Sitemap:", robots.data)
-        self.assertIn(b"Disallow: /api/", robots.data)
-        self.assertIn(b"Disallow: /data", robots.data)
+        robots_text = robots.data.decode("utf-8")
+        self.assertIn("Sitemap:", robots_text)
+        self.assertIn("Disallow: /api/", robots_text)
+        self.assertIn("Disallow: /data", robots_text)
+        # Single source of truth (Cloudflare managed injection disabled): the
+        # content signals and AI-bot blocklist live in the app, and there must be
+        # exactly one "User-agent: *" group (no duplicate from a managed prepend).
+        self.assertIn("Content-Signal: search=yes,ai-train=no", robots_text)
+        self.assertIn("User-agent: ClaudeBot", robots_text)
+        self.assertIn("User-agent: Google-Extended", robots_text)
+        self.assertEqual(robots_text.count("User-agent: *"), 1)
 
         privacy = client.get("/privacy")
         self.assertEqual(privacy.status_code, 200)
