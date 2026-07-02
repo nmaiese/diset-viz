@@ -8,7 +8,7 @@ cover: /static/img/blog/tasso-di-occupazione-giovanile-15-29-anni.svg
 cover_alt: "Tasso di occupazione giovanile (15-29 anni) per regione (2024): da Trentino-Alto Adige (47,5) a Calabria (18,5). Grafico a barre."
 tags:
   - Lavoro e conciliazione dei tempi di vita
-indicator: 03LAV003P-N22
+indicator: 407
 indicator_label: "Tasso di occupazione giovanile (15-29 anni)"
 draft: false
 ---
@@ -60,4 +60,4 @@ Questo significa che, a parità di fascia d'età (15-29 anni), un giovane reside
    - **URL**: [https://ec.europa.eu/eurostat/web/lfs/data/database](https://ec.europa.eu/eurostat/web/lfs/data/database)
    - **Data di consultazione**: 2 luglio 2026
 
-*Per approfondire, esplora questo e gli altri indicatori nell'[atlante di Divario Italia](/?indicator=03LAV003P-N22) o sfoglia il tema [Lavoro](/tema/lavoro).*
+*Per approfondire, esplora questo e gli altri indicatori nell'[atlante di Divario Italia](/?indicator=407) o sfoglia il tema [Lavoro](/tema/lavoro).*
