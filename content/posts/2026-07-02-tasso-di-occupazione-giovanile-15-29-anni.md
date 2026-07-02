@@ -52,12 +52,12 @@ Questo significa che, a parità di fascia d'età (15-29 anni), un giovane reside
 
 1. **Istituto Nazionale di Statistica (ISTAT)**
    - **Titolo**: Tasso di occupazione per classe di età - 15-29 anni
-   - **URL**: https://www.istat.it/it/occupazione-e-disoccupazione
+   - **URL**: [https://www.istat.it/it/occupazione-e-disoccupazione](https://www.istat.it/it/occupazione-e-disoccupazione)
    - **Data di consultazione**: 2 luglio 2026
 
 2. **Eurostat**
    - **Titolo**: Regional labour market statistics - Employment and activity rates by age group (15-29 years)
-   - **URL**: https://ec.europa.eu/eurostat/web/lfs/data/database
+   - **URL**: [https://ec.europa.eu/eurostat/web/lfs/data/database](https://ec.europa.eu/eurostat/web/lfs/data/database)
    - **Data di consultazione**: 2 luglio 2026
 
-*Per approfondire come i dati socio-economici influenzano lo sviluppo dei territori, esplora gli altri indicatori su DISET.*
+*Per approfondire, esplora questo e gli altri indicatori nell'[atlante di Divario Italia](/?indicator=03LAV003P-N22) o sfoglia il tema [Lavoro](/tema/lavoro).*
