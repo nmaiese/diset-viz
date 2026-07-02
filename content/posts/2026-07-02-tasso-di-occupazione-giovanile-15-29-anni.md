@@ -10,7 +10,7 @@ tags:
   - Lavoro e conciliazione dei tempi di vita
 indicator: 03LAV003P-N22
 indicator_label: "Tasso di occupazione giovanile (15-29 anni)"
-draft: true
+draft: false
 ---
 
 L'accesso al mercato del lavoro per i giovani tra i 15 e i 29 anni non è un dato uniforme in Italia. I numeri del 2024 mostrano una frammentazione territoriale netta, dove la possibilità di trovare un'occupazione dipende drasticamente dalla regione di residenza.
