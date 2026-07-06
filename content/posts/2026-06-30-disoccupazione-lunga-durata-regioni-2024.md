@@ -1,5 +1,5 @@
 ---
-title: "Disoccupazione di lunga durata per regione: il divario nel 2024"
+title: "Disoccupazione di lunga durata per regione: il divario Nord-Sud"
 slug: disoccupazione-lunga-durata-regioni-2024
 description: "Nel 2024 la disoccupazione di lunga durata va dallo 0,5% del Trentino-Alto Adige all'11,0% della Campania. Oltre venti volte. I dati Istat per regione."
 date: 2026-06-30
@@ -38,7 +38,7 @@ Il dato da cui partire sono **11,0% contro 0,5%**. Tanto separa la Campania, dov
 - **Metodo:** dato di fonte diretta. Le medie tra regioni sono semplici, non pesate.
 - **Limite:** misura la durata della ricerca, non la qualità del lavoro trovato né lo scoraggiamento di chi smette di cercare.
 
-## Le regioni agli estremi
+## Dove il problema pesa di più
 
 Qui valori più bassi raccontano una situazione migliore. Nella posizione migliore
 c'è il Nord: Trentino-Alto Adige 0,5%, Veneto 0,9%, Valle d'Aosta 1,1%, Lombardia
@@ -78,7 +78,7 @@ Il confine resta però quello di sempre. Nel Mezzogiorno la quota media è 6,3%,
 Centro-Nord 1,7%: quasi quattro volte. La Campania, con l'11%, è un caso a sé,
 lontana anche dalle altre regioni del Sud.
 
-## Perché conta
+## Cosa segnala sul mercato del lavoro
 
 La disoccupazione di lunga durata è uno degli indicatori che meglio anticipano
 l'esclusione: chi resta fuori a lungo trova poi più difficile rientrare. Dove la
@@ -88,7 +88,7 @@ territorio di non lasciare indietro chi è già rimasto fuori.
 Puoi vedere l'indicatore anno per anno e regione per regione nell'[atlante di
 Divario Italia](/?indicator=17). Il tema è collegato ai [giovani
 NEET](/blog/neet-giovani-regioni-2024) e al [PIL pro capite per
-regione](/blog/pil-pro-capite-regioni-divario-2024); per il quadro completo guarda
+regione](/blog/pil-pro-capite-regioni-divario-2024). Per il quadro completo guarda
 il tema [Lavoro](/tema/lavoro).
 
 *Dati: Istat, "Indicatori territoriali per le politiche di sviluppo". Le medie

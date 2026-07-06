@@ -1,5 +1,5 @@
 ---
-title: "Quanti adulti si fermano alla licenza media? Il divario per regione (2024)"
+title: "Quanti adulti si fermano alla licenza media? Il divario per regione"
 slug: istruzione-adulti-licenza-media-divario-2024
 description: "Nel 2024 in Sicilia il 44% degli adulti 25-64 ha al più la licenza media, in Umbria il 24%. Un divario di istruzione che segue la linea Nord-Sud. Dati Istat."
 date: 2026-06-30
@@ -26,8 +26,8 @@ Il dato da cui partire sono **44,1% contro 24,3%**. Tanto separa la Sicilia, dov
 
 ## In breve
 
-- In Sicilia il 44,1% degli adulti 25-64 ha al più la licenza media; in Umbria il 24,3%.
-- I valori più alti — cioè più adulti fermi a un titolo basso — sono al Sud e nelle isole.
+- In Sicilia il 44,1% degli adulti 25-64 ha al più la licenza media. In Umbria il 24,3%.
+- I valori più alti, quindi più adulti fermi a un titolo basso, sono al Sud e nelle isole.
 - La media nazionale è scesa dal 38,1% del 2018 al 33,0% del 2024.
 
 ## Dati usati
@@ -46,7 +46,7 @@ licenza media significa una popolazione mediamente più istruita. È il contrari
 quello che il nome dell'indicatore può suggerire a una prima lettura, ed è il
 motivo per cui va guardato con attenzione.
 
-In testa per quota di adulti a basso titolo — quindi nella posizione più fragile —
+In testa per quota di adulti a basso titolo, quindi nella posizione più fragile,
 ci sono Sicilia (44,1%), Sardegna (43,7%), Puglia (43,2%), Campania (41,7%) e
 Calabria (38,7%). Nella posizione migliore, con le quote più basse, ci sono Umbria
 (24,3%), Lazio (25,2%), Friuli-Venezia Giulia (25,4%), Trentino-Alto Adige (27,1%)
@@ -75,7 +75,7 @@ fragilità lavorativa.
 
 ## Un divario che si riduce lentamente
 
-C'è un movimento positivo da registrare. Nel 2018 la media nazionale era 38,1%;
+C'è un movimento positivo da registrare. Nel 2018 la media nazionale era 38,1%,
 nel 2024 è scesa al 33,0%. Cinque punti in sei anni: le generazioni più giovani
 arrivano con titoli di studio più alti, e questo abbassa gradualmente la quota di
 adulti fermi alla licenza media in tutto il Paese.
@@ -88,7 +88,7 @@ Il punto è che la riduzione è lenta e parte da livelli molto diversi. Una regi
 che oggi è al 44% impiegherà anni a raggiungere i valori del Centro-Nord, anche
 mantenendo lo stesso ritmo di miglioramento.
 
-## Perché conta
+## Cosa cambia per lavoro e competenze
 
 Il livello di istruzione degli adulti è uno dei fattori che pesano di più sul
 resto: occupazione, tipo di lavoro, reddito, capacità di un territorio di

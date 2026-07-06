@@ -1,5 +1,5 @@
 ---
-title: "Giovani NEET per regione: il divario che si riduce ma non sparisce (2024)"
+title: "Giovani NEET per regione: il divario che si riduce ma non sparisce"
 slug: neet-giovani-regioni-2024
 description: "Nel 2024 in Calabria il 26,2% dei giovani non studia e non lavora, in Trentino-Alto Adige il 7,7%. Il dato è migliorato dal 2018, ma il divario resta. Dati Istat."
 date: 2026-06-30
@@ -36,12 +36,12 @@ Il dato da cui partire sono **26,2% contro 7,7%**. Tanto separa la Calabria, dov
 - **Territorio:** 20 regioni italiane.
 - **Unità:** percentuale di giovani NEET sul totale della stessa fascia d'età.
 - **Metodo:** dato di fonte diretta. La media tra regioni è semplice, non pesata.
-- **Limite:** la quota di NEET non distingue tra chi cerca attivamente lavoro e chi è scoraggiato; va letta insieme a occupazione e formazione.
+- **Limite:** la quota di NEET non distingue tra chi cerca attivamente lavoro e chi è scoraggiato. Va letta insieme a occupazione e formazione.
 
-## Le regioni agli estremi
+## Dove il disagio giovanile è più alto
 
 Qui valori più bassi raccontano una situazione migliore. In fondo alla classifica
-del disagio — cioè nella posizione migliore — c'è il Nord: Trentino-Alto Adige
+del disagio, cioè nella posizione migliore, c'è il Nord: Trentino-Alto Adige
 7,7%, Veneto 9,0%, Emilia-Romagna 9,6%, Piemonte 9,8%, Lombardia 10,1%. In cima
 al disagio il Sud: Calabria 26,2%, Sicilia 25,7%, Campania 24,9%, Puglia 21,4%.
 
@@ -59,13 +59,13 @@ al disagio il Sud: Calabria 26,2%, Sicilia 25,7%, Campania 24,9%, Puglia 21,4%.
 | Veneto | 9,0 |
 | Trentino-Alto Adige | 7,7 |
 
-Nelle tre regioni in cima — Calabria, Sicilia, Campania — circa un giovane su
+Nelle tre regioni in cima, Calabria, Sicilia e Campania, circa un giovane su
 quattro non studia e non lavora. Nelle tre in fondo è meno di uno su dieci. È lo
 stesso confine Nord-Sud che ritorna su quasi tutti gli indicatori del divario.
 
 ## La notizia buona, e quella che resta
 
-C'è un miglioramento reale da raccontare. Nel 2018 la media delle regioni era 22%;
+C'è un miglioramento reale da raccontare. Nel 2018 la media delle regioni era 22%,
 nel 2024 è scesa a 14,8%. Sono più di sette punti in sei anni, un calo che ha
 riguardato l'intero Paese, comprese le regioni del Sud che partivano da valori
 molto alti.
@@ -82,7 +82,7 @@ giovani NEET è 10,5%, nel Mezzogiorno 21,2%. **Il doppio.** È uno dei divari p
 larghi tra tutti gli indicatori territoriali, e riguarda proprio la fascia d'età
 da cui dipende il futuro di un territorio.
 
-## Perché conta
+## Cosa racconta sulle opportunità
 
 I NEET non sono un numero astratto: sono ragazze e ragazzi nella fase in cui si
 costruiscono competenze, relazioni e lavoro. Dove la quota è alta e stabile, il

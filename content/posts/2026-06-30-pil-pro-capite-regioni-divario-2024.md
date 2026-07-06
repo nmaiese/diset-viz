@@ -1,5 +1,5 @@
 ---
-title: "PIL pro capite per regione: il divario Nord-Sud nei dati 2024"
+title: "PIL pro capite per regione: il divario Nord-Sud"
 slug: pil-pro-capite-regioni-divario-2024
 description: "Nel 2024 il Trentino-Alto Adige produce 54.637 euro di PIL per abitante, la Calabria 21.702. Quasi due volte e mezzo. I dati Istat per regione."
 date: 2026-06-30
@@ -37,7 +37,7 @@ Il punto di partenza sono **54.637 euro contro 21.702 euro**. Tanto separa il Tr
 - **Metodo:** dato di fonte diretta. Le medie per area sono medie semplici tra regioni, non pesate per popolazione.
 - **Limite:** essendo a valori correnti, non è confrontabile nel tempo come misura di potere d'acquisto reale.
 
-## Le regioni agli estremi
+## Dove si produce più valore
 
 In cima ci sono i territori del Nord. Il Trentino-Alto Adige guida con 54.637
 euro per abitante, seguito dalla Lombardia con 50.399 e dalla Valle d'Aosta con
@@ -85,12 +85,12 @@ d'impresa può segnare un valore alto anche se parte di quel valore si redistrib
 altrove. Per leggere quanto resta davvero alle famiglie serve affiancare il reddito
 disponibile, un altro indicatore della stessa famiglia.
 
-## Perché conta
+## Cosa dice sul divario economico
 
 Dove il PIL pro capite è alto e stabile, di solito si appoggiano salari più alti,
 servizi più solidi e un mercato del lavoro più capace di assorbire i giovani.
-Dove è basso, le altre fragilità — disoccupazione di lunga durata, giovani che non
-studiano e non lavorano, emigrazione — tendono a presentarsi insieme.
+Dove è basso, le altre fragilità, dalla disoccupazione di lunga durata ai giovani che non
+studiano e non lavorano, tendono a presentarsi insieme.
 
 Puoi vedere l'indicatore anno per anno e regione per regione, con mappa e classifica,
 nell'[atlante di Divario Italia](/?indicator=901). Per il quadro completo della
