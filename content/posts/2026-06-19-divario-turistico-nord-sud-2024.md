@@ -1,5 +1,5 @@
 ---
-title: "Il divario turistico tra Nord e Sud Italia: cosa dicono i dati 2024"
+title: "Il divario turistico tra Nord e Sud Italia: cosa dicono i dati"
 slug: divario-turistico-nord-sud-2024
 description: "Nel 2024 il Trentino-Alto Adige registra 33 volte le presenze turistiche del Molise. Analisi del divario turistico tra le regioni italiane sui dati Istat."
 date: 2026-06-19
@@ -23,7 +23,7 @@ decenni.
 Il dato da cui partire sono **52,3 contro 1,6 giornate per abitante**. Tanto separa il Trentino-Alto Adige, primo in classifica, dal Molise, ultimo. In pratica un rapporto di 33 a 1.
 {: .data-callout}
 
-## Le regioni agli estremi
+## Dove il turismo pesa di più
 
 In cima c'è il Trentino-Alto Adige con 52,3 giornate per abitante, seguito dalla
 Valle d'Aosta con 30,1. Sono due territori di montagna, dove il turismo pesa
@@ -57,7 +57,7 @@ geografica.
 > Il divario turistico non separa solo il Nord dal Sud. Separa i territori che
 > hanno saputo costruire un'offerta dagli altri.
 
-## Perché conta
+## Cosa muove sul territorio
 
 Il turismo non è fatto solo di presenze. Porta con sé lavoro, indotto, servizi,
 manutenzione del territorio. Dove il tasso di turisticità è alto e stabile, ci si

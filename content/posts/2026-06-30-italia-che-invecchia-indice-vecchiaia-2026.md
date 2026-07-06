@@ -31,9 +31,9 @@ Il dato nazionale è di circa **233 anziani ogni 100 giovani**. Vent'anni fa, ne
 ## Dati usati
 
 - **Fonte:** Istat, Indicatori demografici.
-- **Periodo:** indice di vecchiaia ed età media all'1 gennaio 2026; figli per donna e saldo migratorio 2025.
+- **Periodo:** indice di vecchiaia ed età media all'1 gennaio 2026, figli per donna e saldo migratorio 2025.
 - **Territorio:** 20 regioni italiane.
-- **Unità:** anziani (65+) ogni 100 giovani (0-14); anni; numero medio di figli per donna; saldo per mille abitanti.
+- **Unità:** anziani (65+) ogni 100 giovani (0-14), anni, numero medio di figli per donna e saldo per mille abitanti.
 - **Metodo:** dati di fonte diretta. Le medie tra regioni sono semplici, non pesate.
 - **Limite:** è un indicatore di struttura, senza una direzione "buona" o "cattiva". Va letto insieme a natalità e migrazioni, non come una classifica di merito.
 
@@ -58,7 +58,7 @@ Campania (168,8) e Sicilia (192,0).
 | Trentino-Alto Adige | 168,5 |
 
 È un quadro diverso da quello economico. La Sardegna, regione del Sud, è la più
-anziana d'Italia; la Campania, anch'essa del Sud, è tra le più giovani. Qui contano
+anziana d'Italia. La Campania, anch'essa del Sud, è tra le più giovani. Qui contano
 soprattutto due forze: quanti bambini nascono e chi entra o esce dal territorio.
 
 Il dato che lo conferma è il confronto per blocchi: il Centro-Nord ha un indice
@@ -78,12 +78,12 @@ in arrivo, generazione dopo generazione.
 > L'invecchiamento non è un fenomeno solo del Sud o solo del Nord. È il risultato
 > di poche nascite e di movimenti di popolazione che cambiano da regione a regione.
 
-L'altra forza sono le migrazioni. Nel 2025 il saldo migratorio totale — chi arriva
-meno chi parte, ogni mille abitanti — è positivo quasi ovunque, ma molto diverso:
+L'altra forza sono le migrazioni. Nel 2025 il saldo migratorio totale, cioè chi arriva
+meno chi parte ogni mille abitanti, è positivo quasi ovunque, ma molto diverso:
 la Liguria segna +9,8, la Basilicata -2,3. Le regioni che attraggono popolazione
-rallentano l'invecchiamento; quelle da cui si parte lo accelerano.
+rallentano l'invecchiamento. Quelle da cui si parte lo accelerano.
 
-## Perché conta
+## Cosa cambia per servizi e territorio
 
 Una popolazione più anziana cambia tutto ciò che le sta intorno: la domanda di
 servizi sanitari e di cura, il numero di persone in età da lavoro, la tenuta dei

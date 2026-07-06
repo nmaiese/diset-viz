@@ -1,5 +1,5 @@
 ---
-title: "Speranza di vita per regione: quanto pesa il territorio nel 2025"
+title: "Speranza di vita per regione: quanto pesa il territorio"
 slug: speranza-di-vita-regioni-2025
 description: "Nel 2025 in Trentino-Alto Adige si vive in media 84,8 anni, in Campania 82,1. Due anni e mezzo di differenza tra regioni italiane. I dati Istat."
 date: 2026-06-30
@@ -27,7 +27,7 @@ Il dato da cui partire sono **84,8 anni contro 82,1**. Tanto separa il Trentino-
 
 - Trentino-Alto Adige in testa con 84,8 anni attesi alla nascita, Campania ultima con 82,1.
 - La media nazionale è 83,6 anni, in crescita dai 80,1 del 2002.
-- Le regioni del Centro-Nord stanno quasi tutte sopra la media; il Sud e le isole sotto.
+- Le regioni del Centro-Nord stanno quasi tutte sopra la media. Il Sud e le isole sotto.
 
 ## Dati usati
 
@@ -38,7 +38,7 @@ Il dato da cui partire sono **84,8 anni contro 82,1**. Tanto separa il Trentino-
 - **Metodo:** dato di fonte diretta. La media tra regioni è semplice, non pesata per popolazione.
 - **Limite:** è un valore medio. Non dice nulla sulle disuguaglianze interne a una regione né sulla qualità degli anni vissuti.
 
-## Le regioni agli estremi
+## Dove si vive più a lungo
 
 In testa ci sono le regioni del Centro-Nord. Trentino-Alto Adige a 84,8 anni,
 poi Veneto e Marche a 84,4, Lombardia e Toscana a 84,3. In fondo si concentra il
@@ -81,11 +81,11 @@ più deboli.
 C'è però una cosa che la speranza di vita racconta in modo diverso dagli
 indicatori economici. Aggregando le regioni, il Centro-Nord segna in media 84,1
 anni e il Mezzogiorno 83,0: poco più di un anno di distanza. Sul reddito il
-divario tra gli stessi due blocchi vale il 60%; sulla durata della vita si misura
+divario tra gli stessi due blocchi vale il 60%. Sulla durata della vita si misura
 in mesi. Il divario sanitario esiste, ma è molto più stretto di quello economico,
 e questo è un dato che vale la pena tenere a mente.
 
-## Perché conta
+## Cosa dice sulla salute dei territori
 
 Questo numero non è solo statistica. Tradotto, vuol dire che nascere in una regione
 o in un'altra cambia, in media, gli anni che ci si può attendere di vivere. È la

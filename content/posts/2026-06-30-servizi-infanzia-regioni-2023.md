@@ -1,5 +1,5 @@
 ---
-title: "Asili e servizi per l'infanzia: quanti bambini coperti, regione per regione (2023)"
+title: "Asili e servizi per l'infanzia: quanti bambini coperti, regione per regione"
 slug: servizi-infanzia-regioni-2023
 description: "Nel 2023 in Friuli-Venezia Giulia il 40,5% dei bambini sotto i 3 anni usa un servizio per l'infanzia, in Calabria il 5,9%. Il divario di accesso. Dati Istat."
 date: 2026-06-30
@@ -14,8 +14,8 @@ indicator: 414
 indicator_label: "Presa in carico servizi per l'infanzia (2023)"
 ---
 
-I servizi per la prima infanzia — nidi e servizi integrativi per i bambini fino a
-tre anni — sono uno dei pezzi più concreti del welfare locale. Dove ci sono e sono
+I servizi per la prima infanzia, nidi e servizi integrativi per i bambini fino a
+tre anni, sono uno dei pezzi più concreti del welfare locale. Dove ci sono e sono
 accessibili, cambiano la vita delle famiglie e la possibilità per i genitori, in
 particolare le madri, di lavorare. Nel 2023 la quota di bambini coperti cambia di
 quasi sette volte tra la prima e l'ultima regione.
@@ -38,7 +38,7 @@ Il dato da cui partire sono **40,5% contro 5,9%**. Tanto separa il Friuli-Venezi
 - **Metodo:** dato di fonte diretta. Le medie tra regioni sono semplici, non pesate.
 - **Limite:** misura la presa in carico, non la qualità, gli orari, i costi o le liste d'attesa del servizio.
 
-## Le regioni agli estremi
+## Dove il servizio arriva davvero
 
 Qui valori più alti raccontano una copertura migliore. In testa il Nord-Est e il
 Centro: Friuli-Venezia Giulia 40,5%, Emilia-Romagna 34,4%, Valle d'Aosta 34,0%,
@@ -59,7 +59,7 @@ Toscana 30,2%, Trentino-Alto Adige 29,7%. In fondo il Sud: Calabria 5,9%, Campan
 | Campania | 6,9 |
 | Calabria | 5,9 |
 
-Le regioni in testa superano l'obiettivo europeo di copertura; quelle in fondo
+Le regioni in testa superano l'obiettivo europeo di copertura. Quelle in fondo
 restano molto sotto. È un divario di servizi, non solo di reddito: dove il nido
 manca, manca una leva che altrove le famiglie danno per scontata.
 
@@ -78,7 +78,7 @@ Il confronto per blocchi lo conferma: 25,5% di copertura media nel Centro-Nord
 contro 12,8% nel Mezzogiorno, il doppio. È uno dei punti in cui il divario
 territoriale si trasforma in una differenza diretta di servizi disponibili.
 
-## Perché conta
+## Cosa significa per famiglie e lavoro
 
 L'accesso ai servizi per l'infanzia è uno dei pochi indicatori che lega
 direttamente welfare, lavoro e demografia. Dove la copertura è bassa, è più
