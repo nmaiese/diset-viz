@@ -26,10 +26,10 @@ Questo indicatore e uno dei termometri piu onesti della parita reale. Non guarda
 ## Che cosa misura davvero questo indicatore
 Il tasso di occupazione e la quota di persone che lavorano rispetto alla popolazione di riferimento in una certa fascia di eta. Quando calcoliamo la differenza tra il valore maschile e quello femminile otteniamo il divario di genere nell'occupazione, espresso in punti percentuali.
 
-Un esempio rende tutto piu chiaro. Nel 2024, nella fascia 20-64 anni, in Italia lavorava il 76,8 per cento degli uomini e il 57,4 per cento delle donne (ISTAT). La differenza tra i due valori, circa 19,4 punti, e esattamente il divario che questo indicatore fotografa. Non e un tasso di disoccupazione e non e il divario salariale. E qualcosa di piu radicale: misura chi entra nel mercato del lavoro e chi ne resta fuori del tutto.
+Un esempio rende tutto piu chiaro. A livello nazionale, nel 2024 in Italia lavorava circa il 76,8 per cento degli uomini e il 57,4 per cento delle donne nella fascia 20-64 anni (ISTAT ed Eurostat), con una differenza di circa 19,4 punti. I valori regionali dell'atlante, invece, sono calcolati sulla fascia 15-64 anni: le due popolazioni di riferimento non coincidono del tutto, ma la fotografia del divario resta la stessa. Non e un tasso di disoccupazione e non e il divario salariale. E qualcosa di piu radicale: misura chi entra nel mercato del lavoro e chi ne resta fuori del tutto.
 
 ## Il quadro regionale: i numeri di DISET
-I dati territoriali per il 2024 mostrano una penisola spaccata. Ecco i valori disponibili nell'atlante di Divario Italia, ordinati dal divario piu ampio al piu contenuto.
+I dati territoriali per il 2024 mostrano una penisola spaccata. Ecco tutte le regioni nell'atlante di Divario Italia (fascia 15-64 anni), ordinate dal divario piu ampio al piu contenuto.
 
 | Regione | Divario uomini-donne (punti percentuali) |
 | --- | --- |
@@ -45,6 +45,8 @@ I dati territoriali per il 2024 mostrano una penisola spaccata. Ecco i valori di
 | Liguria | 15,0 |
 | Toscana | 14,4 |
 | Sardegna | 14,2 |
+| Emilia-Romagna | 14,2 |
+| Lombardia | 14,0 |
 | Piemonte | 13,3 |
 | Umbria | 13,1 |
 | Friuli-Venezia Giulia | 11,6 |
