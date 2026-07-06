@@ -3,8 +3,9 @@
 This module is pure configuration: no logic. It declares the quality-of-life
 categories (each mapped to one or more Istat themes that already exist in the
 catalog) and the weight profiles that re-read the same scores under a different
-lens. The engine in ``app/quality_life.py`` consumes these tables and composes a
-ranking on top of the existing percentile machinery in ``app/profiles.py``.
+lens. The active engine is ``app/quality_life_bes.py`` (BES-based, parametrised on
+territorial level region|province); ``app/quality_life.py`` is the earlier
+regional engine. Both consume these tables on top of ``app/profiles.py``.
 
 Design rules:
 - Theme names in ``themes`` must match the Istat catalog *verbatim* (see the
@@ -19,25 +20,20 @@ Design rules:
 - Weights here are raw; the engine normalises them to sum to 1.0 and renormalises
   over the categories actually available for each region.
 
-PROVINCE ROADMAP (not implemented here, no data in the repo yet)
-----------------------------------------------------------------
-The categories below are deliberately territory-agnostic so they can be reused
-for a future provincial ranking. Moving to provinces (107 province e città
-metropolitane) will require, outside this file:
-- a new provincial dataset: Istat "BES dei Territori" (BesT) as the backbone,
-  plus the provincial tables of "Indicatori territoriali per le politiche di
-  sviluppo" for lavoro, sicurezza, servizi di cura, ambiente, acqua, rifiuti,
-  trasporti, cultura, digitale, turismo;
-- Istat province code mapping, name normalisation, città metropolitane handling;
-- provincial geometries (GeoJSON) for future maps;
-- a dedicated pipeline in ``scripts/`` (do not reuse the regional CSV schema);
-- parametrising the engine on a territorial level (region|province) so this
-  config and the profiles stay shared while only the percentile source changes;
+PROVINCE (implemented — regional atlas + provincial BES both live)
+------------------------------------------------------------------
+The categories below are deliberately territory-agnostic and are now reused for
+the provincial ranking too. Provinces are implemented, outside this file, via:
+- the provincial dataset ``app/static/data/Assoluti_Provincia.csv`` (Istat "BES
+  dei Territori" backbone);
+- the BES engine ``app/quality_life_bes.py``, parametrised on level region|province,
+  with ``app/quality_life_province.py`` for the provincial specifics;
 - routes ``/qualita-della-vita/province`` and
-  ``/qualita-della-vita/province/<slug>``;
-- a licence/freshness check on every source before publishing.
-Vertical sources (OMI, ISPRA/SNPA, INAIL, Ministero della Salute, AGCOM/Infratel,
-Ministero dell'Interno, Ministero della Giustizia) only in a later phase. Any
+  ``/qualita-della-vita/province/<slug>`` (see ``app/views.py``);
+- see ``docs/PROVINCE_PIPELINE.md`` for the ingestion pipeline.
+Still future work: additional provincial geometries/maps and the vertical
+sources below. Vertical sources (OMI, ISPRA/SNPA, INAIL, Ministero della Salute,
+AGCOM/Infratel, Ministero dell'Interno, Ministero della Giustizia) only in a later phase. Any
 methodological benchmark against the Sole 24 Ore / ItaliaOggi rankings must stay
 a separate section and never become a primary data source (CC BY-NC licence).
 """

@@ -9,9 +9,34 @@ from app import quality_life_bes as qb
 from flask import Response, abort, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
-import csv, json, os, re
+import csv, json, os, re, time
 
 from app import config
+
+
+def _client_ip():
+    """IP del client, rispettando X-Forwarded-For dietro il proxy Cloud Run."""
+    fwd = request.headers.get("X-Forwarded-For", "")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    return request.remote_addr or "unknown"
+
+
+def _rate_limit_ok(bucket, limit, window_s):
+    """Rate limit a finestra fissa, in-process, appoggiato alla cache dell'app.
+    Per-worker (leggermente lasco con più worker), senza dipendenze esterne né Redis:
+    sufficiente a frenare lo spam su un endpoint pubblico di logging."""
+    now = time.time()
+    key = f"rl:{bucket}"
+    entry = cache.get(key)
+    if entry is None or now - entry[0] >= window_s:
+        cache.set(key, (now, 1), timeout=window_s)
+        return True
+    start, count = entry
+    if count >= limit:
+        return False
+    cache.set(key, (start, count + 1), timeout=window_s)
+    return True
 
 
 @app.template_filter("it_num")
@@ -34,27 +59,27 @@ def get_all_data():
         data = list(reader)
     return data
 
-@cache.memoize(timeout=100)
 @app.route("/data")
+@cache.cached(timeout=100)
 def data():
     data = get_all_data()
     return jsonify(data)
 
 
-@cache.cached(timeout=300)
 @app.route("/")
+@cache.cached(timeout=300)
 def main():
     return render_template('app.html')
 
 
-@cache.cached(timeout=300)
 @app.route("/legacy")
+@cache.cached(timeout=300)
 def legacy():
     return render_template('legacy.html')
 
 
-@cache.cached(timeout=300)
 @app.route("/legacy-reddito")
+@cache.cached(timeout=300)
 def legacy_reddito():
     return render_template('legacy_reddito.html')
 
@@ -92,6 +117,10 @@ def indicator_year(indicator_id, year):
 
 @app.post("/api/events")
 def analytics_event():
+    # Endpoint pubblico che scrive nei log: senza limite è vulnerabile a spam/abuso.
+    if not _rate_limit_ok(f"events:{_client_ip()}", limit=30, window_s=60):
+        abort(429)
+
     payload = request.get_json(silent=True) or {}
     name = _clean_event_name(payload.get("name"))
     if not name:

@@ -427,5 +427,34 @@ class AppSmokeTest(unittest.TestCase):
         self.assertTrue(first_row["Dato"])
 
 
+class HardeningTest(unittest.TestCase):
+    def test_home_is_actually_cached(self):
+        """Con i decorator nell'ordine corretto, il corpo della view / non viene
+        ricomputato a ogni richiesta."""
+        from unittest import mock
+        from app import cache
+
+        cache.clear()
+        with mock.patch("app.views.render_template", return_value="OK") as rt:
+            client = app.test_client()
+            client.get("/")
+            client.get("/")
+            client.get("/")
+            self.assertEqual(rt.call_count, 1)
+
+    def test_events_rate_limited(self):
+        """L'endpoint pubblico /api/events blocca lo spam con 429 oltre la soglia."""
+        from app import cache
+
+        cache.clear()
+        client = app.test_client()
+        codes = [
+            client.post("/api/events", json={"name": "unit_test"}).status_code
+            for _ in range(35)
+        ]
+        self.assertEqual(codes.count(204), 30)
+        self.assertTrue(codes.count(429) >= 1)
+
+
 if __name__ == "__main__":
     unittest.main()

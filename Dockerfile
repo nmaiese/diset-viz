@@ -26,4 +26,6 @@ COPY --from=frontend-build /build/app/static/dist app/static/dist
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "gunicorn run:app -b 0.0.0.0:${PORT:-8080} --workers 2 --threads 8 --timeout 0"]
+# timeout FINITO (60s): un worker bloccato viene terminato e riavviato invece di
+# restare appeso per sempre (--timeout 0 disabilitava del tutto il watchdog).
+CMD ["sh", "-c", "gunicorn run:app -b 0.0.0.0:${PORT:-8080} --workers 2 --threads 8 --timeout 60 --graceful-timeout 30"]

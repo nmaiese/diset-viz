@@ -211,8 +211,19 @@ def get_catalog():
     }
 
 
+@cache.memoize(timeout=3600)
+def _rows_by_indicator():
+    """Indice righe-per-indicatore costruito UNA volta (memoizzato) invece di
+    filtrare tutte le ~110k righe a ogni chiamata di get_indicator()."""
+    index = defaultdict(list)
+    for row in get_rows():
+        index[row["id"]].append(row)
+    return dict(index)
+
+
+@cache.memoize(timeout=3600)
 def get_indicator(indicator_id):
-    rows = [row for row in get_rows() if row["id"] == indicator_id]
+    rows = _rows_by_indicator().get(indicator_id, [])
     if not rows:
         return None
 
