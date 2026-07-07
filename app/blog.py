@@ -2,7 +2,8 @@
 
 Drop a `.md` file in `content/posts/` and it is published automatically — this is
 the surface an AI agent writes to. Posts are server-rendered (Jinja) so they are
-fully crawlable and SEO-friendly.
+fully crawlable and SEO-friendly. Frontmatter supports optional `seo_title` when
+the browser title should be shorter than the visible H1.
 """
 
 import datetime as dt

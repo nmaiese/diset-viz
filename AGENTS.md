@@ -37,6 +37,12 @@ missed:
 - Only real, verified numbers from the indicators. Never invent figures. Link to
   the atlas via the `indicator` frontmatter field and `/?indicator=...` links.
 - SEO but natural: keyword in title and `description`, sensible headings, tags.
+- Use optional `seo_title` when the visible H1 is editorial but the SERP title
+  should be shorter or closer to the query.
+- Before publishing, fill a claim table with source, period, geography, unit,
+  transformation and confidence for every headline number.
+- Include a caveat, a methodology/source link, an atlas or indicator link, and a
+  concrete next step for the reader.
 
 The Markdown engine has `smarty` disabled, so `--`/`...` are not auto-converted.
 Keep the source clean.
@@ -44,6 +50,15 @@ Keep the source clean.
 Before publishing article batches, run `rg -n "[—–;]" content/posts` and inspect
 repeated H2 sequences. For templates, frontend strings and SVG text, distinguish
 visible copy from CSS, JS, JSON-LD and CSV syntax.
+
+## Technical SEO checks
+
+- `www.divarioitalia.it` must redirect to `https://divarioitalia.it` with `301`.
+- Public 404 pages must be HTML, useful, and `noindex, follow`.
+- API and data endpoints must carry `X-Robots-Tag: noindex, nofollow, noarchive`.
+- `Strict-Transport-Security`, canonical, OG/Twitter tags, sitemap and robots
+  must be checked after SEO changes.
+- JSON-LD must match visible content. Do not add schema only for rich results.
 
 ## Adding indicators or datasets
 

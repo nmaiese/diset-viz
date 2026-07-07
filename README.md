@@ -38,6 +38,7 @@ data-driven blog and quality-of-life rankings for regions and provinces.
 
 - `/` serves the React atlas (single-page app).
 - `/blog` and `/blog/<slug>` are server-rendered (Jinja) for SEO.
+- `/metodologia` explains sources, method and limits for the atlas.
 - `/qualita-della-vita`, `/qualita-della-vita/classifica` and
   `/qualita-della-vita/metodologia` serve the regional quality-of-life section.
 - `/qualita-della-vita/province` serves the provincial quality-of-life ranking
@@ -58,6 +59,7 @@ YAML frontmatter:
 ```markdown
 ---
 title: "Headline (keep it SEO-friendly)"
+seo_title: "Short SERP title if different from the H1"
 slug: optional-custom-slug          # otherwise derived from the filename
 description: "Meta description, ~155 chars, used for SEO and Open Graph."
 date: 2026-06-19
@@ -79,6 +81,10 @@ See `content/posts/2026-06-19-divario-turistico-nord-sud-2024.md` for a full
 example, and [`content/STYLE.md`](content/STYLE.md) for the editorial style
 (human voice, no em-dashes/semicolons, real data only). Agents should also read
 `CLAUDE.md` / `AGENTS.md`.
+
+Before publishing, agents must leave a claim table, source/method note, internal
+links to methodology and the atlas, caveat, next step, metadata and schema
+candidate.
 
 ## Data
 

@@ -57,13 +57,20 @@ automatico.
 - Cita la fonte (Istat) e spiega in una riga come hai calcolato eventuali medie.
 - Collega l'articolo all'atlante: imposta `indicator` nel frontmatter e inserisci
   link interni come `[testo](/?indicator=105&year=2024)`.
+- Prima di pubblicare, prepara una claim table anche se non entra nel testo:
+  claim, fonte, periodo, territorio, unita, trasformazione e confidenza.
+- Se usi una seconda fonte di contesto, deve essere autorevole e verificata. Se
+  non esiste una seconda fonte pertinente, dichiaralo invece di inventarla.
 
 ## SEO (mantienila, ma naturale)
 
 - Titolo con la keyword principale all'inizio, possibilmente entro 60 caratteri.
 - `description` di 150-160 caratteri, naturale, con la keyword.
+- `seo_title` opzionale per tenere il tag `<title>` piu corto dell'H1.
 - Sottotitoli `##` e `###` sensati, con varianti della keyword senza forzature.
 - Tag pertinenti (2-4).
+- Schema candidate solo se il contenuto e visibile in pagina. Niente FAQ o
+  Dataset schema di riempimento.
 
 ## Controlli prima di pubblicare
 
@@ -76,6 +83,9 @@ anche il testo visibile, ma ignora i punti e virgola di CSS, JS, JSON-LD e CSV.
 
 Controlla anche che non ci siano sequenze identiche di H2 tra piu articoli. I
 blocchi `In breve` e `Dati usati` possono ripetersi, gli H2 interpretativi no.
+
+Controlla infine: link a metodologia o fonte, link a indicatore o tema, caveat,
+next step concreto, title/description/H1 coerenti e non identici.
 
 ## Frontmatter
 

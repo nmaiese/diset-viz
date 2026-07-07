@@ -63,6 +63,12 @@ editorial voice. The non-negotiable rules:
   `/?indicator=105&year=2024`.
 - Keep it SEO-friendly but natural: keyword in the title and description, sensible
   `##`/`###` headings, relevant tags.
+- Use optional `seo_title` when the visible H1 should stay editorial but the
+  browser title should be shorter or closer to the search query.
+- Before publishing, leave a claim table with source, period, geography, unit,
+  transformation and confidence for every headline number.
+- Include a caveat, methodology/source link, atlas or indicator link, schema
+  candidate, and concrete next step for the reader.
 
 The Markdown engine has `smarty` disabled on purpose, so `--` and `...` are NOT
 converted into typographic dashes or ellipses. Keep the source text clean.
@@ -87,6 +93,9 @@ the regional CSV or `app/data.py`.
 ## Constraints
 
 - Do not break `/legacy` or the data schema (`tests/test_app.py` guards both).
+- Keep technical SEO intact: apex canonical host, public 404 HTML `noindex`,
+  API/data `X-Robots-Tag`, HSTS, sitemap of canonical public URLs, and JSON-LD
+  only where the visible page supports it.
 - Keep the cartographic identity (see `frontend/src/styles.css` and
   `app/static/css/site.css`): navy `#15233b`, paper `#fbfaf7`, single accent
   `#e4572e`, fonts Archivo / Inter / Space Mono.
