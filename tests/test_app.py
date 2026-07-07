@@ -12,7 +12,10 @@ class AppSmokeTest(unittest.TestCase):
         home = client.get("/")
         self.assertEqual(home.status_code, 200)
         self.assertEqual(home.headers["Referrer-Policy"], "strict-origin-when-cross-origin")
+        self.assertEqual(home.headers["Strict-Transport-Security"], "max-age=31536000; includeSubDomains")
         self.assertIn(b'id="root"', home.data)
+        self.assertIn(b"/metodologia", home.data)
+        self.assertIn(b"Indicatori territoriali in evidenza", home.data)
 
         legacy = client.get("/legacy")
         self.assertEqual(legacy.status_code, 200)
@@ -91,8 +94,12 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(post.status_code, 200)
         self.assertIn(b"application/ld+json", post.data)
         self.assertIn(b'property="og:type" content="article"', post.data)
+        self.assertIn(b"/static/img/", post.data)
 
-        self.assertEqual(client.get("/blog/does-not-exist").status_code, 404)
+        missing = client.get("/blog/does-not-exist")
+        self.assertEqual(missing.status_code, 404)
+        self.assertIn(b"Pagina non trovata", missing.data)
+        self.assertIn(b'content="noindex, follow"', missing.data)
 
     def test_seo_routes(self):
         client = app.test_client()
@@ -101,6 +108,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(sitemap.status_code, 200)
         self.assertIn("xml", sitemap.headers["Content-Type"])
         self.assertIn(b"/blog", sitemap.data)
+        self.assertIn(b"/metodologia", sitemap.data)
         self.assertNotIn(b"/data", sitemap.data)
 
         robots = client.get("/robots.txt")
@@ -120,6 +128,29 @@ class AppSmokeTest(unittest.TestCase):
         privacy = client.get("/privacy")
         self.assertEqual(privacy.status_code, 200)
         self.assertIn(b"Privacy e cookie", privacy.data)
+
+        methodology = client.get("/metodologia")
+        self.assertEqual(methodology.status_code, 200)
+        self.assertIn(b"Metodologia e fonti", methodology.data)
+        self.assertIn(b"application/ld+json", methodology.data)
+
+    def test_canonical_host_and_public_404(self):
+        client = app.test_client()
+
+        redirect = client.get("/", base_url="https://www.divarioitalia.it", follow_redirects=False)
+        self.assertEqual(redirect.status_code, 301)
+        self.assertEqual(redirect.headers["Location"], "https://divarioitalia.it/")
+        self.assertEqual(redirect.headers["Strict-Transport-Security"], "max-age=31536000; includeSubDomains")
+
+        missing = client.get("/pagina-che-non-esiste")
+        self.assertEqual(missing.status_code, 404)
+        self.assertIn(b"Pagina non trovata", missing.data)
+        self.assertIn("noindex", missing.headers["X-Robots-Tag"])
+
+        api_missing = client.get("/api/indicator/not-found")
+        self.assertEqual(api_missing.status_code, 404)
+        self.assertIn("noindex", api_missing.headers["X-Robots-Tag"])
+        self.assertEqual(api_missing.get_json()["error"], "not_found")
 
     def test_seo_landing_pages(self):
         from app.data import get_catalog

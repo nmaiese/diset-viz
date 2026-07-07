@@ -1,0 +1,73 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'metodologia' %}
+
+{% block title %}Metodologia e fonti | {{ site_name }}{% endblock %}
+{% block description %}Metodo, fonti e limiti di Divario Italia: indicatori territoriali Istat, copertura regionale, pagine indicatore e classifiche qualità della vita.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Metodologia e fonti",
+  "description": "Metodo, fonti e limiti di Divario Italia.",
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": {{ site_name | tojson }}, "url": "{{ site_url }}/" },
+  "about": [
+    { "@type": "Thing", "name": "indicatori territoriali" },
+    { "@type": "Thing", "name": "dati Istat" }
+  ],
+  "isAccessibleForFree": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Metodologia", "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page prose-wrap">
+  <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
+  <h1>Metodologia e fonti</h1>
+  <p class="page-lead">Divario Italia usa dati territoriali pubblici per rendere confrontabili regioni, temi e indicatori. Ogni pagina deve permettere di capire che cosa misura il dato, da dove arriva, quale anno copre e quali limiti ha.</p>
+
+  <section>
+    <h2>Fonte principale</h2>
+    <p>La fonte primaria dell'atlante è la Banca dati territoriale per le politiche di sviluppo di Istat. Le pagine indicatore riportano il nome dell'indicatore, il tema, l'unita di misura, l'ultimo anno disponibile, la copertura territoriale e la definizione leggibile.</p>
+    <p><a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Consulta la fonte Istat</a>.</p>
+  </section>
+
+  <section>
+    <h2>Come leggere gli indicatori</h2>
+    <p>Le schede indicatore mostrano il confronto tra territori e, quando i dati lo consentono, una serie storica. Le classifiche usano la direzione dell'indicatore solo quando il significato è chiaro: per alcuni dati un valore più alto è positivo, per altri è negativo, per altri ancora serve solo contesto.</p>
+    <p>Le pagine fuori soglia di qualità non vengono spinte in sitemap quando l'indicatore è troppo vecchio, incompleto o duplicativo rispetto a una pagina migliore.</p>
+  </section>
+
+  <section>
+    <h2>Qualità della vita</h2>
+    <p>La sezione qualità della vita è una sintesi autonoma basata sugli indicatori BES dei Territori Istat. Usa categorie curate, pesi dichiarati e normalizzazione tra territori. Non sostituisce le graduatorie editoriali di altri soggetti e non pretende di definire da sola il benessere di un territorio.</p>
+    <p><a href="/qualita-della-vita/metodologia">Leggi la metodologia della classifica qualità della vita</a>.</p>
+  </section>
+
+  <section>
+    <h2>Limiti</h2>
+    <p>I dati possono avere anni diversi, coperture diverse e interruzioni di serie. Un confronto territoriale descrive una differenza osservata, non dimostra da solo una causa. Quando un articolo interpreta un divario, deve distinguere il dato dalla spiegazione.</p>
+  </section>
+
+  <aside class="indicator-cta">
+    <span>
+      <small>Esplora i dati</small>
+      <strong>Apri regioni, temi o indicatori dell'atlante</strong>
+    </span>
+    <a href="/regioni">Regioni</a>
+    <a href="/temi">Temi</a>
+  </aside>
+</article>
+{% endblock %}

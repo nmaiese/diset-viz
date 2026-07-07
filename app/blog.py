@@ -74,6 +74,7 @@ def _load_post(path):
     return {
         "slug": slug,
         "title": title,
+        "seo_title": (meta.get("seo_title") or "").strip(),
         "description": _excerpt(meta, body_html),
         "date": _coerce_date(meta.get("date")) or dt.date.today(),
         "author": (meta.get("author") or SITE_NAME).strip(),

@@ -14,6 +14,9 @@ import csv, json, os, re, time
 from app import config
 
 
+_HOME_FEATURED_INDICATORS = ("901", "104", "105", "910")
+
+
 def _client_ip():
     """IP del client, rispettando X-Forwarded-For dietro il proxy Cloud Run."""
     fwd = request.headers.get("X-Forwarded-For", "")
@@ -69,7 +72,7 @@ def data():
 @app.route("/")
 @cache.cached(timeout=300)
 def main():
-    return render_template('app.html')
+    return render_template('app.html', featured_indicators=_home_featured_indicator_links())
 
 
 @app.route("/legacy")
@@ -177,6 +180,16 @@ def privacy():
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/privacy",
+    )
+
+
+@app.route("/metodologia")
+def methodology():
+    return render_template(
+        "methodology.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/metodologia",
     )
 
 
@@ -421,6 +434,7 @@ def sitemap():
     pages = [
         {"loc": f"{SITE_URL}/", "priority": "1.0"},
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
+        {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
@@ -522,6 +536,23 @@ def ads_txt():
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'img/favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+
+def _home_featured_indicator_links():
+    by_id = {str(item["id"]): item for item in get_catalog()["indicators"]}
+    featured = []
+    for indicator_id in _HOME_FEATURED_INDICATORS:
+        item = by_id.get(indicator_id)
+        if not item or not profiles.is_search_indexable_indicator(item):
+            continue
+        featured.append({
+            "name": item["name"],
+            "theme": item["theme"],
+            "year": item["year_max"],
+            "path": profiles.indicator_path(item["id"], item["name"]),
+            "summary": (item.get("explain") or {}).get("plain", ""),
+        })
+    return featured
 
 
 def _clean_event_name(value):

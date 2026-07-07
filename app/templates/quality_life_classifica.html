@@ -6,7 +6,7 @@
 {% set lvl_label = 'province' if is_prov else 'regioni' %}
 
 {% block title %}Classifica qualità della vita per {{ lvl_label }}, profilo {{ p.name }} | {{ site_name }}{% endblock %}
-{% block description %}Classifica della qualità della vita nelle {{ lvl_label }} italiane (BES dei Territori Istat) con il profilo {{ p.name }}: punteggi da 0 a 100 su {{ m.total_indicators }} indicatori, con campioni per categoria e movimento per profilo.{% endblock %}
+{% block description %}Classifica qualità della vita per {{ lvl_label }}: punteggi 0-100 su indicatori BES Istat, profilo {{ p.name }}, categorie e metodo trasparenti.{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">

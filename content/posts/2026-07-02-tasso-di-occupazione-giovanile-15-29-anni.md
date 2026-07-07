@@ -1,6 +1,7 @@
 ---
 title: "L'Italia dei giovani: il divario nell'occupazione tra Nord e Sud"
-description: "L'accesso al mercato del lavoro per i giovani tra i 15 e i 29 anni non è un dato uniforme in Italia."
+seo_title: "Occupazione giovanile 15-29 anni per regione"
+description: "Nel 2024 il tasso di occupazione 15-29 anni va dal 47,5% del Trentino-Alto Adige al 18,5% della Calabria. Dati Istat per regione."
 slug: tasso-di-occupazione-giovanile-15-29-anni
 date: 2026-07-02
 author: "Redazione Divario Italia"
@@ -13,7 +14,7 @@ indicator_label: "Tasso di occupazione giovanile (15-29 anni)"
 draft: false
 ---
 
-L'accesso al mercato del lavoro per i giovani tra i 15 e i 29 anni non è un dato uniforme in Italia. I numeri del 2024 mostrano una frammentazione territoriale netta, dove la possibilità di trovare un'occupazione dipende drasticamente dalla regione di residenza.
+L'accesso al mercato del lavoro per i giovani tra i 15 e i 29 anni non è un dato uniforme in Italia. I numeri del 2024 mostrano una frammentazione territoriale netta: il tasso di occupazione cambia molto da una regione all'altra.
 
 ### In breve
 - **Il primato del Nord**: Il Trentino-Alto Adige guida la classifica con il tasso di occupazione più alto (47,5%).
@@ -33,18 +34,18 @@ Il **Trentino-Alto Adige** si posiziona al vertice con il **47,5%**, seguito da 
 
 Scendendo lungo la penisola e spostandosi verso il Centro, i tassi iniziano a calare. Il **Friuli-Venezia Giulia** registra il 39,3%, mentre le **Marche** si attestano al 38,7%. La **Liguria** scende al 37,1% e l'**Umbria** al 35,6%. 
 
-Il dato del **Lazio**, con il **31,7%**, segna l'ingresso in una zona di criticità più profonda, anticipando il crollo che si osserva nell'estremo Sud.
+Il dato del **Lazio**, con il **31,7%**, segna l'ingresso in una zona di criticità più profonda, anticipando il calo che si osserva nell'estremo Sud.
 
 ### Il peso del divario territoriale
 Il dato più allarmante non è il singolo valore regionale, ma la distanza tra gli estremi. Se in Trentino-Alto Adige l'occupazione giovanile sfiora il 48%, in **Calabria** il valore precipita al **18,5%**.
 
-Questo significa che, a parità di fascia d'età (15-29 anni), un giovane residente al Nord ha probabilità di essere occupato quasi tre volte superiori rispetto a un coetaneo calabrese. Un divario di 2,6 a 1 che non riflette solo differenze di mercato, ma una vera e propria frattura strutturale nelle opportunità di inserimento lavorativo.
+Questo significa che, nella fascia 15-29 anni, la quota di giovani occupati in Trentino-Alto Adige è oltre due volte e mezza quella della Calabria. Il divario non spiega da solo le cause, ma segnala una frattura osservabile nelle opportunità territoriali di inserimento lavorativo.
 
 ### Dati usati
 - **Indicatore**: Tasso di occupazione giovanile (15-29 anni)
 - **Anno**: 2024
 - **Unità di misura**: Percentuale (%)
-- **Fonte**: Dataset DISET (Dati regionali forniti)
+- **Fonte**: Divario Italia, elaborazione da indicatori territoriali Istat
 
 ---
 

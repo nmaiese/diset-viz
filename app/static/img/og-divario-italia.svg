@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Divario Italia</title>
+  <desc id="desc">Atlante degli indicatori territoriali italiani</desc>
+  <rect width="1200" height="630" fill="#f6f3ed"/>
+  <rect x="72" y="72" width="1056" height="486" rx="28" fill="#ffffff" stroke="#1d3557" stroke-width="4"/>
+  <g transform="translate(112 118)">
+    <rect width="112" height="112" rx="16" fill="#1d3557"/>
+    <text x="56" y="72" font-family="Arial, sans-serif" font-size="44" font-weight="700" text-anchor="middle" fill="#ffffff">DI</text>
+  </g>
+  <text x="112" y="300" font-family="Arial, sans-serif" font-size="78" font-weight="700" fill="#111827">Divario Italia</text>
+  <text x="112" y="372" font-family="Arial, sans-serif" font-size="34" fill="#374151">Indicatori territoriali, regioni, temi e serie storiche</text>
+  <g transform="translate(112 430)" fill="none" stroke-width="20" stroke-linecap="round">
+    <path d="M0 58 C90 24 170 92 260 48 S430 14 520 56" stroke="#e63946"/>
+    <path d="M0 108 C90 72 170 132 260 94 S430 72 520 114" stroke="#2a9d8f"/>
+    <path d="M0 158 C90 128 170 166 260 142 S430 124 520 154" stroke="#f4a261"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="24" fill="#374151">
+    <text x="760" y="442">Dati Istat</text>
+    <text x="760" y="486">Confronti territoriali</text>
+    <text x="760" y="530">Metodologia trasparente</text>
+  </g>
+</svg>

@@ -2,7 +2,7 @@
 {% set active_nav = 'qualita-della-vita' %}
 
 {% block title %}Qualità della vita nelle regioni italiane | {{ site_name }}{% endblock %}
-{% block description %}Classifica trasparente della qualità della vita nelle regioni italiane basata su indicatori Istat. Confronta reddito, lavoro, salute, ambiente, sicurezza, istruzione e servizi.{% endblock %}
+{% block description %}Classifica qualità della vita nelle regioni italiane su indicatori Istat: reddito, lavoro, salute, ambiente, istruzione, servizi e metodo trasparente.{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">
@@ -50,7 +50,7 @@
     <p class="page-note">Ogni profilo dà un peso diverso alle categorie. Cambiando profilo cambia la classifica. È proprio quello che vogliamo rendere visibile, quanto una graduatoria dipenda dalle scelte di chi la costruisce.</p>
     <div class="quality-grid">
       {% for profile in profiles %}
-      <a class="quality-card" href="/qualita-della-vita/classifica{{ '' if profile.slug == default_profile else '?profilo=' ~ profile.slug }}">
+      <a class="quality-card" href="/qualita-della-vita/classifica/regioni{{ '' if profile.slug == default_profile else '?profilo=' ~ profile.slug }}">
         <h3>{{ profile.name }}</h3>
         <p>{{ profile.description }}</p>
         <span class="quality-card__cta">Vedi la classifica con questo profilo</span>
