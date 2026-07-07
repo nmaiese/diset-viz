@@ -22,6 +22,6 @@
     <text x="564" y="518" font-size="20" fill="#e4572e" text-anchor="start" font-family="'Space Mono', monospace">5,9%</text>
   </g>
   <line x1="56" y1="560" x2="1144" y2="560" stroke="rgba(21,35,59,0.16)"/>
-  <text x="56" y="592" font-size="18" font-family="'Space Mono', monospace" fill="#6b7785">Fonte: Istat — Indicatori territoriali per le politiche di sviluppo</text>
+  <text x="56" y="592" font-size="18" font-family="'Space Mono', monospace" fill="#6b7785">Fonte: Istat, Indicatori territoriali per le politiche di sviluppo</text>
   <text x="1144" y="592" font-size="18" font-weight="700" fill="#15233b" text-anchor="end">divarioitalia.it</text>
 </svg>

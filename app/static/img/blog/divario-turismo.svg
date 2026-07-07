@@ -35,6 +35,6 @@
   </g>
 
   <line x1="56" y1="560" x2="1144" y2="560" stroke="rgba(21,35,59,0.16)"/>
-  <text x="56" y="592" font-size="18" font-family="'Space Mono', monospace" fill="#6b7785">Fonte: Istat — Indicatori territoriali per le politiche di sviluppo</text>
+  <text x="56" y="592" font-size="18" font-family="'Space Mono', monospace" fill="#6b7785">Fonte: Istat, Indicatori territoriali per le politiche di sviluppo</text>
   <text x="1144" y="592" font-size="18" font-weight="700" fill="#15233b" text-anchor="end" font-family="Archivo, Arial, sans-serif">divarioitalia.it</text>
 </svg>

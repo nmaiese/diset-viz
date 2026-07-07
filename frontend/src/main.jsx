@@ -37,7 +37,7 @@ const tabs = [
 const SORTS = [
   { id: "complete", label: "Completezza" },
   { id: "recent", label: "Più recente" },
-  { id: "az", label: "A–Z" },
+  { id: "az", label: "A-Z" },
   { id: "theme", label: "Tema" },
 ];
 
@@ -241,7 +241,7 @@ function App() {
 function SiteHeader({ children }) {
   return (
     <header className="masthead">
-      <a className="brand" href="/" aria-label="Divario Italia — home">
+      <a className="brand" href="/" aria-label="Divario Italia, home">
         <span className="brand-mark">DI</span>
         <span className="brand-text">
           <strong>Divario Italia</strong>
@@ -494,7 +494,7 @@ function CommandBar({
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Cerca: turismo, occupazione, rifiuti, banda larga…"
+          placeholder="Cerca turismo, occupazione, rifiuti, banda larga"
           aria-label="Cerca un indicatore"
         />
       </label>
@@ -604,7 +604,7 @@ function CoverageBadge({ item }) {
   return (
     <span className="coverage">
       <span className="coverage__pill">{item.region_count} reg.</span>
-      <span className="coverage__pill">{item.year_min}–{item.year_max}</span>
+      <span className="coverage__pill">{item.year_min}-{item.year_max}</span>
       {item.complete ? (
         <span className="coverage__pill is-complete"><Check size={12} /> completo</span>
       ) : (
@@ -798,8 +798,8 @@ function IndicatorHeader({ metadata, regionCount }) {
         </p>
       )}
       <dl>
-        <div><dt>Unità di misura</dt><dd>{metadata.unit || "—"}</dd></div>
-        <div><dt>Copertura</dt><dd>{metadata.year_min}–{metadata.year_max}</dd></div>
+        <div><dt>Unità di misura</dt><dd>{metadata.unit || "n.d."}</dd></div>
+        <div><dt>Copertura</dt><dd>{metadata.year_min}-{metadata.year_max}</dd></div>
         <div><dt>Regioni</dt><dd>{regionCount || metadata.regions.length}/20</dd></div>
         <div><dt>Fonte</dt><dd>{metadata.source_url ? (<a href={metadata.source_url} target="_blank" rel="noreferrer">{metadata.source_label || metadata.source}</a>) : (metadata.source_label || metadata.source)}</dd></div>
       </dl>
@@ -858,12 +858,12 @@ function InsightPanel({ insights, unit, year, region }) {
       </div>
       <div className="insight">
         <small><Trophy size={13} /> Valore più alto · {year}</small>
-        <strong>{insights.top?.region || "—"}</strong>
+        <strong>{insights.top?.region || "n.d."}</strong>
         <span>{formatValue(insights.top?.value, unit)}</span>
       </div>
       <div className="insight">
         <small>Valore più basso · {year}</small>
-        <strong>{insights.bottom?.region || "—"}</strong>
+        <strong>{insights.bottom?.region || "n.d."}</strong>
         <span>{formatValue(insights.bottom?.value, unit)}</span>
       </div>
       <div className={`insight insight--trend ${trendClass}`}>
@@ -1093,7 +1093,7 @@ function LoadingState() {
   return (
     <section className="loading-state">
       <span />
-      <p>Preparazione degli indicatori territoriali…</p>
+      <p>Preparazione degli indicatori territoriali...</p>
     </section>
   );
 }
@@ -1141,7 +1141,7 @@ async function fetchJson(url) {
 function coverageSpan(catalog) {
   const mins = catalog.indicators.map((i) => i.year_min);
   const maxs = catalog.indicators.map((i) => i.year_max);
-  return `${Math.min(...mins)}–${Math.max(...maxs)}`;
+  return `${Math.min(...mins)}-${Math.max(...maxs)}`;
 }
 
 function sparkDelta(spark) {
@@ -1185,9 +1185,9 @@ function buildInsights(metadata, series, yearValues, selectedRegion) {
   const first = regionRows[0];
   const last = regionRows[regionRows.length - 1];
   const delta = first && last ? last.value - first.value : null;
-  const trendLabel = delta === null ? "—" : delta > 0 ? "In crescita" : delta < 0 ? "In calo" : "Stabile";
+  const trendLabel = delta === null ? "n.d." : delta > 0 ? "In crescita" : delta < 0 ? "In calo" : "Stabile";
   const trendText = first && last
-    ? `${formatValue(first.value, metadata?.unit)} → ${formatValue(last.value, metadata?.unit)} (${first.year}–${last.year})`
+    ? `${formatValue(first.value, metadata?.unit)} -> ${formatValue(last.value, metadata?.unit)} (${first.year}-${last.year})`
     : "Serie non disponibile";
 
   return { top, bottom, total, regionEntry, regionRank, delta, trendLabel, trendText };
@@ -1202,7 +1202,7 @@ function normalizeRegionKey(value) {
 }
 
 function formatValue(value, unit = "") {
-  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  if (value === null || value === undefined || Number.isNaN(value)) return "n.d.";
   const digits = Math.abs(value) >= 100 ? 0 : 2;
   const formatted = new Intl.NumberFormat("it-IT", { maximumFractionDigits: digits }).format(value);
   return unit ? `${formatted} ${unit}` : formatted;

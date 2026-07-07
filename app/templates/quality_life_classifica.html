@@ -139,7 +139,7 @@
   <p class="quality-note">Non valutate per mancanza di dati recenti: {{ data.unrated | map(attribute='name') | join(', ') }}.</p>
   {% endif %}
   {% if is_prov %}
-  <p class="quality-note">Copertura: {{ data.ranking | length }} province. Sud Sardegna non è presente in questa edizione del BES; le quattro province sarde soppresse prima del 2016 sono escluse.</p>
+  <p class="quality-note">Copertura: {{ data.ranking | length }} province. Sud Sardegna non è presente in questa edizione del BES. Le quattro province sarde soppresse prima del 2016 sono escluse.</p>
   {% endif %}
 
   <p class="quality-note quality-disclaimer">Sintesi autonoma sugli indicatori BES dei Territori Istat, con percentile orientato (z-score) tra i territori. Categorie e direzioni sono curate ma rivedibili. Non è la classifica del Sole 24 Ore. <a href="/qualita-della-vita/metodologia">Metodologia</a>.</p>

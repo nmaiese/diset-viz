@@ -1,7 +1,7 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'blog' %}
 
-{% block title %}Blog · {{ site_name }} — analisi sul divario territoriale{% endblock %}
+{% block title %}Blog · {{ site_name }}: analisi sul divario territoriale{% endblock %}
 {% block description %}Articoli e analisi data-driven sul divario tra le regioni italiane: lavoro, istruzione, turismo, ambiente e altro, dagli indicatori territoriali Istat.{% endblock %}
 
 {% block head_extra %}
@@ -9,7 +9,7 @@
 {
   "@context": "https://schema.org",
   "@type": "Blog",
-  "name": "{{ site_name }} — Blog",
+  "name": "{{ site_name }}: Blog",
   "url": "{{ canonical }}",
   "description": "Analisi data-driven sul divario territoriale italiano.",
   "blogPost": [

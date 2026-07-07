@@ -36,6 +36,19 @@ automatico.
 - Frasi-slogan tipo "Leggere X significa leggere Y".
 - Gergo e paroloni quando basta una parola comune.
 
+## Struttura: utile, non seriale
+
+- `In breve` e `Dati usati` sono ammessi e spesso utili. Servono a far capire
+  subito fonte, periodo, territorio, unita e limite.
+- Non usare lo stesso telaio completo in ogni articolo. Se molti post hanno tutti
+  `In breve`, `Dati usati`, `Le regioni agli estremi`, `Perche conta`, il lettore
+  percepisce una produzione a stampo.
+- Mantieni i blocchi di fiducia quando servono, ma varia gli H2 narrativi:
+  "Dove il problema pesa di piu", "Cosa segnala sul mercato del lavoro",
+  "Dove si produce piu valore", "Cosa cambia per servizi e territorio".
+- Le chiusure devono portare a un prossimo passo concreto: atlante, indicatore,
+  tema, metodologia o articolo correlato. Niente chiuse da riassunto scolastico.
+
 ## Dati: sempre veri
 
 - Usa solo numeri reali presi dagli indicatori. Puoi ricavarli dall'API
@@ -51,6 +64,18 @@ automatico.
 - `description` di 150-160 caratteri, naturale, con la keyword.
 - Sottotitoli `##` e `###` sensati, con varianti della keyword senza forzature.
 - Tag pertinenti (2-4).
+
+## Controlli prima di pubblicare
+
+```bash
+rg -n "[—–;]" content/posts
+```
+
+Il comando deve tornare vuoto. Per template, frontend e SVG testuali controlla
+anche il testo visibile, ma ignora i punti e virgola di CSS, JS, JSON-LD e CSV.
+
+Controlla anche che non ci siano sequenze identiche di H2 tra piu articoli. I
+blocchi `In breve` e `Dati usati` possono ripetersi, gli H2 interpretativi no.
 
 ## Frontmatter
 

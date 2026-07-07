@@ -31,12 +31,19 @@ missed:
 - Human, journalistic voice. Varied sentence length, one idea per paragraph,
   active voice. Avoid bot patterns: repeated "non solo X ma anche Y", dramatic
   colons, closings like "In conclusione", inflated adverbs, slogan sentences.
+- `In breve` and `Dati usati` can repeat because they help trust. Do not repeat
+  the same full article skeleton across a cluster. Vary narrative H2s and make the
+  closing point to a concrete next step.
 - Only real, verified numbers from the indicators. Never invent figures. Link to
   the atlas via the `indicator` frontmatter field and `/?indicator=...` links.
 - SEO but natural: keyword in title and `description`, sensible headings, tags.
 
 The Markdown engine has `smarty` disabled, so `--`/`...` are not auto-converted.
 Keep the source clean.
+
+Before publishing article batches, run `rg -n "[—–;]" content/posts` and inspect
+repeated H2 sequences. For templates, frontend strings and SVG text, distinguish
+visible copy from CSS, JS, JSON-LD and CSV syntax.
 
 ## Adding indicators or datasets
 
