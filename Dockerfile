@@ -28,4 +28,7 @@ EXPOSE 8080
 
 # timeout FINITO (60s): un worker bloccato viene terminato e riavviato invece di
 # restare appeso per sempre (--timeout 0 disabilitava del tutto il watchdog).
-CMD ["sh", "-c", "gunicorn run:app -b 0.0.0.0:${PORT:-8080} --workers 2 --threads 8 --timeout 60 --graceful-timeout 30"]
+# 1 worker: la cache in-process (CACHE_TYPE=simple) e la tabella da ~110k righe
+# di get_rows() venivano duplicate per ogni worker, portando il container sopra
+# il limite di memoria Cloud Run. Gli 8 thread coprono comunque la concorrenza.
+CMD ["sh", "-c", "gunicorn run:app -b 0.0.0.0:${PORT:-8080} --workers 1 --threads 8 --timeout 60 --graceful-timeout 30"]

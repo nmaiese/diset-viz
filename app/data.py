@@ -93,25 +93,75 @@ def _clean_text(value):
     return " ".join((value or "").split())
 
 
+class _Row:
+    """Riga del dataset regionale (~110k istanze tenute in cache per un'ora).
+
+    __slots__ invece di dict: niente hash table per istanza, solo un blocco
+    fisso di puntatori. get_rows()/get_catalog() e affini leggono via
+    row["campo"] o row.get("campo"), quindi replichiamo quell'interfaccia
+    invece di propagare l'accesso ad attributo in tutto il codebase.
+    """
+
+    __slots__ = (
+        "id",
+        "territory",
+        "region_key",
+        "theme",
+        "indicator",
+        "unit",
+        "source",
+        "archive",
+        "year",
+        "value",
+    )
+
+    def __init__(self, id, territory, region_key, theme, indicator, unit, source, archive, year, value):
+        self.id = id
+        self.territory = territory
+        self.region_key = region_key
+        self.theme = theme
+        self.indicator = indicator
+        self.unit = unit
+        self.source = source
+        self.archive = archive
+        self.year = year
+        self.value = value
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def get(self, key, default=None):
+        return getattr(self, key, default)
+
+
 @cache.memoize(timeout=3600)
 def get_rows():
+    # Colonne come territorio/tema/indicatore/fonte/archivio si ripetono su
+    # ~110k righe ma hanno poche decine/centinaia di valori distinti: senza
+    # dedup, ogni riga porta la sua copia della stringa. Un cache locale di
+    # interning le fa condividere lo stesso oggetto tra tutte le righe.
+    interned = {}
+
+    def _dedup(value):
+        return interned.setdefault(value, value)
+
     with open(DATASET_PATH, "r", encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f, delimiter=";")
         rows = []
         for row in reader:
             rows.append(
-                {
-                    "id": row["idIndicatore"],
-                    "territory": row["Territorio"],
-                    "region_key": _slugify(row["Territorio"]),
-                    "theme": _clean_text(row["Tema"]),
-                    "indicator": _clean_text(row["Indicatore"]),
-                    "unit": _clean_text(row["UDM"]),
-                    "source": _clean_text(row["Fonte"]),
-                    "archive": _clean_text(row["Archivio"]),
-                    "year": int(row["Anno"]),
-                    "value": _parse_number(row["Dato"]),
-                }
+                _Row(
+                    id=_dedup(row["idIndicatore"]),
+                    territory=_dedup(row["Territorio"]),
+                    region_key=_dedup(_slugify(row["Territorio"])),
+                    theme=_dedup(_clean_text(row["Tema"])),
+                    indicator=_dedup(_clean_text(row["Indicatore"])),
+                    unit=_dedup(_clean_text(row["UDM"])),
+                    source=_dedup(_clean_text(row["Fonte"])),
+                    archive=_dedup(_clean_text(row["Archivio"])),
+                    year=int(row["Anno"]),
+                    value=_parse_number(row["Dato"]),
+                )
             )
     return rows
 
