@@ -34,9 +34,13 @@ def add_security_headers(response):
         or request_path in {"/legacy", "/legacy-reddito"}
     ):
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
-    elif request_path == "/blog" or request_path.startswith("/blog/"):
-        # Keep editorial pages indexable even if an upstream proxy/CDN adds a
-        # restrictive default X-Robots-Tag header.
+    elif (
+        request_path == "/blog"
+        or request_path.startswith("/blog/")
+        or request_path.startswith("/indicatore/")
+    ):
+        # Keep public editorial/data pages indexable even if an upstream proxy/CDN
+        # adds a restrictive default X-Robots-Tag header.
         response.headers["X-Robots-Tag"] = "index, follow, max-snippet:-1, max-image-preview:large"
     return response
 
@@ -79,3 +83,8 @@ def inject_site_config():
 
 
 from app import views
+from app import profiles
+from app.seo_policy import is_search_indexable_indicator as _seo_indicator_policy
+
+_original_indicator_policy = profiles.is_search_indexable_indicator
+profiles.is_search_indexable_indicator = lambda item: _seo_indicator_policy(_original_indicator_policy, item)
