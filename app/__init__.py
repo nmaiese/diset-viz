@@ -34,6 +34,10 @@ def add_security_headers(response):
         or request_path in {"/legacy", "/legacy-reddito"}
     ):
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
+    elif request_path == "/blog" or request_path.startswith("/blog/"):
+        # Keep editorial pages indexable even if an upstream proxy/CDN adds a
+        # restrictive default X-Robots-Tag header.
+        response.headers["X-Robots-Tag"] = "index, follow, max-snippet:-1, max-image-preview:large"
     return response
 
 
