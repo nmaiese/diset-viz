@@ -1,7 +1,14 @@
 from app import app
 from app.cache import cache
 from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts
-from app.data import get_catalog, get_indicator, get_indicator_year, get_rows, search_indicators
+from app.data import (
+    get_catalog,
+    get_indicator,
+    get_indicator_year,
+    get_rows,
+    indicator_trend_stats,
+    search_indicators,
+)
 from app import profiles
 from app import indicator_notes
 from app import quality_life_bes as qb
@@ -222,6 +229,8 @@ def indicator_page(slug):
     worst = values[-1] if values and scoreable else None
 
     plain = (meta.get("explain") or {}).get("plain", "")
+    stats = indicator_trend_stats(payload, year, values, best, worst)
+    trend_note = indicator_notes.trend_framing(direction, stats["avg_change_pct"])
     return render_template(
         "indicator_page.html",
         meta=meta,
@@ -229,6 +238,8 @@ def indicator_page(slug):
         best=best,
         worst=worst,
         year=year,
+        stats=stats,
+        trend_note=trend_note,
         is_indexable=profiles.is_search_indexable_indicator(meta),
         seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
         seo_description=indicator_notes.seo_description(plain, meta["year_max"], len(meta["regions"])),

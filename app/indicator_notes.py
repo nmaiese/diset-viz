@@ -413,6 +413,23 @@ def _reading_text(name, theme, unit, direction=None):
     return "Il valore va letto come intensità del fenomeno: più sale, più quel tratto pesa nel profilo della regione."
 
 
+def trend_framing(direction, avg_change_pct):
+    """Short qualitative fragment (no numbers) describing whether a national
+    average's movement reads as favorable, unfavorable, or neutral, given the
+    indicator's direction. Returns '' if avg_change_pct is None (caller must guard
+    rendering on that)."""
+    if avg_change_pct is None:
+        return ""
+    if abs(avg_change_pct) < 1:
+        return "un andamento sostanzialmente stabile"
+    if direction not in ("higher_better", "lower_better", "higher_worse"):
+        return "un aumento" if avg_change_pct > 0 else "una diminuzione"
+    favorable = (direction == "higher_better" and avg_change_pct > 0) or (
+        direction in ("lower_better", "higher_worse") and avg_change_pct < 0
+    )
+    return "un miglioramento diffuso" if favorable else "un peggioramento diffuso"
+
+
 def _caveat_text(name, theme, lens):
     lowered = name.lower()
     if "maschi" in lowered or "femmine" in lowered:

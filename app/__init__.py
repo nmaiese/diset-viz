@@ -23,24 +23,24 @@ def redirect_www_to_apex():
     return redirect(target_url, code=301)
 
 
+_NOINDEX_EXACT_PATHS = {"/data", "/legacy", "/legacy-reddito"}
+_NOINDEX_PATH_PREFIXES = ("/api/",)
+
+
 @app.after_request
 def add_security_headers(response):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     request_path = request.path
-    if (
-        request_path == "/data"
-        or request_path.startswith("/api/")
-        or request_path in {"/legacy", "/legacy-reddito"}
-    ):
+    if request_path in _NOINDEX_EXACT_PATHS or request_path.startswith(_NOINDEX_PATH_PREFIXES):
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
-    elif (
-        request_path == "/blog"
-        or request_path.startswith("/blog/")
-        or request_path.startswith("/indicatore/")
-    ):
-        # Keep public editorial/data pages indexable even if an upstream proxy/CDN
-        # adds a restrictive default X-Robots-Tag header.
+    elif "X-Robots-Tag" not in response.headers:
+        # Default-deny: force an explicit index signal on every public response
+        # unless something upstream (the 404 handler) already set its own
+        # X-Robots-Tag. Without this, a Cloudflare-injected restrictive default
+        # can silently noindex any path (this is what happened to /blog and
+        # /indicatore/* before 2026-07-12) with nothing in our own responses to
+        # override it.
         response.headers["X-Robots-Tag"] = "index, follow, max-snippet:-1, max-image-preview:large"
     return response
 

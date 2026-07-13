@@ -72,12 +72,17 @@ def _load_post(path):
     if isinstance(tags, str):
         tags = [t.strip() for t in tags.split(",") if t.strip()]
 
+    date = _coerce_date(meta.get("date")) or dt.date.today()
+    updated = _coerce_date(meta.get("updated"))
+    date_modified = updated if updated and updated >= date else date
+
     return {
         "slug": slug,
         "title": title,
         "seo_title": (meta.get("seo_title") or "").strip(),
         "description": _excerpt(meta, body_html),
-        "date": _coerce_date(meta.get("date")) or dt.date.today(),
+        "date": date,
+        "date_modified": date_modified,
         "author": (meta.get("author") or SITE_NAME).strip(),
         "cover": meta.get("cover"),
         "cover_alt": meta.get("cover_alt") or title,

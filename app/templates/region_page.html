@@ -13,9 +13,10 @@
   "name": "Profilo territoriale di {{ p.region }}",
   "description": {{ ('Punti di forza e di debolezza di ' ~ p.region ~ ' sugli indicatori territoriali Istat, con confronto tra le regioni italiane.') | tojson }},
   "url": {{ canonical | tojson }},
-  "spatialCoverage": { "@type": "AdministrativeArea", "name": {{ p.region | tojson }} },
+  "spatialCoverage": { "@type": "Place", "name": {{ p.region | tojson }} },
   "creator": { "@type": "Organization", "name": "Istat" },
   "isAccessibleForFree": true,
+  "license": "https://creativecommons.org/licenses/by/3.0/it/",
   "keywords": [{{ p.region | tojson }}, "indicatori territoriali", "divario regionale", "Istat"]
 }
 </script>

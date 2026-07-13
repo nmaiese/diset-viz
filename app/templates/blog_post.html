@@ -26,7 +26,7 @@
   "description": {{ post.description | tojson }},
   {% if cover_abs %}"image": [{{ cover_abs | tojson }}],{% endif %}
   "datePublished": "{{ post.date.isoformat() }}",
-  "dateModified": "{{ post.date.isoformat() }}",
+  "dateModified": "{{ post.date_modified.isoformat() }}",
   "author": { "@type": "Organization", "name": {{ post.author | tojson }} },
   "publisher": { "@type": "Organization", "name": {{ site_name | tojson }} },
   "mainEntityOfPage": { "@type": "WebPage", "@id": {{ canonical | tojson }} },
@@ -52,7 +52,8 @@
     <nav class="breadcrumb"><a href="/blog">Blog</a> / {% if post.tags %}{{ post.tags[0] }}{% else %}Articolo{% endif %}</nav>
     <h1>{{ post.title }}</h1>
     <div class="article-meta">
-      <span>{{ post.date.strftime('%d.%m.%Y') }}</span>
+      <span>Pubblicato il {{ post.date.strftime('%d.%m.%Y') }}</span>
+      {% if post.date_modified != post.date %}<span>Aggiornato il {{ post.date_modified.strftime('%d.%m.%Y') }}</span>{% endif %}
       <span>{{ post.read_time }} min di lettura</span>
       <span>{{ post.author }}</span>
     </div>

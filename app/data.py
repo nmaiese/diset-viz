@@ -328,6 +328,69 @@ def get_indicator_year(indicator_id, year):
     }
 
 
+def indicator_year_average(series, year):
+    """Mean value across regions for one year of an indicator's full series, or
+    None if there is no non-null value for that year."""
+    values = [row["value"] for row in series if row["year"] == year and row["value"] is not None]
+    if not values:
+        return None
+    return sum(values) / len(values)
+
+
+def indicator_trend_stats(payload, year, values, best=None, worst=None):
+    """Pure numeric aggregates for the indicator page: national average for the
+    current year, national average for year_min (for a year-over-year trend), and
+    the best/worst gap. `values` is the year-filtered rows already in scope in the
+    view (get_indicator_year()["values"]). `best`/`worst` are the same two rows the
+    view already picked, or None for contextual (non-scoreable) indicators.
+
+    Every derived field is None when it cannot be computed honestly from the data -
+    callers must treat None as "omit this claim", never substitute or approximate.
+    """
+    meta = payload["metadata"]
+    year_min, year_max = meta["year_min"], meta["year_max"]
+    has_multi_year = year_min != year_max
+
+    year_avg = (sum(v["value"] for v in values) / len(values)) if values else None
+    year_count = len(values)
+
+    year_min_avg = year_avg if not has_multi_year else indicator_year_average(payload["series"], year_min)
+
+    avg_change_abs = avg_change_pct = None
+    if has_multi_year and year_avg is not None and year_min_avg is not None:
+        avg_change_abs = year_avg - year_min_avg
+        if year_min_avg:
+            avg_change_pct = avg_change_abs / year_min_avg * 100
+
+    gap_abs = gap_ratio = None
+    if best is not None and worst is not None and best["value"] is not None and worst["value"] is not None:
+        # best/worst are picked by direction upstream (views.py), so best can hold
+        # either the higher or the lower value depending on the indicator's
+        # direction - always report the magnitude of the gap, never a signed diff.
+        high_value = max(best["value"], worst["value"])
+        low_value = min(best["value"], worst["value"])
+        gap_abs = high_value - low_value
+        name_lower = meta["name"].lower()
+        unit_lower = (meta.get("unit") or "").lower()
+        ratio_meaningless = "differenza" in name_lower or "punti percentuali" in unit_lower
+        if not ratio_meaningless and low_value > 0:
+            gap_ratio = high_value / low_value
+
+    return {
+        "year": year,
+        "year_avg": year_avg,
+        "year_count": year_count,
+        "year_min": year_min,
+        "year_min_avg": year_min_avg,
+        "year_max": year_max,
+        "has_multi_year": has_multi_year,
+        "avg_change_abs": avg_change_abs,
+        "avg_change_pct": avg_change_pct,
+        "gap_abs": gap_abs,
+        "gap_ratio": gap_ratio,
+    }
+
+
 def search_indicators(query="", theme=None, limit=50):
     query = _normalize_search(query)
     theme = _clean_text(theme)

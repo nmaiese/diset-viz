@@ -101,6 +101,38 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b"Pagina non trovata", missing.data)
         self.assertIn(b'content="noindex, follow"', missing.data)
 
+    def test_blog_post_updated_field_drives_date_modified(self):
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+
+        from app import blog, cache
+
+        fixtures = {
+            "with-update.md": (
+                "---\ntitle: Con aggiornamento\ndate: 2026-06-01\nupdated: 2026-06-15\n---\nBody.\n"
+            ),
+            "no-update.md": "---\ntitle: Senza aggiornamento\ndate: 2026-06-01\n---\nBody.\n",
+            "stale-update.md": (
+                "---\ntitle: Aggiornamento antecedente\ndate: 2026-06-01\nupdated: 2026-05-01\n---\nBody.\n"
+            ),
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_dir = Path(tmp)
+            for name, content in fixtures.items():
+                (tmp_dir / name).write_text(content, encoding="utf-8")
+
+            with mock.patch.object(blog, "POSTS_DIR", tmp_dir):
+                cache.cache.clear()
+                posts = {p["title"]: p for p in blog.get_posts()}
+                cache.cache.clear()
+
+        self.assertEqual(posts["Con aggiornamento"]["date_modified"].isoformat(), "2026-06-15")
+        self.assertEqual(posts["Senza aggiornamento"]["date_modified"], posts["Senza aggiornamento"]["date"])
+        # An `updated` earlier than `date` is a frontmatter mistake, not a real
+        # freshness signal - fall back to `date` rather than regress dateModified.
+        self.assertEqual(posts["Aggiornamento antecedente"]["date_modified"], posts["Aggiornamento antecedente"]["date"])
+
     def test_seo_routes(self):
         client = app.test_client()
 
@@ -152,6 +184,41 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("noindex", api_missing.headers["X-Robots-Tag"])
         self.assertEqual(api_missing.get_json()["error"], "not_found")
 
+    def test_public_pages_get_explicit_index_header(self):
+        from app.data import get_catalog
+        from app import profiles
+
+        client = app.test_client()
+        expected = "index, follow, max-snippet:-1, max-image-preview:large"
+        for path in (
+            "/", "/regioni", "/temi", "/qualita-della-vita",
+            "/qualita-della-vita/classifica/regioni",
+            "/qualita-della-vita/metodologia", "/metodologia", "/blog",
+        ):
+            self.assertEqual(client.get(path).headers.get("X-Robots-Tag"), expected, path)
+
+        catalog = get_catalog()
+        sample = catalog["indicators"][0]
+        indicator_path = profiles.indicator_path(sample["id"], sample["name"])
+        self.assertEqual(client.get(indicator_path).headers.get("X-Robots-Tag"), expected)
+        self.assertEqual(client.get("/regione/lombardia").headers.get("X-Robots-Tag"), expected)
+        theme_slug = next(iter(profiles._theme_slug_map()))
+        self.assertEqual(client.get(f"/tema/{theme_slug}").headers.get("X-Robots-Tag"), expected)
+
+    def test_noindex_paths_unaffected_by_default_index_header(self):
+        client = app.test_client()
+        for path in ("/data", "/legacy", "/legacy-reddito"):
+            self.assertIn("noindex", client.get(path).headers["X-Robots-Tag"])
+        self.assertIn("noindex", client.get("/api/catalog").headers["X-Robots-Tag"])
+
+    def test_404_header_is_not_overwritten_by_default_index_header(self):
+        client = app.test_client()
+        self.assertEqual(client.get("/pagina-che-non-esiste").headers["X-Robots-Tag"], "noindex, follow")
+        self.assertEqual(
+            client.get("/api/indicator/not-found").headers["X-Robots-Tag"],
+            "noindex, nofollow, noarchive",
+        )
+
     def test_seo_landing_pages(self):
         from app.data import get_catalog
         from app import profiles
@@ -195,11 +262,111 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b"/regione/lombardia", sitemap)
         self.assertIn(b"/tema/", sitemap)
         self.assertIn(b"/indicatore/", sitemap)
-        self.assertNotIn(b"/indicatore/264-aree-terrestri-protette", sitemap)
+        # Deliberate policy since 2026-07-12 (afd31d3): every existing indicator page
+        # is indexable and listed in the sitemap, no curated noindex carve-out.
+        self.assertIn(b"/indicatore/264-aree-terrestri-protette", sitemap)
 
-        stale = client.get("/indicatore/264-aree-terrestri-protette")
-        self.assertEqual(stale.status_code, 200)
-        self.assertIn(b'name="robots" content="noindex, follow"', stale.data)
+        legacy_indicator = client.get("/indicatore/264-aree-terrestri-protette")
+        self.assertEqual(legacy_indicator.status_code, 200)
+        self.assertIn(b'name="robots" content="index, follow', legacy_indicator.data)
+
+    def test_dataset_jsonld_spatial_coverage_and_license(self):
+        import json
+        import re
+
+        from app.data import get_catalog
+        from app import profiles
+
+        client = app.test_client()
+        sample = get_catalog()["indicators"][0]
+        pages = {
+            "indicator": client.get(profiles.indicator_path(sample["id"], sample["name"])).data.decode("utf-8"),
+            "region": client.get("/regione/lombardia").data.decode("utf-8"),
+            "ranking": client.get("/qualita-della-vita/classifica/regioni").data.decode("utf-8"),
+        }
+        for name, html in pages.items():
+            self.assertIn('"license": "https://creativecommons.org/licenses/by/3.0/it/"', html, name)
+            self.assertNotIn('"@type": "Country"', html, name)
+            self.assertNotIn('"@type": "AdministrativeArea"', html, name)
+            for block in re.findall(r'<script type="application/ld\+json">\s*(\{.*?\})\s*</script>', html, re.S):
+                json.loads(block)
+
+    def test_indicator_page_has_data_derived_depth(self):
+        from app.data import get_catalog
+        from app import profiles
+
+        client = app.test_client()
+        sample = next(
+            i for i in get_catalog()["indicators"]
+            if i["explain"]["direction"] in ("higher_better", "lower_better", "higher_worse")
+            and i["year_min"] != i["year_max"]
+        )
+        path = profiles.indicator_path(sample["id"], sample["name"])
+        html = client.get(path).data.decode("utf-8")
+        self.assertGreaterEqual(html.count("<h2"), 3)
+        self.assertGreaterEqual(html.count("<h3"), 2)
+        self.assertIn("data-callout", html)
+
+    def test_indicator_trend_stats(self):
+        from app.data import indicator_trend_stats, indicator_year_average
+
+        payload = {
+            "metadata": {"id": "1", "name": "Tasso di occupazione", "unit": "percentuale", "year_min": 2020, "year_max": 2022},
+            "series": [
+                {"year": 2020, "region": "Lombardia", "region_key": "lombardia", "value": 60.0},
+                {"year": 2020, "region": "Calabria", "region_key": "calabria", "value": 40.0},
+                {"year": 2022, "region": "Lombardia", "region_key": "lombardia", "value": 66.0},
+                {"year": 2022, "region": "Calabria", "region_key": "calabria", "value": 44.0},
+            ],
+        }
+        values = [row for row in payload["series"] if row["year"] == 2022]
+        best, worst = values[0], values[1]
+        stats = indicator_trend_stats(payload, 2022, values, best, worst)
+
+        self.assertEqual(stats["year_avg"], 55.0)
+        self.assertEqual(stats["year_min_avg"], 50.0)
+        self.assertAlmostEqual(stats["avg_change_pct"], 10.0)
+        self.assertEqual(stats["gap_abs"], 22.0)
+        self.assertAlmostEqual(stats["gap_ratio"], 66.0 / 44.0)
+
+        # A "differenza tra..." indicator never gets a "N times" ratio: it's already
+        # a gap, not a magnitude that can be honestly expressed as a multiple.
+        gap_payload = dict(payload)
+        gap_payload["metadata"] = dict(payload["metadata"], name="Differenza tra tasso di occupazione maschile e femminile")
+        gap_stats = indicator_trend_stats(gap_payload, 2022, values, best, worst)
+        self.assertIsNone(gap_stats["gap_ratio"])
+
+        # Single-year series: no trend claim, avg falls back to the only year available.
+        single_year_payload = {
+            "metadata": {"id": "2", "name": "Indicatore", "unit": "percentuale", "year_min": 2022, "year_max": 2022},
+            "series": values,
+        }
+        single_stats = indicator_trend_stats(single_year_payload, 2022, values, best, worst)
+        self.assertFalse(single_stats["has_multi_year"])
+        self.assertIsNone(single_stats["avg_change_pct"])
+        self.assertEqual(single_stats["year_avg"], 55.0)
+
+        self.assertIsNone(indicator_year_average(payload["series"], 2021))
+
+        # lower_better/higher_worse indicators pick "best" as the *smaller* value
+        # (views.py reverses the ranking for these directions) - the gap must still
+        # come out as a positive magnitude, never a signed (best - worst) number.
+        reversed_stats = indicator_trend_stats(payload, 2022, values, best=worst, worst=best)
+        self.assertEqual(reversed_stats["gap_abs"], 22.0)
+        self.assertAlmostEqual(reversed_stats["gap_ratio"], 66.0 / 44.0)
+
+    def test_trend_framing(self):
+        from app.indicator_notes import trend_framing
+
+        self.assertEqual(trend_framing("higher_better", None), "")
+        self.assertEqual(trend_framing("higher_better", 0.5), "un andamento sostanzialmente stabile")
+        self.assertEqual(trend_framing("higher_better", 5.0), "un miglioramento diffuso")
+        self.assertEqual(trend_framing("higher_better", -5.0), "un peggioramento diffuso")
+        self.assertEqual(trend_framing("lower_better", -5.0), "un miglioramento diffuso")
+        self.assertEqual(trend_framing("lower_better", 5.0), "un peggioramento diffuso")
+        self.assertEqual(trend_framing("higher_worse", 5.0), "un peggioramento diffuso")
+        self.assertEqual(trend_framing("contextual", 5.0), "un aumento")
+        self.assertEqual(trend_framing("contextual", -5.0), "una diminuzione")
 
     def test_region_profile_is_coherent(self):
         from app import profiles

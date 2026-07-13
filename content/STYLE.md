@@ -67,6 +67,10 @@ automatico.
 - Titolo con la keyword principale all'inizio, possibilmente entro 60 caratteri.
 - `description` di 150-160 caratteri, naturale, con la keyword.
 - `seo_title` opzionale per tenere il tag `<title>` piu corto dell'H1.
+- `updated` opzionale nel frontmatter (stessa sintassi di `date`, es. `2026-07-20`):
+  impostalo solo quando aggiorni davvero i dati o il testo di un articolo gia
+  pubblicato. Guida `dateModified` nello schema Article e mostra "Aggiornato il..."
+  in pagina; senza `updated`, `dateModified` resta uguale a `date`.
 - Sottotitoli `##` e `###` sensati, con varianti della keyword senza forzature.
 - Tag pertinenti (2-4).
 - Schema candidate solo se il contenuto e visibile in pagina. Niente FAQ o

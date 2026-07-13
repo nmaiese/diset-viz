@@ -21,10 +21,11 @@
   "description": {{ desc | tojson }},
   "url": {{ canonical | tojson }},
   "temporalCoverage": "{{ meta.year_min }}/{{ meta.year_max }}",
-  "spatialCoverage": { "@type": "Country", "name": "Italia" },
+  "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": { "@type": "Organization", "name": {{ meta.source | tojson }}, "url": {{ meta.source_url | tojson }} },
   "isBasedOn": {{ meta.source_url | tojson }},
   "isAccessibleForFree": true,
+  "license": "https://creativecommons.org/licenses/by/3.0/it/",
   "keywords": [{{ meta.theme | tojson }}, "indicatori territoriali", "regioni italiane", "Istat"]
 }
 </script>
@@ -59,6 +60,7 @@
   </div>
 
   <section class="prose">
+    <p class="data-callout"><strong>Dato più recente: {{ year }}.</strong>{% if meta.year_min != meta.year_max %} La serie storica copre il periodo {{ meta.year_min }}-{{ meta.year_max }}.{% endif %}</p>
     <p>{{ explain.example }}</p>
     <p>{{ explain.reading }}</p>
     {% if best and worst %}
@@ -67,6 +69,23 @@
       segna il dato più sfavorevole ({{ worst.value | it_num(2) }} {{ meta.unit }}).</p>
     {% endif %}
     <p class="page-caveat">{{ explain.caveat }}</p>
+
+    {% if stats.year_avg is not none or stats.gap_abs is not none %}
+    <h2>Il quadro nazionale nel {{ year }}</h2>
+    {% if stats.year_avg is not none %}
+    <h3>Media delle regioni</h3>
+    <p>Nel {{ year }} il valore medio tra le {{ stats.year_count }} regioni con un dato disponibile è {{ stats.year_avg | it_num(2) }} {{ meta.unit }}.</p>
+    {% endif %}
+    {% if stats.gap_abs is not none %}
+    <h3>Il divario tra le regioni</h3>
+    <p>La distanza tra <a href="/regione/{{ best.region_key }}">{{ best.region }}</a> e <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a> è di {{ stats.gap_abs | it_num(2) }} {{ meta.unit }}{% if stats.gap_ratio %}, pari a {{ stats.gap_ratio | it_num(1) }} volte il valore più basso{% endif %}.</p>
+    {% endif %}
+    {% endif %}
+
+    {% if stats.has_multi_year and stats.avg_change_abs is not none %}
+    <h2>Come cambia nel tempo</h2>
+    <p>Tra il {{ stats.year_min }} e il {{ stats.year_max }} la media nazionale è passata da {{ stats.year_min_avg | it_num(2) }} a {{ stats.year_avg | it_num(2) }} {{ meta.unit }}{% if stats.avg_change_pct is not none %} ({{ stats.avg_change_pct | it_num(1) }}%){% endif %}{% if trend_note %}, {{ trend_note }}{% endif %}.</p>
+    {% endif %}
   </section>
 
   <section class="page-ranking">

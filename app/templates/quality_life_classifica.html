@@ -16,8 +16,10 @@
   "name": "Classifica qualità della vita per {{ lvl_label }}, profilo {{ p.name }}",
   "description": {{ ('Punteggi di qualità della vita delle ' ~ lvl_label ~ ' italiane su indicatori BES dei Territori Istat.') | tojson }},
   "url": {{ canonical | tojson }},
+  "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": { "@type": "Organization", "name": "Istat" },
-  "isAccessibleForFree": true
+  "isAccessibleForFree": true,
+  "license": "https://creativecommons.org/licenses/by/3.0/it/"
 }
 </script>
 <script type="application/ld+json">
