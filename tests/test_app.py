@@ -304,8 +304,12 @@ class AppSmokeTest(unittest.TestCase):
         path = profiles.indicator_path(sample["id"], sample["name"])
         html = client.get(path).data.decode("utf-8")
         self.assertGreaterEqual(html.count("<h2"), 3)
-        self.assertGreaterEqual(html.count("<h3"), 2)
+        self.assertGreaterEqual(html.count("<h3"), 3)
         self.assertIn("data-callout", html)
+        # The cascade fix: analysis h2s inside .page-indicator's .prose section must
+        # get the full article-style treatment, not the compact .page-ranking one.
+        css_path = Path(app.root_path) / "static" / "css" / "site.css"
+        self.assertIn(".page .prose h2", css_path.read_text(encoding="utf-8"))
 
     def test_indicator_trend_stats(self):
         from app.data import indicator_trend_stats, indicator_year_average
@@ -354,6 +358,68 @@ class AppSmokeTest(unittest.TestCase):
         reversed_stats = indicator_trend_stats(payload, 2022, values, best=worst, worst=best)
         self.assertEqual(reversed_stats["gap_abs"], 22.0)
         self.assertAlmostEqual(reversed_stats["gap_ratio"], 66.0 / 44.0)
+
+        # Median/dispersion and the "biggest movers" with an honest kind label.
+        # Mixed-direction fixture: Lombardia rises, Calabria falls, Lazio rises less.
+        mixed_payload = {
+            "metadata": {"id": "3", "name": "Indicatore misto", "unit": "percentuale", "year_min": 2020, "year_max": 2022},
+            "series": [
+                {"year": 2020, "region": "Lombardia", "region_key": "lombardia", "value": 60.0},
+                {"year": 2020, "region": "Calabria", "region_key": "calabria", "value": 40.0},
+                {"year": 2020, "region": "Lazio", "region_key": "lazio", "value": 50.0},
+                {"year": 2022, "region": "Lombardia", "region_key": "lombardia", "value": 70.0},
+                {"year": 2022, "region": "Calabria", "region_key": "calabria", "value": 30.0},
+                {"year": 2022, "region": "Lazio", "region_key": "lazio", "value": 52.0},
+            ],
+        }
+        mixed_values = [row for row in mixed_payload["series"] if row["year"] == 2022]
+        mixed_best = next(row for row in mixed_values if row["region"] == "Lombardia")
+        mixed_worst = next(row for row in mixed_values if row["region"] == "Calabria")
+        mixed_stats = indicator_trend_stats(mixed_payload, 2022, mixed_values, mixed_best, mixed_worst)
+
+        self.assertEqual(mixed_stats["median"], 52.0)
+        # Mean is 50.67: Lombardia (70) and Lazio (52) beat it, only Calabria (30) doesn't.
+        self.assertEqual(mixed_stats["above_avg_count"], 2)
+        self.assertEqual(mixed_stats["below_avg_count"], 1)
+        self.assertEqual(mixed_stats["region_highest_delta"]["region"], "Lombardia")
+        self.assertEqual(mixed_stats["region_highest_delta"]["kind"], "aumento")
+        self.assertEqual(mixed_stats["region_lowest_delta"]["region"], "Calabria")
+        self.assertEqual(mixed_stats["region_lowest_delta"]["kind"], "calo")
+        # Best (Lombardia) - worst (Calabria) gap widened from 20 (2020) to 40 (2022).
+        self.assertEqual(mixed_stats["year_min_gap_abs"], 20.0)
+        self.assertEqual(mixed_stats["gap_trend"], 20.0)
+
+        # Same-direction fixture: every region rises, just by different amounts - the
+        # "lowest delta" region must never be mislabeled as a decrease.
+        rising_payload = {
+            "metadata": {"id": "4", "name": "Indicatore in crescita ovunque", "unit": "euro", "year_min": 2020, "year_max": 2022},
+            "series": [
+                {"year": 2020, "region": "Lombardia", "region_key": "lombardia", "value": 100.0},
+                {"year": 2020, "region": "Calabria", "region_key": "calabria", "value": 50.0},
+                {"year": 2022, "region": "Lombardia", "region_key": "lombardia", "value": 130.0},
+                {"year": 2022, "region": "Calabria", "region_key": "calabria", "value": 60.0},
+            ],
+        }
+        rising_values = [row for row in rising_payload["series"] if row["year"] == 2022]
+        rising_stats = indicator_trend_stats(rising_payload, 2022, rising_values)
+        self.assertEqual(rising_stats["region_highest_delta"]["kind"], "aumento")
+        self.assertEqual(rising_stats["region_lowest_delta"]["region"], "Calabria")
+        self.assertEqual(rising_stats["region_lowest_delta"]["kind"], "aumento")
+        self.assertGreater(rising_stats["region_lowest_delta"]["delta"], 0)
+
+        # Fewer than two regions in common across the two years: no honest "biggest
+        # movers" comparison is possible, both must be None rather than duplicated.
+        single_common_payload = {
+            "metadata": {"id": "5", "name": "Indicatore", "unit": "euro", "year_min": 2020, "year_max": 2022},
+            "series": [
+                {"year": 2020, "region": "Lombardia", "region_key": "lombardia", "value": 100.0},
+                {"year": 2022, "region": "Lombardia", "region_key": "lombardia", "value": 110.0},
+            ],
+        }
+        single_common_values = [row for row in single_common_payload["series"] if row["year"] == 2022]
+        single_common_stats = indicator_trend_stats(single_common_payload, 2022, single_common_values)
+        self.assertIsNone(single_common_stats["region_highest_delta"])
+        self.assertIsNone(single_common_stats["region_lowest_delta"])
 
     def test_trend_framing(self):
         from app.indicator_notes import trend_framing

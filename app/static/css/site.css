@@ -116,6 +116,10 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .prose > * + * { margin-top: 1.1em; }
 .prose h2 { font-size: 27px; margin-top: 1.8em; padding-top: 0.4em; border-top: 1px solid var(--grid); }
 .prose h3 { font-size: 21px; margin-top: 1.4em; }
+/* .page h2 (below) otherwise wins on source order at equal specificity, flattening
+   analysis headings inside .page-indicator's .prose section to the compact ranking-
+   title style (no border, zero top margin). */
+.page .prose h2 { font-size: 27px; margin: 1.8em 0 0.6em; padding-top: 0.4em; border-top: 1px solid var(--grid); }
 .prose a { text-decoration: underline; }
 .prose ul, .prose ol { padding-left: 1.3em; }
 .prose li + li { margin-top: 0.4em; }

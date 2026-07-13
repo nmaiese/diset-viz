@@ -337,12 +337,66 @@ def indicator_year_average(series, year):
     return sum(values) / len(values)
 
 
+def _gap_abs_for_year(series, year):
+    """Magnitude of the spread (max - min) across regions for one year, or None
+    if fewer than two regions have a value that year."""
+    year_values = [row["value"] for row in series if row["year"] == year and row["value"] is not None]
+    if len(year_values) < 2:
+        return None
+    return max(year_values) - min(year_values)
+
+
+def _biggest_movers(series, year_min, year_max):
+    """The region with the highest signed delta and the one with the lowest signed
+    delta in raw value between year_min and year_max, among regions with a value in
+    both years. Each result carries its own "kind" (aumento/calo/stabile) derived
+    from the actual sign of its delta - the two extremes are not guaranteed to be
+    an increase and a decrease (e.g. an indicator rising everywhere has two
+    increases, just of different sizes), so callers must render the label from
+    "kind", never assume highest=increase/lowest=decrease.
+
+    Purely descriptive (no judgement on whether the movement is favorable - the
+    page already carries that framing elsewhere via the indicator's direction).
+    Returns (highest_delta, lowest_delta), each a {"region", "region_key", "delta",
+    "kind"} dict, or (None, None) if there is no region present in both years."""
+    by_region_min = {row["region"]: row for row in series if row["year"] == year_min and row["value"] is not None}
+    by_region_max = {row["region"]: row for row in series if row["year"] == year_max and row["value"] is not None}
+    common = sorted(set(by_region_min) & set(by_region_max))
+    # With a single common region the two extremes would both resolve to the same
+    # region, which reads as a contradiction on the page.
+    if len(common) < 2:
+        return None, None
+
+    def _kind(delta):
+        if delta > 0:
+            return "aumento"
+        if delta < 0:
+            return "calo"
+        return "stabile"
+
+    deltas = [
+        {
+            "region": region,
+            "region_key": by_region_max[region]["region_key"],
+            "delta": by_region_max[region]["value"] - by_region_min[region]["value"],
+        }
+        for region in common
+    ]
+    deltas.sort(key=lambda item: item["delta"])
+    highest, lowest = deltas[-1], deltas[0]
+    highest["kind"] = _kind(highest["delta"])
+    lowest["kind"] = _kind(lowest["delta"])
+    return highest, lowest
+
+
 def indicator_trend_stats(payload, year, values, best=None, worst=None):
-    """Pure numeric aggregates for the indicator page: national average for the
-    current year, national average for year_min (for a year-over-year trend), and
-    the best/worst gap. `values` is the year-filtered rows already in scope in the
-    view (get_indicator_year()["values"]). `best`/`worst` are the same two rows the
-    view already picked, or None for contextual (non-scoreable) indicators.
+    """Pure numeric aggregates for the indicator page: national average and median
+    for the current year, national average for year_min (for a year-over-year
+    trend), the best/worst gap, the regions that moved the most, and whether the
+    regional gap widened or narrowed over time. `values` is the year-filtered rows
+    already in scope in the view (get_indicator_year()["values"]). `best`/`worst`
+    are the same two rows the view already picked, or None for contextual
+    (non-scoreable) indicators.
 
     Every derived field is None when it cannot be computed honestly from the data -
     callers must treat None as "omit this claim", never substitute or approximate.
@@ -351,8 +405,19 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
     year_min, year_max = meta["year_min"], meta["year_max"]
     has_multi_year = year_min != year_max
 
-    year_avg = (sum(v["value"] for v in values) / len(values)) if values else None
-    year_count = len(values)
+    year_values = [v["value"] for v in values]
+    year_avg = (sum(year_values) / len(year_values)) if year_values else None
+    year_count = len(year_values)
+
+    median = None
+    above_avg_count = below_avg_count = None
+    if year_values:
+        sorted_values = sorted(year_values)
+        mid = len(sorted_values) // 2
+        median = sorted_values[mid] if len(sorted_values) % 2 else (sorted_values[mid - 1] + sorted_values[mid]) / 2
+        if year_avg is not None:
+            above_avg_count = sum(1 for v in year_values if v > year_avg)
+            below_avg_count = sum(1 for v in year_values if v < year_avg)
 
     year_min_avg = year_avg if not has_multi_year else indicator_year_average(payload["series"], year_min)
 
@@ -376,10 +441,21 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
         if not ratio_meaningless and low_value > 0:
             gap_ratio = high_value / low_value
 
+    region_highest_delta = region_lowest_delta = None
+    year_min_gap_abs = gap_trend = None
+    if has_multi_year:
+        region_highest_delta, region_lowest_delta = _biggest_movers(payload["series"], year_min, year_max)
+        year_min_gap_abs = _gap_abs_for_year(payload["series"], year_min)
+        if year_min_gap_abs is not None and gap_abs is not None:
+            gap_trend = gap_abs - year_min_gap_abs
+
     return {
         "year": year,
         "year_avg": year_avg,
         "year_count": year_count,
+        "median": median,
+        "above_avg_count": above_avg_count,
+        "below_avg_count": below_avg_count,
         "year_min": year_min,
         "year_min_avg": year_min_avg,
         "year_max": year_max,
@@ -388,6 +464,10 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
         "avg_change_pct": avg_change_pct,
         "gap_abs": gap_abs,
         "gap_ratio": gap_ratio,
+        "region_highest_delta": region_highest_delta,
+        "region_lowest_delta": region_lowest_delta,
+        "year_min_gap_abs": year_min_gap_abs,
+        "gap_trend": gap_trend,
     }
 
 
