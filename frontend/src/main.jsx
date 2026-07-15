@@ -259,7 +259,7 @@ function App() {
     return (
       <main className="app-shell">
         <SiteHeader />
-        <LoadingState variant={activeView} />
+        <LoadingState />
         <SiteFooter />
       </main>
     );
@@ -942,7 +942,7 @@ function RegionView({
               </ol>
             </>
           ) : (
-            <LoadingState variant="regioni" />
+            <LoadingState />
           )}
         </aside>
 
@@ -1318,7 +1318,7 @@ function DetailView({
       </SiteHeader>
 
       {!indicatorMeta ? (
-        <LoadingState variant="detail" />
+        <LoadingState />
       ) : (
         <>
           <ContextBar
@@ -1774,106 +1774,11 @@ function Sparkline({ data, width = 150, height = 40 }) {
   );
 }
 
-function LoadingState({ variant = "atlas" }) {
-  if (variant === "detail") {
-    return (
-      <section className="loading-state loading-state--detail" aria-busy="true" aria-label="Caricamento scheda indicatore">
-        <div className="loading-crumbs">
-          <span className="loading-line loading-line--crumb loading-line--crumb-short" />
-          <span className="loading-line loading-line--crumb" />
-        </div>
-        <div className="loading-detail">
-          <aside className="indicator-panel indicator-panel--loading" aria-hidden="true">
-            <span className="loading-pill" />
-            <span className="loading-line loading-line--title" />
-            <span className="loading-line loading-line--lead" />
-            <span className="loading-block loading-block--intro" />
-            <span className="loading-label" />
-            <span className="loading-field" />
-            <span className="loading-label" />
-            <span className="loading-field" />
-            <span className="loading-card loading-card--summary" />
-            <div className="loading-stats">
-              <span className="loading-mini-card" />
-              <span className="loading-mini-card" />
-            </div>
-            <span className="loading-card loading-card--trend" />
-            <div className="loading-buttons">
-              <span className="loading-button" />
-              <span className="loading-button" />
-            </div>
-          </aside>
-          <section className="loading-viz" aria-hidden="true">
-            <div className="loading-card loading-card--map" />
-            <div className="loading-card loading-card--ranking" />
-            <div className="loading-card loading-card--timeline" />
-          </section>
-        </div>
-      </section>
-    );
-  }
-
-  if (variant === "regioni") {
-    return (
-      <section className="loading-state loading-state--regioni" aria-busy="true" aria-label="Caricamento vista per regione">
-        <div className="loading-hero loading-hero--regioni" aria-hidden="true">
-          <span className="loading-line loading-line--eyebrow" />
-          <span className="loading-line loading-line--title loading-line--wide" />
-          <span className="loading-line loading-line--lead" />
-          <span className="loading-line loading-line--lead loading-line--short" />
-        </div>
-        <div className="loading-region-grid" aria-hidden="true">
-          <div className="loading-region-map loading-card">
-            <span className="loading-map" />
-          </div>
-          <div className="loading-region-list">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div className="loading-region-row" key={i}>
-                <span className="loading-line loading-line--title loading-line--wide" />
-                <span className="loading-line loading-line--lead" />
-                <span className="loading-line loading-line--lead loading-line--short" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
+function LoadingState() {
   return (
-    <section className="loading-state loading-state--atlas" aria-busy="true" aria-label="Caricamento atlante">
-      <div className="loading-hero" aria-hidden="true">
-        <span className="loading-line loading-line--eyebrow" />
-        <span className="loading-line loading-line--title loading-line--wide" />
-        <span className="loading-line loading-line--lead" />
-        <span className="loading-line loading-line--lead loading-line--short" />
-      </div>
-      <div className="loading-atlas" aria-hidden="true">
-        <aside className="loading-theme-spine">
-          <span className="loading-line loading-line--eyebrow" />
-          {Array.from({ length: 8 }).map((_, i) => (
-            <span className="loading-theme-row" key={i}>
-              <span className="loading-line loading-line--lead" />
-              <span className="loading-pill loading-pill--tiny" />
-            </span>
-          ))}
-        </aside>
-        <div className="loading-index-panel">
-          <div className="loading-command-bar">
-            <span className="loading-line loading-line--title loading-line--mid" />
-            <span className="loading-line loading-line--lead loading-line--short" />
-          </div>
-          <div className="loading-index-list">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div className="loading-index-row" key={i}>
-                <span className="loading-line loading-line--title loading-line--wide" />
-                <span className="loading-line loading-line--lead" />
-                <span className="loading-line loading-line--lead loading-line--short" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+    <section className="loading-state">
+      <span />
+      <p>Preparazione degli indicatori territoriali...</p>
     </section>
   );
 }
