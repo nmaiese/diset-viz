@@ -23,9 +23,9 @@ Valori ammessi per `definition_match`:
 
 ## Fonti registrate
 
-- `istat_lavoro`: Rilevazione sulle forze di lavoro, regioni e province, SDMX o
-  XLSX ufficiale Istat. Stato: registrata, da verificare indicatore per
-  indicatore.
+- `istat_lavoro`: Rilevazione sulle forze di lavoro, regioni e province. Stato:
+  parser locale promosso per le righe regionali 2025 presenti nell'archivio
+  BDTPS aggiornato.
 - `istat_demografia`: Indicatori demografici Istat. Stato: parser promosso per
   righe regionali 2025/2026 già presenti nell'atlas.
 - `invalsi`: rilevazioni nazionali 2025 e dispersione implicita. Stato: fonte
@@ -44,7 +44,7 @@ Valori ammessi per `definition_match`:
 ```bash
 .venv/bin/python scripts/discover_external_sources.py
 .venv/bin/python scripts/fetch_external_data.py --source istat_lavoro --year 2025 --offline
-.venv/bin/python scripts/build_external_dataset.py --source istat_demografia --year 2025
+.venv/bin/python scripts/build_external_dataset.py --source all --year 2025
 .venv/bin/python scripts/audit_external_indicators.py
 ```
 

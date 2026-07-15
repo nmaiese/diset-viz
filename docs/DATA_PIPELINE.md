@@ -83,7 +83,7 @@ CSV legacy:
 ```bash
 .venv/bin/python scripts/discover_external_sources.py
 .venv/bin/python scripts/fetch_external_data.py --source istat_lavoro --year 2025 --offline
-.venv/bin/python scripts/build_external_dataset.py --source istat_demografia --year 2025
+.venv/bin/python scripts/build_external_dataset.py --source all --year 2025
 .venv/bin/python scripts/audit_external_indicators.py
 ```
 

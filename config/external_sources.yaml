@@ -9,7 +9,7 @@ sources:
     landing_page: https://www.istat.it/statistiche-per-temi/lavoro/
     format: SDMX, XLSX
     license: CC BY 3.0 IT
-    parser: istat_sdmx
+    parser: local_istat_lavoro_bdtps
     cache_policy: cache-first
     rate_limit: 5 richieste/minuto, usare margine prudenziale
   - source: istat_demografia

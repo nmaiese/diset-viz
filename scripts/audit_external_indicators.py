@@ -83,6 +83,8 @@ def _definition_match(item, source_id):
         return "exact"
     if source_id == "istat_demografia":
         return "compatible"
+    if source_id == "istat_lavoro":
+        return "exact"
     if source_id:
         return "proxy"
     return "different"

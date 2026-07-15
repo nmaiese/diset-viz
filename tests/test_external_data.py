@@ -42,7 +42,9 @@ class ExternalDataTest(unittest.TestCase):
             rows = list(csv.DictReader(handle, delimiter=";"))
         self.assertEqual(list(rows[0]), EXTERNAL_COLUMNS)
         self.assertTrue(rows)
-        self.assertTrue(all(row["source"] == "istat_demografia" for row in rows))
+        sources = {row["source"] for row in rows}
+        self.assertIn("istat_demografia", sources)
+        self.assertIn("istat_lavoro", sources)
         by_indicator = {}
         for row in rows:
             by_indicator.setdefault(row["target_indicator_id"], set()).add(row["territory_code"])
@@ -50,6 +52,7 @@ class ExternalDataTest(unittest.TestCase):
             self.assertIn(row["score_eligible"], {"true", "false"})
         self.assertEqual(len(by_indicator["910"]), 20)
         self.assertEqual(len(by_indicator["922"]), 20)
+        self.assertEqual(len(by_indicator["345"]), 20)
 
     def test_manifest_vocabulary_and_conservative_scoring(self):
         path = ROOT / "app/static/data/external_indicator_manifest.csv"

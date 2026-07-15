@@ -1,13 +1,13 @@
 # Audit freschezza dati 2025
 
-Generato: 2026-07-15T08:37:46.012234+00:00
+Generato: 2026-07-15T08:56:19.511010+00:00
 
 ## Riepilogo
 
-- indicatori aggiornati direttamente: 8
+- indicatori aggiornati direttamente: 33
 - nuovi indicatori 2025 aggiunti: 0
 - indicatori non aggiornabili: 293
-- indicatori da revisionare manualmente: 92
+- indicatori da revisionare manualmente: 67
 - fonti non accessibili automaticamente: INVALSI, Movimprese, Terna e Infratel restano in fixture/metadata mode finche non viene promosso un parser verificato.
 
 ## Decisioni metodologiche
@@ -40,6 +40,31 @@ Generato: 2026-07-15T08:37:46.012234+00:00
 | 910 | Speranza di vita alla nascita | 2025 | istat_demografia | 2025 | integrated |
 | 912 | Speranza di vita alla nascita (femmine) | 2025 | istat_demografia | 2025 | integrated |
 | 911 | Speranza di vita alla nascita (maschi) | 2025 | istat_demografia | 2025 | integrated |
+| 57 | Differenza tra tasso di occupazione maschile e femminile | 2025 | istat_lavoro | 2025 | integrated |
+| 180 | Incidenza della disoccupazione di lunga durata (femmine) | 2025 | istat_lavoro | 2025 | integrated |
+| 179 | Incidenza della disoccupazione di lunga durata (maschi) | 2025 | istat_lavoro | 2025 | integrated |
+| 16 | Incidenza della disoccupazione di lunga durata (totale) | 2025 | istat_lavoro | 2025 | integrated |
+| 12 | Tasso di disoccupazione | 2025 | istat_lavoro | 2025 | integrated |
+| 176 | Tasso di disoccupazione (femmine) | 2025 | istat_lavoro | 2025 | integrated |
+| 175 | Tasso di disoccupazione (maschi) | 2025 | istat_lavoro | 2025 | integrated |
+| 17 | Tasso di disoccupazione di lunga durata | 2025 | istat_lavoro | 2025 | integrated |
+| 184 | Tasso di disoccupazione di lunga durata (femmine) | 2025 | istat_lavoro | 2025 | integrated |
+| 183 | Tasso di disoccupazione di lunga durata (maschi) | 2025 | istat_lavoro | 2025 | integrated |
+| 15 | Tasso di disoccupazione giovanile | 2025 | istat_lavoro | 2025 | integrated |
+| 174 | Tasso di disoccupazione giovanile (femmine) | 2025 | istat_lavoro | 2025 | integrated |
+| 230 | Tasso di disoccupazione giovanile (maschi) | 2025 | istat_lavoro | 2025 | integrated |
+| 178 | Tasso di occupazione (femmine) | 2025 | istat_lavoro | 2025 | integrated |
+| 177 | Tasso di occupazione (maschi) | 2025 | istat_lavoro | 2025 | integrated |
+| 13 | Tasso di occupazione (totale) | 2025 | istat_lavoro | 2025 | integrated |
+| 345 | Tasso di occupazione 20-64 anni | 2025 | istat_lavoro | 2025 | integrated |
+| 347 | Tasso di occupazione 20-64 anni (femmine) | 2025 | istat_lavoro | 2025 | integrated |
+| 346 | Tasso di occupazione 20-64 anni (maschi) | 2025 | istat_lavoro | 2025 | integrated |
+| 476 | Tasso di occupazione giovanile (femmine) | 2025 | istat_lavoro | 2025 | integrated |
+| 475 | Tasso di occupazione giovanile (maschi) | 2025 | istat_lavoro | 2025 | integrated |
+| 407 | Tasso di occupazione giovanile (totale) | 2025 | istat_lavoro | 2025 | integrated |
+| 182 | Tasso di occupazione over 54 (femmine) | 2025 | istat_lavoro | 2025 | integrated |
+| 181 | Tasso di occupazione over 54 (maschi) | 2025 | istat_lavoro | 2025 | integrated |
+| 14 | Tasso di occupazione over 54 (totale) | 2025 | istat_lavoro | 2025 | integrated |
 | 423 | Copertura con banda ultralarga a 100 Mbps | 2015 | infratel | - | needs_review |
 | 422 | Copertura con banda ultralarga ad almeno 30 Mbps | 2015 | infratel | - | needs_review |
 | 73 | Grado di diffusione della larga banda nelle amministrazioni locali | 2022 | infratel | - | needs_review |
@@ -54,37 +79,12 @@ Generato: 2026-07-15T08:37:46.012234+00:00
 | 618 | Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado) | 2025 | invalsi | - | needs_review |
 | 624 | Competenza numerica non adeguata (studenti classi V scuola secondaria secondo grado) | 2025 | invalsi | - | needs_review |
 | 249 | Andamento dell'occupazione del settore della pesca | 2023 | istat_lavoro | - | needs_review |
-| 57 | Differenza tra tasso di occupazione maschile e femminile | 2024 | istat_lavoro | - | needs_review |
-| 180 | Incidenza della disoccupazione di lunga durata (femmine) | 2024 | istat_lavoro | - | needs_review |
-| 179 | Incidenza della disoccupazione di lunga durata (maschi) | 2024 | istat_lavoro | - | needs_review |
-| 16 | Incidenza della disoccupazione di lunga durata (totale) | 2024 | istat_lavoro | - | needs_review |
 | 465 | Occupati, disoccupati e inattivi che partecipano ad attività formative e di istruzione | 2014 | istat_lavoro | - | needs_review |
 | 530 | Quota di lavoratori che percepiscono sussidi di politica del lavoro passiva: Indennità di disoccupazione e Assicurazione sociale per l'impiego | 2020 | istat_lavoro | - | needs_review |
-| 12 | Tasso di disoccupazione | 2024 | istat_lavoro | - | needs_review |
-| 176 | Tasso di disoccupazione (femmine) | 2024 | istat_lavoro | - | needs_review |
-| 175 | Tasso di disoccupazione (maschi) | 2024 | istat_lavoro | - | needs_review |
-| 17 | Tasso di disoccupazione di lunga durata | 2024 | istat_lavoro | - | needs_review |
-| 184 | Tasso di disoccupazione di lunga durata (femmine) | 2024 | istat_lavoro | - | needs_review |
-| 183 | Tasso di disoccupazione di lunga durata (maschi) | 2024 | istat_lavoro | - | needs_review |
-| 15 | Tasso di disoccupazione giovanile | 2024 | istat_lavoro | - | needs_review |
-| 174 | Tasso di disoccupazione giovanile (femmine) | 2024 | istat_lavoro | - | needs_review |
-| 230 | Tasso di disoccupazione giovanile (maschi) | 2024 | istat_lavoro | - | needs_review |
-| 178 | Tasso di occupazione (femmine) | 2024 | istat_lavoro | - | needs_review |
-| 177 | Tasso di occupazione (maschi) | 2024 | istat_lavoro | - | needs_review |
-| 13 | Tasso di occupazione (totale) | 2024 | istat_lavoro | - | needs_review |
-| 345 | Tasso di occupazione 20-64 anni | 2024 | istat_lavoro | - | needs_review |
-| 347 | Tasso di occupazione 20-64 anni (femmine) | 2024 | istat_lavoro | - | needs_review |
-| 346 | Tasso di occupazione 20-64 anni (maschi) | 2024 | istat_lavoro | - | needs_review |
 | 482 | Tasso di occupazione della popolazione straniera (femmine) | 2020 | istat_lavoro | - | needs_review |
 | 481 | Tasso di occupazione della popolazione straniera (maschi) | 2020 | istat_lavoro | - | needs_review |
 | 455 | Tasso di occupazione della popolazione straniera (totale) | 2020 | istat_lavoro | - | needs_review |
-| 476 | Tasso di occupazione giovanile (femmine) | 2024 | istat_lavoro | - | needs_review |
-| 475 | Tasso di occupazione giovanile (maschi) | 2024 | istat_lavoro | - | needs_review |
-| 407 | Tasso di occupazione giovanile (totale) | 2024 | istat_lavoro | - | needs_review |
 | 460 | Tasso di occupazione nelle aree rurali (15-64 anni) | 2023 | istat_lavoro | - | needs_review |
-| 182 | Tasso di occupazione over 54 (femmine) | 2024 | istat_lavoro | - | needs_review |
-| 181 | Tasso di occupazione over 54 (maschi) | 2024 | istat_lavoro | - | needs_review |
-| 14 | Tasso di occupazione over 54 (totale) | 2024 | istat_lavoro | - | needs_review |
 | 50 | Tasso di occupazione regolare | 2018 | istat_lavoro | - | needs_review |
 | 478 | Tasso giovani NEET (femmine) | 2024 | istat_lavoro | - | needs_review |
 | 477 | Tasso giovani NEET (maschi) | 2024 | istat_lavoro | - | needs_review |
@@ -163,13 +163,13 @@ Generato: 2026-07-15T08:37:46.012234+00:00
 | 390 | Costa non definita | 2019 | - | - | unavailable |
 | 539 | Coste marine balneabili | 2019 | - | - | unavailable |
 | 531 | Densità popolazione a rischio frane | 2015 | - | - | unavailable |
-| 61 | Differenza tra tasso di attività maschile e femminile | 2024 | - | - | unavailable |
+| 61 | Differenza tra tasso di attività maschile e femminile | 2025 | - | - | unavailable |
 | 127 | Difficoltà delle famiglie nel raggiungere i supermercati | 2024 | - | - | unavailable |
 | 126 | Difficoltà delle famiglie nel raggiungere negozi alimentari e/o mercati | 2024 | - | - | unavailable |
 | 142 | Diffusione dei servizi per l'infanzia | 2023 | - | - | unavailable |
-| 125 | Diffusione della pratica sportiva | 2024 | - | - | unavailable |
-| 206 | Diffusione della pratica sportiva (femmine) | 2024 | - | - | unavailable |
-| 205 | Diffusione della pratica sportiva (maschi) | 2024 | - | - | unavailable |
+| 125 | Diffusione della pratica sportiva | 2025 | - | - | unavailable |
+| 206 | Diffusione della pratica sportiva (femmine) | 2025 | - | - | unavailable |
+| 205 | Diffusione della pratica sportiva (maschi) | 2025 | - | - | unavailable |
 | 635 | Dimissioni ospedaliere di pazienti affetti da disturbi psichici per centomila abitanti | 2022 | - | - | unavailable |
 | 388 | Dinamica dei litorali in avanzamento | 2019 | - | - | unavailable |
 | 387 | Dinamica dei litorali in erosione | 2019 | - | - | unavailable |
@@ -203,13 +203,13 @@ Generato: 2026-07-15T08:37:46.012234+00:00
 | 431 | Grado di apertura commerciale del comparto manifatturiero | 2019 | - | - | unavailable |
 | 97 | Grado di apertura dei mercati: importazioni | 2022 | - | - | unavailable |
 | 100 | Grado di dipendenza economica | 2021 | - | - | unavailable |
-| 231 | Grado di insoddisfazione dell'utenza per l'erogazione di gas | 2024 | - | - | unavailable |
+| 231 | Grado di insoddisfazione dell'utenza per l'erogazione di gas | 2025 | - | - | unavailable |
 | 428 | Grado di partecipazione dei cittadini attraverso il web a attività politiche e sociali | 2022 | - | - | unavailable |
 | 24 | Grado di promozione dell'offerta culturale dei musei e degli istituti similari statali | 2024 | - | - | unavailable |
 | 259 | Grado di promozione dell'offerta culturale dei musei e istituti similari non statali | 2022 | - | - | unavailable |
-| 210 | Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Femmine) | 2024 | - | - | unavailable |
-| 209 | Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Maschi) | 2024 | - | - | unavailable |
-| 172 | Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Totale) | 2024 | - | - | unavailable |
+| 210 | Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Femmine) | 2025 | - | - | unavailable |
+| 209 | Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Maschi) | 2025 | - | - | unavailable |
+| 172 | Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Totale) | 2025 | - | - | unavailable |
 | 469 | Grado di utilizzo dell'e-procurement nella PA | 2022 | - | - | unavailable |
 | 122 | Importanza economica del settore della pesca | 2023 | - | - | unavailable |
 | 402 | Imprenditorialità femminile | 2023 | - | - | unavailable |
@@ -242,10 +242,10 @@ Generato: 2026-07-15T08:37:46.012234+00:00
 | 135 | Indice di microcriminalità nelle città (2) | 2023 | - | - | unavailable |
 | 633 | Indice di povertà relativa regionale familiare (famiglie) | 2024 | - | - | unavailable |
 | 631 | Indice di povertà relativa regionale individuale (popolazione) | 2024 | - | - | unavailable |
-| 46 | Indice di utilizzazione del trasporto ferroviario (1) | 2024 | - | - | unavailable |
+| 46 | Indice di utilizzazione del trasporto ferroviario (1) | 2025 | - | - | unavailable |
 | 212 | Indice di utilizzazione del trasporto ferroviario (1) (femmine) | 2024 | - | - | unavailable |
 | 211 | Indice di utilizzazione del trasporto ferroviario (1) (maschi) | 2024 | - | - | unavailable |
-| 47 | Indice di utilizzazione del trasporto ferroviario (2) | 2024 | - | - | unavailable |
+| 47 | Indice di utilizzazione del trasporto ferroviario (2) | 2025 | - | - | unavailable |
 | 170 | Indice traffico merci su ferrovia | 2010 | - | - | unavailable |
 | 103 | Inquinamento causato dai mezzi di trasporto | 2019 | - | - | unavailable |
 | 152 | Intensità brevettuale | 2012 | - | - | unavailable |
@@ -255,7 +255,7 @@ Generato: 2026-07-15T08:37:46.012234+00:00
 | 166 | Investimenti diretti netti dall'estero in Italia sul Pil | 2011 | - | - | unavailable |
 | 164 | Investimenti in capitale di rischio - expansion e replacement | 2019 | - | - | unavailable |
 | 471 | Investimenti privati sul PIL | 2023 | - | - | unavailable |
-| 6 | Irregolarità nella distribuzione dell'acqua | 2024 | - | - | unavailable |
+| 6 | Irregolarità nella distribuzione dell'acqua | 2025 | - | - | unavailable |
 | 90 | Laureati in scienza e tecnologia | 2012 | - | - | unavailable |
 | 196 | Laureati in scienza e tecnologia (femmine) | 2012 | - | - | unavailable |
 | 194 | Laureati in scienza e tecnologia (maschi) | 2012 | - | - | unavailable |
@@ -288,7 +288,7 @@ Generato: 2026-07-15T08:37:46.012234+00:00
 | 640 | Ospiti con disabilità o non autosufficienti dei presidi residenziali socio-assistenziali e socio-sanitari per centomila abitanti | 2022 | - | - | unavailable |
 | 639 | Ospiti minori con disabilità o disturbi mentali dei presidi residenziali socio-assistenziali e socio-sanitari per centomila minori | 2022 | - | - | unavailable |
 | 901 | PIL pro capite | 2024 | - | - | unavailable |
-| 108 | Partecipazione della popolazione al mercato del lavoro | 2024 | - | - | unavailable |
+| 108 | Partecipazione della popolazione al mercato del lavoro | 2025 | - | - | unavailable |
 | 268 | Passeggeri trasportati dal TPL nei comuni capoluogo di provincia per abitante | 2023 | - | - | unavailable |
 | 441 | Percentuale di habitat con stato di conservazione favorevole | 2018 | - | - | unavailable |
 | 232 | Percentuale di rifiuti urbani smaltiti in discarica | 2024 | - | - | unavailable |
@@ -378,8 +378,8 @@ Generato: 2026-07-15T08:37:46.012234+00:00
 | 87 | Tasso di abbandono alla fine del primo anno delle scuole secondarie superiori | 2019 | - | - | unavailable |
 | 254 | Tasso di abbandono alla fine del primo biennio delle scuole secondarie superiori | 2019 | - | - | unavailable |
 | 89 | Tasso di abbandono alla fine del secondo anno delle scuole secondarie superiori | 2019 | - | - | unavailable |
-| 203 | Tasso di attività totale della popolazione (femmine) | 2024 | - | - | unavailable |
-| 213 | Tasso di attività totale della popolazione (maschi) | 2024 | - | - | unavailable |
+| 203 | Tasso di attività totale della popolazione (femmine) | 2025 | - | - | unavailable |
+| 213 | Tasso di attività totale della popolazione (maschi) | 2025 | - | - | unavailable |
 | 284 | Tasso di criminalità minorile | 2016 | - | - | unavailable |
 | 282 | Tasso di criminalità organizzata e di tipo mafioso | 2023 | - | - | unavailable |
 | 279 | Tasso di furti denunciati | 2023 | - | - | unavailable |
@@ -403,9 +403,9 @@ Generato: 2026-07-15T08:37:46.012234+00:00
 | 450 | Traffico ferroviario merci generato da porti e interporti | 2018 | - | - | unavailable |
 | 452 | Traffico passeggeri da e per aeroporti su mezzi pubblici collettivi | 2015 | - | - | unavailable |
 | 138 | Trasporto pubblico locale nelle città | 2013 | - | - | unavailable |
-| 208 | Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (femmine) | 2024 | - | - | unavailable |
-| 207 | Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (maschi) | 2024 | - | - | unavailable |
-| 129 | Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (totale) | 2024 | - | - | unavailable |
+| 208 | Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (femmine) | 2025 | - | - | unavailable |
+| 207 | Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (maschi) | 2025 | - | - | unavailable |
+| 129 | Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (totale) | 2025 | - | - | unavailable |
 | 903 | Valore aggiunto per abitante | 2024 | - | - | unavailable |
 | 904 | Valore aggiunto per unità di lavoro | 2024 | - | - | unavailable |
 | 163 | Valore degli investimenti in capitale di rischio - early stage | 2019 | - | - | unavailable |

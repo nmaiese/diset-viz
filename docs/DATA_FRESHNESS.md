@@ -23,7 +23,7 @@ normalizzazioni o score.
 Rigenera i report con:
 
 ```bash
-.venv/bin/python scripts/build_external_dataset.py --source istat_demografia --year 2025
+.venv/bin/python scripts/build_external_dataset.py --source all --year 2025
 .venv/bin/python scripts/audit_external_indicators.py
 ```
 
@@ -38,10 +38,11 @@ Output:
 
 ## Decisioni attuali
 
-- Integrati nel layer esterno: indicatori demografici Istat regionali 2025/2026
-  già presenti nel dataset locale.
-- Non integrati automaticamente: lavoro, INVALSI, Movimprese, turismo, Terna e
-  Infratel. Sono fonti candidate o `needs_review` fino a verifica di definizione,
-  unità, copertura e licenza.
+- Integrati nel layer esterno: indicatori demografici Istat regionali 2025/2026 e
+  indicatori Istat lavoro regionali 2025 già presenti nel dataset locale
+  aggiornato.
+- Non integrati automaticamente: INVALSI, Movimprese, turismo, Terna e Infratel.
+  Sono fonti candidate o `needs_review` fino a verifica di definizione, unità,
+  copertura e licenza.
 - Demografia strutturale, fecondità e saldi migratori restano contestuali o
   descrittivi, salvo motivazione metodologica esplicita.

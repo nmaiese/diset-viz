@@ -95,7 +95,7 @@ The legacy DiSET dataset has been replaced with the current Istat dataset
 
 - Source page: https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/
 - Download used by the updater: https://www.istat.it/storage/politiche-sviluppo/Archivio_unico_indicatori_regionali.zip
-- Current generated dataset: 101,970 rows, 377 indicators, 20 regions, 1981-2025.
+- Current generated dataset: 111,310 rows, 393 indicators, 20 regions, 1981-2026.
 
 The app keeps the original CSV schema expected by the D3 frontend. The updater
 maps `Valle d'Aosta/Vallée d'Aoste` to `Valle d'Aosta` and
@@ -131,16 +131,17 @@ Vertical 2025 sources live outside the legacy CSV schema:
 - audit reports: `reports/indicator_inventory.csv`,
   `reports/data_freshness_2025.csv`, `reports/data_freshness_2025.md`
 
-The first promoted parser is `istat_demografia`, which normalizes the existing
-official Istat demographic 2025/2026 rows into the external layer. Other sources
-are registered and auditable but remain `needs_review` until definition, unit,
-territorial coverage and parser stability are verified. No external source changes
-the BES quality-of-life scoring automatically.
+The promoted local parsers are `istat_demografia` and `istat_lavoro`, which
+normalize official 2025/2026 rows already present in the refreshed regional atlas
+into the external layer. Other sources are registered and auditable but remain
+`needs_review` until definition, unit, territorial coverage and parser stability
+are verified. No external source changes the BES quality-of-life scoring
+automatically.
 
 ```bash
 .venv/bin/python scripts/discover_external_sources.py
 .venv/bin/python scripts/fetch_external_data.py --source istat_lavoro --year 2025 --offline
-.venv/bin/python scripts/build_external_dataset.py --source istat_demografia --year 2025
+.venv/bin/python scripts/build_external_dataset.py --source all --year 2025
 .venv/bin/python scripts/audit_external_indicators.py
 ```
 

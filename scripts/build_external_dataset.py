@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Build the normalized external-source dataset.
 
-Currently promoted parser:
+Currently promoted parsers:
 - istat_demografia: normalizes existing official Istat demographic 2025+ rows
-  already present in the regional atlas, without mutating the legacy CSV.
+  already present in the regional atlas.
+- istat_lavoro: normalizes official Istat labour 2025+ rows after the legacy
+  atlas has been refreshed with scripts/update_data.py.
 """
 
 from __future__ import annotations
@@ -31,6 +33,14 @@ OUTPUT = PROJECT_ROOT / "app" / "static" / "data" / "external" / "normalized_ext
 
 DEMOGRAPHY_IDS = {"910", "911", "912", "913", "920", "921", "922", "923"}
 CONTEXTUAL_DEMOGRAPHY = {"920", "921", "922", "923"}
+LABOUR_NEEDLES = (
+    "occupazione",
+    "disoccupazione",
+    "inattiv",
+    "mancata partecipazione",
+    "neet",
+)
+LABOUR_CONTEXTUAL = {"465"}
 
 
 def _bool(value):
@@ -57,17 +67,17 @@ def _coverage(rows):
     return {key: round(len(value) / 20, 4) for key, value in areas.items()}
 
 
-def build_istat_demografia(year, level):
-    source = source_by_id("istat_demografia")
+def _build_from_legacy(source_id, year, level, include_fn, definition_fn, direction_fn, category_fn, notes):
+    source = source_by_id(source_id)
     if source is None:
-        raise RuntimeError("Missing istat_demografia in external source registry")
+        raise RuntimeError(f"Missing {source_id} in external source registry")
     retrieved_at = datetime.now(timezone.utc).isoformat()
     rows = []
     with LEGACY_REGION.open(encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle, delimiter=";")
         for row in reader:
             indicator_id = row["idIndicatore"]
-            if indicator_id not in DEMOGRAPHY_IDS:
+            if not include_fn(row):
                 continue
             if level and level != "regione":
                 continue
@@ -77,10 +87,9 @@ def build_istat_demografia(year, level):
                 continue
             if row_year < year:
                 continue
-            direction = "contextual" if indicator_id in CONTEXTUAL_DEMOGRAPHY else direction_for(indicator_id, row["Indicatore"])
-            definition_match = "exact" if indicator_id in {"910", "911", "912", "913"} else "compatible"
+            direction = direction_fn(row)
             rows.append({
-                "source": "istat_demografia",
+                "source": source_id,
                 "source_dataset": source["dataset"],
                 "source_indicator_id": indicator_id,
                 "target_indicator_id": indicator_id,
@@ -92,9 +101,9 @@ def build_istat_demografia(year, level):
                 "value": row["Dato"],
                 "unit": row["UDM"],
                 "theme": row["Tema"],
-                "quality_life_category": "salute_cura" if indicator_id in {"910", "911", "912", "913"} else "salute_cura",
+                "quality_life_category": category_fn(row),
                 "direction": direction,
-                "definition_match": definition_match,
+                "definition_match": definition_fn(row),
                 "atlas_eligible": _bool(True),
                 "profile_eligible": _bool(True),
                 "score_eligible": _bool(False),
@@ -102,7 +111,7 @@ def build_istat_demografia(year, level):
                 "retrieved_at": retrieved_at,
                 "source_url": source["landing_page"],
                 "license": source["license"],
-                "notes": "Normalized from existing Istat regional demographic atlas rows. No BES replacement is applied here.",
+                "notes": notes,
             })
 
     cov = _coverage(rows)
@@ -110,6 +119,32 @@ def build_istat_demografia(year, level):
         row["coverage"] = cov[(row["target_indicator_id"], row["year"])]
     rows.sort(key=lambda r: (r["target_indicator_id"], int(r["year"]), r["territory_name"]))
     return rows
+
+
+def build_istat_demografia(year, level):
+    return _build_from_legacy(
+        "istat_demografia",
+        year,
+        level,
+        include_fn=lambda row: row["idIndicatore"] in DEMOGRAPHY_IDS,
+        definition_fn=lambda row: "exact" if row["idIndicatore"] in {"910", "911", "912", "913"} else "compatible",
+        direction_fn=lambda row: "contextual" if row["idIndicatore"] in CONTEXTUAL_DEMOGRAPHY else direction_for(row["idIndicatore"], row["Indicatore"]),
+        category_fn=lambda row: "salute_cura",
+        notes="Normalized from existing Istat regional demographic atlas rows. No BES replacement is applied here.",
+    )
+
+
+def build_istat_lavoro(year, level):
+    return _build_from_legacy(
+        "istat_lavoro",
+        year,
+        level,
+        include_fn=lambda row: any(needle in row["Indicatore"].lower() for needle in LABOUR_NEEDLES),
+        definition_fn=lambda row: "exact",
+        direction_fn=lambda row: "contextual" if row["idIndicatore"] in LABOUR_CONTEXTUAL else direction_for(row["idIndicatore"], row["Indicatore"]),
+        category_fn=lambda row: "lavoro_opportunita",
+        notes="Normalized from official Istat BDTPS regional labour rows after scripts/update_data.py refresh. No BES replacement is applied here.",
+    )
 
 
 def main():
@@ -123,10 +158,18 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    if args.source != "istat_demografia":
+    builders = {
+        "istat_demografia": build_istat_demografia,
+        "istat_lavoro": build_istat_lavoro,
+    }
+    if args.source == "all":
+        rows = []
+        for builder in builders.values():
+            rows.extend(builder(args.year, args.level))
+    elif args.source in builders:
+        rows = builders[args.source](args.year, args.level)
+    else:
         raise SystemExit(f"No promoted parser for {args.source}. Add a fixture/parser before building.")
-
-    rows = build_istat_demografia(args.year, args.level)
     if not rows:
         raise SystemExit("No external rows built")
     if args.dry_run:

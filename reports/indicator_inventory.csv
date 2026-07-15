@@ -97,9 +97,9 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 120;Peso delle società cooperative;regione;Capitale sociale;contextual;percentuale;2019;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 127;Difficoltà delle famiglie nel raggiungere i supermercati;regione;Città;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 126;Difficoltà delle famiglie nel raggiungere negozi alimentari e/o mercati;regione;Città;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-125;Diffusione della pratica sportiva;regione;Città;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-206;Diffusione della pratica sportiva (femmine);regione;Città;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-205;Diffusione della pratica sportiva (maschi);regione;Città;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+125;Diffusione della pratica sportiva;regione;Città;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+206;Diffusione della pratica sportiva (femmine);regione;Città;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+205;Diffusione della pratica sportiva (maschi);regione;Città;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 592;Disponibilità di verde urbano;regione;Città;contextual;metri quadrati;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 252;Verde pubblico nelle città;regione;Città;contextual;metri quadri per abitante;2016;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 436;Addetti occupati nelle unità locali delle imprese italiane a controllo estero;regione;Competitività;contextual;percentuale;2019;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
@@ -169,7 +169,7 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 373;Consumi di energia elettrica della PA per ULA;regione;Energia;higher_worse;Gwh per 100mila ULA;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 374;Consumi di energia elettrica per illuminazione pubblica per superficie dei centri abitati;regione;Energia;higher_worse;Gwh per 100 Km2;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 80;Energia prodotta da fonti rinnovabili;regione;Energia;higher_better;percentuale;2012;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-231;Grado di insoddisfazione dell'utenza per l'erogazione di gas;regione;Energia;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+231;Grado di insoddisfazione dell'utenza per l'erogazione di gas;regione;Energia;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 60;Interruzioni del servizio elettrico;regione;Energia;lower_better;numero medio per utente;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 82;Popolazione regionale servita da gas metano;regione;Energia;contextual;percentuale;2006;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 81;Potenza efficiente lorda delle fonti rinnovabili;regione;Energia;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
@@ -286,44 +286,44 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 549;Valutazione dei livelli di apprendimento degli studenti della terza classe secondaria di primo grado in matematica;regione;Istruzione e formazione;contextual;punteggio standadizzato;2019;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 398;Addetti delle nuove imprese;regione;Lavoro;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 466;Condizione occupazionale dei laureati dopo 1-3 anni dal conseguimento del titolo;regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-61;Differenza tra tasso di attività maschile e femminile;regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-57;Differenza tra tasso di occupazione maschile e femminile;regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+61;Differenza tra tasso di attività maschile e femminile;regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+57;Differenza tra tasso di occupazione maschile e femminile;regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 402;Imprenditorialità femminile;regione;Lavoro;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 401;Imprenditorialità giovanile (totale);regione;Lavoro;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-180;Incidenza della disoccupazione di lunga durata (femmine);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-179;Incidenza della disoccupazione di lunga durata (maschi);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-16;Incidenza della disoccupazione di lunga durata (totale);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-108;Partecipazione della popolazione al mercato del lavoro;regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+180;Incidenza della disoccupazione di lunga durata (femmine);regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+179;Incidenza della disoccupazione di lunga durata (maschi);regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+16;Incidenza della disoccupazione di lunga durata (totale);regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+108;Partecipazione della popolazione al mercato del lavoro;regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 435;Quota di lavoratori che percepiscono sussidi di politica del lavoro passiva: Cassa integrazione e Contratti di solidarietà;regione;Lavoro;contextual;percentuale;2015;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 530;Quota di lavoratori che percepiscono sussidi di politica del lavoro passiva: Indennità di disoccupazione e Assicurazione sociale per l'impiego;regione;Lavoro;lower_better;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-203;Tasso di attività totale della popolazione (femmine);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-213;Tasso di attività totale della popolazione (maschi);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-12;Tasso di disoccupazione;regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-176;Tasso di disoccupazione (femmine);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-175;Tasso di disoccupazione (maschi);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-17;Tasso di disoccupazione di lunga durata;regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-184;Tasso di disoccupazione di lunga durata (femmine);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-183;Tasso di disoccupazione di lunga durata (maschi);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-15;Tasso di disoccupazione giovanile;regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-174;Tasso di disoccupazione giovanile (femmine);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-230;Tasso di disoccupazione giovanile (maschi);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+203;Tasso di attività totale della popolazione (femmine);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+213;Tasso di attività totale della popolazione (maschi);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+12;Tasso di disoccupazione;regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+176;Tasso di disoccupazione (femmine);regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+175;Tasso di disoccupazione (maschi);regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+17;Tasso di disoccupazione di lunga durata;regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+184;Tasso di disoccupazione di lunga durata (femmine);regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+183;Tasso di disoccupazione di lunga durata (maschi);regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+15;Tasso di disoccupazione giovanile;regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+174;Tasso di disoccupazione giovanile (femmine);regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+230;Tasso di disoccupazione giovanile (maschi);regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 113;Tasso di irregolarità del lavoro;regione;Lavoro;lower_better;percentuale;2012;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-178;Tasso di occupazione (femmine);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-177;Tasso di occupazione (maschi);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-13;Tasso di occupazione (totale);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-345;Tasso di occupazione 20-64 anni;regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-347;Tasso di occupazione 20-64 anni (femmine);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-346;Tasso di occupazione 20-64 anni (maschi);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+178;Tasso di occupazione (femmine);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+177;Tasso di occupazione (maschi);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+13;Tasso di occupazione (totale);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+345;Tasso di occupazione 20-64 anni;regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+347;Tasso di occupazione 20-64 anni (femmine);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+346;Tasso di occupazione 20-64 anni (maschi);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 482;Tasso di occupazione della popolazione straniera (femmine);regione;Lavoro;higher_better;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 481;Tasso di occupazione della popolazione straniera (maschi);regione;Lavoro;higher_better;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 455;Tasso di occupazione della popolazione straniera (totale);regione;Lavoro;higher_better;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-476;Tasso di occupazione giovanile (femmine);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-475;Tasso di occupazione giovanile (maschi);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-407;Tasso di occupazione giovanile (totale);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+476;Tasso di occupazione giovanile (femmine);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+475;Tasso di occupazione giovanile (maschi);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+407;Tasso di occupazione giovanile (totale);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 460;Tasso di occupazione nelle aree rurali (15-64 anni);regione;Lavoro;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-182;Tasso di occupazione over 54 (femmine);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-181;Tasso di occupazione over 54 (maschi);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-14;Tasso di occupazione over 54 (totale);regione;Lavoro;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+182;Tasso di occupazione over 54 (femmine);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+181;Tasso di occupazione over 54 (maschi);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+14;Tasso di occupazione over 54 (totale);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 50;Tasso di occupazione regolare;regione;Lavoro;higher_better;percentuale;2018;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 478;Tasso giovani NEET (femmine);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 477;Tasso giovani NEET (maschi);regione;Lavoro;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
@@ -387,7 +387,7 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 385;Dispersione della rete di distribuzione;regione;Risorse idriche;lower_better;percentuale;2018;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 8;Disponibilità di risorse idropotabili;regione;Risorse idriche;contextual;percentuale;2012;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 9;Efficienza nella distribuzione dell'acqua per il consumo umano;regione;Risorse idriche;contextual;percentuale;2018;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-6;Irregolarità nella distribuzione dell'acqua;regione;Risorse idriche;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+6;Irregolarità nella distribuzione dell'acqua;regione;Risorse idriche;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 253;Popolazione equivalente urbana servita da depurazione;regione;Risorse idriche;higher_better;percentuale;2015;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 10;Popolazione regionale servita da impianti di depurazione completa delle acque reflue;regione;Risorse idriche;higher_better;percentuale;2008;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 11;Quota di popolazione equivalente servita da depurazione;regione;Risorse idriche;higher_better;percentuale;2015;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
@@ -421,17 +421,17 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 434;Utilizzo dell'e-government da parte delle imprese;regione;Società dell'informazione;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 139;Dotazione di parcheggi di corrispondenza;regione;Trasporti e mobilità;contextual;numero per mille autovetture circolanti;2015;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 383;Emissioni di gas a effetto serra da trasporti stradali (Teq. CO2);regione;Trasporti e mobilità;lower_better;Tep CO2;2019;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-210;Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Femmine);regione;Trasporti e mobilità;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-209;Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Maschi);regione;Trasporti e mobilità;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-172;Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Totale);regione;Trasporti e mobilità;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+210;Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Femmine);regione;Trasporti e mobilità;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+209;Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Maschi);regione;Trasporti e mobilità;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+172;Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale (Totale);regione;Trasporti e mobilità;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 44;Indice del traffico aereo;regione;Trasporti e mobilità;contextual;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 119;Indice del traffico delle merci in navigazione di cabotaggio;regione;Trasporti e mobilità;contextual;tonnellate per cento abitanti;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 118;Indice del traffico merci su strada;regione;Trasporti e mobilità;contextual;tonnellate per abitante;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 445;Indice di accessibilità verso i nodi urbani e logistici;regione;Trasporti e mobilità;contextual;minuti;2013;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-46;Indice di utilizzazione del trasporto ferroviario (1);regione;Trasporti e mobilità;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+46;Indice di utilizzazione del trasporto ferroviario (1);regione;Trasporti e mobilità;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 212;Indice di utilizzazione del trasporto ferroviario (1) (femmine);regione;Trasporti e mobilità;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 211;Indice di utilizzazione del trasporto ferroviario (1) (maschi);regione;Trasporti e mobilità;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-47;Indice di utilizzazione del trasporto ferroviario (2);regione;Trasporti e mobilità;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+47;Indice di utilizzazione del trasporto ferroviario (2);regione;Trasporti e mobilità;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 170;Indice traffico merci su ferrovia;regione;Trasporti e mobilità;contextual;tonnellate per cento abitanti;2010;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 276;Lunghezza della rete autostradale;regione;Trasporti e mobilità;contextual;chilometro per cento chilometri quadrati;2014;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 273;Lunghezza della rete stradale;regione;Trasporti e mobilità;contextual;chilometro per cento chilometri quadrati;2014;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
@@ -452,9 +452,9 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 450;Traffico ferroviario merci generato da porti e interporti;regione;Trasporti e mobilità;contextual;numero;2018;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 452;Traffico passeggeri da e per aeroporti su mezzi pubblici collettivi;regione;Trasporti e mobilità;contextual;percentuale;2015;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 138;Trasporto pubblico locale nelle città;regione;Trasporti e mobilità;contextual;percentuale;2013;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-208;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (femmine);regione;Trasporti e mobilità;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-207;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (maschi);regione;Trasporti e mobilità;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-129;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (totale);regione;Trasporti e mobilità;contextual;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+208;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (femmine);regione;Trasporti e mobilità;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+207;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (maschi);regione;Trasporti e mobilità;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+129;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (totale);regione;Trasporti e mobilità;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 438;Velocità del trasporto pubblico su gomma nei comuni capoluogo di provincia;regione;Trasporti e mobilità;contextual;Km/ora;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 132;Produttività del lavoro nel turismo;regione;Turismo;contextual;migliaia di euro;2016;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 105;Tasso di turisticità;regione;Turismo;contextual;giornate per abitante;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
