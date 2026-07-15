@@ -168,5 +168,8 @@ singolo dataflow consolidato, solo flussi sparsi mono-tema.
 
 - pagina di dettaglio per singola provincia e geometrie NUTS3 (GeoJSON) per le mappe;
 - eventuale layer SIR "dinamismo economico" (vedi sopra), opt-in e ben etichettato.
+- integrazione di fonti verticali provinciali 2025 solo tramite il layer esterno
+  (`app/static/data/external/`), senza fondere righe provinciali nel dataset
+  regionale e senza usare dati assoluti nello scoring.
 
 Vedi anche [`docs/DATA_PIPELINE.md`](DATA_PIPELINE.md) per lo strato dati regionale.

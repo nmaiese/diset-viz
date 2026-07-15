@@ -12,6 +12,7 @@ from app.data import (
 from app import profiles
 from app import indicator_notes
 from app import quality_life_bes as qb
+from app import external_manifest
 
 from flask import Response, abort, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -97,6 +98,11 @@ def legacy_reddito():
 @app.route("/api/catalog")
 def catalog():
     return jsonify(get_catalog())
+
+
+@app.route("/api/external-indicators/manifest")
+def external_indicator_manifest_api():
+    return jsonify({"manifest": external_manifest.rows()})
 
 
 @app.route("/api/search")

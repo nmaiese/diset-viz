@@ -5,6 +5,7 @@ import unicodedata
 from collections import defaultdict
 
 from app.cache import cache
+from app.external_data import enrich_indicator_metadata
 from app.indicator_notes import MACRO_AREA_ORDER, build_indicator_explain, macro_area_for
 
 
@@ -204,7 +205,7 @@ def get_catalog():
         themes[first["theme"]]["indicator_count"] += 1
         themes[first["theme"]]["row_count"] += len(indicator_rows)
         indicators.append(
-            {
+            enrich_indicator_metadata({
                 "id": indicator_id,
                 "theme": first["theme"],
                 "macro_area": macro_area_for(first["theme"]),
@@ -224,7 +225,7 @@ def get_catalog():
                 "completeness": completeness,
                 "complete": complete,
                 "spark": spark,
-            }
+            })
         )
 
     indicators.sort(key=lambda item: (item["theme"], item["name"]))
@@ -290,22 +291,24 @@ def get_indicator(indicator_id):
         for row in sorted(rows, key=lambda item: (item["year"], _region_sort_key(item["territory"])))
     ]
 
+    metadata = enrich_indicator_metadata({
+        "id": indicator_id,
+        "theme": first["theme"],
+        "name": first["indicator"],
+        "unit": first["unit"],
+        "source": first["source"],
+        "source_label": source_for(indicator_id)["label"],
+        "source_url": source_for(indicator_id)["url"],
+        "archive": first["archive"],
+        "explain": build_indicator_explain(first),
+        "years": years,
+        "year_min": years[0],
+        "year_max": years[-1],
+        "regions": regions,
+    })
+
     return {
-        "metadata": {
-            "id": indicator_id,
-            "theme": first["theme"],
-            "name": first["indicator"],
-            "unit": first["unit"],
-            "source": first["source"],
-            "source_label": source_for(indicator_id)["label"],
-            "source_url": source_for(indicator_id)["url"],
-            "archive": first["archive"],
-            "explain": build_indicator_explain(first),
-            "years": years,
-            "year_min": years[0],
-            "year_max": years[-1],
-            "regions": regions,
-        },
+        "metadata": metadata,
         "series": series,
     }
 

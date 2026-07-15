@@ -20,6 +20,7 @@ import statistics
 from collections import defaultdict
 
 from app.cache import cache
+from app.external_data import quality_life_freshness_from_manifest
 from app.profiles import SCOREABLE_DIRECTIONS
 from app.bes_data import get_bes_manifest, get_bes_rows, get_bes_territories, has_bes_data
 from app.quality_life import get_quality_life_categories, normalize_weights
@@ -162,6 +163,7 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
         return None
 
     matrix, meta = _matrix_and_meta(level)
+    manifest = get_bes_manifest(level)
     by_category = _indicators_by_category(level)
     territories = get_bes_territories(level)
     weights = profile["weights"]
@@ -218,6 +220,7 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
         "level": level,
         "profile": profile,
         "categories": get_quality_life_categories(),
+        "data_freshness": quality_life_freshness_from_manifest(manifest),
         "ranking": rows,
         "unrated": unrated,
         "champions": _champions(level, category_display, territories, expected),

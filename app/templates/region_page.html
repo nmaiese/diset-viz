@@ -40,6 +40,12 @@
   <nav class="breadcrumb"><a href="/regioni">Regioni</a></nav>
   <h1>{{ p.region }}</h1>
   <p class="page-lead">Come se la passa {{ p.region }} rispetto alle altre regioni italiane, tema per tema. Per ogni ambito confrontiamo la regione con le altre diciannove e le assegniamo un punteggio da 0 a 100, dove 100 vuol dire prima in Italia. Il quadro nasce da {{ p.scored_count }} indicatori Istat per cui sappiamo se è meglio salire o scendere.</p>
+  <div class="freshness-strip" aria-label="Freschezza dati del profilo">
+    <span><b>{{ p.data_freshness.current }}</b> aggiornati</span>
+    <span><b>{{ p.data_freshness.recent }}</b> recenti</span>
+    <span><b>{{ p.data_freshness.dated }}</b> da aggiornare</span>
+    <span><b>{{ p.data_freshness.stale }}</b> datati</span>
+  </div>
 
   <div class="profile-cols">
     <section class="profile-card profile-strong">
@@ -97,7 +103,7 @@
               <em class="movement-delta is-up">+{{ m.movement }}</em>
             </span>
             <span class="movement-bar"><span class="is-up" style="width: {{ (m.movement | abs / move_max * 100) | round | int }}%"></span></span>
-            <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }}</small>
+            <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }} · {{ m.freshness_status }}</small>
           </li>
           {% endfor %}
         </ul>
@@ -114,7 +120,7 @@
               <em class="movement-delta is-down">{{ m.movement }}</em>
             </span>
             <span class="movement-bar"><span class="is-down" style="width: {{ (m.movement | abs / move_max * 100) | round | int }}%"></span></span>
-            <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }}</small>
+            <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }} · {{ m.freshness_status }}</small>
           </li>
           {% endfor %}
         </ul>
@@ -205,7 +211,7 @@
             data-rank="{{ i.rank if i.rank is not none else '' }}">
           <td><a href="{{ i.path }}">{{ i.name }}</a></td>
           <td class="explorer-theme">{{ i.theme }}</td>
-          <td class="num">{{ i.value | it_num }} <small>{{ i.unit }}</small></td>
+          <td class="num">{{ i.value | it_num }} <small>{{ i.unit }} · {{ i.year }} · {{ i.freshness_status }}</small></td>
           <td class="num">
             {% if i.rank is not none %}<strong>{{ i.rank }}</strong><small>/{{ i.region_count }}</small>
             {% else %}<span class="page-note">n.v.</span>{% endif %}

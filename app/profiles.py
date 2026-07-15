@@ -23,6 +23,7 @@ from collections import defaultdict
 
 from app.cache import cache
 from app.data import REGION_ORDER, get_catalog, get_rows
+from app.external_data import count_freshness, freshness_status
 from app.indicator_notes import THEME_CAVEATS, THEME_EXAMPLES, macro_area_for
 
 # Directions that carry a clear better/worse meaning (everything else is contextual).
@@ -339,6 +340,7 @@ def region_profile(region_key):
         "region": region,
         "region_key": region_key,
         "scored_count": len(scored),
+        "data_freshness": count_freshness(all_indicators),
         "theme_table": theme_table,
         "themes_strong": themes_strong,
         "themes_weak": themes_weak,
@@ -378,6 +380,7 @@ def _region_indicators(region_key):
             "direction": info["direction"],
             "value": stat["values"][region_key],
             "year": stat["year"],
+            "freshness_status": freshness_status(stat["year"]),
             "year_from": stat["year_from"],
             "rank": stat["ranks"].get(region_key) if scoreable else None,
             "region_count": len(stat["values"]),
