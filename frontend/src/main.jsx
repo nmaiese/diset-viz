@@ -63,6 +63,7 @@ function App() {
   const [selectedYear, setSelectedYear] = useUrlState("year");
   const [selectedRegion, setSelectedRegion] = useUrlState("region");
   const [regionKey, setRegionKey] = useUrlState("rk");
+  const [fromParam, setFromParam] = useUrlState("from");
   const [themeParam, setThemeParam] = useUrlState("theme");
   const [queryParam, setQueryParam] = useUrlState("q");
   const [sortParam, setSortParam] = useUrlState("sort");
@@ -170,27 +171,46 @@ function App() {
     };
   }, [activeView, regionKey]);
 
-  const openIndicator = (item) => {
+  // Open an indicator's dashboard. `origin` optionally carries the region the user
+  // came from, so the dashboard opens on that region and Back can return to it.
+  const openIndicator = (item, origin) => {
     setSelectedId(item.id);
     setThemeParam(item.theme);
     setQueryParam(null);
+    if (origin && origin.type === "regione" && origin.key) {
+      setFromParam(`regione:${origin.key}`);
+      if (origin.name) setSelectedRegion(origin.name);
+    } else {
+      setFromParam(null);
+    }
     setView("detail");
     trackEvent("select_indicator", {
       indicator_id: item.id,
       indicator_name: item.name,
       indicator_theme: item.theme,
+      from: origin?.type || "atlas",
     });
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
-  const backToAtlas = () => {
-    setView("atlas");
-    trackEvent("back_to_atlas");
+  // Back out of the dashboard: return to the region we came from, if any.
+  const backFromDetail = () => {
+    if (fromParam && fromParam.indexOf("regione:") === 0) {
+      const key = fromParam.slice("regione:".length);
+      setFromParam(null);
+      setRegionKey(key);
+      setView("regioni");
+    } else {
+      setFromParam(null);
+      setView("atlas");
+    }
+    trackEvent("back_from_detail", { to: fromParam || "atlas" });
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
   // Switch between the two reading modes ("per indicatore" / "per regione").
   const goToMode = (mode) => {
+    setFromParam(null);
     setView(mode === "regioni" ? "regioni" : "atlas");
     trackEvent("switch_mode", { mode });
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -199,6 +219,7 @@ function App() {
   // Open a region's profile inside the SPA (from the map, the list, similar
   // regions, or the indicator dashboard) without a full page reload.
   const openRegion = (key) => {
+    setFromParam(null);
     setRegionKey(key);
     setView("regioni");
     trackEvent("open_region", { region_key: key });
@@ -235,7 +256,9 @@ function App() {
         onSelectRegion={openRegion}
         onClearRegion={() => setRegionKey(null)}
         onMode={goToMode}
-        onOpenIndicator={openIndicator}
+        onOpenIndicator={(item) =>
+          openIndicator(item, { type: "regione", key: regionKey, name: regionProfile?.region })
+        }
       />
     );
   }
@@ -263,7 +286,11 @@ function App() {
           trackEvent("select_sibling_indicator", { indicator_id: id });
         }}
         onOpenRegion={openRegion}
-        onBack={backToAtlas}
+        onNavRegioni={() => goToMode("regioni")}
+        onBack={backFromDetail}
+        backContext={fromParam && fromParam.indexOf("regione:") === 0
+          ? { type: "regione", key: fromParam.slice("regione:".length), name: selectedRegion }
+          : null}
         activeTab={activeTab}
         setActiveTab={(value) => {
           setActiveTab(value);
@@ -316,7 +343,7 @@ function App() {
 /* Shared chrome                                                       */
 /* ------------------------------------------------------------------ */
 
-function SiteHeader({ children }) {
+function SiteHeader({ children, onNavRegioni }) {
   return (
     <header className="masthead">
       <a className="brand" href="/" aria-label="Divario Italia, home">
@@ -328,7 +355,19 @@ function SiteHeader({ children }) {
       </a>
       {children}
       <nav className="masthead__links" aria-label="Collegamenti">
-        <a href="/regioni">Regioni</a>
+        <a
+          href="/regioni"
+          onClick={(event) => {
+            // Inside the SPA, keep the user in the interactive region mode
+            // instead of loading the server page (which stays for SEO/deep links).
+            if (onNavRegioni && !event.metaKey && !event.ctrlKey && event.button === 0) {
+              event.preventDefault();
+              onNavRegioni();
+            }
+          }}
+        >
+          Regioni
+        </a>
         <a href="/temi">Temi</a>
         <a href="/qualita-della-vita">Qualità della vita</a>
         <a href="/metodologia">Metodologia</a>
@@ -537,7 +576,7 @@ function AtlasView({
 
   return (
     <main className="app-shell">
-      <SiteHeader />
+      <SiteHeader onNavRegioni={() => onMode("regioni")} />
 
       <section className="atlas-hero">
         <p className="eyebrow">Istat · {catalog.indicators.length} indicatori · 20 regioni · {coverageSpan(catalog)}</p>
@@ -834,7 +873,13 @@ function RegionView({
 
   return (
     <main className="app-shell">
-      <SiteHeader />
+      <SiteHeader onNavRegioni={onClearRegion}>
+        {selectedName && (
+          <button className="back-link" type="button" onClick={onClearRegion}>
+            <ArrowLeft size={16} /> Tutte le regioni
+          </button>
+        )}
+      </SiteHeader>
 
       <section className="atlas-hero atlas-hero--region">
         <p className="eyebrow">Istat · 20 regioni · posizionamento complessivo</p>
@@ -846,6 +891,22 @@ function RegionView({
         </p>
         <ModeSwitch active="regioni" onMode={onMode} />
       </section>
+
+      <nav className="breadcrumb" aria-label="Percorso">
+        <button type="button" onClick={() => onMode("atlas")}>Atlante</button>
+        <span>/</span>
+        {selectedName ? (
+          <button type="button" onClick={onClearRegion}>Per regione</button>
+        ) : (
+          <span>Per regione</span>
+        )}
+        {selectedName && (
+          <>
+            <span>/</span>
+            <span>{selectedName}</span>
+          </>
+        )}
+      </nav>
 
       <section className="region-explore">
         <aside className="region-select">
@@ -864,7 +925,7 @@ function RegionView({
                   unit=""
                 />
               </div>
-              <RegionScoreLegend />
+              <RegionScoreLegend selected={selectedEntry} />
               <ol className="region-list">
                 {ranked.map((entry) => (
                   <li key={entry.region_key}>
@@ -890,7 +951,7 @@ function RegionView({
           {!regionKey ? (
             <RegionIntro ranked={ranked} onSelectRegion={onSelectRegion} />
           ) : !profileReady ? (
-            <LoadingState />
+            <RegionProfileSkeleton name={selectedName} entry={selectedEntry} />
           ) : (
             <RegionProfile
               profile={profile}
@@ -907,15 +968,42 @@ function RegionView({
   );
 }
 
-function RegionScoreLegend() {
+function RegionScoreLegend({ selected }) {
   const stops = d3.range(0, 1.0001, 0.2);
   const gradient = `linear-gradient(90deg, ${stops.map((s) => MAP_RAMP(s)).join(", ")})`;
   return (
-    <div className="region-map-legend" aria-hidden="true">
-      <span>Indietro</span>
-      <div className="region-map-legend__bar" style={{ background: gradient }} />
-      <span>Avanti</span>
+    <div className="region-map-legend-wrap">
+      <div className="region-map-legend" aria-hidden="true">
+        <span>Indietro</span>
+        <div className="region-map-legend__bar" style={{ background: gradient }} />
+        <span>Avanti</span>
+      </div>
+      {selected && selected.score !== null && selected.score !== undefined && (
+        <p className="region-map-legend__selected">
+          <b>{selected.region}</b>: punteggio {selected.score}
+          {selected.rank ? ` · ${selected.rank}ª su ${selected.rank_total}` : ""}
+        </p>
+      )}
     </div>
+  );
+}
+
+function RegionProfileSkeleton({ name, entry }) {
+  return (
+    <article className="region-profile region-profile--loading" aria-busy="true">
+      <header className="region-profile__head">
+        <h2>{name || "Regione"}</h2>
+        <div className="region-scoreboard">
+          <div className="region-scoreboard__score">
+            <small>Punteggio complessivo</small>
+            <strong>{entry?.score ?? "—"}</strong>
+            <span>{entry?.rank ? `${entry.rank}ª su ${entry.rank_total} regioni` : "carico…"}</span>
+          </div>
+          <p className="region-scoreboard__note">Carico il profilo di {name || "questa regione"}…</p>
+        </div>
+      </header>
+      <div className="region-skeleton" aria-hidden="true"><span /><span /><span /></div>
+    </article>
   );
 }
 
@@ -972,6 +1060,36 @@ function RegionProfile({ profile, overviewEntry, onOpenIndicator, onSelectRegion
   const moves = [...profile.movement_gains, ...profile.movement_losses];
   const moveMax = Math.max(1, ...moves.map((m) => Math.abs(m.movement)));
 
+  // Which theme rows are expanded in the "Tutti i temi" accordion.
+  const [expanded, setExpanded] = useState(() => new Set());
+  const toggleTheme = (name) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  // Every core indicator of the region, grouped by theme, to reveal on expand.
+  const indicatorsByTheme = useMemo(() => {
+    const map = new Map();
+    for (const ind of profile.all_indicators || []) {
+      if (!map.has(ind.theme)) map.set(ind.theme, []);
+      map.get(ind.theme).push(ind);
+    }
+    return map;
+  }, [profile]);
+
+  const themesRef = useRef(null);
+  const openThemeAndScroll = (name) => {
+    setExpanded((prev) => new Set(prev).add(name));
+    requestAnimationFrame(() => themesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+
+  const topStrong = profile.themes_strong[0];
+  const topWeak = profile.themes_weak[0];
+  const topGain = profile.movement_gains[0];
+  const topLoss = profile.movement_losses[0];
+
   return (
     <article className="region-profile">
       <header className="region-profile__head">
@@ -989,6 +1107,35 @@ function RegionProfile({ profile, overviewEntry, onOpenIndicator, onSelectRegion
             Media su {profile.scored_count} indicatori Istat con una direzione chiara.
             0 = ultima in Italia, 100 = prima.
           </p>
+        </div>
+        <div className="region-summary">
+          {topStrong && (
+            <button type="button" className="region-summary__item is-strong" onClick={() => openThemeAndScroll(topStrong.theme)}>
+              <small><TrendingUp size={12} /> Forte in</small>
+              <strong>{topStrong.theme}</strong>
+              <b>{Math.round(topStrong.score * 100)}</b>
+            </button>
+          )}
+          {topWeak && (
+            <button type="button" className="region-summary__item is-weak" onClick={() => openThemeAndScroll(topWeak.theme)}>
+              <small><TrendingDown size={12} /> Debole in</small>
+              <strong>{topWeak.theme}</strong>
+              <b>{Math.round(topWeak.score * 100)}</b>
+            </button>
+          )}
+          {(topGain || topLoss) && (
+            <button
+              type="button"
+              className="region-summary__item"
+              onClick={() => onOpenIndicator((topGain || topLoss))}
+            >
+              <small>Si muove di più</small>
+              <strong>{(topGain || topLoss).name}</strong>
+              <b className={topGain ? "is-up" : "is-down"}>
+                {topGain ? `+${topGain.movement}` : topLoss.movement}
+              </b>
+            </button>
+          )}
         </div>
       </header>
 
@@ -1037,24 +1184,75 @@ function RegionProfile({ profile, overviewEntry, onOpenIndicator, onSelectRegion
         </section>
       )}
 
-      <section className="region-card">
+      <section className="region-card" ref={themesRef}>
         <h3><Layers size={16} /> Tutti i temi</h3>
-        <div className="theme-score-table">
-          {profile.theme_table.map((t) => (
-            <div key={t.theme} className={t.rated ? "theme-score-row" : "theme-score-row is-unrated"}>
-              <span className="theme-score-row__name">
-                {t.theme}<em>{t.count} ind.</em>
-              </span>
-              {t.rated ? (
-                <span className="theme-score-row__meter">
-                  <Bar pct={t.score * 100} />
-                  <b><AnimatedNumber value={Math.round(t.score * 100)} format={formatScore} /></b>
-                </span>
-              ) : (
-                <span className="theme-score-row__nv">non valutabile</span>
-              )}
-            </div>
-          ))}
+        <p className="region-card__note">
+          Clicca un tema per aprire i suoi indicatori con valore, posizione tra le 20 regioni e
+          punteggio, e capire come si compone il voto.
+        </p>
+        <div className="theme-accordion">
+          {profile.theme_table.map((t, idx) => {
+            const inds = indicatorsByTheme.get(t.theme) || [];
+            const isOpen = expanded.has(t.theme);
+            const panelId = `theme-panel-${idx}`;
+            return (
+              <div key={t.theme} className={`theme-acc${isOpen ? " is-open" : ""}${t.rated ? "" : " is-unrated"}`}>
+                <button
+                  type="button"
+                  className="theme-acc__head"
+                  aria-expanded={isOpen}
+                  aria-controls={panelId}
+                  onClick={() => toggleTheme(t.theme)}
+                  disabled={!inds.length}
+                >
+                  <ChevronRight className="theme-acc__caret" size={16} />
+                  <span className="theme-acc__name">{t.theme}<em>{t.count} ind.</em></span>
+                  {t.rated ? (
+                    <span className="theme-acc__meter">
+                      <Bar pct={t.score * 100} />
+                      <b><AnimatedNumber value={Math.round(t.score * 100)} format={formatScore} /></b>
+                    </span>
+                  ) : (
+                    <span className="theme-score-row__nv">non valutabile</span>
+                  )}
+                </button>
+                {isOpen && (
+                  <div className="theme-acc__panel" id={panelId}>
+                    <ul className="region-ind-rows">
+                      {inds.map((ind) => (
+                        <li key={ind.id}>
+                          <button type="button" className="region-ind-row" onClick={() => onOpenIndicator(ind)}>
+                            <span className="region-ind-row__name">{ind.name}</span>
+                            <span className="region-ind-row__value">{formatValue(ind.value, ind.unit)}</span>
+                            <span className="region-ind-row__rank">
+                              {ind.rank ? <><b>{ind.rank}</b><small>/{ind.region_count}</small></> : <small>n.v.</small>}
+                            </span>
+                            <span className="region-ind-row__meter">
+                              {ind.score !== null && ind.score !== undefined ? (
+                                <><Bar pct={ind.score} /><b>{ind.score}</b></>
+                              ) : (
+                                <small className="theme-score-row__nv">n.v.</small>
+                              )}
+                            </span>
+                            <span className="region-ind-row__move">
+                              {ind.movement ? (
+                                <em className={ind.movement > 0 ? "is-up" : "is-down"}>
+                                  {ind.movement > 0 ? `+${ind.movement}` : ind.movement}
+                                </em>
+                              ) : (
+                                <small>=</small>
+                              )}
+                            </span>
+                            <ChevronRight className="region-ind-row__chev" size={14} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -1112,6 +1310,9 @@ function IndicatorLinkList({ items, onOpen }) {
             <span className="region-ind-list__label">
               {e.name}<small>{e.theme}</small>
             </span>
+            {Number.isFinite(e.score) && (
+              <span className="region-ind-list__score">{Math.round(e.score * 100)}</span>
+            )}
             <ChevronRight size={15} />
           </button>
         </li>
@@ -1160,10 +1361,13 @@ function DetailView({
   setSelectedRegion,
   onSelectIndicator,
   onOpenRegion,
+  onNavRegioni,
   onBack,
+  backContext,
   activeTab,
   setActiveTab,
 }) {
+  const fromRegion = backContext && backContext.type === "regione" ? backContext : null;
   // Only treat the indicator as ready when its payload matches the selected id,
   // so switching indicators never flashes the previous chart.
   const ready = indicator && String(indicator.metadata.id) === String(selectedId);
@@ -1193,9 +1397,9 @@ function DetailView({
 
   return (
     <main className="app-shell">
-      <SiteHeader>
+      <SiteHeader onNavRegioni={onNavRegioni}>
         <button className="back-link" type="button" onClick={onBack}>
-          <ArrowLeft size={16} /> Atlante
+          <ArrowLeft size={16} /> {fromRegion ? fromRegion.name : "Atlante"}
         </button>
       </SiteHeader>
 
@@ -1204,9 +1408,21 @@ function DetailView({
       ) : (
         <>
           <nav className="breadcrumb" aria-label="Percorso">
-            <button type="button" onClick={onBack}>Atlante</button>
-            <span>/</span>
-            <span>{indicatorMeta.theme}</span>
+            {fromRegion ? (
+              <>
+                <button type="button" onClick={onBack}>Regioni</button>
+                <span>/</span>
+                <button type="button" onClick={onBack}>{fromRegion.name}</button>
+                <span>/</span>
+                <span>{indicatorMeta.name}</span>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={onBack}>Atlante</button>
+                <span>/</span>
+                <span>{indicatorMeta.theme}</span>
+              </>
+            )}
           </nav>
 
           <section className="workspace" id="dashboard">
@@ -1322,18 +1538,23 @@ function IndicatorHeader({ metadata, regionCount }) {
         <a href={indicatorPath(metadata.id, metadata.name)}>Scheda completa e classifica regioni →</a>
       </p>
       {metadata.explain && <IndicatorExplain explain={metadata.explain} />}
-      {metadata.archive && (
-        <p className="indicator-header__def">
-          <small>Definizione</small>
-          {metadata.archive}
-        </p>
-      )}
-      <dl>
-        <div><dt>Unità di misura</dt><dd>{metadata.unit || "n.d."}</dd></div>
-        <div><dt>Copertura</dt><dd>{metadata.year_min}-{metadata.year_max}</dd></div>
-        <div><dt>Regioni</dt><dd>{regionCount || metadata.regions.length}/20</dd></div>
-        <div><dt>Fonte</dt><dd>{metadata.source_url ? (<a href={metadata.source_url} target="_blank" rel="noreferrer">{metadata.source_label || metadata.source}</a>) : (metadata.source_label || metadata.source)}</dd></div>
-      </dl>
+      {/* Definition and metadata are collapsed so the year/region controls and the
+          selected-region KPI stay near the top of the panel, in view. */}
+      <details className="indicator-header__more">
+        <summary>Definizione e dettagli</summary>
+        {metadata.archive && (
+          <p className="indicator-header__def">
+            <small>Definizione</small>
+            {metadata.archive}
+          </p>
+        )}
+        <dl>
+          <div><dt>Unità di misura</dt><dd>{metadata.unit || "n.d."}</dd></div>
+          <div><dt>Copertura</dt><dd>{metadata.year_min}-{metadata.year_max}</dd></div>
+          <div><dt>Regioni</dt><dd>{regionCount || metadata.regions.length}/20</dd></div>
+          <div><dt>Fonte</dt><dd>{metadata.source_url ? (<a href={metadata.source_url} target="_blank" rel="noreferrer">{metadata.source_label || metadata.source}</a>) : (metadata.source_label || metadata.source)}</dd></div>
+        </dl>
+      </details>
     </div>
   );
 }

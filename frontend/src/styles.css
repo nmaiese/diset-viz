@@ -849,6 +849,85 @@ h1, h2, h3 { font-family: var(--font-display); }
 .region-cta strong { display: block; margin-top: 3px; font-size: 15px; }
 .region-cta:hover { background: #0f1a2d; }
 
+/* Legend + selected-region readout under the region map */
+.region-map-legend-wrap { display: grid; gap: 6px; }
+.region-map-legend__selected { margin: 0; font-size: 12.5px; color: var(--ink-soft); }
+.region-map-legend__selected b { font-family: var(--font-mono); }
+
+/* Summary strip (top strength / weakness / mover) above the fold */
+.region-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.region-summary__item {
+  display: grid; gap: 3px; text-align: left;
+  padding: 10px 12px; border: 1px solid var(--line); background: var(--paper);
+  border-left-width: 3px; min-width: 0;
+}
+.region-summary__item:hover { border-color: var(--accent); }
+.region-summary__item.is-strong { border-left-color: #2f8f5b; }
+.region-summary__item.is-weak { border-left-color: var(--accent); }
+.region-summary__item small { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.region-summary__item strong { font-size: 13.5px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.region-summary__item b { font-family: var(--font-mono); font-size: 13px; }
+.region-summary__item b.is-up { color: #226e44; }
+.region-summary__item b.is-down { color: var(--accent); }
+
+/* Score badge on the "excels / lags" lists */
+.region-ind-list__score {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  padding: 1px 7px; background: var(--grid); color: var(--ink); margin-left: auto;
+}
+
+/* Expandable themes accordion */
+.theme-accordion { display: grid; gap: 2px; }
+.theme-acc { border-bottom: 1px solid var(--grid); }
+.theme-acc__head {
+  display: grid; grid-template-columns: 18px minmax(0, 1.1fr) minmax(0, 1fr); align-items: center;
+  gap: 12px; width: 100%; padding: 10px 4px; border: 0; background: transparent; text-align: left;
+}
+.theme-acc__head:hover:not(:disabled) { background: var(--grid); }
+.theme-acc__head:disabled { opacity: 0.55; cursor: default; }
+.theme-acc__caret { color: var(--muted); transition: transform 160ms ease; flex: 0 0 auto; }
+.theme-acc.is-open .theme-acc__caret { transform: rotate(90deg); color: var(--accent); }
+.theme-acc__name { display: flex; align-items: baseline; gap: 8px; font-size: 13.5px; min-width: 0; }
+.theme-acc__name em { font-family: var(--font-mono); font-style: normal; font-size: 11px; color: var(--muted); flex: 0 0 auto; }
+.theme-acc__meter { display: grid; grid-template-columns: minmax(0, 1fr) 28px; align-items: center; gap: 10px; }
+.theme-acc__meter b { font-family: var(--font-mono); font-size: 13px; text-align: right; }
+.theme-acc__panel { padding: 4px 0 12px; animation: acc-in 220ms ease; }
+@keyframes acc-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+.region-ind-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.region-ind-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(64px, 0.9fr) 54px minmax(70px, 0.9fr) 40px 16px;
+  align-items: center; gap: 10px; width: 100%; padding: 7px 8px; border: 0;
+  background: var(--paper); text-align: left;
+}
+.region-ind-row:hover { background: var(--accent-soft); }
+.region-ind-row__name { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.region-ind-row__value { font-family: var(--font-mono); font-size: 12px; text-align: right; color: var(--ink-soft); }
+.region-ind-row__rank { font-family: var(--font-mono); font-size: 12px; text-align: right; }
+.region-ind-row__rank small { color: var(--muted); }
+.region-ind-row__meter { display: grid; grid-template-columns: minmax(0, 1fr) 22px; align-items: center; gap: 7px; }
+.region-ind-row__meter b { font-family: var(--font-mono); font-size: 12px; text-align: right; }
+.region-ind-row__move { font-family: var(--font-mono); font-size: 12px; text-align: right; }
+.region-ind-row__move em { font-style: normal; font-weight: 700; }
+.region-ind-row__move em.is-up { color: #226e44; }
+.region-ind-row__move em.is-down { color: var(--accent); }
+.region-ind-row__move small { color: var(--muted); }
+.region-ind-row__chev { color: var(--muted); }
+
+/* Loading skeleton while a region profile is fetched (no full-panel flash) */
+.region-skeleton { display: grid; gap: 12px; margin-top: 16px; }
+.region-skeleton span { height: 78px; background: linear-gradient(90deg, var(--grid), var(--panel), var(--grid)); background-size: 200% 100%; animation: skel 1.2s ease-in-out infinite; }
+@keyframes skel { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* Compact "definition & details" disclosure in the indicator panel header */
+.indicator-header__more { margin: 14px 0 0; }
+.indicator-header__more > summary {
+  display: inline-flex; cursor: pointer; color: var(--accent);
+  font-family: var(--font-mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.indicator-header__more[open] > summary { margin-bottom: 10px; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {
   .region-explore { grid-template-columns: 1fr; }
@@ -889,6 +968,13 @@ h1, h2, h3 { font-family: var(--font-display); }
   .region-intro__cols { grid-template-columns: 1fr; }
   .region-scoreboard { grid-template-columns: 1fr; }
   .region-scoreboard__score { padding-right: 0; border-right: 0; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+  .region-summary { grid-template-columns: 1fr; }
+  /* Hide the raw value column (kept in the full indicator card) so a theme's
+     indicators stay readable on a phone without horizontal scroll. The row then
+     has 5 visible children: name, rank, meter, movement, chevron. */
+  .region-ind-row { grid-template-columns: minmax(0, 1.5fr) 46px minmax(58px, 0.9fr) 36px 14px; gap: 8px; }
+  .region-ind-row__value { display: none; }
+  .theme-acc__head { grid-template-columns: 16px minmax(0, 1fr) 84px; gap: 8px; }
 
   .mobile-tabs {
     display: grid;
