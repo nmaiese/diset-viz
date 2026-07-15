@@ -40,6 +40,12 @@
   <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a></nav>
   <h1>Qualità della vita: {{ lvl_label }} italiane</h1>
   <p class="page-lead">Stessa misura per regioni e province, dal <strong>BES dei Territori</strong> Istat. Profilo <strong>{{ p.name }}</strong>: {{ p.description | lower }} Punteggio da 0 a 100, dove 50 è la media.</p>
+  <div class="freshness-strip" aria-label="Freschezza dati qualità della vita">
+    <span><b>{{ data.data_freshness.current }}</b> aggiornati</span>
+    <span><b>{{ data.data_freshness.recent }}</b> recenti</span>
+    <span><b>{{ data.data_freshness.dated }}</b> da aggiornare</span>
+    <span><b>{{ data.data_freshness.stale }}</b> datati</span>
+  </div>
 
   <nav class="quality-level-toggle" aria-label="Livello territoriale">
     <a href="/qualita-della-vita/classifica/regioni" class="{{ 'is-active' if not is_prov else '' }}">Regioni</a>

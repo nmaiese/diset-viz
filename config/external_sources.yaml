@@ -1,0 +1,92 @@
+sources:
+  - source: istat_lavoro
+    dataset: Rilevazione sulle forze di lavoro
+    enabled: true
+    territory_levels: [regione, provincia]
+    frequency: annuale
+    expected_release_period: anno successivo
+    download_url: https://esploradati.istat.it/databrowser/#/it
+    landing_page: https://www.istat.it/statistiche-per-temi/lavoro/
+    format: SDMX, XLSX
+    license: CC BY 3.0 IT
+    parser: local_istat_lavoro_bdtps
+    cache_policy: cache-first
+    rate_limit: 5 richieste/minuto, usare margine prudenziale
+  - source: istat_demografia
+    dataset: Indicatori demografici
+    enabled: true
+    territory_levels: [regione]
+    frequency: annuale
+    expected_release_period: marzo
+    download_url: https://esploradati.istat.it/databrowser/#/it
+    landing_page: https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/
+    format: SDMX, XLSX
+    license: CC BY 3.0 IT
+    parser: local_istat_demografia
+    cache_policy: cache-first
+    rate_limit: nessuno per fixture locale, SDMX Istat se usato
+  - source: invalsi
+    dataset: Rilevazioni nazionali degli apprendimenti
+    enabled: true
+    territory_levels: [regione]
+    frequency: annuale
+    expected_release_period: luglio
+    download_url: https://invalsiopen.it/dati/
+    landing_page: https://invalsiopen.it/dati-rilevazione-invalsi-2025/
+    format: open data, CSV/XLSX
+    license: licenza dichiarata da INVALSI sui dataset scaricati
+    parser: fixture_table
+    cache_policy: cache-first
+    rate_limit: n.d.
+  - source: movimprese
+    dataset: Movimprese
+    enabled: true
+    territory_levels: [regione, provincia]
+    frequency: trimestrale, annuale
+    expected_release_period: trimestrale
+    download_url: https://www.infocamere.it/movimprese
+    landing_page: https://www.infocamere.it/movimprese
+    format: tabelle online, CSV/XLSX quando disponibile
+    license: fonte InfoCamere/Unioncamere, verificare riuso per ogni estrazione
+    parser: fixture_table
+    cache_policy: cache-first
+    rate_limit: n.d.
+  - source: istat_turismo
+    dataset: Movimento dei clienti negli esercizi ricettivi
+    enabled: true
+    territory_levels: [regione, provincia]
+    frequency: annuale
+    expected_release_period: anno successivo
+    download_url: https://esploradati.istat.it/databrowser/#/it
+    landing_page: https://www.istat.it/statistiche-per-temi/servizi/turismo/
+    format: SDMX, XLSX
+    license: CC BY 3.0 IT
+    parser: istat_sdmx
+    cache_policy: cache-first
+    rate_limit: 5 richieste/minuto, usare margine prudenziale
+  - source: terna
+    dataset: Statistiche del sistema elettrico
+    enabled: true
+    territory_levels: [regione]
+    frequency: mensile, annuale
+    expected_release_period: anno successivo
+    download_url: https://www.terna.it/it/sistema-elettrico/statistiche/pubblicazioni-statistiche
+    landing_page: https://www.terna.it/it/sistema-elettrico/statistiche
+    format: XLSX, PDF, portale dati
+    license: fonte Terna, verificare riuso per ogni tavola
+    parser: fixture_table
+    cache_policy: cache-first
+    rate_limit: n.d.
+  - source: infratel
+    dataset: Mappatura reti fisse e Piano Italia a 1 Giga
+    enabled: true
+    territory_levels: [civico, comune, provincia, regione]
+    frequency: periodica
+    expected_release_period: non stabile
+    download_url: https://www.infratelitalia.it/archivio-documenti/documenti/esiti-mappatura-delle-reti-fisse-2025-conclusa-lanalisi-dei-dati
+    landing_page: https://www.infratelitalia.it/home
+    format: open data/documenti Infratel, aggregazione richiesta
+    license: fonte Infratel, verificare riuso per ogni dataset
+    parser: fixture_table
+    cache_policy: cache-first
+    rate_limit: n.d.

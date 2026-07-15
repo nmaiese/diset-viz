@@ -21,6 +21,10 @@ indicatori mal orientati o macro-aree incomplete.
   calcolati **a runtime** e messi in cache (`@cache.memoize(timeout=3600)`).
   Non c'è nessun artefatto precalcolato su disco: il "ricalcolo" avviene da solo
   alla scadenza della cache o al riavvio del processo.
+- Le **fonti verticali 2025** non entrano in questo CSV. Sono normalizzate in
+  `app/static/data/external/normalized_external_indicators.csv`, con manifest in
+  `app/static/data/external_indicator_manifest.csv`. Il loader è
+  `app/external_data.py`.
 
 ## Come funziona la valutazione delle tematiche
 
@@ -70,6 +74,32 @@ campanello d'allarme, ma da correggere subito aggiungendo il tema a `MACRO_AREAS
 7. **Verifica tematiche**: controlla quali temi sono ora valutabili (>= 3
    indicatori core + direzionali) e quali restano descrittivi. Usa la diagnostica
    qui sotto.
+
+## Fonti verticali e freschezza
+
+Per fonti 2025 diverse dal backbone Istat regionale usa il layer esterno, non il
+CSV legacy:
+
+```bash
+.venv/bin/python scripts/discover_external_sources.py
+.venv/bin/python scripts/fetch_external_data.py --source istat_lavoro --year 2025 --offline
+.venv/bin/python scripts/build_external_dataset.py --source all --year 2025
+.venv/bin/python scripts/audit_external_indicators.py
+```
+
+Regole:
+
+- `definition_match=exact` è l'unico caso in cui una serie può sostituirne una
+  esistente.
+- `compatible` richiede revisione manuale.
+- `proxy` non sostituisce mai il dato BES o atlas.
+- `different` resta descrittivo.
+- Nessun nuovo dato entra nello scoring se non è relativo/standardizzato,
+  completo almeno al 95%, con direzione revisionata e fonte ufficiale citabile.
+
+Le API e le pagine leggono `freshness_status` da `app/external_data.py`:
+`current` per anni dal 2025, `recent` dal 2023, `dated` dal 2020, `stale` prima
+del 2020. I badge sono solo informativi e non modificano score o ordinamenti.
 
 ## Diagnostica: temi valutabili vs descrittivi
 

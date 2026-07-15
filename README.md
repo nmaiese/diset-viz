@@ -48,6 +48,8 @@ data-driven blog and quality-of-life rankings for regions and provinces.
 - `/data` still returns the full legacy dataset for the archived D3 view.
 - `/api/catalog`, `/api/search`, `/api/indicator/<id>` and
   `/api/indicator/<id>/year/<year>` power the atlas.
+- `/api/external-indicators/manifest` exposes the auditable external-source
+  manifest used for 2025 freshness checks.
 - `/api/quality-life/*` powers the regional quality-of-life pages.
 - `/api/quality-life/province/*` powers the provincial quality-of-life pages.
 
@@ -93,7 +95,7 @@ The legacy DiSET dataset has been replaced with the current Istat dataset
 
 - Source page: https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/
 - Download used by the updater: https://www.istat.it/storage/politiche-sviluppo/Archivio_unico_indicatori_regionali.zip
-- Current generated dataset: 101,970 rows, 377 indicators, 20 regions, 1981-2025.
+- Current generated dataset: 111,310 rows, 393 indicators, 20 regions, 1981-2026.
 
 The app keeps the original CSV schema expected by the D3 frontend. The updater
 maps `Valle d'Aosta/Vallée d'Aoste` to `Valle d'Aosta` and
@@ -106,7 +108,9 @@ undefined ratios) are treated as missing throughout the data layer, so they neve
 break the API or the charts. `/api/catalog` enriches each indicator with
 `region_count`, `completeness`, `complete` (≥98% of region×year cells over 20
 regions) and a downsampled national-average `spark` series, which power the atlas
-index, badges, sorting and filtering without shipping the full dataset.
+index, badges, sorting and filtering without shipping the full dataset. It also
+exposes `year_max`, `source`, `retrieved_at` when available, and
+`freshness_status` (`current`, `recent`, `dated`, `stale`) for data-age badges.
 
 The atlas UI loads three Google Fonts (Archivo, Inter, Space Mono) via `<link>`,
 with system-font fallbacks if they are unavailable.
@@ -116,6 +120,33 @@ Regenerate the dataset with:
 ```bash
 python3 scripts/update_data.py
 ```
+
+### External 2025 source layer
+
+Vertical 2025 sources live outside the legacy CSV schema:
+
+- registry: `config/external_sources.yaml`
+- normalized dataset: `app/static/data/external/normalized_external_indicators.csv`
+- manifest: `app/static/data/external_indicator_manifest.csv`
+- audit reports: `reports/indicator_inventory.csv`,
+  `reports/data_freshness_2025.csv`, `reports/data_freshness_2025.md`
+
+The promoted local parsers are `istat_demografia` and `istat_lavoro`, which
+normalize official 2025/2026 rows already present in the refreshed regional atlas
+into the external layer. Other sources are registered and auditable but remain
+`needs_review` until definition, unit, territorial coverage and parser stability
+are verified. No external source changes the BES quality-of-life scoring
+automatically.
+
+```bash
+.venv/bin/python scripts/discover_external_sources.py
+.venv/bin/python scripts/fetch_external_data.py --source istat_lavoro --year 2025 --offline
+.venv/bin/python scripts/build_external_dataset.py --source all --year 2025
+.venv/bin/python scripts/audit_external_indicators.py
+```
+
+See [`docs/EXTERNAL_SOURCES.md`](docs/EXTERNAL_SOURCES.md) and
+[`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md).
 
 ### Quality-of-life datasets
 

@@ -56,12 +56,16 @@
     <span><small>Tema</small><a href="{{ theme_path }}">{{ meta.theme }}</a></span>
     <span><small>Unità di misura</small>{{ meta.unit or 'n.d.' }}</span>
     <span><small>Copertura</small>{{ meta.year_min }}-{{ meta.year_max }}, {{ meta.regions | length }} regioni</span>
+    <span><small>Freschezza</small><b class="freshness-badge is-{{ meta.freshness_status }}">{{ meta.freshness_label }}</b></span>
     <span><small>Fonte</small><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label or meta.source }}</a></span>
   </div>
 
   <section class="prose">
     <p class="data-callout"><strong>Dato più recente: {{ year }}.</strong>{% if meta.year_min != meta.year_max %} La serie storica copre il periodo {{ meta.year_min }}-{{ meta.year_max }}.{% endif %}</p>
     <p>{{ explain.example }}</p>
+    {% if meta.external_sources %}
+    <p class="page-note">Layer esterno collegato: {{ meta.external_sources | join(', ') }}{% if meta.external_year_max %}, ultimo anno normalizzato {{ meta.external_year_max }}{% endif %}.</p>
+    {% endif %}
     <p>{{ explain.reading }}</p>
     {% if best and worst %}
     <p>Nel {{ year }} la posizione migliore è di <a href="/regione/{{ best.region_key }}">{{ best.region }}</a>

@@ -12,6 +12,7 @@ from app.data import (
 from app import profiles
 from app import indicator_notes
 from app import quality_life_bes as qb
+from app import external_manifest
 
 from flask import Response, abort, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -97,6 +98,11 @@ def legacy_reddito():
 @app.route("/api/catalog")
 def catalog():
     return jsonify(get_catalog())
+
+
+@app.route("/api/external-indicators/manifest")
+def external_indicator_manifest_api():
+    return jsonify({"manifest": external_manifest.rows()})
 
 
 @app.route("/api/search")
@@ -262,6 +268,27 @@ def region_page(region_key):
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/regione/{region_key}",
     )
+
+
+@app.route("/api/regions/overview")
+def regions_overview_api():
+    """Compact per-region standing (overall score, rank, strong/weak themes) for
+    the SPA 'per regione' selection map. Same source as the /regioni page."""
+    return jsonify(profiles.regions_overview())
+
+
+@app.route("/api/region/<region_key>")
+def region_api(region_key):
+    """JSON del profilo regione, per la vista 'per regione' della SPA.
+
+    Riusa la stessa funzione che alimenta la pagina server /regione/<key>, così
+    atlante interattivo e pagina SEO restano coerenti su un'unica fonte dati.
+    L'after_request in app/__init__.py aggiunge già X-Robots-Tag: noindex.
+    """
+    profile = profiles.region_profile(region_key)
+    if profile is None:
+        abort(404)
+    return jsonify(profile)
 
 
 @app.route("/tema/<theme_slug>")

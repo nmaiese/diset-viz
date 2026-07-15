@@ -137,6 +137,27 @@ def write_atomic(rows: list[dict[str, str]], output_path: Path) -> None:
     os.chmod(output_path, 0o644)
 
 
+def read_preserved_rows(output_path: Path, refreshed_indicator_ids: set[str]) -> list[dict[str, str]]:
+    """Keep local supplemental indicators that are not in the downloaded archive.
+
+    The project carries a small set of curated regional indicators (for example
+    demographics and territorial accounts) that are already in the legacy schema
+    but do not come from the BDTPS ZIP. A plain refresh must not silently drop
+    them.
+    """
+    if not output_path.exists():
+        return []
+    preserved = []
+    with output_path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle, delimiter=";")
+        if reader.fieldnames != OUTPUT_COLUMNS:
+            return []
+        for row in reader:
+            if row["idIndicatore"] not in refreshed_indicator_ids:
+                preserved.append({column: row.get(column, "") for column in OUTPUT_COLUMNS})
+    return preserved
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default=SOURCE_URL, help="Source ZIP URL")
@@ -157,6 +178,9 @@ def main() -> None:
     if not rows:
         raise RuntimeError("No regional rows were converted")
 
+    refreshed_indicator_ids = {row["idIndicatore"] for row in rows}
+    preserved = read_preserved_rows(args.output, refreshed_indicator_ids)
+    rows.extend(preserved)
     rows.sort(key=lambda row: (int(row["idIndicatore"]), row["Territorio"], int(row["Anno"])))
     write_atomic(rows, args.output)
 
@@ -164,7 +188,8 @@ def main() -> None:
     indicators = {row["idIndicatore"] for row in rows}
     regions = {row["Territorio"] for row in rows}
     print(
-        f"Wrote {len(rows)} rows, {len(indicators)} indicators, "
+        f"Wrote {len(rows)} rows, {len(indicators)} indicators "
+        f"({len(preserved)} preserved rows), "
         f"{len(regions)} regions, years {years[0]}-{years[-1]} to {args.output}"
     )
 

@@ -13,11 +13,15 @@ import {
   ChevronRight,
   Clock3,
   Github,
+  Layers,
   LineChart,
   MapPinned,
   Minus,
   Search,
+  TrendingDown,
+  TrendingUp,
   Trophy,
+  Users,
   X,
 } from "lucide-react";
 import "./styles.css";
@@ -25,6 +29,8 @@ import "./styles.css";
 const API = {
   catalog: "/api/catalog",
   indicator: (id) => `/api/indicator/${id}`,
+  region: (key) => `/api/region/${key}`,
+  regionsOverview: "/api/regions/overview",
   map: "/static/data/italian-regions.geo.json",
 };
 
@@ -48,12 +54,16 @@ function App() {
   const [catalog, setCatalog] = useState(null);
   const [mapData, setMapData] = useState(null);
   const [indicator, setIndicator] = useState(null);
+  const [regionsOverview, setRegionsOverview] = useState(null);
+  const [regionProfile, setRegionProfile] = useState(null);
   const [error, setError] = useState(null);
 
   const [view, setView] = useUrlState("view");
   const [selectedId, setSelectedId] = useUrlState("indicator");
   const [selectedYear, setSelectedYear] = useUrlState("year");
   const [selectedRegion, setSelectedRegion] = useUrlState("region");
+  const [regionKey, setRegionKey] = useUrlState("rk");
+  const [fromParam, setFromParam] = useUrlState("from");
   const [themeParam, setThemeParam] = useUrlState("theme");
   const [queryParam, setQueryParam] = useUrlState("q");
   const [sortParam, setSortParam] = useUrlState("sort");
@@ -69,7 +79,15 @@ function App() {
   const macroArea = areaParam || "Tutte";
   // Default to atlas, but a shared ?indicator=… link (no explicit view) opens the detail.
   const activeView =
-    view === "detail" ? "detail" : view === "atlas" ? "atlas" : selectedId ? "detail" : "atlas";
+    view === "detail"
+      ? "detail"
+      : view === "regioni"
+      ? "regioni"
+      : view === "atlas"
+      ? "atlas"
+      : selectedId
+      ? "detail"
+      : "atlas";
 
   const [activeTab, setActiveTab] = useState("map");
   const pageViewKey = activeView === "detail" ? `detail:${selectedId || ""}` : "atlas";
@@ -125,22 +143,86 @@ function App() {
       .catch(() => setError("Indicatore non disponibile. Prova a selezionarne un altro."));
   }, [activeView, selectedId, catalog]);
 
-  const openIndicator = (item) => {
+  // Region standing map: load once, the first time the region mode is opened.
+  useEffect(() => {
+    if (activeView !== "regioni" || regionsOverview) return;
+    fetchJson(API.regionsOverview)
+      .then(setRegionsOverview)
+      .catch(() => {});
+  }, [activeView, regionsOverview]);
+
+  // Selected region profile, refetched whenever the region key changes.
+  useEffect(() => {
+    if (activeView !== "regioni" || !regionKey) {
+      setRegionProfile(null);
+      return;
+    }
+    if (regionProfile && regionProfile.region_key === regionKey) return;
+    let cancelled = false;
+    fetchJson(API.region(regionKey))
+      .then((payload) => {
+        if (!cancelled) setRegionProfile(payload);
+      })
+      .catch(() => {
+        if (!cancelled) setRegionProfile(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeView, regionKey]);
+
+  // Open an indicator's dashboard. `origin` optionally carries the region the user
+  // came from, so the dashboard opens on that region and Back can return to it.
+  const openIndicator = (item, origin) => {
     setSelectedId(item.id);
     setThemeParam(item.theme);
     setQueryParam(null);
+    if (origin && origin.type === "regione" && origin.key) {
+      setFromParam(`regione:${origin.key}`);
+      if (origin.name) setSelectedRegion(origin.name);
+    } else {
+      setFromParam(null);
+    }
     setView("detail");
     trackEvent("select_indicator", {
       indicator_id: item.id,
       indicator_name: item.name,
       indicator_theme: item.theme,
+      from: origin?.type || "atlas",
     });
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
-  const backToAtlas = () => {
-    setView("atlas");
-    trackEvent("back_to_atlas");
+  // Back out of the dashboard: return to the region we came from, if any.
+  const backFromDetail = () => {
+    if (fromParam && fromParam.indexOf("regione:") === 0) {
+      const key = fromParam.slice("regione:".length);
+      setFromParam(null);
+      setRegionKey(key);
+      setView("regioni");
+    } else {
+      setFromParam(null);
+      setView("atlas");
+    }
+    trackEvent("back_from_detail", { to: fromParam || "atlas" });
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
+
+  // Switch between the two reading modes ("per indicatore" / "per regione").
+  const goToMode = (mode) => {
+    setFromParam(null);
+    setView(mode === "regioni" ? "regioni" : "atlas");
+    trackEvent("switch_mode", { mode });
+    window.scrollTo({ top: 0, behavior: "auto" });
+  };
+
+  // Open a region's profile inside the SPA (from the map, the list, similar
+  // regions, or the indicator dashboard) without a full page reload.
+  const openRegion = (key) => {
+    setFromParam(null);
+    setRegionKey(key);
+    setView("regioni");
+    trackEvent("open_region", { region_key: key });
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
@@ -161,6 +243,23 @@ function App() {
         <LoadingState />
         <SiteFooter />
       </main>
+    );
+  }
+
+  if (activeView === "regioni") {
+    return (
+      <RegionView
+        mapData={mapData}
+        overview={regionsOverview}
+        regionKey={regionKey}
+        profile={regionProfile}
+        onSelectRegion={openRegion}
+        onClearRegion={() => setRegionKey(null)}
+        onMode={goToMode}
+        onOpenIndicator={(item) =>
+          openIndicator(item, { type: "regione", key: regionKey, name: regionProfile?.region })
+        }
+      />
     );
   }
 
@@ -186,7 +285,12 @@ function App() {
           setSelectedId(id);
           trackEvent("select_sibling_indicator", { indicator_id: id });
         }}
-        onBack={backToAtlas}
+        onOpenRegion={openRegion}
+        onNavRegioni={() => goToMode("regioni")}
+        onBack={backFromDetail}
+        backContext={fromParam && fromParam.indexOf("regione:") === 0
+          ? { type: "regione", key: fromParam.slice("regione:".length), name: selectedRegion }
+          : null}
         activeTab={activeTab}
         setActiveTab={(value) => {
           setActiveTab(value);
@@ -230,6 +334,7 @@ function App() {
         trackEvent("filter_year_range", { year_from: from, year_to: to });
       }}
       onOpen={openIndicator}
+      onMode={goToMode}
     />
   );
 }
@@ -238,7 +343,7 @@ function App() {
 /* Shared chrome                                                       */
 /* ------------------------------------------------------------------ */
 
-function SiteHeader({ children }) {
+function SiteHeader({ children, onNavRegioni }) {
   return (
     <header className="masthead">
       <a className="brand" href="/" aria-label="Divario Italia, home">
@@ -250,7 +355,19 @@ function SiteHeader({ children }) {
       </a>
       {children}
       <nav className="masthead__links" aria-label="Collegamenti">
-        <a href="/regioni">Regioni</a>
+        <a
+          href="/regioni"
+          onClick={(event) => {
+            // Inside the SPA, keep the user in the interactive region mode
+            // instead of loading the server page (which stays for SEO/deep links).
+            if (onNavRegioni && !event.metaKey && !event.ctrlKey && event.button === 0) {
+              event.preventDefault();
+              onNavRegioni();
+            }
+          }}
+        >
+          Regioni
+        </a>
         <a href="/temi">Temi</a>
         <a href="/qualita-della-vita">Qualità della vita</a>
         <a href="/metodologia">Metodologia</a>
@@ -298,13 +415,123 @@ function SiteFooter() {
   );
 }
 
+// Top-level reading mode: browse indicators, or look up how a region is doing.
+function ModeSwitch({ active, onMode }) {
+  const modes = [
+    { id: "atlas", label: "Per indicatore", icon: BarChart3 },
+    { id: "regioni", label: "Per regione", icon: MapPinned },
+  ];
+  return (
+    <div className="mode-switch" role="tablist" aria-label="Modalità di lettura">
+      {modes.map((mode) => {
+        const Icon = mode.icon;
+        const isActive = active === mode.id;
+        return (
+          <button
+            key={mode.id}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            className={isActive ? "mode-switch__tab is-active" : "mode-switch__tab"}
+            onClick={() => !isActive && onMode(mode.id)}
+          >
+            <Icon size={16} /> {mode.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Numeric animation primitives                                        */
+/* ------------------------------------------------------------------ */
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handler = () => setReduced(mq.matches);
+    mq.addEventListener?.("change", handler);
+    return () => mq.removeEventListener?.("change", handler);
+  }, []);
+  return reduced;
+}
+
+// Tween a number from its previous value to a new target with an ease-out curve.
+// Honours prefers-reduced-motion by snapping straight to the target.
+function useCountUp(target, duration = 850) {
+  const reduced = usePrefersReducedMotion();
+  const finite = Number.isFinite(target);
+  const [value, setValue] = useState(finite && !reduced ? 0 : target);
+  const prevRef = useRef(finite && !reduced ? 0 : target);
+
+  useEffect(() => {
+    if (!finite || reduced) {
+      prevRef.current = target;
+      setValue(target);
+      return;
+    }
+    const from = Number.isFinite(prevRef.current) ? prevRef.current : 0;
+    if (from === target) {
+      setValue(target);
+      return;
+    }
+    let raf;
+    const start = performance.now();
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(from + (target - from) * eased);
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else prevRef.current = target;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration, reduced, finite]);
+
+  return value;
+}
+
+function AnimatedNumber({ value, unit = "", format = formatValue, className }) {
+  const animated = useCountUp(Number.isFinite(value) ? value : NaN);
+  return <span className={className}>{format(Number.isFinite(value) ? animated : value, unit)}</span>;
+}
+
+// Bar that grows from 0 to `pct`% on mount (CSS width transition), snapping when
+// reduced motion is requested. Used for score meters and movement bars.
+function Bar({ pct, className = "" }) {
+  const reduced = usePrefersReducedMotion();
+  const target = Math.max(0, Math.min(100, pct || 0));
+  const [width, setWidth] = useState(reduced ? target : 0);
+  useEffect(() => {
+    if (reduced) {
+      setWidth(target);
+      return;
+    }
+    const raf = requestAnimationFrame(() => setWidth(target));
+    return () => cancelAnimationFrame(raf);
+  }, [target, reduced]);
+  return (
+    <span className={`di-bar ${className}`.trim()}>
+      <i style={{ width: `${width}%` }} />
+    </span>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Atlas (browse) view                                                */
 /* ------------------------------------------------------------------ */
 
 function AtlasView({
   catalog, theme, setTheme, query, setQuery, sort, setSort, showPartial, setShowPartial,
-  macroArea, setMacroArea, yearFrom, yearTo, setYearRange, onOpen,
+  macroArea, setMacroArea, yearFrom, yearTo, setYearRange, onOpen, onMode,
 }) {
   const [fullMin, fullMax] = useMemo(() => {
     const mins = catalog.indicators.map((i) => i.year_min);
@@ -349,7 +576,7 @@ function AtlasView({
 
   return (
     <main className="app-shell">
-      <SiteHeader />
+      <SiteHeader onNavRegioni={() => onMode("regioni")} />
 
       <section className="atlas-hero">
         <p className="eyebrow">Istat · {catalog.indicators.length} indicatori · 20 regioni · {coverageSpan(catalog)}</p>
@@ -362,6 +589,7 @@ function AtlasView({
           Filtra per area, tema o anni, poi apri la scheda di ogni indicatore con mappa,
           classifica e andamento nel tempo.
         </p>
+        <ModeSwitch active="atlas" onMode={onMode} />
       </section>
 
       <MacroSpine
@@ -616,6 +844,508 @@ function CoverageBadge({ item }) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Region (per-region) view                                           */
+/* ------------------------------------------------------------------ */
+
+function RegionView({
+  mapData, overview, regionKey, profile, onSelectRegion, onClearRegion, onMode, onOpenIndicator,
+}) {
+  const entries = useMemo(() => (overview ? Object.values(overview) : []), [overview]);
+  const ranked = useMemo(
+    () =>
+      [...entries]
+        .filter((entry) => entry.score !== null && entry.score !== undefined)
+        .sort((a, b) => b.score - a.score),
+    [entries],
+  );
+  const values = useMemo(
+    () => entries.map((entry) => ({ region: entry.region, region_key: entry.region_key, value: entry.score })),
+    [entries],
+  );
+  const selectedEntry = overview && regionKey ? overview[regionKey] : null;
+  const selectedName = selectedEntry?.region || profile?.region || null;
+  const profileReady = profile && profile.region_key === regionKey;
+
+  const handleMapSelect = (name) => {
+    const found = entries.find((entry) => entry.region === name);
+    if (found) onSelectRegion(found.region_key);
+  };
+
+  return (
+    <main className="app-shell">
+      <SiteHeader onNavRegioni={onClearRegion}>
+        {selectedName && (
+          <button className="back-link" type="button" onClick={onClearRegion}>
+            <ArrowLeft size={16} /> Tutte le regioni
+          </button>
+        )}
+      </SiteHeader>
+
+      <section className="atlas-hero atlas-hero--region">
+        <p className="eyebrow">Istat · 20 regioni · posizionamento complessivo</p>
+        <h1>Come è messa ogni regione.</h1>
+        <p className="atlas-hero__lead">
+          Scegli una regione sulla mappa o dalla lista: per ogni tema le assegniamo un punteggio
+          da 0 a 100, dove 100 vuol dire prima in Italia. Così vedi a colpo d'occhio dove eccelle,
+          dove resta indietro e come si è mossa nell'ultimo anno.
+        </p>
+        <ModeSwitch active="regioni" onMode={onMode} />
+      </section>
+
+      <nav className="breadcrumb" aria-label="Percorso">
+        <button type="button" onClick={() => onMode("atlas")}>Atlante</button>
+        <span>/</span>
+        {selectedName ? (
+          <button type="button" onClick={onClearRegion}>Per regione</button>
+        ) : (
+          <span>Per regione</span>
+        )}
+        {selectedName && (
+          <>
+            <span>/</span>
+            <span>{selectedName}</span>
+          </>
+        )}
+      </nav>
+
+      <section className="region-explore">
+        <aside className="region-select">
+          <div className="region-select__head">
+            <h2>Scegli una regione</h2>
+            <p>Il colore indica il posizionamento complessivo: più scuro, meglio si posiziona.</p>
+          </div>
+          {overview ? (
+            <>
+              <div className="region-map">
+                <ItalyMap
+                  geo={mapData}
+                  values={values}
+                  selectedRegion={selectedName}
+                  onSelect={handleMapSelect}
+                  unit=""
+                />
+              </div>
+              <RegionScoreLegend selected={selectedEntry} />
+              <ol className="region-list">
+                {ranked.map((entry) => (
+                  <li key={entry.region_key}>
+                    <button
+                      type="button"
+                      className={entry.region_key === regionKey ? "region-chip is-active" : "region-chip"}
+                      onClick={() => onSelectRegion(entry.region_key)}
+                    >
+                      <span className="region-chip__rank">{entry.rank ?? "–"}</span>
+                      <span className="region-chip__name">{entry.region}</span>
+                      <span className="region-chip__score">{entry.score ?? "n.d."}</span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </>
+          ) : (
+            <LoadingState />
+          )}
+        </aside>
+
+        <div className="region-profile-panel">
+          {!regionKey ? (
+            <RegionIntro ranked={ranked} onSelectRegion={onSelectRegion} />
+          ) : !profileReady ? (
+            <RegionProfileSkeleton name={selectedName} entry={selectedEntry} />
+          ) : (
+            <RegionProfile
+              profile={profile}
+              overviewEntry={selectedEntry}
+              onOpenIndicator={onOpenIndicator}
+              onSelectRegion={onSelectRegion}
+              onClear={onClearRegion}
+            />
+          )}
+        </div>
+      </section>
+      <SiteFooter />
+    </main>
+  );
+}
+
+function RegionScoreLegend({ selected }) {
+  const stops = d3.range(0, 1.0001, 0.2);
+  const gradient = `linear-gradient(90deg, ${stops.map((s) => MAP_RAMP(s)).join(", ")})`;
+  return (
+    <div className="region-map-legend-wrap">
+      <div className="region-map-legend" aria-hidden="true">
+        <span>Indietro</span>
+        <div className="region-map-legend__bar" style={{ background: gradient }} />
+        <span>Avanti</span>
+      </div>
+      {selected && selected.score !== null && selected.score !== undefined && (
+        <p className="region-map-legend__selected">
+          <b>{selected.region}</b>: punteggio {selected.score}
+          {selected.rank ? ` · ${selected.rank}ª su ${selected.rank_total}` : ""}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function RegionProfileSkeleton({ name, entry }) {
+  return (
+    <article className="region-profile region-profile--loading" aria-busy="true">
+      <header className="region-profile__head">
+        <h2>{name || "Regione"}</h2>
+        <div className="region-scoreboard">
+          <div className="region-scoreboard__score">
+            <small>Punteggio complessivo</small>
+            <strong>{entry?.score ?? "—"}</strong>
+            <span>{entry?.rank ? `${entry.rank}ª su ${entry.rank_total} regioni` : "carico…"}</span>
+          </div>
+          <p className="region-scoreboard__note">Carico il profilo di {name || "questa regione"}…</p>
+        </div>
+      </header>
+      <div className="region-skeleton" aria-hidden="true"><span /><span /><span /></div>
+    </article>
+  );
+}
+
+function RegionIntro({ ranked, onSelectRegion }) {
+  const top = ranked.slice(0, 3);
+  const bottom = ranked.slice(-3).reverse();
+  return (
+    <div className="region-intro">
+      <MapPinned size={30} />
+      <h2>Scegli una regione per vedere come è messa</h2>
+      <p>
+        Per ogni regione calcoliamo un punteggio da 0 a 100 su ciascun tema, dove 100 significa
+        prima in Italia. Poi mostriamo dove eccelle, dove resta indietro e come si è mossa
+        nell'ultimo anno, con i link alle schede dei singoli indicatori.
+      </p>
+      {ranked.length > 0 && (
+        <div className="region-intro__cols">
+          <div>
+            <small><Trophy size={13} /> In testa</small>
+            <ul>
+              {top.map((entry) => (
+                <li key={entry.region_key}>
+                  <button type="button" onClick={() => onSelectRegion(entry.region_key)}>
+                    <span>{entry.rank}. {entry.region}</span>
+                    <b>{entry.score}</b>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <small>In coda</small>
+            <ul>
+              {bottom.map((entry) => (
+                <li key={entry.region_key}>
+                  <button type="button" onClick={() => onSelectRegion(entry.region_key)}>
+                    <span>{entry.rank}. {entry.region}</span>
+                    <b>{entry.score}</b>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RegionProfile({ profile, overviewEntry, onOpenIndicator, onSelectRegion, onClear }) {
+  const score = overviewEntry?.score ?? null;
+  const rank = overviewEntry?.rank ?? null;
+  const rankTotal = overviewEntry?.rank_total ?? 20;
+  const moves = [...profile.movement_gains, ...profile.movement_losses];
+  const moveMax = Math.max(1, ...moves.map((m) => Math.abs(m.movement)));
+
+  // Which theme rows are expanded in the "Tutti i temi" accordion.
+  const [expanded, setExpanded] = useState(() => new Set());
+  const toggleTheme = (name) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  // Every core indicator of the region, grouped by theme, to reveal on expand.
+  const indicatorsByTheme = useMemo(() => {
+    const map = new Map();
+    for (const ind of profile.all_indicators || []) {
+      if (!map.has(ind.theme)) map.set(ind.theme, []);
+      map.get(ind.theme).push(ind);
+    }
+    return map;
+  }, [profile]);
+
+  const themesRef = useRef(null);
+  const openThemeAndScroll = (name) => {
+    setExpanded((prev) => new Set(prev).add(name));
+    requestAnimationFrame(() => themesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
+
+  const topStrong = profile.themes_strong[0];
+  const topWeak = profile.themes_weak[0];
+  const topGain = profile.movement_gains[0];
+  const topLoss = profile.movement_losses[0];
+
+  return (
+    <article className="region-profile">
+      <header className="region-profile__head">
+        <button type="button" className="region-profile__back" onClick={onClear}>
+          <ArrowLeft size={15} /> Tutte le regioni
+        </button>
+        <h2>{profile.region}</h2>
+        <div className="region-scoreboard">
+          <div className="region-scoreboard__score">
+            <small>Punteggio complessivo</small>
+            <strong><AnimatedNumber value={score} format={formatScore} /></strong>
+            <span>{rank ? `${rank}ª su ${rankTotal} regioni` : "non valutabile"}</span>
+          </div>
+          <p className="region-scoreboard__note">
+            Media su {profile.scored_count} indicatori Istat con una direzione chiara.
+            0 = ultima in Italia, 100 = prima.
+          </p>
+        </div>
+        <div className="region-summary">
+          {topStrong && (
+            <button type="button" className="region-summary__item is-strong" onClick={() => openThemeAndScroll(topStrong.theme)}>
+              <small><TrendingUp size={12} /> Forte in</small>
+              <strong>{topStrong.theme}</strong>
+              <b>{Math.round(topStrong.score * 100)}</b>
+            </button>
+          )}
+          {topWeak && (
+            <button type="button" className="region-summary__item is-weak" onClick={() => openThemeAndScroll(topWeak.theme)}>
+              <small><TrendingDown size={12} /> Debole in</small>
+              <strong>{topWeak.theme}</strong>
+              <b>{Math.round(topWeak.score * 100)}</b>
+            </button>
+          )}
+          {(topGain || topLoss) && (
+            <button
+              type="button"
+              className="region-summary__item"
+              onClick={() => onOpenIndicator((topGain || topLoss))}
+            >
+              <small>Si muove di più</small>
+              <strong>{(topGain || topLoss).name}</strong>
+              <b className={topGain ? "is-up" : "is-down"}>
+                {topGain ? `+${topGain.movement}` : topLoss.movement}
+              </b>
+            </button>
+          )}
+        </div>
+      </header>
+
+      <div className="region-cols">
+        <section className="region-card region-card--strong">
+          <h3><TrendingUp size={16} /> Dove eccelle</h3>
+          {profile.themes_strong.length ? (
+            <ThemeScoreList items={profile.themes_strong} />
+          ) : (
+            <p className="card-empty">Nessun tema emerge nettamente sopra la media.</p>
+          )}
+          {!!profile.top_excels.length && (
+            <IndicatorLinkList items={profile.top_excels} onOpen={onOpenIndicator} />
+          )}
+        </section>
+        <section className="region-card region-card--weak">
+          <h3><TrendingDown size={16} /> Dove resta indietro</h3>
+          {profile.themes_weak.length ? (
+            <ThemeScoreList items={profile.themes_weak} />
+          ) : (
+            <p className="card-empty">Nessun tema emerge nettamente sotto la media.</p>
+          )}
+          {!!profile.top_lags.length && (
+            <IndicatorLinkList items={profile.top_lags} onOpen={onOpenIndicator} />
+          )}
+        </section>
+      </div>
+
+      {moves.length > 0 && (
+        <section className="region-card">
+          <h3>Il movimento dell'ultimo anno</h3>
+          <p className="region-card__note">
+            Posizioni guadagnate o perse rispetto alle altre regioni fra l'ultimo anno disponibile
+            e quello comparabile precedente.
+          </p>
+          <div className="region-cols">
+            <div className="region-move-col">
+              <h4 className="is-up">Dove recupera</h4>
+              <MovementList items={profile.movement_gains} moveMax={moveMax} dir="up" onOpen={onOpenIndicator} />
+            </div>
+            <div className="region-move-col">
+              <h4 className="is-down">Dove perde</h4>
+              <MovementList items={profile.movement_losses} moveMax={moveMax} dir="down" onOpen={onOpenIndicator} />
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="region-card" ref={themesRef}>
+        <h3><Layers size={16} /> Tutti i temi</h3>
+        <p className="region-card__note">
+          Clicca un tema per aprire i suoi indicatori con valore, posizione tra le 20 regioni e
+          punteggio, e capire come si compone il voto.
+        </p>
+        <div className="theme-accordion">
+          {profile.theme_table.map((t, idx) => {
+            const inds = indicatorsByTheme.get(t.theme) || [];
+            const isOpen = expanded.has(t.theme);
+            const panelId = `theme-panel-${idx}`;
+            return (
+              <div key={t.theme} className={`theme-acc${isOpen ? " is-open" : ""}${t.rated ? "" : " is-unrated"}`}>
+                <button
+                  type="button"
+                  className="theme-acc__head"
+                  aria-expanded={isOpen}
+                  aria-controls={panelId}
+                  onClick={() => toggleTheme(t.theme)}
+                  disabled={!inds.length}
+                >
+                  <ChevronRight className="theme-acc__caret" size={16} />
+                  <span className="theme-acc__name">{t.theme}<em>{t.count} ind.</em></span>
+                  {t.rated ? (
+                    <span className="theme-acc__meter">
+                      <Bar pct={t.score * 100} />
+                      <b><AnimatedNumber value={Math.round(t.score * 100)} format={formatScore} /></b>
+                    </span>
+                  ) : (
+                    <span className="theme-score-row__nv">non valutabile</span>
+                  )}
+                </button>
+                {isOpen && (
+                  <div className="theme-acc__panel" id={panelId}>
+                    <ul className="region-ind-rows">
+                      {inds.map((ind) => (
+                        <li key={ind.id}>
+                          <button type="button" className="region-ind-row" onClick={() => onOpenIndicator(ind)}>
+                            <span className="region-ind-row__name">{ind.name}</span>
+                            <span className="region-ind-row__value">{formatValue(ind.value, ind.unit)}</span>
+                            <span className="region-ind-row__rank">
+                              {ind.rank ? <><b>{ind.rank}</b><small>/{ind.region_count}</small></> : <small>n.v.</small>}
+                            </span>
+                            <span className="region-ind-row__meter">
+                              {ind.score !== null && ind.score !== undefined ? (
+                                <><Bar pct={ind.score} /><b>{ind.score}</b></>
+                              ) : (
+                                <small className="theme-score-row__nv">n.v.</small>
+                              )}
+                            </span>
+                            <span className="region-ind-row__move">
+                              {ind.movement ? (
+                                <em className={ind.movement > 0 ? "is-up" : "is-down"}>
+                                  {ind.movement > 0 ? `+${ind.movement}` : ind.movement}
+                                </em>
+                              ) : (
+                                <small>=</small>
+                              )}
+                            </span>
+                            <ChevronRight className="region-ind-row__chev" size={14} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {!!profile.similar_regions.length && (
+        <section className="region-card region-similar">
+          <h3><Users size={16} /> Regioni con un profilo simile</h3>
+          <div className="region-similar__grid">
+            {profile.similar_regions.map((s) => (
+              <button
+                key={s.region_key}
+                type="button"
+                className="region-similar__card"
+                onClick={() => onSelectRegion(s.region_key)}
+              >
+                {s.region}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <a className="region-cta" href={`/regione/${profile.region_key}`}>
+        <span>
+          <small>Scheda completa</small>
+          <strong>Apri la pagina dettagliata e stampabile di {profile.region}</strong>
+        </span>
+        <ArrowUpRight size={18} />
+      </a>
+    </article>
+  );
+}
+
+function ThemeScoreList({ items }) {
+  return (
+    <ul className="theme-chip-list">
+      {items.map((t) => (
+        <li key={t.theme}>
+          <span className="theme-chip-list__name">{t.theme}</span>
+          <span className="theme-chip-list__meter">
+            <Bar pct={t.score * 100} />
+            <b><AnimatedNumber value={Math.round(t.score * 100)} format={formatScore} /></b>
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function IndicatorLinkList({ items, onOpen }) {
+  return (
+    <ul className="region-ind-list">
+      {items.map((e) => (
+        <li key={e.id}>
+          <button type="button" onClick={() => onOpen(e)}>
+            <span className="region-ind-list__label">
+              {e.name}<small>{e.theme}</small>
+            </span>
+            {Number.isFinite(e.score) && (
+              <span className="region-ind-list__score">{Math.round(e.score * 100)}</span>
+            )}
+            <ChevronRight size={15} />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function MovementList({ items, moveMax, dir, onOpen }) {
+  if (!items.length) {
+    return <p className="card-empty">{dir === "up" ? "Nessun recupero netto." : "Nessuna perdita netta."}</p>;
+  }
+  return (
+    <ul className="region-move-list">
+      {items.map((m) => (
+        <li key={m.id}>
+          <button type="button" onClick={() => onOpen(m)}>
+            <span className="region-move-list__head">
+              <span className="region-move-list__name">{m.name}</span>
+              <em className={dir === "up" ? "is-up" : "is-down"}>
+                {m.movement > 0 ? `+${m.movement}` : m.movement}
+              </em>
+            </span>
+            <Bar pct={(Math.abs(m.movement) / moveMax) * 100} className={dir === "up" ? "di-bar--up" : "di-bar--down"} />
+            <small>{m.theme} · {m.year_from}-{m.year}</small>
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Detail (dashboard) view                                            */
 /* ------------------------------------------------------------------ */
 
@@ -630,10 +1360,14 @@ function DetailView({
   selectedRegion,
   setSelectedRegion,
   onSelectIndicator,
+  onOpenRegion,
+  onNavRegioni,
   onBack,
+  backContext,
   activeTab,
   setActiveTab,
 }) {
+  const fromRegion = backContext && backContext.type === "regione" ? backContext : null;
   // Only treat the indicator as ready when its payload matches the selected id,
   // so switching indicators never flashes the previous chart.
   const ready = indicator && String(indicator.metadata.id) === String(selectedId);
@@ -663,9 +1397,9 @@ function DetailView({
 
   return (
     <main className="app-shell">
-      <SiteHeader>
+      <SiteHeader onNavRegioni={onNavRegioni}>
         <button className="back-link" type="button" onClick={onBack}>
-          <ArrowLeft size={16} /> Atlante
+          <ArrowLeft size={16} /> {fromRegion ? fromRegion.name : "Atlante"}
         </button>
       </SiteHeader>
 
@@ -674,9 +1408,21 @@ function DetailView({
       ) : (
         <>
           <nav className="breadcrumb" aria-label="Percorso">
-            <button type="button" onClick={onBack}>Atlante</button>
-            <span>/</span>
-            <span>{indicatorMeta.theme}</span>
+            {fromRegion ? (
+              <>
+                <button type="button" onClick={onBack}>Regioni</button>
+                <span>/</span>
+                <button type="button" onClick={onBack}>{fromRegion.name}</button>
+                <span>/</span>
+                <span>{indicatorMeta.name}</span>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={onBack}>Atlante</button>
+                <span>/</span>
+                <span>{indicatorMeta.theme}</span>
+              </>
+            )}
           </nav>
 
           <section className="workspace" id="dashboard">
@@ -689,7 +1435,7 @@ function DetailView({
                 selectedRegion={selectedRegion}
                 setSelectedRegion={setSelectedRegion}
               />
-              <InsightPanel insights={insights} unit={indicatorMeta.unit} year={year} region={selectedRegion} />
+              <InsightPanel insights={insights} unit={indicatorMeta.unit} year={year} region={selectedRegion} onOpenRegion={onOpenRegion} />
               {siblings.length > 1 && (
                 <div className="sibling-nav">
                   <button type="button" disabled={!prev} onClick={() => prev && onSelectIndicator(prev.id)}>
@@ -792,18 +1538,23 @@ function IndicatorHeader({ metadata, regionCount }) {
         <a href={indicatorPath(metadata.id, metadata.name)}>Scheda completa e classifica regioni →</a>
       </p>
       {metadata.explain && <IndicatorExplain explain={metadata.explain} />}
-      {metadata.archive && (
-        <p className="indicator-header__def">
-          <small>Definizione</small>
-          {metadata.archive}
-        </p>
-      )}
-      <dl>
-        <div><dt>Unità di misura</dt><dd>{metadata.unit || "n.d."}</dd></div>
-        <div><dt>Copertura</dt><dd>{metadata.year_min}-{metadata.year_max}</dd></div>
-        <div><dt>Regioni</dt><dd>{regionCount || metadata.regions.length}/20</dd></div>
-        <div><dt>Fonte</dt><dd>{metadata.source_url ? (<a href={metadata.source_url} target="_blank" rel="noreferrer">{metadata.source_label || metadata.source}</a>) : (metadata.source_label || metadata.source)}</dd></div>
-      </dl>
+      {/* Definition and metadata are collapsed so the year/region controls and the
+          selected-region KPI stay near the top of the panel, in view. */}
+      <details className="indicator-header__more">
+        <summary>Definizione e dettagli</summary>
+        {metadata.archive && (
+          <p className="indicator-header__def">
+            <small>Definizione</small>
+            {metadata.archive}
+          </p>
+        )}
+        <dl>
+          <div><dt>Unità di misura</dt><dd>{metadata.unit || "n.d."}</dd></div>
+          <div><dt>Copertura</dt><dd>{metadata.year_min}-{metadata.year_max}</dd></div>
+          <div><dt>Regioni</dt><dd>{regionCount || metadata.regions.length}/20</dd></div>
+          <div><dt>Fonte</dt><dd>{metadata.source_url ? (<a href={metadata.source_url} target="_blank" rel="noreferrer">{metadata.source_label || metadata.source}</a>) : (metadata.source_label || metadata.source)}</dd></div>
+        </dl>
+      </details>
     </div>
   );
 }
@@ -842,30 +1593,45 @@ function IndicatorExplain({ explain }) {
   );
 }
 
-function InsightPanel({ insights, unit, year, region }) {
+function InsightPanel({ insights, unit, year, region, onOpenRegion }) {
   const TrendIcon = insights.delta > 0 ? ArrowUpRight : insights.delta < 0 ? ArrowDownRight : Minus;
   const trendClass = insights.delta > 0 ? "is-up" : insights.delta < 0 ? "is-down" : "is-flat";
   return (
     <div className="insights">
       <div className="insight insight--region">
         <small>{region || "Regione"} · {year}</small>
-        <strong>{formatValue(insights.regionEntry?.value, unit)}</strong>
+        <strong><AnimatedNumber value={insights.regionEntry?.value} unit={unit} /></strong>
         <span>
           {insights.regionRank
             ? `${insights.regionRank}ª su ${insights.total} regioni`
             : "Dato non disponibile per quest'anno"}
         </span>
-        {region && <a className="insight__link" href={`/regione/${regionKey(region)}`}>Profilo di {region} →</a>}
+        {region && (
+          <a
+            className="insight__link"
+            href={`/regione/${regionKey(region)}`}
+            onClick={(event) => {
+              // Stay inside the SPA when we can (no reload); the href keeps the
+              // link crawlable and works without JS.
+              if (onOpenRegion && !event.metaKey && !event.ctrlKey && event.button === 0) {
+                event.preventDefault();
+                onOpenRegion(regionKey(region));
+              }
+            }}
+          >
+            Come è messa {region} →
+          </a>
+        )}
       </div>
       <div className="insight">
         <small><Trophy size={13} /> Valore più alto · {year}</small>
         <strong>{insights.top?.region || "n.d."}</strong>
-        <span>{formatValue(insights.top?.value, unit)}</span>
+        <span><AnimatedNumber value={insights.top?.value} unit={unit} /></span>
       </div>
       <div className="insight">
         <small>Valore più basso · {year}</small>
         <strong>{insights.bottom?.region || "n.d."}</strong>
-        <span>{formatValue(insights.bottom?.value, unit)}</span>
+        <span><AnimatedNumber value={insights.bottom?.value} unit={unit} /></span>
       </div>
       <div className={`insight insight--trend ${trendClass}`}>
         <small><TrendIcon size={13} /> {region} · trend storico</small>
@@ -1001,7 +1767,7 @@ function Ranking({ values, selectedRegion, onSelect, unit }) {
           <span className="rank">{index + 1}</span>
           <span className="region">{row.region}</span>
           <span className="bar"><i style={{ width: `${Math.max((row.value / max) * 100, 2)}%` }} /></span>
-          <strong>{formatValue(row.value, unit)}</strong>
+          <strong><AnimatedNumber value={row.value} unit={unit} /></strong>
         </button>
       ))}
     </div>
@@ -1207,6 +1973,12 @@ function formatValue(value, unit = "") {
   const digits = Math.abs(value) >= 100 ? 0 : 2;
   const formatted = new Intl.NumberFormat("it-IT", { maximumFractionDigits: digits }).format(value);
   return unit ? `${formatted} ${unit}` : formatted;
+}
+
+// Whole-number 0..100 score readout for region/theme meters (ignores unit).
+function formatScore(value) {
+  if (!Number.isFinite(value)) return "n.d.";
+  return new Intl.NumberFormat("it-IT", { maximumFractionDigits: 0 }).format(Math.round(value));
 }
 
 function formatPercent(ratio) {
