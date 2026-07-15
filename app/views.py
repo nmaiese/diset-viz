@@ -13,6 +13,7 @@ from app import profiles
 from app import indicator_notes
 from app import quality_life_bes as qb
 from app import external_manifest
+from app import game
 
 from flask import Response, abort, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -471,6 +472,45 @@ def quality_life_methodology():
     )
 
 
+@app.route("/gioco")
+def game_page():
+    return render_template(
+        "game.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/gioco",
+    )
+
+
+@app.route("/api/game/regions")
+def game_regions_api():
+    return jsonify({"regions": profiles.all_regions_index()})
+
+
+@app.route("/api/game/daily")
+def game_daily_api():
+    return jsonify(game.daily_payload())
+
+
+@app.route("/api/game/practice")
+def game_practice_api():
+    return jsonify(game.practice_payload())
+
+
+@app.post("/api/game/guess")
+def game_guess_api():
+    payload = request.get_json(silent=True) or {}
+    puzzle_id = payload.get("puzzle_id")
+    region_key = payload.get("region_key")
+    attempt = payload.get("attempt")
+    if not isinstance(region_key, str) or not isinstance(attempt, int) or isinstance(attempt, bool):
+        abort(400)
+    result = game.evaluate_guess(puzzle_id, region_key, attempt)
+    if result is None:
+        abort(400)
+    return jsonify(result)
+
+
 @app.route("/sitemap.xml")
 def sitemap():
     pages = [
@@ -479,6 +519,7 @@ def sitemap():
         {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
+        {"loc": f"{SITE_URL}/gioco", "priority": "0.7"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
         {"loc": f"{SITE_URL}/qualita-della-vita/classifica/regioni", "priority": "0.8"},
         {"loc": f"{SITE_URL}/qualita-della-vita/classifica/province", "priority": "0.8"},

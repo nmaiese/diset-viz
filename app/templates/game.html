@@ -1,0 +1,62 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'gioco' %}
+
+{% block title %}Indovina la Regione: il gioco degli indicatori Istat | {{ site_name }}{% endblock %}
+{% block description %}Indovina la regione italiana misteriosa a partire da sei indicatori Istat. Una sfida al giorno, indizi progressivi e un profilo completo a fine partita.{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" crossorigin href="{{ url_for('static', filename='dist/assets/game.css') }}">
+<script type="module" crossorigin src="{{ url_for('static', filename='dist/assets/game.js') }}"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Game",
+  "name": "Indovina la Regione",
+  "description": "Gioco quotidiano che fa indovinare una regione italiana a partire da sei indicatori Istat, con indizi progressivi.",
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
+  "creator": { "@type": "Organization", "name": "Istat" },
+  "isAccessibleForFree": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Gioco", "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page game-page wrap">
+  <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
+
+  <header class="page-hero">
+    <h1>Indovina la Regione</h1>
+    <p class="page-lead">Una regione italiana misteriosa, sei indicatori Istat come indizi, sei tentativi. Ogni errore rivela un indizio in più e ti dice se sei più vicino o più lontano.</p>
+  </header>
+
+  <div class="game-layout">
+    <div class="game-map-frame" id="game-map-frame">
+      {% include "_italy_map.html" %}
+    </div>
+    <div id="game-root">
+      <noscript>
+        <p>Attiva JavaScript per giocare a "Indovina la Regione". Nel frattempo puoi esplorare
+        <a href="/regioni">le regioni italiane</a> o <a href="/qualita-della-vita">la qualità della vita</a> nell'atlante.</p>
+      </noscript>
+      <p class="game-loading">Preparazione della sfida...</p>
+    </div>
+  </div>
+
+  <section class="prose">
+    <h2>Come si gioca</h2>
+    <p>Ogni giorno tutti i visitatori affrontano la stessa regione misteriosa. Il primo indizio è il meno rivelatore, poi ogni tentativo sbagliato mostra un nuovo indicatore, uno per ciascuna macro-area: economia, lavoro e istruzione, società, ambiente, demografia e salute, istituzioni. Dal terzo errore in poi scopri anche se la regione misteriosa è nella tua stessa ripartizione geografica. Hai sei tentativi. Alla fine trovi il profilo completo della regione, con tutti gli indicatori usati e il confronto con la media nazionale.</p>
+    <p>In modalità allenamento puoi giocare partite illimitate con regioni scelte a caso, senza intaccare la serie della sfida del giorno.</p>
+  </section>
+</article>
+{% endblock %}

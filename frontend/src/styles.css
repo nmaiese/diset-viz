@@ -590,8 +590,15 @@ h1, h2, h3 { font-family: var(--font-display); }
 /* ---------- Viz cards ---------- */
 .viz-stage { min-width: 0; }
 .mobile-tabs { display: none; }
-.viz-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr); gap: 20px; }
-.timeline-card { grid-column: 1 / -1; }
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+.map-card { grid-column: 1 / -1; }
+.ranking-card { grid-column: 1; }
+.timeline-card { grid-column: 2; }
 
 .data-card { background: var(--panel); border: 1px solid var(--line); padding: 18px; min-width: 0; }
 .data-card header { margin-bottom: 14px; }
@@ -602,7 +609,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 .map-wrap { display: grid; gap: 12px; }
 /* Cap the rendered height so the tall Italy shape doesn't push the rest of the
    dashboard out of the viewport; width follows the aspect ratio and is centred. */
-.italy-map { display: block; margin: 0 auto; height: clamp(320px, 48vh, 500px); width: auto; max-width: 100%; }
+.italy-map { display: block; margin: 0 auto; height: clamp(360px, 54vh, 560px); width: auto; max-width: 100%; }
 .italy-map path {
   stroke: rgba(21, 35, 59, 0.35);
   stroke-width: 1;
@@ -737,6 +744,13 @@ h1, h2, h3 { font-family: var(--font-display); }
   .ranking-row .bar i {
     animation: none;
   }
+}
+
+@media (max-width: 1179px) {
+  .viz-grid { grid-template-columns: 1fr; }
+  .map-card,
+  .ranking-card,
+  .timeline-card { grid-column: auto; }
 }
 
 /* ---------- Region view ---------- */

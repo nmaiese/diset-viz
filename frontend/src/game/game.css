@@ -1,0 +1,299 @@
+/* Design tokens (--ink, --accent, --paper, --font-display, ...) come from
+   site.css, already loaded by blog_base.html before this stylesheet. Scoped
+   under .game-app so nothing here leaks into the rest of the server-rendered
+   page shell. */
+
+.game-app {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.game-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.game-tab {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.game-tab.is-active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+.game-btn {
+  padding: 9px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--ink);
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.game-btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+  font-weight: 600;
+}
+
+.game-loading, .game-error {
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.game-error { color: var(--accent); }
+
+.game-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.game-head h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.game-date {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.game-attempts {
+  display: flex;
+  gap: 6px;
+}
+
+.game-attempts .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--grid);
+  border: 1px solid var(--line);
+}
+
+.game-attempts .dot.is-correct { background: #2f8f4e; border-color: #2f8f4e; }
+.game-attempts .dot.is-wrong { background: var(--accent); border-color: var(--accent); }
+
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 380px) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .game-layout { grid-template-columns: 1fr; }
+}
+
+.game-map-frame {
+  position: sticky;
+  top: 84px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.game-map-frame .regions-map { width: 100%; height: auto; }
+
+.game-map-frame .rmap-region {
+  fill: #eceae4;
+  stroke: var(--paper);
+  stroke-width: 1;
+  transition: fill 0.12s ease;
+}
+
+.game-map-frame .rmap-region.is-clickable { cursor: pointer; }
+.game-map-frame .rmap-region.is-clickable:hover,
+.game-map-frame .rmap-region.is-clickable:focus {
+  fill: var(--accent);
+  outline: none;
+}
+
+.game-map-frame .rmap-region.is-guessed-correct { fill: #2f8f4e; }
+.game-map-frame .rmap-region.is-guessed-wrong { fill: rgba(228, 87, 46, 0.55); }
+.game-map-frame .rmap-region.is-mystery {
+  fill: #2f8f4e;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+@media (max-width: 860px) {
+  .game-map-frame { position: static; }
+}
+
+.game-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.game-clues {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.clue-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.clue-index {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.clue-card h3 {
+  margin: 4px 0 6px;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.clue-meta {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.clue-value {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.game-input label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.game-input-row input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 15px;
+}
+
+.game-suggestions {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.game-suggestions li + li { border-top: 1px solid var(--line); }
+
+.game-suggestions button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  background: var(--panel);
+}
+
+.game-suggestions button:hover,
+.game-suggestions button:focus { background: var(--accent-soft); }
+
+.game-history {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.guess-row {
+  border-radius: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.guess-row.is-correct { border-color: #2f8f4e; background: rgba(47, 143, 78, 0.08); }
+.guess-row.is-wrong { border-color: var(--line); }
+
+.guess-feedback {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.guess-symbol {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent);
+  margin-right: 4px;
+}
+
+.guess-ripartizione {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.game-result {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px;
+  background: var(--panel);
+}
+
+.game-result h3 { margin-top: 0; }
+
+.game-result-region a {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.game-recap {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+  font-size: 13px;
+}
+
+.game-recap th, .game-recap td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.game-stats {
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
