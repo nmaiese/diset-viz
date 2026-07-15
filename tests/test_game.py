@@ -80,6 +80,8 @@ class GameTest(unittest.TestCase):
         }).get_json()
         self.assertFalse(wrong["correct"])
         self.assertFalse(wrong["finished"])
+        # The frontend map highlighting keys off region_key, not the display name.
+        self.assertEqual(wrong["region_key"], wrong_key)
         self.assertEqual(len(wrong["feedback"]), 1)
         self.assertIn(wrong["feedback"][0]["comparison"], ("higher", "lower", "equal", "unknown"))
         self.assertIsNotNone(wrong["next_clue"])

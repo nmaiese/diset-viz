@@ -262,6 +262,7 @@ def evaluate_guess(puzzle_id, region_key, attempt):
         "correct": correct,
         "attempt": attempt,
         "region": region_name,
+        "region_key": region_key,
         "feedback": feedback,
         "next_clue": next_clue,
         "ripartizione_hint": ripartizione_hint,
