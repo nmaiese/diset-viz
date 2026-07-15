@@ -307,10 +307,19 @@ def theme_page(theme_slug):
 
 @app.route("/regioni")
 def regions_index():
+    overview = profiles.regions_overview()
+    regions = sorted(
+        overview.values(),
+        key=lambda entry: (
+            entry.get("rank") is None,
+            entry.get("rank") or 999,
+            entry["region"],
+        ),
+    )
     return render_template(
         "regions_index.html",
-        regions=profiles.all_regions_index(),
-        overview=profiles.regions_overview(),
+        regions=regions,
+        overview=overview,
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/regioni",

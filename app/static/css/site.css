@@ -278,9 +278,10 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .index-card:hover { border-color: var(--accent); text-decoration: none; }
 
 /* Clickable region map on /regioni */
-.regions-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 28px; align-items: start; margin-top: 8px; }
-.regions-map-wrap { position: relative; }
+.regions-layout { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 28px; align-items: start; margin-top: 8px; }
+.regions-map-wrap { position: sticky; top: 84px; }
 .regions-map { width: 100%; height: auto; }
+.regions-map-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); line-height: 1.4; }
 .rmap-region { fill: #eceae4; stroke: var(--paper); stroke-width: 1; transition: fill 0.12s ease; }
 .rmap-region.is-clickable { cursor: pointer; }
 .rmap-region.is-clickable:hover, .rmap-region.is-clickable:focus { fill: var(--accent); outline: none; }
@@ -289,10 +290,35 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .rmap-tooltip span { display: block; font-size: 12px; }
 .rmap-tooltip .rmap-strong { color: #8fe3b0; }
 .rmap-tooltip .rmap-weak { color: #ffb59e; }
-.index-grid--regions { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+
+/* Region ranking cards on /regioni */
+.region-rank { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.region-rank__card {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) minmax(120px, 200px);
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+}
+.region-rank__card:hover { border-color: var(--accent); text-decoration: none; }
+.region-rank__pos { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--muted); text-align: center; }
+.region-rank__body { min-width: 0; display: grid; gap: 3px; }
+.region-rank__body strong { font-family: var(--font-display); font-size: 16px; }
+.region-rank__themes { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.region-rank__themes em { font-style: normal; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.region-rank__themes .is-strong { color: #226e44; }
+.region-rank__themes .is-weak { color: var(--accent); }
+.region-rank__score { display: grid; grid-template-columns: minmax(0, 1fr) 30px; align-items: center; gap: 10px; }
+.region-rank__score .score-bar { width: 100%; margin-right: 0; }
+.region-rank__score b { font-family: var(--font-mono); font-size: 14px; text-align: right; }
 
 @media (max-width: 760px) {
   .regions-layout { grid-template-columns: 1fr; }
+  .regions-map-wrap { position: static; }
+  .region-rank__card { grid-template-columns: 28px minmax(0, 1fr) 96px; gap: 10px; }
 }
 
 @media (max-width: 680px) {

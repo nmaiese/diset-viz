@@ -90,7 +90,7 @@ function App() {
       : "atlas";
 
   const [activeTab, setActiveTab] = useState("map");
-  const pageViewKey = activeView === "detail" ? `detail:${selectedId || ""}` : "atlas";
+  const pageViewKey = activeView === "detail" ? `detail:${selectedId || ""}` : activeView;
   const lastPageViewKey = useRef(null);
 
   useEffect(() => {
@@ -226,6 +226,15 @@ function App() {
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
+  // Select another region while already inside the region workspace. This keeps
+  // the page position stable; RegionView resets only the profile panel scroll.
+  const selectRegion = (key) => {
+    setFromParam(null);
+    setRegionKey(key);
+    setView("regioni");
+    trackEvent("select_region", { region_key: key });
+  };
+
   if (error) {
     return (
       <main className="app-shell">
@@ -253,7 +262,7 @@ function App() {
         overview={regionsOverview}
         regionKey={regionKey}
         profile={regionProfile}
-        onSelectRegion={openRegion}
+        onSelectRegion={selectRegion}
         onClearRegion={() => setRegionKey(null)}
         onMode={goToMode}
         onOpenIndicator={(item) =>
@@ -287,6 +296,7 @@ function App() {
         }}
         onOpenRegion={openRegion}
         onNavRegioni={() => goToMode("regioni")}
+        onNavAtlas={() => goToMode("atlas")}
         onBack={backFromDetail}
         backContext={fromParam && fromParam.indexOf("regione:") === 0
           ? { type: "regione", key: fromParam.slice("regione:".length), name: selectedRegion }
@@ -343,7 +353,13 @@ function App() {
 /* Shared chrome                                                       */
 /* ------------------------------------------------------------------ */
 
-function SiteHeader({ children, onNavRegioni }) {
+function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
+  const handleLocalNav = (event, handler) => {
+    if (handler && !event.metaKey && !event.ctrlKey && event.button === 0) {
+      event.preventDefault();
+      handler();
+    }
+  };
   return (
     <header className="masthead">
       <a className="brand" href="/" aria-label="Divario Italia, home">
@@ -356,14 +372,19 @@ function SiteHeader({ children, onNavRegioni }) {
       {children}
       <nav className="masthead__links" aria-label="Collegamenti">
         <a
+          href="/"
+          className={activeNav === "atlas" ? "is-active" : ""}
+          onClick={(event) => handleLocalNav(event, onNavAtlas)}
+        >
+          Atlante
+        </a>
+        <a
           href="/regioni"
+          className={activeNav === "regioni" ? "is-active" : ""}
           onClick={(event) => {
             // Inside the SPA, keep the user in the interactive region mode
             // instead of loading the server page (which stays for SEO/deep links).
-            if (onNavRegioni && !event.metaKey && !event.ctrlKey && event.button === 0) {
-              event.preventDefault();
-              onNavRegioni();
-            }
+            handleLocalNav(event, onNavRegioni);
           }}
         >
           Regioni
@@ -440,6 +461,29 @@ function ModeSwitch({ active, onMode }) {
         );
       })}
     </div>
+  );
+}
+
+function ContextBar({ label, crumbs, children }) {
+  return (
+    <section className="context-bar" aria-label="Contesto">
+      <div className="context-bar__path">
+        <span className="context-bar__label">{label}</span>
+        <nav className="breadcrumb" aria-label="Percorso">
+          {crumbs.map((crumb, index) => (
+            <React.Fragment key={`${crumb.label}-${index}`}>
+              {index > 0 && <span>/</span>}
+              {crumb.onClick ? (
+                <button type="button" onClick={crumb.onClick}>{crumb.label}</button>
+              ) : (
+                <span>{crumb.label}</span>
+              )}
+            </React.Fragment>
+          ))}
+        </nav>
+      </div>
+      {children && <div className="context-bar__tools">{children}</div>}
+    </section>
   );
 }
 
@@ -576,7 +620,15 @@ function AtlasView({
 
   return (
     <main className="app-shell">
-      <SiteHeader onNavRegioni={() => onMode("regioni")} />
+      <SiteHeader
+        activeNav="atlas"
+        onNavAtlas={() => onMode("atlas")}
+        onNavRegioni={() => onMode("regioni")}
+      />
+
+      <ContextBar label="Atlante" crumbs={[{ label: "Atlante" }]}>
+        <ModeSwitch active="atlas" onMode={onMode} />
+      </ContextBar>
 
       <section className="atlas-hero">
         <p className="eyebrow">Istat · {catalog.indicators.length} indicatori · 20 regioni · {coverageSpan(catalog)}</p>
@@ -589,7 +641,6 @@ function AtlasView({
           Filtra per area, tema o anni, poi apri la scheda di ogni indicatore con mappa,
           classifica e andamento nel tempo.
         </p>
-        <ModeSwitch active="atlas" onMode={onMode} />
       </section>
 
       <MacroSpine
@@ -873,7 +924,11 @@ function RegionView({
 
   return (
     <main className="app-shell">
-      <SiteHeader onNavRegioni={onClearRegion}>
+      <SiteHeader
+        activeNav="regioni"
+        onNavAtlas={() => onMode("atlas")}
+        onNavRegioni={onClearRegion}
+      >
         {selectedName && (
           <button className="back-link" type="button" onClick={onClearRegion}>
             <ArrowLeft size={16} /> Tutte le regioni
@@ -881,7 +936,18 @@ function RegionView({
         )}
       </SiteHeader>
 
-      <section className="atlas-hero atlas-hero--region">
+      <ContextBar
+        label="Per regione"
+        crumbs={[
+          { label: "Atlante", onClick: () => onMode("atlas") },
+          selectedName ? { label: "Per regione", onClick: onClearRegion } : { label: "Per regione" },
+          ...(selectedName ? [{ label: selectedName }] : []),
+        ]}
+      >
+        <ModeSwitch active="regioni" onMode={onMode} />
+      </ContextBar>
+
+      <section className="atlas-hero atlas-hero--compact atlas-hero--region">
         <p className="eyebrow">Istat · 20 regioni · posizionamento complessivo</p>
         <h1>Come è messa ogni regione.</h1>
         <p className="atlas-hero__lead">
@@ -889,24 +955,7 @@ function RegionView({
           da 0 a 100, dove 100 vuol dire prima in Italia. Così vedi a colpo d'occhio dove eccelle,
           dove resta indietro e come si è mossa nell'ultimo anno.
         </p>
-        <ModeSwitch active="regioni" onMode={onMode} />
       </section>
-
-      <nav className="breadcrumb" aria-label="Percorso">
-        <button type="button" onClick={() => onMode("atlas")}>Atlante</button>
-        <span>/</span>
-        {selectedName ? (
-          <button type="button" onClick={onClearRegion}>Per regione</button>
-        ) : (
-          <span>Per regione</span>
-        )}
-        {selectedName && (
-          <>
-            <span>/</span>
-            <span>{selectedName}</span>
-          </>
-        )}
-      </nav>
 
       <section className="region-explore">
         <aside className="region-select">
@@ -1008,47 +1057,59 @@ function RegionProfileSkeleton({ name, entry }) {
 }
 
 function RegionIntro({ ranked, onSelectRegion }) {
-  const top = ranked.slice(0, 3);
-  const bottom = ranked.slice(-3).reverse();
+  const top = ranked.slice(0, 5);
+  const bottom = ranked.slice(-5).reverse();
+  const podium = ranked.slice(0, 3);
   return (
     <div className="region-intro">
-      <MapPinned size={30} />
-      <h2>Scegli una regione per vedere come è messa</h2>
-      <p>
-        Per ogni regione calcoliamo un punteggio da 0 a 100 su ciascun tema, dove 100 significa
-        prima in Italia. Poi mostriamo dove eccelle, dove resta indietro e come si è mossa
-        nell'ultimo anno, con i link alle schede dei singoli indicatori.
-      </p>
-      {ranked.length > 0 && (
-        <div className="region-intro__cols">
-          <div>
-            <small><Trophy size={13} /> In testa</small>
-            <ul>
-              {top.map((entry) => (
-                <li key={entry.region_key}>
-                  <button type="button" onClick={() => onSelectRegion(entry.region_key)}>
-                    <span>{entry.rank}. {entry.region}</span>
-                    <b>{entry.score}</b>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <small>In coda</small>
-            <ul>
-              {bottom.map((entry) => (
-                <li key={entry.region_key}>
-                  <button type="button" onClick={() => onSelectRegion(entry.region_key)}>
-                    <span>{entry.rank}. {entry.region}</span>
-                    <b>{entry.score}</b>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+      <header className="region-intro__head">
+        <MapPinned size={30} />
+        <div>
+          <h2>Esplora le regioni italiane</h2>
+          <p>
+            Parti dalla classifica complessiva, poi apri una regione per vedere punti di forza,
+            debolezze, movimento recente e indicatori collegati.
+          </p>
         </div>
+      </header>
+      {ranked.length > 0 && (
+        <>
+          <div className="region-intro__podium" aria-label="Prime tre regioni">
+            {podium.map((entry) => (
+              <button type="button" key={entry.region_key} onClick={() => onSelectRegion(entry.region_key)}>
+                <small>{entry.rank}ª</small>
+                <strong>{entry.region}</strong>
+                <b>{entry.score}</b>
+              </button>
+            ))}
+          </div>
+          <div className="region-intro__cols">
+            <RegionIntroList title="In testa" icon={<Trophy size={13} />} items={top} onSelectRegion={onSelectRegion} />
+            <RegionIntroList title="Più in difficoltà" items={bottom} onSelectRegion={onSelectRegion} />
+          </div>
+        </>
       )}
+      {!ranked.length && (
+        <p className="region-intro__loading">Carico la classifica regionale...</p>
+      )}
+    </div>
+  );
+}
+
+function RegionIntroList({ title, icon, items, onSelectRegion }) {
+  return (
+    <div>
+      <small>{icon} {title}</small>
+      <ul>
+        {items.map((entry) => (
+          <li key={entry.region_key}>
+            <button type="button" onClick={() => onSelectRegion(entry.region_key)}>
+              <span>{entry.rank}. {entry.region}</span>
+              <b>{entry.score}</b>
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -1362,6 +1423,7 @@ function DetailView({
   onSelectIndicator,
   onOpenRegion,
   onNavRegioni,
+  onNavAtlas,
   onBack,
   backContext,
   activeTab,
@@ -1397,7 +1459,11 @@ function DetailView({
 
   return (
     <main className="app-shell">
-      <SiteHeader onNavRegioni={onNavRegioni}>
+      <SiteHeader
+        activeNav={fromRegion ? "regioni" : "atlas"}
+        onNavAtlas={onNavAtlas}
+        onNavRegioni={onNavRegioni}
+      >
         <button className="back-link" type="button" onClick={onBack}>
           <ArrowLeft size={16} /> {fromRegion ? fromRegion.name : "Atlante"}
         </button>
@@ -1407,23 +1473,22 @@ function DetailView({
         <LoadingState />
       ) : (
         <>
-          <nav className="breadcrumb" aria-label="Percorso">
-            {fromRegion ? (
-              <>
-                <button type="button" onClick={onBack}>Regioni</button>
-                <span>/</span>
-                <button type="button" onClick={onBack}>{fromRegion.name}</button>
-                <span>/</span>
-                <span>{indicatorMeta.name}</span>
-              </>
-            ) : (
-              <>
-                <button type="button" onClick={onBack}>Atlante</button>
-                <span>/</span>
-                <span>{indicatorMeta.theme}</span>
-              </>
-            )}
-          </nav>
+          <ContextBar
+            label="Scheda indicatore"
+            crumbs={
+              fromRegion
+                ? [
+                    { label: "Regioni", onClick: onBack },
+                    { label: fromRegion.name, onClick: onBack },
+                    { label: indicatorMeta.name },
+                  ]
+                : [
+                    { label: "Atlante", onClick: onBack },
+                    { label: indicatorMeta.theme },
+                    { label: indicatorMeta.name },
+                  ]
+            }
+          />
 
           <section className="workspace" id="dashboard">
             <aside className="indicator-panel">
