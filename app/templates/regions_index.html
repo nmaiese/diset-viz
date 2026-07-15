@@ -7,23 +7,22 @@
 {% block content %}
 <article class="page page-index wrap">
   <h1>Le regioni a confronto</h1>
-  <p class="page-lead">Venti regioni, un solo metro di giudizio. Per ognuna trovi una scheda con i temi in cui va meglio o peggio delle altre, dove ha recuperato o perso terreno nell'ultimo anno e le regioni dal profilo più simile. Passa il mouse sulla mappa per un'anteprima, clicca per aprire la scheda.</p>
+  <p class="page-lead">Venti regioni, venti profili territoriali. Per ognuna trovi i temi in cui emerge o fatica, dove ha recuperato o perso terreno nell'ultimo anno e le regioni dal profilo più simile. Passa il mouse sulla mappa per un'anteprima, clicca per aprire la scheda.</p>
   <p class="page-note"><a href="/?view=regioni">Apri l'atlante interattivo per regione →</a></p>
 
   <div class="regions-layout">
     <div class="regions-map-wrap">
       {% include "_italy_map.html" %}
-      <p class="regions-map-note">Più scuro significa punteggio complessivo più alto nella sintesi dei temi.</p>
+      <p class="regions-map-note">La mappa è una scorciatoia per aprire la scheda regionale, non una classifica.</p>
       <div class="rmap-tooltip" hidden></div>
     </div>
-    <ol class="region-rank">
+    <ol class="region-index-list">
       {% for r in regions %}
       <li>
-        <a class="region-rank__card" href="{{ r.path }}">
-          <span class="region-rank__pos">{{ r.rank if r.rank else 'n.d.' }}</span>
-          <span class="region-rank__body">
+        <a class="region-index-card" href="{{ r.path }}">
+          <span class="region-index-card__body">
             <strong>{{ r.region }}</strong>
-            <span class="region-rank__themes">
+            <span class="region-index-card__themes">
               {% if r.strong %}
               <em class="is-strong">Forte: {{ r.strong | join(', ') }}</em>
               {% endif %}
@@ -32,14 +31,7 @@
               {% endif %}
             </span>
           </span>
-          <span class="region-rank__score">
-            {% if r.score is not none %}
-            <span class="score-bar"><span style="width: {{ r.score }}%"></span></span>
-            <b>{{ r.score }}</b>
-            {% else %}
-            <span class="theme-score-row__nv">n.v.</span>
-            {% endif %}
-          </span>
+          <span class="region-index-card__action">Apri</span>
         </a>
       </li>
       {% endfor %}
@@ -49,5 +41,4 @@
 
 <script id="regions-overview" type="application/json">{{ overview | tojson }}</script>
 <script src="{{ url_for('static', filename='js/regions-map.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/region-animate.js') }}" defer></script>
 {% endblock %}

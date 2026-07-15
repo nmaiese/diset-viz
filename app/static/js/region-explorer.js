@@ -10,13 +10,12 @@
   var rows = Array.prototype.slice.call(tbody.querySelectorAll("tr"));
   var search = document.getElementById("explorer-search");
   var themeSel = document.getElementById("explorer-theme");
-  var strengthSel = document.getElementById("explorer-strength");
   var sortSel = document.getElementById("explorer-sort");
   var shown = document.getElementById("explorer-shown");
   var empty = document.getElementById("explorer-empty");
   var pills = Array.prototype.slice.call(section.querySelectorAll(".macro-pill"));
 
-  var state = { macro: "", theme: "", strength: "", q: "", sort: "rank" };
+  var state = { macro: "", theme: "", q: "", sort: "rank" };
 
   function num(row, attr) {
     var raw = row.getAttribute(attr);
@@ -27,12 +26,6 @@
     if (state.macro && row.getAttribute("data-macro") !== state.macro) return false;
     if (state.theme && row.getAttribute("data-theme") !== state.theme) return false;
     if (state.q && row.getAttribute("data-name").indexOf(state.q) === -1) return false;
-    if (state.strength) {
-      var score = num(row, "data-score");
-      if (state.strength === "context" && score !== null) return false;
-      if (state.strength === "strong" && !(score !== null && score >= 70)) return false;
-      if (state.strength === "weak" && !(score !== null && score <= 30)) return false;
-    }
     return true;
   }
 
@@ -85,7 +78,6 @@
     apply();
   });
   if (themeSel) themeSel.addEventListener("change", function () { state.theme = themeSel.value; apply(); });
-  if (strengthSel) strengthSel.addEventListener("change", function () { state.strength = strengthSel.value; apply(); });
   if (sortSel) sortSel.addEventListener("change", function () { state.sort = sortSel.value; apply(); });
 
   apply();

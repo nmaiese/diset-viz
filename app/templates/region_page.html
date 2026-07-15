@@ -39,7 +39,7 @@
 <article class="page page-region wrap">
   <nav class="breadcrumb"><a href="/regioni">Regioni</a></nav>
   <h1>{{ p.region }}</h1>
-  <p class="page-lead">Come se la passa {{ p.region }} rispetto alle altre regioni italiane, tema per tema. Per ogni ambito confrontiamo la regione con le altre diciannove e le assegniamo un punteggio da 0 a 100, dove 100 vuol dire prima in Italia. Il quadro nasce da {{ p.scored_count }} indicatori Istat per cui sappiamo se è meglio salire o scendere.</p>
+  <p class="page-lead">Come se la passa {{ p.region }} rispetto alle altre regioni italiane, tema per tema. Il profilo mette in evidenza ambiti forti, ambiti fragili, posizioni e movimenti recenti sugli indicatori Istat per cui sappiamo se è meglio salire o scendere.</p>
   <div class="freshness-strip" aria-label="Freschezza dati del profilo">
     <span><b>{{ p.data_freshness.current }}</b> aggiornati</span>
     <span><b>{{ p.data_freshness.recent }}</b> recenti</span>
@@ -53,7 +53,7 @@
       {% if p.themes_strong %}
       <ul class="theme-chips">
         {% for t in p.themes_strong %}
-        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a> <span>{{ (t.score * 100) | round | int }}</span></li>
+        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a></li>
         {% endfor %}
       </ul>
       {% else %}<p class="page-note">Nessun tema emerge nettamente sopra la media.</p>{% endif %}
@@ -71,7 +71,7 @@
       {% if p.themes_weak %}
       <ul class="theme-chips">
         {% for t in p.themes_weak %}
-        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a> <span>{{ (t.score * 100) | round | int }}</span></li>
+        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a></li>
         {% endfor %}
       </ul>
       {% else %}<p class="page-note">Nessun tema emerge nettamente sotto la media.</p>{% endif %}
@@ -132,19 +132,14 @@
 
   <section class="profile-themes">
     <h2>Tutti i temi, uno per uno</h2>
-    <p class="page-note">Il punteggio medio di {{ p.region }} in ogni tema, da 0 (ultima in Italia) a 100 (prima). I temi con pochi indicatori chiari restano senza voto, per non dare giudizi su basi troppo fragili.</p>
+    <p class="page-note">Elenco dei temi coperti dal profilo regionale, con il numero di indicatori direzionali disponibili per ciascun ambito.</p>
     <table class="data-table">
-      <thead><tr><th>Tema</th><th class="num">Indicatori</th><th class="num">Punteggio</th></tr></thead>
+      <thead><tr><th>Tema</th><th class="num">Indicatori</th></tr></thead>
       <tbody>
         {% for t in p.theme_table %}
         <tr class="{{ 'is-unrated' if not t.rated else '' }}">
           <td><a href="{{ t.theme_path }}">{{ t.theme }}</a></td>
           <td class="num">{{ t.count }}</td>
-          <td class="num">
-            {% if t.rated %}
-            <span class="score-bar"><span style="width: {{ (t.score * 100) | round | int }}%"></span></span>{{ (t.score * 100) | round | int }}
-            {% else %}<span class="page-note">non valutabile</span>{% endif %}
-          </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -177,15 +172,6 @@
           </select>
         </label>
         <label class="explorer-field">
-          <span>Forza</span>
-          <select id="explorer-strength">
-            <option value="">Tutte</option>
-            <option value="strong">Forti (≥70)</option>
-            <option value="weak">Deboli (≤30)</option>
-            <option value="context">Non valutabili</option>
-          </select>
-        </label>
-        <label class="explorer-field">
           <span>Ordina</span>
           <select id="explorer-sort">
             <option value="rank">Posizione</option>
@@ -206,7 +192,6 @@
       <tbody>
         {% for i in p.all_indicators %}
         <tr data-name="{{ i.name | lower }}" data-theme="{{ i.theme }}" data-macro="{{ i.macro_area }}"
-            data-score="{{ i.score if i.score is not none else '' }}"
             data-movement="{{ i.movement if i.movement is not none else '' }}"
             data-rank="{{ i.rank if i.rank is not none else '' }}">
           <td><a href="{{ i.path }}">{{ i.name }}</a></td>
@@ -231,7 +216,7 @@
 
   <section class="profile-similar">
     <h2>Regioni con un profilo simile</h2>
-    <p class="page-note">Regioni più vicine a {{ p.region }} per andamento complessivo, calcolato sugli indicatori Istat completi e aggiornati (dati recenti su tutte e 20 le regioni).</p>
+    <p class="page-note">Regioni più vicine a {{ p.region }} per andamento degli indicatori Istat completi e aggiornati, con dati recenti su tutte e 20 le regioni.</p>
     <div class="similar-grid">
       {% for s in p.similar_regions %}
       <a class="similar-card" href="/regione/{{ s.region_key }}">{{ s.region }}</a>

@@ -538,6 +538,10 @@ class AppSmokeTest(unittest.TestCase):
         overview = profiles.regions_overview()
         keys = {r["region_key"] for r in profiles.all_regions_index()}
         self.assertEqual(set(overview), keys)
+        for entry in overview.values():
+            self.assertNotIn("score", entry)
+            self.assertNotIn("rank", entry)
+            self.assertNotIn("rank_total", entry)
         # The pre-projected SVG partial must cover exactly the same region keys.
         from pathlib import Path
         svg = (Path(app.root_path) / "templates" / "_italy_map.html").read_text(encoding="utf-8")

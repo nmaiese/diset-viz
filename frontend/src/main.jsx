@@ -151,6 +151,16 @@ function App() {
       .catch(() => {});
   }, [activeView, regionsOverview]);
 
+  // A bare ?view=regioni should open an actual regional profile, not a blank
+  // chooser. Keep it random so the entry point feels alive without inventing a
+  // best/worst ranking.
+  useEffect(() => {
+    if (activeView !== "regioni" || regionKey || !regionsOverview) return;
+    const keys = Object.keys(regionsOverview);
+    if (!keys.length) return;
+    setRegionKey(keys[Math.floor(Math.random() * keys.length)]);
+  }, [activeView, regionKey, regionsOverview]);
+
   // Selected region profile, refetched whenever the region key changes.
   useEffect(() => {
     if (activeView !== "regioni" || !regionKey) {
@@ -549,7 +559,7 @@ function AnimatedNumber({ value, unit = "", format = formatValue, className }) {
 }
 
 // Bar that grows from 0 to `pct`% on mount (CSS width transition), snapping when
-// reduced motion is requested. Used for score meters and movement bars.
+// reduced motion is requested.
 function Bar({ pct, className = "" }) {
   const reduced = usePrefersReducedMotion();
   const target = Math.max(0, Math.min(100, pct || 0));
@@ -902,15 +912,8 @@ function RegionView({
   mapData, overview, regionKey, profile, onSelectRegion, onClearRegion, onMode, onOpenIndicator,
 }) {
   const entries = useMemo(() => (overview ? Object.values(overview) : []), [overview]);
-  const ranked = useMemo(
-    () =>
-      [...entries]
-        .filter((entry) => entry.score !== null && entry.score !== undefined)
-        .sort((a, b) => b.score - a.score),
-    [entries],
-  );
   const values = useMemo(
-    () => entries.map((entry) => ({ region: entry.region, region_key: entry.region_key, value: entry.score })),
+    () => entries.map((entry) => ({ region: entry.region, region_key: entry.region_key, value: null })),
     [entries],
   );
   const selectedEntry = overview && regionKey ? overview[regionKey] : null;
@@ -922,16 +925,23 @@ function RegionView({
     if (found) onSelectRegion(found.region_key);
   };
 
+  const selectRandomRegion = () => {
+    if (!entries.length) return;
+    const candidates = entries.filter((entry) => entry.region_key !== regionKey);
+    const pool = candidates.length ? candidates : entries;
+    onSelectRegion(pool[Math.floor(Math.random() * pool.length)].region_key);
+  };
+
   return (
     <main className="app-shell">
       <SiteHeader
         activeNav="regioni"
         onNavAtlas={() => onMode("atlas")}
-        onNavRegioni={onClearRegion}
+        onNavRegioni={selectRandomRegion}
       >
         {selectedName && (
-          <button className="back-link" type="button" onClick={onClearRegion}>
-            <ArrowLeft size={16} /> Tutte le regioni
+          <button className="back-link" type="button" onClick={selectRandomRegion}>
+            <MapPinned size={16} /> Regione casuale
           </button>
         )}
       </SiteHeader>
@@ -940,7 +950,7 @@ function RegionView({
         label="Per regione"
         crumbs={[
           { label: "Atlante", onClick: () => onMode("atlas") },
-          selectedName ? { label: "Per regione", onClick: onClearRegion } : { label: "Per regione" },
+          { label: "Per regione" },
           ...(selectedName ? [{ label: selectedName }] : []),
         ]}
       >
@@ -948,12 +958,12 @@ function RegionView({
       </ContextBar>
 
       <section className="atlas-hero atlas-hero--compact atlas-hero--region">
-        <p className="eyebrow">Istat · 20 regioni · posizionamento complessivo</p>
+        <p className="eyebrow">Istat · 20 regioni · profili territoriali</p>
         <h1>Come è messa ogni regione.</h1>
         <p className="atlas-hero__lead">
-          Scegli una regione sulla mappa o dalla lista: per ogni tema le assegniamo un punteggio
-          da 0 a 100, dove 100 vuol dire prima in Italia. Così vedi a colpo d'occhio dove eccelle,
-          dove resta indietro e come si è mossa nell'ultimo anno.
+          Scegli una regione sulla mappa o dalla lista: trovi i temi in cui emerge, quelli in cui
+          fatica, gli indicatori collegati e i movimenti dell'ultimo anno. La classifica sintetica
+          resta nella sezione Qualità della vita.
         </p>
       </section>
 
@@ -961,7 +971,7 @@ function RegionView({
         <aside className="region-select">
           <div className="region-select__head">
             <h2>Scegli una regione</h2>
-            <p>Il colore indica il posizionamento complessivo: più scuro, meglio si posiziona.</p>
+            <p>La mappa serve per navigare tra le schede regionali, senza ordinare i territori in una graduatoria unica.</p>
           </div>
           {overview ? (
             <>
@@ -972,20 +982,18 @@ function RegionView({
                   selectedRegion={selectedName}
                   onSelect={handleMapSelect}
                   unit=""
+                  neutral
                 />
               </div>
-              <RegionScoreLegend selected={selectedEntry} />
               <ol className="region-list">
-                {ranked.map((entry) => (
+                {entries.map((entry) => (
                   <li key={entry.region_key}>
                     <button
                       type="button"
                       className={entry.region_key === regionKey ? "region-chip is-active" : "region-chip"}
                       onClick={() => onSelectRegion(entry.region_key)}
                     >
-                      <span className="region-chip__rank">{entry.rank ?? "–"}</span>
                       <span className="region-chip__name">{entry.region}</span>
-                      <span className="region-chip__score">{entry.score ?? "n.d."}</span>
                     </button>
                   </li>
                 ))}
@@ -998,16 +1006,15 @@ function RegionView({
 
         <div className="region-profile-panel">
           {!regionKey ? (
-            <RegionIntro ranked={ranked} onSelectRegion={onSelectRegion} />
+            <RegionIntro />
           ) : !profileReady ? (
-            <RegionProfileSkeleton name={selectedName} entry={selectedEntry} />
+            <RegionProfileSkeleton name={selectedName} />
           ) : (
             <RegionProfile
               profile={profile}
-              overviewEntry={selectedEntry}
               onOpenIndicator={onOpenIndicator}
               onSelectRegion={onSelectRegion}
-              onClear={onClearRegion}
+              onRandomRegion={selectRandomRegion}
             />
           )}
         </div>
@@ -1017,107 +1024,37 @@ function RegionView({
   );
 }
 
-function RegionScoreLegend({ selected }) {
-  const stops = d3.range(0, 1.0001, 0.2);
-  const gradient = `linear-gradient(90deg, ${stops.map((s) => MAP_RAMP(s)).join(", ")})`;
-  return (
-    <div className="region-map-legend-wrap">
-      <div className="region-map-legend" aria-hidden="true">
-        <span>Indietro</span>
-        <div className="region-map-legend__bar" style={{ background: gradient }} />
-        <span>Avanti</span>
-      </div>
-      {selected && selected.score !== null && selected.score !== undefined && (
-        <p className="region-map-legend__selected">
-          <b>{selected.region}</b>: punteggio {selected.score}
-          {selected.rank ? ` · ${selected.rank}ª su ${selected.rank_total}` : ""}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function RegionProfileSkeleton({ name, entry }) {
+function RegionProfileSkeleton({ name }) {
   return (
     <article className="region-profile region-profile--loading" aria-busy="true">
       <header className="region-profile__head">
         <h2>{name || "Regione"}</h2>
-        <div className="region-scoreboard">
-          <div className="region-scoreboard__score">
-            <small>Punteggio complessivo</small>
-            <strong>{entry?.score ?? "—"}</strong>
-            <span>{entry?.rank ? `${entry.rank}ª su ${entry.rank_total} regioni` : "carico…"}</span>
-          </div>
-          <p className="region-scoreboard__note">Carico il profilo di {name || "questa regione"}…</p>
-        </div>
+        <p className="region-profile__meta">Carico il profilo di {name || "questa regione"}...</p>
       </header>
       <div className="region-skeleton" aria-hidden="true"><span /><span /><span /></div>
     </article>
   );
 }
 
-function RegionIntro({ ranked, onSelectRegion }) {
-  const top = ranked.slice(0, 5);
-  const bottom = ranked.slice(-5).reverse();
-  const podium = ranked.slice(0, 3);
+function RegionIntro() {
   return (
     <div className="region-intro">
       <header className="region-intro__head">
         <MapPinned size={30} />
         <div>
-          <h2>Esplora le regioni italiane</h2>
+          <h2>Scelgo una regione</h2>
           <p>
-            Parti dalla classifica complessiva, poi apri una regione per vedere punti di forza,
-            debolezze, movimento recente e indicatori collegati.
+            L'atlante sta aprendo una scheda regionale casuale. Da lì puoi passare alle altre
+            regioni con la mappa o con l'elenco.
           </p>
         </div>
       </header>
-      {ranked.length > 0 && (
-        <>
-          <div className="region-intro__podium" aria-label="Prime tre regioni">
-            {podium.map((entry) => (
-              <button type="button" key={entry.region_key} onClick={() => onSelectRegion(entry.region_key)}>
-                <small>{entry.rank}ª</small>
-                <strong>{entry.region}</strong>
-                <b>{entry.score}</b>
-              </button>
-            ))}
-          </div>
-          <div className="region-intro__cols">
-            <RegionIntroList title="In testa" icon={<Trophy size={13} />} items={top} onSelectRegion={onSelectRegion} />
-            <RegionIntroList title="Più in difficoltà" items={bottom} onSelectRegion={onSelectRegion} />
-          </div>
-        </>
-      )}
-      {!ranked.length && (
-        <p className="region-intro__loading">Carico la classifica regionale...</p>
-      )}
+      <p className="region-intro__loading">Carico le regioni...</p>
     </div>
   );
 }
 
-function RegionIntroList({ title, icon, items, onSelectRegion }) {
-  return (
-    <div>
-      <small>{icon} {title}</small>
-      <ul>
-        {items.map((entry) => (
-          <li key={entry.region_key}>
-            <button type="button" onClick={() => onSelectRegion(entry.region_key)}>
-              <span>{entry.rank}. {entry.region}</span>
-              <b>{entry.score}</b>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function RegionProfile({ profile, overviewEntry, onOpenIndicator, onSelectRegion, onClear }) {
-  const score = overviewEntry?.score ?? null;
-  const rank = overviewEntry?.rank ?? null;
-  const rankTotal = overviewEntry?.rank_total ?? 20;
+function RegionProfile({ profile, onOpenIndicator, onSelectRegion, onRandomRegion }) {
   const moves = [...profile.movement_gains, ...profile.movement_losses];
   const moveMax = Math.max(1, ...moves.map((m) => Math.abs(m.movement)));
 
@@ -1154,34 +1091,25 @@ function RegionProfile({ profile, overviewEntry, onOpenIndicator, onSelectRegion
   return (
     <article className="region-profile">
       <header className="region-profile__head">
-        <button type="button" className="region-profile__back" onClick={onClear}>
-          <ArrowLeft size={15} /> Tutte le regioni
+        <button type="button" className="region-profile__back" onClick={onRandomRegion}>
+          <MapPinned size={15} /> Regione casuale
         </button>
         <h2>{profile.region}</h2>
-        <div className="region-scoreboard">
-          <div className="region-scoreboard__score">
-            <small>Punteggio complessivo</small>
-            <strong><AnimatedNumber value={score} format={formatScore} /></strong>
-            <span>{rank ? `${rank}ª su ${rankTotal} regioni` : "non valutabile"}</span>
-          </div>
-          <p className="region-scoreboard__note">
-            Media su {profile.scored_count} indicatori Istat con una direzione chiara.
-            0 = ultima in Italia, 100 = prima.
-          </p>
-        </div>
+        <p className="region-profile__meta">
+          Profilo costruito su {profile.scored_count} indicatori Istat con una direzione chiara,
+          più gli indicatori contestuali utili a leggere il territorio.
+        </p>
         <div className="region-summary">
           {topStrong && (
             <button type="button" className="region-summary__item is-strong" onClick={() => openThemeAndScroll(topStrong.theme)}>
               <small><TrendingUp size={12} /> Forte in</small>
               <strong>{topStrong.theme}</strong>
-              <b>{Math.round(topStrong.score * 100)}</b>
             </button>
           )}
           {topWeak && (
             <button type="button" className="region-summary__item is-weak" onClick={() => openThemeAndScroll(topWeak.theme)}>
               <small><TrendingDown size={12} /> Debole in</small>
               <strong>{topWeak.theme}</strong>
-              <b>{Math.round(topWeak.score * 100)}</b>
             </button>
           )}
           {(topGain || topLoss) && (
@@ -1249,7 +1177,7 @@ function RegionProfile({ profile, overviewEntry, onOpenIndicator, onSelectRegion
         <h3><Layers size={16} /> Tutti i temi</h3>
         <p className="region-card__note">
           Clicca un tema per aprire i suoi indicatori con valore, posizione tra le 20 regioni e
-          punteggio, e capire come si compone il voto.
+          movimento recente.
         </p>
         <div className="theme-accordion">
           {profile.theme_table.map((t, idx) => {
@@ -1268,14 +1196,6 @@ function RegionProfile({ profile, overviewEntry, onOpenIndicator, onSelectRegion
                 >
                   <ChevronRight className="theme-acc__caret" size={16} />
                   <span className="theme-acc__name">{t.theme}<em>{t.count} ind.</em></span>
-                  {t.rated ? (
-                    <span className="theme-acc__meter">
-                      <Bar pct={t.score * 100} />
-                      <b><AnimatedNumber value={Math.round(t.score * 100)} format={formatScore} /></b>
-                    </span>
-                  ) : (
-                    <span className="theme-score-row__nv">non valutabile</span>
-                  )}
                 </button>
                 {isOpen && (
                   <div className="theme-acc__panel" id={panelId}>
@@ -1287,13 +1207,6 @@ function RegionProfile({ profile, overviewEntry, onOpenIndicator, onSelectRegion
                             <span className="region-ind-row__value">{formatValue(ind.value, ind.unit)}</span>
                             <span className="region-ind-row__rank">
                               {ind.rank ? <><b>{ind.rank}</b><small>/{ind.region_count}</small></> : <small>n.v.</small>}
-                            </span>
-                            <span className="region-ind-row__meter">
-                              {ind.score !== null && ind.score !== undefined ? (
-                                <><Bar pct={ind.score} /><b>{ind.score}</b></>
-                              ) : (
-                                <small className="theme-score-row__nv">n.v.</small>
-                              )}
                             </span>
                             <span className="region-ind-row__move">
                               {ind.movement ? (
@@ -1352,10 +1265,6 @@ function ThemeScoreList({ items }) {
       {items.map((t) => (
         <li key={t.theme}>
           <span className="theme-chip-list__name">{t.theme}</span>
-          <span className="theme-chip-list__meter">
-            <Bar pct={t.score * 100} />
-            <b><AnimatedNumber value={Math.round(t.score * 100)} format={formatScore} /></b>
-          </span>
         </li>
       ))}
     </ul>
@@ -1371,9 +1280,6 @@ function IndicatorLinkList({ items, onOpen }) {
             <span className="region-ind-list__label">
               {e.name}<small>{e.theme}</small>
             </span>
-            {Number.isFinite(e.score) && (
-              <span className="region-ind-list__score">{Math.round(e.score * 100)}</span>
-            )}
             <ChevronRight size={15} />
           </button>
         </li>
@@ -1742,7 +1648,7 @@ function DataCard({ title, kicker, className, children }) {
   );
 }
 
-function ItalyMap({ geo, values, selectedRegion, onSelect, unit }) {
+function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false }) {
   const width = 560;
   const height = 660;
   const valueByKey = useMemo(() => new Map(values.map((row) => [row.region_key, row])), [values]);
@@ -1765,16 +1671,21 @@ function ItalyMap({ geo, values, selectedRegion, onSelect, unit }) {
           const row = valueByKey.get(key);
           const hasValue = row && row.value !== null && row.value !== undefined && Number.isFinite(row.value);
           const isSelected = row?.region === selectedRegion;
+          const title = row
+            ? neutral
+              ? row.region
+              : `${row.region}: ${formatValue(row.value, unit)}`
+            : feature.properties.name;
           return (
             <path
               key={key}
               d={path(feature)}
               className={isSelected ? "is-selected" : ""}
-              fill={hasValue ? color(row.value) : MISSING_FILL}
+              fill={neutral ? MISSING_FILL : hasValue ? color(row.value) : MISSING_FILL}
               onClick={() => row && onSelect(row.region)}
               tabIndex={0}
               role="button"
-              aria-label={row ? `${row.region}: ${formatValue(row.value, unit)}` : feature.properties.name}
+              aria-label={title}
               onKeyDown={(event) => {
                 if ((event.key === "Enter" || event.key === " ") && row) {
                   event.preventDefault();
@@ -1782,12 +1693,12 @@ function ItalyMap({ geo, values, selectedRegion, onSelect, unit }) {
                 }
               }}
             >
-              <title>{row ? `${row.region}: ${formatValue(row.value, unit)}` : feature.properties.name}</title>
+              <title>{title}</title>
             </path>
           );
         })}
       </svg>
-      {hasData ? (
+      {neutral ? null : hasData ? (
         <MapLegend min={min} max={max} unit={unit} />
       ) : (
         <p className="map-empty">Nessun dato disponibile per l'anno selezionato.</p>
@@ -2038,12 +1949,6 @@ function formatValue(value, unit = "") {
   const digits = Math.abs(value) >= 100 ? 0 : 2;
   const formatted = new Intl.NumberFormat("it-IT", { maximumFractionDigits: digits }).format(value);
   return unit ? `${formatted} ${unit}` : formatted;
-}
-
-// Whole-number 0..100 score readout for region/theme meters (ignores unit).
-function formatScore(value) {
-  if (!Number.isFinite(value)) return "n.d.";
-  return new Intl.NumberFormat("it-IT", { maximumFractionDigits: 0 }).format(Math.round(value));
 }
 
 function formatPercent(ratio) {

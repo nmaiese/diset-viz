@@ -272,8 +272,10 @@ def region_page(region_key):
 
 @app.route("/api/regions/overview")
 def regions_overview_api():
-    """Compact per-region standing (overall score, rank, strong/weak themes) for
-    the SPA 'per regione' selection map. Same source as the /regioni page."""
+    """Compact per-region summary for the SPA 'per regione' selection map.
+
+    Same source as the /regioni page; no overall regional score is exposed here.
+    """
     return jsonify(profiles.regions_overview())
 
 
@@ -308,14 +310,7 @@ def theme_page(theme_slug):
 @app.route("/regioni")
 def regions_index():
     overview = profiles.regions_overview()
-    regions = sorted(
-        overview.values(),
-        key=lambda entry: (
-            entry.get("rank") is None,
-            entry.get("rank") or 999,
-            entry["region"],
-        ),
-    )
+    regions = list(overview.values())
     return render_template(
         "regions_index.html",
         regions=regions,
