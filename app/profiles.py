@@ -437,19 +437,45 @@ def all_regions_index():
     ]
 
 
+def _overall_score(profile):
+    """Mean oriented score (0..100) over a region's scored indicators.
+
+    Weighted by each theme's indicator count so it equals the average across all
+    scored indicators, not the average of theme averages. None if nothing scored.
+    """
+    table = profile["theme_table"]
+    total = sum(t["count"] for t in table)
+    if not total:
+        return None
+    weighted = sum(t["score"] * t["count"] for t in table)
+    return round(weighted / total * 100)
+
+
 @cache.memoize(timeout=3600)
 def regions_overview():
-    """Compact per-region data for the clickable map tooltips."""
+    """Compact per-region data for the clickable map tooltips and the SPA
+    'per regione' selection map (overall standing colour + rank)."""
     overview = {}
     for region in REGION_ORDER:
         key = region_key_for(region)
         profile = region_profile(key)
         overview[key] = {
             "region": region,
+            "region_key": key,
             "path": f"/regione/{key}",
+            "score": _overall_score(profile),
             "strong": [t["theme"] for t in profile["themes_strong"][:2]],
             "weak": [t["theme"] for t in profile["themes_weak"][:2]],
         }
+    # Rank regions by overall score (1 = best); unscored regions stay rankless.
+    ranked = sorted(
+        (entry for entry in overview.values() if entry["score"] is not None),
+        key=lambda entry: entry["score"],
+        reverse=True,
+    )
+    for position, entry in enumerate(ranked, start=1):
+        entry["rank"] = position
+        entry["rank_total"] = len(ranked)
     return overview
 
 

@@ -77,6 +77,22 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(search.status_code, 200)
         self.assertIn("results", search.get_json())
 
+    def test_region_api(self):
+        client = app.test_client()
+
+        region = client.get("/api/region/lombardia")
+        self.assertEqual(region.status_code, 200)
+        self.assertIn("noindex", region.headers["X-Robots-Tag"])
+        payload = region.get_json()
+        self.assertEqual(payload["region"], "Lombardia")
+        self.assertEqual(payload["region_key"], "lombardia")
+        for field in ("theme_table", "themes_strong", "themes_weak",
+                      "top_excels", "top_lags", "similar_regions", "all_indicators"):
+            self.assertIn(field, payload)
+        self.assertGreater(len(payload["theme_table"]), 0)
+
+        self.assertEqual(client.get("/api/region/atlantide").status_code, 404)
+
     def test_blog_routes(self):
         from app.blog import get_posts
 

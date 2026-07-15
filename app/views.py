@@ -264,6 +264,27 @@ def region_page(region_key):
     )
 
 
+@app.route("/api/regions/overview")
+def regions_overview_api():
+    """Compact per-region standing (overall score, rank, strong/weak themes) for
+    the SPA 'per regione' selection map. Same source as the /regioni page."""
+    return jsonify(profiles.regions_overview())
+
+
+@app.route("/api/region/<region_key>")
+def region_api(region_key):
+    """JSON del profilo regione, per la vista 'per regione' della SPA.
+
+    Riusa la stessa funzione che alimenta la pagina server /regione/<key>, così
+    atlante interattivo e pagina SEO restano coerenti su un'unica fonte dati.
+    L'after_request in app/__init__.py aggiunge già X-Robots-Tag: noindex.
+    """
+    profile = profiles.region_profile(region_key)
+    if profile is None:
+        abort(404)
+    return jsonify(profile)
+
+
 @app.route("/tema/<theme_slug>")
 def theme_page(theme_slug):
     profile = profiles.theme_profile(theme_slug)
