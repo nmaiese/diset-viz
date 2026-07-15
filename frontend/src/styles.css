@@ -698,18 +698,46 @@ h1, h2, h3 { font-family: var(--font-display); }
 .mode-switch__tab:hover { color: var(--ink); }
 .mode-switch__tab.is-active { background: var(--ink); color: var(--paper); }
 
-/* ---------- Animated bar primitive ---------- */
+/* ---------- Stable numeric and bar primitives ---------- */
+.numeric-value {
+  font-variant-numeric: tabular-nums;
+  animation: numeric-refresh 420ms ease-out both;
+}
+@keyframes numeric-refresh {
+  from { background: var(--accent-soft); color: var(--accent); }
+  to { background: transparent; color: inherit; }
+}
 .di-bar { display: block; height: 9px; background: var(--grid); overflow: hidden; }
 .di-bar i {
   display: block;
   height: 100%;
   background: var(--ink);
-  transition: width 720ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-origin: left center;
+  transform: scaleX(var(--bar-scale, 1));
+  animation: bar-grow 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 .di-bar--up i { background: #2f8f5b; }
 .di-bar--down i { background: var(--accent); }
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(var(--bar-scale, 1)); }
+}
 /* Subtle re-flow of the ranking bars when the year changes. */
-.ranking-row .bar i { transition: width 600ms cubic-bezier(0.22, 0.61, 0.36, 1); }
+.ranking-row .bar i {
+  transform-origin: left center;
+  animation: ranking-bar-refresh 420ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@keyframes ranking-bar-refresh {
+  from { transform: scaleX(0.96); opacity: 0.72; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .numeric-value,
+  .di-bar i,
+  .ranking-row .bar i {
+    animation: none;
+  }
+}
 
 /* ---------- Region view ---------- */
 .region-explore {

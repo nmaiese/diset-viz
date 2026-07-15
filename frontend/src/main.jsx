@@ -498,83 +498,24 @@ function ContextBar({ label, crumbs, children }) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Numeric animation primitives                                        */
+/* Stable numeric primitives                                           */
 /* ------------------------------------------------------------------ */
 
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-  );
-  useEffect(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const handler = () => setReduced(mq.matches);
-    mq.addEventListener?.("change", handler);
-    return () => mq.removeEventListener?.("change", handler);
-  }, []);
-  return reduced;
-}
-
-// Tween a number from its previous value to a new target with an ease-out curve.
-// Honours prefers-reduced-motion by snapping straight to the target.
-function useCountUp(target, duration = 850) {
-  const reduced = usePrefersReducedMotion();
-  const finite = Number.isFinite(target);
-  const [value, setValue] = useState(finite && !reduced ? 0 : target);
-  const prevRef = useRef(finite && !reduced ? 0 : target);
-
-  useEffect(() => {
-    if (!finite || reduced) {
-      prevRef.current = target;
-      setValue(target);
-      return;
-    }
-    const from = Number.isFinite(prevRef.current) ? prevRef.current : 0;
-    if (from === target) {
-      setValue(target);
-      return;
-    }
-    let raf;
-    const start = performance.now();
-    const tick = (now) => {
-      const t = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - t, 3);
-      setValue(from + (target - from) * eased);
-      if (t < 1) raf = requestAnimationFrame(tick);
-      else prevRef.current = target;
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target, duration, reduced, finite]);
-
-  return value;
-}
-
-function AnimatedNumber({ value, unit = "", format = formatValue, className }) {
-  const animated = useCountUp(Number.isFinite(value) ? value : NaN);
-  return <span className={className}>{format(Number.isFinite(value) ? animated : value, unit)}</span>;
-}
-
-// Bar that grows from 0 to `pct`% on mount (CSS width transition), snapping when
-// reduced motion is requested.
-function Bar({ pct, className = "" }) {
-  const reduced = usePrefersReducedMotion();
-  const target = Math.max(0, Math.min(100, pct || 0));
-  const [width, setWidth] = useState(reduced ? target : 0);
-  useEffect(() => {
-    if (reduced) {
-      setWidth(target);
-      return;
-    }
-    const raf = requestAnimationFrame(() => setWidth(target));
-    return () => cancelAnimationFrame(raf);
-  }, [target, reduced]);
+function NumericValue({ value, unit = "", format = formatValue, className }) {
+  const text = format(value, unit);
   return (
-    <span className={`di-bar ${className}`.trim()}>
-      <i style={{ width: `${width}%` }} />
+    <span key={text} className={`numeric-value ${className || ""}`.trim()}>
+      {text}
+    </span>
+  );
+}
+
+// Bar that grows with transform, so the visual animation never changes layout.
+function Bar({ pct, className = "" }) {
+  const target = Math.max(0, Math.min(100, pct || 0));
+  return (
+    <span className={`di-bar ${className}`.trim()} style={{ "--bar-scale": target / 100 }}>
+      <i />
     </span>
   );
 }
@@ -1080,7 +1021,7 @@ function RegionProfile({ profile, onOpenIndicator, onSelectRegion, onRandomRegio
   const themesRef = useRef(null);
   const openThemeAndScroll = (name) => {
     setExpanded((prev) => new Set(prev).add(name));
-    requestAnimationFrame(() => themesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    requestAnimationFrame(() => themesRef.current?.scrollIntoView({ behavior: "auto", block: "nearest" }));
   };
 
   const topStrong = profile.themes_strong[0];
@@ -1571,7 +1512,7 @@ function InsightPanel({ insights, unit, year, region, onOpenRegion }) {
     <div className="insights">
       <div className="insight insight--region">
         <small>{region || "Regione"} · {year}</small>
-        <strong><AnimatedNumber value={insights.regionEntry?.value} unit={unit} /></strong>
+        <strong><NumericValue value={insights.regionEntry?.value} unit={unit} /></strong>
         <span>
           {insights.regionRank
             ? `${insights.regionRank}ª su ${insights.total} regioni`
@@ -1597,12 +1538,12 @@ function InsightPanel({ insights, unit, year, region, onOpenRegion }) {
       <div className="insight">
         <small><Trophy size={13} /> Valore più alto · {year}</small>
         <strong>{insights.top?.region || "n.d."}</strong>
-        <span><AnimatedNumber value={insights.top?.value} unit={unit} /></span>
+        <span><NumericValue value={insights.top?.value} unit={unit} /></span>
       </div>
       <div className="insight">
         <small>Valore più basso · {year}</small>
         <strong>{insights.bottom?.region || "n.d."}</strong>
-        <span><AnimatedNumber value={insights.bottom?.value} unit={unit} /></span>
+        <span><NumericValue value={insights.bottom?.value} unit={unit} /></span>
       </div>
       <div className={`insight insight--trend ${trendClass}`}>
         <small><TrendIcon size={13} /> {region} · trend storico</small>
@@ -1743,7 +1684,7 @@ function Ranking({ values, selectedRegion, onSelect, unit }) {
           <span className="rank">{index + 1}</span>
           <span className="region">{row.region}</span>
           <span className="bar"><i style={{ width: `${Math.max((row.value / max) * 100, 2)}%` }} /></span>
-          <strong><AnimatedNumber value={row.value} unit={unit} /></strong>
+          <strong><NumericValue value={row.value} unit={unit} /></strong>
         </button>
       ))}
     </div>
