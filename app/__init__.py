@@ -24,7 +24,7 @@ def redirect_www_to_apex():
 
 
 _NOINDEX_EXACT_PATHS = {"/data", "/legacy", "/legacy-reddito"}
-_NOINDEX_PATH_PREFIXES = ("/api/",)
+_NOINDEX_PATH_PREFIXES = ("/api/", "/download/")
 
 
 @app.after_request

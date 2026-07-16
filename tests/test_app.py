@@ -214,7 +214,7 @@ class AppSmokeTest(unittest.TestCase):
             self.assertEqual(client.get(path).headers.get("X-Robots-Tag"), expected, path)
 
         catalog = get_catalog()
-        sample = catalog["indicators"][0]
+        sample = next(item for item in catalog["indicators"] if profiles.is_search_indexable_indicator(item))
         indicator_path = profiles.indicator_path(sample["id"], sample["name"])
         self.assertEqual(client.get(indicator_path).headers.get("X-Robots-Tag"), expected)
         self.assertEqual(client.get("/regione/lombardia").headers.get("X-Robots-Tag"), expected)
@@ -223,7 +223,7 @@ class AppSmokeTest(unittest.TestCase):
 
     def test_noindex_paths_unaffected_by_default_index_header(self):
         client = app.test_client()
-        for path in ("/data", "/legacy", "/legacy-reddito"):
+        for path in ("/data", "/legacy", "/legacy-reddito", "/download/quality-life/regioni"):
             self.assertIn("noindex", client.get(path).headers["X-Robots-Tag"])
         self.assertIn("noindex", client.get("/api/catalog").headers["X-Robots-Tag"])
 
@@ -242,19 +242,40 @@ class AppSmokeTest(unittest.TestCase):
         client = app.test_client()
 
         catalog = get_catalog()
-        sample = catalog["indicators"][0]
+        sample = next(item for item in catalog["indicators"] if profiles.is_search_indexable_indicator(item))
         path = profiles.indicator_path(sample["id"], sample["name"])
 
         indicator = client.get(path)
         self.assertEqual(indicator.status_code, 200)
         self.assertIn(b"application/ld+json", indicator.data)
         self.assertIn(b'"@type": "Dataset"', indicator.data)
+        self.assertIn(b"DataDownload", indicator.data)
         self.assertIn(sample["name"].encode("utf-8"), indicator.data)
+
+        csv_download = client.get(f"/download/indicator/{sample['id']}.csv")
+        self.assertEqual(csv_download.status_code, 200)
+        self.assertIn("text/csv", csv_download.headers["Content-Type"])
+        self.assertIn("noindex", csv_download.headers["X-Robots-Tag"])
+        self.assertIn(b"indicator_id,indicator,theme,region", csv_download.data)
+        json_download = client.get(f"/download/indicator/{sample['id']}.json")
+        self.assertEqual(json_download.status_code, 200)
+        self.assertIn("noindex", json_download.headers["X-Robots-Tag"])
+        self.assertIn("metadata", json_download.get_json())
 
         # Non-canonical slug 301s to the canonical path.
         wrong = client.get(f"/indicatore/{sample['id']}-slug-sbagliato")
         self.assertEqual(wrong.status_code, 301)
         self.assertTrue(wrong.headers["Location"].endswith(path))
+
+        non_indexable = next(item for item in catalog["indicators"] if not profiles.is_search_indexable_indicator(item))
+        non_indexable_path = profiles.indicator_path(non_indexable["id"], non_indexable["name"])
+        non_indexable_page = client.get(non_indexable_path)
+        self.assertEqual(non_indexable_page.status_code, 200)
+        self.assertIn(b'content="noindex, follow"', non_indexable_page.data)
+        self.assertEqual(non_indexable_page.headers["X-Robots-Tag"], "noindex, follow")
+        sitemap = client.get("/sitemap.xml").data.decode("utf-8")
+        self.assertIn(path, sitemap)
+        self.assertNotIn(non_indexable_path, sitemap)
 
         self.assertEqual(client.get("/indicatore/9999999").status_code, 404)
         self.assertEqual(client.get("/indicatore/abc").status_code, 404)
@@ -278,13 +299,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b"/regione/lombardia", sitemap)
         self.assertIn(b"/tema/", sitemap)
         self.assertIn(b"/indicatore/", sitemap)
-        # Deliberate policy since 2026-07-12 (afd31d3): every existing indicator page
-        # is indexable and listed in the sitemap, no curated noindex carve-out.
-        self.assertIn(b"/indicatore/264-aree-terrestri-protette", sitemap)
-
-        legacy_indicator = client.get("/indicatore/264-aree-terrestri-protette")
-        self.assertEqual(legacy_indicator.status_code, 200)
-        self.assertIn(b'name="robots" content="index, follow', legacy_indicator.data)
+        self.assertNotIn(non_indexable_path.encode("utf-8"), sitemap)
 
     def test_dataset_jsonld_spatial_coverage_and_license(self):
         import json
@@ -294,7 +309,7 @@ class AppSmokeTest(unittest.TestCase):
         from app import profiles
 
         client = app.test_client()
-        sample = get_catalog()["indicators"][0]
+        sample = next(item for item in get_catalog()["indicators"] if profiles.is_search_indexable_indicator(item))
         pages = {
             "indicator": client.get(profiles.indicator_path(sample["id"], sample["name"])).data.decode("utf-8"),
             "region": client.get("/regione/lombardia").data.decode("utf-8"),

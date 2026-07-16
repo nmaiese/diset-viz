@@ -15,10 +15,10 @@ from app import quality_life_bes as qb
 from app import external_manifest
 from app import game
 
-from flask import Response, abort, redirect, render_template, request, send_from_directory, url_for
+from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
-import csv, json, os, re, time
+import csv, io, json, os, re, time
 
 from app import config
 
@@ -238,7 +238,8 @@ def indicator_page(slug):
     plain = (meta.get("explain") or {}).get("plain", "")
     stats = indicator_trend_stats(payload, year, values, best, worst)
     trend_note = indicator_notes.trend_framing(direction, stats["avg_change_pct"])
-    return render_template(
+    is_indexable = profiles.is_search_indexable_indicator(meta)
+    response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
         values=values,
@@ -247,14 +248,17 @@ def indicator_page(slug):
         year=year,
         stats=stats,
         trend_note=trend_note,
-        is_indexable=profiles.is_search_indexable_indicator(meta),
+        is_indexable=is_indexable,
         seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
         seo_description=indicator_notes.seo_description(plain, meta["year_max"], len(meta["regions"])),
         theme_path=profiles.theme_path(meta["theme"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{canonical_path}",
-    )
+    ))
+    if not is_indexable:
+        response.headers["X-Robots-Tag"] = "noindex, follow"
+    return response
 
 
 @app.route("/regione/<region_key>")
@@ -347,6 +351,94 @@ def _quality_life_profile_arg():
 
 def _profile_suffix(slug):
     return "" if slug == qb.DEFAULT_PROFILE else f"?profilo={slug}"
+
+
+
+
+@app.route("/download/indicator/<indicator_id>.csv")
+def indicator_download_csv(indicator_id):
+    payload = get_indicator(indicator_id)
+    if payload is None:
+        abort(404)
+    meta = payload["metadata"]
+    rows = []
+    for point in payload["series"]:
+        rows.append({
+            "indicator_id": indicator_id,
+            "indicator": meta["name"],
+            "theme": meta["theme"],
+            "region": point["region"],
+            "region_key": point["region_key"],
+            "year": point["year"],
+            "value": point["value"],
+            "unit": meta["unit"],
+            "source": meta["source_label"] or meta["source"],
+            "source_url": meta["source_url"],
+        })
+    return _csv_response(
+        rows,
+        ["indicator_id", "indicator", "theme", "region", "region_key", "year", "value", "unit", "source", "source_url"],
+        f"divario-italia-indicatore-{indicator_id}.csv",
+    )
+
+
+@app.route("/download/indicator/<indicator_id>.json")
+def indicator_download_json(indicator_id):
+    payload = get_indicator(indicator_id)
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+@app.route("/download/quality-life/<url_level>")
+def quality_life_download_csv(url_level):
+    level = URL_LEVEL.get(url_level)
+    if level is None:
+        abort(404)
+    payload = qb.build_bes_ranking(level, _quality_life_profile_arg())
+    if payload is None:
+        abort(404)
+    rows = [_quality_life_export_row(row, payload) for row in payload["ranking"]]
+    return _csv_response(
+        rows,
+        ["level", "profile", "rank", "territory", "territory_key", "region", "score", "delta_rank", "coverage"],
+        f"divario-italia-qualita-vita-{url_level}-{payload['profile']['slug']}.csv",
+    )
+
+
+@app.route("/download/quality-life/<url_level>.json")
+def quality_life_download_json(url_level):
+    level = URL_LEVEL.get(url_level)
+    if level is None:
+        abort(404)
+    payload = qb.build_bes_ranking(level, _quality_life_profile_arg())
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+def _quality_life_export_row(row, payload):
+    return {
+        "level": payload["level"],
+        "profile": payload["profile"]["slug"],
+        "rank": row["rank"],
+        "territory": row["name"],
+        "territory_key": row["key"],
+        "region": row.get("region") or "",
+        "score": row["score"],
+        "delta_rank": row["delta_rank"],
+        "coverage": row["coverage"],
+    }
+
+
+def _csv_response(rows, fieldnames, filename):
+    buffer = io.StringIO()
+    writer = csv.DictWriter(buffer, fieldnames=fieldnames, extrasaction="ignore")
+    writer.writeheader()
+    writer.writerows(rows)
+    response = Response(buffer.getvalue(), mimetype="text/csv; charset=utf-8")
+    response.headers["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return response
 
 
 @app.route("/api/quality-life/profiles")
@@ -529,7 +621,7 @@ def sitemap():
     for post in get_posts():
         pages.append({
             "loc": post["url"],
-            "lastmod": post["date"].isoformat(),
+            "lastmod": post.get("date_modified", post["date"]).isoformat(),
             "priority": "0.7",
         })
     for region in profiles.all_regions_index():

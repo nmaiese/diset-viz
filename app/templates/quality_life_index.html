@@ -10,7 +10,7 @@
   "@context": "https://schema.org",
   "@type": "WebPage",
   "name": "Qualità della vita nelle regioni italiane",
-  "description": {{ 'Classifica trasparente della qualità della vita nelle regioni italiane basata su indicatori Istat.' | tojson }},
+  "description": {{ 'Classifica trasparente della qualità della vita nelle regioni e province italiane basata su indicatori BES Istat.' | tojson }},
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
   "creator": { "@type": "Organization", "name": "Istat" },
@@ -61,7 +61,7 @@
 
   <section class="quality-section">
     <h2>Le categorie</h2>
-    <p class="page-note">Ogni categoria raccoglie temi Istat affini. Il punteggio di una categoria è la media dei suoi indicatori, normalizzati con un percentile orientato da 0 a 100.</p>
+    <p class="page-note">Ogni categoria raccoglie temi Istat affini. Il punteggio di una categoria è la media dei suoi indicatori, normalizzati con z-score orientato e mostrati su scala 0-100 con media 50.</p>
     <ul class="quality-category-list">
       {% for category in categories %}
       <li>
