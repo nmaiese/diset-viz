@@ -1,0 +1,270 @@
+"""Motore quiz condiviso per le modalità a domanda rapida.
+
+Copre "Chi è maggiore?" (confronto a due regioni con difficoltà progressiva)
+e "Ordina le regioni" (ordinamento a credito parziale). A differenza di
+"Indovina la Regione" (app/game.py) qui non c'è alcun seed giornaliero né
+anti-spoiler: ogni round è un'estrazione casuale indipendente e i valori
+sono comunque pubblici sulle pagine indicatore. Per questo gli endpoint di
+risposta non usano id opachi: rileggono i dati e restano l'unica fonte di
+verità sul confronto (il client non decide mai chi ha vinto).
+
+Solo il pool di indicatori idonei è memoizzato. Le funzioni di round NON
+vanno memoizzate: devono variare a ogni chiamata.
+"""
+
+import random
+
+from app.cache import cache
+from app.data import get_catalog, get_indicator_year
+from app.indicator_notes import macro_area_for
+from app import profiles
+
+COMPARE_CHOICES = ("region_a", "region_b", "timeout")
+ORDER_COUNTS = (3, 5)
+MAX_DIFFICULTY = 4
+# Finestra (min, max) di distanza tra i due VALORI DISTINTI in gara, come
+# frazione dell'intervallo di indici distinti disponibili: a livello 0 la
+# coppia è lontana in classifica (facile capire chi è maggiore), ai livelli
+# alti è quasi adiacente. Espressa come rapporto (non come conteggio fisso di
+# rank) perché il numero di valori distinti varia da un indicatore all'altro
+# quando ci sono pareggi: le stesse proporzioni restano valide indipendentemente
+# da quanti valori distinti abbia l'indicatore pescato (sempre >= _MIN_DISTINCT_VALUES).
+_DIFFICULTY_GAP_RATIO = {0: (0.63, 1.0), 1: (0.42, 0.58), 2: (0.26, 0.37), 3: (0.16, 0.21), 4: (0.05, 0.11)}
+# Il pool richiede almeno questo numero di valori distinti nell'anno più
+# recente, così lo stesso pool serve anche l'ordinamento a 5 senza pareggi.
+_MIN_DISTINCT_VALUES = 5
+
+
+@cache.memoize(timeout=3600)
+def _quiz_indicators():
+    """Indicatori idonei alle modalità quiz: core (completi e recenti), non
+    varianti di genere, con abbastanza valori distinti nell'anno più recente.
+    Ogni voce porta la classifica per valore già ordinata (decrescente)."""
+    pool = []
+    for item in get_catalog()["indicators"]:
+        if not profiles.is_core(item) or profiles.is_gender_variant(item):
+            continue
+        year = item["year_max"]
+        payload = get_indicator_year(item["id"], year)
+        if payload is None:
+            continue
+        rows = payload["values"]  # non-null, già ordinati per valore desc
+        if len({row["value"] for row in rows}) < _MIN_DISTINCT_VALUES:
+            continue
+        pool.append({
+            "id": item["id"],
+            "name": item["name"],
+            "theme": item["theme"],
+            "macro_area": item["macro_area"],
+            "unit": item["unit"],
+            "year": year,
+            "ranking": [
+                {"region": row["region"], "region_key": row["region_key"], "value": row["value"]}
+                for row in rows
+            ],
+        })
+    return pool
+
+
+def _indicator_fields(entry):
+    return {
+        "id": entry["id"],
+        "name": entry["name"],
+        "theme": entry["theme"],
+        "macro_area": entry["macro_area"],
+        "unit": entry["unit"],
+        "year": entry["year"],
+    }
+
+
+def _region_fields(row):
+    return {"region": row["region"], "region_key": row["region_key"]}
+
+
+def _clamp_difficulty(difficulty):
+    try:
+        level = int(difficulty)
+    except (TypeError, ValueError):
+        return 0
+    return max(0, min(level, MAX_DIFFICULTY))
+
+
+def _distinct_values(ranking):
+    """Valori distinti nella classifica, ordinati dal più alto al più basso,
+    e l'indice (nella classifica originale) di una riga per ciascun valore.
+    Costruito una volta per round: rende la scelta della coppia un'operazione
+    diretta invece di un tentativo-ed-errore su valori potenzialmente ripetuti."""
+    seen = {}
+    order = []
+    for row in ranking:
+        if row["value"] not in seen:
+            seen[row["value"]] = []
+            order.append(row["value"])
+        seen[row["value"]].append(row)
+    return order, seen
+
+
+def compare_round(difficulty=0):
+    """Round di "Chi è maggiore?": un indicatore e due regioni con distanza
+    (tra valori distinti) via via più stretta al crescere della difficoltà.
+    Mai i valori. Nessun tentativo-ed-errore: la coppia è scelta direttamente
+    tra valori diversi, quindi il risultato è sempre valido al primo colpo."""
+    level = _clamp_difficulty(difficulty)
+    ratio_min, ratio_max = _DIFFICULTY_GAP_RATIO[level]
+    entry = random.choice(_quiz_indicators())
+    distinct, rows_by_value = _distinct_values(entry["ranking"])
+    n = len(distinct)  # sempre >= _MIN_DISTINCT_VALUES
+
+    max_index_gap = n - 1
+    min_gap = max(1, round(ratio_min * max_index_gap))
+    max_gap = max(min_gap, round(ratio_max * max_index_gap))
+    max_gap = min(max_gap, max_index_gap)
+    gap = random.randint(min_gap, max_gap)
+    i = random.randint(0, n - 1 - gap)
+
+    a = random.choice(rows_by_value[distinct[i]])
+    b = random.choice(rows_by_value[distinct[i + gap]])
+
+    pair = [a, b]
+    random.shuffle(pair)
+    return {
+        "indicator": _indicator_fields(entry),
+        "region_a": _region_fields(pair[0]),
+        "region_b": _region_fields(pair[1]),
+        "difficulty": level,
+    }
+
+
+def _value_for(indicator_id, year, region_key):
+    payload = get_indicator_year(indicator_id, year)
+    if payload is None:
+        return None
+    for row in payload["values"]:
+        if row["region_key"] == region_key:
+            return row["value"]
+    return None
+
+
+def evaluate_compare(indicator_id, year, region_a_key, region_b_key, choice):
+    """Valuta una risposta di "Chi è maggiore?", o None se l'input non è
+    valido (il chiamante risponde 400). "timeout" conta come errore ma la
+    risposta rivela comunque vincitore e valori."""
+    if choice not in COMPARE_CHOICES:
+        return None
+    if not isinstance(indicator_id, str) or not isinstance(year, int):
+        return None
+    if region_a_key == region_b_key:
+        return None
+    name_a = profiles.region_name(region_a_key)
+    name_b = profiles.region_name(region_b_key)
+    if name_a is None or name_b is None:
+        return None
+    payload = get_indicator_year(indicator_id, year)
+    if payload is None or not payload["values"]:
+        return None
+    value_a = _value_for(indicator_id, year, region_a_key)
+    value_b = _value_for(indicator_id, year, region_b_key)
+    if value_a is None or value_b is None or value_a == value_b:
+        return None
+
+    winner = "region_a" if value_a > value_b else "region_b"
+    meta = payload["metadata"]
+    return {
+        "correct": choice == winner,
+        "choice": choice,
+        "winner": winner,
+        "indicator": {
+            "id": meta["id"],
+            "name": meta["name"],
+            "theme": meta["theme"],
+            "macro_area": macro_area_for(meta["theme"]),
+            "unit": meta["unit"],
+            "year": year,
+        },
+        "region_a": {"region": name_a, "region_key": region_a_key, "value": value_a},
+        "region_b": {"region": name_b, "region_key": region_b_key, "value": value_b},
+    }
+
+
+def order_round(count):
+    """Round di "Ordina le regioni": un indicatore e `count` regioni con
+    valori tutti distinti, restituite in ordine casuale e senza valori.
+    Nessun tentativo-ed-errore: `random.sample` su indici di valori distinti
+    garantisce `count` valori diversi in un colpo solo (il pool richiede
+    sempre almeno _MIN_DISTINCT_VALUES valori distinti, quindi la scelta
+    esiste sempre per ogni count ammesso)."""
+    if count not in ORDER_COUNTS:
+        return None
+    entry = random.choice(_quiz_indicators())
+    distinct, rows_by_value = _distinct_values(entry["ranking"])
+
+    indices = random.sample(range(len(distinct)), count)
+    chosen = [random.choice(rows_by_value[distinct[i]]) for i in indices]
+
+    shuffled = list(chosen)
+    random.shuffle(shuffled)
+    return {
+        "indicator": _indicator_fields(entry),
+        "regions": [_region_fields(row) for row in shuffled],
+        "count": count,
+    }
+
+
+def evaluate_order(indicator_id, year, region_keys):
+    """Valuta un ordinamento proposto (dal valore più alto al più basso), o
+    None se l'input non è valido. Credito parziale: un punto per ogni
+    regione nella posizione esatta."""
+    if not isinstance(indicator_id, str) or not isinstance(year, int):
+        return None
+    if not isinstance(region_keys, list) or len(region_keys) not in ORDER_COUNTS:
+        return None
+    if len(set(region_keys)) != len(region_keys):
+        return None
+    names = {}
+    for key in region_keys:
+        name = profiles.region_name(key)
+        if name is None:
+            return None
+        names[key] = name
+
+    payload = get_indicator_year(indicator_id, year)
+    if payload is None or not payload["values"]:
+        return None
+    values = {}
+    for key in region_keys:
+        value = _value_for(indicator_id, year, key)
+        if value is None:
+            return None
+        values[key] = value
+    if len(set(values.values())) != len(region_keys):
+        return None  # con un pareggio non esiste un ordine corretto univoco
+
+    correct_keys = sorted(region_keys, key=lambda key: values[key], reverse=True)
+    correct_position = {key: idx + 1 for idx, key in enumerate(correct_keys)}
+
+    positions = []
+    score = 0
+    for idx, key in enumerate(region_keys):
+        guessed = idx + 1
+        right = correct_position[key]
+        hit = guessed == right
+        if hit:
+            score += 1
+        positions.append({
+            "region": names[key],
+            "region_key": key,
+            "value": values[key],
+            "guessed_position": guessed,
+            "correct_position": right,
+            "correct": hit,
+        })
+
+    return {
+        "score": score,
+        "total": len(region_keys),
+        "positions": positions,
+        "correct_order": [
+            {"region": names[key], "region_key": key, "value": values[key]}
+            for key in correct_keys
+        ],
+    }

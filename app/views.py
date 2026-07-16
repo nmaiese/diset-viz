@@ -14,6 +14,7 @@ from app import indicator_notes
 from app import quality_life_bes as qb
 from app import external_manifest
 from app import game
+from app import quiz
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -574,6 +575,72 @@ def game_page():
     )
 
 
+@app.route("/gioco/chi-e-maggiore")
+def game_compare_page():
+    return render_template(
+        "game_compare.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/gioco/chi-e-maggiore",
+    )
+
+
+@app.route("/gioco/ordina")
+def game_order_page():
+    return render_template(
+        "game_order.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/gioco/ordina",
+    )
+
+
+@app.route("/api/game/compare/round")
+def game_compare_round_api():
+    difficulty = request.args.get("difficulty", "0")
+    return jsonify(quiz.compare_round(difficulty))
+
+
+@app.post("/api/game/compare/answer")
+def game_compare_answer_api():
+    payload = request.get_json(silent=True) or {}
+    result = quiz.evaluate_compare(
+        payload.get("indicator_id"),
+        payload.get("year"),
+        payload.get("region_a_key"),
+        payload.get("region_b_key"),
+        payload.get("choice"),
+    )
+    if result is None:
+        abort(400)
+    return jsonify(result)
+
+
+@app.route("/api/game/order/round")
+def game_order_round_api():
+    try:
+        count = int(request.args.get("count", ""))
+    except ValueError:
+        abort(400)
+    result = quiz.order_round(count)
+    if result is None:
+        abort(400)
+    return jsonify(result)
+
+
+@app.post("/api/game/order/answer")
+def game_order_answer_api():
+    payload = request.get_json(silent=True) or {}
+    result = quiz.evaluate_order(
+        payload.get("indicator_id"),
+        payload.get("year"),
+        payload.get("region_keys"),
+    )
+    if result is None:
+        abort(400)
+    return jsonify(result)
+
+
 @app.route("/api/game/regions")
 def game_regions_api():
     return jsonify({"regions": profiles.all_regions_index()})
@@ -582,6 +649,19 @@ def game_regions_api():
 @app.route("/api/game/daily")
 def game_daily_api():
     return jsonify(game.daily_payload())
+
+
+@app.route("/api/game/daily/<iso_date>")
+def game_daily_archive_api(iso_date):
+    payload = game.daily_payload_for_date(iso_date)
+    if payload is None:
+        abort(404)
+    return jsonify(payload)
+
+
+@app.route("/api/game/archive")
+def game_archive_api():
+    return jsonify({"puzzles": game.archive_list()})
 
 
 @app.route("/api/game/practice")
@@ -612,6 +692,8 @@ def sitemap():
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
         {"loc": f"{SITE_URL}/gioco", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/gioco/chi-e-maggiore", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/gioco/ordina", "priority": "0.7"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
         {"loc": f"{SITE_URL}/qualita-della-vita/classifica/regioni", "priority": "0.8"},
         {"loc": f"{SITE_URL}/qualita-della-vita/classifica/province", "priority": "0.8"},

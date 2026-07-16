@@ -17,7 +17,7 @@ gioco pubblico non competitivo.
 import random
 import re
 import secrets
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 
 from app.cache import cache
 from app.data import REGION_ORDER, get_indicator, indicator_year_average
@@ -28,10 +28,11 @@ GAME_EPOCH = date(2026, 7, 15)  # giorno di lancio, puzzle numero 1
 CLUES_PER_PUZZLE = len(MACRO_AREA_ORDER)  # un indizio per macro-area
 MAX_ATTEMPTS = CLUES_PER_PUZZLE
 CANDIDATES_PER_AREA = 3  # varietà tra puzzle diversi a parità di area
+ARCHIVE_LIMIT = 30
 
 _DAILY_PREFIX = "daily:"
 _PRACTICE_PREFIX = "practice:"
-_PUZZLE_ID_RE = re.compile(r"^(?:daily:\d{4}-\d{2}-\d{2}|practice:[0-9a-f]+)$")
+_PRACTICE_ID_RE = re.compile(r"^practice:[0-9a-f]+$")
 
 # Ripartizione geografica Istat semplificata, usata come indizio dopo il
 # terzo tentativo sbagliato.
@@ -51,8 +52,28 @@ RIPARTIZIONE = {
 }
 
 
+def _daily_date(puzzle_id):
+    """Parse+validate the date embedded in a daily puzzle_id. Returns a date
+    in [GAME_EPOCH, today] or None if it isn't a valid, currently playable
+    daily puzzle: malformed, before launch, or (this is the anti-spoiler
+    check) a future date whose solution shouldn't be computable yet."""
+    if not puzzle_id.startswith(_DAILY_PREFIX):
+        return None
+    try:
+        day = date.fromisoformat(puzzle_id[len(_DAILY_PREFIX):])
+    except ValueError:
+        return None
+    if day < GAME_EPOCH or day > date.today():
+        return None
+    return day
+
+
 def is_valid_puzzle_id(puzzle_id):
-    return isinstance(puzzle_id, str) and bool(_PUZZLE_ID_RE.match(puzzle_id))
+    if not isinstance(puzzle_id, str):
+        return False
+    if puzzle_id.startswith(_DAILY_PREFIX):
+        return _daily_date(puzzle_id) is not None
+    return bool(_PRACTICE_ID_RE.match(puzzle_id))
 
 
 def daily_puzzle_id(today=None):
@@ -67,6 +88,15 @@ def new_practice_puzzle_id():
 def puzzle_number(today=None):
     today = today or date.today()
     return max((today - GAME_EPOCH).days, 0) + 1
+
+
+def _next_puzzle_at(today):
+    """ISO 8601 UTC timestamp of the next daily puzzle's release (midnight
+    UTC the following day), so the client can render a countdown without
+    needing to know the server's timezone."""
+    next_day = today + timedelta(days=1)
+    midnight_utc = datetime.combine(next_day, datetime.min.time(), tzinfo=timezone.utc)
+    return midnight_utc.isoformat()
 
 
 def _cycle_shuffle(cycle_index):
@@ -103,6 +133,8 @@ def _clue_fields(item):
         "unit": item["unit"],
         "year": item["year"],
         "value": item["value"],
+        "rank": item["rank"],
+        "region_count": item["region_count"],
     }
 
 
@@ -153,14 +185,13 @@ def build_puzzle(puzzle_id):
     }
 
 
-def _guess_value(indicator_id, region_key, year):
-    payload = get_indicator(indicator_id)
-    if payload is None:
-        return None
-    for row in payload["series"]:
-        if row["region_key"] == region_key and row["year"] == year:
-            return row["value"]
-    return None
+def _guessed_region_index(region_key):
+    """id -> {value, rank} for every core indicator of the guessed region,
+    reusing the same memoized profile the region page itself serves."""
+    profile = profiles.region_profile(region_key)
+    if profile is None:
+        return {}
+    return {item["id"]: item for item in profile["all_indicators"]}
 
 
 def _compare(mystery_value, guess_value):
@@ -187,13 +218,14 @@ def _recap_entry(clue):
     }
 
 
-def _puzzle_intro(puzzle_id, number=None, puzzle_date=None):
+def _puzzle_intro(puzzle_id, number=None, puzzle_date=None, next_puzzle_at=None):
     puzzle = build_puzzle(puzzle_id)
     clues = puzzle["clues"]
     return {
         "puzzle_id": puzzle_id,
         "number": number,
         "date": puzzle_date.isoformat() if puzzle_date else None,
+        "next_puzzle_at": next_puzzle_at,
         "clues_total": len(clues),
         "attempts_total": MAX_ATTEMPTS,
         "clue": _clue_fields(clues[0]) if clues else None,
@@ -202,7 +234,41 @@ def _puzzle_intro(puzzle_id, number=None, puzzle_date=None):
 
 def daily_payload():
     puzzle_id, today = daily_puzzle_id()
-    return _puzzle_intro(puzzle_id, number=puzzle_number(today), puzzle_date=today)
+    return _puzzle_intro(
+        puzzle_id,
+        number=puzzle_number(today),
+        puzzle_date=today,
+        next_puzzle_at=_next_puzzle_at(today),
+    )
+
+
+def daily_payload_for_date(iso_date):
+    """Payload for a specific archived daily puzzle, or None if the date is
+    malformed, before launch, or in the future (same rule as evaluate_guess,
+    so the archive can never leak tomorrow's solution either)."""
+    try:
+        day = date.fromisoformat(iso_date)
+    except (ValueError, TypeError):
+        return None
+    if day < GAME_EPOCH or day > date.today():
+        return None
+    puzzle_id, _ = daily_puzzle_id(day)
+    return _puzzle_intro(puzzle_id, number=puzzle_number(day), puzzle_date=day)
+
+
+def archive_list(limit=ARCHIVE_LIMIT):
+    """Most-recent-first list of past playable daily puzzles (today
+    excluded, that's the main "Sfida del giorno" tab already)."""
+    today = date.today()
+    past_days = max((today - GAME_EPOCH).days, 0)
+    count = min(limit, past_days)
+    return [
+        {
+            "date": (day := today - timedelta(days=offset)).isoformat(),
+            "number": puzzle_number(day),
+        }
+        for offset in range(1, count + 1)
+    ]
 
 
 def practice_payload():
@@ -230,15 +296,22 @@ def evaluate_guess(puzzle_id, region_key, attempt):
     correct = region_key == mystery_key
     finished = correct or attempt >= len(clues)
 
-    feedback = [
-        {
+    guess_index = _guessed_region_index(region_key)
+    feedback = []
+    for clue in revealed:
+        guess_item = guess_index.get(clue["id"])
+        guess_value = guess_item["value"] if guess_item else None
+        guess_rank = guess_item["rank"] if guess_item else None
+        feedback.append({
             "id": clue["id"],
             "name": clue["name"],
             "unit": clue["unit"],
-            "comparison": "equal" if correct else _compare(clue["value"], _guess_value(clue["id"], region_key, clue["year"])),
-        }
-        for clue in revealed
-    ]
+            "comparison": "equal" if correct else _compare(clue["value"], guess_value),
+            "guess_value": guess_value,
+            "guess_rank": guess_rank,
+            "mystery_rank": clue["rank"],
+            "region_count": clue["region_count"],
+        })
 
     next_clue = None
     if not finished and attempt < len(clues):

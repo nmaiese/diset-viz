@@ -1,0 +1,58 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'gioco' %}
+
+{% block title %}Chi è maggiore? Sfida a due regioni sugli indicatori Istat | {{ site_name }}{% endblock %}
+{% block description %}Due regioni italiane, un indicatore Istat: indovina quale ha il valore più alto. Round da dieci secondi, difficoltà crescente e serie di risposte da battere.{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" crossorigin href="{{ url_for('static', filename='dist/assets/game.css') }}">
+<script type="module" crossorigin src="{{ url_for('static', filename='dist/assets/game.js') }}"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Game",
+  "name": "Chi è maggiore?",
+  "description": "Quiz a raffica sugli indicatori territoriali Istat: scegli quale delle due regioni italiane ha il valore più alto.",
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
+  "creator": { "@type": "Organization", "name": "Istat" },
+  "isAccessibleForFree": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Gioco", "item": "{{ site_url }}/gioco" },
+    { "@type": "ListItem", "position": 3, "name": "Chi è maggiore?", "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page game-page wrap">
+  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/gioco">Gioco</a></nav>
+
+  <header class="page-hero">
+    <h1>Chi è maggiore?</h1>
+    <p class="page-lead">Un indicatore Istat, due regioni: scegli quale ha il valore più alto prima che scada il tempo. Più risposte giuste di fila dai, più le sfide diventano serrate.</p>
+  </header>
+
+  <div id="compare-root">
+    <noscript>
+      <p>Attiva JavaScript per giocare a "Chi è maggiore?". Nel frattempo puoi esplorare
+      <a href="/regioni">le regioni italiane</a> o provare <a href="/gioco">Indovina la Regione</a>.</p>
+    </noscript>
+    <p class="game-loading">Preparazione del primo round...</p>
+  </div>
+
+  <section class="prose">
+    <h2>Come si gioca</h2>
+    <p>Ogni round mostra il nome di un indicatore Istat e due regioni italiane. Hai dieci secondi per toccare la regione che secondo te ha il valore più alto. Dopo la risposta vedi entrambi i valori reali. Ogni risposta corretta allunga la tua serie e alza la difficoltà: le coppie diventano sempre più vicine in classifica. Un errore o il tempo scaduto azzerano la serie. Il tuo record resta salvato sul dispositivo.</p>
+    <p>Vuoi una sfida più ragionata? Prova a <a href="/gioco/ordina">ordinare le regioni</a> o a <a href="/gioco">indovinare la regione misteriosa</a> del giorno.</p>
+  </section>
+</article>
+{% endblock %}

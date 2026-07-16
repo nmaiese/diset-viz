@@ -43,6 +43,12 @@
   <div class="game-layout">
     <div class="game-map-frame" id="game-map-frame">
       {% include "_italy_map.html" %}
+      <div class="rmap-tooltip" hidden></div>
+      <p class="game-map-legend">
+        <span><i class="sw-available"></i> disponibile</span>
+        <span><i class="sw-wrong"></i> tentata</span>
+        <span><i class="sw-correct"></i> misteriosa / indovinata</span>
+      </p>
     </div>
     <div id="game-root">
       <noscript>
@@ -52,6 +58,17 @@
       <p class="game-loading">Preparazione della sfida...</p>
     </div>
   </div>
+
+  <section class="game-crosspromo" aria-label="Altri giochi">
+    <a class="game-crosspromo-card" href="/gioco/chi-e-maggiore">
+      <strong>Chi è maggiore?</strong>
+      <span>Due regioni, dieci secondi: scegli quella con il valore più alto. Difficoltà crescente e serie da battere.</span>
+    </a>
+    <a class="game-crosspromo-card" href="/gioco/ordina">
+      <strong>Ordina le regioni</strong>
+      <span>Metti tre o cinque regioni nell'ordine giusto su un indicatore. Un punto per ogni posizione corretta.</span>
+    </a>
+  </section>
 
   <section class="prose">
     <h2>Come si gioca</h2>

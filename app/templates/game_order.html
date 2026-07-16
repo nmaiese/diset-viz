@@ -1,0 +1,58 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'gioco' %}
+
+{% block title %}Ordina le regioni: la classifica nascosta degli indicatori Istat | {{ site_name }}{% endblock %}
+{% block description %}Metti in ordine tre o cinque regioni italiane su un indicatore Istat, dal valore più alto al più basso. Punteggio per ogni posizione corretta.{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" crossorigin href="{{ url_for('static', filename='dist/assets/game.css') }}">
+<script type="module" crossorigin src="{{ url_for('static', filename='dist/assets/game.js') }}"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Game",
+  "name": "Ordina le regioni",
+  "description": "Quiz sugli indicatori territoriali Istat: metti in ordine le regioni italiane dal valore più alto al più basso.",
+  "url": {{ canonical | tojson }},
+  "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
+  "creator": { "@type": "Organization", "name": "Istat" },
+  "isAccessibleForFree": true
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Gioco", "item": "{{ site_url }}/gioco" },
+    { "@type": "ListItem", "position": 3, "name": "Ordina le regioni", "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page game-page wrap">
+  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/gioco">Gioco</a></nav>
+
+  <header class="page-hero">
+    <h1>Ordina le regioni</h1>
+    <p class="page-lead">Un indicatore Istat e alcune regioni in ordine sparso: tocca le regioni nella sequenza giusta, dal valore più alto al più basso. Un punto per ogni posizione corretta.</p>
+  </header>
+
+  <div id="order-root">
+    <noscript>
+      <p>Attiva JavaScript per giocare a "Ordina le regioni". Nel frattempo puoi esplorare
+      <a href="/regioni">le regioni italiane</a> o provare <a href="/gioco">Indovina la Regione</a>.</p>
+    </noscript>
+    <p class="game-loading">Preparazione del primo round...</p>
+  </div>
+
+  <section class="prose">
+    <h2>Come si gioca</h2>
+    <p>Scegli il livello: tre regioni per iniziare, cinque per la sfida completa. Tocca le regioni nell'ordine che pensi corretto, dalla più alta alla più bassa sull'indicatore proposto. Un secondo tocco su una regione la toglie dalla sequenza. Quando l'ordine è completo, conferma: vedrai la classifica reale con i valori e un punto per ogni posizione azzeccata. Il tuo record resta salvato sul dispositivo.</p>
+    <p>Preferisci round più rapidi? Prova <a href="/gioco/chi-e-maggiore">Chi è maggiore?</a> o la <a href="/gioco">regione misteriosa</a> del giorno.</p>
+  </section>
+</article>
+{% endblock %}
