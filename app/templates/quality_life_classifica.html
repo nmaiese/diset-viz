@@ -6,7 +6,7 @@
 {% set lvl_label = 'province' if is_prov else 'regioni' %}
 
 {% block title %}Qualità vita {{ lvl_label }}: {{ p.name }} | {{ site_name }}{% endblock %}
-{% block description %}Classifica qualità della vita per {{ lvl_label }}: punteggi 0-100 su indicatori BES Istat, profilo {{ p.name }}, categorie e metodo trasparenti.{% endblock %}
+{% block description %}Classifica qualità della vita per {{ lvl_label }}: z-score orientati su scala 0-100 da indicatori BES Istat, profilo {{ p.name }}, categorie e metodo trasparenti.{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">
@@ -14,12 +14,24 @@
   "@context": "https://schema.org",
   "@type": "Dataset",
   "name": "Classifica qualità della vita per {{ lvl_label }}, profilo {{ p.name }}",
-  "description": {{ ('Punteggi di qualità della vita delle ' ~ lvl_label ~ ' italiane su indicatori BES dei Territori Istat.') | tojson }},
+  "description": {{ ('Punteggi di qualità della vita delle ' ~ lvl_label ~ ' italiane su indicatori BES dei Territori Istat, normalizzati con z-score orientato e display 0-100.') | tojson }},
   "url": {{ canonical | tojson }},
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": { "@type": "Organization", "name": "Istat" },
   "isAccessibleForFree": true,
-  "license": "https://creativecommons.org/licenses/by/3.0/it/"
+  "license": "https://creativecommons.org/licenses/by/3.0/it/",
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "encodingFormat": "text/csv",
+      "contentUrl": "{{ site_url }}/download/quality-life/{{ url_level }}{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}"
+    },
+    {
+      "@type": "DataDownload",
+      "encodingFormat": "application/json",
+      "contentUrl": "{{ site_url }}/download/quality-life/{{ url_level }}.json{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}"
+    }
+  ]
 }
 </script>
 <script type="application/ld+json">
@@ -39,13 +51,15 @@
 <article class="page wrap quality-ranking">
   <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a></nav>
   <h1>Qualità della vita: {{ lvl_label }} italiane</h1>
-  <p class="page-lead">Stessa misura per regioni e province, dal <strong>BES dei Territori</strong> Istat. Profilo <strong>{{ p.name }}</strong>: {{ p.description | lower }} Punteggio da 0 a 100, dove 50 è la media.</p>
+  <p class="page-lead">Stessa misura per regioni e province, dal <strong>BES dei Territori</strong> Istat. Profilo <strong>{{ p.name }}</strong>: {{ p.description | lower }} Z-score orientato, mostrato da 0 a 100, dove 50 è la media.</p>
   <div class="freshness-strip" aria-label="Freschezza dati qualità della vita">
     <span><b>{{ data.data_freshness.current }}</b> aggiornati</span>
     <span><b>{{ data.data_freshness.recent }}</b> recenti</span>
     <span><b>{{ data.data_freshness.dated }}</b> da aggiornare</span>
     <span><b>{{ data.data_freshness.stale }}</b> datati</span>
   </div>
+  <p class="page-note">I badge di freschezza contano i {{ m.manifest_indicators_total }} indicatori BES disponibili nel manifest {{ lvl_label }}. Lo score usa {{ m.score_indicators_total }} indicatori con direzione chiara e dati sufficienti.</p>
+  <p class="page-note"><a href="/download/quality-life/{{ url_level }}{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}">Scarica CSV</a> o <a href="/download/quality-life/{{ url_level }}.json{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}">scarica JSON</a> della classifica corrente.</p>
 
   <nav class="quality-level-toggle" aria-label="Livello territoriale">
     <a href="/qualita-della-vita/classifica/regioni" class="{{ 'is-active' if not is_prov else '' }}">Regioni</a>
@@ -150,6 +164,6 @@
   <p class="quality-note">Copertura: {{ data.ranking | length }} province. Sud Sardegna non è presente in questa edizione del BES. Le quattro province sarde soppresse prima del 2016 sono escluse.</p>
   {% endif %}
 
-  <p class="quality-note quality-disclaimer">Sintesi autonoma sugli indicatori BES dei Territori Istat, con percentile orientato (z-score) tra i territori. Categorie e direzioni sono curate ma rivedibili. Non è la classifica del Sole 24 Ore. <a href="/qualita-della-vita/metodologia">Metodologia</a>.</p>
+  <p class="quality-note quality-disclaimer">Sintesi autonoma sugli indicatori BES dei Territori Istat, con z-score orientato tra i territori. Categorie e direzioni sono curate ma rivedibili. Non è la classifica del Sole 24 Ore. <a href="/qualita-della-vita/metodologia">Metodologia</a>.</p>
 </article>
 {% endblock %}

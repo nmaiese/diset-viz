@@ -231,6 +231,8 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
             "normalization": "z-score orientato per indicatore (distanze conservate), display 0-100 con media 50.",
             "indicator_counts": {c: len(ids) for c, ids in by_category.items()},
             "total_indicators": len(all_ids),
+            "score_indicators_total": len(all_ids),
+            "manifest_indicators_total": len(manifest),
             "quality_checks": {"empty_categories": empty,
                                "unrated": [u["name"] for u in unrated]},
         },

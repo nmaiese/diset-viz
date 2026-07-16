@@ -19,6 +19,19 @@ class QualityLifeStaticTest(unittest.TestCase):
         self.assertIn("Sole 24 Ore".encode("utf-8"), methodology.data)
         self.assertIn("z-score".encode("utf-8"), methodology.data)
 
+    def test_quality_life_copy_uses_z_score_consistently(self):
+        client = app.test_client()
+        for path in (
+            "/qualita-della-vita",
+            "/qualita-della-vita/classifica/regioni",
+            "/qualita-della-vita/metodologia",
+        ):
+            page = client.get(path)
+            self.assertEqual(page.status_code, 200, path)
+            text = page.data.decode("utf-8")
+            self.assertIn("z-score", text, path)
+            self.assertNotIn("percentile orientato", text, path)
+
     def test_api_profiles_and_categories(self):
         client = app.test_client()
         profiles = client.get("/api/quality-life/profiles")
@@ -62,6 +75,18 @@ class QualityLifeStaticTest(unittest.TestCase):
         self.assertEqual(client.get("/api/catalog").status_code, 200)
         self.assertEqual(client.get("/regione/lombardia").status_code, 200)
 
+    def test_quality_life_downloads(self):
+        client = app.test_client()
+        csv_resp = client.get("/download/quality-life/regioni?profilo=giovani")
+        self.assertEqual(csv_resp.status_code, 200)
+        self.assertIn("text/csv", csv_resp.headers["Content-Type"])
+        self.assertIn("noindex", csv_resp.headers["X-Robots-Tag"])
+        self.assertIn(b"level,profile,rank,territory", csv_resp.data)
+        json_resp = client.get("/download/quality-life/province.json")
+        self.assertEqual(json_resp.status_code, 200)
+        self.assertIn("noindex", json_resp.headers["X-Robots-Tag"])
+        self.assertEqual(json_resp.get_json()["level"], "provincia")
+
 
 class QualityLifeBesEngineTest(unittest.TestCase):
     LEVELS = {"regione": ("regioni", 20), "provincia": ("province", 103)}
@@ -85,6 +110,10 @@ class QualityLifeBesEngineTest(unittest.TestCase):
                 self.assertGreaterEqual(row["score"], 0)
                 self.assertLessEqual(row["score"], 100)
                 self.assertIn("delta_rank", row)
+            methodology = payload["methodology"]
+            self.assertEqual(methodology["total_indicators"], methodology["score_indicators_total"])
+            self.assertEqual(methodology["score_indicators_total"], sum(methodology["indicator_counts"].values()))
+            self.assertGreaterEqual(methodology["manifest_indicators_total"], methodology["score_indicators_total"])
             self.assertTrue(payload["champions"])
 
     def test_delta_rank_is_zero_for_standard_and_moves_otherwise(self):
@@ -103,7 +132,9 @@ class QualityLifeBesEngineTest(unittest.TestCase):
         for url_level, key in cases:
             page = client.get(f"/qualita-della-vita/classifica/{url_level}")
             self.assertEqual(page.status_code, 200)
-            self.assertEqual(client.get(f"/qualita-della-vita/classifica/{url_level}?profilo=giovani").status_code, 200)
+            profiled_page = client.get(f"/qualita-della-vita/classifica/{url_level}?profilo=giovani")
+            self.assertEqual(profiled_page.status_code, 200)
+            self.assertIn(f"/qualita-della-vita/classifica/{url_level}?profilo=giovani".encode("utf-8"), profiled_page.data)
 
             api = client.get(f"/api/quality-life/{url_level}/rankings")
             self.assertEqual(api.status_code, 200)

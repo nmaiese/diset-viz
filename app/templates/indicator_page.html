@@ -26,7 +26,19 @@
   "isBasedOn": {{ meta.source_url | tojson }},
   "isAccessibleForFree": true,
   "license": "https://creativecommons.org/licenses/by/3.0/it/",
-  "keywords": [{{ meta.theme | tojson }}, "indicatori territoriali", "regioni italiane", "Istat"]
+  "keywords": [{{ meta.theme | tojson }}, "indicatori territoriali", "regioni italiane", "Istat"],
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "encodingFormat": "text/csv",
+      "contentUrl": "{{ site_url }}/download/indicator/{{ meta.id }}.csv"
+    },
+    {
+      "@type": "DataDownload",
+      "encodingFormat": "application/json",
+      "contentUrl": "{{ site_url }}/download/indicator/{{ meta.id }}.json"
+    }
+  ]
 }
 </script>
 <script type="application/ld+json">
@@ -58,6 +70,7 @@
     <span><small>Copertura</small>{{ meta.year_min }}-{{ meta.year_max }}, {{ meta.regions | length }} regioni</span>
     <span><small>Freschezza</small><b class="freshness-badge is-{{ meta.freshness_status }}">{{ meta.freshness_label }}</b></span>
     <span><small>Fonte</small><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label or meta.source }}</a></span>
+    <span><small>Download</small><a href="/download/indicator/{{ meta.id }}.csv">CSV</a> · <a href="/download/indicator/{{ meta.id }}.json">JSON</a></span>
   </div>
 
   <section class="prose">

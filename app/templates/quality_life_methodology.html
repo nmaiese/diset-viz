@@ -4,7 +4,7 @@
 {% set mp = methodology_province %}
 
 {% block title %}Metodologia della classifica qualità della vita | {{ site_name }}{% endblock %}
-{% block description %}Come Divario Italia costruisce la classifica della qualità della vita: fonti Istat, percentile orientato, categorie, profili di peso e limiti dichiarati.{% endblock %}
+{% block description %}Come Divario Italia costruisce la classifica della qualità della vita: fonti Istat, z-score orientato, categorie, profili di peso e limiti dichiarati.{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">
@@ -43,7 +43,7 @@
   <p>Gli indicatori hanno unità diverse, euro, anni, percentuali, indici. Non si possono sommare così come sono. Per renderli confrontabili standardizziamo ogni indicatore dentro se stesso: misuriamo quanto ogni territorio si discosta dalla media, in deviazioni standard. A differenza del semplice ordinamento, lo z-score conserva le distanze: un divario grande resta grande, uno piccolo resta piccolo. Poi applichiamo la direzione. Per alcuni un valore alto è positivo, per esempio l'occupazione. Per altri un valore alto è negativo, per esempio la mortalità evitabile. Lo z-score orientato mette sempre il segno più dalla parte buona. In pagina lo mostriamo su una scala da 0 a 100 dove 50 è la media.</p>
 
   <h2>Quali indicatori entrano</h2>
-  <p>Usiamo solo indicatori con una direzione chiara e dati recenti su un numero sufficiente di territori. Le direzioni sono curate a mano sulle polarità ufficiali del BES, non lasciate a un'euristica. Gli indicatori puramente contestuali, quelli per cui non esiste un meglio o un peggio condiviso, restano fuori dal punteggio. Oggi la classifica poggia su <strong>{{ mr.total_indicators }} indicatori</strong> per le regioni e <strong>{{ mp.total_indicators }}</strong> per le province.</p>
+  <p>Usiamo solo indicatori con una direzione chiara e dati recenti su un numero sufficiente di territori. Le direzioni sono curate a mano sulle polarità ufficiali del BES, non lasciate a un'euristica. Gli indicatori puramente contestuali, quelli per cui non esiste un meglio o un peggio condiviso, restano fuori dal punteggio. Oggi la classifica usa nello score <strong>{{ mr.score_indicators_total }} indicatori</strong> per le regioni e <strong>{{ mp.score_indicators_total }}</strong> per le province. Il manifest BES disponibile contiene invece <strong>{{ mr.manifest_indicators_total }}</strong> indicatori regionali e <strong>{{ mp.manifest_indicators_total }}</strong> provinciali: alcuni restano fuori perché non hanno direzione chiara o copertura sufficiente.</p>
 
   <h2>Le categorie</h2>
   <p>Raggruppiamo i domini BES in sette categorie leggibili. Lo stesso schema vale per entrambi i livelli. Poiché il punteggio di una categoria è la media dei suoi indicatori, una categoria con pochi indicatori non pesa di più di una ricca solo perché contiene più misure.</p>
@@ -79,6 +79,9 @@
 
   <h2>Le specializzazioni</h2>
   <p>Una graduatoria unica tende a confermare l'ovvio. Per questo diamo risalto alle specializzazioni: chi vince ogni categoria e le classifiche per singola dimensione. È lì che emergono le sorprese, per esempio una provincia del Sud che guida sull'ambiente.</p>
+
+  <h2>Profili, URL e indicizzazione</h2>
+  <p>Le varianti con parametro <code>?profilo=</code> sono pagine autonome: hanno titolo, descrizione e canonical sulla combinazione livello territoriale più profilo. Le manteniamo indicizzabili perché rispondono a intenzioni diverse, per esempio giovani, famiglie, servizi o opportunità economica.</p>
 
   <h2>I limiti, dichiarati</h2>
   <p>La media di un territorio nasconde le differenze interne. Lo z-score misura una posizione relativa tra i territori, non una distanza dai valori ideali. La scelta delle categorie e dei pesi è una scelta editoriale, resa trasparente per poterla discutere. Due note sui dati: il Trentino-Alto Adige a livello regionale è ricostruito come media delle sue due province autonome, Bolzano e Trento, perché il BES non lo pubblica come regione unica. La provincia di Sud Sardegna non è presente in questa edizione del BES, e le quattro province sarde soppresse prima del 2016 sono escluse.</p>
