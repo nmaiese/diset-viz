@@ -201,7 +201,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(api_missing.get_json()["error"], "not_found")
 
     def test_public_pages_get_explicit_index_header(self):
-        from app.data import get_catalog
+        from app.data import get_catalog, get_indicator
         from app import profiles
 
         client = app.test_client()
@@ -216,6 +216,7 @@ class AppSmokeTest(unittest.TestCase):
         catalog = get_catalog()
         sample = next(item for item in catalog["indicators"] if profiles.is_search_indexable_indicator(item))
         indicator_path = profiles.indicator_path(sample["id"], sample["name"])
+        self.assertTrue(profiles.is_search_indexable_indicator(get_indicator(str(sample["id"]))["metadata"]))
         self.assertEqual(client.get(indicator_path).headers.get("X-Robots-Tag"), expected)
         self.assertEqual(client.get("/regione/lombardia").headers.get("X-Robots-Tag"), expected)
         theme_slug = next(iter(profiles._theme_slug_map()))

@@ -55,7 +55,7 @@ def is_search_indexable_indicator(item):
         return False
     if item.get("region_count") is None or item.get("completeness") is None:
         catalog_item = next(
-            (entry for entry in get_catalog()["indicators"] if entry["id"] == item.get("id")),
+            (entry for entry in get_catalog()["indicators"] if str(entry["id"]) == str(item.get("id"))),
             None,
         )
         if catalog_item:
