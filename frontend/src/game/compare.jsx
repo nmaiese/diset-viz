@@ -271,7 +271,18 @@ export default function CompareApp() {
         </>
       )}
 
-      {status === "loading" && !round && <p className="game-loading">Preparazione del round...</p>}
+      {status === "loading" && !round && (
+        <div aria-hidden="true">
+          <div className="skel-bars" style={{ marginTop: 0 }}>
+            <span style={{ height: 12, width: "45%" }} />
+            <span style={{ height: 22, width: "70%" }} />
+          </div>
+          <div className="compare-cards" style={{ marginTop: 18 }}>
+            <span className="skel-bar" style={{ height: 130 }} />
+            <span className="skel-bar" style={{ height: 130 }} />
+          </div>
+        </div>
+      )}
 
       {showOnboarding && (
         <Modal title="Chi è maggiore?" onClose={closeOnboarding} labelledBy="compare-onboarding-title">

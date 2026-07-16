@@ -13,6 +13,10 @@
   --font-display: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  /* Altezza di riferimento del masthead a riga singola: usata dagli elementi
+     sticky che devono agganciarsi appena sotto di esso (.mobile-tabs) e dal
+     pannello di navigazione mobile, invece di duplicare il numero altrove. */
+  --masthead-h: 64px;
   font-family: var(--font-body);
 }
 
@@ -75,9 +79,22 @@ h1, h2, h3 { font-family: var(--font-display); }
   color: var(--muted);
   font-size: 13.5px;
 }
-.masthead__links a { display: inline-flex; align-items: center; gap: 4px; }
+.masthead__links a { display: inline-flex; align-items: center; gap: 4px; padding: 10px 2px; }
 .masthead__links a:hover { color: var(--ink); }
 .masthead__links a.is-active { color: var(--ink); font-weight: 700; }
+
+.masthead__toggle {
+  display: none;
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  flex: 0 0 auto;
+}
 
 .site-footer {
   margin-top: 64px;
@@ -924,9 +941,22 @@ h1, h2, h3 { font-family: var(--font-display); }
 .region-ind-row__move small { color: var(--muted); }
 .region-ind-row__chev { color: var(--muted); }
 
-/* Loading skeleton while a region profile is fetched (no full-panel flash) */
-.region-skeleton { display: grid; gap: 12px; margin-top: 16px; }
-.region-skeleton span { height: 78px; background: linear-gradient(90deg, var(--grid), var(--panel), var(--grid)); background-size: 200% 100%; animation: skel 1.2s ease-in-out infinite; }
+/* Skeleton bars generici: sostituiscono un blocco di contenuto non ancora
+   arrivato mantenendone la sagoma (stessa altezza/posizione approssimativa),
+   per evitare salti di layout. Riusati da RegionProfileSkeleton,
+   AtlasViewSkeleton e DetailViewSkeleton. */
+.skel-bars { display: grid; gap: 12px; margin-top: 16px; }
+.skel-bars span, .skel-bar {
+  display: block;
+  height: 78px;
+  background: linear-gradient(90deg, var(--grid), var(--panel), var(--grid));
+  background-size: 200% 100%;
+  animation: skel 1.2s ease-in-out infinite;
+}
+@keyframes skel {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
 /* Compact "definition & details" disclosure in the indicator panel header */
 .indicator-header__more { margin: 14px 0 0; }
@@ -951,9 +981,26 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 
 @media (max-width: 760px) {
-  .masthead { flex-wrap: wrap; gap: 10px 14px; }
+  .masthead { flex-wrap: nowrap; }
   .brand-text small { display: none; }
-  .masthead__links { gap: 12px; font-size: 13px; }
+  .masthead__toggle { display: flex; }
+  .masthead__links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    margin-left: 0;
+    padding: 10px clamp(16px, 4vw, 48px) 16px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+  .masthead__links.is-open { display: flex; }
+  .masthead__links a { padding: 12px 4px; }
   .context-bar { align-items: stretch; flex-direction: column; gap: 10px; }
   .context-bar__tools { flex: 1 1 auto; }
   .context-bar .mode-switch { width: 100%; }
@@ -990,7 +1037,7 @@ h1, h2, h3 { font-family: var(--font-display); }
     gap: 8px;
     margin-bottom: 12px;
     position: sticky;
-    top: 64px;
+    top: var(--masthead-h);
     z-index: 20;
     padding: 10px 0;
     background: var(--paper);

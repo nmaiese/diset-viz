@@ -184,6 +184,7 @@
       <p class="explorer-count"><strong id="explorer-shown">{{ p.all_indicators | length }}</strong> indicatori</p>
     </div>
 
+    <div class="explorer-table-wrap">
     <table class="data-table explorer-table" id="explorer-table">
       <thead><tr>
         <th>Indicatore</th><th>Tema</th><th class="num">Valore</th>
@@ -210,6 +211,7 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
     <p class="explorer-empty" id="explorer-empty" hidden>Nessun indicatore corrisponde ai filtri scelti.</p>
   </section>
   {% endif %}

@@ -43,7 +43,7 @@
 
 .game-map-frame {
   position: sticky;
-  top: 84px;
+  top: var(--masthead-h, 84px);
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -160,6 +160,24 @@
 
 .game-loading, .game-error { color: var(--muted); font-family: var(--font-mono); }
 .game-error { color: var(--accent); }
+
+/* Skeleton bars (stesso pattern di .skel-bars in frontend/src/styles.css,
+   duplicato perché game.css è un bundle Vite separato): sostituiscono un
+   blocco di contenuto non ancora arrivato mantenendone la sagoma, per
+   evitare che il layout salti quando i dati del round/della sfida arrivano. */
+.skel-bars { display: grid; gap: 10px; margin-top: 4px; }
+.skel-bars span, .skel-bar {
+  display: block;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--grid), var(--panel), var(--grid));
+  background-size: 200% 100%;
+  animation: skel 1.2s ease-in-out infinite;
+}
+@keyframes skel {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
 /* ---------- Header di partita ---------- */
 

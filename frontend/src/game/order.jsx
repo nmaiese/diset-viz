@@ -255,7 +255,19 @@ export default function OrderApp() {
         </>
       )}
 
-      {status === "loading" && !round && <p className="game-loading">Preparazione del round...</p>}
+      {status === "loading" && !round && (
+        <div aria-hidden="true">
+          <div className="skel-bars" style={{ marginTop: 0 }}>
+            <span style={{ height: 12, width: "55%" }} />
+            <span style={{ height: 22, width: "70%" }} />
+          </div>
+          <div className={`order-cards order-cards--${count}`} style={{ marginTop: 18 }}>
+            {Array.from({ length: count }).map((_, i) => (
+              <span key={i} className="skel-bar" style={{ height: 96 }} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {showOnboarding && (
         <Modal title="Ordina le regioni" onClose={closeOnboarding} labelledBy="order-onboarding-title">

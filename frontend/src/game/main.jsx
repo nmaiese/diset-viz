@@ -448,7 +448,22 @@ function GameApp() {
 
       <div className="visually-hidden" aria-live="polite">{liveMessage}</div>
 
-      {status === "loading" && <p className="game-loading">Preparazione della sfida...</p>}
+      {status === "loading" && (
+        <div aria-hidden="true">
+          <div className="game-head">
+            <span className="skel-bar" style={{ height: 22, width: "40%" }} />
+            <div className="game-attempts">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <span key={i} className="seg" />
+              ))}
+            </div>
+          </div>
+          <div className="skel-bars" style={{ marginTop: 18 }}>
+            <span style={{ height: 96 }} />
+            <span style={{ height: 96 }} />
+          </div>
+        </div>
+      )}
       {status === "error" && <p className="game-error">{error}</p>}
 
       {(status === "playing" || finished) && puzzle && (
@@ -792,7 +807,13 @@ function StatsModal({ stats, onClose }) {
 function ArchiveModal({ list, currentPuzzleId, onPick, onClose }) {
   return (
     <Modal title="Sfide passate" onClose={onClose} labelledBy="game-archive-title">
-      {list === null && <p className="game-loading">Caricamento...</p>}
+      {list === null && (
+        <div className="skel-bars" style={{ marginTop: 0 }} aria-hidden="true">
+          <span style={{ height: 44 }} />
+          <span style={{ height: 44 }} />
+          <span style={{ height: 44 }} />
+        </div>
+      )}
       {list !== null && list.length === 0 && <p>Nessuna sfida passata disponibile ancora.</p>}
       {list !== null && list.length > 0 && (
         <ul className="game-archive-list">

@@ -16,6 +16,7 @@ import {
   Layers,
   LineChart,
   MapPinned,
+  Menu,
   Minus,
   Search,
   TrendingDown,
@@ -259,7 +260,7 @@ function App() {
     return (
       <main className="app-shell">
         <SiteHeader />
-        <LoadingState />
+        <AtlasViewSkeleton />
         <SiteFooter />
       </main>
     );
@@ -364,14 +365,44 @@ function App() {
 /* ------------------------------------------------------------------ */
 
 function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
+  const [navOpen, setNavOpen] = useState(false);
+  const headerRef = useRef(null);
+
   const handleLocalNav = (event, handler) => {
     if (handler && !event.metaKey && !event.ctrlKey && event.button === 0) {
       event.preventDefault();
       handler();
     }
+    setNavOpen(false);
   };
+
+  // Il menu mobile è un overlay indipendente dal flusso della vista: va
+  // chiuso quando l'utente cambia sezione (altrimenti resta aperto sopra
+  // contenuto che non c'entra più), su click fuori e con Escape.
+  useEffect(() => {
+    setNavOpen(false);
+  }, [activeNav]);
+
+  useEffect(() => {
+    if (!navOpen) return undefined;
+    function handlePointerDown(event) {
+      if (headerRef.current && !headerRef.current.contains(event.target)) {
+        setNavOpen(false);
+      }
+    }
+    function handleKeyDown(event) {
+      if (event.key === "Escape") setNavOpen(false);
+    }
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [navOpen]);
+
   return (
-    <header className="masthead">
+    <header className="masthead" ref={headerRef}>
       <a className="brand" href="/" aria-label="Divario Italia, home">
         <span className="brand-mark">DI</span>
         <span className="brand-text">
@@ -380,7 +411,21 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
         </span>
       </a>
       {children}
-      <nav className="masthead__links" aria-label="Collegamenti">
+      <button
+        type="button"
+        className="masthead__toggle"
+        aria-expanded={navOpen}
+        aria-controls="masthead-nav"
+        aria-label={navOpen ? "Chiudi il menu" : "Apri il menu"}
+        onClick={() => setNavOpen((open) => !open)}
+      >
+        {navOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+      <nav
+        id="masthead-nav"
+        className={navOpen ? "masthead__links is-open" : "masthead__links"}
+        aria-label="Collegamenti"
+      >
         <a
           href="/"
           className={activeNav === "atlas" ? "is-active" : ""}
@@ -399,11 +444,11 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
         >
           Regioni
         </a>
-        <a href="/temi">Temi</a>
-        <a href="/qualita-della-vita">Qualità della vita</a>
-        <a href="/gioco">Gioco</a>
-        <a href="/metodologia">Metodologia</a>
-        <a href="/blog">Blog</a>
+        <a href="/temi" onClick={() => setNavOpen(false)}>Temi</a>
+        <a href="/qualita-della-vita" onClick={() => setNavOpen(false)}>Qualità della vita</a>
+        <a href="/gioco" onClick={() => setNavOpen(false)}>Gioco</a>
+        <a href="/metodologia" onClick={() => setNavOpen(false)}>Metodologia</a>
+        <a href="/blog" onClick={() => setNavOpen(false)}>Blog</a>
         <a
           href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
           target="_blank"
@@ -973,7 +1018,7 @@ function RegionProfileSkeleton({ name }) {
         <h2>{name || "Regione"}</h2>
         <p className="region-profile__meta">Carico il profilo di {name || "questa regione"}...</p>
       </header>
-      <div className="region-skeleton" aria-hidden="true"><span /><span /><span /></div>
+      <div className="skel-bars" aria-hidden="true"><span /><span /><span /></div>
     </article>
   );
 }
@@ -1318,7 +1363,7 @@ function DetailView({
       </SiteHeader>
 
       {!indicatorMeta ? (
-        <LoadingState />
+        <DetailViewSkeleton />
       ) : (
         <>
           <ContextBar
@@ -1780,6 +1825,71 @@ function LoadingState() {
       <span />
       <p>Preparazione degli indicatori territoriali...</p>
     </section>
+  );
+}
+
+// Riproduce la sagoma di AtlasView (hero + spine + indice) invece del generico
+// LoadingState da 320px, per evitare il salto di layout al primo caricamento
+// della Home, la pagina più visitata del sito.
+function AtlasViewSkeleton() {
+  return (
+    <>
+      <section className="context-bar" aria-label="Contesto" aria-hidden="true">
+        <div className="context-bar__path">
+          <span className="skel-bar" style={{ height: 14, width: 120 }} />
+        </div>
+      </section>
+      <section className="atlas-hero" aria-hidden="true">
+        <div className="skel-bars" style={{ marginTop: 0 }}>
+          <span style={{ height: 14, width: "35%" }} />
+          <span style={{ height: 48, width: "75%" }} />
+          <span style={{ height: 40, width: "90%" }} />
+        </div>
+      </section>
+      <section className="atlas" aria-hidden="true">
+        <aside className="theme-spine" />
+        <div className="index-panel">
+          <div className="skel-bars" style={{ marginTop: 0 }}>
+            <span style={{ height: 60 }} />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+// Riproduce context-bar + workspace (pannello indicatore + mappa/classifica/
+// serie storica) al posto del generico LoadingState: DetailView collassa a
+// quel blocco non solo al primo mount ma ad ogni cambio indicatore
+// (Precedente/Successivo, selezione da classifica), quindi il salto di
+// layout altrimenti si ripete durante la navigazione normale.
+function DetailViewSkeleton() {
+  return (
+    <>
+      <section className="context-bar" aria-label="Contesto" aria-hidden="true">
+        <div className="context-bar__path">
+          <span className="skel-bar" style={{ height: 14, width: 220 }} />
+        </div>
+      </section>
+      <section className="workspace" aria-hidden="true">
+        <aside className="indicator-panel">
+          <div className="skel-bars" style={{ marginTop: 0 }}>
+            <span style={{ height: 28 }} />
+            <span style={{ height: 60 }} />
+            <span style={{ height: 120 }} />
+          </div>
+        </aside>
+        <section className="viz-stage">
+          <div className="skel-bars" style={{ marginTop: 0 }}>
+            <span style={{ height: 340 }} />
+          </div>
+        </section>
+      </section>
+    </>
   );
 }
 

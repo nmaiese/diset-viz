@@ -11,6 +11,11 @@
   --font-display: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --shadow: 0 16px 44px rgba(21, 35, 59, 0.10);
+  /* Altezza di riferimento del masthead a riga singola, condivisa con
+     frontend/src/styles.css: usata da .game-map-frame per agganciarsi
+     appena sotto il masthead invece di un valore fisso scollegato. */
+  --masthead-h: 64px;
 }
 
 * { box-sizing: border-box; }
@@ -49,10 +54,25 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .brand-text { display: grid; line-height: 1.1; }
 .brand-text strong { font-family: var(--font-display); font-size: 17px; }
 .brand-text small { color: var(--muted); font-size: 11.5px; }
-.masthead nav { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 13.5px; }
-.masthead nav a { color: var(--muted); }
-.masthead nav a:hover { color: var(--ink); text-decoration: none; }
-.masthead nav a.is-active { color: var(--ink); font-weight: 600; }
+.masthead__toggle {
+  display: none;
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  flex: 0 0 auto;
+}
+.masthead__toggle .icon-close { display: none; }
+.masthead__toggle[aria-expanded="true"] .icon-menu { display: none; }
+.masthead__toggle[aria-expanded="true"] .icon-close { display: block; }
+.masthead__links { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 13.5px; }
+.masthead__links a { color: var(--muted); padding: 10px 2px; }
+.masthead__links a:hover { color: var(--ink); text-decoration: none; }
+.masthead__links a.is-active { color: var(--ink); font-weight: 600; }
 
 /* Footer */
 .site-footer {
@@ -155,9 +175,26 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .related h2 { font-size: 18px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 16px; }
 
 @media (max-width: 760px) {
-  .masthead { flex-wrap: wrap; gap: 10px 14px; }
+  .masthead { flex-wrap: nowrap; }
   .brand-text small { display: none; }
-  .masthead nav { gap: 12px; font-size: 13px; }
+  .masthead__toggle { display: flex; }
+  .masthead__links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    margin-left: 0;
+    padding: 10px clamp(16px, 4vw, 48px) 16px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+  .masthead__links.is-open { display: flex; }
+  .masthead__links a { padding: 12px 4px; }
   .indicator-cta { flex-direction: column; align-items: stretch; text-align: left; }
 }
 
@@ -258,6 +295,7 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .explorer-field select:focus { outline: none; border-color: var(--accent); }
 .explorer-count { margin: 0; font-size: 13px; color: var(--muted); }
 .explorer-count strong { color: var(--ink); font-family: var(--font-mono); }
+.explorer-table-wrap { overflow-x: auto; }
 .explorer-table td:first-child a { color: var(--ink); }
 .explorer-table td:first-child a:hover { color: var(--accent); }
 .explorer-table .explorer-theme { color: var(--muted); font-size: 13px; }
