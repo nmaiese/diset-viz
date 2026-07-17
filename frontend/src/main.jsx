@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
-  Github,
   Layers,
   LineChart,
   MapPinned,
@@ -421,9 +420,6 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
             rel="noreferrer"
           >
             Fonte Istat <ArrowUpRight size={13} />
-          </a>
-          <a href="https://github.com/nmaiese/diset-viz" target="_blank" rel="noreferrer" aria-label="GitHub">
-            <Github size={17} />
           </a>
         </nav>
         <a
