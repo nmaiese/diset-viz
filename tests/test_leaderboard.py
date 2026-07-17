@@ -264,5 +264,39 @@ class LeaderboardPageTest(LeaderboardTestBase):
         self.assertNotIn(b"/quiz/classifica", sitemap)
 
 
+class LeaderboardAdminDeleteTest(LeaderboardTestBase):
+    def test_delete_requires_correct_admin_key(self):
+        leaderboard.submit("compare", "sid-mod", "Spam", 3, {})
+        client = app.test_client()
+
+        wrong_key = client.post(
+            "/api/game/leaderboard/admin/delete",
+            headers={"X-Admin-Key": "not-the-secret"},
+            json={"mode": "compare", "nickname": "Spam"},
+        )
+        self.assertEqual(wrong_key.status_code, 404)
+
+        no_key = client.post("/api/game/leaderboard/admin/delete", json={"mode": "compare", "nickname": "Spam"})
+        self.assertEqual(no_key.status_code, 404)
+
+        self.assertEqual(len(leaderboard.top("compare", "all", 10)), 1)
+
+    def test_delete_removes_matching_entry(self):
+        leaderboard.submit("compare", "sid-mod", "Spam", 3, {})
+        leaderboard.submit("compare", "sid-keep", "Anna", 5, {})
+        client = app.test_client()
+
+        response = client.post(
+            "/api/game/leaderboard/admin/delete",
+            headers={"X-Admin-Key": app.secret_key},
+            json={"mode": "compare", "nickname": "Spam"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["deleted"], 1)
+
+        remaining = leaderboard.top("compare", "all", 10)
+        self.assertEqual([row["nickname"] for row in remaining], ["Anna"])
+
+
 if __name__ == "__main__":
     unittest.main()

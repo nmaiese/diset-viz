@@ -597,6 +597,16 @@
   max-width: 760px;
 }
 
+/* Schermata di avvio, condivisa (nella forma) da compare.jsx e order.jsx:
+   regole del gioco + un unico pulsante per iniziare deliberatamente. */
+.compare-start, .order-start {
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+.compare-start h2, .order-start h2 { margin: 0 0 14px; font-size: 20px; }
+
 .compare-scorebar {
   display: flex;
   align-items: center;

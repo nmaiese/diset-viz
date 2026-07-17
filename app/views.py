@@ -22,7 +22,7 @@ from app import moderation
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
-import csv, io, json, os, re, time
+import csv, hmac, io, json, os, re, time
 
 from app import config
 
@@ -750,6 +750,23 @@ def leaderboard_post_api():
     leaderboard.submit(mode, state["sid"], nickname, score, detail)
     rank_all, rank_week = leaderboard.ranks_for_session(mode, state["sid"])
     return jsonify({"ok": True, "mode": mode, "score": score, "rank_all": rank_all, "rank_week": rank_week})
+
+
+@app.post("/api/game/leaderboard/admin/delete")
+def leaderboard_admin_delete_api():
+    """Rimozione manuale di una voce (moderazione), autenticata con
+    SECRET_KEY invece che con un account: non c'è un pannello admin, questo
+    endpoint serve solo per interventi occasionali via curl."""
+    provided = request.headers.get("X-Admin-Key", "")
+    if not hmac.compare_digest(provided, app.secret_key):
+        abort(404)
+    payload = request.get_json(silent=True) or {}
+    mode = payload.get("mode")
+    nickname = payload.get("nickname")
+    if mode not in leaderboard.MODES or not nickname:
+        return jsonify({"error": "bad_request"}), 400
+    deleted = leaderboard.delete_entry(mode, nickname)
+    return jsonify({"ok": True, "deleted": deleted})
 
 
 @app.route("/api/game/regions")

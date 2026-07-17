@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  fetchJson, formatValue, prefersReducedMotion, trackGameEvent, Modal, SourceStrip, SubmitScoreModal,
-} from "./shared.jsx";
+import { fetchJson, formatValue, trackGameEvent, SourceStrip, SubmitScoreModal } from "./shared.jsx";
 
 const API = {
   round: (difficulty, token) =>
@@ -13,7 +11,6 @@ const STORAGE_STATS_KEY = "di-compare-stats";
 const STORAGE_ONBOARDED_KEY = "di-compare-onboarded";
 const ROUND_MS = 10000;
 const TICK_MS = 100;
-const NEXT_ROUND_DELAY_MS = 2600;
 
 function loadStats() {
   try {
@@ -41,7 +38,7 @@ const DIFFICULTY_LABELS = ["Riscaldamento", "Facile", "Media", "Difficile", "Est
 
 export default function CompareApp() {
   const [round, setRound] = useState(null);
-  const [status, setStatus] = useState("loading"); // loading | answering | revealed | error
+  const [status, setStatus] = useState("idle"); // idle | loading | answering | revealed | error
   const [result, setResult] = useState(null);
   const [choice, setChoice] = useState(null);
   const [streak, setStreak] = useState(0);
@@ -49,17 +46,16 @@ export default function CompareApp() {
   const [timeLeft, setTimeLeft] = useState(ROUND_MS);
   const [sessionBest, setSessionBest] = useState(0);
   const [showScoreModal, setShowScoreModal] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(() => {
+  const [hasPlayedBefore] = useState(() => {
     try {
-      return !window.localStorage.getItem(STORAGE_ONBOARDED_KEY);
+      return !!window.localStorage.getItem(STORAGE_ONBOARDED_KEY);
     } catch {
       return false;
     }
   });
 
-  const stateRef = useRef({ status: "loading", round: null, streak: 0 });
+  const stateRef = useRef({ status: "idle", round: null, streak: 0 });
   const timerRef = useRef(null);
-  const advanceRef = useRef(null);
   const tokenRef = useRef(null);
   const promptedBestRef = useRef(0);
 
@@ -68,19 +64,13 @@ export default function CompareApp() {
   }, [status, round, streak]);
 
   useEffect(() => {
-    trackGameEvent("compare_start", {});
-    loadRound(0);
     return () => {
       window.clearInterval(timerRef.current);
-      window.clearTimeout(advanceRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Il countdown parte solo a partita attiva e senza onboarding aperto:
-  // non è giusto far scorrere il tempo mentre l'utente legge le regole.
   useEffect(() => {
-    if (status !== "answering" || showOnboarding) return undefined;
+    if (status !== "answering") return undefined;
     timerRef.current = window.setInterval(() => {
       setTimeLeft((prev) => {
         const next = prev - TICK_MS;
@@ -94,7 +84,17 @@ export default function CompareApp() {
     }, TICK_MS);
     return () => window.clearInterval(timerRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, showOnboarding]);
+  }, [status]);
+
+  function startGame() {
+    try {
+      window.localStorage.setItem(STORAGE_ONBOARDED_KEY, "1");
+    } catch {
+      // Il pannello con le regole si ripresenterà alla prossima visita, nessun danno.
+    }
+    trackGameEvent("compare_start", {});
+    loadRound(0);
+  }
 
   function loadRound(difficulty) {
     setStatus("loading");
@@ -158,31 +158,16 @@ export default function CompareApp() {
           streak: nextStreak,
           difficulty: currentRound.difficulty,
         });
-        advanceRef.current = window.setTimeout(() => {
-          const { status: still } = stateRef.current;
-          if (still === "revealed") loadRound(difficultyForStreak(nextStreak));
-        }, NEXT_ROUND_DELAY_MS);
       })
       .catch(() => setStatus("error"));
   }
 
   function nextRound() {
-    window.clearTimeout(advanceRef.current);
     loadRound(difficultyForStreak(streak));
-  }
-
-  function closeOnboarding() {
-    setShowOnboarding(false);
-    try {
-      window.localStorage.setItem(STORAGE_ONBOARDED_KEY, "1");
-    } catch {
-      // Il modal si ripresenterà alla prossima visita, nessun danno.
-    }
   }
 
   const timerPct = Math.max(0, (timeLeft / ROUND_MS) * 100);
   const level = round ? round.difficulty : 0;
-  const winnerKey = result ? result[result.winner].region_key : null;
 
   function cardClass(side) {
     const base = side === "region_a" ? "compare-card compare-card--a" : "compare-card compare-card--b";
@@ -221,11 +206,34 @@ export default function CompareApp() {
         )}
       </div>
 
+      {status === "idle" && (
+        <div className="compare-start">
+          <h2>Chi è maggiore?</h2>
+          <ol className="game-onboarding-steps">
+            <li>
+              <strong>Un indicatore, due regioni.</strong> Tocca la regione che secondo te ha il valore
+              più alto. Hai dieci secondi.
+            </li>
+            <li>
+              <strong>La serie cresce, la sfida pure.</strong> Ogni risposta giusta di fila alza la
+              difficoltà: le coppie diventano sempre più vicine in classifica.
+            </li>
+            <li>
+              <strong>Un errore azzera la serie.</strong> Il tuo record resta salvato su questo
+              dispositivo.
+            </li>
+          </ol>
+          <button type="button" className="game-btn" onClick={startGame}>
+            {hasPlayedBefore ? "Inizia" : "Inizia a giocare"}
+          </button>
+        </div>
+      )}
+
       {status === "error" && (
         <div className="compare-status">
           <p className="game-error">Qualcosa non ha funzionato. Riprova.</p>
           <button type="button" className="game-btn" onClick={() => loadRound(difficultyForStreak(streak))}>
-            Nuovo round
+            Riprova
           </button>
         </div>
       )}
@@ -299,7 +307,7 @@ export default function CompareApp() {
 
           {status === "revealed" && (
             <button type="button" className="game-btn compare-next" onClick={nextRound}>
-              Prossimo round
+              {result && result.correct ? "Avanti" : "Ricomincia"}
             </button>
           )}
         </>
@@ -316,26 +324,6 @@ export default function CompareApp() {
             <span className="skel-bar" style={{ height: 130 }} />
           </div>
         </div>
-      )}
-
-      {showOnboarding && (
-        <Modal title="Chi è maggiore?" onClose={closeOnboarding} labelledBy="compare-onboarding-title">
-          <ol className="game-onboarding-steps">
-            <li>
-              <strong>Un indicatore, due regioni.</strong> Tocca la regione che secondo te ha il valore
-              più alto. Hai dieci secondi.
-            </li>
-            <li>
-              <strong>La serie cresce, la sfida pure.</strong> Ogni risposta giusta di fila alza la
-              difficoltà: le coppie diventano sempre più vicine in classifica.
-            </li>
-            <li>
-              <strong>Un errore azzera la serie.</strong> Il tuo record resta salvato su questo
-              dispositivo.
-            </li>
-          </ol>
-          <button type="button" className="game-btn" onClick={closeOnboarding}>Ho capito, gioco</button>
-        </Modal>
       )}
 
       {showScoreModal && (

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { fetchJson, formatValue, trackGameEvent, Modal, SourceStrip, SubmitScoreModal } from "./shared.jsx";
+import { fetchJson, formatValue, trackGameEvent, SourceStrip, SubmitScoreModal } from "./shared.jsx";
 
 const API = {
   round: (count, token) =>
@@ -31,15 +31,16 @@ function saveStats(stats) {
 export default function OrderApp() {
   const [count, setCount] = useState(3);
   const [round, setRound] = useState(null);
-  const [status, setStatus] = useState("loading"); // loading | ordering | revealed | error
+  const [status, setStatus] = useState("idle"); // idle | loading | ordering | revealed | error
   const [sequence, setSequence] = useState([]); // region_key nell'ordine toccato
   const [result, setResult] = useState(null);
   const [stats, setStats] = useState(loadStats);
   const [sessionBest, setSessionBest] = useState(0);
   const [showScoreModal, setShowScoreModal] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(() => {
+  const [started, setStarted] = useState(false);
+  const [hasPlayedBefore] = useState(() => {
     try {
-      return !window.localStorage.getItem(STORAGE_ONBOARDED_KEY);
+      return !!window.localStorage.getItem(STORAGE_ONBOARDED_KEY);
     } catch {
       return false;
     }
@@ -50,10 +51,20 @@ export default function OrderApp() {
   const promptedBestRef = useRef(0);
 
   useEffect(() => {
+    if (!started) return;
     trackGameEvent("order_start", { count });
     loadRound(count);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count]);
+  }, [count, started]);
+
+  function startGame() {
+    try {
+      window.localStorage.setItem(STORAGE_ONBOARDED_KEY, "1");
+    } catch {
+      // Il pannello con le regole si ripresenterà alla prossima visita, nessun danno.
+    }
+    setStarted(true);
+  }
 
   function loadRound(n) {
     setStatus("loading");
@@ -121,15 +132,6 @@ export default function OrderApp() {
       .catch(() => setStatus("error"));
   }
 
-  function closeOnboarding() {
-    setShowOnboarding(false);
-    try {
-      window.localStorage.setItem(STORAGE_ONBOARDED_KEY, "1");
-    } catch {
-      // Il modal si ripresenterà alla prossima visita, nessun danno.
-    }
-  }
-
   const best = count === 3 ? stats.bestScore3 : stats.bestScore5;
   const resultBySide = result
     ? Object.fromEntries(result.positions.map((p) => [p.region_key, p]))
@@ -161,11 +163,34 @@ export default function OrderApp() {
         )}
       </div>
 
+      {status === "idle" && (
+        <div className="order-start">
+          <h2>Ordina le regioni</h2>
+          <ol className="game-onboarding-steps">
+            <li>
+              <strong>Tocca in sequenza.</strong> Prima la regione che pensi abbia il valore più alto,
+              poi la seconda e così via. Un secondo tocco toglie la regione dalla sequenza.
+            </li>
+            <li>
+              <strong>Conferma quando l'ordine è completo.</strong> Vedrai la classifica reale con i
+              valori Istat.
+            </li>
+            <li>
+              <strong>Un punto per ogni posizione azzeccata.</strong> Parti da tre regioni, passa a
+              cinque quando ti senti pronto.
+            </li>
+          </ol>
+          <button type="button" className="game-btn" onClick={startGame}>
+            {hasPlayedBefore ? "Inizia" : "Inizia a giocare"}
+          </button>
+        </div>
+      )}
+
       {status === "error" && (
         <div className="order-status">
           <p className="game-error">Qualcosa non ha funzionato. Riprova.</p>
           <button type="button" className="game-btn" onClick={() => loadRound(count)}>
-            Nuovo round
+            Riprova
           </button>
         </div>
       )}
@@ -242,7 +267,7 @@ export default function OrderApp() {
               </button>
               {sequence.length > 0 && (
                 <button type="button" className="game-btn game-btn--ghost" onClick={() => setSequence([])}>
-                  Ricomincia
+                  Svuota selezione
                 </button>
               )}
               <span className="order-progress">
@@ -278,7 +303,7 @@ export default function OrderApp() {
                 </ol>
               </div>
               <button type="button" className="game-btn order-next" onClick={() => loadRound(count)}>
-                Nuovo round
+                {result.score === result.total ? "Avanti" : "Ricomincia"}
               </button>
             </>
           )}
@@ -297,26 +322,6 @@ export default function OrderApp() {
             ))}
           </div>
         </div>
-      )}
-
-      {showOnboarding && (
-        <Modal title="Ordina le regioni" onClose={closeOnboarding} labelledBy="order-onboarding-title">
-          <ol className="game-onboarding-steps">
-            <li>
-              <strong>Tocca in sequenza.</strong> Prima la regione che pensi abbia il valore più alto,
-              poi la seconda e così via. Un secondo tocco toglie la regione dalla sequenza.
-            </li>
-            <li>
-              <strong>Conferma quando l'ordine è completo.</strong> Vedrai la classifica reale con i
-              valori Istat.
-            </li>
-            <li>
-              <strong>Un punto per ogni posizione azzeccata.</strong> Parti da tre regioni, passa a
-              cinque quando ti senti pronto.
-            </li>
-          </ol>
-          <button type="button" className="game-btn" onClick={closeOnboarding}>Ho capito, gioco</button>
-        </Modal>
       )}
 
       {showScoreModal && (

@@ -576,6 +576,7 @@ function GameApp() {
                 shareCopied={shareCopied}
                 onShare={handleShare}
                 countdown={mode === "daily" ? countdownParts(puzzle.next_puzzle_at, now) : null}
+                onNewPractice={mode === "practice" ? () => startGame("practice") : null}
               />
             )}
           </div>
@@ -633,7 +634,9 @@ function DistributionChart({ distribution, highlightBucket }) {
   );
 }
 
-function ResultPanel({ status, mode, puzzle, solution, recap, stats, highlightBucket, shareCopied, onShare, countdown }) {
+function ResultPanel({
+  status, mode, puzzle, solution, recap, stats, highlightBucket, shareCopied, onShare, countdown, onNewPractice,
+}) {
   return (
     <section className="game-result">
       <h3>{status === "won" ? "Hai indovinato!" : "Regione misteriosa non indovinata"}</h3>
@@ -644,6 +647,11 @@ function ResultPanel({ status, mode, puzzle, solution, recap, stats, highlightBu
         {mode === "daily" && (
           <button type="button" className="game-btn" onClick={onShare}>
             {shareCopied ? "Copiato!" : "Condividi il risultato"}
+          </button>
+        )}
+        {onNewPractice && (
+          <button type="button" className="game-btn" onClick={onNewPractice}>
+            Ricomincia
           </button>
         )}
         <a className="game-btn game-btn--ghost" href={solution.path}>

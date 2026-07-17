@@ -22,7 +22,7 @@
 
   <header class="page-hero">
     <h1>Classifica</h1>
-    <p class="page-lead">Le migliori serie di "Chi è maggiore?" e "Ordina le regioni", verificate dal server round per round: nessun punteggio è mai dichiarato dal client.</p>
+    <p class="page-lead">Le migliori serie di "Chi è maggiore?" e "Ordina le regioni", calcolate dal server round per round.</p>
   </header>
 
   <div id="leaderboard-root">
@@ -31,8 +31,8 @@
 
   <section class="prose">
     <h2>Come funziona</h2>
-    <p>Il punteggio in classifica è la miglior serie di risposte corrette (per "Chi è maggiore?") o di round perfetti consecutivi (per "Ordina le regioni") ottenuta in una sessione di gioco. Ogni risposta è verificata dal server, che lega ciascun round a un token di sessione firmato: non è possibile inviare un punteggio senza averlo davvero ottenuto giocando.</p>
-    <p>Il nickname è pubblico e scelto liberamente, senza registrazione: non salviamo email o altri dati personali oltre al nickname e al punteggio. Non pubblichiamo nickname offensivi o non validi.</p>
+    <p>Il punteggio in classifica è la miglior serie di risposte corrette (per "Chi è maggiore?") o di round perfetti consecutivi (per "Ordina le regioni") ottenuta in una sessione di gioco. Il server calcola ogni risposta e tiene il conto della serie tramite un token di sessione firmato, legato al round proposto.</p>
+    <p>Il nickname è pubblico e scelto liberamente, senza registrazione: salviamo solo il nickname e il punteggio. I nickname sono filtrati per lunghezza, caratteri ammessi e linguaggio offensivo.</p>
     <p>Vuoi entrare in classifica? Gioca a <a href="/quiz/chi-e-maggiore">Chi è maggiore?</a> o a <a href="/quiz/ordina">Ordina le regioni</a> e invia il tuo risultato a fine serie.</p>
   </section>
 </article>

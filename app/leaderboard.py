@@ -70,6 +70,22 @@ def submit(mode, session_id, nickname, score, detail=None):
         conn.close()
 
 
+def delete_entry(mode, nickname):
+    """Rimuove una riga per moderazione (nickname sfuggito al filtro, voce di
+    test, ecc). Usata dall'endpoint admin in app/views.py."""
+    if mode not in MODES:
+        raise ValueError("bad_mode")
+    conn = _connect()
+    try:
+        with conn:
+            cursor = conn.execute(
+                "DELETE FROM scores WHERE mode = ? AND nickname = ?", (mode, nickname)
+            )
+            return cursor.rowcount
+    finally:
+        conn.close()
+
+
 def _rank(conn, mode, score, created_at, period_sql):
     row = conn.execute(
         f"SELECT COUNT(*) FROM scores WHERE mode = ? AND {period_sql} "
