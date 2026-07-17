@@ -15,6 +15,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(home.headers["Strict-Transport-Security"], "max-age=31536000; includeSubDomains")
         csp = home.headers["Content-Security-Policy"]
         self.assertIn("script-src", csp)
+        self.assertIn("script-src-elem", csp)
         self.assertIn("connect-src", csp)
         self.assertIn("https://www.googletagmanager.com", csp)
         self.assertIn("https://tagmanager.google.com", csp)
@@ -23,6 +24,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://ssl.gstatic.com", csp)
         self.assertIn("https://www.gstatic.com", csp)
         self.assertIn("https://ep1.adtrafficquality.google", csp)
+        self.assertIn("https://ep2.adtrafficquality.google", csp)
         self.assertIn(b'id="root"', home.data)
         self.assertIn(b"/metodologia", home.data)
         self.assertIn(b"Indicatori territoriali in evidenza", home.data)

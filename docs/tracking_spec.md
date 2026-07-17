@@ -127,6 +127,7 @@ Host principali autorizzati oggi:
 
 - `www.googletagmanager.com`
 - `tagmanager.google.com`
+- `ep2.adtrafficquality.google`
 - `ssl.gstatic.com`
 - `www.gstatic.com`
 - `www.google-analytics.com`
