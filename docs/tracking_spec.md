@@ -1,6 +1,6 @@
 # Specifica tracciamento e consenso
 
-Stato verificato il 2026-06-23.
+Stato verificato il 2026-07-17.
 
 Versione GTM live pubblicata: `7`, nome `Disable automatic page_view 2026-06-23`.
 
@@ -127,6 +127,8 @@ Host principali autorizzati oggi:
 
 - `www.googletagmanager.com`
 - `tagmanager.google.com`
+- `ssl.gstatic.com`
+- `www.gstatic.com`
 - `www.google-analytics.com`
 - `*.google-analytics.com`
 - `*.analytics.google.com`
@@ -245,6 +247,8 @@ Parametri gioco da registrare in GA4:
 | `period` | week, all |
 | `attempt` | numero del tentativo |
 | `attempts` | numero tentativi della partita |
+| `correct` | true, false |
+| `won` | true, false |
 
 ## GA4
 
@@ -258,7 +262,7 @@ Configurazione richiesta:
 - marca come key event solo eventi che rappresentano un obiettivo reale, non `page_view`
 - non salvare dati personali o testo libero non controllato
 
-Dimensioni evento create nella property `542300588` il 2026-06-23:
+Dimensioni evento create nella property `542300588` il 2026-07-17:
 
 - `page_type`
 - `indicator_id`
@@ -270,6 +274,8 @@ Dimensioni evento create nella property `542300588` il 2026-06-23:
 - `theme`
 - `sort`
 - `enabled`
+- `correct`
+- `won`
 
 Key event creato:
 
