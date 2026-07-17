@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import CompareApp from "./compare.jsx";
 import OrderApp from "./order.jsx";
+import HubApp from "./hub.jsx";
+import LeaderboardApp from "./leaderboard.jsx";
+import { fetchJson, formatValue, prefersReducedMotion, trackGameEvent, SourceStrip, Modal } from "./shared.jsx";
 import "./game.css";
 
 const API = {
@@ -19,12 +22,6 @@ const STORAGE_ONBOARDED_KEY = "di-game-onboarded";
 const MAP_FRAME_ID = "game-map-frame";
 const DIST_BUCKETS = ["1", "2", "3", "4", "5", "6", "fail"];
 
-export async function fetchJson(url, options) {
-  const response = await fetch(url, options);
-  if (!response.ok) throw new Error(`Request failed: ${url}`);
-  return response.json();
-}
-
 function normalize(value) {
   return (value || "")
     .toString()
@@ -33,23 +30,8 @@ function normalize(value) {
     .toLowerCase();
 }
 
-export function formatValue(value, unit) {
-  if (value === null || value === undefined || !Number.isFinite(value)) return "n.d.";
-  const decimals = Math.abs(value) >= 1000 ? 0 : 1;
-  const formatted = value.toLocaleString("it-IT", { maximumFractionDigits: decimals, minimumFractionDigits: 0 });
-  const lower = (unit || "").toLowerCase();
-  if (lower.includes("percentuale")) return `${formatted}%`;
-  return `${formatted} ${unit || ""}`.trim();
-}
-
 function ordinal(rank) {
   return Number.isFinite(rank) ? `${rank}ª` : "n.d.";
-}
-
-export function prefersReducedMotion() {
-  return typeof window !== "undefined" && window.matchMedia
-    ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    : false;
 }
 
 function loadStats() {
@@ -85,34 +67,6 @@ function saveProgress(puzzleId, progress) {
     window.localStorage.setItem(STORAGE_PROGRESS_PREFIX + puzzleId, JSON.stringify(progress));
   } catch {
     // Idem: modalità privata o quota piena, il gioco resta giocabile senza persistenza.
-  }
-}
-
-export function trackGameEvent(name, params = {}) {
-  if (typeof window === "undefined") return;
-  const eventParams = {
-    page_type: "game",
-    page_path: window.location.pathname,
-    page_title: document.title,
-    ...params,
-  };
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event: name, ...eventParams });
-  try {
-    fetch("/api/events", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        params: eventParams,
-        path: window.location.pathname,
-        title: document.title,
-      }),
-      keepalive: true,
-      credentials: "omit",
-    }).catch(() => {});
-  } catch {
-    // Le metriche non devono mai bloccare il gioco.
   }
 }
 
@@ -357,7 +311,7 @@ function GameApp() {
     if (!puzzle || mode !== "daily") return "";
     const grid = guesses.map((g) => (g.correct ? "🟩" : "🟥")).join("");
     const outcome = status === "won" ? `${guesses.length}/${puzzle.attempts_total}` : `X/${puzzle.attempts_total}`;
-    return `Indovina la Regione #${puzzle.number} ${outcome}\n${grid}\ndivarioitalia.it/gioco`;
+    return `Indovina la Regione #${puzzle.number} ${outcome}\n${grid}\ndivarioitalia.it/quiz/indovina-la-regione`;
   }
 
   async function handleShare() {
@@ -508,7 +462,8 @@ function GameApp() {
                     {isLast && status === "playing" && i > 0 && <span className="clue-badge">Nuovo</span>}
                     <span className="clue-index">Indizio {i + 1}</span>
                     <h3>{clue.name}</h3>
-                    <p className="clue-meta">{clue.macro_area} · {clue.theme} · {clue.year}</p>
+                    <p className="clue-meta">{clue.macro_area} · {clue.theme}</p>
+                    <SourceStrip year={clue.year} sourceLabel={clue.source_label} sourceUrl={clue.source_url} />
                     <div className="clue-stats">
                       <span className="clue-value">{formatValue(clue.value, clue.unit)}</span>
                       <span className="clue-rank">{ordinal(clue.rank)} su {clue.region_count}</span>
@@ -734,37 +689,6 @@ function ResultPanel({ status, mode, puzzle, solution, recap, stats, highlightBu
   );
 }
 
-export function Modal({ title, onClose, children, labelledBy }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    function onKeyDown(e) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
-
-  return (
-    <div
-      className="game-modal-backdrop"
-      onMouseDown={(e) => {
-        if (e.target === ref.current) onClose();
-      }}
-      ref={ref}
-    >
-      <div className="game-modal" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
-        <div className="game-modal-head">
-          <h3 id={labelledBy}>{title}</h3>
-          <button type="button" className="game-modal-close" onClick={onClose} aria-label="Chiudi">
-            ✕
-          </button>
-        </div>
-        <div className="game-modal-body">{children}</div>
-      </div>
-    </div>
-  );
-}
-
 function OnboardingModal({ onClose }) {
   return (
     <Modal title="Come si gioca" onClose={onClose} labelledBy="game-onboarding-title">
@@ -962,4 +886,14 @@ if (compareRoot) {
 const orderRoot = document.getElementById("order-root");
 if (orderRoot) {
   createRoot(orderRoot).render(<OrderApp />);
+}
+
+const hubRoot = document.getElementById("hub-root");
+if (hubRoot) {
+  createRoot(hubRoot).render(<HubApp />);
+}
+
+const leaderboardRoot = document.getElementById("leaderboard-root");
+if (leaderboardRoot) {
+  createRoot(leaderboardRoot).render(<LeaderboardApp />);
 }

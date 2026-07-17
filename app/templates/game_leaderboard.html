@@ -1,0 +1,39 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'gioco' %}
+{% set game_active = 'classifica' %}
+
+{% block title %}Classifica del Quiz Italia | {{ site_name }}{% endblock %}
+{% block description %}La classifica di "Chi è maggiore?" e "Ordina le regioni": le migliori serie verificate sugli indicatori Istat delle regioni italiane.{% endblock %}
+
+{% block robots_meta %}
+<meta name="robots" content="noindex, nofollow, noarchive">
+{% endblock %}
+
+{% block head_extra %}
+<link rel="stylesheet" crossorigin href="{{ url_for('static', filename='dist/assets/game.css') }}">
+<script type="module" crossorigin src="{{ url_for('static', filename='dist/assets/game.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<article class="page game-page wrap">
+  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
+
+  {% include "_game_subnav.html" %}
+
+  <header class="page-hero">
+    <h1>Classifica</h1>
+    <p class="page-lead">Le migliori serie di "Chi è maggiore?" e "Ordina le regioni", verificate dal server round per round: nessun punteggio è mai dichiarato dal client.</p>
+  </header>
+
+  <div id="leaderboard-root">
+    <p class="game-loading">Caricamento della classifica...</p>
+  </div>
+
+  <section class="prose">
+    <h2>Come funziona</h2>
+    <p>Il punteggio in classifica è la miglior serie di risposte corrette (per "Chi è maggiore?") o di round perfetti consecutivi (per "Ordina le regioni") ottenuta in una sessione di gioco. Ogni risposta è verificata dal server, che lega ciascun round a un token di sessione firmato: non è possibile inviare un punteggio senza averlo davvero ottenuto giocando.</p>
+    <p>Il nickname è pubblico e scelto liberamente, senza registrazione: non salviamo email o altri dati personali oltre al nickname e al punteggio. Non pubblichiamo nickname offensivi o non validi.</p>
+    <p>Vuoi entrare in classifica? Gioca a <a href="/quiz/chi-e-maggiore">Chi è maggiore?</a> o a <a href="/quiz/ordina">Ordina le regioni</a> e invia il tuo risultato a fine serie.</p>
+  </section>
+</article>
+{% endblock %}

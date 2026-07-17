@@ -1,0 +1,4 @@
+dbs:
+  - path: ${LEADERBOARD_DB}
+    replica:
+      url: ${LITESTREAM_REPLICA_URL}

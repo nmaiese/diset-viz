@@ -1,5 +1,6 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'gioco' %}
+{% set game_active = 'compare' %}
 
 {% block title %}Chi è maggiore? Sfida a due regioni sugli indicatori Istat | {{ site_name }}{% endblock %}
 {% block description %}Due regioni italiane, un indicatore Istat: indovina quale ha il valore più alto. Round da dieci secondi, difficoltà crescente e serie di risposte da battere.{% endblock %}
@@ -25,7 +26,7 @@
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Gioco", "item": "{{ site_url }}/gioco" },
+    { "@type": "ListItem", "position": 2, "name": "Quiz Italia", "item": "{{ site_url }}/quiz" },
     { "@type": "ListItem", "position": 3, "name": "Chi è maggiore?", "item": {{ canonical | tojson }} }
   ]
 }
@@ -34,7 +35,9 @@
 
 {% block content %}
 <article class="page game-page wrap">
-  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/gioco">Gioco</a></nav>
+  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
+
+  {% include "_game_subnav.html" %}
 
   <header class="page-hero">
     <h1>Chi è maggiore?</h1>
@@ -44,15 +47,15 @@
   <div id="compare-root">
     <noscript>
       <p>Attiva JavaScript per giocare a "Chi è maggiore?". Nel frattempo puoi esplorare
-      <a href="/regioni">le regioni italiane</a> o provare <a href="/gioco">Indovina la Regione</a>.</p>
+      <a href="/regioni">le regioni italiane</a> o provare <a href="/quiz/indovina-la-regione">Indovina la Regione</a>.</p>
     </noscript>
     <p class="game-loading">Preparazione del primo round...</p>
   </div>
 
   <section class="prose">
     <h2>Come si gioca</h2>
-    <p>Ogni round mostra il nome di un indicatore Istat e due regioni italiane. Hai dieci secondi per toccare la regione che secondo te ha il valore più alto. Dopo la risposta vedi entrambi i valori reali. Ogni risposta corretta allunga la tua serie e alza la difficoltà: le coppie diventano sempre più vicine in classifica. Un errore o il tempo scaduto azzerano la serie. Il tuo record resta salvato sul dispositivo.</p>
-    <p>Vuoi una sfida più ragionata? Prova a <a href="/gioco/ordina">ordinare le regioni</a> o a <a href="/gioco">indovinare la regione misteriosa</a> del giorno.</p>
+    <p>Ogni round mostra il nome di un indicatore Istat e due regioni italiane. Hai dieci secondi per toccare la regione che secondo te ha il valore più alto. Dopo la risposta vedi entrambi i valori reali. Ogni risposta corretta allunga la tua serie e alza la difficoltà: le coppie diventano sempre più vicine in classifica. Un errore o il tempo scaduto azzerano la serie. Il tuo record resta salvato sul dispositivo, e le migliori serie possono entrare nella <a href="/quiz/classifica">classifica</a>.</p>
+    <p>Vuoi una sfida più ragionata? Prova a <a href="/quiz/ordina">ordinare le regioni</a> o a <a href="/quiz/indovina-la-regione">indovinare la regione misteriosa</a> del giorno.</p>
   </section>
 </article>
 {% endblock %}

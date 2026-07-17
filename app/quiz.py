@@ -58,6 +58,9 @@ def _quiz_indicators():
             "macro_area": item["macro_area"],
             "unit": item["unit"],
             "year": year,
+            "source_label": item["source_label"],
+            "source_url": item["source_url"],
+            "description": item["explain"]["plain"],
             "ranking": [
                 {"region": row["region"], "region_key": row["region_key"], "value": row["value"]}
                 for row in rows
@@ -67,6 +70,9 @@ def _quiz_indicators():
 
 
 def _indicator_fields(entry):
+    # Fonte e anno non rivelano nulla sul confronto/ordinamento: possono stare
+    # nel round. La descrizione invece si mostra solo alla risposta, per
+    # mantenere il momento di scoperta.
     return {
         "id": entry["id"],
         "name": entry["name"],
@@ -74,6 +80,8 @@ def _indicator_fields(entry):
         "macro_area": entry["macro_area"],
         "unit": entry["unit"],
         "year": entry["year"],
+        "source_label": entry["source_label"],
+        "source_url": entry["source_url"],
     }
 
 
@@ -180,6 +188,9 @@ def evaluate_compare(indicator_id, year, region_a_key, region_b_key, choice):
             "macro_area": macro_area_for(meta["theme"]),
             "unit": meta["unit"],
             "year": year,
+            "source_label": meta["source_label"],
+            "source_url": meta["source_url"],
+            "description": meta["explain"]["plain"],
         },
         "region_a": {"region": name_a, "region_key": region_a_key, "value": value_a},
         "region_b": {"region": name_b, "region_key": region_b_key, "value": value_b},
@@ -259,6 +270,7 @@ def evaluate_order(indicator_id, year, region_keys):
             "correct": hit,
         })
 
+    meta = payload["metadata"]
     return {
         "score": score,
         "total": len(region_keys),
@@ -267,4 +279,13 @@ def evaluate_order(indicator_id, year, region_keys):
             {"region": names[key], "region_key": key, "value": values[key]}
             for key in correct_keys
         ],
+        "indicator": {
+            "id": meta["id"],
+            "name": meta["name"],
+            "unit": meta["unit"],
+            "year": year,
+            "source_label": meta["source_label"],
+            "source_url": meta["source_url"],
+            "description": meta["explain"]["plain"],
+        },
     }

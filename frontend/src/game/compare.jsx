@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { fetchJson, formatValue, prefersReducedMotion, trackGameEvent, Modal } from "./main.jsx";
+import {
+  fetchJson, formatValue, prefersReducedMotion, trackGameEvent, Modal, SourceStrip, SubmitScoreModal,
+} from "./shared.jsx";
 
 const API = {
-  round: (difficulty) => `/api/game/compare/round?difficulty=${difficulty}`,
+  round: (difficulty, token) =>
+    `/api/game/compare/round?difficulty=${difficulty}${token ? `&token=${encodeURIComponent(token)}` : ""}`,
   answer: "/api/game/compare/answer",
 };
 
@@ -44,6 +47,8 @@ export default function CompareApp() {
   const [streak, setStreak] = useState(0);
   const [stats, setStats] = useState(loadStats);
   const [timeLeft, setTimeLeft] = useState(ROUND_MS);
+  const [sessionBest, setSessionBest] = useState(0);
+  const [showScoreModal, setShowScoreModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => {
     try {
       return !window.localStorage.getItem(STORAGE_ONBOARDED_KEY);
@@ -55,6 +60,8 @@ export default function CompareApp() {
   const stateRef = useRef({ status: "loading", round: null, streak: 0 });
   const timerRef = useRef(null);
   const advanceRef = useRef(null);
+  const tokenRef = useRef(null);
+  const promptedBestRef = useRef(0);
 
   useEffect(() => {
     stateRef.current = { status, round, streak };
@@ -94,8 +101,9 @@ export default function CompareApp() {
     setResult(null);
     setChoice(null);
     setTimeLeft(ROUND_MS);
-    fetchJson(API.round(difficulty))
+    fetchJson(API.round(difficulty, tokenRef.current))
       .then((data) => {
+        tokenRef.current = data.token;
         setRound(data);
         setStatus("answering");
       })
@@ -117,11 +125,13 @@ export default function CompareApp() {
         region_a_key: currentRound.region_a.region_key,
         region_b_key: currentRound.region_b.region_key,
         choice: picked,
+        token: tokenRef.current,
       }),
     })
       .then((data) => {
         setResult(data);
         setStatus("revealed");
+        tokenRef.current = data.token;
         const prevStreak = stateRef.current.streak;
         const nextStreak = data.correct ? prevStreak + 1 : 0;
         setStreak(nextStreak);
@@ -134,6 +144,15 @@ export default function CompareApp() {
           saveStats(next);
           return next;
         });
+        if (data.session) {
+          setSessionBest(data.session.best);
+          // La serie appena finita ha battuto il record di questa sessione:
+          // proponiamo la classifica invece di aspettare che l'utente la cerchi.
+          if (!data.correct && data.session.best > promptedBestRef.current && data.session.best >= 3) {
+            promptedBestRef.current = data.session.best;
+            setShowScoreModal(true);
+          }
+        }
         trackGameEvent("compare_answer", {
           result: data.correct ? "correct" : picked === "timeout" ? "timeout" : "wrong",
           streak: nextStreak,
@@ -195,6 +214,11 @@ export default function CompareApp() {
             ))}
           </span>
         </div>
+        {sessionBest > 0 && (
+          <button type="button" className="game-tab game-tab--ghost compare-score-cta" onClick={() => setShowScoreModal(true)}>
+            Entra in classifica
+          </button>
+        )}
       </div>
 
       {status === "error" && (
@@ -212,9 +236,14 @@ export default function CompareApp() {
             <span className="compare-kicker">Quale regione ha il valore più alto?</span>
             <h2>{round.indicator.name}</h2>
             <p className="compare-meta">
-              {round.indicator.macro_area} · {round.indicator.theme} · {round.indicator.year}
+              {round.indicator.macro_area} · {round.indicator.theme}
               {round.indicator.unit && ` · ${round.indicator.unit}`}
             </p>
+            <SourceStrip
+              year={round.indicator.year}
+              sourceLabel={round.indicator.source_label}
+              sourceUrl={round.indicator.source_url}
+            />
           </div>
 
           <div className="compare-timer" role="presentation">
@@ -250,16 +279,21 @@ export default function CompareApp() {
 
           <div className="compare-feedback" aria-live="polite">
             {status === "revealed" && result && (
-              <p className={result.correct ? "compare-verdict is-correct" : "compare-verdict is-wrong"}>
-                {result.correct
-                  ? "Giusto!"
-                  : choice === "timeout"
-                  ? "Tempo scaduto."
-                  : "Sbagliato."}
-                {" "}
-                {result[result.winner].region} ha il valore più alto.
-                {!result.correct && streak === 0 && stats.bestStreak > 0 && " Serie azzerata."}
-              </p>
+              <>
+                <p className={result.correct ? "compare-verdict is-correct" : "compare-verdict is-wrong"}>
+                  {result.correct
+                    ? "Giusto!"
+                    : choice === "timeout"
+                    ? "Tempo scaduto."
+                    : "Sbagliato."}
+                  {" "}
+                  {result[result.winner].region} ha il valore più alto.
+                  {!result.correct && streak === 0 && stats.bestStreak > 0 && " Serie azzerata."}
+                </p>
+                {result.indicator.description && (
+                  <p className="quiz-description">{result.indicator.description}</p>
+                )}
+              </>
             )}
           </div>
 
@@ -302,6 +336,16 @@ export default function CompareApp() {
           </ol>
           <button type="button" className="game-btn" onClick={closeOnboarding}>Ho capito, gioco</button>
         </Modal>
+      )}
+
+      {showScoreModal && (
+        <SubmitScoreModal
+          mode="compare"
+          token={tokenRef.current}
+          score={sessionBest}
+          scoreLabel={`${sessionBest} risposte di fila`}
+          onClose={() => setShowScoreModal(false)}
+        />
       )}
     </div>
   );

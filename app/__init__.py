@@ -1,3 +1,5 @@
+import secrets
+
 from flask import Flask, jsonify, redirect, render_template, request
 from flask_compress import Compress
 
@@ -5,6 +7,10 @@ from app import config
 from app.cache import cache
 
 app = Flask(__name__, static_url_path="/static")
+# Without SECRET_KEY set in the environment, a fresh key is generated on every
+# process start: quiz session tokens issued before a restart stop validating.
+# Fine for local dev, must be set explicitly in production.
+app.secret_key = config.SECRET_KEY or secrets.token_hex(32)
 
 Compress(app)
 cache.init_app(app)
@@ -23,7 +29,7 @@ def redirect_www_to_apex():
     return redirect(target_url, code=301)
 
 
-_NOINDEX_EXACT_PATHS = {"/data", "/legacy", "/legacy-reddito"}
+_NOINDEX_EXACT_PATHS = {"/data", "/legacy", "/legacy-reddito", "/quiz/classifica"}
 _NOINDEX_PATH_PREFIXES = ("/api/", "/download/")
 
 

@@ -1,5 +1,6 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'gioco' %}
+{% set game_active = 'daily' %}
 
 {% block title %}Indovina la Regione: il gioco degli indicatori Istat | {{ site_name }}{% endblock %}
 {% block description %}Indovina la regione italiana misteriosa a partire da sei indicatori Istat. Una sfida al giorno, indizi progressivi e un profilo completo a fine partita.{% endblock %}
@@ -25,7 +26,8 @@
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Gioco", "item": {{ canonical | tojson }} }
+    { "@type": "ListItem", "position": 2, "name": "Quiz Italia", "item": "{{ site_url }}/quiz" },
+    { "@type": "ListItem", "position": 3, "name": "Indovina la Regione", "item": {{ canonical | tojson }} }
   ]
 }
 </script>
@@ -33,7 +35,9 @@
 
 {% block content %}
 <article class="page game-page wrap">
-  <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
+  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
+
+  {% include "_game_subnav.html" %}
 
   <header class="page-hero">
     <h1>Indovina la Regione</h1>
@@ -58,17 +62,6 @@
       <p class="game-loading">Preparazione della sfida...</p>
     </div>
   </div>
-
-  <section class="game-crosspromo" aria-label="Altri giochi">
-    <a class="game-crosspromo-card" href="/gioco/chi-e-maggiore">
-      <strong>Chi è maggiore?</strong>
-      <span>Due regioni, dieci secondi: scegli quella con il valore più alto. Difficoltà crescente e serie da battere.</span>
-    </a>
-    <a class="game-crosspromo-card" href="/gioco/ordina">
-      <strong>Ordina le regioni</strong>
-      <span>Metti tre o cinque regioni nell'ordine giusto su un indicatore. Un punto per ogni posizione corretta.</span>
-    </a>
-  </section>
 
   <section class="prose">
     <h2>Come si gioca</h2>

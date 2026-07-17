@@ -471,29 +471,122 @@
   }
 }
 
-/* ---------- Cross-promo tra i giochi (game.html) ---------- */
+/* ---------- Sotto-navigazione tra le modalità (_game_subnav.html) ---------- */
 
-.game-crosspromo {
+.game-subnav {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin: 0 0 20px;
+  -webkit-overflow-scrolling: touch;
+}
+.game-subnav .game-tab { white-space: nowrap; text-decoration: none; }
+.game-subnav .game-tab:hover { border-color: var(--accent); }
+
+/* ---------- Hub "Quanto conosci l'Italia?" (game_hub.html + hub.jsx) ---------- */
+
+.hub-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 14px;
-  margin: 28px 0 8px;
+  margin: 28px 0;
 }
 
-.game-crosspromo-card {
+.hub-card {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 16px 18px;
+  padding: 18px 20px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--panel);
   color: var(--ink);
+  text-decoration: none;
 }
+.hub-card:hover { border-color: var(--accent); }
+.hub-card-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+.hub-card strong { font-family: var(--font-display); font-size: 19px; }
+.hub-card-body { font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+.hub-card-cta { margin-top: 4px; font-weight: 700; font-size: 13.5px; }
 
-.game-crosspromo-card:hover { border-color: var(--accent); text-decoration: none; }
-.game-crosspromo-card strong { font-family: var(--font-display); font-size: 17px; }
-.game-crosspromo-card span { font-size: 13px; color: var(--muted); line-height: 1.45; }
+.hub-stats {
+  margin: 8px 0 28px;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--grid);
+}
+.hub-stats-title { font-size: 15px; margin: 0 0 12px; }
+.hub-stats-empty { margin: 0; font-size: 13.5px; color: var(--muted); }
+.hub-stat-row { display: flex; flex-wrap: wrap; gap: 24px; }
+.hub-stat { display: flex; flex-direction: column; gap: 2px; }
+.hub-stat strong { font-family: var(--font-mono); font-size: 22px; color: var(--accent); }
+.hub-stat span { font-size: 12px; color: var(--muted); }
+
+.hub-top5 {
+  margin: 0 0 28px;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+.hub-top5-list { list-style: none; margin: 4px 0 14px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.hub-top5-list li { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+.hub-top5-rank {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  width: 18px;
+}
+.hub-top5-nickname { flex: 1; font-weight: 600; }
+.hub-top5-score { font-family: var(--font-mono); color: var(--accent); font-weight: 700; }
+
+/* ---------- Invio punteggio in classifica (shared.jsx: SubmitScoreModal) ---------- */
+
+.submit-score-form { display: flex; flex-direction: column; gap: 10px; }
+.submit-score-form label { font-size: 13px; font-weight: 600; }
+.submit-score-form input {
+  font: inherit;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.submit-score-form input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ---------- Classifica (game_leaderboard.html + leaderboard.jsx) ---------- */
+
+.lb-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; }
+.lb-tabs--period { margin-bottom: 20px; }
+
+.lb-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.lb-table th, .lb-table td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; }
+.lb-table th {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.lb-table td:first-child, .lb-table th:first-child { width: 32px; color: var(--muted); }
+.lb-table td:nth-child(3) { font-family: var(--font-mono); color: var(--accent); font-weight: 700; }
+.lb-table td:last-child { color: var(--muted); font-size: 12.5px; }
+.lb-detail-badge {
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--grid);
+  font-size: 11px;
+  color: var(--muted);
+}
 
 /* ---------- Chi e' maggiore? (compare.jsx) ---------- */
 
@@ -513,6 +606,7 @@
 
 .compare-score { display: flex; flex-direction: column; }
 .compare-score strong { font-family: var(--font-display); font-size: 26px; line-height: 1.1; }
+.compare-score-cta { margin-left: auto; }
 .compare-score span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
 .compare-level { margin-left: auto; display: flex; align-items: center; gap: 8px; }
@@ -536,6 +630,45 @@
   color: var(--accent);
 }
 .compare-meta { margin: 0; font-size: 13px; color: var(--muted); }
+
+/* Striscia fonte/anno condivisa da "Chi è maggiore?", "Ordina le regioni" e
+   dagli indizi di "Indovina la Regione": vedi SourceStrip in main.jsx. */
+.quiz-source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 0;
+}
+.quiz-source-year {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.quiz-source-link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.quiz-source-link:hover { color: var(--ink); }
+
+.quiz-description {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  background: var(--grid);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+}
 
 .compare-timer {
   height: 8px;

@@ -1,5 +1,6 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'gioco' %}
+{% set game_active = 'order' %}
 
 {% block title %}Ordina le regioni: la classifica nascosta degli indicatori Istat | {{ site_name }}{% endblock %}
 {% block description %}Metti in ordine tre o cinque regioni italiane su un indicatore Istat, dal valore più alto al più basso. Punteggio per ogni posizione corretta.{% endblock %}
@@ -25,7 +26,7 @@
   "@type": "BreadcrumbList",
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Gioco", "item": "{{ site_url }}/gioco" },
+    { "@type": "ListItem", "position": 2, "name": "Quiz Italia", "item": "{{ site_url }}/quiz" },
     { "@type": "ListItem", "position": 3, "name": "Ordina le regioni", "item": {{ canonical | tojson }} }
   ]
 }
@@ -34,7 +35,9 @@
 
 {% block content %}
 <article class="page game-page wrap">
-  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/gioco">Gioco</a></nav>
+  <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
+
+  {% include "_game_subnav.html" %}
 
   <header class="page-hero">
     <h1>Ordina le regioni</h1>
@@ -44,15 +47,15 @@
   <div id="order-root">
     <noscript>
       <p>Attiva JavaScript per giocare a "Ordina le regioni". Nel frattempo puoi esplorare
-      <a href="/regioni">le regioni italiane</a> o provare <a href="/gioco">Indovina la Regione</a>.</p>
+      <a href="/regioni">le regioni italiane</a> o provare <a href="/quiz/indovina-la-regione">Indovina la Regione</a>.</p>
     </noscript>
     <p class="game-loading">Preparazione del primo round...</p>
   </div>
 
   <section class="prose">
     <h2>Come si gioca</h2>
-    <p>Scegli il livello: tre regioni per iniziare, cinque per la sfida completa. Tocca le regioni nell'ordine che pensi corretto, dalla più alta alla più bassa sull'indicatore proposto. Un secondo tocco su una regione la toglie dalla sequenza. Quando l'ordine è completo, conferma: vedrai la classifica reale con i valori e un punto per ogni posizione azzeccata. Il tuo record resta salvato sul dispositivo.</p>
-    <p>Preferisci round più rapidi? Prova <a href="/gioco/chi-e-maggiore">Chi è maggiore?</a> o la <a href="/gioco">regione misteriosa</a> del giorno.</p>
+    <p>Scegli il livello: tre regioni per iniziare, cinque per la sfida completa. Tocca le regioni nell'ordine che pensi corretto, dalla più alta alla più bassa sull'indicatore proposto. Un secondo tocco su una regione la toglie dalla sequenza. Quando l'ordine è completo, conferma: vedrai la classifica reale con i valori e un punto per ogni posizione azzeccata. Il tuo record resta salvato sul dispositivo, e le serie perfette possono entrare nella <a href="/quiz/classifica">classifica</a>.</p>
+    <p>Preferisci round più rapidi? Prova <a href="/quiz/chi-e-maggiore">Chi è maggiore?</a> o la <a href="/quiz/indovina-la-regione">regione misteriosa</a> del giorno.</p>
   </section>
 </article>
 {% endblock %}

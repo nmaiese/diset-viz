@@ -15,6 +15,9 @@ from app import quality_life_bes as qb
 from app import external_manifest
 from app import game
 from app import quiz
+from app import quiz_tokens
+from app import leaderboard
+from app import moderation
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -566,39 +569,86 @@ def quality_life_methodology():
 
 
 @app.route("/gioco")
+def game_page_legacy_redirect():
+    return redirect("/quiz", code=301)
+
+
+@app.route("/gioco/chi-e-maggiore")
+def game_compare_page_legacy_redirect():
+    return redirect("/quiz/chi-e-maggiore", code=301)
+
+
+@app.route("/gioco/ordina")
+def game_order_page_legacy_redirect():
+    return redirect("/quiz/ordina", code=301)
+
+
+@app.route("/quiz")
+def game_hub_page():
+    return render_template(
+        "game_hub.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/quiz",
+    )
+
+
+@app.route("/quiz/indovina-la-regione")
 def game_page():
     return render_template(
         "game.html",
         site_url=SITE_URL,
         site_name=SITE_NAME,
-        canonical=f"{SITE_URL}/gioco",
+        canonical=f"{SITE_URL}/quiz/indovina-la-regione",
     )
 
 
-@app.route("/gioco/chi-e-maggiore")
+@app.route("/quiz/chi-e-maggiore")
 def game_compare_page():
     return render_template(
         "game_compare.html",
         site_url=SITE_URL,
         site_name=SITE_NAME,
-        canonical=f"{SITE_URL}/gioco/chi-e-maggiore",
+        canonical=f"{SITE_URL}/quiz/chi-e-maggiore",
     )
 
 
-@app.route("/gioco/ordina")
+@app.route("/quiz/ordina")
 def game_order_page():
     return render_template(
         "game_order.html",
         site_url=SITE_URL,
         site_name=SITE_NAME,
-        canonical=f"{SITE_URL}/gioco/ordina",
+        canonical=f"{SITE_URL}/quiz/ordina",
     )
+
+
+@app.route("/quiz/classifica")
+def game_leaderboard_page():
+    return render_template(
+        "game_leaderboard.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/quiz/classifica",
+    )
+
+
+def _session_summary(session):
+    if session is None:
+        return None
+    return {"streak": session["streak"], "best": session["best"], "rounds": session["rounds"]}
 
 
 @app.route("/api/game/compare/round")
 def game_compare_round_api():
     difficulty = request.args.get("difficulty", "0")
-    return jsonify(quiz.compare_round(difficulty))
+    result = quiz.compare_round(difficulty)
+    state = quiz_tokens.load_state(request.args.get("token"), "compare")
+    keys = [result["region_a"]["region_key"], result["region_b"]["region_key"]]
+    result["token"] = quiz_tokens.bind_round(
+        state, result["indicator"]["id"], result["indicator"]["year"], keys, result["difficulty"]
+    )
+    return jsonify(result)
 
 
 @app.post("/api/game/compare/answer")
@@ -613,6 +663,13 @@ def game_compare_answer_api():
     )
     if result is None:
         abort(400)
+    state = quiz_tokens.load_state(payload.get("token"), "compare")
+    keys = [payload.get("region_a_key"), payload.get("region_b_key")]
+    session, token = quiz_tokens.apply_answer(
+        state, payload.get("indicator_id"), payload.get("year"), keys, result["correct"]
+    )
+    result["session"] = _session_summary(session)
+    result["token"] = token
     return jsonify(result)
 
 
@@ -625,20 +682,74 @@ def game_order_round_api():
     result = quiz.order_round(count)
     if result is None:
         abort(400)
+    state = quiz_tokens.load_state(request.args.get("token"), "order")
+    keys = [r["region_key"] for r in result["regions"]]
+    result["token"] = quiz_tokens.bind_round(
+        state, result["indicator"]["id"], result["indicator"]["year"], keys, count, count=count
+    )
     return jsonify(result)
 
 
 @app.post("/api/game/order/answer")
 def game_order_answer_api():
     payload = request.get_json(silent=True) or {}
+    region_keys = payload.get("region_keys")
     result = quiz.evaluate_order(
         payload.get("indicator_id"),
         payload.get("year"),
-        payload.get("region_keys"),
+        region_keys,
     )
     if result is None:
         abort(400)
+    state = quiz_tokens.load_state(payload.get("token"), "order")
+    is_perfect = result["score"] == result["total"]
+    session, token = quiz_tokens.apply_answer(
+        state, payload.get("indicator_id"), payload.get("year"), region_keys or [], is_perfect
+    )
+    result["session"] = _session_summary(session)
+    result["token"] = token
     return jsonify(result)
+
+
+@app.route("/api/game/leaderboard")
+def leaderboard_get_api():
+    mode = request.args.get("mode", "")
+    period = request.args.get("period", "all")
+    if mode not in leaderboard.MODES:
+        return jsonify({"error": "bad_mode"}), 400
+    if period not in leaderboard.PERIODS:
+        return jsonify({"error": "bad_period"}), 400
+    try:
+        limit = int(request.args.get("limit", leaderboard.DEFAULT_LIMIT))
+    except ValueError:
+        limit = leaderboard.DEFAULT_LIMIT
+    entries = leaderboard.top(mode, period, limit)
+    return jsonify({"mode": mode, "period": period, "entries": entries})
+
+
+@app.post("/api/game/leaderboard")
+def leaderboard_post_api():
+    if not _rate_limit_ok(f"lb:{_client_ip()}", limit=5, window_s=60):
+        return jsonify({"error": "rate_limited"}), 429
+
+    payload = request.get_json(silent=True) or {}
+    state = quiz_tokens.peek_state(payload.get("token"))
+    if state is None:
+        return jsonify({"error": "token_invalid"}), 400
+
+    mode = state["m"]
+    score = state.get("b", 0)
+    if not score:
+        return jsonify({"error": "score_missing"}), 400
+
+    nickname, error = moderation.validate_nickname(payload.get("nickname"))
+    if error:
+        return jsonify({"error": error}), 400
+
+    detail = {"count": state["c"]} if mode == "order" and state.get("c") else {}
+    leaderboard.submit(mode, state["sid"], nickname, score, detail)
+    rank_all, rank_week = leaderboard.ranks_for_session(mode, state["sid"])
+    return jsonify({"ok": True, "mode": mode, "score": score, "rank_all": rank_all, "rank_week": rank_week})
 
 
 @app.route("/api/game/regions")
@@ -691,9 +802,10 @@ def sitemap():
         {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
-        {"loc": f"{SITE_URL}/gioco", "priority": "0.7"},
-        {"loc": f"{SITE_URL}/gioco/chi-e-maggiore", "priority": "0.7"},
-        {"loc": f"{SITE_URL}/gioco/ordina", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/quiz", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/quiz/indovina-la-regione", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/quiz/chi-e-maggiore", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/quiz/ordina", "priority": "0.7"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
         {"loc": f"{SITE_URL}/qualita-della-vita/classifica/regioni", "priority": "0.8"},
         {"loc": f"{SITE_URL}/qualita-della-vita/classifica/province", "priority": "0.8"},

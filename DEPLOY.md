@@ -25,6 +25,57 @@ gcloud run services update diset-viz --region europe-west1 \
   --update-env-vars SITE_URL=https://divarioitalia.it,GOOGLE_TAG_MANAGER_ID=GTM-PZ45BG7D,GA_MEASUREMENT_ID=G-THTPZZ02QH,ADSENSE_CLIENT=ca-pub-6806451730012282
 ```
 
+### Quiz "Quanto conosci l'Italia?" — SECRET_KEY e classifica
+
+**Stato attuale (implementato su `nil-automata` / servizio `diset-viz`):**
+
+- `SECRET_KEY` è un secret Secret Manager (`diset-viz-secret-key`), collegato al
+  servizio con `--update-secrets` e leggibile dalla service account di runtime
+  (`209597210585-compute@developer.gserviceaccount.com`, ruolo
+  `roles/secretmanager.secretAccessor` sul secret). Mai un valore statico in
+  chiaro nel repo o nei log.
+- La classifica persiste con **Litestream**: il file SQLite vive nel filesystem
+  locale effimero del container (`/data/leaderboard.sqlite3`, `LEADERBOARD_DB`
+  impostata come default nel `Dockerfile`) e viene replicato in continuo sul
+  bucket `gs://nil-automata-diset-viz-leaderboard/leaderboard`
+  (`LITESTREAM_REPLICA_URL`, già impostata sul servizio). All'avvio del
+  container Litestream ripristina l'ultima replica se il file locale non
+  esiste (`-restore-if-db-not-exists` nel `CMD` del `Dockerfile`), poi fa da
+  supervisore del processo gunicorn (`-exec`). Nessun impatto sulla
+  scalabilità: non serve un volume condiviso né `--max-instances 1`, ogni
+  container ha la propria copia locale del file.
+- La service account di runtime ha `roles/storage.objectAdmin` sul bucket
+  (necessario per scrivere le repliche).
+
+| Variabile | Valore attuale | A cosa serve |
+|---|---|---|
+| `SECRET_KEY` | secret Manager `diset-viz-secret-key:latest` | Firma i token di sessione del quiz. |
+| `LEADERBOARD_DB` | `/data/leaderboard.sqlite3` (default da `Dockerfile`) | Percorso locale del file SQLite nel container. |
+| `LITESTREAM_REPLICA_URL` | `gs://nil-automata-diset-viz-leaderboard/leaderboard` | Destinazione della replica continua Litestream. |
+
+Per ricreare il setup da zero (nuovo progetto o servizio):
+
+```bash
+# secret
+python3 -c "import secrets; print(secrets.token_hex(32))" | \
+  gcloud secrets create diset-viz-secret-key --data-file=- --replication-policy=automatic
+gcloud secrets add-iam-policy-binding diset-viz-secret-key \
+  --member="serviceAccount:RUNTIME_SA" --role="roles/secretmanager.secretAccessor"
+
+# bucket per la classifica
+gsutil mb -l europe-west1 -b on gs://IL_TUO_BUCKET
+gsutil iam ch serviceAccount:RUNTIME_SA:roles/storage.objectAdmin gs://IL_TUO_BUCKET
+
+# collega tutto al servizio
+gcloud run services update diset-viz --region europe-west1 \
+  --update-secrets=SECRET_KEY=diset-viz-secret-key:latest \
+  --update-env-vars=LITESTREAM_REPLICA_URL=gs://IL_TUO_BUCKET/leaderboard
+```
+
+`RUNTIME_SA` è la service account del servizio Cloud Run (visibile con
+`gcloud run services describe diset-viz --region europe-west1 --format="value(spec.template.spec.serviceAccountName)"`,
+di default la compute service account del progetto).
+
 Il template imposta il default di Google Consent Mode prima di qualunque script
 Google, poi carica Google Tag Manager e, se configurato, il loader AdSense nel
 `<head>`. Non ci sono tag nativi GA4, dispatcher GA4 Custom HTML, banner CMP

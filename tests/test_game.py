@@ -9,7 +9,7 @@ from app import game
 class GameTest(unittest.TestCase):
     def test_game_page_responds(self):
         client = app.test_client()
-        page = client.get("/gioco")
+        page = client.get("/quiz/indovina-la-regione")
         self.assertEqual(page.status_code, 200)
         self.assertIn(b'id="game-root"', page.data)
         self.assertIn(b'id="game-map-frame"', page.data)
@@ -17,16 +17,39 @@ class GameTest(unittest.TestCase):
 
     def test_game_page_has_explicit_index_header(self):
         client = app.test_client()
-        page = client.get("/gioco")
+        page = client.get("/quiz/indovina-la-regione")
         self.assertEqual(
             page.headers.get("X-Robots-Tag"),
             "index, follow, max-snippet:-1, max-image-preview:large",
         )
 
+    def test_hub_page_responds(self):
+        client = app.test_client()
+        page = client.get("/quiz")
+        self.assertEqual(page.status_code, 200)
+        self.assertIn(b'id="hub-root"', page.data)
+        self.assertIn("Quanto conosci l'Italia?".encode(), page.data)
+        for href in (b"/quiz/indovina-la-regione", b"/quiz/chi-e-maggiore", b"/quiz/ordina"):
+            self.assertIn(href, page.data)
+
+    def test_legacy_gioco_paths_redirect_permanently(self):
+        client = app.test_client()
+        cases = {
+            "/gioco": "/quiz",
+            "/gioco/chi-e-maggiore": "/quiz/chi-e-maggiore",
+            "/gioco/ordina": "/quiz/ordina",
+        }
+        for old, new in cases.items():
+            response = client.get(old, follow_redirects=False)
+            self.assertEqual(response.status_code, 301, old)
+            self.assertTrue(response.headers["Location"].endswith(new), old)
+
     def test_sitemap_lists_game_page(self):
         client = app.test_client()
-        sitemap = client.get("/sitemap.xml")
-        self.assertIn(b"/gioco", sitemap.data)
+        sitemap = client.get("/sitemap.xml").data
+        self.assertIn(b"/quiz<", sitemap)
+        self.assertIn(b"/quiz/indovina-la-regione", sitemap)
+        self.assertNotIn(b"/gioco", sitemap)
 
     def test_game_regions_api(self):
         client = app.test_client()
@@ -50,7 +73,10 @@ class GameTest(unittest.TestCase):
         self.assertIn("puzzle_id", first)
         self.assertTrue(first["puzzle_id"].startswith("daily:"))
         self.assertIn("clue", first)
-        for field in ("id", "name", "theme", "macro_area", "unit", "year", "value", "rank", "region_count"):
+        for field in (
+            "id", "name", "theme", "macro_area", "unit", "year", "value", "rank",
+            "region_count", "source_label", "source_url",
+        ):
             self.assertIn(field, first["clue"])
         self.assertGreaterEqual(first["clue"]["rank"], 1)
         self.assertLessEqual(first["clue"]["rank"], first["clue"]["region_count"])
@@ -256,7 +282,7 @@ class GameTest(unittest.TestCase):
 class QuizCompareTest(unittest.TestCase):
     def test_compare_page_responds_without_map(self):
         client = app.test_client()
-        page = client.get("/gioco/chi-e-maggiore")
+        page = client.get("/quiz/chi-e-maggiore")
         self.assertEqual(page.status_code, 200)
         self.assertIn(b'id="compare-root"', page.data)
         self.assertNotIn(b'id="game-map-frame"', page.data)
@@ -268,11 +294,14 @@ class QuizCompareTest(unittest.TestCase):
         response = client.get("/api/game/compare/round?difficulty=2")
         self.assertEqual(response.status_code, 200)
         payload = response.get_json()
-        for field in ("id", "name", "theme", "macro_area", "unit", "year"):
+        for field in ("id", "name", "theme", "macro_area", "unit", "year", "source_label", "source_url"):
             self.assertIn(field, payload["indicator"])
+        self.assertTrue(payload["indicator"]["source_url"].startswith("http"))
         self.assertEqual(payload["difficulty"], 2)
         self.assertNotEqual(payload["region_a"]["region_key"], payload["region_b"]["region_key"])
         self.assertNotIn('"value"', json.dumps(payload))
+        # La descrizione si rivela solo alla risposta, non nel round.
+        self.assertNotIn("description", payload["indicator"])
 
     def test_compare_rounds_use_core_indicators_with_distinct_values(self):
         from app import quiz
@@ -350,6 +379,9 @@ class QuizCompareTest(unittest.TestCase):
         self.assertTrue(right["correct"])
         self.assertEqual(right["winner"], winner)
         self.assertEqual(right["region_a"]["value"], values[key_a])
+        self.assertTrue(right["indicator"]["description"])
+        self.assertTrue(right["indicator"]["source_url"].startswith("http"))
+        self.assertTrue(right["indicator"]["source_label"])
 
         wrong = answer(loser)
         self.assertFalse(wrong["correct"])
@@ -386,7 +418,7 @@ class QuizCompareTest(unittest.TestCase):
 class QuizOrderTest(unittest.TestCase):
     def test_order_page_responds_without_map(self):
         client = app.test_client()
-        page = client.get("/gioco/ordina")
+        page = client.get("/quiz/ordina")
         self.assertEqual(page.status_code, 200)
         self.assertIn(b'id="order-root"', page.data)
         self.assertNotIn(b'id="game-map-frame"', page.data)
@@ -404,6 +436,9 @@ class QuizOrderTest(unittest.TestCase):
             keys = [r["region_key"] for r in payload["regions"]]
             self.assertEqual(len(set(keys)), count)
             self.assertNotIn('"value"', json.dumps(payload))
+            for field in ("source_label", "source_url"):
+                self.assertIn(field, payload["indicator"])
+            self.assertNotIn("description", payload["indicator"])
 
         for bad in ("2", "6", "x", ""):
             self.assertEqual(client.get(f"/api/game/order/round?count={bad}").status_code, 400, bad)
@@ -429,6 +464,9 @@ class QuizOrderTest(unittest.TestCase):
         self.assertEqual(full["total"], 3)
         self.assertTrue(all(p["correct"] for p in full["positions"]))
         self.assertEqual([r["region_key"] for r in full["correct_order"]], perfect)
+        self.assertTrue(full["indicator"]["description"])
+        self.assertTrue(full["indicator"]["source_url"].startswith("http"))
+        self.assertEqual(full["indicator"]["id"], indicator_id)
 
         reversed_resp = answer(list(reversed(perfect))).get_json()
         self.assertLess(reversed_resp["score"], 3)
@@ -463,8 +501,8 @@ class QuizOrderTest(unittest.TestCase):
     def test_sitemap_lists_quiz_pages(self):
         client = app.test_client()
         sitemap = client.get("/sitemap.xml").data
-        self.assertIn(b"/gioco/chi-e-maggiore", sitemap)
-        self.assertIn(b"/gioco/ordina", sitemap)
+        self.assertIn(b"/quiz/chi-e-maggiore", sitemap)
+        self.assertIn(b"/quiz/ordina", sitemap)
 
 
 def game_region_keys():

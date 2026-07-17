@@ -135,6 +135,8 @@ def _clue_fields(item):
         "value": item["value"],
         "rank": item["rank"],
         "region_count": item["region_count"],
+        "source_label": item["source_label"],
+        "source_url": item["source_url"],
     }
 
 

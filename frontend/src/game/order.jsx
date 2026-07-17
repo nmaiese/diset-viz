@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { fetchJson, formatValue, trackGameEvent, Modal } from "./main.jsx";
+import { fetchJson, formatValue, trackGameEvent, Modal, SourceStrip, SubmitScoreModal } from "./shared.jsx";
 
 const API = {
-  round: (count) => `/api/game/order/round?count=${count}`,
+  round: (count, token) =>
+    `/api/game/order/round?count=${count}${token ? `&token=${encodeURIComponent(token)}` : ""}`,
   answer: "/api/game/order/answer",
 };
 
@@ -34,6 +35,8 @@ export default function OrderApp() {
   const [sequence, setSequence] = useState([]); // region_key nell'ordine toccato
   const [result, setResult] = useState(null);
   const [stats, setStats] = useState(loadStats);
+  const [sessionBest, setSessionBest] = useState(0);
+  const [showScoreModal, setShowScoreModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => {
     try {
       return !window.localStorage.getItem(STORAGE_ONBOARDED_KEY);
@@ -43,6 +46,8 @@ export default function OrderApp() {
   });
 
   const submittingRef = useRef(false);
+  const tokenRef = useRef(null);
+  const promptedBestRef = useRef(0);
 
   useEffect(() => {
     trackGameEvent("order_start", { count });
@@ -55,8 +60,9 @@ export default function OrderApp() {
     setResult(null);
     setSequence([]);
     submittingRef.current = false;
-    fetchJson(API.round(n))
+    fetchJson(API.round(n, tokenRef.current))
       .then((data) => {
+        tokenRef.current = data.token;
         setRound(data);
         setStatus("ordering");
       })
@@ -84,11 +90,13 @@ export default function OrderApp() {
         indicator_id: round.indicator.id,
         year: round.indicator.year,
         region_keys: sequence,
+        token: tokenRef.current,
       }),
     })
       .then((data) => {
         setResult(data);
         setStatus("revealed");
+        tokenRef.current = data.token;
         setStats((prev) => {
           const bestKey = round.count === 3 ? "bestScore3" : "bestScore5";
           const next = {
@@ -100,6 +108,14 @@ export default function OrderApp() {
           saveStats(next);
           return next;
         });
+        if (data.session) {
+          setSessionBest(data.session.best);
+          const isPerfect = data.score === data.total;
+          if (!isPerfect && data.session.best > promptedBestRef.current && data.session.best >= 2) {
+            promptedBestRef.current = data.session.best;
+            setShowScoreModal(true);
+          }
+        }
         trackGameEvent("order_answer", { score: data.score, total: data.total });
       })
       .catch(() => setStatus("error"));
@@ -137,6 +153,12 @@ export default function OrderApp() {
           ))}
         </div>
         <span className="order-best">Record: {best}/{count}</span>
+        {sessionBest > 0 && <span className="order-best">Serie perfetta: {sessionBest}</span>}
+        {sessionBest > 0 && (
+          <button type="button" className="game-tab game-tab--ghost" onClick={() => setShowScoreModal(true)}>
+            Entra in classifica
+          </button>
+        )}
       </div>
 
       {status === "error" && (
@@ -156,9 +178,14 @@ export default function OrderApp() {
             </span>
             <h2>{round.indicator.name}</h2>
             <p className="order-meta">
-              {round.indicator.macro_area} · {round.indicator.theme} · {round.indicator.year}
+              {round.indicator.macro_area} · {round.indicator.theme}
               {round.indicator.unit && ` · ${round.indicator.unit}`}
             </p>
+            <SourceStrip
+              year={round.indicator.year}
+              sourceLabel={round.indicator.source_label}
+              sourceUrl={round.indicator.source_url}
+            />
           </div>
 
           <div className={`order-cards order-cards--${round.count}`}>
@@ -236,6 +263,9 @@ export default function OrderApp() {
 
           {status === "revealed" && result && (
             <>
+              {result.indicator.description && (
+                <p className="quiz-description">{result.indicator.description}</p>
+              )}
               <div className="order-solution">
                 <h3>La classifica reale</h3>
                 <ol>
@@ -287,6 +317,16 @@ export default function OrderApp() {
           </ol>
           <button type="button" className="game-btn" onClick={closeOnboarding}>Ho capito, gioco</button>
         </Modal>
+      )}
+
+      {showScoreModal && (
+        <SubmitScoreModal
+          mode="order"
+          token={tokenRef.current}
+          score={sessionBest}
+          scoreLabel={`${sessionBest} round perfetti di fila`}
+          onClose={() => setShowScoreModal(false)}
+        />
       )}
     </div>
   );

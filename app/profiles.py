@@ -161,6 +161,8 @@ def _indicator_meta():
             "direction": (item.get("explain") or {}).get("direction"),
             "year_max": item["year_max"],
             "path": indicator_path(item["id"], item["name"]),
+            "source_label": item.get("source_label"),
+            "source_url": item.get("source_url"),
         }
         for item in get_catalog()["indicators"]
     }
@@ -378,6 +380,8 @@ def _region_indicators(region_key):
             "path": info["path"],
             "unit": info["unit"],
             "direction": info["direction"],
+            "source_label": info["source_label"],
+            "source_url": info["source_url"],
             "value": stat["values"][region_key],
             "year": stat["year"],
             "freshness_status": freshness_status(stat["year"]),

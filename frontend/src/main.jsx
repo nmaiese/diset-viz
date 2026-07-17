@@ -446,7 +446,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
         </a>
         <a href="/temi" onClick={() => setNavOpen(false)}>Temi</a>
         <a href="/qualita-della-vita" onClick={() => setNavOpen(false)}>Qualità della vita</a>
-        <a href="/gioco" onClick={() => setNavOpen(false)}>Gioco</a>
+        <a href="/quiz" onClick={() => setNavOpen(false)}>Quiz Italia</a>
         <a href="/metodologia" onClick={() => setNavOpen(false)}>Metodologia</a>
         <a href="/blog" onClick={() => setNavOpen(false)}>Blog</a>
         <a
@@ -481,7 +481,7 @@ function SiteFooter() {
         , indicatori territoriali per le politiche di sviluppo
       </span>
       <span>
-        <a href="/">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/gioco">Gioco</a> · <a href="/metodologia">Metodologia</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
+        <a href="/">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
       </span>
       {hasConsentPreferences && (
         <button className="privacy-settings-link" type="button" onClick={() => window.diOpenConsentPreferences()}>
