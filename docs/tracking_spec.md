@@ -130,6 +130,7 @@ Host principali autorizzati oggi:
 - `ep2.adtrafficquality.google`
 - `ssl.gstatic.com`
 - `www.gstatic.com`
+- `www.google.it`
 - `www.google-analytics.com`
 - `*.google-analytics.com`
 - `*.analytics.google.com`

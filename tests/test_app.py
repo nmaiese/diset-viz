@@ -23,6 +23,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://fonts.googleapis.com", csp)
         self.assertIn("https://ssl.gstatic.com", csp)
         self.assertIn("https://www.gstatic.com", csp)
+        self.assertIn("https://www.google.it", csp)
         self.assertIn("https://ep1.adtrafficquality.google", csp)
         self.assertIn("https://ep2.adtrafficquality.google", csp)
         self.assertIn("frame-src", csp)
