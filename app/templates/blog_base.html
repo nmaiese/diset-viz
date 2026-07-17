@@ -37,14 +37,6 @@
           <small>Atlante degli indicatori territoriali</small>
         </span>
       </a>
-      <button type="button" class="masthead__toggle" aria-expanded="false" aria-controls="masthead-nav" aria-label="Apri il menu">
-        <svg class="icon-menu" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <path d="M3 5.5H17M3 10H17M3 14.5H17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-        <svg class="icon-close" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <path d="M4.5 4.5L15.5 15.5M15.5 4.5L4.5 15.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-      </button>
       <nav id="masthead-nav" class="masthead__links">
         <a href="/" class="{{ 'is-active' if active_nav == 'atlas' else '' }}">Atlante</a>
         <a href="/regioni" class="{{ 'is-active' if active_nav == 'regioni' else '' }}">Regioni</a>
@@ -55,7 +47,36 @@
         <a href="/blog" class="{{ 'is-active' if active_nav == 'blog' else '' }}">Blog</a>
         <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Fonte Istat</a>
       </nav>
+      <a class="masthead__search" href="/" aria-label="Cerca nell'atlante">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+      </a>
     </header>
+
+    <nav class="tabbar" aria-label="Navigazione principale">
+      <a href="/" class="tabbar__item {{ 'is-active' if active_nav == 'atlas' else '' }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"></path></svg>
+        <span>Atlante</span>
+      </a>
+      <a href="/regioni" class="tabbar__item {{ 'is-active' if active_nav == 'regioni' else '' }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+        <span>Regioni</span>
+      </a>
+      <a href="/qualita-della-vita" class="tabbar__item {{ 'is-active' if active_nav == 'qualita-della-vita' else '' }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+        <span>Qualità</span>
+      </a>
+      <a href="/quiz" class="tabbar__item {{ 'is-active' if active_nav == 'gioco' else '' }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16"></rect><circle cx="8" cy="8" r="1"></circle><circle cx="16" cy="8" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="8" cy="16" r="1"></circle><circle cx="16" cy="16" r="1"></circle></svg>
+        <span>Gioco</span>
+      </a>
+      <a href="/blog" class="tabbar__item {{ 'is-active' if active_nav == 'blog' else '' }}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg>
+        <span>Blog</span>
+      </a>
+    </nav>
 
     {% block content %}{% endblock %}
 
@@ -66,6 +87,5 @@
       {% include "_funding_choices_revoke.html" %}
       {% endblock %}
     </footer>
-    <script src="{{ url_for('static', filename='js/nav-toggle.js') }}" defer></script>
   </body>
 </html>

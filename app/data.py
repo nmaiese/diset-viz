@@ -33,6 +33,32 @@ REGION_ORDER = [
     "Sardegna",
 ]
 
+# ISTAT's standard geographic partition (ripartizione geografica), Nord
+# collapsing Nord-ovest/Nord-est: used only for the region page's eyebrow, not
+# for any scoring or filtering.
+REGION_GEO_AREA = {
+    "piemonte": "Nord",
+    "valle-d-aosta": "Nord",
+    "lombardia": "Nord",
+    "trentino-alto-adige": "Nord",
+    "veneto": "Nord",
+    "friuli-venezia-giulia": "Nord",
+    "liguria": "Nord",
+    "emilia-romagna": "Nord",
+    "toscana": "Centro",
+    "umbria": "Centro",
+    "marche": "Centro",
+    "lazio": "Centro",
+    "abruzzo": "Sud",
+    "molise": "Sud",
+    "campania": "Sud",
+    "puglia": "Sud",
+    "basilicata": "Sud",
+    "calabria": "Sud",
+    "sicilia": "Isole",
+    "sardegna": "Isole",
+}
+
 
 # Verifiable source links per indicator. Most series come from the Banca dati
 # territoriale per le politiche di sviluppo (BDTPS); the "Reddito e ricchezza"
@@ -297,6 +323,12 @@ def get_indicator(indicator_id):
         for row in sorted(rows, key=lambda item: (item["year"], _region_sort_key(item["territory"])))
     ]
 
+    national_avg = _national_average(rows, years)
+    spark = [
+        {"year": point["year"], "value": round(point["value"], 3)}
+        for point in _downsample(national_avg, 24)
+    ]
+
     metadata = enrich_indicator_metadata({
         "id": indicator_id,
         "theme": first["theme"],
@@ -311,6 +343,7 @@ def get_indicator(indicator_id):
         "year_min": years[0],
         "year_max": years[-1],
         "regions": regions,
+        "spark": spark,
     })
 
     return {

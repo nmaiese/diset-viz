@@ -244,6 +244,8 @@ def indicator_page(slug):
     stats = indicator_trend_stats(payload, year, values, best, worst)
     trend_note = indicator_notes.trend_framing(direction, stats["avg_change_pct"])
     is_indexable = profiles.is_search_indexable_indicator(meta)
+    map_colors = indicator_notes.region_choropleth_colors(values)
+    spark_points = indicator_notes.sparkline_points(meta.get("spark") or [])
     response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
@@ -254,6 +256,8 @@ def indicator_page(slug):
         stats=stats,
         trend_note=trend_note,
         is_indexable=is_indexable,
+        map_colors=map_colors,
+        spark_points=spark_points,
         seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
         seo_description=indicator_notes.seo_description(plain, meta["year_max"], len(meta["regions"])),
         theme_path=profiles.theme_path(meta["theme"]),
@@ -510,11 +514,15 @@ def quality_life_region_api_legacy(region_key):
 
 @app.route("/qualita-della-vita")
 def quality_life_index():
+    preview = qb.build_bes_ranking(URL_LEVEL["regioni"], qb.DEFAULT_PROFILE)
+    preview_rows = preview["ranking"][:3] if preview else []
     return render_template(
         "quality_life_index.html",
         categories=qb.get_quality_life_categories(),
         profiles=qb.get_quality_life_profiles(),
         default_profile=qb.DEFAULT_PROFILE,
+        preview_rows=preview_rows,
+        has_province_data=qb.has_bes_data(URL_LEVEL["province"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/qualita-della-vita",

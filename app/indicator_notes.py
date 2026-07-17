@@ -578,6 +578,56 @@ def _direction(name):
     return "contextual"
 
 
+# Same two hex stops as --map-ramp-from/--map-ramp-to (colors.css) and the
+# SPA's MAP_RAMP (frontend/src/main.jsx): a linear RGB interpolation, not a
+# perceptual color space, to stay pixel-identical with the interactive map.
+_MAP_RAMP_FROM = (0xE7, 0xEC, 0xF3)
+_MAP_RAMP_TO = (0x15, 0x23, 0x3B)
+
+
+def region_choropleth_colors(values):
+    """Per-region hex fill for the static indicator-page choropleth: {region_key: "#rrggbb"},
+    scaled over the raw value range like the SPA's d3.scaleSequential(MAP_RAMP)."""
+    numeric = [row["value"] for row in values if row.get("value") is not None]
+    if not numeric:
+        return {}
+    lo, hi = min(numeric), max(numeric)
+    span = hi - lo
+    colors = {}
+    for row in values:
+        value = row.get("value")
+        if value is None:
+            continue
+        t = (value - lo) / span if span else 1.0
+        rgb = tuple(
+            round(_MAP_RAMP_FROM[i] + (_MAP_RAMP_TO[i] - _MAP_RAMP_FROM[i]) * t)
+            for i in range(3)
+        )
+        colors[row["region_key"]] = "#%02x%02x%02x" % rgb
+    return colors
+
+
+def sparkline_points(spark, width=320, height=64, pad=4):
+    """SVG <polyline> "x,y x,y ..." string for the indicator page's inline trend
+    chart, from the national-average series in get_indicator()'s metadata.spark."""
+    values = [point["value"] for point in spark if point.get("value") is not None]
+    if len(values) < 2:
+        return ""
+    lo, hi = min(values), max(values)
+    span = (hi - lo) or 1.0
+    count = len(spark)
+    step = (width - 2 * pad) / (count - 1) if count > 1 else 0
+    coords = []
+    for index, point in enumerate(spark):
+        value = point.get("value")
+        if value is None:
+            continue
+        x = pad + index * step
+        y = pad + (height - 2 * pad) * (1 - (value - lo) / span)
+        coords.append(f"{x:.1f},{y:.1f}")
+    return " ".join(coords)
+
+
 def _clean(value):
     return " ".join((value or "").split())
 

@@ -22,7 +22,7 @@ import unicodedata
 from collections import defaultdict
 
 from app.cache import cache
-from app.data import REGION_ORDER, get_catalog, get_rows
+from app.data import REGION_GEO_AREA, REGION_ORDER, get_catalog, get_rows
 from app.external_data import count_freshness, freshness_status
 from app.indicator_notes import THEME_CAVEATS, THEME_EXAMPLES, macro_area_for
 
@@ -338,9 +338,23 @@ def region_profile(region_key):
         [i for i in moved if i["movement"] < 0], key=lambda i: i["movement"]
     )[:6]
 
+    # Same restriction as the movement section: only indicators complete on all
+    # 20 regions are comparable on a single 1..20 "posizione media" scale.
+    comparable_ranks = [
+        i["rank"] for i in all_indicators
+        if i["rank"] is not None and i["region_count"] == len(REGION_ORDER)
+    ]
+    avg_rank = round(sum(comparable_ranks) / len(comparable_ranks)) if comparable_ranks else None
+    top5_count = sum(1 for r in comparable_ranks if r <= 5)
+
     return {
         "region": region,
         "region_key": region_key,
+        "geo_area": REGION_GEO_AREA.get(region_key),
+        "avg_rank": avg_rank,
+        "region_total": len(REGION_ORDER),
+        "top5_count": top5_count,
+        "comparable_count": len(comparable_ranks),
         "scored_count": len(scored),
         "data_freshness": count_freshness(all_indicators),
         "theme_table": theme_table,

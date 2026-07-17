@@ -38,8 +38,29 @@
 {% block content %}
 <article class="page page-region wrap">
   <nav class="breadcrumb"><a href="/regioni">Regioni</a></nav>
+  <div class="region-kicker">
+    <p class="section-label">Profilo regione{% if p.geo_area %} · {{ p.geo_area }}{% endif %}</p>
+    {% if p.avg_rank %}<span class="tag-pill">Media {{ p.avg_rank }}ª su {{ p.region_total }}</span>{% endif %}
+  </div>
   <h1>{{ p.region }}</h1>
   <p class="page-lead">Come se la passa {{ p.region }} rispetto alle altre regioni italiane, tema per tema. Il profilo mette in evidenza ambiti forti, ambiti fragili, posizioni e movimenti recenti sugli indicatori Istat per cui sappiamo se è meglio salire o scendere.</p>
+
+  <nav class="region-anchors" aria-label="Sezioni del profilo">
+    <a href="#forza">Punti di forza</a>
+    <a href="#debole">Punti deboli</a>
+    {% if p.movement_gains or p.movement_losses %}<a href="#movimento">Movimento</a>{% endif %}
+    <a href="#explorer" class="is-primary">Esplora</a>
+  </nav>
+
+  {% if p.avg_rank or p.themes_strong or p.themes_weak %}
+  <div class="region-facts">
+    {% if p.comparable_count %}<div><small>Top 5</small><strong>{{ p.top5_count }} / {{ p.comparable_count }}</strong></div>{% endif %}
+    {% if p.avg_rank %}<div><small>Pos. media</small><strong>{{ p.avg_rank }}ª</strong></div>{% endif %}
+    {% if p.themes_strong %}<div><small>Forza</small><strong>{{ p.themes_strong[0].theme }}</strong></div>{% endif %}
+    {% if p.themes_weak %}<div><small>Debole</small><strong>{{ p.themes_weak[0].theme }}</strong></div>{% endif %}
+  </div>
+  {% endif %}
+
   <div class="freshness-strip" aria-label="Freschezza dati del profilo">
     <span><b>{{ p.data_freshness.current }}</b> aggiornati</span>
     <span><b>{{ p.data_freshness.recent }}</b> recenti</span>
@@ -47,8 +68,21 @@
     <span><b>{{ p.data_freshness.stale }}</b> datati</span>
   </div>
 
+  <div class="region-layout">
+  <div class="region-locator">
+    <p class="section-label">Dove si trova</p>
+    <style>
+      .region-locator .rmap-region { fill: #e2e0d8; }
+      .region-locator [data-key="{{ p.region_key }}"] { fill: var(--accent); }
+    </style>
+    <div class="indicator-map region-locator-map">
+      {% include "_italy_map.html" %}
+    </div>
+  </div>
+  <div class="region-main">
+
   <div class="profile-cols">
-    <section class="profile-card profile-strong">
+    <section class="profile-card profile-strong" id="forza">
       <h2>Dove eccelle</h2>
       {% if p.themes_strong %}
       <ul class="theme-chips">
@@ -66,7 +100,7 @@
       {% endif %}
     </section>
 
-    <section class="profile-card profile-weak">
+    <section class="profile-card profile-weak" id="debole">
       <h2>Dove resta indietro</h2>
       {% if p.themes_weak %}
       <ul class="theme-chips">
@@ -88,7 +122,7 @@
   {% if p.movement_gains or p.movement_losses %}
   {% set move_values = (p.movement_gains + p.movement_losses) | map(attribute='movement') | map('abs') | list %}
   {% set move_max = move_values | max if move_values else 1 %}
-  <section class="profile-movement">
+  <section class="profile-movement" id="movimento">
     <h2>Il movimento dell'ultimo anno</h2>
     <p class="page-note">Quante posizioni {{ p.region }} ha guadagnato o perso rispetto alle altre regioni, confrontando l'ultimo anno disponibile con l'anno comparabile più recente (gli anni esatti sono indicati su ogni riga). Calcolato solo sugli indicatori direzionali e completi su tutte e 20 le regioni in entrambi gli anni.</p>
     <div class="movement-cols">
@@ -215,6 +249,9 @@
     <p class="explorer-empty" id="explorer-empty" hidden>Nessun indicatore corrisponde ai filtri scelti.</p>
   </section>
   {% endif %}
+
+  </div>
+  </div>
 
   <section class="profile-similar">
     <h2>Regioni con un profilo simile</h2>

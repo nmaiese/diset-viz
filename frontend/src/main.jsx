@@ -16,7 +16,6 @@ import {
   Layers,
   LineChart,
   MapPinned,
-  Menu,
   Minus,
   Search,
   TrendingDown,
@@ -374,102 +373,100 @@ function App() {
 /* ------------------------------------------------------------------ */
 
 function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
-  const [navOpen, setNavOpen] = useState(false);
-  const headerRef = useRef(null);
-
   const handleLocalNav = (event, handler) => {
     if (handler && !event.metaKey && !event.ctrlKey && event.button === 0) {
       event.preventDefault();
       handler();
     }
-    setNavOpen(false);
   };
 
-  // Il menu mobile è un overlay indipendente dal flusso della vista: va
-  // chiuso quando l'utente cambia sezione (altrimenti resta aperto sopra
-  // contenuto che non c'entra più), su click fuori e con Escape.
-  useEffect(() => {
-    setNavOpen(false);
-  }, [activeNav]);
-
-  useEffect(() => {
-    if (!navOpen) return undefined;
-    function handlePointerDown(event) {
-      if (headerRef.current && !headerRef.current.contains(event.target)) {
-        setNavOpen(false);
-      }
-    }
-    function handleKeyDown(event) {
-      if (event.key === "Escape") setNavOpen(false);
-    }
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [navOpen]);
-
   return (
-    <header className="masthead" ref={headerRef}>
-      <a className="brand" href="/" aria-label="Divario Italia, home">
-        <span className="brand-mark">DI</span>
-        <span className="brand-text">
-          <strong>Divario Italia</strong>
-          <small>Atlante degli indicatori territoriali</small>
-        </span>
-      </a>
-      {children}
-      <button
-        type="button"
-        className="masthead__toggle"
-        aria-expanded={navOpen}
-        aria-controls="masthead-nav"
-        aria-label={navOpen ? "Chiudi il menu" : "Apri il menu"}
-        onClick={() => setNavOpen((open) => !open)}
-      >
-        {navOpen ? <X size={20} /> : <Menu size={20} />}
-      </button>
-      <nav
-        id="masthead-nav"
-        className={navOpen ? "masthead__links is-open" : "masthead__links"}
-        aria-label="Collegamenti"
-      >
+    <>
+      <header className="masthead">
+        <a className="brand" href="/" aria-label="Divario Italia, home">
+          <span className="brand-mark">DI</span>
+          <span className="brand-text">
+            <strong>Divario Italia</strong>
+            <small>Atlante degli indicatori territoriali</small>
+          </span>
+        </a>
+        {children}
+        <nav id="masthead-nav" className="masthead__links" aria-label="Collegamenti">
+          <a
+            href="/"
+            className={activeNav === "atlas" ? "is-active" : ""}
+            onClick={(event) => handleLocalNav(event, onNavAtlas)}
+          >
+            Atlante
+          </a>
+          <a
+            href="/regioni"
+            className={activeNav === "regioni" ? "is-active" : ""}
+            onClick={(event) => {
+              // Inside the SPA, keep the user in the interactive region mode
+              // instead of loading the server page (which stays for SEO/deep links).
+              handleLocalNav(event, onNavRegioni);
+            }}
+          >
+            Regioni
+          </a>
+          <a href="/temi">Temi</a>
+          <a href="/qualita-della-vita">Qualità della vita</a>
+          <a href="/quiz">Quiz Italia</a>
+          <a href="/metodologia">Metodologia</a>
+          <a href="/blog">Blog</a>
+          <a
+            href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Fonte Istat <ArrowUpRight size={13} />
+          </a>
+          <a href="https://github.com/nmaiese/diset-viz" target="_blank" rel="noreferrer" aria-label="GitHub">
+            <Github size={17} />
+          </a>
+        </nav>
         <a
+          className="masthead__search"
           href="/"
-          className={activeNav === "atlas" ? "is-active" : ""}
+          aria-label="Cerca nell'atlante"
           onClick={(event) => handleLocalNav(event, onNavAtlas)}
         >
-          Atlante
+          <Search size={18} />
+        </a>
+      </header>
+
+      <nav className="tabbar" aria-label="Navigazione principale">
+        <a
+          href="/"
+          className={activeNav === "atlas" ? "tabbar__item is-active" : "tabbar__item"}
+          onClick={(event) => handleLocalNav(event, onNavAtlas)}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"></path></svg>
+          <span>Atlante</span>
         </a>
         <a
           href="/regioni"
-          className={activeNav === "regioni" ? "is-active" : ""}
-          onClick={(event) => {
-            // Inside the SPA, keep the user in the interactive region mode
-            // instead of loading the server page (which stays for SEO/deep links).
-            handleLocalNav(event, onNavRegioni);
-          }}
+          className={activeNav === "regioni" ? "tabbar__item is-active" : "tabbar__item"}
+          onClick={(event) => handleLocalNav(event, onNavRegioni)}
         >
-          Regioni
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+          <span>Regioni</span>
         </a>
-        <a href="/temi" onClick={() => setNavOpen(false)}>Temi</a>
-        <a href="/qualita-della-vita" onClick={() => setNavOpen(false)}>Qualità della vita</a>
-        <a href="/quiz" onClick={() => setNavOpen(false)}>Quiz Italia</a>
-        <a href="/metodologia" onClick={() => setNavOpen(false)}>Metodologia</a>
-        <a href="/blog" onClick={() => setNavOpen(false)}>Blog</a>
-        <a
-          href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Fonte Istat <ArrowUpRight size={13} />
+        <a href="/qualita-della-vita" className="tabbar__item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+          <span>Qualità</span>
         </a>
-        <a href="https://github.com/nmaiese/diset-viz" target="_blank" rel="noreferrer" aria-label="GitHub">
-          <Github size={17} />
+        <a href="/quiz" className="tabbar__item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16"></rect><circle cx="8" cy="8" r="1"></circle><circle cx="16" cy="8" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="8" cy="16" r="1"></circle><circle cx="16" cy="16" r="1"></circle></svg>
+          <span>Gioco</span>
+        </a>
+        <a href="/blog" className="tabbar__item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg>
+          <span>Blog</span>
         </a>
       </nav>
-    </header>
+    </>
   );
 }
 

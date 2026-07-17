@@ -73,63 +73,48 @@
     <span><small>Download</small><a href="/download/indicator/{{ meta.id }}.csv">CSV</a> · <a href="/download/indicator/{{ meta.id }}.json">JSON</a></span>
   </div>
 
-  <section class="prose">
-    <p class="data-callout"><strong>Dato più recente: {{ year }}.</strong>{% if meta.year_min != meta.year_max %} La serie storica copre il periodo {{ meta.year_min }}-{{ meta.year_max }}.{% endif %}</p>
-    <p>{{ explain.example }}</p>
-    {% if meta.external_sources %}
-    <p class="page-note">Layer esterno collegato: {{ meta.external_sources | join(', ') }}{% if meta.external_year_max %}, ultimo anno normalizzato {{ meta.external_year_max }}{% endif %}.</p>
-    {% endif %}
-    <p>{{ explain.reading }}</p>
-    {% if best and worst %}
-    <p>Nel {{ year }} la posizione migliore è di <a href="/regione/{{ best.region_key }}">{{ best.region }}</a>
-      ({{ best.value | it_num(2) }} {{ meta.unit }}), mentre <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a>
-      segna il dato più sfavorevole ({{ worst.value | it_num(2) }} {{ meta.unit }}).</p>
-    {% endif %}
-    <p class="page-caveat">{{ explain.caveat }}</p>
-
-    {% if stats.year_avg is not none or stats.gap_abs is not none %}
-    <h2>Il quadro nazionale nel {{ year }}</h2>
+  {% if best and worst %}
+  <section class="indicator-insight">
+    <div class="indicator-insight__item is-best">
+      <small>Migliore, {{ year }}</small>
+      <strong><a href="/regione/{{ best.region_key }}">{{ best.region }}</a></strong>
+      <span>{{ best.value | it_num(2) }} {{ meta.unit }}</span>
+    </div>
     {% if stats.year_avg is not none %}
-    <h3>Media e mediana delle regioni</h3>
-    <p>Nel {{ year }} il valore medio tra le {{ stats.year_count }} regioni con un dato disponibile è {{ stats.year_avg | it_num(2) }} {{ meta.unit }}.
-      {% if stats.median is not none %}Il valore mediano è {{ stats.median | it_num(2) }} {{ meta.unit }}{% if stats.above_avg_count is not none and stats.below_avg_count is not none %}: {{ stats.above_avg_count }} regioni superano la media, {{ stats.below_avg_count }} restano sotto{% endif %}.
-      {% if (stats.median - stats.year_avg) | abs > 0.01 * (stats.year_avg | abs) %}Lo scarto tra media e mediana segnala che il dato non è distribuito in modo uniforme tra le regioni.{% endif %}
-      {% endif %}
-    </p>
+    <div class="indicator-insight__item">
+      <small>Media Italia, {{ year }}</small>
+      <strong>{{ stats.year_avg | it_num(2) }}</strong>
+      <span>{{ meta.unit }}, {{ stats.year_count }} regioni</span>
+    </div>
     {% endif %}
-    {% if stats.gap_abs is not none %}
-    <h3>Il divario tra le regioni</h3>
-    <p>La distanza tra <a href="/regione/{{ best.region_key }}">{{ best.region }}</a> e <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a> è di {{ stats.gap_abs | it_num(2) }} {{ meta.unit }}{% if stats.gap_ratio %}, pari a {{ stats.gap_ratio | it_num(1) }} volte il valore più basso{% endif %}. Il dato descrive lo scarto osservato. Da solo non stabilisce se la differenza sia statisticamente significativa.</p>
-    {% endif %}
-    {% endif %}
-
-    {% if stats.has_multi_year and stats.avg_change_abs is not none %}
-    <h2>Come cambia nel tempo</h2>
-    <h3>L'andamento della media nazionale</h3>
-    <p>Tra il {{ stats.year_min }} e il {{ stats.year_max }} la media nazionale è passata da {{ stats.year_min_avg | it_num(2) }} a {{ stats.year_avg | it_num(2) }} {{ meta.unit }}{% if stats.avg_change_pct is not none %} ({{ stats.avg_change_pct | it_num(1) }}%){% endif %}{% if trend_note %}, {{ trend_note }}{% endif %}.</p>
-
-    {% if stats.region_highest_delta and stats.region_lowest_delta %}
-    <h3>Le regioni che cambiano di più</h3>
-    <p>Tra il {{ stats.year_min }} e il {{ stats.year_max }}
-      {% if stats.region_highest_delta.kind == 'aumento' %}l'aumento maggiore si registra a <a href="/regione/{{ stats.region_highest_delta.region_key }}">{{ stats.region_highest_delta.region }}</a> (+{{ stats.region_highest_delta.delta | it_num(2) }} {{ meta.unit }})
-      {% else %}il calo più contenuto si registra a <a href="/regione/{{ stats.region_highest_delta.region_key }}">{{ stats.region_highest_delta.region }}</a> ({{ stats.region_highest_delta.delta | it_num(2) }} {{ meta.unit }})
-      {% endif %},
-      {% if stats.region_lowest_delta.kind == 'calo' %}mentre il calo maggiore si registra a <a href="/regione/{{ stats.region_lowest_delta.region_key }}">{{ stats.region_lowest_delta.region }}</a> ({{ stats.region_lowest_delta.delta | it_num(2) }} {{ meta.unit }})
-      {% else %}mentre l'aumento più contenuto si registra a <a href="/regione/{{ stats.region_lowest_delta.region_key }}">{{ stats.region_lowest_delta.region }}</a> (+{{ stats.region_lowest_delta.delta | it_num(2) }} {{ meta.unit }})
-      {% endif %}. Se questo sia un miglioramento o un peggioramento dipende dalla direzione dell'indicatore, spiegata più sopra in questa pagina.</p>
-    {% endif %}
-
-    {% if stats.gap_trend is not none %}
-    <h3>Il divario si allarga o si restringe?</h3>
-    <p>Nel {{ stats.year_min }} la distanza tra la regione migliore e quella peggiore era {{ stats.year_min_gap_abs | it_num(2) }} {{ meta.unit }}, nel {{ stats.year_max }} è {{ stats.gap_abs | it_num(2) }} {{ meta.unit }}.
-      {% if stats.gap_trend | abs < 0.01 * (stats.year_min_gap_abs | abs) %}Il divario tra le regioni è rimasto sostanzialmente stabile in questo periodo.
-      {% elif stats.gap_trend > 0 %}Il divario tra le regioni si è allargato di {{ stats.gap_trend | it_num(2) }} {{ meta.unit }} in questo periodo.
-      {% else %}Il divario tra le regioni si è ristretto di {{ (stats.gap_trend | abs) | it_num(2) }} {{ meta.unit }} in questo periodo.
-      {% endif %}
-    </p>
-    {% endif %}
-    {% endif %}
+    <div class="indicator-insight__item is-worst">
+      <small>Ultima, {{ year }}</small>
+      <strong><a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a></strong>
+      <span>{{ worst.value | it_num(2) }} {{ meta.unit }}</span>
+    </div>
   </section>
+  {% elif stats.year_avg is not none %}
+  <section class="indicator-insight">
+    <div class="indicator-insight__item">
+      <small>Media Italia, {{ year }}</small>
+      <strong>{{ stats.year_avg | it_num(2) }}</strong>
+      <span>{{ meta.unit }}, {{ stats.year_count }} regioni</span>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if map_colors %}
+  <section class="indicator-map-wrap">
+    <p class="section-label">Mappa: valore per regione, {{ year }}</p>
+    <style>
+      {% for key, color in map_colors.items() %}.indicator-map [data-key="{{ key }}"]{fill:{{ color }}}
+      {% endfor %}
+    </style>
+    <div class="indicator-map">
+      {% include "_italy_map.html" %}
+    </div>
+  </section>
+  {% endif %}
 
   <section class="page-ranking">
     <h2>La classifica delle regioni nel {{ year }}</h2>
@@ -152,6 +137,78 @@
       </tbody>
     </table>
   </section>
+
+  {% if spark_points %}
+  <section class="indicator-sparkline-wrap">
+    <p class="section-label">Serie storica {{ meta.year_min }}-{{ meta.year_max }}, media nazionale</p>
+    <div class="indicator-sparkline">
+      <svg viewBox="0 0 320 64" preserveAspectRatio="none" role="img" aria-label="Andamento della media nazionale nel tempo">
+        <polyline points="{{ spark_points }}"></polyline>
+      </svg>
+    </div>
+  </section>
+  {% endif %}
+
+  <details class="indicator-accordion">
+    <summary>Cos'è questo indicatore?</summary>
+    <section class="prose">
+      <p class="data-callout"><strong>Dato più recente: {{ year }}.</strong>{% if meta.year_min != meta.year_max %} La serie storica copre il periodo {{ meta.year_min }}-{{ meta.year_max }}.{% endif %}</p>
+      <p>{{ explain.example }}</p>
+      {% if meta.external_sources %}
+      <p class="page-note">Layer esterno collegato: {{ meta.external_sources | join(', ') }}{% if meta.external_year_max %}, ultimo anno normalizzato {{ meta.external_year_max }}{% endif %}.</p>
+      {% endif %}
+      <p>{{ explain.reading }}</p>
+      {% if best and worst %}
+      <p>Nel {{ year }} la posizione migliore è di <a href="/regione/{{ best.region_key }}">{{ best.region }}</a>
+        ({{ best.value | it_num(2) }} {{ meta.unit }}), mentre <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a>
+        segna il dato più sfavorevole ({{ worst.value | it_num(2) }} {{ meta.unit }}).</p>
+      {% endif %}
+      <p class="page-caveat">{{ explain.caveat }}</p>
+
+      {% if stats.year_avg is not none or stats.gap_abs is not none %}
+      <h2>Il quadro nazionale nel {{ year }}</h2>
+      {% if stats.year_avg is not none %}
+      <h3>Media e mediana delle regioni</h3>
+      <p>Nel {{ year }} il valore medio tra le {{ stats.year_count }} regioni con un dato disponibile è {{ stats.year_avg | it_num(2) }} {{ meta.unit }}.
+        {% if stats.median is not none %}Il valore mediano è {{ stats.median | it_num(2) }} {{ meta.unit }}{% if stats.above_avg_count is not none and stats.below_avg_count is not none %}: {{ stats.above_avg_count }} regioni superano la media, {{ stats.below_avg_count }} restano sotto{% endif %}.
+        {% if (stats.median - stats.year_avg) | abs > 0.01 * (stats.year_avg | abs) %}Lo scarto tra media e mediana segnala che il dato non è distribuito in modo uniforme tra le regioni.{% endif %}
+        {% endif %}
+      </p>
+      {% endif %}
+      {% if stats.gap_abs is not none %}
+      <h3>Il divario tra le regioni</h3>
+    <p>La distanza tra <a href="/regione/{{ best.region_key }}">{{ best.region }}</a> e <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a> è di {{ stats.gap_abs | it_num(2) }} {{ meta.unit }}{% if stats.gap_ratio %}, pari a {{ stats.gap_ratio | it_num(1) }} volte il valore più basso{% endif %}. Il dato descrive lo scarto osservato. Da solo non stabilisce se la differenza sia statisticamente significativa.</p>
+      {% endif %}
+      {% endif %}
+
+      {% if stats.has_multi_year and stats.avg_change_abs is not none %}
+      <h2>Come cambia nel tempo</h2>
+      <h3>L'andamento della media nazionale</h3>
+      <p>Tra il {{ stats.year_min }} e il {{ stats.year_max }} la media nazionale è passata da {{ stats.year_min_avg | it_num(2) }} a {{ stats.year_avg | it_num(2) }} {{ meta.unit }}{% if stats.avg_change_pct is not none %} ({{ stats.avg_change_pct | it_num(1) }}%){% endif %}{% if trend_note %}, {{ trend_note }}{% endif %}.</p>
+
+      {% if stats.region_highest_delta and stats.region_lowest_delta %}
+      <h3>Le regioni che cambiano di più</h3>
+      <p>Tra il {{ stats.year_min }} e il {{ stats.year_max }}
+        {% if stats.region_highest_delta.kind == 'aumento' %}l'aumento maggiore si registra a <a href="/regione/{{ stats.region_highest_delta.region_key }}">{{ stats.region_highest_delta.region }}</a> (+{{ stats.region_highest_delta.delta | it_num(2) }} {{ meta.unit }})
+        {% else %}il calo più contenuto si registra a <a href="/regione/{{ stats.region_highest_delta.region_key }}">{{ stats.region_highest_delta.region }}</a> ({{ stats.region_highest_delta.delta | it_num(2) }} {{ meta.unit }})
+        {% endif %},
+        {% if stats.region_lowest_delta.kind == 'calo' %}mentre il calo maggiore si registra a <a href="/regione/{{ stats.region_lowest_delta.region_key }}">{{ stats.region_lowest_delta.region }}</a> ({{ stats.region_lowest_delta.delta | it_num(2) }} {{ meta.unit }})
+        {% else %}mentre l'aumento più contenuto si registra a <a href="/regione/{{ stats.region_lowest_delta.region_key }}">{{ stats.region_lowest_delta.region }}</a> (+{{ stats.region_lowest_delta.delta | it_num(2) }} {{ meta.unit }})
+        {% endif %}. Se questo sia un miglioramento o un peggioramento dipende dalla direzione dell'indicatore, spiegata più sopra in questa pagina.</p>
+      {% endif %}
+
+      {% if stats.gap_trend is not none %}
+      <h3>Il divario si allarga o si restringe?</h3>
+      <p>Nel {{ stats.year_min }} la distanza tra la regione migliore e quella peggiore era {{ stats.year_min_gap_abs | it_num(2) }} {{ meta.unit }}, nel {{ stats.year_max }} è {{ stats.gap_abs | it_num(2) }} {{ meta.unit }}.
+        {% if stats.gap_trend | abs < 0.01 * (stats.year_min_gap_abs | abs) %}Il divario tra le regioni è rimasto sostanzialmente stabile in questo periodo.
+        {% elif stats.gap_trend > 0 %}Il divario tra le regioni si è allargato di {{ stats.gap_trend | it_num(2) }} {{ meta.unit }} in questo periodo.
+        {% else %}Il divario tra le regioni si è ristretto di {{ (stats.gap_trend | abs) | it_num(2) }} {{ meta.unit }} in questo periodo.
+        {% endif %}
+      </p>
+      {% endif %}
+      {% endif %}
+    </section>
+  </details>
 
   <aside class="indicator-cta">
     <span>

@@ -36,12 +36,47 @@
   <header class="quality-hero">
     <h1>Qualità della vita nelle regioni italiane</h1>
     <p class="page-lead">La classifica confronta regioni e province sugli indicatori BES dell'Istat. I pesi sono visibili e modificabili: si può verificare quanto il risultato dipenda dalle dimensioni considerate.</p>
-    <div class="quality-cta">
-      <a class="quality-btn quality-btn--primary" href="/qualita-della-vita/classifica/regioni">Classifica regioni</a>
-      <a class="quality-btn quality-btn--primary" href="/qualita-della-vita/classifica/province">Classifica province</a>
-      <a class="quality-btn" href="/qualita-della-vita/metodologia">Leggi la metodologia</a>
-    </div>
   </header>
+
+  <div class="quality-grid quality-entry-grid">
+    <a class="quality-card" href="/qualita-della-vita/classifica/regioni">
+      <small>Classifica</small>
+      <h3>Classifica delle regioni →</h3>
+      <p>Punteggio complessivo e per categoria, regione per regione.</p>
+    </a>
+    {% if has_province_data %}
+    <a class="quality-card" href="/qualita-della-vita/classifica/province">
+      <small>Approfondimento</small>
+      <h3>Classifica delle province →</h3>
+      <p>Una prima versione su base BES dei Territori, ancora in revisione.</p>
+    </a>
+    {% endif %}
+    <a class="quality-card" href="/qualita-della-vita/metodologia">
+      <small>Metodo</small>
+      <h3>Metodologia e fonti →</h3>
+      <p>Come vengono scelti gli indicatori e calcolato il punteggio.</p>
+    </a>
+  </div>
+
+  {% if preview_rows %}
+  <section class="quality-preview">
+    <p class="section-label">Anteprima: le prime regioni, profilo Equilibrato</p>
+    <ol class="quality-preview-list">
+      {% for row in preview_rows %}
+      <li>
+        <span class="quality-preview-rank">{{ row.rank }}</span>
+        <span class="quality-preview-name">{{ row.name }}</span>
+        <span class="quality-score-bar"><span style="width: {{ row.score | round | int }}%"></span></span>
+        <span class="quality-score">{{ row.score | it_num }}</span>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+  {% endif %}
+
+  {% if has_province_data %}
+  <p class="quality-note quality-disclaimer">La classifica provinciale è un lavoro in corso: leggila insieme alla <a href="/qualita-della-vita/metodologia">metodologia</a>, prima di considerarla definitiva.</p>
+  {% endif %}
 
   <p class="quality-note">Una sola misura, due livelli. Regioni (20) e province (103) sono confrontate con lo <strong>stesso framework</strong>, il BES dei Territori Istat, e lo stesso metodo. Cambiando profilo cambia il peso delle categorie, e la colonna del movimento mostra chi sale o scende. Categorie e direzioni sono curate ma rivedibili.</p>
 

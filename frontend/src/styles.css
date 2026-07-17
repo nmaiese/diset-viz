@@ -83,18 +83,33 @@ h1, h2, h3 { font-family: var(--font-display); }
 .masthead__links a:hover { color: var(--ink); }
 .masthead__links a.is-active { color: var(--ink); font-weight: 700; }
 
-.masthead__toggle {
+.masthead__search {
   display: none;
   margin-left: auto;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--line);
-  background: var(--panel);
-  color: var(--ink);
+  color: var(--muted);
   flex: 0 0 auto;
 }
+.masthead__search:hover { color: var(--ink); }
+
+/* Bottom tab bar: mobile-only primary nav, replaces the old hamburger menu. */
+.tabbar { display: none; }
+.tabbar__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 9px 2px 8px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+}
+.tabbar__item:hover { color: var(--ink); }
+.tabbar__item.is-active { color: var(--accent); border-top: 2px solid var(--accent); margin-top: -1px; }
 
 .site-footer {
   margin-top: 64px;
@@ -983,24 +998,21 @@ h1, h2, h3 { font-family: var(--font-display); }
 @media (max-width: 760px) {
   .masthead { flex-wrap: nowrap; }
   .brand-text small { display: none; }
-  .masthead__toggle { display: flex; }
-  .masthead__links {
-    display: none;
-    position: absolute;
-    top: 100%;
+  .masthead__links { display: none; }
+  .masthead__search { display: flex; }
+  .tabbar {
+    display: flex;
+    position: fixed;
     left: 0;
     right: 0;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2px;
-    margin-left: 0;
-    padding: 10px clamp(16px, 4vw, 48px) 16px;
+    bottom: 0;
+    z-index: 40;
     background: var(--paper);
-    border-bottom: 1px solid var(--line);
-    box-shadow: var(--shadow);
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
-  .masthead__links.is-open { display: flex; }
-  .masthead__links a { padding: 12px 4px; }
+  body { padding-bottom: 58px; }
+  .site-footer { padding-bottom: 74px; }
   .context-bar { align-items: stretch; flex-direction: column; gap: 10px; }
   .context-bar__tools { flex: 1 1 auto; }
   .context-bar .mode-switch { width: 100%; }
