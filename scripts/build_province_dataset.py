@@ -330,11 +330,21 @@ def build(level="province"):
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--level", choices=sorted(LEVELS), default="province")
+    parser.add_argument(
+        "--allow-regional-overwrite",
+        action="store_true",
+        help="Explicitly allow overwriting the national-BES regional live dataset.",
+    )
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
+    if args.level == "region" and not args.allow_regional_overwrite:
+        raise SystemExit(
+            "Regional live data now comes from scripts/update_bes_regions.py. "
+            "Use --allow-regional-overwrite only for an intentional diagnostic replacement."
+        )
     build(args.level)
 
 

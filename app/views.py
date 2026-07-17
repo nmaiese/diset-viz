@@ -9,6 +9,11 @@ from app.data import (
     indicator_trend_stats,
     search_indicators,
 )
+from app.atlas_catalog import (
+    get_atlas_catalog,
+    get_atlas_indicator,
+    get_atlas_indicator_year,
+)
 from app import profiles
 from app import indicator_notes
 from app import quality_life_bes as qb
@@ -103,7 +108,7 @@ def legacy_reddito():
 
 @app.route("/api/catalog")
 def catalog():
-    return jsonify(get_catalog())
+    return jsonify(get_atlas_catalog())
 
 
 @app.route("/api/external-indicators/manifest")
@@ -123,7 +128,7 @@ def search():
 
 @app.route("/api/indicator/<indicator_id>")
 def indicator(indicator_id):
-    payload = get_indicator(indicator_id)
+    payload = get_atlas_indicator(indicator_id)
     if payload is None:
         abort(404)
     return jsonify(payload)
@@ -131,7 +136,7 @@ def indicator(indicator_id):
 
 @app.route("/api/indicator/<indicator_id>/year/<int:year>")
 def indicator_year(indicator_id, year):
-    payload = get_indicator_year(indicator_id, year)
+    payload = get_atlas_indicator_year(indicator_id, year)
     if payload is None:
         abort(404)
     return jsonify(payload)

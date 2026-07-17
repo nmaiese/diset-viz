@@ -38,6 +38,7 @@ _DISPLAY_SPREAD = 12.0   # display = 50 + 12 * (standardised score), clipped to 
 _TOP_CATEGORIES = 3
 _TOP_INDICATORS = 5
 _TOP_PER_CATEGORY = 5
+_REGIONAL_CURRENT_YEAR = 2025
 
 
 def _display(z):
@@ -89,6 +90,11 @@ def _matrix_and_meta(level):
         if info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
             continue
         year_max = info["year_max"]
+        # The regional score uses the national BES intermediate release and is
+        # intentionally current-only. Provinces remain on BES dei Territori,
+        # whose latest edition currently reaches 2024 for most indicators.
+        if level == "regione" and year_max < _REGIONAL_CURRENT_YEAR:
+            continue
         latest = {
             row["territory_key"]: row["value"]
             for row in items
@@ -229,13 +235,20 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
         "level": level,
         "profile": profile,
         "categories": get_quality_life_categories(),
-        "data_freshness": quality_life_freshness_from_manifest(manifest),
+        "data_freshness": quality_life_freshness_from_manifest(
+            {indicator_id: manifest[indicator_id] for indicator_id in matrix}
+        ),
         "ranking": rows,
         "unrated": unrated,
         "champions": _champions(level, category_display, territories, expected),
         "category_rankings": _category_rankings(level, category_display, territories, expected),
         "methodology": {
-            "source": "Istat, BES dei Territori (Bes at local level)",
+            "source": (
+                "Istat, BES nazionale, aggiornamento intermedio 2026"
+                if level == "regione"
+                else "Istat, BES dei Territori (Bes at local level)"
+            ),
+            "minimum_reference_year": _REGIONAL_CURRENT_YEAR if level == "regione" else None,
             "territorial_level": "regioni" if level == "regione" else "province e città metropolitane",
             "normalization": "z-score orientato per indicatore (distanze conservate), display 0-100 con media 50.",
             "indicator_counts": {c: len(ids) for c, ids in by_category.items()},

@@ -9,14 +9,14 @@ indicatori mal orientati o macro-aree incomplete.
 
 ## Da dove arrivano i dati
 
-- Sorgente unica: `app/static/data/Assoluti_Regione.csv` (delimitatore `;`,
+- Backbone territoriale: `app/static/data/Assoluti_Regione.csv` (delimitatore `;`,
   12 colonne, 20 regioni). Generato da `scripts/update_data.py`, che scarica
   l'archivio Istat, normalizza i nomi regione e scrive il CSV.
 - Le **categorie (temi)** sono la colonna `Tema` del CSV, prese verbatim da Istat.
   Non esiste un elenco di temi hard-coded: backend e frontend leggono i temi dal
   catalogo. Quindi un tema nuovo nel CSV compare da solo.
-- Il **catalogo** (`app/data.py:get_catalog`) aggrega per indicatore e per tema,
-  calcola completezza, anni, sparkline e aggiunge la `macro_area`.
+- Il **catalogo territoriale** (`app/data.py:get_catalog`) aggrega il CSV legacy
+  per indicatore e tema, calcola completezza, anni, sparkline e `macro_area`.
 - I **profili regionali e le tematiche valutabili** (`app/profiles.py`) sono
   calcolati **a runtime** e messi in cache (`@cache.memoize(timeout=3600)`).
   Non c'è nessun artefatto precalcolato su disco: il "ricalcolo" avviene da solo
@@ -25,6 +25,16 @@ indicatori mal orientati o macro-aree incomplete.
   `app/static/data/external/normalized_external_indicators.csv`, con manifest in
   `app/static/data/external_indicator_manifest.csv`. Il loader è
   `app/external_data.py`.
+- La qualità della vita regionale usa un terzo strato separato:
+  `Assoluti_BES_Regione.csv`, generato dall'appendice regionale del BES nazionale
+  con `scripts/update_bes_regions.py`. Il punteggio regionale ammette solo
+  indicatori con ultimo anno almeno 2025, copertura almeno 80%, categoria e
+  direzione revisionate. Le province continuano a usare BES dei Territori.
+- Il **catalogo pubblico federato** (`app/atlas_catalog.py:get_atlas_catalog`)
+  presenta insieme il catalogo territoriale e tutti i 145 indicatori BES
+  regionali. Gli id BES hanno namespace `bes:*`. L'adattatore alimenta le stesse
+  mappe, classifiche e serie storiche della SPA, ma non modifica il CSV legacy e
+  non inserisce il BES nei profili o nei punteggi territoriali.
 
 ## Come funziona la valutazione delle tematiche
 
@@ -47,11 +57,11 @@ indicatori vanno quindi quasi sempre aggiunti a mano a `CURATED_DIRECTION`.
 
 ## Macro-aree (overlay non distruttivo)
 
-Le 26 tematiche Istat sono raggruppate in ~6 macro-aree in
+Le 26 tematiche del backbone territoriale sono raggruppate in ~6 macro-aree in
 `app/indicator_notes.py:MACRO_AREAS`. È un overlay: non tocca le etichette Istat,
-serve solo come filtro di livello superiore in atlante e pagine regione. La mappa
-è la sorgente unica: il catalogo (`macro_area` per indicatore/tema e lista
-`macro_areas[]`) e i profili la leggono da qui.
+serve come filtro di livello superiore in atlante e pagine regione. I 12 domini
+BES vengono associati alle stesse macro-aree nell'adattatore federato. Questa
+mappatura è soltanto di navigazione: non interviene nello scoring.
 
 Se un tema non è mappato, `macro_area_for` ritorna `"Altro"`: utile come
 campanello d'allarme, ma da correggere subito aggiungendo il tema a `MACRO_AREAS`.
@@ -86,6 +96,18 @@ CSV legacy:
 .venv/bin/python scripts/build_external_dataset.py --source all --year 2025
 .venv/bin/python scripts/audit_external_indicators.py
 ```
+
+Per aggiornare insieme i due backbone regionali e i fingerprint delle fonti:
+
+```bash
+.venv/bin/python scripts/refresh_official_data.py --check-only
+.venv/bin/python scripts/refresh_official_data.py
+```
+
+Il workflow `.github/workflows/data-refresh.yml` esegue il controllo ogni
+settimana. Se cambia un hash ufficiale, rigenera i dati, esegue test e build e
+apre una pull request. Non esegue merge automatici quando cambiano definizioni,
+copertura o punteggi.
 
 Regole:
 

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import os
 import sys
 import tempfile
@@ -30,6 +31,7 @@ from scripts.external_sources import source_by_id  # noqa: E402
 
 LEGACY_REGION = PROJECT_ROOT / "app" / "static" / "data" / "Assoluti_Regione.csv"
 OUTPUT = PROJECT_ROOT / "app" / "static" / "data" / "external" / "normalized_external_indicators.csv"
+SOURCE_STATE = PROJECT_ROOT / "data" / "source_state.json"
 
 DEMOGRAPHY_IDS = {"910", "911", "912", "913", "920", "921", "922", "923"}
 CONTEXTUAL_DEMOGRAPHY = {"920", "921", "922", "923"}
@@ -67,11 +69,25 @@ def _coverage(rows):
     return {key: round(len(value) / 20, 4) for key, value in areas.items()}
 
 
+def _retrieved_at(source_id, source):
+    """Stable provenance timestamp so identical rebuilds stay byte-identical."""
+    if source.get("release_date"):
+        return source["release_date"]
+    if SOURCE_STATE.exists():
+        payload = json.loads(SOURCE_STATE.read_text(encoding="utf-8"))
+        source_state = payload.get("sources", {}).get("istat_indicatori_territoriali", {})
+        if source_state.get("last_modified"):
+            from email.utils import parsedate_to_datetime
+
+            return parsedate_to_datetime(source_state["last_modified"]).isoformat()
+    return datetime.now(timezone.utc).isoformat()
+
+
 def _build_from_legacy(source_id, year, level, include_fn, definition_fn, direction_fn, category_fn, notes):
     source = source_by_id(source_id)
     if source is None:
         raise RuntimeError(f"Missing {source_id} in external source registry")
-    retrieved_at = datetime.now(timezone.utc).isoformat()
+    retrieved_at = _retrieved_at(source_id, source)
     rows = []
     with LEGACY_REGION.open(encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle, delimiter=";")

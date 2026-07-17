@@ -1,4 +1,18 @@
 sources:
+  - source: istat_bes_regioni
+    dataset: Benessere equo e sostenibile, indicatori per regione e sesso
+    enabled: true
+    territory_levels: [regione]
+    frequency: annuale, con aggiornamento intermedio
+    expected_release_period: aprile e rapporto annuale
+    download_url: https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/
+    landing_page: https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/
+    format: XLSX in ZIP
+    license: CC BY 3.0 IT
+    parser: national_bes_region_workbook
+    cache_policy: content-hash
+    release_date: 2026-05-25T15:00:11+00:00
+    rate_limit: una richiesta per controllo, nessun polling aggressivo
   - source: istat_lavoro
     dataset: Rilevazione sulle forze di lavoro
     enabled: true
@@ -24,6 +38,7 @@ sources:
     license: CC BY 3.0 IT
     parser: local_istat_demografia
     cache_policy: cache-first
+    release_date: 2026-03-31T00:00:00+02:00
     rate_limit: nessuno per fixture locale, SDMX Istat se usato
   - source: invalsi
     dataset: Rilevazioni nazionali degli apprendimenti

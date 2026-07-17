@@ -1,25 +1,28 @@
-# Audit freschezza dati 2025
+# Audit freschezza dati
 
-Generato: 2026-07-15T08:56:19.511010+00:00
+Generato: 2026-07-17T20:25:38.653009+00:00
 
 ## Riepilogo
 
-- indicatori aggiornati direttamente: 33
-- nuovi indicatori 2025 aggiunti: 0
+- indicatori aggiornati direttamente: 37
+- indicatori BES regionali disponibili: 145
+- indicatori BES regionali al 2025: 67
+- indicatori BES 2025 ammessi allo scoring regionale: 62
 - indicatori non aggiornabili: 293
-- indicatori da revisionare manualmente: 67
-- fonti non accessibili automaticamente: INVALSI, Movimprese, Terna e Infratel restano in fixture/metadata mode finche non viene promosso un parser verificato.
+- indicatori da revisionare manualmente: 63
+- INVALSI regionale 2025 è acquisito tramite il BES nazionale; Movimprese, Terna e Infratel restano in attesa di un parser e di un match di definizione verificati.
 
 ## Decisioni metodologiche
 
 - I CSV legacy a 12 colonne restano invariati.
 - Le fonti esterne entrano in un dataset normalizzato separato.
 - Nessun nuovo indicatore entra nello scoring senza match esatto e direzione revisionata.
-- Indicatori demografici di struttura, fecondita e saldo migratorio restano contestuali o profilo descrittivo.
+- Indicatori demografici di struttura, fecondità e saldo migratorio restano contestuali o profilo descrittivo.
 - I dati assoluti non sono eleggibili per lo scoring.
 
 ## Fonti ufficiali configurate
 
+- istat_bes_regioni: https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/
 - infratel: https://www.infratelitalia.it/home
 - invalsi: https://invalsiopen.it/dati-rilevazione-invalsi-2025/
 - istat_demografia: https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/
@@ -32,6 +35,10 @@ Generato: 2026-07-15T08:56:19.511010+00:00
 
 | id | indicatore | anno attuale | fonte alternativa | anno disponibile | decisione |
 |---|---|---:|---|---:|---|
+| 617 | Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado) | 2025 | invalsi | - | integrated |
+| 623 | Competenza alfabetica non adeguata (studenti classi V scuola secondaria secondo grado) | 2025 | invalsi | - | integrated |
+| 618 | Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado) | 2025 | invalsi | - | integrated |
+| 624 | Competenza numerica non adeguata (studenti classi V scuola secondaria secondo grado) | 2025 | invalsi | - | integrated |
 | 920 | Eta media della popolazione | 2026 | istat_demografia | 2026 | integrated |
 | 921 | Indice di vecchiaia | 2026 | istat_demografia | 2026 | integrated |
 | 922 | Numero medio di figli per donna | 2025 | istat_demografia | 2025 | integrated |
@@ -73,11 +80,7 @@ Generato: 2026-07-15T08:56:19.511010+00:00
 | 64 | Grado di utilizzo di Internet nelle famiglie negli ultimi 3 mesi | 2023 | infratel | - | needs_review |
 | 429 | Penetrazione della banda ultra larga | 2023 | infratel | - | needs_review |
 | 621 | Competenza alfabetica non adeguata (studenti classi II scuola secondaria secondo grado) | 2023 | invalsi | - | needs_review |
-| 617 | Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado) | 2025 | invalsi | - | needs_review |
-| 623 | Competenza alfabetica non adeguata (studenti classi V scuola secondaria secondo grado) | 2025 | invalsi | - | needs_review |
 | 622 | Competenza numerica non adeguata (studenti classi II scuola secondaria secondo grado) | 2023 | invalsi | - | needs_review |
-| 618 | Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado) | 2025 | invalsi | - | needs_review |
-| 624 | Competenza numerica non adeguata (studenti classi V scuola secondaria secondo grado) | 2025 | invalsi | - | needs_review |
 | 249 | Andamento dell'occupazione del settore della pesca | 2023 | istat_lavoro | - | needs_review |
 | 465 | Occupati, disoccupati e inattivi che partecipano ad attività formative e di istruzione | 2014 | istat_lavoro | - | needs_review |
 | 530 | Quota di lavoratori che percepiscono sussidi di politica del lavoro passiva: Indennità di disoccupazione e Assicurazione sociale per l'impiego | 2020 | istat_lavoro | - | needs_review |

@@ -28,7 +28,13 @@ LEVELS = {
 }
 PROVINCE_CODES = DATA_DIR / "province_codes.csv"
 MIN_PUBLIC_COVERAGE = 0.8
-BES_SOURCE_URL = "https://www.istat.it/notizia/bes-dei-territori-edizione-2025/"
+BES_SOURCE_URLS = {
+    "regione": (
+        "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/"
+        "la-misurazione-del-benessere-bes/gli-indicatori-del-bes/"
+    ),
+    "provincia": "https://www.istat.it/notizia/bes-dei-territori-edizione-2025/",
+}
 
 
 def _trim_words(text, limit):
@@ -133,6 +139,8 @@ def get_bes_rows(level):
                 "theme": row["Tema"],
                 "name": row["Indicatore"],
                 "unit": row["UDM"],
+                "source": row.get("Fonte", ""),
+                "archive": row.get("Archivio", ""),
                 "year": int(row["Anno"]),
                 "value": _parse_number(row["Dato"]),
             })
@@ -158,6 +166,7 @@ def all_bes_indicators():
         info = levels.get("regione") or levels["provincia"]
         indexable = any(
             level_info["coverage_latest"] >= MIN_PUBLIC_COVERAGE
+            and level_info["year_max"] >= 2023
             for level_info in levels.values()
         )
         indicators.append({
@@ -206,5 +215,5 @@ def get_bes_indicator_page(indicator_id):
         "level_payloads": level_payloads,
         "year_min": min(level["year_min"] for level in level_payloads),
         "year_max": max(level["year_max"] for level in level_payloads),
-        "source_url": BES_SOURCE_URL,
+        "source_url": BES_SOURCE_URLS["regione" if "regione" in entry["levels"] else "provincia"],
     }

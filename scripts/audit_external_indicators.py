@@ -71,7 +71,7 @@ def _manifest_status(item, source_id, external_year):
         return "unavailable"
     if external_year and external_year >= 2025:
         return "integrated"
-    if item["year_max"] >= 2025 and source_id == "istat_demografia":
+    if item["year_max"] >= 2025:
         return "integrated"
     if source_id in {"istat_lavoro", "invalsi", "terna", "infratel", "movimprese", "istat_turismo"}:
         return "needs_review"
@@ -84,6 +84,8 @@ def _definition_match(item, source_id):
     if source_id == "istat_demografia":
         return "compatible"
     if source_id == "istat_lavoro":
+        return "exact"
+    if source_id == "invalsi" and item["year_max"] >= 2025:
         return "exact"
     if source_id:
         return "proxy"
@@ -212,30 +214,43 @@ def _write_markdown(rows, output_path):
     counts = defaultdict(int)
     for row in rows:
         counts[row["decisione"]] += 1
+    bes_region = get_bes_manifest("regione")
+    bes_current = [item for item in bes_region.values() if item["year_max"] >= 2025]
+    bes_scoreable = [
+        item for item in bes_current
+        if item["direction"] in SCOREABLE_DIRECTIONS
+        and item["category"]
+        and item["coverage_latest"] >= 0.8
+    ]
     lines = [
-        "# Audit freschezza dati 2025",
+        "# Audit freschezza dati",
         "",
         f"Generato: {datetime.now(timezone.utc).isoformat()}",
         "",
         "## Riepilogo",
         "",
         f"- indicatori aggiornati direttamente: {counts['integrated']}",
-        f"- nuovi indicatori 2025 aggiunti: 0",
+        f"- indicatori BES regionali disponibili: {len(bes_region)}",
+        f"- indicatori BES regionali al 2025: {len(bes_current)}",
+        f"- indicatori BES 2025 ammessi allo scoring regionale: {len(bes_scoreable)}",
         f"- indicatori non aggiornabili: {counts['unavailable']}",
         f"- indicatori da revisionare manualmente: {counts['needs_review'] + counts['candidate']}",
-        "- fonti non accessibili automaticamente: INVALSI, Movimprese, Terna e Infratel restano in fixture/metadata mode finche non viene promosso un parser verificato.",
+        "- INVALSI regionale 2025 è acquisito tramite il BES nazionale; Movimprese, Terna e Infratel restano in attesa di un parser e di un match di definizione verificati.",
         "",
         "## Decisioni metodologiche",
         "",
         "- I CSV legacy a 12 colonne restano invariati.",
         "- Le fonti esterne entrano in un dataset normalizzato separato.",
         "- Nessun nuovo indicatore entra nello scoring senza match esatto e direzione revisionata.",
-        "- Indicatori demografici di struttura, fecondita e saldo migratorio restano contestuali o profilo descrittivo.",
+        "- Indicatori demografici di struttura, fecondità e saldo migratorio restano contestuali o profilo descrittivo.",
         "- I dati assoluti non sono eleggibili per lo scoring.",
         "",
         "## Fonti ufficiali configurate",
         "",
     ]
+    bes_source = source_by_id("istat_bes_regioni")
+    if bes_source:
+        lines.append(f"- istat_bes_regioni: {bes_source['landing_page']}")
     for source_id in sorted({row["fonte_alternativa"] for row in rows if row["fonte_alternativa"]}):
         lines.append(f"- {source_id}: {_source_url(source_id)}")
     lines.extend(["", "## Dettaglio", ""])

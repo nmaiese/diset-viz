@@ -16,6 +16,13 @@ import random
 
 from app.cache import cache
 from app.data import get_catalog, get_indicator_year
+from app.bes_data import (
+    BES_SOURCE_URLS,
+    MIN_PUBLIC_COVERAGE,
+    bes_indicator_path,
+    get_bes_manifest,
+    get_bes_rows,
+)
 from app.indicator_notes import macro_area_for
 from app import profiles
 
@@ -33,6 +40,81 @@ _DIFFICULTY_GAP_RATIO = {0: (0.63, 1.0), 1: (0.42, 0.58), 2: (0.26, 0.37), 3: (0
 # Il pool richiede almeno questo numero di valori distinti nell'anno più
 # recente, così lo stesso pool serve anche l'ordinamento a 5 senza pareggi.
 _MIN_DISTINCT_VALUES = 5
+_BES_PREFIX = "bes:"
+_BES_MIN_YEAR = 2025
+
+
+@cache.memoize(timeout=3600)
+def _bes_region_payload(indicator_id, year):
+    """Adapt one national BES regional indicator to the atlas quiz shape."""
+    raw_id = indicator_id[len(_BES_PREFIX):] if indicator_id.startswith(_BES_PREFIX) else indicator_id
+    info = get_bes_manifest("regione").get(raw_id)
+    if info is None or info["year_max"] != year or year < _BES_MIN_YEAR:
+        return None
+    values = [
+        {
+            "region": row["territory"],
+            "region_key": row["territory_key"],
+            "value": row["value"],
+        }
+        for row in get_bes_rows("regione")
+        if row["id"] == raw_id and row["year"] == year
+        and row["territory_key"] and row["value"] is not None
+    ]
+    values.sort(key=lambda row: row["value"], reverse=True)
+    return {
+        "metadata": {
+            "id": f"{_BES_PREFIX}{raw_id}",
+            "name": info["name"],
+            "theme": info["domain_name"],
+            "macro_area": "Qualità della vita",
+            "unit": info["unit"],
+            "year": year,
+            "source_label": "Istat, BES nazionale",
+            "source_url": BES_SOURCE_URLS["regione"],
+            "description": (
+                f"Indicatore del Benessere equo e sostenibile nel dominio "
+                f"{info['domain_name']}."
+            ),
+            "path": bes_indicator_path(raw_id, info["name"]),
+        },
+        "values": values,
+    }
+
+
+def _quiz_indicator_payload(indicator_id, year):
+    if indicator_id.startswith(_BES_PREFIX):
+        return _bes_region_payload(indicator_id, year)
+    return get_indicator_year(indicator_id, year)
+
+
+@cache.memoize(timeout=3600)
+def _bes_quiz_indicators():
+    pool = []
+    manifest = get_bes_manifest("regione")
+    for raw_id, info in manifest.items():
+        if info["year_max"] < _BES_MIN_YEAR or info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
+            continue
+        payload = _bes_region_payload(f"{_BES_PREFIX}{raw_id}", info["year_max"])
+        if payload is None:
+            continue
+        values = payload["values"]
+        if len({row["value"] for row in values}) < _MIN_DISTINCT_VALUES:
+            continue
+        meta = payload["metadata"]
+        pool.append({
+            "id": meta["id"],
+            "name": meta["name"],
+            "theme": meta["theme"],
+            "macro_area": meta["macro_area"],
+            "unit": meta["unit"],
+            "year": info["year_max"],
+            "source_label": meta["source_label"],
+            "source_url": meta["source_url"],
+            "description": meta["description"],
+            "ranking": values,
+        })
+    return pool
 
 
 @cache.memoize(timeout=3600)
@@ -66,6 +148,10 @@ def _quiz_indicators():
                 for row in rows
             ],
         })
+    # The comparison and ordering games can safely mix the atlas with the
+    # current national BES regional series. IDs are namespaced as ``bes:...``
+    # so answer validation remains unambiguous even when source codes overlap.
+    pool.extend(_bes_quiz_indicators())
     return pool
 
 
@@ -144,7 +230,7 @@ def compare_round(difficulty=0):
 
 
 def _value_for(indicator_id, year, region_key):
-    payload = get_indicator_year(indicator_id, year)
+    payload = _quiz_indicator_payload(indicator_id, year)
     if payload is None:
         return None
     for row in payload["values"]:
@@ -167,7 +253,7 @@ def evaluate_compare(indicator_id, year, region_a_key, region_b_key, choice):
     name_b = profiles.region_name(region_b_key)
     if name_a is None or name_b is None:
         return None
-    payload = get_indicator_year(indicator_id, year)
+    payload = _quiz_indicator_payload(indicator_id, year)
     if payload is None or not payload["values"]:
         return None
     value_a = _value_for(indicator_id, year, region_a_key)
@@ -185,12 +271,12 @@ def evaluate_compare(indicator_id, year, region_a_key, region_b_key, choice):
             "id": meta["id"],
             "name": meta["name"],
             "theme": meta["theme"],
-            "macro_area": macro_area_for(meta["theme"]),
+            "macro_area": meta.get("macro_area") or macro_area_for(meta["theme"]),
             "unit": meta["unit"],
             "year": year,
             "source_label": meta["source_label"],
             "source_url": meta["source_url"],
-            "description": meta["explain"]["plain"],
+            "description": meta.get("description") or meta["explain"]["plain"],
         },
         "region_a": {"region": name_a, "region_key": region_a_key, "value": value_a},
         "region_b": {"region": name_b, "region_key": region_b_key, "value": value_b},
@@ -238,7 +324,7 @@ def evaluate_order(indicator_id, year, region_keys):
             return None
         names[key] = name
 
-    payload = get_indicator_year(indicator_id, year)
+    payload = _quiz_indicator_payload(indicator_id, year)
     if payload is None or not payload["values"]:
         return None
     values = {}
@@ -286,6 +372,6 @@ def evaluate_order(indicator_id, year, region_keys):
             "year": year,
             "source_label": meta["source_label"],
             "source_url": meta["source_url"],
-            "description": meta["explain"]["plain"],
+            "description": meta.get("description") or meta["explain"]["plain"],
         },
     }

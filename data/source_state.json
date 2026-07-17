@@ -1,0 +1,63 @@
+{
+  "sources": {
+    "istat_bes_regioni": {
+      "bytes": 1789151,
+      "dataset": {
+        "current_indicator_count": 67,
+        "indicator_count": 145,
+        "latest_year": 2025,
+        "year_distribution": {
+          "2014": 4,
+          "2015": 1,
+          "2019": 1,
+          "2020": 2,
+          "2021": 3,
+          "2022": 17,
+          "2023": 21,
+          "2024": 29,
+          "2025": 67
+        }
+      },
+      "etag": "\"6a1463fb-1b4cdf\"",
+      "last_modified": "Mon, 25 May 2026 15:00:11 GMT",
+      "sha256": "9003db40394edeb2c88bfa6b6fb56a176c6c00f7e24897b4f5d9af5db40cbebc",
+      "url": "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip"
+    },
+    "istat_indicatori_territoriali": {
+      "bytes": 2510805,
+      "dataset": {
+        "current_indicator_count": 62,
+        "indicator_count": 393,
+        "latest_year": 2026,
+        "preserved_row_count": 8500,
+        "row_count": 111310,
+        "year_distribution": {
+          "2005": 1,
+          "2006": 1,
+          "2008": 1,
+          "2010": 6,
+          "2011": 2,
+          "2012": 16,
+          "2013": 8,
+          "2014": 5,
+          "2015": 13,
+          "2016": 10,
+          "2018": 14,
+          "2019": 31,
+          "2020": 17,
+          "2021": 16,
+          "2022": 37,
+          "2023": 79,
+          "2024": 74,
+          "2025": 60,
+          "2026": 2
+        }
+      },
+      "etag": "\"6a59d3a1-264fd5\"",
+      "last_modified": "Fri, 17 Jul 2026 07:02:57 GMT",
+      "sha256": "36ba03030cd3ee5f2d2742abf3677ae825f838419e9ba4eb520e0b719a3e2830",
+      "url": "https://www.istat.it/storage/politiche-sviluppo/Archivio_unico_indicatori_regionali.zip"
+    }
+  },
+  "version": 1
+}

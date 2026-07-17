@@ -9,9 +9,10 @@ data-driven blog and quality-of-life rankings for regions and provinces.
 
 ## Features
 
-- **Atlas explorer**: a browsable index of all 377 indicators with per-indicator
-  national-trend sparklines, coverage badges, theme spine, search, sort and a
-  "complete data only" filter (on by default).
+- **Atlas explorer**: a federated index of 393 territorial indicators and 145
+  national BES regional indicators, with national-trend sparklines, coverage
+  badges, source/theme filters, search, sort and a "complete data only" filter
+  (on by default).
 - **Indicator detail**: choropleth map, regional ranking and historical series,
   with year/region selectors, contextual insights (value + rank) and in-theme
   previous/next navigation.
@@ -19,11 +20,10 @@ data-driven blog and quality-of-life rankings for regions and provinces.
   (`content/posts/*.md`) — meant to be published automatically by an AI agent.
   Includes per-article meta tags, Open Graph, JSON-LD, `sitemap.xml` and
   `robots.txt`.
-- **Quality of life**: regional rankings on the Istat territorial development
-  indicators, plus a work-in-progress provincial ranking from Istat BES dei
-  Territori.
+- **Quality of life**: regional rankings on the current national BES release and
+  provincial rankings from Istat BES dei Territori.
 - Shareable URLs across both atlas views (`view`, `indicator`, `year`, `region`,
-  `theme`, `q`, `sort`, `partial`).
+  `theme`, `source`, `q`, `sort`, `partial`).
 - Flask backend serving a filtered API (no full dataset download in the SPA).
 
 ## Stack
@@ -47,7 +47,8 @@ data-driven blog and quality-of-life rankings for regions and provinces.
 - `/legacy` keeps the original D3.js dashboard available as an archive view.
 - `/data` still returns the full legacy dataset for the archived D3 view.
 - `/api/catalog`, `/api/search`, `/api/indicator/<id>` and
-  `/api/indicator/<id>/year/<year>` power the atlas.
+  `/api/indicator/<id>/year/<year>` power the federated atlas. BES ids use the
+  `bes:<id>` namespace.
 - `/api/external-indicators/manifest` exposes the auditable external-source
   manifest used for 2025 freshness checks.
 - `/api/quality-life/*` powers the regional quality-of-life pages.
@@ -105,9 +106,12 @@ uses 20 regional geometries. Province-level rows for `Bolzano/Bozen` and
 
 Missing and non-finite values (empty cells, `-`, and Istat `INF` placeholders for
 undefined ratios) are treated as missing throughout the data layer, so they never
-break the API or the charts. `/api/catalog` enriches each indicator with
+break the API or the charts. `/api/catalog` federates these 393 series with the
+145 regional BES series from `Assoluti_BES_Regione.csv`, without merging the two
+files. It enriches each indicator with
 `region_count`, `completeness`, `complete` (≥98% of region×year cells over 20
-regions) and a downsampled national-average `spark` series, which power the atlas
+regions for territorial series, latest-year regional coverage for BES series)
+and a downsampled national-average `spark` series, which power the atlas
 index, badges, sorting and filtering without shipping the full dataset. It also
 exposes `year_max`, `source`, `retrieved_at` when available, and
 `freshness_status` (`current`, `recent`, `dated`, `stale`) for data-age badges.
@@ -131,28 +135,32 @@ Vertical 2025 sources live outside the legacy CSV schema:
 - audit reports: `reports/indicator_inventory.csv`,
   `reports/data_freshness_2025.csv`, `reports/data_freshness_2025.md`
 
-The promoted local parsers are `istat_demografia` and `istat_lavoro`, which
-normalize official 2025/2026 rows already present in the refreshed regional atlas
-into the external layer. Other sources are registered and auditable but remain
-`needs_review` until definition, unit, territorial coverage and parser stability
-are verified. No external source changes the BES quality-of-life scoring
-automatically.
+The promoted parsers are `istat_demografia`, `istat_lavoro` and
+`istat_bes_regioni`. The first two normalize official 2025/2026 rows already in
+the regional atlas. The third imports the national BES regional workbook and is
+the current source for regional quality-of-life scoring. Other sources remain
+`needs_review` until definition, unit, coverage and parser stability are verified.
 
 ```bash
 .venv/bin/python scripts/discover_external_sources.py
 .venv/bin/python scripts/fetch_external_data.py --source istat_lavoro --year 2025 --offline
 .venv/bin/python scripts/build_external_dataset.py --source all --year 2025
 .venv/bin/python scripts/audit_external_indicators.py
+.venv/bin/python scripts/refresh_official_data.py --check-only
 ```
 
-See [`docs/EXTERNAL_SOURCES.md`](docs/EXTERNAL_SOURCES.md) and
-[`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md).
+See [`docs/EXTERNAL_SOURCES.md`](docs/EXTERNAL_SOURCES.md),
+[`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md) and
+[`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md).
 
 ### Quality-of-life datasets
 
-The regional quality-of-life pages use the same regional CSV and score complete,
-recent indicators by profile. The pipeline and checklist are documented in
-[`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md).
+Regional quality-of-life uses the national BES intermediate release: 145
+regional indicators are available and 67 reach 2025. Only the 62 current
+indicators that also pass category, direction and coverage checks enter the
+score. All 145 are browsable in the Atlas under namespaced `bes:*` ids, while
+the atlas CSV and the BES CSV remain separate. The pipeline and checklist are documented
+in [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md).
 
 The provincial ranking is a separate work stream based on Istat BES dei
 Territori through SDMX. It writes separate artifacts under `app/static/data/`:
@@ -162,8 +170,8 @@ Territori through SDMX. It writes separate artifacts under `app/static/data/`:
 - `province_codes.csv`
 
 It does not touch `Assoluti_Regione.csv` or the regional atlas data loader. The
-current provincial output covers 67 indicators, 107 province and metropolitan
-cities, and 2015-2024. Categories and directions in the manifest are still
+current provincial output covers 67 indicators and 103 ranked province or
+metropolitan-city units after excluding obsolete Sardinian codes. Categories and directions in the manifest are still
 proposed and need manual review before treating the ranking as stable. See
 [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md).
 
@@ -180,10 +188,10 @@ the best fit and is kept as the single source. Alternatives were reviewed:
   Rebuilding 377 indicators by stitching individual dataflows would reduce coverage
   and stability versus the single curated archive.
 
-The Istat archive is official, citable, updated monthly (~20th of each month), and
-the download URL was verified live (HTTP 200, `Last-Modified: 2026-05-20`). Re-running
-`scripts/update_data.py` produced a file byte-identical to the committed dataset, so
-the indicators are already current (through 2025) — no data change was required.
+The Istat archive is official, citable and updated monthly around the 20th. Its
+artifact hash, HTTP metadata and output coverage are tracked in
+`data/source_state.json`; the weekly workflow opens a reviewable pull request
+only when an official artifact changes.
 
 ## Run Locally
 

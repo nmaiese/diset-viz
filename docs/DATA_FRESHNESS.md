@@ -1,6 +1,6 @@
 # Freschezza dati
 
-Ogni indicatore esposto dal catalogo riceve metadati di freschezza:
+Ogni indicatore territoriale esposto dal catalogo riceve metadati di freschezza:
 
 - `year_max`
 - `source`
@@ -18,6 +18,16 @@ I badge sono visibili nelle pagine indicatore, nei profili regionali e nella
 qualità della vita. Sono segnali informativi, non modificano ordinamenti,
 normalizzazioni o score.
 
+Il catalogo pubblico include anche tutti gli indicatori BES regionali con id
+`bes:*`, anno massimo, copertura e fonte Istat. Il filtro `Fonte dati` permette di
+isolarli nell'Atlante. Questa esposizione descrittiva non cambia la regola più
+restrittiva applicata al punteggio della qualità della vita.
+
+La classifica regionale applica una regola più forte del badge: dal 2026 usa
+solo indicatori BES con anno di riferimento 2025 o successivo. La classifica
+provinciale resta sull'ultima edizione disponibile del BES dei Territori e ne
+dichiara l'anno senza fingere un aggiornamento che Istat non ha pubblicato.
+
 ## Audit
 
 Rigenera i report con:
@@ -25,6 +35,7 @@ Rigenera i report con:
 ```bash
 .venv/bin/python scripts/build_external_dataset.py --source all --year 2025
 .venv/bin/python scripts/audit_external_indicators.py
+.venv/bin/python scripts/refresh_official_data.py --check-only
 ```
 
 Output:
@@ -41,8 +52,10 @@ Output:
 - Integrati nel layer esterno: indicatori demografici Istat regionali 2025/2026 e
   indicatori Istat lavoro regionali 2025 già presenti nel dataset locale
   aggiornato.
-- Non integrati automaticamente: INVALSI, Movimprese, turismo, Terna e Infratel.
-  Sono fonti candidate o `needs_review` fino a verifica di definizione, unità,
-  copertura e licenza.
+- Integrato nella qualità della vita regionale: BES nazionale, aggiornamento
+  intermedio 2026. Comprende 67 serie regionali al 2025, incluse misure INVALSI,
+  sicurezza, salute, povertà, acqua e copertura internet.
+- Movimprese, turismo, Terna e Infratel restano candidati o `needs_review` fino a
+  verifica di definizione, unità, copertura e licenza.
 - Demografia strutturale, fecondità e saldi migratori restano contestuali o
   descrittivi, salvo motivazione metodologica esplicita.

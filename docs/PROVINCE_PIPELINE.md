@@ -1,7 +1,7 @@
 # Pipeline dati provinciali (Istat SDMX)
 
-Questa pipeline recupera dati **provinciali** (NUTS3, 107 province e città
-metropolitane) dal web service SDMX dell'Istat e li normalizza in un dataset
+Questa pipeline recupera dati **provinciali** (NUTS3, 107 codici pubblicati)
+dal web service SDMX dell'Istat e li normalizza in un dataset
 separato, pronto per arricchire la qualità della vita. È una fase di **sola
 acquisizione**: non tocca il sito live, il dataset regionale
 (`Assoluti_Regione.csv`) né `app/data.py`. L'integrazione nel motore di scoring è
@@ -63,31 +63,26 @@ totale e i codici NUTS3. `BES_08` (benessere soggettivo) non ha dati provinciali
 .venv/bin/python scripts/fetch_provinces.py            # tutti i domini
 .venv/bin/python scripts/fetch_provinces.py --domains BES_01   # validarne uno
 
-# 3. normalizzazione offline (legge solo la cache)
+# 3. normalizzazione offline provinciale (legge solo la cache)
 .venv/bin/python scripts/build_province_dataset.py                 # province (NUTS3)
-.venv/bin/python scripts/build_province_dataset.py --level region  # BES regionale (NUTS2)
 ```
 
-Il livello `region` riusa la **stessa cache** (zero query nuove) e produce
-`Assoluti_BES_Regione.csv` + `bes_regione_manifest.csv` con i 67 indicatori BES a
-livello regionale. Nota verificata: a NUTS2 escono **19 regioni**, non 20. Il
-Trentino-Alto Adige è del tutto **assente** in questo dataflow a livello NUTS2: non
-ci sono né la regione (`ITDA`) né le due province autonome come unità NUTS2 (`ITD1`
-Bolzano, `ITD2` Trento), pur essendo presenti nella codelist. A livello provinciale
-(NUTS3) Bolzano (`ITD10`) e Trento (`ITD20`) ci sono regolarmente. È un dataset di
-arricchimento, tenuto separato dalla classifica regionale live (che resta basata su
-`Assoluti_Regione.csv`).
+Il vecchio build `--level region` non va usato sul dataset live: dal 2026
+`Assoluti_BES_Regione.csv` è prodotto da `scripts/update_bes_regions.py` usando
+il BES nazionale più fresco. Il comando richiede ora un flag esplicito di
+override per evitare sovrascritture accidentali. Il dataflow provinciale resta
+la fonte corretta per province e città metropolitane.
 
 ## Output (in `app/static/data/`)
 
 - **`Assoluti_Provincia.csv`** — stesse 12 colonne di `Assoluti_Regione.csv`, ma
-  `Area="Provincia"`. ~48.700 righe, 67 indicatori, 107 province, 2015-2024.
+  `Area="Provincia"`. ~48.700 righe, 67 indicatori, 103 unità classificate, 2015-2024.
   `idIndicatore` = codice BES (`DATA_TYPE`, es. `01SAL001`), `Tema` = dominio BES,
   `Dato` con la virgola decimale come nel dataset regionale.
 - **`province_manifest.csv`** — la mappa **auditabile**: per ogni indicatore il
   dataflow sorgente, il dominio BES, la **categoria QoL proposta**, la
   **direzione proposta**, l'unità, gli anni e la copertura provinciale.
-- **`province_codes.csv`** — le 107 province: codice NUTS3, nome normalizzato,
+- **`province_codes.csv`** — le 103 unità classificate: codice NUTS3, nome normalizzato,
   slug (`province_key`), regione, flag città metropolitana.
 
 I tre file sono versionati. La cache grezza (`data/istat_cache/`) no.
@@ -118,8 +113,10 @@ I tre file sono versionati. La cache grezza (`data/istat_cache/`) no.
 
 ## Visualizzazione (già attiva)
 
-La classifica è online, unificata su BES per **regioni e province** con lo stesso
-motore: `/qualita-della-vita/classifica/regioni` e `…/classifica/province` (con
+La classifica è online con lo stesso motore per **regioni e province**, ma con
+fonti adeguate al livello: BES nazionale 2026 per le regioni e BES dei Territori
+per le province. Le route sono `/qualita-della-vita/classifica/regioni` e
+`…/classifica/province` (con
 `?profilo=`), API `/api/quality-life/<livello>/rankings[/<profilo>]` e
 `/api/quality-life/<livello>/<key>`. Il motore unico è
 [`app/quality_life_bes.py`](../app/quality_life_bes.py) (z-score orientato,

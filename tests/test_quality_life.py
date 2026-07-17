@@ -72,8 +72,8 @@ class QualityLifeStaticTest(unittest.TestCase):
     def test_every_bes_indicator_has_a_public_page(self):
         client = app.test_client()
         indicators = all_bes_indicators()
-        self.assertEqual(len(indicators), 67)
-        self.assertEqual(sum(item["indexable"] for item in indicators), 66)
+        self.assertGreaterEqual(len(indicators), 145)
+        self.assertGreater(sum(item["indexable"] for item in indicators), 100)
 
         sample = next(item for item in indicators if item["id"] == "09PAE009-N25")
         page = client.get(sample["path"])
@@ -91,16 +91,20 @@ class QualityLifeStaticTest(unittest.TestCase):
         self.assertNotIn(sparse["path"], sitemap)
 
     def test_bes_labels_units_and_directions_are_resolved(self):
-        expected = {
+        expected_province = {
             "09PAE009-N25": ("Densità di verde storico", "higher_better", "per 100 m2"),
             "10AMB018P": ("Impermeabilizzazione del suolo da copertura artificiale", "lower_better", "%"),
             "12SER003P-N25": ("Posti letto negli ospedali", "higher_better", "per 10.000 abitanti"),
         }
-        for level in ("regione", "provincia"):
-            manifest = get_bes_manifest(level)
-            for indicator_id, values in expected.items():
-                item = manifest[indicator_id]
-                self.assertEqual((item["name"], item["direction"], item["unit"]), values)
+        manifest = get_bes_manifest("provincia")
+        for indicator_id, values in expected_province.items():
+            item = manifest[indicator_id]
+            self.assertEqual((item["name"], item["direction"], item["unit"]), values)
+
+        region = get_bes_manifest("regione")
+        self.assertEqual(region["01SAL001"]["year_max"], 2025)
+        self.assertEqual(region["01SAL001"]["direction"], "higher_better")
+        self.assertEqual(region["08BSO001"]["category"], "benessere_soggettivo")
 
     def test_bes_metadata_stays_within_serp_budgets(self):
         for item in all_bes_indicators():
@@ -111,6 +115,14 @@ class QualityLifeStaticTest(unittest.TestCase):
         for level in ("regione", "provincia"):
             matrix, _ = qb._matrix_and_meta(level)
             self.assertNotIn("06POL001P", matrix)
+
+    def test_regional_score_uses_only_2025_bes_indicators(self):
+        matrix, meta = qb._matrix_and_meta("regione")
+        self.assertGreaterEqual(len(matrix), 60)
+        self.assertTrue(all(item["year_max"] >= 2025 for item in meta.values()))
+        ranking = qb.build_bes_ranking("regione", "standard")
+        self.assertEqual(ranking["data_freshness"]["current"], len(matrix))
+        self.assertEqual(ranking["data_freshness"]["recent"], 0)
 
     def test_invalid_level_is_404(self):
         client = app.test_client()

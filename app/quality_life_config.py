@@ -108,6 +108,14 @@ QUALITY_LIFE_CATEGORIES = {
         ),
         "themes": ["Cultura", "Società dell'informazione"],
     },
+    "benessere_soggettivo": {
+        "name": "Benessere soggettivo",
+        "description": (
+            "Misura soddisfazione per la vita e il tempo libero, insieme alle "
+            "aspettative dichiarate per il futuro."
+        ),
+        "themes": ["Benessere soggettivo"],
+    },
 }
 
 # Raw weights per profile. The engine normalises them to sum to 1.0 and
@@ -115,7 +123,7 @@ QUALITY_LIFE_CATEGORIES = {
 QUALITY_LIFE_PROFILES = {
     "standard": {
         "name": "Equilibrato",
-        "description": "Assegna lo stesso peso alle sette dimensioni della qualità della vita.",
+        "description": "Assegna lo stesso peso alle otto dimensioni della qualità della vita.",
         "weights": {
             "reddito_accessibilita": 1.0,
             "lavoro_opportunita": 1.0,
@@ -124,6 +132,7 @@ QUALITY_LIFE_PROFILES = {
             "ambiente_mobilita_servizi": 1.0,
             "sicurezza_istituzioni": 1.0,
             "cultura_digitale": 1.0,
+            "benessere_soggettivo": 1.0,
         },
     },
     "opportunita": {
@@ -137,6 +146,7 @@ QUALITY_LIFE_PROFILES = {
             "ambiente_mobilita_servizi": 0.7,
             "sicurezza_istituzioni": 0.7,
             "cultura_digitale": 1.0,
+            "benessere_soggettivo": 0.8,
         },
     },
     "accessibilita": {
@@ -153,6 +163,7 @@ QUALITY_LIFE_PROFILES = {
             "ambiente_mobilita_servizi": 1.5,
             "sicurezza_istituzioni": 1.3,
             "cultura_digitale": 0.8,
+            "benessere_soggettivo": 1.1,
         },
     },
     "famiglie": {
@@ -166,6 +177,7 @@ QUALITY_LIFE_PROFILES = {
             "ambiente_mobilita_servizi": 1.2,
             "sicurezza_istituzioni": 1.2,
             "cultura_digitale": 0.8,
+            "benessere_soggettivo": 1.1,
         },
     },
     "giovani": {
@@ -179,6 +191,7 @@ QUALITY_LIFE_PROFILES = {
             "ambiente_mobilita_servizi": 0.9,
             "sicurezza_istituzioni": 0.8,
             "cultura_digitale": 1.4,
+            "benessere_soggettivo": 1.0,
         },
     },
     "servizi": {
@@ -195,6 +208,7 @@ QUALITY_LIFE_PROFILES = {
             "ambiente_mobilita_servizi": 1.7,
             "sicurezza_istituzioni": 1.5,
             "cultura_digitale": 1.0,
+            "benessere_soggettivo": 0.9,
         },
     },
 }

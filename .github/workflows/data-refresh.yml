@@ -1,0 +1,66 @@
+name: Aggiornamento dati ufficiali
+
+on:
+  schedule:
+    # Istat aggiorna il backbone territoriale circa il 20 di ogni mese; il
+    # controllo settimanale intercetta anche correzioni straordinarie BES.
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: official-data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Installa dipendenze
+        run: |
+          pip install -r requirements.txt
+          npm --prefix frontend ci
+
+      - name: Controlla e integra le fonti ufficiali
+        run: |
+          python scripts/refresh_official_data.py
+          if ! git diff --quiet; then
+            python scripts/build_external_dataset.py --source all --year 2025
+            python scripts/audit_external_indicators.py
+          fi
+
+      - name: Verifica dataset, backend e frontend
+        run: |
+          python -m unittest discover -s tests -v
+          npm --prefix frontend run build
+
+      - name: Apri o aggiorna la proposta automatica
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/official-data-refresh
+          delete-branch: true
+          commit-message: Aggiorna dati ufficiali regionali
+          title: Aggiorna automaticamente i dati ufficiali
+          body: |
+            Aggiornamento generato dal monitor delle fonti ufficiali.
+
+            Controlli eseguiti:
+            - hash degli artefatti Istat
+            - rigenerazione atomica dei dataset
+            - audit di freschezza e copertura
+            - test Python
+            - build React
+
+            Verificare nel diff eventuali cambi di definizione, copertura o direzione prima del merge.

@@ -4,9 +4,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from app import app, config, leaderboard, quiz_tokens
+from app import app, config, leaderboard, quiz, quiz_tokens
 from app.cache import cache
-from app.data import get_indicator_year
 
 
 class LeaderboardTestBase(unittest.TestCase):
@@ -34,7 +33,9 @@ class TokenChainTest(LeaderboardTestBase):
             round_ = client.get(f"/api/game/compare/round?difficulty=0&token={token or ''}").get_json()
             values = {
                 row["region_key"]: row["value"]
-                for row in get_indicator_year(round_["indicator"]["id"], round_["indicator"]["year"])["values"]
+                for row in quiz._quiz_indicator_payload(
+                    round_["indicator"]["id"], round_["indicator"]["year"]
+                )["values"]
             }
             key_a, key_b = round_["region_a"]["region_key"], round_["region_b"]["region_key"]
             winner = "region_a" if values[key_a] > values[key_b] else "region_b"
@@ -63,7 +64,9 @@ class TokenChainTest(LeaderboardTestBase):
         round_ = client.get("/api/game/order/round?count=3&token=").get_json()
         values = {
             row["region_key"]: row["value"]
-            for row in get_indicator_year(round_["indicator"]["id"], round_["indicator"]["year"])["values"]
+            for row in quiz._quiz_indicator_payload(
+                round_["indicator"]["id"], round_["indicator"]["year"]
+            )["values"]
         }
         keys = [r["region_key"] for r in round_["regions"]]
         perfect = sorted(keys, key=lambda key: values[key], reverse=True)
@@ -78,7 +81,9 @@ class TokenChainTest(LeaderboardTestBase):
         round_ = client.get("/api/game/compare/round?difficulty=0").get_json()
         values = {
             row["region_key"]: row["value"]
-            for row in get_indicator_year(round_["indicator"]["id"], round_["indicator"]["year"])["values"]
+            for row in quiz._quiz_indicator_payload(
+                round_["indicator"]["id"], round_["indicator"]["year"]
+            )["values"]
         }
         key_a, key_b = round_["region_a"]["region_key"], round_["region_b"]["region_key"]
         winner = "region_a" if values[key_a] > values[key_b] else "region_b"
@@ -108,7 +113,9 @@ class TokenChainTest(LeaderboardTestBase):
         round_ = client.get("/api/game/compare/round?difficulty=0").get_json()
         values = {
             row["region_key"]: row["value"]
-            for row in get_indicator_year(round_["indicator"]["id"], round_["indicator"]["year"])["values"]
+            for row in quiz._quiz_indicator_payload(
+                round_["indicator"]["id"], round_["indicator"]["year"]
+            )["values"]
         }
         key_a, key_b = round_["region_a"]["region_key"], round_["region_b"]["region_key"]
         winner = "region_a" if values[key_a] > values[key_b] else "region_b"
@@ -176,7 +183,9 @@ class LeaderboardApiTest(LeaderboardTestBase):
             round_ = client.get(f"/api/game/compare/round?difficulty=0&token={token or ''}").get_json()
             values = {
                 row["region_key"]: row["value"]
-                for row in get_indicator_year(round_["indicator"]["id"], round_["indicator"]["year"])["values"]
+                for row in quiz._quiz_indicator_payload(
+                    round_["indicator"]["id"], round_["indicator"]["year"]
+                )["values"]
             }
             key_a, key_b = round_["region_a"]["region_key"], round_["region_b"]["region_key"]
             winner = "region_a" if values[key_a] > values[key_b] else "region_b"

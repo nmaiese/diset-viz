@@ -27,7 +27,7 @@ import "./styles.css";
 
 const API = {
   catalog: "/api/catalog",
-  indicator: (id) => `/api/indicator/${id}`,
+  indicator: (id) => `/api/indicator/${encodeURIComponent(id)}`,
   region: (key) => `/api/region/${key}`,
   regionsOverview: "/api/regions/overview",
   map: "/static/data/italian-regions.geo.json",
@@ -68,6 +68,7 @@ function App() {
   const [sortParam, setSortParam] = useUrlState("sort");
   const [partialParam, setPartialParam] = useUrlState("partial");
   const [areaParam, setAreaParam] = useUrlState("area");
+  const [sourceParam, setSourceParam] = useUrlState("source");
   const [yearFromParam, setYearFromParam] = useUrlState("yfrom");
   const [yearToParam, setYearToParam] = useUrlState("yto");
 
@@ -76,6 +77,7 @@ function App() {
   const sort = sortParam || "complete";
   const showPartial = partialParam === "1";
   const macroArea = areaParam || "Tutte";
+  const sourceFamily = sourceParam || "all";
   // Default to atlas, but a shared ?indicator=… link (no explicit view) opens the detail.
   const activeView =
     view === "detail"
@@ -354,6 +356,12 @@ function App() {
         setThemeParam(null);
         trackEvent("filter_macro_area", { macro_area: value });
       }}
+      sourceFamily={sourceFamily}
+      setSourceFamily={(value) => {
+        setSourceParam(value === "all" ? null : value);
+        setThemeParam(null);
+        trackEvent("filter_data_source", { source_family: value });
+      }}
       yearFrom={yearFromParam ? Number(yearFromParam) : null}
       yearTo={yearToParam ? Number(yearToParam) : null}
       setYearRange={(from, to) => {
@@ -574,7 +582,7 @@ function Bar({ pct, className = "" }) {
 
 function AtlasView({
   catalog, theme, setTheme, query, setQuery, sort, setSort, showPartial, setShowPartial,
-  macroArea, setMacroArea, yearFrom, yearTo, setYearRange, onOpen, onMode,
+  macroArea, setMacroArea, sourceFamily, setSourceFamily, yearFrom, yearTo, setYearRange, onOpen, onMode,
 }) {
   const [fullMin, fullMax] = useMemo(() => {
     const mins = catalog.indicators.map((i) => i.year_min);
@@ -591,13 +599,14 @@ function AtlasView({
 
   const pool = useMemo(() => {
     let list = showPartial ? catalog.indicators : catalog.indicators.filter((i) => i.complete);
+    if (sourceFamily !== "all") list = list.filter((i) => i.catalog_family === sourceFamily);
     if (macroArea !== "Tutte") list = list.filter((i) => i.macro_area === macroArea);
     // Year coverage: only the bounds the user actually set constrain the list.
     // "Dal X" keeps series that reach back to X; "Al Y" keeps series that run up to Y.
     if (yearFrom != null) list = list.filter((i) => i.year_min <= yearFrom);
     if (yearTo != null) list = list.filter((i) => i.year_max >= yearTo);
     return list;
-  }, [catalog, showPartial, macroArea, yearFrom, yearTo]);
+  }, [catalog, showPartial, sourceFamily, macroArea, yearFrom, yearTo]);
 
   const themeCounts = useMemo(() => {
     const counts = new Map();
@@ -610,12 +619,18 @@ function AtlasView({
     if (theme !== "Tutti") list = list.filter((i) => i.theme === theme);
     const nq = normalizeText(query);
     if (nq) {
-      list = list.filter((i) => normalizeText(`${i.name} ${i.theme} ${i.archive}`).includes(nq));
+      list = list.filter((i) => normalizeText(
+        `${i.name} ${i.theme} ${i.archive} ${i.catalog_family_label}`,
+      ).includes(nq));
     }
     return [...list].sort(SORTERS[sort] || SORTERS.complete);
   }, [pool, theme, query, sort]);
 
-  const completeTotal = useMemo(() => catalog.indicators.filter((i) => i.complete).length, [catalog]);
+  const completeTotal = useMemo(() => catalog.indicators.filter((i) => (
+    i.complete
+    && (sourceFamily === "all" || i.catalog_family === sourceFamily)
+    && (macroArea === "Tutte" || i.macro_area === macroArea)
+  )).length, [catalog, sourceFamily, macroArea]);
 
   return (
     <main className="app-shell">
@@ -636,7 +651,7 @@ function AtlasView({
           regione per regione.
         </h1>
         <p className="atlas-hero__lead">
-          Centinaia di indicatori Istat per capire dove l'Italia corre e dove resta indietro.
+          Indicatori territoriali e BES Istat per capire dove l'Italia corre e dove resta indietro.
           Filtra per area, tema o anni, poi apri la scheda di ogni indicatore con mappa,
           classifica e andamento nel tempo.
         </p>
@@ -665,6 +680,9 @@ function AtlasView({
             setSort={setSort}
             showPartial={showPartial}
             setShowPartial={setShowPartial}
+            sourceFamilies={catalog.source_families || []}
+            sourceFamily={sourceFamily}
+            setSourceFamily={setSourceFamily}
             count={filtered.length}
             completeTotal={completeTotal}
             fullMin={fullMin}
@@ -741,6 +759,7 @@ function ThemeSpine({ themes, counts, total, selected, onSelect }) {
 
 function CommandBar({
   query, setQuery, sort, setSort, showPartial, setShowPartial, count, completeTotal,
+  sourceFamilies, sourceFamily, setSourceFamily,
   fullMin, fullMax, yearFrom, yearTo, setYearRange,
 }) {
   const years = useMemo(() => {
@@ -808,6 +827,16 @@ function CommandBar({
           )}
         </div>
         <label className="select-field">
+          <span>Fonte dati</span>
+          <select value={sourceFamily} onChange={(event) => setSourceFamily(event.target.value)}>
+            <option value="all">Tutte</option>
+            {sourceFamilies.map((source) => (
+              <option key={source.id} value={source.id}>{source.label}</option>
+            ))}
+          </select>
+          <ChevronDown className="select-icon" size={15} />
+        </label>
+        <label className="select-field">
           <span>Ordina</span>
           <select value={sort} onChange={(event) => setSort(event.target.value)}>
             {SORTS.map((option) => (
@@ -857,7 +886,9 @@ function IndexRow({ item, onOpen }) {
     <li>
       <button className="index-row" onClick={() => onOpen(item)} type="button">
         <span className="index-row__main">
-          <small className="index-row__theme">{item.theme}</small>
+          <small className="index-row__theme">
+            {item.theme} · {item.catalog_family_label}
+          </small>
           <strong className="index-row__name">{item.name}</strong>
           <CoverageBadge item={item} />
         </span>
@@ -1348,7 +1379,7 @@ function DetailView({
       .sort((a, b) => a.name.localeCompare(b.name, "it"));
   }, [catalog, indicatorMeta, theme]);
 
-  const siblingIndex = siblings.findIndex((item) => item.id === selectedId);
+  const siblingIndex = siblings.findIndex((item) => String(item.id) === String(selectedId));
   const prev = siblingIndex > 0 ? siblings[siblingIndex - 1] : null;
   const next = siblingIndex >= 0 && siblingIndex < siblings.length - 1 ? siblings[siblingIndex + 1] : null;
 
@@ -1479,7 +1510,8 @@ function indicatorSlug(name) {
     .replace(/-+$/, "");
 }
 
-function indicatorPath(id, name) {
+function indicatorPath(id, name, path) {
+  if (path) return path;
   const slug = indicatorSlug(name);
   return slug ? `/indicatore/${id}-${slug}` : `/indicatore/${id}`;
 }
@@ -1492,10 +1524,10 @@ function regionKey(region) {
 function IndicatorHeader({ metadata, regionCount }) {
   return (
     <div className="indicator-header">
-      <span className="tag">{metadata.theme}</span>
+      <span className="tag">{metadata.theme} · {metadata.catalog_family_label}</span>
       <h2>{metadata.name}</h2>
       <p className="indicator-header__seo">
-        <a href={indicatorPath(metadata.id, metadata.name)}>Scheda completa e classifica regioni →</a>
+        <a href={indicatorPath(metadata.id, metadata.name, metadata.path)}>Scheda completa e classifica regioni →</a>
       </p>
       {metadata.explain && <IndicatorExplain explain={metadata.explain} />}
       {/* Definition and metadata are collapsed so the year/region controls and the

@@ -330,14 +330,17 @@ class QuizCompareTest(unittest.TestCase):
 
     def test_compare_rounds_use_core_indicators_with_distinct_values(self):
         from app import quiz
-        from app.data import get_catalog, get_indicator_year
+        from app.data import get_catalog
         from app import profiles
 
         core_ids = {item["id"] for item in get_catalog()["indicators"] if profiles.is_core(item)}
+        core_ids.update(item["id"] for item in quiz._bes_quiz_indicators())
         for _ in range(40):
             round_ = quiz.compare_round(4)
             self.assertIn(round_["indicator"]["id"], core_ids)
-            payload = get_indicator_year(round_["indicator"]["id"], round_["indicator"]["year"])
+            payload = quiz._quiz_indicator_payload(
+                round_["indicator"]["id"], round_["indicator"]["year"]
+            )
             values = {row["region_key"]: row["value"] for row in payload["values"]}
             value_a = values[round_["region_a"]["region_key"]]
             value_b = values[round_["region_b"]["region_key"]]
@@ -345,13 +348,13 @@ class QuizCompareTest(unittest.TestCase):
 
     def test_compare_difficulty_narrows_value_gap(self):
         from app import quiz
-        from app.data import get_indicator_year
-
         def value_index_gap(round_):
             # Distanza tra i due valori nella lista dei valori DISTINTI
             # dell'indicatore (non il rank grezzo, che con i pareggi non è
             # un indice affidabile di quanto le due regioni siano vicine).
-            payload = get_indicator_year(round_["indicator"]["id"], round_["indicator"]["year"])
+            payload = quiz._quiz_indicator_payload(
+                round_["indicator"]["id"], round_["indicator"]["year"]
+            )
             distinct = sorted({row["value"] for row in payload["values"]}, reverse=True)
             values = {row["region_key"]: row["value"] for row in payload["values"]}
             idx_a = distinct.index(values[round_["region_a"]["region_key"]])
@@ -382,7 +385,7 @@ class QuizCompareTest(unittest.TestCase):
         self.assertNotIn("while True", inspect.getsource(quiz.order_round))
 
     def test_compare_answer_flow(self):
-        from app.data import get_indicator_year
+        from app import quiz
 
         client = app.test_client()
         round_ = client.get("/api/game/compare/round?difficulty=0").get_json()
@@ -390,7 +393,10 @@ class QuizCompareTest(unittest.TestCase):
         year = round_["indicator"]["year"]
         key_a = round_["region_a"]["region_key"]
         key_b = round_["region_b"]["region_key"]
-        values = {row["region_key"]: row["value"] for row in get_indicator_year(indicator_id, year)["values"]}
+        values = {
+            row["region_key"]: row["value"]
+            for row in quiz._quiz_indicator_payload(indicator_id, year)["values"]
+        }
         winner = "region_a" if values[key_a] > values[key_b] else "region_b"
         loser = "region_b" if winner == "region_a" else "region_a"
 
@@ -469,14 +475,17 @@ class QuizOrderTest(unittest.TestCase):
             self.assertEqual(client.get(f"/api/game/order/round?count={bad}").status_code, 400, bad)
 
     def test_order_answer_perfect_reversed_and_partial(self):
-        from app.data import get_indicator_year
+        from app import quiz
 
         client = app.test_client()
         round_ = client.get("/api/game/order/round?count=3").get_json()
         indicator_id = round_["indicator"]["id"]
         year = round_["indicator"]["year"]
         keys = [r["region_key"] for r in round_["regions"]]
-        values = {row["region_key"]: row["value"] for row in get_indicator_year(indicator_id, year)["values"]}
+        values = {
+            row["region_key"]: row["value"]
+            for row in quiz._quiz_indicator_payload(indicator_id, year)["values"]
+        }
         perfect = sorted(keys, key=lambda key: values[key], reverse=True)
 
         def answer(order):

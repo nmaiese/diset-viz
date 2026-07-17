@@ -1,4 +1,4 @@
-# Fonti esterne 2025
+# Fonti esterne e aggiornamenti 2025/2026
 
 Le fonti verticali sono configurate in `config/external_sources.yaml` e
 normalizzate in un dataset separato. Non modificano lo schema di
@@ -23,6 +23,9 @@ Valori ammessi per `definition_match`:
 
 ## Fonti registrate
 
+- `istat_bes_regioni`: appendice statistica del BES nazionale. Parser promosso:
+  145 indicatori regionali, di cui 67 al 2025. È la fonte della classifica
+  regionale e non sostituisce il BES dei Territori provinciale.
 - `istat_lavoro`: Rilevazione sulle forze di lavoro, regioni e province. Stato:
   parser locale promosso per le righe regionali 2025 presenti nell'archivio
   BDTPS aggiornato.
@@ -58,3 +61,8 @@ Il motore BES resta la fonte dello scoring. Il bridge `app/quality_life_external
 espone candidati e sostituzioni esatte, ma non li applica automaticamente.
 Qualunque sostituzione deve avere `definition_match=exact`, copertura almeno 95%,
 direzione curata e test comparativo di stabilità dello scoring.
+
+Per la qualità della vita regionale il motore legge direttamente il dataset BES
+nazionale separato. Qui la soglia operativa è anno almeno 2025, copertura almeno
+80% e direzione esplicitamente revisionata. Le serie contestuali non entrano nel
+punteggio ma restano disponibili nelle schede.

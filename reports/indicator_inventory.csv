@@ -1,6 +1,4 @@
 id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;fonte_attuale;uso_in_atlante;uso_nei_profili;uso_nello_scoring
-10AMB018P;10AMB018P;provincia;ambiente_mobilita_servizi;contextual;numero;2023;Istat, BES dei Territori;false;false;false
-12SER003P-N25;12SER003P-N25;provincia;ambiente_mobilita_servizi;contextual;INHAB_5;2022;Istat, BES dei Territori;false;false;false
 10AMB014;Aree protette;provincia;ambiente_mobilita_servizi;higher_better;%;2022;Istat, BES dei Territori;false;false;true
 10AMB001P;Concentrazione media annua di PM10;provincia;ambiente_mobilita_servizi;lower_better;microgrammi per m3;2023;Istat, BES dei Territori;false;false;true
 10AMB002P;Concentrazione media annua di PM2.5;provincia;ambiente_mobilita_servizi;lower_better;microgrammi per m3;2023;Istat, BES dei Territori;false;false;true
@@ -8,19 +6,21 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 10AMB008;Disponibilità di verde urbano;provincia;ambiente_mobilita_servizi;higher_better;m2 per abitante;2023;Istat, BES dei Territori;false;false;true
 12SER025;Emigrazione ospedaliera in altra regione;provincia;ambiente_mobilita_servizi;lower_better;%;2023;Istat, BES dei Territori;false;false;true
 10AMB016;Energia elettrica da fonti rinnovabili;provincia;ambiente_mobilita_servizi;higher_better;%;2023;Istat, BES dei Territori;false;false;true
+10AMB018P;Impermeabilizzazione del suolo da copertura artificiale;provincia;ambiente_mobilita_servizi;lower_better;%;2023;Istat, BES dei Territori;false;false;true
 12SER007;Irregolarità del servizio elettrico;provincia;ambiente_mobilita_servizi;lower_better;numero medio di utenti;2023;Istat, BES dei Territori;false;false;true
 12SER002P;Medici specialisti;provincia;ambiente_mobilita_servizi;higher_better;per 10.000 abitanti;2023;Istat, BES dei Territori;false;false;true
 10AMB012;Popolazione esposta al rischio di alluvioni;provincia;ambiente_mobilita_servizi;lower_better;%;2020;Istat, BES dei Territori;false;false;true
 10AMB011;Popolazione esposta al rischio di frane;provincia;ambiente_mobilita_servizi;lower_better;%;2020;Istat, BES dei Territori;false;false;true
+12SER003P-N25;Posti letto negli ospedali;provincia;ambiente_mobilita_servizi;higher_better;per 10.000 abitanti;2022;Istat, BES dei Territori;false;false;true
 12SER022;Posti letto per specialità ad elevata assistenza;provincia;ambiente_mobilita_servizi;higher_better;per 10.000 abitanti;2022;Istat, BES dei Territori;false;false;true
 12SER008;Posti-km offerti dal Tpl;provincia;ambiente_mobilita_servizi;higher_better;valore per abitante;2023;Istat, BES dei Territori;false;false;true
 10AMB017;Raccolta differenziata dei rifiuti urbani;provincia;ambiente_mobilita_servizi;higher_better;%;2023;Istat, BES dei Territori;false;false;true
 10AMB024P;Rifiuti urbani prodotti;provincia;ambiente_mobilita_servizi;lower_better;kg per abitante;2023;Istat, BES dei Territori;false;false;true
 12SER024;Servizio di raccolta differenziata dei rifiuti urbani;provincia;ambiente_mobilita_servizi;higher_better;%;2023;Istat, BES dei Territori;false;false;true
-09PAE009-N25;09PAE009-N25;provincia;cultura_digitale;contextual;per 100 m2;2022;Istat, BES dei Territori;false;false;false
 11RIC004P;Addetti nelle imprese culturali;provincia;cultura_digitale;higher_better;%;2022;Istat, BES dei Territori;false;false;true
 11RIC022;Comuni con servizi per le famiglie interamente on line;provincia;cultura_digitale;higher_better;%;2018;Istat, BES dei Territori;false;false;true
 12SER020;Copertura della rete fissa di accesso ultra veloce a internet;provincia;cultura_digitale;higher_better;%;2024;Istat, BES dei Territori;false;false;true
+09PAE009-N25;Densità di verde storico;provincia;cultura_digitale;higher_better;per 100 m2;2022;Istat, BES dei Territori;false;false;true
 09PAE002;Densità e rilevanza del patrimonio museale;provincia;cultura_digitale;higher_better;per 100 km2;2022;Istat, BES dei Territori;false;false;true
 09PAE008;Diffusione delle aziende agrituristiche;provincia;cultura_digitale;higher_better;per 100 km2;2023;Istat, BES dei Territori;false;false;true
 12SER002;Bambini che hanno usufruito dei servizi comunali per l'infanzia;provincia;istruzione_capitale_umano;higher_better;%;2022;Istat, BES dei Territori;false;false;true
@@ -75,7 +75,7 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 387;Dinamica dei litorali in erosione;regione;Ambiente, altro;contextual;percentuale;2019;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 389;Dinamica dei litorali stabili;regione;Ambiente, altro;contextual;percentuale;2019;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 33;Elementi fertilizzanti usati in agricoltura;regione;Ambiente, altro;higher_worse;quintali;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-384;Gestione dei siti contaminati;regione;Ambiente, altro;contextual;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+384;Gestione dei siti contaminati;regione;Ambiente, altro;higher_better;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 441;Percentuale di habitat con stato di conservazione favorevole;regione;Ambiente, altro;contextual;numero;2018;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 278;Popolazione esposta a rischio alluvione;regione;Ambiente, altro;lower_better;classi;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 277;Popolazione esposta a rischio frane;regione;Ambiente, altro;lower_better;numero per kmq;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
@@ -86,8 +86,8 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 393;Resilienza ai Terremoti degli Insediamenti, per presenza di microzonazione sismica;regione;Ambiente, altro;contextual;percentuale;2016;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 263;Rete Natura 2000;regione;Ambiente, altro;contextual;percentuale;2021;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 261;Siti di Importanza Comunitaria (SIC);regione;Ambiente, altro;contextual;percentuale;2021;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-255;Superficie boscata e non boscata percorsa dal fuoco;regione;Ambiente, altro;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-514;Superficie boscata percorsa dal fuoco;regione;Ambiente, altro;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+255;Superficie boscata e non boscata percorsa dal fuoco;regione;Ambiente, altro;lower_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+514;Superficie boscata percorsa dal fuoco;regione;Ambiente, altro;lower_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 442;Superficie delle Aree agricole ad Alto Valore Naturale;regione;Ambiente, altro;contextual;percentuale;2010;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 239;Superficie forestale;regione;Ambiente, altro;contextual;ettari;2005;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 443;Tasso di turisticità nei parchi nazionali e regionali;regione;Ambiente, altro;contextual;giornate per abitante;2018;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
@@ -100,18 +100,18 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 125;Diffusione della pratica sportiva;regione;Città;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 206;Diffusione della pratica sportiva (femmine);regione;Città;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 205;Diffusione della pratica sportiva (maschi);regione;Città;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-592;Disponibilità di verde urbano;regione;Città;contextual;metri quadrati;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+592;Disponibilità di verde urbano;regione;Città;higher_better;metri quadrati;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 252;Verde pubblico nelle città;regione;Città;contextual;metri quadri per abitante;2016;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 436;Addetti occupati nelle unità locali delle imprese italiane a controllo estero;regione;Competitività;contextual;percentuale;2019;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-115;Capacità di sviluppo dei servizi alle imprese;regione;Competitività;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+115;Capacità di sviluppo dei servizi alle imprese;regione;Competitività;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 375;Consumi di energia elettrica delle imprese dell'agricoltura;regione;Competitività;higher_worse;Gwh per 100 milioni di euro;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 376;Consumi di energia elettrica delle imprese dell'industria;regione;Competitività;higher_worse;Gwh per 100 milioni di euro;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 377;Consumi di energia elettrica delle imprese private del terziario (esclusa la PA);regione;Competitività;higher_worse;Gwh per 100 milioni di euro;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-437;Consumi finali di energia per Unità di lavoro;regione;Competitività;contextual;KTep per Ula (migliaia);2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+437;Consumi finali di energia per Unità di lavoro;regione;Competitività;higher_worse;KTep per Ula (migliaia);2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 158;Incidenza della certificazione ambientale;regione;Competitività;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 167;Intensità di accumulazione del capitale;regione;Competitività;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 471;Investimenti privati sul PIL;regione;Competitività;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-523;Quota degli addetti nei settori ad alta intensità di conoscenza nelle imprese dell'industria e dei servizi;regione;Competitività;contextual;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+523;Quota degli addetti nei settori ad alta intensità di conoscenza nelle imprese dell'industria e dei servizi;regione;Competitività;higher_better;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 421;Specializzazione produttiva nei settori ad alta tecnologia (femmine);regione;Competitività;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 420;Specializzazione produttiva nei settori ad alta tecnologia (maschi);regione;Competitività;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 419;Specializzazione produttiva nei settori ad alta tecnologia (totale);regione;Competitività;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
@@ -145,7 +145,7 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 241;Tasso di iscrizione lordo nel registro delle imprese;regione;Demografia di impresa;contextual;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 242;Tasso di iscrizione netto nel registro delle imprese;regione;Demografia di impresa;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 54;Tasso di natalità delle imprese;regione;Demografia di impresa;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-157;Tasso netto di turnover delle imprese;regione;Demografia di impresa;contextual;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+157;Tasso netto di turnover delle imprese;regione;Demografia di impresa;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 920;Eta media della popolazione;regione;Demografia e popolazione;contextual;anni;2026;Istat, Indicatori demografici;true;true;false
 921;Indice di vecchiaia;regione;Demografia e popolazione;contextual;percentuale;2026;Istat, Indicatori demografici;true;true;false
 922;Numero medio di figli per donna;regione;Demografia e popolazione;contextual;numero medio;2025;Istat, Indicatori demografici;true;true;false
@@ -207,7 +207,7 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 650;Percentuale scuole dotate di segnali acustici o/e visivi;regione;Inclusione sociale;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 360;Persone a rischio di povertà o esclusione sociale - Europa 2030 (femmine);regione;Inclusione sociale;lower_better;numero;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 359;Persone a rischio di povertà o esclusione sociale - Europa 2030 (maschi);regione;Inclusione sociale;lower_better;numero;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-285;Persone a rischio di povertà o esclusione sociale - Europa 2030 (totale);regione;Inclusione sociale;lower_better;numero;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
+285;Persone a rischio di povertà o esclusione sociale - Europa 2030 (totale);regione;Inclusione sociale;contextual;numero;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 371;Persone che vivono in situazioni di sovraffollamento abitativo, in abitazioni prive di alcuni servizi e con problemi strutturali;regione;Inclusione sociale;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 367;Persone in condizioni di grave deprivazione materiale e sociale - Europa 2030 (femmine);regione;Inclusione sociale;lower_better;numero;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 366;Persone in condizioni di grave deprivazione materiale e sociale - Europa 2030 (maschi);regione;Inclusione sociale;lower_better;numero;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
@@ -243,8 +243,8 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 620;Comprensione della lettura (reading) della lingua inglese non adeguata (studenti classi III scuola secondaria primo grado);regione;Istruzione e formazione;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 626;Comprensione della lettura (reading) della lingua inglese non adeguata (studenti classi V scuola secondaria secondo grado);regione;Istruzione e formazione;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 411;Disponibilità di nuove tecnologie per fini didattici;regione;Istruzione e formazione;contextual;numero;2014;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-409;Incidenza dei diplomati nei percorsi di istruzione tecnica e professionale sul totale dei diplomati;regione;Istruzione e formazione;higher_better;percentuale;2021;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-244;Indice di attrattività delle università;regione;Istruzione e formazione;contextual;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+409;Incidenza dei diplomati nei percorsi di istruzione tecnica e professionale sul totale dei diplomati;regione;Istruzione e formazione;contextual;percentuale;2021;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+244;Indice di attrattività delle università;regione;Istruzione e formazione;higher_better;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 77;Livello di istruzione della popolazione 15-19 anni;regione;Istruzione e formazione;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 190;Livello di istruzione della popolazione 15-19 anni (femmine);regione;Istruzione e formazione;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 189;Livello di istruzione della popolazione 15-19 anni (maschi);regione;Istruzione e formazione;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
@@ -295,7 +295,7 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 16;Incidenza della disoccupazione di lunga durata (totale);regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 108;Partecipazione della popolazione al mercato del lavoro;regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 435;Quota di lavoratori che percepiscono sussidi di politica del lavoro passiva: Cassa integrazione e Contratti di solidarietà;regione;Lavoro;contextual;percentuale;2015;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-530;Quota di lavoratori che percepiscono sussidi di politica del lavoro passiva: Indennità di disoccupazione e Assicurazione sociale per l'impiego;regione;Lavoro;lower_better;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+530;Quota di lavoratori che percepiscono sussidi di politica del lavoro passiva: Indennità di disoccupazione e Assicurazione sociale per l'impiego;regione;Lavoro;contextual;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 203;Tasso di attività totale della popolazione (femmine);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 213;Tasso di attività totale della popolazione (maschi);regione;Lavoro;higher_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 12;Tasso di disoccupazione;regione;Lavoro;lower_better;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
@@ -363,19 +363,19 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 903;Valore aggiunto per abitante;regione;Reddito e ricchezza;higher_better;euro;2024;Istat, Conti economici territoriali;true;true;false
 904;Valore aggiunto per unità di lavoro;regione;Reddito e ricchezza;higher_better;euro;2024;Istat, Conti economici territoriali;true;true;false
 251;Addetti alla R&S;regione;Ricerca ed innovazione;contextual;numero per mille abitanti;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-417;Imprese che hanno svolto attività di R&S in collaborazione con soggetti esterni;regione;Ricerca ed innovazione;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-432;Imprese che hanno svolto attività di R&S utilizzando infrastrutture di ricerca e altri servizi alla R&S da soggetti pubblici o privati;regione;Ricerca ed innovazione;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-93;Incidenza della spesa delle imprese in R&S;regione;Ricerca ed innovazione;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+417;Imprese che hanno svolto attività di R&S in collaborazione con soggetti esterni;regione;Ricerca ed innovazione;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+432;Imprese che hanno svolto attività di R&S utilizzando infrastrutture di ricerca e altri servizi alla R&S da soggetti pubblici o privati;regione;Ricerca ed innovazione;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+93;Incidenza della spesa delle imprese in R&S;regione;Ricerca ed innovazione;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 418;Incidenza della spesa per R&S del settore privato sul PIL;regione;Ricerca ed innovazione;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 92;Incidenza della spesa pubblica per R&S sul PIL;regione;Ricerca ed innovazione;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-114;Incidenza della spesa totale per R&S sul PIL;regione;Ricerca ed innovazione;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+114;Incidenza della spesa totale per R&S sul PIL;regione;Ricerca ed innovazione;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 152;Intensità brevettuale;regione;Ricerca ed innovazione;higher_better;numero per milione di abitanti;2012;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 90;Laureati in scienza e tecnologia;regione;Ricerca ed innovazione;contextual;numero per mille abitanti;2012;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 196;Laureati in scienza e tecnologia (femmine);regione;Ricerca ed innovazione;contextual;numero per mille abitanti;2012;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 194;Laureati in scienza e tecnologia (maschi);regione;Ricerca ed innovazione;contextual;numero per mille abitanti;2012;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-416;Ricercatori occupati nelle imprese sul totale degli addetti (totale);regione;Ricerca ed innovazione;contextual;percentuale;2021;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-150;Spesa media regionale per innovazione delle imprese;regione;Ricerca ed innovazione;contextual;migliaia di euro;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-148;Tasso di innovazione del sistema produttivo;regione;Ricerca ed innovazione;contextual;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+416;Ricercatori occupati nelle imprese sul totale degli addetti (totale);regione;Ricerca ed innovazione;higher_better;percentuale;2021;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+150;Spesa media regionale per innovazione delle imprese;regione;Ricerca ed innovazione;higher_better;migliaia di euro;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+148;Tasso di innovazione del sistema produttivo;regione;Ricerca ed innovazione;higher_better;percentuale;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 396;Tasso di natalità delle imprese nei settori ad alta intensità di conoscenza;regione;Ricerca ed innovazione;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 397;Tasso di sopravvivenza a tre anni delle imprese nei settori ad alta intensità di conoscenza;regione;Ricerca ed innovazione;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 232;Percentuale di rifiuti urbani smaltiti in discarica;regione;Rifiuti;lower_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
@@ -395,23 +395,23 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 910;Speranza di vita alla nascita;regione;Salute;higher_better;anni;2025;Istat, Indicatori demografici;true;true;false
 912;Speranza di vita alla nascita (femmine);regione;Salute;higher_better;anni;2025;Istat, Indicatori demografici;true;true;false
 911;Speranza di vita alla nascita (maschi);regione;Salute;higher_better;anni;2025;Istat, Indicatori demografici;true;true;false
-415;Anziani trattati in assistenza domiciliare socio-assistenziale;regione;Servizi di cura;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+415;Anziani trattati in assistenza domiciliare socio-assistenziale;regione;Servizi di cura;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 142;Diffusione dei servizi per l'infanzia;regione;Servizi di cura;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 590;Emigrazione ospedaliera in altra regione;regione;Servizi di cura;lower_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 145;Incidenza del costo dell'ADI sul totale della spesa sanitaria;regione;Servizi di cura;contextual;percentuale;2012;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-144;Presa in carico degli anziani per il servizio di assistenza domiciliare integrata;regione;Servizi di cura;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+144;Presa in carico degli anziani per il servizio di assistenza domiciliare integrata;regione;Servizi di cura;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 414;Presa in carico di tutti gli utenti dei servizi per l'infanzia;regione;Servizi di cura;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 425;Cittadini che utilizzano il Fascicolo Sanitario Elettronico;regione;Società dell'informazione;contextual;percentuale;2015;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 424;Comuni con servizi pienamente interattivi;regione;Società dell'informazione;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 423;Copertura con banda ultralarga a 100 Mbps;regione;Società dell'informazione;higher_better;percentuale;2015;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 422;Copertura con banda ultralarga ad almeno 30 Mbps;regione;Società dell'informazione;higher_better;percentuale;2015;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 430;Dipendenti di amministrazioni locali che hanno seguito corsi di formazione ICT;regione;Società dell'informazione;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-427;Disponibilità di wi-fi pubblico nei Comuni;regione;Società dell'informazione;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+427;Disponibilità di wi-fi pubblico nei Comuni;regione;Società dell'informazione;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 65;Grado di diffusione del personal computer nelle imprese con più di dieci addetti;regione;Società dell'informazione;contextual;percentuale;2019;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 73;Grado di diffusione della larga banda nelle amministrazioni locali;regione;Società dell'informazione;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 62;Grado di diffusione di Internet nelle famiglie;regione;Società dell'informazione;contextual;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 428;Grado di partecipazione dei cittadini attraverso il web a attività politiche e sociali;regione;Società dell'informazione;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-469;Grado di utilizzo dell'e-procurement nella PA;regione;Società dell'informazione;contextual;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+469;Grado di utilizzo dell'e-procurement nella PA;regione;Società dell'informazione;higher_better;percentuale;2022;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 426;Grado di utilizzo di Internet nelle famiglie negli ultimi 12 mesi;regione;Società dell'informazione;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 64;Grado di utilizzo di Internet nelle famiglie negli ultimi 3 mesi;regione;Società dell'informazione;higher_better;percentuale;2023;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 72;Grado di utilizzo di Internet nelle imprese;regione;Società dell'informazione;higher_better;percentuale;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
@@ -455,74 +455,152 @@ id;nome;livello_territoriale;categoria;direzione;unita;ultimo_anno_disponibile;f
 208;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (femmine);regione;Trasporti e mobilità;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 207;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (maschi);regione;Trasporti e mobilità;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 129;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici (totale);regione;Trasporti e mobilità;contextual;percentuale;2025;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
-438;Velocità del trasporto pubblico su gomma nei comuni capoluogo di provincia;regione;Trasporti e mobilità;contextual;Km/ora;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
+438;Velocità del trasporto pubblico su gomma nei comuni capoluogo di provincia;regione;Trasporti e mobilità;higher_better;Km/ora;2020;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 132;Produttività del lavoro nel turismo;regione;Turismo;contextual;migliaia di euro;2016;Istat, Banca dati territoriale per le politiche di sviluppo;true;false;false
 105;Tasso di turisticità;regione;Turismo;contextual;giornate per abitante;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
 165;Turismo nei mesi non estivi;regione;Turismo;contextual;giornate per abitante;2024;Istat, Banca dati territoriale per le politiche di sviluppo;true;true;false
-10AMB018P;10AMB018P;regione;ambiente_mobilita_servizi;contextual;numero;2023;Istat, BES dei Territori;false;false;false
-12SER003P-N25;12SER003P-N25;regione;ambiente_mobilita_servizi;contextual;INHAB_5;2022;Istat, BES dei Territori;false;false;false
-10AMB014;Aree protette;regione;ambiente_mobilita_servizi;higher_better;%;2022;Istat, BES dei Territori;false;false;true
-10AMB001P;Concentrazione media annua di PM10;regione;ambiente_mobilita_servizi;lower_better;microgrammi per m3;2023;Istat, BES dei Territori;false;false;true
-10AMB002P;Concentrazione media annua di PM2.5;regione;ambiente_mobilita_servizi;lower_better;microgrammi per m3;2023;Istat, BES dei Territori;false;false;true
-10AMB003;Dispersione da rete idrica comunale;regione;ambiente_mobilita_servizi;lower_better;%;2022;Istat, BES dei Territori;false;false;true
-10AMB008;Disponibilità di verde urbano;regione;ambiente_mobilita_servizi;higher_better;m2 per abitante;2023;Istat, BES dei Territori;false;false;true
-12SER025;Emigrazione ospedaliera in altra regione;regione;ambiente_mobilita_servizi;lower_better;%;2023;Istat, BES dei Territori;false;false;true
-10AMB016;Energia elettrica da fonti rinnovabili;regione;ambiente_mobilita_servizi;higher_better;%;2023;Istat, BES dei Territori;false;false;true
-12SER007;Irregolarità del servizio elettrico;regione;ambiente_mobilita_servizi;lower_better;numero medio di utenti;2023;Istat, BES dei Territori;false;false;true
-12SER002P;Medici specialisti;regione;ambiente_mobilita_servizi;higher_better;per 10.000 abitanti;2023;Istat, BES dei Territori;false;false;true
-10AMB012;Popolazione esposta al rischio di alluvioni;regione;ambiente_mobilita_servizi;lower_better;%;2020;Istat, BES dei Territori;false;false;true
-10AMB011;Popolazione esposta al rischio di frane;regione;ambiente_mobilita_servizi;lower_better;%;2020;Istat, BES dei Territori;false;false;true
-12SER022;Posti letto per specialità ad elevata assistenza;regione;ambiente_mobilita_servizi;higher_better;per 10.000 abitanti;2022;Istat, BES dei Territori;false;false;true
-12SER008;Posti-km offerti dal Tpl;regione;ambiente_mobilita_servizi;higher_better;valore per abitante;2023;Istat, BES dei Territori;false;false;true
-10AMB017;Raccolta differenziata dei rifiuti urbani;regione;ambiente_mobilita_servizi;higher_better;%;2023;Istat, BES dei Territori;false;false;true
-10AMB024P;Rifiuti urbani prodotti;regione;ambiente_mobilita_servizi;lower_better;kg per abitante;2023;Istat, BES dei Territori;false;false;true
-12SER024;Servizio di raccolta differenziata dei rifiuti urbani;regione;ambiente_mobilita_servizi;higher_better;%;2023;Istat, BES dei Territori;false;false;true
-09PAE009-N25;09PAE009-N25;regione;cultura_digitale;contextual;per 100 m2;2022;Istat, BES dei Territori;false;false;false
-11RIC004P;Addetti nelle imprese culturali;regione;cultura_digitale;higher_better;%;2022;Istat, BES dei Territori;false;false;true
-11RIC022;Comuni con servizi per le famiglie interamente on line;regione;cultura_digitale;higher_better;%;2022;Istat, BES dei Territori;false;false;true
-12SER020;Copertura della rete fissa di accesso ultra veloce a internet;regione;cultura_digitale;higher_better;%;2024;Istat, BES dei Territori;false;false;true
-09PAE002;Densità e rilevanza del patrimonio museale;regione;cultura_digitale;higher_better;per 100 km2;2022;Istat, BES dei Territori;false;false;true
-09PAE008;Diffusione delle aziende agrituristiche;regione;cultura_digitale;higher_better;per 100 km2;2023;Istat, BES dei Territori;false;false;true
-12SER002;Bambini che hanno usufruito dei servizi comunali per l'infanzia;regione;istruzione_capitale_umano;higher_better;%;2022;Istat, BES dei Territori;false;false;true
-02IST011P;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);regione;istruzione_capitale_umano;lower_better;%;2024;Istat, BES dei Territori;false;false;true
-02IST010P;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);regione;istruzione_capitale_umano;lower_better;%;2024;Istat, BES dei Territori;false;false;true
-02IST006-N22;Giovani che non lavorano e non studiano (NEET);regione;istruzione_capitale_umano;lower_better;%;2024;Istat, BES dei Territori;false;false;true
-02IST003P-N22;Laureati e altri titoli terziari (25-39 anni);regione;istruzione_capitale_umano;higher_better;%;2024;Istat, BES dei Territori;false;false;true
-11RIC025;Mobilità dei laureati italiani (25-39 anni);regione;istruzione_capitale_umano;higher_better;per 1.000 laureati residenti;2023;Istat, BES dei Territori;false;false;true
-02IST001;Partecipazione al sistema scolastico dei bambini di 4-5 anni;regione;istruzione_capitale_umano;higher_better;%;2023;Istat, BES dei Territori;false;false;true
-02IST007-N22;Partecipazione alla formazione continua;regione;istruzione_capitale_umano;higher_better;%;2024;Istat, BES dei Territori;false;false;true
-02IST004;Passaggio all'università;regione;istruzione_capitale_umano;higher_better;tasso specifico per coorte;2022;Istat, BES dei Territori;false;false;true
-02IST002-N22;Persone con almeno il diploma (25-64 anni);regione;istruzione_capitale_umano;higher_better;%;2024;Istat, BES dei Territori;false;false;true
-11RIC002;Propensione alla brevettazione;regione;istruzione_capitale_umano;higher_better;per milione di abitanti;2022;Istat, BES dei Territori;false;false;true
-03LAV004P;Giornate retribuite nell'anno (lavoratori dipendenti);regione;lavoro_opportunita;higher_better;%;2023;Istat, BES dei Territori;false;false;true
-03LAV007;Tasso di infortuni mortali e inabilità permanente;regione;lavoro_opportunita;lower_better;per 10.000 occupati;2022;Istat, BES dei Territori;false;false;true
-03LAV002-N22;Tasso di mancata partecipazione al lavoro;regione;lavoro_opportunita;lower_better;%;2024;Istat, BES dei Territori;false;false;true
-03LAV006P-N22;Tasso di mancata partecipazione al lavoro giovanile (15-29 anni);regione;lavoro_opportunita;lower_better;%;2024;Istat, BES dei Territori;false;false;true
-03LAV001-N22;Tasso di occupazione (20-64 anni);regione;lavoro_opportunita;higher_better;%;2024;Istat, BES dei Territori;false;false;true
-03LAV003P-N22;Tasso di occupazione giovanile (15-29 anni);regione;lavoro_opportunita;higher_better;%;2024;Istat, BES dei Territori;false;false;true
-04BEC005P;Importo medio annuo pro-capite dei redditi pensionistici;regione;reddito_accessibilita;higher_better;euro;2023;Istat, BES dei Territori;false;false;true
-04BEC006P;Pensionati con reddito pensionistico di basso importo;regione;reddito_accessibilita;lower_better;%;2023;Istat, BES dei Territori;false;false;true
-04BEC001P;Reddito medio disponibile pro capite;regione;reddito_accessibilita;higher_better;euro;2023;Istat, BES dei Territori;false;false;true
-04BEC002P;Retribuzione media annua dei lavoratori dipendenti;regione;reddito_accessibilita;higher_better;euro;2023;Istat, BES dei Territori;false;false;true
-04BEC009P;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;regione;reddito_accessibilita;lower_better;%;2024;Istat, BES dei Territori;false;false;true
-01SAL020;Mortalità evitabile (0-74 anni);regione;salute_cura;lower_better;tasso standardizzato per 10.000;2022;Istat, BES dei Territori;false;false;true
-01SAL004;Mortalità infantile;regione;salute_cura;lower_better;per 1.000 nati vivi;2022;Istat, BES dei Territori;false;false;true
-01SAL007;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);regione;salute_cura;lower_better;tasso standardizzato per 10.000;2022;Istat, BES dei Territori;false;false;true
-01SAL005;Mortalità per incidenti stradali (15-34 anni);regione;salute_cura;lower_better;tasso standardizzato per 10.000;2023;Istat, BES dei Territori;false;false;true
-01SAL006;Mortalità per tumore (20-64 anni);regione;salute_cura;lower_better;tasso standardizzato per 10.000;2022;Istat, BES dei Territori;false;false;true
-01SAL001;Speranza di vita alla nascita;regione;salute_cura;higher_better;anni (media);2024;Istat, BES dei Territori;false;false;true
-06POL012P;Affollamento degli istituti di pena;regione;sicurezza_istituzioni;lower_better;%;2024;Istat, BES dei Territori;false;false;true
-07SIC007P;Altri delitti mortali denunciati;regione;sicurezza_istituzioni;lower_better;per 100.000 abitanti;2023;Istat, BES dei Territori;false;false;true
-06POL003P;Amministratori comunali con meno di 40 anni;regione;sicurezza_istituzioni;higher_better;%;2024;Istat, BES dei Territori;false;false;true
-06POL002P;Amministratori comunali donne;regione;sicurezza_istituzioni;higher_better;%;2024;Istat, BES dei Territori;false;false;true
-06POL007P;Amministrazioni provinciali: capacità di riscossione;regione;sicurezza_istituzioni;higher_better;%;2022;Istat, BES dei Territori;false;false;true
-06POL009P;Comuni: capacità di riscossione;regione;sicurezza_istituzioni;higher_better;%;2022;Istat, BES dei Territori;false;false;true
-07SIC005P;Denunce di borseggio;regione;sicurezza_istituzioni;lower_better;per 100.000 abitanti;2023;Istat, BES dei Territori;false;false;true
-07SIC004P;Denunce di furto in abitazione;regione;sicurezza_istituzioni;lower_better;per 100.000 abitanti;2023;Istat, BES dei Territori;false;false;true
-07SIC006P;Denunce di rapina;regione;sicurezza_istituzioni;lower_better;per 100.000 abitanti;2023;Istat, BES dei Territori;false;false;true
-07SIC008P;Mortalità stradale in ambito extraurbano;regione;sicurezza_istituzioni;lower_better;%;2023;Istat, BES dei Territori;false;false;true
-07SIC001P;Omicidi volontari;regione;sicurezza_istituzioni;lower_better;per 100.000 abitanti;2023;Istat, BES dei Territori;false;false;true
-05REL008;Organizzazioni non profit;regione;sicurezza_istituzioni;higher_better;per 10.000 abitanti;2022;Istat, BES dei Territori;false;false;true
-06POL001;Partecipazione elettorale;regione;sicurezza_istituzioni;higher_better;%;2024;Istat, BES dei Territori;false;false;true
-06POL001P;Partecipazione elettorale (elezioni regionali);regione;sicurezza_istituzioni;higher_better;%;2024;Istat, BES dei Territori;false;false;true
-05REL007P;Scuole accessibili;regione;sicurezza_istituzioni;higher_better;%;2024;Istat, BES dei Territori;false;false;true
+12SER003;Anziani trattati in assistenza domiciliare integrata;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+10AMB014;Aree protette;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2022;Istat, BES dei Territori;false;false;false
+10AMB004;Conferimento dei rifiuti urbani in discarica;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+10AMB002;Consumo materiale interno;regione;ambiente_mobilita_servizi;contextual;Milioni di tonnellate;2022;Istat, BES dei Territori;false;false;false
+12SER020;Copertura della rete fissa di accesso ultra veloce a internet;regione;ambiente_mobilita_servizi;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+10AMB007;Coste marine balneabili;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2019;Istat, BES dei Territori;false;false;false
+12SER004;Difficoltà di accesso ad alcuni servizi;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+10AMB003;Dispersione da rete idrica comunale;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2022;Istat, BES dei Territori;false;false;false
+10AMB008;Disponibilità di verde urbano;regione;ambiente_mobilita_servizi;contextual;M2 per abitante;2023;Istat, BES dei Territori;false;false;false
+12SER025;Emigrazione ospedaliera in altra regione;regione;ambiente_mobilita_servizi;lower_better;Valori percentuali;2024;Istat, BES dei Territori;false;false;true
+10AMB016;Energia elettrica da fonti rinnovabili;regione;ambiente_mobilita_servizi;higher_better;Valori percentuali;2024;Istat, BES dei Territori;false;false;true
+10AMB026;Giorni con precipitazione estremamente intensa;regione;ambiente_mobilita_servizi;contextual;Numero di giorni;2023;Istat, BES dei Territori;false;false;false
+10AMB027;Giorni consecutivi senza pioggia;regione;ambiente_mobilita_servizi;contextual;Numero di giorni;2023;Istat, BES dei Territori;false;false;false
+10AMB018;Impermeabilizzazione del suolo da copertura artificiale;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+10AMB025;Indice di durata dei periodi di caldo;regione;ambiente_mobilita_servizi;contextual;Numero di giorni;2023;Istat, BES dei Territori;false;false;false
+SDG-4;Infermieri e ostetriche;regione;ambiente_mobilita_servizi;contextual;Per 1.000 abitanti;2023;Istat, BES dei Territori;false;false;false
+12SER007;Irregolarità del servizio elettrico;regione;ambiente_mobilita_servizi;contextual;Numero medio per utente;2024;Istat, BES dei Territori;false;false;false
+12SER006;Irregolarità nella distribuzione dell'acqua;regione;ambiente_mobilita_servizi;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+SDG-3;Medici;regione;ambiente_mobilita_servizi;contextual;Per 1.000 abitanti;2023;Istat, BES dei Territori;false;false;false
+12SER027;Medici di medicina generale con un numero di assistiti oltre soglia;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2023;Istat, BES dei Territori;false;false;false
+10AMB012;Popolazione esposta al rischio di alluvioni;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2020;Istat, BES dei Territori;false;false;false
+10AMB011;Popolazione esposta al rischio di frane;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+SDG-405;Posti letto nei presidi residenziali socio-assistenziali e socio-sanitari;regione;ambiente_mobilita_servizi;contextual;Per 10.000 abitanti;2023;Istat, BES dei Territori;false;false;false
+12SER022;Posti letto per specialità a elevata assistenza;regione;ambiente_mobilita_servizi;contextual;Per 10.000 abitanti;2023;Istat, BES dei Territori;false;false;false
+12SER008;Posti-km offerti dal Tpl;regione;ambiente_mobilita_servizi;higher_better;Valori per abitante;2023;Istat, BES dei Territori;false;false;true
+10AMB023;Preoccupazione per cambiamenti climatici ed effetto serra;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+10AMB015;Preoccupazione per la perdita di biodiversità;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+10AMB020;Qualità dell'aria - PM2.5;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+10AMB024;Rifiuti urbani prodotti;regione;ambiente_mobilita_servizi;contextual;Kg per abitante;2024;Istat, BES dei Territori;false;false;false
+12SER026;Rinuncia a prestazioni sanitarie;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+12SER024;Servizio di raccolta differenziata dei rifiuti urbani;regione;ambiente_mobilita_servizi;higher_better;Valori percentuali;2024;Istat, BES dei Territori;false;false;true
+10AMB010;Siti contaminati;regione;ambiente_mobilita_servizi;contextual;Valori per 1.000;2021;Istat, BES dei Territori;false;false;false
+12SER010;Soddisfazione per i servizi di trasporto pubblico;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+10AMB009;Soddisfazione per la situazione ambientale;regione;ambiente_mobilita_servizi;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+10AMB013;Trattamento delle acque reflue;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2015;Istat, BES dei Territori;false;false;false
+12SER021;Utenti assidui dei mezzi pubblici;regione;ambiente_mobilita_servizi;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+08BSO004;Giudizio negativo sulle prospettive future;regione;benessere_soggettivo;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+08BSO003;Giudizio positivo sulle prospettive future;regione;benessere_soggettivo;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+08BSO002;Soddisfazione per il tempo libero;regione;benessere_soggettivo;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+08BSO001;Soddisfazione per la propria vita;regione;benessere_soggettivo;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+09PAE003;Abusivismo edilizio;regione;cultura_digitale;contextual;Per 100 costruzioni autorizzate;2022;Istat, BES dei Territori;false;false;false
+09PAE009-N25;Densità di verde storico;regione;cultura_digitale;higher_better;Per 100 m2;2023;Istat, BES dei Territori;false;false;true
+09PAE002;Densità e rilevanza del patrimonio museale;regione;cultura_digitale;higher_better;Per 100 km2;2022;Istat, BES dei Territori;false;false;true
+09PAE008;Diffusione delle aziende agrituristiche;regione;cultura_digitale;higher_better;Per 100 km2;2024;Istat, BES dei Territori;false;false;true
+09PAE005;Erosione dello spazio rurale da abbandono;regione;cultura_digitale;contextual;Valori percentuali;2021;Istat, BES dei Territori;false;false;false
+09PAE004;Erosione dello spazio rurale da dispersione urbana (urban sprawl);regione;cultura_digitale;contextual;Valori percentuali;2021;Istat, BES dei Territori;false;false;false
+09PAE007;Impatto degli incendi boschivi;regione;cultura_digitale;contextual;Per 1.000 km2;2024;Istat, BES dei Territori;false;false;false
+09PAE010;Insoddisfazione per il paesaggio del luogo di vita;regione;cultura_digitale;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+09PAE011;Preoccupazione per il deterioramento del paesaggio;regione;cultura_digitale;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+09PAE006;Pressione delle attività estrattive;regione;cultura_digitale;contextual;M3 per km2;2023;Istat, BES dei Territori;false;false;false
+09PAE001;Spesa corrente dei Comuni per la cultura;regione;cultura_digitale;contextual;Euro pro capite;2023;Istat, BES dei Territori;false;false;false
+02IST020;Bambini di 0-2 anni iscritti al nido;regione;istruzione_capitale_umano;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+SDG-311;Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado);regione;istruzione_capitale_umano;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+SDG-310;Competenza numerica non adeguata (studenti classi III scuola secondaria primo grado);regione;istruzione_capitale_umano;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+02IST025;Competenze digitali almeno di base;regione;istruzione_capitale_umano;contextual;Valori percentuali;2023;Istat, BES dei Territori;false;false;false
+11RIC022;Comuni con servizi per le famiglie interamente online;regione;istruzione_capitale_umano;higher_better;Valori percentuali;2022;Istat, BES dei Territori;false;false;true
+11RIC021;Disponibilità in famiglia di almeno un computer e della connessione a Internet;regione;istruzione_capitale_umano;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+02IST024;Fruizione delle biblioteche;regione;istruzione_capitale_umano;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+02IST006-N22;Giovani che non lavorano e non studiano (NEET);regione;istruzione_capitale_umano;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+11RIC023;Imprese con almeno 10 addetti con vendite via web a clienti finali;regione;istruzione_capitale_umano;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+11RIC004;Innovazione del sistema produttivo;regione;istruzione_capitale_umano;contextual;Valori percentuali;2022;Istat, BES dei Territori;false;false;false
+11RIC001;Intensità di ricerca;regione;istruzione_capitale_umano;contextual;Valori percentuali;2023;Istat, BES dei Territori;false;false;false
+02IST026-N22;Laureati e altri titoli terziari (25-34 anni);regione;istruzione_capitale_umano;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+11RIC003-N22;Lavoratori della conoscenza;regione;istruzione_capitale_umano;higher_better;Per 100 occupati;2025;Istat, BES dei Territori;false;false;true
+02IST023;Lettura di libri e quotidiani;regione;istruzione_capitale_umano;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+11RIC025;Mobilità dei laureati italiani (25-39 anni);regione;istruzione_capitale_umano;contextual;Per 1.000 laureati residenti;2023;Istat, BES dei Territori;false;false;false
+11RIC006-N22;Occupazione culturale e creativa;regione;istruzione_capitale_umano;higher_better;Per 100 occupati;2025;Istat, BES dei Territori;false;false;true
+02IST001;Partecipazione al sistema scolastico dei bambini di 4-5 anni;regione;istruzione_capitale_umano;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+02IST007-N22;Partecipazione alla formazione continua;regione;istruzione_capitale_umano;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+02IST022;Partecipazione culturale fuori casa;regione;istruzione_capitale_umano;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+02IST004;Passaggio all'università;regione;istruzione_capitale_umano;contextual;Tasso specifico di coorte;2023;Istat, BES dei Territori;false;false;false
+02IST021;Persone che conseguono un titolo terziario STEM nell'anno;regione;istruzione_capitale_umano;contextual;Per 1.000 residenti di 20-29 anni;2022;Istat, BES dei Territori;false;false;false
+02IST002-N22;Persone con almeno il diploma (25-64 anni);regione;istruzione_capitale_umano;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+11RIC002;Propensione alla brevettazione;regione;istruzione_capitale_umano;contextual;Per milione di abitanti;2022;Istat, BES dei Territori;false;false;false
+02IST005-N22;Uscita precoce dal sistema di istruzione e formazione;regione;istruzione_capitale_umano;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+11RIC020;Utenti regolari di internet;regione;istruzione_capitale_umano;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+03LAV005;Dipendenti con bassa paga;regione;lavoro_opportunita;contextual;Valori percentuali;2020;Istat, BES dei Territori;false;false;false
+03LAV010;Occupati (15-64 anni) che svolgono più di 60 ore settimanali di lavoro retribuito e/o familiare;regione;lavoro_opportunita;contextual;Valori percentuali;2014;Istat, BES dei Territori;false;false;false
+03LAV021-N22;Occupati che lavorano da casa;regione;lavoro_opportunita;contextual;Valori percentuali;2025;Istat, BES dei Territori;false;false;false
+03LAV004-N22;Occupati in lavori a termine da almeno 5 anni;regione;lavoro_opportunita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+03LAV008;Occupati non regolari;regione;lavoro_opportunita;contextual;Valori percentuali;2022;Istat, BES dei Territori;false;false;false
+03LAV006-N25;Occupati sovraistruiti tra i laureati (25-64 anni);regione;lavoro_opportunita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+03LAV014-N22;Part time involontario;regione;lavoro_opportunita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+03LAV013-N22;Percezione di insicurezza dell'occupazione;regione;lavoro_opportunita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+03LAV009-N22;Rapporto tra i tassi di occupazione (25-49 anni) delle donne con figli in età prescolare e delle donne senza figli;regione;lavoro_opportunita;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+03LAV022-N22;Soddisfazione per il lavoro svolto;regione;lavoro_opportunita;higher_better;Per 100 occupati;2025;Istat, BES dei Territori;false;false;true
+03LAV007;Tasso di infortuni sul lavoro mortali e con inabilità permanente;regione;lavoro_opportunita;contextual;Per 10.000 occupati;2022;Istat, BES dei Territori;false;false;false
+03LAV002-N22;Tasso di mancata partecipazione al lavoro;regione;lavoro_opportunita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+03LAV001-N22;Tasso di occupazione (20-64 anni);regione;lavoro_opportunita;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+03LAV003;Trasformazioni da lavori instabili a lavori stabili;regione;lavoro_opportunita;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+04BEC010-N23;Bassa intensità di lavoro - Europa 2030;regione;reddito_accessibilita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+04BEC002;Disuguaglianza del reddito netto (s80/s20);regione;reddito_accessibilita;contextual;Numero puro - rapporto tra redditi;2024;Istat, BES dei Territori;false;false;false
+04BEC009;Grande difficoltà ad arrivare a fine mese;regione;reddito_accessibilita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+04BEC008;Grave deprivazione abitativa;regione;reddito_accessibilita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+04BEC007-N23;Grave deprivazione materiale e sociale - Europa 2030;regione;reddito_accessibilita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+04BEC001;Reddito disponibile lordo pro capite;regione;reddito_accessibilita;contextual;Euro (prezzi correnti);2024;Istat, BES dei Territori;false;false;false
+04BEC003;Rischio di povertà;regione;reddito_accessibilita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+04BEC020;Situazione economica della famiglia;regione;reddito_accessibilita;contextual;Valori percentuali;2025;Istat, BES dei Territori;false;false;false
+SDG-222;Sovraccarico del costo dell'abitazione;regione;reddito_accessibilita;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+01SAL013;Adeguata alimentazione (tassi standardizzati);regione;salute_cura;higher_better;Tassi standardizzati per 100 persone;2025;Istat, BES dei Territori;false;false;true
+01SAL011;Alcol (tassi standardizzati);regione;salute_cura;lower_better;Tassi standardizzati per 100 persone;2025;Istat, BES dei Territori;false;false;true
+01SAL009;Eccesso di peso (tassi standardizzati);regione;salute_cura;lower_better;Tassi standardizzati per 100 persone;2025;Istat, BES dei Territori;false;false;true
+01SAL010;Fumo (tassi standardizzati);regione;salute_cura;lower_better;Tassi standardizzati per 100 persone;2025;Istat, BES dei Territori;false;false;true
+01SAL003;Indice di salute mentale (MH);regione;salute_cura;higher_better;Punteggi medi standardizzati;2025;Istat, BES dei Territori;false;false;true
+01SAL020;Mortalità evitabile (0-74 anni);regione;salute_cura;contextual;Tassi standardizzati per 10.000 residenti;2022;Istat, BES dei Territori;false;false;false
+01SAL004;Mortalità infantile;regione;salute_cura;contextual;Per 1.000 nati vivi;2022;Istat, BES dei Territori;false;false;false
+01SAL007;Mortalità per demenze e malattie del sistema nervoso (65 anni e più);regione;salute_cura;contextual;Tassi standardizzati per 10.000 residenti;2022;Istat, BES dei Territori;false;false;false
+01SAL005;Mortalità per incidenti stradali (15-34 anni);regione;salute_cura;contextual;Tassi standardizzati per 10.000 residenti;2024;Istat, BES dei Territori;false;false;false
+01SAL006;Mortalità per tumore (20-64 anni);regione;salute_cura;contextual;Tassi standardizzati per 10.000 residenti;2022;Istat, BES dei Territori;false;false;false
+01SAL021;Multicronicità e limitazioni gravi (75 anni e più);regione;salute_cura;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+01SAL012;Sedentarietà (tassi standardizzati);regione;salute_cura;lower_better;Tassi standardizzati per 100 persone;2025;Istat, BES dei Territori;false;false;true
+01SAL001;Speranza di vita alla nascita;regione;salute_cura;higher_better;Numero medio di anni;2025;Istat, BES dei Territori;false;false;true
+01SAL002;Speranza di vita in buona salute alla nascita;regione;salute_cura;higher_better;Numero medio di anni;2025;Istat, BES dei Territori;false;false;true
+01SAL008;Speranza di vita senza limitazioni nelle attività a 65 anni;regione;salute_cura;higher_better;Numero medio di anni;2025;Istat, BES dei Territori;false;false;true
+06POL012;Affollamento degli istituti di pena;regione;sicurezza_istituzioni;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+05REL006;Attività di volontariato;regione;sicurezza_istituzioni;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+07SIC003;Borseggi;regione;sicurezza_istituzioni;lower_better;Per 1.000 abitanti;2025;Istat, BES dei Territori;false;false;true
+06POL007;Donne e rappresentanza politica a livello locale;regione;sicurezza_istituzioni;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+06POL006;Donne e rappresentanza politica in Parlamento;regione;sicurezza_istituzioni;contextual;Valori percentuali;2022;Istat, BES dei Territori;false;false;false
+06POL011;Durata dei procedimenti civili;regione;sicurezza_istituzioni;lower_better;Numero di giorni;2025;Istat, BES dei Territori;false;false;true
+06POL010;Età media dei parlamentari italiani;regione;sicurezza_istituzioni;contextual;Età media;2022;Istat, BES dei Territori;false;false;false
+05REL009;Fiducia generalizzata;regione;sicurezza_istituzioni;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+06POL004;Fiducia nei partiti;regione;sicurezza_istituzioni;higher_better;Valore medio;2025;Istat, BES dei Territori;false;false;true
+06POL002;Fiducia nel Parlamento italiano;regione;sicurezza_istituzioni;higher_better;Valore medio;2025;Istat, BES dei Territori;false;false;true
+06POL003;Fiducia nel sistema giudiziario;regione;sicurezza_istituzioni;higher_better;Valore medio;2025;Istat, BES dei Territori;false;false;true
+06POL005;Fiducia nelle Forze dell'ordine e nei Vigili del fuoco;regione;sicurezza_istituzioni;higher_better;Valore medio;2025;Istat, BES dei Territori;false;false;true
+05REL007;Finanziamento delle associazioni;regione;sicurezza_istituzioni;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+07SIC002;Furti in abitazione;regione;sicurezza_istituzioni;lower_better;Per 1.000 famiglie;2025;Istat, BES dei Territori;false;false;true
+07SIC001;Omicidi volontari;regione;sicurezza_istituzioni;contextual;Per 100.000 abitanti;2023;Istat, BES dei Territori;false;false;false
+05REL008;Organizzazioni non profit;regione;sicurezza_istituzioni;higher_better;Per 10.000 abitanti;2023;Istat, BES dei Territori;false;false;true
+05REL005;Partecipazione civica e politica;regione;sicurezza_istituzioni;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+06POL001;Partecipazione elettorale;regione;sicurezza_istituzioni;contextual;Valori percentuali;2024;Istat, BES dei Territori;false;false;false
+05REL010;Partecipazione sociale;regione;sicurezza_istituzioni;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+07SIC010;Paura di stare per subire un reato;regione;sicurezza_istituzioni;contextual;Valori percentuali;2023;Istat, BES dei Territori;false;false;false
+07SIC022;Percezione del rischio di criminalità;regione;sicurezza_istituzioni;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+07SIC020;Percezione di sicurezza camminando da soli quando è buio;regione;sicurezza_istituzioni;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+05REL003;Persone su cui contare;regione;sicurezza_istituzioni;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+07SIC008;Preoccupazione di subire una violenza sessuale;regione;sicurezza_istituzioni;contextual;Valori percentuali;2023;Istat, BES dei Territori;false;false;false
+07SIC021;Presenza di elementi di degrado nella zona in cui si vive;regione;sicurezza_istituzioni;lower_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+07SIC004;Rapine;regione;sicurezza_istituzioni;lower_better;Per 1.000 abitanti;2025;Istat, BES dei Territori;false;false;true
+05REL002;Soddisfazione per le relazioni amicali;regione;sicurezza_istituzioni;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+05REL001;Soddisfazione per le relazioni familiari;regione;sicurezza_istituzioni;higher_better;Valori percentuali;2025;Istat, BES dei Territori;false;false;true
+07SIC005;Violenza fisica sulle donne;regione;sicurezza_istituzioni;contextual;Valori percentuali;2014;Istat, BES dei Territori;false;false;false
+07SIC007;Violenza nella coppia;regione;sicurezza_istituzioni;contextual;Valori percentuali;2014;Istat, BES dei Territori;false;false;false
+07SIC006;Violenza sessuale sulle donne;regione;sicurezza_istituzioni;contextual;Valori percentuali;2014;Istat, BES dei Territori;false;false;false
