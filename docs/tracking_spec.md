@@ -137,6 +137,7 @@ Host principali autorizzati oggi:
 - `pagead2.googlesyndication.com`
 - `googleads.g.doubleclick.net`
 - `ad.doubleclick.net`
+- `ep1.adtrafficquality.google`
 - `fonts.googleapis.com`
 - `fonts.gstatic.com`
 - `embeds.iubenda.com`
