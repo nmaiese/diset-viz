@@ -171,6 +171,51 @@ Parametri applicativi:
 | `sort` | ordinamento catalogo |
 | `enabled` | valore booleano per dati parziali |
 
+## Giochi
+
+La nuova area giochi usa un tracciamento leggermente diverso finché il
+container GTM non espone tag nativi dedicati ai giochi:
+
+- il codice continua a fare `push` nel `dataLayer`
+- il helper `trackGameEvent` chiama anche `gtag('event', ...)` con
+  `send_to: G-THTPZZ02QH`
+- l'endpoint interno `/api/events` resta solo log operativo, non inoltra a GA4
+
+Eventi gioco oggi previsti:
+
+| Evento | Quando parte | Uso |
+|---|---|---|
+| `game_start` | avvio di una partita | inizio sessione gioco |
+| `game_guess` | risposta in "Indovina la Regione" | engagement round quotidiano |
+| `game_finish` | fine partita del gioco quotidiano | completamento round |
+| `game_share` | condivisione del risultato | retention / viralità |
+| `game_stats_open` | apertura statistiche | engagement |
+| `game_archive_open` | apertura archivio round | engagement |
+| `compare_start` | inizio di "Chi è maggiore?" | avvio sfida |
+| `compare_answer` | risposta a un round di confronto | risposta corretta / errata |
+| `order_start` | inizio di "Ordina le regioni" | avvio sfida |
+| `order_answer` | invio dell'ordine | completamento sfida |
+| `leaderboard_submit` | invio punteggio in classifica | conversione gioco |
+| `leaderboard_view` | apertura classifica | engagement |
+| `hub_mode_click` | click su una modalità dal hub | navigazione |
+| `quiz_source_click` | click sulla fonte del round | fiducia e approfondimento |
+
+Parametri gioco da registrare in GA4:
+
+| Parametro | Valori o significato |
+|---|---|
+| `mode` | daily, practice, archive, compare, order |
+| `score` | punteggio ottenuto |
+| `total` | totale massimo del round |
+| `result` | correct, wrong, timeout |
+| `streak` | serie attuale |
+| `difficulty` | livello difficoltà |
+| `count` | numero regioni nel round order |
+| `source` | etichetta della fonte mostrata |
+| `period` | week, all |
+| `attempt` | numero del tentativo |
+| `attempts` | numero tentativi della partita |
+
 ## GA4
 
 Configurazione richiesta:
@@ -199,6 +244,19 @@ Dimensioni evento create nella property `542300588` il 2026-06-23:
 Key event creato:
 
 - `select_indicator`, counting method `ONCE_PER_EVENT`
+
+Key event aggiunto per i giochi:
+
+- `leaderboard_submit`, counting method `ONCE_PER_EVENT`
+
+Key event rimossi perché non rappresentano una conversione:
+
+- `change_year`
+- `change_region`
+
+Key event ancora presente ma non cancellabile via Admin API:
+
+- `purchase`
 
 ## Checklist operativa
 

@@ -33,6 +33,16 @@ export function trackGameEvent(name, params = {}) {
   };
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({ event: name, ...eventParams });
+  if (typeof window.gtag === "function") {
+    try {
+      window.gtag("event", name, {
+        ...eventParams,
+        send_to: "G-THTPZZ02QH",
+      });
+    } catch {
+      // Se il Google Tag non è ancora disponibile, il push nel dataLayer resta.
+    }
+  }
   try {
     fetch("/api/events", {
       method: "POST",
