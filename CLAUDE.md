@@ -79,7 +79,10 @@ When you add indicators, themes, or a new dataset to
 `app/static/data/Assoluti_Regione.csv`, follow the checklist in
 [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md). The short version: themes,
 theme scores, region profiles and macro-areas are all **derived** from the data
-and recomputed at runtime (cache 1h). For each new indicator id set its direction
+and recomputed at runtime. The core loaders in `app/data.py`
+(`get_rows`/`get_catalog`/`get_indicator`) cache for the life of the process
+(`lru_cache`, not a TTL); most other derived views still use `cache.memoize`
+(1h TTL). For each new indicator id set its direction
 in `CURATED_DIRECTION` (`app/indicator_notes.py`), and for each new theme map it
 to a macro-area in `MACRO_AREAS` (same file). Then restart gunicorn to clear the
 cache, rebuild the frontend, run the tests, and re-check which themes are now

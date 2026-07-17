@@ -70,5 +70,20 @@
         <a href="/blog">Blog</a>
       </nav>
     </footer>
+    <!-- Copre il contenuto SEO (sopra) finche' l'app React non ha dati veri
+         da mostrare, cosi' l'utente vede un solo caricamento invece del
+         cambio di forma tra pagina SEO, scheletro e contenuto reale. Vive
+         fuori da #root apposta: React lo rimuove esplicitamente (vedi
+         main.jsx) invece di sovrascriverlo al mount. Il timeout e' una rete
+         di sicurezza se il bundle non parte. -->
+    <div id="boot-loader" role="presentation">
+      <span></span>
+    </div>
+    <script>
+      setTimeout(function () {
+        var el = document.getElementById("boot-loader");
+        if (el) el.remove();
+      }, 8000);
+    </script>
   </body>
 </html>

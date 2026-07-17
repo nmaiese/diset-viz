@@ -103,6 +103,15 @@ function App() {
       .catch(() => setError("Non è stato possibile caricare l'archivio degli indicatori."));
   }, []);
 
+  // Il boot-loader (app.html) copre la pagina SEO finche' non c'e' davvero
+  // qualcosa da mostrare: lo rimuoviamo solo qui, non al mount, altrimenti
+  // l'utente vedrebbe comunque il passaggio pagina SEO -> scheletro.
+  useEffect(() => {
+    if ((catalog && mapData) || error) {
+      document.getElementById("boot-loader")?.remove();
+    }
+  }, [catalog, mapData, error]);
+
   useEffect(() => {
     if (activeView === "detail" && !selectedId) return;
     if (lastPageViewKey.current === pageViewKey) return;

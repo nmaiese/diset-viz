@@ -3,8 +3,8 @@ import math
 import os
 import unicodedata
 from collections import defaultdict
+from functools import lru_cache
 
-from app.cache import cache
 from app.external_data import enrich_indicator_metadata
 from app.indicator_notes import MACRO_AREA_ORDER, build_indicator_explain, macro_area_for
 
@@ -135,7 +135,7 @@ class _Row:
         return getattr(self, key, default)
 
 
-@cache.memoize(timeout=3600)
+@lru_cache(maxsize=1)
 def get_rows():
     # Colonne come territorio/tema/indicatore/fonte/archivio si ripetono su
     # ~110k righe ma hanno poche decine/centinaia di valori distinti: senza
@@ -167,7 +167,7 @@ def get_rows():
     return rows
 
 
-@cache.memoize(timeout=3600)
+@lru_cache(maxsize=1)
 def get_catalog():
     rows = get_rows()
     by_id = defaultdict(list)
@@ -262,17 +262,23 @@ def get_catalog():
     }
 
 
-@cache.memoize(timeout=3600)
+@lru_cache(maxsize=1)
 def _rows_by_indicator():
     """Indice righe-per-indicatore costruito UNA volta (memoizzato) invece di
-    filtrare tutte le ~110k righe a ogni chiamata di get_indicator()."""
+    filtrare tutte le ~110k righe a ogni chiamata di get_indicator(). lru_cache
+    invece di cache.memoize: quest'ultimo passa da Flask-Caching, che ripickla
+    l'intero indice a ogni lettura anche in-process (SimpleCache serializza
+    sempre) — con ~120 indicatori letti in sequenza (es. pool del quiz) il
+    solo unpickling costava diversi secondi. lru_cache tiene l'oggetto vero in
+    memoria per la vita del processo, che qui coincide con un container: i
+    dati sono statici per deploy, quindi non serve un timeout."""
     index = defaultdict(list)
     for row in get_rows():
         index[row["id"]].append(row)
     return dict(index)
 
 
-@cache.memoize(timeout=3600)
+@lru_cache(maxsize=None)
 def get_indicator(indicator_id):
     rows = _rows_by_indicator().get(indicator_id, [])
     if not rows:

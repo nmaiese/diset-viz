@@ -1093,3 +1093,22 @@ h1, h2, h3 { font-family: var(--font-display); }
 .spa-seo-fallback li a { font-weight: 600; }
 .spa-seo-fallback li span { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
 .spa-seo-fallback > p:last-child { font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 20px; margin-top: 8px; }
+
+/* Copre la pagina SEO finche' React non ha dati veri (vedi commento in
+   app.html): un solo caricamento invece di pagina SEO -> scheletro ->
+   contenuto reale in sequenza visibile. */
+#boot-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+}
+#boot-loader span {
+  width: 52px; height: 52px;
+  border: 4px solid var(--grid);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 900ms linear infinite;
+}
