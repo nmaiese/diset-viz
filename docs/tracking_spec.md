@@ -131,6 +131,7 @@ Host principali autorizzati oggi:
 - `ssl.gstatic.com`
 - `www.gstatic.com`
 - `www.google.it`
+- `cdn.iubenda.com`
 - `www.google-analytics.com`
 - `*.google-analytics.com`
 - `*.analytics.google.com`
