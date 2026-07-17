@@ -25,6 +25,8 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://www.gstatic.com", csp)
         self.assertIn("https://ep1.adtrafficquality.google", csp)
         self.assertIn("https://ep2.adtrafficquality.google", csp)
+        self.assertIn("frame-src", csp)
+        self.assertIn("https://tpc.googlesyndication.com", csp)
         self.assertIn(b'id="root"', home.data)
         self.assertIn(b"/metodologia", home.data)
         self.assertIn(b"Indicatori territoriali in evidenza", home.data)
