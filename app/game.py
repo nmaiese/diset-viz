@@ -197,9 +197,13 @@ def _guessed_region_index(region_key):
 
 
 def _compare(mystery_value, guess_value):
+    """"higher"/"lower" descrivono il valore INDOVINATO rispetto al mistero
+    (es. "higher" = il tuo tentativo ha un valore più alto): il frontend
+    mostra questo esito subito dopo il valore del tentativo, quindi il verso
+    deve riferirsi a quello, non al mistero."""
     if guess_value is None or mystery_value is None:
         return "unknown"
-    diff = mystery_value - guess_value
+    diff = guess_value - mystery_value
     if abs(diff) < 1e-9:
         return "equal"
     return "higher" if diff > 0 else "lower"

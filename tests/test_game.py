@@ -6,6 +6,19 @@ from app.data import REGION_ORDER
 from app import game
 
 
+class CompareHelperTest(unittest.TestCase):
+    def test_comparison_describes_the_guess_relative_to_the_mystery(self):
+        # "higher" deve significare "il valore indovinato è più alto di quello
+        # misterioso": il frontend mostra questo esito subito dopo il valore
+        # del tentativo (vedi frontend/src/game/main.jsx), quindi il verso
+        # deve riferirsi al tentativo, non al mistero.
+        self.assertEqual(game._compare(mystery_value=10, guess_value=15), "higher")
+        self.assertEqual(game._compare(mystery_value=15, guess_value=10), "lower")
+        self.assertEqual(game._compare(mystery_value=10, guess_value=10), "equal")
+        self.assertEqual(game._compare(mystery_value=10, guess_value=None), "unknown")
+        self.assertEqual(game._compare(mystery_value=None, guess_value=10), "unknown")
+
+
 class GameTest(unittest.TestCase):
     def test_game_page_responds(self):
         client = app.test_client()
@@ -125,6 +138,18 @@ class GameTest(unittest.TestCase):
         self.assertLessEqual(entry["mystery_rank"], entry["region_count"])
         self.assertGreaterEqual(entry["guess_rank"], 1)
         self.assertLessEqual(entry["guess_rank"], entry["region_count"])
+        # Il verso riportato deve corrispondere al confronto reale fra il
+        # valore del tentativo e quello (nascosto) della regione misteriosa.
+        if entry["comparison"] != "unknown":
+            clue = puzzle["clues"][0]
+            mystery_value = clue["value"]
+            guess_value = entry["guess_value"]
+            if entry["comparison"] == "equal":
+                self.assertAlmostEqual(guess_value, mystery_value)
+            elif entry["comparison"] == "higher":
+                self.assertGreater(guess_value, mystery_value)
+            else:
+                self.assertLess(guess_value, mystery_value)
         self.assertIsNotNone(wrong["next_clue"])
         self.assertIsNone(wrong["solution"])
         self.assertIsNone(wrong["ripartizione_hint"])  # only from attempt 3 onward
