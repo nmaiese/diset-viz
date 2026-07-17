@@ -11,7 +11,7 @@ import io
 import unittest
 from pathlib import Path
 
-from scripts import istat_sdmx, province_sources
+from scripts import build_province_dataset, istat_sdmx, province_sources
 from scripts.province_names import normalize_province_name, province_key
 
 
@@ -187,6 +187,24 @@ class ProposeDirectionTest(unittest.TestCase):
         self.assertTrue(province_sources.NUTS3_PATTERN.match("ITC11"))   # Torino
         self.assertFalse(province_sources.NUTS3_PATTERN.match("ITC1"))   # NUTS2 region
         self.assertTrue(province_sources.NUTS2_PATTERN.match("ITC1"))
+
+    def test_edition_variant_labels_and_units_are_resolved(self):
+        indicators = {
+            "09PAE009": {"name": "Densità di verde storico"},
+            "10AMB018": {"name": "Impermeabilizzazione del suolo da copertura artificiale"},
+            "12SER003P": {"name": "Posti letto negli ospedali"},
+        }
+        self.assertEqual(
+            build_province_dataset.resolve_indicator_label(indicators, "09PAE009-N25"),
+            "Densità di verde storico",
+        )
+        self.assertEqual(
+            build_province_dataset.resolve_indicator_label(indicators, "10AMB018P"),
+            "Impermeabilizzazione del suolo da copertura artificiale",
+        )
+        self.assertEqual(
+            build_province_dataset.resolve_unit_label("10AMB018P", ""), "%",
+        )
 
 
 class ProvinceDatasetSchemaTest(unittest.TestCase):

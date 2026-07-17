@@ -2,7 +2,13 @@ import unittest
 
 from app import app
 from app import quality_life_bes as qb
-from app.bes_data import has_bes_data
+from app.bes_data import (
+    all_bes_indicators,
+    bes_seo_description,
+    bes_seo_title,
+    get_bes_manifest,
+    has_bes_data,
+)
 from app.quality_life import normalize_weights
 from app.quality_life_config import QUALITY_LIFE_CATEGORIES, QUALITY_LIFE_PROFILES
 
@@ -62,6 +68,49 @@ class QualityLifeStaticTest(unittest.TestCase):
         sitemap = app.test_client().get("/sitemap.xml").data
         self.assertIn(b"/qualita-della-vita/classifica/regioni", sitemap)
         self.assertIn(b"/qualita-della-vita/classifica/province", sitemap)
+
+    def test_every_bes_indicator_has_a_public_page(self):
+        client = app.test_client()
+        indicators = all_bes_indicators()
+        self.assertEqual(len(indicators), 67)
+        self.assertEqual(sum(item["indexable"] for item in indicators), 66)
+
+        sample = next(item for item in indicators if item["id"] == "09PAE009-N25")
+        page = client.get(sample["path"])
+        self.assertEqual(page.status_code, 200)
+        self.assertIn("Densità di verde storico".encode("utf-8"), page.data)
+        self.assertIn("valore più alto è considerato favorevole".encode("utf-8"), page.data)
+
+        sparse = next(item for item in indicators if item["id"] == "06POL001P")
+        sparse_page = client.get(sparse["path"])
+        self.assertEqual(sparse_page.status_code, 200)
+        self.assertEqual(sparse_page.headers["X-Robots-Tag"], "noindex, follow")
+
+        sitemap = client.get("/sitemap.xml").data.decode("utf-8")
+        self.assertIn(sample["path"], sitemap)
+        self.assertNotIn(sparse["path"], sitemap)
+
+    def test_bes_labels_units_and_directions_are_resolved(self):
+        expected = {
+            "09PAE009-N25": ("Densità di verde storico", "higher_better", "per 100 m2"),
+            "10AMB018P": ("Impermeabilizzazione del suolo da copertura artificiale", "lower_better", "%"),
+            "12SER003P-N25": ("Posti letto negli ospedali", "higher_better", "per 10.000 abitanti"),
+        }
+        for level in ("regione", "provincia"):
+            manifest = get_bes_manifest(level)
+            for indicator_id, values in expected.items():
+                item = manifest[indicator_id]
+                self.assertEqual((item["name"], item["direction"], item["unit"]), values)
+
+    def test_bes_metadata_stays_within_serp_budgets(self):
+        for item in all_bes_indicators():
+            self.assertLessEqual(len(bes_seo_title(item["name"], "Divario Italia")), 60)
+            self.assertLessEqual(len(bes_seo_description(item["name"])), 155)
+
+    def test_sparse_latest_years_do_not_enter_the_score(self):
+        for level in ("regione", "provincia"):
+            matrix, _ = qb._matrix_and_meta(level)
+            self.assertNotIn("06POL001P", matrix)
 
     def test_invalid_level_is_404(self):
         client = app.test_client()

@@ -75,8 +75,8 @@
 
   {% if data.champions %}
   <section class="quality-section">
-    <h2>Chi vince ogni categoria</h2>
-    <p class="page-note">Una classifica unica nasconde le specializzazioni. Qui la {{ 'provincia' if is_prov else 'regione' }} che guida ogni dimensione.</p>
+    <h2>Il primo territorio per categoria</h2>
+    <p class="page-note">Per ogni dimensione è indicata la {{ 'provincia' if is_prov else 'regione' }} con il punteggio più alto.</p>
     <div class="quality-grid">
       {% for c in data.champions %}
       <div class="quality-card">
@@ -92,7 +92,7 @@
   <section class="quality-section">
     <h2>La classifica</h2>
     {% if active_profile != default_profile %}
-    <p class="page-note">La colonna <strong>Δ</strong> mostra quante posizioni ogni territorio guadagna o perde con il profilo <strong>{{ p.name }}</strong> rispetto all'Equilibrato. È qui che la lente cambia davvero qualcosa.</p>
+    <p class="page-note">La colonna <strong>Δ</strong> mostra quante posizioni ogni territorio guadagna o perde con il profilo <strong>{{ p.name }}</strong> rispetto all'Equilibrato.</p>
     {% endif %}
     <div class="quality-table-wrap">
       <table class="data-table quality-rank-table">
@@ -142,7 +142,7 @@
   {% if data.category_rankings %}
   <section class="quality-section">
     <h2>Classifiche per categoria</h2>
-    <p class="page-note">Le migliori e le ultime in ogni dimensione: qui il quadro smette di essere ovvio.</p>
+    <p class="page-note">Per ogni dimensione sono riportati i tre punteggi più alti e il più basso.</p>
     <div class="quality-grid">
       {% for slug, cat in data.category_rankings.items() %}
       <div class="quality-card">

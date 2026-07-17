@@ -22,7 +22,14 @@ from collections import defaultdict
 from app.cache import cache
 from app.external_data import quality_life_freshness_from_manifest
 from app.profiles import SCOREABLE_DIRECTIONS
-from app.bes_data import get_bes_manifest, get_bes_rows, get_bes_territories, has_bes_data
+from app.bes_data import (
+    MIN_PUBLIC_COVERAGE,
+    bes_indicator_path,
+    get_bes_manifest,
+    get_bes_rows,
+    get_bes_territories,
+    has_bes_data,
+)
 from app.quality_life import get_quality_life_categories, normalize_weights
 from app.quality_life_config import DEFAULT_PROFILE, QUALITY_LIFE_CATEGORIES, QUALITY_LIFE_PROFILES
 
@@ -79,6 +86,8 @@ def _matrix_and_meta(level):
         info = manifest.get(ind_id)
         if not info:
             continue
+        if info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
+            continue
         year_max = info["year_max"]
         latest = {
             row["territory_key"]: row["value"]
@@ -99,7 +108,7 @@ def _matrix_and_meta(level):
             "direction": info["direction"],
             "year_max": year_max,
             "unit": info["unit"],
-            "path": "",
+            "path": bes_indicator_path(ind_id, info["name"]),
         }
     return matrix, meta
 

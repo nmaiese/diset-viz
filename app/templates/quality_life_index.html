@@ -35,7 +35,7 @@
 
   <header class="quality-hero">
     <h1>Qualità della vita nelle regioni italiane</h1>
-    <p class="page-lead">Una classifica non è mai neutrale. Divario Italia mostra come cambia la qualità della vita quando pesiamo reddito, lavoro, salute, istruzione, ambiente, sicurezza, servizi e cultura.</p>
+    <p class="page-lead">La classifica confronta regioni e province sugli indicatori BES dell'Istat. I pesi sono visibili e modificabili: si può verificare quanto il risultato dipenda dalle dimensioni considerate.</p>
     <div class="quality-cta">
       <a class="quality-btn quality-btn--primary" href="/qualita-della-vita/classifica/regioni">Classifica regioni</a>
       <a class="quality-btn quality-btn--primary" href="/qualita-della-vita/classifica/province">Classifica province</a>
@@ -47,7 +47,7 @@
 
   <section class="quality-section">
     <h2>Scegli un punto di vista</h2>
-    <p class="page-note">Ogni profilo dà un peso diverso alle categorie. Cambiando profilo cambia la classifica. È proprio quello che vogliamo rendere visibile, quanto una graduatoria dipenda dalle scelte di chi la costruisce.</p>
+    <p class="page-note">Ogni profilo assegna pesi diversi alle categorie. Il confronto con il profilo Equilibrato mostra quali territori salgono o scendono quando cambiano le priorità.</p>
     <div class="quality-grid">
       {% for profile in profiles %}
       <a class="quality-card" href="/qualita-della-vita/classifica/regioni{{ '' if profile.slug == default_profile else '?profilo=' ~ profile.slug }}">
@@ -80,6 +80,6 @@
     </span>
     <a href="/">Apri l'atlante →</a>
   </aside>
-  <p class="quality-note"><a href="/regioni">Sfoglia il profilo di ogni regione</a> oppure leggi <a href="/qualita-della-vita/metodologia">come è costruita la classifica</a>.</p>
+  <p class="quality-note"><a href="/regioni">Sfoglia il profilo di ogni regione</a> oppure consulta <a href="/qualita-della-vita/metodologia#indicatori-bes">le 67 schede degli indicatori BES</a>.</p>
 </article>
 {% endblock %}

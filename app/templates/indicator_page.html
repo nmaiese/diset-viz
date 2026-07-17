@@ -99,7 +99,7 @@
     {% endif %}
     {% if stats.gap_abs is not none %}
     <h3>Il divario tra le regioni</h3>
-    <p>La distanza tra <a href="/regione/{{ best.region_key }}">{{ best.region }}</a> e <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a> è di {{ stats.gap_abs | it_num(2) }} {{ meta.unit }}{% if stats.gap_ratio %}, pari a {{ stats.gap_ratio | it_num(1) }} volte il valore più basso{% endif %}. Questa distanza racconta un divario territoriale concreto tra le due regioni, non una differenza statistica marginale.</p>
+    <p>La distanza tra <a href="/regione/{{ best.region_key }}">{{ best.region }}</a> e <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a> è di {{ stats.gap_abs | it_num(2) }} {{ meta.unit }}{% if stats.gap_ratio %}, pari a {{ stats.gap_ratio | it_num(1) }} volte il valore più basso{% endif %}. Il dato descrive lo scarto osservato. Da solo non stabilisce se la differenza sia statisticamente significativa.</p>
     {% endif %}
     {% endif %}
 

@@ -133,6 +133,24 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b"Pagina non trovata", missing.data)
         self.assertIn(b'content="noindex, follow"', missing.data)
 
+    def test_every_published_post_has_a_valid_indicator_page_and_cover(self):
+        from app.blog import get_posts
+        from app.data import get_indicator
+        from app import profiles
+
+        client = app.test_client()
+        for post in get_posts():
+            self.assertTrue(post.get("indicator"), post["slug"])
+            payload = get_indicator(str(post["indicator"]))
+            self.assertIsNotNone(payload, post["slug"])
+            indicator_path = profiles.indicator_path(
+                post["indicator"], payload["metadata"]["name"]
+            )
+            self.assertEqual(client.get(indicator_path).status_code, 200, post["slug"])
+            cover = Path(app.root_path) / "static" / post["cover"].removeprefix("/static/")
+            self.assertTrue(cover.is_file(), post["slug"])
+            self.assertTrue(post.get("cover_alt"), post["slug"])
+
     def test_blog_post_updated_field_drives_date_modified(self):
         import tempfile
         from pathlib import Path
@@ -474,11 +492,11 @@ class AppSmokeTest(unittest.TestCase):
 
         self.assertEqual(trend_framing("higher_better", None), "")
         self.assertEqual(trend_framing("higher_better", 0.5), "un andamento sostanzialmente stabile")
-        self.assertEqual(trend_framing("higher_better", 5.0), "un miglioramento diffuso")
-        self.assertEqual(trend_framing("higher_better", -5.0), "un peggioramento diffuso")
-        self.assertEqual(trend_framing("lower_better", -5.0), "un miglioramento diffuso")
-        self.assertEqual(trend_framing("lower_better", 5.0), "un peggioramento diffuso")
-        self.assertEqual(trend_framing("higher_worse", 5.0), "un peggioramento diffuso")
+        self.assertEqual(trend_framing("higher_better", 5.0), "una variazione media favorevole")
+        self.assertEqual(trend_framing("higher_better", -5.0), "una variazione media sfavorevole")
+        self.assertEqual(trend_framing("lower_better", -5.0), "una variazione media favorevole")
+        self.assertEqual(trend_framing("lower_better", 5.0), "una variazione media sfavorevole")
+        self.assertEqual(trend_framing("higher_worse", 5.0), "una variazione media sfavorevole")
         self.assertEqual(trend_framing("contextual", 5.0), "un aumento")
         self.assertEqual(trend_framing("contextual", -5.0), "una diminuzione")
 
@@ -563,6 +581,12 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(direction_for("623", "Competenza alfabetica non adeguata"), "lower_better")
         # Share of students with high competence is positive.
         self.assertEqual(direction_for("111", "Studenti con elevate competenze in lettura"), "higher_better")
+        # Burned forest area is an environmental pressure.
+        self.assertEqual(direction_for("514", "Superficie boscata percorsa dal fuoco"), "lower_better")
+        # An absolute count of people at risk also reflects regional population.
+        self.assertEqual(direction_for("285", "Persone a rischio di povertà"), "contextual")
+        # Research collaboration is a positive capacity indicator.
+        self.assertEqual(direction_for("417", "Imprese che collaborano in attività di R&S"), "higher_better")
 
     def test_regions_map_data_matches_geometry(self):
         from app import profiles

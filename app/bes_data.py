@@ -7,11 +7,12 @@ and its 20-region completeness rule are untouched. Cached 1h.
 """
 
 import csv
+import statistics
 from pathlib import Path
 
 from app.cache import cache
 from app.data import _parse_number
-from app.profiles import region_key_for
+from app.profiles import region_key_for, slugify
 
 DATA_DIR = Path(__file__).resolve().parent / "static" / "data"
 
@@ -26,6 +27,30 @@ LEVELS = {
     },
 }
 PROVINCE_CODES = DATA_DIR / "province_codes.csv"
+MIN_PUBLIC_COVERAGE = 0.8
+BES_SOURCE_URL = "https://www.istat.it/notizia/bes-dei-territori-edizione-2025/"
+
+
+def _trim_words(text, limit):
+    if len(text) <= limit:
+        return text
+    cut = text[:limit].rsplit(" ", 1)[0].rstrip(" ,.;:-")
+    return cut or text[:limit].rstrip(" ,.;:-")
+
+
+def bes_seo_title(name, site_name):
+    suffix = f" | {site_name}"
+    if len(name) + len(suffix) <= 60:
+        return f"{name}{suffix}"
+    if len(name) <= 60:
+        return name
+    return _trim_words(name, 60)
+
+
+def bes_seo_description(name):
+    prefix = "Dati BES Istat su "
+    suffix = ": valori per regioni e province, anno, unità, copertura e direzione."
+    return f"{prefix}{_trim_words(name, 155 - len(prefix) - len(suffix))}{suffix}"
 
 
 def _paths(level):
@@ -85,6 +110,7 @@ def get_bes_manifest(level):
                 "category": row["proposed_category"] or None,
                 "direction": row["proposed_direction"],
                 "unit": row["unit"],
+                "year_min": int(row["year_min"]),
                 "year_max": int(row["year_max"]),
                 "coverage_latest": float(row.get("coverage_latest", 0) or 0),
             }
@@ -111,3 +137,74 @@ def get_bes_rows(level):
                 "value": _parse_number(row["Dato"]),
             })
     return rows
+
+
+def bes_indicator_path(indicator_id, name):
+    return f"/qualita-della-vita/indicatore/{indicator_id}/{slugify(name)}"
+
+
+@cache.memoize(timeout=3600)
+def all_bes_indicators():
+    """One public catalog entry for every BES indicator used by the rankings."""
+    regioni = get_bes_manifest("regione")
+    province = get_bes_manifest("provincia")
+    indicators = []
+    for indicator_id in sorted(set(regioni) | set(province)):
+        levels = {
+            level: manifest[indicator_id]
+            for level, manifest in (("regione", regioni), ("provincia", province))
+            if indicator_id in manifest
+        }
+        info = levels.get("regione") or levels["provincia"]
+        indexable = any(
+            level_info["coverage_latest"] >= MIN_PUBLIC_COVERAGE
+            for level_info in levels.values()
+        )
+        indicators.append({
+            **info,
+            "path": bes_indicator_path(indicator_id, info["name"]),
+            "indexable": indexable,
+            "levels": levels,
+        })
+    return indicators
+
+
+@cache.memoize(timeout=3600)
+def get_bes_indicator_page(indicator_id):
+    """Metadata and observations for one BES indicator at both public levels."""
+    entry = next((item for item in all_bes_indicators() if item["id"] == indicator_id), None)
+    if entry is None:
+        return None
+
+    level_payloads = []
+    for level, label in (("regione", "Regioni"), ("provincia", "Province")):
+        info = entry["levels"].get(level)
+        if info is None:
+            continue
+        observations = [
+            row for row in get_bes_rows(level)
+            if row["id"] == indicator_id and row["year"] == info["year_max"]
+            and row["value"] is not None and row["territory_key"]
+        ]
+        reverse = info["direction"] == "higher_better"
+        observations.sort(key=lambda row: row["value"], reverse=reverse)
+        values = [row["value"] for row in observations]
+        level_payloads.append({
+            "level": level,
+            "label": label,
+            "year_min": info["year_min"],
+            "year_max": info["year_max"],
+            "coverage_latest": info["coverage_latest"],
+            "count_latest": len(observations),
+            "territory_total": len(get_bes_territories(level)),
+            "observations": observations,
+            "mean": sum(values) / len(values) if values else None,
+            "median": statistics.median(values) if values else None,
+        })
+    return {
+        **entry,
+        "level_payloads": level_payloads,
+        "year_min": min(level["year_min"] for level in level_payloads),
+        "year_max": max(level["year_max"] for level in level_payloads),
+        "source_url": BES_SOURCE_URL,
+    }

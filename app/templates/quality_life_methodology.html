@@ -34,16 +34,16 @@
 <article class="page wrap prose quality-methodology">
   <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a></nav>
   <h1>Come è costruita la classifica</h1>
-  <p class="page-lead">La priorità non è una classifica bella, ma una classifica auditabile. Ogni numero è tracciabile, ogni indicatore ha una direzione, ogni categoria è spiegabile, ogni profilo ha pesi espliciti. Qui trovi tutto il metodo.</p>
+  <p class="page-lead">Questa pagina documenta fonte, selezione degli indicatori, direzioni, copertura e pesi. In questo modo la classifica può essere verificata e discussa a partire dagli stessi dati.</p>
 
   <h2>La fonte: un solo framework per regioni e province</h2>
-  <p>I dati arrivano dal BES dei Territori dell'Istat, il Benessere equo e sostenibile a livello locale. È la stessa fonte e la stessa misura sia per le regioni sia per le province, così i due livelli sono finalmente confrontabili: una categoria significa la stessa cosa ovunque. Non aggiungiamo stime, non mescoliamo fonti diverse, non inventiamo valori.</p>
+  <p>I dati arrivano dal BES dei Territori dell'Istat, il Benessere equo e sostenibile a livello locale. Regioni e province usano lo stesso insieme di indicatori e le stesse categorie. I punteggi restano separati per livello territoriale: una regione viene confrontata con le altre regioni, una provincia con le altre province.</p>
 
   <h2>Cos'è uno z-score orientato</h2>
   <p>Gli indicatori hanno unità diverse, euro, anni, percentuali, indici. Non si possono sommare così come sono. Per renderli confrontabili standardizziamo ogni indicatore dentro se stesso: misuriamo quanto ogni territorio si discosta dalla media, in deviazioni standard. A differenza del semplice ordinamento, lo z-score conserva le distanze: un divario grande resta grande, uno piccolo resta piccolo. Poi applichiamo la direzione. Per alcuni un valore alto è positivo, per esempio l'occupazione. Per altri un valore alto è negativo, per esempio la mortalità evitabile. Lo z-score orientato mette sempre il segno più dalla parte buona. In pagina lo mostriamo su una scala da 0 a 100 dove 50 è la media.</p>
 
   <h2>Quali indicatori entrano</h2>
-  <p>Usiamo solo indicatori con una direzione chiara e dati recenti su un numero sufficiente di territori. Le direzioni sono curate a mano sulle polarità ufficiali del BES, non lasciate a un'euristica. Gli indicatori puramente contestuali, quelli per cui non esiste un meglio o un peggio condiviso, restano fuori dal punteggio. Oggi la classifica usa nello score <strong>{{ mr.score_indicators_total }} indicatori</strong> per le regioni e <strong>{{ mp.score_indicators_total }}</strong> per le province. Il manifest BES disponibile contiene invece <strong>{{ mr.manifest_indicators_total }}</strong> indicatori regionali e <strong>{{ mp.manifest_indicators_total }}</strong> provinciali: alcuni restano fuori perché non hanno direzione chiara o copertura sufficiente.</p>
+  <p>Entrano nel punteggio solo gli indicatori con una direzione interpretabile e con dati disponibili per almeno l'80% dei territori nell'ultimo anno. Le polarità ufficiali del BES sono il riferimento. Quando un indicatore non ammette un giudizio univoco viene segnato come contestuale e resta fuori dallo score. La classifica usa <strong>{{ mr.score_indicators_total }} indicatori</strong> per le regioni e <strong>{{ mp.score_indicators_total }}</strong> per le province. I due manifest contengono entrambi <strong>{{ mr.manifest_indicators_total }} indicatori</strong>. Quelli esclusi restano consultabili nelle schede.</p>
 
   <h2>Le categorie</h2>
   <p>Raggruppiamo i domini BES in sette categorie leggibili. Lo stesso schema vale per entrambi i livelli. Poiché il punteggio di una categoria è la media dei suoi indicatori, una categoria con pochi indicatori non pesa di più di una ricca solo perché contiene più misure.</p>
@@ -70,7 +70,7 @@
   <p>Se per un territorio una categoria non ha indicatori disponibili, non blocchiamo la classifica: ridistribuiamo i pesi sulle categorie rimaste e mostriamo la copertura.</p>
 
   <h2>I profili e il movimento</h2>
-  <p>Lo stesso insieme di dati può raccontare classifiche diverse a seconda di cosa conta di più. Ogni profilo ha pesi espliciti, normalizzati a 1. C'è però una verità da dichiarare: il divario territoriale italiano è così ampio che cambiare profilo sposta le posizioni ma non ribalta il quadro. Per questo accanto al punteggio mostriamo il <strong>movimento</strong>, cioè quante posizioni un territorio guadagna o perde con il profilo scelto rispetto all'Equilibrato. È lì che la lente cambia davvero qualcosa.</p>
+  <p>Ogni profilo modifica i pesi delle sette categorie, poi li normalizza a 1. Accanto al punteggio mostriamo il <strong>movimento</strong>: quante posizioni un territorio guadagna o perde rispetto al profilo Equilibrato. Il confronto rende visibile l'effetto concreto delle priorità scelte.</p>
   <ul class="quality-category-list">
     {% for profile in profiles %}
     <li><h3>{{ profile.name }}</h3><p>{{ profile.description }}</p></li>
@@ -78,7 +78,20 @@
   </ul>
 
   <h2>Le specializzazioni</h2>
-  <p>Una graduatoria unica tende a confermare l'ovvio. Per questo diamo risalto alle specializzazioni: chi vince ogni categoria e le classifiche per singola dimensione. È lì che emergono le sorprese, per esempio una provincia del Sud che guida sull'ambiente.</p>
+  <p>La graduatoria generale viene affiancata dalle classifiche per categoria. Servono a distinguere un buon risultato complessivo da un vantaggio circoscritto, per esempio nei servizi, nell'ambiente o nell'istruzione.</p>
+
+  <section id="indicatori-bes">
+    <h2>Le 67 schede degli indicatori BES</h2>
+    <p>Ogni indicatore usato dalla sezione ha una pagina con unità di misura, direzione, anno, copertura e valori territoriali. La partecipazione alle elezioni regionali resta consultabile ma non viene inserita nella sitemap: nell'ultimo anno copre meno dell'80% dei territori a entrambi i livelli.</p>
+    {% for domain, items in bes_indicators | groupby('domain_name') %}
+    <h3>{{ domain }}</h3>
+    <ul>
+      {% for item in items %}
+      <li><a href="{{ item.path }}">{{ item.name }}</a>{% if not item.indexable %} <small>(copertura limitata)</small>{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% endfor %}
+  </section>
 
   <h2>Profili, URL e indicizzazione</h2>
   <p>Le varianti con parametro <code>?profilo=</code> sono pagine autonome: hanno titolo, descrizione e canonical sulla combinazione livello territoriale più profilo. Le manteniamo indicizzabili perché rispondono a intenzioni diverse, per esempio giovani, famiglie, servizi o opportunità economica.</p>

@@ -1,0 +1,93 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'qualita-della-vita' %}
+
+{% block title %}{{ seo_title }}{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
+{% block robots_meta %}
+{% if not indicator.indexable %}<meta name="robots" content="noindex, follow">{% else %}{{ super() }}{% endif %}
+{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": {{ indicator.name | tojson }},
+  "description": {{ ('Valori territoriali dell’indicatore BES Istat «' ~ indicator.name ~ '» per regioni e province italiane.') | tojson }},
+  "url": {{ canonical | tojson }},
+  "temporalCoverage": "{{ indicator.year_min }}/{{ indicator.year_max }}",
+  "spatialCoverage": { "@type": "Place", "name": "Italia" },
+  "creator": { "@type": "Organization", "name": "Istat", "url": {{ indicator.source_url | tojson }} },
+  "isBasedOn": {{ indicator.source_url | tojson }},
+  "isAccessibleForFree": true,
+  "license": "https://creativecommons.org/licenses/by/3.0/it/"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Qualità della vita", "item": "{{ site_url }}/qualita-della-vita" },
+    { "@type": "ListItem", "position": 3, "name": {{ indicator.name | tojson }}, "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page page-indicator wrap">
+  <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a> / <a href="/qualita-della-vita/metodologia#indicatori-bes">Indicatori BES</a></nav>
+  <h1>{{ indicator.name }}</h1>
+  <p class="page-lead">Indicatore del BES dei Territori Istat, nel dominio <strong>{{ indicator.domain_name }}</strong>. La scheda raccoglie gli ultimi dati disponibili per regioni e province senza mescolare anni diversi.</p>
+  {% if not indicator.indexable %}
+  <p class="page-note">La scheda è consultabile ma non viene proposta ai motori di ricerca: nell'ultimo anno la copertura è inferiore all'80% sia per le regioni sia per le province.</p>
+  {% endif %}
+
+  <div class="page-facts">
+    <span><small>Unità di misura</small>{{ indicator.unit or 'n.d.' }}</span>
+    <span><small>Periodo disponibile</small>{{ indicator.year_min }}-{{ indicator.year_max }}</span>
+    <span><small>Categoria</small>{{ indicator.domain_name }}</span>
+    <span><small>Fonte</small><a href="{{ indicator.source_url }}" target="_blank" rel="noopener">Istat, BES dei Territori</a></span>
+  </div>
+
+  <section class="prose">
+    <h2>Come si legge</h2>
+    {% if indicator.direction == 'higher_better' %}
+    <p>Per questo indicatore un valore più alto è considerato favorevole. Le tabelle partono quindi dal territorio con il valore maggiore.</p>
+    {% elif indicator.direction in ('lower_better', 'higher_worse') %}
+    <p>Per questo indicatore un valore più basso è considerato favorevole. Le tabelle partono quindi dal territorio con il valore minore.</p>
+    {% else %}
+    <p>L'indicatore è contestuale: un valore più alto descrive una maggiore intensità del fenomeno, ma non identifica da solo un territorio migliore.</p>
+    {% endif %}
+    <p>La direzione serve a ordinare i dati e, quando è definita, a costruire il punteggio della qualità della vita. Non sostituisce l'interpretazione del contesto territoriale.</p>
+  </section>
+
+  {% for level in indicator.level_payloads %}
+  <section class="page-ranking">
+    <h2>{{ level.label }}: dati {{ level.year_max }}</h2>
+    <p class="page-note">Copertura: {{ level.count_latest }} territori su {{ level.territory_total }} ({{ (level.coverage_latest * 100) | round | int }}%). Media {{ level.mean | it_num(2) }}. Mediana {{ level.median | it_num(2) }} {{ indicator.unit }}.</p>
+    <div class="quality-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Territorio</th><th class="num">{{ indicator.unit or 'Valore' }}</th></tr></thead>
+        <tbody>
+          {% for row in level.observations %}
+          <tr>
+            <td class="rank">{{ loop.index if indicator.direction != 'contextual' else 'n.a.' }}</td>
+            <td>{% if level.level == 'regione' %}<a href="/regione/{{ row.territory_key }}">{{ row.territory }}</a>{% else %}{{ row.territory }}{% endif %}</td>
+            <td class="num">{{ row.value | it_num(2) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  {% endfor %}
+
+  <aside class="indicator-cta">
+    <span><small>Metodo e limiti</small><strong>Consulta criteri di selezione, pesi e copertura degli indicatori.</strong></span>
+    <a href="/qualita-della-vita/metodologia">Leggi la metodologia →</a>
+  </aside>
+</article>
+{% endblock %}

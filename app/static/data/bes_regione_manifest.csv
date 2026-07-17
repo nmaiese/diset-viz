@@ -42,7 +42,7 @@ id;name;domain;domain_name;proposed_category;proposed_direction;unit;year_min;ye
 07SIC008P;Mortalità stradale in ambito extraurbano;BES_07;Sicurezza;sicurezza_istituzioni;lower_better;%;2015;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
 09PAE002;Densità e rilevanza del patrimonio museale;BES_09;Paesaggio e patrimonio culturale;cultura_digitale;higher_better;per 100 km2;2015;2022;20;1.0;20;1.0;DF_BES_TERRIT_0T
 09PAE008;Diffusione delle aziende agrituristiche;BES_09;Paesaggio e patrimonio culturale;cultura_digitale;higher_better;per 100 km2;2015;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
-09PAE009-N25;09PAE009-N25;BES_09;Paesaggio e patrimonio culturale;cultura_digitale;contextual;per 100 m2;2021;2022;20;1.0;20;1.0;DF_BES_TERRIT_0T
+09PAE009-N25;Densità di verde storico;BES_09;Paesaggio e patrimonio culturale;cultura_digitale;higher_better;per 100 m2;2021;2022;20;1.0;20;1.0;DF_BES_TERRIT_0T
 10AMB001P;Concentrazione media annua di PM10;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;microgrammi per m3;2015;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
 10AMB002P;Concentrazione media annua di PM2.5;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;microgrammi per m3;2015;2023;20;1.0;19;0.95;DF_BES_TERRIT_0T
 10AMB003;Dispersione da rete idrica comunale;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;%;2015;2022;20;1.0;20;1.0;DF_BES_TERRIT_0T
@@ -52,14 +52,14 @@ id;name;domain;domain_name;proposed_category;proposed_direction;unit;year_min;ye
 10AMB014;Aree protette;BES_10;Ambiente;ambiente_mobilita_servizi;higher_better;%;2021;2022;20;1.0;20;1.0;DF_BES_TERRIT_0T
 10AMB016;Energia elettrica da fonti rinnovabili;BES_10;Ambiente;ambiente_mobilita_servizi;higher_better;%;2015;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
 10AMB017;Raccolta differenziata dei rifiuti urbani;BES_10;Ambiente;ambiente_mobilita_servizi;higher_better;%;2015;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
-10AMB018P;10AMB018P;BES_10;Ambiente;ambiente_mobilita_servizi;contextual;numero;2015;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
+10AMB018P;Impermeabilizzazione del suolo da copertura artificiale;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;%;2015;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
 10AMB024P;Rifiuti urbani prodotti;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;kg per abitante;2015;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
 11RIC002;Propensione alla brevettazione;BES_11;Innovazione, ricerca e creatività;istruzione_capitale_umano;higher_better;per milione di abitanti;2015;2022;20;1.0;20;1.0;DF_BES_TERRIT_0T
 11RIC004P;Addetti nelle imprese culturali;BES_11;Innovazione, ricerca e creatività;cultura_digitale;higher_better;%;2015;2022;20;1.0;20;1.0;DF_BES_TERRIT_0T
 11RIC022;Comuni con servizi per le famiglie interamente on line;BES_11;Innovazione, ricerca e creatività;cultura_digitale;higher_better;%;2018;2022;20;1.0;19;0.95;DF_BES_TERRIT_0T
 11RIC025;Mobilità dei laureati italiani (25-39 anni);BES_11;Innovazione, ricerca e creatività;istruzione_capitale_umano;higher_better;per 1.000 laureati residenti;2019;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
 12SER002P;Medici specialisti;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;higher_better;per 10.000 abitanti;2015;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
-12SER003P-N25;12SER003P-N25;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;contextual;INHAB_5;2015;2022;20;1.0;20;1.0;DF_BES_TERRIT_0T
+12SER003P-N25;Posti letto negli ospedali;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;higher_better;per 10.000 abitanti;2015;2022;20;1.0;20;1.0;DF_BES_TERRIT_0T
 12SER007;Irregolarità del servizio elettrico;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;lower_better;numero medio di utenti;2015;2023;20;1.0;20;1.0;DF_BES_TERRIT_0T
 12SER008;Posti-km offerti dal Tpl;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;higher_better;valore per abitante;2015;2023;20;1.0;19;0.95;DF_BES_TERRIT_0T
 12SER020;Copertura della rete fissa di accesso ultra veloce a internet;BES_12;Qualità dei servizi;cultura_digitale;higher_better;%;2020;2024;20;1.0;19;0.95;DF_BES_TERRIT_0T

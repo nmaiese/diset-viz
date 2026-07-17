@@ -177,7 +177,7 @@ export function SubmitScoreModal({ mode, token, score, scoreLabel, onClose, onSu
         <>
           <p>
             Punteggio salvato: <strong>{scoreLabel}</strong>
-            {rank ? ` — ${rank}ª posizione assoluta.` : "."}
+            {rank ? `. Posizione assoluta: ${rank}ª.` : "."}
           </p>
           <a className="game-btn" href="/quiz/classifica">Vedi la classifica</a>
         </>

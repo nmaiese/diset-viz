@@ -12,6 +12,7 @@ from app.data import (
 from app import profiles
 from app import indicator_notes
 from app import quality_life_bes as qb
+from app import bes_data
 from app import external_manifest
 from app import game
 from app import quiz
@@ -552,6 +553,28 @@ def quality_life_province_redirect():
     return redirect(f"/qualita-della-vita/classifica/province{_profile_suffix(_quality_life_profile_arg())}", code=301)
 
 
+@app.route("/qualita-della-vita/indicatore/<indicator_id>/<slug>")
+def quality_life_indicator(indicator_id, slug):
+    indicator = bes_data.get_bes_indicator_page(indicator_id)
+    if indicator is None:
+        abort(404)
+    canonical_path = bes_data.bes_indicator_path(indicator_id, indicator["name"])
+    if request.path != canonical_path:
+        return redirect(canonical_path, code=301)
+    response = make_response(render_template(
+        "quality_life_indicator.html",
+        indicator=indicator,
+        seo_title=bes_data.bes_seo_title(indicator["name"], SITE_NAME),
+        seo_description=bes_data.bes_seo_description(indicator["name"]),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}{canonical_path}",
+    ))
+    if not indicator["indexable"]:
+        response.headers["X-Robots-Tag"] = "noindex, follow"
+    return response
+
+
 @app.route("/qualita-della-vita/metodologia")
 def quality_life_methodology():
     regioni = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
@@ -562,6 +585,7 @@ def quality_life_methodology():
         methodology_province=province["methodology"] if province else None,
         categories=qb.get_quality_life_categories(),
         profiles=qb.get_quality_life_profiles(),
+        bes_indicators=bes_data.all_bes_indicators(),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/qualita-della-vita/metodologia",
@@ -844,6 +868,14 @@ def sitemap():
             continue
         pages.append({
             "loc": f"{SITE_URL}{profiles.indicator_path(item['id'], item['name'])}",
+            "lastmod": f"{item['year_max']}-12-31",
+            "priority": "0.6",
+        })
+    for item in bes_data.all_bes_indicators():
+        if not item["indexable"]:
+            continue
+        pages.append({
+            "loc": f"{SITE_URL}{item['path']}",
             "lastmod": f"{item['year_max']}-12-31",
             "priority": "0.6",
         })

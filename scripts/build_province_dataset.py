@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import csv
 import os
+import re
 import sys
 import tempfile
 from collections import defaultdict
@@ -59,10 +60,16 @@ UNIT_LABELS = {
     "PER_100_KM2": "per 100 km2",
     "PER_100_M2": "per 100 m2",
     "M2_PER_INHA": "m2 per abitante",
+    "INHAB_5": "per 10.000 abitanti",
     "KG_PER_INHA": "kg per abitante",
     "VAL_PER_INHA": "valore per abitante",
     "AVG_NUMB_USER": "numero medio di utenti",
     "": "numero",
+}
+
+UNIT_BY_INDICATOR = {
+    # Quota di territorio coperta artificialmente, espressa in percentuale.
+    "10AMB018P": "%",
 }
 
 # Trentino-Alto Adige is absent at NUTS2 in this BES dataflow; reconstruct it as the
@@ -84,6 +91,31 @@ def load_codelist_csv(path):
         for row in csv.DictReader(handle, delimiter=";"):
             mapping[row["code"]] = {"name": row["name"], "parent": row.get("parent") or ""}
     return mapping
+
+
+def resolve_indicator_label(indicators, indicator_id):
+    """Resolve BES edition variants to the official base codelist label.
+
+    The SDMX dataflow sometimes appends an edition suffix (``-N25``) or a
+    provincial marker (``P``) that is absent from ``CL_BES_INDICATOR``.  An
+    exact lookup therefore leaked the technical code into the public UI.
+    """
+    candidates = [indicator_id, re.sub(r"-N\d+$", "", indicator_id)]
+    without_edition = candidates[-1]
+    if without_edition.endswith("P"):
+        candidates.append(without_edition[:-1])
+    for candidate in candidates:
+        match = indicators.get(candidate)
+        if match and match.get("name"):
+            return match["name"]
+    return indicator_id
+
+
+def resolve_unit_label(indicator_id, unit_code):
+    return UNIT_BY_INDICATOR.get(
+        indicator_id,
+        UNIT_LABELS.get(unit_code, unit_code),
+    )
 
 
 def to_italian_decimal(value):
@@ -204,8 +236,8 @@ def build(level="province"):
             "idIndicatore": data_type,
             "Territorio": name,
             "Tema": domains.get(domain, {}).get("name", domain),
-            "Indicatore": indicators.get(data_type, {}).get("name", data_type),
-            "UDM": UNIT_LABELS.get(unit_of.get(data_type, ""), unit_of.get(data_type, "")),
+            "Indicatore": resolve_indicator_label(indicators, data_type),
+            "UDM": resolve_unit_label(data_type, unit_of.get(data_type, "")),
             "Fonte": "Istat",
             "Archivio": f"BES dei Territori (Bes at local level), {province_sources.BES_DATAFLOW}, dominio {domain}",
             "Anno": year,
@@ -231,7 +263,7 @@ def build(level="province"):
     manifest_rows = []
     for data_type, agg in by_indicator.items():
         domain = domain_of[data_type]
-        name = indicators.get(data_type, {}).get("name", data_type)
+        name = resolve_indicator_label(indicators, data_type)
         year_max = max(agg["years"])
         n_latest = len(agg["areas_by_year"][year_max])
         manifest_rows.append({
@@ -241,7 +273,7 @@ def build(level="province"):
             "domain_name": domains.get(domain, {}).get("name", domain),
             "proposed_category": province_sources.category_for(data_type, domain) or "",
             "proposed_direction": province_sources.direction_for(data_type, name),
-            "unit": UNIT_LABELS.get(unit_of.get(data_type, ""), unit_of.get(data_type, "")),
+            "unit": resolve_unit_label(data_type, unit_of.get(data_type, "")),
             "year_min": min(agg["years"]),
             "year_max": year_max,
             # ever = areas seen across all years; *_latest = areas present in year_max.

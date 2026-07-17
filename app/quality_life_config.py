@@ -43,16 +43,16 @@ QUALITY_LIFE_CATEGORIES = {
     "reddito_accessibilita": {
         "name": "Reddito e accessibilità",
         "description": (
-            "Misura le condizioni economiche e sociali che rendono più o meno "
-            "accessibile la vita quotidiana."
+            "Tiene insieme reddito, condizioni economiche e accesso ai servizi "
+            "che incidono sulla vita quotidiana."
         ),
         "themes": ["Reddito e ricchezza", "Inclusione sociale", "Città"],
     },
     "lavoro_opportunita": {
         "name": "Lavoro e opportunità",
         "description": (
-            "Misura partecipazione al lavoro, opportunità economiche e vitalità "
-            "produttiva."
+            "Guarda quante persone lavorano, la continuità dell'occupazione e la "
+            "capacità produttiva del territorio."
         ),
         "themes": [
             "Lavoro",
@@ -64,24 +64,24 @@ QUALITY_LIFE_CATEGORIES = {
     "salute_cura": {
         "name": "Salute e cura",
         "description": (
-            "Misura salute, servizi di cura e condizioni demografiche legate al "
-            "benessere delle persone."
+            "Riassume condizioni di salute, assistenza e servizi di cura, tenendo "
+            "distinta la struttura demografica dall'offerta sanitaria."
         ),
         "themes": ["Salute", "Servizi di cura", "Demografia e popolazione"],
     },
     "istruzione_capitale_umano": {
         "name": "Istruzione e capitale umano",
         "description": (
-            "Misura scuola, formazione, competenze e capacità di produrre "
-            "conoscenza."
+            "Considera istruzione, competenze, formazione e attività di ricerca "
+            "che alimentano il capitale umano."
         ),
         "themes": ["Istruzione e formazione", "Ricerca ed innovazione"],
     },
     "ambiente_mobilita_servizi": {
         "name": "Ambiente, mobilità e servizi",
         "description": (
-            "Misura qualità ambientale, mobilità, acqua, rifiuti, energia e "
-            "servizi essenziali."
+            "Riunisce qualità ambientale, mobilità, acqua, rifiuti, energia e "
+            "accesso ai servizi essenziali."
         ),
         "themes": [
             "Ambiente, altro",
@@ -95,16 +95,16 @@ QUALITY_LIFE_CATEGORIES = {
     "sicurezza_istituzioni": {
         "name": "Sicurezza, legalità e istituzioni",
         "description": (
-            "Misura sicurezza quotidiana, legalità, capitale sociale e "
-            "funzionamento amministrativo."
+            "Mette in relazione sicurezza quotidiana, legalità, partecipazione "
+            "civica e funzionamento delle amministrazioni."
         ),
         "themes": ["Legalità e sicurezza", "Pubblica Amministrazione", "Capitale sociale"],
     },
     "cultura_digitale": {
         "name": "Cultura e digitale",
         "description": (
-            "Misura accesso culturale, partecipazione, digitalizzazione e società "
-            "dell'informazione."
+            "Considera offerta e partecipazione culturale insieme alla possibilità "
+            "di usare reti e servizi digitali."
         ),
         "themes": ["Cultura", "Società dell'informazione"],
     },
@@ -115,7 +115,7 @@ QUALITY_LIFE_CATEGORIES = {
 QUALITY_LIFE_PROFILES = {
     "standard": {
         "name": "Equilibrato",
-        "description": "Dà peso simile alle principali dimensioni della qualità della vita.",
+        "description": "Assegna lo stesso peso alle sette dimensioni della qualità della vita.",
         "weights": {
             "reddito_accessibilita": 1.0,
             "lavoro_opportunita": 1.0,
@@ -128,7 +128,7 @@ QUALITY_LIFE_PROFILES = {
     },
     "opportunita": {
         "name": "Opportunità economica",
-        "description": "Premia territori con più lavoro, reddito, istruzione e capacità produttiva.",
+        "description": "Aumenta il peso di lavoro, reddito, istruzione e capacità produttiva.",
         "weights": {
             "reddito_accessibilita": 1.4,
             "lavoro_opportunita": 1.7,
@@ -157,7 +157,7 @@ QUALITY_LIFE_PROFILES = {
     },
     "famiglie": {
         "name": "Famiglie",
-        "description": "Dà più peso a salute, cura, istruzione, ambiente e sicurezza.",
+        "description": "Aumenta il peso di salute, cura, istruzione, ambiente e sicurezza.",
         "weights": {
             "reddito_accessibilita": 1.0,
             "lavoro_opportunita": 0.9,
@@ -170,7 +170,7 @@ QUALITY_LIFE_PROFILES = {
     },
     "giovani": {
         "name": "Giovani",
-        "description": "Premia lavoro, formazione, digitale, cultura e opportunità.",
+        "description": "Aumenta il peso di lavoro, formazione, digitale, cultura e opportunità.",
         "weights": {
             "reddito_accessibilita": 0.9,
             "lavoro_opportunita": 1.6,
@@ -184,7 +184,7 @@ QUALITY_LIFE_PROFILES = {
     "servizi": {
         "name": "Servizi e territorio",
         "description": (
-            "Guarda soprattutto a servizi essenziali, mobilità, ambiente, "
+            "Aumenta il peso di servizi essenziali, mobilità, ambiente, "
             "sicurezza e istituzioni."
         ),
         "weights": {

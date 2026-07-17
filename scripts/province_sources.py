@@ -159,16 +159,19 @@ CURATED_DIRECTION_BES = {
     # Paesaggio e patrimonio culturale
     "09PAE002": "higher_better",   # patrimonio museale
     "09PAE008": "higher_better",   # aziende agrituristiche
+    "09PAE009-N25": "higher_better",  # densità di verde storico
     # Ambiente
     "10AMB001P": "lower_better",   # PM10
     "10AMB002P": "lower_better",   # PM2.5
     "10AMB016": "higher_better",   # energia da rinnovabili
     "10AMB017": "higher_better",   # raccolta differenziata (heuristic flipped it)
+    "10AMB018P": "lower_better",   # impermeabilizzazione del suolo
     # Innovazione, ricerca
     "11RIC004P": "higher_better",  # addetti imprese culturali
     "11RIC022": "higher_better",   # comuni con servizi famiglie online
     # Qualità dei servizi
     "12SER002P": "higher_better",  # medici specialisti
+    "12SER003P-N25": "higher_better",  # posti letto negli ospedali
     "12SER008": "higher_better",   # posti-km offerti dal TPL
     "12SER020": "higher_better",   # copertura rete internet ultra veloce
     "12SER024": "higher_better",   # raccolta differenziata (heuristic flipped it)
