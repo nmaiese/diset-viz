@@ -36,14 +36,14 @@
   <h1>Come è costruita la classifica</h1>
   <p class="page-lead">Questa pagina documenta fonte, selezione degli indicatori, direzioni, copertura e pesi. In questo modo la classifica può essere verificata e discussa a partire dagli stessi dati.</p>
 
-  <h2>Le fonti: un framework BES, due livelli</h2>
-  <p>Per le regioni usiamo l'aggiornamento intermedio 2026 del BES nazionale, limitando il punteggio agli indicatori con dati 2025. Per le province usiamo il BES dei Territori, l'ultima fonte ufficiale omogenea disponibile a quel livello. Le categorie restano comuni, mentre i punteggi sono sempre separati: una regione viene confrontata con le altre regioni, una provincia con le altre province.</p>
+  <h2>Un catalogo, una selezione per il punteggio</h2>
+  <p>Atlante, temi e qualità della vita partono dallo stesso catalogo. Per le regioni selezioniamo sia indicatori del BES nazionale con dati almeno al 2025, sia indicatori territoriali DISET completi e con dati almeno al 2023. I duplicati esatti vengono contati una sola volta. Per le province usiamo il BES dei Territori, l'unica fonte omogenea disponibile a quel livello.</p>
 
   <h2>Cos'è uno z-score orientato</h2>
   <p>Gli indicatori hanno unità diverse, euro, anni, percentuali, indici. Non si possono sommare così come sono. Per renderli confrontabili standardizziamo ogni indicatore dentro se stesso: misuriamo quanto ogni territorio si discosta dalla media, in deviazioni standard. A differenza del semplice ordinamento, lo z-score conserva le distanze: un divario grande resta grande, uno piccolo resta piccolo. Poi applichiamo la direzione. Per alcuni un valore alto è positivo, per esempio l'occupazione. Per altri un valore alto è negativo, per esempio la mortalità evitabile. Lo z-score orientato mette sempre il segno più dalla parte buona. In pagina lo mostriamo su una scala da 0 a 100 dove 50 è la media.</p>
 
   <h2>Quali indicatori entrano</h2>
-  <p>Entrano nel punteggio solo gli indicatori con una direzione interpretabile e con dati disponibili per almeno l'80% dei territori nell'ultimo anno. Per le regioni imponiamo inoltre l'anno minimo 2025. Le polarità ufficiali del BES sono il riferimento. Quando un indicatore non ammette un giudizio univoco viene segnato come contestuale e resta fuori dallo score. La classifica usa <strong>{{ mr.score_indicators_total }} indicatori</strong> per le regioni e <strong>{{ mp.score_indicators_total }}</strong> per le province. I manifest ne contengono rispettivamente <strong>{{ mr.manifest_indicators_total }}</strong> e <strong>{{ mp.manifest_indicators_total }}</strong>. Quelli esclusi restano consultabili nelle schede.</p>
+  <p>Entrano nel punteggio solo gli indicatori con una direzione interpretabile e copertura sufficiente. La selezione regionale usa <strong>{{ mr.score_indicators_total }} indicatori</strong>: <strong>{{ mr.source_counts.bes }}</strong> BES e <strong>{{ mr.source_counts.territorial }}</strong> territoriali. La selezione provinciale ne usa <strong>{{ mp.score_indicators_total }}</strong>. Tutti gli altri restano consultabili nell'Atlante e nelle pagine per tema, senza influire sullo score.</p>
 
   <h2>Le categorie</h2>
   <p>Raggruppiamo i domini BES in otto categorie leggibili, inclusa una dimensione esplicita di benessere soggettivo. Lo stesso schema vale per entrambi i livelli. Poiché il punteggio di una categoria è la media dei suoi indicatori, una categoria con pochi indicatori non pesa di più di una ricca solo perché contiene più misure.</p>
@@ -80,14 +80,14 @@
   <h2>Le specializzazioni</h2>
   <p>La graduatoria generale viene affiancata dalle classifiche per categoria. Servono a distinguere un buon risultato complessivo da un vantaggio circoscritto, per esempio nei servizi, nell'ambiente o nell'istruzione.</p>
 
-  <section id="indicatori-bes">
-    <h2>Le schede degli indicatori BES</h2>
-    <p>Ogni indicatore disponibile per almeno uno dei due livelli ha una pagina con unità di misura, direzione, anno, copertura e valori territoriali. Le serie troppo vecchie o con copertura insufficiente restano consultabili ma non vengono inserite nella sitemap.</p>
-    {% for domain, items in bes_indicators | groupby('domain_name') %}
-    <h3>{{ domain }}</h3>
+  <section id="indicatori-usati">
+    <h2>Gli indicatori usati nel punteggio regionale</h2>
+    <p>Queste voci appartengono allo stesso catalogo dell'Atlante. L'etichetta della fonte distingue BES e indicatori territoriali, mentre la categoria indica dove ciascuna misura contribuisce.</p>
+    {% for category, items in quality_life_indicators | groupby('quality_life_category_label') %}
+    <h3>{{ category }}</h3>
     <ul>
       {% for item in items %}
-      <li><a href="{{ item.path }}">{{ item.name }}</a>{% if not item.indexable %} <small>(copertura limitata)</small>{% endif %}</li>
+      <li><a href="{{ item.path }}">{{ item.name }}</a> <small>({{ item.catalog_family_label }}, dati {{ item.year_max }})</small></li>
       {% endfor %}
     </ul>
     {% endfor %}
@@ -100,7 +100,7 @@
   <p>La media di un territorio nasconde le differenze interne. Lo z-score misura una posizione relativa tra i territori, non una distanza dai valori ideali. La scelta delle categorie e dei pesi è una scelta editoriale, resa trasparente per poterla discutere. Sul livello provinciale resta un limite amministrativo: la provincia di Sud Sardegna non è presente nell'edizione usata, e le quattro province sarde soppresse prima del 2016 sono escluse.</p>
 
   <h2>In cosa siamo diversi dal Sole 24 Ore e da ItaliaOggi</h2>
-  <p>La classifica Divario Italia è una sintesi autonoma sugli indicatori BES dell'Istat. Non è la classifica del Sole 24 Ore e non usa il dataset del Sole come fonte primaria. Il nostro obiettivo è diverso, più trasparente e più interattivo: far vedere come cambia il quadro quando cambiano categorie e pesi, e dove ogni territorio eccelle.</p>
+  <p>La classifica Divario Italia è una sintesi autonoma su una selezione dichiarata di indicatori Istat. Non è la classifica del Sole 24 Ore e non usa il dataset del Sole come fonte primaria. Il nostro obiettivo è far vedere come cambia il quadro quando cambiano categorie e pesi, e dove ogni territorio eccelle.</p>
 
   <aside class="indicator-cta">
     <span>

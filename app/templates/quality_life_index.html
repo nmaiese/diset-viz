@@ -10,7 +10,7 @@
   "@context": "https://schema.org",
   "@type": "WebPage",
   "name": "Qualità della vita nelle regioni italiane",
-  "description": {{ 'Classifica trasparente della qualità della vita nelle regioni e province italiane basata su indicatori BES Istat.' | tojson }},
+  "description": {{ 'Classifica trasparente della qualità della vita nelle regioni e province italiane basata su indicatori Istat selezionati.' | tojson }},
   "url": {{ canonical | tojson }},
   "isPartOf": { "@type": "WebSite", "name": "Divario Italia", "url": "{{ site_url }}/" },
   "creator": { "@type": "Organization", "name": "Istat" },
@@ -35,7 +35,7 @@
 
   <header class="quality-hero">
     <h1>Qualità della vita nelle regioni italiane</h1>
-    <p class="page-lead">La classifica confronta regioni e province sugli indicatori BES dell'Istat. I pesi sono visibili e modificabili: si può verificare quanto il risultato dipenda dalle dimensioni considerate.</p>
+    <p class="page-lead">La classifica seleziona dal catalogo unico gli indicatori Istat adatti a descrivere la qualità della vita. Per le regioni combina BES nazionale e indicatori territoriali DISET. I pesi sono visibili e modificabili.</p>
   </header>
 
   <div class="quality-grid quality-entry-grid">
@@ -78,7 +78,7 @@
   <p class="quality-note quality-disclaimer">La classifica provinciale è un lavoro in corso: leggila insieme alla <a href="/qualita-della-vita/metodologia">metodologia</a>, prima di considerarla definitiva.</p>
   {% endif %}
 
-  <p class="quality-note">Un metodo, due livelli. Le regioni usano l'aggiornamento nazionale BES 2026 con dati 2025. Le province usano il BES dei Territori, l'ultima fonte omogenea disponibile a quel livello. Cambiando profilo cambia il peso delle categorie, e la colonna del movimento mostra chi sale o scende. Categorie e direzioni sono curate ma rivedibili.</p>
+  <p class="quality-note">Un catalogo, una selezione dichiarata. Le regioni combinano l'aggiornamento nazionale BES 2026 con gli indicatori territoriali completi e recenti. Le province usano il BES dei Territori, l'ultima fonte omogenea disponibile a quel livello. Cambiando profilo cambia il peso delle categorie.</p>
 
   <section class="quality-section">
     <h2>Scegli un punto di vista</h2>
@@ -115,6 +115,6 @@
     </span>
     <a href="/">Apri l'atlante →</a>
   </aside>
-  <p class="quality-note"><a href="/regioni">Sfoglia il profilo di ogni regione</a> oppure consulta <a href="/qualita-della-vita/metodologia#indicatori-bes">le schede degli indicatori BES</a>.</p>
+  <p class="quality-note"><a href="/regioni">Sfoglia il profilo di ogni regione</a>, consulta <a href="/temi">tutti gli indicatori per tema</a> oppure leggi <a href="/qualita-della-vita/metodologia#indicatori-usati">quali entrano nel punteggio</a>.</p>
 </article>
 {% endblock %}

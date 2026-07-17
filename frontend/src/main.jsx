@@ -920,6 +920,9 @@ function CoverageBadge({ item }) {
       ) : (
         <span className="coverage__pill is-partial">{Math.round(item.completeness * 100)}% dati</span>
       )}
+      {item.quality_life_scored && (
+        <span className="coverage__pill is-quality">Qualità della vita</span>
+      )}
     </span>
   );
 }
@@ -1525,6 +1528,9 @@ function IndicatorHeader({ metadata, regionCount }) {
   return (
     <div className="indicator-header">
       <span className="tag">{metadata.theme} · {metadata.catalog_family_label}</span>
+      {metadata.quality_life_scored && (
+        <span className="tag tag--quality">Nel punteggio: {metadata.quality_life_category_label}</span>
+      )}
       <h2>{metadata.name}</h2>
       <p className="indicator-header__seo">
         <a href={indicatorPath(metadata.id, metadata.name, metadata.path)}>Scheda completa e classifica regioni →</a>

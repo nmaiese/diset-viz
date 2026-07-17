@@ -1,13 +1,13 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'temi' %}
 
-{% block title %}I temi degli indicatori territoriali · {{ site_name }}{% endblock %}
-{% block description %}Esplora {{ total }} indicatori territoriali Istat per tema: lavoro, istruzione, ambiente, salute, trasporti e gli altri ambiti del divario tra le regioni italiane.{% endblock %}
+{% block title %}I temi degli indicatori regionali · {{ site_name }}{% endblock %}
+{% block description %}Esplora {{ total }} indicatori Istat per tema: lavoro, istruzione, ambiente, salute, trasporti, qualità della vita e divari regionali.{% endblock %}
 
 {% block content %}
 <article class="page page-index wrap">
   <h1>I temi</h1>
-  <p class="page-lead">{{ total }} indicatori Istat per leggere il divario tra le regioni italiane, raccolti in sei grandi aree. Scegli un tema per aprire tutti i suoi indicatori, con mappe, classifiche e andamenti negli anni.</p>
+  <p class="page-lead">{{ total }} indicatori del catalogo unico Istat per leggere divari e qualità della vita nelle regioni italiane. Scegli un tema per aprire tutte le serie, con fonte, mappe, classifiche e andamenti negli anni.</p>
 
   {% for group in groups %}
   <section class="theme-group">

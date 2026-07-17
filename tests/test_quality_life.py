@@ -114,15 +114,23 @@ class QualityLifeStaticTest(unittest.TestCase):
     def test_sparse_latest_years_do_not_enter_the_score(self):
         for level in ("regione", "provincia"):
             matrix, _ = qb._matrix_and_meta(level)
-            self.assertNotIn("06POL001P", matrix)
+            self.assertFalse(any(indicator_id.endswith("06POL001P") for indicator_id in matrix))
 
-    def test_regional_score_uses_only_2025_bes_indicators(self):
+    def test_regional_score_uses_the_federated_indicator_selection(self):
         matrix, meta = qb._matrix_and_meta("regione")
-        self.assertGreaterEqual(len(matrix), 60)
-        self.assertTrue(all(item["year_max"] >= 2025 for item in meta.values()))
+        self.assertGreaterEqual(len(matrix), 200)
+        self.assertEqual(set(item["source_family"] for item in meta.values()), {"bes", "territorial"})
+        self.assertTrue(all(
+            item["year_max"] >= (2025 if item["source_family"] == "bes" else 2023)
+            for item in meta.values()
+        ))
         ranking = qb.build_bes_ranking("regione", "standard")
-        self.assertEqual(ranking["data_freshness"]["current"], len(matrix))
-        self.assertEqual(ranking["data_freshness"]["recent"], 0)
+        self.assertEqual(
+            ranking["data_freshness"]["current"] + ranking["data_freshness"]["recent"],
+            len(matrix),
+        )
+        self.assertGreater(ranking["methodology"]["source_counts"]["bes"], 0)
+        self.assertGreater(ranking["methodology"]["source_counts"]["territorial"], 0)
 
     def test_invalid_level_is_404(self):
         client = app.test_client()

@@ -441,6 +441,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 .coverage__pill.is-complete { color: var(--accent); border-color: var(--accent); }
 .coverage__pill.is-partial { color: var(--ink-soft); }
+.coverage__pill.is-quality { color: var(--ink); border-color: var(--ink); background: #eef2f7; }
 
 .index-row__spark { grid-area: spark; }
 .index-row__meta { grid-area: meta; display: grid; gap: 3px; justify-items: end; text-align: right; }
@@ -516,6 +517,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+.indicator-header .tag--quality { margin-left: 6px; background: #eef2f7; color: var(--ink); }
 .indicator-header h2 {
   margin: 14px 0 12px;
   font-size: 27px;

@@ -34,7 +34,12 @@ indicatori mal orientati o macro-aree incomplete.
   presenta insieme il catalogo territoriale e tutti i 145 indicatori BES
   regionali. Gli id BES hanno namespace `bes:*`. L'adattatore alimenta le stesse
   mappe, classifiche e serie storiche della SPA, ma non modifica il CSV legacy e
-  non inserisce il BES nei profili o nei punteggi territoriali.
+  non modifica i profili regionali descrittivi calcolati da `app/profiles.py`.
+- La **selezione qualità della vita** (`app/quality_life_selection.py`) opera
+  sul catalogo federato. Include BES regionali almeno al 2025 e indicatori
+  territoriali core almeno al 2023, tutti con direzione revisionata e copertura
+  sufficiente. Gli indicatori territoriali restano esclusi dal punteggio
+  provinciale. I duplicati esatti per nome vengono contati una sola volta.
 
 ## Come funziona la valutazione delle tematiche
 

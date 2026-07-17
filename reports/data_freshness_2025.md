@@ -1,6 +1,6 @@
 # Audit freschezza dati
 
-Generato: 2026-07-17T20:25:38.653009+00:00
+Generato: 2026-07-17T20:42:52.765578+00:00
 
 ## Riepilogo
 
@@ -8,6 +8,8 @@ Generato: 2026-07-17T20:25:38.653009+00:00
 - indicatori BES regionali disponibili: 145
 - indicatori BES regionali al 2025: 67
 - indicatori BES 2025 ammessi allo scoring regionale: 62
+- indicatori territoriali ammessi allo scoring regionale: 142
+- totale indicatori del catalogo unico nello scoring regionale: 204
 - indicatori non aggiornabili: 293
 - indicatori da revisionare manualmente: 63
 - INVALSI regionale 2025 è acquisito tramite il BES nazionale; Movimprese, Terna e Infratel restano in attesa di un parser e di un match di definizione verificati.

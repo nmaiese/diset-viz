@@ -8,10 +8,14 @@ families can coexist without collisions or accidental double counting.
 
 from collections import defaultdict
 from functools import lru_cache
+import unicodedata
 
 from app.bes_data import BES_SOURCE_URLS, bes_indicator_path, get_bes_manifest, get_bes_rows
 from app.data import REGION_ORDER, get_catalog, get_indicator
-from app.indicator_notes import MACRO_AREA_ORDER
+from app.indicator_notes import MACRO_AREA_ORDER, THEME_CAVEATS, THEME_EXAMPLES
+from app.profiles import indicator_path, slugify
+from app.quality_life_config import QUALITY_LIFE_CATEGORIES
+from app.quality_life_selection import regional_quality_life_selection
 
 
 BES_ID_PREFIX = "bes:"
@@ -167,18 +171,31 @@ def _catalog_entry(payload):
 def get_atlas_catalog():
     """Merge legacy territorial metadata and BES metadata for atlas browsing."""
     legacy = get_catalog()
+    score_selection = regional_quality_life_selection()
     legacy_indicators = [
         {
             **item,
             "catalog_family": "territorial",
             "catalog_family_label": "Indicatori territoriali",
+            "path": indicator_path(item["id"], item["name"]),
+            "quality_life_scored": item["id"] in score_selection,
+            "quality_life_category": score_selection.get(item["id"]),
         }
         for item in legacy["indicators"]
     ]
     bes_indicators = [
-        _catalog_entry(get_bes_atlas_indicator(_bes_public_id(raw_id)))
+        {
+            **_catalog_entry(get_bes_atlas_indicator(_bes_public_id(raw_id))),
+            "quality_life_scored": _bes_public_id(raw_id) in score_selection,
+            "quality_life_category": score_selection.get(_bes_public_id(raw_id)),
+        }
         for raw_id in get_bes_manifest("regione")
     ]
+    for item in legacy_indicators + bes_indicators:
+        category = item.get("quality_life_category")
+        item["quality_life_category_label"] = (
+            QUALITY_LIFE_CATEGORIES[category]["name"] if category else None
+        )
     indicators = sorted(
         legacy_indicators + bes_indicators,
         key=lambda item: (item["theme"].lower(), item["name"].lower(), item["catalog_family"]),
@@ -234,16 +251,37 @@ def get_atlas_catalog():
 
 def get_atlas_indicator(indicator_id):
     if _bes_raw_id(indicator_id) is not None:
-        return get_bes_atlas_indicator(str(indicator_id))
+        payload = get_bes_atlas_indicator(str(indicator_id))
+        if payload is None:
+            return None
+        category = regional_quality_life_selection().get(str(indicator_id))
+        return {
+            **payload,
+            "metadata": {
+                **payload["metadata"],
+                "quality_life_scored": category is not None,
+                "quality_life_category": category,
+                "quality_life_category_label": (
+                    QUALITY_LIFE_CATEGORIES[category]["name"] if category else None
+                ),
+            },
+        }
     payload = get_indicator(str(indicator_id))
     if payload is None:
         return None
+    category = regional_quality_life_selection().get(str(indicator_id))
     return {
         **payload,
         "metadata": {
             **payload["metadata"],
             "catalog_family": "territorial",
             "catalog_family_label": "Indicatori territoriali",
+            "path": indicator_path(payload["metadata"]["id"], payload["metadata"]["name"]),
+            "quality_life_scored": category is not None,
+            "quality_life_category": category,
+            "quality_life_category_label": (
+                QUALITY_LIFE_CATEGORIES[category]["name"] if category else None
+            ),
         },
     }
 
@@ -258,3 +296,98 @@ def get_atlas_indicator_year(indicator_id, year):
     ]
     values.sort(key=lambda row: row["value"], reverse=True)
     return {"metadata": payload["metadata"], "year": year, "values": values}
+
+
+@lru_cache(maxsize=1)
+def _theme_slug_map():
+    return {slugify(theme["name"]): theme["name"] for theme in get_atlas_catalog()["themes"]}
+
+
+def get_atlas_theme_profile(theme_slug):
+    name = _theme_slug_map().get(theme_slug)
+    if name is None:
+        return None
+    indicators = [
+        {
+            "id": item["id"],
+            "name": item["name"],
+            "path": item["path"],
+            "year_min": item["year_min"],
+            "year_max": item["year_max"],
+            "region_count": item["region_count"],
+            "complete": item["complete"],
+            "plain": (item.get("explain") or {}).get("plain"),
+            "catalog_family_label": item["catalog_family_label"],
+            "quality_life_scored": item["quality_life_scored"],
+            "quality_life_category_label": item["quality_life_category_label"],
+        }
+        for item in get_atlas_catalog()["indicators"]
+        if item["theme"] == name
+    ]
+    indicators.sort(key=lambda item: (not item["complete"], item["name"].lower()))
+    theme = next(item for item in get_atlas_catalog()["themes"] if item["name"] == name)
+    return {
+        "theme": name,
+        "theme_slug": theme_slug,
+        "theme_path": f"/tema/{theme_slug}",
+        "macro_area": theme["macro_area"],
+        "example": THEME_EXAMPLES.get(name),
+        "caveat": THEME_CAVEATS.get(name),
+        "indicator_count": len(indicators),
+        "complete_count": sum(item["complete"] for item in indicators),
+        "quality_life_count": sum(item["quality_life_scored"] for item in indicators),
+        "indicators": indicators,
+    }
+
+
+@lru_cache(maxsize=1)
+def atlas_themes_by_macro_area():
+    catalog = get_atlas_catalog()
+    by_macro = defaultdict(list)
+    for theme in catalog["themes"]:
+        by_macro[theme["macro_area"]].append({
+            "theme": theme["name"],
+            "path": f"/tema/{slugify(theme['name'])}",
+            "indicator_count": theme["indicator_count"],
+        })
+    return [
+        {
+            "macro_area": area["name"],
+            "indicator_count": area["indicator_count"],
+            "themes": sorted(by_macro[area["name"]], key=lambda item: item["theme"]),
+        }
+        for area in catalog["macro_areas"]
+    ]
+
+
+def all_atlas_themes_index():
+    return [
+        {
+            "theme": theme["name"],
+            "path": f"/tema/{slugify(theme['name'])}",
+            "indicator_count": theme["indicator_count"],
+        }
+        for theme in get_atlas_catalog()["themes"]
+    ]
+
+
+def search_atlas_indicators(query="", theme=None, limit=50):
+    query = " ".join(
+        unicodedata.normalize("NFKD", query or "").encode("ascii", "ignore").decode("ascii").lower().split()
+    )
+    results = []
+    for item in get_atlas_catalog()["indicators"]:
+        if theme and item["theme"] != theme:
+            continue
+        haystack = " ".join(
+            unicodedata.normalize(
+                "NFKD",
+                f"{item['name']} {item['theme']} {item.get('archive', '')} {item['catalog_family_label']}",
+            ).encode("ascii", "ignore").decode("ascii").lower().split()
+        )
+        if query and query not in haystack:
+            continue
+        results.append(item)
+        if len(results) >= limit:
+            break
+    return results

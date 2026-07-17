@@ -2,7 +2,7 @@
 {% set active_nav = 'temi' %}
 {% set p = profile %}
 
-{% block title %}{{ p.theme }}: indicatori territoriali delle regioni italiane · {{ site_name }}{% endblock %}
+{% block title %}{{ p.theme }}: indicatori delle regioni italiane · {{ site_name }}{% endblock %}
 {% block description %}Tutti gli indicatori Istat del tema {{ p.theme }} per le regioni italiane: {{ p.indicator_count }} indicatori con mappe, classifiche e serie storiche.{% endblock %}
 
 {% block head_extra %}
@@ -10,7 +10,7 @@
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  "name": "{{ p.theme }} - indicatori territoriali",
+  "name": "{{ p.theme }} - indicatori regionali",
   "description": {{ ('Indicatori Istat del tema ' ~ p.theme ~ ' per le regioni italiane.') | tojson }},
   "url": {{ canonical | tojson }}
 }
@@ -33,7 +33,7 @@
   <nav class="breadcrumb"><a href="/temi">Temi</a>{% if p.macro_area %} / {{ p.macro_area }}{% endif %}</nav>
   <h1>{{ p.theme }}</h1>
   <p class="page-lead">{% if p.example %}{{ p.example | replace('Esempio: ', '') | capitalize }}{% else %}Gli indicatori Istat che raccontano il tema {{ p.theme }}, regione per regione.{% endif %}</p>
-  <p class="page-intro">In questo tema trovi {{ p.indicator_count }} indicatori{% if p.complete_count %}, di cui {{ p.complete_count }} con dati completi e aggiornati su tutte e 20 le regioni{% endif %}. Apri una scheda per la classifica aggiornata, oppure esplora mappa e andamento negli anni nell'atlante.</p>
+  <p class="page-intro">In questo tema trovi {{ p.indicator_count }} indicatori{% if p.complete_count %}, di cui {{ p.complete_count }} con dati completi e aggiornati su tutte e 20 le regioni{% endif %}{% if p.quality_life_count %}. {{ p.quality_life_count }} entrano nel punteggio della qualità della vita{% endif %}. Apri una scheda per la classifica aggiornata, oppure esplora mappa e andamento negli anni nell'atlante.</p>
 
   <ul class="indicator-list">
     {% for ind in p.indicators %}
@@ -41,7 +41,7 @@
       <a href="{{ ind.path }}">
         <strong>{{ ind.name }}</strong>
         {% if ind.plain %}<span>{{ ind.plain }}</span>{% endif %}
-        <small>{{ ind.year_min }}-{{ ind.year_max }} · {{ ind.region_count }} regioni{% if ind.complete %} · copertura completa{% endif %}</small>
+        <small>{{ ind.catalog_family_label }} · {{ ind.year_min }}-{{ ind.year_max }} · {{ ind.region_count }} regioni{% if ind.complete %} · copertura completa{% endif %}{% if ind.quality_life_scored %} · usato per {{ ind.quality_life_category_label }}{% endif %}</small>
       </a>
     </li>
     {% endfor %}

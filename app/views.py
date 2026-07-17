@@ -7,12 +7,15 @@ from app.data import (
     get_indicator_year,
     get_rows,
     indicator_trend_stats,
-    search_indicators,
 )
 from app.atlas_catalog import (
+    all_atlas_themes_index,
+    atlas_themes_by_macro_area,
     get_atlas_catalog,
     get_atlas_indicator,
     get_atlas_indicator_year,
+    get_atlas_theme_profile,
+    search_atlas_indicators,
 )
 from app import profiles
 from app import indicator_notes
@@ -119,7 +122,7 @@ def external_indicator_manifest_api():
 @app.route("/api/search")
 def search():
     return jsonify({
-        "results": search_indicators(
+        "results": search_atlas_indicators(
             query=request.args.get("q", ""),
             theme=request.args.get("theme"),
         )
@@ -314,7 +317,7 @@ def region_api(region_key):
 
 @app.route("/tema/<theme_slug>")
 def theme_page(theme_slug):
-    profile = profiles.theme_profile(theme_slug)
+    profile = get_atlas_theme_profile(theme_slug)
     if profile is None:
         abort(404)
     return render_template(
@@ -342,7 +345,7 @@ def regions_index():
 
 @app.route("/temi")
 def themes_index():
-    groups = profiles.themes_by_macro_area()
+    groups = atlas_themes_by_macro_area()
     total = sum(group["indicator_count"] for group in groups)
     return render_template(
         "themes_index.html",
@@ -371,7 +374,7 @@ def _profile_suffix(slug):
 
 @app.route("/download/indicator/<indicator_id>.csv")
 def indicator_download_csv(indicator_id):
-    payload = get_indicator(indicator_id)
+    payload = get_atlas_indicator(indicator_id)
     if payload is None:
         abort(404)
     meta = payload["metadata"]
@@ -398,7 +401,7 @@ def indicator_download_csv(indicator_id):
 
 @app.route("/download/indicator/<indicator_id>.json")
 def indicator_download_json(indicator_id):
-    payload = get_indicator(indicator_id)
+    payload = get_atlas_indicator(indicator_id)
     if payload is None:
         abort(404)
     return jsonify(payload)
@@ -598,7 +601,10 @@ def quality_life_methodology():
         methodology_province=province["methodology"] if province else None,
         categories=qb.get_quality_life_categories(),
         profiles=qb.get_quality_life_profiles(),
-        bes_indicators=bes_data.all_bes_indicators(),
+        quality_life_indicators=[
+            item for item in get_atlas_catalog()["indicators"]
+            if item["quality_life_scored"]
+        ],
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/qualita-della-vita/metodologia",
@@ -874,7 +880,7 @@ def sitemap():
         })
     for region in profiles.all_regions_index():
         pages.append({"loc": f"{SITE_URL}{region['path']}", "priority": "0.7"})
-    for theme in profiles.all_themes_index():
+    for theme in all_atlas_themes_index():
         pages.append({"loc": f"{SITE_URL}{theme['path']}", "priority": "0.5"})
     for item in get_catalog()["indicators"]:
         if not profiles.is_search_indexable_indicator(item):

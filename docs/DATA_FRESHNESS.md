@@ -23,10 +23,10 @@ Il catalogo pubblico include anche tutti gli indicatori BES regionali con id
 isolarli nell'Atlante. Questa esposizione descrittiva non cambia la regola più
 restrittiva applicata al punteggio della qualità della vita.
 
-La classifica regionale applica una regola più forte del badge: dal 2026 usa
-solo indicatori BES con anno di riferimento 2025 o successivo. La classifica
-provinciale resta sull'ultima edizione disponibile del BES dei Territori e ne
-dichiara l'anno senza fingere un aggiornamento che Istat non ha pubblicato.
+La classifica regionale applica regole più forti del badge: usa indicatori BES
+con anno di riferimento almeno 2025 e indicatori territoriali completi con anno
+almeno 2023, sempre con direzione revisionata. La classifica provinciale resta
+sull'ultima edizione disponibile del BES dei Territori e ne dichiara l'anno.
 
 ## Audit
 
@@ -52,9 +52,10 @@ Output:
 - Integrati nel layer esterno: indicatori demografici Istat regionali 2025/2026 e
   indicatori Istat lavoro regionali 2025 già presenti nel dataset locale
   aggiornato.
-- Integrato nella qualità della vita regionale: BES nazionale, aggiornamento
-  intermedio 2026. Comprende 67 serie regionali al 2025, incluse misure INVALSI,
-  sicurezza, salute, povertà, acqua e copertura internet.
+- Integrati nella qualità della vita regionale: 62 indicatori scoreable del BES
+  nazionale 2026 e 142 indicatori territoriali DISET completi, recenti e con
+  direzione revisionata. Il catalogo resta unico e segnala quali voci entrano
+  nel punteggio.
 - Movimprese, turismo, Terna e Infratel restano candidati o `needs_review` fino a
   verifica di definizione, unità, copertura e licenza.
 - Demografia strutturale, fecondità e saldi migratori restano contestuali o

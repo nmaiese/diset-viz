@@ -12,16 +12,18 @@ Two ideas address the "the profiles do nothing / results feel obvious" problem:
 - **specializations**: per-category rankings and champions, so "where does each
   territory excel or lag" is foreground, not buried under one averaged number.
 
-Same categories and profiles as `app/quality_life_config.py`; same source (BES dei
-Territori) at both levels, so regions and provinces are finally comparable.
+Same categories and profiles as `app/quality_life_config.py`. Regions use the
+scoreable subset of the federated atlas (territorial indicators plus national
+BES); provinces use BES dei Territori, the only source available at that level.
 """
 
 import statistics
 from collections import defaultdict
 
 from app.cache import cache
-from app.external_data import quality_life_freshness_from_manifest
-from app.profiles import SCOREABLE_DIRECTIONS
+from app.data import get_catalog, get_rows
+from app.external_data import count_freshness
+from app.profiles import SCOREABLE_DIRECTIONS, indicator_path
 from app.bes_data import (
     MIN_PUBLIC_COVERAGE,
     bes_indicator_path,
@@ -32,6 +34,7 @@ from app.bes_data import (
 )
 from app.quality_life import get_quality_life_categories, normalize_weights
 from app.quality_life_config import DEFAULT_PROFILE, QUALITY_LIFE_CATEGORIES, QUALITY_LIFE_PROFILES
+from app.quality_life_selection import BES_PREFIX, regional_quality_life_selection
 
 LEVELS = ("regione", "provincia")
 _DISPLAY_SPREAD = 12.0   # display = 50 + 12 * (standardised score), clipped to 0..100
@@ -83,9 +86,13 @@ def _matrix_and_meta(level):
             by_id[row["id"]].append(row)
 
     matrix, meta = {}, {}
+    selection = regional_quality_life_selection() if level == "regione" else None
     for ind_id, items in by_id.items():
         info = manifest.get(ind_id)
         if not info:
+            continue
+        public_id = f"{BES_PREFIX}{ind_id}"
+        if selection is not None and public_id not in selection:
             continue
         if info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
             continue
@@ -106,25 +113,60 @@ def _matrix_and_meta(level):
         if not any(z.values()):
             continue
         sign = 1.0 if info["direction"] == "higher_better" else -1.0  # orient
-        matrix[ind_id] = {k: sign * v for k, v in z.items()}
-        meta[ind_id] = {
-            "id": ind_id,
+        matrix[public_id] = {k: sign * v for k, v in z.items()}
+        meta[public_id] = {
+            "id": public_id,
+            "raw_id": ind_id,
             "name": info["name"],
             "theme": info["domain_name"],
+            "category": info["category"],
             "direction": info["direction"],
             "year_max": year_max,
             "unit": info["unit"],
             "path": bes_indicator_path(ind_id, info["name"]),
+            "source_family": "bes",
         }
+
+    if level == "regione":
+        catalog = {item["id"]: item for item in get_catalog()["indicators"]}
+        selected_ids = {indicator_id for indicator_id in selection if not indicator_id.startswith(BES_PREFIX)}
+        latest = defaultdict(dict)
+        for row in get_rows():
+            item = catalog.get(row["id"])
+            if row["id"] not in selected_ids or item is None:
+                continue
+            if row["year"] == item["year_max"] and row["value"] is not None:
+                latest[row["id"]][row["region_key"]] = row["value"]
+        for indicator_id in selected_ids:
+            item = catalog[indicator_id]
+            values = latest.get(indicator_id, {})
+            if len(values) < 3:
+                continue
+            z = _standardise(values)
+            if not any(z.values()):
+                continue
+            direction = (item.get("explain") or {}).get("direction")
+            sign = 1.0 if direction == "higher_better" else -1.0
+            matrix[indicator_id] = {key: sign * value for key, value in z.items()}
+            meta[indicator_id] = {
+                "id": indicator_id,
+                "name": item["name"],
+                "theme": item["theme"],
+                "category": selection[indicator_id],
+                "direction": direction,
+                "year_max": item["year_max"],
+                "unit": item["unit"],
+                "path": indicator_path(indicator_id, item["name"]),
+                "source_family": "territorial",
+            }
     return matrix, meta
 
 
 @cache.memoize(timeout=3600)
 def _indicators_by_category(level):
-    manifest = get_bes_manifest(level)
-    matrix, _ = _matrix_and_meta(level)
+    matrix, meta = _matrix_and_meta(level)
     by_category = {slug: [] for slug in QUALITY_LIFE_CATEGORIES}
-    for ind_id, info in manifest.items():
+    for ind_id, info in meta.items():
         category = info["category"]
         if category not in QUALITY_LIFE_CATEGORIES:
             continue
@@ -235,26 +277,34 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
         "level": level,
         "profile": profile,
         "categories": get_quality_life_categories(),
-        "data_freshness": quality_life_freshness_from_manifest(
-            {indicator_id: manifest[indicator_id] for indicator_id in matrix}
-        ),
+        "data_freshness": count_freshness(meta.values()),
         "ranking": rows,
         "unrated": unrated,
         "champions": _champions(level, category_display, territories, expected),
         "category_rankings": _category_rankings(level, category_display, territories, expected),
         "methodology": {
             "source": (
-                "Istat, BES nazionale, aggiornamento intermedio 2026"
+                "Istat, indicatori territoriali e BES nazionale"
                 if level == "regione"
                 else "Istat, BES dei Territori (Bes at local level)"
             ),
-            "minimum_reference_year": _REGIONAL_CURRENT_YEAR if level == "regione" else None,
+            "minimum_reference_year": (
+                {"bes": _REGIONAL_CURRENT_YEAR, "territorial": 2023}
+                if level == "regione" else None
+            ),
             "territorial_level": "regioni" if level == "regione" else "province e città metropolitane",
             "normalization": "z-score orientato per indicatore (distanze conservate), display 0-100 con media 50.",
             "indicator_counts": {c: len(ids) for c, ids in by_category.items()},
             "total_indicators": len(all_ids),
             "score_indicators_total": len(all_ids),
-            "manifest_indicators_total": len(manifest),
+            "manifest_indicators_total": (
+                len(manifest) + len(get_catalog()["indicators"])
+                if level == "regione" else len(manifest)
+            ),
+            "source_counts": {
+                source: sum(item["source_family"] == source for item in meta.values())
+                for source in sorted({item["source_family"] for item in meta.values()})
+            },
             "quality_checks": {"empty_categories": empty,
                                "unrated": [u["name"] for u in unrated]},
         },

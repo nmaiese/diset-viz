@@ -155,10 +155,11 @@ See [`docs/EXTERNAL_SOURCES.md`](docs/EXTERNAL_SOURCES.md),
 
 ### Quality-of-life datasets
 
-Regional quality-of-life uses the national BES intermediate release: 145
-regional indicators are available and 67 reach 2025. Only the 62 current
-indicators that also pass category, direction and coverage checks enter the
-score. All 145 are browsable in the Atlas under namespaced `bes:*` ids, while
+Regional quality-of-life selects from the same federated catalog used by the
+Atlas and theme pages. The score currently uses 204 regional indicators: 62
+from the national BES release and 142 from the curated, complete and recent
+territorial subset. Exact name duplicates are counted once. All 145 regional
+BES indicators are browsable in the Atlas under namespaced `bes:*` ids, while
 the atlas CSV and the BES CSV remain separate. The pipeline and checklist are documented
 in [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md).
 

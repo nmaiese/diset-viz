@@ -19,6 +19,7 @@ from app.bes_data import get_bes_manifest  # noqa: E402
 from app.data import get_catalog  # noqa: E402
 from app.external_data import MANIFEST_COLUMNS, get_external_rows, freshness_status  # noqa: E402
 from app.profiles import SCOREABLE_DIRECTIONS, is_core  # noqa: E402
+from app.quality_life_selection import BES_PREFIX, regional_quality_life_selection  # noqa: E402
 from scripts.external_sources import source_by_id  # noqa: E402
 
 
@@ -116,6 +117,7 @@ def _external_years():
 
 def _inventory_rows():
     rows = []
+    score_selection = regional_quality_life_selection()
     for item in get_catalog()["indicators"]:
         direction = (item.get("explain") or {}).get("direction")
         rows.append({
@@ -129,22 +131,25 @@ def _inventory_rows():
             "fonte_attuale": item["source_label"],
             "uso_in_atlante": "true",
             "uso_nei_profili": "true" if is_core(item) else "false",
-            "uso_nello_scoring": "false",
+            "uso_nello_scoring": "true" if item["id"] in score_selection else "false",
         })
     for level in ("regione", "provincia"):
         for item in get_bes_manifest(level).values():
+            public_id = f"{BES_PREFIX}{item['id']}"
             rows.append({
-                "id": item["id"],
+                "id": public_id if level == "regione" else item["id"],
                 "nome": item["name"],
                 "livello_territoriale": level,
                 "categoria": item["category"] or "",
                 "direzione": item["direction"],
                 "unita": item["unit"],
                 "ultimo_anno_disponibile": item["year_max"],
-                "fonte_attuale": "Istat, BES dei Territori",
-                "uso_in_atlante": "false",
+                "fonte_attuale": "Istat, BES nazionale" if level == "regione" else "Istat, BES dei Territori",
+                "uso_in_atlante": "true" if level == "regione" else "false",
                 "uso_nei_profili": "false",
-                "uso_nello_scoring": "true" if item["direction"] in SCOREABLE_DIRECTIONS and item["category"] else "false",
+                "uso_nello_scoring": "true" if public_id in score_selection and level == "regione" else (
+                    "true" if level == "provincia" and item["direction"] in SCOREABLE_DIRECTIONS and item["category"] else "false"
+                ),
             })
     rows.sort(key=lambda r: (r["livello_territoriale"], r["categoria"], r["nome"], r["id"]))
     return rows
@@ -222,6 +227,8 @@ def _write_markdown(rows, output_path):
         and item["category"]
         and item["coverage_latest"] >= 0.8
     ]
+    regional_selection = regional_quality_life_selection()
+    territorial_scoreable = [item for item in regional_selection if not item.startswith(BES_PREFIX)]
     lines = [
         "# Audit freschezza dati",
         "",
@@ -233,6 +240,8 @@ def _write_markdown(rows, output_path):
         f"- indicatori BES regionali disponibili: {len(bes_region)}",
         f"- indicatori BES regionali al 2025: {len(bes_current)}",
         f"- indicatori BES 2025 ammessi allo scoring regionale: {len(bes_scoreable)}",
+        f"- indicatori territoriali ammessi allo scoring regionale: {len(territorial_scoreable)}",
+        f"- totale indicatori del catalogo unico nello scoring regionale: {len(regional_selection)}",
         f"- indicatori non aggiornabili: {counts['unavailable']}",
         f"- indicatori da revisionare manualmente: {counts['needs_review'] + counts['candidate']}",
         "- INVALSI regionale 2025 è acquisito tramite il BES nazionale; Movimprese, Terna e Infratel restano in attesa di un parser e di un match di definizione verificati.",
