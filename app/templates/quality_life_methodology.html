@@ -46,7 +46,7 @@
   <p>Entrano nel punteggio solo gli indicatori con una direzione interpretabile e copertura sufficiente. La selezione regionale usa <strong>{{ mr.score_indicators_total }} indicatori</strong>: <strong>{{ mr.source_counts.bes }}</strong> BES e <strong>{{ mr.source_counts.territorial }}</strong> territoriali. La selezione provinciale ne usa <strong>{{ mp.score_indicators_total }}</strong>. Tutti gli altri restano consultabili nell'Atlante e nelle pagine per tema, senza influire sullo score.</p>
 
   <h2>Le categorie</h2>
-  <p>Raggruppiamo i domini BES in otto categorie leggibili, inclusa una dimensione esplicita di benessere soggettivo. Lo stesso schema vale per entrambi i livelli. Poiché il punteggio di una categoria è la media dei suoi indicatori, una categoria con pochi indicatori non pesa di più di una ricca solo perché contiene più misure.</p>
+  <p>Usiamo le stesse dodici categorie dell'Atlante, inclusa una dimensione esplicita di benessere soggettivo. Nel punteggio entrano solo gli indicatori con una direzione interpretabile e una copertura sufficiente. Lo stesso schema vale per entrambi i livelli. Poiché il punteggio di una categoria è la media dei suoi indicatori, una categoria con pochi indicatori non pesa di più di una ricca solo perché contiene più misure.</p>
   <table class="data-table">
     <thead><tr><th>Categoria</th><th>Cosa misura</th><th class="num">Ind. regioni</th><th class="num">Ind. province</th></tr></thead>
     <tbody>
@@ -70,7 +70,7 @@
   <p>Se per un territorio una categoria non ha indicatori disponibili, non blocchiamo la classifica: ridistribuiamo i pesi sulle categorie rimaste e mostriamo la copertura.</p>
 
   <h2>I profili e il movimento</h2>
-  <p>Ogni profilo modifica i pesi delle otto categorie, poi li normalizza a 1. Accanto al punteggio mostriamo il <strong>movimento</strong>: quante posizioni un territorio guadagna o perde rispetto al profilo Equilibrato. Il confronto rende visibile l'effetto concreto delle priorità scelte.</p>
+  <p>Ogni profilo modifica i pesi delle dodici categorie, poi li normalizza a 1. Accanto al punteggio mostriamo il <strong>movimento</strong>: quante posizioni un territorio guadagna o perde rispetto al profilo Equilibrato. Il confronto rende visibile l'effetto concreto delle priorità scelte.</p>
   <ul class="quality-category-list">
     {% for profile in profiles %}
     <li><h3>{{ profile.name }}</h3><p>{{ profile.description }}</p></li>

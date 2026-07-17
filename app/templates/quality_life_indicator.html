@@ -40,7 +40,7 @@
 <article class="page page-indicator wrap">
   <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a> / <a href="/qualita-della-vita/metodologia#indicatori-bes">Indicatori BES</a></nav>
   <h1>{{ indicator.name }}</h1>
-  <p class="page-lead">Indicatore BES Istat, nel dominio <strong>{{ indicator.domain_name }}</strong>. La scheda raccoglie gli ultimi dati disponibili per regioni e province senza mescolare anni diversi.</p>
+  <p class="page-lead">Indicatore BES Istat nella categoria <strong>{{ indicator.category_name }}</strong>. Il dominio originale della fonte è {{ indicator.domain_name }}. La scheda raccoglie gli ultimi dati disponibili per regioni e province senza mescolare anni diversi.</p>
   {% if not indicator.indexable %}
   <p class="page-note">La scheda è consultabile ma non viene proposta ai motori di ricerca: nell'ultimo anno la copertura è inferiore all'80% sia per le regioni sia per le province.</p>
   {% endif %}
@@ -48,7 +48,8 @@
   <div class="page-facts">
     <span><small>Unità di misura</small>{{ indicator.unit or 'n.d.' }}</span>
     <span><small>Periodo disponibile</small>{{ indicator.year_min }}-{{ indicator.year_max }}</span>
-    <span><small>Categoria</small>{{ indicator.domain_name }}</span>
+    <span><small>Categoria</small><a href="{{ indicator.category_path }}">{{ indicator.category_name }}</a></span>
+    <span><small>Dominio BES</small>{{ indicator.domain_name }}</span>
     <span><small>Fonte</small><a href="{{ indicator.source_url }}" target="_blank" rel="noopener">Istat, sistema BES</a></span>
   </div>
 

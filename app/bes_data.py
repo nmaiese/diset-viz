@@ -13,6 +13,7 @@ from pathlib import Path
 from app.cache import cache
 from app.data import _parse_number
 from app.profiles import region_key_for, slugify
+from app.taxonomy import CANONICAL_CATEGORIES, category_for_indicator, category_path
 
 DATA_DIR = Path(__file__).resolve().parent / "static" / "data"
 
@@ -108,12 +109,18 @@ def get_bes_manifest(level):
     manifest = {}
     with manifest_path.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle, delimiter=";"):
+            proposed = row["proposed_category"] or None
+            category = proposed if proposed in CANONICAL_CATEGORIES else category_for_indicator(
+                row["id"], row["domain_name"]
+            )
             manifest[row["id"]] = {
                 "id": row["id"],
                 "name": row["name"],
                 "domain": row["domain"],
                 "domain_name": row["domain_name"],
-                "category": row["proposed_category"] or None,
+                "category": category,
+                "category_name": CANONICAL_CATEGORIES[category]["name"] if category else None,
+                "category_path": category_path(category) if category else None,
                 "direction": row["proposed_direction"],
                 "unit": row["unit"],
                 "year_min": int(row["year_min"]),

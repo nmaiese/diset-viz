@@ -226,7 +226,7 @@ def indicator_page(slug):
     if not match:
         abort(404)
     indicator_id = match.group(1)
-    payload = get_indicator(indicator_id)
+    payload = get_atlas_indicator(indicator_id)
     if payload is None:
         abort(404)
 
@@ -236,7 +236,7 @@ def indicator_page(slug):
         return redirect(canonical_path, code=301)
 
     year = meta["year_max"]
-    year_view = get_indicator_year(indicator_id, year)
+    year_view = get_atlas_indicator_year(indicator_id, year)
 
     # Order the ranking so #1 is the best-performing region for this indicator's
     # direction; for contextual indicators "best" is undefined, so keep raw order.
@@ -320,12 +320,14 @@ def theme_page(theme_slug):
     profile = get_atlas_theme_profile(theme_slug)
     if profile is None:
         abort(404)
+    if request.path != profile["theme_path"]:
+        return redirect(profile["theme_path"], code=301)
     return render_template(
         "theme_page.html",
         profile=profile,
         site_url=SITE_URL,
         site_name=SITE_NAME,
-        canonical=f"{SITE_URL}/tema/{theme_slug}",
+        canonical=f"{SITE_URL}{profile['theme_path']}",
     )
 
 

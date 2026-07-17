@@ -25,44 +25,44 @@ id;name;domain;domain_name;proposed_category;proposed_direction;unit;year_min;ye
 04BEC005P;Importo medio annuo pro-capite dei redditi pensionistici;BES_04;Benessere economico;reddito_accessibilita;higher_better;euro;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
 04BEC006P;Pensionati con reddito pensionistico di basso importo;BES_04;Benessere economico;reddito_accessibilita;lower_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
 04BEC009P;Tasso di ingresso in sofferenza dei prestiti bancari alle famiglie;BES_04;Benessere economico;reddito_accessibilita;lower_better;%;2015;2024;103;1.0;103;1.0;DF_BES_TERRIT_0T
-05REL007P;Scuole accessibili;BES_05;Relazioni sociali;sicurezza_istituzioni;higher_better;%;2024;2024;95;0.9223;95;0.9223;DF_BES_TERRIT_0T
-05REL008;Organizzazioni non profit;BES_05;Relazioni sociali;sicurezza_istituzioni;higher_better;per 10.000 abitanti;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
-06POL001;Partecipazione elettorale;BES_06;Politica e istituzioni;sicurezza_istituzioni;higher_better;%;2019;2024;103;1.0;103;1.0;DF_BES_TERRIT_0T
-06POL001P;Partecipazione elettorale (elezioni regionali);BES_06;Politica e istituzioni;sicurezza_istituzioni;higher_better;%;2015;2024;103;1.0;29;0.2816;DF_BES_TERRIT_0T
-06POL002P;Amministratori comunali donne;BES_06;Politica e istituzioni;sicurezza_istituzioni;higher_better;%;2015;2024;103;1.0;103;1.0;DF_BES_TERRIT_0T
-06POL003P;Amministratori comunali con meno di 40 anni;BES_06;Politica e istituzioni;sicurezza_istituzioni;higher_better;%;2015;2024;103;1.0;103;1.0;DF_BES_TERRIT_0T
-06POL007P;Amministrazioni provinciali: capacità di riscossione;BES_06;Politica e istituzioni;sicurezza_istituzioni;higher_better;%;2015;2022;103;1.0;99;0.9612;DF_BES_TERRIT_0T
-06POL009P;Comuni: capacità di riscossione;BES_06;Politica e istituzioni;sicurezza_istituzioni;higher_better;%;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
-06POL012P;Affollamento degli istituti di pena;BES_06;Politica e istituzioni;sicurezza_istituzioni;lower_better;%;2015;2024;103;1.0;103;1.0;DF_BES_TERRIT_0T
-07SIC001P;Omicidi volontari;BES_07;Sicurezza;sicurezza_istituzioni;lower_better;per 100.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-07SIC004P;Denunce di furto in abitazione;BES_07;Sicurezza;sicurezza_istituzioni;lower_better;per 100.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-07SIC005P;Denunce di borseggio;BES_07;Sicurezza;sicurezza_istituzioni;lower_better;per 100.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-07SIC006P;Denunce di rapina;BES_07;Sicurezza;sicurezza_istituzioni;lower_better;per 100.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-07SIC007P;Altri delitti mortali denunciati;BES_07;Sicurezza;sicurezza_istituzioni;lower_better;per 100.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-07SIC008P;Mortalità stradale in ambito extraurbano;BES_07;Sicurezza;sicurezza_istituzioni;lower_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-09PAE002;Densità e rilevanza del patrimonio museale;BES_09;Paesaggio e patrimonio culturale;cultura_digitale;higher_better;per 100 km2;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
-09PAE008;Diffusione delle aziende agrituristiche;BES_09;Paesaggio e patrimonio culturale;cultura_digitale;higher_better;per 100 km2;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-09PAE009-N25;Densità di verde storico;BES_09;Paesaggio e patrimonio culturale;cultura_digitale;higher_better;per 100 m2;2021;2022;102;0.9903;102;0.9903;DF_BES_TERRIT_0T
-10AMB001P;Concentrazione media annua di PM10;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;microgrammi per m3;2015;2023;101;0.9806;92;0.8932;DF_BES_TERRIT_0T
-10AMB002P;Concentrazione media annua di PM2.5;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;microgrammi per m3;2015;2023;97;0.9417;44;0.4272;DF_BES_TERRIT_0T
-10AMB003;Dispersione da rete idrica comunale;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;%;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
-10AMB008;Disponibilità di verde urbano;BES_10;Ambiente;ambiente_mobilita_servizi;higher_better;m2 per abitante;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-10AMB011;Popolazione esposta al rischio di frane;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;%;2017;2020;103;1.0;103;1.0;DF_BES_TERRIT_0T
-10AMB012;Popolazione esposta al rischio di alluvioni;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;%;2017;2020;103;1.0;103;1.0;DF_BES_TERRIT_0T
-10AMB014;Aree protette;BES_10;Ambiente;ambiente_mobilita_servizi;higher_better;%;2021;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
-10AMB016;Energia elettrica da fonti rinnovabili;BES_10;Ambiente;ambiente_mobilita_servizi;higher_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-10AMB017;Raccolta differenziata dei rifiuti urbani;BES_10;Ambiente;ambiente_mobilita_servizi;higher_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-10AMB018P;Impermeabilizzazione del suolo da copertura artificiale;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-10AMB024P;Rifiuti urbani prodotti;BES_10;Ambiente;ambiente_mobilita_servizi;lower_better;kg per abitante;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-11RIC002;Propensione alla brevettazione;BES_11;Innovazione, ricerca e creatività;istruzione_capitale_umano;higher_better;per milione di abitanti;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
-11RIC004P;Addetti nelle imprese culturali;BES_11;Innovazione, ricerca e creatività;cultura_digitale;higher_better;%;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
-11RIC022;Comuni con servizi per le famiglie interamente on line;BES_11;Innovazione, ricerca e creatività;cultura_digitale;higher_better;%;2018;2018;103;1.0;103;1.0;DF_BES_TERRIT_0T
-11RIC025;Mobilità dei laureati italiani (25-39 anni);BES_11;Innovazione, ricerca e creatività;istruzione_capitale_umano;higher_better;per 1.000 laureati residenti;2019;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-12SER002P;Medici specialisti;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;higher_better;per 10.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-12SER003P-N25;Posti letto negli ospedali;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;higher_better;per 10.000 abitanti;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
-12SER007;Irregolarità del servizio elettrico;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;lower_better;numero medio di utenti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-12SER008;Posti-km offerti dal Tpl;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;higher_better;valore per abitante;2015;2023;103;1.0;45;0.4369;DF_BES_TERRIT_0T
-12SER020;Copertura della rete fissa di accesso ultra veloce a internet;BES_12;Qualità dei servizi;cultura_digitale;higher_better;%;2020;2024;103;1.0;102;0.9903;DF_BES_TERRIT_0T
-12SER022;Posti letto per specialità ad elevata assistenza;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;higher_better;per 10.000 abitanti;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
-12SER024;Servizio di raccolta differenziata dei rifiuti urbani;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;higher_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
-12SER025;Emigrazione ospedaliera in altra regione;BES_12;Qualità dei servizi;ambiente_mobilita_servizi;lower_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+05REL007P;Scuole accessibili;BES_05;Relazioni sociali;istituzioni_partecipazione;higher_better;%;2024;2024;95;0.9223;95;0.9223;DF_BES_TERRIT_0T
+05REL008;Organizzazioni non profit;BES_05;Relazioni sociali;istituzioni_partecipazione;higher_better;per 10.000 abitanti;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
+06POL001;Partecipazione elettorale;BES_06;Politica e istituzioni;istituzioni_partecipazione;higher_better;%;2019;2024;103;1.0;103;1.0;DF_BES_TERRIT_0T
+06POL001P;Partecipazione elettorale (elezioni regionali);BES_06;Politica e istituzioni;istituzioni_partecipazione;higher_better;%;2015;2024;103;1.0;29;0.2816;DF_BES_TERRIT_0T
+06POL002P;Amministratori comunali donne;BES_06;Politica e istituzioni;istituzioni_partecipazione;higher_better;%;2015;2024;103;1.0;103;1.0;DF_BES_TERRIT_0T
+06POL003P;Amministratori comunali con meno di 40 anni;BES_06;Politica e istituzioni;istituzioni_partecipazione;higher_better;%;2015;2024;103;1.0;103;1.0;DF_BES_TERRIT_0T
+06POL007P;Amministrazioni provinciali: capacità di riscossione;BES_06;Politica e istituzioni;istituzioni_partecipazione;higher_better;%;2015;2022;103;1.0;99;0.9612;DF_BES_TERRIT_0T
+06POL009P;Comuni: capacità di riscossione;BES_06;Politica e istituzioni;istituzioni_partecipazione;higher_better;%;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
+06POL012P;Affollamento degli istituti di pena;BES_06;Politica e istituzioni;istituzioni_partecipazione;lower_better;%;2015;2024;103;1.0;103;1.0;DF_BES_TERRIT_0T
+07SIC001P;Omicidi volontari;BES_07;Sicurezza;sicurezza_legalita;lower_better;per 100.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+07SIC004P;Denunce di furto in abitazione;BES_07;Sicurezza;sicurezza_legalita;lower_better;per 100.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+07SIC005P;Denunce di borseggio;BES_07;Sicurezza;sicurezza_legalita;lower_better;per 100.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+07SIC006P;Denunce di rapina;BES_07;Sicurezza;sicurezza_legalita;lower_better;per 100.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+07SIC007P;Altri delitti mortali denunciati;BES_07;Sicurezza;sicurezza_legalita;lower_better;per 100.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+07SIC008P;Mortalità stradale in ambito extraurbano;BES_07;Sicurezza;sicurezza_legalita;lower_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+09PAE002;Densità e rilevanza del patrimonio museale;BES_09;Paesaggio e patrimonio culturale;cultura_patrimonio_turismo;higher_better;per 100 km2;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
+09PAE008;Diffusione delle aziende agrituristiche;BES_09;Paesaggio e patrimonio culturale;cultura_patrimonio_turismo;higher_better;per 100 km2;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+09PAE009-N25;Densità di verde storico;BES_09;Paesaggio e patrimonio culturale;cultura_patrimonio_turismo;higher_better;per 100 m2;2021;2022;102;0.9903;102;0.9903;DF_BES_TERRIT_0T
+10AMB001P;Concentrazione media annua di PM10;BES_10;Ambiente;ambiente_energia;lower_better;microgrammi per m3;2015;2023;101;0.9806;92;0.8932;DF_BES_TERRIT_0T
+10AMB002P;Concentrazione media annua di PM2.5;BES_10;Ambiente;ambiente_energia;lower_better;microgrammi per m3;2015;2023;97;0.9417;44;0.4272;DF_BES_TERRIT_0T
+10AMB003;Dispersione da rete idrica comunale;BES_10;Ambiente;ambiente_energia;lower_better;%;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
+10AMB008;Disponibilità di verde urbano;BES_10;Ambiente;ambiente_energia;higher_better;m2 per abitante;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+10AMB011;Popolazione esposta al rischio di frane;BES_10;Ambiente;ambiente_energia;lower_better;%;2017;2020;103;1.0;103;1.0;DF_BES_TERRIT_0T
+10AMB012;Popolazione esposta al rischio di alluvioni;BES_10;Ambiente;ambiente_energia;lower_better;%;2017;2020;103;1.0;103;1.0;DF_BES_TERRIT_0T
+10AMB014;Aree protette;BES_10;Ambiente;ambiente_energia;higher_better;%;2021;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
+10AMB016;Energia elettrica da fonti rinnovabili;BES_10;Ambiente;ambiente_energia;higher_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+10AMB017;Raccolta differenziata dei rifiuti urbani;BES_10;Ambiente;ambiente_energia;higher_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+10AMB018P;Impermeabilizzazione del suolo da copertura artificiale;BES_10;Ambiente;ambiente_energia;lower_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+10AMB024P;Rifiuti urbani prodotti;BES_10;Ambiente;ambiente_energia;lower_better;kg per abitante;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+11RIC002;Propensione alla brevettazione;BES_11;Innovazione, ricerca e creatività;ricerca_innovazione_digitale;higher_better;per milione di abitanti;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
+11RIC004P;Addetti nelle imprese culturali;BES_11;Innovazione, ricerca e creatività;cultura_patrimonio_turismo;higher_better;%;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
+11RIC022;Comuni con servizi per le famiglie interamente on line;BES_11;Innovazione, ricerca e creatività;ricerca_innovazione_digitale;higher_better;%;2018;2018;103;1.0;103;1.0;DF_BES_TERRIT_0T
+11RIC025;Mobilità dei laureati italiani (25-39 anni);BES_11;Innovazione, ricerca e creatività;ricerca_innovazione_digitale;higher_better;per 1.000 laureati residenti;2019;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+12SER002P;Medici specialisti;BES_12;Qualità dei servizi;mobilita_servizi_territoriali;higher_better;per 10.000 abitanti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+12SER003P-N25;Posti letto negli ospedali;BES_12;Qualità dei servizi;mobilita_servizi_territoriali;higher_better;per 10.000 abitanti;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
+12SER007;Irregolarità del servizio elettrico;BES_12;Qualità dei servizi;mobilita_servizi_territoriali;lower_better;numero medio di utenti;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+12SER008;Posti-km offerti dal Tpl;BES_12;Qualità dei servizi;mobilita_servizi_territoriali;higher_better;valore per abitante;2015;2023;103;1.0;45;0.4369;DF_BES_TERRIT_0T
+12SER020;Copertura della rete fissa di accesso ultra veloce a internet;BES_12;Qualità dei servizi;ricerca_innovazione_digitale;higher_better;%;2020;2024;103;1.0;102;0.9903;DF_BES_TERRIT_0T
+12SER022;Posti letto per specialità ad elevata assistenza;BES_12;Qualità dei servizi;mobilita_servizi_territoriali;higher_better;per 10.000 abitanti;2015;2022;103;1.0;103;1.0;DF_BES_TERRIT_0T
+12SER024;Servizio di raccolta differenziata dei rifiuti urbani;BES_12;Qualità dei servizi;mobilita_servizi_territoriali;higher_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T
+12SER025;Emigrazione ospedaliera in altra regione;BES_12;Qualità dei servizi;mobilita_servizi_territoriali;lower_better;%;2015;2023;103;1.0;103;1.0;DF_BES_TERRIT_0T

@@ -23,7 +23,7 @@ from app.bes_data import (
     get_bes_manifest,
     get_bes_rows,
 )
-from app.indicator_notes import macro_area_for
+from app.taxonomy import category_metadata
 from app import profiles
 
 COMPARE_CHOICES = ("region_a", "region_b", "timeout")
@@ -62,12 +62,12 @@ def _bes_region_payload(indicator_id, year):
         and row["territory_key"] and row["value"] is not None
     ]
     values.sort(key=lambda row: row["value"], reverse=True)
+    public_theme = category_metadata(info["domain_name"])
     return {
         "metadata": {
             "id": f"{_BES_PREFIX}{raw_id}",
             "name": info["name"],
-            "theme": info["domain_name"],
-            "macro_area": "Qualità della vita",
+            **public_theme,
             "unit": info["unit"],
             "year": year,
             "source_label": "Istat, BES nazionale",
@@ -106,6 +106,7 @@ def _bes_quiz_indicators():
             "id": meta["id"],
             "name": meta["name"],
             "theme": meta["theme"],
+            "source_theme": meta["source_theme"],
             "macro_area": meta["macro_area"],
             "unit": meta["unit"],
             "year": info["year_max"],
@@ -133,11 +134,11 @@ def _quiz_indicators():
         rows = payload["values"]  # non-null, già ordinati per valore desc
         if len({row["value"] for row in rows}) < _MIN_DISTINCT_VALUES:
             continue
+        public_theme = category_metadata(item["theme"])
         pool.append({
             "id": item["id"],
             "name": item["name"],
-            "theme": item["theme"],
-            "macro_area": item["macro_area"],
+            **public_theme,
             "unit": item["unit"],
             "year": year,
             "source_label": item["source_label"],
@@ -163,6 +164,7 @@ def _indicator_fields(entry):
         "id": entry["id"],
         "name": entry["name"],
         "theme": entry["theme"],
+        "source_theme": entry.get("source_theme"),
         "macro_area": entry["macro_area"],
         "unit": entry["unit"],
         "year": entry["year"],
@@ -263,6 +265,7 @@ def evaluate_compare(indicator_id, year, region_a_key, region_b_key, choice):
 
     winner = "region_a" if value_a > value_b else "region_b"
     meta = payload["metadata"]
+    public_theme = category_metadata(meta.get("source_theme") or meta["theme"])
     return {
         "correct": choice == winner,
         "choice": choice,
@@ -270,8 +273,7 @@ def evaluate_compare(indicator_id, year, region_a_key, region_b_key, choice):
         "indicator": {
             "id": meta["id"],
             "name": meta["name"],
-            "theme": meta["theme"],
-            "macro_area": meta.get("macro_area") or macro_area_for(meta["theme"]),
+            **public_theme,
             "unit": meta["unit"],
             "year": year,
             "source_label": meta["source_label"],

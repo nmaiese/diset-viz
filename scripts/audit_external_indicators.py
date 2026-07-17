@@ -20,6 +20,7 @@ from app.data import get_catalog  # noqa: E402
 from app.external_data import MANIFEST_COLUMNS, get_external_rows, freshness_status  # noqa: E402
 from app.profiles import SCOREABLE_DIRECTIONS, is_core  # noqa: E402
 from app.quality_life_selection import BES_PREFIX, regional_quality_life_selection  # noqa: E402
+from app.taxonomy import CANONICAL_CATEGORIES, category_metadata  # noqa: E402
 from scripts.external_sources import source_by_id  # noqa: E402
 
 
@@ -124,7 +125,7 @@ def _inventory_rows():
             "id": item["id"],
             "nome": item["name"],
             "livello_territoriale": "regione",
-            "categoria": item["theme"],
+            "categoria": category_metadata(item["theme"])["theme"],
             "direzione": direction,
             "unita": item["unit"],
             "ultimo_anno_disponibile": item["year_max"],
@@ -140,7 +141,7 @@ def _inventory_rows():
                 "id": public_id if level == "regione" else item["id"],
                 "nome": item["name"],
                 "livello_territoriale": level,
-                "categoria": item["category"] or "",
+                "categoria": CANONICAL_CATEGORIES[item["category"]]["name"] if item["category"] else "",
                 "direzione": item["direction"],
                 "unita": item["unit"],
                 "ultimo_anno_disponibile": item["year_max"],

@@ -24,7 +24,13 @@ from collections import defaultdict
 from app.cache import cache
 from app.data import REGION_GEO_AREA, REGION_ORDER, get_catalog, get_rows
 from app.external_data import count_freshness, freshness_status
-from app.indicator_notes import THEME_CAVEATS, THEME_EXAMPLES, macro_area_for
+from app.taxonomy import (
+    CANONICAL_CATEGORIES,
+    MACRO_AREA_ORDER,
+    canonical_category_slug,
+    category_metadata,
+    category_path,
+)
 
 # Directions that carry a clear better/worse meaning (everything else is contextual).
 SCOREABLE_DIRECTIONS = ("lower_better", "higher_worse", "higher_better")
@@ -103,16 +109,23 @@ def indicator_path(indicator_id, name):
 
 @cache.memoize(timeout=3600)
 def _theme_slug_map():
-    """slug -> exact theme name, built from the catalog so it always matches data."""
-    return {slugify(theme["name"]): theme["name"] for theme in get_catalog()["themes"]}
+    """Canonical public URL slug -> category name."""
+    return {
+        slugify(category["name"]): category["name"]
+        for category in CANONICAL_CATEGORIES.values()
+    }
 
 
 def theme_name(theme_slug):
+    category_slug = canonical_category_slug(theme_slug)
+    if category_slug:
+        return CANONICAL_CATEGORIES[category_slug]["name"]
     return _theme_slug_map().get(theme_slug)
 
 
 def theme_path(name):
-    return f"/tema/{slugify(name)}"
+    category_slug = canonical_category_slug(slugify(name))
+    return category_path(category_slug) if category_slug else f"/tema/{slugify(name)}"
 
 
 @cache.memoize(timeout=3600)
@@ -151,12 +164,12 @@ def _percentile_matrix():
 @cache.memoize(timeout=3600)
 def _indicator_meta():
     """id -> light metadata needed for scoring and links."""
-    return {
-        item["id"]: {
+    result = {}
+    for item in get_catalog()["indicators"]:
+        result[item["id"]] = {
             "id": item["id"],
             "name": item["name"],
-            "theme": item["theme"],
-            "macro_area": item.get("macro_area") or macro_area_for(item["theme"]),
+            **category_metadata(item["theme"]),
             "unit": item["unit"],
             "direction": (item.get("explain") or {}).get("direction"),
             "year_max": item["year_max"],
@@ -164,8 +177,7 @@ def _indicator_meta():
             "source_label": item.get("source_label"),
             "source_url": item.get("source_url"),
         }
-        for item in get_catalog()["indicators"]
-    }
+    return result
 
 
 def _oriented(percentile, direction):
@@ -301,6 +313,8 @@ def region_profile(region_key):
             "id": ind_id,
             "name": info["name"],
             "theme": info["theme"],
+            "source_theme": info["source_theme"],
+            "macro_area": info["macro_area"],
             "path": info["path"],
             "score": round(oriented, 4),
         }
@@ -312,7 +326,7 @@ def region_profile(region_key):
         avg = sum(e["score"] for e in entries) / len(entries)
         theme_table.append({
             "theme": theme,
-            "macro_area": macro_area_for(theme),
+            "macro_area": entries[0]["macro_area"],
             "theme_path": theme_path(theme),
             "count": len(entries),
             "score": round(avg, 4),
@@ -390,6 +404,7 @@ def _region_indicators(region_key):
             "id": ind_id,
             "name": info["name"],
             "theme": info["theme"],
+            "source_theme": info["source_theme"],
             "macro_area": info["macro_area"],
             "path": info["path"],
             "unit": info["unit"],
@@ -432,18 +447,17 @@ def theme_profile(theme_slug):
             "plain": (item.get("explain") or {}).get("plain"),
         }
         for item in get_catalog()["indicators"]
-        if item["theme"] == name
+        if category_metadata(item["theme"])["theme"] == name
     ]
     indicators.sort(key=lambda i: (not i["complete"], i["name"]))
 
     complete_count = sum(1 for i in indicators if i["complete"])
     return {
         "theme": name,
-        "theme_slug": theme_slug,
+        "theme_slug": slugify(name),
         "theme_path": theme_path(name),
-        "macro_area": macro_area_for(name),
-        "example": THEME_EXAMPLES.get(name),
-        "caveat": THEME_CAVEATS.get(name),
+        "macro_area": category_metadata(name)["macro_area"],
+        "description": CANONICAL_CATEGORIES[canonical_category_slug(slugify(name))]["description"],
         "indicator_count": len(indicators),
         "complete_count": complete_count,
         "indicators": indicators,
@@ -482,32 +496,33 @@ def regions_overview():
 
 @cache.memoize(timeout=3600)
 def all_themes_index():
+    counts = defaultdict(int)
+    for item in get_catalog()["indicators"]:
+        counts[category_metadata(item["theme"])["theme"]] += 1
     return [
         {
-            "theme": theme["name"],
-            "path": theme_path(theme["name"]),
-            "indicator_count": theme["indicator_count"],
+            "theme": category["name"],
+            "path": category_path(slug),
+            "indicator_count": counts[category["name"]],
         }
-        for theme in get_catalog()["themes"]
+        for slug, category in CANONICAL_CATEGORIES.items()
+        if counts[category["name"]]
     ]
 
 
 @cache.memoize(timeout=3600)
 def themes_by_macro_area():
-    """Themes grouped under their macro-area, in display order, for the /temi hub."""
-    catalog = get_catalog()
+    """Canonical categories grouped under their navigation area."""
     by_macro = defaultdict(list)
-    for theme in catalog["themes"]:
-        by_macro[theme["macro_area"]].append({
-            "theme": theme["name"],
-            "path": theme_path(theme["name"]),
-            "indicator_count": theme["indicator_count"],
-        })
+    for theme in all_themes_index():
+        macro_area = category_metadata(theme["theme"])["macro_area"]
+        by_macro[macro_area].append(theme)
     return [
         {
-            "macro_area": area["name"],
-            "indicator_count": area["indicator_count"],
-            "themes": sorted(by_macro[area["name"]], key=lambda t: t["theme"]),
+            "macro_area": area,
+            "indicator_count": sum(t["indicator_count"] for t in by_macro[area]),
+            "themes": sorted(by_macro[area], key=lambda t: t["theme"]),
         }
-        for area in catalog["macro_areas"]
+        for area in MACRO_AREA_ORDER
+        if by_macro[area]
     ]

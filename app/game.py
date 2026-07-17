@@ -21,11 +21,11 @@ from datetime import date, datetime, timedelta, timezone
 
 from app.cache import cache
 from app.data import REGION_ORDER, get_indicator, indicator_year_average
-from app.indicator_notes import MACRO_AREA_ORDER
+from app.taxonomy import MACRO_AREA_ORDER
 from app import profiles
 
 GAME_EPOCH = date(2026, 7, 15)  # giorno di lancio, puzzle numero 1
-CLUES_PER_PUZZLE = len(MACRO_AREA_ORDER)  # un indizio per macro-area
+CLUES_PER_PUZZLE = 6
 MAX_ATTEMPTS = CLUES_PER_PUZZLE
 CANDIDATES_PER_AREA = 3  # varietà tra puzzle diversi a parità di area
 ARCHIVE_LIMIT = 30

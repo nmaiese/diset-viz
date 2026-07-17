@@ -198,7 +198,7 @@ def parse_archive(archive_bytes):
             "name": meta["name"],
             "domain": meta["domain"],
             "domain_name": meta["domain"],
-            "proposed_category": category_for(meta["domain"]) or "",
+            "proposed_category": category_for(meta["domain"], indicator_id) or "",
             "proposed_direction": direction_for(indicator_id, meta["name"]),
             "unit": meta["unit"],
             "year_min": min(info["years"]),

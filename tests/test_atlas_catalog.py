@@ -4,6 +4,8 @@ from app import app
 from app.atlas_catalog import BES_ID_PREFIX, get_atlas_catalog, get_atlas_theme_profile
 from app.bes_data import get_bes_manifest
 from app.data import get_catalog
+from app.quality_life_config import QUALITY_LIFE_CATEGORIES
+from app.taxonomy import CANONICAL_CATEGORIES, MACRO_AREA_ORDER
 
 
 class FederatedAtlasCatalogTest(unittest.TestCase):
@@ -35,6 +37,25 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         page = client.get("/tema/benessere-soggettivo")
         self.assertEqual(page.status_code, 200)
         self.assertIn("Qualità della vita".encode("utf-8"), page.data)
+
+    def test_public_taxonomy_is_shared_and_preserves_source_themes(self):
+        catalog = get_atlas_catalog()
+        self.assertEqual(len(catalog["themes"]), 12)
+        self.assertEqual(len(catalog["macro_areas"]), 4)
+        self.assertEqual(tuple(area["name"] for area in catalog["macro_areas"]), MACRO_AREA_ORDER)
+        self.assertEqual(tuple(QUALITY_LIFE_CATEGORIES), tuple(CANONICAL_CATEGORIES))
+        self.assertTrue(all(item["source_theme"] for item in catalog["indicators"]))
+        self.assertFalse(any(item["macro_area"] == "Altro" for item in catalog["indicators"]))
+
+    def test_duplicate_source_theme_urls_redirect_to_one_canonical_page(self):
+        client = app.test_client()
+        for source_slug in ("sicurezza", "legalita-e-sicurezza"):
+            response = client.get(f"/tema/{source_slug}")
+            self.assertEqual(response.status_code, 301)
+            self.assertTrue(response.headers["Location"].endswith("/tema/sicurezza-e-legalita"))
+        canonical = client.get("/tema/sicurezza-e-legalita")
+        self.assertEqual(canonical.status_code, 200)
+        self.assertIn("Legalità e sicurezza, Sicurezza".encode("utf-8"), canonical.data)
 
     def test_namespaced_bes_indicator_uses_the_standard_atlas_api_contract(self):
         client = app.test_client()

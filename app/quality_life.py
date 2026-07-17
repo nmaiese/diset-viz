@@ -59,9 +59,10 @@ def _score_to_ui(value):
 
 @cache.memoize(timeout=3600)
 def _theme_category_map():
-    """Exact Istat theme name -> category slug (inverts the config table)."""
+    """Source-theme and canonical category name -> category slug."""
     mapping = {}
     for slug, category in QUALITY_LIFE_CATEGORIES.items():
+        mapping[category["name"]] = slug
         for theme in category["themes"]:
             mapping[theme] = slug
     return mapping
@@ -123,7 +124,7 @@ def quality_life_indicator_set():
         info = meta.get(ind_id)
         if not info or info["direction"] not in SCOREABLE_DIRECTIONS:
             continue
-        category = theme_category.get(info["theme"])
+        category = info.get("category_slug") or theme_category.get(info["theme"])
         if category is None:
             continue
         by_category[category].append(ind_id)

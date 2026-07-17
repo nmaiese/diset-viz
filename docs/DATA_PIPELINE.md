@@ -12,9 +12,10 @@ indicatori mal orientati o macro-aree incomplete.
 - Backbone territoriale: `app/static/data/Assoluti_Regione.csv` (delimitatore `;`,
   12 colonne, 20 regioni). Generato da `scripts/update_data.py`, che scarica
   l'archivio Istat, normalizza i nomi regione e scrive il CSV.
-- Le **categorie (temi)** sono la colonna `Tema` del CSV, prese verbatim da Istat.
-  Non esiste un elenco di temi hard-coded: backend e frontend leggono i temi dal
-  catalogo. Quindi un tema nuovo nel CSV compare da solo.
+- La colonna `Tema` conserva il **sottotema della fonte** verbatim. La tassonomia
+  pubblica in `app/taxonomy.py` armonizza i 36 sottotemi territoriali e BES in
+  12 categorie canoniche e 4 aree di navigazione. Un sottotema nuovo resta
+  tracciabile, ma deve essere mappato prima di essere pubblicato.
 - Il **catalogo territoriale** (`app/data.py:get_catalog`) aggrega il CSV legacy
   per indicatore e tema, calcola completezza, anni, sparkline e `macro_area`.
 - I **profili regionali e le tematiche valutabili** (`app/profiles.py`) sono
@@ -60,16 +61,18 @@ prima il dizionario curato `CURATED_DIRECTION` (per id), poi un'euristica a
 parole chiave (`_direction`). **L'euristica spesso ritorna `contextual`**: i nuovi
 indicatori vanno quindi quasi sempre aggiunti a mano a `CURATED_DIRECTION`.
 
-## Macro-aree (overlay non distruttivo)
+## Tassonomia pubblica (overlay non distruttivo)
 
-Le 26 tematiche del backbone territoriale sono raggruppate in ~6 macro-aree in
-`app/indicator_notes.py:MACRO_AREAS`. È un overlay: non tocca le etichette Istat,
-serve come filtro di livello superiore in atlante e pagine regione. I 12 domini
-BES vengono associati alle stesse macro-aree nell'adattatore federato. Questa
-mappatura è soltanto di navigazione: non interviene nello scoring.
+I temi del backbone territoriale e i 12 domini BES sono raggruppati nelle stesse
+12 categorie canoniche in `app/taxonomy.py:CANONICAL_CATEGORIES`. Le categorie
+sono raccolte in 4 aree tramite `MACRO_AREAS`. È un overlay: non modifica le
+etichette Istat, che restano disponibili come `source_theme`, e viene usato da
+Atlante, pagine SEO, profili regionali, qualità della vita e minigiochi.
 
-Se un tema non è mappato, `macro_area_for` ritorna `"Altro"`: utile come
-campanello d'allarme, ma da correggere subito aggiungendo il tema a `MACRO_AREAS`.
+Se un sottotema non è mappato, `category_metadata` ritorna la categoria
+`"Altro"`: è un campanello d'allarme da correggere aggiungendo il sottotema a una
+sola categoria canonica. Le vecchie URL dei sottotemi fanno redirect alla pagina
+della categoria, così i link già indicizzati non si perdono.
 
 ## Checklist quando aggiungi indicatori o dataset
 
@@ -79,8 +82,9 @@ campanello d'allarme, ma da correggere subito aggiungendo il tema a `MACRO_AREAS
    (`higher_better` / `lower_better` / `higher_worse` / lascia `contextual` se non
    c'è un verso onesto). Senza questo, l'indicatore quasi sempre resta
    `contextual` e non viene valutato.
-3. **Macro-area** di ogni nuovo *tema*: mappalo in `MACRO_AREAS`. Controlla che
-   nessun tema finisca in `"Altro"` (vedi diagnostica sotto).
+3. **Categoria** di ogni nuovo sottotema: mappalo in
+   `CANONICAL_CATEGORIES[...]["themes"]`. Controlla che nessun tema finisca in
+   `"Altro"` e che non compaia in due categorie.
 4. **Ricalcolo**: è runtime + cache 1h. Per vederlo subito **riavvia gunicorn**
    (o aspetta la scadenza). I test girano senza cache, quindi sono sempre freschi.
 5. **Frontend**: `cd frontend && npm run build && cd ..` (il catalogo cambia, la

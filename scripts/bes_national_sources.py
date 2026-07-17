@@ -9,23 +9,8 @@ human reviews them: an automatic refresh must never guess the sign of a score.
 
 from __future__ import annotations
 
+from app.taxonomy import category_for_indicator
 from scripts.province_sources import CURATED_DIRECTION_BES
-
-
-DOMAIN_TO_CATEGORY = {
-    "Salute": "salute_cura",
-    "Istruzione e formazione": "istruzione_capitale_umano",
-    "Lavoro e conciliazione dei tempi di vita": "lavoro_opportunita",
-    "Benessere economico": "reddito_accessibilita",
-    "Relazioni sociali": "sicurezza_istituzioni",
-    "Politica e istituzioni": "sicurezza_istituzioni",
-    "Sicurezza": "sicurezza_istituzioni",
-    "Benessere soggettivo": "benessere_soggettivo",
-    "Paesaggio e patrimonio culturale": "cultura_digitale",
-    "Ambiente": "ambiente_mobilita_servizi",
-    "Innovazione, ricerca e creatività": "istruzione_capitale_umano",
-    "Qualità dei servizi": "ambiente_mobilita_servizi",
-}
 
 
 # Reviewed against the indicator definitions in the May 2026 BES metadata.
@@ -103,8 +88,8 @@ CURATED_DIRECTION_BES_NATIONAL = {
 }
 
 
-def category_for(domain):
-    return DOMAIN_TO_CATEGORY.get((domain or "").strip())
+def category_for(domain, indicator_id=""):
+    return category_for_indicator(indicator_id, domain)
 
 
 def direction_for(indicator_id, name=""):

@@ -620,7 +620,7 @@ function AtlasView({
     const nq = normalizeText(query);
     if (nq) {
       list = list.filter((i) => normalizeText(
-        `${i.name} ${i.theme} ${i.archive} ${i.catalog_family_label}`,
+        `${i.name} ${i.theme} ${i.source_theme || ""} ${i.archive} ${i.catalog_family_label}`,
       ).includes(nq));
     }
     return [...list].sort(SORTERS[sort] || SORTERS.complete);
@@ -887,7 +887,7 @@ function IndexRow({ item, onOpen }) {
       <button className="index-row" onClick={() => onOpen(item)} type="button">
         <span className="index-row__main">
           <small className="index-row__theme">
-            {item.theme} · {item.catalog_family_label}
+            {item.theme}{item.source_theme && item.source_theme !== item.theme ? ` · ${item.source_theme}` : ""} · {item.catalog_family_label}
           </small>
           <strong className="index-row__name">{item.name}</strong>
           <CoverageBadge item={item} />
@@ -1547,6 +1547,9 @@ function IndicatorHeader({ metadata, regionCount }) {
           </p>
         )}
         <dl>
+          {metadata.source_theme && metadata.source_theme !== metadata.theme && (
+            <div><dt>Sottotema Istat</dt><dd>{metadata.source_theme}</dd></div>
+          )}
           <div><dt>Unità di misura</dt><dd>{metadata.unit || "n.d."}</dd></div>
           <div><dt>Copertura</dt><dd>{metadata.year_min}-{metadata.year_max}</dd></div>
           <div><dt>Regioni</dt><dd>{regionCount || metadata.regions.length}/20</dd></div>

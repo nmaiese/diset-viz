@@ -66,9 +66,9 @@ When you change `app/static/data/Assoluti_Regione.csv` (new indicators, themes o
 a new dataset), follow [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md). Themes,
 theme scores, region profiles and macro-areas are derived from the data and
 recomputed at runtime (cache 1h). Set each new indicator's direction in
-`CURATED_DIRECTION` and map each new theme to a macro-area in `MACRO_AREAS`
-(both in `app/indicator_notes.py`), then restart gunicorn, rebuild the frontend
-and run the tests.
+`CURATED_DIRECTION` (`app/indicator_notes.py`) and map each new source theme to
+one canonical category in `CANONICAL_CATEGORIES` (`app/taxonomy.py`), then
+restart gunicorn, rebuild the frontend and run the tests.
 
 When working on provincial quality-of-life data, keep it separate from the
 regional atlas. Follow [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md),

@@ -1,22 +1,17 @@
 """Configuration for the "Qualità della vita" regional ranking.
 
-This module is pure configuration: no logic. It declares the quality-of-life
-categories (each mapped to one or more Istat themes that already exist in the
-catalog) and the weight profiles that re-read the same scores under a different
-lens. The active engine is ``app/quality_life_bes.py`` (BES-based, parametrised on
-territorial level region|province); ``app/quality_life.py`` is the earlier
-regional engine. Both consume these tables on top of ``app/profiles.py``.
+The categories come from the same canonical taxonomy used by the atlas.  The
+quality-of-life engines use only the directional indicators available inside
+those categories, so this is a scoring subset of the catalog, not a separate
+classification.
 
 Design rules:
-- Theme names in ``themes`` must match the Istat catalog *verbatim* (see the
-  "Tema" column of ``app/static/data/Assoluti_Regione.csv``). The engine ignores
-  any theme that has no scoreable core indicator, so a typo silently drops a
-  theme. ``app/quality_life.py`` exposes a diagnostic for unmapped/empty themes.
+- Theme names in ``themes`` match the source labels verbatim. They are defined
+  once in ``app.taxonomy`` and retain the source classification for auditing.
 - Only directional indicators (``lower_better`` / ``higher_worse`` /
   ``higher_better``) feed the score. Contextual indicators never affect the
-  ranking. "Turismo" is deliberately left out of the standard categories: more
-  tourism can be an opportunity or a pressure, so it is not always "higher is
-  better".
+  ranking. Contextual tourism indicators remain in the catalog without being
+  forced into the score.
 - Weights here are raw; the engine normalises them to sum to 1.0 and renormalises
   over the categories actually available for each region.
 
@@ -38,84 +33,17 @@ methodological benchmark against the Sole 24 Ore / ItaliaOggi rankings must stay
 a separate section and never become a primary data source (CC BY-NC licence).
 """
 
-# Each category maps to one or more *exact* Istat theme names from the catalog.
+from app.taxonomy import CANONICAL_CATEGORIES
+
+
 QUALITY_LIFE_CATEGORIES = {
-    "reddito_accessibilita": {
-        "name": "Reddito e accessibilità",
-        "description": (
-            "Tiene insieme reddito, condizioni economiche e accesso ai servizi "
-            "che incidono sulla vita quotidiana."
-        ),
-        "themes": ["Reddito e ricchezza", "Inclusione sociale", "Città"],
-    },
-    "lavoro_opportunita": {
-        "name": "Lavoro e opportunità",
-        "description": (
-            "Guarda quante persone lavorano, la continuità dell'occupazione e la "
-            "capacità produttiva del territorio."
-        ),
-        "themes": [
-            "Lavoro",
-            "Competitività",
-            "Demografia di impresa",
-            "Dinamiche settoriali",
-        ],
-    },
-    "salute_cura": {
-        "name": "Salute e cura",
-        "description": (
-            "Riassume condizioni di salute, assistenza e servizi di cura, tenendo "
-            "distinta la struttura demografica dall'offerta sanitaria."
-        ),
-        "themes": ["Salute", "Servizi di cura", "Demografia e popolazione"],
-    },
-    "istruzione_capitale_umano": {
-        "name": "Istruzione e capitale umano",
-        "description": (
-            "Considera istruzione, competenze, formazione e attività di ricerca "
-            "che alimentano il capitale umano."
-        ),
-        "themes": ["Istruzione e formazione", "Ricerca ed innovazione"],
-    },
-    "ambiente_mobilita_servizi": {
-        "name": "Ambiente, mobilità e servizi",
-        "description": (
-            "Riunisce qualità ambientale, mobilità, acqua, rifiuti, energia e "
-            "accesso ai servizi essenziali."
-        ),
-        "themes": [
-            "Ambiente, altro",
-            "Qualità dell'aria",
-            "Rifiuti",
-            "Risorse idriche",
-            "Trasporti e mobilità",
-            "Energia",
-        ],
-    },
-    "sicurezza_istituzioni": {
-        "name": "Sicurezza, legalità e istituzioni",
-        "description": (
-            "Mette in relazione sicurezza quotidiana, legalità, partecipazione "
-            "civica e funzionamento delle amministrazioni."
-        ),
-        "themes": ["Legalità e sicurezza", "Pubblica Amministrazione", "Capitale sociale"],
-    },
-    "cultura_digitale": {
-        "name": "Cultura e digitale",
-        "description": (
-            "Considera offerta e partecipazione culturale insieme alla possibilità "
-            "di usare reti e servizi digitali."
-        ),
-        "themes": ["Cultura", "Società dell'informazione"],
-    },
-    "benessere_soggettivo": {
-        "name": "Benessere soggettivo",
-        "description": (
-            "Misura soddisfazione per la vita e il tempo libero, insieme alle "
-            "aspettative dichiarate per il futuro."
-        ),
-        "themes": ["Benessere soggettivo"],
-    },
+    slug: {
+        "name": category["name"],
+        "description": category["description"],
+        "themes": list(category["themes"]),
+        "macro_area": category["macro_area"],
+    }
+    for slug, category in CANONICAL_CATEGORIES.items()
 }
 
 # Raw weights per profile. The engine normalises them to sum to 1.0 and
@@ -123,17 +51,8 @@ QUALITY_LIFE_CATEGORIES = {
 QUALITY_LIFE_PROFILES = {
     "standard": {
         "name": "Equilibrato",
-        "description": "Assegna lo stesso peso alle otto dimensioni della qualità della vita.",
-        "weights": {
-            "reddito_accessibilita": 1.0,
-            "lavoro_opportunita": 1.0,
-            "salute_cura": 1.0,
-            "istruzione_capitale_umano": 1.0,
-            "ambiente_mobilita_servizi": 1.0,
-            "sicurezza_istituzioni": 1.0,
-            "cultura_digitale": 1.0,
-            "benessere_soggettivo": 1.0,
-        },
+        "description": "Assegna lo stesso peso alle dodici dimensioni della qualità della vita.",
+        "weights": {slug: 1.0 for slug in QUALITY_LIFE_CATEGORIES},
     },
     "opportunita": {
         "name": "Opportunità economica",
@@ -141,11 +60,15 @@ QUALITY_LIFE_PROFILES = {
         "weights": {
             "reddito_accessibilita": 1.4,
             "lavoro_opportunita": 1.7,
+            "imprese_competitivita": 1.5,
             "salute_cura": 0.8,
             "istruzione_capitale_umano": 1.3,
-            "ambiente_mobilita_servizi": 0.7,
-            "sicurezza_istituzioni": 0.7,
-            "cultura_digitale": 1.0,
+            "ricerca_innovazione_digitale": 1.3,
+            "ambiente_energia": 0.7,
+            "mobilita_servizi_territoriali": 0.7,
+            "sicurezza_legalita": 0.7,
+            "istituzioni_partecipazione": 0.7,
+            "cultura_patrimonio_turismo": 1.0,
             "benessere_soggettivo": 0.8,
         },
     },
@@ -158,11 +81,15 @@ QUALITY_LIFE_PROFILES = {
         "weights": {
             "reddito_accessibilita": 1.1,
             "lavoro_opportunita": 0.8,
+            "imprese_competitivita": 0.7,
             "salute_cura": 1.3,
             "istruzione_capitale_umano": 0.9,
-            "ambiente_mobilita_servizi": 1.5,
-            "sicurezza_istituzioni": 1.3,
-            "cultura_digitale": 0.8,
+            "ricerca_innovazione_digitale": 0.8,
+            "ambiente_energia": 1.5,
+            "mobilita_servizi_territoriali": 1.5,
+            "sicurezza_legalita": 1.3,
+            "istituzioni_partecipazione": 1.2,
+            "cultura_patrimonio_turismo": 0.8,
             "benessere_soggettivo": 1.1,
         },
     },
@@ -172,11 +99,15 @@ QUALITY_LIFE_PROFILES = {
         "weights": {
             "reddito_accessibilita": 1.0,
             "lavoro_opportunita": 0.9,
+            "imprese_competitivita": 0.7,
             "salute_cura": 1.5,
             "istruzione_capitale_umano": 1.4,
-            "ambiente_mobilita_servizi": 1.2,
-            "sicurezza_istituzioni": 1.2,
-            "cultura_digitale": 0.8,
+            "ricerca_innovazione_digitale": 0.8,
+            "ambiente_energia": 1.2,
+            "mobilita_servizi_territoriali": 1.2,
+            "sicurezza_legalita": 1.2,
+            "istituzioni_partecipazione": 1.0,
+            "cultura_patrimonio_turismo": 0.8,
             "benessere_soggettivo": 1.1,
         },
     },
@@ -186,11 +117,15 @@ QUALITY_LIFE_PROFILES = {
         "weights": {
             "reddito_accessibilita": 0.9,
             "lavoro_opportunita": 1.6,
+            "imprese_competitivita": 1.3,
             "salute_cura": 0.7,
             "istruzione_capitale_umano": 1.5,
-            "ambiente_mobilita_servizi": 0.9,
-            "sicurezza_istituzioni": 0.8,
-            "cultura_digitale": 1.4,
+            "ricerca_innovazione_digitale": 1.4,
+            "ambiente_energia": 0.9,
+            "mobilita_servizi_territoriali": 1.0,
+            "sicurezza_legalita": 0.8,
+            "istituzioni_partecipazione": 0.8,
+            "cultura_patrimonio_turismo": 1.3,
             "benessere_soggettivo": 1.0,
         },
     },
@@ -203,11 +138,15 @@ QUALITY_LIFE_PROFILES = {
         "weights": {
             "reddito_accessibilita": 0.7,
             "lavoro_opportunita": 0.7,
+            "imprese_competitivita": 0.7,
             "salute_cura": 1.3,
             "istruzione_capitale_umano": 0.9,
-            "ambiente_mobilita_servizi": 1.7,
-            "sicurezza_istituzioni": 1.5,
-            "cultura_digitale": 1.0,
+            "ricerca_innovazione_digitale": 0.8,
+            "ambiente_energia": 1.7,
+            "mobilita_servizi_territoriali": 1.7,
+            "sicurezza_legalita": 1.5,
+            "istituzioni_partecipazione": 1.5,
+            "cultura_patrimonio_turismo": 1.0,
             "benessere_soggettivo": 0.9,
         },
     },

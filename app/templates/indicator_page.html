@@ -66,6 +66,7 @@
 
   <div class="page-facts">
     <span><small>Tema</small><a href="{{ theme_path }}">{{ meta.theme }}</a></span>
+    {% if meta.source_theme and meta.source_theme != meta.theme %}<span><small>Sottotema Istat</small>{{ meta.source_theme }}</span>{% endif %}
     <span><small>Unità di misura</small>{{ meta.unit or 'n.d.' }}</span>
     <span><small>Copertura</small>{{ meta.year_min }}-{{ meta.year_max }}, {{ meta.regions | length }} regioni</span>
     <span><small>Freschezza</small><b class="freshness-badge is-{{ meta.freshness_status }}">{{ meta.freshness_label }}</b></span>

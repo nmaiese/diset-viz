@@ -32,8 +32,9 @@
 <article class="page page-theme wrap">
   <nav class="breadcrumb"><a href="/temi">Temi</a>{% if p.macro_area %} / {{ p.macro_area }}{% endif %}</nav>
   <h1>{{ p.theme }}</h1>
-  <p class="page-lead">{% if p.example %}{{ p.example | replace('Esempio: ', '') | capitalize }}{% else %}Gli indicatori Istat che raccontano il tema {{ p.theme }}, regione per regione.{% endif %}</p>
+  <p class="page-lead">{{ p.description }}</p>
   <p class="page-intro">In questo tema trovi {{ p.indicator_count }} indicatori{% if p.complete_count %}, di cui {{ p.complete_count }} con dati completi e aggiornati su tutte e 20 le regioni{% endif %}{% if p.quality_life_count %}. {{ p.quality_life_count }} entrano nel punteggio della qualità della vita{% endif %}. Apri una scheda per la classifica aggiornata, oppure esplora mappa e andamento negli anni nell'atlante.</p>
+  <p class="page-note"><strong>Sottotemi delle fonti:</strong> {{ p.source_themes | join(', ') }}.</p>
 
   <ul class="indicator-list">
     {% for ind in p.indicators %}
@@ -41,14 +42,11 @@
       <a href="{{ ind.path }}">
         <strong>{{ ind.name }}</strong>
         {% if ind.plain %}<span>{{ ind.plain }}</span>{% endif %}
-        <small>{{ ind.catalog_family_label }} · {{ ind.year_min }}-{{ ind.year_max }} · {{ ind.region_count }} regioni{% if ind.complete %} · copertura completa{% endif %}{% if ind.quality_life_scored %} · usato per {{ ind.quality_life_category_label }}{% endif %}</small>
+        <small>{{ ind.source_theme }} · {{ ind.catalog_family_label }} · {{ ind.year_min }}-{{ ind.year_max }} · {{ ind.region_count }} regioni{% if ind.complete %} · copertura completa{% endif %}{% if ind.quality_life_scored %} · usato per la qualità della vita{% endif %}</small>
       </a>
     </li>
     {% endfor %}
   </ul>
 
-  {% if p.caveat %}
-  <p class="page-caveat">{{ p.caveat }}</p>
-  {% endif %}
 </article>
 {% endblock %}

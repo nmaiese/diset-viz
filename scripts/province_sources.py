@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import re
 
+from app.taxonomy import category_for_indicator
+
 # -- BES dei Territori (backbone) -------------------------------------------
 
 BES_DATAFLOW = "DF_BES_TERRIT_0T"   # "All indicators - All territories"
@@ -35,35 +37,25 @@ BES_DOMAINS = [f"BES_{n:02d}" for n in range(1, 13)]
 # BES domain (CL_SUS_DOMAIN) -> our quality-of-life category slug.
 # BES_08 (subjective well-being) has no clean fit in the 7 categories, so it is
 # left unmapped (kept as context, never scored) for now.
-BES_DOMAIN_TO_CATEGORY = {
-    "BES_01": "salute_cura",                 # Salute
-    "BES_02": "istruzione_capitale_umano",   # Istruzione e formazione
-    "BES_03": "lavoro_opportunita",          # Lavoro e conciliazione dei tempi di vita
-    "BES_04": "reddito_accessibilita",       # Benessere economico
-    "BES_05": "sicurezza_istituzioni",       # Relazioni sociali (capitale sociale)
-    "BES_06": "sicurezza_istituzioni",       # Politica e istituzioni
-    "BES_07": "sicurezza_istituzioni",       # Sicurezza
-    "BES_08": None,                          # Benessere soggettivo (contesto)
-    "BES_09": "cultura_digitale",            # Paesaggio e patrimonio culturale
-    "BES_10": "ambiente_mobilita_servizi",   # Ambiente
-    "BES_11": "istruzione_capitale_umano",   # Innovazione, ricerca e creatività
-    "BES_12": "ambiente_mobilita_servizi",   # Qualità dei servizi
+BES_DOMAIN_NAMES = {
+    "BES_01": "Salute",
+    "BES_02": "Istruzione e formazione",
+    "BES_03": "Lavoro e conciliazione dei tempi di vita",
+    "BES_04": "Benessere economico",
+    "BES_05": "Relazioni sociali",
+    "BES_06": "Politica e istituzioni",
+    "BES_07": "Sicurezza",
+    "BES_08": "Benessere soggettivo",
+    "BES_09": "Paesaggio e patrimonio culturale",
+    "BES_10": "Ambiente",
+    "BES_11": "Innovazione, ricerca e creatività",
+    "BES_12": "Qualità dei servizi",
 }
-
-# Per-indicator category overrides, consulted before the domain->category map.
-# The BES domains don't isolate "digitale": the digital and cultural-employment
-# indicators sit in BES_11/BES_12, so without these overrides "Cultura e
-# digitale" would be museums + agritourism only (no digital at all).
-INDICATOR_CATEGORY_OVERRIDE = {
-    "12SER020": "cultura_digitale",   # copertura rete internet ultra veloce
-    "11RIC022": "cultura_digitale",   # comuni con servizi per le famiglie online
-    "11RIC004P": "cultura_digitale",  # addetti nelle imprese culturali
-}
-
 
 def category_for(indicator_id, domain):
     """Override-first category slug for a BES indicator."""
-    return INDICATOR_CATEGORY_OVERRIDE.get(indicator_id) or BES_DOMAIN_TO_CATEGORY.get(domain)
+    source_theme = BES_DOMAIN_NAMES.get(domain, domain)
+    return category_for_indicator(indicator_id, source_theme)
 
 
 # CL_SEXISTAT1 codes that mean "total" (we keep only the total breakdown).

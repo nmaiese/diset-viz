@@ -12,30 +12,20 @@ import unicodedata
 
 from app.bes_data import BES_SOURCE_URLS, bes_indicator_path, get_bes_manifest, get_bes_rows
 from app.data import REGION_ORDER, get_catalog, get_indicator
-from app.indicator_notes import MACRO_AREA_ORDER, THEME_CAVEATS, THEME_EXAMPLES
 from app.profiles import indicator_path, slugify
 from app.quality_life_config import QUALITY_LIFE_CATEGORIES
 from app.quality_life_selection import regional_quality_life_selection
+from app.taxonomy import (
+    CANONICAL_CATEGORIES,
+    MACRO_AREA_ORDER,
+    canonical_category_slug,
+    category_metadata,
+    category_path,
+)
 
 
 BES_ID_PREFIX = "bes:"
 BES_SOURCE_LABEL = "Istat, BES nazionale, aggiornamento intermedio 2026"
-
-_BES_MACRO_AREAS = {
-    "Salute": "Demografia e salute",
-    "Istruzione e formazione": "Lavoro e istruzione",
-    "Lavoro e conciliazione dei tempi di vita": "Lavoro e istruzione",
-    "Benessere economico": "Economia e produzione",
-    "Relazioni sociali": "Società e inclusione",
-    "Politica e istituzioni": "Istituzioni e infrastrutture",
-    "Sicurezza": "Società e inclusione",
-    "Benessere soggettivo": "Società e inclusione",
-    "Paesaggio e patrimonio culturale": "Ambiente, energia e territorio",
-    "Ambiente": "Ambiente, energia e territorio",
-    "Innovazione, ricerca e creatività": "Economia e produzione",
-    "Qualità dei servizi": "Istituzioni e infrastrutture",
-}
-
 
 def _region_sort_key(name):
     try:
@@ -125,11 +115,11 @@ def get_bes_atlas_indicator(indicator_id):
         for point in _downsample(averages)
     ]
     first = rows[0]
+    source_theme = info["domain_name"]
     metadata = {
         "id": public_id,
         "raw_id": raw_id,
-        "theme": info["domain_name"],
-        "macro_area": _BES_MACRO_AREAS.get(info["domain_name"], "Altro"),
+        **category_metadata(source_theme),
         "name": info["name"],
         "unit": info["unit"],
         "source": first.get("source") or BES_SOURCE_LABEL,
@@ -167,20 +157,26 @@ def _catalog_entry(payload):
     return dict(payload["metadata"])
 
 
+def _canonicalize_item(item):
+    """Add the public category while retaining the exact Istat source label."""
+    source_theme = item.get("source_theme") or item.get("theme") or ""
+    return {**item, **category_metadata(source_theme)}
+
+
 @lru_cache(maxsize=1)
 def get_atlas_catalog():
     """Merge legacy territorial metadata and BES metadata for atlas browsing."""
     legacy = get_catalog()
     score_selection = regional_quality_life_selection()
     legacy_indicators = [
-        {
+        _canonicalize_item({
             **item,
             "catalog_family": "territorial",
             "catalog_family_label": "Indicatori territoriali",
             "path": indicator_path(item["id"], item["name"]),
             "quality_life_scored": item["id"] in score_selection,
             "quality_life_category": score_selection.get(item["id"]),
-        }
+        })
         for item in legacy["indicators"]
     ]
     bes_indicators = [
@@ -201,16 +197,27 @@ def get_atlas_catalog():
         key=lambda item: (item["theme"].lower(), item["name"].lower(), item["catalog_family"]),
     )
 
-    themes = defaultdict(lambda: {"indicator_count": 0, "row_count": 0, "macro_area": "Altro"})
+    themes = defaultdict(
+        lambda: {"indicator_count": 0, "row_count": 0, "source_themes": set()}
+    )
     for item in indicators:
         theme = themes[item["theme"]]
         theme["indicator_count"] += 1
         theme["row_count"] += item["row_count"]
-        if theme["macro_area"] == "Altro" or item["macro_area"] != "Altro":
-            theme["macro_area"] = item["macro_area"]
+        theme["source_themes"].add(item["source_theme"])
     theme_items = [
-        {"name": name, **payload}
-        for name, payload in sorted(themes.items(), key=lambda pair: pair[0].lower())
+        {
+            "name": category["name"],
+            "slug": slug,
+            "path": category_path(slug),
+            "description": category["description"],
+            "macro_area": category["macro_area"],
+            "indicator_count": themes[category["name"]]["indicator_count"],
+            "row_count": themes[category["name"]]["row_count"],
+            "source_themes": sorted(themes[category["name"]]["source_themes"]),
+        }
+        for slug, category in CANONICAL_CATEGORIES.items()
+        if category["name"] in themes
     ]
 
     macro = defaultdict(lambda: {"themes": [], "indicator_count": 0})
@@ -258,7 +265,7 @@ def get_atlas_indicator(indicator_id):
         return {
             **payload,
             "metadata": {
-                **payload["metadata"],
+                **_canonicalize_item(payload["metadata"]),
                 "quality_life_scored": category is not None,
                 "quality_life_category": category,
                 "quality_life_category_label": (
@@ -273,7 +280,7 @@ def get_atlas_indicator(indicator_id):
     return {
         **payload,
         "metadata": {
-            **payload["metadata"],
+            **_canonicalize_item(payload["metadata"]),
             "catalog_family": "territorial",
             "catalog_family_label": "Indicatori territoriali",
             "path": indicator_path(payload["metadata"]["id"], payload["metadata"]["name"]),
@@ -298,15 +305,12 @@ def get_atlas_indicator_year(indicator_id, year):
     return {"metadata": payload["metadata"], "year": year, "values": values}
 
 
-@lru_cache(maxsize=1)
-def _theme_slug_map():
-    return {slugify(theme["name"]): theme["name"] for theme in get_atlas_catalog()["themes"]}
-
-
 def get_atlas_theme_profile(theme_slug):
-    name = _theme_slug_map().get(theme_slug)
-    if name is None:
+    category_slug = canonical_category_slug(theme_slug)
+    if category_slug is None:
         return None
+    category = CANONICAL_CATEGORIES[category_slug]
+    name = category["name"]
     indicators = [
         {
             "id": item["id"],
@@ -320,6 +324,7 @@ def get_atlas_theme_profile(theme_slug):
             "catalog_family_label": item["catalog_family_label"],
             "quality_life_scored": item["quality_life_scored"],
             "quality_life_category_label": item["quality_life_category_label"],
+            "source_theme": item["source_theme"],
         }
         for item in get_atlas_catalog()["indicators"]
         if item["theme"] == name
@@ -328,11 +333,11 @@ def get_atlas_theme_profile(theme_slug):
     theme = next(item for item in get_atlas_catalog()["themes"] if item["name"] == name)
     return {
         "theme": name,
-        "theme_slug": theme_slug,
-        "theme_path": f"/tema/{theme_slug}",
+        "theme_slug": slugify(name),
+        "theme_path": category_path(category_slug),
         "macro_area": theme["macro_area"],
-        "example": THEME_EXAMPLES.get(name),
-        "caveat": THEME_CAVEATS.get(name),
+        "description": category["description"],
+        "source_themes": theme["source_themes"],
         "indicator_count": len(indicators),
         "complete_count": sum(item["complete"] for item in indicators),
         "quality_life_count": sum(item["quality_life_scored"] for item in indicators),
@@ -347,7 +352,7 @@ def atlas_themes_by_macro_area():
     for theme in catalog["themes"]:
         by_macro[theme["macro_area"]].append({
             "theme": theme["name"],
-            "path": f"/tema/{slugify(theme['name'])}",
+            "path": theme["path"],
             "indicator_count": theme["indicator_count"],
         })
     return [
@@ -364,7 +369,7 @@ def all_atlas_themes_index():
     return [
         {
             "theme": theme["name"],
-            "path": f"/tema/{slugify(theme['name'])}",
+            "path": theme["path"],
             "indicator_count": theme["indicator_count"],
         }
         for theme in get_atlas_catalog()["themes"]
@@ -382,7 +387,8 @@ def search_atlas_indicators(query="", theme=None, limit=50):
         haystack = " ".join(
             unicodedata.normalize(
                 "NFKD",
-                f"{item['name']} {item['theme']} {item.get('archive', '')} {item['catalog_family_label']}",
+                f"{item['name']} {item['theme']} {item.get('source_theme', '')} "
+                f"{item.get('archive', '')} {item['catalog_family_label']}",
             ).encode("ascii", "ignore").decode("ascii").lower().split()
         )
         if query and query not in haystack:
