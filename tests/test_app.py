@@ -13,6 +13,12 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(home.status_code, 200)
         self.assertEqual(home.headers["Referrer-Policy"], "strict-origin-when-cross-origin")
         self.assertEqual(home.headers["Strict-Transport-Security"], "max-age=31536000; includeSubDomains")
+        csp = home.headers["Content-Security-Policy"]
+        self.assertIn("script-src", csp)
+        self.assertIn("connect-src", csp)
+        self.assertIn("https://www.googletagmanager.com", csp)
+        self.assertIn("https://www.google-analytics.com", csp)
+        self.assertIn("https://fonts.googleapis.com", csp)
         self.assertIn(b'id="root"', home.data)
         self.assertIn(b"/metodologia", home.data)
         self.assertIn(b"Indicatori territoriali in evidenza", home.data)

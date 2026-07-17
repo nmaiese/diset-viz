@@ -113,6 +113,36 @@ Regole operative GTM:
 - non rieseguire il Google Tag su `iubenda_gtm_consent_event`, l'aggiornamento consenso passa dal tag dedicato
 - `send_page_view` sul Google Tag deve restare `false`, per evitare doppie pageview tra hit automatica e aggiornamenti consenso
 
+## CSP
+
+La CSP server-side è gestita in `app/__init__.py` e deve restare compatibile con:
+
+- Google Tag Manager e Tag Assistant
+- GA4 e gli endpoint di raccolta `google-analytics.com` / `analytics.google.com`
+- AdSense e i suoi endpoint Google Ads
+- Iubenda
+- i font Google usati dal frontend
+
+Host principali autorizzati oggi:
+
+- `www.googletagmanager.com`
+- `tagmanager.google.com`
+- `www.google-analytics.com`
+- `*.google-analytics.com`
+- `*.analytics.google.com`
+- `www.google.com`
+- `*.google.com`
+- `pagead2.googlesyndication.com`
+- `googleads.g.doubleclick.net`
+- `ad.doubleclick.net`
+- `fonts.googleapis.com`
+- `fonts.gstatic.com`
+- `embeds.iubenda.com`
+- `cdn.iubenda.com`
+- `cs.iubenda.com`
+- `idb.iubenda.com`
+- `www.iubenda.com`
+
 ## AdSense
 
 AdSense è caricato direttamente nel `<head>` da

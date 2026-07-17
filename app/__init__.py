@@ -33,10 +33,33 @@ _NOINDEX_EXACT_PATHS = {"/data", "/legacy", "/legacy-reddito", "/quiz/classifica
 _NOINDEX_PATH_PREFIXES = ("/api/", "/download/")
 
 
+def _build_content_security_policy():
+    # Divario Italia usa ancora diversi inline script nei template server-side,
+    # quindi una CSP strict a nonce richiederebbe una refactor più ampia.
+    # Per ora teniamo una allowlist esplicita che lascia lavorare GTM, GA4,
+    # AdSense, Iubenda, i font Google e Tag Assistant senza blocchi.
+    return "; ".join(
+        [
+            "default-src 'self'",
+            "base-uri 'self'",
+            "object-src 'none'",
+            "form-action 'self'",
+            "frame-ancestors 'self'",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.googletagmanager.com https://tagmanager.google.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagservices.com https://embeds.iubenda.com https://cdn.iubenda.com https://cs.iubenda.com https://idb.iubenda.com https://www.iubenda.com https://static.cloudflareinsights.com",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.googletagmanager.com https://tagmanager.google.com https://embeds.iubenda.com https://cdn.iubenda.com https://cs.iubenda.com https://www.iubenda.com",
+            "img-src 'self' data: blob: https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://stats.g.doubleclick.net https://idb.iubenda.com https://*.cloudflareinsights.com",
+            "font-src 'self' data: https://fonts.gstatic.com",
+            "connect-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://ad.doubleclick.net https://stats.g.doubleclick.net https://idb.iubenda.com https://cpl.iubenda.com https://cs.iubenda.com https://embeds.iubenda.com https://static.cloudflareinsights.com",
+            "frame-src 'self' https://www.googletagmanager.com https://tagmanager.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://www.google.com https://*.google.com https://*.googletagmanager.com",
+        ]
+    )
+
+
 @app.after_request
 def add_security_headers(response):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Content-Security-Policy"] = _build_content_security_policy()
     request_path = request.path
     if request_path in _NOINDEX_EXACT_PATHS or request_path.startswith(_NOINDEX_PATH_PREFIXES):
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
