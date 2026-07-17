@@ -1075,3 +1075,21 @@ h1, h2, h3 { font-family: var(--font-display); }
 .spa-seo-footer { padding: 24px 16px 40px; text-align: center; border-top: 1px solid var(--line, rgba(21,35,59,0.16)); }
 .spa-seo-footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: center; font-size: 13px; }
 .spa-seo-footer a { color: var(--muted, #6b7785); }
+
+/* Contenuto server-renderizzato dentro #root, visibile per un istante prima
+   che React monti: senza queste regole eredita solo i reset globali (link
+   senza colore/sottolineatura, elenchi coi pallini di default) e appare come
+   una pagina spoglia e diversa rispetto all'app che la sostituisce subito
+   dopo. */
+.spa-seo-fallback { max-width: 760px; margin: 0 auto; padding: clamp(28px, 6vw, 56px) 20px 40px; }
+.spa-seo-fallback h1 { font-size: clamp(26px, 4vw, 38px); margin: 0 0 12px; }
+.spa-seo-fallback > p { font-size: 16px; color: var(--ink-soft); margin: 0 0 24px; max-width: 62ch; }
+.spa-seo-fallback nav { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 0 0 32px; }
+.spa-seo-fallback nav a { padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; font-size: 13.5px; font-weight: 600; }
+.spa-seo-fallback section { margin: 0 0 24px; }
+.spa-seo-fallback h2 { font-size: 18px; margin: 0 0 12px; }
+.spa-seo-fallback ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.spa-seo-fallback li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--grid); font-size: 14px; }
+.spa-seo-fallback li a { font-weight: 600; }
+.spa-seo-fallback li span { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+.spa-seo-fallback > p:last-child { font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 20px; margin-top: 8px; }
