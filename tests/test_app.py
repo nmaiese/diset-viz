@@ -27,6 +27,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://ep1.adtrafficquality.google", csp)
         self.assertIn("https://ep2.adtrafficquality.google", csp)
         self.assertIn("https://cdn.iubenda.com", csp)
+        self.assertIn("https://www.iubenda.com", csp)
         self.assertIn("frame-src", csp)
         self.assertIn("https://tpc.googlesyndication.com", csp)
         self.assertIn(b'id="root"', home.data)

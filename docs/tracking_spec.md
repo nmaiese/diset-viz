@@ -149,6 +149,7 @@ Host principali autorizzati oggi:
 - `cs.iubenda.com`
 - `idb.iubenda.com`
 - `www.iubenda.com`
+- `*.iubenda.com` in `frame-src` for the Iubenda consent widget iframe
 
 ## AdSense
 
