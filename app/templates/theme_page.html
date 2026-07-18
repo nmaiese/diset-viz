@@ -36,17 +36,21 @@
   <p class="page-intro">In questo tema trovi {{ p.indicator_count }} indicatori{% if p.complete_count %}, di cui {{ p.complete_count }} con dati completi e aggiornati su tutte e 20 le regioni{% endif %}{% if p.quality_life_count %}. {{ p.quality_life_count }} entrano nel punteggio della qualità della vita{% endif %}. Apri una scheda per la classifica aggiornata, oppure esplora mappa e andamento negli anni nell'atlante.</p>
   <p class="page-note"><strong>Sottotemi delle fonti:</strong> {{ p.source_themes | join(', ') }}.</p>
 
-  <ul class="indicator-list">
+  <div class="theme-grid">
     {% for ind in p.indicators %}
-    <li>
-      <a href="{{ ind.path }}">
-        <strong>{{ ind.name }}</strong>
-        {% if ind.plain %}<span>{{ ind.plain }}</span>{% endif %}
-        <small>{{ ind.source_theme }} · {{ ind.catalog_family_label }} · {{ ind.year_min }}-{{ ind.year_max }} · {{ ind.region_count }} regioni{% if ind.complete %} · copertura completa{% endif %}{% if ind.quality_life_scored %} · usato per la qualità della vita{% endif %}</small>
-      </a>
-    </li>
+    <a class="ind-card" href="{{ ind.path }}">
+      <div class="ind-card__head">
+        <h3>{{ ind.name }}</h3>
+        <span class="ind-card__years">{{ ind.year_min }}-{{ ind.year_max }}</span>
+      </div>
+      {% if ind.plain %}<p class="ind-card__plain">{{ ind.plain }}</p>{% endif %}
+      <div class="ind-card__foot">
+        <span class="ind-card__coverage">{{ ind.region_count }} regioni{% if ind.complete %} · completa{% endif %}{% if ind.quality_life_scored %} · qualità della vita{% endif %}</span>
+        <span class="ind-card__go">Apri la scheda →</span>
+      </div>
+    </a>
     {% endfor %}
-  </ul>
+  </div>
 
 </article>
 {% endblock %}
