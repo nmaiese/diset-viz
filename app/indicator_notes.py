@@ -4,6 +4,127 @@ import re
 # Metriche che il solo nome non basta a spiegare. Le definizioni restano
 # descrittive: chiariscono numeratore e denominatore senza aggiungere cause.
 PLAIN_DEFINITION_OVERRIDES = {
+    "907": (
+        "Indica il saldo per abitante tra prestazioni sociali ricevute e imposte "
+        "e contributi versati. Un valore positivo segnala una regione "
+        "beneficiaria netta"
+    ),
+    "906": (
+        "Somma per abitante i redditi da lavoro, capitale e impresa delle "
+        "famiglie, prima di imposte e trasferimenti"
+    ),
+    "930": (
+        "Misura quanto il reddito netto familiare è distribuito in modo diseguale "
+        "su una scala da 0 a 1, escludendo i fitti imputati"
+    ),
+    "102": (
+        "Indica la quota di giovani tra 18 e 24 anni con al massimo la licenza "
+        "media che non studiano e non partecipano ad attività formative"
+    ),
+    "199": (
+        "Indica la quota di uomini tra 18 e 24 anni con al massimo la licenza "
+        "media che non studiano e non partecipano ad attività formative"
+    ),
+    "200": (
+        "Indica la quota di donne tra 18 e 24 anni con al massimo la licenza "
+        "media che non studiano e non partecipano ad attività formative"
+    ),
+    "414": (
+        "Indica la quota di bambini tra 0 e 2 anni che hanno utilizzato asili "
+        "nido, micronidi o altri servizi per l'infanzia"
+    ),
+    "67": (
+        "Indica la quota di persone tra 25 e 64 anni senza un'occupazione che "
+        "partecipano ad attività formative o di istruzione"
+    ),
+    "187": (
+        "Indica la quota di uomini tra 25 e 64 anni senza un'occupazione che "
+        "partecipano ad attività formative o di istruzione"
+    ),
+    "188": (
+        "Indica la quota di donne tra 25 e 64 anni senza un'occupazione che "
+        "partecipano ad attività formative o di istruzione"
+    ),
+    "107": (
+        "Rapporta il valore aggiunto dell'industria alimentare, delle bevande e "
+        "del tabacco alle unità di lavoro equivalenti a tempo pieno del settore"
+    ),
+    "1": (
+        "Rapporta il valore aggiunto di agricoltura, caccia e silvicoltura alle "
+        "unità di lavoro equivalenti a tempo pieno del settore"
+    ),
+    "31": (
+        "Rapporta il valore aggiunto di agricoltura, allevamento e attività "
+        "connesse agli ettari di superficie agricola utilizzata"
+    ),
+    "419": (
+        "Indica la quota di occupati nella manifattura ad alta tecnologia e nei "
+        "servizi ad alta tecnologia e intensità di conoscenza"
+    ),
+    "408": (
+        "Indica la quota di giovani tra 15 e 29 anni che non lavorano e non "
+        "seguono percorsi di istruzione o formazione"
+    ),
+    "477": (
+        "Indica la quota di uomini tra 15 e 29 anni che non lavorano e non "
+        "seguono percorsi di istruzione o formazione"
+    ),
+    "478": (
+        "Indica la quota di donne tra 15 e 29 anni che non lavorano e non "
+        "seguono percorsi di istruzione o formazione"
+    ),
+    "133": (
+        "Rapporta il valore aggiunto dei servizi alle imprese alle unità di "
+        "lavoro equivalenti a tempo pieno degli stessi servizi"
+    ),
+    "371": (
+        "Indica la quota di persone che vivono in sovraffollamento e in "
+        "abitazioni con carenze di servizi o problemi strutturali"
+    ),
+    "375": (
+        "Rapporta i consumi elettrici delle imprese agricole, espressi in GWh, "
+        "a ogni 100 milioni di euro di valore aggiunto dell'agricoltura"
+    ),
+    "376": (
+        "Rapporta i consumi elettrici delle imprese industriali, espressi in GWh, "
+        "a ogni 100 milioni di euro di valore aggiunto dell'industria"
+    ),
+    "377": (
+        "Rapporta i consumi elettrici delle imprese private dei servizi, espressi "
+        "in GWh, a ogni 100 milioni di euro di valore aggiunto del settore"
+    ),
+    "437": (
+        "Rapporta i consumi finali di energia elettrica e termica alle unità di "
+        "lavoro equivalenti a tempo pieno"
+    ),
+    "378": (
+        "Indica quale quota dei consumi interni lordi di elettricità è coperta "
+        "dalla produzione in cogenerazione"
+    ),
+    "379": (
+        "Indica quale quota dei consumi interni lordi di elettricità è coperta "
+        "dalla produzione da bioenergie"
+    ),
+    "85": (
+        "Indica quale quota dei consumi interni lordi di elettricità è coperta "
+        "da fonti rinnovabili, compreso l'idroelettrico"
+    ),
+    "86": (
+        "Indica quale quota dei consumi interni lordi di elettricità è coperta "
+        "da fonti rinnovabili, escluso l'idroelettrico"
+    ),
+    "373": (
+        "Rapporta i consumi elettrici della pubblica amministrazione, espressi "
+        "in GWh, a 100.000 unità di lavoro equivalenti a tempo pieno"
+    ),
+    "374": (
+        "Rapporta i consumi elettrici per l'illuminazione pubblica, espressi in "
+        "GWh, alla superficie dei centri abitati"
+    ),
+    "404": (
+        "Indica quanti giorni durano in media i procedimenti civili ordinari di "
+        "primo e secondo grado"
+    ),
     "04BEC002": (
         "Misura quante volte il reddito complessivo del 20% più ricco supera "
         "quello del 20% più povero"
@@ -34,6 +155,22 @@ PLAIN_DEFINITION_OVERRIDES = {
         "Misura la diffusione di un'alimentazione che rispetta il criterio "
         "definito dal sistema BES Istat"
     ),
+    "01SAL009": (
+        "Indica quante persone su 100 sono in eccesso di peso, usando un tasso "
+        "corretto per confrontare popolazioni con età diverse"
+    ),
+    "01SAL010": (
+        "Indica quante persone su 100 fumano, usando un tasso corretto per "
+        "confrontare popolazioni con età diverse"
+    ),
+    "01SAL011": (
+        "Indica la quota di persone associata al consumo di alcol secondo la "
+        "definizione BES, con un tasso corretto per età"
+    ),
+    "01SAL012": (
+        "Indica quante persone su 100 sono sedentarie, usando un tasso corretto "
+        "per confrontare popolazioni con età diverse"
+    ),
 }
 
 
@@ -47,7 +184,7 @@ _TERM_REPLACEMENTS = (
     (r"\bEPO\b", "Ufficio europeo dei brevetti, EPO"),
     (r"\bPA\b", "pubblica amministrazione"),
     (r"\bUL\b", "unità locali"),
-    (r"\bEta\b", "Età"),
+    (r"\bEta\b", "età"),
     (r"\bGwh\b", "gigawattora, GWh"),
     (r"\bMw\b", "megawatt, MW"),
     (r"\bkmq\b", "chilometro quadrato"),
@@ -571,7 +708,7 @@ def _bes_plain_text(name, unit, indicator_id):
         return _finish_sentence(override)
 
     subject = _expand_terms(name)
-    lowered_unit = unit.lower().replace("²", "2")
+    lowered_unit = unit.lower().replace("²", "2").replace("³", "3")
     with_article = _with_article(subject)
 
     if "puntegg" in lowered_unit or "standardizz" in lowered_unit and "tass" not in lowered_unit:
@@ -634,7 +771,14 @@ def _scope_text(name, level):
         focus = " Il perimetro riguarda la popolazione maschile indicata nel nome."
     elif re.search(r"\d+\s*-\s*\d+ anni|\d+ anni e più|\d+ anni e meno", lowered):
         focus = " La fascia di età indicata nel nome fa parte della definizione e non va estesa ad altri gruppi."
-    return f"Il confronto usa la stessa definizione per tutti i {level} e per ciascun anno.{focus}"
+    territory_phrase = {
+        "regioni": "in tutte le regioni",
+        "province": "in tutte le province",
+        "regioni e province": "in tutte le regioni e le province",
+        "territori regionali": "in tutti i territori regionali",
+        "territori": "in tutti i territori",
+    }.get(level, f"nei territori indicati, {level}")
+    return f"Il confronto applica la stessa definizione {territory_phrase} e per ciascun anno.{focus}"
 
 
 def _unit_explanation(name, unit):
@@ -645,40 +789,90 @@ def _unit_explanation(name, unit):
         return "Un valore di 5 significa che il reddito del 20% più ricco è cinque volte quello del 20% più povero."
     if "rapporto tra i tassi di occupazione" in lowered_name:
         return "Un valore di 100 indica due tassi uguali. Sotto 100, il tasso delle donne con figli è più basso."
+    if "differenza tra tasso" in lowered_name or "differenza assoluta fra tasso" in lowered_name:
+        return "Un valore di 5 indica che i due tassi differiscono di 5 punti percentuali."
     if "puntegg" in lowered_unit and "standardizz" in lowered_unit:
         return "È un punteggio riportato su una scala comune: serve per confrontare territori e anni, non come conteggio assoluto."
-    if "standardizz" in lowered_unit or "standardizz" in lowered_name:
-        return "Il tasso è corretto per rendere più confrontabili territori con una diversa struttura della popolazione."
-    if re.search(r"(^|\s)%($|\s)", lowered_unit) or "percentual" in lowered_unit or "per 100 " in lowered_unit:
-        return "Un valore di 20 indica che la misura equivale al 20% del totale definito dalla fonte."
-
     per_match = re.search(
-        r"per\s+(1[\. ]?000|10[\. ]?000|100[\. ]?000|milione)\s+(.+)",
+        r"(?:numero\s+|valori\s+|tassi?\s+standardizzati?\s+)?per\s+"
+        r"(cento|mille|centomila|milione|100|1[\. ]?000|10[\. ]?000|100[\. ]?000)\s+(.+)",
         lowered_unit,
     )
+    if per_match is None:
+        per_match = re.fullmatch(
+            r"(cento|mille|centomila|milione|100|1[\. ]?000|10[\. ]?000|100[\. ]?000)\s+(.+)",
+            lowered_unit,
+        )
     if per_match:
         raw_base = per_match.group(1).replace(".", "").replace(" ", "")
-        base = "1.000.000" if raw_base == "milione" else f"{int(raw_base):,}".replace(",", ".")
-        denominator = per_match.group(2).strip()
-        return f"Un valore di 12 corrisponde a 12 casi ogni {base} {denominator}."
+        base_map = {
+            "cento": "100",
+            "mille": "1.000",
+            "centomila": "100.000",
+            "milione": "1.000.000",
+        }
+        base = base_map.get(raw_base)
+        if base is None:
+            base = f"{int(raw_base):,}".replace(",", ".")
+        denominator = per_match.group(2).strip().replace("km2", "km²").replace("m2", "m²")
+        explanation = f"Un valore di 12 corrisponde a 12 casi ogni {base} {denominator}."
+        if "standardizz" in lowered_unit or "standardizz" in lowered_name:
+            explanation += " Il tasso è corretto per confrontare popolazioni con una diversa struttura per età."
+        return explanation
+    if re.fullmatch(r"valori\s+per\s+1[\. ]?000", lowered_unit):
+        return "Un valore di 12 indica 12 casi ogni 1.000 unità del gruppo definito dalla fonte."
+    if re.search(r"(^|\s)%($|\s)", lowered_unit) or "percentual" in lowered_unit:
+        return "Un valore di 20 indica che la misura equivale al 20% del totale definito dalla fonte."
+    if "standardizz" in lowered_unit or "standardizz" in lowered_name:
+        return "Il tasso è corretto per rendere più confrontabili territori con una diversa struttura della popolazione."
+    if "tasso specifico di coorte" in lowered_unit:
+        return "Il valore confronta le persone che compongono la stessa generazione o fascia di ingresso, seguendone il percorso nel tempo."
+    if "gini" in lowered_name and "0-1" in lowered_unit:
+        return "L'indice va da 0 a 1: valori vicini a 0 indicano redditi più uniformi, valori vicini a 1 una maggiore disuguaglianza."
+    if "co2" in lowered_unit and "emission" in lowered_name:
+        return "Le emissioni sono espresse in CO2 equivalente, così gas diversi possono essere confrontati in base al loro effetto sul clima."
+    if "posti-km" in lowered_unit:
+        return "Il valore combina i posti disponibili sui mezzi con i chilometri percorsi e li rapporta agli abitanti."
+    if "microgrammi per m3" in lowered_unit:
+        return "Il valore indica quanti microgrammi di inquinante sono presenti in media in un metro cubo d'aria."
     if "m2 per abitante" in lowered_unit or "metri quadrati per abitante" in lowered_unit:
         return "Il valore indica quanti metri quadrati sono disponibili in media per ogni abitante."
-    if "per abitante" in lowered_unit or "pro capite" in lowered_unit:
+    if "per abitante" in lowered_unit or "pro capite" in lowered_unit or "per abitante" in lowered_name:
         return "Il totale è diviso per il numero di abitanti, così territori grandi e piccoli sono più confrontabili."
     if "per km" in lowered_unit or "per chilometro quadrato" in lowered_unit:
         return "Il valore rapporta il fenomeno alla superficie del territorio, non al numero di abitanti."
     if "euro" in lowered_unit:
         if "prezzi correnti" in lowered_unit:
             return "Sono euro dell'anno osservato, non corretti per l'inflazione."
-        return "Il valore è espresso in euro e va letto nel perimetro medio o pro capite indicato nel nome."
+        if "pro capite" in lowered_unit or "per abitante" in lowered_unit:
+            return "Il valore indica quanti euro corrispondono in media a ogni abitante."
+        if "migliaia" in lowered_unit:
+            return "Un valore di 12 equivale a 12.000 euro nel perimetro indicato dalla fonte."
+        if "milioni" in lowered_unit:
+            return "Un valore di 12 equivale a 12 milioni di euro nel perimetro indicato dalla fonte."
+        return "Il valore è espresso in euro. Il nome dell'indicatore specifica se si tratta di un totale, una media o un dato per abitante."
     if "anno" in lowered_unit or "anni" in lowered_unit:
         return "Il valore indica un numero medio di anni, non la durata garantita per ogni persona."
+    if lowered_unit in {"età media", "eta media"}:
+        return "Il valore indica l'età media del gruppo osservato, non l'età di ogni singola persona."
+    if "numero medio per utente" in lowered_unit:
+        return "Il valore indica il numero medio di eventi registrati per ciascun utente, non il totale complessivo."
+    if lowered_unit == "numero medio":
+        return "Il valore è una media, non un conteggio totale."
     if "giorn" in lowered_unit:
         return "Il valore conta i giorni associati al fenomeno nel periodo osservato."
-    if "puntegg" in lowered_unit or "valore medio" in lowered_unit or "numero indice" in lowered_unit:
+    if lowered_unit == "minuti" or "ore, minuti, secondi" in lowered_unit:
+        return "Il valore esprime il tempo necessario: più aumenta, più lunga è l'attesa o il percorso misurato."
+    if "km/ora" in lowered_unit:
+        return "Il valore indica la velocità media in chilometri orari."
+    if "valore medio" in lowered_unit:
+        return "È un punteggio medio: riassume le risposte del gruppo osservato e serve per confrontare territori e anni."
+    if "puntegg" in lowered_unit or "numero indice" in lowered_unit:
         return "È un punteggio sintetico: serve soprattutto per confrontare territori e anni sulla stessa scala."
     if "rapporto" in lowered_unit or "numero puro" in lowered_unit:
         return "È un rapporto tra due quantità, non una percentuale o un conteggio di persone."
+    if lowered_unit in {"numero", "classi", "ettari", "giornate", "metri quadrati", "quintali"}:
+        return "È un valore assoluto: la dimensione del territorio può influire sul confronto con le altre regioni."
     if any(token in lowered_unit for token in ("milioni", "migliaia", "tonnellate", "quintali", "gwh")):
         return "È un valore assoluto o di intensità: la dimensione del territorio e dell'economia può influire sul confronto."
     if unit:
@@ -759,6 +953,7 @@ def _subject_from_archive(archive):
     if not archive:
         return ""
     text = re.sub(r"^TAVOLA DISMESSA\s*-\s*", "", archive.strip().rstrip("."), flags=re.I)
+    text = re.sub(r"\.?\s*Indicatori demografici Istat\.?$", "", text, flags=re.I)
     text = re.sub(r"\s*\([^)]*percentuale[^)]*\)\s*$", "", text, flags=re.I)
     text = re.sub(r"\s*\([^)]*valori?[^)]*\)\s*$", "", text, flags=re.I)
     text = re.sub(r"\s+", " ", text)
@@ -782,6 +977,17 @@ def _expand_terms(text):
     expanded = text
     for pattern, replacement in _TERM_REPLACEMENTS:
         expanded = re.sub(pattern, replacement, expanded, flags=re.I)
+    cleanups = (
+        (r"\bde settore\b", "del settore"),
+        (r"\bfecondita\b", "fecondità"),
+        (r"\bstandadizzat", "standardizzat"),
+        (r"\bValore aggiunto\b", "valore aggiunto"),
+        (r"\bUnità di [Ll]avoro\b", "unità di lavoro"),
+        (r"\bServizi alle imprese\b", "servizi alle imprese"),
+        (r"\bdalla Regione\b", "dalla regione"),
+    )
+    for pattern, replacement in cleanups:
+        expanded = re.sub(pattern, replacement, expanded)
     return re.sub(r"\s+", " ", expanded).strip()
 
 
@@ -971,6 +1177,19 @@ def sparkline_points(spark, width=320, height=64, pad=4):
 
 def _clean(value):
     return " ".join((value or "").split())
+
+
+def display_unit(unit):
+    """Correct presentation-only typos and notation without changing source CSVs."""
+    value = _clean(unit)
+    value = re.sub(r"\bstandadizzato\b", "standardizzato", value, flags=re.I)
+    value = re.sub(r"\bGwh\b", "GWh", value, flags=re.I)
+    value = re.sub(r"\bUla\b", "ULA", value, flags=re.I)
+    value = re.sub(r"\bKm/ora\b", "km/ora", value, flags=re.I)
+    value = re.sub(r"\bM2\b", "m²", value)
+    value = re.sub(r"\bM3\b", "m³", value)
+    value = re.sub(r"\bKm2\b", "km²", value, flags=re.I)
+    return value
 
 
 def _pick(seed, modulo):

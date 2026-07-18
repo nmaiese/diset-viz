@@ -73,6 +73,7 @@ def _bes_region_payload(indicator_id, year):
             "source_label": "Istat, BES nazionale",
             "source_url": BES_SOURCE_URLS["regione"],
             "description": info["explain"]["plain"],
+            "value_explanation": info["explain"]["example"],
             "path": bes_indicator_path(raw_id, info["name"]),
         },
         "values": values,
@@ -110,6 +111,7 @@ def _bes_quiz_indicators():
             "source_label": meta["source_label"],
             "source_url": meta["source_url"],
             "description": meta["description"],
+            "value_explanation": meta["value_explanation"],
             "ranking": values,
         })
     return pool
@@ -141,6 +143,7 @@ def _quiz_indicators():
             "source_label": item["source_label"],
             "source_url": item["source_url"],
             "description": item["explain"]["plain"],
+            "value_explanation": item["explain"]["example"],
             "ranking": [
                 {"region": row["region"], "region_key": row["region_key"], "value": row["value"]}
                 for row in rows
@@ -167,6 +170,7 @@ def _indicator_fields(entry):
         "source_label": entry["source_label"],
         "source_url": entry["source_url"],
         "description": entry["description"],
+        "value_explanation": entry["value_explanation"],
     }
 
 
@@ -276,6 +280,7 @@ def evaluate_compare(indicator_id, year, region_a_key, region_b_key, choice):
             "source_label": meta["source_label"],
             "source_url": meta["source_url"],
             "description": meta.get("description") or meta["explain"]["plain"],
+            "value_explanation": meta.get("value_explanation") or meta["explain"]["example"],
         },
         "region_a": {"region": name_a, "region_key": region_a_key, "value": value_a},
         "region_b": {"region": name_b, "region_key": region_b_key, "value": value_b},
@@ -372,5 +377,6 @@ def evaluate_order(indicator_id, year, region_keys):
             "source_label": meta["source_label"],
             "source_url": meta["source_url"],
             "description": meta.get("description") or meta["explain"]["plain"],
+            "value_explanation": meta.get("value_explanation") or meta["explain"]["example"],
         },
     }

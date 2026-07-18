@@ -6,7 +6,7 @@
 {% set lvl_label = 'province' if is_prov else 'regioni' %}
 
 {% block title %}Qualità vita {{ lvl_label }}: {{ p.name }} | {{ site_name }}{% endblock %}
-{% block description %}Classifica qualità della vita per {{ lvl_label }}: z-score orientati su scala 0-100 da indicatori Istat selezionati, profilo {{ p.name }}, categorie e metodo trasparenti.{% endblock %}
+{% block description %}Classifica della qualità della vita per {{ lvl_label }}: indicatori Istat su scala 0-100, profilo {{ p.name }}, categorie e metodo trasparenti.{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">

@@ -9,6 +9,8 @@
   --accent-soft: rgba(228, 87, 46, 0.12);
   --line: rgba(21, 35, 59, 0.16);
   --grid: rgba(21, 35, 59, 0.09);
+  --positive: #2f8f5b;
+  --positive-ink: #226e44;
   --shadow: 0 16px 44px rgba(21, 35, 59, 0.10);
   --font-display: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -349,7 +351,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   color: var(--accent);
   cursor: pointer;
 }
-.year-range__reset:hover { background: var(--accent); color: #fff; }
+.year-range__reset:hover { background: var(--accent); color: var(--panel); }
 
 .toggle {
   display: inline-flex;
@@ -759,7 +761,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   transform: scaleX(var(--bar-scale, 1));
   animation: bar-grow 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
-.di-bar--up i { background: #2f8f5b; }
+.di-bar--up i { background: var(--positive); }
 .di-bar--down i { background: var(--accent); }
 @keyframes bar-grow {
   from { transform: scaleX(0); }
@@ -860,9 +862,9 @@ h1, h2, h3 { font-family: var(--font-display); }
   font-size: 17px; letter-spacing: -0.01em;
 }
 .region-card h4 { margin: 0 0 10px; font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
-.region-card h4.is-up { color: #226e44; }
+.region-card h4.is-up { color: var(--positive-ink); }
 .region-card h4.is-down { color: var(--accent); }
-.region-card--strong { border-top: 3px solid #2f8f5b; }
+.region-card--strong { border-top: 3px solid var(--positive); }
 .region-card--weak { border-top: 3px solid var(--accent); }
 .region-card__note { margin: -6px 0 14px; color: var(--muted); font-size: 12.5px; line-height: 1.4; }
 .region-move-col { min-width: 0; }
@@ -888,7 +890,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 .region-move-list__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .region-move-list__name { font-size: 13.5px; }
 .region-move-list em { font-family: var(--font-mono); font-style: normal; font-size: 13px; font-weight: 700; }
-.region-move-list em.is-up { color: #226e44; }
+.region-move-list em.is-up { color: var(--positive-ink); }
 .region-move-list em.is-down { color: var(--accent); }
 .region-move-list small { color: var(--muted); font-size: 11.5px; }
 
@@ -924,12 +926,12 @@ h1, h2, h3 { font-family: var(--font-display); }
   border-left-width: 3px; min-width: 0;
 }
 .region-summary__item:hover { border-color: var(--accent); }
-.region-summary__item.is-strong { border-left-color: #2f8f5b; }
+.region-summary__item.is-strong { border-left-color: var(--positive); }
 .region-summary__item.is-weak { border-left-color: var(--accent); }
 .region-summary__item small { display: flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
 .region-summary__item strong { font-size: 13.5px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .region-summary__item b { font-family: var(--font-mono); font-size: 13px; }
-.region-summary__item b.is-up { color: #226e44; }
+.region-summary__item b.is-up { color: var(--positive-ink); }
 .region-summary__item b.is-down { color: var(--accent); }
 
 /* Expandable themes accordion */
@@ -962,7 +964,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 .region-ind-row__rank small { color: var(--muted); }
 .region-ind-row__move { font-family: var(--font-mono); font-size: 12px; text-align: right; }
 .region-ind-row__move em { font-style: normal; font-weight: 700; }
-.region-ind-row__move em.is-up { color: #226e44; }
+.region-ind-row__move em.is-up { color: var(--positive-ink); }
 .region-ind-row__move em.is-down { color: var(--accent); }
 .region-ind-row__move small { color: var(--muted); }
 .region-ind-row__chev { color: var(--muted); }
@@ -1097,7 +1099,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 /* Crawlable SSR footer below the React app (links to indexed hub pages). */
 .spa-seo-footer { padding: 24px 16px 40px; text-align: center; border-top: 1px solid var(--line, rgba(21,35,59,0.16)); }
 .spa-seo-footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: center; font-size: 13px; }
-.spa-seo-footer a { color: var(--muted, #6b7785); }
+.spa-seo-footer a { color: var(--muted); }
 
 /* Contenuto server-renderizzato dentro #root, visibile per un istante prima
    che React monti: senza queste regole eredita solo i reset globali (link

@@ -1,5 +1,7 @@
 import csv
+import re
 import unittest
+from html import unescape
 from pathlib import Path
 
 from app import app
@@ -762,6 +764,31 @@ class AppSmokeTest(unittest.TestCase):
             self.assertNotEqual(
                 seo_title(by_id["189"]["name"], "Divario Italia"),
                 seo_title(by_id["190"]["name"], "Divario Italia"),
+            )
+
+    def test_public_game_and_editorial_metadata_within_budget(self):
+        client = app.test_client()
+        paths = (
+            "/quiz/chi-e-maggiore",
+            "/quiz/ordina",
+            "/qualita-della-vita/classifica/regioni",
+            "/blog/divario-turistico-nord-sud-2024",
+        )
+        for path in paths:
+            response = client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+            html = response.data.decode("utf-8")
+            title_match = re.search(r"<title>(.*?)</title>", html, re.DOTALL)
+            description_match = re.search(
+                r'<meta name="description" content="([^"]*)"', html
+            )
+            self.assertIsNotNone(title_match, path)
+            self.assertIsNotNone(description_match, path)
+            title = unescape(title_match.group(1)).strip()
+            description = unescape(description_match.group(1)).strip()
+            self.assertLessEqual(len(title), 60, f"title too long for {path}: {title}")
+            self.assertLessEqual(
+                len(description), 155, f"description too long for {path}: {description}"
             )
 
     def test_dataset_schema(self):

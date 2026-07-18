@@ -6,7 +6,7 @@ from collections import defaultdict
 from functools import lru_cache
 
 from app.external_data import enrich_indicator_metadata
-from app.indicator_notes import MACRO_AREA_ORDER, build_indicator_explain, macro_area_for
+from app.indicator_notes import MACRO_AREA_ORDER, build_indicator_explain, display_unit, macro_area_for
 
 
 DATASET_PATH = os.path.join(os.path.dirname(__file__), "static/data/Assoluti_Regione.csv")
@@ -183,7 +183,7 @@ def get_rows():
                     region_key=_dedup(_slugify(row["Territorio"])),
                     theme=_dedup(_clean_text(row["Tema"])),
                     indicator=_dedup(_clean_text(row["Indicatore"])),
-                    unit=_dedup(_clean_text(row["UDM"])),
+                    unit=_dedup(display_unit(_clean_text(row["UDM"]))),
                     source=_dedup(_clean_text(row["Fonte"])),
                     archive=_dedup(_clean_text(row["Archivio"])),
                     year=int(row["Anno"]),

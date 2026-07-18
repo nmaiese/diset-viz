@@ -12,7 +12,7 @@ from pathlib import Path
 
 from app.cache import cache
 from app.data import _parse_number
-from app.indicator_notes import build_bes_indicator_explain
+from app.indicator_notes import build_bes_indicator_explain, display_unit
 from app.profiles import region_key_for, slugify
 from app.taxonomy import CANONICAL_CATEGORIES, category_for_indicator, category_path
 
@@ -157,7 +157,7 @@ def get_bes_manifest(level):
                 "category_name": CANONICAL_CATEGORIES[category]["name"] if category else None,
                 "category_path": category_path(category) if category else None,
                 "direction": row["proposed_direction"],
-                "unit": row["unit"],
+                "unit": display_unit(row["unit"]),
                 "year_min": int(row["year_min"]),
                 "year_max": int(row["year_max"]),
                 "coverage_latest": float(row.get("coverage_latest", 0) or 0),
@@ -185,7 +185,7 @@ def get_bes_rows(level):
                 "territory_key": name_to_key.get(territory),
                 "theme": row["Tema"],
                 "name": row["Indicatore"],
-                "unit": row["UDM"],
+                "unit": display_unit(row["UDM"]),
                 "source": row.get("Fonte", ""),
                 "archive": row.get("Archivio", ""),
                 "year": int(row["Anno"]),
@@ -216,8 +216,14 @@ def all_bes_indicators():
             and level_info["year_max"] >= 2023
             for level_info in levels.values()
         )
+        public_scope = (
+            "regioni e province"
+            if set(levels) == {"regione", "provincia"}
+            else "province" if "provincia" in levels else "regioni"
+        )
         indicators.append({
             **info,
+            "explain": build_bes_indicator_explain(info, public_scope),
             "path": bes_indicator_path(indicator_id, info["name"]),
             "indexable": indexable,
             "levels": levels,

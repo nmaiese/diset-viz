@@ -463,7 +463,21 @@ function GameApp() {
                     <span className="clue-index">Indizio {i + 1}</span>
                     <h3>{clue.name}</h3>
                     <p className="clue-meta">{clue.macro_area} · {clue.theme}</p>
-                    {clue.description && <p className="clue-description">{clue.description}</p>}
+                    {clue.description && (
+                      <p className="clue-description">
+                        <strong>Che cosa misura.</strong> {clue.description}
+                      </p>
+                    )}
+                    {clue.value_explanation && (
+                      <p className="clue-value-hint">
+                        <strong>Come leggere il valore.</strong> {clue.value_explanation}
+                      </p>
+                    )}
+                    {clue.reading && (
+                      <p className="clue-reading">
+                        <strong>Come leggere la posizione.</strong> {clue.reading}
+                      </p>
+                    )}
                     <SourceStrip year={clue.year} sourceLabel={clue.source_label} sourceUrl={clue.source_url} />
                     <div className="clue-stats">
                       <span className="clue-value">{formatValue(clue.value, clue.unit)}</span>

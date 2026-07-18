@@ -87,7 +87,8 @@ class GameTest(unittest.TestCase):
         self.assertTrue(first["puzzle_id"].startswith("daily:"))
         self.assertIn("clue", first)
         for field in (
-            "id", "name", "theme", "macro_area", "unit", "year", "value", "rank",
+            "id", "name", "theme", "macro_area", "unit", "description",
+            "value_explanation", "reading", "year", "value", "rank",
             "region_count", "source_label", "source_url",
         ):
             self.assertIn(field, first["clue"])
@@ -319,7 +320,10 @@ class QuizCompareTest(unittest.TestCase):
         response = client.get("/api/game/compare/round?difficulty=2")
         self.assertEqual(response.status_code, 200)
         payload = response.get_json()
-        for field in ("id", "name", "theme", "macro_area", "unit", "year", "source_label", "source_url"):
+        for field in (
+            "id", "name", "theme", "macro_area", "unit", "year",
+            "source_label", "source_url", "description", "value_explanation",
+        ):
             self.assertIn(field, payload["indicator"])
         self.assertTrue(payload["indicator"]["source_url"].startswith("http"))
         self.assertEqual(payload["difficulty"], 2)
@@ -327,6 +331,7 @@ class QuizCompareTest(unittest.TestCase):
         self.assertNotIn('"value"', json.dumps(payload))
         # La spiegazione non rivela i valori e accompagna subito la domanda.
         self.assertTrue(payload["indicator"]["description"])
+        self.assertTrue(payload["indicator"]["value_explanation"])
 
     def test_compare_rounds_use_core_indicators_with_distinct_values(self):
         from app import quiz
@@ -411,6 +416,7 @@ class QuizCompareTest(unittest.TestCase):
         self.assertEqual(right["winner"], winner)
         self.assertEqual(right["region_a"]["value"], values[key_a])
         self.assertTrue(right["indicator"]["description"])
+        self.assertTrue(right["indicator"]["value_explanation"])
         self.assertTrue(right["indicator"]["source_url"].startswith("http"))
         self.assertTrue(right["indicator"]["source_label"])
 
@@ -470,6 +476,7 @@ class QuizOrderTest(unittest.TestCase):
             for field in ("source_label", "source_url"):
                 self.assertIn(field, payload["indicator"])
             self.assertTrue(payload["indicator"]["description"])
+            self.assertTrue(payload["indicator"]["value_explanation"])
 
         for bad in ("2", "6", "x", ""):
             self.assertEqual(client.get(f"/api/game/order/round?count={bad}").status_code, 400, bad)
@@ -499,6 +506,7 @@ class QuizOrderTest(unittest.TestCase):
         self.assertTrue(all(p["correct"] for p in full["positions"]))
         self.assertEqual([r["region_key"] for r in full["correct_order"]], perfect)
         self.assertTrue(full["indicator"]["description"])
+        self.assertTrue(full["indicator"]["value_explanation"])
         self.assertTrue(full["indicator"]["source_url"].startswith("http"))
         self.assertEqual(full["indicator"]["id"], indicator_id)
 

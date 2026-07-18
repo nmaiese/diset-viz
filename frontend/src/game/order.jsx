@@ -169,7 +169,8 @@ export default function OrderApp() {
           <ol className="game-onboarding-steps">
             <li>
               <strong>Tocca in sequenza.</strong> Prima la regione che pensi abbia il valore più alto,
-              poi la seconda e così via. Un secondo tocco toglie la regione dalla sequenza.
+              poi la seconda e così via. Conta il numero, anche quando un valore alto non rappresenta
+              un risultato migliore. Un secondo tocco toglie la regione dalla sequenza.
             </li>
             <li>
               <strong>Conferma quando l'ordine è completo.</strong> Vedrai la classifica reale con i
@@ -211,9 +212,21 @@ export default function OrderApp() {
               sourceLabel={round.indicator.source_label}
               sourceUrl={round.indicator.source_url}
             />
-            {round.indicator.description && (
-              <p className="quiz-description">{round.indicator.description}</p>
-            )}
+            <div className="quiz-explanation">
+              {round.indicator.description && (
+                <p className="quiz-description">
+                  <strong>Che cosa misura.</strong> {round.indicator.description}
+                </p>
+              )}
+              {round.indicator.value_explanation && (
+                <p className="quiz-value-hint">
+                  <strong>Come leggere il valore.</strong> {round.indicator.value_explanation}
+                </p>
+              )}
+              <p className="quiz-rule-note">
+                Ordina i numeri dal più alto al più basso, non dal risultato migliore al peggiore.
+              </p>
+            </div>
           </div>
 
           <div className={`order-cards order-cards--${round.count}`}>

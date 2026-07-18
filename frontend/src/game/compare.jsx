@@ -212,7 +212,8 @@ export default function CompareApp() {
           <ol className="game-onboarding-steps">
             <li>
               <strong>Un indicatore, due regioni.</strong> Tocca la regione che secondo te ha il valore
-              più alto. Hai dieci secondi.
+              più alto. Conta il numero, anche quando un valore alto non rappresenta un risultato migliore.
+              Hai dieci secondi.
             </li>
             <li>
               <strong>La serie cresce, la sfida pure.</strong> Ogni risposta giusta di fila alza la
@@ -252,9 +253,21 @@ export default function CompareApp() {
               sourceLabel={round.indicator.source_label}
               sourceUrl={round.indicator.source_url}
             />
-            {round.indicator.description && (
-              <p className="quiz-description">{round.indicator.description}</p>
-            )}
+            <div className="quiz-explanation">
+              {round.indicator.description && (
+                <p className="quiz-description">
+                  <strong>Che cosa misura.</strong> {round.indicator.description}
+                </p>
+              )}
+              {round.indicator.value_explanation && (
+                <p className="quiz-value-hint">
+                  <strong>Come leggere il valore.</strong> {round.indicator.value_explanation}
+                </p>
+              )}
+              <p className="quiz-rule-note">
+                Nel gioco vince il numero più alto, non necessariamente il risultato migliore.
+              </p>
+            </div>
           </div>
 
           <div className="compare-timer" role="presentation">

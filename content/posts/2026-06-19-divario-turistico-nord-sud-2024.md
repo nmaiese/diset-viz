@@ -1,5 +1,6 @@
 ---
 title: "Il divario turistico tra Nord e Sud Italia: cosa dicono i dati"
+seo_title: "Divario turistico Nord-Sud: dati 2024"
 slug: divario-turistico-nord-sud-2024
 description: "Nel 2024 il Trentino-Alto Adige registra 33 volte le presenze turistiche del Molise. Analisi del divario turistico tra le regioni italiane sui dati Istat."
 date: 2026-06-19
