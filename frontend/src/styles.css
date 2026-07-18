@@ -1018,7 +1018,11 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 .region-explore > * { min-width: 0; }
 
-.region-select { display: grid; gap: 14px; }
+/* Keep the map column pinned under the masthead so the profile column growing
+   (RegionIntro -> RegionProfile) never shoves the locator map around. Scoped to
+   the two-column desktop layout; on mobile the grid is a single column and a
+   sticky ~400px map block would swallow the viewport (see the max-width query). */
+.region-select { display: grid; gap: 14px; position: sticky; top: calc(var(--masthead-h, 72px) + 12px); align-self: start; }
 .region-select__head h2 {
   margin: 0 0 4px;
   font-family: var(--font-mono);
@@ -1028,8 +1032,13 @@ h1, h2, h3 { font-family: var(--font-display); }
   color: var(--muted);
 }
 .region-select__head p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.4; }
-.region-map { background: var(--panel); border: 1px solid var(--line); padding: 12px; }
+/* Anchor the locator map with its own view-transition-name: it's the same
+   element before and after, so if any view transition ever captures the root
+   (e.g. arriving on /regioni) the map is lifted into its own group and held
+   still instead of being cross-faded through a geometric jump. */
+.region-map { background: var(--panel); border: 1px solid var(--line); padding: 12px; view-transition-name: region-locator-map; contain: layout paint; }
 .region-map .italy-map { height: clamp(300px, 42vh, 440px); }
+::view-transition-group(region-locator-map) { animation-duration: 0ms; }
 
 .region-switcher { display: grid; gap: 6px; }
 .region-switcher .lbl { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
@@ -1212,6 +1221,8 @@ h1, h2, h3 { font-family: var(--font-display); }
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {
   .region-explore { grid-template-columns: 1fr; }
+  /* Single column here: a sticky map block would pin ~400px over the profile. */
+  .region-select { position: static; }
   .atlas { grid-template-columns: 1fr; }
   .theme-spine { position: static; }
   .theme-spine ul { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }

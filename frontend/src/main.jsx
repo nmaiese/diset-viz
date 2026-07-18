@@ -302,11 +302,16 @@ function App() {
   // the page position stable; RegionView resets only the profile panel scroll.
   const selectRegion = (key) => {
     trackEvent("select_region", { region_key: key });
-    withViewTransition(() => {
-      setFromParam(null);
-      setRegionKey(key);
-      setView("regioni");
-    });
+    // Siamo già dentro /regioni: questo è un cambio di dato interno, non di
+    // sezione. Un startViewTransition qui cattura tutto il root e ci finisce
+    // dentro il salto geometrico della griglia (la colonna profilo passa da
+    // RegionIntro alta poche righe a RegionProfile alta centinaia di px),
+    // facendo "spostare" la mappa. Il fade del solo pannello profilo lo dà già
+    // .scene-enter, ri-keyato su regionKey in RegionView. La view transition
+    // resta solo su openRegion, che cambia davvero sezione.
+    setFromParam(null);
+    setRegionKey(key);
+    setView("regioni");
   };
 
   if (error) {
