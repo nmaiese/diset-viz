@@ -714,11 +714,17 @@ class AppSmokeTest(unittest.TestCase):
     def test_seo_metadata_within_budget(self):
         from app.data import get_catalog
         from app.indicator_notes import seo_title, seo_description
+        from app import profiles
 
         indicators = get_catalog()["indicators"]
         for item in indicators:
             title = seo_title(item["name"], "Divario Italia")
-            desc = seo_description(item["explain"]["plain"], item["year_max"], len(item["regions"]))
+            desc = seo_description(
+                item["explain"]["plain"],
+                item["year_max"],
+                len(item["regions"]),
+                name=item["name"],
+            )
             # SERP budgets: titles stay readable, descriptions are not truncated by Google.
             self.assertLessEqual(len(title), 60, f"title too long for {item['id']}: {title}")
             self.assertGreaterEqual(len(title), 8, f"title too short for {item['id']}: {title}")
@@ -734,6 +740,23 @@ class AppSmokeTest(unittest.TestCase):
             self.assertTrue(desc.rstrip().endswith("."), desc)
 
         by_id = {i["id"]: i for i in indicators}
+        indexable_titles = [
+            seo_title(item["name"], "Divario Italia")
+            for item in indicators
+            if profiles.is_search_indexable_indicator(item)
+        ]
+        indexable_descriptions = [
+            seo_description(
+                item["explain"]["plain"],
+                item["year_max"],
+                len(item["regions"]),
+                name=item["name"],
+            )
+            for item in indicators
+            if profiles.is_search_indexable_indicator(item)
+        ]
+        self.assertEqual(len(indexable_titles), len(set(indexable_titles)))
+        self.assertEqual(len(indexable_descriptions), len(set(indexable_descriptions)))
         # Gender siblings (189 maschi / 190 femmine) must not collapse to one title.
         if {"189", "190"} <= set(by_id):
             self.assertNotEqual(

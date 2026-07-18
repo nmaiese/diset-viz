@@ -1,6 +1,112 @@
 import re
 
 
+# Metriche che il solo nome non basta a spiegare. Le definizioni restano
+# descrittive: chiariscono numeratore e denominatore senza aggiungere cause.
+PLAIN_DEFINITION_OVERRIDES = {
+    "04BEC002": (
+        "Misura quante volte il reddito complessivo del 20% più ricco supera "
+        "quello del 20% più povero"
+    ),
+    "03LAV009-N22": (
+        "Confronta il tasso di occupazione delle donne tra 25 e 49 anni con figli "
+        "in età prescolare con quello delle donne della stessa età senza figli"
+    ),
+    "06POL012": (
+        "Rapporta il numero di persone detenute ai posti regolamentari disponibili "
+        "negli istituti di pena"
+    ),
+    "06POL012P": (
+        "Rapporta il numero di persone detenute ai posti regolamentari disponibili "
+        "negli istituti di pena"
+    ),
+    "10AMB002": (
+        "Misura la quantità complessiva di materiali usati dal sistema economico e "
+        "trasformati in emissioni, rifiuti, beni o infrastrutture"
+    ),
+    "12SER008": (
+        "Misura l'offerta di trasporto pubblico locale moltiplicando i posti "
+        "disponibili sui mezzi per i chilometri percorsi"
+    ),
+    "07SIC004": "Misura le rapine denunciate in rapporto alla popolazione",
+    "SDG-3": "Misura il numero di medici in rapporto alla popolazione",
+    "01SAL013": (
+        "Misura la diffusione di un'alimentazione che rispetta il criterio "
+        "definito dal sistema BES Istat"
+    ),
+}
+
+
+_TERM_REPLACEMENTS = (
+    (r"\bSAU\b", "superficie agricola utilizzata"),
+    (r"\bULA\b", "unità di lavoro equivalenti a tempo pieno"),
+    (r"\bR&S\b", "ricerca e sviluppo"),
+    (r"\bTPL\b", "trasporto pubblico locale"),
+    (r"\bCLE\b", "Condizione limite per l'emergenza, CLE"),
+    (r"\bICT\b", "tecnologie dell'informazione e della comunicazione"),
+    (r"\bEPO\b", "Ufficio europeo dei brevetti, EPO"),
+    (r"\bPA\b", "pubblica amministrazione"),
+    (r"\bUL\b", "unità locali"),
+    (r"\bEta\b", "Età"),
+    (r"\bGwh\b", "gigawattora, GWh"),
+    (r"\bMw\b", "megawatt, MW"),
+    (r"\bkmq\b", "chilometro quadrato"),
+    (r"\bkm2\b", "chilometro quadrato"),
+)
+
+
+_FEMININE_SINGULAR = {
+    "acqua", "associazione", "attività", "capacità", "competenza",
+    "concentrazione", "copertura", "densità", "differenza", "difficoltà",
+    "diffusione", "dispersione", "disponibilità", "durata", "energia",
+    "emigrazione", "erosione", "età", "fiducia", "frazione", "frequenza",
+    "fruizione", "impermeabilizzazione", "incidenza", "insoddisfazione",
+    "intensità", "innovazione", "irregolarità", "lettura", "lunghezza",
+    "dotazione", "imprenditorialità", "media", "mobilità", "mortalità",
+    "multicronicità", "occupazione", "paura",
+    "partecipazione", "percezione", "percentuale", "popolazione", "presenza",
+    "pressione", "preoccupazione", "produzione", "propensione", "qualità",
+    "quota", "raccolta", "rete", "retribuzione", "rinuncia", "sedentarietà",
+    "situazione", "soddisfazione", "somma", "spesa", "speranza", "superficie",
+    "tavola", "uscita", "variazione", "velocità", "violenza",
+    "adeguata", "bassa", "grande", "grave",
+}
+
+_MASCULINE_SINGULAR = {
+    "abusivismo", "affollamento", "alcol", "conferimento", "consumo", "divario",
+    "differenziale", "eccesso", "export", "fumo",
+    "finanziamento", "grado", "giudizio", "impatto", "importo", "indice",
+    "numero", "passaggio", "peso", "pil", "rapporto", "reddito", "rischio",
+    "part", "saldo", "servizio", "sovraccarico", "tasso", "tempo", "totale",
+    "traffico", "trattamento", "valore", "verde", "punteggio", "prodotto",
+}
+
+_FEMININE_PLURAL = {
+    "amministrazioni", "aree", "aziende", "coste", "donne", "emissioni",
+    "competenze", "denunce", "dimissioni", "famiglie", "forze", "giornate",
+    "importazioni", "imprese", "merci", "organizzazioni", "persone", "presenze",
+    "rapine", "reti", "scuole", "spese", "strade", "tonnellate",
+    "trasformazioni", "unità", "zone",
+}
+
+_MASCULINE_PLURAL_GLI = {
+    "15enni", "abitanti", "addetti", "adulti", "alunni", "amministratori",
+    "anziani", "ingressi", "investimenti", "impieghi", "occupati", "ospiti",
+    "studenti", "utenti",
+}
+
+_MASCULINE_PLURAL_I = {
+    "abbandoni", "bambini", "beni", "biglietti", "borseggi", "brevetti",
+    "comuni", "consumi", "delitti", "dipendenti", "elementi", "furti",
+    "gigawattora", "giorni",
+    "giovani", "infermieri", "laureati", "lavoratori", "maschi", "medici",
+    "megawatt", "metri", "minorenni", "minori", "omicidi", "passeggeri", "pensionati",
+    "gwh", "mw", "postikm", "posti", "principi", "reati", "redditi",
+    "rifiuti", "servizi", "siti", "stalli",
+    "tempi", "valori", "visitatori",
+}
+
+
 THEME_EXAMPLES = {
     "Ambiente, altro": "Esempio: aiuta a capire se un territorio è più esposto a pressioni ambientali, rischi naturali o consumo di suolo rispetto ad altri.",
     "Capitale sociale": "Esempio: rende visibile la presenza di reti civiche, cooperative o organizzazioni che tengono insieme servizi e comunità.",
@@ -301,22 +407,52 @@ def _truncate_words(text, budget, add_period=False):
 
 
 def _variant_marker(name):
-    """Gender/total marker kept distinct so sibling variant titles stay unique."""
+    """Keep a compact parenthetical so sibling indicator titles stay unique."""
     low = (name or "").lower()
     for marker in ("femmine", "maschi", "totale"):
         if f"({marker})" in low:
             return f" ({marker})"
+    groups = re.findall(r"\(([^()]*)\)", name or "")
+    if groups:
+        marker = groups[-1]
+        marker = re.sub(r"studenti classi?\s+", "classe ", marker, flags=re.I)
+        marker = re.sub(r"scuola secondaria primo grado", "secondaria I grado", marker, flags=re.I)
+        marker = re.sub(r"scuola secondaria secondo grado", "secondaria II grado", marker, flags=re.I)
+        marker = _truncate_words(marker, 27)
+        return f" ({marker})" if marker else ""
     return ""
 
 
 def _short_name_for_title(name):
     n = re.sub(r"^TAVOLA DISMESSA\s*-\s*", "", name or "", flags=re.I).strip()
-    # Keep only the concise head before a colon ("Quota...: Indennità" -> "Quota...").
-    n = n.split(":", 1)[0].strip()
     # Drop parentheticals; the gender/total marker is re-added separately so it
     # survives truncation instead of being cut off with the tail of a long name.
     n = re.sub(r"\s*\([^)]*\)", "", n)
     return re.sub(r"\s+", " ", n).strip()
+
+
+def _compact_title(core, marker, max_len):
+    combined = f"{core}{marker}"
+    if len(combined) <= max_len:
+        return combined
+    if marker:
+        return f"{_truncate_words(core, max_len - len(marker))}{marker}"
+
+    words = core.split()
+    tail_words = words[-4:]
+    while len(" ".join(tail_words)) > 24 and len(tail_words) > 1:
+        tail_words.pop(0)
+    tail = " ".join(tail_words).rstrip(" ,.;:-")
+    separator = " ("
+    head = _truncate_words(core, max_len - len(separator) - len(tail) - 1)
+    dangling = {"a", "al", "alla", "da", "dal", "dalla", "di", "del", "della", "dei", "delle", "e", "in", "nei", "nelle", "per", "tra", "fra"}
+    head_words = head.split()
+    while len(head_words) > 1 and head_words[-1].lower() in dangling:
+        head_words.pop()
+    head = " ".join(head_words)
+    if not head or tail.lower() in head.lower():
+        return _truncate_words(core, max_len)
+    return f"{head}{separator}{tail})"
 
 
 def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX):
@@ -337,15 +473,36 @@ def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX):
     body = f"{core}{marker}"
     if len(body) <= max_len:
         return body
-    return f"{_truncate_words(core, max_len - len(marker))}{marker}"
+    return _compact_title(core, marker, max_len)
 
 
-def seo_description(plain, year_max, region_count, max_len=_DESC_MAX):
+def seo_description(
+    plain,
+    year_max,
+    region_count,
+    max_len=_DESC_MAX,
+    name="",
+    territory_label="regioni",
+):
     """SERP description from the data-derived plain text: keep whole sentences that
     fit, then append the data vintage. Never cut a sentence to a dangling stub."""
     base = (plain or "").strip()
-    tail = f" Dati Istat, {region_count} regioni, ultimo anno {year_max}."
+    # Keep the provenance compact so the explanation, which is the useful part
+    # for the reader and for search intent, can remain a complete sentence.
+    tail = f" Dati Istat: {region_count} {territory_label}, al {year_max}."
+    prefix = (
+        f"{_compact_title(_short_name_for_title(name), _variant_marker(name), 58)}: "
+        if name else ""
+    )
     room = max_len - len(tail)
+    # Add the indicator name only when the first explanatory sentence still fits
+    # in full. The title already names the indicator, so clarity wins over
+    # repetition in tighter snippets.
+    first_sentence = re.split(r"(?<=\.)\s+", base)[0] if base else ""
+    if prefix and len(prefix) + len(first_sentence) <= room:
+        room -= len(prefix)
+    else:
+        prefix = ""
     sentences = re.split(r"(?<=\.)\s+", base) if base else []
     kept = ""
     for sentence in sentences:
@@ -355,9 +512,19 @@ def seo_description(plain, year_max, region_count, max_len=_DESC_MAX):
         else:
             break
     if not kept:
-        first = sentences[0] if sentences else base
-        kept = _truncate_words(first, room, add_period=True)
-    return kept + tail
+        # A clipped statistical definition can change meaning or leave a broken
+        # phrase. For long definitions use a complete, search-specific fallback
+        # and leave the full explanation to the visible page section.
+        compact_name = _compact_title(
+            _short_name_for_title(name) or name or "Indicatore",
+            _variant_marker(name),
+            78,
+        )
+        return (
+            f"{compact_name}: cosa misura e confronto tra "
+            f"{region_count} {territory_label}. Dati Istat al {year_max}."
+        )[:max_len].rstrip(" ,.;:-") + "."
+    return prefix + kept + tail
 
 
 def build_indicator_explain(item):
@@ -372,11 +539,74 @@ def build_indicator_explain(item):
 
     return {
         "plain": _plain_text(base_name, theme, archive, unit, indicator_id),
-        "example": _example_text(name, theme, lens),
+        "example": _unit_explanation(name, unit),
+        "scope": _scope_text(name, "territori regionali"),
         "reading": _reading_text(name, theme, unit, direction),
         "caveat": _caveat_text(name, theme, lens),
         "direction": direction,
     }
+
+
+def build_bes_indicator_explain(item, level="territori"):
+    """Spiegazione comune a catalogo BES, pagine pubbliche e quiz."""
+    name = _clean(item.get("name") or item.get("indicator"))
+    unit = _clean(item.get("unit"))
+    theme = _clean(item.get("domain_name") or item.get("theme"))
+    indicator_id = str(item.get("id", ""))
+    direction = item.get("direction") or direction_for(indicator_id, name)
+    return {
+        "plain": _bes_plain_text(name, unit, indicator_id),
+        "example": _unit_explanation(name, unit),
+        "scope": _scope_text(name, level),
+        "reading": _reading_text(name, theme, unit, direction),
+        "caveat": _bes_caveat(unit, level),
+        "direction": direction,
+    }
+
+
+def _bes_plain_text(name, unit, indicator_id):
+    """Turn the BES label and unit into an explanation, not a label echo."""
+    override = PLAIN_DEFINITION_OVERRIDES.get(indicator_id)
+    if override:
+        return _finish_sentence(override)
+
+    subject = _expand_terms(name)
+    lowered_unit = unit.lower().replace("²", "2")
+    with_article = _with_article(subject)
+
+    if "puntegg" in lowered_unit or "standardizz" in lowered_unit and "tass" not in lowered_unit:
+        return _finish_sentence(
+            f"Riassume {with_article} in un punteggio riportato su una scala comune, utile per confrontare territori diversi"
+        )
+    if "valor" in lowered_unit and "percent" in lowered_unit or lowered_unit.strip() == "%":
+        return _finish_sentence(
+            f"Esprime come percentuale {with_article} nel gruppo di riferimento definito dalla fonte"
+        )
+
+    rate_match = re.search(r"per\s+([\d\.]+|milione)\s+(.+)", lowered_unit)
+    if rate_match:
+        denominator = f"{rate_match.group(1)} {rate_match.group(2)}".strip()
+        standardised = " Il tasso è inoltre corretto per rendere confrontabili popolazioni con età diverse." if "standardizz" in lowered_unit else ""
+        return (
+            _finish_sentence(
+                f"Rapporta {with_article} a {denominator}, così territori di dimensioni diverse sono confrontabili"
+            )
+            + standardised
+        )
+    if "numero medio di anni" in lowered_unit or lowered_unit in {"età media", "eta media"}:
+        return _finish_sentence(f"Esprime in anni {with_article} come valore medio per il gruppo osservato")
+    if "numero di giorni" in lowered_unit:
+        return _finish_sentence(f"Esprime in giorni {with_article} nel periodo osservato")
+    if "euro" in lowered_unit:
+        qualifier = "pro capite" if "pro capite" in lowered_unit else "nel perimetro medio definito dalla fonte"
+        return _finish_sentence(f"Esprime in euro {with_article}, {qualifier}")
+    if "valore medio" in lowered_unit or "numero medio" in lowered_unit:
+        return _finish_sentence(f"Riporta il valore medio di {subject} per il gruppo osservato")
+    if unit:
+        return _finish_sentence(
+            f"Esprime {with_article} nell'unità usata dalla fonte, {unit}"
+        )
+    return _finish_sentence(f"Misura {with_article}")
 
 
 def _plain_text(name, theme, archive, unit, indicator_id):
@@ -384,17 +614,76 @@ def _plain_text(name, theme, archive, unit, indicator_id):
     # riportiamo direttamente, senza alternare verbi ornamentali scelti in base
     # all'id ("racconta", "osserva", "mette a fuoco"), che rendevano le schede
     # artificiose e in alcuni casi poco grammaticali.
-    subject = _subject_from_archive(archive) or name
+    override = PLAIN_DEFINITION_OVERRIDES.get(indicator_id)
+    if override:
+        return _finish_sentence(override)
+
+    subject = _expand_terms(_subject_from_archive(archive) or name)
     subject = subject.replace("puo'", "può").replace("piu'", "più")
     if len(subject) < 8 or subject.startswith("("):
         subject = name
-    subject = subject[:1].upper() + subject[1:]
-    return subject if subject.endswith((".", "?", "!")) else f"{subject}."
+    return _finish_sentence(f"Misura {_with_article(subject)}")
 
 
-def _example_text(name, theme, lens):
-    label = _display_name(name)
-    return f"La serie confronta «{label}» tra le regioni usando la stessa definizione e la stessa unità di misura."
+def _scope_text(name, level):
+    lowered = name.lower()
+    focus = ""
+    if "femmine" in lowered or "donne" in lowered:
+        focus = " Il perimetro riguarda la popolazione femminile indicata nel nome."
+    elif "maschi" in lowered or "uomini" in lowered:
+        focus = " Il perimetro riguarda la popolazione maschile indicata nel nome."
+    elif re.search(r"\d+\s*-\s*\d+ anni|\d+ anni e più|\d+ anni e meno", lowered):
+        focus = " La fascia di età indicata nel nome fa parte della definizione e non va estesa ad altri gruppi."
+    return f"Il confronto usa la stessa definizione per tutti i {level} e per ciascun anno.{focus}"
+
+
+def _unit_explanation(name, unit):
+    lowered_name = name.lower()
+    lowered_unit = unit.lower().replace("²", "2")
+
+    if "s80/s20" in lowered_name:
+        return "Un valore di 5 significa che il reddito del 20% più ricco è cinque volte quello del 20% più povero."
+    if "rapporto tra i tassi di occupazione" in lowered_name:
+        return "Un valore di 100 indica due tassi uguali. Sotto 100, il tasso delle donne con figli è più basso."
+    if "puntegg" in lowered_unit and "standardizz" in lowered_unit:
+        return "È un punteggio riportato su una scala comune: serve per confrontare territori e anni, non come conteggio assoluto."
+    if "standardizz" in lowered_unit or "standardizz" in lowered_name:
+        return "Il tasso è corretto per rendere più confrontabili territori con una diversa struttura della popolazione."
+    if re.search(r"(^|\s)%($|\s)", lowered_unit) or "percentual" in lowered_unit or "per 100 " in lowered_unit:
+        return "Un valore di 20 indica che la misura equivale al 20% del totale definito dalla fonte."
+
+    per_match = re.search(
+        r"per\s+(1[\. ]?000|10[\. ]?000|100[\. ]?000|milione)\s+(.+)",
+        lowered_unit,
+    )
+    if per_match:
+        raw_base = per_match.group(1).replace(".", "").replace(" ", "")
+        base = "1.000.000" if raw_base == "milione" else f"{int(raw_base):,}".replace(",", ".")
+        denominator = per_match.group(2).strip()
+        return f"Un valore di 12 corrisponde a 12 casi ogni {base} {denominator}."
+    if "m2 per abitante" in lowered_unit or "metri quadrati per abitante" in lowered_unit:
+        return "Il valore indica quanti metri quadrati sono disponibili in media per ogni abitante."
+    if "per abitante" in lowered_unit or "pro capite" in lowered_unit:
+        return "Il totale è diviso per il numero di abitanti, così territori grandi e piccoli sono più confrontabili."
+    if "per km" in lowered_unit or "per chilometro quadrato" in lowered_unit:
+        return "Il valore rapporta il fenomeno alla superficie del territorio, non al numero di abitanti."
+    if "euro" in lowered_unit:
+        if "prezzi correnti" in lowered_unit:
+            return "Sono euro dell'anno osservato, non corretti per l'inflazione."
+        return "Il valore è espresso in euro e va letto nel perimetro medio o pro capite indicato nel nome."
+    if "anno" in lowered_unit or "anni" in lowered_unit:
+        return "Il valore indica un numero medio di anni, non la durata garantita per ogni persona."
+    if "giorn" in lowered_unit:
+        return "Il valore conta i giorni associati al fenomeno nel periodo osservato."
+    if "puntegg" in lowered_unit or "valore medio" in lowered_unit or "numero indice" in lowered_unit:
+        return "È un punteggio sintetico: serve soprattutto per confrontare territori e anni sulla stessa scala."
+    if "rapporto" in lowered_unit or "numero puro" in lowered_unit:
+        return "È un rapporto tra due quantità, non una percentuale o un conteggio di persone."
+    if any(token in lowered_unit for token in ("milioni", "migliaia", "tonnellate", "quintali", "gwh")):
+        return "È un valore assoluto o di intensità: la dimensione del territorio e dell'economia può influire sul confronto."
+    if unit:
+        return f"La fonte esprime il dato in {unit}. Il confronto è valido solo usando la stessa unità e lo stesso perimetro."
+    return "La fonte non specifica un'unità leggibile: il valore va interpretato insieme alla definizione originale."
 
 
 def _reading_text(name, theme, unit, direction=None):
@@ -453,24 +742,76 @@ def _caveat_text(name, theme, lens):
     return THEME_CAVEATS.get(theme, "Va letto insieme ad altri indicatori dello stesso tema, per evitare conclusioni troppo rapide.")
 
 
+def _bes_caveat(unit, level):
+    lowered = unit.lower()
+    if any(token in lowered for token in ("milioni", "migliaia", "tonnellate", "quintali")):
+        first = "Il valore assoluto risente della dimensione demografica ed economica del territorio. "
+    elif "medio" in lowered or "media" in lowered:
+        first = "La media può nascondere differenze importanti tra persone e aree dello stesso territorio. "
+    elif "%" in lowered or "percentual" in lowered:
+        first = "La percentuale non mostra da sola quante persone o unità siano coinvolte in valore assoluto. "
+    else:
+        first = "Il dato va letto insieme a unità di misura, anno e copertura. "
+    return first + f"Il confronto tra {level} descrive una differenza osservata, ma non ne dimostra le cause."
+
+
 def _subject_from_archive(archive):
     if not archive:
         return ""
-    text = archive.strip().rstrip(".")
+    text = re.sub(r"^TAVOLA DISMESSA\s*-\s*", "", archive.strip().rstrip("."), flags=re.I)
     text = re.sub(r"\s*\([^)]*percentuale[^)]*\)\s*$", "", text, flags=re.I)
     text = re.sub(r"\s*\([^)]*valori?[^)]*\)\s*$", "", text, flags=re.I)
     text = re.sub(r"\s+", " ", text)
     if text.lower() in {
         "percentuale",
         "numero",
+        "valori percentuali",
         "punteggio standardizzato",
         "punteggio standadizzato",
         "giornate",
     }:
         return ""
+    if re.fullmatch(r"per (mille|centomila|[\d.]+) (abitanti|persone|occupati)", text, flags=re.I):
+        return ""
     if not text:
         return ""
     return text[0].lower() + text[1:]
+
+
+def _expand_terms(text):
+    expanded = text
+    for pattern, replacement in _TERM_REPLACEMENTS:
+        expanded = re.sub(pattern, replacement, expanded, flags=re.I)
+    return re.sub(r"\s+", " ", expanded).strip()
+
+
+def _with_article(text):
+    value = text.strip().rstrip(".")
+    if not value:
+        return "il fenomeno descritto"
+    first = re.sub(r"[^a-zA-Zàèéìòóù0-9]", "", value.split()[0]).lower()
+    lowered = value[:1].lower() + value[1:]
+    if first in _FEMININE_SINGULAR:
+        return f"l'{lowered}" if first[0] in "aeiou" else f"la {lowered}"
+    if first in _MASCULINE_SINGULAR:
+        return f"l'{lowered}" if first[0] in "aeiou" else f"il {lowered}"
+    if first in _FEMININE_PLURAL:
+        return f"le {lowered}"
+    if first in _MASCULINE_PLURAL_GLI:
+        return f"gli {lowered}"
+    if first in _MASCULINE_PLURAL_I:
+        return f"gli {lowered}" if first[0] in "aeiou" else f"i {lowered}"
+    if first == "altri":
+        return f"gli {lowered}"
+    return lowered
+
+
+def _finish_sentence(text):
+    value = " ".join((text or "").split()).strip()
+    if not value:
+        return ""
+    value = value[:1].upper() + value[1:]
+    return value if value.endswith((".", "?", "!")) else f"{value}."
 
 
 def _display_name(name):

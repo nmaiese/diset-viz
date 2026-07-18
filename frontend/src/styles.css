@@ -427,6 +427,15 @@ h1, h2, h3 { font-family: var(--font-display); }
   color: var(--ink);
   overflow-wrap: anywhere;
 }
+.index-row__description {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
 
 .coverage { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
 .coverage__pill {

@@ -131,6 +131,7 @@ def _clue_fields(item):
         "theme": item["theme"],
         "macro_area": item["macro_area"],
         "unit": item["unit"],
+        "description": item.get("description", ""),
         "year": item["year"],
         "value": item["value"],
         "rank": item["rank"],
@@ -221,6 +222,7 @@ def _recap_entry(clue):
         "value": clue["value"],
         "national_avg": round(national_avg, 3) if national_avg is not None else None,
         "path": profiles.indicator_path(clue["id"], clue["name"]),
+        "description": clue.get("description", ""),
     }
 
 

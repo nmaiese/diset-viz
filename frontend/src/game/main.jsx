@@ -463,6 +463,7 @@ function GameApp() {
                     <span className="clue-index">Indizio {i + 1}</span>
                     <h3>{clue.name}</h3>
                     <p className="clue-meta">{clue.macro_area} · {clue.theme}</p>
+                    {clue.description && <p className="clue-description">{clue.description}</p>}
                     <SourceStrip year={clue.year} sourceLabel={clue.source_label} sourceUrl={clue.source_url} />
                     <div className="clue-stats">
                       <span className="clue-value">{formatValue(clue.value, clue.unit)}</span>

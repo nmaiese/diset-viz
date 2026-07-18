@@ -521,7 +521,11 @@ def search_indicators(query="", theme=None, limit=50):
     for item in get_catalog()["indicators"]:
         if theme and item["theme"] != theme:
             continue
-        haystack = _normalize_search(f"{item['name']} {item['theme']} {item['archive']}")
+        explain = item.get("explain") or {}
+        haystack = _normalize_search(
+            f"{item['name']} {item['theme']} {item['archive']} "
+            f"{explain.get('plain', '')} {explain.get('example', '')}"
+        )
         if query and query not in haystack:
             continue
         results.append(item)

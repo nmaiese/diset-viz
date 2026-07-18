@@ -12,6 +12,7 @@ import unicodedata
 
 from app.bes_data import BES_SOURCE_URLS, bes_indicator_path, get_bes_manifest, get_bes_rows
 from app.data import REGION_ORDER, get_catalog, get_indicator
+from app.indicator_notes import build_bes_indicator_explain
 from app.profiles import indicator_path, slugify
 from app.quality_life_config import QUALITY_LIFE_CATEGORIES
 from app.quality_life_selection import regional_quality_life_selection
@@ -44,23 +45,7 @@ def _bes_raw_id(indicator_id):
 
 
 def _bes_explain(info):
-    direction = info["direction"]
-    if direction == "higher_better":
-        reading = "A parità di condizioni, un valore più alto descrive un esito più favorevole."
-    elif direction in {"lower_better", "higher_worse"}:
-        reading = "A parità di condizioni, un valore più basso descrive un esito più favorevole."
-    else:
-        reading = "Il dato descrive il territorio, ma non stabilisce da solo quale regione stia meglio."
-    return {
-        "plain": f"È un indicatore del dominio BES «{info['domain_name']}» pubblicato da Istat.",
-        "example": "Esempio: confronta il valore regionale con le altre regioni e con la serie storica.",
-        "reading": reading,
-        "caveat": (
-            "Il confronto va letto insieme a unità di misura, anno e copertura. "
-            "Una media regionale può nascondere differenze interne al territorio."
-        ),
-        "direction": direction,
-    }
+    return info.get("explain") or build_bes_indicator_explain(info, "territori regionali")
 
 
 def _national_average(rows, years):
@@ -384,11 +369,13 @@ def search_atlas_indicators(query="", theme=None, limit=50):
     for item in get_atlas_catalog()["indicators"]:
         if theme and item["theme"] != theme:
             continue
+        explain = item.get("explain") or {}
         haystack = " ".join(
             unicodedata.normalize(
                 "NFKD",
                 f"{item['name']} {item['theme']} {item.get('source_theme', '')} "
-                f"{item.get('archive', '')} {item['catalog_family_label']}",
+                f"{item.get('archive', '')} {item['catalog_family_label']} "
+                f"{explain.get('plain', '')} {explain.get('example', '')}",
             ).encode("ascii", "ignore").decode("ascii").lower().split()
         )
         if query and query not in haystack:

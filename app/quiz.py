@@ -72,10 +72,7 @@ def _bes_region_payload(indicator_id, year):
             "year": year,
             "source_label": "Istat, BES nazionale",
             "source_url": BES_SOURCE_URLS["regione"],
-            "description": (
-                f"Indicatore del Benessere equo e sostenibile nel dominio "
-                f"{info['domain_name']}."
-            ),
+            "description": info["explain"]["plain"],
             "path": bes_indicator_path(raw_id, info["name"]),
         },
         "values": values,
@@ -157,9 +154,8 @@ def _quiz_indicators():
 
 
 def _indicator_fields(entry):
-    # Fonte e anno non rivelano nulla sul confronto/ordinamento: possono stare
-    # nel round. La descrizione invece si mostra solo alla risposta, per
-    # mantenere il momento di scoperta.
+    # La spiegazione chiarisce la metrica senza rivelare valori o ordinamento,
+    # quindi può accompagnare la domanda fin dall'inizio del round.
     return {
         "id": entry["id"],
         "name": entry["name"],
@@ -170,6 +166,7 @@ def _indicator_fields(entry):
         "year": entry["year"],
         "source_label": entry["source_label"],
         "source_url": entry["source_url"],
+        "description": entry["description"],
     }
 
 

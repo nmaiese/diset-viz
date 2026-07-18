@@ -252,6 +252,9 @@ export default function CompareApp() {
               sourceLabel={round.indicator.source_label}
               sourceUrl={round.indicator.source_url}
             />
+            {round.indicator.description && (
+              <p className="quiz-description">{round.indicator.description}</p>
+            )}
           </div>
 
           <div className="compare-timer" role="presentation">
@@ -298,9 +301,6 @@ export default function CompareApp() {
                   {result[result.winner].region} ha il valore più alto.
                   {!result.correct && streak === 0 && stats.bestStreak > 0 && " Serie azzerata."}
                 </p>
-                {result.indicator.description && (
-                  <p className="quiz-description">{result.indicator.description}</p>
-                )}
               </>
             )}
           </div>

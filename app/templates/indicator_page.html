@@ -74,6 +74,15 @@
     <span><small>Download</small><a href="/download/indicator/{{ meta.id }}.csv">CSV</a> · <a href="/download/indicator/{{ meta.id }}.json">JSON</a></span>
   </div>
 
+  <section class="prose indicator-definition">
+    <h2>Che cosa misura questo indicatore</h2>
+    <p>{{ explain.plain }}</p>
+    <p><strong>In pratica.</strong> {{ explain.example }}</p>
+    <p><strong>Perimetro del confronto.</strong> {{ explain.scope }}</p>
+    <p><strong>Come leggere valori e classifica.</strong> {{ explain.reading }}</p>
+    <p class="page-caveat"><strong>Che cosa non dice.</strong> {{ explain.caveat }}</p>
+  </section>
+
   {% if best and worst %}
   <section class="indicator-insight">
     <div class="indicator-insight__item is-best">
@@ -151,21 +160,17 @@
   {% endif %}
 
   <details class="indicator-accordion">
-    <summary>Cos'è questo indicatore?</summary>
+    <summary>Approfondisci dati e divari territoriali</summary>
     <section class="prose">
       <p class="data-callout"><strong>Dato più recente: {{ year }}.</strong>{% if meta.year_min != meta.year_max %} La serie storica copre il periodo {{ meta.year_min }}-{{ meta.year_max }}.{% endif %}</p>
-      <p>{{ explain.example }}</p>
       {% if meta.external_sources %}
       <p class="page-note">Layer esterno collegato: {{ meta.external_sources | join(', ') }}{% if meta.external_year_max %}, ultimo anno normalizzato {{ meta.external_year_max }}{% endif %}.</p>
       {% endif %}
-      <p>{{ explain.reading }}</p>
       {% if best and worst %}
       <p>Nel {{ year }} la posizione migliore è di <a href="/regione/{{ best.region_key }}">{{ best.region }}</a>
         ({{ best.value | it_num(2) }} {{ meta.unit }}), mentre <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a>
         segna il dato più sfavorevole ({{ worst.value | it_num(2) }} {{ meta.unit }}).</p>
       {% endif %}
-      <p class="page-caveat">{{ explain.caveat }}</p>
-
       {% if stats.year_avg is not none or stats.gap_abs is not none %}
       <h2>Il quadro nazionale nel {{ year }}</h2>
       {% if stats.year_avg is not none %}

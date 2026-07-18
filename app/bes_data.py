@@ -12,6 +12,7 @@ from pathlib import Path
 
 from app.cache import cache
 from app.data import _parse_number
+from app.indicator_notes import build_bes_indicator_explain
 from app.profiles import region_key_for, slugify
 from app.taxonomy import CANONICAL_CATEGORIES, category_for_indicator, category_path
 
@@ -45,19 +46,53 @@ def _trim_words(text, limit):
     return cut or text[:limit].rstrip(" ,.;:-")
 
 
-def bes_seo_title(name, site_name):
-    suffix = f" | {site_name}"
-    if len(name) + len(suffix) <= 60:
-        return f"{name}{suffix}"
-    if len(name) <= 60:
-        return name
-    return _trim_words(name, 60)
+def _trim_name_preserving_tail(text, limit):
+    if len(text) <= limit:
+        return text
+    words = text.split()
+    tail = " ".join(words[-2:]).rstrip(" ,.;:-")
+    separator = ": "
+    head = _trim_words(text, limit - len(separator) - len(tail))
+    if head and tail.lower() not in head.lower():
+        return f"{head}{separator}{tail}"
+    return _trim_words(text, limit)
 
 
-def bes_seo_description(name):
-    prefix = "Dati BES Istat su "
-    suffix = ": valori per regioni e province, anno, unità, copertura e direzione."
-    return f"{prefix}{_trim_words(name, 155 - len(prefix) - len(suffix))}{suffix}"
+def bes_territory_label(indicator):
+    levels = set(indicator.get("levels") or {})
+    if levels == {"regione", "provincia"}:
+        return "regioni e province"
+    if levels == {"provincia"}:
+        return "province"
+    return "regioni"
+
+
+def bes_seo_title(name, site_name, territory_label="territori"):
+    topic_suffix = f": BES {territory_label}"
+    brand_suffix = f" | {site_name}"
+    candidate = f"{name}{topic_suffix}"
+    if len(candidate) + len(brand_suffix) <= 60:
+        return candidate + brand_suffix
+    if len(candidate) <= 60:
+        return candidate
+    return f"{_trim_name_preserving_tail(name, 60 - len(topic_suffix))}{topic_suffix}"
+
+
+def bes_seo_description(name, plain="", territory_label="regioni e province"):
+    body = (plain or "Consulta valori e significato dell'indicatore").strip()
+    body = body if body.endswith(".") else f"{body}."
+    suffix = f" Dati BES Istat per {territory_label}."
+    if len(body) + len(suffix) <= 155:
+        return body + suffix
+
+    fixed = f": cosa misura, unità e confronto tra {territory_label}. Dati BES Istat."
+    concise_name = {
+        "Rapporto tra i tassi di occupazione (25-49 anni) delle donne con figli in età prescolare e delle donne senza figli": (
+            "Occupazione delle donne con figli piccoli e senza figli"
+        ),
+    }.get(name, name)
+    label = _trim_name_preserving_tail(concise_name, 155 - len(fixed))
+    return f"{label}{fixed}"
 
 
 def _paths(level):
@@ -113,7 +148,7 @@ def get_bes_manifest(level):
             category = proposed if proposed in CANONICAL_CATEGORIES else category_for_indicator(
                 row["id"], row["domain_name"]
             )
-            manifest[row["id"]] = {
+            item = {
                 "id": row["id"],
                 "name": row["name"],
                 "domain": row["domain"],
@@ -127,6 +162,11 @@ def get_bes_manifest(level):
                 "year_max": int(row["year_max"]),
                 "coverage_latest": float(row.get("coverage_latest", 0) or 0),
             }
+            item["explain"] = build_bes_indicator_explain(
+                item,
+                "regioni" if level == "regione" else "province",
+            )
+            manifest[row["id"]] = item
     return manifest
 
 

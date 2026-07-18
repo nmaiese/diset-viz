@@ -890,6 +890,9 @@ function IndexRow({ item, onOpen }) {
             {item.theme}{item.source_theme && item.source_theme !== item.theme ? ` · ${item.source_theme}` : ""} · {item.catalog_family_label}
           </small>
           <strong className="index-row__name">{item.name}</strong>
+          {item.explain?.plain && (
+            <span className="index-row__description">{item.explain.plain}</span>
+          )}
           <CoverageBadge item={item} />
         </span>
         <span className="index-row__spark">
@@ -1562,7 +1565,8 @@ function IndicatorHeader({ metadata, regionCount }) {
 
 function IndicatorExplain({ explain }) {
   const detailRows = [
-    ["Esempio", explain.example?.replace(/^Esempio:\s*/, "")],
+    ["In pratica", explain.example],
+    ["Perimetro", explain.scope],
     ["Come leggerlo", explain.reading],
     ["Attenzione", explain.caveat],
   ].filter(([, value]) => value);
@@ -1579,7 +1583,7 @@ function IndicatorExplain({ explain }) {
       )}
       {!!detailRows.length && (
         <details className="indicator-explain__details">
-          <summary>Leggi esempio e avvertenze</summary>
+          <summary>Capisci unità, perimetro e limiti</summary>
           <div>
             {detailRows.map(([label, value]) => (
               <p key={label}>

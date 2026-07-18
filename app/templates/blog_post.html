@@ -30,6 +30,12 @@
   "author": { "@type": "Organization", "name": {{ post.author | tojson }} },
   "publisher": { "@type": "Organization", "name": {{ site_name | tojson }} },
   "mainEntityOfPage": { "@type": "WebPage", "@id": {{ canonical | tojson }} },
+  {% if post.indicator_meta %}"about": {
+    "@type": "Thing",
+    "name": {{ post.indicator_meta.name | tojson }},
+    "description": {{ post.indicator_meta.explain.plain | tojson }},
+    "url": {{ (site_url ~ post.indicator_path) | tojson }}
+  },{% endif %}
   "isAccessibleForFree": true
 }
 </script>
@@ -69,13 +75,21 @@
   <div class="prose prose-wrap">
     {{ post.body_html | safe }}
 
-    {% if post.indicator %}
+    {% if post.indicator_meta %}
+    <section class="article-indicator-explain">
+      <h2>L'indicatore in parole semplici</h2>
+      <p><strong>{{ post.indicator_meta.name }}.</strong> {{ post.indicator_meta.explain.plain }}</p>
+      <p><strong>In pratica.</strong> {{ post.indicator_meta.explain.example }}</p>
+      <p><strong>Come si legge.</strong> {{ post.indicator_meta.explain.reading }}</p>
+      <p class="page-caveat"><strong>Limite.</strong> {{ post.indicator_meta.explain.caveat }}</p>
+    </section>
+
     <aside class="indicator-cta">
       <span>
         <small>Esplora i dati</small>
         <strong>{{ post.indicator_label or 'Apri questo indicatore nell\'atlante' }}</strong>
       </span>
-      {% if post.indicator_path %}<a href="{{ post.indicator_path }}">Scheda indicatore →</a>{% endif %}
+      <a href="{{ post.indicator_path }}">Scheda indicatore →</a>
       <a href="/?indicator={{ post.indicator }}">Apri nell'atlante →</a>
     </aside>
     {% endif %}

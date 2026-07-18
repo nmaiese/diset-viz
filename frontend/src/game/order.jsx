@@ -211,6 +211,9 @@ export default function OrderApp() {
               sourceLabel={round.indicator.source_label}
               sourceUrl={round.indicator.source_url}
             />
+            {round.indicator.description && (
+              <p className="quiz-description">{round.indicator.description}</p>
+            )}
           </div>
 
           <div className={`order-cards order-cards--${round.count}`}>
@@ -288,9 +291,6 @@ export default function OrderApp() {
 
           {status === "revealed" && result && (
             <>
-              {result.indicator.description && (
-                <p className="quiz-description">{result.indicator.description}</p>
-              )}
               <div className="order-solution">
                 <h3>La classifica reale</h3>
                 <ol>

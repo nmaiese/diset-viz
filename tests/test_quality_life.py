@@ -6,6 +6,7 @@ from app.bes_data import (
     all_bes_indicators,
     bes_seo_description,
     bes_seo_title,
+    bes_territory_label,
     get_bes_manifest,
     has_bes_data,
 )
@@ -79,7 +80,7 @@ class QualityLifeStaticTest(unittest.TestCase):
         page = client.get(sample["path"])
         self.assertEqual(page.status_code, 200)
         self.assertIn("Densità di verde storico".encode("utf-8"), page.data)
-        self.assertIn("valore più alto è considerato favorevole".encode("utf-8"), page.data)
+        self.assertIn("valore più alto occupa la posizione migliore".encode("utf-8"), page.data)
 
         sparse = next(item for item in indicators if item["id"] == "06POL001P")
         sparse_page = client.get(sparse["path"])
@@ -107,9 +108,17 @@ class QualityLifeStaticTest(unittest.TestCase):
         self.assertEqual(region["08BSO001"]["category"], "benessere_soggettivo")
 
     def test_bes_metadata_stays_within_serp_budgets(self):
+        titles = []
         for item in all_bes_indicators():
-            self.assertLessEqual(len(bes_seo_title(item["name"], "Divario Italia")), 60)
-            self.assertLessEqual(len(bes_seo_description(item["name"])), 155)
+            territory_label = bes_territory_label(item)
+            title = bes_seo_title(item["name"], "Divario Italia", territory_label)
+            titles.append(title)
+            self.assertLessEqual(len(title), 60)
+            self.assertLessEqual(
+                len(bes_seo_description(item["name"], item["explain"]["plain"], territory_label)),
+                155,
+            )
+        self.assertEqual(len(titles), len(set(titles)))
 
     def test_sparse_latest_years_do_not_enter_the_score(self):
         for level in ("regione", "provincia"):

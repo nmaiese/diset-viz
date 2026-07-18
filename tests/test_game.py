@@ -325,8 +325,8 @@ class QuizCompareTest(unittest.TestCase):
         self.assertEqual(payload["difficulty"], 2)
         self.assertNotEqual(payload["region_a"]["region_key"], payload["region_b"]["region_key"])
         self.assertNotIn('"value"', json.dumps(payload))
-        # La descrizione si rivela solo alla risposta, non nel round.
-        self.assertNotIn("description", payload["indicator"])
+        # La spiegazione non rivela i valori e accompagna subito la domanda.
+        self.assertTrue(payload["indicator"]["description"])
 
     def test_compare_rounds_use_core_indicators_with_distinct_values(self):
         from app import quiz
@@ -469,7 +469,7 @@ class QuizOrderTest(unittest.TestCase):
             self.assertNotIn('"value"', json.dumps(payload))
             for field in ("source_label", "source_url"):
                 self.assertIn(field, payload["indicator"])
-            self.assertNotIn("description", payload["indicator"])
+            self.assertTrue(payload["indicator"]["description"])
 
         for bad in ("2", "6", "x", ""):
             self.assertEqual(client.get(f"/api/game/order/round?count={bad}").status_code, 400, bad)

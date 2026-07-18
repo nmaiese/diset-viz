@@ -12,13 +12,14 @@
 {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  "name": {{ indicator.name | tojson }},
-  "description": {{ ('Valori territoriali dell’indicatore BES Istat «' ~ indicator.name ~ '» per regioni e province italiane.') | tojson }},
+  "name": {{ (indicator.name ~ ' per ' ~ territory_label) | tojson }},
+  "description": {{ (indicator.explain.plain ~ ' ' ~ indicator.explain.reading) | tojson }},
   "url": {{ canonical | tojson }},
   "temporalCoverage": "{{ indicator.year_min }}/{{ indicator.year_max }}",
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": { "@type": "Organization", "name": "Istat", "url": {{ indicator.source_url | tojson }} },
   "isBasedOn": {{ indicator.source_url | tojson }},
+  "variableMeasured": {{ indicator.name | tojson }},
   "isAccessibleForFree": true,
   "license": "https://creativecommons.org/licenses/by/3.0/it/"
 }
@@ -40,7 +41,7 @@
 <article class="page page-indicator wrap">
   <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a> / <a href="/qualita-della-vita/metodologia#indicatori-bes">Indicatori BES</a></nav>
   <h1>{{ indicator.name }}</h1>
-  <p class="page-lead">Indicatore BES Istat nella categoria <strong>{{ indicator.category_name }}</strong>. Il dominio originale della fonte è {{ indicator.domain_name }}. La scheda raccoglie gli ultimi dati disponibili per regioni e province senza mescolare anni diversi.</p>
+  <p class="page-lead">{{ indicator.explain.plain }}</p>
   {% if not indicator.indexable %}
   <p class="page-note">La scheda è consultabile ma non viene proposta ai motori di ricerca: nell'ultimo anno la copertura è inferiore all'80% sia per le regioni sia per le province.</p>
   {% endif %}
@@ -53,16 +54,13 @@
     <span><small>Fonte</small><a href="{{ indicator.source_url }}" target="_blank" rel="noopener">Istat, sistema BES</a></span>
   </div>
 
-  <section class="prose">
-    <h2>Come si legge</h2>
-    {% if indicator.direction == 'higher_better' %}
-    <p>Per questo indicatore un valore più alto è considerato favorevole. Le tabelle partono quindi dal territorio con il valore maggiore.</p>
-    {% elif indicator.direction in ('lower_better', 'higher_worse') %}
-    <p>Per questo indicatore un valore più basso è considerato favorevole. Le tabelle partono quindi dal territorio con il valore minore.</p>
-    {% else %}
-    <p>L'indicatore è contestuale: un valore più alto descrive una maggiore intensità del fenomeno, ma non identifica da solo un territorio migliore.</p>
-    {% endif %}
-    <p>La direzione serve a ordinare i dati e, quando è definita, a costruire il punteggio della qualità della vita. Non sostituisce l'interpretazione del contesto territoriale.</p>
+  <section class="prose indicator-definition">
+    <h2>Che cosa rappresenta il dato</h2>
+    <p><strong>In pratica.</strong> {{ indicator.explain.example }}</p>
+    <p><strong>Perimetro del confronto.</strong> {{ indicator.explain.scope }}</p>
+    <p><strong>Come si legge.</strong> {{ indicator.explain.reading }}</p>
+    <p class="page-caveat"><strong>Che cosa non dice.</strong> {{ indicator.explain.caveat }}</p>
+    <p>L'indicatore appartiene alla categoria <a href="{{ indicator.category_path }}">{{ indicator.category_name }}</a> e al dominio BES {{ indicator.domain_name }}. La direzione serve a ordinare i dati e, quando è definita, a costruire il punteggio della qualità della vita. Non sostituisce l'interpretazione del contesto territoriale.</p>
   </section>
 
   {% for level in indicator.level_payloads %}

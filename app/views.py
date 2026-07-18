@@ -185,10 +185,11 @@ def blog_post(slug):
         abort(404)
     post = dict(post)
     if post.get("indicator"):
-        indicator_payload = get_indicator(post["indicator"])
+        indicator_payload = get_atlas_indicator(post["indicator"])
         if indicator_payload:
             meta = indicator_payload["metadata"]
-            post["indicator_path"] = profiles.indicator_path(post["indicator"], meta["name"])
+            post["indicator_path"] = meta["path"]
+            post["indicator_meta"] = meta
     related = [p for p in get_posts() if p["slug"] != slug][:3]
     return render_template(
         "blog_post.html",
@@ -267,7 +268,12 @@ def indicator_page(slug):
         map_colors=map_colors,
         spark_points=spark_points,
         seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
-        seo_description=indicator_notes.seo_description(plain, meta["year_max"], len(meta["regions"])),
+        seo_description=indicator_notes.seo_description(
+            plain,
+            meta["year_max"],
+            len(meta["regions"]),
+            name=meta["name"],
+        ),
         theme_path=profiles.theme_path(meta["theme"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
@@ -579,11 +585,17 @@ def quality_life_indicator(indicator_id, slug):
     canonical_path = bes_data.bes_indicator_path(indicator_id, indicator["name"])
     if request.path != canonical_path:
         return redirect(canonical_path, code=301)
+    territory_label = bes_data.bes_territory_label(indicator)
     response = make_response(render_template(
         "quality_life_indicator.html",
         indicator=indicator,
-        seo_title=bes_data.bes_seo_title(indicator["name"], SITE_NAME),
-        seo_description=bes_data.bes_seo_description(indicator["name"]),
+        territory_label=territory_label,
+        seo_title=bes_data.bes_seo_title(indicator["name"], SITE_NAME, territory_label),
+        seo_description=bes_data.bes_seo_description(
+            indicator["name"],
+            indicator["explain"]["plain"],
+            territory_label,
+        ),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{canonical_path}",
