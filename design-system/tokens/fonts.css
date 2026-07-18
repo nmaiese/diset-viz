@@ -1,0 +1,13 @@
+/* Divario Italia — webfonts
+ * The atlas loads three Google Fonts via <link>: Archivo (display),
+ * Inter (body), Space Mono (mono), each with a system-font fallback.
+ * We import the same three families from Google Fonts so consumers get
+ * the exact type the product ships. */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
+
+:root {
+  /* Family stacks (mirror frontend/src/styles.css) */
+  --font-display: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}

@@ -1,0 +1,8 @@
+/* Divario Italia — design system entry point.
+ * Consumers link THIS one file. It is an @import manifest only; every
+ * token and @font-face lives in the files below. Order: fonts first so the
+ * family stacks resolve, then color, type, spacing/layout. */
+@import "tokens/fonts.css";
+@import "tokens/colors.css";
+@import "tokens/typography.css";
+@import "tokens/spacing.css";

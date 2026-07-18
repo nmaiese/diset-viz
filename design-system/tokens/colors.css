@@ -1,0 +1,36 @@
+/* Divario Italia — color system
+ * Cartographic identity, verbatim from frontend/src/styles.css and
+ * app/static/css/site.css. Navy ink on warm paper, a single hot accent,
+ * hairline navy-tinted lines. Do not introduce new hues. */
+:root {
+  /* --- Base palette --- */
+  --paper: #fbfaf7;   /* app background, warm off-white */
+  --panel: #ffffff;   /* cards, surfaces raised off the paper */
+  --ink: #15233b;     /* primary text, dark navy */
+  --ink-soft: #2b3a55;/* secondary text, lighter navy */
+  --muted: #6b7785;   /* tertiary text, labels, captions */
+  --accent: #e4572e;  /* single brand accent, terracotta/vermilion */
+  --accent-soft: rgba(228, 87, 46, 0.12); /* accent wash / highlight fills */
+
+  /* --- Hairlines & grids (navy at low alpha) --- */
+  --line: rgba(21, 35, 59, 0.16); /* borders, dividers */
+  --grid: rgba(21, 35, 59, 0.09); /* faint gridlines, bar tracks, table zebra */
+
+  /* --- Semantic status (used on quality-of-life + region movement) --- */
+  --positive: #2f8f5b;      /* gains / "in crescita" / strong themes */
+  --positive-ink: #226e44;  /* positive text on paper */
+  --positive-soft: #8fe3b0; /* positive on dark tooltip */
+  --negative: var(--accent);/* losses reuse the accent */
+  --negative-soft: #ffb59e; /* negative on dark tooltip */
+
+  /* --- Choropleth (sequential navy ramp) --- */
+  --map-ramp-from: #e7ecf3; /* low end of the sequential scale */
+  --map-ramp-to: #15233b;   /* high end == ink */
+  --map-missing: #e2e0d8;   /* no data for the selected year */
+
+  /* --- Elevation --- */
+  --shadow: 0 16px 44px rgba(21, 35, 59, 0.10);
+  --shadow-tooltip: 0 6px 22px rgba(21, 35, 59, 0.25);
+
+  color-scheme: light;
+}

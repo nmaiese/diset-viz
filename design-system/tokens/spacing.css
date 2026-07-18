@@ -1,0 +1,47 @@
+/* Divario Italia — spacing, radii, borders, layout
+ * The product is emphatically square: borders are 1px hairlines, corners
+ * are NOT rounded (border-radius: 0) except the pill toggle. Surfaces are
+ * separated by hairlines and shadow, never by rounding. */
+:root {
+  /* --- Spacing scale (px) --- */
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 8px;
+  --space-4: 10px;
+  --space-5: 12px;
+  --space-6: 14px;
+  --space-7: 16px;
+  --space-8: 18px;
+  --space-9: 20px;
+  --space-10: 22px;
+  --space-12: 28px;
+  --space-14: 32px;
+  --space-16: 40px;
+  --space-20: 48px;
+  --space-24: 64px;
+
+  /* --- Fluid page gutter --- */
+  --gutter: clamp(16px, 4vw, 48px); /* @kind spacing */
+
+  /* --- Content widths --- */
+  --measure-prose: 760px; /* @kind spacing */ /* article/blog column max */
+  --measure-wide: 1180px; /* @kind spacing */ /* page shell max (hero, hub, presentation wrappers) */
+
+  /* --- Radii (the brand is square) --- */
+  --radius-0: 0;      /* default: everything is a crisp rectangle */
+  --radius-pill: 999px;/* the ONE exception: the on/off toggle knob */
+
+  /* --- Borders --- */
+  --border-hairline: 1px solid var(--line);
+  --border-grid: 1px solid var(--grid);
+  --border-width: 1px;
+
+  /* --- Accent rules (left borders on callouts / insights) --- */
+  --rule-accent: 3px solid var(--accent);
+
+  /* --- Motion --- */
+  --ease: ease; /* @kind other */
+  --dur-fast: 120ms; /* @kind other */
+  --dur: 140ms; /* @kind other */
+  --dur-slow: 240ms; /* @kind other */
+}

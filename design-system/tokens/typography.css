@@ -1,0 +1,45 @@
+/* Divario Italia — typography scale
+ * Three roles: Archivo display (tight, heavy headlines), Inter body,
+ * Space Mono for eyebrows, labels, numbers and metadata. Editorial and
+ * cartographic: big weighted headers, uppercase mono kickers with
+ * generous letter-spacing, tabular numbers in mono. */
+:root {
+  /* --- Fluid display sizes (clamp: min / preferred / max) --- */
+  --text-hero: clamp(38px, 6.4vw, 76px);      /* atlas hero H1, weight 800, lh .98 */
+  --text-hero-blog: clamp(34px, 5.5vw, 62px); /* blog listing hero */
+  --text-title: clamp(30px, 4.6vw, 50px);     /* article / landing page H1 */
+  --text-h2: 27px;                            /* section headline (indicator panel) */
+  --text-h3: 21px;                            /* card title */
+  --text-lead: clamp(16px, 1.7vw, 19px);      /* hero standfirst / intro */
+
+  /* --- Fixed sizes --- */
+  --text-prose: 17px;   /* long-form article body */
+  --text-body: 15px;    /* default UI text */
+  --text-body-lg: 16px; /* search input, comfortable reading */
+  --text-sm: 13.5px;    /* meta, footnotes, nav */
+  --text-xs: 12px;      /* mono labels, coverage pills */
+  --text-xxs: 11px;     /* smallest eyebrow / pill mono */
+
+  /* --- Weights --- */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 800; /* headline display weight */
+
+  /* --- Line heights --- */
+  --leading-tight: 0.98; /* huge display headlines */
+  --leading-snug: 1.1;   /* headings */
+  --leading-normal: 1.45;/* leads */
+  --leading-body: 1.6;   /* prose */
+
+  /* --- Tracking --- */
+  --tracking-display: -0.015em; /* negative on big headlines */
+  --tracking-tight: -0.01em;
+  --tracking-eyebrow: 0.08em;   /* uppercase mono kickers */
+  --tracking-label: 0.06em;     /* uppercase mono labels */
+
+  /* --- Semantic aliases --- */
+  --eyebrow-font: var(--font-mono);
+  --eyebrow-transform: uppercase; /* @kind other */
+}
