@@ -12,6 +12,7 @@ Solo il pool di indicatori idonei è memoizzato. Le funzioni di round NON
 vanno memoizzate: devono variare a ogni chiamata.
 """
 
+import math
 import random
 
 from app.cache import cache
@@ -39,7 +40,7 @@ MAX_DIFFICULTY = 4
 _DIFFICULTY_GAP_RATIO = {0: (0.63, 1.0), 1: (0.42, 0.58), 2: (0.26, 0.37), 3: (0.16, 0.21), 4: (0.05, 0.11)}
 # Il pool richiede almeno questo numero di valori distinti nell'anno più
 # recente, così lo stesso pool serve anche l'ordinamento a 5 senza pareggi.
-_MIN_DISTINCT_VALUES = 5
+_MIN_DISTINCT_VALUES = 6
 _BES_PREFIX = "bes:"
 _BES_MIN_YEAR = 2025
 
@@ -213,8 +214,10 @@ def compare_round(difficulty=0):
     n = len(distinct)  # sempre >= _MIN_DISTINCT_VALUES
 
     max_index_gap = n - 1
-    min_gap = max(1, round(ratio_min * max_index_gap))
-    max_gap = max(min_gap, round(ratio_max * max_index_gap))
+    # ceil/floor rispettano davvero i limiti proporzionali. round() poteva
+    # produrre, per esempio, 4/7 al livello facile, sotto la soglia minima.
+    min_gap = max(1, math.ceil(ratio_min * max_index_gap))
+    max_gap = max(min_gap, math.floor(ratio_max * max_index_gap))
     max_gap = min(max_gap, max_index_gap)
     gap = random.randint(min_gap, max_gap)
     i = random.randint(0, n - 1 - gap)

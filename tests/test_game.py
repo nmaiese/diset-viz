@@ -367,7 +367,7 @@ class QuizCompareTest(unittest.TestCase):
             return abs(idx_a - idx_b), len(distinct)
 
         easy_ratios, hard_ratios = [], []
-        for _ in range(40):
+        for _ in range(120):
             gap, n = value_index_gap(quiz.compare_round(0))
             easy_ratios.append(gap / (n - 1))
             gap, n = value_index_gap(quiz.compare_round(4))
