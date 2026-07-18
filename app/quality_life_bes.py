@@ -20,6 +20,19 @@ BES); provinces use BES dei Territori, the only source available at that level.
 import statistics
 from collections import defaultdict
 
+# Sequential choropleth ramp, matching --map-ramp-from/--map-ramp-to in the
+# frontend tokens (frontend/src/styles.css, app/static/css/site.css).
+_MAP_RAMP_FROM = (0xE7, 0xEC, 0xF3)
+_MAP_RAMP_TO = (0x15, 0x23, 0x3B)
+
+
+def _score_color(score, lo, hi):
+    """Hex fill for a 0-100 score, interpolated along the brand's map ramp."""
+    span = hi - lo
+    t = 0.5 if span <= 0 else max(0.0, min(1.0, (score - lo) / span))
+    rgb = tuple(round(a + (b - a) * t) for a, b in zip(_MAP_RAMP_FROM, _MAP_RAMP_TO))
+    return "#{:02x}{:02x}{:02x}".format(*rgb)
+
 from app.cache import cache
 from app.data import get_catalog, get_rows
 from app.external_data import count_freshness
@@ -272,6 +285,12 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
         row["rank"] = rank
         row["delta_rank"] = base_rank.get(row["key"], rank) - rank  # + = up vs balanced
         del row["raw"]
+
+    if level == "regione" and rows:
+        score_lo = min(r["score"] for r in rows)
+        score_hi = max(r["score"] for r in rows)
+        for row in rows:
+            row["color"] = _score_color(row["score"], score_lo, score_hi)
 
     return {
         "level": level,

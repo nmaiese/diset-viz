@@ -89,6 +89,23 @@
   </section>
   {% endif %}
 
+  {% if not is_prov %}
+  <section class="quality-section">
+    <h2>Il punteggio sulla mappa</h2>
+    <p class="page-note">Più scuro il colore, più alto il punteggio con il profilo {{ p.name }}. Passa il mouse su una regione, clicca per aprirne il profilo.</p>
+    <div class="regions-map-wrap quality-map-wrap">
+      {% include "_italy_map.html" %}
+      <div class="rmap-tooltip" hidden></div>
+    </div>
+    <style>
+      {% for row in data.ranking %}.quality-map-wrap [data-key="{{ row.key }}"] { fill: {{ row.color }}; }
+      {% endfor %}
+    </style>
+    <script type="application/json" id="quality-map-data">{{ quality_map_data | tojson }}</script>
+    <script src="{{ url_for('static', filename='js/quality-map.js') }}" defer></script>
+  </section>
+  {% endif %}
+
   <section class="quality-section">
     <h2>La classifica</h2>
     {% if active_profile != default_profile %}

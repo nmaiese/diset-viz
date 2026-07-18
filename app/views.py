@@ -554,9 +554,17 @@ def quality_life_classifica(url_level):
     payload = qb.build_bes_ranking(level, slug)
     if payload is None:
         abort(404)
+    quality_map_data = (
+        {
+            row["key"]: {"name": row["name"], "score": it_num(row["score"]), "rank": row["rank"]}
+            for row in payload["ranking"]
+        }
+        if level == "regione" else {}
+    )
     return render_template(
         "quality_life_classifica.html",
         data=payload,
+        quality_map_data=quality_map_data,
         url_level=url_level,
         profiles=qb.get_quality_life_profiles(),
         active_profile=slug,
