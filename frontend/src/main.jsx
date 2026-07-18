@@ -638,6 +638,12 @@ function HomeMapHero({ catalog, mapData, onOpenRegion }) {
     () => (heroIndicator ? valuesForYear(heroIndicator.series, year) : []),
     [heroIndicator, year],
   );
+  // ItalyMap's onSelect/onHover hand back the region's display name (row.region);
+  // navigation needs the region_key slug, so look it up from the same rows.
+  const handleMapSelect = (name) => {
+    const row = values.find((entry) => entry.region === name);
+    if (row) onOpenRegion(row.region_key);
+  };
 
   return (
     <section className="home-hero">
@@ -690,7 +696,7 @@ function HomeMapHero({ catalog, mapData, onOpenRegion }) {
                 geo={mapData}
                 values={values}
                 selectedRegion={hoverRow?.region}
-                onSelect={onOpenRegion}
+                onSelect={handleMapSelect}
                 onHover={setHoverRow}
                 unit={meta.unit}
               />
@@ -1585,6 +1591,13 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
     }, null);
   }, [regionNames, valueByRegion, meta]);
 
+  // ItalyMap's onSelect hands back the region's display name; navigation needs
+  // the region_key slug, so look it up from the same year's rows.
+  const handleMapSelect = (name) => {
+    const row = valueByRegion.get(name);
+    if (row) onOpenRegion(row.region_key);
+  };
+
   const availableRegions = (meta?.regions || []).filter((name) => !regionNames.includes(name));
   const addRegion = (name) => { if (name && regionNames.length < COMPARE_MAX_REGIONS) setRegionNames([...regionNames, name]); };
   const removeRegion = (name) => { if (regionNames.length > 1) setRegionNames(regionNames.filter((n) => n !== name)); };
@@ -1658,7 +1671,7 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
                 geo={mapData}
                 values={yearValues}
                 selectedRegion={regionNames}
-                onSelect={onOpenRegion}
+                onSelect={handleMapSelect}
                 unit={meta.unit}
               />
             </DataCard>
