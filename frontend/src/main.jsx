@@ -1123,7 +1123,7 @@ function RegionView({
         <p className="eyebrow">Istat · 20 regioni · profili territoriali</p>
         <h1>Come è messa ogni regione.</h1>
         <p className="atlas-hero__lead">
-          Scegli una regione sulla mappa o dalla lista: trovi i temi in cui emerge, quelli in cui
+          Scegli una regione sulla mappa o dal menu: trovi i temi in cui emerge, quelli in cui
           fatica, gli indicatori collegati e i movimenti dell'ultimo anno. La classifica sintetica
           resta nella sezione Qualità della vita.
         </p>
@@ -1147,19 +1147,15 @@ function RegionView({
                   neutral
                 />
               </div>
-              <ol className="region-list">
-                {entries.map((entry) => (
-                  <li key={entry.region_key}>
-                    <button
-                      type="button"
-                      className={entry.region_key === regionKey ? "region-chip is-active" : "region-chip"}
-                      onClick={() => onSelectRegion(entry.region_key)}
-                    >
-                      <span className="region-chip__name">{entry.region}</span>
-                    </button>
-                  </li>
-                ))}
-              </ol>
+              <label className="region-switcher">
+                <span className="lbl">Cambia regione</span>
+                <select value={regionKey || ""} onChange={(event) => onSelectRegion(event.target.value)}>
+                  {!regionKey && <option value="" disabled>Scegli...</option>}
+                  {entries.map((entry) => (
+                    <option key={entry.region_key} value={entry.region_key}>{entry.region}</option>
+                  ))}
+                </select>
+              </label>
             </>
           ) : (
             <LoadingState />
@@ -1207,7 +1203,7 @@ function RegionIntro() {
           <h2>Scelgo una regione</h2>
           <p>
             L'atlante sta aprendo una scheda regionale casuale. Da lì puoi passare alle altre
-            regioni con la mappa o con l'elenco.
+            regioni con la mappa o con il menu.
           </p>
         </div>
       </header>
