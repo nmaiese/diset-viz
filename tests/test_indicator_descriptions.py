@@ -1,3 +1,4 @@
+import re
 import unittest
 from html import unescape
 
@@ -14,7 +15,20 @@ class IndicatorDescriptionCoverageTest(unittest.TestCase):
 
     def _assert_explanation(self, item, family):
         explain = item.get("explain") or {}
-        self.assertNotRegex(item.get("unit", ""), r"\b(?:standadizzato|Gwh|Ula|Km/ora|M2|M3|Km2)\b", item["id"])
+        unit = item.get("unit", "")
+        for bad_token in (
+            "standadizzato",
+            "Gwh",
+            "Ula",
+            "Km/ora",
+            "M2",
+            "M3",
+            "Km2",
+            "m2",
+            "m3",
+            "km2",
+        ):
+            self.assertNotIn(bad_token, unit, item["id"])
         for field in self.REQUIRED_FIELDS:
             self.assertTrue(explain.get(field), f"{family} {item['id']} senza {field}")
         visible = " ".join(str(explain[field]) for field in self.REQUIRED_FIELDS[:-1])
@@ -27,6 +41,8 @@ class IndicatorDescriptionCoverageTest(unittest.TestCase):
         self.assertNotRegex(visible, r"\b(?:de settore|fecondita|standadizzat\w*)\b", f"{family} {item['id']}")
         self.assertNotIn("È un indicatore del dominio BES", visible)
         self.assertNotIn("La fonte esprime il dato in", explain["example"])
+        if re.search(r"\b(?:GWh|tonnellate|chilometro) per\b", item.get("unit", ""), re.I):
+            self.assertNotIn("casi ogni", explain["example"], item["id"])
         self.assertGreaterEqual(len(explain["plain"]), 18, f"{family} {item['id']}")
         self.assertTrue(explain["plain"].endswith("."), f"{family} {item['id']}")
 

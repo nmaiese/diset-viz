@@ -93,7 +93,7 @@ class QualityLifeStaticTest(unittest.TestCase):
 
     def test_bes_labels_units_and_directions_are_resolved(self):
         expected_province = {
-            "09PAE009-N25": ("Densità di verde storico", "higher_better", "per 100 m2"),
+            "09PAE009-N25": ("Densità di verde storico", "higher_better", "per 100 m²"),
             "10AMB018P": ("Impermeabilizzazione del suolo da copertura artificiale", "lower_better", "%"),
             "12SER003P-N25": ("Posti letto negli ospedali", "higher_better", "per 10.000 abitanti"),
         }

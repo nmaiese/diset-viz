@@ -77,6 +77,22 @@ PLAIN_DEFINITION_OVERRIDES = {
         "Rapporta il valore aggiunto dei servizi alle imprese alle unità di "
         "lavoro equivalenti a tempo pieno degli stessi servizi"
     ),
+    "139": (
+        "Indica quanti stalli offrono i parcheggi di corrispondenza dei comuni "
+        "capoluogo ogni 1.000 autovetture circolanti"
+    ),
+    "270": (
+        "Indica quanti chilometri di rete ferroviaria sono presenti ogni 100 "
+        "km² di superficie regionale"
+    ),
+    "273": (
+        "Indica quanti chilometri di rete stradale sono presenti ogni 100 km² "
+        "di superficie regionale"
+    ),
+    "276": (
+        "Indica quanti chilometri di autostrada sono presenti ogni 100 km² di "
+        "superficie regionale"
+    ),
     "371": (
         "Indica la quota di persone che vivono in sovraffollamento e in "
         "abitazioni con carenze di servizi o problemi strutturali"
@@ -188,7 +204,9 @@ _TERM_REPLACEMENTS = (
     (r"\bGwh\b", "gigawattora, GWh"),
     (r"\bMw\b", "megawatt, MW"),
     (r"\bkmq\b", "chilometro quadrato"),
-    (r"\bkm2\b", "chilometro quadrato"),
+    (r"\bkm2\b", "km²"),
+    (r"\bm2\b", "m²"),
+    (r"\bm3\b", "m³"),
 )
 
 
@@ -687,7 +705,7 @@ def build_indicator_explain(item):
 def build_bes_indicator_explain(item, level="territori"):
     """Spiegazione comune a catalogo BES, pagine pubbliche e quiz."""
     name = _clean(item.get("name") or item.get("indicator"))
-    unit = _clean(item.get("unit"))
+    unit = display_unit(item.get("unit"))
     theme = _clean(item.get("domain_name") or item.get("theme"))
     indicator_id = str(item.get("id", ""))
     direction = item.get("direction") or direction_for(indicator_id, name)
@@ -723,6 +741,7 @@ def _bes_plain_text(name, unit, indicator_id):
     rate_match = re.search(r"per\s+([\d\.]+|milione)\s+(.+)", lowered_unit)
     if rate_match:
         denominator = f"{rate_match.group(1)} {rate_match.group(2)}".strip()
+        denominator = denominator.replace("km2", "km²").replace("m2", "m²").replace("m3", "m³")
         standardised = " Il tasso è inoltre corretto per rendere confrontabili popolazioni con età diverse." if "standardizz" in lowered_unit else ""
         return (
             _finish_sentence(
@@ -783,7 +802,7 @@ def _scope_text(name, level):
 
 def _unit_explanation(name, unit):
     lowered_name = name.lower()
-    lowered_unit = unit.lower().replace("²", "2")
+    lowered_unit = unit.lower().replace("²", "2").replace("³", "3")
 
     if "s80/s20" in lowered_name:
         return "Un valore di 5 significa che il reddito del 20% più ricco è cinque volte quello del 20% più povero."
@@ -791,6 +810,10 @@ def _unit_explanation(name, unit):
         return "Un valore di 100 indica due tassi uguali. Sotto 100, il tasso delle donne con figli è più basso."
     if "differenza tra tasso" in lowered_name or "differenza assoluta fra tasso" in lowered_name:
         return "Un valore di 5 indica che i due tassi differiscono di 5 punti percentuali."
+    if "parcheggi di corrispondenza" in lowered_name:
+        return "Un valore di 12 indica 12 stalli ogni 1.000 autovetture circolanti."
+    if "densità di verde storico" in lowered_name:
+        return "Un valore di 12 indica 12 m² di verde storico ogni 100 m² della superficie di riferimento."
     if "puntegg" in lowered_unit and "standardizz" in lowered_unit:
         return "È un punteggio riportato su una scala comune: serve per confrontare territori e anni, non come conteggio assoluto."
     per_match = re.search(
@@ -814,8 +837,16 @@ def _unit_explanation(name, unit):
         base = base_map.get(raw_base)
         if base is None:
             base = f"{int(raw_base):,}".replace(",", ".")
-        denominator = per_match.group(2).strip().replace("km2", "km²").replace("m2", "m²")
-        explanation = f"Un valore di 12 corrisponde a 12 casi ogni {base} {denominator}."
+        denominator = (
+            per_match.group(2).strip().replace("km2", "km²").replace("m2", "m²").replace("m3", "m³")
+        )
+        prefix = lowered_unit[: per_match.start()].strip()
+        quantity = {
+            "gwh": "GWh",
+            "tonnellate": "tonnellate",
+            "chilometro": "chilometri",
+        }.get(prefix, "casi")
+        explanation = f"Un valore di 12 corrisponde a 12 {quantity} ogni {base} {denominator}."
         if "standardizz" in lowered_unit or "standardizz" in lowered_name:
             explanation += " Il tasso è corretto per confrontare popolazioni con una diversa struttura per età."
         return explanation
@@ -1186,8 +1217,8 @@ def display_unit(unit):
     value = re.sub(r"\bGwh\b", "GWh", value, flags=re.I)
     value = re.sub(r"\bUla\b", "ULA", value, flags=re.I)
     value = re.sub(r"\bKm/ora\b", "km/ora", value, flags=re.I)
-    value = re.sub(r"\bM2\b", "m²", value)
-    value = re.sub(r"\bM3\b", "m³", value)
+    value = re.sub(r"\bM2\b", "m²", value, flags=re.I)
+    value = re.sub(r"\bM3\b", "m³", value, flags=re.I)
     value = re.sub(r"\bKm2\b", "km²", value, flags=re.I)
     return value
 
