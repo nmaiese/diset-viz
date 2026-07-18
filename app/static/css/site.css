@@ -47,6 +47,21 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
 .prose-wrap { width: min(760px, 100% - 32px); margin-inline: auto; }
 
+/* Cross-document View Transitions: every server-rendered page (blog, quiz,
+   qualità della vita, metodologia, schede indicatore/regione...) cross-fades
+   into the next instead of hard-swapping, matching the atlante SPA. Purely
+   declarative — the browser handles it and ignores the rule where unsupported,
+   degrading to an instant navigation with no breakage and no JS to maintain.
+   Kept in sync with the same opt-in in frontend/src/styles.css. */
+@view-transition { navigation: auto; }
+::view-transition-group(root) {
+  animation-duration: var(--dur);
+  animation-timing-function: var(--ease-out);
+}
+/* Named so the identical top bar stays put and morphs across a navigation
+   rather than cross-fading with the rest of the viewport (persistent shell). */
+.masthead { view-transition-name: masthead; }
+
 /* Masthead (shared with the app) */
 .masthead {
   position: sticky; top: 0; z-index: 40;
@@ -594,4 +609,11 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  /* The universal selector doesn't reach view-transition pseudo-elements, so
+     disable the cross-document cross-fade / row morphs explicitly. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

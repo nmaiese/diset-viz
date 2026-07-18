@@ -126,7 +126,12 @@
         </thead>
         <tbody>
           {% for row in data.ranking %}
-          <tr>
+          {# Stable per-territory view-transition-name: when the profile or level
+             switch reloads the page, the browser matches each row by this name
+             across the old and new document and animates it from its old rank to
+             the new one (a FLIP reorder), all while the page stays fully
+             server-rendered. Ignored where View Transitions aren't supported. #}
+          <tr style="view-transition-name: qlrow-{{ row.key }}">
             <td class="num quality-rank">{{ row.rank }}</td>
             <td>{{ row.name }}{% if row.metro_city %} <span class="quality-metro" title="Città metropolitana">cm</span>{% endif %}</td>
             {% if is_prov %}<td><small>{{ row.region }}</small></td>{% endif %}

@@ -56,6 +56,14 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 .scene-enter { animation: scene-fade-in var(--dur) var(--ease-out) both; }
 
+/* Cross-document View Transitions: the SPA lives at "/", the rest of the site
+   (blog, quiz, qualità della vita, metodologia...) is server-rendered by Flask.
+   Opting in here — and in app/static/css/site.css — makes navigating *between*
+   the two worlds a smooth cross-fade instead of a hard page swap. Declarative:
+   the browser drives it and simply ignores the rule where unsupported, so it is
+   safe to ship everywhere and needs no upkeep as browser support widens. */
+@view-transition { navigation: auto; }
+
 /* View Transitions API: shared-element pairing between an index-row card and
    the detail hero it opens into (see openIndicator/backFromDetail). */
 ::view-transition-old(ind-hero),
@@ -63,7 +71,16 @@ h1, h2, h3 { font-family: var(--font-display); }
   animation-duration: var(--dur-slow);
   animation-timing-function: var(--ease-out);
 }
-::view-transition-group(root) { animation-duration: var(--dur); }
+::view-transition-group(root) {
+  animation-duration: var(--dur);
+  animation-timing-function: var(--ease-out);
+}
+
+/* The masthead is byte-for-byte the same top bar on every page and in the SPA,
+   so name it: the browser keeps it in place and morphs it across a navigation
+   instead of cross-fading the whole viewport, giving a persistent app-shell
+   feel. Must stay in sync with the same rule in app/static/css/site.css. */
+.masthead { view-transition-name: masthead; }
 
 /* ---------- Masthead ---------- */
 .masthead {
