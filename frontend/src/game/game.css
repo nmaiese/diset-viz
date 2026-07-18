@@ -447,6 +447,9 @@
   border-radius: 0;
   border: 1px solid var(--line);
   background: var(--panel);
+  display: grid;
+  place-items: center;
+  color: var(--ink-soft);
 }
 
 .game-modal-body { padding: 18px; }

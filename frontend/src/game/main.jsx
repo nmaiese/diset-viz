@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { BarChart3 } from "lucide-react";
 import CompareApp from "./compare.jsx";
 import OrderApp from "./order.jsx";
 import HubApp from "./hub.jsx";
@@ -388,7 +389,7 @@ function GameApp() {
         )}
         <span className="game-toolbar-spacer" />
         <button type="button" className="game-icon-btn" onClick={openStats} aria-label="Statistiche">
-          📊
+          <BarChart3 size={16} strokeWidth={2} />
         </button>
         <button
           type="button"

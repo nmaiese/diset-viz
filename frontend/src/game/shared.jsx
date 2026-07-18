@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { X } from "lucide-react";
 
 const STORAGE_NICKNAME_KEY = "di-nickname";
 
@@ -102,7 +103,7 @@ export function Modal({ title, onClose, children, labelledBy }) {
         <div className="game-modal-head">
           <h3 id={labelledBy}>{title}</h3>
           <button type="button" className="game-modal-close" onClick={onClose} aria-label="Chiudi">
-            ✕
+            <X size={16} strokeWidth={2} />
           </button>
         </div>
         <div className="game-modal-body">{children}</div>
