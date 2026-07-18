@@ -15,6 +15,13 @@
   --font-display: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "Space Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  /* Navigation-transition timing shared by the scene fade, the sliding nav
+     underline, the map colour lerp and the ranking FLIP reorder. */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.15, 1);
+  --ease-in-out: cubic-bezier(0.65, 0.05, 0.35, 1);
+  --dur-fast: 180ms;
+  --dur: 280ms;
+  --dur-slow: 420ms;
   /* Altezza di riferimento del masthead a riga singola: usata dagli elementi
      sticky che devono agganciarsi appena sotto di esso (.mobile-tabs) e dal
      pannello di navigazione mobile, invece di duplicare il numero altrove. */
@@ -39,6 +46,24 @@ a { color: inherit; text-decoration: none; }
 h1, h2, h3 { font-family: var(--font-display); }
 
 .app-shell { min-height: 100vh; }
+
+/* Cross-fade + rise applied to whichever top-level scene (atlas / detail /
+   regioni / confronto) just mounted, so switching modes inside the SPA never
+   hard-cuts. Re-keyed per scene in App(), see scene-enter usage in main.jsx. */
+@keyframes scene-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.scene-enter { animation: scene-fade-in var(--dur) var(--ease-out) both; }
+
+/* View Transitions API: shared-element pairing between an index-row card and
+   the detail hero it opens into (see openIndicator/backFromDetail). */
+::view-transition-old(ind-hero),
+::view-transition-new(ind-hero) {
+  animation-duration: var(--dur-slow);
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-group(root) { animation-duration: var(--dur); }
 
 /* ---------- Masthead ---------- */
 .masthead {
@@ -69,6 +94,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 .brand-text small { color: var(--muted); font-size: 11.5px; }
 
 .masthead__links {
+  position: relative;
   margin-left: auto;
   display: flex;
   align-items: center;
@@ -76,9 +102,23 @@ h1, h2, h3 { font-family: var(--font-display); }
   color: var(--muted);
   font-size: 13.5px;
 }
-.masthead__links a { display: inline-flex; align-items: center; gap: 4px; padding: 10px 2px; }
+.masthead__links a { display: inline-flex; align-items: center; gap: 4px; padding: 10px 2px; transition: color var(--dur-fast) var(--ease-out); }
 .masthead__links a:hover { color: var(--ink); }
 .masthead__links a.is-active { color: var(--ink); font-weight: 700; }
+
+/* Accent pill that slides beneath the active masthead link, positioned in JS
+   via getBoundingClientRect against #masthead-nav (see SiteHeader/useNavUnderline). */
+.nav-underline {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: transform var(--dur) var(--ease-in-out), width var(--dur) var(--ease-in-out), opacity var(--dur-fast) var(--ease-out);
+  pointer-events: none;
+}
+.nav-underline.is-visible { opacity: 1; }
 
 .masthead__search {
   display: none;
@@ -592,6 +632,11 @@ h1, h2, h3 { font-family: var(--font-display); }
   padding: 22px;
 }
 
+/* Shared-element target for the View Transitions API: pairs with whichever
+   .index-row got tagged "ind-hero" for the click that opened this indicator
+   (see openIndicator in main.jsx). Harmless no-op in browsers without support. */
+.indicator-header { view-transition-name: ind-hero; }
+
 .indicator-header .tag {
   display: inline-flex;
   padding: 6px 10px;
@@ -725,7 +770,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 .italy-map path {
   stroke: rgba(21, 35, 59, 0.35);
   stroke-width: 1;
-  transition: fill 240ms ease, stroke-width 160ms ease;
+  transition: fill var(--dur) var(--ease-out), stroke-width 160ms ease;
   outline: none;
 }
 .italy-map path:hover, .italy-map path.is-selected {
@@ -756,6 +801,9 @@ h1, h2, h3 { font-family: var(--font-display); }
   padding: 7px 8px;
 }
 .ranking-row:hover, .ranking-row.is-active { background: var(--accent-soft); border-color: rgba(228, 87, 46, 0.3); }
+/* FLIP row-reorder on year change: useFlipRows sets a transform delta then
+   clears it on the next frame, letting this transition carry the move. */
+.ranking-row.is-flipping { transition: transform var(--dur-slow) var(--ease-out); will-change: transform; }
 .ranking-row .rank { font-family: var(--font-mono); color: var(--muted); font-size: 13px; }
 .ranking-row .bar { height: 9px; background: var(--grid); overflow: hidden; }
 .ranking-row .bar i { display: block; height: 100%; background: var(--ink); }
@@ -1240,6 +1288,14 @@ h1, h2, h3 { font-family: var(--font-display); }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  /* The universal selector above doesn't match view-transition pseudo-elements;
+     main.jsx already avoids calling startViewTransition when motion is reduced,
+     this is defense in depth for the OS setting changing mid-session. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }
 
 .indicator-header__seo { margin: 4px 0 0; font-size: 13.5px; }

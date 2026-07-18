@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import * as d3 from "d3";
 import {
@@ -49,6 +49,33 @@ const SORTS = [
 
 const MAP_RAMP = (t) => d3.interpolate("#E7ECF3", "#15233B")(t);
 const MISSING_FILL = "#E2E0D8";
+
+/* ------------------------------------------------------------------ */
+/* Navigation-transition helpers                                       */
+/* ------------------------------------------------------------------ */
+
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined"
+    && typeof window.matchMedia === "function"
+    && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+const supportsViewTransitions =
+  typeof document !== "undefined" && typeof document.startViewTransition === "function";
+
+// Runs a state update as a native View Transition (cross-fade + shared-element
+// pairing via view-transition-name) when the browser supports it and the user
+// hasn't asked for reduced motion. Falls back to a plain call otherwise; the
+// CSS .scene-enter animation still covers the fade in that case.
+function withViewTransition(apply) {
+  if (!supportsViewTransitions || prefersReducedMotion()) {
+    apply();
+    return;
+  }
+  document.startViewTransition(() => apply());
+}
 
 function App() {
   const [catalog, setCatalog] = useState(null);
@@ -196,66 +223,90 @@ function App() {
 
   // Open an indicator's dashboard. `origin` optionally carries the region the user
   // came from, so the dashboard opens on that region and Back can return to it.
-  const openIndicator = (item, origin) => {
-    setSelectedId(item.id);
-    setThemeParam(item.theme);
-    setQueryParam(null);
-    if (origin && origin.type === "regione" && origin.key) {
-      setFromParam(`regione:${origin.key}`);
-      if (origin.name) setSelectedRegion(origin.name);
-    } else {
-      setFromParam(null);
-    }
-    setView("detail");
+  // `evt`, when present, is the click that triggered the open: its target becomes
+  // the shared-element source for a View Transitions API expand into the detail
+  // hero (see the "ind-hero" view-transition-name on .indicator-header).
+  const openIndicator = (item, origin, evt) => {
+    const source = evt && evt.currentTarget instanceof HTMLElement ? evt.currentTarget : null;
+    const apply = () => {
+      setSelectedId(item.id);
+      setThemeParam(item.theme);
+      setQueryParam(null);
+      if (origin && origin.type === "regione" && origin.key) {
+        setFromParam(`regione:${origin.key}`);
+        if (origin.name) setSelectedRegion(origin.name);
+      } else {
+        setFromParam(null);
+      }
+      setView("detail");
+      window.scrollTo({ top: 0, behavior: "auto" });
+    };
     trackEvent("select_indicator", {
       indicator_id: item.id,
       indicator_name: item.name,
       indicator_theme: item.theme,
       from: origin?.type || "atlas",
     });
-    window.scrollTo({ top: 0, behavior: "auto" });
+    if (source && supportsViewTransitions && !prefersReducedMotion()) {
+      source.style.viewTransitionName = "ind-hero";
+      document
+        .startViewTransition(apply)
+        .finished.catch(() => {})
+        .finally(() => { source.style.viewTransitionName = ""; });
+      return;
+    }
+    withViewTransition(apply);
   };
 
   // Back out of the dashboard: return to the region we came from, if any.
   const backFromDetail = () => {
-    if (fromParam && fromParam.indexOf("regione:") === 0) {
-      const key = fromParam.slice("regione:".length);
-      setFromParam(null);
-      setRegionKey(key);
-      setView("regioni");
-    } else {
-      setFromParam(null);
-      setView("atlas");
-    }
+    const apply = () => {
+      if (fromParam && fromParam.indexOf("regione:") === 0) {
+        const key = fromParam.slice("regione:".length);
+        setFromParam(null);
+        setRegionKey(key);
+        setView("regioni");
+      } else {
+        setFromParam(null);
+        setView("atlas");
+      }
+      window.scrollTo({ top: 0, behavior: "auto" });
+    };
     trackEvent("back_from_detail", { to: fromParam || "atlas" });
-    window.scrollTo({ top: 0, behavior: "auto" });
+    withViewTransition(apply);
   };
 
   // Switch between reading modes ("per indicatore" / "per regione" / "confronta").
   const goToMode = (mode) => {
-    setFromParam(null);
-    setView(mode === "regioni" ? "regioni" : mode === "confronto" ? "confronto" : "atlas");
     trackEvent("switch_mode", { mode });
-    window.scrollTo({ top: 0, behavior: "auto" });
+    withViewTransition(() => {
+      setFromParam(null);
+      setView(mode === "regioni" ? "regioni" : mode === "confronto" ? "confronto" : "atlas");
+      window.scrollTo({ top: 0, behavior: "auto" });
+    });
   };
 
   // Open a region's profile inside the SPA (from the map, the list, similar
   // regions, or the indicator dashboard) without a full page reload.
   const openRegion = (key) => {
-    setFromParam(null);
-    setRegionKey(key);
-    setView("regioni");
     trackEvent("open_region", { region_key: key });
-    window.scrollTo({ top: 0, behavior: "auto" });
+    withViewTransition(() => {
+      setFromParam(null);
+      setRegionKey(key);
+      setView("regioni");
+      window.scrollTo({ top: 0, behavior: "auto" });
+    });
   };
 
   // Select another region while already inside the region workspace. This keeps
   // the page position stable; RegionView resets only the profile panel scroll.
   const selectRegion = (key) => {
-    setFromParam(null);
-    setRegionKey(key);
-    setView("regioni");
     trackEvent("select_region", { region_key: key });
+    withViewTransition(() => {
+      setFromParam(null);
+      setRegionKey(key);
+      setView("regioni");
+    });
   };
 
   if (error) {
@@ -325,8 +376,8 @@ function App() {
           trackEvent("change_region", { indicator_id: selectedId, region: value });
         }}
         onSelectIndicator={(id) => {
-          setSelectedId(id);
           trackEvent("select_sibling_indicator", { indicator_id: id });
+          withViewTransition(() => setSelectedId(id));
         }}
         onOpenRegion={openRegion}
         onNavRegioni={() => goToMode("regioni")}
@@ -395,7 +446,45 @@ function App() {
 /* Shared chrome                                                       */
 /* ------------------------------------------------------------------ */
 
+// Measures the active masthead link's position/width against the nav container
+// and returns an inline style for the sliding .nav-underline accent, redone on
+// every activeNav change (and on resize, since the layout is fluid).
+function useNavUnderline(navRef, activeKey) {
+  const [style, setStyle] = useState({ opacity: 0 });
+
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav || !activeKey) {
+      setStyle({ opacity: 0 });
+      return undefined;
+    }
+    const measure = () => {
+      const link = nav.querySelector(`[data-nav-key="${activeKey}"]`);
+      if (!link) {
+        setStyle({ opacity: 0 });
+        return;
+      }
+      const navRect = nav.getBoundingClientRect();
+      const linkRect = link.getBoundingClientRect();
+      setStyle({
+        opacity: 1,
+        width: `${linkRect.width - 4}px`,
+        transform: `translateX(${linkRect.left - navRect.left + 2}px)`,
+      });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [navRef, activeKey]);
+
+  return style;
+}
+
 function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
+  const navRef = useRef(null);
+  const underlineKey = activeNav === "atlas" || activeNav === "regioni" ? activeNav : null;
+  const underlineStyle = useNavUnderline(navRef, underlineKey);
+
   const handleLocalNav = (event, handler) => {
     if (handler && !event.metaKey && !event.ctrlKey && event.button === 0) {
       event.preventDefault();
@@ -414,9 +503,10 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
           </span>
         </a>
         {children}
-        <nav id="masthead-nav" className="masthead__links" aria-label="Collegamenti">
+        <nav id="masthead-nav" className="masthead__links" aria-label="Collegamenti" ref={navRef}>
           <a
             href="/"
+            data-nav-key="atlas"
             className={activeNav === "atlas" ? "is-active" : ""}
             onClick={(event) => handleLocalNav(event, onNavAtlas)}
           >
@@ -424,6 +514,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
           </a>
           <a
             href="/regioni"
+            data-nav-key="regioni"
             className={activeNav === "regioni" ? "is-active" : ""}
             onClick={(event) => {
               // Inside the SPA, keep the user in the interactive region mode
@@ -445,6 +536,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
           >
             Fonte Istat <ArrowUpRight size={13} />
           </a>
+          <span className={`nav-underline${underlineStyle.opacity ? " is-visible" : ""}`} style={underlineStyle} aria-hidden="true" />
         </nav>
         <a
           className="masthead__search"
@@ -787,49 +879,51 @@ function AtlasView({
         onNavRegioni={() => onMode("regioni")}
       />
 
-      <ContextBar label="Atlante" crumbs={[{ label: "Atlante" }]}>
-        <ModeSwitch active="atlas" onMode={onMode} />
-      </ContextBar>
+      <div className="scene-enter">
+        <ContextBar label="Atlante" crumbs={[{ label: "Atlante" }]}>
+          <ModeSwitch active="atlas" onMode={onMode} />
+        </ContextBar>
 
-      <HomeMapHero catalog={catalog} mapData={mapData} onOpenRegion={onOpenRegion} />
+        <HomeMapHero catalog={catalog} mapData={mapData} onOpenRegion={onOpenRegion} />
 
-      <MacroSpine
-        areas={catalog.macro_areas || []}
-        selected={macroArea}
-        onSelect={setMacroArea}
-      />
-
-      <section className="atlas">
-        <ThemeSpine
-          themes={areaThemes}
-          counts={themeCounts}
-          total={pool.length}
-          selected={theme}
-          onSelect={setTheme}
+        <MacroSpine
+          areas={catalog.macro_areas || []}
+          selected={macroArea}
+          onSelect={setMacroArea}
         />
 
-        <div className="index-panel" id="atlas-index">
-          <CommandBar
-            query={query}
-            setQuery={setQuery}
-            sort={sort}
-            setSort={setSort}
-            showPartial={showPartial}
-            setShowPartial={setShowPartial}
-            sourceFamilies={catalog.source_families || []}
-            sourceFamily={sourceFamily}
-            setSourceFamily={setSourceFamily}
-            count={filtered.length}
-            completeTotal={completeTotal}
-            fullMin={fullMin}
-            fullMax={fullMax}
-            yearFrom={yearFrom}
-            yearTo={yearTo}
-            setYearRange={setYearRange}
+        <section className="atlas">
+          <ThemeSpine
+            themes={areaThemes}
+            counts={themeCounts}
+            total={pool.length}
+            selected={theme}
+            onSelect={setTheme}
           />
-          <IndicatorIndex items={filtered} onOpen={onOpen} />
-        </div>
-      </section>
+
+          <div className="index-panel" id="atlas-index">
+            <CommandBar
+              query={query}
+              setQuery={setQuery}
+              sort={sort}
+              setSort={setSort}
+              showPartial={showPartial}
+              setShowPartial={setShowPartial}
+              sourceFamilies={catalog.source_families || []}
+              sourceFamily={sourceFamily}
+              setSourceFamily={setSourceFamily}
+              count={filtered.length}
+              completeTotal={completeTotal}
+              fullMin={fullMin}
+              fullMax={fullMax}
+              yearFrom={yearFrom}
+              yearTo={yearTo}
+              setYearRange={setYearRange}
+            />
+            <IndicatorIndex items={filtered} onOpen={onOpen} />
+          </div>
+        </section>
+      </div>
       <SiteFooter />
     </main>
   );
@@ -1020,7 +1114,7 @@ function IndexRow({ item, onOpen }) {
   const delta = sparkDelta(item.spark);
   return (
     <li>
-      <button className="index-row" onClick={() => onOpen(item)} type="button">
+      <button className="index-row" onClick={(evt) => onOpen(item, undefined, evt)} type="button">
         <span className="index-row__main">
           <small className="index-row__theme">
             {item.theme}{item.source_theme && item.source_theme !== item.theme ? ` · ${item.source_theme}` : ""} · {item.catalog_family_label}
@@ -1108,75 +1202,79 @@ function RegionView({
         )}
       </SiteHeader>
 
-      <ContextBar
-        label="Per regione"
-        crumbs={[
-          { label: "Atlante", onClick: () => onMode("atlas") },
-          { label: "Per regione" },
-          ...(selectedName ? [{ label: selectedName }] : []),
-        ]}
-      >
-        <ModeSwitch active="regioni" onMode={onMode} />
-      </ContextBar>
+      <div className="scene-enter">
+        <ContextBar
+          label="Per regione"
+          crumbs={[
+            { label: "Atlante", onClick: () => onMode("atlas") },
+            { label: "Per regione" },
+            ...(selectedName ? [{ label: selectedName }] : []),
+          ]}
+        >
+          <ModeSwitch active="regioni" onMode={onMode} />
+        </ContextBar>
 
-      <section className="atlas-hero atlas-hero--compact atlas-hero--region">
-        <p className="eyebrow">Istat · 20 regioni · profili territoriali</p>
-        <h1>Come è messa ogni regione.</h1>
-        <p className="atlas-hero__lead">
-          Scegli una regione sulla mappa o dal menu: trovi i temi in cui emerge, quelli in cui
-          fatica, gli indicatori collegati e i movimenti dell'ultimo anno. La classifica sintetica
-          resta nella sezione Qualità della vita.
-        </p>
-      </section>
+        <section className="atlas-hero atlas-hero--compact atlas-hero--region">
+          <p className="eyebrow">Istat · 20 regioni · profili territoriali</p>
+          <h1>Come è messa ogni regione.</h1>
+          <p className="atlas-hero__lead">
+            Scegli una regione sulla mappa o dal menu: trovi i temi in cui emerge, quelli in cui
+            fatica, gli indicatori collegati e i movimenti dell'ultimo anno. La classifica sintetica
+            resta nella sezione Qualità della vita.
+          </p>
+        </section>
 
-      <section className="region-explore">
-        <aside className="region-select">
-          <div className="region-select__head">
-            <h2>Scegli una regione</h2>
-            <p>La mappa serve per navigare tra le schede regionali, senza ordinare i territori in una graduatoria unica.</p>
-          </div>
-          {overview ? (
-            <>
-              <div className="region-map">
-                <ItalyMap
-                  geo={mapData}
-                  values={values}
-                  selectedRegion={selectedName}
-                  onSelect={handleMapSelect}
-                  unit=""
-                  neutral
+        <section className="region-explore">
+          <aside className="region-select">
+            <div className="region-select__head">
+              <h2>Scegli una regione</h2>
+              <p>La mappa serve per navigare tra le schede regionali, senza ordinare i territori in una graduatoria unica.</p>
+            </div>
+            {overview ? (
+              <>
+                <div className="region-map">
+                  <ItalyMap
+                    geo={mapData}
+                    values={values}
+                    selectedRegion={selectedName}
+                    onSelect={handleMapSelect}
+                    unit=""
+                    neutral
+                  />
+                </div>
+                <label className="region-switcher">
+                  <span className="lbl">Cambia regione</span>
+                  <select value={regionKey || ""} onChange={(event) => onSelectRegion(event.target.value)}>
+                    {!regionKey && <option value="" disabled>Scegli...</option>}
+                    {entries.map((entry) => (
+                      <option key={entry.region_key} value={entry.region_key}>{entry.region}</option>
+                    ))}
+                  </select>
+                </label>
+              </>
+            ) : (
+              <LoadingState />
+            )}
+          </aside>
+
+          <div className="region-profile-panel">
+            <div key={regionKey || "none"} className="scene-enter">
+              {!regionKey ? (
+                <RegionIntro />
+              ) : !profileReady ? (
+                <RegionProfileSkeleton name={selectedName} />
+              ) : (
+                <RegionProfile
+                  profile={profile}
+                  onOpenIndicator={onOpenIndicator}
+                  onSelectRegion={onSelectRegion}
+                  onRandomRegion={selectRandomRegion}
                 />
-              </div>
-              <label className="region-switcher">
-                <span className="lbl">Cambia regione</span>
-                <select value={regionKey || ""} onChange={(event) => onSelectRegion(event.target.value)}>
-                  {!regionKey && <option value="" disabled>Scegli...</option>}
-                  {entries.map((entry) => (
-                    <option key={entry.region_key} value={entry.region_key}>{entry.region}</option>
-                  ))}
-                </select>
-              </label>
-            </>
-          ) : (
-            <LoadingState />
-          )}
-        </aside>
-
-        <div className="region-profile-panel">
-          {!regionKey ? (
-            <RegionIntro />
-          ) : !profileReady ? (
-            <RegionProfileSkeleton name={selectedName} />
-          ) : (
-            <RegionProfile
-              profile={profile}
-              onOpenIndicator={onOpenIndicator}
-              onSelectRegion={onSelectRegion}
-              onRandomRegion={selectRandomRegion}
-            />
-          )}
-        </div>
-      </section>
+              )}
+            </div>
+          </div>
+        </section>
+      </div>
       <SiteFooter />
     </main>
   );
@@ -1602,108 +1700,110 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
     <main className="app-shell">
       <SiteHeader activeNav="atlas" onNavAtlas={() => onMode("atlas")} onNavRegioni={() => onMode("regioni")} />
 
-      <ContextBar label="Confronta" crumbs={[{ label: "Confronta" }]}>
-        <ModeSwitch active="confronto" onMode={onMode} />
-      </ContextBar>
+      <div className="scene-enter">
+        <ContextBar label="Confronta" crumbs={[{ label: "Confronta" }]}>
+          <ModeSwitch active="confronto" onMode={onMode} />
+        </ContextBar>
 
-      <section className="atlas-hero atlas-hero--compact">
-        <p className="eyebrow">Confronto regioni</p>
-        <h1>Metti due o tre regioni a confronto.</h1>
-        <p className="atlas-hero__lead">
-          Scegli un indicatore e fino a tre regioni. Le vedi sovrapposte nella serie storica,
-          sulla mappa e in tabella, contro la media nazionale.
-        </p>
-      </section>
+        <section className="atlas-hero atlas-hero--compact">
+          <p className="eyebrow">Confronto regioni</p>
+          <h1>Metti due o tre regioni a confronto.</h1>
+          <p className="atlas-hero__lead">
+            Scegli un indicatore e fino a tre regioni. Le vedi sovrapposte nella serie storica,
+            sulla mappa e in tabella, contro la media nazionale.
+          </p>
+        </section>
 
-      <div className="compare-bar">
-        <label className="compare-select">
-          <span className="lbl">Indicatore</span>
-          <select value={indId} onChange={(event) => setIndId(Number(event.target.value))}>
-            {catalog.indicators.map((item) => (
-              <option key={item.id} value={item.id}>{item.name}</option>
-            ))}
-          </select>
-        </label>
-        <div className="cmp-chips-field">
-          <span className="lbl">Regioni ({regionNames.length}/{COMPARE_MAX_REGIONS})</span>
-          <div className="cmp-chips">
-            {regionNames.map((name, i) => (
-              <span className="cmp-chip" key={name}>
-                <span className="cmp-chip__swatch" style={{ background: COMPARE_SERIES_COLORS[i] }} />
-                {name}
-                {regionNames.length > 1 && (
-                  <button type="button" aria-label={`Rimuovi ${name}`} onClick={() => removeRegion(name)}>
-                    <X size={13} />
-                  </button>
-                )}
-              </span>
-            ))}
-            {regionNames.length < COMPARE_MAX_REGIONS && availableRegions.length > 0 && (
-              <span className="cmp-chip cmp-chip--add">
-                <select value="" onChange={(event) => addRegion(event.target.value)} aria-label="Aggiungi regione">
-                  <option value="" disabled>Aggiungi…</option>
-                  {availableRegions.map((name) => <option key={name} value={name}>{name}</option>)}
-                </select>
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {!meta ? (
-        <p className="map-empty">Caricamento…</p>
-      ) : (
-        <div className="compare-layout">
-          <div className="compare-main">
-            <DataCard title="Serie storica" kicker={`${meta.name} · ${meta.unit}`}>
-              <div className="compare-legend">
-                {seriesList.map((s) => <span key={s.region} className="legend-item"><i style={{ background: s.color }} />{s.region}</span>)}
-                <span className="legend-item legend-average"><i />Media nazionale</span>
-              </div>
-              <CompareTimeline seriesList={seriesList} averageSeries={averageSeries} selectedYear={year} onYear={setYear} unit={meta.unit} />
-            </DataCard>
-            <DataCard title="Mappa" kicker={`${year} · regioni a confronto evidenziate`}>
-              <ItalyMap
-                geo={mapData}
-                values={yearValues}
-                selectedRegion={regionNames}
-                onSelect={handleMapSelect}
-                unit={meta.unit}
-              />
-            </DataCard>
-          </div>
-          <aside className="compare-side">
-            <DataCard title={`Confronto · ${year}`} kicker={meta.unit}>
-              <table className="cmp-table">
-                <thead><tr><th>Regione</th><th className="num">Valore</th></tr></thead>
-                <tbody>
-                  {regionNames.map((name, i) => {
-                    const row = valueByRegion.get(name);
-                    return (
-                      <tr key={name}>
-                        <td><span className="cmp-swatch" style={{ background: COMPARE_SERIES_COLORS[i] }} />{name}</td>
-                        <td className={`num ${name === bestRegion ? "cmp-winner" : ""}`}>
-                          {row ? formatValue(row.value, meta.unit) : "n.d."}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  <tr>
-                    <td className="cmp-avg-label">Media nazionale</td>
-                    <td className="num cmp-avg-label">{nationalAvg != null ? formatValue(nationalAvg, meta.unit) : "n.d."}</td>
-                  </tr>
-                </tbody>
-              </table>
-              {bestRegion && (
-                <p className="compare-note">
-                  Migliore tra le selezionate: <strong>{bestRegion}</strong>
-                  {meta.invert ? " (valore più basso è meglio)" : ""}.
-                </p>
+        <div className="compare-bar">
+          <label className="compare-select">
+            <span className="lbl">Indicatore</span>
+            <select value={indId} onChange={(event) => setIndId(Number(event.target.value))}>
+              {catalog.indicators.map((item) => (
+                <option key={item.id} value={item.id}>{item.name}</option>
+              ))}
+            </select>
+          </label>
+          <div className="cmp-chips-field">
+            <span className="lbl">Regioni ({regionNames.length}/{COMPARE_MAX_REGIONS})</span>
+            <div className="cmp-chips">
+              {regionNames.map((name, i) => (
+                <span className="cmp-chip" key={name}>
+                  <span className="cmp-chip__swatch" style={{ background: COMPARE_SERIES_COLORS[i] }} />
+                  {name}
+                  {regionNames.length > 1 && (
+                    <button type="button" aria-label={`Rimuovi ${name}`} onClick={() => removeRegion(name)}>
+                      <X size={13} />
+                    </button>
+                  )}
+                </span>
+              ))}
+              {regionNames.length < COMPARE_MAX_REGIONS && availableRegions.length > 0 && (
+                <span className="cmp-chip cmp-chip--add">
+                  <select value="" onChange={(event) => addRegion(event.target.value)} aria-label="Aggiungi regione">
+                    <option value="" disabled>Aggiungi…</option>
+                    {availableRegions.map((name) => <option key={name} value={name}>{name}</option>)}
+                  </select>
+                </span>
               )}
-            </DataCard>
-          </aside>
+            </div>
+          </div>
         </div>
-      )}
+
+        {!meta ? (
+          <p className="map-empty">Caricamento…</p>
+        ) : (
+          <div className="compare-layout">
+            <div className="compare-main">
+              <DataCard title="Serie storica" kicker={`${meta.name} · ${meta.unit}`}>
+                <div className="compare-legend">
+                  {seriesList.map((s) => <span key={s.region} className="legend-item"><i style={{ background: s.color }} />{s.region}</span>)}
+                  <span className="legend-item legend-average"><i />Media nazionale</span>
+                </div>
+                <CompareTimeline seriesList={seriesList} averageSeries={averageSeries} selectedYear={year} onYear={setYear} unit={meta.unit} />
+              </DataCard>
+              <DataCard title="Mappa" kicker={`${year} · regioni a confronto evidenziate`}>
+                <ItalyMap
+                  geo={mapData}
+                  values={yearValues}
+                  selectedRegion={regionNames}
+                  onSelect={handleMapSelect}
+                  unit={meta.unit}
+                />
+              </DataCard>
+            </div>
+            <aside className="compare-side">
+              <DataCard title={`Confronto · ${year}`} kicker={meta.unit}>
+                <table className="cmp-table">
+                  <thead><tr><th>Regione</th><th className="num">Valore</th></tr></thead>
+                  <tbody>
+                    {regionNames.map((name, i) => {
+                      const row = valueByRegion.get(name);
+                      return (
+                        <tr key={name}>
+                          <td><span className="cmp-swatch" style={{ background: COMPARE_SERIES_COLORS[i] }} />{name}</td>
+                          <td className={`num ${name === bestRegion ? "cmp-winner" : ""}`}>
+                            {row ? formatValue(row.value, meta.unit) : "n.d."}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    <tr>
+                      <td className="cmp-avg-label">Media nazionale</td>
+                      <td className="num cmp-avg-label">{nationalAvg != null ? formatValue(nationalAvg, meta.unit) : "n.d."}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                {bestRegion && (
+                  <p className="compare-note">
+                    Migliore tra le selezionate: <strong>{bestRegion}</strong>
+                    {meta.invert ? " (valore più basso è meglio)" : ""}.
+                  </p>
+                )}
+              </DataCard>
+            </aside>
+          </div>
+        )}
+      </div>
       <SiteFooter />
     </main>
   );
@@ -1775,7 +1875,7 @@ function DetailView({
       {!indicatorMeta ? (
         <DetailViewSkeleton />
       ) : (
-        <>
+        <div key={selectedId} className="scene-enter">
           <ContextBar
             label="Scheda indicatore"
             crumbs={
@@ -1864,7 +1964,7 @@ function DetailView({
               </div>
             </section>
           </section>
-        </>
+        </div>
       )}
       <SiteFooter />
     </main>
@@ -2135,7 +2235,48 @@ function MapLegend({ min, max, unit }) {
   );
 }
 
+// FLIP row-reorder: the ranking re-sorts every time the year changes (see
+// valuesForYear), so without this the rows just snap into their new order.
+// Runs after every commit, diffing each row's top position against what was
+// measured after the previous commit, and animates the delta away with a
+// transform so the eye can follow a region moving up or down the list.
+function useFlipRows() {
+  const elementsRef = useRef(new Map());
+  const rectsRef = useRef(new Map());
+
+  useLayoutEffect(() => {
+    const nextRects = new Map();
+    elementsRef.current.forEach((el, key) => {
+      if (el) nextRects.set(key, el.getBoundingClientRect());
+    });
+    if (!prefersReducedMotion()) {
+      nextRects.forEach((nextRect, key) => {
+        const prevRect = rectsRef.current.get(key);
+        if (!prevRect) return;
+        const dy = prevRect.top - nextRect.top;
+        if (Math.abs(dy) < 0.5) return;
+        const el = elementsRef.current.get(key);
+        if (!el) return;
+        el.classList.add("is-flipping");
+        el.style.transition = "none";
+        el.style.transform = `translateY(${dy}px)`;
+        el.getBoundingClientRect(); // force reflow so the jump above paints before the transition kicks in
+        el.style.transition = "";
+        el.style.transform = "";
+        el.addEventListener("transitionend", () => el.classList.remove("is-flipping"), { once: true });
+      });
+    }
+    rectsRef.current = nextRects;
+  });
+
+  return (key) => (el) => {
+    if (el) elementsRef.current.set(key, el);
+    else elementsRef.current.delete(key);
+  };
+}
+
 function Ranking({ values, selectedRegion, onSelect, unit }) {
+  const registerRow = useFlipRows();
   if (!values.length) {
     return <p className="card-empty">Nessuna regione con dati per l'anno selezionato.</p>;
   }
@@ -2145,6 +2286,7 @@ function Ranking({ values, selectedRegion, onSelect, unit }) {
       {values.map((row, index) => (
         <button
           key={row.region}
+          ref={registerRow(row.region)}
           className={row.region === selectedRegion ? "ranking-row is-active" : "ranking-row"}
           onClick={() => onSelect(row.region)}
           type="button"

@@ -22,6 +22,12 @@
      frontend/src/styles.css: usata da .game-map-frame per agganciarsi
      appena sotto il masthead invece di un valore fisso scollegato. */
   --masthead-h: 64px;
+  /* Timing della navigazione condiviso con frontend/src/styles.css, usato qui
+     dall'underline che segue il link attivo nel masthead (vedi nav-underline.js). */
+  --ease-out: cubic-bezier(0.2, 0.7, 0.15, 1);
+  --ease-in-out: cubic-bezier(0.65, 0.05, 0.35, 1);
+  --dur-fast: 180ms;
+  --dur: 280ms;
 }
 
 * { box-sizing: border-box; }
@@ -61,10 +67,24 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .brand-text { display: grid; line-height: 1.1; }
 .brand-text strong { font-family: var(--font-display); font-size: 17px; }
 .brand-text small { color: var(--muted); font-size: 11.5px; }
-.masthead__links { margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 13.5px; }
-.masthead__links a { color: var(--muted); padding: 10px 2px; }
+.masthead__links { position: relative; margin-left: auto; display: flex; align-items: center; gap: 18px; font-size: 13.5px; }
+.masthead__links a { color: var(--muted); padding: 10px 2px; transition: color var(--dur-fast) var(--ease-out); }
 .masthead__links a:hover { color: var(--ink); text-decoration: none; }
 .masthead__links a.is-active { color: var(--ink); font-weight: 600; }
+
+/* Accent pill that slides beneath the active masthead link; positioned by
+   nav-underline.js against #masthead-nav, mirrors .nav-underline in the SPA. */
+.nav-underline {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: transform var(--dur) var(--ease-in-out), width var(--dur) var(--ease-in-out), opacity var(--dur-fast) var(--ease-out);
+  pointer-events: none;
+}
+.nav-underline.is-visible { opacity: 1; }
 .masthead__search {
   display: none;
   margin-left: auto;

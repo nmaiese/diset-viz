@@ -25,6 +25,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+    <script src="{{ url_for('static', filename='js/nav-underline.js') }}" defer></script>
     {% block head_extra %}{% endblock %}
   </head>
   <body>
@@ -46,6 +47,7 @@
         <a href="/metodologia" class="{{ 'is-active' if active_nav == 'metodologia' else '' }}">Metodologia</a>
         <a href="/blog" class="{{ 'is-active' if active_nav == 'blog' else '' }}">Blog</a>
         <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Fonte Istat</a>
+        <span class="nav-underline" aria-hidden="true"></span>
       </nav>
       <a class="masthead__search" href="/" aria-label="Cerca nell'atlante">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
