@@ -5,6 +5,7 @@ import {
   AlertTriangle,
   ArrowDownRight,
   ArrowLeft,
+  ArrowLeftRight,
   ArrowUpRight,
   BarChart3,
   Check,
@@ -84,6 +85,8 @@ function App() {
       ? "detail"
       : view === "regioni"
       ? "regioni"
+      : view === "confronto"
+      ? "confronto"
       : view === "atlas"
       ? "atlas"
       : selectedId
@@ -228,10 +231,10 @@ function App() {
     window.scrollTo({ top: 0, behavior: "auto" });
   };
 
-  // Switch between the two reading modes ("per indicatore" / "per regione").
+  // Switch between reading modes ("per indicatore" / "per regione" / "confronta").
   const goToMode = (mode) => {
     setFromParam(null);
-    setView(mode === "regioni" ? "regioni" : "atlas");
+    setView(mode === "regioni" ? "regioni" : mode === "confronto" ? "confronto" : "atlas");
     trackEvent("switch_mode", { mode });
     window.scrollTo({ top: 0, behavior: "auto" });
   };
@@ -288,6 +291,17 @@ function App() {
         onOpenIndicator={(item) =>
           openIndicator(item, { type: "regione", key: regionKey, name: regionProfile?.region })
         }
+      />
+    );
+  }
+
+  if (activeView === "confronto") {
+    return (
+      <CompareView
+        catalog={catalog}
+        mapData={mapData}
+        onMode={goToMode}
+        onOpenRegion={openRegion}
       />
     );
   }
@@ -393,7 +407,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
     <>
       <header className="masthead">
         <a className="brand" href="/" aria-label="Divario Italia, home">
-          <span className="brand-mark">DI</span>
+          <img className="brand-mark" src="/static/img/logo-mark.png" alt="" width="38" height="38" />
           <span className="brand-text">
             <strong>Divario Italia</strong>
             <small>Atlante degli indicatori territoriali</small>
@@ -509,6 +523,7 @@ function ModeSwitch({ active, onMode }) {
   const modes = [
     { id: "atlas", label: "Per indicatore", icon: BarChart3 },
     { id: "regioni", label: "Per regione", icon: MapPinned },
+    { id: "confronto", label: "Confronta", icon: ArrowLeftRight },
   ];
   return (
     <div className="mode-switch" role="tablist" aria-label="Modalità di lettura">
@@ -1454,6 +1469,238 @@ function MovementList({ items, moveMax, dir, onOpen }) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Compare (multi-region) view                                        */
+/* ------------------------------------------------------------------ */
+
+const COMPARE_SERIES_COLORS = ["var(--accent)", "var(--ink)", "var(--positive)"];
+const COMPARE_MAX_REGIONS = 3;
+
+function CompareTimeline({ seriesList, averageSeries, selectedYear, onYear, unit }) {
+  const width = 720;
+  const height = 300;
+  const margin = { top: 20, right: 24, bottom: 34, left: 58 };
+  const all = [...seriesList.flatMap((s) => s.points), ...averageSeries].filter((row) => Number.isFinite(row.value));
+  if (!all.length) return <p className="card-empty">Serie storica non disponibile.</p>;
+
+  const x = d3.scaleLinear().domain(d3.extent(all, (row) => row.year)).range([margin.left, width - margin.right]);
+  const y = d3.scaleLinear().domain(d3.extent(all, (row) => row.value)).nice().range([height - margin.bottom, margin.top]);
+  const line = d3.line().defined((row) => Number.isFinite(row.value)).x((row) => x(row.year)).y((row) => y(row.value)).curve(d3.curveMonotoneX);
+
+  return (
+    <svg className="timeline" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Serie storica a confronto">
+      <text className="axis-title" x={16} y={margin.top + 4}>{unit}</text>
+      <g className="grid">
+        {y.ticks(4).map((tick) => (
+          <g key={tick}>
+            <line x1={margin.left} x2={width - margin.right} y1={y(tick)} y2={y(tick)} />
+            <text x={margin.left - 10} y={y(tick)}>{formatCompact(tick, unit)}</text>
+          </g>
+        ))}
+      </g>
+      <path className="average-line" d={line(averageSeries)} />
+      {seriesList.map((s) => <path key={s.region} d={line(s.points)} style={{ stroke: s.color }} className="compare-line" />)}
+      {seriesList.map((s) => {
+        const pt = s.points.find((row) => row.year === selectedYear) || s.points[s.points.length - 1];
+        return pt && Number.isFinite(pt.value) ? (
+          <circle
+            key={s.region}
+            cx={x(pt.year)}
+            cy={y(pt.value)}
+            r={5}
+            style={{ fill: s.color }}
+            tabIndex={0}
+            role="button"
+            onClick={() => onYear(pt.year)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onYear(pt.year); }
+            }}
+          >
+            <title>{s.region}, {pt.year}: {formatValue(pt.value, unit)}</title>
+          </circle>
+        ) : null;
+      })}
+      <g className="x-axis">
+        {x.ticks(6).map((tick) => (
+          <text
+            key={tick}
+            x={x(tick)}
+            y={height - 10}
+            className={Math.round(tick) === selectedYear ? "is-active" : ""}
+            onClick={() => onYear(Math.round(tick))}
+          >
+            {Math.round(tick)}
+          </text>
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
+  const [indId, setIndId] = useState(catalog.featured_indicator_id);
+  const [indicator, setIndicator] = useState(null);
+  const [regionNames, setRegionNames] = useState([]);
+  const [year, setYear] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchJson(API.indicator(indId))
+      .then((payload) => {
+        if (cancelled) return;
+        setIndicator(payload);
+        setYear(payload.metadata.year_max);
+        setRegionNames((current) => {
+          const valid = current.filter((name) => payload.metadata.regions.includes(name));
+          if (valid.length) return valid;
+          return payload.metadata.regions.slice(0, 3);
+        });
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [indId]);
+
+  const meta = indicator?.metadata;
+  const series = indicator?.series || [];
+  const yearValues = useMemo(() => (year != null ? valuesForYear(series, year) : []), [series, year]);
+  const averageSeries = useMemo(() => buildAverageSeries(series), [series]);
+  const seriesList = useMemo(
+    () => regionNames.map((name, i) => ({
+      region: name,
+      color: COMPARE_SERIES_COLORS[i],
+      points: valuesForRegion(series, name),
+    })),
+    [regionNames, series],
+  );
+  const valueByRegion = useMemo(() => new Map(yearValues.map((row) => [row.region, row])), [yearValues]);
+  const nationalAvg = yearValues.length ? yearValues.reduce((sum, row) => sum + row.value, 0) / yearValues.length : null;
+  const bestRegion = useMemo(() => {
+    if (!regionNames.length) return null;
+    return regionNames.reduce((best, name) => {
+      const row = valueByRegion.get(name);
+      if (!row) return best;
+      const bestRow = best ? valueByRegion.get(best) : null;
+      if (!bestRow) return name;
+      const better = meta?.invert ? row.value < bestRow.value : row.value > bestRow.value;
+      return better ? name : best;
+    }, null);
+  }, [regionNames, valueByRegion, meta]);
+
+  const availableRegions = (meta?.regions || []).filter((name) => !regionNames.includes(name));
+  const addRegion = (name) => { if (name && regionNames.length < COMPARE_MAX_REGIONS) setRegionNames([...regionNames, name]); };
+  const removeRegion = (name) => { if (regionNames.length > 1) setRegionNames(regionNames.filter((n) => n !== name)); };
+
+  return (
+    <main className="app-shell">
+      <SiteHeader activeNav="atlas" onNavAtlas={() => onMode("atlas")} onNavRegioni={() => onMode("regioni")} />
+
+      <ContextBar label="Confronta" crumbs={[{ label: "Confronta" }]}>
+        <ModeSwitch active="confronto" onMode={onMode} />
+      </ContextBar>
+
+      <section className="atlas-hero atlas-hero--compact">
+        <p className="eyebrow">Confronto regioni</p>
+        <h1>Metti due o tre regioni a confronto.</h1>
+        <p className="atlas-hero__lead">
+          Scegli un indicatore e fino a tre regioni. Le vedi sovrapposte nella serie storica,
+          sulla mappa e in tabella, contro la media nazionale.
+        </p>
+      </section>
+
+      <div className="compare-bar">
+        <label className="compare-select">
+          <span className="lbl">Indicatore</span>
+          <select value={indId} onChange={(event) => setIndId(Number(event.target.value))}>
+            {catalog.indicators.map((item) => (
+              <option key={item.id} value={item.id}>{item.name}</option>
+            ))}
+          </select>
+        </label>
+        <div className="cmp-chips-field">
+          <span className="lbl">Regioni ({regionNames.length}/{COMPARE_MAX_REGIONS})</span>
+          <div className="cmp-chips">
+            {regionNames.map((name, i) => (
+              <span className="cmp-chip" key={name}>
+                <span className="cmp-chip__swatch" style={{ background: COMPARE_SERIES_COLORS[i] }} />
+                {name}
+                {regionNames.length > 1 && (
+                  <button type="button" aria-label={`Rimuovi ${name}`} onClick={() => removeRegion(name)}>
+                    <X size={13} />
+                  </button>
+                )}
+              </span>
+            ))}
+            {regionNames.length < COMPARE_MAX_REGIONS && availableRegions.length > 0 && (
+              <span className="cmp-chip cmp-chip--add">
+                <select value="" onChange={(event) => addRegion(event.target.value)} aria-label="Aggiungi regione">
+                  <option value="" disabled>Aggiungi…</option>
+                  {availableRegions.map((name) => <option key={name} value={name}>{name}</option>)}
+                </select>
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {!meta ? (
+        <p className="map-empty">Caricamento…</p>
+      ) : (
+        <div className="compare-layout">
+          <div className="compare-main">
+            <DataCard title="Serie storica" kicker={`${meta.name} · ${meta.unit}`}>
+              <div className="compare-legend">
+                {seriesList.map((s) => <span key={s.region} className="legend-item"><i style={{ background: s.color }} />{s.region}</span>)}
+                <span className="legend-item legend-average"><i />Media nazionale</span>
+              </div>
+              <CompareTimeline seriesList={seriesList} averageSeries={averageSeries} selectedYear={year} onYear={setYear} unit={meta.unit} />
+            </DataCard>
+            <DataCard title="Mappa" kicker={`${year} · regioni a confronto evidenziate`}>
+              <ItalyMap
+                geo={mapData}
+                values={yearValues}
+                selectedRegion={regionNames}
+                onSelect={onOpenRegion}
+                unit={meta.unit}
+              />
+            </DataCard>
+          </div>
+          <aside className="compare-side">
+            <DataCard title={`Confronto · ${year}`} kicker={meta.unit}>
+              <table className="cmp-table">
+                <thead><tr><th>Regione</th><th className="num">Valore</th></tr></thead>
+                <tbody>
+                  {regionNames.map((name, i) => {
+                    const row = valueByRegion.get(name);
+                    return (
+                      <tr key={name}>
+                        <td><span className="cmp-swatch" style={{ background: COMPARE_SERIES_COLORS[i] }} />{name}</td>
+                        <td className={`num ${name === bestRegion ? "cmp-winner" : ""}`}>
+                          {row ? formatValue(row.value, meta.unit) : "n.d."}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  <tr>
+                    <td className="cmp-avg-label">Media nazionale</td>
+                    <td className="num cmp-avg-label">{nationalAvg != null ? formatValue(nationalAvg, meta.unit) : "n.d."}</td>
+                  </tr>
+                </tbody>
+              </table>
+              {bestRegion && (
+                <p className="compare-note">
+                  Migliore tra le selezionate: <strong>{bestRegion}</strong>
+                  {meta.invert ? " (valore più basso è meglio)" : ""}.
+                </p>
+              )}
+            </DataCard>
+          </aside>
+        </div>
+      )}
+      <SiteFooter />
+    </main>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Detail (dashboard) view                                            */
 /* ------------------------------------------------------------------ */
 
@@ -1819,7 +2066,9 @@ function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false
           const key = normalizeRegionKey(feature.properties.name);
           const row = valueByKey.get(key);
           const hasValue = row && row.value !== null && row.value !== undefined && Number.isFinite(row.value);
-          const isSelected = row?.region === selectedRegion;
+          const isSelected = Array.isArray(selectedRegion)
+            ? row && selectedRegion.includes(row.region)
+            : row?.region === selectedRegion;
           const title = row
             ? neutral
               ? row.region
