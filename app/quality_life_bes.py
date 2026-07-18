@@ -131,7 +131,10 @@ def _matrix_and_meta(level):
             "id": public_id,
             "raw_id": ind_id,
             "name": info["name"],
-            "theme": info["domain_name"],
+            # info["category_name"] is the canonical public category (app.taxonomy);
+            # info["domain_name"] is the raw BES domain, kept for traceability.
+            "theme": info.get("category_name") or info["domain_name"],
+            "source_theme": info["domain_name"],
             "category": info["category"],
             "direction": info["direction"],
             "year_max": year_max,
@@ -164,7 +167,9 @@ def _matrix_and_meta(level):
             meta[indicator_id] = {
                 "id": indicator_id,
                 "name": item["name"],
+                # get_catalog() already carries the canonical category (app/data.py).
                 "theme": item["theme"],
+                "source_theme": item.get("source_theme"),
                 "category": selection[indicator_id],
                 "direction": direction,
                 "year_max": item["year_max"],

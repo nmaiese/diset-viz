@@ -18,6 +18,7 @@ from app.quality_life_config import QUALITY_LIFE_CATEGORIES
 from app.quality_life_selection import regional_quality_life_selection
 from app.taxonomy import (
     CANONICAL_CATEGORIES,
+    DUPLICATE_BES_IDS,
     MACRO_AREA_ORDER,
     canonical_category_slug,
     category_metadata,
@@ -171,6 +172,7 @@ def get_atlas_catalog():
             "quality_life_category": score_selection.get(_bes_public_id(raw_id)),
         }
         for raw_id in get_bes_manifest("regione")
+        if raw_id not in DUPLICATE_BES_IDS
     ]
     for item in legacy_indicators + bes_indicators:
         category = item.get("quality_life_category")

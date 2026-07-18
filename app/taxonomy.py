@@ -179,6 +179,25 @@ SOURCE_INDICATOR_CATEGORY_OVERRIDES = {
     "11RIC022": "ricerca_innovazione_digitale",  # servizi comunali online
     "11RIC004P": "cultura_patrimonio_turismo",   # imprese culturali
 }
+
+# National BES regional indicators that are exact duplicates of an existing
+# territorial-backbone series: identical name and identical values in every
+# region and year (verified against the CSVs, not just the label). Excluded
+# from general browsing (atlas catalog, search, theme pages, quiz pool) so the
+# same measure does not appear twice; the territorial id is kept as canonical
+# there. The BES id stays fully reachable on its own page and keeps being used
+# by the quality-of-life score, which prefers the BES release for exact-name
+# duplicates (see quality_life_selection.regional_quality_life_selection) -
+# this is a browsing-only dedup, not a data change.
+DUPLICATE_BES_IDS = {
+    "01SAL001",  # Speranza di vita alla nascita -> territoriale 910
+    "10AMB007",  # Coste marine balneabili -> territoriale 539
+    "10AMB008",  # Disponibilità di verde urbano -> territoriale 592
+    "12SER006",  # Irregolarità nella distribuzione dell'acqua -> territoriale 6
+    "12SER025",  # Emigrazione ospedaliera in altra regione -> territoriale 590
+    "SDG-310",   # Competenza numerica non adeguata (III media) -> territoriale 618
+    "SDG-311",   # Competenza alfabetica non adeguata (III media) -> territoriale 617
+}
 CATEGORY_NAME_TO_SLUG = {
     category["name"]: slug for slug, category in CANONICAL_CATEGORIES.items()
 }

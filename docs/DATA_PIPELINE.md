@@ -32,10 +32,17 @@ indicatori mal orientati o macro-aree incomplete.
   indicatori con ultimo anno almeno 2025, copertura almeno 80%, categoria e
   direzione revisionate. Le province continuano a usare BES dei Territori.
 - Il **catalogo pubblico federato** (`app/atlas_catalog.py:get_atlas_catalog`)
-  presenta insieme il catalogo territoriale e tutti i 145 indicatori BES
-  regionali. Gli id BES hanno namespace `bes:*`. L'adattatore alimenta le stesse
-  mappe, classifiche e serie storiche della SPA, ma non modifica il CSV legacy e
-  non modifica i profili regionali descrittivi calcolati da `app/profiles.py`.
+  presenta insieme il catalogo territoriale e gli indicatori BES regionali,
+  tranne quelli in `app/taxonomy.py:DUPLICATE_BES_IDS`. Gli id BES hanno
+  namespace `bes:*`. L'adattatore alimenta le stesse mappe, classifiche e serie
+  storiche della SPA, ma non modifica il CSV legacy e non modifica i profili
+  regionali descrittivi calcolati da `app/profiles.py`. Quando aggiungi un
+  indicatore BES, controlla se esiste già una serie territoriale con lo stesso
+  nome e con gli stessi valori (stesso fenomeno Istat ingerito due volte): se
+  sì, aggiungi il suo id BES a `DUPLICATE_BES_IDS` così non compare due volte
+  nel catalogo/ricerca/quiz. `app/quiz.py` legge la stessa lista. Il motore di
+  punteggio (`app/quality_life_selection.py`) ha una deduplica separata, che
+  preferisce BES: non toccarla.
 - La **selezione qualità della vita** (`app/quality_life_selection.py`) opera
   sul catalogo federato. Include BES regionali almeno al 2025 e indicatori
   territoriali core almeno al 2023, tutti con direzione revisionata e copertura

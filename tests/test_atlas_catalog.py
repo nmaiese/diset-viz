@@ -5,14 +5,14 @@ from app.atlas_catalog import BES_ID_PREFIX, get_atlas_catalog, get_atlas_theme_
 from app.bes_data import get_bes_manifest
 from app.data import get_catalog
 from app.quality_life_config import QUALITY_LIFE_CATEGORIES
-from app.taxonomy import CANONICAL_CATEGORIES, MACRO_AREA_ORDER
+from app.taxonomy import CANONICAL_CATEGORIES, DUPLICATE_BES_IDS, MACRO_AREA_ORDER
 
 
 class FederatedAtlasCatalogTest(unittest.TestCase):
-    def test_catalog_adds_every_regional_bes_indicator_without_mutating_legacy_catalog(self):
+    def test_catalog_adds_every_non_duplicate_regional_bes_indicator_without_mutating_legacy_catalog(self):
         legacy = get_catalog()
         federated = get_atlas_catalog()
-        bes_count = len(get_bes_manifest("regione"))
+        bes_count = len(get_bes_manifest("regione")) - len(DUPLICATE_BES_IDS)
 
         self.assertEqual(len(federated["indicators"]), len(legacy["indicators"]) + bes_count)
         self.assertFalse(any(str(item["id"]).startswith(BES_ID_PREFIX) for item in legacy["indicators"]))
@@ -28,6 +28,30 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         self.assertGreaterEqual(len(scored), 200)
         self.assertEqual({item["catalog_family"] for item in scored}, {"bes", "territorial"})
         self.assertTrue(all(item["quality_life_category_label"] for item in scored))
+
+    def test_exact_duplicate_bes_indicators_are_excluded_from_general_browsing(self):
+        """These BES ids are the same Istat series (identical name and values) as an
+        existing territorial indicator. They must not show up twice in the general
+        catalog, so only the territorial id is kept for browsing/search/quiz."""
+        federated = get_atlas_catalog()
+        federated_ids = {str(item["id"]) for item in federated["indicators"]}
+        for raw_id in DUPLICATE_BES_IDS:
+            self.assertNotIn(f"{BES_ID_PREFIX}{raw_id}", federated_ids)
+
+        from collections import Counter
+
+        name_counts = Counter(item["name"].strip().lower() for item in federated["indicators"])
+        duplicate_names = {
+            "speranza di vita alla nascita",
+            "coste marine balneabili",
+            "disponibilità di verde urbano",
+            "emigrazione ospedaliera in altra regione",
+            "irregolarità nella distribuzione dell'acqua",
+            "competenza alfabetica non adeguata (studenti classi iii scuola secondaria primo grado)",
+            "competenza numerica non adeguata (studenti classi iii scuola secondaria primo grado)",
+        }
+        for name in duplicate_names:
+            self.assertEqual(name_counts[name], 1, f"{name!r} still appears more than once in the atlas catalog")
 
     def test_theme_pages_use_the_same_federated_catalog(self):
         client = app.test_client()

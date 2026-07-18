@@ -24,7 +24,7 @@ from app.bes_data import (
     get_bes_manifest,
     get_bes_rows,
 )
-from app.taxonomy import category_metadata
+from app.taxonomy import DUPLICATE_BES_IDS, category_metadata
 from app import profiles
 
 COMPARE_CHOICES = ("region_a", "region_b", "timeout")
@@ -92,6 +92,8 @@ def _bes_quiz_indicators():
     pool = []
     manifest = get_bes_manifest("regione")
     for raw_id, info in manifest.items():
+        if raw_id in DUPLICATE_BES_IDS:
+            continue
         if info["year_max"] < _BES_MIN_YEAR or info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
             continue
         payload = _bes_region_payload(f"{_BES_PREFIX}{raw_id}", info["year_max"])
@@ -134,11 +136,15 @@ def _quiz_indicators():
         rows = payload["values"]  # non-null, già ordinati per valore desc
         if len({row["value"] for row in rows}) < _MIN_DISTINCT_VALUES:
             continue
-        public_theme = category_metadata(item["theme"])
         pool.append({
             "id": item["id"],
             "name": item["name"],
-            **public_theme,
+            # get_catalog() already carries the canonical category (see app/data.py).
+            "category_slug": item.get("category_slug"),
+            "theme_slug": item.get("theme_slug"),
+            "theme": item["theme"],
+            "source_theme": item.get("source_theme"),
+            "macro_area": item["macro_area"],
             "unit": item["unit"],
             "year": year,
             "source_label": item["source_label"],

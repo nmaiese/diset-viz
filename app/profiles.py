@@ -169,7 +169,13 @@ def _indicator_meta():
         result[item["id"]] = {
             "id": item["id"],
             "name": item["name"],
-            **category_metadata(item["theme"]),
+            # get_catalog() already carries the canonical category (see app/data.py);
+            # no need to call category_metadata() a second time here.
+            "category_slug": item.get("category_slug"),
+            "theme_slug": item.get("theme_slug"),
+            "theme": item["theme"],
+            "source_theme": item.get("source_theme"),
+            "macro_area": item["macro_area"],
             "unit": item["unit"],
             "description": (item.get("explain") or {}).get("plain"),
             "value_explanation": (item.get("explain") or {}).get("example"),
@@ -454,7 +460,7 @@ def theme_profile(theme_slug):
             "plain": (item.get("explain") or {}).get("plain"),
         }
         for item in get_catalog()["indicators"]
-        if category_metadata(item["theme"])["theme"] == name
+        if item["theme"] == name
     ]
     indicators.sort(key=lambda i: (not i["complete"], i["name"]))
 
@@ -505,7 +511,7 @@ def regions_overview():
 def all_themes_index():
     counts = defaultdict(int)
     for item in get_catalog()["indicators"]:
-        counts[category_metadata(item["theme"])["theme"]] += 1
+        counts[item["theme"]] += 1
     return [
         {
             "theme": category["name"],

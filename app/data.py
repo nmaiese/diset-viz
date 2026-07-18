@@ -6,7 +6,8 @@ from collections import defaultdict
 from functools import lru_cache
 
 from app.external_data import enrich_indicator_metadata
-from app.indicator_notes import MACRO_AREA_ORDER, build_indicator_explain, display_unit, macro_area_for
+from app.indicator_notes import build_indicator_explain, display_unit
+from app.taxonomy import MACRO_AREA_ORDER, category_metadata
 
 
 DATASET_PATH = os.path.join(os.path.dirname(__file__), "static/data/Assoluti_Regione.csv")
@@ -233,8 +234,12 @@ def get_catalog():
         indicators.append(
             enrich_indicator_metadata({
                 "id": indicator_id,
-                "theme": first["theme"],
-                "macro_area": macro_area_for(first["theme"]),
+                # Populate the canonical public category (theme/macro_area) right at
+                # the source, keeping the verbatim Istat sub-theme as source_theme.
+                # Every consumer of get_catalog() then sees the same taxonomy without
+                # having to remember to call category_metadata() itself (a couple of
+                # call sites used to skip it and leak the raw sub-theme to users).
+                **category_metadata(first["theme"]),
                 "name": first["indicator"],
                 "unit": first["unit"],
                 "source": first["source"],
@@ -256,7 +261,7 @@ def get_catalog():
 
     indicators.sort(key=lambda item: (item["theme"], item["name"]))
     theme_items = [
-        {"name": name, "macro_area": macro_area_for(name), **payload}
+        {"name": name, "macro_area": category_metadata(name)["macro_area"], **payload}
         for name, payload in sorted(themes.items(), key=lambda item: item[0].lower())
     ]
 
