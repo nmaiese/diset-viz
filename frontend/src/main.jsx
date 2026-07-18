@@ -333,6 +333,8 @@ function App() {
   return (
     <AtlasView
       catalog={catalog}
+      mapData={mapData}
+      onOpenRegion={openRegion}
       theme={theme}
       setTheme={(value) => {
         setThemeParam(value === "Tutti" ? null : value);
@@ -577,11 +579,135 @@ function Bar({ pct, className = "" }) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Home hero: interactive map + dual entry                            */
+/* ------------------------------------------------------------------ */
+
+// A short, varied set of indicators to offer in the hero map picker: the
+// catalog's featured indicator plus one complete indicator per additional
+// theme, capped so the <select> stays scannable (the full 538-item catalog
+// lives in the index below, this is just an inviting first taste).
+function heroIndicatorChoices(catalog) {
+  const seenThemes = new Set();
+  const picks = [];
+  const featured = catalog.indicators.find((i) => i.id === catalog.featured_indicator_id);
+  if (featured) {
+    picks.push(featured);
+    seenThemes.add(featured.theme);
+  }
+  for (const item of catalog.indicators) {
+    if (picks.length >= 6) break;
+    if (!item.complete || seenThemes.has(item.theme)) continue;
+    picks.push(item);
+    seenThemes.add(item.theme);
+  }
+  return picks;
+}
+
+function HomeMapHero({ catalog, mapData, onOpenRegion }) {
+  const choices = useMemo(() => heroIndicatorChoices(catalog), [catalog]);
+  const [heroIndId, setHeroIndId] = useState(choices[0]?.id ?? catalog.featured_indicator_id);
+  const [heroIndicator, setHeroIndicator] = useState(null);
+  const [hoverRow, setHoverRow] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchJson(API.indicator(heroIndId))
+      .then((payload) => { if (!cancelled) setHeroIndicator(payload); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [heroIndId]);
+
+  const meta = heroIndicator?.metadata;
+  const year = meta?.year_max;
+  const values = useMemo(
+    () => (heroIndicator ? valuesForYear(heroIndicator.series, year) : []),
+    [heroIndicator, year],
+  );
+
+  return (
+    <section className="home-hero">
+      <div className="home-hero__intro">
+        <p className="eyebrow">Istat · {catalog.indicators.length} indicatori · 20 regioni · {coverageSpan(catalog)}</p>
+        <h1>
+          Un atlante per leggere l'Italia,<br />
+          regione per regione.
+        </h1>
+        <p className="atlas-hero__lead">
+          Indicatori territoriali e BES Istat per capire dove l'Italia corre e dove resta indietro.
+          Filtra per area, tema o anni, poi apri la scheda di ogni indicatore con mappa,
+          classifica e andamento nel tempo.
+        </p>
+        <div className="entry-cards">
+          <a className="entry-card" href="#home-map">
+            <span className="entry-card__icon"><MapPinned size={20} /></span>
+            <strong>Parti da una regione</strong>
+            <span>Clicca una regione sulla mappa per aprirne il profilo.</span>
+            <span className="entry-card__go">Esplora la mappa ↓</span>
+          </a>
+          <a className="entry-card" href="#atlas-index">
+            <span className="entry-card__icon"><Layers size={20} /></span>
+            <strong>Parti da un tema</strong>
+            <span>Sfoglia gli indicatori per area e completezza.</span>
+            <span className="entry-card__go">Vai all'indice ↓</span>
+          </a>
+        </div>
+      </div>
+
+      <div className="map-panel" id="home-map">
+        <div className="map-panel__bar">
+          <span className="lbl">Colora la mappa per</span>
+          <select
+            className="map-panel__select"
+            value={heroIndId}
+            onChange={(event) => setHeroIndId(Number(event.target.value))}
+            aria-label="Indicatore mostrato sulla mappa"
+          >
+            {choices.map((item) => (
+              <option key={item.id} value={item.id}>{item.name}</option>
+            ))}
+          </select>
+          {year != null && <span className="lbl map-panel__year">{year}</span>}
+        </div>
+        <div className="map-panel__body">
+          {heroIndicator && meta ? (
+            <>
+              <ItalyMap
+                geo={mapData}
+                values={values}
+                selectedRegion={hoverRow?.region}
+                onSelect={onOpenRegion}
+                onHover={setHoverRow}
+                unit={meta.unit}
+              />
+              <div className="map-readout">
+                {hoverRow ? (
+                  <>
+                    <span className="map-readout__name">{hoverRow.region}</span>
+                    <span className="map-readout__value">{formatValue(hoverRow.value, meta.unit)}</span>
+                    <span className="map-readout__go">Clicca per il profilo →</span>
+                  </>
+                ) : (
+                  <span className="map-readout__hint">
+                    Passa sopra una regione per vederne il valore. Clicca per aprire il profilo completo.
+                  </span>
+                )}
+              </div>
+            </>
+          ) : (
+            <p className="map-empty">Caricamento mappa...</p>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Atlas (browse) view                                                */
 /* ------------------------------------------------------------------ */
 
 function AtlasView({
-  catalog, theme, setTheme, query, setQuery, sort, setSort, showPartial, setShowPartial,
+  catalog, mapData, onOpenRegion, theme, setTheme, query, setQuery, sort, setSort, showPartial, setShowPartial,
   macroArea, setMacroArea, sourceFamily, setSourceFamily, yearFrom, yearTo, setYearRange, onOpen, onMode,
 }) {
   const [fullMin, fullMax] = useMemo(() => {
@@ -644,18 +770,7 @@ function AtlasView({
         <ModeSwitch active="atlas" onMode={onMode} />
       </ContextBar>
 
-      <section className="atlas-hero">
-        <p className="eyebrow">Istat · {catalog.indicators.length} indicatori · 20 regioni · {coverageSpan(catalog)}</p>
-        <h1>
-          Un atlante per leggere l'Italia,<br />
-          regione per regione.
-        </h1>
-        <p className="atlas-hero__lead">
-          Indicatori territoriali e BES Istat per capire dove l'Italia corre e dove resta indietro.
-          Filtra per area, tema o anni, poi apri la scheda di ogni indicatore con mappa,
-          classifica e andamento nel tempo.
-        </p>
-      </section>
+      <HomeMapHero catalog={catalog} mapData={mapData} onOpenRegion={onOpenRegion} />
 
       <MacroSpine
         areas={catalog.macro_areas || []}
@@ -672,7 +787,7 @@ function AtlasView({
           onSelect={setTheme}
         />
 
-        <div className="index-panel">
+        <div className="index-panel" id="atlas-index">
           <CommandBar
             query={query}
             setQuery={setQuery}
@@ -1682,7 +1797,7 @@ function DataCard({ title, kicker, className, children }) {
   );
 }
 
-function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false }) {
+function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false, onHover }) {
   const width = 560;
   const height = 660;
   const valueByKey = useMemo(() => new Map(values.map((row) => [row.region_key, row])), [values]);
@@ -1717,6 +1832,8 @@ function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false
               className={isSelected ? "is-selected" : ""}
               fill={neutral ? MISSING_FILL : hasValue ? color(row.value) : MISSING_FILL}
               onClick={() => row && onSelect(row.region)}
+              onMouseEnter={() => onHover && onHover(row || null)}
+              onMouseLeave={() => onHover && onHover(null)}
               tabIndex={0}
               role="button"
               aria-label={title}
