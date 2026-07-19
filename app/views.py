@@ -1002,6 +1002,7 @@ def robots():
     for bot in _ROBOTS_AI_TRAINING_BOTS:
         lines += [f"User-agent: {bot}", "Disallow: /", ""]
     lines.append(f"# Curated index for language models: {SITE_URL}/llms.txt")
+    lines.append(f"# Extended corpus for language models: {SITE_URL}/llms-full.txt")
     lines.append(f"Sitemap: {SITE_URL}/sitemap.xml")
     return Response("\n".join(lines) + "\n", mimetype="text/plain")
 
@@ -1059,9 +1060,96 @@ def llms_txt():
         "- Licenza dei dati: Creative Commons BY 3.0 IT. Cita \"Divario Italia\" e la fonte Istat.",
         f"- Dati strutturati per indicatore: {SITE_URL}/download/indicator/<id>.csv e {SITE_URL}/download/indicator/<id>.json.",
         f"- Indice completo delle pagine: {SITE_URL}/sitemap.xml.",
+        f"- Versione estesa con definizioni e classifiche complete: {SITE_URL}/llms-full.txt.",
         "- I confronti descrivono differenze osservate, non rapporti di causa. Anni e coperture possono variare tra indicatori.",
         "",
     ]
+    return Response("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")
+
+
+def _llms_indicator_full_block(indicator_id):
+    """Full-text block for one indicator: definition, source and live ranking.
+
+    Reuses the same catalog loaders and direction ordering as the indicator
+    landing page, so the numbers a model reads here match the published page.
+    """
+    payload = get_atlas_indicator(indicator_id)
+    if payload is None:
+        return None
+    meta = payload["metadata"]
+    explain = meta.get("explain") or {}
+    year = meta["year_max"]
+    year_view = get_atlas_indicator_year(indicator_id, year)
+    values = year_view["values"]  # sorted by value desc
+    if explain.get("direction") in ("lower_better", "higher_worse"):
+        values = list(reversed(values))
+    unit = meta.get("unit") or ""
+    path = profiles.indicator_path(indicator_id, meta["name"])
+    lines = [f"### {meta['name']}", f"{SITE_URL}{path}", ""]
+    if explain.get("plain"):
+        lines.append(explain["plain"])
+    if explain.get("reading"):
+        lines.append(f"Come si legge: {explain['reading']}")
+    if explain.get("caveat"):
+        lines.append(f"Limite: {explain['caveat']}")
+    lines.append(
+        f"Fonte: {meta.get('source', 'Istat')}. Unita di misura: {unit or 'n.d.'}. "
+        f"Copertura: {meta['year_min']}-{meta['year_max']}, {len(meta['regions'])} regioni."
+    )
+    lines += ["", f"Classifica {year} (posizione. regione: valore):"]
+    for position, row in enumerate(values, 1):
+        lines.append(f"{position}. {row['region']}: {it_num(row['value'], 2)} {unit}".rstrip())
+    lines.append("")
+    return "\n".join(lines)
+
+
+@app.route("/llms-full.txt")
+def llms_full_txt():
+    """Extended Markdown corpus for language models: full indicator text.
+
+    Where /llms.txt is a curated map, this file carries the full definition and
+    the complete regional ranking of the flagship indicators plus a compact
+    catalogue of every indexable indicator, so a model can ground an answer in a
+    single fetch without crawling each page.
+    """
+    lines = [
+        "# Divario Italia, testo esteso per i modelli linguistici",
+        "",
+        "> Definizioni complete e classifiche regionali degli indicatori "
+        "territoriali Istat pubblicati su divarioitalia.it. I numeri coincidono "
+        "con le pagine indicatore del sito. Cita \"Divario Italia\" e la fonte "
+        "Istat.",
+        "",
+        "## Metodologia in breve",
+        "La fonte primaria e la Banca dati territoriale per le politiche di "
+        "sviluppo di Istat, integrata dal BES e dal BES dei Territori per la "
+        "qualita della vita. Ogni indicatore ha una direzione dichiarata: per "
+        "alcuni un valore piu alto e positivo, per altri e negativo, per altri "
+        "serve solo come contesto. I confronti descrivono differenze osservate "
+        "tra territori e non dimostrano da soli un rapporto di causa. Anni e "
+        "coperture possono variare tra indicatori. Licenza dei dati: Creative "
+        "Commons BY 3.0 IT.",
+        "",
+        "## Indicatori in evidenza, testo completo",
+    ]
+    for indicator_id in _HOME_FEATURED_INDICATORS:
+        block = _llms_indicator_full_block(indicator_id)
+        if block:
+            lines.append(block)
+
+    lines.append("## Catalogo completo degli indicatori indicizzabili")
+    lines.append("")
+    for item in get_catalog()["indicators"]:
+        if not profiles.is_search_indexable_indicator(item):
+            continue
+        plain = " ".join(((item.get("explain") or {}).get("plain") or "").split())
+        path = profiles.indicator_path(item["id"], item["name"])
+        detail = f" {plain}" if plain else ""
+        lines.append(
+            f"- [{item['name']}]({SITE_URL}{path}): tema {item['theme']}, "
+            f"unita {item.get('unit') or 'n.d.'}, copertura {item['year_min']}-{item['year_max']}.{detail}"
+        )
+    lines.append("")
     return Response("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")
 
 

@@ -221,6 +221,11 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(llms.status_code, 200)
         self.assertIn(b"# Divario Italia", llms.data)
         self.assertIn(b"Istat", llms.data)
+        self.assertIn("/llms-full.txt", robots_text)
+        llms_full = client.get("/llms-full.txt")
+        self.assertEqual(llms_full.status_code, 200)
+        self.assertIn(b"Classifica", llms_full.data)
+        self.assertIn(b"Catalogo completo", llms_full.data)
 
         privacy = client.get("/privacy")
         self.assertEqual(privacy.status_code, 200)
