@@ -253,21 +253,6 @@ export default function CompareApp() {
               sourceLabel={round.indicator.source_label}
               sourceUrl={round.indicator.source_url}
             />
-            <div className="quiz-explanation">
-              {round.indicator.description && (
-                <p className="quiz-description">
-                  <strong>Che cosa misura.</strong> {round.indicator.description}
-                </p>
-              )}
-              {round.indicator.value_explanation && (
-                <p className="quiz-value-hint">
-                  <strong>Come leggere il valore.</strong> {round.indicator.value_explanation}
-                </p>
-              )}
-              <p className="quiz-rule-note">
-                Nel gioco vince il numero più alto, non necessariamente il risultato migliore.
-              </p>
-            </div>
           </div>
 
           <div className="compare-timer" role="presentation">
@@ -300,6 +285,12 @@ export default function CompareApp() {
               );
             })}
           </div>
+
+          {(round.indicator.description || round.indicator.value_explanation) && (
+            <p className="quiz-description-compact">
+              {[round.indicator.description, round.indicator.value_explanation].filter(Boolean).join(" ")}
+            </p>
+          )}
 
           <div className="compare-feedback" aria-live="polite">
             {status === "revealed" && result && (

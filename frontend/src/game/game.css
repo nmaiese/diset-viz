@@ -694,6 +694,16 @@
 .quiz-explanation p + p { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--line); }
 .quiz-rule-note { color: var(--muted); font-size: 12px; }
 
+/* Descrizione sintetica sotto le card di "Chi è maggiore?": niente titoli
+   né pannello, una sola riga di testo per non spingere la scelta fuori
+   dallo schermo su mobile (vedi compare.jsx). */
+.quiz-description-compact {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
 .compare-timer {
   height: 8px;
   border-radius: 0;
