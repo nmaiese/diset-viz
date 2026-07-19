@@ -203,12 +203,29 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("Disallow: /api/", robots_text)
         self.assertIn("Disallow: /data", robots_text)
         # Single source of truth (Cloudflare managed injection disabled): the
-        # content signals and AI-bot blocklist live in the app, and there must be
+        # content signals and AI-bot rules live in the app, and there must be
         # exactly one "User-agent: *" group (no duplicate from a managed prepend).
-        self.assertIn("Content-Signal: search=yes,ai-train=no", robots_text)
+        # Real-time grounding (ai-input) is allowed for citation while training
+        # (ai-train) stays reserved.
+        self.assertIn("Content-Signal: search=yes,ai-input=yes,ai-train=no", robots_text)
+        # Training crawlers stay blocked, answer/citation crawlers are allowed.
         self.assertIn("User-agent: ClaudeBot", robots_text)
+        self.assertIn("User-agent: GPTBot", robots_text)
+        self.assertIn("User-agent: OAI-SearchBot", robots_text)
+        self.assertIn("User-agent: PerplexityBot", robots_text)
         self.assertIn("User-agent: Google-Extended", robots_text)
         self.assertEqual(robots_text.count("User-agent: *"), 1)
+        # llms.txt is advertised and served as a curated index for models.
+        self.assertIn("/llms.txt", robots_text)
+        llms = client.get("/llms.txt")
+        self.assertEqual(llms.status_code, 200)
+        self.assertIn(b"# Divario Italia", llms.data)
+        self.assertIn(b"Istat", llms.data)
+        self.assertIn("/llms-full.txt", robots_text)
+        llms_full = client.get("/llms-full.txt")
+        self.assertEqual(llms_full.status_code, 200)
+        self.assertIn(b"Classifica", llms_full.data)
+        self.assertIn(b"Catalogo completo", llms_full.data)
 
         privacy = client.get("/privacy")
         self.assertEqual(privacy.status_code, 200)

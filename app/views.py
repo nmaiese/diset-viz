@@ -954,15 +954,31 @@ _ROBOTS_CONTENT_SIGNALS_PREAMBLE = """\
 # RIGHTS UNDER ARTICLE 4 OF THE EUROPEAN UNION DIRECTIVE 2019/790 ON COPYRIGHT
 # AND RELATED RIGHTS IN THE DIGITAL SINGLE MARKET."""
 
-_ROBOTS_CONTENT_SIGNAL = "search=yes,ai-train=no"
-_ROBOTS_AI_BOTS = (
+# search + real-time AI grounding (ai-input) are permitted so generative answer
+# engines can cite the atlas, while model training (ai-train) stays reserved.
+_ROBOTS_CONTENT_SIGNAL = "search=yes,ai-input=yes,ai-train=no"
+# Generative answer engines allowed to fetch pages for real-time citation and
+# grounding. These are the retrieval/citation crawlers, not the training ones:
+# unblocking them is what makes the site eligible to be surfaced in AI answers.
+_ROBOTS_AI_ANSWER_BOTS = (
+    "OAI-SearchBot",
+    "ChatGPT-User",
+    "PerplexityBot",
+    "Perplexity-User",
+    "Claude-SearchBot",
+    "Claude-User",
+    "Google-Extended",
+)
+# AI training crawlers kept blocked so the ai-train=no reservation stays
+# enforceable. Anthropic and OpenAI split retrieval from training by user agent,
+# so ClaudeBot/GPTBot are blocked here while their answer bots above are allowed.
+_ROBOTS_AI_TRAINING_BOTS = (
     "Amazonbot",
     "Applebot-Extended",
     "Bytespider",
     "CCBot",
     "ClaudeBot",
     "CloudflareBrowserRenderingCrawler",
-    "Google-Extended",
     "GPTBot",
     "meta-externalagent",
 )
@@ -973,14 +989,168 @@ _ROBOTS_DISALLOW_PATHS = ("/api/", "/data", "/legacy", "/legacy-reddito")
 @app.route("/robots.txt")
 def robots():
     lines = [_ROBOTS_CONTENT_SIGNALS_PREAMBLE, ""]
-    # Single crawler group: content signals, then the path rules for all crawlers.
+    # Default group: content signals, then the shared path rules for all crawlers.
     lines += ["User-agent: *", f"Content-Signal: {_ROBOTS_CONTENT_SIGNAL}", "Allow: /"]
     lines += [f"Disallow: {path}" for path in _ROBOTS_DISALLOW_PATHS]
     lines.append("")
-    for bot in _ROBOTS_AI_BOTS:
+    # Answer-engine group: one group for all citation crawlers, so each reads its
+    # own rules (ai-input allowed) and inherits the same crawl boundaries as "*".
+    lines += [f"User-agent: {bot}" for bot in _ROBOTS_AI_ANSWER_BOTS]
+    lines += [f"Content-Signal: {_ROBOTS_CONTENT_SIGNAL}", "Allow: /"]
+    lines += [f"Disallow: {path}" for path in _ROBOTS_DISALLOW_PATHS]
+    lines.append("")
+    for bot in _ROBOTS_AI_TRAINING_BOTS:
         lines += [f"User-agent: {bot}", "Disallow: /", ""]
+    lines.append(f"# Curated index for language models: {SITE_URL}/llms.txt")
+    lines.append(f"# Extended corpus for language models: {SITE_URL}/llms-full.txt")
     lines.append(f"Sitemap: {SITE_URL}/sitemap.xml")
     return Response("\n".join(lines) + "\n", mimetype="text/plain")
+
+
+@app.route("/llms.txt")
+def llms_txt():
+    """Curated Markdown index for language models (llmstxt.org convention).
+
+    Generated from the live catalog and blog so the entry points, featured
+    indicators and recent articles a generative engine sees stay in sync with
+    the site instead of drifting from a hand-maintained file.
+    """
+    featured = _home_featured_indicator_links()
+    recent_posts = get_posts()[:8]
+    lines = [
+        "# Divario Italia",
+        "",
+        "> Atlante degli indicatori territoriali Istat: confronto tra regioni "
+        "italiane su economia, lavoro, demografia, salute e qualita della vita, "
+        "con serie storiche, fonti verificate e dati aperti in CSV e JSON.",
+        "",
+        "Divario Italia (divarioitalia.it) pubblica i dati Istat sullo sviluppo "
+        "dei territori italiani. Ogni pagina indicatore espone la definizione, "
+        "l'ultimo anno disponibile, la copertura regionale, la fonte primaria e "
+        "i download strutturati. I numeri provengono dalla Banca dati "
+        "territoriale per le politiche di sviluppo di Istat e dal BES dei "
+        "Territori. I contenuti sono citabili con attribuzione a \"Divario "
+        "Italia\" e alla fonte Istat.",
+        "",
+        "## Sezioni principali",
+        f"- [Atlante degli indicatori]({SITE_URL}/): mappa interattiva e catalogo regionale degli indicatori territoriali.",
+        f"- [Regioni]({SITE_URL}/regioni): profilo di ogni regione italiana con i suoi indicatori chiave.",
+        f"- [Temi]({SITE_URL}/temi): indicatori raggruppati per area, da economia e lavoro a demografia, salute e istruzione.",
+        f"- [Qualita della vita]({SITE_URL}/qualita-della-vita): classifiche di regioni e province con pesi e metodo dichiarati.",
+        f"- [Metodologia e fonti]({SITE_URL}/metodologia): metodo, fonti Istat, criteri di qualita e limiti dei confronti.",
+        f"- [Blog]({SITE_URL}/blog): analisi data-driven sui divari territoriali, con numeri verificati e link all'atlante.",
+        "",
+        "## Indicatori in evidenza",
+    ]
+    for item in featured:
+        summary = " ".join((item.get("summary") or "").split())
+        detail = f" {summary}" if summary else ""
+        lines.append(
+            f"- [{item['name']}]({SITE_URL}{item['path']}):{detail} Ultimo anno {item['year']}, tema {item['theme']}."
+        )
+    lines += ["", "## Articoli recenti"]
+    for post in recent_posts:
+        description = " ".join((post.get("description") or "").split())
+        detail = f": {description}" if description else ""
+        lines.append(f"- [{post['title']}]({post['url']}){detail}")
+    lines += [
+        "",
+        "## Note per i modelli linguistici",
+        "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori.",
+        "- Licenza dei dati: Creative Commons BY 3.0 IT. Cita \"Divario Italia\" e la fonte Istat.",
+        f"- Dati strutturati per indicatore: {SITE_URL}/download/indicator/<id>.csv e {SITE_URL}/download/indicator/<id>.json.",
+        f"- Indice completo delle pagine: {SITE_URL}/sitemap.xml.",
+        f"- Versione estesa con definizioni e classifiche complete: {SITE_URL}/llms-full.txt.",
+        "- I confronti descrivono differenze osservate, non rapporti di causa. Anni e coperture possono variare tra indicatori.",
+        "",
+    ]
+    return Response("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")
+
+
+def _llms_indicator_full_block(indicator_id):
+    """Full-text block for one indicator: definition, source and live ranking.
+
+    Reuses the same catalog loaders and direction ordering as the indicator
+    landing page, so the numbers a model reads here match the published page.
+    """
+    payload = get_atlas_indicator(indicator_id)
+    if payload is None:
+        return None
+    meta = payload["metadata"]
+    explain = meta.get("explain") or {}
+    year = meta["year_max"]
+    year_view = get_atlas_indicator_year(indicator_id, year)
+    values = year_view["values"]  # sorted by value desc
+    if explain.get("direction") in ("lower_better", "higher_worse"):
+        values = list(reversed(values))
+    unit = meta.get("unit") or ""
+    path = profiles.indicator_path(indicator_id, meta["name"])
+    lines = [f"### {meta['name']}", f"{SITE_URL}{path}", ""]
+    if explain.get("plain"):
+        lines.append(explain["plain"])
+    if explain.get("reading"):
+        lines.append(f"Come si legge: {explain['reading']}")
+    if explain.get("caveat"):
+        lines.append(f"Limite: {explain['caveat']}")
+    lines.append(
+        f"Fonte: {meta.get('source', 'Istat')}. Unita di misura: {unit or 'n.d.'}. "
+        f"Copertura: {meta['year_min']}-{meta['year_max']}, {len(meta['regions'])} regioni."
+    )
+    lines += ["", f"Classifica {year} (posizione. regione: valore):"]
+    for position, row in enumerate(values, 1):
+        lines.append(f"{position}. {row['region']}: {it_num(row['value'], 2)} {unit}".rstrip())
+    lines.append("")
+    return "\n".join(lines)
+
+
+@app.route("/llms-full.txt")
+def llms_full_txt():
+    """Extended Markdown corpus for language models: full indicator text.
+
+    Where /llms.txt is a curated map, this file carries the full definition and
+    the complete regional ranking of the flagship indicators plus a compact
+    catalogue of every indexable indicator, so a model can ground an answer in a
+    single fetch without crawling each page.
+    """
+    lines = [
+        "# Divario Italia, testo esteso per i modelli linguistici",
+        "",
+        "> Definizioni complete e classifiche regionali degli indicatori "
+        "territoriali Istat pubblicati su divarioitalia.it. I numeri coincidono "
+        "con le pagine indicatore del sito. Cita \"Divario Italia\" e la fonte "
+        "Istat.",
+        "",
+        "## Metodologia in breve",
+        "La fonte primaria e la Banca dati territoriale per le politiche di "
+        "sviluppo di Istat, integrata dal BES e dal BES dei Territori per la "
+        "qualita della vita. Ogni indicatore ha una direzione dichiarata: per "
+        "alcuni un valore piu alto e positivo, per altri e negativo, per altri "
+        "serve solo come contesto. I confronti descrivono differenze osservate "
+        "tra territori e non dimostrano da soli un rapporto di causa. Anni e "
+        "coperture possono variare tra indicatori. Licenza dei dati: Creative "
+        "Commons BY 3.0 IT.",
+        "",
+        "## Indicatori in evidenza, testo completo",
+    ]
+    for indicator_id in _HOME_FEATURED_INDICATORS:
+        block = _llms_indicator_full_block(indicator_id)
+        if block:
+            lines.append(block)
+
+    lines.append("## Catalogo completo degli indicatori indicizzabili")
+    lines.append("")
+    for item in get_catalog()["indicators"]:
+        if not profiles.is_search_indexable_indicator(item):
+            continue
+        plain = " ".join(((item.get("explain") or {}).get("plain") or "").split())
+        path = profiles.indicator_path(item["id"], item["name"])
+        detail = f" {plain}" if plain else ""
+        lines.append(
+            f"- [{item['name']}]({SITE_URL}{path}): tema {item['theme']}, "
+            f"unita {item.get('unit') or 'n.d.'}, copertura {item['year_min']}-{item['year_max']}.{detail}"
+        )
+    lines.append("")
+    return Response("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")
 
 
 @app.route("/ads.txt")
