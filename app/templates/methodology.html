@@ -30,6 +30,39 @@
   ]
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Da dove arrivano i dati di Divario Italia?",
+      "acceptedAnswer": { "@type": "Answer", "text": "I dati provengono dalla Banca dati territoriale per le politiche di sviluppo di Istat e, per la qualita della vita, dal BES dei Territori. Ogni pagina indicatore riporta la fonte e l'ultimo anno disponibile." }
+    },
+    {
+      "@type": "Question",
+      "name": "I confronti tra regioni sono affidabili?",
+      "acceptedAnswer": { "@type": "Answer", "text": "I confronti mostrano differenze osservate tra territori, non dimostrano da soli un rapporto di causa. Gli indicatori possono avere anni e coperture diverse, quindi vanno letti insieme alla loro definizione." }
+    },
+    {
+      "@type": "Question",
+      "name": "Posso scaricare i dati?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Si. Ogni scheda indicatore offre il download in formato CSV e JSON. La licenza dei dati e Creative Commons BY 3.0 IT." }
+    },
+    {
+      "@type": "Question",
+      "name": "Ogni quanto vengono aggiornati gli indicatori?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Temi, punteggi e classifiche vengono ricalcolati a ogni pubblicazione. I valori si aggiornano quando Istat rilascia una nuova annualita dell'indicatore, e la freschezza del dato e indicata su ciascuna scheda." }
+    },
+    {
+      "@type": "Question",
+      "name": "Posso citare Divario Italia in un articolo o in una risposta generata da un modello?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Si. Cita \"Divario Italia\" e la fonte primaria Istat. I contenuti sono liberamente consultabili e citabili con attribuzione." }
+    }
+  ]
+}
+</script>
 {% endblock %}
 
 {% block content %}
@@ -59,6 +92,20 @@
   <section>
     <h2>Limiti</h2>
     <p>I dati possono avere anni diversi, coperture diverse e interruzioni di serie. Un confronto territoriale descrive una differenza osservata, non dimostra da solo una causa. Quando un articolo interpreta un divario, deve distinguere il dato dalla spiegazione.</p>
+  </section>
+
+  <section class="prose faq">
+    <h2>Domande frequenti</h2>
+    <h3>Da dove arrivano i dati di Divario Italia?</h3>
+    <p>I dati provengono dalla Banca dati territoriale per le politiche di sviluppo di Istat e, per la qualità della vita, dal BES dei Territori. Ogni pagina indicatore riporta la fonte e l'ultimo anno disponibile.</p>
+    <h3>I confronti tra regioni sono affidabili?</h3>
+    <p>I confronti mostrano differenze osservate tra territori, non dimostrano da soli un rapporto di causa. Gli indicatori possono avere anni e coperture diverse, quindi vanno letti insieme alla loro definizione.</p>
+    <h3>Posso scaricare i dati?</h3>
+    <p>Sì. Ogni scheda indicatore offre il download in formato CSV e JSON. La licenza dei dati è Creative Commons BY 3.0 IT.</p>
+    <h3>Ogni quanto vengono aggiornati gli indicatori?</h3>
+    <p>Temi, punteggi e classifiche vengono ricalcolati a ogni pubblicazione. I valori si aggiornano quando Istat rilascia una nuova annualità dell'indicatore, e la freschezza del dato è indicata su ciascuna scheda.</p>
+    <h3>Posso citare Divario Italia in un articolo o in una risposta generata da un modello?</h3>
+    <p>Sì. Cita "Divario Italia" e la fonte primaria Istat. I contenuti sono liberamente consultabili e citabili con attribuzione.</p>
   </section>
 
   <aside class="indicator-cta">
