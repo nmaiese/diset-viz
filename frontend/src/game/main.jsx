@@ -455,6 +455,7 @@ function GameApp() {
               bundle del gioco non avrebbe senso; useMapInteractions() la rende
               interattiva dall'esterno con querySelector/addEventListener. */}
           <div className="game-panel">
+            <p className="qz-section-label">Indizi svelati</p>
             <section className="game-clues" aria-label="Indizi" ref={cluesListRef}>
               {clues.map((clue, i) => {
                 const isLast = i === clues.length - 1;

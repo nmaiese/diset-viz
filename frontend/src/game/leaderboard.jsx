@@ -11,6 +11,14 @@ const PERIODS = [
   { value: "all", label: "Sempre" },
 ];
 
+// Copy del punteggio per modalità: descrive la metrica reale calcolata dal
+// server (serie di risposte corrette per "Chi è maggiore?", round perfetti
+// consecutivi per "Ordina le regioni"). Niente numeri inventati.
+const SCORING = {
+  compare: "La serie di risposte corrette consecutive in una sessione di \"Chi è maggiore?\".",
+  order: "Il numero di round perfetti consecutivi in una sessione di \"Ordina le regioni\".",
+};
+
 function relativeWhen(iso) {
   const then = new Date(iso).getTime();
   if (!Number.isFinite(then)) return "";
@@ -26,6 +34,26 @@ function detailBadge(mode, detail) {
   return null;
 }
 
+function Podium({ entries, mode }) {
+  const top = entries.slice(0, 3);
+  const labels = ["1° posto", "2° posto", "3° posto"];
+  return (
+    <div className="qz-podium">
+      {top.map((entry, i) => (
+        <div key={entry.rank} className={`qz-podium-card p${i + 1}`}>
+          <small>{labels[i]}</small>
+          <h3>{entry.nickname}</h3>
+          <em>
+            {detailBadge(mode, entry.detail) || " "}
+            {entry.when && ` · ${relativeWhen(entry.when)}`}
+          </em>
+          <div className="qz-podium-pts">{entry.score} pt</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function LeaderboardApp() {
   const [mode, setMode] = useState("compare");
   const [period, setPeriod] = useState("week");
@@ -36,87 +64,104 @@ export default function LeaderboardApp() {
     setEntries(null);
     setError(false);
     trackGameEvent("leaderboard_view", { mode, period });
-    fetchJson(`/api/game/leaderboard?mode=${mode}&period=${period}&limit=20`)
+    fetchJson(`/api/game/leaderboard?mode=${mode}&period=${period}&limit=40`)
       .then((data) => setEntries(data.entries))
       .catch(() => setError(true));
   }, [mode, period]);
 
+  const periodLabel = period === "week" ? "ultimi 7 giorni" : "tutti i tempi";
+
   return (
-    <div className="leaderboard-app">
-      <div className="lb-tabs" role="tablist" aria-label="Modalità">
-        {MODES.map((m) => (
-          <button
-            key={m.value}
-            type="button"
-            role="tab"
-            aria-selected={mode === m.value}
-            className={mode === m.value ? "game-tab is-active" : "game-tab"}
-            onClick={() => setMode(m.value)}
-          >
-            {m.label}
-          </button>
-        ))}
+    <div className="qz-page qz-page--lb">
+      <div className="qz-lb-main">
+        <div className="qz-filters">
+          {MODES.map((m) => (
+            <button
+              key={m.value}
+              type="button"
+              className={mode === m.value ? "qz-filter is-active" : "qz-filter"}
+              aria-pressed={mode === m.value}
+              onClick={() => setMode(m.value)}
+            >
+              {m.label}
+            </button>
+          ))}
+          <span className="qz-filters-sep" aria-hidden="true" />
+          {PERIODS.map((p) => (
+            <button
+              key={p.value}
+              type="button"
+              className={period === p.value ? "qz-filter is-active" : "qz-filter"}
+              aria-pressed={period === p.value}
+              onClick={() => setPeriod(p.value)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+
+        <div aria-live="polite">
+          {error && <p className="game-error">Impossibile caricare la classifica. Riprova.</p>}
+
+          {!error && entries === null && (
+            <div className="skel-bars" aria-hidden="true" style={{ marginTop: 16 }}>
+              <span style={{ height: 44, width: "100%" }} />
+              <span style={{ height: 44, width: "100%" }} />
+              <span style={{ height: 44, width: "100%" }} />
+            </div>
+          )}
+
+          {!error && entries && entries.length === 0 && (
+            <p className="hub-stats-empty">
+              Ancora nessun punteggio in questo periodo: gioca una serie e sii il primo in classifica.
+            </p>
+          )}
+
+          {!error && entries && entries.length > 0 && (
+            <>
+              {entries.length >= 3 && <Podium entries={entries} mode={mode} />}
+              <div className="qz-lb-rows">
+                {entries.map((entry) => (
+                  <div key={entry.rank} className={entry.rank <= 3 ? "qz-lb-row top" : "qz-lb-row"}>
+                    <span className="rank">{entry.rank}</span>
+                    <span className="who">
+                      <b>{entry.nickname}</b>
+                      {detailBadge(mode, entry.detail) && <em>{detailBadge(mode, entry.detail)}</em>}
+                    </span>
+                    <span className="pts">{entry.score}</span>
+                    <span className="when col-hide">{relativeWhen(entry.when)}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
-      <div className="lb-tabs lb-tabs--period" role="tablist" aria-label="Periodo">
-        {PERIODS.map((p) => (
-          <button
-            key={p.value}
-            type="button"
-            role="tab"
-            aria-selected={period === p.value}
-            className={period === p.value ? "game-tab is-active" : "game-tab"}
-            onClick={() => setPeriod(p.value)}
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
 
-      <div aria-live="polite">
-        {error && <p className="game-error">Impossibile caricare la classifica. Riprova.</p>}
-
-        {!error && entries === null && (
-          <div className="skel-bars" aria-hidden="true" style={{ marginTop: 16 }}>
-            <span style={{ height: 14, width: "90%" }} />
-            <span style={{ height: 14, width: "80%" }} />
-            <span style={{ height: 14, width: "85%" }} />
-          </div>
-        )}
-
-        {!error && entries && entries.length === 0 && (
-          <p className="hub-stats-empty">
-            Ancora nessun punteggio in questo periodo: gioca una serie e sii il primo in classifica.
+      <aside className="qz-side">
+        <div className="qz-side-card qz-side-card--accent">
+          <p className="eb">Entra in classifica</p>
+          <p className="qz-side-body">
+            Gioca una serie e invia il tuo risultato a fine partita. Il nickname è pubblico, senza registrazione.
           </p>
-        )}
+          <div className="qz-side-cta">
+            <a className="game-btn" href={mode === "order" ? "/quiz/ordina" : "/quiz/chi-e-maggiore"}>Gioca ora</a>
+          </div>
+        </div>
 
-        {!error && entries && entries.length > 0 && (
-          <table className="lb-table">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nickname</th>
-                <th scope="col">Punteggio</th>
-                <th scope="col">Quando</th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((entry) => (
-                <tr key={entry.rank}>
-                  <td>{entry.rank}</td>
-                  <td>
-                    {entry.nickname}
-                    {detailBadge(mode, entry.detail) && (
-                      <span className="lb-detail-badge">{detailBadge(mode, entry.detail)}</span>
-                    )}
-                  </td>
-                  <td>{entry.score}</td>
-                  <td>{relativeWhen(entry.when)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+        <div className="qz-side-card">
+          <p className="eb">Come si calcola</p>
+          <p className="qz-side-body">{SCORING[mode]}</p>
+        </div>
+
+        <div className="qz-side-card">
+          <p className="eb">Periodo</p>
+          <p className="qz-side-body">
+            Stai vedendo i punteggi dei <strong>{periodLabel}</strong>. La finestra settimanale scorre sugli
+            ultimi sette giorni. I record personali restano salvati sul tuo dispositivo.
+          </p>
+        </div>
+      </aside>
     </div>
   );
 }

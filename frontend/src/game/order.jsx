@@ -163,6 +163,9 @@ export default function OrderApp() {
         )}
       </div>
 
+      <div className="qz-ordina-grid">
+        <div className="qz-ordina-main">
+
       {status === "idle" && (
         <div className="order-start">
           <h2>Ordina le regioni</h2>
@@ -323,6 +326,28 @@ export default function OrderApp() {
           </div>
         </div>
       )}
+        </div>
+
+        <aside className="qz-side qz-ordina-side">
+          <div className="qz-side-card">
+            <p className="eb">Punteggio</p>
+            <div className="qz-score-grid">
+              <div><small>Record 3 regioni</small><strong>{stats.bestScore3}/3</strong></div>
+              <div><small>Record 5 regioni</small><strong>{stats.bestScore5}/5</strong></div>
+              <div><small>Serie perfetta</small><strong className="pos">{sessionBest}</strong></div>
+              <div><small>Livello</small><strong className="ink">{count} reg.</strong></div>
+            </div>
+          </div>
+          <div className="qz-side-card qz-side-card--accent">
+            <p className="eb">Regole rapide</p>
+            <ul className="qz-rules">
+              <li>1 punto per ogni regione al posto giusto</li>
+              <li>Round perfetto: tutte le posizioni corrette</li>
+              <li>Nessuna penalità per gli errori</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
 
       {showScoreModal && (
         <SubmitScoreModal
