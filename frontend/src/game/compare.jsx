@@ -36,6 +36,14 @@ function difficultyForStreak(streak) {
 
 const DIFFICULTY_LABELS = ["Riscaldamento", "Facile", "Media", "Difficile", "Estrema"];
 
+// Il cronometro nella barra di stato mostra i secondi in stile 0:06, come nel
+// design "Chi è maggiore?": arrotonda per eccesso i millisecondi rimasti così
+// il salto a 0 coincide con lo scadere effettivo del round.
+function formatClock(ms) {
+  const seconds = Math.max(0, Math.ceil(ms / 1000));
+  return `0:${String(seconds).padStart(2, "0")}`;
+}
+
 export default function CompareApp() {
   const [round, setRound] = useState(null);
   const [status, setStatus] = useState("idle"); // idle | loading | answering | revealed | error
@@ -46,6 +54,11 @@ export default function CompareApp() {
   const [timeLeft, setTimeLeft] = useState(ROUND_MS);
   const [sessionBest, setSessionBest] = useState(0);
   const [showScoreModal, setShowScoreModal] = useState(false);
+  // Contatori della sessione corrente, mostrati nella barra di stato in cima
+  // (Round / Serie / Punti): ripartono a ogni caricamento della pagina, a
+  // differenza dei record salvati in localStorage.
+  const [roundNumber, setRoundNumber] = useState(0);
+  const [sessionPoints, setSessionPoints] = useState(0);
   const [hasPlayedBefore] = useState(() => {
     try {
       return !!window.localStorage.getItem(STORAGE_ONBOARDED_KEY);
@@ -86,6 +99,26 @@ export default function CompareApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
 
+  // Comando da tastiera mostrato nell'HUD (← A · B →): frecce o i tasti A/B
+  // scelgono la regione mentre il round è aperto. Registrato una sola volta,
+  // legge lo stato corrente da stateRef per non re-agganciarsi a ogni render.
+  useEffect(() => {
+    function onKeyDown(event) {
+      if (stateRef.current.status !== "answering") return;
+      const key = event.key.toLowerCase();
+      if (key === "arrowleft" || key === "a") {
+        event.preventDefault();
+        submitAnswer("region_a");
+      } else if (key === "arrowright" || key === "b") {
+        event.preventDefault();
+        submitAnswer("region_b");
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function startGame() {
     try {
       window.localStorage.setItem(STORAGE_ONBOARDED_KEY, "1");
@@ -105,6 +138,7 @@ export default function CompareApp() {
       .then((data) => {
         tokenRef.current = data.token;
         setRound(data);
+        setRoundNumber((n) => n + 1);
         setStatus("answering");
       })
       .catch(() => setStatus("error"));
@@ -135,6 +169,7 @@ export default function CompareApp() {
         const prevStreak = stateRef.current.streak;
         const nextStreak = data.correct ? prevStreak + 1 : 0;
         setStreak(nextStreak);
+        if (data.correct) setSessionPoints((p) => p + 1);
         setStats((prev) => {
           const next = {
             bestStreak: Math.max(prev.bestStreak, nextStreak),
@@ -168,9 +203,13 @@ export default function CompareApp() {
 
   const timerPct = Math.max(0, (timeLeft / ROUND_MS) * 100);
   const level = round ? round.difficulty : 0;
+  const isLowTime = status === "answering" && timeLeft <= 3000;
+  const accuracy = stats.totalRounds > 0
+    ? Math.round((stats.totalCorrect / stats.totalRounds) * 100)
+    : 0;
 
-  function cardClass(side) {
-    const base = side === "region_a" ? "compare-card compare-card--a" : "compare-card compare-card--b";
+  function regionClass(side) {
+    const base = "qz-region";
     if (status !== "revealed" || !result) return base;
     const isWinner = result.winner === side;
     const wasPicked = choice === side;
@@ -182,30 +221,6 @@ export default function CompareApp() {
 
   return (
     <div className="compare-app">
-      <div className="compare-scorebar">
-        <div className="compare-score">
-          <strong>{streak}</strong>
-          <span>Serie</span>
-        </div>
-        <div className="compare-score">
-          <strong>{stats.bestStreak}</strong>
-          <span>Record</span>
-        </div>
-        <div className="compare-level" aria-label={`Difficoltà ${DIFFICULTY_LABELS[level]}`}>
-          <span className="compare-level-label">{DIFFICULTY_LABELS[level]}</span>
-          <span className="compare-level-dots" aria-hidden="true">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <i key={i} className={i <= level ? "is-on" : ""} />
-            ))}
-          </span>
-        </div>
-        {sessionBest > 0 && (
-          <button type="button" className="game-tab game-tab--ghost compare-score-cta" onClick={() => setShowScoreModal(true)}>
-            Entra in classifica
-          </button>
-        )}
-      </div>
-
       {status === "idle" && (
         <div className="compare-start">
           <h2>Chi è maggiore?</h2>
@@ -221,7 +236,7 @@ export default function CompareApp() {
             </li>
             <li>
               <strong>Un errore azzera la serie.</strong> Il tuo record resta salvato su questo
-              dispositivo.
+              dispositivo. Da tastiera usa le frecce o i tasti A e B.
             </li>
           </ol>
           <button type="button" className="game-btn" onClick={startGame}>
@@ -241,13 +256,30 @@ export default function CompareApp() {
 
       {round && status !== "error" && (
         <>
-          <div className="compare-question">
-            <span className="compare-kicker">Quale regione ha il valore più alto?</span>
+          <div className="qz-status">
+            <span className="qz-badge">Round <strong>{roundNumber}</strong></span>
+            <span className="qz-badge">Serie <strong>{streak}</strong></span>
+            <span className="qz-badge">Punti <strong>{sessionPoints}</strong></span>
+            <span className="qz-badge qz-badge--level">{DIFFICULTY_LABELS[level]}</span>
+            <div className="qz-timer">
+              <span className={isLowTime ? "qz-clock is-low" : "qz-clock"}>{formatClock(timeLeft)}</span>
+              <span className="qz-timer-bar">
+                <i
+                  className={status === "answering" ? "" : "is-paused"}
+                  style={{ width: `${timerPct}%` }}
+                />
+              </span>
+            </div>
+          </div>
+
+          <div className="qz-question">
+            <small>Indicatore Istat · {round.indicator.year}</small>
             <h2>{round.indicator.name}</h2>
-            <p className="compare-meta">
-              {round.indicator.macro_area} · {round.indicator.theme}
-              {round.indicator.unit && ` · ${round.indicator.unit}`}
-            </p>
+            {(round.indicator.description || round.indicator.value_explanation) && (
+              <p className="desc">
+                {[round.indicator.description, round.indicator.value_explanation].filter(Boolean).join(" ")}
+              </p>
+            )}
             <SourceStrip
               year={round.indicator.year}
               sourceLabel={round.indicator.source_label}
@@ -255,63 +287,73 @@ export default function CompareApp() {
             />
           </div>
 
-          <div className="compare-timer" role="presentation">
-            <div
-              className={status === "answering" ? "compare-timer-fill" : "compare-timer-fill is-paused"}
-              style={{ width: `${timerPct}%` }}
-            />
+          <div className="qz-vs">
+            <button
+              type="button"
+              className={regionClass("region_a")}
+              disabled={status !== "answering"}
+              onClick={() => submitAnswer("region_a")}
+            >
+              <span className="code">A</span>
+              <span className="name">{round.region_a.region}</span>
+              {round.region_a.geo_area && <span className="macro">{round.region_a.geo_area}</span>}
+              {status === "revealed" && result && (
+                <span className="value">{formatValue(result.region_a.value, round.indicator.unit)}</span>
+              )}
+              {status === "revealed" && result && result.winner === "region_a" && (
+                <span className="crown">maggiore</span>
+              )}
+            </button>
+            <div className="divider">VS</div>
+            <button
+              type="button"
+              className={regionClass("region_b")}
+              disabled={status !== "answering"}
+              onClick={() => submitAnswer("region_b")}
+            >
+              <span className="code">B</span>
+              <span className="name">{round.region_b.region}</span>
+              {round.region_b.geo_area && <span className="macro">{round.region_b.geo_area}</span>}
+              {status === "revealed" && result && (
+                <span className="value">{formatValue(result.region_b.value, round.indicator.unit)}</span>
+              )}
+              {status === "revealed" && result && result.winner === "region_b" && (
+                <span className="crown">maggiore</span>
+              )}
+            </button>
           </div>
-
-          <div className="compare-cards">
-            {["region_a", "region_b"].map((side) => {
-              const region = round[side];
-              const revealed = status === "revealed" && result;
-              return (
-                <button
-                  key={side}
-                  type="button"
-                  className={cardClass(side)}
-                  disabled={status !== "answering"}
-                  onClick={() => submitAnswer(side)}
-                >
-                  <strong className="compare-region-name">{region.region}</strong>
-                  {revealed && (
-                    <span className="compare-value">
-                      {formatValue(result[side].value, round.indicator.unit)}
-                    </span>
-                  )}
-                  {revealed && result.winner === side && <span className="compare-crown">maggiore</span>}
-                </button>
-              );
-            })}
-          </div>
-
-          {(round.indicator.description || round.indicator.value_explanation) && (
-            <p className="quiz-description-compact">
-              {[round.indicator.description, round.indicator.value_explanation].filter(Boolean).join(" ")}
-            </p>
-          )}
 
           <div className="compare-feedback" aria-live="polite">
             {status === "revealed" && result && (
-              <>
-                <p className={result.correct ? "compare-verdict is-correct" : "compare-verdict is-wrong"}>
-                  {result.correct
-                    ? "Giusto!"
-                    : choice === "timeout"
-                    ? "Tempo scaduto."
-                    : "Sbagliato."}
-                  {" "}
-                  {result[result.winner].region} ha il valore più alto.
-                  {!result.correct && streak === 0 && stats.bestStreak > 0 && " Serie azzerata."}
-                </p>
-              </>
+              <p className={result.correct ? "compare-verdict is-correct" : "compare-verdict is-wrong"}>
+                {result.correct
+                  ? "Giusto!"
+                  : choice === "timeout"
+                  ? "Tempo scaduto."
+                  : "Sbagliato."}
+                {" "}
+                {result[result.winner].region} ha il valore più alto.
+                {!result.correct && streak === 0 && stats.bestStreak > 0 && " Serie azzerata."}
+              </p>
             )}
           </div>
 
           {status === "revealed" && (
             <button type="button" className="game-btn compare-next" onClick={nextRound}>
               {result && result.correct ? "Avanti" : "Ricomincia"}
+            </button>
+          )}
+
+          <div className="qz-hud">
+            <div><small>Serie attuale</small><strong className="streak">{streak}</strong></div>
+            <div><small>Record personale</small><strong className="best">{stats.bestStreak}</strong></div>
+            <div><small>Accuratezza</small><strong>{accuracy}%</strong></div>
+            <div className="qz-hud-cmd"><small>Comando</small><strong>← A · B →</strong></div>
+          </div>
+
+          {sessionBest > 0 && (
+            <button type="button" className="game-btn game-btn--ghost compare-lb-cta" onClick={() => setShowScoreModal(true)}>
+              Entra in classifica
             </button>
           )}
         </>
@@ -323,9 +365,10 @@ export default function CompareApp() {
             <span style={{ height: 12, width: "45%" }} />
             <span style={{ height: 22, width: "70%" }} />
           </div>
-          <div className="compare-cards" style={{ marginTop: 18 }}>
-            <span className="skel-bar" style={{ height: 130 }} />
-            <span className="skel-bar" style={{ height: 130 }} />
+          <div className="qz-vs" style={{ marginTop: 18 }}>
+            <span className="skel-bar" style={{ height: 140 }} />
+            <div className="divider">VS</div>
+            <span className="skel-bar" style={{ height: 140 }} />
           </div>
         </div>
       )}

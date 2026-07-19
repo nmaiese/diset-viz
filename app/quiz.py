@@ -16,7 +16,7 @@ import math
 import random
 
 from app.cache import cache
-from app.data import get_catalog, get_indicator_year
+from app.data import REGION_GEO_AREA, get_catalog, get_indicator_year
 from app.bes_data import (
     BES_SOURCE_URLS,
     MIN_PUBLIC_COVERAGE,
@@ -182,7 +182,14 @@ def _indicator_fields(entry):
 
 
 def _region_fields(row):
-    return {"region": row["region"], "region_key": row["region_key"]}
+    # geo_area is the Istat geographic partition (Nord/Centro/Sud/Isole), used
+    # only as a label under the region name in the quiz UI. BES rows carry no
+    # region_key in REGION_GEO_AREA for aggregate territories, hence the .get.
+    return {
+        "region": row["region"],
+        "region_key": row["region_key"],
+        "geo_area": REGION_GEO_AREA.get(row["region_key"]),
+    }
 
 
 def _clamp_difficulty(difficulty):

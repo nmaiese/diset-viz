@@ -618,39 +618,77 @@
 }
 .compare-start h2, .order-start h2 { margin: 0 0 14px; font-size: 20px; }
 
-.compare-scorebar {
+/* Barra di stato in cima al round: badge mono (Round / Serie / Punti /
+   difficoltà) a sinistra e cronometro con i secondi a destra. */
+.qz-status {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
-.compare-score { display: flex; flex-direction: column; }
-.compare-score strong { font-family: var(--font-display); font-size: 26px; line-height: 1.1; }
-.compare-score-cta { margin-left: auto; }
-.compare-score span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-
-.compare-level { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-.compare-level-label { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
-.compare-level-dots { display: flex; gap: 4px; }
-.compare-level-dots i {
-  width: 8px;
-  height: 8px;
-  border-radius: 0;
-  background: var(--grid);
-  border: 1px solid var(--line);
-}
-.compare-level-dots i.is-on { background: var(--accent); border-color: var(--accent); }
-
-.compare-question h2 { margin: 4px 0 6px; font-size: 20px; line-height: 1.3; }
-.compare-kicker {
+.qz-badge {
   font-family: var(--font-mono);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--accent);
+  color: var(--muted);
 }
-.compare-meta { margin: 0; font-size: 13px; color: var(--muted); }
+.qz-badge strong { color: var(--ink); font-weight: 700; }
+.qz-badge--level {
+  color: var(--accent);
+  border: 1px solid var(--line);
+  padding: 3px 9px;
+}
+
+.qz-timer { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.qz-clock {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.qz-clock.is-low { animation: qz-pulse 1s ease-in-out infinite; }
+@keyframes qz-pulse { 50% { opacity: 0.45; } }
+
+.qz-timer-bar {
+  width: 180px;
+  height: 6px;
+  background: var(--grid);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.qz-timer-bar > i { display: block; height: 100%; background: var(--accent); transition: width 0.1s linear; }
+.qz-timer-bar > i.is-paused { background: var(--muted); }
+
+/* Scheda della domanda con filo d'accento a sinistra: etichetta mono,
+   indicatore, breve spiegazione e striscia della fonte. Condivisa da "Chi è
+   maggiore?" e "Ordina le regioni". */
+.qz-question {
+  padding: 18px 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+}
+.qz-question small {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.qz-question h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(20px, 2.2vw, 26px);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin: 6px 0 4px;
+}
+.qz-question .desc { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.45; }
+.qz-question .quiz-source { margin-top: 8px; }
 
 /* Striscia fonte/anno condivisa da "Chi è maggiore?", "Ordina le regioni" e
    dagli indizi di "Indovina la Regione": vedi SourceStrip in main.jsx. */
@@ -704,58 +742,70 @@
   color: var(--muted);
 }
 
-.compare-timer {
-  height: 8px;
-  border-radius: 0;
-  background: var(--grid);
-  border: 1px solid var(--line);
-  overflow: hidden;
-}
-
-.compare-timer-fill {
-  height: 100%;
-  background: var(--accent);
-  transition: width 0.1s linear;
-}
-
-.compare-timer-fill.is-paused { background: var(--muted); }
-
-.compare-cards {
+/* Faccia a faccia: regione A | divisore "VS" | regione B. Su schermi stretti
+   il divisore resta in mezzo mentre le due schede si impilano. */
+.qz-vs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr auto 1fr;
   gap: 14px;
+  align-items: stretch;
 }
 
-@media (max-width: 560px) {
-  .compare-cards { grid-template-columns: 1fr; }
+.qz-vs .divider {
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--muted);
+  padding: 0 6px;
 }
 
-.compare-card {
+.qz-region {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 130px;
-  padding: 22px 16px;
+  min-height: 140px;
+  padding: 28px 20px;
   border: 2px solid var(--line);
   border-radius: 0;
   background: var(--panel);
-  transition: border-color 0.12s ease, transform 0.12s ease;
+  text-align: center;
+  transition: border-color 0.14s ease, background 0.14s ease, transform 0.12s ease;
 }
+.qz-region:not(:disabled):hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-2px); }
+.qz-region:disabled { cursor: default; }
 
-.compare-card:not(:disabled):hover { border-color: var(--accent); transform: translateY(-2px); }
-.compare-card:disabled { cursor: default; }
+.qz-region .code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.qz-region .name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(23px, 3vw, 30px);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.qz-region .macro {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.qz-region .value { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--ink); margin-top: 4px; }
 
-.compare-region-name { font-family: var(--font-display); font-size: 21px; }
+.qz-region.is-winner { border-color: var(--positive); background: rgba(47, 143, 91, 0.08); }
+.qz-region.is-picked-wrong { border-color: var(--accent); background: var(--accent-soft); }
 
-.compare-card.is-winner { border-color: var(--positive); background: rgba(47, 143, 91, 0.08); }
-.compare-card.is-picked-wrong { border-color: var(--accent); background: var(--accent-soft); }
-
-.compare-value { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--ink); }
-
-.compare-crown {
+.qz-region .crown {
   position: absolute;
   top: -10px;
   right: 14px;
@@ -766,7 +816,40 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 3px 9px;
-  border-radius: 0;
+}
+
+/* Cruscotto sotto la sfida: serie corrente, record, accuratezza e il comando
+   da tastiera. Su mobile il comando si nasconde per lasciare spazio ai numeri. */
+.qz-hud {
+  display: flex;
+  gap: 20px;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  flex-wrap: wrap;
+}
+.qz-hud div { display: grid; gap: 2px; }
+.qz-hud small {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.qz-hud strong { font-family: var(--font-mono); font-size: 22px; font-weight: 700; }
+.qz-hud strong.streak { color: var(--accent); }
+.qz-hud strong.best { color: var(--positive); }
+.qz-hud-cmd { margin-left: auto; }
+.qz-hud-cmd strong { font-size: 13px; color: var(--muted); }
+
+.compare-lb-cta { align-self: flex-start; }
+
+@media (max-width: 640px) {
+  .qz-vs { grid-template-columns: 1fr; }
+  .qz-vs .divider { padding: 2px 0; font-size: 16px; }
+  .qz-timer { margin-left: 0; width: 100%; }
+  .qz-timer-bar { flex: 1; width: auto; }
+  .qz-hud-cmd { display: none; }
 }
 
 .compare-feedback { min-height: 24px; }
@@ -804,16 +887,6 @@
   color: var(--muted);
 }
 
-.order-question h2 { margin: 4px 0 6px; font-size: 20px; line-height: 1.3; }
-.order-kicker {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-}
-.order-meta { margin: 0; font-size: 13px; color: var(--muted); }
-
 .order-cards { display: grid; gap: 10px; }
 .order-cards--3 { grid-template-columns: repeat(3, 1fr); }
 .order-cards--5 { grid-template-columns: repeat(5, 1fr); }
@@ -847,6 +920,13 @@
 .order-card.is-wrong { border-color: var(--accent); background: var(--accent-soft); }
 
 .order-region-name { font-family: var(--font-display); font-size: 16px; text-align: center; }
+.order-region-macro {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
 
 .order-pos-badge {
   position: absolute;
@@ -897,9 +977,11 @@
 .order-status { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 
 @media (prefers-reduced-motion: reduce) {
-  .compare-card,
-  .compare-timer-fill,
+  .qz-region,
+  .qz-timer-bar > i,
+  .qz-clock,
   .order-card {
     transition: none !important;
+    animation: none !important;
   }
 }

@@ -198,15 +198,10 @@ export default function OrderApp() {
 
       {round && status !== "error" && (
         <>
-          <div className="order-question">
-            <span className="order-kicker">
-              Tocca le regioni in ordine, dal valore più alto al più basso
-            </span>
+          <div className="qz-question">
+            <small>Indicatore Istat · {round.indicator.year}</small>
             <h2>{round.indicator.name}</h2>
-            <p className="order-meta">
-              {round.indicator.macro_area} · {round.indicator.theme}
-              {round.indicator.unit && ` · ${round.indicator.unit}`}
-            </p>
+            <p className="desc">Tocca le regioni in ordine, dal valore più alto al più basso.</p>
             <SourceStrip
               year={round.indicator.year}
               sourceLabel={round.indicator.source_label}
@@ -241,6 +236,7 @@ export default function OrderApp() {
                     </span>
                   )}
                   <strong className="order-region-name">{region.region}</strong>
+                  {region.geo_area && <span className="order-region-macro">{region.geo_area}</span>}
                   {revealed && (
                     <span className="order-card-result">
                       <span className="order-value">{formatValue(revealed.value, round.indicator.unit)}</span>
