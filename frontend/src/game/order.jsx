@@ -10,6 +10,19 @@ const API = {
 const STORAGE_STATS_KEY = "di-order-stats";
 const STORAGE_ONBOARDED_KEY = "di-order-onboarded";
 
+// Altezza di una riga trascinabile (item + gap) usata per calcolare gli
+// spostamenti del drag con posizionamento assoluto, come nel design QuizOrdina.
+const ROW = 68;
+
+function shuffle(list) {
+  const arr = [...list];
+  for (let i = arr.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function loadStats() {
   try {
     const raw = window.localStorage.getItem(STORAGE_STATS_KEY);
@@ -32,7 +45,9 @@ export default function OrderApp() {
   const [count, setCount] = useState(3);
   const [round, setRound] = useState(null);
   const [status, setStatus] = useState("idle"); // idle | loading | ordering | revealed | error
-  const [sequence, setSequence] = useState([]); // region_key nell'ordine toccato
+  const [sequence, setSequence] = useState([]); // region_key nell'ordine corrente (lista completa, riordinabile)
+  const [drag, setDrag] = useState(null); // { i, dy } durante il trascinamento
+  const dragStartY = useRef(0);
   const [result, setResult] = useState(null);
   const [stats, setStats] = useState(loadStats);
   const [sessionBest, setSessionBest] = useState(0);
@@ -75,19 +90,59 @@ export default function OrderApp() {
       .then((data) => {
         tokenRef.current = data.token;
         setRound(data);
+        // La lista parte gia' piena, in ordine casuale: si riordina trascinando.
+        setSequence(shuffle(data.regions.map((region) => region.region_key)));
+        setDrag(null);
         setStatus("ordering");
       })
       .catch(() => setStatus("error"));
   }
 
-  function toggleRegion(regionKey) {
-    if (status !== "ordering") return;
+  // Sposta un elemento della sequenza da una posizione all'altra.
+  function moveItem(from, to) {
+    const clamped = Math.max(0, Math.min(sequence.length - 1, to));
+    if (clamped === from) return;
     setSequence((prev) => {
-      const idx = prev.indexOf(regionKey);
-      if (idx >= 0) return prev.filter((key) => key !== regionKey);
-      if (prev.length >= round.count) return prev;
-      return [...prev, regionKey];
+      const arr = [...prev];
+      const [moved] = arr.splice(from, 1);
+      arr.splice(clamped, 0, moved);
+      return arr;
     });
+  }
+
+  function onDragDown(event, i) {
+    if (status !== "ordering") return;
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // setPointerCapture puo' fallire su alcuni browser: il drag funziona comunque.
+    }
+    dragStartY.current = event.clientY;
+    setDrag({ i, dy: 0 });
+  }
+
+  function onDragMove(event) {
+    if (!drag) return;
+    setDrag((prev) => (prev ? { ...prev, dy: event.clientY - dragStartY.current } : prev));
+  }
+
+  function onDragUp() {
+    if (!drag) return;
+    const to = drag.i + Math.round(drag.dy / ROW);
+    moveItem(drag.i, to);
+    setDrag(null);
+  }
+
+  // Riordino da tastiera: frecce su/giu' sulla riga a fuoco.
+  function onItemKeyDown(event, i) {
+    if (status !== "ordering") return;
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      moveItem(i, i - 1);
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      moveItem(i, i + 1);
+    }
   }
 
   function confirmOrder() {
@@ -136,6 +191,22 @@ export default function OrderApp() {
   const resultBySide = result
     ? Object.fromEntries(result.positions.map((p) => [p.region_key, p]))
     : {};
+  const regionByKey = round
+    ? Object.fromEntries(round.regions.map((region) => [region.region_key, region]))
+    : {};
+
+  // Posizione verticale di ogni riga: durante il drag le righe non trascinate
+  // scorrono per fare posto, la riga trascinata segue il dito.
+  function itemOffset(i) {
+    let y = i * ROW;
+    if (drag) {
+      if (drag.i === i) return y + drag.dy;
+      const target = Math.max(0, Math.min(sequence.length - 1, drag.i + Math.round(drag.dy / ROW)));
+      if (drag.i < i && i <= target) y -= ROW;
+      else if (target <= i && i < drag.i) y += ROW;
+    }
+    return y;
+  }
 
   return (
     <div className="order-app">
@@ -171,12 +242,12 @@ export default function OrderApp() {
           <h2>Ordina le regioni</h2>
           <ol className="game-onboarding-steps">
             <li>
-              <strong>Tocca in sequenza.</strong> Prima la regione che pensi abbia il valore più alto,
-              poi la seconda e così via. Conta il numero, anche quando un valore alto non rappresenta
-              un risultato migliore. Un secondo tocco toglie la regione dalla sequenza.
+              <strong>Trascina per riordinare.</strong> Tieni premuto su una regione e spostala in alto
+              o in basso, dal valore più alto al più basso. Conta il numero, anche quando un valore alto
+              non rappresenta un risultato migliore. Da tastiera usa le frecce su e giù.
             </li>
             <li>
-              <strong>Conferma quando l'ordine è completo.</strong> Vedrai la classifica reale con i
+              <strong>Verifica quando l'ordine ti convince.</strong> Vedrai la classifica reale con i
               valori Istat.
             </li>
             <li>
@@ -204,7 +275,7 @@ export default function OrderApp() {
           <div className="qz-question">
             <small>Indicatore Istat · {round.indicator.year}</small>
             <h2>{round.indicator.name}</h2>
-            <p className="desc">Tocca le regioni in ordine, dal valore più alto al più basso.</p>
+            <p className="desc">Trascina dal valore più alto al più basso. Punti per ogni posizione giusta.</p>
             <SourceStrip
               year={round.indicator.year}
               sourceLabel={round.indicator.source_label}
@@ -212,67 +283,71 @@ export default function OrderApp() {
             />
           </div>
 
-          <div className={`order-cards order-cards--${round.count}`}>
-            {round.regions.map((region) => {
-              const pos = sequence.indexOf(region.region_key);
-              const revealed = status === "revealed" && resultBySide[region.region_key];
-              let cls = "order-card";
-              if (pos >= 0 && status === "ordering") cls += " is-picked";
-              if (revealed) {
-                cls += revealed.correct ? " is-correct" : " is-wrong";
-              }
+          <div
+            className="qz-list"
+            style={{ height: sequence.length * ROW - (ROW - 60) }}
+          >
+            {sequence.map((regionKey, i) => {
+              const region = regionByKey[regionKey];
+              if (!region) return null;
+              const revealed = status === "revealed" && resultBySide[regionKey];
+              const dragging = drag && drag.i === i;
+              let cls = "qz-item";
+              if (dragging) cls += " is-dragging";
+              if (revealed) cls += revealed.correct ? " correct" : " wrong";
               return (
-                <button
-                  key={region.region_key}
-                  type="button"
+                <div
+                  key={regionKey}
                   className={cls}
-                  disabled={status !== "ordering"}
-                  onClick={() => toggleRegion(region.region_key)}
-                  aria-pressed={pos >= 0}
+                  style={{
+                    transform: `translateY(${itemOffset(i)}px)`,
+                    transition: dragging ? "none" : "transform 0.16s ease",
+                    zIndex: dragging ? 5 : 1,
+                  }}
+                  role="button"
+                  tabIndex={status === "ordering" ? 0 : -1}
+                  aria-label={`${i + 1}° posto: ${region.region}. Usa le frecce su e giù per spostare.`}
+                  onPointerDown={status === "ordering" ? (e) => onDragDown(e, i) : undefined}
+                  onPointerMove={status === "ordering" ? onDragMove : undefined}
+                  onPointerUp={status === "ordering" ? onDragUp : undefined}
+                  onPointerCancel={status === "ordering" ? onDragUp : undefined}
+                  onKeyDown={(e) => onItemKeyDown(e, i)}
                 >
-                  {pos >= 0 && status === "ordering" && (
-                    <span className="order-pos-badge">{pos + 1}</span>
-                  )}
-                  {revealed && (
-                    <span className="order-pos-badge order-pos-badge--result">
-                      {revealed.guessed_position}
+                  <span className="qz-item-rank">{i + 1}</span>
+                  <span className="qz-item-name">
+                    {region.region}
+                    {region.geo_area && <em>{region.geo_area}</em>}
+                  </span>
+                  <span className="qz-item-val">
+                    {revealed ? formatValue(revealed.value, round.indicator.unit) : "nascosto"}
+                  </span>
+                  {status === "ordering" ? (
+                    <span className="qz-item-handle" aria-hidden="true">⋮⋮</span>
+                  ) : (
+                    <span className="qz-item-verdict" aria-hidden="true">
+                      {revealed && (revealed.correct ? "✓" : `${revealed.correct_position}ª`)}
                     </span>
                   )}
-                  <strong className="order-region-name">{region.region}</strong>
-                  {region.geo_area && <span className="order-region-macro">{region.geo_area}</span>}
-                  {revealed && (
-                    <span className="order-card-result">
-                      <span className="order-value">{formatValue(revealed.value, round.indicator.unit)}</span>
-                      <span className="order-verdict-line">
-                        {revealed.correct
-                          ? "posizione giusta"
-                          : `era ${revealed.correct_position}ª`}
-                      </span>
-                    </span>
-                  )}
-                </button>
+                </div>
               );
             })}
           </div>
 
           {status === "ordering" && (
-            <div className="order-actions">
+            <div className="qz-actions">
+              <button type="button" className="game-btn" onClick={confirmOrder}>
+                Verifica ordine
+              </button>
               <button
                 type="button"
-                className="game-btn"
-                disabled={sequence.length !== round.count}
-                onClick={confirmOrder}
+                className="game-btn game-btn--ghost"
+                onClick={() => setSequence((prev) => shuffle(prev))}
               >
-                Conferma ordine
+                Mischia
               </button>
-              {sequence.length > 0 && (
-                <button type="button" className="game-btn game-btn--ghost" onClick={() => setSequence([])}>
-                  Svuota selezione
-                </button>
-              )}
-              <span className="order-progress">
-                {sequence.length} di {round.count} in sequenza
-              </span>
+              <button type="button" className="game-btn game-btn--ghost" onClick={() => loadRound(count)}>
+                Salta round
+              </button>
             </div>
           )}
 
@@ -319,9 +394,9 @@ export default function OrderApp() {
             <span style={{ height: 12, width: "55%" }} />
             <span style={{ height: 22, width: "70%" }} />
           </div>
-          <div className={`order-cards order-cards--${count}`} style={{ marginTop: 18 }}>
+          <div className="qz-list-skel" style={{ marginTop: 18 }}>
             {Array.from({ length: count }).map((_, i) => (
-              <span key={i} className="skel-bar" style={{ height: 96 }} />
+              <span key={i} className="skel-bar" style={{ height: 60 }} />
             ))}
           </div>
         </div>

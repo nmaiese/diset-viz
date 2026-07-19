@@ -456,42 +456,51 @@ function GameApp() {
               interattiva dall'esterno con querySelector/addEventListener. */}
           <div className="game-panel">
             <p className="qz-section-label">Indizi svelati</p>
-            <section className="game-clues" aria-label="Indizi" ref={cluesListRef}>
-              {clues.map((clue, i) => {
-                const isLast = i === clues.length - 1;
-                return (
-                  <article
-                    key={clue.id}
-                    className={isLast && status === "playing" ? "clue-card is-latest" : "clue-card"}
-                  >
-                    {isLast && status === "playing" && i > 0 && <span className="clue-badge">Nuovo</span>}
-                    <span className="clue-index">Indizio {i + 1}</span>
-                    <h3>{clue.name}</h3>
-                    <p className="clue-meta">{clue.macro_area} · {clue.theme}</p>
-                    {clue.description && (
-                      <p className="clue-description">
-                        <strong>Che cosa misura.</strong> {clue.description}
+            {(() => {
+              const latest = clues[clues.length - 1];
+              const latestIndex = clues.length - 1;
+              return (
+                <>
+                  <table className="qz-clues" aria-label="Indizi">
+                    <tbody ref={cluesListRef}>
+                      {Array.from({ length: puzzle.attempts_total }).map((_, i) => {
+                        const clue = clues[i];
+                        if (!clue) {
+                          return (
+                            <tr key={`locked-${i}`} className="locked">
+                              <td className="n">{i + 1}</td>
+                              <td className="theme">Indizio da svelare</td>
+                              <td className="v">—</td>
+                            </tr>
+                          );
+                        }
+                        const isLatest = i === latestIndex && status === "playing";
+                        return (
+                          <tr key={clue.id} className={isLatest ? "latest" : ""}>
+                            <td className="n">{i + 1}</td>
+                            <td>
+                              <strong>{clue.theme}</strong> · {clue.name}
+                            </td>
+                            <td className="v">{formatValue(clue.value, clue.unit)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  {latest && (
+                    <div className="qz-clue-desc">
+                      <p>
+                        <strong>Indizio {clues.length}</strong> · {latest.name}
+                        {latest.description ? `: ${latest.description}` : "."}
+                        {latest.reading ? ` ${latest.reading}` : ""}{" "}
+                        <span className="qz-clue-rank">{ordinal(latest.rank)} su {latest.region_count}</span>
                       </p>
-                    )}
-                    {clue.value_explanation && (
-                      <p className="clue-value-hint">
-                        <strong>Come leggere il valore.</strong> {clue.value_explanation}
-                      </p>
-                    )}
-                    {clue.reading && (
-                      <p className="clue-reading">
-                        <strong>Come leggere la posizione.</strong> {clue.reading}
-                      </p>
-                    )}
-                    <SourceStrip year={clue.year} sourceLabel={clue.source_label} sourceUrl={clue.source_url} />
-                    <div className="clue-stats">
-                      <span className="clue-value">{formatValue(clue.value, clue.unit)}</span>
-                      <span className="clue-rank">{ordinal(clue.rank)} su {clue.region_count}</span>
+                      <SourceStrip year={latest.year} sourceLabel={latest.source_label} sourceUrl={latest.source_url} />
                     </div>
-                  </article>
-                );
-              })}
-            </section>
+                  )}
+                </>
+              );
+            })()}
 
             {status === "playing" && (
               <section className="game-input" aria-label="Indovina la regione">
