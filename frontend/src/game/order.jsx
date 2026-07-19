@@ -212,21 +212,6 @@ export default function OrderApp() {
               sourceLabel={round.indicator.source_label}
               sourceUrl={round.indicator.source_url}
             />
-            <div className="quiz-explanation">
-              {round.indicator.description && (
-                <p className="quiz-description">
-                  <strong>Che cosa misura.</strong> {round.indicator.description}
-                </p>
-              )}
-              {round.indicator.value_explanation && (
-                <p className="quiz-value-hint">
-                  <strong>Come leggere il valore.</strong> {round.indicator.value_explanation}
-                </p>
-              )}
-              <p className="quiz-rule-note">
-                Ordina i numeri dal più alto al più basso, non dal risultato migliore al peggiore.
-              </p>
-            </div>
           </div>
 
           <div className={`order-cards order-cards--${round.count}`}>
@@ -290,6 +275,12 @@ export default function OrderApp() {
                 {sequence.length} di {round.count} in sequenza
               </span>
             </div>
+          )}
+
+          {(round.indicator.description || round.indicator.value_explanation) && (
+            <p className="quiz-description-compact">
+              {[round.indicator.description, round.indicator.value_explanation].filter(Boolean).join(" ")}
+            </p>
           )}
 
           <div className="order-feedback" aria-live="polite">

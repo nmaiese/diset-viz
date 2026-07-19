@@ -128,7 +128,7 @@ function GameApp() {
 
   const statsRecordedRef = useRef(false);
   const stateRef = useRef({ status: "loading", submitting: false });
-  const cluesEndRef = useRef(null);
+  const cluesListRef = useRef(null);
 
   const regionByKey = useMemo(() => {
     const map = {};
@@ -163,9 +163,13 @@ function GameApp() {
     setHighlighted(-1);
   }, [query]);
 
+  // Scrolla solo il pannello indizi (non la pagina): un nuovo indizio non deve
+  // trascinare la finestra oltre il campo di risposta, che resta sempre
+  // visibile subito sotto (vedi .game-clues in game.css, max-height + overflow).
   useEffect(() => {
-    if (clues.length > 1) {
-      cluesEndRef.current?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "nearest" });
+    const list = cluesListRef.current;
+    if (clues.length > 1 && list) {
+      list.scrollTo({ top: list.scrollHeight, behavior: prefersReducedMotion() ? "auto" : "smooth" });
     }
   }, [clues.length]);
 
@@ -451,14 +455,13 @@ function GameApp() {
               bundle del gioco non avrebbe senso; useMapInteractions() la rende
               interattiva dall'esterno con querySelector/addEventListener. */}
           <div className="game-panel">
-            <section className="game-clues" aria-label="Indizi">
+            <section className="game-clues" aria-label="Indizi" ref={cluesListRef}>
               {clues.map((clue, i) => {
                 const isLast = i === clues.length - 1;
                 return (
                   <article
                     key={clue.id}
                     className={isLast && status === "playing" ? "clue-card is-latest" : "clue-card"}
-                    ref={isLast ? cluesEndRef : null}
                   >
                     {isLast && status === "playing" && i > 0 && <span className="clue-badge">Nuovo</span>}
                     <span className="clue-index">Indizio {i + 1}</span>

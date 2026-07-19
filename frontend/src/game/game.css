@@ -818,8 +818,11 @@
 .order-cards--3 { grid-template-columns: repeat(3, 1fr); }
 .order-cards--5 { grid-template-columns: repeat(5, 1fr); }
 
+/* Sotto 860px una sola colonna impilava fino a 5 card e spingeva "Conferma
+   ordine" fuori dallo schermo: due colonne dimezzano l'altezza totale e
+   tengono l'azione visibile insieme alle regioni (vedi order.jsx). */
 @media (max-width: 860px) {
-  .order-cards--3, .order-cards--5 { grid-template-columns: 1fr; }
+  .order-cards--3, .order-cards--5 { grid-template-columns: repeat(2, 1fr); }
 }
 
 .order-card {
@@ -829,8 +832,8 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 96px;
-  padding: 18px 12px;
+  min-height: 84px;
+  padding: 14px 10px;
   border: 2px solid var(--line);
   border-radius: 0;
   background: var(--panel);
