@@ -36,52 +36,58 @@
 {% endblock %}
 
 {% block content %}
-<article class="page page-region wrap">
+<article class="page page-region wrap-wide">
   <nav class="breadcrumb"><a href="/regioni">Regioni</a></nav>
-  <div class="region-kicker">
-    <p class="section-label">Profilo regione{% if p.geo_area %} · {{ p.geo_area }}{% endif %}</p>
-    {% if p.avg_rank %}<span class="tag-pill">Media {{ p.avg_rank }}ª su {{ p.region_total }}</span>{% endif %}
-  </div>
-  <h1>{{ p.region }}</h1>
-  <p class="page-lead">Come se la passa {{ p.region }} rispetto alle altre regioni italiane, tema per tema. Il profilo mette in evidenza ambiti forti, ambiti fragili, posizioni e movimenti recenti sugli indicatori Istat per cui sappiamo se è meglio salire o scendere.</p>
 
-  <nav class="region-anchors" aria-label="Sezioni del profilo">
-    <a href="#forza">Punti di forza</a>
-    <a href="#debole">Punti deboli</a>
-    {% if p.movement_gains or p.movement_losses %}<a href="#movimento">Movimento</a>{% endif %}
-    <a href="#explorer" class="is-primary">Esplora</a>
-  </nav>
+  {% set has_movement = p.movement_gains or p.movement_losses %}
+  <div class="region-hero">
+    <div class="region-hero__main">
+      <div class="region-kicker">
+        <p class="section-label">Profilo regione{% if p.geo_area %} · {{ p.geo_area }}{% endif %}</p>
+        {% if p.avg_rank %}<span class="tag-pill">Media {{ p.avg_rank }}ª su {{ p.region_total }}</span>{% endif %}
+      </div>
+      <h1>{{ p.region }}</h1>
+      <p class="page-lead">Come se la passa {{ p.region }} rispetto alle altre regioni italiane, tema per tema. Il profilo mette in evidenza ambiti forti, ambiti fragili, posizioni e movimenti recenti sugli indicatori Istat per cui sappiamo se è meglio salire o scendere.</p>
 
-  {% if p.avg_rank or p.themes_strong or p.themes_weak %}
-  <div class="region-facts">
-    {% if p.comparable_count %}<div><small>Top 5</small><strong>{{ p.top5_count }} / {{ p.comparable_count }}</strong></div>{% endif %}
-    {% if p.avg_rank %}<div><small>Pos. media</small><strong>{{ p.avg_rank }}ª</strong></div>{% endif %}
-    {% if p.themes_strong %}<div><small>Forza</small><strong>{{ p.themes_strong[0].theme }}</strong></div>{% endif %}
-    {% if p.themes_weak %}<div><small>Debole</small><strong>{{ p.themes_weak[0].theme }}</strong></div>{% endif %}
-  </div>
-  {% endif %}
+      <nav class="region-anchors" aria-label="Sezioni del profilo">
+        <a href="#forza">Punti di forza</a>
+        <a href="#debole">Punti deboli</a>
+        {% if has_movement %}<a href="#movimento">Movimento</a>{% endif %}
+        <a href="#explorer" class="is-primary">Esplora</a>
+      </nav>
+    </div>
 
-  <div class="freshness-strip" aria-label="Freschezza dati del profilo">
-    <span><b>{{ p.data_freshness.current }}</b> aggiornati</span>
-    <span><b>{{ p.data_freshness.recent }}</b> recenti</span>
-    <span><b>{{ p.data_freshness.dated }}</b> da aggiornare</span>
-    <span><b>{{ p.data_freshness.stale }}</b> datati</span>
-  </div>
+    <div class="panel-card region-hero__summary">
+      <p class="section-label">Sintesi</p>
+      {% if p.avg_rank or p.themes_strong or p.themes_weak %}
+      <div class="region-facts">
+        {% if p.comparable_count %}<div><small>Top 5</small><strong>{{ p.top5_count }} / {{ p.comparable_count }}</strong></div>{% endif %}
+        {% if p.avg_rank %}<div><small>Pos. media</small><strong>{{ p.avg_rank }}ª</strong></div>{% endif %}
+        {% if p.themes_strong %}<div><small>Forza</small><strong>{{ p.themes_strong[0].theme }}</strong></div>{% endif %}
+        {% if p.themes_weak %}<div><small>Debole</small><strong>{{ p.themes_weak[0].theme }}</strong></div>{% endif %}
+      </div>
+      {% endif %}
+      <div class="freshness-strip" aria-label="Freschezza dati del profilo">
+        <span><b>{{ p.data_freshness.current }}</b> aggiornati</span>
+        <span><b>{{ p.data_freshness.recent }}</b> recenti</span>
+        <span><b>{{ p.data_freshness.dated }}</b> da aggiornare</span>
+        <span><b>{{ p.data_freshness.stale }}</b> datati</span>
+      </div>
+    </div>
 
-  <div class="region-layout">
-  <div class="region-locator">
-    <p class="section-label">Dove si trova</p>
-    <style>
-      .region-locator .rmap-region { fill: var(--map-missing); }
-      .region-locator [data-key="{{ p.region_key }}"] { fill: var(--accent); }
-    </style>
-    <div class="indicator-map region-locator-map">
-      {% include "_italy_map.html" %}
+    <div class="panel-card region-hero__locator">
+      <p class="section-label">Dove si trova</p>
+      <style>
+        .region-locator .rmap-region { fill: var(--map-missing); }
+        .region-locator [data-key="{{ p.region_key }}"] { fill: var(--accent); }
+      </style>
+      <div class="indicator-map region-locator region-locator-map">
+        {% include "_italy_map.html" %}
+      </div>
     </div>
   </div>
-  <div class="region-main">
 
-  <div class="profile-cols">
+  <div class="profile-quad{{ '' if has_movement else ' profile-quad--two' }}">
     <section class="profile-card profile-strong" id="forza">
       <h2>Dove eccelle</h2>
       {% if p.themes_strong %}
@@ -117,158 +123,156 @@
       </ul>
       {% endif %}
     </section>
-  </div>
 
-  {% if p.movement_gains or p.movement_losses %}
-  {% set move_values = (p.movement_gains + p.movement_losses) | map(attribute='movement') | map('abs') | list %}
-  {% set move_max = move_values | max if move_values else 1 %}
-  <section class="profile-movement" id="movimento">
-    <h2>Il movimento dell'ultimo anno</h2>
-    <p class="page-note">Quante posizioni {{ p.region }} ha guadagnato o perso rispetto alle altre regioni, confrontando l'ultimo anno disponibile con l'anno comparabile più recente (gli anni esatti sono indicati su ogni riga). Calcolato solo sugli indicatori direzionali e completi su tutte e 20 le regioni in entrambi gli anni.</p>
-    <div class="movement-cols">
-      <div class="movement-card movement-up">
-        <h3>Dove recupera</h3>
-        {% if p.movement_gains %}
-        <ul class="movement-list">
-          {% for m in p.movement_gains %}
-          <li>
-            <span class="movement-row__head">
-              <a href="{{ m.path }}">{{ m.name }}</a>
-              <em class="movement-delta is-up">+{{ m.movement }}</em>
-            </span>
-            <span class="movement-bar"><span class="is-up" style="width: {{ (m.movement | abs / move_max * 100) | round | int }}%"></span></span>
-            <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }} · {{ m.freshness_status }}</small>
-          </li>
-          {% endfor %}
-        </ul>
-        {% else %}<p class="page-note">Nessun guadagno netto di posizioni nell'ultimo anno.</p>{% endif %}
-      </div>
-      <div class="movement-card movement-down">
-        <h3>Dove perde</h3>
-        {% if p.movement_losses %}
-        <ul class="movement-list">
-          {% for m in p.movement_losses %}
-          <li>
-            <span class="movement-row__head">
-              <a href="{{ m.path }}">{{ m.name }}</a>
-              <em class="movement-delta is-down">{{ m.movement }}</em>
-            </span>
-            <span class="movement-bar"><span class="is-down" style="width: {{ (m.movement | abs / move_max * 100) | round | int }}%"></span></span>
-            <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }} · {{ m.freshness_status }}</small>
-          </li>
-          {% endfor %}
-        </ul>
-        {% else %}<p class="page-note">Nessuna perdita netta di posizioni nell'ultimo anno.</p>{% endif %}
-      </div>
-    </div>
-  </section>
+    {% if has_movement %}
+    {% set move_values = (p.movement_gains + p.movement_losses) | map(attribute='movement') | map('abs') | list %}
+    {% set move_max = move_values | max if move_values else 1 %}
+    <section class="profile-card movement-card movement-up" id="movimento">
+      <h3>Recupera posizioni</h3>
+      {% if p.movement_gains %}
+      <ul class="movement-list">
+        {% for m in p.movement_gains %}
+        <li>
+          <span class="movement-row__head">
+            <a href="{{ m.path }}">{{ m.name }}</a>
+            <em class="movement-delta is-up">+{{ m.movement }}</em>
+          </span>
+          <span class="movement-bar"><span class="is-up" style="width: {{ (m.movement | abs / move_max * 100) | round | int }}%"></span></span>
+          <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }} · {{ m.freshness_status }}</small>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="page-note">Nessun guadagno netto di posizioni nell'ultimo anno.</p>{% endif %}
+    </section>
+
+    <section class="profile-card movement-card movement-down">
+      <h3>Perde posizioni</h3>
+      {% if p.movement_losses %}
+      <ul class="movement-list">
+        {% for m in p.movement_losses %}
+        <li>
+          <span class="movement-row__head">
+            <a href="{{ m.path }}">{{ m.name }}</a>
+            <em class="movement-delta is-down">{{ m.movement }}</em>
+          </span>
+          <span class="movement-bar"><span class="is-down" style="width: {{ (m.movement | abs / move_max * 100) | round | int }}%"></span></span>
+          <small>{{ m.theme }} · {{ m.year_from }}-{{ m.year }} · {{ m.freshness_status }}</small>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="page-note">Nessuna perdita netta di posizioni nell'ultimo anno.</p>{% endif %}
+    </section>
+    {% endif %}
+  </div>
+  {% if has_movement %}
+  <p class="page-note region-movement-note">Movimento: quante posizioni {{ p.region }} ha guadagnato o perso rispetto alle altre regioni, confrontando l'ultimo anno disponibile con l'anno comparabile più recente. Calcolato solo sugli indicatori direzionali e completi su tutte e 20 le regioni in entrambi gli anni.</p>
   {% endif %}
 
-  <section class="profile-themes">
-    <h2>Tutti i temi, uno per uno</h2>
-    <p class="page-note">Elenco dei temi coperti dal profilo regionale, con il numero di indicatori direzionali disponibili per ciascun ambito.</p>
-    <table class="data-table">
-      <thead><tr><th>Tema</th><th class="num">Indicatori</th></tr></thead>
-      <tbody>
-        {% for t in p.theme_table %}
-        <tr class="{{ 'is-unrated' if not t.rated else '' }}">
-          <td><a href="{{ t.theme_path }}">{{ t.theme }}</a></td>
-          <td class="num">{{ t.count }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </section>
+  <div class="region-content">
+    <div class="region-main">
+      {% if p.all_indicators %}
+      {% set macros = p.all_indicators | map(attribute='macro_area') | unique | list %}
+      {% set themes = p.all_indicators | map(attribute='theme') | unique | sort | list %}
+      <section class="profile-explorer" id="explorer" data-region="{{ p.region }}">
+        <h2>Esplora gli indicatori di {{ p.region }}</h2>
+        <p class="page-note">Tutti gli {{ p.all_indicators | length }} indicatori completi e aggiornati per {{ p.region }}, con la posizione tra le 20 regioni (1 = migliore) e il movimento sull'ultimo anno. Filtra per area, tema o forza per andare a fondo.</p>
 
-  {% if p.all_indicators %}
-  {% set macros = p.all_indicators | map(attribute='macro_area') | unique | list %}
-  {% set themes = p.all_indicators | map(attribute='theme') | unique | sort | list %}
-  <section class="profile-explorer" id="explorer" data-region="{{ p.region }}">
-    <h2>Esplora gli indicatori di {{ p.region }}</h2>
-    <p class="page-note">Tutti gli {{ p.all_indicators | length }} indicatori completi e aggiornati per {{ p.region }}, con la posizione tra le 20 regioni (1 = migliore) e il movimento sull'ultimo anno. Filtra per area, tema o forza per andare a fondo.</p>
+        <div class="explorer-toolbar">
+          <div class="macro-pills" role="group" aria-label="Filtra per area">
+            <button type="button" class="macro-pill is-active" data-macro="">Tutte le aree</button>
+            {% for area in macros %}
+            <button type="button" class="macro-pill" data-macro="{{ area }}">{{ area }}</button>
+            {% endfor %}
+          </div>
+          <div class="explorer-controls">
+            <label class="explorer-search">
+              <input type="search" id="explorer-search" placeholder="Cerca un indicatore..." aria-label="Cerca un indicatore">
+            </label>
+            <label class="explorer-field">
+              <span>Tema</span>
+              <select id="explorer-theme">
+                <option value="">Tutti</option>
+                {% for t in themes %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+              </select>
+            </label>
+            <label class="explorer-field">
+              <span>Ordina</span>
+              <select id="explorer-sort">
+                <option value="rank">Posizione</option>
+                <option value="movement">Movimento</option>
+                <option value="az">A-Z</option>
+                <option value="theme">Tema</option>
+              </select>
+            </label>
+          </div>
+          <p class="explorer-count"><strong id="explorer-shown">{{ p.all_indicators | length }}</strong> indicatori</p>
+        </div>
 
-    <div class="explorer-toolbar">
-      <div class="macro-pills" role="group" aria-label="Filtra per area">
-        <button type="button" class="macro-pill is-active" data-macro="">Tutte le aree</button>
-        {% for area in macros %}
-        <button type="button" class="macro-pill" data-macro="{{ area }}">{{ area }}</button>
-        {% endfor %}
-      </div>
-      <div class="explorer-controls">
-        <label class="explorer-search">
-          <input type="search" id="explorer-search" placeholder="Cerca un indicatore..." aria-label="Cerca un indicatore">
-        </label>
-        <label class="explorer-field">
-          <span>Tema</span>
-          <select id="explorer-theme">
-            <option value="">Tutti</option>
-            {% for t in themes %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
-          </select>
-        </label>
-        <label class="explorer-field">
-          <span>Ordina</span>
-          <select id="explorer-sort">
-            <option value="rank">Posizione</option>
-            <option value="movement">Movimento</option>
-            <option value="az">A-Z</option>
-            <option value="theme">Tema</option>
-          </select>
-        </label>
-      </div>
-      <p class="explorer-count"><strong id="explorer-shown">{{ p.all_indicators | length }}</strong> indicatori</p>
+        <div class="explorer-table-wrap">
+        <table class="data-table explorer-table" id="explorer-table">
+          <thead><tr>
+            <th>Indicatore</th><th>Tema</th><th class="num">Valore</th>
+            <th class="num">Posizione</th><th class="num">Movimento</th>
+          </tr></thead>
+          <tbody>
+            {% for i in p.all_indicators %}
+            <tr data-name="{{ i.name | lower }}" data-theme="{{ i.theme }}" data-macro="{{ i.macro_area }}"
+                data-movement="{{ i.movement if i.movement is not none else '' }}"
+                data-rank="{{ i.rank if i.rank is not none else '' }}">
+              <td><a href="{{ i.path }}">{{ i.name }}</a></td>
+              <td class="explorer-theme">{{ i.theme }}</td>
+              <td class="num">{{ i.value | it_num }} <small>{{ i.unit }} · {{ i.year }} · {{ i.freshness_status }}</small></td>
+              <td class="num">
+                {% if i.rank is not none %}<strong>{{ i.rank }}</strong><small>/{{ i.region_count }}</small>
+                {% else %}<span class="page-note">n.v.</span>{% endif %}
+              </td>
+              <td class="num">
+                {% if i.movement %}<span class="movement-tag {{ 'is-up' if i.movement > 0 else 'is-down' }}">{{ '+' if i.movement > 0 else '' }}{{ i.movement }}</span>
+                {% elif i.movement == 0 %}<span class="page-note">=</span>
+                {% else %}<span class="page-note">-</span>{% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+        <p class="explorer-empty" id="explorer-empty" hidden>Nessun indicatore corrisponde ai filtri scelti.</p>
+      </section>
+      {% endif %}
     </div>
 
-    <div class="explorer-table-wrap">
-    <table class="data-table explorer-table" id="explorer-table">
-      <thead><tr>
-        <th>Indicatore</th><th>Tema</th><th class="num">Valore</th>
-        <th class="num">Posizione</th><th class="num">Movimento</th>
-      </tr></thead>
-      <tbody>
-        {% for i in p.all_indicators %}
-        <tr data-name="{{ i.name | lower }}" data-theme="{{ i.theme }}" data-macro="{{ i.macro_area }}"
-            data-movement="{{ i.movement if i.movement is not none else '' }}"
-            data-rank="{{ i.rank if i.rank is not none else '' }}">
-          <td><a href="{{ i.path }}">{{ i.name }}</a></td>
-          <td class="explorer-theme">{{ i.theme }}</td>
-          <td class="num">{{ i.value | it_num }} <small>{{ i.unit }} · {{ i.year }} · {{ i.freshness_status }}</small></td>
-          <td class="num">
-            {% if i.rank is not none %}<strong>{{ i.rank }}</strong><small>/{{ i.region_count }}</small>
-            {% else %}<span class="page-note">n.v.</span>{% endif %}
-          </td>
-          <td class="num">
-            {% if i.movement %}<span class="movement-tag {{ 'is-up' if i.movement > 0 else 'is-down' }}">{{ '+' if i.movement > 0 else '' }}{{ i.movement }}</span>
-            {% elif i.movement == 0 %}<span class="page-note">=</span>
-            {% else %}<span class="page-note">-</span>{% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    </div>
-    <p class="explorer-empty" id="explorer-empty" hidden>Nessun indicatore corrisponde ai filtri scelti.</p>
-  </section>
-  {% endif %}
+    <aside class="region-rail">
+      <section class="profile-similar">
+        <p class="section-label">Regioni con un profilo simile</p>
+        <div class="similar-grid">
+          {% for s in p.similar_regions %}
+          <a class="similar-card" href="/regione/{{ s.region_key }}">{{ s.region }}</a>
+          {% endfor %}
+        </div>
+      </section>
 
+      <section class="profile-themes">
+        <p class="section-label">Tutti i temi</p>
+        <table class="data-table">
+          <tbody>
+            {% for t in p.theme_table %}
+            <tr class="{{ 'is-unrated' if not t.rated else '' }}">
+              <td><a href="{{ t.theme_path }}">{{ t.theme }}</a></td>
+              <td class="num">{{ t.count }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+
+      <aside class="indicator-cta">
+        <span>
+          <small>Esplora i dati</small>
+          <strong>Mappa interattiva e classifiche per ogni indicatore</strong>
+        </span>
+        <a href="/">Apri l'atlante →</a>
+      </aside>
+    </aside>
   </div>
-  </div>
-
-  <section class="profile-similar">
-    <h2>Regioni con un profilo simile</h2>
-    <p class="page-note">Regioni più vicine a {{ p.region }} per andamento degli indicatori Istat completi e aggiornati, con dati recenti su tutte e 20 le regioni.</p>
-    <div class="similar-grid">
-      {% for s in p.similar_regions %}
-      <a class="similar-card" href="/regione/{{ s.region_key }}">{{ s.region }}</a>
-      {% endfor %}
-    </div>
-  </section>
-
-  <aside class="indicator-cta">
-    <span>
-      <small>Esplora i dati</small>
-      <strong>Mappa interattiva e classifiche per ogni indicatore</strong>
-    </span>
-    <a href="/">Apri l'atlante →</a>
-  </aside>
 </article>
 {% endblock %}

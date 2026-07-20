@@ -29,12 +29,26 @@
 {% endblock %}
 
 {% block content %}
-<article class="page page-theme wrap">
+<article class="page page-theme wrap-wide">
   <nav class="breadcrumb"><a href="/temi">Temi</a>{% if p.macro_area %} / {{ p.macro_area }}{% endif %}</nav>
-  <h1>{{ p.theme }}</h1>
-  <p class="page-lead">{{ p.description }}</p>
-  <p class="page-intro">In questo tema trovi {{ p.indicator_count }} indicatori{% if p.complete_count %}, di cui {{ p.complete_count }} con dati completi e aggiornati su tutte e 20 le regioni{% endif %}{% if p.quality_life_count %}. {{ p.quality_life_count }} entrano nel punteggio della qualità della vita{% endif %}. Apri una scheda per la classifica aggiornata, oppure esplora mappa e andamento negli anni nell'atlante.</p>
-  <p class="page-note"><strong>Sottotemi delle fonti:</strong> {{ p.source_themes | join(', ') }}.</p>
+
+  <div class="theme-hero">
+    <div class="theme-hero__main">
+      <h1>{{ p.theme }}</h1>
+      <p class="page-lead">{{ p.description }}</p>
+      <p class="page-intro">In questo tema trovi {{ p.indicator_count }} indicatori{% if p.complete_count %}, di cui {{ p.complete_count }} con dati completi e aggiornati su tutte e 20 le regioni{% endif %}{% if p.quality_life_count %}. {{ p.quality_life_count }} entrano nel punteggio della qualità della vita{% endif %}. Apri una scheda per la classifica aggiornata, oppure esplora mappa e andamento negli anni nell'atlante.</p>
+      <p class="page-note"><strong>Sottotemi delle fonti:</strong> {{ p.source_themes | join(', ') }}.</p>
+    </div>
+    <div class="panel-card theme-hero__stats">
+      <p class="section-label">In sintesi</p>
+      <div class="region-facts">
+        <div><small>Indicatori</small><strong>{{ p.indicator_count }}</strong></div>
+        <div><small>Completi</small><strong>{{ p.complete_count }}</strong></div>
+        <div><small>Nel score QoL</small><strong>{{ p.quality_life_count }}</strong></div>
+        <div><small>Ultimo aggior.</small><strong>{{ (p.indicators | map(attribute='year_max') | max) if p.indicators else '—' }}</strong></div>
+      </div>
+    </div>
+  </div>
 
   <div class="theme-grid">
     {% for ind in p.indicators %}

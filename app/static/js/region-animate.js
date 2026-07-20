@@ -23,7 +23,7 @@
   }
 
   var blocks = Array.prototype.slice.call(
-    document.querySelectorAll(".profile-cols, .profile-movement, .profile-themes")
+    document.querySelectorAll(".profile-quad, .profile-themes")
   );
   if (!("IntersectionObserver" in window) || !blocks.length) {
     reveal(document);
