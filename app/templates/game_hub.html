@@ -21,46 +21,51 @@
 {% endblock %}
 
 {% block content %}
-<article class="page game-page wrap">
+<article class="page game-page wrap-wide">
   <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
 
   {% include "_game_subnav.html" %}
 
-  <header class="page-hero">
-    <h1>Quanto conosci l'Italia?</h1>
-    <p class="page-lead">Tre giochi rapidi sugli indicatori territoriali Istat: una regione misteriosa da scoprire, sfide a due e classifiche da ricostruire. Ogni domanda mostra l'anno e la fonte, ogni risposta svela cosa misura davvero il dato.</p>
-  </header>
+  <div class="hub-layout">
+    <div class="hub-layout__hero">
+      <header class="page-hero">
+        <h1>Quanto conosci l'Italia?</h1>
+        <p class="page-lead">Tre giochi rapidi sugli indicatori territoriali Istat: una regione misteriosa da scoprire, sfide a due e classifiche da ricostruire. Ogni domanda mostra l'anno e la fonte, ogni risposta svela cosa misura davvero il dato.</p>
+      </header>
+      <div class="panel-card hub-intro">
+        <h2>Come funziona il quiz</h2>
+        <p>Tutti i giochi usano gli indicatori territoriali Istat pubblicati nell'<a href="/">atlante</a>, con anno e fonte indicati prima di ogni domanda. Alla risposta trovi anche una breve spiegazione di cosa misura l'indicatore, per imparare qualcosa in più sull'Italia a ogni round.</p>
+        <p>Le partite si giocano senza registrazione. I record personali restano salvati sul dispositivo, mentre le serie migliori possono entrare nella <a href="/quiz/classifica">classifica</a> condivisa.</p>
+      </div>
+    </div>
 
-  <p class="qz-section-eb">I tre giochi</p>
-  <section class="hub-cards qz-games" aria-label="Modalità di gioco">
-    <a class="hub-card qz-game" href="/quiz/indovina-la-regione">
-      <small>Sfida quotidiana</small>
-      <h3>Indovina la Regione</h3>
-      <p>Una regione italiana misteriosa, sei indicatori Istat come indizi, sei tentativi. Una nuova sfida ogni giorno.</p>
-      <span class="qz-meta"><em>~3 min · 6 tentativi</em><span>Gioca ora →</span></span>
-    </a>
-    <a class="hub-card qz-game" href="/quiz/chi-e-maggiore">
-      <small>Round da 10 secondi</small>
-      <h3>Chi è maggiore?</h3>
-      <p>Due regioni, un indicatore: scegli quella con il valore più alto prima che scada il tempo. Difficoltà crescente.</p>
-      <span class="qz-meta"><em>~2 min · 10s per round</em><span>Gioca ora →</span></span>
-    </a>
-    <a class="hub-card qz-game" href="/quiz/ordina">
-      <small>Credito parziale</small>
-      <h3>Ordina le regioni</h3>
-      <p>Metti tre o cinque regioni in ordine, dal valore più alto al più basso. Un punto per ogni posizione corretta.</p>
-      <span class="qz-meta"><em>~4 min · 3 o 5 regioni</em><span>Gioca ora →</span></span>
-    </a>
-  </section>
+    <div class="hub-layout__main">
+      <p class="qz-section-eb">I tre giochi</p>
+      <section class="hub-cards qz-games" aria-label="Modalità di gioco">
+        <a class="hub-card qz-game" href="/quiz/indovina-la-regione">
+          <small>Sfida quotidiana</small>
+          <h3>Indovina la Regione</h3>
+          <p>Una regione italiana misteriosa, sei indicatori Istat come indizi, sei tentativi. Una nuova sfida ogni giorno.</p>
+          <span class="qz-meta"><em>~3 min · 6 tentativi</em><span>Gioca ora →</span></span>
+        </a>
+        <a class="hub-card qz-game" href="/quiz/chi-e-maggiore">
+          <small>Round da 10 secondi</small>
+          <h3>Chi è maggiore?</h3>
+          <p>Due regioni, un indicatore: scegli quella con il valore più alto prima che scada il tempo. Difficoltà crescente.</p>
+          <span class="qz-meta"><em>~2 min · 10s per round</em><span>Gioca ora →</span></span>
+        </a>
+        <a class="hub-card qz-game" href="/quiz/ordina">
+          <small>Credito parziale</small>
+          <h3>Ordina le regioni</h3>
+          <p>Metti tre o cinque regioni in ordine, dal valore più alto al più basso. Un punto per ogni posizione corretta.</p>
+          <span class="qz-meta"><em>~4 min · 3 o 5 regioni</em><span>Gioca ora →</span></span>
+        </a>
+      </section>
 
-  <div id="hub-root">
-    <p class="game-loading">Caricamento delle statistiche...</p>
+      <div id="hub-root">
+        <p class="game-loading">Caricamento delle statistiche...</p>
+      </div>
+    </div>
   </div>
-
-  <section class="prose">
-    <h2>Come funziona il quiz</h2>
-    <p>Tutti i giochi usano gli indicatori territoriali Istat pubblicati nell'<a href="/">atlante</a>, con anno e fonte indicati prima di ogni domanda. Alla risposta trovi anche una breve spiegazione di cosa misura l'indicatore, per imparare qualcosa in più sull'Italia a ogni round.</p>
-    <p>Le partite si giocano senza registrazione. I record personali restano salvati sul dispositivo, mentre le serie migliori possono entrare nella <a href="/quiz/classifica">classifica</a> condivisa.</p>
-  </section>
 </article>
 {% endblock %}

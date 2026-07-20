@@ -46,6 +46,12 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 
 .wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
 .prose-wrap { width: min(760px, 100% - 32px); margin-inline: auto; }
+/* Wider desktop wrap for the region / indicator / theme / quality-ranking /
+   quiz-hub pages: their content is dense enough to use multi-column layouts
+   at 1440px, unlike the narrower prose-driven pages that keep .wrap. */
+.wrap-wide { width: min(1360px, 100% - 32px); margin-inline: auto; }
+
+.panel-card { border: 1px solid var(--line); background: var(--panel); padding: 16px 18px; }
 
 /* Cross-document View Transitions: every server-rendered page (blog, quiz,
    qualità della vita, metodologia, schede indicatore/regione...) cross-fades
@@ -326,6 +332,15 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .indicator-accordion[open] summary::after { content: "▴"; }
 .indicator-accordion .prose { padding: 0 16px 16px; }
 
+/* Indicator page: left column (definition, ranking, accordion) + sticky
+   right rail (map, insight strip, sparkline, CTA). */
+.indicator-layout { display: block; }
+@media (min-width: 1180px) {
+  .indicator-layout { display: grid; grid-template-columns: 1fr 480px; gap: 36px; align-items: start; }
+  .indicator-rail { position: sticky; top: calc(var(--masthead-h) + 20px); display: grid; gap: 18px; align-self: start; }
+  .indicator-rail > * { margin: 0; }
+}
+
 /* Tables shared by indicator and region pages */
 .data-table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin: 8px 0 28px; }
 .data-table th { text-align: left; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
@@ -350,18 +365,47 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .region-facts small { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 .region-facts strong { font-family: var(--font-display); font-size: 18px; }
 
-.region-layout { display: block; }
-.region-locator { display: none; }
-.region-locator .indicator-map { padding: 12px; }
+/* Region profile: hero row (title/anchors | sintesi card | locator map) */
+.region-hero { display: grid; grid-template-columns: 1fr; gap: 20px; margin: 0 0 24px; align-items: start; }
+.region-hero__locator { display: none; }
+.region-hero__locator .indicator-map { padding: 10px; }
 .region-locator-map .regions-map { display: block; width: 100%; height: auto; }
 
-@media (min-width: 1080px) {
-  .region-layout { display: grid; grid-template-columns: 280px 1fr; gap: 28px; align-items: start; }
-  .region-locator { display: block; position: sticky; top: calc(var(--masthead-h) + 20px); border: 1px solid var(--line); background: var(--panel); padding: 16px; }
+@media (min-width: 680px) {
+  .region-hero { grid-template-columns: 1fr 1fr; }
+  .region-hero__main { grid-column: 1 / -1; }
+  .region-hero__locator { display: block; }
 }
+@media (min-width: 1180px) {
+  .region-hero { grid-template-columns: 1fr 320px 240px; }
+  .region-hero__main { grid-column: auto; }
+}
+.region-hero__summary .region-facts,
+.region-hero__summary .freshness-strip { margin: 0 0 14px; }
+.region-hero__summary .freshness-strip:last-child,
+.region-hero__summary .region-facts:last-child { margin-bottom: 0; }
+
+/* Region profile: forza / debolezza / recupera / perde in one row */
+.profile-quad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 8px 0 12px; align-items: start; }
+.profile-quad--two { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1180px) {
+  .profile-quad:not(.profile-quad--two) { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 620px) {
+  .profile-quad { grid-template-columns: 1fr; }
+}
+.region-movement-note { margin: 0 0 36px; }
+
+/* Region: indicator explorer + sticky rail (regioni simili, temi, CTA) */
+.region-content { display: block; }
+@media (min-width: 1180px) {
+  .region-content { display: grid; grid-template-columns: 1fr 320px; gap: 32px; align-items: start; }
+  .region-rail { position: sticky; top: calc(var(--masthead-h) + 20px); display: grid; gap: 24px; align-self: start; }
+}
+.region-rail .similar-grid { grid-template-columns: 1fr 1fr; }
+.region-rail .indicator-cta { margin: 0; }
 
 /* Region profile */
-.profile-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 8px 0 36px; }
 .profile-card { padding: 20px; border: 1px solid var(--line); background: var(--panel); }
 .profile-card h2 { font-size: 16px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; }
 .profile-strong { border-top: 3px solid var(--positive); }
@@ -372,15 +416,16 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .profile-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .profile-list li { display: grid; }
 .profile-list small { color: var(--muted); font-size: 12px; }
-.profile-themes { margin: 8px 0 36px; }
+.profile-themes,
 .profile-similar { margin: 8px 0 36px; }
+.region-rail .profile-themes,
+.region-rail .profile-similar { margin: 0; }
 .similar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
 .similar-card { padding: 16px; border: 1px solid var(--line); background: var(--panel); font-family: var(--font-display); font-weight: 700; color: var(--ink); }
 .similar-card:hover { border-color: var(--accent); text-decoration: none; }
 
-/* Region: movement of the last year (recovered / lost positions) */
-.profile-movement { margin: 8px 0 36px; }
-.movement-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 12px; }
+/* Region: movement of the last year (recovered / lost positions), shown as
+   two of the four cards in .profile-quad alongside forza/debolezza. */
 .movement-card { padding: 18px 20px; border: 1px solid var(--line); background: var(--panel); }
 .movement-card h3 { font-size: 13px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 14px; }
 .movement-up { border-top: 3px solid var(--positive); }
@@ -434,9 +479,15 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .explorer-empty { padding: 24px 0; color: var(--muted); }
 
 @media (max-width: 680px) {
-  .movement-cols { grid-template-columns: 1fr; }
   .explorer-table th:nth-child(2), .explorer-table td:nth-child(2) { display: none; }
 }
+
+/* Theme page: hero (title/description/subthemes | quick-facts card) */
+.theme-hero { display: block; margin-bottom: 8px; }
+@media (min-width: 1080px) {
+  .theme-hero { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+}
+.theme-hero__stats .region-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; margin: 0; }
 
 /* Theme + index listings */
 .indicator-list { list-style: none; padding: 0; margin: 8px 0 32px; display: grid; gap: 10px; }
@@ -534,12 +585,24 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   .region-index-card { grid-template-columns: 1fr; gap: 8px; }
 }
 
-@media (max-width: 680px) {
-  .profile-cols { grid-template-columns: 1fr; }
-}
-
 /* ---------- Qualità della vita ---------- */
 .quality-hero { margin: 8px 0 22px; }
+
+/* Classifica: hero (title/toggles/tabs | freshness card), then a wide
+   ranking table beside a sticky rail (map, champions, methodology CTA). */
+.quality-hero-row { display: block; margin-bottom: 24px; }
+@media (min-width: 1080px) {
+  .quality-hero-row { display: grid; grid-template-columns: 1fr 340px; gap: 32px; align-items: start; }
+}
+.quality-hero-row__fresh .page-note:last-child { margin-bottom: 0; }
+
+.quality-body { display: block; }
+@media (min-width: 1180px) {
+  .quality-body { display: grid; grid-template-columns: 1fr 480px; gap: 32px; align-items: start; }
+  .quality-rail { position: sticky; top: calc(var(--masthead-h) + 20px); display: grid; gap: 22px; align-self: start; }
+}
+.quality-body__main { margin: 0; }
+.quality-rail .indicator-cta { margin: 0; }
 .quality-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
 .quality-btn { display: inline-block; padding: 11px 18px; border: 1px solid var(--ink); font-weight: 700; font-size: 14px; }
 .quality-btn:hover { text-decoration: none; background: var(--accent-soft); }
