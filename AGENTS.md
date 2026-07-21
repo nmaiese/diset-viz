@@ -51,6 +51,26 @@ Before publishing article batches, run `rg -n "[—–;]" content/posts` and ins
 repeated H2 sequences. For templates, frontend strings and SVG text, distinguish
 visible copy from CSS, JS, JSON-LD and CSV syntax.
 
+## Writing indicator pages
+
+Every public indicator page must follow [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md).
+The common page generator must make every sheet answer these questions with data
+from the indicator itself:
+
+- What does the indicator measure, and what population, denominator or unit does
+  it use?
+- What does a concrete value mean?
+- How should high and low values be read, and what can the indicator not prove?
+- How did the latest value change from the previous available year on the same
+  territorial base?
+- What is the long-term movement, source, coverage and next useful action?
+
+For percentages, annual changes are percentage points. Never call an unweighted
+mean of regional values the Italian or national average. Compare only territories
+present in both years, keep observation separate from causality, and omit claims
+that the data cannot support. Add a regression test when a page exposes a new
+indicator family or a special interpretation rule.
+
 ## Technical SEO checks
 
 - `www.divarioitalia.it` must redirect to `https://divarioitalia.it` with `301`.

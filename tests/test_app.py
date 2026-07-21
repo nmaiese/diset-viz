@@ -397,8 +397,51 @@ class AppSmokeTest(unittest.TestCase):
         css_path = Path(app.root_path) / "static" / "css" / "site.css"
         self.assertIn(".page .prose h2", css_path.read_text(encoding="utf-8"))
 
+    def test_indicator_page_explains_latest_change_and_gender_gap_scope(self):
+        client = app.test_client()
+        response = client.get(
+            "/indicatore/61-differenza-tra-tasso-di-attivita-maschile-e-femminile"
+        )
+        self.assertEqual(response.status_code, 200)
+        html = response.data.decode("utf-8")
+        self.assertIn("Come è cambiato nell'ultimo anno disponibile", html)
+        self.assertIn("Tra il 2024 e il 2025", html)
+        self.assertIn("da 17,14 punti percentuali a 16,69 punti percentuali", html)
+        self.assertIn("Il valore è diminuito in 14 regioni, è aumentato in 6", html)
+        self.assertIn("il divario medio tra i due tassi si è ridotto", html)
+        self.assertIn("sia la popolazione femminile sia quella maschile", html)
+        self.assertNotIn("Il perimetro riguarda la popolazione maschile", html)
+        self.assertNotIn("Media Italia", html)
+        self.assertNotIn("media nazionale", html)
+
+    def test_every_legacy_indicator_has_explanatory_and_annual_context(self):
+        from app.data import get_catalog, get_indicator, indicator_year_over_year_stats
+
+        generic_percentage = (
+            "Un valore di 20 indica che la misura equivale al 20% del totale "
+            "definito dalla fonte."
+        )
+        for item in get_catalog()["indicators"]:
+            explain = item["explain"]
+            for field in ("plain", "example", "scope", "reading", "caveat"):
+                self.assertTrue(explain[field].strip(), f"{item['id']} missing {field}")
+            self.assertNotEqual(explain["example"], generic_percentage, item["id"])
+
+            payload = get_indicator(item["id"])
+            annual = indicator_year_over_year_stats(payload)
+            if item["year_min"] == item["year_max"]:
+                self.assertIsNone(annual, item["id"])
+                continue
+            self.assertIsNotNone(annual, item["id"])
+            self.assertGreater(annual["common_count"], 0, item["id"])
+            self.assertLess(annual["previous_year"], annual["year"], item["id"])
+
     def test_indicator_trend_stats(self):
-        from app.data import indicator_trend_stats, indicator_year_average
+        from app.data import (
+            indicator_trend_stats,
+            indicator_year_average,
+            indicator_year_over_year_stats,
+        )
 
         payload = {
             "metadata": {"id": "1", "name": "Tasso di occupazione", "unit": "percentuale", "year_min": 2020, "year_max": 2022},
@@ -438,12 +481,39 @@ class AppSmokeTest(unittest.TestCase):
 
         self.assertIsNone(indicator_year_average(payload["series"], 2021))
 
+        annual = indicator_year_over_year_stats(payload)
+        self.assertEqual(annual["previous_year"], 2020)
+        self.assertEqual(annual["year"], 2022)
+        self.assertEqual(annual["year_gap"], 2)
+        self.assertEqual(annual["common_count"], 2)
+        self.assertEqual(annual["previous_avg"], 50.0)
+        self.assertEqual(annual["current_avg"], 55.0)
+        self.assertEqual(annual["increase_count"], 2)
+        self.assertEqual(annual["decrease_count"], 0)
+        self.assertIsNone(indicator_year_over_year_stats(single_year_payload))
+
         # lower_better/higher_worse indicators pick "best" as the *smaller* value
         # (views.py reverses the ranking for these directions) - the gap must still
         # come out as a positive magnitude, never a signed (best - worst) number.
         reversed_stats = indicator_trend_stats(payload, 2022, values, best=worst, worst=best)
         self.assertEqual(reversed_stats["gap_abs"], 22.0)
         self.assertAlmostEqual(reversed_stats["gap_ratio"], 66.0 / 44.0)
+
+        # Coverage changes: both means use only territories present in both
+        # years, so the comparison does not mix different territorial bases.
+        partial_payload = {
+            "metadata": {"year_min": 2020, "year_max": 2021},
+            "series": [
+                {"year": 2020, "region": "A", "region_key": "a", "value": 10.0},
+                {"year": 2020, "region": "B", "region_key": "b", "value": 20.0},
+                {"year": 2021, "region": "A", "region_key": "a", "value": 12.0},
+            ],
+        }
+        partial = indicator_year_over_year_stats(partial_payload)
+        self.assertEqual(partial["common_count"], 1)
+        self.assertFalse(partial["same_coverage"])
+        self.assertEqual(partial["previous_avg"], 10.0)
+        self.assertEqual(partial["current_avg"], 12.0)
 
         # Median/dispersion and the "biggest movers" with an honest kind label.
         # Mixed-direction fixture: Lombardia rises, Calabria falls, Lazio rises less.

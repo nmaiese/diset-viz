@@ -436,10 +436,106 @@ def _biggest_movers(series, year_min, year_max):
     return highest, lowest
 
 
+def indicator_year_over_year_stats(payload, year=None):
+    """Compare the latest selected year with the previous available year.
+
+    The comparison uses only territories that have a value in both years. This
+    keeps the two simple territorial averages on the same base when coverage
+    changes between releases. The result is descriptive and never assigns a
+    positive or negative meaning to the movement. That interpretation belongs
+    to the indicator direction handled by ``indicator_notes``.
+    """
+    meta = payload["metadata"]
+    current_year = year if year is not None else meta["year_max"]
+    available_years = sorted({
+        row["year"]
+        for row in payload["series"]
+        if row["value"] is not None and row["year"] <= current_year
+    })
+    previous_years = [candidate for candidate in available_years if candidate < current_year]
+    if not previous_years:
+        return None
+
+    previous_year = previous_years[-1]
+    def territory_name(row):
+        return row.get("region") or row.get("territory")
+
+    def territory_key(row):
+        return row.get("region_key") or row.get("territory_key")
+
+    current = {
+        territory_name(row): row
+        for row in payload["series"]
+        if row["year"] == current_year and row["value"] is not None and territory_name(row)
+    }
+    previous = {
+        territory_name(row): row
+        for row in payload["series"]
+        if row["year"] == previous_year and row["value"] is not None and territory_name(row)
+    }
+    common = sorted(set(current) & set(previous))
+    if not common:
+        return None
+
+    changes = []
+    for region in common:
+        delta = current[region]["value"] - previous[region]["value"]
+        if math.isclose(delta, 0.0, abs_tol=1e-12):
+            delta = 0.0
+            kind = "stabile"
+        else:
+            kind = "aumento" if delta > 0 else "calo"
+        changes.append({
+            "region": region,
+            "region_key": territory_key(current[region]),
+            "previous_value": previous[region]["value"],
+            "current_value": current[region]["value"],
+            "delta": delta,
+            "kind": kind,
+        })
+
+    previous_avg = sum(previous[region]["value"] for region in common) / len(common)
+    current_avg = sum(current[region]["value"] for region in common) / len(common)
+    average_delta = current_avg - previous_avg
+    average_delta_pct = (
+        average_delta / abs(previous_avg) * 100
+        if previous_avg and not math.isclose(previous_avg, 0.0, abs_tol=1e-12)
+        else None
+    )
+    increases = sorted(
+        (change for change in changes if change["delta"] > 0),
+        key=lambda change: change["delta"],
+        reverse=True,
+    )
+    decreases = sorted(
+        (change for change in changes if change["delta"] < 0),
+        key=lambda change: change["delta"],
+    )
+
+    return {
+        "year": current_year,
+        "previous_year": previous_year,
+        "year_gap": current_year - previous_year,
+        "common_count": len(common),
+        "current_count": len(current),
+        "previous_count": len(previous),
+        "same_coverage": len(common) == len(current) == len(previous),
+        "previous_avg": previous_avg,
+        "current_avg": current_avg,
+        "average_delta": average_delta,
+        "average_delta_pct": average_delta_pct,
+        "increase_count": len(increases),
+        "decrease_count": len(decreases),
+        "stable_count": sum(change["delta"] == 0 for change in changes),
+        "largest_increases": increases[:3],
+        "largest_decreases": decreases[:3],
+    }
+
+
 def indicator_trend_stats(payload, year, values, best=None, worst=None):
-    """Pure numeric aggregates for the indicator page: national average and median
-    for the current year, national average for year_min (for a year-over-year
-    trend), the best/worst gap, the regions that moved the most, and whether the
+    """Pure numeric aggregates for the indicator page: regional mean and median
+    for the current year, regional mean for year_min (for the long-term trend),
+    the best/worst gap, the regions that moved the most, and whether the
     regional gap widened or narrowed over time. `values` is the year-filtered rows
     already in scope in the view (get_indicator_year()["values"]). `best`/`worst`
     are the same two rows the view already picked, or None for contextual

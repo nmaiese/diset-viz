@@ -41,13 +41,13 @@
 <article class="page page-indicator wrap">
   <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a> / <a href="/qualita-della-vita/metodologia#indicatori-bes">Indicatori BES</a></nav>
   <h1>{{ indicator.name }}</h1>
-  <p class="page-lead">{{ indicator.explain.plain }}</p>
+  <p class="page-lead">{{ indicator.explain.plain }} La scheda confronta {{ territory_label }} e mostra l'ultimo aggiornamento disponibile della serie.</p>
   {% if not indicator.indexable %}
   <p class="page-note">La scheda è consultabile ma non viene proposta ai motori di ricerca: nell'ultimo anno la copertura è inferiore all'80% sia per le regioni sia per le province.</p>
   {% endif %}
 
   <div class="page-facts">
-    <span><small>Unità di misura</small>{{ indicator.unit or 'n.d.' }}</span>
+    <span><small>Unità di misura</small>{{ indicator.value_unit }}</span>
     <span><small>Periodo disponibile</small>{{ indicator.year_min }}-{{ indicator.year_max }}</span>
     <span><small>Categoria</small><a href="{{ indicator.category_path }}">{{ indicator.category_name }}</a></span>
     <span><small>Dominio BES</small>{{ indicator.domain_name }}</span>
@@ -64,12 +64,34 @@
   </section>
 
   {% for level in indicator.level_payloads %}
+  <section class="prose indicator-year-change">
+    <h2>{{ level.label }}: come è cambiato nell'ultimo aggiornamento</h2>
+    {% if level.annual_change %}
+    <p>Tra il {{ level.annual_change.previous_year }} e il {{ level.annual_change.year }} la media semplice dei valori dei {{ level.annual_change.common_count }} territori confrontabili è passata da {{ level.annual_change.previous_avg | it_num(2) }} {{ indicator.value_unit }} a {{ level.annual_change.current_avg | it_num(2) }} {{ indicator.value_unit }}.
+      {% if level.annual_change.average_delta > 0 %}È un aumento di {{ level.annual_change.average_delta | it_num(2) }} {{ indicator.change_unit }}.
+      {% elif level.annual_change.average_delta < 0 %}È una diminuzione di {{ (level.annual_change.average_delta | abs) | it_num(2) }} {{ indicator.change_unit }}.
+      {% else %}Il valore medio non è cambiato.
+      {% endif %}
+      {{ level.annual_note }}
+    </p>
+    <p>Il valore è diminuito in {{ level.annual_change.decrease_count }} territori, è aumentato in {{ level.annual_change.increase_count }}{% if level.annual_change.stable_count %} ed è rimasto invariato in {{ level.annual_change.stable_count }}{% endif %}.</p>
+    {% if level.annual_change.largest_decreases or level.annual_change.largest_increases %}
+    <p>
+      {% if level.annual_change.largest_decreases %}{% set decrease = level.annual_change.largest_decreases[0] %}La diminuzione più ampia si osserva {% if level.level == 'regione' %}in <a href="/regione/{{ decrease.region_key }}">{{ decrease.region }}</a>{% else %}nel territorio {{ decrease.region }}{% endif %}, da {{ decrease.previous_value | it_num(2) }} a {{ decrease.current_value | it_num(2) }} {{ indicator.value_unit }} ({{ decrease.delta | it_num(2) }} {{ indicator.change_unit }}){% endif %}{% if level.annual_change.largest_decreases and level.annual_change.largest_increases %}, mentre {% endif %}{% if level.annual_change.largest_increases %}{% set increase = level.annual_change.largest_increases[0] %}l'aumento più ampio riguarda {% if level.level == 'regione' %}<a href="/regione/{{ increase.region_key }}">{{ increase.region }}</a>{% else %}{{ increase.region }}{% endif %}, da {{ increase.previous_value | it_num(2) }} a {{ increase.current_value | it_num(2) }} {{ indicator.value_unit }} (+{{ increase.delta | it_num(2) }} {{ indicator.change_unit }}){% endif %}.
+    </p>
+    {% endif %}
+    <p class="page-note">Il confronto usa soltanto territori presenti in entrambi gli anni. La media è una sintesi non ponderata dei valori territoriali.</p>
+    {% else %}
+    <p>La serie espone un solo anno confrontabile per questo livello territoriale. Non è possibile calcolare una variazione rispetto all'aggiornamento precedente.</p>
+    {% endif %}
+  </section>
+
   <section class="page-ranking">
     <h2>{{ level.label }}: dati {{ level.year_max }}</h2>
-    <p class="page-note">Copertura: {{ level.count_latest }} territori su {{ level.territory_total }} ({{ (level.coverage_latest * 100) | round | int }}%). Media {{ level.mean | it_num(2) }}. Mediana {{ level.median | it_num(2) }} {{ indicator.unit }}.</p>
+    <p class="page-note">Copertura: {{ level.count_latest }} territori su {{ level.territory_total }} ({{ (level.coverage_latest * 100) | round | int }}%). Media semplice {{ level.mean | it_num(2) }}. Mediana {{ level.median | it_num(2) }} {{ indicator.value_unit }}.</p>
     <div class="quality-table-wrap">
       <table class="data-table">
-        <thead><tr><th>#</th><th>Territorio</th><th class="num">{{ indicator.unit or 'Valore' }}</th></tr></thead>
+        <thead><tr><th>#</th><th>Territorio</th><th class="num">{{ indicator.value_unit }}</th></tr></thead>
         <tbody>
           {% for row in level.observations %}
           <tr>

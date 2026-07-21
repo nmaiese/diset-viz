@@ -11,8 +11,14 @@ import statistics
 from pathlib import Path
 
 from app.cache import cache
-from app.data import _parse_number
-from app.indicator_notes import build_bes_indicator_explain, display_unit
+from app.data import _parse_number, indicator_year_over_year_stats
+from app.indicator_notes import (
+    annual_change_framing,
+    build_bes_indicator_explain,
+    change_unit_label,
+    display_unit,
+    value_unit_label,
+)
 from app.profiles import region_key_for, slugify
 from app.taxonomy import CANONICAL_CATEGORIES, category_for_indicator, category_path
 
@@ -243,14 +249,19 @@ def get_bes_indicator_page(indicator_id):
         info = entry["levels"].get(level)
         if info is None:
             continue
-        observations = [
+        level_rows = [
             row for row in get_bes_rows(level)
-            if row["id"] == indicator_id and row["year"] == info["year_max"]
-            and row["value"] is not None and row["territory_key"]
+            if row["id"] == indicator_id and row["value"] is not None and row["territory_key"]
+        ]
+        observations = [
+            row for row in level_rows if row["year"] == info["year_max"]
         ]
         reverse = info["direction"] == "higher_better"
         observations.sort(key=lambda row: row["value"], reverse=reverse)
         values = [row["value"] for row in observations]
+        annual_change = indicator_year_over_year_stats(
+            {"metadata": {"year_max": info["year_max"]}, "series": level_rows}
+        )
         level_payloads.append({
             "level": level,
             "label": label,
@@ -262,11 +273,19 @@ def get_bes_indicator_page(indicator_id):
             "observations": observations,
             "mean": sum(values) / len(values) if values else None,
             "median": statistics.median(values) if values else None,
+            "annual_change": annual_change,
+            "annual_note": annual_change_framing(
+                entry["name"],
+                info["direction"],
+                annual_change["average_delta"] if annual_change else None,
+            ),
         })
     return {
         **entry,
         "level_payloads": level_payloads,
         "year_min": min(level["year_min"] for level in level_payloads),
         "year_max": max(level["year_max"] for level in level_payloads),
+        "value_unit": value_unit_label(entry["name"], entry["unit"]),
+        "change_unit": change_unit_label(entry["name"], entry["unit"]),
         "source_url": BES_SOURCE_URLS["regione" if "regione" in entry["levels"] else "provincia"],
     }

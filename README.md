@@ -85,6 +85,10 @@ example, and [`content/STYLE.md`](content/STYLE.md) for the editorial style
 (human voice, no em-dashes/semicolons, real data only). Agents should also read
 `CLAUDE.md` / `AGENTS.md`.
 
+Public indicator sheets follow [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md):
+specific definition and perimeter, concrete value example, latest-year change
+on a common territorial base, long-term trend, limits, source and download.
+
 Before publishing, agents must leave a claim table, source/method note, internal
 links to methodology and the atlas, caveat, next step, metadata and schema
 candidate.
@@ -111,7 +115,7 @@ break the API or the charts. `/api/catalog` federates these 393 series with the
 files. It enriches each indicator with
 `region_count`, `completeness`, `complete` (≥98% of region×year cells over 20
 regions for territorial series, latest-year regional coverage for BES series)
-and a downsampled national-average `spark` series, which power the atlas
+and a downsampled simple regional-average `spark` series, which power the atlas
 index, badges, sorting and filtering without shipping the full dataset. It also
 exposes `year_max`, `source`, `retrieved_at` when available, and
 `freshness_status` (`current`, `recent`, `dated`, `stale`) for data-age badges.

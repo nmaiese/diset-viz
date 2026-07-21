@@ -7,6 +7,7 @@ from app.data import (
     get_indicator_year,
     get_rows,
     indicator_trend_stats,
+    indicator_year_over_year_stats,
 )
 from app.atlas_catalog import (
     all_atlas_themes_index,
@@ -251,7 +252,13 @@ def indicator_page(slug):
 
     plain = (meta.get("explain") or {}).get("plain", "")
     stats = indicator_trend_stats(payload, year, values, best, worst)
+    annual_change = indicator_year_over_year_stats(payload, year)
     trend_note = indicator_notes.trend_framing(direction, stats["avg_change_pct"])
+    annual_note = indicator_notes.annual_change_framing(
+        meta["name"],
+        direction,
+        annual_change["average_delta"] if annual_change else None,
+    )
     is_indexable = profiles.is_search_indexable_indicator(meta)
     map_colors = indicator_notes.region_choropleth_colors(values)
     spark_points = indicator_notes.sparkline_points(meta.get("spark") or [])
@@ -263,10 +270,20 @@ def indicator_page(slug):
         worst=worst,
         year=year,
         stats=stats,
+        annual_change=annual_change,
+        annual_note=annual_note,
         trend_note=trend_note,
         is_indexable=is_indexable,
         map_colors=map_colors,
         spark_points=spark_points,
+        page_intro=indicator_notes.indicator_page_intro(
+            plain,
+            meta["year_min"],
+            meta["year_max"],
+            len(meta["regions"]),
+        ),
+        value_unit=indicator_notes.value_unit_label(meta["name"], meta["unit"]),
+        change_unit=indicator_notes.change_unit_label(meta["name"], meta["unit"]),
         seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
         seo_description=indicator_notes.seo_description(
             plain,

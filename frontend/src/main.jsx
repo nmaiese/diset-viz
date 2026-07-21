@@ -1715,7 +1715,7 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
           <h1>Metti due o tre regioni a confronto.</h1>
           <p className="atlas-hero__lead">
             Scegli un indicatore e fino a tre regioni. Le vedi sovrapposte nella serie storica,
-            sulla mappa e in tabella, contro la media nazionale.
+            sulla mappa e in tabella, rispetto alla media semplice delle regioni.
           </p>
         </section>
 

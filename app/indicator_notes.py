@@ -634,10 +634,11 @@ def build_indicator_explain(item):
     lens = _lens(name)
     direction = direction_for(indicator_id, name)
 
+    plain = _plain_text(base_name, theme, archive, unit, indicator_id)
     return {
-        "plain": _plain_text(base_name, theme, archive, unit, indicator_id),
-        "example": _unit_explanation(name, unit),
-        "scope": _scope_text(name, "territori regionali"),
+        "plain": plain,
+        "example": _unit_explanation(name, unit, archive),
+        "scope": _scope_text(name, "territori regionali", archive),
         "reading": _reading_text(name, theme, unit, direction),
         "caveat": _caveat_text(name, theme, lens),
         "direction": direction,
@@ -654,7 +655,7 @@ def build_bes_indicator_explain(item, level="territori"):
     return {
         "plain": _bes_plain_text(name, unit, indicator_id),
         "example": _unit_explanation(name, unit),
-        "scope": _scope_text(name, level),
+        "scope": _scope_text(name, level, name),
         "reading": _reading_text(name, theme, unit, direction),
         "caveat": _bes_caveat(unit, level),
         "direction": direction,
@@ -723,15 +724,25 @@ def _plain_text(name, theme, archive, unit, indicator_id):
     return _finish_sentence(f"Misura {_with_article(subject)}")
 
 
-def _scope_text(name, level):
-    lowered = name.lower()
+def _scope_text(name, level, definition=""):
+    lowered = f"{name} {definition}".lower()
     focus = ""
-    if "femmine" in lowered or "donne" in lowered:
+    has_female = "femmine" in lowered or "donne" in lowered or "femminile" in lowered
+    has_male = "maschi" in lowered or "uomini" in lowered or "maschile" in lowered
+    age_match = re.search(r"(?:tra\s+|in età\s+)?(\d+)\s*-\s*(\d+)\s*anni", lowered)
+    if has_female and has_male:
+        focus = " Il perimetro comprende sia la popolazione femminile sia quella maschile indicate nella definizione."
+    elif has_female:
         focus = " Il perimetro riguarda la popolazione femminile indicata nel nome."
-    elif "maschi" in lowered or "uomini" in lowered:
+    elif has_male:
         focus = " Il perimetro riguarda la popolazione maschile indicata nel nome."
-    elif re.search(r"\d+\s*-\s*\d+ anni|\d+ anni e più|\d+ anni e meno", lowered):
-        focus = " La fascia di età indicata nel nome fa parte della definizione e non va estesa ad altri gruppi."
+    if age_match:
+        focus += (
+            f" La fascia da {age_match.group(1)} a {age_match.group(2)} anni fa parte "
+            "della definizione e non va estesa ad altri gruppi."
+        )
+    elif re.search(r"\d+ anni e più|\d+ anni e meno", lowered):
+        focus += " La fascia di età indicata nella definizione non va estesa ad altri gruppi."
     territory_phrase = {
         "regioni": "in tutte le regioni",
         "province": "in tutte le province",
@@ -742,16 +753,56 @@ def _scope_text(name, level):
     return f"Il confronto applica la stessa definizione {territory_phrase} e per ciascun anno.{focus}"
 
 
-def _unit_explanation(name, unit):
+def _percentage_denominator(definition):
+    """Extract a readable denominator from common Istat percentage definitions."""
+    text = _clean(definition).rstrip(" .")
+    patterns = (
+        r"in percentuale\s+(dell'|della|delle|degli|dei|del|sull'|sulla|sulle|sugli|sui|sul|al|alla)\s+(.+)",
+        r"\b(sull'|sulla|sulle|sugli|sui|sul|su)\s+(.+?)(?:\s*\([^)]*\))?$",
+        r"\brispetto\s+(al|alla)\s+(.+?)(?:\s*\([^)]*\))?$",
+    )
+    article = {
+        "dell'": "dell'",
+        "della": "della ",
+        "delle": "delle ",
+        "degli": "degli ",
+        "dei": "dei ",
+        "del": "del ",
+        "sull'": "dell'",
+        "sulla": "della ",
+        "sulle": "delle ",
+        "sugli": "degli ",
+        "sui": "dei ",
+        "sul": "del ",
+        "su": "di ",
+        "al": "del ",
+        "alla": "della ",
+    }
+    for pattern in patterns:
+        match = re.search(pattern, text, flags=re.I)
+        if not match:
+            continue
+        denominator = match.group(2)
+        denominator = re.sub(r"\s*\([^)]*\)\s*$", "", denominator).strip(" .,;")
+        if denominator:
+            return article[match.group(1).lower()] + denominator
+    return ""
+
+
+def _unit_explanation(name, unit, definition=""):
     lowered_name = name.lower()
     lowered_unit = unit.lower().replace("²", "2").replace("³", "3")
+    lowered_definition = definition.lower()
+    lowered_context = f"{lowered_name} {lowered_definition}"
 
     if "s80/s20" in lowered_name:
         return "Un valore di 5 significa che il reddito del 20% più ricco è cinque volte quello del 20% più povero."
     if "rapporto tra i tassi di occupazione" in lowered_name:
         return "Un valore di 100 indica due tassi uguali. Sotto 100, il tasso delle donne con figli è più basso."
-    if "differenza tra tasso" in lowered_name or "differenza assoluta fra tasso" in lowered_name:
+    if "differenza tra tasso" in lowered_context or "differenza assoluta fra tasso" in lowered_context or "differenza tra il tasso" in lowered_context:
         return "Un valore di 5 indica che i due tassi differiscono di 5 punti percentuali."
+    if "variazione rispetto all'anno precedente" in lowered_context:
+        return "Un valore di 5 indica una variazione del 5% rispetto all'anno precedente."
     if "parcheggi di corrispondenza" in lowered_name:
         return "Un valore di 12 indica 12 stalli ogni 1.000 autovetture circolanti."
     if "densità di verde storico" in lowered_name:
@@ -795,7 +846,14 @@ def _unit_explanation(name, unit):
     if re.fullmatch(r"valori\s+per\s+1[\. ]?000", lowered_unit):
         return "Un valore di 12 indica 12 casi ogni 1.000 unità del gruppo definito dalla fonte."
     if re.search(r"(^|\s)%($|\s)", lowered_unit) or "percentual" in lowered_unit:
-        return "Un valore di 20 indica che la misura equivale al 20% del totale definito dalla fonte."
+        per_hundred = re.search(r"\bper\s+100\s+(.+?)(?:\s*\([^)]*\))?$", definition, flags=re.I)
+        if per_hundred:
+            denominator = re.sub(r"\s+\(.*$", "", per_hundred.group(1)).strip(" .,;")
+            return f"Un valore di 20 indica 20 casi ogni 100 {denominator}."
+        denominator = _percentage_denominator(definition)
+        if denominator:
+            return f"Un valore di 20 indica che il fenomeno misurato equivale al 20% {denominator}."
+        return "Un valore di 20 indica che la condizione descritta riguarda 20 unità ogni 100 nel gruppo di riferimento."
     if "standardizz" in lowered_unit or "standardizz" in lowered_name:
         return "Il tasso è corretto per rendere più confrontabili territori con una diversa struttura della popolazione."
     if "tasso specifico di coorte" in lowered_unit:
@@ -892,6 +950,61 @@ def trend_framing(direction, avg_change_pct):
         direction in ("lower_better", "higher_worse") and avg_change_pct < 0
     )
     return "una variazione media favorevole" if favorable else "una variazione media sfavorevole"
+
+
+def indicator_page_intro(plain, year_min, year_max, region_count):
+    """Reader-first lead for a regional indicator page."""
+    if year_min == year_max:
+        coverage = f"La scheda confronta {region_count} regioni per il {year_max}."
+    else:
+        coverage = (
+            f"La scheda confronta {region_count} regioni nell'ultimo anno disponibile "
+            f"e mostra l'andamento dal {year_min} al {year_max}."
+        )
+    return f"{plain} {coverage}".strip()
+
+
+def is_percentage_unit(unit):
+    lowered = (unit or "").lower()
+    return "%" in lowered or "percentual" in lowered or "per cento" in lowered
+
+
+def value_unit_label(name, unit):
+    lowered_name = (name or "").lower()
+    if is_percentage_unit(unit):
+        if "differenza tra tasso" in lowered_name or "differenza assoluta fra tasso" in lowered_name:
+            return "punti percentuali"
+        return "%"
+    return display_unit(unit) or "valore"
+
+
+def change_unit_label(name, unit):
+    if is_percentage_unit(unit):
+        return "punti percentuali"
+    return value_unit_label(name, unit)
+
+
+def annual_change_framing(name, direction, delta):
+    """Interpret a mean movement without adding causal claims."""
+    if delta is None:
+        return ""
+    if abs(delta) < 1e-12:
+        return "La media è rimasta invariata."
+    movement = "aumento" if delta > 0 else "diminuzione"
+    lowered_name = (name or "").lower()
+    if "differenza tra tasso" in lowered_name or "differenza assoluta fra tasso" in lowered_name:
+        outcome = "si è ampliato" if delta > 0 else "si è ridotto"
+        return f"La {movement} indica che il divario medio tra i due tassi {outcome}."
+    if direction not in ("higher_better", "lower_better", "higher_worse"):
+        return (
+            f"Il dato descrive un {movement}, ma non indica da solo un "
+            "miglioramento o un peggioramento."
+        )
+    favorable = (direction == "higher_better" and delta > 0) or (
+        direction in ("lower_better", "higher_worse") and delta < 0
+    )
+    outcome = "favorevole" if favorable else "sfavorevole"
+    return f"Per la direzione di questo indicatore, il movimento medio è {outcome}."
 
 
 def _caveat_text(name, theme, lens):

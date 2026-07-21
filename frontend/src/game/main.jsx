@@ -697,7 +697,7 @@ function ResultPanel({
       {recap && (
         <table className="game-recap">
           <thead>
-            <tr><th>Indicatore</th><th>{solution.region}</th><th>Media Italia</th></tr>
+            <tr><th>Indicatore</th><th>{solution.region}</th><th>Media delle regioni</th></tr>
           </thead>
           <tbody>
             {recap.map((row) => (
@@ -742,7 +742,7 @@ function OnboardingModal({ onClose }) {
         </li>
         <li>
           <strong>Sei tentativi.</strong> Alla fine trovi il profilo completo della regione, con tutti gli
-          indicatori usati e il confronto con la media nazionale.
+          indicatori usati e il confronto con la media semplice delle regioni.
         </li>
       </ol>
       <button type="button" className="game-btn" onClick={onClose}>Ho capito, gioco</button>

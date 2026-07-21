@@ -40,12 +40,12 @@
       <p class="page-note"><strong>Sottotemi delle fonti:</strong> {{ p.source_themes | join(', ') }}.</p>
     </div>
     <div class="panel-card theme-hero__stats">
-      <p class="section-label">In sintesi</p>
+      <p class="section-label">Dati disponibili</p>
       <div class="region-facts">
         <div><small>Indicatori</small><strong>{{ p.indicator_count }}</strong></div>
         <div><small>Completi</small><strong>{{ p.complete_count }}</strong></div>
         <div><small>Nel score QoL</small><strong>{{ p.quality_life_count }}</strong></div>
-        <div><small>Ultimo aggior.</small><strong>{{ (p.indicators | map(attribute='year_max') | max) if p.indicators else '—' }}</strong></div>
+        <div><small>Ultimo aggior.</small><strong>{{ (p.indicators | map(attribute='year_max') | max) if p.indicators else 'n.d.' }}</strong></div>
       </div>
     </div>
   </div>
