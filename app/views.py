@@ -261,7 +261,8 @@ def indicator_page(slug):
     )
     is_indexable = profiles.is_search_indexable_indicator(meta)
     map_colors = indicator_notes.region_choropleth_colors(values)
-    spark_points = indicator_notes.sparkline_points(meta.get("spark") or [])
+    spark_points = indicator_notes.sparkline_points(meta.get("spark") or [], width=1200, height=140)
+    cover_bars = indicator_notes.cover_bars(values, best, worst, scoreable)
     response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
@@ -270,6 +271,7 @@ def indicator_page(slug):
         worst=worst,
         year=year,
         stats=stats,
+        cover_bars=cover_bars,
         annual_change=annual_change,
         annual_note=annual_note,
         trend_note=trend_note,

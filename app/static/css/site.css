@@ -311,34 +311,56 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .indicator-map {
   border: 1px solid var(--line);
   background: linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 22px, var(--paper);
-  padding: 12px;
+  padding: 16px;
 }
-.indicator-map .regions-map { display: block; width: 100%; height: auto; max-height: 420px; }
+.indicator-map .regions-map { display: block; width: 100%; height: auto; max-height: 560px; margin-inline: auto; }
 .indicator-map .rmap-region { fill: var(--map-missing); stroke: var(--paper); stroke-width: 1; }
 
 .indicator-sparkline-wrap { margin: 0 0 28px; }
-.indicator-sparkline { border: 1px solid var(--line); padding: 14px 16px; }
-.indicator-sparkline svg { display: block; width: 100%; height: 64px; }
+.indicator-sparkline { border: 1px solid var(--line); padding: 18px 20px; }
+.indicator-sparkline svg { display: block; width: 100%; height: 140px; }
 .indicator-sparkline polyline { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
 
-.indicator-accordion { border: 1px dashed var(--line); background: var(--panel); margin: 0 0 28px; }
-.indicator-accordion summary {
-  cursor: pointer; list-style: none; padding: 12px 16px;
-  font-family: var(--font-mono); font-size: 13px; color: var(--ink-soft);
-  display: flex; justify-content: space-between; align-items: center;
+/* Auto-generated indicator cover card: a bar-chart preview of the top/worst
+   regions, in the same visual language as a social-preview image. */
+.indicator-cover { margin: 8px 0 30px; }
+.indicator-cover__card {
+  border: 1px solid var(--line);
+  background: linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 28px, var(--paper);
+  padding: 26px 32px 22px;
 }
-.indicator-accordion summary::-webkit-details-marker { display: none; }
-.indicator-accordion summary::after { content: "▾"; color: var(--muted); }
-.indicator-accordion[open] summary::after { content: "▴"; }
-.indicator-accordion .prose { padding: 0 16px 16px; }
+.indicator-cover__kicker {
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 10px;
+}
+.indicator-cover__title {
+  font-family: var(--font-display); font-weight: 800; color: var(--ink);
+  font-size: clamp(22px, 3vw, 30px); line-height: 1.05; margin-bottom: 6px;
+}
+.indicator-cover__subtitle { font-family: var(--font-mono); font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+.indicator-cover__bars { display: grid; gap: 12px; }
+.indicator-cover__bar { display: grid; grid-template-columns: 170px 1fr auto; align-items: center; gap: 12px; }
+.indicator-cover__bar-name {
+  font-family: var(--font-display); font-size: 14px; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.indicator-cover__bar-track { display: block; height: 20px; background: var(--grid); }
+.indicator-cover__bar-fill { display: block; height: 100%; background: var(--ink); }
+.indicator-cover__bar.is-best .indicator-cover__bar-fill { background: var(--accent); }
+.indicator-cover__bar.is-worst .indicator-cover__bar-fill { background: transparent; border: 2px solid var(--accent); box-sizing: border-box; }
+.indicator-cover__bar-value { font-family: var(--font-mono); font-size: 14px; color: var(--ink); text-align: right; min-width: 56px; }
+.indicator-cover__bar.is-worst .indicator-cover__bar-value { color: var(--accent); }
+.indicator-cover__footer {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line);
+  font-family: var(--font-mono); font-size: 12px; color: var(--muted);
+}
+.indicator-cover__footer strong { font-family: var(--font-display); color: var(--ink); font-weight: 700; }
+.indicator-cover figcaption { color: var(--muted); font-size: 13px; margin-top: 8px; text-align: center; }
 
-/* Indicator page: left column (definition, ranking, accordion) + sticky
-   right rail (map, insight strip, sparkline, CTA). */
-.indicator-layout { display: block; }
-@media (min-width: 1180px) {
-  .indicator-layout { display: grid; grid-template-columns: 1fr 480px; gap: 36px; align-items: start; }
-  .indicator-rail { position: sticky; top: calc(var(--masthead-h) + 20px); display: grid; gap: 18px; align-self: start; }
-  .indicator-rail > * { margin: 0; }
+@media (max-width: 640px) {
+  .indicator-cover__bar { grid-template-columns: 96px 1fr auto; gap: 8px; }
+  .indicator-cover__bar-name { font-size: 13px; }
 }
 
 /* Tables shared by indicator and region pages */

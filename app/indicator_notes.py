@@ -1240,6 +1240,42 @@ def region_choropleth_colors(values):
     return colors
 
 
+def cover_bars(values, best, worst, scoreable, limit=4):
+    """Top `limit` regions (already best-to-worst ordered) plus the worst one,
+    for the auto-generated indicator cover card's bar chart. Bar width is the
+    value scaled over the full observed range, like region_choropleth_colors."""
+    if not values:
+        return []
+    numeric = [row["value"] for row in values if row.get("value") is not None]
+    if not numeric:
+        return []
+    lo, hi = min(numeric), max(numeric)
+    span = (hi - lo) or 1.0
+
+    rows = list(values[:limit])
+    if scoreable and worst is not None and all(row["region_key"] != worst["region_key"] for row in rows):
+        rows.append(worst)
+
+    best_key = values[0]["region_key"] if scoreable and values else None
+    worst_key = worst["region_key"] if scoreable and worst is not None else None
+
+    bars = []
+    for row in rows:
+        value = row.get("value")
+        if value is None:
+            continue
+        t = (value - lo) / span
+        bars.append({
+            "region": row["region"],
+            "region_key": row["region_key"],
+            "value": value,
+            "width_pct": round(6 + t * 94),
+            "is_best": row["region_key"] == best_key,
+            "is_worst": row["region_key"] == worst_key,
+        })
+    return bars
+
+
 def sparkline_points(spark, width=320, height=64, pad=4):
     """SVG <polyline> "x,y x,y ..." string for the indicator page's inline trend
     chart, from the national-average series in get_indicator()'s metadata.spark."""
