@@ -10,19 +10,6 @@ const API = {
 const STORAGE_STATS_KEY = "di-order-stats";
 const STORAGE_ONBOARDED_KEY = "di-order-onboarded";
 
-// Altezza di una riga trascinabile (item + gap) usata per calcolare gli
-// spostamenti del drag con posizionamento assoluto, come nel design QuizOrdina.
-const ROW = 68;
-
-function shuffle(list) {
-  const arr = [...list];
-  for (let i = arr.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
 function loadStats() {
   try {
     const raw = window.localStorage.getItem(STORAGE_STATS_KEY);
@@ -45,9 +32,8 @@ export default function OrderApp() {
   const [count, setCount] = useState(3);
   const [round, setRound] = useState(null);
   const [status, setStatus] = useState("idle"); // idle | loading | ordering | revealed | error
-  const [sequence, setSequence] = useState([]); // region_key nell'ordine corrente (lista completa, riordinabile)
-  const [drag, setDrag] = useState(null); // { i, dy } durante il trascinamento
-  const dragStartY = useRef(0);
+  const [orderKeys, setOrderKeys] = useState([]); // region_key nell'ordine corrente (dal più alto al più basso, secondo il giocatore)
+  const [dragIndex, setDragIndex] = useState(null);
   const [result, setResult] = useState(null);
   const [stats, setStats] = useState(loadStats);
   const [sessionBest, setSessionBest] = useState(0);
@@ -84,69 +70,67 @@ export default function OrderApp() {
   function loadRound(n) {
     setStatus("loading");
     setResult(null);
-    setSequence([]);
+    setDragIndex(null);
     submittingRef.current = false;
     fetchJson(API.round(n, tokenRef.current))
       .then((data) => {
         tokenRef.current = data.token;
         setRound(data);
-        // La lista parte gia' piena, in ordine casuale: si riordina trascinando.
-        setSequence(shuffle(data.regions.map((region) => region.region_key)));
-        setDrag(null);
+        setOrderKeys(data.regions.map((r) => r.region_key));
         setStatus("ordering");
       })
       .catch(() => setStatus("error"));
   }
 
-  // Sposta un elemento della sequenza da una posizione all'altra.
-  function moveItem(from, to) {
-    const clamped = Math.max(0, Math.min(sequence.length - 1, to));
-    if (clamped === from) return;
-    setSequence((prev) => {
-      const arr = [...prev];
-      const [moved] = arr.splice(from, 1);
-      arr.splice(clamped, 0, moved);
-      return arr;
+  function moveItem(index, direction) {
+    if (status !== "ordering") return;
+    const target = index + direction;
+    if (target < 0 || target >= orderKeys.length) return;
+    setOrderKeys((prev) => {
+      const next = [...prev];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
     });
   }
 
-  function onDragDown(event, i) {
+  function shuffleOrder() {
     if (status !== "ordering") return;
-    try {
-      event.currentTarget.setPointerCapture(event.pointerId);
-    } catch {
-      // setPointerCapture puo' fallire su alcuni browser: il drag funziona comunque.
-    }
-    dragStartY.current = event.clientY;
-    setDrag({ i, dy: 0 });
+    setOrderKeys((prev) => {
+      const next = [...prev];
+      for (let i = next.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [next[i], next[j]] = [next[j], next[i]];
+      }
+      return next;
+    });
   }
 
-  function onDragMove(event) {
-    if (!drag) return;
-    setDrag((prev) => (prev ? { ...prev, dy: event.clientY - dragStartY.current } : prev));
-  }
-
-  function onDragUp() {
-    if (!drag) return;
-    const to = drag.i + Math.round(drag.dy / ROW);
-    moveItem(drag.i, to);
-    setDrag(null);
-  }
-
-  // Riordino da tastiera: frecce su/giu' sulla riga a fuoco.
-  function onItemKeyDown(event, i) {
+  function handleDragStart(index) {
     if (status !== "ordering") return;
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      moveItem(i, i - 1);
-    } else if (event.key === "ArrowDown") {
-      event.preventDefault();
-      moveItem(i, i + 1);
+    setDragIndex(index);
+  }
+
+  function handleDragOver(e) {
+    if (status !== "ordering") return;
+    e.preventDefault();
+  }
+
+  function handleDrop(index) {
+    if (status !== "ordering" || dragIndex === null || dragIndex === index) {
+      setDragIndex(null);
+      return;
     }
+    setOrderKeys((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(dragIndex, 1);
+      next.splice(index, 0, moved);
+      return next;
+    });
+    setDragIndex(null);
   }
 
   function confirmOrder() {
-    if (status !== "ordering" || sequence.length !== round.count || submittingRef.current) return;
+    if (status !== "ordering" || orderKeys.length !== round.count || submittingRef.current) return;
     submittingRef.current = true;
     setStatus("loading");
     fetchJson(API.answer, {
@@ -155,7 +139,7 @@ export default function OrderApp() {
       body: JSON.stringify({
         indicator_id: round.indicator.id,
         year: round.indicator.year,
-        region_keys: sequence,
+        region_keys: orderKeys,
         token: tokenRef.current,
       }),
     })
@@ -192,21 +176,8 @@ export default function OrderApp() {
     ? Object.fromEntries(result.positions.map((p) => [p.region_key, p]))
     : {};
   const regionByKey = round
-    ? Object.fromEntries(round.regions.map((region) => [region.region_key, region]))
+    ? Object.fromEntries(round.regions.map((r) => [r.region_key, r]))
     : {};
-
-  // Posizione verticale di ogni riga: durante il drag le righe non trascinate
-  // scorrono per fare posto, la riga trascinata segue il dito.
-  function itemOffset(i) {
-    let y = i * ROW;
-    if (drag) {
-      if (drag.i === i) return y + drag.dy;
-      const target = Math.max(0, Math.min(sequence.length - 1, drag.i + Math.round(drag.dy / ROW)));
-      if (drag.i < i && i <= target) y -= ROW;
-      else if (target <= i && i < drag.i) y += ROW;
-    }
-    return y;
-  }
 
   return (
     <div className="order-app">
@@ -225,26 +196,26 @@ export default function OrderApp() {
             </button>
           ))}
         </div>
-        <span className="order-best">Record: {best}/{count}</span>
-        {sessionBest > 0 && <span className="order-best">Serie perfetta: {sessionBest}</span>}
         {sessionBest > 0 && (
-          <button type="button" className="game-tab game-tab--ghost" onClick={() => setShowScoreModal(true)}>
+          <button
+            type="button"
+            className="game-tab game-tab--ghost"
+            style={{ marginLeft: "auto" }}
+            onClick={() => setShowScoreModal(true)}
+          >
             Entra in classifica
           </button>
         )}
       </div>
-
-      <div className="qz-ordina-grid">
-        <div className="qz-ordina-main">
 
       {status === "idle" && (
         <div className="order-start">
           <h2>Ordina le regioni</h2>
           <ol className="game-onboarding-steps">
             <li>
-              <strong>Trascina per riordinare.</strong> Tieni premuto su una regione e spostala in alto
-              o in basso, dal valore più alto al più basso. Conta il numero, anche quando un valore alto
-              non rappresenta un risultato migliore. Da tastiera usa le frecce su e giù.
+              <strong>Trascina o usa le frecce.</strong> Le regioni partono in ordine casuale: trascina le
+              righe con l'icona ⋮⋮, oppure sposta ogni riga su o giù, finché non sono in ordine dal
+              valore più alto al più basso secondo la tua ipotesi.
             </li>
             <li>
               <strong>Verifica quando l'ordine ti convince.</strong> Vedrai la classifica reale con i
@@ -271,121 +242,166 @@ export default function OrderApp() {
       )}
 
       {round && status !== "error" && (
-        <>
-          <div className="qz-question">
-            <small>Indicatore Istat · {round.indicator.year}</small>
-            <h2>{round.indicator.name}</h2>
-            <p className="desc">Trascina dal valore più alto al più basso. Punti per ogni posizione giusta.</p>
-            <SourceStrip
-              year={round.indicator.year}
-              sourceLabel={round.indicator.source_label}
-              sourceUrl={round.indicator.source_url}
-            />
-          </div>
-
-          <div
-            className="qz-list"
-            style={{ height: sequence.length * ROW - (ROW - 60) }}
-          >
-            {sequence.map((regionKey, i) => {
-              const region = regionByKey[regionKey];
-              if (!region) return null;
-              const revealed = status === "revealed" && resultBySide[regionKey];
-              const dragging = drag && drag.i === i;
-              let cls = "qz-item";
-              if (dragging) cls += " is-dragging";
-              if (revealed) cls += revealed.correct ? " correct" : " wrong";
-              return (
-                <div
-                  key={regionKey}
-                  className={cls}
-                  style={{
-                    transform: `translateY(${itemOffset(i)}px)`,
-                    transition: dragging ? "none" : "transform 0.16s ease",
-                    zIndex: dragging ? 5 : 1,
-                  }}
-                  role="button"
-                  tabIndex={status === "ordering" ? 0 : -1}
-                  aria-label={`${i + 1}° posto: ${region.region}. Usa le frecce su e giù per spostare.`}
-                  onPointerDown={status === "ordering" ? (e) => onDragDown(e, i) : undefined}
-                  onPointerMove={status === "ordering" ? onDragMove : undefined}
-                  onPointerUp={status === "ordering" ? onDragUp : undefined}
-                  onPointerCancel={status === "ordering" ? onDragUp : undefined}
-                  onKeyDown={(e) => onItemKeyDown(e, i)}
-                >
-                  <span className="qz-item-rank">{i + 1}</span>
-                  <span className="qz-item-name">
-                    {region.region}
-                    {region.geo_area && <em>{region.geo_area}</em>}
-                  </span>
-                  <span className="qz-item-val">
-                    {revealed ? formatValue(revealed.value, round.indicator.unit) : "nascosto"}
-                  </span>
-                  {status === "ordering" ? (
-                    <span className="qz-item-handle" aria-hidden="true">⋮⋮</span>
-                  ) : (
-                    <span className="qz-item-verdict" aria-hidden="true">
-                      {revealed && (revealed.correct ? "✓" : `${revealed.correct_position}ª`)}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {status === "ordering" && (
-            <div className="qz-actions">
-              <button type="button" className="game-btn" onClick={confirmOrder}>
-                Verifica ordine
-              </button>
-              <button
-                type="button"
-                className="game-btn game-btn--ghost"
-                onClick={() => setSequence((prev) => shuffle(prev))}
-              >
-                Mischia
-              </button>
-              <button type="button" className="game-btn game-btn--ghost" onClick={() => loadRound(count)}>
-                Salta round
-              </button>
-            </div>
-          )}
-
-          {(round.indicator.description || round.indicator.value_explanation) && (
-            <p className="quiz-description-compact">
-              {[round.indicator.description, round.indicator.value_explanation].filter(Boolean).join(" ")}
-            </p>
-          )}
-
-          <div className="order-feedback" aria-live="polite">
-            {status === "revealed" && result && (
-              <p className={result.score === result.total ? "order-verdict is-perfect" : "order-verdict"}>
-                {result.score === result.total
-                  ? `Perfetto! ${result.score} su ${result.total}.`
-                  : `${result.score} su ${result.total} posizioni corrette.`}
+        <div className="order-layout">
+          <div className="order-main">
+            <div className="order-question">
+              <span className="order-kicker">
+                Trascina o usa le frecce per ordinare, dal valore più alto al più basso
+              </span>
+              <h2>{round.indicator.name}</h2>
+              <p className="order-meta">
+                {round.indicator.macro_area} · {round.indicator.theme}
+                {round.indicator.unit && ` · ${round.indicator.unit}`}
               </p>
+              <SourceStrip
+                year={round.indicator.year}
+                sourceLabel={round.indicator.source_label}
+                sourceUrl={round.indicator.source_url}
+              />
+              <div className="quiz-explanation">
+                {round.indicator.description && (
+                  <p className="quiz-description">
+                    <strong>Che cosa misura.</strong> {round.indicator.description}
+                  </p>
+                )}
+                {round.indicator.value_explanation && (
+                  <p className="quiz-value-hint">
+                    <strong>Come leggere il valore.</strong> {round.indicator.value_explanation}
+                  </p>
+                )}
+                <p className="quiz-rule-note">
+                  Ordina i numeri dal più alto al più basso, non dal risultato migliore al peggiore.
+                </p>
+              </div>
+            </div>
+
+            <div className="order-list">
+              {orderKeys.map((key, idx) => {
+                const region = regionByKey[key];
+                if (!region) return null;
+                const revealed = status === "revealed" && resultBySide[key];
+                let cls = "order-row";
+                if (status === "ordering") cls += " is-draggable";
+                if (dragIndex === idx) cls += " is-dragging";
+                if (revealed) cls += revealed.correct ? " is-correct" : " is-wrong";
+                return (
+                  <div
+                    key={key}
+                    className={cls}
+                    draggable={status === "ordering"}
+                    onDragStart={() => handleDragStart(idx)}
+                    onDragOver={handleDragOver}
+                    onDrop={() => handleDrop(idx)}
+                    onDragEnd={() => setDragIndex(null)}
+                  >
+                    <span className="order-rank">{idx + 1}</span>
+                    <strong className="order-row-name">{region.region}</strong>
+                    <span className="order-row-value">
+                      {revealed ? formatValue(revealed.value, round.indicator.unit) : "nascosto"}
+                      {revealed && (
+                        <span className="order-row-status">
+                          {revealed.correct ? "posizione corretta" : `era ${revealed.correct_position}ª`}
+                        </span>
+                      )}
+                    </span>
+                    <span className="order-row-controls">
+                      {status === "ordering" && (
+                        <>
+                          <button
+                            type="button"
+                            className="order-move-btn"
+                            aria-label={`Sposta ${region.region} più in alto`}
+                            disabled={idx === 0}
+                            onClick={() => moveItem(idx, -1)}
+                          >
+                            ▲
+                          </button>
+                          <button
+                            type="button"
+                            className="order-move-btn"
+                            aria-label={`Sposta ${region.region} più in basso`}
+                            disabled={idx === orderKeys.length - 1}
+                            onClick={() => moveItem(idx, 1)}
+                          >
+                            ▼
+                          </button>
+                          <span className="order-handle" aria-hidden="true">⋮⋮</span>
+                        </>
+                      )}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {status === "ordering" && (
+              <div className="order-actions">
+                <button type="button" className="game-btn" onClick={confirmOrder}>
+                  Verifica ordine
+                </button>
+                <button type="button" className="game-btn game-btn--ghost" onClick={shuffleOrder}>
+                  Mischia
+                </button>
+                <button type="button" className="game-btn game-btn--ghost" onClick={() => loadRound(count)}>
+                  Salta round
+                </button>
+              </div>
+            )}
+
+            <div className="order-feedback" aria-live="polite">
+              {status === "revealed" && result && (
+                <p className={result.score === result.total ? "order-verdict is-perfect" : "order-verdict"}>
+                  {result.score === result.total
+                    ? `Perfetto! ${result.score} su ${result.total}.`
+                    : `${result.score} su ${result.total} posizioni corrette.`}
+                </p>
+              )}
+            </div>
+
+            {status === "revealed" && result && (
+              <>
+                <div className="order-solution">
+                  <h3>La classifica reale</h3>
+                  <ol>
+                    {result.correct_order.map((row) => (
+                      <li key={row.region_key}>
+                        <span>{row.region}</span>
+                        <strong>{formatValue(row.value, round.indicator.unit)}</strong>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+                <button type="button" className="game-btn order-next" onClick={() => loadRound(count)}>
+                  {result.score === result.total ? "Avanti" : "Ricomincia"}
+                </button>
+              </>
             )}
           </div>
 
-          {status === "revealed" && result && (
-            <>
-              <div className="order-solution">
-                <h3>La classifica reale</h3>
-                <ol>
-                  {result.correct_order.map((row) => (
-                    <li key={row.region_key}>
-                      <span>{row.region}</span>
-                      <strong>{formatValue(row.value, round.indicator.unit)}</strong>
-                    </li>
-                  ))}
-                </ol>
+          <aside className="order-side">
+            <div className="card">
+              <p className="order-side-eyebrow">Punteggio</p>
+              <div className="order-score-grid">
+                <div>
+                  <small>Record</small>
+                  <strong>{best}/{count}</strong>
+                </div>
+                <div>
+                  <small>Serie perfetta</small>
+                  <strong>{sessionBest}</strong>
+                </div>
               </div>
-              <button type="button" className="game-btn order-next" onClick={() => loadRound(count)}>
-                {result.score === result.total ? "Avanti" : "Ricomincia"}
-              </button>
-            </>
-          )}
-        </>
+            </div>
+            <div className="card order-rules-card">
+              <p className="order-side-eyebrow">Regole rapide</p>
+              <ul>
+                <li>+1 per ogni regione nella posizione esatta</li>
+                <li>Punteggio massimo: {round.count}</li>
+                <li>Nessuna penalità per un ordine sbagliato</li>
+              </ul>
+            </div>
+          </aside>
+        </div>
       )}
 
       {status === "loading" && !round && (
@@ -394,35 +410,13 @@ export default function OrderApp() {
             <span style={{ height: 12, width: "55%" }} />
             <span style={{ height: 22, width: "70%" }} />
           </div>
-          <div className="qz-list-skel" style={{ marginTop: 18 }}>
+          <div className="order-list" style={{ marginTop: 18 }}>
             {Array.from({ length: count }).map((_, i) => (
-              <span key={i} className="skel-bar" style={{ height: 60 }} />
+              <span key={i} className="skel-bar" style={{ height: 56 }} />
             ))}
           </div>
         </div>
       )}
-        </div>
-
-        <aside className="qz-side qz-ordina-side">
-          <div className="qz-side-card">
-            <p className="eb">Punteggio</p>
-            <div className="qz-score-grid">
-              <div><small>Record 3 regioni</small><strong>{stats.bestScore3}/3</strong></div>
-              <div><small>Record 5 regioni</small><strong>{stats.bestScore5}/5</strong></div>
-              <div><small>Serie perfetta</small><strong className="pos">{sessionBest}</strong></div>
-              <div><small>Livello</small><strong className="ink">{count} reg.</strong></div>
-            </div>
-          </div>
-          <div className="qz-side-card qz-side-card--accent">
-            <p className="eb">Regole rapide</p>
-            <ul className="qz-rules">
-              <li>1 punto per ogni regione al posto giusto</li>
-              <li>Round perfetto: tutte le posizioni corrette</li>
-              <li>Nessuna penalità per gli errori</li>
-            </ul>
-          </div>
-        </aside>
-      </div>
 
       {showScoreModal && (
         <SubmitScoreModal
