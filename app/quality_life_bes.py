@@ -45,9 +45,15 @@ from app.bes_data import (
     get_bes_territories,
     has_bes_data,
 )
+from app.multiscopo_data import (
+    get_multiscopo_manifest,
+    get_multiscopo_rows,
+    has_multiscopo_data,
+    multiscopo_indicator_path,
+)
 from app.quality_life import get_quality_life_categories, normalize_weights
 from app.quality_life_config import DEFAULT_PROFILE, QUALITY_LIFE_CATEGORIES, QUALITY_LIFE_PROFILES
-from app.quality_life_selection import BES_PREFIX, regional_quality_life_selection
+from app.quality_life_selection import BES_PREFIX, MULTI_PREFIX, regional_quality_life_selection
 
 LEVELS = ("regione", "provincia")
 _DISPLAY_SPREAD = 12.0   # display = 50 + 12 * (standardised score), clipped to 0..100
@@ -145,7 +151,10 @@ def _matrix_and_meta(level):
 
     if level == "regione":
         catalog = {item["id"]: item for item in get_catalog()["indicators"]}
-        selected_ids = {indicator_id for indicator_id in selection if not indicator_id.startswith(BES_PREFIX)}
+        selected_ids = {
+            indicator_id for indicator_id in selection
+            if not indicator_id.startswith(BES_PREFIX) and not indicator_id.startswith(MULTI_PREFIX)
+        }
         latest = defaultdict(dict)
         for row in get_rows():
             item = catalog.get(row["id"])
@@ -177,6 +186,45 @@ def _matrix_and_meta(level):
                 "path": indicator_path(indicator_id, item["name"]),
                 "source_family": "territorial",
             }
+
+        if has_multiscopo_data():
+            multi_manifest = get_multiscopo_manifest()
+            multi_by_id = defaultdict(list)
+            for row in get_multiscopo_rows():
+                if row["territory_key"]:
+                    multi_by_id[row["id"]].append(row)
+            for raw_id, info in multi_manifest.items():
+                public_id = f"{MULTI_PREFIX}{raw_id}"
+                if public_id not in selection:
+                    continue
+                if info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
+                    continue
+                year_max = info["year_max"]
+                latest = {
+                    row["territory_key"]: row["value"]
+                    for row in multi_by_id.get(raw_id, [])
+                    if row["year"] == year_max and row["value"] is not None
+                }
+                if len(latest) < 3:
+                    continue
+                z = _standardise(latest)
+                if not any(z.values()):
+                    continue
+                sign = 1.0 if info["direction"] == "higher_better" else -1.0
+                matrix[public_id] = {k: sign * v for k, v in z.items()}
+                meta[public_id] = {
+                    "id": public_id,
+                    "raw_id": raw_id,
+                    "name": info["name"],
+                    "theme": info.get("category_name") or info["domain_name"],
+                    "source_theme": info["domain_name"],
+                    "category": info["category"],
+                    "direction": info["direction"],
+                    "year_max": year_max,
+                    "unit": info["unit"],
+                    "path": multiscopo_indicator_path(raw_id, info["name"]),
+                    "source_family": "multiscopo",
+                }
     return matrix, meta
 
 
@@ -313,7 +361,7 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
                 else "Istat, BES dei Territori (Bes at local level)"
             ),
             "minimum_reference_year": (
-                {"bes": _REGIONAL_CURRENT_YEAR, "territorial": 2023}
+                {"bes": _REGIONAL_CURRENT_YEAR, "territorial": 2023, "multiscopo": 2023}
                 if level == "regione" else None
             ),
             "territorial_level": "regioni" if level == "regione" else "province e città metropolitane",

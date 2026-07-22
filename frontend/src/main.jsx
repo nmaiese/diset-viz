@@ -777,7 +777,7 @@ function HomeMapHero({ catalog, mapData, onOpenRegion }) {
           <select
             className="map-panel__select"
             value={heroIndId}
-            onChange={(event) => setHeroIndId(Number(event.target.value))}
+            onChange={(event) => setHeroIndId(event.target.value)}
             aria-label="Indicatore mostrato sulla mappa"
           >
             {choices.map((item) => (
@@ -1722,7 +1722,7 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
         <div className="compare-bar">
           <label className="compare-select">
             <span className="lbl">Indicatore</span>
-            <select value={indId} onChange={(event) => setIndId(Number(event.target.value))}>
+            <select value={indId} onChange={(event) => setIndId(event.target.value)}>
               {catalog.indicators.map((item) => (
                 <option key={item.id} value={item.id}>{item.name}</option>
               ))}

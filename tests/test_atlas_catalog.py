@@ -4,6 +4,7 @@ from app import app
 from app.atlas_catalog import BES_ID_PREFIX, get_atlas_catalog, get_atlas_theme_profile
 from app.bes_data import get_bes_manifest
 from app.data import get_catalog
+from app.multiscopo_data import get_multiscopo_manifest
 from app.quality_life_config import QUALITY_LIFE_CATEGORIES
 from app.taxonomy import CANONICAL_CATEGORIES, DUPLICATE_BES_IDS, MACRO_AREA_ORDER
 
@@ -13,8 +14,12 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         legacy = get_catalog()
         federated = get_atlas_catalog()
         bes_count = len(get_bes_manifest("regione")) - len(DUPLICATE_BES_IDS)
+        multiscopo_count = len(get_multiscopo_manifest())
 
-        self.assertEqual(len(federated["indicators"]), len(legacy["indicators"]) + bes_count)
+        self.assertEqual(
+            len(federated["indicators"]),
+            len(legacy["indicators"]) + bes_count + multiscopo_count,
+        )
         self.assertFalse(any(str(item["id"]).startswith(BES_ID_PREFIX) for item in legacy["indicators"]))
         self.assertEqual(
             sum(area["indicator_count"] for area in federated["macro_areas"]),
@@ -23,10 +28,13 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         families = {item["id"]: item["indicator_count"] for item in federated["source_families"]}
         self.assertEqual(families["territorial"], len(legacy["indicators"]))
         self.assertEqual(families["bes"], bes_count)
+        self.assertEqual(families["multiscopo"], multiscopo_count)
         self.assertTrue(any(item["complete"] for item in federated["indicators"] if item["catalog_family"] == "bes"))
         scored = [item for item in federated["indicators"] if item["quality_life_scored"]]
         self.assertGreaterEqual(len(scored), 200)
-        self.assertEqual({item["catalog_family"] for item in scored}, {"bes", "territorial"})
+        self.assertEqual(
+            {item["catalog_family"] for item in scored}, {"bes", "territorial", "multiscopo"}
+        )
         self.assertTrue(all(item["quality_life_category_label"] for item in scored))
 
     def test_exact_duplicate_bes_indicators_are_excluded_from_general_browsing(self):

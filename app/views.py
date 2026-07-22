@@ -22,6 +22,7 @@ from app import profiles
 from app import indicator_notes
 from app import quality_life_bes as qb
 from app import bes_data
+from app import multiscopo_data
 from app import external_manifest
 from app import game
 from app import quiz
@@ -617,6 +618,46 @@ def quality_life_indicator(indicator_id, slug):
         "quality_life_indicator.html",
         indicator=indicator,
         territory_label=territory_label,
+        source_breadcrumb_path="/qualita-della-vita/metodologia#indicatori-bes",
+        source_breadcrumb_label="Indicatori BES",
+        coverage_note_scope="sia per le regioni sia per le province",
+        domain_label="Dominio BES",
+        source_label="Istat, sistema BES",
+        domain_prose="al dominio BES",
+        seo_title=bes_data.bes_seo_title(indicator["name"], SITE_NAME, territory_label),
+        seo_description=bes_data.bes_seo_description(
+            indicator["name"],
+            indicator["explain"]["plain"],
+            territory_label,
+        ),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}{canonical_path}",
+    ))
+    if not indicator["indexable"]:
+        response.headers["X-Robots-Tag"] = "noindex, follow"
+    return response
+
+
+@app.route("/qualita-della-vita/indicatore/multiscopo-<indicator_id>/<slug>")
+def quality_life_multiscopo_indicator(indicator_id, slug):
+    indicator = multiscopo_data.get_multiscopo_indicator_page(indicator_id)
+    if indicator is None:
+        abort(404)
+    canonical_path = f"/qualita-della-vita/indicatore/multiscopo-{indicator_id}/{profiles.slugify(indicator['name'])}"
+    if request.path != canonical_path:
+        return redirect(canonical_path, code=301)
+    territory_label = bes_data.bes_territory_label(indicator)
+    response = make_response(render_template(
+        "quality_life_indicator.html",
+        indicator=indicator,
+        territory_label=territory_label,
+        source_breadcrumb_path="/qualita-della-vita/metodologia",
+        source_breadcrumb_label="Indagine Multiscopo",
+        coverage_note_scope="per le regioni",
+        domain_label="Tema Istat",
+        source_label="Istat, Indagine Multiscopo sulle famiglie",
+        domain_prose="al tema Istat",
         seo_title=bes_data.bes_seo_title(indicator["name"], SITE_NAME, territory_label),
         seo_description=bes_data.bes_seo_description(
             indicator["name"],
@@ -939,6 +980,15 @@ def sitemap():
             "lastmod": f"{item['year_max']}-12-31",
             "priority": "0.6",
         })
+    if multiscopo_data.has_multiscopo_data():
+        for item in multiscopo_data.all_multiscopo_indicators():
+            if not item["indexable"]:
+                continue
+            pages.append({
+                "loc": f"{SITE_URL}{item['path']}",
+                "lastmod": f"{item['year_max']}-12-31",
+                "priority": "0.6",
+            })
     xml = render_template("sitemap.xml", pages=pages)
     return Response(xml, mimetype="application/xml")
 
