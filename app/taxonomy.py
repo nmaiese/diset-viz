@@ -20,7 +20,7 @@ CANONICAL_CATEGORIES = {
             "opportunità offerte dai territori."
         ),
         "macro_area": "Economia e opportunità",
-        "themes": ["Benessere economico", "Reddito e ricchezza", "Inclusione sociale"],
+        "themes": ["Benessere economico", "Reddito e ricchezza", "Inclusione sociale", "Abitazione"],
     },
     "lavoro_opportunita": {
         "name": "Lavoro e conciliazione",

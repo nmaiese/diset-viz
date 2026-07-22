@@ -130,7 +130,9 @@ class QualityLifeStaticTest(unittest.TestCase):
     def test_regional_score_uses_the_federated_indicator_selection(self):
         matrix, meta = qb._matrix_and_meta("regione")
         self.assertGreaterEqual(len(matrix), 200)
-        self.assertEqual(set(item["source_family"] for item in meta.values()), {"bes", "territorial"})
+        self.assertEqual(
+            set(item["source_family"] for item in meta.values()), {"bes", "territorial", "multiscopo"}
+        )
         self.assertTrue(all(
             item["year_max"] >= (2025 if item["source_family"] == "bes" else 2023)
             for item in meta.values()

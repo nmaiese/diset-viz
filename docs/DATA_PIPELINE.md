@@ -31,16 +31,29 @@ indicatori mal orientati o macro-aree incomplete.
   con `scripts/update_bes_regions.py`. Il punteggio regionale ammette solo
   indicatori con ultimo anno almeno 2025, copertura almeno 80%, categoria e
   direzione revisionate. Le province continuano a usare BES dei Territori.
+- Una **quarta famiglia** copre l'Indagine Multiscopo Istat (Aspetti della vita
+  quotidiana, ICT nelle famiglie, condizioni abitative, reddito e disagio
+  economico, spesa delle famiglie), tutta a livello regionale (NUTS2, 21 unità
+  con Bolzano+Trento mediati in una sola regione, come per il BES nazionale).
+  Fonte SDMX Istat (`scripts/istat_sdmx.py`, stesso client rate-limited della
+  pipeline provinciale), selezione e curatela in `scripts/multiscopo_sources.py`,
+  fetch/normalizzazione in `scripts/update_multiscopo_regions.py` (scrive
+  `Assoluti_Multiscopo_Regione.csv` e `multiscopo_regione_manifest.csv`), loader
+  in `app/multiscopo_data.py`. Namespace id `multiscopo:*`. Ogni indicatore è
+  una singola serie SDMX ben definita (nessuna euristica sui codici Istat, solo
+  scelte curate a mano) e ammette solo indicatori con ultimo anno almeno 2023 e
+  copertura almeno 80% nel punteggio, esattamente come le altre famiglie.
 - Il **catalogo pubblico federato** (`app/atlas_catalog.py:get_atlas_catalog`)
-  presenta insieme il catalogo territoriale e gli indicatori BES regionali,
-  tranne quelli in `app/taxonomy.py:DUPLICATE_BES_IDS`. Gli id BES hanno
-  namespace `bes:*`. L'adattatore alimenta le stesse mappe, classifiche e serie
-  storiche della SPA, ma non modifica il CSV legacy e non modifica i profili
-  regionali descrittivi calcolati da `app/profiles.py`. Quando aggiungi un
-  indicatore BES, controlla se esiste già una serie territoriale con lo stesso
-  nome e con gli stessi valori (stesso fenomeno Istat ingerito due volte): se
-  sì, aggiungi il suo id BES a `DUPLICATE_BES_IDS` così non compare due volte
-  nel catalogo/ricerca/quiz. `app/quiz.py` legge la stessa lista. Il motore di
+  presenta insieme il catalogo territoriale, gli indicatori BES regionali e
+  quelli Multiscopo, tranne i BES in `app/taxonomy.py:DUPLICATE_BES_IDS`. Gli id
+  BES hanno namespace `bes:*`, quelli Multiscopo `multiscopo:*`. L'adattatore
+  alimenta le stesse mappe, classifiche e serie storiche della SPA, ma non
+  modifica il CSV legacy e non modifica i profili regionali descrittivi
+  calcolati da `app/profiles.py`. Quando aggiungi un indicatore BES, controlla
+  se esiste già una serie territoriale con lo stesso nome e con gli stessi
+  valori (stesso fenomeno Istat ingerito due volte): se sì, aggiungi il suo id
+  BES a `DUPLICATE_BES_IDS` così non compare due volte nel catalogo/ricerca/quiz.
+  `app/quiz.py` legge la stessa lista. Il motore di
   punteggio (`app/quality_life_selection.py`) ha una deduplica separata, che
   preferisce BES: non toccarla.
 - La **selezione qualità della vita** (`app/quality_life_selection.py`) opera

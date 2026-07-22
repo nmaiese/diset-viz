@@ -1,0 +1,48 @@
+id;name;domain;domain_name;proposed_category;proposed_direction;unit;year_min;year_max;n_region;coverage;n_region_latest;coverage_latest;source_dataflow
+MULTI_ABIT_AFFITTO;Famiglie in affitto;Abitazione;Abitazione;;contextual;%;2018;2025;20;1.0;20;1.0;33_290_DF_DCCV_TITGODABIT_6
+MULTI_ABIT_AFFOLLAMENTO;Indice di affollamento delle abitazioni (componenti per 100 m2);Abitazione;Abitazione;;lower_better;numero;2018;2025;20;1.0;20;1.0;33_179_DF_DCCV_ABITAFFOLL_6
+MULTI_ABIT_PROBLEMI;Famiglie con problemi nell'abitazione;Abitazione;Abitazione;;lower_better;%;2018;2025;20;1.0;20;1.0;33_4_DF_DCCV_ABITPROBL_6
+MULTI_ABIT_PROPRIETA;Famiglie proprietarie dell'abitazione;Abitazione;Abitazione;;contextual;%;2018;2025;20;1.0;20;1.0;33_290_DF_DCCV_TITGODABIT_6
+MULTI_ABIT_SPESA_EURO;Spesa media mensile per l'abitazione;Abitazione;Abitazione;;contextual;euro;2018;2025;20;1.0;20;1.0;33_225_DF_DCCV_ABITSPESA_6
+MULTI_ABIT_SPESA_REDDITO;Spesa media mensile per l'abitazione (per 100 euro di reddito medio mensile);Abitazione;Abitazione;;lower_better;per 100 euro di reddito;2018;2025;20;1.0;20;1.0;33_225_DF_DCCV_ABITSPESA_6
+MULTI_BMI_NORMO;Persone di 18 anni e più normopeso;Salute;Salute;;higher_better;%;2018;2025;20;1.0;20;1.0;83_85_DF_DCCV_AVQ_PERSONE1_231
+MULTI_BMI_OBESI;Persone di 18 anni e più obese;Salute;Salute;;lower_better;%;2018;2025;20;1.0;20;1.0;83_85_DF_DCCV_AVQ_PERSONE1_231
+MULTI_BMI_SOTTO;Persone di 18 anni e più sottopeso;Salute;Salute;;lower_better;%;2018;2025;20;1.0;20;1.0;83_85_DF_DCCV_AVQ_PERSONE1_231
+MULTI_BMI_SOVRA;Persone di 18 anni e più sovrappeso;Salute;Salute;;lower_better;%;2018;2025;20;1.0;20;1.0;83_85_DF_DCCV_AVQ_PERSONE1_231
+MULTI_DISAGIO_DIFFICOLTA;Famiglie che arrivano a fine mese con difficoltà;Benessere economico;Benessere economico;;lower_better;%;2018;2024;20;1.0;19;0.95;34_226_DF_PERCEPIT_6
+MULTI_DISAGIO_FACILITA;Famiglie che arrivano a fine mese con facilità o molta facilità;Benessere economico;Benessere economico;;higher_better;%;2018;2024;20;1.0;20;1.0;34_226_DF_PERCEPIT_6
+MULTI_DISAGIO_GRANDE_DIFFICOLTA;Famiglie che arrivano a fine mese con grande difficoltà;Benessere economico;Benessere economico;;lower_better;%;2018;2024;19;0.95;15;0.75;34_226_DF_PERCEPIT_6
+MULTI_DISAGIO_IMPREVISTI;Famiglie che non riescono a far fronte a spese impreviste;Benessere economico;Benessere economico;;lower_better;%;2018;2025;20;1.0;20;1.0;34_216_DF_DCCV_IMPREV_6
+MULTI_DISAGIO_RISPARMIO;Famiglie che non riescono a risparmiare;Benessere economico;Benessere economico;;lower_better;%;2018;2025;20;1.0;20;1.0;34_216_DF_DCCV_IMPREV_6
+MULTI_ELETTR_BOLL;Famiglie che comprendono la bolletta elettrica;Energia;Energia;;higher_better;%;2018;2025;20;1.0;20;1.0;82_87_DF_DCCV_AVQ_FAMIGLIE_101
+MULTI_ELETTR_CONT;Famiglie soddisfatte della continuità del servizio elettrico;Energia;Energia;;higher_better;%;2018;2025;20;1.0;20;1.0;82_87_DF_DCCV_AVQ_FAMIGLIE_101
+MULTI_ELETTR_DISPLAY;Famiglie che comprendono il display del contatore elettronico;Energia;Energia;;higher_better;%;2018;2025;20;1.0;20;1.0;82_87_DF_DCCV_AVQ_FAMIGLIE_101
+MULTI_ELETTR_INFO;Famiglie soddisfatte dell'informazione sul servizio elettrico;Energia;Energia;;higher_better;%;2018;2025;20;1.0;20;1.0;82_87_DF_DCCV_AVQ_FAMIGLIE_101
+MULTI_ELETTR_TOT;Famiglie molto o abbastanza soddisfatte del servizio elettrico nel complesso;Energia;Energia;;higher_better;%;2018;2025;20;1.0;20;1.0;82_87_DF_DCCV_AVQ_FAMIGLIE_101
+MULTI_ELETTR_VOLT;Famiglie soddisfatte della stabilità della tensione elettrica;Energia;Energia;;higher_better;%;2018;2025;20;1.0;20;1.0;82_87_DF_DCCV_AVQ_FAMIGLIE_101
+MULTI_ICT_BANDA_LARGA;Famiglie con connessione a banda larga;Società dell'informazione;Società dell'informazione;;higher_better;%;2018;2024;20;1.0;20;1.0;60_130_DF_DCCV_ICT_3
+MULTI_ICT_BANDA_LARGA_FISSA;Famiglie con connessione fissa a banda larga;Società dell'informazione;Società dell'informazione;;higher_better;%;2018;2024;20;1.0;20;1.0;60_130_DF_DCCV_ICT_3
+MULTI_ICT_BANDA_LARGA_MOBILE;Famiglie con connessione mobile a banda larga;Società dell'informazione;Società dell'informazione;;higher_better;%;2018;2024;20;1.0;20;1.0;60_130_DF_DCCV_ICT_3
+MULTI_ICT_BANDA_STRETTA;Famiglie con connessione a banda stretta (fissa o mobile);Società dell'informazione;Società dell'informazione;;lower_better;%;2018;2024;20;1.0;20;1.0;60_130_DF_DCCV_ICT_3
+MULTI_REDD_FONTE_CAPITALE;Famiglie con fonte principale di reddito da capitale e altri redditi;Reddito e ricchezza;Reddito e ricchezza;;contextual;%;2018;2024;13;0.65;11;0.55;32_223_DF_DCCV_FONTEPRED_6
+MULTI_REDD_FONTE_LAVAUT;Famiglie con fonte principale di reddito da lavoro autonomo;Reddito e ricchezza;Reddito e ricchezza;;contextual;%;2018;2024;20;1.0;19;0.95;32_223_DF_DCCV_FONTEPRED_6
+MULTI_REDD_FONTE_LAVDIP;Famiglie con fonte principale di reddito da lavoro dipendente;Reddito e ricchezza;Reddito e ricchezza;;contextual;%;2018;2024;20;1.0;20;1.0;32_223_DF_DCCV_FONTEPRED_6
+MULTI_REDD_FONTE_TRASF;Famiglie con fonte principale di reddito da trasferimenti pubblici;Reddito e ricchezza;Reddito e ricchezza;;contextual;%;2018;2024;20;1.0;20;1.0;32_223_DF_DCCV_FONTEPRED_6
+MULTI_REDD_MEDIANO;Reddito netto mediano annuale delle famiglie;Reddito e ricchezza;Reddito e ricchezza;;higher_better;euro;2018;2024;20;1.0;20;1.0;32_292_DF_DCCV_REDNETFAMFONTERED_9
+MULTI_REDD_MEDIO;Reddito netto medio annuale delle famiglie;Reddito e ricchezza;Reddito e ricchezza;;higher_better;euro;2018;2024;20;1.0;20;1.0;32_292_DF_DCCV_REDNETFAMFONTERED_9
+MULTI_SATLIFE_0;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 0 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;lower_better;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SATLIFE_1;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 1 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;lower_better;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SATLIFE_10;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 10 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;higher_better;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SATLIFE_2;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 2 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;lower_better;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SATLIFE_3;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 3 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;lower_better;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SATLIFE_4;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 4 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;contextual;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SATLIFE_5;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 5 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;contextual;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SATLIFE_6;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 6 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;contextual;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SATLIFE_7;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 7 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;higher_better;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SATLIFE_8;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 8 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;higher_better;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SATLIFE_9;Persone di 14 anni e più con un livello di soddisfazione per la vita pari a 9 (scala 0-10);Benessere soggettivo;Benessere soggettivo;;higher_better;%;2018;2024;20;1.0;20;1.0;83_63_DF_DCCV_AVQ_PERSONE_141
+MULTI_SPESA_GINI;Indice di concentrazione di Gini della spesa per consumi;Reddito e ricchezza;Reddito e ricchezza;;lower_better;indice;2018;2024;20;1.0;20;1.0;31_740_DF_DCCV_SPEMEFAM_COICOP_2018_11
+MULTI_SPESA_INTERQUINTILE;Rapporto interquintilico della spesa per consumi;Reddito e ricchezza;Reddito e ricchezza;;lower_better;rapporto;2018;2024;20;1.0;20;1.0;31_740_DF_DCCV_SPEMEFAM_COICOP_2018_11
+MULTI_ZONA_CRIMINALITA;Famiglie che lamentano criminalità nella zona di residenza;Sicurezza;Sicurezza;;lower_better;%;2018;2025;19;0.95;17;0.85;33_291_DF_DCCV_PROBLZONRES_2_6
+MULTI_ZONA_INQUINAMENTO;Famiglie che lamentano inquinamento nella zona di residenza;Ambiente;Ambiente;;lower_better;%;2018;2025;19;0.95;17;0.85;33_291_DF_DCCV_PROBLZONRES_2_6
+MULTI_ZONA_RUMORI;Famiglie che lamentano rumori nella zona di residenza;Ambiente;Ambiente;;lower_better;%;2018;2025;20;1.0;18;0.9;33_291_DF_DCCV_PROBLZONRES_2_6

@@ -10,12 +10,15 @@ import unicodedata
 from functools import lru_cache
 
 from app.bes_data import MIN_PUBLIC_COVERAGE, get_bes_manifest
+from app.multiscopo_data import get_multiscopo_manifest, has_multiscopo_data
 from app.profiles import SCOREABLE_DIRECTIONS
 from app.quality_life import quality_life_indicator_set
 
 
 BES_PREFIX = "bes:"
 REGIONAL_BES_MIN_YEAR = 2025
+MULTI_PREFIX = "multiscopo:"
+REGIONAL_MULTI_MIN_YEAR = 2023
 
 
 def _normalise_name(value):
@@ -53,6 +56,19 @@ def regional_quality_life_selection():
             if _normalise_name(item["name"]) in bes_names:
                 continue
             selected[indicator_id] = category
+
+    if has_multiscopo_data():
+        used_names = bes_names | {_normalise_name(catalog[i]["name"]) for i in selected if i in catalog}
+        for raw_id, info in get_multiscopo_manifest().items():
+            if info["year_max"] < REGIONAL_MULTI_MIN_YEAR:
+                continue
+            if info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
+                continue
+            if info["direction"] not in SCOREABLE_DIRECTIONS or not info["category"]:
+                continue
+            if _normalise_name(info["name"]) in used_names:
+                continue
+            selected[f"{MULTI_PREFIX}{raw_id}"] = info["category"]
     return selected
 
 

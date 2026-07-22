@@ -24,6 +24,13 @@ from app.bes_data import (
     get_bes_manifest,
     get_bes_rows,
 )
+from app.multiscopo_data import (
+    SOURCE_URL as MULTISCOPO_SOURCE_URL,
+    get_multiscopo_manifest,
+    get_multiscopo_rows,
+    has_multiscopo_data,
+    multiscopo_indicator_path,
+)
 from app.taxonomy import DUPLICATE_BES_IDS, category_metadata
 from app import profiles
 
@@ -43,6 +50,8 @@ _DIFFICULTY_GAP_RATIO = {0: (0.63, 1.0), 1: (0.42, 0.58), 2: (0.26, 0.37), 3: (0
 _MIN_DISTINCT_VALUES = 6
 _BES_PREFIX = "bes:"
 _BES_MIN_YEAR = 2025
+_MULTI_PREFIX = "multiscopo:"
+_MULTI_MIN_YEAR = 2023
 
 
 @cache.memoize(timeout=3600)
@@ -81,9 +90,47 @@ def _bes_region_payload(indicator_id, year):
     }
 
 
+@cache.memoize(timeout=3600)
+def _multi_region_payload(indicator_id, year):
+    """Adapt one Multiscopo regional indicator to the atlas quiz shape."""
+    raw_id = indicator_id[len(_MULTI_PREFIX):] if indicator_id.startswith(_MULTI_PREFIX) else indicator_id
+    info = get_multiscopo_manifest().get(raw_id)
+    if info is None or info["year_max"] != year or year < _MULTI_MIN_YEAR:
+        return None
+    values = [
+        {
+            "region": row["territory"],
+            "region_key": row["territory_key"],
+            "value": row["value"],
+        }
+        for row in get_multiscopo_rows()
+        if row["id"] == raw_id and row["year"] == year
+        and row["territory_key"] and row["value"] is not None
+    ]
+    values.sort(key=lambda row: row["value"], reverse=True)
+    public_theme = category_metadata(info["domain_name"])
+    return {
+        "metadata": {
+            "id": f"{_MULTI_PREFIX}{raw_id}",
+            "name": info["name"],
+            **public_theme,
+            "unit": info["unit"],
+            "year": year,
+            "source_label": "Istat, Indagine Multiscopo sulle famiglie",
+            "source_url": MULTISCOPO_SOURCE_URL,
+            "description": info["explain"]["plain"],
+            "value_explanation": info["explain"]["example"],
+            "path": multiscopo_indicator_path(raw_id, info["name"]),
+        },
+        "values": values,
+    }
+
+
 def _quiz_indicator_payload(indicator_id, year):
     if indicator_id.startswith(_BES_PREFIX):
         return _bes_region_payload(indicator_id, year)
+    if indicator_id.startswith(_MULTI_PREFIX):
+        return _multi_region_payload(indicator_id, year)
     return get_indicator_year(indicator_id, year)
 
 
@@ -97,6 +144,39 @@ def _bes_quiz_indicators():
         if info["year_max"] < _BES_MIN_YEAR or info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
             continue
         payload = _bes_region_payload(f"{_BES_PREFIX}{raw_id}", info["year_max"])
+        if payload is None:
+            continue
+        values = payload["values"]
+        if len({row["value"] for row in values}) < _MIN_DISTINCT_VALUES:
+            continue
+        meta = payload["metadata"]
+        pool.append({
+            "id": meta["id"],
+            "name": meta["name"],
+            "theme": meta["theme"],
+            "source_theme": meta["source_theme"],
+            "macro_area": meta["macro_area"],
+            "unit": meta["unit"],
+            "year": info["year_max"],
+            "source_label": meta["source_label"],
+            "source_url": meta["source_url"],
+            "description": meta["description"],
+            "value_explanation": meta["value_explanation"],
+            "ranking": values,
+        })
+    return pool
+
+
+@cache.memoize(timeout=3600)
+def _multiscopo_quiz_indicators():
+    if not has_multiscopo_data():
+        return []
+    pool = []
+    manifest = get_multiscopo_manifest()
+    for raw_id, info in manifest.items():
+        if info["year_max"] < _MULTI_MIN_YEAR or info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
+            continue
+        payload = _multi_region_payload(f"{_MULTI_PREFIX}{raw_id}", info["year_max"])
         if payload is None:
             continue
         values = payload["values"]
@@ -160,6 +240,7 @@ def _quiz_indicators():
     # current national BES regional series. IDs are namespaced as ``bes:...``
     # so answer validation remains unambiguous even when source codes overlap.
     pool.extend(_bes_quiz_indicators())
+    pool.extend(_multiscopo_quiz_indicators())
     return pool
 
 

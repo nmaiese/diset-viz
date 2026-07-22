@@ -22,6 +22,7 @@ from app import profiles
 from app import indicator_notes
 from app import quality_life_bes as qb
 from app import bes_data
+from app import multiscopo_data
 from app import external_manifest
 from app import game
 from app import quiz
@@ -610,6 +611,34 @@ def quality_life_indicator(indicator_id, slug):
     if indicator is None:
         abort(404)
     canonical_path = bes_data.bes_indicator_path(indicator_id, indicator["name"])
+    if request.path != canonical_path:
+        return redirect(canonical_path, code=301)
+    territory_label = bes_data.bes_territory_label(indicator)
+    response = make_response(render_template(
+        "quality_life_indicator.html",
+        indicator=indicator,
+        territory_label=territory_label,
+        seo_title=bes_data.bes_seo_title(indicator["name"], SITE_NAME, territory_label),
+        seo_description=bes_data.bes_seo_description(
+            indicator["name"],
+            indicator["explain"]["plain"],
+            territory_label,
+        ),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}{canonical_path}",
+    ))
+    if not indicator["indexable"]:
+        response.headers["X-Robots-Tag"] = "noindex, follow"
+    return response
+
+
+@app.route("/qualita-della-vita/indicatore/multiscopo-<indicator_id>/<slug>")
+def quality_life_multiscopo_indicator(indicator_id, slug):
+    indicator = multiscopo_data.get_multiscopo_indicator_page(indicator_id)
+    if indicator is None:
+        abort(404)
+    canonical_path = f"/qualita-della-vita/indicatore/multiscopo-{indicator_id}/{profiles.slugify(indicator['name'])}"
     if request.path != canonical_path:
         return redirect(canonical_path, code=301)
     territory_label = bes_data.bes_territory_label(indicator)
