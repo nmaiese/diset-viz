@@ -83,6 +83,24 @@ class MultiscopoDataTest(unittest.TestCase):
         unresolved = [row for row in rows if not row["territory_key"]]
         self.assertEqual(unresolved, [])
 
+    def test_every_indexable_indicator_has_a_public_page_listed_in_the_sitemap(self):
+        client = app.test_client()
+        indicators = all_multiscopo_indicators()
+        indexable = [item for item in indicators if item["indexable"]]
+        non_indexable = [item for item in indicators if not item["indexable"]]
+        self.assertGreaterEqual(len(indexable), 40)
+
+        sample = indexable[0]
+        page = client.get(sample["path"])
+        self.assertEqual(page.status_code, 200)
+        self.assertIn(sample["name"].encode("utf-8"), page.data)
+        self.assertNotIn("noindex", page.headers.get("X-Robots-Tag", ""))
+
+        sitemap = client.get("/sitemap.xml").data.decode("utf-8")
+        self.assertIn(sample["path"], sitemap)
+        for item in non_indexable:
+            self.assertNotIn(item["path"], sitemap)
+
 
 if __name__ == "__main__":
     unittest.main()

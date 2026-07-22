@@ -968,6 +968,15 @@ def sitemap():
             "lastmod": f"{item['year_max']}-12-31",
             "priority": "0.6",
         })
+    if multiscopo_data.has_multiscopo_data():
+        for item in multiscopo_data.all_multiscopo_indicators():
+            if not item["indexable"]:
+                continue
+            pages.append({
+                "loc": f"{SITE_URL}{item['path']}",
+                "lastmod": f"{item['year_max']}-12-31",
+                "priority": "0.6",
+            })
     xml = render_template("sitemap.xml", pages=pages)
     return Response(xml, mimetype="application/xml")
 
