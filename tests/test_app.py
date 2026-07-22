@@ -35,6 +35,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b"Un atlante per leggere l", home.data)
         self.assertIn(b"/atlante", home.data)
         self.assertIn(b"Cosa puoi fare qui", home.data)
+        self.assertIn(b'<main class="home-page wrap-wide">', home.data)
         self.assertIn(b'id="home-map-data"', home.data)
 
         atlante = client.get("/atlante")
