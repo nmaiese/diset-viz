@@ -203,6 +203,7 @@ def get_multiscopo_atlas_indicator(indicator_id):
         "source": first.get("source") or MULTI_SOURCE_LABEL,
         "source_label": MULTI_SOURCE_LABEL,
         "source_url": MULTISCOPO_SOURCE_URL,
+        "source_data_url": info["source_data_url"],
         "archive": first.get("archive") or "Indagine Multiscopo sulle famiglie",
         "explain": info.get("explain") or build_bes_indicator_explain(info, "regioni"),
         "years": years,

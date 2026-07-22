@@ -26,6 +26,7 @@ DATASET_PATH = DATA_DIR / "Assoluti_Multiscopo_Regione.csv"
 MANIFEST_PATH = DATA_DIR / "multiscopo_regione_manifest.csv"
 MIN_PUBLIC_COVERAGE = 0.8
 SOURCE_URL = "https://esploradati.istat.it/databrowser/#/it"
+SDMX_DATA_URL = "https://esploradati.istat.it/SDMXWS/rest/data/{flow_id}"
 
 
 def has_multiscopo_data():
@@ -49,7 +50,7 @@ def _name_to_key():
 
 @cache.memoize(timeout=3600)
 def get_multiscopo_manifest():
-    """id -> {name, domain_name, category, direction, year_max, unit, coverage_latest}."""
+    """Metadata curati e tracciabilità SDMX per ogni indicatore."""
     manifest = {}
     with MANIFEST_PATH.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle, delimiter=";"):
@@ -66,12 +67,24 @@ def get_multiscopo_manifest():
                 "category_name": CANONICAL_CATEGORIES[category]["name"] if category else None,
                 "category_path": category_path(category) if category else None,
                 "direction": row["proposed_direction"],
+                "scoreable": row.get("scoreable", "0") == "1",
                 "unit": display_unit(row["unit"]),
                 "year_min": int(row["year_min"]),
                 "year_max": int(row["year_max"]),
                 "coverage_latest": float(row.get("coverage_latest", 0) or 0),
+                "source_dataflow": row.get("source_dataflow", ""),
             }
+            item["source_data_url"] = SDMX_DATA_URL.format(flow_id=item["source_dataflow"])
             item["explain"] = build_bes_indicator_explain(item, "regioni")
+            item["explain"]["scope"] += (
+                " Per il Trentino Alto Adige il valore è una media semplice dei dati "
+                "pubblicati separatamente per le province autonome di Trento e Bolzano."
+            )
+            item["explain"]["caveat"] = (
+                "È una stima campionaria e alcune osservazioni possono non essere pubblicate "
+                "quando il campione è troppo piccolo. Le differenze tra regioni descrivono "
+                "un'associazione, non dimostrano da sole un rapporto di causa."
+            )
             manifest[row["id"]] = item
     return manifest
 
@@ -169,4 +182,5 @@ def get_multiscopo_indicator_page(indicator_id):
         "value_unit": value_unit_label(entry["name"], entry["unit"]),
         "change_unit": change_unit_label(entry["name"], entry["unit"]),
         "source_url": SOURCE_URL,
+        "source_data_url": entry["source_data_url"],
     }

@@ -1,4 +1,5 @@
 import csv
+import math
 import unittest
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from app.multiscopo_data import (
     MIN_PUBLIC_COVERAGE,
 )
 from app.taxonomy import CANONICAL_CATEGORIES
+from scripts.multiscopo_sources import MULTISCOPO_INDICATORS, QUALITY_LIFE_SCORE_IDS
 
 ROOT = Path(__file__).resolve().parents[1]
 LEGACY_COLUMNS = [
@@ -21,7 +23,7 @@ LEGACY_COLUMNS = [
 MANIFEST_COLUMNS = [
     "id", "name", "domain", "domain_name", "proposed_category",
     "proposed_direction", "unit", "year_min", "year_max", "n_region",
-    "coverage", "n_region_latest", "coverage_latest", "source_dataflow",
+    "coverage", "n_region_latest", "coverage_latest", "source_dataflow", "scoreable",
 ]
 
 
@@ -33,7 +35,16 @@ class MultiscopoDataTest(unittest.TestCase):
         self.assertEqual(list(rows[0]), LEGACY_COLUMNS)
         self.assertTrue(rows)
         self.assertTrue(all(row["Area"] == "Regione" for row in rows))
-        self.assertTrue(all("," in row["Dato"] or "," not in row["Dato"] for row in rows))
+        keys = set()
+        for row in rows:
+            value = float(row["Dato"].replace(",", "."))
+            self.assertTrue(math.isfinite(value), row)
+            key = (row["idIndicatore"], row["Territorio"], row["Anno"])
+            self.assertNotIn(key, keys)
+            keys.add(key)
+            if row["UDM"] == "%":
+                self.assertGreaterEqual(value, 0, row)
+                self.assertLessEqual(value, 100, row)
 
     def test_manifest_schema_and_vocabulary(self):
         path = ROOT / "app/static/data/multiscopo_regione_manifest.csv"
@@ -46,6 +57,34 @@ class MultiscopoDataTest(unittest.TestCase):
                 row["proposed_direction"],
                 {"higher_better", "lower_better", "higher_worse", "contextual"},
             )
+            self.assertIn(row["scoreable"], {"0", "1"})
+
+    def test_manifest_exactly_matches_curated_specs_and_score_allowlist(self):
+        manifest = get_multiscopo_manifest()
+        expected_ids = {spec["id"] for spec in MULTISCOPO_INDICATORS}
+        self.assertEqual(set(manifest), expected_ids)
+        self.assertEqual(
+            {indicator_id for indicator_id, info in manifest.items() if info["scoreable"]},
+            QUALITY_LIFE_SCORE_IDS,
+        )
+        self.assertNotIn("MULTI_ICT_BANDA_STRETTA", manifest)
+
+    def test_ambiguous_sdmx_dimensions_are_pinned(self):
+        specs = {spec["id"]: spec for spec in MULTISCOPO_INDICATORS}
+        for indicator_id, spec in specs.items():
+            if indicator_id.startswith("MULTI_SATLIFE_"):
+                self.assertEqual(spec["filters"].get("MEASURE"), "HSC")
+            if indicator_id.startswith("MULTI_ELETTR_"):
+                self.assertEqual(spec["filters"].get("MEASURE"), "HSC_F")
+            if indicator_id.startswith("MULTI_BMI_"):
+                self.assertEqual(spec["filters"].get("MEASURE"), "HSC")
+                self.assertEqual(spec["filters"].get("SEX"), "9")
+        housing_filters = {
+            spec["filters"].get("PROBLEM_WITH_ACCOMM")
+            for spec in MULTISCOPO_INDICATORS
+            if spec["flow_id"] == "33_4_DF_DCCV_ABITPROBL_6"
+        }
+        self.assertEqual(housing_filters, {"1", "2", "3"})
 
     def test_every_indicator_meets_the_coverage_requirement_or_is_flagged(self):
         manifest = get_multiscopo_manifest()
@@ -76,6 +115,59 @@ class MultiscopoDataTest(unittest.TestCase):
             level = page["level_payloads"][0]
             self.assertGreater(level["count_latest"], 0, item["id"])
             self.assertTrue(page["value_unit"])
+            self.assertTrue(page["source_dataflow"])
+            self.assertIn(page["source_dataflow"], page["source_data_url"])
+
+    def test_scoreable_indicators_vary_across_regions(self):
+        manifest = get_multiscopo_manifest()
+        rows = get_multiscopo_rows()
+        for indicator_id, info in manifest.items():
+            if not info["scoreable"]:
+                continue
+            latest = {
+                row["value"] for row in rows
+                if row["id"] == indicator_id and row["year"] == info["year_max"]
+            }
+            self.assertGreater(len(latest), 1, indicator_id)
+
+    def test_percentage_distributions_sum_to_about_one_hundred(self):
+        rows = get_multiscopo_rows()
+        distributions = {
+            # La soddisfazione non include le mancate risposte, quindi può
+            # restare qualche punto sotto 100.
+            "soddisfazione": (
+                {f"MULTI_SATLIFE_{value}" for value in range(11)}, 94, 101
+            ),
+            "massa corporea": (
+                {
+                    "MULTI_BMI_NORMO", "MULTI_BMI_SOTTO",
+                    "MULTI_BMI_SOVRA", "MULTI_BMI_OBESI",
+                },
+                99,
+                101,
+            ),
+        }
+        for label, (indicator_ids, lower, upper) in distributions.items():
+            year = min(get_multiscopo_manifest()[indicator_id]["year_max"] for indicator_id in indicator_ids)
+            totals = {}
+            for row in rows:
+                if row["id"] in indicator_ids and row["year"] == year:
+                    totals.setdefault(row["territory"], 0)
+                    totals[row["territory"]] += row["value"]
+            self.assertEqual(len(totals), 20, label)
+            for territory, total in totals.items():
+                self.assertGreaterEqual(total, lower, f"{label}: {territory}")
+                self.assertLessEqual(total, upper, f"{label}: {territory}")
+
+    def test_public_page_distinguishes_score_use_and_links_exact_dataflow(self):
+        client = app.test_client()
+        scored = get_multiscopo_indicator_page("MULTI_ABIT_UMIDITA")
+        descriptive = get_multiscopo_indicator_page("MULTI_BMI_NORMO")
+        scored_html = client.get(scored["path"]).data.decode("utf-8")
+        descriptive_html = client.get(descriptive["path"]).data.decode("utf-8")
+        self.assertIn("Questa serie entra nel punteggio regionale", scored_html)
+        self.assertIn("Questa serie resta descrittiva", descriptive_html)
+        self.assertIn(scored["source_dataflow"], scored_html)
 
     def test_rows_have_a_resolvable_territory_key(self):
         rows = get_multiscopo_rows()

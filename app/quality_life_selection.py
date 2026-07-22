@@ -64,6 +64,8 @@ def regional_quality_life_selection():
                 continue
             if info["coverage_latest"] < MIN_PUBLIC_COVERAGE:
                 continue
+            if not info["scoreable"]:
+                continue
             if info["direction"] not in SCOREABLE_DIRECTIONS or not info["category"]:
                 continue
             if _normalise_name(info["name"]) in used_names:

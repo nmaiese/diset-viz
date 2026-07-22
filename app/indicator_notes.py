@@ -4,6 +4,22 @@ import re
 # Metriche che il solo nome non basta a spiegare. Le definizioni restano
 # descrittive: chiariscono numeratore e denominatore senza aggiungere cause.
 PLAIN_DEFINITION_OVERRIDES = {
+    "MULTI_ABIT_AFFOLLAMENTO": (
+        "Indica quanti componenti della famiglia vivono mediamente ogni 100 m² "
+        "di superficie dell'abitazione"
+    ),
+    "MULTI_ABIT_SPESA_REDDITO": (
+        "Indica quanti euro di spesa mensile per l'abitazione corrispondono a "
+        "100 euro di reddito medio mensile familiare"
+    ),
+    "MULTI_SPESA_GINI": (
+        "Misura quanto la spesa per consumi è concentrata tra le famiglie. Un "
+        "valore più alto indica una distribuzione più diseguale"
+    ),
+    "MULTI_SPESA_INTERQUINTILE": (
+        "Indica quante volte la spesa per consumi del quinto di famiglie con la "
+        "spesa più alta supera quella del quinto con la spesa più bassa"
+    ),
     "907": (
         "Indica il saldo per abitante tra prestazioni sociali ricevute e imposte "
         "e contributi versati. Un valore positivo segnala una regione "
@@ -374,6 +390,9 @@ HIGHER_IS_BETTER = (
 # and "lower_better" score identically (lower value = better); both are kept for the
 # accuracy of the reading text.
 CURATED_DIRECTION = {
+    # Indagine Multiscopo, problemi strutturali dell'abitazione
+    "MULTI_ABIT_INFISSI_FATISCENTI": "lower_better",
+    "MULTI_ABIT_UMIDITA": "lower_better",
     # Competitività
     "158": "higher_better", "167": "higher_better", "471": "higher_better", "419": "higher_better",
     "115": "higher_better",  # servizi alle imprese sul totale dei servizi vendibili

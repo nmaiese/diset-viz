@@ -26,6 +26,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Ripristina la cache SDMX Istat
+        uses: actions/cache@v4
+        with:
+          path: data/istat_cache
+          key: istat-sdmx-${{ runner.os }}-${{ hashFiles('scripts/multiscopo_sources.py') }}
+          restore-keys: |
+            istat-sdmx-${{ runner.os }}-
 
       - name: Installa dipendenze
         run: |
@@ -35,6 +42,7 @@ jobs:
       - name: Controlla e integra le fonti ufficiali
         run: |
           python scripts/refresh_official_data.py
+          python scripts/update_multiscopo_regions.py
           if ! git diff --quiet; then
             python scripts/build_external_dataset.py --source all --year 2025
             python scripts/audit_external_indicators.py

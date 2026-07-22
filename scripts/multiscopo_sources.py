@@ -28,7 +28,7 @@ MULTISCOPO_INDICATORS = [
     *[
         {
             "flow_id": "83_63_DF_DCCV_AVQ_PERSONE_141",
-            "filters": {"DATA_TYPE": f"14_SAT_LIFE_{n}"},
+            "filters": {"DATA_TYPE": f"14_SAT_LIFE_{n}", "MEASURE": "HSC"},
             "id": f"MULTI_SATLIFE_{n}",
             "name": f"Persone di 14 anni e più con un livello di soddisfazione per la vita pari a {n} (scala 0-10)",
             "tema": "Benessere soggettivo",
@@ -44,54 +44,54 @@ MULTISCOPO_INDICATORS = [
 
     # -- Ambiente ed energia: soddisfazione per il servizio elettrico --------
     {
-        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_TELECTR"},
+        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_TELECTR", "MEASURE": "HSC_F"},
         "id": "MULTI_ELETTR_TOT", "name": "Famiglie molto o abbastanza soddisfatte del servizio elettrico nel complesso",
         "tema": "Energia", "unit": "%", "direction": "higher_better",
     },
     {
-        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_CONT_SERV"},
+        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_CONT_SERV", "MEASURE": "HSC_F"},
         "id": "MULTI_ELETTR_CONT", "name": "Famiglie soddisfatte della continuità del servizio elettrico",
         "tema": "Energia", "unit": "%", "direction": "higher_better",
     },
     {
-        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_VOLT_STAB"},
+        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_VOLT_STAB", "MEASURE": "HSC_F"},
         "id": "MULTI_ELETTR_VOLT", "name": "Famiglie soddisfatte della stabilità della tensione elettrica",
         "tema": "Energia", "unit": "%", "direction": "higher_better",
     },
     {
-        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_ECOMP_BILL"},
+        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_ECOMP_BILL", "MEASURE": "HSC_F"},
         "id": "MULTI_ELETTR_BOLL", "name": "Famiglie che comprendono la bolletta elettrica",
         "tema": "Energia", "unit": "%", "direction": "higher_better",
     },
     {
-        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_COUNT_DISPL"},
+        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_COUNT_DISPL", "MEASURE": "HSC_F"},
         "id": "MULTI_ELETTR_DISPLAY", "name": "Famiglie che comprendono il display del contatore elettronico",
         "tema": "Energia", "unit": "%", "direction": "higher_better",
     },
     {
-        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_EINF_ESERV"},
+        "flow_id": "82_87_DF_DCCV_AVQ_FAMIGLIE_101", "filters": {"DATA_TYPE": "HOUS_EINF_ESERV", "MEASURE": "HSC_F"},
         "id": "MULTI_ELETTR_INFO", "name": "Famiglie soddisfatte dell'informazione sul servizio elettrico",
         "tema": "Energia", "unit": "%", "direction": "higher_better",
     },
 
     # -- Salute: indice di massa corporea -------------------------------------
     {
-        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_231", "filters": {"DATA_TYPE": "18_BMI_NORMO"},
+        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_231", "filters": {"DATA_TYPE": "18_BMI_NORMO", "MEASURE": "HSC", "SEX": "9"},
         "id": "MULTI_BMI_NORMO", "name": "Persone di 18 anni e più normopeso",
         "tema": "Salute", "unit": "%", "direction": "higher_better",
     },
     {
-        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_231", "filters": {"DATA_TYPE": "18_BMI_SOTTO"},
+        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_231", "filters": {"DATA_TYPE": "18_BMI_SOTTO", "MEASURE": "HSC", "SEX": "9"},
         "id": "MULTI_BMI_SOTTO", "name": "Persone di 18 anni e più sottopeso",
         "tema": "Salute", "unit": "%", "direction": "lower_better",
     },
     {
-        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_231", "filters": {"DATA_TYPE": "18_BMI_SOVRA"},
+        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_231", "filters": {"DATA_TYPE": "18_BMI_SOVRA", "MEASURE": "HSC", "SEX": "9"},
         "id": "MULTI_BMI_SOVRA", "name": "Persone di 18 anni e più sovrappeso",
         "tema": "Salute", "unit": "%", "direction": "lower_better",
     },
     {
-        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_231", "filters": {"DATA_TYPE": "18_BMI_OBE"},
+        "flow_id": "83_85_DF_DCCV_AVQ_PERSONE1_231", "filters": {"DATA_TYPE": "18_BMI_OBE", "MEASURE": "HSC", "SEX": "9"},
         "id": "MULTI_BMI_OBESI", "name": "Persone di 18 anni e più obese",
         "tema": "Salute", "unit": "%", "direction": "lower_better",
     },
@@ -112,12 +112,6 @@ MULTISCOPO_INDICATORS = [
         "id": "MULTI_ICT_BANDA_LARGA_MOBILE", "name": "Famiglie con connessione mobile a banda larga",
         "tema": "Società dell'informazione", "unit": "%", "direction": "higher_better",
     },
-    {
-        "flow_id": "60_130_DF_DCCV_ICT_3", "filters": {"DATA_TYPE": "FAM_CONN_NARRO"},
-        "id": "MULTI_ICT_BANDA_STRETTA", "name": "Famiglie con connessione a banda stretta (fissa o mobile)",
-        "tema": "Società dell'informazione", "unit": "%", "direction": "lower_better",
-    },
-
     # -- Abitazione: sovraffollamento, spesa, titolo, problemi ---------------
     {
         "flow_id": "33_179_DF_DCCV_ABITAFFOLL_6", "filters": {"DATA_TYPE": "ABITAZ_AFFOLL_MED"},
@@ -149,8 +143,22 @@ MULTISCOPO_INDICATORS = [
         "tema": "Abitazione", "unit": "%", "direction": "contextual",
     },
     {
-        "flow_id": "33_4_DF_DCCV_ABITPROBL_6", "filters": {"DATA_TYPE": "ABITAZ_PROBLEMI"},
-        "id": "MULTI_ABIT_PROBLEMI", "name": "Famiglie con problemi nell'abitazione",
+        "flow_id": "33_4_DF_DCCV_ABITPROBL_6",
+        "filters": {"DATA_TYPE": "ABITAZ_PROBLEMI", "PROBLEM_WITH_ACCOMM": "3"},
+        "id": "MULTI_ABIT_PROBLEMI", "name": "Famiglie con scarsa luminosità nell'abitazione",
+        "tema": "Abitazione", "unit": "%", "direction": "lower_better",
+    },
+    {
+        "flow_id": "33_4_DF_DCCV_ABITPROBL_6",
+        "filters": {"DATA_TYPE": "ABITAZ_PROBLEMI", "PROBLEM_WITH_ACCOMM": "1"},
+        "id": "MULTI_ABIT_INFISSI_FATISCENTI",
+        "name": "Famiglie con infissi, pavimenti o fondamenta in cattive condizioni",
+        "tema": "Abitazione", "unit": "%", "direction": "lower_better",
+    },
+    {
+        "flow_id": "33_4_DF_DCCV_ABITPROBL_6",
+        "filters": {"DATA_TYPE": "ABITAZ_PROBLEMI", "PROBLEM_WITH_ACCOMM": "2"},
+        "id": "MULTI_ABIT_UMIDITA", "name": "Famiglie con umidità nell'abitazione",
         "tema": "Abitazione", "unit": "%", "direction": "lower_better",
     },
     {
@@ -261,6 +269,26 @@ MULTISCOPO_INDICATORS = [
         "tema": "Reddito e ricchezza", "unit": "rapporto", "direction": "lower_better",
     },
 ]
+
+# La direzione spiega come leggere la serie, ma non basta a renderla adatta a
+# un indice composito. Questa lista evita di contare più volte scomposizioni
+# della stessa domanda e indicatori già rappresentati dal BES.
+QUALITY_LIFE_SCORE_IDS = {
+    "MULTI_ABIT_AFFOLLAMENTO",
+    "MULTI_ABIT_SPESA_REDDITO",
+    "MULTI_ABIT_PROBLEMI",
+    "MULTI_ABIT_INFISSI_FATISCENTI",
+    "MULTI_ABIT_UMIDITA",
+    "MULTI_ELETTR_TOT",
+    "MULTI_ICT_BANDA_LARGA",
+    "MULTI_REDD_MEDIANO",
+    "MULTI_DISAGIO_RISPARMIO",
+    "MULTI_DISAGIO_IMPREVISTI",
+    "MULTI_SPESA_GINI",
+    "MULTI_ZONA_INQUINAMENTO",
+    "MULTI_ZONA_RUMORI",
+    "MULTI_ZONA_CRIMINALITA",
+}
 
 # Trentino-Alto Adige is split into two NUTS2-equivalent codes in this survey
 # family (unlike the BES NUTS3 pipeline): average them into one region, same

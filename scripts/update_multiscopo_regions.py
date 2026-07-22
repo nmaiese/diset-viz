@@ -9,7 +9,9 @@ manifest, following the pattern of scripts/update_bes_regions.py.
 
 from __future__ import annotations
 
+import argparse
 import csv
+import math
 import os
 import re
 import sys
@@ -34,7 +36,7 @@ NUTS2_PATTERN = re.compile(r"^IT[A-Z]\d$")
 MANIFEST_COLUMNS = [
     "id", "name", "domain", "domain_name", "proposed_category",
     "proposed_direction", "unit", "year_min", "year_max", "n_region",
-    "coverage", "n_region_latest", "coverage_latest", "source_dataflow",
+    "coverage", "n_region_latest", "coverage_latest", "source_dataflow", "scoreable",
 ]
 
 
@@ -67,8 +69,14 @@ def _matches(row, filters):
     return all(row.get(dim) == code for dim, code in filters.items())
 
 
-def build(min_interval=16.0, max_requests=200):
-    client = istat_sdmx.SdmxClient(cache_dir=DEFAULT_CACHE, min_interval=min_interval)
+def build(
+    min_interval=16.0,
+    max_requests=200,
+    output=OUTPUT,
+    manifest=MANIFEST,
+    cache_dir=DEFAULT_CACHE,
+):
+    client = istat_sdmx.SdmxClient(cache_dir=cache_dir, min_interval=min_interval)
     region_names = _load_region_names()
 
     dataset = []
@@ -77,8 +85,10 @@ def build(min_interval=16.0, max_requests=200):
 
     for spec in multiscopo_sources.MULTISCOPO_INDICATORS:
         if client.request_count >= max_requests:
-            print(f"Reached --max-requests={max_requests}; stopping. Re-run to resume (cache is warm).")
-            break
+            raise RuntimeError(
+                f"Raggiunto --max-requests={max_requests} prima di completare il dataset. "
+                "Nessun file è stato sovrascritto; rilanciare usando la cache già popolata."
+            )
         flow_id = spec["flow_id"]
         if flow_id not in by_flow_cache:
             dsd_dims = _dataflow_dim_count(client, flow_id)
@@ -97,11 +107,24 @@ def build(min_interval=16.0, max_requests=200):
             value = row.get("OBS_VALUE")
             if value in (None, ""):
                 continue
+            numeric_value = float(value)
+            if not math.isfinite(numeric_value):
+                raise ValueError(f"{spec['id']}: valore non finito per {area}, {year}")
+            if spec["unit"] == "%" and not 0 <= numeric_value <= 100:
+                raise ValueError(
+                    f"{spec['id']}: percentuale fuori intervallo per {area}, {year}: {value}"
+                )
             if area in multiscopo_sources.TRENTINO_PARTS:
-                trentino_parts[year][area] = float(value)
+                if area in trentino_parts[year]:
+                    raise ValueError(f"{spec['id']}: serie SDMX duplicata per {area}, {year}")
+                trentino_parts[year][area] = numeric_value
                 continue
             if not NUTS2_PATTERN.match(area) or area not in region_names:
                 continue
+            if year in by_region_year[area]:
+                raise ValueError(
+                    f"{spec['id']}: più osservazioni corrispondono ai filtri per {area}, {year}"
+                )
             by_region_year[area][year] = value
 
         for year, parts in trentino_parts.items():
@@ -159,16 +182,23 @@ def build(min_interval=16.0, max_requests=200):
             "n_region_latest": n_latest,
             "coverage_latest": round(n_latest / 20, 4),
             "source_dataflow": flow_id,
+            "scoreable": int(spec["id"] in multiscopo_sources.QUALITY_LIFE_SCORE_IDS),
         })
         print(f"  {spec['id']}: year_max={year_max} coverage_latest={n_latest}/20 "
               f"(queries so far: {client.request_count})")
 
     dataset.sort(key=lambda r: (r["idIndicatore"], r["Territorio"], int(r["Anno"])))
     manifest_rows.sort(key=lambda r: r["id"])
-    _write_atomic(dataset, OUTPUT_COLUMNS, OUTPUT)
-    _write_atomic(manifest_rows, MANIFEST_COLUMNS, MANIFEST)
-    print(f"\nWrote {OUTPUT}: {len(dataset)} rows, {len(manifest_rows)} indicators")
-    print(f"Wrote {MANIFEST}")
+    expected = {spec["id"] for spec in multiscopo_sources.MULTISCOPO_INDICATORS}
+    completed = {row["id"] for row in manifest_rows}
+    if completed != expected:
+        missing = sorted(expected - completed)
+        raise RuntimeError(f"Dataset incompleto, indicatori senza dati: {', '.join(missing)}")
+
+    _write_atomic(dataset, OUTPUT_COLUMNS, output)
+    _write_atomic(manifest_rows, MANIFEST_COLUMNS, manifest)
+    print(f"\nWrote {output}: {len(dataset)} rows, {len(manifest_rows)} indicators")
+    print(f"Wrote {manifest}")
     print(f"Total network queries used: {client.request_count}")
 
 
@@ -182,4 +212,17 @@ def _dataflow_dim_count(client, flow_id):
 
 
 if __name__ == "__main__":
-    build()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--manifest", type=Path, default=MANIFEST)
+    parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE)
+    parser.add_argument("--min-interval", type=float, default=16.0)
+    parser.add_argument("--max-requests", type=int, default=200)
+    args = parser.parse_args()
+    build(
+        min_interval=args.min_interval,
+        max_requests=args.max_requests,
+        output=args.output,
+        manifest=args.manifest,
+        cache_dir=args.cache_dir,
+    )

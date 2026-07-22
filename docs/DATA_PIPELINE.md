@@ -41,8 +41,11 @@ indicatori mal orientati o macro-aree incomplete.
   `Assoluti_Multiscopo_Regione.csv` e `multiscopo_regione_manifest.csv`), loader
   in `app/multiscopo_data.py`. Namespace id `multiscopo:*`. Ogni indicatore è
   una singola serie SDMX ben definita (nessuna euristica sui codici Istat, solo
-  scelte curate a mano) e ammette solo indicatori con ultimo anno almeno 2023 e
-  copertura almeno 80% nel punteggio, esattamente come le altre famiglie.
+  scelte curate a mano). Il manifest separa `proposed_direction`, utile a leggere
+  la serie, da `scoreable`, che autorizza esplicitamente l'uso nell'indice. Anche
+  una serie direzionale resta descrittiva se duplica il BES, scompone una stessa
+  domanda o non aggiunge una dimensione autonoma. Nel punteggio servono inoltre
+  ultimo anno almeno 2023 e copertura almeno 80%.
 - Il **catalogo pubblico federato** (`app/atlas_catalog.py:get_atlas_catalog`)
   presenta insieme il catalogo territoriale, gli indicatori BES regionali e
   quelli Multiscopo, tranne i BES in `app/taxonomy.py:DUPLICATE_BES_IDS`. Gli id
@@ -60,7 +63,8 @@ indicatori mal orientati o macro-aree incomplete.
   sul catalogo federato. Include BES regionali almeno al 2025 e indicatori
   territoriali core almeno al 2023, tutti con direzione revisionata e copertura
   sufficiente. Gli indicatori territoriali restano esclusi dal punteggio
-  provinciale. I duplicati esatti per nome vengono contati una sola volta.
+  provinciale. Per Multiscopo richiede anche `scoreable=1`. I duplicati esatti
+  per nome vengono contati una sola volta.
 
 ## Come funziona la valutazione delle tematiche
 

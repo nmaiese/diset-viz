@@ -18,7 +18,7 @@
   "temporalCoverage": "{{ indicator.year_min }}/{{ indicator.year_max }}",
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": { "@type": "Organization", "name": "Istat", "url": {{ indicator.source_url | tojson }} },
-  "isBasedOn": {{ indicator.source_url | tojson }},
+  "isBasedOn": {{ (indicator.source_data_url or indicator.source_url) | tojson }},
   "variableMeasured": {{ indicator.name | tojson }},
   "isAccessibleForFree": true,
   "license": "https://creativecommons.org/licenses/by/3.0/it/"
@@ -52,6 +52,7 @@
     <span><small>Categoria</small><a href="{{ indicator.category_path }}">{{ indicator.category_name }}</a></span>
     <span><small>{{ domain_label }}</small>{{ indicator.domain_name }}</span>
     <span><small>Fonte</small><a href="{{ indicator.source_url }}" target="_blank" rel="noopener">{{ source_label }}</a></span>
+    {% if indicator.source_dataflow %}<span><small>Serie SDMX</small><a href="{{ indicator.source_data_url }}" target="_blank" rel="noopener">{{ indicator.source_dataflow }}</a></span>{% endif %}
   </div>
 
   <section class="prose indicator-definition">
@@ -60,7 +61,7 @@
     <p><strong>Perimetro del confronto.</strong> {{ indicator.explain.scope }}</p>
     <p><strong>Come si legge.</strong> {{ indicator.explain.reading }}</p>
     <p class="page-caveat"><strong>Che cosa non dice.</strong> {{ indicator.explain.caveat }}</p>
-    <p>L'indicatore appartiene alla categoria <a href="{{ indicator.category_path }}">{{ indicator.category_name }}</a> e {{ domain_prose }} {{ indicator.domain_name }}. La direzione serve a ordinare i dati e, quando è definita, a costruire il punteggio della qualità della vita. Non sostituisce l'interpretazione del contesto territoriale.</p>
+    <p>L'indicatore appartiene alla categoria <a href="{{ indicator.category_path }}">{{ indicator.category_name }}</a> e {{ domain_prose }} {{ indicator.domain_name }}. La direzione serve a ordinare i dati.{% if indicator.scoreable is defined %} {% if indicator.scoreable %}Questa serie entra nel punteggio regionale della qualità della vita.{% else %}Questa serie resta descrittiva e non entra nel punteggio, per evitare sovrapposizioni o interpretazioni arbitrarie.{% endif %}{% else %} Quando è definita, può essere usata per costruire il punteggio della qualità della vita.{% endif %} Non sostituisce l'interpretazione del contesto territoriale.</p>
   </section>
 
   {% for level in indicator.level_payloads %}
