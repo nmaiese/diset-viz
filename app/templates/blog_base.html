@@ -39,7 +39,7 @@
         </span>
       </a>
       <nav id="masthead-nav" class="masthead__links">
-        <a href="/" class="{{ 'is-active' if active_nav == 'atlas' else '' }}">Atlante</a>
+        <a href="/atlante" class="{{ 'is-active' if active_nav == 'atlas' else '' }}">Atlante</a>
         <a href="/regioni" class="{{ 'is-active' if active_nav == 'regioni' else '' }}">Regioni</a>
         <a href="/temi" class="{{ 'is-active' if active_nav == 'temi' else '' }}">Temi</a>
         <a href="/qualita-della-vita" class="{{ 'is-active' if active_nav == 'qualita-della-vita' else '' }}">Qualità della vita</a>
@@ -49,7 +49,7 @@
         <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Fonte Istat</a>
         <span class="nav-underline" aria-hidden="true"></span>
       </nav>
-      <a class="masthead__search" href="/" aria-label="Cerca nell'atlante">
+      <a class="masthead__search" href="/atlante" aria-label="Cerca nell'atlante">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.3-4.3"></path>
@@ -58,7 +58,7 @@
     </header>
 
     <nav class="tabbar" aria-label="Navigazione principale">
-      <a href="/" class="tabbar__item {{ 'is-active' if active_nav == 'atlas' else '' }}">
+      <a href="/atlante" class="tabbar__item {{ 'is-active' if active_nav == 'atlas' else '' }}">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"></path></svg>
         <span>Atlante</span>
       </a>
@@ -84,7 +84,7 @@
 
     <footer class="site-footer">
       <span>{{ site_name }} · dati <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Istat</a>, indicatori territoriali per le politiche di sviluppo</span>
-      <span><a href="/">Esplora l'atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/blog">Tutti gli articoli</a> · <a href="/privacy">Privacy e cookie</a></span>
+      <span><a href="/atlante">Esplora l'atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/blog">Tutti gli articoli</a> · <a href="/privacy">Privacy e cookie</a></span>
       {% block footer_privacy_settings %}
       {% include "_funding_choices_revoke.html" %}
       {% endblock %}

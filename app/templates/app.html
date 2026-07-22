@@ -6,10 +6,10 @@
     <title>Divario Italia: Atlante degli indicatori territoriali</title>
     <meta name="description" content="Atlante di indicatori territoriali Istat: confronta regioni, temi, serie storiche e dati sullo sviluppo dei territori italiani.">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
-    <link rel="canonical" href="{{ SITE_URL }}/">
+    <link rel="canonical" href="{{ SITE_URL }}/atlante">
     <meta property="og:title" content="Divario Italia: Atlante degli indicatori territoriali">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ SITE_URL }}/">
+    <meta property="og:url" content="{{ SITE_URL }}/atlante">
     <meta property="og:description" content="Atlante di indicatori territoriali Istat per confrontare regioni, temi e serie storiche.">
     <meta property="og:image" content="{{ SITE_URL }}/static/img/og-divario-italia.svg">
     <meta name="twitter:card" content="summary_large_image">
@@ -17,34 +17,6 @@
     <script>window.__diSpaPageView = true;</script>
     {% set TRACK_SERVER_PAGE_VIEW = false %}
     {% include "_third_party_head.html" %}
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Divario Italia",
-      "url": "{{ SITE_URL }}/",
-      "inLanguage": "it-IT",
-      "description": "Atlante di indicatori territoriali Istat per confrontare regioni italiane, temi e serie storiche.",
-      "publisher": { "@type": "Organization", "name": "Divario Italia", "url": "{{ SITE_URL }}/" }
-    }
-    </script>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Divario Italia",
-      "url": "{{ SITE_URL }}/",
-      "logo": "{{ SITE_URL }}/static/img/logo-mark.png",
-      "description": "Atlante indipendente degli indicatori territoriali italiani basato sui dati Istat: regioni, temi, serie storiche e qualita della vita.",
-      "knowsAbout": [
-        "indicatori territoriali",
-        "divari regionali in Italia",
-        "dati Istat",
-        "qualita della vita in Italia",
-        "sviluppo economico dei territori"
-      ]
-    }
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
@@ -58,6 +30,7 @@
         <h1>Atlante degli indicatori territoriali italiani</h1>
         <p>Divario Italia raccoglie indicatori territoriali Istat per confrontare regioni, temi e serie storiche sullo sviluppo dei territori italiani.</p>
         <nav aria-label="Percorsi principali">
+          <a href="/">Home</a>
           <a href="/regioni">Regioni italiane a confronto</a>
           <a href="/temi">Indicatori per tema</a>
           <a href="/blog">Analisi data-driven</a>

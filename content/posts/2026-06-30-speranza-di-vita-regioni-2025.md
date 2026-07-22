@@ -93,7 +93,7 @@ forma più concreta del divario territoriale, quella che tocca la vita delle per
 prima ancora del lavoro o del reddito.
 
 Puoi vedere l'indicatore anno per anno e regione per regione nell'[atlante di
-Divario Italia](/?indicator=910). Per capire come cambia la popolazione che sta
+Divario Italia](/atlante?indicator=910). Per capire come cambia la popolazione che sta
 dietro a questi numeri, leggi l'analisi sull'[Italia che invecchia](/blog/italia-che-invecchia-indice-vecchiaia-2026),
 e per il quadro economico che spesso accompagna il divario sanitario guarda il
 [PIL pro capite per regione](/blog/pil-pro-capite-regioni-divario-2024).

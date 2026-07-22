@@ -13,7 +13,7 @@ indicator_label: "Emigrazione ospedaliera in altra regione"
 draft: false
 ---
 
-In Italia curarsi vicino casa non è un diritto uguale per tutti. Nel 2023 il 32,6% dei ricoveri dei residenti in Molise è avvenuto in un'altra regione: quasi un ricovero su tre. Nello stesso anno in Lombardia la quota si è fermata al 5,1 per cento. Tra le due punte c'è un rapporto di oltre sei a uno (dati ISTAT, atlante Divario Italia, indicatore [Emigrazione ospedaliera in altra regione](/?indicator=590)).
+In Italia curarsi vicino casa non è un diritto uguale per tutti. Nel 2023 il 32,6% dei ricoveri dei residenti in Molise è avvenuto in un'altra regione: quasi un ricovero su tre. Nello stesso anno in Lombardia la quota si è fermata al 5,1 per cento. Tra le due punte c'è un rapporto di oltre sei a uno (dati ISTAT, atlante Divario Italia, indicatore [Emigrazione ospedaliera in altra regione](/atlante?indicator=590)).
 
 L'indice di emigrazione ospedaliera misura una cosa precisa: la percentuale di dimissioni ospedaliere di pazienti residenti in una regione che vengono registrate in un'altra regione. In parole semplici, quanti cittadini di un territorio devono andare a farsi ricoverare altrove. Più il valore è alto, più l'ospedale di riferimento è lontano da casa.
 

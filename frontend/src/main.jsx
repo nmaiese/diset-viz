@@ -510,7 +510,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
         {children}
         <nav id="masthead-nav" className="masthead__links" aria-label="Collegamenti" ref={navRef}>
           <a
-            href="/"
+            href="/atlante"
             data-nav-key="atlas"
             className={activeNav === "atlas" ? "is-active" : ""}
             onClick={(event) => handleLocalNav(event, onNavAtlas)}
@@ -545,7 +545,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
         </nav>
         <a
           className="masthead__search"
-          href="/"
+          href="/atlante"
           aria-label="Cerca nell'atlante"
           onClick={(event) => handleLocalNav(event, onNavAtlas)}
         >
@@ -555,7 +555,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
 
       <nav className="tabbar" aria-label="Navigazione principale">
         <a
-          href="/"
+          href="/atlante"
           className={activeNav === "atlas" ? "tabbar__item is-active" : "tabbar__item"}
           onClick={(event) => handleLocalNav(event, onNavAtlas)}
         >
@@ -604,7 +604,7 @@ function SiteFooter() {
         , indicatori territoriali per le politiche di sviluppo
       </span>
       <span>
-        <a href="/">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
+        <a href="/atlante">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
       </span>
       {hasConsentPreferences && (
         <button className="privacy-settings-link" type="button" onClick={() => window.diOpenConsentPreferences()}>

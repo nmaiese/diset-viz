@@ -692,6 +692,102 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   .quality-grid { grid-template-columns: 1fr; }
 }
 
+/* ---------- Homepage (map hero + full-site overview) ---------- */
+.home-hero {
+  display: grid; gap: 28px; margin: 8px 0 20px; align-items: start;
+  padding: clamp(20px, 3vw, 32px) 0 clamp(24px, 3vw, 36px);
+  background: linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 28px, var(--paper);
+}
+@media (min-width: 980px) {
+  .home-hero { grid-template-columns: minmax(0, 480px) minmax(0, 1fr); gap: 36px; }
+}
+.home-hero__eyebrow {
+  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em;
+  font-size: 12px; color: var(--accent); margin: 0 0 12px;
+}
+.home-hero h1 { margin: 0 0 14px; font-size: clamp(30px, 4vw, 44px); font-weight: 800; line-height: 1.08; }
+.home-hero__lead { margin: 0 0 20px; max-width: 46ch; color: var(--ink-soft); font-size: clamp(15.5px, 1.5vw, 17px); }
+
+.home-entry-cards { display: grid; gap: 10px; }
+.home-entry-card {
+  display: grid; gap: 4px; padding: 16px 18px; border: 1px solid var(--line); background: var(--panel);
+  color: var(--ink); transition: border-color 140ms ease, transform 140ms ease;
+}
+.home-entry-card:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; }
+.home-entry-card strong { font-family: var(--font-display); font-size: 16px; }
+.home-entry-card span { font-size: 13.5px; color: var(--ink-soft); }
+.home-entry-card__go { font-family: var(--font-mono); font-size: 12px; color: var(--accent) !important; margin-top: 2px; }
+
+.home-map-panel { border: 1px solid var(--line); background: var(--panel); box-shadow: 0 12px 34px rgba(21, 35, 59, 0.05); }
+.home-map-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+  padding: 12px 16px; border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft);
+}
+.home-map-bar select {
+  padding: 6px 10px; border: 1px solid var(--line); background: var(--paper); font: inherit; color: var(--ink); cursor: pointer;
+}
+.home-map-bar select:focus { outline: none; border-color: var(--accent); }
+.home-map-bar__year { margin-left: auto; color: var(--muted); }
+.home-map-body { display: block; padding: 14px; }
+@media (min-width: 640px) {
+  .home-map-body { display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 16px; align-items: start; }
+}
+.home-map-body .regions-map { display: block; width: 100%; height: auto; max-height: 460px; margin-inline: auto; }
+.home-map-body .rmap-region { fill: var(--map-missing); stroke: var(--paper); stroke-width: 1; }
+.home-map-readout {
+  display: grid; align-content: start; gap: 4px; padding: 14px 16px; margin-top: 12px;
+  border: 1px solid var(--line); background: var(--paper); min-height: 108px;
+}
+@media (min-width: 640px) { .home-map-readout { margin-top: 0; } }
+.home-map-readout__hint { color: var(--muted); font-size: 13.5px; align-self: center; }
+.home-map-readout__area { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.home-map-readout__name { font-family: var(--font-display); font-size: 19px; }
+.home-map-readout__value { font-family: var(--font-mono); font-size: 15px; color: var(--ink); }
+.home-map-readout__rank { font-size: 12.5px; color: var(--ink-soft); }
+.home-map-readout__go { font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-top: 4px; }
+
+.home-section { margin: 44px 0; }
+.home-section__head { max-width: 760px; margin: 0 0 20px; }
+.home-section__head--row { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px; max-width: none; }
+.home-section__head h2 { font-size: 27px; margin: 0 0 8px; }
+.home-section__lead { margin: 0; color: var(--ink-soft); font-size: 15.5px; max-width: 62ch; }
+
+.home-stories-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.home-story-card {
+  display: flex; flex-direction: column; gap: 8px; padding: 18px; border: 1px solid var(--line); background: var(--panel); color: inherit;
+  transition: border-color 140ms ease, transform 140ms ease;
+}
+.home-story-card:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; }
+.home-story-card small { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); }
+.home-story-card h3 { font-family: var(--font-display); font-size: 17px; margin: 0; }
+.home-story-card__stat { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.home-story-card__value { display: grid; font-family: var(--font-display); font-size: 19px; }
+.home-story-card__value em { font-style: normal; display: block; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.home-story-card__stat svg { flex: 0 0 auto; }
+.home-story-card__stat polyline { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.home-story-card p { margin: 0; font-size: 13.5px; color: var(--ink-soft); }
+.home-story-card__go { margin-top: auto; font-family: var(--font-mono); font-size: 11.5px; color: var(--accent); }
+
+.home-qol { display: block; }
+@media (min-width: 980px) {
+  .home-qol { display: grid; grid-template-columns: 1fr 420px; gap: 32px; align-items: start; }
+}
+.home-qol p { color: var(--ink-soft); font-size: 15px; max-width: 56ch; }
+.home-qol-list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); background: var(--panel); }
+.home-qol-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-bottom: 1px solid var(--grid); }
+.home-qol-row:last-child { border-bottom: 0; }
+.home-qol-row.is-bottom { color: var(--ink-soft); }
+.home-qol-row__rank { font-family: var(--font-mono); color: var(--muted); width: 20px; flex: 0 0 auto; }
+.home-qol-row__name { flex: 1 1 auto; font-family: var(--font-display); font-size: 14.5px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.home-qol-sep { text-align: center; padding: 6px 0; color: var(--muted); letter-spacing: 0.2em; }
+
+.home-quiz-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+
+@media (max-width: 640px) {
+  .home-quiz-grid, .home-stories-grid { grid-template-columns: 1fr; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
   /* The universal selector doesn't reach view-transition pseudo-elements, so

@@ -92,9 +92,9 @@ chiede di essere governata, e che parte da punti molto diversi tra una regione e
 l'altra.
 
 Puoi esplorare l'indice di vecchiaia e gli altri indicatori demografici, anno per
-anno e regione per regione, nell'[atlante di Divario Italia](/?indicator=921):
-ci sono anche l'[età media della popolazione](/?indicator=920) e il
-[numero medio di figli per donna](/?indicator=922). Per il legame tra demografia
+anno e regione per regione, nell'[atlante di Divario Italia](/atlante?indicator=921):
+ci sono anche l'[età media della popolazione](/atlante?indicator=920) e il
+[numero medio di figli per donna](/atlante?indicator=922). Per il legame tra demografia
 e salute, leggi l'analisi sulla [speranza di vita per regione](/blog/speranza-di-vita-regioni-2025).
 
 *Dati: Istat, "Indicatori demografici". Le medie tra regioni sono medie semplici,

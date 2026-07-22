@@ -32,9 +32,16 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://www.iubenda.com", csp)
         self.assertIn("frame-src", csp)
         self.assertIn("https://tpc.googlesyndication.com", csp)
-        self.assertIn(b'id="root"', home.data)
-        self.assertIn(b"/metodologia", home.data)
-        self.assertIn(b"Indicatori territoriali in evidenza", home.data)
+        self.assertIn(b"Un atlante per leggere l", home.data)
+        self.assertIn(b"/atlante", home.data)
+        self.assertIn(b"Cosa puoi fare qui", home.data)
+        self.assertIn(b'id="home-map-data"', home.data)
+
+        atlante = client.get("/atlante")
+        self.assertEqual(atlante.status_code, 200)
+        self.assertIn(b'id="root"', atlante.data)
+        self.assertIn(b"/metodologia", atlante.data)
+        self.assertIn(b"Indicatori territoriali in evidenza", atlante.data)
 
         legacy = client.get("/legacy")
         self.assertEqual(legacy.status_code, 200)
@@ -261,7 +268,7 @@ class AppSmokeTest(unittest.TestCase):
         client = app.test_client()
         expected = "index, follow, max-snippet:-1, max-image-preview:large"
         for path in (
-            "/", "/regioni", "/temi", "/qualita-della-vita",
+            "/", "/atlante", "/regioni", "/temi", "/qualita-della-vita",
             "/qualita-della-vita/classifica/regioni",
             "/qualita-della-vita/metodologia", "/metodologia", "/blog",
         ):
@@ -720,9 +727,9 @@ class AppSmokeTest(unittest.TestCase):
         try:
             config.GOOGLE_TAG_MANAGER_ID = "GTM-PZ45BG7D"
             config.ADSENSE_CLIENT = "ca-pub-1234567890123456"
-            home = client.get("/")
-            self.assertEqual(home.status_code, 200)
-            html = home.data.decode("utf-8")
+            atlante = client.get("/atlante")
+            self.assertEqual(atlante.status_code, 200)
+            html = atlante.data.decode("utf-8")
             consent_index = html.index("gtag('consent', 'default'")
             gtm_index = html.index("googletagmanager.com/gtm.js?id=")
             loader_index = html.index("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js")
@@ -733,11 +740,22 @@ class AppSmokeTest(unittest.TestCase):
             self.assertIn("gtag('set', 'ads_data_redaction', true)", html)
             self.assertIn("GTM-PZ45BG7D", html)
             self.assertIn("googletagmanager.com/ns.html?id=GTM-PZ45BG7D", html)
+            # /atlante still mounts the React SPA, which fires its own page_view
+            # once mounted, so the server-rendered page_view push stays off there
+            # (TRACK_SERVER_PAGE_VIEW = false in app.html) to avoid double-counting.
             self.assertNotIn("event: 'page_view'", html)
             self.assertNotIn("googletagmanager.com/gtag/js", html)
             self.assertNotIn("diSendGoogleEvent", html)
             self.assertNotIn("googlefc.controlledMessagingFunction", html)
             self.assertNotIn("diApplyGoogleConsent", html)
+
+            # The homepage and /blog are both plain server-rendered pages (no
+            # SPA to track its own page view), so both get the default push.
+            home = client.get("/")
+            self.assertEqual(home.status_code, 200)
+            home_html = home.data.decode("utf-8")
+            self.assertIn("event: 'page_view'", home_html)
+            self.assertIn("page_type: window.location.pathname.indexOf('/blog') === 0 ? 'blog' : 'server'", home_html)
 
             blog = client.get("/blog")
             self.assertEqual(blog.status_code, 200)

@@ -87,7 +87,7 @@ ricade soprattutto sulle famiglie. È un divario che si trascina nel tempo, perc
 tocca le condizioni in cui si decide se e quando avere figli.
 
 Puoi vedere l'indicatore anno per anno e regione per regione nell'[atlante di
-Divario Italia](/?indicator=414). Il tema si lega alla [speranza di vita per
+Divario Italia](/atlante?indicator=414). Il tema si lega alla [speranza di vita per
 regione](/blog/speranza-di-vita-regioni-2025) e all'[Italia che
 invecchia](/blog/italia-che-invecchia-indice-vecchiaia-2026), dove la natalità è
 uno dei motori del cambiamento.

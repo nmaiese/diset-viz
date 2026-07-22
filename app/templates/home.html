@@ -1,0 +1,214 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'home' %}
+
+{% block title %}Divario Italia: l'atlante degli indicatori territoriali Istat{% endblock %}
+{% block description %}{{ total_indicators }} indicatori Istat, 20 regioni, dal {{ year_min }} al {{ year_max }}. Mappa interattiva, schede regione, confronti, qualità della vita, quiz e storie dai dati.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "{{ SITE_URL }}/#site",
+      "name": "{{ site_name }}",
+      "url": "{{ SITE_URL }}/",
+      "inLanguage": "it-IT",
+      "description": {{ ("Atlante interattivo degli indicatori territoriali Istat: " ~ total_indicators ~ " indicatori, 20 regioni, dal " ~ year_min ~ " al " ~ year_max ~ ".") | tojson }},
+      "publisher": { "@id": "{{ SITE_URL }}/#org" },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "{{ SITE_URL }}/atlante?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "{{ SITE_URL }}/#org",
+      "name": "{{ site_name }}",
+      "url": "{{ SITE_URL }}/"
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="home-hero" aria-labelledby="home-hero-title">
+  <div>
+    <p class="home-hero__eyebrow">Istat &middot; {{ total_indicators }} indicatori &middot; 20 regioni &middot; dal {{ year_min }} al {{ year_max }}</p>
+    <h1 id="home-hero-title">Un atlante per leggere l'Italia, regione per regione.</h1>
+    <p class="home-hero__lead">Scegli un indicatore, guarda come si colora la mappa, poi apri una regione o l'atlante completo. I divari territoriali, resi navigabili.</p>
+    <div class="home-entry-cards">
+      <a class="home-entry-card" href="#home-map">
+        <strong>Parti da una regione</strong>
+        <span>Scegli una regione sulla mappa per aprirne il profilo.</span>
+        <span class="home-entry-card__go">Esplora la mappa &darr;</span>
+      </a>
+      <a class="home-entry-card" href="/temi">
+        <strong>Parti da un tema</strong>
+        <span>Sfoglia gli indicatori per area: economia, lavoro, salute, ambiente.</span>
+        <span class="home-entry-card__go">Vai ai temi &rarr;</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="home-map-panel" id="home-map">
+    <form class="home-map-bar" method="get" action="/">
+      <label for="home-map-indicator">Colora la mappa per</label>
+      <select id="home-map-indicator" name="indicator" onchange="this.form.submit()">
+        {% for opt in map_hero.options %}
+        <option value="{{ opt.id }}" {{ "selected" if opt.id == map_hero.selected_id }}>{{ opt.name }}</option>
+        {% endfor %}
+      </select>
+      <noscript><button type="submit" class="quality-btn">Aggiorna</button></noscript>
+      <span class="home-map-bar__year">{{ map_hero.year }}</span>
+    </form>
+    <style>
+      {% for key, color in map_hero.colors.items() %}.home-map-body [data-key="{{ key }}"] { fill: {{ color }}; }
+      {% endfor %}
+    </style>
+    <div class="home-map-body">
+      {% include "_italy_map.html" %}
+      <div class="home-map-readout" id="home-map-readout">
+        <span class="home-map-readout__hint">Passa il mouse su una regione per vederne il valore e la posizione. Clicca per aprire il profilo completo.</span>
+      </div>
+    </div>
+    <script type="application/json" id="home-map-data">{{ map_hero.tooltip_data | tojson }}</script>
+    <script src="{{ url_for('static', filename='js/home-map.js') }}" defer></script>
+  </div>
+</section>
+
+<section class="home-section" aria-labelledby="cap-title">
+  <div class="home-section__head">
+    <p class="section-label">Cosa puoi fare qui</p>
+    <h2 id="cap-title">Un sito, sei modi di leggere i divari territoriali</h2>
+    <p class="home-section__lead">Mappe interattive, schede regione, confronti, un indice di qualità della vita, storie dai dati e quiz. Tutto costruito sugli indicatori Istat.</p>
+  </div>
+  <div class="quality-grid">
+    {% for cap in capabilities %}
+    <a class="quality-card" href="{{ cap.href }}">
+      <small>{{ cap.kicker }}</small>
+      <h3>{{ cap.title }}</h3>
+      <p>{{ cap.body }}</p>
+      <span class="quality-card__cta">{{ cap.cta }} &rarr;</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% if stories %}
+<section class="home-section" aria-labelledby="stories-title">
+  <div class="home-section__head">
+    <p class="section-label">Storie dai dati</p>
+    <h2 id="stories-title">Dove l'Italia corre e dove resta indietro</h2>
+  </div>
+  <div class="home-stories-grid">
+    {% for s in stories %}
+    <a class="home-story-card" href="{{ s.path }}">
+      <small>{{ s.theme }}</small>
+      <h3>{{ s.name }}</h3>
+      <div class="home-story-card__stat">
+        <span class="home-story-card__value">{{ s.value }} {{ s.unit }}<em>{{ s.best_region }}, {{ s.year }}</em></span>
+        <svg viewBox="0 0 84 36" width="84" height="36" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ s.spark_points }}"></polyline></svg>
+      </div>
+      <p>{{ s.note }}</p>
+      <span class="home-story-card__go">Apri la scheda &rarr;</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if qol %}
+<section class="home-section home-qol" aria-labelledby="qol-title">
+  <div>
+    <p class="section-label">Qualità della vita</p>
+    <h2 id="qol-title">Un indice per misurare il benessere regionale</h2>
+    <p>Un punteggio composito che combina reddito, lavoro, salute, istruzione, ambiente e altre otto dimensioni. Sperimentale e non ufficiale: serve a leggere in una sola lettura chi è avanti e chi indietro.</p>
+    <dl class="region-facts">
+      <div><small>Divario massimo</small><strong>{{ qol.spread }} punti su 100</strong></div>
+      <div><small>In testa</small><strong>{{ qol.leader }}</strong></div>
+      <div><small>Ultima</small><strong>{{ qol.last }}</strong></div>
+    </dl>
+    <p><a href="/qualita-della-vita/classifica/regioni">Apri la classifica completa &rarr;</a></p>
+  </div>
+  <ol class="home-qol-list">
+    {% for r in qol.top5 %}
+    <li class="home-qol-row">
+      <span class="home-qol-row__rank">{{ r.rank }}</span>
+      <span class="home-qol-row__name">{{ r.name }}</span>
+      <span class="quality-score-bar"><span style="width: {{ r.score | round | int }}%"></span></span>
+      <span class="quality-score">{{ r.score | it_num }}</span>
+    </li>
+    {% endfor %}
+    <li class="home-qol-sep" aria-hidden="true">&middot;&middot;&middot;</li>
+    {% for r in qol.bottom3 %}
+    <li class="home-qol-row is-bottom">
+      <span class="home-qol-row__rank">{{ r.rank }}</span>
+      <span class="home-qol-row__name">{{ r.name }}</span>
+      <span class="quality-score-bar"><span style="width: {{ r.score | round | int }}%"></span></span>
+      <span class="quality-score">{{ r.score | it_num }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+<section class="home-section" aria-labelledby="quiz-title">
+  <div class="home-section__head">
+    <p class="section-label">Quiz</p>
+    <h2 id="quiz-title">Metti alla prova quello che sai dell'Italia</h2>
+    <p class="home-section__lead">Tre giochi rapidi, tutti basati sui numeri Istat. Una classifica settimanale unica.</p>
+  </div>
+  <div class="home-quiz-grid">
+    {% for g in quiz_games %}
+    <a class="quality-card" href="{{ g.href }}">
+      <h3>{{ g.name }}</h3>
+      <p>{{ g.desc }}</p>
+      <span class="quality-card__cta">{{ g.meta }}</span>
+    </a>
+    {% endfor %}
+    <a class="quality-card" href="/quiz/classifica">
+      <h3>Classifica</h3>
+      <p>I migliori giocatori di questa settimana su tutti e tre i giochi.</p>
+      <span class="quality-card__cta">Vedi la classifica &rarr;</span>
+    </a>
+  </div>
+</section>
+
+{% if posts %}
+<section class="home-section" aria-labelledby="blog-title">
+  <div class="home-section__head home-section__head--row">
+    <div>
+      <p class="section-label">Dal blog</p>
+      <h2 id="blog-title">Storie e metodo, dietro i numeri</h2>
+    </div>
+    <a href="/blog">Tutti gli articoli &rarr;</a>
+  </div>
+  <div class="post-grid">
+    {% for post in posts %}
+    <a class="post-card" href="/blog/{{ post.slug }}">
+      <div class="post-card__cover">
+        {% if post.cover %}<img src="{{ post.cover }}" alt="{{ post.cover_alt }}" loading="lazy" width="640" height="360">{% endif %}
+      </div>
+      <div class="post-card__body">
+        <span class="post-card__meta">{{ post.date.strftime('%d.%m.%Y') }} &middot; {{ post.read_time }} min{% if post.tags %} &middot; {{ post.tags[0] }}{% endif %}</span>
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.description }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<aside class="indicator-cta">
+  <span>
+    <small>Tutto l'archivio</small>
+    <strong>{{ total_indicators }} indicatori Istat, 20 regioni, dal {{ year_min }} al {{ year_max }}.</strong>
+  </span>
+  <a href="/atlante">Vai all'atlante &rarr;</a>
+</aside>
+{% endblock %}

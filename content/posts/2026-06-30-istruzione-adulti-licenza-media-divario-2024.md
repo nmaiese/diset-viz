@@ -96,8 +96,8 @@ trattenere e attrarre competenze. Dove la quota di adulti fermi a un titolo bass
 è alta, le altre fragilità del divario tendono a presentarsi insieme.
 
 Puoi vedere l'indicatore anno per anno e regione per regione nell'[atlante di
-Divario Italia](/?indicator=104). Il tema è legato all'[abbandono scolastico per
-regione](/?indicator=102) e ai [giovani NEET](/blog/neet-giovani-regioni-2024).
+Divario Italia](/atlante?indicator=104). Il tema è legato all'[abbandono scolastico per
+regione](/atlante?indicator=102) e ai [giovani NEET](/blog/neet-giovani-regioni-2024).
 Per il quadro economico che fa da sfondo, leggi il [PIL pro capite per
 regione](/blog/pil-pro-capite-regioni-divario-2024).
 

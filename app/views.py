@@ -40,6 +40,17 @@ from app import config
 
 _HOME_FEATURED_INDICATORS = ("901", "104", "105", "910")
 
+# Indicators shown as the selectable choropleth in the homepage map hero.
+# Same flagship set used elsewhere (llms.txt, the /atlante SEO fallback), so
+# "featured" means the same thing everywhere on the site.
+_HOME_MAP_INDICATORS = _HOME_FEATURED_INDICATORS
+
+# Indicators behind the "Storie dai dati" cards: real, already-published
+# indicators (three overlap with existing blog posts) with a declared
+# higher_better/lower_better direction, so "guida"/"resta indietro" framing is
+# supported by the data instead of asserted for a contextual indicator.
+_HOME_STORY_INDICATORS = ("901", "408", "910", "102")
+
 
 def _client_ip():
     """IP del client, rispettando X-Forwarded-For dietro il proxy Cloud Run."""
@@ -94,8 +105,30 @@ def data():
 
 
 @app.route("/")
+@cache.cached(timeout=300, query_string=True)
+def home():
+    indicators = get_catalog()["indicators"]
+    total_indicators = len(indicators)
+    return render_template(
+        "home.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/",
+        total_indicators=total_indicators,
+        year_min=min(item["year_min"] for item in indicators),
+        year_max=max(item["year_max"] for item in indicators),
+        map_hero=_home_map_hero(),
+        capabilities=_home_capabilities(total_indicators),
+        stories=_home_story_cards(),
+        qol=_home_qol_preview(),
+        quiz_games=_home_quiz_games(),
+        posts=get_posts()[:3],
+    )
+
+
+@app.route("/atlante")
 @cache.cached(timeout=300)
-def main():
+def atlante():
     return render_template('app.html', featured_indicators=_home_featured_indicator_links())
 
 
@@ -940,6 +973,7 @@ def game_guess_api():
 def sitemap():
     pages = [
         {"loc": f"{SITE_URL}/", "priority": "1.0"},
+        {"loc": f"{SITE_URL}/atlante", "priority": "0.9"},
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
         {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
@@ -1102,7 +1136,7 @@ def llms_txt():
         "Italia\" e alla fonte Istat.",
         "",
         "## Sezioni principali",
-        f"- [Atlante degli indicatori]({SITE_URL}/): mappa interattiva e catalogo regionale degli indicatori territoriali.",
+        f"- [Atlante degli indicatori]({SITE_URL}/atlante): mappa interattiva e catalogo regionale degli indicatori territoriali.",
         f"- [Regioni]({SITE_URL}/regioni): profilo di ogni regione italiana con i suoi indicatori chiave.",
         f"- [Temi]({SITE_URL}/temi): indicatori raggruppati per area, da economia e lavoro a demografia, salute e istruzione.",
         f"- [Qualita della vita]({SITE_URL}/qualita-della-vita): classifiche di regioni e province con pesi e metodo dichiarati.",
@@ -1251,6 +1285,176 @@ def _home_featured_indicator_links():
             "summary": (item.get("explain") or {}).get("plain", ""),
         })
     return featured
+
+
+def _home_map_hero():
+    """Data for the homepage's interactive choropleth: a curated indicator
+    picker (same flagship set as _HOME_FEATURED_INDICATORS), the chosen
+    indicator's per-region colors, and a JSON tooltip payload for the hover/
+    click behaviour in home-map.js. The indicator choice lives in ?indicator=
+    so picking one is a plain link, no JS required to change the map."""
+    by_id = {str(item["id"]): item for item in get_catalog()["indicators"]}
+    options = [
+        {"id": indicator_id, "name": by_id[indicator_id]["name"]}
+        for indicator_id in _HOME_MAP_INDICATORS
+        if indicator_id in by_id
+    ]
+    requested = request.args.get("indicator")
+    selected_id = requested if requested in _HOME_MAP_INDICATORS and requested in by_id else _HOME_MAP_INDICATORS[0]
+
+    payload = get_atlas_indicator(selected_id)
+    meta = payload["metadata"]
+    year = meta["year_max"]
+    values = get_atlas_indicator_year(selected_id, year)["values"]
+    direction = (meta.get("explain") or {}).get("direction")
+    ranked = list(reversed(values)) if direction in ("lower_better", "higher_worse") else values
+    unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+    total = len(ranked)
+
+    tooltip_data = {
+        row["region_key"]: {
+            "name": row["region"],
+            "value": it_num(row["value"], 2),
+            "unit": unit,
+            "rank": position,
+            "total": total,
+        }
+        for position, row in enumerate(ranked, 1)
+    }
+
+    return {
+        "options": options,
+        "selected_id": selected_id,
+        "indicator_name": meta["name"],
+        "theme": meta["theme"],
+        "year": year,
+        "colors": indicator_notes.region_choropleth_colors(values),
+        "tooltip_data": tooltip_data,
+    }
+
+
+def _home_capabilities(total_indicators):
+    return [
+        {
+            "kicker": "Atlante",
+            "title": f"{total_indicators} indicatori esplorabili",
+            "body": "Tutti gli indicatori Istat delle politiche di sviluppo, per tema e completezza.",
+            "href": "/atlante",
+            "cta": "Apri l'atlante",
+        },
+        {
+            "kicker": "Regioni",
+            "title": "Schede regione",
+            "body": "Punti di forza, punti deboli e ranking tematico per tutte le 20 regioni.",
+            "href": "/regioni",
+            "cta": "Sfoglia le regioni",
+        },
+        {
+            "kicker": "Confronta",
+            "title": "Regione contro regione",
+            "body": "Metti a confronto due o tre regioni su qualsiasi indicatore, con mappa e serie storica.",
+            "href": "/atlante?view=confronto",
+            "cta": "Confronta ora",
+        },
+        {
+            "kicker": "Temi",
+            "title": "Aree e temi",
+            "body": "Economia, lavoro, salute, ambiente: ogni tema raccoglie i suoi indicatori in una pagina.",
+            "href": "/temi",
+            "cta": "Scopri i temi",
+        },
+        {
+            "kicker": "Qualità della vita",
+            "title": "Classifica composita",
+            "body": "Un indice sperimentale che unisce salute, lavoro, istruzione e ambiente.",
+            "href": "/qualita-della-vita",
+            "cta": "Vedi la classifica",
+        },
+        {
+            "kicker": "Quiz",
+            "title": "Metti alla prova quello che sai",
+            "body": "Tre giochi rapidi sui dati Istat, con una classifica settimanale.",
+            "href": "/quiz",
+            "cta": "Gioca ora",
+        },
+    ]
+
+
+def _home_story_cards():
+    """Real 'chi guida, chi resta indietro' highlights for the homepage,
+    limited to indicators with a declared higher_better/lower_better
+    direction so the framing is something the data actually supports."""
+    cards = []
+    for indicator_id in _HOME_STORY_INDICATORS:
+        payload = get_atlas_indicator(indicator_id)
+        if payload is None:
+            continue
+        meta = payload["metadata"]
+        year = meta["year_max"]
+        values = get_atlas_indicator_year(indicator_id, year)["values"]
+        direction = (meta.get("explain") or {}).get("direction")
+        ranked = list(reversed(values)) if direction in ("lower_better", "higher_worse") else values
+        best, worst = ranked[0], ranked[-1]
+        unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+        if direction == "lower_better":
+            note = (
+                f"{worst['region']} resta indietro con {it_num(worst['value'], 2)} {unit}, "
+                f"{best['region']} fa meglio di tutte."
+            )
+        else:
+            note = (
+                f"{best['region']} guida con {it_num(best['value'], 2)} {unit}, "
+                f"{worst['region']} chiude a {it_num(worst['value'], 2)} {unit}."
+            )
+        cards.append({
+            "theme": meta["theme"],
+            "name": meta["name"],
+            "value": it_num(best["value"], 2),
+            "unit": unit,
+            "best_region": best["region"],
+            "year": year,
+            "note": note,
+            "spark_points": indicator_notes.sparkline_points(meta.get("spark") or [], width=84, height=36),
+            "path": profiles.indicator_path(indicator_id, meta["name"]),
+        })
+    return cards
+
+
+def _home_qol_preview():
+    payload = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
+    if payload is None:
+        return None
+    ranking = payload["ranking"]
+    return {
+        "top5": ranking[:5],
+        "bottom3": list(reversed(ranking[-3:])),
+        "spread": it_num(ranking[0]["score"] - ranking[-1]["score"]),
+        "leader": ranking[0]["name"],
+        "last": ranking[-1]["name"],
+    }
+
+
+def _home_quiz_games():
+    return [
+        {
+            "name": "Indovina la Regione",
+            "desc": "Mappa e indizi Istat che si sbloccano a ogni tentativo sbagliato. Sei tentativi.",
+            "meta": "circa 2 minuti",
+            "href": "/quiz/indovina-la-regione",
+        },
+        {
+            "name": "Chi è maggiore?",
+            "desc": "Due regioni, un indicatore. Scegli quale ha il valore più alto.",
+            "meta": "testa a testa",
+            "href": "/quiz/chi-e-maggiore",
+        },
+        {
+            "name": "Ordina le regioni",
+            "desc": "Cinque regioni da ordinare dal valore più alto al più basso, con credito parziale.",
+            "meta": "credito parziale",
+            "href": "/quiz/ordina",
+        },
+    ]
 
 
 def _clean_event_name(value):
