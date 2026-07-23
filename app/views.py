@@ -481,11 +481,11 @@ def regions_index():
 
 @app.route("/temi")
 def themes_index():
-    groups = atlas_themes_by_macro_area()
-    total = sum(group["indicator_count"] for group in groups)
+    areas = _themes_index_areas()
+    total = sum(area["count"] for area in areas)
     return render_template(
         "themes_index.html",
-        groups=groups,
+        areas=areas,
         total=total,
         site_url=SITE_URL,
         site_name=SITE_NAME,
@@ -1509,45 +1509,73 @@ def _home_qol_preview():
     }
 
 
+def _area_leaders(area, matrix, meta):
+    """Region in front and region trailing for a macro-area, as the mean oriented
+    score across the area's scoreable indicators (best = 1.0). Returns
+    (best_name, worst_name), or (None, None) when nothing in the area is
+    scoreable. Purely derived from the data, no placeholder leaders."""
+    totals = {}  # region_key -> [sum_oriented, count]
+    for ind_id, by_region in matrix.items():
+        info = meta.get(ind_id)
+        if not info or info["macro_area"] != area:
+            continue
+        direction = info["direction"]
+        if direction not in profiles.SCOREABLE_DIRECTIONS:
+            continue
+        for region_key, percentile in by_region.items():
+            oriented = profiles._oriented(percentile, direction)
+            acc = totals.setdefault(region_key, [0.0, 0])
+            acc[0] += oriented
+            acc[1] += 1
+    ranked = sorted(
+        ((key, total / n) for key, (total, n) in totals.items() if n),
+        key=lambda kv: kv[1],
+        reverse=True,
+    )
+    if not ranked:
+        return None, None
+    return profiles.region_name(ranked[0][0]), profiles.region_name(ranked[-1][0])
+
+
 def _home_themes_preview():
     """'Temi e aree' cards: for each macro-area, its indicator/theme counts plus
-    the region in front and the region trailing, computed as the mean oriented
-    score across the area's scoreable indicators (best = 1.0). Purely derived
-    from the data, no placeholder leaders."""
+    the region in front and the region trailing."""
     matrix = profiles._percentile_matrix()
     meta = profiles._indicator_meta()
     cards = []
     for group in atlas_themes_by_macro_area():
-        area = group["macro_area"]
-        totals = {}  # region_key -> [sum_oriented, count]
-        for ind_id, by_region in matrix.items():
-            info = meta.get(ind_id)
-            if not info or info["macro_area"] != area:
-                continue
-            direction = info["direction"]
-            if direction not in profiles.SCOREABLE_DIRECTIONS:
-                continue
-            for region_key, percentile in by_region.items():
-                oriented = profiles._oriented(percentile, direction)
-                acc = totals.setdefault(region_key, [0.0, 0])
-                acc[0] += oriented
-                acc[1] += 1
-        ranked = sorted(
-            ((key, total / n) for key, (total, n) in totals.items() if n),
-            key=lambda kv: kv[1],
-            reverse=True,
-        )
-        if not ranked:
+        best, worst = _area_leaders(group["macro_area"], matrix, meta)
+        if best is None:
             continue
         cards.append({
-            "area": area,
+            "area": group["macro_area"],
             "count": group["indicator_count"],
             "theme_count": len(group["themes"]),
             "themes": [t["theme"] for t in group["themes"][:4]],
-            "best": profiles.region_name(ranked[0][0]),
-            "worst": profiles.region_name(ranked[-1][0]),
+            "best": best,
+            "worst": worst,
         })
     return cards
+
+
+def _themes_index_areas():
+    """Full '/temi' page: every macro-area with its complete, clickable theme
+    list, the indicator/theme counts, and the region in front / trailing (the
+    same standings as the home teaser)."""
+    matrix = profiles._percentile_matrix()
+    meta = profiles._indicator_meta()
+    areas = []
+    for group in atlas_themes_by_macro_area():
+        best, worst = _area_leaders(group["macro_area"], matrix, meta)
+        areas.append({
+            "area": group["macro_area"],
+            "count": group["indicator_count"],
+            "theme_count": len(group["themes"]),
+            "themes": group["themes"],
+            "best": best,
+            "worst": worst,
+        })
+    return areas
 
 
 def _home_compare_preview():
