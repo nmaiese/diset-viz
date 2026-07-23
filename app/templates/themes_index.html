@@ -62,6 +62,18 @@
         <a class="theme-index-card" href="{{ t.path }}" data-theme="{{ t.theme | lower }}">
           <strong>{{ t.theme }}</strong>
           <small>{{ t.indicator_count }} {{ 'indicatore' if t.indicator_count == 1 else 'indicatori' }}</small>
+          {% if t.indicators %}
+          <ul class="theme-index-card__inds">
+            {% for name in t.indicators %}<li>{{ name }}</li>{% endfor %}
+            {% if t.extra_count %}<li class="theme-index-card__more">+{{ t.extra_count }} altri indicatori</li>{% endif %}
+          </ul>
+          {% endif %}
+          {% if t.spark_points %}
+          <div class="theme-index-card__spark-wrap">
+            <span class="theme-index-card__sparklabel">Andamento medio</span>
+            <svg class="theme-index-card__spark" viewBox="0 0 160 42" width="160" height="42" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ t.spark_points }}"></polyline></svg>
+          </div>
+          {% endif %}
           {% if t.lead %}
           <div class="theme-index-card__standing">
             <span><i class="dot dot--lead"></i>{{ t.lead }}</span>

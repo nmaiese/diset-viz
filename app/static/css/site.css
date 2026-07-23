@@ -981,11 +981,20 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 
 .card-empty { margin: 0; padding: 4px clamp(16px, 4vw, 48px) 24px; color: var(--muted); font-size: 14px; }
 
-.theme-index-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.theme-index-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
 .theme-index-card { display: grid; gap: 4px; align-content: start; padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); color: var(--ink); transition: border-color 140ms ease, transform 140ms ease; }
 .theme-index-card:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; }
 .theme-index-card strong { font-family: var(--font-display); font-size: 16px; line-height: 1.2; }
 .theme-index-card small { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.theme-index-card__inds { list-style: none; margin: 10px 0 0; padding: 10px 0 0; border-top: 1px solid var(--grid); display: flex; flex-direction: column; gap: 6px; }
+.theme-index-card__inds li { position: relative; padding-left: 14px; font-family: var(--font-body); font-size: 13px; line-height: 1.3; color: var(--ink-soft); }
+.theme-index-card__inds li::before { content: ""; position: absolute; left: 0; top: 0.5em; width: 5px; height: 5px; background: var(--accent); }
+.theme-index-card__inds li.theme-index-card__more { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.theme-index-card__inds li.theme-index-card__more::before { background: none; border: 1px solid var(--line); }
+.theme-index-card__spark-wrap { display: grid; gap: 4px; margin-top: 10px; }
+.theme-index-card__sparklabel { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.theme-index-card__spark { display: block; width: 100%; height: 36px; }
+.theme-index-card__spark polyline { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
 .theme-index-card__standing { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--grid); font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); }
 .theme-index-card__standing span { display: flex; align-items: center; gap: 6px; }
 .dot { width: 6px; height: 6px; border-radius: 999px; flex: 0 0 auto; display: inline-block; }

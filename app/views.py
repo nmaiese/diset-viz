@@ -1574,19 +1574,31 @@ def _home_themes_preview():
 
 def _themes_index_areas():
     """Full '/temi' page: every macro-area with its themes, and for each theme
-    the indicator count plus the region in front / trailing (per-theme
+    the indicator count, a preview of its indicators, an illustrative
+    average-trend sparkline and the region in front / trailing (per-theme
     standings), matching the design's themes index."""
     matrix = profiles._percentile_matrix()
     meta = profiles._indicator_meta()
+    by_theme = {}
+    for item in get_catalog()["indicators"]:
+        by_theme.setdefault(item["theme"], []).append(item)
     areas = []
     for group in atlas_themes_by_macro_area():
         themes = []
         for theme in group["themes"]:
             lead, lag = _theme_leaders(theme["theme"], matrix, meta)
+            items = sorted(
+                by_theme.get(theme["theme"], []),
+                key=lambda i: (not i["complete"], i["name"].lower()),
+            )
+            names = [i["name"] for i in items]
             themes.append({
                 "theme": theme["theme"],
                 "path": theme["path"],
                 "indicator_count": theme["indicator_count"],
+                "indicators": names[:5],
+                "extra_count": max(0, len(names) - 5),
+                "spark_points": _theme_spark_points(items),
                 "lead": lead,
                 "lag": lag,
             })
@@ -1597,6 +1609,33 @@ def _themes_index_areas():
             "themes": themes,
         })
     return areas
+
+
+def _theme_spark_points(items):
+    """SVG polyline for a theme's illustrative average trend: each indicator's
+    national-average series normalised to 0..1 (inverted so up = improving),
+    averaged across indicators by point index. Illustrative composite, not an
+    official series."""
+    series = []
+    for item in items:
+        values = [p["value"] for p in (item.get("spark") or []) if p.get("value") is not None]
+        if len(values) < 2:
+            continue
+        lo, hi = min(values), max(values)
+        span = (hi - lo) or 1.0
+        invert = (item.get("explain") or {}).get("direction") in ("lower_better", "higher_worse")
+        normalised = [(v - lo) / span for v in values]
+        if invert:
+            normalised = [1.0 - n for n in normalised]
+        series.append(normalised)
+    if not series:
+        return ""
+    length = min(len(s) for s in series)
+    averaged = [
+        {"year": index, "value": sum(s[index] for s in series) / len(series)}
+        for index in range(length)
+    ]
+    return indicator_notes.sparkline_points(averaged, width=160, height=42)
 
 
 def _home_compare_preview():
