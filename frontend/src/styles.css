@@ -1227,7 +1227,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   .theme-spine { position: static; }
   .theme-spine ul { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
   .theme-spine li { flex: 0 0 auto; }
-  .theme-spine button { width: auto; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+  .theme-spine button { width: auto; border: 1px solid var(--line); border-radius: 0; white-space: nowrap; }
   .theme-spine button.is-active { border-color: var(--accent); }
   .workspace { grid-template-columns: 1fr; }
   .indicator-panel { position: static; }
@@ -1343,7 +1343,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 .spa-seo-fallback h1 { font-size: clamp(26px, 4vw, 38px); margin: 0 0 12px; }
 .spa-seo-fallback > p { font-size: 16px; color: var(--ink-soft); margin: 0 0 24px; max-width: 62ch; }
 .spa-seo-fallback nav { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 0 0 32px; }
-.spa-seo-fallback nav a { padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; font-size: 13.5px; font-weight: 600; }
+.spa-seo-fallback nav a { padding: 7px 14px; border: 1px solid var(--line); border-radius: 0; font-size: 13.5px; font-weight: 600; }
 .spa-seo-fallback section { margin: 0 0 24px; }
 .spa-seo-fallback h2 { font-size: 18px; margin: 0 0 12px; }
 .spa-seo-fallback ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
