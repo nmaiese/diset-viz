@@ -1,0 +1,761 @@
+{
+ "178": {
+  "attacco": "In Valle d'Aosta lavora quasi il 69% delle donne tra 15 e 64 anni, in Campania poco meno del 34%. Trentino Alto Adige ed Emilia-Romagna restano sopra il 64%, mentre Sicilia e Calabria si fermano attorno al 35%. Tra la regione che guida e quella in coda ci sono circa 35 punti percentuali di distanza.",
+  "spunto": "La media delle regioni, quasi il 55%, dice meno di quanto sembri. Il valore mediano sfiora il 61%, quindi metà delle regioni sta sopra quella soglia e a tirare in basso il quadro medio è un gruppo di territori del Mezzogiorno, non una difficoltà diffusa. Un tasso di occupazione femminile alto racconta quante donne hanno un lavoro, non quanto quel lavoro sia stabile o a tempo pieno. In ambito europeo l'Italia registra il divario di genere nell'occupazione più ampio dell'Unione ([Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Employment_-_annual_statistics)). Dove l'occupazione femminile cresce, sta crescendo anche la sua qualità?",
+  "limite": "Il dato conta chi ha un impiego, non separa il tempo pieno dal part time involontario e non misura orari, retribuzione o continuità del contratto. Non dice nulla sul lavoro di cura non retribuito che grava sulla stessa fascia di popolazione.",
+  "fonti": [
+   {
+    "testo": "Eurostat, Employment statistics: nel 2025 l'Italia registra il divario di genere nell'occupazione più ampio dell'UE (19,1 punti).",
+    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Employment_-_annual_statistics"
+   }
+  ]
+ },
+ "614": {
+  "attacco": "In Calabria l'11,2% dei residenti vive in comuni dove non si tiene alcun evento di spettacolo, intrattenimento o sport. In Emilia-Romagna e in Toscana la stessa quota è dello 0,03%, quasi nessuno. Tra i due estremi il divario è enorme, e Molise e Campania seguono la Calabria con valori sopra il 4%.",
+  "spunto": "Un evento di spettacolo o di sport è la soglia più bassa della vita culturale pubblica, la sua semplice presenza. Che ne resti fuori oltre un decimo dei calabresi e quasi nessun emiliano racconta un'Italia a due velocità anche qui, nei comuni piccoli e nelle aree interne, dove un'occasione pubblica in meno si somma alla distanza da scuola, treno e ospedale. Il numero non pesa la qualità di ciò che c'è, segnala dove non c'è nulla. Questa assenza va letta come fatto culturale o come uno dei sintomi dello spopolamento?",
+  "limite": "L'indicatore registra se in un comune si tiene almeno un evento, non quanti né di che tipo. Un comune con una sola manifestazione l'anno conta come uno con un cartellone ricco. Non dice nulla sull'offerta privata, informale o dei comuni vicini raggiungibili.",
+  "fonti": []
+ },
+ "bes:10AMB014": {
+  "attacco": "In Abruzzo più di un terzo del territorio, il 36,6%, ricade in aree protette. In Emilia-Romagna la quota scende al 12,1%. La maggior parte delle regioni si colloca però intorno al 23%, con media e mediana quasi coincidenti. Qui l'Italia è più omogenea di quanto gli estremi lascino pensare.",
+  "spunto": "Un territorio molto protetto non è di per sé migliore o peggiore, l'indicatore fotografa una scelta di tutela, non un esito ambientale. Abruzzo e Campania, fatti di montagne e parchi storici, stanno in alto, mentre le regioni più pianeggianti e urbanizzate partono da presupposti diversi. La percentuale dice quanta superficie è sotto vincolo, non quanto quella tutela sia efficace o finanziata. La domanda utile non è chi protegge di più, ma cosa accade davvero dentro e fuori quei confini.",
+  "limite": "La quota misura la superficie formalmente protetta, non la qualità della gestione, i fondi disponibili o lo stato di conservazione di habitat e specie. Un vincolo solo sulla carta e un'area davvero tutelata pesano allo stesso modo in questo numero.",
+  "fonti": []
+ },
+ "76": {
+  "attacco": "Questa serie non fa più parte del set corrente di indicatori, ma resta come memoria. Nell'ultimo anno rilevato, il 2021, in Puglia il 27,5% delle famiglie viveva sotto la soglia di povertà, in Campania il 22,8%. In Trentino Alto Adige la quota era del 4,5%. Tra le due Italie, quasi sei volte di distanza.",
+  "spunto": "Va guardato per quello che è, una fotografia del 2021 di una serie che Istat non aggiorna più. I modi di misurare la povertà sono cambiati nel tempo, e affiancare questo indice ai dati di oggi porta fuori strada. Quello che resta leggibile è la forma del divario. In coda alla classifica c'è un blocco meridionale, con Puglia, Campania e Calabria sopra il 20% delle famiglie sotto la soglia, in testa il Nord-Est sotto il 6%. Una distanza che vale la pena confrontare con gli indicatori di povertà oggi in uso. Quanto di questa geografia è ancora la nostra?",
+  "limite": "L'indice conta le famiglie sotto una soglia definita anni fa, con criteri non più in uso. Non misura l'intensità della povertà, cioè quanto ci si trova sotto la soglia, né tiene conto del costo della vita, diverso tra Nord e Sud.",
+  "fonti": []
+ },
+ "910": {
+  "attacco": "In Italia si vive a lungo quasi ovunque. La speranza di vita alla nascita va dagli 82,1 anni della Campania agli 84,8 del Trentino Alto Adige. Meno di tre anni separano la prima dall'ultima regione, e la media, 83,6 anni, coincide quasi con la mediana. È uno degli indicatori più uniformi del quadro territoriale.",
+  "spunto": "Meno di tre anni di differenza sembrano pochi, ma su un esito così stabile anche un divario contenuto pesa. La Campania segna il valore più basso, il Nord-Est i più alti. La speranza di vita riassume in un solo numero prevenzione, ambiente, redditi e servizi, e proprio per questo non racconta come si vivono quegli anni, dato che una regione può guadagnare mesi di vita e perdere qualità della salute. In ambito europeo l'Italia è tra i paesi più longevi ([Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Mortality_and_life_expectancy_statistics)). Quanti di quegli anni si vivono in buona salute?",
+  "limite": "È un dato medio alla nascita, non dice nulla sulle disuguaglianze interne a ogni regione, tra quartieri o gruppi sociali, né sulla qualità degli anni vissuti. Due regioni con la stessa speranza di vita possono avere condizioni di salute molto diverse.",
+  "fonti": [
+   {
+    "testo": "Eurostat, Mortality and life expectancy statistics: nel 2024 le province autonome di Trento e Bolzano (85,0 anni) figurano tra le regioni europee con la speranza di vita più alta.",
+    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Mortality_and_life_expectancy_statistics"
+   }
+  ]
+ },
+ "bes:07SIC003": {
+  "attacco": "I borseggi denunciati sono un fenomeno molto concentrato. Nel Lazio se ne contano 12,5 ogni mille abitanti, in Basilicata appena 0,2. La media delle regioni, 3,1, è più del doppio della mediana, che si ferma a 1,6. Bastano poche regioni con grandi città a spostare in alto la media tra le regioni.",
+  "spunto": "Un tasso alto qui segnala soprattutto dove il reato è più frequente, spesso nelle aree urbane più affollate e turistiche, non quanto una regione sia insicura nel complesso. Il borseggio è anche uno dei reati più legati alla propensione a denunciare, dove si segnala di più il numero sale, e la sicurezza percepita può muoversi in modo diverso dal dato registrato. Toscana e Lombardia seguono il Lazio, mentre il Mezzogiorno mostra i valori più bassi. Il numero misura le denunce, non la paura. Quale delle due conta di più per chi ci vive?",
+  "limite": "Restano fuori i borseggi mai denunciati alle forze dell'ordine, molti per un reato come questo, quindi il numero sottostima il fenomeno reale. Non distingue poi tra residenti e persone di passaggio, e un tasso calcolato sulla popolazione non tiene conto di pendolari e turisti presenti nelle grandi città.",
+  "fonti": []
+ },
+ "bes:08BSO001": {
+  "attacco": "In Trentino Alto Adige quasi due persone su tre, il 60,9%, si dichiarano soddisfatte della propria vita. In Campania la quota scende al 36%, in Puglia al 41,7%. Nella media delle regioni si ferma attorno al 49%, e la distanza tra la testa e la coda della classifica supera i 24 punti.",
+  "spunto": "La mappa della soddisfazione somiglia a quella dei redditi e dei servizi, con il Nord-Est davanti e il Mezzogiorno più indietro, ma qui misuriamo un giudizio, non una condizione. Le persone valutano la propria vita anche in base alle attese, al confronto con chi le circonda, a ciò che considerano normale. Per questo due territori con condizioni simili possono dichiarare soddisfazioni diverse, e un luogo più povero non è sempre meno soddisfatto. Quanto di questo 49% racconta come si sta davvero e quanto come ci si aspetta di stare?",
+  "limite": "È un dato auto-riportato in un singolo momento. Coglie come le persone dicono di sentirsi, non le loro condizioni materiali, e risente dell'umore, delle attese e del modo in cui è posta la domanda. Non distingue le ragioni della soddisfazione.",
+  "fonti": []
+ },
+ "bes:08BSO002": {
+  "attacco": "La soddisfazione per il tempo libero è alta e piuttosto uniforme. In Trentino Alto Adige riguarda il 76,3% delle persone, in Sicilia il 61,2%, con quasi tutte le regioni sopra il 60%. La media si colloca intorno al 68%, e il divario tra la prima e l'ultima è tra i più contenuti di quest'area.",
+  "spunto": "Rispetto alla soddisfazione per la vita nel suo insieme, qui le distanze tra Nord e Sud si accorciano. Il tempo libero intreccia relazioni, clima e abitudini più del solo reddito, e la sua valutazione tende a essere generosa un po' ovunque. Resta comunque un giudizio soggettivo: dichiararsi soddisfatti del proprio tempo libero non dice quanto tempo libero si abbia davvero, né come lo si passi. L'uniformità di questo dato è una risposta o una domanda?",
+  "limite": "Il numero misura la soddisfazione dichiarata, non la quantità di tempo libero disponibile né la sua qualità. Chi ha poche ore libere può dirsi comunque soddisfatto, e la stessa risposta può nascere da attività e possibilità molto diverse tra loro.",
+  "fonti": []
+ },
+ "bes:08BSO003": {
+  "attacco": "Rispetto a pochi anni fa gli italiani guardano al futuro con più fiducia: la quota di chi si aspetta di migliorare la propria situazione è cresciuta di circa un quarto. Resta però bassa, intorno al 30%, e sorprendentemente uniforme, dal 24,3% del Molise al 34,3% della Sardegna, con media e mediana quasi coincidenti.",
+  "spunto": "L'ottimismo non segue la solita geografia: Sardegna e Veneto vicine in testa, il Mezzogiorno presente sia in alto sia in basso. Le aspettative sul futuro si muovono con il momento, con il clima economico percepito, con l'età di chi risponde, e cambiano in fretta. Un dato basso ma in crescita può segnalare un recupero di fiducia oppure un punto di partenza molto arretrato. Il valore misura un'attesa, non un esito: chi spera di migliorare non è detto che ci riesca. La fiducia sta anticipando un cambiamento o solo un umore?",
+  "limite": "Il dato coglie un'aspettativa dichiarata in un preciso momento, sensibile al clima del periodo e alla formulazione della domanda. Non dice se quel giudizio diventerà un reale miglioramento, né su cosa le persone fondino la loro previsione.",
+  "fonti": []
+ },
+ "bes:08BSO004": {
+  "attacco": "Il pessimismo sul futuro è calato molto, quasi dimezzato rispetto a qualche anno fa, e oggi riguarda in media poco più del 12% delle persone. La geografia è controintuitiva: la quota più alta di chi teme di peggiorare è in Valle d'Aosta, al 15,6%, e in Emilia-Romagna, al 14,3%, mentre la Campania si ferma al 9,8%.",
+  "spunto": "Che alcune regioni economicamente solide mostrino più timore del futuro, e alcune del Sud meno, ricorda quanto questi giudizi siano relativi. Le persone valutano il domani rispetto a ciò che hanno e temono di perdere, non su una scala assoluta. Il forte calo del pessimismo va poi letto con prudenza, dato che segue l'umore collettivo e gli eventi recenti più delle condizioni strutturali. Un dato che scende è una buona notizia o il riflesso di aspettative che si sono già abbassate?",
+  "limite": "Misura un timore dichiarato, non un rischio reale di peggioramento. Un giudizio negativo può nascere da informazione, carattere o clima del momento, e due persone nella stessa condizione possono rispondere in modo opposto. Il dato non spiega su cosa si fondi la paura.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_10": {
+  "attacco": "Al vertice della scala, chi dà alla propria vita il voto pieno di 10 è una minoranza che non abita dove ci si aspetterebbe. In Valle d'Aosta è il 9,1% delle persone, in Sicilia e Sardegna l'8,7%, mentre Toscana, Lazio e Lombardia restano sotto il 6%. La media è intorno al 7%.",
+  "spunto": "La soddisfazione estrema disegna una mappa diversa da quella dei redditi: alcune regioni del Sud e delle isole guidano, alcune ricche del Centro-Nord seguono. Dare 10 alla propria vita è anche un fatto culturale, un modo di rispondere, non solo la fotografia di condizioni migliori. Questo rung va letto insieme agli altri: da solo dice quante persone scelgono il massimo, non quanto la popolazione stia bene nel complesso. La piena soddisfazione dichiarata misura la vita o il modo di raccontarla?",
+  "limite": "È un solo gradino di una scala da 0 a 10, isolato dal resto della distribuzione. Non dice nulla su chi sta appena sotto, e la propensione a scegliere il valore massimo varia per cultura e stile di risposta, non solo per condizioni di vita.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_9": {
+  "attacco": "Il voto 9 alla propria vita riguarda circa una persona su dieci. In Trentino Alto Adige arriva al 19,4%, quasi il doppio della media, seguito da Umbria e Valle d'Aosta sopra il 13%. In fondo restano Campania al 6,8% e Calabria al 7,7%.",
+  "spunto": "Insieme al voto 10, questo gradino racconta la fascia dei molto soddisfatti, e qui il Trentino Alto Adige stacca nettamente tutti. La parte alta della scala tende a premiare i territori alpini e del Centro, mentre parte del Mezzogiorno si concentra altrove nella distribuzione. Sono differenze reali, ma pur sempre di giudizio: un 9 e un 8 possono nascere dalla stessa vita e da una diversa indole nel valutarla. Cosa distingue chi sceglie il quasi-massimo da chi si ferma un gradino sotto?",
+  "limite": "Il valore isola una singola posizione della scala e ne fotografa la diffusione, non l'intensità del benessere. Su percentuali piccole anche pochi casi spostano il dato, e la scelta tra 8, 9 e 10 dipende molto dallo stile personale di risposta.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_8": {
+  "attacco": "Il voto 8 è la risposta più frequente quando si chiede quanto si è soddisfatti della propria vita: in media lo sceglie il 30,4% delle persone. In Trentino Alto Adige sale al 35,1%, mentre Campania e Sicilia restano più indietro, al 23,7% e al 27,3%.",
+  "spunto": "Questo è il gradino che regge la soddisfazione media del Paese, il punto in cui si addensa gran parte delle risposte. Il Nord-Est vi si concentra più del Sud, che invece si distribuisce verso i valori più bassi e, in parte, verso quelli altissimi. Leggere solo la media della soddisfazione nasconde questa forma: due regioni con lo stesso punteggio medio possono avere popolazioni molto diverse. È più solido un territorio che si raccoglie sull'8 o uno che si spinge sul 10?",
+  "limite": "Da solo, un gradino così popolato dice dove si concentra la maggioranza, non se la sua vita sia davvero migliore. La preferenza diffusa per l'8 è anche un'abitudine di risposta, un valore alto ma prudente, e non va confusa con una misura oggettiva del benessere.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_7": {
+  "attacco": "Il voto 7 raccoglie in media il 23,9% delle persone, la seconda risposta più comune dopo l'8. È la fascia più uniforme dell'intera scala: si va dal 19,8% del Trentino Alto Adige al 26,5% della Campania, con quasi tutte le regioni vicine.",
+  "spunto": "Sette su dieci è il giudizio dei soddisfatti senza entusiasmo, e proprio per questo è il più equilibrato tra i territori. Curiosamente qui la Campania sta in alto e il Trentino Alto Adige più in basso, l'opposto di quanto accade ai gradini più alti: dove le regioni del Nord si spingono su 8 e 9, quelle del Sud si fermano più spesso sul 7. La soddisfazione media nasce da queste piccole traslazioni. Un 7 diffuso è prudenza, misura o realismo?",
+  "limite": "Il dato coglie una sola posizione intermedia della scala e non si può leggere senza le fasce vicine. Un 7 può essere un giudizio sereno o una risposta di comodo, e la stessa cifra racchiude atteggiamenti diversi verso la domanda.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_6": {
+  "attacco": "Il voto 6, appena sopra la metà della scala, riguarda in media il 13,8% delle persone, ma con differenze marcate. In Campania sale al 20% e in Puglia al 15,2%, mentre in Trentino Alto Adige si ferma al 7,3%, meno della metà.",
+  "spunto": "Questo gradino segna il confine tra la soddisfazione piena e quella tiepida, e qui il Mezzogiorno pesa di più. Non è un voto negativo, è un giudizio prudente, di chi si dice appena soddisfatto. Il fatto che si concentri in alcune regioni del Sud, mentre il Nord si sposta su valori più alti, aiuta a leggere come mai le medie regionali divergano pur restando tutte in area positiva. La differenza tra un 6 e un 8 è nella vita o nel modo di misurarla?",
+  "limite": "Isolare il gradino appena sopra la sufficienza non dice se chi lo sceglie stia bene o meno: il confine tra un 6 e un 7 è sottile e personale. Il dato non spiega da cosa nasca, in alcuni territori, questa risposta più prudente.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_5": {
+  "attacco": "Il voto 5, la metà esatta della scala, riguarda in media il 6,9% delle persone. In Campania arriva al 9,1% e in Sardegna all'8,4%, mentre in Trentino Alto Adige si ferma al 4,9%. È la zona di chi non si sbilancia.",
+  "spunto": "Cinque su dieci è il punto neutro, il giudizio di chi non si dice né soddisfatto né insoddisfatto. Che questa risposta sia più frequente in alcune regioni del Sud e meno nel Nord-Est riflette la stessa traslazione che si vede lungo tutta la scala. Non è di per sé un segnale di disagio, ma di distanza dalla soddisfazione piena. Per questo la Multiscopo lo classifica come valore descrittivo, senza un verso migliore o peggiore. Il punto medio è indifferenza o una forma di cautela nel rispondere?",
+  "limite": "Un valore centrale della scala non ha una direzione chiara: può indicare equilibrio, incertezza o riluttanza a esporsi. Il dato conta chi sceglie esattamente il 5, non le ragioni di una posizione così sospesa.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_4": {
+  "attacco": "Sotto la metà della scala, il voto 4 riguarda in media il 2% delle persone. In Friuli-Venezia Giulia e Puglia sfiora il 3%, in Valle d'Aosta e Trentino Alto Adige resta intorno all'1,3%. La quota è piccola quasi ovunque, e negli ultimi anni si è ridotta.",
+  "spunto": "Qui inizia la parte bassa della scala, dove le percentuali si assottigliano e le differenze tra regioni contano meno in valore assoluto. Un 4 non è una vita infelice, è un giudizio insoddisfatto ma non estremo. La Multiscopo tratta questo gradino come descrittivo, dato che a metà-bassa scala la lettura migliore-peggiore diventa incerta. Su numeri così contenuti, poche risposte in più o in meno cambiano la classifica: conviene guardare l'intera coda bassa, non il singolo scalino. Dove finisce l'insoddisfazione e comincia il disagio?",
+  "limite": "Su una quota così piccola il dato è fragile: bastano pochi intervistati a spostarlo, e il confine con i gradini vicini è arbitrario. Il numero non dice se chi sceglie il 4 viva una difficoltà passeggera o una condizione stabile.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_3": {
+  "attacco": "Il voto 3 riguarda in media l'1,2% delle persone e negli ultimi anni è diminuito di circa un quinto. Le quote più alte sono in Emilia-Romagna, all'1,6%, e in Friuli-Venezia Giulia, all'1,5%, le più basse in Trentino Alto Adige, allo 0,8%.",
+  "spunto": "Siamo nella coda bassa della soddisfazione, quella di chi esprime un giudizio nettamente negativo sulla propria vita. Sono minoranze piccole, ma è la parte della distribuzione che conta di più per capire il disagio, più della soddisfazione media. La geografia qui si mescola, con regioni ricche e povere vicine, segno che l'infelicità dichiarata non segue solo il reddito. Il lieve calo recente è incoraggiante, ma va confermato nel tempo. Quanto pesa questa minoranza in un dato dominato dai soddisfatti?",
+  "limite": "Il gradino isola una piccola frazione della popolazione e, per la sua dimensione, risente del margine di errore dell'indagine. Non dice nulla sulle cause del malessere né su quanto sia duraturo, e va sempre letto insieme agli altri valori bassi.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_2": {
+  "attacco": "Il voto 2 è raro, in media lo sceglie lo 0,6% delle persone, e negli ultimi anni è calato di circa un quinto. Le quote più alte sono nel Lazio, all'1%, e in Piemonte, allo 0,9%, mentre Molise e Campania restano intorno allo 0,3%.",
+  "spunto": "Ai piedi della scala le percentuali sono minime e ogni confronto va preso con cautela: differenze di pochi decimi cambiano l'ordine tra le regioni. È una parte della distribuzione preziosa, visto che racconta il disagio profondo, ma proprio per la sua piccolezza è la più esposta al caso. Che qui compaiano regioni del Centro-Nord più che del Sud conferma quanto la soddisfazione dichiarata non ricalchi la geografia economica. Un dato così sottile misura un fenomeno o il rumore attorno a un fenomeno?",
+  "limite": "Con quote sotto l'uno per cento il valore è statisticamente fragile e va letto solo come ordine di grandezza. Non distingue le tante situazioni che possono portare a un giudizio così basso, e da solo non regge un confronto fine tra territori.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_1": {
+  "attacco": "Il voto 1 riguarda in media lo 0,4% delle persone, una delle quote più basse dell'intera scala. In Friuli-Venezia Giulia arriva allo 0,9%, in Emilia-Romagna e Abruzzo allo 0,6%, mentre in Molise si ferma allo 0,1%, quasi zero. Sono differenze di pochi decimi di punto, ai limiti di ciò che l'indagine riesce a distinguere.",
+  "spunto": "Quasi al fondo della scala restano piccolissime minoranze che danno alla propria vita un giudizio durissimo. Numeri così bassi non permettono classifiche affidabili tra regioni: la distanza tra la prima e l'ultima è fatta di pochi decimi di punto. Il loro valore non è nel confronto territoriale ma nell'esistenza stessa di questa fascia, che nessuna media può assorbire. Sono le persone che gli indicatori di benessere faticano a raggiungere. Ha senso leggere questa coda regione per regione, o va guardata come fenomeno nazionale?",
+  "limite": "La quota è troppo piccola per un confronto tra territori: rientra nel margine di incertezza dell'indagine. Il dato segnala che una fascia di disagio estremo esiste, ma non chi la compone, da cosa nasca, né quanto sia stabile nel tempo.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SATLIFE_0": {
+  "attacco": "All'estremo più basso della scala, chi dà alla propria vita il voto zero è in media lo 0,8% delle persone. Le quote più alte sono in Calabria e Abruzzo, all'1,4%, e in Umbria, all'1,2%, le più basse nelle Marche e in Trentino Alto Adige, sotto lo 0,5%.",
+  "spunto": "Lo zero è il punto in cui la scala tocca il fondo, il giudizio di chi non trova nulla di soddisfacente nella propria vita. È una minoranza esigua, ma è la fascia che più mette alla prova gli indicatori di benessere, quasi invisibile nelle medie e pure decisiva per capire chi resta indietro. Su quote così ridotte il confronto tra regioni va preso con prudenza. Il senso di questo numero non è dire quale territorio stia peggio, ma ricordare che sotto la media c'è sempre una coda. Come si legge un dato che parla di pochissimi ma pesa moltissimo?",
+  "limite": "Con una quota inferiore all'uno per cento il valore è fragile e non sostiene graduatorie fini tra regioni. Segnala la presenza di un disagio estremo, non le persone che lo vivono, le sue cause o la sua durata, e va sempre affiancato agli altri gradini bassi.",
+  "fonti": []
+ },
+ "279": {
+  "attacco": "I furti denunciati raccontano un'Italia rovesciata rispetto ai luoghi comuni. Il tasso più alto è nel Lazio, con 28,4 denunce ogni mille abitanti, seguito da Lombardia e Toscana sopra le 20. In fondo ci sono Basilicata, 4,6, e Calabria, 6,8. La media delle regioni è intorno a 13,6 ogni mille.",
+  "spunto": "I furti si concentrano dove c'è più da rubare e più movimento di persone, nelle grandi aree urbane e nei loro poli commerciali, non dove la sicurezza percepita è più bassa. Negli ultimi decenni il fenomeno è calato di circa un terzo, pur restando molto diseguale tra i territori. Un tasso alto misura anche una maggiore propensione a denunciare, spesso legata all'assicurazione e alla fiducia nelle forze dell'ordine. Il numero fotografa i reati registrati, non tutti quelli avvenuti. Dove si ruba di più o dove si denuncia di più?",
+  "limite": "Conta solo i furti denunciati, quindi risente della propensione a segnalarli, che varia tra territori e tipi di furto. Non distingue il valore o la gravità del reato, e un tasso sulla popolazione residente non considera pendolari, turisti e attività presenti in una zona.",
+  "fonti": []
+ },
+ "280": {
+  "attacco": "Le rapine denunciate sono un fenomeno raro e sbilanciato. In Campania se ne contano 0,74 ogni mille abitanti, in Lombardia 0,66, mentre in Basilicata il tasso scende a 0,08. La media delle regioni, 0,35, è ben più alta della mediana, 0,28: pochi territori spostano l'intero quadro.",
+  "spunto": "A differenza del furto, la rapina implica minaccia o violenza, e questo la rende più visibile e temuta di quanto il suo numero, molto piccolo, suggerisca. Si concentra in alcune grandi regioni urbane del Nord e in Campania, mentre gran parte del Paese resta su valori minimi. Negli ultimi anni il tasso medio è rimasto quasi stabile. Un reato poco frequente ma ad alto impatto emotivo pesa sulla sicurezza percepita più del suo peso statistico. Conta di più la frequenza o l'intensità di ciò che si teme?",
+  "limite": "Registra le sole rapine denunciate e le rapporta ai residenti, senza contare chi frequenta un territorio senza abitarci. Su numeri così piccoli anche pochi episodi cambiano la classifica, e il dato non distingue le rapine di strada da quelle a banche o esercizi commerciali.",
+  "fonti": []
+ },
+ "281": {
+  "attacco": "Gli omicidi sono diventati rari quasi ovunque. Il tasso medio è sceso di circa due terzi negli ultimi decenni e oggi vale in media 0,5 ogni centomila abitanti. In Valle d'Aosta e Molise non se ne registrano, mentre i valori più alti restano in Sardegna, 1,0, e Liguria, 0,9.",
+  "spunto": "Su un fenomeno così raro la classifica va letta con molta prudenza: pochi casi in un anno bastano a far salire o scendere una regione, e la geografia non coincide con quella della criminalità organizzata. Il forte calo di lungo periodo è uno dei cambiamenti più netti tra tutti gli indicatori di sicurezza, in linea con l'Italia e con gran parte d'Europa. Un tasso quasi azzerato non significa assenza di violenza, ma che la sua forma più estrema è oggi eccezionale. Cosa resta fuori quando l'omicidio diventa raro?",
+  "limite": "Conta solo gli omicidi volontari consumati, non i tentati né altre forme di violenza grave. Data la rarità dell'evento, un tasso annuale per centomila abitanti è instabile per le regioni piccole e va guardato su più anni, non isolato in un singolo dato.",
+  "fonti": []
+ },
+ "282": {
+  "attacco": "I reati associativi di tipo mafioso restano concentrati in poche regioni. I valori più alti sono in Calabria, 2,7 ogni centomila abitanti, Campania, 2,0, e Molise, mentre in Valle d'Aosta il tasso è nullo. La media delle regioni, 0,7, supera di parecchio la mediana, 0,4: la distribuzione è tutta sbilanciata verso pochi territori.",
+  "spunto": "Questo indicatore conta i reati associativi accertati dalla giustizia, non l'estensione reale del fenomeno mafioso, che sfugge in buona parte alle statistiche. Un valore alto può segnalare una presenza radicata ma anche un'azione di contrasto più intensa, che porta più procedimenti a compimento. Il forte calo registrato va quindi letto con cautela, come cambiamento nei reati rilevati più che come misura certa del fenomeno. La concentrazione territoriale resta netta. Un numero che scende racconta meno mafia o più repressione?",
+  "limite": "Misura i soli reati associativi giudiziariamente accertati, quindi dipende dall'attività di indagine e non cattura la parte sommersa del fenomeno. Non dice nulla sull'infiltrazione economica, sull'estorsione diffusa o sul controllo del territorio, che questo tasso non riesce a contare.",
+  "fonti": []
+ },
+ "542": {
+  "attacco": "Un processo civile ordinario dura in media 416 giorni, ma dietro questa cifra c'è un'Italia spaccata. In Valle d'Aosta un procedimento si chiude in 140 giorni, in Basilicata ne servono 911, in Calabria 730. Tra la giustizia più rapida e la più lenta il tempo si moltiplica per oltre sei.",
+  "spunto": "La durata dei processi è una forma silenziosa di diseguaglianza territoriale: lo stesso diritto costa mesi o anni a seconda di dove lo si fa valere. I tempi più lunghi si concentrano nel Mezzogiorno, ma il quadro dipende anche dal carico di cause, dagli organici e dall'organizzazione dei singoli tribunali, molto diversi tra loro. La media regionale nasconde tribunali vicini con prestazioni opposte. Una giustizia più lenta pesa su imprese, famiglie e fiducia nelle istituzioni. Quanto vale un diritto che arriva tardi?",
+  "limite": "È una media regionale che accorpa tribunali molto diversi e non distingue tra tipi di causa, dai contenziosi semplici a quelli complessi. Non misura la qualità delle decisioni né i gradi successivi del giudizio, e un valore medio può nascere da situazioni locali opposte.",
+  "fonti": []
+ },
+ "bes:07SIC001": {
+  "attacco": "Nel sistema BES gli omicidi sono classificati come indicatore descrittivo, senza un verso migliore o peggiore, e il motivo si vede nei numeri. In gran parte delle regioni il tasso è vicino allo zero, con Valle d'Aosta e Molise a quota nulla, e i valori più alti, in Sardegna e Liguria, restano intorno a 1 ogni centomila abitanti.",
+  "spunto": "Trattare l'omicidio come dato di contesto, e non come classifica, è una scelta di prudenza statistica: quando gli eventi sono così pochi, ordinare venti regioni dalla migliore alla peggiore darebbe una precisione illusoria. Il valore serve a fotografare un fenomeno ormai raro e in forte calo di lungo periodo, non a stabilire dove si viva più o meno sicuri. La sicurezza reale di un territorio si legge meglio incrociando più reati e la loro percezione. Un singolo tasso così basso informa o inganna?",
+  "limite": "Come dato di contesto non ordina le regioni e va preso come ordine di grandezza, non come graduatoria. Copre i soli omicidi volontari consumati e, vista la rarità, oscilla molto di anno in anno nelle regioni meno popolose.",
+  "fonti": []
+ },
+ "bes:07SIC002": {
+  "attacco": "I furti in abitazione seguono anch'essi una geografia rovesciata. Ne subiscono di più le famiglie del Centro-Nord, con la Toscana a 12,6 ogni mille, il Veneto a 11,7 e l'Umbria a 11,5, mentre in Calabria il tasso scende a 2,2 e in Sardegna a 2,7. La media delle regioni è intorno a 6,9 ogni mille famiglie.",
+  "spunto": "Questi furti si concentrano più spesso nei territori con redditi e patrimoni familiari elevati, dove le abitazioni offrono un bottino maggiore. È un capovolgimento utile a smontare l'idea che il Sud sia sempre il luogo più esposto ai reati. Pesano però molto sulla sicurezza percepita, dato che toccano lo spazio più intimo, quello di casa. Il numero conta le abitazioni colpite, non la paura che lasciano dopo. La casa violata spaventa più del furto in sé?",
+  "limite": "Conta i furti in abitazione denunciati ogni mille famiglie, quindi risente della propensione a denunciare, più alta dove esiste una copertura assicurativa. Non misura il valore del maltolto né il senso di insicurezza che questi episodi lasciano a lungo.",
+  "fonti": []
+ },
+ "bes:07SIC004": {
+  "attacco": "Anche le rapine, nel dato BES, pesano più al Nord. I valori più alti sono in Emilia-Romagna, 1,6 ogni mille abitanti, Lombardia, 1,5, e Liguria, 1,3, mentre Basilicata e Calabria restano a 0,2. Negli ultimi anni il tasso medio è sceso, oggi intorno a 0,8.",
+  "spunto": "La rapina è un reato di strada e di flussi, e tende a seguire le città più grandi, i loro trasporti e i loro centri commerciali, dove circolano più persone e più denaro. Per questo compare più al Nord urbano che nel Sud rurale, un'altra smentita della mappa attesa della sicurezza. Il calo recente è coerente con la discesa di lungo periodo dei reati predatori. Resta un reato che spaventa oltre la sua frequenza. Un territorio con più rapine è meno sicuro o solo più affollato?",
+  "limite": "Conta le rapine denunciate ogni mille abitanti residenti e non pesa chi attraversa un territorio senza viverci, come pendolari e turisti. Non distingue la rapina in strada da quella a un esercizio o a un istituto di credito, situazioni molto diverse tra loro.",
+  "fonti": []
+ },
+ "bes:07SIC008": {
+  "attacco": "La preoccupazione di subire una violenza sessuale non segue la mappa dei reati. È più diffusa in Friuli-Venezia Giulia, dove riguarda il 56,8% delle persone, in Trentino Alto Adige, 47,9%, e in Toscana, 45,2%, mentre in Marche e Molise scende intorno al 20%. La media delle regioni è del 35%.",
+  "spunto": "Qui non misuriamo un reato ma un timore, e i due non coincidono: alcune regioni tra le più sicure per i dati registrati esprimono la preoccupazione più alta. Contano l'informazione, l'attenzione pubblica al tema, il senso di esposizione nello spazio urbano, oltre alla maggiore consapevolezza di un fenomeno a lungo sommerso. È un indicatore descrittivo, senza un verso migliore o peggiore, dato che una preoccupazione più alta può nascere anche da più attenzione. La paura racconta il pericolo o lo sguardo di chi la prova?",
+  "limite": "Rileva una preoccupazione dichiarata, non la frequenza reale delle violenze, che restano in larga parte non denunciate e non misurabili con questo dato. Non distingue chi teme per esperienza diretta da chi risponde in base al clima e all'informazione.",
+  "fonti": []
+ },
+ "bes:07SIC010": {
+  "attacco": "La paura acuta, quella di chi si è sentito sul punto di subire un reato, è poco diffusa e molto concentrata. Riguarda in media il 2,5% delle persone, con l'Umbria al 5,6% e la Lombardia al 4,2% ai vertici, mentre in Valle d'Aosta si ferma allo 0,3%. Negli ultimi anni si è quasi dimezzata.",
+  "spunto": "A differenza di una generica percezione di rischio, questo indicatore coglie un episodio vissuto, un momento di allarme concreto. Che sia raro e in forte calo è coerente con la discesa dei reati predatori, ma la sua distribuzione non ricalca quella dei crimini denunciati. La paura, anche quando è puntuale, ha una geografia propria, fatta di contesti urbani, racconti ed esperienze indirette. Un dato basso è una buona notizia, ma azzerarlo del tutto è impossibile. Quanto di questa paura nasce da ciò che accade e quanto da ciò che si teme?",
+  "limite": "Misura un vissuto soggettivo e puntuale, non un rischio oggettivo né un reato effettivamente avvenuto. Su valori così piccoli le differenze tra regioni sono fragili, e il dato non dice se quell'allarme fosse fondato o quali situazioni lo abbiano provocato.",
+  "fonti": []
+ },
+ "bes:07SIC020": {
+  "attacco": "Sentirsi al sicuro camminando da soli col buio è più facile lontano dalle grandi città. In Valle d'Aosta lo dichiara il 75,9% delle persone, in Basilicata il 69,9%, mentre nel Lazio la quota scende al 48% e in Lombardia al 49,6%. In media si sente sicuro circa il 60%.",
+  "spunto": "Le regioni con le grandi aree metropolitane, dove i reati denunciati sono più numerosi, sono anche quelle dove ci si sente meno sicuri al buio: qui percezione e dati registrati vanno nella stessa direzione, al contrario di altri indicatori. La densità urbana, l'illuminazione, la presenza di persone e la conoscenza dei luoghi contano quanto la criminalità effettiva. È l'unico indicatore di quest'area in cui un valore alto è per definizione positivo. Ci si sente sicuri dove c'è meno crimine o dove ci si conosce di più?",
+  "limite": "Coglie una sensazione di sicurezza, non un livello di rischio: due persone nello stesso quartiere possono rispondere in modo opposto per età, genere o abitudini. Non dice se chi si sente insicuro eviti di uscire, un effetto che il dato non riesce a registrare.",
+  "fonti": []
+ },
+ "bes:07SIC021": {
+  "attacco": "Vedere segni di degrado attorno a casa, come vandalismo o spazi abbandonati, è un'esperienza più urbana che rurale. Nel Lazio riguarda il 12,7% delle persone, in Campania il 10,3% e in Lombardia il 10,2%, mentre in Calabria e Basilicata scende sotto il 4%. La media delle regioni è intorno al 6,5%.",
+  "spunto": "Il degrado è a metà strada tra un dato oggettivo e una percezione: descrive ciò che le persone vedono nel loro ambiente, e quel disordine visibile alimenta il senso di insicurezza più di molti reati. Si concentra nelle grandi regioni urbane, dove spazi pubblici estesi e alta densità rendono più visibili incuria e abbandono. Agire sull'ambiente fisico è una delle leve più concrete sulla sicurezza percepita. Conta di più il reato o il segnale di trascuratezza che lo evoca?",
+  "limite": "Registra la presenza dichiarata di segni di degrado, non la loro gravità né l'estensione reale. È filtrato dallo sguardo di chi risponde e non distingue il degrado occasionale da quello strutturale, né dice se sia accompagnato da reati effettivi.",
+  "fonti": []
+ },
+ "bes:07SIC022": {
+  "attacco": "La percezione del rischio di criminalità nella propria zona è massima nelle regioni delle grandi città. In Campania riguarda il 38% delle persone, nel Lazio il 35,8% e in Lombardia il 32,8%, mentre in Valle d'Aosta scende al 7,9% e in Calabria al 10,3%. La media delle regioni è del 22,6%.",
+  "spunto": "Qui la geografia mescola dati e racconto: le grandi aree metropolitane, che hanno davvero più reati predatori, sono anche quelle dove il timore è più diffuso, ma la percezione amplifica il fenomeno oltre i numeri. Contano la cronaca, la densità, l'esperienza di conoscenti, il passaparola. Il Mezzogiorno interno, con meno reati predatori denunciati, esprime timori più bassi. Sicurezza vissuta e sicurezza misurata qui si sfiorano senza coincidere. Il rischio percepito segue i reati o li precede nell'immaginario?",
+  "limite": "Misura quanto le persone percepiscono il rischio nella propria zona, non il rischio reale. Concentra l'attenzione sui reati di strada più visibili e trascura quelli meno percepibili, come le frodi o i reati economici, che non lasciano lo stesso senso di allarme.",
+  "fonti": []
+ },
+ "142": {
+  "attacco": "L'accesso a un nido o a un servizio per l'infanzia dipende ancora molto da dove si nasce. In Valle d'Aosta e Friuli-Venezia Giulia tutti i comuni ne offrono uno, in Trentino Alto Adige quasi tutti, mentre in Basilicata la quota scende al 29,8% e in Calabria al 34,9%. La media delle regioni è intorno al 69%.",
+  "spunto": "Questi servizi sono un pezzo di infrastruttura sociale: dove mancano, la cura dei più piccoli ricade sulle famiglie, e in genere sulle donne, con effetti a catena su lavoro e natalità. Il dato conta i comuni che offrono almeno un servizio, non i posti disponibili, quindi un comune con un solo nido pesa come uno ben attrezzato. Negli ultimi vent'anni la copertura è cresciuta molto, ma il divario territoriale resta ampio. Un servizio che esiste sulla carta è davvero raggiungibile per chi ne ha bisogno?",
+  "limite": "Misura la presenza di un servizio nei comuni, non il numero di posti, gli orari, le rette o le liste di attesa. Un territorio può avere quasi tutti i comuni coperti e insieme troppi pochi posti per la domanda reale delle famiglie.",
+  "fonti": []
+ },
+ "414": {
+  "attacco": "Se il primo indicatore conta i comuni con un servizio, questo conta i bambini che davvero lo usano, e il divario si allarga. In Friuli-Venezia Giulia va al nido il 40,5% dei bambini sotto i tre anni, in Emilia-Romagna il 34,4%, mentre in Calabria si ferma al 5,9% e in Campania al 6,9%. La media è del 20%.",
+  "spunto": "Qui si misura la copertura reale, e racconta una diseguaglianza di opportunità che parte dai primi anni di vita. Il nido non è solo un servizio di cura ma un luogo educativo, e la sua assenza pesa di più proprio dove i contesti familiari sono più fragili. L'obiettivo di una copertura piena resta lontano per molte regioni del Sud. Dietro le medie ci sono liste d'attesa, rette e offerta diseguale tra città e aree interne. La disuguaglianza comincia prima della scuola?",
+  "limite": "Conta i bambini che hanno usato un servizio, non la domanda inespressa di chi rinuncia per costi, distanza o assenza di posti. Non distingue nido pubblico e privato né la qualità educativa dell'offerta, molto variabile tra territori.",
+  "fonti": []
+ },
+ "144": {
+  "attacco": "Questo indicatore mostra numeri difficili da confrontare tra loro. La presa in carico degli anziani in assistenza domiciliare integrata risulta al 3,8% in Veneto, ma sotto lo 0,7% in tutte le altre regioni e vicina allo zero in Friuli-Venezia Giulia e Basilicata. La media delle regioni, 0,4%, è schiacciata da pochissimi valori alti.",
+  "spunto": "Distanze così estreme, con una regione oltre venti volte le altre, segnalano più una diversa contabilità del servizio che un divario reale nella cura. Regioni diverse classificano e registrano l'assistenza domiciliare in modi non omogenei, e questo rende il confronto fragile. Il dato va quindi letto come indizio, non come classifica: dice che l'assistenza integrata a domicilio è misurata in modo disomogeneo, prima ancora che erogata in modo diseguale. Stiamo confrontando servizi o modi di contarli?",
+  "limite": "I criteri con cui le regioni registrano l'assistenza domiciliare integrata non sono uniformi, quindi i confronti diretti possono ingannare. Il dato non dice nulla sull'intensità delle cure, sulle ore erogate o sulla qualità dell'assistenza ricevuta da ciascun anziano.",
+  "fonti": []
+ },
+ "415": {
+  "attacco": "L'assistenza domiciliare socio-assistenziale agli anziani raggiunge in media poco più dell'1% della popolazione over 65, ma con forti differenze. In Trentino Alto Adige e Valle d'Aosta arriva al 3,2%, in Sardegna al 2,2%, mentre in Umbria si ferma allo 0,3% e in Campania allo 0,5%. Pochi anziani, quasi ovunque.",
+  "spunto": "Con una popolazione tra le più anziane d'Europa, la domanda di cura a domicilio è destinata a crescere, ma la copertura resta bassa e a macchia di leopardo. Dove il servizio pubblico manca, il carico ricade sulle famiglie e sulle reti informali di prossimità. Anche qui i modi di registrare il servizio variano tra regioni, quindi le distanze vanno prese con prudenza. La rete di cura per gli anziani regge sulle istituzioni o sulle famiglie?",
+  "limite": "Come per l'assistenza integrata, le regioni contano il servizio con criteri diversi, e questo limita i confronti. Il dato misura quanti anziani sono presi in carico, non le ore, la continuità o il tipo di aiuto ricevuto, che cambiano molto da caso a caso.",
+  "fonti": []
+ },
+ "590": {
+  "attacco": "Curarsi fuori dalla propria regione è molto più comune al Sud. In Molise quasi un ricovero su tre di residenti, il 32,6%, avviene in un'altra regione, in Basilicata il 29,7%, mentre in Lombardia ed Emilia-Romagna la quota scende sotto il 6%. La media delle regioni è del 12,5%.",
+  "spunto": "La mobilità sanitaria è uno dei segnali più concreti della fiducia nei servizi locali: quando manca un'offerta vicina e adeguata, i pazienti si spostano, spesso da Sud a Nord, con costi umani ed economici. Il fenomeno è cresciuto nel tempo, e alimenta un circolo in cui le risorse seguono i pazienti verso le regioni già più attrezzate. Non tutta la mobilità è un problema, alcune cure specialistiche giustificano lo spostamento. Ma quanta parte di questi viaggi nasce da una scelta e quanta da una mancanza?",
+  "limite": "Conta le dimissioni avvenute fuori regione, non i motivi del viaggio: distingue male chi cerca cure assenti a casa da chi sceglie un centro di eccellenza vicino al confine. Non misura la gravità dei casi né la qualità delle cure ottenute altrove.",
+  "fonti": []
+ },
+ "913": {
+  "attacco": "A 65 anni un italiano può contare in media su altri 21,5 anni di vita, e le regioni si somigliano molto: dai 20,2 anni della Campania ai 22,4 del Trentino Alto Adige. Poco più di due anni separano la prima dall'ultima, ma il Mezzogiorno resta stabilmente in fondo.",
+  "spunto": "La longevità in età anziana è una conquista, ma sposta il baricentro dei bisogni verso la cura di lungo periodo, la cronicità e l'assistenza. Due anni di differenza tra regioni, su una base già alta, valgono più di quanto sembri quando si parla di anni vissuti con fragilità. Questo indicatore dice quanto si vive dopo i 65, non in che condizioni: la stessa aspettativa può nascondere anni in salute molto diversi. Vivere più a lungo o vivere meglio la vecchiaia?",
+  "limite": "Misura gli anni attesi dopo i 65, non la loro qualità né l'autonomia di chi li vive. È una media che non coglie le differenze tra uomini e donne, tra livelli di istruzione o tra aree interne e città della stessa regione.",
+  "fonti": []
+ },
+ "920": {
+  "attacco": "L'Italia invecchia, ma non alla stessa velocità ovunque. L'età media va dai 44,8 anni della Campania ai 49,7 della Liguria, con la Sardegna vicina a 49,6. Cinque anni di distanza tra la regione più giovane e la più anziana, e una media nazionale salita a 47,6 anni.",
+  "spunto": "Un'età media più bassa non è di per sé un vantaggio né un problema: dipende da natalità, migrazioni e movimenti dei giovani. Il Mezzogiorno appare più giovane, il Nord più anziano pur attirando popolazione in età da lavoro. Ma la stessa cifra può nascere da storie opposte, una regione che trattiene le famiglie e una che perde i suoi anziani prima del tempo. Resta un indicatore descrittivo, una fotografia della struttura per età, non una classifica. Un territorio giovane guarda al futuro o sta salutando i suoi giovani?",
+  "limite": "Fotografa la struttura per età in un istante, senza distinguere le cause: bassa natalità, arrivi o partenze producono lo stesso numero. Non dice nulla sulla direzione del cambiamento né su come la popolazione si distribuisce tra città, coste e aree interne.",
+  "fonti": []
+ },
+ "921": {
+  "attacco": "Ci sono ormai più di due anziani ogni bambino in Italia. L'indice di vecchiaia, che rapporta gli over 65 ai minori di 15 anni, è salito in vent'anni di circa il 60% e oggi vale in media 233. In Sardegna arriva a 300, quasi tre anziani per bambino, mentre in Trentino Alto Adige e Campania si ferma intorno a 169.",
+  "spunto": "Un indice così alto racconta il doppio movimento della demografia italiana: pochi nati e molti anziani, con la seconda spinta ormai più forte della prima. Non è un valore con un verso migliore o peggiore, ma pesa su scuole, sanità e pensioni in modo concreto. La Sardegna, con la fecondità più bassa del Paese, sta all'estremo. Alcune regioni del Sud restano più giovani per ora, ma invecchiano in fretta. Un Paese con questa struttura può reggersi sugli stessi servizi di trent'anni fa?",
+  "limite": "È un rapporto tra generazioni, non una misura del benessere degli anziani o dei bambini. Un valore alto può convivere con anziani attivi e servizi efficienti, oppure con territori in abbandono: da solo non distingue le due situazioni.",
+  "fonti": []
+ },
+ "922": {
+  "attacco": "Nessuna regione italiana fa abbastanza figli per rinnovare la popolazione. Il numero medio di figli per donna è di 1,12, lontano dalla soglia di ricambio, e va dallo 0,85 della Sardegna all'1,4 del Trentino Alto Adige. Anche le regioni in testa, come Sicilia e Campania poco sopra 1,2, restano ben sotto quel livello.",
+  "spunto": "La fecondità è scesa ancora nell'ultimo ventennio, e la mappa sorprende: il Trentino Alto Adige, con più servizi per l'infanzia, sta in testa, la Sardegna in fondo. Fare figli dipende da lavoro, case, servizi e attese sul futuro, molto più che dal reddito da solo. È un indicatore descrittivo, ma dietro c'è la traiettoria di lungo periodo del Paese, dove meno nascite oggi significano meno giovani e più anziani domani. Si fanno pochi figli per scelta o per un contesto che non aiuta?",
+  "limite": "Il tasso di fecondità totale è una sintesi statistica di un anno, sensibile ai rinvii delle nascite, e non racconta i figli che una donna avrà davvero nella vita. Non distingue tra chi non ha figli per scelta e chi vi rinuncia per condizioni sfavorevoli.",
+  "fonti": []
+ },
+ "923": {
+  "attacco": "Il saldo tra chi arriva e chi se ne va premia il Centro-Nord. In Liguria il saldo migratorio è di 9,8 ogni mille abitanti, in Emilia-Romagna 8,6, mentre la Basilicata è l'unica regione in negativo, a meno 2,3. La media delle regioni è positiva, intorno a 4,6, ma la mediana più alta segnala poche regioni molto indietro.",
+  "spunto": "Questo saldo somma due movimenti diversi, gli arrivi dall'estero e gli spostamenti interni, e il risultato dice dove la popolazione si concentra. Le regioni che attraggono sono anche quelle con più lavoro e servizi, in un meccanismo che tende ad accentuarsi nel tempo. Un saldo positivo però non è sempre una buona notizia, e uno negativo non è sempre una crisi: conta chi arriva e chi parte, non solo quanti. Le persone seguono le opportunità o le opportunità seguono le persone?",
+  "limite": "Il saldo netto nasconde la composizione dei flussi: non distingue giovani laureati e famiglie, italiani e stranieri, arrivi stabili e temporanei. Due regioni con lo stesso valore possono vivere dinamiche opposte, una che attrae e una che semplicemente perde meno.",
+  "fonti": []
+ },
+ "bes:01SAL002": {
+  "attacco": "Si vive quasi ovunque a lungo, ma non ovunque in salute. Gli anni attesi in buona salute alla nascita vanno dai 52,6 della Calabria ai 65,3 del Trentino Alto Adige: quasi tredici anni di differenza, circa cinque volte il divario che si vede sulla speranza di vita totale.",
+  "spunto": "Se la durata della vita è ormai simile tra Nord e Sud, la qualità di quegli anni no, e proprio qui si annida la disuguaglianza di salute più forte. Contano prevenzione, stili di vita, ambiente e accesso alle cure, che si distribuiscono in modo diseguale. Vivere a lungo ma con più anni di malattia o limitazioni cambia tutto, per le persone e per i servizi che dovranno sostenerle. La vera frattura territoriale è nella lunghezza della vita o nella salute con cui la si attraversa?",
+  "limite": "Combina dati di sopravvivenza e di salute percepita, quindi risente anche di come le persone giudicano la propria condizione. È una media alla nascita che non distingue i gruppi sociali interni a ogni regione, dove le differenze possono essere anche più ampie di quelle tra regioni.",
+  "fonti": []
+ },
+ "bes:01SAL003": {
+  "attacco": "L'indice di salute mentale è uno degli indicatori più uniformi del quadro sanitario. Su una scala standardizzata la media è intorno a 69, e tra la Campania, a 67, e il Trentino Alto Adige, a 71,7, la distanza è contenuta. Le differenze territoriali qui contano meno che altrove.",
+  "spunto": "Un punteggio così compresso non significa che il disagio psicologico sia uniforme, ma che questo indice, costruito su alcune domande standardizzate, coglie solo una parte del fenomeno. La salute mentale dipende da relazioni, lavoro, solitudine e accesso ai servizi, dimensioni che una media regionale appiattisce. L'uniformità apparente può nascondere gruppi fragili ovunque, dai giovani agli anziani soli. Un dato piatto è un segnale di equilibrio o solo di uno strumento poco sensibile alle differenze?",
+  "limite": "È un punteggio sintetico ricavato da poche domande, quindi cattura il benessere psicologico generale, non i disturbi diagnosticati né la loro gravità. Non misura l'offerta di servizi di salute mentale, molto diseguale, né raggiunge chi resta fuori dalle indagini.",
+  "fonti": []
+ },
+ "bes:01SAL004": {
+  "attacco": "La mortalità infantile è oggi bassa in tutta Italia, ma non identica. Va da 1,4 morti ogni mille nati vivi in Toscana a 3,6 in Calabria e 3,2 in Campania, con la Valle d'Aosta a 6,4 che, essendo piccolissima, oscilla molto. La media delle regioni è 2,6.",
+  "spunto": "È uno degli indicatori più delicati, dato che tocca la vita dei più piccoli e la qualità dei percorsi nascita. La Multiscopo lo tratta come descrittivo: gli eventi sono pochi, e nelle regioni piccole basta una manciata di casi a spostare il tasso, come mostra la Valle d'Aosta. Resta però un divario Nord-Sud reale nel lungo periodo, legato a prevenzione, reti ospedaliere e presa in carico della gravidanza. Un numero piccolo che pesa moltissimo va letto sull'orizzonte di più anni. È un divario di natura o di servizi?",
+  "limite": "Su eventi così rari il tasso annuale è instabile, specie nelle regioni meno popolose, e va guardato su serie lunghe. Non distingue le cause, dalla prematurità alle malformazioni all'accesso alle cure, che richiedono risposte molto diverse.",
+  "fonti": []
+ },
+ "bes:01SAL005": {
+  "attacco": "La mortalità stradale tra i 15 e i 34 anni si è più che dimezzata negli ultimi vent'anni, uno dei cali più forti tra gli indicatori di salute. Oggi vale in media 0,7 ogni diecimila giovani residenti, con la Sardegna al valore più alto, 1,3, e diverse regioni del Nord intorno a 0,4.",
+  "spunto": "Dietro questo calo ci sono veicoli più sicuri, controlli, campagne e norme, un raro esempio di politica pubblica che sposta i numeri in modo visibile. La geografia residua parla di distanze, tipo di strade e abitudini di mobilità più che di rischio individuale, e la Sardegna, con lunghe percorrenze e trasporto pubblico limitato, sta all'estremo. È un indicatore descrittivo, ma racconta vite giovani spezzate, non solo statistiche. Quanto margine di miglioramento resta dove i numeri sono già bassi?",
+  "limite": "Conta i decessi per incidente in una fascia d'età, non i feriti gravi né gli incidenti senza vittime, che pesano su sanità e famiglie. Su numeri contenuti il dato annuale oscilla, e non distingue la mortalità di chi guida da quella di passeggeri e pedoni.",
+  "fonti": []
+ },
+ "bes:01SAL006": {
+  "attacco": "La mortalità per tumore in età lavorativa, tra i 20 e i 64 anni, è scesa di circa un terzo in vent'anni, con diagnosi e cure più efficaci. Oggi il tasso più basso è in Trentino Alto Adige, 6,1 ogni diecimila, il più alto in Campania, 9,0, con Sardegna e Sicilia poco sotto. La media è 7,4.",
+  "spunto": "A lungo il Nord industriale ha avuto la mortalità oncologica più alta. Oggi la mappa si è in parte rovesciata, con alcune regioni del Sud in testa. Contano prevenzione, screening, stili di vita e accesso tempestivo alle cure, che si distribuiscono in modo diseguale. È un dato descrittivo, ma la parola tumore lo rende tutto fuorché neutro. Il divario che emerge riguarda la malattia o la possibilità di curarla in tempo?",
+  "limite": "È un tasso standardizzato per età, quindi confrontabile tra territori, ma aggrega tumori molto diversi per origine e prognosi. Non distingue l'incidenza, cioè quante persone si ammalano, dalla mortalità, che dipende anche dalla qualità e dalla tempestività delle cure.",
+  "fonti": []
+ },
+ "bes:01SAL007": {
+  "attacco": "La mortalità per demenze e malattie del sistema nervoso tra gli anziani è cresciuta molto, di oltre l'80% in vent'anni. Oggi va da circa 26 ogni diecimila in Calabria a 44 in Sardegna, con la Valle d'Aosta a 62 che, piccola, oscilla molto. La media delle regioni è intorno a 36.",
+  "spunto": "L'aumento va letto con cautela: in parte riflette una popolazione sempre più anziana, in parte una migliore capacità di diagnosticare e certificare queste malattie, prima spesso attribuite ad altre cause. Non è quindi solo un peggioramento della salute, ma anche un cambiamento nel modo di misurarla. Resta il segnale di un bisogno di cura di lungo periodo in forte crescita, che grava su famiglie e servizi. Stiamo osservando più malattia o più consapevolezza di una malattia?",
+  "limite": "Il dato dipende molto dai criteri di certificazione della causa di morte, cambiati nel tempo e non uniformi tra territori. Non misura quante persone convivono con la demenza né il carico di assistenza che comporta, che nessun tasso di mortalità cattura.",
+  "fonti": []
+ },
+ "bes:01SAL008": {
+  "attacco": "Dopo i 65 anni, gli anni attesi senza limitazioni nelle attività quotidiane vanno dagli 8,8 della Calabria ai 12,2 del Veneto. Oltre tre anni di autonomia in più o in meno, a parità di età, con il Nord davanti e parte del Sud in coda. La media è di circa 10,5 anni.",
+  "spunto": "Questo è il rovescio della longevità: non quanto si vive dopo i 65, ma quanto a lungo si resta autosufficienti. Tre anni di autonomia in più significano meno bisogno di assistenza, più partecipazione, un carico minore per famiglie e servizi. Il vantaggio del Nord si lega a stili di vita, prevenzione e reti di cura, ma anche qui la media regionale nasconde forti differenze sociali. Allungare la vita serve, ma allungare l'autonomia forse serve di più. Su cosa dovrebbero puntare i territori che restano indietro?",
+  "limite": "Si basa sulla percezione delle limitazioni riferita dalle persone, quindi mescola condizione reale e giudizio soggettivo. Non dice quali attività risultino compromesse né come cambiano le disuguaglianze di autonomia tra uomini e donne o tra livelli di istruzione.",
+  "fonti": []
+ },
+ "bes:01SAL009": {
+  "attacco": "In eccesso di peso è quasi una persona su due, ma con un chiaro gradiente Nord-Sud. In Campania riguarda il 51,5% degli adulti, in Puglia il 50,8%, mentre in Trentino Alto Adige scende al 39,3% e in Liguria al 40,3%. La media delle regioni è del 44,5%, un tasso corretto per età per rendere confrontabili le popolazioni.",
+  "spunto": "L'eccesso di peso non è solo un fatto individuale: segue reddito, istruzione e ambiente alimentare, e si concentra dove questi sono più fragili. Il gradiente Nord-Sud che compare qui torna in molti indicatori di salute, dalla sedentarietà all'alimentazione, e disegna una geografia della prevenzione. Il dato è quasi fermo negli ultimi anni, segno che le abitudini cambiano lentamente. Un corpo è la somma di scelte personali o del contesto in cui quelle scelte si fanno?",
+  "limite": "Somma sovrappeso e obesità in un unico tasso e si basa su peso e altezza dichiarati, spesso sottostimati. Non distingue la gravità delle situazioni né tiene conto di massa muscolare, età e attività fisica, che cambiano il significato dello stesso indice.",
+  "fonti": []
+ },
+ "bes:01SAL010": {
+  "attacco": "Il fumo non segue la solita divisione Nord-Sud. Fuma in media il 20% degli adulti, con l'Umbria in testa, 24,5%, seguita da Sicilia e Basilicata, mentre Trentino Alto Adige e Friuli-Venezia Giulia restano sotto il 18%. Calabria e Nord condividono i valori più bassi.",
+  "spunto": "A differenza di peso e sedentarietà, qui non c'è un Sud tutto più esposto: la mappa del fumo è a chiazze, segno di storie regionali diverse tra abitudini, offerta e politiche di prevenzione. Il calo di lungo periodo c'è ma è lento, e il tabacco resta il primo fattore di rischio evitabile per molte malattie. Un tasso corretto per età permette di confrontare popolazioni diverse. Come mai su un rischio così noto le abitudini cambiano tanto piano?",
+  "limite": "Conta chi si dichiara fumatore, senza distinguere l'intensità, dai fumatori occasionali ai forti fumatori, che hanno rischi molto diversi. Non coglie il fumo passivo né le nuove forme di consumo, come le sigarette elettroniche, sempre più diffuse.",
+  "fonti": []
+ },
+ "bes:01SAL011": {
+  "attacco": "Sul consumo di alcol a rischio la geografia si capovolge: sono le regioni del Nord a guidare. In Valle d'Aosta riguarda il 23,8% delle persone, in Trentino Alto Adige il 23,6%, mentre in Sicilia scende al 10,8% e in Campania al 13%. La media delle regioni è del 16,8%.",
+  "spunto": "Dove eccesso di peso e sedentarietà penalizzano il Sud, l'alcol a rischio disegna la mappa opposta, con il Nord-Est e le zone alpine in testa. Contano tradizioni, produzione locale e abitudini di consumo radicate, non un generico stile di vita più o meno sano. Il dato è in calo, uno dei più netti tra i comportamenti a rischio. Il fatto stesso che ogni vizio abbia la sua geografia smonta l'idea di un Nord salubre e di un Sud malsano. Esiste davvero una regione più sana delle altre?",
+  "limite": "Segue la definizione BES di consumo a rischio, che combina quantità e modalità, e si basa su dichiarazioni spesso prudenti. Non distingue il consumo quotidiano moderato dalle ubriacature occasionali, comportamenti con rischi diversi che il tasso unisce.",
+  "fonti": []
+ },
+ "bes:01SAL012": {
+  "attacco": "La sedentarietà è forse la disuguaglianza di salute più marcata tra le abitudini. In Calabria non pratica alcuna attività fisica il 47,4% delle persone, in Sicilia il 47%, contro il 14,8% del Trentino Alto Adige. Più di tre volte di distanza, con una media delle regioni del 29,7%.",
+  "spunto": "Muoversi poco moltiplica il rischio di eccesso di peso, malattie croniche e fragilità, e non a caso la mappa della sedentarietà somiglia a quella dell'obesità. L'attività fisica dipende anche da spazi, impianti, tempo e sicurezza dei luoghi, non solo dalla volontà individuale, e questi mancano più spesso dove il dato è alto. Il valore è in calo, un segnale incoraggiante. Ma quanto della sedentarietà è pigrizia e quanto assenza di occasioni per muoversi?",
+  "limite": "Registra chi dichiara di non praticare sport o attività fisica nel tempo libero, ma non conta il movimento legato al lavoro o agli spostamenti a piedi. Due persone ugualmente attive nella vita quotidiana possono risultare una sedentaria e una no.",
+  "fonti": []
+ },
+ "bes:01SAL013": {
+  "attacco": "Seguire un'alimentazione adeguata secondo i criteri del sistema BES riguarda una minoranza ovunque, in media il 16,6% delle persone. Le quote più alte sono in Liguria e Friuli-Venezia Giulia, intorno al 20,8%, le più basse in Basilicata, 10%, e Molise, 11%. Anche la regione migliore resta sotto un quinto della popolazione.",
+  "spunto": "C'è un paradosso apparente: le regioni del Sud, patria della dieta mediterranea, segnano i valori più bassi, mentre il Nord-Ovest e le isole guidano. Il criterio BES misura un mix di frutta, verdura e abitudini specifico, che non coincide con l'immagine tradizionale del mangiar sano. Il dato è per giunta in calo, come se il modello alimentare storico si stesse indebolendo proprio dove era più forte. La dieta mediterranea è ancora di casa dove è nata?",
+  "limite": "Applica una definizione specifica di alimentazione adeguata, quindi cattura solo alcune abitudini e non l'intera qualità della dieta. Si basa su comportamenti dichiarati, esposti a imprecisioni, e non misura la quantità né la sostenibilità economica del cibo salutare.",
+  "fonti": []
+ },
+ "bes:01SAL020": {
+  "attacco": "La mortalità evitabile, quella che prevenzione e cure tempestive potrebbero ridurre, misura più di ogni altra il divario di salute. Va da circa 15 morti ogni diecimila in Trentino Alto Adige, Veneto e Toscana a 22,4 in Campania, con Sicilia e Calabria sopra 20. La media è 17,6.",
+  "spunto": "Se un solo numero dovesse riassumere le disuguaglianze territoriali di salute, sarebbe questo: dice quante morti, in teoria, si sarebbero potute evitare con prevenzione e cure adeguate. Il divario Nord-Sud è netto e stabile, e cala ovunque senza però chiudersi. È un indicatore descrittivo, che non attribuisce responsabilità, ma indica dove il sistema salute rende meno di quanto potrebbe. Come mai la stessa malattia porta a esiti diversi a seconda di dove si vive?",
+  "limite": "È una stima di quanto sarebbe evitabile in condizioni ideali, non un conteggio di errori. Aggrega cause molto diverse, dalle malattie prevenibili a quelle curabili, e non separa il peso della prevenzione da quello dell'accesso alle cure.",
+  "fonti": []
+ },
+ "bes:01SAL021": {
+  "attacco": "Tra gli over 75, la quota che convive con più malattie croniche e gravi limitazioni va dal 35,2% del Trentino Alto Adige al 57,8% della Calabria. In Campania è al 57,6%, in Puglia al 55,3%. Oltre venti punti separano la vecchiaia più autonoma da quella più fragile, con una media del 47,2%.",
+  "spunto": "Questo indicatore misura il peso reale della non autosufficienza, quello che ricade su famiglie, badanti e servizi sanitari. Il divario territoriale ricalca quello degli anni vissuti in salute: al Sud si arriva più fragili alla grande vecchiaia, con più bisogni e spesso meno servizi di prossimità. È il rovescio della longevità, il costo nascosto di una popolazione che invecchia. Un Paese che vive a lungo si sta attrezzando per la cura di chi vive a lungo ma male?",
+  "limite": "Si basa su condizioni e limitazioni riferite dalle persone o da chi le assiste, quindi mescola dato clinico e percezione. Non misura l'intensità dell'assistenza necessaria né la rete di servizi disponibile, che determina quanto quel bisogno pesi davvero.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_BMI_NORMO": {
+  "attacco": "Guardando il rovescio della medaglia, gli adulti normopeso sono in media poco più della metà, il 50,6%. La quota più alta è in Trentino Alto Adige, 56,5%, la più bassa in Puglia e Campania, sotto il 45%. In circa metà del Paese, quindi, il peso normale è già una minoranza risicata.",
+  "spunto": "Ribaltare l'indicatore aiuta a vedere la posta in gioco: in nessuna regione i normopeso superano di molto la metà, e in quelle del Sud sono già minoranza. Il dato è fermo da anni, il che dice quanto siano radicate abitudini e ambiente alimentare. Leggere il peso normale come traguardo, e non solo l'eccesso come problema, sposta lo sguardo dalla cura alla prevenzione diffusa. Il normopeso è la norma o sta diventando l'eccezione?",
+  "limite": "È l'immagine speculare dell'eccesso di peso e ne condivide i limiti: si fonda su misure dichiarate e sull'indice di massa corporea. Non distingue chi mantiene il peso con uno stile di vita sano da chi vi arriva per altre ragioni, comprese alcune poco salutari.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_BMI_OBESI": {
+  "attacco": "Oltre il sovrappeso c'è l'obesità, che riguarda in media l'11,7% degli adulti. Le quote più alte sono in Molise, 14,9%, Puglia, 13,7%, e Abruzzo, 13,1%, le più basse in Toscana e Trentino Alto Adige, sotto il 9,5%. Negli ultimi anni il dato è leggermente salito.",
+  "spunto": "L'obesità è la punta più seria dell'eccesso di peso, quella con le conseguenze sanitarie più pesanti, dal diabete alle malattie cardiovascolari. Che cresca, sia pure lentamente, mentre l'eccesso di peso complessivo resta fermo, suggerisce uno spostamento verso i casi più gravi. La geografia ricalca quella meridionale della prevenzione, ma con differenze meno nette di altri indicatori. Prevenire l'obesità è più una questione sanitaria o sociale?",
+  "limite": "Si basa su peso e altezza riferiti dagli intervistati, che tendono a sottostimare il primo, quindi il valore reale è probabilmente più alto. L'indice di massa corporea non distingue grasso e muscolo e non coglie la distribuzione del peso, che conta per la salute.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_BMI_SOVRA": {
+  "attacco": "Il sovrappeso, gradino intermedio prima dell'obesità, riguarda in media più di un adulto su tre, il 34,6%. In Campania sale al 40,3%, in Puglia al 39,2%, mentre in Trentino Alto Adige si ferma al 31%. È la fascia più numerosa dell'eccesso di peso.",
+  "spunto": "Il sovrappeso è la zona grigia della salute: non ancora una patologia, ma la soglia da cui molti scivolano verso l'obesità. Proprio essendo così diffuso, è anche il terreno dove la prevenzione può incidere di più, con alimentazione e movimento. La solita mappa meridionale si conferma, meno marcata che sull'obesità grave. Vale più agire su chi è già obeso o sulla platea molto più ampia in sovrappeso?",
+  "limite": "Come gli altri indici di peso, dipende da dati dichiarati e dall'indice di massa corporea, che semplifica la realtà. Non dice da quanto tempo una persona è in sovrappeso né se stia peggiorando o migliorando, informazioni decisive per il rischio.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_BMI_SOTTO": {
+  "attacco": "All'estremo opposto del peso c'è chi è sottopeso, una minoranza del 3,1% degli adulti. Qui la geografia si inverte: le quote più alte sono in Lombardia, 4,5%, Valle d'Aosta, 4,3%, e Marche, mentre in Basilicata e Sicilia scendono sotto il 2,5%. Il Sud, più esposto all'eccesso di peso, lo è meno alla magrezza.",
+  "spunto": "Il sottopeso è la faccia dimenticata dei problemi di peso, e non è sempre una buona notizia: può segnalare disturbi alimentari, specie tra i più giovani, o fragilità negli anziani. Che sia più diffuso al Centro-Nord ricorda che ogni estremo dell'indice di massa corporea ha i suoi rischi, non solo l'eccesso. È una minoranza piccola, ma da non confondere con la forma fisica. Essere magri è sempre essere in salute?",
+  "limite": "Su una quota così piccola le differenze tra regioni sono fragili e vanno prese con prudenza. L'indice di massa corporea non distingue una magrezza costituzionale e sana da una legata a disturbi alimentari o a malattia, situazioni molto diverse che il dato accorpa.",
+  "fonti": []
+ },
+ "108": {
+  "attacco": "Prima ancora di chi lavora, conta chi prova a farlo. La partecipazione al mercato del lavoro, cioè la quota di persone tra 15 e 64 anni occupate o in cerca, va dal 51,7% della Calabria al 74,9% della Valle d'Aosta. La media delle regioni è del 67%, ma la mediana, oltre il 71%, è più alta.",
+  "spunto": "Lo scarto tra media e mediana racconta un'Italia spaccata: in gran parte delle regioni partecipa più del 70% delle persone in età da lavoro, e a tirare giù il quadro è un blocco meridionale. Chi non partecipa non è disoccupato, è fuori dal mercato, tra scoraggiati, chi si dedica alla cura e chi ha smesso di cercare. Questa inattività è il vero serbatoio nascosto del divario del lavoro italiano, più della disoccupazione visibile. Un territorio cresce di più recuperando disoccupati o chi non cerca nemmeno?",
+  "limite": "Somma occupati e persone in cerca, quindi non distingue la qualità del lavoro da chi lo cerca invano. Non racconta i motivi dell'inattività, molto diversi tra chi studia, chi assiste un familiare e chi ha rinunciato a cercare.",
+  "fonti": []
+ },
+ "13": {
+  "attacco": "Il tasso di occupazione è il termometro del lavoro, e segna una frattura netta. In Trentino Alto Adige lavora il 72,9% delle persone tra 15 e 64 anni, in Emilia-Romagna il 71,4%, mentre Calabria, Campania e Sicilia restano sotto il 48%. La media è del 63%, la mediana oltre il 68%.",
+  "spunto": "Oltre venticinque punti tra la prima e l'ultima regione sono uno dei divari più larghi del quadro territoriale, e sono cresciuti poco nonostante il buon recupero recente. Come per la partecipazione, il baricentro del problema è il Mezzogiorno, dove non lavora circa una persona su due in età attiva. L'occupazione dice quante persone hanno un impiego, non che tipo: dietro lo stesso tasso possono esserci lavori stabili o precari. Serve più occupazione o più occupazione buona?",
+  "limite": "Misura la quota di occupati sulla popolazione in età da lavoro, senza distinguere tempo pieno e parziale, stabile e a termine. Non coglie la qualità, la retribuzione o le ore effettive, e nasconde le differenze per genere, età e titolo di studio.",
+  "fonti": []
+ },
+ "345": {
+  "attacco": "Misurato sulla fascia 20-64 anni, quella usata per i confronti europei, il tasso di occupazione italiano sale al 68% in media, dato che esclude i più giovani spesso ancora a scuola. Il divario però resta netto: dal 50,3% della Calabria al 78,8% del Trentino Alto Adige.",
+  "spunto": "Cambiare la fascia d'età non cambia la sostanza, ma serve a confrontarsi con l'Europa, dove l'Italia resta stabilmente indietro rispetto alla media dei tassi di occupazione. Le regioni del Nord si allineano ai livelli europei più alti, quelle del Sud restano molto sotto, come se nello stesso Paese convivessero due mercati del lavoro. Recuperare il ritardo nazionale significa soprattutto colmare quello meridionale. L'Italia ha un problema di occupazione o un problema di Mezzogiorno?",
+  "limite": "Adotta la fascia 20-64 per il confronto internazionale, quindi non è direttamente comparabile con l'indicatore 15-64. Resta una misura di quantità, che non dice nulla su stabilità, orari e retribuzione del lavoro contato.",
+  "fonti": []
+ },
+ "bes:03LAV001-N22": {
+  "attacco": "Nel sistema BES il tasso di occupazione 20-64 misura quanto un territorio si avvicina agli standard europei. La media italiana è del 68%, ancora distante dai Paesi più avanzati, e al suo interno si va dal 50,3% della Calabria al 78,8% del Trentino Alto Adige, che quella soglia la supera.",
+  "spunto": "Un tasso alto è la base del benessere economico, ma da solo non basta a dire se il lavoro sia di qualità o conciliabile con la vita. Il Nord-Est che guida la classifica combina alta occupazione e, spesso, più servizi per l'infanzia e più stabilità. Il Sud sconta occupazione bassa e lavoro più precario insieme. Guardare solo il tasso rischia di premiare la quantità e ignorare le condizioni. Quanto conta avere un lavoro rispetto a che lavoro si ha?",
+  "limite": "È la quota di occupati 20-64 sulla popolazione, un dato di sola quantità. Non incorpora ore, contratti e salari, e una regione può migliorare il tasso aumentando lavori parziali o a termine senza che le condizioni migliorino.",
+  "fonti": []
+ },
+ "14": {
+  "attacco": "Il lavoro degli over 54 è cresciuto più di ogni altro, di oltre il 14% in pochi anni, spinto dalle riforme che hanno alzato l'età pensionabile. Oggi lavora in media il 62% delle persone tra 55 e 64 anni, con la Toscana quasi al 70% e la Calabria al 47,7%.",
+  "spunto": "Tenere al lavoro più a lungo gli anziani è una necessità per i conti pubblici, ma cambia il volto del mercato: convivono generazioni che escono più tardi e giovani che entrano con fatica. Il divario territoriale resta, con il Sud sotto anche qui. Un tasso alto tra gli over 54 può segnalare esperienza valorizzata oppure impossibilità di ritirarsi. Lavorare più a lungo è una conquista o un obbligo?",
+  "limite": "Conta gli occupati tra 55 e 64 anni, non le condizioni in cui lavorano né la fatica di certi mestieri in età avanzata. Non dice se l'aumento nasca da scelta, da bisogno economico o dal semplice rinvio della pensione.",
+  "fonti": []
+ },
+ "407": {
+  "attacco": "Tra i giovani il lavoro è raro e diseguale. Nella fascia 15-29 anni lavora il 45,8% dei ragazzi in Trentino Alto Adige ma solo il 19,4% in Calabria, meno di uno su cinque. La media delle regioni è del 33%, e il Sud occupa tutte le ultime posizioni.",
+  "spunto": "Un giovane su cinque che lavora in Calabria contro quasi uno su due in Trentino non è solo una fotografia, è l'inizio di traiettorie di vita divergenti, tra chi accumula esperienza e chi resta ai margini o emigra. Parte del divario dipende da quanti proseguono gli studi, ma resta un problema di occasioni. Questi anni contano doppio, dato che segnano i redditi e le carriere future. Da dove ricomincia un giovane che a trent'anni non ha ancora lavorato?",
+  "limite": "Include tra i non occupati anche studenti e chi è in formazione, quindi un valore basso non equivale a giovani inattivi. Non distingue lavoro stabile e occasionale, e non cattura chi ha lasciato la regione per lavorare altrove.",
+  "fonti": []
+ },
+ "408": {
+  "attacco": "I NEET, i giovani tra 15 e 29 anni che non studiano e non lavorano, sono in media il 14,8%, ma la media inganna. La mediana è più bassa, sotto il 12%, quindi in gran parte delle regioni il fenomeno è contenuto, mentre in Campania, Sicilia e Calabria supera il 24%. Il Trentino Alto Adige è al 7,7%.",
+  "spunto": "Il NEET è l'indicatore più crudo dello spreco di capitale umano: non è chi cerca lavoro, è chi è fuori da tutto, senza studio né impiego né formazione. È calato di un terzo negli ultimi anni, ma resta concentrato in poche regioni, dove riguarda quasi un giovane su quattro. Dietro c'è una miscela di scoraggiamento, lavoro nero e assenza di occasioni. Ridurre i NEET è una politica del lavoro o dell'istruzione?",
+  "limite": "Somma situazioni diverse, dallo scoraggiamento alla cura familiare all'attesa tra due percorsi, che richiedono risposte opposte. Non distingue chi è NEET per pochi mesi da chi lo è da anni, né intercetta chi lavora in nero pur risultando inattivo.",
+  "fonti": []
+ },
+ "12": {
+  "attacco": "La disoccupazione è scesa molto, quasi dimezzata in pochi anni, e oggi la media delle regioni è del 6,2%. Ma il dato unisce realtà lontane: dal 2% del Trentino Alto Adige al 13,9% della Campania, con Sicilia e Puglia oltre il 10%. Sette volte di distanza tra la prima e l'ultima.",
+  "spunto": "Il calo è reale e diffuso, ma la disoccupazione misura solo chi cerca attivamente lavoro, e al Sud molti hanno smesso di cercare, finendo tra gli inattivi. Per questo un tasso in discesa può convivere con un mercato ancora debole, dove il problema si sposta dalla disoccupazione alla non partecipazione. Guardare solo questo numero rischia di dare un quadro troppo ottimista. La disoccupazione che scende è più lavoro o meno persone che lo cercano?",
+  "limite": "Conta chi cerca attivamente un impiego, quindi esclude scoraggiati e inattivi, numerosi al Sud, e può migliorare anche quando le persone rinunciano a cercare. Non dice nulla sulla qualità o sulla durata del lavoro trovato da chi esce dalla disoccupazione.",
+  "fonti": []
+ },
+ "15": {
+  "attacco": "Tra i giovani in cerca di lavoro la disoccupazione resta alta: in media il 20,6% di chi si affaccia sul mercato tra 15 e 24 anni non trova impiego. In Campania sale al 40,1%, quattro giovani attivi su dieci, mentre in Trentino Alto Adige scende al 7,1%.",
+  "spunto": "Il tasso giovanile va letto con attenzione: si calcola sui giovani attivi, non su tutti, e al Sud molti studiano o non cercano, quindi la disoccupazione visibile è solo la punta. Resta un segnale forte di quanto sia difficile l'ingresso nel lavoro, con effetti lunghi su fiducia, redditi e scelte di vita. Un ritardo all'inizio pesa per decenni. Il problema dei giovani del Sud è trovare lavoro o restare per cercarlo?",
+  "limite": "È calcolato sulle sole forze di lavoro giovanili, una base ristretta che rende il tasso alto e volatile. Non conta i tanti giovani che studiano o non cercano, e va sempre affiancato al tasso di occupazione e ai NEET per non ingannare.",
+  "fonti": []
+ },
+ "16": {
+  "attacco": "Non conta solo quanti sono senza lavoro, ma da quanto. Tra i disoccupati, la quota di chi cerca da oltre un anno va dal 19,9% del Trentino Alto Adige al 70,8% del Molise. Al Sud la disoccupazione non è solo più alta, è anche più cronica: in Campania riguarda due disoccupati su tre.",
+  "spunto": "La lunga durata è ciò che trasforma la disoccupazione in trappola: più a lungo si resta fuori, più diventa difficile rientrare, tra competenze che si perdono e datori che diffidano. Che al Sud la maggioranza dei disoccupati sia di lungo periodo racconta un mercato bloccato, non solo affollato. È una misura di composizione, non di livello, e dice che tipo di disoccupazione prevale. Combattere la disoccupazione lunga è più difficile che ridurre quella totale?",
+  "limite": "È una quota interna ai disoccupati, quindi può salire anche quando i disoccupati totali calano, se escono prima quelli di breve durata. Non dice se chi è fuori da tempo cerchi ancora davvero o sia ormai ai margini del mercato.",
+  "fonti": []
+ },
+ "17": {
+  "attacco": "Rapportata a tutte le forze di lavoro, la disoccupazione di lunga durata mostra il divario più estremo del mercato del lavoro. In Campania il 9,4% delle persone attive cerca da oltre un anno, in Trentino Alto Adige solo lo 0,4%: oltre venti volte di distanza. La media delle regioni è del 3,2%.",
+  "spunto": "Se l'incidenza dice che tipo di disoccupazione prevale, questo tasso ne misura il peso sull'intera forza lavoro, ed è qui che il Sud paga il conto più alto. Un divario di venti volte non ha eguali tra gli indicatori economici, e segnala un nucleo di esclusione radicata più che una difficoltà passeggera. Il calo recente è forte, ma parte da livelli altissimi. Si può parlare di ripresa del lavoro con una disoccupazione così incistata?",
+  "limite": "Rapporta i disoccupati di lungo periodo alle forze di lavoro, quindi risente anche di quante persone partecipano al mercato. Non distingue chi è vicino a rientrare da chi è fuori da anni, situazioni con bisogni molto diversi.",
+  "fonti": []
+ },
+ "bes:03LAV002-N22": {
+  "attacco": "Più ampio della disoccupazione, il tasso di mancata partecipazione somma chi cerca lavoro e chi lo vorrebbe ma non lo cerca attivamente. Così misurato, il divario esplode: dal 4,3% del Trentino Alto Adige al 27,3% della Campania. La media è del 12,9%, la mediana molto più bassa, sotto il 10%.",
+  "spunto": "Questo indicatore svela ciò che la disoccupazione nasconde: al Sud una parte enorme del potenziale di lavoro è fuori dal radar, tra scoraggiati e disponibili che non cercano più. La media schiacciata dalla mediana conferma che il problema è concentrato in poche regioni, dove riguarda oltre un quarto delle persone. È forse la misura più onesta della distanza tra Nord e Sud sul lavoro. Quanti lavoratori invisibili nasconde un tasso di disoccupazione basso?",
+  "limite": "Allarga la definizione di chi manca al lavoro, ma resta una misura di quantità, non di qualità. Non distingue chi è pronto a lavorare subito da chi lo farebbe solo a certe condizioni, e non racconta le ragioni per cui tanti hanno smesso di cercare.",
+  "fonti": []
+ },
+ "57": {
+  "attacco": "Il divario di genere nel lavoro è una delle fratture più persistenti. In Puglia il tasso di occupazione degli uomini supera quello delle donne di 26,3 punti, in Campania e Sicilia di oltre 25, mentre in Valle d'Aosta il distacco scende a 6,1. La media delle regioni è di 16,3 punti.",
+  "spunto": "Il gap si allarga proprio dove l'occupazione totale è più bassa: al Sud non solo si lavora meno, ma il poco lavoro è molto più maschile. Contano servizi per l'infanzia, cultura del lavoro femminile e struttura dell'economia locale. Il divario cala lentamente, ma resta doppio rispetto alle regioni migliori. In ambito europeo l'Italia ha il divario di genere nell'occupazione più ampio dell'Unione ([Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Employment_-_annual_statistics)). Ridurre questa distanza è una questione di lavoro o di servizi?",
+  "limite": "Misura la distanza tra due tassi, non la condizione delle donne in sé: un divario basso può nascere anche da un'occupazione maschile debole, non solo da una femminile forte. Non dice nulla su ore, salari e ruoli, dove il divario di genere spesso è ancora più ampio.",
+  "fonti": [
+   {
+    "testo": "Eurostat, Employment statistics: nel 2025 l'Italia registra il divario di genere nell'occupazione più ampio dell'UE (19,1 punti).",
+    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Employment_-_annual_statistics"
+   }
+  ]
+ },
+ "61": {
+  "attacco": "Il divario di genere si vede anche prima del lavoro, nella semplice partecipazione al mercato. Tra uomini e donne che lavorano o cercano lavoro il distacco va dai 5,9 punti della Valle d'Aosta ai 28,1 della Campania. La media delle regioni è di 16,7 punti, poco sopra il divario di occupazione.",
+  "spunto": "Che il gap di attività superi quello di occupazione dice una cosa precisa: molte donne del Sud non sono disoccupate, sono fuori dal mercato, non cercano nemmeno. È la conciliazione mancata tra lavoro e cura, in assenza di servizi, a spingere molte a rinunciare prima ancora di provarci. Questo divario è la radice di molti altri, dai redditi alle pensioni. Le donne del Sud scelgono di non lavorare o smettono di cercare?",
+  "limite": "Confronta i tassi di attività, includendo chi cerca lavoro, ma resta un divario tra medie che non racconta le storie individuali. Non distingue l'inattività scelta da quella subita, né misura il lavoro di cura non retribuito che sostituisce, per molte, quello retribuito.",
+  "fonti": []
+ },
+ "402": {
+  "attacco": "Sull'imprenditoria femminile la classifica si ribalta. La quota di imprese guidate da donne è più alta in Molise, 32,1%, Basilicata, 31,3%, e Abruzzo, mentre in Trentino Alto Adige e Lombardia scende sotto il 25%. La media delle regioni è del 27,6%.",
+  "spunto": "Il primato del Sud va letto con prudenza: dove il lavoro dipendente scarseggia, mettersi in proprio è spesso una necessità più che una scelta, e le imprese femminili sono in media piccole e fragili. Un dato alto può quindi segnalare vitalità imprenditoriale oppure mancanza di alternative occupazionali. La stessa cifra racconta storie opposte a seconda del contesto. L'imprenditoria femminile del Sud è un segno di forza o di ripiego?",
+  "limite": "Conta la quota di imprese a guida femminile, non la loro dimensione, il fatturato o la sopravvivenza. Non distingue l'impresa scelta per ambizione da quella aperta per necessità, e non misura le condizioni di lavoro di chi la guida.",
+  "fonti": []
+ },
+ "bes:03LAV009-N22": {
+  "attacco": "Avere figli piccoli pesa sul lavoro delle donne, ma non ovunque allo stesso modo. In Sicilia le madri con bambini in età prescolare lavorano il 64,5% di quanto lavorano le donne senza figli, in Umbria il 92,4%. Se le une e le altre lavorassero nella stessa misura non ci sarebbe alcuna penalità. La media delle regioni è del 79%.",
+  "spunto": "È la misura più diretta della conciliazione tra maternità e lavoro, quanto la nascita di un figlio allontana le donne dall'impiego. Dove i servizi per l'infanzia sono più diffusi e l'occupazione femminile più radicata la penalità si riduce, dove mancano sono le madri a uscire dal mercato. Il dato è quasi fermo, segno che la conciliazione resta un nodo irrisolto. Il costo di un figlio sul lavoro dovrebbe ricadere sulle madri?",
+  "limite": "Confronta due gruppi di donne, con e senza figli, ma non segue le stesse persone nel tempo, quindi coglie una differenza media, non un percorso. Non distingue chi riduce l'orario da chi esce del tutto, né considera il ruolo dei padri nella cura.",
+  "fonti": []
+ },
+ "398": {
+  "attacco": "La quota di addetti impiegati in imprese nate negli ultimi tre anni è più alta al Sud: in Calabria è il 3,8% dell'occupazione, in Sicilia il 3,3%, contro l'1,3% del Trentino Alto Adige. La media delle regioni è del 2,3%, in calo rispetto a vent'anni fa.",
+  "spunto": "Un peso alto delle nuove imprese sembra un segno di dinamismo, ma al Sud riflette anche un tessuto fatto di aziende piccole e a vita breve, che nascono e chiudono in fretta. Al Nord la quota bassa convive con imprese più grandi e longeve, dove l'occupazione è più stabile. Nascita d'impresa non è sinonimo di solidità. Un'economia con tante imprese nuove è più viva o più instabile?",
+  "limite": "Misura il peso occupazionale delle imprese giovani, non la loro qualità né quante sopravvivono oltre i primi anni. Un valore alto può nascere da vera vivacità o dall'alto ricambio di un tessuto fragile, due cose che il dato non separa.",
+  "fonti": []
+ },
+ "401": {
+  "attacco": "L'imprenditoria giovanile si è ridotta di quasi il 40% in vent'anni. Oggi la quota di imprese a guida giovanile è in media del 5,3%, con Campania, Lombardia e Trentino Alto Adige poco sopra il 6% e Molise fermo al 4,1%. Le differenze tra regioni sono contenute.",
+  "spunto": "Il forte calo racconta un Paese che invecchia anche nell'impresa: sempre meno giovani avviano un'attività, ovunque, Nord e Sud insieme. Contano l'accesso al credito, il peso della burocrazia e la difficoltà di rischiare senza reti familiari solide. Che la geografia conti poco, mentre il tempo conta molto, sposta la domanda dal territorio alle generazioni. I giovani fanno meno impresa per mancanza di mezzi o di prospettive?",
+  "limite": "Conta le imprese a guida giovanile, non il settore, la dimensione o la durata. Un calo può nascere da meno vocazione imprenditoriale ma anche dal semplice invecchiamento della popolazione, con meno giovani in età da impresa.",
+  "fonti": []
+ },
+ "466": {
+  "attacco": "Anche una laurea rende in modo diverso a seconda della regione. Tra chi si è laureato da uno a tre anni, lavora il 91,6% in Trentino Alto Adige ma solo il 50,9% in Molise e il 53,6% in Calabria. La media è salita al 75%, con un forte recupero recente.",
+  "spunto": "Il titolo di studio protegge, ma non annulla il divario territoriale: al Sud anche i laureati faticano a trovare lavoro vicino a casa, e molti si spostano al Nord o all'estero. Il buon miglioramento recente riguarda tutti, ma la distanza resta ampia. È un caso in cui il capitale umano c'è, mancano le occasioni per usarlo dove si è formato. La laurea garantisce lavoro o solo la possibilità di cercarlo altrove?",
+  "limite": "Misura l'occupazione dei laureati nella regione di rilevazione, non dice dove hanno studiato né dove sono nati. Non distingue il lavoro coerente con il titolo da quello che non lo è, e chi emigra per lavorare può gonfiare i numeri della regione di arrivo.",
+  "fonti": []
+ },
+ "455": {
+  "attacco": "L'occupazione degli stranieri segue la geografia del lavoro che offre di più. In Friuli-Venezia Giulia lavora il 63,6% degli stranieri residenti in età da lavoro, in Veneto il 63,2%, mentre in Molise la quota scende al 41,5%. La media delle regioni è del 56,6%.",
+  "spunto": "Gli stranieri si spostano dove c'è domanda di lavoro, e infatti i tassi più alti sono nelle regioni del Nord manifatturiero. Che al Sud anche la loro occupazione sia bassa conferma che il problema è la scarsità di lavoro, non l'origine di chi lo cerca. L'occupazione straniera è spesso concentrata in pochi settori faticosi e poco pagati, un dato che il tasso non mostra. L'integrazione si misura con quanti lavorano o con come lavorano?",
+  "limite": "Rapporta gli stranieri occupati alla popolazione straniera residente, un insieme mobile e difficile da censire con precisione. Non distingue i settori, spesso pochi e gravosi, né la regolarità del rapporto di lavoro, dove l'irregolarità è più diffusa.",
+  "fonti": []
+ },
+ "460": {
+  "attacco": "Anche nelle campagne il lavoro segue la frattura Nord-Sud. Nelle aree rurali lavora il 72,6% delle persone in Trentino Alto Adige ma solo il 44,6% in Calabria. La media delle regioni è del 61,7%, con la mediana più alta, oltre il 66%.",
+  "spunto": "Il mondo rurale non è uniforme: al Nord è fatto di agricoltura specializzata, agroindustria e turismo, al Sud più spesso di attività fragili e stagionali. Per questo lo stesso ambiente, la campagna, offre occupazione molto diversa a seconda della regione. Le aree interne e rurali rischiano di sommare due svantaggi, quello territoriale e quello geografico. La campagna è una riserva di lavoro o una trappola di marginalità?",
+  "limite": "Definisce le aree rurali con criteri statistici che accorpano territori diversi, dalla collina produttiva alla montagna spopolata. Non distingue il lavoro agricolo da quello di servizi e industria presenti in quelle zone, né la stagionalità che segna molte attività rurali.",
+  "fonti": []
+ },
+ "530": {
+  "attacco": "La quota di lavoratori che ricevono sussidi di disoccupazione è più alta dove non ci si aspetterebbe: in Valle d'Aosta è il 23,9%, in Sardegna il 22,4%, mentre in Piemonte scende all'8,5%. La media delle regioni è del 14,3%, in crescita negli ultimi anni.",
+  "spunto": "Questo indicatore mescola due cose: il bisogno, cioè quanti perdono il lavoro, e la copertura, cioè quanti hanno i requisiti per accedere ai sussidi. Un valore alto può segnalare più disoccupazione oppure un lavoro più formale, che dà diritto all'indennità. Per questo la Multiscopo lo tratta come descrittivo, senza un verso migliore o peggiore. Molti sussidi sono un segno di crisi o di tutele che funzionano?",
+  "limite": "Somma chi riceve indennità di disoccupazione e Aspi, senza distinguere il bisogno dalla semplice esistenza dei requisiti. Non misura chi resta escluso dai sussidi, spesso i lavoratori più precari e discontinui, che ne avrebbero più bisogno.",
+  "fonti": []
+ },
+ "bes:03LAV003": {
+  "attacco": "Quanto è facile passare da un lavoro instabile a uno stabile cambia moltissimo tra regioni. In Umbria e Lombardia lo fa circa il 19% di chi partiva da un impiego precario, in Puglia solo il 4,1%. La media delle regioni è del 12%, in calo negli ultimi anni.",
+  "spunto": "È la misura della mobilità verso la stabilità, la possibilità concreta che un lavoro precario diventi il trampolino verso uno stabile e non una condizione permanente. Al Nord la transizione funziona per quasi un lavoratore su cinque, al Sud per pochi, dove il precariato tende a restare tale. Il calo recente è un segnale da tenere d'occhio. Un contratto a termine è un ponte verso la stabilità o un binario morto?",
+  "limite": "Misura le transizioni in un intervallo breve, quindi risente molto del ciclo economico e delle stagioni. Non dice se la stabilità raggiunta duri nel tempo, né distingue chi si stabilizza nello stesso lavoro da chi cambia del tutto occupazione.",
+  "fonti": []
+ },
+ "bes:03LAV004-N22": {
+  "attacco": "Non tutti i contratti a termine sono un passaggio: molti durano anni. La quota di occupati a termine da almeno cinque anni va dall'11,4% del Veneto al 38,8% della Basilicata. La media delle regioni è del 21,3%, ed è cresciuta nel tempo.",
+  "spunto": "È il volto del precariato cronico, chi resta a termine non per una fase iniziale ma come condizione stabile, spesso per anni. Al Sud riguarda una quota molto più alta, e blocca redditi, mutui e progetti di vita. Che il fenomeno cresca mentre le transizioni verso la stabilità calano descrive un mercato che intrappola più che accompagnare. Un lavoro a termine da cinque anni è ancora un lavoro temporaneo?",
+  "limite": "Isola chi è a termine da oltre cinque anni, ma va letto insieme al peso complessivo del lavoro temporaneo in ogni regione. Non distingue chi resta precario per scelta o per settore da chi lo è per assenza di alternative.",
+  "fonti": []
+ },
+ "bes:03LAV005": {
+  "attacco": "Avere un lavoro non basta a garantire un reddito dignitoso. La quota di dipendenti con bassa paga va dal 6,3% del Trentino Alto Adige al 19% della Calabria. La media delle regioni è del 10,7%, con il Sud stabilmente sopra.",
+  "spunto": "È l'indicatore dei lavoratori poveri, chi ha un impiego ma guadagna troppo poco per uscire dalla fragilità. Si concentra al Sud, dove al problema di trovare lavoro si somma quello della sua qualità retributiva. La Multiscopo lo tratta come descrittivo, dato che la soglia di bassa paga è convenzionale, ma il fenomeno è concreto. Il lavoro è ancora una garanzia contro la povertà?",
+  "limite": "Definisce la bassa paga con una soglia convenzionale sulla retribuzione oraria, che non tiene conto delle ore lavorate né del reddito familiare complessivo. Non dice se la bassa paga sia temporanea o duratura, né distingue giovani all'inizio e lavoratori adulti.",
+  "fonti": []
+ },
+ "bes:03LAV006-N25": {
+  "attacco": "Molti laureati fanno un lavoro che non richiede la laurea. La quota di sovraistruiti tra gli occupati con titolo terziario va dal 18,3% della Lombardia al 28,3% delle Marche. La media delle regioni è del 22,3%, e la geografia non è la solita Nord-Sud.",
+  "spunto": "La sovraistruzione misura uno spreco diverso: non la mancanza di lavoro, ma il suo cattivo abbinamento con le competenze. Le grandi regioni industriali, con più lavori qualificati, assorbono meglio i laureati. Alcune regioni piccole e del Centro, con un'economia meno complessa, li impiegano sotto il loro livello. Il capitale umano c'è, ma resta sottoutilizzato. Formare più laureati serve se poi il lavoro non li usa?",
+  "limite": "Confronta il titolo di studio con la professione svolta secondo una classificazione standard, che semplifica realtà complesse. Non coglie le competenze reali, spesso diverse dal titolo, né se la sovraistruzione sia una fase iniziale o una condizione stabile.",
+  "fonti": []
+ },
+ "bes:03LAV007": {
+  "attacco": "Il lavoro può ferire e uccidere, in modo diseguale. Il tasso di infortuni gravi e mortali va da 8 ogni diecimila occupati in Piemonte a 17,8 in Umbria. La media delle regioni è del 12,4, e la mappa non ricalca quella dell'occupazione.",
+  "spunto": "Gli infortuni dipendono soprattutto da come è fatto il lavoro di un territorio: agricoltura, edilizia e manifattura pesante rischiano più dei servizi. Per questo alcune regioni piccole e industriali stanno in alto, e l'indicatore è descrittivo, senza un verso che dipenda dalla virtù di una regione. Il calo di lungo periodo c'è, ma ogni infortunio grave resta un fallimento. Quanti di questi eventi sono davvero incidenti e quanti rischi accettati?",
+  "limite": "Rapporta gli infortuni gravi agli occupati, ma risente della struttura produttiva e della sotto-denuncia in alcuni settori. Non conta gli infortuni lievi né le malattie professionali, che emergono anni dopo e sfuggono a questa misura.",
+  "fonti": []
+ },
+ "bes:03LAV008": {
+  "attacco": "Una parte del lavoro sfugge alle regole. La quota di occupati non regolari va dal 7% del Veneto al 17% della Calabria. La media delle regioni è del 10,2%, con il Mezzogiorno stabilmente sopra e il Nord-Est sotto la soglia dell'8%.",
+  "spunto": "Il lavoro irregolare è la zona d'ombra del mercato: niente contratto, niente tutele, spesso paghe più basse. Si concentra al Sud e in alcuni settori, dall'agricoltura ai servizi alla persona, dove il confine con il nero è sottile. È un indicatore descrittivo, ma pesa su diritti, gettito e concorrenza tra imprese. Quanta parte del divario di lavoro tra Nord e Sud si nasconde nel sommerso?",
+  "limite": "È una stima, per definizione incerta, di un fenomeno che si sottrae alla misura diretta. Non distingue il lavoro del tutto in nero da quello solo in parte irregolare, e la sua reale estensione è probabilmente sottovalutata.",
+  "fonti": []
+ },
+ "bes:03LAV013-N22": {
+  "attacco": "La paura di perdere il lavoro è oggi bassa e in forte calo, più che dimezzata in pochi anni. Riguarda in media il 2,6% degli occupati, dall'1,5% del Lazio al 4,2% della Calabria. Anche qui il Sud avverte più insicurezza.",
+  "spunto": "È una misura soggettiva, la percezione del rischio di perdere l'impiego, e non coincide con la sua probabilità reale. Che sia più alta al Sud, dove il lavoro è oggettivamente più fragile, mostra un raro allineamento tra dato e percezione. Il forte calo recente segue il buon andamento dell'occupazione, ma la sicurezza percepita resta sensibile agli umori del momento. La fiducia nel proprio lavoro anticipa o segue i fatti?",
+  "limite": "Rileva un timore dichiarato, non un rischio effettivo di licenziamento. Riguarda i soli occupati, quindi non dice nulla di chi un lavoro non ce l'ha, e può muoversi con il clima generale più che con la situazione individuale.",
+  "fonti": []
+ },
+ "bes:03LAV014-N22": {
+  "attacco": "Non tutto il part time è una scelta. La quota di chi lavora a orario ridotto pur volendo il tempo pieno va dal 5,4% del Trentino Alto Adige al 12,4% della Sardegna. La media delle regioni è dell'8,2%, in calo negli ultimi anni.",
+  "spunto": "Il part time involontario è lavoro a metà, spesso subìto, che nasconde disoccupazione e colpisce soprattutto le donne e il Sud. Un tasso di occupazione alto può contenere molto lavoro parziale non voluto, che gonfia i numeri senza dare reddito pieno. Per questo va letto accanto all'occupazione, come correttivo della sua qualità. Meglio un lavoro a metà o nessun lavoro?",
+  "limite": "Conta chi dichiara di volere più ore, quindi dipende anche da come le persone valutano la propria disponibilità. Non misura di quante ore si tratti né da quanto tempo dura la condizione, elementi che cambiano il peso reale del fenomeno.",
+  "fonti": []
+ },
+ "bes:03LAV021-N22": {
+  "attacco": "Il lavoro da casa è cresciuto molto, di quasi la metà in pochi anni, ma resta appannaggio di poche regioni. Nel Lazio riguarda il 12,9% degli occupati, in Lombardia l'11%, mentre in Puglia si ferma al 3,2%. La media delle regioni è del 7%.",
+  "spunto": "Lavorare da casa dipende dal tipo di lavoro, non dalla volontà: uffici, servizi avanzati e professioni qualificate si prestano, agricoltura, manifattura e servizi alla persona no. Per questo il fenomeno si concentra nelle grandi regioni urbane e terziarie, e resta marginale dove prevalgono altri mestieri. È un indicatore descrittivo, che fotografa la struttura del lavoro più che una conquista di flessibilità. Il lavoro da casa è un privilegio o una caratteristica di certi mestieri?",
+  "limite": "Conta chi lavora da casa in modo abituale, senza distinguere lo smart working strutturato dal lavoro portato a casa la sera. Non dice se sia una scelta o un obbligo, né misura i suoi effetti su produttività, tempi di vita e isolamento.",
+  "fonti": []
+ },
+ "bes:03LAV022-N22": {
+  "attacco": "Quanto piace il proprio lavoro cambia con la geografia. La soddisfazione per il lavoro svolto va dal 38,2% degli occupati in Campania al 56,7% del Trentino Alto Adige. La media delle regioni è del 48%, con il Nord davanti e il Sud in coda anche qui.",
+  "spunto": "La soddisfazione lavorativa unisce condizioni oggettive e percezione: stabilità, salario, orari, ma anche attese e alternative disponibili. Non a caso è più alta dove il lavoro è più stabile e meglio pagato, e più bassa dove è precario e sottopagato. Resta però un giudizio, che due persone nello stesso impiego possono dare in modo opposto. Un lavoro soddisfacente è un buon lavoro o un lavoratore che si accontenta?",
+  "limite": "È una misura soggettiva, esposta alle attese e al confronto con ciò che si conosce. Non distingue quali aspetti del lavoro soddisfino, dal reddito all'ambiente, e chi ha poche alternative può dichiararsi soddisfatto di condizioni comunque difficili.",
+  "fonti": []
+ },
+ "901": {
+  "attacco": "Il PIL per abitante misura la ricchezza prodotta in un territorio, e divide l'Italia in due. In Trentino Alto Adige sfiora i 54.600 euro a testa, in Lombardia i 50.400, mentre in Calabria si ferma a 21.700, meno della metà. La media delle regioni è di circa 35.700 euro.",
+  "spunto": "Un PIL pro capite alto dice quanto si produce, non quanto arriva nelle tasche delle persone, e comprende profitti, imposte e ricchezza che può lasciare il territorio. La distanza di oltre due volte tra Nord e Sud è tra le più ampie d'Europa dentro uno stesso Paese. È cresciuto ovunque nei decenni, ma il divario relativo è rimasto. Produrre di più significa vivere meglio, o dipende da come quella ricchezza si distribuisce?",
+  "limite": "Rapporta la produzione agli abitanti, non ai lavoratori, quindi risente anche di quanti lavorano. Non dice come la ricchezza è distribuita tra le persone, né quanta ne resta davvero ai residenti dopo imposte e trasferimenti.",
+  "fonti": []
+ },
+ "902": {
+  "attacco": "Più del PIL conta quanto le famiglie hanno davvero da spendere. Il reddito disponibile per abitante va dai 16.800 euro della Calabria ai 29.300 del Trentino Alto Adige. La media delle regioni è di circa 22.500, e il divario, meno ampio di quello del PIL, resta netto.",
+  "spunto": "Questo è il reddito che resta alle famiglie dopo imposte e trasferimenti pubblici, il più vicino alla vita quotidiana. Il divario Nord-Sud si restringe rispetto al PIL, segno che la redistribuzione avvicina un po' i territori, senza però annullarne le distanze. Va poi confrontato con il costo della vita, diverso tra aree, che cambia il potere d'acquisto reale. Lo stesso reddito vale ovunque allo stesso modo?",
+  "limite": "È una media per abitante, quindi nasconde le disuguaglianze interne a ogni regione e non distingue redditi alti e bassi. Non tiene conto del diverso costo della vita, che al Sud in parte compensa i redditi più bassi.",
+  "fonti": []
+ },
+ "903": {
+  "attacco": "Il valore aggiunto per abitante è la ricchezza netta creata dall'economia di un territorio, molto simile al PIL. Va dai 19.500 euro della Calabria ai 48.700 del Trentino Alto Adige, con una media delle regioni di circa 31.900. Il divario Nord-Sud supera anche qui le due volte.",
+  "spunto": "Rispetto al PIL, il valore aggiunto toglie le imposte sui prodotti e misura più da vicino ciò che imprese e lavoratori generano. Il risultato però non cambia la mappa: la ricchezza si crea soprattutto al Nord, in un tessuto produttivo più denso e specializzato. Misura la capacità di un'economia di generare valore, non come quel valore si ripartisce. Un territorio che produce poco valore è povero o solo meno industrializzato?",
+  "limite": "Come il PIL, rapporta la ricchezza prodotta agli abitanti, non ai lavoratori, e non dice nulla sulla sua distribuzione. Un valore aggiunto alto può convivere con salari bassi se i profitti pesano molto.",
+  "fonti": []
+ },
+ "904": {
+  "attacco": "Misurato per unità di lavoro, e non per abitante, il valore aggiunto racconta la produttività: quanto genera in media chi lavora. Qui il divario si stringe, dai 57.100 euro della Calabria agli 88.500 della Lombardia. La media delle regioni è di circa 70.600 euro per lavoratore.",
+  "spunto": "Rapportare la ricchezza ai lavoratori, e non alla popolazione, toglie di mezzo l'effetto dell'occupazione e mostra un divario molto più contenuto. Significa che gran parte della distanza Nord-Sud dipende da quante persone lavorano, più che da quanto rendono quando lavorano. Chi ha un impiego al Sud non è così meno produttivo, ma è più raro averlo. Il problema del Mezzogiorno è la produttività o l'occupazione?",
+  "limite": "Misura il valore aggiunto per unità di lavoro, quindi risente della composizione settoriale, dato che industria e servizi avanzati rendono più dell'agricoltura. Non è un indicatore di salari, e un'alta produttività non garantisce retribuzioni alte.",
+  "fonti": []
+ },
+ "905": {
+  "attacco": "Quanto rende un anno di lavoro dipendente cambia con la regione. La retribuzione media per unità di lavoro va dai 33.300 euro della Calabria ai 48.800 della Lombardia. La media delle regioni è di circa 40.400, e il divario, il più contenuto tra gli indicatori di reddito, resta reale.",
+  "spunto": "I salari sono più uniformi della ricchezza prodotta, in parte per i contratti nazionali che fissano minimi uguali ovunque. Ma la distanza esiste, e nasce da settori, dimensione delle imprese e qualifiche diverse tra Nord e Sud. Un divario salariale di quindicimila euro l'anno pesa sul risparmio, sull'acquisto della casa e sulle pensioni future, e si accumula lungo tutta la vita lavorativa. Lavori uguali sono pagati uguali in tutta Italia?",
+  "limite": "È una media per unità di lavoro dipendente, che non distingue settori, qualifiche e ore lavorate. Non include il lavoro autonomo né i redditi da capitale, e non tiene conto del costo della vita che erode diversamente i salari.",
+  "fonti": []
+ },
+ "906": {
+  "attacco": "Prima che imposte e trasferimenti entrino in gioco, il reddito primario per abitante misura quanto le famiglie ottengono dal mercato, tra lavoro, capitale e impresa. Va dai 15.300 euro della Calabria ai 33.600 del Trentino Alto Adige. La media delle regioni è di circa 24.100.",
+  "spunto": "È il reddito grezzo, prima dell'intervento pubblico, e qui il divario Nord-Sud è più ampio che nel reddito disponibile. La differenza tra i due misura quanto la redistribuzione avvicina i territori: molto, ma non abbastanza da colmare la distanza di partenza. Il mercato, da solo, allarga le distanze che poi lo Stato riduce in parte. Quanto del divario Nord-Sud nasce dal mercato e quanto resta dopo l'intervento pubblico?",
+  "limite": "Misura i redditi di mercato per abitante prima di imposte e prestazioni, quindi non descrive le condizioni finali delle famiglie. È una media che nasconde le disuguaglianze interne e non tiene conto del costo della vita locale.",
+  "fonti": []
+ },
+ "907": {
+  "attacco": "Questo indicatore mostra chi versa e chi riceve. Il saldo tra prestazioni sociali ricevute e imposte pagate per abitante è negativo in Lombardia, meno 5.400 euro, e in Emilia-Romagna, meno 3.900, mentre è positivo in Calabria, più 1.500, e Sicilia. La media delle regioni è negativa, intorno a meno 1.600.",
+  "spunto": "È la fotografia della redistribuzione tra territori: le regioni ricche del Nord versano più di quanto ricevono, quelle del Sud il contrario. Non è un giudizio, ma il funzionamento di uno Stato che raccoglie dove c'è più reddito e sostiene dove ce n'è meno. Il segno del saldo dipende dal reddito di partenza, quindi va letto insieme al reddito primario, non da solo. La solidarietà tra territori si misura o si racconta?",
+  "limite": "È un saldo medio per abitante, che non dice come imposte e prestazioni si distribuiscono tra le persone dentro ogni regione. Non misura l'efficienza della spesa pubblica né la qualità dei servizi ottenuti in cambio dei contributi versati.",
+  "fonti": []
+ },
+ "bes:04BEC001": {
+  "attacco": "Nel sistema BES il reddito disponibile pro capite misura il benessere economico delle famiglie. Va dai 16.800 euro della Calabria ai 29.300 del Trentino Alto Adige, con una media delle regioni di circa 22.500. È lo stesso divario che percorre tutti gli indicatori di reddito.",
+  "spunto": "Il BES lo classifica come descrittivo, senza un verso automatico, dato che un reddito medio alto non dice come sia distribuito: due regioni con lo stesso valore possono avere una classe media ampia oppure pochi ricchi e molti poveri. Va quindi letto insieme agli indici di disuguaglianza e di povertà, che raccontano l'altra metà della storia. Il reddito medio misura il benessere di una regione o solo la sua media?",
+  "limite": "È una media per abitante, cieca alle disuguaglianze interne e al diverso costo della vita. Coincide con l'indicatore dei conti economici territoriali, quindi non aggiunge informazione a quello, ma lo inquadra nel sistema del benessere.",
+  "fonti": []
+ },
+ "930": {
+  "attacco": "La disuguaglianza dei redditi è più alta dove i redditi sono più bassi. L'indice di Gini, che va da 0 a 1, tocca 0,345 in Sicilia, 0,343 in Campania e 0,342 in Calabria, mentre in Basilicata e Trentino Alto Adige scende sotto 0,27. La media delle regioni è 0,30.",
+  "spunto": "Il Sud somma due svantaggi: redditi medi più bassi e distribuiti in modo più diseguale. Dove il lavoro scarseggia, e informalità e sussidi pesano di più, la forbice tra chi ha e chi non ha si allarga. La disuguaglianza è in leggero calo, ma resta un tratto strutturale. Ridurre la povertà del Sud significa anche ridurre le distanze al suo interno, non solo verso il Nord. La disuguaglianza è un problema tra territori o dentro i territori?",
+  "limite": "L'indice di Gini riassume in un numero l'intera distribuzione, quindi può restare uguale mentre cambiano gli estremi. Esclude i fitti imputati e si basa su redditi dichiarati, e non dice chi siano i più ricchi e i più poveri di una regione.",
+  "fonti": []
+ },
+ "bes:04BEC002": {
+  "attacco": "Un altro modo di misurare la disuguaglianza confronta i più ricchi con i più poveri. In Calabria il 20% più ricco guadagna 5,9 volte il 20% più povero, in Sicilia 5,7, mentre in Basilicata il rapporto scende a 3,5. La media delle regioni è di 4,5 volte.",
+  "spunto": "Rispetto al Gini, questo indice guarda solo le due code, e racconta la stessa geografia: il Sud più diseguale, il Nord-Est più compatto. Un rapporto di quasi sei volte significa mondi lontani nello stesso territorio, con effetti su coesione, fiducia e opportunità dei figli. La Multiscopo lo tratta come descrittivo, ma è tra le misure più intuitive della distanza sociale. Cinque volte tra ricchi e poveri è tanto o è normale?",
+  "limite": "Confronta solo il quinto più ricco e il quinto più povero, ignorando cosa accade in mezzo. Si basa su redditi dichiarati e non coglie la ricchezza accumulata, spesso più concentrata del reddito annuale.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SPESA_GINI": {
+  "attacco": "Guardando i consumi invece dei redditi, la disuguaglianza cambia mappa. L'indice di Gini della spesa è più alto in Trentino Alto Adige, 0,351, e in Molise, 0,337, più basso in Veneto e Basilicata, sotto 0,28. La media delle regioni è di circa 0,30.",
+  "spunto": "La disuguaglianza nei consumi è di solito più bassa di quella nei redditi, dato che anche chi guadagna poco deve spendere per vivere, e chi guadagna molto non consuma tutto. Che il Trentino Alto Adige, ricco e con redditi compatti, mostri una spesa diseguale ricorda come reddito e consumo raccontino cose diverse. Misura le distanze nel tenore di vita più che nelle entrate. Conta di più la disuguaglianza di ciò che si guadagna o di ciò che si spende?",
+  "limite": "Misura la concentrazione della spesa per consumi, che risponde più lentamente del reddito ai cambiamenti economici. Non distingue la spesa necessaria da quella voluttuaria, e una spesa diseguale può nascere sia da redditi diversi sia da scelte diverse.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_SPESA_INTERQUINTILE": {
+  "attacco": "Il rapporto tra la spesa del quinto di famiglie che spende di più e quello che spende di meno va da 3,8 volte in Veneto a 5,6 in Trentino Alto Adige. La media delle regioni è di 4,5 volte. Anche nei consumi, quindi, la distanza tra estremi non è piccola.",
+  "spunto": "È il gemello, sui consumi, del rapporto tra redditi, e conferma che le distanze nel tenore di vita restano ampie ovunque, anche dove i redditi sembrano compatti. Guardare la spesa aiuta a cogliere il benessere reale meglio del reddito dichiarato, spesso sottostimato. Ma un divario nei consumi può riflettere anche scelte e prezzi diversi, non solo diseguaglianza. Chi spende il triplo vive tre volte meglio?",
+  "limite": "Confronta solo il quinto che spende di più e quello che spende di meno, tralasciando il centro della distribuzione. Non tiene conto dei prezzi locali né del risparmio, e una spesa bassa può nascere da povertà o da parsimonia.",
+  "fonti": []
+ },
+ "285": {
+  "attacco": "Questo indicatore conta in valore assoluto le persone a rischio di povertà o esclusione sociale, quindi rispecchia soprattutto la dimensione delle regioni. In Campania sono oltre 2,4 milioni, in Sicilia quasi 2 milioni, mentre in Valle d'Aosta sono circa 13.000. La media delle regioni supera le 670.000 persone.",
+  "spunto": "Un conteggio assoluto non serve a stabilire dove si stia peggio: le regioni popolose avranno sempre più poveri di quelle piccole, a parità di condizioni. Per confrontare i territori servono le percentuali, non i totali, ed è per questo che l'indicatore è descrittivo. Il suo valore è un altro, ricordare quante persone, in numeri reali, questa condizione tocca in ciascun territorio. Contano di più le proporzioni o le persone in carne e ossa?",
+  "limite": "Essendo un totale, non è confrontabile tra regioni di dimensioni diverse e non indica dove il rischio sia più diffuso. Va affiancato agli indici in percentuale, e non distingue la povertà di reddito dall'esclusione sociale, che il criterio europeo somma.",
+  "fonti": []
+ },
+ "631": {
+  "attacco": "La povertà relativa colpisce in media il 14,7% delle persone, ma la media inganna. La mediana è più bassa, al 12,2%, mentre in Puglia la quota sale al 29,1%, in Calabria al 28,1%, contro il 5% della Valle d'Aosta. Quasi sei volte tra la prima e l'ultima regione.",
+  "spunto": "La povertà relativa misura chi vive sotto una soglia legata al tenore di vita medio del Paese, quindi fotografa le distanze più che la miseria assoluta. Al Sud riguarda quasi una persona su tre, un livello che segna intere comunità, non solo individui. A differenza di molti indicatori sociali, non è in calo. Combattere questa povertà è ridurre un numero o cambiare la struttura di un'economia?",
+  "limite": "Usa una soglia relativa nazionale, quindi non tiene conto del diverso costo della vita tra Nord e Sud, che ne attenua in parte il divario. Non misura l'intensità della povertà, cioè quanto si sta sotto la soglia, né la sua durata.",
+  "fonti": []
+ },
+ "371": {
+  "attacco": "Vivere in una casa sovraffollata, senza alcuni servizi o con problemi strutturali, riguarda in media il 5% delle persone. Le quote più alte sono nel Lazio, 8,8%, in Campania, 8,2%, e in Puglia, mentre in Abruzzo e Friuli-Venezia Giulia scendono sotto il 2,8%. Il fenomeno è quasi dimezzato in vent'anni.",
+  "spunto": "La deprivazione abitativa mescola spazio, servizi e stato della casa, e sorprende trovare il Lazio in testa insieme alla Campania: pesano le grandi città, dove i costi alti costringono a case piccole e affollate. È una povertà meno visibile del reddito, ma incide su salute, studio dei figli e vita quotidiana. Il calo di lungo periodo è netto. La casa è tornata a essere un fattore di disuguaglianza?",
+  "limite": "Somma condizioni diverse, dal sovraffollamento ai problemi strutturali, in un unico indice che non dice quale prevalga. Non misura il costo dell'abitare né la difficoltà di accedere a una casa, che nelle città pesa quanto la sua qualità.",
+  "fonti": []
+ },
+ "102": {
+  "attacco": "Lasciare la scuola presto, con al più la licenza media, riguarda in media il 9,5% dei giovani tra 18 e 24 anni. In Sicilia sale al 15,2%, in Sardegna al 14,5%, mentre in Molise scende al 4,8%. Il fenomeno è calato di oltre un quarto negli ultimi anni.",
+  "spunto": "L'abbandono precoce è la porta d'ingresso di molte disuguaglianze: chi lascia presto la scuola ha più probabilità di finire tra i NEET, in lavori precari o in povertà. Si concentra dove il contesto economico è più fragile, in un legame stretto tra istruzione e reddito. Il calo recente avvicina l'Italia all'Europa, ma il divario interno resta. Si lascia la scuola per scelta o per un contesto che non premia lo studio?",
+  "limite": "Conta chi ha al più la licenza media e non è in formazione, quindi risente anche dell'offerta formativa locale. Non distingue chi abbandona per lavorare da chi si perde del tutto, e non cattura chi riprende gli studi più tardi.",
+  "fonti": []
+ },
+ "bes:04BEC020": {
+  "attacco": "Quante famiglie giudicano peggiorata la propria situazione economica? In media il 25,6%, con valori più alti in Veneto, 30,9%, e Piemonte, 29,4%, e più bassi in Campania, 20%, e Basilicata. La geografia non ricalca quella dei redditi, e alcune regioni ricche del Nord appaiono più pessimiste di altre più povere.",
+  "spunto": "È un giudizio soggettivo sul cambiamento, non una misura del livello di reddito, e per questo la mappa sorprende: regioni ricche del Nord avvertono più peggioramento di alcune del Sud. Le famiglie valutano rispetto a ciò che avevano, non su una scala assoluta, quindi chi parte più in alto sente di più le perdite. Il forte calo recente segue il miglioramento del clima economico. La percezione del proprio bilancio segue i fatti o le attese?",
+  "limite": "Rileva una percezione di peggioramento, non la situazione economica reale delle famiglie. Dipende dalle attese e dal punto di partenza, e due famiglie con lo stesso reddito possono giudicarlo in modo opposto.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ABIT_AFFITTO": {
+  "attacco": "Vivere in affitto è più comune di quanto la retorica della casa di proprietà suggerisca, ma non ovunque. In Campania riguarda il 24,2% delle famiglie, in Piemonte il 22,9%, mentre in Basilicata scende al 7,7%. La media delle regioni è del 15,7%.",
+  "spunto": "L'affitto non ha un verso migliore o peggiore: può segnalare mercati dinamici e mobilità, come nelle grandi città del Nord, oppure fragilità di chi non riesce ad accedere alla proprietà. Che compaiano insieme in testa Campania e Piemonte mostra queste due anime. Per le famiglie a basso reddito l'affitto è spesso la spesa che pesa di più. La casa in affitto è una scelta di flessibilità o un ripiego?",
+  "limite": "Conta le famiglie in affitto, senza distinguere l'affitto di mercato da quello agevolato o pubblico. Non dice quanto pesi il canone sul reddito, né distingue chi affitta per scelta da chi non può comprare.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ABIT_AFFOLLAMENTO": {
+  "attacco": "Quante persone vivono per ogni cento metri quadri di casa? In media 2,4, un dato piuttosto uniforme: si va dai 2,2 di Friuli-Venezia Giulia, Umbria e Molise ai 2,9 della Campania. Il Trentino Alto Adige, pur ricco, è tra i più affollati, a 2,6.",
+  "spunto": "L'affollamento intreccia dimensione delle case, numero di componenti e costo degli spazi. Che il Trentino Alto Adige stia in alto ricorda che non è solo un fatto di reddito: contano anche prezzi immobiliari e famiglie più numerose. In Campania si somma invece il peso di case piccole e nuclei ampi. Un dato uniforme nasconde queste storie diverse. Vivere stretti è una questione di soldi o di spazio disponibile?",
+  "limite": "Misura i componenti per cento metri quadri, non la qualità o la funzionalità degli spazi. Non dice se l'affollamento sia scelto o subìto, e una casa piccola ma ben distribuita può risultare più vivibile di una grande mal organizzata.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ABIT_PROPRIETA": {
+  "attacco": "L'Italia è un Paese di proprietari di casa: in media possiede l'abitazione l'84,3% delle famiglie. La quota va dal 75,8% della Campania al 92,3% della Basilicata, con differenze contenute. Anche dove si possiede di meno, la maggioranza è padrona di casa.",
+  "spunto": "La casa di proprietà è la principale forma di ricchezza delle famiglie italiane, e le regioni del Sud e le isole, pur più povere di reddito, ne hanno molte. È un patrimonio che protegge, ma anche un capitale immobile, difficile da usare e da lasciare quando il lavoro chiama altrove. Alta proprietà e bassa mobilità spesso vanno insieme. Possedere casa è sempre un vantaggio o a volte un'ancora?",
+  "limite": "Conta le famiglie proprietarie, non il valore né lo stato delle abitazioni. Una casa di proprietà in un'area che si spopola può valere poco e vincolare chi la possiede, aspetti che la sola percentuale non mostra.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ABIT_SPESA_EURO": {
+  "attacco": "Quanto costa tenere la casa cambia molto con il territorio. La spesa media mensile per l'abitazione va dai 244 euro della Calabria ai 426 della Lombardia. La media delle regioni è di circa 331 euro, ed è cresciuta negli ultimi anni.",
+  "spunto": "La spesa più alta al Nord riflette prezzi immobiliari e costi dei servizi maggiori, non un tenore di vita per forza migliore. Da sola dice poco: 400 euro pesano diversamente su un reddito alto o basso. Va quindi letta insieme al reddito, per capire quanto l'abitare erode il bilancio familiare. Una casa costosa è un lusso o un costo obbligato di dove si vive?",
+  "limite": "È una media in euro correnti, che non tiene conto del diverso costo della vita né distingue affitto, mutuo e utenze. Non dice quanto pesi sul reddito, il dato che davvero misura lo sforzo delle famiglie.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ABIT_SPESA_REDDITO": {
+  "attacco": "Rapportata al reddito, la spesa per la casa racconta lo sforzo reale delle famiglie. Ogni 100 euro di reddito se ne vanno per l'abitazione 12 in Liguria, 11,6 in Campania, contro 8,6 nelle Marche. La media delle regioni è di circa 10,2 euro su 100.",
+  "spunto": "Qui la mappa si riequilibra: la Campania, che spende poco in valore assoluto, è tra le regioni dove la casa pesa di più sul reddito, dato che i redditi sono bassi. È la misura più onesta del costo dell'abitare, quella che conta per chi arriva a fine mese. Un peso alto lascia meno spazio a tutto il resto, dal cibo alla salute. Quanto reddito può assorbire la casa prima di diventare un problema?",
+  "limite": "Rapporta la spesa abitativa al reddito medio, quindi risente della qualità delle stime di entrambi. Non distingue proprietari con mutuo, proprietari senza mutuo e affittuari, per i quali il peso della casa è molto diverso.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ABIT_UMIDITA": {
+  "attacco": "Case con problemi di umidità sono più diffuse di quanto si pensi: riguardano in media il 16,2% delle famiglie. Le quote più alte sono in Sardegna, 25,7%, Friuli-Venezia Giulia, 21,1%, e Abruzzo, mentre in Campania e Basilicata scendono sotto il 12%. Il dato è cresciuto molto negli ultimi anni.",
+  "spunto": "L'umidità è un difetto concreto, che tocca salute e comfort, e la sua mappa non segue la ricchezza: compare più al Nord-Est e nelle isole che nel Sud continentale. Contano clima, età del patrimonio edilizio e manutenzione, non solo il reddito delle famiglie. L'aumento recente merita attenzione, tra edifici che invecchiano e climi che cambiano. La qualità della casa conta meno del semplice possederla?",
+  "limite": "Rileva la presenza dichiarata di umidità, non la sua gravità o estensione. Dipende anche dalla sensibilità di chi risponde, e non distingue un problema passeggero da un difetto strutturale dell'edificio.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_DISAGIO_FACILITA": {
+  "attacco": "Arrivare a fine mese con facilità è un privilegio di pochi. Ci riesce il 17,8% delle famiglie in Trentino Alto Adige, il 15,6% in Valle d'Aosta, ma solo il 3% in Calabria. La media delle regioni è del 9%, e il divario tra la prima e l'ultima è di quasi sei volte.",
+  "spunto": "Questo indicatore misura l'agio economico percepito, il rovescio del disagio: quante famiglie non solo non faticano, ma vivono con margine. Che in Calabria sia una su trenta e in Trentino quasi una su cinque riassume in un numero la distanza tra le due Italie. È in netto miglioramento ovunque, forse anche per effetto dei sostegni recenti. Vivere con agio dipende dal reddito o dal saperlo gestire?",
+  "limite": "È un giudizio soggettivo sulla propria condizione, sensibile alle attese e al tenore di vita di riferimento. Non misura il reddito reale, e la stessa cifra può nascere da situazioni economiche diverse.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_DISAGIO_IMPREVISTI": {
+  "attacco": "Non riuscire a far fronte a una spesa imprevista è la misura più usata della fragilità economica. Riguarda in media il 26% delle famiglie, ma in Calabria quasi la metà, il 47,5%, in Puglia il 43,7%, contro il 10,5% del Trentino Alto Adige. Il dato è in calo.",
+  "spunto": "Chi non può affrontare una spesa improvvisa, una riparazione, una bolletta straordinaria, vive senza rete: basta un contrattempo per finire nei debiti. Al Sud tocca quasi una famiglia su due, un livello che rende fragili intere comunità, non solo i più poveri. Il calo recente è incoraggiante, ma parte da soglie altissime. Quanto è vicina alla povertà una famiglia che non ha risparmi per un imprevisto?",
+  "limite": "Fissa convenzionalmente l'importo della spesa imprevista, uguale per tutti, senza adattarlo al costo della vita locale. Rileva una difficoltà dichiarata in un momento, che può cambiare in fretta con il reddito e con i sostegni pubblici.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_DISAGIO_RISPARMIO": {
+  "attacco": "Metà delle famiglie italiane non riesce a mettere da parte nulla. In media non risparmia il 47,5%, ma in Calabria e Sicilia oltre il 61%, contro il 27% del Trentino Alto Adige. Anche nelle regioni migliori, un terzo delle famiglie non risparmia.",
+  "spunto": "Il risparmio è la differenza tra sopravvivere e costruire un futuro: chi non riesce a mettere da parte non può assorbire gli shock né investire su casa e figli. Al Sud non risparmiano quasi due famiglie su tre, un dato che frena la mobilità sociale tra generazioni. È in calo, ma resta altissimo ovunque. Un Paese che non risparmia sta consumando il suo futuro o solo il suo margine?",
+  "limite": "Registra chi dichiara di non riuscire a risparmiare, senza misurare quanto gli altri mettano da parte. Non distingue chi non risparmia per necessità da chi sceglie di spendere tutto, e non coglie il risparmio già accumulato in passato.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_REDD_MEDIANO": {
+  "attacco": "Il reddito netto della famiglia a metà della scala va dai 29.400 euro l'anno della Sicilia ai 47.000 del Trentino Alto Adige. La media delle regioni è di circa 37.500. Tra la famiglia mediana del Sud e quella del Nord ci sono oltre quindicimila euro l'anno.",
+  "spunto": "Il reddito mediano è più affidabile della media per capire come vive la famiglia comune, dato che non è gonfiato dai pochi redditi altissimi. La distanza tra Nord e Sud resta ampia, ma va confrontata con il costo della vita, più basso al Sud, che ne attenua una parte. Un reddito familiare più alto non significa sempre più benessere individuale, se le famiglie sono più numerose. La famiglia tipo del Sud è più povera o solo diversamente ricca?",
+  "limite": "È il reddito della famiglia mediana, non della persona, quindi risente della dimensione dei nuclei. Non tiene conto del costo della vita locale né della ricchezza posseduta, e non dice nulla sulle famiglie agli estremi della distribuzione.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_REDD_MEDIO": {
+  "attacco": "Il reddito netto medio delle famiglie va dai 34.700 euro della Calabria ai 55.300 del Trentino Alto Adige. La media delle regioni è di circa 44.500, più alta del reddito mediano, segno che i redditi più elevati tirano su la media.",
+  "spunto": "La distanza tra reddito medio e mediano è essa stessa una misura di disuguaglianza: dove la media supera di molto la mediana, pochi redditi alti pesano tanto. Il reddito medio è utile per i confronti, ma racconta un'Italia più ricca di quella in cui vive la famiglia tipica. Va quindi letto accanto al mediano e agli indici di disuguaglianza. La media descrive le famiglie o le nasconde dietro un numero?",
+  "limite": "È una media, quindi sensibile ai redditi più alti e meno rappresentativa della famiglia comune. Non considera il costo della vita né la dimensione dei nuclei, e nasconde le distanze interne a ogni regione.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_REDD_FONTE_LAVDIP": {
+  "attacco": "Da dove arriva il reddito delle famiglie cambia con il territorio. Vive soprattutto di lavoro dipendente il 50,6% delle famiglie in Veneto e circa il 50,3% in Emilia-Romagna e Trentino Alto Adige, contro il 33,8% del Molise. La media delle regioni è del 43,4%.",
+  "spunto": "Dove prevale il lavoro dipendente c'è in genere un'economia più industriale e strutturata, con redditi più stabili. Al Sud la quota è più bassa, e a compensare sono lavoro autonomo, pensioni e trasferimenti pubblici. Non è un verso migliore o peggiore, ma la fotografia di due modelli economici diversi. Un reddito da stipendio è più sicuro di uno da impresa o da sussidio?",
+  "limite": "Classifica le famiglie per la fonte principale di reddito, senza misurarne l'ammontare. Non distingue un lavoro dipendente stabile da uno precario, e una quota bassa può nascere da più lavoro autonomo come da più pensioni.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_REDD_FONTE_TRASF": {
+  "attacco": "Per molte famiglie la fonte principale di reddito non è il lavoro ma un trasferimento pubblico, pensione o sussidio. Riguarda in media il 41,8% delle famiglie, con punte in Calabria, 49,2%, e Campania, 46,7%, e valori più bassi in Trentino Alto Adige, intorno al 35%.",
+  "spunto": "Una quota alta di redditi da trasferimenti riflette due cose intrecciate: una popolazione più anziana, con molte pensioni, e un mercato del lavoro più debole, con più sussidi. Al Sud si sommano entrambe, e la dipendenza dai trasferimenti diventa strutturale. È un indicatore descrittivo, ma dice quanto un territorio si regge sul lavoro e quanto sul sostegno pubblico. Vivere di trasferimenti è una rete di protezione o un segno di fragilità?",
+  "limite": "Somma pensioni e altri trasferimenti in un'unica voce, senza distinguere il reddito da una vita di lavoro da un sussidio assistenziale. Non ne misura l'importo, e una quota alta può nascere da tanti anziani come da tanti disoccupati.",
+  "fonti": []
+ }
+}

@@ -20,6 +20,7 @@ from app.atlas_catalog import (
 )
 from app import profiles
 from app import indicator_notes
+from app import analyst_notes
 from app import quality_life_bes as qb
 from app import bes_data
 from app import multiscopo_data
@@ -95,6 +96,22 @@ def it_num(value, decimals=1):
     except (TypeError, ValueError):
         return str(value)
     return formatted.replace(",", "§").replace(".", ",").replace("§", ".")
+
+
+@app.template_filter("analyst_html")
+def analyst_html(text):
+    """Render an analyst note (plain prose with inline markdown links) to safe
+    HTML. Strips the single wrapping <p> so the fragment can sit inside an
+    existing <p> in the templates."""
+    import markdown as _markdown
+    from markupsafe import Markup
+
+    if not text:
+        return ""
+    html = _markdown.markdown(str(text), output_format="html5").strip()
+    if html.startswith("<p>") and html.endswith("</p>") and html.count("<p>") == 1:
+        html = html[3:-4]
+    return Markup(html)
 
 
 @cache.memoize(timeout=100)
@@ -310,6 +327,7 @@ def indicator_page(slug):
     response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
+        analyst=analyst_notes.get_analyst_note(meta["id"]),
         values=values,
         best=best,
         worst=worst,
@@ -765,6 +783,7 @@ def quality_life_indicator(indicator_id, slug):
         "quality_life_indicator.html",
         indicator=indicator,
         territory_label=territory_label,
+        analyst=analyst_notes.get_analyst_note(indicator["id"]),
         source_breadcrumb_path="/qualita-della-vita/metodologia#indicatori-bes",
         source_breadcrumb_label="Indicatori BES",
         coverage_note_scope="sia per le regioni sia per le province",
@@ -799,6 +818,7 @@ def quality_life_multiscopo_indicator(indicator_id, slug):
         "quality_life_indicator.html",
         indicator=indicator,
         territory_label=territory_label,
+        analyst=analyst_notes.get_analyst_note(indicator["id"]),
         source_breadcrumb_path="/qualita-della-vita/metodologia",
         source_breadcrumb_label="Indagine Multiscopo",
         coverage_note_scope="per le regioni",
