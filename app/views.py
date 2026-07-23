@@ -482,11 +482,15 @@ def regions_index():
 @app.route("/temi")
 def themes_index():
     areas = _themes_index_areas()
-    total = sum(area["count"] for area in areas)
+    indicators = get_catalog()["indicators"]
+    total = len(indicators)
     return render_template(
         "themes_index.html",
         areas=areas,
         total=total,
+        theme_total=sum(area["theme_count"] for area in areas),
+        year_min=min(item["year_min"] for item in indicators),
+        year_max=max(item["year_max"] for item in indicators),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/temi",
@@ -1509,15 +1513,15 @@ def _home_qol_preview():
     }
 
 
-def _area_leaders(area, matrix, meta):
-    """Region in front and region trailing for a macro-area, as the mean oriented
-    score across the area's scoreable indicators (best = 1.0). Returns
-    (best_name, worst_name), or (None, None) when nothing in the area is
-    scoreable. Purely derived from the data, no placeholder leaders."""
+def _region_leaders(matrix, meta, keep):
+    """Region in front and region trailing over the mean oriented score across
+    the scoreable indicators for which keep(info) is true (best = 1.0). Returns
+    (best_name, worst_name), or (None, None) when nothing matched is scoreable.
+    Purely derived from the data, no placeholder leaders."""
     totals = {}  # region_key -> [sum_oriented, count]
     for ind_id, by_region in matrix.items():
         info = meta.get(ind_id)
-        if not info or info["macro_area"] != area:
+        if not info or not keep(info):
             continue
         direction = info["direction"]
         if direction not in profiles.SCOREABLE_DIRECTIONS:
@@ -1535,6 +1539,16 @@ def _area_leaders(area, matrix, meta):
     if not ranked:
         return None, None
     return profiles.region_name(ranked[0][0]), profiles.region_name(ranked[-1][0])
+
+
+def _area_leaders(area, matrix, meta):
+    """Region in front / trailing for a macro-area."""
+    return _region_leaders(matrix, meta, lambda info: info["macro_area"] == area)
+
+
+def _theme_leaders(theme, matrix, meta):
+    """Region in front / trailing for a single theme."""
+    return _region_leaders(matrix, meta, lambda info: info["theme"] == theme)
 
 
 def _home_themes_preview():
@@ -1559,21 +1573,28 @@ def _home_themes_preview():
 
 
 def _themes_index_areas():
-    """Full '/temi' page: every macro-area with its complete, clickable theme
-    list, the indicator/theme counts, and the region in front / trailing (the
-    same standings as the home teaser)."""
+    """Full '/temi' page: every macro-area with its themes, and for each theme
+    the indicator count plus the region in front / trailing (per-theme
+    standings), matching the design's themes index."""
     matrix = profiles._percentile_matrix()
     meta = profiles._indicator_meta()
     areas = []
     for group in atlas_themes_by_macro_area():
-        best, worst = _area_leaders(group["macro_area"], matrix, meta)
+        themes = []
+        for theme in group["themes"]:
+            lead, lag = _theme_leaders(theme["theme"], matrix, meta)
+            themes.append({
+                "theme": theme["theme"],
+                "path": theme["path"],
+                "indicator_count": theme["indicator_count"],
+                "lead": lead,
+                "lag": lag,
+            })
         areas.append({
             "area": group["macro_area"],
             "count": group["indicator_count"],
             "theme_count": len(group["themes"]),
-            "themes": group["themes"],
-            "best": best,
-            "worst": worst,
+            "themes": themes,
         })
     return areas
 

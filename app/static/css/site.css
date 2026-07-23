@@ -264,9 +264,10 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .page-lead { font-size: 18px; color: var(--ink-soft); max-width: 70ch; margin: 0 0 24px; }
 .page-note { font-size: 13.5px; color: var(--muted); margin: 0 0 14px; }
 .page-intro { font-size: 15.5px; color: var(--ink-soft); max-width: 68ch; margin: 0 0 24px; }
-.theme-group { margin: 0 0 32px; }
-.theme-group h2 { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--grid); }
-.theme-group__count { font-family: var(--font-mono); font-size: 12px; font-weight: 400; color: var(--muted); }
+.theme-group { padding: 0 clamp(16px, 4vw, 48px) clamp(28px, 3vw, 40px); }
+.theme-group__head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.theme-group__head h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(20px, 2.4vw, 26px); letter-spacing: -0.01em; }
+.theme-group__count { font-family: var(--font-mono); font-size: 12px; font-weight: 400; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
 .page-caveat { color: var(--muted); font-size: 15px; border-left: 3px solid var(--line); padding-left: 14px; }
 .indicator-definition,
 .article-indicator-explain {
@@ -958,29 +959,46 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .home-theme-card__ends dd.is-bottom { color: var(--accent); }
 .home-theme-card__go { margin-top: auto; font-family: var(--font-mono); font-size: 11.5px; color: var(--accent); }
 
-/* ---------- Pagina "I temi" (themes_index.html) ---------- */
-.page-themes { display: grid; gap: clamp(22px, 4vw, 38px); }
-.themes-hero { display: grid; gap: 12px; padding: clamp(20px, 4vw, 40px) clamp(16px, 3vw, 28px) clamp(16px, 2.5vw, 24px); border: 1px solid var(--line); background: linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 28px, var(--paper); }
+/* ---------- Pagina "I temi" (themes_index.html) — allineata al design ---------- */
+.themes-index { display: block; }
+.themes-hero { padding: clamp(24px, 4vw, 44px) clamp(16px, 4vw, 48px) clamp(16px, 2vw, 24px); background: linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 100% 28px, var(--paper); border-bottom: 1px solid var(--line); }
 .themes-hero .eyebrow { margin: 0; font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
-.themes-hero h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 5vw, 52px); letter-spacing: -0.015em; line-height: 1; }
-.themes-hero .page-lead { margin: 0; max-width: 62ch; }
-/* Area cards mirror the design's "Temi e aree" treatment (same values as the
-   home-theme-card the home already uses); here the theme names are clickable. */
-.themes-areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; align-items: start; }
-.theme-area { display: grid; gap: 12px; align-content: start; padding: 20px; background: var(--panel); border: 1px solid var(--line); }
-.theme-area__kicker { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
-.theme-area h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.01em; }
-.theme-area__count { margin: 0; color: var(--ink-soft); font-size: 13.5px; }
-.theme-area__count strong { font-family: var(--font-mono); font-size: 14px; color: var(--ink); }
-.theme-area__themes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
-.theme-area__themes a { display: inline-block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); padding: 3px 7px; border: 1px solid var(--grid); transition: border-color 140ms ease, color 140ms ease; }
-.theme-area__themes a:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
-.theme-area__ends { display: grid; gap: 6px; margin: 0; padding: 10px 0 0; border-top: 1px solid var(--grid); }
-.theme-area__ends div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.theme-area__ends dt { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
-.theme-area__ends dd { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 14.5px; text-align: right; }
-.theme-area__ends dd.is-top { color: var(--positive-ink); }
-.theme-area__ends dd.is-bottom { color: var(--accent); }
+.themes-hero h1 { margin: 12px 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(32px, 4.4vw, 58px); line-height: 0.98; letter-spacing: -0.015em; }
+.themes-index .region-hero__sum { margin: 0; max-width: 60ch; color: var(--ink-soft); font-size: clamp(15px, 1.5vw, 18px); line-height: 1.45; }
+
+.facts { display: flex; flex-wrap: wrap; gap: 12px 40px; padding: 18px clamp(16px, 4vw, 48px); border-bottom: 1px solid var(--line); }
+.fact { display: grid; gap: 3px; }
+.fact small { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.fact strong { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+.fact__range { color: var(--muted); font-size: 13px; font-family: var(--font-mono); }
+
+.theme-search { padding: clamp(20px, 3vw, 28px) clamp(16px, 4vw, 48px) clamp(6px, 1.5vw, 12px); max-width: 468px; }
+.search-box { display: flex; align-items: center; gap: 10px; padding: 11px 14px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); }
+.search-box:focus-within { border-color: var(--accent); color: var(--accent); }
+.search-box svg { flex: 0 0 auto; }
+.search-box input { flex: 1; min-width: 0; border: 0; background: transparent; font-family: var(--font-body); font-size: 15px; color: var(--ink); outline: none; }
+.search-box input::placeholder { color: var(--muted); }
+
+.card-empty { margin: 0; padding: 4px clamp(16px, 4vw, 48px) 24px; color: var(--muted); font-size: 14px; }
+
+.theme-index-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.theme-index-card { display: grid; gap: 4px; align-content: start; padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); color: var(--ink); transition: border-color 140ms ease, transform 140ms ease; }
+.theme-index-card:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; }
+.theme-index-card strong { font-family: var(--font-display); font-size: 16px; line-height: 1.2; }
+.theme-index-card small { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.theme-index-card__standing { display: flex; flex-direction: column; gap: 3px; margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--grid); font-family: var(--font-mono); font-size: 11px; color: var(--ink-soft); }
+.theme-index-card__standing span { display: flex; align-items: center; gap: 6px; }
+.dot { width: 6px; height: 6px; border-radius: 999px; flex: 0 0 auto; display: inline-block; }
+.dot--lead { background: #2f8f5b; }
+.dot--lag { background: var(--accent); }
+
+/* Explore band: Quiz CTA on the ink second background */
+.explore-band { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px; margin: 0 clamp(16px, 4vw, 48px); padding: 28px clamp(20px, 3vw, 36px); background: var(--ink); color: var(--paper); }
+.explore-band__text { display: grid; gap: 6px; }
+.explore-band__text small { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(251, 250, 247, 0.7); }
+.explore-band__text strong { font-family: var(--font-display); font-weight: 800; font-size: clamp(20px, 2.4vw, 28px); }
+.explore-band__cta { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; background: var(--accent); color: #fff; font-weight: 700; font-size: 14px; white-space: nowrap; }
+.explore-band__cta:hover { filter: brightness(1.05); text-decoration: none; }
 
 /* Confronta preview */
 .home-compare-panel { background: var(--panel); border: 1px solid var(--line); padding: 20px; display: grid; gap: 18px; }

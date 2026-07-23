@@ -27,30 +27,85 @@
 {% endblock %}
 
 {% block content %}
-<article class="page page-themes wrap-wide">
-  <header class="themes-hero">
-    <p class="eyebrow">Atlante · Temi e aree</p>
+<article class="themes-index">
+  <section class="themes-hero">
+    <p class="eyebrow">Temi</p>
     <h1>I temi</h1>
-    <p class="page-lead">{{ total }} indicatori del catalogo unico Istat, raggruppati per macro-area. Vedi subito chi è avanti e chi resta indietro, poi apri un tema per mappe, classifiche e serie storiche nell'atlante.</p>
-  </header>
+    <p class="region-hero__sum">{{ total }} indicatori del catalogo unico Istat per leggere divari e qualità della vita nelle regioni italiane. Scegli un tema per aprire tutte le serie, con fonte, mappe, classifiche e andamenti negli anni.</p>
+  </section>
 
-  <div class="themes-areas">
+  <div class="facts">
+    <div class="fact"><small>Aree</small><strong>{{ areas | length }}</strong></div>
+    <div class="fact"><small>Temi</small><strong>{{ theme_total }}</strong></div>
+    <div class="fact"><small>Indicatori</small><strong>{{ total }}</strong></div>
+    <div class="fact"><small>Copertura</small><strong>{{ year_min }}<span class="fact__range"> &ndash; {{ year_max }}</span></strong></div>
+  </div>
+
+  <div class="theme-search">
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="search" id="theme-filter" placeholder="Cerca un tema..." autocomplete="off" aria-label="Cerca un tema">
+    </div>
+  </div>
+
+  <p class="card-empty" id="theme-empty" hidden>Nessun tema corrisponde alla ricerca.</p>
+
+  <div id="theme-groups">
     {% for a in areas %}
-    <section class="theme-area" aria-label="{{ a.area }}">
-      <span class="theme-area__kicker">Area</span>
-      <h2>{{ a.area }}</h2>
-      <p class="theme-area__count"><strong>{{ a.count }}</strong> {{ 'indicatore' if a.count == 1 else 'indicatori' }} &middot; {{ a.theme_count }} {{ 'tema' if a.theme_count == 1 else 'temi' }}</p>
-      <ul class="theme-area__themes">
-        {% for t in a.themes %}<li><a href="{{ t.path }}">{{ t.theme }}</a></li>{% endfor %}
-      </ul>
-      {% if a.best %}
-      <dl class="theme-area__ends">
-        <div><dt>In testa</dt><dd class="is-top">{{ a.best }}</dd></div>
-        <div><dt>In coda</dt><dd class="is-bottom">{{ a.worst }}</dd></div>
-      </dl>
-      {% endif %}
+    <section class="theme-group" data-area>
+      <div class="theme-group__head">
+        <h2>{{ a.area }}</h2>
+        <span class="theme-group__count">{{ a.count }} {{ 'indicatore' if a.count == 1 else 'indicatori' }}</span>
+      </div>
+      <div class="theme-index-grid">
+        {% for t in a.themes %}
+        <a class="theme-index-card" href="{{ t.path }}" data-theme="{{ t.theme | lower }}">
+          <strong>{{ t.theme }}</strong>
+          <small>{{ t.indicator_count }} {{ 'indicatore' if t.indicator_count == 1 else 'indicatori' }}</small>
+          {% if t.lead %}
+          <div class="theme-index-card__standing">
+            <span><i class="dot dot--lead"></i>{{ t.lead }}</span>
+            <span><i class="dot dot--lag"></i>{{ t.lag }}</span>
+          </div>
+          {% endif %}
+        </a>
+        {% endfor %}
+      </div>
     </section>
     {% endfor %}
   </div>
+
+  <div class="explore-band">
+    <div class="explore-band__text">
+      <small>Ancora curioso?</small>
+      <strong>Metti alla prova quello che sai con Quiz Italia.</strong>
+    </div>
+    <a class="explore-band__cta" href="/quiz">Gioca ora <span aria-hidden="true">&rarr;</span></a>
+  </div>
 </article>
+
+<script>
+  (function () {
+    var input = document.getElementById("theme-filter");
+    if (!input) return;
+    var groups = Array.prototype.slice.call(document.querySelectorAll("#theme-groups .theme-group"));
+    var empty = document.getElementById("theme-empty");
+    input.addEventListener("input", function () {
+      var q = input.value.trim().toLowerCase();
+      var anyVisible = false;
+      groups.forEach(function (group) {
+        var cards = Array.prototype.slice.call(group.querySelectorAll(".theme-index-card"));
+        var groupVisible = false;
+        cards.forEach(function (card) {
+          var match = !q || (card.getAttribute("data-theme") || "").indexOf(q) !== -1;
+          card.hidden = !match;
+          if (match) groupVisible = true;
+        });
+        group.hidden = !groupVisible;
+        if (groupVisible) anyVisible = true;
+      });
+      if (empty) empty.hidden = anyVisible;
+    });
+  })();
+</script>
 {% endblock %}
