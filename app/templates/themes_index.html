@@ -9,18 +9,51 @@
   <h1>I temi</h1>
   <p class="page-lead">{{ total }} indicatori del catalogo unico Istat per leggere divari e qualità della vita nelle regioni italiane. Scegli un tema per aprire tutte le serie, con fonte, mappe, classifiche e andamenti negli anni.</p>
 
+  <div class="facts">
+    <div class="fact"><small>Aree</small><strong>{{ facts.areas }}</strong></div>
+    <div class="fact"><small>Temi</small><strong>{{ facts.themes }}</strong></div>
+    <div class="fact"><small>Indicatori</small><strong>{{ total }}</strong></div>
+    <div class="fact"><small>Copertura</small><strong>{{ facts.year_min }}<span class="fact__range"> - {{ facts.year_max }}</span></strong></div>
+  </div>
+
   {% for group in groups %}
   <section class="theme-group">
     <h2>{{ group.macro_area }} <span class="theme-group__count">{{ group.indicator_count }} indicatori</span></h2>
-    <div class="index-grid">
+    <div class="theme-index-grid">
       {% for t in group.themes %}
-      <a class="index-card index-card--theme" href="{{ t.path }}">
-        <strong>{{ t.theme }}</strong>
-        <small>{{ t.indicator_count }} {{ 'indicatore' if t.indicator_count == 1 else 'indicatori' }}</small>
+      <a class="theme-index-card" href="{{ t.path }}">
+        <div class="theme-index-card__main">
+          <strong>{{ t.theme }}</strong>
+          <small>{{ t.indicator_count }} {{ 'indicatore' if t.indicator_count == 1 else 'indicatori' }}</small>
+          <ul class="theme-index-card__inds">
+            {% for name in t.indicators %}<li>{{ name }}</li>{% endfor %}
+            {% if t.extra_count %}<li class="theme-index-card__more">+{{ t.extra_count }} altri indicatori</li>{% endif %}
+          </ul>
+        </div>
+        <div class="theme-index-card__aside">
+          {% if t.spark_points %}
+          <span class="theme-index-card__sparklabel">Andamento medio</span>
+          <svg class="theme-index-card__spark" viewBox="0 0 160 42" width="160" height="42" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ t.spark_points }}"></polyline></svg>
+          {% endif %}
+          {% if t.lead and t.lag %}
+          <div class="theme-index-card__standing">
+            <span><i class="dot dot--lead"></i>{{ t.lead }}</span>
+            <span><i class="dot dot--lag"></i>{{ t.lag }}</span>
+          </div>
+          {% endif %}
+        </div>
       </a>
       {% endfor %}
     </div>
   </section>
   {% endfor %}
+
+  <aside class="indicator-cta">
+    <div>
+      <small>Ancora curioso?</small>
+      <strong>Metti alla prova quello che sai con Quiz Italia.</strong>
+    </div>
+    <a href="/quiz">Gioca ora &rarr;</a>
+  </aside>
 </article>
 {% endblock %}

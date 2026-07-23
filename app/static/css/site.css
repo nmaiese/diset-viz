@@ -267,6 +267,42 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .theme-group { margin: 0 0 32px; }
 .theme-group h2 { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--grid); }
 .theme-group__count { font-family: var(--font-mono); font-size: 12px; font-weight: 400; color: var(--muted); }
+
+/* Themes index (/temi): facts strip + rich theme cards */
+.facts { display: flex; flex-wrap: wrap; gap: 12px 40px; margin: 0 0 32px; padding: 18px 0; border-block: 1px solid var(--line); }
+.fact { display: grid; gap: 3px; }
+.fact small { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.fact strong { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+.fact__range { color: var(--muted); font-size: 13px; font-family: var(--font-mono); font-weight: 400; }
+
+.theme-index-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(430px, 1fr)); gap: 16px; margin-top: 8px; }
+.theme-index-card { display: grid; grid-template-columns: 1fr 190px; gap: 22px; padding: 20px 22px; background: var(--panel); border: 1px solid var(--line); color: var(--ink); text-decoration: none; transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out); }
+.theme-index-card:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; }
+.theme-index-card__main { display: flex; flex-direction: column; min-width: 0; }
+.theme-index-card strong { font-family: var(--font-display); font-size: 18px; line-height: 1.15; letter-spacing: -0.005em; }
+.theme-index-card small { margin-top: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.theme-index-card__inds { list-style: none; margin: 12px 0 0; padding: 12px 0 0; border-top: 1px solid var(--grid); display: flex; flex-direction: column; gap: 7px; }
+.theme-index-card__inds li { position: relative; padding-left: 15px; font-family: var(--font-body); font-size: 13.5px; line-height: 1.35; color: var(--ink-soft); }
+.theme-index-card__inds li::before { content: ""; position: absolute; left: 0; top: 0.5em; width: 5px; height: 5px; background: var(--accent); }
+.theme-index-card__inds li.theme-index-card__more { font-family: var(--font-mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.theme-index-card__inds li.theme-index-card__more::before { background: none; border: 1px solid var(--line); }
+.theme-index-card__aside { display: flex; flex-direction: column; gap: 8px; padding-left: 20px; border-left: 1px solid var(--line); }
+.theme-index-card__sparklabel { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+.theme-index-card__spark { display: block; width: 100%; height: 42px; }
+.theme-index-card__spark polyline { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.theme-index-card__standing { display: flex; flex-direction: column; gap: 5px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--grid); font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-soft); }
+.theme-index-card__standing span { display: flex; align-items: center; gap: 7px; }
+.dot { width: 6px; height: 6px; border-radius: 999px; flex: 0 0 auto; display: inline-block; }
+.dot--lead { background: var(--positive); }
+.dot--lag { background: var(--accent); }
+
+@media (max-width: 620px) {
+  .theme-index-grid { grid-template-columns: 1fr; }
+  .theme-index-card { grid-template-columns: 1fr; gap: 14px; }
+  .theme-index-card__aside { padding-left: 0; border-left: none; border-top: 1px solid var(--line); padding-top: 14px; }
+  .theme-index-card__standing { margin-top: 0; }
+}
+
 .page-caveat { color: var(--muted); font-size: 15px; border-left: 3px solid var(--line); padding-left: 14px; }
 .indicator-definition,
 .article-indicator-explain {

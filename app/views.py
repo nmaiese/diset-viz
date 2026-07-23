@@ -34,6 +34,7 @@ from flask import Response, abort, make_response, redirect, render_template, req
 from flask.json import jsonify
 
 import csv, hmac, io, json, os, re, time
+from collections import defaultdict
 
 from app import config
 
@@ -415,16 +416,120 @@ def regions_index():
 
 @app.route("/temi")
 def themes_index():
-    groups = atlas_themes_by_macro_area()
+    groups = _themes_index_groups()
     total = sum(group["indicator_count"] for group in groups)
+    indicators = get_catalog()["indicators"]
+    facts = {
+        "areas": len(groups),
+        "themes": sum(len(group["themes"]) for group in groups),
+        "indicators": total,
+        "year_min": min(item["year_min"] for item in indicators),
+        "year_max": max(item["year_max"] for item in indicators),
+    }
     return render_template(
         "themes_index.html",
         groups=groups,
         total=total,
+        facts=facts,
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/temi",
     )
+
+
+@cache.memoize(timeout=3600)
+def _themes_index_groups():
+    """Enriched /temi index: every theme grouped by macro-area with its indicator
+    list, an illustrative average-trend sparkline, and the leading/trailing region.
+
+    The lead/lag standing uses the same oriented-percentile mean as the home
+    'Temi e aree' cards (best = 1.0), but only over scoreable indicators, so a
+    theme made purely of contextual indicators renders without a standing rather
+    than being dropped from the index. The sparkline averages each indicator's
+    national-average series after normalising to 0..1 (up = improving); it is an
+    illustrative composite, aligned by point index, not an official series."""
+    matrix = profiles._percentile_matrix()
+    meta = profiles._indicator_meta()
+
+    by_theme = defaultdict(list)
+    for item in get_catalog()["indicators"]:
+        by_theme[item["theme"]].append(item)
+
+    groups = []
+    for group in atlas_themes_by_macro_area():
+        themes = []
+        for t in group["themes"]:
+            items = sorted(
+                by_theme.get(t["theme"], []),
+                key=lambda i: (not i["complete"], i["name"].lower()),
+            )
+            names = [i["name"] for i in items]
+            standing = _theme_standing(items, matrix, meta)
+            themes.append({
+                "theme": t["theme"],
+                "path": t["path"],
+                "indicator_count": t["indicator_count"],
+                "indicators": names[:5],
+                "extra_count": max(0, len(names) - 5),
+                "spark_points": _theme_spark_points(items),
+                "lead": standing[0],
+                "lag": standing[1],
+            })
+        groups.append({
+            "macro_area": group["macro_area"],
+            "indicator_count": group["indicator_count"],
+            "themes": themes,
+        })
+    return groups
+
+
+def _theme_standing(items, matrix, meta):
+    """(lead_region, lag_region) by mean oriented percentile over the theme's
+    scoreable indicators, or (None, None) when none are scoreable."""
+    totals = {}  # region_key -> [sum_oriented, count]
+    for item in items:
+        info = meta.get(item["id"])
+        if not info or info["direction"] not in profiles.SCOREABLE_DIRECTIONS:
+            continue
+        for region_key, percentile in matrix.get(item["id"], {}).items():
+            oriented = profiles._oriented(percentile, info["direction"])
+            acc = totals.setdefault(region_key, [0.0, 0])
+            acc[0] += oriented
+            acc[1] += 1
+    ranked = sorted(
+        ((key, total / n) for key, (total, n) in totals.items() if n),
+        key=lambda kv: kv[1],
+        reverse=True,
+    )
+    if not ranked:
+        return None, None
+    return profiles.region_name(ranked[0][0]), profiles.region_name(ranked[-1][0])
+
+
+def _theme_spark_points(items):
+    """SVG polyline for a theme's illustrative average trend: each indicator's
+    national-average series normalised to 0..1 (inverted so up = improving),
+    averaged across indicators by point index."""
+    series = []
+    for item in items:
+        values = [p["value"] for p in (item.get("spark") or []) if p.get("value") is not None]
+        if len(values) < 2:
+            continue
+        lo, hi = min(values), max(values)
+        span = (hi - lo) or 1.0
+        invert = (item.get("explain") or {}).get("direction") in ("lower_better", "higher_worse")
+        normalised = [(v - lo) / span for v in values]
+        if invert:
+            normalised = [1.0 - n for n in normalised]
+        series.append(normalised)
+    if not series:
+        return ""
+    length = min(len(s) for s in series)
+    averaged = [
+        {"year": index, "value": sum(s[index] for s in series) / len(series)}
+        for index in range(length)
+    ]
+    return indicator_notes.sparkline_points(averaged, width=160, height=42)
 
 
 # User-facing URL level (plural) -> engine level (singular).
