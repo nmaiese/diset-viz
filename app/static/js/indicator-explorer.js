@@ -1,18 +1,17 @@
 /*
  * Indicator page in-page explorer (progressive enhancement).
  *
- * The server renders the editorial, the last-year ranking, the choropleth and the
- * trend as plain, crawlable HTML. This script reads the full year x region matrix
- * embedded in <script id="indicator-data"> and turns that same markup into the
- * interactive dashboard the atlas used to own: a year slider and a region focus
- * that drive, in place, the ranking table, the choropleth (clickable + hover),
- * the readout and a per-region time series chart.
+ * The server renders the editorial, the last-year ranking (with bars), the
+ * choropleth (+ legend) and the region insights as plain, crawlable HTML. This
+ * script reads the full year x region matrix embedded in <script id="indicator-data">
+ * and turns that same markup into the interactive dashboard the atlas used to own:
+ * year slider + region focus driving, in place, the ranking, the map (clickable +
+ * hover), the map legend, the region readout (value, rank, historic trend) and a
+ * per-region time series chart, with Map/Ranking/Serie storica tabs on mobile.
  *
- * There is one canonical URL per indicator. Exploration states only touch the
- * query string via history.replaceState, so the browser never navigates and the
- * canonical stays the base URL (the page is served noindex when parameters are
- * present). With JavaScript disabled the server-rendered sections remain the
- * fallback and nothing here runs.
+ * One canonical URL per indicator: exploration states only touch the query string
+ * via history.replaceState (served noindex). With JavaScript disabled the
+ * server-rendered dashboard stays as the fallback and nothing here runs.
  */
 (function () {
   "use strict";
@@ -56,9 +55,7 @@
     return unit === "%" ? s + "%" : s;
   }
 
-  function valuesForYear(year) {
-    return matrix[String(year)] || {};
-  }
+  function valuesForYear(year) { return matrix[String(year)] || {}; }
   function ranked(year) {
     var byRegion = valuesForYear(year);
     var rows = Object.keys(byRegion).map(function (key) {
@@ -68,15 +65,6 @@
     rows.forEach(function (row, i) { row.rank = i + 1; });
     return rows;
   }
-  function averageAt(year) {
-    var byRegion = valuesForYear(year);
-    var keys = Object.keys(byRegion);
-    if (!keys.length) return null;
-    var s = 0;
-    keys.forEach(function (k) { s += byRegion[k]; });
-    return s / keys.length;
-  }
-  // Series of one region across every year (nulls where a year has no value).
   function regionSeries(key) {
     return years.map(function (y) {
       var byRegion = matrix[String(y)] || {};
@@ -84,7 +72,24 @@
     });
   }
   function averageSeries() {
-    return years.map(function (y) { return { year: y, value: averageAt(y) }; });
+    return years.map(function (y) {
+      var byRegion = matrix[String(y)] || {};
+      var keys = Object.keys(byRegion);
+      if (!keys.length) return { year: y, value: null };
+      var s = 0; keys.forEach(function (k) { s += byRegion[k]; });
+      return { year: y, value: s / keys.length };
+    });
+  }
+  function regionTrend(key) {
+    var rows = regionSeries(key).filter(function (p) { return p.value !== null; });
+    if (!rows.length) return { label: "n.d.", text: "Serie non disponibile", dir: "flat" };
+    var first = rows[0], last = rows[rows.length - 1];
+    var delta = last.value - first.value;
+    return {
+      label: delta > 0 ? "In crescita" : delta < 0 ? "In calo" : "Stabile",
+      text: fmtValue(first.value) + " → " + fmtValue(last.value) + " (" + first.year + "-" + last.year + ")",
+      dir: delta > 0 ? "up" : delta < 0 ? "down" : "flat",
+    };
   }
 
   function rampColor(t) {
@@ -100,18 +105,26 @@
   var focusName = root.querySelector('[data-explore="focus-name"]');
   var focusValue = root.querySelector('[data-explore="focus-value"]');
   var focusRank = root.querySelector('[data-explore="focus-rank"]');
+  var focusTrendEl = root.querySelector('[data-explore="focus-trend"]');
+  var focusLink = root.querySelector('[data-explore="focus-link"]');
 
-  var trendFig = root.querySelector('[data-explore="trend"]');
-  var trendSvg = root.querySelector('[data-explore="trend-svg"]');
-  var trendTitle = root.querySelector('[data-explore="trend-title"]');
-  var trendTip = root.querySelector('[data-explore="trend-tip"]');
+  var trendFig = document.querySelector('[data-explore="trend"]');
+  var trendSvg = document.querySelector('[data-explore="trend-svg"]');
+  var trendTitle = document.querySelector('[data-explore="trend-title"]');
+  var trendTip = document.querySelector('[data-explore="trend-tip"]');
+  var trendRegionEl = document.querySelector('[data-explore="trend-region"]');
 
-  var rankingBody = document.querySelector('[data-explore="ranking"]');
+  var rankingEl = document.querySelector('[data-explore="ranking"]');
   var mapEl = document.querySelector('[data-explore="map"]');
   var mapTip = document.querySelector('[data-explore="map-tip"]');
+  var legendMin = document.querySelector('[data-explore="legend-min"]');
+  var legendMid = document.querySelector('[data-explore="legend-mid"]');
+  var legendMax = document.querySelector('[data-explore="legend-max"]');
+  var tabsEl = document.querySelector('[data-explore="tabs"]');
+  var vizGrid = document.querySelector('[data-explore="viz-grid"]');
   var yearTitles = document.querySelectorAll('[data-explore="year-title"]');
   var mapYearEls = document.querySelectorAll('[data-explore="map-year"]');
-  var insightYearLabels = document.querySelectorAll('[data-explore="year-label"]');
+  var yearLabelEls = document.querySelectorAll('[data-explore="year-label"]');
   var bestNameEl = document.querySelector('[data-explore="best-name"]');
   var bestValueEl = document.querySelector('[data-explore="best-value"]');
   var worstNameEl = document.querySelector('[data-explore="worst-name"]');
@@ -124,30 +137,24 @@
   // ---- Region select ------------------------------------------------------
   regions.forEach(function (r) {
     var opt = document.createElement("option");
-    opt.value = r.key;
-    opt.textContent = r.name;
+    opt.value = r.key; opt.textContent = r.name;
     regionSelect.appendChild(opt);
   });
 
-  // ---- Initial state (URL params fall back to canonical defaults) ----------
+  // ---- Initial state ------------------------------------------------------
   var params = new URLSearchParams(location.search);
   var startYear = data.defaultYear || yearMax;
   var paramYear = parseInt(params.get("anno"), 10);
   if (!isNaN(paramYear) && years.indexOf(paramYear) !== -1) startYear = paramYear;
-
   var startRegion = regions.length ? regions[0].key : null;
   var paramRegion = params.get("regione");
   if (paramRegion && nameByKey[paramRegion]) startRegion = paramRegion;
-
   var state = { yearIndex: Math.max(0, years.indexOf(startYear)), regionKey: startRegion };
 
   yearInput.min = 0;
   yearInput.max = years.length - 1;
   yearInput.value = state.yearIndex;
-  if (years.length < 2) {
-    yearInput.disabled = true;
-    yearInput.setAttribute("aria-hidden", "true");
-  }
+  if (years.length < 2) { yearInput.disabled = true; yearInput.setAttribute("aria-hidden", "true"); }
   regionSelect.value = state.regionKey || "";
 
   function currentYear() { return years[state.yearIndex]; }
@@ -156,12 +163,11 @@
   // ---- Trend chart --------------------------------------------------------
   var TREND_W = 640, TREND_H = 200;
   var PAD = { l: 46, r: 14, t: 14, b: 26 };
-  var trendGeom = null; // cached scales for hit-testing
+  var trendGeom = null;
 
   function buildTrend() {
     if (!trendSvg) return;
     while (trendSvg.firstChild) trendSvg.removeChild(trendSvg.firstChild);
-
     var focus = regionSeries(state.regionKey);
     var avg = averageSeries();
     var all = [];
@@ -170,22 +176,15 @@
     if (!all.length) { if (trendFig) trendFig.hidden = true; return; }
     if (trendFig) trendFig.hidden = false;
 
-    var lo = Math.min.apply(null, all);
-    var hi = Math.max.apply(null, all);
+    var lo = Math.min.apply(null, all), hi = Math.max.apply(null, all);
     if (lo === hi) { lo -= 1; hi += 1; }
-    var padY = (hi - lo) * 0.08;
-    lo -= padY; hi += padY;
-
+    var padY = (hi - lo) * 0.08; lo -= padY; hi += padY;
     var span = (yearMax - yearMin) || 1;
     function sx(year) { return PAD.l + ((year - yearMin) / span) * (TREND_W - PAD.l - PAD.r); }
     function sy(value) { return PAD.t + (1 - (value - lo) / (hi - lo)) * (TREND_H - PAD.t - PAD.b); }
     trendGeom = { sx: sx, sy: sy };
 
-    function el(name, attrs) {
-      var n = document.createElementNS(SVGNS, name);
-      for (var k in attrs) n.setAttribute(k, attrs[k]);
-      return n;
-    }
+    function el(name, attrs) { var n = document.createElementNS(SVGNS, name); for (var k in attrs) n.setAttribute(k, attrs[k]); return n; }
     function pathFor(series, cls) {
       var d = "", started = false;
       series.forEach(function (p) {
@@ -196,44 +195,25 @@
       if (!d) return null;
       return el("path", { d: d.trim(), class: cls, fill: "none", "vector-effect": "non-scaling-stroke" });
     }
-
-    // Gridlines + Y labels (min / mid / max).
     [lo + padY, (lo + hi) / 2, hi - padY].forEach(function (v) {
       var y = sy(v);
       trendSvg.appendChild(el("line", { x1: PAD.l, x2: TREND_W - PAD.r, y1: y, y2: y, class: "trend-grid" }));
       var t = el("text", { x: PAD.l - 6, y: y + 3, class: "trend-axis", "text-anchor": "end" });
-      t.textContent = fmtAxis(v);
-      trendSvg.appendChild(t);
+      t.textContent = fmtAxis(v); trendSvg.appendChild(t);
     });
-    // X labels (first / last year).
     [yearMin, yearMax].forEach(function (yr, i) {
       var t = el("text", { x: sx(yr), y: TREND_H - 8, class: "trend-axis", "text-anchor": i === 0 ? "start" : "end" });
-      t.textContent = yr;
-      trendSvg.appendChild(t);
+      t.textContent = yr; trendSvg.appendChild(t);
     });
-
-    var avgPath = pathFor(avg, "trend-line trend-line--avg");
-    if (avgPath) trendSvg.appendChild(avgPath);
-    var focusPath = pathFor(focus, "trend-line trend-line--focus");
-    if (focusPath) trendSvg.appendChild(focusPath);
-
-    // Focus dots.
-    focus.forEach(function (p) {
-      if (p.value === null) return;
-      trendSvg.appendChild(el("circle", { cx: sx(p.year), cy: sy(p.value), r: 2.6, class: "trend-dot" }));
-    });
-
-    // Current-year marker.
+    var avgPath = pathFor(avg, "trend-line trend-line--avg"); if (avgPath) trendSvg.appendChild(avgPath);
+    var focusPath = pathFor(focus, "trend-line trend-line--focus"); if (focusPath) trendSvg.appendChild(focusPath);
+    focus.forEach(function (p) { if (p.value !== null) trendSvg.appendChild(el("circle", { cx: sx(p.year), cy: sy(p.value), r: 2.6, class: "trend-dot" })); });
     var yr = currentYear();
     trendSvg.appendChild(el("line", { x1: sx(yr), x2: sx(yr), y1: PAD.t, y2: TREND_H - PAD.b, class: "trend-marker" }));
     var cur = focus[state.yearIndex];
-    if (cur && cur.value !== null) {
-      trendSvg.appendChild(el("circle", { cx: sx(yr), cy: sy(cur.value), r: 4.5, class: "trend-dot trend-dot--current" }));
-    }
-    if (trendTitle) {
-      trendTitle.textContent = "Serie storica " + yearMin + "-" + yearMax + " · " +
-        (nameByKey[state.regionKey] || "") + " (arancio) vs media regioni";
-    }
+    if (cur && cur.value !== null) trendSvg.appendChild(el("circle", { cx: sx(yr), cy: sy(cur.value), r: 4.5, class: "trend-dot trend-dot--current" }));
+    if (trendTitle) trendTitle.textContent = (nameByKey[state.regionKey] || "") + " (arancio) vs media delle regioni (tratteggio)";
+    if (trendRegionEl) trendRegionEl.textContent = nameByKey[state.regionKey] || "";
   }
 
   function trendYearFromEvent(evt) {
@@ -241,15 +221,13 @@
     var rect = trendSvg.getBoundingClientRect();
     var xPix = ((evt.clientX - rect.left) / rect.width) * TREND_W;
     var span = (yearMax - yearMin) || 1;
-    var frac = (xPix - PAD.l) / (TREND_W - PAD.l - PAD.r);
-    var yr = yearMin + frac * span;
-    // Snap to the nearest available year.
+    var yr = yearMin + ((xPix - PAD.l) / (TREND_W - PAD.l - PAD.r)) * span;
     var best = years[0], bestD = Infinity;
     years.forEach(function (y) { var d = Math.abs(y - yr); if (d < bestD) { bestD = d; best = y; } });
     return best;
   }
 
-  // ---- Map interactivity --------------------------------------------------
+  // ---- Map ----------------------------------------------------------------
   var mapNodes = mapEl ? mapEl.querySelectorAll("[data-key]") : [];
   function paintMap(rows) {
     if (!mapEl) return;
@@ -267,6 +245,9 @@
       if (!present[key]) mapNodes[n].style.fill = "";
       mapNodes[n].classList.toggle("is-selected", key === state.regionKey);
     }
+    if (legendMin) legendMin.textContent = fmtAxis(lo);
+    if (legendMid) legendMid.textContent = fmtAxis(lo + (hi - lo) / 2);
+    if (legendMax) legendMax.textContent = fmtAxis(hi);
   }
   function wireMap() {
     if (!mapEl) return;
@@ -275,11 +256,7 @@
         var key = node.getAttribute("data-key");
         if (!nameByKey[key]) return;
         node.style.cursor = "pointer";
-        node.addEventListener("click", function () {
-          state.regionKey = key;
-          regionSelect.value = key;
-          sync();
-        });
+        node.addEventListener("click", function () { state.regionKey = key; regionSelect.value = key; sync(); });
         node.addEventListener("mousemove", function (evt) {
           if (!mapTip) return;
           var byRegion = valuesForYear(currentYear());
@@ -295,6 +272,20 @@
     }
   }
 
+  // ---- Tabs (mobile) ------------------------------------------------------
+  function wireTabs() {
+    if (!tabsEl || !vizGrid) return;
+    tabsEl.hidden = false;
+    var btns = tabsEl.querySelectorAll("button[data-tab]");
+    btns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var tab = btn.getAttribute("data-tab");
+        vizGrid.className = "viz-grid active-" + tab;
+        btns.forEach(function (b) { b.classList.toggle("is-active", b === btn); });
+      });
+    });
+  }
+
   // ---- Render -------------------------------------------------------------
   function render() {
     var year = currentYear();
@@ -302,35 +293,47 @@
     var count = rows.length;
     var focus = null;
     for (var i = 0; i < rows.length; i++) { if (rows[i].key === state.regionKey) { focus = rows[i]; break; } }
+    var focusNameStr = nameByKey[state.regionKey] || "-";
 
     if (yearLabel) yearLabel.textContent = year;
     setText(yearTitles, year);
     setText(mapYearEls, year);
-    setText(insightYearLabels, year);
+    setText(yearLabelEls, year);
 
-    if (focusName) focusName.textContent = (nameByKey[state.regionKey] || "-") + " · " + year;
+    // Focus region readout.
+    if (focusName) focusName.textContent = focusNameStr + " · " + year;
     if (focusValue) focusValue.textContent = focus ? fmtValue(focus.value) : "n.d.";
-    if (focusRank) {
-      focusRank.textContent = focus
-        ? focus.rank + "ª su " + count + " regioni"
-        : "dato non disponibile per il " + year;
+    if (focusRank) focusRank.textContent = focus ? focus.rank + "ª su " + count + " regioni" : "dato non disponibile per il " + year;
+    if (focusTrendEl) {
+      var tr = regionTrend(state.regionKey);
+      focusTrendEl.textContent = tr.label + " · " + tr.text;
+      focusTrendEl.className = "insight__trend is-" + tr.dir;
+    }
+    if (focusLink && state.regionKey) {
+      focusLink.setAttribute("href", "/regione/" + state.regionKey);
+      focusLink.textContent = "Come è messa " + focusNameStr + " →";
     }
 
-    if (rankingBody) {
+    // Ranking with bars.
+    if (rankingEl) {
+      var barMax = Math.max.apply(null, rows.map(function (r) { return r.value; }).concat([0]));
       var html = "";
       rows.forEach(function (row) {
-        var active = row.key === state.regionKey ? ' class="is-focus"' : "";
+        var w = barMax ? (row.value / barMax) * 100 : 0;
+        var active = row.key === state.regionKey ? " is-active" : "";
         html +=
-          '<tr data-region-key="' + row.key + '"' + active + ">" +
-          '<td class="rank">' + row.rank + "</td>" +
-          '<td><a href="/regione/' + row.key + '">' + row.name + "</a></td>" +
-          '<td class="num">' + numberFmt.format(row.value) + "</td></tr>";
+          '<div class="ranking-row' + active + '" data-region-key="' + row.key + '">' +
+          '<span class="rank">' + row.rank + "</span>" +
+          '<a class="region" href="/regione/' + row.key + '">' + row.name + "</a>" +
+          '<span class="bar"><i style="width:' + Math.max(w, 2).toFixed(1) + '%"></i></span>' +
+          '<strong class="num">' + numberFmt.format(row.value) + "</strong></div>";
       });
-      rankingBody.innerHTML = html;
+      rankingEl.innerHTML = html;
     }
 
     paintMap(rows);
 
+    // Insight tiles.
     if (rows.length) {
       var sum = 0; rows.forEach(function (r) { sum += r.value; });
       if (avgValueEl) avgValueEl.textContent = numberFmt.format(sum / rows.length);
@@ -347,7 +350,6 @@
     buildTrend();
   }
 
-  // Same page, same canonical: only the query string changes.
   function sync() {
     var qs = "?anno=" + currentYear() + "&regione=" + encodeURIComponent(state.regionKey || "");
     try { history.replaceState(null, "", basePath + qs); } catch (err) { /* ignore */ }
@@ -357,11 +359,11 @@
   yearInput.addEventListener("input", function () { state.yearIndex = Number(yearInput.value); sync(); });
   regionSelect.addEventListener("change", function () { state.regionKey = regionSelect.value; sync(); });
 
-  if (rankingBody) {
-    rankingBody.addEventListener("click", function (evt) {
-      var tr = evt.target.closest("tr[data-region-key]");
-      if (!tr || evt.target.closest("a")) return;
-      var key = tr.getAttribute("data-region-key");
+  if (rankingEl) {
+    rankingEl.addEventListener("click", function (evt) {
+      var row = evt.target.closest(".ranking-row");
+      if (!row || evt.target.closest("a")) return;
+      var key = row.getAttribute("data-region-key");
       if (!key || !nameByKey[key]) return;
       state.regionKey = key; regionSelect.value = key; sync();
     });
@@ -371,9 +373,7 @@
     trendSvg.addEventListener("click", function (evt) {
       var yr = trendYearFromEvent(evt);
       if (yr == null) return;
-      state.yearIndex = years.indexOf(yr);
-      yearInput.value = state.yearIndex;
-      sync();
+      state.yearIndex = years.indexOf(yr); yearInput.value = state.yearIndex; sync();
     });
     trendSvg.addEventListener("mousemove", function (evt) {
       if (!trendTip || !trendGeom) return;
@@ -390,8 +390,8 @@
   }
 
   wireMap();
+  wireTabs();
 
-  // Reveal the controls and paint the initial state.
   root.hidden = false;
   if (params.has("anno") || params.has("regione")) sync();
   else render();

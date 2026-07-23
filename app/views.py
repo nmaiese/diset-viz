@@ -338,6 +338,30 @@ def indicator_page(slug):
         "ramp": {"from": [0xE7, 0xEC, 0xF3], "to": [0x15, 0x23, 0x3B]},
     }
 
+    # Previous / next indicator within the same theme, so the page keeps the
+    # atlas dashboard's sibling navigation (server-rendered, plain canonical links).
+    theme_siblings = sorted(
+        (
+            {"id": item["id"], "name": item["name"], "path": item["path"]}
+            for item in get_atlas_catalog()["indicators"]
+            if item["theme"] == meta["theme"]
+        ),
+        key=lambda item: item["name"].lower(),
+    )
+    sibling_index = next(
+        (i for i, item in enumerate(theme_siblings) if str(item["id"]) == str(meta["id"])),
+        None,
+    )
+    sibling_prev = theme_siblings[sibling_index - 1] if sibling_index else None
+    sibling_next = (
+        theme_siblings[sibling_index + 1]
+        if sibling_index is not None and sibling_index < len(theme_siblings) - 1
+        else None
+    )
+
+    # Bar length reference for the ranking (same rule as the atlas Ranking).
+    bar_max = max((row["value"] for row in values if row["value"] is not None), default=0)
+
     # Exploration states (?anno=, ?regione=) are the same object, not a new page:
     # they never enter the index or sitemap and the canonical stays the base URL.
     explore_state = seo_policy.has_explore_params(request.args)
@@ -358,6 +382,9 @@ def indicator_page(slug):
         is_indexable=is_indexable,
         noindex=noindex,
         explore_data=explore_data,
+        sibling_prev=sibling_prev,
+        sibling_next=sibling_next,
+        bar_max=bar_max,
         map_colors=map_colors,
         spark_points=spark_points,
         page_intro=indicator_notes.indicator_page_intro(
