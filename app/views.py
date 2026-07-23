@@ -51,6 +51,13 @@ _HOME_MAP_INDICATORS = _HOME_FEATURED_INDICATORS
 # supported by the data instead of asserted for a contextual indicator.
 _HOME_STORY_INDICATORS = ("901", "408", "910", "102")
 
+# "Confronta" preview: a North / Centre / South contrast on three scoreable
+# indicators (PIL pro capite, NEET, speranza di vita), so bars and ranking are
+# something the data supports rather than a placeholder.
+_HOME_COMPARE_INDICATORS = ("901", "408", "910")
+_HOME_COMPARE_REGIONS = ("lombardia", "lazio", "campania")
+_HOME_COMPARE_COLORS = ("var(--ink)", "var(--accent)", "var(--positive-ink)")
+
 
 def _client_ip():
     """IP del client, rispettando X-Forwarded-For dietro il proxy Cloud Run."""
@@ -120,6 +127,8 @@ def home():
         map_hero=_home_map_hero(),
         capabilities=_home_capabilities(total_indicators),
         stories=_home_story_cards(),
+        themes_preview=_home_themes_preview(),
+        compare_preview=_home_compare_preview(),
         qol=_home_qol_preview(),
         quiz_games=_home_quiz_games(),
         posts=get_posts()[:3],
@@ -1432,6 +1441,94 @@ def _home_qol_preview():
         "leader": ranking[0]["name"],
         "last": ranking[-1]["name"],
     }
+
+
+def _home_themes_preview():
+    """'Temi e aree' cards: for each macro-area, its indicator/theme counts plus
+    the region in front and the region trailing, computed as the mean oriented
+    score across the area's scoreable indicators (best = 1.0). Purely derived
+    from the data, no placeholder leaders."""
+    matrix = profiles._percentile_matrix()
+    meta = profiles._indicator_meta()
+    cards = []
+    for group in atlas_themes_by_macro_area():
+        area = group["macro_area"]
+        totals = {}  # region_key -> [sum_oriented, count]
+        for ind_id, by_region in matrix.items():
+            info = meta.get(ind_id)
+            if not info or info["macro_area"] != area:
+                continue
+            direction = info["direction"]
+            if direction not in profiles.SCOREABLE_DIRECTIONS:
+                continue
+            for region_key, percentile in by_region.items():
+                oriented = profiles._oriented(percentile, direction)
+                acc = totals.setdefault(region_key, [0.0, 0])
+                acc[0] += oriented
+                acc[1] += 1
+        ranked = sorted(
+            ((key, total / n) for key, (total, n) in totals.items() if n),
+            key=lambda kv: kv[1],
+            reverse=True,
+        )
+        if not ranked:
+            continue
+        cards.append({
+            "area": area,
+            "count": group["indicator_count"],
+            "theme_count": len(group["themes"]),
+            "themes": [t["theme"] for t in group["themes"][:4]],
+            "best": profiles.region_name(ranked[0][0]),
+            "worst": profiles.region_name(ranked[-1][0]),
+        })
+    return cards
+
+
+def _home_compare_preview():
+    """'Confronta' preview: three real regions across three scoreable indicators,
+    with a bar filled by oriented position (best = full) and the real ranking."""
+    rows = []
+    for indicator_id in _HOME_COMPARE_INDICATORS:
+        payload = get_atlas_indicator(indicator_id)
+        if payload is None:
+            continue
+        meta = payload["metadata"]
+        year = meta["year_max"]
+        values = get_atlas_indicator_year(indicator_id, year)["values"]
+        direction = (meta.get("explain") or {}).get("direction")
+        invert = direction in ("lower_better", "higher_worse")
+        ranked = list(reversed(values)) if invert else values
+        rank_by_key = {row["region_key"]: pos for pos, row in enumerate(ranked, 1)}
+        value_by_key = {row["region_key"]: row["value"] for row in values}
+        vals = [row["value"] for row in values]
+        low, high = min(vals), max(vals)
+        span = (high - low) or 1
+        unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+        entries = []
+        for key, color in zip(_HOME_COMPARE_REGIONS, _HOME_COMPARE_COLORS):
+            if key not in value_by_key:
+                continue
+            fraction = (value_by_key[key] - low) / span
+            if invert:
+                fraction = 1 - fraction
+            entries.append({
+                "name": profiles.region_name(key),
+                "value": it_num(value_by_key[key], 2),
+                "unit": unit,
+                "rank": rank_by_key[key],
+                "total": len(ranked),
+                "pct": max(6, round(fraction * 100)),
+                "color": color,
+            })
+        if entries:
+            rows.append({"theme": meta["theme"], "name": meta["name"], "entries": entries})
+    if not rows:
+        return None
+    legend = [
+        {"name": profiles.region_name(key), "color": color}
+        for key, color in zip(_HOME_COMPARE_REGIONS, _HOME_COMPARE_COLORS)
+    ]
+    return {"legend": legend, "rows": rows}
 
 
 def _home_quiz_games():

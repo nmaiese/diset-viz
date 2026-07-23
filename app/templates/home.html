@@ -122,6 +122,78 @@
 </section>
 {% endif %}
 
+{% if themes_preview %}
+<section class="home-section" aria-labelledby="themes-title">
+  <div class="home-section__head home-section__head--row">
+    <div>
+      <p class="section-label">Temi e aree</p>
+      <h2 id="themes-title">Ogni tema è una lente sull'Italia</h2>
+      <p class="home-section__lead">Gli indicatori sono raggruppati per macro-area. Vedi subito chi è avanti e chi resta indietro, poi apri i temi per la lettura completa.</p>
+    </div>
+    <a href="/temi">Tutte le aree &rarr;</a>
+  </div>
+  <div class="home-themes-grid">
+    {% for a in themes_preview %}
+    <a class="home-theme-card" href="/temi">
+      <div class="home-theme-card__head">
+        <span class="home-theme-card__kicker">Area</span>
+        <h3>{{ a.area }}</h3>
+      </div>
+      <p class="home-theme-card__count"><strong>{{ a.count }}</strong> indicatori &middot; {{ a.theme_count }} temi</p>
+      <ul class="home-theme-card__themes">
+        {% for t in a.themes %}<li>{{ t }}</li>{% endfor %}
+      </ul>
+      <dl class="home-theme-card__ends">
+        <div><dt>In testa</dt><dd class="is-top">{{ a.best }}</dd></div>
+        <div><dt>In coda</dt><dd class="is-bottom">{{ a.worst }}</dd></div>
+      </dl>
+      <span class="home-theme-card__go">Apri i temi &rarr;</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if compare_preview %}
+<section class="home-section" aria-labelledby="compare-title">
+  <div class="home-section__head home-section__head--row">
+    <div>
+      <p class="section-label">Confronta</p>
+      <h2 id="compare-title">Metti a paragone regioni, indicatore per indicatore</h2>
+      <p class="home-section__lead">Un esempio con tre regioni. Nell'atlante puoi confrontarle sulla mappa e sulla serie storica, indicatore per indicatore.</p>
+    </div>
+    <a href="/atlante?view=confronto">Apri il comparatore &rarr;</a>
+  </div>
+  <div class="home-compare-panel">
+    <div class="home-compare-legend" aria-hidden="true">
+      {% for l in compare_preview.legend %}
+      <span><i style="background: {{ l.color }}"></i>{{ l.name }}</span>
+      {% endfor %}
+    </div>
+    <div class="home-compare-grid">
+      {% for row in compare_preview.rows %}
+      <div class="home-cmp-mini">
+        <div class="home-cmp-mini__head">
+          <span class="home-cmp-mini__kicker">{{ row.theme }}</span>
+          <span class="home-cmp-mini__name">{{ row.name }}</span>
+        </div>
+        <ul class="home-cmp-mini__bars">
+          {% for e in row.entries %}
+          <li>
+            <span class="home-cmp-mini__reg">{{ e.name }}</span>
+            <span class="home-cmp-mini__bar"><i style="width: {{ e.pct }}%; background: {{ e.color }}"></i></span>
+            <span class="home-cmp-mini__val">{{ e.value }}<small>{{ e.rank }}ª</small></span>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+    </div>
+    <a class="home-compare-cta" href="/atlante?view=confronto">Prova con le tue regioni &rarr;</a>
+  </div>
+</section>
+{% endif %}
+
 {% if qol %}
 <section class="home-section home-qol" aria-labelledby="qol-title">
   <div>

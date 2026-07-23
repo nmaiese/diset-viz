@@ -37,6 +37,11 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b"Cosa puoi fare qui", home.data)
         self.assertIn(b'<main class="home-page wrap-wide">', home.data)
         self.assertIn(b'id="home-map-data"', home.data)
+        # The "Temi e aree" and "Confronta" previews render with real data.
+        self.assertIn("Ogni tema è una lente sull'Italia".encode("utf-8"), home.data)
+        self.assertIn(b'class="home-theme-card"', home.data)
+        self.assertIn(b"Metti a paragone regioni", home.data)
+        self.assertIn(b'class="home-cmp-mini"', home.data)
 
         atlante = client.get("/atlante")
         self.assertEqual(atlante.status_code, 200)
