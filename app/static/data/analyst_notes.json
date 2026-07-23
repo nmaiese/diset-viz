@@ -757,5 +757,131 @@
   "spunto": "Una quota alta di redditi da trasferimenti riflette due cose intrecciate: una popolazione più anziana, con molte pensioni, e un mercato del lavoro più debole, con più sussidi. Al Sud si sommano entrambe, e la dipendenza dai trasferimenti diventa strutturale. È un indicatore descrittivo, ma dice quanto un territorio si regge sul lavoro e quanto sul sostegno pubblico. Vivere di trasferimenti è una rete di protezione o un segno di fragilità?",
   "limite": "Somma pensioni e altri trasferimenti in un'unica voce, senza distinguere il reddito da una vita di lavoro da un sussidio assistenziale. Non ne misura l'importo, e una quota alta può nascere da tanti anziani come da tanti disoccupati.",
   "fonti": []
+ },
+ "627": {
+  "attacco": "Questo indicatore conta in valore assoluto gli alunni con disabilità motoria, quindi rispecchia soprattutto quanti studenti ha una regione. In Lombardia sono 1.386, nel Lazio 837, mentre in Valle d'Aosta appena 29 e in Molise 32. La media delle regioni è di circa 438.",
+  "spunto": "Un conteggio assoluto non dice dove la disabilità motoria sia più diffusa, dato che le regioni popolose ne avranno sempre di più. Per capire l'incidenza servirebbe il rapporto sugli alunni totali, non il numero secco. Il dato è comunque utile a dimensionare il bisogno reale di supporti e barriere da abbattere in ogni sistema scolastico. Serve di più sapere quanti sono o quanti ne ha ciascuna scuola?",
+  "limite": "Essendo un totale, non è confrontabile tra regioni di dimensioni diverse e non misura l'incidenza. Non dice nulla sul grado di disabilità né sul supporto effettivamente ricevuto da ciascun alunno.",
+  "fonti": []
+ },
+ "628": {
+  "attacco": "Anche gli alunni con disabilità uditiva sono contati in valore assoluto, e i numeri seguono la dimensione delle regioni. In Lazio sono 848, in Lombardia 841, mentre in Valle d'Aosta sono 7 e in Molise 12. La media delle regioni è di circa 289.",
+  "spunto": "Come per le altre disabilità, il totale non permette confronti tra territori: dice quanti studenti sordi o ipoudenti frequentano, non quanto siano frequenti. La disabilità uditiva richiede supporti specifici, dagli interpreti alle tecnologie, e conoscerne il numero aiuta a dimensionare l'offerta. Ma senza il rapporto sulla popolazione scolastica il dato resta un ordine di grandezza. Quanti servizi servono si legge dai numeri o dalle incidenze?",
+  "limite": "È un conteggio assoluto, non confrontabile tra regioni e non indicativo dell'incidenza. Non distingue i gradi di disabilità uditiva né misura l'adeguatezza dei supporti scolastici disponibili.",
+  "fonti": []
+ },
+ "629": {
+  "attacco": "Gli alunni con disabilità visiva sono i meno numerosi tra le tre categorie, e anche qui il conteggio è assoluto. In Lombardia sono 524, nel Lazio 476, in Campania 330, mentre in Valle d'Aosta sono 4 e in Molise 18. La media delle regioni è di circa 188.",
+  "spunto": "A differenza delle altre disabilità qui contate, il numero di alunni con disabilità visiva è leggermente cresciuto negli ultimi anni. Su totali così piccoli, però, poche unità cambiano molto il quadro, e nelle regioni minori il dato oscilla. Resta un'informazione utile a garantire strumenti dedicati, dai testi in braille alle mappe a rilievo. Un piccolo aumento è un segnale reale o rumore statistico?",
+  "limite": "Il totale non è confrontabile tra regioni e, data la rarità, è instabile di anno in anno. Non dice il grado di disabilità visiva né se la scuola disponga degli strumenti adatti a garantire l'apprendimento.",
+  "fonti": []
+ },
+ "630": {
+  "attacco": "Qui, finalmente, un dato confrontabile: la quota di alunni con disabilità sul totale, cresciuta molto negli ultimi anni. Va dal 2,9% della Basilicata al 4,4% della Sicilia, con una media delle regioni del 3,8%. Le differenze tra territori sono contenute.",
+  "spunto": "L'aumento della quota, quasi raddoppiata, riflette soprattutto una maggiore capacità di riconoscere e certificare le disabilità, non necessariamente più bisogni. È un progresso di consapevolezza, che però mette sotto pressione scuole e sostegno. Rispetto ai conteggi assoluti, questo rapporto permette un confronto onesto tra regioni, e mostra un'Italia più uniforme di quanto i numeri secchi suggeriscano. Più alunni certificati significano più inclusione o più fragilità riconosciuta?",
+  "limite": "Misura la quota di alunni certificati, che dipende dai criteri e dalla capacità diagnostica locale, non solo dalla disabilità reale. Non dice se il sostegno ricevuto sia adeguato, il vero nodo dell'inclusione scolastica.",
+  "fonti": []
+ },
+ "634": {
+  "attacco": "Quanto un comune spende per ogni anziano ospitato in una struttura residenziale varia in modo estremo. In Valle d'Aosta sono 2.502 euro per utente, in Trentino Alto Adige 2.065, mentre in Veneto appena 65 e in Molise 109. La media delle regioni è di circa 770.",
+  "spunto": "Distanze di quaranta volte non misurano la generosità di una regione, ma modi diversi di organizzare e contabilizzare la spesa sociale dei comuni. Dove le rette sono coperte da altri enti o dalle famiglie, la spesa comunale per utente risulta bassa. Il dato va quindi letto come indizio di modelli diversi, non come classifica di quanto si investe nella cura. Stiamo confrontando spesa o modi di spendere?",
+  "limite": "La spesa per utente dipende dai criteri contabili dei comuni e da chi copre le rette, quindi i confronti diretti ingannano. Non misura la qualità delle strutture né quanti anziani restano senza posto.",
+  "fonti": []
+ },
+ "635": {
+  "attacco": "I ricoveri per disturbi psichici si sono quasi dimezzati in vent'anni. Le dimissioni ospedaliere per queste patologie vanno da 187 ogni centomila abitanti in Campania a 456 in Liguria, con una media delle regioni di circa 294. Il fenomeno è calato ovunque, pur restando diseguale.",
+  "spunto": "Il forte calo riflette il passaggio, iniziato decenni fa, da una psichiatria ospedaliera a una territoriale, fatta di servizi diffusi. Un numero basso può quindi essere un buon segno, cure sul territorio, oppure un vuoto di assistenza: dipende da cosa c'è fuori dall'ospedale. Per questo è un indicatore descrittivo, che va letto insieme all'offerta dei servizi di salute mentale. Meno ricoveri significa più cura o meno cura?",
+  "limite": "Conta i ricoveri, non le persone in cura sul territorio, quindi da solo non misura la salute mentale di una regione. Non distingue ricoveri appropriati da quelli evitabili, né la qualità dell'assistenza dentro e fuori l'ospedale.",
+  "fonti": []
+ },
+ "637": {
+  "attacco": "Quanti adulti con disabilità o disagio psichico vivono in strutture residenziali cambia molto tra Nord e Sud. In Liguria sono 281 ogni centomila adulti, in Valle d'Aosta 245, mentre in Campania 65 e in Molise 87. La media delle regioni è di circa 150.",
+  "spunto": "Il Nord ospita in strutture una quota molto più alta di adulti fragili, il Sud molto meno: non significa meno bisogni, ma una cura che al Sud resta dentro le famiglie. È il tratto ricorrente dell'assistenza italiana, un welfare istituzionale al Nord e familiare al Mezzogiorno. Nessuno dei due modelli è di per sé migliore, ma pesano su persone diverse. Chi non entra in una struttura è meno assistito o assistito in casa?",
+  "limite": "Conta gli ospiti dei presidi, non chi è assistito a domicilio o in famiglia, quindi una quota bassa non equivale a meno cura. Non misura la qualità delle strutture né l'adeguatezza dell'alternativa familiare.",
+  "fonti": []
+ },
+ "638": {
+  "attacco": "L'assistenza residenziale agli anziani non autosufficienti disegna la stessa Italia divisa. In Trentino Alto Adige sono 3.702 ogni centomila anziani, in Friuli-Venezia Giulia 2.672, mentre in Campania solo 228 e in Sicilia 443. La media delle regioni è di circa 1.532.",
+  "spunto": "Il divario, oltre sedici volte, è tra i più ampi del welfare: al Nord la non autosufficienza degli anziani viene affrontata anche con posti in struttura, al Sud quasi solo in casa. Con l'invecchiamento della popolazione il peso di questa cura crescerà ovunque, ma il modello familiare del Sud regge su risorse che si assottigliano. È un indicatore descrittivo, ma anticipa una delle grandi questioni sociali. Il Sud reggerà la cura degli anziani senza strutture?",
+  "limite": "Conta gli anziani ospitati, non quelli assistiti a casa da familiari o badanti, che al Sud sono la norma. Non misura la qualità delle strutture né i costi che ricadono sulle famiglie dove il posto manca.",
+  "fonti": []
+ },
+ "639": {
+  "attacco": "I minori con disabilità o disturbi mentali ospitati in strutture sono cresciuti molto negli ultimi anni. Vanno da 13 ogni centomila minori in Calabria a 129 in Valle d'Aosta, con la media delle regioni intorno a 44. Il Nord ospita, il Sud molto meno.",
+  "spunto": "Che i minori fragili in struttura aumentino è un dato delicato: può segnalare più presa in carico di situazioni prima invisibili, ma anche più famiglie che non riescono a farsene carico. La solita geografia, più strutture al Nord, si ripete anche per i più piccoli. Dietro numeri piccoli ci sono storie difficili, e il dato va maneggiato con cautela. L'aumento è più protezione o più fragilità delle famiglie?",
+  "limite": "Su numeri piccoli il tasso oscilla e va letto con prudenza. Conta i minori in struttura, non le cause né le alternative familiari, e non dice se l'inserimento sia la soluzione migliore per ciascun bambino.",
+  "fonti": []
+ },
+ "640": {
+  "attacco": "Sommando tutte le età, la quota di persone con disabilità o non autosufficienti ospitate in strutture conferma il quadro. In Trentino Alto Adige sono 965 ogni centomila abitanti, in Valle d'Aosta 824, mentre in Campania 90 e in Calabria 187. La media delle regioni è di circa 479.",
+  "spunto": "È la sintesi dei singoli indicatori sull'assistenza residenziale, e racconta la stessa frattura: un Nord che istituzionalizza la cura e un Sud che la tiene in famiglia. Dieci volte di differenza non sono dieci volte più bisogni, ma due sistemi di welfare opposti. Con meno figli e più anziani, la tenuta del modello familiare meridionale è la vera incognita. Un welfare che scarica sulle famiglie è più solidale o più fragile?",
+  "limite": "Aggrega età e condizioni diverse in un unico tasso di ospiti, senza distinguerle. Non conta l'assistenza domiciliare e familiare, e una quota bassa può nascondere un carico enorme sulle famiglie invece di meno bisogni.",
+  "fonti": []
+ },
+ "653": {
+  "attacco": "Anche la spesa dei comuni per l'assistenza domiciliare agli anziani varia moltissimo. In Valle d'Aosta è di 4.027 euro per utente, in Campania 3.791, mentre in Veneto appena 409. La media delle regioni è di circa 2.241 euro, ed è cresciuta negli ultimi anni.",
+  "spunto": "Qui la geografia si mescola, con Campania e Trentino Alto Adige entrambe in alto: la spesa per utente dipende da quanti anziani si seguono e con quale intensità, oltre che dai criteri contabili. Una spesa alta per pochi utenti non equivale a un servizio diffuso. Va quindi letta insieme a quanti anziani sono davvero raggiunti, non da sola. Spendere di più per utente è coprire meglio o coprire meno persone?",
+  "limite": "È spesa per singolo utente, quindi un valore alto può nascere da pochi assistiti seguiti intensamente. Dipende dai criteri contabili dei comuni e non dice quanti anziani restano senza alcun servizio a domicilio.",
+  "fonti": []
+ },
+ "654": {
+  "attacco": "Per l'assistenza domiciliare alle persone con disabilità la spesa comunale per utente va dai 433 euro del Veneto ai 6.904 del Friuli-Venezia Giulia, con Lazio e Liguria oltre i 5.800. La media delle regioni è di circa 3.464 euro. Quindici volte tra la prima e l'ultima.",
+  "spunto": "Distanze così ampie riflettono soprattutto come i comuni organizzano e registrano il servizio, non quanto tengano alle persone con disabilità. Dove l'assistenza è intensa e individualizzata la spesa per utente sale, dove è diffusa e leggera scende. Il dato è un indizio di modelli diversi, non una graduatoria di impegno. Contano di più i soldi per utente o le persone raggiunte?",
+  "limite": "La spesa per utente dipende dai criteri contabili e dall'intensità del servizio, quindi i confronti diretti sono fragili. Non misura la qualità dell'assistenza né quante persone con disabilità restano fuori dal servizio.",
+  "fonti": []
+ },
+ "641": {
+  "attacco": "Meno di sei scuole su dieci con alunni disabili hanno postazioni informatiche adattate. La quota va dal 47,5% della Valle d'Aosta al 63,7% dell'Emilia-Romagna, con la Calabria sorprendentemente in alto. La media delle regioni è del 57,2%, una copertura ancora solo parziale.",
+  "spunto": "La tecnologia adattata è uno degli strumenti più efficaci per l'inclusione, e qui la geografia non segue il solito Nord-Sud, con Calabria ed Emilia-Romagna vicine in testa. Ma che quasi metà delle scuole ne sia priva racconta un'inclusione ancora incompleta, dichiarata più che attrezzata. Avere l'alunno in classe non basta se manca lo strumento per farlo studiare. L'inclusione è un principio o una dotazione?",
+  "limite": "Conta le scuole che dichiarano di avere postazioni adattate, non quante né se funzionanti o davvero usate. Non dice se lo strumento sia adeguato alla disabilità specifica degli alunni presenti.",
+  "fonti": []
+ },
+ "642": {
+  "attacco": "Meno di metà delle scuole ha un accesso con rampe per chi non può usare le scale. La quota va dal 36% del Trentino Alto Adige al 60,2% della Puglia, con la media delle regioni al 48,5%. Qui il Sud è spesso più attrezzato del Nord.",
+  "spunto": "La rampa è la più elementare delle accessibilità, eppure manca in oltre metà delle scuole. Che Puglia e Basilicata stiano davanti a Trentino ed Emilia ricorda che l'edilizia scolastica più recente, diffusa al Sud, parte a volte da standard migliori. Una barriera architettonica esclude prima ancora che si parli di didattica. Quante scuole restano fisicamente inaccessibili a un alunno in carrozzina?",
+  "limite": "Rileva la presenza di rampe, non la loro conformità, pendenza o reale utilizzabilità. Una scuola può avere una rampa e restare piena di altre barriere, dai piani ai bagni, che il dato non considera.",
+  "fonti": []
+ },
+ "643": {
+  "attacco": "Poco più di sei scuole su dieci hanno un ascensore utilizzabile da persone con disabilità. In Valle d'Aosta arriva all'88%, in Friuli-Venezia Giulia al 71%, mentre in Campania si ferma al 51,5%. La media delle regioni è del 63,4%, con divari territoriali ampi.",
+  "spunto": "L'ascensore è ciò che rende accessibili i piani alti, decisivo negli edifici a più livelli. La sua assenza, in oltre un terzo delle scuole, può relegare un alunno con disabilità motoria al pianterreno, un'inclusione solo apparente. Il divario tra regioni è ampio e non del tutto prevedibile. Essere in classe al piano giusto è un dettaglio o una condizione dell'inclusione?",
+  "limite": "Conta la presenza di un ascensore adatto, non se sia funzionante o manutenuto. Non dice quanti piani abbia l'edificio, e una scuola su un solo livello non ne ha bisogno pur risultando priva.",
+  "fonti": []
+ },
+ "644": {
+  "attacco": "Il servoscala, alternativa all'ascensore per superare i dislivelli, è raro: lo ha in media solo il 12% delle scuole. La quota va dal 7,5% della Calabria al 18,2% del Piemonte, con la media delle regioni ferma al 12%. Ovunque è una dotazione minoritaria.",
+  "spunto": "Numeri così bassi dicono che il servoscala è più un rimedio occasionale che una soluzione diffusa, spesso installato dove mancava l'ascensore. La sua rarità, insieme a quella di rampe e ascensori, compone il quadro di scuole ancora piene di barriere fisiche. L'accessibilità non è un singolo dispositivo, ma una catena che basta un anello a spezzare. Bastano pochi ausili o serve ripensare gli edifici?",
+  "limite": "Rileva la presenza del servoscala, non se sia funzionante o adatto alle carrozzine in uso. È solo uno dei tanti ausili necessari, e da solo non rende accessibile un edificio.",
+  "fonti": []
+ },
+ "645": {
+  "attacco": "I bagni accessibili sono più diffusi di altri ausili: li ha in media il 72,4% delle scuole. La quota parte dal 61,1% della Liguria, con Campania e Lazio poco sopra, mentre altrove supera l'80%. La media delle regioni è del 72,4%.",
+  "spunto": "Il bagno a norma è una necessità quotidiana, non un dettaglio: senza, la giornata scolastica di un alunno con disabilità diventa impraticabile. Che quasi tre scuole su dieci ne siano prive, in alcune regioni di più, pesa sulla dignità prima che sull'apprendimento. La sua diffusione, superiore ad ascensori e rampe, mostra che alcune barriere si abbattono prima di altre. Come mai un ausilio così basilare non è ancora ovunque?",
+  "limite": "Conta i bagni dichiarati a norma, non il loro numero né lo stato di manutenzione. Una scuola grande con un solo bagno accessibile può risultare a norma pur non bastando alla sua popolazione.",
+  "fonti": []
+ },
+ "646": {
+  "attacco": "Le scale a norma, con gradini e corrimano regolari, sono presenti in media nell'81,2% delle scuole. La quota va dal 71,8% del Lazio al 94% della Valle d'Aosta. È una delle dotazioni di sicurezza più diffuse, ma non ancora presente in tutte le scuole.",
+  "spunto": "Le scale a norma riguardano la sicurezza di tutti, non solo degli alunni con disabilità, e la loro buona diffusione racconta un patrimonio edilizio in parte adeguato. Ma quasi una scuola su cinque resta indietro, e nelle grandi città, con edifici più vecchi, il ritardo è maggiore. La sicurezza strutturale è la base su cui ogni altra accessibilità si appoggia. Una scuola sicura è già una scuola accessibile?",
+  "limite": "Rileva la conformità dichiarata delle scale, non lo stato reale di manutenzione. Riguarda la sicurezza generale, non l'accessibilità di chi non può usare le scale, garantita da ascensori e rampe.",
+  "fonti": []
+ },
+ "647": {
+  "attacco": "Le porte a norma, abbastanza larghe e sicure, sono presenti in media nell'82,6% delle scuole. Si va dal 72,8% del Lazio, in coda, al 95,9% della Valle d'Aosta. Come le scale, è una dotazione diffusa ma non ancora ovunque presente.",
+  "spunto": "Porte troppo strette o non sicure sono una barriera silenziosa, che blocca le carrozzine e rallenta le evacuazioni. La loro buona diffusione, insieme a scale e bagni, mostra che le accessibilità più semplici avanzano prima di quelle costose come gli ascensori. Il Lazio, con molti edifici storici, resta indietro un po' su tutto. Le barriere più difficili da togliere sono quelle strutturali o quelle economiche?",
+  "limite": "Conta le porte dichiarate a norma, non quante nell'edificio lo siano davvero. Una sola porta non conforme su un percorso può renderlo inaccessibile, un dettaglio che la percentuale complessiva non coglie.",
+  "fonti": []
+ },
+ "650": {
+  "attacco": "I segnali acustici o visivi per l'emergenza, utili a chi ha disabilità sensoriali, sono rari: li ha in media solo il 17% delle scuole. La quota va dal 12,3% della Campania al 23,5% della Valle d'Aosta. Ovunque è una dotazione di minoranza.",
+  "spunto": "In caso di emergenza, un allarme solo sonoro esclude chi non sente, uno solo luminoso chi non vede. Che più di quattro scuole su cinque ne siano prive mostra come l'accessibilità sensoriale sia la più trascurata, dietro a quella motoria. È una sicurezza che diventa visibile solo quando serve, e allora è tardi. L'inclusione pensa anche a chi non vede o non sente, o solo a chi non cammina?",
+  "limite": "Rileva la presenza di segnali adatti, non se funzionanti o conformi alle diverse disabilità sensoriali. Non dice se il personale sia formato a gestire un'emergenza con studenti sordi o ciechi.",
+  "fonti": []
+ },
+ "651": {
+  "attacco": "Le mappe a rilievo, che orientano gli alunni con disabilità visiva, sono quasi assenti: le ha in media solo il 3,6% delle scuole. La quota va dallo 0,76% della Liguria al 6,7% della Calabria, con il Sud in testa. Ovunque è una rarità.",
+  "spunto": "È l'ausilio più raro di tutti, presente in una scuola su trenta: per uno studente cieco, muoversi da solo nell'edificio resta spesso impossibile. Che le quote più alte siano al Sud non cambia la sostanza, ovunque il numero è minimo. È il segno che l'accessibilità visiva è l'ultima frontiera, quella meno presidiata dell'inclusione scolastica. Una scuola che un cieco non può attraversare da solo è davvero inclusiva?",
+  "limite": "Conta le scuole con mappe a rilievo, non la loro qualità o aggiornamento. È un solo ausilio tra quelli necessari a chi non vede, e da solo non garantisce l'autonomia negli spazi scolastici.",
+  "fonti": []
  }
 }
