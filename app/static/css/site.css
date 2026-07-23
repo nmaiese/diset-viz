@@ -393,6 +393,30 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   .indicator-explore__readout { margin-left: 0; text-align: left; }
   .indicator-explore__ctrl input[type="range"] { width: 100%; }
 }
+.indicator-explore__trend { margin: 18px 0 0; }
+.indicator-explore__trend[hidden] { display: none; }
+.indicator-explore__trend figcaption { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 8px; }
+.indicator-explore__chart { position: relative; }
+.indicator-explore__chart svg { display: block; width: 100%; height: auto; cursor: crosshair; }
+.trend-grid { stroke: var(--grid); stroke-width: 1; }
+.trend-axis { font-family: var(--font-mono); font-size: 10px; fill: var(--muted); }
+.trend-line { stroke-width: 2; }
+.trend-line--avg { stroke: var(--muted); stroke-dasharray: 4 4; opacity: 0.7; }
+.trend-line--focus { stroke: var(--accent); }
+.trend-dot { fill: var(--accent); }
+.trend-dot--current { fill: var(--accent); stroke: var(--paper); stroke-width: 2; }
+.trend-marker { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.4; }
+.indicator-explore__tip,
+.indicator-map__tip { position: absolute; transform: translate(-50%, -140%); pointer-events: none; background: var(--ink); color: var(--paper); font-size: 12px; padding: 4px 8px; white-space: nowrap; box-shadow: var(--shadow-tooltip); z-index: 5; }
+.indicator-explore__tip[hidden],
+.indicator-map__tip[hidden] { display: none; }
+
+/* Choropleth made interactive on the indicator page: hover + selected region. */
+.indicator-map-frame { position: relative; }
+.indicator-map [data-key] { transition: fill var(--dur-fast) var(--ease-out); }
+.indicator-map [data-key]:hover { opacity: 0.85; }
+.indicator-map [data-key].is-selected { stroke: var(--accent); stroke-width: 2; }
+.indicator-map-hint { margin-top: 0; }
 .score-bar { display: inline-block; width: 80px; height: 7px; margin-right: 8px; background: var(--grid); vertical-align: middle; }
 .score-bar > span { display: block; height: 100%; background: var(--accent); transition: transform 520ms cubic-bezier(0.22, 0.61, 0.36, 1); }
 

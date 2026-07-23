@@ -167,6 +167,13 @@
           <span class="indicator-explore__sub" data-explore="focus-rank"></span>
         </div>
       </div>
+      <figure class="indicator-explore__trend" data-explore="trend" hidden>
+        <figcaption data-explore="trend-title"></figcaption>
+        <div class="indicator-explore__chart">
+          <svg data-explore="trend-svg" viewBox="0 0 640 200" role="img" aria-label="Serie storica della regione a fuoco e media delle regioni"></svg>
+          <div class="indicator-explore__tip" data-explore="trend-tip" hidden></div>
+        </div>
+      </figure>
     </div>
 
     <table class="data-table">
@@ -281,8 +288,12 @@
       {% for key, color in map_colors.items() %}.indicator-map [data-key="{{ key }}"]{fill:{{ color }}}
       {% endfor %}
     </style>
-    <div class="indicator-map" data-explore="map">
-      {% include "_italy_map.html" %}
+    <p class="page-note indicator-map-hint">Passa sopra o tocca una regione per leggerne il valore; selezionala per portarla a fuoco nella scheda e nella serie storica.</p>
+    <div class="indicator-map-frame">
+      <div class="indicator-map" data-explore="map">
+        {% include "_italy_map.html" %}
+      </div>
+      <div class="indicator-map__tip" data-explore="map-tip" hidden></div>
     </div>
   </section>
   {% endif %}
