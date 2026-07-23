@@ -370,6 +370,29 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .data-table .num { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .data-table .rank { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--muted); width: 36px; }
 .data-table tr.is-unrated { color: var(--muted); }
+.data-table tr.is-focus { background: var(--accent-soft); }
+.data-table tr.is-focus .rank { color: var(--accent); }
+.data-table tr[data-region-key] { cursor: pointer; }
+.data-table tr[data-region-key]:hover { background: var(--accent-soft); }
+
+/* In-page indicator explorer: year slider + region focus, hydrated over the
+   server-rendered ranking. Hidden until JS wires it (progressive enhancement). */
+.indicator-explore { border: 1px solid var(--accent); background: var(--panel); padding: 20px 20px 18px; margin: 6px 0 18px; }
+.indicator-explore[hidden] { display: none; }
+.indicator-explore__bar { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; }
+.indicator-explore__ctrl { display: grid; gap: 6px; }
+.indicator-explore__ctrl > span { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.indicator-explore__ctrl input[type="range"] { width: 220px; accent-color: var(--accent); }
+.indicator-explore__ctrl select { border: 1px solid var(--line); background: var(--panel); padding: 9px 12px; font-family: inherit; font-size: 14px; color: var(--ink); }
+.indicator-explore__year { font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: var(--ink); }
+.indicator-explore__readout { margin-left: auto; display: grid; gap: 2px; text-align: right; }
+.indicator-explore__k { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.indicator-explore__big { font-family: var(--font-mono); font-weight: 700; font-size: 34px; line-height: 1; color: var(--ink); }
+.indicator-explore__sub { color: var(--ink-soft); font-size: 13px; }
+@media (max-width: 640px) {
+  .indicator-explore__readout { margin-left: 0; text-align: left; }
+  .indicator-explore__ctrl input[type="range"] { width: 100%; }
+}
 .score-bar { display: inline-block; width: 80px; height: 7px; margin-right: 8px; background: var(--grid); vertical-align: middle; }
 .score-bar > span { display: block; height: 100%; background: var(--accent); transition: transform 520ms cubic-bezier(0.22, 0.61, 0.36, 1); }
 

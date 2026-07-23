@@ -159,28 +159,15 @@ function App() {
     }
   }, [activeView, selectedId]);
 
-  // Load the selected indicator only when the detail view is active.
+  // A detail intent (a shared ?indicator=… link, or ?view=detail) is no longer a
+  // page the atlas renders: it resolves to the indicator's canonical URL. Redirect
+  // to that server-rendered, interactive page instead of mounting a dashboard.
   useEffect(() => {
     if (activeView !== "detail" || !catalog) return;
     const id = selectedId || catalog.featured_indicator_id;
-    if (!id) return;
-    if (id !== selectedId) {
-      setSelectedId(id);
-      return;
-    }
-    fetchJson(API.indicator(id))
-      .then((payload) => {
-        setIndicator(payload);
-        const years = payload.metadata.years;
-        const regions = payload.metadata.regions;
-        if (!selectedYear || !years.includes(Number(selectedYear))) {
-          setSelectedYear(String(payload.metadata.year_max));
-        }
-        if (!selectedRegion || !regions.includes(selectedRegion)) {
-          setSelectedRegion(regions[0]);
-        }
-      })
-      .catch(() => setError("Indicatore non disponibile. Prova a selezionarne un altro."));
+    const list = catalog.indicators || [];
+    const item = id && list.find((it) => String(it.id) === String(id));
+    window.location.replace(item ? (item.path || indicatorPath(item.id, item.name)) : "/atlante");
   }, [activeView, selectedId, catalog]);
 
   // Region standing map: load once, the first time the region mode is opened.
@@ -221,41 +208,18 @@ function App() {
     };
   }, [activeView, regionKey]);
 
-  // Open an indicator's dashboard. `origin` optionally carries the region the user
-  // came from, so the dashboard opens on that region and Back can return to it.
-  // `evt`, when present, is the click that triggered the open: its target becomes
-  // the shared-element source for a View Transitions API expand into the detail
-  // hero (see the "ind-hero" view-transition-name on .indicator-header).
+  // Open an indicator. The atlas no longer owns a detail URL of its own: every
+  // indicator has a single canonical, server-rendered page at /indicatore/{slug}
+  // that is itself interactive (year slider, region focus, live ranking/map). So
+  // a result click navigates there instead of mounting a duplicate dashboard.
   const openIndicator = (item, origin, evt) => {
-    const source = evt && evt.currentTarget instanceof HTMLElement ? evt.currentTarget : null;
-    const apply = () => {
-      setSelectedId(item.id);
-      setThemeParam(item.theme);
-      setQueryParam(null);
-      if (origin && origin.type === "regione" && origin.key) {
-        setFromParam(`regione:${origin.key}`);
-        if (origin.name) setSelectedRegion(origin.name);
-      } else {
-        setFromParam(null);
-      }
-      setView("detail");
-      window.scrollTo({ top: 0, behavior: "auto" });
-    };
     trackEvent("select_indicator", {
       indicator_id: item.id,
       indicator_name: item.name,
       indicator_theme: item.theme,
       from: origin?.type || "atlas",
     });
-    if (source && supportsViewTransitions && !prefersReducedMotion()) {
-      source.style.viewTransitionName = "ind-hero";
-      document
-        .startViewTransition(apply)
-        .finished.catch(() => {})
-        .finally(() => { source.style.viewTransitionName = ""; });
-      return;
-    }
-    withViewTransition(apply);
+    window.location.assign(item.path || indicatorPath(item.id, item.name));
   };
 
   // Back out of the dashboard: return to the region we came from, if any.
@@ -363,40 +327,14 @@ function App() {
   }
 
   if (activeView === "detail") {
+    // The redirect effect above sends the browser to the indicator's canonical
+    // page. Show the skeleton meanwhile so there is no flash of a second dashboard.
     return (
-      <DetailView
-        catalog={catalog}
-        mapData={mapData}
-        indicator={indicator}
-        theme={theme}
-        selectedId={selectedId}
-        selectedYear={selectedYear}
-        setSelectedYear={(value) => {
-          setSelectedYear(value);
-          trackEvent("change_year", { indicator_id: selectedId, year: value });
-        }}
-        selectedRegion={selectedRegion}
-        setSelectedRegion={(value) => {
-          setSelectedRegion(value);
-          trackEvent("change_region", { indicator_id: selectedId, region: value });
-        }}
-        onSelectIndicator={(id) => {
-          trackEvent("select_sibling_indicator", { indicator_id: id });
-          withViewTransition(() => setSelectedId(id));
-        }}
-        onOpenRegion={openRegion}
-        onNavRegioni={() => goToMode("regioni")}
-        onNavAtlas={() => goToMode("atlas")}
-        onBack={backFromDetail}
-        backContext={fromParam && fromParam.indexOf("regione:") === 0
-          ? { type: "regione", key: fromParam.slice("regione:".length), name: selectedRegion }
-          : null}
-        activeTab={activeTab}
-        setActiveTab={(value) => {
-          setActiveTab(value);
-          trackEvent("change_visualization", { view_type: value, indicator_id: selectedId });
-        }}
-      />
+      <main className="app-shell">
+        <SiteHeader />
+        <AtlasViewSkeleton />
+        <SiteFooter />
+      </main>
     );
   }
 

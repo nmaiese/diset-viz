@@ -19,6 +19,7 @@ from app.atlas_catalog import (
     search_atlas_indicators,
 )
 from app import profiles
+from app import seo_policy
 from app import indicator_notes
 from app import quality_life_bes as qb
 from app import bes_data
@@ -306,6 +307,42 @@ def indicator_page(slug):
     map_colors = indicator_notes.region_choropleth_colors(values)
     spark_points = indicator_notes.sparkline_points(meta.get("spark") or [], width=1200, height=140)
     cover_bars = indicator_notes.cover_bars(values, best, worst, scoreable)
+
+    # Full year x region matrix embedded in the page so the client hydrates the
+    # ranking, map and readout in place, on this one canonical URL, without any
+    # extra fetch. The last-year ranking above stays server-rendered as the
+    # crawlable fallback: the explore controls only enhance it.
+    region_names = {}
+    matrix = {}
+    for row in payload["series"]:
+        if row["value"] is None:
+            continue
+        region_names.setdefault(row["region_key"], row["region"])
+        matrix.setdefault(str(row["year"]), {})[row["region_key"]] = row["value"]
+    explore_data = {
+        "id": meta["id"],
+        "unit": indicator_notes.value_unit_label(meta["name"], meta["unit"]),
+        "years": meta["years"],
+        "yearMin": meta["year_min"],
+        "yearMax": meta["year_max"],
+        "defaultYear": year,
+        "direction": direction,
+        "higherBetter": direction not in ("lower_better", "higher_worse"),
+        "scoreable": scoreable,
+        "canonical": canonical_path,
+        "regions": [
+            {"key": key, "name": name}
+            for key, name in sorted(region_names.items(), key=lambda kv: kv[1])
+        ],
+        "matrix": matrix,
+        "ramp": {"from": [0xE7, 0xEC, 0xF3], "to": [0x15, 0x23, 0x3B]},
+    }
+
+    # Exploration states (?anno=, ?regione=) are the same object, not a new page:
+    # they never enter the index or sitemap and the canonical stays the base URL.
+    explore_state = seo_policy.has_explore_params(request.args)
+    noindex = (not is_indexable) or explore_state
+
     response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
@@ -319,6 +356,8 @@ def indicator_page(slug):
         annual_note=annual_note,
         trend_note=trend_note,
         is_indexable=is_indexable,
+        noindex=noindex,
+        explore_data=explore_data,
         map_colors=map_colors,
         spark_points=spark_points,
         page_intro=indicator_notes.indicator_page_intro(
@@ -341,7 +380,7 @@ def indicator_page(slug):
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{canonical_path}",
     ))
-    if not is_indexable:
+    if noindex:
         response.headers["X-Robots-Tag"] = "noindex, follow"
     return response
 

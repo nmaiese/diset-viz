@@ -5,7 +5,7 @@
 {% block title %}{{ seo_title }}{% endblock %}
 {% block description %}{{ seo_description }}{% endblock %}
 {% block robots_meta %}
-{% if not is_indexable %}
+{% if noindex %}
 <meta name="robots" content="noindex, follow">
 {% else %}
 {{ super() }}
@@ -141,19 +141,39 @@
     {% endif %}
   </section>
 
-  <section class="page-ranking">
-    <h2>La classifica delle regioni nel {{ year }}</h2>
+  <section class="page-ranking" id="esplora">
+    <h2>La classifica delle regioni nel <span data-explore="year-title">{{ year }}</span></h2>
     <p class="page-note">L'ultimo dato disponibile, regione per regione.
       {% if explain.direction == 'higher_better' %}Più in alto nella lista, meglio è.
       {% elif explain.direction in ('lower_better', 'higher_worse') %}Qui valori più bassi raccontano una situazione migliore.
       {% else %}Come leggere i numeri dipende dal singolo indicatore, quindi confrontali con prudenza.{% endif %}
-      Per scorrere gli anni e vedere come è cambiato, apri l'indicatore nell'atlante.
+      Scorri gli anni e scegli una regione qui sotto: la classifica, la mappa e la scheda si aggiornano su questa stessa pagina.
     </p>
+
+    <div class="indicator-explore" data-explore-root hidden>
+      <div class="indicator-explore__bar">
+        <label class="indicator-explore__ctrl">
+          <span>Anno</span>
+          <input type="range" data-explore="year" min="0" max="0" step="1" value="0" aria-label="Anno">
+          <span class="indicator-explore__year" data-explore="year-label">{{ year }}</span>
+        </label>
+        <label class="indicator-explore__ctrl">
+          <span>Regione a fuoco</span>
+          <select data-explore="region" aria-label="Regione a fuoco"></select>
+        </label>
+        <div class="indicator-explore__readout">
+          <span class="indicator-explore__k" data-explore="focus-name"></span>
+          <strong class="indicator-explore__big" data-explore="focus-value"></strong>
+          <span class="indicator-explore__sub" data-explore="focus-rank"></span>
+        </div>
+      </div>
+    </div>
+
     <table class="data-table">
       <thead><tr><th>#</th><th>Regione</th><th class="num">{{ value_unit }}</th></tr></thead>
-      <tbody>
+      <tbody data-explore="ranking">
         {% for row in values %}
-        <tr>
+        <tr data-region-key="{{ row.region_key }}">
           <td class="rank">{{ loop.index }}</td>
           <td><a href="/regione/{{ row.region_key }}">{{ row.region }}</a></td>
           <td class="num">{{ row.value | it_num(2) }}</td>
@@ -227,33 +247,33 @@
 
   {% if map_colors %}
   <section class="indicator-map-wrap">
-    <h2>Mappa: valore per regione, {{ year }}</h2>
+    <h2>Mappa: valore per regione, <span data-explore="map-year">{{ year }}</span></h2>
     {% if best and worst %}
-    <section class="indicator-insight">
+    <section class="indicator-insight" data-explore="insight" data-explore-scoreable="1">
       <div class="indicator-insight__item is-best">
-        <small>Migliore, {{ year }}</small>
-        <strong><a href="/regione/{{ best.region_key }}">{{ best.region }}</a></strong>
-        <span>{{ best.value | it_num(2) }} {{ value_unit }}</span>
+        <small>Migliore, <span data-explore="year-label">{{ year }}</span></small>
+        <strong><a href="/regione/{{ best.region_key }}" data-explore="best-name">{{ best.region }}</a></strong>
+        <span><span data-explore="best-value">{{ best.value | it_num(2) }}</span> {{ value_unit }}</span>
       </div>
       {% if stats.year_avg is not none %}
       <div class="indicator-insight__item">
-        <small>Media delle regioni, {{ year }}</small>
-        <strong>{{ stats.year_avg | it_num(2) }}</strong>
-        <span>{{ value_unit }}, {{ stats.year_count }} regioni</span>
+        <small>Media delle regioni, <span data-explore="year-label">{{ year }}</span></small>
+        <strong data-explore="avg-value">{{ stats.year_avg | it_num(2) }}</strong>
+        <span>{{ value_unit }}, <span data-explore="avg-count">{{ stats.year_count }}</span> regioni</span>
       </div>
       {% endif %}
       <div class="indicator-insight__item is-worst">
-        <small>Ultima, {{ year }}</small>
-        <strong><a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a></strong>
-        <span>{{ worst.value | it_num(2) }} {{ value_unit }}</span>
+        <small>Ultima, <span data-explore="year-label">{{ year }}</span></small>
+        <strong><a href="/regione/{{ worst.region_key }}" data-explore="worst-name">{{ worst.region }}</a></strong>
+        <span><span data-explore="worst-value">{{ worst.value | it_num(2) }}</span> {{ value_unit }}</span>
       </div>
     </section>
     {% elif stats.year_avg is not none %}
-    <section class="indicator-insight">
+    <section class="indicator-insight" data-explore="insight">
       <div class="indicator-insight__item">
-        <small>Media delle regioni, {{ year }}</small>
-        <strong>{{ stats.year_avg | it_num(2) }}</strong>
-        <span>{{ value_unit }}, {{ stats.year_count }} regioni</span>
+        <small>Media delle regioni, <span data-explore="year-label">{{ year }}</span></small>
+        <strong data-explore="avg-value">{{ stats.year_avg | it_num(2) }}</strong>
+        <span>{{ value_unit }}, <span data-explore="avg-count">{{ stats.year_count }}</span> regioni</span>
       </div>
     </section>
     {% endif %}
@@ -261,7 +281,7 @@
       {% for key, color in map_colors.items() %}.indicator-map [data-key="{{ key }}"]{fill:{{ color }}}
       {% endfor %}
     </style>
-    <div class="indicator-map">
+    <div class="indicator-map" data-explore="map">
       {% include "_italy_map.html" %}
     </div>
   </section>
@@ -280,10 +300,13 @@
 
   <aside class="indicator-cta">
     <span>
-      <small>Esplora l'indicatore</small>
-      <strong>Mappa, serie storica anno per anno e confronti tra regioni nell'atlante</strong>
+      <small>Continua il percorso</small>
+      <strong>Metti a confronto più regioni su questo e altri indicatori nello strumento di confronto.</strong>
     </span>
-    <a href="/atlante?indicator={{ meta.id }}">Apri nell'atlante →</a>
+    <a href="/atlante?view=confronto">Apri il confronto →</a>
   </aside>
 </article>
+
+<script type="application/json" id="indicator-data">{{ explore_data | tojson }}</script>
+<script src="{{ url_for('static', filename='js/indicator-explorer.js') }}" defer></script>
 {% endblock %}
