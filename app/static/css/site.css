@@ -964,26 +964,23 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .themes-hero .eyebrow { margin: 0; font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
 .themes-hero h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(30px, 5vw, 52px); letter-spacing: -0.015em; line-height: 1; }
 .themes-hero .page-lead { margin: 0; max-width: 62ch; }
-.themes-areas { display: grid; gap: 18px; }
-.theme-area { display: grid; gap: 16px; padding: clamp(18px, 3vw, 24px); background: var(--panel); border: 1px solid var(--line); }
-.theme-area__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; }
-.theme-area__kicker { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 5px; }
-.theme-area__head h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: clamp(21px, 3vw, 26px); letter-spacing: -0.01em; }
+/* Area cards mirror the design's "Temi e aree" treatment (same values as the
+   home-theme-card the home already uses); here the theme names are clickable. */
+.themes-areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; align-items: start; }
+.theme-area { display: grid; gap: 12px; align-content: start; padding: 20px; background: var(--panel); border: 1px solid var(--line); }
+.theme-area__kicker { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.theme-area h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 20px; letter-spacing: -0.01em; }
 .theme-area__count { margin: 0; color: var(--ink-soft); font-size: 13.5px; }
 .theme-area__count strong { font-family: var(--font-mono); font-size: 14px; color: var(--ink); }
-.theme-area__ends { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0; padding: 11px 14px; background: var(--paper); border: 1px solid var(--grid); }
-.theme-area__ends div { display: flex; align-items: baseline; gap: 10px; }
+.theme-area__themes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
+.theme-area__themes a { display: inline-block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); padding: 3px 7px; border: 1px solid var(--grid); transition: border-color 140ms ease, color 140ms ease; }
+.theme-area__themes a:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+.theme-area__ends { display: grid; gap: 6px; margin: 0; padding: 10px 0 0; border-top: 1px solid var(--grid); }
+.theme-area__ends div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .theme-area__ends dt { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
-.theme-area__ends dd { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 14.5px; }
+.theme-area__ends dd { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 14.5px; text-align: right; }
 .theme-area__ends dd.is-top { color: var(--positive-ink); }
 .theme-area__ends dd.is-bottom { color: var(--accent); }
-.theme-area__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
-.theme-chip { display: flex; flex-direction: column; gap: 7px; padding: 13px 15px; background: var(--paper); border: 1px solid var(--line); color: inherit; transition: border-color 140ms ease, transform 140ms ease; }
-.theme-chip:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; }
-.theme-chip__name { font-family: var(--font-display); font-weight: 700; font-size: 15.5px; letter-spacing: -0.01em; color: var(--ink); }
-.theme-chip__meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-family: var(--font-mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
-.theme-chip:hover .theme-chip__meta { color: var(--accent); }
-@media (max-width: 640px) { .theme-area__grid { grid-template-columns: 1fr; } }
 
 /* Confronta preview */
 .home-compare-panel { background: var(--panel); border: 1px solid var(--line); padding: 20px; display: grid; gap: 18px; }

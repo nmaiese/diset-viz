@@ -37,27 +37,18 @@
   <div class="themes-areas">
     {% for a in areas %}
     <section class="theme-area" aria-label="{{ a.area }}">
-      <div class="theme-area__head">
-        <div>
-          <span class="theme-area__kicker">Area</span>
-          <h2>{{ a.area }}</h2>
-        </div>
-        <p class="theme-area__count"><strong>{{ a.count }}</strong> {{ 'indicatore' if a.count == 1 else 'indicatori' }} &middot; {{ a.theme_count }} {{ 'tema' if a.theme_count == 1 else 'temi' }}</p>
-      </div>
+      <span class="theme-area__kicker">Area</span>
+      <h2>{{ a.area }}</h2>
+      <p class="theme-area__count"><strong>{{ a.count }}</strong> {{ 'indicatore' if a.count == 1 else 'indicatori' }} &middot; {{ a.theme_count }} {{ 'tema' if a.theme_count == 1 else 'temi' }}</p>
+      <ul class="theme-area__themes">
+        {% for t in a.themes %}<li><a href="{{ t.path }}">{{ t.theme }}</a></li>{% endfor %}
+      </ul>
       {% if a.best %}
       <dl class="theme-area__ends">
         <div><dt>In testa</dt><dd class="is-top">{{ a.best }}</dd></div>
         <div><dt>In coda</dt><dd class="is-bottom">{{ a.worst }}</dd></div>
       </dl>
       {% endif %}
-      <div class="theme-area__grid">
-        {% for t in a.themes %}
-        <a class="theme-chip" href="{{ t.path }}">
-          <span class="theme-chip__name">{{ t.theme }}</span>
-          <span class="theme-chip__meta">{{ t.indicator_count }} {{ 'indicatore' if t.indicator_count == 1 else 'indicatori' }} <span aria-hidden="true">&rarr;</span></span>
-        </a>
-        {% endfor %}
-      </div>
     </section>
     {% endfor %}
   </div>
