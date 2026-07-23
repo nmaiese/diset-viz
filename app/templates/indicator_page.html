@@ -60,6 +60,16 @@
 <article class="page page-indicator wrap">
   <nav class="breadcrumb"><a href="/temi">Temi</a> / <a href="{{ theme_path }}">{{ meta.theme }}</a></nav>
 
+  {# Same catalog search the atlas offered: without JS it submits to /atlante, with JS it
+     shows live results linking straight to each indicator's canonical page. #}
+  <form class="indicator-finder" data-indicator-search role="search" action="/atlante" method="get" autocomplete="off">
+    <label>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="search" name="q" data-search-input placeholder="Cerca un altro indicatore nell'atlante..." aria-label="Cerca un indicatore">
+    </label>
+    <div class="indicator-finder__results" data-search-results hidden role="listbox" aria-label="Risultati della ricerca"></div>
+  </form>
+
   <h1>{{ meta.name }}</h1>
   <p class="page-lead">{{ page_intro }}</p>
   {% if not is_indexable %}
@@ -77,30 +87,104 @@
     <span><small>Download</small><a href="/download/indicator/{{ meta.id }}.csv">CSV</a> · <a href="/download/indicator/{{ meta.id }}.json">JSON</a></span>
   </div>
 
-  {% if cover_bars %}
-  <figure class="indicator-cover">
-    <div class="indicator-cover__card">
-      <div class="indicator-cover__kicker">Divario Italia · dati {{ year }}</div>
-      <div class="indicator-cover__title">{{ meta.name }}</div>
-      <div class="indicator-cover__subtitle">{{ meta.theme }} · {{ value_unit }}</div>
-      <div class="indicator-cover__bars">
-        {% for bar in cover_bars %}
-        <div class="indicator-cover__bar{{ ' is-best' if bar.is_best }}{{ ' is-worst' if bar.is_worst }}">
-          <span class="indicator-cover__bar-name">{{ bar.region }}</span>
-          <span class="indicator-cover__bar-track"><i class="indicator-cover__bar-fill" style="width:{{ bar.width_pct }}%"></i></span>
-          <strong class="indicator-cover__bar-value">{{ bar.value | it_num(2) }}</strong>
+  {# ---- Interattività in alto: lo stesso cruscotto dell'atlante (anno, regione,
+       mappa, classifica, serie storica), idratato sulla stessa URL canonica. ---- #}
+  <section class="indicator-dashboard" id="esplora" aria-label="Esplora l'indicatore">
+    <div class="indicator-explore" data-explore-root hidden>
+      <div class="indicator-explore__bar">
+        <label class="indicator-explore__ctrl">
+          <span>Anno</span>
+          <input type="range" data-explore="year" min="0" max="0" step="1" value="0" aria-label="Anno">
+          <span class="indicator-explore__year" data-explore="year-label">{{ year }}</span>
+        </label>
+        <label class="indicator-explore__ctrl">
+          <span>Regione a fuoco</span>
+          <select data-explore="region" aria-label="Regione a fuoco"></select>
+        </label>
+        <div class="indicator-explore__readout">
+          <span class="indicator-explore__k" data-explore="focus-name"></span>
+          <strong class="indicator-explore__big" data-explore="focus-value"></strong>
+          <span class="indicator-explore__sub" data-explore="focus-rank"></span>
         </div>
-        {% endfor %}
       </div>
-      <div class="indicator-cover__footer">
-        <span>Fonte: {{ meta.source_label or meta.source }}</span>
-        <strong>divarioitalia.it</strong>
+      <figure class="indicator-explore__trend" data-explore="trend" hidden>
+        <figcaption data-explore="trend-title"></figcaption>
+        <div class="indicator-explore__chart">
+          <svg data-explore="trend-svg" viewBox="0 0 640 200" role="img" aria-label="Serie storica della regione a fuoco e media delle regioni"></svg>
+          <div class="indicator-explore__tip" data-explore="trend-tip" hidden></div>
+        </div>
+      </figure>
+    </div>
+
+    {% if (best and worst) or stats.year_avg is not none %}
+    <section class="indicator-insight" data-explore="insight"{% if best and worst %} data-explore-scoreable="1"{% endif %}>
+      {% if best and worst %}
+      <div class="indicator-insight__item is-best">
+        <small>Migliore, <span data-explore="year-label">{{ year }}</span></small>
+        <strong><a href="/regione/{{ best.region_key }}" data-explore="best-name">{{ best.region }}</a></strong>
+        <span><span data-explore="best-value">{{ best.value | it_num(2) }}</span> {{ value_unit }}</span>
+      </div>
+      {% endif %}
+      {% if stats.year_avg is not none %}
+      <div class="indicator-insight__item">
+        <small>Media delle regioni, <span data-explore="year-label">{{ year }}</span></small>
+        <strong data-explore="avg-value">{{ stats.year_avg | it_num(2) }}</strong>
+        <span>{{ value_unit }}, <span data-explore="avg-count">{{ stats.year_count }}</span> regioni</span>
+      </div>
+      {% endif %}
+      {% if best and worst %}
+      <div class="indicator-insight__item is-worst">
+        <small>Ultima, <span data-explore="year-label">{{ year }}</span></small>
+        <strong><a href="/regione/{{ worst.region_key }}" data-explore="worst-name">{{ worst.region }}</a></strong>
+        <span><span data-explore="worst-value">{{ worst.value | it_num(2) }}</span> {{ value_unit }}</span>
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <div class="indicator-dashboard__grid">
+      {% if map_colors %}
+      <div class="indicator-dashboard__panel indicator-dashboard__map">
+        <h2>Mappa: valore per regione, <span data-explore="map-year">{{ year }}</span></h2>
+        <p class="page-note indicator-map-hint">Passa sopra o tocca una regione per leggerne il valore; selezionala per portarla a fuoco nella scheda e nella serie storica.</p>
+        <style>
+          {% for key, color in map_colors.items() %}.indicator-map [data-key="{{ key }}"]{fill:{{ color }}}
+          {% endfor %}
+        </style>
+        <div class="indicator-map-frame">
+          <div class="indicator-map" data-explore="map">
+            {% include "_italy_map.html" %}
+          </div>
+          <div class="indicator-map__tip" data-explore="map-tip" hidden></div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="indicator-dashboard__panel indicator-dashboard__ranking">
+        <h2>Classifica delle regioni nel <span data-explore="year-title">{{ year }}</span></h2>
+        <p class="page-note">
+          {% if explain.direction == 'higher_better' %}Più in alto nella lista, meglio è.
+          {% elif explain.direction in ('lower_better', 'higher_worse') %}Qui valori più bassi raccontano una situazione migliore.
+          {% else %}Come leggere i numeri dipende dal singolo indicatore, quindi confrontali con prudenza.{% endif %}
+          Usa i controlli qui sopra per cambiare anno e regione: la classifica, la mappa e la serie storica si aggiornano insieme su questa stessa pagina.
+        </p>
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Regione</th><th class="num">{{ value_unit }}</th></tr></thead>
+          <tbody data-explore="ranking">
+            {% for row in values %}
+            <tr data-region-key="{{ row.region_key }}">
+              <td class="rank">{{ loop.index }}</td>
+              <td><a href="/regione/{{ row.region_key }}">{{ row.region }}</a></td>
+              <td class="num">{{ row.value | it_num(2) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
-    <figcaption>Anteprima dei dati di questo indicatore, generata automaticamente nello stesso formato usato per le condivisioni social.</figcaption>
-  </figure>
-  {% endif %}
+  </section>
 
+  {# ---- Testi ed editoriale SEO sotto il cruscotto. ---- #}
   <section class="prose indicator-definition">
     <h2>Che cosa misura e come leggere il dato</h2>
     <h3>Che cosa significa il valore</h3>
@@ -139,55 +223,6 @@
     {% else %}
     <p>La fonte rende disponibile un solo anno per questa serie. Non è quindi possibile calcolare una variazione rispetto all'anno precedente con la stessa definizione.</p>
     {% endif %}
-  </section>
-
-  <section class="page-ranking" id="esplora">
-    <h2>La classifica delle regioni nel <span data-explore="year-title">{{ year }}</span></h2>
-    <p class="page-note">L'ultimo dato disponibile, regione per regione.
-      {% if explain.direction == 'higher_better' %}Più in alto nella lista, meglio è.
-      {% elif explain.direction in ('lower_better', 'higher_worse') %}Qui valori più bassi raccontano una situazione migliore.
-      {% else %}Come leggere i numeri dipende dal singolo indicatore, quindi confrontali con prudenza.{% endif %}
-      Scorri gli anni e scegli una regione qui sotto: la classifica, la mappa e la scheda si aggiornano su questa stessa pagina.
-    </p>
-
-    <div class="indicator-explore" data-explore-root hidden>
-      <div class="indicator-explore__bar">
-        <label class="indicator-explore__ctrl">
-          <span>Anno</span>
-          <input type="range" data-explore="year" min="0" max="0" step="1" value="0" aria-label="Anno">
-          <span class="indicator-explore__year" data-explore="year-label">{{ year }}</span>
-        </label>
-        <label class="indicator-explore__ctrl">
-          <span>Regione a fuoco</span>
-          <select data-explore="region" aria-label="Regione a fuoco"></select>
-        </label>
-        <div class="indicator-explore__readout">
-          <span class="indicator-explore__k" data-explore="focus-name"></span>
-          <strong class="indicator-explore__big" data-explore="focus-value"></strong>
-          <span class="indicator-explore__sub" data-explore="focus-rank"></span>
-        </div>
-      </div>
-      <figure class="indicator-explore__trend" data-explore="trend" hidden>
-        <figcaption data-explore="trend-title"></figcaption>
-        <div class="indicator-explore__chart">
-          <svg data-explore="trend-svg" viewBox="0 0 640 200" role="img" aria-label="Serie storica della regione a fuoco e media delle regioni"></svg>
-          <div class="indicator-explore__tip" data-explore="trend-tip" hidden></div>
-        </div>
-      </figure>
-    </div>
-
-    <table class="data-table">
-      <thead><tr><th>#</th><th>Regione</th><th class="num">{{ value_unit }}</th></tr></thead>
-      <tbody data-explore="ranking">
-        {% for row in values %}
-        <tr data-region-key="{{ row.region_key }}">
-          <td class="rank">{{ loop.index }}</td>
-          <td><a href="/regione/{{ row.region_key }}">{{ row.region }}</a></td>
-          <td class="num">{{ row.value | it_num(2) }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
   </section>
 
   <section class="prose indicator-analysis">
@@ -244,58 +279,28 @@
     {% endif %}
   </section>
 
-  <aside class="indicator-cta">
-    <span>
-      <small>Continua il percorso</small>
-      <strong>Confronta questo indicatore con il tema {{ meta.theme }} e con gli altri profili territoriali.</strong>
-    </span>
-    <a href="{{ theme_path }}">Vai al tema →</a>
-  </aside>
-
-  {% if map_colors %}
-  <section class="indicator-map-wrap">
-    <h2>Mappa: valore per regione, <span data-explore="map-year">{{ year }}</span></h2>
-    {% if best and worst %}
-    <section class="indicator-insight" data-explore="insight" data-explore-scoreable="1">
-      <div class="indicator-insight__item is-best">
-        <small>Migliore, <span data-explore="year-label">{{ year }}</span></small>
-        <strong><a href="/regione/{{ best.region_key }}" data-explore="best-name">{{ best.region }}</a></strong>
-        <span><span data-explore="best-value">{{ best.value | it_num(2) }}</span> {{ value_unit }}</span>
+  {% if cover_bars %}
+  <figure class="indicator-cover">
+    <div class="indicator-cover__card">
+      <div class="indicator-cover__kicker">Divario Italia · dati {{ year }}</div>
+      <div class="indicator-cover__title">{{ meta.name }}</div>
+      <div class="indicator-cover__subtitle">{{ meta.theme }} · {{ value_unit }}</div>
+      <div class="indicator-cover__bars">
+        {% for bar in cover_bars %}
+        <div class="indicator-cover__bar{{ ' is-best' if bar.is_best }}{{ ' is-worst' if bar.is_worst }}">
+          <span class="indicator-cover__bar-name">{{ bar.region }}</span>
+          <span class="indicator-cover__bar-track"><i class="indicator-cover__bar-fill" style="width:{{ bar.width_pct }}%"></i></span>
+          <strong class="indicator-cover__bar-value">{{ bar.value | it_num(2) }}</strong>
+        </div>
+        {% endfor %}
       </div>
-      {% if stats.year_avg is not none %}
-      <div class="indicator-insight__item">
-        <small>Media delle regioni, <span data-explore="year-label">{{ year }}</span></small>
-        <strong data-explore="avg-value">{{ stats.year_avg | it_num(2) }}</strong>
-        <span>{{ value_unit }}, <span data-explore="avg-count">{{ stats.year_count }}</span> regioni</span>
+      <div class="indicator-cover__footer">
+        <span>Fonte: {{ meta.source_label or meta.source }}</span>
+        <strong>divarioitalia.it</strong>
       </div>
-      {% endif %}
-      <div class="indicator-insight__item is-worst">
-        <small>Ultima, <span data-explore="year-label">{{ year }}</span></small>
-        <strong><a href="/regione/{{ worst.region_key }}" data-explore="worst-name">{{ worst.region }}</a></strong>
-        <span><span data-explore="worst-value">{{ worst.value | it_num(2) }}</span> {{ value_unit }}</span>
-      </div>
-    </section>
-    {% elif stats.year_avg is not none %}
-    <section class="indicator-insight" data-explore="insight">
-      <div class="indicator-insight__item">
-        <small>Media delle regioni, <span data-explore="year-label">{{ year }}</span></small>
-        <strong data-explore="avg-value">{{ stats.year_avg | it_num(2) }}</strong>
-        <span>{{ value_unit }}, <span data-explore="avg-count">{{ stats.year_count }}</span> regioni</span>
-      </div>
-    </section>
-    {% endif %}
-    <style>
-      {% for key, color in map_colors.items() %}.indicator-map [data-key="{{ key }}"]{fill:{{ color }}}
-      {% endfor %}
-    </style>
-    <p class="page-note indicator-map-hint">Passa sopra o tocca una regione per leggerne il valore; selezionala per portarla a fuoco nella scheda e nella serie storica.</p>
-    <div class="indicator-map-frame">
-      <div class="indicator-map" data-explore="map">
-        {% include "_italy_map.html" %}
-      </div>
-      <div class="indicator-map__tip" data-explore="map-tip" hidden></div>
     </div>
-  </section>
+    <figcaption>Anteprima dei dati di questo indicatore, generata automaticamente nello stesso formato usato per le condivisioni social.</figcaption>
+  </figure>
   {% endif %}
 
   {% if spark_points %}
@@ -312,6 +317,14 @@
   <aside class="indicator-cta">
     <span>
       <small>Continua il percorso</small>
+      <strong>Confronta questo indicatore con il tema {{ meta.theme }} e con gli altri profili territoriali.</strong>
+    </span>
+    <a href="{{ theme_path }}">Vai al tema →</a>
+  </aside>
+
+  <aside class="indicator-cta">
+    <span>
+      <small>Continua il percorso</small>
       <strong>Metti a confronto più regioni su questo e altri indicatori nello strumento di confronto.</strong>
     </span>
     <a href="/atlante?view=confronto">Apri il confronto →</a>
@@ -320,4 +333,5 @@
 
 <script type="application/json" id="indicator-data">{{ explore_data | tojson }}</script>
 <script src="{{ url_for('static', filename='js/indicator-explorer.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/indicator-finder.js') }}" defer></script>
 {% endblock %}

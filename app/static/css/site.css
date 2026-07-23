@@ -417,6 +417,36 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .indicator-map [data-key]:hover { opacity: 0.85; }
 .indicator-map [data-key].is-selected { stroke: var(--accent); stroke-width: 2; }
 .indicator-map-hint { margin-top: 0; }
+
+/* Dashboard block: interactivity on top, editorial below. Map and ranking sit
+   side by side like the old atlas workspace, trend + controls span full width. */
+.indicator-dashboard { margin: 10px 0 34px; }
+.indicator-dashboard .indicator-explore { margin: 0 0 16px; }
+.indicator-dashboard .indicator-insight { margin: 0 0 16px; }
+.indicator-dashboard__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.indicator-dashboard__panel { min-width: 0; }
+.indicator-dashboard__panel > h2 { font-size: 20px; margin: 0 0 6px; }
+.indicator-dashboard__panel .data-table { margin-top: 8px; }
+.indicator-dashboard__map { position: sticky; top: 16px; }
+@media (max-width: 860px) {
+  .indicator-dashboard__grid { grid-template-columns: 1fr; }
+  .indicator-dashboard__map { position: static; }
+}
+
+/* Catalog search on the indicator page (same search the atlas offered). */
+.indicator-finder { position: relative; margin: 4px 0 20px; max-width: 540px; }
+.indicator-finder label { display: flex; align-items: center; gap: 9px; border: 1px solid var(--line); background: var(--panel); padding: 10px 13px; }
+.indicator-finder label:focus-within { border-color: var(--accent); }
+.indicator-finder svg { color: var(--muted); flex: none; }
+.indicator-finder input { border: 0; background: none; font: inherit; color: var(--ink); width: 100%; outline: none; }
+.indicator-finder__results { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); z-index: 20; max-height: 360px; overflow: auto; }
+.indicator-finder__results[hidden] { display: none; }
+.indicator-finder__result { display: flex; flex-direction: column; gap: 2px; padding: 10px 13px; border-bottom: 1px solid var(--grid); }
+.indicator-finder__result:last-child { border-bottom: 0; }
+.indicator-finder__result:hover { background: var(--accent-soft); text-decoration: none; }
+.indicator-finder__name { color: var(--ink); font-weight: 600; font-size: 14px; }
+.indicator-finder__meta { color: var(--muted); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+.indicator-finder__empty { padding: 13px; color: var(--muted); font-size: 14px; margin: 0; }
 .score-bar { display: inline-block; width: 80px; height: 7px; margin-right: 8px; background: var(--grid); vertical-align: middle; }
 .score-bar > span { display: block; height: 100%; background: var(--accent); transition: transform 520ms cubic-bezier(0.22, 0.61, 0.36, 1); }
 
