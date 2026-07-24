@@ -177,7 +177,10 @@ class SdmxClient:
                         "Back off for several minutes."
                     ) from exc
                 raise
-            except urllib.error.URLError as exc:
+            except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
+                # A read timeout on a large SDMX response surfaces as a bare
+                # TimeoutError (not wrapped in URLError), so catch it here and
+                # retry with backoff instead of aborting the whole run.
                 if attempt < self.max_retries:
                     self._sleep(backoff)
                     backoff *= 2

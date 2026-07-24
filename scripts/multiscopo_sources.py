@@ -291,10 +291,14 @@ QUALITY_LIFE_SCORE_IDS = {
 }
 
 # Trentino-Alto Adige is split into two NUTS2-equivalent codes in this survey
-# family (unlike the BES NUTS3 pipeline): average them into one region, same
-# convention used across the project.
+# family (Bolzano ITD1, Trento ITD2). They are combined into one region by a
+# POPULATION-WEIGHTED mean, not a plain mean: for the rates in this survey the
+# unweighted average is a synthetic figure, not the region's true value. Weights
+# are average annual population (thousands, Eurostat nama_10r_3popgdp 2023, the
+# same basis used for the Eurostat pilot); the ratio is stable year to year.
 TRENTINO_PARTS = ("ITD1", "ITD2")
 TRENTINO_CODE = "_TRENTINO"
+TRENTINO_WEIGHTS = {"ITD1": 535.8, "ITD2": 544.1}
 
 SOURCE_URL = "https://esploradati.istat.it/databrowser/#/it"
 ARCHIVE_LABEL = "Indagine Multiscopo sulle famiglie, Istat SDMX"
