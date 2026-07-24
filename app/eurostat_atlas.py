@@ -106,6 +106,9 @@ def eurostat_regional_scoreables():
             coverage = 0.0
         years = [int(r["year"]) for r in rows if r.get("year")]
         result[public_id] = {
+            # The name travels with the entry so the selection can deduplicate
+            # against the other families without reopening the external rows.
+            "name": first.get("name", ""),
             "category": category,
             "direction": direction,
             "coverage": coverage,

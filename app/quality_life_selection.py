@@ -35,11 +35,14 @@ def regional_quality_life_selection():
 
     BES indicators must be current, sufficiently covered and explicitly
     directional. Territorial indicators reuse the already curated DISET core
-    selection. Exact name duplicates are counted once, preferring BES.
+    selection. Exact name duplicates are counted once, in family order: BES
+    first, then territorial, Multiscopo and Eurostat. `used_names` accumulates
+    across every family, so a later source cannot re-add a phenomenon already
+    in the score under a different id and weigh it twice.
     """
     manifest = get_bes_manifest("regione")
     selected = {}
-    bes_names = set()
+    used_names = set()
     for raw_id, info in manifest.items():
         if info["year_max"] < REGIONAL_BES_MIN_YEAR:
             continue
@@ -48,7 +51,7 @@ def regional_quality_life_selection():
         if info["direction"] not in SCOREABLE_DIRECTIONS or not info["category"]:
             continue
         selected[f"{BES_PREFIX}{raw_id}"] = info["category"]
-        bes_names.add(_normalise_name(info["name"]))
+        used_names.add(_normalise_name(info["name"]))
 
     from app.data import get_catalog
 
@@ -56,12 +59,13 @@ def regional_quality_life_selection():
     for category, indicator_ids in quality_life_indicator_set().items():
         for indicator_id in indicator_ids:
             item = catalog[indicator_id]
-            if _normalise_name(item["name"]) in bes_names:
+            name = _normalise_name(item["name"])
+            if name in used_names:
                 continue
             selected[indicator_id] = category
+            used_names.add(name)
 
     if has_multiscopo_data():
-        used_names = bes_names | {_normalise_name(catalog[i]["name"]) for i in selected if i in catalog}
         for raw_id, info in get_multiscopo_manifest().items():
             if info["year_max"] < REGIONAL_MULTI_MIN_YEAR:
                 continue
@@ -71,12 +75,13 @@ def regional_quality_life_selection():
                 continue
             if info["direction"] not in SCOREABLE_DIRECTIONS or not info["category"]:
                 continue
-            if _normalise_name(info["name"]) in used_names:
+            name = _normalise_name(info["name"])
+            if name in used_names:
                 continue
             selected[f"{MULTI_PREFIX}{raw_id}"] = info["category"]
+            used_names.add(name)
 
     if has_eurostat_data():
-        used_names = bes_names | {_normalise_name(catalog[i]["name"]) for i in selected if i in catalog}
         for public_id, info in eurostat_regional_scoreables().items():
             # Direction and score-eligibility are the curator's reviewed verdict
             # (eurostat_regional_scoreables already enforces both); here we only
@@ -85,7 +90,11 @@ def regional_quality_life_selection():
                 continue
             if info["coverage"] < MIN_PUBLIC_COVERAGE:
                 continue
+            name = _normalise_name(info.get("name", ""))
+            if name and name in used_names:
+                continue
             selected[public_id] = info["category"]
+            used_names.add(name)
     return selected
 
 

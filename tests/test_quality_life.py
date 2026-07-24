@@ -2,6 +2,7 @@ import unittest
 
 from app import app
 from app import quality_life_bes as qb
+from app.atlas_catalog import get_atlas_indicator
 from app.bes_data import (
     all_bes_indicators,
     bes_seo_description,
@@ -145,6 +146,58 @@ class QualityLifeStaticTest(unittest.TestCase):
         )
         self.assertGreater(ranking["methodology"]["source_counts"]["bes"], 0)
         self.assertGreater(ranking["methodology"]["source_counts"]["territorial"], 0)
+
+    def test_no_phenomenon_enters_the_score_twice_under_two_families(self):
+        """The methodology promises exact name duplicates are counted once. The
+        universe is federated, so the guarantee has to hold across every family,
+        not only between BES and territorial."""
+        from app.data import get_catalog
+        from app.quality_life_selection import (
+            _normalise_name,
+            regional_quality_life_selection,
+        )
+
+        names = {}
+        catalog = {item["id"]: item for item in get_catalog()["indicators"]}
+        for indicator_id in regional_quality_life_selection():
+            payload = get_atlas_indicator(indicator_id)
+            raw = (payload["metadata"]["name"] if payload
+                   else catalog[indicator_id]["name"])
+            name = _normalise_name(raw)
+            self.assertNotIn(
+                name, names,
+                f"{indicator_id} duplicates {names.get(name)} in the score",
+            )
+            names[name] = indicator_id
+
+    def test_a_later_family_cannot_re_add_a_name_already_scored(self):
+        """Guards the accumulating used_names: a Eurostat series named like an
+        already selected indicator must not be added a second time."""
+        from unittest import mock
+
+        from app import quality_life_selection as qls
+
+        first_id = next(iter(qls.regional_quality_life_selection()))
+        payload = get_atlas_indicator(first_id)
+        if payload is None:
+            self.skipTest("no resolvable indicator to clone")
+        clone = {
+            "eur:clone_of_an_existing_name": {
+                "name": payload["metadata"]["name"],
+                "category": "reddito_accessibilita",
+                "direction": "higher_better",
+                "coverage": 1.0,
+                "year_max": 2024,
+            }
+        }
+        qls.regional_quality_life_selection.cache_clear()
+        try:
+            with mock.patch.object(qls, "has_eurostat_data", return_value=True), \
+                 mock.patch.object(qls, "eurostat_regional_scoreables", return_value=clone):
+                selection = qls.regional_quality_life_selection()
+            self.assertNotIn("eur:clone_of_an_existing_name", selection)
+        finally:
+            qls.regional_quality_life_selection.cache_clear()
 
     def test_invalid_level_is_404(self):
         client = app.test_client()
