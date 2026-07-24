@@ -73,6 +73,22 @@ class DedupClassifier(unittest.TestCase):
         # The territorial family owns the unprefixed namespace.
         self.assertTrue(any(i.isdigit() for i, _, _ in index))
 
+    def test_promotion_refuses_a_candidate_id_that_lies_about_its_source(self):
+        """Found end-to-end: the dataset merge is keyed on the source series, so
+        a queue row whose candidate_id no longer matches its own source fields
+        overwrites and retargets another candidate's series, silently removing a
+        live atlas entry. The queue is hand-edited in the review PR, so the
+        mismatch has to fail before anything is written."""
+        from scripts import promote_candidates
+
+        good = {"candidate_id": "eurostat_regional:rd_e_gerdreg",
+                "source": "eurostat_regional", "source_indicator_id": "rd_e_gerdreg"}
+        promote_candidates._check_candidate_id(good)  # non solleva
+
+        lying = dict(good, candidate_id="eurostat_regional:qualcos_altro")
+        with self.assertRaises(SystemExit):
+            promote_candidates._check_candidate_id(lying)
+
     def test_promotion_refuses_an_unqualified_duplicate_target(self):
         from scripts import promote_candidates
 

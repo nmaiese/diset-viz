@@ -190,6 +190,24 @@ def _merge_manifest(existing, new_entries):
     return sorted(merged.values(), key=lambda r: r["target_indicator_id"])
 
 
+def _check_candidate_id(candidate):
+    """The queue's stable key must stay `<source>:<source_indicator_id>`.
+
+    The dataset merge is keyed on the source series, not on candidate_id, so a
+    row whose id no longer matches its own source fields silently overwrites
+    *another* candidate's series and retargets it: a live atlas entry can
+    disappear from the catalog with no error. The queue is hand-edited in the
+    review PR (that is where triage_status is set), so this is a plausible typo,
+    and it must fail before anything is written."""
+    expected = f"{candidate.get('source', '')}:{candidate.get('source_indicator_id', '')}"
+    if candidate.get("candidate_id") != expected:
+        raise SystemExit(
+            f"{candidate.get('candidate_id')}: candidate_id does not match its own "
+            f"source fields (expected '{expected}'). Promoting it would overwrite "
+            "the series that owns that key. Fix the queue row."
+        )
+
+
 def run(offline=True, refresh=False, candidate_id=None,
         out_dataset=EXTERNAL_DATASET, out_manifest=EXTERNAL_MANIFEST, dry_run=False):
     candidates = discovery.read_candidates()
@@ -198,6 +216,8 @@ def run(offline=True, refresh=False, candidate_id=None,
         if c.get("triage_status") == "approved"
         and (candidate_id is None or c.get("candidate_id") == candidate_id)
     ]
+    for candidate in approved:
+        _check_candidate_id(candidate)
     dataset_rows, manifest_entries, summary = [], [], []
     for candidate in approved:
         rows, target, enriches, note = _external_rows_for(candidate, offline, refresh)
