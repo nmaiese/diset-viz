@@ -18,6 +18,9 @@ client_secret_*.json
 # Raw Istat SDMX response cache (bulky; the normalized CSVs are committed instead)
 data/istat_cache/
 
+# Raw Eurostat API response cache (offline fixtures are committed instead)
+data/eurostat_cache/
+
 # Quiz leaderboard SQLite file (local/runtime state, not source data)
 data/*.sqlite3
 data/*.sqlite3-*

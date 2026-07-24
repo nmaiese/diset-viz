@@ -93,6 +93,20 @@ Provincial data is separate. Follow
 of git, commit only normalized CSV artifacts, and never mix provincial rows into
 the regional CSV or `app/data.py`.
 
+## Discovering new multi-source indicators — READ THIS
+
+The app is a multi-source aggregator that prefers fresh, regional data (then
+provincial). New indicators are **discovered** into a reviewable staging queue
+before any integration. Follow [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md).
+The short version: a scheduled hunter (`scripts/discover_candidates.py`, stdlib
+only) scans allowlisted institutional sources (`config/external_sources.yaml`)
+and writes candidates to `data/discovery/candidates.csv`; a human approves them
+in a PR (`triage_status=approved`); then `scripts/promote_candidates.py` writes
+`status=proposed` rows into the external layer. Nothing goes live without a merged
+PR. The hunter never claims `definition_match=exact` (humans confirm that). Eurostat
+regional (NUTS2) is the pilot source; its raw cache (`data/eurostat_cache/`) stays
+out of git, only the offline fixtures under `data/discovery/fixtures/` are committed.
+
 ## Constraints
 
 - Do not break `/legacy` or the data schema (`tests/test_app.py` guards both).

@@ -92,6 +92,19 @@ sources:
     parser: fixture_table
     cache_policy: cache-first
     rate_limit: n.d.
+  - source: eurostat_regional
+    dataset: Eurostat regional statistics (NUTS2)
+    enabled: true
+    territory_levels: [regione]
+    frequency: annuale
+    expected_release_period: continuo, per dataset
+    download_url: https://ec.europa.eu/eurostat/web/regions/data/database
+    landing_page: https://ec.europa.eu/eurostat/web/regions/data/database
+    format: JSON-stat via API dissemination
+    license: CC BY 4.0 (Eurostat)
+    parser: eurostat_source
+    cache_policy: cache-first
+    rate_limit: nessun limite pubblicato, margine prudenziale una richiesta per dataset
   - source: infratel
     dataset: Mappatura reti fisse e Piano Italia a 1 Giga
     enabled: true
