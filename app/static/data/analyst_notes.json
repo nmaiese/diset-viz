@@ -1675,5 +1675,143 @@
   "spunto": "La biodiversità preoccupa molto meno del clima, pur essendo una crisi altrettanto grave e legata, dato che la perdita di specie e habitat è meno visibile e più difficile da percepire. La crescita recente segnala però una consapevolezza che si allarga oltre il solo tema climatico. Difendere la biodiversità resta astratto finché non se ne vedono gli effetti. Ci si accorge della natura solo quando comincia a mancare?",
   "limite": "Rileva una preoccupazione dichiarata, non la conoscenza reale del tema né i comportamenti. Una bassa preoccupazione può nascere da minore informazione più che da minore importanza del problema.",
   "fonti": []
+ },
+ "101": {
+  "attacco": "Quanti giovani arrivano al diploma è la base del capitale umano di un territorio. Tra i 20-24enni ha almeno il diploma il 93,6% in Molise e il 91,4% in Umbria, contro il 78,7% della Sicilia e il 79,6% della Sardegna. La media delle regioni è dell'86,7%.",
+  "spunto": "Il diploma è ormai la soglia minima per entrare nel lavoro qualificato, e chi non lo raggiunge parte svantaggiato per tutta la vita. La geografia sorprende, con regioni piccole del Centro-Sud in testa e le isole in fondo, segno che il divario non è solo Nord-Sud. Ogni giovane senza diploma è un'opportunità persa per lui e per il territorio. Il diploma per tutti è un traguardo raggiunto o ancora lontano?",
+  "limite": "Misura chi ha conseguito il diploma tra i 20-24 anni, non la qualità della formazione ricevuta né le competenze reali. Non dice quanti proseguano gli studi o trovino lavoro coerente con il titolo.",
+  "fonti": []
+ },
+ "77": {
+  "attacco": "Quasi tutti i giovani tra 15 e 19 anni hanno almeno la licenza media: in media il 99% delle regioni. Il dato è uniforme, dal 99,9% della Valle d'Aosta al 95,5% del Molise. È uno degli indicatori più omogenei dell'intero quadro educativo.",
+  "spunto": "Che quasi tutti i quindicenni abbiano la licenza media è una conquista storica, frutto dell'obbligo scolastico esteso. Ma la soglia è bassa, e superarla non basta più in un'economia della conoscenza. Il vero divario si gioca dopo, sul diploma, sulla laurea e sulle competenze, dove le distanze territoriali si riaprono. Aver finito le medie è ancora un traguardo o solo un punto di partenza?",
+  "limite": "Misura il possesso della sola licenza media, una soglia minima ormai quasi universale. Non dice nulla sulle competenze reali né su chi prosegue verso il diploma, dove i divari ricompaiono.",
+  "fonti": []
+ },
+ "248": {
+  "attacco": "La partecipazione alla scuola superiore mostra valori sopra il 100% in alcune regioni, oltre 108 in Basilicata e 106 in Sardegna, effetto di studenti non residenti e ripetenti conteggiati sulla popolazione locale. All'estremo opposto il Trentino Alto Adige, al 75%, dove molti scelgono la formazione professionale. La media è del 97%.",
+  "spunto": "I valori sopra il 100% non indicano più iscritti che ragazzi, ma un modo di calcolare che include chi studia fuori dalla propria regione. Il caso del Trentino, apparentemente in fondo, si spiega con un forte sistema di apprendistato e formazione professionale, alternativo alla scuola tradizionale. Il dato va quindi letto con attenzione al contesto. Meno liceo significa meno istruzione o solo una strada diversa?",
+  "limite": "Il rapporto tra iscritti e popolazione locale può superare il 100% per la mobilità degli studenti, rendendo i confronti imprecisi. Non distingue i percorsi liceali da quelli professionali, né conta chi si forma fuori dalla scuola.",
+  "fonti": []
+ },
+ "bes:02IST001": {
+  "attacco": "La scuola dell'infanzia raggiunge quasi tutti: tra i bambini di 4-5 anni la frequenza è in media del 95,7%. È più alta in Campania, 98,8%, e Valle d'Aosta, più bassa nel Lazio, 89,3%, e in Lombardia. La media delle regioni è del 95,7%, con differenze piccole.",
+  "spunto": "La scuola dell'infanzia è quasi universale, e sorprende che il Sud, in ritardo sui nidi, sia invece in testa per i 4-5 anni. È il segno di una tradizione radicata di scuola materna pubblica, che precede l'obbligo. Il BES lo tratta come descrittivo, ma la frequenza precoce aiuta lo sviluppo e riduce i divari di partenza. La scuola che inizia prima livella le opportunità o basta la sua diffusione?",
+  "limite": "Misura la frequenza dei bambini di 4-5 anni, non la qualità educativa dei servizi. Un'alta partecipazione non dice se la scuola dell'infanzia sia a tempo pieno, ben organizzata o davvero formativa.",
+  "fonti": []
+ },
+ "bes:02IST020": {
+  "attacco": "L'asilo nido è molto meno diffuso della scuola dell'infanzia: raggiunge in media il 37% dei bambini fino a 2 anni, dopo essere più che raddoppiato nel tempo. È più alto in Emilia-Romagna, 48%, e nelle Marche, più basso in Campania, 25,9%, e Trentino Alto Adige.",
+  "spunto": "Il nido non è solo cura ma educazione precoce, e la sua assenza pesa proprio dove i contesti familiari sono più fragili, come al Sud. La forte crescita avvicina l'Italia agli obiettivi europei, ma il divario resta ampio e parte da lontano. Investire nei primi mille giorni è la politica con il ritorno più alto sul capitale umano. La disuguaglianza di opportunità comincia prima dei tre anni?",
+  "limite": "Conta i bambini iscritti al nido, non i posti disponibili né la domanda inespressa di chi rinuncia. Non distingue nido pubblico e privato, né misura la qualità educativa del servizio.",
+  "fonti": []
+ },
+ "104": {
+  "attacco": "Molti adulti italiani si sono fermati presto negli studi. Tra i 25-64enni, ha al più la licenza media il 44,1% in Sicilia, il 43,7% in Sardegna e il 43,2% in Puglia, contro il 24,3% dell'Umbria. La media delle regioni è del 33%, in calo nel tempo.",
+  "spunto": "Un adulto su tre fermo alla licenza media è un freno per l'economia della conoscenza, e il divario tra Sud e Centro-Nord è netto. È l'eredità di generazioni cresciute quando studiare era un lusso, e cambia lentamente con il ricambio generazionale. Bassa istruzione significa meno reddito, più disoccupazione e minore mobilità sociale. Il divario educativo degli adulti è un problema del passato o del presente?",
+  "limite": "Misura chi ha al più la licenza media, non le competenze acquisite col lavoro o l'esperienza. Un titolo basso non equivale sempre a scarse capacità, ma limita l'accesso a molte occasioni professionali.",
+  "fonti": []
+ },
+ "339": {
+  "attacco": "La laurea resta rara e diseguale. Tra i 30-34enni ha un titolo terziario il 37,1% nel Lazio e il 35,9% in Veneto, contro il 20,4% della Sicilia e il 21,1% della Puglia. La media delle regioni è del 29,5%, ancora sotto la media europea.",
+  "spunto": "L'Italia forma pochi laureati rispetto all'Europa, e il divario interno aggrava il ritardo, con il Sud molto indietro. Ma il dato di residenza inganna, dato che molti laureati del Sud lavorano al Nord, dove risultano. Il capitale umano si forma in un luogo e si spende in un altro, impoverendo chi lo produce. Fare più laureati serve, se poi vanno via?",
+  "limite": "Misura i laureati per regione di residenza, non dove si sono formati né dove lavorano. Non distingue i tipi di titolo terziario né la loro spendibilità sul mercato del lavoro locale.",
+  "fonti": []
+ },
+ "bes:02IST002-N22": {
+  "attacco": "Avere almeno il diploma tra gli adulti 25-64 anni è diventato la norma, ma non ovunque. Ce l'ha il 76% in Umbria e il 74,7% in Friuli-Venezia Giulia, contro il 56,6% della Sicilia e il 57,2% della Sardegna. La media delle regioni è del 67,6%.",
+  "spunto": "Il diploma diffuso è la base di una forza lavoro adattabile, e il divario di quasi venti punti tra Nord e Sud pesa su produttività e innovazione. È il rovescio dell'indicatore sulla bassa istruzione, e racconta la stessa frattura. Il ricambio generazionale sta alzando ovunque il livello, ma lentamente. Colmare il divario educativo tra territori è la vera leva del Mezzogiorno?",
+  "limite": "Conta chi ha almeno il diploma tra gli adulti, non la qualità o l'attualità delle competenze. Un diploma preso decenni fa può valere poco in un mercato del lavoro cambiato, aspetto che il dato non coglie.",
+  "fonti": []
+ },
+ "bes:02IST026-N22": {
+  "attacco": "Tra i più giovani, 25-34 anni, ha una laurea o un titolo terziario il 37,4% nel Lazio e il 36,2% in Emilia-Romagna, contro il 23,8% della Sardegna e il 24% della Sicilia. La media delle regioni è del 30,4%, in lenta crescita.",
+  "spunto": "Guardando i giovani adulti, il livello di laurea sale rispetto alle generazioni precedenti, ma l'Italia resta indietro in Europa e il Sud molto indietro nel Paese. È la generazione su cui si gioca la competitività futura, e formarla poco significa ipotecare i prossimi decenni. La laurea non garantisce lavoro, ma la sua assenza chiude molte porte. Un Paese con pochi laureati può competere nell'economia della conoscenza?",
+  "limite": "Misura i titoli terziari per residenza, quindi risente della mobilità dei laureati. Non distingue lauree, dottorati e titoli professionalizzanti, né dice quanto siano richiesti dal mercato del lavoro.",
+  "fonti": []
+ },
+ "bes:02IST021": {
+  "attacco": "I laureati in materie scientifiche e tecnologiche, le cosiddette STEM, sono più numerosi in rapporto ai giovani nel Sud: 21,8 ogni mille residenti in Molise, 21 in Basilicata e 20,4 in Abruzzo, contro 8,7 in Trentino Alto Adige. La media delle regioni è di circa 17.",
+  "spunto": "Il primato del Sud sorprende, ma nasce dal rapporto per abitante, dato che regioni piccole con poche università concentrano i laureati STEM su una popolazione giovane ridotta. Non significa un'economia più tecnologica, dato che molti di questi laureati poi emigrano. Formare competenze scientifiche è prezioso, ma trattenerle lo è ancora di più. Il Sud forma i tecnici che poi arricchiscono il Nord?",
+  "limite": "Conta i laureati STEM per mille giovani residenti, un rapporto sensibile alla dimensione della popolazione. Non dice dove questi laureati lavorino, e molti lasciano la regione in cui si sono formati.",
+  "fonti": []
+ },
+ "bes:02IST005-N22": {
+  "attacco": "L'abbandono precoce degli studi, chi lascia gli studi da giovane con al più la licenza media, è calato molto, quasi il 40% in meno. Resta più alto in Sicilia, 13,7%, e Sardegna, 13,6%, più basso in Umbria, 4,9%, e Abruzzo. La media delle regioni è dell'8%.",
+  "spunto": "L'uscita precoce è la porta d'ingresso dell'esclusione, dato che chi lascia presto la scuola ha più probabilità di finire tra i NEET e nella povertà. Il forte calo avvicina l'Italia all'obiettivo europeo, ma la Sicilia e la Sardegna restano molto indietro. Ogni giovane che abbandona è una traiettoria di vita che si restringe presto. Trattenere a scuola i più fragili è possibile senza cambiare il contesto attorno a loro?",
+  "limite": "Misura chi ha lasciato la scuola con un titolo basso e non è in formazione, non le ragioni dell'abbandono. Non distingue chi lascia per lavorare da chi si perde del tutto, né chi riprende gli studi più tardi.",
+  "fonti": []
+ },
+ "bes:02IST006-N22": {
+  "attacco": "I NEET, i giovani che non studiano e non lavorano, sono molto più numerosi al Sud. Riguardano il 22,8% dei giovani in Sicilia, il 21,5% in Campania e il 20,9% in Calabria, contro il 6,1% del Trentino Alto Adige. La media delle regioni è del 12,8%, in forte calo.",
+  "spunto": "Il NEET è la misura più cruda dello spreco di gioventù, chi è fuori da tutto, senza scuola né lavoro né formazione. Al Sud riguarda più di un giovane su cinque, un serbatoio di potenziale inutilizzato che frena intere comunità. Il calo recente è forte, ma parte da livelli altissimi. Ridurre i NEET è compito della scuola, del lavoro o dell'intero contesto?",
+  "limite": "Somma situazioni diverse, dallo scoraggiamento alla cura familiare all'attesa tra due percorsi. Non distingue chi è NEET per pochi mesi da chi lo è da anni, né intercetta chi lavora in nero pur risultando inattivo.",
+  "fonti": []
+ },
+ "244": {
+  "attacco": "L'indice di attrattività delle università misura il saldo tra studenti che arrivano e che partono. È fortemente positivo in Emilia-Romagna, più 35, e Lombardia, negativo in modo estremo in Basilicata, meno 191, e Valle d'Aosta. La media delle regioni è negativa.",
+  "spunto": "Le università del Centro-Nord attraggono studenti da tutta Italia, quelle del Sud e delle regioni piccole li perdono, spesso privi di atenei completi. Ogni studente che parte porta altrove talento, spesa e futuro lavoro, in una migrazione che comincia a diciannove anni. È l'anticamera della fuga dei cervelli, e ne condivide la geografia. La scelta dell'università è già la scelta di dove si vivrà?",
+  "limite": "Misura il saldo netto degli iscritti, non i motivi della scelta né se lo studente torni dopo la laurea. Non tiene conto della qualità degli atenei, e regioni senza università complete partono svantaggiate.",
+  "fonti": []
+ },
+ "bes:02IST004": {
+  "attacco": "Quanti diplomati proseguono all'università varia molto. Ci va il 62,3% in Abruzzo e il 61,1% in Umbria, contro il 38,9% della Campania e, sorprendentemente, il 40,1% del Trentino Alto Adige. La media delle regioni è del 54,6%. Il quadro è a macchia di leopardo.",
+  "spunto": "Il basso passaggio del Trentino non è un ritardo, dato che lì molti scelgono l'apprendistato e la formazione professionale, con ottimi sbocchi. Al Sud, invece, il minore passaggio si somma a più abbandono, ed è un segnale di opportunità mancate. Lo stesso numero basso racconta storie opposte a seconda del contesto. Non andare all'università è una scelta o una rinuncia?",
+  "limite": "Misura il passaggio dalla scuola all'università, non la scelta tra atenei o percorsi professionali di pari valore. Non dice quanti completino gli studi terziari, dove i divari si riaprono.",
+  "fonti": []
+ },
+ "63": {
+  "attacco": "La formazione degli adulti che già lavorano è poco diffusa e diseguale. Partecipa ad attività formative il 14,2% degli occupati in Emilia-Romagna e il 14% in Trentino Alto Adige, contro il 6,2% della Sicilia. La media delle regioni è del 10,4%, in crescita.",
+  "spunto": "In un lavoro che cambia in fretta aggiornarsi è essenziale, ma in Italia lo fa un occupato su dieci, e molto meno al Sud. La formazione continua dipende dalle imprese, più propense a investire dove sono grandi e strutturate, cioè al Nord. Chi non si aggiorna rischia di restare indietro con le competenze. Imparare per tutta la vita è un diritto o un privilegio di pochi settori?",
+  "limite": "Conta gli occupati che partecipano alla formazione, non la sua qualità o durata. Non distingue i corsi brevi obbligatori da percorsi formativi reali, né dice se migliorino davvero le competenze.",
+  "fonti": []
+ },
+ "67": {
+  "attacco": "Anche tra chi non lavora, disoccupati e inattivi, la formazione è poco diffusa: la segue in media il 10% degli adulti 25-64 anni. È più alta in Umbria, 11,9%, e Molise, più bassa in Sicilia, 6,4%, e Puglia. La media delle regioni è del 10%.",
+  "spunto": "Per chi è fuori dal lavoro formarsi è la via principale per rientrarci, eppure la partecipazione è bassa proprio dove la disoccupazione è più alta, come in Sicilia. È un paradosso che aggrava il divario, dato che chi più avrebbe bisogno di riqualificarsi lo fa di meno. Le politiche attive del lavoro dovrebbero colmare proprio questo vuoto. La formazione raggiunge chi è già forte o chi resta indietro?",
+  "limite": "Conta i non occupati che partecipano alla formazione, senza distinguere disoccupati in cerca e inattivi. Non dice se la formazione porti davvero a un lavoro, il vero banco di prova.",
+  "fonti": []
+ },
+ "99": {
+  "attacco": "L'apprendimento permanente, la quota di adulti 25-64 anni che studia o si forma, misura quanto un territorio continua a imparare. È più alto in Emilia-Romagna, 13,6%, Trentino Alto Adige e Friuli-Venezia Giulia, più basso in Sicilia, 6,3%. La media delle regioni è del 10,4%.",
+  "spunto": "L'Italia impara poco da adulta rispetto all'Europa, e il divario interno raddoppia le distanze tra Nord e Sud. In un'economia che cambia, chi smette di formarsi vede invecchiare le proprie competenze. È un indicatore di lungo periodo, che dice quanto un territorio investe nel proprio capitale umano oltre la scuola. Un Paese che non si aggiorna può stare al passo?",
+  "limite": "Misura chi partecipa a corsi di studio o formazione, non l'apprendimento informale, molto diffuso e non registrato. Non dice la qualità dei percorsi né il loro effetto su lavoro e competenze.",
+  "fonti": []
+ },
+ "bes:02IST007-N22": {
+  "attacco": "Il dato BES sulla formazione continua conferma il quadro: partecipa il 13,7% degli adulti in Friuli-Venezia Giulia e il 13,3% in Veneto, contro il 7,2% della Sicilia. La media delle regioni è dell'11%, in netta e diffusa crescita negli ultimi anni.",
+  "spunto": "La formazione continua è cresciuta ovunque, un segnale positivo in un mercato del lavoro che chiede competenze sempre nuove. Ma resta bassa in assoluto e concentrata al Nord, dove imprese e servizi pubblici la sostengono di più. Chiudere il divario formativo è una condizione per non allargare quello economico. La formazione degli adulti è la leva più trascurata dello sviluppo?",
+  "limite": "Conta la partecipazione dichiarata alla formazione, non la sua intensità o efficacia. Riflette anche l'offerta di corsi e la spinta delle imprese, più forte dove il tessuto produttivo è solido.",
+  "fonti": []
+ },
+ "409": {
+  "attacco": "Quanti diplomati escono da istituti tecnici e professionali, invece che dai licei, dice come è orientata la scuola di un territorio. La quota è più alta in Campania, 56,3%, Veneto, 55,6%, e Friuli-Venezia Giulia, più bassa nel Lazio, 39,2%, e in Liguria. La media delle regioni è del 49%.",
+  "spunto": "La scelta tra liceo e istituto tecnico plasma le traiettorie di vita e l'incontro con il lavoro. Un'alta quota di tecnici può segnalare un legame stretto con l'industria, come in Veneto, ma anche minori aspettative universitarie. Il BES lo tratta come descrittivo, senza un verso migliore o peggiore. La formazione tecnica è una scorciatoia verso il lavoro o un binario che allontana dall'università?",
+  "limite": "Misura la quota di diplomati tecnici e professionali, non la qualità dei percorsi né gli sbocchi reali. Non dice se la scelta sia orientata dalle opportunità del territorio o dalle sue mancanze.",
+  "fonti": []
+ },
+ "bes:02IST022": {
+  "attacco": "La partecipazione culturale fuori casa, dal cinema ai musei ai concerti, è più diffusa al Nord e nel Centro. Riguarda il 48,9% delle persone in Trentino Alto Adige e il 47% nel Lazio, contro il 26,2% della Calabria. La media delle regioni è del 38,7%.",
+  "spunto": "Uscire per cultura dipende da offerta, reddito e abitudini, e la sua geografia ricalca quella dei consumi culturali. Non è un lusso, dato che la partecipazione culturale allarga competenze, relazioni e senso critico, con effetti che durano nel tempo. Il divario culturale si somma a quello economico e li rafforza a vicenda. La cultura è causa o effetto delle disuguaglianze territoriali?",
+  "limite": "Conta chi ha partecipato ad attività culturali fuori casa, non la loro frequenza o profondità. Riflette anche l'offerta disponibile, più ricca nelle grandi città, che rende più facile partecipare.",
+  "fonti": []
+ },
+ "bes:02IST023": {
+  "attacco": "Leggere libri e quotidiani è un'abitudine in calo e molto diseguale. Legge il 52,6% delle persone in Trentino Alto Adige e il 46,7% in Friuli-Venezia Giulia, contro il 22,7% della Campania e il 23% della Basilicata. La media delle regioni è del 36%.",
+  "spunto": "La lettura è il segno più antico di capitale culturale, e il divario, oltre il doppio tra Nord-Est e Sud, riflette scuola, famiglia e abitudini radicate. Il calo generale, complice il digitale, riguarda tutti, ma parte da livelli già bassi al Sud. Chi legge poco da giovane fatica a colmare il divario da adulto. La lettura è una competenza che si eredita o si può ancora costruire?",
+  "limite": "Conta chi ha letto almeno un libro o legge quotidiani, non quanto né cosa. Con il digitale molta lettura avviene online e sfugge a questo indicatore, che coglie solo una parte del fenomeno.",
+  "fonti": []
+ },
+ "bes:02IST024": {
+  "attacco": "Frequentare le biblioteche è raro e concentrato: lo fa il 30,9% delle persone in Trentino Alto Adige e il 29,2% in Valle d'Aosta, contro il 7,6% della Calabria e l'8% di Campania e Basilicata. La media delle regioni è del 14,8%, con un divario di quattro volte.",
+  "spunto": "La biblioteca è un servizio culturale pubblico e gratuito, e la sua frequentazione dipende molto da quante ce ne sono e da come funzionano. Il divario enorme mostra dove esiste una rete di biblioteche vive e dove no, un pezzo di welfare culturale spesso trascurato. Dove mancano, la cultura torna a essere solo di chi la può comprare. Una biblioteca in ogni comune è un lusso o un diritto?",
+  "limite": "Conta chi ha frequentato una biblioteca, non l'offerta reale né la qualità dei servizi. Un valore basso può dipendere dall'assenza di biblioteche più che dal disinteresse delle persone.",
+  "fonti": []
+ },
+ "bes:02IST025": {
+  "attacco": "Avere almeno le competenze digitali di base è ormai essenziale, ma le ha solo il 45% delle persone. La quota è più alta in Lombardia, 53,4%, Trentino Alto Adige e Lazio, più bassa in Calabria, 32,2%, e Campania. La media delle regioni è del 45%.",
+  "spunto": "Le competenze digitali sono la nuova alfabetizzazione, e chi non le ha resta escluso da servizi, lavoro e informazione. Il divario Nord-Sud si somma a quello di età e istruzione, colpendo di più anziani e meno istruiti. A differenza dell'accesso a internet, ormai diffuso, le competenze restano indietro e diseguali. Connettersi è facile, ma saperlo fare bene è ancora un privilegio?",
+  "limite": "Misura le competenze digitali dichiarate secondo una scala europea, non l'uso reale né le abilità avanzate. Una soglia di base non dice se le persone sappiano affrontare compiti complessi o riconoscere le insidie della rete.",
+  "fonti": []
  }
 }
