@@ -87,6 +87,41 @@ class ApplyCurationTest(unittest.TestCase):
                 desc_row = next(csv.DictReader(h, delimiter=";"))
             self.assertEqual(desc_row["plain"], "Testo rivisto.")
 
+    def test_a_decision_only_touches_its_own_source_series(self):
+        """Two sources can enrich the same indicator. Reviewing one of them must
+        not rewrite the direction and the score flag of the other, which nobody
+        has looked at."""
+        reviewed = {
+            "target_indicator_id": "eur:demo", "source": "eurostat_regional",
+            "source_indicator_id": "demo", "reviewed_direction": "higher_better",
+            "score_eligible": "true", "reviewed_at": "2026-07-24",
+        }
+        rows = [
+            {"target_indicator_id": "eur:demo", "source": "eurostat_regional",
+             "source_indicator_id": "demo", "direction": "contextual",
+             "score_eligible": "false"},
+            {"target_indicator_id": "eur:demo", "source": "altra_fonte",
+             "source_indicator_id": "altra", "direction": "contextual",
+             "score_eligible": "false"},
+        ]
+        dataset, manifest, _ = apply_curation.apply([reviewed], rows, [], [])
+        self.assertEqual(dataset[0]["direction"], "higher_better")
+        self.assertEqual(dataset[0]["score_eligible"], "true")
+        self.assertEqual(dataset[1]["direction"], "contextual")
+        self.assertEqual(dataset[1]["score_eligible"], "false")
+
+    def test_two_descriptions_for_one_target_are_a_conflict(self):
+        decisions = [
+            {"target_indicator_id": "eur:demo", "source": "a", "source_indicator_id": "1",
+             "reviewed_direction": "higher_better", "description": "Prima versione.",
+             "reviewed_at": "2026-07-24"},
+            {"target_indicator_id": "eur:demo", "source": "b", "source_indicator_id": "2",
+             "reviewed_direction": "higher_better", "description": "Seconda versione.",
+             "reviewed_at": "2026-07-24"},
+        ]
+        with self.assertRaises(SystemExit):
+            apply_curation.apply(decisions, [], [], [])
+
     def test_score_eligible_requires_scoreable_direction(self):
         with TemporaryDirectory() as tmp:
             ds, mf, desc, curation = self._setup(tmp, {

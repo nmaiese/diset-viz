@@ -72,13 +72,50 @@ def _validate(decision):
         )
 
 
+def _row_key(row):
+    """What a decision is about: a target, reached from one source series.
+
+    Keying on the target alone was enough while one external series existed per
+    target. It stops being enough as soon as two sources enrich the same
+    indicator: reviewing one of them would silently rewrite the direction and
+    the score flag of the other, which nobody has looked at."""
+    return (
+        row.get("target_indicator_id", ""),
+        row.get("source", ""),
+        row.get("source_indicator_id", ""),
+    )
+
+
+def _decision_lookup(decisions):
+    """(exact-key map, target-only fallback).
+
+    The fallback covers curation rows that name no source at all, written before
+    the source columns were part of the key: those still apply to every row of
+    their target. A decision that *does* name its source only ever touches that
+    source, which is the whole point."""
+    by_key = {_row_key(d): d for d in decisions}
+    by_target = {
+        d["target_indicator_id"]: d
+        for d in decisions
+        if not d.get("source") and not d.get("source_indicator_id")
+    }
+    return by_key, by_target
+
+
+def _decision_for(row, by_key, by_target):
+    decision = by_key.get(_row_key(row))
+    if decision is not None:
+        return decision
+    return by_target.get(row.get("target_indicator_id"))
+
+
 def apply(decisions, dataset_rows, manifest_rows, descriptions):
-    by_target = {d["target_indicator_id"]: d for d in decisions}
     for decision in decisions:
         _validate(decision)
+    by_key, by_target = _decision_lookup(decisions)
 
     for row in dataset_rows:
-        decision = by_target.get(row.get("target_indicator_id"))
+        decision = _decision_for(row, by_key, by_target)
         if decision is None:
             continue
         row["direction"] = decision["reviewed_direction"]
@@ -87,7 +124,7 @@ def apply(decisions, dataset_rows, manifest_rows, descriptions):
         row["score_eligible"] = decision.get("score_eligible", "false")
 
     for row in manifest_rows:
-        decision = by_target.get(row.get("target_indicator_id"))
+        decision = _decision_for(row, by_key, by_target)
         if decision is None:
             continue
         row["direction"] = decision["reviewed_direction"]
@@ -96,14 +133,27 @@ def apply(decisions, dataset_rows, manifest_rows, descriptions):
         if decision.get("reviewer_notes"):
             row["review_notes"] = decision["reviewer_notes"]
 
+    # The description belongs to the atlas entry, so it stays keyed by target.
+    # Two sources describing the same target differently is a review conflict,
+    # not something to resolve by whichever row happens to come last.
     desc_by_target = {d["target_indicator_id"]: d for d in descriptions}
+    written = {}
     for decision in decisions:
-        if decision.get("description") or decision.get("value_explanation"):
-            desc_by_target[decision["target_indicator_id"]] = {
-                "target_indicator_id": decision["target_indicator_id"],
-                "plain": decision.get("description", ""),
-                "value_explanation": decision.get("value_explanation", ""),
-            }
+        if not (decision.get("description") or decision.get("value_explanation")):
+            continue
+        target = decision["target_indicator_id"]
+        entry = {
+            "target_indicator_id": target,
+            "plain": decision.get("description", ""),
+            "value_explanation": decision.get("value_explanation", ""),
+        }
+        if written.get(target, entry) != entry:
+            raise SystemExit(
+                f"{target}: two curation rows describe the same indicator "
+                "differently. Keep one description per target."
+            )
+        written[target] = entry
+        desc_by_target[target] = entry
     return dataset_rows, manifest_rows, sorted(desc_by_target.values(), key=lambda r: r["target_indicator_id"])
 
 

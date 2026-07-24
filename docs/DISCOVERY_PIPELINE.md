@@ -73,7 +73,7 @@ Colonne in `scripts/discovery.py:CANDIDATE_COLUMNS`. I campi chiave:
 | `territory_level` | `regione` (priorità) o `provincia` |
 | `year_max` / `coverage` | anno recente con copertura sufficiente, e copertura sulle 20 regioni |
 | `definition_match` | `new` / `compatible` / `proxy` / `different` (mai `exact` in automatico) |
-| `duplicate_of` | id dell'indicatore esistente più simile, se c'è |
+| `duplicate_of` | id dell'indicatore esistente più simile, se c'è, **qualificato per famiglia** (`bes:<id>`, `multiscopo:<id>`, o id numerico per i territoriali) |
 | `freshness_status` | `current` ≥2025, `recent` ≥2023, `dated` ≥2020, `stale` prima |
 | `priority_score` | 0..1, fresco + regionale + copertura + novità |
 | `triage_status` | `new` → `approved`/`rejected`/`needs-info` → `promoted` |
@@ -120,6 +120,11 @@ Strumenti (stdlib):
 - Il curatore scrive la decisione in `data/discovery/curation.csv`: verso
   revisionato, verdetto (`confermato`/`corretto`), categoria, `score_eligible`
   (solo se il verso è davvero direzionale) e una descrizione rivista opzionale.
+  La decisione è identificata da **target più fonte più serie di origine**, non
+  dal solo target: due fonti possono arricchire lo stesso indicatore, e
+  revisionarne una non deve riscrivere verso e `score_eligible` dell'altra. Una
+  riga senza fonte vale ancora per tutte le righe del target, per compatibilità
+  con le decisioni scritte prima che le colonne facessero parte della chiave.
 - `scripts/apply_curation.py` **pubblica** la decisione nel layer esterno e nel
   manifest (direzione, categoria, `score_eligible`, `status=integrated`) e scrive
   la descrizione rivista in `app/static/data/external/curated_descriptions.csv`,

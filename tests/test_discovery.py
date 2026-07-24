@@ -59,6 +59,35 @@ class DedupClassifier(unittest.TestCase):
         match, _ = discovery.classify_definition_match("PIL pro capite", index)
         self.assertNotEqual(match, "exact")
 
+    def test_existing_index_ids_carry_their_family(self):
+        """A raw id is only unique inside a family, so a match on a BES or
+        Multiscopo series has to name the family or the promotion step cannot
+        tell which indicator it means."""
+        index = discovery.build_existing_index()
+        by_prefix = {
+            "bes:": sum(1 for i, _, _ in index if i.startswith("bes:")),
+            "multiscopo:": sum(1 for i, _, _ in index if i.startswith("multiscopo:")),
+        }
+        for prefix, count in by_prefix.items():
+            self.assertGreater(count, 0, f"no {prefix} entries in the index")
+        # The territorial family owns the unprefixed namespace.
+        self.assertTrue(any(i.isdigit() for i, _, _ in index))
+
+    def test_promotion_refuses_an_unqualified_duplicate_target(self):
+        from scripts import promote_candidates
+
+        candidate = {
+            "candidate_id": "eurostat_regional:x",
+            "definition_match": "compatible",
+            "duplicate_of": "10AMB014",  # a BES id without its family
+            "source_indicator_id": "x",
+        }
+        with self.assertRaises(SystemExit):
+            promote_candidates._target_id(candidate)
+
+        candidate["duplicate_of"] = "bes:10AMB014"
+        self.assertEqual(promote_candidates._target_id(candidate), "bes:10AMB014")
+
 
 class EurostatAdapter(unittest.TestCase):
     def test_parse_weights_bolzano_trento(self):

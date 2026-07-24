@@ -29,13 +29,29 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DISCOVERY_DIR = PROJECT_ROOT / "data" / "discovery"
 CANDIDATES_PATH = DISCOVERY_DIR / "candidates.csv"
 
+# Public id namespace per family. A mirror of app/sources.py `internal_prefix`,
+# copied rather than imported because this module is stdlib-only (same reason
+# promote_candidates.py duplicates the external-layer columns): keep in sync.
+FAMILY_PREFIX = {
+    "territorial": "",
+    "bes": "bes:",
+    "multiscopo": "multiscopo:",
+}
+
 # Committed regional backbones used to detect whether a discovered indicator is
 # genuinely new or overlaps an existing series. Read as raw CSV (no app import).
+# Each carries its family: raw ids are only unique *inside* a family, so an id
+# without one ("104") does not say which indicator it means.
 EXISTING_NAME_SOURCES = [
-    PROJECT_ROOT / "app" / "static" / "data" / "Assoluti_Regione.csv",
-    PROJECT_ROOT / "app" / "static" / "data" / "Assoluti_BES_Regione.csv",
-    PROJECT_ROOT / "app" / "static" / "data" / "Assoluti_Multiscopo_Regione.csv",
+    ("territorial", PROJECT_ROOT / "app" / "static" / "data" / "Assoluti_Regione.csv"),
+    ("bes", PROJECT_ROOT / "app" / "static" / "data" / "Assoluti_BES_Regione.csv"),
+    ("multiscopo", PROJECT_ROOT / "app" / "static" / "data" / "Assoluti_Multiscopo_Regione.csv"),
 ]
+
+
+def public_id(family, raw_id):
+    """Family-qualified catalog id, the same one app/sources.py builds."""
+    return f"{FAMILY_PREFIX[family]}{raw_id}"
 
 CANDIDATE_COLUMNS = [
     "candidate_id",            # stable key: "<source>:<source_indicator_id>"
@@ -126,10 +142,15 @@ def normalize_name(value):
 
 
 def build_existing_index(sources=EXISTING_NAME_SOURCES):
-    """[(indicator_id, name, token_set)] for every committed regional series."""
+    """[(public_id, name, token_set)] for every committed regional series.
+
+    The id is family-qualified ("bes:10AMB014", "multiscopo:...", or the bare
+    numeric id for the territorial family, which owns the unprefixed namespace).
+    A duplicate match has to name one indicator unambiguously: downstream,
+    promote_candidates.py uses it as the target the candidate enriches."""
     seen = set()
     index = []
-    for path in sources:
+    for family, path in sources:
         if not Path(path).exists():
             continue
         with Path(path).open(encoding="utf-8", newline="") as handle:
@@ -138,7 +159,7 @@ def build_existing_index(sources=EXISTING_NAME_SOURCES):
                 if key in seen or not key[1]:
                     continue
                 seen.add(key)
-                index.append((key[0], key[1], normalize_name(key[1])))
+                index.append((public_id(family, key[0]), key[1], normalize_name(key[1])))
     return index
 
 

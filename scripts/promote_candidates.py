@@ -52,9 +52,29 @@ ENRICHING_MATCHES = {"exact", "compatible", "proxy"}
 
 
 def _target_id(candidate):
+    """The catalog id the promoted rows attach to.
+
+    `duplicate_of` comes from discovery.build_existing_index and is already
+    family-qualified ("bes:10AMB014", "multiscopo:...", or a bare numeric id for
+    the territorial family, which owns the unprefixed namespace). Anything else
+    would name an indicator that does not exist, so it is refused here rather
+    than written into the external layer."""
     if candidate["definition_match"] in ENRICHING_MATCHES and candidate.get("duplicate_of"):
-        return candidate["duplicate_of"]
+        target = candidate["duplicate_of"]
+        if not _is_known_target(target):
+            raise SystemExit(
+                f"{candidate['candidate_id']}: duplicate_of='{target}' is not a "
+                "family-qualified catalog id (expected 'bes:<id>', "
+                "'multiscopo:<id>' or a numeric territorial id). Re-run the "
+                "hunter so the match carries its family."
+            )
+        return target
     return f"eur:{candidate['source_indicator_id']}"
+
+
+def _is_known_target(target):
+    prefixes = tuple(p for p in discovery.FAMILY_PREFIX.values() if p)
+    return target.startswith(prefixes) or target.isdigit()
 
 
 def _bool(value):
