@@ -1273,5 +1273,161 @@
   "spunto": "Numeri sopra il 100% segnalano un problema di definizione o di misura, non un'irrigazione reale che supera il possibile, e probabilmente cambiano nel tempo i criteri di cosa sia irrigabile, o le unità non coincidono tra regioni. Il dato va quindi preso con estrema cautela, come indizio che l'irrigazione è molto diffusa in pianura padana e rara altrove, non come classifica. Stiamo misurando l'acqua o le definizioni?",
   "limite": "I valori sopra il 100% rendono i confronti inaffidabili e segnalano definizioni non omogenee tra territori e nel tempo. Il dato non misura il consumo d'acqua né l'efficienza dell'irrigazione, ma solo un rapporto tra superfici.",
   "fonti": []
+ },
+ "105": {
+  "attacco": "Il turismo pesa in modo profondamente diverso sui territori. In Trentino Alto Adige si contano oltre 52 giornate di presenza per abitante, in Valle d'Aosta 30, contro le 1,6 del Molise e le 3,4 del Piemonte. La media delle regioni è di circa 10, ma la mediana, 7,5, è ben più bassa.",
+  "spunto": "Un rapporto di oltre trenta volte tra la prima e l'ultima regione racconta economie turistiche opposte, dalle Alpi affollate al Sud interno quasi ignorato dai flussi. Ma alta intensità turistica non significa solo ricchezza, dato che dove i visitatori superano di molto i residenti crescono pressione sui servizi, prezzi delle case e stagionalità del lavoro. Il turismo è una risorsa o un peso a seconda di quanto ne resta al territorio. Molte presenze fanno un territorio ricco o solo affollato?",
+  "limite": "Rapporta le presenze ufficiali agli abitanti, escludendo il turismo non registrato, dalle seconde case agli affitti brevi non dichiarati. Non dice quanto della spesa turistica resti sul territorio né come il turismo incida sulla vita dei residenti.",
+  "fonti": []
+ },
+ "165": {
+  "attacco": "Guardando i soli mesi non estivi, il turismo si concentra ancora di più in poche regioni. In Trentino Alto Adige si contano 26 giornate per abitante, in Valle d'Aosta 16,5, contro le 0,5 del Molise e le 0,67 della Calabria. La media delle regioni è di circa 4,6.",
+  "spunto": "Questo indicatore misura la destagionalizzazione, la capacità di attrarre visitatori tutto l'anno e non solo d'estate. Le montagne, con la stagione invernale, riempiono i mesi freddi, mentre il turismo balneare del Sud si concentra in poche settimane. Un turismo stagionale crea lavoro precario e sfrutta male le strutture, uno diffuso nell'anno regge meglio le comunità. Distribuire i flussi nel tempo conta quanto attrarli. Meglio molti turisti in estate o pochi tutto l'anno?",
+  "limite": "Conta le presenze fuori stagione estiva, senza distinguere il turismo montano invernale da quello culturale delle città. Non dice se le strutture restino aperte tutto l'anno né se il lavoro turistico sia stabile o stagionale.",
+  "fonti": []
+ },
+ "25": {
+  "attacco": "La spesa del pubblico per teatro e musica misura quanto si investe in cultura dal vivo. È di circa 42 euro a testa in Lombardia, 37 nel Lazio, contro i 6 della Calabria e del Molise. La media delle regioni è di circa 19 euro pro capite.",
+  "spunto": "La spesa culturale segue reddito, offerta e abitudini, e dove ci sono teatri, sale e una tradizione di fruizione si spende di più, in un circolo tra domanda e offerta. Il divario, quasi sette volte, non riflette solo disponibilità economica ma anche quanta cultura dal vivo esista sul territorio. Al Sud mancano spesso le occasioni prima ancora della spesa. La cultura si consuma poco per povertà o per assenza di offerta?",
+  "limite": "Misura la spesa per teatro e musica, non l'intera vita culturale, che include forme gratuite, informali o digitali. Non distingue chi non spende per scelta da chi non trova un'offerta vicina.",
+  "fonti": []
+ },
+ "27": {
+  "attacco": "La domanda di teatro e musica, misurata dai biglietti venduti, va da 107 ogni cento abitanti nel Lazio e 105 in Toscana e Lombardia a 27 in Basilicata. La media delle regioni è di circa 73, con un divario di quasi quattro volte.",
+  "spunto": "Più biglietti significano più partecipazione culturale, e le regioni con grandi città e poli teatrali guidano. Ma la domanda si costruisce con l'offerta, e dove ci sono stagioni ricche e sale attive il pubblico cresce, in un rapporto che si autoalimenta. Il Sud, con meno strutture, resta indietro non per disinteresse ma per opportunità. Colmare questo divario è questione di gusti o di infrastrutture culturali?",
+  "limite": "Conta i biglietti venduti, quindi la fruizione a pagamento, non gli eventi gratuiti, le sagre o la cultura informale. Non dice nulla sulla qualità dell'offerta né su chi resta escluso per costo o distanza.",
+  "fonti": []
+ },
+ "28": {
+  "attacco": "Quanta parte del bilancio familiare va a cultura e tempo libero è un segno di benessere e priorità. È più alta in Trentino Alto Adige, 8,8%, Piemonte, 8,5%, e Umbria, più bassa in Sicilia, 5%, e Campania. La media delle regioni è del 6,8%.",
+  "spunto": "La quota spesa per cultura e svago cresce con il reddito, dato che chi ha di più destina una parte maggiore a ciò che non è essenziale. Ma conta anche l'offerta e l'abitudine, e alcune regioni spendono più di quanto il reddito farebbe prevedere. È un indicatore descrittivo, che unisce possibilità economica e scelte di vita. La cultura è la prima cosa che si taglia quando il reddito scende?",
+  "limite": "Misura la quota di spesa per ricreazione e cultura, che include anche sport, giochi e vacanze, non solo cultura in senso stretto. Una quota bassa può nascere da redditi bassi come da priorità diverse.",
+  "fonti": []
+ },
+ "593": {
+  "attacco": "Le imprese culturali e creative, dai musei al design all'editoria, sono più diffuse dove c'è mercato e tradizione. Le unità locali del settore sono il 9,5% del totale in Lombardia e il 9,4% in Toscana e Lazio, contro il 5,2% della Calabria. La media delle regioni è del 7,4%.",
+  "spunto": "La densità di imprese creative segnala un'economia che produce cultura, non solo la consuma, e si concentra nelle grandi città e nelle regioni d'arte, dove domanda, competenze e reti si alimentano a vicenda. Non è un settore marginale, dato che intreccia turismo, manifattura di qualità e identità dei luoghi. Ma un conto è avere molte imprese, un altro che diano lavoro e valore stabili. La cultura è un'industria o un ornamento dell'economia?",
+  "limite": "Conta le unità locali dei settori culturali sul totale, non la loro dimensione o solidità. Molte sono piccolissime o individuali, e il numero non dice quanto lavoro e reddito generino davvero.",
+  "fonti": []
+ },
+ "594": {
+  "attacco": "Guardando l'occupazione, la cultura pesa meno: gli addetti dei settori culturali e creativi sono il 7,6% del totale in Toscana e il 6,6% nelle Marche e in Friuli-Venezia Giulia, contro il 3,3% della Calabria. La media delle regioni è del 4,7%.",
+  "spunto": "Che gli addetti siano meno delle imprese conferma che la cultura è fatta di tante attività piccole, spesso individuali. Toscana e Marche in testa mostrano che non conta solo la grande città, ma anche i distretti di artigianato artistico e manifattura culturale. È lavoro spesso creativo ma precario e sottopagato. Quanti di questi posti sono mestieri stabili e quanti passioni che non pagano?",
+  "limite": "Conta gli addetti dei settori culturali sul totale, senza distinguere lavoro stabile e occasionale. Non misura i tanti lavoratori culturali autonomi, intermittenti o non dichiarati, numerosi in questo campo.",
+  "fonti": []
+ },
+ "595": {
+  "attacco": "Il valore aggiunto dei settori culturali e creativi sul totale va dal 2,2% del Molise e della Liguria al 7% della Toscana, con Marche e Friuli-Venezia Giulia poco sotto. La media delle regioni è del 3,8%, ma supera di molto la mediana.",
+  "spunto": "Il valore economico della cultura si concentra dove artigianato d'arte, moda, design ed editoria fanno sistema, spesso in regioni medie del Centro-Nord più che nelle metropoli. Lo scarto tra media e mediana dice che poche regioni trainano il dato nazionale. La cultura come industria vale più dove si produce che dove si consuma. Un territorio ricco d'arte è anche ricco di economia della cultura?",
+  "limite": "Misura il valore aggiunto delle imprese culturali sul totale, non il valore indiretto su turismo e immagine dei luoghi. Non coglie il patrimonio pubblico, musei e monumenti, che non passa dalle imprese.",
+  "fonti": []
+ },
+ "596": {
+  "attacco": "Quanto rende un addetto della cultura varia molto: da circa 28 mila euro in Calabria a 62 mila in Lombardia e 61 mila nel Lazio. La media delle regioni è di circa 41 mila euro. Il valore per addetto raddoppia tra Sud e Nord.",
+  "spunto": "La produttività culturale è alta dove ci sono grandi imprese dei media, dell'editoria e del software creativo, cioè nelle metropoli. Altrove prevale un artigianato culturale di qualità ma a basso valore per addetto. Il divario mostra che la cultura genera reddito molto diverso a seconda di come è organizzata. Fare cultura può essere un buon lavoro o resta spesso una vocazione mal pagata?",
+  "limite": "È il valore per addetto nei settori culturali, che dipende dal tipo di attività e dalla dimensione delle imprese. Non misura la qualità artistica né il valore sociale della cultura, che sfuggono a ogni conto economico.",
+  "fonti": []
+ },
+ "597": {
+  "attacco": "Questo indicatore misura quanto del fatturato delle imprese culturali diventa valore aggiunto, cioè quanto lavorano al proprio interno invece di comprare da altri. È più alto in Molise, Sicilia e Liguria, intorno al 48%, più basso in Marche e Piemonte, sotto il 32%. La media delle regioni è del 39%.",
+  "spunto": "Un'alta integrazione verticale può segnalare imprese che fanno molto in casa, ma anche filiere corte e poco articolate, tipiche di economie meno sviluppate. Al contrario, dove le imprese comprano più servizi da altri, c'è spesso una filiera creativa più ricca e specializzata. È un indicatore descrittivo, che dice come è organizzata la produzione culturale, non quanto valga. Fare tutto in casa è forza o isolamento?",
+  "limite": "È il rapporto tra valore aggiunto e fatturato, che riflette il modello organizzativo più della performance. Un valore alto o basso non è di per sé migliore, e va letto insieme alla dimensione e al tipo di imprese.",
+  "fonti": []
+ },
+ "598": {
+  "attacco": "Le donne sono il 48,7% dei dipendenti delle imprese culturali in Toscana e il 48,4% in Lombardia, ma solo il 31% in Valle d'Aosta e il 31,2% in Basilicata. La media delle regioni è del 40,9%. La cultura è quasi paritaria, ma non ovunque.",
+  "spunto": "I settori creativi sono tra i più femminili dell'economia, ma la presenza delle donne cambia con il tessuto locale, e dove domina un artigianato più tecnico o manuale la quota scende. È un indicatore descrittivo, senza un verso migliore o peggiore, ma racconta dove la cultura offre più spazio al lavoro femminile. La parità nella cultura dipende dai mestieri o dai territori?",
+  "limite": "Conta la quota di dipendenti donne, non i ruoli, i salari o le posizioni apicali, dove il divario di genere resta ampio anche nella cultura. Non include il lavoro autonomo, molto diffuso nel settore.",
+  "fonti": []
+ },
+ "599": {
+  "attacco": "I giovani tra 15 e 29 anni sono il 24,8% dei dipendenti delle imprese culturali in Trentino Alto Adige e il 21,2% in Campania, ma solo il 9,7% in Sardegna. La media delle regioni è del 15,8%. La cultura dà lavoro ai giovani in modo molto diseguale.",
+  "spunto": "La cultura è spesso vista come un settore giovane, ma la quota di under 30 varia molto, e dove prevalgono turismo e intrattenimento i giovani sono di più, dove domina un artigianato consolidato di meno. È un indicatore descrittivo, che dice quanto la cultura sia una porta d'ingresso al lavoro per i più giovani. Un settore giovane è più dinamico o solo più precario? Anche qui il tipo di attività conta più del territorio.",
+  "limite": "Conta i dipendenti giovani, non se il loro lavoro sia stabile, formativo o di passaggio. Non include stagisti, collaboratori e autonomi, forme molto diffuse tra i giovani della cultura.",
+  "fonti": []
+ },
+ "600": {
+  "attacco": "Le nuove imprese culturali danno più lavoro al Sud: gli addetti delle imprese creative nate di recente sono il 7,8% del totale in Basilicata e il 7,6% in Calabria, contro il 2,7% delle Marche. La media delle regioni è del 5%.",
+  "spunto": "Come per l'impresa in generale, al Sud la cultura si rinnova con molte nuove attività, segno di vivacità ma anche di un tessuto giovane e instabile. Al Nord, dove le imprese culturali sono più radicate, il peso delle nuove è minore. Nascere non basta, e la sfida è far durare le imprese creative oltre i primi anni difficili. La cultura del Sud è in fermento o in perenne ripartenza?",
+  "limite": "Misura il peso occupazionale delle imprese culturali giovani, non la loro solidità o sopravvivenza. Un valore alto può segnalare vitalità o un tessuto fragile che si rinnova di continuo.",
+  "fonti": []
+ },
+ "610": {
+  "attacco": "La domanda complessiva di spettacolo e sport, misurata dagli ingressi, va da 578 ogni cento abitanti in Emilia-Romagna e 510 nel Lazio a 106 in Molise. La media delle regioni è di circa 335, con un divario di oltre cinque volte.",
+  "spunto": "Gli ingressi a eventi dal vivo misurano quanto una comunità partecipa alla vita culturale e sportiva fuori casa. Il divario Nord-Sud è netto e riflette offerta, impianti e tradizione, più che il solo interesse delle persone. Dove mancano teatri, cinema e stadi attivi, la partecipazione cala per forza. La vita culturale di un territorio si misura da quanto offre o da quanto la gente esce di casa?",
+  "limite": "Conta gli ingressi a eventi a pagamento, non la partecipazione gratuita, digitale o informale. Un valore basso può nascere da poca offerta più che da poco interesse, e non distingue spettacolo e sport.",
+  "fonti": []
+ },
+ "611": {
+  "attacco": "La domanda di cinema è in calo ovunque, quasi un quinto in meno negli ultimi anni. Gli ingressi vanno da 166 ogni cento abitanti nel Lazio e 163 in Emilia-Romagna a 47 in Molise. La media delle regioni è di circa 114.",
+  "spunto": "Il cinema in sala vive una crisi lunga, tra streaming e cambiamento delle abitudini, e il calo tocca tutte le regioni. Ma il divario territoriale resta, dato che dove le sale sono poche o hanno chiuso andare al cinema è più difficile, e questo pesa soprattutto sulle aree interne e sul Sud. La sala non è solo intrattenimento, è presidio culturale. Il cinema in sala è un rito che finisce o un servizio da difendere?",
+  "limite": "Conta gli ingressi nelle sale, non la visione di film in altre forme, ormai dominante. Il calo riflette anche il passaggio allo streaming, non solo un minore interesse per il cinema.",
+  "fonti": []
+ },
+ "612": {
+  "attacco": "La domanda di spettacolo sportivo, dagli ingressi agli eventi, va da 92 ogni cento abitanti in Liguria e 87 in Toscana a 19 in Molise e Basilicata. La media delle regioni è di circa 53, con differenze molto ampie tra i territori.",
+  "spunto": "Assistere a eventi sportivi dal vivo dipende dalla presenza di squadre, impianti e tradizione sportiva, concentrati in alcune regioni e nelle grandi città. Il divario riflette la geografia dello sport professionistico e degli stadi, più che la passione, diffusa ovunque. Lo sport dal vivo è aggregazione, identità ed economia locale, oltre che spettacolo. La passione sportiva del Sud trova dove esprimersi allo stadio?",
+  "limite": "Conta gli ingressi a eventi sportivi, non chi pratica sport né chi lo segue in televisione. Riflette l'offerta di eventi e impianti più della cultura sportiva di un territorio.",
+  "fonti": []
+ },
+ "613": {
+  "attacco": "Guardando i soli comuni delle aree interne, la domanda di spettacolo e sport va da 513 ingressi per abitante in Valle d'Aosta e 302 in Veneto a 43 in Calabria. La media delle regioni è di circa 176, con un divario di quasi dodici volte.",
+  "spunto": "Nelle aree interne, lontane dai grandi centri, l'offerta culturale è la cartina di tornasole dell'abbandono, dato che dove esistono ancora eventi e presidi la comunità resiste, dove mancano lo spopolamento avanza. Il divario enorme mostra due destini opposti delle aree marginali, alcune ancora vive, altre ormai svuotate. La cultura nelle aree interne è un lusso o un argine allo spopolamento?",
+  "limite": "Conta gli ingressi a eventi nei comuni interni, non la loro qualità o continuità. Un valore alto può dipendere da poche località turistiche interne, non da una diffusione reale dell'offerta.",
+  "fonti": []
+ },
+ "bes:09PAE001": {
+  "attacco": "Quanto un comune spende per la cultura varia di dieci volte. In Trentino Alto Adige sono 56,7 euro per abitante, in Friuli-Venezia Giulia 45,7, contro i 5,4 della Campania e gli 8,8 del Molise. La media delle regioni è di circa 24 euro pro capite.",
+  "spunto": "La spesa comunale per la cultura è una scelta politica prima che una necessità, e il divario riflette risorse dei comuni ma anche priorità diverse. Dove si investe poco, biblioteche, teatri e iniziative pubbliche si diradano, e la cultura diventa un privilegio di chi può pagarla. È un indicatore descrittivo, ma dice quanto il pubblico crede nella cultura come servizio. La cultura è una spesa o un investimento per un territorio?",
+  "limite": "Misura la spesa corrente dei comuni per la cultura, non quella di regioni, Stato o privati, spesso rilevante. Non dice come i fondi siano usati né con quali risultati per i cittadini.",
+  "fonti": []
+ },
+ "bes:09PAE002": {
+  "attacco": "Il patrimonio museale è distribuito in modo diseguale. Contando densità e rilevanza, il Lazio ha 6,1 musei di peso ogni cento chilometri quadrati, la Campania 3,5 e la Toscana 3,3, contro lo 0,12 del Molise. La media delle regioni è di circa 1,3.",
+  "spunto": "La ricchezza museale segue la storia, dato che dove sono passati impero, papato, Rinascimento e grandi corti si addensano musei e collezioni. È un patrimonio enorme, ma concentrato, e gestirlo e tutelarlo costa più di quanto renda in molte aree. Avere musei non basta, servono visitatori e risorse per tenerli aperti. Un grande patrimonio culturale è una rendita o un onere?",
+  "limite": "Misura la densità e la rilevanza dei musei sul territorio, non il numero di visitatori né lo stato di conservazione. Un'alta densità non dice se il patrimonio sia valorizzato, accessibile o solo custodito.",
+  "fonti": []
+ },
+ "bes:09PAE003": {
+  "attacco": "L'abusivismo edilizio spacca l'Italia in due. In Calabria e Basilicata si contano 54 costruzioni abusive ogni cento autorizzate, in Campania 50, contro le 3,3 di Trentino Alto Adige e Friuli-Venezia Giulia. La media delle regioni è di circa 20, ma la mediana è molto più bassa, 11.",
+  "spunto": "L'abusivismo è una ferita al paesaggio e alla legalità, e la sua concentrazione al Sud riflette debolezza dei controlli, sanatorie ripetute e bisogno abitativo. Costruire senza regole deturpa le coste, aumenta il rischio idrogeologico e toglie valore ai territori. È un indicatore descrittivo, senza un verso automatico nel sistema, ma il fenomeno che misura è tutt'altro che neutro. Un territorio che si costruisce da sé è più libero o più fragile?",
+  "limite": "Rapporta le costruzioni abusive stimate a quelle autorizzate, una misura per sua natura incerta di un fenomeno sommerso. Non dice la gravità degli abusi, dal piccolo ampliamento all'edificio intero in area protetta.",
+  "fonti": []
+ },
+ "bes:09PAE005": {
+  "attacco": "L'erosione dello spazio rurale da abbandono riguarda quanta campagna viene lasciata incolta. È altissima in Molise, 79,6%, Valle d'Aosta, 74,5%, e Umbria, più bassa in Veneto, 16,4%, e Lombardia. La media delle regioni è del 43%, con un divario molto ampio.",
+  "spunto": "L'abbandono dei campi non è solo un fatto agricolo, dato che cambia il paesaggio, aumenta il rischio di incendi e frane e segna lo spopolamento delle aree interne e montane. Dove l'agricoltura è intensiva e redditizia, come in pianura padana, la terra resta coltivata, dove è marginale viene lasciata. È un indicatore descrittivo, ma racconta territori che si svuotano. Una campagna abbandonata torna natura o diventa degrado?",
+  "limite": "Misura la quota di spazio rurale in abbandono, senza distinguere il ritorno spontaneo a bosco dal degrado incolto. Non dice se l'abbandono sia recente o storico, né i suoi effetti sul rischio ambientale.",
+  "fonti": []
+ },
+ "bes:09PAE006": {
+  "attacco": "La pressione delle attività estrattive, cave e miniere, va da 598 metri cubi per chilometro quadrato in Lombardia e 474 in Umbria a 18 in Valle d'Aosta. La media delle regioni è di circa 291. Media e mediana quasi coincidono.",
+  "spunto": "Estrarre inerti e minerali serve all'edilizia e all'industria, ma consuma suolo, altera il paesaggio e lascia cave spesso non recuperate. La pressione è alta dove c'è più costruzione e industria, cioè soprattutto al Nord. È un indicatore descrittivo, senza un verso automatico, ma segnala un prelievo di risorse non rinnovabili dal territorio. Quanto paesaggio vale il materiale con cui costruiamo?",
+  "limite": "Misura i volumi estratti per superficie, non l'impatto reale, che dipende da dove e come avviene l'estrazione. Non dice se le cave vengano recuperate a fine attività, il vero nodo ambientale.",
+  "fonti": []
+ },
+ "bes:09PAE008": {
+  "attacco": "Gli agriturismi, che uniscono campagna e turismo, sono più diffusi dove il paesaggio è una risorsa. Ce ne sono 28,9 ogni cento chilometri quadrati in Trentino Alto Adige e 25,5 in Toscana, contro 1,6 in Valle d'Aosta e 2,2 in Basilicata. La media delle regioni è di circa 8,7.",
+  "spunto": "L'agriturismo è un modello che tiene insieme agricoltura, turismo e presidio del territorio, e dà reddito extra alle aziende agricole. La sua diffusione, quasi raddoppiata nel tempo, è più alta dove il paesaggio è famoso e la domanda turistica forte, come in Toscana. È un turismo che, a differenza di altri, resta legato alla terra e ai residenti. Il paesaggio rende di più coltivato o mostrato ai turisti?",
+  "limite": "Conta gli agriturismi per superficie, non la loro dimensione, il fatturato o quanto restino legati all'attività agricola. Alcuni sono ormai strutture ricettive con poca agricoltura reale.",
+  "fonti": []
+ },
+ "bes:09PAE009-N25": {
+  "attacco": "La densità di verde storico, parchi e giardini di valore, va da 5 metri quadri ogni cento in Umbria e 3,9 in Piemonte a 0,13 in Molise e 0,19 in Basilicata. La media delle regioni è di circa 1,5. Il divario è enorme.",
+  "spunto": "Il verde storico è patrimonio e qualità della vita insieme, dato che ville, parchi e giardini raccontano la storia dei luoghi e offrono spazi pubblici pregiati. La sua concentrazione riflette dove ci furono corti, nobiltà e grandi città, più che una scelta recente. Tutelarlo costa, e molte aree ne hanno pochissimo. Un giardino storico è un lusso del passato o un bene comune del presente?",
+  "limite": "Misura la superficie di verde storico per area urbana, non il suo stato di conservazione o accessibilità. Non include il verde pubblico ordinario, spesso più utile alla vita quotidiana dei residenti.",
+  "fonti": []
+ },
+ "bes:09PAE010": {
+  "attacco": "L'insoddisfazione per il paesaggio del luogo in cui si vive è più alta al Sud. Riguarda il 35,3% delle persone in Campania, il 31,1% in Sicilia e il 28,2% nel Lazio, contro il 9,8% della Valle d'Aosta. La media delle regioni è del 18,7%.",
+  "spunto": "Il giudizio sul proprio paesaggio unisce bellezza dei luoghi, degrado e cura del territorio, e la mappa ricalca quella dell'abusivismo e dell'incuria urbana. Dove il paesaggio è deturpato o trascurato cresce l'insoddisfazione, che è anche un giudizio sulla qualità della vita. È una percezione, ma nasce da fatti concreti sotto gli occhi di tutti. Un bel paesaggio è un dono della natura o una responsabilità di chi lo abita?",
+  "limite": "Rileva un giudizio soggettivo sul paesaggio, influenzato da attese e abitudini oltre che dallo stato reale dei luoghi. Non distingue il paesaggio naturale da quello costruito, né dice cosa esattamente scontenti le persone.",
+  "fonti": []
+ },
+ "bes:09PAE011": {
+  "attacco": "La preoccupazione per il deterioramento del paesaggio è più diffusa al Nord: riguarda il 17,1% delle persone in Veneto, il 16,2% in Liguria e il 15,6% in Trentino Alto Adige, contro il 9,1% della Basilicata. La media delle regioni è del 12,5%.",
+  "spunto": "A differenza dell'insoddisfazione, che cresce dove il paesaggio è già degradato, la preoccupazione è più alta dove il paesaggio è bello e conta molto, come le montagne del Nord. È una forma di consapevolezza ambientale, dato che si teme di perdere ciò a cui si tiene. Il calo recente del dato va letto con cautela, tra assuefazione e altre priorità. Ci si preoccupa di più del paesaggio quando è bello o quando è già rovinato?",
+  "limite": "Misura una preoccupazione dichiarata, non un rischio reale per il paesaggio. Dipende dalla sensibilità e dall'attenzione mediatica, e non dice se si traduca in comportamenti o scelte di tutela.",
+  "fonti": []
  }
 }
