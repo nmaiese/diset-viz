@@ -59,7 +59,8 @@
     <h2>Che cosa rappresenta il dato</h2>
     <p><strong>In pratica.</strong> {{ indicator.explain.example }}</p>
     <p><strong>Perimetro del confronto.</strong> {{ indicator.explain.scope }}</p>
-    {% if analyst and analyst.spunto %}<p class="analyst-spunto"><strong>Come si legge.</strong> {{ analyst.spunto | analyst_html }}</p>{% else %}<p><strong>Come si legge.</strong> {{ indicator.explain.reading }}</p>{% endif %}
+    <p><strong>Come si legge.</strong> {{ indicator.explain.reading }}</p>
+    {% if analyst and analyst.spunto %}<p class="analyst-spunto">{{ analyst.spunto | analyst_html }}</p>{% endif %}
     <p class="page-caveat"><strong>Che cosa non dice.</strong> {% if analyst and analyst.limite %}{{ analyst.limite | analyst_html }}{% else %}{{ indicator.explain.caveat }}{% endif %}</p>
     <p>L'indicatore appartiene alla categoria <a href="{{ indicator.category_path }}">{{ indicator.category_name }}</a> e {{ domain_prose }} {{ indicator.domain_name }}. La direzione serve a ordinare i dati.{% if indicator.scoreable is defined %} {% if indicator.scoreable %}Questa serie entra nel punteggio regionale della qualità della vita.{% else %}Questa serie resta descrittiva e non entra nel punteggio, per evitare sovrapposizioni o interpretazioni arbitrarie.{% endif %}{% else %} Quando è definita, può essere usata per costruire il punteggio della qualità della vita.{% endif %} Non sostituisce l'interpretazione del contesto territoriale.</p>
   </section>

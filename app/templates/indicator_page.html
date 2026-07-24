@@ -108,7 +108,8 @@
     <h3>Chi e che cosa comprende</h3>
     <p>{{ explain.scope }}</p>
     <h3>Come interpretare valori e classifica</h3>
-    {% if analyst and analyst.spunto %}<p class="analyst-spunto">{{ analyst.spunto | analyst_html }}</p>{% else %}<p>{{ explain.reading }}</p>{% endif %}
+    <p>{{ explain.reading }}</p>
+    {% if analyst and analyst.spunto %}<p class="analyst-spunto">{{ analyst.spunto | analyst_html }}</p>{% endif %}
     <p class="page-caveat"><strong>Che cosa non dice.</strong> {% if analyst and analyst.limite %}{{ analyst.limite | analyst_html }}{% else %}{{ explain.caveat }}{% endif %}</p>
     {% if meta.archive %}
     <details class="indicator-source-definition">
