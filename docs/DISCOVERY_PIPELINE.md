@@ -139,6 +139,22 @@ Dove entra l'indicatore dopo la cura:
 Tutto sotto gate PR: la modifica al punteggio è visibile nel diff e va live solo
 al merge.
 
+## Fase 4: lo scrittore, il testo editoriale
+
+Dopo che il curatore ha integrato e orientato un indicatore, manca il testo che
+l'utente legge. Lo **scrittore** (`.claude/agents/indicator-writer.md`, agente
+Claude Code invocabile via subagent) scrive la nota d'analista
+(`attacco`/`spunto`/`limite`/`fonti`/`vintage`) in
+`app/static/data/analyst_notes.json`, seguendo `content/STYLE.md`, con **solo
+numeri reali** presi dai dati (API/data layer), le fonti verificate per le
+affermazioni comparative e il `vintage` uguale all'`year_max` corrente (drift
+guard). Apre una PR, niente merge. È lo step che trasforma un indicatore appena
+integrato in una pagina che si legge come scritta da un giornalista.
+
+La catena completa degli agenti:
+
+    cacciatore -> [approvazione umana] -> curatore -> scrittore -> PR -> merge -> live
+
 ## Fonte pilota: Eurostat regionale (NUTS2)
 
 Prima istituzione oltre Istat, per validare il flusso end-to-end.

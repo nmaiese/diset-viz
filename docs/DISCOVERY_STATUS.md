@@ -87,11 +87,20 @@ Dopo modifiche ai dati serve **riavviare gunicorn** (loader in `lru_cache` per l
 vita del processo). Il frontend NON va ricostruito per i soli dati (la SPA legge
 `/api/catalog` a runtime; filtri ed etichette fonti sono data-driven).
 
+## Agenti
+
+Tre agenti, catena: **cacciatore -> [approvazione umana] -> curatore -> scrittore**.
+Il cacciatore e il curatore hanno il contratto in `docs/DISCOVERY_PIPELINE.md`;
+lo **scrittore** è definito in `.claude/agents/indicator-writer.md` (scrive la
+nota d'analista con numeri reali, stile `content/STYLE.md`, vintage e fonti).
+
 ## Cosa NON è ancora fatto (prossimi passi)
 
-1. **Schedulare i due agenti** (hunter e curatore) come Routine Claude Code.
-   Attenzione: l'accesso web dipende dalla network policy dell'ambiente; Eurostat
-   qui è raggiungibile, con fallback `--offline`.
+1. **Schedulare cacciatore e curatore** come Routine Claude Code
+   (`create_trigger`): richiede l'approvazione del permesso sugli strumenti di
+   scheduling in sessione. Cadenza proposta: cacciatore lun 06:00 UTC, curatore
+   gio 06:00 UTC, entrambi in sessione nuova e PR-gated. L'accesso web dipende
+   dalla network policy; Eurostat è raggiungibile, con fallback `--offline`.
 2. **Scouting opt-in**: proporre nuovi domini all'allowlist (oggi solo watchlist).
 3. **Estendere la watchlist**: altre serie Eurostat/istituzionali, poi livello
    provinciale (NUTS3), sempre priorità al regionale fresco.
