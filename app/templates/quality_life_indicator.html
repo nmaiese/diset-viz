@@ -41,7 +41,7 @@
 <article class="page page-indicator wrap">
   <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a> / <a href="{{ source_breadcrumb_path }}">{{ source_breadcrumb_label }}</a></nav>
   <h1>{{ indicator.name }}</h1>
-  <p class="page-lead">{{ indicator.explain.plain }} La scheda confronta {{ territory_label }} e mostra l'ultimo aggiornamento disponibile della serie.</p>
+  <p class="page-lead">{% if analyst and analyst.attacco %}{{ analyst.attacco | analyst_html }}{% else %}{{ indicator.explain.plain }} La scheda confronta {{ territory_label }} e mostra l'ultimo aggiornamento disponibile della serie.{% endif %}</p>
   {% if not indicator.indexable %}
   <p class="page-note">La scheda è consultabile ma non viene proposta ai motori di ricerca: nell'ultimo anno la copertura è inferiore all'80% {{ coverage_note_scope }}.</p>
   {% endif %}
@@ -60,7 +60,8 @@
     <p><strong>In pratica.</strong> {{ indicator.explain.example }}</p>
     <p><strong>Perimetro del confronto.</strong> {{ indicator.explain.scope }}</p>
     <p><strong>Come si legge.</strong> {{ indicator.explain.reading }}</p>
-    <p class="page-caveat"><strong>Che cosa non dice.</strong> {{ indicator.explain.caveat }}</p>
+    {% if analyst and analyst.spunto %}<p class="analyst-spunto">{{ analyst.spunto | analyst_html }}</p>{% endif %}
+    <p class="page-caveat"><strong>Che cosa non dice.</strong> {% if analyst and analyst.limite %}{{ analyst.limite | analyst_html }}{% else %}{{ indicator.explain.caveat }}{% endif %}</p>
     <p>L'indicatore appartiene alla categoria <a href="{{ indicator.category_path }}">{{ indicator.category_name }}</a> e {{ domain_prose }} {{ indicator.domain_name }}. La direzione serve a ordinare i dati.{% if indicator.scoreable is defined %} {% if indicator.scoreable %}Questa serie entra nel punteggio regionale della qualità della vita.{% else %}Questa serie resta descrittiva e non entra nel punteggio, per evitare sovrapposizioni o interpretazioni arbitrarie.{% endif %}{% else %} Quando è definita, può essere usata per costruire il punteggio della qualità della vita.{% endif %} Non sostituisce l'interpretazione del contesto territoriale.</p>
   </section>
 

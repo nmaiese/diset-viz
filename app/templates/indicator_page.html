@@ -71,7 +71,7 @@
   </form>
 
   <h1>{{ meta.name }}</h1>
-  <p class="page-lead">{{ page_intro }}</p>
+  <p class="page-lead">{% if analyst and analyst.attacco %}{{ analyst.attacco | analyst_html }}{% else %}{{ page_intro }}{% endif %}</p>
   {% if not is_indexable %}
   <p class="page-note">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante demografica da leggere insieme alla pagina principale.</p>
   {% endif %}
@@ -227,7 +227,8 @@
     <p>{{ explain.scope }}</p>
     <h3>Come interpretare valori e classifica</h3>
     <p>{{ explain.reading }}</p>
-    <p class="page-caveat"><strong>Che cosa non dice.</strong> {{ explain.caveat }}</p>
+    {% if analyst and analyst.spunto %}<p class="analyst-spunto">{{ analyst.spunto | analyst_html }}</p>{% endif %}
+    <p class="page-caveat"><strong>Che cosa non dice.</strong> {% if analyst and analyst.limite %}{{ analyst.limite | analyst_html }}{% else %}{{ explain.caveat }}{% endif %}</p>
     {% if meta.archive %}
     <details class="indicator-source-definition">
       <summary>Leggi la definizione originale della fonte</summary>
