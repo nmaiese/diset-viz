@@ -1,0 +1,61 @@
+name: Discovery cacciatore (watchlist)
+
+# Schedula la parte meccanica del "cacciatore": scansiona le fonti watchlist,
+# aggiorna la coda candidati e apre una PR revisionabile. Nessun dato va live
+# (tocca solo data/discovery/candidates.csv, sotto gate PR). Il lavoro
+# qualitativo (verso, categoria, testi) resta agli agenti curatore e scrittore.
+
+on:
+  schedule:
+    # Lunedì 06:30 UTC, sfalsato dal data-refresh ('17 6 * * 1').
+    - cron: '30 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: discovery-hunter
+  cancel-in-progress: false
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Gli script di discovery sono stdlib puri: nessuna dipendenza da installare.
+      - name: Cache risposte Eurostat (cache-first, rispetta la fonte)
+        uses: actions/cache@v4
+        with:
+          path: data/eurostat_cache
+          key: eurostat-cache-${{ runner.os }}
+          restore-keys: |
+            eurostat-cache-${{ runner.os }}-
+
+      - name: Discovery watchlist (live, cache-first)
+        run: |
+          python scripts/discover_candidates.py --source eurostat_regional
+
+      - name: Apri o aggiorna la coda candidati
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: automation/discovery-candidates
+          delete-branch: true
+          add-paths: data/discovery/candidates.csv
+          commit-message: "Discovery: aggiorna la coda candidati"
+          title: "Discovery: nuovi candidati indicatori da revisionare"
+          body: |
+            Coda candidati aggiornata dal cacciatore (scripts/discover_candidates.py, watchlist).
+
+            Da fare (revisione umana):
+            - rivedi data/discovery/candidates.csv: per ogni candidato con triage_status=new imposta approved / rejected / needs-info;
+            - i definition_match sono euristici e mai "exact": la conferma spetta a te;
+            - dopo il merge, il curatore promuove gli approved, verifica il verso e la categoria, e lo scrittore prepara i testi.
+
+            Nulla e' andato live: questo aggiorna solo la coda revisionabile. Vedi docs/DISCOVERY_PIPELINE.md.
