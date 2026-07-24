@@ -94,19 +94,36 @@ Il cacciatore e il curatore hanno il contratto in `docs/DISCOVERY_PIPELINE.md`;
 lo **scrittore** è definito in `.claude/agents/indicator-writer.md` (scrive la
 nota d'analista con numeri reali, stile `content/STYLE.md`, vintage e fonti).
 
+## Schedulazione (fatta)
+
+Cacciatore e curatore girano come **Routine Claude Code** (agenti cloud, sessione
+nuova a ogni firing, checkout git proprio, PR-gated). Create il 2026-07-24
+sull'environment `divarioitalia`, modello `claude-opus-4-8`:
+
+| agente | cron (UTC) | routine id |
+| --- | --- | --- |
+| cacciatore (watchlist) | `0 6 * * 1` (lun) | `trig_01VizeycZocZoeDE1RxjWj1f` |
+| curatore (verso, categoria) | `0 6 * * 4` (gio) | `trig_019EP6TnEbYnKz8VpKFaRm4g` |
+
+Le Routine si gestiscono da <https://claude.ai/code/routines> (elenco, modifica,
+esecuzione manuale, disattivazione). Il prompt di ciascuna riproduce il contratto
+in [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md) (sezione "Runtime"): il
+cacciatore esegue i passi 1-3 e si ferma prima della promozione, il curatore
+esegue i passi 1-3 del suo contratto e lancia la suite completa perché tocca il
+punteggio qualità della vita. Nessuno dei due fa merge, e nessuno dei due apre una
+PR vuota quando non c'è nulla da revisionare.
+
+Cadenza sfalsata di tre giorni per un motivo: il curatore ha senso solo dopo che
+un umano ha approvato la coda del cacciatore e ha girato la promozione.
+
 ## Cosa NON è ancora fatto (prossimi passi)
 
-1. **Schedulare cacciatore e curatore** come Routine Claude Code
-   (`create_trigger`): richiede l'approvazione del permesso sugli strumenti di
-   scheduling in sessione. Cadenza proposta: cacciatore lun 06:00 UTC, curatore
-   gio 06:00 UTC, entrambi in sessione nuova e PR-gated. L'accesso web dipende
-   dalla network policy; Eurostat è raggiungibile, con fallback `--offline`.
-2. **Scouting opt-in**: proporre nuovi domini all'allowlist (oggi solo watchlist).
-3. **Estendere la watchlist**: altre serie Eurostat/istituzionali, poi livello
+1. **Scouting opt-in**: proporre nuovi domini all'allowlist (oggi solo watchlist).
+2. **Estendere la watchlist**: altre serie Eurostat/istituzionali, poi livello
    provinciale (NUTS3), sempre priorità al regionale fresco.
-4. **Profili regionali** (`app/profiles.py`): oggi calcolati sui soli territoriali
+3. **Profili regionali** (`app/profiles.py`): oggi calcolati sui soli territoriali
    core, non includono ancora le famiglie esterne.
-5. **Migrazione URL**: se serve, ripulire eventuali link storici residui; i 301
+4. **Migrazione URL**: se serve, ripulire eventuali link storici residui; i 301
    coprono territoriali, BES e Multiscopo.
 
 ## Gotcha per la prossima sessione

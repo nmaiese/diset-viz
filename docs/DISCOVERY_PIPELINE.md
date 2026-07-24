@@ -184,8 +184,10 @@ copertura 20/20.
 
 ## Runtime: agente Claude Code schedulato
 
-La discovery gira come **agente Claude Code schedulato** (Routine). Contratto
-dell'agente a ogni firing:
+La discovery gira come **agente Claude Code schedulato** (Routine). Le due Routine
+sono attive: cacciatore lunedì `0 6 * * 1` UTC, curatore giovedì `0 6 * * 4` UTC,
+environment `divarioitalia`, sessione nuova a ogni firing. Id e gestione in
+[`DISCOVERY_STATUS.md`](DISCOVERY_STATUS.md). Contratto dell'agente a ogni firing:
 
 1. `python3 scripts/discover_candidates.py --source eurostat_regional` (live,
    cache-first) per ogni fonte watchlist abilitata.
@@ -232,3 +234,6 @@ dati di produzione non vengono mai toccati.
 - Implementare lo scouting opt-in per proporre nuovi domini all'allowlist.
 - Far entrare gli indicatori esterni anche nei profili regionali
   (`app/profiles.py`), oggi calcolati sui soli territoriali core.
+- Dare al cacciatore un adapter per fonte: oggi l'unico implementato è
+  `eurostat_regional`, quindi la Routine scansiona una sola delle fonti
+  dell'allowlist.
