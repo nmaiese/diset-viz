@@ -182,8 +182,23 @@ def _merge_dataset(existing, new_rows):
 
 
 def _merge_manifest(existing, new_entries):
+    """Merge on the source series, exactly like the dataset.
+
+    A source series has one current target: candidate_id is
+    `<source>:<source_indicator_id>` and each candidate promotes to a single
+    target. Including the target in the key meant a re-promotion after a human
+    corrected `duplicate_of` in the review PR (the documented way a match is
+    confirmed) moved the data rows to the new target but left the old entry
+    behind, still claiming status=integrated for an indicator with no data."""
     def key(row):
-        return (row["target_indicator_id"], row.get("source", ""), row.get("source_indicator_id", ""))
+        source, series = row.get("source", ""), row.get("source_indicator_id", "")
+        if source or series:
+            return ("series", source, series)
+        # Placeholder entries carry no source (status=unavailable: no external
+        # series exists for that indicator yet). They are one per target, so the
+        # target is what identifies them.
+        return ("target", row.get("target_indicator_id", ""))
+
     merged = {key(row): row for row in existing}
     for row in new_entries:
         merged[key(row)] = row

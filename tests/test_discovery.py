@@ -241,6 +241,62 @@ class QueueRoundTrip(unittest.TestCase):
             self.assertTrue(all(r["atlas_eligible"] == "true" for r in ds_rows))
             self.assertTrue(all(r["score_eligible"] == "false" for r in ds_rows))
 
+    def test_retargeting_a_series_moves_its_manifest_entry(self):
+        """Found end-to-end. Confirming a match in the review PR (editing
+        duplicate_of on an already promoted candidate) is the documented way a
+        series changes target. The data rows follow the new target, so the
+        manifest entry has to follow too: keying it on the target as well left
+        the old entry behind, still claiming status=integrated for an indicator
+        with no data. Placeholder entries carry no source and must survive."""
+        with TemporaryDirectory() as tmp:
+            self._patched_queue(tmp)
+            discover_candidates.run("eurostat_regional", offline=True)
+            rows = discovery.read_candidates()
+            for row in rows:
+                if row["candidate_id"] == "eurostat_regional:rd_e_gerdreg":
+                    row["triage_status"] = "approved"
+            discovery.write_candidates(rows)
+
+            out_ds = Path(tmp) / "external.csv"
+            out_mf = Path(tmp) / "manifest.csv"
+            promote_candidates.run(offline=True, out_dataset=out_ds, out_manifest=out_mf)
+
+            # Un segnaposto senza fonte, come quelli reali (status=unavailable).
+            with out_mf.open(encoding="utf-8", newline="") as handle:
+                manifest = list(csv.DictReader(handle, delimiter=";"))
+            placeholder = {c: "" for c in promote_candidates.MANIFEST_COLUMNS}
+            placeholder.update({"target_indicator_id": "999", "status": "unavailable"})
+            manifest.append(placeholder)
+            with out_mf.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=promote_candidates.MANIFEST_COLUMNS,
+                                        delimiter=";", lineterminator="\n")
+                writer.writeheader()
+                writer.writerows(manifest)
+
+            # Un umano conferma il match: la stessa serie ora aggancia un BES.
+            rows = discovery.read_candidates()
+            for row in rows:
+                if row["candidate_id"] == "eurostat_regional:rd_e_gerdreg":
+                    row.update({"definition_match": "compatible",
+                                "duplicate_of": "bes:01SAL002",
+                                "triage_status": "approved"})
+            discovery.write_candidates(rows)
+            promote_candidates.run(offline=True, out_dataset=out_ds, out_manifest=out_mf)
+
+            with out_mf.open(encoding="utf-8", newline="") as handle:
+                manifest = list(csv.DictReader(handle, delimiter=";"))
+            for_series = [r for r in manifest if r["source_indicator_id"] == "rd_e_gerdreg"]
+            self.assertEqual(len(for_series), 1, "the manifest entry was duplicated, not moved")
+            self.assertEqual(for_series[0]["target_indicator_id"], "bes:01SAL002")
+            self.assertEqual(
+                [r for r in manifest if r["target_indicator_id"] == "eur:rd_e_gerdreg"], [],
+                "stale entry left behind for the old target",
+            )
+            self.assertEqual(
+                len([r for r in manifest if not r["source"] and not r["source_indicator_id"]]), 1,
+                "the source-less placeholder entry was collapsed",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
