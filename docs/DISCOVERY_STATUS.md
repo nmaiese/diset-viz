@@ -45,7 +45,7 @@ senza merge.
 - `scripts/curate.py` mostra l'evidenza sul **verso** (regioni in cima/in fondo).
 - `data/discovery/curation.csv` = decisione rivista (verso, categoria,
   `score_eligible`, descrizione).
-- `scripts/apply_curation.py` pubblica nel layer esterno + manifest + 
+- `scripts/apply_curation.py` pubblica nel layer esterno + manifest +
   `app/static/data/external/curated_descriptions.csv`.
 - Aggancio consumatori: quiz (`app/quiz.py`), selezione e motore qualità della
   vita (`app/quality_life_selection.py`, `app/quality_life_bes.py`).

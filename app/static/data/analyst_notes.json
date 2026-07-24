@@ -346,7 +346,7 @@
   "vintage": 2024
  },
  "bes:01SAL006": {
-  "attacco": "La mortalità per tumore in età lavorativa, tra i 20 e i 64 anni, è scesa di circa un terzo in vent'anni, con diagnosi e cure più efficaci. Oggi il tasso più basso è in Trentino Alto Adige, 6,1 ogni diecimila, il più alto in Campania, 9,0, con Sardegna e Sicilia poco sotto. La media è 7,4.",
+  "attacco": "La mortalità per tumore in età lavorativa, tra i 20 e i 64 anni, è scesa di circa un terzo in vent'anni, dagli 11,1 decessi ogni diecimila del 2004 ai 7,4 di oggi. Il tasso più basso è in Trentino Alto Adige, 6,1 ogni diecimila, il più alto in Campania, 9,0, con Sardegna e Sicilia poco sotto. La media è 7,4.",
   "spunto": "A lungo il Nord industriale ha avuto la mortalità oncologica più alta. Oggi la mappa si è in parte rovesciata, con alcune regioni del Sud in testa. Contano prevenzione, screening, stili di vita e accesso tempestivo alle cure, che si distribuiscono in modo diseguale. È un dato descrittivo, ma la parola tumore lo rende tutto fuorché neutro. Il divario che emerge riguarda la malattia o la possibilità di curarla in tempo?",
   "limite": "È un tasso standardizzato per età, quindi confrontabile tra territori, ma aggrega tumori molto diversi per origine e prognosi. Non distingue l'incidenza, cioè quante persone si ammalano, dalla mortalità, che dipende anche dalla qualità e dalla tempestività delle cure.",
   "fonti": [],
@@ -472,7 +472,7 @@
   "vintage": 2025
  },
  "14": {
-  "attacco": "Il lavoro degli over 54 è cresciuto più di ogni altro, di oltre il 14% in pochi anni, spinto dalle riforme che hanno alzato l'età pensionabile. Oggi lavora in media il 62% delle persone tra 55 e 64 anni, con la Toscana quasi al 70% e la Calabria al 47,7%.",
+  "attacco": "Il lavoro degli over 54 è cresciuto in fretta, dal 54,2% del 2018 al 62,1% del 2025, negli stessi anni in cui l'età pensionabile si alzava. Oggi lavora in media il 62% delle persone tra 55 e 64 anni, con la Toscana quasi al 70% e la Calabria al 47,7%.",
   "spunto": "Tenere al lavoro più a lungo gli anziani è una necessità per i conti pubblici, ma cambia il volto del mercato: convivono generazioni che escono più tardi e giovani che entrano con fatica. Il divario territoriale resta, con il Sud sotto anche qui. Un tasso alto tra gli over 54 può segnalare esperienza valorizzata oppure impossibilità di ritirarsi. Lavorare più a lungo è una conquista o un obbligo?",
   "limite": "Conta gli occupati tra 55 e 64 anni, non le condizioni in cui lavorano né la fatica di certi mestieri in età avanzata. Non dice se l'aumento nasca da scelta, da bisogno economico o dal semplice rinvio della pensione.",
   "fonti": [],
@@ -674,7 +674,7 @@
  },
  "901": {
   "attacco": "Il PIL per abitante misura la ricchezza prodotta in un territorio, e divide l'Italia in due. In Trentino Alto Adige sfiora i 54.600 euro a testa, in Lombardia i 50.400, mentre in Calabria si ferma a 21.700, meno della metà. La media delle regioni è di circa 35.700 euro.",
-  "spunto": "Un PIL pro capite alto dice quanto si produce, non quanto arriva nelle tasche delle persone, e comprende profitti, imposte e ricchezza che può lasciare il territorio. La distanza di oltre due volte tra Nord e Sud è tra le più ampie d'Europa dentro uno stesso Paese. È cresciuto ovunque nei decenni, ma il divario relativo è rimasto. Produrre di più significa vivere meglio, o dipende da come quella ricchezza si distribuisce?",
+  "spunto": "Un PIL pro capite alto dice quanto si produce, non quanto arriva nelle tasche delle persone, e comprende profitti, imposte e ricchezza che può lasciare il territorio. Tra il Trentino Alto Adige e la Calabria la distanza è di due volte e mezza. È cresciuto ovunque nei decenni, ma il divario relativo è rimasto. Produrre di più significa vivere meglio, o dipende da come quella ricchezza si distribuisce?",
   "limite": "Rapporta la produzione agli abitanti, non ai lavoratori, quindi risente anche di quanti lavorano. Non dice come la ricchezza è distribuita tra le persone, né quanta ne resta davvero ai residenti dopo imposte e trasferimenti.",
   "fonti": [],
   "vintage": 2024
@@ -1927,9 +1927,14 @@
  },
  "bes:10AMB020": {
   "attacco": "L'esposizione al particolato fine PM2.5 oltre i limiti riguarda soprattutto la pianura padana. Il valore è massimo in Veneto, 100, Lombardia, 96, e Friuli-Venezia Giulia, minimo in Sardegna, 4, e Basilicata. La media delle regioni è di circa 65, con un divario molto ampio.",
-  "spunto": "Il PM2.5 è tra gli inquinanti più dannosi per la salute, e la sua concentrazione in pianura padana dipende da traffico, industria, riscaldamento e da una conformazione geografica che intrappola l'aria. Non è colpa dei soli residenti, ma la somma di molte pressioni in un bacino chiuso tra le montagne. È tra le aree con la peggiore qualità dell'aria d'Europa. Un problema di clima e geografia si può risolvere solo localmente?",
+  "spunto": "Il PM2.5 è tra gli inquinanti più dannosi per la salute, e la sua concentrazione in pianura padana dipende da traffico, industria, riscaldamento e da una conformazione geografica che intrappola l'aria. Non è colpa dei soli residenti, ma la somma di molte pressioni in un bacino chiuso tra le montagne. L'Italia è tra i Paesi europei che segnalano le concentrazioni di particolato più alte. Un problema di clima e geografia si può risolvere solo localmente?",
   "limite": "Misura l'esposizione al PM2.5 secondo una soglia, non la concentrazione media reale. Riflette geografia e meteo oltre alle emissioni, e non attribuisce l'inquinamento a una singola fonte.",
-  "fonti": [],
+  "fonti": [
+   {
+    "testo": "Agenzia europea dell'ambiente, Air pollution: nel 2023 Turchia, alcuni Paesi dei Balcani occidentali e l'Italia riportano le concentrazioni di particolato più alte d'Europa.",
+    "url": "https://www.eea.europa.eu/en/topics/in-depth/air-pollution"
+   }
+  ],
   "vintage": 2024
  },
  "bes:10AMB009": {
@@ -2361,7 +2366,7 @@
  },
  "bes:06POL010": {
   "attacco": "L'età media dei parlamentari eletti in ciascuna regione va dai 47,4 anni dell'Abruzzo ai 57,3 della Basilicata, con la Valle d'Aosta e il Molise sopra i 55. La media delle regioni è di circa 52 anni. Il Parlamento italiano resta tra i più anziani.",
-  "spunto": "Un Parlamento anziano riflette in parte una società che invecchia, ma anche partiti che rinnovano poco la classe dirigente. Le regioni piccole, con pochi eletti, mostrano età più variabili. Il ricambio generazionale in politica è lento, e e i giovani restano sottorappresentati rispetto al loro peso nella società. Una politica più giovane guarderebbe più lontano o conta di più l'esperienza?",
+  "spunto": "Un Parlamento anziano riflette in parte una società che invecchia, ma anche partiti che rinnovano poco la classe dirigente. Le regioni piccole, con pochi eletti, mostrano età più variabili. Il ricambio generazionale in politica è lento, e i giovani restano sottorappresentati rispetto al loro peso nella società. Una politica più giovane guarderebbe più lontano o conta di più l'esperienza?",
   "limite": "È l'età media degli eletti per regione, un dato sensibile al piccolo numero di seggi di molte regioni. Non dice nulla sul ricambio reale né sulla presenza dei giovani nei ruoli decisionali.",
   "fonti": [],
   "vintage": 2022
@@ -2374,7 +2379,7 @@
   "vintage": 2025
  },
  "bes:06POL012": {
-  "attacco": "L'affollamento delle carceri supera ovunque la capienza: in media i detenuti sono il 118,5% dei posti. È massimo in Puglia, 148%, Lombardia, 143,8%, e Friuli-Venezia Giulia, minimo in Valle d'Aosta, 77,9%. La media delle regioni è del 118,5%, oltre la piena capienza.",
+  "attacco": "In 17 regioni su 20 i detenuti sono più dei posti disponibili. La media regionale è del 118,5% della capienza, con il massimo in Puglia, 148%, e in Lombardia, 143,8%. Sotto la capienza restano solo Trentino Alto Adige, 93,3%, Sardegna, 87,6%, e Valle d'Aosta, 77,9%.",
   "spunto": "Le carceri più piene dei posti disponibili sono un problema di dignità e di legalità insieme, che l'Italia si trascina da anni nonostante le condanne europee. L'affollamento non segue il Nord-Sud, dato che dipende da dove ci sono più istituti e più detenuti in attesa di giudizio. Un carcere sovraffollato rende più difficile ogni percorso di reinserimento. La pena serve a punire o a recuperare, e un carcere pieno cosa permette?",
   "limite": "Rapporta i detenuti ai posti regolamentari, senza contare le celle inagibili, che peggiorano l'affollamento reale. Non dice le condizioni di vita né quanti siano i detenuti in attesa di giudizio, non ancora condannati.",
   "fonti": [],
