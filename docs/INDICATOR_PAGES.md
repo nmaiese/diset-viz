@@ -66,6 +66,34 @@ necessaria per capire la scala.
 - Un divario tra due tassi va espresso in punti percentuali e non descrive da
   solo il livello complessivo dei due tassi.
 
+## Note dell'analista: cosa è verificato e cosa no
+
+Le note in `app/static/data/analyst_notes.json` mescolano cifre, osservazioni
+ricavate dai dati e interpretazioni. I test coprono la parte meccanica:
+
+- struttura, punteggiatura editoriale, `vintage` e risoluzione dell'indicatore,
+- **ogni cifra con decimale attribuita a una regione** ("il 24,3% del Molise")
+  confrontata con il dato di quell'anno,
+- **ogni soglia asserita su un elenco di regioni** ("supera il 78% in A, B e C")
+  verificata regione per regione.
+
+Le ultime due nascono da errori reali: una nota diceva che l'affollamento
+carcerario supera "ovunque" la capienza mentre tre regioni erano sotto, e
+un'altra metteva la Sardegna sopra il 78% di differenziata quando stava al
+76,6%. Un intero senza decimale non viene controllato, perché in questa prosa è
+quasi sempre un'approssimazione ("circa 27%", "quasi 78%").
+
+Restano **fuori dai test**, e vanno rivisti a mano:
+
+- le affermazioni universali su un andamento ("è cresciuto ovunque"): si
+  verificano confrontando primo e ultimo anno di ogni regione, non lo stato
+  finale,
+- le attribuzioni causali ("grazie a", "spinto da"): o si documentano o si
+  riformulano come contesto, non come causa accertata,
+- i confronti con l'estero ("tra i più alti d'Europa"): richiedono una fonte in
+  `fonti`, verificata, altrimenti vanno tolti. Eurostat e AEA hanno pagine
+  stabili adatte allo scopo.
+
 ## SEO e struttura
 
 La pagina serve prima di tutto gli intenti di definizione, confronto, fonte e
