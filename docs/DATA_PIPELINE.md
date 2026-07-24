@@ -118,6 +118,16 @@ della categoria, così i link già indicizzati non si perdono.
    indicatori core + direzionali) e quali restano descrittivi. Usa la diagnostica
    qui sotto.
 
+## Scoperta di nuovi indicatori (a monte)
+
+Il passo che *trova* nuovi indicatori presso fonti istituzionali e li mette in
+una coda revisionabile prima di qualsiasi integrazione è descritto in
+[`docs/DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md). In breve: il cacciatore
+(`scripts/discover_candidates.py`) scrive candidati in
+`data/discovery/candidates.csv`, un umano li approva in PR, e
+`scripts/promote_candidates.py` li porta nel layer esterno con `status=proposed`.
+Niente va live senza merge. La fonte pilota è Eurostat regionale (NUTS2).
+
 ## Fonti verticali e freschezza
 
 Per fonti 2025 diverse dal backbone Istat regionale usa il layer esterno, non il

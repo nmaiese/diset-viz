@@ -19,6 +19,7 @@ from app.indicator_notes import (
     display_unit,
     value_unit_label,
 )
+from app import sources
 from app.profiles import region_key_for, slugify
 from app.taxonomy import CANONICAL_CATEGORIES, category_for_indicator, category_path
 
@@ -201,7 +202,7 @@ def get_bes_rows(level):
 
 
 def bes_indicator_path(indicator_id, name):
-    return f"/qualita-della-vita/indicatore/{indicator_id}/{slugify(name)}"
+    return sources.indicator_url("bes", indicator_id, slugify(name))
 
 
 @cache.memoize(timeout=3600)

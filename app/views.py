@@ -19,12 +19,14 @@ from app.atlas_catalog import (
     search_atlas_indicators,
 )
 from app import profiles
+from app import sources
 from app import seo_policy
 from app import indicator_notes
 from app import analyst_notes
 from app import quality_life_bes as qb
 from app import bes_data
 from app import multiscopo_data
+from app import eurostat_atlas
 from app import external_manifest
 from app import game
 from app import quiz
@@ -284,19 +286,48 @@ def methodology():
     )
 
 
-@app.route("/indicatore/<slug>")
-def indicator_page(slug):
-    match = re.match(r"^(\d+)(?:-.*)?$", slug)
-    if not match:
-        abort(404)
-    indicator_id = match.group(1)
+@app.route("/indicatore/<first>")
+@app.route("/indicatore/<first>/<second>")
+def indicator_page(first, second=None):
+    """Unified, keyword-first indicator page: /indicatore/<slug>/<acr>-<id>.
+
+    The resolving code (ter/bes/ims/eur + id) is the LAST segment; the slug leads
+    for SEO. Dispatch by family and 301 any legacy or non-canonical URL to the
+    canonical form."""
+    # New canonical: code is the last segment. Also tolerate the transitional
+    # code-first order (/indicatore/<code>/<slug>) so nothing 404s mid-rollout.
+    parsed = sources.parse_indicator_code(second if second is not None else first)
+    if parsed is None and second is not None:
+        parsed = sources.parse_indicator_code(first)
+    if parsed is None:
+        # Pre-migration territorial URL (single bare numeric id): 301 to canonical.
+        raw_id = sources.legacy_territorial_id(first)
+        if raw_id is None:
+            abort(404)
+        payload = get_atlas_indicator(raw_id)
+        if payload is None:
+            abort(404)
+        return redirect(
+            sources.indicator_url("territorial", raw_id, profiles.indicator_slug(payload["metadata"]["name"])),
+            code=301,
+        )
+    family, raw_id = parsed
+    if family in ("bes", "multiscopo"):
+        return _render_qol_indicator(family, raw_id)
+    return _render_atlas_indicator(family, raw_id)
+
+
+def _render_atlas_indicator(family, raw_id):
+    """Map + ranking + trend page for atlas families (territorial, eurostat),
+    rendered with indicator_page.html."""
+    indicator_id = sources.internal_id(family, raw_id)
     payload = get_atlas_indicator(indicator_id)
     if payload is None:
         abort(404)
 
     meta = payload["metadata"]
-    canonical_path = profiles.indicator_path(indicator_id, meta["name"])
-    if f"/indicatore/{slug}" != canonical_path:
+    canonical_path = sources.indicator_url(family, raw_id, profiles.indicator_slug(meta["name"]))
+    if request.path != canonical_path:
         return redirect(canonical_path, code=301)
 
     year = meta["year_max"]
@@ -736,12 +767,37 @@ def quality_life_province_redirect():
     return redirect(f"/qualita-della-vita/classifica/province{_profile_suffix(_quality_life_profile_arg())}", code=301)
 
 
-@app.route("/qualita-della-vita/indicatore/<indicator_id>/<slug>")
-def quality_life_indicator(indicator_id, slug):
-    indicator = bes_data.get_bes_indicator_page(indicator_id)
+# Per-family presentation for the shared quality_life_indicator.html template.
+# Loader returns the family's page object; labels use the source registry so the
+# user sees plain names, not internal jargon.
+_QOL_FAMILY_PRESENTATION = {
+    "bes": {
+        "loader": lambda raw_id: bes_data.get_bes_indicator_page(raw_id),
+        "source_breadcrumb_path": "/qualita-della-vita/metodologia#indicatori-bes",
+        "source_breadcrumb_label": sources.family_short_label("bes"),
+        "coverage_note_scope": "sia per le regioni sia per le province",
+        "domain_label": "Dominio BES",
+        "domain_prose": "al dominio BES",
+    },
+    "multiscopo": {
+        "loader": lambda raw_id: multiscopo_data.get_multiscopo_indicator_page(raw_id),
+        "source_breadcrumb_path": "/qualita-della-vita/metodologia",
+        "source_breadcrumb_label": sources.family_short_label("multiscopo"),
+        "coverage_note_scope": "per le regioni",
+        "domain_label": "Tema Istat",
+        "domain_prose": "al tema Istat",
+    },
+}
+
+
+def _render_qol_indicator(family, raw_id):
+    """Quality-of-life indicator page (BES, Multiscopo), rendered with
+    quality_life_indicator.html at the unified /indicatore/<acr>-... URL."""
+    conf = _QOL_FAMILY_PRESENTATION[family]
+    indicator = conf["loader"](raw_id)
     if indicator is None:
         abort(404)
-    canonical_path = bes_data.bes_indicator_path(indicator_id, indicator["name"])
+    canonical_path = sources.indicator_url(family, raw_id, profiles.slugify(indicator["name"]))
     if request.path != canonical_path:
         return redirect(canonical_path, code=301)
     territory_label = bes_data.bes_territory_label(indicator)
@@ -750,12 +806,12 @@ def quality_life_indicator(indicator_id, slug):
         indicator=indicator,
         territory_label=territory_label,
         analyst=analyst_notes.get_analyst_note(indicator["id"]),
-        source_breadcrumb_path="/qualita-della-vita/metodologia#indicatori-bes",
-        source_breadcrumb_label="Indicatori BES",
-        coverage_note_scope="sia per le regioni sia per le province",
-        domain_label="Dominio BES",
-        source_label="Istat, sistema BES",
-        domain_prose="al dominio BES",
+        source_breadcrumb_path=conf["source_breadcrumb_path"],
+        source_breadcrumb_label=conf["source_breadcrumb_label"],
+        coverage_note_scope=conf["coverage_note_scope"],
+        domain_label=conf["domain_label"],
+        source_label=sources.family_label(family),
+        domain_prose=conf["domain_prose"],
         seo_title=bes_data.bes_seo_title(indicator["name"], SITE_NAME, territory_label),
         seo_description=bes_data.bes_seo_description(
             indicator["name"],
@@ -771,39 +827,22 @@ def quality_life_indicator(indicator_id, slug):
     return response
 
 
+# Pre-migration quality-of-life URLs: 301 to the unified /indicatore/ space. The
+# multiscopo-prefixed rule is matched ahead of the generic BES one.
 @app.route("/qualita-della-vita/indicatore/multiscopo-<indicator_id>/<slug>")
-def quality_life_multiscopo_indicator(indicator_id, slug):
+def quality_life_multiscopo_indicator_legacy(indicator_id, slug):
     indicator = multiscopo_data.get_multiscopo_indicator_page(indicator_id)
     if indicator is None:
         abort(404)
-    canonical_path = f"/qualita-della-vita/indicatore/multiscopo-{indicator_id}/{profiles.slugify(indicator['name'])}"
-    if request.path != canonical_path:
-        return redirect(canonical_path, code=301)
-    territory_label = bes_data.bes_territory_label(indicator)
-    response = make_response(render_template(
-        "quality_life_indicator.html",
-        indicator=indicator,
-        territory_label=territory_label,
-        analyst=analyst_notes.get_analyst_note(indicator["id"]),
-        source_breadcrumb_path="/qualita-della-vita/metodologia",
-        source_breadcrumb_label="Indagine Multiscopo",
-        coverage_note_scope="per le regioni",
-        domain_label="Tema Istat",
-        source_label="Istat, Indagine Multiscopo sulle famiglie",
-        domain_prose="al tema Istat",
-        seo_title=bes_data.bes_seo_title(indicator["name"], SITE_NAME, territory_label),
-        seo_description=bes_data.bes_seo_description(
-            indicator["name"],
-            indicator["explain"]["plain"],
-            territory_label,
-        ),
-        site_url=SITE_URL,
-        site_name=SITE_NAME,
-        canonical=f"{SITE_URL}{canonical_path}",
-    ))
-    if not indicator["indexable"]:
-        response.headers["X-Robots-Tag"] = "noindex, follow"
-    return response
+    return redirect(multiscopo_data.multiscopo_indicator_path(indicator_id, indicator["name"]), code=301)
+
+
+@app.route("/qualita-della-vita/indicatore/<indicator_id>/<slug>")
+def quality_life_indicator_legacy(indicator_id, slug):
+    indicator = bes_data.get_bes_indicator_page(indicator_id)
+    if indicator is None:
+        abort(404)
+    return redirect(bes_data.bes_indicator_path(indicator_id, indicator["name"]), code=301)
 
 
 @app.route("/qualita-della-vita/metodologia")
@@ -1116,6 +1155,15 @@ def sitemap():
         })
     if multiscopo_data.has_multiscopo_data():
         for item in multiscopo_data.all_multiscopo_indicators():
+            if not item["indexable"]:
+                continue
+            pages.append({
+                "loc": f"{SITE_URL}{item['path']}",
+                "lastmod": f"{item['year_max']}-12-31",
+                "priority": "0.6",
+            })
+    if eurostat_atlas.has_eurostat_data():
+        for item in eurostat_atlas.all_eurostat_indicators():
             if not item["indexable"]:
                 continue
             pages.append({

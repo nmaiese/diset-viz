@@ -11,14 +11,17 @@ from app.taxonomy import CANONICAL_CATEGORIES, DUPLICATE_BES_IDS, MACRO_AREA_ORD
 
 class FederatedAtlasCatalogTest(unittest.TestCase):
     def test_catalog_adds_every_non_duplicate_regional_bes_indicator_without_mutating_legacy_catalog(self):
+        from app.eurostat_atlas import all_eurostat_indicators
+
         legacy = get_catalog()
         federated = get_atlas_catalog()
         bes_count = len(get_bes_manifest("regione")) - len(DUPLICATE_BES_IDS)
         multiscopo_count = len(get_multiscopo_manifest())
+        eurostat_count = len(all_eurostat_indicators())
 
         self.assertEqual(
             len(federated["indicators"]),
-            len(legacy["indicators"]) + bes_count + multiscopo_count,
+            len(legacy["indicators"]) + bes_count + multiscopo_count + eurostat_count,
         )
         self.assertFalse(any(str(item["id"]).startswith(BES_ID_PREFIX) for item in legacy["indicators"]))
         self.assertEqual(
@@ -33,7 +36,7 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         scored = [item for item in federated["indicators"] if item["quality_life_scored"]]
         self.assertGreaterEqual(len(scored), 200)
         self.assertEqual(
-            {item["catalog_family"] for item in scored}, {"bes", "territorial", "multiscopo"}
+            {item["catalog_family"] for item in scored}, {"bes", "territorial", "multiscopo", "eurostat"}
         )
         self.assertTrue(all(item["quality_life_category_label"] for item in scored))
 
@@ -100,7 +103,8 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         self.assertEqual(payload["metadata"]["id"], item["id"])
         self.assertEqual(payload["metadata"]["catalog_family"], "bes")
         self.assertEqual(payload["metadata"]["source_label"], "Istat, BES nazionale, aggiornamento intermedio 2026")
-        self.assertTrue(payload["metadata"]["path"].startswith("/qualita-della-vita/indicatore/"))
+        self.assertTrue(payload["metadata"]["path"].startswith("/indicatore/"))
+        self.assertTrue(payload["metadata"]["path"].rsplit("/", 1)[-1].startswith("bes-"))
         self.assertEqual(client.get(payload["metadata"]["path"]).status_code, 200)
         self.assertTrue(payload["series"])
         self.assertLessEqual(len(payload["metadata"]["regions"]), 20)

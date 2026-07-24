@@ -10,8 +10,10 @@ from collections import defaultdict
 from functools import lru_cache
 import unicodedata
 
+from app import sources
 from app.bes_data import BES_SOURCE_URLS, bes_indicator_path, get_bes_manifest, get_bes_rows
 from app.data import REGION_ORDER, get_catalog, get_indicator
+from app.eurostat_atlas import all_eurostat_indicators, get_eurostat_atlas_indicator, has_eurostat_data
 from app.indicator_notes import build_bes_indicator_explain
 from app.multiscopo_data import (
     SOURCE_URL as MULTISCOPO_SOURCE_URL,
@@ -133,7 +135,7 @@ def get_bes_atlas_indicator(indicator_id):
         "complete": latest_region_count == 20 and completeness >= 0.98,
         "spark": spark,
         "catalog_family": "bes",
-        "catalog_family_label": "Qualità della vita, BES",
+        "catalog_family_label": sources.family_label("bes"),
         "path": bes_indicator_path(raw_id, info["name"]),
     }
     series = [
@@ -217,7 +219,7 @@ def get_multiscopo_atlas_indicator(indicator_id):
         "complete": latest_region_count == 20 and completeness >= 0.98,
         "spark": spark,
         "catalog_family": "multiscopo",
-        "catalog_family_label": "Indagine Multiscopo",
+        "catalog_family_label": sources.family_label("multiscopo"),
         "path": multiscopo_indicator_path(raw_id, info["name"]),
     }
     series = [
@@ -251,7 +253,7 @@ def get_atlas_catalog():
         _canonicalize_item({
             **item,
             "catalog_family": "territorial",
-            "catalog_family_label": "Indicatori territoriali",
+            "catalog_family_label": sources.family_label("territorial"),
             "path": indicator_path(item["id"], item["name"]),
             "quality_life_scored": item["id"] in score_selection,
             "quality_life_category": score_selection.get(item["id"]),
@@ -275,13 +277,22 @@ def get_atlas_catalog():
         }
         for raw_id in get_multiscopo_manifest()
     ] if has_multiscopo_data() else []
-    for item in legacy_indicators + bes_indicators + multiscopo_indicators:
+    eurostat_indicators = [
+        {
+            **_catalog_entry(get_eurostat_atlas_indicator(item["id"])),
+            "quality_life_scored": item["id"] in score_selection,
+            "quality_life_category": score_selection.get(item["id"]),
+        }
+        for item in all_eurostat_indicators()
+    ] if has_eurostat_data() else []
+    all_families = legacy_indicators + bes_indicators + multiscopo_indicators + eurostat_indicators
+    for item in all_families:
         category = item.get("quality_life_category")
         item["quality_life_category_label"] = (
             QUALITY_LIFE_CATEGORIES[category]["name"] if category else None
         )
     indicators = sorted(
-        legacy_indicators + bes_indicators + multiscopo_indicators,
+        all_families,
         key=lambda item: (item["theme"].lower(), item["name"].lower(), item["catalog_family"]),
     )
 
@@ -328,22 +339,18 @@ def get_atlas_catalog():
             }
             for area in ordered_areas
         ],
+        # Data-driven from the source registry: plain user-facing labels, and a
+        # family only appears once it has indicators (so the SPA filter grows
+        # automatically as new sources land).
         "source_families": [
-            {
-                "id": "territorial",
-                "label": "Indicatori territoriali",
-                "indicator_count": len(legacy_indicators),
-            },
-            {
-                "id": "bes",
-                "label": "Qualità della vita, BES",
-                "indicator_count": len(bes_indicators),
-            },
-            {
-                "id": "multiscopo",
-                "label": "Indagine Multiscopo",
-                "indicator_count": len(multiscopo_indicators),
-            },
+            {"id": family, "label": sources.family_label(family), "indicator_count": count}
+            for family, count in (
+                ("territorial", len(legacy_indicators)),
+                ("bes", len(bes_indicators)),
+                ("multiscopo", len(multiscopo_indicators)),
+                ("eurostat", len(eurostat_indicators)),
+            )
+            if count
         ],
         "indicators": indicators,
     }
@@ -382,6 +389,22 @@ def get_atlas_indicator(indicator_id):
                 ),
             },
         }
+    if str(indicator_id).startswith(sources.SOURCES["eurostat"]["internal_prefix"]):
+        payload = get_eurostat_atlas_indicator(str(indicator_id))
+        if payload is None:
+            return None
+        category = regional_quality_life_selection().get(str(indicator_id))
+        return {
+            **payload,
+            "metadata": {
+                **_canonicalize_item(payload["metadata"]),
+                "quality_life_scored": category is not None,
+                "quality_life_category": category,
+                "quality_life_category_label": (
+                    QUALITY_LIFE_CATEGORIES[category]["name"] if category else None
+                ),
+            },
+        }
     payload = get_indicator(str(indicator_id))
     if payload is None:
         return None
@@ -391,7 +414,9 @@ def get_atlas_indicator(indicator_id):
         "metadata": {
             **_canonicalize_item(payload["metadata"]),
             "catalog_family": "territorial",
-            "catalog_family_label": "Indicatori territoriali",
+            "catalog_family_label": sources.family_label("territorial"),
+            "institution": sources.family_institution("territorial"),
+            "license_url": "https://creativecommons.org/licenses/by/3.0/it/",
             "path": indicator_path(payload["metadata"]["id"], payload["metadata"]["name"]),
             "quality_life_scored": category is not None,
             "quality_life_category": category,

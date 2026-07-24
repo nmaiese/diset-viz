@@ -129,10 +129,14 @@ def build(
 
         for year, parts in trentino_parts.items():
             if all(code in parts for code in multiscopo_sources.TRENTINO_PARTS):
-                mean = sum(parts[code] for code in multiscopo_sources.TRENTINO_PARTS) / len(
-                    multiscopo_sources.TRENTINO_PARTS
-                )
-                by_region_year[multiscopo_sources.TRENTINO_CODE][year] = repr(round(mean, 6))
+                # Population-weighted mean of Bolzano and Trento (a plain mean
+                # would publish a synthetic value for these rates).
+                weights = multiscopo_sources.TRENTINO_WEIGHTS
+                total_weight = sum(weights[code] for code in multiscopo_sources.TRENTINO_PARTS)
+                weighted = sum(
+                    parts[code] * weights[code] for code in multiscopo_sources.TRENTINO_PARTS
+                ) / total_weight
+                by_region_year[multiscopo_sources.TRENTINO_CODE][year] = repr(round(weighted, 6))
 
         years_seen = set()
         areas_seen = set()

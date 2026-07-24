@@ -31,6 +31,7 @@ from app.multiscopo_data import (
     has_multiscopo_data,
     multiscopo_indicator_path,
 )
+from app.eurostat_atlas import all_eurostat_indicators, get_eurostat_atlas_indicator, has_eurostat_data
 from app.taxonomy import DUPLICATE_BES_IDS, category_metadata
 from app import profiles
 
@@ -52,6 +53,7 @@ _BES_PREFIX = "bes:"
 _BES_MIN_YEAR = 2025
 _MULTI_PREFIX = "multiscopo:"
 _MULTI_MIN_YEAR = 2023
+_EUR_PREFIX = "eur:"
 
 
 @cache.memoize(timeout=3600)
@@ -126,11 +128,48 @@ def _multi_region_payload(indicator_id, year):
     }
 
 
+@cache.memoize(timeout=3600)
+def _eurostat_region_payload(indicator_id, year):
+    """Adapt one Eurostat regional indicator to the atlas quiz shape."""
+    payload = get_eurostat_atlas_indicator(indicator_id)
+    if payload is None or payload["metadata"]["year_max"] != year:
+        return None
+    meta = payload["metadata"]
+    values = sorted(
+        (
+            {"region": row["region"], "region_key": row["region_key"], "value": row["value"]}
+            for row in payload["series"]
+            if row["year"] == year and row["region_key"] and row["value"] is not None
+        ),
+        key=lambda row: row["value"],
+        reverse=True,
+    )
+    return {
+        "metadata": {
+            "id": meta["id"],
+            "name": meta["name"],
+            "theme": meta["theme"],
+            "source_theme": meta.get("source_theme"),
+            "macro_area": meta["macro_area"],
+            "unit": meta["unit"],
+            "year": year,
+            "source_label": meta["source_label"],
+            "source_url": meta["source_url"],
+            "description": meta["explain"]["plain"],
+            "value_explanation": meta["explain"]["example"],
+            "path": meta["path"],
+        },
+        "values": values,
+    }
+
+
 def _quiz_indicator_payload(indicator_id, year):
     if indicator_id.startswith(_BES_PREFIX):
         return _bes_region_payload(indicator_id, year)
     if indicator_id.startswith(_MULTI_PREFIX):
         return _multi_region_payload(indicator_id, year)
+    if indicator_id.startswith(_EUR_PREFIX):
+        return _eurostat_region_payload(indicator_id, year)
     return get_indicator_year(indicator_id, year)
 
 
@@ -201,6 +240,37 @@ def _multiscopo_quiz_indicators():
 
 
 @cache.memoize(timeout=3600)
+def _eurostat_quiz_indicators():
+    if not has_eurostat_data():
+        return []
+    pool = []
+    for item in all_eurostat_indicators():
+        year = item["year_max"]
+        payload = _eurostat_region_payload(item["id"], year)
+        if payload is None:
+            continue
+        values = payload["values"]
+        if len({row["value"] for row in values}) < _MIN_DISTINCT_VALUES:
+            continue
+        meta = payload["metadata"]
+        pool.append({
+            "id": meta["id"],
+            "name": meta["name"],
+            "theme": meta["theme"],
+            "source_theme": meta["source_theme"],
+            "macro_area": meta["macro_area"],
+            "unit": meta["unit"],
+            "year": year,
+            "source_label": meta["source_label"],
+            "source_url": meta["source_url"],
+            "description": meta["description"],
+            "value_explanation": meta["value_explanation"],
+            "ranking": values,
+        })
+    return pool
+
+
+@cache.memoize(timeout=3600)
 def _quiz_indicators():
     """Indicatori idonei alle modalità quiz: core (completi e recenti), non
     varianti di genere, con abbastanza valori distinti nell'anno più recente.
@@ -241,6 +311,7 @@ def _quiz_indicators():
     # so answer validation remains unambiguous even when source codes overlap.
     pool.extend(_bes_quiz_indicators())
     pool.extend(_multiscopo_quiz_indicators())
+    pool.extend(_eurostat_quiz_indicators())
     return pool
 
 

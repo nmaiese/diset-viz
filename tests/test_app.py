@@ -384,7 +384,17 @@ class AppSmokeTest(unittest.TestCase):
             "ranking": client.get("/qualita-della-vita/classifica/regioni").data.decode("utf-8"),
         }
         for name, html in pages.items():
-            self.assertIn('"license": "https://creativecommons.org/licenses/by/3.0/it/"', html, name)
+            if name == "ranking":
+                # The regional ranking can combine Istat and Eurostat, so its JSON-LD
+                # license must reflect both rather than claim Istat-only.
+                self.assertRegex(
+                    html,
+                    r'"license": "(https://creativecommons\.org/licenses/by/3\.0/it/'
+                    r'|CC BY 3\.0 IT \(Istat\) e CC BY 4\.0 \(Eurostat\))"',
+                    name,
+                )
+            else:
+                self.assertIn('"license": "https://creativecommons.org/licenses/by/3.0/it/"', html, name)
             self.assertNotIn('"@type": "Country"', html, name)
             self.assertNotIn('"@type": "AdministrativeArea"', html, name)
             for block in re.findall(r'<script type="application/ld\+json">\s*(\{.*?\})\s*</script>', html, re.S):
@@ -412,8 +422,10 @@ class AppSmokeTest(unittest.TestCase):
 
     def test_indicator_page_explains_latest_change_and_gender_gap_scope(self):
         client = app.test_client()
+        # Legacy single-segment territorial URL 301s to the unified acronym form.
         response = client.get(
-            "/indicatore/61-differenza-tra-tasso-di-attivita-maschile-e-femminile"
+            "/indicatore/61-differenza-tra-tasso-di-attivita-maschile-e-femminile",
+            follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
         html = response.data.decode("utf-8")

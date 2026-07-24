@@ -18,6 +18,7 @@ from app.indicator_notes import (
     display_unit,
     value_unit_label,
 )
+from app import sources
 from app.profiles import region_key_for, slugify
 from app.taxonomy import CANONICAL_CATEGORIES, category_for_indicator, category_path
 
@@ -77,8 +78,8 @@ def get_multiscopo_manifest():
             item["source_data_url"] = SDMX_DATA_URL.format(flow_id=item["source_dataflow"])
             item["explain"] = build_bes_indicator_explain(item, "regioni")
             item["explain"]["scope"] += (
-                " Per il Trentino Alto Adige il valore è una media semplice dei dati "
-                "pubblicati separatamente per le province autonome di Trento e Bolzano."
+                " Per il Trentino Alto Adige il valore è una media pesata per popolazione "
+                "dei dati pubblicati separatamente per le province autonome di Trento e Bolzano."
             )
             item["explain"]["caveat"] = (
                 "È una stima campionaria e alcune osservazioni possono non essere pubblicate "
@@ -113,7 +114,7 @@ def get_multiscopo_rows():
 
 
 def multiscopo_indicator_path(indicator_id, name):
-    return f"/qualita-della-vita/indicatore/multiscopo-{indicator_id}/{slugify(name)}"
+    return sources.indicator_url("multiscopo", indicator_id, slugify(name))
 
 
 @cache.memoize(timeout=3600)

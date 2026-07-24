@@ -16,6 +16,16 @@ quality-of-life section for regions and provinces.
   `/qualita-della-vita/metodologia` — regional quality-of-life pages.
 - `/qualita-della-vita/province` — provincial quality-of-life ranking from Istat
   BES dei Territori, available when the provincial artifacts are present.
+- `/indicatore/<slug>/<acronimo>-<id>` — every atlas indicator, from every source
+  family, lives here. Keyword-first for SEO: the human slug leads, the resolving
+  code trails under a source acronym (`ter` Istat territoriali, `bes` Istat
+  benessere, `ims` Istat vita quotidiana delle famiglie, `eur` Eurostat). The code
+  is the id-carrying last segment, so the page survives a name (slug) change; the
+  slug is decorative and a wrong one 301s to canonical. Legacy URLs
+  (`/indicatore/<num>-<slug>` and `/qualita-della-vita/indicatore/...`) 301 to it.
+  Source naming and URL building have a single source of truth in `app/sources.py`:
+  user-facing labels are institution-first plain names, never a bare internal
+  acronym. Do not hardcode family labels or indicator URLs elsewhere.
 - `/legacy` — original D3 dashboard (do not break it).
 - `/api/catalog`, `/api/search`, `/api/indicator/<id>`,
   `/api/indicator/<id>/year/<year>` — JSON API for the atlas.
@@ -92,6 +102,25 @@ Provincial data is separate. Follow
 [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md), keep the SDMX cache out
 of git, commit only normalized CSV artifacts, and never mix provincial rows into
 the regional CSV or `app/data.py`.
+
+## Discovering new multi-source indicators — READ THIS
+
+The app is a multi-source aggregator that prefers fresh, regional data (then
+provincial). New indicators are **discovered** into a reviewable staging queue
+before any integration. Follow [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md).
+The short version: a scheduled hunter (`scripts/discover_candidates.py`, stdlib
+only) scans allowlisted institutional sources (`config/external_sources.yaml`)
+and writes candidates to `data/discovery/candidates.csv`; a human approves them
+in a PR (`triage_status=approved`); then `scripts/promote_candidates.py` writes
+rows into the external layer (a new indicator becomes a standalone atlas entry
+under the `eur:` id namespace via `app/eurostat_atlas.py`). A second **curator**
+step (`scripts/curate.py` for the direction evidence, `data/discovery/curation.csv`
+for the reviewed decision, `scripts/apply_curation.py` to publish) verifies the
+verso against the data, reviews the description, and sets `score_eligible` so the
+indicator enters the quiz and the quality-of-life score. Nothing goes live without
+a merged PR. The hunter never claims `definition_match=exact` (humans confirm that).
+Eurostat regional (NUTS2) is the pilot source; its raw cache (`data/eurostat_cache/`)
+stays out of git, only the offline fixtures under `data/discovery/fixtures/` are committed.
 
 ## Constraints
 
