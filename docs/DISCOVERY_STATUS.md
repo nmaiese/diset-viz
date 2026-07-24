@@ -1,0 +1,112 @@
+# Stato aggregatore multifonte (handoff)
+
+Documento di passaggio: cosa è stato fatto sul branch
+`claude/aggregatore-indicatori-multifonte-4en56u`, com'è messo il sistema ora, e
+cosa manca. Per il dettaglio operativo vedi
+[`docs/DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md); per lo strato dati
+[`docs/DATA_PIPELINE.md`](DATA_PIPELINE.md).
+
+## Obiettivo
+
+Trasformare l'app in un **aggregatore multifonte** che dà priorità ai dati
+freschi e regionali (poi provinciali): un processo ricorrente scopre indicatori
+presso fonti istituzionali, li mette in coda, un curatore fa il lavoro
+qualitativo (verso, descrizioni) e pubblica la mappatura così l'indicatore entra
+in atlante, quiz e qualità della vita. Tutto sotto **gate PR**: niente va live
+senza merge.
+
+## Le tre fasi, tutte implementate
+
+### Fase 1 — Scoperta (hunter)
+- `scripts/discover_candidates.py` (watchlist) scansiona le fonti in
+  `config/external_sources.yaml`, classifica ogni indicatore contro le serie
+  esistenti (`new`/`compatible`/`proxy`, mai `exact` in automatico), assegna un
+  `priority_score` (fresco + regionale + copertura + novità) e scrive in
+  `data/discovery/candidates.csv`.
+- Lib: `scripts/discovery.py`. Adapter pilota: `scripts/eurostat_source.py`
+  (Eurostat NUTS2, cache-first, fixture offline, Bolzano+Trento mediati).
+- Stdlib puro: gira senza il venv dell'app.
+
+### Fase 2 — Promozione + Eurostat come famiglia d'atlante
+- `scripts/promote_candidates.py` agisce solo sui candidati `triage_status=approved`.
+  Un indicatore `new` diventa voce d'atlante autonoma con id `eur:<dataset>`;
+  un `compatible`/`proxy` arricchisce l'indicatore Istat che punta.
+- `app/eurostat_atlas.py` adatta le righe `eur:` del layer esterno al contratto
+  API dell'atlante, federato in `app/atlas_catalog.py`
+  (`get_atlas_catalog`/`get_atlas_indicator`/`source_families`).
+- URL unificati: ogni indicatore è sotto `/indicatore/<acr>-<id>/<slug>`
+  (`ter`/`bes`/`ims`/`eur`), i vecchi URL fanno 301. Naming e URL centralizzati in
+  `app/sources.py` (etichette istituzione-first, niente gergo).
+
+### Fase 3 — Curatore (lavoro qualitativo)
+- `scripts/curate.py` mostra l'evidenza sul **verso** (regioni in cima/in fondo).
+- `data/discovery/curation.csv` = decisione rivista (verso, categoria,
+  `score_eligible`, descrizione).
+- `scripts/apply_curation.py` pubblica nel layer esterno + manifest + 
+  `app/static/data/external/curated_descriptions.csv`.
+- Aggancio consumatori: quiz (`app/quiz.py`), selezione e motore qualità della
+  vita (`app/quality_life_selection.py`, `app/quality_life_bes.py`).
+
+## Stato attuale dei dati (pilota)
+
+- Fonte pilota: **Eurostat regionale (NUTS2)**, registrata in
+  `config/external_sources.yaml` come `eurostat_regional`.
+- **`eur:rd_e_gerdreg`** (spesa R&S sul PIL): scoperto, promosso come voce
+  d'atlante nuova, **curato** (verso `higher_better` confermato dai dati,
+  categoria `ricerca_innovazione_digitale`, descrizione rivista) e quindi attivo
+  in atlante, ricerca, quiz e **punteggio qualità della vita**.
+- **PIL pro capite Eurostat** (`nama_10r_2gdp`): riconosciuto `proxy` dell'id
+  territoriale 901, arricchisce quell'indicatore (freschezza EU), non è una voce
+  separata.
+
+## Comandi
+
+```bash
+# ambiente (container fresco): serve un venv per l'app; gli script discovery no
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+
+# hunter -> coda
+python3 scripts/discover_candidates.py --source eurostat_regional          # live
+python3 scripts/discover_candidates.py --source eurostat_regional --offline # fixture
+
+# promozione (solo approved)
+python3 scripts/promote_candidates.py --offline
+
+# curatore
+python3 scripts/curate.py                       # evidenza sul verso
+python3 scripts/apply_curation.py               # pubblica curation.csv
+
+# test (tutta la suite: 183 verdi)
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+Dopo modifiche ai dati serve **riavviare gunicorn** (loader in `lru_cache` per la
+vita del processo). Il frontend NON va ricostruito per i soli dati (la SPA legge
+`/api/catalog` a runtime; filtri ed etichette fonti sono data-driven).
+
+## Cosa NON è ancora fatto (prossimi passi)
+
+1. **Schedulare i due agenti** (hunter e curatore) come Routine Claude Code.
+   Attenzione: l'accesso web dipende dalla network policy dell'ambiente; Eurostat
+   qui è raggiungibile, con fallback `--offline`.
+2. **Scouting opt-in**: proporre nuovi domini all'allowlist (oggi solo watchlist).
+3. **Estendere la watchlist**: altre serie Eurostat/istituzionali, poi livello
+   provinciale (NUTS3), sempre priorità al regionale fresco.
+4. **Profili regionali** (`app/profiles.py`): oggi calcolati sui soli territoriali
+   core, non includono ancora le famiglie esterne.
+5. **Migrazione URL**: se serve, ripulire eventuali link storici residui; i 301
+   coprono territoriali, BES e Multiscopo.
+
+## Gotcha per la prossima sessione
+
+- Gli id BES contengono trattini (es. `09PAE009-N25`): per questo lo slug URL è un
+  **segmento separato** (`/indicatore/bes-09PAE009-N25/<slug>`), non `-<slug>`.
+- Non hardcodare etichette fonte o URL indicatore: passano tutti da
+  `app/sources.py`.
+- Gli script `scripts/*discovery*/curate/promote/eurostat_source` sono **stdlib
+  puri** (niente import di `app.*` a load-time): devono girare nell'agente
+  schedulato senza Flask.
+- Cache grezza Eurostat (`data/eurostat_cache/`) gitignorata; committati solo i
+  fixture in `data/discovery/fixtures/`.
+- Il curatore non dichiara mai `exact`; `score_eligible=true` è rifiutato se il
+  verso non è direzionale.
