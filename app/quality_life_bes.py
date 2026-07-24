@@ -45,6 +45,12 @@ from app.bes_data import (
     get_bes_territories,
     has_bes_data,
 )
+from app.eurostat_atlas import (
+    eurostat_indicator_path,
+    eurostat_regional_scoreables,
+    get_eurostat_atlas_indicator,
+    has_eurostat_data,
+)
 from app.multiscopo_data import (
     get_multiscopo_manifest,
     get_multiscopo_rows,
@@ -53,7 +59,7 @@ from app.multiscopo_data import (
 )
 from app.quality_life import get_quality_life_categories, normalize_weights
 from app.quality_life_config import DEFAULT_PROFILE, QUALITY_LIFE_CATEGORIES, QUALITY_LIFE_PROFILES
-from app.quality_life_selection import BES_PREFIX, MULTI_PREFIX, regional_quality_life_selection
+from app.quality_life_selection import BES_PREFIX, EUR_PREFIX, MULTI_PREFIX, regional_quality_life_selection
 
 LEVELS = ("regione", "provincia")
 _DISPLAY_SPREAD = 12.0   # display = 50 + 12 * (standardised score), clipped to 0..100
@@ -153,7 +159,9 @@ def _matrix_and_meta(level):
         catalog = {item["id"]: item for item in get_catalog()["indicators"]}
         selected_ids = {
             indicator_id for indicator_id in selection
-            if not indicator_id.startswith(BES_PREFIX) and not indicator_id.startswith(MULTI_PREFIX)
+            if not indicator_id.startswith(BES_PREFIX)
+            and not indicator_id.startswith(MULTI_PREFIX)
+            and not indicator_id.startswith(EUR_PREFIX)
         }
         latest = defaultdict(dict)
         for row in get_rows():
@@ -224,6 +232,41 @@ def _matrix_and_meta(level):
                     "unit": info["unit"],
                     "path": multiscopo_indicator_path(raw_id, info["name"]),
                     "source_family": "multiscopo",
+                }
+
+        if has_eurostat_data():
+            scoreables = eurostat_regional_scoreables()
+            for public_id in (i for i in selection if i.startswith(EUR_PREFIX)):
+                info = scoreables.get(public_id)
+                payload = get_eurostat_atlas_indicator(public_id)
+                if info is None or payload is None:
+                    continue
+                meta_src = payload["metadata"]
+                year_max = meta_src["year_max"]
+                latest = {
+                    row["region_key"]: row["value"]
+                    for row in payload["series"]
+                    if row["year"] == year_max and row["value"] is not None
+                }
+                if len(latest) < 3:
+                    continue
+                z = _standardise(latest)
+                if not any(z.values()):
+                    continue
+                sign = 1.0 if info["direction"] == "higher_better" else -1.0
+                matrix[public_id] = {k: sign * v for k, v in z.items()}
+                meta[public_id] = {
+                    "id": public_id,
+                    "raw_id": meta_src["raw_id"],
+                    "name": meta_src["name"],
+                    "theme": meta_src["theme"],
+                    "source_theme": meta_src["source_theme"],
+                    "category": info["category"],
+                    "direction": info["direction"],
+                    "year_max": year_max,
+                    "unit": meta_src["unit"],
+                    "path": meta_src["path"],
+                    "source_family": "eurostat",
                 }
     return matrix, meta
 

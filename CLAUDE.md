@@ -109,10 +109,15 @@ The short version: a scheduled hunter (`scripts/discover_candidates.py`, stdlib
 only) scans allowlisted institutional sources (`config/external_sources.yaml`)
 and writes candidates to `data/discovery/candidates.csv`; a human approves them
 in a PR (`triage_status=approved`); then `scripts/promote_candidates.py` writes
-`status=proposed` rows into the external layer. Nothing goes live without a merged
-PR. The hunter never claims `definition_match=exact` (humans confirm that). Eurostat
-regional (NUTS2) is the pilot source; its raw cache (`data/eurostat_cache/`) stays
-out of git, only the offline fixtures under `data/discovery/fixtures/` are committed.
+rows into the external layer (a new indicator becomes a standalone atlas entry
+under the `eur:` id namespace via `app/eurostat_atlas.py`). A second **curator**
+step (`scripts/curate.py` for the direction evidence, `data/discovery/curation.csv`
+for the reviewed decision, `scripts/apply_curation.py` to publish) verifies the
+verso against the data, reviews the description, and sets `score_eligible` so the
+indicator enters the quiz and the quality-of-life score. Nothing goes live without
+a merged PR. The hunter never claims `definition_match=exact` (humans confirm that).
+Eurostat regional (NUTS2) is the pilot source; its raw cache (`data/eurostat_cache/`)
+stays out of git, only the offline fixtures under `data/discovery/fixtures/` are committed.
 
 ## Constraints
 

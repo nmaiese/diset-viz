@@ -393,4 +393,4 @@ target_indicator_id;target_indicator_name;source;source_indicator_id;definition_
 94;Capacità di finanziamento;;;different;2018;;regione;false;1.0;contextual;false;unavailable;Nessuna fonte prioritaria 2025 mappata automaticamente sul nome indicatore.
 97;Grado di apertura dei mercati: importazioni;;;different;2022;;regione;false;1.0;contextual;false;unavailable;Nessuna fonte prioritaria 2025 mappata automaticamente sul nome indicatore.
 99;Adulti che partecipano all'apprendimento permanente (totale);;;different;2024;;regione;false;1.0;higher_better;false;unavailable;Nessuna fonte prioritaria 2025 mappata automaticamente sul nome indicatore.
-eur:rd_e_gerdreg;Spesa in ricerca e sviluppo sul PIL (Eurostat, NUTS2);eurostat_regional;rd_e_gerdreg;new;;2023;regione;;1.0;higher_better;false;proposed;Voce d'atlante Eurostat autonoma (namespace eur:). Fuori dallo scoring finche la direzione non e revisionata a mano.
+eur:rd_e_gerdreg;Spesa in ricerca e sviluppo sul PIL (Eurostat, NUTS2);eurostat_regional;rd_e_gerdreg;new;;2023;regione;;1.0;higher_better;true;integrated;Verso confermato dai dati: in cima le regioni con piu investimento in R&S. Categoria coerente.

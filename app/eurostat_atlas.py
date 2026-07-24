@@ -15,19 +15,23 @@ provenance/freshness to the indicator they point at, via app.external_data.
 
 from __future__ import annotations
 
+import csv
 from collections import defaultdict
 from functools import lru_cache
+from pathlib import Path
 
 from app import sources
 from app.data import _parse_number, REGION_ORDER
 from app.external_data import get_external_rows
 from app.indicator_notes import build_bes_indicator_explain, display_unit
-from app.profiles import slugify
+from app.profiles import SCOREABLE_DIRECTIONS, slugify
 from app.taxonomy import category_metadata
 
 EUR_ID_PREFIX = sources.SOURCES["eurostat"]["internal_prefix"]  # "eur:"
 EUROSTAT_SOURCE_LABEL = sources.family_label("eurostat")
 MIN_INDEXABLE_YEAR = 2020
+# Reviewed plain-language descriptions written by the curator (apply_curation.py).
+CURATED_DESC_PATH = Path(__file__).resolve().parent / "static" / "data" / "external" / "curated_descriptions.csv"
 
 
 def _raw_id(public_id):
@@ -64,6 +68,50 @@ def has_eurostat_data():
     return bool(_rows_by_target())
 
 
+@lru_cache(maxsize=1)
+def _curated_descriptions():
+    """id -> {'plain', 'example'} reviewed by the curator, if present."""
+    if not CURATED_DESC_PATH.exists():
+        return {}
+    with CURATED_DESC_PATH.open(encoding="utf-8", newline="") as handle:
+        return {
+            row["target_indicator_id"]: {
+                "plain": (row.get("plain") or "").strip(),
+                "example": (row.get("value_explanation") or "").strip(),
+            }
+            for row in csv.DictReader(handle, delimiter=";")
+            if row.get("target_indicator_id")
+        }
+
+
+def eurostat_regional_scoreables():
+    """public_id -> scoring metadata for Eurostat indicators the curator has
+    marked score-eligible with a scoreable direction. This is the gate the
+    quality-of-life selection reads: nothing here until a human confirms the
+    verso (direction) and flips score_eligible."""
+    result = {}
+    for public_id, rows in _rows_by_target().items():
+        first = rows[0]
+        if first.get("score_eligible") != "true":
+            continue
+        direction = first.get("direction")
+        category = first.get("quality_life_category")
+        if direction not in SCOREABLE_DIRECTIONS or not category:
+            continue
+        try:
+            coverage = float(first.get("coverage") or 0.0)
+        except (TypeError, ValueError):
+            coverage = 0.0
+        years = [int(r["year"]) for r in rows if r.get("year")]
+        result[public_id] = {
+            "category": category,
+            "direction": direction,
+            "coverage": coverage,
+            "year_max": max(years) if years else None,
+        }
+    return result
+
+
 def _national_average(series):
     by_year = defaultdict(list)
     for point in series:
@@ -81,6 +129,19 @@ def _downsample(points, limit=24):
     step = (len(points) - 1) / (limit - 1)
     keep = sorted({round(i * step) for i in range(limit)})
     return [points[i] for i in keep]
+
+
+def _explain_with_curation(public_id, explain):
+    """Let a curator-reviewed description override the auto-generated one."""
+    curated = _curated_descriptions().get(public_id)
+    if not curated:
+        return explain
+    result = dict(explain)
+    if curated.get("plain"):
+        result["plain"] = curated["plain"]
+    if curated.get("example"):
+        result["example"] = curated["example"]
+    return result
 
 
 def get_eurostat_atlas_indicator(public_id):
@@ -131,10 +192,13 @@ def get_eurostat_atlas_indicator(public_id):
         "source_label": EUROSTAT_SOURCE_LABEL,
         "source_url": first.get("source_url") or "",
         "archive": first.get("source_dataset") or "Eurostat regional database",
-        "explain": build_bes_indicator_explain(
-            {"name": first["name"], "unit": unit, "theme": source_theme,
-             "id": str(public_id), "direction": direction},
-            level="territori regionali",
+        "explain": _explain_with_curation(
+            str(public_id),
+            build_bes_indicator_explain(
+                {"name": first["name"], "unit": unit, "theme": source_theme,
+                 "id": str(public_id), "direction": direction},
+                level="territori regionali",
+            ),
         ),
         "years": years,
         "year_min": years[0],

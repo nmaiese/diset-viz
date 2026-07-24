@@ -131,7 +131,8 @@ class QualityLifeStaticTest(unittest.TestCase):
         matrix, meta = qb._matrix_and_meta("regione")
         self.assertGreaterEqual(len(matrix), 200)
         self.assertEqual(
-            set(item["source_family"] for item in meta.values()), {"bes", "territorial", "multiscopo"}
+            set(item["source_family"] for item in meta.values()),
+            {"bes", "territorial", "multiscopo", "eurostat"},
         )
         self.assertTrue(all(
             item["year_max"] >= (2025 if item["source_family"] == "bes" else 2023)

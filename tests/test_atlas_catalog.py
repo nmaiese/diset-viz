@@ -36,7 +36,7 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         scored = [item for item in federated["indicators"] if item["quality_life_scored"]]
         self.assertGreaterEqual(len(scored), 200)
         self.assertEqual(
-            {item["catalog_family"] for item in scored}, {"bes", "territorial", "multiscopo"}
+            {item["catalog_family"] for item in scored}, {"bes", "territorial", "multiscopo", "eurostat"}
         )
         self.assertTrue(all(item["quality_life_category_label"] for item in scored))
 

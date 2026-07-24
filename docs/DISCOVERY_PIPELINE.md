@@ -102,6 +102,43 @@ unificata `/indicatore/eur-<dataset>/<slug>`. Le righe *enriching* (Eurostat che
 duplica un indicatore Istat) NON diventano voci separate: restano agganciate all'id
 Istat che puntano.
 
+## Fase 3 (implementata): il curatore, il lavoro qualitativo
+
+Lo scouting propone verso e categoria dai soli nomi. Il **curatore** (agente
+schedulato o umano) fa il lavoro qualitativo che manca: verifica il **verso**
+contro i dati veri, rivede la descrizione, e pubblica la mappatura così
+l'indicatore entra nel punteggio, nel quiz e nella qualità della vita.
+
+Strumenti (stdlib):
+
+- `scripts/curate.py` produce l'**evidenza sul verso**: per ogni indicatore
+  esterno non ancora curato mostra le regioni in cima e in fondo nell'ultimo anno
+  e il verso proposto. Se il verso è `higher_better`, in cima devono esserci le
+  regioni che chiameremmo "migliori": se non è così, il verso va corretto.
+  Esempio reale (R&S sul PIL): in cima Emilia-Romagna, Piemonte, Lazio; in fondo
+  Calabria, Valle d'Aosta. Verso `higher_better` confermato.
+- Il curatore scrive la decisione in `data/discovery/curation.csv`: verso
+  revisionato, verdetto (`confermato`/`corretto`), categoria, `score_eligible`
+  (solo se il verso è davvero direzionale) e una descrizione rivista opzionale.
+- `scripts/apply_curation.py` **pubblica** la decisione nel layer esterno e nel
+  manifest (direzione, categoria, `score_eligible`, `status=integrated`) e scrive
+  la descrizione rivista in `app/static/data/external/curated_descriptions.csv`,
+  che l'atlante usa come override. `score_eligible=true` è rifiutato se la
+  direzione non è direzionale (guardia in `apply_curation`).
+
+Dove entra l'indicatore dopo la cura:
+
+- **Atlante e ricerca**: già dalla fase 2 (`atlas_eligible`).
+- **Quiz** (`app/quiz.py`): entra appena è `atlas_eligible` e ha abbastanza valori
+  distinti; il verso non serve al quiz (confronta solo i valori).
+- **Qualità della vita** (`app/quality_life_selection.py` +
+  `app/quality_life_bes.py`): entra solo dopo la cura, quando `score_eligible=true`
+  con verso direzionale, categoria e copertura sufficiente. Il motore orienta lo
+  z-score con il verso curato, come per BES, territoriali e Multiscopo.
+
+Tutto sotto gate PR: la modifica al punteggio è visibile nel diff e va live solo
+al merge.
+
 ## Fonte pilota: Eurostat regionale (NUTS2)
 
 Prima istituzione oltre Istat, per validare il flusso end-to-end.
@@ -135,6 +172,16 @@ dell'agente a ogni firing:
 4. Su approvazione umana della PR, eseguire `promote_candidates.py` per generare
    il diff del layer esterno (seconda PR o stessa PR), sempre sotto gate.
 
+Il **curatore** è un secondo agente (o passo umano) che gira dopo la promozione:
+
+1. `python3 scripts/curate.py` per leggere l'evidenza sul verso di ogni
+   indicatore esterno non ancora curato.
+2. Per ciascuno: confermare o correggere il verso, scegliere la categoria,
+   rivedere la descrizione e decidere `score_eligible`, scrivendo la riga in
+   `data/discovery/curation.csv`.
+3. `python3 scripts/apply_curation.py` per pubblicare le decisioni nel layer
+   esterno, poi aprire la PR. Al merge l'indicatore entra nel punteggio.
+
 Note operative:
 
 - Gli script sono **stdlib puri**: girano senza il venv dell'app.
@@ -158,6 +205,5 @@ dati di produzione non vengono mai toccati.
 - Estendere la watchlist ad altre fonti Eurostat e istituzionali, poi al livello
   provinciale (NUTS3), sempre con priorità al regionale fresco.
 - Implementare lo scouting opt-in per proporre nuovi domini all'allowlist.
-- Collegare la coda alla selezione qualità della vita
-  (`app/quality_life_selection.py`) per i candidati regionali `score_eligible`
-  dopo revisione manuale della direzione.
+- Far entrare gli indicatori esterni anche nei profili regionali
+  (`app/profiles.py`), oggi calcolati sui soli territoriali core.

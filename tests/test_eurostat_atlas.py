@@ -54,9 +54,15 @@ class EurostatAtlasFamilyTest(unittest.TestCase):
         ids = {item["id"] for item in all_eurostat_indicators()}
         self.assertNotIn("eur:nama_10r_2gdp", ids)
 
-    def test_not_scored_without_manual_direction_review(self):
+    def test_scored_after_curation(self):
+        # The pilot R&D indicator has been curated (verso confirmed, score_eligible),
+        # so it now contributes to the regional quality-of-life score.
         entry = next(i for i in get_atlas_catalog()["indicators"] if i["id"] == "eur:rd_e_gerdreg")
-        self.assertFalse(entry["quality_life_scored"])
+        self.assertTrue(entry["quality_life_scored"])
+        self.assertEqual(entry["quality_life_category"], "ricerca_innovazione_digitale")
+        # Reviewed description overrides the auto-generated one.
+        payload = get_atlas_indicator("eur:rd_e_gerdreg")
+        self.assertIn("investe in ricerca e sviluppo", payload["metadata"]["explain"]["plain"])
 
 
 if __name__ == "__main__":
