@@ -1813,5 +1813,125 @@
   "spunto": "Le competenze digitali sono la nuova alfabetizzazione, e chi non le ha resta escluso da servizi, lavoro e informazione. Il divario Nord-Sud si somma a quello di età e istruzione, colpendo di più anziani e meno istruiti. A differenza dell'accesso a internet, ormai diffuso, le competenze restano indietro e diseguali. Connettersi è facile, ma saperlo fare bene è ancora un privilegio?",
   "limite": "Misura le competenze digitali dichiarate secondo una scala europea, non l'uso reale né le abilità avanzate. Una soglia di base non dice se le persone sappiano affrontare compiti complessi o riconoscere le insidie della rete.",
   "fonti": []
+ },
+ "118": {
+  "attacco": "Il traffico merci su strada, in tonnellate per abitante, misura quanto un territorio è attraversato dalle merci. È altissimo in Trentino Alto Adige, 120, e Friuli-Venezia Giulia, 76, per la loro posizione di transito verso l'Europa, contro le 6,4 della Calabria. La media delle regioni è di circa 22.",
+  "spunto": "I valori estremi del Nord-Est non misurano la ricchezza locale ma la funzione di corridoio verso i valichi alpini, dove passano merci dirette altrove. È un dato di posizione geografica prima che di economia, e il Sud, più periferico, ne resta ai margini. Molto traffico significa connessione ma anche congestione e inquinamento. Essere attraversati dalle merci è un vantaggio o solo un costo ambientale?",
+  "limite": "Conta le tonnellate in transito su strada per abitante, non il valore delle merci né quanto resti sul territorio. Le regioni di confine risultano gonfiate dal traffico che le attraversa senza fermarsi.",
+  "fonti": []
+ },
+ "268": {
+  "attacco": "L'uso del trasporto pubblico nelle città capoluogo è enormemente diseguale. In Liguria si contano 310 viaggi per abitante all'anno, in Lombardia 303, contro i 12 della Valle d'Aosta e i 20 del Molise. La media delle regioni è di circa 121, con la mediana molto più bassa.",
+  "spunto": "Il trasporto pubblico funziona dove ci sono grandi città con metropolitane e reti dense, e quasi scompare nelle regioni piccole e disperse. Non è solo comodità, è diritto alla mobilità per chi non ha l'auto, dagli anziani ai giovani ai meno abbienti. Dove il servizio manca, spostarsi diventa un privilegio di chi guida. Il diritto a muoversi vale anche fuori dalle grandi città?",
+  "limite": "Conta i passeggeri nei soli comuni capoluogo, non nelle aree interne dove il servizio è più scarso. Un dato alto riflette anche la presenza di grandi reti metropolitane, non solo la qualità del servizio.",
+  "fonti": []
+ },
+ "269": {
+  "attacco": "L'offerta di trasporto pubblico, misurata dai posti-km disponibili, conferma il divario. In Lombardia si offrono 11 mila posti-km per abitante, nel Lazio 6,6 mila, contro i 236 della Sicilia e i 768 del Molise. La media delle regioni è di circa 3,2 mila.",
+  "spunto": "Se i passeggeri misurano l'uso, i posti-km misurano l'offerta, quanto servizio viene messo a disposizione. Il divario è ancora più estremo, oltre quaranta volte, e mostra che al Sud e nelle isole il trasporto pubblico è spesso solo scheletrico. Senza offerta non può esserci domanda, in un circolo che penalizza chi già ha meno alternative. Prima viene il servizio o l'utenza che lo giustifica?",
+  "limite": "Misura i posti-km offerti nei capoluoghi, non la loro distribuzione oraria né la copertura delle periferie. Molta offerta concentrata su poche linee può convivere con quartieri e orari del tutto scoperti.",
+  "fonti": []
+ },
+ "bes:12SER008": {
+  "attacco": "Il dato BES sui posti-km del trasporto pubblico ricalca lo stesso quadro: 11.104 per abitante in Lombardia e 6.639 nel Lazio, contro i 768 del Molise e i 789 della Valle d'Aosta. La media delle regioni è di circa 3.281.",
+  "spunto": "Nel sistema BES è un indicatore di qualità dei servizi, e il suo divario di quattordici volte è tra i più ampi del welfare territoriale. Il trasporto pubblico è la spina dorsale della mobilità sostenibile, ma esiste davvero solo in poche regioni urbane. Il Sud paga un doppio prezzo, meno servizio e più dipendenza dall'auto. Una mobilità pulita è possibile senza un trasporto pubblico diffuso?",
+  "limite": "Coincide con l'indicatore territoriale sui posti-km e ne condivide i limiti, dato che misura l'offerta nei capoluoghi, non nelle aree interne. Non dice la puntualità, il comfort o la copertura reale del servizio.",
+  "fonti": []
+ },
+ "438": {
+  "attacco": "Quanto velocemente si muovono gli autobus urbani cambia poco tra regioni, ma incide sulla loro utilità. La velocità commerciale va dai 15,3 km orari della Campania ai 23,8 della Basilicata, con la media delle regioni intorno ai 19,5. Le grandi città congestionate sono spesso più lente.",
+  "spunto": "Un autobus lento è un autobus poco competitivo con l'auto, e la sua velocità dipende da traffico, corsie preferenziali e organizzazione della rete. Le grandi città come Napoli, più congestionate, penalizzano il mezzo pubblico proprio dove servirebbe di più. Rendere veloce il trasporto pubblico è una scelta di priorità nello spazio urbano. Chi decide se la strada è dell'auto o dell'autobus?",
+  "limite": "Misura la velocità media del trasporto su gomma, non la frequenza né l'affidabilità del servizio. Un autobus veloce ma raro resta poco utile, e il dato non coglie l'esperienza reale del passeggero.",
+  "fonti": []
+ },
+ "47": {
+  "attacco": "Usare il treno per andare a scuola o al lavoro è un'abitudine diffusa solo dove la rete lo permette. Lo fa il 9% dei pendolari nel Lazio e l'8,3% in Liguria, contro lo 0,9% della Basilicata e l'1,5% della Sardegna. La media delle regioni è di circa 4%.",
+  "spunto": "Il pendolarismo su ferro dipende da quante linee esistono e da quanto sono servite, e il divario racconta un'Italia ferroviaria a due velocità. Al Sud e nelle isole, con reti scarse o a binario unico, il treno non è quasi un'opzione per gli spostamenti quotidiani. Questo spinge verso l'auto, con più costi, traffico e inquinamento. Il diritto alla rotaia è garantito ovunque o solo dove conviene?",
+  "limite": "Conta chi usa il treno abitualmente per lavoro o studio, non i viaggi occasionali né l'alta velocità. Riflette l'offerta di linee locali, molto diseguale, più che la propensione delle persone a usarlo.",
+  "fonti": []
+ },
+ "bes:12SER021": {
+  "attacco": "Gli utenti assidui dei mezzi pubblici, chi li usa più volte a settimana, sono in media il 12,6%. Sono di più in Liguria, 25%, Lazio, 18,9%, e Trentino Alto Adige, meno in Molise, 7,7%, e Sicilia. La media delle regioni è del 12,6%.",
+  "spunto": "L'uso abituale dei mezzi pubblici segue la loro disponibilità, e le grandi città con reti forti hanno più utenti fedeli e assidui. È un indicatore descrittivo, ma racconta chi ha davvero un'alternativa all'auto nella vita di tutti i giorni. Dove il servizio è raro, anche chi vorrebbe non può contarci. La scelta del mezzo pubblico è libertà o mancanza di alternative?",
+  "limite": "Conta chi usa spesso i mezzi pubblici, non le ragioni per cui li usa o li evita. Un uso basso può nascere da servizio scarso quanto da abitudini radicate all'auto, che il dato non distingue.",
+  "fonti": []
+ },
+ "bes:12SER010": {
+  "attacco": "La soddisfazione per il trasporto pubblico è bassa quasi ovunque: in media solo il 24,9% degli utenti. È più alta in Trentino Alto Adige, 44,7%, e Friuli-Venezia Giulia, 39,3%, più bassa in Campania, 13,8%, e nel Lazio. La media delle regioni è del 24,9%.",
+  "spunto": "Che meno di un utente su quattro sia soddisfatto dice quanto il trasporto pubblico italiano deluda, tra ritardi, affollamento e scarsa copertura. Curiosamente le grandi città, con più servizio, non sono le più soddisfatte, segno che quantità non basta senza qualità. Il Trentino, piccolo ma efficiente, guida. Un buon trasporto pubblico si misura in chilometri o in fiducia degli utenti?",
+  "limite": "Rileva la soddisfazione dichiarata degli utenti, non chi il servizio non lo usa affatto per mancanza di alternative. Dipende dalle attese, che possono essere più basse dove il servizio è storicamente scarso.",
+  "fonti": []
+ },
+ "bes:12SER004": {
+  "attacco": "Quante famiglie faticano a raggiungere servizi essenziali, dalla farmacia al pronto soccorso, misura la marginalità di un territorio. La difficoltà è più alta in Calabria, 9,1%, e Campania, 8%, più bassa in Trentino Alto Adige, 3%, e Lombardia. La media delle regioni è del 5,1%, in calo.",
+  "spunto": "L'accesso ai servizi di base è un diritto che si assottiglia nelle aree interne e montane, dove distanze e trasporti scarsi isolano interi paesi. La difficoltà è più alta al Sud, ma tocca ovunque le zone marginali, spesso invisibili nelle medie regionali. Dove i servizi si allontanano, restare a vivere diventa una scelta faticosa. Il diritto ai servizi essenziali dipende da dove si abita?",
+  "limite": "Rileva una difficoltà dichiarata dalle famiglie, non la distanza reale dai servizi. La media regionale nasconde le aree interne, dove il problema è molto più grave che nei capoluoghi.",
+  "fonti": []
+ },
+ "bes:12SER020": {
+  "attacco": "La copertura della rete internet ultraveloce è cresciuta enormemente e, sorprendentemente, non penalizza il Sud. È più alta in Sicilia, 89,1%, Trentino Alto Adige, 87,4%, e Molise, più bassa in Valle d'Aosta, 58,6%, e Calabria. La media delle regioni è del 75,8%.",
+  "spunto": "La banda ultraveloce fissa ha ribaltato la geografia del divario digitale, dato che i piani pubblici di cablaggio hanno raggiunto anche il Sud, mentre le aree alpine restano difficili da collegare. È l'infrastruttura di base per lavoro, scuola e servizi online del futuro. Ma copertura non è uso, e serve poi che le famiglie si abbonino. La rete che arriva basta, o conta chi la usa davvero?",
+  "limite": "Misura la copertura potenziale della rete, non gli abbonamenti attivi né la velocità reale sperimentata. Una zona coperta sulla carta può avere prestazioni molto diverse da quelle teoriche.",
+  "fonti": []
+ },
+ "bes:12SER024": {
+  "attacco": "Il servizio di raccolta differenziata, nel dato BES, mostra un divario ancora ampio: supera il 90% in Emilia-Romagna, Sardegna e Marche, contro il 33% del Lazio e il 36,6% della Campania. La media delle regioni è del 66,2%, in enorme crescita nel tempo.",
+  "spunto": "La differenziata è cresciuta ovunque, ma qui il divario resta più marcato che in altri indicatori ambientali, con il Lazio e la Campania molto indietro nonostante le grandi città. Raccogliere in modo differenziato è un servizio prima che un comportamento, e dipende da come i comuni lo organizzano. Dove il servizio è debole, i cittadini virtuosi non bastano. Riciclare è merito dei cittadini o dei comuni che organizzano la raccolta?",
+  "limite": "Misura quanto rifiuto è raccolto in modo differenziato, non quanto viene poi realmente riciclato. La qualità della raccolta e gli impianti disponibili cambiano molto il risultato finale.",
+  "fonti": []
+ },
+ "bes:12SER007": {
+  "attacco": "L'irregolarità del servizio elettrico, misurata dalle interruzioni per utente, conferma il divario Nord-Sud. È massima in Campania, 5,3, Sicilia, 4,5, e Calabria, minima in Trentino Alto Adige, 0,8. La media delle regioni è di circa 2,5. Il Sud paga la rete più fragile.",
+  "spunto": "Le interruzioni frequenti sono un divario di qualità di un servizio essenziale, e pesano su famiglie e imprese del Sud, dove reti più vecchie e territori difficili le rendono più comuni. Il BES lo tratta come descrittivo, ma il fenomeno è concreto e misurabile. Un'elettricità che si interrompe spesso frena anche lo sviluppo economico. Un servizio essenziale può restare a due velocità nello stesso Paese?",
+  "limite": "Conta le interruzioni per utente, non la loro durata né le cause. Non distingue i guasti dovuti al maltempo da quelli strutturali della rete, e non misura i danni che provocano.",
+  "fonti": []
+ },
+ "bes:12SER003": {
+  "attacco": "L'assistenza domiciliare integrata agli anziani è cresciuta molto, più che raddoppiata, ma resta bassa: raggiunge in media il 4,6% degli anziani. È più alta in Molise, 7,6%, Abruzzo e Toscana, più bassa in Calabria e Sardegna, 2,2%. La media delle regioni è del 4,6%.",
+  "spunto": "Curare gli anziani a casa, invece che in ospedale o in struttura, è la frontiera di un welfare che invecchia, più umano e meno costoso. La copertura resta però bassa e diseguale, e cresce lentamente rispetto al bisogno. Con una popolazione tra le più anziane d'Europa, l'assistenza domiciliare è destinata a diventare cruciale. Il Paese si sta attrezzando per curare a casa i suoi anziani?",
+  "limite": "Conta gli anziani presi in carico a domicilio, non l'intensità o la qualità delle cure ricevute. I criteri di registrazione variano tra regioni, quindi i confronti diretti vanno presi con prudenza.",
+  "fonti": []
+ },
+ "bes:12SER022": {
+  "attacco": "I posti letto ospedalieri per le specialità ad alta assistenza, come le terapie intensive, sono in media 2,9 ogni diecimila abitanti. Sono di più in Liguria e Molise, 3,9, meno in Umbria e Campania, 2,2. La media delle regioni è di circa 2,9, in calo nel tempo.",
+  "spunto": "I posti ad alta assistenza sono la capacità di un sistema sanitario di reggere le emergenze, come ha ricordato la pandemia. Il loro calo di lungo periodo, legato ai tagli e alla riorganizzazione ospedaliera, riduce i margini nei momenti di crisi. Un'alta dotazione può però anche riflettere ospedali piccoli e dispersi, non solo efficienza. Quanti posti servono per essere pronti all'imprevisto?",
+  "limite": "Conta i posti letto per abitante, non il personale né le attrezzature che li rendono operativi. Un dato alto può nascere da tanti piccoli ospedali, non per forza da un sistema più efficiente.",
+  "fonti": []
+ },
+ "bes:12SER026": {
+  "attacco": "Rinunciare a curarsi per costi, attese o distanza riguarda in media il 10,1% delle persone, in aumento. È più diffuso in Sardegna, 17,2%, Abruzzo, 12,6%, e Umbria, meno in Trentino Alto Adige, 6,3%, e Veneto. La media delle regioni è del 10,1%.",
+  "spunto": "Rinunciare alle cure è il sintomo più grave di un servizio sanitario che non arriva a tutti, tra liste d'attesa lunghe e costi del privato. L'aumento recente è un segnale d'allarme, e non colpisce solo il Sud, ma le aree dove i servizi sono lontani o intasati. Chi rinuncia oggi a curarsi rischia costi maggiori domani, per sé e per il sistema. La sanità pubblica è ancora universale se in tanti rinunciano?",
+  "limite": "Rileva la rinuncia dichiarata a prestazioni sanitarie, senza distinguere i motivi, dai costi alle attese alla distanza. Non dice la gravità delle cure a cui si rinuncia né le conseguenze sulla salute.",
+  "fonti": []
+ },
+ "bes:12SER027": {
+  "attacco": "La quota di medici di famiglia con troppi assistiti, oltre la soglia di legge, è cresciuta moltissimo. È massima in Lombardia, 74%, Veneto, 68,7%, e Valle d'Aosta, minima in Molise, 21,6%, e Sicilia. La media delle regioni è del 48,3%.",
+  "spunto": "Un medico con troppi pazienti ha meno tempo per ciascuno, e questo indicatore misura la pressione sulla medicina di base, cresciuta con la carenza di camici bianchi e i pensionamenti. Al Nord, dove mancano più medici, la sovrasaturazione è maggiore, un paradosso rispetto alle risorse. È la porta d'ingresso del sistema sanitario che si ingolfa. Chi cura la medicina di famiglia quando i medici sono troppo pochi?",
+  "limite": "Conta i medici oltre la soglia di assistiti, non il tempo reale dedicato a ciascun paziente. Non misura la qualità delle cure né la distribuzione dei medici tra città e aree interne.",
+  "fonti": []
+ },
+ "bes:SDG-3": {
+  "attacco": "Il numero di medici per abitante è abbastanza uniforme: in media 4,8 ogni mille. È più alto nel Lazio, 6,2, e Liguria, 5,6, per la presenza di grandi ospedali e università, più basso in Basilicata, 3,9, e Veneto. La media delle regioni è di circa 4,8.",
+  "spunto": "L'Italia ha molti medici sulla carta, ma mal distribuiti e in via di invecchiamento, con tante uscite per pensione. Il dato alto di Lazio e Liguria riflette poli ospedalieri e universitari, non per forza più medici sul territorio. Il vero problema non è il numero totale ma dove e come sono impiegati, tra ospedali pieni e medicina di base scoperta. Bastano più medici o servono nei posti giusti?",
+  "limite": "Conta tutti i medici per abitante, ospedalieri e di base, senza distinguere specialità e luoghi di lavoro. Non dice la loro età né la copertura delle aree interne, dove spesso mancano.",
+  "fonti": []
+ },
+ "bes:SDG-4": {
+  "attacco": "Gli infermieri, spina dorsale dell'assistenza, sono in media 7,4 ogni mille abitanti, meno che in gran parte d'Europa. Sono di più in Trentino Alto Adige, 9,1, Lazio ed Emilia-Romagna, meno in Campania, 5,4, e Calabria. La media delle regioni è di circa 7,4.",
+  "spunto": "La carenza di infermieri è uno dei nodi più seri della sanità italiana, e il divario penalizza proprio il Sud, dove il bisogno è alto. Meno infermieri significa reparti sotto pressione, assistenza domiciliare debole e più carico sulle famiglie. È una professione centrale ma sottopagata e poco attrattiva, che fatica a coprire i vuoti. Un sistema sanitario può reggere senza abbastanza infermieri?",
+  "limite": "Conta gli infermieri per abitante, non la loro distribuzione tra ospedali, territorio e strutture. Non misura i carichi di lavoro reali né la carenza rispetto agli standard assistenziali.",
+  "fonti": []
+ },
+ "bes:SDG-405": {
+  "attacco": "I posti letto nelle strutture residenziali socio-assistenziali variano di sette volte. Sono 135 ogni diecimila abitanti in Trentino Alto Adige e 120 in Friuli-Venezia Giulia, contro i 19 della Campania e i 40 di Puglia e Calabria. La media delle regioni è di circa 77.",
+  "spunto": "È la stessa frattura vista per l'assistenza agli anziani, un Nord che offre posti in struttura e un Sud che affida la cura alle famiglie. Con l'invecchiamento, la domanda di posti crescerà ovunque, ma il Sud parte con una dotazione minima. Non è detto che più posti siano meglio, se l'alternativa domiciliare funziona, ma il divario di offerta è enorme. Curare in struttura o a casa è una scelta o una necessità dettata da ciò che c'è?",
+  "limite": "Conta i posti letto nei presidi per abitante, non la loro qualità né l'alternativa domiciliare. Una bassa dotazione può nascondere un carico enorme sulle famiglie, non un minore bisogno.",
+  "fonti": []
+ },
+ "592": {
+  "attacco": "Il verde urbano disponibile per abitante è distribuito in modo estremo. In Trentino Alto Adige si contano 312 metri quadri a testa nei capoluoghi, in Basilicata 102, contro i 9 della Puglia e i 9,8 del Molise. La media delle regioni è di circa 48, ma la mediana è molto più bassa.",
+  "spunto": "Il verde in città non è solo estetica, ma salute, refrigerio contro il caldo e spazio di socialità, sempre più prezioso con il clima che cambia. Il dato altissimo del Trentino riflette grandi parchi e boschi urbani, mentre molte città del Sud ne hanno pochissimo. Lo scarto tra media e mediana dice che poche città verdissime alzano il dato nazionale. Il verde urbano è un lusso o un'infrastruttura per la salute?",
+  "limite": "Conta i metri quadri di verde per abitante nei capoluoghi, non la sua qualità, accessibilità o distribuzione tra quartieri. Grandi parchi periferici possono gonfiare il dato mentre il centro resta senza alberi.",
+  "fonti": []
  }
 }
