@@ -234,6 +234,34 @@ def get_multiscopo_atlas_indicator(indicator_id):
     return {"metadata": metadata, "series": series}
 
 
+@lru_cache(maxsize=1)
+def catalog_summary():
+    """One description of the federated public catalog, for every surface that
+    quotes its size.
+
+    The home page used to count only the territorial family while the themes
+    beside it aggregated all of them, and the quality-of-life page summed BES
+    plus territorial, silently dropping Multiscopo and Eurostat. Three numbers
+    for one catalog. Anything user-facing (home, quality of life, docs) reads
+    its counts from here instead.
+
+    `total` is the catalog you can browse. How many of those enter the score is
+    a different number, owned by the scoring engine (`quality_life_bes`), and the
+    copy has to keep the two distinct."""
+    catalog = get_atlas_catalog()
+    indicators = catalog["indicators"]
+    families = catalog["source_families"]
+    return {
+        "total": len(indicators),
+        "year_min": min(item["year_min"] for item in indicators),
+        "year_max": max(item["year_max"] for item in indicators),
+        "families": families,
+        "institutions_label": sources.institutions_label(
+            [family["id"] for family in families]
+        ),
+    }
+
+
 def _catalog_entry(payload):
     return dict(payload["metadata"])
 

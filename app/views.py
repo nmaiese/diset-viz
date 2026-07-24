@@ -12,6 +12,7 @@ from app.data import (
 from app.atlas_catalog import (
     all_atlas_themes_index,
     atlas_themes_by_macro_area,
+    catalog_summary,
     get_atlas_catalog,
     get_atlas_indicator,
     get_atlas_indicator_year,
@@ -135,16 +136,20 @@ def data():
 @app.route("/")
 @cache.cached(timeout=300, query_string=True)
 def home():
-    indicators = get_catalog()["indicators"]
-    total_indicators = len(indicators)
+    # The federated catalog, not the territorial family alone: the themes below
+    # already aggregate every source, so counting one family here made the same
+    # page show two different sizes for the same catalog.
+    summary = catalog_summary()
+    total_indicators = summary["total"]
     return render_template(
         "home.html",
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/",
         total_indicators=total_indicators,
-        year_min=min(item["year_min"] for item in indicators),
-        year_max=max(item["year_max"] for item in indicators),
+        sources_label=summary["institutions_label"],
+        year_min=summary["year_min"],
+        year_max=summary["year_max"],
         map_hero=_home_map_hero(),
         capabilities=_home_capabilities(total_indicators),
         stories=_home_story_cards(),

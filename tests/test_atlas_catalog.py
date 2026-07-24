@@ -1,12 +1,67 @@
 import unittest
 
 from app import app
-from app.atlas_catalog import BES_ID_PREFIX, get_atlas_catalog, get_atlas_theme_profile
+from app.atlas_catalog import (
+    BES_ID_PREFIX,
+    catalog_summary,
+    get_atlas_catalog,
+    get_atlas_theme_profile,
+)
 from app.bes_data import get_bes_manifest
 from app.data import get_catalog
 from app.multiscopo_data import get_multiscopo_manifest
 from app.quality_life_config import QUALITY_LIFE_CATEGORIES
 from app.taxonomy import CANONICAL_CATEGORIES, DUPLICATE_BES_IDS, MACRO_AREA_ORDER
+
+
+class CatalogSummaryTest(unittest.TestCase):
+    """One catalog, one size. The public surfaces used to quote three different
+    totals for it: the home counted the territorial family alone, the themes
+    beside it aggregated everything, and the quality-of-life page summed BES
+    plus territorial while dropping Multiscopo and Eurostat."""
+
+    def test_summary_matches_the_federated_catalog(self):
+        summary = catalog_summary()
+        indicators = get_atlas_catalog()["indicators"]
+        self.assertEqual(summary["total"], len(indicators))
+        self.assertEqual(
+            sum(family["indicator_count"] for family in summary["families"]),
+            summary["total"],
+        )
+
+    def setUp(self):
+        # The home view is cached, and another test fills that cache with a
+        # stub body. Start from a clean cache so we read the real page.
+        from app import cache
+
+        cache.clear()
+
+    def test_home_and_quality_life_quote_the_same_catalog_size(self):
+        from app.quality_life_bes import build_bes_ranking
+
+        total = catalog_summary()["total"]
+        methodology = build_bes_ranking("regione", "standard")["methodology"]
+        self.assertEqual(methodology["manifest_indicators_total"], total)
+        # The score is a subset of that catalog, never the whole of it.
+        self.assertLess(methodology["score_indicators_total"], total)
+
+        html = app.test_client().get("/").data.decode("utf-8")
+        self.assertIn(f"{total} indicatori", html)
+
+    def test_public_copy_names_every_institution_in_the_catalog(self):
+        from app import sources
+
+        summary = catalog_summary()
+        expected = {
+            sources.family_institution(family["id"]) for family in summary["families"]
+        }
+        for institution in expected:
+            self.assertIn(institution, summary["institutions_label"])
+
+        for path in ("/", "/qualita-della-vita/classifica/regioni"):
+            html = app.test_client().get(path).data.decode("utf-8")
+            for institution in expected:
+                self.assertIn(institution, html, f"{institution} missing from {path}")
 
 
 class FederatedAtlasCatalogTest(unittest.TestCase):

@@ -2,7 +2,7 @@
 {% set active_nav = 'home' %}
 
 {% block title %}Divario Italia: l'atlante degli indicatori territoriali Istat{% endblock %}
-{% block description %}{{ total_indicators }} indicatori Istat, 20 regioni, dal {{ year_min }} al {{ year_max }}. Mappa interattiva, schede regione, confronti, qualità della vita, quiz e storie dai dati.{% endblock %}
+{% block description %}{{ total_indicators }} indicatori {{ sources_label }}, 20 regioni, dal {{ year_min }} al {{ year_max }}. Mappa interattiva, schede regione, confronti, qualità della vita, quiz e storie dai dati.{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">
@@ -15,7 +15,7 @@
       "name": "{{ site_name }}",
       "url": "{{ SITE_URL }}/",
       "inLanguage": "it-IT",
-      "description": {{ ("Atlante interattivo degli indicatori territoriali Istat: " ~ total_indicators ~ " indicatori, 20 regioni, dal " ~ year_min ~ " al " ~ year_max ~ ".") | tojson }},
+      "description": {{ ("Atlante interattivo degli indicatori territoriali " ~ sources_label ~ ": " ~ total_indicators ~ " indicatori, 20 regioni, dal " ~ year_min ~ " al " ~ year_max ~ ".") | tojson }},
       "publisher": { "@id": "{{ SITE_URL }}/#org" },
       "potentialAction": {
         "@type": "SearchAction",
@@ -38,7 +38,7 @@
 <main class="home-page wrap-wide">
 <section class="home-hero" aria-labelledby="home-hero-title">
   <div>
-    <p class="home-hero__eyebrow">Istat &middot; {{ total_indicators }} indicatori &middot; 20 regioni &middot; dal {{ year_min }} al {{ year_max }}</p>
+    <p class="home-hero__eyebrow">{{ sources_label }} &middot; {{ total_indicators }} indicatori &middot; 20 regioni &middot; dal {{ year_min }} al {{ year_max }}</p>
     <h1 id="home-hero-title">Un atlante per leggere l'Italia, regione per regione.</h1>
     <p class="home-hero__lead">Scegli un indicatore, guarda come si colora la mappa, poi apri una regione o l'atlante completo. I divari territoriali, resi navigabili.</p>
     <div class="home-entry-cards">
@@ -85,7 +85,7 @@
   <div class="home-section__head">
     <p class="section-label">Cosa puoi fare qui</p>
     <h2 id="cap-title">Un sito, sei modi di leggere i divari territoriali</h2>
-    <p class="home-section__lead">Mappe interattive, schede regione, confronti, un indice di qualità della vita, storie dai dati e quiz. Tutto costruito sugli indicatori Istat.</p>
+    <p class="home-section__lead">Mappe interattive, schede regione, confronti, un indice di qualità della vita, storie dai dati e quiz. Tutto costruito sugli indicatori {{ sources_label }}.</p>
   </div>
   <div class="quality-grid">
     {% for cap in capabilities %}
@@ -233,7 +233,7 @@
   <div class="home-section__head">
     <p class="section-label">Quiz</p>
     <h2 id="quiz-title">Metti alla prova quello che sai dell'Italia</h2>
-    <p class="home-section__lead">Tre giochi rapidi, tutti basati sui numeri Istat. Una classifica settimanale unica.</p>
+    <p class="home-section__lead">Tre giochi rapidi, tutti basati sui numeri {{ sources_label }}. Una classifica settimanale unica.</p>
   </div>
   <div class="home-quiz-grid">
     {% for g in quiz_games %}
@@ -280,7 +280,7 @@
 <aside class="indicator-cta">
   <span>
     <small>Tutto l'archivio</small>
-    <strong>{{ total_indicators }} indicatori Istat, 20 regioni, dal {{ year_min }} al {{ year_max }}.</strong>
+    <strong>{{ total_indicators }} indicatori {{ sources_label }}, 20 regioni, dal {{ year_min }} al {{ year_max }}.</strong>
   </span>
   <a href="/atlante">Vai all'atlante &rarr;</a>
 </aside>

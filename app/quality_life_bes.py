@@ -35,6 +35,7 @@ def _score_color(score, lo, hi):
 
 from app.cache import cache
 from app.data import get_catalog, get_rows
+from app.atlas_catalog import catalog_summary as _regional_catalog_summary
 from app.external_data import count_freshness
 from app.profiles import SCOREABLE_DIRECTIONS, indicator_path
 from app.bes_data import (
@@ -407,7 +408,8 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
         "category_rankings": _category_rankings(level, category_display, territories, expected),
         "methodology": {
             "source": (
-                "Istat, indicatori territoriali e BES nazionale"
+                _regional_catalog_summary()["institutions_label"]
+                + ", catalogo federato degli indicatori regionali"
                 if level == "regione"
                 else "Istat, BES dei Territori (Bes at local level)"
             ),
@@ -420,9 +422,23 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
             "indicator_counts": {c: len(ids) for c, ids in by_category.items()},
             "total_indicators": len(all_ids),
             "score_indicators_total": len(all_ids),
+            # The browsable catalog this level selects from. At regional level
+            # that is the whole federated catalog: summing BES and territorial
+            # by hand silently dropped Multiscopo and Eurostat, and described a
+            # catalog that no longer matched the one behind the atlas.
             "manifest_indicators_total": (
-                len(manifest) + len(get_catalog()["indicators"])
+                _regional_catalog_summary()["total"]
                 if level == "regione" else len(manifest)
+            ),
+            "catalog_families": (
+                _regional_catalog_summary()["families"] if level == "regione" else []
+            ),
+            # Who the data comes from, derived rather than written by hand: the
+            # visible copy claimed "Istat" for a catalog that already had
+            # Eurostat in it.
+            "catalog_institutions": (
+                _regional_catalog_summary()["institutions_label"]
+                if level == "regione" else "Istat"
             ),
             "source_counts": {
                 source: sum(item["source_family"] == source for item in meta.values())

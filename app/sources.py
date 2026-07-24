@@ -77,6 +77,28 @@ def family_institution(family):
     return SOURCES[family]["institution"]
 
 
+def institutions_label(families):
+    """Plain Italian list of the institutions behind `families`, in registry
+    order and without repetitions: "Istat", "Istat ed Eurostat", and so on.
+
+    Public copy says who the data comes from, so it has to be derived from the
+    families actually present. Hardcoding "Istat" is what made the pages claim a
+    single source after Eurostat had already landed in the catalog."""
+    seen = [
+        SOURCES[family]["institution"]
+        for family in SOURCES
+        if family in set(families)
+    ]
+    names = list(dict.fromkeys(seen))
+    if not names:
+        return ""
+    if len(names) == 1:
+        return names[0]
+    last = names[-1]
+    joiner = " ed " if last[:1].lower() in "aeiou" else " e "
+    return ", ".join(names[:-1]) + joiner + last
+
+
 def acronym(family):
     return SOURCES[family]["acronym"]
 

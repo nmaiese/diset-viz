@@ -58,8 +58,8 @@
   <div class="quality-hero-row">
     <div class="quality-hero-row__main">
       <h1>Qualità della vita: {{ lvl_label }} italiane</h1>
-      <p class="page-lead">{% if is_prov %}Indicatori <strong>BES dei Territori</strong>.{% else %}Indicatori <strong>Istat del catalogo unico</strong>, dal BES nazionale e dagli indicatori territoriali DISET, con altre fonti istituzionali quando disponibili.{% endif %} Profilo <strong>{{ p.name }}</strong>: {{ p.description | lower }} Z-score orientato, mostrato da 0 a 100, dove 50 è la media.</p>
-      <p class="page-note">Il catalogo disponibile contiene {{ m.manifest_indicators_total }} indicatori per questo livello. I badge descrivono i {{ m.score_indicators_total }} selezionati per lo score, con direzione chiara e dati sufficienti.{% if not is_prov %} La selezione comprende {% for s in m.source_breakdown %}{{ s.count }} {{ s.label }}{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p>
+      <p class="page-lead">{% if is_prov %}Indicatori <strong>BES dei Territori</strong>.{% else %}Indicatori del <strong>catalogo federato</strong> ({{ m.catalog_institutions }}), dal BES nazionale agli indicatori territoriali DISET, fino alle altre fonti istituzionali già integrate.{% endif %} Profilo <strong>{{ p.name }}</strong>: {{ p.description | lower }} Z-score orientato, mostrato da 0 a 100, dove 50 è la media.</p>
+      <p class="page-note">Il catalogo consultabile per questo livello contiene {{ m.manifest_indicators_total }} indicatori{% if not is_prov %} ({% for f in m.catalog_families %}{{ f.indicator_count }} {{ f.label }}{% if not loop.last %}, {% endif %}{% endfor %}){% endif %}. Lo score ne seleziona {{ m.score_indicators_total }}, quelli con direzione chiara e dati sufficienti.{% if not is_prov %} La selezione comprende {% for s in m.source_breakdown %}{{ s.count }} {{ s.label }}{% if not loop.last %}, {% endif %}{% endfor %}.{% endif %}</p>
 
       <nav class="quality-level-toggle" aria-label="Livello territoriale">
         <a href="/qualita-della-vita/classifica/regioni" class="{{ 'is-active' if not is_prov else '' }}">Regioni</a>
@@ -82,7 +82,7 @@
         <span><b>{{ data.data_freshness.dated }}</b> da aggiornare</span>
         <span><b>{{ data.data_freshness.stale }}</b> datati</span>
       </div>
-      <p class="page-note">{{ m.manifest_indicators_total }} indicatori. <a href="/download/quality-life/{{ url_level }}{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}">Scarica CSV</a> · <a href="/download/quality-life/{{ url_level }}.json{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}">JSON</a> · <a href="/qualita-della-vita/metodologia">metodologia</a></p>
+      <p class="page-note">{{ m.score_indicators_total }} indicatori nello score. <a href="/download/quality-life/{{ url_level }}{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}">Scarica CSV</a> · <a href="/download/quality-life/{{ url_level }}.json{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}">JSON</a> · <a href="/qualita-della-vita/metodologia">metodologia</a></p>
     </div>
   </div>
 
@@ -210,6 +210,6 @@
   <p class="quality-note">Copertura: {{ data.ranking | length }} province. Sud Sardegna non è presente in questa edizione del BES. Le quattro province sarde soppresse prima del 2016 sono escluse.</p>
   {% endif %}
 
-  <p class="quality-note quality-disclaimer">Sintesi autonoma sugli indicatori Istat selezionati dal catalogo unico, con z-score orientato tra territori dello stesso livello. Categorie e direzioni sono curate ma rivedibili. Non è la classifica del Sole 24 Ore. <a href="/qualita-della-vita/metodologia">Metodologia</a>.</p>
+  <p class="quality-note quality-disclaimer">Sintesi autonoma sugli indicatori selezionati dal catalogo federato ({{ m.catalog_institutions }}), con z-score orientato tra territori dello stesso livello. Categorie e direzioni sono curate ma rivedibili. Non è la classifica del Sole 24 Ore. <a href="/qualita-della-vita/metodologia">Metodologia</a>.</p>
 </article>
 {% endblock %}
