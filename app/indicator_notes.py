@@ -571,6 +571,48 @@ def _compact_title(core, marker, max_len):
     return f"{head}{separator}{tail})"
 
 
+def _it_number(value):
+    """Italian number formatting for FAQ answers: dot thousands, comma decimals."""
+    if value is None:
+        return ""
+    if abs(value) >= 100 or float(value).is_integer():
+        return f"{round(value):,}".replace(",", ".")
+    return f"{value:.2f}".rstrip("0").rstrip(".").replace(".", ",")
+
+
+def build_indicator_faq(name, value_unit, year, ranked_values, year_avg):
+    """Factual, data-derived Q&A for an indicator page: highest region, lowest
+    region and the regional mean for the latest year.
+
+    Every answer is computed from the live data at request time (never
+    hand-written), so it cannot drift, and the visible FAQ section and the
+    FAQPage JSON-LD are rendered from this same list, keeping structured data
+    identical to visible content (AGENTS.md). Returns [] when there is not enough
+    data to answer honestly. `ranked_values` are the year's rows sorted by value
+    descending (regardless of the indicator's direction)."""
+    rows = [row for row in (ranked_values or []) if row.get("value") is not None]
+    if len(rows) < 3:
+        return []
+    unit = f" {value_unit}" if value_unit else ""
+    top, bottom = rows[0], rows[-1]
+    faq = [
+        {
+            "q": f"Quale regione ha il valore più alto di {name}?",
+            "a": f"Nel {year} il valore più alto è {_it_number(top['value'])}{unit}, in {top['region']}.",
+        },
+        {
+            "q": f"Quale regione ha il valore più basso di {name}?",
+            "a": f"Nel {year} il valore più basso è {_it_number(bottom['value'])}{unit}, in {bottom['region']}.",
+        },
+    ]
+    if year_avg is not None:
+        faq.append({
+            "q": f"Qual è il valore medio tra le regioni per {name}?",
+            "a": f"Nel {year} la media delle {len(rows)} regioni è {_it_number(year_avg)}{unit}.",
+        })
+    return faq
+
+
 def meta_description_from_attacco(attacco, max_len=_DESC_MAX):
     """Turn an analyst-note lead (the visible page opener, with real regional
     numbers) into a SERP meta description, trimmed to budget on a word boundary.
@@ -1142,7 +1184,15 @@ def _with_article(text):
         return f"gli {lowered}" if first[0] in "aeiou" else f"i {lowered}"
     if first == "altri":
         return f"gli {lowered}"
-    return lowered
+    # Unknown term (not in the curated gender lists): never leave it bare, which
+    # would read "Misura popolazione..." with no article. Guess a definite article
+    # so the generated sentence stays grammatical; a new term should still be added
+    # to the lists above, and tests/test_indicator_text.py flags a bare result.
+    if first[:1] in "aeiou":
+        return f"l'{lowered}"
+    if first.endswith("a") or re.search(r"(zione|sione|tà|trice|udine|aggine)$", first):
+        return f"la {lowered}"
+    return f"il {lowered}"
 
 
 def _finish_sentence(text):

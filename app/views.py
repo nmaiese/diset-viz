@@ -427,6 +427,12 @@ def _render_atlas_indicator(family, raw_id):
             plain, meta["year_max"], len(meta["regions"]), name=meta["name"]
         )
     )
+    value_unit = indicator_notes.value_unit_label(meta["name"], meta["unit"])
+    # Factual, data-derived FAQ (highest/lowest region, regional mean) rendered
+    # both as a visible section and as FAQPage JSON-LD from the same list.
+    faq = indicator_notes.build_indicator_faq(
+        meta["name"], value_unit, year, year_view["values"], stats["year_avg"]
+    )
 
     response = make_response(render_template(
         "indicator_page.html",
@@ -455,8 +461,9 @@ def _render_atlas_indicator(family, raw_id):
             meta["year_max"],
             len(meta["regions"]),
         ),
-        value_unit=indicator_notes.value_unit_label(meta["name"], meta["unit"]),
+        value_unit=value_unit,
         change_unit=indicator_notes.change_unit_label(meta["name"], meta["unit"]),
+        faq=faq,
         seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
         seo_description=seo_description,
         theme_path=profiles.theme_path(meta["theme"]),

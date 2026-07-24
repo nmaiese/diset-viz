@@ -54,6 +54,23 @@
   ]
 }
 </script>
+{% if faq %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {%- for item in faq %}
+    {
+      "@type": "Question",
+      "name": {{ item.q | tojson }},
+      "acceptedAnswer": { "@type": "Answer", "text": {{ item.a | tojson }} }
+    }{{ "," if not loop.last else "" }}
+    {%- endfor %}
+  ]
+}
+</script>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -229,6 +246,16 @@
     <p>{{ explain.reading }}</p>
     {% if analyst and analyst.spunto %}<p class="analyst-spunto">{{ analyst.spunto | analyst_html }}</p>{% endif %}
     <p class="page-caveat"><strong>Che cosa non dice.</strong> {% if analyst and analyst.limite %}{{ analyst.limite | analyst_html }}{% else %}{{ explain.caveat }}{% endif %}</p>
+    {% if analyst and analyst.fonti %}
+    <div class="analyst-sources">
+      <h3>Fonti dell'analisi</h3>
+      <ul>
+        {% for fonte in analyst.fonti %}
+        <li>{% if fonte.url %}<a href="{{ fonte.url }}" target="_blank" rel="noopener">{{ fonte.testo }}</a>{% else %}{{ fonte.testo }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
     {% if meta.archive %}
     <details class="indicator-source-definition">
       <summary>Leggi la definizione originale della fonte</summary>
@@ -237,6 +264,16 @@
     </details>
     {% endif %}
   </section>
+
+  {% if faq %}
+  <section class="prose indicator-faq">
+    <h2>Domande frequenti</h2>
+    {% for item in faq %}
+    <h3>{{ item.q }}</h3>
+    <p>{{ item.a }}</p>
+    {% endfor %}
+  </section>
+  {% endif %}
 
   <section class="prose indicator-year-change">
     <h2>Come è cambiato nell'ultimo anno disponibile</h2>
