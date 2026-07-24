@@ -115,10 +115,9 @@ vita del processo). Il frontend NON va ricostruito per i soli dati (la SPA legge
 - Il curatore non dichiara mai `exact`; `score_eligible=true` è rifiutato se il
   verso non è direzionale.
 - **Bolzano+Trento**: BES e territoriali ricevono già da Istat l'aggregato
-  Trentino Alto Adige. Eurostat lo combina con media pesata per popolazione.
-  **Multiscopo usa ancora una media semplice** (`update_multiscopo_regions.py`):
-  ok come approssimazione (tassi, province ~50/50) ma da allineare al pesato in
-  un giro dedicato (richiede rifetch SDMX rate-limited).
+  Trentino Alto Adige. Eurostat e Multiscopo lo combinano con **media pesata per
+  popolazione** (`multiscopo_sources.TRENTINO_WEIGHTS`,
+  `eurostat_source` via `nama_10r_3popgdp`), non con media semplice.
 - `indicator_page.html` è condiviso da territoriali ed Eurostat: usa
   `meta.institution` e `meta.license_url` (fallback Istat), quindi le pagine
   Eurostat mostrano licenza CC BY 4.0 e "fonte Eurostat", non Istat.

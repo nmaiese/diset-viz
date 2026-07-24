@@ -151,11 +151,10 @@ Prima istituzione oltre Istat, per validare il flusso end-to-end.
   vengono combinati in Trentino Alto Adige con **media pesata per popolazione**
   (`fetch_weights`, dataset `nama_10r_3popgdp`), non con media semplice: per un
   rapporto come il PIL pro capite la media non pesata sarebbe un valore sintetico
-  sbagliato. `ITZZ` (Extra-Regio) scartato. Nota: il BES nazionale non ha questo
-  problema perché Istat pubblica già Trentino Alto Adige come regione unica; la
-  pipeline Multiscopo invece usa ancora una media semplice
-  (`scripts/update_multiscopo_regions.py`), accettabile perché sono tassi con
-  popolazioni province quasi identiche, ma da allineare al metodo pesato.
+  sbagliato. `ITZZ` (Extra-Regio) scartato. Nota cross-famiglia: BES e
+  territoriali non hanno questo problema perché Istat pubblica già Trentino Alto
+  Adige come regione unica; Multiscopo ora usa la stessa media pesata per
+  popolazione (`scripts/multiscopo_sources.py:TRENTINO_WEIGHTS`).
 - "Anno recente onesto": si sceglie l'anno più recente che supera la soglia di
   copertura (`MIN_COVERAGE=0.8`), non l'ultimo assoluto (spesso sparso).
 
