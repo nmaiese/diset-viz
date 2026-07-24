@@ -44,3 +44,17 @@ def get_analyst_note(indicator_id):
         if note:
             return note
     return None
+
+
+def note_vintage(indicator_id):
+    """Data year the note's hand-written figures were validated against, or None.
+
+    The drift guard (tests/test_analyst_notes.py) compares this to the
+    indicator's current year_max so a note is flagged for review once the data
+    moves past the vintage it was written for.
+    """
+    note = get_analyst_note(indicator_id)
+    if not note:
+        return None
+    value = note.get("vintage")
+    return int(value) if isinstance(value, int) else None
