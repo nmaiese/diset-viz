@@ -63,6 +63,14 @@ class IndicatorFaq(unittest.TestCase):
         self.assertIn("Gamma", faq[1]["a"])   # lowest
         self.assertEqual(indicator_notes.build_indicator_faq("X", "%", 2025, rows[:2], None), [])
 
+    def test_faq_number_format_preserves_decimals(self):
+        # A value above 100 must keep its decimals (it_num-consistent), not round
+        # to a whole number that would disagree with the ranking/table.
+        self.assertEqual(indicator_notes._it_number(116.407), "116,41")
+        self.assertEqual(indicator_notes._it_number(68.9), "68,9")
+        self.assertEqual(indicator_notes._it_number(34500), "34.500")
+        self.assertEqual(indicator_notes._it_number(5.0), "5")
+
     def test_page_faq_jsonld_matches_visible_content(self):
         meta = get_atlas_indicator("178")["metadata"]
         html = app.test_client().get(meta["path"]).data.decode("utf-8")

@@ -571,13 +571,23 @@ def _compact_title(core, marker, max_len):
     return f"{head}{separator}{tail})"
 
 
-def _it_number(value):
-    """Italian number formatting for FAQ answers: dot thousands, comma decimals."""
+def _it_number(value, decimals=2):
+    """Italian number formatting for FAQ answers: dot thousands, comma decimals.
+
+    Mirrors the page's `it_num` filter (same 2-decimal rounding as the ranking,
+    table and downloads) so the FAQ never publishes a figure that differs from
+    the rest of the page. Trailing zeros are trimmed for readability, which does
+    not change the value (e.g. 34500 -> "34.500", 116.407 -> "116,41")."""
     if value is None:
         return ""
-    if abs(value) >= 100 or float(value).is_integer():
-        return f"{round(value):,}".replace(",", ".")
-    return f"{value:.2f}".rstrip("0").rstrip(".").replace(".", ",")
+    try:
+        formatted = f"{float(value):,.{decimals}f}"
+    except (TypeError, ValueError):
+        return str(value)
+    formatted = formatted.replace(",", "§").replace(".", ",").replace("§", ".")
+    if "," in formatted:
+        formatted = formatted.rstrip("0").rstrip(",")
+    return formatted
 
 
 def build_indicator_faq(name, value_unit, year, ranked_values, year_avg):
