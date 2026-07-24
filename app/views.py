@@ -469,8 +469,13 @@ def _themes_index_groups():
     matrix = profiles._percentile_matrix()
     meta = profiles._indicator_meta()
 
+    # Build card details from the unified atlas catalog (numeric + BES +
+    # Multiscopo), the same source as the macro-area counts and theme links.
+    # Using the legacy territorial get_catalog() here left themes made only of
+    # BES/Multiscopo indicators (e.g. Benessere soggettivo) with a nonzero count
+    # but no names, sparkline, or standing.
     by_theme = defaultdict(list)
-    for item in get_catalog()["indicators"]:
+    for item in get_atlas_catalog()["indicators"]:
         by_theme[item["theme"]].append(item)
 
     groups = []
