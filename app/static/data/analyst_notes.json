@@ -883,5 +883,209 @@
   "spunto": "È l'ausilio più raro di tutti, presente in una scuola su trenta: per uno studente cieco, muoversi da solo nell'edificio resta spesso impossibile. Che le quote più alte siano al Sud non cambia la sostanza, ovunque il numero è minimo. È il segno che l'accessibilità visiva è l'ultima frontiera, quella meno presidiata dell'inclusione scolastica. Una scuola che un cieco non può attraversare da solo è davvero inclusiva?",
   "limite": "Conta le scuole con mappe a rilievo, non la loro qualità o aggiornamento. È un solo ausilio tra quelli necessari a chi non vede, e da solo non garantisce l'autonomia negli spazi scolastici.",
   "fonti": []
+ },
+ "114": {
+  "attacco": "La spesa in ricerca e sviluppo rispetto al PIL misura quanto un territorio investe nel futuro, e divide nettamente l'Italia. In Piemonte è il 2,1% del PIL, in Emilia-Romagna il 2%, mentre in Valle d'Aosta e Calabria resta sotto lo 0,6%. La media delle regioni è dell'1,2%.",
+  "spunto": "L'Italia investe in ricerca meno di gran parte dei Paesi avanzati, e al suo interno concentra quel poco in poche regioni del Nord, dove si sommano grandi imprese, università e centri pubblici. Il divario, oltre quattro volte, disegna una geografia della conoscenza che tende a rafforzarsi da sé, dato che la ricerca attira ricerca. Investire dove già si investe è efficienza o è abbandono del resto del Paese?",
+  "limite": "Rapporta la spesa al PIL, quindi una regione con PIL basso può avere un'intensità alta pur spendendo poco in valore assoluto. Non distingue la ricerca pubblica da quella privata, né la sua qualità o i risultati.",
+  "fonti": []
+ },
+ "bes:11RIC001": {
+  "attacco": "Nel sistema BES l'intensità di ricerca conferma la stessa mappa: dal 2,1% del PIL del Piemonte e dell'Emilia-Romagna allo 0,5% della Valle d'Aosta. La media delle regioni è dell'1,2%. È lo stesso divario dell'indicatore territoriale, letto dentro il quadro del benessere.",
+  "spunto": "Il BES la tratta come descrittiva, senza un verso automatico, dato che un'intensità alta è positiva ma va letta insieme a occupazione e struttura produttiva. Un territorio può investire molto in ricerca e non tradurla in lavoro qualificato, oppure poco ma in modo mirato. La concentrazione resta comunque il tratto dominante della ricerca italiana. La conoscenza si distribuisce o si addensa?",
+  "limite": "Coincide con l'indicatore dei conti territoriali e ne condivide i limiti, dato che rapporta la spesa al PIL, non alla popolazione o agli addetti. Non dice quanta ricerca produca risultati applicati.",
+  "fonti": []
+ },
+ "93": {
+  "attacco": "Guardando la sola ricerca delle imprese, il divario si allarga ancora. La spesa privata in R&S rispetto al PIL va dall'1,6% del Piemonte allo 0,12% della Calabria, oltre tredici volte. La media delle regioni è dello 0,6%. Il Sud resta ai margini della ricerca privata.",
+  "spunto": "La ricerca privata è la più concentrata di tutte, dato che segue le grandi imprese manifatturiere e i loro centri, quasi tutti al Nord. Dove il tessuto è fatto di piccole aziende, la ricerca interna è rara. È cresciuta molto nei decenni, ma quasi solo dove era già presente, allargando ancora la distanza tra i territori. Un'economia senza grandi imprese può fare ricerca?",
+  "limite": "Misura la spesa dichiarata delle imprese in R&S sul PIL, non l'innovazione informale né quella acquistata dall'esterno. Non coglie la ricerca delle piccole imprese, spesso non contabilizzata come tale.",
+  "fonti": []
+ },
+ "bes:11RIC002": {
+  "attacco": "I brevetti sono il segno più visibile dell'innovazione, e in Italia sono fortemente concentrati. Se ne depositano 176 per milione di abitanti in Emilia-Romagna, 132 in Veneto, ma appena 6 in Calabria. La media delle regioni è di circa 58.",
+  "spunto": "Un divario di trenta volte racconta un Paese in cui l'innovazione formale vive quasi solo in alcuni distretti industriali del Nord. Ma non tutta l'innovazione passa dai brevetti, e molte piccole imprese innovano senza registrarli, per costo o cultura. Il dato è contestuale, e va letto come segnale di dove si concentra la ricerca applicata, non come mappa completa della creatività. Chi non brevetta non innova?",
+  "limite": "Conta i brevetti per abitante, non la loro qualità o valore economico. Molte innovazioni, specie nei servizi e nelle piccole imprese, non vengono brevettate e restano invisibili a questo indicatore.",
+  "fonti": []
+ },
+ "416": {
+  "attacco": "I ricercatori che lavorano nelle imprese sono pochi e concentrati. Sono lo 0,85% degli addetti in Emilia-Romagna e lo 0,69% in Toscana, ma solo lo 0,12% in Basilicata. La media delle regioni è dello 0,45%, quasi raddoppiata negli ultimi anni.",
+  "spunto": "Avere ricercatori dentro le aziende, e non solo nelle università, è ciò che trasforma la conoscenza in prodotti. La loro rarità, e la concentrazione al Centro-Nord, aiuta a capire come mai l'innovazione italiana fatichi a diffondersi. La forte crescita recente è incoraggiante, ma parte da numeri minimi e procede a ritmi diversi tra le regioni. Le competenze seguono le imprese o le imprese le competenze?",
+  "limite": "Conta i ricercatori formalmente classificati come tali, non chi svolge attività innovativa con altri ruoli. Rapportato agli addetti, risente della struttura settoriale, con l'industria ad alta tecnologia che ne impiega di più.",
+  "fonti": []
+ },
+ "148": {
+  "attacco": "Innovare non significa solo brevettare. La quota di imprese che hanno introdotto innovazioni di prodotto o processo va dal 30,4% del Molise al 52,8% delle Marche. La media delle regioni è del 43,6%, in crescita negli ultimi anni. Qui il Centro guida più del Nord.",
+  "spunto": "Questo indicatore è più largo dei brevetti, e infatti la geografia si appiattisce: anche molte imprese del Centro e del Sud innovano, adottando tecnologie e cambiando processi. L'innovazione diffusa, non solo quella di frontiera, è ciò che tiene competitivo un tessuto di piccole aziende. Marche e Umbria in testa lo confermano. Conta di più inventare o saper adottare ciò che altri inventano?",
+  "limite": "Considera le sole imprese con almeno dieci addetti, escludendo le micro, dove l'innovazione è diversa. Registra se un'impresa ha innovato, non quanto radicalmente né con quali risultati economici.",
+  "fonti": []
+ },
+ "bes:11RIC004": {
+  "attacco": "La versione BES dell'innovazione produttiva mostra quote più alte, con la Calabria sorprendentemente vicina a Lombardia e Piemonte, oltre il 62%, mentre la Valle d'Aosta si ferma al 37,4%. La media delle regioni è del 55,5%. Anche parte del Sud compare in alto.",
+  "spunto": "Che la Calabria compaia in alto, accanto alle regioni più industriali, ricorda quanto la definizione di innovazione conti: qui pesano anche i cambiamenti organizzativi e digitali, non solo la ricerca. Il BES lo tratta come descrittivo, senza un verso automatico. È un promemoria utile contro l'idea che il Sud non innovi mai davvero. Innovazione è solo tecnologia o anche organizzazione?",
+  "limite": "Aggrega tipi di innovazione molto diversi, dal prodotto al metodo organizzativo, in un'unica quota. Non ne misura la portata né gli effetti su produttività e occupazione.",
+  "fonti": []
+ },
+ "150": {
+  "attacco": "La spesa per innovazione per addetto disegna una geografia meno prevedibile. Va da 1,9 mila euro in Basilicata a 9,3 mila in Liguria, con il Lazio a 6,5 mila e la Calabria in alto. La media delle regioni è di circa 4,2 mila euro.",
+  "spunto": "Una spesa alta per addetto non coincide con la mappa della ricerca, dato che pesano pochi grandi investimenti concentrati, che gonfiano la media di una regione. La Liguria e la Calabria in alto mostrano che qui contano singoli progetti più che un sistema diffuso. Va letta insieme al numero di imprese coinvolte e alla continuità nel tempo. Spendere molto per pochi è innovare?",
+  "limite": "È una media per addetto sull'intera popolazione di imprese, quindi sensibile a pochi grandi investimenti. Non distingue l'innovazione strutturale da spese una tantum, né quante imprese effettivamente investono.",
+  "fonti": []
+ },
+ "417": {
+  "attacco": "Qui la classifica si ribalta: la collaborazione nella ricerca è più diffusa al Sud. Tra le imprese che fanno R&S, collaborano con soggetti esterni il 53,4% in Basilicata e il 50,5% in Calabria, contro il 22,5% del Veneto. La media delle regioni è del 34,7%.",
+  "spunto": "L'inversione ha una radice strutturale: dove le imprese sono piccole e con poca ricerca interna, quando la fanno devono appoggiarsi a università e partner esterni. Al Nord, con centri di ricerca propri, la collaborazione è meno necessaria. Un dato alto non è quindi più virtù, ma segno di un tessuto diverso. Collaborare è una scelta o una necessità di chi è piccolo?",
+  "limite": "È calcolato sulle sole imprese che già fanno R&S, una minoranza soprattutto al Sud, quindi le percentuali vanno lette con questa base ristretta. Non misura la qualità o l'esito delle collaborazioni.",
+  "fonti": []
+ },
+ "432": {
+  "attacco": "Anche l'uso di infrastrutture di ricerca esterne è più alto al Sud. Tra le imprese con R&S, le usa il 33,3% in Molise e il 27% in Calabria, contro il 14,7% della Valle d'Aosta. La media delle regioni è del 20,8%.",
+  "spunto": "Come per la collaborazione, il primato del Sud riflette la mancanza di risorse interne: chi non ha laboratori propri usa quelli pubblici o condivisi. È un segnale che le infrastrutture di ricerca, dove esistono, servono davvero a chi è piccolo. Rafforzarle potrebbe contare più al Sud che al Nord, dove le imprese hanno più mezzi propri. Le infrastrutture pubbliche compensano la debolezza del tessuto privato?",
+  "limite": "Riguarda le sole imprese che fanno R&S interna, quindi una base piccola e selezionata. Non dice se le infrastrutture usate siano locali o lontane, né quanto pesino sui risultati.",
+  "fonti": []
+ },
+ "396": {
+  "attacco": "Le imprese nei settori ad alta conoscenza nascono di più al Sud: il tasso di natalità è dell'11,9% in Calabria e dell'11,2% in Campania, contro il 7,9% della Liguria. La media delle regioni è del 9,4%. Il Mezzogiorno guida la nascita di imprese innovative.",
+  "spunto": "Un'alta natalità di imprese innovative sembra una buona notizia, ma al Sud riflette anche un tessuto instabile, dove si apre molto e si chiude molto. Va letta insieme alla sopravvivenza, che al Sud è più bassa: nascono più imprese della conoscenza, ma ne resistono meno. La vera sfida non è farle nascere, ma farle durare. Un'economia che crea molte imprese fragili è dinamica o precaria?",
+  "limite": "Misura quante imprese nascono nei settori ad alta conoscenza, non la loro dimensione o solidità. Un tasso alto può nascere anche da un tessuto che si rinnova per fragilità, non per vitalità.",
+  "fonti": []
+ },
+ "397": {
+  "attacco": "Se al Sud nascono più imprese della conoscenza, al Nord ne sopravvivono di più. A tre anni resiste il 69,4% delle imprese in Liguria e in Veneto, contro il 55,5% della Calabria. La media delle regioni è del 64%. Il Nord consolida più del Sud.",
+  "spunto": "La sopravvivenza completa il quadro della natalità: il Sud crea, il Nord consolida. Un'impresa innovativa che chiude a due anni disperde competenze e investimenti, mentre quelle che durano costruiscono nel tempo un ecosistema solido. Contano l'accesso al credito, i mercati vicini e le reti di supporto, più forti al Nord. Dietro i numeri ci sono progetti e persone. Meglio nascere o durare?",
+  "limite": "Segue le imprese per tre anni, un orizzonte breve per settori dove i risultati arrivano tardi. Non distingue chi chiude per fallimento da chi viene assorbito o cambia attività.",
+  "fonti": []
+ },
+ "bes:11RIC003-N22": {
+  "attacco": "I lavoratori della conoscenza, occupati in professioni ad alta qualifica, sono il 24,3% degli occupati nel Lazio e il 20,8% in Abruzzo, ma solo il 15,2% in Valle d'Aosta. La media delle regioni è del 18,6%, in crescita negli ultimi anni.",
+  "spunto": "Dove ci sono università, pubblica amministrazione centrale e servizi avanzati cresce la quota di lavoro qualificato, e per questo il Lazio guida. È una geografia diversa da quella della manifattura, più legata alle grandi città. La crescita di questi lavori segnala un'economia che si sposta verso la conoscenza, ma il ritmo è lento. Il lavoro del futuro è già la norma o ancora una minoranza?",
+  "limite": "Classifica gli occupati per tipo di professione, non per il titolo di studio o la reale attività svolta. Non dice se questi lavori siano stabili o ben pagati, né dove le competenze vengano formate.",
+  "fonti": []
+ },
+ "bes:11RIC006-N22": {
+  "attacco": "L'occupazione culturale e creativa pesa poco ovunque: è il 5% degli occupati nel Lazio, il 4,2% in Lombardia, ma solo il 2,2% in Calabria, Puglia e Liguria. La media delle regioni è del 3,1%. È un settore ovunque piccolo, raccolto nelle grandi città.",
+  "spunto": "Il lavoro creativo, dal design ai media al software culturale, si concentra nelle grandi città, dove ci sono mercato, committenti e reti professionali. Roma e Milano fanno da poli, il resto del Paese segue a grande distanza. È un settore piccolo ma strategico, che intreccia cultura ed economia della conoscenza. Come mai la creatività si addensa in così pochi luoghi?",
+  "limite": "Delimita i settori creativi con una classificazione convenzionale, che lascia fuori molto lavoro culturale informale o ibrido. Non ne misura il valore economico né la stabilità, spesso bassa.",
+  "fonti": []
+ },
+ "bes:11RIC025": {
+  "attacco": "Questo indicatore misura il saldo dei laureati che una regione attira o perde. È fortemente negativo in Basilicata, meno 50 ogni mille laureati, e in Calabria, mentre è positivo in Emilia-Romagna, più 18, e Lombardia. La media delle regioni è negativa.",
+  "spunto": "È la fotografia della fuga dei cervelli interna: il Sud forma laureati che poi se ne vanno, il Nord li attrae. Ogni giovane qualificato che parte è un investimento pubblico che frutta altrove, e un impoverimento del territorio d'origine. Il fenomeno alimenta il divario che lo genera, in un circolo difficile da rompere. Trattenere i laureati è possibile senza prima creare lavoro per loro?",
+  "limite": "Misura il saldo netto tra partenze e arrivi, non i motivi né se il trasferimento sia definitivo. Non conta chi va all'estero, una parte importante della fuga, e non dice quanti tornano.",
+  "fonti": []
+ },
+ "426": {
+  "attacco": "L'uso di internet nelle famiglie è ormai diffuso quasi ovunque. Ha navigato negli ultimi dodici mesi l'84,5% delle persone in Emilia-Romagna e l'83,3% in Trentino Alto Adige, contro il 71,6% della Calabria. La media delle regioni è dell'80%. La rete è ormai di casa quasi per tutti.",
+  "spunto": "Il divario digitale di base si è quasi chiuso: tra la regione più connessa e la meno connessa ci sono meno di quindici punti, e ovunque la maggioranza è online. Il vero divario si è spostato altrove, dalla quantità alla qualità dell'uso, dalle competenze ai servizi. Essere connessi non basta più a definire chi è dentro e chi è fuori. Il digitale unisce o crea nuove distanze?",
+  "limite": "Conta chi ha usato internet almeno una volta in un anno, una soglia bassa che dice poco sull'uso reale. Non misura le competenze digitali né la qualità della connessione disponibile.",
+  "fonti": []
+ },
+ "64": {
+  "attacco": "Restringendo a chi ha usato internet negli ultimi tre mesi, cioè con regolarità, la quota scende di poco: in media il 78,7%. In testa Emilia-Romagna e Trentino Alto Adige sopra l'83%, in coda la Calabria al 70,4%. Il quadro resta quello di un uso ormai di massa.",
+  "spunto": "La vicinanza tra uso annuale e trimestrale dice quanti sono utenti abituali, non solo occasionali, e conferma che chi si connette lo fa con continuità. Resta però una parte di popolazione ancora esclusa, concentrata tra anziani e aree fragili. Chiudere quest'ultimo tratto, l'ultimo miglio umano, è più difficile del primo. Chi resta offline oggi lo è per scelta o per barriera?",
+  "limite": "La soglia dei tre mesi cattura l'uso recente, non la frequenza reale né le attività svolte online. Non distingue chi usa internet per lavoro e servizi da chi solo per messaggistica.",
+  "fonti": []
+ },
+ "bes:11RIC020": {
+  "attacco": "Nel sistema BES gli utenti regolari di internet sono in media il 79,9%, con Lombardia, Veneto e Friuli-Venezia Giulia sopra l'84% e la Calabria al 72,3%. È lo stesso quadro di convergenza degli altri indicatori d'uso. Il divario di accesso si è quasi chiuso.",
+  "spunto": "Il BES lo tratta come descrittivo, dato che l'uso di internet non ha di per sé un verso migliore o peggiore, e va letto insieme a competenze e sicurezza online. La forte crescita di lungo periodo ha reso il collegarsi la norma, ma restano fuori proprio i gruppi più fragili. La misura semplice dell'accesso ha ormai esaurito la sua capacità di raccontare il divario. Cosa conta ora, connettersi o saperlo fare bene?",
+  "limite": "Registra l'uso regolare dichiarato, non le competenze digitali né il tipo di attività. Un utente regolare può fare online cose molto diverse, dalle più semplici alle più avanzate.",
+  "fonti": []
+ },
+ "bes:11RIC021": {
+  "attacco": "La disponibilità in casa di un computer e di una connessione è meno diffusa dell'uso di internet: in media il 65,6% delle famiglie. Va dal 49,4% della Calabria al 75,4% del Trentino Alto Adige. Qui il divario è più ampio.",
+  "spunto": "Molti si connettono ormai solo da smartphone, e infatti l'accesso a un computer resta più basso dell'uso di internet. La differenza conta, dato che studiare, lavorare o usare certi servizi da solo telefono è difficile. Il divario si sposta così dal connettersi all'avere gli strumenti giusti, e penalizza le famiglie più povere. Un Paese che naviga solo da telefono è davvero digitale?",
+  "limite": "Conta il possesso di computer e connessione insieme, senza distinguere strumenti nuovi e obsoleti. Non dice se e come vengano usati, né misura le competenze di chi li possiede.",
+  "fonti": []
+ },
+ "429": {
+  "attacco": "La banda ultra larga è passata da fenomeno marginale a diffuso in pochi anni, con una crescita enorme da una base quasi nulla. Oggi gli abbonamenti coprono il 32,2% della popolazione in Liguria e il 31,9% nel Lazio, contro il 18,9% del Molise. La media delle regioni è del 26%.",
+  "spunto": "L'esplosione recente riflette il completamento delle reti veloci più che una scelta delle famiglie, dato che dove arriva la fibra gli abbonamenti seguono. Il divario ora dipende dalle infrastrutture, e le aree interne e il Sud restano indietro nella copertura, non solo nella domanda. La banda ultra larga è la condizione di molti servizi futuri. La rete veloce arriva prima dove serve o dove conviene?",
+  "limite": "Conta gli abbonamenti sulla popolazione, non la copertura effettiva del territorio. Non dice a quale velocità reale si navighi, né distingue le aree raggiunte dalla fibra da quelle ancora scoperte.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ICT_BANDA_LARGA": {
+  "attacco": "Le famiglie con una connessione a banda larga sono ormai la grande maggioranza: in media l'83,3%. Si va dal 75,9% della Calabria all'87,9% del Friuli-Venezia Giulia. Il divario di accesso di base è tra i più stretti del digitale, quasi ovunque colmato.",
+  "spunto": "La banda larga in casa è quasi universale, segno che l'infrastruttura di base ha raggiunto quasi tutti. Ma dietro il dato unico si nascondono tecnologie diverse, dalla fibra veloce alla connessione mobile, più lenta e a consumo, che cambiano cosa si può fare online. L'accesso c'è quasi ovunque, la qualità no. Avere la banda larga significa la stessa cosa ovunque?",
+  "limite": "Somma tutte le connessioni a banda larga, fisse e mobili, senza distinguerne la velocità reale. Una famiglia connessa solo via telefono risulta coperta quanto una con la fibra.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ICT_BANDA_LARGA_FISSA": {
+  "attacco": "Scomponendo la banda larga, quella fissa, di solito più veloce e stabile, è meno diffusa: in media il 56,3% delle famiglie. Va dal 39,7% della Calabria al 65,7% della Lombardia. Qui il divario Nord-Sud si riapre, e con esso la qualità della connessione.",
+  "spunto": "La connessione fissa è quella che regge lavoro da casa, studio e servizi pesanti, e la sua minore diffusione al Sud segnala un divario di qualità dietro quello, ormai chiuso, di accesso. Dove la fibra manca o costa, le famiglie ripiegano sul mobile. È la vera frattura digitale di oggi, meno visibile ma più profonda. La rete che conta è quella che arriva o quella che regge?",
+  "limite": "Conta le connessioni fisse a banda larga, senza distinguere fibra veloce e vecchie linee. Non dice la velocità reale né se la famiglia usi anche o solo il mobile.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ICT_BANDA_LARGA_MOBILE": {
+  "attacco": "La connessione mobile a banda larga inverte la mappa: è più diffusa al Sud e nelle isole. La usa il 51% delle famiglie in Sardegna e il 47,8% in Calabria, contro il 33,7% della Lombardia. La media delle regioni è del 40,6%.",
+  "spunto": "L'inversione non è un primato: al Sud si usa di più il mobile proprio dove la rete fissa è più debole, e il telefono diventa la connessione principale invece che complementare. È un ripiego tecnologico, non una scelta di avanguardia. Un accesso solo mobile limita ciò che si può fare, dallo studio al lavoro. Connettersi dal telefono è digitale di serie A o di serie B?",
+  "limite": "Conta le famiglie con connessione mobile a banda larga, che per molte al Sud è l'unica. Non misura se sostituisca o affianchi la fissa, né i limiti d'uso di dati e velocità.",
+  "fonti": []
+ },
+ "70": {
+  "attacco": "Avere un sito web è ancora tutt'altro che scontato per le imprese italiane. Lo ha il 90,4% delle aziende in Trentino Alto Adige e l'84,3% in Friuli-Venezia Giulia, ma solo il 52,4% in Calabria. La media delle regioni è del 69,7%.",
+  "spunto": "Il sito web è la porta digitale minima di un'impresa, e la sua assenza in quasi metà delle aziende di alcune regioni pesa su visibilità e mercati. Il divario ricalca quello economico, con il Nord più strutturato e il Sud fatto di micro-imprese meno digitali. Essere online è la premessa per vendere lontano da casa. Un'impresa senza sito esiste per i clienti che non la conoscono?",
+  "limite": "Considera le imprese con più di dieci addetti, non le micro, dove il ritardo è maggiore. Registra la presenza di un sito, non la sua qualità né se serva davvero a vendere o comunicare.",
+  "fonti": []
+ },
+ "71": {
+  "attacco": "La banda larga nelle imprese è ormai quasi universale: in media il 98,1%. Diverse regioni, dalla Valle d'Aosta alla Calabria, toccano il 100%, mentre la Liguria resta un po' sotto, all'81,5%. È una delle dotazioni digitali più diffuse, e il divario tra imprese è quasi scomparso.",
+  "spunto": "La connessione veloce è arrivata a quasi tutte le imprese medio-grandi, e qui il divario territoriale è quasi sparito. Ma avere la banda larga è ormai il minimo, e il vantaggio competitivo si gioca su cosa se ne fa, dal commercio elettronico ai dati. L'infrastruttura non basta più a distinguere le imprese. La connessione è ancora un fattore di competitività o solo un prerequisito?",
+  "limite": "Riguarda le imprese con oltre dieci addetti e conta la presenza della banda larga, non la sua velocità o il suo uso. Le micro-imprese, escluse, sono spesso meno connesse.",
+  "fonti": []
+ },
+ "72": {
+  "attacco": "Guardando gli addetti che usano computer connessi a internet, la diffusione scende: in media il 52,4%. È il 66,3% nel Lazio e il 59,4% in Emilia-Romagna, ma il 41,9% in Abruzzo. Circa metà dei lavoratori, quindi, usa la rete. La struttura produttiva pesa più della volontà.",
+  "spunto": "Che solo metà degli addetti usi internet al lavoro ricorda quanto pesino ancora i settori manifatturieri e manuali, dove il computer non è centrale. Non è un ritardo puro, ma il riflesso della struttura produttiva, dato che più servizi avanzati significano più uso della rete. Il Lazio in testa, con la sua economia terziaria, lo conferma. La digitalizzazione dipende dalla volontà o dal tipo di lavoro?",
+  "limite": "Misura gli addetti che usano internet, non le competenze né l'intensità dell'uso. Risente della composizione settoriale, con l'industria pesante che ne usa meno dei servizi, e riguarda le sole imprese sopra i dieci addetti.",
+  "fonti": []
+ },
+ "bes:11RIC023": {
+  "attacco": "Vendere online resta raro per le imprese italiane. Lo fa il 30,6% delle aziende in Trentino Alto Adige e il 22,4% in Valle d'Aosta, ma solo il 9,9% in Molise. La media delle regioni è del 16,3%, in forte crescita da una base bassa.",
+  "spunto": "Il commercio elettronico verso i clienti finali è la frontiera più avanzata della digitalizzazione d'impresa, e in Italia è ancora agli inizi. Che il Trentino guidi, con il suo turismo, mostra come conti il settore più della semplice tecnologia. La crescita recente è forte, ma i numeri restano piccoli. Le imprese italiane vendono poco online per arretratezza o per il tipo di prodotti?",
+  "limite": "Conta le imprese che vendono via web ai clienti finali, non il peso di quelle vendite sul fatturato. Non include le vendite tramite piattaforme di terzi, che per molte piccole imprese sono il canale principale.",
+  "fonti": []
+ },
+ "424": {
+  "attacco": "I comuni con servizi pienamente interattivi, che permettono di concludere una pratica online, sono cresciuti moltissimo in un decennio. Oggi sono l'87,9% in Veneto e l'81,3% in Toscana, contro il 36% del Molise. La media delle regioni è del 67,9%.",
+  "spunto": "La digitalizzazione dei comuni è avanzata in fretta, ma a velocità diverse: alcune regioni hanno quasi completato la transizione, altre sono a metà strada. Contano dimensione dei comuni, risorse e competenze del personale, tutte più fragili nei piccoli enti del Sud e delle aree interne. Un servizio online in meno significa una fila in più per il cittadino. La PA digitale avvicina o allontana chi ha meno strumenti?",
+  "limite": "Conta i comuni che offrono servizi interattivi, non quanti cittadini li usino davvero. Non dice se i servizi funzionino bene, né se chi non è digitale trovi un'alternativa allo sportello.",
+  "fonti": []
+ },
+ "bes:11RIC022": {
+  "attacco": "Guardando i servizi comunali per le famiglie interamente online, il balzo è ancora più netto, con una crescita di oltre cinque volte in un decennio. Sono il 76,7% dei comuni in Veneto e il 75,5% in Toscana, contro il 23,9% del Molise. La media delle regioni è del 52%.",
+  "spunto": "Rispetto ai servizi interattivi in generale, questi riguardano pratiche familiari concrete, dall'iscrizione a scuola ai certificati, e la loro diffusione più bassa dice quanto resti da fare sui servizi quotidiani. Il divario tra il Nord-Est e il Sud interno è ampio e stabile. La comodità del digitale arriva prima dove i comuni sono più organizzati. Il diritto a un servizio online dipende da dove si vive?",
+  "limite": "Conta i comuni che offrono online i servizi per le famiglie, non la loro qualità o effettivo utilizzo. Non dice se le pratiche siano davvero concludibili senza recarsi allo sportello.",
+  "fonti": []
+ },
+ "427": {
+  "attacco": "La disponibilità di wi-fi pubblico gratuito nei comuni è cresciuta ma resta diseguale. Lo offre l'83% dei comuni in Emilia-Romagna e il 74% in Basilicata, contro il 27% della Valle d'Aosta. La media delle regioni è del 57,7%. La scelta dipende dai singoli comuni.",
+  "spunto": "Il wi-fi pubblico è un servizio di prossimità, utile a chi non ha connessione propria e negli spazi come piazze e biblioteche. La sua diffusione non segue il Nord-Sud, con la Basilicata in alto e la Valle d'Aosta in fondo, e conta la scelta dei singoli comuni più che la ricchezza. È un tassello piccolo ma concreto di inclusione digitale. Connettere gli spazi pubblici serve ancora, ora che quasi tutti hanno il telefono?",
+  "limite": "Conta i comuni che offrono almeno un punto wi-fi, non quanti né dove. Un solo hotspot rende un comune coperto, senza dire nulla sulla reale disponibilità per i cittadini.",
+  "fonti": []
+ },
+ "434": {
+  "attacco": "Quasi tutte le imprese ormai dialogano online con la pubblica amministrazione: in media il 97,4%. Si va dal 91,9% dell'Abruzzo al 99,7% dell'Umbria, con differenze minime. È uno degli indicatori digitali più uniformi, un rapporto ormai quasi obbligato per tutte le imprese.",
+  "spunto": "Il rapporto digitale tra imprese e PA è quasi totale, spinto dall'obbligo per fatture, tributi e adempimenti. Qui il divario è sparito, ma è una digitalizzazione imposta più che scelta, che dice poco sulla qualità dei servizi. Il vero nodo non è più se le imprese usino l'e-government, ma se questo semplifichi o complichi la loro vita. Il digitale obbligatorio è progresso o solo un nuovo modo di adempiere?",
+  "limite": "Conta le imprese che hanno avuto rapporti online con la PA, non la frequenza né la soddisfazione. Un uso quasi universale riflette gli obblighi di legge più che la maturità digitale delle aziende.",
+  "fonti": []
+ },
+ "469": {
+  "attacco": "L'uso delle gare d'appalto elettroniche nella pubblica amministrazione è cresciuto molto, quasi triplicato in pochi anni. Copre il 99,9% dei bandi sopra soglia in Trentino Alto Adige e il 95,7% in Toscana, contro il 51,7% del Molise. La media delle regioni è dell'86,2%.",
+  "spunto": "Digitalizzare gli appalti serve a trasparenza e concorrenza, rendendo tracciabili le procedure. La forte crescita mostra un'amministrazione che si adegua, ma con ritardi marcati in alcune regioni, dove le stazioni appaltanti sono piccole e meno attrezzate, spesso i comuni minori. Dove le gare restano su carta, tracciabilità, controlli e concorrenza ne soffrono. La trasparenza digitale basta a rendere onesti gli appalti?",
+  "limite": "Conta i bandi sopra soglia gestiti in forma elettronica, non quelli minori né la qualità delle procedure. La presentazione digitale dell'offerta non garantisce da sola concorrenza o correttezza.",
+  "fonti": []
+ },
+ "73": {
+  "attacco": "La banda larga nelle amministrazioni comunali è ormai quasi ovunque: in media il 98,7% dei comuni. Diverse regioni toccano il 100%, mentre Puglia e Campania restano appena sotto il 97%. È tra le dotazioni più diffuse in assoluto, ormai la norma per gli enti.",
+  "spunto": "Che quasi tutti i comuni abbiano la banda larga è la base minima di ogni servizio digitale pubblico, ormai raggiunta. Ma la connessione dell'ente non dice nulla sulla sua capacità di offrire servizi online, che dipende da software, personale e organizzazione. L'infrastruttura di base c'è, la trasformazione dei servizi no. Avere la rete è la fine o l'inizio della PA digitale?",
+  "limite": "Conta i comuni connessi, non la velocità della loro rete né l'uso che ne fanno. Una connessione veloce in municipio non equivale a servizi digitali per i cittadini.",
+  "fonti": []
+ },
+ "428": {
+  "attacco": "Partecipare online al dibattito politico e sociale è più diffuso al Sud. Esprime opinioni sul web il 34,3% delle persone in Campania e il 30,8% in Abruzzo, contro il 20,4% della Lombardia. La media delle regioni è del 26,3%. La geografia qui è capovolta.",
+  "spunto": "L'inversione sorprende, ma la partecipazione digitale non richiede infrastrutture ricche, solo uno smartphone e la voglia di dire la propria opinione. Dove i canali tradizionali di rappresentanza contano meno, il web diventa uno spazio politico alternativo. Non è di per sé segno di maggiore impegno civico, e va distinta dalla partecipazione civica reale. Esprimersi online è partecipare o solo commentare?",
+  "limite": "Conta chi esprime opinioni politiche o sociali sul web, non la qualità o l'effetto di quella partecipazione. Non distingue un impegno civico strutturato dallo sfogo occasionale sui social.",
+  "fonti": []
  }
 }
