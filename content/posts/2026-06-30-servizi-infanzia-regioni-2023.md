@@ -86,8 +86,7 @@ difficile per i genitori restare nel mercato del lavoro, e il peso della cura
 ricade soprattutto sulle famiglie. È un divario che si trascina nel tempo, perché
 tocca le condizioni in cui si decide se e quando avere figli.
 
-Puoi vedere l'indicatore anno per anno e regione per regione nell'[atlante di
-Divario Italia](/atlante?indicator=414). Il tema si lega alla [speranza di vita per
+Puoi vedere l'indicatore anno per anno e regione per regione nella [scheda dell'indicatore](/indicatore/presa-in-carico-di-tutti-gli-utenti-dei-servizi-per-l-infanzia/ter-414). Il tema si lega alla [speranza di vita per
 regione](/blog/speranza-di-vita-regioni-2025) e all'[Italia che
 invecchia](/blog/italia-che-invecchia-indice-vecchiaia-2026), dove la natalità è
 uno dei motori del cambiamento.

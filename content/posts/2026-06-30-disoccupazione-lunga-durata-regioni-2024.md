@@ -85,8 +85,7 @@ l'esclusione: chi resta fuori a lungo trova poi più difficile rientrare. Dove l
 quota è alta, il problema non è solo il numero di posti, ma la capacità del
 territorio di non lasciare indietro chi è già rimasto fuori.
 
-Puoi vedere l'indicatore anno per anno e regione per regione nell'[atlante di
-Divario Italia](/atlante?indicator=17). Il tema è collegato ai [giovani
+Puoi vedere l'indicatore anno per anno e regione per regione nella [scheda dell'indicatore](/indicatore/tasso-di-disoccupazione-di-lunga-durata/ter-17). Il tema è collegato ai [giovani
 NEET](/blog/neet-giovani-regioni-2024) e al [PIL pro capite per
 regione](/blog/pil-pro-capite-regioni-divario-2024). Per il quadro completo guarda
 il tema [Lavoro](/tema/lavoro).

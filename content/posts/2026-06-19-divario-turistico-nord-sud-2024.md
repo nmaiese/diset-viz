@@ -66,8 +66,8 @@ appoggiano intere filiere economiche. Dove è basso, manca una leva di sviluppo
 che altrove viene data per scontata.
 
 Puoi guardare l'indicatore anno per anno e regione per regione, con mappa,
-classifica e serie storica, dentro l'[atlante di Divario
-Italia](/atlante?indicator=105&year=2024). La cosa più interessante è seguire come il
+classifica e serie storica, nella [scheda
+dell'indicatore](/indicatore/tasso-di-turisticita/ter-105). La cosa più interessante è seguire come il
 divario è cambiato dal 1981 a oggi. In molti casi si è allargato, non ridotto.
 
 *Dati: Istat, "Indicatori territoriali per le politiche di sviluppo". Le medie

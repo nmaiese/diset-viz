@@ -96,7 +96,7 @@ La differenza tra tasso di occupazione maschile e femminile non è un dato astra
 
 La buona notizia è che il divario si può ridurre, e altri Paesi lo dimostrano ogni giorno. La cattiva è che senza asili nido, tempi pieni e lavoro stabile continueremo a chiedere alle donne di scegliere tra famiglia e lavoro, una scelta che agli uomini non viene quasi mai richiesta.
 
-Vuoi vedere il divario nella tua regione e confrontarlo con le altre? Esplora i dati interattivi nell'[atlante di Divario Italia](/atlante?indicator=57).
+Vuoi vedere il divario nella tua regione e confrontarlo con le altre? Esplora i dati interattivi nella [scheda dell'indicatore](/indicatore/differenza-tra-tasso-di-occupazione-maschile-e-femminile/ter-57).
 
 ## Fonti
 - [ISTAT - Livelli di istruzione e ritorni occupazionali, Anno 2024](https://www.istat.it/comunicato-stampa/livelli-di-istruzione-e-ritorni-occupazionali-anno-2024/) - consultato il 2026-07-06 (fonte primaria: tassi di occupazione per genere e per livello di istruzione)

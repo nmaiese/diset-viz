@@ -78,4 +78,4 @@ Per leggere meglio il dato conviene affiancarlo ad altri indicatori dell'atlante
    - **URL**: [https://ec.europa.eu/eurostat/web/lfs/data/database](https://ec.europa.eu/eurostat/web/lfs/data/database)
    - **Data di consultazione**: 2 luglio 2026
 
-*Per approfondire, esplora questo e gli altri indicatori nell'[atlante di Divario Italia](/atlante?indicator=407) o sfoglia il tema [Lavoro](/tema/lavoro).*
+*Per approfondire, apri la [scheda dell'indicatore](/indicatore/tasso-di-occupazione-giovanile-totale/ter-407) o sfoglia il tema [Lavoro](/tema/lavoro).*

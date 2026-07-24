@@ -95,9 +95,8 @@ resto: occupazione, tipo di lavoro, reddito, capacità di un territorio di
 trattenere e attrarre competenze. Dove la quota di adulti fermi a un titolo basso
 è alta, le altre fragilità del divario tendono a presentarsi insieme.
 
-Puoi vedere l'indicatore anno per anno e regione per regione nell'[atlante di
-Divario Italia](/atlante?indicator=104). Il tema è legato all'[abbandono scolastico per
-regione](/atlante?indicator=102) e ai [giovani NEET](/blog/neet-giovani-regioni-2024).
+Puoi vedere l'indicatore anno per anno e regione per regione nella [scheda dell'indicatore](/indicatore/livello-di-istruzione-della-popolazione-adulta/ter-104). Il tema è legato all'[abbandono scolastico per
+regione](/indicatore/giovani-che-abbandonano-prematuramente-i-percorsi-di-istruzione-e-formazione-pro/ter-102) e ai [giovani NEET](/blog/neet-giovani-regioni-2024).
 Per il quadro economico che fa da sfondo, leggi il [PIL pro capite per
 regione](/blog/pil-pro-capite-regioni-divario-2024).
 

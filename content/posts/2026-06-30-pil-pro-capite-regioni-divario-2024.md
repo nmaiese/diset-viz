@@ -93,7 +93,7 @@ Dove è basso, le altre fragilità, dalla disoccupazione di lunga durata ai giov
 studiano e non lavorano, tendono a presentarsi insieme.
 
 Puoi vedere l'indicatore anno per anno e regione per regione, con mappa e classifica,
-nell'[atlante di Divario Italia](/atlante?indicator=901). Per il quadro completo della
+nella [scheda dell'indicatore](/indicatore/pil-pro-capite/ter-901). Per il quadro completo della
 ricchezza prodotta e redistribuita, guarda il tema [Reddito e ricchezza](/tema/reddito-e-ricchezza),
 e per capire dove il divario economico si traduce in fragilità giovanile leggi
 l'analisi sui [NEET per regione](/blog/neet-giovani-regioni-2024).

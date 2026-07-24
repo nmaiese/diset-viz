@@ -5,7 +5,9 @@ pre-migration URLs 301 to it. User-facing labels are institution-first plain
 names, never internal jargon on its own.
 """
 
+import re
 import unittest
+from pathlib import Path
 
 from app import app, sources
 from app.atlas_catalog import get_atlas_catalog
@@ -73,6 +75,40 @@ class UnifiedUrlRoutingTest(unittest.TestCase):
         response = self.client.get(f"/qualita-della-vita/indicatore/multiscopo-{raw}/x")
         self.assertEqual(response.status_code, 301)
         self.assertTrue(response.headers["Location"].endswith(mul["path"]))
+
+
+class EditorialLinksAreCanonicalTest(unittest.TestCase):
+    """Articles must link to the canonical indicator page.
+
+    `/?indicator=...` now opens the home page, and `/atlante?indicator=...`
+    lands on the atlas and only reaches the indicator through JavaScript. Both
+    are broken destinations for a reader without JS and for a crawler."""
+
+    LEGACY = re.compile(r"\((/(?:atlante)?\?indicator=[^)]*)\)")
+
+    def test_no_post_links_to_a_query_string_indicator(self):
+        posts = Path(__file__).resolve().parent.parent / "content" / "posts"
+        offenders = [
+            (md.name, match)
+            for md in sorted(posts.glob("*.md"))
+            for match in self.LEGACY.findall(md.read_text(encoding="utf-8"))
+        ]
+        self.assertEqual(offenders, [], f"legacy atlas links in posts: {offenders[:10]}")
+
+    def test_every_indicator_link_in_posts_resolves(self):
+        posts = Path(__file__).resolve().parent.parent / "content" / "posts"
+        client = app.test_client()
+        link_re = re.compile(r"\((/indicatore/[^)\s]+)\)")
+        seen = set()
+        for md in sorted(posts.glob("*.md")):
+            for href in link_re.findall(md.read_text(encoding="utf-8")):
+                if href in seen:
+                    continue
+                seen.add(href)
+                self.assertEqual(
+                    client.get(href).status_code, 200, f"{md.name} -> {href}"
+                )
+        self.assertTrue(seen, "no canonical indicator links found in the posts")
 
 
 if __name__ == "__main__":

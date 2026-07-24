@@ -55,8 +55,12 @@ automatico.
   (`/api/indicator/<id>` e `/api/indicator/<id>/year/<year>`) o dallo script dati.
   Non inventare cifre e non arrotondare in modo fuorviante.
 - Cita la fonte (Istat) e spiega in una riga come hai calcolato eventuali medie.
-- Collega l'articolo all'atlante: imposta `indicator` nel frontmatter e inserisci
-  link interni come `[testo](/?indicator=105&year=2024)`.
+- Collega l'articolo al catalogo: imposta `indicator` nel frontmatter e inserisci
+  link interni con il **percorso canonico** dell'indicatore, per esempio
+  `[testo](/indicatore/tasso-di-turisticita/ter-105)`. È il `path` che il
+  catalogo espone per ogni voce. Non usare `/?indicator=...` né
+  `/atlante?indicator=...`: la prima forma oggi apre la home, la seconda resta
+  sull'Atlante e arriva alla scheda solo via JavaScript.
 - Prima di pubblicare, prepara una claim table anche se non entra nel testo:
   claim, fonte, periodo, territorio, unita, trasformazione e confidenza.
 - Se usi una seconda fonte di contesto, deve essere autorevole e verificata. Se

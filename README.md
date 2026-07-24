@@ -70,14 +70,15 @@ author: "Redazione Divario Italia"
 cover: /static/img/blog/your-cover.svg
 cover_alt: "Accessible description of the cover"
 tags: [Turismo, Divario Nord-Sud]
-indicator: 105                      # optional: links to /?indicator=105 in the atlas
+indicator: 105                      # optional: links the post to catalog indicator 105
 indicator_label: "Tasso di turisticità (2024)"
 draft: false                        # set true to hide
 ---
 
 Body in Markdown. Tables, lists and `> blockquotes` are supported. Add
 `{: .data-callout}` after a paragraph to render it as a highlighted data box,
-and link into the atlas with `[text](/?indicator=105&year=2024)`.
+and link to an indicator with its canonical path,
+`[text](/indicatore/tasso-di-turisticita/ter-105)`.
 ```
 
 See `content/posts/2026-06-19-divario-turistico-nord-sud-2024.md` for a full

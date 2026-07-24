@@ -68,9 +68,11 @@ editorial voice. The non-negotiable rules:
   active voice, concrete numbers. Avoid bot tells (repeated "non solo X ma anche
   Y", dramatic colons, "In conclusione", inflated adverbs, slogan sentences).
 - Use only **real, verified numbers** from the indicators (via the API or the
-  data layer). Never invent figures. Link the article to the atlas with the
-  `indicator` frontmatter field and internal links like
-  `/?indicator=105&year=2024`.
+  data layer). Never invent figures. Link the article to the catalog with the
+  `indicator` frontmatter field and internal links using the indicator's
+  **canonical path**, e.g. `/indicatore/tasso-di-turisticita/ter-105`. Never
+  `/?indicator=...` or `/atlante?indicator=...` (`tests/test_url_migration.py`
+  fails on those).
 - Keep it SEO-friendly but natural: keyword in the title and description, sensible
   `##`/`###` headings, relevant tags.
 - Use optional `seo_title` when the visible H1 should stay editorial but the

@@ -35,7 +35,8 @@ missed:
   the same full article skeleton across a cluster. Vary narrative H2s and make the
   closing point to a concrete next step.
 - Only real, verified numbers from the indicators. Never invent figures. Link to
-  the atlas via the `indicator` frontmatter field and `/?indicator=...` links.
+  the catalog via the `indicator` frontmatter field and canonical indicator
+  paths (`/indicatore/<slug>/<acr>-<id>`), never `/?indicator=...`.
 - SEO but natural: keyword in title and `description`, sensible headings, tags.
 - Use optional `seo_title` when the visible H1 is editorial but the SERP title
   should be shorter or closer to the query.

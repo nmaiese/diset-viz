@@ -89,9 +89,8 @@ costruiscono competenze, relazioni e lavoro. Dove la quota è alta e stabile, il
 territorio rischia di perdere una parte della sua generazione più giovane, spesso
 quella che poi se ne va.
 
-Puoi vedere l'indicatore anno per anno e regione per regione nell'[atlante di
-Divario Italia](/atlante?indicator=408). Il tema è strettamente legato all'istruzione:
-guarda l'[abbandono scolastico per regione](/atlante?indicator=102) e il tema
+Puoi vedere l'indicatore anno per anno e regione per regione nella [scheda dell'indicatore](/indicatore/tasso-giovani-neet-totale/ter-408). Il tema è strettamente legato all'istruzione:
+guarda l'[abbandono scolastico per regione](/indicatore/giovani-che-abbandonano-prematuramente-i-percorsi-di-istruzione-e-formazione-pro/ter-102) e il tema
 [Lavoro](/tema/lavoro). Per il quadro economico che fa da sfondo, leggi il
 [PIL pro capite per regione](/blog/pil-pro-capite-regioni-divario-2024).
 
