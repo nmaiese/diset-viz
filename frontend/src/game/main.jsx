@@ -314,7 +314,7 @@ function GameApp() {
 
   function shareText() {
     if (!puzzle || mode !== "daily") return "";
-    const grid = guesses.map((g) => (g.correct ? "🟩" : "🟥")).join("");
+    const grid = guesses.map((g) => (g.correct ? "■" : "□")).join("");
     const outcome = status === "won" ? `${guesses.length}/${puzzle.attempts_total}` : `X/${puzzle.attempts_total}`;
     return `Indovina la Regione #${puzzle.number} ${outcome}\n${grid}\ndivarioitalia.it/quiz/indovina-la-regione`;
   }

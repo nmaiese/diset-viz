@@ -87,10 +87,9 @@
     <aside class="indicator-cta">
       <span>
         <small>Esplora i dati</small>
-        <strong>{{ post.indicator_label or 'Apri questo indicatore nell\'atlante' }}</strong>
+        <strong>{{ post.indicator_label or 'Apri la pagina di questo indicatore' }}</strong>
       </span>
-      <a href="{{ post.indicator_path }}">Scheda indicatore →</a>
-      <a href="/atlante?indicator={{ post.indicator }}">Apri nell'atlante →</a>
+      <a href="{{ post.indicator_path }}">Mappa, classifica e serie storica →</a>
     </aside>
     {% endif %}
   </div>

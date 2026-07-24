@@ -19,6 +19,7 @@ from app.atlas_catalog import (
     search_atlas_indicators,
 )
 from app import profiles
+from app import seo_policy
 from app import indicator_notes
 from app import analyst_notes
 from app import quality_life_bes as qb
@@ -324,6 +325,66 @@ def indicator_page(slug):
     map_colors = indicator_notes.region_choropleth_colors(values)
     spark_points = indicator_notes.sparkline_points(meta.get("spark") or [], width=1200, height=140)
     cover_bars = indicator_notes.cover_bars(values, best, worst, scoreable)
+
+    # Full year x region matrix embedded in the page so the client hydrates the
+    # ranking, map and readout in place, on this one canonical URL, without any
+    # extra fetch. The last-year ranking above stays server-rendered as the
+    # crawlable fallback: the explore controls only enhance it.
+    region_names = {}
+    matrix = {}
+    for row in payload["series"]:
+        if row["value"] is None:
+            continue
+        region_names.setdefault(row["region_key"], row["region"])
+        matrix.setdefault(str(row["year"]), {})[row["region_key"]] = row["value"]
+    explore_data = {
+        "id": meta["id"],
+        "unit": indicator_notes.value_unit_label(meta["name"], meta["unit"]),
+        "years": meta["years"],
+        "yearMin": meta["year_min"],
+        "yearMax": meta["year_max"],
+        "defaultYear": year,
+        "direction": direction,
+        "higherBetter": direction not in ("lower_better", "higher_worse"),
+        "scoreable": scoreable,
+        "canonical": canonical_path,
+        "regions": [
+            {"key": key, "name": name}
+            for key, name in sorted(region_names.items(), key=lambda kv: kv[1])
+        ],
+        "matrix": matrix,
+        "ramp": {"from": [0xE7, 0xEC, 0xF3], "to": [0x15, 0x23, 0x3B]},
+    }
+
+    # Previous / next indicator within the same theme, so the page keeps the
+    # atlas dashboard's sibling navigation (server-rendered, plain canonical links).
+    theme_siblings = sorted(
+        (
+            {"id": item["id"], "name": item["name"], "path": item["path"]}
+            for item in get_atlas_catalog()["indicators"]
+            if item["theme"] == meta["theme"]
+        ),
+        key=lambda item: item["name"].lower(),
+    )
+    sibling_index = next(
+        (i for i, item in enumerate(theme_siblings) if str(item["id"]) == str(meta["id"])),
+        None,
+    )
+    sibling_prev = theme_siblings[sibling_index - 1] if sibling_index else None
+    sibling_next = (
+        theme_siblings[sibling_index + 1]
+        if sibling_index is not None and sibling_index < len(theme_siblings) - 1
+        else None
+    )
+
+    # Bar length reference for the ranking (same rule as the atlas Ranking).
+    bar_max = max((row["value"] for row in values if row["value"] is not None), default=0)
+
+    # Exploration states (?anno=, ?regione=) are the same object, not a new page:
+    # they never enter the index or sitemap and the canonical stays the base URL.
+    explore_state = seo_policy.has_explore_params(request.args)
+    noindex = (not is_indexable) or explore_state
+
     response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
@@ -338,6 +399,11 @@ def indicator_page(slug):
         annual_note=annual_note,
         trend_note=trend_note,
         is_indexable=is_indexable,
+        noindex=noindex,
+        explore_data=explore_data,
+        sibling_prev=sibling_prev,
+        sibling_next=sibling_next,
+        bar_max=bar_max,
         map_colors=map_colors,
         spark_points=spark_points,
         page_intro=indicator_notes.indicator_page_intro(
@@ -360,7 +426,7 @@ def indicator_page(slug):
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{canonical_path}",
     ))
-    if not is_indexable:
+    if noindex:
         response.headers["X-Robots-Tag"] = "noindex, follow"
     return response
 
@@ -434,125 +500,20 @@ def regions_index():
 
 @app.route("/temi")
 def themes_index():
-    groups = _themes_index_groups()
-    total = sum(group["indicator_count"] for group in groups)
+    areas = _themes_index_areas()
     indicators = get_catalog()["indicators"]
-    facts = {
-        "areas": len(groups),
-        "themes": sum(len(group["themes"]) for group in groups),
-        "indicators": total,
-        "year_min": min(item["year_min"] for item in indicators),
-        "year_max": max(item["year_max"] for item in indicators),
-    }
+    total = len(indicators)
     return render_template(
         "themes_index.html",
-        groups=groups,
+        areas=areas,
         total=total,
-        facts=facts,
+        theme_total=sum(area["theme_count"] for area in areas),
+        year_min=min(item["year_min"] for item in indicators),
+        year_max=max(item["year_max"] for item in indicators),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/temi",
     )
-
-
-@cache.memoize(timeout=3600)
-def _themes_index_groups():
-    """Enriched /temi index: every theme grouped by macro-area with its indicator
-    list, an illustrative average-trend sparkline, and the leading/trailing region.
-
-    The lead/lag standing uses the same oriented-percentile mean as the home
-    'Temi e aree' cards (best = 1.0), but only over scoreable indicators, so a
-    theme made purely of contextual indicators renders without a standing rather
-    than being dropped from the index. The sparkline averages each indicator's
-    national-average series after normalising to 0..1 (up = improving); it is an
-    illustrative composite, aligned by point index, not an official series."""
-    matrix = profiles._percentile_matrix()
-    meta = profiles._indicator_meta()
-
-    # Build card details from the unified atlas catalog (numeric + BES +
-    # Multiscopo), the same source as the macro-area counts and theme links.
-    # Using the legacy territorial get_catalog() here left themes made only of
-    # BES/Multiscopo indicators (e.g. Benessere soggettivo) with a nonzero count
-    # but no names, sparkline, or standing.
-    by_theme = defaultdict(list)
-    for item in get_atlas_catalog()["indicators"]:
-        by_theme[item["theme"]].append(item)
-
-    groups = []
-    for group in atlas_themes_by_macro_area():
-        themes = []
-        for t in group["themes"]:
-            items = sorted(
-                by_theme.get(t["theme"], []),
-                key=lambda i: (not i["complete"], i["name"].lower()),
-            )
-            names = [i["name"] for i in items]
-            standing = _theme_standing(items, matrix, meta)
-            themes.append({
-                "theme": t["theme"],
-                "path": t["path"],
-                "indicator_count": t["indicator_count"],
-                "indicators": names[:5],
-                "extra_count": max(0, len(names) - 5),
-                "spark_points": _theme_spark_points(items),
-                "lead": standing[0],
-                "lag": standing[1],
-            })
-        groups.append({
-            "macro_area": group["macro_area"],
-            "indicator_count": group["indicator_count"],
-            "themes": themes,
-        })
-    return groups
-
-
-def _theme_standing(items, matrix, meta):
-    """(lead_region, lag_region) by mean oriented percentile over the theme's
-    scoreable indicators, or (None, None) when none are scoreable."""
-    totals = {}  # region_key -> [sum_oriented, count]
-    for item in items:
-        info = meta.get(item["id"])
-        if not info or info["direction"] not in profiles.SCOREABLE_DIRECTIONS:
-            continue
-        for region_key, percentile in matrix.get(item["id"], {}).items():
-            oriented = profiles._oriented(percentile, info["direction"])
-            acc = totals.setdefault(region_key, [0.0, 0])
-            acc[0] += oriented
-            acc[1] += 1
-    ranked = sorted(
-        ((key, total / n) for key, (total, n) in totals.items() if n),
-        key=lambda kv: kv[1],
-        reverse=True,
-    )
-    if not ranked:
-        return None, None
-    return profiles.region_name(ranked[0][0]), profiles.region_name(ranked[-1][0])
-
-
-def _theme_spark_points(items):
-    """SVG polyline for a theme's illustrative average trend: each indicator's
-    national-average series normalised to 0..1 (inverted so up = improving),
-    averaged across indicators by point index."""
-    series = []
-    for item in items:
-        values = [p["value"] for p in (item.get("spark") or []) if p.get("value") is not None]
-        if len(values) < 2:
-            continue
-        lo, hi = min(values), max(values)
-        span = (hi - lo) or 1.0
-        invert = (item.get("explain") or {}).get("direction") in ("lower_better", "higher_worse")
-        normalised = [(v - lo) / span for v in values]
-        if invert:
-            normalised = [1.0 - n for n in normalised]
-        series.append(normalised)
-    if not series:
-        return ""
-    length = min(len(s) for s in series)
-    averaged = [
-        {"year": index, "value": sum(s[index] for s in series) / len(series)}
-        for index in range(length)
-    ]
-    return indicator_notes.sparkline_points(averaged, width=160, height=42)
 
 
 # User-facing URL level (plural) -> engine level (singular).
@@ -1573,45 +1534,132 @@ def _home_qol_preview():
     }
 
 
+def _region_leaders(matrix, meta, keep):
+    """Region in front and region trailing over the mean oriented score across
+    the scoreable indicators for which keep(info) is true (best = 1.0). Returns
+    (best_name, worst_name), or (None, None) when nothing matched is scoreable.
+    Purely derived from the data, no placeholder leaders."""
+    totals = {}  # region_key -> [sum_oriented, count]
+    for ind_id, by_region in matrix.items():
+        info = meta.get(ind_id)
+        if not info or not keep(info):
+            continue
+        direction = info["direction"]
+        if direction not in profiles.SCOREABLE_DIRECTIONS:
+            continue
+        for region_key, percentile in by_region.items():
+            oriented = profiles._oriented(percentile, direction)
+            acc = totals.setdefault(region_key, [0.0, 0])
+            acc[0] += oriented
+            acc[1] += 1
+    ranked = sorted(
+        ((key, total / n) for key, (total, n) in totals.items() if n),
+        key=lambda kv: kv[1],
+        reverse=True,
+    )
+    if not ranked:
+        return None, None
+    return profiles.region_name(ranked[0][0]), profiles.region_name(ranked[-1][0])
+
+
+def _area_leaders(area, matrix, meta):
+    """Region in front / trailing for a macro-area."""
+    return _region_leaders(matrix, meta, lambda info: info["macro_area"] == area)
+
+
+def _theme_leaders(theme, matrix, meta):
+    """Region in front / trailing for a single theme."""
+    return _region_leaders(matrix, meta, lambda info: info["theme"] == theme)
+
+
 def _home_themes_preview():
     """'Temi e aree' cards: for each macro-area, its indicator/theme counts plus
-    the region in front and the region trailing, computed as the mean oriented
-    score across the area's scoreable indicators (best = 1.0). Purely derived
-    from the data, no placeholder leaders."""
+    the region in front and the region trailing."""
     matrix = profiles._percentile_matrix()
     meta = profiles._indicator_meta()
     cards = []
     for group in atlas_themes_by_macro_area():
-        area = group["macro_area"]
-        totals = {}  # region_key -> [sum_oriented, count]
-        for ind_id, by_region in matrix.items():
-            info = meta.get(ind_id)
-            if not info or info["macro_area"] != area:
-                continue
-            direction = info["direction"]
-            if direction not in profiles.SCOREABLE_DIRECTIONS:
-                continue
-            for region_key, percentile in by_region.items():
-                oriented = profiles._oriented(percentile, direction)
-                acc = totals.setdefault(region_key, [0.0, 0])
-                acc[0] += oriented
-                acc[1] += 1
-        ranked = sorted(
-            ((key, total / n) for key, (total, n) in totals.items() if n),
-            key=lambda kv: kv[1],
-            reverse=True,
-        )
-        if not ranked:
+        best, worst = _area_leaders(group["macro_area"], matrix, meta)
+        if best is None:
             continue
         cards.append({
-            "area": area,
+            "area": group["macro_area"],
             "count": group["indicator_count"],
             "theme_count": len(group["themes"]),
             "themes": [t["theme"] for t in group["themes"][:4]],
-            "best": profiles.region_name(ranked[0][0]),
-            "worst": profiles.region_name(ranked[-1][0]),
+            "best": best,
+            "worst": worst,
         })
     return cards
+
+
+def _themes_index_areas():
+    """Full '/temi' page: every macro-area with its themes, and for each theme
+    the indicator count, a preview of its indicators, an illustrative
+    average-trend sparkline and the region in front / trailing (per-theme
+    standings), matching the design's themes index."""
+    matrix = profiles._percentile_matrix()
+    meta = profiles._indicator_meta()
+    # Card details from the unified atlas catalog (numeric + BES + Multiscopo),
+    # the same source as the macro-area counts, so themes made only of BES/
+    # Multiscopo indicators (e.g. Benessere soggettivo) get names and sparkline.
+    by_theme = {}
+    for item in get_atlas_catalog()["indicators"]:
+        by_theme.setdefault(item["theme"], []).append(item)
+    areas = []
+    for group in atlas_themes_by_macro_area():
+        themes = []
+        for theme in group["themes"]:
+            lead, lag = _theme_leaders(theme["theme"], matrix, meta)
+            items = sorted(
+                by_theme.get(theme["theme"], []),
+                key=lambda i: (not i["complete"], i["name"].lower()),
+            )
+            names = [i["name"] for i in items]
+            themes.append({
+                "theme": theme["theme"],
+                "path": theme["path"],
+                "indicator_count": theme["indicator_count"],
+                "indicators": names[:5],
+                "extra_count": max(0, len(names) - 5),
+                "spark_points": _theme_spark_points(items),
+                "lead": lead,
+                "lag": lag,
+            })
+        areas.append({
+            "area": group["macro_area"],
+            "count": group["indicator_count"],
+            "theme_count": len(group["themes"]),
+            "themes": themes,
+        })
+    return areas
+
+
+def _theme_spark_points(items):
+    """SVG polyline for a theme's illustrative average trend: each indicator's
+    national-average series normalised to 0..1 (inverted so up = improving),
+    averaged across indicators by point index. Illustrative composite, not an
+    official series."""
+    series = []
+    for item in items:
+        values = [p["value"] for p in (item.get("spark") or []) if p.get("value") is not None]
+        if len(values) < 2:
+            continue
+        lo, hi = min(values), max(values)
+        span = (hi - lo) or 1.0
+        invert = (item.get("explain") or {}).get("direction") in ("lower_better", "higher_worse")
+        normalised = [(v - lo) / span for v in values]
+        if invert:
+            normalised = [1.0 - n for n in normalised]
+        series.append(normalised)
+    if not series:
+        return ""
+    length = min(len(s) for s in series)
+    averaged = [
+        {"year": index, "value": sum(s[index] for s in series) / len(series)}
+        for index in range(length)
+    ]
+    return indicator_notes.sparkline_points(averaged, width=160, height=42)
 
 
 def _home_compare_preview():

@@ -2,58 +2,122 @@
 {% set active_nav = 'temi' %}
 
 {% block title %}I temi degli indicatori regionali · {{ site_name }}{% endblock %}
-{% block description %}Esplora {{ total }} indicatori Istat per tema: lavoro, istruzione, ambiente, salute, trasporti, qualità della vita e divari regionali.{% endblock %}
+{% block description %}Esplora {{ total }} indicatori Istat per macro-area e tema: lavoro, istruzione, ambiente, salute, trasporti, qualità della vita e divari regionali.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "I temi degli indicatori territoriali",
+  "description": {{ ('Indicatori Istat delle regioni italiane raggruppati per macro-area e tema.') | tojson }},
+  "url": {{ canonical | tojson }}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Temi", "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+{% endblock %}
 
 {% block content %}
-<article class="page page-index wrap">
-  <h1>I temi</h1>
-  <p class="page-lead">{{ total }} indicatori del catalogo unico Istat per leggere divari e qualità della vita nelle regioni italiane. Scegli un tema per aprire tutte le serie, con fonte, mappe, classifiche e andamenti negli anni.</p>
+<article class="themes-index">
+  <section class="themes-hero">
+    <p class="eyebrow">Temi</p>
+    <h1>I temi</h1>
+    <p class="region-hero__sum">{{ total }} indicatori del catalogo unico Istat per leggere divari e qualità della vita nelle regioni italiane. Scegli un tema per aprire tutte le serie, con fonte, mappe, classifiche e andamenti negli anni.</p>
+  </section>
 
   <div class="facts">
-    <div class="fact"><small>Aree</small><strong>{{ facts.areas }}</strong></div>
-    <div class="fact"><small>Temi</small><strong>{{ facts.themes }}</strong></div>
+    <div class="fact"><small>Aree</small><strong>{{ areas | length }}</strong></div>
+    <div class="fact"><small>Temi</small><strong>{{ theme_total }}</strong></div>
     <div class="fact"><small>Indicatori</small><strong>{{ total }}</strong></div>
-    <div class="fact"><small>Copertura</small><strong>{{ facts.year_min }}<span class="fact__range"> - {{ facts.year_max }}</span></strong></div>
+    <div class="fact"><small>Copertura</small><strong>{{ year_min }}<span class="fact__range"> &ndash; {{ year_max }}</span></strong></div>
   </div>
 
-  {% for group in groups %}
-  <section class="theme-group">
-    <h2>{{ group.macro_area }} <span class="theme-group__count">{{ group.indicator_count }} indicatori</span></h2>
-    <div class="theme-index-grid">
-      {% for t in group.themes %}
-      <a class="theme-index-card" href="{{ t.path }}">
-        <div class="theme-index-card__main">
+  <div class="theme-search">
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="search" id="theme-filter" placeholder="Cerca un tema..." autocomplete="off" aria-label="Cerca un tema">
+    </div>
+  </div>
+
+  <p class="card-empty" id="theme-empty" hidden>Nessun tema corrisponde alla ricerca.</p>
+
+  <div id="theme-groups">
+    {% for a in areas %}
+    <section class="theme-group" data-area>
+      <div class="theme-group__head">
+        <h2>{{ a.area }}</h2>
+        <span class="theme-group__count">{{ a.count }} {{ 'indicatore' if a.count == 1 else 'indicatori' }}</span>
+      </div>
+      <div class="theme-index-grid">
+        {% for t in a.themes %}
+        <a class="theme-index-card" href="{{ t.path }}" data-theme="{{ t.theme | lower }}">
           <strong>{{ t.theme }}</strong>
           <small>{{ t.indicator_count }} {{ 'indicatore' if t.indicator_count == 1 else 'indicatori' }}</small>
+          {% if t.indicators %}
           <ul class="theme-index-card__inds">
             {% for name in t.indicators %}<li>{{ name }}</li>{% endfor %}
             {% if t.extra_count %}<li class="theme-index-card__more">+{{ t.extra_count }} altri indicatori</li>{% endif %}
           </ul>
-        </div>
-        <div class="theme-index-card__aside">
-          {% if t.spark_points %}
-          <span class="theme-index-card__sparklabel">Andamento medio</span>
-          <svg class="theme-index-card__spark" viewBox="0 0 160 42" width="160" height="42" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ t.spark_points }}"></polyline></svg>
           {% endif %}
-          {% if t.lead and t.lag %}
+          {% if t.spark_points %}
+          <div class="theme-index-card__spark-wrap">
+            <span class="theme-index-card__sparklabel">Andamento medio</span>
+            <svg class="theme-index-card__spark" viewBox="0 0 160 42" width="160" height="42" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ t.spark_points }}"></polyline></svg>
+          </div>
+          {% endif %}
+          {% if t.lead %}
           <div class="theme-index-card__standing">
             <span><i class="dot dot--lead"></i>{{ t.lead }}</span>
             <span><i class="dot dot--lag"></i>{{ t.lag }}</span>
           </div>
           {% endif %}
-        </div>
-      </a>
-      {% endfor %}
-    </div>
-  </section>
-  {% endfor %}
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  </div>
 
-  <aside class="indicator-cta">
-    <div>
+  <div class="explore-band">
+    <div class="explore-band__text">
       <small>Ancora curioso?</small>
       <strong>Metti alla prova quello che sai con Quiz Italia.</strong>
     </div>
-    <a href="/quiz">Gioca ora &rarr;</a>
-  </aside>
+    <a class="explore-band__cta" href="/quiz">Gioca ora <span aria-hidden="true">&rarr;</span></a>
+  </div>
 </article>
+
+<script>
+  (function () {
+    var input = document.getElementById("theme-filter");
+    if (!input) return;
+    var groups = Array.prototype.slice.call(document.querySelectorAll("#theme-groups .theme-group"));
+    var empty = document.getElementById("theme-empty");
+    input.addEventListener("input", function () {
+      var q = input.value.trim().toLowerCase();
+      var anyVisible = false;
+      groups.forEach(function (group) {
+        var cards = Array.prototype.slice.call(group.querySelectorAll(".theme-index-card"));
+        var groupVisible = false;
+        cards.forEach(function (card) {
+          var match = !q || (card.getAttribute("data-theme") || "").indexOf(q) !== -1;
+          card.hidden = !match;
+          if (match) groupVisible = true;
+        });
+        group.hidden = !groupVisible;
+        if (groupVisible) anyVisible = true;
+      });
+      if (empty) empty.hidden = anyVisible;
+    });
+  })();
+</script>
 {% endblock %}
