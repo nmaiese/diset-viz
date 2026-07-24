@@ -341,6 +341,7 @@ class QuizCompareTest(unittest.TestCase):
         core_ids = {item["id"] for item in get_catalog()["indicators"] if profiles.is_core(item)}
         core_ids.update(item["id"] for item in quiz._bes_quiz_indicators())
         core_ids.update(item["id"] for item in quiz._multiscopo_quiz_indicators())
+        core_ids.update(item["id"] for item in quiz._eurostat_quiz_indicators())
         for _ in range(40):
             round_ = quiz.compare_round(4)
             self.assertIn(round_["indicator"]["id"], core_ids)

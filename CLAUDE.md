@@ -16,13 +16,16 @@ quality-of-life section for regions and provinces.
   `/qualita-della-vita/metodologia` — regional quality-of-life pages.
 - `/qualita-della-vita/province` — provincial quality-of-life ranking from Istat
   BES dei Territori, available when the provincial artifacts are present.
-- `/indicatore/<acronimo>-<id>/<slug>` — every atlas indicator, from every source
-  family, lives here under a source acronym (`ter` Istat territoriali, `bes` Istat
-  benessere, `ims` Istat vita quotidiana delle famiglie, `eur` Eurostat). Legacy
-  URLs (`/indicatore/<num>-<slug>` and `/qualita-della-vita/indicatore/...`) 301 to
-  it. Source naming and URL building have a single source of truth in
-  `app/sources.py`: user-facing labels are institution-first plain names, never a
-  bare internal acronym. Do not hardcode family labels or indicator URLs elsewhere.
+- `/indicatore/<slug>/<acronimo>-<id>` — every atlas indicator, from every source
+  family, lives here. Keyword-first for SEO: the human slug leads, the resolving
+  code trails under a source acronym (`ter` Istat territoriali, `bes` Istat
+  benessere, `ims` Istat vita quotidiana delle famiglie, `eur` Eurostat). The code
+  is the id-carrying last segment, so the page survives a name (slug) change; the
+  slug is decorative and a wrong one 301s to canonical. Legacy URLs
+  (`/indicatore/<num>-<slug>` and `/qualita-della-vita/indicatore/...`) 301 to it.
+  Source naming and URL building have a single source of truth in `app/sources.py`:
+  user-facing labels are institution-first plain names, never a bare internal
+  acronym. Do not hardcode family labels or indicator URLs elsewhere.
 - `/legacy` — original D3 dashboard (do not break it).
 - `/api/catalog`, `/api/search`, `/api/indicator/<id>`,
   `/api/indicator/<id>/year/<year>` — JSON API for the atlas.

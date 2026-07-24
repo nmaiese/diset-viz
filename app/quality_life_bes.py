@@ -61,6 +61,14 @@ from app.quality_life import get_quality_life_categories, normalize_weights
 from app.quality_life_config import DEFAULT_PROFILE, QUALITY_LIFE_CATEGORIES, QUALITY_LIFE_PROFILES
 from app.quality_life_selection import BES_PREFIX, EUR_PREFIX, MULTI_PREFIX, regional_quality_life_selection
 
+# Compact source labels for the visible methodology breakdown.
+_SOURCE_SCORE_LABEL = {
+    "bes": "BES",
+    "territorial": "indicatori territoriali",
+    "multiscopo": "Multiscopo",
+    "eurostat": "Eurostat",
+}
+
 LEVELS = ("regione", "provincia")
 _DISPLAY_SPREAD = 12.0   # display = 50 + 12 * (standardised score), clipped to 0..100
 _TOP_CATEGORIES = 3
@@ -404,7 +412,7 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
                 else "Istat, BES dei Territori (Bes at local level)"
             ),
             "minimum_reference_year": (
-                {"bes": _REGIONAL_CURRENT_YEAR, "territorial": 2023, "multiscopo": 2023}
+                {"bes": _REGIONAL_CURRENT_YEAR, "territorial": 2023, "multiscopo": 2023, "eurostat": 2021}
                 if level == "regione" else None
             ),
             "territorial_level": "regioni" if level == "regione" else "province e città metropolitane",
@@ -420,6 +428,16 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
                 source: sum(item["source_family"] == source for item in meta.values())
                 for source in sorted({item["source_family"] for item in meta.values()})
             },
+            # Human-readable breakdown, data-driven so the visible methodology
+            # always lists exactly the source families actually in the score.
+            "source_breakdown": [
+                {"family": family, "label": _SOURCE_SCORE_LABEL.get(family, family), "count": count}
+                for family, count in sorted(
+                    ((f, sum(i["source_family"] == f for i in meta.values()))
+                     for f in {i["source_family"] for i in meta.values()}),
+                    key=lambda fc: (-fc[1], fc[0]),
+                )
+            ],
             "quality_checks": {"empty_categories": empty,
                                "unrated": [u["name"] for u in unrated]},
         },

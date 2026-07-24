@@ -107,8 +107,9 @@ def apply(decisions, dataset_rows, manifest_rows, descriptions):
     return dataset_rows, manifest_rows, sorted(desc_by_target.values(), key=lambda r: r["target_indicator_id"])
 
 
-def run(dry_run=False, dataset=EXTERNAL_DATASET, manifest=EXTERNAL_MANIFEST, descriptions=CURATED_DESCRIPTIONS):
-    decisions = curate.read_curation()
+def run(dry_run=False, dataset=EXTERNAL_DATASET, manifest=EXTERNAL_MANIFEST,
+        descriptions=CURATED_DESCRIPTIONS, curation_path=None):
+    decisions = curate.read_curation(curation_path)
     if not decisions:
         return {"applied": 0, "score_eligible": 0}
     dataset_rows = _read(dataset)

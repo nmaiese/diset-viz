@@ -106,16 +106,18 @@ def uncurated_targets(rows=None):
     return [target for target, scoreable in seen.items() if not scoreable]
 
 
-def read_curation(path=CURATION_PATH):
-    path = Path(path)
+def read_curation(path=None):
+    # Resolve CURATION_PATH at call time (not as a default) so tests can point
+    # the curation file elsewhere without ever risking the committed one.
+    path = Path(path) if path else CURATION_PATH
     if not path.exists():
         return []
     with path.open(encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle, delimiter=";"))
 
 
-def write_curation(rows, path=CURATION_PATH):
-    path = Path(path)
+def write_curation(rows, path=None):
+    path = Path(path) if path else CURATION_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
         "w", encoding="utf-8", newline="", delete=False, dir=path.parent

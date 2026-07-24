@@ -286,16 +286,22 @@ def methodology():
     )
 
 
-@app.route("/indicatore/<code>")
-@app.route("/indicatore/<code>/<path:slug>")
-def indicator_page(code, slug=None):
-    """Unified indicator page. Every family lives here under a source acronym
-    (ter/bes/ims/eur) in the first path segment; dispatch by family and 301 any
-    legacy or non-canonical URL to the canonical unified form."""
-    parsed = sources.parse_indicator_code(code)
+@app.route("/indicatore/<first>")
+@app.route("/indicatore/<first>/<second>")
+def indicator_page(first, second=None):
+    """Unified, keyword-first indicator page: /indicatore/<slug>/<acr>-<id>.
+
+    The resolving code (ter/bes/ims/eur + id) is the LAST segment; the slug leads
+    for SEO. Dispatch by family and 301 any legacy or non-canonical URL to the
+    canonical form."""
+    # New canonical: code is the last segment. Also tolerate the transitional
+    # code-first order (/indicatore/<code>/<slug>) so nothing 404s mid-rollout.
+    parsed = sources.parse_indicator_code(second if second is not None else first)
+    if parsed is None and second is not None:
+        parsed = sources.parse_indicator_code(first)
     if parsed is None:
-        # Pre-migration territorial URL (bare numeric id): 301 to the unified form.
-        raw_id = sources.legacy_territorial_id(code)
+        # Pre-migration territorial URL (single bare numeric id): 301 to canonical.
+        raw_id = sources.legacy_territorial_id(first)
         if raw_id is None:
             abort(404)
         payload = get_atlas_indicator(raw_id)

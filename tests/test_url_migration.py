@@ -20,10 +20,11 @@ class SourceRegistryTest(unittest.TestCase):
             self.assertNotIn(sources.family_label(family).lower(), {"bes", "multiscopo", "multifonte"})
 
     def test_url_round_trip_handles_dashed_ids(self):
-        # BES variant ids contain dashes; they must survive the URL round trip.
+        # Keyword-first: the slug leads, the resolving code is the last segment.
+        # BES variant ids contain dashes; they must survive the round trip.
         url = sources.indicator_url("bes", "09PAE009-N25", "verde-storico")
-        self.assertEqual(url, "/indicatore/bes-09PAE009-N25/verde-storico")
-        code = url.split("/")[2]
+        self.assertEqual(url, "/indicatore/verde-storico/bes-09PAE009-N25")
+        code = url.split("/")[-1]
         self.assertEqual(sources.parse_indicator_code(code), ("bes", "09PAE009-N25"))
 
     def test_parse_rejects_unknown_and_legacy(self):

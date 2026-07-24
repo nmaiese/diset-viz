@@ -29,7 +29,8 @@ class EurostatAtlasFamilyTest(unittest.TestCase):
         self.assertEqual(entry["catalog_family"], "eurostat")
         self.assertEqual(entry["catalog_family_label"], "Eurostat, statistiche regionali")
         self.assertEqual(entry["theme"], "Ricerca, innovazione e digitale")
-        self.assertTrue(entry["path"].startswith("/indicatore/eur-rd_e_gerdreg/"))
+        self.assertTrue(entry["path"].startswith("/indicatore/"))
+        self.assertTrue(entry["path"].endswith("/eur-rd_e_gerdreg"))
         # The Eurostat family is offered as a source filter with a plain label.
         families = {f["id"]: f["label"] for f in catalog["source_families"]}
         self.assertEqual(families.get("eurostat"), "Eurostat, statistiche regionali")

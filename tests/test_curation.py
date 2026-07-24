@@ -46,9 +46,12 @@ class DirectionEvidenceTest(unittest.TestCase):
 
 class ApplyCurationTest(unittest.TestCase):
     def _setup(self, tmp, decision):
+        # Everything (including the curation file) lives under tmp and is passed
+        # explicitly, so the committed data/discovery/curation.csv is never touched.
         ds = Path(tmp) / "external.csv"
         mf = Path(tmp) / "manifest.csv"
         desc = Path(tmp) / "desc.csv"
+        curation = Path(tmp) / "curation.csv"
         ds.write_text(DATASET_HEADER + "\n" + _dataset_row("Lazio", "1,0") + "\n"
                       + _dataset_row("Molise", "0,4") + "\n", encoding="utf-8")
         mf_cols = {c: "" for c in apply_curation.MANIFEST_COLUMNS}
@@ -58,19 +61,18 @@ class ApplyCurationTest(unittest.TestCase):
                         "score_eligible": "false", "status": "proposed"})
         mf.write_text(MANIFEST_HEADER + "\n" + ";".join(mf_cols[c] for c in apply_curation.MANIFEST_COLUMNS) + "\n",
                       encoding="utf-8")
-        curate.CURATION_PATH = Path(tmp) / "curation.csv"
-        curate.write_curation([decision])
-        return ds, mf, desc
+        curate.write_curation([decision], path=curation)
+        return ds, mf, desc, curation
 
     def test_apply_flips_score_and_direction_and_writes_description(self):
         with TemporaryDirectory() as tmp:
-            ds, mf, desc = self._setup(tmp, {
+            ds, mf, desc, curation = self._setup(tmp, {
                 "target_indicator_id": "eur:demo", "reviewed_direction": "higher_better",
                 "direction_verdict": "confermato", "reviewed_category": "ricerca_innovazione_digitale",
                 "score_eligible": "true", "description": "Testo rivisto.", "value_explanation": "Unita.",
                 "reviewer_notes": "ok", "reviewed_at": "2026-07-24",
             })
-            result = apply_curation.run(dataset=ds, manifest=mf, descriptions=desc)
+            result = apply_curation.run(dataset=ds, manifest=mf, descriptions=desc, curation_path=curation)
             self.assertEqual(result["score_eligible"], 1)
 
             with ds.open(encoding="utf-8", newline="") as h:
@@ -87,12 +89,12 @@ class ApplyCurationTest(unittest.TestCase):
 
     def test_score_eligible_requires_scoreable_direction(self):
         with TemporaryDirectory() as tmp:
-            ds, mf, desc = self._setup(tmp, {
+            ds, mf, desc, curation = self._setup(tmp, {
                 "target_indicator_id": "eur:demo", "reviewed_direction": "contextual",
                 "score_eligible": "true", "reviewed_at": "2026-07-24",
             })
             with self.assertRaises(SystemExit):
-                apply_curation.run(dataset=ds, manifest=mf, descriptions=desc)
+                apply_curation.run(dataset=ds, manifest=mf, descriptions=desc, curation_path=curation)
 
 
 if __name__ == "__main__":

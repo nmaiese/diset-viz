@@ -86,10 +86,21 @@ def internal_id(family, raw_id):
     return f"{SOURCES[family]['internal_prefix']}{raw_id}"
 
 
+def indicator_code(family, raw_id):
+    """The resolving segment: <acronym>-<raw_id> (e.g. 'eur-rd_e_gerdreg')."""
+    return f"{acronym(family)}-{raw_id}"
+
+
 def indicator_url(family, raw_id, slug_tail=""):
-    """Canonical unified URL: /indicatore/<acronym>-<raw_id>[/<slug_tail>]."""
-    code = f"{acronym(family)}-{raw_id}"
-    return f"{INDICATOR_ROOT}/{code}/{slug_tail}" if slug_tail else f"{INDICATOR_ROOT}/{code}"
+    """Canonical unified URL, keyword-first for SEO: the human slug leads and the
+    resolving code trails so the id is stable even if the name (slug) changes.
+
+        /indicatore/<slug>/<acronym>-<raw_id>
+
+    With no slug we fall back to the code alone; the page then 301s to the
+    canonical slug-first form."""
+    code = indicator_code(family, raw_id)
+    return f"{INDICATOR_ROOT}/{slug_tail}/{code}" if slug_tail else f"{INDICATOR_ROOT}/{code}"
 
 
 def parse_indicator_code(code):

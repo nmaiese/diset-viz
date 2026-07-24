@@ -34,9 +34,11 @@ senza merge.
 - `app/eurostat_atlas.py` adatta le righe `eur:` del layer esterno al contratto
   API dell'atlante, federato in `app/atlas_catalog.py`
   (`get_atlas_catalog`/`get_atlas_indicator`/`source_families`).
-- URL unificati: ogni indicatore è sotto `/indicatore/<acr>-<id>/<slug>`
-  (`ter`/`bes`/`ims`/`eur`), i vecchi URL fanno 301. Naming e URL centralizzati in
-  `app/sources.py` (etichette istituzione-first, niente gergo).
+- URL unificati **keyword-first**: `/indicatore/<slug>/<acr>-<id>`
+  (`ter`/`bes`/`ims`/`eur`). Lo slug (keyword) apre l'URL per la SEO, il codice
+  con l'id è l'ultimo segmento e risolve in modo stabile anche se il nome cambia.
+  I vecchi URL fanno 301. Naming e URL centralizzati in `app/sources.py`
+  (etichette istituzione-first, niente gergo).
 
 ### Fase 3 — Curatore (lavoro qualitativo)
 - `scripts/curate.py` mostra l'evidenza sul **verso** (regioni in cima/in fondo).
@@ -99,8 +101,9 @@ vita del processo). Il frontend NON va ricostruito per i soli dati (la SPA legge
 
 ## Gotcha per la prossima sessione
 
-- Gli id BES contengono trattini (es. `09PAE009-N25`): per questo lo slug URL è un
-  **segmento separato** (`/indicatore/bes-09PAE009-N25/<slug>`), non `-<slug>`.
+- Gli id BES contengono trattini (es. `09PAE009-N25`): per questo il codice
+  `<acr>-<id>` è un **segmento separato in coda** (`/indicatore/<slug>/bes-09PAE009-N25`),
+  e lo slug non è mai fuso con l'id.
 - Non hardcodare etichette fonte o URL indicatore: passano tutti da
   `app/sources.py`.
 - Gli script `scripts/*discovery*/curate/promote/eurostat_source` sono **stdlib

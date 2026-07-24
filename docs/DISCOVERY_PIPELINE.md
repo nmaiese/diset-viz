@@ -98,7 +98,7 @@ badge). Per pubblicare un indicatore Eurostat **nuovo** come voce autonoma c'è
 pagina, ricerca, categoria, direzione, URL e sitemap funzionano senza casi
 speciali. È federato in `app/atlas_catalog.py` (`get_atlas_catalog`,
 `get_atlas_indicator`, `source_families`) e la pagina è servita dalla route
-unificata `/indicatore/eur-<dataset>/<slug>`. Le righe *enriching* (Eurostat che
+unificata keyword-first `/indicatore/<slug>/eur-<dataset>`. Le righe *enriching* (Eurostat che
 duplica un indicatore Istat) NON diventano voci separate: restano agganciate all'id
 Istat che puntano.
 
