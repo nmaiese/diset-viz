@@ -45,15 +45,16 @@ MANIFEST_COLUMNS = [
     "coverage", "direction", "score_eligible", "status", "review_notes",
 ]
 
-# A real overlap enriches an existing indicator; a genuinely new series is staged
-# but stays out of the atlas until the catalog wiring (phase 2) is done.
+# A real overlap enriches an existing indicator (target = the existing id); a
+# genuinely new series becomes a standalone atlas entry under the "eur:" public
+# id namespace, wired into the federated catalog by app/eurostat_atlas.py.
 ENRICHING_MATCHES = {"exact", "compatible", "proxy"}
 
 
 def _target_id(candidate):
     if candidate["definition_match"] in ENRICHING_MATCHES and candidate.get("duplicate_of"):
         return candidate["duplicate_of"]
-    return candidate["candidate_id"]
+    return f"eur:{candidate['source_indicator_id']}"
 
 
 def _bool(value):
@@ -70,7 +71,7 @@ def _external_rows_for(candidate, offline, refresh):
     note = (
         "Eurostat NUTS2 arricchisce un indicatore esistente. Nessuna sostituzione BES/atlas."
         if enriches
-        else "Indicatore Eurostat nuovo: richiede il wiring nel catalogo federato (fase 2) prima della pubblicazione in atlante."
+        else "Voce d'atlante Eurostat autonoma (namespace eur:). Fuori dallo scoring finche la direzione non e revisionata a mano."
     )
     out = []
     for row in rows:
@@ -90,7 +91,9 @@ def _external_rows_for(candidate, offline, refresh):
             "quality_life_category": candidate["proposed_quality_life_category"],
             "direction": candidate["proposed_direction"],
             "definition_match": candidate["definition_match"],
-            "atlas_eligible": _bool(enriches),
+            # Both paths are browsable in the atlas; only a reviewed overlap feeds
+            # regional profiles, and nothing feeds the score without manual review.
+            "atlas_eligible": _bool(True),
             "profile_eligible": _bool(enriches),
             "score_eligible": _bool(False),
             "coverage": row["coverage"],

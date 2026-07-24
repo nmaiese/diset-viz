@@ -164,6 +164,26 @@ class QueueRoundTrip(unittest.TestCase):
                 mf_rows = list(csv.DictReader(handle, delimiter=";"))
             self.assertTrue(all(r["status"] == "proposed" for r in mf_rows))
 
+    def test_promote_new_indicator_gets_eur_namespace(self):
+        with TemporaryDirectory() as tmp:
+            self._patched_queue(tmp)
+            discover_candidates.run("eurostat_regional", offline=True)
+            rows = discovery.read_candidates()
+            for row in rows:
+                if row["candidate_id"] == "eurostat_regional:rd_e_gerdreg":  # definition_match == new
+                    row["triage_status"] = "approved"
+            discovery.write_candidates(rows)
+
+            out_ds = Path(tmp) / "external.csv"
+            out_mf = Path(tmp) / "manifest.csv"
+            promote_candidates.run(offline=True, out_dataset=out_ds, out_manifest=out_mf)
+            with out_ds.open(encoding="utf-8", newline="") as handle:
+                ds_rows = list(csv.DictReader(handle, delimiter=";"))
+            # A genuinely new series becomes a standalone atlas entry under eur:.
+            self.assertTrue(all(r["target_indicator_id"] == "eur:rd_e_gerdreg" for r in ds_rows))
+            self.assertTrue(all(r["atlas_eligible"] == "true" for r in ds_rows))
+            self.assertTrue(all(r["score_eligible"] == "false" for r in ds_rows))
+
 
 if __name__ == "__main__":
     unittest.main()

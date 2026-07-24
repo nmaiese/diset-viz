@@ -82,23 +82,25 @@ Colonne in `scripts/discovery.py:CANDIDATE_COLUMNS`. I campi chiave:
 
 - **`compatible` / `proxy` con `duplicate_of`**: arricchisce l'indicatore esistente
   (`target_indicator_id = duplicate_of`), aggiunge freschezza e provenienza
-  multifonte. `score_eligible=false` sempre (la valutazione resta manuale). Questo
-  funziona **oggi** con il layer esterno.
-- **`new`**: viene messo in staging con `atlas_eligible=false` e una nota che
-  segnala il lavoro di **fase 2** (vedi sotto). Non compare in atlante finché non
-  è collegato al catalogo federato.
+  multifonte. `score_eligible=false` sempre (la valutazione resta manuale).
+- **`new`**: diventa una **voce d'atlante autonoma** con id nel namespace
+  `eur:<dataset>` e `atlas_eligible=true`. Resta fuori dai profili regionali
+  (`profile_eligible=false`) e dallo scoring (`score_eligible=false`) finché la
+  direzione non è revisionata a mano.
 
-## Fase 2: indicatori nuovi come voci di catalogo di prima classe
+## Fase 2 (implementata): indicatori nuovi come voci di catalogo di prima classe
 
-Oggi `app/external_data.py` **arricchisce** indicatori già presenti (freschezza,
-fonti, badge), non crea da solo nuove voci di catalogo: un `target_indicator_id`
-senza controparte territoriale/BES/Multiscopo resta inerte per l'atlante. Per
-pubblicare un indicatore Eurostat **nuovo** come voce autonoma servirà un
-adattatore in `app/atlas_catalog.py` che legga il layer esterno con
-`atlas_eligible=true` e lo unisca al catalogo federato (mappa, ricerca, serie
-storica, categoria, direzione, URL e slug), esattamente come già fanno gli
-adattatori BES e Multiscopo. È un passo ben delimitato, lasciato fuori da questo
-scaffolding di proposito: la coda e la promozione lo preparano, la PR lo completa.
+`app/external_data.py` **arricchisce** indicatori già presenti (freschezza, fonti,
+badge). Per pubblicare un indicatore Eurostat **nuovo** come voce autonoma c'è
+`app/eurostat_atlas.py`: legge dal layer esterno le righe con
+`target_indicator_id` nel namespace `eur:` e `atlas_eligible=true` e le adatta al
+**contratto API dell'atlante** identico a quello territoriale/BES, così mappa,
+pagina, ricerca, categoria, direzione, URL e sitemap funzionano senza casi
+speciali. È federato in `app/atlas_catalog.py` (`get_atlas_catalog`,
+`get_atlas_indicator`, `source_families`) e la pagina è servita dalla route
+unificata `/indicatore/eur-<dataset>/<slug>`. Le righe *enriching* (Eurostat che
+duplica un indicatore Istat) NON diventano voci separate: restano agganciate all'id
+Istat che puntano.
 
 ## Fonte pilota: Eurostat regionale (NUTS2)
 
@@ -153,7 +155,6 @@ dati di produzione non vengono mai toccati.
 
 ## Prossime fasi
 
-- Fase 2: adattatore catalogo per gli indicatori esterni `new` (sopra).
 - Estendere la watchlist ad altre fonti Eurostat e istituzionali, poi al livello
   provinciale (NUTS3), sempre con priorità al regionale fresco.
 - Implementare lo scouting opt-in per proporre nuovi domini all'allowlist.

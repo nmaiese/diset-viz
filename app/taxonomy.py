@@ -20,7 +20,10 @@ CANONICAL_CATEGORIES = {
             "opportunità offerte dai territori."
         ),
         "macro_area": "Economia e opportunità",
-        "themes": ["Benessere economico", "Reddito e ricchezza", "Inclusione sociale", "Abitazione"],
+        "themes": [
+            "Benessere economico", "Reddito e ricchezza", "Inclusione sociale", "Abitazione",
+            "Conti economici regionali (Eurostat)",
+        ],
     },
     "lavoro_opportunita": {
         "name": "Lavoro e conciliazione",
@@ -75,6 +78,7 @@ CANONICAL_CATEGORIES = {
             "Innovazione, ricerca e creatività",
             "Ricerca ed innovazione",
             "Società dell'informazione",
+            "Ricerca e sviluppo (Eurostat)",
         ],
     },
     "ambiente_energia": {

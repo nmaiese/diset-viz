@@ -48,7 +48,7 @@ class ExternalDataTest(unittest.TestCase):
         by_indicator = {}
         for row in rows:
             by_indicator.setdefault(row["target_indicator_id"], set()).add(row["territory_code"])
-            self.assertIn(row["definition_match"], {"exact", "compatible", "proxy", "different"})
+            self.assertIn(row["definition_match"], {"exact", "compatible", "proxy", "different", "new"})
             self.assertIn(row["score_eligible"], {"true", "false"})
         self.assertEqual(len(by_indicator["910"]), 20)
         self.assertEqual(len(by_indicator["922"]), 20)
@@ -63,8 +63,11 @@ class ExternalDataTest(unittest.TestCase):
         self.assertIn("integrated", statuses)
         self.assertIn("needs_review", statuses)
         for row in rows:
-            self.assertIn(row["definition_match"], {"exact", "compatible", "proxy", "different"})
-            self.assertIn(row["status"], {"integrated", "candidate", "rejected", "needs_review", "unavailable"})
+            # "new" = a discovered indicator with no Istat counterpart (Eurostat
+            # standalone); "proposed" = staged by the discovery integrator, live
+            # only once the PR merges.
+            self.assertIn(row["definition_match"], {"exact", "compatible", "proxy", "different", "new"})
+            self.assertIn(row["status"], {"integrated", "candidate", "rejected", "needs_review", "unavailable", "proposed"})
         self.assertFalse(score_candidates())
         self.assertTrue(all(row["definition_match"] == "exact" for row in integrated_score_replacements()))
 

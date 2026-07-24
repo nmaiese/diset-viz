@@ -412,8 +412,10 @@ class AppSmokeTest(unittest.TestCase):
 
     def test_indicator_page_explains_latest_change_and_gender_gap_scope(self):
         client = app.test_client()
+        # Legacy single-segment territorial URL 301s to the unified acronym form.
         response = client.get(
-            "/indicatore/61-differenza-tra-tasso-di-attivita-maschile-e-femminile"
+            "/indicatore/61-differenza-tra-tasso-di-attivita-maschile-e-femminile",
+            follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
         html = response.data.decode("utf-8")

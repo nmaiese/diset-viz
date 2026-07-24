@@ -21,6 +21,7 @@ import re
 import unicodedata
 from collections import defaultdict
 
+from app import sources
 from app.cache import cache
 from app.data import REGION_GEO_AREA, REGION_ORDER, get_catalog, get_rows
 from app.external_data import count_freshness, freshness_status
@@ -103,8 +104,7 @@ def indicator_slug(name):
 
 
 def indicator_path(indicator_id, name):
-    slug = indicator_slug(name)
-    return f"/indicatore/{indicator_id}-{slug}" if slug else f"/indicatore/{indicator_id}"
+    return sources.indicator_url("territorial", indicator_id, indicator_slug(name))
 
 
 @cache.memoize(timeout=3600)
