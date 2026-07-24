@@ -1933,5 +1933,113 @@
   "spunto": "Il verde in città non è solo estetica, ma salute, refrigerio contro il caldo e spazio di socialità, sempre più prezioso con il clima che cambia. Il dato altissimo del Trentino riflette grandi parchi e boschi urbani, mentre molte città del Sud ne hanno pochissimo. Lo scarto tra media e mediana dice che poche città verdissime alzano il dato nazionale. Il verde urbano è un lusso o un'infrastruttura per la salute?",
   "limite": "Conta i metri quadri di verde per abitante nei capoluoghi, non la sua qualità, accessibilità o distribuzione tra quartieri. Grandi parchi periferici possono gonfiare il dato mentre il centro resta senza alberi.",
   "fonti": []
+ },
+ "bes:05REL001": {
+  "attacco": "La soddisfazione per le relazioni familiari, spesso data per scontata al Sud, è in realtà più alta al Nord. La dichiara il 42% delle persone in Trentino Alto Adige e il 39,9% in Friuli-Venezia Giulia, contro il 25,8% della Basilicata. La media delle regioni è del 33,8%.",
+  "spunto": "Sorprende che la famiglia, tradizionalmente più forte al Sud, generi più soddisfazione dichiarata al Nord. Ma il giudizio è soggettivo e risente delle attese e del contesto generale di benessere, non solo dei legami. Dove la vita è meno precaria, anche le relazioni si vivono con più serenità. La qualità dei legami familiari dipende dai legami o dalla vita attorno a essi?",
+  "limite": "Rileva la soddisfazione dichiarata per i rapporti familiari, non la loro solidità o frequenza. È un giudizio soggettivo, influenzato dall'umore e dal contesto, che due persone nella stessa situazione possono dare in modo diverso.",
+  "fonti": []
+ },
+ "bes:05REL002": {
+  "attacco": "La soddisfazione per le amicizie segue la stessa mappa di quella familiare, più alta al Nord-Est. La dichiara il 30,6% delle persone in Trentino Alto Adige e il 28,7% in Friuli-Venezia Giulia, contro il 17,8% della Calabria. La media delle regioni è del 23,6%.",
+  "spunto": "Le amicizie, come la famiglia, danno più soddisfazione dove il tessuto sociale è più ricco e la vita meno segnata da difficoltà economiche. È un tassello del capitale sociale, quella rete di relazioni che rende le comunità più forti e resilienti. Il divario Nord-Sud qui è meno atteso ma altrettanto netto. Il benessere relazionale è causa o conseguenza del benessere materiale?",
+  "limite": "Misura la soddisfazione dichiarata per le amicizie, non il numero o la qualità dei rapporti. È una percezione soggettiva, che non dice quanto le persone siano davvero circondate e sostenute.",
+  "fonti": []
+ },
+ "bes:05REL003": {
+  "attacco": "Avere qualcuno su cui contare in caso di bisogno è quasi universale: lo dichiara in media l'83,9% delle persone. Il dato è alto ovunque, dall'89,9% della Valle d'Aosta al 79,1% della Puglia. È uno degli indicatori sociali più uniformi del quadro.",
+  "spunto": "Che quasi tutti abbiano una rete di sostegno è rassicurante, ma nasconde chi resta solo, spesso anziani e persone fragili invisibili nelle medie. La leggera prevalenza del Nord riflette reti civiche più ampie, oltre alla famiglia. Poter contare su qualcuno è la prima difesa contro le crisi della vita. Un dato così alto racconta la forza dei legami o il rischio di chi resta ai margini?",
+  "limite": "Rileva se le persone dichiarano di avere qualcuno su cui contare, non quanto quel sostegno sia reale o frequente. Un valore alto può nascondere piccole minoranze del tutto isolate, che pesano moltissimo.",
+  "fonti": []
+ },
+ "bes:05REL005": {
+  "attacco": "La partecipazione civica e politica, dall'informarsi al discutere di temi pubblici, è più diffusa al Centro-Nord. Riguarda il 66,6% delle persone in Emilia-Romagna e il 65,7% in Trentino Alto Adige, contro il 46,1% della Sicilia. La media delle regioni è del 59,5%, in calo.",
+  "spunto": "La partecipazione alla vita pubblica è il cuore del capitale civico, quella cultura della cosa comune più forte nelle regioni con lunga tradizione di associazionismo. Il calo recente, generalizzato, segnala un allontanamento dalla politica che riguarda tutto il Paese. È un indicatore descrittivo, ma tocca la salute stessa della democrazia. Una comunità che partecipa meno è più libera o più fragile?",
+  "limite": "Misura forme dichiarate di partecipazione, dall'informazione al confronto, non l'impegno concreto né la sua qualità. Non distingue la partecipazione costruttiva dallo scontento espresso, che possono convivere.",
+  "fonti": []
+ },
+ "bes:05REL006": {
+  "attacco": "Il volontariato disegna un'Italia a due velocità. Vi dedica tempo il 19,3% delle persone in Trentino Alto Adige e il 14,1% in Veneto, contro il 5,3% della Campania e il 5,7% della Calabria. La media delle regioni è del 9,3%.",
+  "spunto": "Il volontariato è il capitale sociale in azione, la disponibilità a dare tempo per gli altri senza compenso. La sua concentrazione al Nord-Est riflette una tradizione civica e associativa radicata, mentre al Sud reti informali e familiari sostituiscono spesso quelle organizzate. Non significa meno solidarietà, ma una solidarietà di forma diversa. La cura degli altri passa dalle associazioni o dalle famiglie?",
+  "limite": "Conta chi svolge volontariato organizzato, non l'aiuto informale tra vicini e parenti, molto diffuso al Sud. Un valore basso non equivale a minore solidarietà, ma a una sua diversa organizzazione.",
+  "fonti": []
+ },
+ "bes:05REL007": {
+  "attacco": "Sostenere economicamente le associazioni, con donazioni o quote, è più comune al Nord. Lo fa il 23% delle persone in Trentino Alto Adige e il 15,1% in Lombardia ed Emilia-Romagna, contro il 5,3% della Campania. La media delle regioni è del 12,2%, in calo.",
+  "spunto": "Finanziare le associazioni è un altro segno di capitale civico, e la sua geografia ricalca quella del volontariato, con il Nord-Est in testa. Dipende anche dal reddito disponibile, oltre che dalla cultura del dono, e il calo recente riflette forse la pressione economica sulle famiglie. Le associazioni vivono di questo sostegno diffuso. Il terzo settore regge dove le famiglie hanno più mezzi o più abitudine a donare?",
+  "limite": "Conta chi dichiara di finanziare associazioni, non quanto né quali. Non distingue piccole donazioni da contributi rilevanti, e risente del reddito oltre che della propensione a sostenere il terzo settore.",
+  "fonti": []
+ },
+ "bes:05REL008": {
+  "attacco": "La densità di organizzazioni non profit misura quanto è fitto il tessuto associativo. Ce ne sono 110 ogni diecimila abitanti in Valle d'Aosta e 108,7 in Trentino Alto Adige, contro le 41,7 della Campania. La media delle regioni è di circa 71, in crescita.",
+  "spunto": "Il non profit è l'ossatura organizzata della società civile, dalle associazioni culturali a quelle di cura, e la sua densità dice quanto una comunità sa auto-organizzarsi. Il divario, più che doppio, riflette la solita frattura tra un Nord ricco di reti civiche e un Sud dove prevalgono legami informali. È cresciuto ovunque, segno di una società civile comunque viva. Un territorio con più associazioni è più coeso o solo più formalizzato?",
+  "limite": "Conta le organizzazioni non profit per abitante, non la loro dimensione, attività o solidità. Molte sono piccolissime o poco attive, e il numero non dice quanto incidano davvero sulla vita delle comunità.",
+  "fonti": []
+ },
+ "bes:05REL009": {
+  "attacco": "La fiducia negli altri, il credere che la gente sia in generale affidabile, è bassa in Italia e diseguale. La dichiara il 37,6% delle persone in Trentino Alto Adige e il 29,9% in Valle d'Aosta, contro il 15,4% del Molise e il 15,9% della Sicilia. La media delle regioni è del 22,9%.",
+  "spunto": "La fiducia generalizzata è il collante invisibile che rende possibili cooperazione, scambio e istituzioni funzionanti, e in Italia è tra le più basse d'Europa. Il divario Nord-Sud è netto e stabile, e alcuni studiosi lo legano alla storia civica dei territori. Bassa fiducia significa più diffidenza, più costi di controllo, meno collaborazione. Si può costruire fiducia o è un'eredità che si trasmette nei secoli?",
+  "limite": "Misura una fiducia dichiarata e astratta, non i comportamenti concreti di cooperazione. È un giudizio generale, sensibile al clima sociale del momento, che non dice verso chi la fiducia sia rivolta o negata.",
+  "fonti": []
+ },
+ "bes:05REL010": {
+  "attacco": "La partecipazione sociale, la presenza in associazioni e attività collettive, è più forte al Nord-Est. Riguarda il 39,3% delle persone in Trentino Alto Adige e il 35,3% in Veneto, contro il 21,9% della Calabria. La media delle regioni è del 30,3%.",
+  "spunto": "Partecipare a gruppi, associazioni e attività collettive costruisce relazioni e competenze civiche, ed è un pezzo importante del benessere oltre che della democrazia. La geografia conferma la frattura tra un Nord più associativo e un Sud dove la socialità passa per canali informali. Il lieve calo recente riguarda tutti, in una società più individuale. La vita associata è in ritirata ovunque o solo cambia forma?",
+  "limite": "Conta la partecipazione dichiarata ad attività sociali organizzate, non la socialità informale, molto diffusa. Non distingue l'impegno continuativo dalla presenza occasionale, che pesano diversamente sul capitale sociale.",
+  "fonti": []
+ },
+ "bes:06POL001": {
+  "attacco": "La partecipazione al voto è calata molto e in modo diseguale. È più alta in Umbria, 60,8%, Toscana, 59,1%, ed Emilia-Romagna, più bassa in Sardegna, 36,9%, e Sicilia, 38%. La media delle regioni è del 48,7%, in forte calo nel tempo.",
+  "spunto": "L'affluenza al voto è il segno più diretto della salute democratica, e il suo crollo, un terzo in meno in un ventennio, è uno dei dati più preoccupanti del quadro civico. Il divario ricalca la geografia della partecipazione, con il Centro storicamente più affezionato al voto e le isole più disincantate. Meno voto significa istituzioni meno rappresentative. Chi non vota rinuncia o non si sente più rappresentato?",
+  "limite": "Misura l'affluenza a una tornata elettorale, molto variabile a seconda del tipo di elezione e del momento politico. Non dice le ragioni dell'astensione, dal disinteresse alla protesta all'impossibilità pratica di votare.",
+  "fonti": []
+ },
+ "bes:06POL002": {
+  "attacco": "La fiducia nel Parlamento è bassa ovunque: su una scala da zero a dieci vale in media 4,6. Le differenze sono piccole, dal 4,9 di Umbria e Marche al 4,2 di Calabria e Sardegna. Il dato è cresciuto rispetto agli anni più critici.",
+  "spunto": "Un voto medio sotto la sufficienza racconta un rapporto logorato tra cittadini e istituzione parlamentare, comune a molte democrazie. Le differenze territoriali sono minime, segno che la sfiducia è un fenomeno nazionale, non locale. La lieve ripresa recente va letta con cautela, legata ai cicli politici e all'alternanza dei governi. Una democrazia regge con un Parlamento in cui si crede poco?",
+  "limite": "Rileva un giudizio medio di fiducia, sensibile al momento politico e al governo in carica. Non distingue la fiducia nell'istituzione da quella nella classe politica che la occupa in quel momento.",
+  "fonti": []
+ },
+ "bes:06POL003": {
+  "attacco": "La fiducia nel sistema giudiziario, in media 5 su dieci, mostra una geografia inattesa. È più alta in Liguria, 5,2, Campania e Basilicata, 5,1, più bassa in Veneto, 4,6, e Abruzzo. Qui, per una volta, il Sud non è in fondo.",
+  "spunto": "Che il Sud, dove la giustizia è più lenta, esprima più fiducia del Nord efficiente sorprende, e ricorda che la fiducia non sempre segue le prestazioni oggettive. Contano attese, esperienze dirette e cultura del rapporto con lo Stato. È un raro caso in cui la mappa della fiducia si stacca da quella del funzionamento. La fiducia nella giustizia nasce dai fatti o dalle attese verso di essa?",
+  "limite": "Misura un giudizio medio di fiducia, non l'esperienza reale con i tribunali. Chi non ha mai avuto a che fare con la giustizia risponde in base all'immagine che se ne fa, non a fatti vissuti.",
+  "fonti": []
+ },
+ "bes:06POL004": {
+  "attacco": "I partiti sono le istituzioni in cui gli italiani credono di meno: la fiducia, su una scala da zero a dieci, vale in media appena 3,4. Le differenze sono minime, dal 3,8 del Trentino Alto Adige al 3 della Sardegna. Il dato è cresciuto dai minimi storici.",
+  "spunto": "Un voto medio così basso segnala una crisi profonda della rappresentanza, con i partiti percepiti come lontani e autoreferenziali. È un fenomeno nazionale, quasi identico ovunque, che alimenta astensione, antipolitica e ricambio continuo di sigle. Senza partiti credibili, la democrazia perde i suoi canali di partecipazione organizzata. La sfiducia nei partiti è un giudizio sui partiti o sulla politica in sé?",
+  "limite": "Rileva la fiducia media nei partiti come categoria, non nei singoli o nelle idee. È un giudizio molto sensibile al clima politico, che può cambiare in fretta con gli eventi.",
+  "fonti": []
+ },
+ "bes:06POL005": {
+  "attacco": "Le forze dell'ordine e i vigili del fuoco sono le istituzioni più fidate: su una scala da zero a dieci raccolgono in media 7,5. Il dato è alto e uniforme, dal 7,8 del Trentino Alto Adige al 7 della Campania. La fiducia qui è larga e stabile.",
+  "spunto": "Che polizia, carabinieri e vigili del fuoco godano di così ampia fiducia, ovunque, li rende un raro punto di coesione nazionale in un quadro di sfiducia diffusa. Contano la vicinanza al cittadino e la concretezza del loro servizio, specie nelle emergenze. È il rovescio della fiducia nella politica, e mostra che gli italiani distinguono tra istituzioni. Ci si fida di più di chi protegge o di chi decide?",
+  "limite": "Misura un giudizio medio di fiducia, non l'esperienza diretta con le forze dell'ordine. Un valore alto e generale può nascondere rapporti più difficili in specifici contesti o gruppi sociali.",
+  "fonti": []
+ },
+ "bes:06POL006": {
+  "attacco": "La presenza femminile in Parlamento varia molto per regione di elezione. Supera il 50% in Trentino Alto Adige, Valle d'Aosta e Friuli-Venezia Giulia, ma scende al 14,3% in Basilicata. La media delle regioni è del 34,8%, più che raddoppiata nel tempo.",
+  "spunto": "I valori altissimi delle regioni piccole vanno letti con prudenza, dato che con pochi seggi basta una eletta a cambiare di molto la percentuale. Al netto di questo, la rappresentanza femminile è cresciuta molto con le norme sulle quote, pur restando lontana dalla parità. È un indicatore descrittivo di un equilibrio ancora in movimento. Più donne in Parlamento cambia le priorità della politica o solo la sua composizione?",
+  "limite": "Misura la quota di elette per regione, sensibile al numero di seggi, piccolo in molte regioni. Non dice nulla sul peso reale delle donne nei ruoli di potere, dove la parità è ancora lontana.",
+  "fonti": []
+ },
+ "bes:06POL010": {
+  "attacco": "L'età media dei parlamentari eletti in ciascuna regione va dai 47,4 anni dell'Abruzzo ai 57,3 della Basilicata, con la Valle d'Aosta e il Molise sopra i 55. La media delle regioni è di circa 52 anni. Il Parlamento italiano resta tra i più anziani.",
+  "spunto": "Un Parlamento anziano riflette in parte una società che invecchia, ma anche partiti che rinnovano poco la classe dirigente. Le regioni piccole, con pochi eletti, mostrano età più variabili. Il ricambio generazionale in politica è lento, e e i giovani restano sottorappresentati rispetto al loro peso nella società. Una politica più giovane guarderebbe più lontano o conta di più l'esperienza?",
+  "limite": "È l'età media degli eletti per regione, un dato sensibile al piccolo numero di seggi di molte regioni. Non dice nulla sul ricambio reale né sulla presenza dei giovani nei ruoli decisionali.",
+  "fonti": []
+ },
+ "bes:06POL011": {
+  "attacco": "La durata dei processi civili misura l'efficienza della giustizia, e spacca l'Italia. Un procedimento dura in media 390 giorni, ma va dai 160 della Valle d'Aosta agli 828 della Basilicata, con Calabria e Campania oltre i 600. Il divario supera le cinque volte.",
+  "spunto": "La lentezza della giustizia è una forma di ingiustizia, dato che un diritto riconosciuto troppo tardi vale meno, per le persone e per le imprese. Il divario, con il Sud molto più lento, dipende da carichi, organici e organizzazione dei tribunali. Tempi lunghi scoraggiano investimenti e minano la fiducia nelle istituzioni e nello Stato di diritto. Una giustizia lenta è ancora giustizia?",
+  "limite": "È una media regionale che accorpa tribunali molto diversi e tipi di causa dai tempi opposti. Non misura la qualità delle decisioni né i gradi successivi del giudizio, che allungano ancora i tempi reali.",
+  "fonti": []
+ },
+ "bes:06POL012": {
+  "attacco": "L'affollamento delle carceri supera ovunque la capienza: in media i detenuti sono il 118,5% dei posti. È massimo in Puglia, 148%, Lombardia, 143,8%, e Friuli-Venezia Giulia, minimo in Valle d'Aosta, 77,9%. La media delle regioni è del 118,5%, oltre la piena capienza.",
+  "spunto": "Le carceri più piene dei posti disponibili sono un problema di dignità e di legalità insieme, che l'Italia si trascina da anni nonostante le condanne europee. L'affollamento non segue il Nord-Sud, dato che dipende da dove ci sono più istituti e più detenuti in attesa di giudizio. Un carcere sovraffollato rende più difficile ogni percorso di reinserimento. La pena serve a punire o a recuperare, e un carcere pieno cosa permette?",
+  "limite": "Rapporta i detenuti ai posti regolamentari, senza contare le celle inagibili, che peggiorano l'affollamento reale. Non dice le condizioni di vita né quanti siano i detenuti in attesa di giudizio, non ancora condannati.",
+  "fonti": []
  }
 }
