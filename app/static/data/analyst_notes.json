@@ -1429,5 +1429,251 @@
   "spunto": "A differenza dell'insoddisfazione, che cresce dove il paesaggio è già degradato, la preoccupazione è più alta dove il paesaggio è bello e conta molto, come le montagne del Nord. È una forma di consapevolezza ambientale, dato che si teme di perdere ciò a cui si tiene. Il calo recente del dato va letto con cautela, tra assuefazione e altre priorità. Ci si preoccupa di più del paesaggio quando è bello o quando è già rovinato?",
   "limite": "Misura una preoccupazione dichiarata, non un rischio reale per il paesaggio. Dipende dalla sensibilità e dall'attenzione mediatica, e non dice se si traduca in comportamenti o scelte di tutela.",
   "fonti": []
+ },
+ "232": {
+  "attacco": "Quanti rifiuti finiscono ancora in discarica varia enormemente. In Molise arriva l'82% dei rifiuti urbani, nelle Marche il 43% e in Toscana il 39%, mentre in Campania la discarica è ormai azzerata e in Trentino Alto Adige è all'1,4%. La media delle regioni è del 22,5%, in forte calo.",
+  "spunto": "La discarica è l'ultima e peggiore opzione nel ciclo dei rifiuti, e il suo calo di lungo periodo, oltre due terzi in meno, è uno dei progressi ambientali più netti. Ma il quadro resta a macchia di leopardo, con regioni che hanno chiuso le discariche e altre che ne dipendono ancora. Azzerare la discarica richiede impianti di riciclo e recupero che non tutti hanno. Dove il rifiuto non va in discarica, che fine fa davvero?",
+  "limite": "Misura la quota di rifiuti in discarica, non dove vada il resto, tra riciclo, compostaggio e inceneritore. Un valore basso è positivo solo se il rifiuto è recuperato, non se è solo bruciato o esportato altrove.",
+  "fonti": []
+ },
+ "84": {
+  "attacco": "In chilogrammi per abitante, i rifiuti mandati in discarica vanno da zero in Campania e 7 in Trentino Alto Adige a 317 in Molise e 231 in Toscana. La media delle regioni è di circa 111 chili a testa, in forte calo nel tempo.",
+  "spunto": "Espresso per abitante, il dato dice quanti rifiuti ciascuno di noi manda ancora in discarica, e i valori estremi confermano due Italie del rifiuto. Rispetto alla percentuale, questo conteggio pesa anche quanti rifiuti si producono, non solo come li si tratta. Ridurre la discarica per abitante significa insieme riciclare di più e produrre meno scarti. Vale di più separare i rifiuti o produrne di meno?",
+  "limite": "Conta i chili in discarica per abitante, quindi mescola quanti rifiuti si producono e quanti se ne recuperano. Non dice nulla sulla qualità della raccolta né su dove finisca la parte non smaltita in discarica.",
+  "fonti": []
+ },
+ "bes:10AMB004": {
+  "attacco": "Il dato BES sul conferimento in discarica conferma il quadro: dallo zero della Campania e l'1,4% del Trentino Alto Adige all'82% del Molise e il 43% delle Marche. La media delle regioni è del 22,5%, in forte calo negli ultimi vent'anni.",
+  "spunto": "Nel sistema BES questo indicatore è descrittivo, senza un verso automatico, ma la direzione è chiara, dato che meno discarica significa in genere un ciclo dei rifiuti più maturo. Il calo è netto ovunque, segno di un cambiamento culturale e impiantistico diffuso. Restano però ritardi in alcune regioni, dove mancano alternative alla discarica. Chiudere le discariche è una scelta ambientale o un obbligo europeo?",
+  "limite": "Coincide con l'indicatore territoriale sulla discarica e ne condivide i limiti, dato che dice solo quanto va in discarica, non dove finisca il resto. Non distingue riciclo, compostaggio e incenerimento del rifiuto residuo.",
+  "fonti": []
+ },
+ "52": {
+  "attacco": "La raccolta differenziata è cresciuta enormemente e ha quasi omogeneizzato l'Italia. Oggi supera il 78% in Emilia-Romagna, Veneto e Sardegna, e resta più bassa in Sicilia, 55,5%, Lazio e Calabria. La media delle regioni è del 67,4%, con un divario ormai contenuto.",
+  "spunto": "Da fenomeno di poche regioni virtuose, la differenziata è diventata la norma quasi ovunque, e il divario Nord-Sud si è molto ridotto. È uno dei rari indicatori ambientali in netto e diffuso miglioramento. Ma raccogliere in modo differenziato è solo il primo passo, e conta poi quanto di quel materiale viene davvero riciclato. Separare i rifiuti serve se poi esistono gli impianti per trattarli?",
+  "limite": "Misura quanto rifiuto è raccolto in modo differenziato, non quanto viene effettivamente riciclato, che è meno. La qualità della raccolta e la presenza di impianti di trattamento cambiano molto il risultato reale.",
+  "fonti": []
+ },
+ "53": {
+  "attacco": "Questo indicatore mostra valori difficili da leggere, con percentuali che superano il 100%, oltre 179 in Friuli-Venezia Giulia e 167 in Molise, mentre in Valle d'Aosta e Basilicata risultano a zero. La media delle regioni è di circa 68%, ma il dato è distorto.",
+  "spunto": "Valori sopra il 100% segnalano che una regione tratta più frazione umida di quanta ne produca, importandola da altre, oppure che i criteri di calcolo non sono omogenei. Il dato va quindi preso con cautela, come indizio che il compostaggio è molto sviluppato in alcune regioni e assente in altre, non come classifica precisa. Stiamo misurando il compost o i flussi di rifiuti tra regioni?",
+  "limite": "I valori sopra il 100% nascono da rifiuto umido trattato in una regione ma prodotto altrove, e rendono i confronti inaffidabili. Il dato non dice la qualità del compost prodotto né dove venga poi usato.",
+  "fonti": []
+ },
+ "bes:10AMB024": {
+  "attacco": "Quanti rifiuti produce ciascun abitante è la radice del problema. Se ne producono 664 chili a testa in Emilia-Romagna e 650 in Valle d'Aosta, contro i 355 della Basilicata e i 387 del Molise. La media delle regioni è di circa 502 chili.",
+  "spunto": "Produrre più rifiuti va spesso insieme a più ricchezza, consumi e turismo, e infatti il Nord e le regioni turistiche stanno in alto. Ridurre i rifiuti alla fonte è l'obiettivo più difficile, dato che tocca modelli di consumo e imballaggi prima che la raccolta. È un indicatore descrittivo, senza un verso automatico, ma meno rifiuti prodotti è quasi sempre meglio. Un territorio più ricco è condannato a produrre più scarti?",
+  "limite": "Conta i chili di rifiuti urbani per abitante, non quelli industriali né la loro pericolosità. Risente del turismo, che gonfia il dato di alcune regioni attribuendo ai residenti anche i rifiuti dei visitatori.",
+  "fonti": []
+ },
+ "255": {
+  "attacco": "La superficie forestale percorsa dal fuoco varia moltissimo tra le regioni rilevate. In Puglia arriva al 2,4% dei boschi, in Lazio e Calabria intorno all'1%, mentre nelle Marche resta allo 0,02%. La media delle regioni è di circa 0,5%, un fenomeno molto concentrato.",
+  "spunto": "Gli incendi boschivi colpiscono soprattutto il Sud e le aree mediterranee, dove clima caldo, siccità e macchia rendono i roghi più frequenti, spesso di origine dolosa o colposa. Il fuoco distrugge un patrimonio che impiega decenni a ricostituirsi e aumenta il rischio di frane. È un fenomeno legato al clima ma anche alla cura del territorio. Gli incendi sono una fatalità del clima o un fallimento della prevenzione?",
+  "limite": "Misura la superficie forestale bruciata sul totale, senza distinguere incendi dolosi, colposi o naturali. Riguarda un sottoinsieme di regioni e un solo aspetto del rischio, non i danni a persone e abitazioni.",
+  "fonti": []
+ },
+ "514": {
+  "attacco": "Restringendo alla sola superficie boscata, e non a tutta quella forestale, gli incendi colpiscono di più Calabria, 0,79%, Lazio, 0,76%, e Puglia, mentre nelle Marche restano allo 0,01%. La media delle regioni è di circa 0,3%, in aumento negli ultimi anni.",
+  "spunto": "Il bosco vero e proprio, più che la macchia, è la parte più preziosa e più lenta a rigenerarsi del patrimonio forestale. Che gli incendi boschivi crescano, in un clima sempre più caldo e secco, è un segnale da non sottovalutare. Il Sud mediterraneo resta il più esposto, ma il rischio si estende verso Nord. Difendere i boschi dal fuoco è più questione di sorveglianza o di gestione del territorio?",
+  "limite": "Conta la superficie boscata bruciata, un dato che oscilla molto di anno in anno con il clima. Non misura l'intensità dei roghi né la capacità di rigenerazione del bosco colpito.",
+  "fonti": []
+ },
+ "277": {
+  "attacco": "L'esposizione al rischio frane, misurata in abitanti per chilometro quadrato, è massima dove montagne e coste franose incontrano popolazione. In Liguria e Campania supera i 19 abitanti per km², contro lo 0,34 del Veneto. La media delle regioni è di circa 4,9.",
+  "spunto": "Le frane non colpiscono a caso, dato che si concentrano dove versanti fragili, urbanizzazione spinta e abbandono del territorio si sommano, come in Liguria e nell'entroterra campano. L'esposizione dipende sia dalla geologia sia da dove e come si è costruito. È un rischio che il cambiamento climatico, con piogge più violente, sta aggravando. Convivere con le frane è inevitabile o si può ridurre il rischio?",
+  "limite": "Misura la popolazione esposta al rischio, non i danni effettivi né la loro gravità. Non dice quanto quel rischio dipenda dalla natura o da scelte urbanistiche sbagliate, che spesso lo aumentano.",
+  "fonti": []
+ },
+ "278": {
+  "attacco": "L'esposizione al rischio alluvione è concentrata in poche regioni di pianura densamente abitata. In Emilia-Romagna raggiunge 121, in Liguria 50 e in Toscana 41, contro lo 0,6 della Basilicata. La media delle regioni, quasi 20, è ben più alta della mediana, meno di 10.",
+  "spunto": "L'alluvione è il rischio idrogeologico che più si è aggravato con il clima, tra piogge intense e suolo impermeabilizzato che non assorbe più l'acqua. Si concentra dove fiumi, pianure fertili e città convivono, come in Emilia-Romagna. Lo scarto enorme tra media e mediana dice che poche regioni portano quasi tutto il peso. Costruire e vivere vicino ai fiumi è un rischio che si può ancora governare?",
+  "limite": "Misura la popolazione esposta secondo mappe di pericolosità, non gli allagamenti realmente avvenuti. L'esposizione dipende da dove si è costruito, e non dice quanto le difese idrauliche riducano il rischio effettivo.",
+  "fonti": []
+ },
+ "bes:10AMB011": {
+  "attacco": "Il dato BES esprime la popolazione a rischio frane in percentuale: è massima in Valle d'Aosta, 10,9%, e in Liguria e Basilicata, 7%, mentre in Veneto e Friuli-Venezia Giulia è sotto lo 0,4%. La media delle regioni è del 3,3%.",
+  "spunto": "In percentuale sulla popolazione, il rischio frane premia le regioni montane e appenniniche, dove più persone vivono su versanti instabili. Il BES lo tratta come descrittivo, dato che l'esposizione dipende dalla geografia, non dalla virtù di una regione. Ma quanto rischio si trasformi in disastro dipende anche da prevenzione e manutenzione. La montagna è un rischio in sé o lo diventa senza cura?",
+  "limite": "Misura la quota di popolazione in aree a rischio frana, non la probabilità reale né i danni. Non tiene conto delle opere di difesa e del monitoraggio, che possono ridurre molto il pericolo effettivo.",
+  "fonti": []
+ },
+ "bes:10AMB012": {
+  "attacco": "In percentuale, la popolazione esposta al rischio alluvioni è altissima in Emilia-Romagna, 62,5%, seguita da Toscana, 25,5%, e Trentino Alto Adige, mentre in Basilicata e Molise resta sotto il 2,3%. La media delle regioni è dell'11%, ma poche regioni portano quasi tutto il rischio.",
+  "spunto": "Che in Emilia-Romagna quasi due terzi degli abitanti vivano in aree a rischio alluvione dice quanto sviluppo e acqua si intreccino nelle grandi pianure. Il BES lo tratta come descrittivo, ma il fenomeno è tra i più concreti del cambiamento climatico. L'esposizione cresce con l'urbanizzazione e con eventi meteo più estremi. Si può proteggere una popolazione che vive quasi tutta in pianura alluvionale?",
+  "limite": "Misura la quota di popolazione in aree allagabili, non gli eventi reali né i danni. Non considera argini, casse di espansione e altre difese, che cambiano molto il rischio effettivo di un territorio.",
+  "fonti": []
+ },
+ "bes:10AMB025": {
+  "attacco": "L'indice di durata dei periodi di caldo è cresciuto di quasi due terzi negli ultimi anni. I periodi caldi durano di più in Trentino Alto Adige, 61 giorni, Valle d'Aosta, 58, e Piemonte, meno nelle Marche, 22, e in Molise. La media delle regioni è di circa 41 giorni.",
+  "spunto": "Sorprende che i periodi di caldo prolungato crescano di più al Nord e in montagna, ma è lì che il riscaldamento corre più veloce rispetto al clima di riferimento locale. È uno degli indicatori più diretti del cambiamento climatico, e la sua crescita generalizzata è coerente con l'aumento delle temperature. Il caldo estremo pesa su salute, agricoltura ed energia. Un clima che cambia colpisce prima chi è meno abituato al caldo?",
+  "limite": "Misura la durata delle ondate di calore rispetto a un clima di riferimento, quindi coglie il cambiamento più del caldo assoluto. Non dice gli effetti su salute e agricoltura, che dipendono anche da come ci si adatta.",
+  "fonti": []
+ },
+ "bes:10AMB026": {
+  "attacco": "I giorni con precipitazioni estremamente intense sono ancora rari ma in aumento. Se ne contano fino a 5 all'anno in Friuli-Venezia Giulia e 2 in Lombardia, mentre in molte regioni restano vicini a zero. La media delle regioni è inferiore a un giorno l'anno.",
+  "spunto": "Le piogge estreme, concentrate in poche ore, sono il volto più violento del clima che cambia, e causano alluvioni improvvise anche dove prima erano rare. Numeri così piccoli oscillano molto di anno in anno, ma la tendenza all'aumento è chiara. Bastano pochi eventi estremi a fare danni enormi su un territorio fragile. Ci si prepara a un clima medio o agli estremi che diventano più frequenti?",
+  "limite": "Conta i giorni di pioggia estrema in media, un evento raro e per sua natura molto variabile di anno in anno. Non misura i danni provocati, che dipendono da dove cade la pioggia e da come è difeso il territorio.",
+  "fonti": []
+ },
+ "bes:10AMB027": {
+  "attacco": "La durata dei periodi senza pioggia, segno di siccità, è più lunga al Sud e nelle isole. In Sicilia si arriva a 48 giorni consecutivi, in Puglia e Sardegna a 34, contro i 19 del Trentino Alto Adige. La media delle regioni è di circa 27 giorni.",
+  "spunto": "La siccità prolungata mette in crisi agricoltura, riserve idriche ed ecosistemi, e la sua geografia, con il Sud in testa, si somma alla maggiore dispersione delle reti idriche meridionali. È l'altra faccia del clima estremo, opposta alle piogge violente ma altrettanto dannosa. Con l'acqua che scarseggia, ogni goccia persa pesa di più. Il Sud è pronto a un futuro con meno pioggia?",
+  "limite": "Misura i giorni consecutivi senza pioggia, non l'intera disponibilità d'acqua, che dipende anche da falde, invasi e neve. Un dato annuale variabile va letto come tendenza, non come singola fotografia.",
+  "fonti": []
+ },
+ "33": {
+  "attacco": "L'uso di fertilizzanti per ettaro è concentrato nella pianura padana: circa 0,26 quintali per ettaro in Emilia-Romagna, 0,2 in Lombardia, contro quasi zero in Valle d'Aosta e Sardegna. La media delle regioni è di circa 0,09, con un divario netto tra pianura e montagna.",
+  "spunto": "Più fertilizzanti significano agricoltura più intensiva e produttiva, ma anche più azoto e fosforo che finiscono in acqua e suolo, con eutrofizzazione e inquinamento delle falde. La pianura padana, cuore agricolo del Paese, è anche la più pressata. Non è un male in sé produrre molto, ma il conto ambientale va considerato. Un'agricoltura più ricca è per forza più inquinante?",
+  "limite": "Misura la quantità di fertilizzanti distribuita per ettaro, non quanto ne finisca effettivamente nell'ambiente. Non distingue fertilizzanti di sintesi e organici, né tiene conto delle tecniche che ne riducono la dispersione.",
+  "fonti": []
+ },
+ "34": {
+  "attacco": "I pesticidi, misurati come principi attivi per ettaro, sono più usati dove l'agricoltura è intensiva: circa 10 in Veneto, 6,5 in Emilia-Romagna e Trentino Alto Adige, quasi zero in Valle d'Aosta. La media delle regioni è di circa 3, in calo di quasi la metà nel tempo.",
+  "spunto": "La geografia dei pesticidi segue le colture di pregio, frutta, vite e ortaggi, che ne richiedono di più, non un'agricoltura più arretrata. Il calo di lungo periodo è un buon segno, spinto da normative e agricoltura integrata. Ma restano concentrazioni alte in aree vocate, con effetti su acqua, api e biodiversità. Il cibo di qualità ha un costo ambientale nascosto?",
+  "limite": "Misura i principi attivi distribuiti per ettaro, non la loro tossicità né quanto raggiungano l'ambiente. Prodotti diversi hanno impatti molto diversi a parità di quantità, che questo dato non distingue.",
+  "fonti": []
+ },
+ "373": {
+  "attacco": "Quanta energia elettrica consuma la pubblica amministrazione per addetto varia tra regioni: circa 1,8 GWh ogni centomila addetti in Valle d'Aosta e 1,65 in Sardegna, contro 0,67 in Molise. La media delle regioni è di circa 1,1, in crescita nel tempo.",
+  "spunto": "I consumi energetici degli uffici pubblici dipendono da clima, età degli edifici e digitalizzazione, più che dall'efficienza della macchina amministrativa. Le regioni fredde o con edifici vecchi consumano di più. La crescita nel tempo riflette anche la maggiore informatizzazione. Ridurre questi consumi è un banco di prova per il pubblico, che dovrebbe dare l'esempio. La PA può guidare la transizione energetica o la subisce?",
+  "limite": "Rapporta i consumi elettrici della pubblica amministrazione ai suoi addetti, non ai servizi erogati né agli edifici. Non conta il riscaldamento né distingue uffici, scuole e ospedali, con fabbisogni molto diversi.",
+  "fonti": []
+ },
+ "374": {
+  "attacco": "Il consumo per l'illuminazione pubblica, rapportato alla superficie dei centri abitati, è più alto in Basilicata, 53,5, Puglia, 40, e Molise, più basso in Friuli-Venezia Giulia, 14,5, e Veneto. La media delle regioni è di circa 29, in calo con il passaggio ai LED.",
+  "spunto": "L'illuminazione pubblica è un consumo su cui i comuni possono incidere molto, con lampade efficienti e gestione intelligente. Le differenze dipendono da densità dei centri, dispersione dell'abitato e scelte tecnologiche. Il calo recente mostra che l'efficienza paga, ma i divari restano. Illuminare bene consumando meno è possibile, e la domanda è quante amministrazioni lo stiano davvero facendo, e non solo a parole.",
+  "limite": "Rapporta i consumi alla superficie dei centri abitati, non al numero di punti luce né alle ore di accensione. Non dice se l'illuminazione sia adeguata alla sicurezza, e un valore basso può nascere da efficienza o da carenza.",
+  "fonti": []
+ },
+ "bes:10AMB018": {
+  "attacco": "L'impermeabilizzazione del suolo, il consumo di terra sotto cemento e asfalto, è massima nelle regioni più urbanizzate. Copre il 12,2% del territorio in Lombardia, l'11,9% in Veneto e il 10,6% in Campania, contro l'1,6% della Puglia. La media delle regioni è del 6,3%.",
+  "spunto": "Il suolo impermeabilizzato non assorbe più l'acqua, aumenta il rischio di alluvioni e si perde per sempre come risorsa agricola e naturale. Si concentra dove città, industria e infrastrutture hanno consumato più terra, in pianura padana e attorno alle grandi aree urbane. È un consumo quasi irreversibile, che continua anche dove la popolazione non cresce. Costruire ancora suolo è sviluppo o debito verso il futuro?",
+  "limite": "Misura la quota di suolo coperto da superfici artificiali, non la qualità del suolo perso né la sua funzione precedente. Non distingue il consumo recente da quello storico, né dice se prosegua o si sia fermato.",
+  "fonti": []
+ },
+ "bes:10AMB002": {
+  "attacco": "Il consumo materiale interno misura in valore assoluto le risorse fisiche usate da un'economia, quindi rispecchia la dimensione delle regioni. In Lombardia sono 96 milioni di tonnellate, in Veneto 49 ed Emilia-Romagna 46, contro lo 0,6 della Valle d'Aosta. La media delle regioni è di circa 26 milioni.",
+  "spunto": "Essendo un totale, il dato dice quanto pesano le economie più grandi, non quanto siano efficienti nell'uso delle risorse. Per confrontare i territori servirebbe il consumo per abitante o per unità di PIL, non il valore assoluto. Il suo valore è ricordare la massa fisica di materiali, dal cemento ai combustibili, che ogni economia divora ogni anno. Crescere significa per forza consumare più materia?",
+  "limite": "È un conteggio assoluto, non confrontabile tra regioni di dimensioni diverse e legato alla scala dell'economia. Non dice l'efficienza nell'uso delle risorse né quanto materiale venga riciclato invece che estratto.",
+  "fonti": []
+ },
+ "378": {
+  "attacco": "La cogenerazione, che produce insieme elettricità e calore riducendo gli sprechi, copre quote molto diverse dei consumi. In Calabria arriva al 74,5%, in Puglia al 55% e in Sardegna al 46%, contro il 3,6% della Campania. La media delle regioni è del 24,3%.",
+  "spunto": "La cogenerazione è tra le tecnologie più efficienti, dato che recupera il calore che le centrali normali disperdono. La sua diffusione dipende da dove ci sono grandi impianti industriali ed energetici che la usano, non da una scelta diffusa delle famiglie. Il calo recente in alcune regioni va letto insieme al mix energetico che cambia. L'efficienza energetica è più una questione di tecnologia o di comportamenti?",
+  "limite": "Misura la quota di consumi coperta da cogenerazione, non l'efficienza complessiva del sistema energetico. Un valore alto dipende spesso da pochi grandi impianti, non da una diffusione capillare della tecnologia.",
+  "fonti": []
+ },
+ "379": {
+  "attacco": "L'elettricità da bioenergie, ricavata da biomasse e scarti, copre quote piccole ma in forte crescita. È più alta in Calabria, 18,5%, Puglia, 11,3%, e Molise, quasi nulla in Liguria e Valle d'Aosta. La media delle regioni è del 5%, quasi triplicata nel tempo.",
+  "spunto": "Le bioenergie sono rinnovabili, ma non neutre, dato che bruciare biomasse produce comunque emissioni e può competere con l'uso alimentare dei terreni agricoli. La loro concentrazione al Sud riflette la disponibilità di scarti agricoli e forestali da valorizzare. La crescita è forte, ma il loro ruolo nella transizione energetica resta discusso, tra benefici e limiti. Un'energia rinnovabile è sempre un'energia pulita?",
+  "limite": "Misura la quota di elettricità da bioenergie, senza distinguere le fonti, dagli scarti agricoli alle colture dedicate, con impatti molto diversi. Non dice le emissioni reali né la sostenibilità della filiera.",
+  "fonti": []
+ },
+ "81": {
+  "attacco": "Questo indicatore mostra valori anomali, con la Toscana oltre il 200%, effetto probabile di un errore di misura o di definizione. Al netto di questo, la potenza rinnovabile è altissima in Valle d'Aosta e Trentino Alto Adige, vicino al 100%, bassa in Liguria, 34%. La media delle regioni è distorta.",
+  "spunto": "Un valore sopra il 100% non ha senso per una quota di potenza, e segnala un problema nei dati più che una realtà fisica. Al di là dell'anomalia, il quadro reale premia le regioni alpine, dove l'idroelettrico storico copre quasi tutta la potenza installata. Il dato va quindi preso come indizio, non come classifica precisa. Le montagne partono avvantaggiate nella corsa alle rinnovabili?",
+  "limite": "I valori sopra il 100% rendono il confronto inaffidabile e segnalano definizioni o misure non omogenee. Il dato riguarda la potenza installata, non l'energia prodotta, che dipende anche da quanto gli impianti funzionano.",
+  "fonti": []
+ },
+ "85": {
+  "attacco": "La quota di elettricità da rinnovabili, incluso l'idroelettrico, supera il 100% dove la produzione eccede il consumo locale: in Valle d'Aosta arriva al 328%, in Trentino Alto Adige al 186%, mentre in Liguria è al 12,4%. La media delle regioni è del 66,6%.",
+  "spunto": "I valori sopra il 100% non sono errori, dato che significano che alcune regioni alpine producono da fonti pulite molta più elettricità di quanta ne consumino, e la esportano. È il vantaggio dell'idroelettrico di montagna, un'eredità di un secolo di dighe. Il resto d'Italia dipende invece ancora molto dai combustibili fossili. Un Paese può fondare la transizione sulle poche regioni che esportano energia pulita?",
+  "limite": "Rapporta la produzione rinnovabile al consumo locale, quindi supera il 100% per le regioni esportatrici e non misura l'autoconsumo reale. Non dice quanta di quell'energia sia idroelettrica storica e quanta da nuove fonti.",
+  "fonti": []
+ },
+ "86": {
+  "attacco": "Escludendo l'idroelettrico, le nuove rinnovabili, dal sole al vento alle biomasse, coprono quote cresciute enormemente da quasi zero. In Basilicata superano il 116% dei consumi, in Puglia e Molise il 68%, contro il 4% della Valle d'Aosta. La media delle regioni è del 32,8%.",
+  "spunto": "Tolto l'idroelettrico storico, emerge la vera nuova energia pulita, e qui a guidare è il Sud, con il sole della Puglia e il vento della Basilicata. È un ribaltamento rispetto alle rinnovabili tradizionali di montagna, e mostra dove si sta costruendo il futuro energetico. La crescita, quasi da zero, è tra le più rapide di ogni indicatore. Il Sud può diventare la centrale rinnovabile d'Italia?",
+  "limite": "Rapporta la produzione da nuove rinnovabili al consumo locale, superando il 100% dove si esporta. Non dice quanta di quell'energia sia effettivamente usata sul posto né quanto pesino accumulo e reti.",
+  "fonti": []
+ },
+ "bes:10AMB016": {
+  "attacco": "Il dato BES sull'elettricità da rinnovabili conferma il primato alpino: oltre il 100% dei consumi in Valle d'Aosta, 328%, e Trentino Alto Adige, 186%, per via delle esportazioni, contro il 12,4% della Liguria. La media delle regioni è del 66,6%.",
+  "spunto": "Nel sistema BES è un indicatore di sostenibilità, e la sua crescita di lungo periodo, più che raddoppiata, è una delle buone notizie ambientali. Ma la media nazionale nasconde due Italie dell'energia, alcune regioni quasi autosufficienti da fonti pulite, altre ancora molto dipendenti dai fossili. La transizione è avviata, ma resta diseguale tra i territori. Quanto è vicina l'Italia a un'elettricità davvero pulita?",
+  "limite": "Coincide con l'indicatore territoriale e ne condivide i limiti, dato che rapporta la produzione al consumo locale e supera il 100% per le regioni esportatrici. Non misura l'intero fabbisogno energetico, ma solo l'elettricità.",
+  "fonti": []
+ },
+ "384": {
+  "attacco": "La gestione dei siti contaminati misura quanti procedimenti di bonifica si sono conclusi. È più avanzata in Valle d'Aosta, 87%, Friuli-Venezia Giulia, 84%, e Trentino Alto Adige, molto indietro in Campania, 14%, e Abruzzo. La media delle regioni è del 50%.",
+  "spunto": "Bonificare un sito inquinato è lungo e costoso, e il divario mostra chi ha chiuso i conti con il proprio passato industriale e chi no. La Campania in fondo, con la sua storia di rifiuti e discariche, ha ancora molto da recuperare. Un procedimento concluso però non sempre significa area pienamente risanata. Bonificare è chiudere una pratica o restituire davvero un territorio?",
+  "limite": "Conta i procedimenti amministrativi conclusi, non la qualità della bonifica né i siti mai censiti. Un'alta percentuale può nascere anche da pochi siti da trattare, non solo da un'azione efficace.",
+  "fonti": []
+ },
+ "bes:10AMB010": {
+  "attacco": "Il numero di siti contaminati per mille varia moltissimo, spesso per eredità industriali del passato. È altissimo in Piemonte, 34,7, Friuli-Venezia Giulia, 18,7, e Sardegna, mentre è minimo nelle Marche e in Molise, sotto lo 0,3. La media delle regioni è di circa 5,6.",
+  "spunto": "I siti contaminati sono la cicatrice della storia industriale ed estrattiva, e si concentrano dove c'erano fabbriche, miniere e poli chimici, come il Piemonte industriale. Il forte calo recente riflette bonifiche completate e revisioni dei censimenti. È un indicatore descrittivo, ma segnala un debito ambientale che alcune regioni pagano ancora. Il prezzo dell'industria si misura anche in terra da risanare?",
+  "limite": "Conta i siti contaminati per abitante, un dato sensibile a come vengono censiti e classificati. Non dice l'estensione o la pericolosità dei siti, né a che punto sia la loro bonifica.",
+  "fonti": []
+ },
+ "60": {
+  "attacco": "La continuità dell'elettricità non è uguale ovunque. In Sicilia si contano in media 5,65 interruzioni lunghe per utente all'anno, in Campania 4,4 e in Calabria 3,8, contro le 0,93 del Trentino Alto Adige. La media delle regioni è di circa 2,4, in calo nel tempo.",
+  "spunto": "Le interruzioni frequenti sono un divario di qualità del servizio, non solo un fastidio, dato che pesano su imprese, ospedali e vita quotidiana. Si concentrano al Sud, dove reti più vecchie e territori difficili rendono la distribuzione meno affidabile. Il calo di lungo periodo è reale, ma il Sud resta indietro. Un servizio essenziale come l'elettricità può funzionare a due velocità?",
+  "limite": "Conta le interruzioni lunghe accidentali per utente, non quelle brevi né i cali di tensione. Non distingue le cause, dal maltempo ai guasti di rete, e non misura i danni economici che provocano.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ELETTR_TOT": {
+  "attacco": "La soddisfazione complessiva per il servizio elettrico è alta ma diseguale. È massima in Trentino Alto Adige, 90%, e Valle d'Aosta, 88%, più bassa in Sardegna, 63%, e Calabria. La media delle regioni è del 75%, con un chiaro svantaggio delle isole.",
+  "spunto": "La soddisfazione per l'elettricità riflette la qualità reale del servizio, dalle interruzioni alla stabilità, ma anche le attese dei cittadini. Il Sud e le isole, con reti più fragili, sono meno soddisfatti, in linea con i dati oggettivi sulle interruzioni di corrente. È uno dei pochi casi in cui percezione e realtà coincidono. Un servizio essenziale dovrebbe essere ugualmente buono ovunque?",
+  "limite": "Rileva una soddisfazione dichiarata, che dipende anche dalle aspettative oltre che dal servizio reale. Non distingue quale aspetto scontenti, dalla continuità al costo della bolletta.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ELETTR_CONT": {
+  "attacco": "La soddisfazione per la continuità del servizio elettrico, cioè per l'assenza di interruzioni, è alta quasi ovunque: in media il 90%. Va dal 98% del Trentino Alto Adige e 97% della Valle d'Aosta all'84% della Calabria e Campania. Il divario è contenuto ma reale.",
+  "spunto": "Questo giudizio ricalca da vicino i dati oggettivi sulle interruzioni, con il Sud meno soddisfatto, dove il servizio è davvero meno continuo. La netta convergenza tra percezione e realtà rende questo indicatore affidabile. Anche piccole differenze di continuità pesano molto su chi lavora da casa o usa dispositivi medici salvavita. Quanto vale, per una famiglia o un'impresa, un'elettricità che non si interrompe mai?",
+  "limite": "Misura la soddisfazione per la continuità, non il numero reale di interruzioni. Riflette anche le attese, che possono essere più alte dove il servizio è storicamente migliore.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ELETTR_VOLT": {
+  "attacco": "La soddisfazione per la stabilità della tensione elettrica, che evita sbalzi dannosi per gli apparecchi, è più alta in Trentino Alto Adige, 96%, e Valle d'Aosta, 94%, più bassa in Sicilia, 78%, e Calabria. La media delle regioni è dell'85,5%.",
+  "spunto": "Gli sbalzi di tensione danneggiano elettrodomestici e macchinari, e la loro percezione segue la qualità della rete, più fragile al Sud e nelle isole. È un aspetto tecnico ma concreto, che incide sui costi delle famiglie e delle imprese quando la tensione non è stabile. Ancora una volta la qualità del servizio disegna un Nord e un Sud. Una rete elettrica moderna è ancora un obiettivo da raggiungere al Sud?",
+  "limite": "Rileva la soddisfazione per la stabilità della tensione, non le misure tecniche reali degli sbalzi. Dipende anche dalla sensibilità di chi risponde e dagli apparecchi che possiede.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ELETTR_BOLL": {
+  "attacco": "Capire la propria bolletta elettrica non è scontato: ci riesce in media solo il 60% delle famiglie. La quota è più alta in Trentino Alto Adige, 75%, e Valle d'Aosta, 71%, più bassa nel Lazio, 55%, e in Puglia. La media delle regioni è del 60%.",
+  "spunto": "Che quattro famiglie su dieci non capiscano la bolletta è un problema di trasparenza, non di rete, e limita la capacità di scegliere l'offerta migliore o di risparmiare. La comprensione più bassa al Centro-Sud si somma ad altri divari di alfabetizzazione, anche digitale. Una bolletta oscura è un ostacolo alla concorrenza tra fornitori. Chi non capisce quanto spende può davvero risparmiare?",
+  "limite": "Rileva la comprensione dichiarata della bolletta, non quella reale, che potrebbe essere anche minore. Non dice cosa esattamente risulti oscuro, dai consumi alle voci di costo e agli oneri di sistema.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ELETTR_DISPLAY": {
+  "attacco": "Capire il display del contatore elettronico, utile a controllare i consumi, riesce in media al 75,6% delle famiglie. La quota è più alta in Trentino Alto Adige, 87%, e Valle d'Aosta, 85%, più bassa nel Lazio, 67%, e in Campania. La media delle regioni è del 75,6%.",
+  "spunto": "Il contatore elettronico permette di monitorare i consumi in tempo reale, ma serve solo a chi sa leggerlo. La comprensione più bassa al Centro-Sud riduce i benefici di uno strumento pensato per l'efficienza. Gli strumenti digitali aiutano solo chi ha le competenze per usarli, e qui torna il divario di alfabetizzazione. La tecnologia riduce le disuguaglianze o ne crea di nuove?",
+  "limite": "Misura la comprensione dichiarata del display, non l'uso effettivo per ridurre i consumi. Non dice se chi lo capisce poi cambi davvero comportamenti in base ai dati che legge.",
+  "fonti": []
+ },
+ "multiscopo:MULTI_ELETTR_INFO": {
+  "attacco": "La soddisfazione per le informazioni ricevute sul servizio elettrico è la più bassa tra gli aspetti misurati: in media il 53,5%. È più alta in Trentino Alto Adige, 70%, e Valle d'Aosta, 66%, più bassa nel Lazio, 46%, e in Abruzzo. La media delle regioni è del 53,5%.",
+  "spunto": "Meno di una famiglia su due si dice ben informata sul servizio elettrico, il punto più debole del rapporto tra utenti e fornitori. Una comunicazione carente pesa sulla capacità di gestire consumi, guasti e contratti, e va insieme alla difficoltà di capire la bolletta. In un mercato liberalizzato, l'informazione è la base per scegliere. Un cliente poco informato è un cliente davvero libero?",
+  "limite": "Rileva la soddisfazione per l'informazione ricevuta, non la sua qualità oggettiva. Dipende dalle attese e dal canale usato, e non dice quali informazioni manchino di più alle famiglie.",
+  "fonti": []
+ },
+ "bes:10AMB003": {
+  "attacco": "Quanta acqua si perde lungo la rete prima di arrivare ai rubinetti è un problema enorme. La dispersione supera il 65% in Basilicata e il 62% in Abruzzo, contro il 29,7% dell'Emilia-Romagna. La media delle regioni è del 44%, quasi metà dell'acqua immessa.",
+  "spunto": "Perdere quasi metà dell'acqua in rete è uno spreco che pesa doppio dove l'acqua scarseggia, come nel Sud siccitoso. Le perdite dipendono da tubature vecchie e da decenni di mancata manutenzione, un debito infrastrutturale accumulato. Con la siccità che avanza, ridurre le perdite vale quanto trovare nuova acqua. Investire nelle reti idriche è meno visibile ma più urgente di nuove opere?",
+  "limite": "Stima l'acqua immessa in rete che non arriva agli utenti, un dato in parte calcolato e non sempre preciso. Non distingue le perdite fisiche dai furti e dagli errori di misura dei contatori.",
+  "fonti": []
+ },
+ "bes:10AMB020": {
+  "attacco": "L'esposizione al particolato fine PM2.5 oltre i limiti riguarda soprattutto la pianura padana. Il valore è massimo in Veneto, 100, Lombardia, 96, e Friuli-Venezia Giulia, minimo in Sardegna, 4, e Basilicata. La media delle regioni è di circa 65, con un divario molto ampio.",
+  "spunto": "Il PM2.5 è tra gli inquinanti più dannosi per la salute, e la sua concentrazione in pianura padana dipende da traffico, industria, riscaldamento e da una conformazione geografica che intrappola l'aria. Non è colpa dei soli residenti, ma la somma di molte pressioni in un bacino chiuso tra le montagne. È tra le aree con la peggiore qualità dell'aria d'Europa. Un problema di clima e geografia si può risolvere solo localmente?",
+  "limite": "Misura l'esposizione al PM2.5 secondo una soglia, non la concentrazione media reale. Riflette geografia e meteo oltre alle emissioni, e non attribuisce l'inquinamento a una singola fonte.",
+  "fonti": []
+ },
+ "bes:10AMB009": {
+  "attacco": "La soddisfazione per la situazione ambientale del luogo in cui si vive è alta al Nord e più bassa al Sud urbano. È massima in Valle d'Aosta, 87,5%, e Trentino Alto Adige, 87%, minima in Campania, 58,6%, e Sicilia. La media delle regioni è del 75,3%.",
+  "spunto": "Il giudizio sull'ambiente unisce natura, pulizia, rifiuti e qualità dell'aria, e premia le regioni alpine, dove il paesaggio è integro e i servizi funzionano. La Campania in fondo sconta l'eredità dei rifiuti e dell'inquinamento urbano. È una percezione, ma nasce da condizioni reali sotto gli occhi di tutti. Un ambiente migliore rende più soddisfatti o ci si abitua a ciò che si ha?",
+  "limite": "Rileva un giudizio soggettivo sull'ambiente, influenzato da attese e abitudini. Non distingue quale aspetto pesi di più, dall'aria ai rifiuti al verde, e chi vive a lungo in un luogo può assuefarsi ai suoi problemi.",
+  "fonti": []
+ },
+ "bes:10AMB023": {
+  "attacco": "La preoccupazione per i cambiamenti climatici è alta e piuttosto uniforme: in media il 68,8% delle persone. È massima in Molise, 71,7%, Umbria e Puglia, minima in Calabria, 62,2%, e Friuli-Venezia Giulia. La media delle regioni è del 68,8%, con differenze minime.",
+  "spunto": "Che oltre due terzi degli italiani si dicano preoccupati per il clima, in modo simile ovunque, segnala una consapevolezza ormai diffusa, cresciuta negli ultimi anni. Ma preoccuparsi non significa cambiare comportamenti, e la distanza tra allarme dichiarato e scelte quotidiane resta ampia. È un indicatore descrittivo dell'opinione, non dell'azione. La preoccupazione per il clima si traduce in qualcosa o resta un sentimento?",
+  "limite": "Misura una preoccupazione dichiarata, non i comportamenti concreti né la loro coerenza. Dipende dall'attenzione mediatica del momento e non dice cosa le persone siano davvero disposte a fare.",
+  "fonti": []
+ },
+ "bes:10AMB015": {
+  "attacco": "La preoccupazione per la perdita di biodiversità è meno diffusa di quella per il clima, in media il 22,8%, ma in crescita. È più alta in Sardegna, 26,4%, Molise e Toscana, più bassa in Puglia, 18,9%, e Marche. La media delle regioni è del 22,8%.",
+  "spunto": "La biodiversità preoccupa molto meno del clima, pur essendo una crisi altrettanto grave e legata, dato che la perdita di specie e habitat è meno visibile e più difficile da percepire. La crescita recente segnala però una consapevolezza che si allarga oltre il solo tema climatico. Difendere la biodiversità resta astratto finché non se ne vedono gli effetti. Ci si accorge della natura solo quando comincia a mancare?",
+  "limite": "Rileva una preoccupazione dichiarata, non la conoscenza reale del tema né i comportamenti. Una bassa preoccupazione può nascere da minore informazione più che da minore importanza del problema.",
+  "fonti": []
  }
 }
