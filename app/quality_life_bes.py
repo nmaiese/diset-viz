@@ -33,6 +33,7 @@ def _score_color(score, lo, hi):
     rgb = tuple(round(a + (b - a) * t) for a, b in zip(_MAP_RAMP_FROM, _MAP_RAMP_TO))
     return "#{:02x}{:02x}{:02x}".format(*rgb)
 
+from app import sources
 from app.cache import cache
 from app.data import get_catalog, get_rows
 from app.atlas_catalog import catalog_summary as _regional_catalog_summary
@@ -63,12 +64,14 @@ from app.quality_life_config import DEFAULT_PROFILE, QUALITY_LIFE_CATEGORIES, QU
 from app.quality_life_selection import BES_PREFIX, EUR_PREFIX, MULTI_PREFIX, regional_quality_life_selection
 
 # Compact source labels for the visible methodology breakdown.
-_SOURCE_SCORE_LABEL = {
-    "bes": "BES",
-    "territorial": "indicatori territoriali",
-    "multiscopo": "Multiscopo",
-    "eurostat": "Eurostat",
-}
+def _source_score_label(family):
+    """Inline label for a source family inside a sentence.
+
+    From the source registry, never hand-written here: this map used to say
+    "BES" and "Multiscopo", bare internal acronyms that the naming rules keep
+    out of user-facing copy."""
+    label = sources.family_short_label(family)
+    return label[:1].lower() + label[1:]
 
 LEVELS = ("regione", "provincia")
 _DISPLAY_SPREAD = 12.0   # display = 50 + 12 * (standardised score), clipped to 0..100
@@ -447,7 +450,7 @@ def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
             # Human-readable breakdown, data-driven so the visible methodology
             # always lists exactly the source families actually in the score.
             "source_breakdown": [
-                {"family": family, "label": _SOURCE_SCORE_LABEL.get(family, family), "count": count}
+                {"family": family, "label": _source_score_label(family), "count": count}
                 for family, count in sorted(
                     ((f, sum(i["source_family"] == f for i in meta.values()))
                      for f in {i["source_family"] for i in meta.values()}),

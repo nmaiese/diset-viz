@@ -21,6 +21,19 @@ class SourceRegistryTest(unittest.TestCase):
         for family in sources.SOURCES:
             self.assertNotIn(sources.family_label(family).lower(), {"bes", "multiscopo", "multifonte"})
 
+    def test_score_breakdown_labels_come_from_the_registry(self):
+        """The visible score breakdown used to carry a second, hand-written set
+        of names ("BES", "Multiscopo"), the bare internal acronyms the naming
+        rules keep out of user-facing copy."""
+        from app.quality_life_bes import build_bes_ranking
+
+        breakdown = build_bes_ranking("regione", "standard")["methodology"]["source_breakdown"]
+        self.assertTrue(breakdown)
+        for entry in breakdown:
+            expected = sources.family_short_label(entry["family"])
+            self.assertEqual(entry["label"].lower(), expected.lower())
+            self.assertNotIn(entry["label"].lower(), {"bes", "multiscopo"})
+
     def test_url_round_trip_handles_dashed_ids(self):
         # Keyword-first: the slug leads, the resolving code is the last segment.
         # BES variant ids contain dashes; they must survive the round trip.
