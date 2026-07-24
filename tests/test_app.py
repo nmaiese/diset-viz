@@ -384,7 +384,17 @@ class AppSmokeTest(unittest.TestCase):
             "ranking": client.get("/qualita-della-vita/classifica/regioni").data.decode("utf-8"),
         }
         for name, html in pages.items():
-            self.assertIn('"license": "https://creativecommons.org/licenses/by/3.0/it/"', html, name)
+            if name == "ranking":
+                # The regional ranking can combine Istat and Eurostat, so its JSON-LD
+                # license must reflect both rather than claim Istat-only.
+                self.assertRegex(
+                    html,
+                    r'"license": "(https://creativecommons\.org/licenses/by/3\.0/it/'
+                    r'|CC BY 3\.0 IT \(Istat\) e CC BY 4\.0 \(Eurostat\))"',
+                    name,
+                )
+            else:
+                self.assertIn('"license": "https://creativecommons.org/licenses/by/3.0/it/"', html, name)
             self.assertNotIn('"@type": "Country"', html, name)
             self.assertNotIn('"@type": "AdministrativeArea"', html, name)
             for block in re.findall(r'<script type="application/ld\+json">\s*(\{.*?\})\s*</script>', html, re.S):

@@ -22,7 +22,7 @@ from pathlib import Path
 
 from app import sources
 from app.data import _parse_number, REGION_ORDER
-from app.external_data import get_external_rows
+from app.external_data import freshness_label, freshness_status, get_external_rows
 from app.indicator_notes import build_bes_indicator_explain, display_unit
 from app.profiles import SCOREABLE_DIRECTIONS, slugify
 from app.taxonomy import category_metadata
@@ -214,6 +214,11 @@ def get_eurostat_atlas_indicator(public_id):
         "completeness": completeness,
         "complete": latest_region_count == 20 and completeness >= 0.98,
         "spark": spark,
+        # Freshness badge (same contract as territorial metadata) driven by the
+        # latest published year, so indicator_page.html doesn't render an empty badge.
+        "freshness_status": freshness_status(latest_year),
+        "freshness_label": freshness_label(freshness_status(latest_year)),
+        "freshness_year_max": latest_year,
         "catalog_family": "eurostat",
         "catalog_family_label": EUROSTAT_SOURCE_LABEL,
         "path": eurostat_indicator_path(raw_id, first["name"]),

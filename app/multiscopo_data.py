@@ -78,8 +78,8 @@ def get_multiscopo_manifest():
             item["source_data_url"] = SDMX_DATA_URL.format(flow_id=item["source_dataflow"])
             item["explain"] = build_bes_indicator_explain(item, "regioni")
             item["explain"]["scope"] += (
-                " Per il Trentino Alto Adige il valore è una media semplice dei dati "
-                "pubblicati separatamente per le province autonome di Trento e Bolzano."
+                " Per il Trentino Alto Adige il valore è una media pesata per popolazione "
+                "dei dati pubblicati separatamente per le province autonome di Trento e Bolzano."
             )
             item["explain"]["caveat"] = (
                 "È una stima campionaria e alcune osservazioni possono non essere pubblicate "

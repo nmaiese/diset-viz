@@ -9,17 +9,21 @@
 {% block description %}Classifica della qualità della vita per {{ lvl_label }}: indicatori Istat su scala 0-100, profilo {{ p.name }}, categorie e metodo trasparenti.{% endblock %}
 
 {% block head_extra %}
+{# Keep the Dataset JSON-LD in sync with the visible sources: at regional level
+   the score can include Eurostat, so creator/description/license must not claim
+   Istat-only when a non-Istat family contributes. #}
+{% set has_eurostat = (not is_prov) and (m.source_breakdown | selectattr('family', 'equalto', 'eurostat') | list | length > 0) %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Dataset",
   "name": "Classifica qualità della vita per {{ lvl_label }}, profilo {{ p.name }}",
-  "description": {{ ('Punteggi di qualità della vita delle ' ~ lvl_label ~ ' italiane su indicatori Istat selezionati, normalizzati con z-score orientato e display 0-100.') | tojson }},
+  "description": {{ ('Punteggi di qualità della vita delle ' ~ lvl_label ~ ' italiane su indicatori ' ~ ('istituzionali selezionati (Istat ed Eurostat)' if has_eurostat else 'Istat selezionati') ~ ', normalizzati con z-score orientato e display 0-100.') | tojson }},
   "url": {{ canonical | tojson }},
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
-  "creator": { "@type": "Organization", "name": "Istat" },
+  "creator": {% if has_eurostat %}[{ "@type": "Organization", "name": "Istat" }, { "@type": "Organization", "name": "Eurostat" }]{% else %}{ "@type": "Organization", "name": "Istat" }{% endif %},
   "isAccessibleForFree": true,
-  "license": "https://creativecommons.org/licenses/by/3.0/it/",
+  "license": {{ ('CC BY 3.0 IT (Istat) e CC BY 4.0 (Eurostat)' if has_eurostat else 'https://creativecommons.org/licenses/by/3.0/it/') | tojson }},
   "distribution": [
     {
       "@type": "DataDownload",
