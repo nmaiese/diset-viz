@@ -24,7 +24,8 @@ senza merge.
   `priority_score` (fresco + regionale + copertura + novità) e scrive in
   `data/discovery/candidates.csv`.
 - Lib: `scripts/discovery.py`. Adapter pilota: `scripts/eurostat_source.py`
-  (Eurostat NUTS2, cache-first, fixture offline, Bolzano+Trento mediati).
+  (Eurostat NUTS2, cache-first, fixture offline, Bolzano+Trento combinati con
+  media pesata per popolazione).
 - Stdlib puro: gira senza il venv dell'app.
 
 ### Fase 2 — Promozione + Eurostat come famiglia d'atlante
@@ -113,3 +114,11 @@ vita del processo). Il frontend NON va ricostruito per i soli dati (la SPA legge
   fixture in `data/discovery/fixtures/`.
 - Il curatore non dichiara mai `exact`; `score_eligible=true` è rifiutato se il
   verso non è direzionale.
+- **Bolzano+Trento**: BES e territoriali ricevono già da Istat l'aggregato
+  Trentino Alto Adige. Eurostat lo combina con media pesata per popolazione.
+  **Multiscopo usa ancora una media semplice** (`update_multiscopo_regions.py`):
+  ok come approssimazione (tassi, province ~50/50) ma da allineare al pesato in
+  un giro dedicato (richiede rifetch SDMX rate-limited).
+- `indicator_page.html` è condiviso da territoriali ed Eurostat: usa
+  `meta.institution` e `meta.license_url` (fallback Istat), quindi le pagine
+  Eurostat mostrano licenza CC BY 4.0 e "fonte Eurostat", non Istat.

@@ -26,8 +26,8 @@
   "isBasedOn": {{ meta.source_url | tojson }},
   "variableMeasured": {{ meta.name | tojson }},
   "isAccessibleForFree": true,
-  "license": "https://creativecommons.org/licenses/by/3.0/it/",
-  "keywords": [{{ meta.theme | tojson }}, "indicatori territoriali", "regioni italiane", "Istat"],
+  "license": {{ (meta.license_url or "https://creativecommons.org/licenses/by/3.0/it/") | tojson }},
+  "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}],
   "distribution": [
     {
       "@type": "DataDownload",
@@ -78,7 +78,7 @@
 
   <div class="page-facts">
     <span><small>Tema</small><a href="{{ theme_path }}">{{ meta.theme }}</a></span>
-    {% if meta.source_theme and meta.source_theme != meta.theme %}<span><small>Sottotema Istat</small>{{ meta.source_theme }}</span>{% endif %}
+    {% if meta.source_theme and meta.source_theme != meta.theme %}<span><small>Sottotema {{ meta.institution or "Istat" }}</small>{{ meta.source_theme }}</span>{% endif %}
     <span><small>Unità di misura</small>{{ value_unit }}</span>
     <span><small>Copertura</small>{{ meta.year_min }}-{{ meta.year_max }}, {{ meta.regions | length }} regioni</span>
     <span><small>Freschezza</small><b class="freshness-badge is-{{ meta.freshness_status }}">{{ meta.freshness_label }}</b></span>
@@ -233,7 +233,7 @@
     <details class="indicator-source-definition">
       <summary>Leggi la definizione originale della fonte</summary>
       <p>{{ meta.archive }}</p>
-      <p><a href="{{ meta.source_url }}" target="_blank" rel="noopener">Consulta la fonte Istat →</a></p>
+      <p><a href="{{ meta.source_url }}" target="_blank" rel="noopener">Consulta la fonte {{ meta.institution or "Istat" }} →</a></p>
     </details>
     {% endif %}
   </section>

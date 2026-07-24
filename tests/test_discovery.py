@@ -61,14 +61,26 @@ class DedupClassifier(unittest.TestCase):
 
 
 class EurostatAdapter(unittest.TestCase):
-    def test_parse_collapses_bolzano_trento(self):
+    def test_parse_weights_bolzano_trento(self):
         doc = eurostat_source.fetch_dataset("rd_e_gerdreg", offline=True)
-        regional = eurostat_source.parse_regional(doc)
-        # 20 regions max, Trentino present once (Bolzano+Trento merged).
-        self.assertLessEqual(len(regional), 20)
+        weights = eurostat_source.fetch_weights(offline=True)
+        regional = eurostat_source.parse_regional(doc, "weighted", weights)
+        # Trentino present once (Bolzano+Trento combined by population weight),
+        # 20 regions, and the value sits between the two provincial figures.
         self.assertIn("trentino-alto-adige", regional)
+        self.assertEqual(len(regional), 20)
         for region_key in regional:
             self.assertIn(region_key, eurostat_source.REGION_NAMES)
+        tv = regional["trentino-alto-adige"]["2023"]
+        self.assertGreater(tv, 1.0)
+        self.assertLess(tv, 1.3)
+
+    def test_weighted_needs_weights_else_drops_split(self):
+        # Without weights the split region cannot be combined honestly: dropped,
+        # never silently averaged.
+        doc = eurostat_source.fetch_dataset("rd_e_gerdreg", offline=True)
+        regional = eurostat_source.parse_regional(doc, "weighted", weights=None)
+        self.assertNotIn("trentino-alto-adige", regional)
 
     def test_best_recent_year_respects_coverage(self):
         doc = eurostat_source.fetch_dataset("nama_10r_2gdp", offline=True)

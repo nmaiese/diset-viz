@@ -39,7 +39,10 @@ class EurostatAtlasFamilyTest(unittest.TestCase):
         payload = get_atlas_indicator("eur:rd_e_gerdreg")
         self.assertIsNotNone(payload)
         self.assertEqual(payload["metadata"]["explain"]["direction"], "higher_better")
+        # Bolzano and Trento are combined by population weight (not a plain mean),
+        # so Trentino Alto Adige keeps a real value and all 20 regions are present.
         self.assertEqual(len(payload["series"]), 20)
+        self.assertIn("trentino-alto-adige", {r["region_key"] for r in payload["series"]})
 
         path = payload["metadata"]["path"]
         self.assertEqual(self.client.get(path).status_code, 200)

@@ -29,6 +29,8 @@ from app.taxonomy import category_metadata
 
 EUR_ID_PREFIX = sources.SOURCES["eurostat"]["internal_prefix"]  # "eur:"
 EUROSTAT_SOURCE_LABEL = sources.family_label("eurostat")
+EUROSTAT_INSTITUTION = sources.family_institution("eurostat")  # "Eurostat"
+EUROSTAT_LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/"
 MIN_INDEXABLE_YEAR = 2020
 # Reviewed plain-language descriptions written by the curator (apply_curation.py).
 CURATED_DESC_PATH = Path(__file__).resolve().parent / "static" / "data" / "external" / "curated_descriptions.csv"
@@ -191,6 +193,9 @@ def get_eurostat_atlas_indicator(public_id):
         "source": EUROSTAT_SOURCE_LABEL,
         "source_label": EUROSTAT_SOURCE_LABEL,
         "source_url": first.get("source_url") or "",
+        "institution": EUROSTAT_INSTITUTION,
+        "license": first.get("license") or "CC BY 4.0 (Eurostat)",
+        "license_url": EUROSTAT_LICENSE_URL,
         "archive": first.get("source_dataset") or "Eurostat regional database",
         "explain": _explain_with_curation(
             str(public_id),

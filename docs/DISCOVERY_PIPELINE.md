@@ -147,9 +147,15 @@ Prima istituzione oltre Istat, per validare il flusso end-to-end.
 - Selezione curata `EUROSTAT_SERIES`: PIL pro capite (`nama_10r_2gdp`) e spesa
   R&S sul PIL (`rd_e_gerdreg`). Un dataflow = un indicatore, nessuna euristica sui
   codici.
-- Mappa `NUTS2_TO_REGION`: 21 NUTS2 italiane sulle 20 regioni, con Bolzano+Trento
-  mediati in Trentino Alto Adige (come nel BES nazionale). `ITZZ` (Extra-Regio)
-  scartato.
+- Mappa `NUTS2_TO_REGION`: 21 NUTS2 italiane sulle 20 regioni. Bolzano e Trento
+  vengono combinati in Trentino Alto Adige con **media pesata per popolazione**
+  (`fetch_weights`, dataset `nama_10r_3popgdp`), non con media semplice: per un
+  rapporto come il PIL pro capite la media non pesata sarebbe un valore sintetico
+  sbagliato. `ITZZ` (Extra-Regio) scartato. Nota: il BES nazionale non ha questo
+  problema perché Istat pubblica già Trentino Alto Adige come regione unica; la
+  pipeline Multiscopo invece usa ancora una media semplice
+  (`scripts/update_multiscopo_regions.py`), accettabile perché sono tassi con
+  popolazioni province quasi identiche, ma da allineare al metodo pesato.
 - "Anno recente onesto": si sceglie l'anno più recente che supera la soglia di
   copertura (`MIN_COVERAGE=0.8`), non l'ultimo assoluto (spesso sparso).
 
@@ -196,7 +202,7 @@ Note operative:
 ## Test
 
 `tests/test_discovery.py` (stdlib, offline): schema e policy di priorità, dedup
-conservativa, collasso Bolzano+Trento, anno recente per copertura, e il round
+conservativa, combinazione pesata Bolzano+Trento, anno recente per copertura, e il round
 trip cacciatore → coda → (approvazione) → promozione su file temporanei, così i
 dati di produzione non vengono mai toccati.
 
