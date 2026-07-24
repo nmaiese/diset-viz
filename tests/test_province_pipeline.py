@@ -136,6 +136,93 @@ class SdmxClientTest(unittest.TestCase):
         self.assertEqual(len(calls), 1)        # second served from disk cache
         self.assertEqual(client.request_count, 1)
 
+    def test_expired_data_response_is_refetched_but_structures_are_not(self):
+        """The cache split that keeps a scheduled refresh from freezing: a data
+        response older than data_max_age is refetched, a structure never is."""
+        import tempfile
+
+        import time
+
+        clock = FakeClock()
+        # Anchored to real time: cache ages are measured against file mtimes.
+        wall = {"now": time.time()}
+        calls = []
+
+        def opener(url, headers):
+            calls.append(url)
+            return 200, b"PAYLOAD"
+
+        with tempfile.TemporaryDirectory() as tmp:
+            client = istat_sdmx.SdmxClient(
+                cache_dir=tmp,
+                min_interval=0.0,
+                sleeper=clock.sleep,
+                clock=clock.time,
+                wall_clock=lambda: wall["now"],
+                data_max_age=100.0,
+                opener=opener,
+            )
+            client.get("https://example/data", "text/csv", max_age=100.0)
+            client.get("https://example/struct", "text/json")
+            self.assertEqual(len(calls), 2)
+
+            # Still inside the window: both served from disk.
+            wall["now"] += 50
+            client.get("https://example/data", "text/csv", max_age=100.0)
+            client.get("https://example/struct", "text/json")
+            self.assertEqual(len(calls), 2)
+
+            # Past it: only the data response goes back to the network.
+            wall["now"] += 100
+            client.get("https://example/data", "text/csv", max_age=100.0)
+            client.get("https://example/struct", "text/json")
+            self.assertEqual(calls, [
+                "https://example/data",
+                "https://example/struct",
+                "https://example/data",
+            ])
+
+    def test_cache_only_serves_expired_entries(self):
+        """cache_only means no network at all, so age must not turn a hit into
+        a miss (offline reruns of build_province_dataset depend on this)."""
+        import tempfile
+        import time
+
+        clock = FakeClock()
+        wall = {"now": time.time()}
+
+        with tempfile.TemporaryDirectory() as tmp:
+            writer = istat_sdmx.SdmxClient(
+                cache_dir=tmp, min_interval=0.0, sleeper=clock.sleep, clock=clock.time,
+                opener=lambda url, headers: (200, b"PAYLOAD"),
+            )
+            writer.get("https://example/old", "text/csv", max_age=10.0)
+
+            offline = istat_sdmx.SdmxClient(
+                cache_dir=tmp, cache_only=True, wall_clock=lambda: wall["now"] + 10_000,
+            )
+            self.assertEqual(
+                offline.get("https://example/old", "text/csv", max_age=10.0), b"PAYLOAD"
+            )
+            self.assertEqual(offline.request_count, 0)
+
+    def test_refresh_data_forces_a_refetch(self):
+        import tempfile
+
+        clock = FakeClock()
+        calls = []
+
+        with tempfile.TemporaryDirectory() as tmp:
+            client = istat_sdmx.SdmxClient(
+                cache_dir=tmp, min_interval=0.0, sleeper=clock.sleep, clock=clock.time,
+                refresh_data=True,
+                opener=lambda url, headers: (calls.append(url), (200, b"A,B\n1,2\n"))[1],
+            )
+            client.data("FLOW", key="A")
+            client.data("FLOW", key="A")
+
+        self.assertEqual(len(calls), 2)
+
     def test_block_detection_on_empty_200(self):
         import tempfile
 

@@ -26,12 +26,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Calcola la settimana corrente
+        id: periodo
+        run: echo "week=$(date -u +%G-W%V)" >> "$GITHUB_OUTPUT"
+
+      # Una cache GitHub è immutabile: con una chiave fissa il primo archivio
+      # salvato non verrebbe mai sostituito e il job continuerebbe a rileggere
+      # la prima risposta SDMX ottenuta. La chiave ruota ogni settimana, mentre
+      # le restore-keys recuperano l'archivio precedente: le strutture
+      # (dataflow, DSD, codelist) restano riusabili e non consumano il budget
+      # di richieste, i dati scadono da soli lato client (DATA_MAX_AGE).
       - name: Ripristina la cache SDMX Istat
         uses: actions/cache@v4
         with:
           path: data/istat_cache
-          key: istat-sdmx-${{ runner.os }}-${{ hashFiles('scripts/multiscopo_sources.py') }}
+          key: istat-sdmx-${{ runner.os }}-${{ hashFiles('scripts/multiscopo_sources.py') }}-${{ steps.periodo.outputs.week }}
           restore-keys: |
+            istat-sdmx-${{ runner.os }}-${{ hashFiles('scripts/multiscopo_sources.py') }}-
             istat-sdmx-${{ runner.os }}-
 
       - name: Installa dipendenze

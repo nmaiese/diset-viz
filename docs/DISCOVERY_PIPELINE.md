@@ -214,6 +214,17 @@ Note operative:
 - Gli script sono **stdlib puri**: girano senza il venv dell'app.
 - **Rate limit**: una richiesta per dataset, cache-first. Rispettare i limiti
   Istat SDMX (5/min) quando si aggiungeranno fonti Istat alla watchlist.
+- **Scadenza della cache**: la cache serve a non rifare la stessa richiesta
+  dentro una run, non a congelare la fonte. Le risposte dati scadono dopo
+  `CACHE_MAX_AGE` (Eurostat, `scripts/eurostat_source.py`) e `DATA_MAX_AGE`
+  (Istat, `scripts/istat_sdmx.py`), sei giorni, appena sotto la cadenza
+  settimanale. Le **strutture** SDMX (dataflow, DSD, codelist) restano invece
+  in cache senza scadenza, perché cambiano di rado e rifarle consuma solo
+  budget di richieste. Un job schedulato che ripristina una cache di lungo
+  periodo senza questa scadenza rileggerebbe per sempre la prima risposta
+  salvata: se si aggiunge un workflow, la chiave `actions/cache` deve ruotare
+  (le cache GitHub sono immutabili) e le `restore-keys` recuperare la
+  precedente, come in `.github/workflows/data-refresh.yml`.
 - **Network policy**: l'accesso web dipende dalla policy dell'ambiente. In una
   sessione senza rete, usare `--offline` sui fixture committati.
 - Le colonne del layer esterno in `promote_candidates.py` (`EXTERNAL_COLUMNS`,

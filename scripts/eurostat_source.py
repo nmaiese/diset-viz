@@ -18,12 +18,16 @@ Design choices that mirror the rest of the pipeline:
 from __future__ import annotations
 
 import json
+import time
 import urllib.request
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_DIR = PROJECT_ROOT / "data" / "discovery" / "fixtures" / "eurostat"
 CACHE_DIR = PROJECT_ROOT / "data" / "eurostat_cache"
+# A live cached response expires after this many seconds, so a scheduled run
+# (weekly at most) always re-reads the source instead of a frozen snapshot.
+CACHE_MAX_AGE = 6 * 24 * 3600
 
 API_BASE = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data"
 LANDING = "https://ec.europa.eu/eurostat/web/regions/data/database"
@@ -104,28 +108,47 @@ def _build_url(dataset, params):
     return f"{API_BASE}/{dataset}?" + "&".join(query)
 
 
-def fetch_dataset(series_id, offline=True, refresh=False):
-    """Return the raw JSON-stat document for a curated series.
+def _cached_fetch(dataset, params, refresh, max_age):
+    """Live fetch of one Eurostat dataset, cache-first with an expiry.
 
-    offline: read the committed fixture (default, used by tests and repeatable
-    runs). Live mode is cache-first: a cached response is reused, otherwise the
-    Eurostat API is queried once and the response is cached under
-    data/eurostat_cache/ (gitignored)."""
-    series = EUROSTAT_SERIES[series_id]
-    dataset = series["dataset"]
-    if offline:
-        return json.loads((FIXTURE_DIR / f"{dataset}.json").read_text(encoding="utf-8"))
-
+    The cache exists to avoid refetching the same document inside a run and
+    across quick reruns, not to freeze the source: past `max_age` the entry is
+    refetched. Without the expiry a long-lived cache (one restored by a
+    scheduled CI job, say) would make every run re-read the first response ever
+    saved, and a discovery run would never see new Eurostat data."""
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     cache_path = CACHE_DIR / f"{dataset}.json"
-    if cache_path.exists() and not refresh:
+    if cache_path.exists() and not refresh and _cache_is_fresh(cache_path, max_age):
         return json.loads(cache_path.read_text(encoding="utf-8"))
-    url = _build_url(dataset, series["params"])
+    url = _build_url(dataset, params)
     request = urllib.request.Request(url, headers={"User-Agent": "divarioitalia-discovery/1.0"})
     with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310 (institutional host)
         payload = response.read().decode("utf-8")
     cache_path.write_text(payload, encoding="utf-8")
     return json.loads(payload)
+
+
+def _cache_is_fresh(cache_path, max_age):
+    if max_age is None:
+        return True
+    try:
+        return (time.time() - cache_path.stat().st_mtime) <= float(max_age)
+    except OSError:
+        return False
+
+
+def fetch_dataset(series_id, offline=True, refresh=False, max_age=CACHE_MAX_AGE):
+    """Return the raw JSON-stat document for a curated series.
+
+    offline: read the committed fixture (default, used by tests and repeatable
+    runs). Live mode is cache-first with an expiry: a cached response younger
+    than `max_age` is reused, otherwise the Eurostat API is queried once and the
+    response is cached under data/eurostat_cache/ (gitignored)."""
+    series = EUROSTAT_SERIES[series_id]
+    dataset = series["dataset"]
+    if offline:
+        return json.loads((FIXTURE_DIR / f"{dataset}.json").read_text(encoding="utf-8"))
+    return _cached_fetch(dataset, series["params"], refresh, max_age)
 
 
 def _nuts_year_values(doc):
@@ -201,24 +224,14 @@ def parse_regional(doc, combine_split="weighted", weights=None):
     return result
 
 
-def fetch_weights(offline=True, refresh=False):
+def fetch_weights(offline=True, refresh=False, max_age=CACHE_MAX_AGE):
     """Population weights ({nuts: {year: pop}}) for the split NUTS2 regions,
     from Eurostat's average-annual-population series. Cache-first with a
     committed fixture, like the data series."""
     if offline:
         doc = json.loads((FIXTURE_DIR / f"{WEIGHT_DATASET}.json").read_text(encoding="utf-8"))
     else:
-        CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        cache_path = CACHE_DIR / f"{WEIGHT_DATASET}.json"
-        if cache_path.exists() and not refresh:
-            doc = json.loads(cache_path.read_text(encoding="utf-8"))
-        else:
-            url = _build_url(WEIGHT_DATASET, WEIGHT_PARAMS)
-            request = urllib.request.Request(url, headers={"User-Agent": "divarioitalia-discovery/1.0"})
-            with urllib.request.urlopen(request, timeout=60) as response:  # noqa: S310
-                payload = response.read().decode("utf-8")
-            cache_path.write_text(payload, encoding="utf-8")
-            doc = json.loads(payload)
+        doc = _cached_fetch(WEIGHT_DATASET, WEIGHT_PARAMS, refresh, max_age)
     by_nuts = _nuts_year_values(doc)
     return {nuts: by_nuts.get(nuts, {}) for nuts in SPLIT_NUTS}
 

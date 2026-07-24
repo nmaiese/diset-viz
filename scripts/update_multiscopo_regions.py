@@ -75,8 +75,15 @@ def build(
     output=OUTPUT,
     manifest=MANIFEST,
     cache_dir=DEFAULT_CACHE,
+    data_max_age=istat_sdmx.DATA_MAX_AGE,
+    refresh_data=False,
 ):
-    client = istat_sdmx.SdmxClient(cache_dir=cache_dir, min_interval=min_interval)
+    client = istat_sdmx.SdmxClient(
+        cache_dir=cache_dir,
+        min_interval=min_interval,
+        data_max_age=data_max_age,
+        refresh_data=refresh_data,
+    )
     region_names = _load_region_names()
 
     dataset = []
@@ -222,6 +229,18 @@ if __name__ == "__main__":
     parser.add_argument("--cache-dir", type=Path, default=DEFAULT_CACHE)
     parser.add_argument("--min-interval", type=float, default=16.0)
     parser.add_argument("--max-requests", type=int, default=200)
+    parser.add_argument(
+        "--data-max-age",
+        type=float,
+        default=istat_sdmx.DATA_MAX_AGE,
+        help="Età massima in secondi di una risposta dati in cache (0 = sempre scaduta). "
+             "Le strutture (dataflow, DSD, codelist) restano in cache senza scadenza.",
+    )
+    parser.add_argument(
+        "--refresh-data",
+        action="store_true",
+        help="Riscarica le risposte dati ignorando la cache, strutture escluse.",
+    )
     args = parser.parse_args()
     build(
         min_interval=args.min_interval,
@@ -229,4 +248,6 @@ if __name__ == "__main__":
         output=args.output,
         manifest=args.manifest,
         cache_dir=args.cache_dir,
+        data_max_age=args.data_max_age,
+        refresh_data=args.refresh_data,
     )

@@ -9,6 +9,17 @@ Everything here is built around never tripping that:
 - a minimum spacing between *network* calls (default 16s, i.e. <= ~4/min);
 - an on-disk cache keyed by URL+Accept: a cached response costs no network call
   and no rate budget, so a rerun is idempotent and resumable after any stop;
+
+The cache is deliberately split in two by lifetime. **Structures** (dataflows,
+DSDs, codelists) change rarely and are cached forever: re-fetching them only
+burns rate budget. **Data** responses are the whole point of a scheduled
+refresh, so they carry a max age (`data_max_age`, default `DATA_MAX_AGE`): past
+it the entry is refetched. Without that split a long-lived cache (a CI cache
+restored on every run, for instance) would pin the job to the first response
+ever saved and no new Istat release would ever be discovered.
+
+Rate-limit safety is unaffected: an expired entry costs one throttled request,
+and `cache_only` mode still serves whatever is on disk regardless of age.
 - exponential backoff on 429/503/transient errors;
 - explicit detection of an IP block (403 / empty 200) that stops with a clear
   message instead of hammering the endpoint.
@@ -36,6 +47,11 @@ USER_AGENT = "diset-viz-data-updater/1.0 (+https://divarioitalia.it)"
 # structure JSON media type is version 1.0 (a 1.0.0 there returns HTTP 406).
 ACCEPT_CSV = "application/vnd.sdmx.data+csv;version=1.0.0"
 ACCEPT_STRUCTURE_JSON = "application/vnd.sdmx.structure+json;version=1.0"
+# Data responses go stale; structures do not. Six days is just under the weekly
+# refresh cadence, so a scheduled run always re-reads the data it is there for.
+DATA_MAX_AGE = 6 * 24 * 3600
+# Sentinel for "this response never expires" (structures).
+CACHE_FOREVER = None
 
 
 class IstatRateLimitError(RuntimeError):
@@ -63,8 +79,11 @@ class SdmxClient:
         initial_backoff=30.0,
         accept_language="it",
         cache_only=False,
+        data_max_age=DATA_MAX_AGE,
+        refresh_data=False,
         sleeper=time.sleep,
         clock=time.monotonic,
+        wall_clock=time.time,
         opener=None,
     ):
         self.base_url = base_url.rstrip("/")
@@ -72,12 +91,17 @@ class SdmxClient:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.accept_language = accept_language
         self.cache_only = cache_only
+        self.data_max_age = data_max_age
+        self.refresh_data = bool(refresh_data)
         self.min_interval = float(min_interval)
         self.max_retries = int(max_retries)
         self.timeout = timeout
         self.initial_backoff = float(initial_backoff)
         self._sleep = sleeper
         self._clock = clock
+        # Wall clock, separate from the monotonic throttle clock: cache ages are
+        # compared against file mtimes, which survive the process.
+        self._wall_clock = wall_clock
         # Test seam: opener(url, headers) -> (status:int, body:bytes). When None
         # we hit the network with urllib.
         self._opener = opener
@@ -86,12 +110,18 @@ class SdmxClient:
 
     # -- public API ---------------------------------------------------------
 
-    def get(self, path, accept):
-        """Return the raw response bytes for `path`, cache-first."""
+    def get(self, path, accept, max_age=CACHE_FOREVER, force=False):
+        """Return the raw response bytes for `path`, cache-first.
+
+        `max_age` is the entry's lifetime in seconds (None = never expires).
+        `force` refetches even a fresh entry. In `cache_only` mode whatever is
+        on disk is served regardless of age, since no network call is allowed.
+        """
         url = path if path.startswith("http") else f"{self.base_url}/{path.lstrip('/')}"
         cache_path = self._cache_path(url, accept)
         if cache_path.exists():
-            return cache_path.read_bytes()
+            if self.cache_only or (not force and self._is_fresh(cache_path, max_age)):
+                return cache_path.read_bytes()
         if self.cache_only:
             raise CacheMissError(f"Not cached and cache_only is set: {url}")
         body = self._fetch_with_retry(url, accept)
@@ -125,10 +155,21 @@ class SdmxClient:
             path += f"/{key}"
         if start is not None:
             path += f"?startPeriod={start}"
-        body = self.get(path, ACCEPT_CSV)
+        body = self.get(
+            path, ACCEPT_CSV, max_age=self.data_max_age, force=self.refresh_data
+        )
         return parse_sdmx_csv(body)
 
     # -- internals ----------------------------------------------------------
+
+    def _is_fresh(self, cache_path, max_age):
+        if max_age is None:
+            return True
+        try:
+            age = self._wall_clock() - cache_path.stat().st_mtime
+        except OSError:
+            return False
+        return age <= float(max_age)
 
     def _cache_path(self, url, accept):
         digest = hashlib.sha256(
