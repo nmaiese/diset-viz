@@ -416,10 +416,22 @@ def _render_atlas_indicator(family, raw_id):
     explore_state = seo_policy.has_explore_params(request.args)
     noindex = (not is_indexable) or explore_state
 
+    # Prefer the analyst lead (concrete regional figures, and the same text that
+    # opens the visible page) as the SERP description; fall back to the procedural
+    # description only when there is no note.
+    analyst = analyst_notes.get_analyst_note(meta["id"])
+    seo_description = (
+        indicator_notes.meta_description_from_attacco(analyst["attacco"])
+        if analyst and analyst.get("attacco")
+        else indicator_notes.seo_description(
+            plain, meta["year_max"], len(meta["regions"]), name=meta["name"]
+        )
+    )
+
     response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
-        analyst=analyst_notes.get_analyst_note(meta["id"]),
+        analyst=analyst,
         values=values,
         best=best,
         worst=worst,
@@ -446,12 +458,7 @@ def _render_atlas_indicator(family, raw_id):
         value_unit=indicator_notes.value_unit_label(meta["name"], meta["unit"]),
         change_unit=indicator_notes.change_unit_label(meta["name"], meta["unit"]),
         seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
-        seo_description=indicator_notes.seo_description(
-            plain,
-            meta["year_max"],
-            len(meta["regions"]),
-            name=meta["name"],
-        ),
+        seo_description=seo_description,
         theme_path=profiles.theme_path(meta["theme"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
@@ -801,11 +808,19 @@ def _render_qol_indicator(family, raw_id):
     if request.path != canonical_path:
         return redirect(canonical_path, code=301)
     territory_label = bes_data.bes_territory_label(indicator)
+    analyst = analyst_notes.get_analyst_note(indicator["id"])
+    seo_description = (
+        indicator_notes.meta_description_from_attacco(analyst["attacco"])
+        if analyst and analyst.get("attacco")
+        else bes_data.bes_seo_description(
+            indicator["name"], indicator["explain"]["plain"], territory_label
+        )
+    )
     response = make_response(render_template(
         "quality_life_indicator.html",
         indicator=indicator,
         territory_label=territory_label,
-        analyst=analyst_notes.get_analyst_note(indicator["id"]),
+        analyst=analyst,
         source_breadcrumb_path=conf["source_breadcrumb_path"],
         source_breadcrumb_label=conf["source_breadcrumb_label"],
         coverage_note_scope=conf["coverage_note_scope"],
@@ -813,11 +828,7 @@ def _render_qol_indicator(family, raw_id):
         source_label=sources.family_label(family),
         domain_prose=conf["domain_prose"],
         seo_title=bes_data.bes_seo_title(indicator["name"], SITE_NAME, territory_label),
-        seo_description=bes_data.bes_seo_description(
-            indicator["name"],
-            indicator["explain"]["plain"],
-            territory_label,
-        ),
+        seo_description=seo_description,
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{canonical_path}",

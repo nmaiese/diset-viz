@@ -571,6 +571,34 @@ def _compact_title(core, marker, max_len):
     return f"{head}{separator}{tail})"
 
 
+def meta_description_from_attacco(attacco, max_len=_DESC_MAX):
+    """Turn an analyst-note lead (the visible page opener, with real regional
+    numbers) into a SERP meta description, trimmed to budget on a word boundary.
+
+    Prefers this over the procedural description because it carries concrete
+    figures that lift click-through, and it is the same text already visible on
+    the page (so structured/visible content stay consistent). Markdown links are
+    flattened to their label and any residual markup is dropped."""
+    text = (attacco or "").strip()
+    if not text:
+        return ""
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)  # [label](url) -> label
+    text = re.sub(r"[*_`]", "", text)                       # stray markdown emphasis
+    text = " ".join(text.split())
+    if len(text) <= max_len:
+        return text
+    # Keep whole sentences that fit; fall back to a clean word-boundary cut.
+    sentences = re.split(r"(?<=\.)\s+", text)
+    kept = ""
+    for sentence in sentences:
+        candidate = f"{kept} {sentence}".strip() if kept else sentence
+        if len(candidate) <= max_len:
+            kept = candidate
+        else:
+            break
+    return kept or _truncate_words(text, max_len, add_period=True)
+
+
 def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX):
     """Compact SERP title: shortened name + variant marker + 'per regione'."""
     marker = _variant_marker(name)
