@@ -267,23 +267,31 @@ def discover(series_id, offline=True, refresh=False):
 
 
 def normalized_rows(series_id, offline=True, refresh=False):
-    """External-layer rows (regione level) for the promotion step, for the single
-    best-recent year. Values use the Italian decimal comma, like the other CSVs."""
+    """External-layer rows (regione level) for the promotion step: the full
+    historical series, one row per region per year, for every year that clears
+    the coverage threshold (so the atlas gets a real trend, ending at the latest
+    well-covered year and skipping Eurostat's sparse newest years). Values use
+    the Italian decimal comma, like the other CSVs."""
     series = EUROSTAT_SERIES[series_id]
     doc = fetch_dataset(series_id, offline=offline, refresh=refresh)
     combine = series.get("combine_split", "weighted")
     weights = fetch_weights(offline=offline, refresh=refresh) if combine == "weighted" else None
     regional = parse_regional(doc, combine, weights)
-    year, coverage, present = best_recent_year(regional)
+    years = sorted({year for values in regional.values() for year in values})
     rows = []
-    for region_key in sorted(present):
-        rows.append({
-            "region_key": region_key,
-            "region_name": REGION_NAMES.get(region_key, region_key),
-            "year": year,
-            "value": _format_value(present[region_key], series["decimals"]),
-            "coverage": coverage,
-        })
+    for year in years:
+        present = {rk: vals[year] for rk, vals in regional.items() if year in vals}
+        coverage = round(len(present) / REGION_COUNT, 4)
+        if coverage < MIN_COVERAGE:
+            continue
+        for region_key in sorted(present):
+            rows.append({
+                "region_key": region_key,
+                "region_name": REGION_NAMES.get(region_key, region_key),
+                "year": year,
+                "value": _format_value(present[region_key], series["decimals"]),
+                "coverage": coverage,
+            })
     return rows
 
 

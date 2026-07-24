@@ -106,7 +106,8 @@ def _external_rows_for(candidate, offline, refresh):
 
 
 def _manifest_entry(candidate, target, enriches, note, rows):
-    year = rows[0]["year"] if rows else candidate.get("year_max", "")
+    # rows span the full historical series; the manifest headline is the latest year.
+    year = max((r["year"] for r in rows), default=candidate.get("year_max", ""))
     return {
         "target_indicator_id": target,
         "target_indicator_name": candidate["name"],

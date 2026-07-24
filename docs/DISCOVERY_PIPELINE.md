@@ -155,8 +155,12 @@ Prima istituzione oltre Istat, per validare il flusso end-to-end.
   territoriali non hanno questo problema perché Istat pubblica già Trentino Alto
   Adige come regione unica; Multiscopo ora usa la stessa media pesata per
   popolazione (`scripts/multiscopo_sources.py:TRENTINO_WEIGHTS`).
-- "Anno recente onesto": si sceglie l'anno più recente che supera la soglia di
-  copertura (`MIN_COVERAGE=0.8`), non l'ultimo assoluto (spesso sparso).
+- "Anno recente onesto": per la coda si mostra l'anno più recente che supera la
+  soglia di copertura (`MIN_COVERAGE=0.8`), non l'ultimo assoluto (spesso sparso).
+- **Serie storica**: la promozione (`normalized_rows`) pubblica **tutti** gli anni
+  con copertura sufficiente, non solo l'ultimo, così la scheda atlante ha il
+  grafico pluriennale come le altre famiglie. Gli anni più recenti troppo sparsi
+  restano esclusi; la combinazione pesata di Trentino si applica a ogni anno.
 
 Esempio reale di coda prodotta: R&S sul PIL classificato `new` (0.88), PIL pro
 capite `proxy` dell'id 901 dei conti economici territoriali (0.78), entrambi
