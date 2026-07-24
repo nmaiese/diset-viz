@@ -50,10 +50,17 @@ jobs:
           pip install -r requirements.txt
           npm --prefix frontend ci
 
+      # --refresh-data: la scadenza a sei giorni si basa sulle mtime dei file in
+      # cache, che qui arrivano da un archivio ripristinato. Il refresh
+      # settimanale non deve dipendere da come l'action tratta le mtime, quindi
+      # richiede esplicitamente i dati freschi. Le strutture (dataflow, DSD,
+      # codelist) restano servite dalla cache e non consumano budget: 14 flussi
+      # distinti, ben dentro il limite Istat di 5 richieste al minuto grazie
+      # alla spaziatura del client.
       - name: Controlla e integra le fonti ufficiali
         run: |
           python scripts/refresh_official_data.py
-          python scripts/update_multiscopo_regions.py
+          python scripts/update_multiscopo_regions.py --refresh-data
           if ! git diff --quiet; then
             python scripts/build_external_dataset.py --source all --year 2025
             python scripts/audit_external_indicators.py
