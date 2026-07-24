@@ -147,10 +147,12 @@ Per aggiornare insieme i due backbone regionali e i fingerprint delle fonti:
 .venv/bin/python scripts/refresh_official_data.py
 ```
 
-Il workflow `.github/workflows/data-refresh.yml` esegue il controllo ogni
-settimana. Se cambia un hash ufficiale, rigenera i dati, esegue test e build e
-apre una pull request. Non esegue merge automatici quando cambiano definizioni,
-copertura o punteggi.
+Il refresh completo si esegue a mano, come gli altri passi della pipeline, con
+`scripts/refresh_official_local.sh` (`--check` per il solo controllo). Replica i
+passi storici del workflow: controllo hash, aggiornamento dei backbone e del
+Multiscopo regionale, e se qualcosa cambia rigenera il layer esterno e l'audit,
+poi test e build. Il diff resta da revisionare a mano: nessun commit e nessuna
+pull request automatici quando cambiano definizioni, copertura o punteggi.
 
 Regole:
 

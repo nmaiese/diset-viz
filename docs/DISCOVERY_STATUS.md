@@ -116,18 +116,19 @@ PR vuota quando non c'è nulla da revisionare.
 Cadenza sfalsata di tre giorni per un motivo: il curatore ha senso solo dopo che
 un umano ha approvato la coda del cacciatore e ha girato la promozione.
 
-### Se si aggiunge un workflow GitHub Actions per la discovery
+### Niente workflow GitHub per i dati: tutto in locale
 
-Esiste un branch non ancora unito, `claude/discovery-schedule-action` (commit
-`22902fa`), che schedula il cacciatore come workflow. Usa una chiave di cache
-costante, `eurostat-cache-${{ runner.os }}`, e lancia la discovery senza
-`--refresh`. Da quando le risposte Eurostat scadono lato client
-(`CACHE_MAX_AGE` in `scripts/eurostat_source.py`) quel workflow non congela più
-la fonte, ma con una chiave fissa la cache non viene mai riscritta: ogni
-esecuzione ripristina un archivio vecchio, lo trova scaduto e riscarica, quindi
-la cache non serve a niente. Prima di unirlo, allineare la chiave allo schema
-di `.github/workflows/data-refresh.yml`, che ruota per settimana e recupera
-l'archivio precedente con le `restore-keys`.
+Scelta operativa: la pipeline dati non gira su GitHub Actions. Il refresh dei
+backbone e del Multiscopo si esegue a mano con `scripts/refresh_official_local.sh`
+(`--check` per il solo controllo hash), come gli altri passi della pipeline
+(promote, curate, apply). Il vecchio `data-refresh.yml` è stato rimosso.
+
+Di conseguenza il branch `claude/discovery-schedule-action` (commit `22902fa`),
+che schedulava il cacciatore come workflow GitHub, **non va unito**: contraddice
+questa scelta. Il cacciatore si lancia a mano con
+`python3 scripts/discover_candidates.py --source eurostat_regional`, esattamente
+come nel contratto della Routine (vedi "Runtime" in
+[`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md)).
 
 ## Cosa NON è ancora fatto (prossimi passi)
 

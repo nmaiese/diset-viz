@@ -8,9 +8,10 @@
 | [Istat, indicatori BES](https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/gli-indicatori-del-bes/) | aggiornamento intermedio e rapporto annuale | qualità della vita regionale, schede BES, quiz confronto e ordine | `scripts/refresh_official_data.py` e `scripts/update_bes_regions.py` |
 | [Istat, BES dei Territori](https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/il-bes-dei-territori/) | annuale, storicamente in estate | qualità della vita provinciale | client SDMX cache-first e pipeline provinciale |
 
-Il workflow `.github/workflows/data-refresh.yml` controlla ogni lunedì gli hash
-dei primi due artefatti. Se non cambiano, non scrive file. Se cambiano, rigenera
-i dataset, aggiorna i report, esegue test e build e apre una pull request.
+Il controllo si esegue a mano con `scripts/refresh_official_local.sh` (o
+`--check` per il solo confronto degli hash dei primi due artefatti). Se non
+cambiano, non scrive file. Se cambiano, rigenera i dataset, aggiorna i report,
+esegue test e build, e lascia il diff da revisionare a mano prima del commit.
 
 ## Watchlist ufficiale
 
