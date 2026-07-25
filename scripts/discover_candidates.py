@@ -20,7 +20,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts import discovery, eurostat_source  # noqa: E402
+from scripts import discovery, eurostat_source, istat_regional_source  # noqa: E402
 
 
 # source id -> callable(offline, refresh) -> list[raw candidate dict]
@@ -31,8 +31,16 @@ def _eurostat_watchlist(offline, refresh):
     ]
 
 
+def _istat_demografia_watchlist(offline, refresh):
+    return [
+        istat_regional_source.discover(series_id, offline=offline, refresh=refresh)
+        for series_id in istat_regional_source.ISTAT_SERIES
+    ]
+
+
 WATCHLIST = {
     "eurostat_regional": _eurostat_watchlist,
+    "istat_demografia": _istat_demografia_watchlist,
 }
 
 
