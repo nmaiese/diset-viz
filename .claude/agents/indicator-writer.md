@@ -61,6 +61,17 @@ So do **not** spend the note re-listing what the template already prints. If you
 attacco or spunto only says "the highest is X, the lowest is Y, the mean is Z", it
 is redundant with the cards and the "I numeri" block. Interpret instead.
 
+**Two anti-echo rules, learned from a refresh that still felt repetitive:**
+1. Do not reopen the `spunto` with the same headline figure the `attacco` already
+   used (the top region's value). If the attacco opens "In Valle d'Aosta ... 69%",
+   the spunto must enter from a different angle, not "Il 69% della Valle d'Aosta ...".
+2. "I numeri" prints the above/below-mean split as two counts (e.g. "12 regioni
+   superano la media, 8 restano sotto"). If you make a rank or geography claim with
+   those same counts ("le prime dodici sono del Centro-Nord, le ultime otto del
+   Sud"), it visually echoes the machine line even though the claim differs. Check
+   the split counts first; if they collide, reframe so the numbers do not repeat
+   (name the divide qualitatively, or use a different, non-coinciding cut).
+
 ## The note fields
 
 - `attacco`: the lead, and the SERP meta description (must stand alone, ideally
