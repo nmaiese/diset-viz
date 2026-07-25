@@ -532,7 +532,7 @@
  },
  "bes:03LAV002-N22": {
   "attacco": "Più ampio della disoccupazione, il tasso di mancata partecipazione somma chi cerca lavoro e chi lo vorrebbe ma non lo cerca attivamente. Così misurato, il divario esplode: dal 4,3% del Trentino Alto Adige al 27,3% della Campania. La media è del 12,9%, la mediana molto più bassa, sotto il 10%.",
-  "spunto": "Questo indicatore svela ciò che la disoccupazione nasconde: al Sud una parte enorme del potenziale di lavoro è fuori dal radar, tra scoraggiati e disponibili che non cercano più. La media schiacciata dalla mediana conferma che il problema è concentrato in poche regioni, dove riguarda oltre un quarto delle persone. È forse la misura più onesta della distanza tra Nord e Sud sul lavoro. Quanti lavoratori invisibili nasconde un tasso di disoccupazione basso?",
+  "spunto": "Questo indicatore svela ciò che la disoccupazione nasconde: al Sud una parte enorme del potenziale di lavoro è fuori dal radar, tra scoraggiati e disponibili che non cercano più. Il problema è concentrato in poche regioni del Sud, dove riguarda oltre un quarto delle persone. È forse la misura più onesta della distanza tra Nord e Sud sul lavoro. Quanti lavoratori invisibili nasconde un tasso di disoccupazione basso?",
   "limite": "Allarga la definizione di chi manca al lavoro, ma resta una misura di quantità, non di qualità. Non distingue chi è pronto a lavorare subito da chi lo farebbe solo a certe condizioni, e non racconta le ragioni per cui tanti hanno smesso di cercare.",
   "fonti": [],
   "vintage": 2025
@@ -2541,17 +2541,13 @@
   "vintage": 2025
  },
  "181": {
-  "attacco": "In Toscana lavora oltre il 77% degli uomini tra 55 e 64 anni, in Sicilia poco più del 64%. Nel 2025 la media regionale sfiora il 72% e quasi ovunque supera i due terzi. Rispetto al 2018, quando la media si fermava al 64%, la crescita è stata netta.",
-  "spunto": "Il quadro non disegna una netta frattura Nord-Sud. In testa ci sono Toscana e Umbria, appaiate sopra il 77%, ma la Basilicata le segue da vicino al 76%, mentre il Friuli-Venezia Giulia resta sotto il 69%. In fondo alla classifica stanno Sicilia, Sardegna e Calabria. Media e mediana quasi coincidono, 71,8% contro 72,7%, segno che poche regioni tirano giù il dato senza spaccare in due la distribuzione. Colpisce la corsa recente. In sette anni la media regionale è salita di quasi otto punti, e pesa molto l'innalzamento dell'età pensionabile, che trattiene gli uomini più a lungo nel mercato del lavoro secondo le [previsioni delle forze di lavoro Istat](https://www.istat.it/comunicato-stampa/previsioni-delle-forze-di-lavoro-al-2050/). Resta la domanda di fondo. Questi occupati in più restano perché il lavoro c'è ed è buono, o perché la pensione è semplicemente più lontana?",
-  "limite": "Il dato riguarda solo gli uomini. Il tasso femminile nella stessa fascia segue un andamento diverso e più basso, quindi questo indicatore non misura la partecipazione complessiva degli over 54. Racconta quante persone risultano occupate, non che lavoro fanno né a quali condizioni. La crescita recente riflette le regole previdenziali quanto la domanda di lavoro delle imprese, perché un'età di uscita più alta trattiene chi altrimenti sarebbe già in pensione. Il perimetro è la classe 55-64 anni, così restano fuori gli occupati oltre i 65. È una fotografia annuale per regione, non consente di isolare le cause dei divari territoriali.",
+  "attacco": "In Toscana lavora oltre il 77% degli uomini tra 55 e 64 anni, in Sicilia poco più del 64%, e in mezzo la geografia conta meno del solito. La Basilicata sfiora il 76% e lascia dietro Lombardia, Veneto e Piemonte, mentre il Friuli-Venezia Giulia scende sotto il 69% e finisce dietro alla Campania.",
+  "spunto": "La stessa mappa, letta al femminile, si dispone in modo diverso. Basilicata, Abruzzo e Molise stanno tra i primi otto posti degli uomini over 54, ma tra le [donne della stessa età](/indicatore/tasso-di-occupazione-over-54-femmine/ter-182) scivolano nella metà bassa della classifica. Il Friuli-Venezia Giulia fa il tragitto inverso, sedicesimo tra i maschi e quinto tra le femmine. Il fondo però resta lo stesso in entrambe, con le ultime quattro regioni tutte del Mezzogiorno. C'è poi un rimescolamento nel tempo. Nel 2018 guidava l'Abruzzo e l'Umbria era quindicesima, oggi l'Umbria è seconda con la risalita più ampia di tutte e l'Abruzzo è settimo. Sullo sfondo pesa probabilmente l'età di uscita dal lavoro che si è alzata, ma è una spinta nazionale e non spiega da sola perché a guadagnare di più siano state proprio Umbria, Piemonte e Liguria. Viene da chiedersi se la parte alta continuerà a mescolare le due Italie, o se col tempo l'ordine maschile tornerà a somigliare a quello, molto più netto, delle donne.",
+  "limite": "Il dato riguarda solo gli uomini, quindi non misura la partecipazione complessiva degli over 54. Il tasso femminile nella stessa fascia è molto più basso e va letto a parte. L'indicatore conta quante persone risultano occupate, non che lavoro fanno né a quali condizioni, e non distingue il tempo pieno dal parziale. Il perimetro è la classe 55-64 anni, così restano fuori gli occupati oltre i 65. È la fotografia di un solo anno per regione, e non permette di isolare le cause dei divari, dall'età di uscita dal lavoro alla domanda delle imprese.",
   "fonti": [
    {
-    "testo": "Istat, Previsioni delle forze di lavoro al 2050 (2025), sull'aumento della partecipazione degli anziani e il ruolo dell'età pensionabile",
-    "url": "https://www.istat.it/comunicato-stampa/previsioni-delle-forze-di-lavoro-al-2050/"
-   },
-   {
-    "testo": "Istat, Pensione e partecipazione al mercato del lavoro dei 50-74enni, Anno 2023",
-    "url": "https://www.istat.it/wp-content/uploads/2025/05/Pensione_partecipazione_mercato-del-lavoro.pdf"
+    "testo": "Istat, Pensione e partecipazione al mercato del lavoro dei 50-74enni, Anno 2023 (comunicato dell'8 maggio 2025), sul ruolo dell'età di uscita e la partecipazione degli over 50",
+    "url": "https://www.istat.it/comunicato-stampa/pensione-e-partecipazione-al-mercato-del-lavoro-dei-50-74enni-anno-2023/"
    }
   ],
   "vintage": 2025

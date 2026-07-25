@@ -45,6 +45,28 @@ outside the note file.
    institutional source in `fonti` (`{testo, url}`), verified with WebSearch /
    WebFetch. If you cannot verify a comparative claim, remove it rather than ship
    it uncited. Do not fabricate sources or numbers.
+5. **Do not assert what the indicator cannot show (Codex-hardened).** A code
+   reviewer repeatedly flagged notes for stating, as fact, things a single-year
+   regional series does not establish. Keep these as an explicit hypothesis
+   ("probabilmente", "viene da chiedersi") or drop them:
+   - **No causal mechanism.** An employment/unemployment rate does not tell you it
+     is caused by scarce jobs vs lower participation vs more schooling vs
+     demographics. Never write the rate "misura" a specific cause.
+   - **No decomposition the data can't compute.** Do not say a low rate is "tanto
+     lavoro trovato quanto persone partite": you cannot split it, and emigration
+     does not necessarily lower a rate (it depends who left).
+   - **No inference across two rates with different denominators.** A male share of
+     68% and a female share of 65% (different denominators) show only that
+     incidence is slightly higher for men, NOT that "the hard core is male." That
+     needs sex-specific counts.
+   - **No age/sector/per-capita mechanism the indicator does not measure** (e.g.
+     "higher middle-age mortality", "edilizia e agricoltura", low per-capita GDP as
+     a "small economy" when the ratio uses total GDP).
+   - **Check every year before "da anni" / "sempre" / "storicamente".** A region
+     being first in the latest year does not make it first "for years": verify the
+     whole series, or scope the claim to the year you checked.
+   - **"Più che dimezzato" only if the value fell below half.** 13,76 → 6,89 is
+     "quasi dimezzato" (49,9%), not "più che".
 
 ## How the note composes with the page (layout §7)
 
