@@ -41,6 +41,56 @@ class GeneratedArticleSafety(unittest.TestCase):
         self.assertEqual(offenders, [], f"article-less generated text: {offenders[:10]}")
 
 
+class AnnualChangeFramingAgreement(unittest.TestCase):
+    """A1: the movement noun ('aumento' masculine, 'diminuzione' feminine) must keep
+    its article in agreement, in every branch of annual_change_framing."""
+
+    def test_zero_delta_reads_invariata(self):
+        self.assertEqual(
+            indicator_notes.annual_change_framing("Indicatore X", "contextual", 0.0),
+            "La media è rimasta invariata.",
+        )
+
+    def test_contextual_uses_indefinite_article_in_agreement(self):
+        up = indicator_notes.annual_change_framing("Indicatore X", "contextual", 2.0)
+        down = indicator_notes.annual_change_framing("Indicatore X", "contextual", -2.0)
+        self.assertIn("un aumento", up)
+        self.assertNotIn("un diminuzione", down)
+        self.assertIn("una diminuzione", down)
+
+    def test_difference_indicator_uses_definite_article_in_agreement(self):
+        up = indicator_notes.annual_change_framing(
+            "Differenza tra tasso maschile e femminile", "contextual", 1.5
+        )
+        down = indicator_notes.annual_change_framing(
+            "Differenza tra tasso maschile e femminile", "contextual", -1.5
+        )
+        self.assertTrue(up.startswith("L'aumento indica"), up)
+        self.assertTrue(down.startswith("La diminuzione indica"), down)
+        self.assertNotIn("La aumento", up)
+
+
+class ItPluralAgreement(unittest.TestCase):
+    """A2: singular/plural agreement so a count of 1 never reads as '1 regioni'."""
+
+    def test_singular_and_plural_forms(self):
+        self.assertEqual(indicator_notes.it_plural(1, "regione", "regioni"), "regione")
+        self.assertEqual(indicator_notes.it_plural(2, "regione", "regioni"), "regioni")
+        self.assertEqual(indicator_notes.it_plural(0, "regione", "regioni"), "regioni")
+        # Verbs agree too.
+        self.assertEqual(indicator_notes.it_plural(1, "supera", "superano"), "supera")
+        self.assertEqual(indicator_notes.it_plural(3, "supera", "superano"), "superano")
+
+    def test_non_integer_count_falls_back_to_plural(self):
+        self.assertEqual(indicator_notes.it_plural(None, "regione", "regioni"), "regioni")
+        self.assertEqual(indicator_notes.it_plural("x", "regione", "regioni"), "regioni")
+
+    def test_intro_helper_never_says_one_regioni(self):
+        one = indicator_notes.indicator_page_intro("Misura qualcosa.", 2024, 2024, 1)
+        self.assertIn("1 regione ", one)
+        self.assertNotIn("1 regioni", one)
+
+
 class AnalystSourcesRendered(unittest.TestCase):
     def test_fonti_are_shown_on_the_page(self):
         # id 178 (tasso di occupazione femminile) carries a note with a source.

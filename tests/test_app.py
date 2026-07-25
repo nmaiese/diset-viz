@@ -412,8 +412,14 @@ class AppSmokeTest(unittest.TestCase):
         )
         path = profiles.indicator_path(sample["id"], sample["name"])
         html = client.get(path).data.decode("utf-8")
-        self.assertGreaterEqual(html.count("<h2"), 3)
-        self.assertGreaterEqual(html.count("<h3"), 3)
+        # Depth is carried by the data-derived H2 sections (the definition, the
+        # snapshot and the change-over-time blocks) plus the movers/gap H3s. Empty
+        # nested H2->H3 headings were flattened into inline strong labels, so the
+        # floor is on the sections that prove the page is not a stub, not a raw H3
+        # count.
+        self.assertGreaterEqual(html.count("<h2"), 5)
+        self.assertIn("I numeri, in breve", html)
+        self.assertIn("Cosa sapere su questo indicatore", html)
         self.assertIn("data-callout", html)
         # The cascade fix: analysis h2s inside .page-indicator's .prose section must
         # get the full article-style treatment, not the compact .page-ranking one.
@@ -429,8 +435,10 @@ class AppSmokeTest(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         html = response.data.decode("utf-8")
-        self.assertIn("Come è cambiato nell'ultimo anno disponibile", html)
-        self.assertIn("Tra il 2024 e il 2025", html)
+        # The last-year change now lives inside the fused "I numeri, in breve" block
+        # as a clause on the long-run story (layout §7), not a standalone section.
+        self.assertIn("I numeri, in breve", html)
+        self.assertIn("tra il 2024 e il 2025", html)
         self.assertIn("da 17,14 punti percentuali a 16,69 punti percentuali", html)
         self.assertIn("Il valore è diminuito in 14 regioni, è aumentato in 6", html)
         self.assertIn("il divario medio tra i due tassi si è ridotto", html)
@@ -542,15 +550,21 @@ class AppSmokeTest(unittest.TestCase):
 
         # Median/dispersion and the "biggest movers" with an honest kind label.
         # Mixed-direction fixture: Lombardia rises, Calabria falls, Lazio rises less.
+        # Five regions report, above the small-N gate, so median and the mean split
+        # are computed (below the gate they are suppressed - see the N=2 case below).
         mixed_payload = {
             "metadata": {"id": "3", "name": "Indicatore misto", "unit": "percentuale", "year_min": 2020, "year_max": 2022},
             "series": [
                 {"year": 2020, "region": "Lombardia", "region_key": "lombardia", "value": 60.0},
                 {"year": 2020, "region": "Calabria", "region_key": "calabria", "value": 40.0},
                 {"year": 2020, "region": "Lazio", "region_key": "lazio", "value": 50.0},
+                {"year": 2020, "region": "Veneto", "region_key": "veneto", "value": 55.0},
+                {"year": 2020, "region": "Sicilia", "region_key": "sicilia", "value": 45.0},
                 {"year": 2022, "region": "Lombardia", "region_key": "lombardia", "value": 70.0},
                 {"year": 2022, "region": "Calabria", "region_key": "calabria", "value": 30.0},
                 {"year": 2022, "region": "Lazio", "region_key": "lazio", "value": 52.0},
+                {"year": 2022, "region": "Veneto", "region_key": "veneto", "value": 58.0},
+                {"year": 2022, "region": "Sicilia", "region_key": "sicilia", "value": 44.0},
             ],
         }
         mixed_values = [row for row in mixed_payload["series"] if row["year"] == 2022]
@@ -558,10 +572,12 @@ class AppSmokeTest(unittest.TestCase):
         mixed_worst = next(row for row in mixed_values if row["region"] == "Calabria")
         mixed_stats = indicator_trend_stats(mixed_payload, 2022, mixed_values, mixed_best, mixed_worst)
 
+        # 2022 values 70,30,52,58,44 -> sorted 30,44,52,58,70 -> median 52.
         self.assertEqual(mixed_stats["median"], 52.0)
-        # Mean is 50.67: Lombardia (70) and Lazio (52) beat it, only Calabria (30) doesn't.
-        self.assertEqual(mixed_stats["above_avg_count"], 2)
-        self.assertEqual(mixed_stats["below_avg_count"], 1)
+        # Mean is 50.8: Lombardia (70), Lazio (52) and Veneto (58) beat it; Calabria
+        # (30) and Sicilia (44) do not.
+        self.assertEqual(mixed_stats["above_avg_count"], 3)
+        self.assertEqual(mixed_stats["below_avg_count"], 2)
         self.assertEqual(mixed_stats["region_highest_delta"]["region"], "Lombardia")
         self.assertEqual(mixed_stats["region_highest_delta"]["kind"], "aumento")
         self.assertEqual(mixed_stats["region_lowest_delta"]["region"], "Calabria")
@@ -569,6 +585,26 @@ class AppSmokeTest(unittest.TestCase):
         # Best (Lombardia) - worst (Calabria) gap widened from 20 (2020) to 40 (2022).
         self.assertEqual(mixed_stats["year_min_gap_abs"], 20.0)
         self.assertEqual(mixed_stats["gap_trend"], 20.0)
+
+        # Small-N gate: with only two regions reporting, a median / mean split is
+        # statistical theatre. Those fields are suppressed (None), but the honest
+        # mean and min-max gap are still computed for the page.
+        small_n_payload = {
+            "metadata": {"id": "3b", "name": "Indicatore misto", "unit": "percentuale", "year_min": 2022, "year_max": 2022},
+            "series": [
+                {"year": 2022, "region": "Lombardia", "region_key": "lombardia", "value": 70.0},
+                {"year": 2022, "region": "Calabria", "region_key": "calabria", "value": 30.0},
+            ],
+        }
+        small_n_values = [row for row in small_n_payload["series"] if row["year"] == 2022]
+        small_n_best = next(row for row in small_n_values if row["region"] == "Lombardia")
+        small_n_worst = next(row for row in small_n_values if row["region"] == "Calabria")
+        small_n_stats = indicator_trend_stats(small_n_payload, 2022, small_n_values, small_n_best, small_n_worst)
+        self.assertIsNone(small_n_stats["median"])
+        self.assertIsNone(small_n_stats["above_avg_count"])
+        self.assertIsNone(small_n_stats["below_avg_count"])
+        self.assertEqual(small_n_stats["year_avg"], 50.0)
+        self.assertEqual(small_n_stats["gap_abs"], 40.0)
 
         # Same-direction fixture: every region rises, just by different amounts - the
         # "lowest delta" region must never be mislabeled as a decrease.

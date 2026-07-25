@@ -46,15 +46,36 @@ outside the note file.
    WebFetch. If you cannot verify a comparative claim, remove it rather than ship
    it uncited. Do not fabricate sources or numbers.
 
+## How the note composes with the page (layout §7)
+
+The page is built from two layers. **The template owns the numbers and the
+structure deterministically**: a headline-answer lead for note-less pages (best,
+worst, regional mean), the insight cards, and a fused "I numeri, in breve" block
+that already states the min-max gap as a ratio, the above/below-mean split and the
+change over time. **Your note owns the voice and the one thing a script can never
+generate**: a point of view and at least one non-templatizable, indicator-specific
+fact. When a note exists, `attacco` replaces the deterministic lead and `spunto`
+sits at the top of the definition, above "I numeri".
+
+So do **not** spend the note re-listing what the template already prints. If your
+attacco or spunto only says "the highest is X, the lowest is Y, the mean is Z", it
+is redundant with the cards and the "I numeri" block. Interpret instead.
+
 ## The note fields
 
-- `attacco`: the lead. Open with the concrete regional picture using real
-  figures and region names (this is also reused as the SERP meta description, so
-  it must read well and stand alone, ideally within ~155 characters for the first
-  sentence). Example shape: "In X lavora quasi il 69% ..., in Y poco meno del 34%."
-- `spunto`: the insight. Read the data, do not restate the label: median vs mean,
-  a "due velocità" divide, what a high value does and does not say, and end with
-  one honest open question. Inline markdown links are allowed here.
+- `attacco`: the lead, and the SERP meta description (must stand alone, ideally
+  ~155 characters for the first sentence). Open with the concrete regional picture
+  using real figures and region names, but as a *story with an angle*, not a stat
+  dump the "I numeri" block already carries. Example shape: "In X lavora quasi il
+  69% ..., in Y poco meno del 34%." The figures anchor a point, they are not the
+  point.
+- `spunto`: the insight, and the one place the page earns its "not a bot" status.
+  Carry at least one fact the template cannot derive on its own: what a high value
+  does and does not mean here, a "due velocità" divide the mean hides, a link to
+  the provincial detail where the regional mean conceals it, a real-world driver
+  with Eurostat-style hedging ("probabilmente riflette..."). Do not restate the
+  median-vs-mean or the gap that "I numeri" already prints. End with one honest
+  open question. Inline markdown links are allowed here.
 - `limite`: what the number does not capture (coverage, definition, unmeasured
   dimensions). Statistical honesty, no causal claims from a cross-section.
 - `fonti`: list of `{testo, url}` for comparative/contextual claims. Prefer

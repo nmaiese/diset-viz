@@ -552,9 +552,15 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
     year_avg = (sum(year_values) / len(year_values)) if year_values else None
     year_count = len(year_values)
 
+    # With only a handful of regions reporting, a median, an "above/below the
+    # mean" split or a mean-vs-median spread are statistical theatre: they read as
+    # precise but describe two or three numbers. Below the threshold we keep the
+    # mean and the min-max gap (honest even at N=2) and drop the rest - the "None
+    # means omit" contract then suppresses those claims in both templates.
+    SMALL_N = 5
     median = None
     above_avg_count = below_avg_count = None
-    if year_values:
+    if year_values and year_count >= SMALL_N:
         sorted_values = sorted(year_values)
         mid = len(sorted_values) // 2
         median = sorted_values[mid] if len(sorted_values) % 2 else (sorted_values[mid - 1] + sorted_values[mid]) / 2
@@ -582,7 +588,13 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
         unit_lower = (meta.get("unit") or "").lower()
         ratio_meaningless = "differenza" in name_lower or "punti percentuali" in unit_lower
         if not ratio_meaningless and low_value > 0:
-            gap_ratio = high_value / low_value
+            ratio = high_value / low_value
+            # A "X volte" ratio only reads as informative when the two values are
+            # genuinely far apart. When they are close (e.g. life expectancy, 84 vs
+            # 81) the ratio rounds to "1,0 volte", which contradicts a non-zero gap
+            # and reads as broken; below the threshold the absolute gap says it all.
+            if ratio >= 1.2:
+                gap_ratio = ratio
 
     region_highest_delta = region_lowest_delta = None
     year_min_gap_abs = gap_trend = None
