@@ -52,12 +52,11 @@ COLUMNS = [
     "triage_notes",
 ]
 
-# A dataflow name that names the regional/territorial breakdown. Regional is the
-# priority; broader territorial names still qualify (a human sets the level).
-REGIONAL_HINT = re.compile(r"\b(region|ripartiz|nuts2)", re.IGNORECASE)
-# Provincial/municipal-only breakdowns are allowed but ranked lower (the project
-# prioritises regional, then provincial).
-SUBREGIONAL_HINT = re.compile(r"\b(provinc|comun|nuts3)", re.IGNORECASE)
+# A dataflow name that names a genuine 20-region (NUTS2) breakdown. Deliberately
+# NOT 'ripartiz': a "ripartizionale" flow is broken down by the 5 macro-areas,
+# not the 20 regions, so it neither gives regional coverage nor deserves the
+# regional label. Such macro-area-only flows are left out of the queue.
+REGIONAL_HINT = re.compile(r"\b(region|nuts2)", re.IGNORECASE)
 # Generic words that carry no domain signal, so they never count as "already
 # covered" when matched against the allowlist.
 STOPWORDS = {
@@ -79,9 +78,14 @@ METADATA_NAME = re.compile(
     r"corrispondenz|codice e|nome della|classificazion|metadat|bulk", re.IGNORECASE
 )
 # SDMX family codes of allowlisted domains whose terse dataflow names ("Dati
-# regionali - durata della disoccupazione") do not reveal the domain to the
-# name-token dedup. Forze di Lavoro (istat_lavoro) is the notable case.
-ALLOWLIST_FAMILY_HINT = re.compile(r"TAXOCCU|TAXDISOCCU|DISOCCUP|FORZLV|NEET", re.IGNORECASE)
+# regionali - durata della disoccupazione", "Dati regionali - titolo di studio")
+# do not reveal the domain to the name-token dedup. Forze di Lavoro
+# (istat_lavoro) is the notable case: occupation, unemployment, activity and
+# inactivity rates, and the labour-force stock all live under these family codes.
+ALLOWLIST_FAMILY_HINT = re.compile(
+    r"TAXOCCU|TAXDISOCCU|TAXATVT|TAXINATT|DISOCCUP|OCCUPT|INATTIV|FORZLV|NEET",
+    re.IGNORECASE,
+)
 
 
 def _norm(text):
@@ -157,14 +161,15 @@ def propose_sources(flows, covered=None, terms=None, limit=40):
         if key in seen_names:
             continue
         seen_names.add(key)
-        regional = bool(REGIONAL_HINT.search(name))
-        subregional = bool(SUBREGIONAL_HINT.search(blob))
-        score = 0.6 + (0.3 if regional else 0.0) - (0.2 if subregional and not regional else 0.0)
+        # Uniform score on purpose: at catalogue level there is no freshness or
+        # coverage signal to rank by (that needs a data query per dataflow, which
+        # the scout deliberately avoids). Every survivor is a genuinely new
+        # regional dataflow; the human ranks them in triage.
         proposals.append({
             "dataflow_id": flow.get("id", ""),
             "name": name,
-            "territory_hint": "regione" if regional else "territoriale",
-            "priority_score": round(min(max(score, 0.0), 1.0), 2),
+            "territory_hint": "regione",
+            "priority_score": 0.9,
             "reason": (
                 "Dataflow territoriale non coperto da fonti in allowlist ne da adapter "
                 "curati; dominio nuovo per il catalogo. Da verificare a mano: livello "

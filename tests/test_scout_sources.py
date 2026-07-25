@@ -25,6 +25,7 @@ FLOWS = [
     {"id": "6_DF_BULK_CORRIS", "name": "Corrispondenza tra codice e nome della regione"},
     {"id": "7_DF_Y_GEN_1", "name": "Dati regionali"},
     {"id": "8_DF_Z_NAT_1", "name": "Occupazione nazionale"},
+    {"id": "11_DF_DCSC_FIDIMPR_1", "name": "Clima di fiducia - livello nazionale e ripartizionale"},
     {"id": "covered_exact", "name": "Servizi sanitari - regioni"},
     {"id": "9_DF_DCIS_RSERVSAN_4b", "name": "Accertamenti diagnostici - regioni"},
 ]
@@ -51,6 +52,7 @@ class ProposeSources(unittest.TestCase):
             "6_DF_BULK_CORRIS",           # metadata/lookup table
             "7_DF_Y_GEN_1",               # generic name, no domain signal
             "8_DF_Z_NAT_1",               # not a regional breakdown
+            "11_DF_DCSC_FIDIMPR_1",       # macro-area only (ripartizionale), not 20 regions
         ]:
             self.assertNotIn(excluded, self.ids, excluded)
 

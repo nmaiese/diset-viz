@@ -143,11 +143,14 @@ def parse_regional(rows, data_type):
             continue
         by_region.setdefault(names.get(area, area), {})[year] = value
     for year, parts in trentino.items():
-        if all(p in TRENTINO_WEIGHTS for p in parts):
-            total = sum(TRENTINO_WEIGHTS[p] for p in parts)
-            if total > 0:
-                weighted = sum(parts[p] * TRENTINO_WEIGHTS[p] for p in parts) / total
-                by_region.setdefault(TRENTINO_NAME, {})[year] = weighted
+        # Both provinces must be present to combine honestly: a lone Bolzano or
+        # Trento is not Trentino Alto Adige, so a partial year is left missing
+        # (and does not count toward regional coverage) rather than published as
+        # one province's value.
+        if all(part in parts for part in TRENTINO_PARTS):
+            total = sum(TRENTINO_WEIGHTS[p] for p in TRENTINO_PARTS)
+            weighted = sum(parts[p] * TRENTINO_WEIGHTS[p] for p in TRENTINO_PARTS) / total
+            by_region.setdefault(TRENTINO_NAME, {})[year] = weighted
     return by_region
 
 

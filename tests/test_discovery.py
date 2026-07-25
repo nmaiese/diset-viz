@@ -319,6 +319,19 @@ class IstatRegionalAdapter(unittest.TestCase):
         self.assertGreaterEqual(combined, lo)
         self.assertLessEqual(combined, hi)
 
+    def test_partial_trentino_is_dropped_not_published(self):
+        # A year with only Bolzano (or only Trento) is not Trentino Alto Adige:
+        # it must be left missing, never published as one province's value.
+        rows = [
+            {"DATA_TYPE": "X", "REF_AREA": "ITD1", "TIME_PERIOD": "2020", "OBS_VALUE": "40"},
+            {"DATA_TYPE": "X", "REF_AREA": "ITD2", "TIME_PERIOD": "2020", "OBS_VALUE": "42"},
+            {"DATA_TYPE": "X", "REF_AREA": "ITD1", "TIME_PERIOD": "2021", "OBS_VALUE": "41"},
+        ]
+        regional = istat_regional_source.parse_regional(rows, "X")
+        trentino = regional.get(istat_regional_source.TRENTINO_NAME, {})
+        self.assertIn("2020", trentino)   # both provinces present -> combined
+        self.assertNotIn("2021", trentino)  # only Bolzano -> dropped
+
     def test_best_recent_year_respects_coverage(self):
         rows = istat_regional_source.fetch_rows("DEPENDRATE", offline=True)
         regional = istat_regional_source.parse_regional(rows, "DEPENDRATE")
