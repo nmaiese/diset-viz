@@ -48,8 +48,10 @@ non vengono scartati: scendono solo in fondo alla coda.
    gira a ogni run schedulata.
 2. **Scouting (raro, opt-in).** Cerca fonti istituzionali non ancora conosciute e
    le **propone** per l'allowlist. Un dominio nuovo entra in watchlist solo dopo
-   approvazione umana. Non è ancora implementato: è il gancio per la crescita
-   controllata del bacino di fonti.
+   approvazione umana. Implementato per Istat da `scripts/scout_sources.py`, che
+   legge il catalogo dataflow SDMX e scrive i dataflow regionali non ancora
+   coperti in `data/discovery/source_candidates.csv` (vedi "Fase 2b" sotto). È il
+   gancio per la crescita controllata del bacino di fonti.
 
 ## Il gate: niente va live senza PR
 
@@ -285,13 +287,28 @@ conservativa, combinazione pesata Bolzano+Trento, anno recente per copertura, e 
 trip cacciatore → coda → (approvazione) → promozione su file temporanei, così i
 dati di produzione non vengono mai toccati.
 
+## Fase 2b (implementata): lo scout, nuove fonti nel catalogo SDMX
+
+`scripts/scout_sources.py` è lo scouting del punto 2 sopra, per Istat. Legge il
+catalogo dei dataflow SDMX (una query cache-forever, condivisa con
+`discover_provinces.py`) e propone i dataflow **regionali** che **non** sono
+coperti da alcuna fonte in allowlist né da un adapter curato, così emergono
+domini nuovi (sanità, edilizia, giustizia, violenza di genere, capitale umano).
+È **livello-catalogo**: nessuna query dati per dataflow, quindi economico rispetto
+al limite Istat di 5 query/minuto. Esclude i flow e le famiglie SDMX già coperte
+(tutta la famiglia Multiscopo AVQ, non solo i flow curati; le famiglie Forze di
+Lavoro che i nomi terse non rivelano), i domini già in allowlist per token del
+nome, le tabelle di metadati e i nomi generici. Scrive **solo** in
+`data/discovery/source_candidates.csv` (coda revisionabile): ammettere un dominio
+all'allowlist resta un merge umano, e cablarne l'adapter è il passo successivo.
+
 ## Prossime fasi
 
 - Estendere la watchlist ad altre fonti Eurostat e istituzionali, poi al livello
   provinciale (NUTS3), sempre con priorità al regionale fresco.
-- Implementare lo scouting opt-in per proporre nuovi domini all'allowlist.
 - Far entrare gli indicatori esterni anche nei profili regionali
   (`app/profiles.py`), oggi calcolati sui soli territoriali core.
-- Dare al cacciatore un adapter per fonte: oggi l'unico implementato è
-  `eurostat_regional`, quindi la Routine scansiona una sola delle fonti
-  dell'allowlist.
+- Dare al cacciatore un adapter per fonte: oggi sono implementati
+  `eurostat_regional` e `istat_demografia` (`scripts/istat_regional_source.py`,
+  indicatori demografici via SDMX). Restano da cablare le altre fonti in
+  allowlist, partendo da quelle che lo scout propone e che un umano approva.
