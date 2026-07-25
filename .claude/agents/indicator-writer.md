@@ -33,6 +33,13 @@ outside the note file.
 3. **Set the vintage.** `vintage` MUST equal the indicator's current `year_max`
    (the data year your figures are written against). This is what the drift guard
    checks; a note without a correct vintage is incomplete.
+   - **Threshold phrasing gotcha.** The guard `test_thresholds_hold_for_every_region_they_name`
+     binds any `supera/oltre/sopra/più di/scende/sotto/meno di <numero> ... in/a/nel/per
+     <Regione>` to that region's OWN value, and fails if it does not hold. So never
+     write a gap, a difference, or another indicator's value in that shape ("oltre 36
+     in Campania" for a male-female gap fails, because Campania's own value is 32).
+     Put the region before the comparator instead ("in Campania supera i 36 punti"),
+     or name the quantity ("un divario di 36 punti in Campania").
 4. **Cite comparative claims.** Any claim that compares beyond the dataset ("il
    divario più ampio d'Europa", "primato", a national/EU ranking) must have a real
    institutional source in `fonti` (`{testo, url}`), verified with WebSearch /

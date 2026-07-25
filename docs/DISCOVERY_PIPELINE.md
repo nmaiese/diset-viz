@@ -160,6 +160,33 @@ La catena completa degli agenti:
 
     cacciatore -> [approvazione umana] -> curatore -> scrittore -> PR -> merge -> live
 
+### Il trigger dello scrittore (worklist deterministica)
+
+Lo scrittore aveva l'unico stadio della catena senza un innesco automatico: il
+cacciatore e il curatore girano come Routine, ma nulla diceva allo scrittore
+quali indicatori il curatore avesse appena integrato e lasciato senza nota. Per
+questo `scripts/pending_notes.py` produce la **coda dello scrittore**, come
+`curate.uncurated_targets` fa per il curatore:
+
+- **da scrivere** (`missing`): un indicatore integrato nel manifest
+  (`status=integrated`) senza nota d'analista. È il passaggio di consegne
+  curatore -> scrittore.
+- **da aggiornare** (`stale`): una nota il cui `vintage` è rimasto indietro
+  rispetto all'`year_max` corrente dell'indicatore (il caso di refresh, la stessa
+  deriva che controlla `tests/test_analyst_notes.py`).
+
+```bash
+python3 scripts/pending_notes.py            # coda leggibile
+python3 scripts/pending_notes.py --json      # coda per l'agente
+```
+
+Lo script è stdlib puro come i fratelli (cacciatore, curatore): sia la coda sia
+l'`year_max` corrente arrivano da file committati (il `new_year` del manifest),
+quindi la Routine dello scrittore non richiede Flask. Il controllo `stale` si
+restringe così agli indicatori esterni/integrati che il manifest traccia, cioè
+proprio il perimetro dello scrittore come innesco della pipeline di discovery.
+La logica è testata (`tests/test_pending_notes.py`) senza toccare alcun file.
+
 ## Fonte pilota: Eurostat regionale (NUTS2)
 
 Prima istituzione oltre Istat, per validare il flusso end-to-end.
@@ -213,6 +240,18 @@ Il **curatore** è un secondo agente (o passo umano) che gira dopo la promozione
    `data/discovery/curation.csv`.
 3. `python3 scripts/apply_curation.py` per pubblicare le decisioni nel layer
    esterno, poi aprire la PR. Al merge l'indicatore entra nel punteggio.
+
+Lo **scrittore** è un terzo agente (o passo umano) che gira dopo la curation:
+
+1. `python3 scripts/pending_notes.py` per leggere la coda: gli indicatori
+   integrati senza nota (`missing`) e le note col vintage indietro (`stale`).
+2. Per ciascuno: leggere i dati reali dell'indicatore (API/data layer), scrivere
+   la nota d'analista (`attacco`/`spunto`/`limite`/`fonti`/`vintage`) seguendo
+   `.claude/agents/indicator-writer.md` e `content/STYLE.md`, con solo numeri
+   reali e le fonti verificate per le affermazioni comparative.
+3. Aggiornare `app/static/data/analyst_notes.json` (solo la chiave di quell'id),
+   lanciare `.venv/bin/python -m unittest tests.test_analyst_notes` e aprire la
+   PR. Nessun merge automatico.
 
 Note operative:
 
