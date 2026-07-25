@@ -98,19 +98,27 @@ def pending(manifest_rows, notes, year_max_of):
 
 
 def manifest_year_max(manifest_rows):
-    """``{target_indicator_id: latest year}`` from the manifest's ``new_year``.
+    """``{target_indicator_id: latest year}`` from the manifest.
 
-    Stdlib pure: the discovery pipeline records the promoted series' latest year
-    here, so the writer's trigger reads it straight from the committed manifest
-    instead of importing the app. Rows with a blank/non-numeric ``new_year`` (a
-    placeholder, or an entry written before the column was filled) contribute no
-    year, so they never produce a false stale signal."""
+    Stdlib pure: the discovery pipeline records the series' latest year here, so
+    the writer's trigger reads it straight from the committed manifest instead of
+    importing the app. The year can live in ``new_year`` (a promotion) or only in
+    ``current_year`` (an integrated indicator without a fresh promotion year, e.g.
+    617/618/623/624), so we take the max of whichever columns are present.
+    Reading only ``new_year`` would drop those targets and their notes could never
+    enter the ``stale`` worklist. A row with neither contributes no year."""
     out = {}
     for row in manifest_rows:
-        year = (row.get("new_year") or "").strip()
         target = row.get("target_indicator_id", "")
-        if target and year.isdigit():
-            out[target] = int(year)
+        if not target:
+            continue
+        years = [
+            int(value)
+            for column in ("new_year", "current_year")
+            if (value := (row.get(column) or "").strip()).isdigit()
+        ]
+        if years:
+            out[target] = max(years)
     return out
 
 

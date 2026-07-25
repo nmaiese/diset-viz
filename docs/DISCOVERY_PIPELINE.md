@@ -181,8 +181,9 @@ python3 scripts/pending_notes.py --json      # coda per l'agente
 ```
 
 Lo script è stdlib puro come i fratelli (cacciatore, curatore): sia la coda sia
-l'`year_max` corrente arrivano da file committati (il `new_year` del manifest),
-quindi la Routine dello scrittore non richiede Flask. Il controllo `stale` si
+l'`year_max` corrente arrivano da file committati (il `new_year`, o in mancanza
+il `current_year`, del manifest), quindi la Routine dello scrittore non richiede
+Flask. Il controllo `stale` si
 restringe così agli indicatori esterni/integrati che il manifest traccia, cioè
 proprio il perimetro dello scrittore come innesco della pipeline di discovery.
 La logica è testata (`tests/test_pending_notes.py`) senza toccare alcun file.

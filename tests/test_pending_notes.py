@@ -60,12 +60,23 @@ class PendingNotesWorklist(unittest.TestCase):
     def test_manifest_year_max_reads_new_year_stdlib(self):
         rows = [
             {"target_indicator_id": "eur:a", "new_year": "2023", "status": "integrated"},
-            {"target_indicator_id": "eur:b", "new_year": "", "status": "integrated"},
+            {"target_indicator_id": "eur:b", "new_year": "", "current_year": "", "status": "integrated"},
             {"target_indicator_id": "eur:c", "new_year": "n/d", "status": "integrated"},
         ]
         year_of = pending_notes.manifest_year_max(rows)
         self.assertEqual(year_of, {"eur:a": 2023})  # blank / non-numeric -> no year
         self.assertIsInstance(year_of["eur:a"], int)
+
+    def test_manifest_year_max_falls_back_to_current_year(self):
+        # Integrated entries like 617/618/623/624 carry the year only in
+        # current_year; the max of both columns keeps them eligible for staleness.
+        rows = [
+            {"target_indicator_id": "617", "new_year": "", "current_year": "2025"},
+            {"target_indicator_id": "eur:a", "new_year": "2023", "current_year": "2024"},
+        ]
+        year_of = pending_notes.manifest_year_max(rows)
+        self.assertEqual(year_of["617"], 2025)          # current_year fallback
+        self.assertEqual(year_of["eur:a"], 2024)        # max of the two
 
     def test_integrated_targets_dedup_and_order(self):
         rows = [
