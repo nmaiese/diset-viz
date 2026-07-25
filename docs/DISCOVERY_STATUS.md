@@ -104,6 +104,17 @@ sull'environment `divarioitalia`, modello `claude-opus-4-8`:
 | --- | --- | --- |
 | cacciatore (watchlist) | `0 6 * * 1` (lun) | `trig_01VizeycZocZoeDE1RxjWj1f` |
 | curatore (verso, categoria) | `0 6 * * 4` (gio) | `trig_019EP6TnEbYnKz8VpKFaRm4g` |
+| scrittore (note d'analista) | `0 6 * * 6` (sab) | *da registrare* |
+
+Lo **scrittore** ha ora un innesco deterministico: `scripts/pending_notes.py`
+elenca gli indicatori integrati senza nota (e le note col vintage indietro), così
+la Routine sa su cosa lavorare invece di ripartire da zero. La cadenza sabato sta
+due giorni dopo il curatore (giovedì), lo stesso sfasamento cacciatore->curatore,
+perché lo scrittore ha senso solo dopo che una integrazione del curatore è a
+monte. La Routine va registrata a mano su <https://claude.ai/code/routines> come
+le altre due (contratto in [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md),
+sezione "Runtime", passi 1-3 dello scrittore); il prompt non apre una PR vuota
+quando `pending_notes.py` non elenca nulla.
 
 Le Routine si gestiscono da <https://claude.ai/code/routines> (elenco, modifica,
 esecuzione manuale, disattivazione). Il prompt di ciascuna riproduce il contratto

@@ -223,6 +223,38 @@ def _as_float(value):
         return 0.0
 
 
+def read_semicolon(path):
+    """Read a semicolon-delimited CSV into a list of dict rows.
+
+    The external dataset, the manifest, the curation file and the queue are all
+    semicolon CSVs, and every script had its own private copy of this read (and
+    the atomic write below). They live here now so the discovery scripts share
+    one implementation instead of four that can drift apart."""
+    path = Path(path)
+    if not path.exists():
+        return []
+    with path.open(encoding="utf-8", newline="") as handle:
+        return list(csv.DictReader(handle, delimiter=";"))
+
+
+def write_semicolon(rows, columns, path):
+    """Atomically write dict rows as a semicolon-delimited CSV in the given
+    column order (extra keys dropped, missing keys blank). Same temp-file +
+    os.replace pattern the scripts already used, in one place."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8", newline="", delete=False, dir=path.parent
+    ) as tmp:
+        writer = csv.DictWriter(tmp, fieldnames=columns, delimiter=";", lineterminator="\n")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({col: row.get(col, "") for col in columns})
+        temp_name = tmp.name
+    os.replace(temp_name, path)
+    os.chmod(path, 0o644)
+
+
 def upsert_candidates(existing, discovered):
     """Merge freshly discovered candidates into the existing queue by
     candidate_id. A candidate a human already triaged keeps its decision and

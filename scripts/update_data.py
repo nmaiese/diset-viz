@@ -87,6 +87,22 @@ def read_zip_csv(archive_bytes: bytes) -> csv.DictReader:
     return csv.DictReader(text_file, delimiter=";")
 
 
+# Known corruptions in the upstream Istat archive (BDTPS): the ZIP itself ships
+# these impossible values, so a plain refresh re-introduces them. We heal a cell
+# only while it still carries the exact bad value, recovered from an independent
+# Istat source; if Istat later corrects the archive (any other value), theirs
+# wins. Keyed by (idIndicatore, Territorio, Anno).
+KNOWN_ARCHIVE_CORRECTIONS: dict[tuple[str, str, str], tuple[str, str, str]] = {
+    ("476", "Trentino Alto Adige", "2022"): (
+        "328,803168570214",  # bad value published in the archive
+        "43,16288",          # real value, verified below
+        "Istat RCFL SDMX 150_915_DF_DCCV_TAXOCCU1_YOUTH_1 (ITDA, eta 15-29, femmine, "
+        "2022): l'archivio BDTPS pubblica 328,8, impossibile per un tasso di occupazione. "
+        "Cross-check: le altre 19 regioni combaciano archivio==SDMX alla quarta cifra.",
+    ),
+}
+
+
 def convert_row(row: dict[str, str]) -> dict[str, str] | None:
     territory = REGION_NAME_MAP.get(
         row["DESCRIZIONE_RIPARTIZIONE"],
@@ -98,7 +114,7 @@ def convert_row(row: dict[str, str]) -> dict[str, str] | None:
     theme = row["DESCRIZIONE_TEMA1"] or row["OC_TEMA_SINTETICO"] or "Indicatori territoriali"
     archive = row["SOTTOTITOLO"] or row[" 1° OBIETTIVO"] or row["OC_TEMA_SINTETICO"]
 
-    return {
+    result = {
         "idIndicatore": row["COD_INDICATORE"].lstrip("0") or "0",
         "Territorio": territory,
         "Tema": theme.strip(),
@@ -112,6 +128,14 @@ def convert_row(row: dict[str, str]) -> dict[str, str] | None:
         "Benchmark": "",
         "Area": "Regione",
     }
+    correction = KNOWN_ARCHIVE_CORRECTIONS.get(
+        (result["idIndicatore"], result["Territorio"], result["Anno"])
+    )
+    if correction is not None:
+        bad_value, corrected_value, _reason = correction
+        if result["Dato"] == bad_value:
+            result["Dato"] = corrected_value
+    return result
 
 
 def write_atomic(rows: list[dict[str, str]], output_path: Path) -> None:
