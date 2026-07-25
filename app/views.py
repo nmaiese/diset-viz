@@ -125,19 +125,26 @@ def analyst_html(text):
     return Markup(html)
 
 
-@cache.memoize(timeout=100)
 def get_all_data():
     filepath = os.path.join(os.path.dirname(__file__), 'static/data/Assoluti_Regione.csv')
     with open(filepath, 'r', encoding='utf8') as f:
         reader = csv.DictReader(f, delimiter=";")
-        data = list(reader)
-    return data
+        return list(reader)
+
 
 @app.route("/data")
-@cache.cached(timeout=100)
 def data():
-    data = get_all_data()
-    return jsonify(data)
+    # /data is the full CSV (~111k rows, ~46 MB of JSON) consumed only by the
+    # legacy D3 dashboard. It used to cache that whole 46 MB Response in each
+    # worker's SimpleCache (standing memory) and memoize the raw row list on top.
+    # Compression and encoding negotiation are already handled app-wide by
+    # Flask-Compress (same as every /api/* route), so we only build the payload,
+    # let Flask-Compress gzip it on the wire, and add Cache-Control so the browser
+    # stops re-fetching it. Nothing large is held standing: the rows are built per
+    # request and freed.
+    response = jsonify(get_all_data())
+    response.headers["Cache-Control"] = "public, max-age=600"
+    return response
 
 
 @app.route("/")

@@ -57,12 +57,20 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(legacy_reddito.status_code, 200)
         self.assertIn(b"federalismo fiscale", legacy_reddito.data)
 
-        data = client.get("/data")
+        # /data is the legacy dashboard's full dataset (~46 MB of JSON uncompressed).
+        # It must stay a JSON array and stay noindex, but the route now serves it
+        # gzipped with browser caching, so assert the compressed path and validate
+        # only a small decompressed prefix instead of parsing the whole payload.
+        data = client.get("/data", headers={"Accept-Encoding": "gzip"})
         self.assertEqual(data.status_code, 200)
         self.assertIn("noindex", data.headers["X-Robots-Tag"])
-        rows = data.get_json()
-        self.assertGreater(len(rows), 0)
-        self.assertIn("Indicatore", rows[0])
+        self.assertEqual(data.headers.get("Content-Encoding"), "gzip")
+        self.assertIn("max-age", data.headers.get("Cache-Control", ""))
+        self.assertLess(len(data.data), 10_000_000)  # gzipped, well under the raw ~46 MB
+        import zlib
+        head = zlib.decompressobj(zlib.MAX_WBITS | 16).decompress(data.data, 300).decode("utf-8", "ignore")
+        self.assertTrue(head.lstrip().startswith("[{"))
+        self.assertIn("Indicatore", head)
 
     def test_filtered_api_routes(self):
         client = app.test_client()
