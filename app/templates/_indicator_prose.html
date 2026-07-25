@@ -1,0 +1,88 @@
+{# Shared prose blocks for the indicator pages, so the atlas (indicator_page.html)
+   and the quality-of-life (quality_life_indicator.html) render paths keep the same
+   editorial voice and layout (§7) from a single source. Each template still owns its
+   own "I numeri" block, because the two data models differ (atlas: stats/best/worst;
+   QoL: per-level payloads), but the definition, FAQ, "cosa sapere" and citation are
+   identical and live here as macros. #}
+
+{% macro definition_block(explain, analyst) %}
+<section class="prose indicator-definition">
+  <h2>Che cosa misura e come leggere il dato</h2>
+  <p><strong>Che cosa significa il valore.</strong> {{ explain.example }}</p>
+  {% if explain.scope %}<p><strong>Chi e che cosa comprende.</strong> {{ explain.scope }}</p>{% endif %}
+  <p><strong>Come interpretare valori e classifica.</strong> {{ explain.reading }}</p>
+  {% if analyst and analyst.spunto %}<p class="analyst-spunto">{{ analyst.spunto | analyst_html }}</p>{% endif %}
+</section>
+{% endmacro %}
+
+{% macro faq_block(faq) %}
+{% if faq %}
+<section class="prose indicator-faq">
+  <h2>Domande frequenti</h2>
+  {% for item in faq %}
+  <details class="indicator-faq__item">
+    <summary>{{ item.q }}</summary>
+    <p>{{ item.a }}</p>
+  </details>
+  {% endfor %}
+</section>
+{% endif %}
+{% endmacro %}
+
+{% macro caveat_block(analyst, explain, year, year_min, year_max, source_label, source_url, institution, archive=None) %}
+<section class="prose indicator-caveats">
+  <h2>Cosa sapere su questo indicatore</h2>
+  <p class="page-caveat"><strong>Che cosa non dice.</strong> {% if analyst and analyst.limite %}{{ analyst.limite | analyst_html }}{% else %}{{ explain.caveat }}{% endif %}</p>
+  <p class="data-callout"><strong>Dato più recente: {{ year }}.</strong>{% if year_min != year_max %} La serie storica copre il periodo {{ year_min }}-{{ year_max }}.{% endif %} Fonte <a href="{{ source_url }}" target="_blank" rel="noopener">{{ source_label }}</a>.</p>
+  {% if analyst and analyst.fonti %}
+  <div class="analyst-sources">
+    <h3>Fonti dell'analisi</h3>
+    <ul>
+      {% for fonte in analyst.fonti %}
+      <li>{% if fonte.url %}<a href="{{ fonte.url }}" target="_blank" rel="noopener">{{ fonte.testo }}</a>{% else %}{{ fonte.testo }}{% endif %}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  {% if archive %}
+  <details class="indicator-source-definition">
+    <summary>Leggi la definizione originale della fonte</summary>
+    <p>{{ archive }}</p>
+    <p><a href="{{ source_url }}" target="_blank" rel="noopener">Consulta la fonte {{ institution or "Istat" }} →</a></p>
+  </details>
+  {% endif %}
+</section>
+{% endmacro %}
+
+{% macro _verso(direction) %}{% if direction == 'higher_better' %}più alto è meglio{% elif direction in ('lower_better', 'higher_worse') %}più basso è meglio{% else %}senza direzione univoca{% endif %}{% endmacro %}
+
+{% macro related_block(related, theme, theme_path) %}
+{% if related %}
+<section class="prose indicator-related">
+  <h2>Altri indicatori del tema {{ theme }}</h2>
+  <div class="quality-table-wrap">
+    <table class="data-table indicator-related__table">
+      <thead><tr><th>Indicatore</th><th>Come si legge</th><th class="num">Ultimo dato</th></tr></thead>
+      <tbody>
+        {% for item in related %}
+        <tr>
+          <td><a href="{{ item.path }}">{{ item.name }}</a></td>
+          <td>{{ _verso(item.direction) }}</td>
+          <td class="num">{{ item.year_max }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="page-note"><a href="{{ theme_path }}">Vedi tutti gli indicatori del tema {{ theme }} →</a></p>
+</section>
+{% endif %}
+{% endmacro %}
+
+{% macro citation_block(source_label, institution, name, year, source_url, canonical) %}
+<section class="prose indicator-cite">
+  <h2>Come citare questo dato</h2>
+  <p><strong>Dato originale:</strong> {{ source_label }}{% if institution and institution not in source_label %} ({{ institution }}){% endif %}, <em>{{ name }}</em>, {{ year }}. <a href="{{ source_url }}" target="_blank" rel="noopener">Fonte</a>.</p>
+  <p><strong>Elaborazione e visualizzazione:</strong> Divario Italia, <a href="{{ canonical }}">{{ canonical }}</a>. Il dato non è raccolto da noi: lo ripubblichiamo dalla fonte, con calcoli derivati (media, divario, classifica) e grafici.</p>
+</section>
+{% endmacro %}

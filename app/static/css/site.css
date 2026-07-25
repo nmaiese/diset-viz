@@ -322,6 +322,23 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .indicator-sparkline svg { display: block; width: 100%; height: 140px; }
 .indicator-sparkline polyline { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
 
+/* Compact FAQ: the answers repeat the dashboard numbers, so they collapse by
+   default and stay available (and in the FAQPage JSON-LD) for who wants them. */
+.indicator-faq__item { border-top: 1px solid var(--grid); padding: 10px 0; }
+.indicator-faq__item summary {
+  cursor: pointer; font-family: var(--font-display); font-weight: 600; color: var(--ink);
+}
+.indicator-faq__item[open] summary { margin-bottom: 8px; }
+
+/* The social-preview cover is a share asset, not reading matter: keep it out of
+   the reading flow behind a disclosure. */
+.indicator-cover-share { margin: 8px 0 30px; }
+.indicator-cover-share > summary {
+  cursor: pointer; font-family: var(--font-mono); font-size: 13px; color: var(--muted);
+}
+.indicator-cover-share[open] > summary { margin-bottom: 14px; }
+.indicator-cover-share .indicator-cover { margin: 0; }
+
 /* Auto-generated indicator cover card: a bar-chart preview of the top/worst
    regions, in the same visual language as a social-preview image. */
 .indicator-cover { margin: 8px 0 30px; }

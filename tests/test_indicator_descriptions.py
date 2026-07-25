@@ -78,7 +78,7 @@ class IndicatorDescriptionCoverageTest(unittest.TestCase):
         html = unescape(response.data.decode("utf-8"))
         self.assertEqual(response.status_code, 200)
         self.assertIn("Che cosa misura e come leggere il dato", html)
-        self.assertIn("Come è cambiato nell'ultimo anno disponibile", html)
+        self.assertIn("I numeri, in breve", html)
         self.assertIn(item["explain"]["plain"], html)
         self.assertIn(item["explain"]["example"], html)
         self.assertIn('"@type": "Dataset"', html)

@@ -1,4 +1,5 @@
 {% extends "blog_base.html" %}
+{% import "_indicator_prose.html" as prose %}
 {% set active_nav = 'qualita-della-vita' %}
 
 {% block title %}{{ seo_title }}{% endblock %}
@@ -49,29 +50,15 @@
   <div class="page-facts">
     <span><small>Unità di misura</small>{{ indicator.value_unit }}</span>
     <span><small>Periodo disponibile</small>{{ indicator.year_min }}-{{ indicator.year_max }}</span>
+    <span><small>Ultimo dato</small>{{ indicator.year_max }}</span>
     <span><small>Categoria</small><a href="{{ indicator.category_path }}">{{ indicator.category_name }}</a></span>
     <span><small>{{ domain_label }}</small>{{ indicator.domain_name }}</span>
     <span><small>Fonte</small><a href="{{ indicator.source_url }}" target="_blank" rel="noopener">{{ source_label }}</a></span>
     {% if indicator.source_dataflow %}<span><small>Serie SDMX</small><a href="{{ indicator.source_data_url }}" target="_blank" rel="noopener">{{ indicator.source_dataflow }}</a></span>{% endif %}
   </div>
 
-  <section class="prose indicator-definition">
-    <h2>Che cosa rappresenta il dato</h2>
-    <p><strong>In pratica.</strong> {{ indicator.explain.example }}</p>
-    <p><strong>Perimetro del confronto.</strong> {{ indicator.explain.scope }}</p>
-    <p><strong>Come si legge.</strong> {{ indicator.explain.reading }}</p>
-    {% if analyst and analyst.spunto %}<p class="analyst-spunto">{{ analyst.spunto | analyst_html }}</p>{% endif %}
-    <p class="page-caveat"><strong>Che cosa non dice.</strong> {% if analyst and analyst.limite %}{{ analyst.limite | analyst_html }}{% else %}{{ indicator.explain.caveat }}{% endif %}</p>
-    {% if analyst and analyst.fonti %}
-    <div class="analyst-sources">
-      <h3>Fonti dell'analisi</h3>
-      <ul>
-        {% for fonte in analyst.fonti %}
-        <li>{% if fonte.url %}<a href="{{ fonte.url }}" target="_blank" rel="noopener">{{ fonte.testo }}</a>{% else %}{{ fonte.testo }}{% endif %}</li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
+  {{ prose.definition_block(indicator.explain, analyst) }}
+  <section class="prose indicator-scoring">
     <p>L'indicatore appartiene alla categoria <a href="{{ indicator.category_path }}">{{ indicator.category_name }}</a> e {{ domain_prose }} {{ indicator.domain_name }}. La direzione serve a ordinare i dati.{% if indicator.scoreable is defined %} {% if indicator.scoreable %}Questa serie entra nel punteggio regionale della qualità della vita.{% else %}Questa serie resta descrittiva e non entra nel punteggio, per evitare sovrapposizioni o interpretazioni arbitrarie.{% endif %}{% else %} Quando è definita, può essere usata per costruire il punteggio della qualità della vita.{% endif %} Non sostituisce l'interpretazione del contesto territoriale.</p>
   </section>
 
@@ -79,14 +66,14 @@
   <section class="prose indicator-year-change">
     <h2>{{ level.label }}: come è cambiato nell'ultimo aggiornamento</h2>
     {% if level.annual_change %}
-    <p>Tra il {{ level.annual_change.previous_year }} e il {{ level.annual_change.year }} la media semplice dei valori dei {{ level.annual_change.common_count }} territori confrontabili è passata da {{ level.annual_change.previous_avg | it_num(2) }} {{ indicator.value_unit }} a {{ level.annual_change.current_avg | it_num(2) }} {{ indicator.value_unit }}.
+    <p>Tra il {{ level.annual_change.previous_year }} e il {{ level.annual_change.year }} la media semplice dei valori dei {{ level.annual_change.common_count }} {{ level.annual_change.common_count | it_plural('territorio', 'territori') }} confrontabili è passata da {{ level.annual_change.previous_avg | it_num(2) }} {{ indicator.value_unit }} a {{ level.annual_change.current_avg | it_num(2) }} {{ indicator.value_unit }}.
       {% if level.annual_change.average_delta > 0 %}È un aumento di {{ level.annual_change.average_delta | it_num(2) }} {{ indicator.change_unit }}.
       {% elif level.annual_change.average_delta < 0 %}È una diminuzione di {{ (level.annual_change.average_delta | abs) | it_num(2) }} {{ indicator.change_unit }}.
       {% else %}Il valore medio non è cambiato.
       {% endif %}
       {{ level.annual_note }}
     </p>
-    <p>Il valore è diminuito in {{ level.annual_change.decrease_count }} territori, è aumentato in {{ level.annual_change.increase_count }}{% if level.annual_change.stable_count %} ed è rimasto invariato in {{ level.annual_change.stable_count }}{% endif %}.</p>
+    <p>Il valore è diminuito in {{ level.annual_change.decrease_count }} {{ level.annual_change.decrease_count | it_plural('territorio', 'territori') }}, è aumentato in {{ level.annual_change.increase_count }}{% if level.annual_change.stable_count %} ed è rimasto invariato in {{ level.annual_change.stable_count }}{% endif %}.</p>
     {% if level.annual_change.largest_decreases or level.annual_change.largest_increases %}
     <p>
       {% if level.annual_change.largest_decreases %}{% set decrease = level.annual_change.largest_decreases[0] %}La diminuzione più ampia si osserva {% if level.level == 'regione' %}in <a href="/regione/{{ decrease.region_key }}">{{ decrease.region }}</a>{% else %}nel territorio {{ decrease.region }}{% endif %}, da {{ decrease.previous_value | it_num(2) }} a {{ decrease.current_value | it_num(2) }} {{ indicator.value_unit }} ({{ decrease.delta | it_num(2) }} {{ indicator.change_unit }}){% endif %}{% if level.annual_change.largest_decreases and level.annual_change.largest_increases %}, mentre {% endif %}{% if level.annual_change.largest_increases %}{% set increase = level.annual_change.largest_increases[0] %}l'aumento più ampio riguarda {% if level.level == 'regione' %}<a href="/regione/{{ increase.region_key }}">{{ increase.region }}</a>{% else %}{{ increase.region }}{% endif %}, da {{ increase.previous_value | it_num(2) }} a {{ increase.current_value | it_num(2) }} {{ indicator.value_unit }} (+{{ increase.delta | it_num(2) }} {{ indicator.change_unit }}){% endif %}.
@@ -100,7 +87,7 @@
 
   <section class="page-ranking">
     <h2>{{ level.label }}: dati {{ level.year_max }}</h2>
-    <p class="page-note">Copertura: {{ level.count_latest }} territori su {{ level.territory_total }} ({{ (level.coverage_latest * 100) | round | int }}%). Media semplice {{ level.mean | it_num(2) }}. Mediana {{ level.median | it_num(2) }} {{ indicator.value_unit }}.</p>
+    <p class="page-note">Copertura: {{ level.count_latest }} {{ level.count_latest | it_plural('territorio', 'territori') }} su {{ level.territory_total }} ({{ (level.coverage_latest * 100) | round | int }}%). Media semplice {{ level.mean | it_num(2) }}. Mediana {{ level.median | it_num(2) }} {{ indicator.value_unit }}.</p>
     <div class="quality-table-wrap">
       <table class="data-table">
         <thead><tr><th>#</th><th>Territorio</th><th class="num">{{ indicator.value_unit }}</th></tr></thead>
@@ -117,6 +104,10 @@
     </div>
   </section>
   {% endfor %}
+
+  {{ prose.caveat_block(analyst, indicator.explain, indicator.year_max, indicator.year_min, indicator.year_max, source_label, indicator.source_url, "Istat") }}
+
+  {{ prose.citation_block(source_label, "Istat", indicator.name, indicator.year_max, indicator.source_url, canonical) }}
 
   <aside class="indicator-cta">
     <span><small>Metodo e limiti</small><strong>Consulta criteri di selezione, pesi e copertura degli indicatori.</strong></span>

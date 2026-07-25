@@ -102,6 +102,13 @@ def it_num(value, decimals=1):
     return formatted.replace(",", "§").replace(".", ",").replace("§", ".")
 
 
+@app.template_filter("it_plural")
+def it_plural_filter(count, singular, plural):
+    """Italian singular/plural agreement for a count: `{{ n | it_plural('regione',
+    'regioni') }}`. Delegates to the shared helper so prose and templates agree."""
+    return indicator_notes.it_plural(count, singular, plural)
+
+
 @app.template_filter("analyst_html")
 def analyst_html(text):
     """Render an analyst note (plain prose with inline markdown links) to safe
@@ -396,7 +403,13 @@ def _render_atlas_indicator(family, raw_id):
     # atlas dashboard's sibling navigation (server-rendered, plain canonical links).
     theme_siblings = sorted(
         (
-            {"id": item["id"], "name": item["name"], "path": item["path"]}
+            {
+                "id": item["id"],
+                "name": item["name"],
+                "path": item["path"],
+                "direction": (item.get("explain") or {}).get("direction"),
+                "year_max": item["year_max"],
+            }
             for item in get_atlas_catalog()["indicators"]
             if item["theme"] == meta["theme"]
         ),
@@ -412,6 +425,9 @@ def _render_atlas_indicator(family, raw_id):
         if sibling_index is not None and sibling_index < len(theme_siblings) - 1
         else None
     )
+    # Related-in-theme table (C9): the other indicators of the same theme, with their
+    # reading direction, as a scannable table instead of a bare prev/next.
+    related_siblings = [s for s in theme_siblings if str(s["id"]) != str(meta["id"])][:8]
 
     # Bar length reference for the ranking (same rule as the atlas Ranking).
     bar_max = max((row["value"] for row in values if row["value"] is not None), default=0)
@@ -457,6 +473,7 @@ def _render_atlas_indicator(family, raw_id):
         explore_data=explore_data,
         sibling_prev=sibling_prev,
         sibling_next=sibling_next,
+        related_siblings=related_siblings,
         bar_max=bar_max,
         map_colors=map_colors,
         spark_points=spark_points,
@@ -465,6 +482,11 @@ def _render_atlas_indicator(family, raw_id):
             meta["year_min"],
             meta["year_max"],
             len(meta["regions"]),
+            year=year,
+            best=best,
+            worst=worst,
+            year_avg=stats["year_avg"],
+            value_unit=value_unit,
         ),
         value_unit=value_unit,
         change_unit=indicator_notes.change_unit_label(meta["name"], meta["unit"]),

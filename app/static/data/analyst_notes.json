@@ -1,12 +1,12 @@
 {
  "178": {
-  "attacco": "In Valle d'Aosta lavora quasi il 69% delle donne tra 15 e 64 anni, in Campania poco meno del 34%. Trentino Alto Adige ed Emilia-Romagna restano sopra il 64%, mentre Sicilia e Calabria si fermano attorno al 35%. Tra la regione che guida e quella in coda ci sono circa 35 punti percentuali di distanza.",
-  "spunto": "La media delle regioni, quasi il 55%, dice meno di quanto sembri. Il valore mediano sfiora il 61%, quindi metà delle regioni sta sopra quella soglia e a tirare in basso il quadro medio è un gruppo di territori del Mezzogiorno, non una difficoltà diffusa. Un tasso di occupazione femminile alto racconta quante donne hanno un lavoro, non quanto quel lavoro sia stabile o a tempo pieno. In ambito europeo l'Italia registra il divario di genere nell'occupazione più ampio dell'Unione ([Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Employment_-_annual_statistics)). Dove l'occupazione femminile cresce, sta crescendo anche la sua qualità?",
+  "attacco": "In Valle d'Aosta lavora quasi il 69% delle donne tra 15 e 64 anni, in Campania appena il 34%. Ma quello che colpisce è l'ordine della classifica, con le prime dodici posizioni tutte del Centro-Nord e le ultime otto tutte del Mezzogiorno, senza una sola eccezione. La geografia qui pesa più della singola regione.",
+  "spunto": "Il 69% della Valle d'Aosta impressiona finché non si guarda la colonna accanto, quella dell'occupazione maschile. Le donne al lavoro in Italia restano molto più indietro degli uomini, e il divario di genere nell'occupazione è il più ampio dell'Unione europea, 19,4 punti nel 2024 contro una media UE di 10 ([Eurostat](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/edn-20260303-1)). Un tasso femminile alto dice quante donne hanno un impiego, non quanto quel lavoro renda o quanto sia continuo. Dal 2018 il valore è salito in ogni regione, un recupero reale ma partito da punti molto lontani tra loro. Quella crescita sta portando lavoro stabile o soprattutto part time?",
   "limite": "Il dato conta chi ha un impiego, non separa il tempo pieno dal part time involontario e non misura orari, retribuzione o continuità del contratto. Non dice nulla sul lavoro di cura non retribuito che grava sulla stessa fascia di popolazione.",
   "fonti": [
    {
-    "testo": "Eurostat, Employment statistics: nel 2025 l'Italia registra il divario di genere nell'occupazione più ampio dell'UE (19,1 punti).",
-    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Employment_-_annual_statistics"
+    "testo": "Eurostat, Women at work: nel 2024 l'Italia registra il divario di genere nell'occupazione più ampio dell'UE, 19,4 punti contro una media europea di 10.",
+    "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/edn-20260303-1"
    }
   ],
   "vintage": 2025

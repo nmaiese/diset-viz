@@ -1051,13 +1051,55 @@ def trend_framing(direction, avg_change_pct):
     return "una variazione media favorevole" if favorable else "una variazione media sfavorevole"
 
 
-def indicator_page_intro(plain, year_min, year_max, region_count):
-    """Reader-first lead for a regional indicator page."""
+def it_plural(count, singular, plural):
+    """Pick the Italian singular or plural form for a count. Shared by the Python
+    prose helpers and the `it_plural` Jinja filter, so a count of 1 never reads as
+    "1 regioni" / "1 territori" and verbs agree ("supera" vs "superano")."""
+    try:
+        n = abs(int(count))
+    except (TypeError, ValueError):
+        return plural
+    return singular if n == 1 else plural
+
+
+def indicator_page_intro(
+    plain,
+    year_min,
+    year_max,
+    region_count,
+    year=None,
+    best=None,
+    worst=None,
+    year_avg=None,
+    value_unit=None,
+):
+    """Reader-first lead for a regional indicator page, used only when the indicator
+    has no analyst note (noted pages lead with the attacco). When the ranking is
+    meaningful it opens with a headline answer, the best and worst region and the
+    regional mean for the latest year, so the sentence reads as distinct per
+    indicator (real regions and figures) and is snippet-friendly. Contextual
+    indicators, which have no best/worst, fall back to a plain coverage line.
+
+    This feeds the visible lead only, not the SERP meta description (the view keeps
+    a separate seo_description)."""
+    unit = f" {value_unit}" if value_unit else ""
+    if best and worst and year is not None:
+        lead = (
+            f"Nel {year} il dato più favorevole è di {best['region']} con "
+            f"{_it_number(best['value'])}{unit}, il più sfavorevole di {worst['region']} con "
+            f"{_it_number(worst['value'])}{unit}."
+        )
+        if year_avg is not None:
+            regioni = it_plural(region_count, "regione", "regioni")
+            lead += f" La media tra le {region_count} {regioni} è {_it_number(year_avg)}{unit}."
+        return f"{plain} {lead}".strip()
+
+    regioni = it_plural(region_count, "regione", "regioni")
     if year_min == year_max:
-        coverage = f"La scheda confronta {region_count} regioni per il {year_max}."
+        coverage = f"La scheda confronta {region_count} {regioni} per il {year_max}."
     else:
         coverage = (
-            f"La scheda confronta {region_count} regioni nell'ultimo anno disponibile "
+            f"La scheda confronta {region_count} {regioni} nell'ultimo anno disponibile "
             f"e mostra l'andamento dal {year_min} al {year_max}."
         )
     return f"{plain} {coverage}".strip()
@@ -1089,14 +1131,16 @@ def annual_change_framing(name, direction, delta):
         return ""
     if abs(delta) < 1e-12:
         return "La media è rimasta invariata."
-    movement = "aumento" if delta > 0 else "diminuzione"
+    # "aumento" is masculine, "diminuzione" feminine: keep the article agreeing.
+    indef_movement = "un aumento" if delta > 0 else "una diminuzione"
+    def_movement = "L'aumento" if delta > 0 else "La diminuzione"
     lowered_name = (name or "").lower()
     if "differenza tra tasso" in lowered_name or "differenza assoluta fra tasso" in lowered_name:
         outcome = "si è ampliato" if delta > 0 else "si è ridotto"
-        return f"La {movement} indica che il divario medio tra i due tassi {outcome}."
+        return f"{def_movement} indica che il divario medio tra i due tassi {outcome}."
     if direction not in ("higher_better", "lower_better", "higher_worse"):
         return (
-            f"Il dato descrive un {movement}, ma non indica da solo un "
+            f"Il dato descrive {indef_movement}, ma non indica da solo un "
             "miglioramento o un peggioramento."
         )
     favorable = (direction == "higher_better" and delta > 0) or (
