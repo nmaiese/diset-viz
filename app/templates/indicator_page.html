@@ -253,7 +253,7 @@
       {% if stats.gap_abs is not none %}
       <div class="numbers-tile">
         <span class="numbers-tile__label">Divario</span>
-        <span class="numbers-tile__value">{{ stats.gap_abs | it_num(2) }} <span class="u">{{ value_unit }}</span></span>
+        <span class="numbers-tile__value">{{ stats.gap_abs | it_num(2) }} <span class="u">{{ change_unit }}</span></span>
         {% if stats.gap_ratio %}<span class="numbers-tile__sub">{{ stats.gap_ratio | it_num(1) }}× il valore più basso</span>{% endif %}
       </div>
       {% endif %}
