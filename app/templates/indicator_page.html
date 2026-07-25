@@ -258,9 +258,11 @@
     <p class="page-note">Con {{ stats.year_count }} {{ stats.year_count | it_plural('regione', 'regioni') }} a confronto, i valori vanno letti come indicazioni di massima. Mediana e distribuzione non sarebbero significative su così pochi dati.</p>
     {% endif %}
 
-    {% if stats.has_multi_year and stats.avg_change_abs is not none and (stats.year_max - stats.year_min) >= 2 %}
-    {# serie lunga: la storia lunga una volta, l'ultimo anno come frase con numeri diversi #}
-    <p>Dal {{ stats.year_min }} al {{ stats.year_max }} la media regionale è passata da {{ stats.year_min_avg | it_num(2) }} a {{ stats.year_avg | it_num(2) }} {{ value_unit }}{% if stats.avg_change_pct is not none %} ({{ stats.avg_change_pct | it_num(1) }}%){% endif %}{% if trend_note %}, {{ trend_note }}{% endif %}.{% if annual_change %} Nell'ultimo anno, tra il {{ annual_change.previous_year }} e il {{ annual_change.year }}, la media è passata da {{ annual_change.previous_avg | it_num(2) }} {{ value_unit }} a {{ annual_change.current_avg | it_num(2) }} {{ value_unit }}. Il valore è diminuito in {{ annual_change.decrease_count }} {{ annual_change.decrease_count | it_plural('regione', 'regioni') }}, è aumentato in {{ annual_change.increase_count }}{% if annual_change.stable_count %} ed è rimasto invariato in {{ annual_change.stable_count }}{% endif %}. {{ annual_note }}{% endif %}</p>
+    {% if stats.has_multi_year and stats.avg_change_abs is not none and (meta.years | length) >= 3 %}
+    {# serie lunga (almeno 3 osservazioni): la storia lunga una volta, l'ultimo anno
+       come frase con numeri diversi. Le serie a due sole osservazioni cadono nel
+       ramo corto sotto, per non raccontare due volte lo stesso intervallo. #}
+    <p>Dal {{ stats.year_min }} al {{ stats.year_max }} la media regionale è passata da {{ stats.year_min_avg | it_num(2) }} a {{ stats.year_avg | it_num(2) }} {{ value_unit }}{% if stats.avg_change_pct is not none %} ({{ stats.avg_change_pct | it_num(1) }}%){% endif %}{% if trend_note %}, {{ trend_note }}{% endif %}.{% if annual_change %} Nell'ultimo anno disponibile, tra il {{ annual_change.previous_year }} e il {{ annual_change.year }}, la media delle {{ annual_change.common_count }} {{ annual_change.common_count | it_plural('regione', 'regioni') }} confrontabili è passata da {{ annual_change.previous_avg | it_num(2) }} {{ value_unit }} a {{ annual_change.current_avg | it_num(2) }} {{ value_unit }}. Il valore è diminuito in {{ annual_change.decrease_count }} {{ annual_change.decrease_count | it_plural('regione', 'regioni') }}, è aumentato in {{ annual_change.increase_count }}{% if annual_change.stable_count %} ed è rimasto invariato in {{ annual_change.stable_count }}{% endif %}. {{ annual_note }}{% endif %}</p>
     {% if stats.region_highest_delta and stats.region_lowest_delta %}
     <p>Sull'intero periodo
       {% if stats.region_highest_delta.kind == 'aumento' %}l'aumento maggiore è di <a href="/regione/{{ stats.region_highest_delta.region_key }}">{{ stats.region_highest_delta.region }}</a> (+{{ stats.region_highest_delta.delta | it_num(2) }} {{ change_unit }})
@@ -285,6 +287,8 @@
       {% else %}Il valore medio non è cambiato.{% endif %}
       {{ annual_note }}</p>
     <p>Il valore è diminuito in {{ annual_change.decrease_count }} {{ annual_change.decrease_count | it_plural('regione', 'regioni') }}, è aumentato in {{ annual_change.increase_count }}{% if annual_change.stable_count %} ed è rimasto invariato in {{ annual_change.stable_count }}{% endif %}.</p>
+    {% elif not stats.has_multi_year %}
+    <p>La fonte rende disponibile un solo anno per questa serie, quindi non è possibile calcolare una variazione rispetto a un anno precedente con la stessa definizione.</p>
     {% endif %}
 
     <p class="page-note">La media è una sintesi non ponderata dei valori regionali e non coincide necessariamente con un indicatore nazionale calcolato sulla popolazione.{% if meta.external_sources %} Layer esterno collegato: {{ meta.external_sources | join(', ') }}{% if meta.external_year_max %}, ultimo anno normalizzato {{ meta.external_year_max }}{% endif %}.{% endif %}</p>
