@@ -17,10 +17,7 @@ lists mirror app.external_data so the app is not imported here.
 from __future__ import annotations
 
 import argparse
-import csv
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -146,29 +143,6 @@ def _manifest_entry(candidate, target, enriches, note, rows):
     }
 
 
-def _read_semicolon(path):
-    path = Path(path)
-    if not path.exists():
-        return []
-    with path.open(encoding="utf-8", newline="") as handle:
-        return list(csv.DictReader(handle, delimiter=";"))
-
-
-def _write_semicolon(rows, columns, path):
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile(
-        "w", encoding="utf-8", newline="", delete=False, dir=path.parent
-    ) as tmp:
-        writer = csv.DictWriter(tmp, fieldnames=columns, delimiter=";", lineterminator="\n")
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({col: row.get(col, "") for col in columns})
-        temp_name = tmp.name
-    os.replace(temp_name, path)
-    os.chmod(path, 0o644)
-
-
 def _merge_dataset(existing, new_rows):
     def key(row):
         return (row["source"], row["source_indicator_id"], row["territory_code"], row["year"])
@@ -244,10 +218,10 @@ def run(offline=True, refresh=False, candidate_id=None,
         return {"approved": 0, "dataset_rows": 0, "manifest_entries": 0, "summary": []}
 
     if not dry_run:
-        merged_dataset = _merge_dataset(_read_semicolon(out_dataset), dataset_rows)
-        _write_semicolon(merged_dataset, EXTERNAL_COLUMNS, out_dataset)
-        merged_manifest = _merge_manifest(_read_semicolon(out_manifest), manifest_entries)
-        _write_semicolon(merged_manifest, MANIFEST_COLUMNS, out_manifest)
+        merged_dataset = _merge_dataset(discovery.read_semicolon(out_dataset), dataset_rows)
+        discovery.write_semicolon(merged_dataset, EXTERNAL_COLUMNS, out_dataset)
+        merged_manifest = _merge_manifest(discovery.read_semicolon(out_manifest), manifest_entries)
+        discovery.write_semicolon(merged_manifest, MANIFEST_COLUMNS, out_manifest)
 
     return {
         "approved": len(approved),

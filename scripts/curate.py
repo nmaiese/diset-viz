@@ -13,12 +13,17 @@ to build direction evidence, and it defines the curation record schema.
 
 from __future__ import annotations
 
-import csv
-import os
-import tempfile
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+# Same pattern as promote_candidates/apply_curation, so the CLI can import the
+# shared discovery helpers when run as `python3 scripts/curate.py`.
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from scripts import discovery  # noqa: E402
+
 CURATION_PATH = PROJECT_ROOT / "data" / "discovery" / "curation.csv"
 EXTERNAL_DATASET = PROJECT_ROOT / "app" / "static" / "data" / "external" / "normalized_external_indicators.csv"
 
@@ -51,11 +56,7 @@ def _parse_number(value):
 
 
 def read_external(path=EXTERNAL_DATASET):
-    path = Path(path)
-    if not path.exists():
-        return []
-    with path.open(encoding="utf-8", newline="") as handle:
-        return list(csv.DictReader(handle, delimiter=";"))
+    return discovery.read_semicolon(path)
 
 
 def direction_evidence(target_indicator_id, rows=None):
@@ -110,25 +111,12 @@ def read_curation(path=None):
     # Resolve CURATION_PATH at call time (not as a default) so tests can point
     # the curation file elsewhere without ever risking the committed one.
     path = Path(path) if path else CURATION_PATH
-    if not path.exists():
-        return []
-    with path.open(encoding="utf-8", newline="") as handle:
-        return list(csv.DictReader(handle, delimiter=";"))
+    return discovery.read_semicolon(path)
 
 
 def write_curation(rows, path=None):
     path = Path(path) if path else CURATION_PATH
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile(
-        "w", encoding="utf-8", newline="", delete=False, dir=path.parent
-    ) as tmp:
-        writer = csv.DictWriter(tmp, fieldnames=CURATION_COLUMNS, delimiter=";", lineterminator="\n")
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({col: row.get(col, "") for col in CURATION_COLUMNS})
-        temp_name = tmp.name
-    os.replace(temp_name, path)
-    os.chmod(path, 0o644)
+    discovery.write_semicolon(rows, CURATION_COLUMNS, path)
 
 
 def _cli():

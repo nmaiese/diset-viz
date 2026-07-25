@@ -19,16 +19,13 @@ until the resulting diff is merged. Pure stdlib.
 from __future__ import annotations
 
 import argparse
-import csv
-import os
 import sys
-import tempfile
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts import curate  # noqa: E402
+from scripts import curate, discovery  # noqa: E402
 from scripts.promote_candidates import EXTERNAL_COLUMNS, MANIFEST_COLUMNS  # noqa: E402
 
 EXTERNAL_DATASET = PROJECT_ROOT / "app" / "static" / "data" / "external" / "normalized_external_indicators.csv"
@@ -37,29 +34,6 @@ CURATED_DESCRIPTIONS = PROJECT_ROOT / "app" / "static" / "data" / "external" / "
 DESCRIPTION_COLUMNS = ["target_indicator_id", "plain", "value_explanation"]
 
 VALID_DIRECTIONS = {"higher_better", "lower_better", "higher_worse", "contextual"}
-
-
-def _read(path):
-    path = Path(path)
-    if not path.exists():
-        return []
-    with path.open(encoding="utf-8", newline="") as handle:
-        return list(csv.DictReader(handle, delimiter=";"))
-
-
-def _write(rows, columns, path):
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile(
-        "w", encoding="utf-8", newline="", delete=False, dir=path.parent
-    ) as tmp:
-        writer = csv.DictWriter(tmp, fieldnames=columns, delimiter=";", lineterminator="\n")
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({col: row.get(col, "") for col in columns})
-        temp_name = tmp.name
-    os.replace(temp_name, path)
-    os.chmod(path, 0o644)
 
 
 def _validate(decision):
@@ -162,15 +136,15 @@ def run(dry_run=False, dataset=EXTERNAL_DATASET, manifest=EXTERNAL_MANIFEST,
     decisions = curate.read_curation(curation_path)
     if not decisions:
         return {"applied": 0, "score_eligible": 0}
-    dataset_rows = _read(dataset)
-    manifest_rows = _read(manifest)
-    desc_rows = _read(descriptions)
+    dataset_rows = discovery.read_semicolon(dataset)
+    manifest_rows = discovery.read_semicolon(manifest)
+    desc_rows = discovery.read_semicolon(descriptions)
     dataset_rows, manifest_rows, desc_rows = apply(decisions, dataset_rows, manifest_rows, desc_rows)
     if not dry_run:
-        _write(dataset_rows, EXTERNAL_COLUMNS, dataset)
-        _write(manifest_rows, MANIFEST_COLUMNS, manifest)
+        discovery.write_semicolon(dataset_rows, EXTERNAL_COLUMNS, dataset)
+        discovery.write_semicolon(manifest_rows, MANIFEST_COLUMNS, manifest)
         if desc_rows:
-            _write(desc_rows, DESCRIPTION_COLUMNS, descriptions)
+            discovery.write_semicolon(desc_rows, DESCRIPTION_COLUMNS, descriptions)
     return {
         "applied": len(decisions),
         "score_eligible": sum(1 for d in decisions if d.get("score_eligible") == "true"),
