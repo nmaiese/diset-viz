@@ -167,7 +167,7 @@ class QueueRoundTrip(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             path = self._patched_queue(tmp)
             discovered, merged = discover_candidates.run("eurostat_regional", offline=True)
-            self.assertEqual(len(discovered), 2)
+            self.assertEqual(len(discovered), len(eurostat_source.EUROSTAT_SERIES))
             rows = discovery.read_candidates(path)
             scores = [float(r["priority_score"]) for r in rows]
             self.assertEqual(scores, sorted(scores, reverse=True))
