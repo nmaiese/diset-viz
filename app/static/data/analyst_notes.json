@@ -150,10 +150,15 @@
   "vintage": 2024
  },
  "multiscopo:MULTI_SATLIFE_0": {
-  "attacco": "All'estremo più basso della scala, chi dà alla propria vita il voto zero è in media lo 0,8% delle persone. Le quote più alte sono in Calabria e Abruzzo, all'1,4%, e in Umbria, all'1,2%, le più basse nelle Marche e in Trentino Alto Adige, sotto lo 0,5%.",
-  "spunto": "Lo zero è il punto in cui la scala tocca il fondo, il giudizio di chi non trova nulla di soddisfacente nella propria vita. È una minoranza esigua, ma è la fascia che più mette alla prova gli indicatori di benessere, quasi invisibile nelle medie e pure decisiva per capire chi resta indietro. Su quote così ridotte il confronto tra regioni va preso con prudenza. Il senso di questo numero non è dire quale territorio stia peggio, ma ricordare che sotto la media c'è sempre una coda. Come si legge un dato che parla di pochissimi ma pesa moltissimo?",
-  "limite": "Con una quota inferiore all'uno per cento il valore è fragile e non sostiene graduatorie fini tra regioni. Segnala la presenza di un disagio estremo, non le persone che lo vivono, le sue cause o la sua durata, e va sempre affiancato agli altri gradini bassi.",
-  "fonti": [],
+  "attacco": "Dare alla propria vita il voto zero su dieci è una risposta rara, in quasi tutte le regioni la sceglie meno di una persona su cento. Le quote più alte, l'1,4%, sono in Calabria e Abruzzo, la più bassa nelle Marche, allo 0,4%.",
+  "spunto": "La geografia di questo gradino non ricalca la linea Nord-Sud che ordina quasi tutto l'atlante. Le regioni dove la povertà è più diffusa finiscono ai due estremi, la Calabria in cima e la Campania giù in fondo, ferma allo 0,5%, sotto Liguria e Umbria che pure stanno al Centro-Nord. Il voto zero probabilmente dice più di una condizione personale, una salute che cede, un isolamento, uno choc recente, che della ricchezza del posto in cui si vive. È il motivo per cui a muovere questa coda sembra la storia di chi risponde più del territorio in cui abita. Conta di più dove vivi o cosa ti è successo?",
+  "limite": "Con una quota quasi ovunque sotto l'uno per cento il valore è fragile e non regge graduatorie fini tra regioni. Segnala la presenza di un disagio estremo, non chi lo vive, le sue cause o quanto dura. Resta una stima campionaria, da leggere accanto agli altri gradini bassi della scala.",
+  "fonti": [
+   {
+    "testo": "Istat, La povertà in Italia, Anno 2024",
+    "url": "https://www.istat.it/wp-content/uploads/2025/10/La-poverta-in-italia-_-Anno-2024.pdf"
+   }
+  ],
   "vintage": 2024
  },
  "279": {
@@ -220,9 +225,9 @@
   "vintage": 2023
  },
  "bes:07SIC010": {
-  "attacco": "La paura acuta, quella di chi si è sentito sul punto di subire un reato, è poco diffusa e molto concentrata. Riguarda in media il 2,5% delle persone, con l'Umbria al 5,6% e la Lombardia al 4,2% ai vertici, mentre in Valle d'Aosta si ferma allo 0,3%. Negli ultimi anni si è quasi dimezzata.",
-  "spunto": "A differenza di una generica percezione di rischio, questo indicatore coglie un episodio vissuto, un momento di allarme concreto. Che sia raro e in forte calo è coerente con la discesa dei reati predatori, ma la sua distribuzione non ricalca quella dei crimini denunciati. La paura, anche quando è puntuale, ha una geografia propria, fatta di contesti urbani, racconti ed esperienze indirette. Un dato basso è una buona notizia, ma azzerarlo del tutto è impossibile. Quanto di questa paura nasce da ciò che accade e quanto da ciò che si teme?",
-  "limite": "Misura un vissuto soggettivo e puntuale, non un rischio oggettivo né un reato effettivamente avvenuto. Su valori così piccoli le differenze tra regioni sono fragili, e il dato non dice se quell'allarme fosse fondato o quali situazioni lo abbiano provocato.",
+  "attacco": "La paura di stare per subire un reato resta rara ma non uniforme, e sale al 5,6% in Umbria mentre in Valle d'Aosta si ferma allo 0,3%. In cima non c'è una grande area metropolitana, ma un piccolo territorio del centro Italia.",
+  "spunto": "Il calo di questo allarme non è una discesa regolare. Il timore, più raro di una vaga percezione di rischio perché nasce da un episodio vissuto, era salito fino al 5,64% del 2016 prima di crollare a meno della metà. Quel picco cade negli anni in cui la sicurezza teneva banco nel dibattito pubblico, e suggerisce che la paura acuta respiri l'aria del momento più di quanto segua i reati denunciati. Fa eccezione l'Umbria, dove è cresciuta a ogni rilevazione, dal 4,5% del 2009 fino a diventare la più alta d'Italia, controcorrente rispetto a tutte le altre regioni. Quanto di questo allarme nasce da ciò che accade e quanto dal clima che si respira intorno?",
+  "limite": "Misura un vissuto soggettivo e puntuale, non un rischio oggettivo né un reato davvero avvenuto. Le rilevazioni sono solo tre, distanti anni tra loro, quindi la traiettoria poggia su pochi punti e risente del clima di ciascuna indagine. Su valori così piccoli le differenze tra regioni restano fragili, e il dato non dice se quell'allarme fosse fondato.",
   "fonti": [],
   "vintage": 2023
  },
@@ -449,9 +454,9 @@
   "vintage": 2025
  },
  "108": {
-  "attacco": "Prima ancora di chi lavora, conta chi prova a farlo. La partecipazione al mercato del lavoro, cioè la quota di persone tra 15 e 64 anni occupate o in cerca, va dal 51,7% della Calabria al 74,9% della Valle d'Aosta. La media delle regioni è del 67%, ma la mediana, oltre il 71%, è più alta.",
-  "spunto": "Lo scarto tra media e mediana racconta un'Italia spaccata: in gran parte delle regioni partecipa più del 70% delle persone in età da lavoro, e a tirare giù il quadro è un blocco meridionale. Chi non partecipa non è disoccupato, è fuori dal mercato, tra scoraggiati, chi si dedica alla cura e chi ha smesso di cercare. Questa inattività è il vero serbatoio nascosto del divario del lavoro italiano, più della disoccupazione visibile. Un territorio cresce di più recuperando disoccupati o chi non cerca nemmeno?",
-  "limite": "Somma occupati e persone in cerca, quindi non distingue la qualità del lavoro da chi lo cerca invano. Non racconta i motivi dell'inattività, molto diversi tra chi studia, chi assiste un familiare e chi ha rinunciato a cercare.",
+  "attacco": "In Valle d'Aosta ed Emilia-Romagna quasi tre persone su quattro tra i 15 e i 64 anni lavorano o cercano un impiego, in Calabria poco più di una su due. La distanza salta agli occhi, ma dal 2018 conta di più la direzione in cui ogni regione si muove.",
+  "spunto": "Tra il 2018 e il 2025 la partecipazione è salita quasi ovunque, e proprio per questo colpiscono le tre eccezioni. Lombardia e Lazio hanno perso qualche decimo, la Calabria ha lasciato per strada più di due punti. Basta questo a ridisegnare il fondo della graduatoria. Nel 2018 la Calabria stava davanti a Campania e Sicilia, oggi è la regione dove meno persone provano anche solo a entrare nel mercato del lavoro. Il Mezzogiorno che la media fa sembrare un blocco unico non si muove insieme, perché Campania e Sicilia recuperano mentre la Calabria arretra. Il Sud che arretra e quello che recupera raccontano problemi diversi. Quanto ancora ha senso trattarli come un unico Mezzogiorno?",
+  "limite": "Somma occupati e persone in cerca in un unico tasso, quindi non dice nulla sulla qualità del lavoro né distingue chi un impiego ce l'ha da chi lo cerca senza trovarlo. Non spiega i motivi dell'inattività, molto diversi tra chi studia, chi assiste un familiare e chi ha rinunciato a cercare. E resta un conteggio di teste sulla popolazione tra i 15 e i 64 anni, cieco alla composizione per età e genere dentro quella fascia.",
   "fonti": [],
   "vintage": 2025
  },
@@ -2396,21 +2401,21 @@
   "vintage": 2024
  },
  "eur:rd_e_gerdreg": {
-  "attacco": "Nel 2023 la spesa in ricerca e sviluppo tocca il 2,09% del PIL in Emilia-Romagna e in Piemonte, e cala allo 0,53% in Valle d'Aosta. Il Lazio segue con l'1,80%, il Friuli-Venezia Giulia con l'1,69%. In coda restano Calabria e Basilicata, ferme allo 0,64%. Tra la regione che guida e quella in fondo il rapporto è quasi quattro a uno.",
-  "spunto": "La media regionale, l'1,17%, sta poco sopra la mediana all'1,11%, segno che a spingere in alto il quadro è un piccolo gruppo di regioni e non un impegno diffuso. Metà dei territori resta sotto l'1,11%. Anche le due regioni al vertice, al 2,09%, non raggiungono la media europea, che nel 2023 vale il 2,2% del PIL ([Eurostat](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20241211-2)). L'Italia nel suo insieme investe l'1,37% del PIL, sotto quella media. L'obiettivo europeo del 3% del PIL resta lontano per ogni regione italiana. Tra il 2019 e il 2023 la media regionale è scesa dall'1,23% all'1,17%, quindi il ritardo non si sta chiudendo. A tenere alta la spesa sono di più il pubblico o le imprese?",
-  "limite": "La percentuale rapporta la spesa al PIL, quindi non dice quante persone o quante imprese facciano ricerca in valore assoluto, e una regione piccola può muoversi anche solo per effetto del denominatore. Il dato somma ricerca pubblica e privata senza separarle, così non mostra se a mancare siano i laboratori delle imprese o la spesa dello Stato. Il confronto tra regioni fotografa una distanza in un solo anno, non ne spiega le cause.",
+  "attacco": "Nel 2023 la spesa in ricerca e sviluppo tocca il 2,09% del PIL in Piemonte ed Emilia-Romagna e scende allo 0,53% in Valle d'Aosta. In coda restano anche Calabria e Basilicata, allo 0,64%. Ma la classifica non ricalca la mappa Nord-Sud, e la sorpresa arriva da chi sta in mezzo.",
+  "spunto": "Questa spesa si legge in rapporto al PIL, e il rapporto scombina la lettura. La Campania, tra le regioni italiane con il PIL per abitante più basso ([Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Economy_at_regional_level)), si piazza a metà graduatoria con l'1,20%, alla pari col Veneto e appena sopra la Lombardia. Non è il Mezzogiorno che rincorre, perché Puglia, Calabria e Basilicata restano sotto lo 0,85%. È l'aritmetica di un indicatore che gonfia chi spende molto su un'economia piccola e diluisce chi spende molto su un'economia grande. La Lombardia investe in ricerca più euro di ogni altra regione, circa un quinto del totale nazionale ([Istat](https://www.istat.it/comunicato-stampa/la-ricerca-e-sviluppo-in-italia-anni-2023-2025/)), eppure la sua intensità resta media perché il suo PIL è il più alto del Paese. Nemmeno le due regioni di testa toccano la media UE del 2,2% ([Eurostat](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20241211-2)). Ma questa intensità intermedia si tradurrà in brevetti e lavoro qualificato, o resta soltanto un numero sul PIL?",
+  "limite": "La percentuale rapporta la spesa al PIL, quindi non dice quante persone o imprese facciano ricerca in valore assoluto, e una regione piccola oscilla facilmente per effetto del denominatore. Lo stesso rapporto può salire anche solo perché l'economia si restringe, non perché la ricerca cresca. Il dato somma spesa pubblica e privata senza separarle, così non mostra se a mancare siano i laboratori delle imprese o l'investimento dello Stato. Il confronto tra regioni fotografa una distanza in un anno, non ne spiega le cause.",
   "fonti": [
    {
-    "testo": "Eurostat, EU spent €381.4 billion on R&D in 2023: nel 2023 l'intensità di ricerca e sviluppo nell'UE resta al 2,2% del PIL, con cinque Paesi sopra il 3%.",
+    "testo": "Eurostat, EU spent €381.4 billion on R&D in 2023: nel 2023 l'intensità di ricerca e sviluppo dell'UE resta al 2,2% del PIL, con cinque Paesi sopra il 3%.",
     "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20241211-2"
    },
    {
-    "testo": "Istat, La ricerca e sviluppo in Italia (Anni 2023-2025): nel 2023 l'intensità di ricerca e sviluppo dell'Italia è pari all'1,37% del PIL.",
+    "testo": "Istat, La ricerca e sviluppo in Italia (Anni 2023-2025): la Lombardia da sola vale circa il 20% della spesa nazionale in ricerca e sviluppo, e quattro regioni del Nord ne concentrano quasi il 60%.",
     "url": "https://www.istat.it/comunicato-stampa/la-ricerca-e-sviluppo-in-italia-anni-2023-2025/"
    },
    {
-    "testo": "Eurostat, R&D expenditure (Statistics Explained): l'Unione europea punta all'obiettivo del 3% del PIL investito in ricerca e sviluppo.",
-    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=R%26D_expenditure"
+    "testo": "Eurostat, Economy at regional level: la Campania è tra le regioni italiane con il PIL per abitante più basso, intorno ai due terzi della media nazionale.",
+    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Economy_at_regional_level"
    }
   ],
   "vintage": 2023
@@ -2452,13 +2457,17 @@
   "vintage": 2025
  },
  "911": {
-  "attacco": "In Trentino-Alto Adige un uomo alla nascita può contare su 82,8 anni di vita attesa nel 2025, in Campania su 80,1. Le sei regioni sotto gli 81 anni stanno tutte nel Mezzogiorno. La media delle venti regioni si ferma a 81,68 anni, in linea con gli 81,7 stimati dall'Istat per l'Italia.",
-  "spunto": "La mediana regionale, 81,75 anni, sta un soffio sopra la media di 81,68. Le venti regioni si stringono attorno a quel valore, e lo scarto tra media e mediana dice che poche regioni tirano giù il conto, senza scendere di molto. In cima la distanza si misura in mesi, non in anni. Dalla Lombardia a 82,4 al Trentino-Alto Adige a 82,8 il gruppo di testa sta in meno di cinque mesi. Il divario si apre verso il basso, dove Campania a 80,1 e Molise a 80,3 restano gli unici sotto gli 80,5. Dalla vetta al fondo corrono 2,7 anni. Tutte le regioni hanno guadagnato tempo dal 2002, quando la media era 77,2, e il 2025 segna il valore più alto della serie regionale, dopo il calo del 2020. La domanda aperta è se quel pavimento meridionale recuperi terreno o resti a oltre due anni dai primi.",
+  "attacco": "Un neonato maschio del Trentino-Alto Adige può contare su 82,8 anni di vita attesa nel 2025, uno della Campania su 80,1. Le sei regioni sotto gli 81 anni stanno tutte nel Mezzogiorno, e la media delle venti si ferma a 81,68 anni, in linea con gli 81,7 stimati dall'Istat per l'Italia.",
+  "spunto": "La Sardegna offre il rovescio più curioso di questa graduatoria. L'isola ospita una delle Blue Zone del pianeta, la fascia montana dell'Ogliastra, dove lo [studio AKEA](https://www.sciencedirect.com/science/article/abs/pii/S0531556504002141) ha documentato una longevità maschile riconosciuta come unica al mondo. Eppure la vita attesa alla nascita degli uomini sardi resta a 80,60 anni, tra le più basse d'Italia. Non è una contraddizione. La longevità estrema riguarda pochi comuni interni, mentre la speranza di vita alla nascita pesa la mortalità di tutta l'isola a ogni età. Il primato dei vecchissimi convive con una mortalità più alta nelle età di mezzo, e il dato regionale tiene insieme le due cose senza mostrarle. Resta da capire se quei cluster di longevità possano un giorno sollevare la media dell'isola, o se resteranno un'eccezione di valle.",
   "limite": "Il numero racconta solo gli uomini. Le donne arrivano a 85,7 anni nel 2025 secondo l'Istat, quattro anni più degli uomini, quindi la vita attesa di un territorio cambia parecchio a seconda di quale metà della popolazione guardi. La speranza di vita alla nascita è poi una misura di periodo. Riassume la mortalità osservata in un solo anno applicata a una coorte ipotetica, non è una previsione di quanto a lungo vivranno i nati del 2025. Un valore alto non spiega da sé le sue cause, che intrecciano sanità, reddito, ambiente e stili di vita. E nelle regioni piccole come Valle d'Aosta e Molise i pochi eventi rendono la serie instabile da un anno all'altro, per cui un singolo scarto può essere rumore più che tendenza.",
   "fonti": [
    {
     "testo": "Istat, Indicatori demografici, Anno 2025 (speranza di vita alla nascita a 81,7 anni per gli uomini e 85,7 per le donne, divario di genere sceso a quattro anni)",
     "url": "https://www.istat.it/wp-content/uploads/2026/03/Report_Indicatori-demografici_Anno-2025.pdf"
+   },
+   {
+    "testo": "Poulain, Pes et al., Identification of a geographic area characterized by extreme longevity in the Sardinia island: the AKEA study, Experimental Gerontology, 2004 (longevità maschile eccezionale e rapporto femmine/maschi tra i centenari unico dell'isola, concentrato nella fascia montana dell'Ogliastra)",
+    "url": "https://www.sciencedirect.com/science/article/abs/pii/S0531556504002141"
    }
   ],
   "vintage": 2025
@@ -2552,12 +2561,12 @@
   "vintage": 2025
  },
  "183": {
-  "attacco": "In Campania quasi il 9% degli uomini attivi è in cerca di lavoro da oltre un anno, in Trentino Alto Adige lo 0,3%. Tra i due estremi corre più di venti volte. Nel 2025 la mediana regionale si ferma poco sopra il 2%, la media sfiora il 3% perché poche regioni del Sud la tirano verso l'alto.",
-  "spunto": "La distanza fra media e mediana racconta un mercato del lavoro a due velocità. Metà delle regioni sta sotto il 2,3% circa, mentre Campania, Sicilia, Puglia e Calabria restano tra il 5% e quasi il 9% e da sole spostano la media verso l'alto. Dal 2018 il tasso maschile è però sceso in tutto il Mezzogiorno, in Calabria da circa il 14% al 5%, in Campania da quasi il 13% a meno del 9%. Sul totale della popolazione, uomini e donne insieme, Campania, Calabria e Sicilia restano tra le regioni più colpite dell'Unione europea, dove il tasso medio è dell'1,9% (Eurostat, 2024). Una domanda resta aperta. Quanto di questo calo è lavoro trovato e quanto è gente che ha smesso di cercare o è emigrata?",
-  "limite": "Questo è un tasso calcolato sulle forze lavoro, non l'incidenza dei disoccupati di lunga durata sul totale dei disoccupati. Sono due misure diverse e un valore basso non significa sempre un mercato sano. Chi rinuncia a cercare lavoro esce dalle forze lavoro e dal conteggio, quindi un tasso che scende può riflettere scoraggiamento o emigrazione più che nuove assunzioni. Il dato riguarda i soli uomini e andrebbe letto accanto a quello femminile e alla struttura per età. È una stima annuale da indagine campionaria, non spiega le cause e nelle regioni più piccole risente della variabilità del campione.",
+  "attacco": "La disoccupazione maschile di lunga durata tocca quasi il 9% degli uomini attivi in Campania e lo 0,3% in Trentino Alto Adige. È la parte più dura del problema, quella che una ripresa non riassorbe in fretta e che segna intere carriere.",
+  "spunto": "Guardando indietro al 2018, il blocco del Mezzogiorno che stava in cima si sta sfaldando. Calabria e Sicilia partivano vicino al 14% e da allora hanno più che dimezzato il tasso maschile, la Basilicata è passata dal 6,8% al 2,3%. La Campania invece si è mossa poco, dal 12,9% del 2018 all'8,8% di oggi, e ora resta sola in testa, con la Sicilia seconda intorno al 7%. Non è un caso isolato. Sul totale, uomini e donne insieme, la Campania al 9,9% nel 2024 figura tra le regioni con la disoccupazione di lunga durata più alta dell'Unione europea, dove la media è dell'1,9% ([Eurostat, 2024](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20251111-2)). Il calo del Sud è reale, ma resta una domanda. È lavoro ritrovato o è gente uscita dalle statistiche, tra chi ha smesso di cercare e chi è partito?",
+  "limite": "Questo è un tasso calcolato sulle forze di lavoro, non la quota di disoccupati di lunga durata sul totale dei disoccupati. Sono misure diverse e un valore basso non racconta sempre un mercato sano. Chi rinuncia a cercare esce dalle forze di lavoro e dal conteggio, così un tasso che cala può nascere da scoraggiamento o emigrazione più che da nuove assunzioni. Il dato copre i soli uomini e va letto accanto a quello femminile e alla struttura per età. È una stima campionaria annuale, non spiega le cause e nelle regioni piccole risente della variabilità del campione.",
   "fonti": [
    {
-    "testo": "Eurostat, tassi di disoccupazione di lunga durata nelle regioni dell'Unione europea, dato 2024",
+    "testo": "Eurostat, tassi di disoccupazione di lunga durata nelle regioni dell'Unione europea, dato 2024 (media UE 1,9%, Campania al 9,9% tra le più alte)",
     "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20251111-2"
    }
   ],
