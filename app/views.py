@@ -38,7 +38,7 @@ from app import moderation
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
-import csv, gzip, hmac, io, json, os, re, time
+import csv, hmac, io, json, os, re, time
 from collections import defaultdict
 
 from app import config
@@ -132,35 +132,17 @@ def get_all_data():
         return list(reader)
 
 
-@cache.cached(timeout=600, key_prefix="legacy_data_gzip")
-def _legacy_data_gzip():
-    """Serialize the full CSV once and cache only the gzipped bytes.
-
-    /data is consumed solely by the legacy D3 dashboard, and the full CSV
-    (~111k rows) serializes to roughly 46 MB of JSON. Previously the route
-    cached that whole Response in the worker's memory (SimpleCache) and sent it
-    uncompressed with no browser caching, so every /legacy visit re-downloaded
-    46 MB and each worker held 46 MB standing. Caching only the compressed bytes
-    (a few MB) keeps standing memory small; the route below adds gzip
-    content-negotiation and Cache-Control so the payload is small on the wire and
-    the browser stops re-fetching it. The raw list is no longer memoized: it is
-    built once per cache window here and freed, instead of held for its own TTL.
-    """
-    payload = json.dumps(get_all_data(), separators=(",", ":")).encode("utf-8")
-    return gzip.compress(payload, compresslevel=6)
-
-
 @app.route("/data")
 def data():
-    gz = _legacy_data_gzip()
-    if "gzip" in request.headers.get("Accept-Encoding", "").lower():
-        response = app.response_class(gz, mimetype="application/json")
-        response.headers["Content-Encoding"] = "gzip"
-    else:
-        # Rare path (a client that does not accept gzip): decompress on demand
-        # rather than keep a second, uncompressed copy cached in memory.
-        response = app.response_class(gzip.decompress(gz), mimetype="application/json")
-    response.headers["Vary"] = "Accept-Encoding"
+    # /data is the full CSV (~111k rows, ~46 MB of JSON) consumed only by the
+    # legacy D3 dashboard. It used to cache that whole 46 MB Response in each
+    # worker's SimpleCache (standing memory) and memoize the raw row list on top.
+    # Compression and encoding negotiation are already handled app-wide by
+    # Flask-Compress (same as every /api/* route), so we only build the payload,
+    # let Flask-Compress gzip it on the wire, and add Cache-Control so the browser
+    # stops re-fetching it. Nothing large is held standing: the rows are built per
+    # request and freed.
+    response = jsonify(get_all_data())
     response.headers["Cache-Control"] = "public, max-age=600"
     return response
 
