@@ -511,6 +511,11 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 
 @media (max-width: 980px) {
   .workspace { grid-template-columns: 1fr; }
+  /* On mobile the panel is full width, so the best/worst/media cards read as a
+     compact row instead of a tall stack. A lone last card spans the full width
+     so the grid never looks lopsided. */
+  .insights { grid-template-columns: 1fr 1fr; }
+  .insights .insight:last-child:nth-child(odd) { grid-column: 1 / -1; }
 }
 @media (max-width: 760px) {
   .viz-tabs { display: flex; gap: 6px; margin: 0 0 12px; }
@@ -1072,3 +1077,74 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
     animation: none !important;
   }
 }
+
+/* =========================================================================
+   Pagine indicatore — rifiniture UX mobile-first
+   Callout della voce d'analista, tessere "I numeri", related a lista su mobile,
+   dedup della sparkline. Dentro l'identita cartografica esistente.
+   ========================================================================= */
+
+/* Lettura d'analista: stacca la voce umana dalla prosa deterministica. */
+.analyst-note {
+  margin: 20px 0 6px;
+  padding: 14px 18px 15px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+}
+.analyst-note__label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.analyst-note__body { font-size: 16px; line-height: 1.6; color: var(--ink); }
+.analyst-note__body p { margin: 0 0 8px; }
+.analyst-note__body p:last-child { margin-bottom: 0; }
+.analyst-note__body a { color: var(--accent); }
+
+/* "I numeri": tessere-testata scannabili. L'interpretazione resta nella prosa
+   sotto. Flex-wrap, cosi una tessera isolata cresce e non sbilancia la riga. */
+.numbers-tiles {
+  display: flex; flex-wrap: wrap; gap: 1px;
+  background: var(--line); border: 1px solid var(--line);
+  margin: 2px 0 16px;
+}
+.numbers-tile {
+  flex: 1 1 150px; min-width: 0;
+  background: var(--panel); padding: 12px 15px;
+  display: grid; gap: 3px; align-content: start;
+}
+.numbers-tile__label {
+  font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--muted);
+}
+.numbers-tile__value {
+  font-family: var(--font-display); font-size: 22px; line-height: 1.05;
+  color: var(--ink); font-variant-numeric: tabular-nums;
+}
+.numbers-tile__value .u { font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-weight: 400; }
+.numbers-tile__sub { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); }
+
+/* Related-in-tema: tabella su desktop, lista impilata sotto i 560px cosi il nome
+   guida e verso/anno stanno sotto, invece di tre colonne strette. */
+@media (max-width: 560px) {
+  .indicator-related__table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .indicator-related__table,
+  .indicator-related__table tbody,
+  .indicator-related__table tr,
+  .indicator-related__table td { display: block; width: 100%; }
+  .indicator-related__table tr { border-bottom: 1px solid var(--grid); padding: 9px 0; }
+  .indicator-related__table td { border: 0; padding: 0; }
+  .indicator-related__table td:first-child { font-size: 15px; margin-bottom: 3px; }
+  .indicator-related__table td:nth-child(2) { display: inline-block; color: var(--muted); font-size: 12px; font-family: var(--font-mono); }
+  .indicator-related__table td:nth-child(2)::after { content: " ·"; color: var(--line); }
+  .indicator-related__table td.num { display: inline-block; text-align: left; color: var(--muted); font-size: 12px; }
+}
+
+/* La sparkline statica e il fallback no-JS del grafico trend interattivo. Quando
+   l'explorer si idrata, il cruscotto mostra gia la serie: la togliamo. */
+.has-explorer .indicator-sparkline-wrap { display: none; }

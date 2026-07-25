@@ -393,6 +393,9 @@
   wireTabs();
 
   root.hidden = false;
+  // Signal that the interactive trend chart is live, so the static sparkline
+  // fallback lower on the page can hide itself (CSS: .has-explorer ...).
+  document.documentElement.classList.add("has-explorer");
   if (params.has("anno") || params.has("regione")) sync();
   else render();
 })();
