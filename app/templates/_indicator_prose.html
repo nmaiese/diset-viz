@@ -11,7 +11,12 @@
   <p><strong>Che cosa significa il valore.</strong> {{ explain.example }}</p>
   {% if explain.scope %}<p><strong>Chi e che cosa comprende.</strong> {{ explain.scope }}</p>{% endif %}
   <p><strong>Come interpretare valori e classifica.</strong> {{ explain.reading }}</p>
-  {% if analyst and analyst.spunto %}<p class="analyst-spunto">{{ analyst.spunto | analyst_html }}</p>{% endif %}
+  {% if analyst and analyst.spunto %}
+  <aside class="analyst-note">
+    <span class="analyst-note__label">Lettura d'analista</span>
+    <div class="analyst-note__body">{{ analyst.spunto | analyst_html }}</div>
+  </aside>
+  {% endif %}
 </section>
 {% endmacro %}
 

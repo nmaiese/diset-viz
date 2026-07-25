@@ -141,12 +141,12 @@
       <div class="insights">
         {% if best and worst %}
         <div class="insight is-best">
-          <small>Valore più alto · <span data-explore="year-label">{{ year }}</span></small>
+          <small>In testa · <span data-explore="year-label">{{ year }}</span></small>
           <strong><a href="/regione/{{ best.region_key }}" data-explore="best-name">{{ best.region }}</a></strong>
           <span><span data-explore="best-value">{{ best.value | it_num(2) }}</span> {{ value_unit }}</span>
         </div>
         <div class="insight is-worst">
-          <small>Valore più basso · <span data-explore="year-label">{{ year }}</span></small>
+          <small>In coda · <span data-explore="year-label">{{ year }}</span></small>
           <strong><a href="/regione/{{ worst.region_key }}" data-explore="worst-name">{{ worst.region }}</a></strong>
           <span><span data-explore="worst-value">{{ worst.value | it_num(2) }}</span> {{ value_unit }}</span>
         </div>
@@ -247,12 +247,45 @@
   <section class="prose indicator-numbers">
     <h2>I numeri, in breve</h2>
 
-    {% if stats.gap_abs is not none %}
-    <p>Tra <a href="/regione/{{ best.region_key }}">{{ best.region }}</a> e <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a> corre un divario di {{ stats.gap_abs | it_num(2) }} {{ value_unit }}{% if stats.gap_ratio %}, con il valore più alto pari a {{ stats.gap_ratio | it_num(1) }} volte quello più basso{% endif %}. È lo scarto osservato e da solo non dice se la differenza sia statisticamente significativa.</p>
+    {% set has_tiles = stats.gap_abs is not none or stats.above_avg_count is not none or (stats.has_multi_year and stats.avg_change_pct is not none and (meta.years | length) >= 3) or (annual_change and annual_change.average_delta is not none) %}
+    {% if has_tiles %}
+    <div class="numbers-tiles">
+      {% if stats.gap_abs is not none %}
+      <div class="numbers-tile">
+        <span class="numbers-tile__label">Divario</span>
+        <span class="numbers-tile__value">{{ stats.gap_abs | it_num(2) }} <span class="u">{{ change_unit }}</span></span>
+        {% if stats.gap_ratio %}<span class="numbers-tile__sub">{{ stats.gap_ratio | it_num(1) }}× il valore più basso</span>{% endif %}
+      </div>
+      {% endif %}
+      {% if stats.above_avg_count is not none and stats.below_avg_count is not none %}
+      <div class="numbers-tile">
+        <span class="numbers-tile__label">Sopra la media</span>
+        <span class="numbers-tile__value">{{ stats.above_avg_count }} <span class="u">di {{ stats.year_count }}</span></span>
+        <span class="numbers-tile__sub">{{ stats.below_avg_count }} {{ stats.below_avg_count | it_plural('regione', 'regioni') }} sotto</span>
+      </div>
+      {% endif %}
+      {% if stats.has_multi_year and stats.avg_change_pct is not none and (meta.years | length) >= 3 %}
+      <div class="numbers-tile">
+        <span class="numbers-tile__label">Dal {{ stats.year_min }} al {{ stats.year_max }}</span>
+        <span class="numbers-tile__value">{% if stats.avg_change_pct > 0 %}+{% endif %}{{ stats.avg_change_pct | it_num(1) }}<span class="u">%</span></span>
+        <span class="numbers-tile__sub">media regionale</span>
+      </div>
+      {% elif annual_change and annual_change.average_delta is not none %}
+      <div class="numbers-tile">
+        <span class="numbers-tile__label">Tra {{ annual_change.previous_year }} e {{ annual_change.year }}</span>
+        <span class="numbers-tile__value">{% if annual_change.average_delta > 0 %}+{% endif %}{{ annual_change.average_delta | it_num(2) }} <span class="u">{{ change_unit }}</span></span>
+        <span class="numbers-tile__sub">media regionale</span>
+      </div>
+      {% endif %}
+    </div>
     {% endif %}
 
-    {% if stats.median is not none and stats.above_avg_count is not none and stats.below_avg_count is not none %}
-    <p>Rispetto alla media, {{ stats.above_avg_count }} {{ stats.above_avg_count | it_plural('regione', 'regioni') }} {{ stats.above_avg_count | it_plural('supera', 'superano') }} il valore medio e {{ stats.below_avg_count }} {{ stats.below_avg_count | it_plural('resta', 'restano') }} sotto{% if (stats.median - stats.year_avg) | abs > 0.01 * (stats.year_avg | abs) %}. Lo scarto tra media e mediana segnala una distribuzione non uniforme{% endif %}.</p>
+    {% if stats.gap_abs is not none %}
+    <p>Lo scarto tra <a href="/regione/{{ best.region_key }}">{{ best.region }}</a> e <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a> è quello osservato e, da solo, non dice se la differenza sia statisticamente significativa.</p>
+    {% endif %}
+
+    {% if stats.median is not none and stats.year_avg is not none and (stats.median - stats.year_avg) | abs > 0.01 * (stats.year_avg | abs) %}
+    <p>Lo scarto tra media e mediana segnala una distribuzione non uniforme tra le regioni.</p>
     {% endif %}
     {% if stats.year_count is not none and stats.year_count < 5 %}
     <p class="page-note">Con {{ stats.year_count }} {{ stats.year_count | it_plural('regione', 'regioni') }} a confronto, i valori vanno letti come indicazioni di massima. Mediana e distribuzione non sarebbero significative su così pochi dati.</p>
