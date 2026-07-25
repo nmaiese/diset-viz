@@ -84,6 +84,19 @@ EUROSTAT_SERIES = {
         # plain mean (which would be synthetic).
         "combine_split": "weighted",
     },
+    "rd_p_persreg": {
+        "dataset": "rd_p_persreg",
+        "params": {"prof_pos": "TOTAL", "sectperf": "TOTAL", "sex": "T", "unit": "PC_ACT_FTE"},
+        "name": "Personale addetto a ricerca e sviluppo (Eurostat, NUTS2)",
+        "unit": "% della popolazione attiva",
+        "decimals": 2,
+        "proposed_theme": "Ricerca e sviluppo (Eurostat)",
+        "proposed_quality_life_category": "ricerca_innovazione_digitale",
+        "proposed_direction": "higher_better",
+        # Share of the active population (FTE): a ratio, so Bolzano+Trento combine
+        # by population weight, not a plain mean.
+        "combine_split": "weighted",
+    },
     "rd_e_gerdreg": {
         "dataset": "rd_e_gerdreg",
         "params": {"unit": "PC_GDP", "sectperf": "TOTAL"},
