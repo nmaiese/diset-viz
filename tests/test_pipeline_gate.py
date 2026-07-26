@@ -75,6 +75,8 @@ class HunterDecisions(unittest.TestCase):
                 "triage_status": "approved",
                 "triage_notes": "Regionale, copertura 20 su 20, serie nuova.",
                 "definition_match": "new",
+                "coverage": "1.0",
+                "license": "CC BY 4.0 (Eurostat)",
             }]
         )
         self.assertTrue(check.ok, check.detail)
@@ -87,6 +89,52 @@ class HunterDecisions(unittest.TestCase):
                 {"candidate_id": "a", "triage_status": "new", "triage_notes": ""},
                 {"candidate_id": "b", "triage_status": "promoted", "triage_notes": ""},
             ]
+        )
+        self.assertTrue(check.ok, check.detail)
+
+    def test_an_approval_below_the_coverage_floor_is_refused(self):
+        """The hunter approves on its own now, so the things that make a series
+        unusable have to be refusable without reading its reasoning. Twelve
+        regions out of twenty cannot carry a claim about Italy."""
+        check = pipeline_gate.check_hunter_decisions(
+            [{
+                "candidate_id": "eurostat_regional:sparse",
+                "triage_status": "approved",
+                "triage_notes": "sembra interessante",
+                "definition_match": "new",
+                "coverage": "0.6",
+                "license": "CC BY 4.0",
+            }]
+        )
+        self.assertFalse(check.ok)
+        self.assertIn("copertura", check.detail)
+
+    def test_an_approval_without_a_licence_is_refused(self):
+        check = pipeline_gate.check_hunter_decisions(
+            [{
+                "candidate_id": "eurostat_regional:x",
+                "triage_status": "approved",
+                "triage_notes": "regionale, copertura piena",
+                "definition_match": "new",
+                "coverage": "1.0",
+                "license": "",
+            }]
+        )
+        self.assertFalse(check.ok)
+        self.assertIn("licenza", check.detail)
+
+    def test_the_floor_only_binds_approvals(self):
+        """A rejected candidate is allowed to be as thin as it likes: recording
+        why it was refused is exactly what the queue is for."""
+        check = pipeline_gate.check_hunter_decisions(
+            [{
+                "candidate_id": "eurostat_regional:sparse",
+                "triage_status": "rejected",
+                "triage_notes": "copertura 12 regioni su 20, non regge un confronto nazionale",
+                "definition_match": "new",
+                "coverage": "0.6",
+                "license": "",
+            }]
         )
         self.assertTrue(check.ok, check.detail)
 

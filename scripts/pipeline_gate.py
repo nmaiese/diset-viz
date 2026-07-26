@@ -61,6 +61,7 @@ CANDIDATES = "data/discovery/candidates.csv"
 SOURCE_CANDIDATES = "data/discovery/source_candidates.csv"
 CURATION = "data/discovery/curation.csv"
 ISTAT_SERIES_CONFIG = "config/istat_series.yaml"
+THEME_CATEGORIES = "config/theme_categories.csv"
 
 # What each stage is allowed to change. Anything outside its list is a failure,
 # not a warning: the point of the list is that a prompt cannot widen it.
@@ -68,7 +69,11 @@ STAGE_PATHS = {
     "scout": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG),
     "hunter": (CANDIDATES,),
     "promoter": (CANDIDATES, EXTERNAL_DATASET, EXTERNAL_MANIFEST),
-    "curator": (CURATION, EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS),
+    # The curator gets the theme map because a promoted indicator brings a theme
+    # name with it, and an unmapped theme drops it out of every macro-area total
+    # silently. That fix used to live in `app/taxonomy.py`, which no agent may
+    # touch, so it would have stalled the chain on a legitimate case.
+    "curator": (CURATION, EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS, THEME_CATEGORIES),
     "writer": (INDICATOR_TEXTS,),
     "reviewer": (INDICATOR_TEXTS,),
 }
@@ -97,6 +102,13 @@ MERGE_POLICY = {
 # the moment it was written: it left out `higher_worse`, which is a perfectly
 # scoreable verso, so the gate would have blocked correct curation work.
 DIRECTIONAL = curate.SCOREABLE_DIRECTIONS
+
+# The floor under an autonomous approval. Below this a series cannot support the
+# comparisons the atlas makes of it: the pages, the ranking and the quality-of-life
+# score all read across the twenty regions, and a series that covers twelve of
+# them produces a national reading built on a hole. Deliberately the same
+# threshold the adapters use to pick their "honest recent year".
+MIN_APPROVAL_COVERAGE = 0.8
 
 
 class Check:
@@ -229,6 +241,28 @@ def check_hunter_decisions(rows=None):
             "triage-motivato",
             False,
             f"definition_match=exact non e' mai automatico: {', '.join(claimed_exact[:5])}",
+        )
+    # Hard floor under an approval. The hunter approves on its own now, so the
+    # things that make an indicator unusable have to be refusable without
+    # reading its reasoning: a series that covers half the regions cannot carry
+    # a national comparison, and one with no licence cannot be published at all.
+    unusable = []
+    for row in rows:
+        if row.get("triage_status") != "approved":
+            continue
+        try:
+            coverage = float(row.get("coverage") or 0)
+        except ValueError:
+            coverage = 0.0
+        if coverage < MIN_APPROVAL_COVERAGE:
+            unusable.append(f"{row.get('candidate_id', '?')} (copertura {coverage:.2f})")
+        elif not (row.get("license") or "").strip():
+            unusable.append(f"{row.get('candidate_id', '?')} (licenza assente)")
+    if unusable:
+        return Check(
+            "triage-motivato",
+            False,
+            f"approvazioni che non reggono i minimi: {', '.join(unusable[:5])}",
         )
     return Check("triage-motivato", True, f"{len(rows)} candidati, ogni decisione ha una motivazione")
 
