@@ -85,17 +85,27 @@
   "vintage": 2024
  },
  "105": {
-  "fonti": [],
-  "lead": "Il turismo pesa in modo profondamente diverso sui territori. In Trentino Alto Adige si contano oltre 52 giornate di presenza per abitante, in Valle d'Aosta 30, contro le 1,6 del Molise e le 3,4 del Piemonte. La media delle regioni è di circa 10, ma la mediana, 7,5, è ben più bassa.",
+  "lead": "In Trentino Alto Adige il turismo pesa oltre trenta volte più che in Molise, e questo dato misura quanto un territorio viva addosso a chi lo visita.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Un rapporto di oltre trenta volte tra la prima e l'ultima regione racconta economie turistiche opposte, dalle Alpi affollate al Sud interno quasi ignorato dai flussi. Ma alta intensità turistica non significa solo ricchezza, dato che dove i visitatori superano di molto i residenti crescono pressione sui servizi, prezzi delle case e stagionalità del lavoro. Il turismo è una risorsa o un peso a seconda di quanto ne resta al territorio. Molte presenze fanno un territorio ricco o solo affollato?",
-    "h": null,
+    "body": "Il tasso di turisticità mette le giornate di presenza negli esercizi ricettivi, quelle di italiani e stranieri insieme, in rapporto alla popolazione residente. Una giornata di presenza è una notte che un cliente trascorre in un albergo, un campeggio, un agriturismo o una struttura analoga. Il rapporto con gli abitanti trasforma un dato di volume in un dato di intensità, e dice quanto turismo attraversa un luogo rispetto a quante persone ci vivono. Così un valore intorno a cinquanta, come quello del Trentino Alto Adige, racconta che nell'arco dell'anno le strutture hanno registrato più di cinquanta pernottamenti per ogni residente, mentre dove il valore resta sotto i due il turismo ufficiale sfiora appena la vita di tutti i giorni.",
+    "h": "Giornate di presenza per ogni abitante",
+    "role": "definizione"
+   },
+   {
+    "body": "La graduatoria del 2024 non scende con gradualità. Tra la prima e la seconda regione si aprono più di ventidue giornate, tra la seconda e la terza quasi quindici, e solo da lì in poi i valori cominciano ad avvicinarsi. Trentino Alto Adige e Valle d'Aosta stanno in un campionato a parte, staccati da tutti prima ancora che cominci il confronto vero. È questa coppia a spiegare perché la media regionale, poco sopra le dieci giornate, resti molto più alta della mediana ferma a sette e mezza: metà delle regioni sta sotto quella soglia, e sono i due vertici alpini a tirare in alto il valore. Più in basso il gruppo si fa fitto, con Veneto e Toscana a fare da cerniera tra le grandi mete e la fascia larga dove la presenza ricettiva vale pochi giorni per abitante.",
+    "h": "Due regioni alpine in un campionato a parte",
     "role": "quadro"
    },
    {
-    "body": "Rapporta le presenze ufficiali agli abitanti, escludendo il turismo non registrato, dalle seconde case agli affitti brevi non dichiarati. Non dice quanto della spesa turistica resti sul territorio né come il turismo incida sulla vita dei residenti.",
-    "h": null,
+    "body": "Dal 1981 nessuna regione ha camminato all'indietro, il tasso è cresciuto ovunque e la media è passata da poco meno di sei giornate a poco più di dieci. Ma la direzione comune tiene insieme passi lunghissimi e passi minimi. Il Trentino Alto Adige ha guadagnato oltre venticinque giornate per abitante in poco più di quarant'anni, quasi quanto valeva all'inizio, mentre il Molise si è mosso di appena quattro decimi. Il risultato è che la distanza tra il vertice e il fondo della graduatoria è all'incirca raddoppiata, la crescita è stata generale e la convergenza no. L'ultimo anno conferma il quadro senza scomporlo, con sedici regioni in aumento sul 2023 e quattro in calo, e uno spostamento della media di meno di tre decimi di giornata.",
+    "h": "Dal 1981 il vertice si è allontanato, non avvicinato",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il conteggio vede solo il turismo che passa dagli esercizi ricettivi ufficiali, quindi alberghi, campeggi, agriturismi e strutture registrate. Le seconde case, gli affitti brevi non dichiarati e le gite in giornata non lasciano traccia, e dove pesano molto il tasso sottostima il movimento reale. C'è poi l'effetto del denominatore, perché essendo un rapporto per abitante una regione poco popolosa con numeri assoluti modesti può risultare intensa, mentre la Lombardia, che pure muove grandi volumi, resta in fondo alla graduatoria perché quei volumi si dividono tra quasi dieci milioni di residenti. L'indicatore non distingue nemmeno la stagione, e un territorio con un picco estivo concentrato e uno con presenze distribuite tutto l'anno possono avere lo stesso valore. Va letto come misura di intensità, non come una classifica di merito, perché un tasso alto segnala che il turismo pesa sull'economia e sui servizi locali, non che una regione stia facendo meglio di un'altra.",
+    "h": "Cosa resta fuori dal conteggio",
     "role": "limiti"
    }
   ],
@@ -187,17 +197,27 @@
   "vintage": 2023
  },
  "12": {
-  "fonti": [],
-  "lead": "La disoccupazione è scesa molto, quasi dimezzata in pochi anni, e oggi la media delle regioni è del 6,2%. Ma il dato unisce realtà lontane: dal 2% del Trentino Alto Adige al 13,9% della Campania, con Sicilia e Puglia oltre il 10%. Sette volte di distanza tra la prima e l'ultima.",
+  "lead": "Il tasso di disoccupazione conta chi vorrebbe lavorare e non ci riesce, ed è sceso in tutte e venti le regioni dal 2018, di più dove pesava di più. Ma la mappa non si è riscritta.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Il calo è reale e diffuso, ma la disoccupazione misura solo chi cerca attivamente lavoro, e al Sud molti hanno smesso di cercare, finendo tra gli inattivi. Per questo un tasso in discesa può convivere con un mercato ancora debole, dove il problema si sposta dalla disoccupazione alla non partecipazione. Guardare solo questo numero rischia di dare un quadro troppo ottimista. La disoccupazione che scende è più lavoro o meno persone che lo cercano?",
-    "h": null,
+    "body": "Il tasso conta le persone dai quindici anni in su che un lavoro lo cercano davvero, disponibili e attive nella ricerca, e le mette in rapporto alle forze di lavoro, cioè a chi un impiego ce l'ha sommato a chi lo sta cercando. Un valore di sei vuol dire che sei persone su cento, tra quelle attive, cercano e non trovano. Il punto delicato è il denominatore: chi ha smesso di cercare non compare qui come disoccupato, esce dalle forze di lavoro e viene contato come inattivo. In pratica il tasso misura la pressione del mercato dal lato di chi vorrebbe entrarci o restarci, e la stessa cifra può nascere da situazioni diverse.",
+    "h": "Chi entra nel conto dei disoccupati",
+    "role": "definizione"
+   },
+   {
+    "body": "Nel 2025 la distribuzione non scende per gradi, si spezza su un gradino. Quindici regioni non arrivano al 6,6 per cento e si distinguono tra loro per pochi decimali, poi la graduatoria si spezza. Tra l'Abruzzo, fermo a 6,54, e la Sardegna, a 9,24, si apre lo scarto più largo di tutta la classifica, 2,71 punti in un colpo solo. Sopra quel salto restano solo cinque territori da nove punti in su, le due isole maggiori insieme a Calabria, Campania e Puglia. Il gradino però non ricalca il confine tra Nord e Sud: Basilicata, Molise e Abruzzo, tre regioni meridionali, restano nel gruppo basso. È il grappolo delle cinque a tenere la media sopra la mediana di 5,18, segno che il valore medio racconta l'eccezione più della regione tipica.",
+    "h": "Un gradino, non una scala",
     "role": "quadro"
    },
    {
-    "body": "Conta chi cerca attivamente un impiego, quindi esclude scoraggiati e inattivi, numerosi al Sud, e può migliorare anche quando le persone rinunciano a cercare. Non dice nulla sulla qualità o sulla durata del lavoro trovato da chi esce dalla disoccupazione.",
-    "h": null,
+    "body": "Il movimento dal 2018 al 2025 corre in una sola direzione. Nessuna regione ha visto crescere la disoccupazione, e la media è passata da 11,00 a poco più di sei, quasi cinque punti in meno. A scendere di più sono stati proprio i territori che partivano più in alto. La Calabria ha perso 11,72 punti, il calo più forte del paese, e ha più che dimezzato il suo tasso, da 21,54 a 9,82. La Sicilia ne ha lasciati per strada 9,10. All'estremo opposto l'Emilia-Romagna, già tra le più basse, è calata di appena 1,70 punti, la riduzione più contenuta: chi aveva poco da recuperare si è mosso poco. La convergenza nasce da questa differenza di velocità, e la distanza tra la prima e l'ultima regione si è ristretta di 5,81 punti in sette anni. L'ultimo anno conferma la rotta ma accorcia il passo, dal 2024 al 2025 la media cede altri 0,45 punti.",
+    "h": "È sceso di più dove era più alto",
+    "role": "dinamica"
+   },
+   {
+    "body": "Resta un punto cieco che conviene tenere a mente. Il tasso misura chi cerca, non chi è fuori dal lavoro: due regioni con lo stesso valore possono avere quote molto diverse di persone che un impiego ce l'hanno, perché chi rinuncia a cercare sparisce dal denominatore. Così un calo del tasso non dice, da solo, se sono cresciuti gli occupati o se si sono ritirate le persone in cerca. Il dato non entra nemmeno nel lavoro trovato, ore, contratto e retribuzione restano fuori, e fotografa una condizione in un istante, senza seguire chi entra ed esce dalla ricerca durante l'anno.\n\nIl punto cieco però si può misurare. Accanto a questa graduatoria c'è quella dei [giovani che non lavorano e non studiano](/indicatore/tasso-giovani-neet-totale/ter-408), che contano anche chi un impiego non lo sta cercando, e le due si somigliano molto. Non dove serve, però. Basilicata, Abruzzo e Molise, le tre regioni meridionali che qui restano nel gruppo largo sotto il gradino, sul NEET nel 2024 stanno tutte e tre oltre la rottura della distribuzione, nella coda dove si trova quasi tutto il Mezzogiorno. Sono le stesse regioni, e la fotografia cambia a seconda di chi entra nel conto.",
+    "h": "Quello che un calo del tasso non distingue",
     "role": "limiti"
    }
   ],
@@ -323,17 +343,27 @@
   "vintage": 2025
  },
  "142": {
-  "fonti": [],
-  "lead": "L'accesso a un nido o a un servizio per l'infanzia dipende ancora molto da dove si nasce. In Valle d'Aosta e Friuli-Venezia Giulia tutti i comuni ne offrono uno, in Trentino Alto Adige quasi tutti, mentre in Basilicata la quota scende al 29,8% e in Calabria al 34,9%. La media delle regioni è intorno al 69%.",
+  "lead": "Che nel proprio comune ci sia un asilo nido o nessun servizio cambia la vita di chi lavora e ha figli, e questa mappa non segue la linea Nord-Sud.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Questi servizi sono un pezzo di infrastruttura sociale: dove mancano, la cura dei più piccoli ricade sulle famiglie, e in genere sulle donne, con effetti a catena su lavoro e natalità. Il dato conta i comuni che offrono almeno un servizio, non i posti disponibili, quindi un comune con un solo nido pesa come uno ben attrezzato. Negli ultimi vent'anni la copertura è cresciuta molto, ma il divario territoriale resta ampio. Un servizio che esiste sulla carta è davvero raggiungibile per chi ne ha bisogno?",
-    "h": null,
+    "body": "L'indicatore misura la quota di comuni di una regione che hanno attivato almeno un servizio per la prima infanzia, asilo nido, micronido o servizi integrativi e innovativi, sul totale dei comuni. È una risposta sì o no presa municipio per municipio e poi sommata, nel comune il servizio esiste oppure non esiste. Per una famiglia con figli piccoli la prima domanda è proprio questa, se un'opzione c'è vicino casa o se tocca spostarsi altrove. Il dato racconta quanto è diffusa l'offerta sul territorio, non quanto è capiente, e un comune con un solo micronido pesa come uno che ha costruito un'intera rete di nidi.",
+    "h": "Un servizio che c'è o non c'è, comune per comune",
+    "role": "definizione"
+   },
+   {
+    "body": "La graduatoria del 2023 smentisce la geografia che l'atlante insegna ad aspettarsi. Puglia e Campania stanno nel gruppo di testa, mentre Piemonte, Liguria e Lazio restano sotto la mediana, che vale 74,57 e si tiene sopra la media perché un blocco di regioni ferme in basso la tira giù. Il salto vero non corre tra Nord e Sud ma dentro la classifica, dopo Abruzzo la distribuzione si spezza e verso l'Umbria si aprono di colpo dodici punti. Non è una discesa graduale ma una doppia struttura, un plateau in alto e una coda lunga di regioni rimaste molto indietro. Sopra quella soglia l'offerta copre più di otto comuni su dieci, sotto cala in fretta. In cinque regioni meno della metà dei municipi ha attivato un servizio, e lì trovare un nido vicino casa dipende ancora da quale comune esatto ti è capitato.\n\nMessa accanto al [saldo migratorio interno](/indicatore/saldo-migratorio-interno-istat-regioni/dem-NMIGRATEIN), questa graduatoria si accompagna a quella di chi guadagna e chi perde residenti verso altre regioni italiane, e agli estremi le due coincidono, con la Basilicata che chiude tutte e due. A monte c'è probabilmente la stessa cosa, quanto è ricca l'area, quindi non è un meccanismo che porta da una all'altra. E le eccezioni cadono dove questa pagina le ha già trovate. La Puglia sta quarta per servizi e quindicesima per saldo migratorio, la Campania ottava e diciassettesima, due regioni che perdono abitanti verso il resto del paese e intanto hanno esteso l'offerta più di quasi tutto il Centro-Nord. La Liguria fa il contrario, sesta per saldo e quindicesima per servizi. Gli altri indicatori di [salute, demografia e cura](/tema/salute-demografia-e-cura) misurano la stessa infrastruttura da altri lati.",
+    "h": "Una mappa che scavalca il Nord-Sud",
     "role": "quadro"
    },
    {
-    "body": "Misura la presenza di un servizio nei comuni, non il numero di posti, gli orari, le rette o le liste di attesa. Un territorio può avere quasi tutti i comuni coperti e insieme troppi pochi posti per la domanda reale delle famiglie.",
-    "h": null,
+    "body": "Dal 2004 al 2023 la media è passata da 38,09 a 69,24, quasi il doppio in vent'anni, e la distanza tra la vetta e il fondo si è ristretta di 27,57 punti percentuali. È una convergenza vera, arrivata perché chi partiva indietro ha recuperato. Il Trentino Alto Adige è salito da meno di dieci comuni su cento a quasi tutti, la Puglia ha aggiunto oltre settanta punti. La Valle d'Aosta è l'unica a non aver mosso nulla, perché copriva già tutti i suoi comuni nel 2004. Una regione però ha fatto il cammino inverso. La Liguria nel 2004 stava sopra la mediana di allora, con il 67,66, e nel 2023 è scesa al 52,99, quasi quindici punti lasciati per strada mentre intorno quasi tutte guadagnavano. Nell'ultimo anno il movimento resta corale, diciotto regioni in crescita su venti.",
+    "h": "Vent'anni di rincorsa, e l'eccezione ligure",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il numero conta comuni, non bambini. Un municipio risulta coperto sia che gestisca un micronido sia che abbia una rete completa, così la percentuale non dice nulla su posti disponibili, liste d'attesa, orari o costo, né su quanti bambini trovino davvero un posto. Nemmeno la qualità entra nel conto, un servizio integrativo aperto poche ore a settimana risulta attivato come un nido a tempo pieno. Pesa inoltre ogni comune allo stesso modo, un paese di duecento abitanti vale come un capoluogo, e una regione fatta di tanti piccoli comuni può segnare poco anche dove i centri più popolosi sono serviti. Infine attivato è la fotografia di un anno, non la promessa che il servizio resti aperto con continuità negli anni successivi.",
+    "h": "Cosa non dice un servizio soltanto 'attivato'",
     "role": "limiti"
    }
   ],
@@ -646,20 +676,31 @@
  "178": {
   "fonti": [
    {
-    "testo": "Eurostat, Women at work: nel 2024 l'Italia registra il divario di genere nell'occupazione più ampio dell'UE, 19,4 punti contro una media europea di 10.",
+    "testo": "Eurostat, Women at work: a snapshot of the EU's gender employment gap, marzo 2026: nel 2024 l'Italia registra il divario di occupazione tra i sessi più ampio dell'Unione (19,4 punti, fascia 20-64).",
     "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/edn-20260303-1"
    }
   ],
-  "lead": "In Valle d'Aosta lavora quasi il 69% delle donne tra 15 e 64 anni, in Campania appena il 34%. Ma quello che colpisce è l'ordine della classifica, con le prime dodici posizioni tutte del Centro-Nord e le ultime otto tutte del Mezzogiorno, senza una sola eccezione. La geografia qui pesa più della singola regione.",
+  "lead": "Quante donne tra i 15 e i 64 anni hanno un lavoro dice quanto reddito e quanta autonomia una regione mette nelle loro mani, e la risposta italiana si spezza in due. In fondo alla scala restano quattro regioni dove lavora poco più di una donna su tre.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Il 69% della Valle d'Aosta impressiona finché non si guarda la colonna accanto, quella dell'occupazione maschile. Le donne al lavoro in Italia restano molto più indietro degli uomini, e il divario di genere nell'occupazione è il più ampio dell'Unione europea, 19,4 punti nel 2024 contro una media UE di 10 ([Eurostat](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/edn-20260303-1)). Un tasso femminile alto dice quante donne hanno un impiego, non quanto quel lavoro renda o quanto sia continuo. Dal 2018 il valore è salito in ogni regione, un recupero reale ma partito da punti molto lontani tra loro. Quella crescita sta portando lavoro stabile o soprattutto part time?",
-    "h": null,
+    "body": "Il tasso conta le donne tra i 15 e i 64 anni che hanno un lavoro, sul totale delle donne nella stessa fascia d'età. Un valore di 60 significa che su cento donne in età da lavoro sessanta un impiego ce l'hanno e quaranta no. Conta il fatto di avere un'occupazione, non quante ore duri né con quale contratto, così una dipendente a tempo pieno e una a poche ore pesano uguale. È la misura più diretta di quante donne, in un territorio, portano a casa un reddito da lavoro, e quindi di quanta indipendenza economica quel posto rende possibile.",
+    "h": "Chi conta come occupata, e chi resta fuori",
+    "role": "definizione"
+   },
+   {
+    "body": "La geografia non scende per gradini regolari lungo la penisola. La regione che sta a metà classifica si colloca intorno al 61 per cento, sei punti sopra la media, che è tirata verso il basso da una coda staccata dal resto. Il salto vero arriva in fondo alla graduatoria: la Basilicata, già sotto la metà con 45,41, cede sette punti e mezzo alla regione che la segue, e da lì in giù quattro regioni restano raccolte tra il 34 e il 38 per cento, poco più di una su tre al lavoro. Non è una distanza che cresce piano piano lungo la classifica, è un gradino, sopra un blocco largo di regioni dai 60 punti in su, sotto un fondo meridionale che non le sfiora.",
+    "h": "Un gradino, non una discesa graduale",
     "role": "quadro"
    },
    {
-    "body": "Il dato conta chi ha un impiego, non separa il tempo pieno dal part time involontario e non misura orari, retribuzione o continuità del contratto. Non dice nulla sul lavoro di cura non retribuito che grava sulla stessa fascia di popolazione.",
-    "h": null,
+    "body": "Dal 2018 al 2025 nessuna regione è arretrata. La media è salita di quasi cinque punti, da 49,99 a 54,87, e i guadagni più ampi non sono venuti dalle regioni già in testa ma da Basilicata e Umbria, oltre otto punti ciascuna. Eppure la distanza tra la prima e l'ultima si è accorciata di meno di un punto in sette anni. Il motivo è che la crescita è arrivata quasi ovunque nella stessa misura: le quattro regioni in fondo hanno guadagnato tra i quasi quattro punti della Calabria e i poco più di cinque della Sicilia, in linea con la media, così sono salite senza avvicinarsi a chi le precede. A muoversi diversamente è la Basilicata, che con 8,47 punti si è staccata dal blocco di coda e ha reso il gradino più netto. L'ultimo anno aggiunge altri 0,74 punti, con sedici regioni su venti in aumento. Il quadro continua a salire, le posizioni restano dove erano.",
+    "h": "Sette anni di crescita che non hanno rimontato il fondo",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il numero dice se una donna ha un lavoro, non quale. Non distingue il tempo pieno dal part time subìto, il contratto stabile da quello a termine, il reddito pieno da quello di sussistenza, così due regioni con lo stesso tasso possono nascondere mercati molto diversi. Non dice nemmeno perché un territorio resti in basso, se manchino i posti, se meno donne cerchino un impiego o se il carico di cura familiare le tenga fuori, sono cause che l'indicatore da solo non separa. Ed è una media regionale, che appiattisce le differenze tra un capoluogo e le sue aree interne. Misura poi le donne per conto loro, non la distanza dagli uomini: a livello nazionale l'Italia ha il divario di occupazione tra i sessi più ampio dell'Unione europea, un dato che un tasso femminile non può far vedere.",
+    "h": "Un impiego sì, ma non quale né rispetto a chi",
     "role": "limiti"
    }
   ],
