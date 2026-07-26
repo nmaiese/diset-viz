@@ -138,6 +138,13 @@ Multiscopo, più le province SDMX. Le due famiglie arrivate dalla catena:
   si esegue a mano con `scripts/refresh_official_local.sh`. Il branch
   `claude/discovery-schedule-action` (commit `22902fa`), che schedulava il
   cacciatore come workflow GitHub, **non va unito**: contraddice questa scelta.
+- **La suite crasha in uscita, a caso, circa una run su quattro.** SIGSEGV a
+  interprete che smonta, dopo che unittest ha gia' stampato `OK`: i test passano
+  tutti, il processo esce 139. Per questo `pipeline_gate.check_suite` legge il
+  **referto** di unittest e non il codice di uscita, e quando i due divergono lo
+  dice invece di ingoiarlo. Senza, un quarto delle run di ogni stadio verrebbe
+  bloccato da un fallimento che non esiste. La causa vera resta da trovare: sei
+  run con `-X faulthandler` non l'hanno riprodotto.
 - In una shell dell'utente `python3` è una funzione che rilancia il comando
   quando esce non-zero, quindi l'output di uno script che fallisce **appare due
   volte**. Non è un bug del programma.

@@ -10,7 +10,9 @@ Pure stdlib and side-effect free. Nothing here reads or writes the committed
 queues: every check takes its rows as an argument for exactly this reason.
 """
 
+import json
 import unittest
+from pathlib import Path
 
 from scripts import pipeline_gate
 
@@ -234,6 +236,56 @@ class ARunThatProducedSomethingHasToSayItDid(unittest.TestCase):
         check = pipeline_gate.check_run_is_recorded("writer", [])
         self.assertTrue(check.ok, check.detail)
         check = pipeline_gate.check_run_is_recorded("writer", [pipeline_gate.RUN_JOURNAL])
+        self.assertTrue(check.ok, check.detail)
+
+
+class TheSignatureCheckReadsStateNotDiffLines(unittest.TestCase):
+    """Il punto cieco che il revisore ha trovato correggendo il proprio lavoro.
+
+    La prima versione cercava una riga aggiunta con `"reviewed_at"`. Una
+    correzione in giornata su un articolo gia' firmato quel giorno non ne
+    produce nessuna, perche' la firma giusta e' quella che c'e' gia': il
+    cancello bloccava lavoro corretto e spingeva verso una data falsa. Ora
+    legge lo stato degli articoli toccati, che e' anche strettamente piu'
+    forte.
+    """
+
+    def _check_over(self, entries, keys):
+        original = pipeline_gate.changed_text_keys
+        real_read = Path(pipeline_gate.PROJECT_ROOT / pipeline_gate.INDICATOR_TEXTS).read_text
+        pipeline_gate.changed_text_keys = lambda base=None, cwd=None: keys
+        try:
+            import unittest.mock as mock
+
+            with mock.patch.object(Path, "read_text", lambda self, **kw: json.dumps(entries)):
+                return pipeline_gate.check_reviewer_signature()
+        finally:
+            pipeline_gate.changed_text_keys = original
+            del real_read
+
+    def test_a_same_day_correction_to_an_already_signed_article_passes(self):
+        check = self._check_over(
+            {"178": {"reviewed_at": "2026-07-26", "reviewed_vintage": 2024, "vintage": 2024}},
+            ["178"],
+        )
+        self.assertTrue(check.ok, check.detail)
+
+    def test_prose_changed_without_any_signature_is_refused(self):
+        check = self._check_over({"178": {"vintage": 2024}}, ["178"])
+        self.assertFalse(check.ok)
+        self.assertIn("178", check.detail)
+
+    def test_a_signature_that_does_not_match_the_vintage_is_refused(self):
+        """Sarebbe riaperta comunque dalla regola di rientro, quindi accettarla
+        qui nasconderebbe il problema per una run sola."""
+        check = self._check_over(
+            {"178": {"reviewed_at": "2026-07-26", "reviewed_vintage": 2023, "vintage": 2024}},
+            ["178"],
+        )
+        self.assertFalse(check.ok)
+
+    def test_a_run_that_touched_no_article_owes_no_signature(self):
+        check = self._check_over({}, [])
         self.assertTrue(check.ok, check.detail)
 
 

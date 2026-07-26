@@ -41,41 +41,73 @@ from scripts import pipeline_log, pipeline_status  # noqa: E402
 DEFAULT_OUT = PROJECT_ROOT / "data" / "pipeline" / "cruscotto.html"
 REPO = "nmaiese/diset-viz"
 
-# L'identita' del progetto, la stessa di frontend/src/styles.css. Un cruscotto
-# che sembra un altro prodotto si legge come un altro prodotto.
+# L'identita' cartografica del progetto (CLAUDE.md): navy, carta, un solo accento.
+# Un cruscotto che sembra un altro prodotto si legge come un altro prodotto.
+#
+# I font veri del sito (Archivo, Inter, Space Mono) arrivano da Google Fonts, che
+# qui non si puo' caricare: la pagina deve restare autonoma e apribile offline.
+# Quindi uno stack di sistema scelto, non un fallback silenzioso.
+#
+# I colori stanno tutti in token su :root e vengono ridefiniti tre volte: dal
+# sistema, e poi da data-theme nelle due direzioni, perche' l'interruttore di chi
+# guarda deve poter vincere anche contro la preferenza del sistema.
 CSS = """
-:root { --ink:#15233b; --paper:#fbfaf7; --accent:#e4572e; --line:rgba(21,35,59,.16); --muted:#5a6779; }
-* { box-sizing:border-box; }
-body { margin:0; padding:2rem 1.25rem 4rem; background:var(--paper); color:var(--ink);
-  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; }
-.wrap { max-width:60rem; margin:0 auto; }
-h1 { font-family:Archivo,Inter,sans-serif; font-size:1.9rem; letter-spacing:-.02em; margin:0 0 .25rem; }
-h2 { font-family:Archivo,Inter,sans-serif; font-size:1.15rem; margin:2.5rem 0 .75rem;
-  padding-bottom:.4rem; border-bottom:1px solid var(--line); }
-.sub { color:var(--muted); font-size:.9rem; margin:0 0 1.5rem; }
-.mono { font-family:"Space Mono",ui-monospace,SFMono-Regular,Menlo,monospace; }
-table { width:100%; border-collapse:collapse; font-size:.92rem; }
-th { text-align:left; font-weight:600; font-size:.75rem; letter-spacing:.06em; text-transform:uppercase;
-  color:var(--muted); padding:.5rem .6rem; border-bottom:1px solid var(--line); }
-td { padding:.55rem .6rem; border-bottom:1px solid var(--line); vertical-align:top; }
-tr:last-child td { border-bottom:0; }
-.n { font-family:"Space Mono",ui-monospace,monospace; text-align:right; white-space:nowrap; }
-.dot { display:inline-block; width:.55rem; height:.55rem; border-radius:0; margin-right:.5rem;
-  background:var(--line); vertical-align:middle; }
-.dot.work { background:var(--accent); }
-.tag { display:inline-block; padding:.1rem .45rem; border:1px solid var(--line);
-  font-size:.72rem; letter-spacing:.04em; text-transform:uppercase; white-space:nowrap; }
-.tag.bad { border-color:var(--accent); color:var(--accent); }
-.detail { color:var(--muted); font-size:.86rem; margin:.35rem 0 0; padding-left:1rem;
-  border-left:2px solid var(--line); }
-a { color:var(--accent); }
-.empty { color:var(--muted); font-style:italic; padding:.8rem 0; }
-.scroll { overflow-x:auto; }
-footer { margin-top:3rem; padding-top:1rem; border-top:1px solid var(--line);
-  color:var(--muted); font-size:.82rem; }
-@media (prefers-color-scheme: dark) {
-  :root { --ink:#eceff4; --paper:#101725; --line:rgba(236,239,244,.16); --muted:#9aa6b8; }
+:root {
+  --paper:#fbfaf7; --ink:#15233b; --accent:#e4572e;
+  --muted:#5a6779; --line:rgba(21,35,59,.16); --sunk:rgba(21,35,59,.035);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
 }
+@media (prefers-color-scheme: dark) {
+  :root { --paper:#0e1522; --ink:#e9edf4; --accent:#ff7a52;
+          --muted:#94a1b5; --line:rgba(233,237,244,.18); --sunk:rgba(233,237,244,.04); }
+}
+:root[data-theme="dark"] { --paper:#0e1522; --ink:#e9edf4; --accent:#ff7a52;
+  --muted:#94a1b5; --line:rgba(233,237,244,.18); --sunk:rgba(233,237,244,.04); }
+:root[data-theme="light"] { --paper:#fbfaf7; --ink:#15233b; --accent:#e4572e;
+  --muted:#5a6779; --line:rgba(21,35,59,.16); --sunk:rgba(21,35,59,.035); }
+
+* { box-sizing:border-box; }
+body { margin:0; padding:2.5rem 1.25rem 4rem; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); line-height:1.55; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:62rem; margin:0 auto; display:flex; flex-direction:column; gap:2.5rem; }
+header { display:flex; flex-direction:column; gap:.6rem; }
+h1 { font-size:1.75rem; font-weight:700; letter-spacing:-.02em; margin:0; text-wrap:balance; }
+h2 { font-size:.78rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--muted); margin:0 0 .75rem; }
+section { display:flex; flex-direction:column; }
+.lede { margin:0; font-size:1rem; color:var(--ink); max-width:52ch; }
+.lede strong { color:var(--accent); }
+.stamp { margin:0; font-family:var(--mono); font-size:.75rem; color:var(--muted); }
+
+.strip { display:grid; grid-template-columns:repeat(auto-fit,minmax(9rem,1fr)); gap:1px;
+  background:var(--line); border:1px solid var(--line); }
+.cell { background:var(--paper); padding:.9rem 1rem; display:flex; flex-direction:column; gap:.2rem; }
+.cell .k { font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.cell .v { font-family:var(--mono); font-size:1.5rem; font-variant-numeric:tabular-nums;
+  line-height:1.1; }
+.cell.alert .v { color:var(--accent); }
+
+table { width:100%; border-collapse:collapse; font-size:.92rem; }
+th { text-align:left; font-weight:600; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); padding:.45rem .7rem; border-bottom:1px solid var(--line); white-space:nowrap; }
+td { padding:.6rem .7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+tbody tr:last-child td { border-bottom:0; }
+tbody tr.idle td { color:var(--muted); }
+tbody tr.flag td:first-child { box-shadow:inset 3px 0 0 var(--accent); }
+.n { font-family:var(--mono); text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.mono { font-family:var(--mono); font-size:.85em; }
+.tag { display:inline-block; padding:.12rem .5rem; border:1px solid var(--line); background:var(--sunk);
+  font-family:var(--mono); font-size:.7rem; letter-spacing:.03em; white-space:nowrap; }
+.tag.bad { border-color:var(--accent); color:var(--accent); background:transparent; }
+.detail { color:var(--muted); font-size:.85rem; margin:.3rem 0 0; padding-left:.8rem;
+  border-left:2px solid var(--line); }
+a { color:var(--accent); text-underline-offset:.15em; }
+a:focus-visible, summary:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.empty { color:var(--muted); font-size:.9rem; margin:0; padding:.9rem 0; }
+.scroll { overflow-x:auto; }
+footer { border-top:1px solid var(--line); padding-top:1rem; color:var(--muted); font-size:.8rem;
+  display:flex; flex-direction:column; gap:.4rem; }
 """
 
 
@@ -150,16 +182,37 @@ def _esc(value):
 
 
 def _stage_rows(status):
+    """Lo stato incide nella forma, non solo nel numero: una riga con lavoro in
+    coda porta una barretta d'accento, una a zero si spegne nel colore attenuato.
+    Un cruscotto si scorre, non si legge."""
     rows = []
     for entry in status["stages"]:
-        dot = "dot work" if entry["waiting"] else "dot"
+        css = "flag" if entry["waiting"] else "idle"
         rows.append(
-            f"<tr><td><span class='{dot}'></span><strong>{_esc(entry['stage'])}</strong></td>"
+            f"<tr class='{css}'><td><strong>{_esc(entry['stage'])}</strong></td>"
             f"<td class='mono'>{_esc(entry['agent'])}</td>"
             f"<td class='n'>{entry['waiting']}</td>"
             f"<td>{_esc(entry['next'])}</td></tr>"
         )
     return "\n".join(rows)
+
+
+def _summary_cells(status, entries):
+    """Il riassunto prima del dettaglio. Quattro numeri che dicono, in un colpo
+    d'occhio, se c'e' qualcosa da guardare o no."""
+    attention = sum(1 for e in entries if e.get("outcome") in pipeline_log.ATTENTION)
+    last = max((e.get("at", "") for e in entries), default="")
+    cells = [
+        ("in coda, tutti gli stadi", str(status["total_waiting"]), False),
+        ("run registrate", str(len(entries)), False),
+        ("run da guardare", str(attention), attention > 0),
+        ("ultima run", (last[:10] or "mai"), False),
+    ]
+    return "\n".join(
+        f"<div class='cell{' alert' if alert else ''}'>"
+        f"<span class='k'>{_esc(k)}</span><span class='v'>{_esc(v)}</span></div>"
+        for k, v, alert in cells
+    )
 
 
 def _journal_rows(entries, limit=25):
@@ -235,7 +288,7 @@ def render(out_path=None):
 
     if status["next_stage"]:
         first = next(e for e in status["stages"] if e["stage"] == status["next_stage"])
-        headline = f"Prossimo passo: <strong>{_esc(first['agent'])}</strong>, {_esc(first['next'])}."
+        headline = f"Tocca a <strong>{_esc(first['agent'])}</strong>: {_esc(first['next'])}."
     else:
         headline = ("Niente in coda: la catena e ferma perche ha finito, "
                     "non perche e bloccata.")
@@ -246,29 +299,46 @@ def render(out_path=None):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Catena Divario Italia</title>
 <style>{CSS}</style></head><body><div class="wrap">
+
+<header>
 <h1>Catena Divario Italia</h1>
-<p class="sub">{headline} Generato il {_esc(generated)} UTC.</p>
+<p class="lede">{headline}</p>
+<p class="stamp">fotografia del {_esc(generated)} UTC</p>
+</header>
 
-<h2>Dove sta la catena adesso</h2>
+<section>
+<div class="strip">{_summary_cells(status, entries)}</div>
+</section>
+
+<section>
+<h2>Dove sta la catena</h2>
 <div class="scroll"><table>
-<tr><th>stadio</th><th>agente</th><th class="n">in attesa</th><th>prossima cosa da fare</th></tr>
+<thead><tr><th>stadio</th><th>agente</th><th class="n">in coda</th><th>prossima cosa da fare</th></tr></thead>
+<tbody>
 {_stage_rows(status)}
-</table></div>
+</tbody></table></div>
+</section>
 
+<section>
 <h2>Che cosa hanno fatto gli agenti</h2>
 {_journal_rows(entries)}
+</section>
 
+<section>
 <h2>Che cosa e finito in pagina</h2>
 {_commit_rows(commits)}
+</section>
 
+<section>
 <h2>Pull request della catena</h2>
 {_pr_rows(prs)}
+</section>
 
 <footer>
-Rigenera con <span class="mono">python3 scripts/pipeline_dashboard.py --open</span>.
-Questa pagina e una fotografia: mostra lo stato del checkout locale al momento in
-cui e stata scritta. Per lo stato vivo di una Routine in corso serve
-<a href="https://claude.ai/code/routines">claude.ai/code/routines</a>.
+<span>Rigenera con <span class="mono">python3 scripts/pipeline_dashboard.py --open</span>.</span>
+<span>Questa pagina e una fotografia del checkout locale. Per lo stato vivo di una
+Routine in corso serve <a href="https://claude.ai/code/routines">claude.ai/code/routines</a>:
+l'API delle Routine espone solo l'ora dell'ultimo firing.</span>
 </footer>
 </div></body></html>
 """

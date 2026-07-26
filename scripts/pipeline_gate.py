@@ -338,23 +338,53 @@ def check_curation_decisions(rows=None):
 
 def check_reviewer_signature(base=None, cwd=None):
     """The reviewer's whole output is a signature, so a run that changed prose
-    without signing anything has not reviewed, it has rewritten."""
-    resolved = resolve_base(base, cwd=cwd)
-    if not resolved:
-        return Check("firma-revisore", True, "nessuna base di confronto, controllo saltato")
-    code, out, _ = _git("diff", f"{resolved}...HEAD", "--", INDICATOR_TEXTS, cwd=cwd)
-    if code != 0 or not out.strip():
-        code, out, _ = _git("diff", "--", INDICATOR_TEXTS, cwd=cwd)
-    if not out.strip():
+    without signing has not reviewed, it has rewritten.
+
+    Checks the **state** of the articles it touched, not the lines of the diff.
+    The first version looked for an added line containing `"reviewed_at"`, which
+    is a proxy that fails on a real and correct case: a same-day correction to an
+    article already signed today rewrites nothing, because the right signature is
+    the one already there. The reviewer agent hit exactly that, refused to fake a
+    date to get past the gate, refused to edit the gate, and escalated it with
+    the fix. A gate that pushes a correct agent toward a false date is worse than
+    no gate.
+
+    Reading the state is also strictly stronger: a diff line proves a string was
+    added, this proves every article the run touched carries a valid signature
+    that matches the data it describes.
+    """
+    keys = changed_text_keys(base, cwd=cwd)
+    if not keys:
         return Check("firma-revisore", True, "nessuna modifica ai testi")
-    signed = [line for line in out.splitlines() if line.startswith("+") and '"reviewed_at"' in line]
-    if not signed:
+    current = PROJECT_ROOT / INDICATOR_TEXTS
+    try:
+        entries = json.loads(current.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        return Check("firma-revisore", False, f"testi illeggibili: {type(exc).__name__}")
+    unsigned, mismatched = [], []
+    for key in keys:
+        entry = entries.get(key) or {}
+        signed = (entry.get("reviewed_at") or "").strip()
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", signed):
+            unsigned.append(key)
+        elif entry.get("reviewed_vintage") != entry.get("vintage"):
+            # A signature that does not match the article's own vintage is one
+            # the re-entry rule will reopen anyway, so accepting it here would
+            # only hide the problem for one run.
+            mismatched.append(f"{key} (firmato sul {entry.get('reviewed_vintage')}, ora {entry.get('vintage')})")
+    if unsigned:
         return Check(
             "firma-revisore",
             False,
-            "il revisore ha cambiato la prosa senza aggiungere nessun reviewed_at",
+            f"articoli cambiati senza una firma valida: {', '.join(unsigned[:5])}",
         )
-    return Check("firma-revisore", True, f"{len(signed)} articoli firmati")
+    if mismatched:
+        return Check(
+            "firma-revisore",
+            False,
+            f"firme che non corrispondono al vintage: {', '.join(mismatched[:5])}",
+        )
+    return Check("firma-revisore", True, f"{len(keys)} articoli toccati, tutti firmati e coerenti")
 
 
 def changed_text_keys(base=None, cwd=None):
@@ -502,16 +532,40 @@ def _python():
 
 
 def check_suite(cwd=None):
+    """Il verdetto lo da' il referto di unittest, non il codice di uscita.
+
+    Sembra un cavillo ed e' invece la differenza fra una catena che gira e una
+    ferma. La suite qui crasha in uscita, con SIGSEGV, circa una run su quattro:
+    i test passano tutti, unittest stampa `OK`, e poi l'interprete muore mentre
+    smonta qualche estensione C. Il processo esce 139 e un cancello che leggesse
+    solo quello bloccherebbe un quarto delle run di **ogni** stadio, su un
+    fallimento che non esiste. E' esattamente cio' che il revisore ha incontrato
+    e ha descritto come "un test dipendente dalla piattaforma".
+
+    Quindi: se unittest dice `FAILED`, o se non dice niente di riconoscibile, e'
+    rosso. Se dice `OK` ma il processo e' morto lo stesso, i test sono passati e
+    lo diciamo a voce alta invece di ingoiarlo, perche' un crash resta una cosa
+    da sistemare anche quando non e' una bocciatura.
+    """
     result = subprocess.run(
         [_python(), "-m", "unittest", "discover", "-s", "tests"],
         cwd=str(cwd or PROJECT_ROOT),
         capture_output=True,
         text=True,
     )
-    tail = (result.stderr or result.stdout).strip().splitlines()
-    summary = " / ".join(line for line in tail[-3:] if line.strip())
+    report = (result.stderr or "") + (result.stdout or "")
+    tail = [line for line in report.strip().splitlines()[-3:] if line.strip()]
+    summary = " / ".join(tail)
+    passed = re.search(r"^OK(\s|$)", report, re.M) and not re.search(r"^FAILED", report, re.M)
+    if not passed:
+        return Check("suite", False, f"la suite fallisce: {summary[:500] or 'nessun referto leggibile'}")
     if result.returncode != 0:
-        return Check("suite", False, f"la suite fallisce: {summary[:500]}")
+        return Check(
+            "suite",
+            True,
+            f"{summary[:160]} (l'interprete e' morto in uscita, segnale {-result.returncode if result.returncode < 0 else result.returncode}: "
+            f"i test passano, il crash e' a valle)",
+        )
     return Check("suite", True, summary[:200] or "suite verde")
 
 
