@@ -310,6 +310,24 @@
     <p class="page-note"><a href="/metodologia">Definizioni, confronti e limiti</a>{% if meta.quality_life_scored %} · <a href="/qualita-della-vita/metodologia">Come entra nel punteggio della qualità della vita</a>{% endif %}</p>
   </section>
 
+  {# Il verso opposto del link che il post dichiara già nel frontmatter. Solo
+     titolo e data: la descrizione di un articolo cita le stesse cifre che il
+     cruscotto stampa qui sopra, e una cifra si mostra una volta sola. #}
+  {% if related_posts %}
+  <section class="indicator-articles">
+    <h2>Abbiamo scritto di questo indicatore</h2>
+    <ul class="indicator-articles__list">
+      {% for post in related_posts %}
+      <li>
+        <a href="/blog/{{ post.slug }}">{{ post.title }}</a>
+        <span>{{ post.date.strftime('%d.%m.%Y') }} · {{ post.read_time }} min di lettura</span>
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="page-note"><a href="/blog">Tutte le analisi del blog →</a></p>
+  </section>
+  {% endif %}
+
   {% if level.cover_bars %}
   <details class="indicator-cover-share">
     <summary>Immagine da condividere</summary>
