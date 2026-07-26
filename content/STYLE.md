@@ -50,9 +50,13 @@ stesse cifre e scrive un pezzo che il lettore ricorda. Sei mosse:
 - **Dai al pezzo un ancoraggio concreto.** Un solo contrasto vivido che il lettore
   porta via, due territori che quasi non si sfiorano, un valore che era il fondo e
   ora è la vetta. Uno che se lo merita, non una lista.
-- **Varia il ritmo, usa la frase corta.** Quasi tutte le frasi hanno una
-  subordinata. Ogni tanto una no. Una riga di tre parole dopo una lunga è lo
-  strumento più antico del mestiere, e questi testi non lo usano quasi mai.
+- **Varia il ritmo, ma tieni le frasi collegate.** Quasi tutte le frasi hanno una
+  subordinata e portano alla successiva. Ogni tanto una no, e una riga breve dopo
+  una lunga fa cadere il punto. La frase corta però è uno strumento raro, per dare
+  enfasi, non la regola: un paragrafo di frasette secche di tre parole suona a
+  singhiozzo, ed è un tell da bot tanto quanto il periodare uniforme che sostituisce.
+  Il metro non è la lunghezza, è il flusso. Rileggi il paragrafo ad alta voce, ogni
+  frase deve nascere dalla precedente, non stare accanto come una voce di elenco.
 
 ## Schemi da evitare (suonano da bot)
 
@@ -65,6 +69,8 @@ stesse cifre e scrive un pezzo che il lettore ricorda. Sei mosse:
   taglia la frase.
 - Avverbi gonfi: "davvero", "assolutamente", "incredibilmente", "chiaramente".
 - Frasi-slogan tipo "Leggere X significa leggere Y".
+- Prosa a singhiozzo: frasi tutte corte e slegate, accostate senza un nesso, che
+  si leggono come un elenco puntato travestito da paragrafo.
 - Gergo e paroloni quando basta una parola comune.
 
 ## Struttura: utile, non seriale

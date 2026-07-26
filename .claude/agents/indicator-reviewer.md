@@ -128,6 +128,10 @@ otto del Sud") repeats the machine even though the wording differs.
   - *The closing rhetorical question.* The migrated notes are full of a final
     question that answers nothing ("il mercato assume di più o le giovani restano
     fuori?"). Replace it with the point, or end on the sentence before it.
+  - *Staccato prose.* Varied rhythm is the goal, not short sentences. A paragraph
+    of clipped, disconnected lines that sit beside each other like bullet points
+    reads as flat as a wall of uniform long ones. Rejoin them with the logical
+    link the writer dropped, so the paragraph flows from one idea to the next.
 - **Does the level match?** An entry declares `level` and is used only there.
   Figures must belong to that level.
 - **Contextual indicators have no better.** No "migliora", no "peggiora", no

@@ -148,10 +148,15 @@ competent-but-flat draft does not:
    region that crossed half the ranking in ten years, a value that used to be the
    floor and is now the ceiling. One that earns its place, not a list of them.
 
-6. **Vary the rhythm, and use the short sentence.** Most sentences carry a clause.
-   Every so often one does not. A three-word line after a long one is the oldest
-   tool in the trade and this prose almost never reaches for it. `content/STYLE.md`
-   asks for varied length: deliver it on the page, not just in principle.
+6. **Vary the rhythm, but keep the prose connected.** Most sentences carry a
+   clause and lead into the next. Every so often one does not, and a short line
+   after a long one lands the point. But the short sentence is a rare tool for
+   emphasis, never the default: a paragraph of clipped three-word declaratives
+   reads as staccato, which is its own bot tell, as flat as the uniform long
+   sentence it replaced. The real test is flow, not length. Read the paragraph
+   aloud: each sentence should follow from the one before, joined by a real
+   logical link, not sit beside it like a bullet. One idea per paragraph, carried
+   from sentence to sentence, is what makes it read like a person wrote it.
 
 And one tell to kill on sight: **the closing rhetorical question.** The migrated
 backlog ends paragraph after paragraph on "il mercato assume di più o le giovani
