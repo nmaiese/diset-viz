@@ -23,8 +23,10 @@ FIXTURE = Path(__file__).resolve().parent / "fixtures" / "indicator_stats_golden
 # Same precision the dump was written at.
 TOLERANCE = 1e-6
 
-# Two deviations from the fixture are deliberate. They are listed here instead of
-# being regenerated away, so the guard keeps proving that nothing ELSE moved.
+# Three deviations from the fixture are deliberate. None is regenerated away, so
+# the guard keeps proving that nothing ELSE moved. Two are listed here; the third
+# (ties at the extremes) is documented where it is asserted, in
+# test_best_and_worst_are_the_same_territories.
 #
 # 1. These four indicators declare a first year for which no region has a value
 #    (id 103 declares 1995, its first real observation is 1996). The old code fed
