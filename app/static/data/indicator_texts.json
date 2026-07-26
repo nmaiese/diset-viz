@@ -1113,11 +1113,18 @@
   "vintage": 2023
  },
  "281": {
-  "fonti": [],
-  "lead": "Gli omicidi sono diventati rari quasi ovunque. Il tasso medio è sceso di circa due terzi negli ultimi decenni e oggi vale in media 0,5 ogni centomila abitanti. In Valle d'Aosta e Molise non se ne registrano, mentre i valori più alti restano in Sardegna, 1,0, e Liguria, 0,9.",
+  "fonti": [
+   {
+    "testo": "Istat, Le vittime di omicidio, anno 2023",
+    "url": "https://www.istat.it/comunicato-stampa/le-vittime-di-omicidio-anno-2023/"
+   }
+  ],
+  "lead": "Gli omicidi sono diventati rari quasi ovunque. Il tasso medio è sceso di quasi due terzi negli ultimi decenni e nel 2023 vale in media 0,5 ogni centomila abitanti. In Valle d'Aosta e Molise non se ne registrano, mentre i valori più alti sono in Sardegna, 1,0, e Liguria, 0,9.",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2023,
   "sections": [
    {
-    "body": "Su un fenomeno così raro la classifica va letta con molta prudenza: pochi casi in un anno bastano a far salire o scendere una regione, e la geografia non coincide con quella della criminalità organizzata. Il forte calo di lungo periodo è uno dei cambiamenti più netti tra tutti gli indicatori di sicurezza, in linea con l'Italia e con gran parte d'Europa. Un tasso quasi azzerato non significa assenza di violenza, ma che la sua forma più estrema è oggi eccezionale. Cosa resta fuori quando l'omicidio diventa raro?",
+    "body": "Su un fenomeno così raro la classifica va letta con prudenza. Fra il quarto posto della Lombardia, 0,42, e il sedicesimo dell'Abruzzo, 0,71, passano meno di tre decimi di punto, cioè una manciata di casi in un anno. La geografia non è quella che ci si aspetta, perché i due valori più alti sono in Sardegna e Liguria mentre la Sicilia sta a metà classifica. Il calo di lungo periodo non ha toccato tutti allo stesso modo, e Marche, Umbria e Friuli-Venezia Giulia oggi stanno sopra il livello del 1995. La discesa però è finita da tempo, perché il tasso medio si è più che dimezzato fra il 1995 e il 2015 e dal 2016 oscilla fra quattro e sei decimi senza più scendere. Istat conta 0,57 omicidi per centomila abitanti in Italia nel 2023 e colloca il paese al tasso più basso d'Europa nel 2022. Un valore quasi azzerato non significa assenza di violenza, ma che la sua forma più estrema è oggi eccezionale.",
     "h": null,
     "role": "quadro"
    },
@@ -2419,15 +2426,17 @@
  },
  "612": {
   "fonti": [],
-  "lead": "La domanda di spettacolo sportivo, dagli ingressi agli eventi, va da 92 ogni cento abitanti in Liguria e 87 in Toscana a 19 in Molise e Basilicata. La media delle regioni è di circa 53, con differenze molto ampie tra i territori.",
+  "lead": "La domanda di spettacolo sportivo si misura in ingressi ogni cento abitanti. Nel 2023 va da 92 in Liguria e 87 in Toscana a 19 in Molise, con una media regionale di circa 53.",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2023,
   "sections": [
    {
-    "body": "Assistere a eventi sportivi dal vivo dipende dalla presenza di squadre, impianti e tradizione sportiva, concentrati in alcune regioni e nelle grandi città. Il divario riflette la geografia dello sport professionistico e degli stadi, più che la passione, diffusa ovunque. Lo sport dal vivo è aggregazione, identità ed economia locale, oltre che spettacolo. La passione sportiva del Sud trova dove esprimersi allo stadio?",
+    "body": "La distribuzione si spezza in un punto solo. Le prime sette regioni stanno tutte sopra i 70 ingressi ogni cento abitanti, poi si scende di colpo alle Marche, che si fermano a 56, e da lì i valori calano lentamente fino al Molise. La geografia non è quella attesa. Puglia e Campania passano davanti al Veneto, e la Valle d'Aosta sta più in basso della Calabria. Sul lungo periodo il movimento è quasi tutto verso l'alto, con sei territori in controtendenza, e il calo più netto è quello dell'Umbria.",
     "h": null,
     "role": "quadro"
    },
    {
-    "body": "Conta gli ingressi a eventi sportivi, non chi pratica sport né chi lo segue in televisione. Riflette l'offerta di eventi e impianti più della cultura sportiva di un territorio.",
+    "body": "Conta gli ingressi, non gli spettatori. La stessa persona che segue venti partite pesa venti volte, e chi lo sport lo pratica o lo guarda in televisione non entra nel conteggio. Il dato cade poi dove l'evento si tiene, quindi segue la mappa degli impianti prima di quella del pubblico.",
     "h": null,
     "role": "limiti"
    }
@@ -2617,15 +2626,17 @@
  },
  "63": {
   "fonti": [],
-  "lead": "La formazione degli adulti che già lavorano è poco diffusa e diseguale. Partecipa ad attività formative il 14,2% degli occupati in Emilia-Romagna e il 14% in Trentino Alto Adige, contro il 6,2% della Sicilia. La media delle regioni è del 10,4%, in crescita.",
+  "lead": "La formazione degli adulti che già lavorano è poco diffusa e diseguale. Partecipa ad attività formative il 14,2% degli occupati in Emilia-Romagna, contro il 6,2% della Sicilia. La media semplice delle venti regioni è del 10,4% nel 2024, in calo rispetto al 2023 ma sopra il livello del 2018.",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2024,
   "sections": [
    {
-    "body": "In un lavoro che cambia in fretta aggiornarsi è essenziale, ma in Italia lo fa un occupato su dieci, e molto meno al Sud. La formazione continua dipende dalle imprese, più propense a investire dove sono grandi e strutturate, cioè al Nord. Chi non si aggiorna rischia di restare indietro con le competenze. Imparare per tutta la vita è un diritto o un privilegio di pochi settori?",
+    "body": "Il gruppo di testa è compatto. Le prime dieci regioni stanno dentro poco più di tre punti percentuali, e lì la posizione in classifica dice poco. La distanza vera si apre in fondo. Sotto la Basilicata, all'8,1%, la Puglia scende al 7,1% e le ultime tre restano sotto il 6,6%. È quella coda a tirare giù la media, che resta sei decimi sotto la mediana. Fuori schema c'è la Sardegna, che con il 10,8% passa davanti a Piemonte e Marche ed è l'unica regione del Mezzogiorno sopra la media.",
     "h": null,
     "role": "quadro"
    },
    {
-    "body": "Conta gli occupati che partecipano alla formazione, non la sua qualità o durata. Non distingue i corsi brevi obbligatori da percorsi formativi reali, né dice se migliorino davvero le competenze.",
+    "body": "Conta gli occupati che partecipano alla formazione, non la sua qualità né la sua durata. Un corso obbligatorio di mezza giornata e un percorso lungo di riqualificazione valgono uguale, e il dato non dice se le competenze ne escano migliorate.",
     "h": null,
     "role": "limiti"
    }
@@ -5123,15 +5134,17 @@
  },
  "bes:10AMB023": {
   "fonti": [],
-  "lead": "La preoccupazione per i cambiamenti climatici è alta e piuttosto uniforme: in media il 68,8% delle persone. È massima in Molise, 71,7%, Umbria e Puglia, minima in Calabria, 62,2%, e Friuli-Venezia Giulia. La media delle regioni è del 68,8%, con differenze minime.",
+  "lead": "La preoccupazione per i cambiamenti climatici è alta e distribuita in modo omogeneo. Nel 2024 la dichiara il 68,8% delle persone, come media semplice delle venti regioni, con nove punti e mezzo di distanza fra il Molise, 71,7%, e la Calabria, 62,2%.",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2024,
   "sections": [
    {
-    "body": "Che oltre due terzi degli italiani si dicano preoccupati per il clima, in modo simile ovunque, segnala una consapevolezza ormai diffusa, cresciuta negli ultimi anni. Ma preoccuparsi non significa cambiare comportamenti, e la distanza tra allarme dichiarato e scelte quotidiane resta ampia. È un indicatore descrittivo dell'opinione, non dell'azione. La preoccupazione per il clima si traduce in qualcosa o resta un sentimento?",
+    "body": "Diciotto regioni su venti stanno più in alto che nel 2012, e la somiglianza fra i territori è il tratto più evidente della graduatoria. Le due eccezioni sono la Calabria, l'unica regione sotto il 63%, e il Friuli-Venezia Giulia. Anche quelle distanze però vanno prese con cautela, perché è una domanda di opinione e la serie si muove parecchio da sola. La media regionale ha cambiato quattro punti fra due anni consecutivi più di una volta, e la sola Calabria oscilla di oltre dieci punti nell'arco dei tredici anni. Resta un indicatore di quello che le persone dichiarano, non di quello che fanno.",
     "h": null,
     "role": "quadro"
    },
    {
-    "body": "Misura una preoccupazione dichiarata, non i comportamenti concreti né la loro coerenza. Dipende dall'attenzione mediatica del momento e non dice cosa le persone siano davvero disposte a fare.",
+    "body": "Misura una preoccupazione dichiarata, non i comportamenti. È una domanda di opinione, quindi la risposta può muoversi con il clima informativo del periodo in cui viene posta e non solo con l'esposizione reale al rischio.",
     "h": null,
     "role": "limiti"
    }
@@ -5446,15 +5459,17 @@
  },
  "bes:12SER010": {
   "fonti": [],
-  "lead": "La soddisfazione per il trasporto pubblico è bassa quasi ovunque: in media solo il 24,9% degli utenti. È più alta in Trentino Alto Adige, 44,7%, e Friuli-Venezia Giulia, 39,3%, più bassa in Campania, 13,8%, e nel Lazio. La media delle regioni è del 24,9%.",
+  "lead": "La soddisfazione per il trasporto pubblico è bassa quasi ovunque. Nel 2024 si dichiara soddisfatto il 24,9% degli utenti, come media semplice delle venti regioni, dal 44,7% del Trentino Alto Adige al 13,6% del Lazio.",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2024,
   "sections": [
    {
-    "body": "Che meno di un utente su quattro sia soddisfatto dice quanto il trasporto pubblico italiano deluda, tra ritardi, affollamento e scarsa copertura. Curiosamente le grandi città, con più servizio, non sono le più soddisfatte, segno che quantità non basta senza qualità. Il Trentino, piccolo ma efficiente, guida. Un buon trasporto pubblico si misura in chilometri o in fiducia degli utenti?",
+    "body": "La graduatoria non segue la mappa del servizio. Le tre regioni che ospitano le maggiori aree metropolitane stanno tutte sotto la media semplice, con il Lazio ultimo al 13,6%, la Campania al 13,8% e la Lombardia al 21,2%. In testa ci sono territori piccoli, in gran parte a statuto speciale, ma non solo, perché l'Abruzzo è terzo con il 35,4%. La media resta quasi tre punti sopra la mediana, segno che a tirarla su sono poche regioni. Sul lungo periodo il movimento più ampio è quello della Sardegna, che dal 2005 guadagna ventidue punti, mentre l'Emilia-Romagna ne perde quasi quattro.",
     "h": null,
     "role": "quadro"
    },
    {
-    "body": "Rileva la soddisfazione dichiarata degli utenti, non chi il servizio non lo usa affatto per mancanza di alternative. Dipende dalle attese, che possono essere più basse dove il servizio è storicamente scarso.",
+    "body": "Rileva la soddisfazione di chi il servizio lo usa, quindi non dice niente di chi ha rinunciato a usarlo per mancanza di alternative. E una risposta soggettiva si misura contro le attese di chi risponde, che non sono le stesse in tutte le regioni, quindi la stessa qualità può produrre giudizi diversi.",
     "h": null,
     "role": "limiti"
    }
@@ -5890,10 +5905,12 @@
  },
  "multiscopo:MULTI_DISAGIO_FACILITA": {
   "fonti": [],
-  "lead": "Arrivare a fine mese con facilità è un privilegio di pochi. Ci riesce il 17,8% delle famiglie in Trentino Alto Adige, il 15,6% in Valle d'Aosta, ma solo il 3% in Calabria. La media delle regioni è del 9%, e il divario tra la prima e l'ultima è di quasi sei volte.",
+  "lead": "Arrivare a fine mese con facilità è un privilegio di pochi. Ci riesce il 17,7% delle famiglie in Trentino Alto Adige e il 15,6% in Valle d'Aosta, ma solo il 3% in Calabria. La media semplice delle venti regioni è del 9% nel 2024.",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2024,
   "sections": [
    {
-    "body": "Questo indicatore misura l'agio economico percepito, il rovescio del disagio: quante famiglie non solo non faticano, ma vivono con margine. Che in Calabria sia una su trenta e in Trentino quasi una su cinque riassume in un numero la distanza tra le due Italie. È in netto miglioramento quasi ovunque dal 2018, con la Sardegna in controtendenza. Vivere con agio dipende dal reddito o dal saperlo gestire?",
+    "body": "È l'indicatore rovesciato del disagio economico, e serve a vedere non chi fatica ad arrivare a fine mese ma chi ci arriva con margine. Il vertice è staccato dal resto. Trentino Alto Adige e Valle d'Aosta stanno sopra il 15%, poi si scende di tre punti fino al Veneto e la classifica si comprime, perché dall'Emilia-Romagna al Piemonte dieci regioni stanno dentro poco più di due punti. Dal 2018 la quota cresce quasi ovunque, e l'unico territorio più in basso di allora è il Molise, per un soffio. Cinque regioni non hanno un valore per il 2018, quindi il confronto lungo vale su quindici.",
     "h": null,
     "role": "quadro"
    },
