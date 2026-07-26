@@ -41,7 +41,7 @@ DATAFLOW = "22_293_DF_DCIS_INDDEMOG1_1"
 DSD_LABEL = "DCIS_INDDEMOG1"
 SOURCE = "istat_demografia"
 SOURCE_URL = "https://esploradati.istat.it/databrowser/#/it"
-LICENSE = "CC BY 3.0 IT (Istat)"
+LICENSE = "CC BY 4.0 (Istat)"
 START_YEAR = 2015
 
 # Region-level REF_AREA codes look like ITC1, ITD1, ITF3 (two letters + digit).

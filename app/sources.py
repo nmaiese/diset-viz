@@ -58,8 +58,8 @@ SOURCES = {
         "label": "Istat, indicatori demografici",
         "short_label": "Indicatori demografici",
         "internal_prefix": "dem:",
-        "license": "CC BY 3.0 IT (Istat)",
-        "license_url": "https://creativecommons.org/licenses/by/3.0/it/",
+        "license": "CC BY 4.0 (Istat)",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
         "feeds": ("istat_demografia",),
     },
 }
