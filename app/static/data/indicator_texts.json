@@ -5642,6 +5642,8 @@
   ],
   "lead": "In cima al tasso di natalità il Trentino-Alto Adige convive con la Campania, e l'ordine dei territori non segue quello del reddito ma la loro struttura per età. Un tasso alto racconta quante persone in età fertile vivono in una regione e quanti figli nascono, non un vantaggio da leggere in graduatoria.",
   "level": "regione",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2024,
   "sections": [
    {
     "body": "Il tasso di natalità rapporta i nati vivi di un anno alla popolazione media residente e moltiplica per mille. Il 6,20 del Veneto nel 2024 vuol dire poco più di sei nati ogni mille abitanti in dodici mesi.\n\nÈ un tasso grezzo, e la parola pesa. Al denominatore c'è tutta la popolazione, non le sole donne in età fertile, quindi il valore risponde a due forze insieme, quante persone in età da avere figli vivono in una regione e quanti figli mettono al mondo. Una popolazione giovane alza il tasso a parità di fecondità, una popolazione anziana lo abbassa anche là dove i figli non mancano. Il numero da solo non separa i due effetti.",
@@ -5654,7 +5656,7 @@
     "role": "quadro"
    },
    {
-    "body": "Dal 2015 al 2024 il tasso è sceso in tutte e venti le regioni, senza una sola eccezione, sull'intero periodo come nell'ultimo anno. La media semplice dei valori regionali ha perso 1,76 punti in dieci anni.\n\nA cambiare è la velocità, non la direzione. Il Lazio e la Valle d'Aosta hanno perso 2,50 punti, il calo più netto, mentre la Liguria si è fermata a 0,90 e il Friuli-Venezia Giulia a 1,20. In testa il Trentino-Alto Adige è sceso di 2,00 punti e la Campania di appena 1,40, così il piccolo gruppo ad alta natalità si è mosso a ritmi diversi pur restando insieme.\n\nIl calo è nazionale. Nel 2024 l'Istat stima 1,18 figli per donna, sotto il precedente minimo storico di 1,19 toccato nel 1995, e in Italia nascono meno di 370 mila bambini in un anno. Dal 2023 al 2024 quindici regioni hanno perso ancora terreno e una sola è salita.",
+    "body": "Sull'intero periodo dal 2015 al 2024 il tasso è sceso in tutte e venti le regioni, senza una sola eccezione. La media semplice dei valori regionali ha perso 1,76 punti in dieci anni.\n\nA cambiare è la velocità, non la direzione. Il Lazio e la Valle d'Aosta hanno perso 2,50 punti, il calo più netto, mentre la Liguria si è fermata a 0,90 e il Friuli-Venezia Giulia a 1,20. In testa il Trentino-Alto Adige è sceso di 2,00 punti e la Campania di appena 1,40, così il piccolo gruppo ad alta natalità si è mosso a ritmi diversi pur restando insieme.\n\nIl calo è nazionale. Nel 2024 l'Istat stima 1,18 figli per donna, sotto il precedente minimo storico di 1,19 toccato nel 1995, e in Italia nascono meno di 370 mila bambini in un anno. Nell'ultimo passaggio, dal 2023 al 2024, quindici regioni sono ancora scese e una sola è salita.",
     "h": "In calo ovunque, ma non alla stessa velocità",
     "role": "dinamica"
    },
