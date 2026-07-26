@@ -161,12 +161,14 @@
   function setText(node, value) { if (node) node.textContent = value; }
 
   // ---- Level ---------------------------------------------------------------
-  function applyLevel(key, keepYear) {
+  // Runs once, at boot, on the level the server rendered: switching level is a
+  // navigation, not an in-place swap.
+  function applyLevel(key) {
     if (!levelsByKey[key]) return;
     state.levelKey = key;
     var lv = level();
 
-    if (!keepYear || state.yearIndex >= lv.years.length) state.yearIndex = lv.years.length - 1;
+    state.yearIndex = lv.years.length - 1;
 
     if (territorySelect) {
       territorySelect.innerHTML = "";
@@ -483,19 +485,13 @@
       sync();
     });
   }
-  if (levelSwitch) {
-    levelSwitch.addEventListener("click", function (evt) {
-      var link = evt.target.closest("[data-level]");
-      if (!link) return;
-      var key = link.getAttribute("data-level");
-      if (!levelsByKey[key] || key === state.levelKey) return;
-      // The href is a real server-rendered URL for the no-JS case; with JS the
-      // switch happens in place.
-      evt.preventDefault();
-      applyLevel(key, false);
-      sync();
-    });
-  }
+  // The level switch is left to the browser on purpose. Swapping it in place
+  // updated only what this script owns, the controls, the KPIs, the ranking and
+  // the trend, while the facts strip, the four-section article, the sources and
+  // the citation kept the level the server had rendered: a provincial cockpit
+  // under regional prose. Starting from ?livello=provincia there is no map in
+  // the DOM either, so switching back could not have restored it. A full
+  // navigation costs one server render and every block agrees.
   if (rankingEl) {
     rankingEl.addEventListener("click", function (evt) {
       var row = evt.target.closest(".ranking-row");
@@ -533,7 +529,7 @@
   var startLevel = params.get("livello");
   if (!levelsByKey[startLevel]) startLevel = data.defaultLevel || data.levels[0].key;
   state.territoryKey = params.get("regione") || null;
-  applyLevel(startLevel, false);
+  applyLevel(startLevel);
 
   var paramYear = parseInt(params.get("anno"), 10);
   if (!isNaN(paramYear) && years().indexOf(paramYear) !== -1) {

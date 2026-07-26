@@ -42,6 +42,10 @@ ROLES = (
 ROLE_ORDER = [role for role, _ in ROLES]
 DEFAULT_HEADINGS = dict(ROLES)
 
+# The level an entry describes when it does not say. Every article written so
+# far is regional, and every family except BES has regions as its only level.
+DEFAULT_LEVEL = "regione"
+
 
 @functools.lru_cache(maxsize=1)
 def _load():
@@ -71,13 +75,22 @@ def get_text(indicator_id):
     return None
 
 
-def build_article(indicator_id):
+def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     """The four sections in order, each flagged authored or composed.
 
     `body` is None for a composed section: the template renders that role from
     the data instead. Callers must not treat None as an empty section.
+
+    Prose is written against one territorial level and cites that level's
+    figures. The 31 BES articles that exist for two-level indicators were all
+    written against the regions, so on ``?livello=provincia`` they would name
+    Umbria and Piemonte under a cockpit of provinces. An entry therefore
+    declares the level it describes and is used only there; every other level
+    falls back to the composed skeleton, which reads the level it is given.
     """
     entry = get_text(indicator_id) or {}
+    if (entry.get("level") or DEFAULT_LEVEL) != (level_key or DEFAULT_LEVEL):
+        entry = {}
     authored = {
         section["role"]: section
         for section in entry.get("sections") or []

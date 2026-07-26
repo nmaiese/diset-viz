@@ -275,5 +275,66 @@ class ArticleRendering(unittest.TestCase):
         )
 
 
+class ProseStaysOnTheLevelItWasWrittenFor(unittest.TestCase):
+    """An article cites one level's figures and must not travel to the other.
+
+    Every article that exists was written against the regions. 31 BES indicators
+    also have a provincial level, and on those the regional lead named Umbria and
+    Piemonte and gave the mean of the regions above a cockpit of provinces. The
+    fix is the composed fallback, which reads whichever level it is handed.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from app.bes_data import all_bes_indicators
+
+        cls.two_level = [
+            item["id"] for item in all_bes_indicators()
+            if len(item.get("levels") or {}) > 1
+        ]
+
+    def test_a_regional_article_does_not_render_on_the_provincial_view(self):
+        checked = 0
+        for raw_id in self.two_level:
+            regional = indicator_texts.build_article(f"bes:{raw_id}", "regione")
+            if not regional["lead"] and not regional["authored_count"]:
+                continue
+            checked += 1
+            provincial = indicator_texts.build_article(f"bes:{raw_id}", "provincia")
+            self.assertIsNone(provincial["lead"], raw_id)
+            self.assertEqual(provincial["authored_count"], 0, raw_id)
+            for section in provincial["sections"]:
+                self.assertFalse(section["authored"], f"{raw_id} {section['role']}")
+        self.assertGreater(checked, 20, "expected the two-level BES articles to still exist")
+
+    def test_the_page_reports_the_rendered_levels_own_coverage(self):
+        """meta.year_min/year_max span every level at once, level's do not.
+
+        10AMB011 is 2017-2020 by province and 2015-2024 by region, so the
+        apparatus used to announce a period the provincial series never covered.
+        """
+        from app import app
+        from app.indicator_view import build_indicator_view
+
+        client = app.test_client()
+        pattern = re.compile(r"Dato più recente: (\d+).*?periodo (\d+)-(\d+)", re.S)
+        for raw_id in self.two_level:
+            view = build_indicator_view("bes", raw_id)
+            levels = {level["key"]: level for level in view["levels"]}
+            if "provincia" not in levels:
+                continue
+            level = levels["provincia"]
+            if level["year_min"] == level["year_max"]:
+                continue
+            url = f"{view['meta']['canonical_path']}?livello=provincia"
+            found = pattern.search(client.get(url).get_data(as_text=True))
+            self.assertIsNotNone(found, url)
+            self.assertEqual(
+                [int(value) for value in found.groups()],
+                [level["year_max"], level["year_min"], level["year_max"]],
+                url,
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

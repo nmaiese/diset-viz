@@ -61,6 +61,14 @@ Il testo composto **non** viene congelato nel JSON, di proposito: così non può
 invecchiare in silenzio dietro un aggiornamento dei dati, e la guardia sul
 `vintage` si applica solo alle frasi davvero scritte da qualcuno.
 
+**Un articolo vale per un livello territoriale solo.** Cita le cifre di quel
+livello, quindi non può viaggiare sull'altro: i 31 BES a due livelli avevano un
+lead che nominava l'Umbria e dava la media delle regioni sopra un cruscotto di
+province. Un'entrata dichiara il livello che descrive con il campo `level`, che
+vale `regione` quando manca, e viene usata solo lì. Su ogni altro livello la
+pagina ricade sullo scheletro composto, che legge il livello che gli viene dato.
+Lo garantisce `ProseStaysOnTheLevelItWasWrittenFor` in `tests/test_indicator_texts.py`.
+
 ## Scrivere un articolo
 
 Si comincia sempre da qui:

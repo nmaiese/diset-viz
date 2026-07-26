@@ -263,7 +263,10 @@
   {# ---- Zona 3: l'apparato. Fonti, verifica, condivisione, percorso. ---- #}
   <section class="indicator-apparatus">
     <h2>Fonti e verifica</h2>
-    <p class="data-callout"><strong>Dato più recente: {{ level.year_max }}.</strong>{% if meta.year_min != meta.year_max %} La serie copre il periodo {{ meta.year_min }}-{{ meta.year_max }}.{% endif %} Fonte <a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>.</p>
+    {# Level-specific: meta.year_min/year_max span every level at once, so on a
+       provincial view they would claim a period the provincial series does not
+       cover (10AMB011 is 2017-2020 by province, 2015-2024 by region). #}
+    <p class="data-callout"><strong>Dato più recente: {{ level.year_max }}.</strong>{% if level.year_min != level.year_max %} La serie copre il periodo {{ level.year_min }}-{{ level.year_max }}.{% endif %} Fonte <a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>.</p>
 
     {# How we compute, not what the source measures. It stays here so an authored
        "limiti" section can never drop it. #}

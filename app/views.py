@@ -362,7 +362,7 @@ def _render_indicator(family, raw_id):
     requested = request.args.get("livello")
     level = next((item for item in view["levels"] if item["key"] == requested), view["levels"][0])
 
-    article = indicator_texts.build_article(meta["id"])
+    article = indicator_texts.build_article(meta["id"], level["key"])
     lead = article["lead"] or indicator_texts.composed_lead(meta, level)
     # The lead is the SERP description as well as the first thing on the page,
     # so the two can never describe the indicator differently.
