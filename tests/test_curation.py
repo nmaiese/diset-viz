@@ -44,6 +44,68 @@ class CuratorWorklistEmpties(unittest.TestCase):
         self.assertIn("eur:Y", left)
 
 
+class CuratorReturnsWhenTheDataMoves(unittest.TestCase):
+    """Re-entry: a verso is a claim about a series, and the series keeps moving.
+
+    A decision made on the 2023 release is not automatically right on the 2025
+    one. Sources rebase, redefine and break their series, and the verso is
+    exactly the thing a redefinition can invert. So the decision carries the
+    year it was judged against, and the queue compares that to what the external
+    layer actually holds now.
+
+    The trigger is the data, never a calendar. `CuratorWorklistEmpties` above
+    documents the churn a timer would bring back.
+    """
+
+    ROWS = [
+        {"target_indicator_id": "eur:Y", "atlas_eligible": "true", "year": "2023", "value": "1"},
+        {"target_indicator_id": "eur:Y", "atlas_eligible": "true", "year": "2025", "value": "2"},
+        {"target_indicator_id": "dem:X", "atlas_eligible": "true", "year": "2025", "value": "3"},
+    ]
+
+    def test_a_newer_release_reopens_a_curated_indicator(self):
+        decisions = [{"target_indicator_id": "eur:Y", "reviewed_direction": "higher_better",
+                      "score_eligible": "true", "data_year": "2023"}]
+        queue = curate.worklist(self.ROWS, decisions)
+        self.assertEqual([item["target"] for item in queue["recheck"]], ["eur:Y"])
+        self.assertIn("2025", queue["recheck"][0]["reason"])
+
+    def test_a_decision_current_with_the_data_stays_closed(self):
+        decisions = [{"target_indicator_id": "eur:Y", "reviewed_direction": "higher_better",
+                      "score_eligible": "true", "data_year": "2025"}]
+        queue = curate.worklist(self.ROWS, decisions)
+        self.assertEqual(queue["recheck"], [])
+
+    def test_a_contextual_indicator_does_not_come_back_forever(self):
+        """The regression guard for the bug this queue was fixed for once.
+
+        `contextual` leaves `score_eligible` false permanently, so a rule that
+        read the flag instead of the year would re-open it on every single run.
+        """
+        decisions = [{"target_indicator_id": "dem:X", "reviewed_direction": "contextual",
+                      "score_eligible": "false", "data_year": "2025"}]
+        queue = curate.worklist(self.ROWS, decisions)
+        listed = [item["target"] for item in queue["new"] + queue["recheck"]]
+        self.assertNotIn("dem:X", listed)
+        self.assertIn("eur:Y", listed, "the one nobody judged is still waiting")
+
+    def test_a_decision_with_no_recorded_year_is_due_once(self):
+        decisions = [{"target_indicator_id": "dem:X", "reviewed_direction": "contextual",
+                      "score_eligible": "false", "data_year": ""}]
+        queue = curate.worklist(self.ROWS, decisions)
+        self.assertEqual([item["target"] for item in queue["recheck"]], ["dem:X"])
+
+    def test_an_unjudged_indicator_is_new_not_a_recheck(self):
+        queue = curate.worklist(self.ROWS, [])
+        self.assertEqual(sorted(item["target"] for item in queue["new"]), ["dem:X", "eur:Y"])
+        self.assertEqual(queue["recheck"], [])
+
+    def test_the_recorded_year_is_part_of_the_schema(self):
+        """A column the writer forgets is a re-entry rule that silently never
+        fires, so the schema is asserted rather than assumed."""
+        self.assertIn("data_year", curate.CURATION_COLUMNS)
+
+
 DATASET_HEADER = ";".join(apply_curation.EXTERNAL_COLUMNS)
 MANIFEST_HEADER = ";".join(apply_curation.MANIFEST_COLUMNS)
 

@@ -3,6 +3,27 @@
 Instructions for coding agents (Codex and others) in this repository. Claude
 Code reads `CLAUDE.md`; this file mirrors the essentials for everyone else.
 
+## Dove sta scritto cosa
+
+Questo file è un router, come `CLAUDE.md`. Per i temi con profondità leggi il
+documento che li possiede, non il riassunto qui:
+
+| se stai lavorando su... | leggi |
+| --- | --- |
+| la catena autonoma, gli agenti, il cancello, le Routine | `docs/AUTONOMOUS_PIPELINE.md` |
+| come apre e chiude una run un agente qualsiasi | `docs/AGENT_CONTRACT.md` |
+| una pagina indicatore e le sue guardie | `docs/INDICATOR_PAGES.md` |
+| scoperta e promozione multifonte | `docs/DISCOVERY_PIPELINE.md` |
+| stato corrente, id delle Routine, cosa manca | `docs/DISCOVERY_STATUS.md` |
+| dati regionali / provinciali | `docs/DATA_PIPELINE.md`, `docs/PROVINCE_PIPELINE.md` |
+| la voce editoriale | `content/STYLE.md` |
+
+Un comando per sapere dove sta la catena adesso:
+
+```bash
+python3 scripts/pipeline_status.py
+```
+
 ## Project
 
 **Divario Italia** (divarioitalia.it): a Flask + React atlas of Istat territorial

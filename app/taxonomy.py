@@ -8,8 +8,10 @@ identifiers: changing them would also change ranking configuration and URLs.
 
 from __future__ import annotations
 
+import csv
 import re
 import unicodedata
+from pathlib import Path
 
 
 CANONICAL_CATEGORIES = {
@@ -178,11 +180,46 @@ MACRO_AREAS = {
 }
 MACRO_AREA_ORDER = tuple(MACRO_AREAS)
 
+def _curated_theme_map():
+    """Theme -> category rows the curator may add without touching code.
+
+    A promoted indicator carries its source's theme name, and a theme nobody has
+    mapped falls through to the macro-area "Altro": the indicator stays in the
+    catalogue but vanishes from every macro-area total, which is a silent hole
+    rather than an error. The fix used to be a line inside
+    ``CANONICAL_CATEGORIES`` above, in this module.
+
+    That does not survive an autonomous chain. The curator is allowed to write
+    data and forbidden to write code, on purpose: it is the stage that decides
+    what enters a public ranking, and a stage that can edit a Python module can
+    change anything at all. So the mapping it needs is a committed CSV it may
+    write, and the pipeline gate lists that file in its perimeter.
+
+    Only the mapping is delegated. Inventing a *category* stays here, because a
+    category is a section of the site with a name and a description, not a row.
+    An unknown slug is ignored rather than trusted.
+    """
+    path = Path(__file__).resolve().parent.parent / "config" / "theme_categories.csv"
+    if not path.exists():
+        return {}
+    mapping = {}
+    with path.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle, delimiter=";"):
+            theme = (row.get("theme") or "").strip()
+            slug = (row.get("category") or "").strip()
+            if theme and slug in CANONICAL_CATEGORIES:
+                mapping[theme] = slug
+    return mapping
+
+
 SOURCE_THEME_TO_CATEGORY = {
     theme: slug
     for slug, category in CANONICAL_CATEGORIES.items()
     for theme in category["themes"]
 }
+# Curated rows come last so a mapping added by the chain can also correct one,
+# not only add to it.
+SOURCE_THEME_TO_CATEGORY.update(_curated_theme_map())
 SOURCE_INDICATOR_CATEGORY_OVERRIDES = {
     "12SER020": "ricerca_innovazione_digitale",  # copertura internet ultraveloce
     "11RIC022": "ricerca_innovazione_digitale",  # servizi comunali online

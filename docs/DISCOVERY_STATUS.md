@@ -1,215 +1,143 @@
-# Stato aggregatore multifonte (handoff)
+# Stato della catena
 
-Documento di passaggio: cosa è stato fatto sul branch
-`claude/aggregatore-indicatori-multifonte-4en56u`, com'è messo il sistema ora, e
-cosa manca. Per il dettaglio operativo vedi
-[`docs/DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md); per lo strato dati
-[`docs/DATA_PIPELINE.md`](DATA_PIPELINE.md).
+Il documento che si tiene aggiornato. Dice **dove sta il sistema adesso**: cosa
+gira da solo, con quale cadenza, cosa resta umano e cosa non è ancora fatto.
 
-## Obiettivo
+Per come funziona: [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
+Per il meccanismo della scoperta: [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md).
+Per il contratto di ogni agente: [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md).
 
-Trasformare l'app in un **aggregatore multifonte** che dà priorità ai dati
-freschi e regionali (poi provinciali): un processo ricorrente scopre indicatori
-presso fonti istituzionali, li mette in coda, un curatore fa il lavoro
-qualitativo (verso, descrizioni) e pubblica la mappatura così l'indicatore entra
-in atlante, quiz e qualità della vita. Tutto sotto **gate PR**: niente va live
-senza merge.
+Aggiornato al **2026-07-26**.
 
-## Le tre fasi, tutte implementate
+## In una riga
 
-### Fase 1 — Scoperta (hunter)
-- `scripts/discover_candidates.py` (watchlist) scansiona le fonti in
-  `config/external_sources.yaml`, classifica ogni indicatore contro le serie
-  esistenti (`new`/`compatible`/`proxy`, mai `exact` in automatico), assegna un
-  `priority_score` (fresco + regionale + copertura + novità) e scrive in
-  `data/discovery/candidates.csv`.
-- Lib: `scripts/discovery.py`. Adapter pilota: `scripts/eurostat_source.py`
-  (Eurostat NUTS2, cache-first, fixture offline, Bolzano+Trento combinati con
-  media pesata per popolazione).
-- Stdlib puro: gira senza il venv dell'app.
+Sei stadi, cinque agenti, tutti schedulati. Un indicatore va da un catalogo SDMX
+a una pagina pubblica senza intervento, e la catena ci ritorna sopra quando i
+dati si muovono. Restano umane tre cose, elencate in fondo, ognuna per un motivo
+scritto.
 
-### Fase 2 — Promozione + Eurostat come famiglia d'atlante
-- `scripts/promote_candidates.py` agisce solo sui candidati `triage_status=approved`,
-  con un parser per fonte (`PROMOTION_PARSERS`). Un indicatore `new` diventa voce
-  d'atlante autonoma con id nel namespace della **famiglia della sua fonte**
-  (`eur:` Eurostat, `dem:` indicatori demografici Istat), un `compatible`/`proxy`
-  arricchisce l'indicatore Istat che punta. Al termine lo script scrive da sé
-  `triage_status=promoted` in coda.
-- `app/external_atlas.py` adatta le righe di **ogni famiglia esterna** al contratto
-  API dell'atlante, federato in `app/atlas_catalog.py`
-  (`get_atlas_catalog`/`get_atlas_indicator`/`source_families`). Il prefisso
-  dell'id sceglie la famiglia, la famiglia decide istituzione, etichetta e licenza.
-- URL unificati **keyword-first**: `/indicatore/<slug>/<acr>-<id>`
-  (`ter`/`bes`/`ims`/`eur`/`dem`). Lo slug (keyword) apre l'URL per la SEO, il codice
-  con l'id è l'ultimo segmento e risolve in modo stabile anche se il nome cambia.
-  I vecchi URL fanno 301. Naming e URL centralizzati in `app/sources.py`
-  (etichette istituzione-first, niente gergo).
-
-### Fase 3 — Curatore (lavoro qualitativo)
-- `scripts/curate.py` mostra l'evidenza sul **verso** (regioni in cima/in fondo).
-- `data/discovery/curation.csv` = decisione rivista (verso, categoria,
-  `score_eligible`, descrizione).
-- `scripts/apply_curation.py` pubblica nel layer esterno + manifest +
-  `app/static/data/external/curated_descriptions.csv`.
-- Aggancio consumatori: quiz (`app/quiz.py`), selezione e motore qualità della
-  vita (`app/quality_life_selection.py`, `app/quality_life_bes.py`).
-
-## Stato della catena
-
-Tutti gli stadi funzionano end-to-end, verificato con una run vera e con la rete
-viva su entrambe le fonti: `dem:OLDAGEDEPR` (indice di dipendenza degli anziani,
-Istat SDMX) è stato scoperto, approvato, promosso, curato, scritto e pubblicato.
-È la prima serie non Eurostat ad attraversare la catena, ed è servita a scoprire
-che la promozione conosceva una sola fonte e che il namespace `eur:` era cablato
-in sei punti diversi.
-
-L'indicatore è `contextual`, quindi è integrato, categorizzato e descritto ma
-**non entra nel punteggio qualità della vita**: un rapporto di dipendenza non ha
-un verso. Il percorso dello score per una famiglia nuova resta perciò non
-esercitato da questa run.
-
-## Stato attuale dei dati (pilota)
-
-- Fonte pilota: **Eurostat regionale (NUTS2)**, registrata in
-  `config/external_sources.yaml` come `eurostat_regional`.
-- **`eur:rd_e_gerdreg`** (spesa R&S sul PIL): scoperto, promosso come voce
-  d'atlante nuova, **curato** (verso `higher_better` confermato dai dati,
-  categoria `ricerca_innovazione_digitale`, descrizione rivista) e quindi attivo
-  in atlante, ricerca, quiz e **punteggio qualità della vita**.
-- **PIL pro capite Eurostat** (`nama_10r_2gdp`): riconosciuto `proxy` dell'id
-  territoriale 901, arricchisce quell'indicatore (freschezza EU), non è una voce
-  separata.
-
-## Comandi
+## Lo stato, in un comando
 
 ```bash
-# ambiente (container fresco): serve un venv per l'app; gli script discovery no
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-
-# hunter -> coda
-python3 scripts/discover_candidates.py --source eurostat_regional          # live
-python3 scripts/discover_candidates.py --source eurostat_regional --offline # fixture
-
-# promozione (solo approved)
-python3 scripts/promote_candidates.py --offline
-
-# curatore
-python3 scripts/curate.py                       # evidenza sul verso
-python3 scripts/apply_curation.py               # pubblica curation.csv
-
-# revisione dei testi gia scritti
-.venv/bin/python -m scripts.review_queue
-
-# test (tutta la suite)
-.venv/bin/python -m unittest discover -s tests -v
+python3 scripts/pipeline_status.py
 ```
 
-Dopo modifiche ai dati serve **riavviare gunicorn** (loader in `lru_cache` per la
-vita del processo). Il frontend NON va ricostruito per i soli dati (la SPA legge
-`/api/catalog` a runtime; filtri ed etichette fonti sono data-driven).
+Questo documento invecchia, quel comando no. Se i due non concordano, ha ragione
+il comando.
 
-## Agenti
+## Le Routine
 
-Quattro agenti, tutti con un file di definizione in `.claude/agents/`:
-**cacciatore -> [approvazione umana] -> curatore -> scrittore -> revisore**.
-Ognuno ha una coda deterministica che si calcola dai file committati, così una
-sessione nuova sa su che cosa lavorare senza ricordarsi la precedente. La tabella
-sta in [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md).
+Agenti cloud, sessione nuova a ogni firing, checkout git proprio, environment
+`divarioitalia` (`env_01VgKtjzcUbEYYgZb81pYEfS`). Si gestiscono su
+<https://claude.ai/code/routines>.
 
-## Schedulazione (fatta)
+| agente | definizione | cron (UTC) | merge | routine id |
+| --- | --- | --- | --- | --- |
+| scout | `source-scout.md` | `0 5 * * 0` (dom) | manuale | `trig_01KZ1CHGPRgNmF9Ahni9VXfQ` |
+| cacciatore | `indicator-hunter.md` | `0 6 * * 1` (lun) | checks | `trig_01VizeycZocZoeDE1RxjWj1f` |
+| curatore | `indicator-curator.md` | `0 6 * * 4` (gio) | checks | `trig_019EP6TnEbYnKz8VpKFaRm4g` |
+| scrittore | `indicator-writer.md` | `0 6 * * 6` (sab) | auto | `trig_01RymCgC8VsspDrHHnUJgFUk` |
+| revisore | `indicator-reviewer.md` | `0 7 * * *` (ogni giorno) | auto | `trig_01LSZpaDasW18ZvxbKhXBJSj` |
 
-Cacciatore e curatore girano come **Routine Claude Code** (agenti cloud, sessione
-nuova a ogni firing, checkout git proprio, PR-gated). Create il 2026-07-24
-sull'environment `divarioitalia`, modello `claude-opus-4-8`:
+Cadenza sfalsata di proposito: ogni stadio ha senso solo dopo che quello a monte
+ha prodotto qualcosa, e il ritardo è anche la finestra in cui un umano può ancora
+intervenire su un merge `checks`. Il revisore gira ogni giorno perché lavora su
+un arretrato di centinaia di articoli e non su ciò che è appena arrivato.
 
-| agente | file | cron (UTC) | routine id |
-| --- | --- | --- | --- |
-| cacciatore (watchlist) | `.claude/agents/indicator-hunter.md` | `0 6 * * 1` (lun) | `trig_01VizeycZocZoeDE1RxjWj1f` |
-| curatore (verso, categoria) | `.claude/agents/indicator-curator.md` | `0 6 * * 4` (gio) | `trig_019EP6TnEbYnKz8VpKFaRm4g` |
-| scrittore (l'articolo) | `.claude/agents/indicator-writer.md` | `0 6 * * 6` (sab) | *da registrare* |
-| revisore (i testi che esistono) | `.claude/agents/indicator-reviewer.md` | a piacere | *da registrare* |
+**Il prompt di ogni Routine punta ai file, non li ricopia.** Vedi sotto perché.
 
-I quattro agenti hanno ora un file di definizione in `.claude/agents/`, quindi il
-prompt della Routine non deve più riprodurre il contratto a mano: basta invocare
-l'agente. Il revisore non ha una cadenza legata agli altri, perché lavora su un
-arretrato di 362 articoli e non su ciò che è appena arrivato: si lancia quando si
-vuole avanzare sulla coda, anche più volte al giorno.
+## Cosa è successo il 2026-07-26
 
-Lo **scrittore** ha ora un innesco deterministico: `scripts/pending_notes.py`
-elenca gli indicatori integrati senza nota (e le note col vintage indietro), così
-la Routine sa su cosa lavorare invece di ripartire da zero. La cadenza sabato sta
-due giorni dopo il curatore (giovedì), lo stesso sfasamento cacciatore->curatore,
-perché lo scrittore ha senso solo dopo che una integrazione del curatore è a
-monte. La Routine va registrata a mano su <https://claude.ai/code/routines> come
-le altre due (contratto in [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md),
-sezione "Runtime", passi 1-3 dello scrittore); il prompt non apre una PR vuota
-quando `pending_notes.py` non elenca nulla.
+Giornata di lavoro sulla catena, dopo una prova end-to-end che ha trovato tre
+cose rotte e due mancanti.
 
-Le Routine si gestiscono da <https://claude.ai/code/routines> (elenco, modifica,
-esecuzione manuale, disattivazione). Il prompt di ciascuna riproduce il contratto
-in [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md) (sezione "Runtime"): il
-cacciatore esegue i passi 1-3 e si ferma prima della promozione, il curatore
-esegue i passi 1-3 del suo contratto e lancia la suite completa perché tocca il
-punteggio qualità della vita. Nessuno dei due fa merge, e nessuno dei due apre una
-PR vuota quando non c'è nulla da revisionare.
+**Rotto e riparato:**
 
-Cadenza sfalsata di tre giorni per un motivo: il curatore ha senso solo dopo che
-un umano ha approvato la coda del cacciatore e ha girato la promozione.
+- La Routine dello scrittore girava dal 25 luglio scrivendo in
+  `app/static/data/analyst_notes.json`, un file che l'app **non legge più** dalla
+  migrazione al modello a quattro sezioni. Girava, non falliva, e non arrivava in
+  nessuna pagina. Causa: il prompt riproduceva il contratto invece di puntarlo.
+  Ora i prompt puntano a `.claude/agents/` e a `docs/AGENT_CONTRACT.md`, e lo
+  strato `analyst_notes` è stato rimosso (il testo pre-migrazione resta leggibile
+  in git a `9da6c0b`).
+- Il documento diceva che le Routine di scrittore e revisore erano "da
+  registrare". Lo scrittore era registrato da un giorno. Il revisore no.
+- La catena non tornava mai su ciò che aveva già pubblicato: ogni coda drenava
+  una volta e restava a zero, il che faceva sembrare il sistema finito mentre il
+  catalogo invecchiava sotto.
 
-### Niente workflow GitHub per i dati: tutto in locale
+**Aggiunto:**
 
-Scelta operativa: la pipeline dati non gira su GitHub Actions. Il refresh dei
-backbone e del Multiscopo si esegue a mano con `scripts/refresh_official_local.sh`
-(`--check` per il solo controllo hash), come gli altri passi della pipeline
-(promote, curate, apply). Il vecchio `data-refresh.yml` è stato rimosso.
+- `scripts/pipeline_gate.py`, il verdetto deterministico con cui ogni stadio
+  chiude, con `tests/test_pipeline_gate.py` che costruisce prima l'input cattivo.
+- `scripts/pipeline_status.py`, lo stato di tutti e sei gli stadi in un comando.
+- Il rientro: `data_year` in `curation.csv`, `reviewed_vintage` negli articoli.
+- `source-scout`, il quinto agente, e `config/istat_series.yaml` /
+  `config/theme_categories.csv`, i due file che fanno crescere il bacino senza
+  scrivere codice.
 
-Di conseguenza il branch `claude/discovery-schedule-action` (commit `22902fa`),
-che schedulava il cacciatore come workflow GitHub, **non va unito**: contraddice
-questa scelta. Il cacciatore si lancia a mano con
-`python3 scripts/discover_candidates.py --source eurostat_regional`, esattamente
-come nel contratto della Routine (vedi "Runtime" in
-[`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md)).
+## Stato dei dati
 
-## Fatto di recente
+Famiglie in atlante: backbone territoriale, esterni verticali, BES regionale,
+Multiscopo, più le province SDMX. Le due famiglie arrivate dalla catena:
 
-- **Secondo adapter del cacciatore**: `istat_demografia`
-  (`scripts/istat_regional_source.py`), indicatori demografici via SDMX Istat
-  (indice di dipendenza degli anziani e strutturale), con fixture offline. La
-  watchlist non gira più su un'unica fonte.
-- **Scouting delle fonti**: `scripts/scout_sources.py` propone i dataflow SDMX
-  regionali non ancora coperti in `data/discovery/source_candidates.csv`
-  (PR-gated, non tocca l'allowlist). Vedi "Fase 2b" in `DISCOVERY_PIPELINE.md`.
+- **Eurostat regionale (NUTS2)**, `eurostat_regional`. `eur:rd_e_gerdreg` (spesa
+  R&S sul PIL) e `eur:rd_p_persreg` (personale addetto a R&S): scoperti,
+  promossi, curati con verso `higher_better` confermato dai dati, **entrambi nel
+  punteggio qualità della vita**. PIL pro capite (`nama_10r_2gdp`) riconosciuto
+  `proxy` dell'id territoriale 901: arricchisce quell'indicatore, non è una voce
+  separata.
+- **Indicatori demografici Istat**, `istat_demografia`. `dem:OLDAGEDEPR` (indice
+  di dipendenza degli anziani): prima serie non Eurostat ad attraversare tutta la
+  catena. Verso `contextual` confermato, quindi integrato e descritto ma **fuori
+  dal punteggio**: un rapporto di dipendenza non ha un migliore.
+  `istat_demografia:DEPENDRATE` è fermo a `needs-info`, perché si sovrappone in
+  parte a OLDAGEDEPR e la scelta fra tenerne uno o entrambi non è stata presa.
 
-## Cosa NON è ancora fatto (prossimi passi)
+## Cosa resta umano, e perché
 
-1. **Cablare le fonti proposte dallo scout**: dopo l'approvazione umana di una
-   proposta in `source_candidates.csv`, scrivere l'adapter del cacciatore per
-   quel dominio (come `istat_regional_source` per la demografia).
-2. **Estendere la watchlist**: altre serie Eurostat/istituzionali, poi livello
-   provinciale (NUTS3), sempre priorità al regionale fresco.
-3. **Profili regionali** (`app/profiles.py`): oggi calcolati sui soli territoriali
+1. **Ammettere una fonte** (`scout`, merge `manual`). Decide quale istituzione,
+   quale licenza e quale nome legge un utente su una pagina pubblica.
+2. **Scrivere un adapter** per una fonte che non è un dataflow SDMX Istat. È
+   codice, e nessun agente scrive codice.
+3. **Creare una categoria** della qualità della vita. È una sezione del sito con
+   un nome, una descrizione e una macro-area, non una riga di mappatura.
+
+## Cosa non è ancora fatto
+
+1. **Le 40 proposte dello scout** in `data/discovery/source_candidates.csv` sono
+   tutte `new`: nessuna è mai stata valutata. È il primo collo di bottiglia della
+   catena, ed è per questo che lo scout gira per primo nella settimana.
+2. **Il secondo adapter di famiglia**: oggi la catena cabla da sola solo dataflow
+   SDMX Istat. Eurostat resta a selezione curata in `EUROSTAT_SERIES`, dentro
+   `scripts/eurostat_source.py`, quindi ammettere una serie Eurostat è ancora
+   codice. Stessa forma dell'adapter Istat, quindi lo stesso trattamento a
+   config è possibile.
+3. **Profili regionali** (`app/profiles.py`): calcolati sui soli territoriali
    core, non includono ancora le famiglie esterne.
-4. **Migrazione URL**: se serve, ripulire eventuali link storici residui; i 301
-   coprono territoriali, BES e Multiscopo.
+4. **Livello provinciale (NUTS3)** nella watchlist, sempre con priorità al
+   regionale fresco.
 
 ## Gotcha per la prossima sessione
 
 - Gli id BES contengono trattini (es. `09PAE009-N25`): per questo il codice
-  `<acr>-<id>` è un **segmento separato in coda** (`/indicatore/<slug>/bes-09PAE009-N25`),
-  e lo slug non è mai fuso con l'id.
+  `<acr>-<id>` è un **segmento separato in coda**
+  (`/indicatore/<slug>/bes-09PAE009-N25`), e lo slug non è mai fuso con l'id.
 - Non hardcodare etichette fonte o URL indicatore: passano tutti da
-  `app/sources.py`.
-- Gli script `scripts/*discovery*/curate/promote/eurostat_source` sono **stdlib
-  puri** (niente import di `app.*` a load-time): devono girare nell'agente
-  schedulato senza Flask.
-- Cache grezza Eurostat (`data/eurostat_cache/`) gitignorata; committati solo i
-  fixture in `data/discovery/fixtures/`.
+  `app/sources.py`. Non cablare mai un prefisso di famiglia.
+- Gli script della catena sono **stdlib puri** (niente import di `app.*` a
+  load-time): devono girare nell'agente schedulato senza Flask.
+- Cache grezza Eurostat (`data/eurostat_cache/`) e Istat (`data/istat_cache/`)
+  gitignorate; committati solo i fixture in `data/discovery/fixtures/`.
 - Il curatore non dichiara mai `exact`; `score_eligible=true` è rifiutato se il
   verso non è direzionale.
 - **Bolzano+Trento**: BES e territoriali ricevono già da Istat l'aggregato
   Trentino Alto Adige. Eurostat e Multiscopo lo combinano con **media pesata per
-  popolazione** (`multiscopo_sources.TRENTINO_WEIGHTS`,
-  `eurostat_source` via `nama_10r_3popgdp`), non con media semplice.
-- `indicator_page.html` è condiviso da territoriali ed Eurostat: usa
-  `meta.institution` e `meta.license_url` (fallback Istat), quindi le pagine
-  Eurostat mostrano licenza CC BY 4.0 e "fonte Eurostat", non Istat.
+  popolazione**, non con media semplice.
+- **Niente workflow GitHub per i dati**: il refresh dei backbone e del Multiscopo
+  si esegue a mano con `scripts/refresh_official_local.sh`. Il branch
+  `claude/discovery-schedule-action` (commit `22902fa`), che schedulava il
+  cacciatore come workflow GitHub, **non va unito**: contraddice questa scelta.
+- In una shell dell'utente `python3` è una funzione che rilancia il comando
+  quando esce non-zero, quindi l'output di uno script che fallisce **appare due
+  volte**. Non è un bug del programma.
