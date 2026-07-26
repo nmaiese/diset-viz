@@ -155,7 +155,7 @@ only) scans allowlisted institutional sources (`config/external_sources.yaml`)
 and writes candidates to `data/discovery/candidates.csv`; a human approves them
 in a PR (`triage_status=approved`); then `scripts/promote_candidates.py` writes
 rows into the external layer (a new indicator becomes a standalone atlas entry
-under the `eur:` id namespace via `app/eurostat_atlas.py`). A second **curator**
+under the `eur:` id namespace via `app/external_atlas.py`). A second **curator**
 step (`scripts/curate.py` for the direction evidence, `data/discovery/curation.csv`
 for the reviewed decision, `scripts/apply_curation.py` to publish) verifies the
 verso against the data, reviews the description, and sets `score_eligible` so the

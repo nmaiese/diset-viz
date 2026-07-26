@@ -32,7 +32,7 @@ from app.indicator_notes import build_bes_indicator_explain, display_unit
 from app.profiles import SCOREABLE_DIRECTIONS, slugify
 from app.taxonomy import category_metadata
 
-EUR_ID_PREFIX = sources.SOURCES["eurostat"]["internal_prefix"]  # "eur:"
+
 MIN_INDEXABLE_YEAR = 2020
 # Reviewed plain-language descriptions written by the curator (apply_curation.py).
 CURATED_DESC_PATH = Path(__file__).resolve().parent / "static" / "data" / "external" / "curated_descriptions.csv"
@@ -70,7 +70,7 @@ def _raw_id(public_id):
     return str(public_id)[len(prefix):]
 
 
-def eurostat_indicator_path(raw_id, name, family="eurostat"):
+def external_indicator_path(raw_id, name, family):
     return sources.indicator_url(family, raw_id, slugify(name))
 
 
@@ -95,7 +95,7 @@ def _rows_by_target():
     return dict(grouped)
 
 
-def has_eurostat_data():
+def has_external_data():
     return bool(_rows_by_target())
 
 
@@ -115,7 +115,7 @@ def _curated_descriptions():
         }
 
 
-def eurostat_regional_scoreables():
+def external_regional_scoreables():
     """public_id -> scoring metadata for Eurostat indicators the curator has
     marked score-eligible with a scoreable direction. This is the gate the
     quality-of-life selection reads: nothing here until a human confirms the
@@ -178,7 +178,7 @@ def _explain_with_curation(public_id, explain):
     return result
 
 
-def get_eurostat_atlas_indicator(public_id):
+def get_external_atlas_indicator(public_id):
     """One Eurostat regional indicator in the atlas API shape, or None."""
     family = _family_of(public_id)
     if family is None:
@@ -257,18 +257,18 @@ def get_eurostat_atlas_indicator(public_id):
         "freshness_year_max": latest_year,
         "catalog_family": family,
         "catalog_family_label": source_label,
-        "path": eurostat_indicator_path(raw_id, first["name"], family),
+        "path": external_indicator_path(raw_id, first["name"], family),
     }
     return {"metadata": metadata, "series": series}
 
 
 @lru_cache(maxsize=1)
-def all_eurostat_indicators():
+def all_external_indicators():
     """Catalog entries for every standalone Eurostat indicator, with an
     `indexable` flag for the sitemap."""
     indicators = []
     for public_id in sorted(_rows_by_target()):
-        payload = get_eurostat_atlas_indicator(public_id)
+        payload = get_external_atlas_indicator(public_id)
         if payload is None:
             continue
         meta = payload["metadata"]

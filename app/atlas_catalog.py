@@ -13,7 +13,7 @@ import unicodedata
 from app import sources
 from app.bes_data import BES_SOURCE_URLS, bes_indicator_path, get_bes_manifest, get_bes_rows
 from app.data import REGION_ORDER, get_catalog, get_indicator
-from app.eurostat_atlas import all_eurostat_indicators, get_eurostat_atlas_indicator, has_eurostat_data
+from app.external_atlas import all_external_indicators, get_external_atlas_indicator, has_external_data
 from app.indicator_notes import build_bes_indicator_explain
 from app.multiscopo_data import (
     SOURCE_URL as MULTISCOPO_SOURCE_URL,
@@ -321,12 +321,12 @@ def get_atlas_catalog():
     ] if has_multiscopo_data() else []
     eurostat_indicators = [
         {
-            **_catalog_entry(get_eurostat_atlas_indicator(item["id"])),
+            **_catalog_entry(get_external_atlas_indicator(item["id"])),
             "quality_life_scored": item["id"] in score_selection,
             "quality_life_category": score_selection.get(item["id"]),
         }
-        for item in all_eurostat_indicators()
-    ] if has_eurostat_data() else []
+        for item in all_external_indicators()
+    ] if has_external_data() else []
     # `eurostat_indicators` holds every externally sourced family, not only
     # Eurostat: each entry already carries its own `catalog_family`, so the
     # per-family counts below are derived from the entries instead of assumed.
@@ -436,7 +436,7 @@ def get_atlas_indicator(indicator_id):
             },
         }
     if _is_external_id(indicator_id):
-        payload = get_eurostat_atlas_indicator(str(indicator_id))
+        payload = get_external_atlas_indicator(str(indicator_id))
         if payload is None:
             return None
         category = regional_quality_life_selection().get(str(indicator_id))

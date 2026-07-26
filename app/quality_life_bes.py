@@ -47,11 +47,11 @@ from app.bes_data import (
     get_bes_territories,
     has_bes_data,
 )
-from app.eurostat_atlas import (
-    eurostat_indicator_path,
-    eurostat_regional_scoreables,
-    get_eurostat_atlas_indicator,
-    has_eurostat_data,
+from app.external_atlas import (
+    external_indicator_path,
+    external_regional_scoreables,
+    get_external_atlas_indicator,
+    has_external_data,
 )
 from app.multiscopo_data import (
     get_multiscopo_manifest,
@@ -246,11 +246,11 @@ def _matrix_and_meta(level):
                     "source_family": "multiscopo",
                 }
 
-        if has_eurostat_data():
-            scoreables = eurostat_regional_scoreables()
+        if has_external_data():
+            scoreables = external_regional_scoreables()
             for public_id in (i for i in selection if i.startswith(EUR_PREFIX)):
                 info = scoreables.get(public_id)
-                payload = get_eurostat_atlas_indicator(public_id)
+                payload = get_external_atlas_indicator(public_id)
                 if info is None or payload is None:
                     continue
                 meta_src = payload["metadata"]

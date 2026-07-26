@@ -11,7 +11,7 @@ import unittest
 
 from app import app
 from app.atlas_catalog import get_atlas_catalog, get_atlas_indicator
-from app.eurostat_atlas import all_eurostat_indicators, has_eurostat_data
+from app.external_atlas import all_external_indicators, has_external_data
 
 
 class EurostatAtlasFamilyTest(unittest.TestCase):
@@ -19,8 +19,8 @@ class EurostatAtlasFamilyTest(unittest.TestCase):
         self.client = app.test_client()
 
     def test_pilot_data_present(self):
-        self.assertTrue(has_eurostat_data())
-        ids = {item["id"] for item in all_eurostat_indicators()}
+        self.assertTrue(has_external_data())
+        ids = {item["id"] for item in all_external_indicators()}
         self.assertIn("eur:rd_e_gerdreg", ids)
 
     def test_standalone_indicator_in_federated_catalog(self):
@@ -58,7 +58,7 @@ class EurostatAtlasFamilyTest(unittest.TestCase):
     def test_enriching_overlap_is_not_a_separate_entry(self):
         # The Eurostat GDP series is a proxy of territorial 901: it enriches 901
         # and must NOT appear as its own catalog entry.
-        ids = {item["id"] for item in all_eurostat_indicators()}
+        ids = {item["id"] for item in all_external_indicators()}
         self.assertNotIn("eur:nama_10r_2gdp", ids)
 
     def test_scored_after_curation(self):
@@ -90,10 +90,10 @@ class EveryExternalFamilyIsReachable(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         from app import sources
-        from app.eurostat_atlas import all_eurostat_indicators
+        from app.external_atlas import all_external_indicators
 
         by_family = {}
-        for item in all_eurostat_indicators():
+        for item in all_external_indicators():
             by_family.setdefault(item["catalog_family"], item)
         cls.by_family = by_family
         cls.declared = [

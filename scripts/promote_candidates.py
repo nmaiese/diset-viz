@@ -54,8 +54,8 @@ MANIFEST_COLUMNS = [
 ]
 
 # A real overlap enriches an existing indicator (target = the existing id); a
-# genuinely new series becomes a standalone atlas entry under the "eur:" public
-# id namespace, wired into the federated catalog by app/eurostat_atlas.py.
+# genuinely new series becomes a standalone atlas entry under its own family's public
+# id namespace, wired into the federated catalog by app/external_atlas.py.
 ENRICHING_MATCHES = {"exact", "compatible", "proxy"}
 
 
@@ -179,7 +179,7 @@ def _merge_dataset(existing, new_rows, curated_series=()):
     `curated_series` is the set of (source, source_indicator_id) the curator has
     already signed off. Their reviewed fields survive the refresh: the dataset
     rows carry `direction`, `score_eligible` and `quality_life_category` too, and
-    those are what app.eurostat_atlas actually reads to decide whether an
+    those are what app.external_atlas actually reads to decide whether an
     indicator is in the quality-of-life score. Protecting only the manifest was
     not enough, and a re-promotion silently dropped a live indicator out of the
     ranking while the manifest still said `integrated`.
@@ -247,7 +247,7 @@ def _merge_manifest(existing, new_entries):
 # What the curator owns once an indicator is integrated. A re-promotion refreshes
 # the data and the headline year; it must not undo the review. The two lists
 # differ because the manifest and the dataset carry different reviewed fields,
-# and app.eurostat_atlas reads the *dataset* ones to build the score.
+# and app.external_atlas reads the *dataset* ones to build the score.
 CURATED_FIELDS = ("direction", "score_eligible", "status", "review_notes")
 CURATED_DATASET_FIELDS = ("direction", "score_eligible", "quality_life_category")
 

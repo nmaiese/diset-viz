@@ -16,14 +16,14 @@ def _clear_lru_caches():
     import app.data
     import app.atlas_catalog
     import app.indicator_view
-    import app.eurostat_atlas
+    import app.external_atlas
     import app.blog
 
     modules = [
         app.data,
         app.atlas_catalog,
         app.indicator_view,
-        app.eurostat_atlas,
+        app.external_atlas,
         app.blog,
     ]
     for module in modules:

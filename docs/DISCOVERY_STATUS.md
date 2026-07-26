@@ -35,7 +35,7 @@ senza merge.
   (`eur:` Eurostat, `dem:` indicatori demografici Istat), un `compatible`/`proxy`
   arricchisce l'indicatore Istat che punta. Al termine lo script scrive da sé
   `triage_status=promoted` in coda.
-- `app/eurostat_atlas.py` adatta le righe di **ogni famiglia esterna** al contratto
+- `app/external_atlas.py` adatta le righe di **ogni famiglia esterna** al contratto
   API dell'atlante, federato in `app/atlas_catalog.py`
   (`get_atlas_catalog`/`get_atlas_indicator`/`source_families`). Il prefisso
   dell'id sceglie la famiglia, la famiglia decide istituzione, etichetta e licenza.

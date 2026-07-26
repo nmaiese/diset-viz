@@ -66,13 +66,13 @@ class CatalogSummaryTest(unittest.TestCase):
 
 class FederatedAtlasCatalogTest(unittest.TestCase):
     def test_catalog_adds_every_non_duplicate_regional_bes_indicator_without_mutating_legacy_catalog(self):
-        from app.eurostat_atlas import all_eurostat_indicators
+        from app.external_atlas import all_external_indicators
 
         legacy = get_catalog()
         federated = get_atlas_catalog()
         bes_count = len(get_bes_manifest("regione")) - len(DUPLICATE_BES_IDS)
         multiscopo_count = len(get_multiscopo_manifest())
-        eurostat_count = len(all_eurostat_indicators())
+        eurostat_count = len(all_external_indicators())
 
         self.assertEqual(
             len(federated["indicators"]),

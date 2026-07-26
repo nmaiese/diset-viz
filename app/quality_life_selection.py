@@ -11,7 +11,7 @@ from functools import lru_cache
 
 from app import sources
 from app.bes_data import MIN_PUBLIC_COVERAGE, get_bes_manifest
-from app.eurostat_atlas import eurostat_regional_scoreables, has_eurostat_data
+from app.external_atlas import external_regional_scoreables, has_external_data
 from app.multiscopo_data import get_multiscopo_manifest, has_multiscopo_data
 from app.profiles import SCOREABLE_DIRECTIONS
 from app.quality_life import quality_life_indicator_set
@@ -87,10 +87,10 @@ def regional_quality_life_selection():
             selected[f"{MULTI_PREFIX}{raw_id}"] = info["category"]
             used_names.add(name)
 
-    if has_eurostat_data():
-        for public_id, info in eurostat_regional_scoreables().items():
+    if has_external_data():
+        for public_id, info in external_regional_scoreables().items():
             # Direction and score-eligibility are the curator's reviewed verdict
-            # (eurostat_regional_scoreables already enforces both); here we only
+            # (external_regional_scoreables already enforces both); here we only
             # add coverage and freshness gates, consistent with the other families.
             if info["year_max"] is None or info["year_max"] < REGIONAL_EUR_MIN_YEAR:
                 continue

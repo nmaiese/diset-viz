@@ -102,7 +102,7 @@ Colonne in `scripts/discovery.py:CANDIDATE_COLUMNS`. I campi chiave:
 
 `app/external_data.py` **arricchisce** indicatori già presenti (freschezza, fonti,
 badge). Per pubblicare un indicatore Eurostat **nuovo** come voce autonoma c'è
-`app/eurostat_atlas.py`: legge dal layer esterno le righe con
+`app/external_atlas.py`: legge dal layer esterno le righe con
 `target_indicator_id` nel namespace `eur:` e `atlas_eligible=true` e le adatta al
 **contratto API dell'atlante** identico a quello territoriale/BES, così mappa,
 pagina, ricerca, categoria, direzione, URL e sitemap funzionano senza casi

@@ -31,7 +31,7 @@ from app.multiscopo_data import (
     has_multiscopo_data,
     multiscopo_indicator_path,
 )
-from app.eurostat_atlas import all_eurostat_indicators, get_eurostat_atlas_indicator, has_eurostat_data
+from app.external_atlas import all_external_indicators, get_external_atlas_indicator, has_external_data
 from app.taxonomy import DUPLICATE_BES_IDS, category_metadata
 from app import profiles, sources
 
@@ -137,7 +137,7 @@ def _multi_region_payload(indicator_id, year):
 @cache.memoize(timeout=3600)
 def _eurostat_region_payload(indicator_id, year):
     """Adapt one Eurostat regional indicator to the atlas quiz shape."""
-    payload = get_eurostat_atlas_indicator(indicator_id)
+    payload = get_external_atlas_indicator(indicator_id)
     if payload is None or payload["metadata"]["year_max"] != year:
         return None
     meta = payload["metadata"]
@@ -247,10 +247,10 @@ def _multiscopo_quiz_indicators():
 
 @cache.memoize(timeout=3600)
 def _eurostat_quiz_indicators():
-    if not has_eurostat_data():
+    if not has_external_data():
         return []
     pool = []
-    for item in all_eurostat_indicators():
+    for item in all_external_indicators():
         year = item["year_max"]
         payload = _eurostat_region_payload(item["id"], year)
         if payload is None:

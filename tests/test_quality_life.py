@@ -196,8 +196,8 @@ class QualityLifeStaticTest(unittest.TestCase):
         }
         qls.regional_quality_life_selection.cache_clear()
         try:
-            with mock.patch.object(qls, "has_eurostat_data", return_value=True), \
-                 mock.patch.object(qls, "eurostat_regional_scoreables", return_value=clone):
+            with mock.patch.object(qls, "has_external_data", return_value=True), \
+                 mock.patch.object(qls, "external_regional_scoreables", return_value=clone):
                 selection = qls.regional_quality_life_selection()
             self.assertNotIn("eur:clone_of_an_existing_name", selection)
         finally:

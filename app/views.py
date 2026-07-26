@@ -28,7 +28,7 @@ from app import indicator_view
 from app import quality_life_bes as qb
 from app import bes_data
 from app import multiscopo_data
-from app import eurostat_atlas
+from app import external_atlas
 from app import external_manifest
 from app import game
 from app import quiz
@@ -1046,8 +1046,8 @@ def sitemap():
                 "lastmod": f"{item['year_max']}-12-31",
                 "priority": "0.6",
             })
-    if eurostat_atlas.has_eurostat_data():
-        for item in eurostat_atlas.all_eurostat_indicators():
+    if external_atlas.has_external_data():
+        for item in external_atlas.all_external_indicators():
             if not item["indexable"]:
                 continue
             pages.append({

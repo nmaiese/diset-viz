@@ -65,7 +65,7 @@ SOURCES = {
 }
 
 # Families whose indicators are published through the normalized external layer
-# (discovery -> promotion -> app.eurostat_atlas), rather than from a committed
+# (discovery -> promotion -> app.external_atlas), rather than from a committed
 # backbone CSV. `feeds` names the hunter adapters that write into them: several
 # adapters can land in one family, so adding a second demographic dataflow does
 # NOT mint a new URL acronym.
