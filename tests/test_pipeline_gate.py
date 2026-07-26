@@ -202,6 +202,50 @@ class CurationDecisions(unittest.TestCase):
         self.assertFalse(check.ok)
 
 
+class ChecksThatCannotRunAreNotPasses(unittest.TestCase):
+    """The weakest thing a gate can do is report green because it looked away.
+
+    `check_writer_vintage` needs the app view model. On a fresh cloud checkout
+    that import fails, and returning a pass there would hand `merge: auto` to a
+    writer whose prose is pinned to a year the data has not reached. The drift
+    guard in the suite only fires when a vintage falls *behind*, so nothing else
+    would ever notice.
+    """
+
+    def test_an_unverifiable_vintage_blocks_instead_of_passing(self):
+        original = pipeline_gate.changed_text_keys
+        pipeline_gate.changed_text_keys = lambda base=None, cwd=None: ["eur:fake"]
+        try:
+            import builtins
+
+            real_import = builtins.__import__
+
+            def refuse_app(name, *args, **kwargs):
+                if name.startswith("app"):
+                    raise ModuleNotFoundError("no app here")
+                return real_import(name, *args, **kwargs)
+
+            builtins.__import__ = refuse_app
+            try:
+                check = pipeline_gate.check_writer_vintage()
+            finally:
+                builtins.__import__ = real_import
+        finally:
+            pipeline_gate.changed_text_keys = original
+        self.assertFalse(check.ok, "un controllo che non puo' girare non e' un controllo superato")
+        self.assertIn("venv", check.detail)
+
+    def test_nothing_to_verify_is_still_a_pass(self):
+        """Precision matters: a stage that touched no article owes no vintage."""
+        original = pipeline_gate.changed_text_keys
+        pipeline_gate.changed_text_keys = lambda base=None, cwd=None: []
+        try:
+            check = pipeline_gate.check_writer_vintage()
+        finally:
+            pipeline_gate.changed_text_keys = original
+        self.assertTrue(check.ok, check.detail)
+
+
 class Verdict(unittest.TestCase):
     def test_a_red_check_leaves_no_merge_mode(self):
         """There is nothing to negotiate between "the checks failed" and "but

@@ -150,6 +150,35 @@ def resolve_base(base=None, cwd=None):
     return None
 
 
+def check_base_is_usable(base=None, cwd=None):
+    """The base has to be an ancestor of HEAD, or every verdict below is fiction.
+
+    `resolve_base` falls through `base` -> `origin/master` -> `master`, and a
+    fresh checkout can have a `master` that trails `origin/master`. When that
+    happens the diff contains every commit the branch did *not* make, the
+    perimeter check lists thirty untouched files as violations, and the stage
+    reads `blocked`. Its contract then tells it "the error is in your work, never
+    in the gate", which leaves an autonomous agent with no way out of a wrong
+    diagnosis: it will keep rewriting correct work.
+
+    So a base that cannot explain the diff is a failure of the gate, reported as
+    one, rather than a silent mismeasurement of the branch.
+    """
+    resolved = resolve_base(base, cwd=cwd)
+    if not resolved:
+        return Check("base", True, "nessuna base di confronto, giudizio sul solo working tree")
+    code, _, _ = _git("merge-base", "--is-ancestor", resolved, "HEAD", cwd=cwd)
+    if code != 0:
+        return Check(
+            "base",
+            False,
+            f"la base '{resolved}' non e' un antenato di HEAD: il diff misurato non e' il lavoro "
+            f"di questo branch. Aggiorna la base (git fetch) o passala con --base, e NON correggere "
+            f"il lavoro sulla scorta di questo verdetto.",
+        )
+    return Check("base", True, f"confronto contro {resolved}")
+
+
 def changed_paths(base=None, cwd=None):
     """Repo-relative paths this branch touches, committed and uncommitted.
 
@@ -368,7 +397,19 @@ def check_writer_vintage(base=None, cwd=None):
         from app import sources  # noqa: PLC0415  (optional: needs the app venv)
         from app.indicator_view import build_indicator_view
     except Exception as exc:  # pragma: no cover - only without the venv
-        return Check("vintage", True, f"controllo saltato, l'app non e' importabile ({type(exc).__name__})")
+        # Deliberately a failure, not a skip. This is the only thing standing
+        # between an autonomous writer and prose pinned to numbers that do not
+        # exist yet, and it runs on the two stages whose merge mode is `auto`.
+        # A check that passes because it could not run is worse than no check:
+        # it reads green. The venv is one command away and both stages need it
+        # for the suite anyway, so "cannot verify" means "not ready to publish".
+        return Check(
+            "vintage",
+            False,
+            f"impossibile verificare il vintage di {len(keys)} articoli: l'app non e' importabile "
+            f"({type(exc).__name__}). Crea il venv "
+            f"(python3 -m venv .venv && .venv/bin/pip install -r requirements.txt) e rilancia.",
+        )
     entries = json.loads((PROJECT_ROOT / INDICATOR_TEXTS).read_text(encoding="utf-8"))
     ahead = []
     for key in keys:
@@ -411,7 +452,7 @@ def check_suite(cwd=None):
     return Check("suite", True, summary[:200] or "suite verde")
 
 
-def build_verdict(stage, paths, checks):
+def build_verdict(stage, paths, checks, base=None):
     """Assemble the answer. Separate from `run` so the policy can be tested
     without a git tree, which is the only way to assert that a red gate really
     does refuse to name a merge mode."""
@@ -419,6 +460,9 @@ def build_verdict(stage, paths, checks):
     return {
         "stage": stage,
         "ok": ok,
+        # Reported, not implied: a verdict nobody can reproduce is not evidence,
+        # and the base is the single input that decides what "the diff" even means.
+        "base": base,
         # A red gate has no merge mode at all: there is nothing to argue about
         # between "the checks failed" and "but only a little".
         "merge": MERGE_POLICY[stage] if ok else "blocked",
@@ -433,6 +477,8 @@ def run(stage, base=None, skip_tests=False, cwd=None):
         raise SystemExit(f"stadio sconosciuto '{stage}'. Noti: {', '.join(sorted(STAGE_PATHS))}")
     paths = changed_paths(base, cwd=cwd)
     checks = [
+        # First, because every check under it is measured against this base.
+        check_base_is_usable(base, cwd=cwd),
         check_blast_radius(stage, paths),
         check_whitespace(cwd=cwd),
         check_no_coauthor_trailer(base, cwd=cwd),
@@ -447,7 +493,7 @@ def run(stage, base=None, skip_tests=False, cwd=None):
         checks.append(check_writer_vintage(base, cwd=cwd))
     if not skip_tests:
         checks.append(check_suite(cwd=cwd))
-    return build_verdict(stage, paths, checks)
+    return build_verdict(stage, paths, checks, base=resolve_base(base, cwd=cwd))
 
 
 def main():
@@ -466,6 +512,7 @@ def main():
         print(json.dumps(verdict, ensure_ascii=False, indent=2))
     else:
         print(f"stadio {verdict['stage']}: {'VERDE' if verdict['ok'] else 'BLOCCATO'}  (merge: {verdict['merge']})")
+        print(f"  base: {resolve_base(args.base) or 'nessuna (solo working tree)'}")
         for check in verdict["checks"]:
             print(f"  [{'ok ' if check['ok'] else 'NO '}] {check['check']}: {check['detail']}")
         if verdict["paths"]:
