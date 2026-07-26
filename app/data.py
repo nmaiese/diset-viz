@@ -580,7 +580,26 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
     avg_change_abs = avg_change_pct = None
     if has_multi_year and year_avg is not None and year_min_avg is not None:
         avg_change_abs = year_avg - year_min_avg
-        if year_min_avg:
+        # A percentage change needs a base that is actually a quantity. On the
+        # two Invalsi indicators (549 matematica, 569 inglese) the values are
+        # standardised scores centred on zero, and the mean of the first year
+        # lands on a denormal like -2.7e-19: not `0.0`, so the old falsy guard
+        # let it through, and the division produced a "variazione" of 3.3e+18
+        # per cent. That number reached the fixture in tests/fixtures, the
+        # trend_framing() helper and the page.
+        #
+        # Worse for an autonomous chain: the residue depends on the summation
+        # order, so the same commit produced a different absurd number in a
+        # cloud checkout than it does here. The suite compares against the
+        # fixture, so it failed there and passed here, and the gate blocked
+        # every stage on a difference that meant nothing. The reviewer agent
+        # found it, refused to merge, and reported it as out of its perimeter.
+        #
+        # The test is scale-free rather than a magic epsilon: if the base is a
+        # millionth of the magnitudes in play, it is zero for this purpose and
+        # a relative change is undefined, not merely large.
+        scale = max(abs(year_min_avg), abs(year_avg), abs(avg_change_abs))
+        if scale and abs(year_min_avg) / scale > 1e-6:
             avg_change_pct = avg_change_abs / year_min_avg * 100
 
     gap_abs = gap_ratio = None
