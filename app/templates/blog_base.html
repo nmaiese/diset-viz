@@ -50,7 +50,7 @@
         <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Fonte Istat</a>
         <span class="nav-underline" aria-hidden="true"></span>
       </nav>
-      <a class="masthead__search" href="/atlante" aria-label="Cerca nell'atlante">
+      <a class="masthead__search" href="/ricerca" aria-label="Cerca nel sito">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <circle cx="11" cy="11" r="8"></circle>
           <path d="m21 21-4.3-4.3"></path>
@@ -77,7 +77,9 @@
       </div>
       <div class="mobmenu__search">
         <p class="mobmenu__eyebrow">Menu</p>
-        <form action="/atlante" method="get" role="search">
+        {# /ricerca, non /atlante: la ricerca del sito deve rispondere anche senza
+           JavaScript e comprendere gli articoli, non solo il catalogo. #}
+        <form action="/ricerca" method="get" role="search">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>
           </svg>
@@ -89,7 +91,8 @@
         <a class="mobmenu__item {{ 'is-active' if active_nav == 'atlas' }}" href="/atlante"><span>Atlante</span><span class="k">Mappa e indicatori</span></a>
         <a class="mobmenu__item {{ 'is-active' if active_nav == 'regioni' }}" href="/regioni"><span>Regioni</span><span class="k">20 schede</span></a>
         <a class="mobmenu__item {{ 'is-active' if active_nav == 'temi' }}" href="/temi"><span>Temi</span><span class="k">Per macro-area</span></a>
-        <a class="mobmenu__item" href="/atlante?view=confronto"><span>Confronta</span><span class="k">Regione contro regione</span></a>
+        <a class="mobmenu__item" href="/confronto"><span>Confronta</span><span class="k">Regione contro regione</span></a>
+        <a class="mobmenu__item {{ 'is-active' if active_nav == 'divari' }}" href="/divari-regionali"><span>Divari regionali</span><span class="k">Nord, Centro, Mezzogiorno</span></a>
 
         <p class="mobmenu__group">Classifiche</p>
         <a class="mobmenu__item {{ 'is-active' if active_nav == 'qualita-della-vita' }}" href="/qualita-della-vita/classifica/regioni"><span>Qualità della vita, regioni</span><span class="k">Classifica regioni</span></a>
@@ -112,7 +115,7 @@
 
     <footer class="site-footer">
       <span>{{ site_name }} · dati <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Istat</a>, indicatori territoriali per le politiche di sviluppo</span>
-      <span><a href="/atlante">Esplora l'atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/blog">Tutti gli articoli</a> · <a href="/privacy">Privacy e cookie</a></span>
+      <span><a href="/atlante">Esplora l'atlante</a> · <a href="/divari-regionali">Divari regionali</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/blog">Tutti gli articoli</a> · <a href="/privacy">Privacy e cookie</a></span>
       {% block footer_privacy_settings %}
       {% include "_funding_choices_revoke.html" %}
       {% endblock %}

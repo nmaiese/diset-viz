@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Confronta le regioni italiane</title>
+    <meta name="description" content="Scegli due o tre regioni e mettile a confronto su un indicatore: valore dell'ultimo anno, posizione in classifica e serie storica.">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <link rel="canonical" href="{{ SITE_URL }}/confronto">
+    <meta property="og:title" content="Confronta le regioni italiane">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ SITE_URL }}/confronto">
+    <meta property="og:description" content="Due o tre regioni, un indicatore alla volta: valori, classifica e serie storica a paragone.">
+    <meta property="og:image" content="{{ SITE_URL }}/static/img/og-divario-italia.svg">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ SITE_URL }}/" },
+        { "@type": "ListItem", "position": 2, "name": "Confronta", "item": "{{ SITE_URL }}/confronto" }
+      ]
+    }
+    </script>
+    <script>
+      window.__diSpaPageView = true;
+      /* La SPA vive su /atlante come stato ?view=..., ma il confronto ha una URL
+         pubblica sola, questa. Il flag dice al bundle quale vista aprire quando
+         non c'e' un ?view= nella query, cosi' il percorso non finisce mai a
+         dire una cosa e la query un'altra. */
+      window.__diInitialView = "confronto";
+    </script>
+    {% set TRACK_SERVER_PAGE_VIEW = false %}
+    {% include "_third_party_head.html" %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+    <script type="module" crossorigin src="{{ url_for('static', filename='dist/assets/index.js') }}"></script>
+    <link rel="stylesheet" crossorigin href="{{ url_for('static', filename='dist/assets/index.css') }}">
+  </head>
+  <body>
+    {% include "_third_party_body.html" %}
+    <div id="root">
+      <main class="spa-seo-fallback">
+        <nav aria-label="Percorso">
+          <a href="/">Home</a>
+          <a href="/confronto" aria-current="page">Confronta</a>
+        </nav>
+        <h1>Confronta le regioni italiane</h1>
+        <p>Scegli due o tre regioni e guarda come si comportano sullo stesso indicatore. Il comparatore mostra il valore dell'ultimo anno, la posizione in classifica e la serie storica delle regioni che hai scelto, con la media semplice delle regioni come riferimento.</p>
+        {% if compare_preview %}
+        {% for row in compare_preview.rows %}
+        <section aria-label="{{ row.name }}">
+          <h2>{{ row.name }}, {{ row.year }}</h2>
+          <ul>
+            {% for e in row.entries %}
+            <li>
+              <a href="{{ row.path }}">{{ e.name }}</a>
+              <span>{{ e.value }} {{ e.unit }}, {{ e.rank }}ª su {{ e.total }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endfor %}
+        {% endif %}
+        <section aria-label="Da dove partire">
+          <h2>Altri modi di leggere gli stessi dati</h2>
+          <ul>
+            {% for item in featured_indicators %}
+            <li>
+              <a href="{{ item.path }}">{{ item.name }}</a>
+              <span>{{ item.theme }}, ultimo anno {{ item.year }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </section>
+        <nav aria-label="Percorsi principali">
+          <a href="/atlante">Atlante completo</a>
+          <a href="/divari-regionali">Divari regionali</a>
+          <a href="/regioni">Schede regione</a>
+          <a href="/temi">Indicatori per tema</a>
+          <a href="/qualita-della-vita/classifica/regioni">Qualità della vita</a>
+          <a href="/metodologia">Metodologia e fonti</a>
+        </nav>
+        <p>Il confronto usa lo stesso catalogo delle pagine indicatore, quindi i valori che leggi qui sono quelli delle schede. Ogni scheda porta definizione, fonte, ultimo anno disponibile e copertura territoriale.</p>
+      </main>
+    </div>
+    <footer class="spa-seo-footer">
+      <nav aria-label="Sezioni del sito">
+        <a href="/atlante">Atlante</a>
+        <a href="/regioni">Regioni italiane a confronto</a>
+        <a href="/temi">Indicatori per tema</a>
+        <a href="/quiz">Quanto conosci l'Italia?</a>
+        <a href="/metodologia">Metodologia</a>
+        <a href="/blog">Blog</a>
+      </nav>
+    </footer>
+    {# Vedi app.html: copre il fallback SEO finche' il bundle non ha dati veri. #}
+    <div id="boot-loader" role="presentation">
+      <span></span>
+    </div>
+    <script>
+      setTimeout(function () {
+        var el = document.getElementById("boot-loader");
+        if (el) el.remove();
+      }, 8000);
+    </script>
+  </body>
+</html>

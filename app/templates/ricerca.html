@@ -1,0 +1,64 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'ricerca' %}
+
+{% block title %}{% if query %}Risultati per "{{ query }}"{% else %}Cerca nel catalogo{% endif %} · {{ site_name }}{% endblock %}
+{% block description %}{% if query %}Indicatori e articoli di Divario Italia che rispondono a "{{ query }}".{% else %}Cerca tra gli indicatori territoriali e gli articoli di Divario Italia.{% endif %}{% endblock %}
+
+{# La ricerca interna resta fuori dall'indice per scelta: uno spazio ?q= genera
+   pagine arbitrarie e quasi identiche alle schede che elenca. I link restano
+   follow, cosi' l'equity arriva alle pagine vere. #}
+{% block robots_meta %}
+<meta name="robots" content="noindex, follow">
+{% endblock %}
+
+{% block content %}
+<main class="wrap search-page">
+  <p class="eyebrow">Ricerca</p>
+  <h1>{% if query %}Risultati per "{{ query }}"{% else %}Cerca nel catalogo{% endif %}</h1>
+
+  <form class="search-page__form" method="get" action="/ricerca" role="search">
+    <label class="search-box" for="site-search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="search" id="site-search" name="q" value="{{ query }}" placeholder="Occupazione, NEET, speranza di vita..." autocomplete="off" aria-label="Cerca indicatori e articoli">
+    </label>
+    <button type="submit">Cerca</button>
+  </form>
+
+  {% if query %}
+  <p class="page-note">
+    {% if total %}
+    {{ total }} {{ total | it_plural('risultato', 'risultati') }}
+    ({{ indicator_count }} {{ indicator_count | it_plural('indicatore', 'indicatori') }},
+    {{ post_count }} {{ post_count | it_plural('articolo', 'articoli') }}).
+    {% if pages > 1 %}Pagina {{ page }} di {{ pages }}, righe dalla {{ first_index }} alla {{ last_index }}.{% endif %}
+    {% if truncated %}La ricerca si ferma ai primi {{ total }} risultati, quindi restringi la query per vedere il resto.{% endif %}
+    {% else %}
+    Nessun risultato. Prova con una parola sola, oppure sfoglia i <a href="/temi">temi</a> e le <a href="/regioni">regioni</a>.
+    {% endif %}
+  </p>
+  {% else %}
+  <p class="page-note">Scrivi una parola per cercare tra gli indicatori del catalogo e gli articoli del blog. Se preferisci sfogliare, parti dai <a href="/temi">temi</a>, dalle <a href="/regioni">schede regione</a> o dall'<a href="/atlante">atlante interattivo</a>.</p>
+  {% endif %}
+
+  {% if results %}
+  <ol class="search-results" start="{{ first_index }}">
+    {% for row in results %}
+    <li class="search-result">
+      <span class="search-result__kind">{{ row.kind_label }}</span>
+      <a class="search-result__title" href="{{ row.url }}">{{ row.title }}</a>
+      {% if row.summary %}<p class="search-result__sum">{{ row.summary }}</p>{% endif %}
+      <span class="search-result__meta">{{ row.meta }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+
+  {% if pages > 1 %}
+  <nav class="search-pager" aria-label="Pagine dei risultati">
+    {% if page > 1 %}<a href="/ricerca{{ query_param }}{{ '&' if query_param else '?' }}pagina={{ page - 1 }}" rel="prev">&larr; Pagina precedente</a>{% endif %}
+    <span>Pagina {{ page }} di {{ pages }}</span>
+    {% if page < pages %}<a href="/ricerca{{ query_param }}{{ '&' if query_param else '?' }}pagina={{ page + 1 }}" rel="next">Pagina successiva &rarr;</a>{% endif %}
+  </nav>
+  {% endif %}
+  {% endif %}
+</main>
+{% endblock %}

@@ -1,0 +1,33 @@
+{# Pannello mappa interattiva, condiviso tra la home e /divari-regionali.
+   Richiede `map_hero` (vedi _map_hero in app/views.py) e `map_action`, la rotta
+   a cui il selettore rimanda con ?indicator=. Gli id e le classi restano quelli
+   che home-map.js si aspetta: un solo comportamento mappa lato server. #}
+<div class="home-map-panel" id="home-map">
+  <form class="home-map-bar" method="get" action="{{ map_action }}">
+    <label for="home-map-indicator">Colora la mappa per</label>
+    <select id="home-map-indicator" name="indicator" onchange="this.form.submit()">
+      {% for opt in map_hero.options %}
+      <option value="{{ opt.id }}" {{ "selected" if opt.id == map_hero.selected_id }}>{{ opt.name }}</option>
+      {% endfor %}
+    </select>
+    <noscript><button type="submit" class="quality-btn">Aggiorna</button></noscript>
+    <span class="home-map-bar__year">{{ map_hero.year }}</span>
+  </form>
+  <style>
+    {% for key, color in map_hero.colors.items() %}.home-map-body [data-key="{{ key }}"] { fill: {{ color }}; }
+    {% endfor %}
+  </style>
+  <div class="home-map-body">
+    {# role="img" sul partial rende presentazionali le venti path, quindi questa
+       etichetta e' l'unica cosa che uno screen reader sente: deve dire quale
+       dato e' disegnato, non solo che c'e' una mappa. #}
+    {% with map_label = "Mappa cliccabile delle regioni italiane per " ~ map_hero.indicator_name ~ ", " ~ map_hero.year %}
+    {% include "_italy_map.html" %}
+    {% endwith %}
+    <div class="home-map-readout" id="home-map-readout">
+      <span class="home-map-readout__hint">Passa il mouse su una regione per vederne il valore e la posizione. Clicca per aprire il profilo completo.</span>
+    </div>
+  </div>
+  <script type="application/json" id="home-map-data">{{ map_hero.tooltip_data | tojson }}</script>
+  <script src="{{ url_for('static', filename='js/home-map.js') }}" defer></script>
+</div>

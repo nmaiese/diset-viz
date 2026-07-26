@@ -50,6 +50,12 @@ const SORTS = [
 const MAP_RAMP = (t) => d3.interpolate("#E7ECF3", "#15233B")(t);
 const MISSING_FILL = "#E2E0D8";
 
+// Vista da aprire quando la pagina che ha montato il bundle ne ha una sua e la
+// query non dice altro. La imposta il template server (window.__diInitialView in
+// confronto.html): il percorso resta l'unica URL pubblica di quella vista, senza
+// che il bundle sappia niente delle rotte Flask.
+const INITIAL_VIEW = typeof window !== "undefined" ? window.__diInitialView || null : null;
+
 /* ------------------------------------------------------------------ */
 /* Navigation-transition helpers                                       */
 /* ------------------------------------------------------------------ */
@@ -85,7 +91,7 @@ function App() {
   const [regionProfile, setRegionProfile] = useState(null);
   const [error, setError] = useState(null);
 
-  const [view, setView] = useUrlState("view");
+  const [viewParam, setView] = useUrlState("view");
   const [selectedId, setSelectedId] = useUrlState("indicator");
   const [selectedYear, setSelectedYear] = useUrlState("year");
   const [selectedRegion, setSelectedRegion] = useUrlState("region");
@@ -100,6 +106,7 @@ function App() {
   const [yearFromParam, setYearFromParam] = useUrlState("yfrom");
   const [yearToParam, setYearToParam] = useUrlState("yto");
 
+  const view = viewParam || INITIAL_VIEW;
   const theme = themeParam || "Tutti";
   const query = queryParam || "";
   const sort = sortParam || "complete";
@@ -243,6 +250,17 @@ function App() {
   // Switch between reading modes ("per indicatore" / "per regione" / "confronta").
   const goToMode = (mode) => {
     trackEvent("switch_mode", { mode });
+    // Su una pagina che possiede la sua vista (/confronto) cambiare modalita' e'
+    // una navigazione vera: altrimenti resteremmo su /confronto con ?view=atlas,
+    // cioe' una URL che dice il contrario di quello che mostra.
+    if (INITIAL_VIEW) {
+      if (mode === INITIAL_VIEW) {
+        window.scrollTo({ top: 0, behavior: "auto" });
+        return;
+      }
+      window.location.assign(mode === "regioni" ? "/atlante?view=regioni" : "/atlante");
+      return;
+    }
     withViewTransition(() => {
       setFromParam(null);
       setView(mode === "regioni" ? "regioni" : mode === "confronto" ? "confronto" : "atlas");
@@ -254,6 +272,13 @@ function App() {
   // regions, or the indicator dashboard) without a full page reload.
   const openRegion = (key) => {
     trackEvent("open_region", { region_key: key });
+    // Stessa regola di goToMode: da una pagina che possiede la sua vista si esce
+    // navigando. Senza questa riga, aprire una regione dal confronto lascerebbe
+    // /confronto?view=regioni, una URL che mostra tutt'altro da quello che dice.
+    if (INITIAL_VIEW) {
+      window.location.assign(`/atlante?view=regioni&rk=${encodeURIComponent(key)}`);
+      return;
+    }
     withViewTransition(() => {
       setFromParam(null);
       setRegionKey(key);
@@ -734,6 +759,7 @@ function HomeMapHero({ catalog, mapData, onOpenRegion }) {
                 onSelect={handleMapSelect}
                 onHover={setHoverRow}
                 unit={meta.unit}
+                label={`Mappa cliccabile delle regioni italiane per ${meta.name}${year != null ? `, ${year}` : ""}`}
               />
               <div className="map-readout">
                 {hoverRow ? (
@@ -1183,6 +1209,7 @@ function RegionView({
                     onSelect={handleMapSelect}
                     unit=""
                     neutral
+                    label="Mappa cliccabile delle regioni italiane per aprire la scheda di una regione"
                   />
                 </div>
                 <label className="region-switcher">
@@ -1615,7 +1642,10 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
     [regionNames, series],
   );
   const valueByRegion = useMemo(() => new Map(yearValues.map((row) => [row.region, row])), [yearValues]);
-  const nationalAvg = yearValues.length ? yearValues.reduce((sum, row) => sum + row.value, 0) / yearValues.length : null;
+  // Media semplice dei valori regionali, non il valore italiano: la riga in
+  // tabella e la legenda devono chiamarla con il suo nome (il testo introduttivo
+  // qui sopra lo faceva gia', la legenda no).
+  const regionsAvg = yearValues.length ? yearValues.reduce((sum, row) => sum + row.value, 0) / yearValues.length : null;
   const bestRegion = useMemo(() => {
     if (!regionNames.length) return null;
     return regionNames.reduce((best, name) => {
@@ -1700,7 +1730,7 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
               <DataCard title="Serie storica" kicker={`${meta.name} · ${meta.unit}`}>
                 <div className="compare-legend">
                   {seriesList.map((s) => <span key={s.region} className="legend-item"><i style={{ background: s.color }} />{s.region}</span>)}
-                  <span className="legend-item legend-average"><i />Media nazionale</span>
+                  <span className="legend-item legend-average"><i />Media delle regioni</span>
                 </div>
                 <CompareTimeline seriesList={seriesList} averageSeries={averageSeries} selectedYear={year} onYear={setYear} unit={meta.unit} />
               </DataCard>
@@ -1711,6 +1741,7 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
                   selectedRegion={regionNames}
                   onSelect={handleMapSelect}
                   unit={meta.unit}
+                  label={`Mappa cliccabile delle regioni italiane per ${meta.name}, ${year}, con le regioni a confronto in evidenza`}
                 />
               </DataCard>
             </div>
@@ -1731,8 +1762,8 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
                       );
                     })}
                     <tr>
-                      <td className="cmp-avg-label">Media nazionale</td>
-                      <td className="num cmp-avg-label">{nationalAvg != null ? formatValue(nationalAvg, meta.unit) : "n.d."}</td>
+                      <td className="cmp-avg-label">Media delle regioni</td>
+                      <td className="num cmp-avg-label">{regionsAvg != null ? formatValue(regionsAvg, meta.unit) : "n.d."}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1884,6 +1915,7 @@ function DetailView({
                     selectedRegion={selectedRegion}
                     onSelect={setSelectedRegion}
                     unit={indicatorMeta.unit}
+                    label={`Mappa cliccabile delle regioni italiane per ${indicatorMeta.name}, ${year}`}
                   />
                 </DataCard>
                 <DataCard className="ranking-card" title="Classifica" kicker={`${year} · ${indicatorMeta.unit}`}>
@@ -2096,7 +2128,7 @@ function DataCard({ title, kicker, className, children }) {
   );
 }
 
-function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false, onHover }) {
+function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false, onHover, label }) {
   const width = 560;
   const height = 660;
   const valueByKey = useMemo(() => new Map(values.map((row) => [row.region_key, row])), [values]);
@@ -2113,7 +2145,16 @@ function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false
 
   return (
     <div className="map-wrap">
-      <svg className="italy-map" viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Mappa delle regioni italiane">
+      {/* role="img" rende presentazionali le venti path che stanno sotto, quindi
+          questa etichetta e' l'unica cosa che uno screen reader sente della
+          mappa: deve dire che dato sta disegnando, non solo che e' una mappa.
+          Stessa formula del partial server (_italy_map.html, map_label). */}
+      <svg
+        className="italy-map"
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label={label || "Mappa delle regioni italiane"}
+      >
         {geo.features.map((feature) => {
           const key = normalizeRegionKey(feature.properties.name);
           const row = valueByKey.get(key);
@@ -2163,6 +2204,9 @@ function MapLegend({ min, max, unit }) {
   const stops = d3.range(0, 1.0001, 0.1);
   const gradient = `linear-gradient(90deg, ${stops.map((s) => MAP_RAMP(s)).join(", ")})`;
   const mid = min + (max - min) / 2;
+  // aria-hidden per scelta: la scala colore da sola non aggiunge informazione a
+  // chi non vede la mappa, e gli stessi valori stanno in forma testuale nella
+  // classifica accanto. Esporla darebbe due letture dello stesso dato.
   return (
     <div className="map-legend" aria-hidden="true">
       <div className="map-legend__bar" style={{ background: gradient }} />
@@ -2265,7 +2309,7 @@ function Timeline({ series, regionSeries, selectedRegion, selectedYear, setSelec
     <div className="timeline-wrap">
       <div className="timeline-legend">
         <span className="legend-item legend-region"><i /> {selectedRegion}</span>
-        <span className="legend-item legend-average"><i /> Media nazionale</span>
+        <span className="legend-item legend-average"><i /> Media delle regioni</span>
       </div>
       <svg className="timeline" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Serie storica di ${selectedRegion}`}>
         <text className="axis-title" x={16} y={margin.top + 4}>{unit}</text>

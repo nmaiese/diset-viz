@@ -19,7 +19,7 @@
       "publisher": { "@id": "{{ SITE_URL }}/#org" },
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "{{ SITE_URL }}/atlante?q={search_term_string}",
+        "target": "{{ SITE_URL }}/ricerca?q={search_term_string}",
         "query-input": "required name=search_term_string"
       }
     },
@@ -52,33 +52,15 @@
         <span>Sfoglia gli indicatori per area: economia, lavoro, salute, ambiente.</span>
         <span class="home-entry-card__go">Vai ai temi &rarr;</span>
       </a>
+      <a class="home-entry-card" href="/divari-regionali">
+        <strong>Parti dal divario</strong>
+        <span>Nord, Centro e Mezzogiorno a confronto su reddito, lavoro e salute.</span>
+        <span class="home-entry-card__go">Leggi i divari &rarr;</span>
+      </a>
     </div>
   </div>
 
-  <div class="home-map-panel" id="home-map">
-    <form class="home-map-bar" method="get" action="/">
-      <label for="home-map-indicator">Colora la mappa per</label>
-      <select id="home-map-indicator" name="indicator" onchange="this.form.submit()">
-        {% for opt in map_hero.options %}
-        <option value="{{ opt.id }}" {{ "selected" if opt.id == map_hero.selected_id }}>{{ opt.name }}</option>
-        {% endfor %}
-      </select>
-      <noscript><button type="submit" class="quality-btn">Aggiorna</button></noscript>
-      <span class="home-map-bar__year">{{ map_hero.year }}</span>
-    </form>
-    <style>
-      {% for key, color in map_hero.colors.items() %}.home-map-body [data-key="{{ key }}"] { fill: {{ color }}; }
-      {% endfor %}
-    </style>
-    <div class="home-map-body">
-      {% include "_italy_map.html" %}
-      <div class="home-map-readout" id="home-map-readout">
-        <span class="home-map-readout__hint">Passa il mouse su una regione per vederne il valore e la posizione. Clicca per aprire il profilo completo.</span>
-      </div>
-    </div>
-    <script type="application/json" id="home-map-data">{{ map_hero.tooltip_data | tojson }}</script>
-    <script src="{{ url_for('static', filename='js/home-map.js') }}" defer></script>
-  </div>
+  {% with map_action = "/" %}{% include "_map_panel.html" %}{% endwith %}
 </section>
 
 <section class="home-section" aria-labelledby="cap-title">
@@ -162,7 +144,7 @@
       <h2 id="compare-title">Metti a paragone regioni, indicatore per indicatore</h2>
       <p class="home-section__lead">Un esempio con tre regioni. Nell'atlante puoi confrontarle sulla mappa e sulla serie storica, indicatore per indicatore.</p>
     </div>
-    <a href="/atlante?view=confronto">Apri il comparatore &rarr;</a>
+    <a href="/confronto">Apri il comparatore &rarr;</a>
   </div>
   <div class="home-compare-panel">
     <div class="home-compare-legend" aria-hidden="true">
@@ -189,7 +171,7 @@
       </div>
       {% endfor %}
     </div>
-    <a class="home-compare-cta" href="/atlante?view=confronto">Prova con le tue regioni &rarr;</a>
+    <a class="home-compare-cta" href="/confronto">Prova con le tue regioni &rarr;</a>
   </div>
 </section>
 {% endif %}
