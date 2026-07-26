@@ -127,7 +127,11 @@
          from the same value, so this tile does not change on hydration. #}
       <div class="kpi kpi--focus" data-kpi="focus">
         <small><span data-kpi="focus-name">{{ level.default_territory.name }}</span> · <span data-explore="year-label">{{ level.year_max }}</span></small>
-        <strong data-kpi="focus-value">{{ level.default_territory.value | it_num(2) }}</strong>
+        {# data-kpi sullo span interno, non sullo <strong>: l'explorer fa
+           textContent= sul nodo che trova, e sullo <strong> cancellerebbe
+           l'unita' al primo cambio d'anno. L'unita' solo se corta: "%" sta
+           accanto alla cifra, "GWh per 100 milioni di euro" no. #}
+        <strong><span data-kpi="focus-value">{{ level.default_territory.value | it_num(2) }}</span>{% if meta.value_unit and meta.value_unit | length <= 8 %} <span class="u">{{ meta.value_unit }}</span>{% endif %}</strong>
         <span class="kpi__sub"><span data-kpi="focus-rank">1ª su {{ level.observations | length }} {{ level.plural }}</span> <a data-kpi="focus-link" href="{{ level.profile_path or '#' }}{{ level.default_territory.key }}"{% if not level.profile_path %} hidden{% endif %}>profilo →</a></span>
       </div>
 
