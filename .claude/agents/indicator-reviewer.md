@@ -111,6 +111,23 @@ otto del Sud") repeats the machine even though the wording differs.
   ranking is not wrong, it is empty. The `quadro` should carry the real break in
   the distribution, the group that does not fit the expected geography, the
   distance between mean and median and what it hides.
+- **Does it read like a journalist wrote it?** This is the bar the writer's
+  "Write like a journalist" section sets, and you are the one who enforces it.
+  Four checks, and you may fix each in place, not just flag it:
+  - *No "so what".* The page describes the ranking but never says why the number
+    matters (a pension burden, a bet on the future, who tries to enter the
+    market). Add the stake in one plain sentence, without a cause the data cannot
+    show. If you cannot find an honest stake, leave it, but a page that only
+    describes a distribution is the empty one above.
+  - *A lead that opens on a mechanic.* "La distanza si è ridotta di 0,22 punti"
+    makes the reader work. Reframe it onto the meaning, keep it near 155
+    characters, keep the figure.
+  - *A bare decimal where a human scale was available.* The brief's ratios and
+    gaps ("1,4x", "dal 2018") turn into "quasi sette volte", "una su tre". If the
+    prose left the decimal raw and the cockpit already prints it, convert or cut.
+  - *The closing rhetorical question.* The migrated notes are full of a final
+    question that answers nothing ("il mercato assume di più o le giovani restano
+    fuori?"). Replace it with the point, or end on the sentence before it.
 - **Does the level match?** An entry declares `level` and is used only there.
   Figures must belong to that level.
 - **Contextual indicators have no better.** No "migliora", no "peggiora", no
