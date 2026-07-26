@@ -590,39 +590,6 @@ def _it_number(value, decimals=2):
     return formatted
 
 
-def build_indicator_faq(name, value_unit, year, ranked_values, year_avg):
-    """Factual, data-derived Q&A for an indicator page: highest region, lowest
-    region and the regional mean for the latest year.
-
-    Every answer is computed from the live data at request time (never
-    hand-written), so it cannot drift, and the visible FAQ section and the
-    FAQPage JSON-LD are rendered from this same list, keeping structured data
-    identical to visible content (AGENTS.md). Returns [] when there is not enough
-    data to answer honestly. `ranked_values` are the year's rows sorted by value
-    descending (regardless of the indicator's direction)."""
-    rows = [row for row in (ranked_values or []) if row.get("value") is not None]
-    if len(rows) < 3:
-        return []
-    unit = f" {value_unit}" if value_unit else ""
-    top, bottom = rows[0], rows[-1]
-    faq = [
-        {
-            "q": f"Quale regione ha il valore più alto di {name}?",
-            "a": f"Nel {year} il valore più alto è {_it_number(top['value'])}{unit}, in {top['region']}.",
-        },
-        {
-            "q": f"Quale regione ha il valore più basso di {name}?",
-            "a": f"Nel {year} il valore più basso è {_it_number(bottom['value'])}{unit}, in {bottom['region']}.",
-        },
-    ]
-    if year_avg is not None:
-        faq.append({
-            "q": f"Qual è il valore medio tra le regioni per {name}?",
-            "a": f"Nel {year} la media delle {len(rows)} regioni è {_it_number(year_avg)}{unit}.",
-        })
-    return faq
-
-
 def meta_description_from_attacco(attacco, max_len=_DESC_MAX):
     """Turn an analyst-note lead (the visible page opener, with real regional
     numbers) into a SERP meta description, trimmed to budget on a word boundary.
@@ -1060,49 +1027,6 @@ def it_plural(count, singular, plural):
     except (TypeError, ValueError):
         return plural
     return singular if n == 1 else plural
-
-
-def indicator_page_intro(
-    plain,
-    year_min,
-    year_max,
-    region_count,
-    year=None,
-    best=None,
-    worst=None,
-    year_avg=None,
-    value_unit=None,
-):
-    """Reader-first lead for a regional indicator page, used only when the indicator
-    has no analyst note (noted pages lead with the attacco). When the ranking is
-    meaningful it opens with a headline answer, the best and worst region and the
-    regional mean for the latest year, so the sentence reads as distinct per
-    indicator (real regions and figures) and is snippet-friendly. Contextual
-    indicators, which have no best/worst, fall back to a plain coverage line.
-
-    This feeds the visible lead only, not the SERP meta description (the view keeps
-    a separate seo_description)."""
-    unit = f" {value_unit}" if value_unit else ""
-    if best and worst and year is not None:
-        lead = (
-            f"Nel {year} il dato più favorevole è di {best['region']} con "
-            f"{_it_number(best['value'])}{unit}, il più sfavorevole di {worst['region']} con "
-            f"{_it_number(worst['value'])}{unit}."
-        )
-        if year_avg is not None:
-            regioni = it_plural(region_count, "regione", "regioni")
-            lead += f" La media tra le {region_count} {regioni} è {_it_number(year_avg)}{unit}."
-        return f"{plain} {lead}".strip()
-
-    regioni = it_plural(region_count, "regione", "regioni")
-    if year_min == year_max:
-        coverage = f"La scheda confronta {region_count} {regioni} per il {year_max}."
-    else:
-        coverage = (
-            f"La scheda confronta {region_count} {regioni} nell'ultimo anno disponibile "
-            f"e mostra l'andamento dal {year_min} al {year_max}."
-        )
-    return f"{plain} {coverage}".strip()
 
 
 def is_percentage_unit(unit):

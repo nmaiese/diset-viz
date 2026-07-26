@@ -1,0 +1,114 @@
+{# The indicator article: four roles, one continuous piece of prose.
+
+   Each role is either authored (app/static/data/indicator_texts.json, written by
+   the editorial agent) or composed here from the data. Composed text is not
+   frozen into the JSON on purpose, so it can never age behind a data refresh.
+
+   The composed version deliberately does NOT re-list the figures the cockpit
+   already shows above (highest, lowest, mean, gap, latest change). It states
+   what those figures do and do not allow a reader to conclude. Re-printing them
+   is exactly the duplication this rebuild removes, and it is also the trap an
+   authored section must avoid. #}
+
+{# "54,87 %" reads wrong in Italian and "%" is glued to the number everywhere
+   else on the page, so the unit is joined for percentages and spaced otherwise. #}
+{% macro value(number, unit) -%}
+{{ number | it_num(2) }}{% if unit == '%' %}%{% elif unit %} {{ unit }}{% endif %}
+{%- endmacro %}
+
+{% macro territory(level, item) -%}
+{%- if item and level.profile_path -%}<a href="{{ level.profile_path }}{{ item.key }}">{{ item.name }}</a>
+{%- elif item -%}{{ item.name }}{%- endif -%}
+{%- endmacro %}
+
+{% macro body(article, meta, level) %}
+<div class="indicator-article prose">
+  {% for section in article.sections %}
+  <h2 id="sezione-{{ section.role }}">{{ section.heading }}</h2>
+  {% if section.authored %}
+  {{ section.body | analyst_html }}
+  {% elif section.role == 'definizione' %}{{ definizione(meta, level) }}
+  {% elif section.role == 'quadro' %}{{ quadro(meta, level) }}
+  {% elif section.role == 'dinamica' %}{{ dinamica(meta, level) }}
+  {% elif section.role == 'limiti' %}{{ limiti(meta, level) }}
+  {% endif %}
+  {% endfor %}
+</div>
+{% endmacro %}
+
+
+{% macro definizione(meta, level) %}
+{% set explain = meta.explain %}
+{% if explain.plain %}<p>{{ explain.plain }}</p>{% endif %}
+<p>{{ explain.example }}</p>
+{% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
+<p>{{ explain.reading }}</p>
+{% endmacro %}
+
+
+{% macro quadro(meta, level) %}
+{% set stats = level.stats %}
+{% if level.best and level.worst and stats.gap_abs is not none %}
+<p>Lo scarto tra {{ territory(level, level.best) }} e {{ territory(level, level.worst) }} è quello osservato nell'anno più recente, {{ level.year_max }}. Da solo non dice se la differenza sia statisticamente significativa, e non spiega da che cosa dipenda.</p>
+{% endif %}
+{% if stats.above_avg_count is not none and stats.below_avg_count is not none %}
+<p>La media divide le {{ level.plural }} in due gruppi diseguali, {{ stats.above_avg_count }} sopra e {{ stats.below_avg_count }} sotto.
+  {%- if stats.median is not none and stats.year_avg is not none and (stats.median - stats.year_avg) | abs > 0.01 * (stats.year_avg | abs) %} Media e mediana non coincidono, segno che la distribuzione non è uniforme e che qualche valore estremo tira la media dalla sua parte.
+  {%- else %} Media e mediana sono vicine, quindi nessun valore estremo sta spostando da solo la sintesi.{% endif %}</p>
+{% elif stats.year_count is not none and stats.year_count < 5 %}
+<p>Con {{ stats.year_count }} {{ stats.year_count | it_plural(level.singular, level.plural) }} a confronto i valori vanno letti come indicazioni di massima. Su così pochi dati mediana e distribuzione non sarebbero significative.</p>
+{% endif %}
+{% if not meta.scoreable %}
+<p>Questo indicatore non ha una direzione univoca. Un valore alto descrive una maggiore intensità del fenomeno, non un territorio automaticamente migliore o peggiore, quindi la classifica qui sopra serve a ordinare i dati, non a premiare nessuno.</p>
+{% endif %}
+{% endmacro %}
+
+
+{% macro dinamica(meta, level) %}
+{% set stats = level.stats %}
+{% set annual = level.annual_change %}
+{% if not stats.has_multi_year %}
+<p>La fonte pubblica un solo anno per questa serie, il {{ level.year_max }}. Non è quindi possibile calcolare una variazione rispetto a un anno precedente con la stessa definizione, e la fotografia va letta come tale.</p>
+{% else %}
+{% if stats.avg_change_abs is not none %}
+{# Two rules learned from reading the rendered output:
+   - the unit appears once, on the second figure. Several sources give a
+     descriptive unit ("Numero medio di anni") and repeating it on both sides of
+     "da ... a ..." turns a short sentence into a mouthful.
+   - a percentage-like indicator states its change in points. A relative "9,8%"
+     next to a "54,87%" level puts two unrelated percentages in one sentence. #}
+<p>Dal {{ stats.year_min }} al {{ stats.year_max }} la media {{ level.singular == 'regione' and 'regionale' or 'provinciale' }} è passata da {{ stats.year_min_avg | it_num(2) }} a {{ value(stats.year_avg, meta.value_unit) }}{% if meta.percentage_like %}, {{ (stats.avg_change_abs | abs) | it_num(2) }} {{ meta.change_unit }} in {{ 'più' if stats.avg_change_abs > 0 else 'meno' }}{% elif stats.avg_change_pct is not none %}, {{ (stats.avg_change_pct | abs) | it_num(1) }}% in {{ 'più' if stats.avg_change_pct > 0 else 'meno' }}{% endif %}{% if level.trend_note %}, {{ level.trend_note }}{% endif %}.</p>
+{% endif %}
+{% if stats.highest_delta and stats.lowest_delta %}
+<p>Sull'intero periodo
+  {%- if stats.highest_delta.kind == 'aumento' %} l'aumento maggiore è di {{ territory(level, stats.highest_delta) }}, {{ stats.highest_delta.delta | it_num(2) }} {{ meta.change_unit }}
+  {%- elif stats.highest_delta.kind == 'calo' %} il calo più contenuto è di {{ territory(level, stats.highest_delta) }}, {{ stats.highest_delta.delta | it_num(2) }} {{ meta.change_unit }}
+  {%- else %} {{ territory(level, stats.highest_delta) }} resta sostanzialmente stabile{% endif %},
+  {%- if stats.lowest_delta.kind == 'calo' %} mentre il calo maggiore è di {{ territory(level, stats.lowest_delta) }}, {{ stats.lowest_delta.delta | it_num(2) }} {{ meta.change_unit }}
+  {%- elif stats.lowest_delta.kind == 'aumento' %} mentre l'aumento più contenuto è di {{ territory(level, stats.lowest_delta) }}, {{ stats.lowest_delta.delta | it_num(2) }} {{ meta.change_unit }}
+  {%- else %} mentre {{ territory(level, stats.lowest_delta) }} resta sostanzialmente stabile{% endif %}.
+  {#- No "it depends on the direction" caveat here. On a directional indicator the
+      direction is known and the sentence is simply false; on a contextual one the
+      "quadro" section already says there is no direction to read. -#}</p>
+{% endif %}
+{% if stats.gap_trend is not none and stats.year_min_gap_abs %}
+<p>{% if stats.gap_trend | abs < 0.01 * (stats.year_min_gap_abs | abs) %}Il divario tra il valore più alto e il più basso è rimasto sostanzialmente stabile nel periodo, quindi le distanze di partenza non si sono ricomposte.
+  {%- elif stats.gap_trend > 0 %}Il divario tra il valore più alto e il più basso si è allargato di {{ stats.gap_trend | it_num(2) }} {{ meta.change_unit }}, quindi i territori non si stanno avvicinando.
+  {%- else %}Il divario tra il valore più alto e il più basso si è ristretto di {{ (stats.gap_trend | abs) | it_num(2) }} {{ meta.change_unit }}, quindi le distanze si sono in parte ricomposte.{% endif %}</p>
+{% endif %}
+{% if annual %}
+<p>Nell'ultimo passaggio disponibile, tra il {{ annual.previous_year }} e il {{ annual.year }}, il valore è diminuito in {{ annual.decrease_count }} {{ annual.decrease_count | it_plural(level.singular, level.plural) }}, è aumentato in {{ annual.increase_count }}{% if annual.stable_count %} ed è rimasto invariato in {{ annual.stable_count }}{% endif %}. Il confronto usa le {{ annual.common_count }} {{ annual.common_count | it_plural(level.singular, level.plural) }} presenti in entrambi gli anni. {{ level.annual_note }}</p>
+{% endif %}
+{% endif %}
+{% endmacro %}
+
+
+{# The unweighted-mean disclaimer is deliberately NOT here. It describes how we
+   compute, not what the indicator measures, so it belongs to the apparatus and
+   must survive an authored `limiti` replacing this composed one. #}
+{% macro limiti(meta, level) %}
+<p>{{ meta.explain.caveat }}</p>
+{% if level.coverage is not none and level.coverage < 1 %}
+<p>Nell'anno più recente la copertura è parziale, {{ level.observations | length }} {{ level.plural }} su {{ level.territory_total }}. I territori mancanti non entrano in nessuno dei calcoli di questa pagina.</p>
+{% endif %}
+{% endmacro %}

@@ -286,6 +286,10 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .page-facts { display: flex; flex-wrap: wrap; gap: 12px 28px; margin: 0 0 28px; padding: 16px 0; border-block: 1px solid var(--line); }
 .page-facts span { display: grid; gap: 2px; font-size: 14px; }
 .page-facts small { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+/* Descendant selector on purpose: `.page-facts span { display: grid }` outranks
+   a bare class, and this nested span matches it too, which put the two links
+   and their separator on three separate rows. */
+.page-facts .page-facts__inline { display: block; white-space: nowrap; }
 .freshness-badge { display: inline-flex; align-items: center; width: max-content; padding: 2px 8px; border: 1px solid var(--line); font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); }
 .freshness-badge.is-current { border-color: var(--positive); color: var(--positive); }
 .freshness-badge.is-recent { border-color: var(--accent); color: var(--accent); }
@@ -317,10 +321,6 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .indicator-map .regions-map { display: block; width: 100%; height: auto; max-height: 560px; margin-inline: auto; }
 .indicator-map .rmap-region { fill: var(--map-missing); stroke: var(--paper); stroke-width: 1; }
 
-.indicator-sparkline-wrap { margin: 0 0 28px; }
-.indicator-sparkline { border: 1px solid var(--line); padding: 18px 20px; }
-.indicator-sparkline svg { display: block; width: 100%; height: 140px; }
-.indicator-sparkline polyline { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; }
 
 /* Compact FAQ: the answers repeat the dashboard numbers, so they collapse by
    default and stay available (and in the FAQPage JSON-LD) for who wants them. */
@@ -393,24 +393,6 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .data-table tr[data-region-key] { cursor: pointer; }
 .data-table tr[data-region-key]:hover { background: var(--accent-soft); }
 
-/* In-page indicator explorer: year slider + region focus, hydrated over the
-   server-rendered ranking. Hidden until JS wires it (progressive enhancement). */
-.indicator-explore { border: 1px solid var(--accent); background: var(--panel); padding: 20px 20px 18px; margin: 6px 0 18px; }
-.indicator-explore[hidden] { display: none; }
-.indicator-explore__bar { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; }
-.indicator-explore__ctrl { display: grid; gap: 6px; }
-.indicator-explore__ctrl > span { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
-.indicator-explore__ctrl input[type="range"] { width: 220px; accent-color: var(--accent); }
-.indicator-explore__ctrl select { border: 1px solid var(--line); background: var(--panel); padding: 9px 12px; font-family: inherit; font-size: 14px; color: var(--ink); }
-.indicator-explore__year { font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: var(--ink); }
-.indicator-explore__readout { margin-left: auto; display: grid; gap: 2px; text-align: right; }
-.indicator-explore__k { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
-.indicator-explore__big { font-family: var(--font-mono); font-weight: 700; font-size: 34px; line-height: 1; color: var(--ink); }
-.indicator-explore__sub { color: var(--ink-soft); font-size: 13px; }
-@media (max-width: 640px) {
-  .indicator-explore__readout { margin-left: 0; text-align: left; }
-  .indicator-explore__ctrl input[type="range"] { width: 100%; }
-}
 .indicator-explore__trend { margin: 18px 0 0; }
 .indicator-explore__trend[hidden] { display: none; }
 .indicator-explore__trend figcaption { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin: 0 0 8px; }
@@ -436,39 +418,43 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .indicator-map [data-key].is-selected { stroke: var(--accent); stroke-width: 2; }
 .indicator-map-hint { margin-top: 0; }
 
-/* Interactive dashboard: the old atlas workspace rebuilt on the canonical page.
-   Left panel (controls, region KPI, insights, sibling nav) + right viz-stage
-   (map, ranking, serie storica) with mobile tabs. Editorial sits below. */
-.indicator-dashboard { margin: 12px 0 36px; }
-.workspace { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: 26px; align-items: start; }
-.indicator-panel { min-width: 0; display: grid; gap: 16px; align-content: start; }
-.indicator-panel__tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.tag { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; padding: 4px 9px; border: 1px solid var(--line); color: var(--ink-soft); }
-.tag--quality { border-color: var(--positive); color: var(--positive-ink); }
+/* The cockpit: every number of the page, once, above the article.
+   It replaced three separate numeric zones (facts chips, insight cards, number
+   tiles) plus two that used to reappear below all the prose. Full width, no side
+   panel: the article underneath is the reading surface, this is the instrument. */
+/* grid-template-columns: minmax(0, 1fr) and min-width on the children are both
+   load-bearing. Grid items default to min-width: auto, so the widest thing in
+   the cockpit (the 560px map) would set the column width and push the entire
+   page, headline and lead included, past the viewport on a phone. */
+.indicator-cockpit { margin: 12px 0 30px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+.indicator-cockpit > * { min-width: 0; }
 
-.indicator-panel .indicator-explore { border: 1px solid var(--accent); background: var(--panel); padding: 16px; margin: 0; display: grid; gap: 14px; }
-.indicator-panel .controls { display: grid; gap: 12px; }
-.controls .select-field { display: grid; gap: 6px; }
-.controls .select-field > span { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
-.controls input[type="range"] { width: 100%; accent-color: var(--accent); }
-.controls select { border: 1px solid var(--line); background: var(--panel); padding: 9px 12px; font: inherit; color: var(--ink); }
-.controls .indicator-explore__year { font-family: var(--font-mono); font-weight: 700; color: var(--ink); }
+.cockpit-controls { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: flex-end; }
+.cockpit-control { display: grid; gap: 6px; min-width: 0; }
+.cockpit-control > span { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.cockpit-control input[type="range"] { width: 220px; max-width: 100%; accent-color: var(--accent); }
+.cockpit-control input[type="range"]:disabled { opacity: 0.4; }
+.cockpit-control select { border: 1px solid var(--line); background: var(--panel); padding: 9px 12px; font: inherit; color: var(--ink); max-width: 100%; }
+.cockpit-control b { font-family: var(--font-mono); font-weight: 700; font-size: 15px; color: var(--ink); }
 
-.insights { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); }
-.insight { display: grid; gap: 3px; padding: 13px 15px; background: var(--panel); }
-.insight small { font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); display: flex; gap: 5px; align-items: baseline; }
-.insight strong { font-family: var(--font-display); font-size: 19px; }
-.insight strong a { color: var(--ink); }
-.insight span { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-soft); }
-.insight.is-best strong a { color: var(--positive-ink); }
-.insight.is-worst strong a { color: var(--accent); }
-.insight--region { border: 1px solid var(--accent); background: var(--accent-soft); }
-.insight--region .indicator-explore__big { font-family: var(--font-mono); font-weight: 700; font-size: 32px; line-height: 1; color: var(--ink); }
-.insight__rank { color: var(--ink-soft); }
-.insight__trend { font-family: var(--font-body) !important; font-size: 13px !important; }
-.insight__trend.is-up { color: var(--positive-ink); }
-.insight__trend.is-down { color: var(--accent); }
-.insight__link { font-family: var(--font-mono); font-size: 12px; color: var(--accent); margin-top: 4px; }
+/* Regions / provinces. Real links, so the level works without JavaScript. */
+.level-switch { display: inline-flex; border: 1px solid var(--line); }
+.level-switch__option { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding: 9px 14px; color: var(--muted); background: var(--panel); }
+.level-switch__option + .level-switch__option { border-left: 1px solid var(--line); }
+.level-switch__option:hover { text-decoration: none; color: var(--ink); }
+.level-switch__option.is-active { background: var(--ink); color: var(--paper); }
+
+/* One KPI row. Tabular figures so the numbers line up as the year changes. */
+.kpi-row { display: flex; flex-wrap: wrap; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.kpi { flex: 1 1 150px; min-width: 0; background: var(--panel); padding: 12px 15px; display: grid; gap: 3px; align-content: start; }
+.kpi[hidden] { display: none; }
+.kpi small { font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.kpi strong { font-family: var(--font-display); font-size: 22px; line-height: 1.05; color: var(--ink); font-variant-numeric: tabular-nums; }
+.kpi__sub { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); overflow-wrap: anywhere; }
+.kpi__sub a { color: var(--accent); }
+.kpi--focus { border-left: 3px solid var(--accent); }
+.kpi--best strong { color: var(--positive-ink); }
+.kpi--worst strong { color: var(--accent); }
 
 .sibling-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .sibling-nav__link { display: grid; gap: 3px; padding: 10px 12px; border: 1px solid var(--line); }
@@ -483,7 +469,7 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .viz-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "map ranking" "trend trend"; gap: 18px; align-items: start; }
 .viz-card--map { grid-area: map; }
 .viz-card--ranking { grid-area: ranking; }
-.viz-card--trend { grid-area: trend; }
+.viz-card--trend { grid-area: trend; }\n/* Provinces have no choropleth: the ranking takes the whole row. */\n.viz-grid.has-no-map { grid-template-columns: minmax(0, 1fr); grid-template-areas: "ranking" "trend"; }\n.viz-grid.has-no-map .viz-card--map { display: none; }
 .data-card { border: 1px solid var(--line); background: var(--panel); padding: 16px 18px; min-width: 0; }
 .data-card > header { margin: 0 0 8px; }
 .data-card > header small { font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
@@ -509,13 +495,14 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .map-legend__note { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
 .map-legend__swatch { width: 12px; height: 12px; background: var(--map-missing); display: inline-block; }
 
-@media (max-width: 980px) {
-  .workspace { grid-template-columns: 1fr; }
-  /* On mobile the panel is full width, so the best/worst/media cards read as a
-     compact row instead of a tall stack. A lone last card spans the full width
-     so the grid never looks lopsided. */
-  .insights { grid-template-columns: 1fr 1fr; }
-  .insights .insight:last-child:nth-child(odd) { grid-column: 1 / -1; }
+@media (max-width: 700px) {
+  /* Two KPIs per row rather than a tall stack, with a lone last one spanning
+     the width so the grid never looks lopsided. */
+  .kpi { flex: 1 1 calc(50% - 1px); }
+  .kpi strong { font-size: 20px; }
+  .cockpit-controls { gap: 12px; }
+  .cockpit-control { flex: 1 1 100%; }
+  .cockpit-control input[type="range"] { width: 100%; }
 }
 @media (max-width: 760px) {
   .viz-tabs { display: flex; gap: 6px; margin: 0 0 12px; }
@@ -1106,29 +1093,6 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .analyst-note__body p:last-child { margin-bottom: 0; }
 .analyst-note__body a { color: var(--accent); }
 
-/* "I numeri": tessere-testata scannabili. L'interpretazione resta nella prosa
-   sotto. Flex-wrap, cosi una tessera isolata cresce e non sbilancia la riga. */
-.numbers-tiles {
-  display: flex; flex-wrap: wrap; gap: 1px;
-  background: var(--line); border: 1px solid var(--line);
-  margin: 2px 0 16px;
-}
-.numbers-tile {
-  flex: 1 1 150px; min-width: 0;
-  background: var(--panel); padding: 12px 15px;
-  display: grid; gap: 3px; align-content: start;
-}
-.numbers-tile__label {
-  font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase;
-  letter-spacing: 0.05em; color: var(--muted);
-}
-.numbers-tile__value {
-  font-family: var(--font-display); font-size: 22px; line-height: 1.05;
-  color: var(--ink); font-variant-numeric: tabular-nums;
-}
-.numbers-tile__value .u { font-family: var(--font-mono); font-size: 13px; color: var(--muted); font-weight: 400; }
-.numbers-tile__sub { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); }
-
 /* Related-in-tema: tabella su desktop, lista impilata sotto i 560px cosi il nome
    guida e verso/anno stanno sotto, invece di tre colonne strette. */
 @media (max-width: 560px) {
@@ -1145,6 +1109,14 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   .indicator-related__table td.num { display: inline-block; text-align: left; color: var(--muted); font-size: 12px; }
 }
 
-/* La sparkline statica e il fallback no-JS del grafico trend interattivo. Quando
-   l'explorer si idrata, il cruscotto mostra gia la serie: la togliamo. */
-.has-explorer .indicator-sparkline-wrap { display: none; }
+/* L'articolo: una sola superficie di lettura, tipografia uniforme, nessuna
+   tessera o card in mezzo ai paragrafi. */
+.indicator-article { margin: 0 0 8px; }
+.indicator-apparatus { margin: 26px 0 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+.indicator-apparatus h2 { font-size: 20px; margin: 0 0 10px; }
+.indicator-apparatus h3 { font-size: 15px; margin: 16px 0 6px; }
+.indicator-apparatus p { margin: 0 0 10px; color: var(--ink-soft); font-size: 15px; line-height: 1.6; }
+.indicator-apparatus .analyst-sources ul { margin: 0; padding-left: 18px; }
+.indicator-apparatus .analyst-sources li { margin-bottom: 6px; color: var(--ink-soft); font-size: 14px; }
+.indicator-cite-details, .indicator-source-definition { margin: 10px 0; border-top: 1px solid var(--grid); padding-top: 10px; }
+.indicator-cite-details summary, .indicator-source-definition summary { font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); cursor: pointer; }

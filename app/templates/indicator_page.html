@@ -1,7 +1,16 @@
 {% extends "blog_base.html" %}
-{% import "_indicator_prose.html" as prose %}
-{% set explain = meta.explain %}
-{% set desc = explain.plain ~ ' ' ~ explain.reading %}
+{% import "_indicator_article.html" as article %}
+
+{# One template for every indicator, whatever the source family, in three zones:
+
+   1. the cockpit, which owns every number and is the only interactive part
+   2. the article, which owns every sentence and no numbers the cockpit repeats
+   3. the apparatus (sources, citation, sharing, related), which owns neither
+
+   Before this, numbers and prose alternated across eleven blocks and two of the
+   numeric ones reappeared after all the text. The rule now is that a figure is
+   shown once, in the cockpit, and the prose interprets it instead of restating it.
+#}
 
 {% block title %}{{ seo_title }}{% endblock %}
 {% block description %}{{ seo_description }}{% endblock %}
@@ -19,28 +28,20 @@
   "@context": "https://schema.org",
   "@type": "Dataset",
   "name": {{ meta.name | tojson }},
-  "description": {{ desc | tojson }},
+  "description": {{ dataset_description | tojson }},
   "url": {{ canonical | tojson }},
   "temporalCoverage": "{{ meta.year_min }}/{{ meta.year_max }}",
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
-  "creator": { "@type": "Organization", "name": {{ meta.source | tojson }}, "url": {{ meta.source_url | tojson }} },
-  "isBasedOn": {{ meta.source_url | tojson }},
+  "creator": { "@type": "Organization", "name": {{ (meta.source_label or meta.source) | tojson }}, "url": {{ meta.source_url | tojson }} },
+  "isBasedOn": {{ (meta.source_data_url or meta.source_url) | tojson }},
   "variableMeasured": {{ meta.name | tojson }},
   "isAccessibleForFree": true,
-  "license": {{ (meta.license_url or "https://creativecommons.org/licenses/by/3.0/it/") | tojson }},
-  "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}],
+  "license": {{ meta.license_url | tojson }},
+  "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads %},
   "distribution": [
-    {
-      "@type": "DataDownload",
-      "encodingFormat": "text/csv",
-      "contentUrl": "{{ site_url }}/download/indicator/{{ meta.id }}.csv"
-    },
-    {
-      "@type": "DataDownload",
-      "encodingFormat": "application/json",
-      "contentUrl": "{{ site_url }}/download/indicator/{{ meta.id }}.json"
-    }
-  ]
+    { "@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "{{ site_url }}{{ meta.downloads.csv }}" },
+    { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "{{ site_url }}{{ meta.downloads.json }}" }
+  ]{% endif %}
 }
 </script>
 <script type="application/ld+json">
@@ -50,33 +51,16 @@
   "itemListElement": [
     { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
     { "@type": "ListItem", "position": 2, "name": "Temi", "item": "{{ site_url }}/temi" },
-    { "@type": "ListItem", "position": 3, "name": {{ meta.theme | tojson }}, "item": "{{ site_url }}{{ theme_path }}" },
+    { "@type": "ListItem", "position": 3, "name": {{ meta.theme | tojson }}, "item": "{{ site_url }}{{ meta.theme_path }}" },
     { "@type": "ListItem", "position": 4, "name": {{ meta.name | tojson }}, "item": {{ canonical | tojson }} }
   ]
 }
 </script>
-{% if faq %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {%- for item in faq %}
-    {
-      "@type": "Question",
-      "name": {{ item.q | tojson }},
-      "acceptedAnswer": { "@type": "Answer", "text": {{ item.a | tojson }} }
-    }{{ "," if not loop.last else "" }}
-    {%- endfor %}
-  ]
-}
-</script>
-{% endif %}
 {% endblock %}
 
 {% block content %}
 <article class="page page-indicator wrap">
-  <nav class="breadcrumb"><a href="/temi">Temi</a> / <a href="{{ theme_path }}">{{ meta.theme }}</a></nav>
+  <nav class="breadcrumb"><a href="/temi">Temi</a> / <a href="{{ meta.theme_path }}">{{ meta.theme }}</a></nav>
 
   {# Same catalog search the atlas offered: without JS it submits to /atlante, with JS it
      shows live results linking straight to each indicator's canonical page. #}
@@ -89,301 +73,307 @@
   </form>
 
   <h1>{{ meta.name }}</h1>
-  <p class="page-lead">{% if analyst and analyst.attacco %}{{ analyst.attacco | analyst_html }}{% else %}{{ page_intro }}{% endif %}</p>
-  {% if not is_indexable %}
-  <p class="page-note">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante demografica da leggere insieme alla pagina principale.</p>
+  <p class="page-lead">{{ page_lead | analyst_html }}</p>
+  {% if not meta.indexable %}
+  <p class="page-note">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
   {% endif %}
 
-  <div class="page-facts">
-    <span><small>Tema</small><a href="{{ theme_path }}">{{ meta.theme }}</a></span>
-    {% if meta.source_theme and meta.source_theme != meta.theme %}<span><small>Sottotema {{ meta.institution or "Istat" }}</small>{{ meta.source_theme }}</span>{% endif %}
-    <span><small>Unità di misura</small>{{ value_unit }}</span>
-    <span><small>Copertura</small>{{ meta.year_min }}-{{ meta.year_max }}, {{ meta.regions | length }} {{ meta.regions | length | it_plural('regione', 'regioni') }}</span>
-    <span><small>Ultimo dato</small>{{ year }}</span>
-    <span><small>Freschezza</small><b class="freshness-badge is-{{ meta.freshness_status }}">{{ meta.freshness_label }}</b></span>
-    <span><small>Fonte</small><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label or meta.source }}</a></span>
-    <span><small>Metodo</small><a href="/metodologia">Definizioni, confronti e limiti</a></span>
-    <span><small>Download</small><a href="/download/indicator/{{ meta.id }}.csv">CSV</a> · <a href="/download/indicator/{{ meta.id }}.json">JSON</a></span>
-  </div>
-
-  {# ---- Interattività in alto: lo stesso cruscotto dell'atlante (pannello con
-       controlli, KPI regione, insight e navigazione; a fianco mappa, classifica
-       e serie storica), idratato sulla stessa URL canonica. ---- #}
-  <section class="indicator-dashboard workspace" id="esplora" aria-label="Esplora l'indicatore">
-    <aside class="indicator-panel">
-      <div class="indicator-panel__tags">
-        <span class="tag">{{ meta.theme }} · {{ meta.catalog_family_label }}</span>
-        {% if meta.quality_life_scored %}<span class="tag tag--quality">Nel punteggio: {{ meta.quality_life_category_label }}</span>{% endif %}
-      </div>
-
-      <div class="indicator-explore" data-explore-root hidden>
-        <div class="controls">
-          <label class="select-field">
-            <span>Anno</span>
-            <input type="range" data-explore="year" min="0" max="0" step="1" value="0" aria-label="Anno">
-            <span class="indicator-explore__year" data-explore="year-label">{{ year }}</span>
-          </label>
-          <label class="select-field">
-            <span>Regione a fuoco</span>
-            <select data-explore="region" aria-label="Regione a fuoco"></select>
-          </label>
-        </div>
-        <div class="insight insight--region" data-explore="focus">
-          <small data-explore="focus-name"></small>
-          <strong class="indicator-explore__big" data-explore="focus-value"></strong>
-          <span class="insight__rank" data-explore="focus-rank"></span>
-          <span class="insight__trend" data-explore="focus-trend"></span>
-          <a class="insight__link" data-explore="focus-link" href="#">Vai al profilo della regione →</a>
-        </div>
-      </div>
-
-      {% if (best and worst) or stats.year_avg is not none %}
-      <div class="insights">
-        {% if best and worst %}
-        <div class="insight is-best">
-          <small>In testa · <span data-explore="year-label">{{ year }}</span></small>
-          <strong><a href="/regione/{{ best.region_key }}" data-explore="best-name">{{ best.region }}</a></strong>
-          <span><span data-explore="best-value">{{ best.value | it_num(2) }}</span> {{ value_unit }}</span>
-        </div>
-        <div class="insight is-worst">
-          <small>In coda · <span data-explore="year-label">{{ year }}</span></small>
-          <strong><a href="/regione/{{ worst.region_key }}" data-explore="worst-name">{{ worst.region }}</a></strong>
-          <span><span data-explore="worst-value">{{ worst.value | it_num(2) }}</span> {{ value_unit }}</span>
-        </div>
-        {% endif %}
-        {% if stats.year_avg is not none %}
-        <div class="insight">
-          <small>Media delle regioni · <span data-explore="year-label">{{ year }}</span></small>
-          <strong data-explore="avg-value">{{ stats.year_avg | it_num(2) }}</strong>
-          <span>{{ value_unit }}, <span data-explore="avg-count">{{ stats.year_count }}</span> {{ stats.year_count | it_plural('regione', 'regioni') }}</span>
-        </div>
-        {% endif %}
-      </div>
-      {% endif %}
-
-      {% if sibling_prev or sibling_next %}
-      <nav class="sibling-nav" aria-label="Altri indicatori del tema {{ meta.theme }}">
-        {% if sibling_prev %}<a class="sibling-nav__link is-prev" href="{{ sibling_prev.path }}"><span>← Precedente</span><small>{{ sibling_prev.name }}</small></a>{% else %}<span class="sibling-nav__link is-disabled" aria-hidden="true"></span>{% endif %}
-        {% if sibling_next %}<a class="sibling-nav__link is-next" href="{{ sibling_next.path }}"><span>Successivo →</span><small>{{ sibling_next.name }}</small></a>{% else %}<span class="sibling-nav__link is-disabled" aria-hidden="true"></span>{% endif %}
-      </nav>
-      {% endif %}
-    </aside>
-
-    <section class="viz-stage">
-      <div class="viz-tabs" role="tablist" data-explore="tabs" hidden>
-        <button type="button" class="is-active" data-tab="map" role="tab">Mappa</button>
-        <button type="button" data-tab="ranking" role="tab">Classifica</button>
-        <button type="button" data-tab="trend" role="tab">Serie storica</button>
-      </div>
-      <div class="viz-grid active-map" data-explore="viz-grid">
-        {% if map_colors %}
-        <article class="data-card viz-card--map" data-tabpanel="map">
-          <header><small>Anno <span data-explore="map-year">{{ year }}</span></small><h2>Mappa regionale</h2></header>
-          <p class="page-note indicator-map-hint">Passa sopra o tocca una regione per leggerne il valore; selezionala per portarla a fuoco nella scheda e nella serie storica.</p>
-          <style>
-            {% for key, color in map_colors.items() %}.indicator-map [data-key="{{ key }}"]{fill:{{ color }}}
-            {% endfor %}
-          </style>
-          <div class="indicator-map-frame">
-            <div class="indicator-map" data-explore="map">
-              {% include "_italy_map.html" %}
-            </div>
-            <div class="indicator-map__tip" data-explore="map-tip" hidden></div>
-          </div>
-          <div class="map-legend" aria-hidden="true">
-            <div class="map-legend__bar"></div>
-            <div class="map-legend__scale">
-              <span data-explore="legend-min"></span>
-              <span data-explore="legend-mid"></span>
-              <span data-explore="legend-max"></span>
-            </div>
-            <div class="map-legend__note"><span class="map-legend__swatch"></span> dato non disponibile</div>
-          </div>
-        </article>
-        {% endif %}
-
-        <article class="data-card viz-card--ranking" data-tabpanel="ranking">
-          <header><small><span data-explore="year-title">{{ year }}</span> · {{ value_unit }}</small><h2>Classifica delle regioni</h2></header>
-          <p class="page-note">
-            {% if explain.direction == 'higher_better' %}Più in alto nella lista, meglio è.
-            {% elif explain.direction in ('lower_better', 'higher_worse') %}Qui valori più bassi raccontano una situazione migliore.
-            {% else %}Come leggere i numeri dipende dal singolo indicatore, quindi confrontali con prudenza.{% endif %}
-            Clicca una regione per portarla a fuoco; il nome apre il suo profilo.
-          </p>
-          <div class="ranking" data-explore="ranking">
-            {% for row in values %}
-            {% set bar_w = (row.value / bar_max * 100) if bar_max else 0 %}
-            <div class="ranking-row" data-region-key="{{ row.region_key }}">
-              <span class="rank">{{ loop.index }}</span>
-              <a class="region" href="/regione/{{ row.region_key }}">{{ row.region }}</a>
-              <span class="bar"><i style="width: {{ [bar_w, 2] | max | round(1) }}%"></i></span>
-              <strong class="num">{{ row.value | it_num(2) }}</strong>
-            </div>
-            {% endfor %}
-          </div>
-        </article>
-
-        <article class="data-card viz-card--trend" data-tabpanel="trend">
-          <header><small data-explore="trend-region">Media delle regioni</small><h2>Serie storica {{ meta.year_min }}-{{ meta.year_max }}</h2></header>
-          <figure class="indicator-explore__trend" data-explore="trend">
-            <figcaption data-explore="trend-title"></figcaption>
-            <div class="indicator-explore__chart">
-              <svg data-explore="trend-svg" viewBox="0 0 640 200" role="img" aria-label="Serie storica della regione a fuoco e media delle regioni"></svg>
-              <div class="indicator-explore__tip" data-explore="trend-tip" hidden></div>
-            </div>
-          </figure>
-        </article>
-      </div>
-    </section>
-  </section>
-
-  {# ---- Prosa SEO sotto il cruscotto, in ordine piramide invertita (layout §7):
-       definizione + voce, poi "i numeri" come blocco unico interpretativo (i valori
-       best/worst/media vivono gia nelle insight card sopra), poi "cosa sapere" con
-       il caveat mirato, infine come citare. ---- #}
-  {{ prose.definition_block(explain, analyst) }}
-
-  {% if stats.gap_abs is not none or stats.year_avg is not none or annual_change or (stats.has_multi_year and stats.avg_change_abs is not none) %}
-  <section class="prose indicator-numbers">
-    <h2>I numeri, in breve</h2>
-
-    {% set has_tiles = stats.gap_abs is not none or stats.above_avg_count is not none or (stats.has_multi_year and stats.avg_change_pct is not none and (meta.years | length) >= 3) or (annual_change and annual_change.average_delta is not none) %}
-    {% if has_tiles %}
-    <div class="numbers-tiles">
-      {% if stats.gap_abs is not none %}
-      <div class="numbers-tile">
-        <span class="numbers-tile__label">Divario</span>
-        <span class="numbers-tile__value">{{ stats.gap_abs | it_num(2) }} <span class="u">{{ change_unit }}</span></span>
-        {% if stats.gap_ratio %}<span class="numbers-tile__sub">{{ stats.gap_ratio | it_num(1) }}× il valore più basso</span>{% endif %}
-      </div>
-      {% endif %}
-      {% if stats.above_avg_count is not none and stats.below_avg_count is not none %}
-      <div class="numbers-tile">
-        <span class="numbers-tile__label">Sopra la media</span>
-        <span class="numbers-tile__value">{{ stats.above_avg_count }} <span class="u">di {{ stats.year_count }}</span></span>
-        <span class="numbers-tile__sub">{{ stats.below_avg_count }} {{ stats.below_avg_count | it_plural('regione', 'regioni') }} sotto</span>
-      </div>
-      {% endif %}
-      {% if stats.has_multi_year and stats.avg_change_pct is not none and (meta.years | length) >= 3 %}
-      <div class="numbers-tile">
-        <span class="numbers-tile__label">Dal {{ stats.year_min }} al {{ stats.year_max }}</span>
-        <span class="numbers-tile__value">{% if stats.avg_change_pct > 0 %}+{% endif %}{{ stats.avg_change_pct | it_num(1) }}<span class="u">%</span></span>
-        <span class="numbers-tile__sub">media regionale</span>
-      </div>
-      {% elif annual_change and annual_change.average_delta is not none %}
-      <div class="numbers-tile">
-        <span class="numbers-tile__label">Tra {{ annual_change.previous_year }} e {{ annual_change.year }}</span>
-        <span class="numbers-tile__value">{% if annual_change.average_delta > 0 %}+{% endif %}{{ annual_change.average_delta | it_num(2) }} <span class="u">{{ change_unit }}</span></span>
-        <span class="numbers-tile__sub">media regionale</span>
-      </div>
-      {% endif %}
+  {# ---- Zona 1: il cruscotto. Ogni numero della pagina vive qui, una volta sola. ---- #}
+  <section class="indicator-cockpit" id="esplora" data-explore-root aria-label="Esplora i dati dell'indicatore">
+    <div class="page-facts">
+      <span><small>Tema</small><a href="{{ meta.theme_path }}">{{ meta.theme }}</a></span>
+      {% if meta.source_theme and meta.source_theme != meta.theme %}<span><small>Sottotema {{ meta.institution or "Istat" }}</small>{{ meta.source_theme }}</span>{% endif %}
+      <span><small>Unità di misura</small>{{ meta.value_unit }}</span>
+      <span><small>Copertura</small>{{ level.year_min }}-{{ level.year_max }}, {{ level.observations | length }} {{ level.observations | length | it_plural(level.singular, level.plural) }}</span>
+      <span><small>Freschezza</small><b class="freshness-badge is-{{ meta.freshness_status }}">{{ meta.freshness_label }}</b></span>
+      <span><small>Fonte</small><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a></span>
+      {# One grid child, or `.page-facts span { display: grid }` puts the two
+         links and the separator on three separate rows. #}
+      {% if meta.downloads %}<span><small>Download</small><span class="page-facts__inline"><a href="{{ meta.downloads.csv }}">CSV</a> · <a href="{{ meta.downloads.json }}">JSON</a></span></span>{% endif %}
     </div>
-    {% endif %}
 
-    {% if stats.gap_abs is not none %}
-    <p>Lo scarto tra <a href="/regione/{{ best.region_key }}">{{ best.region }}</a> e <a href="/regione/{{ worst.region_key }}">{{ worst.region }}</a> è quello osservato e, da solo, non dice se la differenza sia statisticamente significativa.</p>
-    {% endif %}
-
-    {% if stats.median is not none and stats.year_avg is not none and (stats.median - stats.year_avg) | abs > 0.01 * (stats.year_avg | abs) %}
-    <p>Lo scarto tra media e mediana segnala una distribuzione non uniforme tra le regioni.</p>
-    {% endif %}
-    {% if stats.year_count is not none and stats.year_count < 5 %}
-    <p class="page-note">Con {{ stats.year_count }} {{ stats.year_count | it_plural('regione', 'regioni') }} a confronto, i valori vanno letti come indicazioni di massima. Mediana e distribuzione non sarebbero significative su così pochi dati.</p>
-    {% endif %}
-
-    {% if stats.has_multi_year and stats.avg_change_abs is not none and (meta.years | length) >= 3 %}
-    {# serie lunga (almeno 3 osservazioni): la storia lunga una volta, l'ultimo anno
-       come frase con numeri diversi. Le serie a due sole osservazioni cadono nel
-       ramo corto sotto, per non raccontare due volte lo stesso intervallo. #}
-    <p>Dal {{ stats.year_min }} al {{ stats.year_max }} la media regionale è passata da {{ stats.year_min_avg | it_num(2) }} a {{ stats.year_avg | it_num(2) }} {{ value_unit }}{% if stats.avg_change_pct is not none %} ({{ stats.avg_change_pct | it_num(1) }}%){% endif %}{% if trend_note %}, {{ trend_note }}{% endif %}.{% if annual_change %} Nell'ultimo anno disponibile, tra il {{ annual_change.previous_year }} e il {{ annual_change.year }}, la media delle {{ annual_change.common_count }} {{ annual_change.common_count | it_plural('regione', 'regioni') }} confrontabili è passata da {{ annual_change.previous_avg | it_num(2) }} {{ value_unit }} a {{ annual_change.current_avg | it_num(2) }} {{ value_unit }}. Il valore è diminuito in {{ annual_change.decrease_count }} {{ annual_change.decrease_count | it_plural('regione', 'regioni') }}, è aumentato in {{ annual_change.increase_count }}{% if annual_change.stable_count %} ed è rimasto invariato in {{ annual_change.stable_count }}{% endif %}. {{ annual_note }}{% endif %}</p>
-    {% if stats.region_highest_delta and stats.region_lowest_delta %}
-    <p>Sull'intero periodo
-      {% if stats.region_highest_delta.kind == 'aumento' %}l'aumento maggiore è di <a href="/regione/{{ stats.region_highest_delta.region_key }}">{{ stats.region_highest_delta.region }}</a> (+{{ stats.region_highest_delta.delta | it_num(2) }} {{ change_unit }})
-      {% elif stats.region_highest_delta.kind == 'calo' %}il calo più contenuto è di <a href="/regione/{{ stats.region_highest_delta.region_key }}">{{ stats.region_highest_delta.region }}</a> ({{ stats.region_highest_delta.delta | it_num(2) }} {{ change_unit }})
-      {% else %}<a href="/regione/{{ stats.region_highest_delta.region_key }}">{{ stats.region_highest_delta.region }}</a> resta sostanzialmente stabile
-      {% endif %},
-      {% if stats.region_lowest_delta.kind == 'calo' %}mentre il calo maggiore è di <a href="/regione/{{ stats.region_lowest_delta.region_key }}">{{ stats.region_lowest_delta.region }}</a> ({{ stats.region_lowest_delta.delta | it_num(2) }} {{ change_unit }})
-      {% elif stats.region_lowest_delta.kind == 'aumento' %}mentre l'aumento più contenuto è di <a href="/regione/{{ stats.region_lowest_delta.region_key }}">{{ stats.region_lowest_delta.region }}</a> (+{{ stats.region_lowest_delta.delta | it_num(2) }} {{ change_unit }})
-      {% else %}mentre <a href="/regione/{{ stats.region_lowest_delta.region_key }}">{{ stats.region_lowest_delta.region }}</a> resta sostanzialmente stabile
-      {% endif %}. Se sia un miglioramento o un peggioramento dipende dalla direzione dell'indicatore.</p>
-    {% endif %}
-    {% if stats.gap_trend is not none %}
-    <p>{% if stats.gap_trend | abs < 0.01 * (stats.year_min_gap_abs | abs) %}Il divario tra la regione migliore e quella peggiore è rimasto sostanzialmente stabile nel periodo.
-      {% elif stats.gap_trend > 0 %}Il divario tra la regione migliore e quella peggiore si è allargato di {{ stats.gap_trend | it_num(2) }} {{ change_unit }} nel periodo.
-      {% else %}Il divario tra la regione migliore e quella peggiore si è ristretto di {{ (stats.gap_trend | abs) | it_num(2) }} {{ change_unit }} nel periodo.{% endif %}</p>
-    {% endif %}
-    {% elif annual_change %}
-    {# serie di due anni o corta: una sola storia di cambiamento, l'ultimo anno #}
-    <p>Tra il {{ annual_change.previous_year }} e il {{ annual_change.year }} la media semplice delle {{ annual_change.common_count }} {{ annual_change.common_count | it_plural('regione', 'regioni') }} confrontabili è passata da {{ annual_change.previous_avg | it_num(2) }} {{ value_unit }} a {{ annual_change.current_avg | it_num(2) }} {{ value_unit }}.
-      {% if annual_change.average_delta > 0 %}È un aumento di {{ annual_change.average_delta | it_num(2) }} {{ change_unit }}.
-      {% elif annual_change.average_delta < 0 %}È una diminuzione di {{ (annual_change.average_delta | abs) | it_num(2) }} {{ change_unit }}.
-      {% else %}Il valore medio non è cambiato.{% endif %}
-      {{ annual_note }}</p>
-    <p>Il valore è diminuito in {{ annual_change.decrease_count }} {{ annual_change.decrease_count | it_plural('regione', 'regioni') }}, è aumentato in {{ annual_change.increase_count }}{% if annual_change.stable_count %} ed è rimasto invariato in {{ annual_change.stable_count }}{% endif %}.</p>
-    {% elif not stats.has_multi_year %}
-    <p>La fonte rende disponibile un solo anno per questa serie, quindi non è possibile calcolare una variazione rispetto a un anno precedente con la stessa definizione.</p>
-    {% endif %}
-
-    <p class="page-note">La media è una sintesi non ponderata dei valori regionali e non coincide necessariamente con un indicatore nazionale calcolato sulla popolazione.{% if meta.external_sources %} Layer esterno collegato: {{ meta.external_sources | join(', ') }}{% if meta.external_year_max %}, ultimo anno normalizzato {{ meta.external_year_max }}{% endif %}.{% endif %}</p>
-  </section>
-  {% endif %}
-
-  {{ prose.faq_block(faq) }}
-
-  {{ prose.caveat_block(analyst, explain, year, meta.year_min, meta.year_max, meta.source_label or meta.source, meta.source_url, meta.institution, meta.archive) }}
-
-  {% if cover_bars %}
-  <details class="indicator-cover-share">
-    <summary>Immagine da condividere</summary>
-  <figure class="indicator-cover">
-    <div class="indicator-cover__card">
-      <div class="indicator-cover__kicker">Divario Italia · dati {{ year }}</div>
-      <div class="indicator-cover__title">{{ meta.name }}</div>
-      <div class="indicator-cover__subtitle">{{ meta.theme }} · {{ value_unit }}</div>
-      <div class="indicator-cover__bars">
-        {% for bar in cover_bars %}
-        <div class="indicator-cover__bar{{ ' is-best' if bar.is_best }}{{ ' is-worst' if bar.is_worst }}">
-          <span class="indicator-cover__bar-name">{{ bar.region }}</span>
-          <span class="indicator-cover__bar-track"><i class="indicator-cover__bar-fill" style="width:{{ bar.width_pct }}%"></i></span>
-          <strong class="indicator-cover__bar-value">{{ bar.value | it_num(2) }}</strong>
-        </div>
+    <div class="cockpit-controls">
+      {% if levels | length > 1 %}
+      {# Server-rendered links first, so the other level is reachable without JS;
+         the script upgrades them to an in-place switch. #}
+      <div class="level-switch" data-explore="levels" role="group" aria-label="Livello territoriale">
+        {% for item in levels %}
+        <a class="level-switch__option{{ ' is-active' if item.key == level.key }}"
+           href="{{ meta.canonical_path }}?livello={{ item.key }}"
+           data-level="{{ item.key }}"{% if item.key == level.key %} aria-current="true"{% endif %}>{{ item.label }}</a>
         {% endfor %}
       </div>
-      <div class="indicator-cover__footer">
-        <span>Fonte: {{ meta.source_label or meta.source }}</span>
-        <strong>divarioitalia.it</strong>
-      </div>
+      {% endif %}
+
+      <label class="cockpit-control">
+        <span>Anno</span>
+        <input type="range" data-explore="year" min="0" max="{{ level.years | length - 1 }}" step="1"
+               value="{{ level.years | length - 1 }}" aria-label="Anno"{% if level.years | length < 2 %} disabled{% endif %}>
+        <b data-explore="year-label">{{ level.year_max }}</b>
+      </label>
+
+      <label class="cockpit-control">
+        <span>{{ level.singular | capitalize }} a fuoco</span>
+        <select data-explore="territory" aria-label="{{ level.singular | capitalize }} a fuoco">
+          {% for item in level.territories %}<option value="{{ item.key }}"{{ ' selected' if item.key == level.default_territory.key }}>{{ item.name }}</option>{% endfor %}
+        </select>
+      </label>
     </div>
-    <figcaption>Anteprima dei dati di questo indicatore, generata automaticamente nello stesso formato usato per le condivisioni social.</figcaption>
-  </figure>
+
+    {# One KPI row. These used to be three separate blocks (chips, insight cards,
+       numbers tiles) in three places on the page. #}
+    <div class="kpi-row">
+      {# level.default_territory, not observations[0] by hand: the script boots
+         from the same value, so this tile does not change on hydration. #}
+      <div class="kpi kpi--focus" data-kpi="focus">
+        <small><span data-kpi="focus-name">{{ level.default_territory.name }}</span> · <span data-explore="year-label">{{ level.year_max }}</span></small>
+        <strong data-kpi="focus-value">{{ level.default_territory.value | it_num(2) }}</strong>
+        <span class="kpi__sub"><span data-kpi="focus-rank">1ª su {{ level.observations | length }} {{ level.plural }}</span> <a data-kpi="focus-link" href="{{ level.profile_path or '#' }}{{ level.default_territory.key }}"{% if not level.profile_path %} hidden{% endif %}>profilo →</a></span>
+      </div>
+
+      {% if level.best and level.worst %}
+      <div class="kpi kpi--best">
+        <small>In testa</small>
+        <strong data-kpi="top-value">{{ level.best.value | it_num(2) }}</strong>
+        <span class="kpi__sub" data-kpi="top-name">{{ level.best.name }}</span>
+      </div>
+      <div class="kpi kpi--worst">
+        <small>In coda</small>
+        <strong data-kpi="bottom-value">{{ level.worst.value | it_num(2) }}</strong>
+        <span class="kpi__sub" data-kpi="bottom-name">{{ level.worst.name }}</span>
+      </div>
+      {% else %}
+      <div class="kpi">
+        <small>Valore più alto</small>
+        <strong data-kpi="top-value">{{ level.observations[0].value | it_num(2) }}</strong>
+        <span class="kpi__sub" data-kpi="top-name">{{ level.observations[0].name }}</span>
+      </div>
+      <div class="kpi">
+        <small>Valore più basso</small>
+        <strong data-kpi="bottom-value">{{ level.observations[-1].value | it_num(2) }}</strong>
+        <span class="kpi__sub" data-kpi="bottom-name">{{ level.observations[-1].name }}</span>
+      </div>
+      {% endif %}
+
+      {% if level.stats.year_avg is not none %}
+      <div class="kpi">
+        <small>Media delle {{ level.plural }}</small>
+        <strong data-kpi="mean-value">{{ level.stats.year_avg | it_num(2) }}</strong>
+        <span class="kpi__sub">su <span data-kpi="mean-count">{{ level.stats.year_count }}</span> {{ level.plural }}</span>
+      </div>
+      {% endif %}
+
+      {% if level.stats.gap_abs is not none %}
+      <div class="kpi">
+        <small>Divario</small>
+        <strong data-kpi="gap-value">{{ level.stats.gap_abs | it_num(2) }}</strong>
+        <span class="kpi__sub"><span data-kpi="gap-ratio">{% if level.stats.gap_ratio %}{{ level.stats.gap_ratio | it_num(1) }}× il più basso{% else %}{{ meta.change_unit }}{% endif %}</span></span>
+      </div>
+      {% endif %}
+
+      {% if level.annual_change %}
+      <div class="kpi">
+        <small>Dal <span data-kpi="change-from">{{ level.annual_change.previous_year }}</span></small>
+        <strong data-kpi="change-value">{% if level.annual_change.average_delta > 0 %}+{% endif %}{{ level.annual_change.average_delta | it_num(2) }}</strong>
+        <span class="kpi__sub">{{ meta.change_unit }}, media</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="viz-tabs" role="tablist" data-explore="tabs" hidden>
+      {% if level.has_map %}<button type="button" class="is-active" data-tab="map" role="tab">Mappa</button>{% endif %}
+      <button type="button"{{ ' class=is-active' if not level.has_map }} data-tab="ranking" role="tab">Classifica</button>
+      <button type="button" data-tab="trend" role="tab">Serie storica</button>
+    </div>
+
+    {# No active-* class from the server. Under 760px the stylesheet hides every
+       card except the active one, and without JavaScript the tabs that would
+       switch it are inert, so a no-JS phone could only ever see the map. The
+       script adds the class when it can also honour it. #}
+    <div class="viz-grid{{ ' has-no-map' if not level.has_map }}" data-explore="viz-grid">
+      {% if level.has_map and level.map_colors %}
+      <article class="data-card viz-card--map" data-tabpanel="map">
+        <header><small>Anno <span data-explore="year-label">{{ level.year_max }}</span></small><h3>Mappa</h3></header>
+        <p class="page-note indicator-map-hint">Passa sopra o tocca una regione per leggerne il valore, selezionala per portarla a fuoco nella scheda e nella serie storica.</p>
+        <style>
+          {% for key, color in level.map_colors.items() %}.indicator-map [data-key="{{ key }}"]{fill:{{ color }}}
+          {% endfor %}
+        </style>
+        <div class="indicator-map-frame">
+          <div class="indicator-map" data-explore="map">
+            {# The shared partial defaults to a label that says only "regioni
+               italiane". Here the map carries an indicator, and role="img" makes
+               the twenty paths presentational, so this label is the only thing a
+               screen reader gets to hear about what is drawn. #}
+            {% with map_label = "Mappa cliccabile delle regioni italiane per " ~ meta.name %}
+            {% include "_italy_map.html" %}
+            {% endwith %}
+          </div>
+          <div class="indicator-map__tip" data-explore="map-tip" hidden></div>
+        </div>
+        <div class="map-legend" aria-hidden="true">
+          <div class="map-legend__bar"></div>
+          <div class="map-legend__scale">
+            <span data-explore="legend-min"></span>
+            <span data-explore="legend-mid"></span>
+            <span data-explore="legend-max"></span>
+          </div>
+          <div class="map-legend__note"><span class="map-legend__swatch"></span> dato non disponibile</div>
+        </div>
+      </article>
+      {% endif %}
+
+      <article class="data-card viz-card--ranking" data-tabpanel="ranking">
+        <header><small><span data-explore="year-label">{{ level.year_max }}</span> · {{ meta.value_unit }}</small><h3>Classifica</h3></header>
+        <p class="page-note">
+          {% if meta.direction == 'higher_better' %}Più in alto nella lista, meglio è.
+          {% elif meta.direction in ('lower_better', 'higher_worse') %}Qui valori più bassi raccontano una situazione migliore.
+          {% else %}Questo indicatore non ha una direzione univoca, quindi la lista ordina i valori senza premiare nessuno.{% endif %}
+          {% if level.profile_path %}Clicca una riga per portarla a fuoco, il nome apre il profilo.{% else %}Clicca una riga per portarla a fuoco.{% endif %}
+        </p>
+        <div class="ranking" data-explore="ranking">
+          {% for row in level.observations %}
+          {% set bar_w = (row.value / level.bar_max * 100) if level.bar_max else 0 %}
+          <div class="ranking-row" data-region-key="{{ row.key }}">
+            <span class="rank">{{ loop.index }}</span>
+            {% if level.profile_path %}<a class="region" href="{{ level.profile_path }}{{ row.key }}">{{ row.name }}</a>{% else %}<span class="region">{{ row.name }}</span>{% endif %}
+            <span class="bar"><i style="width: {{ [bar_w, 2] | max | round(1) }}%"></i></span>
+            <strong class="num">{{ row.value | it_num(2) }}</strong>
+          </div>
+          {% endfor %}
+        </div>
+      </article>
+
+      <article class="data-card viz-card--trend" data-tabpanel="trend">
+        <header><small data-explore="trend-region">Media delle {{ level.plural }}</small><h3>Serie storica {{ level.year_min }}-{{ level.year_max }}</h3></header>
+        <figure class="indicator-explore__trend" data-explore="trend">
+          <figcaption data-explore="trend-title"></figcaption>
+          <div class="indicator-explore__chart">
+            <svg data-explore="trend-svg" viewBox="0 0 640 200" role="img" aria-label="Serie storica del territorio a fuoco e media dei territori"></svg>
+            <div class="indicator-explore__tip" data-explore="trend-tip" hidden></div>
+          </div>
+        </figure>
+      </article>
+    </div>
+  </section>
+
+  {# ---- Zona 2: l'articolo. Quattro sezioni, una voce sola. ---- #}
+  {{ article.body(page_article, meta, level) }}
+
+  {# ---- Zona 3: l'apparato. Fonti, verifica, condivisione, percorso. ---- #}
+  <section class="indicator-apparatus">
+    <h2>Fonti e verifica</h2>
+    {# Level-specific: meta.year_min/year_max span every level at once, so on a
+       provincial view they would claim a period the provincial series does not
+       cover (10AMB011 is 2017-2020 by province, 2015-2024 by region). #}
+    <p class="data-callout"><strong>Dato più recente: {{ level.year_max }}.</strong>{% if level.year_min != level.year_max %} La serie copre il periodo {{ level.year_min }}-{{ level.year_max }}.{% endif %} Fonte <a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>.</p>
+
+    {# How we compute, not what the source measures. It stays here so an authored
+       "limiti" section can never drop it. #}
+    <p>La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. Classifica e divario derivano dagli stessi valori pubblicati dalla fonte, senza riponderazioni.</p>
+
+    {% if meta.quality_life_scored %}
+    <p>Questa serie entra nel punteggio regionale della qualità della vita{% if meta.quality_life_category_label %}, nella categoria {{ meta.quality_life_category_label }}{% endif %}. Il punteggio ordina i dati, non sostituisce l'interpretazione del contesto territoriale.</p>
+    {% elif meta.family in ('bes', 'multiscopo') %}
+    <p>Questa serie resta descrittiva e non entra nel punteggio della qualità della vita, per evitare sovrapposizioni con altri indicatori o interpretazioni arbitrarie.</p>
+    {% endif %}
+
+    {% if meta.source_dataflow %}
+    <p class="page-note">Serie SDMX di origine: <a href="{{ meta.source_data_url or meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_dataflow }}</a>.</p>
+    {% endif %}
+
+    {% if page_article.fonti %}
+    <div class="analyst-sources">
+      <h3>Fonti dell'analisi</h3>
+      <ul>
+        {% for fonte in page_article.fonti %}
+        <li>{% if fonte.url %}<a href="{{ fonte.url }}" target="_blank" rel="noopener">{{ fonte.testo }}</a>{% else %}{{ fonte.testo }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if meta.archive %}
+    <details class="indicator-source-definition">
+      <summary>Leggi la definizione originale della fonte</summary>
+      <p>{{ meta.archive }}</p>
+      <p><a href="{{ meta.source_url }}" target="_blank" rel="noopener">Consulta la fonte {{ meta.institution or "Istat" }} →</a></p>
+    </details>
+    {% endif %}
+
+    <details class="indicator-cite-details">
+      <summary>Come citare questo dato</summary>
+      <p><strong>Dato originale:</strong> {{ meta.source_label }}{% if meta.institution and meta.institution not in meta.source_label %} ({{ meta.institution }}){% endif %}, <em>{{ meta.name }}</em>, {{ level.year_max }}. <a href="{{ meta.source_url }}" target="_blank" rel="noopener">Fonte</a>.</p>
+      <p><strong>Elaborazione e visualizzazione:</strong> Divario Italia, <a href="{{ canonical }}">{{ canonical }}</a>. Il dato non è raccolto da noi, lo ripubblichiamo dalla fonte con calcoli derivati (media, divario, classifica) e grafici.</p>
+    </details>
+
+    <p class="page-note"><a href="/metodologia">Definizioni, confronti e limiti</a>{% if meta.quality_life_scored %} · <a href="/qualita-della-vita/metodologia">Come entra nel punteggio della qualità della vita</a>{% endif %}</p>
+  </section>
+
+  {% if level.cover_bars %}
+  <details class="indicator-cover-share">
+    <summary>Immagine da condividere</summary>
+    <figure class="indicator-cover">
+      <div class="indicator-cover__card">
+        <div class="indicator-cover__kicker">Divario Italia · dati {{ level.year_max }}</div>
+        <div class="indicator-cover__title">{{ meta.name }}</div>
+        <div class="indicator-cover__subtitle">{{ meta.theme }} · {{ meta.value_unit }}</div>
+        <div class="indicator-cover__bars">
+          {% for bar in level.cover_bars %}
+          <div class="indicator-cover__bar{{ ' is-best' if bar.is_best }}{{ ' is-worst' if bar.is_worst }}">
+            <span class="indicator-cover__bar-name">{{ bar.region }}</span>
+            <span class="indicator-cover__bar-track"><i class="indicator-cover__bar-fill" style="width:{{ bar.width_pct }}%"></i></span>
+            <strong class="indicator-cover__bar-value">{{ bar.value | it_num(2) }}</strong>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="indicator-cover__footer">
+          <span>Fonte: {{ meta.source_label }}</span>
+          <strong>divarioitalia.it</strong>
+        </div>
+      </div>
+      <figcaption>Anteprima dei dati di questo indicatore, generata automaticamente nello stesso formato usato per le condivisioni social.</figcaption>
+    </figure>
   </details>
   {% endif %}
 
-  {% if spark_points %}
-  <section class="indicator-sparkline-wrap">
-    <h2>Serie storica {{ meta.year_min }}-{{ meta.year_max }}, media semplice delle regioni</h2>
-    <div class="indicator-sparkline">
-      <svg viewBox="0 0 1200 140" preserveAspectRatio="none" role="img" aria-label="Andamento della media semplice delle regioni nel tempo">
-        <polyline points="{{ spark_points }}"></polyline>
-      </svg>
+  {% if related %}
+  <section class="indicator-related">
+    <h2>Altri indicatori del tema {{ meta.theme }}</h2>
+    <div class="quality-table-wrap">
+      <table class="data-table indicator-related__table">
+        <thead><tr><th>Indicatore</th><th>Come si legge</th><th class="num">Ultimo dato</th></tr></thead>
+        <tbody>
+          {% for item in related %}
+          <tr>
+            <td><a href="{{ item.path }}">{{ item.name }}</a></td>
+            <td>{% if item.direction == 'higher_better' %}più alto è meglio{% elif item.direction in ('lower_better', 'higher_worse') %}più basso è meglio{% else %}senza direzione univoca{% endif %}</td>
+            <td class="num">{{ item.year_max }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </section>
   {% endif %}
 
-  {{ prose.related_block(related_siblings, meta.theme, theme_path) }}
-
-  {{ prose.citation_block(meta.source_label or meta.source, meta.institution, meta.name, year, meta.source_url, canonical) }}
+  {% if siblings.prev or siblings.next %}
+  <nav class="sibling-nav" aria-label="Altri indicatori del tema {{ meta.theme }}">
+    {% if siblings.prev %}<a class="sibling-nav__link is-prev" href="{{ siblings.prev.path }}"><span>← Precedente</span><small>{{ siblings.prev.name }}</small></a>{% else %}<span class="sibling-nav__link is-disabled" aria-hidden="true"></span>{% endif %}
+    {% if siblings.next %}<a class="sibling-nav__link is-next" href="{{ siblings.next.path }}"><span>Successivo →</span><small>{{ siblings.next.name }}</small></a>{% else %}<span class="sibling-nav__link is-disabled" aria-hidden="true"></span>{% endif %}
+  </nav>
+  {% endif %}
 
   <aside class="indicator-cta">
     <span>
       <small>Continua il percorso</small>
       <strong>Vedi gli altri indicatori del tema {{ meta.theme }}, oppure <a href="/atlante?view=confronto">confronta più regioni</a> nello strumento di confronto.</strong>
     </span>
-    <a href="{{ theme_path }}">Vai al tema →</a>
+    <a href="{{ meta.theme_path }}">Vai al tema →</a>
   </aside>
 </article>
 
-<script type="application/json" id="indicator-data">{{ explore_data | tojson }}</script>
+<script type="application/json" id="indicator-data">{{ explore | tojson }}</script>
 <script src="{{ url_for('static', filename='js/indicator-explorer.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/indicator-finder.js') }}" defer></script>
 {% endblock %}

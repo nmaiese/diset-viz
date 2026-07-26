@@ -1,4 +1,18 @@
-"""Loader for the analyst-voice indicator notes.
+"""DEPRECATED loader for the analyst-voice indicator notes.
+
+Superseded by ``app.indicator_texts``. The indicator page no longer reads this
+module or ``analyst_notes.json``: the prose was migrated into the four-role
+article schema by ``scripts/migrate_notes_to_texts.py``.
+
+Both are kept, unreferenced, only until the migrated articles have been reviewed
+on rendered pages. ``attacco -> lead`` and ``spunto -> quadro`` are role
+reassignments rather than renames, so the original wording is worth having until
+someone has read the result. Delete this module, the JSON and
+``tests/test_analyst_notes.py`` together once that review is done.
+
+Original docstring follows.
+
+Loader for the analyst-voice indicator notes.
 
 The prose lives in ``app/static/data/analyst_notes.json`` (never in the .py, per
 the editorial pipeline), keyed by indicator id. Numeric ids match the atlas

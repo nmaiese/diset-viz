@@ -108,6 +108,22 @@ def internal_id(family, raw_id):
     return f"{SOURCES[family]['internal_prefix']}{raw_id}"
 
 
+def split_internal_id(indicator_id):
+    """Inverse of ``internal_id``: 'bes:10AMB002' -> ('bes', '10AMB002').
+
+    Territorial ids carry no prefix, so a bare id resolves to that family. This
+    is the only correct way back from a catalog id to the pair the page and the
+    editorial tooling need, and it used to be reimplemented ad hoc wherever it
+    was wanted.
+    """
+    value = str(indicator_id)
+    for family, meta in SOURCES.items():
+        prefix = meta["internal_prefix"]
+        if prefix and value.startswith(prefix):
+            return family, value[len(prefix):]
+    return "territorial", value
+
+
 def indicator_code(family, raw_id):
     """The resolving segment: <acronym>-<raw_id> (e.g. 'eur-rd_e_gerdreg')."""
     return f"{acronym(family)}-{raw_id}"

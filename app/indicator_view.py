@@ -34,13 +34,15 @@ import functools
 
 from app import profiles, sources
 from app.atlas_catalog import get_atlas_indicator, get_atlas_catalog
-from app.bes_data import get_bes_indicator_page, get_bes_rows, get_bes_territories
+from app.bes_data import all_bes_indicators, get_bes_indicator_page, get_bes_rows, get_bes_territories
 from app.data import indicator_trend_stats, indicator_year_over_year_stats
 from app.external_data import freshness_label, freshness_status
+from app.multiscopo_data import all_multiscopo_indicators
 from app.indicator_notes import (
     annual_change_framing,
     change_unit_label,
     cover_bars,
+    is_percentage_unit,
     region_choropleth_colors,
     trend_framing,
     value_unit_label,
@@ -141,6 +143,10 @@ def _build_meta(family, raw_id, source_meta):
         "unit": source_meta.get("unit"),
         "value_unit": value_unit_label(name, source_meta.get("unit")),
         "change_unit": change_unit_label(name, source_meta.get("unit")),
+        # True for "%" and for "punti percentuali". Prose must then express a
+        # change in points, never as a relative percentage: "da 49,99% a 54,87%,
+        # il 9,8% in piu" puts two unrelated percentages in one sentence.
+        "percentage_like": is_percentage_unit(source_meta.get("unit")),
         "direction": direction,
         "scoreable": direction in profiles.SCOREABLE_DIRECTIONS,
         "explain": explain,
@@ -149,32 +155,56 @@ def _build_meta(family, raw_id, source_meta):
         "source_theme": source_meta.get("source_theme"),
         "macro_area": source_meta.get("macro_area"),
         "source": source_meta.get("source"),
-        "source_label": source_meta.get("source_label") or source_meta.get("source"),
+        # Never None: the province-only BES series carry no catalog metadata, and
+        # a page that cannot name its source is worse than one naming the family.
+        "source_label": (
+            source_meta.get("source_label")
+            or source_meta.get("source")
+            or sources.family_label(family)
+        ),
         "source_url": source_meta.get("source_url"),
         "source_data_url": source_meta.get("source_data_url"),
+        # The exact SDMX series behind a Multiscopo indicator, so a reader can
+        # go and pull the same numbers rather than trust ours.
+        "source_dataflow": source_meta.get("source_dataflow"),
         "institution": source_meta.get("institution") or sources.family_institution(family),
         "license_url": source_meta.get("license_url") or "https://creativecommons.org/licenses/by/3.0/it/",
         "archive": source_meta.get("archive"),
         "quality_life_scored": source_meta.get("quality_life_scored", False),
         "quality_life_category_label": source_meta.get("quality_life_category_label"),
-        "indexable": _is_indexable(family, source_meta),
-        "canonical_path": sources.indicator_url(family, raw_id, profiles.indicator_slug(name)),
+        "indexable": _is_indexable(family, raw_id, source_meta),
+        # The catalog already computed the canonical path for every family, and
+        # the families do not agree on the slug: the atlas truncates it at 80
+        # characters, the quality-of-life ones do not. Rebuilding it here silently
+        # moved six long-named BES indicators to a URL the sitemap does not list
+        # and every existing link 301s away from. Defer, never recompute.
+        "canonical_path": source_meta.get("path")
+        or sources.indicator_url(family, raw_id, profiles.indicator_slug(name)),
         "downloads": _downloads(family, source_meta["id"]),
     }
 
 
-def _is_indexable(family, source_meta):
-    """One indexability answer, applying each family's existing rule.
+@functools.lru_cache(maxsize=2)
+def _family_indexability(family):
+    """{raw_id: indexable} as the family's own catalog computes it."""
+    if family == "bes":
+        return {item["id"]: bool(item["indexable"]) for item in all_bes_indicators()}
+    return {item["id"]: bool(item["indexable"]) for item in all_multiscopo_indicators()}
 
-    The atlas rule (complete regional coverage, no gender variant) and the
-    quality-of-life rule (80% coverage in the latest year) stay exactly as they
-    were: this only picks between them, so no page changes sitemap status.
+
+def _is_indexable(family, raw_id, source_meta):
+    """One indexability answer, applying each family's own rule unchanged.
+
+    The two rules are genuinely different: the atlas wants complete regional
+    coverage, no gender variant and a recent year, while the quality-of-life
+    families want 80% coverage in the latest year. The sitemap
+    (app/views.py) still branches on the family catalog's own `indexable` flag,
+    so reading anything else here puts 47 BES and Multiscopo pages out of step
+    with the sitemap that lists them. Picking between the rules is all this does.
     """
-    if family in ("territorial", "eurostat"):
-        return profiles.is_search_indexable_indicator(source_meta)
-    if source_meta.get("region_count") is not None:
-        return profiles.is_search_indexable_indicator(source_meta)
-    return bool(source_meta.get("indexable"))
+    if family in ("bes", "multiscopo"):
+        return _family_indexability(family).get(raw_id, False)
+    return profiles.is_search_indexable_indicator(source_meta)
 
 
 def _downloads(family, indicator_id):
@@ -297,6 +327,12 @@ def _build_level(key, series, meta, territory_total, coverage):
             {"key": tkey, "name": name}
             for tkey, name in sorted(territories.items(), key=lambda item: item[1])
         ],
+        # Which territory the cockpit opens on. It has to be one explicit value:
+        # the server rendered the ranking leader while the script fell back to
+        # territories[0], which is alphabetical, so the focus tile visibly
+        # changed the moment the page hydrated. The leader is the more
+        # informative default.
+        "default_territory": _territory(observations[0]) if observations else None,
         "matrix": matrix,
         "map_colors": region_choropleth_colors(observations) if conf["has_map"] else None,
         "cover_bars": cover_bars(observations, best, worst, meta["scoreable"]) if conf["has_map"] else None,
@@ -433,6 +469,7 @@ def _explore_payload(meta, levels):
                 "yearMax": level["year_max"],
                 "defaultYear": level["year_max"],
                 "territories": level["territories"],
+                "defaultTerritory": (level["default_territory"] or {}).get("key"),
                 "matrix": level["matrix"],
             }
             for level in levels

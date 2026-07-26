@@ -8,11 +8,16 @@ MIN_COMPLETENESS = 0.98
 REQUIRED_REGION_COUNT = 20
 
 # Exploration query parameters that put an indicator or region page into an
-# in-page state (a chosen year, a focused region). They never create a new
-# document: the canonical stays the base URL and the variant is kept out of the
-# index and the sitemap. Keeping the list here makes it the single source of
-# truth shared by the views and any future sitemap check.
-EXPLORE_PARAMS = ("anno", "regione")
+# in-page state (a chosen year, a focused region, a territorial level). They
+# never create a new document: the canonical stays the base URL and the variant
+# is kept out of the index and the sitemap. Keeping the list here makes it the
+# single source of truth shared by the views and any future sitemap check.
+#
+# `livello` switches an indicator page between regions and provinces. It is
+# server-rendered so the provincial view works without JavaScript, which is
+# exactly why it has to be listed here: without it, ?livello=provincia would be
+# a second indexable URL showing the same indicator.
+EXPLORE_PARAMS = ("anno", "regione", "livello")
 
 
 def has_explore_params(args):
