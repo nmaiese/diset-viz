@@ -11,7 +11,10 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from scripts import discovery, eurostat_source, discover_candidates, promote_candidates
+from scripts import (
+    discovery, eurostat_source, istat_regional_source,
+    discover_candidates, promote_candidates,
+)
 
 
 class FreshnessAndScoring(unittest.TestCase):
@@ -296,6 +299,69 @@ class QueueRoundTrip(unittest.TestCase):
                 len([r for r in manifest if not r["source"] and not r["source_indicator_id"]]), 1,
                 "the source-less placeholder entry was collapsed",
             )
+
+
+class IstatRegionalAdapter(unittest.TestCase):
+    def test_parse_regional_combines_bolzano_trento(self):
+        rows = istat_regional_source.fetch_rows("OLDAGEDEPR", offline=True)
+        regional = istat_regional_source.parse_regional(rows, "OLDAGEDEPR")
+        # 20 regions, Trentino present once (Bolzano+Trento combined by weight),
+        # its value sitting between the two provincial figures.
+        self.assertEqual(len(regional), istat_regional_source.REGION_COUNT)
+        self.assertIn(istat_regional_source.TRENTINO_NAME, regional)
+        parts = {}
+        for row in rows:
+            if row["DATA_TYPE"] == "OLDAGEDEPR" and row["REF_AREA"] in istat_regional_source.TRENTINO_PARTS:
+                parts.setdefault(row["TIME_PERIOD"], {})[row["REF_AREA"]] = float(row["OBS_VALUE"])
+        year = max(istat_regional_source.parse_regional(rows, "OLDAGEDEPR")[istat_regional_source.TRENTINO_NAME])
+        combined = regional[istat_regional_source.TRENTINO_NAME][year]
+        lo, hi = sorted(parts[year].values())
+        self.assertGreaterEqual(combined, lo)
+        self.assertLessEqual(combined, hi)
+
+    def test_partial_trentino_is_dropped_not_published(self):
+        # A year with only Bolzano (or only Trento) is not Trentino Alto Adige:
+        # it must be left missing, never published as one province's value.
+        rows = [
+            {"DATA_TYPE": "X", "REF_AREA": "ITD1", "TIME_PERIOD": "2020", "OBS_VALUE": "40"},
+            {"DATA_TYPE": "X", "REF_AREA": "ITD2", "TIME_PERIOD": "2020", "OBS_VALUE": "42"},
+            {"DATA_TYPE": "X", "REF_AREA": "ITD1", "TIME_PERIOD": "2021", "OBS_VALUE": "41"},
+        ]
+        regional = istat_regional_source.parse_regional(rows, "X")
+        trentino = regional.get(istat_regional_source.TRENTINO_NAME, {})
+        self.assertIn("2020", trentino)   # both provinces present -> combined
+        self.assertNotIn("2021", trentino)  # only Bolzano -> dropped
+
+    def test_best_recent_year_respects_coverage(self):
+        rows = istat_regional_source.fetch_rows("DEPENDRATE", offline=True)
+        regional = istat_regional_source.parse_regional(rows, "DEPENDRATE")
+        year, coverage, present = istat_regional_source.best_recent_year(regional)
+        self.assertIsNotNone(year)
+        self.assertGreaterEqual(coverage, istat_regional_source.MIN_COVERAGE)
+        self.assertLessEqual(len(present), istat_regional_source.REGION_COUNT)
+
+    def test_discover_produces_regional_candidate(self):
+        raw = istat_regional_source.discover("OLDAGEDEPR", offline=True)
+        self.assertEqual(raw["territory_level"], "regione")
+        self.assertEqual(raw["source"], "istat_demografia")
+        self.assertEqual(raw["source_dataset"], istat_regional_source.DATAFLOW)
+        self.assertTrue(raw["year_max"])
+        self.assertGreater(float(raw["coverage"]), 0.0)
+
+    def test_normalized_rows_use_decimal_comma(self):
+        rows = istat_regional_source.normalized_rows("OLDAGEDEPR", offline=True)
+        self.assertTrue(rows)
+        self.assertTrue(any("," in row["value"] for row in rows))
+
+    def test_hunter_discovers_new_istat_candidates(self):
+        with TemporaryDirectory() as tmp:
+            discovery.CANDIDATES_PATH = Path(tmp) / "candidates.csv"
+            discovered, _ = discover_candidates.run("istat_demografia", offline=True)
+            self.assertEqual(len(discovered), len(istat_regional_source.ISTAT_SERIES))
+            for cand in discovered:
+                self.assertEqual(cand["source"], "istat_demografia")
+                self.assertEqual(cand["territory_level"], "regione")
+                self.assertEqual(cand["triage_status"], "new")
 
 
 if __name__ == "__main__":

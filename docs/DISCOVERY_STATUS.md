@@ -142,9 +142,21 @@ questa scelta. Il cacciatore si lancia a mano con
 come nel contratto della Routine (vedi "Runtime" in
 [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md)).
 
+## Fatto di recente
+
+- **Secondo adapter del cacciatore**: `istat_demografia`
+  (`scripts/istat_regional_source.py`), indicatori demografici via SDMX Istat
+  (indice di dipendenza degli anziani e strutturale), con fixture offline. La
+  watchlist non gira più su un'unica fonte.
+- **Scouting delle fonti**: `scripts/scout_sources.py` propone i dataflow SDMX
+  regionali non ancora coperti in `data/discovery/source_candidates.csv`
+  (PR-gated, non tocca l'allowlist). Vedi "Fase 2b" in `DISCOVERY_PIPELINE.md`.
+
 ## Cosa NON è ancora fatto (prossimi passi)
 
-1. **Scouting opt-in**: proporre nuovi domini all'allowlist (oggi solo watchlist).
+1. **Cablare le fonti proposte dallo scout**: dopo l'approvazione umana di una
+   proposta in `source_candidates.csv`, scrivere l'adapter del cacciatore per
+   quel dominio (come `istat_regional_source` per la demografia).
 2. **Estendere la watchlist**: altre serie Eurostat/istituzionali, poi livello
    provinciale (NUTS3), sempre priorità al regionale fresco.
 3. **Profili regionali** (`app/profiles.py`): oggi calcolati sui soli territoriali
