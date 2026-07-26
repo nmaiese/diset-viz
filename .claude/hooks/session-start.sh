@@ -25,9 +25,13 @@ fi
 .venv/bin/pip install --quiet -r requirements.txt
 
 # --- Frontend: dipendenze (dist e' gia' committato, serve solo per build) ---
-if [ -f frontend/package.json ]; then
-  ( cd frontend && npm install --no-audit --no-fund --silent ) \
-    || echo "session-start: npm install fallito (non bloccante)"
+# npm ci, non npm install: installa esattamente dal lockfile e NON lo riscrive.
+# npm install invece riallinea package-lock.json a ogni avvio (l'npm del
+# container droppa i campi libc), lasciando il working tree sporco in ogni
+# sessione. Salta del tutto se node_modules c'e' gia' (container ripreso).
+if [ -f frontend/package.json ] && [ ! -d frontend/node_modules ]; then
+  ( cd frontend && npm ci --no-audit --no-fund --silent ) \
+    || echo "session-start: npm ci fallito (non bloccante)"
 fi
 
 # --- GitHub CLI (gh) --------------------------------------------------------
