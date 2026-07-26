@@ -212,6 +212,31 @@ class CurationDecisions(unittest.TestCase):
         self.assertFalse(check.ok)
 
 
+class ARunThatProducedSomethingHasToSayItDid(unittest.TestCase):
+    """Imposto dal cancello invece che ricordato nel prompt.
+
+    E' la stessa logica del perimetro: un promemoria si puo' saltare, e questo
+    sta all'ultimo passo di una run lunga, cioe' nel punto in cui e' piu'
+    facile saltarlo. Ed e' proprio la riga di diario a rendere osservabile la
+    catena, quindi vale un controllo, non un'esortazione.
+    """
+
+    def test_work_without_a_journal_line_is_refused(self):
+        check = pipeline_gate.check_run_is_recorded(
+            "writer", [pipeline_gate.INDICATOR_TEXTS]
+        )
+        self.assertFalse(check.ok)
+        self.assertIn("pipeline_log.py --write", check.detail)
+
+    def test_a_run_that_touched_nothing_owes_no_record(self):
+        """Una run a mani vuote non passa nemmeno di qui: non ha un branch da
+        giudicare, e la sua riga resta affidata al contratto."""
+        check = pipeline_gate.check_run_is_recorded("writer", [])
+        self.assertTrue(check.ok, check.detail)
+        check = pipeline_gate.check_run_is_recorded("writer", [pipeline_gate.RUN_JOURNAL])
+        self.assertTrue(check.ok, check.detail)
+
+
 class ChecksThatCannotRunAreNotPasses(unittest.TestCase):
     """The weakest thing a gate can do is report green because it looked away.
 

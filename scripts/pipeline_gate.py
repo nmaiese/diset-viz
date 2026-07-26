@@ -385,6 +385,63 @@ def changed_text_keys(base=None, cwd=None):
     return sorted(key for key in new if new[key] != old.get(key))
 
 
+def check_run_is_recorded(stage, paths, base=None, cwd=None):
+    """Una run che ha prodotto qualcosa deve dire di averlo fatto.
+
+    Imposto qui invece che ricordato nel prompt, per la stessa ragione per cui
+    il perimetro sta nel repo: un promemoria si puo' saltare, soprattutto
+    all'ultimo passo di una run lunga, ed e' proprio la riga di diario che
+    trasforma la catena in una cosa osservabile. Senza, l'unica traccia di un
+    agente resta il commit, e le run che non ne producono restano invisibili.
+
+    Vincola solo le run che hanno toccato altro. Una run a mani vuote non passa
+    di qui, perche' non ha un branch da giudicare: la sua riga di diario resta
+    affidata al contratto.
+    """
+    worked = [p for p in paths if p != RUN_JOURNAL]
+    if not worked:
+        return Check("diario", True, "nessun lavoro da registrare")
+    if RUN_JOURNAL not in paths:
+        return Check(
+            "diario",
+            False,
+            f"la run ha toccato {len(worked)} file ma non ha registrato niente in {RUN_JOURNAL}. "
+            f"Aggiungi la riga con: python3 scripts/pipeline_log.py --write --stage {stage} "
+            f"--outcome <esito> --summary \"...\"",
+        )
+    added = _journal_lines_added(base, cwd=cwd)
+    mine = [entry for entry in added if entry.get("stage") == stage]
+    if not mine:
+        return Check(
+            "diario",
+            False,
+            f"il diario e' cambiato ma nessuna riga nuova e' dello stadio '{stage}'",
+        )
+    return Check("diario", True, f"{len(mine)} run registrate come '{stage}'")
+
+
+def _journal_lines_added(base=None, cwd=None):
+    """Le righe di diario che questo branch aggiunge, gia' interpretate."""
+    resolved = resolve_base(base, cwd=cwd)
+    old = set()
+    if resolved:
+        code, out, _ = _git("show", f"{resolved}:{RUN_JOURNAL}", cwd=cwd)
+        if code == 0:
+            old = {line for line in out.splitlines() if line.strip()}
+    current = PROJECT_ROOT / RUN_JOURNAL
+    if not current.exists():
+        return []
+    added = []
+    for line in current.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line in old:
+            continue
+        try:
+            added.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return added
+
+
 def check_writer_vintage(base=None, cwd=None):
     """The writer's contract is `vintage == year_max`, stricter than the drift
     guard in the suite, which only fails when the vintage falls *behind*. A
@@ -488,6 +545,7 @@ def run(stage, base=None, skip_tests=False, cwd=None):
         check_blast_radius(stage, paths),
         check_whitespace(cwd=cwd),
         check_no_coauthor_trailer(base, cwd=cwd),
+        check_run_is_recorded(stage, paths, base, cwd=cwd),
     ]
     if stage in ("hunter", "promoter"):
         checks.append(check_hunter_decisions())
