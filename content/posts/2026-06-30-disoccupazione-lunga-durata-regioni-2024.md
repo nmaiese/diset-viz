@@ -88,7 +88,7 @@ territorio di non lasciare indietro chi è già rimasto fuori.
 Puoi vedere l'indicatore anno per anno e regione per regione nella [scheda dell'indicatore](/indicatore/tasso-di-disoccupazione-di-lunga-durata/ter-17). Il tema è collegato ai [giovani
 NEET](/blog/neet-giovani-regioni-2024) e al [PIL pro capite per
 regione](/blog/pil-pro-capite-regioni-divario-2024). Per il quadro completo guarda
-il tema [Lavoro](/tema/lavoro).
+il tema [Lavoro e conciliazione](/tema/lavoro-e-conciliazione).
 
 *Dati: Istat, "Indicatori territoriali per le politiche di sviluppo". Le medie
 sono medie semplici tra le regioni, non pesate per popolazione.*

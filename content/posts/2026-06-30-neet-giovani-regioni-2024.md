@@ -91,7 +91,7 @@ quella che poi se ne va.
 
 Puoi vedere l'indicatore anno per anno e regione per regione nella [scheda dell'indicatore](/indicatore/tasso-giovani-neet-totale/ter-408). Il tema è strettamente legato all'istruzione:
 guarda l'[abbandono scolastico per regione](/indicatore/giovani-che-abbandonano-prematuramente-i-percorsi-di-istruzione-e-formazione-pro/ter-102) e il tema
-[Lavoro](/tema/lavoro). Per il quadro economico che fa da sfondo, leggi il
+[Lavoro e conciliazione](/tema/lavoro-e-conciliazione). Per il quadro economico che fa da sfondo, leggi il
 [PIL pro capite per regione](/blog/pil-pro-capite-regioni-divario-2024).
 
 *Dati: Istat, "Indicatori territoriali per le politiche di sviluppo". Le medie
