@@ -39,6 +39,26 @@ quality-of-life section for regions and provinces.
   every sentence, and an apparatus (sources, citation, related). A figure is
   shown once, in the cockpit, and the prose interprets it. See
   [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) before touching either.
+- `/divari-regionali` — the editorial hub on the territorial divide, server
+  rendered from `app/divari.py`. Not a second taxonomy over `/temi` and
+  `/regioni`: it argues one thesis (the divide is not a single line) and measures
+  it, so **every number and every share in its prose is recomputed from the
+  catalog at render time**. Never hardcode a figure into that template. It reuses
+  the homepage map component through `_map_panel.html` (`_map_hero` in
+  `app/views.py`), and its partition means are plain averages of regional values,
+  a limit the page states in full.
+- `/confronto` — the canonical home of the compare tool: a server-rendered page
+  that mounts the SPA's compare view through `window.__diInitialView`. The SPA
+  state `/atlante?view=confronto` still works, but nothing links to it: one tool,
+  one public URL. Add a path-scoped view by setting that flag in the template,
+  never by teaching `frontend/src/main.jsx` about Flask routes.
+- `/ricerca?q=` — internal search, server rendered, **`noindex, follow` on
+  purpose** (an unbounded `?q=` space would be thin duplicate pages of the cards
+  it lists). The header is set in the view because `add_security_headers`
+  stamps `index, follow` on anything that does not declare otherwise. It is out of
+  the sitemap and deliberately *not* in the robots.txt disallow list, since a
+  disallowed page never gets its noindex read. The masthead search icon, the
+  mobile menu form and the homepage `SearchAction` all point here.
 - `/legacy` — original D3 dashboard (do not break it).
 - `/api/catalog`, `/api/search`, `/api/indicator/<id>`,
   `/api/indicator/<id>/year/<year>` — JSON API for the atlas.

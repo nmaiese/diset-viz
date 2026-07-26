@@ -19,6 +19,7 @@ from app.atlas_catalog import (
     get_atlas_theme_profile,
     search_atlas_indicators,
 )
+from app import divari
 from app import profiles
 from app import sources
 from app import seo_policy
@@ -39,8 +40,9 @@ from app import moderation
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
-import csv, hmac, io, json, os, re, time
+import csv, hmac, io, json, os, re, time, unicodedata
 from collections import defaultdict
+from urllib.parse import quote_plus
 
 from app import config
 
@@ -182,6 +184,46 @@ def atlante():
     return render_template('app.html', featured_indicators=_home_featured_indicator_links())
 
 
+@app.route("/divari-regionali")
+@cache.cached(timeout=300, query_string=True)
+def divari_regionali():
+    """L'hub editoriale sui divari territoriali.
+
+    Non e' una seconda tassonomia sopra /temi e /regioni: quelle pagine servono a
+    sfogliare, questa sostiene una tesi (il divario non e' una linea sola) e la
+    misura sul catalogo, ripartizione per ripartizione. Ogni numero in pagina e'
+    ricalcolato dai dati a ogni render, cosi' la prosa non puo' invecchiare.
+    """
+    view = divari.build_divari_view()
+    if view is None:
+        abort(404)
+    return render_template(
+        "divari_regionali.html",
+        divari=view,
+        map_hero=_map_hero(divari.MAP_DIVARI),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/divari-regionali",
+    )
+
+
+@app.route("/confronto")
+@cache.cached(timeout=300)
+def confronto():
+    """La casa canonica del comparatore.
+
+    Il confronto tra regioni era solo uno stato della SPA (/atlante?view=confronto):
+    funzionava, ma non aveva una URL da condividere ne' un titolo suo. Qui la
+    pagina e' server-rendered, quindi chi arriva senza JavaScript legge un
+    confronto vero con numeri reali, e il bundle monta sopra la vista giusta.
+    """
+    return render_template(
+        "confronto.html",
+        compare_preview=_home_compare_preview(),
+        featured_indicators=_home_featured_indicator_links(),
+    )
+
+
 @app.route("/legacy")
 @cache.cached(timeout=300)
 def legacy():
@@ -212,6 +254,134 @@ def search():
             theme=request.args.get("theme"),
         )
     })
+
+
+_SEARCH_PAGE_SIZE = 50
+# Oltre questo tetto la ricerca smette di raccogliere: una query di una lettera
+# altrimenti impaginerebbe l'intero catalogo, e nessuno arriva a pagina dodici.
+_SEARCH_MAX_RESULTS = 300
+
+
+def _search_fold(value):
+    """Minuscolo, senza accenti, spazi compattati: la forma su cui confrontare."""
+    folded = unicodedata.normalize("NFKD", value or "").encode("ascii", "ignore").decode("ascii")
+    return " ".join(folded.lower().split())
+
+
+def _search_rank(title, secondary, query):
+    """3 se la query apre il titolo, 2 se sta nel titolo, 1 se sta nel resto.
+
+    Serve solo a ordinare, non a filtrare: chi cerca "neet" deve trovare in cima
+    l'indicatore che si chiama NEET, non un articolo che lo nomina di passaggio.
+    """
+    title_folded = _search_fold(title)
+    if title_folded.startswith(query):
+        return 3
+    if query in title_folded:
+        return 2
+    if query in _search_fold(secondary):
+        return 1
+    return 0
+
+
+def _search_results(query):
+    """Indicatori e articoli che rispondono alla query, ordinati per pertinenza."""
+    folded = _search_fold(query)
+    if not folded:
+        return []
+
+    results = []
+    for item in search_atlas_indicators(query=query, limit=_SEARCH_MAX_RESULTS):
+        explain = item.get("explain") or {}
+        results.append({
+            "kind": "indicatore",
+            "kind_label": "Indicatore",
+            "title": item["name"],
+            "url": item["path"],
+            "summary": explain.get("plain") or "",
+            "meta": f"{item['theme']} · {item['catalog_family_label']} · ultimo anno {item['year_max']}",
+            "rank": _search_rank(item["name"], f"{item['theme']} {explain.get('plain', '')}", folded),
+        })
+
+    for post in get_posts():
+        haystack = " ".join([
+            post["title"],
+            post.get("description") or "",
+            " ".join(post.get("tags") or []),
+            re.sub(r"<[^>]+>", " ", post.get("body_html") or ""),
+        ])
+        if folded not in _search_fold(haystack):
+            continue
+        results.append({
+            "kind": "articolo",
+            "kind_label": "Articolo",
+            "title": post["title"],
+            "url": f"/blog/{post['slug']}",
+            "summary": post.get("description") or "",
+            "meta": f"Blog · {post['date'].strftime('%d.%m.%Y')} · {post['read_time']} min di lettura",
+            "rank": _search_rank(post["title"], haystack, folded),
+        })
+
+    # Ordine stabile: prima la pertinenza, poi l'ordine in cui le due fonti li
+    # hanno prodotti (catalogo per gli indicatori, data per gli articoli).
+    results.sort(key=lambda row: -row["rank"])
+    return results
+
+
+@app.route("/ricerca")
+def ricerca():
+    """Ricerca interna server-rendered, `noindex, follow` per scelta.
+
+    Uno spazio `?q=` e' illimitato per costruzione: indicizzarlo produrrebbe un
+    numero arbitrario di pagine sottili, ognuna un sottoinsieme di righe che
+    esistono gia' sulle schede. Qui la pagina serve a chi cerca, non a Google:
+    funziona senza JavaScript, si condivide, e i suoi link restano `follow`
+    cosi' l'equity scorre verso le pagine indicatore e gli articoli.
+    """
+    query = (request.args.get("q") or "").strip()
+    try:
+        page = max(1, int(request.args.get("pagina", 1)))
+    except (TypeError, ValueError):
+        page = 1
+
+    results = _search_results(query)
+    total = len(results)
+    # Il tetto vale sulla raccolta degli indicatori: contare anche gli articoli
+    # farebbe annunciare "ci fermiamo qui" con qualche risultato di anticipo.
+    truncated = sum(1 for row in results if row["kind"] == "indicatore") >= _SEARCH_MAX_RESULTS
+    pages = max(1, (total + _SEARCH_PAGE_SIZE - 1) // _SEARCH_PAGE_SIZE)
+    page = min(page, pages)
+    start = (page - 1) * _SEARCH_PAGE_SIZE
+    visible = results[start:start + _SEARCH_PAGE_SIZE]
+
+    canonical_query = f"?q={quote_plus(query)}" if query else ""
+    canonical = f"{SITE_URL}/ricerca{canonical_query}"
+    if page > 1:
+        canonical = f"{canonical}{'&' if canonical_query else '?'}pagina={page}"
+
+    response = make_response(render_template(
+        "ricerca.html",
+        query=query,
+        results=visible,
+        total=total,
+        page=page,
+        pages=pages,
+        first_index=start + 1,
+        last_index=start + len(visible),
+        page_size=_SEARCH_PAGE_SIZE,
+        truncated=truncated,
+        indicator_count=sum(1 for row in results if row["kind"] == "indicatore"),
+        post_count=sum(1 for row in results if row["kind"] == "articolo"),
+        query_param=canonical_query,
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=canonical,
+    ))
+    # L'after_request mette "index, follow" su tutto quello che non si dichiara:
+    # qui l'header va scritto a mano, altrimenti la pagina direbbe noindex nel
+    # meta e index nell'header.
+    response.headers["X-Robots-Tag"] = "noindex, follow"
+    return response
 
 
 @app.route("/api/indicator/<indicator_id>")
@@ -997,6 +1167,8 @@ def sitemap():
     pages = [
         {"loc": f"{SITE_URL}/", "priority": "1.0"},
         {"loc": f"{SITE_URL}/atlante", "priority": "0.9"},
+        {"loc": f"{SITE_URL}/divari-regionali", "priority": "0.9"},
+        {"loc": f"{SITE_URL}/confronto", "priority": "0.7"},
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
         {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
@@ -1319,20 +1491,23 @@ def _home_featured_indicator_links():
     return featured
 
 
-def _home_map_hero():
-    """Data for the homepage's interactive choropleth: a curated indicator
-    picker (same flagship set as _HOME_FEATURED_INDICATORS), the chosen
-    indicator's per-region colors, and a JSON tooltip payload for the hover/
-    click behaviour in home-map.js. The indicator choice lives in ?indicator=
-    so picking one is a plain link, no JS required to change the map."""
+def _map_hero(indicator_ids):
+    """Data for an interactive choropleth panel: a curated indicator picker, the
+    chosen indicator's per-region colors, and a JSON tooltip payload for the
+    hover/click behaviour in home-map.js. The indicator choice lives in
+    ?indicator= so picking one is a plain link, no JS required to change the map.
+
+    Shared by the homepage and /divari-regionali through _map_panel.html: same
+    component, different curated set, so there is one map behaviour on the
+    server-rendered side of the site instead of two."""
     by_id = {str(item["id"]): item for item in get_catalog()["indicators"]}
     options = [
         {"id": indicator_id, "name": by_id[indicator_id]["name"]}
-        for indicator_id in _HOME_MAP_INDICATORS
+        for indicator_id in indicator_ids
         if indicator_id in by_id
     ]
     requested = request.args.get("indicator")
-    selected_id = requested if requested in _HOME_MAP_INDICATORS and requested in by_id else _HOME_MAP_INDICATORS[0]
+    selected_id = requested if requested in indicator_ids and requested in by_id else indicator_ids[0]
 
     payload = get_atlas_indicator(selected_id)
     meta = payload["metadata"]
@@ -1358,11 +1533,16 @@ def _home_map_hero():
         "options": options,
         "selected_id": selected_id,
         "indicator_name": meta["name"],
+        "indicator_path": meta["path"],
         "theme": meta["theme"],
         "year": year,
         "colors": indicator_notes.region_choropleth_colors(values),
         "tooltip_data": tooltip_data,
     }
+
+
+def _home_map_hero():
+    return _map_hero(_HOME_MAP_INDICATORS)
 
 
 def _home_capabilities(total_indicators):
@@ -1385,7 +1565,7 @@ def _home_capabilities(total_indicators):
             "kicker": "Confronta",
             "title": "Regione contro regione",
             "body": "Metti a confronto due o tre regioni su qualsiasi indicatore, con mappa e serie storica.",
-            "href": "/atlante?view=confronto",
+            "href": "/confronto",
             "cta": "Confronta ora",
         },
         {
@@ -1631,7 +1811,16 @@ def _home_compare_preview():
                 "color": color,
             })
         if entries:
-            rows.append({"theme": meta["theme"], "name": meta["name"], "entries": entries})
+            rows.append({
+                "theme": meta["theme"],
+                "name": meta["name"],
+                # /confronto rende lo stesso confronto senza JavaScript, e la'
+                # ogni riga deve poter aprire la scheda dell'indicatore: il
+                # percorso canonico viene dal catalogo, non ricostruito a mano.
+                "path": meta["path"],
+                "year": year,
+                "entries": entries,
+            })
     if not rows:
         return None
     legend = [

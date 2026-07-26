@@ -1,0 +1,173 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'divari' %}
+
+{% block title %}Divari regionali in Italia: economia, lavoro, salute{% endblock %}
+{% block description %}Quanto distano Nord, Centro e Mezzogiorno su reddito, lavoro e salute: {{ divari.indicator_links }} divari misurati sui dati Istat, regione per regione.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ SITE_URL }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Divari regionali", "item": "{{ SITE_URL }}/divari-regionali" }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="wrap divari-page">
+  <nav class="divari-crumbs" aria-label="Percorso">
+    <a href="/">Home</a> <span aria-hidden="true">/</span> <span aria-current="page">Divari regionali</span>
+  </nav>
+
+  <section class="divari-hero" aria-labelledby="divari-title">
+    <p class="eyebrow">Nord, Centro, Mezzogiorno</p>
+    <h1 id="divari-title">I divari regionali italiani non sono una linea sola</h1>
+    <p class="divari-hero__lead">Reddito, lavoro e salute ordinano le regioni in modi diversi, e la distanza tra la prima e l'ultima cambia di ordine di grandezza a seconda di cosa si misura. Qui i divari stanno uno accanto all'altro, ognuno con la sua unità, il suo anno e la sua scheda.</p>
+    <div class="facts">
+      <div class="fact"><small>Indicatori confrontati</small><strong>{{ divari.scanned }}</strong></div>
+      <div class="fact"><small>Regioni</small><strong>20</strong></div>
+      <div class="fact"><small>Ripartizioni</small><strong>3</strong></div>
+      <div class="fact"><small>Dati</small><strong>{{ divari.year_min }}<span class="fact__range">-{{ divari.year_max }}</span></strong></div>
+    </div>
+  </section>
+
+  {% with map_action = "/divari-regionali" %}{% include "_map_panel.html" %}{% endwith %}
+  <p class="page-note">La mappa mostra <a href="{{ map_hero.indicator_path }}">{{ map_hero.indicator_name }}</a> nel {{ map_hero.year }}. Cambia indicatore dal menu, oppure apri <a href="/atlante">l'atlante interattivo</a> per tutti gli altri.</p>
+
+  <section class="divari-intro" aria-labelledby="divari-intro-title">
+    <h2 id="divari-intro-title">Che cosa misuriamo quando diciamo divario</h2>
+    <p>Il divario territoriale italiano viene raccontato come una linea che taglia il paese all'altezza di Roma. I dati dicono qualcosa di più preciso e di più scomodo. Le linee sono tante e non passano tutte nello stesso punto.</p>
+    <p>Su {{ divari.scanned }} indicatori del catalogo che hanno una direzione dichiarata, cioè per cui si può dire quale valore è preferibile, il Nord ha la media migliore {{ divari.tally.Nord }} volte, il Centro {{ divari.tally.Centro }}, il Mezzogiorno {{ divari.tally.Mezzogiorno }}. Il Nord resta davanti nella maggioranza dei casi. Ma il {{ divari.share.Centro }} per cento degli indicatori mette in testa il Centro e il {{ divari.share.Mezzogiorno }} per cento il Mezzogiorno, e sono indicatori veri, non dettagli.</p>
+    <p>Poi c'è la questione della scala. Tra la media del Nord e quella del Mezzogiorno il PIL pro capite cambia di {{ divari.core[0].gap | it_num(0) }} euro per abitante. Il tasso di occupazione cambia di {{ divari.core[1].gap | it_num(1) }} punti. La speranza di vita alla nascita cambia di {{ divari.core[2].gap | it_num(1) }} anni. Tre divari reali, tre ordini di grandezza diversi. Chi legge solo le percentuali finisce per mettere sullo stesso piano una differenza di reddito enorme e una differenza di longevità che si misura in mesi.</p>
+    <p>Questa pagina tiene insieme le tre letture. Prima la mappa, per vedere dove cade ogni indicatore. Poi una sezione per ripartizione, con gli stessi tre divari misurati ogni volta contro la media nazionale e l'elenco degli indicatori su cui quella parte del paese ha la media migliore. In chiusura la tabella con gli altri {{ divari.others | length }} divari, dal più ampio al più contenuto, e il link alla scheda di ognuno.</p>
+    <p>Nessun punteggio unico e nessuna classifica di sintesi. Un divario alla volta, con la sua unità di misura e la sua fonte. Se cerchi il punteggio composito, sta nella <a href="/qualita-della-vita/classifica/regioni">classifica della qualità della vita</a>, che dichiara i suoi limiti in <a href="/qualita-della-vita/metodologia">metodologia</a>.</p>
+  </section>
+
+  <section class="divari-core" aria-labelledby="divari-core-title">
+    <p class="section-label">I tre divari d'apertura</p>
+    <h2 id="divari-core-title">Quanto si produce, quanti lavorano, quanto si vive</h2>
+    <div class="divari-core-grid">
+      {% for d in divari.core %}
+      <article class="divari-core-card">
+        <small>{{ d.theme }} · {{ d.year }}</small>
+        <h3><a href="{{ d.path }}">{{ d.name }}</a></h3>
+        <ul class="divari-bars">
+          {% for area in ('Nord', 'Centro', 'Mezzogiorno') %}
+          {% set a = d.areas[area] %}
+          <li>
+            <span class="divari-bars__area">{{ area }}</span>
+            <span class="divari-bars__bar"><i style="width: {{ (a.mean / d.bar_max * 100) | round(1) }}%"></i></span>
+            <span class="divari-bars__val">{{ a.mean | it_num(1) }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <p class="divari-core-card__note">
+          Divario tra {{ d.leader }} e {{ d.last }}: {{ d.gap | it_num(1) }} {{ d.change_unit }}.
+          Media nazionale {{ d.national | it_num(1) }} {{ d.unit }}, in testa {{ d.national_lead.name }} con {{ d.national_lead.value | it_num(1) }}, ultima {{ d.national_lag.name }} con {{ d.national_lag.value | it_num(1) }}.
+        </p>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% for a in divari.areas %}
+  <section class="divari-area" id="divari-{{ a.name | lower }}" aria-labelledby="divari-{{ a.name | lower }}-title">
+    <p class="section-label">Ripartizione</p>
+    <h2 id="divari-{{ a.name | lower }}-title">{{ a.name }}</h2>
+    {# "meglio" e "peggio" della media, non "sopra" e "sotto": su un indicatore
+       come i NEET stare sotto la media nazionale e' una buona notizia, e la
+       frase deve restare vera anche se il set d'apertura cambia. #}
+    {% set n = a.above_national %}{% set tot = a.cards | length %}
+    {% set all_of_them = "tutti e tre i" if tot == 3 else "tutti i " ~ tot %}
+    {% set standing %}{% if n == tot %}sta meglio della media nazionale su {{ all_of_them }} divari d'apertura{% elif n == 0 %}sta peggio della media nazionale su {{ all_of_them }} divari d'apertura{% else %}sta meglio della media nazionale su {{ n }} dei {{ tot }} divari d'apertura{% endif %}{% endset %}
+    <p class="divari-area__lead">
+      {% if a.name == 'Nord' %}
+      Otto regioni, da Piemonte e Valle d'Aosta fino all'Emilia-Romagna. Il Nord ha la media migliore su {{ a.leads }} dei {{ divari.scanned }} indicatori confrontati, il {{ a.share }} per cento del totale, e {{ standing }}.
+      {% elif a.name == 'Centro' %}
+      Quattro regioni, e non una via di mezzo.{% if a.leads %} Il Centro ha la media migliore su {{ a.leads }} indicatori, il {{ a.share }} per cento del totale, e su quelli sta davanti anche al Nord.{% endif %} Qui {{ standing }}. Il Lazio pesa molto sulle medie di questa ripartizione, quindi vale la pena aprire le schede regione una per una.
+      {% else %}
+      Otto regioni tra Sud e Isole, la ripartizione che paga il conto più alto su reddito e lavoro: {{ standing }}.{% if a.leads %} Ma resta in testa su {{ a.leads }} indicatori, il {{ a.share }} per cento del totale, e sono indicatori di ambiente, sicurezza percepita e dinamica d'impresa.{% endif %}
+      {% endif %}
+    </p>
+
+    <div class="divari-cards">
+      {% for card in a.cards %}
+      <article class="divari-card{{ ' is-better' if card.better_than_national else ' is-worse' }}">
+        <small>{{ card.theme }} · {{ card.year }}</small>
+        <h3><a href="{{ card.path }}">{{ card.indicator }}</a></h3>
+        <strong>{{ card.mean | it_num(1) }} <span class="u">{{ card.unit }}</span></strong>
+        <span class="divari-card__delta">
+          {{ 'Sopra' if card.delta > 0 else 'Sotto' }} la media nazionale di {{ card.delta | abs | it_num(1) }} {{ card.change_unit }},
+          {{ 'un vantaggio' if card.better_than_national else 'un ritardo' }}
+        </span>
+        <span class="divari-card__extremes">
+          Meglio <a href="/regione/{{ card.lead.key }}">{{ card.lead.name }}</a> con {{ card.lead.value | it_num(1) }}, peggio <a href="/regione/{{ card.lag.key }}">{{ card.lag.name }}</a> con {{ card.lag.value | it_num(1) }}
+        </span>
+      </article>
+      {% endfor %}
+    </div>
+
+    {% if a.examples %}
+    <div class="divari-examples">
+      <h3>Dove il {{ a.name }} ha la media migliore</h3>
+      <ul>
+        {% for e in a.examples %}
+        <li><a href="{{ e.path }}">{{ e.name }}</a> <span>{{ e.theme }}, {{ e.year }}</span></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <p class="divari-area__regions">
+      Le {{ a.regions | length }} regioni della ripartizione:
+      {% for r in a.regions %}<a href="/regione/{{ r.key }}">{{ r.name }}</a>{{ ", " if not loop.last }}{% endfor %}.
+    </p>
+  </section>
+  {% endfor %}
+
+  <section class="divari-others" aria-labelledby="divari-others-title">
+    <p class="section-label">Gli altri divari</p>
+    <h2 id="divari-others-title">Altre {{ divari.others | length }} distanze, dalla più ampia alla più contenuta</h2>
+    <p class="page-note">Media semplice dei valori regionali per ripartizione, ultimo anno disponibile di ogni serie. La colonna "divario" è la distanza tra la ripartizione con la media migliore e quella con la peggiore, letta secondo il verso dell'indicatore, ed è in punti percentuali per gli indicatori espressi in percentuale.</p>
+    <div class="divari-table-wrap">
+      <table class="divari-table">
+        <thead>
+          <tr><th>Indicatore</th><th class="num">Nord</th><th class="num">Centro</th><th class="num">Mezzogiorno</th><th class="num">Divario</th></tr>
+        </thead>
+        <tbody>
+          {% for d in divari.others %}
+          <tr>
+            <td>
+              <a href="{{ d.path }}">{{ d.name }}</a>
+              <span class="divari-table__meta">{{ d.unit }} · {{ d.year }} · in testa {{ d.leader }}</span>
+            </td>
+            <td class="num">{{ d.areas.Nord.mean | it_num(1) }}</td>
+            <td class="num">{{ d.areas.Centro.mean | it_num(1) }}</td>
+            <td class="num">{{ d.areas.Mezzogiorno.mean | it_num(1) }}</td>
+            <td class="num">{{ d.gap | it_num(1) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="divari-cta" aria-labelledby="divari-cta-title">
+    <h2 id="divari-cta-title">Ora fallo con le regioni che ti interessano</h2>
+    <p>Le medie di ripartizione servono a inquadrare. La differenza che conta per chi ci vive è tra due regioni precise, sull'indicatore che gli sta a cuore.</p>
+    <a class="divari-cta__btn" href="/confronto">Confronta le tue regioni &rarr;</a>
+  </section>
+
+  <section class="divari-method" aria-labelledby="divari-method-title">
+    <h2 id="divari-method-title">Come sono calcolati questi numeri</h2>
+    <p>Ogni indicatore arriva dal catalogo di Divario Italia, che federa gli indicatori territoriali Istat, il Benessere equo e sostenibile, l'indagine sulla vita quotidiana delle famiglie e le serie regionali Eurostat. Per ogni indicatore prendiamo l'ultimo anno con copertura completa sulle venti regioni, poi calcoliamo la media dei valori regionali di ciascuna ripartizione.</p>
+    <p>Il limite da tenere presente: sono medie semplici, non pesate per popolazione. Vanno lette come confronto tra territori, non come stima del valore reale della ripartizione, che per un indicatore per abitante richiederebbe i denominatori demografici. Le ripartizioni seguono la classificazione Istat, con Sud e Isole insieme sotto Mezzogiorno.</p>
+    <p>Entrano nel conto solo gli indicatori con una direzione dichiarata, copertura completa e anno recente, perché "media migliore" ha senso solo dove è chiaro quale valore è preferibile. Il metodo completo sta in <a href="/metodologia">metodologia</a>, e ogni scheda indicatore dichiara fonte, definizione e anni disponibili.</p>
+    <p>Da qui puoi continuare con <a href="/temi">gli indicatori per tema</a>, con le <a href="/regioni">venti schede regione</a> o con le <a href="/blog">analisi del blog</a>.</p>
+  </section>
+</main>
+{% endblock %}

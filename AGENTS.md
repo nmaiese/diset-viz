@@ -10,6 +10,13 @@ indicators, a server-rendered SEO blog (`content/posts/*.md`, rendered at
 `/blog`) and a quality-of-life section for regions and provinces. The React app
 lives in `frontend/` and builds into `app/static/dist/`. Do not break `/legacy`.
 
+Three server-rendered pages have rules worth knowing before touching them:
+`/divari-regionali` (the editorial hub, every figure recomputed from the catalog
+in `app/divari.py`, never hardcoded), `/confronto` (the compare tool's only public
+URL, mounts the SPA view via `window.__diInitialView`), and `/ricerca` (internal
+search, `noindex, follow` set in the view, out of the sitemap and out of the
+robots disallow list). See `CLAUDE.md` for the why of each.
+
 ## Commands
 
 ```bash

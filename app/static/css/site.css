@@ -1182,3 +1182,94 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 
 .indicator-cite-details, .indicator-source-definition { margin: 10px 0; border-top: 1px solid var(--grid); padding-top: 10px; }
 .indicator-cite-details summary, .indicator-source-definition summary { font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); cursor: pointer; }
+
+/* Ricerca interna (/ricerca): una lista di risultati, niente card. La pagina e'
+   noindex per scelta, quindi tutto il peso sta sulla leggibilita', non sul
+   markup ricco. */
+.search-page { padding: clamp(24px, 5vw, 44px) 0 56px; max-width: 860px; }
+.search-page h1 { font-size: clamp(26px, 4vw, 36px); margin: 0 0 18px; }
+.search-page__form { display: flex; gap: 10px; align-items: stretch; margin: 0 0 14px; }
+.search-page__form .search-box { flex: 1; min-width: 0; }
+.search-page__form button { font-family: var(--font-mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; padding: 0 18px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; }
+.search-page__form button:hover { background: var(--accent); border-color: var(--accent); }
+.search-results { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 0; }
+.search-result { display: grid; gap: 3px; padding: 14px 0; border-bottom: 1px solid var(--grid); }
+.search-result__kind { font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.search-result__title { font-family: var(--font-display); font-size: 18px; line-height: 1.3; }
+.search-result__sum { margin: 2px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--ink-soft); }
+.search-result__meta { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.search-pager { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 22px 0 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14px; }
+.search-pager span { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+
+@media (max-width: 600px) {
+  .search-page__form { flex-direction: column; }
+  .search-page__form button { padding: 12px 18px; }
+}
+
+/* /divari-regionali: l'hub editoriale sui divari. Stessa identita' cartografica
+   del resto del sito, densita' da pagina di lettura: prima la prosa, poi i
+   numeri, nessuna card decorativa. */
+.divari-page { padding: clamp(20px, 4vw, 36px) 0 60px; }
+.divari-crumbs { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); margin: 0 0 18px; display: flex; gap: 8px; }
+.divari-hero { max-width: 800px; margin: 0 0 26px; }
+.divari-hero h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.1; margin: 0 0 14px; }
+.divari-hero__lead { font-size: 17px; line-height: 1.6; color: var(--ink-soft); margin: 0 0 22px; }
+.divari-page .facts { margin: 0 0 26px; }
+
+.divari-intro { max-width: 720px; margin: 30px 0 40px; }
+.divari-intro h2 { font-size: 24px; margin: 0 0 14px; }
+.divari-intro p { font-size: 16.5px; line-height: 1.7; color: var(--ink-soft); margin: 0 0 14px; }
+
+.divari-core, .divari-area, .divari-others, .divari-cta, .divari-method { margin: 0 0 44px; padding-top: 26px; border-top: 1px solid var(--line); }
+.divari-core h2, .divari-area h2, .divari-others h2, .divari-cta h2, .divari-method h2 { font-size: 24px; margin: 0 0 16px; }
+
+.divari-core-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.divari-core-card { border: 1px solid var(--line); background: var(--panel); padding: 16px; display: grid; gap: 10px; align-content: start; }
+.divari-core-card small { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.divari-core-card h3 { font-size: 17px; margin: 0; line-height: 1.3; }
+.divari-core-card__note { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+.divari-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+.divari-bars li { display: grid; grid-template-columns: 84px 1fr auto; align-items: center; gap: 9px; }
+.divari-bars__area { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.divari-bars__bar { height: 9px; background: var(--grid); }
+.divari-bars__bar i { display: block; height: 100%; background: var(--ink); }
+.divari-bars__val { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink); }
+
+.divari-area__lead { max-width: 720px; font-size: 16px; line-height: 1.65; color: var(--ink-soft); margin: 0 0 20px; }
+.divari-cards { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin: 0 0 22px; }
+.divari-card { border: 1px solid var(--line); border-left-width: 3px; padding: 14px 16px; display: grid; gap: 5px; align-content: start; background: var(--panel); }
+.divari-card.is-better { border-left-color: var(--positive-ink, var(--ink)); }
+.divari-card.is-worse { border-left-color: var(--accent); }
+.divari-card small { font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.divari-card h3 { font-size: 15.5px; margin: 0; line-height: 1.3; }
+.divari-card strong { font-family: var(--font-display); font-size: 26px; line-height: 1; }
+.divari-card strong .u { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.divari-card__delta { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.divari-card__extremes { font-size: 13px; line-height: 1.5; color: var(--ink-soft); }
+
+.divari-examples { margin: 0 0 18px; }
+.divari-examples h3 { font-size: 15px; margin: 0 0 8px; }
+.divari-examples ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+.divari-examples li { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; padding-bottom: 7px; border-bottom: 1px solid var(--grid); font-size: 14.5px; }
+.divari-examples li span { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+.divari-area__regions { font-size: 13.5px; line-height: 1.7; color: var(--muted); margin: 0; }
+
+.divari-table-wrap { overflow-x: auto; }
+.divari-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.divari-table th { text-align: left; font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 400; padding: 0 10px 8px 0; border-bottom: 1px solid var(--ink); }
+.divari-table td { padding: 10px 10px 10px 0; border-bottom: 1px solid var(--grid); vertical-align: top; }
+.divari-table .num { text-align: right; font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
+.divari-table__meta { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.divari-cta { max-width: 720px; }
+.divari-cta p { font-size: 16px; line-height: 1.65; color: var(--ink-soft); margin: 0 0 16px; }
+.divari-cta__btn { display: inline-block; font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; padding: 13px 22px; background: var(--accent); color: var(--paper); border: 1px solid var(--accent); }
+.divari-cta__btn:hover { background: var(--ink); border-color: var(--ink); text-decoration: none; }
+
+.divari-method { max-width: 720px; }
+.divari-method p { font-size: 15px; line-height: 1.65; color: var(--ink-soft); margin: 0 0 12px; }
+
+@media (max-width: 600px) {
+  .divari-bars li { grid-template-columns: 70px 1fr auto; }
+  .divari-table { font-size: 13.5px; min-width: 520px; }
+}
