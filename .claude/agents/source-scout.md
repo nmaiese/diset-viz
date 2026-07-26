@@ -102,12 +102,28 @@ check failed and leave the candidate `needs-info`.
 
 ## Closing
 
-Your merge mode is **always `manual`**. Run the gate, open the PR, stop:
+Your merge mode is `checks`: the pull request merges itself once CI is green,
+and **nobody is going to read it first**. Run the gate, open the PR, hand it to
+the merge step:
 
 ```bash
 python3 scripts/pipeline_gate.py --stage scout
 gh pr create --base master --title "..." --body "..."
+python3 scripts/pipeline_merge.py --stage scout --pr <numero>
 ```
+
+This used to be `manual`, and it was the bottleneck that kept the whole chain
+still: nothing new could be discovered until a human merged your work. The
+control did not disappear, it moved to where it can run unattended.
+`tests/test_source_admission.py` refuses a config row with a missing field, an
+unknown direction, a category that does not exist, or a theme nobody has mapped,
+and CI runs it before your pull request can land.
+
+So write the row as if no one will check it, because no one will. What the test
+cannot see stays yours: whether the institution is citable, whether the licence
+is real and you read it on the source's own pages, whether the series is
+genuinely additive. Getting one of those wrong now puts an institution's name on
+a public page with nothing in between.
 
 In the body, per proposal: the decision, the four checks with their evidence and
 URLs, and for an approved one the config row you added and what the hunter will

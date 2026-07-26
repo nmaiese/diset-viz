@@ -33,7 +33,7 @@ Agenti cloud, sessione nuova a ogni firing, checkout git proprio, environment
 
 | agente | definizione | cron (UTC) | merge | routine id |
 | --- | --- | --- | --- | --- |
-| scout | `source-scout.md` | `0 5 * * 0` (dom) | manuale | `trig_01KZ1CHGPRgNmF9Ahni9VXfQ` |
+| scout | `source-scout.md` | `0 5 * * 0` (dom) | checks | `trig_01KZ1CHGPRgNmF9Ahni9VXfQ` |
 | cacciatore | `indicator-hunter.md` | `0 6 * * 1` (lun) | checks | `trig_01VizeycZocZoeDE1RxjWj1f` |
 | curatore | `indicator-curator.md` | `0 6 * * 4` (gio) | checks | `trig_019EP6TnEbYnKz8VpKFaRm4g` |
 | scrittore | `indicator-writer.md` | `0 6 * * 6` (sab) | auto | `trig_01RymCgC8VsspDrHHnUJgFUk` |
@@ -96,12 +96,20 @@ Multiscopo, più le province SDMX. Le due famiglie arrivate dalla catena:
 
 ## Cosa resta umano, e perché
 
-1. **Ammettere una fonte** (`scout`, merge `manual`). Decide quale istituzione,
-   quale licenza e quale nome legge un utente su una pagina pubblica.
-2. **Scrivere un adapter** per una fonte che non è un dataflow SDMX Istat. È
-   codice, e nessun agente scrive codice.
-3. **Creare una categoria** della qualità della vita. È una sezione del sito con
-   un nome, una descrizione e una macro-area, non una riga di mappatura.
+Niente, nel flusso. Nessuno stadio aspetta un'approvazione: la catena è non
+presidiata per decisione presa, e un modo `manual` in una catena che nessuno
+guarda vuol dire fermo per sempre. Lo scout era l'unico rimasto così, ed era
+esattamente il tappo che teneva ferma tutta la scoperta di indicatori nuovi.
+
+Restano fuori due cose, che non sono approvazioni ma lavoro che gli agenti non
+possono fare:
+
+1. **Scrivere un adapter** per una fonte che non è un dataflow SDMX Istat. È
+   codice, e nessun agente scrive codice. Lo scout che approva una fonte del
+   genere lo scrive nella PR e descrive che adapter servirebbe.
+2. **Creare una categoria** della qualità della vita. È una sezione del sito con
+   un nome, una descrizione e una macro-area, non una riga di mappatura. Mappare
+   un tema a una categoria esistente invece è del curatore.
 
 ## Cosa non è ancora fatto
 

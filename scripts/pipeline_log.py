@@ -62,6 +62,32 @@ OUTCOMES = {
 # problema, e' la risposta giusta quando la coda e' vuota.
 ATTENTION = {"blocked", "stopped", "error"}
 
+# Ogni quanto ci si aspetta che qualcuno registri una run, per gruppo di stadi.
+#
+# Serve perche' il diario da solo non vede il modo di fallire piu' pericoloso di
+# tutti: una Routine che smette di partire. Una run andata male lascia una riga
+# `blocked` e si vede subito. Una run che non parte, o che muore prima di
+# scrivere, non lascia niente, e il diario di uno stadio fermo da un mese e'
+# identico a quello di uno stadio che ha finito il lavoro. E' la stessa forma del
+# bug che e' costato settimane: il silenzio letto come normalita'.
+#
+# Non e' il cron, e' l'attesa. Il cron vive nelle Routine cloud e questo file non
+# lo puo' leggere, quindi qui sta la promessa contro cui misurare il silenzio. Se
+# cambia la schedulazione, cambia anche questa riga.
+#
+# Cacciatore e promotore condividono una Routine sola: chiude su `hunter` se non
+# ha promosso niente e su `promoter` se ha promosso, quindi ogni settimana ci si
+# aspetta una riga dall'uno **o** dall'altro, mai da tutti e due.
+WATCH_GROUPS = (
+    ("scout", ("scout",), 7),
+    ("cacciatore", ("hunter", "promoter"), 7),
+    ("curatore", ("curator",), 7),
+    ("scrittore", ("writer",), 7),
+    ("revisore", ("reviewer",), 1),
+)
+# Una run saltata non e' una catena rotta. Due si'.
+GRACE = 2.5
+
 
 def _now():
     from datetime import datetime, timezone
@@ -148,6 +174,76 @@ def summarize(entries):
     return out
 
 
+def _days_since(stamp, today):
+    from datetime import datetime
+
+    if not stamp:
+        return None
+    try:
+        when = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if when.tzinfo is None:
+        from datetime import timezone
+
+        when = when.replace(tzinfo=timezone.utc)
+    return max(0, (today - when).total_seconds() / 86400)
+
+
+def silence(entries, today=None):
+    """Quali gruppi di stadi hanno smesso di farsi vivi.
+
+    Ritorna una riga per gruppo, sempre, anche per i gruppi in orario: un
+    cruscotto che mostra solo i problemi non permette di distinguere "tutto a
+    posto" da "il controllo non ha girato".
+    """
+    from datetime import datetime, timezone
+
+    today = today or datetime.now(timezone.utc)
+    latest = {}
+    for entry in entries:
+        stage = entry.get("stage")
+        stamp = entry.get("at") or ""
+        if stage and stamp > latest.get(stage, ""):
+            latest[stage] = stamp
+    rows = []
+    for name, stages, expected in WATCH_GROUPS:
+        stamps = [latest[s] for s in stages if s in latest]
+        last = max(stamps) if stamps else ""
+        days = _days_since(last, today)
+        rows.append({
+            "group": name,
+            "stages": list(stages),
+            "expected_days": expected,
+            "last": last,
+            "days_since": None if days is None else round(days, 1),
+            # Mai registrata una run non e' "in ritardo", e' "non ancora vista":
+            # dire che il revisore e' fermo da sempre il giorno in cui nasce il
+            # diario sarebbe un falso allarme che insegna a ignorare gli allarmi.
+            "stale": days is not None and days > expected * GRACE,
+            "never": not last,
+        })
+    return rows
+
+
+def _print_silence(entries):
+    rows = silence(entries)
+    late = [r for r in rows if r["stale"]]
+    print()
+    if late:
+        print("Stadi fermi:")
+        for row in late:
+            print(f"  ! {row['group']:11s} ultima run {row['days_since']:.0f} giorni fa, "
+                  f"ne era attesa una ogni {row['expected_days']}")
+    else:
+        seen = [r for r in rows if not r["never"]]
+        if seen:
+            print("Nessuno stadio e fermo oltre l'attesa.")
+    never = [r for r in rows if r["never"]]
+    if never:
+        print("Mai registrata una run: " + ", ".join(r["group"] for r in never))
+
+
 def _print_timeline(entries, limit):
     if not entries:
         print("Il diario e vuoto: nessun agente ha ancora registrato una run.")
@@ -181,6 +277,7 @@ def _print_timeline(entries, limit):
         warn = f"  ({state['attention']} da guardare)" if state["attention"] else ""
         print(f"  {stage:9s} {state['runs']:3d} run, ultima {(last.get('at') or '')[:10]}"
               f" -> {OUTCOMES.get(last.get('outcome'), '?')}{warn}")
+    _print_silence(entries)
 
 
 def main():
@@ -211,7 +308,8 @@ def main():
     if args.stage:
         entries = [e for e in entries if e.get("stage") == args.stage]
     if args.json:
-        print(json.dumps({"entries": entries, "by_stage": summarize(entries)},
+        print(json.dumps({"entries": entries, "by_stage": summarize(entries),
+                          "silence": silence(entries)},
                          ensure_ascii=False, indent=2))
         return 0
     _print_timeline(entries, args.limit)

@@ -88,15 +88,21 @@ STAGE_PATHS = {
 #
 #   auto     merge now. The change is prose in one file, it reaches no other
 #            page, and reverting it is one commit.
-#   checks   merge when the remote checks pass (`gh pr merge --auto`). The
-#            change moves live numbers (the quality-of-life score, the atlas
-#            catalogue), so it goes through CI and leaves a window in which a
-#            human can still step in.
-#   manual   never merged by an agent. Admitting a source decides which
-#            institution, licence and name a reader sees on a public page, and
-#            that is the one decision the chain does not take by itself.
+#   checks   merge only once the remote checks have concluded green. The change
+#            moves live numbers (the quality-of-life score, the atlas catalogue,
+#            which institution a page names), so CI is what stands between the
+#            agent's judgment and the site.
+#   manual   never merged by an agent. No stage uses this today: the chain is
+#            unattended by decision, and a mode that parks a pull request until
+#            somebody looks is a mode that parks it forever. Kept as a word the
+#            gate can still say, because a future stage may earn it.
+#
+# The wait for `checks` lives in `scripts/pipeline_merge.py`, not in a `gh` flag.
+# `gh pr merge --auto` does NOT wait on this repository: with `allow_auto_merge`
+# false and `master` unprotected it falls back to merging immediately, and a
+# probe pull request proved it by merging with the test job still running.
 MERGE_POLICY = {
-    "scout": "manual",
+    "scout": "checks",
     "hunter": "checks",
     "promoter": "checks",
     "curator": "checks",
@@ -531,24 +537,11 @@ def _python():
     return str(venv) if venv.exists() else sys.executable
 
 
-def check_suite(cwd=None):
-    """Il verdetto lo da' il referto di unittest, non il codice di uscita.
-
-    Sembra un cavillo ed e' invece la differenza fra una catena che gira e una
-    ferma. La suite qui crasha in uscita, con SIGSEGV, circa una run su quattro:
-    i test passano tutti, unittest stampa `OK`, e poi l'interprete muore mentre
-    smonta qualche estensione C. Il processo esce 139 e un cancello che leggesse
-    solo quello bloccherebbe un quarto delle run di **ogni** stadio, su un
-    fallimento che non esiste. E' esattamente cio' che il revisore ha incontrato
-    e ha descritto come "un test dipendente dalla piattaforma".
-
-    Quindi: se unittest dice `FAILED`, o se non dice niente di riconoscibile, e'
-    rosso. Se dice `OK` ma il processo e' morto lo stesso, i test sono passati e
-    lo diciamo a voce alta invece di ingoiarlo, perche' un crash resta una cosa
-    da sistemare anche quando non e' una bocciatura.
-    """
+def _run_suite(cwd=None):
+    """Una passata di suite. Ritorna (verdetto, riassunto, codice di uscita),
+    dove il verdetto e' 'ok', 'failed' o 'crashed'."""
     result = subprocess.run(
-        [_python(), "-m", "unittest", "discover", "-s", "tests"],
+        [_python(), "-X", "faulthandler", "-m", "unittest", "discover", "-s", "tests"],
         cwd=str(cwd or PROJECT_ROOT),
         capture_output=True,
         text=True,
@@ -556,16 +549,58 @@ def check_suite(cwd=None):
     report = (result.stderr or "") + (result.stdout or "")
     tail = [line for line in report.strip().splitlines()[-3:] if line.strip()]
     summary = " / ".join(tail)
-    passed = re.search(r"^OK(\s|$)", report, re.M) and not re.search(r"^FAILED", report, re.M)
-    if not passed:
+    if re.search(r"^FAILED", report, re.M):
+        return "failed", summary, result.returncode
+    if re.search(r"^OK(\s|$)", report, re.M):
+        return "ok", summary, result.returncode
+    return "crashed", summary, result.returncode
+
+
+def check_suite(cwd=None):
+    """Il verdetto lo da' il referto di unittest, non il codice di uscita.
+
+    Sembra un cavillo ed e' invece la differenza fra una catena che gira e una
+    ferma. Questa suite muore di SIGSEGV circa una run su venticinque, e il
+    crash non e' dove sembrava: `-X faulthandler` lo ha inchiodato dentro
+    `app.indicator_view.build_indicator_view`, sulla passata in cui il cruscotto
+    costruisce la vista di ogni indicatore del catalogo. La causa vera non e'
+    ancora nota.
+
+    Ne discendono due comportamenti diversi, e confonderli costa in entrambe le
+    direzioni:
+
+    - **`OK` e poi morto.** I test sono passati e lo si dice a voce alta invece
+      di ingoiarlo, perche' un crash resta una cosa da sistemare anche quando non
+      e' una bocciatura.
+    - **Morto senza referto.** Non e' un fallimento, e' un'assenza di risposta.
+      Trattarlo come rosso bloccherebbe uno stadio su un guasto che non c'e', e
+      la catena e' non presidiata: nessuno rilancerebbe. Quindi si rilancia qui,
+      **una volta sola**, e la seconda risposta e' definitiva.
+
+    Ritentare un `FAILED` sarebbe tutt'altra cosa e non si fa: quello e' un bug
+    con un referto, e nasconderlo e' esattamente cio' che questo cancello esiste
+    per impedire.
+    """
+    verdict, summary, code = _run_suite(cwd=cwd)
+
+    if verdict == "crashed":
+        retry_verdict, retry_summary, retry_code = _run_suite(cwd=cwd)
+        if retry_verdict == "crashed":
+            return Check("suite", False, (
+                f"la suite e' morta senza referto due volte (uscita {code} e {retry_code}). "
+                f"Non e' una bocciatura, e' un crash: {retry_summary[:300] or 'nessun referto'}"
+            ))
+        verdict, summary, code = retry_verdict, retry_summary, retry_code
+        summary = f"{summary} (al primo tentativo l'interprete era morto senza referto)"
+
+    if verdict == "failed":
         return Check("suite", False, f"la suite fallisce: {summary[:500] or 'nessun referto leggibile'}")
-    if result.returncode != 0:
-        return Check(
-            "suite",
-            True,
-            f"{summary[:160]} (l'interprete e' morto in uscita, segnale {-result.returncode if result.returncode < 0 else result.returncode}: "
-            f"i test passano, il crash e' a valle)",
-        )
+    if code != 0:
+        signal = -code if code < 0 else code
+        return Check("suite", True, (
+            f"{summary[:160]} (l'interprete e' morto in uscita, segnale {signal}: "
+            "i test passano, il crash e' a valle)"
+        ))
     return Check("suite", True, summary[:200] or "suite verde")
 
 

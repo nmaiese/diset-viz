@@ -202,10 +202,14 @@ def _summary_cells(status, entries):
     d'occhio, se c'e' qualcosa da guardare o no."""
     attention = sum(1 for e in entries if e.get("outcome") in pipeline_log.ATTENTION)
     last = max((e.get("at", "") for e in entries), default="")
+    late = [r for r in pipeline_log.silence(entries) if r["stale"]]
     cells = [
         ("in coda, tutti gli stadi", str(status["total_waiting"]), False),
         ("run registrate", str(len(entries)), False),
         ("run da guardare", str(attention), attention > 0),
+        # Il silenzio non entra fra le "run da guardare" perche' non e' una run:
+        # e' l'assenza di una run, ed e' il modo di fallire che non lascia tracce.
+        ("stadi fermi", str(len(late)), bool(late)),
         ("ultima run", (last[:10] or "mai"), False),
     ]
     return "\n".join(
@@ -292,6 +296,18 @@ def render(out_path=None):
     else:
         headline = ("Niente in coda: la catena e ferma perche ha finito, "
                     "non perche e bloccata.")
+
+    # Un avviso sopra tutto il resto, perche' uno stadio fermo non si vede in
+    # nessuna delle tabelle sotto: quelle mostrano cio' che e' successo, e qui il
+    # problema e' che non e' successo niente.
+    late = [r for r in pipeline_log.silence(entries) if r["stale"]]
+    if late:
+        detail = ", ".join(
+            f"{r['group']} ({r['days_since']:.0f} giorni, atteso ogni {r['expected_days']})"
+            for r in late
+        )
+        headline += (f" <strong>Fermi: {_esc(detail)}.</strong> "
+                     "Una Routine che smette di partire non lascia nessuna traccia.")
 
     generated = pipeline_log._now().replace("T", " ")[:16]
     page = f"""<!doctype html>

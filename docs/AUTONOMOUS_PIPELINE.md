@@ -30,7 +30,7 @@ un buco: un buco si vede.
  source_        candidates.csv   layer esterno   curation.csv    indicator_    reviewed_at
  candidates.csv                  + manifest      + descrizioni    texts.json    + vintage
      |               |                |                |                |             |
-  manuale         checks           checks           checks            auto          auto
+  checks          checks           checks           checks            auto          auto
 ```
 
 Ogni stadio ha tre cose, e sono sempre le stesse tre: una **coda deterministica**
@@ -129,15 +129,33 @@ Il verdetto porta un campo `merge`, che e' l'ordine:
 | stadio | `merge` | perche' |
 | --- | --- | --- |
 | `writer`, `reviewer` | `auto` | prosa in un file solo, non raggiunge nessun'altra pagina, si annulla con un commit |
-| `hunter`, `promoter`, `curator` | `checks` | muovono numeri vivi (catalogo, punteggio qualita' della vita), quindi passano dai check remoti e lasciano una finestra |
-| `scout` | `manual` | ammettere una fonte decide **quale istituzione e quale licenza** legge un utente su una pagina pubblica |
+| `scout`, `hunter`, `promoter`, `curator` | `checks` | muovono numeri vivi (catalogo, punteggio qualita' della vita) o decidono quale istituzione compare su una pagina pubblica: non fondono finche' la CI non e' verde |
 
 Un verdetto rosso non porta nessun `merge`: fra "i controlli sono falliti" e "ma
 solo un po'" non c'e' niente da negoziare.
 
-Questa tabella e' una **decisione**, non una limitazione tecnica. Se un domani si
-vuole che anche lo scout si fonda da solo, si cambia `MERGE_POLICY` in un diff
-che qualcuno ha letto, e non per deriva.
+**Nessuno stadio e' `manual`.** Lo scout lo era, ed era il tappo: la scoperta di
+indicatori nuovi si fermava alla sua pull request e non ripartiva finche' un
+umano non la guardava. In una catena non presidiata "aspetta una firma" vuol dire
+"aspetta per sempre", quindi il controllo si e' spostato dove puo' girare da solo,
+cioe' nella CI. `tests/test_source_admission.py` rifiuta una riga di fonte a cui
+manchi un campo, con un verso sconosciuto, con una categoria inesistente o con un
+tema che nessuno ha mappato, che e' il guasto piu' silenzioso di tutti:
+l'indicatore resta in catalogo e sparisce da ogni totale per macro-area.
+
+### L'attesa dei check e' codice, non un flag
+
+`gh pr merge --auto` **non aspetta niente su questo repository**. Con
+`allow_auto_merge` a falso e `master` non protetto, `gh` ripiega su un merge
+immediato: una PR sonda e' stata fusa con il job dei test ancora `IN_PROGRESS`.
+Il contratto ha detto per settimane a tre stadi di chiudere con quel comando,
+quindi `checks` e' stato una bugia dal giorno in cui e' stato scritto, e non
+c'era niente da nessuna parte che lo dicesse.
+
+Adesso l'attesa e' in `scripts/pipeline_merge.py`, che rilegge il cancello per
+conto suo (non si fida del rapporto dell'agente sul proprio verdetto), sonda i
+check finche' non concludono, e rifiuta se uno fallisce, se non ne compare
+nessuno, o se il cancello e' rosso.
 
 ## Il rientro: la catena lavora anche sul pubblicato
 
@@ -228,15 +246,17 @@ Sintomi ricorrenti e cosa significano davvero:
 
 ## Cosa resta umano, e perche'
 
-Tre cose, e sono scelte:
+Due cose, e nessuna delle due e' un'approvazione:
 
-1. **Ammettere una fonte** (`scout`, `merge: manual`). Decide quale istituzione,
-   quale licenza e quale nome legge un utente su una pagina pubblica sotto il
-   nome di questo progetto.
-2. **Scrivere un adapter** per una fonte che non e' un dataflow SDMX Istat.
-   E' codice, e nessun agente scrive codice.
-3. **Creare una categoria** della qualita' della vita. E' una sezione del sito,
-   con un nome, una descrizione e una macro-area.
+1. **Scrivere un adapter** per una fonte che non e' un dataflow SDMX Istat.
+   E' codice, e nessun agente scrive codice. Lo scout che approva una fonte del
+   genere lo dice nella PR e descrive che adapter servirebbe.
+2. **Creare una categoria** della qualita' della vita. E' una sezione del sito,
+   con un nome, una descrizione e una macro-area, non una riga di CSV. Mappare
+   un tema a una categoria che gia' esiste invece e' del curatore, e si fa in
+   `config/theme_categories.csv`.
 
-Tutto il resto, dalla scelta dell'indicatore alla pagina pubblicata e poi
-rivisitata, gira da solo.
+Tutto il resto, dalla fonte alla pagina pubblicata e poi rivisitata, gira da
+solo e si fonde da solo. Non c'e' nessun punto in cui la catena aspetta che
+qualcuno guardi: il controllo non e' un'approvazione, sono il perimetro, il
+cancello e la CI, e girano tutti e tre senza di te.

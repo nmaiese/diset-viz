@@ -48,25 +48,39 @@ Lavora su un branch dedicato (`automation/<stadio>-<YYYY-MM-DD>`), committa
 python3 scripts/pipeline_gate.py --stage <scout|hunter|promoter|curator|writer|reviewer>
 ```
 
-Il verdetto porta un `merge`, e quello e' l'ordine:
+Il verdetto porta un `merge`. **Non eseguire tu il merge**: apri la pull request
+e passa il numero al passo di merge, che rilegge il cancello per conto suo e
+decide.
 
-| `merge` | che cosa fai |
+```bash
+gh pr create --title "..." --body "..."
+python3 scripts/pipeline_merge.py --stage <stadio> --pr <numero>
+```
+
+| `merge` | che cosa fa il passo di merge |
 | --- | --- |
-| `auto` | apri la PR e falla merge subito: `gh pr merge --squash --delete-branch` |
-| `checks` | apri la PR e lascia che i check remoti la chiudano: `gh pr merge --auto --squash --delete-branch` |
-| `manual` | apri la PR e **fermati**. Spiega nel corpo cosa deve decidere un umano |
-| `blocked` | **non aprire nessun merge.** Correggi il tuo lavoro e rilancia il cancello |
+| `auto` | fonde subito. E' prosa in un file solo, e la suite l'ha gia' girata il cancello |
+| `checks` | **aspetta davvero** che ogni check remoto concluda, poi fonde. Se uno fallisce, rifiuta |
+| `blocked` | non fonde niente. Correggi il lavoro e rilancia il cancello |
 
-La politica non e' uniforme e il motivo e' il raggio d'azione, non la fiducia:
+Non usare `gh pr merge --auto`. **Su questo repository non aspetta niente**:
+`allow_auto_merge` e' falso e `master` non e' protetto, quindi `gh` ripiega su un
+merge immediato. Una PR sonda e' stata fusa con il job dei test ancora in corso,
+e per tutto il tempo in cui il contratto ha detto di usare quel comando i tre
+stadi `checks` hanno fuso al buio credendo di aspettare. L'attesa vive dentro
+`scripts/pipeline_merge.py`, dove si puo' leggere e testare.
+
+La politica non e' uniforme, e il criterio e' il raggio d'azione:
 
 - la prosa (`writer`, `reviewer`) sta in un file solo, non raggiunge nessun'altra
   pagina e si annulla con un commit,
-- la curatela e la promozione (`curator`, `hunter`, `promoter`) muovono numeri
-  vivi, cioe' il punteggio qualita' della vita e il catalogo, quindi passano dai
-  check remoti,
-- ammettere una **fonte** (`scout`) decide quale istituzione, quale licenza e
-  quale nome legge un utente su una pagina pubblica. Quella resta una firma
-  umana.
+- tutto il resto (`scout`, `hunter`, `promoter`, `curator`) muove numeri vivi o
+  decide quale istituzione compare su una pagina pubblica, quindi non fonde
+  finche' la CI non e' verde.
+
+Nessuno stadio aspetta un umano. Se il tuo lavoro ha bisogno di una decisione che
+non puoi prendere, il posto dove scriverla e' il corpo della PR e la riga di
+diario, non un merge sospeso: **nessuno sta guardando**.
 
 Se `blocked`, non aggirare mai il cancello disattivando un controllo o
 modificando un test. Correggi il lavoro, oppure lascia il branch committato e

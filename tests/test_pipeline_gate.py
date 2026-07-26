@@ -66,10 +66,19 @@ class BlastRadius(unittest.TestCase):
         for stage, policy in pipeline_gate.MERGE_POLICY.items():
             self.assertIn(policy, ("auto", "checks", "manual"), stage)
 
-    def test_admitting_a_source_is_never_automatic(self):
-        """Which institution and licence appear on a public page stays a human
-        decision. If this ever flips, it should flip in a diff someone read."""
-        self.assertEqual(pipeline_gate.MERGE_POLICY["scout"], "manual")
+    def test_no_stage_waits_for_a_human(self):
+        """La catena e' non presidiata per decisione presa. Un modo `manual`
+        parcheggia la PR finche' qualcuno guarda, e in una catena che nessuno
+        guarda vuol dire per sempre: lo scout era l'unico stadio cosi', ed era
+        il tappo che teneva ferma tutta la scoperta di indicatori nuovi."""
+        for stage, policy in pipeline_gate.MERGE_POLICY.items():
+            self.assertNotEqual(policy, "manual", stage)
+
+    def test_admitting_a_source_still_goes_through_ci(self):
+        """Il merge e' automatico, il controllo no. Una fonte cambia quale
+        istituzione compare su una pagina pubblica, quindi resta lo stadio che
+        non puo' fondere senza che la CI sia verde."""
+        self.assertEqual(pipeline_gate.MERGE_POLICY["scout"], "checks")
 
 
 class HunterDecisions(unittest.TestCase):
@@ -321,6 +330,60 @@ class ChecksThatCannotRunAreNotPasses(unittest.TestCase):
             pipeline_gate.changed_text_keys = original
         self.assertFalse(check.ok, "un controllo che non puo' girare non e' un controllo superato")
         self.assertIn("venv", check.detail)
+
+
+class ACrashIsNotAFailure(unittest.TestCase):
+    """Sono due cose diverse e vogliono reazioni opposte.
+
+    Un `FAILED` e' un bug con un referto, e ritentarlo sarebbe nasconderlo. Una
+    morte senza referto non e' una bocciatura, e' un'assenza di risposta: qui
+    capita circa una run su venticinque, dentro `build_indicator_view`, e
+    trattarla come rossa fermerebbe uno stadio su un guasto che non esiste in una
+    catena dove nessuno rilancia.
+    """
+
+    def run_with(self, *outcomes):
+        calls = []
+        queue = list(outcomes)
+
+        def fake(cwd=None):
+            calls.append(1)
+            return queue.pop(0)
+
+        original = pipeline_gate._run_suite
+        pipeline_gate._run_suite = fake
+        try:
+            return pipeline_gate.check_suite(), len(calls)
+        finally:
+            pipeline_gate._run_suite = original
+
+    def test_a_real_failure_is_never_retried(self):
+        check, calls = self.run_with(("failed", "FAILED (failures=1)", 1))
+        self.assertFalse(check.ok)
+        self.assertEqual(calls, 1, "ha ritentato un fallimento vero, cioe' l'ha nascosto")
+
+    def test_a_crash_without_a_verdict_gets_one_retry(self):
+        check, calls = self.run_with(("crashed", "", -11), ("ok", "OK", 0))
+        self.assertTrue(check.ok)
+        self.assertEqual(calls, 2)
+        self.assertIn("senza referto", check.detail)
+
+    def test_two_crashes_in_a_row_are_red(self):
+        """Il secondo tentativo e' definitivo, o il ritentativo diventa un modo
+        per ignorare un crash riproducibile."""
+        check, calls = self.run_with(("crashed", "", -11), ("crashed", "", -11))
+        self.assertFalse(check.ok)
+        self.assertEqual(calls, 2)
+
+    def test_a_failure_after_a_crash_is_still_a_failure(self):
+        check, _ = self.run_with(("crashed", "", -11), ("failed", "FAILED (errors=2)", 1))
+        self.assertFalse(check.ok)
+
+    def test_green_with_a_dying_interpreter_stays_green_and_says_so(self):
+        check, calls = self.run_with(("ok", "OK", -11))
+        self.assertTrue(check.ok)
+        self.assertEqual(calls, 1, "aveva un referto, non c'era niente da ritentare")
+        self.assertIn("segnale 11", check.detail)
 
     def test_nothing_to_verify_is_still_a_pass(self):
         """Precision matters: a stage that touched no article owes no vintage."""

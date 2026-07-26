@@ -133,9 +133,13 @@ What you need to know before touching any of it:
 
 - **The gate is not advisory.** Every stage may write only a short list of paths
   (`pipeline_gate.STAGE_PATHS`). Do not widen it to make something pass.
-- **Merge policy is per stage and not uniform**: prose merges itself, anything
-  that moves live numbers waits for the remote checks, admitting a **source**
-  stays human.
+- **No stage waits for a human.** Prose merges itself; everything that moves live
+  numbers or names an institution merges once CI is green. Nobody reads these
+  pull requests before they land, so the control is the perimeter, the gate and
+  the suite, never an approval.
+- **Never close a stage with `gh pr merge --auto`.** It does not wait on this
+  repository, it merges immediately, and it did so for weeks while the docs said
+  otherwise. The wait lives in `scripts/pipeline_merge.py`.
 - **Re-entry is data-driven, never calendar-driven.** A curation decision expires
   when its source publishes a newer year (`data_year`); a review expires when the
   article's figures are refreshed (`reviewed_vintage`).

@@ -23,19 +23,48 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from scripts import discovery, eurostat_source, istat_regional_source  # noqa: E402
 
 
+# Failures collected by the last survey: [(series_id, message)]. Read by the CLI
+# and by whoever calls run(), so a series that could not be fetched is reported
+# rather than silently missing from the queue.
+FAILURES = []
+
+
+def _survey(series_ids, fetch):
+    """Fetch every series, and let one broken series cost only itself.
+
+    This used to be a list comprehension, which meant the first exception ended
+    the whole scan. That was survivable while the series lived in a Python module
+    that only a human edited. It stopped being survivable when the scout started
+    writing rows into `config/istat_series.yaml` on its own: one wrong code, and
+    every following run of the hunter died on a traceback, discovering nothing
+    from any source, for as long as nobody read the log.
+
+    A failure is not swallowed either. It goes into FAILURES, gets printed, and
+    an empty result is an error exit: "found nothing" and "could not look" must
+    not look the same from outside.
+    """
+    rows = []
+    for series_id in series_ids:
+        try:
+            rows.append(fetch(series_id))
+        except Exception as error:  # noqa: BLE001 - any source failure, one series
+            FAILURES.append((series_id, f"{type(error).__name__}: {error}"))
+    return rows
+
+
 # source id -> callable(offline, refresh) -> list[raw candidate dict]
 def _eurostat_watchlist(offline, refresh):
-    return [
-        eurostat_source.discover(series_id, offline=offline, refresh=refresh)
-        for series_id in eurostat_source.EUROSTAT_SERIES
-    ]
+    return _survey(
+        eurostat_source.EUROSTAT_SERIES,
+        lambda sid: eurostat_source.discover(sid, offline=offline, refresh=refresh),
+    )
 
 
 def _istat_demografia_watchlist(offline, refresh):
-    return [
-        istat_regional_source.discover(series_id, offline=offline, refresh=refresh)
-        for series_id in istat_regional_source.ISTAT_SERIES
-    ]
+    return _survey(
+        istat_regional_source.ISTAT_SERIES,
+        lambda sid: istat_regional_source.discover(sid, offline=offline, refresh=refresh),
+    )
 
 
 WATCHLIST = {
@@ -80,6 +109,7 @@ def run(source, offline=True, refresh=False, mode="watchlist"):
         raise SystemExit(
             f"Unknown source '{source}'. Configured: {', '.join(sorted(WATCHLIST))}"
         )
+    FAILURES.clear()
     existing_index = discovery.build_existing_index()
     discovered = [_enrich(raw, existing_index, mode) for raw in WATCHLIST[source](offline, refresh)]
     merged = discovery.upsert_candidates(discovery.read_candidates(), discovered)
@@ -112,6 +142,12 @@ def main():
     discovered, merged = run(args.source, offline=args.offline, refresh=args.refresh)
     print(f"Discovered {len(discovered)} candidate(s) from {args.source}.")
     print(f"Queue now holds {len(merged)} candidate(s): {discovery.CANDIDATES_PATH}")
+    for series_id, message in FAILURES:
+        print(f"  SERIE NON LETTA  {series_id}: {message}", file=sys.stderr)
+    if FAILURES and not discovered:
+        # Nessuna serie letta. Uscire con zero direbbe all'agente "scansionato,
+        # niente di nuovo", che e' la cosa piu' sbagliata da fargli credere.
+        raise SystemExit(f"nessuna serie leggibile da {args.source}")
 
 
 if __name__ == "__main__":

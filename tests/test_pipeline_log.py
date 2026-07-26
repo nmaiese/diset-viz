@@ -82,6 +82,57 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         self.assertEqual([e["summary"] for e in entries], ["prima", "seconda"])
 
 
+class SilenceIsTheFailureNobodySees(unittest.TestCase):
+    """Una run andata male lascia una riga `blocked` e si vede. Una Routine che
+    smette di partire non lascia niente, e il diario di uno stadio fermo da un
+    mese e' identico a quello di uno stadio che ha finito il lavoro."""
+
+    def entry(self, stage, days_ago):
+        from datetime import datetime, timedelta, timezone
+
+        when = datetime.now(timezone.utc) - timedelta(days=days_ago)
+        return {"stage": stage, "outcome": "merged", "at": when.isoformat(timespec="seconds")}
+
+    def group(self, rows, name):
+        return next(r for r in rows if r["group"] == name)
+
+    def test_a_daily_stage_quiet_for_a_week_is_flagged(self):
+        rows = pipeline_log.silence([self.entry("reviewer", 7)])
+        self.assertTrue(self.group(rows, "revisore")["stale"])
+
+    def test_a_daily_stage_that_skipped_one_day_is_not_flagged(self):
+        """Con la grazia troppo stretta l'allarme suona ogni settimana per
+        niente, e un allarme che suona sempre non e' un allarme."""
+        rows = pipeline_log.silence([self.entry("reviewer", 2)])
+        self.assertFalse(self.group(rows, "revisore")["stale"])
+
+    def test_a_weekly_stage_quiet_for_ten_days_is_not_yet_late(self):
+        rows = pipeline_log.silence([self.entry("curator", 10)])
+        self.assertFalse(self.group(rows, "curatore")["stale"])
+
+    def test_the_hunter_and_the_promoter_are_one_routine(self):
+        """Chiude su `promoter` se ha promosso e su `hunter` se no, mai su tutti
+        e due: contarli separatamente segnalerebbe fermo l'uno ogni volta che
+        lavora l'altro."""
+        rows = pipeline_log.silence([self.entry("promoter", 1)])
+        group = self.group(rows, "cacciatore")
+        self.assertFalse(group["stale"])
+        self.assertFalse(group["never"])
+
+    def test_never_run_is_not_the_same_as_late(self):
+        """Il giorno in cui nasce il diario nessuno stadio ha una storia. Dire
+        che sono tutti fermi da sempre insegnerebbe a ignorare l'avviso."""
+        rows = pipeline_log.silence([])
+        for row in rows:
+            self.assertTrue(row["never"])
+            self.assertFalse(row["stale"])
+
+    def test_every_stage_belongs_to_exactly_one_group(self):
+        watched = [s for _, stages, _ in pipeline_log.WATCH_GROUPS for s in stages]
+        self.assertEqual(sorted(watched), sorted(pipeline_log.STAGES))
+        self.assertEqual(len(watched), len(set(watched)))
+
+
 class TheDashboardReadsWithoutBreaking(unittest.TestCase):
     def test_it_renders_over_the_real_repo(self):
         with TemporaryDirectory() as tmp:
