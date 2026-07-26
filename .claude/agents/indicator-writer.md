@@ -119,11 +119,14 @@ competent-but-flat draft does not:
 
 1. **Answer "so what". Every article makes a point, not an inventory.** The reader
    must finish knowing why these numbers matter, not only how the ranking is
-   shaped. Old-age dependency is a pension and care burden and a shrinking labour
-   supply. R&D intensity is a region betting on its own future. Labour-market
-   participation is who even tries to enter the market. Say the stake once, in
-   plain terms, without inventing a cause the data cannot show (rule 5 still
-   binds). A page that only describes the distribution is not wrong, it is empty.
+   shaped. Old-age dependency is the age balance a pension and care system rests
+   on. R&D intensity is a region betting on its own future. Labour-market
+   participation is who even tries to enter the market. Note the discipline in
+   these examples: each names why the metric matters, none imports a trend the
+   metric does not measure (an old-age ratio is not a labour-supply figure, and
+   the ratio can rise from the numerator alone). Say the stake once, in plain
+   terms, without inventing a cause the data cannot show (rule 5 still binds). A
+   page that only describes the distribution is not wrong, it is empty.
 
 2. **Decide the through-line before you draft, then thread it.** One sentence:
    what is the single true thing this indicator says this year? "The convergence
