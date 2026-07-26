@@ -13,10 +13,16 @@ from pathlib import Path
 import frontmatter
 import markdown
 
+from app import sources
 from app.cache import cache
 from app.config import SITE_NAME, SITE_URL
 
 POSTS_DIR = Path(__file__).resolve().parents[1] / "content" / "posts"
+
+# How many articles an indicator page lists. Three is the whole point of the
+# widget: enough to show the indicator has been written about, few enough that
+# the apparatus stays an apparatus.
+POSTS_PER_INDICATOR = 3
 
 # No "smarty": it would auto-convert -- and ... into en/em dashes and ellipses,
 # exactly the typographic artifacts we want to keep out of the prose.
@@ -57,6 +63,30 @@ def _excerpt(meta, html):
     return text[:157].rsplit(" ", 1)[0] + "..."
 
 
+def _normalize_indicator(value):
+    """Frontmatter `indicator:` -> the catalog id the atlas resolves.
+
+    Two spellings are accepted, and both mean the same indicator:
+
+        indicator: 408          a bare id, i.e. the territorial family
+        indicator: ter-408      the unified URL code, any family
+
+    The second form is the one the reader sees in the address bar, so an author
+    can copy it straight out of the link they just pasted into the article. It
+    is also the only way to point a post at a non-territorial family: a bare
+    "01SAL001" would silently resolve to nothing.
+    """
+    if value is None:
+        return None
+    raw = str(value).strip()
+    if not raw:
+        return None
+    parsed = sources.parse_indicator_code(raw)
+    if parsed is not None:
+        return sources.internal_id(*parsed)
+    return raw
+
+
 def _load_post(path):
     post = frontmatter.load(path)
     meta = post.metadata
@@ -87,7 +117,7 @@ def _load_post(path):
         "cover": meta.get("cover"),
         "cover_alt": meta.get("cover_alt") or title,
         "tags": tags,
-        "indicator": str(meta.get("indicator")) if meta.get("indicator") is not None else None,
+        "indicator": _normalize_indicator(meta.get("indicator")),
         "indicator_label": meta.get("indicator_label"),
         "read_time": _read_time(post.content),
         "body_html": body_html,
@@ -110,6 +140,24 @@ def get_posts():
 
 def get_post(slug):
     return next((post for post in get_posts() if post["slug"] == slug), None)
+
+
+def posts_for_indicator(indicator_id, limit=POSTS_PER_INDICATOR):
+    """Articles written about one indicator, newest first.
+
+    The reverse of the link a post already declares in its frontmatter. The
+    forward direction (post -> indicator) has always existed; without this one
+    the two halves of the site never referred to each other, and an indicator
+    page was a dead end for a reader who wanted the story behind the number.
+
+    `indicator_id` is the catalog id (``meta["id"]``), so a page gets its own
+    posts whatever family it belongs to.
+    """
+    if not indicator_id:
+        return []
+    wanted = str(indicator_id)
+    matched = [post for post in get_posts() if post["indicator"] == wanted]
+    return matched[:limit] if limit else matched
 
 
 def all_tags():

@@ -1159,5 +1159,14 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .indicator-apparatus p { margin: 0 0 10px; color: var(--ink-soft); font-size: 15px; line-height: 1.6; }
 .indicator-apparatus .analyst-sources ul { margin: 0; padding-left: 18px; }
 .indicator-apparatus .analyst-sources li { margin-bottom: 6px; color: var(--ink-soft); font-size: 14px; }
+/* Approfondimenti: il rimando dalla scheda agli articoli che la raccontano.
+   Stessa densità dell'apparato, nessuna card: è un percorso di lettura. */
+.indicator-articles { margin: 22px 0 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.indicator-articles h2 { font-size: 20px; margin: 0 0 10px; }
+.indicator-articles__list { list-style: none; margin: 0 0 10px; padding: 0; display: grid; gap: 10px; }
+.indicator-articles__list li { display: grid; gap: 2px; border-left: 2px solid var(--accent); padding-left: 11px; }
+.indicator-articles__list a { font-family: var(--font-display); font-size: 16.5px; line-height: 1.3; }
+.indicator-articles__list span { font-family: var(--font-mono); font-size: 11.5px; color: var(--muted); }
+
 .indicator-cite-details, .indicator-source-definition { margin: 10px 0; border-top: 1px solid var(--grid); padding-top: 10px; }
 .indicator-cite-details summary, .indicator-source-definition summary { font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); cursor: pointer; }

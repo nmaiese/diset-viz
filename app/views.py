@@ -1,6 +1,6 @@
 from app import app
 from app.cache import cache
-from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts
+from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts, posts_for_indicator
 from app.data import (
     get_catalog,
     get_indicator,
@@ -377,6 +377,7 @@ def _render_indicator(family, raw_id):
         levels=view["levels"],
         level=level,
         related=view["related"],
+        related_posts=posts_for_indicator(meta["id"]),
         siblings=view["siblings"],
         explore=view["explore"],
         page_article=article,
