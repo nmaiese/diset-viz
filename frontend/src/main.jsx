@@ -1642,7 +1642,10 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
     [regionNames, series],
   );
   const valueByRegion = useMemo(() => new Map(yearValues.map((row) => [row.region, row])), [yearValues]);
-  const nationalAvg = yearValues.length ? yearValues.reduce((sum, row) => sum + row.value, 0) / yearValues.length : null;
+  // Media semplice dei valori regionali, non il valore italiano: la riga in
+  // tabella e la legenda devono chiamarla con il suo nome (il testo introduttivo
+  // qui sopra lo faceva gia', la legenda no).
+  const regionsAvg = yearValues.length ? yearValues.reduce((sum, row) => sum + row.value, 0) / yearValues.length : null;
   const bestRegion = useMemo(() => {
     if (!regionNames.length) return null;
     return regionNames.reduce((best, name) => {
@@ -1727,7 +1730,7 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
               <DataCard title="Serie storica" kicker={`${meta.name} · ${meta.unit}`}>
                 <div className="compare-legend">
                   {seriesList.map((s) => <span key={s.region} className="legend-item"><i style={{ background: s.color }} />{s.region}</span>)}
-                  <span className="legend-item legend-average"><i />Media nazionale</span>
+                  <span className="legend-item legend-average"><i />Media delle regioni</span>
                 </div>
                 <CompareTimeline seriesList={seriesList} averageSeries={averageSeries} selectedYear={year} onYear={setYear} unit={meta.unit} />
               </DataCard>
@@ -1759,8 +1762,8 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
                       );
                     })}
                     <tr>
-                      <td className="cmp-avg-label">Media nazionale</td>
-                      <td className="num cmp-avg-label">{nationalAvg != null ? formatValue(nationalAvg, meta.unit) : "n.d."}</td>
+                      <td className="cmp-avg-label">Media delle regioni</td>
+                      <td className="num cmp-avg-label">{regionsAvg != null ? formatValue(regionsAvg, meta.unit) : "n.d."}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -2306,7 +2309,7 @@ function Timeline({ series, regionSeries, selectedRegion, selectedYear, setSelec
     <div className="timeline-wrap">
       <div className="timeline-legend">
         <span className="legend-item legend-region"><i /> {selectedRegion}</span>
-        <span className="legend-item legend-average"><i /> Media nazionale</span>
+        <span className="legend-item legend-average"><i /> Media delle regioni</span>
       </div>
       <svg className="timeline" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Serie storica di ${selectedRegion}`}>
         <text className="axis-title" x={16} y={margin.top + 4}>{unit}</text>

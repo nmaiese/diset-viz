@@ -164,6 +164,47 @@ class DivariRegionaliPageTest(unittest.TestCase):
         self.assertIn("medie semplici", text)
         self.assertIn("non pesate per popolazione", text)
 
+    def test_the_simple_mean_is_never_called_national(self):
+        """docs/INDICATOR_PAGES.md: una media semplice di valori regionali non e'
+        la media Italia. Qui la media di venti regioni guida ogni "meglio o
+        peggio", quindi chiamarla nazionale sarebbe un numero dichiarato falso."""
+        text = visible_text(self.html)
+        self.assertIn("media delle venti regioni", text)
+        self.assertNotIn("Media Italia", text)
+        # L'unica occorrenza ammessa e' la frase del metodo che spiega perche' la
+        # pagina non usa quel nome.
+        self.assertEqual(text.count("media nazionale"), 1, "solo la nota di metodo puo' nominarla")
+        self.assertIn('mai "media nazionale"', text)
+        self.assertNotIn("Media nazionale", text)
+
+    def test_every_mean_uses_a_year_with_all_twenty_regions(self):
+        from app import divari
+        from app.atlas_catalog import get_atlas_indicator, get_atlas_indicator_year
+
+        view = divari.build_divari_view()
+        for divario in view["core"] + view["others"]:
+            covered = sum(area["regions"] for area in divario["areas"].values())
+            self.assertEqual(covered, 20, f'{divario["name"]}: media su {covered} regioni')
+
+        # Un anno finale parziale non viene mediato: si scende all'ultimo completo.
+        # 144 (presa in carico degli anziani) pubblica il 2022 con 19 regioni.
+        partial = "144"
+        meta = get_atlas_indicator(partial)["metadata"]
+        latest = {
+            row["region_key"]
+            for row in get_atlas_indicator_year(partial, meta["year_max"])["values"]
+            if row.get("value") is not None
+        }
+        self.assertLess(len(latest), 20, "il caso di prova non e' piu parziale, scegline un altro")
+        year, values = divari._full_coverage_year(partial, meta["year_max"])
+        self.assertIsNotNone(year)
+        self.assertLess(year, meta["year_max"])
+        self.assertEqual(len({row["region_key"] for row in values if row.get("value") is not None}), 20)
+
+        # E l'anno usato nel conto della tesi e' quello, non year_max.
+        scanned = {row["id"]: row for row in divari._scan_catalog()}
+        self.assertEqual(scanned[partial]["year"], year)
+
 
 class SearchPageTest(unittest.TestCase):
     """Issue #26: ricerca interna server-rendered, fuori dall'indice per scelta."""
@@ -337,6 +378,28 @@ class PathScopedViewTest(unittest.TestCase):
         # Il bundle servito contiene davvero il gancio: il template lo usa.
         bundle = Path(app.root_path) / "static" / "dist" / "assets" / "index.js"
         self.assertIn("__diInitialView", bundle.read_text(encoding="utf-8"))
+
+
+class SitemapTest(unittest.TestCase):
+    """Cosa entra e cosa resta fuori dalla sitemap, e perche'."""
+
+    def test_new_public_pages_are_in_the_sitemap_and_search_is_not(self):
+        client = app.test_client()
+        sitemap = client.get("/sitemap.xml").data.decode("utf-8")
+        locs = set(re.findall(r"<loc>([^<]+)</loc>", sitemap))
+
+        for path in ("/", "/divari-regionali", "/confronto"):
+            self.assertIn(f"https://divarioitalia.it{path}", locs, path)
+        # La ricerca interna e' noindex per scelta, quindi non si annuncia.
+        self.assertNotIn("https://divarioitalia.it/ricerca", locs)
+        # Nessuna URL con stato di esplorazione: la sitemap elenca canoniche.
+        for loc in locs:
+            self.assertNotIn("?", loc, loc)
+        # Ogni pagina annunciata risponde 200 ed e' indicizzabile.
+        for path in ("/divari-regionali", "/confronto"):
+            response = client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+            self.assertEqual(response.headers["X-Robots-Tag"], INDEX_HEADER, path)
 
 
 if __name__ == "__main__":

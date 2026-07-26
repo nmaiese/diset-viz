@@ -43,7 +43,7 @@
     <p>Il divario territoriale italiano viene raccontato come una linea che taglia il paese all'altezza di Roma. I dati dicono qualcosa di più preciso e di più scomodo. Le linee sono tante e non passano tutte nello stesso punto.</p>
     <p>Su {{ divari.scanned }} indicatori del catalogo che hanno una direzione dichiarata, cioè per cui si può dire quale valore è preferibile, il Nord ha la media migliore {{ divari.tally.Nord }} volte, il Centro {{ divari.tally.Centro }}, il Mezzogiorno {{ divari.tally.Mezzogiorno }}. Il Nord resta davanti nella maggioranza dei casi. Ma il {{ divari.share.Centro }} per cento degli indicatori mette in testa il Centro e il {{ divari.share.Mezzogiorno }} per cento il Mezzogiorno, e sono indicatori veri, non dettagli.</p>
     <p>Poi c'è la questione della scala. Tra la media del Nord e quella del Mezzogiorno il PIL pro capite cambia di {{ divari.core[0].gap | it_num(0) }} euro per abitante. Il tasso di occupazione cambia di {{ divari.core[1].gap | it_num(1) }} punti. La speranza di vita alla nascita cambia di {{ divari.core[2].gap | it_num(1) }} anni. Tre divari reali, tre ordini di grandezza diversi. Chi legge solo le percentuali finisce per mettere sullo stesso piano una differenza di reddito enorme e una differenza di longevità che si misura in mesi.</p>
-    <p>Questa pagina tiene insieme le tre letture. Prima la mappa, per vedere dove cade ogni indicatore. Poi una sezione per ripartizione, con gli stessi tre divari misurati ogni volta contro la media nazionale e l'elenco degli indicatori su cui quella parte del paese ha la media migliore. In chiusura la tabella con gli altri {{ divari.others | length }} divari, dal più ampio al più contenuto, e il link alla scheda di ognuno.</p>
+    <p>Questa pagina tiene insieme le tre letture. Prima la mappa, per vedere dove cade ogni indicatore. Poi una sezione per ripartizione, con gli stessi tre divari misurati ogni volta contro la media delle venti regioni e l'elenco degli indicatori su cui quella parte del paese ha la media migliore. In chiusura la tabella con gli altri {{ divari.others | length }} divari, dal più ampio al più contenuto, e il link alla scheda di ognuno.</p>
     <p>Nessun punteggio unico e nessuna classifica di sintesi. Un divario alla volta, con la sua unità di misura e la sua fonte. Se cerchi il punteggio composito, sta nella <a href="/qualita-della-vita/classifica/regioni">classifica della qualità della vita</a>, che dichiara i suoi limiti in <a href="/qualita-della-vita/metodologia">metodologia</a>.</p>
   </section>
 
@@ -67,7 +67,7 @@
         </ul>
         <p class="divari-core-card__note">
           Divario tra {{ d.leader }} e {{ d.last }}: {{ d.gap | it_num(1) }} {{ d.change_unit }}.
-          Media nazionale {{ d.national | it_num(1) }} {{ d.unit }}, in testa {{ d.national_lead.name }} con {{ d.national_lead.value | it_num(1) }}, ultima {{ d.national_lag.name }} con {{ d.national_lag.value | it_num(1) }}.
+          Media semplice delle venti regioni {{ d.regions_mean | it_num(1) }} {{ d.unit }}, in testa {{ d.top_region.name }} con {{ d.top_region.value | it_num(1) }}, ultima {{ d.bottom_region.name }} con {{ d.bottom_region.value | it_num(1) }}.
         </p>
       </article>
       {% endfor %}
@@ -79,11 +79,12 @@
     <p class="section-label">Ripartizione</p>
     <h2 id="divari-{{ a.name | lower }}-title">{{ a.name }}</h2>
     {# "meglio" e "peggio" della media, non "sopra" e "sotto": su un indicatore
-       come i NEET stare sotto la media nazionale e' una buona notizia, e la
-       frase deve restare vera anche se il set d'apertura cambia. #}
-    {% set n = a.above_national %}{% set tot = a.cards | length %}
+       come i NEET stare sotto la media e' una buona notizia, e la frase deve
+       restare vera anche se il set d'apertura cambia. La media e' quella delle
+       venti regioni, mai chiamata nazionale: e' un numero diverso. #}
+    {% set n = a.above_mean %}{% set tot = a.cards | length %}
     {% set all_of_them = "tutti e tre i" if tot == 3 else "tutti i " ~ tot %}
-    {% set standing %}{% if n == tot %}sta meglio della media nazionale su {{ all_of_them }} divari d'apertura{% elif n == 0 %}sta peggio della media nazionale su {{ all_of_them }} divari d'apertura{% else %}sta meglio della media nazionale su {{ n }} dei {{ tot }} divari d'apertura{% endif %}{% endset %}
+    {% set standing %}{% if n == tot %}sta meglio della media delle venti regioni su {{ all_of_them }} divari d'apertura{% elif n == 0 %}sta peggio della media delle venti regioni su {{ all_of_them }} divari d'apertura{% else %}sta meglio della media delle venti regioni su {{ n }} dei {{ tot }} divari d'apertura{% endif %}{% endset %}
     <p class="divari-area__lead">
       {% if a.name == 'Nord' %}
       Otto regioni, da Piemonte e Valle d'Aosta fino all'Emilia-Romagna. Il Nord ha la media migliore su {{ a.leads }} dei {{ divari.scanned }} indicatori confrontati, il {{ a.share }} per cento del totale, e {{ standing }}.
@@ -96,13 +97,13 @@
 
     <div class="divari-cards">
       {% for card in a.cards %}
-      <article class="divari-card{{ ' is-better' if card.better_than_national else ' is-worse' }}">
+      <article class="divari-card{{ ' is-better' if card.better_than_mean else ' is-worse' }}">
         <small>{{ card.theme }} · {{ card.year }}</small>
         <h3><a href="{{ card.path }}">{{ card.indicator }}</a></h3>
         <strong>{{ card.mean | it_num(1) }} <span class="u">{{ card.unit }}</span></strong>
         <span class="divari-card__delta">
-          {{ 'Sopra' if card.delta > 0 else 'Sotto' }} la media nazionale di {{ card.delta | abs | it_num(1) }} {{ card.change_unit }},
-          {{ 'un vantaggio' if card.better_than_national else 'un ritardo' }}
+          {{ 'Sopra' if card.delta > 0 else 'Sotto' }} la media delle venti regioni di {{ card.delta | abs | it_num(1) }} {{ card.change_unit }},
+          {{ 'un vantaggio' if card.better_than_mean else 'un ritardo' }}
         </span>
         <span class="divari-card__extremes">
           Meglio <a href="/regione/{{ card.lead.key }}">{{ card.lead.name }}</a> con {{ card.lead.value | it_num(1) }}, peggio <a href="/regione/{{ card.lag.key }}">{{ card.lag.name }}</a> con {{ card.lag.value | it_num(1) }}
@@ -132,7 +133,7 @@
   <section class="divari-others" aria-labelledby="divari-others-title">
     <p class="section-label">Gli altri divari</p>
     <h2 id="divari-others-title">Altre {{ divari.others | length }} distanze, dalla più ampia alla più contenuta</h2>
-    <p class="page-note">Media semplice dei valori regionali per ripartizione, ultimo anno disponibile di ogni serie. La colonna "divario" è la distanza tra la ripartizione con la media migliore e quella con la peggiore, letta secondo il verso dell'indicatore, ed è in punti percentuali per gli indicatori espressi in percentuale.</p>
+    <p class="page-note">Media semplice dei valori regionali per ripartizione, sull'ultimo anno in cui la serie copre tutte e venti le regioni. La colonna "divario" è la distanza tra la ripartizione con la media migliore e quella con la peggiore, letta secondo il verso dell'indicatore, ed è in punti percentuali per gli indicatori espressi in percentuale.</p>
     <div class="divari-table-wrap">
       <table class="divari-table">
         <thead>
@@ -164,8 +165,8 @@
 
   <section class="divari-method" aria-labelledby="divari-method-title">
     <h2 id="divari-method-title">Come sono calcolati questi numeri</h2>
-    <p>Ogni indicatore arriva dal catalogo di Divario Italia, che federa gli indicatori territoriali Istat, il Benessere equo e sostenibile, l'indagine sulla vita quotidiana delle famiglie e le serie regionali Eurostat. Per ogni indicatore prendiamo l'ultimo anno con copertura completa sulle venti regioni, poi calcoliamo la media dei valori regionali di ciascuna ripartizione.</p>
-    <p>Il limite da tenere presente: sono medie semplici, non pesate per popolazione. Vanno lette come confronto tra territori, non come stima del valore reale della ripartizione, che per un indicatore per abitante richiederebbe i denominatori demografici. Le ripartizioni seguono la classificazione Istat, con Sud e Isole insieme sotto Mezzogiorno.</p>
+    <p>Ogni indicatore arriva dal catalogo di Divario Italia, che federa gli indicatori territoriali Istat, il Benessere equo e sostenibile, l'indagine sulla vita quotidiana delle famiglie e le serie regionali Eurostat. Per ogni indicatore cerchiamo l'ultimo anno in cui tutte e venti le regioni hanno un valore, poi calcoliamo la media dei valori regionali di ciascuna ripartizione. Se l'anno più recente è ancora parziale scendiamo a quello prima, perché mediare venti regioni o diciannove non dà la stessa distanza.</p>
+    <p>Il limite da tenere presente: sono medie semplici, non pesate per popolazione. Per questo in pagina si legge sempre "media delle venti regioni" e mai "media nazionale": il valore italiano di un indicatore per abitante si calcola con i denominatori demografici, che qui non entrano, e sarebbe un numero diverso. Queste medie servono a confrontare i territori tra loro. Le ripartizioni seguono la classificazione Istat, con Sud e Isole insieme sotto Mezzogiorno.</p>
     <p>Entrano nel conto solo gli indicatori con una direzione dichiarata, copertura completa e anno recente, perché "media migliore" ha senso solo dove è chiaro quale valore è preferibile. Il metodo completo sta in <a href="/metodologia">metodologia</a>, e ogni scheda indicatore dichiara fonte, definizione e anni disponibili.</p>
     <p>Da qui puoi continuare con <a href="/temi">gli indicatori per tema</a>, con le <a href="/regioni">venti schede regione</a> o con le <a href="/blog">analisi del blog</a>.</p>
   </section>

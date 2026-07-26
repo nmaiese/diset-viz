@@ -10,10 +10,18 @@ Tutti i numeri arrivano dal catalogo federato e vengono ricalcolati a ogni
 render, quindi la prosa in pagina non puo' invecchiare rispetto ai dati: le
 frasi contengono i valori, non li ripetono a mano.
 
-Una avvertenza che vale per tutta la pagina: le medie di ripartizione qui sono
-medie semplici dei valori regionali, non pesate per popolazione. Servono a
-confrontare i territori tra loro, non a stimare il valore vero della
-ripartizione, che per un indicatore per abitante richiederebbe i denominatori.
+Una avvertenza che vale per tutta la pagina: le medie qui sono medie semplici dei
+valori regionali, non pesate per popolazione. Servono a confrontare i territori
+tra loro, non a stimare il valore vero della ripartizione o dell'Italia, che per
+un indicatore per abitante richiederebbe i denominatori demografici. Per questo
+il campo si chiama `regions_mean` e non `national`, e in pagina si legge "media
+delle venti regioni": chiamarla media nazionale e' vietato dalle regole del
+repository (docs/INDICATOR_PAGES.md) perche' sarebbe un numero diverso.
+
+Le medie si calcolano solo su un anno con tutte e venti le regioni presenti. Se
+l'ultimo anno pubblicato e' parziale si scende all'ultimo completo, e se non
+esiste l'indicatore esce: mediare sottoinsiemi diversi restringe o allarga il
+divario a seconda di chi manca.
 """
 
 from app.atlas_catalog import get_atlas_catalog, get_atlas_indicator, get_atlas_indicator_year
@@ -68,6 +76,16 @@ MAP_DIVARI = ("901", "13", "910", "408")
 _MIN_YEAR = 2022
 _BETTER_LOW = ("lower_better", "higher_worse")
 
+# Quante regioni compongono ciascuna ripartizione. Serve a pretendere copertura
+# piena prima di mediare: 8 + 4 + 8 = le venti regioni, sempre le stesse.
+_EXPECTED_REGIONS = {
+    area: sum(1 for mapped in _AREA_BY_KEY.values() if mapped == area)
+    for area in AREA_ORDER
+}
+
+# Quanti anni indietro cercare un anno a copertura piena prima di rinunciare.
+_COVERAGE_LOOKBACK = 6
+
 
 def _area_of(region_key):
     return _AREA_BY_KEY.get(region_key)
@@ -78,14 +96,19 @@ def _direction(meta_or_item):
 
 
 def _area_means(values):
-    """Media semplice per ripartizione, piu il numero di regioni che la compone."""
+    """Media semplice per ripartizione, solo a copertura piena.
+
+    Un anno con qualche regione mancante non viene mediato: basta che manchi la
+    Lombardia perche' la media del Nord scenda e il divario si restringa da solo.
+    Fuori tutto l'anno, quindi, non la ripartizione incompleta.
+    """
     buckets = {}
     for row in values:
         area = _area_of(row["region_key"])
         if area is None or row.get("value") is None:
             continue
         buckets.setdefault(area, []).append(row["value"])
-    if any(area not in buckets for area in AREA_ORDER):
+    if any(len(buckets.get(area, ())) != _EXPECTED_REGIONS[area] for area in AREA_ORDER):
         return None
     return {
         area: {"mean": sum(buckets[area]) / len(buckets[area]), "regions": len(buckets[area])}
@@ -93,12 +116,32 @@ def _area_means(values):
     }
 
 
+def _full_coverage_year(indicator_id, year_max):
+    """L'ultimo anno con un valore per tutte e venti le regioni.
+
+    `year_max` da solo non basta: alcune serie pubblicano l'ultimo anno ancora
+    parziale (a oggi cinque nel catalogo, per esempio la presa in carico degli
+    anziani, ferma a 19 regioni nel 2022). Prenderlo comunque farebbe mediare
+    sottoinsiemi diversi e contraddirebbe il metodo dichiarato in pagina, quindi
+    si scende di anno fino al primo completo. Se non esiste, l'indicatore esce.
+    """
+    for year in range(year_max, year_max - _COVERAGE_LOOKBACK, -1):
+        payload = get_atlas_indicator_year(indicator_id, year)
+        if not payload:
+            continue
+        if _area_means(payload["values"]) is not None:
+            return year, payload["values"]
+    return None, None
+
+
 def _is_comparable(item):
     """Indicatori su cui un confronto tra ripartizioni ha senso.
 
     Serve una direzione dichiarata (senza verso "in testa" non vuol dire nulla),
-    la copertura piena delle venti regioni e un anno recente. Le varianti di
-    genere restano fuori: raddoppierebbero lo stesso divario.
+    una serie completa e un anno recente. Le varianti di genere restano fuori:
+    raddoppierebbero lo stesso divario. La copertura dell'anno che verra' poi
+    usato la controlla `_full_coverage_year`: `region_count` e `completeness`
+    parlano della serie intera, non dell'ultimo anno pubblicato.
     """
     if _direction(item) not in ("higher_better", "lower_better", "higher_worse"):
         return False
@@ -113,17 +156,18 @@ def _scan_catalog():
     """Per ogni indicatore confrontabile: chi ha la media migliore, e di quanto.
 
     E' il conto che sostiene la tesi della pagina. Gira su tutto il catalogo
-    federato, non su una selezione: 221 indicatori a oggi, sotto un decimo di
-    secondo, perche' le serie sono gia' in cache di processo.
+    federato, non su una selezione: 221 indicatori a oggi, in frazioni di secondo,
+    perche' le serie sono gia' in cache di processo. Per ciascuno usa l'ultimo
+    anno a copertura piena, che per cinque serie non e' l'ultimo pubblicato.
     """
     scanned = []
     for item in get_atlas_catalog()["indicators"]:
         if not _is_comparable(item):
             continue
-        payload = get_atlas_indicator_year(item["id"], item["year_max"])
-        if not payload:
+        year, values = _full_coverage_year(item["id"], item["year_max"])
+        if year is None:
             continue
-        means = _area_means(payload["values"])
+        means = _area_means(values)
         if means is None:
             continue
         better_low = _direction(item) in _BETTER_LOW
@@ -135,7 +179,7 @@ def _scan_catalog():
             "name": item["name"],
             "path": item["path"],
             "theme": item["theme"],
-            "year": item["year_max"],
+            "year": year,
             "leader": ranked[0],
             "last": ranked[-1],
             "spread_pct": spread,
@@ -162,27 +206,31 @@ def _examples_led_by(scanned, area, limit=3):
 
 
 def _divario(indicator_id):
-    """Un divario: le tre medie di ripartizione, la media nazionale, gli estremi."""
+    """Un divario: le tre medie di ripartizione, la media delle regioni, gli estremi.
+
+    `regions_mean` e' la media semplice dei venti valori regionali. Non e' il
+    valore italiano e non va chiamato cosi': per un indicatore per abitante il
+    dato nazionale vuole i denominatori demografici, che qui non ci sono. Il nome
+    del campo lo dice, cosi' nessun template puo' scriverlo per sbaglio.
+    """
     payload = get_atlas_indicator(indicator_id)
     if payload is None:
         return None
     meta = payload["metadata"]
-    year = meta["year_max"]
-    year_payload = get_atlas_indicator_year(indicator_id, year)
-    if not year_payload:
+    year, values = _full_coverage_year(indicator_id, meta["year_max"])
+    if year is None:
         return None
-    values = year_payload["values"]
     means = _area_means(values)
     if means is None:
         return None
 
     direction = _direction(meta)
     better_low = direction in _BETTER_LOW
-    national = sum(row["value"] for row in values) / len(values)
+    regions_mean = sum(row["value"] for row in values) / len(values)
     ordered = sorted(values, key=lambda row: row["value"], reverse=not better_low)
     unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
     # L'unita' di una differenza non e' quella di un valore: su un indicatore in
-    # percentuale la distanza dalla media nazionale si misura in punti, non in %.
+    # percentuale la distanza dalla media si misura in punti, non in %.
     change_unit = indicator_notes.change_unit_label(meta["name"], meta.get("unit"))
 
     areas = {}
@@ -190,15 +238,15 @@ def _divario(indicator_id):
         mean = means[area]["mean"]
         in_area = [row for row in values if _area_of(row["region_key"]) == area]
         ranked_in_area = sorted(in_area, key=lambda row: row["value"], reverse=not better_low)
-        delta = mean - national
+        delta = mean - regions_mean
         areas[area] = {
             "mean": mean,
             "regions": means[area]["regions"],
             "delta": delta,
-            "delta_pct": (delta / national * 100) if national else 0.0,
+            "delta_pct": (delta / regions_mean * 100) if regions_mean else 0.0,
             # "meglio" e "peggio" vengono dal verso dell'indicatore, non dal segno:
-            # su disoccupazione o NEET stare sotto la media nazionale e' un bene.
-            "better_than_national": (delta < 0) if better_low else (delta > 0),
+            # su disoccupazione o NEET stare sotto la media e' un bene.
+            "better_than_mean": (delta < 0) if better_low else (delta > 0),
             "lead": {
                 "name": ranked_in_area[0]["region"],
                 "key": ranked_in_area[0]["region_key"],
@@ -228,15 +276,15 @@ def _divario(indicator_id):
         "change_unit": change_unit,
         "direction": direction,
         "better_low": better_low,
-        "national": national,
+        "regions_mean": regions_mean,
         "bar_max": bar_max,
         "areas": areas,
         "leader": ranked_areas[0],
         "last": ranked_areas[-1],
         "gap": gap,
         "gap_pct": (gap / areas[ranked_areas[-1]]["mean"] * 100) if areas[ranked_areas[-1]]["mean"] else 0.0,
-        "national_lead": {"name": ordered[0]["region"], "key": ordered[0]["region_key"], "value": ordered[0]["value"]},
-        "national_lag": {"name": ordered[-1]["region"], "key": ordered[-1]["region_key"], "value": ordered[-1]["value"]},
+        "top_region": {"name": ordered[0]["region"], "key": ordered[0]["region_key"], "value": ordered[0]["value"]},
+        "bottom_region": {"name": ordered[-1]["region"], "key": ordered[-1]["region_key"], "value": ordered[-1]["value"]},
     }
 
 
@@ -268,7 +316,7 @@ def build_divari_view():
             # La quota, non la frazione a mano: "un indicatore su quattro"
             # invecchierebbe al primo aggiornamento del catalogo.
             "share": round(tally[area] / len(scanned) * 100) if scanned else 0,
-            "above_national": sum(1 for card in cards_for_area if card["better_than_national"]),
+            "above_mean": sum(1 for card in cards_for_area if card["better_than_mean"]),
             "examples": _examples_led_by(scanned, area),
             "cards": [
                 {
