@@ -148,13 +148,14 @@ al merge.
 
 Dopo che il curatore ha integrato e orientato un indicatore, manca il testo che
 l'utente legge. Lo **scrittore** (`.claude/agents/indicator-writer.md`, agente
-Claude Code invocabile via subagent) scrive la nota d'analista
-(`attacco`/`spunto`/`limite`/`fonti`/`vintage`) in
-`app/static/data/analyst_notes.json`, seguendo `content/STYLE.md`, con **solo
-numeri reali** presi dai dati (API/data layer), le fonti verificate per le
-affermazioni comparative e il `vintage` uguale all'`year_max` corrente (drift
-guard). Apre una PR, niente merge. È lo step che trasforma un indicatore appena
-integrato in una pagina che si legge come scritta da un giornalista.
+Claude Code invocabile via subagent) scrive l'intero articolo della pagina
+(`lead` piu le quattro sezioni `definizione`/`quadro`/`dinamica`/`limiti`, con
+`fonti` e `vintage`) in `app/static/data/indicator_texts.json`, seguendo
+`content/STYLE.md`, con **solo numeri reali** presi dal brief
+(`scripts/indicator_brief.py`), le fonti verificate per le affermazioni
+comparative e il `vintage` uguale all'`year_max` corrente (drift guard). Apre una
+PR, niente merge. È lo step che trasforma un indicatore appena integrato in una
+pagina che si legge come scritta da un giornalista.
 
 La catena completa degli agenti:
 
@@ -169,11 +170,15 @@ questo `scripts/pending_notes.py` produce la **coda dello scrittore**, come
 `curate.uncurated_targets` fa per il curatore:
 
 - **da scrivere** (`missing`): un indicatore integrato nel manifest
-  (`status=integrated`) senza nota d'analista. È il passaggio di consegne
+  (`status=integrated`) senza articolo. È il passaggio di consegne
   curatore -> scrittore.
-- **da aggiornare** (`stale`): una nota il cui `vintage` è rimasto indietro
+- **da aggiornare** (`stale`): un articolo il cui `vintage` è rimasto indietro
   rispetto all'`year_max` corrente dell'indicatore (il caso di refresh, la stessa
-  deriva che controlla `tests/test_analyst_notes.py`).
+  deriva che controlla `tests/test_indicator_texts.py`).
+
+`pending_notes.py` copre gli indicatori tracciati dal manifest. Per lo stato
+editoriale dell'intero catalogo, incluse le sezioni ancora composte dal template,
+si usa `.venv/bin/python -m scripts.text_queue`.
 
 ```bash
 python3 scripts/pending_notes.py            # coda leggibile
@@ -246,12 +251,12 @@ Lo **scrittore** è un terzo agente (o passo umano) che gira dopo la curation:
 
 1. `python3 scripts/pending_notes.py` per leggere la coda: gli indicatori
    integrati senza nota (`missing`) e le note col vintage indietro (`stale`).
-2. Per ciascuno: leggere i dati reali dell'indicatore (API/data layer), scrivere
-   la nota d'analista (`attacco`/`spunto`/`limite`/`fonti`/`vintage`) seguendo
-   `.claude/agents/indicator-writer.md` e `content/STYLE.md`, con solo numeri
-   reali e le fonti verificate per le affermazioni comparative.
-3. Aggiornare `app/static/data/analyst_notes.json` (solo la chiave di quell'id),
-   lanciare `.venv/bin/python -m unittest tests.test_analyst_notes` e aprire la
+2. Per ciascuno: leggere il brief
+   (`.venv/bin/python -m scripts.indicator_brief <codice>`), scrivere l'articolo
+   completo seguendo `.claude/agents/indicator-writer.md` e `content/STYLE.md`,
+   con solo numeri reali e le fonti verificate per le affermazioni comparative.
+3. Aggiornare `app/static/data/indicator_texts.json` (solo la chiave di quell'id),
+   lanciare `.venv/bin/python -m unittest tests.test_indicator_texts` e aprire la
    PR. Nessun merge automatico.
 
 Note operative:

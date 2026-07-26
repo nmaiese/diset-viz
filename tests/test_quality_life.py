@@ -82,8 +82,12 @@ class QualityLifeStaticTest(unittest.TestCase):
         self.assertEqual(page.status_code, 200)
         self.assertIn("Densità di verde storico".encode("utf-8"), page.data)
         self.assertIn("valore più alto occupa la posizione migliore".encode("utf-8"), page.data)
-        self.assertIn("come è cambiato nell'ultimo aggiornamento".encode("utf-8"), page.data)
-        self.assertIn("media semplice dei valori".encode("utf-8"), page.data)
+        # BES indicators render through the same template as every other family
+        # now, so the checks are on the shared article skeleton rather than on
+        # the wording of the old quality-of-life page.
+        self.assertIn(b'id="sezione-dinamica"', page.data)
+        self.assertIn(b'class="indicator-cockpit"', page.data)
+        self.assertIn("sintesi non ponderata".encode("utf-8"), page.data)
 
         sparse = next(item for item in indicators if item["id"] == "06POL001P")
         sparse_page = client.get(sparse["path"])

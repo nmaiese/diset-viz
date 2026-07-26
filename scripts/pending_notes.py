@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The writer's worklist: integrated indicators that still need an analyst note.
+"""The writer's worklist: integrated indicators that still need an article.
 
 Fase 4 (lo scrittore) was the only stage of the discovery chain with no automated
 trigger. The hunter and the curator run as scheduled Routines, but nothing told
@@ -9,10 +9,15 @@ closes that gap deterministically, the way `curate.uncurated_targets` feeds the
 curator. It reports two worklists:
 
   - **missing**: an indicator integrated in the manifest (status=integrated) with
-    no analyst note yet. This is the curator -> writer hand-off.
-  - **stale**:   a note whose vintage is behind the indicator's current year_max,
-    the refresh case the writer agent also handles (drift guard in
-    tests/test_analyst_notes.py).
+    no article yet. This is the curator -> writer hand-off.
+  - **stale**:   an article whose vintage is behind the indicator's current
+    year_max, the refresh case the writer agent also handles (drift guard in
+    tests/test_indicator_texts.py).
+
+This is the *discovery pipeline* trigger and stays scoped to the externally
+sourced indicators the manifest tracks. For the editorial state of the whole
+catalogue, including which of the four sections are still composed by the
+template rather than written, use ``scripts/text_queue.py`` instead.
 
 Stdlib pure, like its sibling discovery scripts: both the queue read and the
 current year_max come from committed files (the manifest's ``new_year``), so the
@@ -41,7 +46,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from scripts import discovery  # noqa: E402
 
 MANIFEST_PATH = PROJECT_ROOT / "app" / "static" / "data" / "external_indicator_manifest.csv"
-NOTES_PATH = PROJECT_ROOT / "app" / "static" / "data" / "analyst_notes.json"
+NOTES_PATH = PROJECT_ROOT / "app" / "static" / "data" / "indicator_texts.json"
 
 
 def read_manifest(path=None):

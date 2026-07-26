@@ -26,6 +26,12 @@ quality-of-life section for regions and provinces.
   Source naming and URL building have a single source of truth in `app/sources.py`:
   user-facing labels are institution-first plain names, never a bare internal
   acronym. Do not hardcode family labels or indicator URLs elsewhere.
+  **One template serves all four families** (`app/templates/indicator_page.html`)
+  over one view model (`app/indicator_view.py`), in three zones: an interactive
+  cockpit that owns every number, an article of four fixed sections that owns
+  every sentence, and an apparatus (sources, citation, related). A figure is
+  shown once, in the cockpit, and the prose interprets it. See
+  [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) before touching either.
 - `/legacy` — original D3 dashboard (do not break it).
 - `/api/catalog`, `/api/search`, `/api/indicator/<id>`,
   `/api/indicator/<id>/year/<year>` — JSON API for the atlas.
@@ -52,6 +58,26 @@ git diff --check
 ```
 
 After editing `frontend/src/*`, always rebuild before testing the served app.
+
+## Writing indicator pages — READ THIS
+
+The prose of an indicator page lives in
+`app/static/data/indicator_texts.json`: one `lead` plus four ordered sections
+(`definizione`, `quadro`, `dinamica`, `limiti`), written by
+`.claude/agents/indicator-writer.md`. A section nobody has written yet is
+composed from the data at render time, so every page has the same skeleton while
+only some have been through an editor.
+
+Always start from the deterministic data brief, never from ad-hoc API calls:
+
+```bash
+.venv/bin/python -m scripts.indicator_brief ter-178     # everything about one indicator
+.venv/bin/python -m scripts.text_queue                  # what still needs an editor
+```
+
+Rules, guards and the "who owns what" table are in
+[`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md). The editorial voice is
+`content/STYLE.md`, same as the blog.
 
 ## Writing blog articles — READ THIS
 

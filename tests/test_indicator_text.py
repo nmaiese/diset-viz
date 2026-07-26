@@ -11,7 +11,7 @@ import json
 import re
 import unittest
 
-from app import app, indicator_notes
+from app import app, indicator_notes, indicator_texts
 from app.atlas_catalog import get_atlas_catalog, get_atlas_indicator
 
 _ARTICLES = {"il", "lo", "la", "l'", "i", "gli", "le", "un", "una", "uno", "un'"}
@@ -85,10 +85,35 @@ class ItPluralAgreement(unittest.TestCase):
         self.assertEqual(indicator_notes.it_plural(None, "regione", "regioni"), "regioni")
         self.assertEqual(indicator_notes.it_plural("x", "regione", "regioni"), "regioni")
 
-    def test_intro_helper_never_says_one_regioni(self):
-        one = indicator_notes.indicator_page_intro("Misura qualcosa.", 2024, 2024, 1)
-        self.assertIn("1 regione ", one)
+    def test_composed_lead_never_says_one_regioni(self):
+        meta = {"explain": {"plain": "Misura qualcosa."}, "institution": "Istat"}
+        level = {
+            "observations": [{"key": "a", "name": "A", "value": 1.0}],
+            "singular": "regione", "plural": "regioni",
+            "year_min": 2024, "year_max": 2024, "has_map": True,
+        }
+        one = indicator_texts.composed_lead(meta, level)
+        self.assertIn("1 regione", one)
         self.assertNotIn("1 regioni", one)
+
+    def test_composed_lead_does_not_repeat_the_cockpit_figures(self):
+        """The lead used to open with best, worst and the mean, which the KPI row
+        prints right below it. That duplication is the whole reason this text was
+        rewritten, so it must not creep back."""
+        meta = {"explain": {"plain": "Misura qualcosa."}, "institution": "Istat"}
+        level = {
+            "observations": [
+                {"key": "a", "name": "Alpha", "value": 91.5},
+                {"key": "b", "name": "Beta", "value": 12.25},
+            ],
+            "singular": "regione", "plural": "regioni",
+            "year_min": 2019, "year_max": 2024, "has_map": True,
+        }
+        lead = indicator_texts.composed_lead(meta, level)
+        for forbidden in ("Alpha", "Beta", "91,5", "12,25", "51,8"):
+            self.assertNotIn(forbidden, lead)
+        self.assertIn("2 regioni", lead)
+        self.assertIn("dal 2019 al 2024", lead)
 
 
 class AnalystSourcesRendered(unittest.TestCase):
@@ -100,40 +125,33 @@ class AnalystSourcesRendered(unittest.TestCase):
         self.assertIn("ec.europa.eu/eurostat", html)
 
 
-class IndicatorFaq(unittest.TestCase):
-    def test_faq_helper_is_factual_or_empty(self):
-        rows = [
-            {"region": "Alpha", "value": 10.0},
-            {"region": "Beta", "value": 5.0},
-            {"region": "Gamma", "value": 1.0},
-        ]
-        faq = indicator_notes.build_indicator_faq("Indicatore X", "%", 2025, rows, 5.3)
-        self.assertEqual(len(faq), 3)
-        self.assertIn("Alpha", faq[0]["a"])   # highest
-        self.assertIn("Gamma", faq[1]["a"])   # lowest
-        self.assertEqual(indicator_notes.build_indicator_faq("X", "%", 2025, rows[:2], None), [])
+class NoGeneratedFaq(unittest.TestCase):
+    """The auto-generated FAQ is gone, and must not come back.
 
-    def test_faq_number_format_preserves_decimals(self):
+    It restated the highest region, the lowest region and the mean, which the
+    cockpit already shows above it, and emitted FAQPage structured data for
+    those same three facts. INDICATOR_PAGES.md forbids generic FAQ filler and
+    CLAUDE.md allows JSON-LD only where the visible page supports it, so the
+    block and its schema were removed together rather than one without the other.
+    """
+
+    def test_page_has_no_faq_block_and_no_faqpage_schema(self):
+        meta = get_atlas_indicator("178")["metadata"]
+        html = app.test_client().get(meta["path"]).data.decode("utf-8")
+        self.assertNotIn("Domande frequenti", html)
+        blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)
+        self.assertEqual([b for b in blocks if '"FAQPage"' in b], [])
+        # The two schemas the visible page does support stay.
+        self.assertTrue(any('"Dataset"' in b for b in blocks))
+        self.assertTrue(any('"BreadcrumbList"' in b for b in blocks))
+
+    def test_number_format_preserves_decimals(self):
         # A value above 100 must keep its decimals (it_num-consistent), not round
-        # to a whole number that would disagree with the ranking/table.
+        # to a whole number that would disagree with the ranking.
         self.assertEqual(indicator_notes._it_number(116.407), "116,41")
         self.assertEqual(indicator_notes._it_number(68.9), "68,9")
         self.assertEqual(indicator_notes._it_number(34500), "34.500")
         self.assertEqual(indicator_notes._it_number(5.0), "5")
-
-    def test_page_faq_jsonld_matches_visible_content(self):
-        meta = get_atlas_indicator("178")["metadata"]
-        html = app.test_client().get(meta["path"]).data.decode("utf-8")
-        self.assertIn("Domande frequenti", html)
-        blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)
-        faq_blocks = [json.loads(b) for b in blocks if '"FAQPage"' in b]
-        self.assertEqual(len(faq_blocks), 1)
-        for entry in faq_blocks[0]["mainEntity"]:
-            question = entry["name"]
-            answer = entry["acceptedAnswer"]["text"]
-            # Both question and answer must be visible on the page (HTML-escaped).
-            self.assertIn(question.replace("'", "&#39;"), html)
-            self.assertIn(answer.replace("'", "&#39;"), html)
 
 
 if __name__ == "__main__":

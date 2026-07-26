@@ -91,8 +91,9 @@ vita del processo). Il frontend NON va ricostruito per i soli dati (la SPA legge
 
 Tre agenti, catena: **cacciatore -> [approvazione umana] -> curatore -> scrittore**.
 Il cacciatore e il curatore hanno il contratto in `docs/DISCOVERY_PIPELINE.md`;
-lo **scrittore** è definito in `.claude/agents/indicator-writer.md` (scrive la
-nota d'analista con numeri reali, stile `content/STYLE.md`, vintage e fonti).
+lo **scrittore** è definito in `.claude/agents/indicator-writer.md` (scrive
+l'articolo completo della pagina con numeri reali presi da
+`scripts/indicator_brief.py`, stile `content/STYLE.md`, vintage e fonti).
 
 ## Schedulazione (fatta)
 

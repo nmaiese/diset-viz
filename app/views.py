@@ -23,7 +23,8 @@ from app import profiles
 from app import sources
 from app import seo_policy
 from app import indicator_notes
-from app import analyst_notes
+from app import indicator_texts
+from app import indicator_view
 from app import quality_life_bes as qb
 from app import bes_data
 from app import multiscopo_data
@@ -331,183 +332,77 @@ def indicator_page(first, second=None):
             code=301,
         )
     family, raw_id = parsed
-    if family in ("bes", "multiscopo"):
-        return _render_qol_indicator(family, raw_id)
-    return _render_atlas_indicator(family, raw_id)
+    return _render_indicator(family, raw_id)
 
 
-def _render_atlas_indicator(family, raw_id):
-    """Map + ranking + trend page for atlas families (territorial, eurostat),
-    rendered with indicator_page.html."""
-    indicator_id = sources.internal_id(family, raw_id)
-    payload = get_atlas_indicator(indicator_id)
-    if payload is None:
+def _render_indicator(family, raw_id):
+    """The one indicator page, for every source family.
+
+    Everything numeric comes from app/indicator_view.py, everything editorial
+    from app/indicator_texts.py. This function only resolves the URL, picks the
+    territorial level to render, and decides what search engines see.
+    """
+    view = indicator_view.build_indicator_view(family, raw_id)
+    if view is None:
         abort(404)
 
-    meta = payload["metadata"]
-    canonical_path = sources.indicator_url(family, raw_id, profiles.indicator_slug(meta["name"]))
-    if request.path != canonical_path:
-        return redirect(canonical_path, code=301)
+    meta = view["meta"]
+    if request.path != meta["canonical_path"]:
+        # Keep the query string across the canonicalization hop, otherwise a
+        # shared link with a decorative slug silently drops the exploration
+        # state it was pointing at (?livello=provincia lands on the regions).
+        target = meta["canonical_path"]
+        if request.query_string:
+            target = f"{target}?{request.query_string.decode('utf-8')}"
+        return redirect(target, code=301)
 
-    year = meta["year_max"]
-    year_view = get_atlas_indicator_year(indicator_id, year)
+    # ?livello= picks which territorial level is server-rendered, so a reader
+    # without JavaScript can still reach the provincial view. It is an
+    # exploration state of the same page, never a second indexable URL.
+    requested = request.args.get("livello")
+    level = next((item for item in view["levels"] if item["key"] == requested), view["levels"][0])
 
-    # Order the ranking so #1 is the best-performing region for this indicator's
-    # direction; for contextual indicators "best" is undefined, so keep raw order.
-    direction = (meta.get("explain") or {}).get("direction")
-    values = year_view["values"]  # already sorted by value desc
-    if direction in ("lower_better", "higher_worse"):
-        values = list(reversed(values))
-    scoreable = direction in profiles.SCOREABLE_DIRECTIONS
-    best = values[0] if values and scoreable else None
-    worst = values[-1] if values and scoreable else None
+    article = indicator_texts.build_article(meta["id"])
+    lead = article["lead"] or indicator_texts.composed_lead(meta, level)
+    # The lead is the SERP description as well as the first thing on the page,
+    # so the two can never describe the indicator differently.
+    seo_description = indicator_notes.meta_description_from_attacco(lead)
 
-    plain = (meta.get("explain") or {}).get("plain", "")
-    stats = indicator_trend_stats(payload, year, values, best, worst)
-    annual_change = indicator_year_over_year_stats(payload, year)
-    trend_note = indicator_notes.trend_framing(direction, stats["avg_change_pct"])
-    annual_note = indicator_notes.annual_change_framing(
-        meta["name"],
-        direction,
-        annual_change["average_delta"] if annual_change else None,
-    )
-    is_indexable = profiles.is_search_indexable_indicator(meta)
-    map_colors = indicator_notes.region_choropleth_colors(values)
-    spark_points = indicator_notes.sparkline_points(meta.get("spark") or [], width=1200, height=140)
-    cover_bars = indicator_notes.cover_bars(values, best, worst, scoreable)
-
-    # Full year x region matrix embedded in the page so the client hydrates the
-    # ranking, map and readout in place, on this one canonical URL, without any
-    # extra fetch. The last-year ranking above stays server-rendered as the
-    # crawlable fallback: the explore controls only enhance it.
-    region_names = {}
-    matrix = {}
-    for row in payload["series"]:
-        if row["value"] is None:
-            continue
-        region_names.setdefault(row["region_key"], row["region"])
-        matrix.setdefault(str(row["year"]), {})[row["region_key"]] = row["value"]
-    explore_data = {
-        "id": meta["id"],
-        "unit": indicator_notes.value_unit_label(meta["name"], meta["unit"]),
-        "years": meta["years"],
-        "yearMin": meta["year_min"],
-        "yearMax": meta["year_max"],
-        "defaultYear": year,
-        "direction": direction,
-        "higherBetter": direction not in ("lower_better", "higher_worse"),
-        "scoreable": scoreable,
-        "canonical": canonical_path,
-        "regions": [
-            {"key": key, "name": name}
-            for key, name in sorted(region_names.items(), key=lambda kv: kv[1])
-        ],
-        "matrix": matrix,
-        "ramp": {"from": [0xE7, 0xEC, 0xF3], "to": [0x15, 0x23, 0x3B]},
-    }
-
-    # Previous / next indicator within the same theme, so the page keeps the
-    # atlas dashboard's sibling navigation (server-rendered, plain canonical links).
-    theme_siblings = sorted(
-        (
-            {
-                "id": item["id"],
-                "name": item["name"],
-                "path": item["path"],
-                "direction": (item.get("explain") or {}).get("direction"),
-                "year_max": item["year_max"],
-            }
-            for item in get_atlas_catalog()["indicators"]
-            if item["theme"] == meta["theme"]
-        ),
-        key=lambda item: item["name"].lower(),
-    )
-    sibling_index = next(
-        (i for i, item in enumerate(theme_siblings) if str(item["id"]) == str(meta["id"])),
-        None,
-    )
-    sibling_prev = theme_siblings[sibling_index - 1] if sibling_index else None
-    sibling_next = (
-        theme_siblings[sibling_index + 1]
-        if sibling_index is not None and sibling_index < len(theme_siblings) - 1
-        else None
-    )
-    # Related-in-theme table (C9): the other indicators of the same theme, with their
-    # reading direction, as a scannable table instead of a bare prev/next.
-    related_siblings = [s for s in theme_siblings if str(s["id"]) != str(meta["id"])][:8]
-
-    # Bar length reference for the ranking (same rule as the atlas Ranking).
-    bar_max = max((row["value"] for row in values if row["value"] is not None), default=0)
-
-    # Exploration states (?anno=, ?regione=) are the same object, not a new page:
-    # they never enter the index or sitemap and the canonical stays the base URL.
     explore_state = seo_policy.has_explore_params(request.args)
-    noindex = (not is_indexable) or explore_state
-
-    # Prefer the analyst lead (concrete regional figures, and the same text that
-    # opens the visible page) as the SERP description; fall back to the procedural
-    # description only when there is no note.
-    analyst = analyst_notes.get_analyst_note(meta["id"])
-    seo_description = (
-        indicator_notes.meta_description_from_attacco(analyst["attacco"])
-        if analyst and analyst.get("attacco")
-        else indicator_notes.seo_description(
-            plain, meta["year_max"], len(meta["regions"]), name=meta["name"]
-        )
-    )
-    value_unit = indicator_notes.value_unit_label(meta["name"], meta["unit"])
-    # Factual, data-derived FAQ (highest/lowest region, regional mean) rendered
-    # both as a visible section and as FAQPage JSON-LD from the same list.
-    faq = indicator_notes.build_indicator_faq(
-        meta["name"], value_unit, year, year_view["values"], stats["year_avg"]
-    )
+    noindex = (not meta["indexable"]) or explore_state
 
     response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
-        analyst=analyst,
-        values=values,
-        best=best,
-        worst=worst,
-        year=year,
-        stats=stats,
-        cover_bars=cover_bars,
-        annual_change=annual_change,
-        annual_note=annual_note,
-        trend_note=trend_note,
-        is_indexable=is_indexable,
+        levels=view["levels"],
+        level=level,
+        related=view["related"],
+        siblings=view["siblings"],
+        explore=view["explore"],
+        page_article=article,
+        page_lead=lead,
         noindex=noindex,
-        explore_data=explore_data,
-        sibling_prev=sibling_prev,
-        sibling_next=sibling_next,
-        related_siblings=related_siblings,
-        bar_max=bar_max,
-        map_colors=map_colors,
-        spark_points=spark_points,
-        page_intro=indicator_notes.indicator_page_intro(
-            plain,
-            meta["year_min"],
-            meta["year_max"],
-            len(meta["regions"]),
-            year=year,
-            best=best,
-            worst=worst,
-            year_avg=stats["year_avg"],
-            value_unit=value_unit,
-        ),
-        value_unit=value_unit,
-        change_unit=indicator_notes.change_unit_label(meta["name"], meta["unit"]),
-        faq=faq,
         seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
         seo_description=seo_description,
-        theme_path=profiles.theme_path(meta["theme"]),
+        dataset_description=_dataset_description(lead, meta),
         site_url=SITE_URL,
         site_name=SITE_NAME,
-        canonical=f"{SITE_URL}{canonical_path}",
+        canonical=f"{SITE_URL}{meta['canonical_path']}",
     ))
     if noindex:
         response.headers["X-Robots-Tag"] = "noindex, follow"
     return response
+
+
+def _dataset_description(lead, meta):
+    """Dataset JSON-LD description, kept in step with the visible page.
+
+    It used to concatenate two procedural sentences that appeared nowhere on the
+    page. Now it is the lead the reader actually sees, with the plain definition
+    as the fallback for indicators that have no written lead yet.
+    """
+    plain = (meta["explain"].get("plain") or "").strip()
+    return lead or plain or meta["name"]
 
 
 @app.route("/regione/<region_key>")
@@ -813,70 +708,6 @@ def quality_life_classifica_redirect():
 @app.route("/qualita-della-vita/province")
 def quality_life_province_redirect():
     return redirect(f"/qualita-della-vita/classifica/province{_profile_suffix(_quality_life_profile_arg())}", code=301)
-
-
-# Per-family presentation for the shared quality_life_indicator.html template.
-# Loader returns the family's page object; labels use the source registry so the
-# user sees plain names, not internal jargon.
-_QOL_FAMILY_PRESENTATION = {
-    "bes": {
-        "loader": lambda raw_id: bes_data.get_bes_indicator_page(raw_id),
-        "source_breadcrumb_path": "/qualita-della-vita/metodologia#indicatori-bes",
-        "source_breadcrumb_label": sources.family_short_label("bes"),
-        "coverage_note_scope": "sia per le regioni sia per le province",
-        "domain_label": "Dominio BES",
-        "domain_prose": "al dominio BES",
-    },
-    "multiscopo": {
-        "loader": lambda raw_id: multiscopo_data.get_multiscopo_indicator_page(raw_id),
-        "source_breadcrumb_path": "/qualita-della-vita/metodologia",
-        "source_breadcrumb_label": sources.family_short_label("multiscopo"),
-        "coverage_note_scope": "per le regioni",
-        "domain_label": "Tema Istat",
-        "domain_prose": "al tema Istat",
-    },
-}
-
-
-def _render_qol_indicator(family, raw_id):
-    """Quality-of-life indicator page (BES, Multiscopo), rendered with
-    quality_life_indicator.html at the unified /indicatore/<acr>-... URL."""
-    conf = _QOL_FAMILY_PRESENTATION[family]
-    indicator = conf["loader"](raw_id)
-    if indicator is None:
-        abort(404)
-    canonical_path = sources.indicator_url(family, raw_id, profiles.slugify(indicator["name"]))
-    if request.path != canonical_path:
-        return redirect(canonical_path, code=301)
-    territory_label = bes_data.bes_territory_label(indicator)
-    analyst = analyst_notes.get_analyst_note(indicator["id"])
-    seo_description = (
-        indicator_notes.meta_description_from_attacco(analyst["attacco"])
-        if analyst and analyst.get("attacco")
-        else bes_data.bes_seo_description(
-            indicator["name"], indicator["explain"]["plain"], territory_label
-        )
-    )
-    response = make_response(render_template(
-        "quality_life_indicator.html",
-        indicator=indicator,
-        territory_label=territory_label,
-        analyst=analyst,
-        source_breadcrumb_path=conf["source_breadcrumb_path"],
-        source_breadcrumb_label=conf["source_breadcrumb_label"],
-        coverage_note_scope=conf["coverage_note_scope"],
-        domain_label=conf["domain_label"],
-        source_label=sources.family_label(family),
-        domain_prose=conf["domain_prose"],
-        seo_title=bes_data.bes_seo_title(indicator["name"], SITE_NAME, territory_label),
-        seo_description=seo_description,
-        site_url=SITE_URL,
-        site_name=SITE_NAME,
-        canonical=f"{SITE_URL}{canonical_path}",
-    ))
-    if not indicator["indexable"]:
-        response.headers["X-Robots-Tag"] = "noindex, follow"
-    return response
 
 
 # Pre-migration quality-of-life URLs: 301 to the unified /indicatore/ space. The

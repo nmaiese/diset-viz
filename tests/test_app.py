@@ -420,15 +420,19 @@ class AppSmokeTest(unittest.TestCase):
         )
         path = profiles.indicator_path(sample["id"], sample["name"])
         html = client.get(path).data.decode("utf-8")
-        # Depth is carried by the data-derived H2 sections (the definition, the
-        # snapshot and the change-over-time blocks) plus the movers/gap H3s. Empty
-        # nested H2->H3 headings were flattened into inline strong labels, so the
-        # floor is on the sections that prove the page is not a stub, not a raw H3
-        # count.
-        self.assertGreaterEqual(html.count("<h2"), 5)
-        self.assertIn("I numeri, in breve", html)
-        self.assertIn("Cosa sapere su questo indicatore", html)
+        # Depth is carried by the article: four ordered sections, present on every
+        # indicator whether an editor has written them or the page composed them
+        # from the data. A missing role means the skeleton broke, which is the one
+        # thing that would make 621 pages inconsistent again.
+        self.assertIn('class="indicator-article', html)
+        for role in ("definizione", "quadro", "dinamica", "limiti"):
+            self.assertIn(f'id="sezione-{role}"', html)
         self.assertIn("data-callout", html)
+        # Numbers live in the cockpit, once. The blocks that used to repeat them
+        # further down the page must not come back.
+        self.assertIn('class="indicator-cockpit"', html)
+        self.assertNotIn("I numeri, in breve", html)
+        self.assertNotIn("numbers-tile", html)
         # The cascade fix: analysis h2s inside .page-indicator's .prose section must
         # get the full article-style treatment, not the compact .page-ranking one.
         css_path = Path(app.root_path) / "static" / "css" / "site.css"
@@ -443,15 +447,18 @@ class AppSmokeTest(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 200)
         html = response.data.decode("utf-8")
-        # The last-year change now lives inside the fused "I numeri, in breve" block
-        # as a clause on the long-run story (layout §7), not a standalone section.
-        self.assertIn("I numeri, in breve", html)
+        # The latest change is told in the "dinamica" section as movement across
+        # territories. The mean's own before/after is not repeated there: the
+        # cockpit KPI already carries it, and printing it twice is the duplication
+        # this layout removes.
         self.assertIn("tra il 2024 e il 2025", html)
-        self.assertIn("da 17,14 punti percentuali a 16,69 punti percentuali", html)
-        self.assertIn("Il valore è diminuito in 14 regioni, è aumentato in 6", html)
+        self.assertIn("il valore è diminuito in 14 regioni, è aumentato in 6", html)
         self.assertIn("il divario medio tra i due tassi si è ridotto", html)
+        # A gap between two rates covers both populations, and the page must not
+        # narrow that perimeter to one sex.
         self.assertIn("sia la popolazione femminile sia quella maschile", html)
         self.assertNotIn("Il perimetro riguarda la popolazione maschile", html)
+        # A simple mean of regional values is never a national indicator.
         self.assertNotIn("Media Italia", html)
         self.assertNotIn("media nazionale", html)
 

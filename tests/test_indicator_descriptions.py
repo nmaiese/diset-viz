@@ -77,11 +77,20 @@ class IndicatorDescriptionCoverageTest(unittest.TestCase):
         response = app.test_client().get(indicator_path(item["id"], item["name"]))
         html = unescape(response.data.decode("utf-8"))
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Che cosa misura e come leggere il dato", html)
-        self.assertIn("I numeri, in breve", html)
+        # The explanation now opens the article's "definizione" section rather
+        # than a block of its own, but it must still be visible text, not only
+        # structured data.
+        self.assertIn('id="sezione-definizione"', html)
         self.assertIn(item["explain"]["plain"], html)
         self.assertIn(item["explain"]["example"], html)
         self.assertIn('"@type": "Dataset"', html)
+        # The Dataset description has to be something the reader can also see:
+        # it is the page lead, not a sentence written only for crawlers.
+        lead = re.search(r'<p class="page-lead">(.*?)</p>', html, re.S)
+        self.assertIsNotNone(lead)
+        description = re.search(r'"description": "(.*?)(?<!\\)"', html, re.S)
+        self.assertIsNotNone(description)
+        self.assertTrue(description.group(1)[:40] in unescape(re.sub(r"<[^>]+>", "", lead.group(1))))
 
     def test_blog_posts_with_an_indicator_show_the_same_explanation(self):
         response = app.test_client().get("/blog/divario-turistico-nord-sud-2024")
