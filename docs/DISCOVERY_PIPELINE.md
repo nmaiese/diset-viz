@@ -1,5 +1,12 @@
 # Pipeline di discovery multifonte
 
+> **Come gira tutto insieme, senza intervento umano, sta in
+> [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).** Questo documento descrive
+> il **meccanismo** della scoperta: gli adapter, lo schema della coda, il
+> punteggio di priorità, cosa succede in promozione. Quello descrive **chi lo
+> muove**: i sei stadi, gli agenti, il cancello, la politica di merge e il
+> rientro sul pubblicato. Se cerchi "chi decide e quando", vai lì.
+
 Questo documento descrive lo strato di **scoperta e messa in coda** degli
 indicatori, cioè il pezzo che rende Divario Italia un aggregatore multifonte con
 priorità ai dati freschi e regionali (poi provinciali). È il livello che sta
@@ -20,14 +27,14 @@ svuota nel layer esterno esistente.
 ## Flusso
 
 ```
-                (fase 1: watchlist)                         (gate umano, in PR)
+                (fase 1: watchlist)                       (triage dell'agente, sotto cancello)
  fonti istituzionali  ─►  scripts/discover_candidates.py  ─►  data/discovery/candidates.csv
    (allowlist)              │  classifica vs catalogo             │  triage_status:
                             │  (new/compatible/proxy)             │   new → approved / rejected
                             │  punteggio priorità                 ▼
                             ▼                            scripts/promote_candidates.py
                 (fase 2: scouting, raro, opt-in)          (solo candidati approved)
-   nuovi domini  ─►  proposta di allowlist  ─►ok umano─►  watchlist          │
+   nuovi domini  ─►  proposta di allowlist  ─►ok umano─►  config/istat_series.yaml │
                                                                              ▼
                                             app/static/data/external/normalized_external_indicators.csv
                                             app/static/data/external_indicator_manifest.csv (status=proposed)
@@ -46,23 +53,34 @@ non vengono scartati: scendono solo in fondo alla coda.
    `config/external_sources.yaml` (allowlist istituzionale) e rileva nuove uscite
    e nuovi indicatori dentro quelle fonti. Alta qualità, poco rumore. È ciò che
    gira a ogni run schedulata.
-2. **Scouting (raro, opt-in).** Cerca fonti istituzionali non ancora conosciute e
-   le **propone** per l'allowlist. Un dominio nuovo entra in watchlist solo dopo
-   approvazione umana. Implementato per Istat da `scripts/scout_sources.py`, che
-   legge il catalogo dataflow SDMX e scrive i dataflow regionali non ancora
-   coperti in `data/discovery/source_candidates.csv` (vedi "Fase 2b" sotto). È il
-   gancio per la crescita controllata del bacino di fonti.
+2. **Scouting.** Cerca fonti istituzionali non ancora conosciute e le
+   **propone**. Un dominio nuovo entra in watchlist solo dopo approvazione umana,
+   ed è l'unico punto della catena in cui questo è ancora vero: la fonte decide
+   quale istituzione e quale licenza legge un utente in pagina. Implementato per
+   Istat da `scripts/scout_sources.py`, che legge il catalogo dataflow SDMX e
+   scrive i dataflow regionali non ancora coperti in
+   `data/discovery/source_candidates.csv` (vedi "Fase 2b" sotto). L'agente che lo
+   guida è `source-scout`, e per un dataflow approvato **cabla la fonte scrivendo
+   una riga in `config/istat_series.yaml`**, senza toccare codice.
 
-## Il gate: niente va live senza PR
+## Il gate: niente va live senza passare dal cancello
 
-Il cacciatore scrive **solo** in `data/discovery/candidates.csv` (versionato).
-`promote_candidates.py` agisce **solo** sui candidati con `triage_status=approved`
-e scrive nel layer esterno con `status=proposed`. La pubblicazione avviene al
-**merge** della pull request, non prima. Questo rispetta le regole già scritte in
-`DATA_PIPELINE.md`: `exact` è l'unico caso che può sostituire una serie, e niente
-entra nello scoring senza direzione revisionata, copertura e fonte citabile. Il
-cacciatore, per prudenza, **non dichiara mai `exact`** da solo: al massimo
-`compatible`/`proxy`, e la conferma la dà un umano nella PR.
+Ogni stadio scrive **solo** dentro il proprio perimetro (il cacciatore in
+`data/discovery/candidates.csv`, e basta) e chiude con
+`scripts/pipeline_gate.py`, che calcola il verdetto dal diff e dalla suite e
+decide se e come la PR si fonde. La politica non è uniforme: la prosa si fonde da
+sola, la promozione e la curatela passano dai check remoti perché muovono numeri
+vivi, **ammettere una fonte resta una firma umana**. Regole complete e motivazioni
+in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md) e
+[`AGENT_CONTRACT.md`](AGENT_CONTRACT.md).
+
+Restano vere le regole già scritte in `DATA_PIPELINE.md`: `exact` è l'unico caso
+che può sostituire una serie, e niente entra nello scoring senza direzione
+revisionata, copertura e fonte citabile. Il cacciatore **non dichiara mai
+`exact`** da solo, e il cancello lo rifiuta se ci prova. Un'approvazione sotto la
+copertura minima o senza licenza dichiarata viene rifiutata allo stesso modo:
+sono le cose che rendono una serie inutilizzabile, e vanno respinte senza dover
+leggere il ragionamento di chi l'ha approvata.
 
 ## Schema della coda
 
@@ -196,16 +214,23 @@ pagina che si legge come scritta da un giornalista.
 
 La catena completa degli agenti, tutti definiti in `.claude/agents/`:
 
-    cacciatore -> [approvazione umana] -> curatore -> scrittore -> revisore
+    scout -> cacciatore -> promozione -> curatore -> scrittore -> revisore
                                                                       |
-                                                            PR -> merge -> live
+                                                       cancello -> merge -> live
 
 | agente | file | coda deterministica |
 | --- | --- | --- |
+| scout | `source-scout.md` | `data/discovery/source_candidates.csv` |
 | cacciatore | `indicator-hunter.md` | `data/discovery/candidates.csv` |
-| curatore | `indicator-curator.md` | `scripts/curate.py` |
+| curatore | `indicator-curator.md` | `scripts/curate.py --include-recheck` |
 | scrittore | `indicator-writer.md` | `scripts/pending_notes.py`, `scripts/text_queue.py` |
 | revisore | `indicator-reviewer.md` | `scripts/review_queue.py` |
+
+Lo stato di tutti gli stadi insieme:
+
+```bash
+python3 scripts/pipeline_status.py
+```
 
 Ogni stadio ha una coda che si calcola dai file committati, non dalla memoria di
 una sessione precedente. È la condizione perché un agente schedulato sappia su
@@ -288,75 +313,43 @@ Esempio reale di coda prodotta: R&S sul PIL classificato `new` (0.88), PIL pro
 capite `proxy` dell'id 901 dei conti economici territoriali (0.78), entrambi
 copertura 20/20.
 
-## Runtime: agente Claude Code schedulato
+## Runtime: le Routine
 
-La discovery gira come **agente Claude Code schedulato** (Routine). Le due Routine
-sono attive: cacciatore lunedì `0 6 * * 1` UTC, curatore giovedì `0 6 * * 4` UTC,
-environment `divarioitalia`, sessione nuova a ogni firing. Id e gestione in
-[`DISCOVERY_STATUS.md`](DISCOVERY_STATUS.md). Contratto dell'agente a ogni firing:
+La catena gira come **Routine Claude Code** (agenti cloud, sessione nuova a ogni
+firing, checkout git proprio). Le cadenze, gli id e lo stato stanno in
+[`DISCOVERY_STATUS.md`](DISCOVERY_STATUS.md); il contratto che ogni agente segue a
+ogni run sta in [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md); come stanno insieme i
+sei stadi sta in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 
-1. `python3 scripts/discover_candidates.py --source eurostat_regional` (live,
-   cache-first) per ogni fonte watchlist abilitata.
-2. Leggere `data/discovery/candidates.csv`, esaminare i candidati `new` ordinati
-   per `priority_score`, e proporre una decisione di triage con motivazione
-   (freschezza, copertura, novità, licenza, rischio duplicato).
-3. Aprire una **pull request** con la coda aggiornata (e, per i candidati che
-   l'agente ritiene solidi, `triage_status` proposto). Nessun merge automatico.
-4. Su approvazione umana della PR, eseguire `promote_candidates.py` per generare
-   il diff del layer esterno (seconda PR o stessa PR), sempre sotto gate.
+**Il prompt di una Routine non riproduce il contratto, lo indica.** È la lezione
+più cara di questo sistema: la Routine dello scrittore riproduceva il proprio
+contratto per intero, il repo è andato avanti, e per settimane l'agente ha
+scritto in `analyst_notes.json`, un file che l'app non legge più. Girava, non
+falliva, e non arrivava in nessuna pagina.
 
-Il **curatore** è un secondo agente (o passo umano) che gira dopo la promozione:
-
-1. `python3 scripts/curate.py` per leggere l'evidenza sul verso di ogni
-   indicatore esterno non ancora curato.
-2. Per ciascuno: confermare o correggere il verso, scegliere la categoria,
-   rivedere la descrizione e decidere `score_eligible`, scrivendo la riga in
-   `data/discovery/curation.csv`.
-3. `python3 scripts/apply_curation.py` per pubblicare le decisioni nel layer
-   esterno, poi aprire la PR. Al merge l'indicatore entra nel punteggio.
-
-Lo **scrittore** è un terzo agente (o passo umano) che gira dopo la curation:
-
-1. `python3 scripts/pending_notes.py` per leggere la coda: gli indicatori
-   integrati senza nota (`missing`) e le note col vintage indietro (`stale`).
-2. Per ciascuno: leggere il brief
-   (`.venv/bin/python -m scripts.indicator_brief <codice>`), scrivere l'articolo
-   completo seguendo `.claude/agents/indicator-writer.md` e `content/STYLE.md`,
-   con solo numeri reali e le fonti verificate per le affermazioni comparative.
-3. Aggiornare `app/static/data/indicator_texts.json` (solo la chiave di quell'id),
-   lanciare `.venv/bin/python -m unittest tests.test_indicator_texts` e aprire la
-   PR. Nessun merge automatico.
-
-Note operative:
+Note operative che restano vere per tutti:
 
 - Gli script sono **stdlib puri**: girano senza il venv dell'app.
 - **Rate limit**: una richiesta per dataset, cache-first. Rispettare i limiti
-  Istat SDMX (5/min) quando si aggiungeranno fonti Istat alla watchlist.
+  Istat SDMX (5/min).
 - **Scadenza della cache**: la cache serve a non rifare la stessa richiesta
   dentro una run, non a congelare la fonte. Le risposte dati scadono dopo
   `CACHE_MAX_AGE` (Eurostat, `scripts/eurostat_source.py`) e `DATA_MAX_AGE`
   (Istat, `scripts/istat_sdmx.py`), sei giorni, appena sotto la cadenza
-  settimanale. Le **strutture** SDMX (dataflow, DSD, codelist) restano invece
-  in cache senza scadenza, perché cambiano di rado e rifarle consuma solo
-  budget di richieste. In locale le mtime dei file di cache sono reali, quindi
-  la scadenza a sei giorni funziona da sola: un refresh eseguito a mano riscarica
-  i dati e riusa le strutture senza flag aggiuntivi. Se un domani questa
-  pipeline girasse dentro un runner che ripristina una cache di lungo periodo,
-  quella cache andrebbe invalidata a ogni run (le mtime ripristinate non sono
-  affidabili), o passando `--refresh`/`--refresh-data`, o ruotando la chiave di
-  cache: senza, il job rileggerebbe per sempre la prima risposta salvata.
+  settimanale. Le **strutture** SDMX (dataflow, DSD, codelist) restano invece in
+  cache senza scadenza, perché cambiano di rado e rifarle consuma solo budget di
+  richieste. In locale le mtime dei file di cache sono reali, quindi la scadenza
+  a sei giorni funziona da sola. Se un domani questa pipeline girasse dentro un
+  runner che ripristina una cache di lungo periodo, quella cache andrebbe
+  invalidata a ogni run (le mtime ripristinate non sono affidabili), o passando
+  `--refresh`/`--refresh-data`, o ruotando la chiave di cache: senza, il job
+  rileggerebbe per sempre la prima risposta salvata.
 - **Network policy**: l'accesso web dipende dalla policy dell'ambiente. In una
-  sessione senza rete, usare `--offline` sui fixture committati.
+  sessione senza rete, usare `--offline` sui fixture committati, e dichiararlo:
+  una coda prodotta offline non è una scoperta nuova.
 - Le colonne del layer esterno in `promote_candidates.py` (`EXTERNAL_COLUMNS`,
   `MANIFEST_COLUMNS`) sono una **copia** di quelle in `app/external_data.py`:
   tenerle allineate se cambia lo schema.
-
-## Test
-
-`tests/test_discovery.py` (stdlib, offline): schema e policy di priorità, dedup
-conservativa, combinazione pesata Bolzano+Trento, anno recente per copertura, e il round
-trip cacciatore → coda → (approvazione) → promozione su file temporanei, così i
-dati di produzione non vengono mai toccati.
 
 ## Fase 2b (implementata): lo scout, nuove fonti nel catalogo SDMX
 
