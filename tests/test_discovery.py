@@ -311,13 +311,25 @@ class AdmittingASeriesIsConfigNotCode(unittest.TestCase):
     scout is allowed to write.
     """
 
-    def test_the_committed_config_still_carries_the_wired_series(self):
+    def test_the_committed_config_loads_every_wired_series_well_formed(self):
+        """The committed watchlist may grow, so this does not freeze its
+        contents: freezing the list here is what turned admitting a series back
+        into a code change and stalled the scout. It guards the two things that
+        would break silently instead. The seed series must not be dropped by
+        accident, and every row load_series returns must carry the fields the
+        hunter needs to fetch and identify the series. The exact shape of each
+        admitted row (direction, category, mapped theme) is policed, without
+        freezing the list, by tests/test_source_admission.py."""
         series = istat_regional_source.load_series()
-        self.assertEqual(sorted(series), ["DEPENDRATE", "OLDAGEDEPR"])
-        for spec in series.values():
-            self.assertTrue(spec["name"])
-            self.assertTrue(spec["dataflow"])
-            self.assertEqual(spec["unit"], "%", "a quoted YAML scalar must survive the round trip")
+        self.assertLessEqual(
+            {"OLDAGEDEPR", "DEPENDRATE"}, set(series),
+            "a seed series was dropped from config/istat_series.yaml",
+        )
+        for series_id, spec in series.items():
+            self.assertEqual(spec["data_type"], series_id)
+            self.assertTrue(spec["name"], f"{series_id}: no name")
+            self.assertTrue(spec["dataflow"], f"{series_id}: no dataflow")
+            self.assertTrue(spec["dsd_label"], f"{series_id}: no dsd_label")
 
     def test_a_row_can_bring_its_own_dataflow(self):
         """The point of the file. A second Istat domain is a row, not a module:
@@ -344,6 +356,9 @@ class AdmittingASeriesIsConfigNotCode(unittest.TestCase):
         self.assertEqual(spec["dsd_label"], "DCIS_OTHER")
         self.assertEqual(spec["decimals"], 2)
         self.assertEqual(spec["proposed_direction"], "lower_better")
+        # A quoted YAML scalar must survive the round trip: the mini-parser must
+        # not swallow the "%", or a percentage unit would reach the page blank.
+        self.assertEqual(spec["unit"], "%")
 
     def test_a_missing_config_is_an_empty_watchlist_not_a_crash(self):
         with TemporaryDirectory() as tmp:
@@ -403,15 +418,35 @@ class IstatRegionalAdapter(unittest.TestCase):
         self.assertTrue(any("," in row["value"] for row in rows))
 
     def test_hunter_discovers_new_istat_candidates(self):
-        with TemporaryDirectory() as tmp:
-            discovery.CANDIDATES_PATH = Path(tmp) / "candidates.csv"
-            discovered, _ = discover_candidates.run("istat_demografia", offline=True)
-            self.assertEqual(len(discovered), len(istat_regional_source.ISTAT_SERIES))
-            for cand in discovered:
-                self.assertEqual(cand["source"], "istat_demografia")
-                self.assertEqual(cand["territory_level"], "regione")
-                self.assertEqual(cand["triage_status"], "new")
-                self.assertTrue(cand["discovered_at"], "every candidate carries provenance")
+        # Offline, the hunter can only read series that ship a committed fixture.
+        # Admitting a live-only series to config/istat_series.yaml (the scout may
+        # write a config row but not commit a fixture) must not break this test,
+        # so pin the watchlist to the fixture-backed subset instead of the whole
+        # config. The live hunter reads every series over the network; that path
+        # is not exercised here.
+        original_series = istat_regional_source.ISTAT_SERIES
+        original_path = discovery.CANDIDATES_PATH
+        fixture_backed = {
+            sid: spec for sid, spec in original_series.items()
+            if istat_regional_source._fixture_path(sid).exists()
+        }
+        self.assertTrue(fixture_backed, "no committed Istat fixture to discover from")
+        istat_regional_source.ISTAT_SERIES = fixture_backed
+        try:
+            with TemporaryDirectory() as tmp:
+                discovery.CANDIDATES_PATH = Path(tmp) / "candidates.csv"
+                discovered, _ = discover_candidates.run("istat_demografia", offline=True)
+                # A fixture-backed series must not be silently dropped en route.
+                self.assertEqual(discover_candidates.FAILURES, [])
+                self.assertEqual(len(discovered), len(fixture_backed))
+                for cand in discovered:
+                    self.assertEqual(cand["source"], "istat_demografia")
+                    self.assertEqual(cand["territory_level"], "regione")
+                    self.assertEqual(cand["triage_status"], "new")
+                    self.assertTrue(cand["discovered_at"], "every candidate carries provenance")
+        finally:
+            istat_regional_source.ISTAT_SERIES = original_series
+            discovery.CANDIDATES_PATH = original_path
 
 
 class MultiSourcePromotion(unittest.TestCase):

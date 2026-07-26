@@ -5629,6 +5629,80 @@
   ],
   "vintage": 2023
  },
+ "dem:BIRTHRATE": {
+  "fonti": [
+   {
+    "testo": "Istat, Indicatori demografici, Anno 2024 (31 marzo 2025): nel 2024 la fecondità scende a 1,18 figli per donna, sotto il minimo storico di 1,19 del 1995, e i nati restano sotto le 370 mila unità.",
+    "url": "https://www.istat.it/wp-content/uploads/2025/03/Indicatori_demografici_2024.pdf"
+   },
+   {
+    "testo": "Istat, Natalità e fecondità della popolazione residente, Anno 2024: il numero medio di figli per donna è più alto in Trentino-Alto Adige, 1,39, e più basso in Sardegna, 0,91.",
+    "url": "https://www.istat.it/wp-content/uploads/2025/10/Natalita-e-fecondita-della-popolazione-residente_Anno-2024.pdf"
+   }
+  ],
+  "lead": "In cima al tasso di natalità il Trentino-Alto Adige convive con la Campania, e l'ordine dei territori non segue quello del reddito ma la loro struttura per età. Un tasso alto racconta quante persone in età fertile vivono in una regione e quanti figli nascono, non un vantaggio da leggere in graduatoria.",
+  "level": "regione",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2024,
+  "sections": [
+   {
+    "body": "Il tasso di natalità rapporta i nati vivi di un anno alla popolazione media residente e moltiplica per mille. Il 6,20 del Veneto nel 2024 vuol dire poco più di sei nati ogni mille abitanti in dodici mesi.\n\nÈ un tasso grezzo, e la parola pesa. Al denominatore c'è tutta la popolazione, non le sole donne in età fertile, quindi il valore risponde a due forze insieme, quante persone in età da avere figli vivono in una regione e quanti figli mettono al mondo. Una popolazione giovane alza il tasso a parità di fecondità, una popolazione anziana lo abbassa anche là dove i figli non mancano. Il numero da solo non separa i due effetti.",
+    "h": "Nascite e popolazione, senza filtrare l'età",
+    "role": "definizione"
+   },
+   {
+    "body": "Il tasso non ricalca la faglia del reddito. In testa il Trentino-Alto Adige sta a fianco della Campania, e subito dietro vengono la Sicilia e la Calabria, prima della Lombardia e dell'Emilia-Romagna. Dopo la Calabria la graduatoria fa un gradino di 0,40, e sopra quel gradino restano quattro regioni che il divario economico terrebbe agli antipodi.\n\nLa spiegazione sta in come è fatto il tasso. Il Trentino-Alto Adige unisce al primo posto anche la fecondità più alta del paese, 1,39 figli per donna. La Campania resta in alto senza quel primato, perché un tasso grezzo cresce anche dove le persone in età fertile sono più numerose, a parità di figli per donna.\n\nLa mediana, 5,80, sta sotto la media, e in mezzo le regioni si stringono in una fascia di pochi decimi. In fondo la Sardegna si stacca di 0,70 dalla Valle d'Aosta, il salto più largo di tutta la classifica, e ha la fecondità più bassa d'Italia, 0,91 figli per donna. Per un indicatore contestuale quel fondo segna un estremo della distribuzione, non l'ultimo posto di una gara.",
+    "h": "In cima Nord e Sud arrivano da strade diverse",
+    "role": "quadro"
+   },
+   {
+    "body": "Sull'intero periodo dal 2015 al 2024 il tasso è sceso in tutte e venti le regioni, senza una sola eccezione. La media semplice dei valori regionali ha perso 1,76 punti in dieci anni.\n\nA cambiare è la velocità, non la direzione. Il Lazio e la Valle d'Aosta hanno perso 2,50 punti, il calo più netto, mentre la Liguria si è fermata a 0,90 e il Friuli-Venezia Giulia a 1,20. In testa il Trentino-Alto Adige è sceso di 2,00 punti e la Campania di appena 1,40, così il piccolo gruppo ad alta natalità si è mosso a ritmi diversi pur restando insieme.\n\nIl calo è nazionale. Nel 2024 l'Istat stima 1,18 figli per donna, sotto il precedente minimo storico di 1,19 toccato nel 1995, e in Italia nascono meno di 370 mila bambini in un anno. Nell'ultimo passaggio, dal 2023 al 2024, quindici regioni sono ancora scese e una sola è salita.",
+    "h": "In calo ovunque, ma non alla stessa velocità",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il tasso grezzo tiene insieme due cose che una lettura attenta vorrebbe separate. Non dice se in una regione nascono pochi bambini perché le donne in età fertile sono poche o perché ognuna ha meno figli. Per la propensione ad avere figli, indipendente dall'età della popolazione, serve il numero medio di figli per donna, che l'Istat calcola a parte.\n\nConta i residenti, quindi risente delle migrazioni da tutti e due i lati. Una regione che perde giovani adulti vede assottigliarsi proprio la fascia da cui vengono i nati, e il tasso cala senza che nessuno abbia cambiato idea sul fare figli.\n\nÈ infine la fotografia di un anno. Non distingue chi rinvia una nascita da chi vi rinuncia, e non anticipa quanti figli avrà chi oggi è giovane. Registra quanti bambini sono nati nel 2024 ogni mille abitanti, e nulla di più.",
+    "h": "Quello che un tasso grezzo tiene insieme",
+    "role": "limiti"
+   }
+  ],
+  "vintage": 2024
+ },
+ "dem:NMIGRATEIN": {
+  "fonti": [
+   {
+    "testo": "Istat, Migrazioni interne e internazionali della popolazione residente. Anni 2023-2024 (20 giugno 2025)",
+    "url": "https://www.istat.it/comunicato-stampa/migrazioni-interne-e-internazionali-della-popolazione-residente-anni-2023-2024/"
+   }
+  ],
+  "lead": "Nel saldo migratorio interno la frattura più netta non separa il Nord dal Sud, ma cade tra la Sardegna, quasi in pareggio, e il Mezzogiorno continentale. La maggior parte delle regioni resta in equilibrio o guadagna abitanti negli scambi con il resto d'Italia, mentre le perdite pesanti si concentrano in una coda del Sud continentale.",
+  "level": "regione",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2024,
+  "sections": [
+   {
+    "body": "Il saldo migratorio interno mette a confronto due registri anagrafici: le persone che si iscrivono in una regione arrivando da un altro comune italiano e quelle che si cancellano per trasferirsi altrove in Italia. La differenza, rapportata alla popolazione residente e moltiplicata per mille, dà il valore dell'anno.\n\nUn numero positivo dice che la regione, negli scambi di residenza con il resto del paese, ha guadagnato abitanti. Un numero negativo che li ha persi. Il +1,00 della Toscana vuol dire circa un residente guadagnato ogni mille abitanti nel 2024. Restano fuori del tutto i movimenti da e verso l'estero, perché qui contano solo i trasferimenti da un comune italiano a un altro.",
+    "h": "Un bilancio di traslochi tra comuni italiani",
+    "role": "definizione"
+   },
+   {
+    "body": "La mediana regionale, +0,75, racconta una cosa diversa dalla media, che resta negativa. Vuol dire che la regione tipica guadagna qualche residente, e che a tirare in basso l'aggregato è una coda di poche regioni con perdite profonde.\n\nIl gradino più largo di tutta la graduatoria, 2,10 punti, non corre lungo la solita linea Nord-Sud. Cade tra la Sardegna, che con un saldo appena negativo resta vicina al pareggio, e la Puglia, dove la perdita diventa netta. La Sardegna è un'isola del Mezzogiorno che sta davanti a tutto il Sud continentale, e anche l'Abruzzo mantiene un saldo positivo. Sotto quel gradino la perdita si fa pesante, fino ai valori più bassi del Sud continentale.\n\nIl rapporto Istat sulle migrazioni interne dà la misura assoluta dietro questi tassi. Nel biennio 2023-2024 il Mezzogiorno ha perso 116 mila residenti negli scambi con il Centro-Nord, e quasi tre di quegli spostamenti su dieci hanno avuto come destinazione la Lombardia.",
+    "h": "La graduatoria si spezza tra la Sardegna e la Puglia",
+    "role": "quadro"
+   },
+   {
+    "body": "Sul lungo periodo il quadro nazionale sembra immobile. La media semplice dei valori regionali è passata da -0,32 nel 2015 a -0,18 nel 2024, appena 0,13 punti in dieci anni. Ma quella quasi-stabilità è un pareggio tra spinte opposte: undici regioni hanno migliorato il saldo, otto lo hanno peggiorato, una è rimasta ferma.\n\nA salire di più è stata la Valle d'Aosta, +2,40 punti dal 2015, seguita dal Piemonte e dall'Abruzzo. In direzione contraria si sono mosse alcune regioni che dieci anni fa avevano saldi tra i più alti: il Lazio ha perso 1,60 punti, il calo più forte del paese, e il Trentino-Alto Adige 1,20. Anche la Basilicata ha peggiorato di 1,50, allontanandosi ancora dal gruppo. Così la distanza tra il primo e l'ultimo si è allargata di 0,30 punti.\n\nL'ultimo anno va letto a parte. Dal 2023 al 2024 la media è risalita più di quanto si fosse mossa in tutti i dieci anni precedenti, anche se in quello stesso anno nove regioni hanno comunque perso terreno.",
+    "h": "Un aggregato quasi fermo, una mappa che si sposta",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il conto guarda solo dentro i confini nazionali. Una regione può perdere residenti verso il resto d'Italia e allo stesso tempo crescere grazie agli arrivi dall'estero, e questo saldo non lo vedrebbe. Per capire se la popolazione aumenta o cala serve il saldo migratorio totale, non questo.\n\nÈ inoltre un valore netto. Due regioni con lo stesso saldo possono nascondere realtà opposte, una dove tante persone arrivano e altrettante partono, un'altra dove quasi nessuno si sposta. Il numero non dice nemmeno chi parte e chi arriva, se giovani o anziani, con quale titolo di studio o lavoro. Registra il bilancio dei trasferimenti, non il loro profilo.",
+    "h": "Che cosa resta fuori da questo saldo",
+    "role": "limiti"
+   }
+  ],
+  "vintage": 2024
+ },
  "dem:OLDAGEDEPR": {
   "fonti": [],
   "lead": "In dieci anni le persone dai 65 anni in su ogni cento in età da lavoro sono aumentate in tutte e venti le regioni italiane, ma la Sardegna si è mossa quasi sette volte più della Liguria. La graduatoria che ne esce non separa il Nord dal Sud.",

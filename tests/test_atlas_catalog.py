@@ -90,8 +90,14 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         self.assertTrue(any(item["complete"] for item in federated["indicators"] if item["catalog_family"] == "bes"))
         scored = [item for item in federated["indicators"] if item["quality_life_scored"]]
         self.assertGreaterEqual(len(scored), 200)
+        # Every source family that reaches the quality-of-life score. istat_demografia
+        # joined it when the curator confirmed dem:NMIGRATEIN (saldo migratorio interno)
+        # as higher_better: the first demographic series with a directional verso, so
+        # the first to score. A new family here means a real curatorial decision, not a
+        # bug, and the set grows with it.
         self.assertEqual(
-            {item["catalog_family"] for item in scored}, {"bes", "territorial", "multiscopo", "eurostat"}
+            {item["catalog_family"] for item in scored},
+            {"bes", "territorial", "multiscopo", "eurostat", "istat_demografia"},
         )
         self.assertTrue(all(item["quality_life_category_label"] for item in scored))
 
