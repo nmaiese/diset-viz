@@ -12,6 +12,38 @@ from tempfile import TemporaryDirectory
 from scripts import curate, apply_curation
 
 
+class CuratorWorklistEmpties(unittest.TestCase):
+    """A curated indicator must leave the worklist, whatever the verdict was.
+
+    The queue used to key on `score_eligible`, so `contextual` (a final and
+    common verdict) never cleared it: a scheduled curator would have re-reviewed
+    the same indicator and opened a PR for it every run, forever.
+    """
+
+    ROWS = [
+        {"target_indicator_id": "dem:X", "atlas_eligible": "true", "score_eligible": "false"},
+        {"target_indicator_id": "eur:Y", "atlas_eligible": "true", "score_eligible": "true"},
+        {"target_indicator_id": "eur:Z", "atlas_eligible": "true", "score_eligible": "false"},
+        {"target_indicator_id": "901", "atlas_eligible": "true", "score_eligible": "false"},
+    ]
+
+    def test_a_contextual_decision_clears_the_worklist(self):
+        decisions = [{"target_indicator_id": "dem:X", "reviewed_direction": "contextual",
+                      "score_eligible": "false"}]
+        left = curate.uncurated_targets(self.ROWS, decisions)
+        self.assertNotIn("dem:X", left)
+        self.assertIn("eur:Z", left, "an unreviewed one stays")
+
+    def test_an_enriching_target_is_not_a_curator_job(self):
+        """Bare numeric ids enrich an existing indicator, they are not entries."""
+        self.assertNotIn("901", curate.uncurated_targets(self.ROWS, []))
+
+    def test_every_external_family_is_visible_to_the_curator(self):
+        left = curate.uncurated_targets(self.ROWS, [])
+        self.assertIn("dem:X", left)
+        self.assertIn("eur:Y", left)
+
+
 DATASET_HEADER = ";".join(apply_curation.EXTERNAL_COLUMNS)
 MANIFEST_HEADER = ";".join(apply_curation.MANIFEST_COLUMNS)
 

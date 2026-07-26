@@ -106,16 +106,28 @@ EXTERNAL_PREFIXES = tuple(
 )
 
 
-def uncurated_targets(rows=None):
-    """Standalone external atlas indicators not yet score-eligible: the
-    curator's worklist, across every externally sourced family."""
+def uncurated_targets(rows=None, decisions=None):
+    """Standalone external atlas indicators nobody has reviewed yet.
+
+    "Reviewed" means a row exists in `data/discovery/curation.csv`, not
+    `score_eligible=true`. Those are different things, and reading the flag was
+    a bug with teeth for a scheduled curator: `contextual` is a legitimate and
+    final verdict that leaves `score_eligible` false forever, so a correctly
+    curated dependency ratio came back on the worklist every single run and the
+    agent would have re-reviewed it, and opened a PR for it, week after week.
+    """
     rows = rows if rows is not None else read_external()
-    seen = {}
+    decisions = decisions if decisions is not None else read_curation()
+    reviewed = {row.get("target_indicator_id") for row in decisions}
+    seen = []
     for row in rows:
         target = row.get("target_indicator_id", "")
-        if target.startswith(EXTERNAL_PREFIXES) and row.get("atlas_eligible") == "true":
-            seen.setdefault(target, row.get("score_eligible") == "true")
-    return [target for target, scoreable in seen.items() if not scoreable]
+        if not target.startswith(EXTERNAL_PREFIXES) or row.get("atlas_eligible") != "true":
+            continue
+        if target in reviewed or target in seen:
+            continue
+        seen.append(target)
+    return seen
 
 
 def read_curation(path=None):
