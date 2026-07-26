@@ -173,25 +173,32 @@ def get_rows():
     def _dedup(value):
         return interned.setdefault(value, value)
 
-    with open(DATASET_PATH, "r", encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f, delimiter=";")
-        rows = []
-        for row in reader:
-            rows.append(
-                _Row(
-                    id=_dedup(row["idIndicatore"]),
-                    territory=_dedup(row["Territorio"]),
-                    region_key=_dedup(_slugify(row["Territorio"])),
-                    theme=_dedup(_clean_text(row["Tema"])),
-                    indicator=_dedup(_clean_text(row["Indicatore"])),
-                    unit=_dedup(display_unit(_clean_text(row["UDM"]))),
-                    source=_dedup(_clean_text(row["Fonte"])),
-                    archive=_dedup(_clean_text(row["Archivio"])),
-                    year=int(row["Anno"]),
-                    value=_parse_number(row["Dato"]),
+    try:
+        with open(DATASET_PATH, "r", encoding="utf-8", newline="", errors="replace") as f:
+            reader = csv.DictReader(f, delimiter=";")
+            rows = []
+            for row in reader:
+                rows.append(
+                    _Row(
+                        id=_dedup(row["idIndicatore"]),
+                        territory=_dedup(row["Territorio"]),
+                        region_key=_dedup(_slugify(row["Territorio"])),
+                        theme=_dedup(_clean_text(row["Tema"])),
+                        indicator=_dedup(_clean_text(row["Indicatore"])),
+                        unit=_dedup(display_unit(_clean_text(row["UDM"]))),
+                        source=_dedup(_clean_text(row["Fonte"])),
+                        archive=_dedup(_clean_text(row["Archivio"])),
+                        year=int(row["Anno"]),
+                        value=_parse_number(row["Dato"]),
+                    )
                 )
-            )
-    return rows
+        return rows
+    except FileNotFoundError:
+        raise RuntimeError(f"Dataset not found at {DATASET_PATH}. Expected path: {os.path.abspath(DATASET_PATH)}")
+    except (KeyError, ValueError) as e:
+        raise RuntimeError(f"Failed to parse dataset: {e}. Check CSV format at {DATASET_PATH}")
+    except Exception as e:
+        raise RuntimeError(f"Failed to load dataset: {e}")
 
 
 @lru_cache(maxsize=1)
