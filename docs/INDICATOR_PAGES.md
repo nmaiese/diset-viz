@@ -198,8 +198,17 @@ pagina viene resa per verificare che non ci siano 500.
 Restano **fuori dai test**, e vanno rivisti a mano. Non a memoria, però:
 `.venv/bin/python -m scripts.review_queue` cerca esattamente questi pattern e
 mette in fila gli articoli per quanto è probabile che siano sbagliati, e
-`.claude/agents/indicator-reviewer.md` è l'agente che li legge. Un articolo
-firmato porta `reviewed_at` ed esce dalla coda.
+`.claude/agents/indicator-reviewer.md` è l'agente che li legge, e gira ogni
+giorno.
+
+Un articolo firmato porta **due** campi, `reviewed_at` e `reviewed_vintage`, e
+solo con entrambi esce dalla coda. Il secondo è il `vintage` che il revisore
+aveva davanti: quando lo scrittore aggiorna l'articolo su un anno nuovo tutte le
+cifre cambiano, i due valori smettono di combaciare e l'articolo **rientra** in
+coda col segnale `rilettura`, che pesa più di ogni segnale di rischio. Gli altri
+marcano una frase che potrebbe essere sbagliata, quello marca un articolo in cui
+non è stato controllato niente. Vedi
+[`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 
 - le affermazioni universali su un andamento ("è cresciuto ovunque"): il brief
   ha un blocco apposta, `SI MUOVONO CONTROCORRENTE`,

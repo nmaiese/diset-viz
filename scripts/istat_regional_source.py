@@ -30,7 +30,7 @@ import csv
 import re
 from pathlib import Path
 
-from scripts import discovery, istat_sdmx, multiscopo_sources
+from scripts import discovery, external_sources, istat_sdmx, multiscopo_sources
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_DIR = PROJECT_ROOT / "data" / "discovery" / "fixtures" / "istat"
@@ -73,30 +73,45 @@ TRENTINO_PARTS = multiscopo_sources.TRENTINO_PARTS
 TRENTINO_WEIGHTS = multiscopo_sources.TRENTINO_WEIGHTS
 TRENTINO_NAME = "Trentino Alto Adige"
 
-# Curated series: one DATA_TYPE code within DCIS_INDDEMOG1 = one candidate.
-# `direction` is left `contextual` on purpose: an ageing/dependency ratio is not
-# unambiguously good or bad, so the human curator decides the verso and score
-# eligibility later. The hunter only records the proposal.
-ISTAT_SERIES = {
-    "OLDAGEDEPR": {
-        "data_type": "OLDAGEDEPR",
-        "name": "Indice di dipendenza strutturale degli anziani (Istat, regioni)",
-        "unit": "%",
-        "decimals": 1,
-        "proposed_theme": "Indicatori demografici (Istat)",
-        "proposed_quality_life_category": "salute_cura",
-        "proposed_direction": "contextual",
-    },
-    "DEPENDRATE": {
-        "data_type": "DEPENDRATE",
-        "name": "Indice di dipendenza strutturale (Istat, regioni)",
-        "unit": "%",
-        "decimals": 1,
-        "proposed_theme": "Indicatori demografici (Istat)",
-        "proposed_quality_life_category": "salute_cura",
-        "proposed_direction": "contextual",
-    },
-}
+SERIES_CONFIG = PROJECT_ROOT / "config" / "istat_series.yaml"
+
+
+def load_series(path=None):
+    """Curated series read from config, not from this file.
+
+    One `dataflow` plus one `DATA_TYPE` code selects exactly one indicator, so a
+    series is fully described by a row of scalars. That is the whole reason this
+    moved out of Python: admitting an Istat series used to mean editing a module,
+    which no agent is allowed to do, so the chain stalled the moment its wired
+    sources ran out. Now the scout writes a row and the hunter picks it up.
+
+    `direction` stays a *proposal* read from the name. It is the curator that
+    checks it against the real ranking, and a dependency ratio has no better end
+    at all, which is why both seeded series say `contextual`.
+    """
+    path = Path(path) if path else SERIES_CONFIG
+    if not path.exists():
+        return {}
+    series = {}
+    for entry in external_sources.load_flat_list(path, "series"):
+        series_id = (entry.get("id") or "").strip()
+        if not series_id:
+            continue
+        series[series_id] = {
+            "data_type": series_id,
+            "dataflow": entry.get("dataflow", DATAFLOW),
+            "dsd_label": entry.get("dsd_label", DSD_LABEL),
+            "name": entry.get("name", series_id),
+            "unit": entry.get("unit", ""),
+            "decimals": entry.get("decimals", 1),
+            "proposed_theme": entry.get("theme", ""),
+            "proposed_quality_life_category": entry.get("quality_life_category", ""),
+            "proposed_direction": entry.get("direction", "contextual"),
+        }
+    return series
+
+
+ISTAT_SERIES = load_series()
 
 
 def _load_region_names():
@@ -109,13 +124,14 @@ def _load_region_names():
 
 
 def _fixture_path(series_id):
-    return FIXTURE_DIR / f"{DSD_LABEL}__{series_id}.csv"
+    spec = ISTAT_SERIES[series_id]
+    return FIXTURE_DIR / f"{spec['dsd_label']}__{series_id}.csv"
 
 
 def _data_path(series_id):
-    code = ISTAT_SERIES[series_id]["data_type"]
+    spec = ISTAT_SERIES[series_id]
     # FREQ.REF_AREA.DATA_TYPE : annual, all territories, one indicator.
-    return f"data/{DATAFLOW}/A..{code}?startPeriod={START_YEAR}"
+    return f"data/{spec['dataflow']}/A..{spec['data_type']}?startPeriod={START_YEAR}"
 
 
 def fetch_rows(series_id, offline=True, refresh=False, client=None):
@@ -201,7 +217,7 @@ def discover(series_id, offline=True, refresh=False, client=None):
     year, coverage, _ = best_recent_year(regional)
     return {
         "source": SOURCE,
-        "source_dataset": DATAFLOW,
+        "source_dataset": spec["dataflow"],
         "source_indicator_id": series_id,
         "name": spec["name"],
         "territory_level": "regione",

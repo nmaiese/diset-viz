@@ -301,6 +301,55 @@ class QueueRoundTrip(unittest.TestCase):
             )
 
 
+class AdmittingASeriesIsConfigNotCode(unittest.TestCase):
+    """The change that lets the chain grow without a human writing Python.
+
+    The hunter is exhausted the moment its wired sources stop growing, and
+    wiring one used to mean editing `scripts/istat_regional_source.py`. No agent
+    may write code, so the chain had a hard ceiling: five series, then nothing
+    forever. The curated list now lives in `config/istat_series.yaml`, which the
+    scout is allowed to write.
+    """
+
+    def test_the_committed_config_still_carries_the_wired_series(self):
+        series = istat_regional_source.load_series()
+        self.assertEqual(sorted(series), ["DEPENDRATE", "OLDAGEDEPR"])
+        for spec in series.values():
+            self.assertTrue(spec["name"])
+            self.assertTrue(spec["dataflow"])
+            self.assertEqual(spec["unit"], "%", "a quoted YAML scalar must survive the round trip")
+
+    def test_a_row_can_bring_its_own_dataflow(self):
+        """The point of the file. A second Istat domain is a row, not a module:
+        `dataflow` used to be a module constant, so every series had to come
+        from the demographic one."""
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "istat_series.yaml"
+            path.write_text(
+                "series:\n"
+                "  - id: NEWCODE\n"
+                "    dataflow: 99_999_DF_OTHER_1\n"
+                "    dsd_label: DCIS_OTHER\n"
+                "    name: Una serie di un altro dominio (Istat, regioni)\n"
+                '    unit: "%"\n'
+                "    decimals: 2\n"
+                "    theme: Un tema nuovo (Istat)\n"
+                "    quality_life_category: salute_cura\n"
+                "    direction: lower_better\n",
+                encoding="utf-8",
+            )
+            series = istat_regional_source.load_series(path)
+        spec = series["NEWCODE"]
+        self.assertEqual(spec["dataflow"], "99_999_DF_OTHER_1")
+        self.assertEqual(spec["dsd_label"], "DCIS_OTHER")
+        self.assertEqual(spec["decimals"], 2)
+        self.assertEqual(spec["proposed_direction"], "lower_better")
+
+    def test_a_missing_config_is_an_empty_watchlist_not_a_crash(self):
+        with TemporaryDirectory() as tmp:
+            self.assertEqual(istat_regional_source.load_series(Path(tmp) / "nope.yaml"), {})
+
+
 class IstatRegionalAdapter(unittest.TestCase):
     def test_parse_regional_combines_bolzano_trento(self):
         rows = istat_regional_source.fetch_rows("OLDAGEDEPR", offline=True)

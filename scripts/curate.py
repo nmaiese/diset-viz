@@ -13,6 +13,7 @@ to build direction evidence, and it defines the curation record schema.
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -40,6 +41,7 @@ CURATION_COLUMNS = [
     "value_explanation",       # reviewed unit reading (optional override)
     "reviewer_notes",
     "reviewed_at",
+    "data_year",               # the year_max the verso was judged against (re-entry key)
 ]
 
 SCOREABLE_DIRECTIONS = {"higher_better", "lower_better", "higher_worse"}
@@ -106,6 +108,29 @@ EXTERNAL_PREFIXES = tuple(
 )
 
 
+def atlas_targets(rows=None):
+    """Every standalone external atlas indicator, in file order, deduplicated."""
+    rows = rows if rows is not None else read_external()
+    seen = []
+    for row in rows:
+        target = row.get("target_indicator_id", "")
+        if not target.startswith(EXTERNAL_PREFIXES) or row.get("atlas_eligible") != "true":
+            continue
+        if target not in seen:
+            seen.append(target)
+    return seen
+
+
+def latest_year(target, rows):
+    """The most recent year the external layer carries for one target."""
+    years = [
+        int(row["year"])
+        for row in rows
+        if row.get("target_indicator_id") == target and (row.get("year") or "").strip().isdigit()
+    ]
+    return max(years) if years else None
+
+
 def uncurated_targets(rows=None, decisions=None):
     """Standalone external atlas indicators nobody has reviewed yet.
 
@@ -119,15 +144,58 @@ def uncurated_targets(rows=None, decisions=None):
     rows = rows if rows is not None else read_external()
     decisions = decisions if decisions is not None else read_curation()
     reviewed = {row.get("target_indicator_id") for row in decisions}
-    seen = []
-    for row in rows:
-        target = row.get("target_indicator_id", "")
-        if not target.startswith(EXTERNAL_PREFIXES) or row.get("atlas_eligible") != "true":
+    return [target for target in atlas_targets(rows) if target not in reviewed]
+
+
+def worklist(rows=None, decisions=None):
+    """What the curator has to look at: ``{"new": [...], "recheck": [...]}``.
+
+    `new` is an indicator nobody has judged. `recheck` is the part that makes
+    the chain work on **published** material: a verso was judged against one
+    year of data, and the source has published a newer one since. That is not a
+    formality. A verso is a claim about which end of the ranking is the good
+    end, and a series can be redefined, rebased or broken at any release. The
+    decision has an expiry date and the expiry date is the data, not the
+    calendar: re-reading every indicator every N months would churn stable
+    series forever, which is the exact failure `uncurated_targets` was fixed for
+    once already.
+
+    A decision with no `data_year` is treated as due, not as current. The column
+    is new, so "unknown" means "written before anyone recorded what it was
+    judged against", and re-reading it once fills it in permanently. Freezing on
+    unknown would be the silent option, and silence is what this queue exists to
+    remove.
+    """
+    rows = rows if rows is not None else read_external()
+    decisions = decisions if decisions is not None else read_curation()
+    judged = {}
+    for decision in decisions:
+        target = decision.get("target_indicator_id")
+        if target:
+            judged[target] = decision
+    fresh, recheck = [], []
+    for target in atlas_targets(rows):
+        decision = judged.get(target)
+        if decision is None:
+            fresh.append({"target": target, "reason": "mai curato"})
             continue
-        if target in reviewed or target in seen:
-            continue
-        seen.append(target)
-    return seen
+        recorded = (decision.get("data_year") or "").strip()
+        current = latest_year(target, rows)
+        if not recorded.isdigit():
+            recheck.append({
+                "target": target,
+                "reason": "decisione senza anno di riferimento, da confermare una volta",
+                "data_year": None,
+                "current_year": current,
+            })
+        elif current is not None and current > int(recorded):
+            recheck.append({
+                "target": target,
+                "reason": f"giudicato sul {recorded}, la fonte pubblica ora il {current}",
+                "data_year": int(recorded),
+                "current_year": current,
+            })
+    return {"new": fresh, "recheck": recheck}
 
 
 def read_curation(path=None):
@@ -147,13 +215,34 @@ def _cli():
 
     parser = argparse.ArgumentParser(description="Print direction evidence for the curator.")
     parser.add_argument("--target", help="a specific external id (eur:..., dem:...); default: all uncurated")
+    parser.add_argument(
+        "--include-recheck",
+        action="store_true",
+        help="anche gli indicatori gia curati la cui fonte ha pubblicato un anno nuovo",
+    )
+    parser.add_argument("--json", action="store_true", help="la coda per l'agente")
     args = parser.parse_args()
 
     rows = read_external()
-    targets = [args.target] if args.target else uncurated_targets(rows)
-    if not targets:
-        print("Nessun indicatore esterno da curare.")
+    if args.target:
+        targets = [args.target]
+        queue = {"new": [{"target": args.target, "reason": "richiesto a mano"}], "recheck": []}
+    else:
+        queue = worklist(rows)
+        targets = [item["target"] for item in queue["new"]]
+        if args.include_recheck:
+            targets += [item["target"] for item in queue["recheck"]]
+
+    if args.json:
+        print(json.dumps(queue, ensure_ascii=False, indent=2))
         return
+    if not targets:
+        pending = len(queue["recheck"])
+        print("Nessun indicatore esterno da curare."
+              + (f" ({pending} da riconfermare, usa --include-recheck)" if pending else ""))
+        return
+    for item in queue["recheck"] if args.include_recheck else []:
+        print(f"[riconferma] {item['target']}: {item['reason']}")
     for target in targets:
         ev = direction_evidence(target, rows)
         if ev is None:

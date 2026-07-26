@@ -94,6 +94,54 @@ class ReadingOrder(unittest.TestCase):
         self.assertIn("causale", row["flags"], "the flag stays visible, only the priority drops")
 
 
+class TheSignatureExpiresWithTheData(unittest.TestCase):
+    """Re-entry: the half of the chain that makes it work on published pages.
+
+    A reviewer signs a text *and* the numbers under it. When the source
+    publishes a new year the writer refreshes the article, every figure in it
+    changes, and the signature now covers sentences nobody has read. Without
+    this the reading order drains once and never refills: the chain reports
+    itself finished while the catalogue ages underneath it.
+    """
+
+    def test_an_article_refreshed_after_its_review_comes_back(self):
+        entry = _entry(
+            "Un testo pulito.", reviewed_at="2026-07-26", reviewed_vintage=2023, vintage=2024
+        )
+        row = review_queue.assess("178", entry, _view())
+        self.assertIn("rilettura", row["flags"])
+        self.assertGreater(row["score"], 0)
+        self.assertEqual(row["reviewed_at"], "", "torna in coda come non firmato")
+
+    def test_an_article_whose_data_has_not_moved_stays_out(self):
+        """The churn this rule must not reintroduce. A series that published
+        nothing new has nothing new to read, and re-reading it on a timer is
+        the failure `curate.uncurated_targets` was already fixed for once."""
+        entry = _entry(
+            "Un testo pulito.", reviewed_at="2026-07-26", reviewed_vintage=2023, vintage=2023
+        )
+        row = review_queue.assess("178", entry, _view())
+        self.assertNotIn("rilettura", row["flags"])
+        self.assertEqual(row["score"], 0)
+        self.assertEqual(row["reviewed_at"], "2026-07-26")
+
+    def test_a_signature_that_never_recorded_a_vintage_is_not_trusted(self):
+        """Unknown means "written before anyone recorded what was read", and the
+        safe reading of unknown is re-read once, not trust forever."""
+        entry = _entry("Un testo pulito.", reviewed_at="2026-07-26", vintage=2023)
+        row = review_queue.assess("178", entry, _view())
+        self.assertIn("rilettura", row["flags"])
+
+    def test_a_re_read_outranks_every_risk_flag(self):
+        stale = review_queue.assess(
+            "178",
+            _entry("Un testo pulito.", reviewed_at="2026-07-26", reviewed_vintage=2023, vintage=2024),
+            _view(),
+        )
+        causal = review_queue.assess("178", _entry("Cresce grazie agli incentivi."), _view())
+        self.assertGreater(stale["score"], causal["score"])
+
+
 class QueueAgainstTheLiveFile(unittest.TestCase):
     def test_the_queue_builds_over_the_committed_articles(self):
         rows = review_queue.build_queue()

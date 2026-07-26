@@ -1,0 +1,44 @@
+# Le serie regionali Istat che il cacciatore sorveglia.
+#
+# Questo file esiste perche' ammettere una serie non deve essere una modifica di
+# codice. Lo scout (`.claude/agents/source-scout.md`) puo' scrivere qui dentro,
+# non puo' scrivere in `scripts/`: e' la differenza fra una catena che cresce da
+# sola e una che si ferma al primo dataflow nuovo.
+#
+# Una riga = un indicatore. `dataflow` e `data_type` insieme selezionano una
+# serie sola dentro SDMX: nessuna euristica sui codici, come per Eurostat.
+# `direction` e' una **proposta letta dal nome**, non un verdetto: il curatore la
+# verifica contro la classifica vera e la puo' correggere. Un tema che il
+# catalogo non conosce va mappato in `config/theme_categories.csv`, o
+# l'indicatore sparisce dai totali per macro-area restando in catalogo.
+#
+# Campi:
+#   id                     codice DATA_TYPE, identifica la serie nel dataflow
+#   dataflow               id del dataflow SDMX
+#   dsd_label              etichetta DSD, usata per il nome del fixture offline
+#   name                   nome pubblico, con la fonte fra parentesi
+#   unit                   unita' di misura, fra virgolette se e' un simbolo
+#   decimals               cifre decimali da mostrare
+#   theme                  sottotema, deve risolvere a una categoria canonica
+#   quality_life_category  categoria proposta
+#   direction              higher_better | lower_better | higher_worse | contextual
+
+series:
+  - id: OLDAGEDEPR
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Indice di dipendenza strutturale degli anziani (Istat, regioni)
+    unit: "%"
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
+  - id: DEPENDRATE
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Indice di dipendenza strutturale (Istat, regioni)
+    unit: "%"
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual

@@ -2,6 +2,35 @@
 
 Guidance for Claude Code (and other agents) working in this repository.
 
+This file is a **router**. It carries what is true everywhere and short enough to
+be worth repeating, and for anything with depth it points at the document that
+owns the subject. That split is deliberate: a rule copied into two places goes
+out of sync without anyone noticing, and this project has already paid for that
+once (a scheduled agent spent weeks writing into a file the app no longer read,
+because its prompt repeated a contract instead of pointing at it).
+
+**So: if a topic below has a doc, read the doc. Do not act on the summary here.**
+
+## The map
+
+| se stai lavorando su... | leggi |
+| --- | --- |
+| la catena autonoma, gli agenti, il cancello, le Routine | [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md) |
+| come apre e chiude una run un agente qualsiasi | [`docs/AGENT_CONTRACT.md`](docs/AGENT_CONTRACT.md) |
+| una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
+| scoperta e promozione di indicatori multifonte | [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md) |
+| stato corrente del sistema, id delle Routine, cosa manca | [`docs/DISCOVERY_STATUS.md`](docs/DISCOVERY_STATUS.md) |
+| aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
+| dati provinciali | [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md) |
+| freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
+| la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
+
+Un comando per sapere dove sta la catena in questo momento:
+
+```bash
+python3 scripts/pipeline_status.py
+```
+
 ## What this is
 
 **Divario Italia** (divarioitalia.it) is a Flask + React atlas of the Istat
@@ -17,28 +46,15 @@ quality-of-life section for regions and provinces.
 - `/qualita-della-vita/province` — provincial quality-of-life ranking from Istat
   BES dei Territori, available when the provincial artifacts are present.
 - `/indicatore/<slug>/<acronimo>-<id>` — every atlas indicator, from every source
-  family, lives here. Keyword-first for SEO: the human slug leads, the resolving
-  code trails under a source acronym (`ter` Istat territoriali, `bes` Istat
-  benessere, `ims` Istat vita quotidiana delle famiglie, `eur` Eurostat, `dem`
-  Istat indicatori demografici). Le famiglie servite dallo strato esterno stanno
-  in `sources.EXTERNAL_FAMILIES`: aggiungerne una e' una riga in `app/sources.py`
-  piu una in `discovery.FEED_FAMILY` e un parser in
-  `promote_candidates.PROMOTION_PARSERS`, e i tre mirror sono appaiati da
-  `tests/test_discovery.py`. Non cablare mai un prefisso: il codice che lo faceva
-  ha pubblicato una serie Istat sotto il nome di Eurostat, l'ha tenuta fuori dal
-  quiz e l'ha resa invisibile al curatore. The code
-  is the id-carrying last segment, so the page survives a name (slug) change; the
-  slug is decorative and a wrong one 301s to canonical. Legacy URLs
-  (`/indicatore/<num>-<slug>` and `/qualita-della-vita/indicatore/...`) 301 to it.
-  Source naming and URL building have a single source of truth in `app/sources.py`:
-  user-facing labels are institution-first plain names, never a bare internal
-  acronym. Do not hardcode family labels or indicator URLs elsewhere.
-  **One template serves all four families** (`app/templates/indicator_page.html`)
-  over one view model (`app/indicator_view.py`), in three zones: an interactive
-  cockpit that owns every number, an article of four fixed sections that owns
-  every sentence, and an apparatus (sources, citation, related). A figure is
-  shown once, in the cockpit, and the prose interprets it. See
-  [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) before touching either.
+  family. Keyword-first for SEO: the human slug leads, the resolving code trails
+  under a source acronym (`ter` Istat territoriali, `bes` Istat benessere, `ims`
+  Istat vita quotidiana delle famiglie, `eur` Eurostat, `dem` Istat indicatori
+  demografici). The code is the id-carrying last segment, so the page survives a
+  name change; the slug is decorative and a wrong one 301s to canonical. Legacy
+  URLs 301 here. **One template serves every family**
+  (`app/templates/indicator_page.html`) over one view model
+  (`app/indicator_view.py`). See [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md)
+  before touching either.
 - `/divari-regionali` — the editorial hub on the territorial divide, server
   rendered from `app/divari.py`. Not a second taxonomy over `/temi` and
   `/regioni`: it argues one thesis (the divide is not a single line) and measures
@@ -69,9 +85,23 @@ quality-of-life section for regions and provinces.
 Data layer: `app/data.py` (reads `app/static/data/Assoluti_Regione.csv`).
 Blog layer: `app/blog.py` (reads `content/posts/*.md`).
 
+**Source naming and URL building have a single source of truth in
+`app/sources.py`**, and this one is worth stating here because breaking it is
+invisible: user-facing labels are institution-first plain names, never a bare
+internal acronym, and no family label or indicator URL may be hardcoded anywhere
+else. The families served by the external layer live in
+`sources.EXTERNAL_FAMILIES`; adding one is a line in `app/sources.py`, one in
+`discovery.FEED_FAMILY` and a parser in `promote_candidates.PROMOTION_PARSERS`,
+and `tests/test_discovery.py` pins the three mirrors together. Never hardcode a
+prefix: the code that did published an Istat series under Eurostat's name, kept
+it out of the quiz and made it invisible to the curator.
+
 ## Commands
 
 ```bash
+# stato della catena editoriale, tutti gli stadi
+python3 scripts/pipeline_status.py
+
 # build the SPA (required after changing anything in frontend/)
 cd frontend && npm run build && cd ..
 
@@ -85,15 +115,37 @@ git diff --check
 ```
 
 After editing `frontend/src/*`, always rebuild before testing the served app.
+After changing data, **restart gunicorn**: the core loaders cache for the life of
+the process (`lru_cache`, not a TTL).
 
-## Writing indicator pages — READ THIS
+## The autonomous chain — READ [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md)
 
-The prose of an indicator page lives in
-`app/static/data/indicator_texts.json`: one `lead` plus four ordered sections
-(`definizione`, `quadro`, `dinamica`, `limiti`), written by
-`.claude/agents/indicator-writer.md`. A section nobody has written yet is
-composed from the data at render time, so every page has the same skeleton while
-only some have been through an editor.
+Six stages take an indicator from a source catalogue to a published page and then
+come back to it when the data moves: **scout** (which sources) -> **hunter**
+(which indicators) -> **promoter** -> **curator** (which verso, which score) ->
+**writer** (the article) -> **reviewer** (reads it against the data). Each has an
+agent in `.claude/agents/`, a deterministic queue computed from committed files,
+and a verdict from `scripts/pipeline_gate.py` that decides whether it may publish.
+
+What you need to know before touching any of it:
+
+- **The gate is not advisory.** Every stage may write only a short list of paths
+  (`pipeline_gate.STAGE_PATHS`). Do not widen it to make something pass.
+- **Merge policy is per stage and not uniform**: prose merges itself, anything
+  that moves live numbers waits for the remote checks, admitting a **source**
+  stays human.
+- **Re-entry is data-driven, never calendar-driven.** A curation decision expires
+  when its source publishes a newer year (`data_year`); a review expires when the
+  article's figures are refreshed (`reviewed_vintage`).
+- **The scripts of the chain are stdlib-pure** and must stay so: a cloud agent
+  runs them on a fresh checkout, before any venv exists.
+
+## Writing indicator pages — READ [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md)
+
+The prose of an indicator page lives in `app/static/data/indicator_texts.json`:
+one `lead` plus four ordered sections (`definizione`, `quadro`, `dinamica`,
+`limiti`). A section nobody has written is composed from the data at render time,
+so every page has the same skeleton while only some have been through an editor.
 
 Always start from the deterministic data brief, never from ad-hoc API calls:
 
@@ -104,85 +156,37 @@ Always start from the deterministic data brief, never from ad-hoc API calls:
 ```
 
 An article is written for **one territorial level** and used only there, so it
-declares `"level"` and both queues have one row per (indicator, level). Four
-agents own the chain, each with a file in `.claude/agents/` and a deterministic
-queue: `indicator-hunter`, `indicator-curator`, `indicator-writer`,
-`indicator-reviewer`.
+declares `"level"` and both queues have one row per (indicator, level).
 
-Rules, guards and the "who owns what" table are in
-[`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md). The editorial voice is
-`content/STYLE.md`, same as the blog.
+## Writing blog articles — READ [`content/STYLE.md`](content/STYLE.md)
 
-## Writing blog articles — READ THIS
+It is the single source of truth for the editorial voice, for the blog and for
+indicator pages alike. The rules that are absolute and cheap to state:
 
-When you create or edit anything under `content/posts/`, follow
-[`content/STYLE.md`](content/STYLE.md). It is the single source of truth for the
-editorial voice. The non-negotiable rules:
-
-- **No em-dash `—` and no en-dash `–`** in prose. Use commas or two sentences;
-  write ranges as "dal 1981 al 2024" (or `1981-2024` with a plain hyphen inside
-  tables).
-- **No semicolons `;`** and **no `…` ellipsis character** (use `...` only if
-  truly needed).
+- **No em-dash `—`, no en-dash `–`, no semicolon `;`, no `…`.** Use commas or two
+  sentences; write ranges as "dal 1981 al 2024".
 - Write like a human journalist: varied sentence length, one idea per paragraph,
   active voice, concrete numbers. Avoid bot tells (repeated "non solo X ma anche
   Y", dramatic colons, "In conclusione", inflated adverbs, slogan sentences).
-- Use only **real, verified numbers** from the indicators (via the API or the
-  data layer). Never invent figures. Link the article to the catalog with the
-  `indicator` frontmatter field and internal links using the indicator's
-  **canonical path**, e.g. `/indicatore/tasso-di-turisticita/ter-105`. Never
-  `/?indicator=...` or `/atlante?indicator=...` (`tests/test_url_migration.py`
-  fails on those).
-- Keep it SEO-friendly but natural: keyword in the title and description, sensible
-  `##`/`###` headings, relevant tags.
-- Use optional `seo_title` when the visible H1 should stay editorial but the
-  browser title should be shorter or closer to the search query.
-- Before publishing, leave a claim table with source, period, geography, unit,
-  transformation and confidence for every headline number.
-- Include a caveat, methodology/source link, atlas or indicator link, schema
-  candidate, and concrete next step for the reader.
+- Use only **real, verified numbers**. Never invent figures, never invent a
+  source. Link to an indicator with its **canonical path**, e.g.
+  `/indicatore/tasso-di-turisticita/ter-105`, never `/?indicator=...` nor
+  `/atlante?indicator=...` (`tests/test_url_migration.py` fails on those).
 
 The Markdown engine has `smarty` disabled on purpose, so `--` and `...` are NOT
 converted into typographic dashes or ellipses. Keep the source text clean.
 
-## Adding indicators or datasets — READ THIS
+## Adding indicators or datasets — READ [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md)
 
-When you add indicators, themes, or a new dataset to
-`app/static/data/Assoluti_Regione.csv`, follow the checklist in
-[`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md). The short version: themes,
-theme scores, region profiles and macro-areas are all **derived** from the data
-and recomputed at runtime. The core loaders in `app/data.py`
-(`get_rows`/`get_catalog`/`get_indicator`) cache for the life of the process
-(`lru_cache`, not a TTL); most other derived views still use `cache.memoize`
-(1h TTL). For each new indicator id set its direction
-in `CURATED_DIRECTION` (`app/indicator_notes.py`), and for each new theme map it
-to a macro-area in `MACRO_AREAS` (same file). Then restart gunicorn to clear the
-cache, rebuild the frontend, run the tests, and re-check which themes are now
-"valutabili" vs descriptive with the diagnostic snippet in that doc.
+Themes, theme scores, region profiles and macro-areas are all **derived** from the
+data and recomputed at runtime. For each new indicator id set its direction in
+`CURATED_DIRECTION` (`app/indicator_notes.py`), and for each new theme map it to a
+macro-area in `MACRO_AREAS` (same file). Then restart gunicorn, rebuild the
+frontend, run the tests, and re-check which themes are now "valutabili".
 
-Provincial data is separate. Follow
-[`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md), keep the SDMX cache out
-of git, commit only normalized CSV artifacts, and never mix provincial rows into
-the regional CSV or `app/data.py`.
-
-## Discovering new multi-source indicators — READ THIS
-
-The app is a multi-source aggregator that prefers fresh, regional data (then
-provincial). New indicators are **discovered** into a reviewable staging queue
-before any integration. Follow [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md).
-The short version: a scheduled hunter (`scripts/discover_candidates.py`, stdlib
-only) scans allowlisted institutional sources (`config/external_sources.yaml`)
-and writes candidates to `data/discovery/candidates.csv`; a human approves them
-in a PR (`triage_status=approved`); then `scripts/promote_candidates.py` writes
-rows into the external layer (a new indicator becomes a standalone atlas entry
-under the `eur:` id namespace via `app/external_atlas.py`). A second **curator**
-step (`scripts/curate.py` for the direction evidence, `data/discovery/curation.csv`
-for the reviewed decision, `scripts/apply_curation.py` to publish) verifies the
-verso against the data, reviews the description, and sets `score_eligible` so the
-indicator enters the quiz and the quality-of-life score. Nothing goes live without
-a merged PR. The hunter never claims `definition_match=exact` (humans confirm that).
-Eurostat regional (NUTS2) is the pilot source; its raw cache (`data/eurostat_cache/`)
-stays out of git, only the offline fixtures under `data/discovery/fixtures/` are committed.
+Provincial data is separate: [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md).
+Keep the SDMX cache out of git, commit only normalized CSV artifacts, and never
+mix provincial rows into the regional CSV or `app/data.py`.
 
 ## Constraints
 
