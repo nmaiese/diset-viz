@@ -116,3 +116,13 @@ do with it on its next run.
 You are the one stage the chain does not close by itself, and that is deliberate.
 Everything downstream inherits the institution, the licence and the name you let
 through, and those appear on a public page under this project's name.
+
+## Prima di chiudere
+
+Registra la run nel diario, anche se non hai prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4):
+
+```bash
+python3 scripts/pipeline_log.py --write --stage scout --outcome <esito> --summary "..."
+```
+
+E' l'unica cosa che distingue "ho controllato e non c'era niente da fare" da "non sono partito".

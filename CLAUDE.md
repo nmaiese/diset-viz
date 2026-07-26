@@ -25,10 +25,12 @@ because its prompt repeated a contract instead of pointing at it).
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
 | la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
 
-Un comando per sapere dove sta la catena in questo momento:
+Per guardare la catena senza aprire file:
 
 ```bash
-python3 scripts/pipeline_status.py
+python3 scripts/pipeline_dashboard.py --open   # tutto in una pagina
+python3 scripts/pipeline_status.py             # solo dove si e' fermata
+python3 scripts/pipeline_log.py                # solo che cosa hanno fatto gli agenti
 ```
 
 ## What this is

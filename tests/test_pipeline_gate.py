@@ -38,14 +38,24 @@ class BlastRadius(unittest.TestCase):
         self.assertTrue(check.ok, check.detail)
 
     def test_the_perimeters_do_not_overlap_where_it_would_matter(self):
-        """The writer and the hunter must not be able to touch each other's file.
+        """The writer and the hunter must not be able to touch each other's work.
 
-        Stated as a test because the two lists are short enough that widening
-        one by hand looks harmless in a diff.
+        The run journal is the one deliberate exception, and it is shared on
+        purpose: every stage records what it did, including the runs that produce
+        nothing else, which are exactly the runs that would otherwise vanish.
+        Stated as a test because the lists are short enough that widening one by
+        hand looks harmless in a diff.
         """
-        writer = set(pipeline_gate.STAGE_PATHS["writer"])
-        hunter = set(pipeline_gate.STAGE_PATHS["hunter"])
+        shared = {pipeline_gate.RUN_JOURNAL}
+        writer = set(pipeline_gate.STAGE_PATHS["writer"]) - shared
+        hunter = set(pipeline_gate.STAGE_PATHS["hunter"]) - shared
         self.assertEqual(writer & hunter, set())
+
+    def test_every_stage_can_write_the_run_journal(self):
+        """A stage that cannot record its run is a stage nobody can observe, and
+        the gate would block it for trying."""
+        for stage, paths in pipeline_gate.STAGE_PATHS.items():
+            self.assertIn(pipeline_gate.RUN_JOURNAL, paths, stage)
 
     def test_every_stage_declares_a_merge_policy(self):
         self.assertEqual(

@@ -124,3 +124,13 @@ In the body: what ran, live or offline, against which sources; the queue diff in
 words; for every candidate you touched the decision and the reason with real
 numbers; what you promoted and what public id it got; and explicitly what you
 did **not** decide and why.
+
+## Prima di chiudere
+
+Registra la run nel diario, anche se non hai prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4):
+
+```bash
+python3 scripts/pipeline_log.py --write --stage hunter --outcome <esito> --summary "..."
+```
+
+E' l'unica cosa che distingue "ho controllato e non c'era niente da fare" da "non sono partito".

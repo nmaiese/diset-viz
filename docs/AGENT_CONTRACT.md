@@ -72,12 +72,42 @@ Se `blocked`, non aggirare mai il cancello disattivando un controllo o
 modificando un test. Correggi il lavoro, oppure lascia il branch committato e
 spiega perche' ti sei fermato.
 
-## 4. Non aprire PR vuote
+## 4. Registrare la run nel diario, sempre
+
+Ultimo passo di ogni run, **anche quando non hai prodotto niente**:
+
+```bash
+python3 scripts/pipeline_log.py --write \
+    --stage <stadio> --outcome <merged|pr-open|blocked|nothing|stopped|error> \
+    --summary "una riga: che cosa hai fatto" \
+    --detail "una riga per decisione, con i numeri veri" \
+    --gate <il campo merge del verdetto> --pr <numero, se l'hai aperta>
+```
+
+Il caso che conta di piu' e' `nothing`. Una Routine che gira e non produce
+niente ha lo stesso aspetto di una Routine che non e' mai partita, ed e'
+esattamente cosi' che lo scrittore ha lavorato per settimane su un file morto
+senza che nessuno se ne accorgesse. La riga di diario e' l'unica cosa che
+distingue "ho controllato e non c'era niente da fare" da "non sono partito".
+
+Il diario (`data/pipeline/runs.jsonl`) e' nel perimetro di ogni stadio, quindi
+la riga viaggia insieme al tuo lavoro. Committala con il resto. Se ti sei
+fermato o il cancello ti ha bloccato, scrivi comunque la riga e committala sul
+branch: sono le run che serve di piu' poter leggere.
+
+Chi legge, legge cosi':
+
+```bash
+python3 scripts/pipeline_log.py               # la timeline
+python3 scripts/pipeline_dashboard.py --open  # tutto in una pagina
+```
+
+## 5. Non aprire PR vuote
 
 Se la tua coda e' vuota, chiudi la run dicendo che cosa hai controllato e con
 quale esito. Una PR vuota a settimana e' rumore che insegna a non leggere le PR.
 
-## 5. Il perimetro, stadio per stadio
+## 6. Il perimetro, stadio per stadio
 
 Scritto in `scripts/pipeline_gate.py:STAGE_PATHS`, che e' l'unica versione che
 conta. Qui per comodita':
@@ -91,12 +121,14 @@ conta. Qui per comodita':
 | `writer` | `app/static/data/indicator_texts.json` |
 | `reviewer` | `app/static/data/indicator_texts.json` |
 
+Ogni stadio puo' inoltre scrivere `data/pipeline/runs.jsonl`, il diario.
+
 Tutto il resto e' fuori perimetro e fa fallire il cancello, compreso il codice
 dell'app, i test e i documenti. Se ti accorgi che serve una modifica al codice,
 **non farla**: scrivila nel corpo della PR come cosa che serve, e lascia che sia
 un umano ad aprirla.
 
-## 6. Regole del repo che valgono per tutti
+## 7. Regole del repo che valgono per tutti
 
 - Non rompere `/legacy` ne' lo schema dati (`tests/test_app.py` li sorveglia).
 - Mantenere la SEO tecnica: canonical, `noindex` sulle varianti, JSON-LD

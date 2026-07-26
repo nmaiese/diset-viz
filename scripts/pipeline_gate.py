@@ -62,20 +62,26 @@ SOURCE_CANDIDATES = "data/discovery/source_candidates.csv"
 CURATION = "data/discovery/curation.csv"
 ISTAT_SERIES_CONFIG = "config/istat_series.yaml"
 THEME_CATEGORIES = "config/theme_categories.csv"
+# Il diario delle run. Ogni stadio ci scrive una riga a fine run, quindi sta
+# nel perimetro di tutti: senza, meta' delle run (quelle che non producono
+# altro) non lascerebbe nessuna traccia, che e' esattamente il buco che il
+# diario esiste per chiudere.
+RUN_JOURNAL = "data/pipeline/runs.jsonl"
 
 # What each stage is allowed to change. Anything outside its list is a failure,
 # not a warning: the point of the list is that a prompt cannot widen it.
 STAGE_PATHS = {
-    "scout": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG),
-    "hunter": (CANDIDATES,),
-    "promoter": (CANDIDATES, EXTERNAL_DATASET, EXTERNAL_MANIFEST),
+    "scout": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, RUN_JOURNAL),
+    "hunter": (CANDIDATES, RUN_JOURNAL),
+    "promoter": (CANDIDATES, EXTERNAL_DATASET, EXTERNAL_MANIFEST, RUN_JOURNAL),
     # The curator gets the theme map because a promoted indicator brings a theme
     # name with it, and an unmapped theme drops it out of every macro-area total
     # silently. That fix used to live in `app/taxonomy.py`, which no agent may
     # touch, so it would have stalled the chain on a legitimate case.
-    "curator": (CURATION, EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS, THEME_CATEGORIES),
-    "writer": (INDICATOR_TEXTS,),
-    "reviewer": (INDICATOR_TEXTS,),
+    "curator": (CURATION, EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS,
+                THEME_CATEGORIES, RUN_JOURNAL),
+    "writer": (INDICATOR_TEXTS, RUN_JOURNAL),
+    "reviewer": (INDICATOR_TEXTS, RUN_JOURNAL),
 }
 
 # How far a green gate is allowed to go, per stage. Not uniform on purpose.

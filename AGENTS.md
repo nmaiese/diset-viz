@@ -18,10 +18,12 @@ documento che li possiede, non il riassunto qui:
 | dati regionali / provinciali | `docs/DATA_PIPELINE.md`, `docs/PROVINCE_PIPELINE.md` |
 | la voce editoriale | `content/STYLE.md` |
 
-Un comando per sapere dove sta la catena adesso:
+Per guardare la catena senza aprire file:
 
 ```bash
-python3 scripts/pipeline_status.py
+python3 scripts/pipeline_dashboard.py --open   # tutto in una pagina
+python3 scripts/pipeline_status.py             # solo dove si e' fermata
+python3 scripts/pipeline_log.py                # solo che cosa hanno fatto gli agenti
 ```
 
 ## Project

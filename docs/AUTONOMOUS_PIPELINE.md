@@ -58,6 +58,37 @@ quindi nessuno riesce a distinguere "sono fermo perche' ho finito" da "sono ferm
 perche' e' bloccato lo stadio sopra di me", che sono situazioni opposte e si
 somigliano moltissimo. Ogni agente lo lancia per primo.
 
+## Guardare la catena senza aprire file
+
+Tre comandi, e il terzo li contiene tutti.
+
+```bash
+python3 scripts/pipeline_status.py            # dove si e' fermata
+python3 scripts/pipeline_log.py               # che cosa hanno fatto gli agenti
+python3 scripts/pipeline_dashboard.py --open  # tutto in una pagina, nel browser
+```
+
+Il **diario** (`data/pipeline/runs.jsonl`) e' la parte che mancava. Prima l'unico
+segno che una run fosse avvenuta era il commit che produceva: una run che non
+produce niente, perche' la coda e' vuota o perche' il cancello l'ha bloccata,
+non lasciava assolutamente nulla. Il che significa che **una Routine che gira a
+vuoto ha lo stesso aspetto di una Routine che non e' mai partita**, ed e'
+esattamente cosi' che lo scrittore ha lavorato per settimane su un file morto.
+
+Ora ogni agente ci scrive una riga a fine run, sempre, con l'esito preso da un
+vocabolario corto (`merged`, `pr-open`, `blocked`, `nothing`, `stopped`,
+`error`), che cosa ha deciso e che cosa ha detto il cancello. Il file e'
+committato, quindi la storia sopravvive alla sessione, ed e' JSON per riga,
+quindi due run non si corrompono a vicenda. Sta nel perimetro di **tutti** gli
+stadi: senza, meta' delle run non lo raggiungerebbe.
+
+Il **cruscotto** e' una pagina HTML autonoma che mette insieme lo stato delle
+code, il diario, i commit che la catena ha prodotto (riconosciuti dai file che
+toccano, non dai messaggi) e le sue pull request. Si rigenera in un secondo e si
+apre da file, anche offline. E' una fotografia: per lo stato **vivo** di una
+Routine in corso serve <https://claude.ai/code/routines>, perche' l'API delle
+Routine espone solo l'ora dell'ultimo firing.
+
 ## Il cancello: cosa rende sicuro togliere l'umano
 
 `scripts/pipeline_gate.py` e' il punto in cui ogni stadio chiude. Non e' una

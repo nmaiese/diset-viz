@@ -168,3 +168,13 @@ previous decision and what did not.
 `scripts/pending_notes.py` lists the indicator as needing an article, and the
 writer (`.claude/agents/indicator-writer.md`) runs on its own schedule and picks
 it up. You do not have to hand it over.
+
+## Prima di chiudere
+
+Registra la run nel diario, anche se non hai prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4):
+
+```bash
+python3 scripts/pipeline_log.py --write --stage curator --outcome <esito> --summary "..."
+```
+
+E' l'unica cosa che distingue "ho controllato e non c'era niente da fare" da "non sono partito".

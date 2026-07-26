@@ -253,3 +253,13 @@ writing, so run them over your own draft before opening the PR:
 ```bash
 .venv/bin/python -m scripts.review_queue --show <id>
 ```
+
+## Prima di chiudere
+
+Registra la run nel diario, anche se non hai prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4):
+
+```bash
+python3 scripts/pipeline_log.py --write --stage writer --outcome <esito> --summary "..."
+```
+
+E' l'unica cosa che distingue "ho controllato e non c'era niente da fare" da "non sono partito".

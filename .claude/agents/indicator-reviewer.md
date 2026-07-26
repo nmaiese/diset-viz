@@ -188,3 +188,13 @@ You are reading prose against data, so you will be wrong sometimes. Two rules
 that keep that cheap: when a claim is plausible but unverifiable, cut it rather
 than keep it, and when you are unsure whether a sentence is a cause or a
 description, say so in the PR instead of deciding silently.
+
+## Prima di chiudere
+
+Registra la run nel diario, anche se non hai prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4):
+
+```bash
+python3 scripts/pipeline_log.py --write --stage reviewer --outcome <esito> --summary "..."
+```
+
+E' l'unica cosa che distingue "ho controllato e non c'era niente da fare" da "non sono partito".

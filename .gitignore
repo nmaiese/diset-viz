@@ -24,3 +24,7 @@ data/eurostat_cache/
 # Quiz leaderboard SQLite file (local/runtime state, not source data)
 data/*.sqlite3
 data/*.sqlite3-*
+
+# Cruscotto della catena: rigenerato da scripts/pipeline_dashboard.py.
+# Il diario (data/pipeline/runs.jsonl) invece e' committato: e' la storia.
+data/pipeline/cruscotto.html
