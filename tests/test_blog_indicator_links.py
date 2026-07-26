@@ -8,12 +8,13 @@ mistyped id in the frontmatter broke the one existing direction in silence.
 These tests pin both directions and the guard that keeps the mapping honest.
 """
 
+import re
 import unittest
 
 from markupsafe import escape
 
 from app import app, sources
-from app.atlas_catalog import get_atlas_indicator
+from app.atlas_catalog import get_atlas_catalog, get_atlas_indicator
 from app.blog import POSTS_PER_INDICATOR, get_posts, posts_for_indicator
 
 
@@ -36,6 +37,14 @@ class FrontmatterIndicatorTest(unittest.TestCase):
     """Every article is anchored to a real indicator."""
 
     def test_every_post_declares_an_indicator(self):
+        """CLAUDE.md: un articolo si aggancia al catalogo con `indicator`.
+
+        E una regola editoriale, non solo tecnica: un post orfano non compare
+        su nessuna scheda e resta fuori dal grafo dei link interni, che e la
+        ragione per cui il blog esiste. Se in futuro serve pubblicare qualcosa
+        di trasversale (una nota metodologica, un pezzo su piu indicatori), la
+        decisione va presa qui, non aggirata togliendo il campo.
+        """
         orphans = [post["slug"] for post in get_posts() if not post["indicator"]]
         self.assertEqual(orphans, [], "articoli senza campo indicator nel frontmatter")
 
@@ -61,6 +70,19 @@ class FrontmatterIndicatorTest(unittest.TestCase):
         self.assertEqual(_normalize_indicator("eur-rd_e_gerdreg"), "eur:rd_e_gerdreg")
         self.assertIsNone(_normalize_indicator(None))
         self.assertIsNone(_normalize_indicator("  "))
+
+    def test_the_code_form_lands_on_a_real_non_territorial_id(self):
+        """La trasformazione di stringa non basta: il valore normalizzato viene
+        confrontato con `meta["id"]`, quindi deve coincidere con l'id vero di
+        una scheda BES. E la meta' della feature che nessun post usa ancora."""
+        from app.blog import _normalize_indicator
+
+        bes = next(
+            entry for entry in get_atlas_catalog()["indicators"]
+            if str(entry["id"]).startswith("bes:")
+        )
+        _, raw_id = sources.split_internal_id(bes["id"])
+        self.assertEqual(_normalize_indicator(f"bes-{raw_id}"), str(bes["id"]))
 
 
 class PostsForIndicatorTest(unittest.TestCase):
@@ -111,6 +133,22 @@ class IndicatorPageRendersItsArticlesTest(unittest.TestCase):
                 # The code the URL resolves through, so a family change here
                 # would surface as a failing round trip rather than a dead link.
                 self.assertIn(sources.indicator_code(family, raw_id), path)
+
+    def test_indicator_links_in_the_prose_point_at_the_canonical_url(self):
+        """Un 301 nel corpo di un articolo non passa link equity come un 200.
+
+        PR #30 ha gia sistemato questa classe di bug sui link ai temi. Lato
+        indicatori nessuno aveva controllato: un link scritto a mano con lo
+        slug sbagliato, o nel vecchio formato /indicatore/<num>-<slug>,
+        risolve lo stesso e la redazione non se ne accorge.
+        """
+        offenders = []
+        for post in get_posts():
+            for href in sorted(set(re.findall(r'href="(/indicatore/[^"]+)"', post["body_html"]))):
+                response = self.client.get(href)
+                if response.status_code != 200:
+                    offenders.append((post["slug"], href, response.headers.get("Location")))
+        self.assertEqual(offenders, [], "link a indicatori che passano da un redirect")
 
     def test_an_indicator_without_articles_renders_no_widget(self):
         """An empty section with a heading would read as a broken promise."""
