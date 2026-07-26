@@ -103,6 +103,27 @@ def load_texts(path=None):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def resolve_key(texts, code):
+    """The internal id for a code written either way, or None.
+
+    `--show` used to index the texts dict directly, so it accepted the internal
+    id (`920`, `bes:10AMB004`) and silently refused the URL form (`ter-920`,
+    `bes-10AMB004`). The URL form is the one every other command in the chain
+    takes, and it is the one this file's own docstring and the reviewer's prompt
+    put in their examples, so the documented invocation answered "nessun
+    articolo" for every indicator. A reviewer that hits that either works around
+    it or skips the step, and neither leaves a trace.
+    """
+    if code in texts:
+        return code
+    parsed = sources.parse_indicator_code(code)
+    if parsed is not None:
+        key = sources.internal_id(*parsed)
+        if key in texts:
+            return key
+    return None
+
+
 def prose_fields(entry):
     """(field, text) for every piece of hand-written prose in an entry."""
     out = []
@@ -255,15 +276,15 @@ def main(argv=None):
 
     texts = load_texts()
     if args.show:
-        entry = texts.get(args.show)
-        if entry is None:
+        key = resolve_key(texts, args.show)
+        if key is None:
             print(f"nessun articolo per {args.show}")
             return 1
-        row = assess(args.show, entry)
+        row = assess(key, texts[key])
         if row is None:
             print(f"{args.show}: indicatore non risolvibile")
             return 1
-        _print_one(args.show, entry, row)
+        _print_one(key, texts[key], row)
         return 0
 
     rows = build_queue(texts)

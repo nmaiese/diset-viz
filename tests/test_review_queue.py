@@ -142,6 +142,37 @@ class TheSignatureExpiresWithTheData(unittest.TestCase):
         self.assertGreater(stale["score"], causal["score"])
 
 
+class ShowAcceptsTheCodeAsItIsWritten(unittest.TestCase):
+    """`--show` must take the code the rest of the chain uses.
+
+    It used to index the texts dict directly, so it accepted the internal id and
+    refused the URL form. That is the form in this module's own docstring, in
+    the reviewer's prompt, and in every other command of the chain, so the
+    documented invocation answered "nessun articolo" for every indicator. A
+    reviewer hitting that works around it or drops the step, and neither leaves
+    a trace anyone can see afterwards.
+    """
+
+    TEXTS = {"920": {"lead": "x"}, "bes:10AMB004": {"lead": "y"}}
+
+    def test_the_url_form_resolves(self):
+        self.assertEqual(review_queue.resolve_key(self.TEXTS, "ter-920"), "920")
+        self.assertEqual(
+            review_queue.resolve_key(self.TEXTS, "bes-10AMB004"), "bes:10AMB004"
+        )
+
+    def test_the_internal_id_still_resolves(self):
+        self.assertEqual(review_queue.resolve_key(self.TEXTS, "920"), "920")
+        self.assertEqual(
+            review_queue.resolve_key(self.TEXTS, "bes:10AMB004"), "bes:10AMB004"
+        )
+
+    def test_something_that_is_not_an_article_is_refused(self):
+        """A code that parses but has no article must not resolve to a neighbour."""
+        self.assertIsNone(review_queue.resolve_key(self.TEXTS, "ter-99999"))
+        self.assertIsNone(review_queue.resolve_key(self.TEXTS, "pippo"))
+
+
 class QueueAgainstTheLiveFile(unittest.TestCase):
     def test_the_queue_builds_over_the_committed_articles(self):
         rows = review_queue.build_queue()
