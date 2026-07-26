@@ -313,11 +313,20 @@ class AdmittingASeriesIsConfigNotCode(unittest.TestCase):
 
     def test_the_committed_config_still_carries_the_wired_series(self):
         series = istat_regional_source.load_series()
-        self.assertEqual(sorted(series), ["DEPENDRATE", "OLDAGEDEPR"])
+        # Containment, not equality: the two demographic indices must stay wired,
+        # but the scout may add rows (admitting a series is config, not code).
+        # An exact-list assertion here would just move the chain's ceiling out of
+        # the source module and into the suite, which is the one place no agent
+        # may lift it.
+        self.assertLessEqual({"DEPENDRATE", "OLDAGEDEPR"}, set(series))
         for spec in series.values():
             self.assertTrue(spec["name"])
             self.assertTrue(spec["dataflow"])
-            self.assertEqual(spec["unit"], "%", "a quoted YAML scalar must survive the round trip")
+            self.assertTrue(spec["unit"])
+        # The seeded indices are percentages: the quoted YAML scalar "%" must
+        # survive the round trip and not be read as the start of a comment.
+        self.assertEqual(series["OLDAGEDEPR"]["unit"], "%")
+        self.assertEqual(series["DEPENDRATE"]["unit"], "%")
 
     def test_a_row_can_bring_its_own_dataflow(self):
         """The point of the file. A second Istat domain is a row, not a module:
@@ -406,7 +415,17 @@ class IstatRegionalAdapter(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             discovery.CANDIDATES_PATH = Path(tmp) / "candidates.csv"
             discovered, _ = discover_candidates.run("istat_demografia", offline=True)
-            self.assertEqual(len(discovered), len(istat_regional_source.ISTAT_SERIES))
+            # Offline discovery is bounded by the committed fixtures: a series the
+            # scout has admitted in config but whose fixture is not committed yet
+            # is reachable only live, which is the hunter's default. So the
+            # offline scan covers exactly the series that carry a fixture, and
+            # there is at least one.
+            with_fixture = [
+                sid for sid in istat_regional_source.ISTAT_SERIES
+                if istat_regional_source._fixture_path(sid).exists()
+            ]
+            self.assertTrue(with_fixture)
+            self.assertEqual(len(discovered), len(with_fixture))
             for cand in discovered:
                 self.assertEqual(cand["source"], "istat_demografia")
                 self.assertEqual(cand["territory_level"], "regione")
