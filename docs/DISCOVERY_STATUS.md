@@ -15,10 +15,10 @@ Sei stadi, cinque agenti, tutti schedulati, **nessuno che aspetti una firma**.
 Un indicatore va da un catalogo SDMX a una pagina pubblica senza intervento, e la
 catena ci ritorna sopra quando i dati si muovono.
 
-**Ma oggi lo stadio uno non passa.** Un test congela l'elenco delle serie
-ammesse, quindi nessuna fonte nuova entra finché non viene liberato: vedi
-[Il tappo](#il-tappo-lo-stadio-uno-non-passa). Tutto il resto della catena
-funziona e lavora sull'arretrato che ha già.
+**Il tappo è tolto.** Il test che congelava l'elenco delle serie è stato
+liberato, e per provare la catena due serie demografiche sono arrivate fino a una
+pagina pubblica: `dem:NMIGRATEIN` (saldo migratorio interno) dentro il punteggio,
+`dem:BIRTHRATE` (tasso di natalità) fuori. Vedi [Lo sblocco](#lo-sblocco-il-tappo-è-tolto).
 
 ## Lo stato, in un comando
 
@@ -118,51 +118,59 @@ che ha finito il lavoro: è la stessa forma del bug dello scrittore.
 `pipeline_log.silence()` lo misura contro `WATCH_GROUPS`, e status e cruscotto lo
 mostrano.
 
-## Il tappo: lo stadio uno non passa
+## Lo sblocco: il tappo è tolto
 
-Alla prima run vera con il merge automatico, lo scout ha verificato e cablato due
-serie demografiche regionali nuove sul dataflow `22_293_DF_DCIS_INDDEMOG1_1`,
-`NMIGRATEIN` (saldo migratorio interno) e `BIRTHRATE` (tasso di natalità),
-copertura 20 regioni su 20, serie continua dal 2015 al 2024, valori controllati
-contro il report Istat. Poi il cancello l'ha bloccato, e non per colpa sua.
+Per un giorno lo stadio uno è rimasto chiuso per costruzione. Lo scout aveva
+verificato e cablato due serie demografiche nuove sul dataflow
+`22_293_DF_DCIS_INDDEMOG1_1`, `NMIGRATEIN` e `BIRTHRATE`, ma
+`tests/test_discovery.py` congelava l'elenco esatto degli id ammessi in tre
+asserzioni, dentro una classe chiamata `AdmittingASeriesIsConfigNotCode` che
+faceva l'opposto del proprio nome. L'agente non aveva toccato i test, aveva
+scritto perché, e si era fermato: la terza volta che un agente della catena si
+ferma davanti a una guardia sbagliata invece di aggirarla, e la terza che aveva
+ragione.
 
-`tests/test_discovery.py` congela l'elenco esatto degli id ammessi:
+I tre test ora verificano il **meccanismo, non il contenuto**:
 
-```python
-assertEqual(sorted(series), ["DEPENDRATE", "OLDAGEDEPR"])   # riga 316
-assertEqual(spec["unit"], "%")                              # riga 320, innescata dalla 316
-assertEqual(len(discovered), len(ISTAT_SERIES))             # riga 409, in una run offline
-```
+- il config carica ogni serie ben formata, ma l'elenco può crescere. La forma di
+  ogni riga ammessa resta sorvegliata da `tests/test_source_admission.py`.
+- il round trip di uno scalare quotato (`"%"`) si prova su una riga di test
+  controllata, non pretendendo che ogni serie sia in percentuale.
+- la discovery offline si confronta con le serie che hanno un fixture, così
+  ammettere una serie live-only (lo scout scrive la riga di config ma non il
+  fixture) non rompe più la suite.
 
-La classe si chiama `AdmittingASeriesIsConfigNotCode`. Ammettere una serie **è**
-configurazione e non codice, esattamente come dice il nome, ma poi il test la
-inchioda a due valori: il tetto non è stato tolto dal Python, è stato spostato
-nella suite. La terza asserzione è peggio, perché pretende un fixture offline per
-ogni serie, e i fixture stanno fuori dal perimetro dello scout: una serie ammessa
-non può averlo, quindi non può passare.
+Con il tappo tolto, `config/istat_series.yaml` è cresciuto da due a quattro serie,
+e le due nuove sono state fatte scorrere lungo l'intera catena dai suoi agenti
+reali (curatore, scrittore, revisore):
 
-L'agente non ha toccato i test, ha scritto perché, e si è fermato. È la terza
-volta che un agente di questa catena si ferma davanti a una guardia sbagliata
-invece di aggirarla, e la terza volta che aveva ragione.
+- **`dem:NMIGRATEIN`** (saldo migratorio interno): verso corretto da `contextual`
+  a **`higher_better`** contro il report Istat sulle migrazioni interne (che
+  inquadra l'emigrazione dal Mezzogiorno come una perdita), categoria
+  `lavoro_opportunita`, **prima serie demografica a entrare nel punteggio**.
+  Nessuna regione cambia posizione.
+- **`dem:BIRTHRATE`** (tasso di natalità): verso **`contextual`** confermato. In
+  cima convivono Trentino Alto Adige e Campania, un valore alto riflette struttura
+  per età e fecondità, non un vantaggio. Resta fuori dal punteggio.
 
-**PR [#41](https://github.com/nmaiese/diset-viz/pull/41) aperta e non fusa**, sul
-branch `automation/scout-2026-07-26`. Contiene le due righe di configurazione e
-il triage di 15 proposte. Il prossimo lavoro su questa catena è liberare quei tre
-test, o lo stadio uno resta chiuso per costruzione e i cinque a valle lavorano
-per sempre solo sull'arretrato che hanno già.
+Fuso in **PR [#43](https://github.com/nmaiese/diset-viz/pull/43)**. La PR dello
+scout **[#41](https://github.com/nmaiese/diset-viz/pull/41)** è chiusa, superata:
+le sue due righe di config e la segnalazione della licenza vivono in #43.
 
-### Tre cose che lo scout ha trovato fuori dal proprio perimetro
+### Tre cose che lo scout aveva trovato fuori dal proprio perimetro
 
-1. **La licenza Istat nel repo è sbagliata.** `scripts/istat_regional_source.py`
-   e `config/external_sources.yaml` dichiarano `CC BY 3.0 IT`, Istat dichiara
-   **CC BY 4.0** su <https://www.istat.it/note-legali/>. Compare sulle pagine
-   pubbliche degli indicatori di quella famiglia.
+1. **La licenza Istat era sbagliata, ora corretta.**
+   `scripts/istat_regional_source.py`, `config/external_sources.yaml` (le quattro
+   righe Istat) e `app/sources.py` (famiglia `dem`, anche il `license_url`)
+   dichiaravano `CC BY 3.0 IT`; Istat dichiara **CC BY 4.0** su
+   <https://www.istat.it/note-legali/> (verificato). Corretto in #43.
 2. **`scout_sources.py` tronca la coda alfabeticamente.** Le proposte sono 87, il
    `limit=40` con punteggio uniforme ordina per nome, quindi la coda si ferma a
-   "Notti in Italia" e le altre 47 non sono mai state viste da nessuno.
+   "Notti in Italia" e le altre 47 non sono mai state viste da nessuno. Ancora
+   aperto.
 3. **`REGIONAL_HINT` non riconosce `- reg.`**, l'abbreviazione che Istat usa
    davvero: cerca `\b(region|nuts2)`. È il motivo per cui la spesa sociale dei
-   comuni per regione non è mai arrivata in coda.
+   comuni per regione non è mai arrivata in coda. Ancora aperto.
 
 ## Stato dei dati
 
@@ -175,12 +183,15 @@ Multiscopo, più le province SDMX. Le due famiglie arrivate dalla catena:
   punteggio qualità della vita**. PIL pro capite (`nama_10r_2gdp`) riconosciuto
   `proxy` dell'id territoriale 901: arricchisce quell'indicatore, non è una voce
   separata.
-- **Indicatori demografici Istat**, `istat_demografia`. `dem:OLDAGEDEPR` (indice
-  di dipendenza degli anziani): prima serie non Eurostat ad attraversare tutta la
-  catena. Verso `contextual` confermato, quindi integrato e descritto ma **fuori
-  dal punteggio**: un rapporto di dipendenza non ha un migliore.
-  `istat_demografia:DEPENDRATE` è fermo a `needs-info`, perché si sovrappone in
-  parte a OLDAGEDEPR e la scelta fra tenerne uno o entrambi non è stata presa.
+- **Indicatori demografici Istat**, `istat_demografia`. Tre serie in catalogo.
+  `dem:OLDAGEDEPR` (indice di dipendenza degli anziani): prima serie non Eurostat
+  ad attraversare la catena, verso `contextual`, fuori dal punteggio (un rapporto
+  di dipendenza non ha un migliore). `dem:NMIGRATEIN` (saldo migratorio interno):
+  verso `higher_better`, categoria `lavoro_opportunita`, **la prima serie
+  demografica dentro il punteggio**. `dem:BIRTHRATE` (tasso di natalità): verso
+  `contextual`, fuori dal punteggio. `istat_demografia:DEPENDRATE` è fermo a
+  `needs-info`, perché si sovrappone in parte a OLDAGEDEPR e la scelta fra tenerne
+  uno o entrambi non è stata presa.
 
 ## Cosa resta umano, e perché
 
@@ -201,25 +212,28 @@ possono fare:
 
 ## Cosa non è ancora fatto
 
-1. **Liberare `tests/test_discovery.py`** dalle tre asserzioni che congelano
-   l'elenco delle serie (vedi [Il tappo](#il-tappo-lo-stadio-uno-non-passa)).
-   Finché restano, nessuna fonte nuova entra e la PR #41 non può fondersi. È il
-   primo lavoro da fare, prima di qualunque altra cosa su questa catena.
-2. **Le proposte dello scout** in `data/discovery/source_candidates.csv`: 15
+1. **Le proposte dello scout** in `data/discovery/source_candidates.csv`: 15
    valutate il 26 luglio, nessuna approvata (ognuna con il motivo scritto in
    `triage_notes`), 72 mai viste, di cui 47 nemmeno proposte per via del
    troncamento alfabetico.
-3. **Il secondo adapter di famiglia**: oggi la catena cabla da sola solo dataflow
+2. **Il secondo adapter di famiglia**: oggi la catena cabla da sola solo dataflow
    SDMX Istat. Eurostat resta a selezione curata in `EUROSTAT_SERIES`, dentro
    `scripts/eurostat_source.py`, quindi ammettere una serie Eurostat è ancora
    codice. Stessa forma dell'adapter Istat, quindi lo stesso trattamento a
    config è possibile.
-4. **Profili regionali** (`app/profiles.py`): calcolati sui soli territoriali
+3. **Profili regionali** (`app/profiles.py`): calcolati sui soli territoriali
    core, non includono ancora le famiglie esterne.
-5. **Livello provinciale (NUTS3)** nella watchlist, sempre con priorità al
+4. **Livello provinciale (NUTS3)** nella watchlist, sempre con priorità al
    regionale fresco.
-6. **La licenza Istat sbagliata** e le due lacune di `scout_sources.py`
-   segnalate dallo scout, elencate sopra.
+5. **Le due lacune di `scout_sources.py`** segnalate dallo scout (il troncamento
+   alfabetico della coda e `REGIONAL_HINT` che non riconosce `- reg.`, entrambe
+   sopra). La licenza Istat, che era il terzo punto, è stata corretta in #43.
+6. **La licenza del backbone `istat_lavoro`**: le righe di quella famiglia nel
+   layer esterno (`normalized_external_indicators.csv`, tasso di disoccupazione e
+   simili) portano ancora `CC BY 3.0 IT`, committate da un refresh precedente di
+   `scripts/update_data.py`. La correzione di #43 ha sistemato la famiglia `dem` e
+   `config/external_sources.yaml`, non quelle righe già scritte. Vanno corrette al
+   prossimo refresh, o con una passata mirata sul CSV.
 
 ## Gotcha per la prossima sessione
 
@@ -260,6 +274,15 @@ possono fare:
   `allow_auto_merge` a falso e `master` non protetto, `gh` ripiega su un merge
   immediato senza dirlo. Nessuno stadio deve usarlo: si chiude con
   `python3 scripts/pipeline_merge.py --stage <stadio> --pr <numero>`.
+- **La CI non parte da sola sulle PR aperte via il GitHub MCP.** GitHub non lancia
+  i workflow per eventi creati dal token dell'app (anti-ricorsione), quindi una PR
+  aperta così resta senza check e il box di merge sembra bloccato pur non essendo
+  fallito niente. Si fa partire a mano con `workflow_dispatch` su `ci.yml` (o dalla
+  UI), oppure si apre la PR con `gh`, che usa il token dell'utente e li innesca.
+- **`pipeline_dashboard.py` non crasha più senza `gh`.** `open_pull_requests`
+  cattura `FileNotFoundError`/`OSError` e la sezione PR dice solo che `gh` non c'è,
+  invece di far morire tutto il cruscotto. È quello che pretende la classe di test
+  `TheDashboardReadsWithoutBreaking`.
 - **Il caso `nothing` del diario si regge solo sul contratto.** Una run a mani
   vuote non ha un branch da giudicare, quindi il cancello non la può raggiungere:
   se un agente non scrive quella riga, nessuna guardia se ne accorge. È il punto
