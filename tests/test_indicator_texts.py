@@ -217,6 +217,44 @@ class ArticleStructure(unittest.TestCase):
         self.assertEqual(offenders, [], f"style violations: {offenders[:10]}")
 
 
+class ParagraphsSurviveRendering(unittest.TestCase):
+    """A section written in paragraphs must render in paragraphs.
+
+    The body goes through `analyst_html`, which is Markdown, where a single `\\n`
+    is a soft wrap and not a paragraph break. So a section separated by single
+    newlines produces exactly one `<p>`, which the filter then strips (it strips
+    the wrapper only when there is one), and the whole section lands on the page
+    as an unbroken wall of text. Three of ten freshly written articles had it.
+
+    It is invisible in the JSON, invisible in the diff, and invisible to a render
+    check that strips the tags and splits on newlines, because that rebuilds the
+    paragraphs the browser would never show. The only honest check counts the
+    `<p>` the filter actually emits, which is what this does.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.texts = _load()
+
+    def test_a_body_written_in_paragraphs_produces_more_than_one(self):
+        from app.views import analyst_html
+
+        collapsed = []
+        for key, entry in self.texts.items():
+            for section in entry.get("sections") or []:
+                body = section.get("body") or ""
+                if "\n" not in body:
+                    continue
+                paragraphs = str(analyst_html(body)).count("<p>")
+                if paragraphs < 2:
+                    collapsed.append((key, section.get("role"), body.count("\n")))
+        self.assertEqual(
+            collapsed, [],
+            "sections whose newlines do not survive rendering, so they show as one "
+            f"block (id, role, newlines): {collapsed[:10]}",
+        )
+
+
 class InternalLinksInProse(unittest.TestCase):
     """Cross-references in an article, checked the way the blog's already are.
 
