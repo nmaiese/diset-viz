@@ -148,7 +148,9 @@
         <p class="section-label">Il punteggio sulla mappa</p>
         <p class="page-note">Più scuro il colore, più alto il punteggio con il profilo {{ p.name }}. Passa il mouse su una regione, clicca per aprirne il profilo.</p>
         <div class="regions-map-wrap quality-map-wrap">
+          {% with map_label = "Mappa cliccabile delle regioni italiane per punteggio di qualità della vita, profilo " ~ p.name %}
           {% include "_italy_map.html" %}
+          {% endwith %}
           <div class="rmap-tooltip" hidden></div>
         </div>
         <style>

@@ -201,7 +201,13 @@
         </style>
         <div class="indicator-map-frame">
           <div class="indicator-map" data-explore="map">
+            {# The shared partial defaults to a label that says only "regioni
+               italiane". Here the map carries an indicator, and role="img" makes
+               the twenty paths presentational, so this label is the only thing a
+               screen reader gets to hear about what is drawn. #}
+            {% with map_label = "Mappa cliccabile delle regioni italiane per " ~ meta.name %}
             {% include "_italy_map.html" %}
+            {% endwith %}
           </div>
           <div class="indicator-map__tip" data-explore="map-tip" hidden></div>
         </div>
