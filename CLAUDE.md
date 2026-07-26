@@ -24,6 +24,8 @@ because its prompt repeated a contract instead of pointing at it).
 | dati provinciali | [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md) |
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
 | la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
+| come si misura un articolo, i dieci criteri | [`docs/WRITING_RUBRIC.md`](docs/WRITING_RUBRIC.md) |
+| quali fonti secondarie si possono citare | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
 
 Per guardare la catena senza aprire file:
 
@@ -159,7 +161,16 @@ Always start from the deterministic data brief, never from ad-hoc API calls:
 .venv/bin/python -m scripts.indicator_brief ter-178     # everything about one indicator
 .venv/bin/python -m scripts.text_queue                  # what still needs an editor
 .venv/bin/python -m scripts.review_queue                # what still needs a reader
+python3 scripts/prose_lint.py --summary                 # how the prose is doing, as a number
 ```
+
+The brief's last block ranks the whole theme by rank correlation and says which
+indicators draw the same map as this one, which the opposite, and which one that
+has nothing to do with it. That is where a cross-reference and its internal link
+come from, and the guards check the link but never the sentence around it: a
+rank correlation is a co-occurrence, so the verb has to be calibrated, the
+confounder named and one exception given. The bar an article is measured against
+is [`docs/WRITING_RUBRIC.md`](docs/WRITING_RUBRIC.md).
 
 An article is written for **one territorial level** and used only there, so it
 declares `"level"` and both queues have one row per (indicator, level).

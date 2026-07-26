@@ -101,6 +101,23 @@ clue, so:
   Enforced.
 - Use real figures, from the brief, for the year the brief shows.
 
+The same editorial voice binds here as in the article, which is easy to forget
+because 180 characters feel like a form field rather than writing. They are the
+first prose a reader meets on the card, in search results and in the quiz, so:
+
+- **No spy lexicon.** Not "misura il tessuto produttivo", not "un indicatore
+  cruciale per il panorama regionale", not "sottolinea il divario". There is a
+  plainer word every time, and `content/STYLE.md` lists the ones to watch.
+- **Say what it counts, not that it is important.** "Quante donne tra 15 e 64
+  anni hanno un lavoro, sul totale delle donne di quell'età" beats any sentence
+  about relevance. The relevance belongs to the article.
+- **`value_explanation` reads one value, it does not rank the regions.** The
+  cockpit already ranks them.
+- **Never a weighted aggregate against our simple mean.** If you reach for a
+  national figure to make a value legible, it comes from a weighted source and
+  our pages average twenty regional values. They are different quantities. Say
+  "dato nazionale <fonte>" or stay inside the series.
+
 ## Write the decision
 
 One row per (target, source, source series) in `data/discovery/curation.csv`.

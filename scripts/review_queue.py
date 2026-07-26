@@ -15,6 +15,7 @@ warning, it is a set of patterns, and a pattern can be looked for:
     esterno         a claim about Europe or a national ranking with no source in `fonti`
     provincia       figures on a provincial article, which the region regex cannot read
     eco             a figure the cockpit already prints, restated in the prose
+    mestiere        the bot tells content/STYLE.md names, from scripts/prose_lint
 
 None of these is a defect by itself. They are the sentences where a defect
 hides, so they decide reading order rather than pass or fail. An article the
@@ -37,6 +38,7 @@ from pathlib import Path
 
 from app import indicator_texts, sources
 from app.indicator_view import build_indicator_view
+from scripts import prose_lint
 
 TEXTS_PATH = Path(indicator_texts.__file__).resolve().parent / "static" / "data" / "indicator_texts.json"
 
@@ -61,6 +63,16 @@ EXTERNAL_CLAIM = re.compile(
     r"primato|record|il più alto d|la più alta d|il più basso d|la più bassa d)", re.I,
 )
 DECIMAL = re.compile(r"\d+,\d+")
+# The bot tells live in `scripts/prose_lint`, which owns the patterns and the
+# catalogue-wide counts. Borrowed rather than restated: a second copy of the spy
+# lexicon here would drift from the one the writer lints its draft against, and
+# the two would then disagree about the same sentence.
+#
+# The closing question is deliberately left out of the flag. It is on 340 of the
+# 364 articles, so as a *reading order* signal it is a constant added to almost
+# every row, which changes nothing and hides the rest. It stays a backlog number
+# in `prose_lint --summary` and an instruction in the reviewer's prompt.
+CRAFT_TELLS = tuple(name for name, _, _ in prose_lint.CHECKS)
 
 FLAG_LABELS = {
     "universale": "afferma un andamento generale",
@@ -68,6 +80,7 @@ FLAG_LABELS = {
     "esterno": "confronto fuori dal dataset senza fonte",
     "provincia": "cifre provinciali, non verificate dalle guardie",
     "eco": "ripete una cifra del cruscotto",
+    "mestiere": "tell da bot che STYLE.md nomina",
     "rilettura": "i dati si sono mossi dopo la firma",
 }
 # Weights: how much each pattern moves an article up the reading order. A causal
@@ -77,7 +90,11 @@ FLAG_WEIGHT = {
     # that *might* be wrong; this one marks an article whose figures have been
     # rewritten since anybody read it, so nothing in it has been checked at all.
     "rilettura": 45,
-    "causale": 40, "esterno": 30, "universale": 25, "provincia": 20, "eco": 10,
+    "causale": 40, "esterno": 30, "universale": 25, "provincia": 20,
+    # Below `provincia` on purpose. A bot tell makes an article read badly, the
+    # flags above mark one that may be false, and a false sentence outranks an
+    # ugly one every time.
+    "mestiere": 15, "eco": 10,
 }
 
 
@@ -147,6 +164,12 @@ def assess(key, entry, view=None):
     echoed = sorted({m.group(0) for m in DECIMAL.finditer(text)} & cockpit)
     if echoed:
         hits["eco"] = echoed
+    linted = prose_lint.inspect(entry) or {"hits": {}}
+    tells = [
+        found for name in CRAFT_TELLS for found in linted["hits"].get(name, [])
+    ]
+    if tells:
+        hits["mestiere"] = tells
 
     meta = view["meta"]
     score = sum(FLAG_WEIGHT[flag] for flag in hits)

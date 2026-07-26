@@ -58,6 +58,35 @@ stesse cifre e scrive un pezzo che il lettore ricorda. Sei mosse:
   Il metro non è la lunghezza, è il flusso. Rileggi il paragrafo ad alta voce, ogni
   frase deve nascere dalla precedente, non stare accanto come una voce di elenco.
 
+## Imperfezione controllata
+
+La levigatura uniforme e' un tell da bot quanto la sciatteria. Un pezzo in cui
+tutte le sezioni pesano uguale, nessuna frase esce dallo schema e niente viene
+mai messo tra parentesi non e' stato scritto da nessuno, e si sente.
+
+La regola d'oro, perche' questa sezione non venga letta come un permesso:
+**l'imperfezione e' concessa e richiesta nella forma, e' vietata nel contenuto.**
+Puoi variare il ritmo, spostare il peso tra le sezioni, concederti un inciso,
+aprire una frase con "Ma". Non puoi toccare l'aritmetica, aggiungere una causa
+che il dato non mostra, citare una fonte che non hai verificato. Quando chiedi a
+te stesso di essere piu' umano, l'errore facile e' diventare piu' libero anche
+sui numeri, ed e' l'unico errore che non si puo' correggere dopo.
+
+- **Nut graf.** Un paragrafo, non un accenno, che dice perche' questi numeri
+  contano: quante persone tocca, quale sistema regge, quale scommessa e'. Di'
+  l'importanza, non una causa.
+- **Asimmetria.** Le sezioni pesano dove pesa il dato. Se la storia sta nella
+  distribuzione, il quadro e' lungo e la dinamica corta, e va bene cosi'.
+- **Digressione.** Una per pezzo, che allarga il campo temporale o comparativo
+  restando dentro la serie o citando una fonte reale. Mai un "probabilmente
+  perche'".
+- **Caveat inline.** Sposta un limite dentro il testo, come inciso, dove il
+  numero puo' essere frainteso. Non ripetere il disclaimer sulla media non
+  ponderata, quello sta gia' nell'apparato.
+- **Non scrivere il numero due volte.** O l'immagine ("una su due") o la cifra
+  ("48%"), mai "quasi la meta' (48%)". Il lettore riceve lo stesso fatto due
+  volte e la frase si ferma.
+
 ## Schemi da evitare (suonano da bot)
 
 - Strutture parallele ripetute: "non solo X, ma anche Y", "non è X, è Y" usato di
@@ -72,6 +101,17 @@ stesse cifre e scrive un pezzo che il lettore ricorda. Sei mosse:
 - Prosa a singhiozzo: frasi tutte corte e slegate, accostate senza un nesso, che
   si leggono come un elenco puntato travestito da paragrafo.
 - Gergo e paroloni quando basta una parola comune.
+- Falsi intervalli: "dal Nord al Sud", "dalle Alpi alla Sicilia", "dai piccoli
+  comuni alle grandi citta'", quando i due estremi non stanno su un continuo
+  vero. In un atlante il punto interessante e' quasi sempre in mezzo.
+- La regola del tre: tre aggettivi in fila, tre esempi, tre cause. Se le cose da
+  dire sono due, sono due.
+- Riassunti compulsivi in un pezzo da 600 parole: "Nel complesso", "In generale",
+  "Tirando le somme". Il lettore ha appena letto, non serve ricapitolare.
+- Lessico spia: cruciale, panorama, tessuto, plasmare, sottolineare, evidenziare,
+  giocare un ruolo, non da ultimo, a tal proposito, degno di nota. Nessuna di
+  queste parole e' vietata, ma quando ne trovi una nella tua bozza quasi sempre
+  ce n'e' una piu' comune che dice la stessa cosa meglio.
 
 ## Struttura: utile, non seriale
 
@@ -121,9 +161,14 @@ stesse cifre e scrive un pezzo che il lettore ricorda. Sei mosse:
 
 ```bash
 rg -n "[—–;]" content/posts
+python3 scripts/prose_lint.py --show <id>   # solo pagine indicatore
 ```
 
-Il comando deve tornare vuoto. Per template, frontend e SVG testuali controlla
+Il primo comando deve tornare vuoto. Il secondo elenca i tell di questa guida che
+una regex sa trovare, sull'articolo di un indicatore. Non copre tutto e non
+pretende di farlo: quello che vuole un lettore sta in
+[`docs/WRITING_RUBRIC.md`](../docs/WRITING_RUBRIC.md), i dieci criteri con cui
+si misura un articolo prima di pubblicarlo. Per template, frontend e SVG testuali controlla
 anche il testo visibile, ma ignora i punti e virgola di CSS, JS, JSON-LD e CSV.
 
 Controlla anche che non ci siano sequenze identiche di H2 tra piu articoli. I

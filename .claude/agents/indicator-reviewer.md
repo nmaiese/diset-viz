@@ -40,10 +40,22 @@ dressed as diligence.
 
 `tests/test_indicator_texts.py` covers structure, roles, editorial punctuation,
 `vintage` drift, headings reused across indicators, the length of the lead's
-first sentence, every decimal figure attributed to a region, and every threshold
-asserted over a list of regions.
+first sentence, every decimal figure attributed to a region, every threshold
+asserted over a list of regions, and every internal link in the prose (canonical
+form, an indicator that exists, an anchor that says where it leads).
 
 If the suite is green, those are fine. Do not re-check them by hand.
+
+`scripts/prose_lint.py` covers the mechanical half of the writing rubric: the spy
+lexicon, false ranges, compulsive recaps, the number written twice, the parallel
+structures, the closing rhetorical question. It fails nothing, it counts. Run it
+on a batch before you start reading, and the summary tells you whether the
+catalogue is getting better:
+
+```bash
+python3 scripts/prose_lint.py --show ter-63
+python3 scripts/prose_lint.py --summary
+```
 
 ## What you check, because nothing else can
 
@@ -55,13 +67,14 @@ python3 scripts/pipeline_status.py --json                    # sempre per primo
 .venv/bin/python -m scripts.review_queue                     # ordine di lettura
 .venv/bin/python -m scripts.review_queue --flag rilettura    # i dati si sono mossi dopo la firma
 .venv/bin/python -m scripts.review_queue --flag causale      # una classe alla volta
+.venv/bin/python -m scripts.review_queue --flag mestiere     # i tell da bot che STYLE.md nomina
 .venv/bin/python -m scripts.review_queue --show ter-63       # l'articolo, con i segnali
 ```
 
 Work `rilettura` first when it is not empty. Those are published pages whose
 numbers changed under a signature that no longer applies.
 
-Five patterns, each a class of claim a regex can find but only a person can
+Six patterns, each a class of claim a regex can find but only a person can
 judge. A flag is a place to look, never a verdict.
 
 **`universale` — "ovunque", "sempre", "da anni", "in tutte le regioni".**
@@ -82,10 +95,19 @@ grandi il valore è più alto" states the association, not the cause), or cut it
 **`esterno` — a claim about Europe, a national figure, a primato, with no source.**
 Verify it with WebSearch/WebFetch against the institution that publishes it, and
 add it to `fonti` as `{testo, url}`. If you cannot verify it, cut it. Never
-invent a source. Watch one trap in particular: **the mean of twenty regional
-values is not the national figure.** Istat publishes a weighted national value
-and it differs. An article that says "in Italia lo fa un occupato su dieci" from
-a simple regional mean is wrong even when the arithmetic is right.
+invent a source. [`docs/SECONDARY_SOURCES.md`](../../docs/SECONDARY_SOURCES.md)
+is the list the writer works from, so it is where to check first whether the
+citation is one we already trust.
+
+Watch one trap in particular, because it survives every guard: **a weighted
+aggregate and our simple mean of the regional values are not the same quantity.**
+Istat, Eurostat, SVIMEZ, Banca d'Italia and OECD all publish weighted national
+and macro-area figures. Our pages average twenty regional values. An article that
+says "in Italia lo fa un occupato su dieci" from a simple regional mean is wrong
+even when its arithmetic is right, and one that sets a weighted national figure
+beside our mean as a comparison is comparing two different things. Either keep
+them apart and label them ("dato nazionale Istat" against "la media semplice
+delle regioni") or cut the comparison.
 
 **`provincia` — figures on a provincial article.**
 The two numeric guards now read the level's own data, but their region regex
@@ -105,6 +127,16 @@ cockpit prints the above/below-mean split as two counts, so a geography claim
 built on those same two numbers ("le prime dodici del Centro-Nord, le ultime
 otto del Sud") repeats the machine even though the wording differs.
 
+**`mestiere` — the bot tells `content/STYLE.md` names.**
+The spy lexicon (*cruciale, panorama, tessuto, sottolineare, evidenziare, giocare
+un ruolo*), false ranges ("dal Nord al Sud" when the two ends are categories and
+not a continuum), compulsive recaps in a 600-word piece, the number written twice
+("quasi la metà (48%)"), the parallel structures. None of these makes a sentence
+false, which is why they sit below every other flag in the reading order, and all
+of them are yours to fix in place: there is almost always a plainer word, and
+cutting a recap costs nothing. `scripts/prose_lint.py` found them; deciding
+whether the replacement reads better is the part it cannot do.
+
 ## Also read for, without a flag to guide you
 
 - **Does it say something?** An article that restates the definition and the
@@ -112,8 +144,14 @@ otto del Sud") repeats the machine even though the wording differs.
   the distribution, the group that does not fit the expected geography, the
   distance between mean and median and what it hides.
 - **Does it read like a journalist wrote it?** This is the bar the writer's
-  "Write like a journalist" section sets, and you are the one who enforces it.
-  Four checks, and you may fix each in place, not just flag it:
+  "Write like a journalist" section sets, scored in
+  [`docs/WRITING_RUBRIC.md`](../../docs/WRITING_RUBRIC.md), and you are the one
+  who enforces it. Score the article on the ten criteria before you sign it: an
+  article you would leave under 14 out of 20 is one you have not finished
+  reviewing. Five checks, and you may fix each in place, not just flag it:
+  - *No nut graf.* The stake is a clause tucked into a sentence about something
+    else, or it is absent. Give it a paragraph, in plain terms, without importing
+    a cause the indicator does not measure.
   - *No "so what".* The page describes the ranking but never says why the number
     matters (a pension burden, a bet on the future, who tries to enter the
     market). Add the stake in one plain sentence, without a cause the data cannot
@@ -132,6 +170,22 @@ otto del Sud") repeats the machine even though the wording differs.
     of clipped, disconnected lines that sit beside each other like bullet points
     reads as flat as a wall of uniform long ones. Rejoin them with the logical
     link the writer dropped, so the paragraph flows from one idea to the next.
+- **Does it live alone?** An article that never puts its number next to another
+  indicator is the structural weakness of this whole catalogue, and until
+  recently only six pages out of 364 linked to another one. The brief now hands
+  the writer the theme ranked by rank correlation, so on an article you are
+  reworking anyway, check whether a cross-reference is missing and whether the
+  ones present are honest:
+  - *Is the verb calibrated?* A rank correlation is a co-occurrence. "Va di pari
+    passo con" and "si accompagna a" are fine, "dipende da" and "è trainato da"
+    are not, and "una possibile spiegazione è" must be marked as a hypothesis.
+    The `causale` flag catches the loud version, not this quieter one.
+  - *Is the confounder named, and is there an exception?* Two maps that match
+    across twenty regions usually share the income of the area. A cross-reference
+    with neither the confounder nor the one territory that breaks the pattern is
+    a correlation presented as a law.
+  - *Is it the same thing measured twice?* Female employment 15-64 against female
+    employment 20-64 correlates at 1,00 and says nothing. The brief marks these.
 - **Does the level match?** An entry declares `level` and is used only there.
   Figures must belong to that level.
 - **Contextual indicators have no better.** No "migliora", no "peggiora", no
