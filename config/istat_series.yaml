@@ -42,3 +42,21 @@ series:
     theme: Indicatori demografici (Istat)
     quality_life_category: salute_cura
     direction: contextual
+  - id: NMIGRATEIN
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Saldo migratorio interno (Istat, regioni)
+    unit: per mille abitanti
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
+  - id: BIRTHRATE
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Tasso di natalità (Istat, regioni)
+    unit: per mille abitanti
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
