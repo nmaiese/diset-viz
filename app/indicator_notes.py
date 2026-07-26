@@ -1030,8 +1030,25 @@ def it_plural(count, singular, plural):
 
 
 def is_percentage_unit(unit):
-    lowered = (unit or "").lower()
-    return "%" in lowered or "percentual" in lowered or "per cento" in lowered
+    """Se l'unita' e' una percentuale, non un tasso su base cento.
+
+    La distinzione sembra pedante e non lo e': da qui esce l'etichetta stampata
+    accanto a ogni cifra e la parola usata per ogni variazione. Il test cercava
+    la sottostringa "per cento", che compare dentro **"per centomila"**: cosi'
+    "numero per centomila abitanti" passava per percentuale, e la pagina del
+    tasso di omicidi diceva "0,54%" e "0,93 punti percentuali" su un tasso ogni
+    centomila. Dodici indicatori ne erano toccati, fra cui "tonnellate per cento
+    abitanti" e "chilometro per cento chilometri quadrati", che percentuali non
+    sono in nessun senso.
+
+    Percentuale e' `%` (anche "% del PIL") o "percentuale". "X per cento Y" e'
+    un rapporto: quante X ogni cento Y. Solo un "per cento" in fondo, senza
+    niente misurato dopo, e' davvero una percentuale.
+    """
+    lowered = (unit or "").strip().lower()
+    if "%" in lowered or "percentual" in lowered:
+        return True
+    return lowered.endswith("per cento")
 
 
 def value_unit_label(name, unit):
@@ -1040,7 +1057,30 @@ def value_unit_label(name, unit):
         if "differenza tra tasso" in lowered_name or "differenza assoluta fra tasso" in lowered_name:
             return "punti percentuali"
         return "%"
-    return display_unit(unit) or "valore"
+    return rate_label(unit) or "valore"
+
+
+def rate_label(unit):
+    """L'unita' come si legge accanto a una cifra, non come sta nel CSV.
+
+    Le unita' Istat sono descrizioni, non etichette: "numero per centomila
+    abitanti" letto dopo un valore da "0,54 numero per centomila abitanti", che
+    e' corretto e non e' italiano. La forma naturale e' "0,54 ogni centomila
+    abitanti".
+
+    Solo presentazione: il CSV non si tocca, come per le altre correzioni in
+    `display_unit`.
+    """
+    value = display_unit(unit)
+    if not value:
+        return value
+    # "numero per cento(mila) X" -> "ogni cento(mila) X". Il "numero" iniziale e'
+    # gia' detto dalla cifra che precede l'etichetta.
+    value = re.sub(r"^numero\s+per\s+", "ogni ", value, flags=re.I)
+    # "tonnellate per cento abitanti" -> "tonnellate ogni cento abitanti": qui la
+    # quantita' misurata serve, cambia solo la preposizione.
+    value = re.sub(r"\bper\s+(cento(?:mila)?\s+\S)", r"ogni \1", value, flags=re.I)
+    return value
 
 
 def change_unit_label(name, unit):

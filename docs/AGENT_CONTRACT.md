@@ -95,6 +95,11 @@ la riga viaggia insieme al tuo lavoro. Committala con il resto. Se ti sei
 fermato o il cancello ti ha bloccato, scrivi comunque la riga e committala sul
 branch: sono le run che serve di piu' poter leggere.
 
+**Se git segnala un conflitto su `runs.jsonl`, tieni tutte e due le righe.**
+E' un registro in coda: due stadi che girano vicini aggiungono ognuno la propria
+riga in fondo, e git le vede come lo stesso punto del file. Nessuna delle due e'
+sbagliata e nessuna sostituisce l'altra. Scegliere e' l'unico errore possibile.
+
 Chi legge, legge cosi':
 
 ```bash

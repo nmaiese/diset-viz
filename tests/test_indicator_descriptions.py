@@ -3,6 +3,7 @@ import unittest
 from html import unescape
 
 from app import app
+from app import indicator_notes
 from app import profiles
 from app import quiz
 from app.bes_data import all_bes_indicators
@@ -137,3 +138,64 @@ class IndicatorDescriptionCoverageTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PercentageUnitsAreNotRates(unittest.TestCase):
+    """"per cento" vive dentro "per centomila", e la differenza si vede in pagina.
+
+    Da `is_percentage_unit` esce l'etichetta stampata accanto a ogni cifra e la
+    parola usata per ogni variazione. Cercando la sottostringa, "numero per
+    centomila abitanti" passava per percentuale e la pagina del tasso di omicidi
+    diceva "0,54%" e "0,93 punti percentuali" su un tasso ogni centomila.
+    """
+
+    def test_a_rate_per_hundred_thousand_is_not_a_percentage(self):
+        self.assertFalse(indicator_notes.is_percentage_unit("numero per centomila abitanti"))
+        self.assertEqual(
+            indicator_notes.change_unit_label("Tasso di omicidi", "numero per centomila abitanti"),
+            "ogni centomila abitanti",
+            "e l'etichetta si legge accanto a una cifra, non e' la descrizione del CSV",
+        )
+
+    def test_a_quantity_per_hundred_people_is_not_a_percentage(self):
+        """"tonnellate per cento abitanti" non e' una percentuale in nessun senso:
+        misura tonnellate, non una quota."""
+        for unit in ("tonnellate per cento abitanti", "numero per cento abitanti",
+                     "chilometro per cento chilometri quadrati"):
+            self.assertFalse(indicator_notes.is_percentage_unit(unit), unit)
+
+    def test_a_rate_reads_as_italian_next_to_a_figure(self):
+        """"0,54 numero per centomila abitanti" e' corretto e non e' italiano."""
+        for unit, label in (
+            ("numero per centomila abitanti", "ogni centomila abitanti"),
+            ("numero per cento abitanti", "ogni cento abitanti"),
+            ("tonnellate per cento abitanti", "tonnellate ogni cento abitanti"),
+        ):
+            self.assertEqual(indicator_notes.value_unit_label("x", unit), label)
+
+    def test_units_that_already_read_well_are_left_alone(self):
+        for unit in ("euro per abitante", "punteggio", "centomila abitanti"):
+            self.assertEqual(indicator_notes.value_unit_label("x", unit), unit)
+
+    def test_real_percentages_still_are(self):
+        for unit in ("%", "% del PIL", "% della popolazione attiva",
+                     "percentuale", "Valori percentuali", "per cento"):
+            self.assertTrue(indicator_notes.is_percentage_unit(unit), unit)
+            self.assertEqual(indicator_notes.change_unit_label("x", unit), "punti percentuali")
+
+    def test_no_catalogue_unit_is_misread(self):
+        """La guardia sul catalogo vero: se una fonte introduce un'unita' nuova
+        che finisce nella trappola, il test lo dice subito."""
+        from app.atlas_catalog import get_atlas_catalog
+
+        catalogue = get_atlas_catalog()
+        items = catalogue["indicators"] if isinstance(catalogue, dict) and "indicators" in catalogue else catalogue
+        wrong = [
+            (item["id"], item.get("unit"))
+            for item in items
+            if indicator_notes.is_percentage_unit(item.get("unit"))
+            and "%" not in (item.get("unit") or "")
+            and "percentual" not in (item.get("unit") or "").lower()
+            and not (item.get("unit") or "").strip().lower().endswith("per cento")
+        ]
+        self.assertEqual(wrong, [], f"unita' scambiate per percentuali: {wrong[:8]}")
