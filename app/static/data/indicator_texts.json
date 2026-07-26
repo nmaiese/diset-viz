@@ -5629,6 +5629,43 @@
   ],
   "vintage": 2023
  },
+ "dem:BIRTHRATE": {
+  "fonti": [
+   {
+    "testo": "Istat, Indicatori demografici, Anno 2024 (31 marzo 2025): nel 2024 la fecondità scende a 1,18 figli per donna, sotto il minimo storico di 1,19 del 1995, e i nati restano sotto le 370 mila unità.",
+    "url": "https://www.istat.it/wp-content/uploads/2025/03/Indicatori_demografici_2024.pdf"
+   },
+   {
+    "testo": "Istat, Natalità e fecondità della popolazione residente, Anno 2024: il numero medio di figli per donna è più alto in Trentino-Alto Adige, 1,39, e più basso in Sardegna, 0,91.",
+    "url": "https://www.istat.it/wp-content/uploads/2025/10/Natalita-e-fecondita-della-popolazione-residente_Anno-2024.pdf"
+   }
+  ],
+  "lead": "In cima al tasso di natalità il Trentino-Alto Adige convive con la Campania, e l'ordine dei territori non segue quello del reddito ma la loro struttura per età. Un tasso alto racconta quante persone in età fertile vivono in una regione e quanti figli nascono, non un vantaggio da leggere in graduatoria.",
+  "level": "regione",
+  "sections": [
+   {
+    "body": "Il tasso di natalità rapporta i nati vivi di un anno alla popolazione media residente e moltiplica per mille. Il 6,20 del Veneto nel 2024 vuol dire poco più di sei nati ogni mille abitanti in dodici mesi.\n\nÈ un tasso grezzo, e la parola pesa. Al denominatore c'è tutta la popolazione, non le sole donne in età fertile, quindi il valore risponde a due forze insieme, quante persone in età da avere figli vivono in una regione e quanti figli mettono al mondo. Una popolazione giovane alza il tasso a parità di fecondità, una popolazione anziana lo abbassa anche là dove i figli non mancano. Il numero da solo non separa i due effetti.",
+    "h": "Nascite e popolazione, senza filtrare l'età",
+    "role": "definizione"
+   },
+   {
+    "body": "Il tasso non ricalca la faglia del reddito. In testa il Trentino-Alto Adige sta a fianco della Campania, e subito dietro vengono la Sicilia e la Calabria, prima della Lombardia e dell'Emilia-Romagna. Dopo la Calabria la graduatoria fa un gradino di 0,40, e sopra quel gradino restano quattro regioni che il divario economico terrebbe agli antipodi.\n\nLa spiegazione sta in come è fatto il tasso. Il Trentino-Alto Adige unisce al primo posto anche la fecondità più alta del paese, 1,39 figli per donna. La Campania resta in alto senza quel primato, perché un tasso grezzo cresce anche dove le persone in età fertile sono più numerose, a parità di figli per donna.\n\nLa mediana, 5,80, sta sotto la media, e in mezzo le regioni si stringono in una fascia di pochi decimi. In fondo la Sardegna si stacca di 0,70 dalla Valle d'Aosta, il salto più largo di tutta la classifica, e ha la fecondità più bassa d'Italia, 0,91 figli per donna. Per un indicatore contestuale quel fondo segna un estremo della distribuzione, non l'ultimo posto di una gara.",
+    "h": "In cima Nord e Sud arrivano da strade diverse",
+    "role": "quadro"
+   },
+   {
+    "body": "Dal 2015 al 2024 il tasso è sceso in tutte e venti le regioni, senza una sola eccezione, sull'intero periodo come nell'ultimo anno. La media semplice dei valori regionali ha perso 1,76 punti in dieci anni.\n\nA cambiare è la velocità, non la direzione. Il Lazio e la Valle d'Aosta hanno perso 2,50 punti, il calo più netto, mentre la Liguria si è fermata a 0,90 e il Friuli-Venezia Giulia a 1,20. In testa il Trentino-Alto Adige è sceso di 2,00 punti e la Campania di appena 1,40, così il piccolo gruppo ad alta natalità si è mosso a ritmi diversi pur restando insieme.\n\nIl calo è nazionale. Nel 2024 l'Istat stima 1,18 figli per donna, sotto il precedente minimo storico di 1,19 toccato nel 1995, e in Italia nascono meno di 370 mila bambini in un anno. Dal 2023 al 2024 quindici regioni hanno perso ancora terreno e una sola è salita.",
+    "h": "In calo ovunque, ma non alla stessa velocità",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il tasso grezzo tiene insieme due cose che una lettura attenta vorrebbe separate. Non dice se in una regione nascono pochi bambini perché le donne in età fertile sono poche o perché ognuna ha meno figli. Per la propensione ad avere figli, indipendente dall'età della popolazione, serve il numero medio di figli per donna, che l'Istat calcola a parte.\n\nConta i residenti, quindi risente delle migrazioni da tutti e due i lati. Una regione che perde giovani adulti vede assottigliarsi proprio la fascia da cui vengono i nati, e il tasso cala senza che nessuno abbia cambiato idea sul fare figli.\n\nÈ infine la fotografia di un anno. Non distingue chi rinvia una nascita da chi vi rinuncia, e non anticipa quanti figli avrà chi oggi è giovane. Registra quanti bambini sono nati nel 2024 ogni mille abitanti, e nulla di più.",
+    "h": "Quello che un tasso grezzo tiene insieme",
+    "role": "limiti"
+   }
+  ],
+  "vintage": 2024
+ },
  "dem:NMIGRATEIN": {
   "fonti": [
    {
