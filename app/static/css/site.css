@@ -493,7 +493,19 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .kpi strong { font-family: var(--font-display); font-size: 22px; line-height: 1.05; color: var(--ink); font-variant-numeric: tabular-nums; }
 .kpi__sub { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); overflow-wrap: anywhere; }
 .kpi__sub a { color: var(--accent); }
-.kpi--focus { border-left: 3px solid var(--accent); }
+/* L'unita' accanto alla cifra, non su una riga a parte: "7,65 %" si legge come
+   una quantita', "7,65" da solo si legge come testo. Era la .u delle vecchie
+   numbers-tile, persa quando i tre blocchi sono diventati una riga sola. */
+.kpi strong .u { font-family: var(--font-mono); font-weight: 400; font-size: 13px; color: var(--muted); }
+/* Il riquadro a fuoco e' l'ancora del cruscotto: prima era una card a se',
+   con fondo accento e la cifra grande in mono. Ridotto a un filetto di 3px
+   pesava come le altre cinque celle e la riga si leggeva come un elenco.
+   L'inset invece del border evita di spostare la griglia da 1px, e la tinta
+   va stesa SOPRA il pannello: --accent-soft e' traslucida e da sola si
+   comporrebbe sul grigio di .kpi-row, uscendo fangosa. */
+.kpi--focus { background-color: var(--panel); background-image: linear-gradient(var(--accent-soft), var(--accent-soft)); box-shadow: inset 3px 0 0 var(--accent); }
+.kpi--focus strong { font-family: var(--font-mono); font-weight: 700; font-size: 30px; line-height: 1.05; }
+.kpi--focus strong .u { font-size: 14px; }
 .kpi--best strong { color: var(--positive-ink); }
 .kpi--worst strong { color: var(--accent); }
 
