@@ -5636,8 +5636,10 @@
     "url": "https://www.istat.it/comunicato-stampa/migrazioni-interne-e-internazionali-della-popolazione-residente-anni-2023-2024/"
    }
   ],
-  "lead": "Nel saldo migratorio interno la frattura più netta non separa il Nord dal Sud, ma cade tra la Sardegna, quasi in pareggio, e il Mezzogiorno continentale. Quasi tutte le regioni restano in equilibrio o guadagnano abitanti negli scambi con il resto d'Italia, mentre le perdite pesanti si concentrano in una coda ristretta del Sud.",
+  "lead": "Nel saldo migratorio interno la frattura più netta non separa il Nord dal Sud, ma cade tra la Sardegna, quasi in pareggio, e il Mezzogiorno continentale. La maggior parte delle regioni resta in equilibrio o guadagna abitanti negli scambi con il resto d'Italia, mentre le perdite pesanti si concentrano in una coda del Sud continentale.",
   "level": "regione",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2024,
   "sections": [
    {
     "body": "Il saldo migratorio interno mette a confronto due registri anagrafici: le persone che si iscrivono in una regione arrivando da un altro comune italiano e quelle che si cancellano per trasferirsi altrove in Italia. La differenza, rapportata alla popolazione residente e moltiplicata per mille, dà il valore dell'anno.\n\nUn numero positivo dice che la regione, negli scambi di residenza con il resto del paese, ha guadagnato abitanti. Un numero negativo che li ha persi. Il +1,00 della Toscana vuol dire circa un residente guadagnato ogni mille abitanti nel 2024. Restano fuori del tutto i movimenti da e verso l'estero, perché qui contano solo i trasferimenti da un comune italiano a un altro.",
@@ -5650,7 +5652,7 @@
     "role": "quadro"
    },
    {
-    "body": "Sul lungo periodo il quadro nazionale sembra immobile. La media semplice dei valori regionali è passata da -0,32 nel 2015 a -0,18 nel 2024, appena 0,13 punti in dieci anni. Ma quella quasi-stabilità è un pareggio tra spinte opposte: undici regioni hanno migliorato il saldo, otto lo hanno peggiorato, una è rimasta ferma.\n\nA salire di più è stata la Valle d'Aosta, +2,40 punti dal 2015, seguita dal Piemonte e dall'Abruzzo. In direzione contraria si sono mosse alcune regioni che dieci anni fa avevano saldi tra i più alti: il Lazio ha perso 1,60 punti, il calo più forte del paese, e il Trentino-Alto Adige 1,20. Anche la Basilicata ha peggiorato di 1,50, allontanandosi ancora dal gruppo. Così la distanza tra il primo e l'ultimo si è allargata di 0,30 punti.\n\nL'ultimo anno va letto a parte. Dal 2023 al 2024 la media è risalita di 0,33 punti, un rimbalzo più ampio dell'intero movimento del decennio, anche se in quello stesso anno nove regioni hanno comunque perso terreno.",
+    "body": "Sul lungo periodo il quadro nazionale sembra immobile. La media semplice dei valori regionali è passata da -0,32 nel 2015 a -0,18 nel 2024, appena 0,13 punti in dieci anni. Ma quella quasi-stabilità è un pareggio tra spinte opposte: undici regioni hanno migliorato il saldo, otto lo hanno peggiorato, una è rimasta ferma.\n\nA salire di più è stata la Valle d'Aosta, +2,40 punti dal 2015, seguita dal Piemonte e dall'Abruzzo. In direzione contraria si sono mosse alcune regioni che dieci anni fa avevano saldi tra i più alti: il Lazio ha perso 1,60 punti, il calo più forte del paese, e il Trentino-Alto Adige 1,20. Anche la Basilicata ha peggiorato di 1,50, allontanandosi ancora dal gruppo. Così la distanza tra il primo e l'ultimo si è allargata di 0,30 punti.\n\nL'ultimo anno va letto a parte. Dal 2023 al 2024 la media è risalita più di quanto si fosse mossa in tutti i dieci anni precedenti, anche se in quello stesso anno nove regioni hanno comunque perso terreno.",
     "h": "Un aggregato quasi fermo, una mappa che si sposta",
     "role": "dinamica"
    },
