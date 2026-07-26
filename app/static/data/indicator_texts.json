@@ -5660,6 +5660,7 @@
   "lead": "Dal 2019 al 2023 la distanza tra la regione che investe in ricerca la quota più alta di PIL e l'ultima della classifica si è ridotta di 0,22 punti. La convergenza però arriva dall'alto. Il vertice ha ceduto terreno e la coda si è mossa appena, così oggi le regioni sono più vicine di cinque anni fa, ma su un livello più basso.",
   "level": "regione",
   "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2023,
   "sections": [
    {
     "body": "Eurostat somma quanto si spende in un anno per fare ricerca dentro i confini della regione. Ci finiscono i laboratori delle imprese, le università, gli enti pubblici e le organizzazioni non profit, i quattro settori che eseguono la ricerca ([Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=R%26D_expenditure)). Quel totale viene diviso per il PIL della stessa regione. Un valore di 1,00 significa un euro speso in ricerca ogni cento euro di prodotto.\n\nConta dove la ricerca si fa, non chi la paga. La rilevazione copre la spesa sostenuta sul territorio a prescindere da chi mette i fondi, quindi un progetto finanziato da un ministero o da un bando europeo pesa sulla regione che ospita il laboratorio. La serie regionale va dal 2019 al 2023 e arriva a tutte e venti le regioni, senza buchi.",

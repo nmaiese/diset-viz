@@ -120,6 +120,36 @@ class ArticleStructure(unittest.TestCase):
         ]
         self.assertEqual(bad, [], f"reviewed_at must be YYYY-MM-DD: {bad[:10]}")
 
+    def test_reviewed_vintage_is_an_integer_when_present(self):
+        """`reviewed_vintage` records the data year a reviewer actually read, and
+        `scripts/review_queue.py` compares it to the article's current `vintage`
+        to decide whether the signature has expired. A string "2023" would never
+        equal the integer 2023, so a typed slip would re-open every signed
+        article forever and make the reading order meaningless.
+        """
+        bad = [
+            (key, entry.get("reviewed_vintage"))
+            for key, entry in self.texts.items()
+            if entry.get("reviewed_vintage") is not None
+            and not isinstance(entry.get("reviewed_vintage"), int)
+        ]
+        self.assertEqual(bad, [], f"reviewed_vintage must be an integer: {bad[:10]}")
+
+    def test_a_signed_article_records_what_it_was_signed_against(self):
+        """A signature with no vintage is one the re-entry rule cannot trust, so
+        it re-opens. That is the safe direction, but it is also silent: an agent
+        that keeps forgetting the field would rewrite the same article every run
+        and never notice. Fail loudly instead."""
+        unsigned = [
+            key
+            for key, entry in self.texts.items()
+            if (entry.get("reviewed_at") or "").strip()
+            and entry.get("reviewed_vintage") is None
+        ]
+        self.assertEqual(
+            unsigned, [], f"reviewed_at without reviewed_vintage: {unsigned[:10]}"
+        )
+
     def test_sections_use_known_roles_once_each(self):
         offenders = []
         for key, entry in self.texts.items():

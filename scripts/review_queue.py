@@ -68,10 +68,17 @@ FLAG_LABELS = {
     "esterno": "confronto fuori dal dataset senza fonte",
     "provincia": "cifre provinciali, non verificate dalle guardie",
     "eco": "ripete una cifra del cruscotto",
+    "rilettura": "i dati si sono mossi dopo la firma",
 }
 # Weights: how much each pattern moves an article up the reading order. A causal
 # claim is the worst because it is invisible to every guard and reads as fact.
-FLAG_WEIGHT = {"causale": 40, "esterno": 30, "universale": 25, "provincia": 20, "eco": 10}
+FLAG_WEIGHT = {
+    # `rilettura` outranks the risk flags on purpose. The others mark a sentence
+    # that *might* be wrong; this one marks an article whose figures have been
+    # rewritten since anybody read it, so nothing in it has been checked at all.
+    "rilettura": 45,
+    "causale": 40, "esterno": 30, "universale": 25, "provincia": 20, "eco": 10,
+}
 
 
 def load_texts(path=None):
@@ -148,9 +155,26 @@ def assess(key, entry, view=None):
     if meta.get("quality_life_scored"):
         score += 10
     reviewed = (entry.get("reviewed_at") or "").strip()
-    if reviewed:
-        # Signed off: it stays in --all for the record, out of the reading order.
+    vintage = entry.get("vintage")
+    reviewed_vintage = entry.get("reviewed_vintage")
+    # A signature is a statement about a text *and* about the numbers under it,
+    # so it expires when the numbers move. The writer refreshes an article whose
+    # vintage has fallen behind, which rewrites the figures in every sentence:
+    # the reader who signed off did not read those sentences. Without this the
+    # queue would drain once and never refill, and the chain would look finished
+    # while the published catalogue quietly aged underneath it.
+    #
+    # Keyed on the vintage, not on a calendar interval: a series that has not
+    # published a new year has nothing new to read, and re-reading it on a timer
+    # is churn dressed up as diligence.
+    stale_signature = bool(reviewed) and reviewed_vintage != vintage
+    if reviewed and not stale_signature:
+        # Signed off and still current: it stays in --all for the record, out of
+        # the reading order.
         score = 0
+    elif stale_signature:
+        hits["rilettura"] = [f"firmato sul {reviewed_vintage or 'ignoto'}, ora {vintage}"]
+        score += FLAG_WEIGHT["rilettura"]
     return {
         "id": key,
         "code": sources.indicator_code(meta["family"], meta["raw_id"]),
@@ -158,7 +182,9 @@ def assess(key, entry, view=None):
         "name": meta["name"],
         "indexable": meta["indexable"],
         "written": sum(1 for field, _ in fields if field.startswith("sections.")),
-        "reviewed_at": reviewed,
+        "reviewed_at": "" if stale_signature else reviewed,
+        "signed_vintage": reviewed_vintage,
+        "vintage": vintage,
         "flags": hits,
         "score": score,
     }
