@@ -162,12 +162,21 @@ def recent_chain_commits(limit=12):
 
 
 def open_pull_requests():
-    """Le PR della catena, se `gh` c'e'. Senza, la sezione lo dice e basta."""
-    result = subprocess.run(
-        ["gh", "pr", "list", "-R", REPO, "--state", "all", "--limit", "10",
-         "--json", "number,title,state,headRefName,createdAt"],
-        cwd=str(PROJECT_ROOT), capture_output=True, text=True,
-    )
+    """Le PR della catena, se `gh` c'e'. Senza, la sezione lo dice e basta.
+
+    `gh` puo' mancare del tutto: la web app usa il GitHub MCP e non installa la
+    CLI, e allora `subprocess.run` solleva FileNotFoundError prima ancora di
+    arrivare al controllo del returncode. Va trattato come "gh non c'e'", non
+    come un crash: il cruscotto deve leggere senza rompersi anche quando l'unica
+    cosa assente e' l'elenco delle PR (lo pretende TheDashboardReadsWithoutBreaking)."""
+    try:
+        result = subprocess.run(
+            ["gh", "pr", "list", "-R", REPO, "--state", "all", "--limit", "10",
+             "--json", "number,title,state,headRefName,createdAt"],
+            cwd=str(PROJECT_ROOT), capture_output=True, text=True,
+        )
+    except (FileNotFoundError, OSError):
+        return None
     if result.returncode != 0:
         return None
     try:
