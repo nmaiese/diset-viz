@@ -78,6 +78,11 @@ Si comincia sempre da qui:
 .venv/bin/python -m scripts.indicator_brief bes-01SAL001 --level provincia
 ```
 
+Il brief è per livello, in ogni sua parte: cifre, stato dell'articolo e `vintage`
+richiesto. Chiudendo, stampa il valore che il campo `level` deve avere. Prima
+ignorava il livello nel blocco finale, quindi su `--level provincia` dichiarava
+scritte le sezioni dell'articolo *regionale* davanti a una pagina vuota.
+
 Il brief stampa la graduatoria completa con la variazione di ogni territorio dal
 primo anno, dove la distribuzione si spezza davvero, chi si è mosso in
 controtendenza e che cosa la pagina dice già da sola. Esiste per una ragione
@@ -190,7 +195,11 @@ quasi sempre un'approssimazione ("circa 27%", "quasi 78%").
 indicatori è confrontato con una fixture estratta dal codice precedente, e ogni
 pagina viene resa per verificare che non ci siano 500.
 
-Restano **fuori dai test**, e vanno rivisti a mano:
+Restano **fuori dai test**, e vanno rivisti a mano. Non a memoria, però:
+`.venv/bin/python -m scripts.review_queue` cerca esattamente questi pattern e
+mette in fila gli articoli per quanto è probabile che siano sbagliati, e
+`.claude/agents/indicator-reviewer.md` è l'agente che li legge. Un articolo
+firmato porta `reviewed_at` ed esce dalla coda.
 
 - le affermazioni universali su un andamento ("è cresciuto ovunque"): il brief
   ha un blocco apposta, `SI MUOVONO CONTROCORRENTE`,

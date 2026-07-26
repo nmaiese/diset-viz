@@ -80,7 +80,14 @@ Always start from the deterministic data brief, never from ad-hoc API calls:
 ```bash
 .venv/bin/python -m scripts.indicator_brief ter-178     # everything about one indicator
 .venv/bin/python -m scripts.text_queue                  # what still needs an editor
+.venv/bin/python -m scripts.review_queue                # what still needs a reader
 ```
+
+An article is written for **one territorial level** and used only there, so it
+declares `"level"` and both queues have one row per (indicator, level). Four
+agents own the chain, each with a file in `.claude/agents/` and a deterministic
+queue: `indicator-hunter`, `indicator-curator`, `indicator-writer`,
+`indicator-reviewer`.
 
 Rules, guards and the "who owns what" table are in
 [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md). The editorial voice is

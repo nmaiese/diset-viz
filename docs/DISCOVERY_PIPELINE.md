@@ -78,17 +78,25 @@ Colonne in `scripts/discovery.py:CANDIDATE_COLUMNS`. I campi chiave:
 | `duplicate_of` | id dell'indicatore esistente più simile, se c'è, **qualificato per famiglia** (`bes:<id>`, `multiscopo:<id>`, o id numerico per i territoriali) |
 | `freshness_status` | `current` ≥2025, `recent` ≥2023, `dated` ≥2020, `stale` prima |
 | `priority_score` | 0..1, fresco + regionale + copertura + novità |
-| `triage_status` | `new` → `approved`/`rejected`/`needs-info` → `promoted` |
+| `triage_status` | `new` → `approved`/`rejected`/`needs-info` → `promoted` (scritto da `promote_candidates.py`, non a mano) |
 
 ## Cosa succede in promozione, per tipo di match
 
 - **`compatible` / `proxy` con `duplicate_of`**: arricchisce l'indicatore esistente
   (`target_indicator_id = duplicate_of`), aggiunge freschezza e provenienza
   multifonte. `score_eligible=false` sempre (la valutazione resta manuale).
-- **`new`**: diventa una **voce d'atlante autonoma** con id nel namespace
-  `eur:<dataset>` e `atlas_eligible=true`. Resta fuori dai profili regionali
+- **`new`**: diventa una **voce d'atlante autonoma** con id nel namespace della
+  **famiglia della sua fonte** (`eur:` per Eurostat, `dem:` per gli indicatori
+  demografici Istat) e `atlas_eligible=true`. Resta fuori dai profili regionali
   (`profile_eligible=false`) e dallo scoring (`score_eligible=false`) finché la
   direzione non è revisionata a mano.
+
+  Il namespace non è un dettaglio estetico: decide l'istituzione, l'etichetta e
+  la licenza che il lettore vede in pagina. Era cablato a `eur:`, quindi con un
+  secondo adapter attivo una serie Istat sarebbe uscita sotto il nome di
+  Eurostat. La mappa fonte -> famiglia sta in `discovery.FEED_FAMILY`, rispecchia
+  i `feeds` di `app/sources.py`, e i due mirror sono appaiati da
+  `tests/test_discovery.py`.
 
 ## Fase 2 (implementata): indicatori nuovi come voci di catalogo di prima classe
 
@@ -146,6 +154,33 @@ Dove entra l'indicatore dopo la cura:
 Tutto sotto gate PR: la modifica al punteggio è visibile nel diff e va live solo
 al merge.
 
+### Osservazioni non definitive
+
+Gli adapter scartano le osservazioni marcate come stima, provvisorio o previsione
+(`e`, `p`, `f` in `OBS_STATUS` per Istat, nella mappa `status` JSON-stat per
+Eurostat). Il campo non era letto da nessuna parte, e le proiezioni Istat del
+2026 sugli indicatori demografici, tutte flaggate `e`, portavano `year_max` a
+2026 e `priority_score` a 1.0: il principio "vince il dato più fresco" veniva
+aggirato da una cifra che Istat rivedrà. La lista è volutamente stretta, perché
+`b` (rottura di serie), `d` (definizione diversa) e `u` (bassa affidabilità)
+sono valori definitivi con un'avvertenza e scartarli butterebbe via dati buoni.
+
+### Aggiungere un adapter
+
+Tre righe, in tre posti che i test tengono allineati:
+
+1. la famiglia in `app/sources.py` (`acronym`, `institution`, `label`, `license`,
+   `internal_prefix`, `feeds`), oppure il nome della fonte nei `feeds` di una
+   famiglia che esiste già,
+2. `discovery.FEED_FAMILY`, il mirror stdlib della stessa mappa,
+3. il parser in `promote_candidates.PROMOTION_PARSERS`.
+
+Ne manca uno e la promozione si rifiuta con un messaggio che dice quale. Se
+l'adapter porta un tema nuovo, va registrato in
+`CANONICAL_CATEGORIES[...]["themes"]` (`app/taxonomy.py`): un tema sconosciuto
+finisce nella macro-area "Altro" e l'indicatore sparisce dai totali per
+macro-area pur restando in catalogo.
+
 ## Fase 4: lo scrittore, il testo editoriale
 
 Dopo che il curatore ha integrato e orientato un indicatore, manca il testo che
@@ -159,9 +194,40 @@ comparative e il `vintage` uguale all'`year_max` corrente (drift guard). Apre un
 PR, niente merge. È lo step che trasforma un indicatore appena integrato in una
 pagina che si legge come scritta da un giornalista.
 
-La catena completa degli agenti:
+La catena completa degli agenti, tutti definiti in `.claude/agents/`:
 
-    cacciatore -> [approvazione umana] -> curatore -> scrittore -> PR -> merge -> live
+    cacciatore -> [approvazione umana] -> curatore -> scrittore -> revisore
+                                                                      |
+                                                            PR -> merge -> live
+
+| agente | file | coda deterministica |
+| --- | --- | --- |
+| cacciatore | `indicator-hunter.md` | `data/discovery/candidates.csv` |
+| curatore | `indicator-curator.md` | `scripts/curate.py` |
+| scrittore | `indicator-writer.md` | `scripts/pending_notes.py`, `scripts/text_queue.py` |
+| revisore | `indicator-reviewer.md` | `scripts/review_queue.py` |
+
+Ogni stadio ha una coda che si calcola dai file committati, non dalla memoria di
+una sessione precedente. È la condizione perché un agente schedulato sappia su
+che cosa lavorare partendo da zero, e perché due run non si pestino i piedi.
+
+## Fase 5: il revisore, i testi che esistono già
+
+Lo scrittore produce articoli, il revisore è il motivo per cui ci si può fidare.
+Le guardie meccaniche coprono struttura, stile, `vintage`, le cifre decimali
+attribuite a una regione e le soglie asserite su un elenco di regioni. Quello che
+non possono coprire, elencato in `docs/INDICATOR_PAGES.md`, è esattamente dove si
+nascondono gli errori, e `scripts/review_queue.py` lo cerca:
+
+    universale   "ovunque", "sempre", "da anni": basta un controesempio
+    causale      "grazie a", "dipende dalle": l'indicatore non mostra meccanismi
+    esterno      un confronto fuori dal dataset senza fonte in `fonti`
+    provincia    cifre provinciali, che la regex delle regioni non legge
+    eco          una cifra che il cruscotto stampa già
+
+Nessuno di questi è un difetto di per sé. Sono le frasi in cui un difetto si
+nasconde, quindi decidono l'ordine di lettura, non un esito. Un articolo firmato
+porta `reviewed_at` (`YYYY-MM-DD`, sotto guardia) ed esce dalla coda.
 
 ### Il trigger dello scrittore (worklist deterministica)
 

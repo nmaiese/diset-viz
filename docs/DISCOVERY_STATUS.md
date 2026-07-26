@@ -29,14 +29,18 @@ senza merge.
 - Stdlib puro: gira senza il venv dell'app.
 
 ### Fase 2 — Promozione + Eurostat come famiglia d'atlante
-- `scripts/promote_candidates.py` agisce solo sui candidati `triage_status=approved`.
-  Un indicatore `new` diventa voce d'atlante autonoma con id `eur:<dataset>`;
-  un `compatible`/`proxy` arricchisce l'indicatore Istat che punta.
-- `app/eurostat_atlas.py` adatta le righe `eur:` del layer esterno al contratto
+- `scripts/promote_candidates.py` agisce solo sui candidati `triage_status=approved`,
+  con un parser per fonte (`PROMOTION_PARSERS`). Un indicatore `new` diventa voce
+  d'atlante autonoma con id nel namespace della **famiglia della sua fonte**
+  (`eur:` Eurostat, `dem:` indicatori demografici Istat), un `compatible`/`proxy`
+  arricchisce l'indicatore Istat che punta. Al termine lo script scrive da sé
+  `triage_status=promoted` in coda.
+- `app/eurostat_atlas.py` adatta le righe di **ogni famiglia esterna** al contratto
   API dell'atlante, federato in `app/atlas_catalog.py`
-  (`get_atlas_catalog`/`get_atlas_indicator`/`source_families`).
+  (`get_atlas_catalog`/`get_atlas_indicator`/`source_families`). Il prefisso
+  dell'id sceglie la famiglia, la famiglia decide istituzione, etichetta e licenza.
 - URL unificati **keyword-first**: `/indicatore/<slug>/<acr>-<id>`
-  (`ter`/`bes`/`ims`/`eur`). Lo slug (keyword) apre l'URL per la SEO, il codice
+  (`ter`/`bes`/`ims`/`eur`/`dem`). Lo slug (keyword) apre l'URL per la SEO, il codice
   con l'id è l'ultimo segmento e risolve in modo stabile anche se il nome cambia.
   I vecchi URL fanno 301. Naming e URL centralizzati in `app/sources.py`
   (etichette istituzione-first, niente gergo).
@@ -49,6 +53,20 @@ senza merge.
   `app/static/data/external/curated_descriptions.csv`.
 - Aggancio consumatori: quiz (`app/quiz.py`), selezione e motore qualità della
   vita (`app/quality_life_selection.py`, `app/quality_life_bes.py`).
+
+## Stato della catena
+
+Tutti gli stadi funzionano end-to-end, verificato con una run vera e con la rete
+viva su entrambe le fonti: `dem:OLDAGEDEPR` (indice di dipendenza degli anziani,
+Istat SDMX) è stato scoperto, approvato, promosso, curato, scritto e pubblicato.
+È la prima serie non Eurostat ad attraversare la catena, ed è servita a scoprire
+che la promozione conosceva una sola fonte e che il namespace `eur:` era cablato
+in sei punti diversi.
+
+L'indicatore è `contextual`, quindi è integrato, categorizzato e descritto ma
+**non entra nel punteggio qualità della vita**: un rapporto di dipendenza non ha
+un verso. Il percorso dello score per una famiglia nuova resta perciò non
+esercitato da questa run.
 
 ## Stato attuale dei dati (pilota)
 
@@ -79,7 +97,10 @@ python3 scripts/promote_candidates.py --offline
 python3 scripts/curate.py                       # evidenza sul verso
 python3 scripts/apply_curation.py               # pubblica curation.csv
 
-# test (tutta la suite: 183 verdi)
+# revisione dei testi gia scritti
+.venv/bin/python -m scripts.review_queue
+
+# test (tutta la suite)
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
@@ -89,11 +110,11 @@ vita del processo). Il frontend NON va ricostruito per i soli dati (la SPA legge
 
 ## Agenti
 
-Tre agenti, catena: **cacciatore -> [approvazione umana] -> curatore -> scrittore**.
-Il cacciatore e il curatore hanno il contratto in `docs/DISCOVERY_PIPELINE.md`;
-lo **scrittore** è definito in `.claude/agents/indicator-writer.md` (scrive
-l'articolo completo della pagina con numeri reali presi da
-`scripts/indicator_brief.py`, stile `content/STYLE.md`, vintage e fonti).
+Quattro agenti, tutti con un file di definizione in `.claude/agents/`:
+**cacciatore -> [approvazione umana] -> curatore -> scrittore -> revisore**.
+Ognuno ha una coda deterministica che si calcola dai file committati, così una
+sessione nuova sa su che cosa lavorare senza ricordarsi la precedente. La tabella
+sta in [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md).
 
 ## Schedulazione (fatta)
 
@@ -101,11 +122,18 @@ Cacciatore e curatore girano come **Routine Claude Code** (agenti cloud, session
 nuova a ogni firing, checkout git proprio, PR-gated). Create il 2026-07-24
 sull'environment `divarioitalia`, modello `claude-opus-4-8`:
 
-| agente | cron (UTC) | routine id |
-| --- | --- | --- |
-| cacciatore (watchlist) | `0 6 * * 1` (lun) | `trig_01VizeycZocZoeDE1RxjWj1f` |
-| curatore (verso, categoria) | `0 6 * * 4` (gio) | `trig_019EP6TnEbYnKz8VpKFaRm4g` |
-| scrittore (note d'analista) | `0 6 * * 6` (sab) | *da registrare* |
+| agente | file | cron (UTC) | routine id |
+| --- | --- | --- | --- |
+| cacciatore (watchlist) | `.claude/agents/indicator-hunter.md` | `0 6 * * 1` (lun) | `trig_01VizeycZocZoeDE1RxjWj1f` |
+| curatore (verso, categoria) | `.claude/agents/indicator-curator.md` | `0 6 * * 4` (gio) | `trig_019EP6TnEbYnKz8VpKFaRm4g` |
+| scrittore (l'articolo) | `.claude/agents/indicator-writer.md` | `0 6 * * 6` (sab) | *da registrare* |
+| revisore (i testi che esistono) | `.claude/agents/indicator-reviewer.md` | a piacere | *da registrare* |
+
+I quattro agenti hanno ora un file di definizione in `.claude/agents/`, quindi il
+prompt della Routine non deve più riprodurre il contratto a mano: basta invocare
+l'agente. Il revisore non ha una cadenza legata agli altri, perché lavora su un
+arretrato di 362 articoli e non su ciò che è appena arrivato: si lancia quando si
+vuole avanzare sulla coda, anche più volte al giorno.
 
 Lo **scrittore** ha ora un innesco deterministico: `scripts/pending_notes.py`
 elenca gli indicatori integrati senza nota (e le note col vintage indietro), così
