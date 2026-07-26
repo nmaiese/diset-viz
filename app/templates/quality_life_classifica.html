@@ -23,7 +23,7 @@
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": {% if has_eurostat %}[{ "@type": "Organization", "name": "Istat" }, { "@type": "Organization", "name": "Eurostat" }]{% else %}{ "@type": "Organization", "name": "Istat" }{% endif %},
   "isAccessibleForFree": true,
-  "license": {{ ('CC BY 3.0 IT (Istat) e CC BY 4.0 (Eurostat)' if has_eurostat else 'https://creativecommons.org/licenses/by/3.0/it/') | tojson }},
+  "license": {{ ('CC BY 4.0 (Istat) e CC BY 4.0 (Eurostat)' if has_eurostat else 'https://creativecommons.org/licenses/by/4.0/') | tojson }},
   "distribution": [
     {
       "@type": "DataDownload",

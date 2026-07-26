@@ -159,11 +159,14 @@ le sue due righe di config e la segnalazione della licenza vivono in #43.
 
 ### Tre cose che lo scout aveva trovato fuori dal proprio perimetro
 
-1. **La licenza Istat era sbagliata, ora corretta.**
-   `scripts/istat_regional_source.py`, `config/external_sources.yaml` (le quattro
-   righe Istat) e `app/sources.py` (famiglia `dem`, anche il `license_url`)
-   dichiaravano `CC BY 3.0 IT`; Istat dichiara **CC BY 4.0** su
-   <https://www.istat.it/note-legali/> (verificato). Corretto in #43.
+1. **La licenza Istat era sbagliata, ora corretta ovunque.** Istat dichiara
+   **CC BY 4.0** su <https://www.istat.it/note-legali/> (verificato), non
+   `CC BY 3.0 IT`. Corretta nel registro delle fonti e negli adapter (#43) e poi
+   in tutto il resto: le righe `istat_lavoro` del layer esterno
+   (`normalized_external_indicators.csv`) e i quattro fallback hardcoded a
+   `by/3.0/it/` nel view model (`app/indicator_view.py`), nel catalogo
+   (`app/atlas_catalog.py`) e nel JSON-LD delle pagine regione e della classifica.
+   Il test che pinnava la vecchia licenza è stato aggiornato.
 2. **`scout_sources.py` tronca la coda alfabeticamente.** Le proposte sono 87, il
    `limit=40` con punteggio uniforme ordina per nome, quindi la coda si ferma a
    "Notti in Italia" e le altre 47 non sono mai state viste da nessuno. Ancora
@@ -227,13 +230,8 @@ possono fare:
    regionale fresco.
 5. **Le due lacune di `scout_sources.py`** segnalate dallo scout (il troncamento
    alfabetico della coda e `REGIONAL_HINT` che non riconosce `- reg.`, entrambe
-   sopra). La licenza Istat, che era il terzo punto, è stata corretta in #43.
-6. **La licenza del backbone `istat_lavoro`**: le righe di quella famiglia nel
-   layer esterno (`normalized_external_indicators.csv`, tasso di disoccupazione e
-   simili) portano ancora `CC BY 3.0 IT`, committate da un refresh precedente di
-   `scripts/update_data.py`. La correzione di #43 ha sistemato la famiglia `dem` e
-   `config/external_sources.yaml`, non quelle righe già scritte. Vanno corrette al
-   prossimo refresh, o con una passata mirata sul CSV.
+   sopra). La licenza Istat, che era il terzo punto, è stata corretta ovunque
+   (vedi sopra).
 
 ## Gotcha per la prossima sessione
 

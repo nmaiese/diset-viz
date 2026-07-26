@@ -394,15 +394,16 @@ class AppSmokeTest(unittest.TestCase):
         for name, html in pages.items():
             if name == "ranking":
                 # The regional ranking can combine Istat and Eurostat, so its JSON-LD
-                # license must reflect both rather than claim Istat-only.
+                # license must reflect both rather than claim Istat-only. Istat is
+                # CC BY 4.0 (istat.it/note-legali), like Eurostat.
                 self.assertRegex(
                     html,
-                    r'"license": "(https://creativecommons\.org/licenses/by/3\.0/it/'
-                    r'|CC BY 3\.0 IT \(Istat\) e CC BY 4\.0 \(Eurostat\))"',
+                    r'"license": "(https://creativecommons\.org/licenses/by/4\.0/'
+                    r'|CC BY 4\.0 \(Istat\) e CC BY 4\.0 \(Eurostat\))"',
                     name,
                 )
             else:
-                self.assertIn('"license": "https://creativecommons.org/licenses/by/3.0/it/"', html, name)
+                self.assertIn('"license": "https://creativecommons.org/licenses/by/4.0/"', html, name)
             self.assertNotIn('"@type": "Country"', html, name)
             self.assertNotIn('"@type": "AdministrativeArea"', html, name)
             for block in re.findall(r'<script type="application/ld\+json">\s*(\{.*?\})\s*</script>', html, re.S):
