@@ -5633,6 +5633,8 @@
   "fonti": [],
   "lead": "In dieci anni le persone dai 65 anni in su ogni cento in età da lavoro sono aumentate in tutte e venti le regioni italiane, ma la Sardegna si è mossa quasi sette volte più della Liguria. La graduatoria che ne esce non separa il Nord dal Sud.",
   "level": "regione",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2025,
   "sections": [
    {
     "body": "L'indicatore mette al numeratore i residenti dai 65 anni in su e al denominatore quelli tra i 15 e i 64, e moltiplica per cento. Un valore di 40 vuol dire quaranta persone dai 65 anni in su ogni cento in età da lavoro.\n\nIl nome inganna su un punto. La parola dipendenza qui non descrive nessuna dipendenza reale, è solo il rapporto tra due fasce anagrafiche. Chi lavora a sessantasette anni sta comunque al numeratore, chi a trenta non ha mai lavorato sta comunque al denominatore. Per sapere quante persone attive sostengono davvero quante inattive serve il tasso di occupazione, non questo numero.",
@@ -5709,6 +5711,8 @@
   ],
   "lead": "Nel 2023 gli addetti a ricerca e sviluppo valgono il 2,06% della popolazione attiva in Emilia-Romagna e appena lo 0,50% in Calabria. Dietro l'Emilia-Romagna vengono il Lazio con l'1,68% e il Friuli-Venezia Giulia con l'1,64%, mentre in coda, poco sopra la Calabria, restano Sardegna e Basilicata. Tra la regione che guida e quella in fondo il rapporto è di poco più di quattro a uno.",
   "level": "regione",
+  "reviewed_at": "2026-07-26",
+  "reviewed_vintage": 2023,
   "sections": [
    {
     "body": "Eurostat conta qui tutto il personale di ricerca e sviluppo, non i soli ricercatori. Dentro ci sono anche i tecnici e il personale di supporto, e tutti i settori che la ricerca la fanno, dalle imprese alle università agli enti pubblici.\n\nLe due metà del rapporto si contano in modo diverso, e questo cambia la lettura. Il numeratore è in equivalenti a tempo pieno, quindi due persone che dedicano alla ricerca metà del proprio orario valgono una unità sola. Il denominatore è invece la popolazione attiva contata per teste. Un valore dell'1,00 dice che ogni cento persone nella forza lavoro corrisponde una unità di lavoro a tempo pieno dedicata alla ricerca, non che una persona su cento faccia il ricercatore.",
@@ -5716,7 +5720,7 @@
     "role": "definizione"
    },
    {
-    "body": "La media delle venti regioni è dell'1,16%, ma la mediana è più bassa, all'1,06%: bastano pochi territori del Nord a tenere alto il quadro, e metà delle regioni resta sotto quel valore. Il disegno ricalca quello della [spesa in ricerca e sviluppo](/indicatore/spesa-in-ricerca-e-sviluppo-sul-pil-eurostat-nuts2/eur-rd_e_gerdreg), con l'Emilia-Romagna davanti e il Mezzogiorno in fondo, solo che qui si contano le persone e non gli euro. L'Italia nel suo insieme impiega nella ricerca l'1,41% della popolazione attiva, sotto la media europea dell'1,57% ([Eurostat](https://ec.europa.eu/eurostat/databrowser/view/rd_p_perslf/default/table?lang=en)), soglia che solo cinque regioni italiane superano. Tra il 2019 e il 2023 la media regionale non si muove, resta all'1,16%, però la mediana scende dall'1,15% all'1,06%: il centro si abbassa mentre il vertice tiene, e la distanza interna si allarga invece di chiudersi. Le poche regioni che fanno ricerca riusciranno a tirarsi dietro le altre, o il divario continuerà a nutrirsi da solo?",
+    "body": "La media delle venti regioni è dell'1,16%, ma la mediana è più bassa, all'1,06%: bastano pochi territori del Nord a tenere alto il quadro, e metà delle regioni resta sotto quel valore. Il disegno ricalca quello della [spesa in ricerca e sviluppo](/indicatore/spesa-in-ricerca-e-sviluppo-sul-pil-eurostat-nuts2/eur-rd_e_gerdreg), con l'Emilia-Romagna davanti e il Mezzogiorno in fondo, solo che qui si contano le persone e non gli euro. L'Italia nel suo insieme impiega nella ricerca l'1,41% della popolazione attiva, sotto la media europea dell'1,57% ([Eurostat](https://ec.europa.eu/eurostat/databrowser/view/rd_p_perslf/default/table?lang=en)), soglia che solo cinque regioni italiane superano. Tra il 2019 e il 2023 la media regionale non si muove, resta all'1,16%, però la mediana scende dall'1,15% all'1,06%: il centro si abbassa mentre il vertice tiene, e la distanza interna si allarga invece di chiudersi.",
     "h": null,
     "role": "quadro"
    },
