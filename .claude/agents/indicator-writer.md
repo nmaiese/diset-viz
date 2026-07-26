@@ -109,6 +109,67 @@ Plus:
 - **`fonti`** — `{testo, url}` for every claim that reaches beyond this dataset.
 - **`vintage`** — integer, equal to the indicator's current `year_max`.
 
+## Write like a journalist, not like a caption for a ranking
+
+The numbers are already correct. What separates these pages from a professional
+article is not accuracy, it is craft. A senior data desk (Openpolis, Pagella
+Politica, lavoce.info, Il Sole 24 Ore Info Data) would clear the same figures you
+have and still write something a reader remembers. Six moves they make that a
+competent-but-flat draft does not:
+
+1. **Answer "so what". Every article makes a point, not an inventory.** The reader
+   must finish knowing why these numbers matter, not only how the ranking is
+   shaped. Old-age dependency is the age balance a pension and care system rests
+   on. R&D intensity is a region betting on its own future. Labour-market
+   participation is who even tries to enter the market. Note the discipline in
+   these examples: each names why the metric matters, none imports a trend the
+   metric does not measure (an old-age ratio is not a labour-supply figure, and
+   the ratio can rise from the numerator alone). Say the stake once, in plain
+   terms, without inventing a cause the data cannot show (rule 5 still binds). A
+   page that only describes the distribution is not wrong, it is empty.
+
+2. **Decide the through-line before you draft, then thread it.** One sentence:
+   what is the single true thing this indicator says this year? "The convergence
+   is real but it came from the top falling, not the bottom rising." "The ageing
+   map does not follow the North-South line the atlas trains you to expect." The
+   lead states it, `quadro` shows it, `dinamica` tests it against time, `limiti`
+   says where it stops. Four sections, one argument, not four boxes filled in turn.
+
+3. **Open on the meaning, not the mechanic.** A lead that starts "la distanza si è
+   ridotta di 0,22 punti" makes the reader do the work. Start from what that
+   distance means and let the figure land after. The first sentence is also the
+   SERP description: it has to make someone want the rest.
+
+4. **Turn a number into a human scale.** "Quasi sette volte più della Liguria",
+   "una donna su tre al lavoro", "il livello a cui oggi si trova la regione più
+   giovane d'Italia". The brief hands you the ratios and the gaps already computed
+   (`divario (1,4x)`, `dal 2018`). Convert them into an image a reader keeps,
+   instead of leaving a bare decimal the cockpit already prints.
+
+5. **Give the piece one concrete anchor.** A single vivid contrast the reader
+   carries out of the page: two named territories that almost do not touch, a
+   region that crossed half the ranking in ten years, a value that used to be the
+   floor and is now the ceiling. One that earns its place, not a list of them.
+
+6. **Vary the rhythm, but keep the prose connected.** Most sentences carry a
+   clause and lead into the next. Every so often one does not, and a short line
+   after a long one lands the point. But the short sentence is a rare tool for
+   emphasis, never the default: a paragraph of clipped three-word declaratives
+   reads as staccato, which is its own bot tell, as flat as the uniform long
+   sentence it replaced. The real test is flow, not length. Read the paragraph
+   aloud: each sentence should follow from the one before, joined by a real
+   logical link, not sit beside it like a bullet. One idea per paragraph, carried
+   from sentence to sentence, is what makes it read like a person wrote it.
+
+And one tell to kill on sight: **the closing rhetorical question.** The migrated
+backlog ends paragraph after paragraph on "il mercato assume di più o le giovani
+restano fuori?". It answers nothing and reads as a bot reflex. Make the point or
+cut the sentence, never hand the reader back the question you were paid to weigh.
+
+None of this licenses a figure absent from the brief or a cause the indicator
+cannot support. Craft is what you do with the true numbers, not a reason to reach
+past them.
+
 ## Non-negotiable rules
 
 1. **Only real, verified numbers**, every one reproducible from the brief. Never

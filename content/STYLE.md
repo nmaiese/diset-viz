@@ -26,14 +26,51 @@ automatico.
 - Voce attiva, soggetti concreti, verbi semplici.
 - Numeri precisi e verificati al posto degli aggettivi vaghi.
 
+## Tecniche da giornalista (fai così)
+
+I numeri, da soli, non sono un articolo. Un buon desk di data journalism
+(Openpolis, Pagella Politica, lavoce.info, Info Data del Sole 24 Ore) parte dalle
+stesse cifre e scrive un pezzo che il lettore ricorda. Sei mosse:
+
+- **Rispondi a "e allora?".** Ogni pezzo fa un punto, non un inventario. Il
+  lettore deve finire sapendo perché quei numeri contano, non solo che forma ha la
+  classifica. Un rapporto tra fasce d'età è un peso previdenziale e di cura, la
+  spesa in ricerca è la scommessa di un territorio sul proprio futuro. Di' la
+  posta in gioco una volta, in parole semplici, senza inventare una causa che il
+  dato non mostra.
+- **Decidi il filo prima di scrivere, poi tienilo.** Una frase sola: qual è
+  l'unica cosa vera che questo dato dice quest'anno? Il titolo la annuncia, i
+  paragrafi la reggono. Non paragrafi separati messi in fila, un'idea che avanza.
+- **Apri sul significato, non sulla meccanica.** Un incipit tipo "la distanza si è
+  ridotta di 0,22 punti" fa lavorare il lettore. Parti da cosa vuol dire quella
+  distanza, la cifra arriva dopo.
+- **Trasforma un numero in una scala umana.** "Quasi sette volte più veloce", "una
+  donna su tre al lavoro", "tre volte la media". Un'immagine che resta, non un
+  decimale nudo.
+- **Dai al pezzo un ancoraggio concreto.** Un solo contrasto vivido che il lettore
+  porta via, due territori che quasi non si sfiorano, un valore che era il fondo e
+  ora è la vetta. Uno che se lo merita, non una lista.
+- **Varia il ritmo, ma tieni le frasi collegate.** Quasi tutte le frasi hanno una
+  subordinata e portano alla successiva. Ogni tanto una no, e una riga breve dopo
+  una lunga fa cadere il punto. La frase corta però è uno strumento raro, per dare
+  enfasi, non la regola: un paragrafo di frasette secche di tre parole suona a
+  singhiozzo, ed è un tell da bot tanto quanto il periodare uniforme che sostituisce.
+  Il metro non è la lunghezza, è il flusso. Rileggi il paragrafo ad alta voce, ogni
+  frase deve nascere dalla precedente, non stare accanto come una voce di elenco.
+
 ## Schemi da evitare (suonano da bot)
 
 - Strutture parallele ripetute: "non solo X, ma anche Y", "non è X, è Y" usato di
   continuo, le triadi di aggettivi.
 - Il "due punti drammatico" a fine di ogni paragrafo.
 - Chiuse retoriche tipo "In conclusione", "In sintesi", "Insomma", "In definitiva".
+- La domanda retorica in chiusura di paragrafo ("il mercato assume di più o le
+  giovani restano fuori?"). Non risponde a niente e suona da bot. Fai il punto o
+  taglia la frase.
 - Avverbi gonfi: "davvero", "assolutamente", "incredibilmente", "chiaramente".
 - Frasi-slogan tipo "Leggere X significa leggere Y".
+- Prosa a singhiozzo: frasi tutte corte e slegate, accostate senza un nesso, che
+  si leggono come un elenco puntato travestito da paragrafo.
 - Gergo e paroloni quando basta una parola comune.
 
 ## Struttura: utile, non seriale
