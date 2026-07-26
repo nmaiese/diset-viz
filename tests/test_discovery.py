@@ -362,6 +362,128 @@ class IstatRegionalAdapter(unittest.TestCase):
                 self.assertEqual(cand["source"], "istat_demografia")
                 self.assertEqual(cand["territory_level"], "regione")
                 self.assertEqual(cand["triage_status"], "new")
+                self.assertTrue(cand["discovered_at"], "every candidate carries provenance")
+
+
+class MultiSourcePromotion(unittest.TestCase):
+    """Every hunter adapter must be able to reach the atlas under its own name.
+
+    The hunter grew a second adapter while promotion still hardcoded
+    `source != "eurostat_regional"` and a fixed `eur:` namespace. The result was
+    two candidates permanently stuck at the top of the queue, and a trap behind
+    them: wiring only the parser would have published an Istat series at
+    /indicatore/<slug>/eur-... under Eurostat's name and licence.
+    """
+
+    def test_every_feed_has_a_promotion_parser_and_a_family(self):
+        for feed in discovery.FEED_FAMILY:
+            with self.subTest(feed=feed):
+                self.assertIn(feed, promote_candidates.PROMOTION_PARSERS)
+        for feed in promote_candidates.PROMOTION_PARSERS:
+            with self.subTest(feed=feed):
+                self.assertIn(feed, discovery.FEED_FAMILY)
+
+    def test_the_stdlib_mirrors_match_the_app_source_registry(self):
+        """discovery.FAMILY_PREFIX / FEED_FAMILY are copies of app/sources.py.
+
+        They are copied because the discovery scripts are stdlib-only, and a
+        silent drift here does not crash: it mislabels an indicator's
+        institution and licence on a public page.
+        """
+        from app import sources
+
+        self.assertEqual(
+            discovery.FAMILY_PREFIX,
+            {family: meta["internal_prefix"] for family, meta in sources.SOURCES.items()},
+        )
+        self.assertEqual(discovery.FEED_FAMILY, dict(sources.FAMILY_BY_FEED))
+
+    def test_a_new_series_takes_its_own_familys_namespace(self):
+        istat = {"definition_match": "new", "duplicate_of": "",
+                 "source": "istat_demografia", "source_indicator_id": "OLDAGEDEPR",
+                 "candidate_id": "istat_demografia:OLDAGEDEPR"}
+        euro = {"definition_match": "new", "duplicate_of": "",
+                "source": "eurostat_regional", "source_indicator_id": "rd_e_gerdreg",
+                "candidate_id": "eurostat_regional:rd_e_gerdreg"}
+        self.assertEqual(promote_candidates._target_id(istat), "dem:OLDAGEDEPR")
+        self.assertEqual(promote_candidates._target_id(euro), "eur:rd_e_gerdreg")
+
+    def test_an_unknown_source_is_refused_not_guessed(self):
+        candidate = {"definition_match": "new", "duplicate_of": "",
+                     "source": "invalsi", "source_indicator_id": "x",
+                     "candidate_id": "invalsi:x"}
+        with self.assertRaises(SystemExit):
+            promote_candidates._target_id(candidate)
+
+    def test_repromotion_keeps_the_curators_decision(self):
+        """A refresh must not undo a review.
+
+        The promoter fills the manifest from the candidate, so re-promoting an
+        integrated series wrote the *proposed* direction, score_eligible=false
+        and status=proposed over the curator's work, silently dropping a live
+        indicator out of the quality-of-life score.
+        """
+        existing = [{
+            "target_indicator_id": "eur:rd_p_persreg", "source": "eurostat_regional",
+            "source_indicator_id": "rd_p_persreg", "new_year": "2023",
+            "direction": "higher_better", "score_eligible": "true",
+            "status": "integrated", "review_notes": "Verso confermato dai dati.",
+        }]
+        fresh = [{
+            "target_indicator_id": "eur:rd_p_persreg", "source": "eurostat_regional",
+            "source_indicator_id": "rd_p_persreg", "new_year": "2024",
+            "direction": "contextual", "score_eligible": "false",
+            "status": "proposed", "review_notes": "Voce d'atlante autonoma.",
+        }]
+        merged = promote_candidates._merge_manifest(existing, fresh)
+        self.assertEqual(len(merged), 1)
+        row = merged[0]
+        self.assertEqual(row["new_year"], "2024", "data fields refresh")
+        self.assertEqual(row["direction"], "higher_better")
+        self.assertEqual(row["score_eligible"], "true")
+        self.assertEqual(row["status"], "integrated")
+        self.assertEqual(row["review_notes"], "Verso confermato dai dati.")
+
+    def test_a_proposed_entry_is_overwritten_normally(self):
+        existing = [{"target_indicator_id": "dem:X", "source": "istat_demografia",
+                     "source_indicator_id": "X", "status": "proposed",
+                     "direction": "contextual", "score_eligible": "false", "review_notes": ""}]
+        fresh = [{"target_indicator_id": "dem:X", "source": "istat_demografia",
+                  "source_indicator_id": "X", "status": "proposed",
+                  "direction": "higher_better", "score_eligible": "false", "review_notes": "nuova"}]
+        merged = promote_candidates._merge_manifest(existing, fresh)
+        self.assertEqual(merged[0]["direction"], "higher_better")
+        self.assertEqual(merged[0]["review_notes"], "nuova")
+
+
+class NonFinalObservations(unittest.TestCase):
+    """Estimates must not win the freshness ranking.
+
+    Istat flags the current year 'e' on the demographic indicators. Nothing read
+    OBS_STATUS, so an estimate set year_max, scored `current` and put the
+    candidate at the top of the queue ahead of series with published years.
+    """
+
+    def test_istat_drops_estimated_observations(self):
+        rows = istat_regional_source.fetch_rows("OLDAGEDEPR", offline=True)
+        final = istat_regional_source.parse_regional(rows, "OLDAGEDEPR")
+        everything = istat_regional_source.parse_regional(rows, "OLDAGEDEPR", include_non_final=True)
+        years = lambda data: {int(y) for values in data.values() for y in values}
+        self.assertTrue(years(everything) - years(final), "the fixture must carry an estimate")
+        for row in rows:
+            if (row.get("OBS_STATUS") or "").strip().lower() in istat_regional_source.NON_FINAL_STATUSES:
+                self.assertNotIn(int(row["TIME_PERIOD"]), years(final))
+
+    def test_only_estimate_like_codes_are_dropped(self):
+        """'b' (break), 'd' (definition differs) and 'u' (low reliability) are
+        final values with a caveat. Dropping them would discard real data."""
+        for code in ("b", "d", "u", "", "a"):
+            self.assertNotIn(code, istat_regional_source.NON_FINAL_STATUSES)
+        self.assertEqual(
+            istat_regional_source.NON_FINAL_STATUSES,
+            eurostat_source.NON_FINAL_STATUSES,
+            "both adapters must apply the same rule",
+        )
 
 
 if __name__ == "__main__":

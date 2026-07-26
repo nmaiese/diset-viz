@@ -48,7 +48,32 @@ SOURCES = {
         "label": "Eurostat, statistiche regionali",
         "short_label": "Statistiche regionali europee",
         "internal_prefix": "eur:",
+        "license": "CC BY 4.0 (Eurostat)",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "feeds": ("eurostat_regional",),
     },
+    "istat_demografia": {
+        "acronym": "dem",
+        "institution": "Istat",
+        "label": "Istat, indicatori demografici",
+        "short_label": "Indicatori demografici",
+        "internal_prefix": "dem:",
+        "license": "CC BY 3.0 IT (Istat)",
+        "license_url": "https://creativecommons.org/licenses/by/3.0/it/",
+        "feeds": ("istat_demografia",),
+    },
+}
+
+# Families whose indicators are published through the normalized external layer
+# (discovery -> promotion -> app.eurostat_atlas), rather than from a committed
+# backbone CSV. `feeds` names the hunter adapters that write into them: several
+# adapters can land in one family, so adding a second demographic dataflow does
+# NOT mint a new URL acronym.
+EXTERNAL_FAMILIES = tuple(family for family, meta in SOURCES.items() if meta.get("feeds"))
+FAMILY_BY_FEED = {
+    feed: family
+    for family, meta in SOURCES.items()
+    for feed in meta.get("feeds", ())
 }
 
 FAMILY_BY_ACRONYM = {meta["acronym"]: family for family, meta in SOURCES.items()}
@@ -101,6 +126,25 @@ def institutions_label(families):
 
 def acronym(family):
     return SOURCES[family]["acronym"]
+
+
+def family_for_feed(feed):
+    """The catalog family a hunter adapter promotes into, e.g.
+    'istat_demografia' -> 'istat_demografia', 'eurostat_regional' -> 'eurostat'.
+
+    The promotion step needs this to mint the public id, and it lives here
+    rather than in scripts/ because the id namespace and the user-facing
+    institution have to agree: an Istat series published under the Eurostat
+    namespace would carry Eurostat's name and licence on the page. Returns None
+    for a feed with no family, which the promoter refuses rather than guesses.
+    """
+    return FAMILY_BY_FEED.get(feed)
+
+
+def family_license(family):
+    """(license, license_url) for an external family, empty strings if unset."""
+    meta = SOURCES[family]
+    return meta.get("license", ""), meta.get("license_url", "")
 
 
 def internal_id(family, raw_id):

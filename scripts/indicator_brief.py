@@ -51,6 +51,16 @@ def _resolve(code):
     return "territorial", code
 
 
+def _text_for_level(indicator_id, level_key):
+    """The stored entry only if it was written for this level, else None."""
+    from app.indicator_texts import DEFAULT_LEVEL
+
+    entry = get_text(indicator_id)
+    if not entry:
+        return None
+    return entry if (entry.get("level") or DEFAULT_LEVEL) == level_key else None
+
+
 def build_brief(family, raw_id, level_key=None):
     view = build_indicator_view(family, raw_id)
     if view is None:
@@ -81,8 +91,12 @@ def build_brief(family, raw_id, level_key=None):
         "level": level,
         "stats": stats,
         "rows": rows,
-        "article": build_article(meta["id"]),
-        "has_text": get_text(meta["id"]) is not None,
+        # Both keyed on the level actually being briefed. Without it, asking for
+        # `--level provincia` printed the state of the *regional* article: on a
+        # two-level BES the brief said "lead scritto, quadro scritto" while the
+        # provincial page was still the composed skeleton from top to bottom.
+        "article": build_article(meta["id"], level["key"]),
+        "has_text": _text_for_level(meta["id"], level["key"]) is not None,
         "breaks": _distribution_breaks(rows),
         "against_the_grain": _against_the_grain(rows, stats),
     }
@@ -220,6 +234,9 @@ def render(brief):
         add(f"  {section['role']:<12} {status}")
         add(f"  {'':<12} h2: {title}")
     add(f"  vintage  {article['vintage'] or 'assente'}   (deve valere {level['year_max']})")
+    add(f"  livello  {level['key']}   (l'articolo va scritto con \"level\": \"{level['key']}\")")
+    if len(brief["view"]["levels"]) > 1:
+        add("           un articolo vale per un livello solo, gli altri restano composti")
     add("-" * 78)
     return "\n".join(out)
 

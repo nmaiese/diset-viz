@@ -22,6 +22,8 @@ import time
 import urllib.request
 from pathlib import Path
 
+from scripts import discovery
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_DIR = PROJECT_ROOT / "data" / "discovery" / "fixtures" / "eurostat"
 CACHE_DIR = PROJECT_ROOT / "data" / "eurostat_cache"
@@ -45,15 +47,12 @@ NUTS2_TO_REGION = {
     "ITF5": "basilicata", "ITF6": "calabria", "ITG1": "sicilia", "ITG2": "sardegna",
 }
 
-REGION_NAMES = {
-    "piemonte": "Piemonte", "valle-d-aosta": "Valle d'Aosta", "liguria": "Liguria",
-    "lombardia": "Lombardia", "trentino-alto-adige": "Trentino Alto Adige",
-    "veneto": "Veneto", "friuli-venezia-giulia": "Friuli-Venezia Giulia",
-    "emilia-romagna": "Emilia-Romagna", "toscana": "Toscana", "umbria": "Umbria",
-    "marche": "Marche", "lazio": "Lazio", "abruzzo": "Abruzzo", "molise": "Molise",
-    "campania": "Campania", "puglia": "Puglia", "basilicata": "Basilicata",
-    "calabria": "Calabria", "sicilia": "Sicilia", "sardegna": "Sardegna",
-}
+# The shared 20 regional keys (scripts/discovery.py), so every adapter joins on
+# the same ones. Kept under this module's original name: it is part of its API.
+REGION_NAMES = discovery.REGION_NAMES
+
+# Same rule, same reason as scripts/istat_regional_source.NON_FINAL_STATUSES.
+NON_FINAL_STATUSES = frozenset({"e", "p", "f"})
 REGION_COUNT = 20
 MIN_COVERAGE = 0.8
 
@@ -164,9 +163,17 @@ def fetch_dataset(series_id, offline=True, refresh=False, max_age=CACHE_MAX_AGE)
     return _cached_fetch(dataset, series["params"], refresh, max_age)
 
 
-def _nuts_year_values(doc):
+def _nuts_year_values(doc, include_non_final=False):
     """{nuts: {year: value}} straight from a JSON-stat doc, general over the
-    number of pinned (size-1) dimensions (only geo and time vary here)."""
+    number of pinned (size-1) dimensions (only geo and time vary here).
+
+    JSON-stat carries a parallel ``status`` map keyed by the same flat index.
+    Cells flagged not final (see NON_FINAL_STATUSES) are dropped unless
+    `include_non_final`, the same rule the Istat adapter applies to OBS_STATUS,
+    so no family can win the freshness ranking with a year it has only
+    estimated. Only estimate-like codes are dropped: 'b' (break), 'd'
+    (definition differs) and 'u' (low reliability) are final values.
+    """
     dims = doc["id"]
     sizes = doc["size"]
     strides = [1] * len(dims)
@@ -175,6 +182,7 @@ def _nuts_year_values(doc):
     geo_index = doc["dimension"]["geo"]["category"]["index"]
     time_index = doc["dimension"]["time"]["category"]["index"]
     values = doc["value"]
+    status = {} if include_non_final else (doc.get("status") or {})
 
     def flat(geo_idx, time_idx):
         pos = 0
@@ -186,9 +194,13 @@ def _nuts_year_values(doc):
     out = {}
     for nuts, geo_idx in geo_index.items():
         for year, time_idx in time_index.items():
-            value = values.get(str(flat(geo_idx, time_idx)))
-            if value is not None:
-                out.setdefault(nuts, {})[year] = float(value)
+            cell = str(flat(geo_idx, time_idx))
+            value = values.get(cell)
+            if value is None:
+                continue
+            if str(status.get(cell) or "").strip().lower() in NON_FINAL_STATUSES:
+                continue
+            out.setdefault(nuts, {})[year] = float(value)
     return out
 
 

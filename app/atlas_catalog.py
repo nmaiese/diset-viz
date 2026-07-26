@@ -6,7 +6,7 @@ to the public atlas API contract, using namespaced ids so the two source
 families can coexist without collisions or accidental double counting.
 """
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 from functools import lru_cache
 import unicodedata
 
@@ -45,6 +45,20 @@ def _region_sort_key(name):
         return REGION_ORDER.index(name)
     except ValueError:
         return len(REGION_ORDER)
+
+
+def _is_external_id(indicator_id):
+    """True for a public id served by the external layer (eur:, dem:, ...).
+
+    Derived from the source registry rather than pinned to one prefix, so a new
+    externally sourced family resolves here the day it is registered.
+    """
+    value = str(indicator_id)
+    return any(
+        sources.SOURCES[family]["internal_prefix"]
+        and value.startswith(sources.SOURCES[family]["internal_prefix"])
+        for family in sources.EXTERNAL_FAMILIES
+    )
 
 
 def _bes_public_id(indicator_id):
@@ -313,6 +327,10 @@ def get_atlas_catalog():
         }
         for item in all_eurostat_indicators()
     ] if has_eurostat_data() else []
+    # `eurostat_indicators` holds every externally sourced family, not only
+    # Eurostat: each entry already carries its own `catalog_family`, so the
+    # per-family counts below are derived from the entries instead of assumed.
+    external_counts = Counter(item["catalog_family"] for item in eurostat_indicators)
     all_families = legacy_indicators + bes_indicators + multiscopo_indicators + eurostat_indicators
     for item in all_families:
         category = item.get("quality_life_category")
@@ -376,7 +394,7 @@ def get_atlas_catalog():
                 ("territorial", len(legacy_indicators)),
                 ("bes", len(bes_indicators)),
                 ("multiscopo", len(multiscopo_indicators)),
-                ("eurostat", len(eurostat_indicators)),
+                *((family, external_counts.get(family, 0)) for family in sources.EXTERNAL_FAMILIES),
             )
             if count
         ],
@@ -417,7 +435,7 @@ def get_atlas_indicator(indicator_id):
                 ),
             },
         }
-    if str(indicator_id).startswith(sources.SOURCES["eurostat"]["internal_prefix"]):
+    if _is_external_id(indicator_id):
         payload = get_eurostat_atlas_indicator(str(indicator_id))
         if payload is None:
             return None

@@ -38,7 +38,9 @@
 
 
 {% macro definizione(meta, level) %}
-{% set explain = meta.explain %}
+{# Level-scoped: `scope` and `caveat` name the territorial level, so they
+   come from the rendered level, never from meta (which spans all levels). #}
+{% set explain = level.explain or meta.explain %}
 {% if explain.plain %}<p>{{ explain.plain }}</p>{% endif %}
 <p>{{ explain.example }}</p>
 {% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
@@ -107,7 +109,7 @@
    compute, not what the indicator measures, so it belongs to the apparatus and
    must survive an authored `limiti` replacing this composed one. #}
 {% macro limiti(meta, level) %}
-<p>{{ meta.explain.caveat }}</p>
+<p>{{ (level.explain or meta.explain).caveat }}</p>
 {% if level.coverage is not none and level.coverage < 1 %}
 <p>Nell'anno più recente la copertura è parziale, {{ level.observations | length }} {{ level.plural }} su {{ level.territory_total }}. I territori mancanti non entrano in nessuno dei calcoli di questa pagina.</p>
 {% endif %}

@@ -33,7 +33,7 @@ from app.multiscopo_data import (
 )
 from app.eurostat_atlas import all_eurostat_indicators, get_eurostat_atlas_indicator, has_eurostat_data
 from app.taxonomy import DUPLICATE_BES_IDS, category_metadata
-from app import profiles
+from app import profiles, sources
 
 COMPARE_CHOICES = ("region_a", "region_b", "timeout")
 ORDER_COUNTS = (3, 5)
@@ -53,7 +53,13 @@ _BES_PREFIX = "bes:"
 _BES_MIN_YEAR = 2025
 _MULTI_PREFIX = "multiscopo:"
 _MULTI_MIN_YEAR = 2023
-_EUR_PREFIX = "eur:"
+# Every family served by the external layer, not just Eurostat. Pinning the
+# single literal "eur:" here meant a promoted Istat series entered the quiz pool
+# (it is atlas-eligible) but its payload fell through to the territorial loader,
+# which returned None and crashed the round mid-question.
+_EXTERNAL_PREFIXES = tuple(
+    sources.SOURCES[family]["internal_prefix"] for family in sources.EXTERNAL_FAMILIES
+)
 
 
 @cache.memoize(timeout=3600)
@@ -168,7 +174,7 @@ def _quiz_indicator_payload(indicator_id, year):
         return _bes_region_payload(indicator_id, year)
     if indicator_id.startswith(_MULTI_PREFIX):
         return _multi_region_payload(indicator_id, year)
-    if indicator_id.startswith(_EUR_PREFIX):
+    if indicator_id.startswith(_EXTERNAL_PREFIXES):
         return _eurostat_region_payload(indicator_id, year)
     return get_indicator_year(indicator_id, year)
 

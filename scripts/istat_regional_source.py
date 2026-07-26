@@ -30,7 +30,7 @@ import csv
 import re
 from pathlib import Path
 
-from scripts import istat_sdmx, multiscopo_sources
+from scripts import discovery, istat_sdmx, multiscopo_sources
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_DIR = PROJECT_ROOT / "data" / "discovery" / "fixtures" / "istat"
@@ -50,6 +50,22 @@ START_YEAR = 2015
 REGION_CODE_RE = re.compile(r"^IT[A-Z]\d$")
 REGION_COUNT = 20
 MIN_COVERAGE = 0.8
+
+# SDMX observation statuses that mean "not final yet". Istat flags the current
+# year 'e' on the demographic indicators, because the 1 January population it is
+# computed on is itself an estimate that will be revised.
+#
+# Nothing in the app read this field, so the 2026 estimates presented themselves
+# as observations: they set year_max, won `freshness_status=current` and put the
+# candidate at the top of the queue with priority_score 1.0, ahead of series with
+# real published years. Worse downstream, the writer would have pinned a
+# `vintage` to numbers Istat will change, and the drift guard only notices a NEW
+# year, never a REVISED value, so the prose would have gone quietly wrong.
+#
+# Deliberately narrow. 'b' (break in series), 'd' (definition differs) and 'u'
+# (low reliability) are final values with a caveat, and dropping them would
+# throw away good observations.
+NON_FINAL_STATUSES = frozenset({"e", "p", "f"})
 
 # Bolzano (ITD1) + Trento (ITD2) -> Trentino Alto Adige. Reuse the Multiscopo
 # population weights so the split is combined identically across Istat families.
@@ -120,10 +136,14 @@ def fetch_rows(series_id, offline=True, refresh=False, client=None):
     return istat_sdmx.parse_sdmx_csv(body)
 
 
-def parse_regional(rows, data_type):
+def parse_regional(rows, data_type, include_non_final=False):
     """{region_name: {year: value}} for the 20 regions, Bolzano+Trento combined
     by population weight. Keeps only the requested DATA_TYPE and region-level
-    REF_AREA codes."""
+    REF_AREA codes.
+
+    Observations flagged not final (see NON_FINAL_STATUSES) are dropped unless
+    `include_non_final`, so an estimated year cannot pass for a published one.
+    """
     names = _load_region_names()
     by_region = {}
     trentino = {}  # year -> {part_code: value}
@@ -134,6 +154,8 @@ def parse_regional(rows, data_type):
         year = row.get("TIME_PERIOD")
         raw = row.get("OBS_VALUE")
         if not area or not year or raw in (None, ""):
+            continue
+        if not include_non_final and (row.get("OBS_STATUS") or "").strip().lower() in NON_FINAL_STATUSES:
             continue
         value = float(raw)
         if area in TRENTINO_PARTS:
@@ -191,7 +213,13 @@ def discover(series_id, offline=True, refresh=False, client=None):
         "proposed_direction": spec["proposed_direction"],
         "source_url": SOURCE_URL,
         "license": LICENSE,
-        "updated": "",
+        # Provenance for the queue's `discovered_at`. Istat SDMX gives no
+        # per-dataflow publication timestamp on the data query, so the honest
+        # stand-in is the last final year: it says which vintage the candidate
+        # was read at, which is what a reviewer comparing two runs needs. Left
+        # blank before, so the two Istat rows were the only ones in the queue
+        # with no provenance at all.
+        "updated": f"{year}-12-31" if year is not None else "",
     }
 
 
@@ -216,7 +244,17 @@ def normalized_rows(series_id, offline=True, refresh=False, client=None):
         if coverage < MIN_COVERAGE:
             continue
         for region_name in sorted(present):
+            region_key = discovery.region_key(region_name)
+            if region_key is None:
+                # A name outside the 20 regions would be written with no key the
+                # atlas can join on, so it would vanish from the map without an
+                # error. Fail here instead.
+                raise SystemExit(
+                    f"{series_id}: '{region_name}' is not one of the 20 regional "
+                    "names. Check the ITTER107 codelist mapping."
+                )
             out.append({
+                "region_key": region_key,
                 "region_name": region_name,
                 "year": key,
                 "value": _format_value(present[region_name], spec["decimals"]),

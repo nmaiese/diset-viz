@@ -29,6 +29,8 @@ import functools
 import json
 from pathlib import Path
 
+from app import sources
+
 _PATH = Path(__file__).resolve().parent / "static" / "data" / "indicator_texts.json"
 
 # Ordered. The default heading is a fallback for pages the agent has not reached
@@ -45,6 +47,14 @@ DEFAULT_HEADINGS = dict(ROLES)
 # The level an entry describes when it does not say. Every article written so
 # far is regional, and every family except BES has regions as its only level.
 DEFAULT_LEVEL = "regione"
+
+# Namespaces to try when a caller passes a bare id (the quality-of-life pages
+# do). Read from the source registry so a new family is looked up the day it is
+# registered, instead of being invisible to the editorial layer until someone
+# remembers this list.
+_NAMESPACES = tuple(
+    meta["internal_prefix"] for meta in sources.SOURCES.values() if meta["internal_prefix"]
+)
 
 
 @functools.lru_cache(maxsize=1)
@@ -68,7 +78,7 @@ def get_text(indicator_id):
     if not data:
         return None
     iid = str(indicator_id)
-    for key in (iid, f"bes:{iid}", f"multiscopo:{iid}", f"eur:{iid}"):
+    for key in (iid, *(f"{prefix}{iid}" for prefix in _NAMESPACES)):
         entry = data.get(key)
         if entry:
             return entry

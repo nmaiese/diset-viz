@@ -73,21 +73,57 @@ def integrated_targets(manifest_rows):
     return seen
 
 
+# The four roles an article is made of, mirroring app/indicator_texts.ROLES.
+# Stdlib-only module, so the list is copied rather than imported; the mirror is
+# pinned by tests/test_pending_notes.py.
+ARTICLE_ROLES = ("definizione", "quadro", "dinamica", "limiti")
+
+
+def unwritten_roles(entry):
+    """The roles of an article that nobody has written yet.
+
+    An entry can exist and still be half a page. The four-role rewrite made
+    "has an entry" and "is written" two different things, and this script only
+    knew the first: with both external indicators sitting at two sections out of
+    four, it printed "la catena e completa" and the writer stage never fired.
+    """
+    if not isinstance(entry, dict):
+        return list(ARTICLE_ROLES)
+    written = {
+        section.get("role")
+        for section in entry.get("sections") or []
+        if isinstance(section, dict) and (section.get("body") or "").strip()
+    }
+    return [role for role in ARTICLE_ROLES if role not in written]
+
+
 def pending(manifest_rows, notes, year_max_of):
     """Return ``(missing, stale)`` worklists.
 
     ``year_max_of(key) -> int | None`` yields the indicator's current latest data
-    year. ``missing`` is an integrated indicator with no note; ``stale`` is any
-    existing note whose vintage has fallen behind that year (checked across all
-    notes, not only integrated ones, because a note can drift for any family)."""
+    year. ``missing`` is an integrated indicator whose article is absent or
+    incomplete; ``stale`` is any existing note whose vintage has fallen behind
+    that year (checked across all notes, not only integrated ones, because a note
+    can drift for any family)."""
     missing = []
     for target in integrated_targets(manifest_rows):
-        if target not in notes:
-            missing.append({
-                "id": target,
-                "reason": "integrated senza nota d'analista",
-                "year_max": year_max_of(target),
-            })
+        entry = notes.get(target)
+        unwritten = unwritten_roles(entry)
+        has_lead = bool((entry or {}).get("lead") if isinstance(entry, dict) else None)
+        if not unwritten and has_lead:
+            continue
+        if entry is None:
+            reason = "integrated senza articolo"
+        else:
+            gaps = ", ".join(unwritten) or "nessuna sezione"
+            reason = f"articolo incompleto (mancano: {gaps}{'' if has_lead else ', +lead'})"
+        missing.append({
+            "id": target,
+            "reason": reason,
+            "year_max": year_max_of(target),
+            "unwritten": unwritten,
+            "lead": has_lead,
+        })
     stale = []
     for key, note in notes.items():
         year_max = year_max_of(key)
@@ -148,7 +184,7 @@ def main():
         print("Nessun indicatore in attesa di nota: la catena e completa.")
         return
     if missing:
-        print(f"Da scrivere ({len(missing)}): indicatori integrati senza nota")
+        print(f"Da scrivere ({len(missing)}): indicatori integrati con l'articolo incompleto")
         for item in missing:
             print(f"  {item['id']:24s} year_max={item['year_max']}  ({item['reason']})")
     if stale:

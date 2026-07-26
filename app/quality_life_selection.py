@@ -9,6 +9,7 @@ import re
 import unicodedata
 from functools import lru_cache
 
+from app import sources
 from app.bes_data import MIN_PUBLIC_COVERAGE, get_bes_manifest
 from app.eurostat_atlas import eurostat_regional_scoreables, has_eurostat_data
 from app.multiscopo_data import get_multiscopo_manifest, has_multiscopo_data
@@ -20,7 +21,12 @@ BES_PREFIX = "bes:"
 REGIONAL_BES_MIN_YEAR = 2025
 MULTI_PREFIX = "multiscopo:"
 REGIONAL_MULTI_MIN_YEAR = 2023
-EUR_PREFIX = "eur:"
+# Public-id prefixes of every externally sourced family. Named EUR_PREFIX while
+# Eurostat was the only one; it is a tuple now so `startswith` covers all of
+# them, and a promoted Istat series can reach the score the same way.
+EUR_PREFIX = tuple(
+    sources.SOURCES[family]["internal_prefix"] for family in sources.EXTERNAL_FAMILIES
+)
 REGIONAL_EUR_MIN_YEAR = 2021
 
 

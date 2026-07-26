@@ -31,6 +31,7 @@ Two consequences worth knowing:
 """
 
 import functools
+import re
 
 from app import profiles, sources
 from app.atlas_catalog import get_atlas_indicator, get_atlas_catalog
@@ -109,6 +110,8 @@ def _assemble(meta, levels):
     levels = [level for level in levels if level is not None and level["observations"]]
     if not levels:
         return None
+    for level in levels:
+        level["explain"] = _explain_for_level(meta, level["key"], len(levels))
     meta["year_min"] = min(level["year_min"] for level in levels)
     meta["year_max"] = max(level["year_max"] for level in levels)
     meta["freshness_status"] = freshness_status(meta["year_max"])
@@ -257,6 +260,51 @@ def _provincial_level(raw_id, meta):
     )
 
 
+# The exact phrases app/indicator_notes.py emits for the territorial level, and
+# what each becomes on the other level. Whole phrases, not the bare noun: a
+# substitution on the word alone turned "in tutti i territori regionali" into
+# "in tutti i regioni" on every territorial page, because the article and the
+# agreement belong to the phrase.
+_LEVEL_PHRASES = {
+    "scope": {
+        "regione": ("in tutte le province", "in tutte le regioni"),
+        "provincia": ("in tutte le regioni", "in tutte le province"),
+    },
+    "caveat": {
+        "regione": ("Il confronto tra province", "Il confronto tra regioni"),
+        "provincia": ("Il confronto tra regioni", "Il confronto tra province"),
+    },
+}
+
+
+def _explain_for_level(meta, level_key, level_count):
+    """`meta.explain` with the two level-dependent sentences retargeted.
+
+    `explain` is built once per indicator and stored on `meta`, but two of its
+    fields name a territorial level: `scope` ("il confronto applica la stessa
+    definizione in tutte le regioni") and `caveat` ("il confronto tra regioni
+    descrive una differenza osservata"). On the 34 BES indicators that also have
+    provinces, both sentences said "regioni" above a cockpit of 103 provinces,
+    in the composed article that is the only one those pages can show.
+
+    The rule the rest of this model follows: anything level-specific belongs to
+    `levels`, never to `meta`.
+
+    A single-level indicator is left exactly as it is. There is nothing to
+    retarget there, and rewriting it would only be a chance to get the Italian
+    wrong on 393 pages that were never affected by the bug.
+    """
+    explain = dict(meta.get("explain") or {})
+    if not explain or level_count < 2:
+        return explain
+    for field, by_level in _LEVEL_PHRASES.items():
+        text = explain.get(field)
+        source, target = by_level.get(level_key, (None, None))
+        if text and source and source in text:
+            explain[field] = text.replace(source, target)
+    return explain
+
+
 def _build_level(key, series, meta, territory_total, coverage):
     conf = LEVELS[key]
     series = [row for row in series if row.get("value") is not None]
@@ -309,6 +357,9 @@ def _build_level(key, series, meta, territory_total, coverage):
         "plural": conf["plural"],
         "profile_path": conf["profile_path"],
         "has_map": conf["has_map"],
+        # Retargeted once the level list is known (see _scope_levels): a level
+        # cannot tell on its own whether the indicator has a second one.
+        "explain": dict(meta.get("explain") or {}),
         "years": years,
         "year_min": year_min,
         "year_max": year_max,

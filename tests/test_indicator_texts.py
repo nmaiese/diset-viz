@@ -16,6 +16,7 @@ docs/INDICATOR_PAGES.md lists what stays uncovered.
 import json
 import re
 import unittest
+import unittest.mock
 from pathlib import Path
 
 from app import indicator_texts
@@ -31,6 +32,33 @@ LEAD_FIRST_SENTENCE_MAX = 200
 
 def _load():
     return json.loads(TEXTS_PATH.read_text(encoding="utf-8"))
+
+
+def _level_of(entry):
+    return entry.get("level") or indicator_texts.DEFAULT_LEVEL
+
+
+def _view_level(key, entry):
+    """The view model of the level an entry was written for, or None.
+
+    Everything level-specific has to come from `levels`, never from `meta`:
+    `meta.year_min/year_max` and `meta.explain` span all levels at once, which is
+    exactly how a provincial article ended up judged against regional years.
+    """
+    from app import sources
+    from app.indicator_view import build_indicator_view
+
+    family, raw_id = sources.split_internal_id(key)
+    view = build_indicator_view(family, raw_id)
+    if view is None:
+        return None
+    wanted = _level_of(entry)
+    return next((lv for lv in view["levels"] if lv["key"] == wanted), None)
+
+
+def _level_year_max(key, entry):
+    level = _view_level(key, entry)
+    return level["year_max"] if level else None
 
 
 def _prose(entry):
@@ -57,6 +85,40 @@ class ArticleStructure(unittest.TestCase):
                 for source in entry.get("fonti") or []:
                     self.assertIn("testo", source)
                     self.assertIn("url", source)
+
+    def test_declared_level_is_one_the_indicator_actually_has(self):
+        """A typo in `level` does not fail loudly, it hides the article.
+
+        An entry is used only on the level it declares, so `"level": "provincie"`
+        renders nowhere and the page silently falls back to the composed
+        skeleton, looking exactly like an article nobody has written.
+        """
+        from app.indicator_view import build_indicator_view
+
+        wrong = []
+        for key, entry in self.texts.items():
+            declared = entry.get("level")
+            if not declared:
+                continue
+            family, raw_id = __import__("app.sources", fromlist=["x"]).split_internal_id(key)
+            view = build_indicator_view(family, raw_id)
+            if view is None:
+                continue
+            available = [level["key"] for level in view["levels"]]
+            if declared not in available:
+                wrong.append((key, declared, available))
+        self.assertEqual(wrong, [], f"level declared but not available: {wrong[:10]}")
+
+    def test_reviewed_at_is_a_date_when_present(self):
+        """`reviewed_at` takes an article out of the review queue, so a value the
+        queue cannot read would silently mark it as never reviewed."""
+        bad = [
+            (key, entry["reviewed_at"])
+            for key, entry in self.texts.items()
+            if entry.get("reviewed_at") is not None
+            and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(entry.get("reviewed_at")))
+        ]
+        self.assertEqual(bad, [], f"reviewed_at must be YYYY-MM-DD: {bad[:10]}")
 
     def test_sections_use_known_roles_once_each(self):
         offenders = []
@@ -135,24 +197,28 @@ class ArticleVintageDrift(unittest.TestCase):
         self.assertEqual(missing, [], f"entries without an integer vintage: {missing[:10]}")
 
     def test_articles_are_not_stale_against_current_data(self):
-        """The vintage must be >= the indicator's latest year.
+        """The vintage must be >= the latest year of the level it describes.
 
         When the data moves forward this fails, flagging the hand-written figures
         for review before the page shows prose that contradicts the cockpit
         directly above it.
+
+        Against the *level*, not against `metadata.year_max`, which spans every
+        level at once. 10AMB011 is 2017-2020 by province and 2015-2024 by region,
+        so a correct provincial article with vintage 2020 was reported stale
+        against the regional 2024. The only way to make the suite green was to
+        declare a vintage the provincial series never reaches, and that in turn
+        pointed the figure guards at the wrong year.
         """
         stale = []
         for key, entry in self.texts.items():
-            payload = get_atlas_indicator(key)
-            if payload is None:
-                continue  # orphaned key: separate cleanup, not a drift signal
-            year_max = payload["metadata"].get("year_max")
+            year_max = _level_year_max(key, entry)
             vintage = entry.get("vintage")
             if isinstance(year_max, int) and isinstance(vintage, int) and year_max > vintage:
-                stale.append((key, vintage, year_max))
+                stale.append((key, entry.get("level", indicator_texts.DEFAULT_LEVEL), vintage, year_max))
         self.assertEqual(
             stale, [],
-            f"articles older than the data they describe (id, vintage, data year): {stale[:10]}",
+            f"articles older than the data they describe (id, level, vintage, data year): {stale[:10]}",
         )
 
     def test_every_key_resolves_to_an_indicator(self):
@@ -201,15 +267,25 @@ class ArticleAgainstTheData(unittest.TestCase):
         return float(raw.replace(".", "").replace(",", "."))
 
     def _values(self, key, entry):
-        """{region: value} for the year the article was written against."""
-        payload = get_atlas_indicator(key)
-        if payload is None:
+        """{territory: value} for the year and level the article describes.
+
+        Read from the level's own matrix rather than `payload["series"]`. On a
+        two-level BES that series carries the twenty regions only, so a
+        provincial article was being compared against a regional table in which
+        no province name exists: the two guards below did not fail, they simply
+        matched nothing. Now a provincial figure is checked against provinces,
+        and the REGIONS regex is the only thing still limiting the coverage.
+        """
+        level = _view_level(key, entry)
+        if level is None:
             return {}
-        year = entry.get("vintage") or payload["metadata"]["year_max"]
+        year = entry.get("vintage") or level["year_max"]
+        matrix = level["matrix"].get(str(year)) or {}
+        names = {row["key"]: row["name"] for row in level["observations"]}
         return {
-            row.get("region") or row.get("territory"): row["value"]
-            for row in payload["series"]
-            if row["year"] == year and row["value"] is not None
+            names.get(territory_key, territory_key): value
+            for territory_key, value in matrix.items()
+            if value is not None
         }
 
     def test_figures_attributed_to_a_region_match_that_region(self):
@@ -264,11 +340,42 @@ class ArticleRendering(unittest.TestCase):
             self.assertTrue(section["heading"])
 
     def test_an_authored_section_keeps_its_heading_and_body(self):
-        article = indicator_texts.build_article("178")
+        """Structural, and deliberately not pinned to one indicator's content.
+
+        This used to assert that id 178 showed the *default* heading on
+        `definizione`, which was true only while nobody had written that section.
+        But 178 is the worked example in every doc and every command, so it is
+        the first article an editor completes, and the moment the writer did the
+        thing it is told to do (write its own h2) the suite went red on correct
+        work. The writer's own contract says to run the guards and read the
+        result, so it would have removed the heading to make the test pass.
+        """
+        key, entry = next(
+            (key, entry) for key, entry in sorted(_load().items())
+            if any((s.get("body") or "").strip() for s in entry.get("sections") or [])
+        )
+        authored_roles = {
+            s["role"] for s in entry["sections"] if (s.get("body") or "").strip()
+        }
+        article = indicator_texts.build_article(key, entry.get("level", indicator_texts.DEFAULT_LEVEL))
+        for section in article["sections"]:
+            with self.subTest(indicator=key, role=section["role"]):
+                self.assertTrue(section["heading"], "every section renders a heading")
+                if section["role"] in authored_roles:
+                    self.assertTrue(section["authored"])
+                    self.assertTrue(section["body"])
+                else:
+                    # Not written: the template composes it, so body stays None.
+                    self.assertFalse(section["authored"])
+                    self.assertIsNone(section["body"])
+
+    def test_an_authored_heading_wins_over_the_default(self):
+        """The `h` an author writes must reach the page. Synthetic on purpose."""
+        entry = {"sections": [{"role": "quadro", "h": "Un titolo scritto a mano", "body": "Corpo."}]}
+        with unittest.mock.patch.object(indicator_texts, "get_text", return_value=entry):
+            article = indicator_texts.build_article("__synthetic__")
         by_role = {section["role"]: section for section in article["sections"]}
-        self.assertTrue(by_role["quadro"]["authored"])
-        self.assertTrue(by_role["quadro"]["body"])
-        # No custom heading yet on the migrated entries, so the default shows.
+        self.assertEqual(by_role["quadro"]["heading"], "Un titolo scritto a mano")
         self.assertEqual(
             by_role["definizione"]["heading"],
             indicator_texts.DEFAULT_HEADINGS["definizione"],
@@ -306,6 +413,47 @@ class ProseStaysOnTheLevelItWasWrittenFor(unittest.TestCase):
             for section in provincial["sections"]:
                 self.assertFalse(section["authored"], f"{raw_id} {section['role']}")
         self.assertGreater(checked, 20, "expected the two-level BES articles to still exist")
+
+    def test_a_single_level_indicator_is_left_exactly_as_it_was(self):
+        """Nothing to retarget, so nothing may change.
+
+        The first version of the level scoping substituted the bare noun, which
+        turned the territorial "in tutti i territori regionali" into "in tutti i
+        regioni" on 393 pages that never had the bug. This is the invariant that
+        would have caught it, and it costs one comparison.
+        """
+        from app.indicator_view import build_indicator_view
+
+        for family, raw_id in (("territorial", "178"), ("bes", "01SAL003")):
+            view = build_indicator_view(family, raw_id)
+            if view is None or len(view["levels"]) != 1:
+                continue
+            with self.subTest(indicator=f"{family}:{raw_id}"):
+                self.assertEqual(view["levels"][0]["explain"], view["meta"]["explain"])
+
+    def test_the_composed_article_names_the_level_it_is_rendered_at(self):
+        """The composed text is level-scoped too, not just the authored one.
+
+        `meta.explain` is built once per indicator with a fixed level, and two of
+        its sentences name that level. On the provincial view of all 34 two-level
+        BES indicators the definizione said "in tutte le regioni" and the limiti
+        said "il confronto tra regioni", above 103 provinces. It is the only
+        article those pages can show, since every authored one is regional.
+        """
+        from app.indicator_view import build_indicator_view
+
+        checked = 0
+        for raw_id in self.two_level:
+            view = build_indicator_view("bes", raw_id)
+            levels = {level["key"]: level for level in view["levels"]}
+            if "provincia" not in levels:
+                continue
+            checked += 1
+            explain = levels["provincia"]["explain"]
+            for field in ("scope", "caveat"):
+                with self.subTest(indicator=raw_id, field=field):
+                    self.assertNotIn("regioni", (explain.get(field) or "").lower())
+        self.assertGreater(checked, 20)
 
     def test_the_page_reports_the_rendered_levels_own_coverage(self):
         """meta.year_min/year_max span every level at once, level's do not.

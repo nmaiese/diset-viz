@@ -47,13 +47,24 @@ def _all_indicator_refs():
     return refs
 
 
-def assess(family, raw_id):
+def assess(family, raw_id, level_key=None):
+    """The editorial state of one indicator at one territorial level.
+
+    Level-aware on purpose. This used to read `levels[0]` and call
+    `build_article` with no level, so the 34 two-level BES indicators were only
+    ever judged on their regional half: a provincial article, once written,
+    still showed as `0/4` and could never be reported as done, while the
+    provincial page of every other one was invisible to the worklist.
+    """
     view = build_indicator_view(family, raw_id)
     if view is None:
         return None
     meta = view["meta"]
-    level = view["levels"][0]
-    article = build_article(meta["id"])
+    level = next(
+        (lv for lv in view["levels"] if lv["key"] == level_key),
+        view["levels"][0],
+    )
+    article = build_article(meta["id"], level["key"])
     missing = [s["role"] for s in article["sections"] if not s["authored"]]
     vintage = article["vintage"]
     stale = vintage is not None and vintage < level["year_max"]
@@ -71,6 +82,8 @@ def assess(family, raw_id):
     return {
         "id": meta["id"],
         "code": f"{sources.SOURCES[family]['acronym']}-{raw_id}",
+        "level": level["key"],
+        "levels": len(view["levels"]),
         "name": meta["name"],
         "theme": meta["theme"],
         "indexable": meta["indexable"],
@@ -85,12 +98,18 @@ def assess(family, raw_id):
 
 
 def build_queue():
+    """One row per (indicator, territorial level), because that is the unit of
+    work: an article is written against one level and used only there."""
     rows = []
     for family, raw_id in _all_indicator_refs():
-        entry = assess(family, raw_id)
-        if entry is not None:
-            rows.append(entry)
-    rows.sort(key=lambda row: (-row["score"], row["name"]))
+        view = build_indicator_view(family, raw_id)
+        if view is None:
+            continue
+        for level in view["levels"]:
+            entry = assess(family, raw_id, level["key"])
+            if entry is not None:
+                rows.append(entry)
+    rows.sort(key=lambda row: (-row["score"], row["name"], row["level"]))
     return rows
 
 
@@ -111,9 +130,9 @@ def main(argv=None):
     if args.csv:
         out = io.StringIO()
         writer = csv.DictWriter(out, fieldnames=[
-            "code", "id", "name", "theme", "indexable", "year_max", "vintage",
+            "code", "id", "level", "name", "theme", "indexable", "year_max", "vintage",
             "stale", "lead", "written", "missing", "score",
-        ])
+        ], extrasaction="ignore")
         writer.writeheader()
         for row in (rows if args.all else pending):
             writer.writerow({**row, "missing": " ".join(row["missing"])})
@@ -121,16 +140,20 @@ def main(argv=None):
         return 0
 
     total = len(rows)
-    print(f"{len(complete)} articoli completi su {total}. "
+    print(f"{len(complete)} articoli completi su {total} pagine "
+          f"(indicatore piu livello territoriale). "
           f"{len([r for r in rows if r['stale']])} con vintage arretrato.")
     print()
     shown = (rows if args.all else pending)[: None if args.all else args.limit]
-    print(f"{'codice':<16} {'sez':>4} {'vint':>6}  {'idx':<4} {'mancano':<34} nome")
-    print("-" * 110)
+    print(f"{'codice':<16} {'liv':<10} {'sez':>4} {'vint':>6}  {'idx':<4} {'mancano':<34} nome")
+    print("-" * 120)
     for row in shown:
         flag = "STALE" if row["stale"] else (str(row["vintage"]) if row["vintage"] else "-")
         missing = ",".join(row["missing"]) + ("" if row["lead"] else " +lead")
-        print(f"{row['code']:<16} {row['written']}/4 {flag:>6}  "
+        # The level is shown only where there is more than one, so 587 single
+        # level rows stay readable and the 34 two-level ones are unambiguous.
+        level = row["level"] if row["levels"] > 1 else ""
+        print(f"{row['code']:<16} {level:<10} {row['written']}/4 {flag:>6}  "
               f"{'si' if row['indexable'] else 'no':<4} {missing:<34} {row['name'][:44]}")
     if not args.all and len(pending) > args.limit:
         print(f"\n... e altri {len(pending) - args.limit}. Usa --all per l'elenco completo.")

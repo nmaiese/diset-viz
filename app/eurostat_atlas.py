@@ -1,12 +1,17 @@
-"""Eurostat regional indicators as first-class atlas entries.
+"""Externally sourced indicators as first-class atlas entries.
 
 Phase 2 of the multi-source aggregator: a genuinely new external indicator (one
-with no Istat counterpart) becomes a standalone atlas indicator, not just a
-freshness badge on an existing one. It reads the committed normalized external
-layer (rows whose ``target_indicator_id`` is in the ``eur:`` namespace and are
-``atlas_eligible``) and adapts them to the exact atlas API contract used by the
-territorial and BES families, so the same catalog, page, map, search and sitemap
-work with no special cases downstream.
+with no counterpart in the committed backbone) becomes a standalone atlas
+indicator, not just a freshness badge on an existing one. It reads the committed
+normalized external layer (rows whose ``target_indicator_id`` sits in one of the
+external families' namespaces and are ``atlas_eligible``) and adapts them to the
+exact atlas API contract used by the territorial and BES families, so the same
+catalog, page, map, search and sitemap work with no special cases downstream.
+
+One module serves every external family, not just Eurostat. The prefix on the
+public id selects the family (``app.sources.EXTERNAL_FAMILIES``) and the family
+supplies the user-facing institution, label and licence, so an Istat series can
+never be published under Eurostat's name.
 
 Enriching rows (a Eurostat series that overlaps an existing Istat indicator,
 targeted at that indicator's id) are deliberately NOT surfaced here: those add
@@ -28,21 +33,45 @@ from app.profiles import SCOREABLE_DIRECTIONS, slugify
 from app.taxonomy import category_metadata
 
 EUR_ID_PREFIX = sources.SOURCES["eurostat"]["internal_prefix"]  # "eur:"
-EUROSTAT_SOURCE_LABEL = sources.family_label("eurostat")
-EUROSTAT_INSTITUTION = sources.family_institution("eurostat")  # "Eurostat"
-EUROSTAT_LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/"
 MIN_INDEXABLE_YEAR = 2020
 # Reviewed plain-language descriptions written by the curator (apply_curation.py).
 CURATED_DESC_PATH = Path(__file__).resolve().parent / "static" / "data" / "external" / "curated_descriptions.csv"
 
+# Every family published through the external layer, by public-id prefix. This
+# used to be the single constant "eur:", which meant the second hunter adapter
+# (istat_demografia) could discover a series that no atlas could then show, and
+# promoting it under "eur:" would have put an Istat indicator on the page under
+# Eurostat's name and licence. The prefix decides the family, and the family
+# decides institution, label and licence.
+_PREFIX_TO_FAMILY = {
+    sources.SOURCES[family]["internal_prefix"]: family
+    for family in sources.EXTERNAL_FAMILIES
+}
+
+
+def _family_of(public_id):
+    """The external family a public id belongs to, or None if it is not one.
+
+    Enriching rows target an existing indicator (a bare numeric id, or bes:/
+    multiscopo:), and those are not standalone atlas entries.
+    """
+    value = str(public_id)
+    for prefix, family in _PREFIX_TO_FAMILY.items():
+        if prefix and value.startswith(prefix):
+            return family
+    return None
+
 
 def _raw_id(public_id):
-    value = str(public_id)
-    return value[len(EUR_ID_PREFIX):] if value.startswith(EUR_ID_PREFIX) else None
+    family = _family_of(public_id)
+    if family is None:
+        return None
+    prefix = sources.SOURCES[family]["internal_prefix"]
+    return str(public_id)[len(prefix):]
 
 
-def eurostat_indicator_path(raw_id, name):
-    return sources.indicator_url("eurostat", raw_id, slugify(name))
+def eurostat_indicator_path(raw_id, name, family="eurostat"):
+    return sources.indicator_url(family, raw_id, slugify(name))
 
 
 def _region_sort_key(name):
@@ -58,7 +87,7 @@ def _rows_by_target():
     grouped = defaultdict(list)
     for row in get_external_rows():
         target = row.get("target_indicator_id", "")
-        if not target.startswith(EUR_ID_PREFIX):
+        if _family_of(target) is None:
             continue
         if row.get("atlas_eligible") != "true" or row.get("territory_level") != "regione":
             continue
@@ -151,13 +180,17 @@ def _explain_with_curation(public_id, explain):
 
 def get_eurostat_atlas_indicator(public_id):
     """One Eurostat regional indicator in the atlas API shape, or None."""
-    raw_id = _raw_id(public_id)
-    if raw_id is None:
+    family = _family_of(public_id)
+    if family is None:
         return None
+    raw_id = _raw_id(public_id)
     rows = _rows_by_target().get(str(public_id))
     if not rows:
         return None
 
+    source_label = sources.family_label(family)
+    institution = sources.family_institution(family)
+    default_license, license_url = sources.family_license(family)
     first = rows[0]
     source_theme = first["theme"]
     direction = first.get("direction") or "contextual"
@@ -193,13 +226,13 @@ def get_eurostat_atlas_indicator(public_id):
         **category_metadata(source_theme),
         "name": first["name"],
         "unit": unit,
-        "source": EUROSTAT_SOURCE_LABEL,
-        "source_label": EUROSTAT_SOURCE_LABEL,
+        "source": source_label,
+        "source_label": source_label,
         "source_url": first.get("source_url") or "",
-        "institution": EUROSTAT_INSTITUTION,
-        "license": first.get("license") or "CC BY 4.0 (Eurostat)",
-        "license_url": EUROSTAT_LICENSE_URL,
-        "archive": first.get("source_dataset") or "Eurostat regional database",
+        "institution": institution,
+        "license": first.get("license") or default_license,
+        "license_url": license_url,
+        "archive": first.get("source_dataset") or source_label,
         "explain": _explain_with_curation(
             str(public_id),
             build_bes_indicator_explain(
@@ -222,9 +255,9 @@ def get_eurostat_atlas_indicator(public_id):
         "freshness_status": freshness_status(latest_year),
         "freshness_label": freshness_label(freshness_status(latest_year)),
         "freshness_year_max": latest_year,
-        "catalog_family": "eurostat",
-        "catalog_family_label": EUROSTAT_SOURCE_LABEL,
-        "path": eurostat_indicator_path(raw_id, first["name"]),
+        "catalog_family": family,
+        "catalog_family_label": source_label,
+        "path": eurostat_indicator_path(raw_id, first["name"], family),
     }
     return {"metadata": metadata, "series": series}
 

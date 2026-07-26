@@ -72,5 +72,89 @@ class EurostatAtlasFamilyTest(unittest.TestCase):
         self.assertIn("investe in ricerca e sviluppo", payload["metadata"]["explain"]["plain"])
 
 
+class EveryExternalFamilyIsReachable(unittest.TestCase):
+    """One test per family, over every surface a promoted indicator touches.
+
+    Adding the second external family (istat_demografia) found the same bug in
+    five places at once: `eur:` was pinned as a literal in the atlas dispatcher,
+    the quiz payload router, the quality-of-life selection, the curator worklist
+    and the editorial lookup. Each one failed differently. The quiz was the worst
+    of them, because the indicator entered the pool and then returned a null
+    payload mid-round.
+
+    So this is deliberately generic: it walks the families the registry declares,
+    not the ones that existed when it was written, and a family added tomorrow is
+    covered the day it lands.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from app import sources
+        from app.eurostat_atlas import all_eurostat_indicators
+
+        by_family = {}
+        for item in all_eurostat_indicators():
+            by_family.setdefault(item["catalog_family"], item)
+        cls.by_family = by_family
+        cls.declared = [
+            family for family in sources.EXTERNAL_FAMILIES
+            if family in by_family
+        ]
+
+    def test_more_than_one_family_is_actually_exercised(self):
+        """Otherwise the generality above is untested and drifts back."""
+        self.assertGreater(len(self.declared), 1, self.by_family.keys())
+
+    def test_each_family_resolves_renders_and_is_labelled_by_its_own_institution(self):
+        from app import sources
+
+        client = app.test_client()
+        for family in self.declared:
+            item = self.by_family[family]
+            with self.subTest(family=family, id=item["id"]):
+                payload = get_atlas_indicator(item["id"])
+                self.assertIsNotNone(payload, "the atlas dispatcher must resolve it")
+                meta = payload["metadata"]
+                self.assertEqual(meta["institution"], sources.family_institution(family))
+                self.assertEqual(meta["source_label"], sources.family_label(family))
+                self.assertTrue(meta["license"], "a public page must state its licence")
+                code = sources.indicator_code(family, meta["raw_id"])
+                self.assertIn(code, meta["path"])
+                self.assertEqual(client.get(meta["path"]).status_code, 200)
+                self.assertNotEqual(meta["macro_area"], "Altro", meta["theme"])
+
+    def test_each_family_builds_a_quiz_payload_when_it_is_in_the_pool(self):
+        from app import quiz
+
+        pool = {item["id"]: item for item in quiz._quiz_indicators()}
+        for family in self.declared:
+            item = self.by_family[family]
+            entry = pool.get(item["id"])
+            if entry is None:
+                continue  # legitimately out of the pool (too few distinct values)
+            with self.subTest(family=family, id=item["id"]):
+                payload = quiz._quiz_indicator_payload(entry["id"], entry["year"])
+                self.assertIsNotNone(payload, "in the pool but with no payload crashes a round")
+                self.assertTrue(payload["values"])
+
+    def test_each_family_is_visible_to_the_editorial_layer(self):
+        from app import indicator_texts
+
+        for family in self.declared:
+            item = self.by_family[family]
+            with self.subTest(family=family, id=item["id"]):
+                article = indicator_texts.build_article(item["id"])
+                self.assertEqual(
+                    [s["role"] for s in article["sections"]],
+                    list(indicator_texts.ROLE_ORDER),
+                )
+
+    def test_each_family_is_counted_in_the_catalog_families(self):
+        counts = {f["id"]: f["indicator_count"] for f in get_atlas_catalog()["source_families"]}
+        for family in self.declared:
+            with self.subTest(family=family):
+                self.assertGreater(counts.get(family, 0), 0)
+
+
 if __name__ == "__main__":
     unittest.main()

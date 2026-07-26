@@ -235,9 +235,15 @@ Prima della pubblicazione:
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
 python3 /home/nilo/dev/ai-agents/skills/italian-product-copywriter/references/audit_editorial_quality.py .
-grep -rn "[—–;]" app/templates app/indicator_notes.py docs/INDICATOR_PAGES.md
 git diff --check
 ```
+
+L'audit editoriale è il controllo che conta sui trattini, e va usato al posto di
+un `grep` sui sorgenti. Un `grep -rn "[—–;]" app/templates` restituisce sempre
+righe, perché i template contengono CSS e JavaScript pieni di punti e virgola, e
+soprattutto **non vede le entity**: `&ndash;` rende un trattino medio vietato da
+`content/STYLE.md` senza che il carattere compaia nel sorgente. È così che
+"Copertura 2015 – 2024" è rimasto in pagina.
 
 Controllare almeno una pagina per ciascuna famiglia e per ciascuna forma:
 percentuale, rapporto, valore assoluto, unità per abitante, punteggio, differenza

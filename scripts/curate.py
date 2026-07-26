@@ -28,7 +28,7 @@ CURATION_PATH = PROJECT_ROOT / "data" / "discovery" / "curation.csv"
 EXTERNAL_DATASET = PROJECT_ROOT / "app" / "static" / "data" / "external" / "normalized_external_indicators.csv"
 
 CURATION_COLUMNS = [
-    "target_indicator_id",     # eur:rd_e_gerdreg (the public atlas id)
+    "target_indicator_id",     # eur:rd_e_gerdreg, dem:OLDAGEDEPR (the public atlas id)
     "source",
     "source_indicator_id",
     "name",
@@ -95,14 +95,25 @@ def direction_evidence(target_indicator_id, rows=None):
     }
 
 
+# Public-id prefixes of every family published through the external layer, from
+# the shared registry rather than the single literal "eur:" this used to test.
+# With a second adapter live, that literal meant the curator could not see the
+# indicator the hunter had just promoted: dem:OLDAGEDEPR would have sat
+# integrated-but-unreviewed with nothing pointing at it.
+EXTERNAL_PREFIXES = tuple(
+    prefix for family, prefix in discovery.FAMILY_PREFIX.items()
+    if prefix and family in discovery.FEED_FAMILY.values()
+)
+
+
 def uncurated_targets(rows=None):
-    """Standalone external atlas indicators (eur:*) not yet score-eligible: the
-    curator's worklist."""
+    """Standalone external atlas indicators not yet score-eligible: the
+    curator's worklist, across every externally sourced family."""
     rows = rows if rows is not None else read_external()
     seen = {}
     for row in rows:
         target = row.get("target_indicator_id", "")
-        if target.startswith("eur:") and row.get("atlas_eligible") == "true":
+        if target.startswith(EXTERNAL_PREFIXES) and row.get("atlas_eligible") == "true":
             seen.setdefault(target, row.get("score_eligible") == "true")
     return [target for target, scoreable in seen.items() if not scoreable]
 
@@ -123,13 +134,13 @@ def _cli():
     import argparse
 
     parser = argparse.ArgumentParser(description="Print direction evidence for the curator.")
-    parser.add_argument("--target", help="a specific eur: id; default: all uncurated")
+    parser.add_argument("--target", help="a specific external id (eur:..., dem:...); default: all uncurated")
     args = parser.parse_args()
 
     rows = read_external()
     targets = [args.target] if args.target else uncurated_targets(rows)
     if not targets:
-        print("No uncurated Eurostat atlas indicators.")
+        print("Nessun indicatore esterno da curare.")
         return
     for target in targets:
         ev = direction_evidence(target, rows)

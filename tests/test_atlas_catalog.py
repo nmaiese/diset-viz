@@ -135,7 +135,26 @@ class FederatedAtlasCatalogTest(unittest.TestCase):
         self.assertEqual(tuple(area["name"] for area in catalog["macro_areas"]), MACRO_AREA_ORDER)
         self.assertEqual(tuple(QUALITY_LIFE_CATEGORIES), tuple(CANONICAL_CATEGORIES))
         self.assertTrue(all(item["source_theme"] for item in catalog["indicators"]))
-        self.assertFalse(any(item["macro_area"] == "Altro" for item in catalog["indicators"]))
+        # Named, not just asserted false. A promoted indicator brings its source
+        # theme with it, and an unregistered theme falls through to "Altro": the
+        # indicator then vanishes from the macro-area totals while still being in
+        # the catalog. That is the failure a scheduled run produces, so the
+        # message has to say which theme to add to CANONICAL_CATEGORIES rather
+        # than "True is not false".
+        unmapped = sorted({
+            item["source_theme"] for item in catalog["indicators"]
+            if item["macro_area"] == "Altro"
+        })
+        self.assertEqual(
+            unmapped, [],
+            "temi senza categoria (aggiungerli a CANONICAL_CATEGORIES[...]['themes'] "
+            f"in app/taxonomy.py): {unmapped}",
+        )
+        self.assertEqual(
+            sum(area["indicator_count"] for area in catalog["macro_areas"]),
+            len(catalog["indicators"]),
+            "ogni indicatore deve stare in una macro-area",
+        )
 
     def test_duplicate_source_theme_urls_redirect_to_one_canonical_page(self):
         client = app.test_client()

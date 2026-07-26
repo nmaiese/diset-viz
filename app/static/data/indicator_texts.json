@@ -5614,6 +5614,34 @@
   ],
   "vintage": 2023
  },
+ "dem:OLDAGEDEPR": {
+  "fonti": [],
+  "lead": "In dieci anni le persone dai 65 anni in su ogni cento in età da lavoro sono aumentate in tutte e venti le regioni italiane, ma la Sardegna si è mossa quasi sette volte più della Liguria. La graduatoria che ne esce non separa il Nord dal Sud.",
+  "level": "regione",
+  "sections": [
+   {
+    "body": "L'indicatore mette al numeratore i residenti dai 65 anni in su e al denominatore quelli tra i 15 e i 64, e moltiplica per cento. Un valore di 40 vuol dire quaranta persone dai 65 anni in su ogni cento in età da lavoro.\n\nIl nome inganna su un punto. La parola dipendenza qui non descrive nessuna dipendenza reale, è solo il rapporto tra due fasce anagrafiche. Chi lavora a sessantasette anni sta comunque al numeratore, chi a trenta non ha mai lavorato sta comunque al denominatore. Per sapere quante persone attive sostengono davvero quante inattive serve il tasso di occupazione, non questo numero.",
+    "h": "Un rapporto tra fasce di età, non tra chi lavora e chi no",
+    "role": "definizione"
+   },
+   {
+    "body": "L'invecchiamento non ricalca la faglia Nord Sud a cui questo atlante abitua. In alto insieme alla Liguria ci sono il Friuli-Venezia Giulia e l'Umbria, ma anche il Molise quarto e la Sardegna quinta, mentre la Lombardia e il Lazio stanno tra le ultime cinque.\n\nLa distribuzione ha una sola discontinuità vera, ed è in cima. I 3,60 punti che separano la Liguria dal Friuli-Venezia Giulia valgono esattamente quanto l'intero intervallo che contiene le nove regioni successive, dal Friuli fino alla Valle d'Aosta. Sotto quella vetta isolata il paese è compatto, e la mediana leggermente sopra la media dice la stessa cosa. Trattandosi di un indicatore contestuale, la classifica ordina i territori per struttura per età e non premia nessuno.",
+    "h": "La geografia non è quella che ci si aspetta",
+    "role": "quadro"
+   },
+   {
+    "body": "Dal 2015 al 2025 la media semplice dei valori regionali è salita di 5,54 punti. Non ci sono eccezioni da segnalare, perché non ce ne sono: il rapporto è cresciuto in tutte e venti le regioni sull'intero periodo e in tutte e venti anche nell'ultimo anno disponibile.\n\nA cambiare è la velocità. La Sardegna ha guadagnato 11,00 punti in dieci anni, il doppio della media, e ha attraversato mezza classifica. Nel 2015 stava a 32,70, cioè al livello a cui oggi si trova la regione più giovane d'Italia. La Liguria, che era già la più anziana, si è mossa di 1,60 punti e basta.\n\nÈ un effetto soffitto, non un'inversione. Le regioni che avevano finito prima la transizione demografica rallentano, quelle che erano rimaste indietro recuperano in fretta, e il risultato è che il paese si sta uniformando verso l'alto invece di dividersi.",
+    "h": "Sale ovunque, ma la Sardegna corre e la Liguria si è fermata",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il rapporto conta teste per fascia di età e nient'altro. Non sa chi lavora, chi assiste qualcuno, chi è autosufficiente e chi no. Due regioni con lo stesso valore possono avere carichi previdenziali e di cura molto diversi, a seconda di quante persone in età da lavoro un impiego ce l'hanno davvero.\n\nC'è poi un modo di salire che non ha niente a che fare con l'invecchiamento. Il denominatore si assottiglia anche quando i giovani adulti se ne vanno, quindi l'emigrazione alza il rapporto senza che un solo residente in più superi i 65 anni. Il numero da solo non distingue le due strade.",
+    "h": "Che cosa non dice sul peso reale dell'invecchiamento",
+    "role": "limiti"
+   }
+  ],
+  "vintage": 2025
+ },
  "eur:rd_e_gerdreg": {
   "fonti": [
    {
@@ -5648,11 +5676,22 @@
    }
   ],
   "lead": "Nel 2023 gli addetti a ricerca e sviluppo valgono il 2,06% della popolazione attiva in Emilia-Romagna e appena lo 0,50% in Calabria. Dietro l'Emilia-Romagna vengono il Lazio con l'1,68% e il Friuli-Venezia Giulia con l'1,64%, mentre in coda, poco sopra la Calabria, restano Sardegna e Basilicata. Tra la regione che guida e quella in fondo il rapporto è di poco più di quattro a uno.",
+  "level": "regione",
   "sections": [
+   {
+    "body": "Eurostat conta qui tutto il personale di ricerca e sviluppo, non i soli ricercatori. Dentro ci sono anche i tecnici e il personale di supporto, e tutti i settori che la ricerca la fanno, dalle imprese alle università agli enti pubblici.\n\nLe due metà del rapporto si contano in modo diverso, e questo cambia la lettura. Il numeratore è in equivalenti a tempo pieno, quindi due persone che dedicano alla ricerca metà del proprio orario valgono una unità sola. Il denominatore è invece la popolazione attiva contata per teste. Un valore dell'1,00 dice che ogni cento persone nella forza lavoro corrisponde una unità di lavoro a tempo pieno dedicata alla ricerca, non che una persona su cento faccia il ricercatore.",
+    "h": "Il numeratore è in equivalenti a tempo pieno, il denominatore no",
+    "role": "definizione"
+   },
    {
     "body": "La media delle venti regioni è dell'1,16%, ma la mediana è più bassa, all'1,06%: bastano pochi territori del Nord a tenere alto il quadro, e metà delle regioni resta sotto quel valore. Il disegno ricalca quello della [spesa in ricerca e sviluppo](/indicatore/spesa-in-ricerca-e-sviluppo-sul-pil-eurostat-nuts2/eur-rd_e_gerdreg), con l'Emilia-Romagna davanti e il Mezzogiorno in fondo, solo che qui si contano le persone e non gli euro. L'Italia nel suo insieme impiega nella ricerca l'1,41% della popolazione attiva, sotto la media europea dell'1,57% ([Eurostat](https://ec.europa.eu/eurostat/databrowser/view/rd_p_perslf/default/table?lang=en)), soglia che solo cinque regioni italiane superano. Tra il 2019 e il 2023 la media regionale non si muove, resta all'1,16%, però la mediana scende dall'1,15% all'1,06%: il centro si abbassa mentre il vertice tiene, e la distanza interna si allarga invece di chiudersi. Le poche regioni che fanno ricerca riusciranno a tirarsi dietro le altre, o il divario continuerà a nutrirsi da solo?",
     "h": null,
     "role": "quadro"
+   },
+   {
+    "body": "Dal 2019 al 2023 otto regioni chiudono il periodo sotto il livello da cui erano partite e dodici sopra. È questa somma quasi nulla a tenere ferma la media, non l'immobilità dei territori.\n\nI due estremi del movimento non stanno ai due estremi della classifica. Il guadagno maggiore è della Valle d'Aosta, 0,20 punti, che resta comunque nella parte bassa. La perdita maggiore è dell'Umbria, 0,22 punti, e le è costata posizioni. Nel 2019 stava poco sotto le Marche e la Campania, oggi è quattordicesima. Arretrano anche l'Emilia-Romagna, il Piemonte, la Toscana e il Veneto, tutte e quattro dalla parte alta della graduatoria.\n\nNell'ultimo passaggio, dal 2022 al 2023, il movimento è più compatto. Tredici regioni salgono, sei scendono e una resta ferma, sulle venti presenti in entrambi gli anni. La media guadagna 0,02 punti, troppo poco per dire che la tendenza sia cambiata.",
+    "h": "Chi sale e chi scende, sotto una media che non si muove",
+    "role": "dinamica"
    },
    {
     "body": "La quota conta le persone in equivalenti a tempo pieno, non quanto producono: due regioni con lo stesso valore possono pubblicare, brevettare e innovare in modo molto diverso. Il numero somma ricerca pubblica e privata senza distinguerle, così non dice se a mancare siano i laboratori delle imprese o quelli dello Stato. E fotografa chi la ricerca la fa in regione oggi, non se quelle competenze siano cresciute lì: un territorio può formare ricercatori e vederli partire senza che il dato lo registri.",

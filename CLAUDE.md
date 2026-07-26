@@ -19,7 +19,14 @@ quality-of-life section for regions and provinces.
 - `/indicatore/<slug>/<acronimo>-<id>` — every atlas indicator, from every source
   family, lives here. Keyword-first for SEO: the human slug leads, the resolving
   code trails under a source acronym (`ter` Istat territoriali, `bes` Istat
-  benessere, `ims` Istat vita quotidiana delle famiglie, `eur` Eurostat). The code
+  benessere, `ims` Istat vita quotidiana delle famiglie, `eur` Eurostat, `dem`
+  Istat indicatori demografici). Le famiglie servite dallo strato esterno stanno
+  in `sources.EXTERNAL_FAMILIES`: aggiungerne una e' una riga in `app/sources.py`
+  piu una in `discovery.FEED_FAMILY` e un parser in
+  `promote_candidates.PROMOTION_PARSERS`, e i tre mirror sono appaiati da
+  `tests/test_discovery.py`. Non cablare mai un prefisso: il codice che lo faceva
+  ha pubblicato una serie Istat sotto il nome di Eurostat, l'ha tenuta fuori dal
+  quiz e l'ha resa invisibile al curatore. The code
   is the id-carrying last segment, so the page survives a name (slug) change; the
   slug is decorative and a wrong one 301s to canonical. Legacy URLs
   (`/indicatore/<num>-<slug>` and `/qualita-della-vita/indicatore/...`) 301 to it.

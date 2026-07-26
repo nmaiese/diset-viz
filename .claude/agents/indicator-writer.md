@@ -140,7 +140,9 @@ Plus:
 ## Workflow
 
 1. Run the brief. Read `content/STYLE.md`. Confirm what is missing with
-   `.venv/bin/python -m scripts.text_queue --all | grep <codice>`.
+   `.venv/bin/python -m scripts.text_queue --all | grep <codice>`. That queue has
+   one row per (indicator, territorial level), so a two-level BES appears twice
+   and each row is its own piece of work.
 2. Draft the lead and the four sections. Verify every figure against the brief
    and every comparative claim against a real source.
 3. Write the entry into `app/static/data/indicator_texts.json`, keyed by the
@@ -151,6 +153,7 @@ Plus:
    ```json
    "178": {
      "lead": "...",
+     "level": "regione",
      "sections": [
        {"role": "definizione", "h": "...", "body": "..."},
        {"role": "quadro",      "h": "...", "body": "..."},
@@ -161,6 +164,16 @@ Plus:
      "vintage": 2025
    }
    ```
+
+   **`level` is not optional in practice.** An article cites one territorial
+   level's figures, so it is used only on that level and the other levels fall
+   back to the composed skeleton. The field defaults to `regione` when absent,
+   which is right for every family except the 34 BES indicators that also have
+   provinces. Write a provincial article without it and the result is inverted:
+   it disappears from the provincial page and lands on the regional one, where
+   a lead about "le province italiane" sits above a cockpit of twenty regions.
+   The last line of the brief tells you which value to use. A `level` the
+   indicator does not have is refused by the guards.
 
    A role you leave out is not an empty section: the page composes it from the
    data. That is a working fallback, not a finished page, so leave one out only
@@ -189,5 +202,22 @@ Plus:
 ## Where you sit
 
 hunter (discovery) -> human approval -> curator (direction, category, score) ->
-**you (the whole article)** -> PR -> merge -> live. You are the step that turns a
-correctly-oriented series into a page worth reading.
+**you (the whole article)** -> reviewer (checks what the guards cannot) -> PR ->
+merge -> live. You are the step that turns a correctly-oriented series into a
+page worth reading.
+
+Two worklists point at you, and they answer different questions.
+`scripts/pending_notes.py` is the discovery chain's hand-off: indicators the
+curator has integrated whose article is absent or incomplete. `scripts/text_queue.py`
+is the editorial state of the whole catalogue, every family, every level. Use the
+first when you run right after a curation, the second when you work through the
+backlog.
+
+`.claude/agents/indicator-reviewer.md` reads what you wrote. The five patterns it
+looks for (universal claims, causal attributions, unsourced comparisons,
+provincial figures, echoes of the cockpit) are the same five you should avoid
+writing, so run them over your own draft before opening the PR:
+
+```bash
+.venv/bin/python -m scripts.review_queue --show <id>
+```

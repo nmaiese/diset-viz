@@ -36,7 +36,48 @@ FAMILY_PREFIX = {
     "territorial": "",
     "bes": "bes:",
     "multiscopo": "multiscopo:",
+    "eurostat": "eur:",
+    "istat_demografia": "dem:",
 }
+
+# Which catalog family a hunter adapter promotes into. A second mirror of
+# app/sources.py (the `feeds` tuples), for the same stdlib-only reason as
+# FAMILY_PREFIX. Both mirrors are pinned by tests/test_discovery.py, because
+# getting this wrong is not a crash: it publishes an indicator under another
+# institution's name and licence.
+FEED_FAMILY = {
+    "eurostat_regional": "eurostat",
+    "istat_demografia": "istat_demografia",
+}
+
+# The 20 regional keys the whole app joins on (`territory_code` in the external
+# layer, `region_key` in the atlas API, the id the SVG map matches). It lives
+# here, in the shared stdlib lib, because every hunter adapter has to emit the
+# same keys: the Eurostat one derives them from NUTS2 codes and the Istat one
+# from SDMX region names, and if the two disagreed the same region would appear
+# twice on a page.
+REGION_NAMES = {
+    "piemonte": "Piemonte", "valle-d-aosta": "Valle d'Aosta", "liguria": "Liguria",
+    "lombardia": "Lombardia", "trentino-alto-adige": "Trentino Alto Adige",
+    "veneto": "Veneto", "friuli-venezia-giulia": "Friuli-Venezia Giulia",
+    "emilia-romagna": "Emilia-Romagna", "toscana": "Toscana", "umbria": "Umbria",
+    "marche": "Marche", "lazio": "Lazio", "abruzzo": "Abruzzo", "molise": "Molise",
+    "campania": "Campania", "puglia": "Puglia", "basilicata": "Basilicata",
+    "calabria": "Calabria", "sicilia": "Sicilia", "sardegna": "Sardegna",
+}
+REGION_KEY_BY_NAME = {name: key for key, name in REGION_NAMES.items()}
+
+
+def region_key(name):
+    """Regional key for a region name, or None if the name is not one of the 20.
+
+    Returning None rather than a guessed slug is deliberate: an adapter that
+    hands over an unexpected name (a macro-area, a province, a renamed region)
+    must fail visibly at promotion instead of writing a row the atlas will
+    silently never join.
+    """
+    return REGION_KEY_BY_NAME.get((name or "").strip())
+
 
 # Committed regional backbones used to detect whether a discovered indicator is
 # genuinely new or overlaps an existing series. Read as raw CSV (no app import).

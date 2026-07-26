@@ -56,7 +56,12 @@ CANONICAL_CATEGORIES = {
             "cura disponibili sul territorio."
         ),
         "macro_area": "Persone e conoscenza",
-        "themes": ["Salute", "Servizi di cura", "Demografia e popolazione"],
+        "themes": [
+            "Salute",
+            "Servizi di cura",
+            "Demografia e popolazione",
+            "Indicatori demografici (Istat)",
+        ],
     },
     "istruzione_capitale_umano": {
         "name": "Istruzione e formazione",

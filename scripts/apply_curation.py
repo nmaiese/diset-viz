@@ -36,14 +36,39 @@ DESCRIPTION_COLUMNS = ["target_indicator_id", "plain", "value_explanation"]
 VALID_DIRECTIONS = {"higher_better", "lower_better", "higher_worse", "contextual"}
 
 
+# The reviewed description is shown as the quiz clue, so it has to fit the same
+# budget the rest of the catalogue respects (tests/test_indicator_descriptions).
+# Learned the expensive way: a 202-character description passed curation, landed
+# in the atlas and only failed at the end of the suite, after the indicator was
+# already integrated.
+DESCRIPTION_MAX = 180
+# content/STYLE.md, applied to every visible string this script publishes.
+BANNED_CHARS = ("—", "–", ";", "…")
+
+
 def _validate(decision):
+    target = decision["target_indicator_id"]
     direction = decision.get("reviewed_direction", "")
     if direction not in VALID_DIRECTIONS:
-        raise SystemExit(f"{decision['target_indicator_id']}: invalid reviewed_direction '{direction}'")
+        raise SystemExit(f"{target}: invalid reviewed_direction '{direction}'")
     if decision.get("score_eligible") == "true" and direction not in curate.SCOREABLE_DIRECTIONS:
         raise SystemExit(
-            f"{decision['target_indicator_id']}: score_eligible=true but direction '{direction}' is not scoreable"
+            f"{target}: score_eligible=true but direction '{direction}' is not scoreable"
         )
+    description = (decision.get("description") or "").strip()
+    if len(description) > DESCRIPTION_MAX:
+        raise SystemExit(
+            f"{target}: description is {len(description)} characters, the limit is "
+            f"{DESCRIPTION_MAX}. It is also the quiz clue, so it has to stay short."
+        )
+    for field in ("description", "value_explanation"):
+        text = decision.get(field) or ""
+        bad = [char for char in BANNED_CHARS if char in text]
+        if bad:
+            raise SystemExit(
+                f"{target}: {field} contains {bad}, which content/STYLE.md bans. "
+                "Use commas or two sentences."
+            )
 
 
 def _row_key(row):
