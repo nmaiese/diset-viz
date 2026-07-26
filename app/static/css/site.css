@@ -215,8 +215,13 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 }
 .indicator-cta small { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(251,250,247,0.7); }
 .indicator-cta strong { font-family: var(--font-display); font-size: 18px; }
-.indicator-cta a { background: var(--accent); color: #fff; padding: 10px 16px; font-weight: 700; white-space: nowrap; }
-.indicator-cta a:hover { text-decoration: none; filter: brightness(1.05); }
+/* Direct child only: the button. An inline link inside <strong> (the indicator
+   page's "confronta più regioni") must flow with the text, not inherit the
+   button's orange block and padding. */
+.indicator-cta > a { background: var(--accent); color: #fff; padding: 10px 16px; font-weight: 700; white-space: nowrap; }
+.indicator-cta > a:hover { text-decoration: none; filter: brightness(1.05); }
+.indicator-cta strong a { color: inherit; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 2px; }
+.indicator-cta strong a:hover { text-decoration-color: var(--paper); }
 
 /* Related */
 .related { margin-top: 48px; padding-top: 28px; border-top: 1px solid var(--line); }
