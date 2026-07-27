@@ -4,7 +4,7 @@
 > [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).** Questo documento descrive
 > il **meccanismo** della scoperta: gli adapter, lo schema della coda, il
 > punteggio di priorità, cosa succede in promozione. Quello descrive **chi lo
-> muove**: i sei stadi, gli agenti, il cancello, la politica di merge e il
+> muove**: i sette stadi, gli agenti, il cancello, la politica di merge e il
 > rientro sul pubblicato. Se cerchi "chi decide e quando", vai lì.
 
 Questo documento descrive lo strato di **scoperta e messa in coda** degli
@@ -319,7 +319,7 @@ La catena gira come **Routine Claude Code** (agenti cloud, sessione nuova a ogni
 firing, checkout git proprio). Le cadenze, gli id e lo stato stanno in
 [`DISCOVERY_STATUS.md`](DISCOVERY_STATUS.md); il contratto che ogni agente segue a
 ogni run sta in [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md); come stanno insieme i
-sei stadi sta in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
+sette stadi sta in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 
 **Il prompt di una Routine non riproduce il contratto, lo indica.** È la lezione
 più cara di questo sistema: la Routine dello scrittore riproduceva il proprio

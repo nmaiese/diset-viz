@@ -51,7 +51,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts import curate, discovery  # noqa: E402  (path bootstrap above)
+from scripts import curate, discovery, verification_queue  # noqa: E402  (path bootstrap above)
 
 EXTERNAL_DATASET = "app/static/data/external/normalized_external_indicators.csv"
 EXTERNAL_MANIFEST = "app/static/data/external_indicator_manifest.csv"
@@ -67,6 +67,9 @@ THEME_CATEGORIES = "config/theme_categories.csv"
 # altro) non lascerebbe nessuna traccia, che e' esattamente il buco che il
 # diario esiste per chiudere.
 RUN_JOURNAL = "data/pipeline/runs.jsonl"
+# Il registro delle verifiche. Sta nel perimetro del solo verificatore, ed e'
+# tutto quello che quello stadio produce.
+VERIFICATIONS = "data/pipeline/verifiche.csv"
 
 # What each stage is allowed to change. Anything outside its list is a failure,
 # not a warning: the point of the list is that a prompt cannot widen it.
@@ -82,6 +85,13 @@ STAGE_PATHS = {
                 THEME_CATEGORIES, RUN_JOURNAL),
     "writer": (INDICATOR_TEXTS, RUN_JOURNAL),
     "reviewer": (INDICATOR_TEXTS, RUN_JOURNAL),
+    # Il verificatore NON ha `INDICATOR_TEXTS`, e l'assenza e' la definizione
+    # dello stadio piu' che il suo prompt. Uno stadio che trova e ripara i propri
+    # rilievi corregge i propri compiti, che e' esattamente il difetto che questo
+    # stadio esiste per prendere un livello sopra: la firma del revisore era la
+    # parola del revisore sul lavoro del revisore. Le smentite tornano al revisore
+    # come il segnale `smentita` di `review_queue`, che le legge da qui.
+    "verificatore": (VERIFICATIONS, RUN_JOURNAL),
 }
 
 # How far a green gate is allowed to go, per stage. Not uniform on purpose.
@@ -108,6 +118,13 @@ MERGE_POLICY = {
     "curator": "checks",
     "writer": "auto",
     "reviewer": "auto",
+    # `checks` e non `auto`, pur non scrivendo una riga di prosa. Il verificatore
+    # non cambia nessuna pagina, ma il suo output riordina la coda del revisore e
+    # mette per iscritto che una frase pubblicata e' falsa, quindi vale la pena
+    # che la suite ci stia in mezzo. E c'e' una ragione tecnica: con un perimetro
+    # di due file il cancello ha poco da misurare, e la 3.3 del piano avvertiva
+    # che un perimetro cortissimo rende il verdetto una tautologia verde.
+    "verificatore": "checks",
 }
 
 # Borrowed, not restated. A local copy drifted from `curate.SCOREABLE_DIRECTIONS`
@@ -340,6 +357,181 @@ def check_curation_decisions(rows=None):
             f"decisioni senza reviewed_at in formato YYYY-MM-DD: {', '.join(undated[:5])}",
         )
     return Check("curatela-direzionale", True, f"{len(rows)} decisioni, versi e date coerenti")
+
+
+def check_verifications(base=None, cwd=None):
+    """Il verificatore consegna dei numeri, quindi i numeri devono reggere.
+
+    Ogni riga nuova di `verifiche.csv` deve dire quante affermazioni ha
+    controllato, e i tre parziali devono sommare a quel totale. Non e' pignoleria
+    contabile: senza `controllate` la frase "zero smentite" e la frase "non ho
+    guardato" producono lo stesso file, e uno stadio che non sa distinguerle
+    costa una pull request per articolo e non garantisce niente. La 3.3 del piano
+    lo chiama il campo che non si negozia, e qui e' meccanico invece che ricordato
+    in un prompt, per la stessa ragione per cui il perimetro sta nel repo.
+
+    Controlla anche che la riga parli di un articolo che esiste e che l'impronta
+    della prosa sia quella del testo di adesso. Una verifica registrata su
+    un'impronta che non corrisponde a niente e' una verifica di un testo che non
+    e' in pagina, e sarebbe invisibile: la coda la scarterebbe in silenzio come
+    "da riverificare" e il conto delle smentite non tornerebbe mai.
+    """
+    resolved = resolve_base(base, cwd=cwd)
+    # Il registro e' **append-only**, e questo controllo viene prima di guardare le
+    # righe nuove. Contare solo le righe aggiunte non vede le sottrazioni, quindi
+    # una run che cancella una smentita e non aggiunge niente passava come "nessuna
+    # verifica nuova da controllare": il segnale sparisce dalla coda del revisore
+    # con il cancello verde, che e' il modo peggiore di perdere un rilievo.
+    #
+    # Append-only e non solo "niente cancellazioni", perche' riscrivere una riga
+    # in posto e' la stessa cosa con un passaggio in piu': cambia che cosa dice una
+    # verifica passata senza lasciare traccia. Una verifica si supera riscrivendo
+    # l'articolo, cosa che cambia l'impronta e ne chiede una nuova, mai
+    # modificando la riga vecchia.
+    removed = _verification_rows_removed(base, cwd=cwd)
+    if removed:
+        return Check(
+            "verifiche", False,
+            f"il registro e' append-only e questa run ne toglie o riscrive "
+            f"{len(removed)} righe: "
+            f"{', '.join(sorted(r.get('code') or '?' for r in removed)[:5])}. "
+            "Per superare una verifica si riscrive l'articolo, non la sua riga.",
+        )
+    rows = _verification_rows_added(base, cwd=cwd)
+    if not rows:
+        return Check("verifiche", True, "nessuna verifica nuova da controllare")
+
+    problems = []
+    for row in rows:
+        for problem in verification_queue.row_problems(row):
+            problems.append(f"{row.get('code') or '?'}: {problem}")
+    if problems:
+        return Check("verifiche", False, "; ".join(problems[:5]))
+
+    # L'impronta deve corrispondere a un testo che questo repo ha davvero avuto:
+    # quello di adesso, oppure quello della base. Le due versioni, e non solo la
+    # prima, perche' la prima e' stata scritta e subito smentita da un caso reale.
+    #
+    # Un verificatore legge l'articolo, calcola l'impronta e apre la pull request.
+    # Nel frattempo la Routine del revisore puo' aver fuso una correzione sullo
+    # stesso articolo: l'impronta della run resta quella del testo che ha
+    # effettivamente letto, cioe' quella della base, ed e' onesta. Pretendere
+    # l'impronta di adesso bloccava una run corretta ogni volta che due stadi si
+    # incrociavano, che in una catena con due Routine al giorno non e' un caso
+    # limite. Quello che va preso e' l'impronta che non corrisponde a **niente**,
+    # cioe' scritta a mano o calcolata su un checkout che non e' questo.
+    # La tupla porta anche il livello, e non e' pignoleria: `build_queue` unisce
+    # le righe agli articoli su `(code, level)`, quindi una riga con il livello
+    # sbagliato passerebbe di qui e poi non coprirebbe niente. Una smentita
+    # registrata cosi' sarebbe scritta e invisibile allo stesso tempo, che e' il
+    # modo di fallire peggiore fra quelli disponibili.
+    fingerprints = set()
+    for ref in (None, resolved):
+        try:
+            if ref is None:
+                texts = verification_queue.load_texts()
+            else:
+                code, out, _ = _git("show", f"{ref}:{INDICATOR_TEXTS}", cwd=cwd)
+                if code != 0:
+                    continue
+                texts = json.loads(out)
+        except (OSError, json.JSONDecodeError):
+            continue
+        for key, entry in texts.items():
+            fingerprints.add((
+                verification_queue.code_of(key),
+                (entry.get("level") or "regione"),
+                verification_queue.prose_fingerprint(entry),
+            ))
+    if not fingerprints:
+        return Check("verifiche", False, "testi illeggibili, impossibile verificare le impronte")
+
+    known_codes = {code for code, _level, _hash in fingerprints}
+    known_pairs = {(code, level) for code, level, _hash in fingerprints}
+    orphans, wrong_level, drifted = [], [], []
+    for row in rows:
+        code = (row.get("code") or "").strip()
+        level = (row.get("level") or "").strip()
+        if code not in known_codes:
+            orphans.append(code)
+        elif (code, level) not in known_pairs:
+            wrong_level.append(f"{code} (livello {level!r})")
+        elif (code, level, (row.get("prosa") or "").strip()) not in fingerprints:
+            drifted.append(code)
+    if orphans:
+        return Check("verifiche", False,
+                     f"verifiche su articoli che non esistono: {', '.join(orphans[:5])}")
+    if wrong_level:
+        return Check(
+            "verifiche", False,
+            f"livello che non corrisponde all'articolo: {', '.join(wrong_level[:5])}. "
+            "La coda unisce su (codice, livello), quindi questa riga non coprirebbe "
+            "niente e una sua smentita non arriverebbe al revisore.",
+        )
+    if drifted:
+        return Check(
+            "verifiche", False,
+            f"impronta della prosa che non corrisponde a nessuna versione di "
+            f"{', '.join(drifted[:5])}, ne' quella di adesso ne' quella della base. "
+            "Ricalcolala con verification_queue.prose_fingerprint invece di scriverla.",
+        )
+
+    controllate = sum(verification_queue._int(r.get("controllate")) for r in rows)
+    smentite = sum(verification_queue._int(r.get("smentite")) for r in rows)
+    return Check("verifiche", True,
+                 f"{len(rows)} verifiche, {controllate} affermazioni controllate, "
+                 f"{smentite} smentite")
+
+
+def _verification_rows_removed(base=None, cwd=None):
+    """Le righe della base che questo branch non ha piu' identiche, interpretate.
+
+    Confronta le righe intere, quindi comprende sia una cancellazione sia una
+    riscrittura in posto: per il registro sono la stessa cosa, cioe' cambiare che
+    cosa dice una verifica passata. Un file che alla base non esisteva non ha
+    niente da togliere.
+    """
+    resolved = resolve_base(base, cwd=cwd)
+    if not resolved:
+        return []
+    code, out, _ = _git("show", f"{resolved}:{VERIFICATIONS}", cwd=cwd)
+    if code != 0:
+        return []  # il file non esisteva alla base: non c'e' niente da togliere
+    old_lines = [line for line in out.splitlines() if line.strip()]
+    if not old_lines:
+        return []
+    current = PROJECT_ROOT / VERIFICATIONS
+    new_lines = set()
+    if current.exists():
+        new_lines = {line for line in current.read_text(encoding="utf-8").splitlines() if line.strip()}
+    header, old_body = old_lines[0], old_lines[1:]
+    gone = [line for line in old_body if line not in new_lines]
+    if not gone:
+        return []
+    import csv as _csv
+    return list(_csv.DictReader([header] + gone, delimiter=";"))
+
+
+def _verification_rows_added(base=None, cwd=None):
+    """Le righe che questo branch aggiunge a `verifiche.csv`, gia' interpretate."""
+    resolved = resolve_base(base, cwd=cwd)
+    old = set()
+    if resolved:
+        code, out, _ = _git("show", f"{resolved}:{VERIFICATIONS}", cwd=cwd)
+        if code == 0:
+            old = {line for line in out.splitlines() if line.strip()}
+    current = PROJECT_ROOT / VERIFICATIONS
+    if not current.exists():
+        return []
+    lines = current.read_text(encoding="utf-8").splitlines()
+    if not lines:
+        return []
+    header = lines[0]
+    added = [line for line in lines[1:] if line.strip() and line not in old]
+    if not added:
+        return []
+    import csv as _csv
+    return list(_csv.DictReader([header] + added, delimiter=";"))
 
 
 def check_reviewer_signature(base=None, cwd=None):
@@ -649,6 +841,8 @@ def run(stage, base=None, skip_tests=False, cwd=None):
         checks.append(check_curation_decisions())
     if stage == "reviewer":
         checks.append(check_reviewer_signature(base, cwd=cwd))
+    if stage == "verificatore":
+        checks.append(check_verifications(base, cwd=cwd))
     if stage in ("writer", "reviewer"):
         checks.append(check_writer_vintage(base, cwd=cwd))
     if not skip_tests:

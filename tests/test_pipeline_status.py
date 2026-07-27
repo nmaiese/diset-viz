@@ -18,7 +18,8 @@ class TheChainReadsInOrder(unittest.TestCase):
         when the real answer is two stages above it."""
         self.assertEqual(
             pipeline_status.STAGE_ORDER,
-            ["scout", "hunter", "promoter", "curator", "writer", "reviewer"],
+            ["scout", "hunter", "promoter", "curator", "writer", "reviewer",
+             "verificatore"],
         )
 
     def test_every_stage_names_the_agent_that_owns_it(self):

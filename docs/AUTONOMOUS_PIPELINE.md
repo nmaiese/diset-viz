@@ -21,17 +21,31 @@ Le due meta' contano allo stesso modo. Una catena che scopre e non rilegge
 produce un archivio che invecchia in silenzio, e l'invecchiamento e' peggio di
 un buco: un buco si vede.
 
-## I sei stadi
+## I sette stadi
 
 ```
-  scout          hunter            promoter         curator          writer        reviewer
-  quali fonti    quali indicatori  li integra       quale verso      l'articolo    lo rilegge
-     |               |                |                |                |             |
- source_        candidates.csv   layer esterno   curation.csv    indicator_    reviewed_at
- candidates.csv                  + manifest      + descrizioni    texts.json    + vintage
-     |               |                |                |                |             |
-  checks          checks           checks           checks            auto          auto
+  scout        hunter          promoter      curator       writer      reviewer    verificatore
+  quali fonti  quali indic.    li integra    quale verso   l'articolo  lo rilegge  prova a smentirlo
+     |             |               |             |             |           |             |
+ source_      candidates.csv  layer est.   curation.csv  indicator_  reviewed_at  verifiche.csv
+ candidates.csv               + manifest   + descrizioni  texts.json  + vintage   (impronta prosa)
+     |             |               |             |             |           |             |
+  checks        checks          checks        checks         auto        auto        checks
 ```
+
+L'ultimo e' l'unico che misura un altro stadio invece dei dati, ed e' arrivato per
+ultimo perche' e' servito misurarlo prima di credergli. Una firma del revisore e'
+la parola del revisore sul lavoro del revisore, e finche' nessuno provava a farla
+cadere quanto valesse non si sapeva. Ora si sa:
+
+| stato dell'articolo | affermazioni controllate | false | tasso |
+| --- | --- | --- | --- |
+| note migrate, mai rilette | 113 | 11 | 9,7% |
+| scritte e non ancora rilette | 392 | 19 | 4,8% |
+| scritte e rilette | 529 | 7 | 1,3% |
+
+La rilettura toglie la gran parte degli errori e ne lascia qualcuno, e quel
+qualcuno resta in pagina finche' qualcosa non prova a farlo cadere.
 
 Ogni stadio ha tre cose, e sono sempre le stesse tre: una **coda deterministica**
 calcolata da file committati, un **agente** con un file di definizione in
@@ -45,8 +59,9 @@ calcolata da file committati, un **agente** con un file di definizione in
 | curator | `indicator-curator` | `curate.worklist()` | `scripts/curate.py --include-recheck` |
 | writer | `indicator-writer` | `pending_notes` + `text_queue` | `scripts/pending_notes.py` |
 | reviewer | `indicator-reviewer` | `review_queue` | `scripts/review_queue.py` |
+| verificatore | `indicator-verifier` | `verification_queue` | `scripts/verification_queue.py` |
 
-Un solo comando dice lo stato di tutti e sei:
+Un solo comando dice lo stato di tutti e sette:
 
 ```bash
 python3 scripts/pipeline_status.py            # leggibile
@@ -57,6 +72,41 @@ Esiste per una ragione precisa. Ogni agente vede la propria casella e nient'altr
 quindi nessuno riesce a distinguere "sono fermo perche' ho finito" da "sono fermo
 perche' e' bloccato lo stadio sopra di me", che sono situazioni opposte e si
 somigliano moltissimo. Ogni agente lo lancia per primo.
+
+## Il verificatore, e perche' non ripara niente
+
+`data/pipeline/verifiche.csv` e' tutto quello che produce: una riga per articolo,
+con i quattro contatori e l'impronta della prosa che ha letto.
+
+**Non ha `indicator_texts.json` nel perimetro**, e l'assenza e' la definizione
+dello stadio piu' che il suo prompt. Uno stadio che trova e ripara i propri
+rilievi corregge i propri compiti, che e' esattamente il difetto che esiste per
+prendere un livello sopra. Quindi una smentita torna al revisore, come il segnale
+`smentita` di `review_queue`, che pesa piu' di ogni altro segnale di quella coda:
+tutti gli altri marcano una frase che *potrebbe* essere sbagliata, quello marca
+una frase che qualcuno ha gia' fatto cadere, con la prova, e che e' ancora in
+pagina.
+
+**Una verifica scade quando cambia il testo, non quando passa il tempo.** La riga
+porta un'impronta della prosa, e l'articolo risulta verificato solo finche' la sua
+prosa hasha a quel valore. La prima versione confrontava `reviewed_at` con la data
+della verifica ed e' stata buttata: due eventi nello stesso giorno sono
+indistinguibili, e il revisore che ripara una frase smentita firma il giorno in
+cui il verificatore l'ha smentita. Con l'impronta non c'e' aritmetica e non c'e'
+pareggio.
+
+Le due code si passano il lavoro senza che nessuna cancelli una riga dell'altra:
+
+```
+  verificatore trova una smentita  ->  review_queue la mostra in cima
+  il revisore riscrive la frase    ->  l'impronta cambia, la smentita e' spenta
+  l'impronta cambia                ->  l'articolo torna in coda al verificatore
+```
+
+`affermazioni_controllate` e' il campo che non si negozia, e il cancello lo
+impone invece di ricordarlo: senza, "zero smentite" e "non ho guardato" producono
+la stessa riga, e uno stadio che non sa distinguerle costa una pull request per
+articolo e non garantisce niente.
 
 ## Guardare la catena senza aprire file
 

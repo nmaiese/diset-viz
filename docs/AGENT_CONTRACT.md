@@ -15,7 +15,7 @@ diff sei mesi dopo.
 python3 scripts/pipeline_status.py --json
 ```
 
-Un solo comando dice quanto e' in attesa in ognuno dei sei stadi e qual e' il
+Un solo comando dice quanto e' in attesa in ognuno dei sette stadi e qual e' il
 prossimo passo. Leggilo sempre per primo, anche quando la tua coda e' vuota:
 serve a distinguere "non ho niente da fare perche' ho finito" da "non ho niente
 da fare perche' e' fermo lo stadio sopra di me", che sono due situazioni opposte

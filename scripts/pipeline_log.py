@@ -45,7 +45,8 @@ if str(PROJECT_ROOT) not in sys.path:
 
 JOURNAL = PROJECT_ROOT / "data" / "pipeline" / "runs.jsonl"
 
-STAGES = ("scout", "hunter", "promoter", "curator", "writer", "reviewer")
+STAGES = ("scout", "hunter", "promoter", "curator", "writer", "reviewer",
+          "verificatore")
 
 # Come e' finita una run. Il vocabolario e' corto di proposito: un campo libero
 # si riempirebbe di sinonimi e diventerebbe illeggibile in aggregato.
@@ -84,6 +85,10 @@ WATCH_GROUPS = (
     ("curatore", ("curator",), 7),
     ("scrittore", ("writer",), 7),
     ("revisore", ("reviewer",), 1),
+    # Il verificatore gira dietro al revisore, quindi la sua cadenza attesa e
+    # la stessa: se il revisore firma ogni giorno, ogni giorno c'e' qualcosa da
+    # provare a far cadere.
+    ("verificatore", ("verificatore",), 1),
 )
 # Una run saltata non e' una catena rotta. Due si'.
 GRACE = 2.5

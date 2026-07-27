@@ -11,7 +11,7 @@ Aggiornato al **2026-07-26**.
 
 ## In una riga
 
-Sei stadi, cinque agenti, tutti schedulati, **nessuno che aspetti una firma**.
+Sette stadi, sei agenti, **nessuno che aspetti una firma**.
 Un indicatore va da un catalogo SDMX a una pagina pubblica senza intervento, e la
 catena ci ritorna sopra quando i dati si muovono.
 
@@ -42,10 +42,21 @@ Agenti cloud, sessione nuova a ogni firing, checkout git proprio, environment
 | curatore | `indicator-curator.md` | `0 6 * * 4` (gio) | checks | `trig_019EP6TnEbYnKz8VpKFaRm4g` |
 | scrittore | `indicator-writer.md` | `0 6 * * 6` (sab) | auto | `trig_01RymCgC8VsspDrHHnUJgFUk` |
 | revisore | `indicator-reviewer.md` | `0 7 * * *` (ogni giorno) | auto | `trig_01LSZpaDasW18ZvxbKhXBJSj` |
+| verificatore | `indicator-verifier.md` | `0 9 * * *` (ogni giorno) | checks | **da creare** |
 
 Cadenza sfalsata di proposito: ogni stadio ha senso solo dopo che quello a monte
 ha prodotto qualcosa. Il revisore gira ogni giorno perché lavora su un arretrato
-di centinaia di articoli e non su ciò che è appena arrivato.
+di centinaia di articoli e non su ciò che è appena arrivato, e il verificatore
+due ore dopo di lui per la stessa ragione: se il revisore firma ogni giorno, ogni
+giorno c'è una firma nuova che nessuno ha provato a far cadere.
+
+**La Routine del verificatore non è ancora creata.** Lo stadio è registrato in
+tutti e tre i posti che lo pretendono (`pipeline_gate`, `pipeline_log`,
+`pipeline_status`), ha il suo agente e la sua coda, e gira a mano. Armare la
+Routine è l'ultimo passo e mette in moto un agente che apre e fonde pull request
+da solo: va fatto quando si decide di farlo, non come effetto collaterale di una
+sessione. Il comando è nel prompt della Routine come per gli altri cinque, cioè
+punta al file dell'agente e non ne ricopia il contenuto.
 
 Nessuna riga di questa tabella dice `manual`, e non è una svista. La catena è non
 presidiata per decisione presa: un modo che parcheggia la pull request finché

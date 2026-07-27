@@ -11,10 +11,12 @@ queues: every check takes its rows as an argument for exactly this reason.
 """
 
 import json
+import subprocess
 import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
-from scripts import pipeline_gate
+from scripts import pipeline_gate, verification_queue
 
 
 class BlastRadius(unittest.TestCase):
@@ -472,6 +474,118 @@ class Verdict(unittest.TestCase):
             "curator", [pipeline_gate.CURATION], [pipeline_gate.Check("finto", True)]
         )
         self.assertEqual(verdict["merge"], "checks")
+
+
+class TheVerificationRegisterIsAppendOnly(unittest.TestCase):
+    """Rilievi P2 di Codex sulla #49, su un repo git costruito qui.
+
+    Questi due controlli leggono l'albero git, quindi non si possono provare
+    passando righe a una funzione: serve una base con il registro dentro. Il
+    repo e' finto e minuscolo, e il punto e' sempre lo stesso di questo file,
+    far dire no al cancello prima di fargli dire si'.
+    """
+
+    HEADER = ("code;level;at;vintage;reviewed_at;prosa;controllate;confermate;"
+              "smentite;non_verificabili;esito;rilievi")
+
+    def setUp(self):
+        self._tmp = TemporaryDirectory()
+        self.repo = Path(self._tmp.name)
+        self.addCleanup(self._tmp.cleanup)
+        self._run("git", "init", "-q", "-b", "main")
+        self._run("git", "config", "user.email", "t@example.com")
+        self._run("git", "config", "user.name", "t")
+        (self.repo / "data" / "pipeline").mkdir(parents=True)
+        (self.repo / "app" / "static" / "data").mkdir(parents=True)
+        self.entry = {
+            "lead": "Un lead.", "level": "regione", "vintage": 2024,
+            "reviewed_at": "2026-07-27", "reviewed_vintage": 2024, "fonti": [],
+            "sections": [{"role": "quadro", "h": None, "body": "Il quadro."}],
+        }
+        self._write_texts({"611": self.entry})
+        self.fingerprint = verification_queue.prose_fingerprint(self.entry)
+        self._write_register([self._row()])
+        self._run("git", "add", "-A")
+        self._run("git", "commit", "-qm", "base")
+
+    def _run(self, *args):
+        return subprocess.run(args, cwd=self.repo, capture_output=True, text=True)
+
+    def _write_texts(self, texts):
+        (self.repo / "app" / "static" / "data" / "indicator_texts.json").write_text(
+            json.dumps(texts, ensure_ascii=False), encoding="utf-8")
+
+    def _write_register(self, rows):
+        (self.repo / "data" / "pipeline" / "verifiche.csv").write_text(
+            "\n".join([self.HEADER] + rows) + "\n", encoding="utf-8")
+
+    def _row(self, code="ter-611", level="regione", prosa=None, controllate="40",
+             confermate="40", smentite="0", esito="pulito"):
+        return (f"{code};{level};2026-07-27;2024;2026-07-27;"
+                f"{prosa or self.fingerprint};{controllate};{confermate};{smentite};0;"
+                f"{esito};")
+
+    def _check(self):
+        # `check_verifications` legge i testi dal repo vero per l'impronta, quindi
+        # va puntato al repo finto per la durata della prova.
+        original = verification_queue.TEXTS_PATH
+        gate_root = pipeline_gate.PROJECT_ROOT
+        verification_queue.TEXTS_PATH = (
+            self.repo / "app" / "static" / "data" / "indicator_texts.json")
+        pipeline_gate.PROJECT_ROOT = self.repo
+        try:
+            return pipeline_gate.check_verifications(base="HEAD", cwd=self.repo)
+        finally:
+            verification_queue.TEXTS_PATH = original
+            pipeline_gate.PROJECT_ROOT = gate_root
+
+    def test_an_unchanged_register_passes(self):
+        self.assertTrue(self._check().ok, self._check().detail)
+
+    def test_appending_an_honest_row_passes(self):
+        self._write_texts({"611": self.entry, "72": self.entry})
+        self._write_register([self._row(), self._row(code="ter-72")])
+        check = self._check()
+        self.assertTrue(check.ok, check.detail)
+
+    def test_deleting_a_row_is_refused(self):
+        """Il caso che passava: senza righe nuove il cancello diceva "nessuna
+        verifica nuova da controllare" e il segnale spariva dalla coda del
+        revisore con il verde."""
+        self._write_register([])
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("append-only", check.detail)
+
+    def test_dropping_one_row_while_adding_another_is_refused(self):
+        self._write_texts({"611": self.entry, "72": self.entry})
+        self._write_register([self._row(code="ter-72")])
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("append-only", check.detail)
+
+    def test_rewriting_a_row_in_place_is_refused(self):
+        """Riscrivere e' cancellare con un passaggio in piu': cambia che cosa dice
+        una verifica passata senza lasciare traccia."""
+        self._write_register([self._row(controllate="99", confermate="99")])
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("append-only", check.detail)
+
+    def test_a_row_whose_level_does_not_match_the_article_is_refused(self):
+        """`build_queue` unisce su (codice, livello), quindi una riga col livello
+        sbagliato passava il cancello e poi non copriva niente: la smentita
+        restava scritta e invisibile."""
+        self._write_register([self._row(), self._row(level="provincia")])
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("livello", check.detail)
+
+    def test_a_fingerprint_matching_nothing_is_refused(self):
+        self._write_register([self._row(), self._row(prosa="deadbeefdeadbeef")])
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("impronta", check.detail)
 
 
 if __name__ == "__main__":

@@ -43,7 +43,8 @@ SOURCE_CANDIDATES = PROJECT_ROOT / "data" / "discovery" / "source_candidates.csv
 
 # The order is the chain. Printing them in any other order would invite reading
 # a downstream idle queue as "nothing to do" when the reason is upstream.
-STAGE_ORDER = ["scout", "hunter", "promoter", "curator", "writer", "reviewer"]
+STAGE_ORDER = ["scout", "hunter", "promoter", "curator", "writer", "reviewer",
+               "verificatore"]
 
 AGENT_OF = {
     "scout": "source-scout",
@@ -52,6 +53,7 @@ AGENT_OF = {
     "curator": "indicator-curator",
     "writer": "indicator-writer",
     "reviewer": "indicator-reviewer",
+    "verificatore": "indicator-verifier",
 }
 
 
@@ -228,6 +230,49 @@ def _reading_order():
     }
 
 
+def verificatore_stage():
+    """Di quello che il revisore ha firmato, cosa nessuno ha provato a smentire.
+
+    Ultimo della catena e non per modo di dire: e' lo stadio che misura lo stadio
+    prima. Una firma e' la parola del revisore sul lavoro del revisore, e finche'
+    nessuno provava a farla cadere il numero che diceva quanto valesse non
+    esisteva. Adesso esiste, ed e' 7 smentite su 529 affermazioni.
+    """
+    try:
+        from scripts import verification_queue
+    except Exception as exc:  # pragma: no cover - solo senza il repo completo
+        return {
+            "stage": "verificatore",
+            "waiting": 0,
+            "detail": {"disponibile": False, "motivo": f"{type(exc).__name__}"},
+            "next": "coda non calcolabile",
+            "command": "python3 scripts/verification_queue.py",
+        }
+    rows = verification_queue.build_queue()
+    summary = verification_queue.summarize(rows)
+    waiting = summary["da_verificare"]
+    aperte = summary["smentite_aperte"]
+    if aperte:
+        # Prima di verificarne altri: una smentita aperta e' una frase falsa in
+        # pagina, e l'unico stadio che puo' chiuderla e' il revisore.
+        nxt = (f"{aperte} smentite aperte da chiudere, tocca al revisore, "
+               f"poi {waiting} articoli da verificare")
+    elif summary["riverificare"]:
+        nxt = (f"riverificare {summary['riverificare']} articoli riscritti dopo la verifica, "
+               f"poi {waiting - summary['riverificare']} mai verificati")
+    elif waiting:
+        nxt = f"provare a smentire {waiting} articoli firmati e mai verificati"
+    else:
+        nxt = "ogni articolo firmato e' stato verificato sul testo di adesso"
+    return {
+        "stage": "verificatore",
+        "waiting": waiting,
+        "detail": summary,
+        "next": nxt,
+        "command": "python3 scripts/verification_queue.py",
+    }
+
+
 BUILDERS = {
     "scout": scout_stage,
     "hunter": hunter_stage,
@@ -235,6 +280,7 @@ BUILDERS = {
     "curator": curator_stage,
     "writer": writer_stage,
     "reviewer": reviewer_stage,
+    "verificatore": verificatore_stage,
 }
 
 
