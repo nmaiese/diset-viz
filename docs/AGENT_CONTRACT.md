@@ -120,13 +120,34 @@ e' l'unico errore possibile**, e su `verifiche.csv` e' anche una violazione del
 tuo stesso cancello, che il registro lo pretende append-only.
 
 `app/static/data/indicator_texts.json` e' un caso diverso e riguarda solo
-scrittore e revisore. Su articoli diversi git fonde da solo e non vedi niente. Sullo
-**stesso** articolo il conflitto e' vero e nessuna regola meccanica lo risolve,
-perche' sono due versioni della stessa frase: tieni quella del revisore se il
-revisore ha firmato, altrimenti la piu' recente, e **dichiara nel corpo della PR
-e nel diario che hai scelto**, con l'altra versione scritta accanto. E' l'unico
-punto della catena in cui un agente decide al posto di un altro, quindi e' anche
-l'unico che va lasciato leggibile.
+scrittore e revisore. Su articoli diversi git fonde da solo e non vedi niente.
+Sullo **stesso** articolo guarda il `vintage` delle due versioni, perche' decide
+tutto e le due situazioni non si somigliano affatto.
+
+**`vintage` diverso: vince quello piu' alto, sempre.** Vuol dire che lo scrittore
+ha aggiornato l'articolo su un anno nuovo mentre il revisore firmava quello
+vecchio. La firma del revisore copre cifre che non esistono piu', quindi non vale
+niente: tenere il lato firmato butterebbe via l'aggiornamento e, peggio,
+lascerebbe un testo vecchio con `reviewed_vintage` che combacia, cioe' un
+articolo che **risulta riletto e non torna mai in coda**. E' esattamente il
+guasto che il rientro esiste per impedire. Quindi tieni il testo dello scrittore
+e **non riportare `reviewed_at` ne' `reviewed_vintage` dal lato che hai scartato**:
+lasciarli indietro e' ciò che rimette l'articolo in coda al revisore con il
+segnale `rilettura`, che e' il comportamento giusto. Se il revisore aveva
+corretto un errore vero, quella correzione non e' persa: e' un rilievo da
+riportare nel corpo della PR, e il revisore la rifara' sul testo nuovo.
+
+**`vintage` uguale: e' una scelta editoriale, e la fai.** Sono due versioni della
+stessa frase sulle stesse cifre. Tieni quella del revisore, che e' una passata in
+piu' sugli stessi dati, e **dichiara nel corpo della PR e nel diario che hai
+scelto**, con l'altra versione scritta accanto. E' l'unico punto della catena in
+cui un agente decide al posto di un altro, quindi e' anche l'unico che va
+lasciato leggibile.
+
+Nessuna guardia automatica vede una risoluzione sbagliata qui: il cancello
+controlla che il `vintage` non superi i dati e che una revisione firmi qualcosa,
+non che tu abbia tenuto il lato giusto. Questa regola e' l'unico controllo che
+esiste.
 
 Se il conflitto non e' in nessuno di questi file, non improvvisare: lascia il
 branch committato, scrivi la riga di diario con esito `stopped` e di' quale file
