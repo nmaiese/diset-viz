@@ -477,17 +477,33 @@
   "vintage": 2023
  },
  "158": {
-  "fonti": [],
-  "lead": "Le imprese con certificazione ambientale sono cresciute enormemente da una base quasi nulla. Oggi i siti certificati sono il 34,7% del totale in Valle d'Aosta e il 25,1% in Liguria, contro il 13,3% della Calabria. La media delle regioni è del 20,9%.",
+  "fonti": [
+   {
+    "testo": "ISPRA, indicatore sul numero di certificati UNI EN ISO 14001 su rilevazione Accredia: 41.167 siti aziendali italiani con certificazione valida a fine 2025 contro 37.540 nel 2024, metà nelle regioni del Nord, Lombardia prima con 8.258 siti",
+    "url": "https://indicatoriambientali.isprambiente.it/it/certificazione-ambientale/numero-di-certificati-uni-en-iso-14001"
+   }
+  ],
+  "lead": "L'incidenza della certificazione ambientale non dice quante imprese si certificano, dice quanto pesa l'ambiente dentro le certificazioni che una regione ha già. Letta così, l'Umbria è terza e l'Emilia-Romagna tredicesima.",
+  "level": "regione",
   "sections": [
    {
-    "body": "La certificazione ambientale è un segnale volontario di attenzione alla sostenibilità, richiesto sempre più da mercati e appalti. La sua diffusione, ormai un'impresa certificata su cinque, mostra un tessuto produttivo che si adegua, ma con ritardi al Sud, dove pesano dimensioni piccole e costi. La differenza la fanno i controlli, non il bollino. Certificarsi è impegno reale o adempimento formale?",
-    "h": null,
+    "body": "La norma ISO 14001 certifica un sistema di gestione ambientale, cioè le procedure con cui un'organizzazione controlla i propri effetti sull'ambiente, e la rilascia un organismo accreditato. L'indicatore conta i siti che ce l'hanno, ma non li divide per le imprese della regione. Li divide per il totale dei siti di organizzazioni certificate, quale che sia lo standard. Il denominatore è già una selezione, chi aveva scelto di farsi controllare da un ente terzo.\n\nUn valore alto quindi non segnala molti certificati, segnala che l'ambiente occupa molto spazio dentro quel gruppo. I siti italiani con una ISO 14001 valida a fine 2025 erano 41.167, metà nelle regioni del Nord, e il primato assoluto appartiene alla Lombardia con 8.258 siti, secondo il dato nazionale ISPRA su rilevazione Accredia. In quota, la stessa Lombardia sta sotto la media semplice delle venti regioni.",
+    "h": "Una quota calcolata dentro il mondo già certificato",
+    "role": "definizione"
+   },
+   {
+    "body": "Certificarsi è una scelta dell'organizzazione, non un obbligo di legge. Questa quota dice allora dove chi si era già sottoposto a un controllo esterno ha deciso di estenderlo anche all'ambiente, e non riguarda una popolazione marginale, visto che sono decine di migliaia i siti che raccontano a un verificatore indipendente come lavorano. È la parte di economia italiana che qualcuno, dall'esterno, ha già guardato carte alla mano.\n\nLa forma della graduatoria è insolita. La Valle d'Aosta sta staccata di quasi dieci punti dalla seconda, e sotto di lei dodici regioni, dalla Liguria all'Emilia-Romagna, entrano in poco più di quattro punti, con l'Abruzzo e la Basilicata davanti al Veneto e alla Lombardia. La distanza torna a contare solo sotto la Lombardia, che resta da sola tra il gruppo e la coda.\n\nC'è una graduatoria vicina che questa quasi rovescia. Dove nascono più imprese nuove la quota ambientale è più bassa. La Campania e la Calabria stanno nei primi tre per [tasso di natalità delle imprese](/indicatore/tasso-di-natalita-delle-imprese/ter-54) e nelle ultime tre qui, mentre la Valle d'Aosta fa il percorso opposto. È una co-occorrenza, non un meccanismo, e la dimensione media delle organizzazioni pesa su entrambe. Il Molise sta sopra la media in tutte e due, e basta questo a ricordare che la regolarità ha eccezioni.",
+    "h": "Perché la classifica non segue la potenza industriale",
     "role": "quadro"
    },
    {
-    "body": "Conta i siti con certificazione ambientale, non i loro effetti concreti sull'ambiente. Una certificazione attesta procedure, non risultati, e la sua assenza non significa per forza pratiche peggiori.",
-    "h": null,
+    "body": "All'inizio della serie l'indicatore quasi non esisteva. Nel 1998 sei regioni segnavano zero e il primato nazionale era del Molise, con il 6,06 per cento. Da allora sono cresciute tutte, senza eccezioni, e il Molise che era partito in testa oggi è undicesimo.\n\nL'ultimo passaggio va letto con cautela. Dal 2024 al 2025 la quota è scesa in diciassette regioni su venti, e delle tre rimaste due si sono mosse di qualche centesimo. Tra gli stessi due anni i siti italiani con una ISO 14001 valida sono passati da 37.540 a 41.167, sempre secondo ISPRA. Le due cose non si contraddicono, perché una quota può scendere anche mentre il numeratore cresce, se il totale cresce di più.\n\nIl movimento più ampio dell'anno è il calo del Molise, 4,49 punti in dodici mesi. Dove la base di siti certificati è ristretta, pochi rilasci o poche revoche spostano la percentuale molto più che altrove.",
+    "h": "La quota scende, i certificati no",
+    "role": "dinamica"
+   },
+   {
+    "body": "La ISO 14001 attesta un sistema di gestione, cioè che l'organizzazione ha scritto le proprie procedure ambientali e le fa verificare. Non misura le emissioni né i rifiuti, e non promette che siano diminuiti. E l'unità di conto è il sito, non l'impresa, quindi chi ha molti stabilimenti pesa più di chi ne ha uno.\n\nChe la mappa delle procedure non somigli a quella dei consumi si vede restando dentro il catalogo. La graduatoria dei [consumi di energia elettrica delle imprese del terziario](/indicatore/consumi-di-energia-elettrica-delle-imprese-private-del-terziario-esclusa-la-pa/ter-377) qui non trova riscontro, e la Valle d'Aosta, prima in questa pagina, è la regione dove quei consumi pesano di più su ogni euro di valore aggiunto. Quel dato si ferma al 2023 e guarda i soli servizi, quindi non dimostra che la certificazione sia inutile, ma sconsiglia di leggere questa classifica come una misura di prestazione ambientale.\n\nLa quota si legge meglio accanto alle altre misure di [imprese e competitività](/tema/imprese-e-competitivita), dove la demografia d'impresa descrive la base su cui si appoggia.",
+    "h": "Che cosa certifica davvero un certificato",
     "role": "limiti"
    }
   ],
@@ -584,17 +600,37 @@
   "vintage": 2023
  },
  "168": {
-  "fonti": [],
-  "lead": "Questo indicatore ribalta la mappa dell'export: guarda quanta parte delle esportazioni riguarda settori a domanda mondiale in crescita. È altissimo in Basilicata, 74,8%, e Molise, 66,4%, bassissimo in Sardegna, 3,7%. La media delle regioni è del 36%. Qui la mappa dell'export si capovolge.",
+  "fonti": [
+   {
+    "testo": "I settori considerati a domanda mondiale dinamica cambiano nel 2009 con il passaggio da Ateco 2002 ad Ateco 2007. Metadati Istat dell'indicatore, ripubblicati dall'ISPAT sul portale open data della Provincia autonoma di Trento",
+    "url": "https://dati.trentino.it/dataset/capacita-di-esportare-in-settori-a-domanda-mondiale-dinamica"
+   },
+   {
+    "testo": "Nel primo semestre del 2023 le esportazioni delle Marche al netto del comparto farmaceutico hanno ristagnato. Banca d'Italia, L'economia delle Marche, aggiornamento congiunturale n. 33, 7 novembre 2023",
+    "url": "https://www.bancaditalia.it/pubblicazioni/economie-regionali/2023/2023-0033/index.html"
+   }
+  ],
+  "lead": "Vendere all'estero nei settori dove la domanda mondiale cresce è una cosa diversa dal vendere tanto, e in Italia le due mappe non si somigliano. La Basilicata guida la graduatoria con tre quarti delle sue merci nei comparti dinamici, il Veneto è sedicesimo pur essendo fra le regioni più aperte all'export.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Il primato di regioni piccole del Sud non è un segno di forza diffusa, ma l'effetto di pochi grandi stabilimenti, come l'auto in Basilicata, che concentrano l'export su un solo settore dinamico. È una specializzazione fragile, dato che dipendere da una fabbrica sola espone a rischi enormi se quella chiude o rallenta. La qualità dell'export conta quanto la quantità. Esportare beni giusti da un solo stabilimento è forza o vulnerabilità?",
-    "h": null,
+    "body": "L'indicatore è una quota. Su ogni cento euro di merci che una regione vende oltre confine, dice quanti finiscono in comparti la cui domanda mondiale è in crescita.\n\nQuali siano quei comparti non lo decide il territorio, lo decide l'elenco dei settori Ateco che l'Istat considera dinamici. Dentro ci sono la farmaceutica, l'elettronica e i mezzi di trasporto, fuori restano l'abbigliamento e le calzature. Una regione che vende scarpe eccellenti in mezzo mondo, qui, resta in basso.\n\nUn valore alto quindi non misura la forza dell'export, misura dove è puntato.",
+    "h": "Che cosa rende un settore a domanda mondiale dinamica",
+    "role": "definizione"
+   },
+   {
+    "body": "La graduatoria si spezza subito. Le prime cinque stanno sopra il 56 per cento, la sesta non arriva al 43. Sono Basilicata, Molise, Lazio, Abruzzo e Marche, tutte nel Centro-Sud. La prima regione del Nord-Est arriva al dodicesimo posto.\n\nQuello che un territorio vende fuori decide se la domanda mondiale lo spinge o lo lascia dov'è. Nei comparti dinamici il mercato si allarga da solo e per crescere basta restare in corsa, negli altri ogni euro in più va tolto a un concorrente. Per le sette regioni in cui l'export vale più di un terzo del prodotto, la composizione del paniere arriva ai bilanci di migliaia di imprese e ai posti di lavoro che ne dipendono.\n\nLe due misure dell'export, quanto e che cosa, mettono le regioni in ordini diversi. Nella graduatoria di [quanto ogni regione esporta in rapporto al PIL](/indicatore/capacita-di-esportare/ter-267) stanno davanti l'Emilia-Romagna e la Toscana, che qui sono tredicesima e quattordicesima, e le uniche nei primi cinque posti di entrambe sono le Marche. Una cautela va tenuta sulla dimensione della base esportata, perché dove si spedisce poco una sola voce merceologica può valere metà del paniere.\n\nNemmeno la produttività industriale segue questa geografia. Sulla [produttività del lavoro nell'industria in senso stretto](/indicatore/produttivita-del-lavoro-nell-industria-in-senso-stretto/ter-123) le due regioni agli estremi di questa fila finiscono entrambe a metà classifica, undicesima e quattordicesima. Nel tema [Imprese e competitività](/tema/imprese-e-competitivita) questa mappa resta un caso a sé.",
+    "h": "Le prime cinque e poi il vuoto",
     "role": "quadro"
    },
    {
-    "body": "Misura la quota di export in settori dinamici, non il suo valore assoluto né la sua diffusione tra le imprese. In regioni piccole basta un grande impianto a farla schizzare, senza un tessuto esportatore reale.",
-    "h": null,
+    "body": "Dal 1991 la media semplice delle regioni si è spostata verso i comparti dinamici di 8,5 punti. La fila però si è allargata più di quanto si sia alzata, con 13,6 punti in più fra la testa e la coda.\n\nLa corsa più lunga è quella delle Marche. Nel 1991 meno del sei per cento del loro export stava in settori a domanda dinamica, nel 2022 più della metà, e la regione ha risalito quasi tutta la graduatoria. Buona parte di quel percorso è arrivata in un anno solo, dal 33,2 al 56,5 per cento fra il 2021 e il 2022, mentre quattordici regioni su venti scendevano. La media è rimasta ferma perché quel salto ha pareggiato tutti i cali, ed è una stabilità che non racconta niente di stabile. Una quota del resto si muove anche dal denominatore, e sale pure quando è il paniere a sgonfiarsi.\n\nCinque regioni vanno nella direzione opposta. La Sardegna è il caso estremo, con quasi diciotto punti persi dal 1991, e la Valle d'Aosta ne ha lasciati per strada tredici. Quanto possa pesare un singolo comparto lo dice la Banca d'Italia, che rileva come nei primi sei mesi del 2023, l'anno dopo l'ultimo coperto da questa serie, le esportazioni marchigiane al netto della farmaceutica abbiano ristagnato.",
+    "h": "Trent'anni di spostamento, e un salto tutto in un anno",
+    "role": "dinamica"
+   },
+   {
+    "body": "L'elenco dei comparti considerati dinamici è cambiato per strada. Fino al 2008 l'Istat lo costruiva sulla classificazione Ateco 2002, dal 2009 su Ateco 2007, con un insieme di settori diverso. Il confronto tra il 1991 e oggi attraversa quel passaggio, quindi una variazione di lunghissimo periodo va letta come un ordine di grandezza.\n\nLa quota non dice quanto vale l'export né quante imprese lo fanno. Una regione che spedisce poche merci può stare in cima perché quelle poche appartengono ai comparti giusti, e il conto non distingue un distretto di centinaia di aziende da due o tre stabilimenti. Non dice nemmeno con quali margini si vende dentro quei settori, e l'elenco resta fermo per anni mentre i mercati si muovono più in fretta.",
+    "h": "Il perimetro dei settori dinamici non è sempre stato lo stesso",
     "role": "limiti"
    }
   ],
@@ -943,17 +979,37 @@
   "vintage": 2023
  },
  "242": {
-  "fonti": [],
-  "lead": "Il saldo netto tra imprese iscritte e cessate è oggi negativo quasi ovunque: il tessuto d'impresa si assottiglia. È meno negativo, anzi positivo, in Valle d'Aosta e Trentino Alto Adige, mentre scende a meno 2,6% nelle Marche. La media delle regioni è negativa.",
+  "fonti": [
+   {
+    "testo": "Le camere di commercio cancellano d'ufficio dal registro le imprese non più operative, comprese le società in liquidazione che per oltre tre anni consecutivi non depositano il bilancio (D.P.R. 247/2004, art. 2490 del codice civile)",
+    "url": "https://www.na.camcom.gov.it/registro-imprese-e-albi/deposito-pratiche/cancellazioni-dufficio"
+   },
+   {
+    "testo": "Istat misura nascite, cessazioni e sopravvivenza delle imprese sul registro statistico delle imprese attive (Asia), una popolazione diversa dalle posizioni iscritte al registro camerale",
+    "url": "https://www.istat.it/tavole-di-dati/demografia-dimpresa-anni-2019-2024/"
+   }
+  ],
+  "lead": "Nel 2023 il registro delle imprese si assottiglia più in Emilia-Romagna che in Calabria, e non perché lì se ne iscrivano poche, ma perché ne cessano molte di più. Il saldo tra iscrizioni e cessazioni è negativo in quattordici regioni su venti, e la parte del Paese che ne esce peggio è il Centro.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Che il saldo sia negativo quasi ovunque segnala un'Italia che perde imprese più di quante ne crea, un cambiamento importante rispetto ai decenni di espansione. Chiudono soprattutto le piccole attività tradizionali, schiacciate da costi e concorrenza. Non tutte le chiusure sono un male, alcune sono consolidamento, ma il segno resta preoccupante. Un Paese con meno imprese è più efficiente o più povero di iniziativa?",
-    "h": null,
+    "body": "L'indicatore mette insieme due movimenti dello stesso anno, le imprese che si iscrivono al registro delle camere di commercio e quelle che ne escono, e ne fa la differenza sul totale delle imprese registrate alla fine dell'anno prima. Un valore di meno uno vuol dire che ogni cento posizioni aperte a fine 2022 il bilancio del 2023 ne ha tolta una.\n\nÈ un saldo, quindi può stare sotto lo zero, e le sue variazioni si contano in punti e mai in percentuali, perché su una base vicina allo zero il rapporto tra due anni non dice niente. Conta posizioni al registro, non imprese in attività.",
+    "h": "Iscrizioni meno cessazioni, ogni cento imprese già registrate",
+    "role": "definizione"
+   },
+   {
+    "body": "Il saldo del registro è il conto di chi prova e di chi smette, quello che tiene insieme l'artigiano che apre e la società che va in liquidazione. Dice se la platea si allarga o si restringe, e nel 2023 si restringe in quattordici regioni su venti. Le sei che restano in positivo non compongono la geografia attesa, visto che tra loro ci sono la Sardegna e la Calabria.\n\nLa differenza non sta in quante imprese si aprono, perché su quel fronte le regioni si somigliano. Il [tasso di iscrizione lordo](/indicatore/tasso-di-iscrizione-lordo-nel-registro-delle-imprese/ter-241) sta tra 4,53 e 6,16, poco più di un punto e mezzo tra la prima e l'ultima. Sottraendo il netto dal lordo si ricava il peso delle cessazioni sullo stesso denominatore, e lì la forbice si allarga. L'Emilia-Romagna ne cancella 7,70 ogni cento imprese registrate l'anno prima, la Calabria 4,80, quasi il triplo dello scarto che separa le stesse due regioni sulle iscrizioni.\n\nIl conto più pesante lo paga il Centro. Lazio, Umbria, Toscana e Marche occupano quattro delle ultime otto posizioni, e le Marche chiudono la graduatoria per il secondo anno di fila. L'Emilia-Romagna sta poco più su, sedicesima, sotto la Campania e la Sicilia.\n\nNel tema [imprese e competitività](/tema/imprese-e-competitivita) la mappa cambia a ogni indicatore, e gli [investimenti privati sul PIL](/indicatore/investimenti-privati-sul-pil/ter-471) mettono al primo posto la Basilicata, qui diciassettesima.",
+    "h": "A muovere la classifica sono le cessazioni, non le aperture",
     "role": "quadro"
    },
    {
-    "body": "È la differenza tra iscrizioni e cessazioni, che non pesa la dimensione delle imprese. La perdita di molte micro-attività può convivere con la crescita di poche aziende più grandi, che il saldo non mostra.",
-    "h": null,
+    "body": "All'inizio della serie questo indicatore misurava un'espansione. Dal 1998 al 2005 la media delle regioni è rimasta ogni anno sopra 1,4, poi il 2006 e il 2007 la portano vicino allo zero e nel 2008 diventa negativa per la prima volta. Da lì comincia una lunga fase piatta, quattordici anni chiusi tutti tra meno 0,2 e più 0,9.\n\nL'anno che rompe l'equilibrio è il 2022, con una caduta di più di un punto in dodici mesi. Il 2023 non la approfondisce, la conferma, e la media si sposta di appena otto centesimi di punto, con dodici regioni in calo e otto in aumento. Sono i due anni più bassi dell'intera serie.\n\nNessuna regione fa eccezione, tutte stanno più in basso del 1996. Il calo più profondo è quello del Piemonte, ma quel primato dice più sul 1996 che sull'oggi, perché il Piemonte partiva da 6,29 in un anno in cui nessun'altra regione toccava 2,7. La distanza tra la prima e l'ultima si è ristretta di oltre due punti, una convergenza tutta verso il basso.",
+    "h": "Positivo fino al 2005, piatto per quattordici anni, poi giù",
+    "role": "dinamica"
+   },
+   {
+    "body": "La cancellazione non coincide con la chiusura. Le camere di commercio cancellano d'ufficio le imprese non più operative, per esempio le società in liquidazione che per oltre tre anni non depositano il bilancio, quindi una cessazione datata 2023 può riguardare un'attività ferma da prima. Il Lazio nel 2021 segnò meno 7,02 in un anno in cui la media delle regioni era positiva, e valori così isolati misurano in parte il lavoro degli uffici camerali.\n\nIl saldo non pesa nemmeno la dimensione, e la chiusura di un'edicola conta quanto l'apertura di una società con cinquanta addetti.\n\nIstat pubblica anche il [turnover netto delle imprese](/indicatore/tasso-netto-di-turnover-delle-imprese/ter-157), differenza tra nascite e cessazioni rapportate alle imprese attive, e nel 2023 quella graduatoria e questa non si somigliano, con la Campania e il Lazio in cima là e nella metà bassa qui. Le due misure contano popolazioni diverse, le posizioni iscritte e le imprese in attività, e concordano su un punto solo, le Marche, ultime in entrambe.",
+    "h": "Un conto amministrativo, e non l'unico che esiste",
     "role": "limiti"
    }
   ],
@@ -1972,17 +2028,33 @@
   "vintage": 2023
  },
  "432": {
-  "fonti": [],
-  "lead": "Anche l'uso di infrastrutture di ricerca esterne è più alto al Sud. Tra le imprese con R&S, le usa il 33,3% in Molise e il 27% in Calabria, contro il 14,7% della Valle d'Aosta. La media delle regioni è del 20,8%.",
+  "fonti": [
+   {
+    "testo": "Istat, La ricerca e sviluppo in Italia, anni 2022-2024: nel 2022 la spesa delle imprese per R&S intra-muros cresce del 4,0% sul 2021, con gli incrementi più forti nel Mezzogiorno (+11,2% nelle Isole, +6,1% nel Sud). Dato nazionale in valore, non confrontabile con la media semplice delle quote regionali.",
+    "url": "https://www.istat.it/comunicato-stampa/la-ricerca-e-sviluppo-in-italia-anni-2022-2024/"
+   }
+  ],
+  "lead": "Le imprese che fanno ricerca in proprio ricorrono sempre meno ai laboratori e ai servizi di qualcun altro, e quasi tutta la caduta sta negli ultimi due anni. Nel 2022 la quota è scesa quasi ovunque, nell'anno in cui l'Istat contava una spesa privata in ricerca in aumento.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Come per la collaborazione, il primato del Sud riflette la mancanza di risorse interne: chi non ha laboratori propri usa quelli pubblici o condivisi. È un segnale che le infrastrutture di ricerca, dove esistono, servono davvero a chi è piccolo. Rafforzarle potrebbe contare più al Sud che al Nord, dove le imprese hanno più mezzi propri. Le infrastrutture pubbliche compensano la debolezza del tessuto privato?",
-    "h": null,
+    "body": "L'Istat chiede alle imprese che svolgono ricerca e sviluppo dentro le proprie mura se, per farla, si sono servite anche di infrastrutture di ricerca e di altri servizi alla R&S di soggetti pubblici o privati. L'indicatore conta quante di quelle imprese, ogni cento, hanno risposto di sì.\n\nIl denominatore cambia la lettura. Non entrano tutte le imprese della regione, ma solo quelle che già fanno ricerca intra-muros, un gruppo ristretto e di dimensione molto diversa da una regione all'altra. La graduatoria non dice quanta ricerca si fa in un territorio, dice quanto chi la fa esce dai propri confini per farla.",
+    "h": "Non tutte le imprese, solo quelle che la ricerca la fanno già",
+    "role": "definizione"
+   },
+   {
+    "body": "Il contatto che l'indicatore misura è quello fra la ricerca che un'impresa fa in casa e le strutture che non possiede, un laboratorio universitario o una capacità di calcolo. È lì che si misura quanto il sistema pubblico della ricerca e quello privato si incontrino, e nel 2022 il valore tocca il minimo dei dieci anni coperti quasi dappertutto. Fanno eccezione il Molise e l'Umbria, le stesse due regioni salite nell'ultimo passaggio.\n\nLa distribuzione ha una testa corta e un corpo compresso. Il Molise precede di 6,31 punti la Calabria, che a sua volta ne ha 2,33 sul Friuli-Venezia Giulia, poi la graduatoria si appiattisce e le restanti diciotto stanno in meno di dieci punti, con media e mediana che distano meno di mezzo punto.\n\nChi si aspetta la mappa consueta della ricerca resta spiazzato. L'Emilia-Romagna è la prima regione italiana per [personale addetto a ricerca e sviluppo](/indicatore/personale-addetto-a-ricerca-e-sviluppo-eurostat-nuts2/eur-rd_p_persreg) e qui è diciassettesima, mentre la Calabria, ultima per addetti, è seconda. Le due misure contano popolazioni diverse, persone da un lato e imprese dall'altro, e il rovesciamento vale agli estremi più che nel mezzo, perché sulle venti regioni i due ordini si somigliano poco.\n\nIl primato del Molise chiede un occhio sul denominatore. La sua serie oscilla come nessun'altra, da 53,33 nel 2013 a 26,47 nel 2017 e di nuovo a 39,00 l'anno dopo, salti che segnalano una base piccola, dove poche risposte spostano molto la quota.",
+    "h": "Una testa staccata e diciotto regioni schiacciate",
     "role": "quadro"
    },
    {
-    "body": "Riguarda le sole imprese che fanno R&S interna, quindi una base piccola e selezionata. Non dice se le infrastrutture usate siano locali o lontane, né quanto pesino sui risultati.",
-    "h": null,
+    "body": "Per gran parte della serie questo indicatore non si è mosso. La media semplice delle regioni valeva 33,96 nel 2013 e 31,58 nel 2020, sempre fra 30 e 34 negli anni in mezzo. Poi scende a 25,59 nel 2021 e ancora più giù l'anno dopo. In due anni se ne sono andati 10,82 punti, più di quattro volte quanto si era perso nei sette precedenti.\n\nIl caso più netto dell'ultimo passaggio è la Basilicata, prima regione nel 2021 e sesta adesso, dopo aver lasciato per strada 16,13 punti in dodici mesi. Dal 2013 nessuna regione ha chiuso in rialzo, e perfino la Sardegna, la meno toccata, arretra di 1,11 punti.\n\nL'altra forma di apertura non si è mossa allo stesso modo. Anche le [imprese che fanno R&S in collaborazione con soggetti esterni](/indicatore/imprese-che-hanno-svolto-attivita-di-r-s-in-collaborazione-con-soggetti-esterni/ter-417) calano, da una media regionale di 48,65 nel 2013 a una di 34,70 nel 2022, ma per gradi e senza lo strappo finale.\n\nNello stesso 2022 l'Istat contava una spesa delle imprese per R&S intra-muros in crescita del 4,0% sul 2021, con gli aumenti più forti nel Mezzogiorno. È un dato nazionale in valore, non la media semplice di quote regionali. Si spendeva di più in ricerca propria e ci si appoggiava meno a quella degli altri.",
+    "h": "Sette anni fermi, poi due anni di caduta",
+    "role": "dinamica"
+   },
+   {
+    "body": "Numeratore e denominatore si muovono insieme e la serie non li separa. Se entrano nel gruppo nuove imprese che fanno ricerca in casa senza appoggiarsi a nessuno, la quota scende anche quando nessuna delle altre ha cambiato abitudini, e quale dei due effetti pesi nel biennio 2021-2022 da qui non si vede.\n\nIl dato non dice nemmeno che cosa sia stato usato. Un'ora di calcolo comprata e un laboratorio pubblico condiviso per un anno contano allo stesso modo, e nulla distingue l'infrastruttura vicina da quella dall'altra parte del Paese.\n\nSoprattutto, questa non è una classifica dell'innovazione. Sull'[innovazione del sistema produttivo](/indicatore/innovazione-del-sistema-produttivo/bes-11RIC004) che il Bes misura per lo stesso 2022 il Molise ha il diciannovesimo valore su venti, e qui è primo. Per tenere insieme le due cose servono le altre serie di [ricerca, innovazione e digitale](/tema/ricerca-innovazione-e-digitale).",
+    "h": "Una quota può scendere senza che nessuno cambi comportamento",
     "role": "limiti"
    }
   ],
@@ -2437,17 +2509,41 @@
   "vintage": 2023
  },
  "596": {
-  "fonti": [],
-  "lead": "Quanto rende un addetto della cultura varia molto: da circa 28 mila euro in Calabria a 62 mila in Lombardia e 61 mila nel Lazio. La media delle regioni è di circa 41 mila euro. Il valore per addetto raddoppia tra Sud e Nord.",
+  "fonti": [
+   {
+    "testo": "Istat, nota metodologica sulla perimetrazione dei settori culturali e creativi: 91 codici Ateco in otto macrosettori, esclusione della componente pubblica, fonti Asia e Frame-SBS diffuse con almeno 18 mesi di ritardo, e l'avvertenza che una definizione universale del settore non esiste",
+    "url": "https://www.istat.it/it/files//2022/12/Nota-Metodologica.pdf"
+   },
+   {
+    "testo": "Istat, presentazione degli indicatori sui settori culturali e creativi dentro la Banca dati territoriale per le politiche di sviluppo",
+    "url": "https://www.istat.it/notizia/indicatori-sui-settori-culturali-e-creativi/"
+   },
+   {
+    "testo": "Istat, glossario: l'addetto è la persona occupata in una unità giuridico-economica, con posizione di lavoro a tempo pieno o a tempo parziale",
+    "url": "https://www.istat.it/it/files/2011/01/glossario10.pdf"
+   }
+  ],
+  "lead": "Nei settori culturali e creativi il valore che un addetto produce in un anno è la somma da cui escono la sua retribuzione e il margine dell'impresa. Dal 2015 è cresciuta in tutte e venti le regioni, e la crescita ha lasciato le distanze dove le aveva trovate.",
+  "level": "regione",
   "sections": [
    {
-    "body": "La produttività culturale è alta dove ci sono grandi imprese dei media, dell'editoria e del software creativo, cioè nelle metropoli. Altrove prevale un artigianato culturale di qualità ma a basso valore per addetto. Il divario mostra che la cultura genera reddito molto diverso a seconda di come è organizzata. Fare cultura può essere un buon lavoro o resta spesso una vocazione mal pagata?",
-    "h": null,
+    "body": "L'indicatore divide il valore aggiunto delle imprese dei settori culturali e creativi per gli addetti degli stessi settori. Il valore aggiunto è quello che resta all'impresa dopo i costi esterni, la somma da cui escono stipendi e margine. Quarantamila euro vuol dire che ogni persona occupata nel perimetro genera in media quella ricchezza in un anno.\n\nChe cosa stia dentro il perimetro non è ovvio, e Istat lo ha costruito apposta. Un tavolo di lavoro con il Nucleo di valutazione della Presidenza del Consiglio ha scelto 91 codici Ateco, 61 culturali e 30 creativi, in otto macrosettori. Ci sono l'audiovisivo e l'editoria, e c'è l'artigianato, che porta nel conto la lavorazione artistica della ceramica e l'oreficeria.",
+    "h": "Novantuno codici Ateco in una cifra sola",
+    "role": "definizione"
+   },
+   {
+    "body": "Non è una nicchia. In Lombardia quasi un'unità locale su dieci rientra nel perimetro secondo la [quota di imprese culturali e creative sul totale](/indicatore/quota-di-unita-locali-nei-settori-culturali-e-creativi-sul-totale/ter-593), in Calabria una su venti. Quanto rende un addetto qui riguarda quindi una parte larga delle imprese locali.\n\nLa graduatoria del 2023 non scende con regolarità. Il salto più largo cade a metà, tra Marche e Abruzzo, dove due posizioni contigue distano 8.819 euro per addetto, più di quanto separi l'Abruzzo dall'ultima della classifica. Sotto quel gradino la geografia smette di essere una linea. Accanto a Campania e Puglia stanno Liguria e Valle d'Aosta, divise da 141 euro e più vicine alla Campania che alle Marche.\n\nUn altro indicatore del tema disegna la mappa rovesciata. La [quota di addetti delle imprese nate negli ultimi tre anni](/indicatore/addetti-delle-nuove-imprese-nei-settori-culturali-e-creativi/ter-600) è più alta dove il valore per addetto è più basso, e Basilicata e Calabria guidano quella graduatoria. Si accompagnano al contrario, il che non dice che l'una spieghi l'altra. Una spiegazione possibile per entrambe è la dimensione media delle imprese, che nessuna misura. L'eccezione è il Lazio, secondo qui e sopra la mediana anche là.\n\nNon tutte le mappe del settore si somigliano. La [quota di dipendenti under 30 nelle imprese culturali](/indicatore/incidenza-di-dipendenti-in-eta-giovanile-delle-imprese-nei-settori-culturali-e-c/ter-599), misura senza un verso migliore, è più alta in Trentino Alto Adige e in Campania, e il Friuli-Venezia Giulia, terzo qui, sta tra le più basse.",
+    "h": "Il gradino più largo cade a metà graduatoria",
     "role": "quadro"
    },
    {
-    "body": "È il valore per addetto nei settori culturali, che dipende dal tipo di attività e dalla dimensione delle imprese. Non misura la qualità artistica né il valore sociale della cultura, che sfuggono a ogni conto economico.",
-    "h": null,
+    "body": "Dal 2015 al 2023 il valore per addetto è salito in tutte e venti le regioni, e nel 2020 sono scese tutte insieme. Quell'anno la caduta fu più forte in testa, con il Lazio che perse quasi 10 mila euro per addetto in dodici mesi, e il recupero le ha riportate tutte sopra il 2019.\n\nNella graduatoria si è mosso poco. L'unico spostamento vistoso è dell'Abruzzo, salito di sei posizioni dal 2015, mentre la Calabria chiude l'elenco allora come adesso. E la crescita comune non ha portato la coda dove stava la media otto anni fa, con Calabria, Sardegna, Molise, Sicilia e Basilicata ancora sotto quel livello.\n\nIl 2023 è l'ultimo anno disponibile, e lo è per come nasce il dato, visto che il registro Frame-SBS del valore aggiunto esce con un ritardo di almeno diciotto mesi. Nell'ultimo passaggio le sole due regioni in calo sono Lombardia e Toscana, mentre la Calabria segna il terzo aumento più forte. Un anno, non un'inversione.",
+    "h": "Otto anni di crescita che non hanno spostato nessuno",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il perimetro comprende le imprese, e la nota metodologica lascia fuori la componente pubblica, cioè istituzioni e amministrazioni. Un museo statale o una biblioteca comunale non compaiono né sopra né sotto la linea di frazione. Si misura l'economia privata della cultura, non la cultura di un territorio.\n\nPoi c'è la composizione. Ogni valore regionale è la media di otto macrosettori molto diversi, e non dice quale peso abbia ciascuno in ciascuna regione. Istat stessa avverte che una definizione universale di questi settori non esiste.\n\nConta anche come si contano le persone. Negli archivi Istat l'addetto è la persona occupata, a tempo pieno o parziale, e le due posizioni valgono uno. Dove le stesse ore sono distribuite su più teste il valore per addetto scende, a parità di ricchezza prodotta per ora. Le altre voci del tema [Cultura, patrimonio e turismo](/tema/cultura-patrimonio-e-turismo) dicono quante imprese ci sono e chi ci lavora.",
+    "h": "Il museo statale che non entra nel conto",
     "role": "limiti"
    }
   ],
@@ -2505,17 +2601,37 @@
   "vintage": 2023
  },
  "60": {
-  "fonti": [],
-  "lead": "La continuità dell'elettricità non è uguale ovunque. In Sicilia si contano in media 5,65 interruzioni lunghe per utente all'anno, in Campania 4,4 e in Calabria 3,8, contro le 0,93 del Trentino Alto Adige. La media delle regioni è di circa 2,4, in calo nel tempo.",
+  "fonti": [
+   {
+    "testo": "ARERA definisce lunga l'interruzione che supera i tre minuti e misura la continuità del servizio con due indicatori distinti, il numero medio di interruzioni per utente e i minuti persi",
+    "url": "https://www.arera.it/schede-tecniche/dettaglio/it/schedetecniche/15/inter_continuita_st"
+   },
+   {
+    "testo": "La pubblicazione comparativa ARERA sulla continuità distingue i territori per grado di concentrazione della popolazione e avverte che dal 2024 i dati escludono le interruzioni causate da terzi, quindi non sono pienamente confrontabili con il periodo 2012-2023",
+    "url": "https://www.arera.it/dati-e-statistiche/dettaglio/prestazioni-delle-imprese-distributrici-continuita-del-servizio-23"
+   }
+  ],
+  "lead": "Il calo delle interruzioni di corrente si è consumato quasi tutto tra il 1998 e il 2004, e da allora la media delle regioni oscilla senza migliorare ancora. Nel 2023 è risalita al livello del 2005, e a peggiorare sono state diciannove regioni su venti.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Le interruzioni frequenti sono un divario di qualità del servizio, non solo un fastidio, dato che pesano su imprese, ospedali e vita quotidiana. Si concentrano al Sud, dove reti più vecchie e territori difficili rendono la distribuzione meno affidabile. Il calo di lungo periodo è reale, ma il Sud resta indietro. Un servizio essenziale come l'elettricità può funzionare a due velocità?",
-    "h": null,
+    "body": "L'indicatore conta episodi, non minuti. Registra quante interruzioni accidentali lunghe tocca in un anno all'utente medio della rete elettrica, e accidentale vuol dire non programmata, un guasto e non una manutenzione annunciata. Un valore di 1,00 corrisponde a un'interruzione all'anno per utente.\n\nLunga è una parola tecnica. Nella regolazione ARERA, che fissa gli standard di continuità del servizio, un'interruzione è lunga quando supera i tre minuti, e il microdistacco che riazzera l'orologio del forno resta fuori dal conteggio.",
+    "h": "Che cosa conta un'interruzione lunga",
+    "role": "definizione"
+   },
+   {
+    "body": "Quindici regioni formano una rampa continua senza un vero gradino, dal Trentino Alto Adige all'Abruzzo. Poi la graduatoria si stacca. Sardegna, Puglia, Calabria, Campania e Sicilia stanno tutte oltre le tre interruzioni per utente, e i tre distacchi più larghi dell'intera classifica cadono dentro questo gruppo di coda.\n\nLa distanza si legge meglio in tempo che in decimali. Nella regione mediana l'utente medio resta al buio per un episodio lungo circa una volta ogni sei mesi, in Trentino Alto Adige poco meno di una volta l'anno, in Sicilia una volta ogni due mesi. Sono le ore in cui un caseificio perde la catena del freddo e un ambulatorio riavvia i macchinari da capo, e il conto non lo paga solo chi resta senza luce in casa. Fra media e mediana c'è mezza interruzione di distanza, e a produrla è la coda.\n\nLa linea però non è quella che l'atlante fa aspettare. La Basilicata sta a metà graduatoria davanti al Lazio, e fra corpo centrale e coda si infilano Lazio, Molise e Abruzzo. Nel tema [ambiente ed energia](/tema/ambiente-ed-energia) a ordinare i territori quasi come questa serie è un'altra rete, le [irregolarità nella distribuzione dell'acqua](/indicatore/irregolarita-nella-distribuzione-dell-acqua/ter-6). Vanno di pari passo, che non vuol dire che una spieghi l'altra. Il reddito delle aree può stare dietro a entrambe, e nessuna delle due serie basta a dirlo. L'eccezione è la Puglia, nel gruppo di coda per la corrente e davanti al Lazio e alla Sardegna sull'acqua.",
+    "h": "La classifica non scende, si spezza",
     "role": "quadro"
    },
    {
-    "body": "Conta le interruzioni lunghe accidentali per utente, non quelle brevi né i cali di tensione. Non distingue le cause, dal maltempo ai guasti di rete, e non misura i danni economici che provocano.",
-    "h": null,
+    "body": "Il calo di lungo periodo non ha eccezioni. Dal 1998 al 2023 tutte e venti le regioni riducono la frequenza, la Calabria di quasi quattro episodi per utente, la Lombardia di poco più di due decimi da una partenza già bassa.\n\nIl grosso però è successo presto. Fra il 1998 e il 2004 la media semplice delle venti regioni perde un'interruzione e mezza per utente, cioè quasi tutto il guadagno dei venticinque anni. Da lì la serie entra in una banda stretta e non ne esce, tocca il minimo nel 2016 e da allora risale fino all'estremo alto del 2023.\n\nL'ultimo passaggio è il più netto. Fra il 2022 e il 2023 peggiorano diciannove regioni su venti, e l'unica in controtendenza è la Campania, che scende restando fra le ultime. La Sicilia da sola aggiunge quasi due interruzioni per utente e tocca il valore più alto dei suoi ultimi venticinque anni. Il secondo salto per ampiezza arriva dal Molise, che perde due posizioni e passa dal centro della classifica alla soglia della coda.",
+    "h": "Vent'anni dentro la stessa banda",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il numero non dice quanto è durato il buio. ARERA misura anche i minuti persi per utente, e una regione con poche interruzioni ma lunghissime qui sembra tranquilla. Non porta con sé nemmeno la causa, quindi non si capisce se un anno storto venga dal maltempo o dallo stato della rete. Nella regolazione la distinzione esiste, e ARERA tiene fuori dai propri indicatori le interruzioni per forza maggiore e, dal 2024, quelle provocate da terzi, rompendo la confrontabilità con gli anni prima.\n\nResta la scala. Una media regionale mette insieme quartieri densi e comuni sparsi, mentre la regolazione separa i territori per grado di concentrazione della popolazione. E la spiegazione più comoda, quella del territorio difficile, questa graduatoria non la conferma. La [popolazione esposta al rischio di frane](/indicatore/popolazione-esposta-al-rischio-di-frane/bes-10AMB011) ordina le regioni in un modo che con questo non si somiglia, e Trentino Alto Adige e Sicilia finiscono tutte e due a metà elenco.\n\nFuori restano le interruzioni brevi e i cali di tensione, che l'utente nota e il conteggio no. Li misura la [soddisfazione delle famiglie per la stabilità della tensione elettrica](/indicatore/famiglie-soddisfatte-della-stabilita-della-tensione-elettrica/ims-MULTI_ELETTR_VOLT), che disegna questa mappa rovesciata.",
+    "h": "Episodi contati, minuti no",
     "role": "limiti"
    }
   ],
@@ -2573,17 +2689,37 @@
   "vintage": 2023
  },
  "611": {
-  "fonti": [],
-  "lead": "La domanda di cinema è in calo ovunque, quasi un quinto in meno negli ultimi anni. Gli ingressi vanno da 166 ogni cento abitanti nel Lazio e 163 in Emilia-Romagna a 47 in Molise. La media delle regioni è di circa 114.",
+  "fonti": [
+   {
+    "testo": "Ministero della Cultura, dati sulla partecipazione al cinema nel 2022: una persona su tre è andata in sala almeno una volta nell'anno, una su due nella fascia 6-24 anni",
+    "url": "https://dgeric.cultura.gov.it/aspettando-minicifre-della-cultura-edizione-2024-alcuni-dati-su-cinema-e-spettacolo-dal-vivo/"
+   },
+   {
+    "testo": "Istat, Statistiche culturali anno 2024: a livello nazionale gli spettacoli cinematografici e dal vivo crescono del 6,2% e gli spettatori del 2,2% rispetto al 2023",
+    "url": "https://www.istat.it/tavole-di-dati/statistiche-culturali-anno-2024/"
+   }
+  ],
+  "lead": "Il cinema in sala ha riavuto sette ingressi su dieci di quelli del 2019, poi la risalita si è fermata e la mappa italiana è tornata quella di prima, solo più piccola. In Calabria e in Molise si conta ancora meno di un ingresso l'anno ogni due residenti, nel Lazio più di uno e mezzo.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Il cinema in sala vive una crisi lunga, tra streaming e cambiamento delle abitudini, e il calo tocca tutte le regioni. Ma il divario territoriale resta, dato che dove le sale sono poche o hanno chiuso andare al cinema è più difficile, e questo pesa soprattutto sulle aree interne e sul Sud. La sala non è solo intrattenimento, è presidio culturale. Il cinema in sala è un rito che finisce o un servizio da difendere?",
-    "h": null,
+    "body": "Il conto è di ingressi a spettacoli cinematografici, rapportati ogni cento abitanti residenti. Un valore di 100 non dice che ogni residente sia andato al cinema una volta, dice che le entrate hanno pareggiato il numero dei residenti, e chi ci va una volta al mese ne produce dodici da solo.\n\nNel 2022 in Italia era andata al cinema almeno una volta una persona su tre, e una su due tra i 6 e i 24 anni, secondo il Ministero della Cultura. Quel dato conta le persone, questo conta le entrate. Il primo sale se il pubblico si allarga, il secondo anche solo se chi già ci va torna più spesso.",
+    "h": "Un contatore di biglietti, non di spettatori",
+    "role": "definizione"
+   },
+   {
+    "body": "La graduatoria si spezza in due punti. In alto, tra l'Emilia-Romagna e la Lombardia, si aprono quasi venti ingressi ogni cento abitanti. In fondo, tra la Basilicata e la Calabria, c'è lo stacco più largo dell'intera classifica. La mediana sta sopra la media, segno che a tirare giù il centro è quella coda corta, non un declino graduale.\n\nIn mezzo la geografia non fa quello che l'atlante insegna ad aspettarsi. La Puglia sta davanti al Trentino Alto Adige, e Trentino Alto Adige e Campania sono separate da un quarto di punto, appaiate al quattordicesimo e al quindicesimo posto. Due territori che la lettura corrente del divario non mette quasi mai nella stessa riga.\n\nSotto quel gradino il cinema smette di essere un'abitudine e diventa un'uscita occasionale, e pesa perché resta il canale a pagamento più largo dell'atlante. La [domanda di spettacolo teatrale e musicale](/indicatore/domanda-di-spettacolo-teatrale-e-musicale/ter-27) ordina le regioni quasi allo stesso modo, ma dove è più alta arriva a due terzi scarsi di quello che fa qui il cinema. Se la sala manca, un sostituto della stessa scala non c'è.\n\nNelle stesse aree in cui gli ingressi sono pochi è più alta la [quota di residenti in comuni senza alcuna offerta di spettacolo](/indicatore/incidenza-della-popolazione-residente-in-comuni-senza-offerta-di-spettacolo-intr/ter-614), con una correlazione di rango di -0,70. È una co-occorrenza, non una spiegazione, e il Lazio la incrina, primo per ingressi ma a metà classifica per popolazione tagliata fuori da qualsiasi offerta.",
+    "h": "Il gradino in fondo e le due regioni appaiate a metà",
     "role": "quadro"
    },
    {
-    "body": "Conta gli ingressi nelle sale, non la visione di film in altre forme, ormai dominante. Il calo riflette anche il passaggio allo streaming, non solo un minore interesse per il cinema.",
-    "h": null,
+    "body": "Il punto più alto della serie è il 2019, non l'anno di partenza. Poi due stagioni di sale chiuse o semivuote, con il 2021 sceso più in basso del 2020, e una risalita che nel 2023 riporta la media delle regioni dov'è oggi. Da lì in avanti, quasi niente.\n\nIl divario tra la prima e l'ultima si è ridotto di più di quaranta ingressi ogni cento abitanti dal 2018, ma è un effetto di scala. Il rapporto tra il valore più alto e il più basso era 3,7 nel 2019 ed è 3,5 oggi. Nessuna regione ha invertito la rotta, e i recuperi sul 2019 stanno in una banda stretta, dai quattro quinti del Trentino Alto Adige ai tre quinti abbondanti della Sicilia.\n\nNello stesso 2024 l'Istat, che conta le persone e tiene insieme cinema e spettacolo dal vivo, registra a livello nazionale spettatori in crescita del 2,2%. È un'altra grandezza, ponderata e più larga della media semplice delle regioni, e ricorda che la stasi letta qui riguarda il solo cinema in sala.",
+    "h": "La risalita che si è fermata nel 2023",
+    "role": "dinamica"
+   },
+   {
+    "body": "L'indicatore conta la domanda che ha trovato una sala, non quella che esiste. Un valore basso può dire che al cinema non ci si va, oppure che una sala a portata non c'è, e la serie non separa le due cose.\n\nFuori resta la visione di film che non passa da un botteghino, e da qui non si può dire quanto del calo sia migrato sullo schermo di casa. E un ingresso in un multiplex e uno in un cinema di paese contano uguale.\n\nIl cinema non è poi tutta la cultura. L'[indice di domanda culturale dei musei non statali](/indicatore/indice-di-domanda-culturale-dei-musei-e-istituti-similari-non-statali-media-per/ter-257) mette le regioni in un ordine che a questo non si somiglia, e il Lazio, primo per ingressi in sala, là sta all'ottavo posto per valore. Il quadro intero sta nel tema [cultura, patrimonio e turismo](/tema/cultura-patrimonio-e-turismo), non in una serie sola.",
+    "h": "Il pubblico che questo conteggio non vede",
     "role": "limiti"
    }
   ],
@@ -3098,17 +3234,33 @@
   "vintage": 2023
  },
  "651": {
-  "fonti": [],
-  "lead": "Le mappe a rilievo, che orientano gli alunni con disabilità visiva, sono quasi assenti: le ha in media solo il 3,6% delle scuole. La quota va dallo 0,76% della Liguria al 6,7% della Calabria, con il Sud in testa. Ovunque è una rarità.",
+  "fonti": [
+   {
+    "testo": "Istat, Inclusione scolastica degli alunni con disabilità, anno scolastico 2023-2024: il ritardo sugli ausili senso-percettivi riguarda tutto il territorio nazionale con poche differenze tra Nord e Sud, mappe a rilievo e percorsi tattili sono presenti entrambi solo nell'1% delle scuole, il 41% degli edifici è accessibile agli alunni con disabilità motoria (44% al Nord, 37% nel Mezzogiorno), e i quesiti sulle barriere sono stati modificati a partire dall'anno scolastico 2022-2023",
+    "url": "https://www.istat.it/wp-content/uploads/2025/03/Alunni-con-disabilita-as-23-24.pdf"
+   }
+  ],
+  "lead": "Nelle scuole italiane il divario che pesa non corre tra le regioni ma tra i tipi di disabilità, e la mappa a rilievo è l'ausilio rimasto indietro più di tutti. Nel 2023 nessuna regione arriva a una scuola su dieci, e nove regioni stanno sotto una scuola su trentacinque.",
+  "level": "regione",
   "sections": [
    {
-    "body": "È l'ausilio più raro di tutti, presente in una scuola su trenta: per uno studente cieco, muoversi da solo nell'edificio resta spesso impossibile. Che le quote più alte siano al Sud non cambia la sostanza, ovunque il numero è minimo. È il segno che l'accessibilità visiva è l'ultima frontiera, quella meno presidiata dell'inclusione scolastica. Una scuola che un cieco non può attraversare da solo è davvero inclusiva?",
-    "h": null,
+    "body": "Una mappa a rilievo è la pianta dell'edificio scolastico riprodotta in modo che corridoi, aule e uscite si riconoscano al tatto. Istat la rileva insieme ai percorsi tattili a pavimento, nella categoria degli ausili senso-percettivi destinati all'orientamento degli alunni con cecità o ipovisione.\n\nL'indagine chiede a ogni scuola se l'ausilio c'è, e il valore regionale è la quota di risposte affermative. Un valore di 3 vuol dire tre scuole su cento fra quelle rilevate, e quello che registra è una presenza, non la qualità della mappa né il punto in cui è stata messa. È uno dei molti indicatori sull'accessibilità scolastica del tema [reddito, inclusione e accessibilità](/tema/reddito-inclusione-e-accessibilita).",
+    "h": "Una planimetria che si legge con le dita",
+    "role": "definizione"
+   },
+   {
+    "body": "Nel 2022 le venti regioni contavano insieme poco meno di 3.800 [alunni con disabilità visiva](/indicatore/alunni-con-disabilita-visiva/ter-629), e per ognuno l'edificio scolastico è la prima cosa da imparare a memoria. Istat considera questi ausili necessari a rendere gli spazi accessibili a chi ha una cecità o una ipovisione, il che sposta la posta in gioco dall'arredo alla differenza tra raggiungere un'aula da soli e dipendere ogni volta da qualcuno.\n\nLa stessa indagine, sulle stesse scuole, trova [le rampe di accesso](/indicatore/percentuale-di-scuole-dotate-di-un-accesso-con-rampe/ter-642) in quasi una scuola su due e i [segnali acustici o visivi](/indicatore/percentuale-scuole-dotate-di-segnali-acustici-o-e-visivi/ter-650) pensati per chi non sente in circa una su sei. La mediana regionale delle mappe a rilievo sta intorno a una scuola su trenta. Il salto grosso non separa il Nord dal Sud, separa la disabilità motoria da quella sensoriale, e dentro quella sensoriale chi non sente da chi non vede. Anche le due geografie sensoriali divergono, visto che la regione che chiude questa graduatoria sta a metà classifica su quella dei segnali.\n\nIl quinto più alto della graduatoria è tutto meridionale, il rovescio della geografia che l'atlante mostra quasi ovunque, ma non è una classifica di virtù. Nel report sull'anno scolastico 2023/2024 Istat scrive che il ritardo sugli ausili senso-percettivi riguarda tutto il territorio nazionale, con poche differenze tra Nord e Sud, e sulle barriere fisiche mette il Mezzogiorno in coda al 37% di scuole accessibili contro il 44% del Nord (dato nazionale Istat). La Sardegna, meridionale e diciassettesima, rompe il disegno da sola. E nel mezzo della tabella le regioni si separano per pochi decimi, che su quote di questa taglia non reggono un giudizio.",
+    "h": "Il paragone utile è con le rampe, non con la regione accanto",
     "role": "quadro"
    },
    {
-    "body": "Conta le scuole con mappe a rilievo, non la loro qualità o aggiornamento. È un solo ausilio tra quelli necessari a chi non vede, e da solo non garantisce l'autonomia negli spazi scolastici.",
-    "h": null,
+    "body": "Dal 2018 al 2023 la media semplice delle regioni è salita di poco più di mezzo punto, cioè una scuola ogni centottanta. Ma la salita non è stata continua. Il punto più alto della serie è il 2022, e nell'ultimo passaggio la quota è scesa in tredici regioni su venti.\n\nSei regioni stanno sotto il livello del 2018, e l'Umbria ha perso più di un punto e mezzo. Nella direzione opposta la Campania e la Calabria hanno guadagnato quasi tre punti a testa. Prima di leggere questi spostamenti come cantieri aperti conviene tenere presente un avvertimento di Istat, che ha modificato i quesiti sulle barriere e dichiara il proprio indicatore di scuole accessibili non confrontabile con gli anni precedenti a partire dall'anno scolastico 2022-2023. Riguarda un'altra elaborazione della stessa rilevazione, ma cade proprio sugli anni in cui questa serie ha cambiato direzione.",
+    "h": "Cinque anni di guadagni, un anno che ne toglie più della metà",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il numeratore conta scuole, non studenti. Sapere che tre scuole su cento hanno una mappa a rilievo non dice se ce l'ha la scuola in cui un alunno cieco è iscritto, che è l'unica domanda a cui una famiglia tiene.\n\nLa risposta registra la presenza dell'ausilio, non il suo stato. Non dice se la mappa sia stata rifatta dopo un intervento edilizio, né se un percorso tattile ci arrivi. Istat rileva mappe e percorsi insieme e nel report nazionale conta solo le scuole che hanno entrambi, arrivando intorno all'1% per l'anno scolastico 2023/2024 (dato nazionale Istat), un conteggio più severo, da non affiancare alla media semplice dei valori regionali di questa pagina.\n\nResta fuori tutto ciò che serve a un alunno cieco per seguire una lezione, dai testi in braille agli ausili didattici. La serie misura un edificio, non una scuola.",
+    "h": "Conta le scuole, non gli alunni che ne hanno bisogno",
     "role": "limiti"
    }
   ],
@@ -3200,17 +3352,37 @@
   "vintage": 2021
  },
  "72": {
-  "fonti": [],
-  "lead": "Guardando gli addetti che usano computer connessi a internet, la diffusione scende: in media il 52,4%. È il 66,3% nel Lazio e il 59,4% in Emilia-Romagna, ma il 41,9% in Abruzzo. Circa metà dei lavoratori, quindi, usa la rete. La struttura produttiva pesa più della volontà.",
+  "fonti": [
+   {
+    "testo": "Istat, Imprese e ICT anno 2024: nella stessa rilevazione il divario per dimensione d'impresa, specialisti ICT nell'11,3% delle PMI contro il 74,5% delle grandi imprese e formazione informatica nel 16,9% contro il 67,0%",
+    "url": "https://www.istat.it/comunicato-stampa/imprese-e-ict-anno-2024/"
+   },
+   {
+    "testo": "Eurostat, luglio 2025: nel 2024 gli specialisti ICT sono il 5,0% degli occupati nell'Unione europea e il 4,0% in Italia, tra le tre quote più basse",
+    "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20250708-2"
+   }
+  ],
+  "lead": "Nelle imprese italiane con almeno dieci addetti la banda larga è ormai ovunque, ma in otto regioni al computer connesso lavora meno di un addetto su due. Nemmeno il Lazio, in testa senza interruzioni dal 2007, arriva a due addetti su tre.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Che solo metà degli addetti usi internet al lavoro ricorda quanto pesino ancora i settori manifatturieri e manuali, dove il computer non è centrale. Non è un ritardo puro, ma il riflesso della struttura produttiva, dato che più servizi avanzati significano più uso della rete. Il Lazio in testa, con la sua economia terziaria, lo conferma. La digitalizzazione dipende dalla volontà o dal tipo di lavoro?",
-    "h": null,
+    "body": "L'indicatore conta, nelle imprese con più di dieci addetti di industria e servizi, quanti addetti usano un computer collegato a internet sul totale. Misura persone, non aziende. Un valore di 50 vuol dire che un addetto su due lavora davanti a uno schermo collegato e l'altro no.\n\nLa distinzione conta perché la parte impiantistica è chiusa da tempo. [L'indice di diffusione della banda larga nelle imprese](/indicatore/indice-di-diffusione-della-banda-larga-nelle-imprese/ter-71), fermo al 2021, vedeva sedici regioni su venti sopra il 98%. Le due quote non si sottraggono, una conta imprese e l'altra addetti, ma insieme dicono che il problema non è più la linea.",
+    "h": "Non le imprese connesse, gli addetti che lavorano connessi",
+    "role": "definizione"
+   },
+   {
+    "body": "La graduatoria del 2024 non è una discesa regolare. Nove regioni stanno a 55 addetti connessi ogni cento o più, otto restano sotto i 50, e in mezzo ce ne sono soltanto tre. Il Lazio sta per conto suo, staccato di 6,91 punti dalla seconda, più dei 4,11 che separano la seconda dalla nona.\n\nDietro quella quota c'è chi viene raggiunto da tutto ciò che passa dalla rete, dalla formazione interna alla gestione dei documenti, e chi fa un mestiere che con lo schermo non si incrocia. Nelle otto regioni sotto i 50 fuori dal perimetro digitale della propria impresa resta la maggioranza degli addetti, quale che sia il motivo.\n\nIl fondo è dove la geografia smette di somigliare a sé stessa. Ultimo è l'Abruzzo, dietro Puglia e Calabria, e la stessa regione risulta seconda in Italia per [lavoratori della conoscenza](/indicatore/lavoratori-della-conoscenza/bes-11RIC003-N22). Il perimetro non è lo stesso, uno guarda tutti gli occupati e l'altro i soli addetti delle imprese sopra i dieci, ma il confronto ricorda che questa mappa non ordina i territori per quantità di lavoro qualificato. Nella fascia intermedia la Sardegna sta sopra Piemonte e Marche.\n\nNel tema [ricerca, innovazione e digitale](/tema/ricerca-innovazione-e-digitale) poche graduatorie si somigliano. Questa somiglia a quella dell'uso domestico, perché gli [utenti regolari di internet](/indicatore/utenti-regolari-di-internet/bes-11RIC020) ordinano i territori quasi allo stesso modo, e la spiegazione comune più plausibile non sta nelle imprese ma nel reddito e nell'istruzione dell'area.",
+    "h": "Nove regioni in alto, otto in basso, il centro quasi vuoto",
     "role": "quadro"
    },
    {
-    "body": "Misura gli addetti che usano internet, non le competenze né l'intensità dell'uso. Risente della composizione settoriale, con l'industria pesante che ne usa meno dei servizi, e riguarda le sole imprese sopra i dieci addetti.",
-    "h": null,
+    "body": "Dal 2003 nessuna regione è andata nella direzione opposta, e la media semplice è passata da poco più di venti addetti connessi ogni cento a più di cinquanta. Il guadagno più grande è del Lazio, il più piccolo della Valle d'Aosta, che nel 2003 guidava la graduatoria e oggi è ottava.\n\nIl divario più ampio della serie però non è quello di oggi. Risale al 2019, quando fra la prima regione e l'ultima correvano 35,13 punti. Si è ristretto di quasi otto punti in dodici mesi, nel 2020, perché le regioni in coda hanno guadagnato più delle altre e la Basilicata da sola ha messo insieme più di dieci punti. È l'anno del lavoro a distanza obbligato, e questa rilevazione non permette di attribuirgli il salto.\n\nPoi la salita si è fermata. La media semplice delle regioni oggi vale quanto nel 2022, e l'ultimo anno somiglia più a un rimescolamento che a un avanzamento, con il Veneto che guadagna 6,74 punti mentre Umbria e Piemonte ne perdono più di tre. Quanto sia solido un singolo scarto annuale lo dice il Molise, sesto nel 2019, diciannovesimo nel 2022 e di nuovo a metà classifica.",
+    "h": "Vent'anni di salita, poi tre anni fermi",
+    "role": "dinamica"
+   },
+   {
+    "body": "Il conto si ferma alle imprese con più di dieci addetti, e la parte più minuta del sistema produttivo resta fuori. Dentro il perimetro rilevato, poi, la distanza maggiore non corre tra regioni ma tra taglie: nella stessa indagine del 2024 Istat trova specialisti ICT nell'11,3% delle piccole e medie imprese e nel 74,5% delle grandi. Sono dati nazionali, che non si affiancano alle medie regionali di questa pagina, ma indicano l'asse del divario che la mappa non può mostrare.\n\nIl numero conta chi usa un computer connesso, non quanto lo usa né per farci cosa, e sulle competenze tace. Sul fronte degli specialisti ICT l'Italia nel 2024 è tra le tre quote più basse dell'Unione europea. Resta dentro il valore anche la composizione dei settori, che qui non si può isolare, perché manifattura e servizi hanno bisogni diversi di postazioni collegate.",
+    "h": "Il divario per taglia d'impresa che una mappa regionale non vede",
     "role": "limiti"
    }
   ],
@@ -4105,17 +4277,37 @@
   "vintage": 2025
  },
  "bes:02IST023": {
-  "fonti": [],
-  "lead": "Leggere libri e quotidiani è un'abitudine in calo e molto diseguale. Legge il 52,6% delle persone in Trentino Alto Adige e il 46,7% in Friuli-Venezia Giulia, contro il 22,7% della Campania e il 23% della Basilicata. La media delle regioni è del 36%.",
+  "fonti": [
+   {
+    "testo": "Istat, Rapporto Bes, capitolo Istruzione e formazione: definizione dell'indicatore (persone di 6 anni e più, almeno quattro libri l'anno e/o quotidiani almeno tre volte a settimana) e scomposizione nazionale tra lettori di quotidiani, in calo dal 28,8% del 2016 al 20,9% del 2024, e lettori di libri stabili intorno al 23%. Dal 2016 sono conteggiati anche i lettori di quotidiani online.",
+    "url": "https://www.istat.it/wp-content/uploads/2025/11/02-Istruzione-e-formazione.pdf"
+   },
+   {
+    "testo": "Istat, Libri e biblioteche: abitudini di lettura e frequentazione, anni 2024 e 2025. Nel 2024 il 57,1% delle persone di 6 anni e più ha letto almeno un libro, e i lettori salgono dal 43,9% delle famiglie economicamente più deboli al 72,5% di quelle più agiate.",
+    "url": "https://www.istat.it/comunicato-stampa/libri-e-biblioteche-abitudini-di-lettura-e-frequentazione-anni-2024-e-2025/"
+   }
+  ],
+  "lead": "Il divario nella lettura tra le regioni si è ridotto di dieci punti e mezzo in vent'anni, e a ridurlo è stato il vertice che scende, non il fondo che sale. Nel 2005 sei regioni leggevano più di quanto legga oggi il Trentino Alto Adige, che dall'inizio della serie non ha mai lasciato il primo posto.",
+  "level": "regione",
   "sections": [
    {
-    "body": "La lettura è il segno più antico di capitale culturale, e il divario, oltre il doppio tra Nord-Est e Sud, riflette scuola, famiglia e abitudini radicate. Il calo generale, complice il digitale, riguarda tutti, ma parte da livelli già bassi al Sud. Chi legge poco da giovane fatica a colmare il divario da adulto. La lettura è una competenza che si eredita o si può ancora costruire?",
-    "h": null,
+    "body": "L'indicatore conta le persone di 6 anni e più che hanno letto almeno quattro libri nell'anno, per motivi non strettamente scolastici o professionali, oppure che leggono un quotidiano almeno tre volte a settimana. Basta una delle due condizioni, e i formati digitali contano, perché ebook e audiolibri valgono come i libri di carta.\n\nÈ una soglia, non una misura di quantità. Chi legge quattro libri pesa quanto chi ne legge quaranta. Conviene ricordarlo quando il valore sembra basso, perché con la definizione più larga, quella di chi ha letto almeno un libro in dodici mesi, il dato nazionale Istat per il 2024 è del 57,1%.",
+    "h": "Quattro libri l'anno, oppure il quotidiano tre volte a settimana",
+    "role": "definizione"
+   },
+   {
+    "body": "La graduatoria del 2025 non scende in modo regolare. Dal Friuli-Venezia Giulia all'Umbria corre una fascia lunga e continua, che perde terreno a piccoli passi senza un vero salto. Poi si spezza due volte, quattro punti tra Umbria e Molise e quasi altrettanti tra Abruzzo e Puglia, e si chiude su cinque regioni schiacciate dentro tre punti, dove la classifica smette di distinguere.\n\nDentro quella fascia sta la Sardegna, undicesima, davanti a Toscana e Umbria, e non è una novità dell'ultimo anno, visto che era terza nel 2014.\n\nIl denominatore comprende tutti dai 6 anni in su, quindi qui non si misura una popolazione scolastica ma un'abitudine adulta, quella di leggere quando nessuno lo chiede più. Dove è più diffusa riguarda circa una persona su due, nel blocco di fondo una su quattro. E la geografia non è l'unica variabile in gioco, visto che a livello nazionale Istat misura i lettori di almeno un libro salire dal 43,9% delle famiglie più povere al 72,5% di quelle più agiate.\n\nLa stessa graduatoria torna quasi identica nella [fruizione delle biblioteche](/indicatore/fruizione-delle-biblioteche/bes-02IST024), dove però la Campania non è ultima. E dove gli adulti leggono meno, gli studenti finiscono le superiori con [competenze alfabetiche non adeguate](/indicatore/competenza-alfabetica-non-adeguata-studenti-classi-v-scuola-secondaria-secondo-g/ter-623) più spesso che altrove, due mappe che si somigliano pur venendo da indagini diverse.",
+    "h": "Una fascia lunga in mezzo, un fondo dove cinque regioni stanno in tre punti",
     "role": "quadro"
    },
    {
-    "body": "Conta chi ha letto almeno un libro o legge quotidiani, non quanto né cosa. Con il digitale molta lettura avviene online e sfugge a questo indicatore, che coglie solo una parte del fenomeno.",
-    "h": null,
+    "body": "La media semplice dei valori regionali ha perso sette punti e mezzo dal 2005, ma la perdita non è distribuita. La Toscana ne ha persi sedici, la Valle d'Aosta quasi altrettanti, e sono entrambe ancora nella metà alta della classifica. Campania e Sicilia hanno perso meno di due punti, ed erano già in fondo nel 2005.\n\nSolo due regioni chiudono i vent'anni sopra il punto di partenza, il Molise con 1,6 punti e la Puglia con 0,8, ed è un guadagno da maneggiare con prudenza. Sono stime campionarie e sulle regioni piccole oscillano parecchio, tanto che la Puglia risultava al 31,1% nel 2006 e al 23,4% nel 2022. Un punto guadagnato in vent'anni racconta una discesa mancata, più che una ripresa.\n\nL'ultimo passaggio va nella direzione opposta, con più regioni in aumento che in calo. Troppo poco per chiamarla un'inversione.",
+    "h": "A scendere di più è chi stava in alto",
+    "role": "dinamica"
+   },
+   {
+    "body": "L'indicatore somma due comportamenti che non si muovono insieme, e il totale non dice quale dei due si sia mosso. Sul piano nazionale Istat lo ha scomposto, e il calo è quasi tutto di giornale, con i lettori di quotidiani scesi dal 28,8% del 2016 al 20,9% del 2024 e i lettori di libri fermi intorno al 23%. Il calo di un territorio, qui, può venire dalle edicole e non dalle librerie.\n\nIl confronto con il 2005 attraversa poi un cambio di perimetro, perché dal 2016 l'indagine conta anche chi legge i quotidiani online, e la discesa misurata semmai ne esce attenuata. Fuori resta tutto ciò che non è né libro né quotidiano.\n\nE questa non è una pagella della scuola regionale. La composizione dei percorsi scolastici disegna una geografia che con questa non si somiglia, e l'[incidenza dei diplomati tecnici e professionali](/indicatore/incidenza-dei-diplomati-nei-percorsi-di-istruzione-tecnica-e-professionale-sul-t/ter-409) è più alta in Campania che in Trentino Alto Adige. Gli altri indicatori di [istruzione e formazione](/tema/istruzione-e-formazione) aiutano a separare quello che la scuola produce da quello che gli adulti fanno dopo.",
+    "h": "Due abitudini diverse dentro un numero solo",
     "role": "limiti"
    }
   ],
@@ -5635,17 +5827,37 @@
   "vintage": 2023
  },
  "bes:12SER003": {
-  "fonti": [],
-  "lead": "L'assistenza domiciliare integrata agli anziani è cresciuta molto, più che raddoppiata, ma resta bassa: raggiunge in media il 4,6% degli anziani. È più alta in Molise, 7,6%, Abruzzo e Toscana, più bassa in Calabria e Sardegna, 2,2%. La media delle regioni è del 4,6%.",
+  "fonti": [
+   {
+    "testo": "Istat, Rapporto BES, capitolo Qualità dei servizi: definizione dell'indicatore, dato nazionale del 3,8% nel 2023, carico dei medici di base per ripartizione e posti letto nei presidi residenziali per regione",
+    "url": "https://www.istat.it/wp-content/uploads/2025/11/12-Qualita-dei-servizi.pdf"
+   },
+   {
+    "testo": "Ministero della Salute, PNRR Missione 6: risorse dell'investimento sull'assistenza domiciliare e traguardo di almeno altre 842 mila persone over 65 trattate entro il 2026",
+    "url": "https://www.pnrr.salute.gov.it/it/pnrr-pagina/casa-come-primo-luogo-di-cura-e-telemedicina/"
+   }
+  ],
+  "lead": "Le cure a domicilio per gli anziani sono cresciute in tutte le regioni, ma la mappa che disegnano nel 2024 non è quella del divario tra Nord e Sud. Quasi tutto l'aumento è arrivato dopo il 2021, e nella metà bassa della graduatoria stanno le regioni del Nord con i sistemi sanitari più grandi.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Curare gli anziani a casa, invece che in ospedale o in struttura, è la frontiera di un welfare che invecchia, più umano e meno costoso. La copertura resta però bassa e diseguale, e cresce lentamente rispetto al bisogno. Con una popolazione tra le più anziane d'Europa, l'assistenza domiciliare è destinata a diventare cruciale. Il Paese si sta attrezzando per curare a casa i suoi anziani?",
-    "h": null,
+    "body": "L'assistenza domiciliare integrata è il pacchetto di prestazioni sanitarie e sociosanitarie che la ASL porta a casa di una persona anziana, in alternativa al ricovero o alla struttura residenziale. L'indicatore conta i residenti di 65 anni e più trattati in ADI nel corso dell'anno e li rapporta a tutta la popolazione anziana, non a quella che avrebbe bisogno di cure. Un valore di 5 vuol dire cinque anziani presi in carico ogni cento over 65 della regione.\n\nIl numeratore viene da un flusso amministrativo del Ministero della Salute, rielaborato dall'Istat per il rapporto Bes. Conta le persone, non le ore: chi riceve un accesso infermieristico ogni tanto e chi è seguito quasi ogni giorno pesano uguale.",
+    "h": "Che cosa conta un anziano trattato in ADI",
+    "role": "definizione"
+   },
+   {
+    "body": "Curare gli anziani a casa invece che in ospedale è il perno della riforma dell'assistenza territoriale, e il piano nazionale di ripresa ci ha messo circa 3 miliardi per trattare almeno altre 842 mila persone over 65 entro il 2026. Il punto di partenza è basso. Nel 2024 in nessuna regione italiana l'ADI raggiunge un anziano su dieci.\n\nLa graduatoria non si spezza nel mezzo. Lo stacco più ampio separa la prima regione dalla seconda, un punto e mezzo, e il secondo sta in coda, tra Puglia e Calabria. In mezzo le regioni stanno vicine, e a tirare giù la media sono i pochi valori del fondo.\n\nEd è un fondo che non coincide con il Mezzogiorno. Sotto la media delle regioni ci sono Lombardia, Piemonte, Emilia-Romagna, Veneto e Trentino Alto Adige, mentre Abruzzo, Basilicata, Sicilia e Campania stanno sopra.\n\nParte di questa geografia si ritrova rovesciata nei [medici di medicina generale con un numero di assistiti oltre soglia](/indicatore/medici-di-medicina-generale-con-un-numero-di-assistiti-oltre-soglia/bes-12SER027). Dove più medici di base superano i 1.500 assistiti, gli anziani seguiti a casa tendono a essere una quota più bassa, con una correlazione di rango di -0,60 sui valori regionali. Il Molise sta in cima qui e in fondo là. È una co-occorrenza, e sotto ci lavora il confondente di sempre, la dimensione della popolazione servita. L'eccezione conta: la Calabria ha una quota di medici oltre soglia più bassa di quella nazionale e sta in fondo anche qui, appaiata alla Sardegna.",
+    "h": "Una mappa che il divario Nord-Sud non spiega",
     "role": "quadro"
    },
    {
-    "body": "Conta gli anziani presi in carico a domicilio, non l'intensità o la qualità delle cure ricevute. I criteri di registrazione variano tra regioni, quindi i confronti diretti vanno presi con prudenza.",
-    "h": null,
+    "body": "Fino al 2021 non era successo quasi niente. La media delle regioni passa da 2,28 nel 2015 a 2,83 nel 2021, con un arretramento nell'anno della pandemia (la Sardegna entra solo dal 2019, quindi il confronto con il 2015 è su diciannove regioni). Poi la corsa, fino a 4,61 nel 2024, con circa tre quarti dell'aumento del decennio arrivato dopo il 2021, gli stessi anni del finanziamento nazionale alle cure domiciliari.\n\nIl dato nazionale dell'Istat è ponderato, quindi non coincide con la media semplice delle regioni: per il 2023 dice 3,8%, sotto la nostra, perché le regioni più popolose stanno in basso.\n\nNessuna regione è tornata indietro rispetto al 2015, ma i percorsi non si somigliano. La Valle d'Aosta partiva da una quota sotto l'uno per cento e oggi sta appena sotto la mediana, il salto più grande del gruppo. Il Trentino Alto Adige nel 2015 stava tra i primi cinque, ha guadagnato due decimi di punto in dieci anni ed è scivolato al diciassettesimo posto. Nell'ultimo anno arretrano solo Emilia-Romagna e Trentino Alto Adige, e la Lombardia resta ferma.",
+    "h": "Sei anni fermi, poi tre di corsa",
+    "role": "dinamica"
+   },
+   {
+    "body": "Questo numero vede un canale solo. L'assistenza domiciliare dei Comuni e il lavoro di cura che le famiglie comprano per conto proprio restano fuori dal conteggio.\n\nPer questo una quota bassa non è, da sola, un servizio peggiore. Il capitolo Bes che pubblica questo indicatore mette accanto i posti letto nei presidi residenziali, e lì l'ordine cambia. Nel 2023 sono 151 ogni 10 mila abitanti nella provincia autonoma di Trento e 19 in Campania. Casa e struttura rispondono allo stesso bisogno in modi diversi, e la pagina ne misura uno.\n\nNeanche la distanza dai servizi si legge qui. Rispetto alla [difficoltà di accesso ad alcuni servizi essenziali](/indicatore/difficolta-di-accesso-ad-alcuni-servizi/bes-12SER004) la geografia non si somiglia. La Campania, dove molte famiglie dichiarano difficoltà a raggiungere farmacie e uffici, sta comunque sopra la media per anziani trattati a casa. Gli altri servizi con cui leggere questo dato stanno nel [tema mobilità e servizi territoriali](/tema/mobilita-e-servizi-territoriali).",
+    "h": "Un canale solo, su due",
     "role": "limiti"
    }
   ],
