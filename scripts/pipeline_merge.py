@@ -46,7 +46,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts import pipeline_gate  # noqa: E402  (path bootstrap above)
+from scripts import pipeline_gate, pipeline_log  # noqa: E402  (path bootstrap above)
 
 # How long to wait for the remote checks, and how often to look. Fifteen seconds
 # is polite to the API and invisible next to a CI run that takes minutes.
@@ -126,8 +126,100 @@ def merge(pr, runner=_run, cwd=None):
     return code == 0, out.strip()
 
 
+def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts=3):
+    """Scrive su master la riga di diario con l'esito vero, e la spinge.
+
+    Esiste perche' il diario non poteva quasi mai dire come e' finita, e il modo
+    in cui non poteva e' istruttivo. La riga sta nel perimetro dello stadio,
+    quindi viaggia dentro la pull request e va committata **prima** che la pull
+    request si fonda: quando l'agente la scrive non sa ancora l'esito, e scrive
+    `pr-open`. Il cacciatore ha scritto `pr-open` e si e' fuso trenta secondi
+    dopo, e per mezza giornata il diario ha raccontato che nessuno stadio
+    `checks` si fosse mai chiuso da solo, mentre la #45 diceva il contrario.
+
+    L'altra meta' del buco e' peggiore. Quando il cancello o i check rifiutano, la
+    riga dell'agente resta su un branch che non si fonde mai, quindi **da master
+    non si vede affatto**: la run del 26 luglio dello scout esiste, dice
+    `blocked`, e vive su `automation/scout-2026-07-26` dove nessuno strumento la
+    legge. Una run rifiutata e una run mai avvenuta producono lo stesso master,
+    che e' esattamente la confusione che il diario esiste per togliere.
+
+    Quindi la riga la scrive chi l'esito lo conosce, cioe' questo passo, per ogni
+    uscita terminale e non solo per il merge. Il docstring di `decide` prometteva
+    gia' un dizionario "che il chiamante trasforma in una riga di diario": il
+    chiamante era l'agente, cioe' la parte che in un caso su due non l'ha fatto.
+
+    Il lavoro avviene in un worktree usa e getta su `origin/master`, mai
+    nell'albero dell'agente, che a questo punto e' su un branch appena cancellato
+    dal remoto e non va toccato. Se il push perde una corsa contro un altro
+    stadio si ricomincia da capo: si rilegge `origin/master`, che nel frattempo
+    porta la riga dell'altro, e la nostra le va dietro. Su un registro in coda un
+    ritentativo e' automaticamente corretto, ed e' la stessa ragione per cui il
+    passo 3-bis del contratto dice di tenere entrambe le righe.
+    """
+    import shutil
+    import tempfile
+
+    outcome = result["outcome"]
+    summary = {
+        "merged": f"PR #{pr} fusa in master dal passo di merge",
+        "blocked": f"PR #{pr} non fusa: il cancello e' rosso",
+        "stopped": f"PR #{pr} non fusa: i check non l'hanno permesso",
+        "error": f"PR #{pr} non fusa: il merge e' fallito",
+    }.get(outcome, f"PR #{pr}: {outcome}")
+
+    for attempt in range(1, attempts + 1):
+        runner(["git", "worktree", "prune"], cwd=cwd)
+        code, out = runner(["git", "fetch", "origin", "master"], cwd=cwd)
+        if code != 0:
+            log(f"  diario: fetch fallito ({out.strip()[:120]})")
+            continue
+        code, head = runner(["git", "rev-parse", "--short", "origin/master"], cwd=cwd)
+        tip = head.strip() if code == 0 else ""
+        tmp = tempfile.mkdtemp(prefix="diario-")
+        try:
+            code, out = runner(
+                ["git", "worktree", "add", "--detach", tmp, "origin/master"], cwd=cwd
+            )
+            if code != 0:
+                log(f"  diario: worktree fallito ({out.strip()[:120]})")
+                continue
+            entry = pipeline_log.build_entry(
+                stage, outcome, summary,
+                detail=[result["detail"]] if result.get("detail") else [],
+                gate=result.get("gate"), pr=pr, commit=tip, branch="master",
+            )
+            pipeline_log.append(entry, path=Path(tmp) / "data" / "pipeline" / "runs.jsonl")
+            runner(["git", "add", "data/pipeline/runs.jsonl"], cwd=tmp)
+            code, out = runner(
+                ["git", "commit", "-m", f"Diario: {summary}"], cwd=tmp
+            )
+            if code != 0:
+                log(f"  diario: commit fallito ({out.strip()[:120]})")
+                continue
+            code, out = runner(["git", "push", "origin", "HEAD:master"], cwd=tmp)
+            if code == 0:
+                log(f"  diario: riga '{outcome}' scritta su master")
+                return True
+            log(f"  diario: push perso, ritento ({attempt}/{attempts})")
+        finally:
+            # Due passaggi e non uno: `worktree remove` cancella la directory
+            # quando il worktree e' stato creato davvero, ma se `add` e' fallito
+            # resta la cartella vuota di mkdtemp, e una run al giorno che perde
+            # una cartella e' una perdita lenta che nessuno collega alla causa.
+            runner(["git", "worktree", "remove", "--force", tmp], cwd=cwd)
+            shutil.rmtree(tmp, ignore_errors=True)
+
+    # Non e' un fallimento del merge, che e' gia' avvenuto o gia' stato rifiutato.
+    # Va detto forte comunque: da qui in poi master non sa come e' finita.
+    log(f"  DIARIO NON SCRITTO dopo {attempts} tentativi. "
+        f"Registrala a mano: pipeline_log.py --write --stage {stage} "
+        f"--outcome {outcome} --pr {pr}")
+    return False
+
+
 def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
-           dry_run=False, log=print, skip_tests=False):
+           dry_run=False, log=print, skip_tests=False, journal=True):
     """Run the gate, obey it, and merge only if the gate and the checks agree.
 
     Returns the dict the caller should turn into a journal row, so that a run
@@ -138,17 +230,27 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
     mode = verdict["merge"]
     log(f"stadio {stage}, PR #{pr}, cancello: {mode}")
 
+    def finish(result):
+        """Ogni uscita terminale passa di qui, e nessuna sfugge al diario.
+
+        `pr-open` no: li' non e' finito niente, la pull request resta aperta e la
+        riga che l'agente ha gia' committato dentro la PR la descrive bene.
+        """
+        if journal and not dry_run and result["outcome"] != "pr-open":
+            record_landing(stage, pr, result, runner=runner, cwd=cwd, log=log)
+        return result
+
     if mode == "blocked":
         failed = [c["check"] for c in verdict["checks"] if not c["ok"]]
         detail = "il cancello e' rosso: " + ", ".join(failed)
         log(f"  RIFIUTO. {detail}")
-        return {"merged": False, "outcome": "blocked", "gate": mode, "detail": detail}
+        return finish({"merged": False, "outcome": "blocked", "gate": mode, "detail": detail})
 
     if mode == "checks":
         ok, detail = wait_for_checks(pr, runner=runner, cwd=cwd, sleep=sleep, log=log)
         if not ok:
             log(f"  RIFIUTO. {detail}")
-            return {"merged": False, "outcome": "stopped", "gate": mode, "detail": detail}
+            return finish({"merged": False, "outcome": "stopped", "gate": mode, "detail": detail})
         log(f"  {detail}")
 
     if dry_run:
@@ -158,9 +260,9 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
     ok, out = merge(pr, runner=runner, cwd=cwd)
     if not ok:
         log(f"  il merge e' fallito: {out}")
-        return {"merged": False, "outcome": "error", "gate": mode, "detail": out}
+        return finish({"merged": False, "outcome": "error", "gate": mode, "detail": out})
     log(f"  PR #{pr} fusa in master.")
-    return {"merged": True, "outcome": "merged", "gate": mode, "detail": out}
+    return finish({"merged": True, "outcome": "merged", "gate": mode, "detail": out})
 
 
 def main():
@@ -174,10 +276,13 @@ def main():
                         help="arriva fino al merge e non lo fa")
     parser.add_argument("--skip-tests", action="store_true",
                         help="non rilanciare la suite dentro il cancello (solo per un giro a vuoto)")
+    parser.add_argument("--no-journal", action="store_true",
+                        help="non scrivere la riga di esito su master (solo per prove)")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    result = decide(args.stage, args.pr, dry_run=args.dry_run, skip_tests=args.skip_tests)
+    result = decide(args.stage, args.pr, dry_run=args.dry_run, skip_tests=args.skip_tests,
+                    journal=not args.no_journal)
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result["merged"] else 1

@@ -171,6 +171,25 @@ esattamente cosi' che lo scrittore ha lavorato per settimane su un file morto
 senza che nessuno se ne accorgesse. La riga di diario e' l'unica cosa che
 distingue "ho controllato e non c'era niente da fare" da "non sono partito".
 
+**La tua riga descrive la tua run, non come e' finita la pull request**, e non e'
+una sfumatura: quando la scrivi, come e' finita non lo sai ancora. La riga viaggia
+dentro la PR, quindi va committata prima che la PR si fonda. Scrivi `pr-open` e
+fermati li'.
+
+**La riga con l'esito vero la scrive `pipeline_merge.py`**, che e' l'unico a
+conoscerlo, e la scrive direttamente su master per ogni uscita terminale:
+`merged`, `blocked`, `stopped`, `error`. Non provare a scriverla tu e non
+aggiungerne una seconda dopo il merge. Due righe per run sono normali e attese:
+la tua dentro la PR, la sua su master.
+
+Serviva perche' il buco era doppio. Il cacciatore ha scritto `pr-open` e si e'
+fuso trenta secondi dopo, e per mezza giornata il diario ha raccontato che
+nessuno stadio `checks` si fosse mai chiuso da solo mentre la PR #45 diceva il
+contrario. La meta' peggiore pero' e' l'altra: quando il cancello o i check
+rifiutano, la tua riga resta su un branch che non si fonde mai, e **da master non
+si vede affatto**. La run dello scout del 26 luglio esiste, dice `blocked`, e
+vive su `automation/scout-2026-07-26` dove nessuno strumento la legge.
+
 Il diario (`data/pipeline/runs.jsonl`) e' nel perimetro di ogni stadio, quindi
 la riga viaggia insieme al tuo lavoro. Committala con il resto. Se ti sei
 fermato o il cancello ti ha bloccato, scrivi comunque la riga e committala sul
