@@ -196,11 +196,16 @@ def _stage_rows(status):
     Un cruscotto si scorre, non si legge."""
     rows = []
     for entry in status["stages"]:
-        css = "flag" if entry["waiting"] else "idle"
+        # `None` non e' zero: una coda che nessuno ha contato si accende come
+        # quelle piene, perche' "non lo so" e' un motivo per guardare, non per
+        # spegnere la riga.
+        waiting = entry["waiting"]
+        css = "idle" if waiting == 0 else "flag"
+        shown = "?" if waiting is None else str(waiting)
         rows.append(
             f"<tr class='{css}'><td><strong>{_esc(entry['stage'])}</strong></td>"
             f"<td class='mono'>{_esc(entry['agent'])}</td>"
-            f"<td class='n'>{entry['waiting']}</td>"
+            f"<td class='n'>{_esc(shown)}</td>"
             f"<td>{_esc(entry['next'])}</td></tr>"
         )
     return "\n".join(rows)

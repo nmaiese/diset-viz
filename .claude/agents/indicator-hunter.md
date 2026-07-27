@@ -114,11 +114,20 @@ runs on its own.
 ```bash
 python3 scripts/pipeline_gate.py --stage promoter     # se hai promosso
 python3 scripts/pipeline_gate.py --stage hunter       # se hai solo triagiato
+gh pr create --base master --title "..." --body "..."
+python3 scripts/pipeline_merge.py --stage <hunter|promoter> --pr <numero>
 ```
 
-Your merge mode is `checks`: the PR merges when the remote checks pass, which
-leaves a window in which a human can still step in on a change that moves the
-live catalogue.
+Your merge mode is `checks`, and the wait is that last command, not a property of
+the pull request: nothing merges it on its own. **Never `gh pr merge --auto`**,
+which does not wait on this repository and has already merged a pull request with
+the tests still running. `pipeline_merge.py` polls the checks until they conclude
+and refuses if one fails, if none appear, or if the gate is red. Same stage name
+in the gate and in the merge step, and the same one in the journal.
+
+If the gate reds out on `base`, another stage merged before you: read
+`docs/AGENT_CONTRACT.md`, step 3-bis, and do not correct your work on that
+verdict.
 
 In the body: what ran, live or offline, against which sources; the queue diff in
 words; for every candidate you touched the decision and the reason with real

@@ -176,8 +176,14 @@ def reviewer_stage():
     else:
         nxt = "ogni articolo e stato letto contro i dati correnti"
     return {
+        # `None`, mai `0`. La coda del revisore e' l'unica che serve il venv
+        # dell'app per essere contata, e riportare zero quando la risposta e'
+        # "non lo so" rende le due indistinguibili: un orchestratore che legge
+        # `next_stage` salterebbe il revisore per sempre su un checkout senza
+        # venv, in silenzio. E' lo stesso difetto del diario che non vedeva la
+        # differenza fra una Routine a vuoto e una mai partita.
         "stage": "reviewer",
-        "waiting": waiting if waiting is not None else 0,
+        "waiting": waiting,
         "detail": state,
         "next": nxt,
         "command": ".venv/bin/python -m scripts.review_queue",
@@ -289,13 +295,25 @@ def build_status(stages=None):
     report = [BUILDERS[name]() for name in wanted]
     for entry in report:
         entry["agent"] = AGENT_OF[entry["stage"]]
+    unknown = [e["stage"] for e in report if e["waiting"] is None]
     return {
         "stages": report,
         # The first stage with work is where a human should look, and where an
         # orchestrator should start. An empty chain says so explicitly rather
         # than leaving the reader to scan six zeroes.
-        "next_stage": next((e["stage"] for e in report if e["waiting"]), None),
-        "total_waiting": sum(e["waiting"] for e in report),
+        #
+        # A stage whose queue could not be counted (`waiting: None`) counts as
+        # work, not as done. Skipping it would be the quiet failure this whole
+        # file exists to prevent: the caller cannot tell "nothing to do" from
+        # "nobody counted", so the answer that costs least is to send it there
+        # and let it find out.
+        "next_stage": next(
+            (e["stage"] for e in report if e["waiting"] is None or e["waiting"]), None
+        ),
+        "total_waiting": sum(e["waiting"] or 0 for e in report),
+        # Reported, not folded into the total: a sum that silently omits a term
+        # is a wrong number, a sum that names what it left out is a partial one.
+        "unknown_stages": unknown,
     }
 
 
@@ -312,9 +330,14 @@ def main():
 
     print("Catena Divario Italia, stato per stadio\n")
     for entry in status["stages"]:
-        mark = "." if not entry["waiting"] else "*"
-        print(f" {mark} {entry['stage']:9s} {entry['agent']:19s} in attesa: {entry['waiting']:<5d} {entry['next']}")
+        waiting = entry["waiting"]
+        mark = "?" if waiting is None else ("." if not waiting else "*")
+        shown = "?" if waiting is None else str(waiting)
+        print(f" {mark} {entry['stage']:9s} {entry['agent']:19s} in attesa: {shown:<5s} {entry['next']}")
     print()
+    if status["unknown_stages"]:
+        print("Code non contate (il totale le esclude): "
+              + ", ".join(status["unknown_stages"]))
     if status["next_stage"]:
         first = next(e for e in status["stages"] if e["stage"] == status["next_stage"])
         print(f"Prossimo passo: {first['agent']} -> {first['command']}")

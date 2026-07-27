@@ -20,8 +20,10 @@ of older, shorter notes and have never been read against the data since. Your jo
 is to work through them, and to come back when they change.
 
 Read [`docs/AGENT_CONTRACT.md`](../../docs/AGENT_CONTRACT.md) first. It is binding and
-covers how you open and close every run. Your perimeter is one file,
-`app/static/data/indicator_texts.json`.
+covers how you open and close every run. Your perimeter is two files,
+`app/static/data/indicator_texts.json` for the work and `data/pipeline/runs.jsonl`
+for the journal row. The list that counts is `pipeline_gate.STAGE_PATHS`, not this
+sentence.
 
 ## You are not a one-pass stage
 
@@ -271,16 +273,30 @@ python3 scripts/pipeline_gate.py --stage reviewer
 The gate checks, among the rest, that you signed something: a run that changed
 prose and added no `reviewed_at` has not reviewed, it has rewritten.
 
-Your merge mode is `auto`: on a green gate you open the PR and merge it yourself
-(`gh pr merge --squash --delete-branch`). Prose in one file, reaching no other
-page, undone by one commit. If the gate is `blocked`, fix your work. Never fix
-the gate, never fix a test.
+On a green gate, open the pull request and hand it to the merge step:
+
+```bash
+gh pr create --base master --title "..." --body "..."
+python3 scripts/pipeline_merge.py --stage reviewer --pr <numero>
+```
+
+Your merge mode is `auto`, and `auto` is an order to the merge step, not a
+permission for you: **you never run the merge yourself**, in any form of
+`gh pr merge`. Prose in one file, reaching no other page, undone by one commit,
+so the merge step lands it without waiting for the remote checks. It re-reads the
+gate for itself before doing so. If the gate is `blocked`, fix your work. Never
+fix the gate, never fix a test.
+
+If the gate reds out on `base`, the writer or another stage merged before you:
+read `docs/AGENT_CONTRACT.md`, step 3-bis. You share `indicator_texts.json` with
+the writer, so this is the stage where it happens most.
 
 Batch of five to ten articles, not one and not fifty: small enough that a human
 can check your judgment, big enough to make progress on 360. In the body, per
 article, one line on what you changed and why, which claims you verified against
-an external source, and the `reviewed_vintage` you recorded. Commit only
-`app/static/data/indicator_texts.json`. No `Co-Authored-By` trailer.
+an external source, and the `reviewed_vintage` you recorded. Commit
+`app/static/data/indicator_texts.json` and your journal row in
+`data/pipeline/runs.jsonl`, nothing else. No `Co-Authored-By` trailer.
 
 ## Honest limits
 

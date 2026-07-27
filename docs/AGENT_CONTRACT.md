@@ -45,7 +45,7 @@ Lavora su un branch dedicato (`automation/<stadio>-<YYYY-MM-DD>`), committa
 **senza** il trailer `Co-Authored-By`, poi:
 
 ```bash
-python3 scripts/pipeline_gate.py --stage <scout|hunter|promoter|curator|writer|reviewer>
+python3 scripts/pipeline_gate.py --stage <scout|hunter|promoter|curator|writer|reviewer|verificatore>
 ```
 
 Il verdetto porta un `merge`. **Non eseguire tu il merge**: apri la pull request
@@ -86,6 +86,52 @@ Se `blocked`, non aggirare mai il cancello disattivando un controllo o
 modificando un test. Correggi il lavoro, oppure lascia il branch committato e
 spiega perche' ti sei fermato.
 
+## 3-bis. Se un altro stadio ha fuso prima di te
+
+Succede, e con Routine giornaliere succede spesso. Non e' un guasto ed e' l'unico
+caso in cui il cancello ti accusa di una cosa che non hai fatto. Riconoscilo dal
+verdetto:
+
+```
+[NO ] base: la base 'origin/master' non e' un antenato di HEAD
+```
+
+Quando c'e' quella riga, **tutte le righe rosse sotto sono finzione**: il diff
+misurato non e' il tuo lavoro, e' il tuo lavoro piu' tutto quello che master ha
+fatto senza di te. Il verificatore in particolare si vede accusare di aver
+cancellato righe di `verifiche.csv` che non ha mai avuto davanti. Non correggere
+niente sulla scorta di quel verdetto: e' l'errore che il verdetto stesso ti dice
+di non fare.
+
+Si esce in tre comandi, e sono sempre gli stessi tre:
+
+```bash
+git fetch origin master
+git merge origin/master        # risolvi, vedi sotto
+python3 scripts/pipeline_gate.py --stage <stadio>
+```
+
+**I due registri in coda si risolvono tenendo tutte e due le parti**, sempre, e
+senza pensarci: `data/pipeline/runs.jsonl` e `data/pipeline/verifiche.csv`. Sono
+file a cui si aggiunge in fondo, quindi due stadi che girano vicini scrivono
+nello stesso punto e git chiama conflitto quello che e' solo la somma di due
+righe. Nessuna delle due e' sbagliata e nessuna sostituisce l'altra: **scegliere
+e' l'unico errore possibile**, e su `verifiche.csv` e' anche una violazione del
+tuo stesso cancello, che il registro lo pretende append-only.
+
+`app/static/data/indicator_texts.json` e' un caso diverso e riguarda solo
+scrittore e revisore. Su articoli diversi git fonde da solo e non vedi niente. Sullo
+**stesso** articolo il conflitto e' vero e nessuna regola meccanica lo risolve,
+perche' sono due versioni della stessa frase: tieni quella del revisore se il
+revisore ha firmato, altrimenti la piu' recente, e **dichiara nel corpo della PR
+e nel diario che hai scelto**, con l'altra versione scritta accanto. E' l'unico
+punto della catena in cui un agente decide al posto di un altro, quindi e' anche
+l'unico che va lasciato leggibile.
+
+Se il conflitto non e' in nessuno di questi file, non improvvisare: lascia il
+branch committato, scrivi la riga di diario con esito `stopped` e di' quale file
+era. Fermarsi e' un esito legittimo, indovinare no.
+
 ## 4. Registrare la run nel diario, sempre
 
 Ultimo passo di ogni run, **anche quando non hai prodotto niente**:
@@ -109,10 +155,9 @@ la riga viaggia insieme al tuo lavoro. Committala con il resto. Se ti sei
 fermato o il cancello ti ha bloccato, scrivi comunque la riga e committala sul
 branch: sono le run che serve di piu' poter leggere.
 
-**Se git segnala un conflitto su `runs.jsonl`, tieni tutte e due le righe.**
-E' un registro in coda: due stadi che girano vicini aggiungono ognuno la propria
-riga in fondo, e git le vede come lo stesso punto del file. Nessuna delle due e'
-sbagliata e nessuna sostituisce l'altra. Scegliere e' l'unico errore possibile.
+Se git segnala un conflitto su `runs.jsonl`, tieni tutte e due le righe: e' il
+passo 3-bis, che vale identico per `verifiche.csv` e spiega anche il verdetto
+rosso che vedrai prima.
 
 Chi legge, legge cosi':
 
@@ -139,8 +184,11 @@ conta. Qui per comodita':
 | `curator` | `data/discovery/curation.csv`, layer esterno, manifest, descrizioni curate |
 | `writer` | `app/static/data/indicator_texts.json` |
 | `reviewer` | `app/static/data/indicator_texts.json` |
+| `verificatore` | `data/pipeline/verifiche.csv`, **e non i testi** |
 
-Ogni stadio puo' inoltre scrivere `data/pipeline/runs.jsonl`, il diario.
+Ogni stadio puo' inoltre scrivere `data/pipeline/runs.jsonl`, il diario. Sono due
+file, non uno: un prompt che ti dice "il tuo perimetro e' un file solo" sta
+riassumendo male, e il diario va committato con il resto.
 
 Tutto il resto e' fuori perimetro e fa fallire il cancello, compreso il codice
 dell'app, i test e i documenti. Se ti accorgi che serve una modifica al codice,

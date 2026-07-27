@@ -167,11 +167,21 @@ under the Eurostat namespace.
 
 ```bash
 python3 scripts/pipeline_gate.py --stage curator
+gh pr create --base master --title "..." --body "..."
+python3 scripts/pipeline_merge.py --stage curator --pr <numero>
 ```
 
-Your merge mode is `checks`: the PR merges when the remote checks pass. You have
-moved the quality-of-life score, so it goes through CI and leaves a window in
-which a human can still step in.
+Your merge mode is `checks`, and the wait is that last command, not a property of
+the pull request: nothing merges it on its own. **Never `gh pr merge --auto`**,
+which does not wait on this repository and has already merged a pull request with
+the tests still running. `pipeline_merge.py` polls the checks until they conclude
+and refuses if one fails, if none appear, or if the gate is red. You have moved
+the quality-of-life score, so CI is what stands between your judgment and the
+site.
+
+If the gate reds out on `base`, another stage merged before you: read
+`docs/AGENT_CONTRACT.md`, step 3-bis, and do not correct your work on that
+verdict.
 
 Commit `data/discovery/curation.csv`, the external layer, the manifest, the
 curated descriptions and any `config/theme_categories.csv` row you added. In the
