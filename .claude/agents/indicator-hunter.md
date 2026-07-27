@@ -115,7 +115,7 @@ runs on its own.
 python3 scripts/pipeline_gate.py --stage promoter     # se hai promosso
 python3 scripts/pipeline_gate.py --stage hunter       # se hai solo triagiato
 gh pr create --base master --title "..." --body "..."
-python3 scripts/pipeline_merge.py --stage <hunter|promoter> --pr <numero>
+.venv/bin/python scripts/pipeline_merge.py --stage <hunter|promoter> --pr <numero>
 ```
 
 Your merge mode is `checks`, and the wait is that last command, not a property of

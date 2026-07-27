@@ -277,7 +277,7 @@ On a green gate, open the pull request and hand it to the merge step:
 
 ```bash
 gh pr create --base master --title "..." --body "..."
-python3 scripts/pipeline_merge.py --stage reviewer --pr <numero>
+.venv/bin/python scripts/pipeline_merge.py --stage reviewer --pr <numero>
 ```
 
 Your merge mode is `auto`, and `auto` is an order to the merge step, not a

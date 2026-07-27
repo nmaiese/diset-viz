@@ -293,7 +293,7 @@ possono fare:
 - **`gh pr merge --auto` non aspetta niente su questo repo.** Con
   `allow_auto_merge` a falso e `master` non protetto, `gh` ripiega su un merge
   immediato senza dirlo. Nessuno stadio deve usarlo: si chiude con
-  `python3 scripts/pipeline_merge.py --stage <stadio> --pr <numero>`.
+  `.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero>`.
 - **La CI non parte da sola sulle PR aperte via il GitHub MCP.** GitHub non lancia
   i workflow per eventi creati dal token dell'app (anti-ricorsione), quindi una PR
   aperta così resta senza check e il box di merge sembra bloccato pur non essendo

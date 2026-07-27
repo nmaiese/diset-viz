@@ -170,7 +170,7 @@ rows you finished, say in the journal which article you left open, and stop.
 .venv/bin/python -m unittest discover -s tests
 python3 scripts/pipeline_gate.py --stage verificatore
 gh pr create --base master --title "..." --body "..."
-python3 scripts/pipeline_merge.py --stage verificatore --pr <numero>
+.venv/bin/python scripts/pipeline_merge.py --stage verificatore --pr <numero>
 ```
 
 Your merge mode is `checks`, and the wait is that last command, not a property of

@@ -168,7 +168,7 @@ under the Eurostat namespace.
 ```bash
 python3 scripts/pipeline_gate.py --stage curator
 gh pr create --base master --title "..." --body "..."
-python3 scripts/pipeline_merge.py --stage curator --pr <numero>
+.venv/bin/python scripts/pipeline_merge.py --stage curator --pr <numero>
 ```
 
 Your merge mode is `checks`, and the wait is that last command, not a property of

@@ -110,7 +110,7 @@ the merge step:
 ```bash
 python3 scripts/pipeline_gate.py --stage scout
 gh pr create --base master --title "..." --body "..."
-python3 scripts/pipeline_merge.py --stage scout --pr <numero>
+.venv/bin/python scripts/pipeline_merge.py --stage scout --pr <numero>
 ```
 
 This used to be `manual`, and it was the bottleneck that kept the whole chain
