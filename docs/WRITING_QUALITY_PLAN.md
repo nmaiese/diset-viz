@@ -1143,13 +1143,12 @@ bisogno di dieci articoli appena pubblicati che solo il 4 produce con regolarita
 
 ### 6. Stato dell'esecuzione al 27 luglio 2026, e che cosa manca
 
-Questa sezione esiste perche' il piano qui sopra e' stato eseguito a meta' e la
-sessione si e' fermata sul credito, non su una decisione. Chi riprende deve
-poter sapere dove ci si e' fermati senza ricostruirlo dai commit.
+Questa sezione esiste perche' il piano qui sopra e' stato eseguito a tappe e la
+sessione che lo esegue finisce prima di lui. Chi riprende deve poter sapere dove
+ci si e' fermati senza ricostruirlo dai commit.
 
-**Dove vive tutto.** Branch `claude/article-improvement-plan-bz3qgm`, che sta
-sopra `claude/piano-ultimo-branch-0btfo7` e **non** sopra `master`. Porta con se'
-gli undici commit del primo giro, mai uniti e senza pull request.
+**Dove vive tutto.** Branch `claude/article-improvement-plan-bz3qgm`, pull
+request #46 aperta su `master`.
 
 #### Fatto
 
@@ -1164,54 +1163,85 @@ gli undici commit del primo giro, mai uniti e senza pull request.
   alto della coda, tutti partiti da due sezioni su quattro e circa 140 parole.
   Da 22 sezioni su 44 a 44 su 44, da 1.552 a 7.841 parole, da zero a 29 link
   interni, da zero a 19 fonti verificate, zero tell meccanici.
-- **Lotto 2, rilettura: cinque articoli su undici**, firmati.
-- **Il verificatore, braccio negativo.** Due agenti su dieci articoli migrati e
-  mai riletti, fuori dal lotto: 113 affermazioni controllate, 11 smentite. Lo
-  stadio non e' un timbro, e lo zero che dara' sul lotto nuovo avra' un
-  significato.
+- **Lotto 2, rilettura: undici articoli su undici**, firmati. I sei rimasti
+  (`ter-611`, `ter-72`, `bes-12SER003`, `ter-168`, `ter-432`, `ter-60`) sono
+  stati riletti da sei agenti in parallelo su file separati e integrati in
+  serie. I due file di review gia' sul disco per `ter-432` e `ter-60` non sono
+  stati letti: l'agente che li aveva scritti non aveva dichiarato chiusura,
+  quindi quelle due riletture sono state rifatte da capo.
+- **Il verificatore, tutti e due i bracci.**
+- **La guardia sulle definizioni**, che era la lacuna piu' larga e non era in
+  nessuna parte del piano.
+
+#### Che cosa hanno detto i numeri
+
+La rilettura, sui sei ultimi: 205 affermazioni controllate, 39 rilievi, 15
+affermazioni false. Sul lotto intero, undici articoli: **392 controllate, 57
+rilievi, 19 false**, cioe' circa 1,7 per articolo.
+
+Il verificatore, braccio positivo, sugli stessi undici gia' riletti e firmati:
+**529 controllate, 7 smentite, 3 non verificabili**.
+
+| stato dell'articolo | controllate | smentite | tasso |
+|---|---|---|---|
+| note migrate, mai rilette (braccio negativo) | 113 | 11 | 9,7% |
+| scritte nel lotto 2, non ancora rilette | 392 | 19 | 4,8% |
+| scritte nel lotto 2 e rilette | 529 | 7 | 1,3% |
+
+**Il tasso torna sotto di un fattore sette**, quindi lo zero del braccio
+positivo non era una bugia. Due avvertenze sul confronto, perche' la Parte terza
+esiste per non fidarsi di una tabella: i tre numeri vengono da agenti diversi e
+"affermazione controllata" resta un giudizio, non un conteggio oggettivo, quindi
+il rapporto e' solido e i decimali no.
+
+La conclusione, pero', **non e' "lo stadio di scrittura va bene"**. E' che a
+togliere gli errori e' la rilettura. Un lotto che salta quello stadio pubblica
+circa un'affermazione falsa ogni due articoli, e la Parte seconda aveva concluso
+il contrario solo perche' misurava testi gia' passati di li'.
+
+E 1,3% non e' zero. Su undici articoli scritti bene, riletti e firmati, restano
+sette affermazioni false. **Tre delle sette sono della classe definizione**, che
+e' esattamente la classe che sopravvive a una rilettura fatta bene, perche' una
+rilettura controlla i numeri e i numeri erano giusti. Tutte e sette sono state
+corrette, e le tre non verificabili tagliate.
+
+#### La guardia sulle definizioni, che ora esiste
+
+`scripts/xls_reader.py` (OLE2 e BIFF8 con la sola libreria standard),
+`scripts/fetch_definitions.py` (il foglio `Metadati` di `Metainformazione.xls`
+in `data/definitions/istat_territoriali.csv`, 378 definizioni, 362 dei 393 id
+dell'archivio regionale) e `scripts/definition_check.py` (il confronto).
+
+Il segnale `definizione` di `review_queue` pesa 50, sopra `rilettura`, e segnala
+45 articoli. Il dettaglio dei quattro segnali e la loro affidabilita' stanno in
+[`INDICATOR_PAGES.md`](INDICATOR_PAGES.md), che e' il documento che li possiede.
+
+Due cose vale la pena registrare qui e non li'. La prima: la prima forma del
+segnale `termini` era una lista di parole mancanti e segnalava 148 articoli su
+179, che e' lo stesso che non segnalarne nessuno. Un segnale che copre l'82% del
+campo non ordina niente, ed e' lo stesso difetto della domanda retorica su 340
+articoli su 364. La seconda: il segnale `contraddizione` su tutti e 364 gli
+articoli ne trova **uno**, `ter-72`, ed e' la stessa identica frase che un
+revisore umano aveva trovato leggendo l'articolo, arrivata per una strada
+indipendente. Una guardia lessicale che concorda con un lettore su un caso
+solo e' un campione minuscolo, ma e' l'unico modo che si aveva di tararla.
 
 #### Non fatto, e dove riprendere
 
-1. **Sei articoli senza rilettura**: `ter-611`, `ter-72`, `bes-12SER003`,
-   `ter-168`, `ter-432`, `ter-60`. Non hanno `reviewed_at`, quindi
-   `scripts.review_queue` li ripropone da sola e non c'e' niente da ricordare
-   altrove.
-2. **Due file di review non integrati**, per `ter-432` e `ter-60`. L'agente che
-   li ha scritti e' morto senza dichiarare chiusura mentre diceva di stare
-   ancora verificando. Sono strutturalmente perfetti e indistinguibili da quelli
-   finiti, ed e' esattamente per questo che non sono entrati. Vanno rifatti o
-   riletti da qualcun altro prima di essere creduti.
-3. **Il verificatore sul lotto nuovo**, che e' il braccio positivo e non e' mai
-   partito.
-
-#### Che cosa il lotto 2 ha aggiunto al piano
-
-Due cose, e la seconda non era in nessuna delle due parti precedenti.
-
-**La rilettura e' lo stadio critico, e adesso c'e' il numero.** Sui cinque
-articoli riletti: 187 affermazioni controllate, 18 rilievi, **4 affermazioni
-false**. Tutte prodotte da scrittori con la suite verde e il linter pulito. La
-Parte seconda aveva concluso che lo stadio di scrittura non e' il problema, ma
-quel giudizio era su testi **gia' passati dalla rilettura**. Misurata prima, la
-scrittura produce circa un'affermazione falsa ogni articolo e mezzo. Il
-verificatore di 3.3 non e' piu' una proposta ragionevole, e' la cosa che manca.
-
-**Il difetto ricorrente non sono le cifre, sono le definizioni.** Nessuno dei
-quattro falsi e' un numero sbagliato. Sono descrizioni sbagliate della
-classifica ("la Campania nella meta' bassa" mentre e' decima su venti) e
-soprattutto descrizioni sbagliate di **che cosa l'indicatore conta**. Il braccio
-negativo aveva trovato la stessa classe e piu' grave: `ter-402` chiama "imprese
-a guida femminile" quello che Istat definisce come titolari donne di imprese
-individuali, e lo ripete nella sezione `limiti`, cioe' nel punto che serve a
-dire che cosa l'indicatore non misura. `bes-11RIC023` dichiara un limite che la
-definizione Istat smentisce parola per parola.
-
-Le guardie confrontano ogni cifra con la serie. **Nessuna confronta la
-definizione scritta con la definizione della fonte**, che per gli indicatori
-territoriali sta nel foglio `Metadati` di `Metainformazione.xls` della Banca
-dati territoriale. E' la lacuna piu' larga che l'esecuzione ha esposto, non era
-in nessuna parte di questo piano, e vale piu' del verificatore perche' un errore
-di definizione sopravvive a tutte le riletture che guardano i numeri.
+1. **Lo stadio `verificatore` non e' registrato.** Il braccio positivo e' girato
+   con undici agenti istruiti a mano, non con un agente in `.claude/agents/` e
+   una Routine. La 3.3 dice dove va inchiodato uno stadio nuovo (`STAGE_PATHS`
+   piu' `MERGE_POLICY`, `pipeline_log.STAGES`, `pipeline_status.STAGE_ORDER`) e
+   avverte che il cancello **rifiuta** uno stadio non registrato invece di
+   degradarlo. Adesso pero' si sa che cosa lo stadio misura e quanto costa: undici
+   agenti, circa 900 mila token, e sette smentite trovate.
+2. **Le famiglie non territoriali non hanno una guardia sulle definizioni.**
+   `definition_check` dice `scoperto` su 185 articoli su 364, che e' onesto e
+   non e' una copertura. Il BES pubblica il suo glossario nel capitolo e nel
+   `Metadata.xlsx` dell'annesso statistico, che un verificatore ha scaricato e
+   letto durante questa sessione: la strada esiste, il parser no.
+3. **Il debito di curatela** di 3.5, sotto, e' peggiorato.
+4. **La rubrica non e' stata ritarata** (3.4).
 
 #### Tre cose piccole trovate per strada
 
@@ -1222,12 +1252,23 @@ di definizione sopravvive a tutte le riletture che guardano i numeri.
   partenza. Cinque scrittori su undici ne sono usciti. ARERA per le interruzioni
   elettriche e il MiC per il cinema sono piu' autorevoli di qualunque voce in
   elenco, `dati.trentino.it` per un indicatore Istat nazionale no.
-- Lo stesso registro avverte dei 403 e non dei 503. `pnrr.salute.gov.it`
-  risponde 503 a una richiesta automatica e 200 a un browser, ed e' un blocco,
-  non una fonte morta.
+- Lo stesso registro avverte dei 403 e non dei 503. `pnrr.salute.gov.it` e
+  `salute.gov.it` rispondono 503 a una richiesta automatica e 200 a un browser,
+  ed e' un blocco, non una fonte morta. Confermato due volte in questa sessione.
 
-#### Il debito di curatela, che intanto sta diventando piu' caro
+#### Il debito di curatela, che intanto e' diventato piu' caro
 
-`ter-242` ha gia' linkato `ter-471`, cioe' una delle due pagine gemelle. Ogni
-lotto cementa link verso uno dei due doppioni prima che qualcuno abbia deciso
-quale sopravvive. Le tre voci restano quelle di 3.5.
+`ter-242` ha gia' linkato `ter-471`, cioe' una delle pagine coinvolte. Ogni lotto
+cementa link verso uno dei doppioni prima che qualcuno abbia deciso quale
+sopravvive. Le tre voci restano quelle di 3.5, e il verificatore di `ter-242` ne
+ha aggiunta una quarta, peggiore delle altre:
+
+**`ter-471` e `ter-167` hanno serie identiche riga per riga**, 580 su 580, 29
+anni per 20 regioni. Le due definizioni ufficiali divergono ("Investimenti fissi
+lordi in percentuale del PIL" contro "Investimenti privati sul PIL"), quindi se
+il dato e' lo stesso almeno una delle due etichette e' sbagliata, e sono due
+pagine pubbliche che dicono al lettore due cose diverse mostrandogli lo stesso
+numero. Il brief non lo segnala perche' la sua soglia di allarme scatta a rho
+sopra 0,95 fra i correlati, non sui doppioni esatti. Un controllo di identita'
+delle serie e' molto piu' semplice della guardia sulle definizioni e non
+esiste.
