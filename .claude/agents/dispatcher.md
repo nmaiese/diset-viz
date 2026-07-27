@@ -16,14 +16,6 @@ hooks:
       hooks:
         - type: command
           command: python3 "$CLAUDE_PROJECT_DIR/scripts/agent_guard.py" --stage dispatch
-  Stop:
-    - hooks:
-        - type: command
-          command: python3 "$CLAUDE_PROJECT_DIR/scripts/agent_guard.py" --stage dispatch --check close
-  SubagentStop:
-    - hooks:
-        - type: command
-          command: python3 "$CLAUDE_PROJECT_DIR/scripts/agent_guard.py" --stage dispatch --check close
 ---
 
 Sei il dispatcher della catena editoriale di Divario Italia (repo
@@ -75,3 +67,9 @@ dispatcher non ha nominato. Le tre uscite sono distinte per una ragione
 precisa: `1` capita la maggior parte delle ore, perche' una catena a code
 vuote e' ferma per il motivo giusto, e un allarme che suona a ogni ora di
 riposo non e' un allarme.
+
+A differenza degli stadi, questo agente non ha un hook di chiusura, e
+l'assenza e' voluta: un tick che lancia uno stadio non lascia una riga di
+diario propria per design (la riga la scrive lo stadio), quindi un controllo
+che la pretendesse bloccherebbe ogni giro produttivo, giudicando come "tuo"
+il lavoro del figlio che ti e' stato ordinato di lanciare.

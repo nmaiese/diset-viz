@@ -54,4 +54,4 @@ data e si attribuisce da li'.
 
 | data | cambio | writer | reviewer | verifier | verdetto |
 | --- | --- | --- | --- | --- | --- |
-| _(nessun giro ancora annotato)_ | | | | | |
+| 2026-07-27 | riga fondativa: la PR che crea metro e procedura (guardie, modelli, skills, prompt snelliti) | baseline da stabilire | baseline da stabilire | baseline da stabilire | passa, con riserva dichiarata: il metro non puo' precedere se stesso. In luogo delle eval, un giro end-to-end dispatcher -> scout senza intervento (run `scout-20260727T203950Z-6f47`, cancello verde, 5 triage motivati) e il self-test del metro. Il PRIMO giro pieno di eval fissa la baseline, e da li' in poi la regola vale intera. |

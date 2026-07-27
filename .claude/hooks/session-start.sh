@@ -27,14 +27,19 @@ cd "${CLAUDE_PROJECT_DIR:-.}"
 # pipeline_log.py lo legge best-effort per scrivere session_id e durata nella
 # riga di run. Locale e ignorato da git: appartiene alla sessione, non alla
 # storia.
-printf '%s' "$hook_payload" | python3 - <<'PY' || true
-import json, sys
+# Il payload viaggia in una variabile d'ambiente e non in una pipe: con
+# `python3 -` lo stdin e' gia' occupato dal programma stesso (l'heredoc), e la
+# pipe si perdeva in silenzio, scrivendo un session_id sempre vuoto.
+DI_HOOK_PAYLOAD="$hook_payload" python3 - <<'PY' || true
+import json, os
 from datetime import datetime, timezone
 from pathlib import Path
 
 try:
-    payload = json.load(sys.stdin)
+    payload = json.loads(os.environ.get("DI_HOOK_PAYLOAD") or "{}")
 except Exception:
+    payload = {}
+if not isinstance(payload, dict):
     payload = {}
 meta = {
     "session_id": str(payload.get("session_id") or ""),

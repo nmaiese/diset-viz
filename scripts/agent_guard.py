@@ -118,6 +118,33 @@ def _stages_paths(stages):
     return tuple(allowed)
 
 
+def _bash_write_targets(segment, tokens):
+    """I percorsi che questo segmento di comando scrive, per quanto si veda.
+
+    Best effort dichiarato: prende le redirezioni (`>`, `>>`), le destinazioni
+    di `cp`/`mv` e gli argomenti di `tee`, che sono i modi ovvi di scrivere un
+    file senza passare da Edit/Write. Non prova a essere una sandbox: un
+    `python3 -c` puo' scrivere dove vuole e li' restano il cancello e
+    l'append-only. Questo controllo esiste per il caso comune, non per il
+    caso ostile.
+    """
+    targets = []
+    for match in re.finditer(r"(?<![0-9&])>{1,2}\s*(\S+)", segment):
+        target = match.group(1).strip("'\"")
+        # `2>&1`, `>&2` e simili non sono file, /dev/* nemmeno.
+        if target.startswith("&") or target.startswith("/dev/"):
+            continue
+        targets.append(target)
+    if tokens:
+        head = tokens[0]
+        positional = [t for t in tokens[1:] if not t.startswith("-")]
+        if head in ("cp", "mv") and positional:
+            targets.append(positional[-1])
+        elif head == "tee":
+            targets.extend(positional)
+    return targets
+
+
 def command_verdict(command, stages):
     """(ok, ragione) per un comando Bash."""
     for pattern, label in DENY_PATTERNS:
@@ -142,16 +169,23 @@ def command_verdict(command, stages):
             continue
         head = tokens[0]
         second = tokens[1] if len(tokens) > 1 else None
-        if head in ALLOW_SINGLE:
-            continue
-        if any(head == a and (b is None or second == b) for a, b in ALLOW_PAIRS):
-            continue
-        return False, (
-            f"'{head}' non e' fra i comandi che questo stadio usa. Permessi: "
-            "python/python3 (script della catena e suite), git, gh pr/run/auth, "
-            "lettura file (ls, cat, grep, ...). Se il lavoro richiede altro, "
-            "fermati e segnalalo nella riga di diario invece di aggirare la guardia."
+        allowed = head in ALLOW_SINGLE or any(
+            head == a and (b is None or second == b) for a, b in ALLOW_PAIRS
         )
+        if not allowed:
+            return False, (
+                f"'{head}' non e' fra i comandi che questo stadio usa. Permessi: "
+                "python/python3 (script della catena e suite), git, gh pr/run/auth, "
+                "lettura file (ls, cat, grep, ...). Se il lavoro richiede altro, "
+                "fermati e segnalalo nella riga di diario invece di aggirare la guardia."
+            )
+        # Un comando permesso puo' ancora scrivere un file: un redirect o una
+        # copia sono una Write con un altro vestito, e passano dallo stesso
+        # perimetro.
+        for target in _bash_write_targets(segment, tokens):
+            ok, reason = path_verdict(target, stages)
+            if not ok:
+                return False, reason
     return True, ""
 
 

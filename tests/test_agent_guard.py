@@ -59,6 +59,37 @@ class CommandVerdictTests(unittest.TestCase):
         ok, _ = agent_guard.command_verdict("rm -rf data/pipeline", ["writer"])
         self.assertFalse(ok)
 
+    def test_redirect_is_a_write_with_another_dress(self):
+        # Un comando permesso che scrive fuori perimetro via redirect e' una
+        # Write travestita, e passa dallo stesso perimetro.
+        ok, reason = agent_guard.command_verdict(
+            "echo pwned > app/views.py", ["writer"])
+        self.assertFalse(ok)
+        self.assertIn("perimetro", reason)
+
+    def test_copy_destination_is_checked(self):
+        ok, _ = agent_guard.command_verdict(
+            "cp /tmp/x scripts/pipeline_gate.py", ["writer"])
+        self.assertFalse(ok)
+
+    def test_redirect_to_scratch_is_fine(self):
+        ok, _ = agent_guard.command_verdict(
+            "python3 scripts/pipeline_gate.py --json > /tmp/gate.json", ["writer"])
+        self.assertTrue(ok)
+
+    def test_stream_redirects_are_not_paths(self):
+        ok, _ = agent_guard.command_verdict(
+            "python3 scripts/prose_lint.py --summary 2>&1", ["writer"])
+        self.assertTrue(ok)
+        ok, _ = agent_guard.command_verdict(
+            "grep -r x tests 2>/dev/null", ["writer"])
+        self.assertTrue(ok)
+
+    def test_redirect_inside_the_perimeter_is_fine(self):
+        ok, _ = agent_guard.command_verdict(
+            "echo '{}' > content/indicators/ter__999.json", ["writer"])
+        self.assertTrue(ok)
+
 
 class PathVerdictTests(unittest.TestCase):
     def test_writer_may_write_an_article(self):
