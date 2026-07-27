@@ -163,6 +163,48 @@ def build_entry(stage, outcome, summary, detail=None, gate=None, pr=None,
     return entry
 
 
+def collapse_runs(entries):
+    """Una run lascia due righe, e sono un evento solo.
+
+    L'agente scrive la propria dentro la pull request, quando l'esito non lo sa
+    ancora, e scrive `pr-open`. Il passo di merge scrive la seconda su master,
+    quando l'esito lo conosce. Chi legge le contava come due run, e siccome solo
+    le run che aprono una PR ne producono due, il conteggio gonfiava proprio gli
+    stadi che lavorano e lasciava intatti quelli fermi: il numero saliva quando
+    la catena andava bene, che e' il modo piu' subdolo di essere sbagliato.
+
+    Si uniscono per `(stadio, pr)`, che e' l'unica coppia che identifica una run:
+    una pull request appartiene a una run sola. Una riga senza `pr` (una run a
+    vuoto, o una bloccata prima di aprire) resta per conto suo.
+
+    L'unione tiene il meglio delle due, non la piu' recente. La riga dell'agente
+    porta le motivazioni, una per decisione, e sono la parte che serve rileggere
+    a distanza di mesi. La riga del passo di merge porta l'esito vero e il
+    verdetto del cancello. Buttarne via una delle due sarebbe tornare a scegliere
+    fra sapere che cosa e' stato deciso e sapere come e' finita.
+    """
+    order, index = [], {}
+    for entry in sorted(entries, key=lambda r: r.get("at") or ""):
+        pr = str(entry.get("pr") or "").strip()
+        key = (entry.get("stage"), pr) if pr else None
+        if key is None:
+            order.append(entry)
+            continue
+        if key not in index:
+            index[key] = len(order)
+            order.append(dict(entry))
+            continue
+        first = order[index[key]]
+        first["outcome"] = entry.get("outcome") or first.get("outcome")
+        first["gate"] = entry.get("gate") or first.get("gate")
+        first["commit"] = entry.get("commit") or first.get("commit")
+        # `at` diventa quando la run si e' chiusa, non quando ha aperto la PR:
+        # e' la data che l'allarme del silenzio deve guardare.
+        first["at"] = entry.get("at") or first.get("at")
+        first["detail"] = (first.get("detail") or []) + (entry.get("detail") or [])
+    return order
+
+
 def summarize(entries):
     """Aggregato per stadio: l'ultima run e quante ne meritano attenzione."""
     by_stage = {}
@@ -309,7 +351,7 @@ def main():
         print(f"registrato: {entry['stage']} -> {entry['outcome']}")
         return 0
 
-    entries = read_journal()
+    entries = collapse_runs(read_journal())
     if args.stage:
         entries = [e for e in entries if e.get("stage") == args.stage]
     if args.json:

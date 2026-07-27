@@ -11,6 +11,7 @@ Nessun test parla con la rete o con `gh`: il comando esterno e' iniettato.
 """
 
 import json
+from pathlib import Path
 import unittest
 
 from scripts import pipeline_merge
@@ -182,6 +183,114 @@ class TheVerdictIsNotTakenFromTheCaller(unittest.TestCase):
             pipeline_merge.pipeline_gate.run = original
         self.assertEqual(seen["stage"], "reviewer")
         self.assertFalse(result["merged"])
+
+
+def journalling_gh(checks=None, merge_ok=True, push_failures=0):
+    """Come `fake_gh`, ma tiene anche il conto dei comandi git del diario e sa
+    far perdere le prime N corse al push, che e' il caso che conta."""
+    runner = fake_gh(checks=checks, merge_ok=merge_ok)
+    inner, state = runner, {"pushes": 0, "rows": []}
+
+    def wrapper(argv, cwd=None):
+        if argv[:2] == ["git", "push"]:
+            state["pushes"] += 1
+            if state["pushes"] <= push_failures:
+                return 1, "rejected: non-fast-forward"
+            return 0, ""
+        if argv[:2] == ["git", "commit"]:
+            # La riga e' gia' stata scritta nel worktree: la leggiamo da li',
+            # perche' e' quello che finira' davvero su master.
+            path = Path(cwd) / "data" / "pipeline" / "runs.jsonl"
+            if path.exists():
+                state["rows"] = [json.loads(x) for x in
+                                 path.read_text(encoding="utf-8").splitlines() if x.strip()]
+            return 0, ""
+        if argv[:2] == ["git", "rev-parse"]:
+            return 0, "abc1234\n"
+        return inner(argv, cwd=cwd)
+
+    wrapper.calls = inner.calls
+    wrapper.state = state
+    return wrapper
+
+
+class MasterHasToLearnHowItEnded(unittest.TestCase):
+    """Il buco che questo chiude e' doppio, e la meta' peggiore non e' il merge.
+
+    Una run rifiutata scrive la propria riga su un branch che non si fonde mai,
+    quindi da master non si vede: la run dello scout del 26 luglio esiste, dice
+    `blocked`, e vive su `automation/scout-2026-07-26` dove nessuno strumento la
+    legge. Master non sa distinguerla da una run mai avvenuta.
+    """
+
+    def test_a_refusal_is_recorded_on_master(self):
+        runner = journalling_gh()
+        pipeline_merge.decide("scout", 41, verdict=RED, runner=runner, log=lambda *_: None)
+        rows = runner.state["rows"]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["outcome"], "blocked")
+        self.assertEqual(rows[0]["pr"], 41)
+        self.assertEqual(rows[0]["branch"], "master")
+
+    def test_checks_that_never_conclude_are_recorded_too(self):
+        runner = journalling_gh(checks=None)
+        pipeline_merge.decide("curator", 7, verdict=GREEN, runner=runner,
+                              sleep=lambda _: None, log=lambda *_: None)
+        self.assertEqual([r["outcome"] for r in runner.state["rows"]], ["stopped"])
+
+    def test_a_merge_is_recorded_on_master(self):
+        runner = journalling_gh(checks={"python": "pass"})
+        pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
+                              sleep=lambda _: None, log=lambda *_: None)
+        rows = runner.state["rows"]
+        self.assertEqual([r["outcome"] for r in rows], ["merged"])
+        self.assertEqual(rows[0]["gate"], "checks")
+
+    def test_a_pull_request_left_open_writes_nothing(self):
+        """`pr-open` non e' un esito terminale: la PR resta aperta e la riga che
+        l'agente ha gia' committato dentro di essa la descrive bene. Scriverne
+        una seconda su master direbbe che e' finita quando non e' finita."""
+        runner = journalling_gh(checks={"python": "pass"})
+        pipeline_merge.decide("writer", 9, verdict=AUTO, runner=runner,
+                              dry_run=True, log=lambda *_: None)
+        self.assertEqual(runner.state["rows"], [])
+        self.assertEqual(runner.state["pushes"], 0)
+
+    def test_a_lost_push_race_is_retried(self):
+        """Due stadi che finiscono insieme si contendono la coda del registro.
+        Il ritentativo rilegge origin/master, che intanto porta la riga
+        dell'altro, e ci va dietro: su un file in coda e' sempre corretto."""
+        runner = journalling_gh(checks={"python": "pass"}, push_failures=1)
+        pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
+                              sleep=lambda _: None, log=lambda *_: None)
+        self.assertEqual(runner.state["pushes"], 2)
+        self.assertEqual([r["outcome"] for r in runner.state["rows"]], ["merged"])
+
+    def test_it_never_writes_into_the_agents_own_tree(self):
+        """L'albero dell'agente e' su un branch appena cancellato dal remoto.
+        Toccarlo per scrivere una riga di log e' un modo di perdere lavoro."""
+        runner = journalling_gh(checks={"python": "pass"})
+        pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
+                              sleep=lambda _: None, log=lambda *_: None)
+        for argv in runner.calls:
+            self.assertNotIn(argv[:2], ([  "git", "checkout"], ["git", "switch"]))
+            self.assertNotIn(argv[:2], (["git", "reset"],))
+
+    def test_a_journal_failure_does_not_undo_the_merge(self):
+        """Il merge e' gia' avvenuto. Se il diario non si scrive la run resta
+        valida, e l'unica cosa che cambia e' che va detto forte."""
+        runner = journalling_gh(checks={"python": "pass"}, push_failures=99)
+        said = []
+        result = pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
+                                       sleep=lambda _: None, log=said.append)
+        self.assertTrue(result["merged"])
+        self.assertTrue(any("DIARIO NON SCRITTO" in s for s in said))
+
+    def test_the_journal_can_be_turned_off(self):
+        runner = journalling_gh(checks={"python": "pass"})
+        pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
+                              sleep=lambda _: None, log=lambda *_: None, journal=False)
+        self.assertEqual(runner.state["pushes"], 0)
 
 
 if __name__ == "__main__":

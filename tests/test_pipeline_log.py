@@ -166,3 +166,49 @@ class TheDashboardReadsWithoutBreaking(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TwoRowsAreOneRun(unittest.TestCase):
+    """L'agente scrive la propria riga dentro la PR, il passo di merge scrive
+    l'esito su master. Contarle come due run gonfia il totale **solo** per gli
+    stadi che aprono pull request, cioe' proprio quelli che lavorano."""
+
+    ROWS = [
+        {"at": "2026-07-27T06:20:00+00:00", "stage": "hunter", "outcome": "pr-open",
+         "summary": "triage", "detail": ["DEPENDRATE respinto"], "gate": "checks",
+         "pr": "45", "commit": "aaa1111", "branch": "automation/hunter-2026-07-27"},
+        {"at": "2026-07-27T06:28:30+00:00", "stage": "hunter", "outcome": "merged",
+         "summary": "PR #45 fusa", "detail": [], "gate": "checks",
+         "pr": "45", "commit": "bbb2222", "branch": "master"},
+        {"at": "2026-07-27T07:00:00+00:00", "stage": "curator", "outcome": "nothing",
+         "summary": "niente da curare", "detail": [], "gate": "", "pr": "",
+         "commit": "ccc3333", "branch": "master"},
+    ]
+
+    def test_a_merged_run_counts_once(self):
+        collapsed = pipeline_log.collapse_runs(self.ROWS)
+        self.assertEqual(len(collapsed), 2)
+        self.assertEqual(pipeline_log.summarize(collapsed)["hunter"]["runs"], 1)
+
+    def test_the_outcome_is_the_one_the_merge_step_knew(self):
+        row = pipeline_log.collapse_runs(self.ROWS)[0]
+        self.assertEqual(row["outcome"], "merged")
+        self.assertEqual(row["commit"], "bbb2222")
+
+    def test_the_agents_reasons_survive(self):
+        """La riga del passo di merge non porta le motivazioni. Tenere solo la
+        piu' recente vorrebbe dire scambiare il perche' con il come e' finita."""
+        row = pipeline_log.collapse_runs(self.ROWS)[0]
+        self.assertIn("DEPENDRATE respinto", row["detail"])
+
+    def test_a_run_without_a_pull_request_stays_alone(self):
+        collapsed = pipeline_log.collapse_runs(self.ROWS)
+        self.assertEqual([r["stage"] for r in collapsed], ["hunter", "curator"])
+
+    def test_rows_of_different_stages_never_merge(self):
+        rows = [dict(self.ROWS[0]), dict(self.ROWS[1], stage="writer")]
+        self.assertEqual(len(pipeline_log.collapse_runs(rows)), 2)
+
+    def test_the_closing_time_is_what_the_silence_alarm_sees(self):
+        row = pipeline_log.collapse_runs(self.ROWS)[0]
+        self.assertEqual(row["at"], "2026-07-27T06:28:30+00:00")

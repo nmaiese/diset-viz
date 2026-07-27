@@ -312,7 +312,10 @@ def _pr_rows(prs):
 
 def render(out_path=None):
     status = pipeline_status.build_status()
-    entries = pipeline_log.read_journal()
+    # Collassate: una run che apre una pull request lascia due righe, la propria
+    # e quella del passo di merge, e contarle come due gonfia "run registrate"
+    # solo per gli stadi che lavorano.
+    entries = pipeline_log.collapse_runs(pipeline_log.read_journal())
     commits = recent_chain_commits()
     prs = open_pull_requests()
 
