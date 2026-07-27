@@ -38,6 +38,19 @@ def _level_of(entry):
     return entry.get("level") or indicator_texts.DEFAULT_LEVEL
 
 
+def _view(key):
+    """The view model behind an article key, or None if nothing serves it.
+
+    This is the question the *page* answers, and it is wider than the catalog:
+    a province-only BES series has a page and no catalog entry at all.
+    """
+    from app import sources
+    from app.indicator_view import build_indicator_view
+
+    family, raw_id = sources.split_internal_id(key)
+    return build_indicator_view(family, raw_id)
+
+
 def _view_level(key, entry):
     """The view model of the level an entry was written for, or None.
 
@@ -45,11 +58,7 @@ def _view_level(key, entry):
     `meta.year_min/year_max` and `meta.explain` span all levels at once, which is
     exactly how a provincial article ended up judged against regional years.
     """
-    from app import sources
-    from app.indicator_view import build_indicator_view
-
-    family, raw_id = sources.split_internal_id(key)
-    view = build_indicator_view(family, raw_id)
+    view = _view(key)
     if view is None:
         return None
     wanted = _level_of(entry)
@@ -404,8 +413,31 @@ class ArticleVintageDrift(unittest.TestCase):
         )
 
     def test_every_key_resolves_to_an_indicator(self):
-        orphans = [key for key in self.texts if get_atlas_indicator(key) is None]
+        """Due domande e non una, perche' ci sono due modi legittimi di esistere.
+
+        La guardia chiedeva solo al catalogo dell'atlante, e il catalogo per
+        costruzione non conosce le serie BES solo provinciali: senza copertura
+        regionale non c'e' niente da canonicalizzare, quindi non entrano. Una
+        pagina pero' ce l'hanno, e risponde 200 (`app/indicator_view.py`, il ramo
+        `payload is None`).
+
+        Cosi' tre strumenti della catena si contraddicevano sulla stessa chiave:
+        `text_queue` offriva `bes-10AMB001P` come lavoro da scrivere, la pagina
+        rendeva l'articolo, e questa guardia lo dichiarava orfano. L'articolo sul
+        PM10 e' rimasto scritto e non pubblicabile, e con lui ogni altro
+        indicatore solo provinciale della coda.
+
+        La protezione non si allarga: una chiave inventata non risolve ne' nel
+        catalogo ne' nella vista, e resta orfana come prima.
+        """
+        orphans = [key for key in self.texts
+                   if get_atlas_indicator(key) is None and _view(key) is None]
         self.assertEqual(orphans, [], f"articles for missing indicators: {orphans[:10]}")
+
+    def test_an_invented_key_is_still_an_orphan(self):
+        """Il rischio di allargare una guardia e' spegnerla. Questa resta accesa."""
+        self.assertIsNone(get_atlas_indicator("bes:NON-ESISTE-999"))
+        self.assertIsNone(_view("bes:NON-ESISTE-999"))
 
 
 class ArticleAgainstTheData(unittest.TestCase):
