@@ -1226,6 +1226,55 @@ revisore umano aveva trovato leggendo l'articolo, arrivata per una strada
 indipendente. Una guardia lessicale che concorda con un lettore su un caso
 solo e' un campione minuscolo, ma e' l'unico modo che si aveva di tararla.
 
+#### Il secondo giro, sui rilievi non contati
+
+Il verificatore registra a parte i rilievi che non vuole contare come smentite,
+perche' l'affermazione era letteralmente vera, o l'imprecisione era di tono, o
+l'errore era della fonte. Diciassette, su dieci articoli, rifatti i conti uno per
+uno: **dieci corretti, sette lasciati**.
+
+Il rapporto due a uno e' il numero che vale la pena ricordare, e vale in tutte e
+due le direzioni. Trattare quel campo come una lista di cose da sistemare
+avrebbe peggiorato sette frasi giuste: "sette punti e mezzo" per -7,64 e'
+italiano normale, e "quattordici anni tra meno 0,2 e piu' 0,9" e' una banda vera
+in entrambe le direzioni, non un record da limare. Ignorarlo invece avrebbe
+lasciato in pagina la premessa rovesciata di `bes-02IST023` ("il denominatore
+comprende tutti dai 6 anni in su, quindi qui non si misura una popolazione
+scolastica": il denominatore la include, e a escluderla e' il numeratore) e il
+"sempre meno" di `ter-432`, smentito quattro volte su nove passaggi dalla stessa
+serie che l'articolo descrive due sezioni dopo.
+
+Due rilievi hanno prodotto la classe piu' utile del giro, e non c'era nel piano:
+**la rottura di serie che l'articolo attraversa senza nominarla.** `ter-60`
+appoggia la sua tesi sulla finestra 1998-2004, cioe' esattamente quella che
+precede la ricostruzione della serie del 2004, e non lo diceva. `ter-72` costruisce
+una dinamica su ventidue anni attraverso il cambio di classificazione Ateco che
+Istat dichiara. Nessuna guardia la vede, perche' non e' una cifra sbagliata e non
+e' una definizione sbagliata: e' una finestra temporale che la fonte segnala come
+non confrontabile. Il campo `note` di `data/definitions/istat_territoriali.csv`
+ce l'ha per 470 indicatori e nessuno lo legge.
+
+#### La coppia ter-167 / ter-471, chiusa per quanto si poteva
+
+Il debito di curatela aveva una quarta voce, la sola verificata due volte. Letto
+l'articolo, era peggio di un problema di etichette: `ter-471` costruiva tutto
+sulla distinzione che i numeri non sostengono, "Qui contano i privati, non lo
+Stato", e il suo lead notava la coincidenza con l'accumulazione presentandola
+come una scoperta.
+
+L'argomento non dipende da quale etichetta sia quella giusta: una frase che
+distingue il privato dal totale ha bisogno che le due serie siano diverse, e sono
+identiche. Le due pagine adesso lo dicono, ognuna dall'altro lato, con la prova.
+Nessuna delle due e' soppressa, perche' quella e' una scelta con conseguenze
+sugli URL pubblici e resta al curatore.
+
+La guardia c'e': `tests/test_data_quality.py` fa fallire la suite su due
+indicatori con serie identica, con la coppia nota in una allow-list che porta
+accanto la prova, piu' un secondo test che verifica che sia **ancora** duplicata.
+Quando Istat sistemera' l'archivio quel test cade, ed e' l'avviso per togliere la
+voce e rileggere i due articoli. Sul catalogo intero, 571 indicatori con serie,
+la coppia resta una sola: un confronto esatto costa niente e scatta quasi mai.
+
 #### Non fatto, e dove riprendere
 
 1. **Lo stadio `verificatore` non e' registrato.** Il braccio positivo e' girato
@@ -1258,17 +1307,12 @@ solo e' un campione minuscolo, ma e' l'unico modo che si aveva di tararla.
 
 #### Il debito di curatela, che intanto e' diventato piu' caro
 
-`ter-242` ha gia' linkato `ter-471`, cioe' una delle pagine coinvolte. Ogni lotto
-cementa link verso uno dei doppioni prima che qualcuno abbia deciso quale
-sopravvive. Le tre voci restano quelle di 3.5, e il verificatore di `ter-242` ne
-ha aggiunta una quarta, peggiore delle altre:
+Le tre voci restano quelle di 3.5. La quarta, la coppia `ter-167` / `ter-471`,
+e' descritta sopra: la prosa e la guardia sono a posto, la decisione su quale
+pagina sopravvive no, e quella e' curatela.
 
-**`ter-471` e `ter-167` hanno serie identiche riga per riga**, 580 su 580, 29
-anni per 20 regioni. Le due definizioni ufficiali divergono ("Investimenti fissi
-lordi in percentuale del PIL" contro "Investimenti privati sul PIL"), quindi se
-il dato e' lo stesso almeno una delle due etichette e' sbagliata, e sono due
-pagine pubbliche che dicono al lettore due cose diverse mostrandogli lo stesso
-numero. Il brief non lo segnala perche' la sua soglia di allarme scatta a rho
-sopra 0,95 fra i correlati, non sui doppioni esatti. Un controllo di identita'
-delle serie e' molto piu' semplice della guardia sulle definizioni e non
-esiste.
+Resta il meccanismo che l'ha prodotta. `ter-242` aveva gia' linkato `ter-471`
+prima che qualcuno sapesse che cos'era, e ogni lotto cementa link verso pagine su
+cui nessuno ha deciso. Il brief non aiuta, perche' la sua soglia di allarme
+scatta a rho sopra 0,95 fra i correlati e i doppioni esatti passano da un'altra
+parte: adesso li prende la suite, ma solo a valle, quando sono gia' in pagina.
