@@ -215,12 +215,12 @@ def _stage_rows(status):
     return "\n".join(rows)
 
 
-def _summary_cells(status, entries):
+def _summary_cells(status, entries, queues=None):
     """Il riassunto prima del dettaglio. Quattro numeri che dicono, in un colpo
     d'occhio, se c'e' qualcosa da guardare o no."""
     attention = sum(1 for e in entries if e.get("outcome") in pipeline_log.ATTENTION)
     last = max((e.get("at", "") for e in entries), default="")
-    late = [r for r in pipeline_log.silence(entries) if r["stale"]]
+    late = [r for r in pipeline_log.silence(entries, queues=queues) if r["stale"]]
     # Il totale non puo' portare l'etichetta "tutti gli stadi" quando uno stadio
     # non e' stato contato: sarebbe lo zero silenzioso della riga di stadio
     # spostato nel numero piu' grande della pagina, cioe' l'unico che si legge
@@ -346,8 +346,14 @@ def render(out_path=None):
     # Un avviso sopra tutto il resto, perche' uno stadio fermo non si vede in
     # nessuna delle tabelle sotto: quelle mostrano cio' che e' successo, e qui il
     # problema e' che non e' successo niente.
-    late = [r for r in pipeline_log.silence(entries, queues=pipeline_status.queue_sizes())
-            if r["stale"]]
+    # Le code arrivano dallo `status` gia' calcolato, non da una seconda
+    # `queue_sizes()`. Quella ricostruirebbe la vista di ogni indicatore del
+    # catalogo una seconda volta, che e' lavoro inutile e per giunta il punto
+    # esatto in cui la suite va in segfault una run su venticinque (vedi
+    # `pipeline_gate.check_suite`): raddoppiare quel passaggio raddoppierebbe
+    # la probabilita' di far morire il cruscotto a meta'.
+    queues = {entry["stage"]: entry["waiting"] for entry in status["stages"]}
+    late = [r for r in pipeline_log.silence(entries, queues=queues) if r["stale"]]
     if late:
         detail = ", ".join(
             f"{r['group']} ({r['days_since']:.0f} giorni, atteso ogni {r['expected_days']})"
@@ -370,7 +376,7 @@ def render(out_path=None):
 </header>
 
 <section>
-<div class="strip">{_summary_cells(status, entries)}</div>
+<div class="strip">{_summary_cells(status, entries, queues)}</div>
 </section>
 
 <section>

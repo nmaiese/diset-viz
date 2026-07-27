@@ -284,10 +284,19 @@ def path_allowed(path, allowed):
     prefisso nudo autorizzerebbe `content/indicators-bozze.json`, cioe' un
     percorso fuori dallo store, e un perimetro che si allarga da solo su un
     errore di battitura non e' un perimetro.
+
+    Dentro una directory di store passa **solo `.json`**, e nemmeno questo e'
+    zelo. I tre store contengono un tipo di file solo, e tutto il resto della
+    catena lo da' per scontato: `_touched_under` cerca `.json` per sapere che
+    cosa e' cambiato, quindi un file di altro tipo sarebbe dentro il perimetro
+    e insieme invisibile a ogni controllo che legge il contenuto. Un articolo
+    scritto in `content/indicators/note.txt` non renderizzerebbe da nessuna
+    parte e non farebbe fallire niente, che e' la forma di guasto che questo
+    progetto ha gia' pagato con `analyst_notes.json`.
     """
     for entry in allowed:
         if entry.endswith("/"):
-            if path.startswith(entry):
+            if path.startswith(entry) and path.endswith(".json"):
                 return True
         elif path == entry:
             return True
@@ -721,6 +730,23 @@ def check_run_is_recorded(stage, paths, base=None, cwd=None):
     di qui, perche' non ha un branch da giudicare: la sua riga di diario resta
     affidata al contratto.
     """
+    # Il diario e' append-only come il registro delle verifiche, e il controllo
+    # viene per primo perche' e' l'unico che riguarda le run **passate**. Una
+    # run puo' solo aggiungere il proprio file: riscrivere quello di una run
+    # vecchia, o cancellarlo, vuol dire cambiare che cosa ha detto qualcun
+    # altro, ed e' l'unico modo di far sparire un `blocked` dalla storia. La
+    # riga dell'esito che il passo di merge scrive e' un file nuovo anche lei,
+    # quindi nessun flusso legittimo passa di qui.
+    touched = _touched_under(RUN_JOURNAL, base, cwd=cwd)
+    rewritten = touched["changed"] + touched["gone"]
+    if rewritten:
+        return Check(
+            "diario", False,
+            f"il diario e' append-only e questa run ne riscrive o cancella "
+            f"{len(rewritten)} righe: {', '.join(sorted(rewritten)[:5])}. "
+            "Una run registra la propria e non tocca quelle di prima.",
+        )
+
     worked = [p for p in paths if not p.startswith(RUN_JOURNAL)]
     if not worked:
         return Check("diario", True, "nessun lavoro da registrare")

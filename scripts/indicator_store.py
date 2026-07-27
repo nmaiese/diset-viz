@@ -127,7 +127,7 @@ def paths(root=None):
     return sorted(base.glob("*.json"))
 
 
-def load_all(root=None) -> dict:
+def load_all(root=None, strict=True) -> dict:
     """Tutti gli articoli, come `{chiave: voce}`.
 
     E' esattamente il dizionario che `json.load` restituiva sul file unico, e
@@ -138,6 +138,16 @@ def load_all(root=None) -> dict:
     `root` accetta anche un vecchio file unico, come `read_journal` accetta un
     `.jsonl` e `load_verifications` un `.csv`. Serve alla migrazione e ai test,
     che di un catalogo intero hanno bisogno di scrivere due voci.
+
+    `strict` decide che cosa costa un file rotto, e la risposta giusta dipende
+    da chi chiede. Per il cancello, per la suite e per chi lavora sulla catena
+    un file illeggibile deve fermare tutto, forte: e' un difetto e va visto.
+    Per l'**app** no, e la differenza e' grossa. Con `strict` un solo file mal
+    scritto solleva, il chiamante ripiega su un dizionario vuoto, e tutte e
+    trecentosessantacinque le pagine perdono la prosa insieme senza che si
+    veda un errore da nessuna parte. Un articolo rotto deve costare un
+    articolo, non il catalogo, e a trovarlo ci pensa la suite, che gira in
+    `strict`.
     """
     base = Path(root or ROOT)
     if base.is_file():
@@ -149,9 +159,13 @@ def load_all(root=None) -> dict:
     entries = {}
     for path in paths(root):
         key = key_of(path)
-        if key in entries:
-            raise StoreError(f"due file per la stessa chiave '{key}'")
-        entries[key] = _read_file(path, key)
+        try:
+            if key in entries:
+                raise StoreError(f"due file per la stessa chiave '{key}'")
+            entries[key] = _read_file(path, key)
+        except StoreError:
+            if strict:
+                raise
     return entries
 
 

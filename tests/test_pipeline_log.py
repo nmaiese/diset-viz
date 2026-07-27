@@ -337,3 +337,29 @@ class SilenceMeansSomethingElseNowThatTheDispatcherAssignsTheWork(unittest.TestC
                                     queues={s: 0 for s in pipeline_log.STAGES})
         self.assertTrue(self.group(rows, "dispatcher")["stale"])
         self.assertIsNone(self.group(rows, "dispatcher")["waiting"])
+
+
+class ABrokenShardLeavesAMarkInsteadOfVanishing(unittest.TestCase):
+    """Saltare in silenzio uno shard rotto farebbe sparire una run dal diario,
+    cioe' produrrebbe esattamente l'invisibilita' che il diario esiste per
+    togliere, e per giunta sulle run andate male, che sono quelle piu'
+    probabilmente scritte a meta'."""
+
+    def test_the_run_still_shows_up_as_unreadable(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            pipeline_log.append(
+                pipeline_log.build_entry("writer", "merged", "buona"), path=root)
+            (root / "rotta.json").write_text("{ meta riga", encoding="utf-8")
+            entries = pipeline_log.read_journal(root)
+        self.assertEqual(len(entries), 2)
+        broken = [e for e in entries if e["outcome"] == "error"]
+        self.assertEqual(len(broken), 1)
+        self.assertIn("rotta.json", broken[0]["summary"])
+
+    def test_a_json_that_is_not_an_object_counts_too(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "lista.json").write_text("[1, 2, 3]", encoding="utf-8")
+            entries = pipeline_log.read_journal(root)
+        self.assertEqual([e["outcome"] for e in entries], ["error"])

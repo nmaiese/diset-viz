@@ -232,15 +232,34 @@ def migrate_legacy(jsonl_path=None, root=None) -> int:
 
 
 def _read_shards(root):
-    """Un file per run. Un file illeggibile non nasconde gli altri."""
+    """Un file per run. Un file illeggibile non nasconde gli altri.
+
+    Illeggibile pero' non vuol dire assente, e la differenza e' tutto il punto
+    di questo file. Saltare in silenzio uno shard rotto farebbe sparire una run
+    dal diario, cioe' produrrebbe esattamente l'invisibilita' che il diario
+    esiste per togliere, e per giunta proprio sulle run andate male, che sono
+    quelle piu' probabilmente scritte a meta'. Quindi si lascia un segnaposto,
+    come fa da sempre la lettura riga per riga del vecchio registro.
+    """
     entries = []
     for shard in sorted(Path(root).glob("*.json")):
         try:
             data = json.loads(shard.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
+        except (OSError, ValueError) as exc:
+            entries.append({
+                "stage": "?", "outcome": "error", "run_id": shard.stem,
+                "summary": f"run illeggibile in {shard.name}: {type(exc).__name__}",
+                "at": "", "detail": [], "gate": "", "pr": "",
+            })
             continue
         if isinstance(data, dict):
             entries.append(data)
+        else:
+            entries.append({
+                "stage": "?", "outcome": "error", "run_id": shard.stem,
+                "summary": f"{shard.name} non contiene un oggetto JSON",
+                "at": "", "detail": [], "gate": "", "pr": "",
+            })
     return sorted(entries, key=lambda r: r.get("at") or "")
 
 
@@ -461,9 +480,19 @@ def silence(entries, today=None, queues=None):
         late = days is not None and days > expected * GRACE
         # Il dispatcher non ha una coda, ha un battito: quando tace non c'e'
         # niente da interpretare, e' proprio lui a non essere partito.
+        #
+        # Una coda che nessuno ha potuto contare (`None`, che capita ai due
+        # stadi che hanno bisogno del view model) resta `None` e **non** diventa
+        # zero. Sommandola a zero, uno stadio zitto da un mese con la coda
+        # incalcolabile risultava `idle`, cioe' "tace perche' non ha niente da
+        # fare", che e' l'opposto di quello che si sa: non si sa niente. E'
+        # la stessa scelta che fa `pipeline_status`, dove una coda non contata
+        # vale come lavoro e non come lavoro finito.
         waiting = None
         if queues is not None and name != "dispatcher":
-            waiting = sum(int(queues.get(s) or 0) for s in stages)
+            counts = [queues.get(s) for s in stages]
+            if all(c is not None for c in counts):
+                waiting = sum(int(c) for c in counts)
         rows.append({
             "group": name,
             "stages": list(stages),

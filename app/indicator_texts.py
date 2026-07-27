@@ -63,8 +63,13 @@ _NAMESPACES = tuple(
 
 @functools.lru_cache(maxsize=1)
 def _load():
+    # `strict=False`: un articolo illeggibile costa quell'articolo, che ricade
+    # sullo scheletro composto come una pagina non ancora scritta. In `strict`
+    # solleverebbe, e il ripiego qui sotto svuoterebbe **tutto** il catalogo
+    # per colpa di un file solo, senza che si veda un errore da nessuna parte.
+    # A trovare il file rotto ci pensa la suite, che legge in `strict`.
     try:
-        return indicator_store.load_all()
+        return indicator_store.load_all(strict=False)
     except (OSError, ValueError, indicator_store.StoreError):
         return {}
 

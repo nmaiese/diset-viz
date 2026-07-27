@@ -176,5 +176,51 @@ class TheUrlFormResolvesToTheInternalKey(unittest.TestCase):
 
         self.assertEqual(prose_lint.resolve_key(self.KEYS, "ter-920"), "920")
 
+class OneBrokenArticleCostsOneArticle(unittest.TestCase):
+    """Chi legge decide che cosa costa un file rotto, e le due risposte sono
+    opposte per una ragione.
+
+    Il cancello e la suite devono fermarsi forte: un file illeggibile e' un
+    difetto e va visto. L'app no. Con la lettura severa un solo file mal
+    scritto solleva, il chiamante ripiega su un dizionario vuoto, e tutte e
+    trecentosessantacinque le pagine perdono la prosa insieme senza un errore
+    visibile da nessuna parte."""
+
+    def setUp(self):
+        self._tmp = TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.addCleanup(self._tmp.cleanup)
+        indicator_store.write("920", {"lead": "buono"}, root=self.root)
+        (self.root / "999.json").write_text("{ questo non e' json", encoding="utf-8")
+
+    def test_the_strict_read_refuses_and_says_which_file(self):
+        with self.assertRaises(indicator_store.StoreError) as caught:
+            indicator_store.load_all(self.root)
+        self.assertIn("999.json", str(caught.exception))
+
+    def test_the_lenient_read_keeps_every_other_article(self):
+        entries = indicator_store.load_all(self.root, strict=False)
+        self.assertEqual(sorted(entries), ["920"])
+        self.assertEqual(entries["920"]["lead"], "buono")
+
+    def test_the_app_reads_leniently(self):
+        """La prova che la scelta e' cablata dove serve, non solo possibile."""
+        import unittest.mock as mock
+
+        from app import indicator_texts
+
+        seen = {}
+
+        def fake(root=None, strict=True):
+            seen["strict"] = strict
+            return {}
+
+        with mock.patch.object(indicator_store, "load_all", fake):
+            indicator_texts._load.cache_clear()
+            indicator_texts._load()
+        indicator_texts._load.cache_clear()
+        self.assertFalse(seen["strict"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -207,5 +207,109 @@ class NothingToDoIsNotAFailure(unittest.TestCase):
                 pipeline_dispatch.cli(["--flag-che-non-esiste"])
 
 
+class TheTickNeverPushesAnythingButItself(unittest.TestCase):
+    """Il difetto piu' pericoloso dell'intera modifica, trovato rileggendola.
+
+    `git push origin HEAD:master` spinge su master **tutto** cio' che sta sotto
+    HEAD. Lanciato da un branch di lavoro non pubblicherebbe una riga di
+    diario: pubblicherebbe quel branch intero, senza cancello, senza CI e senza
+    pull request. Il dispatcher gira su un checkout fresco di master e li' non
+    succede, ma "di solito non succede" e' la premessa sbagliata per un comando
+    che non si puo' disfare.
+    """
+
+    ENTRY = {"run_id": "dispatch-20260727T090000Z-aaaa", "at": "2026-07-27T09:00:00+00:00"}
+    REL = "data/pipeline/runs/dispatch-20260727T090000Z-aaaa.json"
+
+    def runner(self, branch="master", dirty=()):
+        calls = []
+
+        def fake(argv, cwd=None):
+            calls.append(argv)
+            if argv[:2] == ["git", "rev-parse"]:
+                return 0, branch + "\n"
+            if argv[:2] == ["git", "status"]:
+                return 0, "".join(f"?? {path}\n" for path in dirty)
+            return 0, ""
+
+        fake.calls = calls
+        return fake
+
+    def test_it_refuses_when_head_is_not_master(self):
+        runner = self.runner(branch="claude/una-modifica")
+        ok = pipeline_dispatch.commit_tick(
+            self.ENTRY, runner=runner, log=lambda *_: None)
+        self.assertFalse(ok)
+        self.assertNotIn(["git", "push", "origin", "HEAD:master"], runner.calls)
+
+    def test_it_refuses_when_the_tree_carries_anything_else(self):
+        """Su master ma con altro non committato, il push porterebbe via anche
+        quello alla prima passata di `git add` di qualcun altro."""
+        runner = self.runner(dirty=[self.REL, "app/views.py"])
+        ok = pipeline_dispatch.commit_tick(
+            self.ENTRY, runner=runner, log=lambda *_: None)
+        self.assertFalse(ok)
+        self.assertNotIn(["git", "push", "origin", "HEAD:master"], runner.calls)
+
+    def test_it_pushes_when_master_carries_only_the_tick(self):
+        runner = self.runner(dirty=[self.REL])
+        ok = pipeline_dispatch.commit_tick(
+            self.ENTRY, runner=runner, log=lambda *_: None)
+        self.assertTrue(ok)
+        self.assertIn(["git", "push", "origin", "HEAD:master"], runner.calls)
+        self.assertIn(["git", "add", self.REL], runner.calls)
+
+
+class AnOpenPullRequestIsRecognisedByWhatItTouches(unittest.TestCase):
+    """Il nome del branch e' una convenzione che nessuna guardia impone, quindi
+    da solo non basta a riconoscere una run in corso. Una run su un branch
+    chiamato altrimenti sarebbe invisibile, e il dispatcher lancerebbe un
+    secondo stadio addosso al primo: il guasto tornerebbe in silenzio."""
+
+    def runner(self, prs, files_by_pr):
+        import json as _json
+
+        def fake(argv, cwd=None):
+            if argv[:3] == ["git", "remote", "get-url"]:
+                return 0, "https://github.com/nmaiese/diset-viz.git\n"
+            path = argv[-1]
+            if "/pulls?" in path:
+                return 0, _json.dumps(prs)
+            for number, files in files_by_pr.items():
+                if f"/pulls/{number}/files" in path:
+                    return 0, _json.dumps([{"filename": f} for f in files])
+            return 1, ""
+
+        return fake
+
+    def pr(self, number, branch):
+        return {"number": number, "head": {"ref": branch}, "title": "t"}
+
+    def test_the_convention_still_works(self):
+        runner = self.runner([self.pr(1, "automation/writer-2026-07-27")], {})
+        state, prs = pipeline_dispatch.open_chain_prs(runner=runner)
+        self.assertEqual(state, "letto")
+        self.assertEqual([p["number"] for p in prs], [1])
+
+    def test_a_chain_run_on_an_odd_branch_is_still_caught(self):
+        runner = self.runner(
+            [self.pr(2, "claude/lavoro-in-corso")],
+            {2: ["content/indicators/ter__920.json", "data/pipeline/runs/x.json"]},
+        )
+        _, prs = pipeline_dispatch.open_chain_prs(runner=runner)
+        self.assertEqual([p["number"] for p in prs], [2])
+        self.assertIn("perimetro", prs[0]["perche"])
+
+    def test_a_humans_pull_request_does_not_block_the_chain(self):
+        """L'altra meta': se qualunque pull request aperta bloccasse il
+        dispatcher, una PR umana lasciata li' fermerebbe la catena per sempre."""
+        runner = self.runner(
+            [self.pr(3, "claude/refactor")],
+            {3: ["app/views.py", "content/indicators/ter__920.json"]},
+        )
+        _, prs = pipeline_dispatch.open_chain_prs(runner=runner)
+        self.assertEqual(prs, [])
+
+
 if __name__ == "__main__":
     unittest.main()

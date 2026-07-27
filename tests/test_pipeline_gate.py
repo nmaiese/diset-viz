@@ -694,3 +694,90 @@ class TheBaseCheckStoppedPunishingAMovingMaster(unittest.TestCase):
         check = pipeline_gate.check_base_is_usable(base="master", cwd=self.repo)
         self.assertFalse(check.ok)
         self.assertIn("antenato in comune", check.detail)
+
+class TheJournalIsAppendOnlyToo(unittest.TestCase):
+    """Il registro delle verifiche era gia' sorvegliato, il diario no.
+
+    Un file per run toglie il conflitto ma non impedisce da solo di riscrivere
+    la riga di qualcun altro, ed e' l'unico modo di far sparire un `blocked`
+    dalla storia. Nessun flusso legittimo passa di qui: l'agente aggiunge il
+    proprio file e il passo di merge ne aggiunge un secondo, tutti e due nuovi.
+    """
+
+    def setUp(self):
+        self._tmp = TemporaryDirectory()
+        self.repo = Path(self._tmp.name)
+        self.addCleanup(self._tmp.cleanup)
+        self._git("init", "-q", "-b", "master")
+        self._git("config", "user.email", "t@example.com")
+        self._git("config", "user.name", "t")
+        self.runs = self.repo / "data" / "pipeline" / "runs"
+        self.runs.mkdir(parents=True)
+        self._write("vecchia.json", '{"run_id": "vecchia", "stage": "writer", "outcome": "blocked"}')
+        self._git("add", "-A")
+        self._git("commit", "-qm", "base")
+
+    def _git(self, *args):
+        return subprocess.run(("git",) + args, cwd=self.repo,
+                              capture_output=True, text=True)
+
+    def _write(self, name, text):
+        (self.runs / name).write_text(text + "\n", encoding="utf-8")
+
+    def _check(self, paths):
+        root = pipeline_gate.PROJECT_ROOT
+        pipeline_gate.PROJECT_ROOT = self.repo
+        try:
+            return pipeline_gate.check_run_is_recorded(
+                "writer", paths, base="HEAD", cwd=self.repo)
+        finally:
+            pipeline_gate.PROJECT_ROOT = root
+
+    def test_rewriting_an_older_run_is_refused(self):
+        self._write("vecchia.json", '{"run_id": "vecchia", "stage": "writer", "outcome": "merged"}')
+        check = self._check(["data/pipeline/runs/vecchia.json"])
+        self.assertFalse(check.ok)
+        self.assertIn("append-only", check.detail)
+
+    def test_deleting_an_older_run_is_refused(self):
+        (self.runs / "vecchia.json").unlink()
+        check = self._check(["data/pipeline/runs/vecchia.json"])
+        self.assertFalse(check.ok)
+        self.assertIn("append-only", check.detail)
+
+    def test_adding_your_own_row_passes(self):
+        self._write("mia.json", '{"run_id": "mia", "stage": "writer", "outcome": "pr-open"}')
+        check = self._check([
+            "content/indicators/ter__920.json", "data/pipeline/runs/mia.json"])
+        self.assertTrue(check.ok, check.detail)
+
+
+class ADirectoryPerimeterTakesOnlyItsOwnFileType(unittest.TestCase):
+    """I tre store contengono un tipo di file solo, e il resto della catena lo
+    da' per scontato: `_touched_under` cerca `.json` per sapere che cosa e'
+    cambiato. Un file di altro tipo sarebbe dentro il perimetro e insieme
+    invisibile a ogni controllo che ne legge il contenuto, cioe' esattamente la
+    forma di guasto gia' pagata con `analyst_notes.json`."""
+
+    def test_a_json_inside_the_store_is_allowed(self):
+        self.assertTrue(pipeline_gate.path_allowed(
+            "content/indicators/bes__10AMB004.json",
+            pipeline_gate.STAGE_PATHS["writer"]))
+
+    def test_anything_else_inside_the_store_is_not(self):
+        for stray in ("content/indicators/note.txt",
+                      "content/indicators/bozza.md",
+                      "data/pipeline/runs/appunti.yaml"):
+            with self.subTest(path=stray):
+                self.assertFalse(pipeline_gate.path_allowed(
+                    stray, pipeline_gate.STAGE_PATHS["writer"]))
+
+    def test_a_file_perimeter_is_untouched_by_the_rule(self):
+        """Le voci senza barra restano uguaglianze esatte, estensione o no."""
+        self.assertTrue(pipeline_gate.path_allowed(
+            pipeline_gate.ISTAT_SERIES_CONFIG,
+            pipeline_gate.STAGE_PATHS["scout"]))
+
+
+if __name__ == "__main__":
+    unittest.main()

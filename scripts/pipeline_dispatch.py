@@ -99,7 +99,7 @@ def open_chain_prs(runner=_run, cwd=None):
     esiste portano a decisioni opposte.
     """
     try:
-        from scripts import pipeline_merge
+        from scripts import pipeline_gate, pipeline_merge
 
         slug = pipeline_merge.repo_slug(runner=runner, cwd=cwd)
         ok, data = pipeline_merge.api(
@@ -109,12 +109,35 @@ def open_chain_prs(runner=_run, cwd=None):
         return "ignoto", []
     if not ok or not isinstance(data, list):
         return "ignoto", []
+
+    owned = tuple({p for paths in pipeline_gate.STAGE_PATHS.values() for p in paths})
     prs = []
     for row in data:
         branch = ((row.get("head") or {}).get("ref") or "")
+        number = row.get("number")
+        why = None
         if branch.startswith("automation/"):
-            prs.append({"number": row.get("number"), "branch": branch,
-                        "title": row.get("title") or ""})
+            why = "branch della catena"
+        else:
+            # Il nome del branch e' una convenzione che nessuno impone, quindi
+            # da solo non basta. Una run che per qualunque motivo lavora su un
+            # branch chiamato altrimenti sarebbe invisibile a questo controllo,
+            # e il dispatcher lancerebbe un secondo stadio addosso al primo:
+            # il guasto tornerebbe esattamente com'era, e in silenzio. Il file
+            # che una pull request tocca invece non e' una convenzione, e' il
+            # perimetro, ed e' la stessa firma con cui il cruscotto riconosce
+            # i commit della catena.
+            ok_files, files = pipeline_merge.api(
+                f"repos/{slug}/pulls/{number}/files?per_page=100",
+                runner=runner, cwd=cwd,
+            )
+            if ok_files and isinstance(files, list) and files:
+                paths = [f.get("filename") or "" for f in files]
+                if all(pipeline_gate.path_allowed(p, owned) for p in paths):
+                    why = "tocca solo file del perimetro della catena"
+        if why:
+            prs.append({"number": number, "branch": branch,
+                        "title": row.get("title") or "", "perche": why})
     return "letto", prs
 
 
@@ -237,8 +260,37 @@ def commit_tick(entry, runner=_run, cwd=None, log=print, attempts=3):
     `data/pipeline/runs/`, con un nome che nessun altro puo' scegliere. Se
     perde la corsa contro un altro push si rilegge master e si riprova, come fa
     `pipeline_merge.record_landing` per la riga di esito.
+
+    Le due condizioni qui sotto non sono prudenza, sono la cosa che rende vera
+    la frase precedente. `git push origin HEAD:master` spinge su master
+    **tutto** cio' che sta sotto HEAD, quindi lanciato da un branch di lavoro
+    non pubblicherebbe una riga di diario: pubblicherebbe quel branch intero,
+    senza cancello, senza CI e senza pull request. Il dispatcher gira su un
+    checkout fresco di master e li' non succede, ma "di solito non succede" e'
+    la premessa sbagliata per un comando che non si puo' disfare. Quindi si
+    rifiuta se HEAD non e' master, e si rifiuta se nell'albero c'e' qualcosa
+    oltre alla riga da registrare.
     """
     rel = f"data/pipeline/runs/{pipeline_log.shard_name(entry)}"
+
+    code, out = runner(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=cwd)
+    branch = out.strip() if code == 0 else ""
+    if branch != "master":
+        log(f"  diario: HEAD e' su '{branch or 'ignoto'}', non su master. "
+            "Non committo: da qui un push su master pubblicherebbe l'intero branch.")
+        return False
+
+    code, out = runner(["git", "status", "--porcelain", "--untracked-files=all"], cwd=cwd)
+    if code != 0:
+        log(f"  diario: non riesco a leggere lo stato dell'albero ({out.strip()[:120]})")
+        return False
+    dirty = {line[3:].strip().split(" -> ")[-1] for line in out.splitlines() if line.strip()}
+    stray = sorted(dirty - {rel})
+    if stray:
+        log(f"  diario: l'albero porta altro oltre alla riga di diario "
+            f"({', '.join(stray[:5])}). Non committo.")
+        return False
+
     for attempt in range(1, attempts + 1):
         code, out = runner(["git", "add", rel], cwd=cwd)
         if code != 0:
