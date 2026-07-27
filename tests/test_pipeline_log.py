@@ -160,7 +160,8 @@ class TheDashboardReadsWithoutBreaking(unittest.TestCase):
 
         owned = {p for paths in pipeline_gate.STAGE_PATHS.values() for p in paths}
         for commit in commits:
-            self.assertTrue(set(commit["files"]) <= owned, commit["sha"])
+            for path in commit["files"]:
+                self.assertTrue(pipeline_gate.path_allowed(path, owned), f"{commit['sha']}: {path}")
             self.assertTrue(commit["sha"] and commit["at"])
 
 
