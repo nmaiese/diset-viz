@@ -16,7 +16,7 @@
   "spatialCoverage": { "@type": "Place", "name": {{ p.region | tojson }} },
   "creator": { "@type": "Organization", "name": "Istat" },
   "isAccessibleForFree": true,
-  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "license": {{ data_license_url | tojson }},
   "keywords": [{{ p.region | tojson }}, "indicatori territoriali", "divario regionale", "Istat"]
 }
 </script>

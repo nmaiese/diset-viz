@@ -35,8 +35,8 @@
   "creator": { "@type": "Organization", "name": {{ (meta.source_label or meta.source) | tojson }}, "url": {{ meta.source_url | tojson }} },
   "isBasedOn": {{ (meta.source_data_url or meta.source_url) | tojson }},
   "variableMeasured": {{ meta.name | tojson }},
-  "isAccessibleForFree": true,
-  "license": {{ meta.license_url | tojson }},
+  "isAccessibleForFree": true,{% if meta.license_url %}
+  "license": {{ meta.license_url | tojson }},{% endif %}
   "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads %},
   "distribution": [
     { "@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "{{ site_url }}{{ meta.downloads.csv }}" },

@@ -17,9 +17,23 @@ from __future__ import annotations
 import re
 
 
+# The licence deed every family in this registry publishes under. Istat declares
+# CC BY 4.0 on istat.it/note-legali and Eurostat on its reuse policy, so today
+# the deed is the same for all of them, but the URL still belongs HERE and only
+# here: it used to be a literal in the view model, in the catalog, in two JSON-LD
+# templates, in the methodology FAQ and in both llms.txt files, and when Istat's
+# licence turned out to be wrong we found six of those and missed four.
+LICENSE_URL = "https://creativecommons.org/licenses/by/4.0/"
+# Prose spelling for the pages that say it in a sentence rather than in JSON-LD.
+LICENSE_LABEL = "Creative Commons BY 4.0"
+
 # family key -> provenance metadata. `institution` + `label` are user-facing;
 # `acronym` is the URL/id code; `internal_prefix` is the public-id namespace the
 # atlas dispatcher already uses (bes:/multiscopo:), extended to eurostat.
+# `license`/`license_url` are declared per family, never defaulted: a future
+# family from `config/external_sources.yaml` (INVALSI, Terna, InfoCamere,
+# Infratel) is explicitly NOT CC BY 4.0, and a page that guesses a licence it was
+# never given makes a legal claim on the institution's behalf.
 SOURCES = {
     "territorial": {
         "acronym": "ter",
@@ -27,6 +41,8 @@ SOURCES = {
         "label": "Istat, indicatori territoriali",
         "short_label": "Indicatori territoriali",
         "internal_prefix": "",
+        "license": "CC BY 4.0 (Istat)",
+        "license_url": LICENSE_URL,
     },
     "bes": {
         "acronym": "bes",
@@ -34,6 +50,8 @@ SOURCES = {
         "label": "Istat, benessere e qualità della vita",
         "short_label": "Benessere e qualità della vita",
         "internal_prefix": "bes:",
+        "license": "CC BY 4.0 (Istat)",
+        "license_url": LICENSE_URL,
     },
     "multiscopo": {
         "acronym": "ims",
@@ -41,6 +59,8 @@ SOURCES = {
         "label": "Istat, vita quotidiana delle famiglie",
         "short_label": "Vita quotidiana delle famiglie",
         "internal_prefix": "multiscopo:",
+        "license": "CC BY 4.0 (Istat)",
+        "license_url": LICENSE_URL,
     },
     "eurostat": {
         "acronym": "eur",
@@ -49,7 +69,7 @@ SOURCES = {
         "short_label": "Statistiche regionali europee",
         "internal_prefix": "eur:",
         "license": "CC BY 4.0 (Eurostat)",
-        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "license_url": LICENSE_URL,
         "feeds": ("eurostat_regional",),
     },
     "istat_demografia": {
@@ -59,7 +79,7 @@ SOURCES = {
         "short_label": "Indicatori demografici",
         "internal_prefix": "dem:",
         "license": "CC BY 4.0 (Istat)",
-        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "license_url": LICENSE_URL,
         "feeds": ("istat_demografia",),
     },
 }
@@ -142,9 +162,37 @@ def family_for_feed(feed):
 
 
 def family_license(family):
-    """(license, license_url) for an external family, empty strings if unset."""
+    """(license, license_url) for a family, empty strings if it declares none."""
     meta = SOURCES[family]
     return meta.get("license", ""), meta.get("license_url", "")
+
+
+def family_license_url(family):
+    """The licence deed URL a family declares, "" if it declares none.
+
+    Empty is a real answer, not a hole to fill: callers must omit the licence
+    from the page rather than fall back to CC BY 4.0. The fallback that used to
+    live in the view model would stamp the wrong deed on the first family that
+    is not CC BY 4.0."""
+    return SOURCES.get(family, {}).get("license_url", "")
+
+
+def licenses_label(families):
+    """Plain Italian list of the licences behind `families`, registry order and
+    no repetitions: "CC BY 4.0 (Istat) e CC BY 4.0 (Eurostat)".
+
+    Same reason as ``institutions_label``: a page whose data comes from two
+    institutions has to name both deeds, and the answer depends on what is
+    actually in the score that day."""
+    seen = [
+        SOURCES[family]["license"]
+        for family in SOURCES
+        if family in set(families) and SOURCES[family].get("license")
+    ]
+    names = list(dict.fromkeys(seen))
+    if not names:
+        return ""
+    return " e ".join(names)
 
 
 def internal_id(family, raw_id):

@@ -159,14 +159,25 @@ le sue due righe di config e la segnalazione della licenza vivono in #43.
 
 ### Tre cose che lo scout aveva trovato fuori dal proprio perimetro
 
-1. **La licenza Istat era sbagliata, ora corretta ovunque.** Istat dichiara
-   **CC BY 4.0** su <https://www.istat.it/note-legali/> (verificato), non
-   `CC BY 3.0 IT`. Corretta nel registro delle fonti e negli adapter (#43) e poi
-   in tutto il resto: le righe `istat_lavoro` del layer esterno
-   (`normalized_external_indicators.csv`) e i quattro fallback hardcoded a
-   `by/3.0/it/` nel view model (`app/indicator_view.py`), nel catalogo
-   (`app/atlas_catalog.py`) e nel JSON-LD delle pagine regione e della classifica.
-   Il test che pinnava la vecchia licenza è stato aggiornato.
+1. **La licenza Istat era sbagliata, ora corretta ovunque e in un posto solo.**
+   Istat dichiara **CC BY 4.0** su <https://www.istat.it/note-legali/>
+   (verificato), non `CC BY 3.0 IT`. Corretta in due passaggi, e il secondo
+   racconta più del primo. Primo: registro delle fonti e adapter (#43), righe
+   `istat_lavoro` del layer esterno (`normalized_external_indicators.csv`) e i
+   quattro fallback hardcoded a `by/3.0/it/` nel view model
+   (`app/indicator_view.py`), nel catalogo (`app/atlas_catalog.py`) e nel JSON-LD
+   delle pagine regione e classifica. Quel giro dichiarava "ovunque" e ne aveva
+   mancati quattro, tutti in prosa e quindi invisibili al test che guardava solo
+   il JSON-LD: la FAQ di `/metodologia` (testo visibile e JSON-LD), `/llms.txt` e
+   `/llms-full.txt`, cioè proprio i file che un modello linguistico cita alla
+   lettera. Secondo passaggio: quei quattro corretti, e la causa rimossa. La
+   licenza ora è **una sola costante in `app/sources.py`**
+   (`LICENSE_URL`, `LICENSE_LABEL`), ogni famiglia dichiara la propria in
+   `SOURCES`, i template la ricevono da un context processor e nessun default
+   copre più una famiglia che non l'ha dichiarata (le fonti non CC BY 4.0 in
+   `config/external_sources.yaml`, INVALSI, Terna, InfoCamere, Infratel,
+   avrebbero ereditato la deed sbagliata). `test_license_is_stated_the_same_way_on_every_surface`
+   pinna le tre superfici in prosa e la coerenza del registro.
 2. **`scout_sources.py` tronca la coda alfabeticamente.** Le proposte sono 87, il
    `limit=40` con punteggio uniforme ordina per nome, quindi la coda si ferma a
    "Notti in Italia" e le altre 47 non sono mai state viste da nessuno. Ancora

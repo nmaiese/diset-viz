@@ -171,7 +171,8 @@ def _build_meta(family, raw_id, source_meta):
         # go and pull the same numbers rather than trust ours.
         "source_dataflow": source_meta.get("source_dataflow"),
         "institution": source_meta.get("institution") or sources.family_institution(family),
-        "license_url": source_meta.get("license_url") or "https://creativecommons.org/licenses/by/4.0/",
+        # No blanket default: a family that declares no licence renders none.
+        "license_url": source_meta.get("license_url") or sources.family_license_url(family),
         "archive": source_meta.get("archive"),
         "quality_life_scored": source_meta.get("quality_life_scored", False),
         "quality_life_category_label": source_meta.get("quality_life_category_label"),

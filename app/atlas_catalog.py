@@ -462,7 +462,7 @@ def get_atlas_indicator(indicator_id):
             "catalog_family": "territorial",
             "catalog_family_label": sources.family_label("territorial"),
             "institution": sources.family_institution("territorial"),
-            "license_url": "https://creativecommons.org/licenses/by/4.0/",
+            "license_url": sources.family_license_url("territorial"),
             "path": indicator_path(payload["metadata"]["id"], payload["metadata"]["name"]),
             "quality_life_scored": category is not None,
             "quality_life_category": category,
