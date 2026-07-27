@@ -1277,20 +1277,44 @@ la coppia resta una sola: un confronto esatto costa niente e scatta quasi mai.
 
 #### Non fatto, e dove riprendere
 
-1. **Lo stadio `verificatore` non e' registrato.** Il braccio positivo e' girato
-   con undici agenti istruiti a mano, non con un agente in `.claude/agents/` e
-   una Routine. La 3.3 dice dove va inchiodato uno stadio nuovo (`STAGE_PATHS`
-   piu' `MERGE_POLICY`, `pipeline_log.STAGES`, `pipeline_status.STAGE_ORDER`) e
-   avverte che il cancello **rifiuta** uno stadio non registrato invece di
-   degradarlo. Adesso pero' si sa che cosa lo stadio misura e quanto costa: undici
-   agenti, circa 900 mila token, e sette smentite trovate.
-2. **Le famiglie non territoriali non hanno una guardia sulle definizioni.**
+1. **Le famiglie non territoriali non hanno una guardia sulle definizioni.**
    `definition_check` dice `scoperto` su 185 articoli su 364, che e' onesto e
    non e' una copertura. Il BES pubblica il suo glossario nel capitolo e nel
    `Metadata.xlsx` dell'annesso statistico, che un verificatore ha scaricato e
    letto durante questa sessione: la strada esiste, il parser no.
 3. **Il debito di curatela** di 3.5, sotto, e' peggiorato.
 4. **La rubrica non e' stata ritarata** (3.4).
+
+#### Lo stadio verificatore, adesso registrato
+
+Era il punto 1 di questo elenco e non lo e' piu'. Lo stadio esiste in tutti e tre
+i posti che la 3.3 elenca (`pipeline_gate.STAGE_PATHS` piu' `MERGE_POLICY`,
+`pipeline_log.STAGES`, `pipeline_status.STAGE_ORDER`), ha il suo agente in
+`.claude/agents/indicator-verifier.md`, la sua coda in
+`scripts/verification_queue.py` e il suo controllo di cancello.
+
+Due scostamenti dalla 3.3, entrambi in direzione di "il cerchio si chiude".
+
+**Il perimetro e' due file e non uno.** La 3.3 diceva
+`STAGE_PATHS["verificatore"] = (RUN_JOURNAL,)` e basta, e avvertiva che con un
+perimetro cosi' corto il cancello diventa una tautologia verde. Il problema vero
+era piu' a monte: con il solo diario una smentita finisce in un campo che
+`review_queue` non legge, quindi non torna a nessuno, ed e' esattamente il difetto
+che la stessa 3.3 nomina due paragrafi dopo a proposito di `analyst_notes.json`.
+Quindi il perimetro e' `(verifiche.csv, runs.jsonl)`: il registro delle verifiche
+e' uno stato che serve a un altro stadio, non un diario parallelo.
+
+**La scadenza e' un'impronta della prosa, non una data.** Una verifica e'
+un'affermazione su un testo, quindi scade quando quel testo cambia e nient'altro
+la fa scadere. La versione a date e' stata scritta e buttata: il revisore che
+ripara una frase smentita firma il giorno in cui e' stata smentita, e due eventi
+nello stesso giorno sono indistinguibili.
+
+Il costo dello stadio, misurato: undici agenti, circa 900 mila token, 529
+affermazioni controllate, 7 smentite.
+
+Resta da armare la Routine, e non e' una dimenticanza: mette in moto un agente
+che apre e fonde pull request da solo.
 
 #### Tre cose piccole trovate per strada
 
