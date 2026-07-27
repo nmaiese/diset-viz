@@ -29,6 +29,20 @@ that got it wrong would rather skip.
 Pure stdlib, like the rest of the chain, so it runs on a fresh cloud checkout
 that has no venv yet. It shells out to `gh`, which the agents already have.
 
+It shells out to `gh api`, the REST surface, and never to the porcelain
+`gh pr checks` / `gh pr merge`. That is not a stylistic preference. Those two
+subcommands are GraphQL, and GraphQL is not always reachable: a session behind
+an egress proxy answered every REST call about this repository and refused the
+GraphQL endpoint with
+
+    HTTP 403: This GraphQL query is not enabled for this session
+
+which is a wall the merge step used to hit as `gh: command failed` with no hint
+of the cause. REST is the smaller and older surface, so a step whose whole job
+is to be reliable is better off on it. The cost is that REST has no `bucket`, so
+`_bucket` reproduces the classification `gh` was doing for us: the vocabulary is
+unchanged and everything downstream reads the same words.
+
     python3 scripts/pipeline_merge.py --stage writer --pr 42
     python3 scripts/pipeline_merge.py --stage curator --pr 43 --dry-run
 """
@@ -37,6 +51,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 import time
@@ -61,6 +76,29 @@ CHECKS_APPEAR_TIMEOUT = 5 * 60
 PASSING = {"pass", "skipping"}
 PENDING = {"pending"}
 
+# La classificazione che `gh pr checks` faceva per noi, rifatta sulle conclusioni
+# grezze della REST. `neutral` sta con i verdi perche' li' stava, e `cancelled`
+# resta fuori da PASSING: un check annullato non e' un check passato.
+_CONCLUSION_BUCKET = {
+    "success": "pass",
+    "neutral": "pass",
+    "skipped": "skipping",
+    "cancelled": "cancel",
+    "failure": "fail",
+    "timed_out": "fail",
+    "action_required": "fail",
+    "startup_failure": "fail",
+    "stale": "fail",
+}
+# Le commit status della vecchia API, che alcuni servizi usano ancora al posto
+# delle check run. Ignorarle vorrebbe dire fondere senza aver guardato.
+_STATE_BUCKET = {
+    "success": "pass",
+    "pending": "pending",
+    "failure": "fail",
+    "error": "fail",
+}
+
 
 def _run(argv, cwd=None):
     """Every external command goes through here, so a test can replace one thing."""
@@ -68,29 +106,106 @@ def _run(argv, cwd=None):
     return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
 
 
-def check_states(pr, runner=_run, cwd=None):
+def _bucket(run):
+    """Una check run REST -> il bucket che `gh` avrebbe stampato."""
+    if (run.get("status") or "") != "completed":
+        return "pending"
+    return _CONCLUSION_BUCKET.get(run.get("conclusion") or "", "fail")
+
+
+def repo_slug(runner=_run, cwd=None):
+    """`owner/repo`, e non lo si chiede a `gh` perche' `gh` qui non lo sa.
+
+    Il proxy di uscita riscrive `origin` in qualcosa come
+    `http://local_proxy@127.0.0.1:41729/git/nmaiese/diset-viz`, e davanti a quel
+    remote `gh` dice "none of the git remotes point to a known GitHub host" e si
+    ferma. Gli ultimi due segmenti del percorso pero' sono ancora owner e repo, e
+    lo sono anche in `git@github.com:owner/repo.git` e in un URL https normale,
+    quindi si prendono da li'. `GH_REPO` vince su tutto, com'e' l'abitudine di
+    `gh`, cosi' un caso che non avessi previsto resta sbloccabile senza toccare
+    il codice.
+    """
+    env = (os.environ.get("GH_REPO") or "").strip()
+    if env:
+        return env
+    code, out = runner(["git", "remote", "get-url", "origin"], cwd=cwd)
+    if code != 0:
+        raise RuntimeError("non riesco a leggere l'URL di origin")
+    url = out.strip().split()[0] if out.strip() else ""
+    path = url.rsplit(":", 1)[-1] if url.startswith("git@") else url
+    parts = [p for p in path.replace("\\", "/").split("/") if p]
+    if len(parts) < 2:
+        raise RuntimeError(f"non riesco a ricavare owner/repo da '{url}'")
+    owner, repo = parts[-2], parts[-1]
+    if repo.endswith(".git"):
+        repo = repo[:-4]
+    return f"{owner}/{repo}"
+
+
+def api(path, runner=_run, cwd=None, method=None, fields=()):
+    """Una chiamata REST via `gh api`. Ritorna (ok, dato-decodificato-o-testo)."""
+    argv = ["gh", "api"]
+    if method:
+        argv += ["--method", method]
+    argv.append(path)
+    for key, value in fields:
+        argv += ["-f", f"{key}={value}"]
+    code, out = runner(argv, cwd=cwd)
+    text = (out or "").strip()
+    if code != 0:
+        return False, text
+    if not text or text.lstrip()[:1] not in "[{":
+        return True, text
+    try:
+        return True, json.loads(text)
+    except json.JSONDecodeError:
+        return False, text
+
+
+def head_sha(pr, runner=_run, cwd=None, slug=None):
+    """Il commit in cima alla PR, che e' quello su cui girano i check."""
+    slug = slug or repo_slug(runner=runner, cwd=cwd)
+    ok, data = api(f"repos/{slug}/pulls/{pr}", runner=runner, cwd=cwd)
+    if not ok or not isinstance(data, dict):
+        return ""
+    return ((data.get("head") or {}).get("sha") or "")
+
+
+def check_states(pr, runner=_run, cwd=None, slug=None):
     """The state of every check on a pull request, as {name: bucket}.
 
-    `gh` buckets a check into pass / fail / pending / skipping / cancel, which is
-    exactly the vocabulary needed and saves interpreting the raw conclusions.
+    Due endpoint e non uno: le check run moderne e le commit status storiche
+    vivono separate, e un repo puo' avere le une, le altre o entrambe. Le prime
+    vincono su un nome in comune, che e' il caso raro in cui lo stesso servizio
+    scrive in tutti e due i posti.
+
+    Un dizionario vuoto vuol dire "non risulta niente", e resta uno stato
+    transitorio legittimo subito dopo il push: quanto insistere lo decide chi
+    chiama. Vale anche quando la chiamata fallisce, come valeva prima quando
+    `gh pr checks` usciva non-zero.
     """
-    code, out = runner(["gh", "pr", "checks", str(pr), "--json", "name,bucket"], cwd=cwd)
-    text = out.strip()
-    if not text or text.lstrip()[:1] not in "[{":
-        # `gh` says "no checks reported" on stderr and exits non-zero. That is a
-        # legitimate transient state right after the push, so it is not an error
-        # here: the caller decides how long to keep asking.
+    slug = slug or repo_slug(runner=runner, cwd=cwd)
+    sha = head_sha(pr, runner=runner, cwd=cwd, slug=slug)
+    if not sha:
         return {}
-    try:
-        rows = json.loads(text)
-    except json.JSONDecodeError:
-        return {}
-    return {row.get("name", "?"): (row.get("bucket") or "pending") for row in rows}
+    states = {}
+    ok, data = api(f"repos/{slug}/commits/{sha}/status?per_page=100",
+                   runner=runner, cwd=cwd)
+    if ok and isinstance(data, dict):
+        for row in data.get("statuses") or []:
+            name = row.get("context") or "?"
+            states[name] = _STATE_BUCKET.get(row.get("state") or "", "pending")
+    ok, data = api(f"repos/{slug}/commits/{sha}/check-runs?per_page=100",
+                   runner=runner, cwd=cwd)
+    if ok and isinstance(data, dict):
+        for row in data.get("check_runs") or []:
+            states[row.get("name") or "?"] = _bucket(row)
+    return states
 
 
 def wait_for_checks(pr, runner=_run, cwd=None, sleep=time.sleep,
                     timeout=CHECKS_TIMEOUT, appear_timeout=CHECKS_APPEAR_TIMEOUT,
-                    log=print):
+                    log=print, slug=None):
     """Poll until every check has concluded. Returns (ok, detail).
 
     Three ways out, and each one has to be distinguishable by the caller, because
@@ -98,7 +213,7 @@ def wait_for_checks(pr, runner=_run, cwd=None, sleep=time.sleep,
     """
     waited = 0
     while True:
-        states = check_states(pr, runner=runner, cwd=cwd)
+        states = check_states(pr, runner=runner, cwd=cwd, slug=slug)
         if not states:
             if waited >= appear_timeout:
                 return False, (
@@ -119,11 +234,36 @@ def wait_for_checks(pr, runner=_run, cwd=None, sleep=time.sleep,
         waited += POLL_SECONDS
 
 
-def merge(pr, runner=_run, cwd=None):
-    code, out = runner(
-        ["gh", "pr", "merge", str(pr), "--squash", "--delete-branch"], cwd=cwd
-    )
-    return code == 0, out.strip()
+def merge(pr, runner=_run, cwd=None, slug=None, log=print):
+    """Squash merge via REST, poi cancella il branch. Ritorna (ok, dettaglio).
+
+    L'ordine conta e la separazione anche: fondere e cancellare erano un flag
+    solo (`--delete-branch`), qui sono due chiamate, e la seconda non puo'
+    disfare la prima. Se la cancellazione fallisce il merge resta fatto, quindi
+    si dice e si va avanti: restituire un fallimento manderebbe a master una riga
+    di diario che dice `error` su una PR che si e' fusa davvero, che e' il tipo
+    di bugia che questo script esiste per non raccontare.
+    """
+    slug = slug or repo_slug(runner=runner, cwd=cwd)
+    branch = ""
+    ok, data = api(f"repos/{slug}/pulls/{pr}", runner=runner, cwd=cwd)
+    if ok and isinstance(data, dict):
+        branch = ((data.get("head") or {}).get("ref") or "")
+
+    ok, data = api(f"repos/{slug}/pulls/{pr}/merge", runner=runner, cwd=cwd,
+                   method="PUT", fields=[("merge_method", "squash")])
+    if not ok:
+        return False, str(data)[:400]
+    if isinstance(data, dict) and not data.get("merged", True):
+        return False, str(data.get("message") or data)[:400]
+    detail = (data.get("message") if isinstance(data, dict) else None) or "merged"
+
+    if branch:
+        gone, out = api(f"repos/{slug}/git/refs/heads/{branch}", runner=runner,
+                        cwd=cwd, method="DELETE")
+        if not gone:
+            log(f"  branch '{branch}' non cancellato: {str(out)[:120]}")
+    return True, detail
 
 
 def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts=3):
@@ -246,8 +386,13 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
         log(f"  RIFIUTO. {detail}")
         return finish({"merged": False, "outcome": "blocked", "gate": mode, "detail": detail})
 
+    # Dopo il ramo `blocked`, non prima: un cancello rosso non parla con GitHub,
+    # e non deve fallire perche' non si capisce da dove viene il remote.
+    slug = repo_slug(runner=runner, cwd=cwd)
+
     if mode == "checks":
-        ok, detail = wait_for_checks(pr, runner=runner, cwd=cwd, sleep=sleep, log=log)
+        ok, detail = wait_for_checks(pr, runner=runner, cwd=cwd, sleep=sleep,
+                                     log=log, slug=slug)
         if not ok:
             log(f"  RIFIUTO. {detail}")
             return finish({"merged": False, "outcome": "stopped", "gate": mode, "detail": detail})
@@ -257,7 +402,7 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
         log("  --dry-run: mi fermo qui, la PR resta aperta.")
         return {"merged": False, "outcome": "pr-open", "gate": mode, "detail": "dry run"}
 
-    ok, out = merge(pr, runner=runner, cwd=cwd)
+    ok, out = merge(pr, runner=runner, cwd=cwd, slug=slug, log=log)
     if not ok:
         log(f"  il merge e' fallito: {out}")
         return finish({"merged": False, "outcome": "error", "gate": mode, "detail": out})

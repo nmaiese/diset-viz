@@ -17,21 +17,66 @@ import unittest
 from scripts import pipeline_merge
 
 
+REPO = "nmaiese/diset-viz"
+SHA = "deadbee"
+BRANCH = "automation/prova"
+
+# I test si esprimono in bucket, che e' la lingua della politica. Il finto `gh`
+# li ritraduce nelle conclusioni grezze della REST, cosi' la classificazione di
+# `_bucket` viene esercitata davvero invece di essere scavalcata.
+_AS_RUN = {
+    "pass": ("completed", "success"),
+    "fail": ("completed", "failure"),
+    "pending": ("in_progress", None),
+    "skipping": ("completed", "skipped"),
+    "cancel": ("completed", "cancelled"),
+}
+
+
 def fake_gh(checks=None, merge_ok=True, script=None):
-    """Un finto `gh`. `script` e' una lista di risposte successive a `pr checks`,
-    cosi' un test puo' descrivere una CI che parte gialla e finisce verde."""
+    """Un finto `gh api`. `script` e' una lista di risposte successive alle check
+    run, cosi' un test puo' descrivere una CI che parte gialla e finisce verde.
+
+    Parla REST perche' ci parla il passo di merge: `gh pr checks` e `gh pr merge`
+    sono GraphQL, e dietro un proxy di uscita GraphQL puo' non esserci. Il remote
+    che restituisce e' quello riscritto dal proxy, che e' il caso in cui `gh` da
+    solo non sa piu' di che repository si tratti.
+    """
     calls = []
     pending = list(script or [])
 
     def runner(argv, cwd=None):
         calls.append(argv)
-        if argv[:3] == ["gh", "pr", "checks"]:
+        if argv[:2] == ["git", "remote"]:
+            return 0, f"http://local_proxy@127.0.0.1:41729/git/{REPO}\n"
+        if argv[:2] != ["gh", "api"]:
+            return 0, ""
+
+        rest = argv[2:]
+        method = "GET"
+        if rest[:1] == ["--method"]:
+            method, rest = rest[1], rest[2:]
+        path = rest[0] if rest else ""
+
+        if method == "PUT" and path.endswith("/merge"):
+            if not merge_ok:
+                return 1, "HTTP 405: Pull Request is not mergeable"
+            return 0, json.dumps({"merged": True, "message": "Pull Request successfully merged"})
+        if method == "DELETE":
+            return 0, ""
+        if path.startswith(f"repos/{REPO}/pulls/"):
+            return 0, json.dumps({"head": {"sha": SHA, "ref": BRANCH}})
+        if "/check-runs" in path:
             rows = pending.pop(0) if pending else checks
             if rows is None:
-                return 1, "no checks reported on the 'x' branch"
-            return 0, json.dumps([{"name": n, "bucket": b} for n, b in rows.items()])
-        if argv[:3] == ["gh", "pr", "merge"]:
-            return (0, "merged") if merge_ok else (1, "merge failed")
+                return 0, json.dumps({"check_runs": []})
+            runs = []
+            for name, bucket in rows.items():
+                status, conclusion = _AS_RUN[bucket]
+                runs.append({"name": name, "status": status, "conclusion": conclusion})
+            return 0, json.dumps({"check_runs": runs})
+        if path.endswith("/status") or "/status?" in path:
+            return 0, json.dumps({"statuses": []})
         return 0, ""
 
     runner.calls = calls
@@ -44,7 +89,8 @@ RED = {"merge": "blocked", "ok": False, "checks": [{"check": "perimetro", "ok": 
 
 
 def merged_prs(runner):
-    return [a[3] for a in runner.calls if a[:3] == ["gh", "pr", "merge"]]
+    return [a[4].rsplit("/", 2)[1] for a in runner.calls
+            if a[:4] == ["gh", "api", "--method", "PUT"] and a[4].endswith("/merge")]
 
 
 class ABlockedGateIsNotAdvice(unittest.TestCase):
@@ -291,6 +337,127 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
         pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
                               sleep=lambda _: None, log=lambda *_: None, journal=False)
         self.assertEqual(runner.state["pushes"], 0)
+
+
+class TheRepositoryHasToBeFoundWithoutGh(unittest.TestCase):
+    """`gh` da solo non ci arriva, ed e' la ragione per cui esiste `repo_slug`.
+
+    Il proxy di uscita riscrive `origin` in un URL su 127.0.0.1, e davanti a
+    quello `gh` risponde "none of the git remotes point to a known GitHub host".
+    Owner e repo pero' sono ancora gli ultimi due segmenti del percorso.
+    """
+
+    def slug_for(self, url):
+        def runner(argv, cwd=None):
+            return (0, url) if argv[:2] == ["git", "remote"] else (0, "")
+        return pipeline_merge.repo_slug(runner=runner)
+
+    def test_it_reads_the_proxy_rewritten_remote(self):
+        self.assertEqual(
+            self.slug_for("http://local_proxy@127.0.0.1:41729/git/nmaiese/diset-viz\n"),
+            "nmaiese/diset-viz",
+        )
+
+    def test_it_still_reads_an_ordinary_remote(self):
+        for url in ("https://github.com/nmaiese/diset-viz.git\n",
+                    "git@github.com:nmaiese/diset-viz.git\n",
+                    "https://github.com/nmaiese/diset-viz\n"):
+            with self.subTest(url=url.strip()):
+                self.assertEqual(self.slug_for(url), "nmaiese/diset-viz")
+
+    def test_gh_repo_wins(self):
+        import os
+
+        os.environ["GH_REPO"] = "altro/repo"
+        try:
+            self.assertEqual(self.slug_for("https://github.com/a/b.git\n"), "altro/repo")
+        finally:
+            del os.environ["GH_REPO"]
+
+    def test_an_unreadable_remote_is_loud(self):
+        def runner(argv, cwd=None):
+            return (1, "fatal: no such remote") if argv[:2] == ["git", "remote"] else (0, "")
+        with self.assertRaises(RuntimeError):
+            pipeline_merge.repo_slug(runner=runner)
+
+
+class TheBucketsSurviveTheMoveToRest(unittest.TestCase):
+    """REST non ha il `bucket` che dava `gh`, quindi la classificazione l'abbiamo
+    riscritta noi. Se scivola qui, tutta la politica dei check scivola con lei."""
+
+    def test_a_run_still_going_is_pending(self):
+        for status in ("queued", "in_progress"):
+            with self.subTest(status=status):
+                self.assertEqual(
+                    pipeline_merge._bucket({"status": status, "conclusion": None}), "pending")
+
+    def test_the_green_conclusions(self):
+        self.assertEqual(
+            pipeline_merge._bucket({"status": "completed", "conclusion": "success"}), "pass")
+        self.assertEqual(
+            pipeline_merge._bucket({"status": "completed", "conclusion": "skipped"}), "skipping")
+
+    def test_an_unknown_conclusion_is_a_failure_not_a_pass(self):
+        """Il verso di default conta: davanti a una parola che non conosciamo
+        rifiutare costa una PR da rilanciare, passare fonde alla cieca."""
+        bucket = pipeline_merge._bucket({"status": "completed", "conclusion": "qualcosa_di_nuovo"})
+        self.assertEqual(bucket, "fail")
+        self.assertNotIn(bucket, pipeline_merge.PASSING)
+
+    def test_cancelled_is_not_passing(self):
+        self.assertNotIn(
+            pipeline_merge._bucket({"status": "completed", "conclusion": "cancelled"}),
+            pipeline_merge.PASSING)
+
+    def test_the_old_commit_statuses_are_read_too(self):
+        """Alcuni servizi scrivono ancora status invece di check run. Ignorarle
+        vorrebbe dire dichiarare verde una PR che nessuno ha guardato."""
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "remote"]:
+                return 0, f"https://github.com/{REPO}.git"
+            path = argv[-1]
+            if path.startswith(f"repos/{REPO}/pulls/"):
+                return 0, json.dumps({"head": {"sha": SHA, "ref": BRANCH}})
+            if "/check-runs" in path:
+                return 0, json.dumps({"check_runs": []})
+            return 0, json.dumps({"statuses": [{"context": "legacy/ci", "state": "failure"}]})
+
+        states = pipeline_merge.check_states(7, runner=runner)
+        self.assertEqual(states, {"legacy/ci": "fail"})
+
+
+class DeletingTheBranchCannotUndoTheMerge(unittest.TestCase):
+    """Erano un flag solo (`--delete-branch`), ora sono due chiamate. La seconda
+    puo' fallire, e se il suo fallimento diventasse l'esito, master leggerebbe
+    `error` su una PR che si e' fusa davvero."""
+
+    def test_a_failed_branch_delete_still_reports_merged(self):
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "remote"]:
+                return 0, f"https://github.com/{REPO}.git"
+            if argv[2:4] == ["--method", "DELETE"]:
+                return 1, "HTTP 422: Reference does not exist"
+            if argv[2:4] == ["--method", "PUT"]:
+                return 0, json.dumps({"merged": True, "message": "merged"})
+            return 0, json.dumps({"head": {"sha": SHA, "ref": BRANCH}})
+
+        said = []
+        ok, detail = pipeline_merge.merge(45, runner=runner, log=said.append)
+        self.assertTrue(ok, "un branch non cancellato ha finto un merge fallito")
+        self.assertEqual(detail, "merged")
+        self.assertTrue(any(BRANCH in s for s in said), "e non l'ha nemmeno detto")
+
+    def test_a_refused_merge_is_a_failure(self):
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "remote"]:
+                return 0, f"https://github.com/{REPO}.git"
+            if argv[2:4] == ["--method", "PUT"]:
+                return 0, json.dumps({"merged": False, "message": "Pull Request is not mergeable"})
+            return 0, json.dumps({"head": {"sha": SHA, "ref": BRANCH}})
+
+        ok, detail = pipeline_merge.merge(45, runner=runner, log=lambda *_: None)
+        self.assertFalse(ok, "`merged: false` con uscita 0 e' stato letto come un merge")
+        self.assertIn("not mergeable", detail)
 
 
 if __name__ == "__main__":

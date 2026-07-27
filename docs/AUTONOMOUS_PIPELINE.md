@@ -207,6 +207,33 @@ conto suo (non si fida del rapporto dell'agente sul proprio verdetto), sonda i
 check finche' non concludono, e rifiuta se uno fallisce, se non ne compare
 nessuno, o se il cancello e' rosso.
 
+### E parla REST, non GraphQL
+
+Lo stesso script chiedeva i check con `gh pr checks` e fondeva con `gh pr merge`,
+che sono GraphQL tutti e due. GraphQL pero' non c'e' sempre: una sessione dietro
+il proxy di uscita ha risposto a ogni chiamata REST su questo repository e ha
+rifiutato l'endpoint GraphQL con `HTTP 403: This GraphQL query is not enabled for
+this session`. Il passo di merge lo vedeva come un comando fallito e basta, senza
+un indizio sul perche', e uno stadio che non sa chiudersi non si distingue da uno
+stadio che ha deciso di non chiudersi.
+
+Adesso passa da `gh api`, cioe' dalla REST, che e' la superficie piu' piccola e
+piu' vecchia: per un passo il cui unico mestiere e' essere affidabile, e' la
+scelta giusta anche a proxy spento. Tre conseguenze che vale la pena conoscere:
+
+- **`owner/repo` se lo ricava da solo** (`repo_slug`). Il proxy riscrive `origin`
+  in un URL su `127.0.0.1`, e davanti a quello `gh` dice "none of the git remotes
+  point to a known GitHub host" e si ferma. Gli ultimi due segmenti del percorso
+  pero' sono ancora owner e repo. `GH_REPO` vince su tutto.
+- **La classificazione dei check e' nostra** (`_bucket`). REST non ha il `bucket`
+  di `gh`, quindi lo ricostruiamo dalle conclusioni grezze, con lo stesso
+  vocabolario di prima. Davanti a una conclusione che non conosciamo il verso di
+  default e' `fail`: rifiutare costa una PR da rilanciare, passare fonde alla
+  cieca. Si leggono anche le vecchie commit status, non solo le check run.
+- **Fondere e cancellare il branch sono due chiamate**, non piu' un flag solo. La
+  seconda non puo' disfare la prima: se il branch non si cancella il merge resta
+  fatto, e lo si dice invece di scrivere `error` su una PR che si e' fusa.
+
 ## Il rientro: la catena lavora anche sul pubblicato
 
 E' la meta' che mancava. Prima ogni stadio drenava la propria coda una volta e
