@@ -1,16 +1,40 @@
 {
- "fonti": [],
+ "fonti": [
+  {
+   "testo": "Istat, FAQ sulla Rilevazione sulle forze di lavoro: sono occupate le persone con almeno 15 anni che nella settimana dell'intervista hanno svolto almeno un'ora di lavoro retribuito.",
+   "url": "https://www.istat.it/non-categorizzato/faq-domande-frequenti-sulla-rilevazione-sulle-forze-di-lavoro/"
+  },
+  {
+   "testo": "Eurostat, EU's employment rate reached almost 76% in 2024: sulla fascia 20-64 la media UE è 75,8% e l'Italia registra il valore più basso dell'Unione, 67,1%.",
+   "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20250415-1"
+  },
+  {
+   "testo": "Eurostat, Labour market statistics at regional level: nel 2024 Calabria e Campania sono le uniche regioni dell'Unione con meno della metà delle persone di 20-64 anni occupate.",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Labour_market_statistics_at_regional_level"
+  }
+ ],
  "key": "13",
- "lead": "Il tasso di occupazione è il termometro del lavoro, e segna una frattura netta. In Trentino Alto Adige lavora il 72,9% delle persone tra 15 e 64 anni, in Emilia-Romagna il 71,4%, mentre Calabria, Campania e Sicilia restano sotto il 48%. La media è del 63%, la mediana oltre il 68%.",
+ "lead": "In tre regioni italiane meno di una persona su due in età da lavoro ha un impiego, e la distanza dalle prime non passa dalla disoccupazione. Passa da chi nel mercato del lavoro non entra affatto, e quella quota il tasso di disoccupazione non la vede.",
+ "level": "regione",
  "sections": [
   {
-   "body": "Oltre venticinque punti tra la prima e l'ultima regione sono uno dei divari più larghi del quadro territoriale, e sono cresciuti poco nonostante il buon recupero recente. Come per la partecipazione, il baricentro del problema è il Mezzogiorno, dove non lavora circa una persona su due in età attiva. L'occupazione dice quante persone hanno un impiego, non che tipo: dietro lo stesso tasso possono esserci lavori stabili o precari. Serve più occupazione o più occupazione buona?",
-   "h": null,
+   "body": "Al numeratore le persone occupate tra i 15 e i 64 anni, al denominatore tutta la popolazione della stessa età. Istat lo pubblica come media annua della rilevazione sulle forze di lavoro, quindi il valore di un anno è la media dei suoi dodici mesi.\n\nOccupato, in quella rilevazione, è chi nella settimana prima dell'intervista ha lavorato almeno un'ora a pagamento, o ha collaborato senza compenso nell'azienda di un familiare, o era assente per ferie o malattia.\n\nIl denominatore è quello che separa questo indicatore dal [tasso di disoccupazione](/indicatore/tasso-di-disoccupazione/ter-12), che sotto la riga mette le sole forze di lavoro. Qui pesano anche gli studenti, i pensionati sotto i 65 anni e chi ha smesso di cercare, e nessuno di loro è occupato.",
+   "h": "Occupati sulla popolazione, non sulle forze di lavoro",
+   "role": "definizione"
+  },
+  {
+   "body": "Dietro ogni punto ci sono persone in età da lavoro senza un reddito da lavoro. In Calabria, Campania e Sicilia sono più della metà, e da quella quota passano i redditi delle famiglie, i contributi versati e la domanda interna di quei territori.\n\nLa mediana delle venti regioni sta a 68,12, più di cinque punti sopra la media. In alto c'è un gruppo folto, in basso una coda corta che tira giù il centro.\n\nIl salto più largo della graduatoria non separa il Centro dal Sud, cade dentro il Mezzogiorno. Tra la Basilicata sedicesima e la Puglia diciassettesima corrono 6,39 punti, più dei 5,04 che separano la stessa Basilicata dall'Abruzzo, quattro posizioni più su. Anche in cima la geografia tiene fino a un certo punto, e il Lazio è dodicesimo, più di tre punti sotto le Marche e meno di due sopra l'Abruzzo.\n\nSulla disoccupazione le venti regioni stanno molto più vicine, 11,93 punti tra il minimo e il massimo, meno della metà del divario che si legge qui. Denominatori diversi, quindi la differenza non si ripartisce tra le due misure, ma dice dove guardare: [il tasso di attività femminile](/indicatore/tasso-di-attivita-totale-della-popolazione-femmine/ter-203), che ha lo stesso denominatore di questo, in Calabria non arriva a quattro donne su dieci. Le due mappe si accompagnano, e il reddito dell'area è il fattore comune che nessuna delle due misura.",
+   "h": "Il salto più largo cade dentro il Mezzogiorno",
    "role": "quadro"
   },
   {
-   "body": "Misura la quota di occupati sulla popolazione in età da lavoro, senza distinguere tempo pieno e parziale, stabile e a termine. Non coglie la qualità, la retribuzione o le ore effettive, e nasconde le differenze per genere, età e titolo di studio.",
-   "h": null,
+   "body": "La serie regionale comincia nel 2018, quindi l'orizzonte è corto e ha in mezzo il 2020. In sette anni la media delle venti regioni guadagna 4,28 punti partendo da 58,76, e nessuna va in direzione opposta. Il recupero è più forte dove si partiva più in basso, la Basilicata ne guadagna 8,02 e l'Emilia-Romagna 1,82, e il divario si accorcia di 3,70 punti.\n\nA questo passo, se tenesse, la distanza si chiuderebbe in mezzo secolo, e intanto la Calabria ha aggiunto 4,33 punti restando ultima.\n\nL'ultimo tratto è molto più piccolo. Dal 2024 al 2025 la media guadagna 0,41 punti e sei regioni arretrano, cinque delle quali tra le prime dieci, la sesta è la Puglia. Il Veneto perde 0,95 punti, la flessione più ampia, e gli aumenti maggiori vanno a Calabria, Liguria e Basilicata.\n\nIl confronto europeo, intanto, è fermo dov'era. Nel 2024, sulla fascia 20-64 che Eurostat usa per gli Stati, l'Italia aveva il tasso di occupazione più basso dell'Unione, 67,1 contro il 75,8 della media europea, e Calabria e Campania erano le uniche regioni europee dove lavorava meno di una persona su due di quell'età. Aggregati ponderati su un'altra classe d'età, che non si appoggiano ai valori qui sopra.",
+   "h": "Sette anni di recupero, e un 2025 a due velocità",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il tasso conta persone, non lavoro. Un part time involontario e un tempo pieno pesano uguale, un contratto di tre mesi vale come uno a tempo indeterminato, e due regioni con lo stesso valore possono avere quantità di ore molto diverse.\n\nNemmeno l'incastro tra studi e mestiere si legge qui. [La sovraistruzione dei laureati occupati](/indicatore/occupati-sovraistruiti-tra-i-laureati-25-64-anni/bes-03LAV006-N25) disegna una mappa che con questa quasi non si sovrappone, e tra Trentino Alto Adige e Calabria la differenza vale poco più di un punto. Dove il lavoro scarseggia, quello che c'è non risulta molto più spesso mal assegnato.\n\nResta la classe d'età. Nel denominatore ci sono anche i ragazzi tra i 15 e i 19 anni, che in grande maggioranza studiano, quindi un territorio con più giovani in formazione parte più basso per costruzione, ed è per questo che i confronti internazionali preferiscono la fascia 20-64. Ore effettive, contratti e lavoro delle madri hanno misure proprie nel tema [lavoro e conciliazione](/tema/lavoro-e-conciliazione).",
+   "h": "Conta le teste, non le ore e nemmeno il contratto",
    "role": "limiti"
   }
  ],
