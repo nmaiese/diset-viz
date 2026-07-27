@@ -112,6 +112,27 @@ class RelatedIndicators(unittest.TestCase):
         twins = [abs(row["rho"]) >= indicator_brief.TWIN_RHO for row in same]
         self.assertEqual(twins, sorted(twins), "twins must sort after the distinct ones")
 
+    def test_an_inverse_twin_carries_the_warning_too(self):
+        """A complement is a duplicate: `ter-9` is a hundred minus `ter-385`.
+
+        `_strongest` has always demoted twins on the absolute rho, so the pair
+        already sorted to the back of the group. The printed warning tested the
+        signed rho, so the one case where the duplication is total, rho exactly
+        -1,00, reached the writer looking like independent evidence.
+        """
+        brief = indicator_brief.build_brief("territorial", "385")
+        opposite = brief["related"]["groups"]["opposta"]
+        inverse_twin = [row for row in opposite if row["id"] == "9"]
+        self.assertTrue(inverse_twin, "ter-9 must be among the correlates of ter-385")
+        self.assertLessEqual(inverse_twin[0]["rho"], -indicator_brief.TWIN_RHO)
+
+        lines = indicator_brief._render_related(brief).splitlines()
+        marked = [line for line in lines if "misurata due volte" in line]
+        self.assertTrue(
+            any("-1,00" in line for line in marked),
+            f"the inverse twin is not marked: {marked}",
+        )
+
     def test_the_two_extremes_are_placed_on_the_other_scale(self):
         """This is what turns a correlation into a sentence someone can write."""
         rows = [row for rows in self.brief["related"]["groups"].values() for row in rows]

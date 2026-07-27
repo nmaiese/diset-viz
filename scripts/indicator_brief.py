@@ -60,6 +60,12 @@ DIFFERENT_MAP = 0.3
 # Above this, the two series are usually two cuts of the same measurement (the
 # same rate on a different age band, the male and the female version), and
 # "cammina di pari passo con" is a tautology dressed as a finding.
+#
+# Compared on the **absolute** rho, always. A complement is a duplicate too: the
+# efficiency of the water network (`ter-9`) is a hundred minus its dispersion
+# (`ter-385`), the two correlate at exactly -1,00, and "dove una sale l'altra
+# scende" is the same tautology with a minus sign. Checking only the positive
+# side let that pair reach a writer as independent cross-indicator evidence.
 TWIN_RHO = 0.95
 
 
@@ -375,7 +381,7 @@ def _render_related(brief):
         add(f"  {title}  ({gloss})")
         for row in rows:
             verso = row["direction"] or "senza verso"
-            twin = "  <- forse la stessa cosa misurata due volte" if row["rho"] >= TWIN_RHO else ""
+            twin = "  <- forse la stessa cosa misurata due volte" if abs(row["rho"]) >= TWIN_RHO else ""
             add(f"    rho {_signed(row['rho'])} su {row['common']} regioni   {row['name']}{twin}")
             add(f"      {row['path']}   ({verso}, ultimo anno {row['year']})")
             placements = [
