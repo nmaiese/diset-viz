@@ -34,9 +34,17 @@ dipende del lavoro futuro:
 | la misura meccanica, per articolo e per catalogo | `scripts/prose_lint.py` |
 | il segnale `mestiere` nell'ordine di lettura | `scripts/review_queue.py` |
 | le guardie sui link interni | `tests/test_indicator_texts.py`, classe `InternalLinksInProse` |
-| gli incroci, il linking, la ricerca di fonti | `.claude/agents/indicator-writer.md` |
-| le verifiche di mestiere e di incrocio | `.claude/agents/indicator-reviewer.md` |
+| gli incroci, il linking, la ricerca di fonti | `.claude/agents/indicator-writer.md` (sezione "Cross-indicator links") |
+| le verifiche di mestiere e di incrocio | la skill `.claude/skills/indicator-review/`, che revisore e verificatore caricano |
 | la voce sulla descrizione in lingua piana | `.claude/agents/indicator-curator.md` |
+
+Nota di manutenzione: i prompt agente sono stati snelliti e ora **puntano**
+invece di ricopiare. Le sezioni del writer che il corpo di questo piano cita
+con il loro vecchio titolo ("Write like a journalist", "Quotas, not options",
+"Hunt your own tells") non esistono piu' come sezioni del prompt: il loro
+contenuto normativo vive in `content/STYLE.md`, in `docs/WRITING_RUBRIC.md` e
+nella skill `indicator-review`. Il corpo qui sotto resta il *perche'* storico
+di quelle scelte, come dichiarato sopra.
 
 I blocchi di testo "pronti" che il piano proponeva sono stati tolti da qui e
 messi nei file sopra. Una regola scritta in due posti va fuori sincrono, e questo

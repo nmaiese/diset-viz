@@ -17,6 +17,12 @@ documento che li possiede, non il riassunto qui:
 | stato corrente, id delle Routine, cosa manca | `docs/DISCOVERY_STATUS.md` |
 | dati regionali / provinciali | `docs/DATA_PIPELINE.md`, `docs/PROVINCE_PIPELINE.md` |
 | la voce editoriale | `content/STYLE.md` |
+| cambiare modello, prompt o hook degli agenti | `docs/CANARY.md`, `evals/README.md` |
+
+Le regole con uno scope stanno in `.claude/rules/` (app, editorial, pipeline,
+frontend, data) e le procedure condivise dagli agenti della catena in
+`.claude/skills/`: Claude Code le carica da solo, chiunque altro le legge come
+documenti normali, e valgono per tutti.
 
 Per guardare la catena senza aprire file:
 
@@ -46,7 +52,9 @@ Il resto sta in `docs/AUTONOMOUS_PIPELINE.md`, che le possiede.
   l'id, `pipeline_merge.py --run-id` unisce le due metà.
 - **Il perimetro sta in `pipeline_gate.STAGE_PATHS`**, non nei prompt, e non si
   allarga per far passare qualcosa. Una voce che finisce con `/` è un prefisso
-  di directory, e la barra è ciò che le impedisce di allargarsi da sola.
+  di directory, e la barra è ciò che le impedisce di allargarsi da sola. Lo
+  stesso perimetro è applicato al momento del gesto da `scripts/agent_guard.py`
+  (hook per-agente) e ri-verificato in CI sui branch `automation/*`.
 
 ## Project
 

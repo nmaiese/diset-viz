@@ -394,15 +394,33 @@ falliva, e non arrivava in nessuna pagina. Un prompt che ricopia una regola va
 fuori sincrono senza che nessuno se ne accorga, un prompt che punta a un file no.
 
 **La Routine adesso e' una sola**, ed e' quella del dispatcher: gli stadi non
-hanno piu' un cron proprio. Il prompt lancia
-`scripts/pipeline_dispatch.py --json --check-open-prs`, legge quale stadio ha
-detto, e invoca quell'agente con il `run_id` che il dispatcher ha coniato.
+hanno piu' un cron proprio. Anche il dispatcher e' un agente a pieno titolo
+(`.claude/agents/dispatcher.md`, con modello e guardia nel frontmatter come
+gli altri sei): lancia `scripts/pipeline_dispatch.py --json --check-open-prs
+--record`, legge quale stadio ha detto, e invoca quell'agente con il `run_id`
+che il dispatcher ha coniato. Il prompt della Routine e' un puntatore a quella
+definizione, mai una copia.
 
 Il vantaggio non e' solo la concorrenza. Sei cron erano anche sei promesse
 ricopiate in `pipeline_log.WATCH_GROUPS`, che nessuno poteva verificare da
 dentro il repo: se cambiava la schedulazione, quella tabella andava fuori
 sincrono in silenzio. Con un battito solo, quello che va sorvegliato e' un
 battito solo, e il tick lo registra invece di dichiararlo.
+
+La stessa lezione anti-drift vale dentro `.claude/`. Ogni agente dichiara nel
+frontmatter il proprio **modello** (niente modello implicito ereditato dalla
+sessione: un cambio di default cambierebbe il giudizio editoriale in silenzio)
+e i propri **hook**: `scripts/agent_guard.py` applica il perimetro di
+`STAGE_PATHS` e una allowlist di comandi al momento del gesto, PreToolUse per
+PreToolUse, e allo Stop rifiuta la chiusura di una run su `automation/*` senza
+la riga di diario. La procedura di chiusura, le regole sui contenuti web e le
+classi di errore della rilettura non sono piu' ricopiate nei sei prompt: sono
+tre skill condivise in `.claude/skills/` (`pipeline-close-run`,
+`untrusted-web`, `indicator-review`), una copia sola a cui i prompt puntano.
+Il cancello, oltre che nel passo di merge, gira anche in CI sui branch
+`automation/*` (job `gate` di `.github/workflows/ci.yml`), quindi la politica
+`checks` lo aspetta come aspetta la suite. Prima di cambiare modello, prompt,
+skill o hook: [`CANARY.md`](CANARY.md) e le eval in `evals/`.
 
 ## Quando qualcosa va storto
 

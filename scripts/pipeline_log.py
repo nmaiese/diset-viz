@@ -149,6 +149,11 @@ TRIGGERS = ("dispatch", "routine", "manuale")
 # la provenienza non dipende dal fatto che l'agente si ricordi di dichiararla.
 TRIGGER_ENV = "DI_PIPELINE_TRIGGER"
 
+# Lo stato che l'hook di inizio sessione lascia per chi scrive il diario:
+# session_id e istante di avvio. Locale e mai committato (.gitignore), perche'
+# appartiene alla sessione e non alla storia. Sovrascrivibile nei test.
+SESSION_META = PROJECT_ROOT / "data" / "pipeline" / ".session_meta.json"
+
 
 def _now():
     from datetime import datetime, timezone
@@ -176,6 +181,94 @@ def new_run_id(stage):
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     return f"{stage}-{stamp}-{secrets.token_hex(2)}"
+
+
+_CLAUDE_VERSION_CACHE = []
+
+
+def _claude_version():
+    """La versione di Claude Code che sta facendo girare la run, o ''.
+
+    Best effort e memoizzata: una run senza CLI in PATH (la CI, un checkout
+    locale) scrive semplicemente meno campi. Il campo esiste perche' hook e
+    subagent sono cambiati piu' volte nel corso del 2026, e una regressione di
+    comportamento senza la versione nel diario non e' diagnosticabile.
+    """
+    if _CLAUDE_VERSION_CACHE:
+        return _CLAUDE_VERSION_CACHE[0]
+    import shutil
+
+    version = ""
+    if shutil.which("claude"):
+        try:
+            result = subprocess.run(
+                ("claude", "--version"), capture_output=True, text=True, timeout=10
+            )
+            if result.returncode == 0:
+                version = result.stdout.strip().splitlines()[0][:80] if result.stdout.strip() else ""
+        except (OSError, subprocess.TimeoutExpired):
+            version = ""
+    _CLAUDE_VERSION_CACHE.append(version)
+    return version
+
+
+def _session_meta(path=None):
+    """Il meta di sessione lasciato da session-start.sh, o {}."""
+    target = Path(path) if path else SESSION_META
+    try:
+        data = json.loads(target.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _session_fields():
+    """I campi con cui il diario dice CHI ha prodotto la run, non solo cosa.
+
+    Tutti facoltativi e tutti best-effort: la riga di diario resta valida anche
+    scritta da un checkout senza sessione Claude. Quello che c'e' viene scritto,
+    quello che manca non diventa una stringa vuota da leggere per niente.
+
+    - `model`: dall'ambiente della sessione, se dichiarato.
+    - `claude_code_version`: dal CLI, se in PATH.
+    - `session_id` e `duration_seconds`: dal meta che l'hook di inizio sessione
+      lascia in `SESSION_META`. La durata e' dall'avvio della sessione alla
+      scrittura della riga, che per una run della catena (una sessione, una
+      run) e' la durata della run.
+    - `base_commit`: dove stava master quando la riga e' stata scritta. Il
+      campo `commit` e' l'HEAD del branch della run; senza la base, il diff che
+      il cancello ha giudicato non e' ricostruibile a distanza di mesi.
+    """
+    fields = {}
+    model = (os.environ.get("ANTHROPIC_MODEL") or os.environ.get("CLAUDE_MODEL") or "").strip()
+    if model:
+        fields["model"] = model
+    version = _claude_version()
+    if version:
+        fields["claude_code_version"] = version
+    meta = _session_meta()
+    session_id = str(meta.get("session_id") or "").strip()
+    if session_id:
+        fields["session_id"] = session_id
+    started = str(meta.get("started_at") or "").strip()
+    if started:
+        from datetime import datetime, timezone
+
+        try:
+            began = datetime.fromisoformat(started.replace("Z", "+00:00"))
+            if began.tzinfo is None:
+                began = began.replace(tzinfo=timezone.utc)
+            elapsed = (datetime.now(timezone.utc) - began).total_seconds()
+            if elapsed >= 0:
+                fields["duration_seconds"] = int(elapsed)
+        except ValueError:
+            pass
+    for candidate in ("origin/master", "master"):
+        code, out, _ = _git("rev-parse", "--short", candidate)
+        if code == 0 and out.strip():
+            fields["base_commit"] = out.strip()
+            break
+    return fields
 
 
 def read_journal(path=None):
@@ -348,6 +441,12 @@ def build_entry(stage, outcome, summary, detail=None, gate=None, pr=None,
         entry["queue_before"] = queue_before
     if queue_after is not None:
         entry["queue_after"] = queue_after
+    # Chi ha prodotto la run: modello, versione del CLI, sessione, durata,
+    # base. Facoltativi tutti, perche' la riga deve restare scrivibile da
+    # qualsiasi checkout, ma quando ci sono trasformano "che cosa e' successo"
+    # in "che cosa e' successo, con che cosa": senza, una regressione dopo un
+    # cambio di modello o di runtime non ha nessuna pista nel diario.
+    entry.update(_session_fields())
     return entry
 
 

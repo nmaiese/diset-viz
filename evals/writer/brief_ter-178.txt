@@ -1,0 +1,132 @@
+==============================================================================
+Tasso di occupazione (femmine)
+/indicatore/slug/ter-178  (178)
+==============================================================================
+
+ANAGRAFICA
+  famiglia        Istat, indicatori territoriali
+  tema            Lavoro e conciliazione   (sottotema: Lavoro)
+  unita           %   variazioni in: punti percentuali
+  direzione       higher_better   (ha un verso)
+  fonte           Istat, Banca dati territoriale per le politiche di sviluppo
+  definizione     Persone occupate in età 15-64 anni sulla popolazione nella corrispondente classe di età (femmine) (percentuale)
+  indicizzabile   False
+  nel punteggio   True
+
+LIVELLI DISPONIBILI  Regioni (2018-2025, 20)
+LIVELLO IN QUESTO BRIEF  Regioni, anni [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+
+DISTRIBUZIONE 2025
+  media 54,87   mediana 61,39   divario 34,96 (2,0x)
+  sopra la media 12, sotto 8
+
+    #  territorio                       valore     dal 2018
+    1  Valle d'Aosta                     68,90        +5,01
+    2  Trentino Alto Adige               67,88        +2,68
+    3  Emilia-Romagna                    64,72        +2,06
+    4  Toscana                           64,34        +3,90
+    5  Friuli-Venezia Giulia             64,17        +4,65
+    6  Umbria                            62,99        +8,39
+    7  Piemonte                          62,96        +4,01
+    8  Marche                            62,66        +6,51
+    9  Lombardia                         62,13        +2,50
+   10  Liguria                           62,04        +6,64
+   11  Veneto                            60,74        +2,49
+   12  Lazio                             56,20        +3,02
+   13  Abruzzo                           52,62        +6,95
+   14  Sardegna                          51,10        +6,26
+   15  Molise                            47,28        +5,38
+   16  Basilicata                        45,41        +8,47
+   17  Puglia                            37,91        +5,11
+   18  Calabria                          34,86        +3,74
+   19  Sicilia                           34,61        +5,28
+   20  Campania                          33,95        +4,58
+
+SALTI PIU AMPI NELLA GRADUATORIA  (dove la distribuzione si spezza davvero)
+  dopo il #16: Basilicata -> Puglia, stacco di 7,50
+  dopo il #11: Veneto -> Lazio, stacco di 4,54
+  dopo il #14: Sardegna -> Molise, stacco di 3,82
+
+ANDAMENTO
+  media 2018: 49,99  ->  2025: 54,87   (4,88 punti percentuali)
+  il divario si e ristretto di 0,92 punti percentuali
+  delta massimo   Basilicata  8,47
+  delta minimo    Emilia-Romagna  2,06
+
+SI MUOVONO CONTROCORRENTE  nessuno: il movimento e nella stessa direzione ovunque
+
+ULTIMO PASSAGGIO  2024 -> 2025  (base comune: 20)
+  media 54,13 -> 54,87 (0,74 punti percentuali)
+  in calo 4, in aumento 16, stabili 0
+
+INDICATORI CORRELATI  (la materia prima di un incrocio e dei link interni)
+  hub del tema  /tema/lavoro-e-conciliazione   (Lavoro e conciliazione, 57 indicatori)
+  rho e' la correlazione di rango sui valori regionali dell'ultimo anno di ciascuna
+  serie. Dice se due indicatori mettono i territori nello stesso ordine, non che
+  uno causi l'altro: e' una co-occorrenza e va scritta come tale. Le posizioni
+  sono per valore decrescente, non per merito.
+  Sopra 0,95 guarda il nome prima di scrivere: di solito e' lo stesso
+  fenomeno misurato su un'altra fascia o sull'altro sesso, e dirlo non e' una notizia.
+
+  DISEGNANO LA STESSA MAPPA  (gli stessi territori in alto e in basso)
+    rho +0,95 su 20 regioni   Tasso di occupazione 20-64 anni
+      /indicatore/tasso-di-occupazione-20-64-anni/ter-345   (higher_better, ultimo anno 2025)
+      le due estreme di qui, su questa scala: Valle d'Aosta 77,79 (#2 su 20), Campania 50,79 (#19 su 20)
+    rho +0,93 su 20 regioni   Tasso di occupazione nelle aree rurali (15-64 anni)
+      /indicatore/tasso-di-occupazione-nelle-aree-rurali-15-64-anni/ter-460   (higher_better, ultimo anno 2023)
+      le due estreme di qui, su questa scala: Valle d'Aosta 72,37 (#2 su 20), Campania 47,71 (#18 su 20)
+    rho +0,92 su 20 regioni   Tasso di occupazione over 54 (totale)
+      /indicatore/tasso-di-occupazione-over-54-totale/ter-14   (higher_better, ultimo anno 2025)
+      le due estreme di qui, su questa scala: Valle d'Aosta 69,37 (#2 su 20), Campania 49,58 (#17 su 20)
+    rho +0,90 su 20 regioni   Tasso di occupazione regolare
+      /indicatore/tasso-di-occupazione-regolare/ter-50   (higher_better, ultimo anno 2018)
+      le due estreme di qui, su questa scala: Valle d'Aosta 70,59 (#2 su 20), Campania 39,99 (#18 su 20)
+
+  DISEGNANO LA MAPPA OPPOSTA  (dove uno sale l'altro scende)
+    rho -0,94 su 20 regioni   Differenza tra tasso di attività maschile e femminile
+      /indicatore/differenza-tra-tasso-di-attivita-maschile-e-femminile/ter-61   (lower_better, ultimo anno 2025)
+      le due estreme di qui, su questa scala: Valle d'Aosta 5,85 (#20 su 20), Campania 28,15 (#1 su 20)
+    rho -0,91 su 20 regioni   Differenza tra tasso di occupazione maschile e femminile
+      /indicatore/differenza-tra-tasso-di-occupazione-maschile-e-femminile/ter-57   (lower_better, ultimo anno 2025)
+      le due estreme di qui, su questa scala: Valle d'Aosta 6,08 (#20 su 20), Campania 25,60 (#2 su 20)
+    rho -0,88 su 20 regioni   Tasso di mancata partecipazione al lavoro
+      /indicatore/tasso-di-mancata-partecipazione-al-lavoro/bes-03LAV002-N22   (lower_better, ultimo anno 2025)
+      le due estreme di qui, su questa scala: Valle d'Aosta 7,00 (#16 su 20), Campania 27,30 (#1 su 20)
+    rho -0,88 su 20 regioni   Tasso di disoccupazione di lunga durata (femmine)
+      /indicatore/tasso-di-disoccupazione-di-lunga-durata-femmine/ter-184   (lower_better, ultimo anno 2025)
+      le due estreme di qui, su questa scala: Valle d'Aosta 1,22 (#19 su 20), Campania 10,31 (#1 su 20)
+
+  DISEGNANO UNA MAPPA DIVERSA  (la geografia qui non c'entra, ed e' spesso la cosa piu interessante da dire)
+    rho +0,01 su 20 regioni   Imprenditorialità giovanile (totale)
+      /indicatore/imprenditorialita-giovanile-totale/ter-401   (higher_better, ultimo anno 2023)
+      le due estreme di qui, su questa scala: Valle d'Aosta 5,49 (#7 su 20), Campania 6,67 (#1 su 20)
+    rho -0,12 su 20 regioni   Imprenditorialità femminile
+      /indicatore/imprenditorialita-femminile/ter-402   (higher_better, ultimo anno 2023)
+      le due estreme di qui, su questa scala: Valle d'Aosta 29,07 (#5 su 20), Campania 27,48 (#10 su 20)
+    rho -0,15 su 20 regioni   Quota di lavoratori che percepiscono sussidi di politica del lavoro passiva: Cassa integrazione e Contratti di solidarietà
+      /indicatore/quota-di-lavoratori-che-percepiscono-sussidi-di-politica-del-lavoro-passiva-cass/ter-435   (contextual, ultimo anno 2015)
+      le due estreme di qui, su questa scala: Valle d'Aosta 1,47 (#19 su 20), Campania 2,59 (#9 su 20)
+    rho -0,23 su 20 regioni   Tasso di infortuni sul lavoro mortali e con inabilità permanente
+      /indicatore/tasso-di-infortuni-sul-lavoro-mortali-e-con-inabilita-permanente/bes-03LAV007   (contextual, ultimo anno 2022)
+      le due estreme di qui, su questa scala: Valle d'Aosta 10,20 (#16 su 20), Campania 11,20 (#14 su 20)
+
+------------------------------------------------------------------------------
+GIA DETTO DALLA PAGINA, NON RISCRIVERLO
+  Il cruscotto stampa da solo: valore del territorio a fuoco e suo rango,
+  valore piu alto e piu basso con i nomi, media, divario (assoluto e
+  rapporto), variazione rispetto al 2024.
+  Ripetere queste cifre in prosa e la duplicazione che il layout ha tolto.
+
+STATO DELL'ARTICOLO
+  lead   scritto
+  definizione  scritto
+               h2: Chi conta come occupata, e chi resta fuori
+  quadro       scritto
+               h2: Un gradino, non una discesa graduale
+  dinamica     scritto
+               h2: Sette anni di crescita che non hanno rimontato il fondo
+  limiti       scritto
+               h2: Un impiego sì, ma non quale né rispetto a chi
+  vintage  2025   (deve valere 2025)
+  livello  regione   (l'articolo va scritto con "level": "regione")
+------------------------------------------------------------------------------

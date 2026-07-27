@@ -1,7 +1,11 @@
-Flask>=3.1,<4
-Flask-Caching>=2.4,<3
-Flask-Compress>=1.24,<2
-gunicorn>=23,<24
-Markdown>=3.6,<4
-python-frontmatter>=1.1,<2
-openpyxl>=3.1,<4
+# Versioni pinned, non range: la catena e' non presidiata e la CI installa a
+# ogni run, quindi "quello che pip risolve oggi" cambiava sotto i piedi senza
+# che nessun file lo registrasse. Con il pin, un aggiornamento e' un diff.
+# Per aggiornare: alza la versione qui, fai girare la suite, committa.
+Flask==3.1.3
+Flask-Caching==2.4.1
+Flask-Compress==1.24
+gunicorn==23.0.0
+Markdown==3.10.2
+python-frontmatter==1.3.0
+openpyxl==3.1.5
