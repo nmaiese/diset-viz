@@ -357,12 +357,15 @@ Prima della pubblicazione:
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
-python3 /home/nilo/dev/ai-agents/skills/italian-product-copywriter/references/audit_editorial_quality.py .
+python3 scripts/prose_lint.py --summary
 git diff --check
 ```
 
 L'audit editoriale è il controllo che conta sui trattini, e va usato al posto di
-un `grep` sui sorgenti. Un `grep -rn "[—–;]" app/templates` restituisce sempre
+un `grep` sui sorgenti. Viveva in uno script fuori dal repo, sotto un percorso
+assoluto della macchina di chi lo aveva scritto, quindi per chiunque altro il
+comando qui sopra non esisteva. La parte che serve a questa verifica la fa
+`scripts/prose_lint.py`, che sta in repo e gira ovunque. Un `grep -rn "[—–;]" app/templates` restituisce sempre
 righe, perché i template contengono CSS e JavaScript pieni di punti e virgola, e
 soprattutto **non vede le entity**: `&ndash;` rende un trattino medio vietato da
 `content/STYLE.md` senza che il carattere compaia nel sorgente. È così che

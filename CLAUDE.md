@@ -225,9 +225,16 @@ converted into typographic dashes or ellipses. Keep the source text clean.
 
 Themes, theme scores, region profiles and macro-areas are all **derived** from the
 data and recomputed at runtime. For each new indicator id set its direction in
-`CURATED_DIRECTION` (`app/indicator_notes.py`), and for each new theme map it to a
-macro-area in `MACRO_AREAS` (same file). Then restart gunicorn, rebuild the
-frontend, run the tests, and re-check which themes are now "valutabili".
+`CURATED_DIRECTION` (`app/indicator_notes.py`). For each new theme add a row to
+`config/theme_categories.csv` mapping it to one of the 12 canonical categories,
+which is data and inside the curator's perimeter; the categories themselves, and
+the four macro-areas they roll up into, live in `CANONICAL_CATEGORIES` and
+`MACRO_AREAS` in `app/taxonomy.py`, and inventing one is code. Then restart
+gunicorn, rebuild the frontend, run the tests, and re-check which themes are now
+"valutabili".
+
+An unmapped theme is the quiet failure worth knowing: the indicator stays in the
+catalogue and disappears from every macro-area total, with nothing failing.
 
 Provincial data is separate: [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md).
 Keep the SDMX cache out of git, commit only normalized CSV artifacts, and never

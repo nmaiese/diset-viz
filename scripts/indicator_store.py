@@ -163,6 +163,35 @@ def read(key: str, root=None):
     return _read_file(path, key)
 
 
+def resolve_key(keys, code):
+    """La chiave interna di un codice scritto in una delle due forme, o None.
+
+    La catena scrive i codici nella forma URL (`ter-920`, `bes-10AMB004`), lo
+    store li tiene in quella interna (`920`, `bes:10AMB004`). Un comando che
+    accetta solo la seconda risponde "nessun articolo" proprio all'invocazione
+    scritta nei prompt, e chi la incontra o la aggira o salta il passo: in
+    nessuno dei due casi resta una traccia.
+
+    Sta qui perche' questo modulo possiede le chiavi e la loro codifica, ed e'
+    la terza volta che questo difetto compare in questo repo. Le prime due hanno
+    prodotto due copie della stessa funzione in due file. `prose_lint` adesso
+    delega qui invece di tenerne una propria.
+
+    L'acronimo di famiglia si confronta con le chiavi che esistono davvero, mai
+    con una tabella di prefissi: quella la possiede `app/sources.py`, e questo
+    modulo deve restare importabile senza Flask.
+    """
+    keys = set(keys)
+    code = str(code)
+    if code in keys:
+        return code
+    if "-" not in code:
+        return None
+    _, raw = code.split("-", 1)
+    matches = [key for key in keys if key.split(NAMESPACE_SEP, 1)[-1] == raw]
+    return matches[0] if len(matches) == 1 else None
+
+
 def write(key: str, entry: dict, root=None) -> Path:
     """Scrive (o riscrive) l'articolo di `key`. Ritorna il percorso toccato.
 
@@ -229,14 +258,14 @@ def main():
         count = migrate(args.migrate)
         print(f"{count} articoli scritti in {ROOT.relative_to(PROJECT_ROOT)}/")
         return 0
+    entries = load_all()
     if args.show:
-        entry = read(args.show)
-        if entry is None:
+        key = resolve_key(entries, args.show)
+        if key is None:
             print(f"nessun articolo per '{args.show}'", file=sys.stderr)
             return 1
-        print(json.dumps(entry, ensure_ascii=False, indent=2))
+        print(json.dumps(entries[key], ensure_ascii=False, indent=2))
         return 0
-    entries = load_all()
     if args.list:
         for key in sorted(entries):
             print(key)
@@ -248,4 +277,11 @@ def main():
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except BrokenPipeError:
+        # `--list | head` chiude la pipe mentre stiamo ancora stampando. Non e'
+        # un errore del programma, e lasciare uscire il traceback fa sembrare
+        # rotto un comando che ha funzionato.
+        sys.stderr.close()
+        raise SystemExit(0)

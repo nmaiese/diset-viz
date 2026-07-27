@@ -7,18 +7,24 @@ Per come funziona: [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 Per il meccanismo della scoperta: [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md).
 Per il contratto di ogni agente: [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md).
 
-Aggiornato al **2026-07-26**.
+Aggiornato al **2026-07-27**.
 
 ## In una riga
 
-Sette stadi, sei agenti, **nessuno che aspetti una firma**.
-Un indicatore va da un catalogo SDMX a una pagina pubblica senza intervento, e la
-catena ci ritorna sopra quando i dati si muovono.
+Sette stadi, sei agenti, **un dispatcher che ne lancia uno per volta**, e nessuno
+che aspetti una firma. Un indicatore va da un catalogo SDMX a una pagina pubblica
+senza intervento, e la catena ci ritorna sopra quando i dati si muovono.
 
 **Il tappo è tolto.** Il test che congelava l'elenco delle serie è stato
 liberato, e per provare la catena due serie demografiche sono arrivate fino a una
 pagina pubblica: `dem:NMIGRATEIN` (saldo migratorio interno) dentro il punteggio,
 `dem:BIRTHRATE` (tasso di natalità) fuori. Vedi [Lo sblocco](#lo-sblocco-il-tappo-è-tolto).
+
+**E la catena ha smesso di pestarsi i piedi**, che era il difetto che restava.
+Tre cose insieme, il 27 luglio: il dispatcher al posto di sei cron, i registri a
+un file per record al posto di tre file unici a cui tutti appendevano, e il
+`run_id` al posto di `(stadio, pr)` come identità di una run. Vedi
+[Cosa è successo il 2026-07-27](#cosa-è-successo-il-2026-07-27).
 
 ## Lo stato, in un comando
 
@@ -138,6 +144,53 @@ lascia nessuna traccia, e uno stadio fermo da un mese ha lo stesso aspetto di un
 che ha finito il lavoro: è la stessa forma del bug dello scrittore.
 `pipeline_log.silence()` lo misura contro `WATCH_GROUPS`, e status e cruscotto lo
 mostrano.
+
+## Cosa è successo il 2026-07-27
+
+Tre sintomi che sembravano scollegati, tre cause tutte di struttura. Il dettaglio
+sta in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md); qui che cosa è
+cambiato e che cosa resta da fare fuori dal repo.
+
+**Non si capiva chi avesse fatto cosa.** Le due righe di una run si univano su
+`(stadio, pr)`, e non poteva funzionare: la riga dell'agente viaggia dentro la
+pull request, quindi va committata prima che la pull request esista, quindi non
+ne può portare il numero. Su trenta run reali diciannove non lo avevano, e il
+diario dichiarava ventuno run in attesa mentre le pull request aperte erano zero.
+Ora ogni run ha un **`run_id`** coniato da chi scrive per primo e passato al
+passo di merge con `--run-id`, più `trigger` e le code prima e dopo.
+
+**La sequenza non funzionava** perché le dipendenze della catena sono di dato e
+la schedulazione era di calendario. `scripts/pipeline_dispatch.py` legge tutte le
+code e lancia un solo stadio, il primo con lavoro in ordine di catena. Sei
+Routine diventano una.
+
+**I conflitti erano garantiti dal formato.** Tre registri erano file unici a cui
+ogni stadio appendeva in fondo. Ora sono store a un file per record:
+`content/indicators/` (365 articoli travasati), `data/pipeline/runs/` (30 run
+travasate) e `data/pipeline/verifiche/`. Il conflitto non è meno probabile, è
+impossibile. La sezione 3-bis del contratto si è accorciata invece di essere
+riscritta.
+
+**E l'anello di retroazione che teneva ferma la catena.** Il cancello bocciava un
+branch la cui base fosse andata avanti, e il passo di merge scrive su master
+anche quando *rifiuta*: un rifiuto solo faceva diventare rosse tutte le pull
+request aperte, con un'accusa che non riguardava il loro lavoro. La severità non
+serviva, perché il diff si misura già con i tre punti. Ora è rosso solo se non
+esiste nessun antenato in comune.
+
+Tre bug trovati strada facendo, tutti reali:
+
+- `git status --porcelain` riassume una directory non tracciata in una voce sola,
+  quindi da `content/indicators/` il cancello ricavava la chiave inventata
+  `indicators`. Ora usa `--untracked-files=all`.
+- `collapse_runs` lasciava che `pr-open`, che è l'*assenza* di un esito, coprisse
+  un esito vero quando le due righe cadevano nello stesso secondo.
+- I sei prompt mettevano la riga di diario **dopo** `gh pr create`, mentre va
+  committata prima perché viaggia dentro la pull request.
+
+**Cosa resta da fare, e non è nel repo:** creare la Routine del dispatcher e
+disattivare le sei per stadio. Se restano accese insieme torna esattamente la
+concorrenza che il dispatcher toglie. Gli id sono nella tabella sopra.
 
 ## Lo sblocco: il tappo è tolto
 
@@ -264,6 +317,15 @@ possono fare:
    alfabetico della coda e `REGIONAL_HINT` che non riconosce `- reg.`, entrambe
    sopra). La licenza Istat, che era il terzo punto, è stata corretta ovunque
    (vedi sopra).
+6. **La Routine del dispatcher**, che è l'unica cosa che manca perché la catena
+   riparta da sola: finché non esiste, gli stadi girano solo a mano. Va creata
+   insieme allo spegnimento delle sei vecchie, non prima e non dopo.
+7. **Una voce per (indicatore, livello)** nello store degli articoli. Oggi è una
+   per indicatore, con il livello come campo dentro, mentre le code dello
+   scrittore e del revisore hanno già una riga per coppia. Non è un difetto
+   nuovo, è quello di prima lasciato dov'era di proposito: cambiare il modello
+   dei dati dentro una modifica che serviva a togliere i conflitti avrebbe
+   mescolato due cose che vanno potute rileggere separate.
 
 ## Gotcha per la prossima sessione
 
@@ -303,7 +365,7 @@ possono fare:
 - **`gh pr merge --auto` non aspetta niente su questo repo.** Con
   `allow_auto_merge` a falso e `master` non protetto, `gh` ripiega su un merge
   immediato senza dirlo. Nessuno stadio deve usarlo: si chiude con
-  `.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero>`.
+  `.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero> --run-id <run_id>`.
 - **La CI non parte da sola sulle PR aperte via il GitHub MCP.** GitHub non lancia
   i workflow per eventi creati dal token dell'app (anti-ricorsione), quindi una PR
   aperta così resta senza check e il box di merge sembra bloccato pur non essendo
@@ -315,5 +377,19 @@ possono fare:
   `TheDashboardReadsWithoutBreaking`.
 - **Il caso `nothing` del diario si regge solo sul contratto.** Una run a mani
   vuote non ha un branch da giudicare, quindi il cancello non la può raggiungere:
-  se un agente non scrive quella riga, nessuna guardia se ne accorge. È il punto
-  più debole del monitoraggio, ed è noto.
+  se un agente non scrive quella riga, nessuna guardia se ne accorge. Resta il
+  punto più debole del monitoraggio, ma pesa meno di prima: il **tick del
+  dispatcher** viene registrato a ogni giro, quindi "la catena non ha fatto
+  niente stanotte" e "la catena non è partita" adesso si distinguono anche se un
+  agente si dimentica della propria riga.
+- **`--run-id` non è decorativo.** Senza, la riga di esito che il passo di merge
+  scrive su master resta orfana, e il diario torna a non saper dire come è finita
+  la run che l'ha aperta. Lo stampa `pipeline_log.py --write`.
+- **Non lanciare uno stadio a mano mentre il dispatcher gira.** Non c'è nessun
+  lock: l'unica cosa che impedisce a due stadi di lavorare insieme è che il
+  dispatcher ne nomini uno solo per tick. Se serve girare a mano, spegni prima la
+  Routine.
+- **Gli store non si ricompattano.** `content/indicators/`,
+  `data/pipeline/runs/` e `data/pipeline/verifiche/` sono a un file per record
+  perché è quello a togliere i conflitti. Rimetterne uno in un file solo li
+  riporta indietro tutti insieme.

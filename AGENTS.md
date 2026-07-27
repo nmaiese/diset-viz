@@ -24,7 +24,29 @@ Per guardare la catena senza aprire file:
 python3 scripts/pipeline_dashboard.py --open   # tutto in una pagina
 python3 scripts/pipeline_status.py             # solo dove si e' fermata
 python3 scripts/pipeline_log.py                # solo che cosa hanno fatto gli agenti
+python3 scripts/pipeline_dispatch.py           # solo chi tocca adesso
 ```
+
+## Se tocchi la catena autonoma
+
+Quattro cose che non si intuiscono dal codice e che costa caro scoprire da soli.
+Il resto sta in `docs/AUTONOMOUS_PIPELINE.md`, che le possiede.
+
+- **Un dispatcher, uno stadio per tick.** `scripts/pipeline_dispatch.py` legge
+  tutte le code e nomina il solo stadio da lanciare. Gli stadi non hanno un cron
+  proprio, quindi non c'è mai un secondo scrittore: non lanciare uno stadio a
+  mano mentre la catena gira e non rimettere una schedulazione per stadio.
+- **Ogni registro è uno store a un file per record**, e quello toglie il
+  conflitto invece di gestirlo: `content/indicators/` (uno per articolo),
+  `data/pipeline/runs/` (uno per run), `data/pipeline/verifiche/` (uno per
+  verifica). Non ricompattarne nessuno in un file solo.
+- **Una run si identifica dal `run_id`, mai dal numero della pull request.** La
+  riga di diario dell'agente viene committata prima che la pull request esista,
+  quindi non può portarne il numero: `pipeline_log.py --write` conia e stampa
+  l'id, `pipeline_merge.py --run-id` unisce le due metà.
+- **Il perimetro sta in `pipeline_gate.STAGE_PATHS`**, non nei prompt, e non si
+  allarga per far passare qualcosa. Una voce che finisce con `/` è un prefisso
+  di directory, e la barra è ciò che le impedisce di allargarsi da sola.
 
 ## Project
 
@@ -118,8 +140,13 @@ a new dataset), follow [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md). Themes,
 theme scores, region profiles and macro-areas are derived from the data and
 recomputed at runtime (cache 1h). Set each new indicator's direction in
 `CURATED_DIRECTION` (`app/indicator_notes.py`) and map each new source theme to
-one canonical category in `CANONICAL_CATEGORIES` (`app/taxonomy.py`), then
-restart gunicorn, rebuild the frontend and run the tests.
+one of the 12 canonical categories with a row in `config/theme_categories.csv`.
+The categories themselves and the four macro-areas live in `CANONICAL_CATEGORIES`
+and `MACRO_AREAS` (`app/taxonomy.py`): mapping a theme is data, inventing a
+category is code. Then restart gunicorn, rebuild the frontend and run the tests.
+
+A theme nobody mapped fails quietly: the indicator stays in the catalogue and
+vanishes from every macro-area total.
 
 When working on provincial quality-of-life data, keep it separate from the
 regional atlas. Follow [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md),

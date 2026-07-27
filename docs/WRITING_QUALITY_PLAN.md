@@ -957,10 +957,18 @@ Cioe': 294 pagine con zero sezioni scritte, 345 con due su quattro, le note
 migrate, e **19 complete**, dieci delle quali sono il lotto di cui parla la
 Parte seconda. L'arretrato vero e' 639 pagine, non 350.
 
-E soprattutto: la catena, girando come gira, non le chiude. Lo scrittore e' una
-Routine settimanale che scrive **un** articolo per run
-(`docs/DISCOVERY_STATUS.md`, `0 6 * * 6`), il revisore e' giornaliero e ne legge
-uno per volta. Seicentotrentanove pagine a una alla settimana sono dodici anni.
+E soprattutto: la catena, girando come girava, non le chiude. Lo scrittore era
+una Routine settimanale che scriveva **un** articolo per run, il revisore era
+giornaliero e ne leggeva uno per volta. Seicentotrentanove pagine a una alla
+settimana sono dodici anni.
+
+> **Aggiornato al 2026-07-27.** I sei cron per stadio non ci sono piu': il lavoro
+> lo assegna `scripts/pipeline_dispatch.py`, che gira a battito e lancia lo
+> stadio in testa alla coda. Il conto qui sotto resta valido come ordine di
+> grandezza, ma il ritmo non e' piu' fissato da un giorno della settimana: e'
+> quanto spesso batte il dispatcher, e quello si cambia in un campo della
+> Routine invece che in sei. Il vincolo di fondo, pero', non e' cambiato e resta
+> quello che dice il paragrafo dopo: uno stadio per tick, un blocco per run.
 Il lotto da dieci che ha prodotto tutte le misure di questa parte non e' la
 catena che gira: sono dieci agenti in parallelo dentro una sessione condotta a
 mano, un modo di lavorare che le Routine non hanno. La Parte seconda misura un
@@ -1314,7 +1322,9 @@ Il costo dello stadio, misurato: undici agenti, circa 900 mila token, 529
 affermazioni controllate, 7 smentite.
 
 Resta da armare la Routine, e non e' una dimenticanza: mette in moto un agente
-che apre e fonde pull request da solo.
+che apre e fonde pull request da solo. Dal 27 luglio la Routine da armare e' una
+sola per tutta la catena, quella del dispatcher, e il verificatore ci entra come
+gli altri sei senza bisogno di una propria.
 
 #### Tre cose piccole trovate per strada
 

@@ -131,5 +131,50 @@ class TheMigrationLostNothing(unittest.TestCase):
             self.assertIsInstance(entry, dict, key)
 
 
+
+class TheUrlFormResolvesToTheInternalKey(unittest.TestCase):
+    """Il difetto che questo repo ha gia' pagato tre volte.
+
+    La catena scrive i codici come `ter-920` e `bes-10AMB004`, lo store li tiene
+    come `920` e `bes:10AMB004`. Un comando che accetta solo la seconda forma
+    risponde "nessun articolo" proprio all'invocazione scritta nei prompt, e chi
+    la incontra o la aggira o salta il passo. E' successo in `review_queue`,
+    poi in `prose_lint` una settimana dopo, poi in questo store il giorno in cui
+    e' stato scritto. Adesso la funzione e' una sola e sta dove stanno le chiavi.
+    """
+
+    KEYS = ("1", "920", "bes:10AMB004", "bes:09PAE009-N25", "eur:rd_e_gerdreg")
+
+    def test_the_url_form_the_prompts_use(self):
+        for code, expected in (
+            ("ter-920", "920"),
+            ("bes-10AMB004", "bes:10AMB004"),
+            ("eur-rd_e_gerdreg", "eur:rd_e_gerdreg"),
+        ):
+            with self.subTest(code=code):
+                self.assertEqual(indicator_store.resolve_key(self.KEYS, code), expected)
+
+    def test_the_internal_form_keeps_working(self):
+        self.assertEqual(indicator_store.resolve_key(self.KEYS, "920"), "920")
+        self.assertEqual(
+            indicator_store.resolve_key(self.KEYS, "bes:10AMB004"), "bes:10AMB004")
+
+    def test_a_bes_id_with_its_own_dashes_survives(self):
+        """Gli id BES contengono trattini, quindi il taglio e' sul primo e uno
+        solo: tagliare su tutti perderebbe `-N25`."""
+        self.assertEqual(
+            indicator_store.resolve_key(self.KEYS, "bes-09PAE009-N25"),
+            "bes:09PAE009-N25",
+        )
+
+    def test_an_unknown_code_is_none_not_a_guess(self):
+        self.assertIsNone(indicator_store.resolve_key(self.KEYS, "ter-99999"))
+        self.assertIsNone(indicator_store.resolve_key(self.KEYS, "boh"))
+
+    def test_prose_lint_delegates_instead_of_keeping_a_copy(self):
+        from scripts import prose_lint
+
+        self.assertEqual(prose_lint.resolve_key(self.KEYS, "ter-920"), "920")
+
 if __name__ == "__main__":
     unittest.main()

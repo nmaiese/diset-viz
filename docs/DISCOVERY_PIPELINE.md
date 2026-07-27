@@ -34,7 +34,7 @@ svuota nel layer esterno esistente.
                             │  punteggio priorità                 ▼
                             ▼                            scripts/promote_candidates.py
                 (fase 2: scouting, raro, opt-in)          (solo candidati approved)
-   nuovi domini  ─►  proposta di allowlist  ─►ok umano─►  config/istat_series.yaml │
+   nuovi domini  ─►  proposta di allowlist  ─►cancello─►  config/istat_series.yaml │
                                                                              ▼
                                             app/static/data/external/normalized_external_indicators.csv
                                             app/static/data/external_indicator_manifest.csv (status=proposed)
@@ -54,9 +54,12 @@ non vengono scartati: scendono solo in fondo alla coda.
    e nuovi indicatori dentro quelle fonti. Alta qualità, poco rumore. È ciò che
    gira a ogni run schedulata.
 2. **Scouting.** Cerca fonti istituzionali non ancora conosciute e le
-   **propone**. Un dominio nuovo entra in watchlist solo dopo approvazione umana,
-   ed è l'unico punto della catena in cui questo è ancora vero: la fonte decide
-   quale istituzione e quale licenza legge un utente in pagina. Implementato per
+   **propone**. Era l'unico punto della catena che aspettasse una firma umana, ed
+   era per questo il tappo: la scoperta si fermava alla pull request dello scout e
+   non ripartiva. Il controllo non è sparito, si è spostato dove può girare da
+   solo, in `tests/test_source_admission.py` e nella CI, perché la fonte decide
+   quale istituzione e quale licenza legge un utente in pagina e quella decisione
+   va controllata, non approvata. Implementato per
    Istat da `scripts/scout_sources.py`, che legge il catalogo dataflow SDMX e
    scrive i dataflow regionali non ancora coperti in
    `data/discovery/source_candidates.csv` (vedi "Fase 2b" sotto). L'agente che lo
@@ -69,9 +72,11 @@ Ogni stadio scrive **solo** dentro il proprio perimetro (il cacciatore in
 `data/discovery/candidates.csv`, e basta) e chiude con
 `scripts/pipeline_gate.py`, che calcola il verdetto dal diff e dalla suite e
 decide se e come la PR si fonde. La politica non è uniforme: la prosa si fonde da
-sola, la promozione e la curatela passano dai check remoti perché muovono numeri
-vivi, **ammettere una fonte resta una firma umana**. Regole complete e motivazioni
-in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md) e
+sola, mentre promozione, curatela e **ammissione di una fonte** passano dai check
+remoti, perché muovono numeri vivi o decidono quale istituzione compare su una
+pagina pubblica. Nessuno stadio aspetta una firma: in una catena che nessuno
+presidia, "aspetta che qualcuno guardi" vuol dire "aspetta per sempre". Regole
+complete e motivazioni in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md) e
 [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md).
 
 Restano vere le regole già scritte in `DATA_PIPELINE.md`: `exact` è l'unico caso
@@ -257,8 +262,9 @@ porta `reviewed_at` (`YYYY-MM-DD`, sotto guardia) ed esce dalla coda.
 ### Il trigger dello scrittore (worklist deterministica)
 
 Lo scrittore aveva l'unico stadio della catena senza un innesco automatico: il
-cacciatore e il curatore girano come Routine, ma nulla diceva allo scrittore
-quali indicatori il curatore avesse appena integrato e lasciato senza nota. Per
+cacciatore e il curatore avevano una coda deterministica, ma nulla diceva allo
+scrittore quali indicatori il curatore avesse appena integrato e lasciato senza
+nota. È anche la coda che il dispatcher legge per sapere se tocca a lui. Per
 questo `scripts/pending_notes.py` produce la **coda dello scrittore**, come
 `curate.uncurated_targets` fa per il curatore:
 
@@ -280,7 +286,7 @@ python3 scripts/pending_notes.py --json      # coda per l'agente
 
 Lo script è stdlib puro come i fratelli (cacciatore, curatore): sia la coda sia
 l'`year_max` corrente arrivano da file committati (il `new_year`, o in mancanza
-il `current_year`, del manifest), quindi la Routine dello scrittore non richiede
+il `current_year`, del manifest), quindi la coda dello scrittore non richiede
 Flask. Il controllo `stale` si
 restringe così agli indicatori esterni/integrati che il manifest traccia, cioè
 proprio il perimetro dello scrittore come innesco della pipeline di discovery.
@@ -313,19 +319,29 @@ Esempio reale di coda prodotta: R&S sul PIL classificato `new` (0.88), PIL pro
 capite `proxy` dell'id 901 dei conti economici territoriali (0.78), entrambi
 copertura 20/20.
 
-## Runtime: le Routine
+## Runtime: una Routine sola, il dispatcher
 
 La catena gira come **Routine Claude Code** (agenti cloud, sessione nuova a ogni
-firing, checkout git proprio). Le cadenze, gli id e lo stato stanno in
+firing, checkout git proprio). La cadenza, l'id e lo stato stanno in
 [`DISCOVERY_STATUS.md`](DISCOVERY_STATUS.md); il contratto che ogni agente segue a
 ogni run sta in [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md); come stanno insieme i
 sette stadi sta in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
+
+**Gli stadi non hanno un cron proprio.** Ne avevano uno a testa, e la forma
+aveva un difetto strutturale: le dipendenze della catena sono di dato e il
+calendario le ignorava, quindi il curatore girava il giovedì comunque, a vuoto
+se a monte non era successo niente. Ora una sola Routine gira a battito, lancia
+`scripts/pipeline_dispatch.py`, e quello nomina **un solo stadio**, il primo con
+lavoro in ordine di catena. Un tick, uno stadio, quindi nessuno stadio si trova
+mai addosso un altro.
 
 **Il prompt di una Routine non riproduce il contratto, lo indica.** È la lezione
 più cara di questo sistema: la Routine dello scrittore riproduceva il proprio
 contratto per intero, il repo è andato avanti, e per settimane l'agente ha
 scritto in `analyst_notes.json`, un file che l'app non legge più. Girava, non
-falliva, e non arrivava in nessuna pagina.
+falliva, e non arrivava in nessuna pagina. Con un dispatcher solo il rischio si
+restringe a un prompt, che è anche il motivo per cui quel prompt è tre righe e
+non ricopia niente.
 
 Note operative che restano vere per tutti:
 
