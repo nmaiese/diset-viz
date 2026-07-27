@@ -1138,3 +1138,96 @@ significa riscriverlo due volte, e `ter-130` e' gia' nel lotto che e' stato fatt
 Il 5 sta dopo il 4 e non prima, contrariamente alla Parte seconda: un verificatore
 tarato su un lotto ogni tanto misura il rumore, e il suo doppio controllo ha
 bisogno di dieci articoli appena pubblicati che solo il 4 produce con regolarita'.
+
+---
+
+### 6. Stato dell'esecuzione al 27 luglio 2026, e che cosa manca
+
+Questa sezione esiste perche' il piano qui sopra e' stato eseguito a meta' e la
+sessione si e' fermata sul credito, non su una decisione. Chi riprende deve
+poter sapere dove ci si e' fermati senza ricostruirlo dai commit.
+
+**Dove vive tutto.** Branch `claude/article-improvement-plan-bz3qgm`, che sta
+sopra `claude/piano-ultimo-branch-0btfo7` e **non** sopra `master`. Porta con se'
+gli undici commit del primo giro, mai uniti e senza pull request.
+
+#### Fatto
+
+- La verifica del piano, con le misure rieseguite, e' la Parte terza qui sopra.
+- Tre strumenti riparati: `prose_lint --show` accettava solo l'id interno e
+  rifiutava la forma URL scritta nel prompt del revisore, il flag `mestiere`
+  della coda non vedeva `ripetuto`, il brief scriveva "le due estreme" anche
+  quando ne colloca una sola.
+- Il cancello riporta il verdetto della suite invece dell'ultima riga stampata
+  da un test.
+- **Lotto 2, scrittura: undici articoli su undici.** Gli undici a rischio piu'
+  alto della coda, tutti partiti da due sezioni su quattro e circa 140 parole.
+  Da 22 sezioni su 44 a 44 su 44, da 1.552 a 7.841 parole, da zero a 29 link
+  interni, da zero a 19 fonti verificate, zero tell meccanici.
+- **Lotto 2, rilettura: cinque articoli su undici**, firmati.
+- **Il verificatore, braccio negativo.** Due agenti su dieci articoli migrati e
+  mai riletti, fuori dal lotto: 113 affermazioni controllate, 11 smentite. Lo
+  stadio non e' un timbro, e lo zero che dara' sul lotto nuovo avra' un
+  significato.
+
+#### Non fatto, e dove riprendere
+
+1. **Sei articoli senza rilettura**: `ter-611`, `ter-72`, `bes-12SER003`,
+   `ter-168`, `ter-432`, `ter-60`. Non hanno `reviewed_at`, quindi
+   `scripts.review_queue` li ripropone da sola e non c'e' niente da ricordare
+   altrove.
+2. **Due file di review non integrati**, per `ter-432` e `ter-60`. L'agente che
+   li ha scritti e' morto senza dichiarare chiusura mentre diceva di stare
+   ancora verificando. Sono strutturalmente perfetti e indistinguibili da quelli
+   finiti, ed e' esattamente per questo che non sono entrati. Vanno rifatti o
+   riletti da qualcun altro prima di essere creduti.
+3. **Il verificatore sul lotto nuovo**, che e' il braccio positivo e non e' mai
+   partito.
+
+#### Che cosa il lotto 2 ha aggiunto al piano
+
+Due cose, e la seconda non era in nessuna delle due parti precedenti.
+
+**La rilettura e' lo stadio critico, e adesso c'e' il numero.** Sui cinque
+articoli riletti: 187 affermazioni controllate, 18 rilievi, **4 affermazioni
+false**. Tutte prodotte da scrittori con la suite verde e il linter pulito. La
+Parte seconda aveva concluso che lo stadio di scrittura non e' il problema, ma
+quel giudizio era su testi **gia' passati dalla rilettura**. Misurata prima, la
+scrittura produce circa un'affermazione falsa ogni articolo e mezzo. Il
+verificatore di 3.3 non e' piu' una proposta ragionevole, e' la cosa che manca.
+
+**Il difetto ricorrente non sono le cifre, sono le definizioni.** Nessuno dei
+quattro falsi e' un numero sbagliato. Sono descrizioni sbagliate della
+classifica ("la Campania nella meta' bassa" mentre e' decima su venti) e
+soprattutto descrizioni sbagliate di **che cosa l'indicatore conta**. Il braccio
+negativo aveva trovato la stessa classe e piu' grave: `ter-402` chiama "imprese
+a guida femminile" quello che Istat definisce come titolari donne di imprese
+individuali, e lo ripete nella sezione `limiti`, cioe' nel punto che serve a
+dire che cosa l'indicatore non misura. `bes-11RIC023` dichiara un limite che la
+definizione Istat smentisce parola per parola.
+
+Le guardie confrontano ogni cifra con la serie. **Nessuna confronta la
+definizione scritta con la definizione della fonte**, che per gli indicatori
+territoriali sta nel foglio `Metadati` di `Metainformazione.xls` della Banca
+dati territoriale. E' la lacuna piu' larga che l'esecuzione ha esposto, non era
+in nessuna parte di questo piano, e vale piu' del verificatore perche' un errore
+di definizione sopravvive a tutte le riletture che guardano i numeri.
+
+#### Tre cose piccole trovate per strada
+
+- Il brief non consegna tutti i correlati. Su `ter-242` stampava il solo gruppo
+  "mappa diversa", e lo scrittore si e' ricalcolato a mano `ter-241` (rho 0,50)
+  e `ter-157` (0,06). Il brief esiste per impedire proprio quello.
+- `docs/SECONDARY_SOURCES.md` non dice se e' una lista chiusa o un punto di
+  partenza. Cinque scrittori su undici ne sono usciti. ARERA per le interruzioni
+  elettriche e il MiC per il cinema sono piu' autorevoli di qualunque voce in
+  elenco, `dati.trentino.it` per un indicatore Istat nazionale no.
+- Lo stesso registro avverte dei 403 e non dei 503. `pnrr.salute.gov.it`
+  risponde 503 a una richiesta automatica e 200 a un browser, ed e' un blocco,
+  non una fonte morta.
+
+#### Il debito di curatela, che intanto sta diventando piu' caro
+
+`ter-242` ha gia' linkato `ter-471`, cioe' una delle due pagine gemelle. Ogni
+lotto cementa link verso uno dei due doppioni prima che qualcuno abbia deciso
+quale sopravvive. Le tre voci restano quelle di 3.5.
