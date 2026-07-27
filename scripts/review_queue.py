@@ -72,7 +72,17 @@ DECIMAL = re.compile(r"\d+,\d+")
 # 364 articles, so as a *reading order* signal it is a constant added to almost
 # every row, which changes nothing and hides the rest. It stays a backlog number
 # in `prose_lint --summary` and an instruction in the reviewer's prompt.
-CRAFT_TELLS = tuple(name for name, _, _ in prose_lint.CHECKS)
+#
+# `ripetuto` is in, and it is the reason this is a subtraction from every signal
+# rather than a copy of `CHECKS`. It lives outside `CHECKS` in `prose_lint`
+# because it compares two numbers instead of matching a pattern, and taking
+# `CHECKS` verbatim silently excluded it: the one signal two independent judges
+# named on their own, the one worth the most per occurrence, was the one the
+# reading order could not see. ter-408 carried it and the queue said "nessun
+# segnale di rischio". Built as "everything except the questions" so a check
+# added to `prose_lint` tomorrow reaches the reviewer by default, which is the
+# direction the mistake should point.
+CRAFT_TELLS = tuple(name for name in prose_lint.ALL_SIGNALS if name != "domanda")
 
 FLAG_LABELS = {
     "universale": "afferma un andamento generale",

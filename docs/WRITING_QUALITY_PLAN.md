@@ -835,3 +835,306 @@ Incroci e internal linking:
 - Eurostat, What is Statistics Explained (PDF): https://ec.europa.eu/eurostat/documents/4031688/5930712/KS-32-12-526-EN.PDF
 
 Fonti secondarie: gli URL verificati sono nell'appendice A e nel registro esteso.
+
+---
+
+## Parte terza, la verifica del piano e il piano di esecuzione
+
+La Parte prima e' il ragionamento, la Parte seconda e' quello che il primo lotto
+ha misurato. Questa parte e' una terza cosa: qualcuno che non ha scritto niente
+di tutto cio' ha riaperto il codice, ha rieseguito le misure e ha controllato le
+affermazioni una per una. Poi ha scritto che cosa fare adesso.
+
+Il metodo, perche' un controllo che non si puo' rifare non e' un controllo: ogni
+cifra qui sotto viene da un comando eseguito su questa branch, e il comando e'
+scritto accanto al numero.
+
+### 1. Che cosa regge
+
+**Le misure sono giuste.** Rieseguite tutte, sui due file di testo, quello di
+`master` e quello di questa branch.
+
+```bash
+python3 scripts/prose_lint.py --summary --texts <indicator_texts.json di master>
+python3 scripts/prose_lint.py --summary
+```
+
+| | dichiarato | verificato |
+|---|---|---|
+| domanda retorica, prima | 340 su 364 | 340 su 364 |
+| lessico spia, prima | 25 | 25 |
+| articoli con un link, prima | 6 su 364 | 6 su 364 |
+| articoli con un link, dopo | 18 | 18 su 364, 43 link |
+
+Anche la tabella del lotto regge, colonna per colonna, sui dieci codici
+dichiarati: 20 sezioni scritte su 40 prima e 40 dopo, 1.517 parole prima, 14 tell
+prima, 10 domande retoriche prima, zero link e zero fonti prima. Il salto e'
+reale e le cifre che lo raccontano sono quelle.
+
+**Le fonti citate esistono.** I sedici riferimenti in `fonti` dei dieci articoli
+del lotto sono quindici URL distinti, tutti interrogati: quindici risposte 200,
+nessun link morto, nessuna fonte inventata. Era l'unico errore da cui il piano
+dice che non si torna indietro, e non e' stato commesso.
+
+**La suite e' verde**, 468 test, e la correlazione di rango e' aritmetica
+corretta: Pearson sui ranghi medi, pari merito gestiti, soglia di dodici regioni
+in comune sotto la quale non risponde.
+
+**I tre debiti di curatela sono tutti veri**, e uno e' piu' grave di come e'
+scritto.
+
+- `ter-282` ha davvero `direction: lower_better`, e il brief aggiunge una riga
+  che la Parte seconda non ha: **`nel punteggio True`**. Non e' solo il cruscotto
+  che stampa una frase in contrasto con l'articolo sotto, e' un verso sbagliato
+  che entra nel punteggio di qualita' della vita. La graduatoria lo mostra da
+  sola: nel 2023 l'Umbria sta sopra la Sicilia e le Marche pari con la Sicilia,
+  che e' quello che succede quando si ordinano per merito i procedimenti
+  conclusi invece del fenomeno.
+- `ter-130` ha davvero l'unita' sbagliata. I valori del 2023 vanno da 41,17 della
+  Calabria a 79,66 della Lombardia, cioe' migliaia di euro per addetto, e i
+  metadati dicono `milioni di euro`. Il vecchio articolo su `master` scrive "dai
+  41 mila euro della Calabria agli 80 mila della Lombardia", quindi la pagina
+  pubblicata oggi stampa un'unita' che la propria prosa smentisce.
+- `ter-167` e `ter-471` sono davvero la stessa serie, 580 chiavi in comune e 580
+  valori identici su 580.
+
+### 2. Che cosa non regge
+
+Quattro cose. Tre sono piccole e sono state corrette in questa branch, la quarta
+e' il motivo per cui esiste il piano di esecuzione qui sotto.
+
+**2.1 Il lotto non aveva zero tell meccanici, ne aveva uno.** La tabella della
+Parte seconda mette 0 nelle colonne "scritto" e "riletto". Rieseguendo il linter
+com'e' oggi, `ter-408` porta un `ripetuto`: "quasi tre punti" nel lead e "2,79
+punti" nel quadro, cioe' esattamente il caso che la docstring di `prose_lint`
+cita come vero positivo. La tabella e' stata calcolata prima che quel controllo
+esistesse e non e' stata rifatta dopo, che e' la forma piu' banale del difetto
+che la Parte seconda descrive altrove: una misura che invecchia quando cambia lo
+strumento. Il lead e' stato corretto, adesso lo zero e' vero.
+
+**2.2 Il comando scritto nel prompt del revisore non funzionava.**
+
+```
+$ python3 scripts/prose_lint.py --show ter-63
+nessun articolo per ter-63     # exit 1
+```
+
+`--show` indicizzava il dizionario dei testi, quindi accettava l'id interno e
+rifiutava la forma URL, che e' quella dell'esempio nel prompt del revisore, in
+`content/STYLE.md` e in ogni altro comando della catena. E' lo stesso identico
+difetto che la Parte seconda, sezione 7, racconta di aver trovato e corretto in
+`review_queue --show`, riscritto nello strumento nuovo pochi commit dopo. La
+lezione era stata scritta, non era stata applicata al vicino di casa. Corretto,
+con il test in tutti e due i moduli.
+
+**2.3 Il segnale piu' prezioso non arrivava al revisore.** La coda di rilettura
+costruisce il flag `mestiere` da `prose_lint.CHECKS`, che e' la meta' a pattern
+del linter. `ripetuto` sta fuori da `CHECKS` perche' confronta due numeri invece
+di cercare una forma, quindi la copia lo lasciava fuori: l'unico segnale nato
+dall'accordo di due giudici indipendenti, quello che vale di piu' per
+occorrenza, era l'unico che l'ordine di lettura non poteva vedere. Su `ter-408`
+la coda diceva "nessun segnale di rischio" mentre il linter trovava il difetto.
+Adesso il flag e' costruito per sottrazione, tutti i segnali tranne la domanda
+retorica, cosi' un controllo aggiunto domani arriva al revisore senza che nessuno
+se ne ricordi.
+
+**2.4 L'arretrato non e' una questione di cadenza.** Questa e' l'unica
+affermazione della Parte seconda che il codice smentisce, ed e' quella su cui
+poggia tutto il resto del giro successivo.
+
+La Parte seconda, punto 3.4, dice: "Non serve un meccanismo nuovo. La catena
+funziona, va fatta girare", e conta 35 lotti. Il conto e' giusto sulla domanda
+che si pone, e la domanda e' troppo stretta. Conta i 364 articoli che hanno gia'
+della prosa. Il catalogo ne ha di piu':
+
+```bash
+.venv/bin/python -m scripts.text_queue      # prima riga
+```
+
+> 19 articoli completi su 658 pagine (indicatore piu' livello territoriale).
+
+Cioe': 294 pagine con zero sezioni scritte, 345 con due su quattro, le note
+migrate, e **19 complete**, dieci delle quali sono il lotto di cui parla la
+Parte seconda. L'arretrato vero e' 639 pagine, non 350.
+
+E soprattutto: la catena, girando come gira, non le chiude. Lo scrittore e' una
+Routine settimanale che scrive **un** articolo per run
+(`docs/DISCOVERY_STATUS.md`, `0 6 * * 6`), il revisore e' giornaliero e ne legge
+uno per volta. Seicentotrentanove pagine a una alla settimana sono dodici anni.
+Il lotto da dieci che ha prodotto tutte le misure di questa parte non e' la
+catena che gira: sono dieci agenti in parallelo dentro una sessione condotta a
+mano, un modo di lavorare che le Routine non hanno. La Parte seconda misura un
+regime e poi programma il lavoro in un altro.
+
+Da qui in avanti, quindi, il vincolo non e' la misura. La misura c'e', e' onesta
+e concorda con due giudici. Il vincolo e' la portata.
+
+### 3. Il piano di esecuzione
+
+Cinque interventi in ordine. I primi due sbloccano, il terzo e' il lavoro vero,
+il quarto e il quinto servono a sapere se il terzo sta andando bene.
+
+#### 3.1 Portare in produzione il primo giro
+
+Il primo lotto, il linter, la rubrica, il registro delle fonti e i correlati nel
+brief **non sono su `master`**. Non c'e' nessuna pull request aperta. Il sito
+serve oggi le versioni vecchie dei dieci articoli, quelle in cui il giudice
+severo ha trovato cinque affermazioni false, e ne serve altre che hanno lo stesso
+difetto: `ter-920` su `master` chiude il lead con "una media nazionale salita a
+47,6 anni", dove 47,58 e' la media semplice delle venti regioni. E' la trappola
+dell'aggregazione descritta in `docs/SECONDARY_SOURCES.md`, pubblicata.
+
+Finche' questo non atterra, ogni giro successivo lavora su una base che i lettori
+non vedono, e ogni misura di `prose_lint` racconta un catalogo che non e' quello
+servito. E' il primo intervento perche' e' l'unico che vale qualcosa da solo.
+
+**Criterio di accettazione.** `prose_lint --summary` su `master` deve dire 326 e
+18, non 340 e 6.
+
+**Effort:** nullo, e' una merge.
+
+#### 3.2 Il lotto come modo di lavorare, non come sessione a mano
+
+Il regime che ha prodotto i numeri della Parte seconda va reso ripetibile, perche'
+e' l'unico che chiude l'arretrato in un tempo che ha senso.
+
+Serve un comando che, dato un numero, restituisca il prossimo lotto: prende la
+coda giusta (`text_queue` per le pagine mai scritte, `review_queue` per quelle da
+rileggere), toglie quelle gia' in lavorazione, e stampa i codici piu' il comando
+di brief per ciascuno. Niente di piu': l'orchestrazione degli agenti sta fuori
+dal repo, la scelta di che cosa lavorare sta dentro.
+
+Due cose che la Parte seconda ha imparato e che vanno nel comando, non nella
+memoria di chi lo lancia:
+
+- **la presenza di un file non e' un segnale di completamento** (sezione 7). Dieci
+  agenti in parallelo scrivono presto e rifiniscono dopo, e integrare alla
+  comparsa del file ha preso quattro versioni intermedie su dieci.
+- **un lotto e' omogeneo per livello**. Un articolo dichiara `"level"` e le due
+  code hanno una riga per coppia indicatore-livello, quindi mescolare regione e
+  provincia dentro un lotto sposta il costo sul revisore.
+
+**Ordine del lavoro.** Le code ordinano per rischio e per indicizzabilita', che e'
+il criterio giusto in mancanza d'altro. Non e' pero' la lettura: indicizzabile
+vuol dire che Google puo' vederla, non che qualcuno la apre. Se esiste un export
+di Search Console, ordinare le prime dieci tornate per impressioni reali vale piu'
+di qualunque altra rifinitura di questo piano. Se non esiste, si tiene l'ordine
+attuale e si dice che e' un ripiego.
+
+**Il conto, per decidere con un numero davanti.** 639 pagine, dieci per lotto,
+sono 64 lotti. Al costo dichiarato dalla Parte seconda, dieci run di scrittura,
+cinque di rilettura e due di giudizio, piu' il verificatore di 3.3, sono circa
+1.150 run di agente. Un lotto a settimana chiude in quindici mesi, due lotti a
+settimana in sette. La domanda da porsi prima di cominciare non e' se il flusso
+funziona, e' quale di questi due ritmi si vuole pagare.
+
+**Criterio di accettazione.** Due lotti consecutivi lavorati con il comando, senza
+sovrapposizioni e senza pagine perse per strada, e `prose_lint --summary` che si
+muove di venti articoli.
+
+**Effort:** basso per il comando, alto e continuativo per il lavoro che apre.
+
+#### 3.3 Il verificatore
+
+La proposta della Parte seconda, 3.1, e' giusta e va fatta come la descrive, con
+il suo doppio controllo: girato sui dieci appena pubblicati deve dare zero
+smentite, girato su dieci articoli migrati e mai riletti deve darne piu' di zero,
+e se tutti e due danno zero il numero e' una bugia. Il campo
+`affermazioni_controllate` nello schema e' la parte che non si negozia, perche'
+senza di esso "zero smentite" e "non ho guardato" sono lo stesso zero.
+
+Due correzioni alla messa in opera, che la Parte seconda stima "medio, e' un
+prompt, uno schema e una riga di diario".
+
+**Non e' un prompt e una riga.** Uno stadio nuovo e' inchiodato in tre posti che
+non si parlano: `pipeline_gate.STAGE_PATHS` piu' `MERGE_POLICY`,
+`pipeline_log.STAGES`, `pipeline_status.STAGE_ORDER`. Il cancello valida lo stadio
+contro `choices=sorted(STAGE_PATHS)`, quindi uno stadio non registrato non e'
+degradato, e' rifiutato. Vanno toccati tutti e tre, piu' l'agente in
+`.claude/agents/`, piu' la Routine, piu' `docs/AUTONOMOUS_PIPELINE.md` che dice
+"i sei stadi".
+
+**Il diario dedicato non va fatto.** La proposta parla di "un file di diario
+dedicato". `data/pipeline/runs.jsonl` e' l'unico diario che il cancello pretende
+e che `pipeline_log` e `pipeline_dashboard` sanno leggere, e un secondo file
+sarebbe invisibile a tutti e tre. I contatori stanno benissimo dentro la riga
+esistente, che ha gia' un campo `detail` libero. Un diario che nessuno strumento
+legge e' il difetto che questo progetto ha gia' pagato una volta, con la Routine
+che scriveva in `analyst_notes.json`.
+
+**Il perimetro giusto.** `STAGE_PATHS["verificatore"] = (RUN_JOURNAL,)` e basta.
+Uno stadio che non corregge niente non ha bisogno di toccare i testi, e un
+perimetro di un solo file rende il cancello una tautologia verde invece di una
+verifica: e' il caso in cui `check_journal` dice "nessun lavoro da registrare", e
+va guardato prima di fidarsi del primo verdetto.
+
+**Effort:** medio, ma su sei file, non su due.
+
+#### 3.4 Ritarare la rubrica
+
+Da fare come scritto nella Parte seconda, 3.2, con il criterio di accettazione che
+propone, cioe' lo scarto interno al lotto sopra i tre punti e non la media. E'
+l'intervento con il rapporto valore su sforzo piu' alto di tutti, un file di testo.
+
+Una sola aggiunta ai quattro criteri che la Parte seconda ritara. **Il criterio 5
+ha adesso il dato per essere giudicato senza aprire il brief**: il blocco
+`INDICATORI CORRELATI` marca i quasi gemelli sopra `rho` 0,95 e li mette in fondo,
+quindi "un correlato che e' lo stesso fenomeno misurato due volte vale 1" e'
+verificabile e non solo enunciabile.
+
+E un limite del brief da scrivere nella rubrica invece di lasciarlo implicito: la
+correlazione si calcola sull'ultimo anno **di ciascuna** serie, che spesso non e'
+lo stesso anno, e su venti regioni. Con venti punti un rho vicino a zero non
+dimostra che due indicatori non c'entrano niente, dice solo che non si vede.
+Il gruppo "mappa diversa" e' quello che il brief invita a scrivere ed e' anche
+quello statisticamente piu' fragile, quindi la frase giusta e' "qui la geografia
+non si somiglia", mai "questi due non hanno niente a che fare".
+
+**Effort:** basso.
+
+#### 3.5 Il debito di curatela
+
+Tre voci, tre decisioni diverse, e nessuna appartiene a uno stadio della catena.
+
+- **`ter-282`, il verso.** E' l'unica che ha bisogno di una decisione umana, ed e'
+  la piu' urgente delle tre perche' l'indicatore e' nel punteggio. `contextual`
+  toglie dal punteggio un verso che il dato non regge.
+- **`ter-130`, l'unita'.** Non e' una decisione, e' un errore. La definizione Istat
+  stampata sulla stessa pagina dice `migliaia di euro concatenati` e i valori lo
+  confermano. Va corretto nei metadati.
+- **`ter-167` e `ter-471`, il doppione.** Due pagine indicatore con gli stessi 580
+  numeri, tutte e due dentro i conteggi del tema. Da decidere quale nome
+  sopravvive e da far 301 all'altra, con la stessa logica delle URL legacy.
+
+**Effort:** basso ciascuno, ma fuori dal perimetro di ogni agente, quindi non si
+fa da solo.
+
+### 4. Che cosa non fare, aggiunte alle tre della Parte seconda
+
+- **Non aggiungere stadi finche' non e' aumentata la portata.** Il verificatore
+  vale perche' misura un buco reale, non perche' la catena abbia bisogno di piu'
+  pezzi. Un settimo stadio su una catena che pubblica un articolo a settimana
+  aggiunge sorveglianza a un flusso che non scorre.
+- **Non contare le pagine come articoli.** 364 e' il numero delle voci con della
+  prosa, 658 quello delle pagine, 19 quello degli articoli veri. Il primo numero
+  e' quello che `prose_lint` stampa e va bene per il prima e dopo, ma se diventa
+  il denominatore dell'arretrato nasconde le 294 pagine che non hanno niente.
+- **Non fidarsi di una tabella di misure senza rieseguirla.** Il caso 2.1 e'
+  costato un numero sbagliato in un documento che sarebbe stato la base del giro
+  successivo, e rieseguire il comando e' costato un decimo di secondo.
+
+### 5. Ordine, e perche' e' questo
+
+| # | Intervento | Effort | Sblocca |
+|---|---|---|---|
+| 1 | 3.1, portare in produzione il primo giro | nullo | tutto il resto |
+| 2 | 3.5, l'unita' di `ter-130` e il verso di `ter-282` | basso | articoli corretti su dati corretti |
+| 3 | 3.4, ritarare la rubrica | basso | il giudizio del lotto successivo |
+| 4 | 3.2, il lotto come comando, e la decisione sul ritmo | basso il comando | l'arretrato |
+| 5 | 3.3, il verificatore su sei file | medio | sapere se il 4 sta andando bene |
+
+Il 2 sta prima del 4 di proposito. Riscrivere un articolo sopra metadati sbagliati
+significa riscriverlo due volte, e `ter-130` e' gia' nel lotto che e' stato fatto.
+Il 5 sta dopo il 4 e non prima, contrariamente alla Parte seconda: un verificatore
+tarato su un lotto ogni tanto misura il rumore, e il suo doppio controllo ha
+bisogno di dieci articoli appena pubblicati che solo il 4 produce con regolarita'.

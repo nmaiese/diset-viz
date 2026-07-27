@@ -25,7 +25,7 @@ because its prompt repeated a contract instead of pointing at it).
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
 | la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
 | come si misura un articolo, i dieci criteri | [`docs/WRITING_RUBRIC.md`](docs/WRITING_RUBRIC.md) |
-| che cosa ha misurato il primo lotto, e il giro dopo | [`docs/WRITING_QUALITY_PLAN.md`](docs/WRITING_QUALITY_PLAN.md), Parte seconda |
+| che cosa ha misurato il primo lotto, e il giro dopo | [`docs/WRITING_QUALITY_PLAN.md`](docs/WRITING_QUALITY_PLAN.md), Parte terza |
 | quali fonti secondarie si possono citare | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
 
 Per guardare la catena senza aprire file:

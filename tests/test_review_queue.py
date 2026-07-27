@@ -13,7 +13,7 @@ regex cannot read, and a figure the cockpit already prints.
 
 import unittest
 
-from scripts import review_queue
+from scripts import prose_lint, review_queue
 
 
 def _view(level_key="regione", indexable=True, avg=40.73, best=48.30, worst=32.70):
@@ -171,6 +171,38 @@ class ShowAcceptsTheCodeAsItIsWritten(unittest.TestCase):
         """A code that parses but has no article must not resolve to a neighbour."""
         self.assertIsNone(review_queue.resolve_key(self.TEXTS, "ter-99999"))
         self.assertIsNone(review_queue.resolve_key(self.TEXTS, "pippo"))
+
+
+class TheCraftFlagSeesEveryTellThePrinterCounts(unittest.TestCase):
+    """`mestiere` must not lag behind `prose_lint`.
+
+    It was built as a copy of `prose_lint.CHECKS`, which is the pattern-matching
+    half of that module and not all of it. `ripetuto` compares two numbers
+    instead of matching a pattern, so it lives outside `CHECKS`, and the copy
+    dropped it: the signal two independent judges named on their own was the one
+    signal the reading order could not see. The rule this pins is the direction
+    of the default, not the current list: a check added to the linter reaches
+    the reviewer unless somebody excludes it on purpose.
+    """
+
+    def test_every_linter_signal_except_the_closing_question_reaches_the_queue(self):
+        expected = set(prose_lint.ALL_SIGNALS) - {"domanda"}
+        self.assertEqual(set(review_queue.CRAFT_TELLS), expected)
+
+    def test_the_same_quantity_twice_reaches_the_reading_order(self):
+        entry = {
+            "lead": "Il divario vale quasi tre punti.",
+            "sections": [{"role": "quadro", "h": None,
+                          "body": "Nei 2,79 punti in mezzo non cade nessun valore."}],
+        }
+        row = review_queue.assess("178", entry, _view())
+        self.assertIn("mestiere", row["flags"])
+
+    def test_a_closing_question_alone_does_not_flag_the_article(self):
+        """It is on almost every article, so as a reading order signal it sorts
+        nothing. It stays a backlog number in `prose_lint --summary`."""
+        row = review_queue.assess("178", _entry("E allora che cosa resta?"), _view())
+        self.assertNotIn("mestiere", row["flags"])
 
 
 class QueueAgainstTheLiveFile(unittest.TestCase):

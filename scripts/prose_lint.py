@@ -26,7 +26,7 @@ checkout, before any venv exists.
 
     python3 scripts/prose_lint.py                  # i peggiori, in ordine
     python3 scripts/prose_lint.py --summary        # il totale, per misurare i progressi
-    python3 scripts/prose_lint.py --show 178       # un articolo solo
+    python3 scripts/prose_lint.py --show ter-178   # un articolo solo
     python3 scripts/prose_lint.py --json
 """
 
@@ -136,6 +136,32 @@ LINK = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
 def load_texts(path=None):
     return json.loads(Path(path or TEXTS_PATH).read_text(encoding="utf-8"))
+
+
+def resolve_key(texts, code):
+    """The internal key for a code written either way, or None.
+
+    The chain writes indicator codes in the URL form (`ter-408`, `bes-10AMB004`)
+    and `indicator_texts.json` keys them internally (`408`, `bes:10AMB004`).
+    `--show` used to index the dict directly, so the very command written in the
+    reviewer's prompt answered "nessun articolo" for every indicator. That is
+    the same defect `review_queue.resolve_key` was written to fix, repeated in
+    the newer tool a week later, which is why it is worth a named function in
+    both places rather than a fix in one.
+
+    The family acronym is matched against the keys that are actually in the
+    file, never against a prefix table: `app/sources.py` owns that mapping and
+    this script has to stay importable without a venv, so a local copy of it
+    would be both a duplicate and the kind of duplicate that drifts. Reading the
+    keys costs nothing and cannot go out of sync with them.
+    """
+    if code in texts:
+        return code
+    if "-" not in code:
+        return None
+    _, raw = code.split("-", 1)
+    matches = [key for key in texts if key.split(":", 1)[-1] == raw]
+    return matches[0] if len(matches) == 1 else None
 
 
 def prose_fields(entry):
@@ -299,7 +325,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--summary", action="store_true",
                         help="solo il totale del catalogo, per misurare i progressi")
-    parser.add_argument("--show", help="un articolo solo, per id interno (178, bes:01SAL001)")
+    parser.add_argument("--show", help="un articolo solo (ter-178, bes-01SAL001, o l'id interno)")
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--texts", help="un file diverso da quello in repo")
@@ -307,11 +333,11 @@ def main(argv=None):
 
     texts = load_texts(args.texts)
     if args.show:
-        entry = texts.get(args.show)
-        if entry is None:
+        key = resolve_key(texts, args.show)
+        if key is None:
             print(f"nessun articolo per {args.show}")
             return 1
-        texts = {args.show: entry}
+        texts = {key: texts[key]}
 
     rows = build_report(texts)
     summary = summarize(rows)

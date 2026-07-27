@@ -166,6 +166,52 @@ class WhatTheReportCounts(unittest.TestCase):
         self.assertNotIn("domanda", found["hits"])
 
 
+class ShowAcceptsTheCodeAsItIsWritten(unittest.TestCase):
+    """The same guard `review_queue` already carries, on the newer tool.
+
+    `--show` indexed the texts dict directly, so it took the internal id and
+    refused the URL form, which is the form the reviewer's prompt puts in its
+    example (`prose_lint.py --show ter-63`). The documented command answered
+    "nessun articolo" for every indicator, and an agent that hits that either
+    works around it or drops the step. `review_queue` had exactly this defect,
+    it was found and fixed, and it was written again here a few commits later:
+    hence a test in both places rather than a memory of the first one.
+    """
+
+    TEXTS = {"920": {"lead": "x"}, "bes:10AMB004": {"lead": "y"}}
+
+    def test_the_url_form_resolves(self):
+        self.assertEqual(prose_lint.resolve_key(self.TEXTS, "ter-920"), "920")
+        self.assertEqual(
+            prose_lint.resolve_key(self.TEXTS, "bes-10AMB004"), "bes:10AMB004"
+        )
+
+    def test_the_internal_id_still_resolves(self):
+        self.assertEqual(prose_lint.resolve_key(self.TEXTS, "920"), "920")
+        self.assertEqual(
+            prose_lint.resolve_key(self.TEXTS, "bes:10AMB004"), "bes:10AMB004"
+        )
+
+    def test_a_code_with_no_article_does_not_resolve_to_a_neighbour(self):
+        self.assertIsNone(prose_lint.resolve_key(self.TEXTS, "ter-99999"))
+        self.assertIsNone(prose_lint.resolve_key(self.TEXTS, "pippo"))
+
+    def test_an_ambiguous_raw_id_refuses_rather_than_guessing(self):
+        """Matching on the part after the prefix is what keeps this script free
+        of a copy of the family table. The cost is that two families sharing a
+        raw id are indistinguishable, and the right answer there is to say so
+        instead of picking whichever came first in the file."""
+        texts = {"bes:X1": {"lead": "a"}, "ims:X1": {"lead": "b"}}
+        self.assertIsNone(prose_lint.resolve_key(texts, "bes-X1"))
+
+    def test_the_command_in_the_reviewer_prompt_runs(self):
+        """The prompt's example, executed. It returned 1 and printed
+        "nessun articolo" for a year of runs that nobody could see fail."""
+        texts = prose_lint.load_texts()
+        code = f"ter-{next(key for key in texts if key.isdigit())}"
+        self.assertEqual(prose_lint.main(["--show", code]), 0)
+
+
 class AgainstTheRealCatalogue(unittest.TestCase):
     def test_the_report_reads_the_published_articles(self):
         rows = prose_lint.build_report()

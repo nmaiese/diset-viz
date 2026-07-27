@@ -383,7 +383,13 @@ def _render_related(brief):
                 for anchor in row["anchors"] if anchor.get("rank")
             ]
             if placements:
-                add(f"      le due estreme di qui, la: {', '.join(placements)}")
+                # "le due estreme" was printed even when only one of them is on
+                # this sibling's scale, which happens whenever the two series
+                # cover different regions. A label that promises two names and
+                # prints one teaches the writer that a region is missing from
+                # the ranking, when it is missing from the *other* series.
+                quante = "le due estreme" if len(placements) > 1 else "l'estrema"
+                add(f"      {quante} di qui, su questa scala: {', '.join(placements)}")
         add("")
     if empty:
         add("  nessun fratello di tema con abbastanza regioni in comune per un confronto")
