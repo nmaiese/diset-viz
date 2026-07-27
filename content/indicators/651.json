@@ -1,0 +1,36 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, Inclusione scolastica degli alunni con disabilità, anno scolastico 2023-2024: il ritardo sugli ausili senso-percettivi riguarda tutto il territorio nazionale con poche differenze tra Nord e Sud, mappe a rilievo e percorsi tattili sono presenti entrambi solo nell'1% delle scuole, il 41% degli edifici è accessibile agli alunni con disabilità motoria (44% al Nord, 37% nel Mezzogiorno), e i quesiti sulle barriere sono stati modificati a partire dall'anno scolastico 2022-2023",
+   "url": "https://www.istat.it/wp-content/uploads/2025/03/Alunni-con-disabilita-as-23-24.pdf"
+  }
+ ],
+ "key": "651",
+ "lead": "Nelle scuole italiane il divario che pesa non corre tra le regioni ma tra i tipi di disabilità, e la mappa a rilievo è l'ausilio rimasto indietro più di tutti. Nel 2023 nessuna regione arriva a una scuola su dieci, e nove regioni stanno sotto una scuola su trentacinque.",
+ "level": "regione",
+ "reviewed_at": "2026-07-27",
+ "reviewed_vintage": 2023,
+ "sections": [
+  {
+   "body": "Una mappa a rilievo è la pianta dell'edificio scolastico riprodotta in modo che corridoi, aule e uscite si riconoscano al tatto. Istat la rileva nel blocco degli ausili senso-percettivi destinati all'orientamento degli alunni con cecità o ipovisione, accanto ai percorsi tattili a pavimento, che però sono un ausilio a sé e non entrano in questa percentuale.\n\nL'indagine chiede a ogni scuola se la mappa c'è, e il valore regionale è la quota di risposte affermative. Un valore di 3 vuol dire tre scuole su cento fra quelle rilevate, e quello che registra è una presenza, non la qualità della mappa né il punto in cui è stata messa. È uno dei molti indicatori sull'accessibilità scolastica del tema [reddito, inclusione e accessibilità](/tema/reddito-inclusione-e-accessibilita).",
+   "h": "Una planimetria che si legge con le dita",
+   "role": "definizione"
+  },
+  {
+   "body": "Nel 2022 le venti regioni contavano insieme poco meno di 3.800 [alunni con disabilità visiva](/indicatore/alunni-con-disabilita-visiva/ter-629), e per ognuno l'edificio scolastico è la prima cosa da imparare a memoria. Istat considera questi ausili necessari a rendere gli spazi accessibili a chi ha una cecità o una ipovisione, il che sposta la posta in gioco dall'arredo alla differenza tra raggiungere un'aula da soli e dipendere ogni volta da qualcuno.\n\nLa stessa indagine, sulle stesse scuole, trova [le rampe di accesso](/indicatore/percentuale-di-scuole-dotate-di-un-accesso-con-rampe/ter-642) in quasi una scuola su due e i [segnali acustici o visivi](/indicatore/percentuale-scuole-dotate-di-segnali-acustici-o-e-visivi/ter-650) per le emergenze in circa una su sei. La mediana regionale delle mappe a rilievo sta intorno a una scuola su trenta. Il salto grosso non separa il Nord dal Sud, separa la disabilità motoria da quella sensoriale, e dentro quella sensoriale chi non sente da chi non vede. Anche le due geografie sensoriali divergono, visto che la regione che chiude questa graduatoria sta a metà classifica su quella dei segnali.\n\nIl quinto più alto della graduatoria è tutto meridionale, il rovescio della geografia che l'atlante mostra quasi ovunque, ma non è una classifica di virtù. Nel report sull'anno scolastico 2023/2024 Istat scrive che il ritardo sugli ausili senso-percettivi riguarda tutto il territorio nazionale, con poche differenze tra Nord e Sud, e sulle barriere fisiche mette il Mezzogiorno in coda al 37% di scuole accessibili contro il 44% del Nord (dato nazionale Istat). La Sardegna, meridionale e diciassettesima, rompe il disegno da sola. E nel mezzo della tabella le regioni si separano per pochi decimi, che su quote di questa taglia non reggono un giudizio.",
+   "h": "Il paragone utile è con le rampe, non con la regione accanto",
+   "role": "quadro"
+  },
+  {
+   "body": "Dal 2018 al 2023 la media semplice delle regioni è salita di poco più di mezzo punto, cioè una scuola ogni centottanta. Ma la salita non è stata continua. Il punto più alto della serie è il 2022, e nell'ultimo passaggio la quota è scesa in tredici regioni su venti.\n\nSei regioni stanno sotto il livello del 2018, e l'Umbria ha perso più di un punto e mezzo. Nella direzione opposta la Campania e la Calabria hanno guadagnato quasi tre punti a testa. Prima di leggere questi spostamenti come cantieri aperti conviene tenere presente un avvertimento di Istat, che ha modificato i quesiti sulle barriere e dichiara il proprio indicatore di scuole accessibili non confrontabile con gli anni precedenti a partire dall'anno scolastico 2022-2023. Riguarda un'altra elaborazione della stessa rilevazione, ma cade proprio sugli anni in cui questa serie ha cambiato direzione.",
+   "h": "Cinque anni di guadagni, un anno che ne toglie più della metà",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il numeratore conta scuole, non studenti. Sapere che tre scuole su cento hanno una mappa a rilievo non dice se ce l'ha la scuola in cui un alunno cieco è iscritto, che è l'unica domanda a cui una famiglia tiene.\n\nLa risposta registra la presenza dell'ausilio, non il suo stato. Non dice se la mappa sia stata rifatta dopo un intervento edilizio, né se un percorso tattile ci arrivi. Quel secondo pezzo conta, perché il report nazionale di Istat considera solo le scuole che hanno la mappa e il percorso tattile insieme, e arriva intorno all'1% per l'anno scolastico 2023/2024 (dato nazionale Istat). È un conteggio diverso e più severo di quello di questa pagina, e non va messo accanto alla media semplice dei venti valori regionali come se la confermasse.\n\nResta fuori tutto ciò che serve a un alunno cieco per seguire una lezione, dai testi in braille agli ausili didattici. La serie misura un edificio, non una scuola.",
+   "h": "Conta le scuole, non gli alunni che ne hanno bisogno",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2023
+}

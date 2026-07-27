@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-26T20:07:01+00:00",
+ "branch": "claude/work-in-progress-branch-52h19r",
+ "commit": "7a042fc",
+ "detail": [
+  "universale: il calo in tutte e 20 era esteso anche all'ultimo anno, ma nel 2023-24 sono scese 15 regioni su 20. Ancorato al solo intero periodo",
+  "contextual: 'perso terreno' neutralizzato in 'sono ancora scese', nessun giudizio di merito su un indicatore senza migliore",
+  "esterno: fecondita 1,18 nazionale, 1,39 Trentino, 0,91 Sardegna verificate contro Istat, etichette figli per donna vs per mille corrette. reviewed_vintage 2024"
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-reviewer-20260726T200701",
+ "stage": "reviewer",
+ "summary": "dem:BIRTHRATE riletto end to end e firmato, corretto un universale falso sull'ultimo anno",
+ "trigger": "manuale"
+}

@@ -1,0 +1,36 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, Cittadini e ICT, anno 2025: l'accesso a internet delle famiglie per composizione e titolo di studio, il divario che una media regionale non mostra",
+   "url": "https://www.istat.it/comunicato-stampa/cittadini-e-ict-anno-2025/"
+  }
+ ],
+ "key": "429",
+ "lead": "In dieci anni la banda ultra larga è passata da quasi zero a poco più di un abbonamento ogni quattro residenti, e la mappa che ne esce non ricalca il divario Nord-Sud. La Campania sta davanti al Veneto, il Trentino Alto Adige dietro la Calabria.",
+ "level": "regione",
+ "reviewed_at": "2026-07-26",
+ "reviewed_vintage": 2023,
+ "sections": [
+  {
+   "body": "L'indicatore conta gli abbonamenti alle connessioni classificate come ultra larga e li divide per la popolazione residente. Il numeratore sono contratti, il denominatore sono persone, e le due grandezze non si sovrappongono, perché un abbonamento serve di solito un'intera casa. Un valore di 30 segnala trenta contratti ogni cento abitanti, non trenta residenti su cento collegati, e le persone che stanno dietro a quei contratti sono molte di più. A parità di case collegate, poi, una regione con famiglie mediamente più piccole conta più abbonamenti per abitante, e conviene ricordarlo leggendo le prime posizioni.",
+   "h": "Contratti veloci contati sugli abitanti",
+   "role": "definizione"
+  },
+  {
+   "body": "Le prime cinque stanno insieme e staccate dal resto. Liguria, Lazio, Lombardia, Toscana ed Emilia-Romagna occupano la testa, poi si apre il salto più largo della graduatoria, quasi due punti, e da lì la fila scende quasi senza gradini. Tra la sesta e la quindicesima i distacchi restano tutti sotto il punto, mentre la coda torna a spezzarsi, con Sicilia, Basilicata e Molise staccate di più di un punto dalla regione davanti. È in quella discesa che la geografia attesa si rompe, perché la Campania è decima, davanti a Veneto e Puglia, e il Trentino Alto Adige diciottesimo, dietro Calabria e Sicilia.\n\nConta perché il contratto veloce in casa è il presupposto del lavoro da remoto e dei servizi pubblici che si stanno spostando online. Anche la regione che guida resta sotto un abbonamento ogni tre residenti, e in fondo alla fila il Molise ne conta meno di uno ogni cinque.\n\nChe questa non sia la mappa della modernizzazione digitale lo dice un'altra serie dello stesso [tema su ricerca, innovazione e digitale](/tema/ricerca-innovazione-e-digitale). La [disponibilità di wi-fi pubblico nei Comuni](/indicatore/disponibilita-di-wi-fi-pubblico-nei-comuni/ter-427), ferma al 2022, mette i territori in un ordine che con questo non c'entra quasi nulla. La Basilicata è seconda e il Molise sesto, cioè le due regioni che qui chiudono la fila, mentre il Lazio, secondo per abbonamenti, sta terzultimo per wi-fi comunale.",
+   "h": "Le prime cinque, poi una discesa senza gradini",
+   "role": "quadro"
+  },
+  {
+   "body": "Nel 2013 non c'era quasi niente da misurare. Il valore più alto, quello della Liguria, stava sotto il mezzo abbonamento ogni cento residenti. La crescita si è poi concentrata in pochi anni. Il 2018 da solo ha aggiunto cinque punti alla media delle regioni, il 2020 e il 2021 più di quattro ciascuno, mentre gli ultimi due anni insieme ne hanno aggiunti circa tre. Tutte e venti sono salite anche nell'ultimo passaggio, ma l'ordine si è rimescolato parecchio: la Puglia era settima nel 2018 ed è quindicesima adesso, la Valle d'Aosta chiudeva quella graduatoria e oggi ne ha nove dietro. Dal 2018 la distanza in punti tra la prima e l'ultima si è allargata, in proporzione si è ristretta.\n\nQuanto sia stretto questo divario si capisce da una serie vicina. L'[incidenza della spesa delle imprese in ricerca e sviluppo](/indicatore/incidenza-della-spesa-delle-imprese-in-r-s/ter-93) ordina le regioni in un modo che somiglia a questo senza coincidere, e nel 2022 separava la prima dall'ultima di tredici volte, un abisso rispetto al rapporto che si legge qui. Le due serie si accompagnano, non si spiegano a vicenda, e su entrambe pesa la variabile che pesa su quasi tutto l'atlante, il reddito dell'area. A farle combaciare meno è il Piemonte, primo per spesa delle imprese in ricerca e nono per abbonamenti.",
+   "h": "Dieci anni partiti da zero, con la corsa che rallenta",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il numero conta contratti attivi, non copertura. Dice quanti abbonamenti sono stati sottoscritti, non dove la rete veloce arriva e dove no, né a quale velocità si navighi davvero una volta firmato il contratto. Sotto la media regionale resta poi un divario che questa graduatoria non può vedere, perché corre dentro le regioni e non tra loro. Secondo l'indagine Istat sulle famiglie, nel 2025 aveva un accesso a internet il 63,9% delle case abitate solo da persone di 65 anni e più e il 66,5% di quelle in cui il titolo di studio più alto è la licenza media, contro l'87,3% del dato nazionale. È un'altra grandezza, misurata sulle famiglie e non sugli abitanti, e va tenuta separata dalla media delle regioni. Nemmeno la connessione degli uffici pubblici entra in questo conto, visto che la [larga banda nelle amministrazioni comunali](/indicatore/grado-di-diffusione-della-larga-banda-nelle-amministrazioni-locali/ter-73) è una serie a parte e in tutte e venti supera il 96%.",
+   "h": "Un abbonamento non dice chi sta dietro allo schermo",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2023
+}

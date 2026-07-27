@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "bes:12SER008",
+ "lead": "Il dato BES sui posti-km del trasporto pubblico ricalca lo stesso quadro: 11.104 per abitante in Lombardia e 6.639 nel Lazio, contro i 768 del Molise e i 789 della Valle d'Aosta. La media delle regioni è di circa 3.281.",
+ "sections": [
+  {
+   "body": "Nel sistema BES è un indicatore di qualità dei servizi, e il suo divario di quattordici volte è tra i più ampi del welfare territoriale. Il trasporto pubblico è la spina dorsale della mobilità sostenibile, ma esiste davvero solo in poche regioni urbane. Il Sud paga un doppio prezzo, meno servizio e più dipendenza dall'auto. Una mobilità pulita è possibile senza un trasporto pubblico diffuso?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Coincide con l'indicatore territoriale sui posti-km e ne condivide i limiti, dato che misura l'offerta nei capoluoghi, non nelle aree interne. Non dice la puntualità, il comfort o la copertura reale del servizio.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2023
+}

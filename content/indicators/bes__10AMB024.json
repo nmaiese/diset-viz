@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "bes:10AMB024",
+ "lead": "Quanti rifiuti produce ciascun abitante è la radice del problema. Se ne producono 664 chili a testa in Emilia-Romagna e 650 in Valle d'Aosta, contro i 355 della Basilicata e i 387 del Molise. La media delle regioni è di circa 502 chili.",
+ "sections": [
+  {
+   "body": "Produrre più rifiuti va spesso insieme a più ricchezza, consumi e turismo, e infatti il Nord e le regioni turistiche stanno in alto. Ridurre i rifiuti alla fonte è l'obiettivo più difficile, dato che tocca modelli di consumo e imballaggi prima che la raccolta. È un indicatore descrittivo, senza un verso automatico, ma meno rifiuti prodotti è quasi sempre meglio. Un territorio più ricco è condannato a produrre più scarti?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Conta i chili di rifiuti urbani per abitante, non quelli industriali né la loro pericolosità. Risente del turismo, che gonfia il dato di alcune regioni attribuendo ai residenti anche i rifiuti dei visitatori.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2024
+}

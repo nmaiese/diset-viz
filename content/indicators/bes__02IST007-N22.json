@@ -1,0 +1,36 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, Rapporto sul benessere equo e sostenibile, capitolo Istruzione e formazione: definizione dell'indicatore (persone di 25-64 anni che hanno partecipato ad attività di istruzione e formazione nelle 4 settimane precedenti l'intervista), primo calo dopo la pandemia nel 2024 e partecipazione per titolo di studio",
+   "url": "https://www.istat.it/wp-content/uploads/2025/11/02-Istruzione-e-formazione.pdf"
+  }
+ ],
+ "key": "bes:02IST007-N22",
+ "lead": "Anche in Friuli-Venezia Giulia, la regione dove se ne fa di più, la formazione continua raggiunge meno di un adulto su sette in quattro settimane. Se ne fa meno proprio nelle regioni dove più adulti si sono fermati alla licenza media.",
+ "level": "regione",
+ "reviewed_at": "2026-07-26",
+ "reviewed_vintage": 2025,
+ "sections": [
+  {
+   "body": "L'indicatore conta le persone tra i 25 e i 64 anni che dichiarano di aver partecipato ad attività di istruzione o formazione nelle quattro settimane precedenti l'intervista, sul totale dei coetanei.\n\nUn valore di 11 vuol dire undici persone ogni cento in quella fascia d'età, non undici corsi, perché chi ne ha seguiti due conta una volta sola. La finestra di quattro settimane cambia il senso di tutto il resto. Non misura quanti adulti si formano in un anno, ma quanti lo stavano facendo nel mese dell'intervista.",
+   "h": "Le quattro settimane che decidono il numero",
+   "role": "definizione"
+  },
+  {
+   "body": "Il salto più largo della graduatoria 2025 isola la Sicilia in fondo, staccata di un punto pieno dalla Puglia. Il secondo cade dopo il sesto posto, e sopra ci sono Friuli-Venezia Giulia, Veneto, Umbria, Emilia-Romagna, Trentino Alto Adige e Sardegna. Non ci entra nessuna regione del Nord-ovest: la Lombardia resta appena sotto, Piemonte e Valle d'Aosta si fermano a dieci adulti ogni cento, dietro al Molise. Fra regioni così vicine la posizione vale poco, perché i valori vengono da un'indagine campionaria, la rilevazione Istat sulle forze di lavoro.\n\nMa sono numeri piccoli. La fascia 25-64 anni è quasi tutta la popolazione adulta in età da lavoro, e in un mese qualunque, perfino dove se ne fa di più, più di otto adulti su dieci non seguono nessun corso. Per chi ha finito la scuola vent'anni fa la formazione continua è la strada che resta per rimettersi in pari.\n\nDove la percorrono meno c'è anche altro. Quattro delle cinque regioni con la partecipazione più bassa sono anche fra le cinque con più [adulti fermi alla licenza media](/indicatore/livello-di-istruzione-della-popolazione-adulta/ter-104), nel 2024. Le due mappe si somigliano, il che da solo non spiega niente, perché dietro a entrambe c'è il livello economico dell'area che i dati non isolano. La Sardegna è l'eccezione, sesta qui e insieme fra le regioni dove oltre quattro adulti su dieci si sono fermati alla licenza media. Sulle singole persone, che una graduatoria regionale non raggiunge, il dato nazionale Istat per il 2024 dà una partecipazione del 22,3% fra chi ha un titolo terziario.\n\nIl [livello di istruzione dei ragazzi di 15-19 anni](/indicatore/livello-di-istruzione-della-popolazione-15-19-anni/ter-77) è invece quasi identico ovunque, sopra il 98% in diciannove regioni su venti, con il solo Molise sotto quella soglia, e lì la Sicilia precede il Friuli-Venezia Giulia. La scuola dell'obbligo ha appiattito la sua mappa. Quella degli adulti no.",
+   "h": "Le prime sei, e nessuna del Nord-ovest",
+   "role": "quadro"
+  },
+  {
+   "body": "Dal 2018 nessuna regione va nella direzione opposta e la media semplice dei valori regionali guadagna 2,7 punti in sette anni. Ma la salita non è stata regolare. Il 2020 ha riportato la media sotto il punto di partenza, il 2021 ha recuperato di colpo e il massimo della serie resta il 2023.\n\nIl 2024 ha tolto più di un punto e il 2025 ne ha restituito sei decimi, così quindici regioni su venti restano sotto il proprio valore del 2023, e il Lazio ha perso 3,6 punti dal massimo. Le quattro che hanno superato il proprio 2023 sono Abruzzo, Calabria, Campania e Sicilia, tutte nel Mezzogiorno, mentre le sei scese nell'ultimo anno stanno tutte nel Centro-Nord. Il recupero è arrivato dove il livello era già basso, ma la distanza tra la prima e l'ultima resta quattro decimi più larga del 2018.\n\nSul dato nazionale Istat ha letto quel calo come la prima diminuzione dopo la pandemia, più marcata fra i 25-54enni e fra chi ha un titolo di studio alto.",
+   "h": "Il massimo del 2023 è ancora là davanti",
+   "role": "dinamica"
+  },
+  {
+   "body": "La finestra di quattro settimane è il limite maggiore. Chi ha seguito un corso a gennaio e viene intervistato a ottobre risulta fuori, quindi il valore dice quanto la formazione è diffusa in un mese, non quanti adulti la fanno in un anno.\n\nPoi c'è quello che il numero non distingue. Un pomeriggio di aggiornamento obbligatorio e un corso serale lungo due anni pesano uguale, e non si vede chi ha pagato né con quale esito. Nemmeno il legame con il titolo di studio si può stringere qui, perché da un valore regionale non si risale alle persone. Che a formarsi siano gli stessi adulti già più istruiti resta fuori da questa serie. Gli altri indicatori del tema [istruzione e formazione](/tema/istruzione-e-formazione) misurano i pezzi che vengono prima.",
+   "h": "Un mese di corsi non è un anno di formazione",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

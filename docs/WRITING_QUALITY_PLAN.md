@@ -855,7 +855,7 @@ scritto accanto al numero.
 `master` e quello di questa branch.
 
 ```bash
-python3 scripts/prose_lint.py --summary --texts <indicator_texts.json di master>
+python3 scripts/prose_lint.py --summary --texts <content/indicators/ di master>
 python3 scripts/prose_lint.py --summary
 ```
 
@@ -1055,7 +1055,7 @@ degradato, e' rifiutato. Vanno toccati tutti e tre, piu' l'agente in
 "i sei stadi".
 
 **Il diario dedicato non va fatto.** La proposta parla di "un file di diario
-dedicato". `data/pipeline/runs.jsonl` e' l'unico diario che il cancello pretende
+dedicato". `data/pipeline/runs/` e' l'unico diario che il cancello pretende
 e che `pipeline_log` e `pipeline_dashboard` sanno leggere, e un secondo file
 sarebbe invisibile a tutti e tre. I contatori stanno benissimo dentro la riga
 esistente, che ha gia' un campo `detail` libero. Un diario che nessuno strumento
@@ -1301,7 +1301,7 @@ perimetro cosi' corto il cancello diventa una tautologia verde. Il problema vero
 era piu' a monte: con il solo diario una smentita finisce in un campo che
 `review_queue` non legge, quindi non torna a nessuno, ed e' esattamente il difetto
 che la stessa 3.3 nomina due paragrafi dopo a proposito di `analyst_notes.json`.
-Quindi il perimetro e' `(verifiche.csv, runs.jsonl)`: il registro delle verifiche
+Quindi il perimetro e' `(verifiche/, runs/)`: il registro delle verifiche
 e' uno stato che serve a un altro stadio, non un diario parallelo.
 
 **La scadenza e' un'impronta della prosa, non una data.** Una verifica e'

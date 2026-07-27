@@ -1,0 +1,15 @@
+{
+ "at": "2026-07-27T15:10:22+00:00",
+ "branch": "master",
+ "commit": "108c399",
+ "detail": [
+  "il cancello e' rosso: vintage"
+ ],
+ "gate": "blocked",
+ "outcome": "blocked",
+ "pr": "54",
+ "run_id": "legacy-writer-pr54",
+ "stage": "writer",
+ "summary": "PR #54 non fusa: il cancello e' rosso",
+ "trigger": "manuale"
+}

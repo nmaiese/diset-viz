@@ -10,13 +10,12 @@ Pure stdlib and side-effect free. Nothing here reads or writes the committed
 queues: every check takes its rows as an argument for exactly this reason.
 """
 
-import json
 import subprocess
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from scripts import pipeline_gate, verification_queue
+from scripts import indicator_store, pipeline_gate, verification_queue
 
 
 class BlastRadius(unittest.TestCase):
@@ -30,16 +29,33 @@ class BlastRadius(unittest.TestCase):
     def test_a_stage_that_edits_application_code_is_refused(self):
         check = pipeline_gate.check_blast_radius(
             "writer",
-            ["app/static/data/indicator_texts.json", "app/views.py"],
+            ["content/indicators/ter__920.json", "app/views.py"],
         )
         self.assertFalse(check.ok)
         self.assertIn("app/views.py", check.detail)
 
     def test_a_stage_inside_its_perimeter_passes(self):
         check = pipeline_gate.check_blast_radius(
-            "writer", ["app/static/data/indicator_texts.json"]
+            "writer", ["content/indicators/ter__920.json"]
         )
         self.assertTrue(check.ok, check.detail)
+
+    def test_a_directory_perimeter_does_not_leak_past_the_slash(self):
+        """Il perimetro a directory e' l'unico modo di autorizzare uno store a
+        un file per record senza elencarne trecento file, e la barra finale e'
+        cio' che gli impedisce di allargarsi da solo. Senza, il prefisso
+        `content/indicators` autorizzerebbe anche `content/indicators-vecchi`,
+        cioe' un percorso che nessuno ha mai concesso a nessuno stadio."""
+        check = pipeline_gate.check_blast_radius(
+            "writer", ["content/indicators-bozze/ter__920.json"]
+        )
+        self.assertFalse(check.ok)
+        self.assertTrue(
+            pipeline_gate.path_allowed(
+                "content/indicators/bes__10AMB004.json",
+                pipeline_gate.STAGE_PATHS["writer"],
+            )
+        )
 
     def test_the_perimeters_do_not_overlap_where_it_would_matter(self):
         """The writer and the hunter must not be able to touch each other's work.
@@ -262,17 +278,15 @@ class TheSignatureCheckReadsStateNotDiffLines(unittest.TestCase):
     """
 
     def _check_over(self, entries, keys):
+        import unittest.mock as mock
+
         original = pipeline_gate.changed_text_keys
-        real_read = Path(pipeline_gate.PROJECT_ROOT / pipeline_gate.INDICATOR_TEXTS).read_text
         pipeline_gate.changed_text_keys = lambda base=None, cwd=None: keys
         try:
-            import unittest.mock as mock
-
-            with mock.patch.object(Path, "read_text", lambda self, **kw: json.dumps(entries)):
+            with mock.patch.object(indicator_store, "load_all", lambda root=None: entries):
                 return pipeline_gate.check_reviewer_signature()
         finally:
             pipeline_gate.changed_text_keys = original
-            del real_read
 
     def test_a_same_day_correction_to_an_already_signed_article_passes(self):
         check = self._check_over(
@@ -485,9 +499,6 @@ class TheVerificationRegisterIsAppendOnly(unittest.TestCase):
     far dire no al cancello prima di fargli dire si'.
     """
 
-    HEADER = ("code;level;at;vintage;reviewed_at;prosa;controllate;confermate;"
-              "smentite;non_verificabili;esito;rilievi")
-
     def setUp(self):
         self._tmp = TemporaryDirectory()
         self.repo = Path(self._tmp.name)
@@ -495,8 +506,8 @@ class TheVerificationRegisterIsAppendOnly(unittest.TestCase):
         self._run("git", "init", "-q", "-b", "main")
         self._run("git", "config", "user.email", "t@example.com")
         self._run("git", "config", "user.name", "t")
-        (self.repo / "data" / "pipeline").mkdir(parents=True)
-        (self.repo / "app" / "static" / "data").mkdir(parents=True)
+        (self.repo / "data" / "pipeline" / "verifiche").mkdir(parents=True)
+        (self.repo / "content" / "indicators").mkdir(parents=True)
         self.entry = {
             "lead": "Un lead.", "level": "regione", "vintage": 2024,
             "reviewed_at": "2026-07-27", "reviewed_vintage": 2024, "fonti": [],
@@ -512,31 +523,40 @@ class TheVerificationRegisterIsAppendOnly(unittest.TestCase):
         return subprocess.run(args, cwd=self.repo, capture_output=True, text=True)
 
     def _write_texts(self, texts):
-        (self.repo / "app" / "static" / "data" / "indicator_texts.json").write_text(
-            json.dumps(texts, ensure_ascii=False), encoding="utf-8")
+        root = self.repo / "content" / "indicators"
+        for stale in root.glob("*.json"):
+            stale.unlink()
+        for key, entry in texts.items():
+            indicator_store.write(key, entry, root=root)
 
     def _write_register(self, rows):
-        (self.repo / "data" / "pipeline" / "verifiche.csv").write_text(
-            "\n".join([self.HEADER] + rows) + "\n", encoding="utf-8")
+        root = self.repo / "data" / "pipeline" / "verifiche"
+        for stale in root.glob("*.json"):
+            stale.unlink()
+        for row in rows:
+            verification_queue.write_verification(row, root=root)
 
     def _row(self, code="ter-611", level="regione", prosa=None, controllate="40",
              confermate="40", smentite="0", esito="pulito"):
-        return (f"{code};{level};2026-07-27;2024;2026-07-27;"
-                f"{prosa or self.fingerprint};{controllate};{confermate};{smentite};0;"
-                f"{esito};")
+        return {
+            "code": code, "level": level, "at": "2026-07-27", "vintage": "2024",
+            "reviewed_at": "2026-07-27", "prosa": prosa or self.fingerprint,
+            "controllate": controllate, "confermate": confermate,
+            "smentite": smentite, "non_verificabili": "0", "esito": esito,
+            "rilievi": "",
+        }
 
     def _check(self):
-        # `check_verifications` legge i testi dal repo vero per l'impronta, quindi
-        # va puntato al repo finto per la durata della prova.
-        original = verification_queue.TEXTS_PATH
+        # Il cancello legge lo store del repo vero per calcolare le impronte,
+        # quindi va puntato a quello finto per la durata della prova.
+        original = indicator_store.ROOT
         gate_root = pipeline_gate.PROJECT_ROOT
-        verification_queue.TEXTS_PATH = (
-            self.repo / "app" / "static" / "data" / "indicator_texts.json")
+        indicator_store.ROOT = self.repo / "content" / "indicators"
         pipeline_gate.PROJECT_ROOT = self.repo
         try:
             return pipeline_gate.check_verifications(base="HEAD", cwd=self.repo)
         finally:
-            verification_queue.TEXTS_PATH = original
+            indicator_store.ROOT = original
             pipeline_gate.PROJECT_ROOT = gate_root
 
     def test_an_unchanged_register_passes(self):
@@ -590,3 +610,87 @@ class TheVerificationRegisterIsAppendOnly(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TheBaseCheckStoppedPunishingAMovingMaster(unittest.TestCase):
+    """Il difetto piu' costoso che questa catena abbia avuto.
+
+    Bastava che `origin/master` non fosse un antenato di HEAD perche' lo stadio
+    leggesse `blocked`. Master pero' si muove di continuo, anche solo perche' un
+    altro stadio ha registrato l'esito di una run, quindi ogni pull request
+    aperta da piu' di qualche minuto diventava rossa senza che il suo lavoro
+    fosse cambiato. Peggio: il passo di merge che rifiutava una pull request
+    scriveva su master, e quella scrittura faceva diventare rosse le pull
+    request di tutti gli altri. Un rifiuto solo fermava la catena intera.
+
+    La severita' non serviva nemmeno: il diff si misura con i tre punti, che
+    confrontano contro la base comune e restano esatti quando master va avanti.
+    """
+
+    def setUp(self):
+        self._tmp = TemporaryDirectory()
+        self.repo = Path(self._tmp.name)
+        self.addCleanup(self._tmp.cleanup)
+        self._git("init", "-q", "-b", "master")
+        self._git("config", "user.email", "t@example.com")
+        self._git("config", "user.name", "t")
+        (self.repo / "content" / "indicators").mkdir(parents=True)
+        self._write("content/indicators/1.json", '{"key": "1", "lead": "base"}')
+        self._git("add", "-A")
+        self._git("commit", "-qm", "base")
+
+    def _git(self, *args):
+        return subprocess.run(("git",) + args, cwd=self.repo,
+                              capture_output=True, text=True)
+
+    def _write(self, rel, text):
+        path = self.repo / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text + "\n", encoding="utf-8")
+
+    def _diverge(self):
+        """Un branch che lavora, e master che intanto va avanti da solo."""
+        base = self._git("rev-parse", "HEAD").stdout.strip()
+        self._git("checkout", "-qb", "lavoro")
+        self._write("content/indicators/1.json", '{"key": "1", "lead": "riscritto"}')
+        self._git("commit", "-qam", "il mio lavoro")
+        self._git("checkout", "-q", base)
+        self._git("branch", "-qf", "master", base)
+        self._git("checkout", "-q", "master")
+        self._write("content/indicators/2.json", '{"key": "2", "lead": "un altro stadio"}')
+        self._git("add", "-A")
+        self._git("commit", "-qm", "un altro stadio ha fuso")
+        self._git("checkout", "-q", "lavoro")
+
+    def test_a_master_that_moved_ahead_is_not_a_red_verdict(self):
+        self._diverge()
+        check = pipeline_gate.check_base_is_usable(base="master", cwd=self.repo)
+        self.assertTrue(check.ok, check.detail)
+        self.assertIn("andata avanti", check.detail)
+
+    def test_and_the_diff_it_measures_is_still_only_this_branch(self):
+        """La ragione per cui ammorbidire non costa niente: i tre punti
+        confrontano contro la base comune, quindi il file che ha aggiunto
+        l'altro stadio non compare fra i miei."""
+        self._diverge()
+        root = pipeline_gate.PROJECT_ROOT
+        pipeline_gate.PROJECT_ROOT = self.repo
+        try:
+            paths = pipeline_gate.changed_paths(base="master", cwd=self.repo)
+            keys = pipeline_gate.changed_text_keys(base="master", cwd=self.repo)
+        finally:
+            pipeline_gate.PROJECT_ROOT = root
+        self.assertEqual(paths, ["content/indicators/1.json"])
+        self.assertEqual(keys, ["1"])
+
+    def test_no_common_ancestor_at_all_is_still_refused(self):
+        """Li' non c'e' davvero niente da misurare, e il verdetto sotto sarebbe
+        finzione: e' il caso che il controllo esiste per prendere."""
+        self._git("checkout", "-q", "--orphan", "altrove")
+        self._git("rm", "-rqf", ".")
+        self._write("altro.txt", "niente in comune")
+        self._git("add", "-A")
+        self._git("commit", "-qm", "orfano")
+        check = pipeline_gate.check_base_is_usable(base="master", cwd=self.repo)
+        self.assertFalse(check.ok)
+        self.assertIn("antenato in comune", check.detail)

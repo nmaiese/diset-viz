@@ -1,0 +1,28 @@
+{
+ "key": "105",
+ "lead": "In Trentino Alto Adige il turismo pesa oltre trenta volte più che in Molise, e questo dato misura quanto un territorio viva addosso a chi lo visita.",
+ "level": "regione",
+ "sections": [
+  {
+   "body": "Il tasso di turisticità mette le giornate di presenza negli esercizi ricettivi, quelle di italiani e stranieri insieme, in rapporto alla popolazione residente. Una giornata di presenza è una notte che un cliente trascorre in un albergo, un campeggio, un agriturismo o una struttura analoga. Il rapporto con gli abitanti trasforma un dato di volume in un dato di intensità, e dice quanto turismo attraversa un luogo rispetto a quante persone ci vivono. Così un valore intorno a cinquanta, come quello del Trentino Alto Adige, racconta che nell'arco dell'anno le strutture hanno registrato più di cinquanta pernottamenti per ogni residente, mentre dove il valore resta sotto i due il turismo ufficiale sfiora appena la vita di tutti i giorni.",
+   "h": "Giornate di presenza per ogni abitante",
+   "role": "definizione"
+  },
+  {
+   "body": "La graduatoria del 2024 non scende con gradualità. Tra la prima e la seconda regione si aprono più di ventidue giornate, tra la seconda e la terza quasi quindici, e solo da lì in poi i valori cominciano ad avvicinarsi. Trentino Alto Adige e Valle d'Aosta stanno in un campionato a parte, staccati da tutti prima ancora che cominci il confronto vero. È questa coppia a spiegare perché la media regionale, poco sopra le dieci giornate, resti molto più alta della mediana ferma a sette e mezza: metà delle regioni sta sotto quella soglia, e sono i due vertici alpini a tirare in alto il valore. Più in basso il gruppo si fa fitto, con Veneto e Toscana a fare da cerniera tra le grandi mete e la fascia larga dove la presenza ricettiva vale pochi giorni per abitante.",
+   "h": "Due regioni alpine in un campionato a parte",
+   "role": "quadro"
+  },
+  {
+   "body": "Dal 1981 nessuna regione ha camminato all'indietro, il tasso è cresciuto ovunque e la media è passata da poco meno di sei giornate a poco più di dieci. Ma la direzione comune tiene insieme passi lunghissimi e passi minimi. Il Trentino Alto Adige ha guadagnato oltre venticinque giornate per abitante in poco più di quarant'anni, quasi quanto valeva all'inizio, mentre il Molise si è mosso di appena quattro decimi. Il risultato è che la distanza tra il vertice e il fondo della graduatoria è all'incirca raddoppiata, la crescita è stata generale e la convergenza no. L'ultimo anno conferma il quadro senza scomporlo, con sedici regioni in aumento sul 2023 e quattro in calo, e uno spostamento della media di meno di tre decimi di giornata.",
+   "h": "Dal 1981 il vertice si è allontanato, non avvicinato",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il conteggio vede solo il turismo che passa dagli esercizi ricettivi ufficiali, quindi alberghi, campeggi, agriturismi e strutture registrate. Le seconde case, gli affitti brevi non dichiarati e le gite in giornata non lasciano traccia, e dove pesano molto il tasso sottostima il movimento reale. C'è poi l'effetto del denominatore, perché essendo un rapporto per abitante una regione poco popolosa con numeri assoluti modesti può risultare intensa, mentre la Lombardia, che pure muove grandi volumi, resta in fondo alla graduatoria perché quei volumi si dividono tra quasi dieci milioni di residenti. L'indicatore non distingue nemmeno la stagione, e un territorio con un picco estivo concentrato e uno con presenze distribuite tutto l'anno possono avere lo stesso valore. Va letto come misura di intensità, non come una classifica di merito, perché un tasso alto segnala che il turismo pesa sull'economia e sui servizi locali, non che una regione stia facendo meglio di un'altra.",
+   "h": "Cosa resta fuori dal conteggio",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2024
+}

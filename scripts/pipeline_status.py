@@ -290,6 +290,16 @@ BUILDERS = {
 }
 
 
+def queue_sizes(stages=None):
+    """`{stadio: quanti in attesa}`, con None dove la coda non si e' contata.
+
+    La forma piu' piccola dello stato, per chi deve solo decidere. La usano il
+    dispatcher, per scegliere lo stadio da lanciare, e `pipeline_log.silence`,
+    per non segnalare fermo uno stadio che tace perche' non ha niente da fare.
+    """
+    return {entry["stage"]: entry["waiting"] for entry in build_status(stages)["stages"]}
+
+
 def build_status(stages=None):
     wanted = stages or STAGE_ORDER
     report = [BUILDERS[name]() for name in wanted]

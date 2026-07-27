@@ -110,7 +110,7 @@ the merge step:
 ```bash
 python3 scripts/pipeline_gate.py --stage scout
 gh pr create --base master --title "..." --body "..."
-.venv/bin/python scripts/pipeline_merge.py --stage scout --pr <numero>
+.venv/bin/python scripts/pipeline_merge.py --stage scout --pr <numero> --run-id <run_id>
 ```
 
 This used to be `manual`, and it was the bottleneck that kept the whole chain
@@ -135,16 +135,26 @@ licence and the name you let through appear on a public page under this project'
 name, and no other stage revisits that choice. The chain closes you like all the
 others, which is exactly why the four checks are yours alone.
 
-If the gate reds out on `base`, another stage merged before you: read
-`docs/AGENT_CONTRACT.md`, step 3-bis, and do not correct your work on that
-verdict.
+The gate no longer reds out because master moved: the diff is measured against
+the common ancestor, so another stage merging while you work costs you nothing.
+The one conflict that can still reach you is two stages editing the same file,
+and `docs/AGENT_CONTRACT.md`, step 3-bis, is the only rule for it.
 
 ## Prima di chiudere
 
-Registra la run nel diario, anche se non hai prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4):
+Registra la run nel diario **prima di aprire la pull request**, anche se non hai
+prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4). L'ordine conta: la riga
+viaggia dentro la pull request, quindi va committata prima che esista.
 
 ```bash
-python3 scripts/pipeline_log.py --write --stage scout --outcome <esito> --summary "..."
+python3 scripts/pipeline_log.py --write --stage scout --outcome <esito> \
+    --summary "..." --detail "..." --queue-before <N> --queue-after <N>
 ```
 
-E' l'unica cosa che distingue "ho controllato e non c'era niente da fare" da "non sono partito".
+Stampa un `run_id`. **Prendilo e passalo al passo di merge**: e' l'unica cosa
+che lega questa riga a come finira'. Non scrivere `--pr`, che in quel momento
+non esiste ancora, ed e' esattamente il motivo per cui appaiare le due meta'
+della run sul numero della pull request non funzionava.
+
+Il caso che conta di piu' e' `nothing`: e' l'unica cosa che distingue "ho
+controllato e non c'era niente da fare" da "non sono partito".

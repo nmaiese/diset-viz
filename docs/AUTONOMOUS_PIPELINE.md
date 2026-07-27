@@ -27,8 +27,8 @@ un buco: un buco si vede.
   scout        hunter          promoter      curator       writer      reviewer    verificatore
   quali fonti  quali indic.    li integra    quale verso   l'articolo  lo rilegge  prova a smentirlo
      |             |               |             |             |           |             |
- source_      candidates.csv  layer est.   curation.csv  indicator_  reviewed_at  verifiche.csv
- candidates.csv               + manifest   + descrizioni  texts.json  + vintage   (impronta prosa)
+ source_      candidates.csv  layer est.   curation.csv  content/    reviewed_at  verifiche/
+ candidates.csv               + manifest   + descrizioni  indicators/ + vintage   (impronta prosa)
      |             |               |             |             |           |             |
   checks        checks          checks        checks         auto        auto        checks
 ```
@@ -73,12 +73,85 @@ quindi nessuno riesce a distinguere "sono fermo perche' ho finito" da "sono ferm
 perche' e' bloccato lo stadio sopra di me", che sono situazioni opposte e si
 somigliano moltissimo. Ogni agente lo lancia per primo.
 
+## Il dispatcher: chi decide chi gira, e uno per volta
+
+```bash
+python3 scripts/pipeline_dispatch.py --json --check-open-prs
+```
+
+Gli stadi non hanno piu' un giorno della settimana. Una sola Routine gira a
+battito, legge tutte le code e lancia **un solo stadio**, il primo con lavoro in
+ordine di catena. Prima erano sei Routine con sei cron, e quella forma aveva due
+difetti che si somigliavano poco.
+
+**Le dipendenze sono di dato, la schedulazione era di calendario.** Il curatore
+girava il giovedi': se il promotore aveva prodotto il venerdi' prima aspettava
+sei giorni, se non aveva prodotto niente girava a vuoto e apriva una pull
+request per dirlo. Dalla fonte alla pagina passavano fino a tre settimane, e
+ogni passaggio era un tiro di dado sul fatto che a monte fosse successo
+qualcosa.
+
+**Nessuno aspettava nessuno.** Due stadi potevano partire insieme, dalla stessa
+base, e scrivere negli stessi registri. Il conflitto era la norma al punto che il
+contratto degli agenti aveva una sezione dedicata a risolverlo a mano.
+
+Un tick, uno stadio: la concorrenza non si gestisce, non c'e'. Non serve un
+lock, non serve un lease, e le sezioni del contratto che spiegavano come
+convivere con un altro stadio sono sparite invece di essere state riscritte.
+
+Il dispatcher rifiuta anche di lanciare quando una pull request della catena e'
+ancora aperta, perche' quella e' una run ancora in corso. Se non riesce a
+chiederlo a GitHub lo dichiara invece di far finta che non ci sia nessuna pull
+request: un controllo che passa perche' non ha potuto girare e' peggio di
+nessun controllo, ed e' lo stesso principio del cancello.
+
+Non lancia lui l'agente, e non potrebbe: un agente e' una sessione Claude Code,
+il dispatcher e' stdlib. Dice **quale** lanciare, con il suo `run_id` gia'
+coniato, e il prompt della Routine fa il resto. La decisione resta cosi'
+deterministica e verificabile da un test, l'esecuzione no.
+
+Scrive un tick nel diario a ogni giro, anche quando non lancia niente, e quella
+riga e' l'unica cosa che distingue "nessuno stadio aveva lavoro" da "non e'
+partito niente". Prima l'attesa era scritta in `pipeline_log.WATCH_GROUPS`, che
+ricopiava il cron delle Routine cloud: una promessa che nessuno poteva
+verificare, e che sarebbe andata fuori sincrono alla prima modifica della
+schedulazione.
+
+## Gli store: perche' i conflitti non esistono piu'
+
+Tre registri della catena erano file unici a cui ogni stadio appendeva **in
+fondo**. Due stadi che girano vicini scrivono nello stesso punto, quindi git
+chiama conflitto quella che e' solo la somma di due righe che non si
+contraddicono. Adesso sono directory, un file per record:
+
+| store | un file per | scritto da |
+| --- | --- | --- |
+| `content/indicators/` | articolo | scrittore, revisore |
+| `data/pipeline/runs/` | run | tutti |
+| `data/pipeline/verifiche/` | verifica | verificatore |
+
+Non e' una riduzione della probabilita' di conflitto, e' la sua rimozione: due
+stadi che lavorano su cose diverse non toccano lo stesso percorso, quindi non
+c'e' niente da fondere. Resta contendibile solo la modifica **allo stesso**
+articolo, che e' l'unico caso in cui un conflitto significa davvero qualcosa e
+merita di essere letto da qualcuno.
+
+Ne vengono due cose che non erano l'obiettivo e valgono quanto l'obiettivo. Il
+diff di una run del revisore adesso e' leggibile, perche' dice di quali articoli
+parla invece di mostrare hunk dentro mezzo megabyte di JSON. E
+`git log content/indicators/ter__920.json` e' la storia editoriale di quella
+pagina, che prima non esisteva.
+
+Il perimetro del cancello capisce le directory: una voce di `STAGE_PATHS` che
+finisce con una barra e' un prefisso. La barra e' ancorata di proposito, cosi'
+`content/indicators` non autorizza `content/indicators-bozze`.
+
 ## Il verificatore, e perche' non ripara niente
 
-`data/pipeline/verifiche.csv` e' tutto quello che produce: una riga per articolo,
+`data/pipeline/verifiche/` e' tutto quello che produce: un file per verifica,
 con i quattro contatori e l'impronta della prosa che ha letto.
 
-**Non ha `indicator_texts.json` nel perimetro**, e l'assenza e' la definizione
+**Non ha `content/indicators/` nel perimetro**, e l'assenza e' la definizione
 dello stadio piu' che il suo prompt. Uno stadio che trova e ripara i propri
 rilievi corregge i propri compiti, che e' esattamente il difetto che esiste per
 prendere un livello sopra. Quindi una smentita torna al revisore, come il segnale
@@ -118,7 +191,7 @@ python3 scripts/pipeline_log.py               # che cosa hanno fatto gli agenti
 python3 scripts/pipeline_dashboard.py --open  # tutto in una pagina, nel browser
 ```
 
-Il **diario** (`data/pipeline/runs.jsonl`) e' la parte che mancava. Prima l'unico
+Il **diario** (`data/pipeline/runs/`) e' la parte che mancava. Prima l'unico
 segno che una run fosse avvenuta era il commit che produceva: una run che non
 produce niente, perche' la coda e' vuota o perche' il cancello l'ha bloccata,
 non lasciava assolutamente nulla. Il che significa che **una Routine che gira a
@@ -127,10 +200,20 @@ esattamente cosi' che lo scrittore ha lavorato per settimane su un file morto.
 
 Ora ogni agente ci scrive una riga a fine run, sempre, con l'esito preso da un
 vocabolario corto (`merged`, `pr-open`, `blocked`, `nothing`, `stopped`,
-`error`), che cosa ha deciso e che cosa ha detto il cancello. Il file e'
-committato, quindi la storia sopravvive alla sessione, ed e' JSON per riga,
-quindi due run non si corrompono a vicenda. Sta nel perimetro di **tutti** gli
-stadi: senza, meta' delle run non lo raggiungerebbe.
+`error`), che cosa ha deciso e che cosa ha detto il cancello. E' committato,
+quindi la storia sopravvive alla sessione, ed e' un file per run, quindi due run
+concorrenti non si contendono nessun percorso. Sta nel perimetro di **tutti**
+gli stadi: senza, meta' delle run non lo raggiungerebbe.
+
+Ogni riga porta un **`run_id`**, ed e' quello che risponde alla domanda "chi ha
+fatto cosa". Una run lascia due righe, la propria dentro la pull request e
+quella di esito che il passo di merge scrive su master, e prima si univano su
+`(stadio, pr)`. Non poteva funzionare: la riga dell'agente viaggia dentro la
+pull request, quindi va committata **prima** che la pull request esista, quindi
+non ne puo' portare il numero. Su trenta run reali diciannove non lo avevano, e
+il diario dichiarava ventuno run in attesa mentre le pull request aperte erano
+zero. Il `run_id` lo conia chi scrive per primo e non dipende da niente che
+succeda dopo.
 
 Il **cruscotto** e' una pagina HTML autonoma che mette insieme lo stato delle
 code, il diario, i commit che la catena ha prodotto (riconosciuti dai file che
@@ -296,21 +379,35 @@ scritto in `analyst_notes.json`, un file che l'app non legge piu'. Girava, non
 falliva, e non arrivava in nessuna pagina. Un prompt che ricopia una regola va
 fuori sincrono senza che nessuno se ne accorga, un prompt che punta a un file no.
 
-Cadenza sfalsata di proposito: ogni stadio ha senso solo dopo che quello a monte
-ha prodotto qualcosa, e il ritardo e' anche la finestra in cui un umano puo'
-ancora intervenire su un `checks`.
+**La Routine adesso e' una sola**, ed e' quella del dispatcher: gli stadi non
+hanno piu' un cron proprio. Il prompt lancia
+`scripts/pipeline_dispatch.py --json --check-open-prs`, legge quale stadio ha
+detto, e invoca quell'agente con il `run_id` che il dispatcher ha coniato.
+
+Il vantaggio non e' solo la concorrenza. Sei cron erano anche sei promesse
+ricopiate in `pipeline_log.WATCH_GROUPS`, che nessuno poteva verificare da
+dentro il repo: se cambiava la schedulazione, quella tabella andava fuori
+sincrono in silenzio. Con un battito solo, quello che va sorvegliato e' un
+battito solo, e il tick lo registra invece di dichiararlo.
 
 ## Quando qualcosa va storto
 
 ```bash
 python3 scripts/pipeline_status.py          # dove si e' fermata
+python3 scripts/pipeline_dispatch.py        # chi dovrebbe girare adesso
 python3 scripts/pipeline_gate.py --stage <stadio> --json    # perche' e' bloccata
 ```
 
 Sintomi ricorrenti e cosa significano davvero:
 
+- **La catena non fa piu' niente.** Guarda per prima cosa il tick del
+  dispatcher (`pipeline_log.py --stage dispatch`). Se non ne registra da giorni
+  il problema e' la Routine, non gli stadi: nessuno sta assegnando il lavoro.
+- **Il dispatcher gira e non lancia mai niente.** Ha trovato una pull request
+  della catena sempre aperta. Una run che non si chiude blocca tutte le altre,
+  di proposito: guarda perche' quella non e' fusa.
 - **Uno stadio non apre PR da settimane.** Guarda `pipeline_status`: se la sua
-  coda e' a zero il problema e' a monte, non in lui.
+  coda e' a zero non e' fermo, e' `idle`, e il diario lo distingue.
 - **Il cancello blocca su `blast-radius`.** L'agente ha toccato un file fuori
   perimetro. Non allargare il perimetro: quasi sempre significa che ha provato a
   risolvere in codice un problema che andava riportato.

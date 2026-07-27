@@ -43,21 +43,21 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts import discovery  # noqa: E402
+from scripts import discovery, indicator_store  # noqa: E402
 
 MANIFEST_PATH = PROJECT_ROOT / "app" / "static" / "data" / "external_indicator_manifest.csv"
-NOTES_PATH = PROJECT_ROOT / "app" / "static" / "data" / "indicator_texts.json"
 
 
 def read_manifest(path=None):
     return discovery.read_semicolon(path if path else MANIFEST_PATH)
 
 
-def read_notes(path=None):
-    path = Path(path) if path else NOTES_PATH
-    if not path.exists():
+def read_notes(root=None):
+    """Gli articoli scritti. `root` e' una directory di store, non un file."""
+    try:
+        return indicator_store.load_all(root)
+    except indicator_store.StoreError:
         return {}
-    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def integrated_targets(manifest_rows):
@@ -163,10 +163,10 @@ def manifest_year_max(manifest_rows):
     return out
 
 
-def build_worklist(manifest_path=None, notes_path=None):
+def build_worklist(manifest_path=None, notes_root=None):
     manifest_rows = read_manifest(manifest_path)
     year_of = manifest_year_max(manifest_rows)
-    return pending(manifest_rows, read_notes(notes_path), year_of.get)
+    return pending(manifest_rows, read_notes(notes_root), year_of.get)
 
 
 def main():

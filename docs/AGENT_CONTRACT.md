@@ -23,6 +23,16 @@ e si somigliano molto.
 
 Poi leggi la coda del tuo stadio, che e' quella che decide il lavoro.
 
+**Non decidi tu quando girare.** Chi ti ha lanciato e' il dispatcher
+(`scripts/pipeline_dispatch.py`), che gira a battito, guarda tutte le code e
+lancia **un solo stadio per volta**. E' l'unica ragione per cui non ti trovi
+mai un altro stadio addosso, quindi non lanciare mai un altro agente e non
+"portarti avanti" su uno stadio che non e' il tuo: e' esattamente la
+concorrenza che il dispatcher esiste per togliere.
+
+Se il dispatcher ti ha passato un `run_id`, usalo. Se non ce l'hai, lo conia
+`pipeline_log` al passo 4.
+
 ## 2. Lavorare: una cosa per volta, sempre motivata
 
 - **Un blocco ragionevole per run.** Da tre a otto unita' di lavoro, non una e
@@ -54,8 +64,13 @@ decide.
 
 ```bash
 gh pr create --title "..." --body "..."
-.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero>
+.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero> --run-id <il tuo run_id>
 ```
+
+**Il `--run-id` non e' facoltativo in pratica.** E' l'unica cosa che lega la
+riga che hai scritto tu, dentro la pull request, alla riga di esito che questo
+passo scrivera' su master. Senza, le due restano due run separate nel diario, e
+la domanda "che cosa ha fatto e come e' finita" torna a non avere risposta.
 
 **L'interprete e' quello del venv, e non e' un dettaglio.** Il passo di merge
 rilancia il cancello, e il cancello per verificare il vintage deve importare
@@ -97,41 +112,39 @@ spiega perche' ti sei fermato.
 
 ## 3-bis. Se un altro stadio ha fuso prima di te
 
-Succede, e con Routine giornaliere succede spesso. Non e' un guasto ed e' l'unico
-caso in cui il cancello ti accusa di una cosa che non hai fatto. Riconoscilo dal
-verdetto:
+Prima questa sezione era lunga il doppio e spiegava come risolvere a mano tre
+conflitti diversi. Quasi tutta e' sparita, perche' quei conflitti non esistono
+piu': **ogni registro della catena e' uno store a un file per record**, e due
+stadi che lavorano su cose diverse non toccano mai lo stesso percorso.
+
+| store | un file per |
+| --- | --- |
+| `content/indicators/` | articolo |
+| `data/pipeline/runs/` | run |
+| `data/pipeline/verifiche/` | verifica |
+
+Erano tre file unici a cui tutti appendevano in coda, quindi due run vicine
+collidevano **sempre**, e la sezione che leggevi qui era una pagina di prosa per
+rimediare a un difetto di formato.
+
+**Un master che va avanti non ti riguarda piu'.** Il cancello non boccia piu'
+un branch la cui base ha fatto altri commit: il diff si misura con i tre punti
+(`base...HEAD`), che confrontano contro la base comune e restano esatti. Il
+verdetto lo dice e basta:
 
 ```
-[NO ] base: la base 'origin/master' non e' un antenato di HEAD
+[ok ] base: origin/master e' andata avanti senza questo branch
 ```
 
-Quando c'e' quella riga, **tutte le righe rosse sotto sono finzione**: il diff
-misurato non e' il tuo lavoro, e' il tuo lavoro piu' tutto quello che master ha
-fatto senza di te. Il verificatore in particolare si vede accusare di aver
-cancellato righe di `verifiche.csv` che non ha mai avuto davanti. Non correggere
-niente sulla scorta di quel verdetto: e' l'errore che il verdetto stesso ti dice
-di non fare.
+Era il difetto piu' costoso della catena. Ogni scrittura su master faceva
+diventare rosse tutte le pull request aperte, il passo di merge scrive su master
+anche quando **rifiuta**, quindi un rifiuto solo bastava a fermare tutti gli
+altri stadi con un'accusa che non riguardava il loro lavoro.
 
-Si esce in tre comandi, e sono sempre gli stessi tre:
-
-```bash
-git fetch origin master
-git merge origin/master        # risolvi, vedi sotto
-python3 scripts/pipeline_gate.py --stage <stadio>
-```
-
-**I due registri in coda si risolvono tenendo tutte e due le parti**, sempre, e
-senza pensarci: `data/pipeline/runs.jsonl` e `data/pipeline/verifiche.csv`. Sono
-file a cui si aggiunge in fondo, quindi due stadi che girano vicini scrivono
-nello stesso punto e git chiama conflitto quello che e' solo la somma di due
-righe. Nessuna delle due e' sbagliata e nessuna sostituisce l'altra: **scegliere
-e' l'unico errore possibile**, e su `verifiche.csv` e' anche una violazione del
-tuo stesso cancello, che il registro lo pretende append-only.
-
-`app/static/data/indicator_texts.json` e' un caso diverso e riguarda solo
-scrittore e revisore. Su articoli diversi git fonde da solo e non vedi niente.
-Sullo **stesso** articolo guarda il `vintage` delle due versioni, perche' decide
-tutto e le due situazioni non si somigliano affatto.
+Resta un solo caso che devi saper leggere, ed e' l'unico che significhi
+qualcosa: **due stadi che hanno modificato lo stesso articolo**. Non lo puo'
+risolvere una regola meccanica, quindi la regola sta qui sotto ed e' l'unico
+controllo che esiste.
 
 **`vintage` diverso: vince quello piu' alto, sempre.** Vuol dire che lo scrittore
 ha aggiornato l'articolo su un anno nuovo mentre il revisore firmava quello
@@ -158,9 +171,9 @@ controlla che il `vintage` non superi i dati e che una revisione firmi qualcosa,
 non che tu abbia tenuto il lato giusto. Questa regola e' l'unico controllo che
 esiste.
 
-Se il conflitto non e' in nessuno di questi file, non improvvisare: lascia il
-branch committato, scrivi la riga di diario con esito `stopped` e di' quale file
-era. Fermarsi e' un esito legittimo, indovinare no.
+Se il conflitto non e' su un articolo, non improvvisare: lascia il branch
+committato, scrivi la riga di diario con esito `stopped` e di' quale file era.
+Fermarsi e' un esito legittimo, indovinare no.
 
 ## 4. Registrare la run nel diario, sempre
 
@@ -171,8 +184,14 @@ python3 scripts/pipeline_log.py --write \
     --stage <stadio> --outcome <merged|pr-open|blocked|nothing|stopped|error> \
     --summary "una riga: che cosa hai fatto" \
     --detail "una riga per decisione, con i numeri veri" \
-    --gate <il campo merge del verdetto> --pr <numero, se l'hai aperta>
+    --gate <il campo merge del verdetto> \
+    --queue-before <quanto c'era> --queue-after <quanto resta>
 ```
+
+Stampa un `run_id`. **Prendilo**: e' quello che passi al passo di merge, ed e'
+l'unica cosa che lega questa riga a come andra' a finire. Non scrivere `--pr`:
+quando scrivi la riga la pull request non esiste ancora, ed e' proprio per
+questo che appaiare le due meta' sul numero non funzionava.
 
 Il caso che conta di piu' e' `nothing`. Una Routine che gira e non produce
 niente ha lo stesso aspetto di una Routine che non e' mai partita, ed e'
@@ -199,14 +218,13 @@ rifiutano, la tua riga resta su un branch che non si fonde mai, e **da master no
 si vede affatto**. La run dello scout del 26 luglio esiste, dice `blocked`, e
 vive su `automation/scout-2026-07-26` dove nessuno strumento la legge.
 
-Il diario (`data/pipeline/runs.jsonl`) e' nel perimetro di ogni stadio, quindi
-la riga viaggia insieme al tuo lavoro. Committala con il resto. Se ti sei
+Il diario (`data/pipeline/runs/`) e' nel perimetro di ogni stadio, quindi la
+tua riga viaggia insieme al tuo lavoro. Committala con il resto. Se ti sei
 fermato o il cancello ti ha bloccato, scrivi comunque la riga e committala sul
 branch: sono le run che serve di piu' poter leggere.
 
-Se git segnala un conflitto su `runs.jsonl`, tieni tutte e due le righe: e' il
-passo 3-bis, che vale identico per `verifiche.csv` e spiega anche il verdetto
-rosso che vedrai prima.
+Il diario non puo' andare in conflitto. Ogni run scrive il proprio file, quindi
+non c'e' un punto condiviso su cui due stadi possano scrivere insieme.
 
 Chi legge, legge cosi':
 
@@ -231,13 +249,18 @@ conta. Qui per comodita':
 | `hunter` | `data/discovery/candidates.csv` |
 | `promoter` | la coda piu' il layer esterno e il manifest |
 | `curator` | `data/discovery/curation.csv`, layer esterno, manifest, descrizioni curate |
-| `writer` | `app/static/data/indicator_texts.json` |
-| `reviewer` | `app/static/data/indicator_texts.json` |
-| `verificatore` | `data/pipeline/verifiche.csv`, **e non i testi** |
+| `writer` | `content/indicators/` |
+| `reviewer` | `content/indicators/` |
+| `verificatore` | `data/pipeline/verifiche/`, **e non i testi** |
 
-Ogni stadio puo' inoltre scrivere `data/pipeline/runs.jsonl`, il diario. Sono due
-file, non uno: un prompt che ti dice "il tuo perimetro e' un file solo" sta
-riassumendo male, e il diario va committato con il resto.
+Ogni stadio puo' inoltre scrivere `data/pipeline/runs/`, il diario, e va
+committato con il resto: un prompt che ti dice "il tuo perimetro e' una cosa
+sola" sta riassumendo male.
+
+Le voci che finiscono con una barra sono directory, e il perimetro le tratta
+come prefissi. La barra e' quello che gli impedisce di allargarsi: dentro
+`content/indicators/` puoi scrivere qualunque articolo, ma
+`content/indicators-bozze/` e' fuori.
 
 Tutto il resto e' fuori perimetro e fa fallire il cancello, compreso il codice
 dell'app, i test e i documenti. Se ti accorgi che serve una modifica al codice,

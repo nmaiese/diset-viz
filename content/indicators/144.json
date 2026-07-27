@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "144",
+ "lead": "Questo indicatore mostra numeri difficili da confrontare tra loro. La presa in carico degli anziani in assistenza domiciliare integrata risulta al 3,8% in Veneto, ma sotto lo 0,7% in tutte le altre regioni e vicina allo zero in Friuli-Venezia Giulia e Basilicata. La media delle regioni, 0,4%, è schiacciata da pochissimi valori alti.",
+ "sections": [
+  {
+   "body": "Distanze così estreme, con una regione oltre venti volte le altre, segnalano più una diversa contabilità del servizio che un divario reale nella cura. Regioni diverse classificano e registrano l'assistenza domiciliare in modi non omogenei, e questo rende il confronto fragile. Il dato va quindi letto come indizio, non come classifica: dice che l'assistenza integrata a domicilio è misurata in modo disomogeneo, prima ancora che erogata in modo diseguale. Stiamo confrontando servizi o modi di contarli?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "I criteri con cui le regioni registrano l'assistenza domiciliare integrata non sono uniformi, quindi i confronti diretti possono ingannare. Il dato non dice nulla sull'intensità delle cure, sulle ore erogate o sulla qualità dell'assistenza ricevuta da ciascun anziano.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2022
+}

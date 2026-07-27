@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-26T19:27:18+00:00",
+ "branch": "claude/work-in-progress-branch-52h19r",
+ "commit": "d1ae512",
+ "detail": [
+  "Storia nei blocchi non in cima/fondo: mediana +0,75 contro media negativa, gradino piu ampio 2,10 punti tra Sardegna e Puglia, Sardegna e Abruzzo controgeografia",
+  "Dinamica 11 su 8 giu 1 ferma, media -0,32 (2015) a -0,18 (2024), Valle d'Aosta +2,40 Lazio -1,60 controcorrente",
+  "Fonte comparativa verificata: Istat Migrazioni interne 2023-2024, Mezzogiorno -116 mila verso il Centro-Nord. vintage 2024"
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-writer-20260726T192718",
+ "stage": "writer",
+ "summary": "Articolo di dem:NMIGRATEIN scritto, 4 sezioni, guard drift/soglia verde",
+ "trigger": "manuale"
+}

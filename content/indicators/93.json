@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "93",
+ "lead": "Guardando la sola ricerca delle imprese, il divario si allarga ancora. La spesa privata in R&S rispetto al PIL va dall'1,6% del Piemonte allo 0,12% della Calabria, oltre tredici volte. La media delle regioni è dello 0,6%. Il Sud resta ai margini della ricerca privata.",
+ "sections": [
+  {
+   "body": "La ricerca privata è la più concentrata di tutte, dato che segue le grandi imprese manifatturiere e i loro centri, quasi tutti al Nord. Dove il tessuto è fatto di piccole aziende, la ricerca interna è rara. È cresciuta molto nei decenni, ma quasi solo dove era già presente, allargando ancora la distanza tra i territori. Un'economia senza grandi imprese può fare ricerca?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Misura la spesa dichiarata delle imprese in R&S sul PIL, non l'innovazione informale né quella acquistata dall'esterno. Non coglie la ricerca delle piccole imprese, spesso non contabilizzata come tale.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2022
+}

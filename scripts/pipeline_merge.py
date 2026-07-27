@@ -266,7 +266,8 @@ def merge(pr, runner=_run, cwd=None, slug=None, log=print):
     return True, detail
 
 
-def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts=3):
+def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts=3,
+                   run_id=None):
     """Scrive su master la riga di diario con l'esito vero, e la spinge.
 
     Esiste perche' il diario non poteva quasi mai dire come e' finita, e il modo
@@ -293,9 +294,17 @@ def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts
     nell'albero dell'agente, che a questo punto e' su un branch appena cancellato
     dal remoto e non va toccato. Se il push perde una corsa contro un altro
     stadio si ricomincia da capo: si rilegge `origin/master`, che nel frattempo
-    porta la riga dell'altro, e la nostra le va dietro. Su un registro in coda un
-    ritentativo e' automaticamente corretto, ed e' la stessa ragione per cui il
-    passo 3-bis del contratto dice di tenere entrambe le righe.
+    porta la riga dell'altro, e la nostra le va dietro.
+
+    Il ritentativo adesso e' anche piu' raro. Con un file per run le due righe
+    non finiscono nello stesso file, quindi due passi di merge concorrenti non
+    si contendono niente e il push perde la corsa solo per il normale
+    non-fast-forward, non per un conflitto di contenuto.
+
+    Il `run_id` arriva da chi ha aperto la pull request, ed e' l'unica cosa che
+    lega questa riga alla riga dell'agente: quando l'agente ha scritto la sua,
+    il numero della pull request non esisteva ancora, quindi appaiarle su
+    quello non funzionava e per meta' delle run non funzionava affatto.
     """
     import shutil
     import tempfile
@@ -328,9 +337,15 @@ def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts
                 stage, outcome, summary,
                 detail=[result["detail"]] if result.get("detail") else [],
                 gate=result.get("gate"), pr=pr, commit=tip, branch="master",
+                run_id=run_id, trigger=result.get("trigger"),
             )
-            pipeline_log.append(entry, path=Path(tmp) / "data" / "pipeline" / "runs.jsonl")
-            runner(["git", "add", "data/pipeline/runs.jsonl"], cwd=tmp)
+            # `.esito` e non un nome nuovo: le due meta' della run condividono
+            # il `run_id`, e il suffisso e' cio' che permette loro di stare in
+            # due file senza contendersi un percorso.
+            pipeline_log.append(
+                entry, path=Path(tmp) / "data" / "pipeline" / "runs", suffix=".esito"
+            )
+            runner(["git", "add", "data/pipeline/runs"], cwd=tmp)
             code, out = runner(
                 ["git", "commit", "-m", f"Diario: {summary}"], cwd=tmp
             )
@@ -354,12 +369,13 @@ def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts
     # Va detto forte comunque: da qui in poi master non sa come e' finita.
     log(f"  DIARIO NON SCRITTO dopo {attempts} tentativi. "
         f"Registrala a mano: pipeline_log.py --write --stage {stage} "
-        f"--outcome {outcome} --pr {pr}")
+        f"--outcome {outcome} --pr {pr}"
+        + (f" --run-id {run_id}" if run_id else ""))
     return False
 
 
 def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
-           dry_run=False, log=print, skip_tests=False, journal=True):
+           dry_run=False, log=print, skip_tests=False, journal=True, run_id=None):
     """Run the gate, obey it, and merge only if the gate and the checks agree.
 
     Returns the dict the caller should turn into a journal row, so that a run
@@ -377,7 +393,8 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
         riga che l'agente ha gia' committato dentro la PR la descrive bene.
         """
         if journal and not dry_run and result["outcome"] != "pr-open":
-            record_landing(stage, pr, result, runner=runner, cwd=cwd, log=log)
+            record_landing(stage, pr, result, runner=runner, cwd=cwd, log=log,
+                           run_id=run_id)
         return result
 
     if mode == "blocked":
@@ -423,11 +440,15 @@ def main():
                         help="non rilanciare la suite dentro il cancello (solo per un giro a vuoto)")
     parser.add_argument("--no-journal", action="store_true",
                         help="non scrivere la riga di esito su master (solo per prove)")
+    parser.add_argument("--run-id",
+                        help="l'identita' della run, quella che pipeline_log ha stampato. "
+                             "Senza, la riga di esito resta orfana e il diario non sa "
+                             "a quale run appartiene")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
     result = decide(args.stage, args.pr, dry_run=args.dry_run, skip_tests=args.skip_tests,
-                    journal=not args.no_journal)
+                    journal=not args.no_journal, run_id=args.run_id)
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result["merged"] else 1

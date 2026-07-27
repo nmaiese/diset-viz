@@ -1,0 +1,28 @@
+{
+ "key": "12",
+ "lead": "Il tasso di disoccupazione conta chi vorrebbe lavorare e non ci riesce, ed è sceso in tutte e venti le regioni dal 2018, di più dove pesava di più. Ma la mappa non si è riscritta.",
+ "level": "regione",
+ "sections": [
+  {
+   "body": "Il tasso conta le persone dai quindici anni in su che un lavoro lo cercano davvero, disponibili e attive nella ricerca, e le mette in rapporto alle forze di lavoro, cioè a chi un impiego ce l'ha sommato a chi lo sta cercando. Un valore di sei vuol dire che sei persone su cento, tra quelle attive, cercano e non trovano. Il punto delicato è il denominatore: chi ha smesso di cercare non compare qui come disoccupato, esce dalle forze di lavoro e viene contato come inattivo. In pratica il tasso misura la pressione del mercato dal lato di chi vorrebbe entrarci o restarci, e la stessa cifra può nascere da situazioni diverse.",
+   "h": "Chi entra nel conto dei disoccupati",
+   "role": "definizione"
+  },
+  {
+   "body": "Nel 2025 la distribuzione non scende per gradi, si spezza su un gradino. Quindici regioni non arrivano al 6,6 per cento e si distinguono tra loro per pochi decimali, poi la graduatoria si spezza. Tra l'Abruzzo, fermo a 6,54, e la Sardegna, a 9,24, si apre lo scarto più largo di tutta la classifica, 2,71 punti in un colpo solo. Sopra quel salto restano solo cinque territori da nove punti in su, le due isole maggiori insieme a Calabria, Campania e Puglia. Il gradino però non ricalca il confine tra Nord e Sud: Basilicata, Molise e Abruzzo, tre regioni meridionali, restano nel gruppo basso. È il grappolo delle cinque a tenere la media sopra la mediana di 5,18, segno che il valore medio racconta l'eccezione più della regione tipica.",
+   "h": "Un gradino, non una scala",
+   "role": "quadro"
+  },
+  {
+   "body": "Il movimento dal 2018 al 2025 corre in una sola direzione. Nessuna regione ha visto crescere la disoccupazione, e la media è passata da 11,00 a poco più di sei, quasi cinque punti in meno. A scendere di più sono stati proprio i territori che partivano più in alto. La Calabria ha perso 11,72 punti, il calo più forte del paese, e ha più che dimezzato il suo tasso, da 21,54 a 9,82. La Sicilia ne ha lasciati per strada 9,10. All'estremo opposto l'Emilia-Romagna, già tra le più basse, è calata di appena 1,70 punti, la riduzione più contenuta: chi aveva poco da recuperare si è mosso poco. La convergenza nasce da questa differenza di velocità, e la distanza tra la prima e l'ultima regione si è ristretta di 5,81 punti in sette anni. L'ultimo anno conferma la rotta ma accorcia il passo, dal 2024 al 2025 la media cede altri 0,45 punti.",
+   "h": "È sceso di più dove era più alto",
+   "role": "dinamica"
+  },
+  {
+   "body": "Resta un punto cieco che conviene tenere a mente. Il tasso misura chi cerca, non chi è fuori dal lavoro: due regioni con lo stesso valore possono avere quote molto diverse di persone che un impiego ce l'hanno, perché chi rinuncia a cercare sparisce dal denominatore. Così un calo del tasso non dice, da solo, se sono cresciuti gli occupati o se si sono ritirate le persone in cerca. Il dato non entra nemmeno nel lavoro trovato, ore, contratto e retribuzione restano fuori, e fotografa una condizione in un istante, senza seguire chi entra ed esce dalla ricerca durante l'anno.\n\nIl punto cieco però si può misurare. Accanto a questa graduatoria c'è quella dei [giovani che non lavorano e non studiano](/indicatore/tasso-giovani-neet-totale/ter-408), che contano anche chi un impiego non lo sta cercando, e le due si somigliano molto. Non dove serve, però. Basilicata, Abruzzo e Molise, le tre regioni meridionali che qui restano nel gruppo largo sotto il gradino, sul NEET nel 2024 stanno tutte e tre oltre il vuoto che si apre dopo la Liguria, nella coda dove si trovano tutte e otto le regioni del Mezzogiorno e il Lazio. Sono le stesse regioni, e la fotografia cambia a seconda di chi entra nel conto.",
+   "h": "Quello che un calo del tasso non distingue",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

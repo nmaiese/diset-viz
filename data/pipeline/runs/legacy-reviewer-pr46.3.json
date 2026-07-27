@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-27T11:58:12+00:00",
+ "branch": "master",
+ "commit": "b69d3a5",
+ "detail": [
+  "Fusa con un commit di merge e non con uno squash: 29 commit il cui messaggio e' il registro su cui la sezione 6 del piano dice a chi riprende di non ricostruire niente dai commit. Stessa forma delle PR #43, #36 e #34.",
+  "Tre tassi di affermazioni false in fila: 9,7% sulle note migrate mai rilette, 4,8% sulle scritte e non rilette, 1,3% sulle scritte e rilette. A togliere gli errori e' la rilettura, non la scrittura.",
+  "Resta aperto e scritto nel piano: lo stadio verificatore non e' registrato nei tre posti della 3.3, le famiglie non territoriali non hanno guardia sulle definizioni, la rottura di serie non dichiarata non ha guardia, e quale delle due pagine gemelle sopravvive e' curatela."
+ ],
+ "gate": "manual",
+ "outcome": "merged",
+ "pr": "46",
+ "run_id": "legacy-reviewer-pr46",
+ "stage": "reviewer",
+ "summary": "PR #46 fusa su master: il lotto 2 chiuso e misurato, la guardia sulle definizioni e quella sui doppioni di serie",
+ "trigger": "manuale"
+}

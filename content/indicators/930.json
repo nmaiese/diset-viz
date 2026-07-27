@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "930",
+ "lead": "La disuguaglianza dei redditi è più alta dove i redditi sono più bassi. L'indice di Gini, che va da 0 a 1, tocca 0,345 in Sicilia, 0,343 in Campania e 0,342 in Calabria, mentre in Basilicata e Trentino Alto Adige scende sotto 0,27. La media delle regioni è 0,30.",
+ "sections": [
+  {
+   "body": "Il Sud somma due svantaggi: redditi medi più bassi e distribuiti in modo più diseguale. Dove il lavoro scarseggia, e informalità e sussidi pesano di più, la forbice tra chi ha e chi non ha si allarga. La disuguaglianza è in leggero calo, ma resta un tratto strutturale. Ridurre la povertà del Sud significa anche ridurre le distanze al suo interno, non solo verso il Nord. La disuguaglianza è un problema tra territori o dentro i territori?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "L'indice di Gini riassume in un numero l'intera distribuzione, quindi può restare uguale mentre cambiano gli estremi. Esclude i fitti imputati e si basa su redditi dichiarati, e non dice chi siano i più ricchi e i più poveri di una regione.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2024
+}

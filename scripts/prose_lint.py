@@ -35,10 +35,14 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-TEXTS_PATH = PROJECT_ROOT / "app" / "static" / "data" / "indicator_texts.json"
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from scripts import indicator_store  # noqa: E402  (path bootstrap above)
 
 # Words that survive in a draft when nobody chose them. Most are ordinary Italian
 # and none is banned outright, but they cluster in machine-written prose and each
@@ -134,15 +138,16 @@ ALL_SIGNALS = tuple(name for name, _, _ in CHECKS) + tuple(EXTRA_SIGNALS)
 LINK = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
 
-def load_texts(path=None):
-    return json.loads(Path(path or TEXTS_PATH).read_text(encoding="utf-8"))
+def load_texts(root=None):
+    """Tutti gli articoli. `root` e' una directory di store, non piu' un file."""
+    return indicator_store.load_all(root)
 
 
 def resolve_key(texts, code):
     """The internal key for a code written either way, or None.
 
     The chain writes indicator codes in the URL form (`ter-408`, `bes-10AMB004`)
-    and `indicator_texts.json` keys them internally (`408`, `bes:10AMB004`).
+    and the store keys them internally (`408`, `bes:10AMB004`).
     `--show` used to index the dict directly, so the very command written in the
     reviewer's prompt answered "nessun articolo" for every indicator. That is
     the same defect `review_queue.resolve_key` was written to fix, repeated in
@@ -328,7 +333,7 @@ def main(argv=None):
     parser.add_argument("--show", help="un articolo solo (ter-178, bes-01SAL001, o l'id interno)")
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--json", action="store_true")
-    parser.add_argument("--texts", help="un file diverso da quello in repo")
+    parser.add_argument("--texts", help="una directory di articoli, o un vecchio file unico")
     args = parser.parse_args(argv)
 
     texts = load_texts(args.texts)

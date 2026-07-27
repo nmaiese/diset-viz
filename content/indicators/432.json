@@ -1,0 +1,36 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, La ricerca e sviluppo in Italia, anni 2022-2024: nel 2022 la spesa delle imprese per R&S intra-muros cresce del 4,0% sul 2021. Gli incrementi più forti nel Mezzogiorno (+11,2% nelle Isole, +6,1% nel Sud) riguardano la spesa complessiva per R&S di tutti i settori, cresciuta del 5,0%, non la sola componente delle imprese. Dato nazionale in valore, non confrontabile con la media semplice delle quote regionali.",
+   "url": "https://www.istat.it/comunicato-stampa/la-ricerca-e-sviluppo-in-italia-anni-2022-2024/"
+  }
+ ],
+ "key": "432",
+ "lead": "Le imprese che fanno ricerca in proprio si appoggiano molto meno ai laboratori e ai servizi di qualcun altro, e quattro quinti della caduta stanno negli ultimi due anni. Nel 2022 la quota è scesa quasi ovunque, nell'anno in cui l'Istat contava una spesa privata in ricerca in aumento.",
+ "level": "regione",
+ "reviewed_at": "2026-07-27",
+ "reviewed_vintage": 2022,
+ "sections": [
+  {
+   "body": "L'Istat chiede alle imprese che svolgono ricerca e sviluppo dentro le proprie mura se, per farla, si sono servite anche di infrastrutture di ricerca e di altri servizi alla R&S di soggetti pubblici o privati. L'indicatore conta quante di quelle imprese, ogni cento, hanno risposto di sì.\n\nIl denominatore cambia la lettura. Non entrano tutte le imprese della regione, ma solo quelle che già fanno ricerca intra-muros, un gruppo ristretto e di dimensione molto diversa da una regione all'altra. La graduatoria non dice quanta ricerca si fa in un territorio, dice quanto chi la fa esce dalle proprie mura per farla.",
+   "h": "Non tutte le imprese, solo quelle che la ricerca la fanno già",
+   "role": "definizione"
+  },
+  {
+   "body": "Il contatto che l'indicatore misura è quello fra la ricerca che un'impresa fa in casa e quello che non possiede, un laboratorio, una capacità di calcolo, una consulenza tecnica. Chi glielo mette a disposizione può essere pubblico o un altro privato, e la quota non distingue fra i due. Nel 2022 il valore tocca il minimo dei dieci anni coperti quasi dappertutto. Fanno eccezione il Molise e l'Umbria, le stesse due regioni salite nell'ultimo passaggio.\n\nLa distribuzione ha una testa corta e un corpo compresso. Il Molise precede di 6,31 punti la Calabria, che a sua volta ne ha 2,33 sul Friuli-Venezia Giulia, poi la graduatoria si appiattisce e le restanti diciotto stanno in meno di dieci punti, con media e mediana che distano meno di mezzo punto.\n\nChi si aspetta la mappa consueta della ricerca resta spiazzato. L'Emilia-Romagna ha la quota più alta d'Italia di [personale addetto a ricerca e sviluppo](/indicatore/personale-addetto-a-ricerca-e-sviluppo-eurostat-nuts2/eur-rd_p_persreg) sulla popolazione attiva e qui è diciassettesima, mentre la Calabria, che su quella quota chiude la fila, è seconda. Le due misure contano popolazioni diverse, persone da un lato e imprese dall'altro, e il rovesciamento vale agli estremi più che nel mezzo, perché sulle venti regioni i due ordini si somigliano poco.\n\nIl primato del Molise chiede un occhio sul denominatore. La sua serie oscilla come nessun'altra, da 53,33 nel 2013 a 26,47 nel 2017 e di nuovo a 39,00 l'anno dopo, salti che segnalano una base piccola, dove poche risposte spostano molto la quota.",
+   "h": "Una testa staccata e diciotto regioni schiacciate",
+   "role": "quadro"
+  },
+  {
+   "body": "Per gran parte della serie questo indicatore non si è mosso. La media semplice delle regioni valeva 33,96 nel 2013 e 31,58 nel 2020, e negli anni in mezzo non è mai scesa sotto 30 né salita sopra 35. Poi scende a 25,59 nel 2021 e ancora più giù l'anno dopo. In due anni se ne sono andati 10,82 punti, più di quattro volte quanto si era perso nei sette precedenti.\n\nIl caso più netto dell'ultimo passaggio è la Basilicata, prima regione nel 2021 e sesta adesso, dopo aver lasciato per strada 16,13 punti in dodici mesi. Dal 2013 nessuna regione ha chiuso in rialzo, e perfino la Sardegna, la meno toccata, arretra di 1,11 punti.\n\nL'altra forma di apertura non si è mossa allo stesso modo. Anche le [imprese che fanno R&S in collaborazione con soggetti esterni](/indicatore/imprese-che-hanno-svolto-attivita-di-r-s-in-collaborazione-con-soggetti-esterni/ter-417) calano, da una media regionale di 48,65 nel 2013 a una di 34,70 nel 2022, ma per gradi e senza lo strappo finale.\n\nNello stesso 2022 l'Istat contava una spesa delle imprese per ricerca intra-muros in crescita del 4,0% sul 2021, dentro una spesa complessiva per ricerca e sviluppo salita del 5,0%, ed è quest'ultima a crescere più forte nel Mezzogiorno. È un dato nazionale in valore e non si confronta con le quote regionali di questa pagina, ma i due movimenti vanno in direzioni opposte. Nell'anno in cui le imprese mettevano più soldi nella ricerca fatta in casa, quelle che la facevano si appoggiavano meno alle strutture di qualcun altro.",
+   "h": "Sette anni fermi, poi due anni di caduta",
+   "role": "dinamica"
+  },
+  {
+   "body": "Numeratore e denominatore si muovono insieme e la serie non li separa. Se entrano nel gruppo nuove imprese che fanno ricerca in casa senza appoggiarsi a nessuno, la quota scende anche quando nessuna delle altre ha cambiato abitudini, e quale dei due effetti pesi nel biennio 2021-2022 da qui non si vede.\n\nIl dato non dice nemmeno che cosa sia stato usato. Un'ora di calcolo comprata e un laboratorio pubblico condiviso per un anno contano allo stesso modo, e nulla distingue l'infrastruttura vicina da quella dall'altra parte del Paese.\n\nSoprattutto, questa non è una classifica dell'innovazione. Sull'[innovazione del sistema produttivo](/indicatore/innovazione-del-sistema-produttivo/bes-11RIC004) che il Bes misura per lo stesso 2022 il Molise ha il diciannovesimo valore su venti, e qui è primo. Per tenere insieme le due cose servono le altre serie di [ricerca, innovazione e digitale](/tema/ricerca-innovazione-e-digitale).",
+   "h": "Una quota può scendere senza che nessuno cambi comportamento",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2022
+}

@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-27T11:22:34+00:00",
+ "branch": "master",
+ "commit": "10b3385",
+ "detail": [
+  "Entrambi i rilievi erano fondati e riguardavano lo stesso articolo, ter-72. Primo: la media non ponderata dei venti valori regionali presentata come quota nazionale di addetti, la stessa classe di errore corretta su ter-920 nella stessa run. Secondo: riscrivendo il lead avevo tolto il perimetro delle imprese sopra i dieci addetti, che pesa doppio perche' il lead e' anche la meta description autonoma in SERP.",
+  "Nessun test copre questa classe: le guardie verificano che una cifra attribuita a un territorio sia vera, non che l'etichetta intorno dica il vero. Una media regionale spacciata per dato nazionale passa perche' il numero e' giusto. Serve una guardia, ma e' codice e sta fuori dal perimetro del revisore.",
+  "Merge via API GitHub: pipeline_merge.py ha riletto il cancello (verdetto auto) e ha fallito sulla chiamata a gh, non autenticato in questa sessione. Terzo blocco della giornata sullo stesso punto."
+ ],
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": "48",
+ "run_id": "legacy-reviewer-pr48",
+ "stage": "reviewer",
+ "summary": "PR #48 fusa: recepiti i due rilievi P2 di Codex, cancello verde e CI verde",
+ "trigger": "manuale"
+}

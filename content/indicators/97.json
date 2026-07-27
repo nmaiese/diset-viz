@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "97",
+ "lead": "Il grado di apertura ai mercati dal lato delle importazioni misura quanto un'economia compra dall'estero rispetto al PIL. È più alto in Lombardia, 40,4%, e Veneto, 38,8%, più basso in Calabria, 3,1%. La media delle regioni è del 22,9%. Il Nord industriale compra molto dall'estero.",
+ "sections": [
+  {
+   "body": "Importare molto non è di per sé un male, dato che le economie industriali comprano dall'estero materie prime e componenti da trasformare, quindi un'alta apertura segnala spesso un apparato produttivo integrato nel mondo. Al Sud le basse importazioni riflettono meno industria, non più autosufficienza. È un indicatore descrittivo, che va letto insieme all'export. Comprare dall'estero è dipendenza o segno di un'economia viva?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Rapporta le importazioni al PIL, senza distinguere beni di consumo e input produttivi. Non dice se le merci importate alimentino produzione ed export o solo consumo interno.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2022
+}

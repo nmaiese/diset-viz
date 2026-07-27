@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "81",
+ "lead": "Questo indicatore mostra valori anomali, con la Toscana oltre il 200%, effetto probabile di un errore di misura o di definizione. Al netto di questo, la potenza rinnovabile è altissima in Valle d'Aosta e Trentino Alto Adige, vicino al 100%, bassa in Liguria, 34%. La media delle regioni è distorta.",
+ "sections": [
+  {
+   "body": "Un valore sopra il 100% non ha senso per una quota di potenza, e segnala un problema nei dati più che una realtà fisica. Al di là dell'anomalia, il quadro reale premia le regioni alpine, dove l'idroelettrico storico copre quasi tutta la potenza installata. Il dato va quindi preso come indizio, non come classifica precisa. Le montagne partono avvantaggiate nella corsa alle rinnovabili?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "I valori sopra il 100% rendono il confronto inaffidabile e segnalano definizioni o misure non omogenee. Il dato riguarda la potenza installata, non l'energia prodotta, che dipende anche da quanto gli impianti funzionano.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2024
+}

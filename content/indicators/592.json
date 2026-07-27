@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "592",
+ "lead": "Il verde urbano disponibile per abitante è distribuito in modo estremo. In Trentino Alto Adige si contano 312 metri quadri a testa nei capoluoghi, in Basilicata 102, contro i 9 della Puglia e i 9,8 del Molise. La media delle regioni è di circa 48, ma la mediana è molto più bassa.",
+ "sections": [
+  {
+   "body": "Il verde in città non è solo estetica, ma salute, refrigerio contro il caldo e spazio di socialità, sempre più prezioso con il clima che cambia. Il dato altissimo del Trentino riflette grandi parchi e boschi urbani, mentre molte città del Sud ne hanno pochissimo. Lo scarto tra media e mediana dice che poche città verdissime alzano il dato nazionale. Il verde urbano è un lusso o un'infrastruttura per la salute?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Conta i metri quadri di verde per abitante nei capoluoghi, non la sua qualità, accessibilità o distribuzione tra quartieri. Grandi parchi periferici possono gonfiare il dato mentre il centro resta senza alberi.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2020
+}

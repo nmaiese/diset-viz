@@ -245,11 +245,13 @@ def journalling_gh(checks=None, merge_ok=True, push_failures=0):
             return 0, ""
         if argv[:2] == ["git", "commit"]:
             # La riga e' gia' stata scritta nel worktree: la leggiamo da li',
-            # perche' e' quello che finira' davvero su master.
-            path = Path(cwd) / "data" / "pipeline" / "runs.jsonl"
-            if path.exists():
-                state["rows"] = [json.loads(x) for x in
-                                 path.read_text(encoding="utf-8").splitlines() if x.strip()]
+            # perche' e' quello che finira' davvero su master. Un file per run,
+            # quindi si legge la directory e non piu' le righe di un `.jsonl`.
+            runs = Path(cwd) / "data" / "pipeline" / "runs"
+            state["rows"] = [
+                json.loads(shard.read_text(encoding="utf-8"))
+                for shard in sorted(runs.glob("*.json"))
+            ] if runs.is_dir() else []
             return 0, ""
         if argv[:2] == ["git", "rev-parse"]:
             return 0, "abc1234\n"

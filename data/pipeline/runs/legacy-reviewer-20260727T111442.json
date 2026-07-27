@@ -1,0 +1,18 @@
+{
+ "at": "2026-07-27T11:14:42+00:00",
+ "branch": "automation/reviewer-2026-07-27-fix",
+ "commit": "56b271c",
+ "detail": [
+  "ter-72: errore mio, della stessa classe che avevo appena corretto su ter-920. Il lead diceva 'poco piu' di un addetto su due, nelle imprese italiane con almeno dieci dipendenti', presentando il 52,42% (media non ponderata dei venti valori regionali) come quota nazionale di addetti. Istat, Imprese e ICT, pubblica solo la quota di imprese con addetti connessi sopra il 50%, che e' un'altra misura, quindi il dato nazionale ponderato non e' verificabile e la claim va tolta invece che tenuta. Lead riscritto su fatti della distribuzione, verificati sul brief: nessuna regione arriva a due addetti su tre (massimo Lazio 66,30, due terzi = 66,67) e otto regioni stanno sotto uno su due (Abruzzo, Basilicata, Calabria, Campania, Molise, Puglia, Sicilia, Umbria). Qualificata 'la media delle regioni'.",
+  "bes-10AMB004: 'nove regioni restano sopra un quarto del totale' poteva leggersi come un quarto delle regioni invece che dei rifiuti. Riscritto in 'nove regioni ne mandano in discarica piu' di un quarto'.",
+  "ter-167: qualificata 'la media' come 'la media delle regioni' nel lead.",
+  "Rilette tutte e sei le voci firmate ieri cercando lo stesso schema (in Italia, italiano, nazionale, del Paese, in media): nessun altro caso. Le firme restano al 27 luglio con lo stesso reviewed_vintage, e' la stessa lettura corretta in giornata. Suite 432 test verde."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-reviewer-20260727T111442",
+ "stage": "reviewer",
+ "summary": "Recepito il rilievo P2 di Codex sulla #47: la media semplice delle regioni non e' un tasso nazionale",
+ "trigger": "manuale"
+}

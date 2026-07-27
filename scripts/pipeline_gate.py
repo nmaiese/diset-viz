@@ -51,25 +51,39 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts import curate, discovery, verification_queue  # noqa: E402  (path bootstrap above)
+from scripts import (  # noqa: E402  (path bootstrap above)
+    curate,
+    discovery,
+    indicator_store,
+    verification_queue,
+)
 
 EXTERNAL_DATASET = "app/static/data/external/normalized_external_indicators.csv"
 EXTERNAL_MANIFEST = "app/static/data/external_indicator_manifest.csv"
 CURATED_DESCRIPTIONS = "app/static/data/external/curated_descriptions.csv"
-INDICATOR_TEXTS = "app/static/data/indicator_texts.json"
 CANDIDATES = "data/discovery/candidates.csv"
 SOURCE_CANDIDATES = "data/discovery/source_candidates.csv"
 CURATION = "data/discovery/curation.csv"
 ISTAT_SERIES_CONFIG = "config/istat_series.yaml"
 THEME_CATEGORIES = "config/theme_categories.csv"
-# Il diario delle run. Ogni stadio ci scrive una riga a fine run, quindi sta
-# nel perimetro di tutti: senza, meta' delle run (quelle che non producono
-# altro) non lascerebbe nessuna traccia, che e' esattamente il buco che il
-# diario esiste per chiudere.
-RUN_JOURNAL = "data/pipeline/runs.jsonl"
+
+# I tre perimetri a directory. La barra finale non e' cosmetica: e' cio' che
+# `path_allowed` usa per distinguere una directory da un file, e senza di essa
+# `content/indicators` autorizzerebbe anche `content/indicators-vecchi.json`.
+#
+# Sono directory perche' i tre registri che contengono erano file unici a cui
+# tutti gli stadi appendevano in coda, cioe' la causa meccanica di ogni
+# conflitto fra due run vicine. Un file per record toglie il conflitto invece
+# di insegnare a risolverlo.
+INDICATOR_TEXTS = "content/indicators/"
+# Il diario delle run. Ogni stadio ci scrive a fine run, quindi sta nel
+# perimetro di tutti: senza, meta' delle run (quelle che non producono altro)
+# non lascerebbe nessuna traccia, che e' esattamente il buco che il diario
+# esiste per chiudere.
+RUN_JOURNAL = "data/pipeline/runs/"
 # Il registro delle verifiche. Sta nel perimetro del solo verificatore, ed e'
 # tutto quello che quello stadio produce.
-VERIFICATIONS = "data/pipeline/verifiche.csv"
+VERIFICATIONS = "data/pipeline/verifiche/"
 
 # What each stage is allowed to change. Anything outside its list is a failure,
 # not a warning: the point of the list is that a prompt cannot widen it.
@@ -180,30 +194,49 @@ def resolve_base(base=None, cwd=None):
 
 
 def check_base_is_usable(base=None, cwd=None):
-    """The base has to be an ancestor of HEAD, or every verdict below is fiction.
+    """La base deve poter spiegare il diff, non deve essere in cima a master.
 
-    `resolve_base` falls through `base` -> `origin/master` -> `master`, and a
-    fresh checkout can have a `master` that trails `origin/master`. When that
-    happens the diff contains every commit the branch did *not* make, the
-    perimeter check lists thirty untouched files as violations, and the stage
-    reads `blocked`. Its contract then tells it "the error is in your work, never
-    in the gate", which leaves an autonomous agent with no way out of a wrong
-    diagnosis: it will keep rewriting correct work.
+    Prima qui bastava che la base **non fosse un antenato** di HEAD per
+    bocciare lo stadio, e quella severita' e' stata il difetto piu' costoso
+    della catena. Master si muove di continuo, anche solo perche' un altro
+    stadio ha registrato l'esito di una run, quindi ogni pull request aperta da
+    piu' di qualche minuto diventava rossa senza che il suo lavoro fosse
+    cambiato di una virgola. Il passo di merge che rifiutava una pull request
+    scriveva una riga su master, quella riga faceva diventare rosse le pull
+    request degli altri stadi, e un rifiuto solo bastava a fermare la catena
+    intera: un anello di retroazione fatto di controlli tutti corretti presi
+    uno per uno.
 
-    So a base that cannot explain the diff is a failure of the gate, reported as
-    one, rather than a silent mismeasurement of the branch.
+    La severita' non serviva nemmeno. Il diff lo misura `changed_paths` con i
+    **tre punti** (`base...HEAD`), che confronta contro la base comune, quindi
+    resta esatto anche quando master e' andato avanti. `check_no_coauthor`
+    usa i due punti, che elencano i soli commit del branch, ed e' esatto per la
+    stessa ragione. Quello che serve davvero e' che una base comune **esista**:
+    senza, non c'e' nessun diff da misurare, e li' il verdetto e' fiction sul
+    serio.
+
+    Che master sia andato avanti resta scritto nel dettaglio, perche' spiega
+    perche' la CI potrebbe vedere qualcosa che il cancello locale non vede: i
+    check remoti girano sul merge commit, quindi su branch piu' master.
     """
     resolved = resolve_base(base, cwd=cwd)
     if not resolved:
         return Check("base", True, "nessuna base di confronto, giudizio sul solo working tree")
-    code, _, _ = _git("merge-base", "--is-ancestor", resolved, "HEAD", cwd=cwd)
+    code, _, _ = _git("merge-base", resolved, "HEAD", cwd=cwd)
     if code != 0:
         return Check(
             "base",
             False,
-            f"la base '{resolved}' non e' un antenato di HEAD: il diff misurato non e' il lavoro "
-            f"di questo branch. Aggiorna la base (git fetch) o passala con --base, e NON correggere "
-            f"il lavoro sulla scorta di questo verdetto.",
+            f"la base '{resolved}' e HEAD non hanno nessun antenato in comune: non c'e' un diff "
+            f"da misurare. Recupera la storia (git fetch --unshallow) o passa la base con --base.",
+        )
+    behind, _, _ = _git("merge-base", "--is-ancestor", resolved, "HEAD", cwd=cwd)
+    if behind != 0:
+        return Check(
+            "base",
+            True,
+            f"{resolved} e' andata avanti senza questo branch: il diff resta esatto (tre punti), "
+            f"ma i check remoti girano sul merge e possono vedere di piu'.",
         )
     return Check("base", True, f"confronto contro {resolved}")
 
@@ -215,6 +248,12 @@ def changed_paths(base=None, cwd=None):
     against the base is the real answer. A local run may still have the change
     in the working tree, and a gate that only looked at commits would call that
     branch clean and green.
+
+    `--untracked-files=all` e non il default. Senza, git riassume una directory
+    nuova in una voce sola (`content/indicators/`), e da quando gli store sono
+    a un file per record quella e' la forma normale del lavoro di uno stadio:
+    il perimetro avrebbe giudicato un percorso che non e' un file, e
+    `changed_text_keys` ne avrebbe ricavato la chiave inventata `indicators`.
     """
     paths = set()
     resolved = resolve_base(base, cwd=cwd)
@@ -222,7 +261,7 @@ def changed_paths(base=None, cwd=None):
         code, out, _ = _git("diff", "--name-only", f"{resolved}...HEAD", cwd=cwd)
         if code == 0:
             paths.update(line.strip() for line in out.splitlines() if line.strip())
-    code, out, _ = _git("status", "--porcelain", cwd=cwd)
+    code, out, _ = _git("status", "--porcelain", "--untracked-files=all", cwd=cwd)
     if code == 0:
         for line in out.splitlines():
             entry = line[3:].strip()
@@ -233,9 +272,31 @@ def changed_paths(base=None, cwd=None):
     return sorted(p for p in paths if p)
 
 
+def path_allowed(path, allowed):
+    """Un percorso rientra nel perimetro `allowed`.
+
+    Due forme, e la differenza sta tutta nella barra finale. Senza, la voce e'
+    un file e vale l'uguaglianza esatta, come e' sempre stato. Con, e' una
+    directory e vale il prefisso, che e' l'unico modo di autorizzare uno store
+    a un file per record senza elencarne i trecento file.
+
+    Il prefisso e' ancorato alla barra di proposito. `content/indicators` come
+    prefisso nudo autorizzerebbe `content/indicators-bozze.json`, cioe' un
+    percorso fuori dallo store, e un perimetro che si allarga da solo su un
+    errore di battitura non e' un perimetro.
+    """
+    for entry in allowed:
+        if entry.endswith("/"):
+            if path.startswith(entry):
+                return True
+        elif path == entry:
+            return True
+    return False
+
+
 def check_blast_radius(stage, paths):
     allowed = STAGE_PATHS[stage]
-    stray = [p for p in paths if p not in allowed]
+    stray = [p for p in paths if not path_allowed(p, allowed)]
     if stray:
         return Check(
             "blast-radius",
@@ -245,6 +306,51 @@ def check_blast_radius(stage, paths):
     if not paths:
         return Check("blast-radius", True, "nessun file modificato")
     return Check("blast-radius", True, f"{len(paths)} file, tutti nel perimetro dello stadio")
+
+
+def _touched_under(prefix, base=None, cwd=None):
+    """Quali file di uno store questo branch aggiunge, cambia o toglie.
+
+    Sostituisce il confronto riga per riga che serviva quando ogni registro era
+    un file solo. Con un file per record la domanda "che cosa e' cambiato" la
+    risponde l'elenco dei percorsi, senza rileggere e ridiffare il contenuto, e
+    la risposta e' esatta invece che dedotta: prima un articolo modificato si
+    riconosceva confrontando due JSON interi, adesso e' il nome del file.
+
+    Unisce i commit e il working tree, come `changed_paths`, perche' una prova
+    locale ha il lavoro ancora non committato e un cancello che la chiama
+    pulita non serve a niente.
+    """
+    resolved = resolve_base(base, cwd=cwd)
+    touched = [
+        p for p in changed_paths(base, cwd=cwd)
+        if p.startswith(prefix) and p.endswith(".json")
+    ]
+    added, changed, gone = [], [], []
+    for path in touched:
+        at_base = False
+        if resolved:
+            code, _, _ = _git("cat-file", "-e", f"{resolved}:{path}", cwd=cwd)
+            at_base = code == 0
+        if not (PROJECT_ROOT / path).exists():
+            gone.append(path)
+        elif at_base:
+            changed.append(path)
+        else:
+            added.append(path)
+    return {"added": added, "changed": changed, "gone": gone,
+            "touched": sorted(added + changed + gone)}
+
+
+def _read_json_at(ref, path, cwd=None):
+    """Il contenuto JSON di un file a un dato commit, o None."""
+    code, out, _ = _git("show", f"{ref}:{path}", cwd=cwd)
+    if code != 0:
+        return None
+    try:
+        return json.loads(out)
+    except json.JSONDecodeError:
+        return None
 
 
 def check_whitespace(cwd=None):
@@ -359,10 +465,49 @@ def check_curation_decisions(rows=None):
     return Check("curatela-direzionale", True, f"{len(rows)} decisioni, versi e date coerenti")
 
 
+def _prose_fingerprints(rows, resolved, cwd=None):
+    """Le impronte valide: quelle di adesso, piu' quelle della base.
+
+    Le due versioni e non solo la prima, per la ragione spiegata in
+    `check_verifications`. Della base pero' si leggono **solo** gli articoli che
+    le righe nuove citano: prima il testo stava tutto in un file e bastava un
+    `git show`, adesso sono trecentosessantacinque file e leggerli tutti a ogni
+    verdetto renderebbe il cancello il passo piu' lento della catena per
+    rispondere a una domanda su tre articoli.
+    """
+    fingerprints = set()
+    try:
+        texts = verification_queue.load_texts()
+    except (OSError, ValueError, indicator_store.StoreError):
+        texts = {}
+    for key, entry in texts.items():
+        fingerprints.add((
+            verification_queue.code_of(key),
+            (entry.get("level") or "regione"),
+            verification_queue.prose_fingerprint(entry),
+        ))
+    if not resolved:
+        return fingerprints
+    wanted = {(row.get("code") or "").strip() for row in rows}
+    for key in texts:
+        if verification_queue.code_of(key) not in wanted:
+            continue
+        path = INDICATOR_TEXTS + indicator_store.filename_for(key)
+        old = _read_json_at(resolved, path, cwd=cwd)
+        if not isinstance(old, dict):
+            continue
+        fingerprints.add((
+            verification_queue.code_of(key),
+            (old.get("level") or "regione"),
+            verification_queue.prose_fingerprint(old),
+        ))
+    return fingerprints
+
+
 def check_verifications(base=None, cwd=None):
     """Il verificatore consegna dei numeri, quindi i numeri devono reggere.
 
-    Ogni riga nuova di `verifiche.csv` deve dire quante affermazioni ha
+    Ogni verifica nuova deve dire quante affermazioni ha
     controllato, e i tre parziali devono sommare a quel totale. Non e' pignoleria
     contabile: senza `controllate` la frase "zero smentite" e la frase "non ho
     guardato" producono lo stesso file, e uno stadio che non sa distinguerle
@@ -425,24 +570,7 @@ def check_verifications(base=None, cwd=None):
     # sbagliato passerebbe di qui e poi non coprirebbe niente. Una smentita
     # registrata cosi' sarebbe scritta e invisibile allo stesso tempo, che e' il
     # modo di fallire peggiore fra quelli disponibili.
-    fingerprints = set()
-    for ref in (None, resolved):
-        try:
-            if ref is None:
-                texts = verification_queue.load_texts()
-            else:
-                code, out, _ = _git("show", f"{ref}:{INDICATOR_TEXTS}", cwd=cwd)
-                if code != 0:
-                    continue
-                texts = json.loads(out)
-        except (OSError, json.JSONDecodeError):
-            continue
-        for key, entry in texts.items():
-            fingerprints.add((
-                verification_queue.code_of(key),
-                (entry.get("level") or "regione"),
-                verification_queue.prose_fingerprint(entry),
-            ))
+    fingerprints = _prose_fingerprints(rows, resolved, cwd=cwd)
     if not fingerprints:
         return Check("verifiche", False, "testi illeggibili, impossibile verificare le impronte")
 
@@ -484,54 +612,37 @@ def check_verifications(base=None, cwd=None):
 
 
 def _verification_rows_removed(base=None, cwd=None):
-    """Le righe della base che questo branch non ha piu' identiche, interpretate.
+    """Le verifiche della base che questo branch ha tolto o riscritto.
 
-    Confronta le righe intere, quindi comprende sia una cancellazione sia una
-    riscrittura in posto: per il registro sono la stessa cosa, cioe' cambiare che
-    cosa dice una verifica passata. Un file che alla base non esisteva non ha
-    niente da togliere.
+    Cancellare un file e riscriverlo in posto sono la stessa cosa per il
+    registro, cioe' cambiare che cosa dice una verifica gia' data, ed e'
+    esattamente cio' che l'append-only vieta. Con un file per verifica la
+    distinzione fra "aggiunta" e "riscrittura" e' il nome del file invece che
+    un confronto di righe, quindi non c'e' piu' niente da dedurre.
     """
     resolved = resolve_base(base, cwd=cwd)
     if not resolved:
         return []
-    code, out, _ = _git("show", f"{resolved}:{VERIFICATIONS}", cwd=cwd)
-    if code != 0:
-        return []  # il file non esisteva alla base: non c'e' niente da togliere
-    old_lines = [line for line in out.splitlines() if line.strip()]
-    if not old_lines:
-        return []
-    current = PROJECT_ROOT / VERIFICATIONS
-    new_lines = set()
-    if current.exists():
-        new_lines = {line for line in current.read_text(encoding="utf-8").splitlines() if line.strip()}
-    header, old_body = old_lines[0], old_lines[1:]
-    gone = [line for line in old_body if line not in new_lines]
-    if not gone:
-        return []
-    import csv as _csv
-    return list(_csv.DictReader([header] + gone, delimiter=";"))
+    touched = _touched_under(VERIFICATIONS, base, cwd=cwd)
+    rows = []
+    for path in touched["gone"] + touched["changed"]:
+        old = _read_json_at(resolved, path, cwd=cwd)
+        if isinstance(old, dict):
+            rows.append(old)
+    return rows
 
 
 def _verification_rows_added(base=None, cwd=None):
-    """Le righe che questo branch aggiunge a `verifiche.csv`, gia' interpretate."""
-    resolved = resolve_base(base, cwd=cwd)
-    old = set()
-    if resolved:
-        code, out, _ = _git("show", f"{resolved}:{VERIFICATIONS}", cwd=cwd)
-        if code == 0:
-            old = {line for line in out.splitlines() if line.strip()}
-    current = PROJECT_ROOT / VERIFICATIONS
-    if not current.exists():
-        return []
-    lines = current.read_text(encoding="utf-8").splitlines()
-    if not lines:
-        return []
-    header = lines[0]
-    added = [line for line in lines[1:] if line.strip() and line not in old]
-    if not added:
-        return []
-    import csv as _csv
-    return list(_csv.DictReader([header] + added, delimiter=";"))
+    """Le verifiche che questo branch aggiunge, gia' interpretate."""
+    rows = []
+    for path in _touched_under(VERIFICATIONS, base, cwd=cwd)["added"]:
+        try:
+            data = json.loads((PROJECT_ROOT / path).read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if isinstance(data, dict):
+            rows.append(data)
+    return rows
 
 
 def check_reviewer_signature(base=None, cwd=None):
@@ -554,10 +665,9 @@ def check_reviewer_signature(base=None, cwd=None):
     keys = changed_text_keys(base, cwd=cwd)
     if not keys:
         return Check("firma-revisore", True, "nessuna modifica ai testi")
-    current = PROJECT_ROOT / INDICATOR_TEXTS
     try:
-        entries = json.loads(current.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
+        entries = indicator_store.load_all()
+    except (OSError, ValueError, indicator_store.StoreError) as exc:
         return Check("firma-revisore", False, f"testi illeggibili: {type(exc).__name__}")
     unsigned, mismatched = [], []
     for key in keys:
@@ -586,31 +696,16 @@ def check_reviewer_signature(base=None, cwd=None):
 
 
 def changed_text_keys(base=None, cwd=None):
-    """The article ids this branch actually touched.
+    """Gli articoli che questo branch ha davvero toccato.
 
-    Read by comparing the two versions of the file rather than by parsing the
-    diff hunks: a JSON diff shows the changed *lines*, and the id that owns them
-    can be a hundred lines above. Comparing parsed objects gives the ids
-    directly and costs one `git show`.
+    Adesso e' l'elenco dei file, e prima non poteva esserlo. Con un JSON unico
+    il diff mostrava le **righe** cambiate, e la chiave che le possiede poteva
+    stare cento righe piu' su, quindi bisognava rileggere e confrontare due
+    oggetti interi da mezzo megabyte per sapere di quale indicatore si stesse
+    parlando. Con un file per articolo la domanda e' gia' risposta dal nome.
     """
-    current_path = PROJECT_ROOT / INDICATOR_TEXTS
-    if not current_path.exists():
-        return []
-    try:
-        new = json.loads(current_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return []
-    resolved = resolve_base(base, cwd=cwd)
-    if not resolved:
-        return []
-    code, out, _ = _git("show", f"{resolved}:{INDICATOR_TEXTS}", cwd=cwd)
-    if code != 0:
-        return sorted(new)
-    try:
-        old = json.loads(out)
-    except json.JSONDecodeError:
-        return sorted(new)
-    return sorted(key for key in new if new[key] != old.get(key))
+    touched = _touched_under(INDICATOR_TEXTS, base, cwd=cwd)
+    return sorted(indicator_store.key_of(p) for p in touched["touched"])
 
 
 def check_run_is_recorded(stage, paths, base=None, cwd=None):
@@ -626,10 +721,11 @@ def check_run_is_recorded(stage, paths, base=None, cwd=None):
     di qui, perche' non ha un branch da giudicare: la sua riga di diario resta
     affidata al contratto.
     """
-    worked = [p for p in paths if p != RUN_JOURNAL]
+    worked = [p for p in paths if not p.startswith(RUN_JOURNAL)]
     if not worked:
         return Check("diario", True, "nessun lavoro da registrare")
-    if RUN_JOURNAL not in paths:
+    journal = [p for p in paths if p.startswith(RUN_JOURNAL)]
+    if not journal:
         return Check(
             "diario",
             False,
@@ -649,25 +745,24 @@ def check_run_is_recorded(stage, paths, base=None, cwd=None):
 
 
 def _journal_lines_added(base=None, cwd=None):
-    """Le righe di diario che questo branch aggiunge, gia' interpretate."""
-    resolved = resolve_base(base, cwd=cwd)
-    old = set()
-    if resolved:
-        code, out, _ = _git("show", f"{resolved}:{RUN_JOURNAL}", cwd=cwd)
-        if code == 0:
-            old = {line for line in out.splitlines() if line.strip()}
-    current = PROJECT_ROOT / RUN_JOURNAL
-    if not current.exists():
-        return []
-    added = []
-    for line in current.read_text(encoding="utf-8").splitlines():
-        if not line.strip() or line in old:
-            continue
+    """Le run che questo branch registra, gia' interpretate.
+
+    Un file per run, quindi "aggiunta" e' letteralmente un file nuovo. La
+    versione che confrontava le righe di un `.jsonl` doveva indovinare quali
+    fossero nuove leggendo il testo, e sbagliava ogni volta che due stadi
+    scrivevano nello stesso punto.
+    """
+    touched = _touched_under(RUN_JOURNAL, base, cwd=cwd)
+    entries = []
+    for path in touched["added"] + touched["changed"]:
+        full = PROJECT_ROOT / path
         try:
-            added.append(json.loads(line))
-        except json.JSONDecodeError:
+            data = json.loads(full.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
             continue
-    return added
+        if isinstance(data, dict):
+            entries.append(data)
+    return entries
 
 
 def check_writer_vintage(base=None, cwd=None):
@@ -701,7 +796,7 @@ def check_writer_vintage(base=None, cwd=None):
             f"({type(exc).__name__}). Crea il venv "
             f"(python3 -m venv .venv && .venv/bin/pip install -r requirements.txt) e rilancia.",
         )
-    entries = json.loads((PROJECT_ROOT / INDICATOR_TEXTS).read_text(encoding="utf-8"))
+    entries = indicator_store.load_all()
     ahead = []
     for key in keys:
         entry = entries.get(key) or {}

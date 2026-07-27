@@ -20,18 +20,22 @@ template, never frozen into the file. Two reasons: composed text cannot silently
 age behind a data refresh, and the vintage guard then applies only to sentences a
 human or an agent actually wrote.
 
-The prose lives in ``app/static/data/indicator_texts.json`` (never in the .py,
-per the editorial pipeline) and is loaded once for the life of the process, like
-the other on-disk artifacts. Editing it requires a gunicorn restart.
+The prose lives in ``content/indicators/``, one file per article (never in the
+.py, per the editorial pipeline), and is loaded once for the life of the
+process like the other on-disk artifacts. Editing it requires a gunicorn
+restart.
+
+The layout and the reason for it live in ``scripts/indicator_store.py``, which
+owns the files. The short version: writer and reviewer are the only two stages
+that may touch prose, they run daily, and one JSON object holding 365 articles
+made every pair of concurrent runs a merge conflict on a file no agent can
+resolve by reading it.
 """
 
 import functools
-import json
-from pathlib import Path
 
 from app import sources
-
-_PATH = Path(__file__).resolve().parent / "static" / "data" / "indicator_texts.json"
+from scripts import indicator_store
 
 # Ordered. The default heading is a fallback for pages the agent has not reached
 # yet; an authored `h` always wins.
@@ -60,11 +64,9 @@ _NAMESPACES = tuple(
 @functools.lru_cache(maxsize=1)
 def _load():
     try:
-        with open(_PATH, encoding="utf-8") as fh:
-            data = json.load(fh)
-    except (OSError, ValueError):
+        return indicator_store.load_all()
+    except (OSError, ValueError, indicator_store.StoreError):
         return {}
-    return data if isinstance(data, dict) else {}
 
 
 def get_text(indicator_id):

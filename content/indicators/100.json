@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "100",
+ "lead": "La dipendenza economica misura quanto una regione importa più di quanto esporta, rispetto al PIL. È negativa nelle regioni esportatrici come Lombardia, meno 17,5%, ed Emilia-Romagna, mentre è alta in Calabria, 35,7%, e Sicilia, 26,2%. La media delle regioni è del 7,5%.",
+ "sections": [
+  {
+   "body": "Un valore negativo indica una regione che esporta più di quanto compra, un valore alto una che dipende dall'esterno per ciò che consuma. Il Sud, con poca industria, produce meno di quanto usa e colma la differenza con beni prodotti altrove, spesso al Nord. È la fotografia economica del divario, non un giudizio. Un'economia che dipende dall'esterno può decidere il proprio sviluppo?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "È un saldo tra importazioni ed esportazioni sul PIL, che non dice quali beni né verso quali mercati. Non misura i flussi di reddito e trasferimenti che compensano, in parte, questa dipendenza.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2021
+}

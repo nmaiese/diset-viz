@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "903",
+ "lead": "Il valore aggiunto per abitante è la ricchezza netta creata dall'economia di un territorio, molto simile al PIL. Va dai 19.500 euro della Calabria ai 48.700 del Trentino Alto Adige, con una media delle regioni di circa 31.900. Il divario Nord-Sud supera anche qui le due volte.",
+ "sections": [
+  {
+   "body": "Rispetto al PIL, il valore aggiunto toglie le imposte sui prodotti e misura più da vicino ciò che imprese e lavoratori generano. Il risultato però non cambia la mappa: la ricchezza si crea soprattutto al Nord, in un tessuto produttivo più denso e specializzato. Misura la capacità di un'economia di generare valore, non come quel valore si ripartisce. Un territorio che produce poco valore è povero o solo meno industrializzato?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Come il PIL, rapporta la ricchezza prodotta agli abitanti, non ai lavoratori, e non dice nulla sulla sua distribuzione. Un valore aggiunto alto può convivere con salari bassi se i profitti pesano molto.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2024
+}

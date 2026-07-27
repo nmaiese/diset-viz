@@ -1,0 +1,40 @@
+{
+ "fonti": [
+  {
+   "testo": "L'elenco dei comparti considerati a domanda mondiale dinamica cambia nel 2009 con il passaggio da Ateco 2002 (settori DG, DL, DM, KK, OO) ad Ateco 2007 (CE, CF, CI, CJ, CL, M, R, S). Metadati Istat dell'indicatore, ripubblicati dall'ISPAT sul portale open data della Provincia autonoma di Trento",
+   "url": "https://dati.trentino.it/dataset/capacita-di-esportare-in-settori-a-domanda-mondiale-dinamica"
+  },
+  {
+   "testo": "Nel primo semestre del 2023 le esportazioni delle Marche al netto del comparto farmaceutico hanno ristagnato. Banca d'Italia, L'economia delle Marche, aggiornamento congiunturale n. 33, 7 novembre 2023",
+   "url": "https://www.bancaditalia.it/pubblicazioni/economie-regionali/2023/2023-0033/index.html"
+  }
+ ],
+ "key": "168",
+ "lead": "Vendere all'estero nei settori dove la domanda mondiale cresce è una cosa diversa dal vendere tanto, e in Italia le due mappe non si somigliano. La Basilicata guida la graduatoria con tre quarti del valore di quello che vende all'estero nei comparti dinamici, il Veneto è sedicesimo pur essendo fra le regioni più aperte all'export.",
+ "level": "regione",
+ "reviewed_at": "2026-07-27",
+ "reviewed_vintage": 2022,
+ "sections": [
+  {
+   "body": "L'indicatore è una quota. Su ogni cento euro di merci che una regione vende oltre confine, dice quanti finiscono in comparti la cui domanda mondiale è in crescita.\n\nQuali siano quei comparti non lo decide il territorio, lo decide l'elenco dei settori Ateco che l'Istat considera dinamici. Dall'elenco in vigore dal 2009 dentro ci sono la chimica, la farmaceutica, l'elettronica, gli apparecchi elettrici, i mezzi di trasporto, le attività professionali e scientifiche, quelle artistiche e gli altri servizi. Fuori restano l'abbigliamento e le calzature, e fuori resta anche la meccanica strumentale, cioè macchinari e attrezzature. L'esclusione pesa sulla quota, ma non decide da sola la posizione, perché il resto del paniere conta. Le Marche sono la regione italiana della calzatura e stanno quinte, la Lombardia dei macchinari è decima e l'Emilia-Romagna tredicesima, tutte e tre intorno o sopra la mediana.\n\nUn valore alto quindi non misura la forza dell'export, misura dove è puntato.",
+   "h": "Che cosa rende un settore a domanda mondiale dinamica",
+   "role": "definizione"
+  },
+  {
+   "body": "La graduatoria si spezza subito. Le prime cinque stanno sopra il 56 per cento, la sesta non arriva al 43. Sono Basilicata, Molise, Lazio, Abruzzo e Marche, tutte nel Centro-Sud. La prima regione del Nord-Est arriva al dodicesimo posto.\n\nQuello che un territorio vende fuori decide se la domanda mondiale lo spinge o lo lascia dov'è. Nei comparti dinamici il mercato si allarga da solo e per crescere basta restare in corsa, negli altri ogni euro in più va tolto a un concorrente. Per le sette regioni in cui l'export vale più di un terzo del prodotto, la composizione del paniere arriva ai bilanci di migliaia di imprese e ai posti di lavoro che ne dipendono.\n\nLe due misure dell'export, quanto e che cosa, mettono le regioni in ordini diversi. Nella graduatoria di [quanto ogni regione esporta in rapporto al PIL](/indicatore/capacita-di-esportare/ter-267) l'Emilia-Romagna è terza e la Toscana quinta, mentre qui scendono al tredicesimo e al quattordicesimo posto, e nei primi cinque posti di entrambe compaiono solo le Marche.\n\nNemmeno la produttività industriale segue questa geografia. Sulla [produttività del lavoro nell'industria in senso stretto](/indicatore/produttivita-del-lavoro-nell-industria-in-senso-stretto/ter-123) le due regioni agli estremi di questa fila finiscono entrambe a metà classifica, undicesima e quattordicesima. Nel tema [Imprese e competitività](/tema/imprese-e-competitivita) questa mappa resta un caso a sé.",
+   "h": "Le prime cinque e poi il vuoto",
+   "role": "quadro"
+  },
+  {
+   "body": "Dal 1991 la media semplice delle regioni si è spostata verso i comparti dinamici di 8,5 punti. La fila però si è allargata più di quanto si sia alzata, con 13,6 punti in più fra la testa e la coda.\n\nLa corsa più lunga è quella delle Marche, ultime nel 1991 con meno del sei per cento dell'export in comparti dinamici e quinte nel 2022 con più della metà. Quasi metà di quella salita è arrivata in un anno solo, dal 33,2 al 56,5 per cento fra il 2021 e il 2022, mentre quattordici regioni su venti scendevano. Un altro pezzo, 12,7 punti, è comparso nel 2009, l'anno in cui l'Istat ha cambiato l'elenco dei settori, e conta meno di quanto sembri. La media è rimasta ferma proprio perché il salto marchigiano ha quasi pareggiato tutti i cali, ed è una stabilità che non racconta niente di stabile. Una quota del resto si muove anche dal denominatore, e sale pure quando è il paniere a sgonfiarsi.\n\nCinque regioni vanno nella direzione opposta. La Sardegna è il caso estremo, con quasi diciotto punti persi dal 1991, e la Valle d'Aosta ne ha lasciati per strada tredici. Quanto possa pesare un singolo comparto lo dice la Banca d'Italia, che rileva come nei primi sei mesi del 2023, l'anno dopo l'ultimo coperto da questa serie, le esportazioni marchigiane al netto della farmaceutica abbiano ristagnato.",
+   "h": "Trent'anni di spostamento, e un salto tutto in un anno",
+   "role": "dinamica"
+  },
+  {
+   "body": "L'elenco dei comparti considerati dinamici è cambiato per strada. Fino al 2008 l'Istat lo costruiva sulla classificazione Ateco 2002, dal 2009 su Ateco 2007, con un insieme di settori diverso. Si vede nell'anno del cambio, quando dodici regioni salgono e otto scendono, la Basilicata di 17,4 punti in su e l'Abruzzo di 7,8 in giù. Quando in un anno solo i territori si muovono in direzioni opposte e di quella misura, a cambiare è più il perimetro che il mercato, e il confronto fra il 1991 e oggi attraversa quel passaggio. Una variazione di lunghissimo periodo va quindi letta come un ordine di grandezza.\n\nLa quota non dice quanto vale l'export né quante imprese lo fanno. Una regione che spedisce poche merci può stare in cima perché quelle poche appartengono ai comparti giusti, e dove si esporta poco una sola voce merceologica può valere metà del paniere. Il conto non distingue un distretto di centinaia di aziende da due o tre stabilimenti, non dice con quali margini si vende dentro quei settori, e l'elenco resta fermo per anni mentre i mercati si muovono più in fretta.",
+   "h": "Il perimetro dei settori dinamici non è sempre stato lo stesso",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2022
+}

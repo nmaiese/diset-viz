@@ -1,0 +1,36 @@
+{
+ "fonti": [
+  {
+   "testo": "Eurostat, personale di ricerca e sviluppo in equivalenti a tempo pieno sulla popolazione attiva (rd_p_perslf): nel 2023 vale l'1,57% nell'UE e l'1,41% in Italia.",
+   "url": "https://ec.europa.eu/eurostat/databrowser/view/rd_p_perslf/default/table?lang=en"
+  }
+ ],
+ "key": "eur:rd_p_persreg",
+ "lead": "Nel 2023 la ricerca e sviluppo si concentra in pochi territori del Centro-Nord. L'Emilia-Romagna guida, la seguono il Lazio all'1,68% della forza lavoro e il Friuli-Venezia Giulia all'1,64%, ma la seconda metà della graduatoria sta quasi tutta sotto l'uno per cento, e nel Mezzogiorno, da Sardegna e Basilicata giù fino alla Calabria, si resta intorno a mezzo punto.",
+ "level": "regione",
+ "reviewed_at": "2026-07-26",
+ "reviewed_vintage": 2023,
+ "sections": [
+  {
+   "body": "Eurostat conta qui tutto il personale di ricerca e sviluppo, non i soli ricercatori. Dentro ci sono anche i tecnici e il personale di supporto, e tutti i settori che la ricerca la fanno, dalle imprese alle università agli enti pubblici.\n\nLe due metà del rapporto si contano in modo diverso, e questo cambia la lettura. Il numeratore è in equivalenti a tempo pieno, quindi due persone che dedicano alla ricerca metà del proprio orario valgono una unità sola. Il denominatore è invece la popolazione attiva contata per teste. Un valore dell'1,00 dice che ogni cento persone nella forza lavoro corrisponde una unità di lavoro a tempo pieno dedicata alla ricerca, non che una persona su cento faccia il ricercatore.",
+   "h": "Il numeratore è in equivalenti a tempo pieno, il denominatore no",
+   "role": "definizione"
+  },
+  {
+   "body": "La media delle venti regioni è dell'1,16%, ma la mediana è più bassa, all'1,06%: bastano pochi territori del Nord a tenere alto il quadro, e metà delle regioni resta sotto quel valore. Il disegno ricalca quello della [spesa in ricerca e sviluppo](/indicatore/spesa-in-ricerca-e-sviluppo-sul-pil-eurostat-nuts2/eur-rd_e_gerdreg), con l'Emilia-Romagna davanti e il Mezzogiorno in fondo, solo che qui si contano le persone e non gli euro. L'Italia nel suo insieme impiega nella ricerca l'1,41% della popolazione attiva, sotto la media europea dell'1,57% ([Eurostat](https://ec.europa.eu/eurostat/databrowser/view/rd_p_perslf/default/table?lang=en)), soglia che solo cinque regioni italiane superano. Tra il 2019 e il 2023 la media regionale non si muove, resta all'1,16%, però la mediana scende dall'1,15% all'1,06%: il centro si abbassa mentre il vertice tiene, e la distanza interna si allarga invece di chiudersi.",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Dal 2019 al 2023 otto regioni chiudono il periodo sotto il livello da cui erano partite e dodici sopra. È questa somma quasi nulla a tenere ferma la media, non l'immobilità dei territori.\n\nI due estremi del movimento non stanno ai due estremi della classifica. Il guadagno maggiore è della Valle d'Aosta, 0,20 punti, che resta comunque nella parte bassa. La perdita maggiore è dell'Umbria, 0,22 punti, e le è costata posizioni. Nel 2019 stava poco sotto le Marche e la Campania, oggi è quattordicesima. Arretrano anche l'Emilia-Romagna, il Piemonte, la Toscana e il Veneto, tutte e quattro dalla parte alta della graduatoria.\n\nNell'ultimo passaggio, dal 2022 al 2023, il movimento è più compatto. Tredici regioni salgono, sei scendono e una resta ferma, sulle venti presenti in entrambi gli anni. La media si muove appena, troppo poco per dire che la tendenza sia cambiata.",
+   "h": "Chi sale e chi scende, sotto una media che non si muove",
+   "role": "dinamica"
+  },
+  {
+   "body": "La quota conta le persone in equivalenti a tempo pieno, non quanto producono: due regioni con lo stesso valore possono pubblicare, brevettare e innovare in modo molto diverso. Il numero somma ricerca pubblica e privata senza distinguerle, così non dice se a mancare siano i laboratori delle imprese o quelli dello Stato. E fotografa chi la ricerca la fa in regione oggi, non se quelle competenze siano cresciute lì: un territorio può formare ricercatori e vederli partire senza che il dato lo registri.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2023
+}

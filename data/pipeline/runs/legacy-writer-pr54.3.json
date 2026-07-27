@@ -1,0 +1,15 @@
+{
+ "at": "2026-07-27T15:12:33+00:00",
+ "branch": "master",
+ "commit": "c441792",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": "54",
+ "run_id": "legacy-writer-pr54",
+ "stage": "writer",
+ "summary": "PR #54 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}

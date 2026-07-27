@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-27T06:23:33+00:00",
+ "branch": "automation/hunter-2026-07-27",
+ "commit": "45d3f0f",
+ "detail": [
+  "eurostat_regional live: 3 candidati, nessuno nuovo, diff vuoto. istat_demografia live: 4 candidati, nessuno nuovo, diff vuoto. Nessuna riga SERIE NON LETTA su stderr in entrambe le scansioni.",
+  "istat_demografia:DEPENDRATE da needs-info a rejected: duplica dem:OLDAGEDEPR senza aggiungere freschezza, correlazione 0,95 Pearson e 0,94 per rango sul 2025, stesso dataflow, stesso anno, copertura 20 su 20 per entrambi, spostamento massimo di rango cinque posizioni.",
+  "Nessuna promozione: zero candidati approved, promote_candidates.py --dry-run conferma."
+ ],
+ "gate": "checks",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-hunter-20260727T062333",
+ "stage": "hunter",
+ "summary": "Scansione live delle due fonti watchlist, coda invariata a 7, chiuso l'unico rimando: istat_demografia:DEPENDRATE respinto",
+ "trigger": "manuale"
+}

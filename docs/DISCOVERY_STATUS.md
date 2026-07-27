@@ -35,36 +35,46 @@ Agenti cloud, sessione nuova a ogni firing, checkout git proprio, environment
 `divarioitalia` (`env_01VgKtjzcUbEYYgZb81pYEfS`). Si gestiscono su
 <https://claude.ai/code/routines>.
 
-| agente | definizione | cron (UTC) | merge | routine id |
-| --- | --- | --- | --- | --- |
-| scout | `source-scout.md` | `0 5 * * 0` (dom) | checks | `trig_01KZ1CHGPRgNmF9Ahni9VXfQ` |
-| cacciatore | `indicator-hunter.md` | `0 6 * * 1` (lun) | checks | `trig_01VizeycZocZoeDE1RxjWj1f` |
-| curatore | `indicator-curator.md` | `0 6 * * 4` (gio) | checks | `trig_019EP6TnEbYnKz8VpKFaRm4g` |
-| scrittore | `indicator-writer.md` | `0 6 * * 6` (sab) | auto | `trig_01RymCgC8VsspDrHHnUJgFUk` |
-| revisore | `indicator-reviewer.md` | `0 7 * * *` (ogni giorno) | auto | `trig_01LSZpaDasW18ZvxbKhXBJSj` |
-| verificatore | `indicator-verifier.md` | `0 9 * * *` (ogni giorno) | checks | **da creare** |
+**Una sola Routine, quella del dispatcher.** Gli stadi non hanno più un cron
+proprio: il dispatcher gira a battito, legge tutte le code e lancia un solo
+stadio per volta, il primo con lavoro in ordine di catena. Il perché sta in
+[`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md#il-dispatcher-chi-decide-chi-gira-e-uno-per-volta),
+in due righe: le dipendenze della catena sono di dato e il calendario le
+ignorava, e sei Routine indipendenti si pestavano i piedi.
 
-Cadenza sfalsata di proposito: ogni stadio ha senso solo dopo che quello a monte
-ha prodotto qualcosa. Il revisore gira ogni giorno perché lavora su un arretrato
-di centinaia di articoli e non su ciò che è appena arrivato, e il verificatore
-due ore dopo di lui per la stessa ragione: se il revisore firma ogni giorno, ogni
-giorno c'è una firma nuova che nessuno ha provato a far cadere.
+| Routine | cadenza (UTC) | che cosa fa | routine id |
+| --- | --- | --- | --- |
+| dispatcher | oraria | `pipeline_dispatch.py`, poi lancia lo stadio che ha nominato | **da creare** |
 
-**La Routine del verificatore non è ancora creata.** Lo stadio è registrato in
-tutti e tre i posti che lo pretendono (`pipeline_gate`, `pipeline_log`,
-`pipeline_status`), ha il suo agente e la sua coda, e gira a mano. Armare la
-Routine è l'ultimo passo e mette in moto un agente che apre e fonde pull request
-da solo: va fatto quando si decide di farlo, non come effetto collaterale di una
-sessione. Il comando è nel prompt della Routine come per gli altri cinque, cioè
-punta al file dell'agente e non ne ricopia il contenuto.
+Il prompt della Routine è tre passi e nessuna regola ricopiata:
 
-Nessuna riga di questa tabella dice `manual`, e non è una svista. La catena è non
-presidiata per decisione presa: un modo che parcheggia la pull request finché
-qualcuno guarda, in un sistema che nessuno guarda, vuol dire fermo per sempre.
-`checks` non è un'attesa di approvazione, è un'attesa della CI, e la esegue
+```
+1. python3 scripts/pipeline_dispatch.py --json --check-open-prs --record
+2. se `stage` è null, la run finisce qui: il tick è già registrato
+3. altrimenti invoca l'agente che dice `agent`, passandogli il `run_id`.
+   L'agente segue .claude/agents/<agent>.md e docs/AGENT_CONTRACT.md
+```
+
+**Le sei Routine per stadio vanno disattivate**, non cancellate finché il
+dispatcher non ha girato qualche giorno. Se restano accese insieme al dispatcher
+si torna esattamente alla concorrenza che il dispatcher toglie.
+
+| vecchia Routine | routine id | stato |
+| --- | --- | --- |
+| scout | `trig_01KZ1CHGPRgNmF9Ahni9VXfQ` | da disattivare |
+| cacciatore | `trig_01VizeycZocZoeDE1RxjWj1f` | da disattivare |
+| curatore | `trig_019EP6TnEbYnKz8VpKFaRm4g` | da disattivare |
+| scrittore | `trig_01RymCgC8VsspDrHHnUJgFUk` | da disattivare |
+| revisore | `trig_01LSZpaDasW18ZvxbKhXBJSj` | da disattivare |
+| verificatore | mai creata | niente da fare |
+
+Nessuno stadio è `manual`, e non è una svista. La catena è non presidiata per
+decisione presa: un modo che parcheggia la pull request finché qualcuno guarda,
+in un sistema che nessuno guarda, vuol dire fermo per sempre. `checks` non è
+un'attesa di approvazione, è un'attesa della CI, e la esegue
 `scripts/pipeline_merge.py`.
 
-**Il prompt di ogni Routine punta ai file, non li ricopia.** Vedi sotto perché.
+**Il prompt della Routine punta ai file, non li ricopia.** Vedi sotto perché.
 
 ## Cosa è successo il 2026-07-26
 

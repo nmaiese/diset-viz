@@ -205,7 +205,7 @@ Dopo che il curatore ha integrato e orientato un indicatore, manca il testo che
 l'utente legge. Lo **scrittore** (`.claude/agents/indicator-writer.md`, agente
 Claude Code invocabile via subagent) scrive l'intero articolo della pagina
 (`lead` piu le quattro sezioni `definizione`/`quadro`/`dinamica`/`limiti`, con
-`fonti` e `vintage`) in `app/static/data/indicator_texts.json`, seguendo
+`fonti` e `vintage`) in `content/indicators/`, un file per articolo, seguendo
 `content/STYLE.md`, con **solo numeri reali** presi dal brief
 (`scripts/indicator_brief.py`), le fonti verificate per le affermazioni
 comparative e il `vintage` uguale all'`year_max` corrente (drift guard). Apre una

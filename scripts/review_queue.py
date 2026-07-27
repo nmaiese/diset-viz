@@ -41,16 +41,12 @@ and that is the one class a reader checking arithmetic will confirm as correct.
 import argparse
 import csv
 import io
-import json
 import re
-from pathlib import Path
 
 from app import indicator_texts, sources
 from app.indicator_view import build_indicator_view
-from scripts import definition_check, prose_lint, verification_queue
+from scripts import definition_check, indicator_store, prose_lint, verification_queue
 from scripts.fetch_definitions import load_definitions
-
-TEXTS_PATH = Path(indicator_texts.__file__).resolve().parent / "static" / "data" / "indicator_texts.json"
 
 # A claim that holds "everywhere" or "always" is false the moment one territory
 # disagrees, and the brief has a block (SI MUOVONO CONTROCORRENTE) that settles
@@ -119,9 +115,9 @@ FLAG_WEIGHT = {
     # marca una frase che *potrebbe* essere sbagliata: questo marca una frase che
     # un verificatore avversariale ha gia' fatto cadere, con la prova, e che e'
     # ancora in pagina perche' nessuno l'ha riscritta. Il verificatore non ha
-    # `indicator_texts.json` nel perimetro proprio perche' la riparazione tocchi
+    # `content/indicators/` nel perimetro proprio perche' la riparazione tocchi
     # a chi legge questa coda, quindi se questo segnale non fosse in cima il
-    # cerchio non si chiuderebbe e la smentita resterebbe in un CSV.
+    # cerchio non si chiuderebbe e la smentita resterebbe in un registro.
     "smentita": 60,
     # `definizione` viene subito dopo, sopra `rilettura`, and it is the only
     # flag whose rank was decided by counting. Reading a batch of eleven
@@ -144,9 +140,9 @@ FLAG_WEIGHT = {
 }
 
 
-def load_texts(path=None):
-    path = Path(path) if path else TEXTS_PATH
-    return json.loads(path.read_text(encoding="utf-8"))
+def load_texts(root=None):
+    """Tutti gli articoli. `root` e' una directory di store, non piu' un file."""
+    return indicator_store.load_all(root)
 
 
 def resolve_key(texts, code):

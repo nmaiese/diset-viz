@@ -1,0 +1,27 @@
+{
+ "fonti": [
+  {
+   "testo": "INVALSI, Rapporto prove nazionali 2025, risultati del grado 13",
+   "url": "https://www.invalsi.it/risultati-invalsi-2025-grado-13/"
+  },
+  {
+   "testo": "INVALSI, Presentazione dei risultati delle prove 2025 (matematica grado 13 al 49,2%, -3,3 punti sul 2024)",
+   "url": "https://invalsi-areaprove.cineca.it/docs/2025/Rilevazioni_Nazionali/Rapporto/Presentazione%20Risultati%20prove%20INVALSI%202025.pdf"
+  }
+ ],
+ "key": "624",
+ "lead": "Nel 2025 in Veneto il 36,5% degli studenti all'ultimo anno delle superiori non raggiunge le competenze numeriche minime, in Sardegna arriva quasi al 70%. Sei anni prima, nelle regioni di testa, quella soglia la mancava poco meno di uno studente su quattro. Oggi ne resta indietro più di uno su tre.",
+ "sections": [
+  {
+   "body": "Attenzione a leggere come una buona notizia il fatto che la distanza tra Nord e Sud si sia accorciata. Si è accorciata verso il basso. Dal 2019 le regioni di testa hanno perso terreno più in fretta della coda, e la forbice si è chiusa così, non perché il Sud sia migliorato. Oggi la regione messa meglio si ritrova al livello di insufficienza che sei anni fa era quello della regione di mezzo. Il [Rapporto INVALSI 2025](https://www.invalsi.it/risultati-invalsi-2025-grado-13/) fotografa lo stesso arretramento su scala nazionale, con la sufficienza in matematica all'ultimo anno al 49,2%, 3,3 punti sotto il 2024. Resta aperta la domanda se sia una coda degli anni della pandemia o un cedimento più stabile della scuola superiore.",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Il dato nasce da una sola prova, quella INVALSI dell'ultimo anno, e fotografa gli apprendimenti in un singolo momento. Conta inoltre solo gli studenti ancora iscritti, perché chi ha lasciato la scuola prima non entra nel calcolo, così misura chi arriva al traguardo più che l'intera coorte di partenza. La media regionale mette insieme percorsi molto diversi, dai licei agli istituti professionali, dove in molte regioni l'esito medio resta sul gradino più basso della scala. È un esito, non una spiegazione delle sue cause, e sulla mappa manca il Trentino-Alto Adige.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

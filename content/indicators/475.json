@@ -1,0 +1,27 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, Banca dati territoriale per le politiche di sviluppo (fonte del dato)",
+   "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
+  },
+  {
+   "testo": "Istat, Giovani e mercato del lavoro, Anno 2024",
+   "url": "https://www.istat.it/comunicato-stampa/giovani-e-mercato-del-lavoro-anno-2024/"
+  }
+ ],
+ "key": "475",
+ "lead": "In Trentino Alto Adige lavora poco più di un giovane uomo su due, il 52,3%, in Calabria meno di uno su quattro, il 24,5%. Dopo il Trentino tutte le regioni del Nord superano il 40%, mentre Campania, Sicilia e Calabria restano in fondo, tutte sotto il 30%.",
+ "sections": [
+  {
+   "body": "Dal 2018 gran parte del Mezzogiorno ha recuperato terreno. La Sicilia e la Sardegna hanno guadagnato oltre sei punti, la Campania è salita dal 22,6% al 25,3%. La Calabria invece è scesa dal 25,6% al 24,5% e chiude ancora la classifica. Un valore basso, qui, non certifica per forza un mercato del lavoro peggiore. La percentuale conta come occupato solo chi lavora, mentre chi studia a tempo pieno pesa lo stesso al denominatore, l'intera popolazione tra i 15 e i 29 anni. Così lo stesso 24,5% può nascere da più ragazzi sui banchi oppure da più ragazzi fuori sia dalla scuola sia dal lavoro. La [partecipazione dei giovani del Sud al mercato del lavoro resta strutturalmente più bassa](https://www.istat.it/comunicato-stampa/giovani-e-mercato-del-lavoro-anno-2024/), con un'inattività molto più alta che al Nord. Resta da capire quale delle due spinte pesi di più oggi in Calabria.",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Il dato riguarda i soli maschi, quindi va confrontato con quello femminile e con il totale per leggere il divario di genere. Copre la fascia 15-29 anni come media annua, con al denominatore l'intera popolazione di quell'età, studenti compresi. Non dice nulla sulla qualità dell'impiego, stabile o precario, a tempo pieno o parziale. E una fotografia per regione in un solo anno non consente di leggere una causa dentro l'altra.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

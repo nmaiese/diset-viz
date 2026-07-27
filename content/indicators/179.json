@@ -1,0 +1,23 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, Banca dati territoriale per le politiche di sviluppo",
+   "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
+  }
+ ],
+ "key": "179",
+ "lead": "In Campania quasi sette uomini disoccupati su dieci cercano lavoro da più di un anno, in Trentino Alto Adige poco più di due su dieci. Nel 2025 la disoccupazione maschile di lunga durata forma un blocco meridionale compatto in cima alla classifica, con Campania al 68,3%, Puglia al 63,7% e Sicilia al 63,4%. Al Nord la stessa quota vale circa un terzo, con Veneto ed Emilia-Romagna intorno al 33,5%.",
+ "sections": [
+  {
+   "body": "In gran parte del Mezzogiorno la disoccupazione di lunga durata pesa di più sulle donne, e in Molise la quota femminile arriva all'81%. Fanno eccezione proprio le due regioni dove il dato maschile tocca il vertice. In Campania e in Puglia sono gli uomini a restare più a lungo senza lavoro, con la [quota femminile](/indicatore/incidenza-della-disoccupazione-di-lunga-durata-femmine/ter-180) ferma al 65,5% e al 61,5%. In quelle due aree, a differenza del resto del Sud, l'incidenza della disoccupazione di lunga durata è un po' più alta tra gli uomini che tra le donne. Probabilmente pesa il ruolo di edilizia e agricoltura, settori a forte manodopera maschile dove l'uscita dal lavoro diventa cronica, ma il dato regionale da solo non lo dimostra. Quanto conta la struttura per settori dietro questo scarto tra uomini e donne?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Attenzione a cosa misura. È la quota dei disoccupati che cercano da oltre un anno, non quanti uomini sono senza lavoro sul totale della forza lavoro. Una regione con pochi disoccupati può avere un valore alto se chi resta fuori fatica a rientrare, una con molti disoccupati può averlo basso. Per il peso reale del fenomeno serve il [tasso di disoccupazione di lunga durata](/indicatore/tasso-di-disoccupazione-di-lunga-durata-maschi/ter-183). Il dato riguarda solo gli uomini ed è una stima campionaria: dove i disoccupati sono pochi oscilla molto da un anno all'altro, come in Sardegna, passata dal 59,7% del 2024 al 39,0% del 2025. Una fotografia annuale non spiega le cause.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

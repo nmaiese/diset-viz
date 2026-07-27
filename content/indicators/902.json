@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "902",
+ "lead": "Più del PIL conta quanto le famiglie hanno davvero da spendere. Il reddito disponibile per abitante va dai 16.800 euro della Calabria ai 29.300 del Trentino Alto Adige. La media delle regioni è di circa 22.500, e il divario, meno ampio di quello del PIL, resta netto.",
+ "sections": [
+  {
+   "body": "Questo è il reddito che resta alle famiglie dopo imposte e trasferimenti pubblici, il più vicino alla vita quotidiana. Il divario Nord-Sud si restringe rispetto al PIL, segno che la redistribuzione avvicina un po' i territori, senza però annullarne le distanze. Va poi confrontato con il costo della vita, diverso tra aree, che cambia il potere d'acquisto reale. Lo stesso reddito vale ovunque allo stesso modo?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "È una media per abitante, quindi nasconde le disuguaglianze interne a ogni regione e non distingue redditi alti e bassi. Non tiene conto del diverso costo della vita, che al Sud in parte compensa i redditi più bassi.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2024
+}

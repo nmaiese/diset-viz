@@ -126,7 +126,7 @@ def recent_chain_commits(limit=12):
     """
     from scripts import pipeline_gate
 
-    owned = {path for paths in pipeline_gate.STAGE_PATHS.values() for path in paths}
+    owned = tuple({path for paths in pipeline_gate.STAGE_PATHS.values() for path in paths})
     code, out, _ = _git("log", f"-{limit * 6}", "--format=%h%x1f%cI%x1f%s", "--name-only")
     if code != 0:
         return []
@@ -149,11 +149,15 @@ def recent_chain_commits(limit=12):
     out_rows = []
     for commit in commits:
         touched = set(commit["files"])
-        if not touched or not touched <= owned:
+        # `path_allowed` e non l'appartenenza a un insieme: da quando i registri
+        # sono store a un file per record, un perimetro puo' essere una
+        # directory, e confrontare i percorsi uno a uno non riconoscerebbe piu'
+        # nessun commit della catena.
+        if not touched or not all(pipeline_gate.path_allowed(p, owned) for p in touched):
             continue
         commit["stages"] = sorted({
             stage for stage, paths in pipeline_gate.STAGE_PATHS.items()
-            if touched <= set(paths)
+            if all(pipeline_gate.path_allowed(p, paths) for p in touched)
         })
         out_rows.append(commit)
         if len(out_rows) >= limit:
@@ -326,10 +330,24 @@ def render(out_path=None):
         headline = ("Niente in coda: la catena e ferma perche ha finito, "
                     "non perche e bloccata.")
 
+    # Il battito del dispatcher, prima di tutto il resto. E' l'unico segnale che
+    # distingue "nessuno stadio aveva lavoro" da "non e' partito niente": da
+    # quando il lavoro lo assegna lui, il silenzio di un singolo stadio e' una
+    # risposta legittima, il suo no.
+    ticks = [e for e in entries if e.get("stage") == "dispatch"]
+    if ticks:
+        last_tick = max(ticks, key=lambda e: e.get("at") or "")
+        headline += (f" Ultimo giro del dispatch: "
+                     f"{_esc((last_tick.get('at') or '')[:16].replace('T', ' '))}.")
+    else:
+        headline += (" Il <strong>dispatch</strong> non ha mai registrato un giro: "
+                     "finche' non lo fa, nessuno assegna il lavoro.")
+
     # Un avviso sopra tutto il resto, perche' uno stadio fermo non si vede in
     # nessuna delle tabelle sotto: quelle mostrano cio' che e' successo, e qui il
     # problema e' che non e' successo niente.
-    late = [r for r in pipeline_log.silence(entries) if r["stale"]]
+    late = [r for r in pipeline_log.silence(entries, queues=pipeline_status.queue_sizes())
+            if r["stale"]]
     if late:
         detail = ", ".join(
             f"{r['group']} ({r['days_since']:.0f} giorni, atteso ogni {r['expected_days']})"

@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "bes:03LAV001-N22",
+ "lead": "Nel sistema BES il tasso di occupazione 20-64 misura quanto un territorio si avvicina agli standard europei. La media italiana è del 68%, ancora distante dai Paesi più avanzati, e al suo interno si va dal 50,3% della Calabria al 78,8% del Trentino Alto Adige, che quella soglia la supera.",
+ "sections": [
+  {
+   "body": "Un tasso alto è la base del benessere economico, ma da solo non basta a dire se il lavoro sia di qualità o conciliabile con la vita. Il Nord-Est che guida la classifica combina alta occupazione e, spesso, più servizi per l'infanzia e più stabilità. Il Sud sconta occupazione bassa e lavoro più precario insieme. Guardare solo il tasso rischia di premiare la quantità e ignorare le condizioni. Quanto conta avere un lavoro rispetto a che lavoro si ha?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "È la quota di occupati 20-64 sulla popolazione, un dato di sola quantità. Non incorpora ore, contratti e salari, e una regione può migliorare il tasso aumentando lavori parziali o a termine senza che le condizioni migliorino.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

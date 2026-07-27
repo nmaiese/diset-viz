@@ -1,0 +1,23 @@
+{
+ "fonti": [
+  {
+   "testo": "Eurostat, Mortality and life expectancy statistics: nel 2024 le province autonome di Trento e Bolzano (85,0 anni) figurano tra le regioni europee con la speranza di vita più alta.",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Mortality_and_life_expectancy_statistics"
+  }
+ ],
+ "key": "910",
+ "lead": "In Italia si vive a lungo quasi ovunque. La speranza di vita alla nascita va dagli 82,1 anni della Campania agli 84,8 del Trentino Alto Adige. Meno di tre anni separano la prima dall'ultima regione, e la media, 83,6 anni, coincide quasi con la mediana. È uno degli indicatori più uniformi del quadro territoriale.",
+ "sections": [
+  {
+   "body": "Meno di tre anni di differenza sembrano pochi, ma su un esito così stabile anche un divario contenuto pesa. La Campania segna il valore più basso, il Nord-Est i più alti. La speranza di vita riassume in un solo numero prevenzione, ambiente, redditi e servizi, e proprio per questo non racconta come si vivono quegli anni, dato che una regione può guadagnare mesi di vita e perdere qualità della salute. In ambito europeo l'Italia è tra i paesi più longevi ([Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Mortality_and_life_expectancy_statistics)). Quanti di quegli anni si vivono in buona salute?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "È un dato medio alla nascita, non dice nulla sulle disuguaglianze interne a ogni regione, tra quartieri o gruppi sociali, né sulla qualità degli anni vissuti. Due regioni con la stessa speranza di vita possono avere condizioni di salute molto diverse.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

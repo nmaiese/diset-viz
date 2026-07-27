@@ -1,0 +1,31 @@
+{
+ "fonti": [],
+ "key": "dem:OLDAGEDEPR",
+ "lead": "In dieci anni le persone dai 65 anni in su ogni cento in età da lavoro sono aumentate in tutte e venti le regioni italiane, ma la Sardegna si è mossa quasi sette volte più della Liguria. La graduatoria che ne esce non separa il Nord dal Sud.",
+ "level": "regione",
+ "reviewed_at": "2026-07-26",
+ "reviewed_vintage": 2025,
+ "sections": [
+  {
+   "body": "L'indicatore mette al numeratore i residenti dai 65 anni in su e al denominatore quelli tra i 15 e i 64, e moltiplica per cento. Un valore di 40 vuol dire quaranta persone dai 65 anni in su ogni cento in età da lavoro.\n\nIl nome inganna su un punto. La parola dipendenza qui non descrive nessuna dipendenza reale, è solo il rapporto tra due fasce anagrafiche. Chi lavora a sessantasette anni sta comunque al numeratore, chi a trenta non ha mai lavorato sta comunque al denominatore. Per sapere quante persone attive sostengono davvero quante inattive serve il tasso di occupazione, non questo numero.",
+   "h": "Un rapporto tra fasce di età, non tra chi lavora e chi no",
+   "role": "definizione"
+  },
+  {
+   "body": "L'invecchiamento non ricalca la faglia Nord Sud a cui questo atlante abitua. In alto insieme alla Liguria ci sono il Friuli-Venezia Giulia e l'Umbria, ma anche il Molise quarto e la Sardegna quinta, mentre la Lombardia e il Lazio stanno tra le ultime cinque.\n\nLa distribuzione ha una sola discontinuità vera, ed è in cima. I 3,60 punti che separano la Liguria dal Friuli-Venezia Giulia valgono esattamente quanto l'intervallo che dal Friuli, secondo, scende fino alla Valle d'Aosta, undicesima: dieci regioni stanno nello stesso spazio che separa la prima dalla seconda. Sotto quella vetta isolata il paese è compatto, e la mediana leggermente sopra la media dice la stessa cosa. Trattandosi di un indicatore contestuale, la classifica ordina i territori per struttura per età e non premia nessuno.",
+   "h": "La geografia non è quella che ci si aspetta",
+   "role": "quadro"
+  },
+  {
+   "body": "Dal 2015 al 2025 la media semplice dei valori regionali è salita di 5,54 punti. Non ci sono eccezioni da segnalare, perché non ce ne sono: il rapporto è cresciuto in tutte e venti le regioni sull'intero periodo e in tutte e venti anche nell'ultimo anno disponibile.\n\nA cambiare è la velocità. La Sardegna ha guadagnato 11,00 punti in dieci anni, il doppio della media, e ha attraversato mezza classifica. Nel 2015 stava a 32,70, cioè al livello a cui oggi si trova la regione più giovane d'Italia. La Liguria, che era già la più anziana, si è mossa di 1,60 punti e basta.\n\nÈ una convergenza, non un'inversione. Le regioni partite più in alto si muovono piano, quelle rimaste indietro recuperano in fretta, e il paese si sta uniformando verso l'alto invece di dividersi.",
+   "h": "Sale ovunque, ma la Sardegna corre e la Liguria si è fermata",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il rapporto conta teste per fascia di età e nient'altro. Non sa chi lavora, chi assiste qualcuno, chi è autosufficiente e chi no. Due regioni con lo stesso valore possono avere carichi previdenziali e di cura molto diversi, a seconda di quante persone in età da lavoro un impiego ce l'hanno davvero.\n\nC'è poi un modo di salire che non ha niente a che fare con l'invecchiamento. Il denominatore si assottiglia anche quando i giovani adulti se ne vanno, quindi l'emigrazione alza il rapporto senza che un solo residente in più superi i 65 anni. Il numero da solo non distingue le due strade.",
+   "h": "Che cosa non dice sul peso reale dell'invecchiamento",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

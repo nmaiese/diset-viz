@@ -1,0 +1,23 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, La povertà in Italia, Anno 2024",
+   "url": "https://www.istat.it/wp-content/uploads/2025/10/La-poverta-in-italia-_-Anno-2024.pdf"
+  }
+ ],
+ "key": "multiscopo:MULTI_SATLIFE_0",
+ "lead": "Dare alla propria vita il voto zero su dieci è una risposta rara, in quasi tutte le regioni la sceglie meno di una persona su cento. Le quote più alte, l'1,4%, sono in Calabria e Abruzzo, la più bassa nelle Marche, allo 0,4%.",
+ "sections": [
+  {
+   "body": "La geografia di questo gradino non ricalca la linea Nord-Sud che ordina quasi tutto l'atlante. Le regioni dove la povertà è più diffusa finiscono ai due estremi, la Calabria in cima e la Campania giù in fondo, ferma allo 0,5%, sotto Liguria e Umbria che pure stanno al Centro-Nord. Il voto zero probabilmente dice più di una condizione personale, una salute che cede, un isolamento, uno choc recente, che della ricchezza del posto in cui si vive. È il motivo per cui a muovere questa coda sembra la storia di chi risponde più del territorio in cui abita. Conta di più dove vivi o cosa ti è successo?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Con una quota quasi ovunque sotto l'uno per cento il valore è fragile e non regge graduatorie fini tra regioni. Segnala la presenza di un disagio estremo, non chi lo vive, le sue cause o quanto dura. Resta una stima campionaria, da leggere accanto agli altri gradini bassi della scala.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2024
+}

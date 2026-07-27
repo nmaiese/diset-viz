@@ -1,0 +1,23 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, Noi Italia 2025, Mercato del lavoro: tasso di disoccupazione e di occupazione per genere, 2024",
+   "url": "https://noi-italia.istat.it/pagina.php?id=3&categoria=16&action=show&L=0"
+  }
+ ],
+ "key": "176",
+ "lead": "In Campania quasi una donna attiva su sei cerca lavoro senza trovarlo, il 15,7%, contro il 2,6% del Trentino Alto Adige. Dal 2018 il tasso è sceso in ogni regione, eppure i valori più alti restano tutti nel Mezzogiorno.",
+ "sections": [
+  {
+   "body": "Il Sud non scende alla stessa velocità. Nel 2018 Campania e Calabria viaggiavano quasi appaiate, tra il 23 e il 25%. Sette anni dopo la Calabria si è più che dimezzata, fino al 10,7%, mentre la Campania ha perso appena un terzo e resta al 15,7%. Due regioni che partivano insieme oggi distano cinque punti pieni. Il club della doppia cifra si è intanto ristretto da undici regioni a quattro, e le quattro che restano sono tutte a sud di Roma. Quanto di quel crollo calabrese è lavoro trovato e quanto è forza lavoro che se ne va?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Il tasso conta solo chi cerca lavoro attivamente, quindi ignora chi ha smesso di provarci, il part time involontario e il lavoro nero. Ed è la sola serie femminile, che da sola non misura il divario di genere. Nel 2024, a livello nazionale, la disoccupazione delle donne era al 7,3% contro il 5,9% degli uomini, e il tasso di occupazione femminile restava sotto quello maschile di oltre 19 punti. Dove poche donne cercano un impiego, un valore basso può segnalare rinuncia più che apertura del mercato.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

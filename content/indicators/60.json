@@ -1,0 +1,40 @@
+{
+ "fonti": [
+  {
+   "testo": "ARERA definisce lunga l'interruzione che supera i tre minuti, calcola la continuità del servizio sugli utenti in bassa tensione escludendo le interruzioni attribuite a forza maggiore, e la misura con due indicatori distinti, il numero medio di interruzioni per utente e i minuti persi",
+   "url": "https://www.arera.it/schede-tecniche/dettaglio/it/schedetecniche/15/inter_continuita_st"
+  },
+  {
+   "testo": "La pubblicazione comparativa ARERA sulla continuità distingue i territori in alta, media e bassa concentrazione secondo la taglia dei comuni, e avverte che dal 2024 i dati escludono le interruzioni causate da terzi e non sono pienamente confrontabili con quelli pubblicati fino al 2023",
+   "url": "https://www.arera.it/dati-e-statistiche/dettaglio/prestazioni-delle-imprese-distributrici-continuita-del-servizio-23"
+  }
+ ],
+ "key": "60",
+ "lead": "Il calo delle interruzioni di corrente si è consumato quasi tutto tra il 1998 e il 2004, e da allora la media delle regioni oscilla senza migliorare ancora. Nel 2023 è risalita al livello del 2005, e a peggiorare sono state diciannove regioni su venti.",
+ "level": "regione",
+ "reviewed_at": "2026-07-27",
+ "reviewed_vintage": 2023,
+ "sections": [
+  {
+   "body": "L'indicatore conta episodi, non minuti. Registra quante interruzioni accidentali lunghe tocca in un anno all'utente medio in bassa tensione, cioè le case e le piccole utenze commerciali, e accidentale vuol dire senza preavviso, un guasto e non una manutenzione annunciata. Un valore di 1,00 corrisponde a un'interruzione all'anno per utente.\n\nLunga è una parola tecnica. Nella regolazione ARERA, che fissa gli standard di continuità del servizio, un'interruzione è lunga quando supera i tre minuti, e il microdistacco che riazzera l'orologio del forno resta fuori dal conteggio.",
+   "h": "Che cosa conta un'interruzione lunga",
+   "role": "definizione"
+  },
+  {
+   "body": "Non è una scala che scende un gradino per volta, sono tre gruppi. Undici regioni, dal Trentino Alto Adige alla Toscana, stanno tutte sotto le due interruzioni per utente e si tengono dentro poco più di un punto. Un gradino le separa dalla fascia intermedia, dove Basilicata, Lazio, Molise e Abruzzo restano fra le due e le tre interruzioni. Poi un secondo gradino apre la coda, dove Sardegna, Puglia, Calabria, Campania e Sicilia stanno tutte oltre le tre, ed è lì che cadono i tre distacchi più larghi dell'intera classifica.\n\nLa distanza si legge meglio in tempo che in decimali. Nella regione mediana l'utente medio resta al buio per un episodio lungo circa una volta ogni sei mesi, in Trentino Alto Adige poco meno di una volta l'anno, in Sicilia una volta ogni due mesi. Ogni episodio è un banco frigo che riparte, un registratore di cassa che si riavvia, una serranda da tirare su a mano, e il conto non lo paga solo chi resta senza luce in casa. Fra media e mediana c'è mezza interruzione di distanza, e a produrla è la coda.\n\nLa linea però non è quella attesa. La Basilicata sta a metà graduatoria davanti al Lazio, e fra corpo centrale e coda si infilano Lazio, Molise e Abruzzo. Nel tema [ambiente ed energia](/tema/ambiente-ed-energia) a ordinare i territori quasi come questa serie è un'altra rete, le [irregolarità nella distribuzione dell'acqua](/indicatore/irregolarita-nella-distribuzione-dell-acqua/ter-6), e le due vanno di pari passo, che non vuol dire che una spieghi l'altra. Due regioni però si scambiano i ruoli. La Puglia è nel gruppo di coda per la corrente e sull'acqua sta davanti al Lazio e alla Sardegna, la Basilicata fa il percorso inverso e per l'acqua finisce fra le ultime.",
+   "h": "La classifica non scende, si spezza",
+   "role": "quadro"
+  },
+  {
+   "body": "Il calo di lungo periodo non ha eccezioni. Dal 1998 al 2023 tutte e venti le regioni riducono la frequenza, la Calabria di quasi quattro episodi per utente, la Lombardia di poco più di due decimi da una partenza già bassa.\n\nIl grosso però è successo presto. Fra il 1998 e il 2004 la media semplice delle venti regioni perde un'interruzione e mezza per utente, cioè quasi tutto il guadagno dei venticinque anni. Da lì la serie entra in una banda stretta e non ne esce, tocca il minimo nel 2016 e da allora risale fino al tetto della banda.\n\nL'ultimo passaggio è il più netto. Fra il 2022 e il 2023 peggiorano diciannove regioni su venti, e l'unica in controtendenza è la Campania, che scende restando fra le ultime. La Sicilia da sola aggiunge quasi due interruzioni per utente e torna al livello del 2000, e da quell'anno in poi non era mai stata così in alto. Sopra le resta solo il 1998, con 6,18. Il secondo salto per ampiezza arriva dal Molise, che con 0,82 perde due posizioni senza uscire dalla fascia intermedia, dal dodicesimo al quattordicesimo posto.",
+   "h": "Vent'anni dentro la stessa banda",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il numero non dice quanto è durato il buio. ARERA misura anche i minuti persi per utente, e una regione con poche interruzioni ma lunghissime qui sembra tranquilla. Non porta con sé nemmeno la causa, quindi non si capisce se un anno storto venga dal maltempo o dallo stato della rete. Nella regolazione la distinzione esiste, e ARERA tiene fuori dai propri indicatori le interruzioni attribuite a forza maggiore. Dal 2024 esclude anche quelle provocate da terzi, che fino al 2023 molte imprese distributrici includevano, quindi quando la serie si allungherà l'anno nuovo non sarà pienamente confrontabile con quelli di questa pagina.\n\nC'è poi un cambio di metodo dentro la finestra su cui questa pagina appoggia la sua tesi. Nel 2005 Istat ha ricostruito la serie perché Enel Distribuzione aveva affinato dal 2004 la stima dei clienti interrotti, e dichiara la continuità garantita dal 1998. Il crollo del 1998-2004 sta tutto prima di quella revisione, quindi vale la pena saperlo anche se la fonte lo considera comparabile.\n\nResta la scala. Una media regionale mette insieme quartieri densi e comuni sparsi, mentre la regolazione separa i territori in alta, media e bassa concentrazione secondo la taglia dei comuni. E la spiegazione più comoda, quella del territorio difficile, questa graduatoria non la conferma. La [popolazione esposta al rischio di frane](/indicatore/popolazione-esposta-al-rischio-di-frane/bes-10AMB011) ordina le regioni in un modo che con questo non si somiglia, e Trentino Alto Adige e Sicilia finiscono tutte e due a metà elenco.\n\nFuori restano le interruzioni brevi e i cali di tensione, che l'utente nota e il conteggio no. Non è un buco che questa serie possa colmare, ma la [soddisfazione delle famiglie per la stabilità della tensione elettrica](/indicatore/famiglie-soddisfatte-della-stabilita-della-tensione-elettrica/ims-MULTI_ELETTR_VOLT) ne raccoglie la percezione, e disegna questa mappa rovesciata.",
+   "h": "Episodi contati, minuti no",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2023
+}

@@ -1,0 +1,23 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, Banca dati territoriale per le politiche di sviluppo",
+   "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
+  }
+ ],
+ "key": "184",
+ "lead": "In Campania il tasso di disoccupazione femminile di lunga durata tocca il 10,3% delle forze lavoro, l'unica regione oltre la doppia cifra. In Trentino Alto Adige la stessa quota resta sotto lo 0,5%.",
+ "sections": [
+  {
+   "body": "Sette anni di calo hanno cambiato pochissimo le posizioni. Le quattro regioni in fondo alla classifica nel 2018, Campania, Sicilia, Puglia e Calabria, sono le stesse quattro in fondo nel 2025. Anche in testa nulla si muove, il Trentino Alto Adige era la regione migliore allora e lo è ancora. Il fenomeno arretra in tutta Italia, ma la geografia del vantaggio resta incisa dov'era. Resta da capire se dietro il calo ci sia un rientro reale al lavoro o l'uscita dal mercato di chi ha smesso di cercare.",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Il tasso rapporta le disoccupate di lunga durata al totale delle forze lavoro femminili, non alla sola platea di chi cerca un impiego. Sono due misure diverse. E il denominatore conta, perché dove poche donne partecipano al mercato il tasso può restare basso anche con molte fuori dal lavoro. Il dato riguarda le sole femmine, quindi va letto accanto al totale e alla struttura per età. Una fotografia per regione non dice nulla sulle cause del divario.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

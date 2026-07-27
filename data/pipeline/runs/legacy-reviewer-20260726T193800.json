@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-26T19:38:00+00:00",
+ "branch": "claude/work-in-progress-branch-52h19r",
+ "commit": "54be109",
+ "detail": [
+  "universale: 'Quasi tutte le regioni' corretto in 'La maggior parte', solo 14 su 20 in equilibrio o guadagno nel 2024",
+  "eco: tolta la ripetizione del +0,33 gia stampato dal cruscotto, tenuto il confronto che faceva",
+  "esterno: verificate le cifre Istat -116 mila e quasi 3 spostamenti su 10 in Lombardia, esatte. reviewed_vintage 2024"
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-reviewer-20260726T193800",
+ "stage": "reviewer",
+ "summary": "dem:NMIGRATEIN riletto end to end e firmato, corretto un universale e un'eco del cruscotto",
+ "trigger": "manuale"
+}

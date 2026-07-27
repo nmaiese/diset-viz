@@ -1,0 +1,23 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, Pensione e partecipazione al mercato del lavoro dei 50-74enni, Anno 2023 (comunicato dell'8 maggio 2025), sul ruolo dell'età di uscita e la partecipazione degli over 50",
+   "url": "https://www.istat.it/comunicato-stampa/pensione-e-partecipazione-al-mercato-del-lavoro-dei-50-74enni-anno-2023/"
+  }
+ ],
+ "key": "181",
+ "lead": "In Toscana lavora oltre il 77% degli uomini tra 55 e 64 anni, in Sicilia poco più del 64%, e in mezzo la geografia conta meno del solito. La Basilicata sfiora il 76% e lascia dietro Lombardia, Veneto e Piemonte, mentre il Friuli-Venezia Giulia scende sotto il 69% e finisce dietro alla Campania.",
+ "sections": [
+  {
+   "body": "La stessa mappa, letta al femminile, si dispone in modo diverso. Basilicata, Abruzzo e Molise stanno tra i primi otto posti degli uomini over 54, ma tra le [donne della stessa età](/indicatore/tasso-di-occupazione-over-54-femmine/ter-182) scivolano nella metà bassa della classifica. Il Friuli-Venezia Giulia fa il tragitto inverso, sedicesimo tra i maschi e quinto tra le femmine. Il fondo però resta lo stesso in entrambe, con le ultime quattro regioni tutte del Mezzogiorno. C'è poi un rimescolamento nel tempo. Nel 2018 guidava l'Abruzzo e l'Umbria era quindicesima, oggi l'Umbria è seconda con la risalita più ampia di tutte e l'Abruzzo è settimo. Sullo sfondo pesa probabilmente l'età di uscita dal lavoro che si è alzata, ma è una spinta nazionale e non spiega da sola perché a guadagnare di più siano state proprio Umbria, Piemonte e Liguria. Viene da chiedersi se la parte alta continuerà a mescolare le due Italie, o se col tempo l'ordine maschile tornerà a somigliare a quello, molto più netto, delle donne.",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Il dato riguarda solo gli uomini, quindi non misura la partecipazione complessiva degli over 54. Il tasso femminile nella stessa fascia è molto più basso e va letto a parte. L'indicatore conta quante persone risultano occupate, non che lavoro fanno né a quali condizioni, e non distingue il tempo pieno dal parziale. Il perimetro è la classe 55-64 anni, così restano fuori gli occupati oltre i 65. È la fotografia di un solo anno per regione, e non permette di isolare le cause dei divari, dall'età di uscita dal lavoro alla domanda delle imprese.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

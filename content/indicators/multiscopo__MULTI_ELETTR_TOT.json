@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "multiscopo:MULTI_ELETTR_TOT",
+ "lead": "La soddisfazione complessiva per il servizio elettrico è alta ma diseguale. È massima in Trentino Alto Adige, 90%, e Valle d'Aosta, 88%, più bassa in Sardegna, 63%, e Calabria. La media delle regioni è del 75%, con un chiaro svantaggio delle isole.",
+ "sections": [
+  {
+   "body": "La soddisfazione per l'elettricità riflette la qualità reale del servizio, dalle interruzioni alla stabilità, ma anche le attese dei cittadini. Il Sud e le isole, con reti più fragili, sono meno soddisfatti, in linea con i dati oggettivi sulle interruzioni di corrente. È uno dei pochi casi in cui percezione e realtà coincidono. Un servizio essenziale dovrebbe essere ugualmente buono ovunque?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Rileva una soddisfazione dichiarata, che dipende anche dalle aspettative oltre che dal servizio reale. Non distingue quale aspetto scontenti, dalla continuità al costo della bolletta.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

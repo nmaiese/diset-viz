@@ -1,0 +1,18 @@
+{
+ "at": "2026-07-27T11:46:19+00:00",
+ "branch": "claude/article-improvement-plan-bz3qgm",
+ "commit": "04c1075",
+ "detail": [
+  "17 rilievi che il verificatore aveva registrato senza contarli come smentite, su dieci articoli. Dieci corretti, sette lasciati con il perche'. I due piu' gravi: la premessa rovesciata sul denominatore di bes-02IST023 e il 'sempre meno' di ter-432, smentito quattro volte su nove passaggi dalla sua stessa serie.",
+  "Classe nuova, non prevista dal piano: la rottura di serie che l'articolo attraversa senza nominarla (ter-60 sul 1998-2004, ter-72 sul cambio Ateco). Il campo note di data/definitions/istat_territoriali.csv la dichiara per 470 indicatori e nessuno lo legge.",
+  "ter-471 asseriva 'qui contano i privati, non lo Stato' su una serie identica a quella dell'accumulazione totale: riscritto, e ter-167 riceve la cautela simmetrica. Nuova guardia in tests/test_data_quality.py sui doppioni esatti di serie, con la coppia nota in allow-list e un test che verifica che sia ancora duplicata.",
+  "Chiuso il rilievo della review Codex sulla #46: l'avviso sui gemelli del brief guardava il rho con segno mentre _strongest declassava su abs(rho), quindi ter-9 (cento meno ter-385) arrivava allo scrittore a rho -1,00 senza avviso."
+ ],
+ "gate": "manual",
+ "outcome": "pr-open",
+ "pr": "46",
+ "run_id": "legacy-reviewer-pr46",
+ "stage": "reviewer",
+ "summary": "Secondo giro sui rilievi non contati: 10 corretti su 17, la coppia ter-167/ter-471 chiusa in prosa e la guardia sui doppioni esatti",
+ "trigger": "manuale"
+}
