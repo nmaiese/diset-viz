@@ -1,0 +1,15 @@
+{
+ "at": "2026-07-27T20:15:24+00:00",
+ "branch": "master",
+ "commit": "f7cafdb",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "gate": "checks",
+ "outcome": "merged",
+ "pr": "62",
+ "run_id": "scout-20260727T201107Z-acab",
+ "stage": "scout",
+ "summary": "PR #62 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}
