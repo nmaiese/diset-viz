@@ -54,8 +54,17 @@ decide.
 
 ```bash
 gh pr create --title "..." --body "..."
-python3 scripts/pipeline_merge.py --stage <stadio> --pr <numero>
+.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero>
 ```
+
+**L'interprete e' quello del venv, e non e' un dettaglio.** Il passo di merge
+rilancia il cancello, e il cancello per verificare il vintage deve importare
+l'app. Con `python3` di sistema non ci riesce, dichiara il vintage non
+verificabile e rifiuta, che e' il verso giusto ma blocca ogni stadio che tocchi
+un articolo. Lo scrittore in quel modo e' bloccato **sempre**: stesso branch,
+stesso commit, `python3` da' `blocked` su `vintage` e `.venv/bin/python` da'
+`auto`. Se il venv non c'e', crealo prima (`python3 -m venv .venv`), come gia'
+serve per la suite.
 
 | `merge` | che cosa fa il passo di merge |
 | --- | --- |
@@ -244,4 +253,7 @@ un umano ad aprirla.
   punto e virgola, carattere di ellissi.
 - Messaggi di commit senza `Co-Authored-By`.
 - Gli script della catena sono **stdlib puri**: girano senza il venv dell'app.
-  Il venv serve solo per la suite e per le due code che leggono il view model.
+  Il venv serve per la suite, per le due code che leggono il view model e per il
+  passo di merge, che rilancia il cancello e quindi eredita il suo bisogno di
+  importare l'app. Stdlib puro vuol dire che gli script non importano niente di
+  esterno, non che ogni controllo sia soddisfacibile senza l'app.

@@ -443,7 +443,7 @@ already prints.
    ```bash
    python3 scripts/pipeline_gate.py --stage writer
    gh pr create --base master --title "..." --body "..."
-   python3 scripts/pipeline_merge.py --stage writer --pr <numero>
+   .venv/bin/python scripts/pipeline_merge.py --stage writer --pr <numero>
    ```
 
    Your merge mode is `auto`, and `auto` is an order to the merge step, not a
