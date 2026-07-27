@@ -332,6 +332,60 @@ class ChecksThatCannotRunAreNotPasses(unittest.TestCase):
         self.assertIn("venv", check.detail)
 
 
+class TheSuiteSummaryQuotesTheVerdict(unittest.TestCase):
+    """What the gate prints about the suite has to be the suite's verdict.
+
+    The summary was the last three lines of stderr and stdout concatenated in
+    that order, and unittest writes its verdict to stderr. So one test printing
+    one line to stdout pushed "Ran 476 tests / OK" out of the message entirely,
+    and the gate announced `[ok ] suite: 1 segnali, 150 parole, 0 link interni`.
+    The verdict underneath was correct, because the regex reads the whole
+    report. The line a person reads was not, and nobody reads these pull
+    requests: the gate's output is the record, so a right answer printed as a
+    wrong sentence is a defect on this chain and not a cosmetic one.
+    """
+
+    class _Result:
+        def __init__(self, stdout, stderr, returncode=0):
+            self.stdout, self.stderr, self.returncode = stdout, stderr, returncode
+
+    def run_with(self, stdout, stderr, returncode=0):
+        original = pipeline_gate.subprocess.run
+        pipeline_gate.subprocess.run = lambda *a, **k: self._Result(stdout, stderr, returncode)
+        try:
+            return pipeline_gate._run_suite()
+        finally:
+            pipeline_gate.subprocess.run = original
+
+    def test_a_test_printing_to_stdout_does_not_become_the_message(self):
+        verdict, summary, _ = self.run_with(
+            stdout="1   1 segnali, 150 parole, 0 link interni\n  [domanda] una domanda\n",
+            stderr="....\n" + "-" * 70 + "\nRan 476 tests in 42.4s\n\nOK\n",
+        )
+        self.assertEqual(verdict, "ok")
+        self.assertIn("OK", summary)
+        self.assertIn("476", summary)
+        self.assertNotIn("segnali", summary)
+
+    def test_a_failure_still_reports_its_own_referto(self):
+        verdict, summary, _ = self.run_with(
+            stdout="rumore su stdout\n",
+            stderr="Ran 476 tests in 42.4s\n\nFAILED (failures=1)\n",
+            returncode=1,
+        )
+        self.assertEqual(verdict, "failed")
+        self.assertIn("FAILED", summary)
+
+    def test_a_crash_with_nothing_on_stderr_falls_back_to_the_whole_report(self):
+        """A dead interpreter may leave stdout as the only trace there is, and
+        an empty message would read as "no reason", which is worse than noise."""
+        verdict, summary, _ = self.run_with(
+            stdout="ultima riga prima del segfault\n", stderr="", returncode=-11,
+        )
+        self.assertEqual(verdict, "crashed")
+        self.assertIn("segfault", summary)
+
+
 class ACrashIsNotAFailure(unittest.TestCase):
     """Sono due cose diverse e vogliono reazioni opposte.
 

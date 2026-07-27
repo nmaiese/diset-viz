@@ -8,6 +8,8 @@ protects nothing. So every check is pinned from both sides, on a sentence that
 must trip it and on prose that must not.
 """
 
+import contextlib
+import io
 import unittest
 
 from scripts import prose_lint
@@ -206,10 +208,18 @@ class ShowAcceptsTheCodeAsItIsWritten(unittest.TestCase):
 
     def test_the_command_in_the_reviewer_prompt_runs(self):
         """The prompt's example, executed. It returned 1 and printed
-        "nessun articolo" for a year of runs that nobody could see fail."""
+        "nessun articolo" for a year of runs that nobody could see fail.
+
+        Stdout is captured, and not only for tidiness: the gate reads the suite
+        as stderr followed by stdout and quotes the last three lines, so a test
+        that prints pushes the unittest verdict out of the only message anybody
+        sees on an unattended pull request.
+        """
         texts = prose_lint.load_texts()
         code = f"ter-{next(key for key in texts if key.isdigit())}"
-        self.assertEqual(prose_lint.main(["--show", code]), 0)
+        with contextlib.redirect_stdout(io.StringIO()):
+            exit_code = prose_lint.main(["--show", code])
+        self.assertEqual(exit_code, 0)
 
 
 class AgainstTheRealCatalogue(unittest.TestCase):

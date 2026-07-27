@@ -547,7 +547,14 @@ def _run_suite(cwd=None):
         text=True,
     )
     report = (result.stderr or "") + (result.stdout or "")
-    tail = [line for line in report.strip().splitlines()[-3:] if line.strip()]
+    # The summary comes from stderr alone, where unittest writes its verdict and
+    # where faulthandler writes a crash. Taking the tail of the concatenation
+    # instead means that any test printing anything to stdout lands at the end
+    # and becomes the whole message: the gate reported "suite: 1 segnali, 150
+    # parole" in place of "Ran 476 tests / OK". The verdict was right, the line
+    # a human reads was not, and on this chain that line is the only record.
+    verdict_source = (result.stderr or "").strip() or report
+    tail = [line for line in verdict_source.strip().splitlines()[-3:] if line.strip()]
     summary = " / ".join(tail)
     if re.search(r"^FAILED", report, re.M):
         return "failed", summary, result.returncode
