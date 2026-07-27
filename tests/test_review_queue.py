@@ -114,13 +114,20 @@ class DefinitionFlag(unittest.TestCase):
         )
         self.assertNotIn("definizione", row["flags"])
 
-    def test_it_outranks_every_other_flag_including_rilettura(self):
+    def test_it_outranks_every_suspicion_including_rilettura(self):
         """A wrong figure dies at the first reader. A wrong definition does not:
         every reading that checks arithmetic confirms it, because the arithmetic
-        is right. That is why it sits at the top of the reading order."""
+        is right. So it leads every flag that marks a *possible* defect.
+
+        Only `smentita` sits above it, and that one is not a suspicion at all: a
+        verifier already made the claim fall, with the proof."""
+        suspicions = {
+            k: v for k, v in review_queue.FLAG_WEIGHT.items()
+            if k not in ("definizione", "smentita")
+        }
+        self.assertGreater(review_queue.FLAG_WEIGHT["definizione"], max(suspicions.values()))
         self.assertGreater(
-            review_queue.FLAG_WEIGHT["definizione"],
-            max(v for k, v in review_queue.FLAG_WEIGHT.items() if k != "definizione"),
+            review_queue.FLAG_WEIGHT["smentita"], review_queue.FLAG_WEIGHT["definizione"]
         )
 
     def test_a_family_with_no_metadata_sheet_is_silent_not_clean(self):

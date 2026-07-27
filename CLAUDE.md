@@ -125,10 +125,12 @@ the process (`lru_cache`, not a TTL).
 
 ## The autonomous chain — READ [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md)
 
-Six stages take an indicator from a source catalogue to a published page and then
-come back to it when the data moves: **scout** (which sources) -> **hunter**
+Seven stages take an indicator from a source catalogue to a published page and
+then come back to it when the data moves: **scout** (which sources) -> **hunter**
 (which indicators) -> **promoter** -> **curator** (which verso, which score) ->
-**writer** (the article) -> **reviewer** (reads it against the data). Each has an
+**writer** (the article) -> **reviewer** (reads it against the data) ->
+**verificatore** (tries to falsify what the reviewer signed, and repairs
+nothing: its refutations go back to the reviewer's queue). Each has an
 agent in `.claude/agents/`, a deterministic queue computed from committed files,
 and a verdict from `scripts/pipeline_gate.py` that decides whether it may publish.
 
