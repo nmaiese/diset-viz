@@ -274,7 +274,13 @@ def parse_regional(rows, data_type, include_non_final=False, indicator_dimension
     for row in rows:
         if row.get(indicator_dimension) != data_type:
             continue
-        if any(dim in row and row.get(dim) != code for dim, code in filters.items()):
+        if any(row.get(dim) != code for dim, code in filters.items()):
+            # Fail closed, not open: a dimension missing from the row (a
+            # truncated response, a typo in dimension_values that names a
+            # column the dataflow doesn't have) must not be treated as a
+            # match just because there was nothing to compare against.
+            # row.get(dim) is None for a missing column, and None never
+            # equals a real code, so this already excludes it.
             continue
         area = row.get("REF_AREA")
         year = row.get("TIME_PERIOD")

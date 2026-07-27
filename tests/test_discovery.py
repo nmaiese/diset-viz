@@ -540,6 +540,17 @@ class IstatMultiDimensionAdapter(unittest.TestCase):
         # or female-only figure and never a sum or an average of the three.
         self.assertEqual(regional["Piemonte"]["2023"], 24.0)
 
+    def test_parse_regional_fails_closed_on_a_missing_filter_column(self):
+        """A dimension named in dimension_filters that is not even a column of
+        the row (a truncated response, or a typo in dimension_values naming a
+        column the dataflow does not have) must exclude the row, not pass it
+        through unfiltered because there was nothing to compare against."""
+        rows = [{"DATA_TYPE": "POVASS", "REF_AREA": "ITC1", "TIME_PERIOD": "2023", "OBS_VALUE": "24"}]
+        regional = istat_regional_source.parse_regional(
+            rows, "POVASS", dimension_filters={"SESSO": "9"},
+        )
+        self.assertEqual(regional, {})
+
     def test_parse_regional_raises_rather_than_guess_a_conflict(self):
         """Without dimension_filters, all three SESSO breakdowns pass the
         DATA_TYPE check and collide on the same region/year with different
