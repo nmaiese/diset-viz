@@ -15,6 +15,14 @@ Sette stadi, sei agenti, **un dispatcher che ne lancia uno per volta**, e nessun
 che aspetti una firma. Un indicatore va da un catalogo SDMX a una pagina pubblica
 senza intervento, e la catena ci ritorna sopra quando i dati si muovono.
 
+> **Adesso però la catena è ferma, ed è voluto.** Le cinque Routine per stadio
+> sono in pausa dal 27 luglio e quella del dispatcher non è ancora stata creata,
+> quindi in questo momento **nessuno assegna il lavoro**. È l'ordine giusto,
+> prima spegnere e poi accendere, perché al contrario si apre una finestra in
+> cui girano tutti e sette. Manca l'ultimo passo, ed è
+> [creare la Routine del dispatcher](#le-routine): finché non esiste, il codice
+> è pronto e nessuno lo chiama, e gli stadi girano solo a mano.
+
 **Il tappo è tolto.** Il test che congelava l'elenco delle serie è stato
 liberato, e per provare la catena due serie demografiche sono arrivate fino a una
 pagina pubblica: `dem:NMIGRATEIN` (saldo migratorio interno) dentro il punteggio,
@@ -107,26 +115,27 @@ giro a vuoto ne lascia una sola al giorno. Con un battito orario registrarli
 tutti sarebbe un commit ogni ora per dire sempre la stessa cosa, e la cadenza
 contro cui `pipeline_log.silence` misura il silenzio è di un giorno.
 
-### Le sei vecchie, da spegnere
+### Le sei vecchie, spente il 27 luglio
 
-**Vanno disattivate**, non cancellate, finché il dispatcher non ha girato
-qualche giorno. Se restano accese insieme al dispatcher si torna esattamente
-alla concorrenza che il dispatcher toglie, e ci si torna in silenzio: due stadi
-che partono a due ore di distanza sembrano funzionare finché uno dei due non
-apre una pull request che l'altro non ha visto.
+**In pausa, non cancellate**, finché il dispatcher non ha girato qualche giorno.
+La distinzione conta: se il dispatcher si rivelasse sbagliato, riaccenderle è un
+clic, ricrearle no.
 
 | vecchia Routine | routine id | stato |
 | --- | --- | --- |
-| scout | `trig_01KZ1CHGPRgNmF9Ahni9VXfQ` | da disattivare |
-| cacciatore | `trig_01VizeycZocZoeDE1RxjWj1f` | da disattivare |
-| curatore | `trig_019EP6TnEbYnKz8VpKFaRm4g` | da disattivare |
-| scrittore | `trig_01RymCgC8VsspDrHHnUJgFUk` | da disattivare |
-| revisore | `trig_01LSZpaDasW18ZvxbKhXBJSj` | da disattivare |
+| scout | `trig_01KZ1CHGPRgNmF9Ahni9VXfQ` | in pausa |
+| cacciatore | `trig_01VizeycZocZoeDE1RxjWj1f` | in pausa |
+| curatore | `trig_019EP6TnEbYnKz8VpKFaRm4g` | in pausa |
+| scrittore | `trig_01RymCgC8VsspDrHHnUJgFUk` | in pausa |
+| revisore | `trig_01LSZpaDasW18ZvxbKhXBJSj` | in pausa |
 | verificatore | mai creata | niente da fare |
 
-L'ordine giusto è **prima spegnere, poi accendere**. Al contrario si apre una
-finestra in cui girano tutti e sette, ed è la finestra in cui la catena può
-produrre proprio il guasto che questa modifica ha tolto.
+L'ordine è **prima spegnere, poi accendere**, e questa è la metà fatta. Al
+contrario si sarebbe aperta una finestra in cui giravano tutti e sette, ed è la
+finestra in cui la catena avrebbe potuto produrre proprio il guasto che questa
+modifica ha tolto. Il prezzo dell'ordine giusto è che nel mezzo non gira niente:
+finché il dispatcher non esiste, la catena è ferma e gli stadi si lanciano solo
+a mano.
 
 ### Come si controlla che sia partita
 
@@ -382,9 +391,10 @@ possono fare:
    alfabetico della coda e `REGIONAL_HINT` che non riconosce `- reg.`, entrambe
    sopra). La licenza Istat, che era il terzo punto, è stata corretta ovunque
    (vedi sopra).
-6. **La Routine del dispatcher**, che è l'unica cosa che manca perché la catena
-   riparta da sola: finché non esiste, gli stadi girano solo a mano. Va creata
-   insieme allo spegnimento delle sei vecchie, non prima e non dopo.
+6. **La Routine del dispatcher**, ed è il solo motivo per cui in questo momento
+   la catena non gira. Le cinque vecchie sono in pausa dal 27 luglio, cioè la
+   prima metà del passaggio è fatta e nell'ordine giusto: manca la seconda.
+   Finché non esiste, il codice è pronto e nessuno lo chiama.
 7. **Una voce per (indicatore, livello)** nello store degli articoli. Oggi è una
    per indicatore, con il livello come campo dentro, mentre le code dello
    scrittore e del revisore hanno già una riga per coppia. Non è un difetto
