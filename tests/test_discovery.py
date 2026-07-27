@@ -449,6 +449,115 @@ class IstatRegionalAdapter(unittest.TestCase):
             discovery.CANDIDATES_PATH = original_path
 
 
+class IstatMultiDimensionAdapter(unittest.TestCase):
+    """A dataflow with more than the pilot's three dimensions (FREQ, REF_AREA,
+    DATA_TYPE) is the common case, not an edge case: povertà, cittadinanza and
+    most other Istat regional data also break down by sex, age band, household
+    type. `_build_key` and `parse_regional` have to handle any dimension count
+    without turning an unfiltered breakdown into a silently wrong regional
+    total."""
+
+    def _spec(self, **overrides):
+        spec = {
+            "data_type": "POVASS",
+            "dataflow": "99_1_DF_TESTPOV_1",
+            "dsd_label": "DCCV_TESTPOV",
+            "indicator_dimension": "DATA_TYPE",
+            "dimension_order": ["FREQ", "REF_AREA", "SESSO", "DATA_TYPE"],
+            "dimension_values": {"SESSO": "9"},
+        }
+        spec.update(overrides)
+        return spec
+
+    def test_build_key_generalizes_beyond_three_dimensions(self):
+        key = istat_regional_source._build_key(self._spec())
+        # FREQ=A, REF_AREA=wildcard, SESSO=9 (totale), DATA_TYPE=POVASS, in the
+        # dataflow's own position order: a fixed three-slot format could not
+        # have produced this even by accident.
+        self.assertEqual(key, "A..9.POVASS")
+
+    def test_build_key_still_produces_the_pilot_shape_by_default(self):
+        """A row that never sets dimension_order/dimension_values (the four
+        seed series) must keep querying exactly as before."""
+        spec = {
+            "data_type": "OLDAGEDEPR",
+            "dataflow": istat_regional_source.DATAFLOW,
+            "dsd_label": istat_regional_source.DSD_LABEL,
+            "indicator_dimension": "DATA_TYPE",
+            "dimension_order": ["FREQ", "REF_AREA", "DATA_TYPE"],
+            "dimension_values": {},
+        }
+        self.assertEqual(istat_regional_source._build_key(spec), "A..OLDAGEDEPR")
+
+    def test_build_key_refuses_a_dimension_with_no_known_value(self):
+        """A dimension missing from dimension_values must stop the query, not
+        wildcard it: a wildcard here does not mean 'total', it means 'every
+        code of this dimension, mixed into the response'."""
+        spec = self._spec(dimension_values={})
+        with self.assertRaises(ValueError):
+            istat_regional_source._build_key(spec)
+
+    def test_load_series_parses_the_new_optional_fields(self):
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "istat_series.yaml"
+            path.write_text(
+                "series:\n"
+                "  - id: POVASS\n"
+                "    dataflow: 99_1_DF_TESTPOV_1\n"
+                "    dsd_label: DCCV_TESTPOV\n"
+                "    name: Poverta assoluta di prova (Istat, regioni)\n"
+                '    unit: "%"\n'
+                "    decimals: 1\n"
+                "    theme: Un tema di prova (Istat)\n"
+                "    quality_life_category: salute_cura\n"
+                "    direction: lower_better\n"
+                "    dimension_order: [FREQ, REF_AREA, SESSO, DATA_TYPE]\n"
+                "    dimension_values: SESSO=9\n",
+                encoding="utf-8",
+            )
+            series = istat_regional_source.load_series(path)
+        spec = series["POVASS"]
+        self.assertEqual(spec["dimension_order"], ["FREQ", "REF_AREA", "SESSO", "DATA_TYPE"])
+        self.assertEqual(spec["dimension_values"], {"SESSO": "9"})
+        self.assertEqual(spec["indicator_dimension"], "DATA_TYPE")
+        self.assertEqual(istat_regional_source._build_key(spec), "A..9.POVASS")
+
+    def _rows(self):
+        # Same region/year, three breakdowns of SESSO: 1 (maschi), 2 (femmine),
+        # 9 (totale, the only one that should ever reach a published page).
+        return [
+            {"DATA_TYPE": "POVASS", "REF_AREA": "ITC1", "SESSO": "1", "TIME_PERIOD": "2023", "OBS_VALUE": "10"},
+            {"DATA_TYPE": "POVASS", "REF_AREA": "ITC1", "SESSO": "2", "TIME_PERIOD": "2023", "OBS_VALUE": "14"},
+            {"DATA_TYPE": "POVASS", "REF_AREA": "ITC1", "SESSO": "9", "TIME_PERIOD": "2023", "OBS_VALUE": "24"},
+        ]
+
+    def test_parse_regional_filters_out_other_breakdowns_of_the_same_dataflow(self):
+        regional = istat_regional_source.parse_regional(
+            self._rows(), "POVASS", indicator_dimension="DATA_TYPE",
+            dimension_filters={"SESSO": "9"},
+        )
+        # Only the 'totale' row (24) may reach the region, never the male-only
+        # or female-only figure and never a sum or an average of the three.
+        self.assertEqual(regional["Piemonte"]["2023"], 24.0)
+
+    def test_parse_regional_raises_rather_than_guess_a_conflict(self):
+        """Without dimension_filters, all three SESSO breakdowns pass the
+        DATA_TYPE check and collide on the same region/year with different
+        values. Averaging or last-write-wins would publish a number nobody
+        asked for; refusing is the only safe response."""
+        with self.assertRaises(ValueError):
+            istat_regional_source.parse_regional(self._rows(), "POVASS")
+
+    def test_parse_regional_does_not_raise_on_a_genuine_duplicate(self):
+        """Two identical rows for the same region/year (a resend, a cache
+        artifact) are not a conflict: only *different* values are."""
+        rows = self._rows()[-1:] * 2  # the 'totale' row, twice, same value
+        regional = istat_regional_source.parse_regional(
+            rows, "POVASS", dimension_filters={"SESSO": "9"},
+        )
+        self.assertEqual(regional["Piemonte"]["2023"], 24.0)
+
+
 class MultiSourcePromotion(unittest.TestCase):
     """Every hunter adapter must be able to reach the atlas under its own name.
 
