@@ -484,12 +484,32 @@
 
 /* ---------- Sotto-navigazione tra le modalità (_game_subnav.html) ---------- */
 
+/* Il wrapper porta il margine e ospita la sfumatura: il fondo scorrevole resta
+   sulla nav, così la sfumatura segue il bordo del viewport invece di scorrere
+   via col contenuto. Su mobile le schede eccedono quasi sempre la larghezza
+   disponibile, e senza un indizio visivo l'ultima scheda tagliata di netto
+   sembra un errore di layout invece che una lista scorrevole. */
+.game-subnav-wrap { position: relative; margin: 0 0 20px; }
+.game-subnav-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 4px;
+  width: 32px;
+  background: linear-gradient(to right, transparent, var(--paper));
+  pointer-events: none;
+}
+
 .game-subnav {
   display: flex;
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 4px;
-  margin: 0 0 20px;
+  /* Pari alla larghezza della sfumatura in .game-subnav-wrap::after: senza
+     questo margine di riserva l'ultima scheda resta sotto la sfumatura anche
+     a scroll completato, invece di sfilarsene fuori. */
+  padding-right: 32px;
   -webkit-overflow-scrolling: touch;
 }
 .game-subnav .game-tab { white-space: nowrap; text-decoration: none; }

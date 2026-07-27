@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { fetchJson, formatValue, trackGameEvent, SourceStrip, SubmitScoreModal } from "./shared.jsx";
+import { fetchJson, formatValue, trackGameEvent, SourceStrip, SubmitScoreModal, prefersReducedMotion } from "./shared.jsx";
 
 const API = {
   round: (difficulty, token) =>
@@ -130,6 +130,7 @@ export default function CompareApp() {
   }
 
   function loadRound(difficulty) {
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
     setStatus("loading");
     setResult(null);
     setChoice(null);
