@@ -71,25 +71,35 @@ Non fai il lavoro di nessuno stadio: decidi chi tocca, e ne lanci uno solo.
 1. Lancia:
    python3 scripts/pipeline_dispatch.py --json --check-open-prs --record
 
-2. Se `stage` e' null, la run finisce qui. Il giro e' gia' registrato dal
-   flag --record: non scrivere altre righe di diario, non aprire pull
-   request, non committare niente. Riporta in una riga il campo `reason` e
-   fermati.
+   Guarda l'uscita, che dice tre cose diverse:
+     0  ha nominato uno stadio, vai al punto 3
+     1  non c'e' niente da lanciare, vai al punto 2
+     2  il dispatcher stesso e' fallito, vai al punto 4
 
-3. Altrimenti invoca l'agente indicato dal campo `agent` (la sua definizione
+2. Uscita 1: la run finisce qui, ed e' la risposta normale a code vuote. Il
+   giro e' gia' registrato dal flag --record. Non scrivere altre righe di
+   diario, non aprire pull request, non committare niente. Riporta in una
+   riga il campo `reason` e fermati.
+
+3. Uscita 0: invoca l'agente indicato dal campo `agent` (la sua definizione
    sta in .claude/agents/<agent>.md) e passagli il `run_id` del piano.
    L'agente obbedisce a docs/AGENT_CONTRACT.md, che dice come apre e come
    chiude la run, compreso il passaggio del run_id al passo di merge.
 
+4. Uscita 2: non indovinare quale stadio toccherebbe. Registra l'errore con
+   quello che c'e' su stderr, e fermati:
+   python3 scripts/pipeline_log.py --write --stage dispatch --outcome error \
+       --trigger dispatch --summary "una riga su che cosa e' fallito"
+
 Non lanciare piu' di uno stadio per giro, e non lanciarne uno che il
 dispatcher non ha nominato. L'unica cosa che impedisce a due stadi di
 scriversi addosso e' che ne giri uno per volta: non c'e' nessun lock sotto.
-
-Se lo script fallisce, non indovinare quale stadio toccherebbe. Registra
-l'errore e fermati:
-   python3 scripts/pipeline_log.py --write --stage dispatch --outcome error \
-       --trigger dispatch --summary "una riga su che cosa e' fallito"
 ```
+
+Le tre uscite sono distinte per una ragione precisa. `1` capita la maggior parte
+delle ore, perché una catena a code vuote è ferma per il motivo giusto. Se
+l'uscita non distinguesse quel caso da un guasto, la Routine registrerebbe un
+errore a ogni ora di riposo, e un allarme che suona sempre non è un allarme.
 
 `--record` scrive **e committa su master** il giro, ma solo quando serve: un
 giro che lancia uno stadio non lascia riga, perché la lascia lo stadio, e un

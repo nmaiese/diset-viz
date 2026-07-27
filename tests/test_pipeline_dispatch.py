@@ -153,5 +153,59 @@ class TheTickIsRecordedOnlyWhenItSaysSomething(unittest.TestCase):
         self.assertTrue(worth)
 
 
+
+class NothingToDoIsNotAFailure(unittest.TestCase):
+    """Tre uscite, non due, e la terza esiste per non far suonare l'allarme ogni
+    ora. Una catena a code vuote e' ferma per il motivo giusto: se il codice di
+    uscita non distinguesse quel caso da un guasto, la Routine registrerebbe un
+    errore a ogni ora di riposo, e un allarme che suona sempre non e' un
+    allarme."""
+
+    def run_with(self, plan_or_error):
+        """Lancia la CLI con una decisione finta, e ritorna il codice di uscita."""
+        import contextlib
+        import io
+
+        real = pipeline_dispatch.decide
+        if isinstance(plan_or_error, Exception):
+            def fake(**kwargs):
+                raise plan_or_error
+        else:
+            def fake(**kwargs):
+                return plan_or_error
+        pipeline_dispatch.decide = fake
+        try:
+            with contextlib.redirect_stdout(io.StringIO()), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                return pipeline_dispatch.cli(["--json"])
+        finally:
+            pipeline_dispatch.decide = real
+
+    def plan(self, stage):
+        return {"stage": stage, "agent": "source-scout" if stage else None,
+                "reason": "motivo", "waiting": 1 if stage else 0,
+                "queues": {}, "open_prs": [], "pr_state": "letto",
+                "run_id": "scout-x-0000"}
+
+    def test_a_stage_to_launch_exits_zero(self):
+        self.assertEqual(self.run_with(self.plan("scout")), 0)
+
+    def test_an_empty_chain_exits_one(self):
+        self.assertEqual(self.run_with(self.plan(None)), 1)
+
+    def test_a_broken_dispatcher_exits_two(self):
+        self.assertEqual(self.run_with(RuntimeError("il catalogo non si legge")), 2)
+
+    def test_a_bad_flag_stays_a_usage_error(self):
+        """`SystemExit` passa attraverso: un flag sbagliato deve restare un
+        errore d'uso, non diventare un 2 che sembra un guasto del catalogo."""
+        import contextlib
+        import io
+
+        with contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                pipeline_dispatch.cli(["--flag-che-non-esiste"])
+
+
 if __name__ == "__main__":
     unittest.main()

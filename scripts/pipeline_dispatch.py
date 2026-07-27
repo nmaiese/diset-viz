@@ -270,7 +270,10 @@ def commit_tick(entry, runner=_run, cwd=None, log=print, attempts=3):
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Quale stadio della catena tocca adesso, e uno solo.",
-        epilog="uscita 0 = c'e' uno stadio da lanciare, 1 = non c'e' niente da fare.",
+        epilog=(
+            "uscita 0 = c'e' uno stadio da lanciare, 1 = non c'e' niente da fare, "
+            "2 = il dispatcher stesso e' fallito e non ha deciso niente."
+        ),
     )
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--check-open-prs", action="store_true",
@@ -320,5 +323,31 @@ def main(argv=None):
     return 0 if plan["stage"] else 1
 
 
+def cli(argv=None):
+    """`main`, piu' la distinzione fra "niente da fare" e "sono rotto".
+
+    Serve perche' il prompt della Routine chiede due cose diverse nei due casi,
+    e senza questa separazione le confonderebbe. `main` esce 1 per dire "nessuno
+    stadio da lanciare", che e' la risposta normale di una catena a code vuote e
+    capitera' la maggior parte delle ore. Un'eccezione non gestita uscirebbe
+    anche lei non-zero, quindi la Routine avrebbe registrato un errore a ogni
+    ora di riposo: un allarme che suona sempre non e' un allarme, ed e' il
+    difetto che questo repo ha gia' pagato altrove.
+
+    Quindi un guasto vero esce **2** e lo dice su stderr. Le altre due uscite
+    restano quello che erano e vogliono dire che il dispatcher ha deciso.
+    """
+    try:
+        return main(argv)
+    except SystemExit:
+        raise
+    except Exception as exc:  # pragma: no cover - il ramo esiste per non tacere
+        import traceback
+
+        print(f"il dispatcher e' fallito: {type(exc).__name__}: {exc}", file=sys.stderr)
+        traceback.print_exc()
+        return 2
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(cli())
