@@ -1,0 +1,18 @@
+{
+ "at": "2026-07-27T19:23:47+00:00",
+ "branch": "automation/scout-2026-07-27",
+ "commit": "97aee4b",
+ "detail": [
+  "APPROVED istat_sdmx:34_727_DF_DCCV_POVERTA_8 (Famiglie povere, poverta assoluta, additivo vs Rischio di poverta BES/AROPE backbone, licenza CC BY 4.0, ultimo rilascio 14/10/2025 su dati 2024); APPROVED istat_sdmx:34_727_DF_DCCV_POVERTA_10 (Individui poveri, stessa DSD/motivazione); APPROVED istat_sdmx:29_317_DF_DCIS_POPSTRCIT1_1 (Paese di cittadinanza, additivo, nessun indicatore di stock stranieri in catalogo, dato 1/1/2025 9.2% popolazione); NEEDS-INFO istat_sdmx:29_317_DF_DCIS_POPSTRCIT1_24 (stessa DSD del candidato appena approvato, ridondante finche' non c'e' adapter); NEEDS-INFO istat_sdmx:43_98_DF_DCIS_RSERVSAN_4 (fonte EHIS pluriennale non annuale, freschezza reale non verificabile senza query dati); NEEDS-INFO istat_sdmx:73_1072_DF_DCCV_IMPUTATI_M_9 (dominio Legalita e sicurezza gia' molto denso, 11 indicatori, additivita' dubbia); REJECTED istat_sdmx:56_259_DF_DCIS_ISCRITTI_2 e _3 (serie storica chiusa 2008-2010, sostituita da ANS/USTAT-MUR, non regolare); NESSUNA riga aggiunta a config/istat_series.yaml: verificato via client.datastructure() che tutte le DSD dei candidati (DCCV_POVERTA 11 dim, DCIS_POPSTRCIT1 5 dim, DCIS_RSERVSAN 7 dim, DCCV_IMPUTATI_M altre dim) hanno piu' dimensioni di quelle che scripts/istat_regional_source.py:_data_path sa filtrare (solo FREQ.REF_AREA.DATA_TYPE, come l'unico dataflow gia' wired DCIS_INDDEMOG1 che ne ha 3); cablare un config row oggi restituirebbe un incrocio di dimensioni extra non filtrato sul totale, non la serie pulita. Handoff: estendere l'adapter con un default TOTALE per dimensione extra, per dataflow.",
+  "CANCELLO BLOCCATO inizialmente, non per il mio lavoro: tests/test_pipeline_log.py::TheDashboardReadsWithoutBreaking::test_chain_commits_are_recognised_by_the_files_they_touch falliva sul mio commit 311d2cf, un bug preesistente nel test (confronto letterale invece di pipeline_gate.path_allowed sui percorsi a directory), mai innescato prima. Corretto fuori dal mio perimetro in PR #57 (merged su master, f381d3d): rebase fatto, il cancello ora e' VERDE (merge: checks). Riapro come pr-open."
+ ],
+ "gate": "checks",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 32,
+ "queue_before": 40,
+ "run_id": "scout-20260727T190949Z-95bf",
+ "stage": "scout",
+ "summary": "Triage completato (vedi dettaglio). Cancello inizialmente bloccato da un bug del test, corretto fuori perimetro in PR #57; dopo rebase il cancello e' verde, apro la PR.",
+ "trigger": "manuale"
+}
