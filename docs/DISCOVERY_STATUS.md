@@ -50,15 +50,45 @@ ignorava, e sei Routine indipendenti si pestavano i piedi.
 
 | Routine | cadenza (UTC) | che cosa fa | routine id |
 | --- | --- | --- | --- |
-| dispatcher | oraria | `pipeline_dispatch.py`, poi lancia lo stadio che ha nominato | **da creare** |
+| dispatcher | oraria (`0 * * * *`) | `pipeline_dispatch.py`, poi lancia lo stadio che ha nominato | **da creare** |
 
-Il prompt della Routine è tre passi e nessuna regola ricopiata:
+Impostazioni: **sessione nuova a ogni firing** (non legata a una sessione
+esistente), environment `divarioitalia`, modello quello di default. La sessione
+nuova non è un dettaglio: il prompt qui sotto è scritto per partire da zero, e
+una Routine legata a una sessione esistente accumulerebbe il contesto di tutti i
+giri precedenti, che è esattamente ciò che rende un agente incoerente con i file
+che ha davanti.
+
+### Il prompt, per intero
+
+Si copia com'è. Non ricopia nessuna regola: le indica, ed è la lezione più cara
+di questo sistema (vedi sotto, `analyst_notes.json`).
 
 ```
-1. python3 scripts/pipeline_dispatch.py --json --check-open-prs --record
-2. se `stage` è null, la run finisce qui: il giro è già registrato
-3. altrimenti invoca l'agente che dice `agent`, passandogli il `run_id`.
-   L'agente segue .claude/agents/<agent>.md e docs/AGENT_CONTRACT.md
+Sei il dispatcher della catena editoriale di Divario Italia.
+Non fai il lavoro di nessuno stadio: decidi chi tocca, e ne lanci uno solo.
+
+1. Lancia:
+   python3 scripts/pipeline_dispatch.py --json --check-open-prs --record
+
+2. Se `stage` e' null, la run finisce qui. Il giro e' gia' registrato dal
+   flag --record: non scrivere altre righe di diario, non aprire pull
+   request, non committare niente. Riporta in una riga il campo `reason` e
+   fermati.
+
+3. Altrimenti invoca l'agente indicato dal campo `agent` (la sua definizione
+   sta in .claude/agents/<agent>.md) e passagli il `run_id` del piano.
+   L'agente obbedisce a docs/AGENT_CONTRACT.md, che dice come apre e come
+   chiude la run, compreso il passaggio del run_id al passo di merge.
+
+Non lanciare piu' di uno stadio per giro, e non lanciarne uno che il
+dispatcher non ha nominato. L'unica cosa che impedisce a due stadi di
+scriversi addosso e' che ne giri uno per volta: non c'e' nessun lock sotto.
+
+Se lo script fallisce, non indovinare quale stadio toccherebbe. Registra
+l'errore e fermati:
+   python3 scripts/pipeline_log.py --write --stage dispatch --outcome error \
+       --trigger dispatch --summary "una riga su che cosa e' fallito"
 ```
 
 `--record` scrive **e committa su master** il giro, ma solo quando serve: un
@@ -67,9 +97,13 @@ giro a vuoto ne lascia una sola al giorno. Con un battito orario registrarli
 tutti sarebbe un commit ogni ora per dire sempre la stessa cosa, e la cadenza
 contro cui `pipeline_log.silence` misura il silenzio è di un giorno.
 
-**Le sei Routine per stadio vanno disattivate**, non cancellate finché il
-dispatcher non ha girato qualche giorno. Se restano accese insieme al dispatcher
-si torna esattamente alla concorrenza che il dispatcher toglie.
+### Le sei vecchie, da spegnere
+
+**Vanno disattivate**, non cancellate, finché il dispatcher non ha girato
+qualche giorno. Se restano accese insieme al dispatcher si torna esattamente
+alla concorrenza che il dispatcher toglie, e ci si torna in silenzio: due stadi
+che partono a due ore di distanza sembrano funzionare finché uno dei due non
+apre una pull request che l'altro non ha visto.
 
 | vecchia Routine | routine id | stato |
 | --- | --- | --- |
@@ -79,6 +113,21 @@ si torna esattamente alla concorrenza che il dispatcher toglie.
 | scrittore | `trig_01RymCgC8VsspDrHHnUJgFUk` | da disattivare |
 | revisore | `trig_01LSZpaDasW18ZvxbKhXBJSj` | da disattivare |
 | verificatore | mai creata | niente da fare |
+
+L'ordine giusto è **prima spegnere, poi accendere**. Al contrario si apre una
+finestra in cui girano tutti e sette, ed è la finestra in cui la catena può
+produrre proprio il guasto che questa modifica ha tolto.
+
+### Come si controlla che sia partita
+
+```bash
+python3 scripts/pipeline_log.py --stage dispatch   # i giri registrati
+python3 scripts/pipeline_dashboard.py --open       # il battito, in cima
+```
+
+Il cruscotto dice in testa quando è stato l'ultimo giro del dispatch, e se non
+ne ha mai visto uno lo scrive a lettere chiare invece di lasciare la riga vuota:
+finché quella riga dice "mai", nessuno sta assegnando il lavoro.
 
 Nessuno stadio è `manual`, e non è una svista. La catena è non presidiata per
 decisione presa: un modo che parcheggia la pull request finché qualcuno guarda,
