@@ -100,5 +100,58 @@ class TheStageListIsNotCopied(unittest.TestCase):
             self.assertIn(stage, pipeline_dispatch.AGENT_OF, stage)
 
 
+class TheTickIsRecordedOnlyWhenItSaysSomething(unittest.TestCase):
+    """Un battito orario committato a ogni giro sarebbe ottomila file l'anno
+    per dire una cosa sola. La riga serve in un caso solo, e va detta una volta
+    al giorno: quando il dispatcher gira e **non** lancia niente, perche' quello
+    e' l'unico caso in cui nessun altro lascia traccia."""
+
+    def plan(self, stage=None):
+        return {"stage": stage, "agent": "x" if stage else None,
+                "reason": "motivo", "waiting": 0}
+
+    def entry(self, at, stage="dispatch"):
+        return {"stage": stage, "outcome": "nothing", "summary": "x", "at": at}
+
+    def today(self):
+        from datetime import datetime, timezone
+
+        return datetime(2026, 7, 27, 14, 0, tzinfo=timezone.utc)
+
+    def test_a_launch_does_not_need_its_own_row(self):
+        """La prova che la catena ha girato la lascia lo stadio lanciato."""
+        worth, why = pipeline_dispatch.tick_is_worth_recording(
+            self.plan("writer"), [], today=self.today())
+        self.assertFalse(worth)
+        self.assertIn("la scrive quello", why)
+
+    def test_the_first_empty_round_of_the_day_is_recorded(self):
+        worth, _ = pipeline_dispatch.tick_is_worth_recording(
+            self.plan(), [], today=self.today())
+        self.assertTrue(worth)
+
+    def test_the_second_empty_round_of_the_day_is_not(self):
+        entries = [self.entry("2026-07-27T09:00:00+00:00")]
+        worth, why = pipeline_dispatch.tick_is_worth_recording(
+            self.plan(), entries, today=self.today())
+        self.assertFalse(worth)
+        self.assertIn("2026-07-27", why)
+
+    def test_yesterdays_round_does_not_cover_today(self):
+        entries = [self.entry("2026-07-26T09:00:00+00:00")]
+        worth, _ = pipeline_dispatch.tick_is_worth_recording(
+            self.plan(), entries, today=self.today())
+        self.assertTrue(worth)
+
+    def test_another_stages_row_today_is_not_a_dispatch_tick(self):
+        """Il silenzio da misurare e' quello del dispatcher. Una run del
+        revisore dice che il revisore ha girato, non che il dispatcher lo abbia
+        guardato."""
+        entries = [self.entry("2026-07-27T09:00:00+00:00", stage="reviewer")]
+        worth, _ = pipeline_dispatch.tick_is_worth_recording(
+            self.plan(), entries, today=self.today())
+        self.assertTrue(worth)
+
+
 if __name__ == "__main__":
     unittest.main()

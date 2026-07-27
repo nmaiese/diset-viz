@@ -56,10 +56,16 @@ Il prompt della Routine è tre passi e nessuna regola ricopiata:
 
 ```
 1. python3 scripts/pipeline_dispatch.py --json --check-open-prs --record
-2. se `stage` è null, la run finisce qui: il tick è già registrato
+2. se `stage` è null, la run finisce qui: il giro è già registrato
 3. altrimenti invoca l'agente che dice `agent`, passandogli il `run_id`.
    L'agente segue .claude/agents/<agent>.md e docs/AGENT_CONTRACT.md
 ```
+
+`--record` scrive **e committa su master** il giro, ma solo quando serve: un
+giro che lancia uno stadio non lascia riga, perché la lascia lo stadio, e un
+giro a vuoto ne lascia una sola al giorno. Con un battito orario registrarli
+tutti sarebbe un commit ogni ora per dire sempre la stessa cosa, e la cadenza
+contro cui `pipeline_log.silence` misura il silenzio è di un giorno.
 
 **Le sei Routine per stadio vanno disattivate**, non cancellate finché il
 dispatcher non ha girato qualche giorno. Se restano accese insieme al dispatcher

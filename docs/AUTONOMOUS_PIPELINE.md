@@ -110,12 +110,26 @@ il dispatcher e' stdlib. Dice **quale** lanciare, con il suo `run_id` gia'
 coniato, e il prompt della Routine fa il resto. La decisione resta cosi'
 deterministica e verificabile da un test, l'esecuzione no.
 
-Scrive un tick nel diario a ogni giro, anche quando non lancia niente, e quella
-riga e' l'unica cosa che distingue "nessuno stadio aveva lavoro" da "non e'
-partito niente". Prima l'attesa era scritta in `pipeline_log.WATCH_GROUPS`, che
-ricopiava il cron delle Routine cloud: una promessa che nessuno poteva
-verificare, e che sarebbe andata fuori sincrono alla prima modifica della
-schedulazione.
+Registra il proprio giro nel diario quando quel giro dice qualcosa, ed e' la
+riga che distingue "nessuno stadio aveva lavoro" da "non e' partito niente".
+Prima l'attesa era scritta in `pipeline_log.WATCH_GROUPS`, che ricopiava il cron
+delle Routine cloud: una promessa che nessuno poteva verificare, e che sarebbe
+andata fuori sincrono alla prima modifica della schedulazione.
+
+Non a ogni giro, pero', e la parsimonia e' la parte progettata. Quando **lancia**
+non scrive niente, perche' la prova che la catena ha girato la lascia lo stadio
+lanciato: due righe direbbero la stessa cosa e gonfierebbero il conto delle run.
+Quando **non lancia** ne scrive una sola al giorno, che e' la granularita' a cui
+`silence` misura. Un battito orario registrato per intero sarebbe un commit ogni
+ora e ottomila file l'anno per un'informazione che si legge una volta al giorno.
+
+Quella riga la committa lui stesso su master, ed e' l'unico passo della catena
+che lo fa fuori dal passo di merge: il dispatcher non ha un perimetro e non apre
+pull request, quindi non esiste nessuna pull request dentro cui possa viaggiare.
+E' sicuro perche' e' **un file nuovo** con un nome che nessun altro puo'
+scegliere. Senza questo passo la riga resterebbe nel checkout usa e getta della
+Routine e sparirebbe con la sessione, cioe' proprio nel caso, l'unico, per cui
+esiste.
 
 ## Gli store: perche' i conflitti non esistono piu'
 

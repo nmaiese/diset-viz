@@ -58,7 +58,7 @@ deterministica e verificabile da un test, l'esecuzione no.
     python3 scripts/pipeline_dispatch.py               # chi tocca, leggibile
     python3 scripts/pipeline_dispatch.py --json        # per il prompt della Routine
     python3 scripts/pipeline_dispatch.py --check-open-prs
-    python3 scripts/pipeline_dispatch.py --json --record   # e registra il tick
+    python3 scripts/pipeline_dispatch.py --json --record   # e registra il giro
 
 Stdlib puro come il resto della catena.
 """
@@ -170,8 +170,38 @@ def decide(queues=None, open_prs=None, pr_state="non-controllato"):
     }
 
 
+def tick_is_worth_recording(plan, entries, today=None):
+    """Se questo giro merita una riga di diario. Ritorna (bool, motivo).
+
+    Due domande, e la risposta a tutte e due e' "no" quasi sempre, che e' il
+    punto. Il battito e' orario: registrarne uno a ogni giro sarebbe un commit
+    su master ogni ora, ottomila file l'anno, per dire una cosa sola.
+
+    **Quando lancia, non serve.** La prova che la catena ha girato la lascia lo
+    stadio lanciato, con la propria riga. Una riga del dispatcher accanto
+    direbbe la stessa cosa due volte e gonfierebbe il conto delle run.
+
+    **Quando non lancia, serve una volta al giorno.** E' l'unica cosa che
+    distingue "nessuno stadio aveva lavoro" da "il dispatcher non e' partito", e
+    la cadenza attesa contro cui la misura `pipeline_log.silence` e' di un
+    giorno (`WATCH_GROUPS`). Piu' fine di cosi' non aggiunge segnale, aggiunge
+    solo commit.
+    """
+    if plan.get("stage"):
+        return False, "ha lanciato uno stadio: la riga la scrive quello, non io"
+    from datetime import datetime, timezone
+
+    today = today or datetime.now(timezone.utc)
+    stamp = today.date().isoformat()
+    for entry in entries:
+        if entry.get("stage") == "dispatch" and (entry.get("at") or "").startswith(stamp):
+            return False, f"un giro a vuoto e' gia' registrato per il {stamp}"
+    return True, "primo giro a vuoto della giornata"
+
+
 def record_tick(plan):
-    """Registra il tick nel diario, anche quando non lancia niente.
+    """Scrive la riga del tick. Ritorna `(riga, motivo)`, con riga None se non
+    serviva.
 
     E' la riga che rende misurabile il silenzio della catena. Prima l'attesa
     era scritta in `pipeline_log.WATCH_GROUPS`, che ricopiava il cron delle
@@ -180,17 +210,61 @@ def record_tick(plan):
     battito del dispatcher e' la stessa informazione, ma misurata invece che
     dichiarata.
     """
-    stage = plan.get("stage")
-    summary = (f"lanciato {stage} ({plan['agent']})" if stage
-               else f"nessun lancio: {plan['reason']}")
-    return pipeline_log.append(pipeline_log.build_entry(
+    worth, why = tick_is_worth_recording(plan, pipeline_log.read_journal())
+    if not worth:
+        return None, why
+    entry = pipeline_log.append(pipeline_log.build_entry(
         "dispatch",
-        "pr-open" if stage else "nothing",
-        summary,
+        "nothing",
+        f"nessun lancio: {plan['reason']}",
         detail=[plan["reason"]],
         trigger="dispatch",
         queue_before=plan.get("waiting"),
     ))
+    return entry, why
+
+
+def commit_tick(entry, runner=_run, cwd=None, log=print, attempts=3):
+    """Porta la riga su master, perche' scritta e non committata non esiste.
+
+    Il dispatcher non e' uno stadio: non ha un perimetro, non apre pull request
+    e non passa dal cancello, quindi non c'e' nessuna pull request dentro cui la
+    sua riga possa viaggiare. Senza questo passo il file resterebbe nel checkout
+    usa e getta della Routine e sparirebbe con la sessione, cioe' proprio nel
+    caso, l'unico, per cui il tick esiste.
+
+    Va dritto su master ed e' sicuro che ci vada: e' **un file nuovo** in
+    `data/pipeline/runs/`, con un nome che nessun altro puo' scegliere. Se
+    perde la corsa contro un altro push si rilegge master e si riprova, come fa
+    `pipeline_merge.record_landing` per la riga di esito.
+    """
+    rel = f"data/pipeline/runs/{pipeline_log.shard_name(entry)}"
+    for attempt in range(1, attempts + 1):
+        code, out = runner(["git", "add", rel], cwd=cwd)
+        if code != 0:
+            log(f"  diario: git add fallito ({out.strip()[:120]})")
+            return False
+        code, out = runner(
+            ["git", "commit", "-m",
+             f"Diario: giro a vuoto del dispatch, {entry['at'][:10]}"],
+            cwd=cwd,
+        )
+        if code != 0:
+            log(f"  diario: commit fallito ({out.strip()[:120]})")
+            return False
+        code, out = runner(["git", "push", "origin", "HEAD:master"], cwd=cwd)
+        if code == 0:
+            log(f"  diario: tick '{entry['run_id']}' su master")
+            return True
+        log(f"  diario: push perso, ritento ({attempt}/{attempts})")
+        runner(["git", "fetch", "origin", "master"], cwd=cwd)
+        code, out = runner(["git", "rebase", "origin/master"], cwd=cwd)
+        if code != 0:
+            runner(["git", "rebase", "--abort"], cwd=cwd)
+            log(f"  diario: rebase fallito ({out.strip()[:120]})")
+            return False
+    log("  TICK NON REGISTRATO: master non sapra' che questo giro e' avvenuto.")
+    return False
 
 
 def main(argv=None):
@@ -202,7 +276,10 @@ def main(argv=None):
     parser.add_argument("--check-open-prs", action="store_true",
                         help="non lanciare niente se una run della catena e' ancora aperta")
     parser.add_argument("--record", action="store_true",
-                        help="scrivi il tick nel diario (lo fa la Routine, non una prova a mano)")
+                        help="scrivi il tick nel diario e portalo su master "
+                             "(lo fa la Routine, non una prova a mano)")
+    parser.add_argument("--no-push", action="store_true",
+                        help="scrivi il tick ma non committarlo (solo per prove)")
     args = parser.parse_args(argv)
 
     pr_state, open_prs = "non-controllato", []
@@ -215,7 +292,11 @@ def main(argv=None):
         # `plan` descrive la run che lo stadio dovra' registrare, ed e' un'altra
         # cosa: confonderli farebbe apparire il lancio e il lanciato come una
         # run sola.
-        record_tick(plan)
+        entry, why = record_tick(plan)
+        plan["tick"] = why
+        if entry is not None and not args.no_push:
+            plan["tick_committed"] = commit_tick(
+                entry, log=(lambda *_: None) if args.json else print)
 
     if args.json:
         print(json.dumps(plan, ensure_ascii=False, indent=2))
