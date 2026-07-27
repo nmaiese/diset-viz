@@ -579,7 +579,7 @@
   "reviewed_vintage": 2023,
   "sections": [
    {
-    "body": "L'intensità di accumulazione mette gli investimenti fissi lordi di un anno sopra il PIL dello stesso anno, e quello che ne esce è una quota. Gli investimenti fissi lordi sono la spesa in beni destinati a restare in produzione oltre l'anno, dagli edifici ai macchinari. Un valore di 20 dice che un quinto di quanto un territorio ha prodotto in dodici mesi è tornato in dotazione produttiva.\n\nTrattandosi di un rapporto, misura l'impegno e non il volume. Una regione piccola può stare in cima muovendo cifre assolute molto più basse di una regione grande ferma a metà classifica.",
+    "body": "L'intensità di accumulazione mette gli investimenti fissi lordi di un anno sopra il PIL dello stesso anno, e quello che ne esce è una quota. Gli investimenti fissi lordi sono la spesa in beni destinati a restare in produzione oltre l'anno, dagli edifici ai macchinari. Un valore di 20 dice che un quinto di quanto un territorio ha prodotto in dodici mesi è tornato in dotazione produttiva.\n\nTrattandosi di un rapporto, misura l'impegno e non il volume. Una regione piccola può stare in cima muovendo cifre assolute molto più basse di una regione grande ferma a metà classifica.\n\nUna cautela sul nome, prima di leggere le cifre. Istat pubblica questi stessi numeri, identici su tutte e 986 le righe dell'archivio unico e su tutti gli anni dal 1995, anche sotto la tavola [investimenti privati sul PIL](/indicatore/investimenti-privati-sul-pil/ter-471), che dichiara come dati di base gli investimenti privati invece degli investimenti fissi lordi. Le due etichette non possono essere giuste entrambe sopra la stessa serie, e da qui non si puo' dire quale lo sia. Quello che la quota misura in ogni caso e' l'intensita' di investimento di un territorio.",
     "h": "Quanta parte del prodotto torna in capitale",
     "role": "definizione"
    },
@@ -2205,16 +2205,27 @@
   "vintage": 2025
  },
  "471": {
-  "fonti": [],
-  "lead": "Guardando i soli investimenti privati sul PIL, il quadro coincide con quello dell'accumulazione: in testa Basilicata, 28,7%, e Piemonte, 26,9%, in coda Calabria e Campania, intorno al 18%. La media delle regioni è del 21,3%. Qui contano i privati, non lo Stato.",
+  "fonti": [
+   {
+    "testo": "Istat, Banca dati territoriale per le politiche di sviluppo, archivio unico degli indicatori regionali: le tavole 167 e 471 riportano valori identici su tutte le 986 righe, pur dichiarando dati di base diversi (investimenti fissi lordi contro investimenti privati). Verificato sull'archivio scaricato il 27 luglio 2026.",
+    "url": "https://www.istat.it/statistiche-per-politiche-di-sviluppo/"
+   }
+  ],
+  "lead": "Nel 2023 la quota di prodotto che le regioni italiane rimettono in dotazione produttiva va dal 28,7% della Basilicata al 18,2% della Calabria, con una media del 21,3%. Il nome della tavola promette la sola parte privata, i numeri che Istat ci mette dentro non la distinguono dal totale.",
+  "level": "regione",
   "sections": [
    {
-    "body": "Sono le imprese e le famiglie, non lo Stato, a fare la parte maggiore degli investimenti, e la loro intensità dice quanta fiducia c'è nel futuro di un territorio. Dove pochi grandi impianti privati pesano molto, come in Basilicata, il dato è alto ma concentrato. Un investimento privato diffuso è più solido di uno legato a poche grandi opere. La fiducia degli investitori si distribuisce o si concentra?",
+    "body": "Istat pubblica questa tavola come investimenti privati in percentuale del PIL, e dichiara come dati di base gli investimenti privati a prezzi correnti e a prezzi dell'anno precedente. Gli investimenti sono la spesa in beni destinati a restare in produzione oltre l'anno, dai capannoni ai macchinari, e privati vorrebbe dire al netto di quelli dello Stato.\n\nQuei numeri pero' sono identici, cifra per cifra, a quelli di [intensita' di accumulazione del capitale](/indicatore/intensita-di-accumulazione-del-capitale/ter-167), che dichiara come dati di base gli investimenti fissi lordi, cioe' il totale, parte pubblica compresa. Le due tavole coincidono su tutte e 986 le righe dell'archivio unico, non solo sulle venti regioni, e su tutti gli anni dal 1995 al 2023.\n\nDue nomi diversi sopra gli stessi numeri non possono essere giusti entrambi, e da qui non si puo' dire quale dei due lo sia. Finche' resta cosi', la quota di questa pagina va letta come una misura dell'intensita' di investimento, e non come il modo di separare il privato dal pubblico.",
+    "h": null,
+    "role": "definizione"
+   },
+   {
+    "body": "La graduatoria del 2023 non e' una scala continua. In testa la Basilicata con 28,65 e il Piemonte con 26,88, poi si apre il salto piu' largo di tutta la distribuzione, due punti e mezzo, prima della Valle d'Aosta a 24,36. Dalla quinta in giu' comincia il mucchio, sedici regioni dentro meno di cinque punti, con la mediana a 20,49 e la media a 21,27.\n\nLa mappa non e' quella che l'atlante abitua ad aspettarsi. La Lombardia sta tredicesima a 19,36, il Lazio diciannovesimo a 18,32, e in fondo Campania, Lazio e Calabria si tengono in poco piu' di un decimo di punto. Un rapporto premia il numeratore piccolo quanto il denominatore piccolo, quindi una regione con un prodotto contenuto sale in classifica muovendo cifre assolute molto piu' basse di una regione grande ferma a meta'.\n\nDal 1995 salgono diciotto regioni su venti. Le due che arretrano sono la Campania, di 1,62 punti, e la Calabria, di 0,63, ed e' anche l'ordine in cui chiudono la graduatoria di oggi.",
     "h": null,
     "role": "quadro"
    },
    {
-    "body": "Considera gli investimenti privati sul PIL, sensibili a pochi grandi progetti in regioni piccole. Non distingue investimenti in ricerca e macchinari da quelli immobiliari, che pesano diversamente sullo sviluppo.",
+    "body": "Il limite piu' grosso e' quello della definizione: finche' la serie resta identica a quella dell'accumulazione totale, nessuna frase costruita su questa pagina puo' distinguere l'investimento delle imprese da quello dello Stato. Un articolo che lo facesse starebbe leggendo nel dato una cosa che nel dato non c'e'.\n\nPoi ci sono i limiti che un rapporto ha comunque. Se il prodotto arretra la quota sale a parita' di investimenti, quindi una posizione guadagnata non e' di per se' un macchinario in piu'. La quota non dice se viene da molte operazioni diffuse o da pochi cantieri grandi, differenza che in una regione piccola cambia tutto, e non separa l'edilizia dai macchinari. Gli investimenti sono lordi, quindi comprendono la sostituzione di quello che si e' consumato e non solo la dotazione in piu'.",
     "h": null,
     "role": "limiti"
    }
