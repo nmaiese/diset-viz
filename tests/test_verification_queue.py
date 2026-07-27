@@ -283,5 +283,69 @@ class TheGateRefusesARowItCannotBelieve(unittest.TestCase):
         self.assertEqual(vq.row_problems(row), [])
 
 
+class TheHeadingIsProseToo(unittest.TestCase):
+    """Rilievo P2 di Codex sulla #49, vero e provato con un caso del repo.
+
+    118 sezioni portano un h2 scritto a mano, sono visibili in pagina e fanno
+    affermazioni. `ter-651` intitola la sua dinamica "Cinque anni di guadagni, un
+    anno che ne toglie piu' della meta'", e il verificatore di quell'articolo l'ha
+    contata e confermata (+1,413 contro -0,855, il 61%). Con l'impronta sul solo
+    body, una verifica pulita continuava a coprire un titolo sostituito, e
+    correggere un titolo smentito non riapriva l'articolo.
+    """
+
+    def _with_heading(self, heading):
+        entry = _entry()
+        entry["sections"] = [{"role": "quadro", "h": heading, "body": "Il quadro."}]
+        return entry
+
+    def test_changing_only_the_heading_changes_the_fingerprint(self):
+        self.assertNotEqual(
+            vq.prose_fingerprint(self._with_heading("Un titolo")),
+            vq.prose_fingerprint(self._with_heading("Un altro titolo")),
+        )
+
+    def test_it_requeues_the_article(self):
+        read = self._with_heading("Un titolo")
+        rewritten = self._with_heading("Un titolo corretto")
+        rows = vq.build_queue({"611": rewritten}, [_row(read)])
+        self.assertEqual(len(vq.waiting(rows)), 1)
+
+    def test_repairing_a_refuted_heading_closes_the_refutation(self):
+        read = self._with_heading("Un titolo falso")
+        verified = _row(read, smentite=1, confermate=39, esito="smentito", rilievi="quadro/h")
+        self.assertIn(("ter-611", "regione"),
+                      review_queue.open_refutations({"611": read}, [verified]))
+        repaired = self._with_heading("Un titolo vero")
+        self.assertEqual(review_queue.open_refutations({"611": repaired}, [verified]), {})
+
+    def test_a_missing_heading_is_not_a_change(self):
+        """`h: null` e `h: ""` sono la stessa cosa: il template compone il titolo."""
+        one, other = _entry(), _entry()
+        one["sections"] = [{"role": "quadro", "h": None, "body": "A"}]
+        other["sections"] = [{"role": "quadro", "h": "", "body": "A"}]
+        self.assertEqual(vq.prose_fingerprint(one), vq.prose_fingerprint(other))
+
+
+class CountersMustBeNonNegativeIntegers(unittest.TestCase):
+    """Rilievo P2 di Codex sulla #49, con il suo esempio esatto."""
+
+    def test_the_negative_refutation_is_refused(self):
+        """`controllate=40, confermate=41, smentite=-1` sommava a 40 e passava
+        ogni controllo, mentre `smentite > 0` restava falso: la smentita era
+        registrata e invisibile allo stesso tempo."""
+        problems = vq.row_problems(_row(_entry(), controllate=40, confermate=41,
+                                        smentite=-1, esito="smentito"))
+        self.assertTrue(any("interi non negativi" in p for p in problems), problems)
+
+    def test_a_non_numeric_counter_is_not_a_zero(self):
+        problems = vq.row_problems(_row(_entry(), controllate="quaranta"))
+        self.assertTrue(any("interi non negativi" in p for p in problems), problems)
+
+    def test_the_bad_counter_is_named(self):
+        problems = vq.row_problems(_row(_entry(), smentite="uno"))
+        self.assertIn("smentite", problems[0])
+
+
 if __name__ == "__main__":
     unittest.main()

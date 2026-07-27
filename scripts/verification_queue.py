@@ -89,12 +89,26 @@ def prose_fingerprint(entry: dict) -> str:
     Ordered by role rather than by the list order so that reordering the
     sections, which changes nothing a verifier read, does not invalidate the
     verification. Whitespace is normalized for the same reason.
+
+    **The authored `h` counts as prose**, and leaving it out was a real hole.
+    118 sections carry a hand-written heading, they are visible on the page, and
+    they make claims: `ter-651` heads its `dinamica` with "Cinque anni di
+    guadagni, un anno che ne toglie piu' della meta'", which its verifier
+    checked and confirmed (+1,413 against -0,855, the 61%). Hashing only the
+    body meant a clean verification kept covering a replaced heading, and
+    repairing a refuted heading did not requeue the article.
     """
-    parts = [("lead", entry.get("lead") or "")]
+    parts = [("lead", "", entry.get("lead") or "")]
     for section in entry.get("sections") or []:
-        parts.append((section.get("role") or "", section.get("body") or ""))
+        parts.append((
+            section.get("role") or "",
+            section.get("h") or "",
+            section.get("body") or "",
+        ))
     blob = "\n".join(
-        role + ":" + WHITESPACE.sub(" ", text).strip() for role, text in sorted(parts)
+        role + ":" + WHITESPACE.sub(" ", heading).strip()
+        + ":" + WHITESPACE.sub(" ", text).strip()
+        for role, heading, text in sorted(parts)
     )
     return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:16]
 
@@ -127,10 +141,29 @@ def code_of(key: str) -> str:
 
 
 def _int(value) -> int:
+    """Lenient, for display and for counting. `row_problems` is the strict one."""
     try:
         return int(str(value).strip() or 0)
     except ValueError:
         return 0
+
+
+COUNTERS = ("controllate", "confermate", "smentite", "non_verificabili")
+
+
+def _counter(value) -> int | None:
+    """A counter, or None when the cell is not a non-negative integer.
+
+    Both halves matter and both were missing. A non-numeric cell used to read as
+    zero, so a typo produced a silent "I checked nothing". A negative cell used
+    to survive: `controllate=40, confermate=41, smentite=-1` sums to 40 and
+    passed every check, while `smentite > 0` stayed false, so the refutation was
+    recorded and invisible at the same time.
+    """
+    text = str(value).strip()
+    if not text.isdigit():
+        return None
+    return int(text)
 
 
 def row_problems(row: dict) -> list[str]:
@@ -147,10 +180,18 @@ def row_problems(row: dict) -> list[str]:
         problems.append(f"data non valida: {row.get('at')!r}")
     if not (row.get("prosa") or "").strip():
         problems.append("nessuna impronta della prosa")
-    controllate = _int(row.get("controllate"))
+    counters = {name: _counter(row.get(name)) for name in COUNTERS}
+    malformed = sorted(name for name, value in counters.items() if value is None)
+    if malformed:
+        problems.append(
+            "contatori che non sono interi non negativi: "
+            + ", ".join(f"{name}={row.get(name)!r}" for name in malformed)
+        )
+        return problems
+    controllate = counters["controllate"]
     if controllate <= 0:
         problems.append("affermazioni_controllate a zero: una verifica che non ha guardato")
-    parts = sum(_int(row.get(k)) for k in ("confermate", "smentite", "non_verificabili"))
+    parts = sum(counters[name] for name in ("confermate", "smentite", "non_verificabili"))
     if controllate and parts != controllate:
         problems.append(
             f"i conti non tornano: {parts} fra confermate, smentite e non verificabili "
@@ -159,8 +200,8 @@ def row_problems(row: dict) -> list[str]:
     esito = (row.get("esito") or "").strip()
     if esito not in OUTCOMES:
         problems.append(f"esito ignoto {esito!r}, attesi {' o '.join(OUTCOMES)}")
-    elif (esito == "pulito") != (_int(row.get("smentite")) == 0):
-        problems.append(f"esito {esito!r} con {_int(row.get('smentite'))} smentite")
+    elif (esito == "pulito") != (counters["smentite"] == 0):
+        problems.append(f"esito {esito!r} con {counters['smentite']} smentite")
     return problems
 
 

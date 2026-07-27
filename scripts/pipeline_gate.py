@@ -377,6 +377,26 @@ def check_verifications(base=None, cwd=None):
     "da riverificare" e il conto delle smentite non tornerebbe mai.
     """
     resolved = resolve_base(base, cwd=cwd)
+    # Il registro e' **append-only**, e questo controllo viene prima di guardare le
+    # righe nuove. Contare solo le righe aggiunte non vede le sottrazioni, quindi
+    # una run che cancella una smentita e non aggiunge niente passava come "nessuna
+    # verifica nuova da controllare": il segnale sparisce dalla coda del revisore
+    # con il cancello verde, che e' il modo peggiore di perdere un rilievo.
+    #
+    # Append-only e non solo "niente cancellazioni", perche' riscrivere una riga
+    # in posto e' la stessa cosa con un passaggio in piu': cambia che cosa dice una
+    # verifica passata senza lasciare traccia. Una verifica si supera riscrivendo
+    # l'articolo, cosa che cambia l'impronta e ne chiede una nuova, mai
+    # modificando la riga vecchia.
+    removed = _verification_rows_removed(base, cwd=cwd)
+    if removed:
+        return Check(
+            "verifiche", False,
+            f"il registro e' append-only e questa run ne toglie o riscrive "
+            f"{len(removed)} righe: "
+            f"{', '.join(sorted(r.get('code') or '?' for r in removed)[:5])}. "
+            "Per superare una verifica si riscrive l'articolo, non la sua riga.",
+        )
     rows = _verification_rows_added(base, cwd=cwd)
     if not rows:
         return Check("verifiche", True, "nessuna verifica nuova da controllare")
@@ -400,6 +420,11 @@ def check_verifications(base=None, cwd=None):
     # incrociavano, che in una catena con due Routine al giorno non e' un caso
     # limite. Quello che va preso e' l'impronta che non corrisponde a **niente**,
     # cioe' scritta a mano o calcolata su un checkout che non e' questo.
+    # La tupla porta anche il livello, e non e' pignoleria: `build_queue` unisce
+    # le righe agli articoli su `(code, level)`, quindi una riga con il livello
+    # sbagliato passerebbe di qui e poi non coprirebbe niente. Una smentita
+    # registrata cosi' sarebbe scritta e invisibile allo stesso tempo, che e' il
+    # modo di fallire peggiore fra quelli disponibili.
     fingerprints = set()
     for ref in (None, resolved):
         try:
@@ -413,23 +438,36 @@ def check_verifications(base=None, cwd=None):
         except (OSError, json.JSONDecodeError):
             continue
         for key, entry in texts.items():
-            fingerprints.add(
-                (verification_queue.code_of(key), verification_queue.prose_fingerprint(entry))
-            )
+            fingerprints.add((
+                verification_queue.code_of(key),
+                (entry.get("level") or "regione"),
+                verification_queue.prose_fingerprint(entry),
+            ))
     if not fingerprints:
         return Check("verifiche", False, "testi illeggibili, impossibile verificare le impronte")
 
-    known_codes = {code for code, _ in fingerprints}
-    orphans, drifted = [], []
+    known_codes = {code for code, _level, _hash in fingerprints}
+    known_pairs = {(code, level) for code, level, _hash in fingerprints}
+    orphans, wrong_level, drifted = [], [], []
     for row in rows:
         code = (row.get("code") or "").strip()
+        level = (row.get("level") or "").strip()
         if code not in known_codes:
             orphans.append(code)
-        elif (code, (row.get("prosa") or "").strip()) not in fingerprints:
+        elif (code, level) not in known_pairs:
+            wrong_level.append(f"{code} (livello {level!r})")
+        elif (code, level, (row.get("prosa") or "").strip()) not in fingerprints:
             drifted.append(code)
     if orphans:
         return Check("verifiche", False,
                      f"verifiche su articoli che non esistono: {', '.join(orphans[:5])}")
+    if wrong_level:
+        return Check(
+            "verifiche", False,
+            f"livello che non corrisponde all'articolo: {', '.join(wrong_level[:5])}. "
+            "La coda unisce su (codice, livello), quindi questa riga non coprirebbe "
+            "niente e una sua smentita non arriverebbe al revisore.",
+        )
     if drifted:
         return Check(
             "verifiche", False,
@@ -443,6 +481,35 @@ def check_verifications(base=None, cwd=None):
     return Check("verifiche", True,
                  f"{len(rows)} verifiche, {controllate} affermazioni controllate, "
                  f"{smentite} smentite")
+
+
+def _verification_rows_removed(base=None, cwd=None):
+    """Le righe della base che questo branch non ha piu' identiche, interpretate.
+
+    Confronta le righe intere, quindi comprende sia una cancellazione sia una
+    riscrittura in posto: per il registro sono la stessa cosa, cioe' cambiare che
+    cosa dice una verifica passata. Un file che alla base non esisteva non ha
+    niente da togliere.
+    """
+    resolved = resolve_base(base, cwd=cwd)
+    if not resolved:
+        return []
+    code, out, _ = _git("show", f"{resolved}:{VERIFICATIONS}", cwd=cwd)
+    if code != 0:
+        return []  # il file non esisteva alla base: non c'e' niente da togliere
+    old_lines = [line for line in out.splitlines() if line.strip()]
+    if not old_lines:
+        return []
+    current = PROJECT_ROOT / VERIFICATIONS
+    new_lines = set()
+    if current.exists():
+        new_lines = {line for line in current.read_text(encoding="utf-8").splitlines() if line.strip()}
+    header, old_body = old_lines[0], old_lines[1:]
+    gone = [line for line in old_body if line not in new_lines]
+    if not gone:
+        return []
+    import csv as _csv
+    return list(_csv.DictReader([header] + gone, delimiter=";"))
 
 
 def _verification_rows_added(base=None, cwd=None):
