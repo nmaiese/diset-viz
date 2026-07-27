@@ -494,10 +494,12 @@
  },
  "167": {
   "fonti": [],
-  "lead": "L'intensità di accumulazione del capitale misura quanto un'economia investe rispetto al PIL. È più alta in Basilicata, 28,7%, e Piemonte, 26,9%, più bassa in Calabria e Lazio, intorno al 18%. La media delle regioni è del 21,3%. Investire molto non è appannaggio del solo Nord.",
+  "lead": "L'intensità di accumulazione del capitale misura quanta parte del PIL un territorio rimette in investimenti, cioè quanto scommette sul proprio futuro. In cima alla classifica non c'è il Nord industriale, dato che la Basilicata investe più di un quarto del proprio prodotto, e sopra la media stanno anche Abruzzo e Molise.",
+  "reviewed_at": "2026-07-27",
+  "reviewed_vintage": 2023,
   "sections": [
    {
-    "body": "Investire molto rispetto al PIL è il segno di un'economia che costruisce il proprio futuro, tra macchinari, impianti e infrastrutture. La geografia qui sorprende, con la Basilicata in alto per effetto di pochi grandi investimenti industriali. Un dato alto in una regione piccola può nascere da un singolo stabilimento, non da un sistema diffuso. Investire tanto in pochi luoghi è sviluppo o dipendenza?",
+    "body": "Investire una quota alta del proprio PIL è la scommessa che un territorio fa sul futuro, in macchinari, impianti e infrastrutture. La geografia che ne esce non è quella attesa. Le prime quattro posizioni vanno a Basilicata, Piemonte, Valle d'Aosta e Trentino Alto Adige, un gruppo che mette insieme regioni molto diverse per dimensione e per collocazione, mentre le tre di coda sono Campania, Lazio e Calabria. Il rapporto dice quanta parte del prodotto torna in investimenti, non quanto quel prodotto sia grande, e qui le due cose non vanno insieme.",
     "h": null,
     "role": "quadro"
    },
@@ -1154,16 +1156,23 @@
   "vintage": 2023
  },
  "285": {
-  "fonti": [],
-  "lead": "Questo indicatore conta in valore assoluto le persone a rischio di povertà o esclusione sociale, quindi rispecchia soprattutto la dimensione delle regioni. In Campania sono oltre 2,4 milioni, in Sicilia quasi 2 milioni, mentre in Valle d'Aosta sono circa 13.000. La media delle regioni supera le 670.000 persone.",
+  "fonti": [
+   {
+    "testo": "Eurostat, glossario, At risk of poverty or social exclusion (AROPE)",
+    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Glossary:At_risk_of_poverty_or_social_exclusion_(AROPE)"
+   }
+  ],
+  "lead": "Sommando le venti regioni si arriva a oltre tredici milioni di persone a rischio di povertà o esclusione sociale. Quasi due terzi vivono in cinque regioni. È un conteggio, non un tasso, quindi dice quante persone la condizione tocca e non dove sia più diffusa.",
+  "reviewed_at": "2026-07-27",
+  "reviewed_vintage": 2024,
   "sections": [
    {
-    "body": "Un conteggio assoluto non serve a stabilire dove si stia peggio: le regioni popolose avranno sempre più poveri di quelle piccole, a parità di condizioni. Per confrontare i territori servono le percentuali, non i totali, ed è per questo che l'indicatore è descrittivo. Il suo valore è un altro, ricordare quante persone, in numeri reali, questa condizione tocca in ciascun territorio. Contano di più le proporzioni o le persone in carne e ossa?",
+    "body": "Un conteggio assoluto non serve a stabilire dove si stia peggio, perché una regione popolosa avrà più persone in difficoltà di una piccola anche a parità di condizioni. Per confrontare i territori servono le quote, ed è per questo che l'indicatore resta descrittivo. Il suo valore è un altro, tenere il conto delle persone invece che delle percentuali. Su quel conto, fra il 2021 e il 2024, il totale complessivo è calato, ma non dappertutto: in Lazio, Puglia, Calabria e Marche le persone a rischio sono più di tre anni prima.",
     "h": null,
     "role": "quadro"
    },
    {
-    "body": "Essendo un totale, non è confrontabile tra regioni di dimensioni diverse e non indica dove il rischio sia più diffuso. Va affiancato agli indici in percentuale, e non distingue la povertà di reddito dall'esclusione sociale, che il criterio europeo somma.",
+    "body": "Essendo un totale, non è confrontabile tra regioni di dimensioni diverse e non indica dove il rischio sia più diffuso. Va affiancato agli indici in percentuale. Non distingue inoltre le tre condizioni che il criterio europeo mette insieme, il reddito basso, la grave deprivazione materiale e sociale e la bassissima intensità di lavoro, e chi ne vive più di una viene contato una volta sola.",
     "h": null,
     "role": "limiti"
    }
@@ -3036,10 +3045,12 @@
  },
  "72": {
   "fonti": [],
-  "lead": "Guardando gli addetti che usano computer connessi a internet, la diffusione scende: in media il 52,4%. È il 66,3% nel Lazio e il 59,4% in Emilia-Romagna, ma il 41,9% in Abruzzo. Circa metà dei lavoratori, quindi, usa la rete. La struttura produttiva pesa più della volontà.",
+  "lead": "Poco più di un addetto su due, nelle imprese italiane con almeno dieci dipendenti, lavora a un computer connesso a internet. Il Lazio stacca di quasi sette punti la regione che lo segue, e la classifica non ricalca del tutto la geografia attesa, dato che la Sardegna sta sopra la media e il Piemonte sotto.",
+  "reviewed_at": "2026-07-27",
+  "reviewed_vintage": 2024,
   "sections": [
    {
-    "body": "Che solo metà degli addetti usi internet al lavoro ricorda quanto pesino ancora i settori manifatturieri e manuali, dove il computer non è centrale. Non è un ritardo puro, ma il riflesso della struttura produttiva, dato che più servizi avanzati significano più uso della rete. Il Lazio in testa, con la sua economia terziaria, lo conferma. La digitalizzazione dipende dalla volontà o dal tipo di lavoro?",
+    "body": "Il salto fra la prima regione e la seconda, quasi sette punti, è il più ampio dell'intera classifica. Dopo di quello le regioni si susseguono a distanze di decimi, e dalla decima all'ultima posizione si perde in tutto una decina di punti. Il grosso del Paese sta quindi in una fascia stretta, e la distanza che pesa davvero non è quella fra Nord e Sud, è quella fra la testa e tutti gli altri.",
     "h": null,
     "role": "quadro"
    },
@@ -3377,16 +3388,23 @@
   "vintage": 2025
  },
  "920": {
-  "fonti": [],
-  "lead": "L'Italia invecchia, ma non alla stessa velocità ovunque. L'età media va dai 44,8 anni della Campania ai 49,7 della Liguria, con la Sardegna vicina a 49,6. Cinque anni di distanza tra la regione più giovane e la più anziana, e una media nazionale salita a 47,6 anni.",
+  "fonti": [
+   {
+    "testo": "Istat, Indicatori demografici, Anno 2025, marzo 2026",
+    "url": "https://www.istat.it/wp-content/uploads/2026/03/Report_Indicatori-demografici_Anno-2025.pdf"
+   }
+  ],
+  "lead": "L'Italia invecchia, ma non alla stessa velocità ovunque. Tra la regione più giovane e la più anziana ci sono quasi cinque anni di età media. E il Mezzogiorno non sta tutto dalla parte giovane, la Sardegna è la seconda regione più anziana del Paese.",
+  "reviewed_at": "2026-07-27",
+  "reviewed_vintage": 2026,
   "sections": [
    {
-    "body": "Un'età media più bassa non è di per sé un vantaggio né un problema: dipende da natalità, migrazioni e movimenti dei giovani. Il Mezzogiorno appare più giovane, il Nord più anziano pur attirando popolazione in età da lavoro. Ma la stessa cifra può nascere da storie opposte, una regione che trattiene le famiglie e una che perde i suoi anziani prima del tempo. Resta un indicatore descrittivo, una fotografia della struttura per età, non una classifica. Un territorio giovane guarda al futuro o sta salutando i suoi giovani?",
+    "body": "Un'età media più bassa non è di per sé un vantaggio né un problema, perché lo stesso numero può nascere da più nascite, da chi arriva o da chi parte. Per questo l'indicatore resta descrittivo, una fotografia della struttura per età e non una classifica. La lettura per grandi aree tiene solo in parte. Secondo Istat, al primo gennaio 2026 l'età media in Italia è di 47,1 anni, il Centro è la ripartizione più anziana con 47,7 anni, il Nord segue con 47,3 e il Mezzogiorno resta la più giovane con 46,4. Ma dentro il Mezzogiorno la Sardegna e il Molise stanno fra le cinque regioni più anziane d'Italia, quindi la linea che divide non coincide con quella Nord-Sud.",
     "h": null,
     "role": "quadro"
    },
    {
-    "body": "Fotografa la struttura per età in un istante, senza distinguere le cause: bassa natalità, arrivi o partenze producono lo stesso numero. Non dice nulla sulla direzione del cambiamento né su come la popolazione si distribuisce tra città, coste e aree interne.",
+    "body": "Fotografa la struttura per età in un istante, senza distinguere le cause, dato che bassa natalità, arrivi o partenze producono lo stesso numero. Non dice nulla sulla direzione del cambiamento né su come la popolazione si distribuisce tra città, coste e aree interne. E la media delle venti regioni non è l'età media dell'Italia, perché pesa allo stesso modo la Valle d'Aosta e la Lombardia: il valore nazionale, ponderato sulla popolazione, è più basso.",
     "h": null,
     "role": "limiti"
    }
@@ -4533,16 +4551,23 @@
   "vintage": 2025
  },
  "bes:06POL012": {
-  "fonti": [],
-  "lead": "In 17 regioni su 20 i detenuti sono più dei posti disponibili. La media regionale è del 118,5% della capienza, con il massimo in Puglia, 148%, e in Lombardia, 143,8%. Sotto la capienza restano solo Trentino Alto Adige, 93,3%, Sardegna, 87,6%, e Valle d'Aosta, 77,9%.",
+  "fonti": [
+   {
+    "testo": "Corte europea dei diritti dell'uomo, Torreggiani e altri c. Italia, 8 gennaio 2013, traduzione del Ministero della Giustizia",
+    "url": "https://www.giustizia.it/giustizia/it/mg_1_20_1.wp?facetNode_1=1_2%282013%29&facetNode_2=0_8_1_85&previsiousPage=mg_1_20&contentId=SDU810042"
+   }
+  ],
+  "lead": "In 17 regioni su 20 le carceri ospitano più detenuti dei posti regolamentari. Restano entro la capienza soltanto Trentino Alto Adige, Sardegna e Valle d'Aosta, e la mappa dell'affollamento non ricalca la linea Nord-Sud.",
+  "reviewed_at": "2026-07-27",
+  "reviewed_vintage": 2024,
   "sections": [
    {
-    "body": "Le carceri più piene dei posti disponibili sono un problema di dignità e di legalità insieme, che l'Italia si trascina da anni nonostante le condanne europee. L'affollamento non segue il Nord-Sud, dato che dipende da dove ci sono più istituti e più detenuti in attesa di giudizio. Un carcere sovraffollato rende più difficile ogni percorso di reinserimento. La pena serve a punire o a recuperare, e un carcere pieno cosa permette?",
+    "body": "Un carcere più pieno dei posti previsti non è un problema di gestione interna. Nel 2013 la Corte europea dei diritti dell'uomo ha condannato l'Italia con la sentenza Torreggiani, ha accertato la violazione dell'articolo 3 della Convenzione e ha definito il sovraffollamento un problema strutturale del sistema penitenziario italiano. La forma che il fenomeno ha oggi non aiuta le spiegazioni facili. Le cinque regioni con il rapporto più alto sono Puglia, Lombardia, Friuli-Venezia Giulia, Veneto e Molise, e subito sotto il Molise la classifica si spezza, con quasi dodici punti di distacco verso l'Emilia-Romagna. Anche le tre regioni che restano entro la capienza stanno in parti diverse del Paese. Un valore alto misura quanto è pieno un istituto rispetto ai posti previsti, non quanto una regione sia amministrata bene, quindi la classifica serve a ordinare e non a premiare nessuno.",
     "h": null,
     "role": "quadro"
    },
    {
-    "body": "Rapporta i detenuti ai posti regolamentari, senza contare le celle inagibili, che peggiorano l'affollamento reale. Non dice le condizioni di vita né quanti siano i detenuti in attesa di giudizio, non ancora condannati.",
+    "body": "Rapporta i detenuti ai posti regolamentari, che non coincidono con quelli davvero agibili, quindi l'affollamento effettivo può essere più alto di quello misurato. Non dice le condizioni di vita né quanti siano i detenuti in attesa di giudizio, non ancora condannati.",
     "h": null,
     "role": "limiti"
    }
@@ -4958,16 +4983,23 @@
   "vintage": 2022
  },
  "bes:10AMB004": {
-  "fonti": [],
-  "lead": "Il dato BES sul conferimento in discarica conferma il quadro: dallo zero della Campania e l'1,4% del Trentino Alto Adige all'82% del Molise e il 43% delle Marche. La media delle regioni è del 22,5%, in forte calo negli ultimi vent'anni.",
+  "fonti": [
+   {
+    "testo": "Commissione europea, Landfill waste: la direttiva discariche limita al 10% la quota di rifiuti urbani collocata in discarica entro il 2035",
+    "url": "https://environment.ec.europa.eu/topics/waste-and-recycling/landfill-waste_en"
+   }
+  ],
+  "lead": "Il Molise manda ancora in discarica quattro quinti dei suoi rifiuti urbani, quasi quaranta punti più della regione che lo segue. Nove regioni restano sopra un quarto del totale, mentre in Campania in discarica non arriva più nulla.",
+  "reviewed_at": "2026-07-27",
+  "reviewed_vintage": 2024,
   "sections": [
    {
-    "body": "Nel sistema BES questo indicatore è descrittivo, senza un verso automatico, ma la direzione è chiara, dato che meno discarica significa in genere un ciclo dei rifiuti più maturo. Il calo è netto ovunque, segno di un cambiamento culturale e impiantistico diffuso. Restano però ritardi in alcune regioni, dove mancano alternative alla discarica. Chiudere le discariche è una scelta ambientale o un obbligo europeo?",
+    "body": "Nel sistema BES questo indicatore è descrittivo e non porta un verso automatico, ma una soglia esterna esiste. La direttiva europea sulle discariche, rivista nel 2018, impone agli Stati membri di portare entro il 2035 al 10% o meno la quota di rifiuti urbani collocata in discarica. Misurata su quel bersaglio la distribuzione italiana è larghissima. Sei regioni sono già sotto la soglia, il Molise sta a più di otto volte tanto, e in mezzo c'è un gruppo folto in cui la discarica non è più la via principale ma non è nemmeno finita.",
     "h": null,
     "role": "quadro"
    },
    {
-    "body": "Coincide con l'indicatore territoriale sulla discarica e ne condivide i limiti, dato che dice solo quanto va in discarica, non dove finisca il resto. Non distingue riciclo, compostaggio e incenerimento del rifiuto residuo.",
+    "body": "Dice quanto va in discarica, non dove finisca il resto, quindi non distingue riciclo, compostaggio e incenerimento. Una quota bassa può nascere da una raccolta differenziata efficace come da un forte ricorso all'incenerimento, e questo indicatore da solo non permette di dire quale delle due.",
     "h": null,
     "role": "limiti"
    }
