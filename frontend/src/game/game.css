@@ -506,6 +506,10 @@
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 4px;
+  /* Pari alla larghezza della sfumatura in .game-subnav-wrap::after: senza
+     questo margine di riserva l'ultima scheda resta sotto la sfumatura anche
+     a scroll completato, invece di sfilarsene fuori. */
+  padding-right: 32px;
   -webkit-overflow-scrolling: touch;
 }
 .game-subnav .game-tab { white-space: nowrap; text-decoration: none; }
