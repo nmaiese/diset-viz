@@ -22,6 +22,24 @@
 #   theme                  sottotema, deve risolvere a una categoria canonica
 #   quality_life_category  categoria proposta
 #   direction              higher_better | lower_better | higher_worse | contextual
+#
+# Campi facoltativi, solo per un dataflow con piu' delle tre dimensioni del
+# pilota (FREQ, REF_AREA, DATA_TYPE). Una riga che li omette prende la forma
+# del pilota, quindi le quattro serie sopra non li scrivono:
+#   indicator_dimension    dimensione che porta il codice della serie, se il
+#                          dataflow non la chiama DATA_TYPE (default: DATA_TYPE)
+#   dimension_order        le dimensioni del dataflow nel loro vero ordine
+#                          SDMX (una chiave si legge per posizione), es.
+#                          [FREQ, REF_AREA, SESSO, ETA1, DATA_TYPE]
+#   dimension_values       il codice per ogni dimensione che non e' REF_AREA ne'
+#                          quella dell'indicatore, di norma il codice 'totale'
+#                          di quel dataflow per quella dimensione, come
+#                          "SESSO=9;ETA1=99". Una dimensione del dataflow senza
+#                          un codice qui fa rifiutare la serie (needs-info),
+#                          non la interroga senza filtro: senza filtro SDMX
+#                          non restituisce un totale, restituisce ogni codice
+#                          di quella dimensione mescolato in quella che
+#                          sembrerebbe una riga sola per regione.
 
 series:
   - id: OLDAGEDEPR
