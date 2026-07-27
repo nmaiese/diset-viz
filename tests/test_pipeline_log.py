@@ -51,9 +51,21 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         self.assertEqual(entry["session_id"], "sess-prova")
         self.assertIsInstance(entry["duration_seconds"], int)
         self.assertGreaterEqual(entry["duration_seconds"], 0)
-        # La base c'e' sempre su un checkout con master, ed e' distinta
-        # dall'HEAD della run: e' cio' che rende ricostruibile il diff.
-        self.assertTrue(entry.get("base_commit"))
+        # La base e' best-effort come tutto il resto: su un checkout con un
+        # ref di master c'e' ed e' distinta dall'HEAD della run, su un clone
+        # shallow (la CI fa cosi') manca, e mancare e' il comportamento
+        # giusto, non una stringa vuota da leggere per niente.
+        import subprocess
+        has_master = any(
+            subprocess.run(("git", "rev-parse", "--verify", "--quiet", ref),
+                           cwd=str(pipeline_log.PROJECT_ROOT),
+                           capture_output=True).returncode == 0
+            for ref in ("origin/master", "master")
+        )
+        if has_master:
+            self.assertTrue(entry.get("base_commit"))
+        else:
+            self.assertNotIn("base_commit", entry)
 
     def test_a_checkout_without_a_session_writes_fewer_fields_not_empty_ones(self):
         from unittest import mock
