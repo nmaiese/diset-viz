@@ -29,6 +29,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app/ app/
 COPY content/ content/
+# `scripts/` serve **a runtime**, non solo alla catena editoriale, e la ragione
+# e' una sola riga: `app/indicator_texts.py` importa `scripts.indicator_store`,
+# che possiede il formato degli articoli in `content/indicators/`. Lo store sta
+# li' e non in `app/` perche' lo leggono anche gli script della catena, che sono
+# stdlib puri e non possono importare `app/__init__.py`, il quale importa Flask.
+#
+# Senza questa riga l'immagine non parte affatto: ModuleNotFoundError su
+# `scripts` al primo import, cioe' il sito giu' invece di una pagina sbagliata.
+# `tests/test_app.py` lo sorveglia, perche' e' un guasto che si vede solo in
+# produzione e la suite qui gira senza container.
+COPY scripts/ scripts/
 COPY run.py .
 COPY --from=frontend-build /build/app/static/dist app/static/dist
 

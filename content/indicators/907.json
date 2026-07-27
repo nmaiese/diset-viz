@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "907",
+ "lead": "Questo indicatore mostra chi versa e chi riceve. Il saldo tra prestazioni sociali ricevute e imposte pagate per abitante è negativo in Lombardia, meno 5.400 euro, e in Emilia-Romagna, meno 3.900, mentre è positivo in Calabria, più 1.500, e Sicilia. La media delle regioni è negativa, intorno a meno 1.600.",
+ "sections": [
+  {
+   "body": "È la fotografia della redistribuzione tra territori: le regioni ricche del Nord versano più di quanto ricevono, quelle del Sud il contrario. Non è un giudizio, ma il funzionamento di uno Stato che raccoglie dove c'è più reddito e sostiene dove ce n'è meno. Il segno del saldo dipende dal reddito di partenza, quindi va letto insieme al reddito primario, non da solo. La solidarietà tra territori si misura o si racconta?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "È un saldo medio per abitante, che non dice come imposte e prestazioni si distribuiscono tra le persone dentro ogni regione. Non misura l'efficienza della spesa pubblica né la qualità dei servizi ottenuti in cambio dei contributi versati.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2024
+}

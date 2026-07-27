@@ -1051,5 +1051,72 @@ class HardeningTest(unittest.TestCase):
         self.assertTrue(codes.count(429) >= 1)
 
 
+class TheImageShipsEverythingTheAppImports(unittest.TestCase):
+    """Il guasto che si vede solo in produzione, e li' si vede tutto insieme.
+
+    `app/indicator_texts.py` importa `scripts.indicator_store`, che possiede il
+    formato degli articoli in `content/indicators/`. Lo store sta in `scripts/`
+    e non in `app/` perche' lo leggono anche gli script della catena, che sono
+    stdlib puri e non possono importare `app/__init__.py`, il quale importa
+    Flask.
+
+    Il Dockerfile pero' copia solo alcune directory. Quando lo store e' nato,
+    `scripts/` non era fra quelle: l'immagine sarebbe morta all'avvio con un
+    ModuleNotFoundError, cioe' il sito giu' invece di una pagina sbagliata, e
+    la suite non se ne sarebbe accorta perche' qui gira senza container.
+
+    Questo test legge le importazioni vere invece di fidarsi di un elenco, cosi'
+    vale anche per la prossima directory che qualcuno decidera' di importare.
+    """
+
+    ROOT = Path(__file__).resolve().parents[1]
+    # Quello che l'immagine ha comunque, senza bisogno di una COPY nel Dockerfile.
+    ALWAYS_THERE = {"app", "flask", "werkzeug", "jinja2", "markdown", "yaml"}
+
+    def _copied_dirs(self):
+        text = (self.ROOT / "Dockerfile").read_text(encoding="utf-8")
+        copied = set()
+        for line in text.splitlines():
+            line = line.strip()
+            if not line.startswith("COPY ") or "--from=" in line:
+                continue
+            source = line.split()[1]
+            if source.endswith("/"):
+                copied.add(source.rstrip("/"))
+        return copied
+
+    def _top_level_imports_of_app(self):
+        import ast
+
+        found = set()
+        for path in sorted((self.ROOT / "app").rglob("*.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"), str(path))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    found.update(a.name.split(".")[0] for a in node.names)
+                elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                    found.add(node.module.split(".")[0])
+        return found
+
+    def test_every_repo_package_the_app_imports_is_copied(self):
+        copied = self._copied_dirs()
+        missing = []
+        for name in sorted(self._top_level_imports_of_app()):
+            if name in self.ALWAYS_THERE or name in copied:
+                continue
+            # Solo i pacchetti che stanno in questo repo: le dipendenze esterne
+            # arrivano da requirements.txt, non da una COPY.
+            if (self.ROOT / name / "__init__.py").exists():
+                missing.append(name)
+        self.assertEqual(
+            missing, [],
+            f"l'app importa {missing} ma il Dockerfile non li copia: "
+            f"l'immagine non partirebbe. COPY presenti: {sorted(copied)}",
+        )
+
+    def test_the_store_is_the_case_that_made_this_necessary(self):
+        self.assertIn("scripts", self._copied_dirs())
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,40 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, Conti economici territoriali, Anni 2021-2023 (28 gennaio 2025): nel 2023 il valore aggiunto delle costruzioni cresce in tutte le ripartizioni, dal +5,4% del Nord-ovest all'+8,6% del Centro.",
+   "url": "https://www.istat.it/comunicato-stampa/conti-economici-territoriali-anni-2021-2023/"
+  },
+  {
+   "testo": "Istat, Conti economici territoriali 2022-2024 (22 dicembre 2025): le stime del 2022 sono definitive, quelle del 2023 semidefinitive, quelle del 2024 preliminari.",
+   "url": "https://www.istat.it/comunicato-stampa/conti-economici-territoriali-2022-2024/"
+  }
+ ],
+ "key": "167",
+ "lead": "Nel 2023 le regioni italiane hanno investito in media la quota di prodotto più alta dal 1995, e la risalita ha toccato tutte e venti. La mappa però non è quella che l'atlante abitua ad aspettarsi, con la Lombardia tredicesima e il Lazio diciannovesimo.",
+ "level": "regione",
+ "reviewed_at": "2026-07-26",
+ "reviewed_vintage": 2023,
+ "sections": [
+  {
+   "body": "L'intensità di accumulazione mette gli investimenti fissi lordi di un anno sopra il PIL dello stesso anno, e quello che ne esce è una quota. Gli investimenti fissi lordi sono la spesa in beni destinati a restare in produzione oltre l'anno, dagli edifici ai macchinari. Un valore di 20 dice che un quinto di quanto un territorio ha prodotto in dodici mesi è tornato in dotazione produttiva.\n\nTrattandosi di un rapporto, misura l'impegno e non il volume. Una regione piccola può stare in cima muovendo cifre assolute molto più basse di una regione grande ferma a metà classifica.\n\nUna cautela sul nome, prima di leggere le cifre. Istat pubblica questi stessi numeri, identici su tutte e 986 le righe dell'archivio unico e su tutti gli anni dal 1995, anche sotto la tavola [investimenti privati sul PIL](/indicatore/investimenti-privati-sul-pil/ter-471), che dichiara come dati di base gli investimenti privati invece degli investimenti fissi lordi. Le due etichette non possono essere giuste entrambe sopra la stessa serie, e da qui non si puo' dire quale lo sia. Quello che la quota misura in ogni caso e' l'intensita' di investimento di un territorio.",
+   "h": "Quanta parte del prodotto torna in capitale",
+   "role": "definizione"
+  },
+  {
+   "body": "La distribuzione del 2023 ha una forma netta, e non è una scala continua. In alto due regioni si staccano, la Basilicata e il Piemonte, e fra il Piemonte e la terza, la Valle d'Aosta, corrono già due punti e mezzo, il salto più largo dell'intera graduatoria. Dalla quinta in giù comincia il mucchio, con sedici regioni schiacciate dentro meno di cinque punti e la mediana a 20,49.\n\nQuella forma conta perché questa quota è la parte del prodotto di un anno che non finisce con l'anno, le macchine e i capannoni con cui si lavorerà nel decennio successivo. Un valore alto una volta sola pesa poco, è la ripetizione a costruire la dotazione.\n\nDue incroci nel tema [imprese e competitività](/tema/imprese-e-competitivita) aiutano a leggere la mappa. Le tre regioni dove nel 2023 sono nate più imprese in rapporto a quelle attive, secondo [il tasso di natalità delle imprese](/indicatore/tasso-di-natalita-delle-imprese/ter-54), sono le stesse tre che chiudono la graduatoria dell'accumulazione, Campania, Lazio e Calabria. I due indicatori contano oggetti diversi, le imprese da una parte e gli euro sul PIL dall'altra, e una spiegazione possibile è che un'economia fatta di attività piccole ne registri parecchie senza che il rapporto si muova. Resta un'ipotesi, e il Molise rompe comunque la simmetria, visto che sta nella metà alta di entrambe.\n\nIn cima l'accostamento è un altro. Dove la quota investita è più alta tende a essere più alto anche [il consumo di energia per unità di lavoro](/indicatore/consumi-finali-di-energia-per-unita-di-lavoro/ter-437), fermo al 2022, e Basilicata, Umbria, Valle d'Aosta e Molise stanno tra le prime sette per entrambe le misure. Il peso dell'industria pesante e delle grandi opere è la spiegazione comune più ovvia, e nessuno dei due indicatori la misura. Il Friuli-Venezia Giulia, che di energia per unità di lavoro ne consuma più di ogni altra regione, qui è appena decimo.",
+   "h": "Due regioni staccate e sedici nel mucchio",
+   "role": "quadro"
+  },
+  {
+   "body": "La serie dal 1995 in poi ha una gobba e un buco. La media semplice delle venti regioni cresce fino al 2007, la crisi la riporta indietro, e dal 2012 al 2020 resta ogni anno sotto il livello da cui era partita. Il fondo è il 2014, con 15,17, oltre due punti sotto il 1995.\n\nLa risalita comincia nel 2021 e nel 2023 la media supera per la prima volta il picco del 2007. Nello stesso anno, nei conti economici territoriali Istat, il valore aggiunto delle costruzioni cresce in ogni ripartizione, dal 5,4% del Nord-ovest all'8,6% del Centro. Sono variazioni del valore aggiunto per ripartizione, un'altra cosa rispetto a queste venti quote regionali, e stanno accanto alla risalita senza spiegarla.\n\nIl lungo periodo lascia però due arretramenti. La Campania investe oggi una quota di 1,62 punti più bassa di quella del 1995 e la Calabria di 0,63, uniche due regioni sotto il proprio punto di partenza dopo ventotto anni. Dall'altra parte il Trentino Alto Adige ha aggiunto 8,67 punti, il guadagno più grande tra le venti, e il Piemonte lo segue.",
+   "h": "Nove anni sotto il livello del 1995",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il rapporto ha due gambe e anche la seconda si muove. Se il prodotto arretra la quota sale a parità di investimenti, quindi una posizione guadagnata in graduatoria non è di per sé una macchina in più.\n\nPoi c'è quello che l'aggregato non distingue. Edilizia e macchinari stanno dentro lo stesso numero, e la quota non dice se viene da molte operazioni diffuse o da pochi cantieri grandi, differenza non da poco per un territorio. Gli investimenti sono lordi, per di più, quindi comprendono anche la sostituzione di quello che si è consumato e non solo la dotazione in più. E il rendimento futuro di quel capitale qui non si vede.\n\nIl punto più recente, infine, non è ancora fermo. Nei conti economici territoriali il 2023 è una stima semidefinitiva, quindi l'ultimo anno della serie può ancora spostarsi con la prossima revisione.",
+   "h": "Il denominatore, e quello che l'aggregato non separa",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2023
+}

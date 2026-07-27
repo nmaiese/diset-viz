@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "437",
+ "lead": "Guardando l'energia totale per unità di lavoro, non solo l'elettricità, i consumi vanno da 3,6 nel Lazio a 6,3 in Friuli-Venezia Giulia, con Emilia-Romagna e Umbria in alto. La media delle regioni è di circa 5,1. Pesano industria e clima.",
+ "sections": [
+  {
+   "body": "L'energia per addetto misura quanto lavoro e produzione dipendono dai consumi energetici, e le regioni più industriali e fredde ne usano di più. Il Lazio, terziario e mite, sta in fondo. È un indicatore di dipendenza energetica dell'economia, cruciale nella transizione, dato che chi consuma di più deve cambiare di più. Ridurre i consumi per unità di lavoro è efficienza o de-industrializzazione?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Rapporta i consumi totali di energia agli addetti, mescolando elettricità e calore. Riflette la struttura produttiva e il clima più dell'efficienza, e non distingue le fonti fossili da quelle rinnovabili.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2022
+}

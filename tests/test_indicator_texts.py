@@ -13,16 +13,14 @@ design. The interpretive half of an article still needs a human, and
 docs/INDICATOR_PAGES.md lists what stays uncovered.
 """
 
-import json
 import re
 import unittest
 import unittest.mock
-from pathlib import Path
 
 from app import indicator_texts
 from app.atlas_catalog import get_atlas_indicator
+from scripts import indicator_store
 
-TEXTS_PATH = Path(indicator_texts.__file__).resolve().parent / "static" / "data" / "indicator_texts.json"
 # STYLE.md bans these in prose: em-dash, en-dash, semicolon, ellipsis char.
 BANNED = ("—", "–", ";", "…")
 # The lead is also the meta description. Google truncates well before this, and a
@@ -31,7 +29,7 @@ LEAD_FIRST_SENTENCE_MAX = 200
 
 
 def _load():
-    return json.loads(TEXTS_PATH.read_text(encoding="utf-8"))
+    return indicator_store.load_all()
 
 
 def _level_of(entry):

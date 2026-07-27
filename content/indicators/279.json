@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "279",
+ "lead": "I furti denunciati raccontano un'Italia rovesciata rispetto ai luoghi comuni. Il tasso più alto è nel Lazio, con 28,4 denunce ogni mille abitanti, seguito da Lombardia e Toscana sopra le 20. In fondo ci sono Basilicata, 4,6, e Calabria, 6,8. La media delle regioni è intorno a 13,6 ogni mille.",
+ "sections": [
+  {
+   "body": "I furti si concentrano dove c'è più da rubare e più movimento di persone, nelle grandi aree urbane e nei loro poli commerciali, non dove la sicurezza percepita è più bassa. Negli ultimi decenni il fenomeno è calato di circa un terzo, pur restando molto diseguale tra i territori. Un tasso alto misura anche una maggiore propensione a denunciare, spesso legata all'assicurazione e alla fiducia nelle forze dell'ordine. Il numero fotografa i reati registrati, non tutti quelli avvenuti. Dove si ruba di più o dove si denuncia di più?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Conta solo i furti denunciati, quindi risente della propensione a segnalarli, che varia tra territori e tipi di furto. Non distingue il valore o la gravità del reato, e un tasso sulla popolazione residente non considera pendolari, turisti e attività presenti in una zona.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2023
+}

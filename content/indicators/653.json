@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "653",
+ "lead": "Anche la spesa dei comuni per l'assistenza domiciliare agli anziani varia moltissimo. In Valle d'Aosta è di 4.027 euro per utente, in Campania 3.791, mentre in Veneto appena 409. La media delle regioni è di circa 2.241 euro, ed è cresciuta negli ultimi anni.",
+ "sections": [
+  {
+   "body": "Qui la geografia si mescola, con Campania e Trentino Alto Adige entrambe in alto: la spesa per utente dipende da quanti anziani si seguono e con quale intensità, oltre che dai criteri contabili. Una spesa alta per pochi utenti non equivale a un servizio diffuso. Va quindi letta insieme a quanti anziani sono davvero raggiunti, non da sola. Spendere di più per utente è coprire meglio o coprire meno persone?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "È spesa per singolo utente, quindi un valore alto può nascere da pochi assistiti seguiti intensamente. Dipende dai criteri contabili dei comuni e non dice quanti anziani restano senza alcun servizio a domicilio.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2021
+}

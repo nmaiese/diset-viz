@@ -115,7 +115,7 @@ runs on its own.
 python3 scripts/pipeline_gate.py --stage promoter     # se hai promosso
 python3 scripts/pipeline_gate.py --stage hunter       # se hai solo triagiato
 gh pr create --base master --title "..." --body "..."
-.venv/bin/python scripts/pipeline_merge.py --stage <hunter|promoter> --pr <numero>
+.venv/bin/python scripts/pipeline_merge.py --stage <hunter|promoter> --pr <numero> --run-id <run_id>
 ```
 
 Your merge mode is `checks`, and the wait is that last command, not a property of
@@ -125,9 +125,10 @@ the tests still running. `pipeline_merge.py` polls the checks until they conclud
 and refuses if one fails, if none appear, or if the gate is red. Same stage name
 in the gate and in the merge step, and the same one in the journal.
 
-If the gate reds out on `base`, another stage merged before you: read
-`docs/AGENT_CONTRACT.md`, step 3-bis, and do not correct your work on that
-verdict.
+The gate no longer reds out because master moved: the diff is measured against
+the common ancestor, so another stage merging while you work costs you nothing.
+The one conflict that can still reach you is two stages editing the same file,
+and `docs/AGENT_CONTRACT.md`, step 3-bis, is the only rule for it.
 
 In the body: what ran, live or offline, against which sources; the queue diff in
 words; for every candidate you touched the decision and the reason with real
@@ -136,10 +137,19 @@ did **not** decide and why.
 
 ## Prima di chiudere
 
-Registra la run nel diario, anche se non hai prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4):
+Registra la run nel diario **prima di aprire la pull request**, anche se non hai
+prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4). L'ordine conta: la riga
+viaggia dentro la pull request, quindi va committata prima che esista.
 
 ```bash
-python3 scripts/pipeline_log.py --write --stage hunter --outcome <esito> --summary "..."
+python3 scripts/pipeline_log.py --write --stage hunter --outcome <esito> \
+    --summary "..." --detail "..." --queue-before <N> --queue-after <N>
 ```
 
-E' l'unica cosa che distingue "ho controllato e non c'era niente da fare" da "non sono partito".
+Stampa un `run_id`. **Prendilo e passalo al passo di merge**: e' l'unica cosa
+che lega questa riga a come finira'. Non scrivere `--pr`, che in quel momento
+non esiste ancora, ed e' esattamente il motivo per cui appaiare le due meta'
+della run sul numero della pull request non funzionava.
+
+Il caso che conta di piu' e' `nothing`: e' l'unica cosa che distingue "ho
+controllato e non c'era niente da fare" da "non sono partito".

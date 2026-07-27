@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-27T12:16:31+00:00",
+ "branch": "claude/article-improvement-batch-2-8lahcb",
+ "commit": "07cebb6",
+ "detail": [
+  "STAGE_PATHS = (verifiche.csv, runs.jsonl): il verificatore non ha i testi nel perimetro, e le smentite tornano al revisore come il segnale smentita di review_queue, peso 60.",
+  "Una verifica scade sull'impronta della prosa e non su una data. Delle undici verifiche del lotto 2 ne resta una nel registro, ter-651: le altre dieci riguardano prosa che non esiste piu' perche' gli articoli sono stati corretti dopo.",
+  "Routine non ancora creata, per scelta: DISCOVERY_STATUS.md dice perche'."
+ ],
+ "gate": "manual",
+ "outcome": "nothing",
+ "pr": "",
+ "run_id": "legacy-verificatore-20260727T121631",
+ "stage": "verificatore",
+ "summary": "Stadio registrato, coda e cancello in piedi, registro con una verifica viva. Nessuna verifica nuova in questa run.",
+ "trigger": "manuale"
+}

@@ -212,3 +212,154 @@ class TwoRowsAreOneRun(unittest.TestCase):
     def test_the_closing_time_is_what_the_silence_alarm_sees(self):
         row = pipeline_log.collapse_runs(self.ROWS)[0]
         self.assertEqual(row["at"], "2026-07-27T06:28:30+00:00")
+
+
+class TheRunIdIsWhatActuallyIdentifiesARun(unittest.TestCase):
+    """La chiave era `(stadio, pr)`, e su trenta run reali ne apparava undici.
+
+    Il motivo non e' una dimenticanza degli agenti ed e' istruttivo: la riga
+    dell'agente viaggia **dentro** la pull request, quindi va committata prima
+    che la pull request esista, quindi non puo' portarne il numero. Il diario
+    finiva per dichiarare ventuno run in attesa mentre le pull request aperte
+    erano zero.
+    """
+
+    def rows(self, run_id="reviewer-20260727T110207Z-a3f1"):
+        return [
+            {"at": "2026-07-27T11:02:07+00:00", "run_id": run_id, "stage": "reviewer",
+             "outcome": "pr-open", "summary": "sei articoli", "detail": ["ter-920 corretto"],
+             "gate": "auto", "pr": "", "commit": "aaa1111", "branch": "automation/x"},
+            {"at": "2026-07-27T11:07:01+00:00", "run_id": run_id, "stage": "reviewer",
+             "outcome": "merged", "summary": "PR #47 fusa", "detail": [],
+             "gate": "auto", "pr": "47", "commit": "bbb2222", "branch": "master"},
+        ]
+
+    def test_the_two_halves_join_without_the_pull_request_number(self):
+        collapsed = pipeline_log.collapse_runs(self.rows())
+        self.assertEqual(len(collapsed), 1)
+        self.assertEqual(collapsed[0]["outcome"], "merged")
+        self.assertIn("ter-920 corretto", collapsed[0]["detail"])
+
+    def test_the_number_arrives_from_the_half_that_could_know_it(self):
+        self.assertEqual(pipeline_log.collapse_runs(self.rows())[0]["pr"], "47")
+
+    def test_two_runs_of_the_same_stage_on_the_same_day_stay_apart(self):
+        """Il ripiego `(stadio, pr)` non li distingueva quando il numero
+        mancava, e due run del revisore nello stesso giorno sono la norma."""
+        rows = self.rows() + self.rows(run_id="reviewer-20260727T114619Z-77b2")
+        self.assertEqual(len(pipeline_log.collapse_runs(rows)), 2)
+
+    def test_old_rows_without_an_id_still_join_on_the_pull_request(self):
+        """Il ripiego resta, perche' la storia gia' scritta non ha id."""
+        rows = [dict(r) for r in TwoRowsAreOneRun.ROWS]
+        self.assertEqual(len(pipeline_log.collapse_runs(rows)), 2)
+
+    def test_an_id_is_minted_and_printed_for_whoever_writes_first(self):
+        entry = pipeline_log.build_entry("writer", "pr-open", "x")
+        self.assertTrue(entry["run_id"].startswith("writer-"))
+        self.assertEqual(entry["trigger"], "manuale")
+
+    def test_an_unknown_trigger_is_refused_like_an_unknown_outcome(self):
+        with self.assertRaises(SystemExit):
+            pipeline_log.build_entry("writer", "pr-open", "x", trigger="a-mano-di-notte")
+
+
+class TwoRunsNeverWriteTheSameFile(unittest.TestCase):
+    """Il conflitto che ha reso necessaria una sezione intera del contratto.
+
+    Sette stadi che appendono in coda allo stesso `.jsonl` collidono sempre.
+    Con un file per run non c'e' niente da fondere, e questo test lo dice sul
+    filesystem invece che in un commento.
+    """
+
+    def test_two_stages_recording_at_once_touch_two_files(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            pipeline_log.append(pipeline_log.build_entry("writer", "pr-open", "a"), path=root)
+            pipeline_log.append(pipeline_log.build_entry("reviewer", "pr-open", "b"), path=root)
+            names = sorted(p.name for p in root.glob("*.json"))
+            self.assertEqual(len(names), 2)
+            self.assertEqual(len(pipeline_log.read_journal(root)), 2)
+
+    def test_the_outcome_row_sits_beside_the_agents_row_not_on_top_of_it(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            entry = pipeline_log.build_entry("writer", "pr-open", "a")
+            pipeline_log.append(entry, path=root)
+            pipeline_log.append(
+                pipeline_log.build_entry("writer", "merged", "fusa", run_id=entry["run_id"]),
+                path=root, suffix=".esito",
+            )
+            self.assertEqual(len(list(root.glob("*.json"))), 2)
+            collapsed = pipeline_log.collapse_runs(pipeline_log.read_journal(root))
+        self.assertEqual(len(collapsed), 1)
+        self.assertEqual(collapsed[0]["outcome"], "merged")
+
+
+class SilenceMeansSomethingElseNowThatTheDispatcherAssignsTheWork(unittest.TestCase):
+    """Uno stadio che tace perche' non ha niente da fare sta rispondendo.
+
+    Con sei cron, il silenzio del curatore era un ritardo. Con il dispatcher e'
+    la risposta giusta a una coda vuota, e segnalarlo come guasto e' il modo
+    piu' sicuro di insegnare a ignorare gli avvisi.
+    """
+
+    def entry(self, stage, days_ago):
+        from datetime import datetime, timedelta, timezone
+
+        when = datetime.now(timezone.utc) - timedelta(days=days_ago)
+        return {"stage": stage, "outcome": "nothing", "summary": "x",
+                "at": when.isoformat(timespec="seconds")}
+
+    def group(self, rows, name):
+        return next(r for r in rows if r["group"] == name)
+
+    def test_a_quiet_stage_with_an_empty_queue_is_idle_not_late(self):
+        rows = pipeline_log.silence([self.entry("curator", 40)],
+                                    queues={"curator": 0})
+        self.assertFalse(self.group(rows, "curatore")["stale"])
+        self.assertTrue(self.group(rows, "curatore")["idle"])
+
+    def test_a_quiet_stage_with_work_waiting_is_still_late(self):
+        rows = pipeline_log.silence([self.entry("curator", 40)],
+                                    queues={"curator": 3})
+        self.assertTrue(self.group(rows, "curatore")["stale"])
+        self.assertFalse(self.group(rows, "curatore")["idle"])
+
+    def test_without_the_queues_it_behaves_as_it_always_did(self):
+        rows = pipeline_log.silence([self.entry("curator", 40)])
+        self.assertTrue(self.group(rows, "curatore")["stale"])
+
+    def test_the_dispatcher_is_judged_on_its_heartbeat_and_nothing_else(self):
+        """Non ha una coda: quando tace, e' lui a non essere partito, e non c'e'
+        niente da interpretare."""
+        rows = pipeline_log.silence([self.entry("dispatch", 9)],
+                                    queues={s: 0 for s in pipeline_log.STAGES})
+        self.assertTrue(self.group(rows, "dispatcher")["stale"])
+        self.assertIsNone(self.group(rows, "dispatcher")["waiting"])
+
+
+class ABrokenShardLeavesAMarkInsteadOfVanishing(unittest.TestCase):
+    """Saltare in silenzio uno shard rotto farebbe sparire una run dal diario,
+    cioe' produrrebbe esattamente l'invisibilita' che il diario esiste per
+    togliere, e per giunta sulle run andate male, che sono quelle piu'
+    probabilmente scritte a meta'."""
+
+    def test_the_run_still_shows_up_as_unreadable(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            pipeline_log.append(
+                pipeline_log.build_entry("writer", "merged", "buona"), path=root)
+            (root / "rotta.json").write_text("{ meta riga", encoding="utf-8")
+            entries = pipeline_log.read_journal(root)
+        self.assertEqual(len(entries), 2)
+        broken = [e for e in entries if e["outcome"] == "error"]
+        self.assertEqual(len(broken), 1)
+        self.assertIn("rotta.json", broken[0]["summary"])
+
+    def test_a_json_that_is_not_an_object_counts_too(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "lista.json").write_text("[1, 2, 3]", encoding="utf-8")
+            entries = pipeline_log.read_journal(root)
+        self.assertEqual([e["outcome"] for e in entries], ["error"])

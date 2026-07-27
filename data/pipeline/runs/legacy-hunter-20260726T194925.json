@@ -1,0 +1,15 @@
+{
+ "at": "2026-07-26T19:49:25+00:00",
+ "branch": "claude/work-in-progress-branch-52h19r",
+ "commit": "4f0689a",
+ "detail": [
+  "20/20 regioni, 2015-2024, definition_match=new, il catalogo non aveva il tasso di natalita della popolazione"
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-hunter-20260726T194925",
+ "stage": "hunter",
+ "summary": "BIRTHRATE (tasso di natalita) scoperto dal vivo e approvato",
+ "trigger": "manuale"
+}

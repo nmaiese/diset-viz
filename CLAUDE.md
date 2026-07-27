@@ -34,6 +34,7 @@ Per guardare la catena senza aprire file:
 python3 scripts/pipeline_dashboard.py --open   # tutto in una pagina
 python3 scripts/pipeline_status.py             # solo dove si e' fermata
 python3 scripts/pipeline_log.py                # solo che cosa hanno fatto gli agenti
+python3 scripts/pipeline_dispatch.py           # solo chi tocca adesso
 ```
 
 ## What this is
@@ -136,8 +137,21 @@ and a verdict from `scripts/pipeline_gate.py` that decides whether it may publis
 
 What you need to know before touching any of it:
 
+- **One dispatcher, one stage per tick.** `scripts/pipeline_dispatch.py` reads
+  every queue and names the single stage to run. Stages have no cron of their
+  own, so there is never a second writer: do not launch a stage yourself and do
+  not re-add a per-stage schedule.
+- **Every registry of the chain is one file per record**, so a conflict between
+  two stages is not unlikely, it is impossible: `content/indicators/` (one per
+  article), `data/pipeline/runs/` (one per run), `data/pipeline/verifiche/` (one
+  per verification). Never collapse one back into a single file.
+- **A run is identified by its `run_id`, never by its PR number.** The agent's
+  journal row is committed before the pull request exists, so it cannot carry
+  the number. `pipeline_log.py --write` mints and prints the id, and
+  `pipeline_merge.py --run-id` is what joins the two halves.
 - **The gate is not advisory.** Every stage may write only a short list of paths
-  (`pipeline_gate.STAGE_PATHS`). Do not widen it to make something pass.
+  (`pipeline_gate.STAGE_PATHS`). Do not widen it to make something pass. A path
+  ending in `/` is a directory prefix, and the slash is what stops it leaking.
 - **No stage waits for a human.** Prose merges itself; everything that moves live
   numbers or names an institution merges once CI is green. Nobody reads these
   pull requests before they land, so the control is the perimeter, the gate and
@@ -153,8 +167,9 @@ What you need to know before touching any of it:
 
 ## Writing indicator pages — READ [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md)
 
-The prose of an indicator page lives in `app/static/data/indicator_texts.json`:
-one `lead` plus four ordered sections (`definizione`, `quadro`, `dinamica`,
+The prose of an indicator page lives in `content/indicators/`, **one file per
+article** (`scripts/indicator_store.py` owns the layout and says why): one `lead`
+plus four ordered sections (`definizione`, `quadro`, `dinamica`,
 `limiti`). A section nobody has written is composed from the data at render time,
 so every page has the same skeleton while only some have been through an editor.
 
@@ -210,9 +225,16 @@ converted into typographic dashes or ellipses. Keep the source text clean.
 
 Themes, theme scores, region profiles and macro-areas are all **derived** from the
 data and recomputed at runtime. For each new indicator id set its direction in
-`CURATED_DIRECTION` (`app/indicator_notes.py`), and for each new theme map it to a
-macro-area in `MACRO_AREAS` (same file). Then restart gunicorn, rebuild the
-frontend, run the tests, and re-check which themes are now "valutabili".
+`CURATED_DIRECTION` (`app/indicator_notes.py`). For each new theme add a row to
+`config/theme_categories.csv` mapping it to one of the 12 canonical categories,
+which is data and inside the curator's perimeter; the categories themselves, and
+the four macro-areas they roll up into, live in `CANONICAL_CATEGORIES` and
+`MACRO_AREAS` in `app/taxonomy.py`, and inventing one is code. Then restart
+gunicorn, rebuild the frontend, run the tests, and re-check which themes are now
+"valutabili".
+
+An unmapped theme is the quiet failure worth knowing: the indicator stays in the
+catalogue and disappears from every macro-area total, with nothing failing.
 
 Provincial data is separate: [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md).
 Keep the SDMX cache out of git, commit only normalized CSV artifacts, and never

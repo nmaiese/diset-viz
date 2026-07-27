@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "bes:06POL002",
+ "lead": "La fiducia nel Parlamento è bassa ovunque: su una scala da zero a dieci vale in media 4,6. Le differenze sono piccole, dal 4,9 di Umbria e Marche al 4,2 di Calabria e Sardegna. Il dato è cresciuto rispetto agli anni più critici.",
+ "sections": [
+  {
+   "body": "Un voto medio sotto la sufficienza racconta un rapporto logorato tra cittadini e istituzione parlamentare, comune a molte democrazie. Le differenze territoriali sono minime, segno che la sfiducia è un fenomeno nazionale, non locale. La lieve ripresa recente va letta con cautela, legata ai cicli politici e all'alternanza dei governi. Una democrazia regge con un Parlamento in cui si crede poco?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Rileva un giudizio medio di fiducia, sensibile al momento politico e al governo in carica. Non distingue la fiducia nell'istituzione da quella nella classe politica che la occupa in quel momento.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

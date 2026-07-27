@@ -1,0 +1,27 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, Indicatori demografici, Anno 2025 (speranza di vita alla nascita a 81,7 anni per gli uomini e 85,7 per le donne, divario di genere sceso a quattro anni)",
+   "url": "https://www.istat.it/wp-content/uploads/2026/03/Report_Indicatori-demografici_Anno-2025.pdf"
+  },
+  {
+   "testo": "Poulain, Pes et al., Identification of a geographic area characterized by extreme longevity in the Sardinia island: the AKEA study, Experimental Gerontology, 2004 (longevità maschile eccezionale e rapporto femmine/maschi tra i centenari unico dell'isola, concentrato nella fascia montana dell'Ogliastra)",
+   "url": "https://www.sciencedirect.com/science/article/abs/pii/S0531556504002141"
+  }
+ ],
+ "key": "911",
+ "lead": "Un neonato maschio del Trentino-Alto Adige può contare su 82,8 anni di vita attesa nel 2025, uno della Campania su 80,1. Le sei regioni sotto gli 81 anni stanno tutte nel Mezzogiorno, e la media delle venti si ferma a 81,68 anni, in linea con gli 81,7 stimati dall'Istat per l'Italia.",
+ "sections": [
+  {
+   "body": "La Sardegna offre il rovescio più curioso di questa graduatoria. L'isola ospita una delle Blue Zone del pianeta, la fascia montana dell'Ogliastra, dove lo [studio AKEA](https://www.sciencedirect.com/science/article/abs/pii/S0531556504002141) ha documentato una longevità maschile riconosciuta come unica al mondo. Eppure la vita attesa alla nascita degli uomini sardi resta a 80,60 anni, tra le più basse d'Italia. Non è una contraddizione. La longevità estrema riguarda pochi comuni interni, mentre la speranza di vita alla nascita pesa la mortalità di tutta l'isola a ogni età. Il primato dei vecchissimi e una vita media più bassa convivono senza contraddirsi, e il dato regionale tiene insieme le due cose senza mostrarle. Resta da capire se quei cluster di longevità possano un giorno sollevare la media dell'isola, o se resteranno un'eccezione di valle.",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Il numero racconta solo gli uomini. Le donne arrivano a 85,7 anni nel 2025 secondo l'Istat, quattro anni più degli uomini, quindi la vita attesa di un territorio cambia parecchio a seconda di quale metà della popolazione guardi. La speranza di vita alla nascita è poi una misura di periodo. Riassume la mortalità osservata in un solo anno applicata a una coorte ipotetica, non è una previsione di quanto a lungo vivranno i nati del 2025. Un valore alto non spiega da sé le sue cause, che intrecciano sanità, reddito, ambiente e stili di vita. E nelle regioni piccole come Valle d'Aosta e Molise i pochi eventi rendono la serie instabile da un anno all'altro, per cui un singolo scarto può essere rumore più che tendenza.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

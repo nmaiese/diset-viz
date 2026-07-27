@@ -16,7 +16,8 @@ about their own work, so nothing in the chain checked it:
     scritte nel lotto 2 e rilette      529 controllate,  7 false   1,3%
 
 The verifier corrects nothing. Its whole output is a row in
-`data/pipeline/verifiche.csv`, and a refuted claim comes back to the reviewer as
+`data/pipeline/verifiche/`, one file per verification, and a refuted claim
+comes back to the reviewer as
 the `smentita` flag of `review_queue`, which outranks every other signal there.
 Separating the two is the point: a stage that both finds and fixes grades its own
 homework, which is the problem it was built to solve one level up.
@@ -55,8 +56,27 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-TEXTS_PATH = PROJECT_ROOT / "app" / "static" / "data" / "indicator_texts.json"
-VERIFICATIONS_PATH = PROJECT_ROOT / "data" / "pipeline" / "verifiche.csv"
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from scripts import indicator_store  # noqa: E402  (path bootstrap above)
+
+# Il registro delle verifiche, un file per verifica.
+#
+# Era un CSV unico a cui si appendeva in fondo, ed era la seconda meta' dello
+# stesso guasto che ha fatto shardare il diario: due stadi che scrivono in coda
+# allo stesso file collidono sempre, e il contratto se la cavava dicendo agli
+# agenti di tenere entrambe le parti a mano. Peggio, il cancello pretende che
+# il registro sia append-only, quindi una risoluzione sbagliata di quel
+# conflitto era anche una violazione del cancello dello stadio che la faceva.
+#
+# Il nome del file e' la chiave naturale della verifica: quale articolo, a
+# quale livello, e su quale versione della prosa. Riverificare lo stesso
+# articolo dopo una correzione produce un'impronta nuova, quindi un file nuovo,
+# quindi non si sovrascrive niente.
+VERIFICATIONS_DIR = PROJECT_ROOT / "data" / "pipeline" / "verifiche"
+# Il vecchio registro unico. Si legge, non si scrive piu'.
+LEGACY_VERIFICATIONS = PROJECT_ROOT / "data" / "pipeline" / "verifiche.csv"
 
 COLUMNS = [
     "code",
@@ -113,26 +133,86 @@ def prose_fingerprint(entry: dict) -> str:
     return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:16]
 
 
-def load_texts(path=None) -> dict:
-    return json.loads(Path(path or TEXTS_PATH).read_text(encoding="utf-8"))
+def load_texts(root=None) -> dict:
+    """Tutti gli articoli. `root` e' una directory di store, non piu' un file."""
+    return indicator_store.load_all(root)
+
+
+def verification_name(row: dict) -> str:
+    """Il nome del file di una verifica: articolo, livello, impronta della prosa.
+
+    Sono i tre campi su cui la verifica e' un'affermazione, quindi due file con
+    lo stesso nome sarebbero la stessa verifica scritta due volte, e due
+    verifiche diverse non possono mai ricadere sullo stesso nome.
+    """
+    code = (row.get("code") or "ignoto").replace("/", "-")
+    level = (row.get("level") or "regione").replace("/", "-")
+    prosa = (row.get("prosa") or "senza-impronta").replace("/", "-")
+    return f"{code}__{level}__{prosa}.json"
 
 
 def load_verifications(path=None) -> list[dict]:
-    target = Path(path or VERIFICATIONS_PATH)
-    if not target.exists():
-        return []
-    with target.open(encoding="utf-8", newline="") as handle:
+    """Tutte le verifiche.
+
+    `path` accetta una directory di shard o un `.csv`, per la stessa ragione
+    per cui `pipeline_log.read_journal` accetta tutte e due le forme: i test
+    ne scrivono uno temporaneo e la catena scrive l'altra. Il vecchio registro
+    unico non si legge piu' in automatico perche' non esiste piu': le sue righe
+    sono state travasate negli shard, e leggerle da tutte e due le parti le
+    avrebbe contate due volte.
+    """
+    target = Path(path) if path else VERIFICATIONS_DIR
+    if target.is_dir():
+        return _read_verification_shards(target)
+    if target.exists():
+        return _read_verification_csv(target)
+    return []
+
+
+def migrate_legacy(csv_path=None, root=None) -> int:
+    """Travasa il vecchio CSV negli shard. Ritorna quante verifiche."""
+    source = Path(csv_path or LEGACY_VERIFICATIONS)
+    if not source.exists():
+        return 0
+    rows = _read_verification_csv(source)
+    for row in rows:
+        write_verification(row, root=root)
+    return len(rows)
+
+
+def _read_verification_shards(root) -> list[dict]:
+    rows = []
+    for shard in sorted(Path(root).glob("*.json")):
+        try:
+            data = json.loads(shard.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(data, dict):
+            rows.append({column: data.get(column, "") for column in COLUMNS})
+    return sorted(rows, key=lambda r: (r.get("at") or "", r.get("code") or ""))
+
+
+def _read_verification_csv(path) -> list[dict]:
+    with Path(path).open(encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle, delimiter=";"))
 
 
-def write_verifications(rows: list[dict], path=None) -> None:
-    target = Path(path or VERIFICATIONS_PATH)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=COLUMNS, delimiter=";", lineterminator="\n")
-        writer.writeheader()
-        for row in rows:
-            writer.writerow({column: row.get(column, "") for column in COLUMNS})
+def write_verification(row: dict, root=None) -> Path:
+    """Registra una verifica. Ritorna il file scritto.
+
+    Una per volta e non una lista: il verificatore ne produce una per articolo,
+    e una funzione che riscrive tutto il registro e' esattamente il modo in cui
+    un registro append-only smette di esserlo per sbaglio.
+    """
+    target = Path(root or VERIFICATIONS_DIR)
+    target.mkdir(parents=True, exist_ok=True)
+    payload = {column: row.get(column, "") for column in COLUMNS}
+    path = target / verification_name(payload)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=1, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
 
 
 def code_of(key: str) -> str:
@@ -323,7 +403,7 @@ def main(argv=None) -> int:
     parser.add_argument("--show", help="un articolo solo (ter-611, bes-12SER003)")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--csv", action="store_true")
-    parser.add_argument("--texts")
+    parser.add_argument("--texts", help="una directory di articoli, o un vecchio file unico")
     parser.add_argument("--verifiche")
     args = parser.parse_args(argv)
 

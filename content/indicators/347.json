@@ -1,0 +1,27 @@
+{
+ "fonti": [
+  {
+   "testo": "Eurostat, obiettivi UE 2030 del Pilastro europeo dei diritti sociali: occupazione 20-64 al 78% e almeno dimezzare il divario di genere nell'occupazione rispetto al 2019",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Glossary:The_European_Pillar_of_Social_Rights_Action_Plan_(EU_2030_targets)"
+  },
+  {
+   "testo": "Istat, Noi Italia, mercato del lavoro: tasso di occupazione 20-64 femminile al 57,4% e maschile al 76,8% nel 2024",
+   "url": "https://noi-italia.istat.it/pagina.php?id=3&categoria=16&action=show"
+  }
+ ],
+ "key": "347",
+ "lead": "In Valle d'Aosta lavora il 74,3% delle donne tra 20 e 64 anni, in Campania appena il 36,8%. Al vertice quasi tre donne su quattro hanno un impiego, e il Trentino Alto Adige segue al 73,6%. In fondo sono tre le regioni dove lavorano meno di due donne su cinque, con la Sicilia al 37,5% e la Calabria al 37,7% appena sopra la Campania.",
+ "sections": [
+  {
+   "body": "Il Mezzogiorno non si muove come un blocco. Dal 2018 la Basilicata ha guadagnato 9,2 punti, l'Abruzzo quasi 8 e la Sardegna 7, mentre la Campania ne ha aggiunti 5 e la Calabria appena 4. Così dentro il Sud le regioni di testa si allontanano da quelle di coda, e il divario che oggi si allarga è quello interno al Mezzogiorno. L'Unione europea ha promesso di dimezzare entro il 2030 il [divario di occupazione tra donne e uomini](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Glossary:The_European_Pillar_of_Social_Rights_Action_Plan_(EU_2030_targets)) rispetto al 2019. Con l'occupazione femminile che in Campania, Sicilia e Calabria resta sotto il 38%, qui quell'obiettivo è ancora lontano. Le regioni in fondo stanno accorciando la distanza o solo salendo insieme a tutte le altre?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Il dato misura solo le donne e non dice nulla sul divario con gli uomini. A livello nazionale, nel 2024, l'occupazione femminile 20-64 si è fermata al 57,4% contro il 76,8% degli uomini, oltre 19 punti di scarto (Istat). Il tasso conta chi ha almeno un'ora di lavoro retribuito a settimana, così il part time involontario e l'impiego a tempo pieno pesano allo stesso modo. E un solo anno di fotografia non spiega da cosa nascano queste differenze.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

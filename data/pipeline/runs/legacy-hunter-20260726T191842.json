@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-26T19:18:42+00:00",
+ "branch": "claude/work-in-progress-branch-52h19r",
+ "commit": "bc03ef4",
+ "detail": [
+  "Tre test che congelavano config/istat_series.yaml riscritti: ammettere una serie torna configurazione, non codice",
+  "NMIGRATEIN e BIRTHRATE ammessi, watchlist demografica da 2 a 4 serie",
+  "NMIGRATEIN scoperto live: 20/20 regioni, serie 2015-2024, definition_match=new, approvato con motivo"
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-hunter-20260726T191842",
+ "stage": "hunter",
+ "summary": "Watchlist sbloccata e cresciuta, NMIGRATEIN scoperto dal vivo (orchestrazione a mano su branch unica)",
+ "trigger": "manuale"
+}

@@ -1,7 +1,7 @@
 """The reviewer's worklist: which written articles are most likely to be wrong.
 
 Logic-only, on synthetic entries, so it never depends on what the live
-indicator_texts.json happens to contain today.
+the article store happens to contain today.
 
 The patterns here are not style preferences. Each one is a class of claim the
 mechanical guards in tests/test_indicator_texts.py cannot check and that

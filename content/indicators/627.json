@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "627",
+ "lead": "Questo indicatore conta in valore assoluto gli alunni con disabilità motoria, quindi rispecchia soprattutto quanti studenti ha una regione. In Lombardia sono 1.386, nel Lazio 837, mentre in Valle d'Aosta appena 29 e in Molise 32. La media delle regioni è di circa 438.",
+ "sections": [
+  {
+   "body": "Un conteggio assoluto non dice dove la disabilità motoria sia più diffusa, dato che le regioni popolose ne avranno sempre di più. Per capire l'incidenza servirebbe il rapporto sugli alunni totali, non il numero secco. Il dato è comunque utile a dimensionare il bisogno reale di supporti e barriere da abbattere in ogni sistema scolastico. Serve di più sapere quanti sono o quanti ne ha ciascuna scuola?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Essendo un totale, non è confrontabile tra regioni di dimensioni diverse e non misura l'incidenza. Non dice nulla sul grado di disabilità né sul supporto effettivamente ricevuto da ciascun alunno.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2022
+}

@@ -28,7 +28,7 @@ il minimo e la media è la duplicazione che questo layout ha eliminato.
 | | proprietario | dove |
 |---|---|---|
 | numeri, aggregati, ordinamenti | `app/indicator_view.py` | cruscotto |
-| prosa scritta | `app/static/data/indicator_texts.json` | articolo |
+| prosa scritta | `content/indicators/<chiave>.json` | articolo |
 | prosa composta, quando manca la scritta | `app/templates/_indicator_article.html` | articolo |
 | fonte, copertura, citazione, disclaimer sulla media | template | apparato |
 
@@ -36,6 +36,33 @@ il minimo e la media è la duplicazione che questo layout ha eliminato.
 dipende da un territorio) e `levels` (una voce per livello territoriale, ciascuna
 con i propri anni, osservazioni, aggregati e confronto annuale). Non duplicare
 quei calcoli altrove.
+
+## Dove vive la prosa: un file per articolo
+
+`content/indicators/<chiave>.json`, con i due punti della chiave scritti `__`:
+`bes:10AMB004` sta in `content/indicators/bes__10AMB004.json`. Lo store è
+`scripts/indicator_store.py`, che possiede la codifica e la spiega per intero.
+
+Era un JSON unico da 365 voci sotto `app/static/data/`, e il formato costava due
+cose distinte. Scrittore e revisore condividono il perimetro e girano tutti e
+due ogni giorno, quindi ogni loro modifica riscriveva l'intero file e due run
+vicine su articoli diversi finivano in conflitto su qualcosa che nessun agente
+può risolvere leggendolo. E il diff di una revisione non diceva di quale
+indicatore parlasse, perché la chiave che possiede le righe cambiate poteva
+stare cento righe più su.
+
+Adesso `git log content/indicators/ter__920.json` è la storia editoriale di
+quella pagina, e due stadi che lavorano su articoli diversi non hanno niente da
+fondere.
+
+Quello che **non** è cambiato: una voce vale per un livello territoriale solo, e
+il livello resta un campo dentro la voce. Il modello è ancora una voce per
+indicatore, non una per coppia (indicatore, livello).
+
+```bash
+python3 scripts/indicator_store.py --list
+python3 scripts/indicator_store.py --show ter-920
+```
 
 ## L'articolo: quattro ruoli
 
@@ -57,7 +84,7 @@ finita: serve perché il layout sia uniforme su tutti i 621 indicatori mentre so
 una parte è passata da un editor. Lo stato di ciascuno si legge con
 `.venv/bin/python -m scripts.text_queue`.
 
-Il testo composto **non** viene congelato nel JSON, di proposito: così non può
+Il testo composto **non** viene congelato nel file, di proposito: così non può
 invecchiare in silenzio dietro un aggiornamento dei dati, e la guardia sul
 `vintage` si applica solo alle frasi davvero scritte da qualcuno.
 
@@ -330,12 +357,15 @@ Prima della pubblicazione:
 
 ```bash
 .venv/bin/python -m unittest discover -s tests -v
-python3 /home/nilo/dev/ai-agents/skills/italian-product-copywriter/references/audit_editorial_quality.py .
+python3 scripts/prose_lint.py --summary
 git diff --check
 ```
 
 L'audit editoriale è il controllo che conta sui trattini, e va usato al posto di
-un `grep` sui sorgenti. Un `grep -rn "[—–;]" app/templates` restituisce sempre
+un `grep` sui sorgenti. Viveva in uno script fuori dal repo, sotto un percorso
+assoluto della macchina di chi lo aveva scritto, quindi per chiunque altro il
+comando qui sopra non esisteva. La parte che serve a questa verifica la fa
+`scripts/prose_lint.py`, che sta in repo e gira ovunque. Un `grep -rn "[—–;]" app/templates` restituisce sempre
 righe, perché i template contengono CSS e JavaScript pieni di punti e virgola, e
 soprattutto **non vede le entity**: `&ndash;` rende un trattino medio vietato da
 `content/STYLE.md` senza che il carattere compaia nel sorgente. È così che

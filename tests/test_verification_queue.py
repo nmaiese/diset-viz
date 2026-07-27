@@ -215,7 +215,7 @@ class TheStageIsRegisteredEverywhere(unittest.TestCase):
         self.assertIn("verificatore", pipeline_gate.MERGE_POLICY)
 
     def test_it_may_not_touch_the_prose(self):
-        """L'assenza di indicator_texts.json dal perimetro *e'* la definizione
+        """L'assenza di content/indicators/ dal perimetro *e'* la definizione
         dello stadio: uno stadio che ripara i propri rilievi corregge i propri
         compiti, che e' il difetto che esiste per prendere."""
         self.assertNotIn(pipeline_gate.INDICATOR_TEXTS,

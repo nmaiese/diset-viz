@@ -1,7 +1,7 @@
 """The writer's worklist: which integrated indicators still need an article.
 
 Logic-only, on synthetic manifest/notes and an injected year_max lookup, so it
-never depends on the live indicator_texts.json (which the writer edits) and needs
+never depends on the live article store (which the writer edits) and needs
 no running app.
 """
 

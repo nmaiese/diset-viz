@@ -1,0 +1,15 @@
+{
+ "at": "2026-07-26T19:49:25+00:00",
+ "branch": "claude/work-in-progress-branch-52h19r",
+ "commit": "4f0689a",
+ "detail": [
+  "200 righe 2015-2024, licenza CC BY 4.0, status=proposed, verso da confermare dal curatore"
+ ],
+ "gate": "checks",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-promoter-20260726T194925",
+ "stage": "promoter",
+ "summary": "dem:BIRTHRATE promosso nel layer esterno, contextual, fuori dallo scoring",
+ "trigger": "manuale"
+}

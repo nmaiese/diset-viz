@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-26T19:18:43+00:00",
+ "branch": "claude/work-in-progress-branch-52h19r",
+ "commit": "bc03ef4",
+ "detail": [
+  "NMIGRATEIN: 200 righe 2015-2024, target dem:NMIGRATEIN, status=proposed, fuori dallo scoring",
+  "Licenza Istat da CC BY 3.0 IT a CC BY 4.0 (verificata su istat.it/note-legali) su famiglia dem, adapter, external_sources",
+  "Ri-promosse le due serie dem con la licenza giusta, curatela di OLDAGEDEPR preservata da _keep_curation"
+ ],
+ "gate": "checks",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-promoter-20260726T191843",
+ "stage": "promoter",
+ "summary": "dem:NMIGRATEIN promosso nel layer esterno, e la licenza Istat corretta a CC BY 4.0",
+ "trigger": "manuale"
+}

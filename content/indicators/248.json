@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "248",
+ "lead": "La partecipazione alla scuola superiore supera il 100% in alcune regioni, oltre 108 in Basilicata e 106 in Sardegna. È l'effetto di studenti non residenti e ripetenti, contati su una popolazione locale più piccola. All'estremo opposto il Trentino Alto Adige, al 75%, dove molti scelgono la formazione professionale. La media è del 97%.",
+ "sections": [
+  {
+   "body": "I valori sopra il 100% non indicano più iscritti che ragazzi, ma un modo di calcolare che include chi studia fuori dalla propria regione. Il caso del Trentino, apparentemente in fondo, si spiega con un forte sistema di apprendistato e formazione professionale, alternativo alla scuola tradizionale. Il dato va quindi letto con attenzione al contesto. Meno liceo significa meno istruzione o solo una strada diversa?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Il rapporto tra iscritti e popolazione locale può superare il 100% per la mobilità degli studenti, rendendo i confronti imprecisi. Non distingue i percorsi liceali da quelli professionali, né conta chi si forma fuori dalla scuola.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2020
+}

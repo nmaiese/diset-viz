@@ -1,0 +1,16 @@
+{
+ "at": "2026-07-26T19:53:35+00:00",
+ "branch": "claude/work-in-progress-branch-52h19r",
+ "commit": "6698b51",
+ "detail": [
+  "In cima convivono Trentino 7,6 e Campania 7,4 (piu Sicilia e Calabria), higher_better non regge: nessun estremo e migliore",
+  "Categoria salute_cura (tema demografico gia mappato), score_eligible=false, classifica regionale invariata, data_year 2024"
+ ],
+ "gate": "checks",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-curator-20260726T195335",
+ "stage": "curator",
+ "summary": "dem:BIRTHRATE curato: verso contextual confermato, resta fuori dal punteggio",
+ "trigger": "manuale"
+}

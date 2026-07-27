@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "13",
+ "lead": "Il tasso di occupazione è il termometro del lavoro, e segna una frattura netta. In Trentino Alto Adige lavora il 72,9% delle persone tra 15 e 64 anni, in Emilia-Romagna il 71,4%, mentre Calabria, Campania e Sicilia restano sotto il 48%. La media è del 63%, la mediana oltre il 68%.",
+ "sections": [
+  {
+   "body": "Oltre venticinque punti tra la prima e l'ultima regione sono uno dei divari più larghi del quadro territoriale, e sono cresciuti poco nonostante il buon recupero recente. Come per la partecipazione, il baricentro del problema è il Mezzogiorno, dove non lavora circa una persona su due in età attiva. L'occupazione dice quante persone hanno un impiego, non che tipo: dietro lo stesso tasso possono esserci lavori stabili o precari. Serve più occupazione o più occupazione buona?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Misura la quota di occupati sulla popolazione in età da lavoro, senza distinguere tempo pieno e parziale, stabile e a termine. Non coglie la qualità, la retribuzione o le ore effettive, e nasconde le differenze per genere, età e titolo di studio.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

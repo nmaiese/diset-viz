@@ -1,0 +1,23 @@
+{
+ "fonti": [
+  {
+   "testo": "Eurostat, Employment statistics: nel 2025 l'Italia registra il divario di genere nell'occupazione più ampio dell'UE (19,1 punti).",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Employment_-_annual_statistics"
+  }
+ ],
+ "key": "57",
+ "lead": "Il divario di genere nel lavoro è una delle fratture più persistenti. In Puglia il tasso di occupazione degli uomini supera quello delle donne di 26,3 punti, in Campania e Sicilia di oltre 25, mentre in Valle d'Aosta il distacco scende a 6,1. La media delle regioni è di 16,3 punti.",
+ "sections": [
+  {
+   "body": "Il gap si allarga proprio dove l'occupazione totale è più bassa: al Sud non solo si lavora meno, ma il poco lavoro è molto più maschile. Contano servizi per l'infanzia, cultura del lavoro femminile e struttura dell'economia locale. Il divario cala lentamente, ma resta doppio rispetto alle regioni migliori. In ambito europeo l'Italia ha il divario di genere nell'occupazione più ampio dell'Unione ([Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Employment_-_annual_statistics)). Ridurre questa distanza è una questione di lavoro o di servizi?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Misura la distanza tra due tassi, non la condizione delle donne in sé: un divario basso può nascere anche da un'occupazione maschile debole, non solo da una femminile forte. Non dice nulla su ore, salari e ruoli, dove il divario di genere spesso è ancora più ampio.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

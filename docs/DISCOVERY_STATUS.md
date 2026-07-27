@@ -7,18 +7,24 @@ Per come funziona: [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 Per il meccanismo della scoperta: [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md).
 Per il contratto di ogni agente: [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md).
 
-Aggiornato al **2026-07-26**.
+Aggiornato al **2026-07-27**.
 
 ## In una riga
 
-Sette stadi, sei agenti, **nessuno che aspetti una firma**.
-Un indicatore va da un catalogo SDMX a una pagina pubblica senza intervento, e la
-catena ci ritorna sopra quando i dati si muovono.
+Sette stadi, sei agenti, **un dispatcher che ne lancia uno per volta**, e nessuno
+che aspetti una firma. Un indicatore va da un catalogo SDMX a una pagina pubblica
+senza intervento, e la catena ci ritorna sopra quando i dati si muovono.
 
 **Il tappo è tolto.** Il test che congelava l'elenco delle serie è stato
 liberato, e per provare la catena due serie demografiche sono arrivate fino a una
 pagina pubblica: `dem:NMIGRATEIN` (saldo migratorio interno) dentro il punteggio,
 `dem:BIRTHRATE` (tasso di natalità) fuori. Vedi [Lo sblocco](#lo-sblocco-il-tappo-è-tolto).
+
+**E la catena ha smesso di pestarsi i piedi**, che era il difetto che restava.
+Tre cose insieme, il 27 luglio: il dispatcher al posto di sei cron, i registri a
+un file per record al posto di tre file unici a cui tutti appendevano, e il
+`run_id` al posto di `(stadio, pr)` come identità di una run. Vedi
+[Cosa è successo il 2026-07-27](#cosa-è-successo-il-2026-07-27).
 
 ## Lo stato, in un comando
 
@@ -35,36 +41,111 @@ Agenti cloud, sessione nuova a ogni firing, checkout git proprio, environment
 `divarioitalia` (`env_01VgKtjzcUbEYYgZb81pYEfS`). Si gestiscono su
 <https://claude.ai/code/routines>.
 
-| agente | definizione | cron (UTC) | merge | routine id |
-| --- | --- | --- | --- | --- |
-| scout | `source-scout.md` | `0 5 * * 0` (dom) | checks | `trig_01KZ1CHGPRgNmF9Ahni9VXfQ` |
-| cacciatore | `indicator-hunter.md` | `0 6 * * 1` (lun) | checks | `trig_01VizeycZocZoeDE1RxjWj1f` |
-| curatore | `indicator-curator.md` | `0 6 * * 4` (gio) | checks | `trig_019EP6TnEbYnKz8VpKFaRm4g` |
-| scrittore | `indicator-writer.md` | `0 6 * * 6` (sab) | auto | `trig_01RymCgC8VsspDrHHnUJgFUk` |
-| revisore | `indicator-reviewer.md` | `0 7 * * *` (ogni giorno) | auto | `trig_01LSZpaDasW18ZvxbKhXBJSj` |
-| verificatore | `indicator-verifier.md` | `0 9 * * *` (ogni giorno) | checks | **da creare** |
+**Una sola Routine, quella del dispatcher.** Gli stadi non hanno più un cron
+proprio: il dispatcher gira a battito, legge tutte le code e lancia un solo
+stadio per volta, il primo con lavoro in ordine di catena. Il perché sta in
+[`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md#il-dispatcher-chi-decide-chi-gira-e-uno-per-volta),
+in due righe: le dipendenze della catena sono di dato e il calendario le
+ignorava, e sei Routine indipendenti si pestavano i piedi.
 
-Cadenza sfalsata di proposito: ogni stadio ha senso solo dopo che quello a monte
-ha prodotto qualcosa. Il revisore gira ogni giorno perché lavora su un arretrato
-di centinaia di articoli e non su ciò che è appena arrivato, e il verificatore
-due ore dopo di lui per la stessa ragione: se il revisore firma ogni giorno, ogni
-giorno c'è una firma nuova che nessuno ha provato a far cadere.
+| Routine | cadenza (UTC) | che cosa fa | routine id |
+| --- | --- | --- | --- |
+| dispatcher | oraria (`0 * * * *`) | `pipeline_dispatch.py`, poi lancia lo stadio che ha nominato | **da creare** |
 
-**La Routine del verificatore non è ancora creata.** Lo stadio è registrato in
-tutti e tre i posti che lo pretendono (`pipeline_gate`, `pipeline_log`,
-`pipeline_status`), ha il suo agente e la sua coda, e gira a mano. Armare la
-Routine è l'ultimo passo e mette in moto un agente che apre e fonde pull request
-da solo: va fatto quando si decide di farlo, non come effetto collaterale di una
-sessione. Il comando è nel prompt della Routine come per gli altri cinque, cioè
-punta al file dell'agente e non ne ricopia il contenuto.
+Impostazioni: **sessione nuova a ogni firing** (non legata a una sessione
+esistente), environment `divarioitalia`, modello quello di default. La sessione
+nuova non è un dettaglio: il prompt qui sotto è scritto per partire da zero, e
+una Routine legata a una sessione esistente accumulerebbe il contesto di tutti i
+giri precedenti, che è esattamente ciò che rende un agente incoerente con i file
+che ha davanti.
 
-Nessuna riga di questa tabella dice `manual`, e non è una svista. La catena è non
-presidiata per decisione presa: un modo che parcheggia la pull request finché
-qualcuno guarda, in un sistema che nessuno guarda, vuol dire fermo per sempre.
-`checks` non è un'attesa di approvazione, è un'attesa della CI, e la esegue
+### Il prompt, per intero
+
+Si copia com'è. Non ricopia nessuna regola: le indica, ed è la lezione più cara
+di questo sistema (vedi sotto, `analyst_notes.json`).
+
+```
+Sei il dispatcher della catena editoriale di Divario Italia.
+Non fai il lavoro di nessuno stadio: decidi chi tocca, e ne lanci uno solo.
+
+1. Lancia:
+   python3 scripts/pipeline_dispatch.py --json --check-open-prs --record
+
+   Guarda l'uscita, che dice tre cose diverse:
+     0  ha nominato uno stadio, vai al punto 3
+     1  non c'e' niente da lanciare, vai al punto 2
+     2  il dispatcher stesso e' fallito, vai al punto 4
+
+2. Uscita 1: la run finisce qui, ed e' la risposta normale a code vuote. Il
+   giro e' gia' registrato dal flag --record. Non scrivere altre righe di
+   diario, non aprire pull request, non committare niente. Riporta in una
+   riga il campo `reason` e fermati.
+
+3. Uscita 0: invoca l'agente indicato dal campo `agent` (la sua definizione
+   sta in .claude/agents/<agent>.md) e passagli il `run_id` del piano.
+   L'agente obbedisce a docs/AGENT_CONTRACT.md, che dice come apre e come
+   chiude la run, compreso il passaggio del run_id al passo di merge.
+
+4. Uscita 2: non indovinare quale stadio toccherebbe. Registra l'errore con
+   quello che c'e' su stderr, e fermati:
+   python3 scripts/pipeline_log.py --write --stage dispatch --outcome error \
+       --trigger dispatch --summary "una riga su che cosa e' fallito"
+
+Non lanciare piu' di uno stadio per giro, e non lanciarne uno che il
+dispatcher non ha nominato. L'unica cosa che impedisce a due stadi di
+scriversi addosso e' che ne giri uno per volta: non c'e' nessun lock sotto.
+```
+
+Le tre uscite sono distinte per una ragione precisa. `1` capita la maggior parte
+delle ore, perché una catena a code vuote è ferma per il motivo giusto. Se
+l'uscita non distinguesse quel caso da un guasto, la Routine registrerebbe un
+errore a ogni ora di riposo, e un allarme che suona sempre non è un allarme.
+
+`--record` scrive **e committa su master** il giro, ma solo quando serve: un
+giro che lancia uno stadio non lascia riga, perché la lascia lo stadio, e un
+giro a vuoto ne lascia una sola al giorno. Con un battito orario registrarli
+tutti sarebbe un commit ogni ora per dire sempre la stessa cosa, e la cadenza
+contro cui `pipeline_log.silence` misura il silenzio è di un giorno.
+
+### Le sei vecchie, da spegnere
+
+**Vanno disattivate**, non cancellate, finché il dispatcher non ha girato
+qualche giorno. Se restano accese insieme al dispatcher si torna esattamente
+alla concorrenza che il dispatcher toglie, e ci si torna in silenzio: due stadi
+che partono a due ore di distanza sembrano funzionare finché uno dei due non
+apre una pull request che l'altro non ha visto.
+
+| vecchia Routine | routine id | stato |
+| --- | --- | --- |
+| scout | `trig_01KZ1CHGPRgNmF9Ahni9VXfQ` | da disattivare |
+| cacciatore | `trig_01VizeycZocZoeDE1RxjWj1f` | da disattivare |
+| curatore | `trig_019EP6TnEbYnKz8VpKFaRm4g` | da disattivare |
+| scrittore | `trig_01RymCgC8VsspDrHHnUJgFUk` | da disattivare |
+| revisore | `trig_01LSZpaDasW18ZvxbKhXBJSj` | da disattivare |
+| verificatore | mai creata | niente da fare |
+
+L'ordine giusto è **prima spegnere, poi accendere**. Al contrario si apre una
+finestra in cui girano tutti e sette, ed è la finestra in cui la catena può
+produrre proprio il guasto che questa modifica ha tolto.
+
+### Come si controlla che sia partita
+
+```bash
+python3 scripts/pipeline_log.py --stage dispatch   # i giri registrati
+python3 scripts/pipeline_dashboard.py --open       # il battito, in cima
+```
+
+Il cruscotto dice in testa quando è stato l'ultimo giro del dispatch, e se non
+ne ha mai visto uno lo scrive a lettere chiare invece di lasciare la riga vuota:
+finché quella riga dice "mai", nessuno sta assegnando il lavoro.
+
+Nessuno stadio è `manual`, e non è una svista. La catena è non presidiata per
+decisione presa: un modo che parcheggia la pull request finché qualcuno guarda,
+in un sistema che nessuno guarda, vuol dire fermo per sempre. `checks` non è
+un'attesa di approvazione, è un'attesa della CI, e la esegue
 `scripts/pipeline_merge.py`.
 
-**Il prompt di ogni Routine punta ai file, non li ricopia.** Vedi sotto perché.
+**Il prompt della Routine punta ai file, non li ricopia.** Vedi sotto perché.
 
 ## Cosa è successo il 2026-07-26
 
@@ -128,6 +209,53 @@ lascia nessuna traccia, e uno stadio fermo da un mese ha lo stesso aspetto di un
 che ha finito il lavoro: è la stessa forma del bug dello scrittore.
 `pipeline_log.silence()` lo misura contro `WATCH_GROUPS`, e status e cruscotto lo
 mostrano.
+
+## Cosa è successo il 2026-07-27
+
+Tre sintomi che sembravano scollegati, tre cause tutte di struttura. Il dettaglio
+sta in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md); qui che cosa è
+cambiato e che cosa resta da fare fuori dal repo.
+
+**Non si capiva chi avesse fatto cosa.** Le due righe di una run si univano su
+`(stadio, pr)`, e non poteva funzionare: la riga dell'agente viaggia dentro la
+pull request, quindi va committata prima che la pull request esista, quindi non
+ne può portare il numero. Su trenta run reali diciannove non lo avevano, e il
+diario dichiarava ventuno run in attesa mentre le pull request aperte erano zero.
+Ora ogni run ha un **`run_id`** coniato da chi scrive per primo e passato al
+passo di merge con `--run-id`, più `trigger` e le code prima e dopo.
+
+**La sequenza non funzionava** perché le dipendenze della catena sono di dato e
+la schedulazione era di calendario. `scripts/pipeline_dispatch.py` legge tutte le
+code e lancia un solo stadio, il primo con lavoro in ordine di catena. Sei
+Routine diventano una.
+
+**I conflitti erano garantiti dal formato.** Tre registri erano file unici a cui
+ogni stadio appendeva in fondo. Ora sono store a un file per record:
+`content/indicators/` (365 articoli travasati), `data/pipeline/runs/` (30 run
+travasate) e `data/pipeline/verifiche/`. Il conflitto non è meno probabile, è
+impossibile. La sezione 3-bis del contratto si è accorciata invece di essere
+riscritta.
+
+**E l'anello di retroazione che teneva ferma la catena.** Il cancello bocciava un
+branch la cui base fosse andata avanti, e il passo di merge scrive su master
+anche quando *rifiuta*: un rifiuto solo faceva diventare rosse tutte le pull
+request aperte, con un'accusa che non riguardava il loro lavoro. La severità non
+serviva, perché il diff si misura già con i tre punti. Ora è rosso solo se non
+esiste nessun antenato in comune.
+
+Tre bug trovati strada facendo, tutti reali:
+
+- `git status --porcelain` riassume una directory non tracciata in una voce sola,
+  quindi da `content/indicators/` il cancello ricavava la chiave inventata
+  `indicators`. Ora usa `--untracked-files=all`.
+- `collapse_runs` lasciava che `pr-open`, che è l'*assenza* di un esito, coprisse
+  un esito vero quando le due righe cadevano nello stesso secondo.
+- I sei prompt mettevano la riga di diario **dopo** `gh pr create`, mentre va
+  committata prima perché viaggia dentro la pull request.
+
+**Cosa resta da fare, e non è nel repo:** creare la Routine del dispatcher e
+disattivare le sei per stadio. Se restano accese insieme torna esattamente la
+concorrenza che il dispatcher toglie. Gli id sono nella tabella sopra.
 
 ## Lo sblocco: il tappo è tolto
 
@@ -254,6 +382,15 @@ possono fare:
    alfabetico della coda e `REGIONAL_HINT` che non riconosce `- reg.`, entrambe
    sopra). La licenza Istat, che era il terzo punto, è stata corretta ovunque
    (vedi sopra).
+6. **La Routine del dispatcher**, che è l'unica cosa che manca perché la catena
+   riparta da sola: finché non esiste, gli stadi girano solo a mano. Va creata
+   insieme allo spegnimento delle sei vecchie, non prima e non dopo.
+7. **Una voce per (indicatore, livello)** nello store degli articoli. Oggi è una
+   per indicatore, con il livello come campo dentro, mentre le code dello
+   scrittore e del revisore hanno già una riga per coppia. Non è un difetto
+   nuovo, è quello di prima lasciato dov'era di proposito: cambiare il modello
+   dei dati dentro una modifica che serviva a togliere i conflitti avrebbe
+   mescolato due cose che vanno potute rileggere separate.
 
 ## Gotcha per la prossima sessione
 
@@ -293,7 +430,7 @@ possono fare:
 - **`gh pr merge --auto` non aspetta niente su questo repo.** Con
   `allow_auto_merge` a falso e `master` non protetto, `gh` ripiega su un merge
   immediato senza dirlo. Nessuno stadio deve usarlo: si chiude con
-  `.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero>`.
+  `.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero> --run-id <run_id>`.
 - **La CI non parte da sola sulle PR aperte via il GitHub MCP.** GitHub non lancia
   i workflow per eventi creati dal token dell'app (anti-ricorsione), quindi una PR
   aperta così resta senza check e il box di merge sembra bloccato pur non essendo
@@ -305,5 +442,19 @@ possono fare:
   `TheDashboardReadsWithoutBreaking`.
 - **Il caso `nothing` del diario si regge solo sul contratto.** Una run a mani
   vuote non ha un branch da giudicare, quindi il cancello non la può raggiungere:
-  se un agente non scrive quella riga, nessuna guardia se ne accorge. È il punto
-  più debole del monitoraggio, ed è noto.
+  se un agente non scrive quella riga, nessuna guardia se ne accorge. Resta il
+  punto più debole del monitoraggio, ma pesa meno di prima: il **tick del
+  dispatcher** viene registrato a ogni giro, quindi "la catena non ha fatto
+  niente stanotte" e "la catena non è partita" adesso si distinguono anche se un
+  agente si dimentica della propria riga.
+- **`--run-id` non è decorativo.** Senza, la riga di esito che il passo di merge
+  scrive su master resta orfana, e il diario torna a non saper dire come è finita
+  la run che l'ha aperta. Lo stampa `pipeline_log.py --write`.
+- **Non lanciare uno stadio a mano mentre il dispatcher gira.** Non c'è nessun
+  lock: l'unica cosa che impedisce a due stadi di lavorare insieme è che il
+  dispatcher ne nomini uno solo per tick. Se serve girare a mano, spegni prima la
+  Routine.
+- **Gli store non si ricompattano.** `content/indicators/`,
+  `data/pipeline/runs/` e `data/pipeline/verifiche/` sono a un file per record
+  perché è quello a togliere i conflitti. Rimetterne uno in un file solo li
+  riporta indietro tutti insieme.

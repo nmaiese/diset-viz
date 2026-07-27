@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "635",
+ "lead": "I ricoveri per disturbi psichici si sono quasi dimezzati in vent'anni. Le dimissioni ospedaliere per queste patologie vanno da 187 ogni centomila abitanti in Campania a 456 in Liguria, con una media delle regioni di circa 294. Il fenomeno è calato ovunque, pur restando diseguale.",
+ "sections": [
+  {
+   "body": "Il forte calo riflette il passaggio, iniziato decenni fa, da una psichiatria ospedaliera a una territoriale, fatta di servizi diffusi. Un numero basso può quindi essere un buon segno, cure sul territorio, oppure un vuoto di assistenza: dipende da cosa c'è fuori dall'ospedale. Per questo è un indicatore descrittivo, che va letto insieme all'offerta dei servizi di salute mentale. Meno ricoveri significa più cura o meno cura?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Conta i ricoveri, non le persone in cura sul territorio, quindi da solo non misura la salute mentale di una regione. Non distingue ricoveri appropriati da quelli evitabili, né la qualità dell'assistenza dentro e fuori l'ospedale.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2022
+}

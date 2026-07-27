@@ -1,0 +1,28 @@
+{
+ "key": "142",
+ "lead": "Che nel proprio comune ci sia un asilo nido o nessun servizio cambia la vita di chi lavora e ha figli, e questa mappa non segue la linea Nord-Sud.",
+ "level": "regione",
+ "sections": [
+  {
+   "body": "L'indicatore misura la quota di comuni di una regione che hanno attivato almeno un servizio per la prima infanzia, asilo nido, micronido o servizi integrativi e innovativi, sul totale dei comuni. È una risposta sì o no presa municipio per municipio e poi sommata, nel comune il servizio esiste oppure non esiste. Per una famiglia con figli piccoli la prima domanda è proprio questa, se un'opzione c'è vicino casa o se tocca spostarsi altrove. Il dato racconta quanto è diffusa l'offerta sul territorio, non quanto è capiente, e un comune con un solo micronido pesa come uno che ha costruito un'intera rete di nidi.",
+   "h": "Un servizio che c'è o non c'è, comune per comune",
+   "role": "definizione"
+  },
+  {
+   "body": "La graduatoria del 2023 smentisce la geografia che l'atlante insegna ad aspettarsi. Puglia e Campania stanno nel gruppo di testa, mentre Piemonte, Liguria e Lazio restano sotto la mediana, che vale 74,57 e si tiene sopra la media perché un blocco di regioni ferme in basso la tira giù. Il salto vero non corre tra Nord e Sud ma dentro la classifica, dopo Abruzzo la distribuzione si spezza e verso l'Umbria si aprono di colpo dodici punti. Non è una discesa graduale ma una doppia struttura, un plateau in alto e una coda lunga di regioni rimaste molto indietro. Sopra quella soglia l'offerta copre più di otto comuni su dieci, sotto cala in fretta. In cinque regioni meno della metà dei municipi ha attivato un servizio, e lì trovare un nido vicino casa dipende ancora da quale comune esatto ti è capitato.\n\nMessa accanto al [saldo migratorio interno](/indicatore/saldo-migratorio-interno-istat-regioni/dem-NMIGRATEIN), questa graduatoria si accompagna a quella di chi guadagna e chi perde residenti verso altre regioni italiane, e agli estremi le due coincidono, con la Basilicata che chiude tutte e due. A monte c'è probabilmente la stessa cosa, quanto è ricca l'area, quindi non è un meccanismo che porta da una all'altra. E le eccezioni cadono dove questa pagina le ha già trovate. La Puglia sta quarta per servizi e quindicesima per saldo migratorio, la Campania ottava e diciassettesima, due regioni che perdono abitanti verso il resto del paese e intanto hanno esteso l'offerta più di quasi tutto il Centro-Nord. La Liguria fa il contrario, sesta per saldo e quindicesima per servizi. Gli altri indicatori di [salute, demografia e cura](/tema/salute-demografia-e-cura) misurano la stessa infrastruttura da altri lati.",
+   "h": "Una mappa che scavalca il Nord-Sud",
+   "role": "quadro"
+  },
+  {
+   "body": "Dal 2004 al 2023 la media è passata da 38,09 a 69,24, quasi il doppio in vent'anni, e la distanza tra la vetta e il fondo si è ristretta di 27,57 punti percentuali. È una convergenza vera, arrivata perché chi partiva indietro ha recuperato. Il Trentino Alto Adige è salito da meno di dieci comuni su cento a quasi tutti, la Puglia ha aggiunto oltre settanta punti. La Valle d'Aosta è l'unica a non aver mosso nulla, perché copriva già tutti i suoi comuni nel 2004. Una regione però ha fatto il cammino inverso. La Liguria nel 2004 stava sopra la mediana di allora, con il 67,66, e nel 2023 è scesa al 52,99, quasi quindici punti lasciati per strada mentre intorno quasi tutte guadagnavano. Nell'ultimo anno il movimento resta corale, diciotto regioni in crescita su venti.",
+   "h": "Vent'anni di rincorsa, e l'eccezione ligure",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il numero conta comuni, non bambini. Un municipio risulta coperto sia che gestisca un micronido sia che abbia una rete completa, così la percentuale non dice nulla su posti disponibili, liste d'attesa, orari o costo, né su quanti bambini trovino davvero un posto. Nemmeno la qualità entra nel conto, un servizio integrativo aperto poche ore a settimana risulta attivato come un nido a tempo pieno. Pesa inoltre ogni comune allo stesso modo, un paese di duecento abitanti vale come un capoluogo, e una regione fatta di tanti piccoli comuni può segnare poco anche dove i centri più popolosi sono serviti. Infine attivato è la fotografia di un anno, non la promessa che il servizio resti aperto con continuità negli anni successivi.",
+   "h": "Cosa non dice un servizio soltanto 'attivato'",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2023
+}

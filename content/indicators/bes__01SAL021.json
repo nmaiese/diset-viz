@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "bes:01SAL021",
+ "lead": "Tra gli over 75, la quota che convive con più malattie croniche e gravi limitazioni va dal 35,2% del Trentino Alto Adige al 57,8% della Calabria. In Campania è al 57,6%, in Puglia al 55,3%. Oltre venti punti separano la vecchiaia più autonoma da quella più fragile, con una media del 47,2%.",
+ "sections": [
+  {
+   "body": "Questo indicatore misura il peso reale della non autosufficienza, quello che ricade su famiglie, badanti e servizi sanitari. Il divario territoriale ricalca quello degli anni vissuti in salute: al Sud si arriva più fragili alla grande vecchiaia, con più bisogni e spesso meno servizi di prossimità. È il rovescio della longevità, il costo nascosto di una popolazione che invecchia. Un Paese che vive a lungo si sta attrezzando per la cura di chi vive a lungo ma male?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Si basa su condizioni e limitazioni riferite dalle persone o da chi le assiste, quindi mescola dato clinico e percezione. Non misura l'intensità dell'assistenza necessaria né la rete di servizi disponibile, che determina quanto quel bisogno pesi davvero.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-26T19:21:27+00:00",
+ "branch": "claude/work-in-progress-branch-52h19r",
+ "commit": "cd18514",
+ "detail": [
+  "Verso corretto da contextual a higher_better: preferenza rivelata, divario Nord-Sud netto (Emilia +2,6, Basilicata -4,8), Istat inquadra l'emigrazione dal Sud come perdita",
+  "Categoria lavoro_opportunita e non salute_cura ereditata dal tema: il flusso e trainato dal mercato del lavoro",
+  "score_eligible=true, verificato che entra in regional_quality_life_selection, nessuna regione cambia posizione"
+ ],
+ "gate": "checks",
+ "outcome": "pr-open",
+ "pr": "",
+ "run_id": "legacy-curator-20260726T192127",
+ "stage": "curator",
+ "summary": "dem:NMIGRATEIN curato: verso higher_better, categoria lavoro_opportunita, entra nel punteggio",
+ "trigger": "manuale"
+}

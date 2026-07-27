@@ -1,0 +1,18 @@
+{
+ "fonti": [],
+ "key": "1",
+ "lead": "La produttività del lavoro in agricoltura varia molto. In Lombardia ogni addetto agricolo genera circa 38 mila euro di valore, in Trentino Alto Adige 35 mila, contro gli 11 mila delle Marche e i 12,6 della Calabria. La media delle regioni è di circa 22,6 mila euro.",
+ "sections": [
+  {
+   "body": "L'agricoltura non è tutta uguale: quella padana e alpina, intensiva e meccanizzata, rende il triplo di quella di collina o del Sud, più frammentata e faticosa. La produttività qui misura il valore prodotto per addetto, non la fatica né la qualità dei prodotti, dove il Sud spesso eccelle. Un ettaro di vigna pregiata e uno di pascolo magro contano diversamente. Più valore per addetto significa un'agricoltura migliore o solo più industriale?",
+   "h": null,
+   "role": "quadro"
+  },
+  {
+   "body": "Rapporta il valore aggiunto agli addetti, quindi risente della meccanizzazione e del tipo di coltura. Non misura la qualità dei prodotti, la sostenibilità né il reddito effettivo di chi lavora la terra.",
+   "h": null,
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2023
+}

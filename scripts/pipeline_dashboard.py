@@ -126,7 +126,7 @@ def recent_chain_commits(limit=12):
     """
     from scripts import pipeline_gate
 
-    owned = {path for paths in pipeline_gate.STAGE_PATHS.values() for path in paths}
+    owned = tuple({path for paths in pipeline_gate.STAGE_PATHS.values() for path in paths})
     code, out, _ = _git("log", f"-{limit * 6}", "--format=%h%x1f%cI%x1f%s", "--name-only")
     if code != 0:
         return []
@@ -149,11 +149,15 @@ def recent_chain_commits(limit=12):
     out_rows = []
     for commit in commits:
         touched = set(commit["files"])
-        if not touched or not touched <= owned:
+        # `path_allowed` e non l'appartenenza a un insieme: da quando i registri
+        # sono store a un file per record, un perimetro puo' essere una
+        # directory, e confrontare i percorsi uno a uno non riconoscerebbe piu'
+        # nessun commit della catena.
+        if not touched or not all(pipeline_gate.path_allowed(p, owned) for p in touched):
             continue
         commit["stages"] = sorted({
             stage for stage, paths in pipeline_gate.STAGE_PATHS.items()
-            if touched <= set(paths)
+            if all(pipeline_gate.path_allowed(p, paths) for p in touched)
         })
         out_rows.append(commit)
         if len(out_rows) >= limit:
@@ -211,12 +215,12 @@ def _stage_rows(status):
     return "\n".join(rows)
 
 
-def _summary_cells(status, entries):
+def _summary_cells(status, entries, queues=None):
     """Il riassunto prima del dettaglio. Quattro numeri che dicono, in un colpo
     d'occhio, se c'e' qualcosa da guardare o no."""
     attention = sum(1 for e in entries if e.get("outcome") in pipeline_log.ATTENTION)
     last = max((e.get("at", "") for e in entries), default="")
-    late = [r for r in pipeline_log.silence(entries) if r["stale"]]
+    late = [r for r in pipeline_log.silence(entries, queues=queues) if r["stale"]]
     # Il totale non puo' portare l'etichetta "tutti gli stadi" quando uno stadio
     # non e' stato contato: sarebbe lo zero silenzioso della riga di stadio
     # spostato nel numero piu' grande della pagina, cioe' l'unico che si legge
@@ -326,10 +330,30 @@ def render(out_path=None):
         headline = ("Niente in coda: la catena e ferma perche ha finito, "
                     "non perche e bloccata.")
 
+    # Il battito del dispatcher, prima di tutto il resto. E' l'unico segnale che
+    # distingue "nessuno stadio aveva lavoro" da "non e' partito niente": da
+    # quando il lavoro lo assegna lui, il silenzio di un singolo stadio e' una
+    # risposta legittima, il suo no.
+    ticks = [e for e in entries if e.get("stage") == "dispatch"]
+    if ticks:
+        last_tick = max(ticks, key=lambda e: e.get("at") or "")
+        headline += (f" Ultimo giro del dispatch: "
+                     f"{_esc((last_tick.get('at') or '')[:16].replace('T', ' '))}.")
+    else:
+        headline += (" Il <strong>dispatch</strong> non ha mai registrato un giro: "
+                     "finche' non lo fa, nessuno assegna il lavoro.")
+
     # Un avviso sopra tutto il resto, perche' uno stadio fermo non si vede in
     # nessuna delle tabelle sotto: quelle mostrano cio' che e' successo, e qui il
     # problema e' che non e' successo niente.
-    late = [r for r in pipeline_log.silence(entries) if r["stale"]]
+    # Le code arrivano dallo `status` gia' calcolato, non da una seconda
+    # `queue_sizes()`. Quella ricostruirebbe la vista di ogni indicatore del
+    # catalogo una seconda volta, che e' lavoro inutile e per giunta il punto
+    # esatto in cui la suite va in segfault una run su venticinque (vedi
+    # `pipeline_gate.check_suite`): raddoppiare quel passaggio raddoppierebbe
+    # la probabilita' di far morire il cruscotto a meta'.
+    queues = {entry["stage"]: entry["waiting"] for entry in status["stages"]}
+    late = [r for r in pipeline_log.silence(entries, queues=queues) if r["stale"]]
     if late:
         detail = ", ".join(
             f"{r['group']} ({r['days_since']:.0f} giorni, atteso ogni {r['expected_days']})"
@@ -352,7 +376,7 @@ def render(out_path=None):
 </header>
 
 <section>
-<div class="strip">{_summary_cells(status, entries)}</div>
+<div class="strip">{_summary_cells(status, entries, queues)}</div>
 </section>
 
 <section>

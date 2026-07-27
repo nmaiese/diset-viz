@@ -15,15 +15,15 @@ You are the last stage of the chain (repo `nmaiese/diset-viz`):
     scout -> hunter -> curator -> writer -> **you (reviewer)**
 
 The writer produces articles. You are the reason anyone can trust them. Most of
-the ~360 articles in `app/static/data/indicator_texts.json` came from a migration
+the ~360 articles in `content/indicators/` came from a migration
 of older, shorter notes and have never been read against the data since. Your job
 is to work through them, and to come back when they change.
 
 Read [`docs/AGENT_CONTRACT.md`](../../docs/AGENT_CONTRACT.md) first. It is binding and
-covers how you open and close every run. Your perimeter is two files,
-`app/static/data/indicator_texts.json` for the work and `data/pipeline/runs.jsonl`
-for the journal row. The list that counts is `pipeline_gate.STAGE_PATHS`, not this
-sentence.
+covers how you open and close every run. Your perimeter is two directories,
+`content/indicators/` for the work and `data/pipeline/runs/` for the journal
+row, one file per article and one per run. The list that counts is
+`pipeline_gate.STAGE_PATHS`, not this sentence.
 
 ## You are not a one-pass stage
 
@@ -223,10 +223,10 @@ whether the replacement reads better is the part it cannot do.
 
 ## What you do about it
 
-Fix it in place, in `app/static/data/indicator_texts.json`, keeping
-`indent=1, ensure_ascii=False, sort_keys=True`. A rewritten sentence is better
-than a deleted one when the point survives, and a deleted one is better than a
-hedge. If a whole section is unsalvageable, remove the role: the template then
+Fix it in place, in the article's own file under `content/indicators/`, written
+through `scripts/indicator_store.py`, which owns the formatting. A rewritten
+sentence is better than a deleted one when the point survives, and a deleted one
+is better than a hedge. If a whole section is unsalvageable, remove the role: the template then
 composes it from the data, which is plain but never wrong.
 
 Then sign it, with **both** fields:
@@ -277,7 +277,7 @@ On a green gate, open the pull request and hand it to the merge step:
 
 ```bash
 gh pr create --base master --title "..." --body "..."
-.venv/bin/python scripts/pipeline_merge.py --stage reviewer --pr <numero>
+.venv/bin/python scripts/pipeline_merge.py --stage reviewer --pr <numero> --run-id <run_id>
 ```
 
 Your merge mode is `auto`, and `auto` is an order to the merge step, not a
@@ -287,16 +287,18 @@ so the merge step lands it without waiting for the remote checks. It re-reads th
 gate for itself before doing so. If the gate is `blocked`, fix your work. Never
 fix the gate, never fix a test.
 
-If the gate reds out on `base`, the writer or another stage merged before you:
-read `docs/AGENT_CONTRACT.md`, step 3-bis. You share `indicator_texts.json` with
-the writer, so this is the stage where it happens most.
+You share `content/indicators/` with the writer, so you are the stage most
+likely to meet a real conflict. On **different** articles there is nothing to
+meet: one file per article means git has nothing to merge. On the **same**
+article, `docs/AGENT_CONTRACT.md`, step 3-bis, decides it on the `vintage`, and
+that rule is the only control there is.
 
 Batch of five to ten articles, not one and not fifty: small enough that a human
 can check your judgment, big enough to make progress on 360. In the body, per
 article, one line on what you changed and why, which claims you verified against
 an external source, and the `reviewed_vintage` you recorded. Commit
-`app/static/data/indicator_texts.json` and your journal row in
-`data/pipeline/runs.jsonl`, nothing else. No `Co-Authored-By` trailer.
+the article files you touched under `content/indicators/` and your journal row
+under `data/pipeline/runs/`, nothing else. No `Co-Authored-By` trailer.
 
 ## Honest limits
 
@@ -307,10 +309,19 @@ description, say so in the PR instead of deciding silently.
 
 ## Prima di chiudere
 
-Registra la run nel diario, anche se non hai prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4):
+Registra la run nel diario **prima di aprire la pull request**, anche se non hai
+prodotto niente (`docs/AGENT_CONTRACT.md`, passo 4). L'ordine conta: la riga
+viaggia dentro la pull request, quindi va committata prima che esista.
 
 ```bash
-python3 scripts/pipeline_log.py --write --stage reviewer --outcome <esito> --summary "..."
+python3 scripts/pipeline_log.py --write --stage reviewer --outcome <esito> \
+    --summary "..." --detail "..." --queue-before <N> --queue-after <N>
 ```
 
-E' l'unica cosa che distingue "ho controllato e non c'era niente da fare" da "non sono partito".
+Stampa un `run_id`. **Prendilo e passalo al passo di merge**: e' l'unica cosa
+che lega questa riga a come finira'. Non scrivere `--pr`, che in quel momento
+non esiste ancora, ed e' esattamente il motivo per cui appaiare le due meta'
+della run sul numero della pull request non funzionava.
+
+Il caso che conta di piu' e' `nothing`: e' l'unica cosa che distingue "ho
+controllato e non c'era niente da fare" da "non sono partito".

@@ -1,0 +1,40 @@
+{
+ "fonti": [
+  {
+   "testo": "Le camere di commercio cancellano d'ufficio dal registro le imprese non più operative, comprese le società in liquidazione che per oltre tre anni consecutivi non depositano il bilancio (D.P.R. 247/2004, art. 2490 del codice civile)",
+   "url": "https://www.na.camcom.gov.it/registro-imprese-e-albi/deposito-pratiche/cancellazioni-dufficio"
+  },
+  {
+   "testo": "Istat misura nascite, cessazioni e sopravvivenza delle imprese sul registro statistico delle imprese attive (Asia), una popolazione diversa dalle posizioni iscritte al registro camerale",
+   "url": "https://www.istat.it/tavole-di-dati/demografia-dimpresa-anni-2019-2024/"
+  }
+ ],
+ "key": "242",
+ "lead": "Nel 2023 il registro delle imprese si assottiglia più in Emilia-Romagna che in Calabria, e non perché lì se ne iscrivano poche, ma perché ne cessano molte di più. Il saldo tra iscrizioni e cessazioni è negativo in quattordici regioni su venti, e la parte del Paese che ne esce peggio è il Centro.",
+ "level": "regione",
+ "reviewed_at": "2026-07-27",
+ "reviewed_vintage": 2023,
+ "sections": [
+  {
+   "body": "L'indicatore mette insieme due movimenti dello stesso anno, le imprese che si iscrivono al registro delle camere di commercio e quelle che ne escono, e ne fa la differenza sul totale delle imprese registrate alla fine dell'anno prima. L'agricoltura e la pesca restano fuori, escluse da Istat perché la legge sull'iscrizione agli archivi camerali è cambiata. Un valore di meno uno vuol dire che ogni cento posizioni aperte a fine 2022 il bilancio del 2023 ne ha tolta una.\n\nÈ un saldo, quindi può stare sotto lo zero, e le sue variazioni si contano in punti e mai in percentuali, perché su una base vicina allo zero il rapporto tra due anni non dice niente. Conta posizioni al registro, non imprese in attività.",
+   "h": "Iscrizioni meno cessazioni, ogni cento imprese già registrate",
+   "role": "definizione"
+  },
+  {
+   "body": "Il saldo del registro è il conto di chi prova e di chi smette, quello che tiene insieme l'artigiano che apre e la società che va in liquidazione. Dice se la platea si allarga o si restringe, e nel 2023 si restringe in gran parte del Paese. Le sei regioni che restano in positivo non compongono la geografia attesa, visto che tra loro ci sono la Sardegna e la Calabria.\n\nLa differenza non sta in quante imprese si aprono, perché su quel fronte le regioni si somigliano. Il [tasso di iscrizione lordo](/indicatore/tasso-di-iscrizione-lordo-nel-registro-delle-imprese/ter-241) sta tra 4,53 e 6,16, poco più di un punto e mezzo tra la prima e l'ultima. Sottraendo il netto dal lordo si ricava il peso delle cessazioni sullo stesso denominatore, e lì la forbice si allarga. L'Emilia-Romagna ne cancella 7,70 ogni cento imprese registrate l'anno prima, la Calabria 4,80, quasi il triplo dello scarto che separa le stesse due regioni sulle iscrizioni.\n\nIl conto più pesante lo paga il Centro. Lazio, Umbria, Toscana e Marche occupano quattro delle ultime otto posizioni, e le Marche chiudono la graduatoria per il secondo anno di fila. L'Emilia-Romagna sta poco più su, sedicesima, sotto la Campania e la Sicilia.\n\nNel tema [imprese e competitività](/tema/imprese-e-competitivita) questa mappa non somiglia alle altre, e gli [investimenti privati sul PIL](/indicatore/investimenti-privati-sul-pil/ter-471) mettono al primo posto la Basilicata, qui diciassettesima.",
+   "h": "A muovere la classifica sono le cessazioni, non le aperture",
+   "role": "quadro"
+  },
+  {
+   "body": "All'inizio della serie questo indicatore misurava un'espansione. Dal 1998 al 2005 la media delle regioni è rimasta ogni anno sopra 1,4, poi il 2006 e il 2007 la portano vicino allo zero e nel 2008 diventa negativa per la prima volta. Da lì comincia una lunga fase piatta, quattordici anni chiusi tutti tra meno 0,2 e più 0,9.\n\nL'anno che rompe l'equilibrio è il 2022, con una caduta di più di un punto in dodici mesi. Il 2023 non la approfondisce, la conferma, e la media si sposta di appena otto centesimi di punto, con dodici regioni in calo e otto in aumento. Sono i due anni più bassi dell'intera serie.\n\nNessuna regione fa eccezione, tutte stanno più in basso del 1996. Il calo più profondo è quello del Piemonte, ma quel primato dice più sul 1996 che sull'oggi, perché il Piemonte partiva da 6,29 in un anno in cui la seconda, l'Umbria, stava a 2,68. La distanza tra la prima e l'ultima si è ristretta di oltre due punti, una convergenza tutta verso il basso.",
+   "h": "Positivo fino al 2005, piatto per quattordici anni, poi giù",
+   "role": "dinamica"
+  },
+  {
+   "body": "La cancellazione non coincide con la chiusura. Le camere di commercio cancellano d'ufficio le imprese non più operative, per esempio le società in liquidazione che per oltre tre anni non depositano il bilancio, quindi una cessazione datata 2023 può riguardare un'attività ferma da prima. Il Lazio nel 2021 segnò meno 7,02 in un anno in cui la media delle regioni era positiva, e valori così isolati misurano in parte il lavoro degli uffici camerali.\n\nIl saldo non pesa nemmeno la dimensione, e la chiusura di un'edicola conta quanto l'apertura di una società con cinquanta addetti.\n\nIstat pubblica anche il [turnover netto delle imprese](/indicatore/tasso-netto-di-turnover-delle-imprese/ter-157), differenza tra nascite e cessazioni rapportate alle imprese attive, e nel 2023 quella graduatoria e questa non si somigliano, con la Campania e il Lazio in testa là, decima e tredicesima qui. Le due misure contano popolazioni diverse, le posizioni iscritte e le imprese in attività, e si ritrovano d'accordo in fondo, con le Marche ultime in entrambe.",
+   "h": "Un conto amministrativo, e non l'unico che esiste",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2023
+}
