@@ -44,8 +44,9 @@ class EveryCheckFires(unittest.TestCase):
         """A check missing from the summary reads as a check that passed."""
         rows = prose_lint.build_report({"x": _entry("Una frase neutra e priva di tell.")})
         summary = prose_lint.summarize(rows)
-        expected = {name for name, _, _ in prose_lint.CHECKS} | {"domanda"}
-        self.assertEqual(set(summary["checks"]), expected)
+        self.assertEqual(set(summary["checks"]), set(prose_lint.ALL_SIGNALS))
+        for name in prose_lint.ALL_SIGNALS:
+            self.assertTrue(summary["checks"][name]["label"], name)
 
 
 class CorrectProseStaysClean(unittest.TestCase):
@@ -77,6 +78,65 @@ class CorrectProseStaysClean(unittest.TestCase):
             "Asilo nido, micronido e servizi integrativi entrano tutti nel conto."
         ))
         self.assertEqual(found["hits"], {})
+
+
+class TheSameQuantityTwice(unittest.TestCase):
+    """The residual defect of the articles that pass everything else.
+
+    Two blind judges, scoring the rewritten batch independently, both named the
+    same thing: an image in one section and the figure it stands for in another.
+    STYLE.md already bans the version where they touch ("quasi la metà (48%)");
+    this is the same fault spread across the page, where an editor stops seeing it.
+
+    The check is deliberately precise rather than complete. It uses the direction
+    the approximation implies, because tolerance alone matched three different
+    quantities in one article that happened to round the same way, and a linter
+    that cries wolf gets ignored.
+    """
+
+    def _hits(self, quadro, dinamica):
+        entry = {"sections": [
+            {"role": "quadro", "body": quadro},
+            {"role": "dinamica", "body": dinamica},
+        ]}
+        return prose_lint.inspect(entry)["hits"].get("ripetuto", [])
+
+    def test_an_image_and_its_figure_in_two_sections_are_caught(self):
+        self.assertTrue(self._hits(
+            "Tra le due si apre un vuoto di quasi tre punti.",
+            "Il salto vale 2,79 punti in un colpo solo.",
+        ))
+
+    def test_a_different_quantity_of_the_same_size_is_not_caught(self):
+        """"quasi tre punti" is 2,79 and the article also discusses 3,31 and
+        3,48 in points. Those are three quantities, not one said three times."""
+        self.assertEqual(self._hits(
+            "Tra le due si apre un vuoto di quasi tre punti.",
+            "La media sta 3,31 punti sopra la mediana, e altrove sono 3,48 punti.",
+        ), [])
+
+    def test_the_approximation_has_to_point_the_right_way(self):
+        """"quasi nove" is below nine. A 9,3 is not what it was approximating."""
+        self.assertEqual(self._hits(
+            "La Sardegna ha aggiunto quasi nove anni.",
+            "Il divario vale 9,3 anni.",
+        ), [])
+        self.assertTrue(self._hits(
+            "La Sardegna ha aggiunto oltre nove anni.",
+            "Il divario vale 9,3 anni.",
+        ))
+
+    def test_the_unit_has_to_match(self):
+        """Nine years and nine points are not the same fact twice."""
+        self.assertEqual(self._hits(
+            "La Sardegna ha aggiunto quasi nove anni.",
+            "Il divario vale 8,9 punti.",
+        ), [])
+
+    def test_inside_one_section_it_is_elaboration_not_repetition(self):
+        entry = {"sections": [{"role": "quadro",
+                               "body": "Un vuoto di quasi tre punti. Vale 2,79 punti."}]}
+        self.assertNotIn("ripetuto", prose_lint.inspect(entry)["hits"])
 
 
 class WhatTheReportCounts(unittest.TestCase):

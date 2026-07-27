@@ -83,6 +83,38 @@ SLOGAN = re.compile(
     re.I,
 )
 
+# "quasi nove anni" in una sezione e "8,9" in un'altra: lo stesso fatto due
+# volte, che e' la regola ONS che STYLE.md gia' porta ("o l'immagine o la
+# cifra"), applicata a distanza invece che dentro la parentesi. Due giudici
+# indipendenti l'hanno indicata come il difetto residuo dei pezzi buoni, con tre
+# istanze verificate. Vive fuori da CHECKS perche' non e' una ricerca di
+# pattern nel testo: confronta due numeri.
+WORD_NUMBERS = {
+    "mezzo": 0.5, "uno": 1, "una": 1, "due": 2, "tre": 3, "quattro": 4, "cinque": 5,
+    "sei": 6, "sette": 7, "otto": 8, "nove": 9, "dieci": 10, "undici": 11,
+    "dodici": 12, "tredici": 13, "quattordici": 14, "quindici": 15, "sedici": 16,
+    "diciassette": 17, "diciotto": 18, "diciannove": 19, "venti": 20, "trenta": 30,
+    "quaranta": 40, "cinquanta": 50, "sessanta": 60, "settanta": 70, "ottanta": 80,
+    "novanta": 90, "cento": 100,
+}
+# The approximation says which side of the round number the real one sits on,
+# and using it is what separates a repetition from a coincidence. In ter-408
+# "quasi tre punti" is the 2,79 gap, and a tolerance alone also matched the 3,31
+# and the 3,48 that the same article discusses in the same unit. Those are three
+# different quantities that happen to round the same way.
+APPROX_BELOW = ("quasi", "poco meno di", "meno di", "sotto i")
+APPROX_ABOVE = ("oltre", "poco più di", "più di", "sopra i")
+APPROX = "|".join(sorted(APPROX_BELOW + APPROX_ABOVE + ("circa",), key=len, reverse=True))
+IMAGE_NUMBER = re.compile(
+    rf"\b({APPROX})\s+(" + "|".join(WORD_NUMBERS) + r")\s+(\w+)", re.I,
+)
+FIGURE = re.compile(r"\b(\d{1,3}(?:\.\d{3})*),(\d+)\s*(\w+)?")
+# How close the figure has to sit to the round number it is being restated as.
+# The epsilon is not decoration: 9,3 - 9 is 0.30000000000000071 in binary
+# floating point, so a bare `> NEAR` drops the exact boundary case.
+NEAR = 0.3
+EPSILON = 1e-9
+
 CHECKS = (
     ("lessico", SPY_WORDS, "lessico spia, c'e' quasi sempre una parola piu comune"),
     ("intervallo", FALSE_RANGE, "falso intervallo: gli estremi non stanno su un continuo"),
@@ -90,6 +122,14 @@ CHECKS = (
     ("doppio", DOUBLE_NUMBER, "il numero scritto due volte, immagine piu cifra"),
     ("slogan", SLOGAN, "struttura parallela da stampo"),
 )
+
+# Every signal the report can emit, in one place: the summary prints them all
+# even at zero, and a check missing from that list reads as a check that passed.
+EXTRA_SIGNALS = {
+    "domanda": "domanda retorica in chiusura di paragrafo",
+    "ripetuto": "la stessa quantita' come immagine e come cifra",
+}
+ALL_SIGNALS = tuple(name for name, _, _ in CHECKS) + tuple(EXTRA_SIGNALS)
 
 LINK = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
@@ -124,6 +164,46 @@ def _closing_questions(fields):
     return found
 
 
+def _same_number_twice(fields):
+    """The same quantity given once as an image and once as a figure.
+
+    STYLE.md bans "quasi la metà (48%)", where the two sit in one breath. The
+    version that survives an editor is the one spread across sections: "quasi
+    nove anni" in the quadro and "8,9" in the dinamica. The reader gets the same
+    fact twice and the second time it tells them nothing.
+
+    Only across different fields, because inside one paragraph a writer is
+    usually elaborating rather than repeating, and the unit noun has to match so
+    that nine years and nine points are not confused for each other.
+    """
+    images, figures = [], {}
+    for field, text in fields:
+        for match in IMAGE_NUMBER.finditer(text):
+            images.append((
+                field, match.group(1).lower(),
+                WORD_NUMBERS[match.group(2).lower()], match.group(3).lower(),
+                match.group(0),
+            ))
+        for match in FIGURE.finditer(text):
+            unit = (match.group(3) or "").lower()
+            if not unit:
+                continue
+            value = float(f"{match.group(1).replace('.', '')}.{match.group(2)}")
+            figures.setdefault(unit, []).append((field, value, match.group(0)))
+
+    found = []
+    for field, approx, value, unit, raw in images:
+        for other_field, figure, figure_raw in figures.get(unit, []):
+            if other_field == field or abs(figure - value) > NEAR + EPSILON or figure == value:
+                continue
+            if approx in APPROX_BELOW and figure > value:
+                continue
+            if approx in APPROX_ABOVE and figure < value:
+                continue
+            found.append(f"{raw} / {figure_raw}")
+    return sorted(set(found))
+
+
 def inspect(entry):
     """Every mechanical tell in one article, plus what it links to."""
     fields = prose_fields(entry)
@@ -138,6 +218,9 @@ def inspect(entry):
     questions = _closing_questions(fields)
     if questions:
         hits["domanda"] = questions
+    repeated = _same_number_twice(fields)
+    if repeated:
+        hits["ripetuto"] = repeated
     internal = [
         url for _, url in LINK.findall(text)
         if url.startswith("/") and not url.startswith("//")
@@ -164,10 +247,9 @@ def build_report(texts=None):
 
 def summarize(rows):
     """The catalogue-wide numbers, which are the point of running this at all."""
-    labels = {name: label for name, _, label in CHECKS}
-    labels["domanda"] = "domanda retorica in chiusura di paragrafo"
+    labels = {name: label for name, _, label in CHECKS} | EXTRA_SIGNALS
     per_check = {}
-    for name in list(labels):
+    for name in ALL_SIGNALS:
         carrying = [row for row in rows if name in row["hits"]]
         per_check[name] = {
             "label": labels[name],
@@ -200,8 +282,7 @@ def _print_summary(summary):
 
 
 def _print_rows(rows, limit):
-    labels = {name: label for name, _, label in CHECKS}
-    labels["domanda"] = "domanda retorica in chiusura di paragrafo"
+    labels = {name: label for name, _, label in CHECKS} | EXTRA_SIGNALS
     for row in rows[:limit]:
         if not row["hits"]:
             continue
