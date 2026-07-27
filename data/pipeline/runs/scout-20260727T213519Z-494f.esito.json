@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-27T21:39:21+00:00",
+ "base_commit": "bbf0508",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "bbf0508",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "gate": "checks",
+ "outcome": "merged",
+ "pr": "64",
+ "run_id": "scout-20260727T213519Z-494f",
+ "stage": "scout",
+ "summary": "PR #64 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}
