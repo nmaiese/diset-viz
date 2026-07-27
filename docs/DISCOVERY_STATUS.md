@@ -58,7 +58,7 @@ ignorava, e sei Routine indipendenti si pestavano i piedi.
 
 | Routine | cadenza (UTC) | che cosa fa | routine id |
 | --- | --- | --- | --- |
-| dispatcher | oraria (minuto `:58`) | `pipeline_dispatch.py`, poi lancia lo stadio che ha nominato | `trig_0145qYivpUMeYVcTAjBTmGHQ` (attiva dal 27 luglio 2026) |
+| dispatcher | ogni 3 ore (minuto `:02`) | `pipeline_dispatch.py`, poi lancia lo stadio che ha nominato | `trig_0145qYivpUMeYVcTAjBTmGHQ` (attiva dal 27 luglio 2026) |
 
 Impostazioni: **sessione nuova a ogni firing** (non legata a una sessione
 esistente), environment `divarioitalia`, modello quello di default. Il modello
