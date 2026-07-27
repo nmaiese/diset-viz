@@ -90,8 +90,23 @@ precisa: scrivendo contro due o tre cifre pescate dall'API si finisce per
 riscrivere la stessa fetta che il cruscotto stampa già, ed è da lì che nasce la
 prosa banale.
 
+L'ultimo blocco, `INDICATORI CORRELATI`, è quello che permette a un articolo di
+uscire dalla propria serie. Prende tutto il tema, non gli otto vicini in ordine
+alfabetico che la pagina mostra in tabella, calcola la correlazione di rango sui
+valori regionali e li divide in tre: chi disegna la stessa mappa, chi la mappa
+opposta, chi una mappa che non c'entra. Il terzo gruppo è quasi sempre il più
+interessante da scrivere, e sopra `rho` 0,95 il brief avverte che con ogni
+probabilità è lo stesso fenomeno misurato due volte. Per ciascun correlato dà il
+percorso canonico da linkare e la posizione, su quella scala, delle due regioni
+agli estremi di questa.
+
 Le regole editoriali complete stanno in `.claude/agents/indicator-writer.md` e in
-`content/STYLE.md`.
+`content/STYLE.md`. La rubrica con cui si misura il risultato, dieci criteri e
+una soglia sotto la quale l'articolo non è pronto, sta in
+[`WRITING_RUBRIC.md`](WRITING_RUBRIC.md). Le fonti secondarie ammesse stanno in
+[`SECONDARY_SOURCES.md`](SECONDARY_SOURCES.md), insieme alla trappola che nessuna
+guardia vede: un aggregato nazionale ponderato non è la nostra media semplice
+delle venti regioni.
 
 ## Risposte obbligatorie
 
@@ -183,7 +198,11 @@ a ogni ricarico. Quel nome finisce nella prosa.
 - **ogni cifra con decimale attribuita a una regione** ("il 24,3% del Molise")
   confrontata con il dato di quell'anno,
 - **ogni soglia asserita su un elenco di regioni** ("supera il 78% in A, B e C")
-  verificata regione per regione.
+  verificata regione per regione,
+- **ogni link interno nella prosa**: forma canonica (mai `/?indicator=` né
+  `/atlante?indicator=`, che arrivano alla scheda solo via JavaScript), un
+  indicatore che esiste davvero, un percorso che il sito serve, e un'anchor che
+  dice dove porta invece di "clicca qui".
 
 Le ultime due nascono da errori reali: una nota diceva che l'affollamento
 carcerario supera "ovunque" la capienza mentre tre regioni erano sotto, e
@@ -218,7 +237,66 @@ non è stato controllato niente. Vedi
   `fonti`, verificata, altrimenti vanno tolti,
 - **le cifre attribuite a una provincia**: la regex delle guardie conosce solo le
   venti regioni, quindi in un articolo BES a livello provinciale nessun controllo
-  automatico le verifica.
+  automatico le verifica,
+- **se l'incrocio con un altro indicatore è onesto**: il verbo calibrato sulla
+  prova (una correlazione di rango è una co-occorrenza, non un meccanismo), il
+  confondente nominato, almeno un'eccezione al pattern. Le guardie controllano
+  che il link funzioni, non che la frase intorno regga.
+
+A metà strada c'è `scripts/prose_lint.py`, che non fa fallire niente e conta: i
+tell da bot che `content/STYLE.md` nomina, articolo per articolo, e il totale del
+catalogo. Serve a scegliere il lotto da rileggere e a misurare se un giro di
+riscritture ha spostato qualcosa, invece di stabilirlo a occhio.
+
+```bash
+python3 scripts/prose_lint.py --show 178
+python3 scripts/prose_lint.py --summary
+```
+
+## La definizione, che è un'altra cosa dai numeri
+
+Tutto quello che sta qui sopra confronta l'articolo con **la serie**. Nessuna di
+quelle guardie confronta l'articolo con la **definizione della fonte**, e questa
+è la distinzione che conta: un numero sbagliato muore al primo lettore che apre
+il brief, una definizione sbagliata sopravvive a ogni rilettura che controlla
+l'aritmetica, perché l'aritmetica è giusta.
+
+Non è un'ipotesi. Rileggendo undici articoli contro i dati non è uscito **un
+solo errore di calcolo**, e sono uscite quattro descrizioni sbagliate di che
+cosa l'indicatore conta. `ter-402` chiamava "imprese a guida femminile" quello
+che Istat definisce come titolari donne di imprese individuali, e lo ripeteva
+nella sezione `limiti`, cioè nel punto che serve a dire che cosa l'indicatore
+non misura. `ter-72` scriveva "almeno dieci addetti" dove la fonte dice "più di
+dieci addetti", che è un'altra popolazione con le stesse parole.
+
+Per la famiglia territoriale la definizione ufficiale sta nel foglio `Metadati`
+di `Metainformazione.xls` della Banca dati territoriale, ed è ora in repo:
+
+```bash
+python3 scripts/fetch_definitions.py            # riscrive data/definitions/istat_territoriali.csv
+python3 scripts/definition_check.py --show ter-402
+python3 scripts/definition_check.py --summary
+```
+
+`scripts/xls_reader.py` legge il `.xls` con la sola libreria standard, perché
+gli script della catena girano su un checkout pulito prima che esista un venv.
+
+Il confronto è **lessicale e lo dichiara**: cerca le parole su cui poggia la
+definizione ufficiale e chiede se l'articolo le usa mai. Un sinonimo risulta
+mancante, e un articolo può usare tutte le parole giuste e descrivere lo stesso
+la cosa sbagliata. Quattro segnali, in ordine di quanto vale fidarsene:
+
+| segnale | che cos'è |
+| --- | --- |
+| `contraddizione` | l'articolo dice una cosa **diversa**, non una in meno: la classe di età della fonte non compare e ne compare un'altra, oppure "almeno N" dove la fonte dice "più di N". È l'unico che afferma invece di suggerire |
+| `base` | il denominatore che la fonte nomina non compare nella `definizione` scritta |
+| `soglia` | una soglia o una classe di età della fonte non compare da nessuna parte nell'articolo |
+| `termini` | l'articolo riprende meno di un terzo delle parole portanti della definizione. È la rete più larga e la più rumorosa, e per questo **non** entra nella coda |
+
+I primi tre diventano il segnale `definizione` di `scripts/review_queue.py`, che
+pesa più di ogni altro, `rilettura` compreso. Le famiglie senza foglio metadati
+(BES, Multiscopo, Eurostat, demografici) risultano `scoperto`: il controllo dice
+che non ha guardato, invece di dire che è tutto a posto.
 
 ## SEO e struttura
 

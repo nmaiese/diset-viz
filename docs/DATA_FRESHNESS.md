@@ -38,6 +38,21 @@ Rigenera i report con:
 .venv/bin/python scripts/refresh_official_data.py --check-only
 ```
 
+Le definizioni ufficiali della famiglia territoriale sono nello stesso rilascio
+Istat dell'archivio, e vanno riprese insieme a quello:
+
+```bash
+python3 scripts/update_data.py                   # la serie
+python3 scripts/fetch_definitions.py             # le definizioni della stessa release
+python3 scripts/definition_check.py --summary    # chi non le rispecchia piu'
+```
+
+`fetch_definitions` stampa quante definizioni sono **ridefinite**, ed è la riga
+da guardare: una definizione riscritta non cambia nessun numero e non fa fallire
+nessun test, invalida però la sezione `definizione` di ogni articolo che
+descriveva quella vecchia. Se il conteggio non è zero, gli articoli interessati
+vanno rimessi in coda di rilettura.
+
 Output:
 
 - `reports/indicator_inventory.csv`: inventario completo richiesto per audit,

@@ -54,7 +54,41 @@ For an indicator with two territorial levels, read both:
 .venv/bin/python -m scripts.indicator_brief bes-01SAL001 --level provincia
 ```
 
-Then read `content/STYLE.md`. It is binding.
+## Then read the definition, before you write the `definizione`
+
+```bash
+python3 scripts/definition_check.py --show <codice>
+```
+
+For the territorial family this prints Istat's own wording, from the `Metadati`
+sheet of the Banca dati territoriale. Read it, and write the `definizione`
+section against **that**, not against the indicator's title.
+
+This is not a formality. Reading eleven finished articles against the data
+turned up no arithmetic error and four wrong descriptions of what the indicator
+counts, all written under a green suite. The title of `ter-402` is
+"Imprenditorialità femminile"; the definition is "titolari di imprese
+individuali donne sul totale dei titolari di imprese individuali", and an
+article that writes "imprese a guida femminile" from the title alone is wrong
+about the whole page. `ter-72` is titled "utilizzo di Internet nelle imprese"
+and counts **addetti**, not firms, in companies with more than ten employees.
+
+Three things in the official definition are worth copying into the prose in
+plain words, because they are what the title hides: the **numerator**, the
+**denominator** (the thing the share is out of), and any **threshold or age
+band**. If the source draws the perimeter at "più di dieci addetti", never write
+"almeno dieci": it is a different population in the same words, and the tool
+will catch it, which means a reviewer will spend an afternoon on it.
+
+On `bes-*`, `ims-*`, `eur-*` and `dem-*` the tool says `scoperto`, because those
+families publish their metadata elsewhere. There the definition is yours to find
+at the source, and the same three questions apply.
+
+Then read `content/STYLE.md`, which is binding, and
+[`docs/WRITING_RUBRIC.md`](../../docs/WRITING_RUBRIC.md), which is the bar. Ten
+criteria, and an article under 14 out of 20 is not ready. Score your own draft
+before you open the pull request, honestly: the criteria you keep losing points
+on are the ones worth fixing before a reviewer finds them.
 
 ## What the page already says without you
 
@@ -170,6 +204,116 @@ None of this licenses a figure absent from the brief or a cause the indicator
 cannot support. Craft is what you do with the true numbers, not a reason to reach
 past them.
 
+### Quotas, not options
+
+The six moves above are what a good draft does. These five are countable, and
+they are quotas because the failure they fix is not "the article breaks a rule",
+it is "the article is uniformly smooth and nobody wrote it". A page where all
+four sections weigh the same, no sentence steps out of the pattern and nothing is
+ever put in parentheses reads as a machine, however correct it is.
+
+1. **One nut graf.** A paragraph, not a clause, that says who this touches and
+   how much. `quadro` is usually where it lands.
+2. **One digression.** Something that widens the frame, a longer time span, a
+   comparison, a definitional oddity, and that stays inside the series or cites a
+   real source. Not a "probably because".
+3. **One inline caveat.** A limit moved into the body as an aside, at the exact
+   sentence where the figure could mislead. Not the unweighted-mean disclaimer,
+   the apparatus carries that one.
+4. **Deliberate asymmetry.** Let the sections weigh where the data weighs. If the
+   story is in the distribution, `quadro` is long and `dinamica` is short.
+5. **Read it aloud, once, whole.** Not section by section. Every sentence should
+   follow from the one before. Where you hear a list, you have written a list.
+
+And the one rule that closes this section, because it is the failure mode of the
+whole section: **the imperfection is in the form, the discipline stays absolute
+on the data.** Nothing above authorises a figure that is not in the brief, a
+cause the indicator cannot show, or a source you have not opened.
+
+### Hunt your own tells
+
+`content/STYLE.md` now names the ones that survive a competent draft: false
+ranges ("dal Nord al Sud" when the ends are not a continuum), the rule of three,
+compulsive recaps, the spy lexicon (*cruciale, panorama, tessuto, sottolineare,
+evidenziare, giocare un ruolo*), the number written twice ("quasi la metà (48%)"),
+and the closing rhetorical question. Do not check them by eye:
+
+```bash
+python3 scripts/prose_lint.py --show <id>
+```
+
+It reads the file you just wrote and lists what it found. It does not check the
+rule of three, because in Italian a regex cannot tell an editorial tic from an
+ordinary list of three things, so that one stays yours.
+
+## Cross-indicator reasoning and internal linking
+
+Every article written before this section lived inside its own series, and not
+one of them linked to another indicator. That is the single largest thing
+separating these pages from a professional desk: a number means something next to
+another number, and an atlas that never puts two of its own side by side is a
+catalogue, not a publication.
+
+The brief now hands you the material under **INDICATORI CORRELATI**, with the
+whole theme ranked by rank correlation and split into three groups: the
+indicators that draw the same map, the ones that draw the opposite map, and the
+ones whose geography has nothing to do with this one.
+
+- **Reference 1 to 3, never more** in a 500-700 word piece. Past three it is a
+  list, and the reader stops following any of them.
+- **The third group is usually the best story.** "Same map" is often the north
+  south line the reader already expects, and above rho 0,95 it is frequently the
+  same measurement cut a second way (the 20-64 band, the male version), which the
+  brief marks for you. An indicator of the same theme whose map is *different* is
+  the sentence nobody can write from the cockpit.
+- **Choose a relationship you can name.** A lever upstream, a plausible
+  consequence downstream, a co-symptom, or the shape of the divide itself. Never
+  two series that merely look alike.
+- **Calibrate the verb to the evidence you have.** A rank correlation is a
+  co-occurrence and nothing more:
+  - co-occurrence: "va di pari passo con", "si accompagna a", "è associato a",
+    "nelle stesse aree in cui";
+  - regularity: "tende a", "in genere";
+  - hypothesis, marked as one: "una possibile spiegazione è", "può contribuire a";
+  - causal link: only with a citable study designed to establish it.
+- **Name the obvious confounder** (in this atlas it is almost always the income
+  of the area) **and at least one exception**, the territory that breaks the
+  pattern. The brief places this indicator's two extremes on the other one's
+  scale precisely so you can find it.
+- **Link every indicator you reference**, with the canonical path the brief
+  prints, in markdown: `[il tasso di occupazione maschile](/indicatore/.../ter-179)`.
+  Never `/?indicator=` nor `/atlante?indicator=`, never rebuild a slug by hand.
+  3 to 5 in-body links in total, anchor text that says where it leads (the
+  indicator's name or a natural paraphrase), never "clicca qui". Add one link to
+  the theme hub, whose path is the first line of the block.
+
+The guards in `tests/test_indicator_texts.py` check that every link is canonical,
+resolves to an indicator that exists, and does not use a generic anchor. They
+cannot check that the cross-reference was worth making. That one is yours.
+
+## Look outside the dataset, on purpose
+
+`fonti` used to fill only when a comparative claim forced it. That is backwards:
+the search is a step of the work, not a repair after the fact. Before drafting,
+read [`docs/SECONDARY_SOURCES.md`](../../docs/SECONDARY_SOURCES.md) and open the
+one or two entries relevant to this theme. You are looking for context the series
+cannot give: what the institution itself said about this movement, a European
+comparison, a definitional caveat, a counter-example.
+
+Verify every URL with WebSearch/WebFetch before citing it. If you cannot verify
+it, cut the claim. Never invent a source, never cite a document you have not
+opened.
+
+**The aggregation trap, which is the one that gets through.** Do not put a
+weighted national or macro-area aggregate (Istat, Eurostat, SVIMEZ, Banca
+d'Italia, OECD) next to our simple mean of the regional values as if they were
+the same quantity. They are not, and the arithmetic being right does not save
+the sentence. If you cite a national figure, say "dato nazionale <fonte>" and
+keep it apart from "la media semplice delle regioni". For the base figure cite
+the primary series (Istat); the secondary source is for context, for a
+counter-check, or for a series we do not carry, never for the number the cockpit
+already prints.
+
 ## Non-negotiable rules
 
 1. **Only real, verified numbers**, every one reproducible from the brief. Never
@@ -217,13 +361,18 @@ past them.
 
 ## Workflow
 
-1. Run the brief. Read `content/STYLE.md`. Confirm what is missing with
+1. Run the brief. Read `content/STYLE.md` and
+   [`docs/WRITING_RUBRIC.md`](../../docs/WRITING_RUBRIC.md), which is the bar
+   this article is measured against. Confirm what is missing with
    `.venv/bin/python -m scripts.text_queue --all | grep <codice>`. That queue has
    one row per (indicator, territorial level), so a two-level BES appears twice
    and each row is its own piece of work.
-2. Draft the lead and the four sections. Verify every figure against the brief
+2. Pick the cross-references from **INDICATORI CORRELATI** and look up the
+   secondary sources for this theme, before drafting. Both change what the
+   article is about, so doing them after the draft means rewriting it.
+3. Draft the lead and the four sections. Verify every figure against the brief
    and every comparative claim against a real source.
-3. Write the entry into `app/static/data/indicator_texts.json`, keyed by the
+4. Write the entry into `app/static/data/indicator_texts.json`, keyed by the
    internal id (`178`, `bes:10AMB014`, `multiscopo:...`, `eur:...`). Preserve the
    file's `indent=1`, `ensure_ascii=False`, `sort_keys=True` formatting and change
    only that one entry. Shape:
@@ -265,14 +414,20 @@ past them.
    fields yourself would erase the only record that the new text has never been
    read.
 
-4. Run the guards and read the result:
+5. Run the guards and the linter, and read both:
 
    ```bash
+   python3 scripts/prose_lint.py --show <id>
    .venv/bin/python -m unittest tests.test_indicator_texts -v
    .venv/bin/python -m unittest discover -s tests
    ```
 
-5. Look at the rendered page, not just the JSON:
+   The guards fail on a broken link, a figure that contradicts the data, a
+   banned character. The linter does not fail on anything: it lists the tells it
+   found and leaves the decision to you. Both of them read the file you wrote,
+   not the draft in your head.
+
+6. Look at the rendered page, not just the JSON:
 
    ```bash
    .venv/bin/gunicorn run:app -b 127.0.0.1:5050
@@ -281,7 +436,7 @@ past them.
    Read it top to bottom once. If a sentence tells you something the cockpit
    just showed you, cut it.
 
-6. Close at the gate:
+7. Close at the gate:
 
    ```bash
    python3 scripts/pipeline_gate.py --stage writer

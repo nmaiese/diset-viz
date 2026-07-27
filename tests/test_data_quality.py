@@ -53,6 +53,90 @@ class BoundedRatesStayWithinRange(unittest.TestCase):
         )
 
 
+# Two indicators that publish the same numbers under two names, known and
+# tolerated because the duplication is Istat's and not ours. Each entry carries
+# the evidence, so a future reader can check whether it is still true rather
+# than trusting a list.
+KNOWN_DUPLICATE_SERIES = {
+    ("167", "471"): (
+        "Istat pubblica 167 'Intensità di accumulazione del capitale' "
+        "(dati di base: investimenti fissi lordi) e 471 'Investimenti privati "
+        "sul PIL' (dati di base: investimenti privati) con valori identici su "
+        "tutte e 986 le righe dell'archivio, non solo sulle venti regioni. "
+        "I due elenchi di dati di base sono diversi, quindi al massimo una "
+        "delle due etichette descrive i numeri pubblicati. Verificato "
+        "scaricando Archivio_unico_indicatori_regionali.zip il 27 luglio 2026: "
+        "la duplicazione e' a monte e un refresh non la toglie."
+    ),
+}
+
+
+class NoTwoIndicatorsPublishTheSameSeries(unittest.TestCase):
+    """Two pages, two names, one set of numbers: at least one of them lies.
+
+    This is not a hypothetical. `ter-167` and `ter-471` carry byte-identical
+    series over 29 years and 20 regions, both have a published article, and one
+    of the two is signed off by a reviewer. Every guard in the repo passed them,
+    because each page is internally consistent: the figures match the series,
+    they just match the *wrong* series.
+
+    It was found by hand, while a verifier was checking something else, and it
+    is the cheapest defect in the catalogue to detect and the most expensive to
+    notice. One pair in 393 indicators, so an exact-match test costs nothing and
+    fires almost never, which is exactly the profile a hard guard should have.
+    """
+
+    def test_no_unknown_duplicate_series(self):
+        by_indicator = {}
+        names = {}
+        with DATA_PATH.open(encoding="utf-8", newline="") as handle:
+            for row in csv.DictReader(handle, delimiter=";"):
+                key = row["idIndicatore"]
+                by_indicator.setdefault(key, {})[(row["Territorio"], row["Anno"])] = row["Dato"]
+                names[key] = row["Indicatore"]
+
+        signatures = {}
+        for indicator, cells in by_indicator.items():
+            # A handful of shared points is a coincidence, a whole series is not.
+            if len(cells) < 20:
+                continue
+            signatures.setdefault(tuple(sorted(cells.items())), []).append(indicator)
+
+        found = {
+            tuple(sorted(group, key=int)) for group in signatures.values() if len(group) > 1
+        }
+        unknown = sorted(found - set(KNOWN_DUPLICATE_SERIES))
+        self.assertEqual(
+            unknown, [],
+            "indicatori diversi con la stessa identica serie: "
+            + "; ".join(
+                " == ".join(f"{i} {names[i]}" for i in group) for group in unknown
+            ),
+        )
+
+    def test_the_known_duplicate_is_still_duplicated(self):
+        """An allow-list nobody rechecks is a way of forgetting.
+
+        When Istat fixes the archive, the pair stops matching and this fails,
+        which is the notice to delete the entry and to reread both articles.
+        """
+        with DATA_PATH.open(encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle, delimiter=";"))
+        for group in KNOWN_DUPLICATE_SERIES:
+            series = [
+                {(r["Territorio"], r["Anno"]): r["Dato"] for r in rows
+                 if r["idIndicatore"] == indicator}
+                for indicator in group
+            ]
+            self.assertTrue(all(series), f"{group}: uno dei due id non e' piu' nel CSV")
+            for other in series[1:]:
+                self.assertEqual(
+                    series[0], other,
+                    f"{group} non sono piu' identici: togli la voce da "
+                    "KNOWN_DUPLICATE_SERIES e rimanda i due articoli in rilettura",
+                )
+
+
 class KnownArchiveCorrectionHealsOnRefresh(unittest.TestCase):
     """`update_data.convert_row` heals the known-bad upstream cell during a refresh,
     but only while the archive still ships the exact bad value."""

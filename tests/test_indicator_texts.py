@@ -217,6 +217,158 @@ class ArticleStructure(unittest.TestCase):
         self.assertEqual(offenders, [], f"style violations: {offenders[:10]}")
 
 
+class ParagraphsSurviveRendering(unittest.TestCase):
+    """A section written in paragraphs must render in paragraphs.
+
+    The body goes through `analyst_html`, which is Markdown, where a single `\\n`
+    is a soft wrap and not a paragraph break. So a section separated by single
+    newlines produces exactly one `<p>`, which the filter then strips (it strips
+    the wrapper only when there is one), and the whole section lands on the page
+    as an unbroken wall of text. Three of ten freshly written articles had it.
+
+    It is invisible in the JSON, invisible in the diff, and invisible to a render
+    check that strips the tags and splits on newlines, because that rebuilds the
+    paragraphs the browser would never show. The only honest check counts the
+    `<p>` the filter actually emits, which is what this does.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.texts = _load()
+
+    def test_every_authored_section_renders_inside_a_block_element(self):
+        """A section body must never reach the page as a bare text node.
+
+        `analyst_html` strips the single wrapping <p>, which is right for the
+        page lead (the template already opened one) and wrong for a section
+        body (the macro does not). Under the wrong filter a one-paragraph
+        section rendered unwrapped, and `.prose > * + *` in site.css applies its
+        spacing to elements only, so that section sat flush against its own h2
+        while the multi-paragraph ones kept the gap. 710 sections in 355 of the
+        364 articles, on every page, and invisible in the JSON.
+        """
+        from app.views import prose_html
+
+        bare = []
+        for key, entry in self.texts.items():
+            for section in entry.get("sections") or []:
+                body = (section.get("body") or "").strip()
+                if body and not str(prose_html(body)).startswith("<"):
+                    bare.append((key, section.get("role")))
+        self.assertEqual(bare, [], f"sections rendering as a bare text node: {bare[:10]}")
+
+    def test_the_lead_filter_still_strips_its_wrapper(self):
+        """The other half of the same split, and the reason it exists.
+
+        The lead sits inside a <p class="page-lead"> the template opens, so a
+        second <p> nested in it is invalid HTML and the browser closes the outer
+        one early. Whoever unifies these two filters has to break one of these
+        two tests to do it.
+        """
+        from app.views import analyst_html, prose_html
+
+        self.assertEqual(str(analyst_html("Una frase sola.")), "Una frase sola.")
+        self.assertEqual(str(prose_html("Una frase sola.")), "<p>Una frase sola.</p>")
+
+    def test_a_body_written_in_paragraphs_produces_more_than_one(self):
+        from app.views import analyst_html
+
+        collapsed = []
+        for key, entry in self.texts.items():
+            for section in entry.get("sections") or []:
+                body = section.get("body") or ""
+                if "\n" not in body:
+                    continue
+                paragraphs = str(analyst_html(body)).count("<p>")
+                if paragraphs < 2:
+                    collapsed.append((key, section.get("role"), body.count("\n")))
+        self.assertEqual(
+            collapsed, [],
+            "sections whose newlines do not survive rendering, so they show as one "
+            f"block (id, role, newlines): {collapsed[:10]}",
+        )
+
+
+class InternalLinksInProse(unittest.TestCase):
+    """Cross-references in an article, checked the way the blog's already are.
+
+    The prose is rendered through `analyst_html`, so a markdown link in a body
+    becomes a real anchor on a real page. Two ways that goes wrong and nothing
+    else catches it: a path shape that does not resolve (the atlas link forms
+    `/?indicator=` and `/atlante?indicator=` reach the indicator only through
+    JavaScript, which is why `tests/test_url_migration.py` bans them in the blog),
+    and a path that is canonical in shape but points at an indicator that does
+    not exist, because the slug was hand-built instead of copied from the brief.
+
+    The anchor text is checked too, and that one is editorial rather than
+    mechanical: Google's own guidance is that the linked words should say where
+    they lead, and "clicca qui" in the middle of a paragraph is both worse for a
+    reader and worse for the internal-linking model the theme hubs rest on.
+    """
+
+    LINK = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+    BANNED_FORMS = ("/?indicator=", "/atlante?indicator=", "?indicator=")
+    GENERIC_ANCHORS = {
+        "qui", "clicca qui", "clicca", "leggi", "leggi di più", "leggi di piu",
+        "leggi tutto", "questa pagina", "la pagina", "questo link", "link",
+        "vedi", "vedi qui", "scopri di più", "scopri di piu", "approfondisci",
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        from app.atlas_catalog import get_atlas_catalog
+
+        cls.texts = _load()
+        cls.canonical = {item["path"] for item in get_atlas_catalog()["indicators"]}
+
+    def _internal_links(self):
+        for key, entry in self.texts.items():
+            for field, text in _prose(entry):
+                for match in self.LINK.finditer(text):
+                    anchor, url = match.group(1).strip(), match.group(2).strip()
+                    if url.startswith(("http://", "https://", "mailto:")):
+                        continue
+                    yield key, field, anchor, url
+
+    def test_no_prose_link_uses_a_form_that_needs_javascript(self):
+        wrong = [
+            (key, field, url)
+            for key, field, _, url in self._internal_links()
+            if any(form in url for form in self.BANNED_FORMS)
+        ]
+        self.assertEqual(wrong, [], f"non-canonical indicator links: {wrong[:10]}")
+
+    def test_every_indicator_link_resolves_to_an_indicator_that_exists(self):
+        broken = [
+            (key, field, url)
+            for key, field, _, url in self._internal_links()
+            if url.startswith("/indicatore/") and url.split("#")[0].split("?")[0] not in self.canonical
+        ]
+        self.assertEqual(broken, [], f"links to indicators that do not exist: {broken[:10]}")
+
+    def test_internal_links_point_somewhere_the_site_actually_serves(self):
+        """Anything internal that is not an indicator must at least be a path we
+        publish, so a theme hub link cannot rot into a 404 unnoticed."""
+        from app import app
+
+        client = app.test_client()
+        dead = []
+        for key, field, _, url in self._internal_links():
+            if url.startswith("/indicatore/") or not url.startswith("/"):
+                continue
+            if client.get(url).status_code not in (200, 301, 308):
+                dead.append((key, field, url))
+        self.assertEqual(dead, [], f"internal links that do not resolve: {dead[:10]}")
+
+    def test_anchor_text_says_where_it_leads(self):
+        generic = [
+            (key, field, anchor)
+            for key, field, anchor, _ in self._internal_links()
+            if anchor.lower().strip(" .,:") in self.GENERIC_ANCHORS
+        ]
+        self.assertEqual(generic, [], f"anchors that could be any link: {generic[:10]}")
+
+
 class ArticleVintageDrift(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -17,6 +17,14 @@ listing:
   actually means
 - which territories moved against the general direction
 - what the page will already say on its own, so you do not write it twice
+- which other indicators of the same theme draw the same map as this one, which
+  draw the opposite one, and which draw a map that has nothing to do with it,
+  each with the canonical path to link it
+
+That last block is the one that lets an article stop living inside its own
+series. It exists because every article written before it did: the brief was
+mono-indicator, so the prose had no handle on anything beyond its own ranking,
+and no article in the catalogue linked to another one.
 
 Usage:
 
@@ -33,14 +41,42 @@ import json
 import sys
 
 from app import sources
+from app.atlas_catalog import get_atlas_catalog, get_atlas_indicator
 from app.indicator_texts import DEFAULT_HEADINGS, ROLE_ORDER, build_article, get_text
 from app.indicator_view import build_indicator_view
+
+# How many indicators to show per relationship group (same map, opposite map,
+# unrelated map). Three groups of four is a menu an editor can read; the whole
+# theme, which can be eighty indicators, is a table nobody uses.
+RELATED_PER_GROUP = 4
+# Below this many shared regions a rank correlation says nothing, it just
+# describes the handful of territories both series happen to cover.
+MIN_COMMON_REGIONS = 12
+# Where "same map" starts and "different map" ends. Deliberately wide in the
+# middle: an indicator at rho 0,45 shares a tendency with this one and no more,
+# and presenting that as a shape is how a co-occurrence turns into a claim.
+SAME_MAP = 0.6
+DIFFERENT_MAP = 0.3
+# Above this, the two series are usually two cuts of the same measurement (the
+# same rate on a different age band, the male and the female version), and
+# "cammina di pari passo con" is a tautology dressed as a finding.
+#
+# Compared on the **absolute** rho, always. A complement is a duplicate too: the
+# efficiency of the water network (`ter-9`) is a hundred minus its dispersion
+# (`ter-385`), the two correlate at exactly -1,00, and "dove una sale l'altra
+# scende" is the same tautology with a minus sign. Checking only the positive
+# side let that pair reach a writer as independent cross-indicator evidence.
+TWIN_RHO = 0.95
 
 
 def _num(value, decimals=2):
     if value is None:
         return "n.d."
     return f"{value:,.{decimals}f}".replace(",", "@").replace(".", ",").replace("@", ".")
+
+
+def _signed(value, decimals=2):
+    return ("+" if value >= 0 else "") + _num(value, decimals)
 
 
 def _resolve(code):
@@ -99,7 +135,19 @@ def build_brief(family, raw_id, level_key=None):
         "has_text": _text_for_level(meta["id"], level["key"]) is not None,
         "breaks": _distribution_breaks(rows),
         "against_the_grain": _against_the_grain(rows, stats),
+        # Always computed over the regions, whatever level is being briefed:
+        # the sibling series are regional, so a provincial brief still gets the
+        # relationships, stated as what they are.
+        "related": _related_indicators(meta, _anchor_territories(view)),
     }
+
+
+def _anchor_territories(view):
+    """The two regions an article is most likely to name: top and bottom."""
+    regional = next((lv for lv in view["levels"] if lv["key"] == "regione"), None)
+    if regional is None:
+        return []
+    return [item for item in (regional.get("best"), regional.get("worst")) if item]
 
 
 def _distribution_breaks(rows, top=3):
@@ -132,6 +180,227 @@ def _against_the_grain(rows, stats):
     if overall >= 0:
         return [row for row in moved if row["delta"] < 0]
     return [row for row in moved if row["delta"] > 0]
+
+
+def _regional_vector(payload):
+    """{region_key: value} in the most recent year the series covers."""
+    series = (payload or {}).get("series") or []
+    years = [row["year"] for row in series if row.get("value") is not None]
+    if not years:
+        return {}, None
+    year = max(years)
+    vector = {
+        row["region_key"]: row["value"]
+        for row in series
+        if row["year"] == year and row.get("value") is not None
+    }
+    return vector, year
+
+
+def _average_ranks(values):
+    """Ranks from 1, ties sharing their average rank.
+
+    Ties are not a corner case here: several series are percentages rounded to
+    one decimal over twenty regions, so two regions land on the same value
+    regularly, and ranking them arbitrarily would move rho by a tenth.
+    """
+    order = sorted(range(len(values)), key=lambda index: values[index])
+    ranks = [0.0] * len(values)
+    position = 0
+    while position < len(order):
+        end = position
+        while end + 1 < len(order) and values[order[end + 1]] == values[order[position]]:
+            end += 1
+        shared = (position + end) / 2 + 1
+        for index in order[position:end + 1]:
+            ranks[index] = shared
+        position = end + 1
+    return ranks
+
+
+def _spearman(first, second):
+    """Rank correlation of two {region: value} maps over the regions they share.
+
+    Rank rather than linear on purpose: these series carry different units and
+    very different distributions, several of them skewed by one alpine outlier,
+    and the question an editor is asking is about the order of the territories,
+    not about a linear fit.
+    """
+    common = sorted(set(first) & set(second))
+    if len(common) < MIN_COMMON_REGIONS:
+        return None, len(common)
+    left = _average_ranks([first[key] for key in common])
+    right = _average_ranks([second[key] for key in common])
+    count = len(common)
+    mean_left = sum(left) / count
+    mean_right = sum(right) / count
+    covariance = sum((a - mean_left) * (b - mean_right) for a, b in zip(left, right))
+    spread_left = sum((a - mean_left) ** 2 for a in left) ** 0.5
+    spread_right = sum((b - mean_right) ** 2 for b in right) ** 0.5
+    if not spread_left or not spread_right:
+        # A constant series has no order to correlate with.
+        return None, count
+    return covariance / (spread_left * spread_right), count
+
+
+def _placement(vector, region_key):
+    """Position of one region on another indicator's scale, by value descending.
+
+    Descending value, never the page's merit order: the merit order flips on a
+    `lower_better` indicator, so "#2" would mean the second highest here and the
+    second lowest there, and the sentence built on it would be backwards.
+    """
+    if region_key not in vector:
+        return None
+    ordered = sorted(vector.values(), reverse=True)
+    return {
+        "value": vector[region_key],
+        "rank": ordered.index(vector[region_key]) + 1,
+        "of": len(ordered),
+    }
+
+
+def _strongest(rows):
+    """The group, with the probable duplicates pushed to the back.
+
+    Sorting a "same map" group by rho alone fills it with the same measurement
+    cut a second way: on female employment the top four were the 20-64 band, the
+    activity rate, overall participation and the over-54 band, all above 0,97,
+    and an article that cross-references one of those has said nothing. Distinct
+    indicators lead, the near-twins stay visible only to backfill.
+    """
+    distinct = [row for row in rows if abs(row["rho"]) < TWIN_RHO]
+    twins = [row for row in rows if abs(row["rho"]) >= TWIN_RHO]
+    return (distinct + twins)[:RELATED_PER_GROUP]
+
+
+def _related_indicators(meta, anchors):
+    """Theme siblings grouped by the shape of the divide they draw.
+
+    The page's own "related" list is the theme in alphabetical order, truncated
+    at eight, which is a fine table and a useless starting point for a
+    cross-reference: it answers "what else is filed here", not "what does this
+    number travel with". Here the whole theme is ranked by rank correlation and
+    split into three groups, because the editorially interesting one is not the
+    strongest correlation. It is the indicator that draws a *different* map,
+    the one that breaks the north-south reflex the atlas trains.
+
+    `anchors` are the two territories the article will most likely name, the
+    extremes of this indicator's own ranking, placed on each sibling's scale so
+    a comparison can be written without a second command.
+    """
+    theme = meta.get("theme")
+    if not theme:
+        return {"hub": None, "groups": {}, "self_year": None}
+
+    own_payload = get_atlas_indicator(meta["id"])
+    own_vector, own_year = _regional_vector(own_payload)
+    scored = []
+    for item in get_atlas_catalog()["indicators"]:
+        if item["theme"] != theme or str(item["id"]) == str(meta["id"]):
+            continue
+        vector, year = _regional_vector(get_atlas_indicator(item["id"]))
+        if not vector:
+            continue
+        rho, common = (None, 0) if not own_vector else _spearman(own_vector, vector)
+        scored.append({
+            "id": item["id"],
+            "name": item["name"],
+            # Never rebuilt: the families truncate the slug differently and the
+            # catalog is the only place that knows how (app/indicator_view.py).
+            "path": item["path"],
+            "direction": (item.get("explain") or {}).get("direction"),
+            "year": year,
+            "rho": rho,
+            "common": common,
+            "anchors": [
+                {"name": anchor["name"], **(_placement(vector, anchor["key"]) or {})}
+                for anchor in anchors
+            ],
+        })
+
+    ranked = [row for row in scored if row["rho"] is not None]
+    ranked.sort(key=lambda row: abs(row["rho"]), reverse=True)
+    groups = {
+        "stessa": _strongest([row for row in ranked if row["rho"] >= SAME_MAP]),
+        "opposta": _strongest([row for row in ranked if row["rho"] <= -SAME_MAP]),
+        # Weakest first: rho near zero is the cleanest "these two have nothing
+        # to do with each other", which is the claim this group is for.
+        "diversa": sorted(
+            (row for row in ranked if abs(row["rho"]) < DIFFERENT_MAP),
+            key=lambda row: abs(row["rho"]),
+        )[:RELATED_PER_GROUP],
+    }
+    return {
+        "hub": {"path": meta.get("theme_path"), "name": theme},
+        "groups": groups,
+        "self_year": own_year,
+        "theme_size": len(scored),
+    }
+
+
+GROUP_TITLES = {
+    "stessa": ("DISEGNANO LA STESSA MAPPA", "gli stessi territori in alto e in basso"),
+    "opposta": ("DISEGNANO LA MAPPA OPPOSTA", "dove uno sale l'altro scende"),
+    "diversa": ("DISEGNANO UNA MAPPA DIVERSA",
+                "la geografia qui non c'entra, ed e' spesso la cosa piu interessante da dire"),
+}
+
+
+def _render_related(brief):
+    related = brief["related"]
+    out = []
+    add = out.append
+    add("INDICATORI CORRELATI  (la materia prima di un incrocio e dei link interni)")
+    if not related.get("groups"):
+        add("  questo indicatore non ha un tema, quindi non ha fratelli con cui incrociarlo")
+        add("")
+        return "\n".join(out)
+
+    hub = related["hub"] or {}
+    if hub.get("path"):
+        add(f"  hub del tema  {hub['path']}   ({hub['name']}, {related['theme_size']} indicatori)")
+    add("  rho e' la correlazione di rango sui valori regionali dell'ultimo anno di ciascuna")
+    add("  serie. Dice se due indicatori mettono i territori nello stesso ordine, non che")
+    add("  uno causi l'altro: e' una co-occorrenza e va scritta come tale. Le posizioni")
+    add("  sono per valore decrescente, non per merito.")
+    add(f"  Sopra {_num(TWIN_RHO)} guarda il nome prima di scrivere: di solito e' lo stesso")
+    add("  fenomeno misurato su un'altra fascia o sull'altro sesso, e dirlo non e' una notizia.")
+    if brief["level"]["key"] != "regione":
+        add(f"  ATTENZIONE: rho e' calcolata sulle regioni, e tu stai scrivendo sul livello "
+            f"{brief['level']['key']}.")
+    add("")
+
+    empty = True
+    for group in ("stessa", "opposta", "diversa"):
+        rows = related["groups"].get(group) or []
+        if not rows:
+            continue
+        empty = False
+        title, gloss = GROUP_TITLES[group]
+        add(f"  {title}  ({gloss})")
+        for row in rows:
+            verso = row["direction"] or "senza verso"
+            twin = "  <- forse la stessa cosa misurata due volte" if abs(row["rho"]) >= TWIN_RHO else ""
+            add(f"    rho {_signed(row['rho'])} su {row['common']} regioni   {row['name']}{twin}")
+            add(f"      {row['path']}   ({verso}, ultimo anno {row['year']})")
+            placements = [
+                f"{anchor['name']} {_num(anchor['value'])} (#{anchor['rank']} su {anchor['of']})"
+                for anchor in row["anchors"] if anchor.get("rank")
+            ]
+            if placements:
+                # "le due estreme" was printed even when only one of them is on
+                # this sibling's scale, which happens whenever the two series
+                # cover different regions. A label that promises two names and
+                # prints one teaches the writer that a region is missing from
+                # the ranking, when it is missing from the *other* series.
+                quante = "le due estreme" if len(placements) > 1 else "l'estrema"
+                add(f"      {quante} di qui, su questa scala: {', '.join(placements)}")
+        add("")
+    if empty:
+        add("  nessun fratello di tema con abbastanza regioni in comune per un confronto")
+        add("")
+    return "\n".join(out)
 
 
 def render(brief):
@@ -216,6 +485,8 @@ def render(brief):
             f"stabili {annual['stable_count']}")
         add("")
 
+    add(_render_related(brief))
+
     add("-" * 78)
     add("GIA DETTO DALLA PAGINA, NON RISCRIVERLO")
     add("  Il cruscotto stampa da solo: valore del territorio a fuoco e suo rango,")
@@ -268,6 +539,7 @@ def main(argv=None):
             "against_the_grain": brief["against_the_grain"],
             "annual_change": brief["level"]["annual_change"],
             "article": brief["article"],
+            "related": brief["related"],
         }
         print(json.dumps(payload, ensure_ascii=False, indent=1, default=str))
     else:
