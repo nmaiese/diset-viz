@@ -127,10 +127,12 @@ probabilità è lo stesso fenomeno misurato due volte. Per ciascun correlato dà
 percorso canonico da linkare e la posizione, su quella scala, delle due regioni
 agli estremi di questa.
 
-Le regole editoriali complete stanno in `.claude/agents/indicator-writer.md` e in
-`content/STYLE.md`. La rubrica con cui si misura il risultato, dieci criteri e
-una soglia sotto la quale l'articolo non è pronto, sta in
-[`WRITING_RUBRIC.md`](WRITING_RUBRIC.md). Le fonti secondarie ammesse stanno in
+Le regole editoriali complete stanno in `content/STYLE.md`, e le classi di
+errore che solo una lettura trova nella skill condivisa
+`.claude/skills/indicator-review/` (il prompt dello scrittore,
+`.claude/agents/indicator-writer.md`, ormai punta e non ricopia). La rubrica
+con cui si misura il risultato, dieci criteri e una soglia sotto la quale
+l'articolo non è pronto, sta in [`WRITING_RUBRIC.md`](WRITING_RUBRIC.md). Le fonti secondarie ammesse stanno in
 [`SECONDARY_SOURCES.md`](SECONDARY_SOURCES.md), insieme alla trappola che nessuna
 guardia vede: un aggregato nazionale ponderato non è la nostra media semplice
 delle venti regioni.

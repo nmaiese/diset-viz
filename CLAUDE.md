@@ -34,7 +34,8 @@ it).
 Le regole con uno scope stanno in `.claude/rules/` (app, editorial, pipeline,
 frontend, data) e si caricano da sole quando tocchi i file a cui si applicano.
 Le procedure condivise dagli agenti stanno in `.claude/skills/`
-(`pipeline-close-run`, `untrusted-web`, `indicator-review`).
+(`pipeline-close-run`, `untrusted-web`, `indicator-review`, e `canary`, che
+scatta prima di ogni cambio a modelli, prompt o hook degli agenti).
 
 Per guardare la catena senza aprire file:
 
