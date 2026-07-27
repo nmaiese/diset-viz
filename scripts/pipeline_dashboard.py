@@ -196,11 +196,16 @@ def _stage_rows(status):
     Un cruscotto si scorre, non si legge."""
     rows = []
     for entry in status["stages"]:
-        css = "flag" if entry["waiting"] else "idle"
+        # `None` non e' zero: una coda che nessuno ha contato si accende come
+        # quelle piene, perche' "non lo so" e' un motivo per guardare, non per
+        # spegnere la riga.
+        waiting = entry["waiting"]
+        css = "idle" if waiting == 0 else "flag"
+        shown = "?" if waiting is None else str(waiting)
         rows.append(
             f"<tr class='{css}'><td><strong>{_esc(entry['stage'])}</strong></td>"
             f"<td class='mono'>{_esc(entry['agent'])}</td>"
-            f"<td class='n'>{entry['waiting']}</td>"
+            f"<td class='n'>{_esc(shown)}</td>"
             f"<td>{_esc(entry['next'])}</td></tr>"
         )
     return "\n".join(rows)
@@ -212,8 +217,20 @@ def _summary_cells(status, entries):
     attention = sum(1 for e in entries if e.get("outcome") in pipeline_log.ATTENTION)
     last = max((e.get("at", "") for e in entries), default="")
     late = [r for r in pipeline_log.silence(entries) if r["stale"]]
+    # Il totale non puo' portare l'etichetta "tutti gli stadi" quando uno stadio
+    # non e' stato contato: sarebbe lo zero silenzioso della riga di stadio
+    # spostato nel numero piu' grande della pagina, cioe' l'unico che si legge
+    # davvero in un colpo d'occhio. Quando manca un termine, la somma lo dice e
+    # si accende, perche' un totale parziale spacciato per completo e' peggio di
+    # nessun totale.
+    unknown = status.get("unknown_stages") or []
+    if unknown:
+        coda_label = f"in coda, senza {', '.join(unknown)}"
+        coda_value = f"{status['total_waiting']}+?"
+    else:
+        coda_label, coda_value = "in coda, tutti gli stadi", str(status["total_waiting"])
     cells = [
-        ("in coda, tutti gli stadi", str(status["total_waiting"]), False),
+        (coda_label, coda_value, bool(unknown)),
         ("run registrate", str(len(entries)), False),
         ("run da guardare", str(attention), attention > 0),
         # Il silenzio non entra fra le "run da guardare" perche' non e' una run:

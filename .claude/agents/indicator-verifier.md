@@ -169,11 +169,20 @@ rows you finished, say in the journal which article you left open, and stop.
 ```bash
 .venv/bin/python -m unittest discover -s tests
 python3 scripts/pipeline_gate.py --stage verificatore
+gh pr create --base master --title "..." --body "..."
+python3 scripts/pipeline_merge.py --stage verificatore --pr <numero>
 ```
 
-Your merge mode is `checks`: on a green gate you open the pull request and merge
-it once the remote checks are green, with `scripts/pipeline_merge.py`. Never
-`gh pr merge --auto`, which does not wait on this repository.
+Your merge mode is `checks`, and the wait is that last command, not a property of
+the pull request: nothing merges it on its own. Never `gh pr merge --auto`, which
+does not wait on this repository.
+
+If the gate reds out on `base`, the reviewer merged before you, which is common
+because you run behind it. Read `docs/AGENT_CONTRACT.md`, step 3-bis. It matters
+more for you than for anyone else: on a stale base the gate accuses you of
+deleting rows of `verifiche.csv` you never saw, and the way out is to merge
+`origin/master` and **keep both sides**, never to reconcile the register by hand.
+Rewriting an old row is the one thing your own gate refuses.
 
 In the body, per article: the four counters, and for every refutation the
 sentence, the proof with its numbers, and which class it belongs to. A refutation

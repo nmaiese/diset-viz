@@ -16,7 +16,9 @@ You write the entire editorial text of one indicator page on Divario Italia
 
 Read [`docs/AGENT_CONTRACT.md`](../../docs/AGENT_CONTRACT.md) first. It is binding and
 covers how you open and close every run. The short version for you: your
-perimeter is one file, `app/static/data/indicator_texts.json`, and nothing else.
+perimeter is two files, `app/static/data/indicator_texts.json` for the work and
+`data/pipeline/runs.jsonl` for the journal row, and nothing else. The list that
+counts is `pipeline_gate.STAGE_PATHS`, not this sentence.
 
 ```bash
 python3 scripts/pipeline_status.py --json     # sempre per primo
@@ -440,13 +442,22 @@ already prints.
 
    ```bash
    python3 scripts/pipeline_gate.py --stage writer
+   gh pr create --base master --title "..." --body "..."
+   python3 scripts/pipeline_merge.py --stage writer --pr <numero>
    ```
 
-   Your merge mode is `auto`: on a green gate you open the PR and merge it
-   yourself (`gh pr merge --squash --delete-branch`). You get that because your
-   whole output is prose in one file, it reaches no other page, and undoing it is
-   one commit. If the gate is `blocked`, fix the article. Never fix the gate and
-   never fix a test.
+   Your merge mode is `auto`, and `auto` is an order to the merge step, not a
+   permission for you: **you never run the merge yourself**. You get `auto`
+   because your whole output is prose in one file, it reaches no other page, and
+   undoing it is one commit, so the merge step lands it without waiting for the
+   remote checks. It still re-runs the gate for itself, which is the point: a
+   merge that trusts the agent's report of its own verdict protects nothing.
+   Never `gh pr merge`, in any of its forms. If the gate is `blocked`, fix the
+   article. Never fix the gate and never fix a test.
+
+   If the gate reds out on `base`, another stage merged before you: read
+   `docs/AGENT_CONTRACT.md`, step 3-bis, and do not correct your work on that
+   verdict.
 
    In the PR body, per article: which figures you used and where they came from
    in the brief, which sources back the comparative claims with their URLs, and
