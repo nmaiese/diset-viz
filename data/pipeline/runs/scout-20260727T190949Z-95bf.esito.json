@@ -1,0 +1,15 @@
+{
+ "at": "2026-07-27T19:40:46+00:00",
+ "branch": "master",
+ "commit": "83abbff",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "gate": "checks",
+ "outcome": "merged",
+ "pr": "58",
+ "run_id": "scout-20260727T190949Z-95bf",
+ "stage": "scout",
+ "summary": "PR #58 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}
