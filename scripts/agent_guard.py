@@ -43,6 +43,15 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts import pipeline_gate  # noqa: E402  (bootstrap del path qui sopra)
 
+# Gli stadi che la guardia sa sorvegliare. Sono quelli del cancello piu' il
+# dispatcher, che del cancello non e' uno stadio (non apre pull request, non ha
+# una voce in STAGE_PATHS) ma un agente e': il suo perimetro di scrittura e' il
+# solo diario, perche' tutto il resto del suo giro passa dagli script, mai da
+# Edit/Write. La voce sta qui e non in STAGE_PATHS apposta: aggiungerla la'
+# insegnerebbe al cancello uno stadio che non deve mai giudicare.
+GUARDED_STAGES = dict(pipeline_gate.STAGE_PATHS)
+GUARDED_STAGES["dispatch"] = (pipeline_gate.RUN_JOURNAL,)
+
 # Comandi che nessuno stadio ha motivo di dare, mai. Regex sul comando intero,
 # prima di ogni altra valutazione: un pattern qui vince anche su un prefisso
 # permesso ("git push --force" comincia con "git").
@@ -103,7 +112,7 @@ SERVICE_PATHS = (
 def _stages_paths(stages):
     allowed = []
     for stage in stages:
-        for entry in pipeline_gate.STAGE_PATHS[stage]:
+        for entry in GUARDED_STAGES[stage]:
             if entry not in allowed:
                 allowed.append(entry)
     return tuple(allowed)
@@ -195,7 +204,7 @@ def close_verdict(stages, cwd=None):
 def main():
     parser = argparse.ArgumentParser(description="La guardia per-agente della catena.")
     parser.add_argument("--stage", action="append", required=True,
-                        choices=sorted(pipeline_gate.STAGE_PATHS),
+                        choices=sorted(GUARDED_STAGES),
                         help="ripetibile: il cacciatore chiude anche da promotore")
     parser.add_argument("--check", choices=("tool", "close"), default="tool")
     args = parser.parse_args()

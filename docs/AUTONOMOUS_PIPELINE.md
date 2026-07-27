@@ -394,9 +394,12 @@ falliva, e non arrivava in nessuna pagina. Un prompt che ricopia una regola va
 fuori sincrono senza che nessuno se ne accorga, un prompt che punta a un file no.
 
 **La Routine adesso e' una sola**, ed e' quella del dispatcher: gli stadi non
-hanno piu' un cron proprio. Il prompt lancia
-`scripts/pipeline_dispatch.py --json --check-open-prs`, legge quale stadio ha
-detto, e invoca quell'agente con il `run_id` che il dispatcher ha coniato.
+hanno piu' un cron proprio. Anche il dispatcher e' un agente a pieno titolo
+(`.claude/agents/dispatcher.md`, con modello e guardia nel frontmatter come
+gli altri sei): lancia `scripts/pipeline_dispatch.py --json --check-open-prs
+--record`, legge quale stadio ha detto, e invoca quell'agente con il `run_id`
+che il dispatcher ha coniato. Il prompt della Routine e' un puntatore a quella
+definizione, mai una copia.
 
 Il vantaggio non e' solo la concorrenza. Sei cron erano anche sei promesse
 ricopiate in `pipeline_log.WATCH_GROUPS`, che nessuno poteva verificare da

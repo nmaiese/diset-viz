@@ -71,41 +71,19 @@ una Routine legata a una sessione esistente accumulerebbe il contesto di tutti i
 giri precedenti, che è esattamente ciò che rende un agente incoerente con i file
 che ha davanti.
 
-### Il prompt, per intero
+### Il prompt, adesso un puntatore
 
-Si copia com'è. Non ricopia nessuna regola: le indica, ed è la lezione più cara
-di questo sistema (vedi sotto, `analyst_notes.json`).
+Il giro del dispatcher (le tre uscite, un solo stadio per volta, l'errore
+registrato senza indovinare) vive in **`.claude/agents/dispatcher.md`**, con
+modello e guardia nel frontmatter come ogni altro agente della catena. Questo
+documento non lo ricopia più: la versione che stava qui era l'ultima copia di
+contratto dentro un prompt di Routine, cioè la forma esatta del drift di
+`analyst_notes.json` (vedi sotto). Il prompt della Routine si copia com'è:
 
 ```
-Sei il dispatcher della catena editoriale di Divario Italia.
-Non fai il lavoro di nessuno stadio: decidi chi tocca, e ne lanci uno solo.
-
-1. Lancia:
-   python3 scripts/pipeline_dispatch.py --json --check-open-prs --record
-
-   Guarda l'uscita, che dice tre cose diverse:
-     0  ha nominato uno stadio, vai al punto 3
-     1  non c'e' niente da lanciare, vai al punto 2
-     2  il dispatcher stesso e' fallito, vai al punto 4
-
-2. Uscita 1: la run finisce qui, ed e' la risposta normale a code vuote. Il
-   giro e' gia' registrato dal flag --record. Non scrivere altre righe di
-   diario, non aprire pull request, non committare niente. Riporta in una
-   riga il campo `reason` e fermati.
-
-3. Uscita 0: invoca l'agente indicato dal campo `agent` (la sua definizione
-   sta in .claude/agents/<agent>.md) e passagli il `run_id` del piano.
-   L'agente obbedisce a docs/AGENT_CONTRACT.md, che dice come apre e come
-   chiude la run, compreso il passaggio del run_id al passo di merge.
-
-4. Uscita 2: non indovinare quale stadio toccherebbe. Registra l'errore con
-   quello che c'e' su stderr, e fermati:
-   python3 scripts/pipeline_log.py --write --stage dispatch --outcome error \
-       --trigger dispatch --summary "una riga su che cosa e' fallito"
-
-Non lanciare piu' di uno stadio per giro, e non lanciarne uno che il
-dispatcher non ha nominato. L'unica cosa che impedisce a due stadi di
-scriversi addosso e' che ne giri uno per volta: non c'e' nessun lock sotto.
+Agisci come il dispatcher della catena editoriale di Divario Italia. La tua
+definizione sta in .claude/agents/dispatcher.md ed è vincolante: leggila ed
+eseguila. Fai UN giro e fermati.
 ```
 
 Le tre uscite sono distinte per una ragione precisa. `1` capita la maggior parte

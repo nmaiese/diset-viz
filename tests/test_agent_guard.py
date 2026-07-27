@@ -96,6 +96,22 @@ class PathVerdictTests(unittest.TestCase):
             "data/pipeline/.session_meta.json", ["writer"])
         self.assertTrue(ok)
 
+    def test_dispatch_may_write_the_journal_only(self):
+        # Il dispatcher non e' uno stadio del cancello ma la guardia lo
+        # sorveglia come gli altri: diario si', code degli stadi no.
+        ok, _ = agent_guard.path_verdict(
+            "data/pipeline/runs/dispatch-x.json", ["dispatch"])
+        self.assertTrue(ok)
+        ok, _ = agent_guard.path_verdict(
+            "data/discovery/source_candidates.csv", ["dispatch"])
+        self.assertFalse(ok)
+
+    def test_dispatch_stays_out_of_the_gate(self):
+        # La voce vive nella guardia, non in STAGE_PATHS: il cancello non deve
+        # mai imparare uno stadio che non giudica.
+        self.assertNotIn("dispatch", pipeline_gate.STAGE_PATHS)
+        self.assertIn("dispatch", agent_guard.GUARDED_STAGES)
+
 
 class CloseVerdictTests(unittest.TestCase):
     def _fake_git(self, branch):
