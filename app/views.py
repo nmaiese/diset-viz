@@ -68,6 +68,22 @@ _HOME_COMPARE_REGIONS = ("lombardia", "lazio", "campania")
 _HOME_COMPARE_COLORS = ("var(--ink)", "var(--accent)", "var(--positive-ink)")
 
 
+@app.context_processor
+def _inject_license():
+    """Licenza dei dati in ogni template, presa da `app/sources.py`.
+
+    Il JSON-LD della pagina regione, quello della classifica e la FAQ della
+    metodologia dicono tutti la stessa cosa: se la scrivono ognuno per conto suo,
+    la prossima correzione ne trova due su tre. `data_licenses_label` è una
+    funzione perché la classifica sa solo a render time quali famiglie sono
+    davvero nel punteggio."""
+    return {
+        "data_license_url": sources.LICENSE_URL,
+        "data_license_label": sources.LICENSE_LABEL,
+        "data_licenses_label": sources.licenses_label,
+    }
+
+
 def _client_ip():
     """IP del client, rispettando X-Forwarded-For dietro il proxy Cloud Run."""
     fwd = request.headers.get("X-Forwarded-For", "")
@@ -1393,7 +1409,7 @@ def llms_txt():
         "",
         "## Note per i modelli linguistici",
         "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori.",
-        "- Licenza dei dati: Creative Commons BY 3.0 IT. Cita \"Divario Italia\" e la fonte Istat.",
+        f"- Licenza dei dati: {sources.LICENSE_LABEL}. Cita \"Divario Italia\" e la fonte Istat.",
         f"- Dati strutturati per indicatore: {SITE_URL}/download/indicator/<id>.csv e {SITE_URL}/download/indicator/<id>.json.",
         f"- Indice completo delle pagine: {SITE_URL}/sitemap.xml.",
         f"- Versione estesa con definizioni e classifiche complete: {SITE_URL}/llms-full.txt.",
@@ -1463,8 +1479,8 @@ def llms_full_txt():
         "alcuni un valore piu alto e positivo, per altri e negativo, per altri "
         "serve solo come contesto. I confronti descrivono differenze osservate "
         "tra territori e non dimostrano da soli un rapporto di causa. Anni e "
-        "coperture possono variare tra indicatori. Licenza dei dati: Creative "
-        "Commons BY 3.0 IT.",
+        "coperture possono variare tra indicatori. Licenza dei dati: "
+        f"{sources.LICENSE_LABEL}.",
         "",
         "## Indicatori in evidenza, testo completo",
     ]

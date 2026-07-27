@@ -409,6 +409,35 @@ class AppSmokeTest(unittest.TestCase):
             for block in re.findall(r'<script type="application/ld\+json">\s*(\{.*?\})\s*</script>', html, re.S):
                 json.loads(block)
 
+    def test_license_is_stated_the_same_way_on_every_surface(self):
+        """Every page that names the licence in prose must name the one in
+        `app/sources.py`, and none may still carry an older deed.
+
+        The JSON-LD test above covers the machine-readable claim only. When Istat
+        turned out to be CC BY 4.0 and not CC BY 3.0 IT, the fix landed on the
+        structured data and left the methodology FAQ and both llms.txt files
+        telling readers, and language models, the opposite."""
+        from app import sources
+
+        client = app.test_client()
+        surfaces = {
+            "/metodologia": client.get("/metodologia").data.decode("utf-8"),
+            "/llms.txt": client.get("/llms.txt").data.decode("utf-8"),
+            "/llms-full.txt": client.get("/llms-full.txt").data.decode("utf-8"),
+        }
+        for path, body in surfaces.items():
+            self.assertIn(sources.LICENSE_LABEL, body, path)
+            # No stale deed anywhere, in prose or in a URL.
+            self.assertNotIn("BY 3.0", body, path)
+            self.assertNotIn("licenses/by/3", body, path)
+
+        # And the registry itself stays coherent: every family declares a deed,
+        # spelled with the same version the URL points at.
+        for family, meta in sources.SOURCES.items():
+            self.assertTrue(meta.get("license"), family)
+            self.assertEqual(meta.get("license_url"), sources.LICENSE_URL, family)
+            self.assertIn("4.0", meta["license"], family)
+
     def test_indicator_page_has_data_derived_depth(self):
         from app.data import get_catalog
         from app import profiles
