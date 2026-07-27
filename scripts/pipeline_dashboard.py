@@ -281,6 +281,39 @@ def _journal_rows(entries, limit=25):
             "<th>che cosa ha fatto</th></tr>" + "\n".join(rows) + "</table></div>")
 
 
+def _stage_metric_rows(entries):
+    """L'aggregato per stadio: quante run, quante da guardare, quanto durano,
+    con quale modello. I campi di provenienza sono best-effort nel diario,
+    quindi qui una colonna vuota significa "le run vecchie non li avevano",
+    non un errore: la tabella diventa piu' piena a ogni run nuova.
+    """
+    if not entries:
+        return "<p class='empty'>Nessuna run registrata, quindi niente da aggregare.</p>"
+    by_stage = {}
+    for entry in entries:
+        by_stage.setdefault(entry.get("stage") or "?", []).append(entry)
+    rows = []
+    for stage in [s for s in pipeline_log.STAGES if s in by_stage]:
+        runs = by_stage[stage]
+        attention = sum(1 for r in runs if r.get("outcome") in pipeline_log.ATTENTION)
+        durations = [r["duration_seconds"] for r in runs
+                     if isinstance(r.get("duration_seconds"), (int, float))]
+        avg = f"{sum(durations) / len(durations) / 60:.0f} min" if durations else ""
+        models = sorted({r["model"] for r in runs if r.get("model")})
+        last = max(runs, key=lambda r: r.get("at") or "")
+        rows.append(
+            f"<tr><td><strong>{_esc(stage)}</strong></td>"
+            f"<td class='n'>{len(runs)}</td>"
+            f"<td class='n'>{attention or ''}</td>"
+            f"<td class='n'>{_esc(avg)}</td>"
+            f"<td>{_esc(', '.join(models))}</td>"
+            f"<td class='mono'>{_esc((last.get('at') or '')[:10])}</td></tr>"
+        )
+    return ("<div class='scroll'><table><tr><th>stadio</th><th class='n'>run</th>"
+            "<th class='n'>da guardare</th><th class='n'>durata media</th>"
+            "<th>modello</th><th>ultima</th></tr>" + "\n".join(rows) + "</table></div>")
+
+
 def _commit_rows(commits):
     if not commits:
         return "<p class='empty'>Nessun commit della catena nella storia recente.</p>"
@@ -391,6 +424,11 @@ def render(out_path=None):
 <section>
 <h2>Che cosa hanno fatto gli agenti</h2>
 {_journal_rows(entries)}
+</section>
+
+<section>
+<h2>Gli stadi, in aggregato</h2>
+{_stage_metric_rows(entries)}
 </section>
 
 <section>

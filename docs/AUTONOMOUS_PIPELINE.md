@@ -404,6 +404,21 @@ dentro il repo: se cambiava la schedulazione, quella tabella andava fuori
 sincrono in silenzio. Con un battito solo, quello che va sorvegliato e' un
 battito solo, e il tick lo registra invece di dichiararlo.
 
+La stessa lezione anti-drift vale dentro `.claude/`. Ogni agente dichiara nel
+frontmatter il proprio **modello** (niente modello implicito ereditato dalla
+sessione: un cambio di default cambierebbe il giudizio editoriale in silenzio)
+e i propri **hook**: `scripts/agent_guard.py` applica il perimetro di
+`STAGE_PATHS` e una allowlist di comandi al momento del gesto, PreToolUse per
+PreToolUse, e allo Stop rifiuta la chiusura di una run su `automation/*` senza
+la riga di diario. La procedura di chiusura, le regole sui contenuti web e le
+classi di errore della rilettura non sono piu' ricopiate nei sei prompt: sono
+tre skill condivise in `.claude/skills/` (`pipeline-close-run`,
+`untrusted-web`, `indicator-review`), una copia sola a cui i prompt puntano.
+Il cancello, oltre che nel passo di merge, gira anche in CI sui branch
+`automation/*` (job `gate` di `.github/workflows/ci.yml`), quindi la politica
+`checks` lo aspetta come aspetta la suite. Prima di cambiare modello, prompt,
+skill o hook: [`CANARY.md`](CANARY.md) e le eval in `evals/`.
+
 ## Quando qualcosa va storto
 
 ```bash

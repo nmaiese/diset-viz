@@ -61,7 +61,11 @@ ignorava, e sei Routine indipendenti si pestavano i piedi.
 | dispatcher | oraria (`0 * * * *`) | `pipeline_dispatch.py`, poi lancia lo stadio che ha nominato | **da creare** |
 
 Impostazioni: **sessione nuova a ogni firing** (non legata a una sessione
-esistente), environment `divarioitalia`, modello quello di default. La sessione
+esistente), environment `divarioitalia`, modello quello di default. Il modello
+della sessione decide solo il dispatcher: ogni agente di stadio dichiara il
+proprio nel frontmatter (`.claude/agents/`, campo `model`), e la riga di
+diario di ogni run registra `model` e `claude_code_version`, quindi una
+regressione osservata dopo il fatto si attribuisce da li'. La sessione
 nuova non è un dettaglio: il prompt qui sotto è scritto per partire da zero, e
 una Routine legata a una sessione esistente accumulerebbe il contesto di tutti i
 giri precedenti, che è esattamente ciò che rende un agente incoerente con i file

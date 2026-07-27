@@ -226,6 +226,13 @@ branch: sono le run che serve di piu' poter leggere.
 Il diario non puo' andare in conflitto. Ogni run scrive il proprio file, quindi
 non c'e' un punto condiviso su cui due stadi possano scrivere insieme.
 
+Alla riga si aggiungono da soli, quando l'ambiente li sa, i campi di
+provenienza: `model`, `claude_code_version`, `session_id`, `duration_seconds`
+e `base_commit`. Non li passi tu e non li inventi: `pipeline_log.py` li legge
+dall'ambiente e dal meta di sessione che l'hook di avvio lascia in locale.
+Esistono perche' una regressione di qualita' dopo un cambio di modello o di
+runtime, senza di loro, non ha nessuna pista nel diario.
+
 Chi legge, legge cosi':
 
 ```bash

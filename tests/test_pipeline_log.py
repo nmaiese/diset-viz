@@ -33,6 +33,37 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         self.assertEqual(entries[0]["outcome"], "nothing")
         self.assertTrue(entries[0]["at"])
 
+    def test_the_row_says_who_produced_the_run_when_it_can(self):
+        """I campi di provenienza (sessione, durata, base) sono best-effort:
+        presenti quando l'ambiente li sa, mai stringhe vuote da leggere per
+        niente. Senza, una regressione dopo un cambio di modello o di runtime
+        non ha nessuna pista nel diario."""
+        from unittest import mock
+
+        with TemporaryDirectory() as tmp:
+            meta = Path(tmp) / "meta.json"
+            meta.write_text(json.dumps({
+                "session_id": "sess-prova",
+                "started_at": "2026-07-27T06:00:00+00:00",
+            }), encoding="utf-8")
+            with mock.patch.object(pipeline_log, "SESSION_META", meta):
+                entry = pipeline_log.build_entry("writer", "nothing", "x")
+        self.assertEqual(entry["session_id"], "sess-prova")
+        self.assertIsInstance(entry["duration_seconds"], int)
+        self.assertGreaterEqual(entry["duration_seconds"], 0)
+        # La base c'e' sempre su un checkout con master, ed e' distinta
+        # dall'HEAD della run: e' cio' che rende ricostruibile il diff.
+        self.assertTrue(entry.get("base_commit"))
+
+    def test_a_checkout_without_a_session_writes_fewer_fields_not_empty_ones(self):
+        from unittest import mock
+
+        with TemporaryDirectory() as tmp:
+            with mock.patch.object(pipeline_log, "SESSION_META", Path(tmp) / "assente.json"):
+                entry = pipeline_log.build_entry("writer", "nothing", "x")
+        self.assertNotIn("session_id", entry)
+        self.assertNotIn("duration_seconds", entry)
+
     def test_an_unknown_stage_or_outcome_is_refused(self):
         """Il vocabolario e' corto di proposito: un campo libero si riempirebbe
         di sinonimi e l'aggregato diventerebbe illeggibile."""
