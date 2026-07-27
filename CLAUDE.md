@@ -160,10 +160,20 @@ Always start from the deterministic data brief, never from ad-hoc API calls:
 
 ```bash
 .venv/bin/python -m scripts.indicator_brief ter-178     # everything about one indicator
+python3 scripts/definition_check.py --show ter-178      # what the source says it counts
 .venv/bin/python -m scripts.text_queue                  # what still needs an editor
 .venv/bin/python -m scripts.review_queue                # what still needs a reader
 python3 scripts/prose_lint.py --summary                 # how the prose is doing, as a number
 ```
+
+The second line is the newest and the least obvious. Everything else compares
+the prose to the **series**; that one compares it to Istat's own definition,
+from the `Metadati` sheet of the Banca dati territoriale, normalized into
+`data/definitions/istat_territoriali.csv` by `scripts/fetch_definitions.py`. It
+exists because rereading eleven articles against the data turned up no
+arithmetic error at all and four wrong descriptions of what the indicator
+counts: a wrong figure dies at the first reader who opens the brief, a wrong
+definition is confirmed as correct by every reading that checks the numbers.
 
 The brief's last block ranks the whole theme by rank correlation and says which
 indicators draw the same map as this one, which the opposite, and which one that

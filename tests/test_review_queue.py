@@ -37,7 +37,7 @@ def _entry(body, **extra):
 
 class RiskFlags(unittest.TestCase):
     def flags(self, body, view=None, **extra):
-        row = review_queue.assess("178", _entry(body, **extra), view or _view())
+        row = review_queue.assess("178", _entry(body, **extra), view or _view(), definitions={})
         return row["flags"]
 
     def test_a_universal_claim_is_flagged(self):
@@ -52,7 +52,8 @@ class RiskFlags(unittest.TestCase):
         body = "È il valore più alto d'Europa."
         self.assertIn("esterno", self.flags(body))
         with_source = review_queue.assess(
-            "178", _entry(body, fonti=[{"testo": "Eurostat", "url": "https://ec.europa.eu"}]), _view(),
+            "178", _entry(body, fonti=[{"testo": "Eurostat", "url": "https://ec.europa.eu"}]),
+            _view(), definitions={},
         )
         self.assertNotIn("esterno", with_source["flags"],
                          "a verified source is exactly what clears this claim")
@@ -62,6 +63,7 @@ class RiskFlags(unittest.TestCase):
         self.assertNotIn("provincia", self.flags(body))
         provincial = review_queue.assess(
             "bes:10AMB008", _entry(body, level="provincia"), _view("provincia"),
+            definitions={},
         )
         self.assertIn("provincia", provincial["flags"])
 
@@ -74,21 +76,74 @@ class RiskFlags(unittest.TestCase):
         self.assertEqual(self.flags("La Sardegna ha guadagnato 11,00 punti in dieci anni."), {})
 
 
+# The definitions are passed in everywhere above so these tests keep saying what
+# they were written to say. Here they are the subject, so they are supplied.
+DEFINITIONS = {
+    "178": {
+        "indicatore": "Imprenditorialità femminile",
+        "definizione": (
+            "Titolari di imprese individuali donne in percentuale sul totale dei "
+            "titolari di imprese individuali iscritti nei registri delle Camere "
+            "di Commercio"
+        ),
+    }
+}
+
+
+class DefinitionFlag(unittest.TestCase):
+    """The gap the second batch exposed: prose against the source's own wording."""
+
+    def assess(self, body, definitions=DEFINITIONS):
+        # The denominator is looked for in the lead and the `definizione`
+        # section only, because that is the section whose job is to say what the
+        # page counts. A `quadro`-only fixture would test the wrong thing.
+        entry = {
+            "lead": "Un lead.",
+            "sections": [{"role": "definizione", "h": None, "body": body}],
+        }
+        return review_queue.assess("178", entry, _view(), definitions=definitions)
+
+    def test_an_article_that_renames_the_quantity_is_flagged(self):
+        row = self.assess("Misura la quota di imprese a guida femminile fra tutte le imprese.")
+        self.assertIn("definizione", row["flags"])
+
+    def test_an_article_that_uses_the_source_denominator_is_not(self):
+        row = self.assess(
+            "Conta le titolari donne di imprese individuali sul totale dei titolari "
+            "di imprese individuali iscritti ai registri delle Camere di Commercio."
+        )
+        self.assertNotIn("definizione", row["flags"])
+
+    def test_it_outranks_every_other_flag_including_rilettura(self):
+        """A wrong figure dies at the first reader. A wrong definition does not:
+        every reading that checks arithmetic confirms it, because the arithmetic
+        is right. That is why it sits at the top of the reading order."""
+        self.assertGreater(
+            review_queue.FLAG_WEIGHT["definizione"],
+            max(v for k, v in review_queue.FLAG_WEIGHT.items() if k != "definizione"),
+        )
+
+    def test_a_family_with_no_metadata_sheet_is_silent_not_clean(self):
+        """No definitions on disk must read as "no opinion", never as a pass."""
+        row = self.assess("Misura la quota di imprese a guida femminile.", definitions={})
+        self.assertNotIn("definizione", row["flags"])
+
+
 class ReadingOrder(unittest.TestCase):
     def test_a_causal_claim_outranks_an_echo(self):
-        causal = review_queue.assess("178", _entry("Cresce grazie agli incentivi."), _view())
-        echo = review_queue.assess("178", _entry("La media è 40,73."), _view())
+        causal = review_queue.assess("178", _entry("Cresce grazie agli incentivi."), _view(), definitions={})
+        echo = review_queue.assess("178", _entry("La media è 40,73."), _view(), definitions={})
         self.assertGreater(causal["score"], echo["score"])
 
     def test_an_indexable_page_outranks_a_noindex_one_with_the_same_flags(self):
         body = "Il valore è cresciuto ovunque."
-        yes = review_queue.assess("178", _entry(body), _view(indexable=True))
-        no = review_queue.assess("178", _entry(body), _view(indexable=False))
+        yes = review_queue.assess("178", _entry(body), _view(indexable=True), definitions={})
+        no = review_queue.assess("178", _entry(body), _view(indexable=False), definitions={})
         self.assertGreater(yes["score"], no["score"])
 
     def test_a_reviewed_article_leaves_the_reading_order(self):
         entry = _entry("Cresce grazie agli incentivi.", reviewed_at="2026-07-26")
-        row = review_queue.assess("178", entry, _view())
+        row = review_queue.assess("178", entry, _view(), definitions={})
         self.assertEqual(row["score"], 0)
         self.assertEqual(row["reviewed_at"], "2026-07-26")
         self.assertIn("causale", row["flags"], "the flag stays visible, only the priority drops")
@@ -108,7 +163,7 @@ class TheSignatureExpiresWithTheData(unittest.TestCase):
         entry = _entry(
             "Un testo pulito.", reviewed_at="2026-07-26", reviewed_vintage=2023, vintage=2024
         )
-        row = review_queue.assess("178", entry, _view())
+        row = review_queue.assess("178", entry, _view(), definitions={})
         self.assertIn("rilettura", row["flags"])
         self.assertGreater(row["score"], 0)
         self.assertEqual(row["reviewed_at"], "", "torna in coda come non firmato")
@@ -120,7 +175,7 @@ class TheSignatureExpiresWithTheData(unittest.TestCase):
         entry = _entry(
             "Un testo pulito.", reviewed_at="2026-07-26", reviewed_vintage=2023, vintage=2023
         )
-        row = review_queue.assess("178", entry, _view())
+        row = review_queue.assess("178", entry, _view(), definitions={})
         self.assertNotIn("rilettura", row["flags"])
         self.assertEqual(row["score"], 0)
         self.assertEqual(row["reviewed_at"], "2026-07-26")
@@ -129,16 +184,16 @@ class TheSignatureExpiresWithTheData(unittest.TestCase):
         """Unknown means "written before anyone recorded what was read", and the
         safe reading of unknown is re-read once, not trust forever."""
         entry = _entry("Un testo pulito.", reviewed_at="2026-07-26", vintage=2023)
-        row = review_queue.assess("178", entry, _view())
+        row = review_queue.assess("178", entry, _view(), definitions={})
         self.assertIn("rilettura", row["flags"])
 
     def test_a_re_read_outranks_every_risk_flag(self):
         stale = review_queue.assess(
             "178",
             _entry("Un testo pulito.", reviewed_at="2026-07-26", reviewed_vintage=2023, vintage=2024),
-            _view(),
+            _view(), definitions={},
         )
-        causal = review_queue.assess("178", _entry("Cresce grazie agli incentivi."), _view())
+        causal = review_queue.assess("178", _entry("Cresce grazie agli incentivi."), _view(), definitions={})
         self.assertGreater(stale["score"], causal["score"])
 
 
@@ -195,13 +250,13 @@ class TheCraftFlagSeesEveryTellThePrinterCounts(unittest.TestCase):
             "sections": [{"role": "quadro", "h": None,
                           "body": "Nei 2,79 punti in mezzo non cade nessun valore."}],
         }
-        row = review_queue.assess("178", entry, _view())
+        row = review_queue.assess("178", entry, _view(), definitions={})
         self.assertIn("mestiere", row["flags"])
 
     def test_a_closing_question_alone_does_not_flag_the_article(self):
         """It is on almost every article, so as a reading order signal it sorts
         nothing. It stays a backlog number in `prose_lint --summary`."""
-        row = review_queue.assess("178", _entry("E allora che cosa resta?"), _view())
+        row = review_queue.assess("178", _entry("E allora che cosa resta?"), _view(), definitions={})
         self.assertNotIn("mestiere", row["flags"])
 
 

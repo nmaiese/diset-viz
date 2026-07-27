@@ -253,6 +253,51 @@ python3 scripts/prose_lint.py --show 178
 python3 scripts/prose_lint.py --summary
 ```
 
+## La definizione, che è un'altra cosa dai numeri
+
+Tutto quello che sta qui sopra confronta l'articolo con **la serie**. Nessuna di
+quelle guardie confronta l'articolo con la **definizione della fonte**, e questa
+è la distinzione che conta: un numero sbagliato muore al primo lettore che apre
+il brief, una definizione sbagliata sopravvive a ogni rilettura che controlla
+l'aritmetica, perché l'aritmetica è giusta.
+
+Non è un'ipotesi. Rileggendo undici articoli contro i dati non è uscito **un
+solo errore di calcolo**, e sono uscite quattro descrizioni sbagliate di che
+cosa l'indicatore conta. `ter-402` chiamava "imprese a guida femminile" quello
+che Istat definisce come titolari donne di imprese individuali, e lo ripeteva
+nella sezione `limiti`, cioè nel punto che serve a dire che cosa l'indicatore
+non misura. `ter-72` scriveva "almeno dieci addetti" dove la fonte dice "più di
+dieci addetti", che è un'altra popolazione con le stesse parole.
+
+Per la famiglia territoriale la definizione ufficiale sta nel foglio `Metadati`
+di `Metainformazione.xls` della Banca dati territoriale, ed è ora in repo:
+
+```bash
+python3 scripts/fetch_definitions.py            # riscrive data/definitions/istat_territoriali.csv
+python3 scripts/definition_check.py --show ter-402
+python3 scripts/definition_check.py --summary
+```
+
+`scripts/xls_reader.py` legge il `.xls` con la sola libreria standard, perché
+gli script della catena girano su un checkout pulito prima che esista un venv.
+
+Il confronto è **lessicale e lo dichiara**: cerca le parole su cui poggia la
+definizione ufficiale e chiede se l'articolo le usa mai. Un sinonimo risulta
+mancante, e un articolo può usare tutte le parole giuste e descrivere lo stesso
+la cosa sbagliata. Quattro segnali, in ordine di quanto vale fidarsene:
+
+| segnale | che cos'è |
+| --- | --- |
+| `contraddizione` | l'articolo dice una cosa **diversa**, non una in meno: la classe di età della fonte non compare e ne compare un'altra, oppure "almeno N" dove la fonte dice "più di N". È l'unico che afferma invece di suggerire |
+| `base` | il denominatore che la fonte nomina non compare nella `definizione` scritta |
+| `soglia` | una soglia o una classe di età della fonte non compare da nessuna parte nell'articolo |
+| `termini` | l'articolo riprende meno di un terzo delle parole portanti della definizione. È la rete più larga e la più rumorosa, e per questo **non** entra nella coda |
+
+I primi tre diventano il segnale `definizione` di `scripts/review_queue.py`, che
+pesa più di ogni altro, `rilettura` compreso. Le famiglie senza foglio metadati
+(BES, Multiscopo, Eurostat, demografici) risultano `scoperto`: il controllo dice
+che non ha guardato, invece di dire che è tutto a posto.
+
 ## SEO e struttura
 
 La pagina serve prima di tutto gli intenti di definizione, confronto, fonte e

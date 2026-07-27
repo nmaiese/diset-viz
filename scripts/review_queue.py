@@ -10,6 +10,7 @@ thresholds asserted over a list of regions. Everything they cannot check is
 listed in `docs/INDICATOR_PAGES.md` and needs eyes. That list is not a vague
 warning, it is a set of patterns, and a pattern can be looked for:
 
+    definizione     the article describes a quantity the source does not define
     universale      "ovunque", "sempre", "da anni": one counter-example makes it false
     causale         "grazie a", "spinto da": the indicator shows no mechanism
     esterno         a claim about Europe or a national ranking with no source in `fonti`
@@ -22,8 +23,16 @@ hides, so they decide reading order rather than pass or fail. An article the
 reviewer has signed off carries `reviewed_at` and leaves the queue until its
 text or its data changes.
 
+`definizione` is the newest and it sorts above all the others, including
+`rilettura`. It comes from `scripts/definition_check`, which reads the article
+against Istat's own wording in `data/definitions/istat_territoriali.csv`. Every
+other signal here marks a sentence that might be false about the numbers; this
+one marks a sentence that might be false about what the page is even measuring,
+and that is the one class a reader checking arithmetic will confirm as correct.
+
     .venv/bin/python -m scripts.review_queue                # top of the queue
     .venv/bin/python -m scripts.review_queue --all
+    .venv/bin/python -m scripts.review_queue --flag definizione
     .venv/bin/python -m scripts.review_queue --flag causale
     .venv/bin/python -m scripts.review_queue --csv
     .venv/bin/python -m scripts.review_queue --show dem:OLDAGEDEPR
@@ -38,7 +47,8 @@ from pathlib import Path
 
 from app import indicator_texts, sources
 from app.indicator_view import build_indicator_view
-from scripts import prose_lint
+from scripts import definition_check, prose_lint
+from scripts.fetch_definitions import load_definitions
 
 TEXTS_PATH = Path(indicator_texts.__file__).resolve().parent / "static" / "data" / "indicator_texts.json"
 
@@ -84,7 +94,15 @@ DECIMAL = re.compile(r"\d+,\d+")
 # direction the mistake should point.
 CRAFT_TELLS = tuple(name for name in prose_lint.ALL_SIGNALS if name != "domanda")
 
+# The signals from `definition_check` that mean "this article may be describing
+# another quantity". `termini` is left out: it is a coverage ratio over the
+# official wording, and an article that says "chi lavora in azienda" for
+# "addetti" trips it while being right. It stays reachable from the script,
+# which is where a loose net belongs.
+DEFINITION_SIGNALS = ("contraddizione", "base", "soglia")
+
 FLAG_LABELS = {
+    "definizione": "descrive una quantita' diversa da quella della fonte",
     "universale": "afferma un andamento generale",
     "causale": "attribuisce una causa",
     "esterno": "confronto fuori dal dataset senza fonte",
@@ -96,6 +114,15 @@ FLAG_LABELS = {
 # Weights: how much each pattern moves an article up the reading order. A causal
 # claim is the worst because it is invisible to every guard and reads as fact.
 FLAG_WEIGHT = {
+    # `definizione` is at the top, above even `rilettura`, and it is the only
+    # flag whose rank was decided by counting. Reading a batch of eleven
+    # articles against the data found no arithmetic error and four wrong
+    # descriptions of what the indicator counts. A wrong figure dies at the
+    # first reader who opens the brief; a wrong definition survives every
+    # reading that checks arithmetic, because the arithmetic is right. `ter-402`
+    # carried one into the `limiti` section, which is the place meant to say
+    # what the indicator does not measure.
+    "definizione": 50,
     # `rilettura` outranks the risk flags on purpose. The others mark a sentence
     # that *might* be wrong; this one marks an article whose figures have been
     # rewritten since anybody read it, so nothing in it has been checked at all.
@@ -166,7 +193,7 @@ def _cockpit_figures(level):
     return out
 
 
-def assess(key, entry, view=None):
+def assess(key, entry, view=None, definitions=None):
     """Risk flags and a reading-order score for one article."""
     if view is None:
         family, raw_id = sources.split_internal_id(key)
@@ -203,6 +230,24 @@ def assess(key, entry, view=None):
         hits["mestiere"] = tells
 
     meta = view["meta"]
+    # The definitions CSV covers the territorial family only, and may not have
+    # been fetched at all on a fresh checkout. Both cases mean "no opinion", not
+    # "clean": `definition_check` says `scoperto` and the flag stays off.
+    if definitions is None:
+        definitions = load_definitions()
+    official = definitions.get(definition_check.official_id(key) or "")
+    if official:
+        found = definition_check.check_entry(
+            sources.indicator_code(meta["family"], meta["raw_id"]), entry, official
+        )["hits"]
+        clashes = [
+            f"{name}: {item}"
+            for name in DEFINITION_SIGNALS
+            for item in found.get(name, [])
+        ]
+        if clashes:
+            hits["definizione"] = clashes
+
     score = sum(FLAG_WEIGHT[flag] for flag in hits)
     if meta["indexable"]:
         score += 15
@@ -246,9 +291,12 @@ def assess(key, entry, view=None):
 
 def build_queue(texts=None):
     texts = texts if texts is not None else load_texts()
+    # Read once for the whole catalogue rather than once per article: 364 reads
+    # of the same CSV is the kind of thing that makes a tool too slow to run.
+    definitions = load_definitions()
     rows = []
     for key, entry in texts.items():
-        assessed = assess(key, entry)
+        assessed = assess(key, entry, definitions=definitions)
         if assessed is not None:
             rows.append(assessed)
     rows.sort(key=lambda row: (-row["score"], row["name"]))

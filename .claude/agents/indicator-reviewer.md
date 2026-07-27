@@ -65,17 +65,42 @@ how old it is:
 ```bash
 python3 scripts/pipeline_status.py --json                    # sempre per primo
 .venv/bin/python -m scripts.review_queue                     # ordine di lettura
+.venv/bin/python -m scripts.review_queue --flag definizione  # descrive un'altra quantita'
 .venv/bin/python -m scripts.review_queue --flag rilettura    # i dati si sono mossi dopo la firma
 .venv/bin/python -m scripts.review_queue --flag causale      # una classe alla volta
 .venv/bin/python -m scripts.review_queue --flag mestiere     # i tell da bot che STYLE.md nomina
 .venv/bin/python -m scripts.review_queue --show ter-63       # l'articolo, con i segnali
 ```
 
-Work `rilettura` first when it is not empty. Those are published pages whose
-numbers changed under a signature that no longer applies.
+Work `definizione` first when it is not empty, then `rilettura`. The second is
+a published page whose numbers changed under a signature that no longer applies.
+The first is worse, and it is the newest thing in this prompt.
 
-Six patterns, each a class of claim a regex can find but only a person can
+Seven patterns, each a class of claim a regex can find but only a person can
 judge. A flag is a place to look, never a verdict.
+
+**`definizione` — the article describes a quantity the source does not define.**
+Every other check on this page, and every guard in the suite, compares the prose
+to the *series*. This one compares it to Istat's own wording. It exists because
+reading a batch of eleven articles against the data turned up **no arithmetic
+error at all** and four wrong descriptions of what the indicator counts.
+`ter-402` called "imprese a guida femminile" what Istat defines as women holding
+sole proprietorships, and said it again in `limiti`, the section whose job is to
+state what the indicator does not measure. `ter-72` wrote "almeno dieci addetti"
+where the source says "più di dieci addetti", a different population in the same
+words. Both survived a green suite, because the numbers were right.
+
+```bash
+python3 scripts/definition_check.py --show ter-402   # la fonte, e che cosa manca
+python3 scripts/definition_check.py --summary
+```
+
+Read the official definition, then read the `definizione` section beside it, then
+read `limiti`, which is where a wrong perimeter gets repeated as a caveat. Fix
+the prose to the source, never the other way round, and if the source itself is
+ambiguous say so in the article rather than picking a reading. The check covers
+the territorial family only: on `bes-*`, `ims-*`, `eur-*` and `dem-*` it reports
+`scoperto`, which means nobody looked, so on those you look yourself.
 
 **`universale` — "ovunque", "sempre", "da anni", "in tutte le regioni".**
 One counter-example makes the sentence false. The brief settles it in one look:

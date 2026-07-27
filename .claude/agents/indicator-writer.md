@@ -54,6 +54,36 @@ For an indicator with two territorial levels, read both:
 .venv/bin/python -m scripts.indicator_brief bes-01SAL001 --level provincia
 ```
 
+## Then read the definition, before you write the `definizione`
+
+```bash
+python3 scripts/definition_check.py --show <codice>
+```
+
+For the territorial family this prints Istat's own wording, from the `Metadati`
+sheet of the Banca dati territoriale. Read it, and write the `definizione`
+section against **that**, not against the indicator's title.
+
+This is not a formality. Reading eleven finished articles against the data
+turned up no arithmetic error and four wrong descriptions of what the indicator
+counts, all written under a green suite. The title of `ter-402` is
+"Imprenditorialità femminile"; the definition is "titolari di imprese
+individuali donne sul totale dei titolari di imprese individuali", and an
+article that writes "imprese a guida femminile" from the title alone is wrong
+about the whole page. `ter-72` is titled "utilizzo di Internet nelle imprese"
+and counts **addetti**, not firms, in companies with more than ten employees.
+
+Three things in the official definition are worth copying into the prose in
+plain words, because they are what the title hides: the **numerator**, the
+**denominator** (the thing the share is out of), and any **threshold or age
+band**. If the source draws the perimeter at "più di dieci addetti", never write
+"almeno dieci": it is a different population in the same words, and the tool
+will catch it, which means a reviewer will spend an afternoon on it.
+
+On `bes-*`, `ims-*`, `eur-*` and `dem-*` the tool says `scoperto`, because those
+families publish their metadata elsewhere. There the definition is yours to find
+at the source, and the same three questions apply.
+
 Then read `content/STYLE.md`, which is binding, and
 [`docs/WRITING_RUBRIC.md`](../../docs/WRITING_RUBRIC.md), which is the bar. Ten
 criteria, and an article under 14 out of 20 is not ready. Score your own draft
