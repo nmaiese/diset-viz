@@ -26,7 +26,10 @@
   {% for section in article.sections %}
   <h2 id="sezione-{{ section.role }}">{{ section.heading }}</h2>
   {% if section.authored %}
-  {{ section.body | analyst_html }}
+  {# prose_html, not analyst_html: this is block content and the macro opens no
+     <p> around it, so the wrapper has to survive or a one-paragraph section
+     renders as a bare text node and loses its spacing. #}
+  {{ section.body | prose_html }}
   {% elif section.role == 'definizione' %}{{ definizione(meta, level) }}
   {% elif section.role == 'quadro' %}{{ quadro(meta, level) }}
   {% elif section.role == 'dinamica' %}{{ dinamica(meta, level) }}

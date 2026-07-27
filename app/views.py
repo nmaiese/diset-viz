@@ -112,20 +112,49 @@ def it_plural_filter(count, singular, plural):
     return indicator_notes.it_plural(count, singular, plural)
 
 
-@app.template_filter("analyst_html")
-def analyst_html(text):
-    """Render an analyst note (plain prose with inline markdown links) to safe
-    HTML. Strips the single wrapping <p> so the fragment can sit inside an
-    existing <p> in the templates."""
+def _markdown_html(text):
+    """Prose with inline markdown links, rendered to safe HTML."""
     import markdown as _markdown
     from markupsafe import Markup
 
     if not text:
         return ""
-    html = _markdown.markdown(str(text), output_format="html5").strip()
+    return Markup(_markdown.markdown(str(text), output_format="html5").strip())
+
+
+@app.template_filter("analyst_html")
+def analyst_html(text):
+    """An inline fragment, for a template that already opened a <p>.
+
+    Strips the single wrapping <p>, because nesting one inside another is
+    invalid HTML and the browser closes the outer one early. Use it only where
+    the template supplies the block element, which today is the page lead.
+    """
+    html = str(_markdown_html(text))
+    if not html:
+        return ""
     if html.startswith("<p>") and html.endswith("</p>") and html.count("<p>") == 1:
-        html = html[3:-4]
-    return Markup(html)
+        from markupsafe import Markup
+
+        return Markup(html[3:-4])
+    return _markdown_html(text)
+
+
+@app.template_filter("prose_html")
+def prose_html(text):
+    """Block content that supplies its own paragraphs. Nothing is stripped.
+
+    The article sections used `analyst_html`, which was written for the old
+    analyst note that sat inside a <p> the template had already opened. The
+    section body does not: the macro emits it directly into the article div. So
+    a section of a single paragraph lost its wrapper and rendered as a bare text
+    node, and `.prose > * + *` in site.css gives its 1.1em only to *elements*.
+    The result was a one-paragraph section pinned to its own h2 while the
+    multi-paragraph ones below it kept the gap, on 710 sections across 355 of
+    the 364 articles. Invisible in the JSON, invisible in the diff, and visible
+    on every page.
+    """
+    return _markdown_html(text)
 
 
 def get_all_data():

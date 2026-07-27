@@ -236,6 +236,40 @@ class ParagraphsSurviveRendering(unittest.TestCase):
     def setUpClass(cls):
         cls.texts = _load()
 
+    def test_every_authored_section_renders_inside_a_block_element(self):
+        """A section body must never reach the page as a bare text node.
+
+        `analyst_html` strips the single wrapping <p>, which is right for the
+        page lead (the template already opened one) and wrong for a section
+        body (the macro does not). Under the wrong filter a one-paragraph
+        section rendered unwrapped, and `.prose > * + *` in site.css applies its
+        spacing to elements only, so that section sat flush against its own h2
+        while the multi-paragraph ones kept the gap. 710 sections in 355 of the
+        364 articles, on every page, and invisible in the JSON.
+        """
+        from app.views import prose_html
+
+        bare = []
+        for key, entry in self.texts.items():
+            for section in entry.get("sections") or []:
+                body = (section.get("body") or "").strip()
+                if body and not str(prose_html(body)).startswith("<"):
+                    bare.append((key, section.get("role")))
+        self.assertEqual(bare, [], f"sections rendering as a bare text node: {bare[:10]}")
+
+    def test_the_lead_filter_still_strips_its_wrapper(self):
+        """The other half of the same split, and the reason it exists.
+
+        The lead sits inside a <p class="page-lead"> the template opens, so a
+        second <p> nested in it is invalid HTML and the browser closes the outer
+        one early. Whoever unifies these two filters has to break one of these
+        two tests to do it.
+        """
+        from app.views import analyst_html, prose_html
+
+        self.assertEqual(str(analyst_html("Una frase sola.")), "Una frase sola.")
+        self.assertEqual(str(prose_html("Una frase sola.")), "<p>Una frase sola.</p>")
+
     def test_a_body_written_in_paragraphs_produces_more_than_one(self):
         from app.views import analyst_html
 
