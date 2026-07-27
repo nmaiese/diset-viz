@@ -75,9 +75,12 @@ Tre scostamenti, tutti in direzione di "misurabile invece di giudicato a naso":
    quali criteri restano a un lettore, e il giudice in cieco resta possibile ma
    non è la strada più corta a un numero che si muove.
 
-Resta non fatto, e consapevolmente: il giudice in cieco della 4b, e la
-riscrittura dell'arretrato. Il secondo è lavoro del revisore, un lotto alla
-volta, e adesso ha una coda che lo ordina e un numero che dice se sta funzionando.
+Il giudice in cieco, che qui era dato per rimandabile, è stato poi eseguito. Il
+lotto è girato per intero, scrittura e rilettura, ed è stato misurato. **Quello
+che ha misurato sta nella [Parte seconda](#parte-seconda--il-flusso-dopo-averlo-misurato),
+in fondo a questo documento, ed è il piano da cui parte il giro successivo.**
+Le sezioni numerate da qui in avanti restano come erano: sono il ragionamento
+che ha prodotto la Parte prima, non istruzioni ancora da eseguire.
 
 ---
 
@@ -532,6 +535,274 @@ Le quattro domande che il piano lasciava aperte, e la risposta che ha avuto ognu
 4. **Dove vive la rubrica.** File suo,
    [`docs/WRITING_RUBRIC.md`](WRITING_RUBRIC.md). Dentro il prompt del revisore
    sarebbe invisibile allo scrittore, che è chi deve raggiungerla.
+
+---
+
+## Parte seconda — il flusso, dopo averlo misurato
+
+La Parte prima è stata eseguita e poi messa alla prova su un lotto vero: dieci
+articoli scelti tra i più deboli del catalogo, riscritti da dieci agenti in
+parallelo, riletti da cinque revisori, e valutati alla fine da due giudici in
+cieco che non avevano scritto niente. Questa parte non propone di rifare quel
+giro. Propone di riparare le tre cose che quel giro ha mostrato rotte.
+
+**Il criterio di questa parte: non aggiungere niente a ciò che è già misurato
+bene.** Lo stadio di scrittura è misurato bene. Tutto il resto no.
+
+### 1. Che cosa ha detto la misura
+
+Il lotto: `ter-130`, `ter-167`, `ter-282`, `ter-285`, `ter-408`, `ter-429`,
+`ter-920`, `bes-02IST007-N22`, `bes-06POL012`, `bes-10AMB004`. Nove temi, due
+famiglie, quattro indicatori contestuali, un BES a due livelli.
+
+**La misura deterministica**, `scripts/prose_lint.py`, sui tre stadi:
+
+| | prima | scritto | riletto |
+|---|---|---|---|
+| sezioni scritte | 20/40 | 40/40 | 40/40 |
+| parole | 1.517 | 6.998 | 7.392 |
+| tell meccanici | 14 | 0 | 0 |
+| domande retoriche | 10 | 0 | 0 |
+| link interni | 0 | 33 | 33 |
+| fonti verificate | 0 | 16 | 16 |
+
+**Il giudizio in cieco**, due giudici indipendenti sulla rubrica a dieci criteri,
+versioni presentate come A e B con l'assegnazione alternata:
+
+| | prima | dopo | vittorie della versione nuova |
+|---|---|---|---|
+| giudice normale | 4,8 / 20 | 19,3 / 20 | 10 su 10 |
+| giudice severo | 3,0 / 20 | 18,9 / 20 | 10 su 10 |
+
+Accordo tra i due giudici: 1,2 punti di differenza media su 20, massima 3, e
+**tutti i disaccordi sulle versioni vecchie, nessuno sulle nuove**. Il giudice
+severo ha verificato tutte e dieci le coppie contro i dati e ha trovato cinque
+affermazioni false: tutte e cinque nelle versioni vecchie.
+
+Il salto di scrittura, quindi, è reale, grande e replicato da due misure
+indipendenti. Non è quello il problema.
+
+### 2. I tre buchi
+
+**Buco 1. La misura deterministica vale zero sullo stadio che decide la verità.**
+Guarda la terza colonna della prima tabella: la rilettura non muove nessuna
+metrica. Zero tell prima e zero dopo, 33 link prima e 33 dopo, 16 fonti prima e
+16 dopo. In quello stesso stadio i revisori hanno tolto, da dieci articoli su
+dieci: un'affermazione geografica falsa, una citazione attribuita a un istituto
+che non la fa, una cifra sbagliata di un centesimo, un controesempio che
+confermava invece di smentire, "undici posizioni" per dodici, "un punto solo"
+per due, "il massimo della serie" per uno di tre anni, un confronto in cui la
+popolazione era travestita da fenomeno.
+
+Non è un difetto di `prose_lint`, che fa esattamente quello che dichiara. È il
+limite della sua categoria: conta forme, e una affermazione falsa ha la stessa
+forma di una vera.
+
+**Buco 2. L'ultimo stadio consegna lavoro che nessuno legge.** I revisori hanno
+aggiunto 394 parole. `ter-920` è passato da 699 a 751, e le due frasi in più
+sono proprio quelle che correggono l'errore sulle ripartizioni. Nessuno le ha
+verificate. È strutturale, non un incidente: l'ultimo anello di qualunque catena
+firma da solo.
+
+**Buco 3. La rubrica è satura in alto.** Sei criteri su dieci danno 2,0 a
+*entrambi* i giudici sulle versioni nuove. Il criterio 3, filo unico, è quello
+che separa meno di tutti. I criteri 5 e 9, incroci e fonti, sono binari nei
+fatti: 0,0 prima e 2,0 dopo, senza nessun valore in mezzo, perché misurano
+presenza e non qualità.
+
+La rubrica separa perfettamente "scheletro vuoto" da "articolo scritto". È la
+distinzione che serviva quando è stata scritta e che tra qualche lotto non
+servirà più. Non separa buono da migliore, che è la domanda del giro successivo.
+
+### 3. Gli interventi
+
+Tre, in ordine di valore, più uno che è solo cadenza.
+
+#### 3.1 Un verificatore, il cui unico output è un numero
+
+**Il problema che risolve:** il buco 1, e gratis anche il buco 2.
+
+**Che cos'è.** Uno stadio nuovo, dopo il revisore, che non corregge niente. Legge
+il testo **finale** e produce una sola cosa: quante affermazioni ha controllato e
+quante il dato smentisce. Non riscrive, non firma, non apre pull request sulla
+prosa. Se trova qualcosa, quella diventa una riga di coda per il revisore.
+
+**Perché un agente e non uno script.** La forma di un'affermazione falsa è
+identica a quella di una vera, ed è per questo che il buco esiste. Ma l'*output*
+può essere strutturato e contabile anche se il giudizio non lo è.
+
+**Il dato che produce**, una riga per run in un file di diario dedicato:
+
+```json
+{"data": "...", "lotto": ["ter-130", "..."], "affermazioni_controllate": 47,
+ "smentite": 0, "dettaglio": []}
+```
+
+**La trappola da evitare, ed è la ragione per cui `affermazioni_controllate` sta
+nello schema:** senza quel campo, "zero smentite" e "non ho guardato" sono lo
+stesso numero. Un verificatore che non dichiara quanto ha controllato non
+misura, rassicura.
+
+**Vincoli.** Non può essere lo stesso agente che ha scritto o riletto quel
+lotto. Deve leggere il testo pubblicato, non i draft.
+
+**Criterio di accettazione.** Girato sui dieci appena pubblicati deve dare zero
+smentite, girato su dieci articoli migrati e mai riletti deve darne più di zero.
+Se entrambi danno zero, il verificatore non funziona e il numero è una bugia.
+Questo doppio controllo va eseguito **prima** di credere alla prima cifra che
+produce.
+
+**Effort:** medio. È un prompt, uno schema e una riga di diario.
+
+#### 3.2 Ritarare la rubrica dove satura
+
+**Il problema che risolve:** il buco 3.
+
+**Che cosa cambia**, criterio per criterio, e solo dove la misura dice che serve:
+
+- **Criterio 2, nut graf.** Entrambi i giudici notano la stessa cosa: i pezzi
+  buoni dicono *quale sistema regge* e quasi mai *quante persone tocca*. Il 2
+  deve richiedere la grandezza, non solo la posta in gioco.
+- **Criterio 5, incroci.** Oggi misura presenza. Deve misurare scelta: un
+  correlato che è lo stesso fenomeno misurato due volte, cioè sopra `rho` 0,95,
+  vale 1 e non 2. Il brief già segnala quei casi, quindi il dato per giudicare
+  c'è.
+- **Criterio 9, fonti.** Stessa correzione: una fonte citata per il numero che il
+  cruscotto già stampa vale 1. Il 2 è per il contesto che la serie non può dare.
+- **Criterio 3, filo unico.** È quello che separa meno. O il testo del criterio
+  chiede qualcosa di più della coerenza fra due sezioni, o va assorbito nel
+  criterio 8.
+
+**Criterio di accettazione.** Rigiudicare in cieco gli stessi dieci con la
+rubrica ritarata. **Lo scarto fra il migliore e il peggiore dei dieci deve
+superare i tre punti.** Oggi è 17-20 per un giudice e 18-20 per l'altro, cioè la
+rubrica non li ordina.
+
+**Effort:** basso, è un file di testo. Ma va rimisurato, altrimenti si è solo
+cambiata un'opinione.
+
+#### 3.3 Il difetto residuo, già chiuso, e come si è trovato
+
+Vale come metodo più che come intervento. Il segnale che i due giudici hanno
+nominato indipendentemente, la stessa quantità detta due volte in due sezioni,
+è diventato un controllo in `prose_lint` (`ripetuto`).
+
+**La lezione riusabile:** il modo per far nascere un controllo deterministico
+nuovo non è immaginarlo, è leggere che cosa due giudici indipendenti hanno
+scritto nella stessa casella. Un difetto che due lettori diversi nominano da soli
+è un difetto reale e spesso ha una forma.
+
+**Il contro-esempio, che vale quanto l'esempio.** Ho provato a costruire una
+guardia per le affermazioni ordinali, che sono la classe di errore più
+frequente fra quelle che i revisori hanno corretto ("undici posizioni" per
+dodici, l'eccezione attribuita alla regione sbagliata). Misurata: il frame
+sintattico stretto trova 7 occorrenze in 364 articoli, e allargarlo produce
+falsi. Gli errori veri erano formulati in modi che una regex non lega al dato.
+**Quella guardia non va scritta**, e il fatto che sia stata misurata prima di
+scriverla è il motivo per cui non è costata niente.
+
+#### 3.4 L'arretrato, che è solo cadenza
+
+Non serve un meccanismo nuovo. La catena funziona, va fatta girare.
+
+Il catalogo oggi: **326 articoli su 364 chiudono un paragrafo con una domanda
+retorica**, e 346 su 364 non linkano nessun altro indicatore. Un lotto da dieci
+ha spostato gli articoli con almeno un link da 6 a 18.
+
+A dieci per volta servono circa 35 lotti. La coda che li ordina esiste già
+(`scripts.review_queue`), e ordina per rischio e per indicizzabilità, che è
+l'ordine giusto: si comincia dalle pagine che qualcuno legge davvero.
+
+### 4. Che cosa non fare
+
+Tre cose che la misura dice esplicitamente di non fare, e vale la pena scriverle
+perché sono tutte tentazioni ragionevoli.
+
+- **Non aggiungere altre metriche deterministiche sullo stadio di scrittura.** È
+  già misurato da due strumenti indipendenti che concordano, e satura. Ogni
+  metrica nuova lì dentro misura una cosa che sappiamo già.
+- **Non trasformare `prose_lint` in un cancello.** La sua precisione è alta e la
+  sua copertura no, di proposito. Un cancello su un segnale incompleto sposta il
+  lavoro dal migliorare la prosa al far tacere il linter, e la parte non coperta
+  peggiora senza che nessuno se ne accorga.
+- **Non regexare le affermazioni di conteggio e di posizione.** Vedi 3.3: è stato
+  misurato, non funziona.
+
+### 5. Rischi
+
+- **Il verificatore che rassicura.** Il rischio numero uno, ed è per questo che
+  il criterio di accettazione di 3.1 pretende un falso positivo prima di credere
+  a uno zero.
+- **La rubrica ritarata che sposta solo la scala.** Se alzare l'asticella porta
+  tutti i punteggi da 19 a 15 senza separarli, non si è misurato di più. Il
+  criterio è lo scarto interno al lotto, non la media.
+- **La saturazione che torna.** Fra qualche lotto anche i criteri ritarati
+  satureranno. È il destino di ogni rubrica e va accettato: si ritara di nuovo,
+  guardando dove i giudici smettono di essere in disaccordo.
+- **Il costo.** Un lotto da dieci sono dieci run di scrittura, cinque di
+  rilettura e due di giudizio. Aggiungere il verificatore ne fa una in più, non
+  dieci: legge un lotto intero.
+
+### 6. Il debito di curatela trovato per strada
+
+Tre difetti che non sono di scrittura e che nessuno stadio della catena può
+toccare, elencati qui perché altrimenti si perdono. Sono decisioni da curatore.
+
+- **`ter-282` ha `direction: lower_better`** mentre l'articolo argomenta che un
+  valore basso non certifica niente, perché conta delitti denunciati e quindi
+  anche l'attività di contrasto. Il cruscotto stampa "valori più bassi
+  raccontano una situazione migliore" sopra un testo che dice il contrario.
+  `contextual` sembra il verso giusto.
+- **`ter-130` ha l'unità sbagliata nei metadati.** Il catalogo dice `milioni di
+  euro`, la definizione Istat stampata sulla stessa pagina dice `migliaia di euro
+  concatenati`. La pagina mostra "Unità di misura milioni di euro" e una
+  variazione "in milioni di euro" che sono sbagliate di un fattore mille.
+- **`ter-167` e `ter-471` sono la stessa serie pubblicata due volte**, 580 punti
+  identici su 580, sotto due nomi diversi. Sono due pagine indicatore che
+  mostrano gli stessi numeri, ed entrambe entrano nei conteggi del tema.
+
+### 7. Che cosa ha insegnato la messa in opera
+
+Tre difetti trovati non nella prosa ma negli strumenti, tutti dello stesso tipo:
+si nascondevano dietro un aggiramento che non lascia traccia.
+
+- **Il `\n` singolo.** Un a-capo semplice dentro un corpo è un a-capo morbido in
+  Markdown, quindi la sezione produce un solo `<p>` e si legge come un muro
+  unico. Trovato da un revisore che guardava la pagina resa, invisibile nel JSON
+  e nel diff. Ora c'è una guardia.
+- **`analyst_html` che spoglia il wrapper.** Giusto per il lead, che sta dentro
+  un `<p>` già aperto; sbagliato per il corpo delle sezioni, che non ci sta. Una
+  sezione di un paragrafo arrivava in pagina come nodo di testo nudo e perdeva la
+  spaziatura, su 710 sezioni in 355 articoli. Ora sono due filtri.
+- **`review_queue --show` che accettava solo l'id interno.** La forma URL, che è
+  quella di ogni altro comando della catena e quella degli esempi nel prompt del
+  revisore, rispondeva "nessun articolo" per ogni indicatore. Trovato da un
+  revisore che ha aggirato usando il brief.
+
+**La regola che ne esce:** un controllo che ricostruisce quello che deve
+verificare non verifica niente. Il primo controllo del revisore sulla pagina resa
+non aveva visto il difetto dei paragrafi perché spogliava i tag e risplittava
+sulle righe, ricostruendo da sé i paragrafi che il browser non avrebbe mostrato.
+Il controllo giusto conta i `<p>` che il filtro emette davvero.
+
+E una nota sull'orchestrazione, che vale per i lotti e non per la catena in
+produzione, dove gli stadi girano uno alla volta: **la presenza di un file non è
+un segnale di completamento.** Dieci agenti in parallelo scrivono presto e
+rifiniscono dopo, e integrare alla comparsa del file ha preso quattro versioni
+intermedie su dieci. Il segnale è la chiusura dichiarata dall'agente.
+
+### 8. Ordine consigliato
+
+| # | Intervento | Effort | Dipende da |
+|---|---|---|---|
+| 1 | 3.1, il verificatore e il suo doppio controllo | Medio | niente |
+| 2 | 3.2, ritarare la rubrica | Basso | niente, ma si rimisura con 1 in piedi |
+| 3 | 3.4, i lotti dell'arretrato | Alto ma parallelo | 1 e 2, per sapere se stanno funzionando |
+| 4 | 6, il debito di curatela | Basso | decisione umana sul verso di `ter-282` |
+
+Il 3 è il lavoro vero e il 1 e il 2 esistono per sapere se il 3 sta andando bene
+o male. Farlo nell'ordine inverso significa riscrivere trecento articoli e
+scoprire alla fine di non avere un modo di dire se sono migliorati.
 
 ---
 
