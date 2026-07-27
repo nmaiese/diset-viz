@@ -1,0 +1,19 @@
+{
+ "at": "2026-07-27T21:56:01+00:00",
+ "base_commit": "f1ec48f",
+ "branch": "automation/scout-2026-07-27-c",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "e2e6ece",
+ "detail": [
+  "SDMX esploradati.istat.it/SDMXWS/rest -> HTTP 500 confermato di nuovo (anche su dataflow gia' cablato 22_293_DF_DCIS_INDDEMOG1_1); rejected: 2 dataset one-off Censimento industria/servizi 2011 (innovazione, internazionalizzazione) e 2 dataflow di trasporto marittimo duplicati di un indicatore di cabotaggio gia' in catalogo; needs-info: 4 permessi di costruire + 1 servizi sociali comuni + 2 conti flussi di materia (quattro controlli passati, solo il codice DATA_TYPE non verificabile per l'avaria), 1 imputati per reato e 2 chiamate 1522 (dominio gia' rappresentato), 3 percorsi diplomati (cadenza non confermata di recente), 2 ASIA imprese e addetti e 1 notti in viaggio (tema gia' denso, dubbio additivo)"
+ ],
+ "gate": "",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 0,
+ "queue_before": 21,
+ "run_id": "scout-20260727T214031Z-2fbb",
+ "stage": "scout",
+ "summary": "Triage dei 21 candidati new: 0 approvati (SDMX in avaria, cablaggio impossibile), 17 needs-info, 4 rejected",
+ "trigger": "manuale"
+}
