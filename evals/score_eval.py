@@ -27,6 +27,7 @@ EVALS = Path(__file__).resolve().parent
 BRIEF = EVALS / "writer" / "brief_ter-178.txt"
 REVIEWER_EXPECTED = EVALS / "reviewer" / "expected.json"
 VERIFIER_GOLD = EVALS / "verifier" / "claims.json"
+ADMISSIONS_GOLD = EVALS / "admissions" / "cases.json"
 
 # I caratteri che content/STYLE.md vieta in assoluto.
 BANNED = {"—": "em-dash", "–": "en-dash", ";": "punto e virgola",
@@ -143,6 +144,49 @@ def score_verifier(verdicts_path, gold_path=None):
     }
 
 
+def score_admissions(verdicts_path, gold_path=None):
+    """Verdetti di triage dell'ammissione contro il gold set, con precision e
+    recall sugli APPROVATI: una falsa approvazione fa entrare in una pagina
+    pubblica, sotto il nome del progetto, una fonte o un indicatore che non
+    doveva passare, e nessuno la rilegge. E' l'errore irreversibile della
+    catena, quindi e' quello che va misurato per primo (l'analogo della falsa
+    smentita nel verificatore). Un rinvio 'needs-info' costa poco: e' un esito
+    legittimo, non un errore."""
+    gold = json.loads(Path(gold_path or ADMISSIONS_GOLD).read_text(encoding="utf-8"))
+    produced = json.loads(Path(verdicts_path).read_text(encoding="utf-8"))
+    if isinstance(produced, dict) and "cases" in produced:
+        produced = {row["id"]: row.get("verdict") for row in produced["cases"]}
+    labels = {row["id"]: row["label"] for row in gold["cases"]}
+
+    right, wrong, missing, false_approvals = [], [], [], []
+    tp = fp = fn = 0
+    for case_id, label in labels.items():
+        verdict = produced.get(case_id)
+        if verdict in (None, ""):
+            missing.append(case_id)
+            continue
+        (right if verdict == label else wrong).append(case_id)
+        if label == "approvato" and verdict == "approvato":
+            tp += 1
+        elif label != "approvato" and verdict == "approvato":
+            fp += 1
+            false_approvals.append(case_id)
+        elif label == "approvato":
+            fn += 1
+    precision = tp / (tp + fp) if (tp + fp) else None
+    recall = tp / (tp + fn) if (tp + fn) else None
+    return {
+        "eval": "admissions",
+        "giusti": right,
+        "sbagliati": wrong,
+        "false_approvazioni": false_approvals,
+        "senza_verdetto": missing,
+        "accuratezza": f"{len(right)}/{len(labels)}",
+        "precision_approvati": precision,
+        "recall_approvati": recall,
+    }
+
+
 def self_test():
     """Il metro provato sul metro: fixture non corrette e gold contro se stesso."""
     failures = []
@@ -168,16 +212,40 @@ def self_test():
     if verifier["sbagliati"] or verifier["senza_verdetto"]:
         failures.append("verifier: il gold contro se stesso non fa punteggio pieno")
 
+    admissions_gold = {
+        row["id"]: row["label"]
+        for row in json.loads(ADMISSIONS_GOLD.read_text(encoding="utf-8"))["cases"]
+    }
+    tmp = EVALS / ".self_test_admissions.json"
+    tmp.write_text(json.dumps(admissions_gold), encoding="utf-8")
+    try:
+        admissions = score_admissions(tmp)
+        # Un'ammissione ingenua che approva tutto: la precision sugli approvati
+        # deve crollare, o il metro non vede la falsa approvazione (l'errore che
+        # esiste per prendere).
+        naive = {cid: "approvato" for cid in admissions_gold}
+        tmp.write_text(json.dumps(naive), encoding="utf-8")
+        naive_score = score_admissions(tmp)
+    finally:
+        tmp.unlink()
+    if admissions["sbagliati"] or admissions["senza_verdetto"]:
+        failures.append("admissions: il gold contro se stesso non fa punteggio pieno")
+    if admissions["precision_approvati"] != 1.0 or admissions["recall_approvati"] != 1.0:
+        failures.append("admissions: il gold contro se stesso non da' precision/recall pieni")
+    if not naive_score["false_approvazioni"] or (naive_score["precision_approvati"] or 1) >= 1.0:
+        failures.append("admissions: 'approva tutto' non fa crollare la precision, il metro e' cieco")
+
     for line in failures:
         print(f"SELF-TEST FALLITO: {line}")
     if not failures:
-        print("self-test ok: writer, reviewer e verifier misurano quel che devono")
+        print("self-test ok: writer, reviewer, verifier e admissions misurano quel che devono")
     return 1 if failures else 0
 
 
 def main():
     parser = argparse.ArgumentParser(description="Punteggio deterministico delle eval.")
-    parser.add_argument("eval", nargs="?", choices=("writer", "reviewer", "verifier"))
+    parser.add_argument("eval", nargs="?",
+                        choices=("writer", "reviewer", "verifier", "admissions"))
     parser.add_argument("target", nargs="?", help="il file o la directory da misurare")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -187,7 +255,7 @@ def main():
     if not (args.eval and args.target):
         parser.error("servono eval e target, oppure --self-test")
     scorer = {"writer": score_writer, "reviewer": score_reviewer,
-              "verifier": score_verifier}[args.eval]
+              "verifier": score_verifier, "admissions": score_admissions}[args.eval]
     print(json.dumps(scorer(args.target), ensure_ascii=False, indent=2))
     return 0
 

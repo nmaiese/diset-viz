@@ -1,0 +1,104 @@
+{
+  "_": [
+    "Gold set dell'ammissione: casi di triage da giudicare CONTRO LA DESCRIZIONE",
+    "CONGELATA di ogni caso, mai contro il catalogo vivo o il web: e' cio' che",
+    "rende l'esito ripetibile quando i cataloghi reali si muovono. Ogni caso ha",
+    "tutti i fatti che servono al giudizio scritti dentro (istituzione, licenza,",
+    "dettaglio territoriale, cadenza, additivita', e per i candidati copertura e",
+    "verso proposto). 'label' e' la verita'; l'agente sotto eval compila 'verdict'",
+    "con uno di (approvato / respinto / needs-info) e score_eval.py confronta.",
+    "L'errore che costa e' la FALSA APPROVAZIONE (approvare cio' che non doveva",
+    "entrare): finisce su una pagina pubblica sotto il nome del progetto e nessuno",
+    "la rilegge. Per questo la misura chiave e' la precision sugli approvati."
+  ],
+  "cases": [
+    {
+      "id": "a01",
+      "tipo": "fonte",
+      "caso": "Serie Istat SDMX 'Reddito disponibile delle famiglie consumatrici', dataflow con dettaglio per le 20 regioni, media annua pubblicata ogni anno. La pagina Istat della serie indica esplicitamente la licenza CC BY 4.0. Il catalogo oggi non ha nessuna misura di reddito familiare a livello regionale.",
+      "label": "approvato",
+      "classe": "additivo",
+      "why": "Quattro parti su quattro: istituto statistico, CC BY 4.0 nominabile dalla pagina, dettaglio regionale a cadenza annua, dominio (reddito familiare) assente dal catalogo."
+    },
+    {
+      "id": "a02",
+      "tipo": "fonte",
+      "caso": "Un 'Osservatorio' di una fondazione bancaria privata pubblica un indice regionale di benessere finanziario, aggiornato ogni anno, con una nota di metodo. La fondazione rielabora dati di piu' fonti in un punteggio proprio. La pagina concede il riuso citando la fonte.",
+      "label": "respinto",
+      "classe": "istituzionale",
+      "why": "Non e' un istituto statistico ne' un ente pubblico: e' una fondazione privata che aggrega ed elabora. Chi risponde della cifra non e' l'ente che la pubblica. Fallisce la prima parte, e la licenza generosa non la salva."
+    },
+    {
+      "id": "a03",
+      "tipo": "fonte",
+      "caso": "Un ministero pubblica una serie regionale annuale di spesa sanitaria pro capite. E' l'ente titolare del dato e la cadenza e' regolare. La pagina dice soltanto 'dati di libera consultazione'; non nomina nessuna licenza e non c'e' un termine di riuso che copra la ripubblicazione.",
+      "label": "needs-info",
+      "classe": "licenza",
+      "why": "Istituzionale, territoriale e regolare, ma la licenza non e' nominabile: 'libera consultazione' non e' un permesso di ripubblicazione. Manca un fatto verificabile, non un giudizio: needs-info col dubbio scritto, non un rifiuto ne' un'approvazione."
+    },
+    {
+      "id": "a04",
+      "tipo": "fonte",
+      "caso": "Eurostat pubblica 'Intramural R&D expenditure (GERD) by NUTS 2 regions', spesa in ricerca e sviluppo regionale, licenza Eurostat compatibile, cadenza annua. Il catalogo ha gia' eur-rd_e_gerdreg, la stessa serie GERD regionale della stessa fonte, gia' pubblicata.",
+      "label": "respinto",
+      "classe": "additivo",
+      "why": "Istituzionale, licenziata, territoriale e regolare: le prime tre parti passano. Ma non e' additiva, e' la stessa serie gia' nel catalogo. Un duplicato costa e non aggiunge un modo nuovo di dire una cosa."
+    },
+    {
+      "id": "a05",
+      "tipo": "fonte",
+      "caso": "Istat pubblica un indice nazionale mensile dei prezzi al consumo, licenza CC BY 4.0, serie lunga e regolare. Il dato esiste solo a livello nazionale: non c'e' disaggregazione regionale ne' provinciale per l'Italia.",
+      "label": "respinto",
+      "classe": "territoriale",
+      "why": "Istituto statistico, licenza nominabile, cadenza regolare: ma nessun dettaglio territoriale. Un atlante territoriale non puo' mettere in mappa un solo numero nazionale. Fallisce la parte territoriale, e non e' un dubbio da rinviare: il dato non ha la grana, punto."
+    },
+    {
+      "id": "a06",
+      "tipo": "candidato",
+      "caso": "Candidato indicatore da una fonte Istat gia' ammessa: quota di famiglie in poverta' assoluta, dettaglio regionale, copertura 0,94 sugli anni recenti, licenza CC BY 4.0. Verso proposto lower_better (meno poverta' e' meglio). Il vicino piu' prossimo nel catalogo e' il reddito familiare mediano, che misura il livello, non l'incidenza della poverta'.",
+      "label": "approvato",
+      "classe": "pieno",
+      "why": "Genuinamente additivo (l'incidenza della poverta' non e' il livello del reddito), copertura ben sopra 0,8, fonte istituzionale licenziata, verso direzionale e difendibile. Quattro condizioni su quattro."
+    },
+    {
+      "id": "a07",
+      "tipo": "candidato",
+      "caso": "Candidato indicatore: numero di brevetti registrati per milione di abitanti, dettaglio regionale. La serie e' rada: esiste un solo anno recente per le 20 regioni e prima ci sono buchi larghi. La copertura calcolata sugli anni recenti e' 0,35. Fonte istituzionale, licenza compatibile, verso higher_better plausibile.",
+      "label": "respinto",
+      "classe": "copertura",
+      "why": "Istituzionale, licenziata, verso difendibile: ma la copertura 0,35 e' sotto il pavimento 0,8 del cancello. Un anno solo di venti regioni non regge una classifica ne' una dinamica. La copertura rada e' un no, non un rinvio."
+    },
+    {
+      "id": "a08",
+      "tipo": "candidato",
+      "caso": "Candidato indicatore: eta' media della popolazione per regione, dettaglio regionale, copertura 0,97, fonte Istat licenziata. Il verso proposto e' higher_better (piu' alta e' meglio). Una regione con eta' media alta e' insieme piu' esperta e piu' anziana: non c'e' un estremo che un lettore ragionevole dica 'messo meglio'.",
+      "label": "needs-info",
+      "classe": "verso",
+      "why": "Additivo, coperto, licenziato: ma il verso higher_better e' indifendibile, perche' non esiste un meglio (e' un contextual da manuale, come la dipendenza anziani). Approvarlo come proposto premierebbe in silenzio le regioni anziane. Non approvato come sta: needs-info, il verso va portato a contextual prima di entrare."
+    },
+    {
+      "id": "a09",
+      "tipo": "candidato",
+      "caso": "Candidato indicatore: 'persone in cerca di lavoro sul totale della forza lavoro', dettaglio regionale, copertura 0,91, fonte Istat licenziata, verso lower_better. Il catalogo ha gia' ter-12, il tasso di disoccupazione, che e' definito esattamente cosi': disoccupati sulla forza lavoro.",
+      "label": "respinto",
+      "classe": "additivo",
+      "why": "Copertura, licenza e verso a posto, ma e' un duplicato: e' la stessa definizione di ter-12 con un altro nome. Un secondo modo di dire una cosa gia' presente non aggiunge, confonde."
+    },
+    {
+      "id": "a10",
+      "tipo": "candidato",
+      "caso": "Candidato indicatore: quota di energia da fonti rinnovabili sui consumi, dettaglio regionale, fonte istituzionale licenziata, verso higher_better difendibile. L'anno piu' recente disponibile e' contrassegnato 'p' (provvisorio) dalla fonte; gli anni definitivi si fermano a due anni prima e la copertura dei soli anni definitivi non e' dichiarata nel candidato.",
+      "label": "needs-info",
+      "classe": "copertura",
+      "why": "Additivo, licenziato, verso difendibile: ma l'anno di punta e' una stima provvisoria (gli adapter scartano 'p'), e senza sapere la copertura dei soli anni definitivi non si sa se regge una serie vera. Un fatto mancante, non un giudizio: needs-info per confermare la copertura reale."
+    },
+    {
+      "id": "a11",
+      "tipo": "candidato",
+      "caso": "Candidato indicatore da fonte Eurostat regionale: quota di popolazione a rischio poverta' o esclusione sociale (AROPE), dettaglio NUTS2 per l'Italia, copertura 0,88 sugli anni recenti, licenza Eurostat compatibile, verso lower_better. Nel catalogo non c'e' nessuna misura di rischio poverta' o esclusione; le misure di lavoro e reddito presenti non coprono l'esclusione sociale.",
+      "label": "approvato",
+      "classe": "pieno",
+      "why": "Additivo (l'esclusione sociale non e' coperta da nessuna misura presente), copertura sopra 0,8, fonte istituzionale europea licenziata, verso direzionale difendibile. Quattro su quattro, famiglia Eurostat."
+    }
+  ]
+}

@@ -9,9 +9,11 @@ l'agente (in una sessione Claude Code, o a mano). La meta' deterministica e'
     python3 evals/run_eval.py writer
     python3 evals/run_eval.py reviewer
     python3 evals/run_eval.py verifier
+    python3 evals/run_eval.py admissions
 
-Tutte le eval giudicano CONTRO IL BRIEF CONGELATO, mai contro i dati vivi:
-e' cio' che rende il punteggio confrontabile tra un modello e il successivo.
+Tutte le eval giudicano CONTRO UNA FIXTURE CONGELATA (il brief per le editoriali,
+la descrizione del caso per l'ammissione), mai contro i dati vivi o il web: e'
+cio' che rende il punteggio confrontabile tra un modello e il successivo.
 Stdlib puro.
 """
 
@@ -51,6 +53,23 @@ un campo "verdict" vuoto. Giudica ciascuna contro il brief congelato in
 confermata, smentita, non_verificabile. Sii avversariale: la domanda e' "posso
 farla cadere?", non "sembra plausibile?". Non modificare nient'altro del file.
 Poi misura: python3 evals/score_eval.py verifier evals/out/verifier/claims.json""",
+    "admissions": """\
+In evals/out/admissions/cases.json ci sono casi di triage dell'ammissione,
+ognuno con un campo "verdict" vuoto. Ogni caso ha in "caso" TUTTI i fatti che
+servono al giudizio (istituzione, licenza, dettaglio territoriale, cadenza,
+additivita', e per i candidati copertura e verso proposto): giudica CONTRO
+QUELLA DESCRIZIONE CONGELATA, mai contro il catalogo vivo, i dati o il web
+(questa e' una eval, non una run: la licenza e' quella scritta nel caso, non
+una da aprire con WebFetch). Applica la rubrica giusta secondo "tipo": per una
+"fonte" le quattro parti (istituzionale, licenza esplicita e compatibile,
+territoriale e regolare, additivo), per un "candidato" le quattro condizioni
+(additivo, copertura vera, licenza e istituzione, verso difendibile). Prima di
+scrivere "approvato" fai l'auto-refutazione: costruisci il caso piu' forte
+CONTRO l'ammissione e approva solo se cade. Se il caso contro regge anche solo
+su un punto verificabile e' "needs-info"; se fallisce una parte per come e'
+fatto il dato e' "respinto". Riempi "verdict" con uno di: approvato, respinto,
+needs-info. Non modificare nient'altro del file.
+Poi misura: python3 evals/score_eval.py admissions evals/out/admissions/cases.json""",
 }
 
 
@@ -71,6 +90,18 @@ def prepare(name):
             row.pop("why", None)
             row["verdict"] = ""
         (workdir / "claims.json").write_text(
+            json.dumps(gold, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+    elif name == "admissions":
+        import json
+
+        gold = json.loads((EVALS / "admissions" / "cases.json").read_text(encoding="utf-8"))
+        for row in gold["cases"]:
+            row.pop("label", None)
+            row.pop("classe", None)
+            row.pop("why", None)
+            row["verdict"] = ""
+        (workdir / "cases.json").write_text(
             json.dumps(gold, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
     return workdir
