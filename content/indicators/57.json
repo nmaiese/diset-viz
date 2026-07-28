@@ -1,21 +1,32 @@
 {
  "fonti": [
   {
-   "testo": "Eurostat, Employment statistics: nel 2025 l'Italia registra il divario di genere nell'occupazione più ampio dell'UE (19,1 punti).",
+   "testo": "Eurostat, Employment - annual statistics: nel 2025 l'Italia ha il divario di genere nell'occupazione più ampio dell'Unione europea, 19,1 punti percentuali sulla fascia 20-64 anni contro una media UE di 9,6.",
    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Employment_-_annual_statistics"
   }
  ],
  "key": "57",
- "lead": "Il divario di genere nel lavoro è una delle fratture più persistenti. In Puglia il tasso di occupazione degli uomini supera quello delle donne di 26,3 punti, in Campania e Sicilia di oltre 25, mentre in Valle d'Aosta il distacco scende a 6,1. La media delle regioni è di 16,3 punti.",
+ "lead": "Il divario di genere nell'occupazione non dice quanto lavoro c'è in una regione, dice quanta parte di quel lavoro va agli uomini. In otto anni l'occupazione è cresciuta da entrambe le parti, e la distanza è rimasta quasi dov'era.",
+ "level": "regione",
  "sections": [
   {
-   "body": "Il gap si allarga proprio dove l'occupazione totale è più bassa: al Sud non solo si lavora meno, ma il poco lavoro è molto più maschile. Contano servizi per l'infanzia, cultura del lavoro femminile e struttura dell'economia locale. Il divario cala lentamente, ma resta doppio rispetto alle regioni migliori. In ambito europeo l'Italia ha il divario di genere nell'occupazione più ampio dell'Unione ([Eurostat](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Employment_-_annual_statistics)). Ridurre questa distanza è una questione di lavoro o di servizi?",
-   "h": null,
+   "body": "Istat prende il tasso di occupazione maschile e quello femminile nella fascia 15-64 anni e ne calcola la differenza assoluta, in media d'anno. Ognuno dei due tassi è il rapporto tra gli occupati di quel sesso e i residenti dello stesso sesso in quell'età, studenti e inattivi compresi. Il risultato si legge in punti percentuali, e la differenza è assoluta, cioè senza segno: nel 2025 nessuna regione la rovescia.\n\nDietro la sottrazione c'è una quota di popolazione adulta senza un reddito da lavoro proprio. Nelle tre regioni con il divario più largo meno di quattro donne su dieci in età da lavoro hanno un impiego, contro quasi sette su dieci in Valle d'Aosta. Da lì passano l'autonomia economica dentro le famiglie e i contributi che costruiscono una pensione.",
+   "h": "Che cosa si sottrae, e in quale età",
+   "role": "definizione"
+  },
+  {
+   "body": "La graduatoria del 2025 non scende, si spezza. Tredici regioni stanno tra i sei e i diciassette punti, poi dopo il Veneto si apre un vuoto di quasi tre punti e comincia un gruppo di sette, dall'Abruzzo alla Puglia, che nessuna delle altre sfiora. È quella coda a tenere la media sopra la mediana, ferma a 14,38.\n\nLa geografia non è quella attesa: la Sardegna sta decima, tra Lombardia e Liguria. Il Veneto chiude la parte alta pur avendo uno dei mercati del lavoro più pieni del paese: il suo [tasso di occupazione maschile](/indicatore/tasso-di-occupazione-maschi/ter-177) e quello dell'Emilia-Romagna stanno entrambi intorno al 78 per cento, ma l'[occupazione femminile](/indicatore/tasso-di-occupazione-femmine/ter-178) emiliana viaggia quasi quattro punti sopra quella veneta, ed è da lì che arriva tutto lo scarto fra i due divari.\n\nNello stesso tema c'è una mappa che con questa non ha quasi niente in comune. L'[imprenditorialità femminile](/indicatore/imprenditorialita-femminile/ter-402), la quota di donne fra i titolari di imprese individuali iscritti alle Camere di Commercio, nel 2023 metteva in testa Molise, Basilicata e Abruzzo, tutte del gruppo a divario largo, e in fondo il Trentino Alto Adige, che qui è terzo. Non è una contraddizione, quella quota dice chi sono i titolari d'impresa, non quante donne lavorino.",
+   "h": "Il gruppo dei sette, e chi non ci si trova",
    "role": "quadro"
   },
   {
-   "body": "Misura la distanza tra due tassi, non la condizione delle donne in sé: un divario basso può nascere anche da un'occupazione maschile debole, non solo da una femminile forte. Non dice nulla su ore, salari e ruoli, dove il divario di genere spesso è ancora più ampio.",
-   "h": null,
+   "body": "Dal 2018 al 2025 la media regionale è scesa di 1,32 punti percentuali, e il motivo sta nei due tassi insieme. Nelle venti regioni l'occupazione femminile è cresciuta in media di quasi cinque punti, quella maschile di tre e mezzo, e il divario si è accorciato solo della differenza fra le due corse. A questo ritmo, che nessuno garantisce, per chiudere il divario servirebbe un secolo.\n\nIntanto i due capi si sono allontanati di 2,05 punti. Il movimento più ampio è quello delle Marche, 6,85 punti in meno ottenuti senza che l'occupazione maschile si spostasse quasi per niente: nel 2018 erano a metà classifica, oggi sono seconde. Sette regioni hanno fatto il cammino inverso, la più decisa è la Sicilia, che ha allargato di 2,33 punti senza che le donne perdessero lavoro: ne hanno trovato, solo che gli uomini ne hanno trovato di più. Dal 2024 al 2025 sedici regioni su venti hanno ristretto la distanza, e fra le quattro in controtendenza ci sono Veneto e Lombardia.\n\nDa fuori la lentezza si vede meglio. Eurostat calcola lo stesso scarto sulla fascia 20-64 anni e per il 2025 mette l'Italia prima nell'Unione europea, con 19,1 punti contro una media UE di 9,6, un dato nazionale ponderato e su un'età diversa da questa.",
+   "h": "Otto anni di crescita per un punto di recupero",
+   "role": "dinamica"
+  },
+  {
+   "body": "Una differenza fra due tassi non dice a quale altezza stanno. La Calabria ha l'occupazione maschile più bassa d'Italia, e anche per questo il suo divario risulta più contenuto di quello pugliese, pur avendo una delle occupazioni femminili più basse del paese: il numero migliora pure quando a cedere è il lato maschile. In Valle d'Aosta accade l'opposto, il distacco più corto sta insieme al tasso femminile più alto.\n\nPoi conta se una persona ha un impiego, non quale. Ore lavorate, part-time, contratti a termine e retribuzione restano fuori, così due regioni con lo stesso divario possono avere mercati del lavoro femminili molto diversi. Fuori resta anche la distinzione fra chi un lavoro lo cerca e chi ha smesso di cercarlo. Gli altri indicatori di [lavoro e conciliazione](/tema/lavoro-e-conciliazione) guardano la stessa materia da altri lati.",
+   "h": "Perché un divario corto non è per forza una buona notizia",
    "role": "limiti"
   }
  ],
