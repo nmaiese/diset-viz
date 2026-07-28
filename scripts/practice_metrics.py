@@ -112,8 +112,20 @@ def compute(dossier: dict, runs: list, today: str = "", soglia_giorni: int = 30,
     }
 
 
+def _resolve_today(today: str = "") -> str:
+    """La data di riferimento, o oggi se non e' data. Senza, la fotografia userebbe
+    `entered_at` come fine e ogni pratica risulterebbe di zero giorni: eta' media
+    zero, niente oltre soglia, il confronto prima/dopo falsato. Oggi e' il default
+    giusto per la CLI documentata, che gira senza `--today`."""
+    if today:
+        return today
+    from datetime import datetime, timezone
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+
 def load_and_compute(today: str = "", soglia_giorni: int = 30, proofs_root=None):
     from scripts import pipeline_log, practice_store
+    today = _resolve_today(today)
     dossier = practice_timeline.load_real(today=today, proofs_root=proofs_root)
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
     declared = practice_store.load_all(strict=False) or None

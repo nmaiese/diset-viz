@@ -126,6 +126,43 @@ class Reconstruct(unittest.TestCase):
             "outcome": "merged"}])
         self.assertIn("curator-20260726", d["dem:NMIGRATEIN"]["runs"])
 
+    def test_hyphenated_bes_id_in_run_text_is_not_truncated(self):
+        # bes-03LAV006-N25 non deve diventare il fantasma bes:03LAV006 (review #1)
+        d = self._run(runs=[{
+            "run_id": "writer-1", "stage": "writer", "at": "2026-07-27",
+            "summary": "Scritto bes-03LAV006-N25", "detail": [], "pr": "", "outcome": "merged"}])
+        self.assertIn("bes:03LAV006-N25", d)
+        self.assertNotIn("bes:03LAV006", d)
+        self.assertIn("writer-1", d["bes:03LAV006-N25"]["runs"])
+
+    def test_stale_verification_reopens_the_verifier_stage(self):
+        # la prosa e' cambiata dopo la verifica: l'impronta non combacia piu'
+        art = _article("dem:Y", 2024, "2026-07-26", 2024)
+        stale = {"code": "dem-Y", "level": "regione", "at": "2026-07-01",
+                 "prosa": "impronta_vecchia", "esito": "pulito", "smentite": "0",
+                 "vintage": "2024"}
+        d = self._run(
+            manifest=[{"target_indicator_id": "dem:Y", "status": "integrated"}],
+            curation=[{"target_indicator_id": "dem:Y", "reviewed_at": "2026-07-25",
+                       "reviewed_direction": "higher_better", "direction_verdict": "corretto",
+                       "reviewed_category": "x", "score_eligible": "true", "data_year": "2024"}],
+            external=[{"target_indicator_id": "dem:Y", "year": "2024"}],
+            articles={"dem:Y": art}, verifiche=[stale],
+        )["dem:Y"]
+        self.assertFalse(d["verification_valid"])
+        self.assertNotIn("verificatore", d["completed_stages"])  # scaduta, non completa
+        self.assertNotEqual(d["state"], "fusa")
+        self.assertEqual(t.ready_stage(d), "verificatore")       # torna al verificatore
+
+    def test_stale_refutation_is_not_open(self):
+        # una vecchia smentita la cui prosa e' stata riscritta non e' piu' aperta (review #4)
+        art = _article("dem:Z", 2024, "2026-07-26", 2024)
+        stale_smentita = {"code": "dem-Z", "level": "regione", "at": "2026-07-01",
+                          "prosa": "impronta_vecchia", "esito": "smentito", "smentite": "1",
+                          "vintage": "2024"}
+        d = self._run(articles={"dem:Z": art}, verifiche=[stale_smentita])["dem:Z"]
+        self.assertFalse(d["flags"].get("open_smentita"))
+
     def test_site_proof_promotes_fusa_to_pubblicata(self):
         art = _article("651", 2023, "2026-07-27", 2023)
         d = self._run(

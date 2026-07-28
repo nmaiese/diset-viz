@@ -73,8 +73,11 @@ def _target_of_candidate(row: dict):
 # famiglia (`dem:NMIGRATEIN`), i candidate_id (`istat_demografia:DEPENDRATE`) e i
 # code (`ter-651`, `eur-rd_e_gerdreg`). Le forme nude (`BIRTHRATE`) sono rumore e
 # si lasciano fuori di proposito: meglio un'associazione mancante e dichiarata
-# che una inventata.
-_ID_IN_TEXT = re.compile(r"\b([a-z_]+:[A-Za-z0-9_]+|(?:ter|dem|eur|bes|multiscopo)-[A-Za-z0-9_]+)\b")
+# che una inventata. Il trattino nel corpo dell'id e' obbligatorio, non opzionale:
+# gli id BES lo contengono (`bes:09PAE009-N25`, `bes-03LAV006-N25`), e fermarsi al
+# secondo trattino inventava `bes:03LAV006` lasciando la vera pratica senza il suo
+# run.
+_ID_IN_TEXT = re.compile(r"\b([a-z_]+:[A-Za-z0-9_-]+|(?:ter|dem|eur|bes|multiscopo)-[A-Za-z0-9_-]+)\b")
 
 
 def _ids_in_text(text: str) -> set:
@@ -239,16 +242,23 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
         d = slot(key)
         esito = row.get("esito")
         smentite = _as_int(row.get("smentite")) or 0
-        if "verificatore" not in d["completed_stages"]:
-            d["completed_stages"].append("verificatore")
         entry = (articles or {}).get(key)
         valid = None
         if entry is not None:
             valid = verification_queue.prose_fingerprint(entry) == row.get("prosa")
+        # Una verifica conta come stadio completo, e una smentita come aperta,
+        # solo se l'impronta combacia ancora con la prosa attuale. Se il testo e'
+        # cambiato dopo, la verifica e' scaduta: il verificatore deve rigirare, e
+        # marcarlo completo terrebbe l'articolo 'fusa' senza che nessuno stadio
+        # pronto lo rimandi a valle. E' lo stesso principio con cui il revisore
+        # spegne una smentita riscrivendo la frase: l'impronta cambia, la
+        # smentita non e' piu' aperta.
+        if valid is True and "verificatore" not in d["completed_stages"]:
+            d["completed_stages"].append("verificatore")
         event(key, row.get("at", ""), "verificatore", "verificata",
               f"esito {esito}, smentite {smentite}, impronta {'combacia' if valid else 'scaduta' if valid is False else '?'}",
               esito=esito, smentite=smentite, prosa_valid=valid)
-        if esito == "smentito" and smentite > 0:
+        if esito == "smentito" and smentite > 0 and valid is True:
             d["flags"]["open_smentita"] = True
         d["verification_valid"] = valid
 

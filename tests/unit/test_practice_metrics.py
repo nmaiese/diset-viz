@@ -58,6 +58,12 @@ class Compute(unittest.TestCase):
         out = self._metrics({"a": _d("a", "fusa")})
         self.assertIsNone(out["affidabilita"]["tentativi_duplicati"])
 
+    def test_resolve_today_defaults_to_a_real_date(self):
+        # senza --today la fotografia non deve datare ogni pratica a zero giorni
+        self.assertEqual(m._resolve_today("2026-01-01"), "2026-01-01")
+        default = m._resolve_today("")
+        self.assertRegex(default, r"^\d{4}-\d{2}-\d{2}$")
+
 
 if __name__ == "__main__":
     unittest.main()
