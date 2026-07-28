@@ -45,6 +45,7 @@ python3 scripts/pipeline_dashboard.py --open   # tutto in una pagina
 python3 scripts/pipeline_status.py             # solo dove si e' fermata
 python3 scripts/pipeline_log.py                # solo che cosa hanno fatto gli agenti
 python3 scripts/pipeline_dispatch.py           # solo chi tocca adesso
+python3 scripts/practice_timeline.py           # la storia per indicatore (Fase B/C, read-only)
 ```
 
 ## What this is

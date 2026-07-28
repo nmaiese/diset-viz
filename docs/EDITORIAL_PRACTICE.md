@@ -564,25 +564,28 @@ pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
 
 - **Fase A, dominio (questo documento).** Uscita: due sviluppatori descrivono lo
   stesso percorso con gli stessi stati. Nessun codice.
-- **Fase B, osservabilita', senza cambiare la pubblicazione.** Costruire la
-  **timeline per indicatore** dai file che ci sono gia': unire `triage_status`,
-  `curation.csv`, i campi dell'articolo, le schede `verifiche/` e i `run_id` in un
-  `data/pipeline/practices/` **ricostruito** (read-only) e una vista che lo mostra.
-  Il seme e' `pipeline_dashboard.py`, che gia' compone code, diario, commit e PR,
-  ma per stadio: qui si aggiunge l'asse indicatore. Uscita: per un campione, dire
-  senza analisi manuale quando l'indicatore e' entrato, cosa e' successo, quali
-  passaggi, quali PR e run, se e' pubblicato, se la verifica regge.
-- **Fase C, macchina a stati in controllo.** Il **riconciliatore**: calcola lo
-  stato atteso di ogni pratica e lo confronta con gli artefatti, rileva transizioni
-  mancanti o incoerenti, simula invalidazioni, classifica gli errori. Affianca il
-  flusso senza pubblicare. Uscita: osserva il flusso reale per un periodo
-  significativo senza divergenze non spiegate.
+- **Fase B, osservabilita', senza cambiare la pubblicazione. [implementata]** La
+  **timeline per indicatore** si ricostruisce dai file che ci sono gia', unendo
+  `triage_status`, `curation.csv`, i campi dell'articolo, le schede `verifiche/` e
+  i `run_id`, in `scripts/practice_timeline.py` (read-only). Per un indicatore
+  qualsiasi dice senza analisi manuale quando e' entrato, cosa e' successo, quali
+  passaggi ha completato, quali run lo hanno toccato, se la verifica regge. Il
+  limite dichiarato: una pratica per indicatore, gli eventi di manutenzione sono
+  nella timeline ma non ancora spezzati in cicli distinti.
+- **Fase C, macchina a stati in controllo. [implementata]** Il **riconciliatore**
+  (`practice_timeline.py --check`) calcola lo stato atteso di ogni pratica dagli
+  artefatti e lo confronta con i record dichiarati (`--write` li materializza in
+  `data/pipeline/practices/`), segnalando le divergenze. Il vocabolario, le
+  transizioni, la tassonomia degli errori e la priorita' sono codice puro in
+  `scripts/practice_model.py`, provati da `tests/unit/test_practice_model.py`.
+  Affianca il flusso senza pubblicare.
 - **Fase D, pilota della PR unica**, solo su nuovi indicatori a perimetro
-  limitato, con lo stato nel record di pratica e non nella PR. Qui nasce anche la
-  **verifica del sito** (§8), il pezzo che oggi manca. Uscita: la storia e'
-  completa, la PR leggibile, una sessione interrotta si riprende, nessun risultato
-  obsoleto pubblicato, la pubblicazione reale verificata, una pratica bloccata non
-  ferma le altre.
+  limitato, con lo stato nel record di pratica e non nella PR. Il pezzo davvero
+  nuovo, la **verifica del sito** (§8), e' gia' scritto in
+  `scripts/verify_publication.py` (la firma di contenuto lead+vintage, con
+  l'irraggiungibile che non passa), **resta da fare** il pilota vero, cioe'
+  costruire lo slug reale, girarlo dopo un deploy e legare la transizione
+  `fusa -> pubblicata` al suo esito.
 - **Fase E, manutenzione.** I tipi `aggiornamento`, `revisione`, `smentita`,
   `integrazione`, `ritiro`, `rollback` (§2). Uscita: ogni indicatore mostra cicli
   distinti ma collegati, senza PR eterna.
@@ -602,6 +605,31 @@ lavoro (il riconciliatore), una pratica non e' pubblicata perche' la PR e' fusa
 (stato `pubblicata` != `fusa`), gli artefatti invalidati restano nella storia, i
 retry non sono infiniti (tetto per classe), un indicatore malato non ferma la
 catena (quarantena), la PR e' una vista non la memoria (record di pratica).
+
+### Stato dell'implementazione
+
+Le Fasi B, C e la parte nuova della D sono **codice, in modalita' di controllo**:
+girano accanto al flusso di oggi e non cambiano niente della pubblicazione.
+
+| file | cosa | prova |
+| --- | --- | --- |
+| `scripts/practice_model.py` | stati, transizioni, tipi, errori, priorita' (§2-4, 9, 11) | `tests/unit/test_practice_model.py` |
+| `scripts/practice_store.py` | lo store un-file-per-record delle pratiche | `tests/unit/test_practice_store.py` |
+| `scripts/practice_timeline.py` | ricostruzione per indicatore + riconciliatore (Fase B/C) | `tests/unit/test_practice_timeline.py` |
+| `scripts/verify_publication.py` | la verifica del sito, `fusa -> pubblicata` (§8) | `tests/unit/test_verify_publication.py` |
+
+```bash
+python3 scripts/practice_timeline.py                       # una riga per indicatore
+python3 scripts/practice_timeline.py --indicator eur:rd_e_gerdreg   # la storia intera
+python3 scripts/practice_timeline.py --check               # dichiarato vs artefatti
+```
+
+Cio' che **non** e' fatto, ed e' voluto: la **Fase F**, la sostituzione. Nessuna
+di queste cose rende il modello autorevole al posto dello stato dedotto, ne'
+tocca dispatcher, cancello o cadenza di merge. La priorita' (§11) e' una funzione
+pura esposta, non ancora consultata da `pipeline_dispatch.decide()`: rilevarla
+li' cambierebbe quale stadio gira, ed e' un cambiamento di comportamento che il
+mandato mette nel pilota, dopo il confronto misurabile.
 
 ---
 
