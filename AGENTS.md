@@ -27,10 +27,10 @@ documenti normali, e valgono per tutti.
 Per guardare la catena senza aprire file:
 
 ```bash
-python3 scripts/pipeline_dashboard.py --open   # tutto in una pagina
-python3 scripts/pipeline_status.py             # solo dove si e' fermata
-python3 scripts/pipeline_log.py                # solo che cosa hanno fatto gli agenti
-python3 scripts/pipeline_dispatch.py           # solo chi tocca adesso
+python3 scripts/pipeline_monitor.py            # dov'e' fermo e perche' (nell'app: /_pipeline)
+python3 scripts/pipeline_launch.py             # cosa lanciare adesso, per-indicatore
+python3 scripts/practice_timeline.py           # la storia per indicatore (il dossier, read-only)
+python3 scripts/pipeline_status.py             # le code per (vecchio) stadio
 ```
 
 ## Se tocchi la catena autonoma
@@ -38,10 +38,13 @@ python3 scripts/pipeline_dispatch.py           # solo chi tocca adesso
 Quattro cose che non si intuiscono dal codice e che costa caro scoprire da soli.
 Il resto sta in `docs/AUTONOMOUS_PIPELINE.md`, che le possiede.
 
-- **Un dispatcher, uno stadio per tick.** `scripts/pipeline_dispatch.py` legge
-  tutte le code e nomina il solo stadio da lanciare. Gli stadi non hanno un cron
-  proprio, quindi non c'è mai un secondo scrittore: non lanciare uno stadio a
-  mano mentre la catena gira e non rimettere una schedulazione per stadio.
+- **Un lanciatore, lavoro per-indicatore in parallelo.** `scripts/pipeline_launch.py`
+  legge il dossier per-indicatore e le code e restituisce la lista prioritizzata
+  di lanci: tre ruoli (ammissione = scout+hunter+promoter, produttore =
+  curator+writer+reviewer, verificatore), produttore e verificatore
+  per-indicatore, ammissione batch. Niente piu' dispatcher a uno-stadio-per-tick
+  ne' lock una-PR-aperta: indicatori diversi toccano file diversi e non
+  contendono.
 - **Ogni registro è uno store a un file per record**, e quello toglie il
   conflitto invece di gestirlo: `content/indicators/` (uno per articolo),
   `data/pipeline/runs/` (uno per run), `data/pipeline/verifiche/` (uno per
