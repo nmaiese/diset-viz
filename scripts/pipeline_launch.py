@@ -204,13 +204,28 @@ def main(argv=None):
                         help="mostra solo le prime N voci (le piu' prioritarie)")
     parser.add_argument("--today", default="",
                         help="data di riferimento YYYY-MM-DD per la priorita'")
+    parser.add_argument("--publish", action="store_true",
+                        help="passo del sito, meccanico e post-deploy: verifica gli "
+                             "indicatori 'fusa' contro il sito e committa le prove su "
+                             "master. Non e' un ruolo, non lancia un agente, non apre "
+                             "PR. Default spento.")
+    parser.add_argument("--publish-base", default=None,
+                        help="il sito da verificare col passo del sito (default: il sito pubblico)")
     args = parser.parse_args(argv)
+
+    publish = None
+    if args.publish:
+        from scripts import verify_publication
+        base = args.publish_base or verify_publication.DEFAULT_BASE
+        publish = verify_publication.publish_step(
+            base=base, log=(lambda *_: None) if args.json else print)
 
     launches = load_plan(today=args.today)
     shown = launches[:args.top] if args.top else launches
 
     if args.json:
-        print(json.dumps(shown, ensure_ascii=False, indent=2))
+        payload = {"launches": shown, "publish": publish} if publish is not None else shown
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0 if launches else 1
 
     if not launches:

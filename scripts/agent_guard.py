@@ -44,13 +44,14 @@ if str(PROJECT_ROOT) not in sys.path:
 from scripts import pipeline_gate  # noqa: E402  (bootstrap del path qui sopra)
 
 # Gli stadi che la guardia sa sorvegliare. Sono quelli del cancello piu' il
-# dispatcher, che del cancello non e' uno stadio (non apre pull request, non ha
-# una voce in STAGE_PATHS) ma un agente e': il suo perimetro di scrittura e' il
-# solo diario, perche' tutto il resto del suo giro passa dagli script, mai da
-# Edit/Write. La voce sta qui e non in STAGE_PATHS apposta: aggiungerla la'
+# lanciatore (`launch`), che del cancello non e' uno stadio (non apre pull
+# request, non ha una voce in STAGE_PATHS) ma un agente e': non fa il lavoro di
+# nessun ruolo, legge le code e lancia, e il solo gesto che scrive nel repo e' il
+# passo del sito (le prove di pubblicazione, portate su master dagli script, mai
+# da Edit/Write). La voce sta qui e non in STAGE_PATHS apposta: aggiungerla la'
 # insegnerebbe al cancello uno stadio che non deve mai giudicare.
 GUARDED_STAGES = dict(pipeline_gate.STAGE_PATHS)
-GUARDED_STAGES["dispatch"] = (pipeline_gate.RUN_JOURNAL,)
+GUARDED_STAGES["launch"] = (pipeline_gate.RUN_JOURNAL, pipeline_gate.PUBLICATIONS)
 
 # Comandi che nessuno stadio ha motivo di dare, mai. Regex sul comando intero,
 # prima di ogni altra valutazione: un pattern qui vince anche su un prefisso
@@ -106,6 +107,16 @@ SERVICE_PATHS = (
     # locale, ignorato da git, ma dentro l'albero del repo.
     "data/pipeline/.session_meta.json",
     "data/pipeline/tool_failures.jsonl",
+)
+
+# Prefissi di servizio: directory usa-e-getta, fuori da ogni perimetro di stadio,
+# che pero' un agente hooked deve poter scrivere. `evals/out/` e' la cartella di
+# lavoro delle eval del canary: e' ignorata da git (non arriva in nessuna pull
+# request) e non e' in `STAGE_PATHS`, quindi senza questa deroga l'agente vero,
+# con i suoi hook, non potrebbe girare la propria eval. La deroga chiude
+# quell'attrito senza allargare cio' che il cancello giudica.
+SERVICE_PREFIXES = (
+    "evals/out/",
 )
 
 
@@ -199,7 +210,7 @@ def path_verdict(path, stages, cwd=None):
         # Fuori dal repo: scratch legittimo, il perimetro non c'entra.
         return True, ""
     rel = str(relative)
-    if rel in SERVICE_PATHS:
+    if rel in SERVICE_PATHS or any(rel.startswith(p) for p in SERVICE_PREFIXES):
         return True, ""
     allowed = _stages_paths(stages)
     if pipeline_gate.path_allowed(rel, allowed):

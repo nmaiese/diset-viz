@@ -301,6 +301,142 @@ def verify_one(indicator, base=DEFAULT_BASE, slug="", level=None,
     return result
 
 
+# --- il passo del sito, meccanico e post-deploy (era nel dispatcher) ---------
+#
+# La verifica `fusa -> pubblicata` non e' uno stadio con un agente: e'
+# deterministica, non apre pull request e non lancia una sessione. E non puo'
+# vivere nella run del produttore, che gira **prima** del deploy: il sito serve
+# la versione nuova solo dopo il merge. Quindi e' un passo meccanico che il
+# lanciatore fa a un tick successivo, sul sito gia' dispiegato. Scrive solo dove
+# il controllo ha confermato (`ok is True`), quindi le invarianti che il cancello
+# imporrebbe sono garantite per costruzione, e le prove nuove arrivano su master
+# con un commit costruito sopra origin/master, spinto da qualunque branch.
+
+def _run(argv, cwd=None, env=None):
+    import subprocess
+    full_env = None
+    if env:
+        import os
+        full_env = {**os.environ, **env}
+    proc = subprocess.run(argv, cwd=cwd, capture_output=True, text=True, env=full_env)
+    return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
+
+
+def land_on_master(rels, message, runner=_run, cwd=None, log=print, attempts=3,
+                   label="prove"):
+    """Mette file nuovi su master **da qualsiasi branch**, spingendo solo quei file.
+
+    La sessione di una Routine sta sempre su un branch `claude/*`, mai su master,
+    e questi sono file nuovi per record (una prova per versione, nome che nessun
+    altro sceglie), fuori da qualsiasi pull request. Si costruisce un commit
+    **sopra origin/master** che contiene **solo** questi file, seminando un indice
+    temporaneo da origin/master e aggiungendoci i soli percorsi da pubblicare, e
+    si spinge quel commit su master. L'invariante 'non spinge altro che se stesso'
+    vale per costruzione, non per guardia: HEAD e gli altri file non committati non
+    entrano. Chi perde la corsa del push si ricostruisce sopra il master
+    aggiornato e ritenta.
+    """
+    rels = sorted(set(rels))
+    if not rels:
+        return False
+
+    import os
+    import tempfile
+
+    fd, index = tempfile.mkstemp(prefix="publish-index-")
+    os.close(fd)
+    try:
+        for attempt in range(1, attempts + 1):
+            code, out = runner(["git", "fetch", "origin", "master"], cwd=cwd)
+            if code != 0:
+                log(f"  {label}: git fetch origin master fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "read-tree", "origin/master"], cwd=cwd,
+                               env={"GIT_INDEX_FILE": index})
+            if code != 0:
+                log(f"  {label}: read-tree origin/master fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "add", "--", *rels], cwd=cwd,
+                               env={"GIT_INDEX_FILE": index})
+            if code != 0:
+                log(f"  {label}: git add fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "write-tree"], cwd=cwd,
+                               env={"GIT_INDEX_FILE": index})
+            tree = out.split()[0] if code == 0 and out.split() else ""
+            if not tree:
+                log(f"  {label}: write-tree fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(
+                ["git", "commit-tree", tree, "-p", "origin/master", "-m", message],
+                cwd=cwd)
+            commit = out.split()[0] if code == 0 and out.split() else ""
+            if not commit:
+                log(f"  {label}: commit-tree fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "push", "origin", f"{commit}:master"], cwd=cwd)
+            if code == 0:
+                log(f"  {label}: {len(rels)} su master")
+                return True
+            log(f"  {label}: push perso, ritento ({attempt}/{attempts})")
+        log(f"  {label.upper()} NON SU MASTER: la corsa al push non si e' chiusa in "
+            f"{attempts} tentativi.")
+        return False
+    finally:
+        try:
+            os.remove(index)
+        except OSError:
+            pass
+
+
+def commit_proofs(rels, runner=_run, cwd=None, log=print, attempts=3):
+    """Porta le prove di pubblicazione nuove su master. Sono file nuovi per
+    record con un nome che nessun altro sceglie, quindi il commit mirato di
+    `land_on_master` e' sicuro e arriva su master anche dal branch di lavoro."""
+    n = len(set(rels))
+    return land_on_master(
+        rels, f"Prove di pubblicazione: {n} indicatori verificati sul sito",
+        runner=runner, cwd=cwd, log=log, attempts=attempts, label="prove")
+
+
+def publish_step(base=DEFAULT_BASE, fetcher=None, runner=_run, cwd=None,
+                 log=print, proofs_root=None, do_commit=True):
+    """Il passo del sito come step meccanico del lanciatore, non come stadio.
+
+    Per ogni indicatore in stato `fusa` prende la pagina pubblica e, se serve la
+    versione committata, scrive la prova e la porta su master. Opt-in nel
+    lanciatore: un sito irraggiungibile o una versione non ancora dispiegata non
+    scrivono niente (ok None/False), l'indicatore resta `fusa` e si riprova al
+    tick dopo, senza un falso positivo.
+    """
+    queue = publication_queue(proofs_root=proofs_root)
+    checked, written = [], []
+    for row in queue:
+        try:
+            kwargs = {} if fetcher is None else {"fetcher": fetcher}
+            result = verify_one(
+                row["id"], base=base, write=True, proofs_root=proofs_root, **kwargs)
+        except Exception as exc:  # una pagina non deve fermare le altre
+            log(f"  prove: {row['code']} saltato ({type(exc).__name__})")
+            continue
+        if result is None:
+            continue
+        checked.append({"code": row["code"], "ok": result.get("ok")})
+        if result.get("proof_path"):
+            written.append(result["proof_path"])
+
+    summary = {"base": base, "fusa": len(queue), "verificati": len(checked),
+               "prove_scritte": len(written), "checked": checked}
+    if written and do_commit:
+        rels = []
+        for path in written:
+            p = Path(path)
+            rels.append(str(p.relative_to(PROJECT_ROOT)) if p.is_absolute() and
+                        str(p).startswith(str(PROJECT_ROOT)) else path)
+        summary["committed"] = commit_proofs(rels, runner=runner, cwd=cwd, log=log)
+    return summary
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--indicator", help="chiave d'articolo, es. dem:NMIGRATEIN")

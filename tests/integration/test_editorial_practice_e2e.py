@@ -42,7 +42,7 @@ import urllib.request
 from pathlib import Path
 
 from scripts import (curate, discovery, indicator_store, pending_notes,
-                     pipeline_dispatch, pipeline_log, practice_metrics,
+                     pipeline_launch, pipeline_log, practice_metrics,
                      practice_store, practice_timeline)
 from scripts import verify_publication as vp
 from scripts import verification_queue as vq
@@ -365,48 +365,46 @@ class MaintenanceCycles(unittest.TestCase):
         self.assertTrue(cycles[0]["active"])
 
 
-# --- 5. Priorita' del dispatcher (Fase F) -----------------------------------
+# --- 5. Priorita' del lanciatore per-indicatore -----------------------------
 
-class DispatcherPriority(unittest.TestCase):
-    """La priorita' reale (una smentita pesa 100+) scavalca l'ordine di catena,
-    ma solo con `priorities` e solo sopra soglia."""
+class LauncherPriority(unittest.TestCase):
+    """Nel lanciatore la priorita' e' per-indicatore, non per-stadio: una smentita
+    pubblica (peso 100+) apre il piano davanti a tutto il resto, e il piano e'
+    ordinato per priorita' decrescente. Non c'e' piu' 'uno stadio scavalca
+    l'altro', ci sono unita' di lavoro lanciabili in parallelo, ordinate."""
 
-    # hunter (a monte) ha lavoro, reviewer (a valle) ospita la pratica urgente
+    # coda a monte con lavoro d'ammissione, piu' un dossier con una smentita urgente.
     QUEUES = {"scout": 0, "hunter": 3, "promoter": 0, "curator": 0,
-              "writer": 0, "reviewer": 1, "verificatore": 0}
+              "writer": 0, "reviewer": 0, "verificatore": 0}
 
-    def test_above_threshold_preempts_chain_order(self):
-        # Una pratica del reviewer sopra la soglia (100, il peso di una smentita
-        # pubblica) scavalca il hunter, che a monte avrebbe la precedenza. Il test
-        # usa una priorita' sintetica invece della smentita reale su eur: quella e'
-        # stata chiusa (glossa corretta), e la logica di preemption va provata con
-        # un input controllato, non con lo stato transitorio del repo.
-        priorities = {"reviewer": pipeline_dispatch.PREEMPT_THRESHOLD, "hunter": 5.0}
-        plan = pipeline_dispatch.decide(queues=self.QUEUES, priorities=priorities)
-        self.assertEqual(plan["stage"], "reviewer")
-        self.assertIn("urgente", plan["reason"])
+    def smentita_dossier(self):
+        return {"eur-x": {
+            "id": "eur-x", "state": "invalidata",
+            "flags": {"open_smentita": True},
+            "completed_stages": ["curator", "writer", "reviewer", "verificatore"],
+            "required_stages": ("reviewer", "verificatore"), "priority": 105.0,
+        }}
 
-    def test_real_priorities_are_consistent_with_the_dispatch(self):
-        # Coi dati reali le priorita' restano calcolabili, e l'esito del dispatch
-        # si **deriva** dallo stato reale invece di pinnarlo: quando un
-        # verificatore registrera' una smentita vera il reviewer salira' sopra
-        # soglia, e un test che pinnasse "sotto soglia -> hunter" bloccherebbe
-        # proprio il PR del verificatore che introduce quel comportamento.
-        priorities = practice_timeline.stage_priorities(practice_timeline.load_real())
-        plan = pipeline_dispatch.decide(queues=self.QUEUES, priorities=priorities)
-        if priorities.get("reviewer", 0) >= pipeline_dispatch.PREEMPT_THRESHOLD:
-            self.assertEqual(plan["stage"], "reviewer")
-        else:
-            self.assertEqual(plan["stage"], "hunter")
+    def test_a_public_smentita_leads_the_plan(self):
+        # La smentita (produttore, il reviewer e' fuso li') apre il piano; la coda
+        # d'ammissione a monte (hunter=3) la segue, perche' 105 > 0.
+        plan = pipeline_launch.plan_launches(
+            self.smentita_dossier(), self.QUEUES, mint=lambda role: f"{role}-x")
+        self.assertEqual(plan[0]["indicator"], "eur-x")
+        self.assertEqual(plan[0]["role"], "producer")
+        self.assertEqual(plan[-1]["role"], "admissions")
 
-    def test_without_priorities_it_is_pure_chain_order(self):
-        plan = pipeline_dispatch.decide(queues=self.QUEUES)
-        self.assertEqual(plan["stage"], "hunter")
+    def test_the_plan_is_sorted_by_priority_descending(self):
+        # Coi dati reali il piano resta ordinato: e' l'invariante che sostituisce
+        # 'sopra soglia scavalca', e si deriva dallo stato reale invece di pinnarlo.
+        plan = pipeline_launch.load_plan()
+        priorities = [item["priority"] for item in plan]
+        self.assertEqual(priorities, sorted(priorities, reverse=True))
 
-    def test_below_threshold_keeps_chain_order(self):
-        plan = pipeline_dispatch.decide(queues=self.QUEUES,
-                                        priorities={"reviewer": 40.0, "hunter": 5.0})
-        self.assertEqual(plan["stage"], "hunter")
+    def test_without_a_smentita_upstream_admissions_still_appears(self):
+        # Nessuna pratica urgente: la coda d'ammissione a monte resta lanciabile.
+        plan = pipeline_launch.plan_launches({}, self.QUEUES, mint=lambda role: f"{role}-x")
+        self.assertEqual([item["role"] for item in plan], ["admissions"])
 
 
 # --- 6. Associazione run -> indicatore --------------------------------------

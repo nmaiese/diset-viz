@@ -127,21 +127,34 @@ class PathVerdictTests(unittest.TestCase):
             "data/pipeline/.session_meta.json", ["writer"])
         self.assertTrue(ok)
 
-    def test_dispatch_may_write_the_journal_only(self):
-        # Il dispatcher non e' uno stadio del cancello ma la guardia lo
-        # sorveglia come gli altri: diario si', code degli stadi no.
+    def test_evals_out_is_allowed_for_any_stage(self):
+        # La deroga di servizio: un agente hooked deve poter girare la propria
+        # eval, la cui cartella di lavoro (evals/out/, ignorata da git) e' fuori
+        # da ogni perimetro di stadio.
         ok, _ = agent_guard.path_verdict(
-            "data/pipeline/runs/dispatch-x.json", ["dispatch"])
+            "evals/out/admissions/cases.json", ["admissions"])
         self.assertTrue(ok)
-        ok, _ = agent_guard.path_verdict(
-            "data/discovery/source_candidates.csv", ["dispatch"])
+        ok, _ = agent_guard.path_verdict("evals/out/writer/article.json", ["writer"])
+        self.assertTrue(ok)
+        # ma le fixture congelate (evals/ senza /out/) restano fuori perimetro
+        ok, _ = agent_guard.path_verdict("evals/writer/brief_ter-178.txt", ["writer"])
         self.assertFalse(ok)
 
-    def test_dispatch_stays_out_of_the_gate(self):
+    def test_launch_may_write_the_journal_and_proofs_only(self):
+        # Il lanciatore non e' uno stadio del cancello ma la guardia lo sorveglia
+        # come gli altri: diario e prove di pubblicazione si', code degli stadi no.
+        ok, _ = agent_guard.path_verdict(
+            "data/pipeline/pubblicazioni/ter-651__regione__abc.json", ["launch"])
+        self.assertTrue(ok)
+        ok, _ = agent_guard.path_verdict(
+            "data/discovery/source_candidates.csv", ["launch"])
+        self.assertFalse(ok)
+
+    def test_launch_stays_out_of_the_gate(self):
         # La voce vive nella guardia, non in STAGE_PATHS: il cancello non deve
         # mai imparare uno stadio che non giudica.
-        self.assertNotIn("dispatch", pipeline_gate.STAGE_PATHS)
-        self.assertIn("dispatch", agent_guard.GUARDED_STAGES)
+        self.assertNotIn("launch", pipeline_gate.STAGE_PATHS)
+        self.assertIn("launch", agent_guard.GUARDED_STAGES)
 
 
 class CloseVerdictTests(unittest.TestCase):
