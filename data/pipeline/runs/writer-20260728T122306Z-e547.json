@@ -1,0 +1,24 @@
+{
+ "at": "2026-07-28T12:35:01+00:00",
+ "base_commit": "76ce9cb",
+ "branch": "automation/writer-2026-07-28",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "24ed833",
+ "detail": [
+  "Riscritte tutte e quattro le sezioni piu il lead: definizione corretta contro la fonte (banda 55-64, non 'over 54' generico, media annua), quadro sulla forma della distribuzione (mediana 64,3 sopra media 62,07, salto di 7,35 punti dopo la Sardegna, blocco di coda Campania/Sicilia/Puglia/Calabria attorno a una persona su due, Sardegna eccezione).",
+  "Dinamica: serie lunga 54,23 (2018) -> 62,07 (2025), +7,83 punti, nessuna regione controcorrente; crescita disomogenea (Umbria +13,14, Calabria +3,41) con divario allargato di 2,89 punti; ultimo passo 2024->2025 +2,23, 19 su 20 in aumento.",
+  "Contesto esterno: eta pensione di vecchiaia 67 anni agganciata alla speranza di vita (INPS), citata come co-occorrenza non come causa; nota che il peso della riforma previdenziale e discusso.",
+  "Link interni: ter-108 (stessa mappa, partecipazione), ter-57 (mappa opposta, divario di genere), ter-401 (mappa diversa, imprenditorialita giovanile) piu hub /tema/lavoro-e-conciliazione; confondente nominato (sviluppo economico dell'area). prose_lint pulito, 4 link interni."
+ ],
+ "duration_seconds": 815,
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 32,
+ "queue_before": 33,
+ "run_id": "writer-20260728T122306Z-e547",
+ "session_id": "7ae242ef-d1f2-568f-bc2c-011b5876c971",
+ "stage": "writer",
+ "summary": "Scritto l'articolo completo di ter-14 (Tasso di occupazione over 54, regione, vintage 2025)",
+ "trigger": "dispatch"
+}
