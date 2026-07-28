@@ -134,6 +134,42 @@ class Reconstruct(unittest.TestCase):
             verifications_site=[{"code": "ter-651", "ok": True}],
         )["651"]
         self.assertEqual(d["state"], "pubblicata")
+        self.assertTrue(d["published"])
+
+    def test_stale_proof_leaves_it_fusa(self):
+        # una prova per una versione vecchia (impronta diversa) non pubblica
+        art = _article("651", 2023, "2026-07-27", 2023)
+        d = self._run(
+            articles={"651": art},
+            verifiche=[_verifica("ter-651", art)],
+            verifications_site=[{"code": "ter-651", "ok": True, "prosa": "vecchia_impronta"}],
+        )["651"]
+        self.assertEqual(d["state"], "fusa")
+        self.assertFalse(d["published"])
+
+    def test_matching_proof_with_fingerprint_publishes(self):
+        art = _article("651", 2023, "2026-07-27", 2023)
+        fp = verification_queue.prose_fingerprint(art)
+        d = self._run(
+            articles={"651": art},
+            verifiche=[_verifica("ter-651", art)],
+            verifications_site=[{"code": "ter-651", "ok": True, "prosa": fp}],
+        )["651"]
+        self.assertEqual(d["state"], "pubblicata")
+
+
+class PublishedFrom(unittest.TestCase):
+    def test_none_when_no_proof(self):
+        self.assertIsNone(t._published_from([], "abc"))
+
+    def test_true_when_matching(self):
+        self.assertTrue(t._published_from([{"ok": True, "prosa": "abc"}], "abc"))
+
+    def test_false_when_only_stale(self):
+        self.assertFalse(t._published_from([{"ok": True, "prosa": "old"}], "abc"))
+
+    def test_unpinned_proof_counts_as_matching(self):
+        self.assertTrue(t._published_from([{"ok": True}], "abc"))
 
 
 class Reconcile(unittest.TestCase):

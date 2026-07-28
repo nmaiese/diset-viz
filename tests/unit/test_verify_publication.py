@@ -1,6 +1,6 @@
 """La verifica della pubblicazione sul sito (§8), senza rete.
 
-Il nucleo (`page_signature`, `match_signature`) e' puro; il recupero HTTP e'
+Il nucleo (`page_signature`, `match_signature`) e' puro, il recupero HTTP e'
 provato con un fetcher iniettato, cosi' il test non tocca la rete e verifica la
 regola di prudenza: un controllo che non ha potuto girare non passa.
 """
@@ -63,6 +63,37 @@ class Url(unittest.TestCase):
     def test_build_url_puts_code_last(self):
         url = v.build_url("eur-rd_e_gerdreg", slug="spesa-ricerca", base="https://x.it")
         self.assertEqual(url, "https://x.it/indicatore/spesa-ricerca/eur-rd_e_gerdreg")
+
+    def test_without_slug_it_is_the_code_only_form(self):
+        # la forma che l'app serve e 301 reindirizza alla canonica
+        url = v.build_url("ter-651", base="https://x.it")
+        self.assertEqual(url, "https://x.it/indicatore/ter-651")
+
+
+class ProofRegister(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        from pathlib import Path
+        self.root = Path(tempfile.mkdtemp())
+
+    def test_proof_carries_the_prose_fingerprint(self):
+        from scripts import verification_queue
+        result = {"code": "ter-651", "ok": True, "snippet_ok": True,
+                  "vintage_ok": True, "url": "http://x", "reason": "combacia"}
+        proof = v.build_proof(ENTRY, result, level="regione", at="2026-07-28")
+        self.assertEqual(proof["prosa"], verification_queue.prose_fingerprint(ENTRY))
+        self.assertEqual(proof["vintage"], "2023")
+        self.assertTrue(proof["ok"])
+
+    def test_write_and_load_round_trip(self):
+        result = {"code": "ter-651", "ok": True, "url": "http://x", "reason": "combacia"}
+        v.write_proof(v.build_proof(ENTRY, result, at="2026-07-28"), root=self.root)
+        loaded = v.load_proofs(root=self.root)
+        self.assertEqual(len(loaded), 1)
+        self.assertEqual(loaded[0]["code"], "ter-651")
+
+    def test_missing_register_reads_empty(self):
+        self.assertEqual(v.load_proofs(root=self.root / "nope"), [])
 
 
 if __name__ == "__main__":

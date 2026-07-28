@@ -581,11 +581,17 @@ pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
   Affianca il flusso senza pubblicare.
 - **Fase D, pilota della PR unica**, solo su nuovi indicatori a perimetro
   limitato, con lo stato nel record di pratica e non nella PR. Il pezzo davvero
-  nuovo, la **verifica del sito** (§8), e' gia' scritto in
-  `scripts/verify_publication.py` (la firma di contenuto lead+vintage, con
-  l'irraggiungibile che non passa), **resta da fare** il pilota vero, cioe'
-  costruire lo slug reale, girarlo dopo un deploy e legare la transizione
-  `fusa -> pubblicata` al suo esito.
+  nuovo, la **verifica del sito** (§8), e' fatto: `scripts/verify_publication.py`
+  prende la pagina reale dalla forma a solo code (che l'app 301 reindirizza allo
+  slug canonico), confronta la firma di contenuto lead+vintage, e scrive una
+  **prova** in `data/pipeline/pubblicazioni/` (un file per record, con l'impronta
+  `prosa` che la fa scadere quando il testo cambia). La ricostruzione legge le
+  prove e porta a `pubblicata` solo gli indicatori confermati, la transizione
+  `fusa -> pubblicata` guidata da un artefatto e non da una modifica di stato.
+  Provata end-to-end contro l'app servita in
+  `tests/integration/test_verify_publication_live.py`. **Resta da fare**: girarla
+  contro `divarioitalia.it` dopo un deploy vero, e legare la scrittura della prova
+  a uno stadio della catena col suo perimetro (Fase F).
 - **Fase E, manutenzione.** I tipi `aggiornamento`, `revisione`, `smentita`,
   `integrazione`, `ritiro`, `rollback` (§2). Uscita: ogni indicatore mostra cicli
   distinti ma collegati, senza PR eterna.
@@ -616,7 +622,7 @@ girano accanto al flusso di oggi e non cambiano niente della pubblicazione.
 | `scripts/practice_model.py` | stati, transizioni, tipi, errori, priorita' (§2-4, 9, 11) | `tests/unit/test_practice_model.py` |
 | `scripts/practice_store.py` | lo store un-file-per-record delle pratiche | `tests/unit/test_practice_store.py` |
 | `scripts/practice_timeline.py` | ricostruzione per indicatore + riconciliatore (Fase B/C) | `tests/unit/test_practice_timeline.py` |
-| `scripts/verify_publication.py` | la verifica del sito, `fusa -> pubblicata` (§8) | `tests/unit/test_verify_publication.py` |
+| `scripts/verify_publication.py` | la verifica del sito e il registro prove `data/pipeline/pubblicazioni/`, `fusa -> pubblicata` (§8) | `tests/unit/test_verify_publication.py`, `tests/integration/test_verify_publication_live.py` |
 
 ```bash
 python3 scripts/practice_timeline.py                       # una riga per indicatore

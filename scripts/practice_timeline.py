@@ -111,7 +111,11 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
     `type`, `state`, `entered_at`, `completed_stages`, `flags`, `error_class`,
     `published`, `verification_valid`, `score_eligible`, `runs`, `timeline`.
     """
-    site = {v["code"]: v for v in (verifications_site or []) if v.get("code")}
+    from scripts import verification_queue
+    proofs_by_code = {}
+    for proof in (verifications_site or []):
+        if proof.get("code"):
+            proofs_by_code.setdefault(proof["code"], []).append(proof)
 
     # 1. Costruisci l'universo degli indicatori e un evento per ogni traccia.
     dossier: dict = {}
@@ -229,7 +233,6 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
                 d["flags"]["stale_vintage"] = True
 
     # --- verifiche: contro l'impronta della prosa ----------------------------
-    from scripts import verification_queue
     for row in verifiche:
         code = row.get("code", "")
         key = key_of_code(code)
@@ -282,7 +285,10 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
         d["timeline"].sort(key=lambda e: (e.get("at") or "", EDITORIAL_ORDER.get(e.get("stage"), 9)))
         d["runs"] = sorted({r for r in d["runs"] if r})
         d["required_stages"] = _required_for(ind, "curator" in d["completed_stages"])
-        d["state"], d["error_class"] = _state_of(d, site.get(code_of(ind)))
+        entry = (articles or {}).get(ind)
+        fp = verification_queue.prose_fingerprint(entry) if entry else None
+        d["published"] = _published_from(proofs_by_code.get(code_of(ind), []), fp)
+        d["state"], d["error_class"] = _state_of(d)
         d["priority"] = practice_model.priority_score(
             {"flags": d["flags"], "state": d["state"], "type": d["type"],
              "completed_stages": d["completed_stages"], "score_eligible": d["score_eligible"],
@@ -313,7 +319,24 @@ def _required_for(ind_id: str, has_curation: bool) -> tuple:
     return tuple(req)
 
 
-def _state_of(d: dict, site_proof):
+def _published_from(proofs: list, fingerprint):
+    """Lo stato di pubblicazione dell'indicatore dalle prove sul sito.
+
+    `True` se esiste una prova riuscita la cui impronta `prosa` combacia con la
+    versione attuale (una prova senza impronta e' una prova non ancorata, e vale
+    come combaciante). `False` se ci sono prove ma nessuna combacia: la
+    pubblicazione e' scaduta, il sito serve un'altra versione o il controllo e'
+    fallito. `None` se non c'e' nessuna prova, che e' diverso da fallita.
+    """
+    if not proofs:
+        return None
+    for p in proofs:
+        if p.get("ok") and (p.get("prosa") in (None, fingerprint)):
+            return True
+    return False
+
+
+def _state_of(d: dict):
     """Lo stato ricostruito dell'indicatore e la classe d'errore, dalle bandiere.
 
     Ogni ramo e' una condizione verificabile degli artefatti (§3): e' cio' che
@@ -337,7 +360,7 @@ def _state_of(d: dict, site_proof):
     if required and set(required).issubset(set(d["completed_stages"])):
         if not f.get("article_complete", True):
             return "in-lavorazione", None
-        if site_proof and site_proof.get("ok"):
+        if d.get("published") is True:
             return "pubblicata", None
         return "fusa", None
     if not d["completed_stages"]:
@@ -350,7 +373,7 @@ def reconcile(declared: dict, reconstructed: dict) -> list:
     ricostruito dagli artefatti (Fase C). Restituisce le divergenze: e' l'evento
     che il mandato chiede a 1.6 e 3.5, cosi' una modifica fuori dalla pipeline non
     passa per assenza di lavoro."""
-    # I record dichiarati sono indicizzati per `practice_id`; qui si riconcilia
+    # I record dichiarati sono indicizzati per `practice_id`, qui si riconcilia
     # per indicatore, quindi si normalizza sul campo `indicator_id` (o `id`).
     by_ind = {}
     for rec in declared.values():
@@ -375,8 +398,9 @@ def reconcile(declared: dict, reconstructed: dict) -> list:
 
 # --- collegamento ai lettori reali (tutti stdlib puri) ----------------------
 
-def load_real(today: str = ""):
-    from scripts import curate, pending_notes, pipeline_log, indicator_store, verification_queue
+def load_real(today: str = "", proofs_root=None):
+    from scripts import (curate, pending_notes, pipeline_log, indicator_store,
+                         verification_queue, verify_publication)
     candidates = discovery.read_candidates()
     manifest = pending_notes.read_manifest()
     curation = curate.read_curation()
@@ -384,8 +408,9 @@ def load_real(today: str = ""):
     articles = indicator_store.load_all(strict=False)
     verifiche = verification_queue.load_verifications()
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
+    proofs = verify_publication.load_proofs(root=proofs_root)
     return reconstruct(candidates, manifest, curation, external, articles,
-                       verifiche, runs, today=today)
+                       verifiche, runs, verifications_site=proofs, today=today)
 
 
 def _dossier_to_record(d: dict) -> dict:
@@ -419,9 +444,10 @@ def main(argv=None) -> int:
     parser.add_argument("--check", action="store_true",
                         help="riconcilia i record dichiarati con gli artefatti (esce !=0 se divergono)")
     parser.add_argument("--today", default="", help="data di riferimento YYYY-MM-DD per la priorita'")
+    parser.add_argument("--proofs-root", default=None, help="cartella del registro prove sito (per i test)")
     args = parser.parse_args(argv)
 
-    dossier = load_real(today=args.today)
+    dossier = load_real(today=args.today, proofs_root=args.proofs_root)
 
     if args.check:
         from scripts import practice_store
