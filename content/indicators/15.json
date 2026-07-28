@@ -1,16 +1,32 @@
 {
- "fonti": [],
+ "fonti": [
+  {
+   "testo": "Eurostat, Unemployment by sex and age, annual data (une_rt_a): nel 2025 in Italia i disoccupati tra i 15 e i 24 anni sono 272 mila, pari al 4,6 per cento della popolazione della stessa età e al 20,6 per cento delle forze di lavoro giovanili, contro il 15,2 per cento dell'aggregato dei 27 paesi dell'Unione",
+   "url": "https://ec.europa.eu/eurostat/databrowser/view/une_rt_a/default/table"
+  }
+ ],
  "key": "15",
- "lead": "Tra i giovani in cerca di lavoro la disoccupazione resta alta: in media il 20,6% di chi si affaccia sul mercato tra 15 e 24 anni non trova impiego. In Campania sale al 40,1%, quattro giovani attivi su dieci, mentre in Trentino Alto Adige scende al 7,1%.",
+ "lead": "Il denominatore del tasso di disoccupazione giovanile sono i giovani che un lavoro lo stanno cercando, ed è da lì che nascono quasi tutti gli equivoci. In Italia i disoccupati tra i 15 e i 24 anni sono 272 mila, il 4,6 per cento dei coetanei, dato Eurostat.",
+ "level": "regione",
  "sections": [
   {
-   "body": "Il tasso giovanile va letto con attenzione: si calcola sui giovani attivi, non su tutti, e al Sud molti studiano o non cercano, quindi la disoccupazione visibile è solo la punta. Resta un segnale forte di quanto sia difficile l'ingresso nel lavoro, con effetti lunghi su fiducia, redditi e scelte di vita. Un ritardo all'inizio pesa per decenni. Il problema dei giovani del Sud è trovare lavoro o restare per cercarlo?",
-   "h": null,
+   "body": "Al numeratore le persone tra i 15 e i 24 anni che un impiego lo cercano e non lo hanno. Al denominatore non tutti i loro coetanei, ma le sole forze di lavoro della stessa età, cioè chi lavora più chi cerca. Chi studia e basta resta fuori da entrambi i lati della frazione. Istat lo calcola come media annua.\n\nPer questo il valore della Campania non va letto come quattro giovani su dieci senza lavoro: sono quattro su dieci fra quelli che si sono messi sul mercato, e a quell'età sul mercato ci va una minoranza. Quanti ne lavorano davvero lo dice un'altra serie, il [tasso di occupazione giovanile](/indicatore/tasso-di-occupazione-giovanile-totale/ter-407), dove la Campania si ferma a 21,80 e il Trentino Alto Adige arriva a 45,80.",
+   "h": "Sulle forze di lavoro, non su tutti i coetanei",
+   "role": "definizione"
+  },
+  {
+   "body": "La media siede sopra la mediana, 20,59 contro 19,82, segno che a spostarla è una coda e non una pendenza regolare. La coda si apre in fondo: tra la Calabria e la Puglia corrono 4,53 punti, tra la Sicilia e la Campania altri 6,32. Sono i due distacchi più larghi della graduatoria dopo quello che separa il Trentino Alto Adige da tutti gli altri.\n\nIn tre regioni la quota supera il trenta per cento di chi ci prova, e la posta in gioco lì non è il conteggio di un anno ma il tempo. Un ingresso ritardato nel lavoro sposta in avanti i primi contributi e tutto quello che ci si costruisce sopra.\n\nIn mezzo alla classifica, però, la geografia si scompone. Il Molise è settimo con 15,80, davanti all'Emilia-Romagna, e la Basilicata undicesima con 20,33, davanti a Marche, Lazio e Liguria. Due regioni del Mezzogiorno piazzate nel gruppo centrale bastano a rendere il Sud una categoria poco utile per leggere questa mappa.",
+   "h": "Il Molise settimo, la Basilicata davanti alle Marche",
    "role": "quadro"
   },
   {
-   "body": "È calcolato sulle sole forze di lavoro giovanili, una base ristretta che rende il tasso alto e volatile. Non conta i tanti giovani che studiano o non cercano, e va sempre affiancato al tasso di occupazione e ai NEET per non ingannare.",
-   "h": null,
+   "body": "Dal 2018 al 2025 la media regionale è scesa da 32,07 a 20,59 e la distanza tra la prima e l'ultima regione si è ristretta di 8,76 punti. La convergenza è arrivata dal basso: la Calabria ha lasciato per strada 25,04 punti e il Molise 23,43, mentre l'Emilia-Romagna si è mossa di 0,31 e le Marche di 0,61. Chi partiva bene è rimasto più o meno dov'era.\n\nL'ultimo passaggio va letto con la lente. Tra il 2024 e il 2025 la media cala di 1,20 punti, ma le regioni in calo sono nove e quelle in aumento undici: la discesa la firmano quasi da sole il Molise, che passa da 39,77 a 15,80 in dodici mesi, e la Calabria, da 42,61 a 28,11. Il Molise è la regione che oscilla di più su questa serie, 44,66 nel 2019 e 25,67 nel 2023, e ventiquattro punti in un anno solo, su una fascia d'età così sottile, sono un avvertimento più che una notizia.\n\nIl confronto europeo si muove meno. Nel 2025 il dato nazionale Eurostat per l'Italia è 20,6 per cento contro il 15,2 dell'aggregato dei ventisette paesi dell'Unione, e che quel 20,6 somigli alla media delle venti regioni è una coincidenza: l'aggregato pesa i territori per quanti giovani attivi hanno, questa media no.",
+   "h": "Sette anni di discesa, e un ultimo anno che inganna",
+   "role": "dinamica"
+  },
+  {
+   "body": "Chi rinuncia sparisce dal numeratore e dal denominatore insieme, quindi il tasso può scendere senza che nessuno abbia trovato lavoro. Il [tasso di mancata partecipazione al lavoro](/indicatore/tasso-di-mancata-partecipazione-al-lavoro/bes-03LAV002-N22) nasce per questo: aggiunge chi sarebbe disponibile ma non cerca più, e su tutte le età mette la Campania a 27,30 e il Trentino Alto Adige a 4,30.\n\nIl tasso non dice nemmeno quante persone siano. Una regione con poche forze di lavoro giovanili può avere un valore altissimo e poche migliaia di ragazzi dietro, e due regioni con lo stesso numero possono nascondere volumi molto diversi.\n\nNon tutte le mappe del lavoro giovanile poi si somigliano. L'[imprenditorialità giovanile](/indicatore/imprenditorialita-giovanile-totale/ter-401), ferma al 2023, mette la Campania prima e il Trentino Alto Adige terzo, cioè le due regioni che qui stanno agli estremi opposti: mettersi in proprio e trovare chi assume non ordinano i territori allo stesso modo. Le altre serie sull'occupazione stanno nel [tema lavoro e conciliazione](/tema/lavoro-e-conciliazione).",
+   "h": "Chi ha smesso di cercare esce dal conto",
    "role": "limiti"
   }
  ],
