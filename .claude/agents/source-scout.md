@@ -64,8 +64,14 @@ written down, never `approved`.
 
 ```bash
 python3 scripts/pipeline_status.py --json          # sempre per primo
-python3 scripts/scout_sources.py                   # aggiorna le proposte (catalogo SDMX, cache-forever)
+python3 scripts/scout_sources.py --refresh         # ri-sonda il catalogo SDMX e aggiorna le proposte
 ```
+
+`--refresh` rifa' la singola query del catalogo anche se e' gia' in cache: e'
+cosi' che vedi i dataflow che Istat ha pubblicato dopo la tua ultima run,
+invece di ripartire ogni volta dalla stessa fotografia. Non c'e' piu' un tetto
+sulle proposte: se il catalogo ha un dominio regionale nuovo, entra in coda come
+`new` e lo triaghi tu.
 
 `data/discovery/source_candidates.csv` holds the proposals. Work
 `triage_status=new`, highest `priority_score` first, and **write the reason in

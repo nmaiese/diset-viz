@@ -131,8 +131,16 @@ def allowlist_terms(registry=None):
     return terms
 
 
-def propose_sources(flows, covered=None, terms=None, limit=40):
+def propose_sources(flows, covered=None, terms=None, limit=None):
     """Pure ranking: which catalogue dataflows to propose as new sources.
+
+    `limit=None` (the default) proposes **every** surviving dataflow. The cap
+    used to default to 40, and with a uniform score that made the ranking
+    alphabetical: the same 40 names won every run, and every genuinely new
+    domain past the 40th was invisible, so the scout looked exhausted while the
+    catalogue held dozens of uncovered regional dataflows. Discovery has to see
+    the whole survivor set to stay continuous; a caller that wants a smaller
+    batch still passes `limit`.
 
     A dataflow is proposed when its name names a regional/territorial breakdown,
     its id is not already covered by a curated adapter, and its domain tokens do
@@ -177,7 +185,7 @@ def propose_sources(flows, covered=None, terms=None, limit=40):
             ),
         })
     proposals.sort(key=lambda p: (-p["priority_score"], p["name"]))
-    return proposals[:limit]
+    return proposals if limit is None else proposals[:limit]
 
 
 def to_rows(proposals, now=None):
@@ -208,35 +216,69 @@ def read_source_candidates(path=SOURCE_CANDIDATES_PATH):
 
 def upsert(existing, fresh):
     """Merge fresh proposals over the queue, preserving any human triage already
-    recorded for a candidate (status and notes are never overwritten)."""
+    recorded for a candidate (status and notes are never overwritten) and the
+    date the candidate was **first** discovered.
+
+    A refresh re-sees the same dataflow, it does not re-discover it. Taking the
+    fresh row wholesale would rewrite `discovered_at` to the refresh time on
+    every run, so the field would stop recording when a candidate entered the
+    queue and any age or audit calculation on it would be wrong. So for a
+    candidate already present we keep its `discovered_at`; only a genuinely new
+    candidate_id carries the fresh timestamp.
+    """
     by_id = {row["candidate_id"]: dict(row) for row in existing}
     for row in fresh:
         prior = by_id.get(row["candidate_id"])
-        if prior and prior.get("triage_status") not in ("", "new", None):
-            merged = dict(row)
-            merged["triage_status"] = prior["triage_status"]
-            merged["triage_notes"] = prior.get("triage_notes", "")
-            by_id[row["candidate_id"]] = merged
-        else:
-            by_id[row["candidate_id"]] = row
+        if prior:
+            row = dict(row)
+            if prior.get("discovered_at"):
+                row["discovered_at"] = prior["discovered_at"]
+            if prior.get("triage_status") not in ("", "new", None):
+                row["triage_status"] = prior["triage_status"]
+                row["triage_notes"] = prior.get("triage_notes", "")
+        by_id[row["candidate_id"]] = row
     return sorted(by_id.values(), key=lambda r: (-float(r["priority_score"]), r["name"]))
 
 
 def write_source_candidates(rows, path=SOURCE_CANDIDATES_PATH):
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     with Path(path).open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=COLUMNS, delimiter=";")
+        # lineterminator="\n": the rest of the discovery layer
+        # (discovery.write_semicolon / write_candidates) writes LF, and
+        # csv.DictWriter defaults to CRLF. The stray CR made every rewrite trip
+        # the gate's `git diff --check` (a bare CR at end of a changed line reads
+        # as trailing whitespace), so the scout could never actually commit an
+        # updated queue. LF keeps it consistent and gate-clean.
+        writer = csv.DictWriter(handle, fieldnames=COLUMNS, delimiter=";",
+                                lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
 
-def _load_flows(offline, cache_dir):
+def _load_flows(offline, cache_dir, refresh=False):
     client = istat_sdmx.SdmxClient(cache_dir=str(cache_dir), cache_only=offline)
-    return client.dataflows()
+    # The catalogue is cache-forever, so a scheduled scout would keep reading the
+    # first snapshot it ever cached and never notice a dataflow Istat published
+    # afterwards. `refresh` forces the one catalogue request, which is how source
+    # discovery stays continuous.
+    if not refresh:
+        return client.dataflows(force=False)
+    try:
+        return client.dataflows(force=True)
+    except (OSError, RuntimeError):
+        # Istat unreachable, blocked or throttled. A forced refresh must not abort
+        # the scout before it can triage the queue it has already committed: the
+        # dispatcher runs one stage per tick and the scout is first, so a failing
+        # forced refresh would keep selecting and killing the scout and stall the
+        # whole chain for as long as the outage lasts. Fall back to the cached
+        # catalogue when there is one; if nothing is cached, the second call
+        # re-raises, because then there is genuinely no catalogue to work from.
+        return client.dataflows(force=False)
 
 
-def run(offline=True, cache_dir=CACHE_DIR, limit=40, path=SOURCE_CANDIDATES_PATH):
-    flows = _load_flows(offline, cache_dir)
+def run(offline=True, cache_dir=CACHE_DIR, limit=None, path=SOURCE_CANDIDATES_PATH,
+        refresh=False):
+    flows = _load_flows(offline, cache_dir, refresh=refresh)
     proposals = propose_sources(flows, limit=limit)
     merged = upsert(read_source_candidates(path), to_rows(proposals))
     write_source_candidates(merged, path)
@@ -246,11 +288,16 @@ def run(offline=True, cache_dir=CACHE_DIR, limit=40, path=SOURCE_CANDIDATES_PATH
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--offline", action="store_true", help="use only the cached dataflow catalogue")
-    parser.add_argument("--limit", type=int, default=40)
+    parser.add_argument("--refresh", action="store_true",
+                        help="refetch the catalogue even if cached (re-poll Istat for newly "
+                             "published dataflows; keeps source discovery continuous)")
+    parser.add_argument("--limit", type=int, default=None,
+                        help="cap the number of proposals (default: no cap, propose every "
+                             "uncovered regional dataflow)")
     parser.add_argument("--dry-run", action="store_true", help="print proposals, do not write the queue")
     args = parser.parse_args()
 
-    flows = _load_flows(args.offline, CACHE_DIR)
+    flows = _load_flows(args.offline, CACHE_DIR, refresh=args.refresh)
     proposals = propose_sources(flows, limit=args.limit)
     if args.dry_run:
         for p in proposals:

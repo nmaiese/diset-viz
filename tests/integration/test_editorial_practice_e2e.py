@@ -448,7 +448,7 @@ class Metrics(unittest.TestCase):
         # una smentita corretta chiude `errori_pubblici` (eur:rd_e_gerdreg). Il
         # test verifica che le metriche siano esposte e valide, non che il gap
         # esista: pinnarle a >= 1 le accoppiava a uno stato transitorio che la
-        # normale operativita' della catena azzera.
+        # normale operativita' della catena azzera, e faceva fallire la suite.
         self.assertIsNotNone(oss["fusa_senza_prova_sul_sito"])
         self.assertGreaterEqual(oss["fusa_senza_prova_sul_sito"], 0)
         self.assertIsNotNone(oss["quota_run_associati_a_un_indicatore_pct"])

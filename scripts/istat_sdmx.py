@@ -130,9 +130,16 @@ class SdmxClient:
         tmp.replace(cache_path)
         return body
 
-    def dataflows(self):
-        """All dataflows for the IT1 agency, parsed to a list of dicts."""
-        body = self.get(f"dataflow/{AGENCY}", ACCEPT_STRUCTURE_JSON)
+    def dataflows(self, force=False):
+        """All dataflows for the IT1 agency, parsed to a list of dicts.
+
+        The catalogue is cache-forever by default (one request, shared with the
+        scout and the province discovery). `force=True` refetches it even when a
+        copy is on disk: that is how the scout re-polls for dataflows Istat has
+        published since its last run, so source discovery stays continuous
+        instead of freezing on the first cached snapshot.
+        """
+        body = self.get(f"dataflow/{AGENCY}", ACCEPT_STRUCTURE_JSON, force=force)
         return parse_dataflows(body)
 
     def datastructure(self, dsd_id, agency=AGENCY):
