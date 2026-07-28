@@ -216,17 +216,27 @@ def read_source_candidates(path=SOURCE_CANDIDATES_PATH):
 
 def upsert(existing, fresh):
     """Merge fresh proposals over the queue, preserving any human triage already
-    recorded for a candidate (status and notes are never overwritten)."""
+    recorded for a candidate (status and notes are never overwritten) and the
+    date the candidate was **first** discovered.
+
+    A refresh re-sees the same dataflow, it does not re-discover it. Taking the
+    fresh row wholesale would rewrite `discovered_at` to the refresh time on
+    every run, so the field would stop recording when a candidate entered the
+    queue and any age or audit calculation on it would be wrong. So for a
+    candidate already present we keep its `discovered_at`; only a genuinely new
+    candidate_id carries the fresh timestamp.
+    """
     by_id = {row["candidate_id"]: dict(row) for row in existing}
     for row in fresh:
         prior = by_id.get(row["candidate_id"])
-        if prior and prior.get("triage_status") not in ("", "new", None):
-            merged = dict(row)
-            merged["triage_status"] = prior["triage_status"]
-            merged["triage_notes"] = prior.get("triage_notes", "")
-            by_id[row["candidate_id"]] = merged
-        else:
-            by_id[row["candidate_id"]] = row
+        if prior:
+            row = dict(row)
+            if prior.get("discovered_at"):
+                row["discovered_at"] = prior["discovered_at"]
+            if prior.get("triage_status") not in ("", "new", None):
+                row["triage_status"] = prior["triage_status"]
+                row["triage_notes"] = prior.get("triage_notes", "")
+        by_id[row["candidate_id"]] = row
     return sorted(by_id.values(), key=lambda r: (-float(r["priority_score"]), r["name"]))
 
 
@@ -251,7 +261,19 @@ def _load_flows(offline, cache_dir, refresh=False):
     # first snapshot it ever cached and never notice a dataflow Istat published
     # afterwards. `refresh` forces the one catalogue request, which is how source
     # discovery stays continuous.
-    return client.dataflows(force=refresh)
+    if not refresh:
+        return client.dataflows(force=False)
+    try:
+        return client.dataflows(force=True)
+    except (OSError, RuntimeError):
+        # Istat unreachable, blocked or throttled. A forced refresh must not abort
+        # the scout before it can triage the queue it has already committed: the
+        # dispatcher runs one stage per tick and the scout is first, so a failing
+        # forced refresh would keep selecting and killing the scout and stall the
+        # whole chain for as long as the outage lasts. Fall back to the cached
+        # catalogue when there is one; if nothing is cached, the second call
+        # re-raises, because then there is genuinely no catalogue to work from.
+        return client.dataflows(force=False)
 
 
 def run(offline=True, cache_dir=CACHE_DIR, limit=None, path=SOURCE_CANDIDATES_PATH,

@@ -131,6 +131,54 @@ class QueueShape(unittest.TestCase):
         self.assertEqual(kept["triage_status"], "rejected")
         self.assertEqual(kept["triage_notes"], "gia coperto altrove")
 
+    def test_upsert_preserves_first_discovery_date(self):
+        # Un refresh ri-vede lo stesso dataflow, non lo ri-scopre: `discovered_at`
+        # deve restare quello della prima volta, non la data del refresh, o l'eta'
+        # di ogni candidato si azzererebbe a ogni run.
+        rows = scout_sources.to_rows(
+            scout_sources.propose_sources(FLOWS, covered=COVERED, terms=TERMS)
+        )
+        old = dict(rows[0])
+        old["discovered_at"] = "2026-07-25T00:00:00+00:00"
+        fresh = dict(rows[0])
+        fresh["discovered_at"] = "2026-07-28T00:00:00+00:00"
+        merged = scout_sources.upsert([old], [fresh])
+        kept = next(r for r in merged if r["candidate_id"] == old["candidate_id"])
+        self.assertEqual(kept["discovered_at"], "2026-07-25T00:00:00+00:00")
+
+    def test_upsert_dates_a_genuinely_new_candidate(self):
+        rows = scout_sources.to_rows(
+            scout_sources.propose_sources(FLOWS, covered=COVERED, terms=TERMS)
+        )
+        fresh = dict(rows[0])
+        fresh["discovered_at"] = "2026-07-28T00:00:00+00:00"
+        merged = scout_sources.upsert([], [fresh])  # nessun prior
+        self.assertEqual(merged[0]["discovered_at"], "2026-07-28T00:00:00+00:00")
+
+
+class RefreshFallsBackToCache(unittest.TestCase):
+    """Con --refresh lo scout forza il refetch del catalogo. Se Istat e' giu' o
+    bloccato, l'errore non deve abortire lo scout prima che triaghi la coda gia'
+    committata: il dispatcher gira uno stadio per tick e lo scout e' il primo,
+    quindi un guasto Istat persistente lo rilancerebbe e ucciderebbe ogni tick,
+    fermando tutta la catena. Si ripiega sulla cache quando c'e'."""
+
+    class _FakeClient:
+        def __init__(self, *a, **k):
+            pass
+
+        def dataflows(self, force=False):
+            if force:
+                from scripts import istat_sdmx
+                raise istat_sdmx.IstatBlockedError("403 dall'endpoint")
+            return [{"id": "cached_1", "name": "Dal catalogo in cache - regioni"}]
+
+    def test_forced_refresh_failure_falls_back_to_cache(self):
+        from unittest import mock
+        with mock.patch.object(scout_sources.istat_sdmx, "SdmxClient", self._FakeClient):
+            flows = scout_sources._load_flows(offline=False, cache_dir="/x", refresh=True)
+        self.assertEqual(flows, [{"id": "cached_1", "name": "Dal catalogo in cache - regioni"}])
+
 
 if __name__ == "__main__":
     unittest.main()
