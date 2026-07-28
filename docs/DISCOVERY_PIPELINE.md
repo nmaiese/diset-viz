@@ -4,8 +4,9 @@
 > [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).** Questo documento descrive
 > il **meccanismo** della scoperta: gli adapter, lo schema della coda, il
 > punteggio di priorità, cosa succede in promozione. Quello descrive **chi lo
-> muove**: i sette stadi, gli agenti, il cancello, la politica di merge e il
-> rientro sul pubblicato. Se cerchi "chi decide e quando", vai lì.
+> muove**: i tre ruoli (ammissione, produttore, verificatore), il lanciatore, il
+> cancello, la politica di merge e il rientro sul pubblicato. Se cerchi "chi
+> decide e quando", vai lì.
 
 Questo documento descrive lo strato di **scoperta e messa in coda** degli
 indicatori, cioè il pezzo che rende Divario Italia un aggregatore multifonte con
@@ -68,15 +69,18 @@ non vengono scartati: scendono solo in fondo alla coda.
 
 ## Il gate: niente va live senza passare dal cancello
 
-Ogni stadio scrive **solo** dentro il proprio perimetro (il cacciatore in
-`data/discovery/candidates.csv`, e basta) e chiude con
+Ogni ruolo scrive **solo** dentro il proprio perimetro (l'ammissione nella coda
+fonti, la config Istat, la coda candidati e il layer esterno; il produttore
+nell'articolo, nella curatela e nella mappa temi) e chiude con
 `scripts/pipeline_gate.py`, che calcola il verdetto dal diff e dalla suite e
-decide se e come la PR si fonde. La politica non è uniforme: la prosa si fonde da
-sola, mentre promozione, curatela e **ammissione di una fonte** passano dai check
-remoti, perché muovono numeri vivi o decidono quale istituzione compare su una
-pagina pubblica. Nessuno stadio aspetta una firma: in una catena che nessuno
-presidia, "aspetta che qualcuno guardi" vuol dire "aspetta per sempre". Regole
-complete e motivazioni in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md) e
+decide se la PR si fonde. **Oggi ogni ruolo fonde `auto`** sul cancello locale,
+che gira la suite intera prima del merge: la CI remota non parte sulle PR aperte
+via il GitHub MCP, quindi aspettarla (`checks`) non comprava un verdetto
+indipendente ma un deadlock, ed e' il motivo per cui la vecchia politica non
+uniforme (prosa `auto`, promozione e ammissione `checks`) e' stata portata tutta
+ad `auto`. Nessun ruolo aspetta una firma: in una catena che nessuno presidia,
+"aspetta che qualcuno guardi" vuol dire "aspetta per sempre". Regole complete e
+motivazioni in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md) e
 [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md).
 
 Restano vere le regole già scritte in `DATA_PIPELINE.md`: `exact` è l'unico caso
@@ -204,42 +208,48 @@ l'adapter porta un tema nuovo, va registrato in
 finisce nella macro-area "Altro" e l'indicatore sparisce dai totali per
 macro-area pur restando in catalogo.
 
-## Fase 4: lo scrittore, il testo editoriale
+## Fase 4: la scrittura del testo editoriale
 
-Dopo che il curatore ha integrato e orientato un indicatore, manca il testo che
-l'utente legge. Lo **scrittore** (`.claude/agents/indicator-writer.md`, agente
-Claude Code invocabile via subagent) scrive l'intero articolo della pagina
-(`lead` piu le quattro sezioni `definizione`/`quadro`/`dinamica`/`limiti`, con
-`fonti` e `vintage`) in `content/indicators/`, un file per articolo, seguendo
+Dopo che la cura ha integrato e orientato un indicatore, manca il testo che
+l'utente legge. La scrittura produce l'intero articolo della pagina (`lead` piu
+le quattro sezioni `definizione`/`quadro`/`dinamica`/`limiti`, con `fonti` e
+`vintage`) in `content/indicators/`, un file per articolo, seguendo
 `content/STYLE.md`, con **solo numeri reali** presi dal brief
 (`scripts/indicator_brief.py`), le fonti verificate per le affermazioni
-comparative e il `vintage` uguale all'`year_max` corrente (drift guard). Apre una
-PR, niente merge. È lo step che trasforma un indicatore appena integrato in una
-pagina che si legge come scritta da un giornalista.
+comparative e il `vintage` uguale all'`year_max` corrente (drift guard). È lo
+step che trasforma un indicatore appena integrato in una pagina che si legge come
+scritta da un giornalista.
 
-La catena completa degli agenti, tutti definiti in `.claude/agents/`:
+Cura, scrittura e revisione **non sono piu' tre agenti freddi** che si passano
+l'indicatore via CSV: sono i tre passi di un ruolo solo, il **produttore**
+(`.claude/agents/producer.md`), che porta un indicatore da ammesso a firmato in
+una sessione e si rilegge il proprio testo prima di firmare. La catena, dopo la
+ri-architettura, e' tre ruoli, non sette stadi:
 
-    scout -> cacciatore -> promozione -> curatore -> scrittore -> revisore
-                                                                      |
-                                                       cancello -> merge -> live
+    ammissione (scout+hunter+promoter) -> produttore (cura+scrive+rilegge+firma) -> verificatore
+                                                                                        |
+                                                                     cancello -> merge auto -> live -> passo del sito
 
-| agente | file | coda deterministica |
+| ruolo | agente | code deterministiche che drena |
 | --- | --- | --- |
-| scout | `source-scout.md` | `data/discovery/source_candidates.csv` |
-| cacciatore | `indicator-hunter.md` | `data/discovery/candidates.csv` |
-| curatore | `indicator-curator.md` | `scripts/curate.py --include-recheck` |
-| scrittore | `indicator-writer.md` | `scripts/pending_notes.py`, `scripts/text_queue.py` |
-| revisore | `indicator-reviewer.md` | `scripts/review_queue.py` |
+| ammissione | `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` da promuovere |
+| produttore | `producer` | `scripts/curate.py --include-recheck`, `scripts/pending_notes.py`, `scripts/text_queue.py`, `scripts/review_queue.py` |
+| verificatore | `indicator-verifier` | `scripts/verification_queue.py` |
 
-Lo stato di tutti gli stadi insieme:
+I file di agente dei vecchi stadi (`source-scout.md`, `indicator-hunter.md`,
+`indicator-curator.md`, `indicator-writer.md`, `indicator-reviewer.md`) esistono
+ancora, ma la Routine lancia solo i tre ruoli via `.claude/agents/launcher.md`.
+
+Lo stato di tutte le code insieme:
 
 ```bash
 python3 scripts/pipeline_status.py
 ```
 
-Ogni stadio ha una coda che si calcola dai file committati, non dalla memoria di
-una sessione precedente. È la condizione perché un agente schedulato sappia su
-che cosa lavorare partendo da zero, e perché due run non si pestino i piedi.
+Ogni coda si calcola dai file committati, non dalla memoria di una sessione
+precedente. È la condizione perché un agente schedulato sappia su che cosa
+lavorare partendo da zero, e perché due run su indicatori diversi non si pestino
+i piedi (file diversi, nessuna contesa).
 
 ## Fase 5: il revisore, i testi che esistono già
 
@@ -259,14 +269,14 @@ Nessuno di questi è un difetto di per sé. Sono le frasi in cui un difetto si
 nasconde, quindi decidono l'ordine di lettura, non un esito. Un articolo firmato
 porta `reviewed_at` (`YYYY-MM-DD`, sotto guardia) ed esce dalla coda.
 
-### Il trigger dello scrittore (worklist deterministica)
+### Il trigger della scrittura (worklist deterministica)
 
-Lo scrittore aveva l'unico stadio della catena senza un innesco automatico: il
-cacciatore e il curatore avevano una coda deterministica, ma nulla diceva allo
-scrittore quali indicatori il curatore avesse appena integrato e lasciato senza
-nota. È anche la coda che il dispatcher legge per sapere se tocca a lui. Per
-questo `scripts/pending_notes.py` produce la **coda dello scrittore**, come
-`curate.uncurated_targets` fa per il curatore:
+La scrittura era l'unico passo della catena senza un innesco automatico: il
+cacciatore e il curatore avevano una coda deterministica, ma nulla diceva quali
+indicatori la cura avesse appena integrato e lasciato senza nota. È anche la coda
+che il lanciatore legge per sapere quali indicatori sono pronti per il produttore.
+Per questo `scripts/pending_notes.py` produce la **coda della scrittura**, come
+`curate.uncurated_targets` fa per la cura:
 
 - **da scrivere** (`missing`): un indicatore integrato nel manifest
   (`status=integrated`) senza articolo. È il passaggio di consegne
@@ -319,28 +329,32 @@ Esempio reale di coda prodotta: R&S sul PIL classificato `new` (0.88), PIL pro
 capite `proxy` dell'id 901 dei conti economici territoriali (0.78), entrambi
 copertura 20/20.
 
-## Runtime: una Routine sola, il dispatcher
+## Runtime: una Routine sola, il lanciatore
 
 La catena gira come **Routine Claude Code** (agenti cloud, sessione nuova a ogni
 firing, checkout git proprio). La cadenza, l'id e lo stato stanno in
 [`DISCOVERY_STATUS.md`](DISCOVERY_STATUS.md); il contratto che ogni agente segue a
 ogni run sta in [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md); come stanno insieme i
-sette stadi sta in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
+tre ruoli sta in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 
-**Gli stadi non hanno un cron proprio.** Ne avevano uno a testa, e la forma
-aveva un difetto strutturale: le dipendenze della catena sono di dato e il
-calendario le ignorava, quindi il curatore girava il giovedì comunque, a vuoto
-se a monte non era successo niente. Ora una sola Routine gira a battito, lancia
-`scripts/pipeline_dispatch.py`, e quello nomina **un solo stadio**, il primo con
-lavoro in ordine di catena. Un tick, uno stadio, quindi nessuno stadio si trova
-mai addosso un altro.
+**I ruoli non hanno un cron proprio.** Gli stadi ne avevano uno a testa, e la
+forma aveva un difetto strutturale: le dipendenze della catena sono di dato e il
+calendario le ignorava, quindi il curatore girava il giovedì comunque, a vuoto se
+a monte non era successo niente. Poi e' arrivato un dispatcher unico, che
+serializzava a uno-stadio-per-tick e rifiutava di partire con una PR aperta,
+congelando tutto su un solo blocco. Ora una sola Routine gira a battito e lancia
+`scripts/pipeline_launch.py`, che **non nomina un solo stadio**: legge il dossier
+per-indicatore e le code e restituisce una **lista prioritizzata di lanci**
+(produttore e verificatore per-indicatore, ammissione batch). Indicatori diversi
+toccano file diversi, quindi il lanciatore ne mette in volo piu' d'uno in
+parallelo senza contesa, e non esiste piu' il lock una-PR-aperta.
 
 **Il prompt di una Routine non riproduce il contratto, lo indica.** È la lezione
 più cara di questo sistema: la Routine dello scrittore riproduceva il proprio
 contratto per intero, il repo è andato avanti, e per settimane l'agente ha
 scritto in `analyst_notes.json`, un file che l'app non legge più. Girava, non
-falliva, e non arrivava in nessuna pagina. Con un dispatcher solo il rischio si
-restringe a un prompt, che è anche il motivo per cui quel prompt è tre righe e
+falliva, e non arrivava in nessuna pagina. Con un lanciatore solo il rischio si
+restringe a un prompt, che è anche il motivo per cui quel prompt è corto e
 non ricopia niente.
 
 Note operative che restano vere per tutti:

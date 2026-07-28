@@ -47,9 +47,14 @@ dedotte invece che per pratica e dichiarate**:
 Quindi il modello proposto non e' un impianto nuovo calato sopra. E' la
 **unificazione** di cose che ci sono: dare all'indicatore-in-un-ciclo un nome e un
 record, dichiarare le dipendenze che oggi sono impronte sparse, e separare il
-merge dalla pubblicazione. Tutto il resto della catena, un dispatcher e uno stadio
-per tick, un file per record, il cancello come perimetro, il rientro guidato dai
-dati, resta in piedi e regge il modello.
+merge dalla pubblicazione. Tutto il resto della catena, un lanciatore che elenca
+il lavoro per-indicatore lanciabile in parallelo, un file per record, il cancello
+come perimetro, il rientro guidato dai dati, resta in piedi e regge il modello.
+Anzi, l'unita' di osservazione che questo documento chiedeva, l'indicatore invece
+dello stadio, e' diventata nel frattempo l'unita' di **lavoro** della catena
+stessa: i sette stadi sono ora tre ruoli (ammissione, produttore, verificatore),
+e produttore e verificatore girano per-indicatore, esattamente la grana su cui il
+modello ragiona (vedi [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md)).
 
 ---
 
@@ -174,7 +179,7 @@ lo **sostituiscono** (mandato 3.2).
 **Decisione 12 (quarantena):** una pratica va in quarantena quando i tentativi
 superano la soglia del suo tipo di errore (§9) **e** l'errore non e' transitorio,
 oppure quando un blocco editoriale non ha una via d'uscita automatica (un dubbio
-che nessun dato scioglie). La quarantena la toglie dalla coda del dispatcher senza
+che nessun dato scioglie). La quarantena la toglie dalla coda del lanciatore senza
 cancellarne la storia, cosi' una pratica malata non ferma le sane (mandato 1.10).
 
 ---
@@ -226,15 +231,22 @@ restare collettivo da cio' che deve diventare individuale.
   illeggibile costa solo se stessa".
 - **Diventa individuale (una pratica):** dalla **promozione in poi**. Nel momento
   in cui un candidato `approved` diventa un indicatore identificato, nasce una
-  pratica, e da li' curator, writer, reviewer, verificatore lavorano **un
-  indicatore alla volta**. E' dove si producono decisioni editoriali e artefatti
-  pubblicabili, ed e' dove il mandato vuole responsabilita' singola: un errore su
-  un indicatore non deve bloccare gli altri, e costo e durata vanno misurati per
-  indicatore.
+  pratica, e da li' il produttore (che fonde curator, writer e reviewer) e il
+  verificatore lavorano **un indicatore alla volta**. E' dove si producono
+  decisioni editoriali e artefatti pubblicabili, ed e' dove il mandato vuole
+  responsabilita' singola: un errore su un indicatore non deve bloccare gli altri,
+  e costo e durata vanno misurati per indicatore.
 
-**Decisione 14:** batch fino alla promozione (scout, hunter), individuale dalla
-promozione (promoter apre la pratica, curator, writer, reviewer, verificatore la
-fanno avanzare). Il batch non si tiene solo perche' riduce il numero di run.
+**Decisione 14:** batch fino alla promozione, individuale dalla promozione. E'
+esattamente la linea su cui la ri-architettura ha tagliato i ruoli:
+l'**ammissione** (scout+hunter+promoter) e' batch, una sessione triaga l'intera
+coda e promuove; il **produttore** (curator+writer+reviewer) e il **verificatore**
+sono per-indicatore. Il lanciatore (`scripts/pipeline_launch.py`) elenca una voce
+di produttore o verificatore per ogni indicatore pronto e una sola voce di
+ammissione batch, cosi' due indicatori diversi si lanciano in parallelo senza
+contendere. Il batch non si tiene solo perche' riduce il numero di run: si tiene
+dove l'oggetto e' pre-pratica (un catalogo da scandire), non dove e' un articolo
+da firmare.
 
 ---
 
@@ -393,7 +405,7 @@ non finito" senza indovinare.
 
 Questa e' la parte in cui il mandato e' piu' netto, e va presa alla lettera: **la
 PR unica non deve diventare la fonte autorevole dello stato, e non deve guidare
-l'architettura.** Il rischio, se lo stato vive nella PR, e' che il dispatcher
+l'architettura.** Il rischio, se lo stato vive nella PR, e' che il lanciatore
 dipenda dalla disponibilita' della piattaforma, che una modifica manuale alteri la
 rappresentazione, che una sessione a freddo non ricostruisca il contesto.
 
@@ -403,13 +415,15 @@ La posizione proposta, ed e' una scelta di architettura da ratificare:
    un file per pratica (rispetta l'invariante "un file per record"), riconciliabile
    con gli artefatti. **Non** e' la PR.
 2. **La PR resta cio' che e' oggi: un passo di ciclo**, con la sua cadenza di
-   merge (writer/reviewer `auto`, gli altri `checks`). Questa cadenza e'
-   portante: il rientro guidato dai dati, un dispatcher e uno stadio per tick, il
-   merge immediato o a check verdi, nessun umano nel giro, dipendono dal fatto che
-   ogni passo fonde per conto suo. **Una PR unica e lunga che attraversa tutti gli
-   stadi contraddice tutto questo** (un umano che la sorveglia in una catena non
-   presidiata, o un branch di giorni che invalida i suoi stessi passaggi mentre i
-   dati si muovono).
+   merge (oggi ogni ruolo fonde `auto` sul cancello locale, che gira la suite
+   intera prima del merge: la CI remota non parte sulle PR aperte via il GitHub
+   MCP, quindi aspettarla comprava un deadlock, non un verdetto). Questa cadenza
+   e' portante: il rientro guidato dai dati, il lanciatore che elenca il lavoro
+   per-indicatore, il merge sul cancello locale, nessun umano nel giro, dipendono
+   dal fatto che ogni passo fonde per conto suo. **Una PR unica e lunga che
+   attraversa tutti gli stadi contraddice tutto questo** (un umano che la
+   sorveglia in una catena non presidiata, o un branch di giorni che invalida i
+   suoi stessi passaggi mentre i dati si muovono).
 3. La "PR unica per indicatore" **si declassa da architettura a strato di
    leggibilita' opzionale**: la sede unica in cui leggere l'intero percorso e' il
    **record di pratica** (e la sua vista, §11), non una PR gigante. Il mandato
@@ -443,19 +457,26 @@ pratica che lega insieme le PR di un ciclo, senza doverle fondere in una sola.
 
 ## 11. Concorrenza e priorita' (mandato 1.10, 1.11, 2.4, decisioni 13, 15)
 
-**Tre concorrenze diverse, oggi trattate come una (mandato 1.10, 2.4).**
+**Tre concorrenze diverse, che il vecchio dispatcher trattava come una (mandato
+1.10, 2.4).**
 
-Il dispatcher serializza tutto: un tick, uno stadio, nessun lock perche' non c'e'
-mai un secondo scrittore. E' semplice e sicuro, ma trasforma una singola anomalia
-in un blocco globale, ed e' esattamente cio' che il mandato vuole evitare. Le tre
-concorrenze vanno distinte:
+Il dispatcher serializzava tutto: un tick, uno stadio, nessun lock perche' non
+c'era mai un secondo scrittore, e in piu' rifiutava di partire finche' una PR
+della catena era aperta. Era semplice e sicuro, ma trasformava una singola
+anomalia in un blocco globale, ed e' esattamente cio' che il mandato vuole
+evitare. La ri-architettura ha risolto proprio questo distinguendo le tre
+concorrenze invece di escluderle tutte:
 
 - **stessa pratica**: due sessioni sullo stesso ciclo. Va esclusa sempre (e la
-  quarantena toglie la pratica malata dalla coda, cosi' non blocca le altre).
+  quarantena toglie la pratica malata dalla coda, cosi' non blocca le altre). Il
+  lanciatore, che e' per-indicatore, non emette mai due voci sullo stesso
+  indicatore.
 - **risorsa condivisa**: due pratiche indipendenti che toccano lo stesso file.
   Qui serve classificare le risorse (sotto), non escludere tutto.
-- **pipeline intera**: il blocco globale di oggi. Va **ridotto**: una pratica in
-  quarantena non deve fermare una pratica pronta e indipendente.
+- **pipeline intera**: il blocco globale di ieri. E' stato **rimosso**: il
+  lanciatore non ha piu' il lock una-PR-aperta, quindi una pratica in quarantena
+  o incagliata non ferma una pratica pronta e indipendente. Indicatori diversi
+  toccano file diversi (un articolo per record) e si lanciano in parallelo.
 
 **Classificazione delle risorse (2.4, decisione 15):**
 
@@ -467,23 +488,27 @@ concorrenze vanno distinte:
 | **derivata** | punteggio qualita' vita, totali per macro-area, profili | non si scrive: si ricalcola a runtime |
 
 Gli store a un file per record rendono la classe "specifica dell'indicatore"
-gia' priva di conflitti (due articoli diversi non collidono mai). Il rischio vero
-e' sulla classe "condivisa": due promozioni che scrivono il manifest, due curatele
-che scrivono `curation.csv`. Il modello lega la regola di concorrenza **alla
-risorsa realmente modificata**, non al fatto che esistano due PR aperte. La
-migrazione naturale, quando i CSV condivisi diventeranno un collo di bottiglia, e'
-spezzarli a un file per record come gia' fatto per i tre store, ma non e'
-necessaria per la Fase A: e' una conseguenza, non una premessa.
+gia' priva di conflitti (due articoli diversi non collidono mai), ed e' la
+proprieta' che permette al lanciatore di lanciare piu' produttori in parallelo.
+Il rischio vero resta sulla classe "condivisa": due promozioni che scrivono il
+manifest, due curatele che scrivono `curation.csv`. Qui aiuta che l'ammissione
+sia **batch** (una sessione sola scrive il manifest e la config, non due che si
+contendono), mentre la scrittura condivisa del produttore (`curation.csv`,
+`theme_categories.csv`) resta il punto da sorvegliare. Il modello lega la regola
+di concorrenza **alla risorsa realmente modificata**, non al fatto che esistano
+due PR aperte. La migrazione naturale, quando i CSV condivisi diventeranno un
+collo di bottiglia, e' spezzarli a un file per record come gia' fatto per i tre
+store, ma non e' necessaria adesso: e' una conseguenza, non una premessa.
 
 **Priorita' oltre l'ordine di catena (1.11, decisione non numerata ma implicita).**
 
-Oggi la priorita' e' **solo** l'ordine di catena: il dispatcher prende il primo
-stadio con lavoro, scout prima di verificatore, perche' il monte alimenta il
-valle. E' ragionevole per far propagare il lavoro, ma insufficiente: **una
-correzione urgente di un dato pubblicato aspetta dietro una coda di candidature
-nuove.** Il modello propone un punteggio di priorita' della **pratica** (non dello
-stadio), leggibile e verificabile, che il dispatcher consulta a parita' di stadio
-pronto:
+L'ordine di catena da solo (a monte prima, scout prima di verificatore) fa
+propagare il lavoro ma e' insufficiente: **una correzione urgente di un dato
+pubblicato aspetterebbe dietro una coda di candidature nuove.** Il lanciatore
+ordina invece le voci per un punteggio di priorita' della **pratica** (non dello
+stadio), leggibile e verificabile, e l'ordine di ruolo rompe solo i pari merito.
+E' `stage_priorities`/il campo `priority` del dossier per-indicatore, consultato
+a ogni piano:
 
 - **errore pubblico** (una smentita su una pagina online): massimo.
 - **prossimita' alla pubblicazione**: una pratica quasi conclusa vale piu' di una
@@ -499,8 +524,8 @@ giudizio. Nessuna classe deve restare permanentemente in attesa.
 **Decisione 13 (nuovo evento sullo stesso indicatore mentre una pratica e'
 aperta):** dipende dall'asse.
 - Se l'evento tocca lo **stesso output pubblicabile** del ciclo aperto e il ciclo
-  non e' ancora fuso, si **assorbe** nel ciclo (es. una smentita mentre il writer
-  sta ancora scrivendo: la si corregge nello stesso giro).
+  non e' ancora fuso, si **assorbe** nel ciclo (es. una smentita mentre il
+  produttore sta ancora scrivendo: la si corregge nello stesso giro).
 - Se tocca un **asse di dipendenza diverso** o il ciclo e' gia' fuso, si apre una
   **nuova pratica collegata** (`<indicator_id>#<tipo>-<seq+1>`), figlia della
   storia dell'indicatore, non un riavvio della stessa unita' di lavoro. E' il modo
@@ -590,24 +615,26 @@ pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
   `fusa -> pubblicata` guidata da un artefatto e non da una modifica di stato.
   Provata end-to-end contro l'app servita in
   `tests/integration/test_verify_publication_live.py` e, contro un gunicorn
-  reale, in `tests/integration/test_editorial_practice_e2e.py`. Lo stadio che
-  scrive la prova e' ora **agganciato in due modi**. Nel cancello: `publisher` ha
-  un perimetro (`data/pipeline/pubblicazioni/`) e una politica di merge (`checks`),
-  una coda deterministica (`verify_publication.publication_queue`, gli indicatori
-  in stato `fusa`), un driver (`--all-fusa`) e un controllo che impone la prudenza
-  (`check_publications`: una prova con `ok!=True`, o ancorata a un testo che non e'
-  in pagina, non e' una pubblicazione). E nel dispatcher, come **passo del sito**
-  (`pipeline_dispatch.py --publish`): meccanico come il tick, verifica gli
-  indicatori fusi contro il sito e committa le prove su master, senza lanciare un
+  reale, in `tests/integration/test_editorial_practice_e2e.py`. Il passo che
+  scrive la prova e' **agganciato in due modi**. Nel cancello: `publisher` ha
+  un perimetro (`data/pipeline/pubblicazioni/`), una coda deterministica
+  (`verify_publication.publication_queue`, gli indicatori in stato `fusa`), un
+  driver (`--all-fusa`) e un controllo che impone la prudenza (`check_publications`:
+  una prova con `ok!=True`, o ancorata a un testo che non e' in pagina, non e' una
+  pubblicazione). E nel **lanciatore**, come **passo del sito** (`pipeline_launch.py
+  --publish`, che riusa `verify_publication.publish_step`): meccanico come il tick,
+  verifica gli indicatori fusi contro il sito e committa le prove su master
+  (`land_on_master`, un commit mirato sopra `origin/master`), senza lanciare un
   agente ne' aprire una PR (e' deterministico, quindi le invarianti del cancello
-  sono garantite per costruzione al momento della scrittura). **L'interruttore e'
-  acceso**: il comando del dispatcher in `.claude/agents/dispatcher.md` passa
+  sono garantite per costruzione al momento della scrittura). Non e' un passo del
+  **produttore**, e non potrebbe esserlo: il produttore gira **prima** del deploy,
+  quando il sito non serve ancora la versione nuova. **L'interruttore e' acceso**:
+  il comando in `.claude/agents/launcher.md` passa
   `--publish --publish-base https://divarioitalia.it`, quindi a ogni giro (la
-  Routine e' a sessione fresca, ogni 3 ore) la catena verifica gli indicatori
-  fusi contro il sito e chiude da se' la transizione `fusa -> pubblicata`. Per
-  spegnerlo, togliere `--publish` da quel comando. `--publish` resta comunque
-  opt-in a livello di script (default spento): e' il comando della Routine a
-  decidere.
+  Routine e' a sessione fresca) il lanciatore verifica gli indicatori fusi contro
+  il sito e chiude da se' la transizione `fusa -> pubblicata`. Per spegnerlo,
+  togliere `--publish` da quel comando. `--publish` resta comunque opt-in a livello
+  di script (default spento): e' il comando della Routine a decidere.
 - **Fase E, manutenzione. [implementata]** `practice_timeline.split_cycles`
   spezza la storia di un indicatore in cicli distinti ma collegati: il primo e'
   `nuovo`, poi ogni innesco su una pagina gia' a valle apre un ciclo nuovo (una
@@ -618,21 +645,21 @@ pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
   eterna. Ricostruibili sono `smentita` e `aggiornamento`, `ritiro`, `rollback`,
   `integrazione` e `metadati` esistono nel modello ma vogliono un segnale
   esplicito. Provata in `tests/unit/test_practice_timeline.py`.
-- **Fase F, sostituzione. [macchina pronta, preemption dei soli errori pubblici accesa]**
-  Le tre condizioni di codice sono fatte e provate: la **priorita' nel dispatcher**
-  (`pipeline_dispatch.py --priority`, una pratica urgente sopra soglia scavalca
-  l'ordine di catena senza affamare la scoperta), le **metriche** del confronto
-  prima/dopo (`practice_metrics.py`), il **recupero** provato (la ricostruzione e'
-  pura, rieseguirla dopo un'interruzione da' lo stesso stato). Lo storico e' gia'
-  classificato (`--write` materializza un record per ciclo). Il **cutover del
-  dispatcher e' fatto** (2026-07-28): la Routine ora passa `--priority`, quindi una
-  smentita aperta su una pagina online (peso 100, sopra la soglia `PREEMPT_THRESHOLD`)
-  precede l'ordine di catena. E' la parte ad alta confidenza: **sotto** la soglia il
-  comportamento resta l'ordine di catena puro e provato, quindi accendere `--priority`
-  non rende il modello autorevole sull'ordinamento generale, attiva solo la valvola di
-  sicurezza per il dato pubblico sbagliato. Cio' che **resta**, ed e' operativo non
-  codice: girare il confronto delle metriche su run reali prima e dopo perche' il
-  modello diventi autorevole anche sotto soglia, come chiede il mandato.
+- **Fase F, sostituzione. [macchina pronta, priorita' della pratica in produzione]**
+  Le tre condizioni di codice sono fatte e provate: la **priorita' della pratica**,
+  ora nativa nel lanciatore (`pipeline_launch.py` ordina le voci per il campo
+  `priority` del dossier, `stage_priorities`, cosi' una smentita su una pagina
+  online, peso 100, apre il piano davanti a una candidatura nuova, senza affamare
+  la scoperta), le **metriche** del confronto prima/dopo (`practice_metrics.py`),
+  il **recupero** provato (la ricostruzione e' pura, rieseguirla dopo
+  un'interruzione da' lo stesso stato). Lo storico e' gia' classificato (`--write`
+  materializza un record per ciclo). Nel vecchio dispatcher la priorita' era un
+  flag opt-in (`--priority`) sopra un ordinamento a uno-stadio-per-tick; nel
+  lanciatore per-indicatore l'ordinamento per priorita' e' il comportamento di
+  base, perche' il piano e' gia' una lista di pratiche, non uno stadio scelto. Cio'
+  che **resta**, ed e' operativo non codice: girare il confronto delle metriche su
+  run reali prima e dopo perche' il modello diventi autorevole anche sulla
+  scrittura dei record di pratica, come chiede il mandato.
 
 Nessuna fase indebolisce i vincoli non negoziabili del mandato (sezione 6),
 tutti gia' presenti nella catena e da preservare: lo stato sopravvive alle
@@ -648,42 +675,47 @@ catena (quarantena), la PR e' una vista non la memoria (record di pratica).
 
 ### Stato dell'implementazione
 
-Le Fasi B, C, D, E e la **macchina** della F sono codice provato. Tutto gira
-**accanto** al flusso di oggi: nessun default cambiato, la pubblicazione e' quella
-di prima. L'unico aggancio che potrebbe cambiare il comportamento della catena,
-la priorita' nel dispatcher, e' **opt-in e spento di default**.
+Le Fasi B, C, D, E e la **macchina** della F sono codice provato, e la
+ri-architettura per-indicatore le ha portate dal fianco del flusso al flusso
+stesso: il dossier per-indicatore che la Fase B ricostruiva e' ora la sorgente
+del **lanciatore** (`pipeline_launch.py`) e del **monitoraggio**
+(`pipeline_monitor.py`, la rotta `/_pipeline`), e la priorita' della pratica non
+e' piu' un flag opt-in ma l'ordinamento nativo del piano di lancio. Cio' che
+resta da rendere autorevole non e' un interruttore ma un confronto di metriche
+(vedi Fase F).
 
 | file | cosa | fase | prova |
 | --- | --- | --- | --- |
 | `scripts/practice_model.py` | stati, transizioni, tipi, errori, priorita' | A | `tests/unit/test_practice_model.py` |
 | `scripts/practice_store.py` | lo store un-file-per-record delle pratiche | A | `tests/unit/test_practice_store.py` |
 | `scripts/practice_timeline.py` | ricostruzione, riconciliatore, cicli, priorita' per stadio | B, C, E | `tests/unit/test_practice_timeline.py` |
-| `scripts/verify_publication.py` | verifica del sito + registro `pubblicazioni/`, `fusa -> pubblicata` | D | `test_verify_publication.py`, `test_verify_publication_live.py` |
+| `scripts/verify_publication.py` | verifica del sito + registro `pubblicazioni/`, `fusa -> pubblicata`, il passo del sito | D | `tests/unit/test_verify_publication.py`, `tests/integration/test_verify_publication_live.py` |
 | `scripts/practice_metrics.py` | le metriche del confronto prima/dopo (mandato §5) | F | `tests/unit/test_practice_metrics.py` |
-| `pipeline_dispatch.py --priority` | preemption per priorita', opt-in, default spento | F | `tests/unit/test_dispatch_priority.py` |
+| `scripts/pipeline_launch.py` | il piano di lancio per-indicatore, priorita' nativa | F | `tests/unit/test_pipeline_launch.py` |
+| `scripts/pipeline_monitor.py` | la vista di lettura "dov'e' fermo e perche'", `/_pipeline` | B | `tests/unit/test_pipeline_monitor.py` |
 
 ```bash
 python3 scripts/practice_timeline.py                       # una riga per indicatore
 python3 scripts/practice_timeline.py --indicator eur:rd_e_gerdreg   # la storia intera
 python3 scripts/practice_timeline.py --check               # dichiarato vs artefatti
 python3 scripts/practice_metrics.py                        # le metriche, prima/dopo
-python3 scripts/pipeline_dispatch.py --priority            # dispatch con la preemption
+python3 scripts/pipeline_launch.py                         # il piano di lancio, per priorita'
+python3 scripts/pipeline_monitor.py                        # dov'e' fermo, e perche'
 ```
 
 **Il passo del sito e' acceso.** La scrittura della prova di pubblicazione e'
-agganciata nel cancello (perimetro `data/pipeline/pubblicazioni/`, merge
-`checks`, `check_publications`) e nel dispatcher come passo del sito
-(`pipeline_dispatch.py --publish`, meccanico come il tick), e il comando in
-`.claude/agents/dispatcher.md` lo passa: la catena, a sessione fresca ogni 3 ore,
-chiude da se' la transizione `fusa -> pubblicata` contro `divarioitalia.it`.
+agganciata nel cancello (perimetro `data/pipeline/pubblicazioni/`,
+`check_publications`) e nel lanciatore come passo del sito (`pipeline_launch.py
+--publish`, meccanico come il tick), e il comando in `.claude/agents/launcher.md`
+lo passa: la catena, a sessione fresca, chiude da se' la transizione
+`fusa -> pubblicata` contro `divarioitalia.it`.
 
 **Resta fuori il cutover che rende il modello autorevole**, ed e' operativo non
-codice: accendere `--priority` di default, girare `practice_metrics.py` su run
-reali prima e dopo e documentare il confronto. Legare allo stesso modo la
-scrittura dei record di pratica e' l'ultimo pezzo. Il modello non diventa
-autorevole al posto dello stato dedotto finche' quel confronto non e' documentato,
-come chiede il mandato: la verifica del sito gira, la sostituzione dello stato
-dedotto no.
+codice: girare `practice_metrics.py` su run reali prima e dopo e documentare il
+confronto. Legare allo stesso modo la scrittura dei record di pratica e' l'ultimo
+pezzo. Il modello non diventa autorevole al posto dello stato dedotto finche' quel
+confronto non e' documentato, come chiede il mandato: la verifica del sito gira,
+la sostituzione dello stato dedotto no.
 
 ---
 
@@ -702,8 +734,9 @@ proprio questo, e le soglie le fissa il team (decisione 18).
 - **Affidabilita'**: tentativi duplicati, transizioni applicate due volte,
   pratiche perse dopo una sessione interrotta, risultati invalidati pubblicati per
   errore, errori pubblici rilevati dopo la pubblicazione.
-- **Velocita'**: tempo dall'ammissione alla pubblicazione (oggi fino a tre
-  settimane, che il dispatcher ha gia' accorciato), tempo in ogni stato, tempo
+- **Velocita'**: tempo dall'ammissione alla pubblicazione (un tempo fino a tre
+  settimane, che prima il tick e poi il lanciatore per-indicatore in parallelo
+  hanno accorciato), tempo in ogni stato, tempo
   medio di blocco, tempo per una correzione urgente, pratiche ferme oltre soglia.
 - **Qualita'**: correzioni dopo revisione, smentite dopo pubblicazione,
   aggiornamenti con vintage errato, controlli saltati, ritorni a uno stadio
