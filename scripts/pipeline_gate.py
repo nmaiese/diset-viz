@@ -116,7 +116,31 @@ STAGE_PATHS = {
     # merge) ma **non** in `pipeline_status.STAGE_ORDER`, quindi il dispatcher non
     # lo lancia: e' l'aggancio del cutover, con l'interruttore ancora spento.
     "publisher": (PUBLICATIONS, RUN_JOURNAL),
+    # I due ruoli della ri-architettura per-indicatore. Nascono qui accanto ai
+    # vecchi stadi: il perimetro e' l'unione di quelli che fondono, perche' un
+    # ruolo porta un indicatore da grezzo a pubblicato in una sola run. Non sono
+    # ancora in `pipeline_status.STAGE_ORDER` (il dispatcher non li lancia finche'
+    # non c'e' il lanciatore per-indicatore), ma il cancello e la guardia li
+    # riconoscono gia', cosi' il primo agente produttore ha dove committare.
+    #
+    # `producer` = curator + writer + reviewer: cura, scrive, si auto-critica,
+    # firma. Il perimetro largo e' sicuro perche' gli invarianti del cancello si
+    # smistano per tipo-di-file (vedi `run`), non per nome, quindi allargarlo non
+    # allarga cio' che sfugge al controllo.
+    "producer": (CURATION, EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS,
+                 THEME_CATEGORIES, INDICATOR_TEXTS, RUN_JOURNAL),
+    # `admissions` = scout + hunter + promoter: propone la fonte, triaga il
+    # candidato, promuove nel layer esterno, in una run.
+    "admissions": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, CANDIDATES,
+                   EXTERNAL_DATASET, EXTERNAL_MANIFEST, RUN_JOURNAL),
 }
+
+# I ruoli che firmano cio' che scrivono. La firma (`reviewed_at`/`reviewed_vintage`)
+# non e' un fatto del file ma una responsabilita' del ruolo: il writer tocca
+# `INDICATOR_TEXTS` e NON deve firmare (la firma e' del revisore), il reviewer e
+# il producer toccano lo stesso file e DEVONO firmare. Per questo `run` smista la
+# firma per ruolo e tutto il resto per tipo-di-file toccato.
+ROLES_THAT_SIGN = ("reviewer", "producer")
 
 # How far a green gate is allowed to go, per stage. Not uniform on purpose.
 #
@@ -161,6 +185,10 @@ MERGE_POLICY = {
     # pubblicazione si committa nel passo `--publish` del tick, non via una PR e
     # questo passo di merge. La sua policy resta inerte, la lasciamo `checks`.
     "publisher": "checks",
+    # I ruoli per-indicatore fondono `auto` come tutti gli altri: il cancello
+    # locale gira la suite e gli invarianti prima del merge.
+    "producer": "auto",
+    "admissions": "auto",
 }
 
 # Borrowed, not restated. A local copy drifted from `curate.SCOREABLE_DIRECTIONS`
@@ -1049,6 +1077,37 @@ def build_verdict(stage, paths, checks, base=None):
     }
 
 
+def invariant_labels(stage, paths):
+    """Which content invariants a diff triggers, and whether the role must sign.
+
+    Pure (no git, no disk): the whole point is that the dispatch can be tested
+    without a tree. Smistato per **tipo-di-file toccato**, non per nome-stadio,
+    cosi' un ruolo fuso (`producer`, `admissions`) compone da solo i controlli
+    dei tipi che tocca. Ogni vecchio stadio tocca esattamente i tipi che
+    innescavano i suoi controlli, quindi per loro il risultato e' identico a
+    prima. L'unica eccezione e' la **firma**: e' del ruolo, non del file, perche'
+    il writer tocca `INDICATOR_TEXTS` e non deve firmare, mentre il reviewer e il
+    producer toccano lo stesso file e devono.
+    """
+    def touched(*targets):
+        return any(path_allowed(p, targets) for p in paths)
+
+    labels = []
+    if touched(CANDIDATES):
+        labels.append("triage")
+    if touched(CURATION):
+        labels.append("curation")
+    if touched(INDICATOR_TEXTS):
+        labels.append("vintage")
+        if stage in ROLES_THAT_SIGN:
+            labels.append("signature")
+    if touched(VERIFICATIONS):
+        labels.append("verifications")
+    if touched(PUBLICATIONS):
+        labels.append("publications")
+    return labels
+
+
 def run(stage, base=None, skip_tests=False, cwd=None):
     """Every check for one stage, in the order a failure should be read."""
     if stage not in STAGE_PATHS:
@@ -1062,18 +1121,19 @@ def run(stage, base=None, skip_tests=False, cwd=None):
         check_no_coauthor_trailer(base, cwd=cwd),
         check_run_is_recorded(stage, paths, base, cwd=cwd),
     ]
-    if stage in ("hunter", "promoter"):
-        checks.append(check_hunter_decisions())
-    if stage == "curator":
-        checks.append(check_curation_decisions())
-    if stage == "reviewer":
-        checks.append(check_reviewer_signature(base, cwd=cwd))
-    if stage == "verificatore":
-        checks.append(check_verifications(base, cwd=cwd))
-    if stage == "publisher":
-        checks.append(check_publications(base, cwd=cwd))
-    if stage in ("writer", "reviewer"):
-        checks.append(check_writer_vintage(base, cwd=cwd))
+    # Gli invarianti di contenuto si smistano per **tipo-di-file toccato dal
+    # diff** (piu' la firma, che e' del ruolo): `invariant_labels` decide quali,
+    # ed e' pura, cosi' la composizione si prova senza git ne' disco.
+    builders = {
+        "triage": lambda: check_hunter_decisions(),
+        "curation": lambda: check_curation_decisions(),
+        "vintage": lambda: check_writer_vintage(base, cwd=cwd),
+        "signature": lambda: check_reviewer_signature(base, cwd=cwd),
+        "verifications": lambda: check_verifications(base, cwd=cwd),
+        "publications": lambda: check_publications(base, cwd=cwd),
+    }
+    for label in invariant_labels(stage, paths):
+        checks.append(builders[label]())
     if not skip_tests:
         checks.append(check_suite(cwd=cwd))
     return build_verdict(stage, paths, checks, base=resolve_base(base, cwd=cwd))

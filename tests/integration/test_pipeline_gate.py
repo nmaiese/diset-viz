@@ -501,6 +501,49 @@ class Verdict(unittest.TestCase):
         self.assertEqual(verdict["merge"], "auto")
 
 
+class InvariantDispatch(unittest.TestCase):
+    """Gli invarianti di contenuto si smistano per tipo-di-file toccato, la firma
+    per ruolo. Due cose insieme: i vecchi stadi devono restare identici al bit, e
+    i ruoli fusi (`producer`, `admissions`) devono comporre da soli i controlli
+    dei tipi che toccano. `invariant_labels` e' pura, quindi si prova senza git."""
+
+    def _paths(self, *constants):
+        # per un file la costante e' gia' il percorso; per una directory (barra
+        # finale) serve un .json sotto, che e' la forma che il perimetro accetta.
+        return [c + "x.json" if c.endswith("/") else c for c in constants]
+
+    def test_old_stages_are_unchanged(self):
+        G = pipeline_gate
+        self.assertEqual(G.invariant_labels("writer", self._paths(G.INDICATOR_TEXTS)), ["vintage"])
+        self.assertEqual(G.invariant_labels("reviewer", self._paths(G.INDICATOR_TEXTS)),
+                         ["vintage", "signature"])
+        self.assertEqual(G.invariant_labels("hunter", self._paths(G.CANDIDATES)), ["triage"])
+        self.assertEqual(G.invariant_labels("promoter", self._paths(G.CANDIDATES)), ["triage"])
+        self.assertEqual(G.invariant_labels("curator", self._paths(G.CURATION)), ["curation"])
+        self.assertEqual(G.invariant_labels("verificatore", self._paths(G.VERIFICATIONS)),
+                         ["verifications"])
+        self.assertEqual(G.invariant_labels("publisher", self._paths(G.PUBLICATIONS)),
+                         ["publications"])
+        self.assertEqual(G.invariant_labels("scout", self._paths(G.SOURCE_CANDIDATES)), [])
+
+    def test_the_writer_must_not_sign_but_the_reviewer_and_producer_must(self):
+        G = pipeline_gate
+        self.assertNotIn("signature", G.invariant_labels("writer", self._paths(G.INDICATOR_TEXTS)))
+        for signer in ("reviewer", "producer"):
+            self.assertIn("signature",
+                          G.invariant_labels(signer, self._paths(G.INDICATOR_TEXTS)), signer)
+
+    def test_the_producer_composes_curation_vintage_and_signature(self):
+        G = pipeline_gate
+        labels = G.invariant_labels("producer", self._paths(G.CURATION, G.INDICATOR_TEXTS))
+        self.assertEqual(set(labels), {"curation", "vintage", "signature"})
+
+    def test_admissions_composes_the_triage(self):
+        G = pipeline_gate
+        labels = G.invariant_labels("admissions", self._paths(G.CANDIDATES, G.SOURCE_CANDIDATES))
+        self.assertEqual(labels, ["triage"])
+
+
 class TheVerificationRegisterIsAppendOnly(unittest.TestCase):
     """Rilievi P2 di Codex sulla #49, su un repo git costruito qui.
 
