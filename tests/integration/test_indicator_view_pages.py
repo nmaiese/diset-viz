@@ -21,7 +21,7 @@ from app import app, sources
 from app.indicator_texts import ROLE_ORDER
 from app.indicator_view import build_indicator_view
 
-from ..support import family_and_raw
+from tests.support import family_and_raw
 
 FIXTURE = Path(__file__).resolve().parent.parent / "fixtures" / "indicator_stats_golden.json"
 
