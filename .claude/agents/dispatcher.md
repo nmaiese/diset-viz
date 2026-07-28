@@ -33,8 +33,15 @@ ignorava, e sei Routine indipendenti si pestavano i piedi.
 1. Lancia:
 
    ```bash
-   python3 scripts/pipeline_dispatch.py --json --check-open-prs --record
+   python3 scripts/pipeline_dispatch.py --json --check-open-prs --record --publish --publish-base https://divarioitalia.it
    ```
+
+   `--publish` e' il passo del sito (docs/EDITORIAL_PRACTICE.md, §8): oltre a
+   nominare lo stadio, verifica gli indicatori in stato `fusa` contro
+   `divarioitalia.it` e committa le prove di pubblicazione su master, chiudendo la
+   transizione `fusa -> pubblicata`. E' meccanico e si committa da solo con le
+   guardie del tick; un sito irraggiungibile o non ancora dispiegato non scrive
+   niente e l'indicatore resta `fusa` per il giro dopo.
 
    Guarda l'uscita, che dice tre cose diverse:
 

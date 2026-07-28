@@ -600,12 +600,14 @@ pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
   (`pipeline_dispatch.py --publish`): meccanico come il tick, verifica gli
   indicatori fusi contro il sito e committa le prove su master, senza lanciare un
   agente ne' aprire una PR (e' deterministico, quindi le invarianti del cancello
-  sono garantite per costruzione al momento della scrittura). **Ma l'interruttore
-  e' spento**: `--publish` e' opt-in e la Routine del dispatcher non lo passa,
-  quindi il comportamento di default della catena non cambia. **Resta da fare**,
-  ed e' operativo: aggiungere `--publish --publish-base https://divarioitalia.it`
-  al comando della Routine del dispatcher, e girarlo contro il sito vero dopo un
-  deploy (Fase F).
+  sono garantite per costruzione al momento della scrittura). **L'interruttore e'
+  acceso**: il comando del dispatcher in `.claude/agents/dispatcher.md` passa
+  `--publish --publish-base https://divarioitalia.it`, quindi a ogni giro (la
+  Routine e' a sessione fresca, ogni 3 ore) la catena verifica gli indicatori
+  fusi contro il sito e chiude da se' la transizione `fusa -> pubblicata`. Per
+  spegnerlo, togliere `--publish` da quel comando. `--publish` resta comunque
+  opt-in a livello di script (default spento): e' il comando della Routine a
+  decidere.
 - **Fase E, manutenzione. [implementata]** `practice_timeline.split_cycles`
   spezza la storia di un indicatore in cicli distinti ma collegati: il primo e'
   `nuovo`, poi ogni innesco su una pagina gia' a valle apre un ciclo nuovo (una
@@ -664,17 +666,20 @@ python3 scripts/practice_metrics.py                        # le metriche, prima/
 python3 scripts/pipeline_dispatch.py --priority            # dispatch con la preemption
 ```
 
-**Il cutover (Fase F) resta fuori, ed e' operativo non codice.** Accendere
-`--priority` di default, girare `practice_metrics.py` su run reali prima e dopo e
-documentare il confronto, e cambiare la Routine del dispatcher. Lo scrittura
-della prova di pubblicazione e' gia' **agganciata**: nel cancello (perimetro
-`data/pipeline/pubblicazioni/`, merge `checks`, `check_publications`) e nel
-dispatcher come passo del sito (`pipeline_dispatch.py --publish`, meccanico come
-il tick, opt-in). Resta da **accenderla**, cioe' passare `--publish` nel comando
-della Routine del dispatcher e puntarlo a `divarioitalia.it`. Legare allo stesso
-modo la scrittura dei record di pratica e' l'ultimo pezzo. Il modello non diventa autorevole al posto
-dello stato dedotto finche' quel confronto non e' documentato, come chiede il
-mandato: la macchina e' pronta, l'interruttore no.
+**Il passo del sito e' acceso.** La scrittura della prova di pubblicazione e'
+agganciata nel cancello (perimetro `data/pipeline/pubblicazioni/`, merge
+`checks`, `check_publications`) e nel dispatcher come passo del sito
+(`pipeline_dispatch.py --publish`, meccanico come il tick), e il comando in
+`.claude/agents/dispatcher.md` lo passa: la catena, a sessione fresca ogni 3 ore,
+chiude da se' la transizione `fusa -> pubblicata` contro `divarioitalia.it`.
+
+**Resta fuori il cutover che rende il modello autorevole**, ed e' operativo non
+codice: accendere `--priority` di default, girare `practice_metrics.py` su run
+reali prima e dopo e documentare il confronto. Legare allo stesso modo la
+scrittura dei record di pratica e' l'ultimo pezzo. Il modello non diventa
+autorevole al posto dello stato dedotto finche' quel confronto non e' documentato,
+come chiede il mandato: la verifica del sito gira, la sostituzione dello stato
+dedotto no.
 
 ---
 
