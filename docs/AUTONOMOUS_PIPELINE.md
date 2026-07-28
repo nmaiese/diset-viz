@@ -265,7 +265,7 @@ Controlla, in ordine di danno:
    niente, un `vintage` oltre i dati.
 4. **L'igiene**: whitespace, e il trailer `Co-Authored-By` che CLAUDE.md vieta.
 
-I test in `tests/test_pipeline_gate.py` costruiscono **prima l'input cattivo** e
+I test in `tests/integration/test_pipeline_gate.py` costruiscono **prima l'input cattivo** e
 verificano che il cancello rifiuti. Un cancello che ha sempre risposto verde non
 e' un cancello.
 
@@ -285,7 +285,7 @@ solo un po'" non c'e' niente da negoziare.
 indicatori nuovi si fermava alla sua pull request e non ripartiva finche' un
 umano non la guardava. In una catena non presidiata "aspetta una firma" vuol dire
 "aspetta per sempre", quindi il controllo si e' spostato dove puo' girare da solo,
-cioe' nella CI. `tests/test_source_admission.py` rifiuta una riga di fonte a cui
+cioe' nella CI. `tests/unit/test_source_admission.py` rifiuta una riga di fonte a cui
 manchi un campo, con un verso sconosciuto, con una categoria inesistente o con un
 tema che nessuno ha mappato, che e' il guasto piu' silenzioso di tutti:
 l'indicatore resta in catalogo e sparisce da ogni totale per macro-area.

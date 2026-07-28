@@ -42,7 +42,7 @@ FAMILY_PREFIX = {
 
 # Which catalog family a hunter adapter promotes into. A second mirror of
 # app/sources.py (the `feeds` tuples), for the same stdlib-only reason as
-# FAMILY_PREFIX. Both mirrors are pinned by tests/test_discovery.py, because
+# FAMILY_PREFIX. Both mirrors are pinned by tests/integration/test_discovery.py, because
 # getting this wrong is not a crash: it publishes an indicator under another
 # institution's name and licence.
 FEED_FAMILY = {

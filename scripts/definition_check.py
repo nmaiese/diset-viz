@@ -1,7 +1,7 @@
 """What an article says the indicator counts, against what the source says it counts.
 
 Every other guard in this repository compares the article to the **series**.
-`tests/test_indicator_texts.py` checks each decimal attributed to a region and
+`tests/integration/test_indicator_texts.py` checks each decimal attributed to a region and
 each threshold asserted over a list of them, `scripts/indicator_brief.py` hands
 the writer the real values, `scripts/prose_lint.py` counts the bot tells. All of
 them read the numbers.

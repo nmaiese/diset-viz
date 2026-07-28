@@ -4,7 +4,7 @@
 the one that grows instead of shrinking: **of the articles that exist, which
 ones are most likely to be wrong?**
 
-The mechanical guards in `tests/test_indicator_texts.py` check what a regex can
+The mechanical guards in `tests/integration/test_indicator_texts.py` check what a regex can
 check: style, structure, vintage, decimal figures attributed to a region, and
 thresholds asserted over a list of regions. Everything they cannot check is
 listed in `docs/INDICATOR_PAGES.md` and needs eyes. That list is not a vague

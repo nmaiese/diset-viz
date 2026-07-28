@@ -94,7 +94,7 @@ lead che nominava l'Umbria e dava la media delle regioni sopra un cruscotto di
 province. Un'entrata dichiara il livello che descrive con il campo `level`, che
 vale `regione` quando manca, e viene usata solo lì. Su ogni altro livello la
 pagina ricade sullo scheletro composto, che legge il livello che gli viene dato.
-Lo garantisce `ProseStaysOnTheLevelItWasWrittenFor` in `tests/test_indicator_texts.py`.
+Lo garantisce `ProseStaysOnTheLevelItWasWrittenFor` in `tests/integration/test_indicator_texts.py`.
 
 ## Scrivere un articolo
 
@@ -218,7 +218,7 @@ a ogni ricarico. Quel nome finisce nella prosa.
 
 ## Che cosa è verificato e che cosa no
 
-`tests/test_indicator_texts.py` copre la parte meccanica:
+`tests/integration/test_indicator_texts.py` copre la parte meccanica:
 
 - struttura, ruoli noti e non duplicati, punteggiatura editoriale, `vintage` e
   risoluzione dell'indicatore,
@@ -239,7 +239,7 @@ un'altra metteva la Sardegna sopra il 78% di differenziata quando stava al
 76,6%. Un intero senza decimale non viene controllato, perché in questa prosa è
 quasi sempre un'approssimazione ("circa 27%", "quasi 78%").
 
-`tests/test_indicator_view.py` copre i numeri: ogni aggregato di tutti i 621
+`tests/integration/test_indicator_view.py` copre i numeri: ogni aggregato di tutti i 621
 indicatori è confrontato con una fixture estratta dal codice precedente, e ogni
 pagina viene resa per verificare che non ci siano 500.
 

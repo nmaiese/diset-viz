@@ -148,8 +148,8 @@ Cosa cambia con Supabase:
    daily_results, scores, saved_comparisons).
 5. `migrations/` Alembic (usa `DIRECT_URL`); prima migrazione crea lo schema.
 6. Riscrivere `app/players.py`/`app/achievements.py`/`app/leaderboard.py` sopra
-   l'ORM (stesse firme). Riadattare `tests/test_players.py`/`test_leaderboard.py`
-   a Postgres di test.
+   l'ORM (stesse firme). Riadattare `tests/test_players.py` (da scrivere) e
+   `tests/integration/test_leaderboard.py` a Postgres di test.
 
 ### Fase B — Autenticazione magic link (Supabase Auth)
 7. Backend: `app/auth.py` che verifica il Bearer JWT (`SUPABASE_JWT_SECRET`),

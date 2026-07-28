@@ -33,7 +33,7 @@ dipende del lavoro futuro:
 | i correlati e la forma del divario | `scripts/indicator_brief.py`, blocco `INDICATORI CORRELATI` |
 | la misura meccanica, per articolo e per catalogo | `scripts/prose_lint.py` |
 | il segnale `mestiere` nell'ordine di lettura | `scripts/review_queue.py` |
-| le guardie sui link interni | `tests/test_indicator_texts.py`, classe `InternalLinksInProse` |
+| le guardie sui link interni | `tests/integration/test_indicator_texts.py`, classe `InternalLinksInProse` |
 | gli incroci, il linking, la ricerca di fonti | `.claude/agents/indicator-writer.md` (sezione "Cross-indicator links") |
 | le verifiche di mestiere e di incrocio | la skill `.claude/skills/indicator-review/`, che revisore e verificatore caricano |
 | la voce sulla descrizione in lingua piana | `.claude/agents/indicator-curator.md` |
@@ -272,7 +272,7 @@ topic cluster.
   punto 3.2 **è** esattamente il link laterale spoke-to-spoke che il modello
   premia.
 - **Forma URL** (già regola nostra): solo `/indicatore/<slug>/<acronimo>-<id>`,
-  mai `/?indicator=` né `/atlante?indicator=` (`tests/test_url_migration.py`).
+  mai `/?indicator=` né `/atlante?indicator=` (`tests/integration/test_url_migration.py`).
 
 ### 3.4 Fonti secondarie
 
@@ -328,7 +328,7 @@ sezione 6 per il dettaglio tecnico.
   file) con: selezionare 1-3 correlati con relazione documentata e ruolo chiaro,
   la scala causa/associazione, il link interno canonico con anchor descrittiva,
   almeno un link all'hub tematico.
-- **2c. Guardia.** Un test in `tests/test_indicator_texts.py` che verifica: ogni
+- **2c. Guardia.** Un test in `tests/integration/test_indicator_texts.py` che verifica: ogni
   link interno nella prosa punta a un indicatore esistente, ha forma canonica
   (mai `/?indicator=`), l'anchor non è generica.
 - **2d (opzionale). Correlazione statistica.** Oggi i "correlati" sono solo
@@ -409,7 +409,7 @@ bene e che va esteso a ogni aggiunta.
 | `indicator-curator.md` | La descrizione in lingua piana segue le stesse regole di voce e la stessa disciplina anti-aggregazione |
 | `scripts/indicator_brief.py` | Sezione "INDICATORI CORRELATI" (da `related`/`siblings`), con path e valore della regione a fuoco, in `render()` e `--json` |
 | `app/indicator_view.py` / `app/profiles.py` | (Opzionale) correlazione statistica per un ranking dei correlati migliore dell'ordine alfabetico |
-| `tests/test_indicator_texts.py` | Nuova guardia sui link interni |
+| `tests/integration/test_indicator_texts.py` | Nuova guardia sui link interni |
 | `docs/SECONDARY_SOURCES.md` | Nuovo, il registro fonti (appendice A) |
 
 ---
@@ -455,7 +455,7 @@ come coordinate. La 6.4 in particolare descrive un buco che adesso è chiuso.
   ogni famiglia, con i ranghi medi sui pari merito e una soglia minima di regioni
   in comune sotto la quale non risponde. Sull'intero tema costa meno di un decimo
   di secondo, perché il catalogo è già in memoria. L'aritmetica è verificata in
-  `tests/test_indicator_brief.py`, che la pinza sia sui casi noti (monotono,
+  `tests/integration/test_indicator_brief.py`, che la pinza sia sui casi noti (monotono,
   invertito, pari merito) sia contro il catalogo vero.
 
 ### 6.5 API
@@ -468,7 +468,7 @@ come coordinate. La 6.4 in particolare descrive un buco che adesso è chiuso.
 1. Il brief non porta i correlati (2a). Fatto, blocco `INDICATORI CORRELATI`.
 2. Nessuna correlazione statistica (2d). Fatta, dentro il brief, vedi 6.4.
 3. Nessuna convenzione/guardia per i link interni in prosa (2b, 2c). Fatte, nel
-   prompt dello scrittore e in `tests/test_indicator_texts.py`.
+   prompt dello scrittore e in `tests/integration/test_indicator_texts.py`.
 4. Nessun registro fonti in repo (3a). Fatto, `docs/SECONDARY_SOURCES.md`.
 5. Nessun harness di valutazione a rubrica (4b). Fatta la metà meccanica,
    `scripts/prose_lint.py`, che gira su tutti gli articoli invece che su un lotto.
@@ -1284,7 +1284,7 @@ identiche. Le due pagine adesso lo dicono, ognuna dall'altro lato, con la prova.
 Nessuna delle due e' soppressa, perche' quella e' una scelta con conseguenze
 sugli URL pubblici e resta al curatore.
 
-La guardia c'e': `tests/test_data_quality.py` fa fallire la suite su due
+La guardia c'e': `tests/integration/test_data_quality.py` fa fallire la suite su due
 indicatori con serie identica, con la coppia nota in una allow-list che porta
 accanto la prova, piu' un secondo test che verifica che sia **ancora** duplicata.
 Quando Istat sistemera' l'archivio quel test cade, ed e' l'avviso per togliere la

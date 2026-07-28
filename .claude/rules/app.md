@@ -34,7 +34,7 @@ paths:
   L'header sta nella view perche' `add_security_headers` timbra `index, follow`
   su cio' che non dichiara altro. Fuori dalla sitemap e deliberatamente NON nel
   disallow di robots.txt: una pagina disallow non si fa mai leggere il noindex.
-- `/legacy` — la dashboard D3 originale: non romperla (`tests/test_app.py`).
+- `/legacy` — la dashboard D3 originale: non romperla (`tests/integration/test_app.py`).
 - `/api/*` — catalogo, ricerca, indicatori, qualita' della vita.
 
 Strato dati: `app/data.py` (legge `app/static/data/Assoluti_Regione.csv`).
@@ -47,7 +47,7 @@ etichette utente sono nomi piani institution-first, mai un acronimo interno
 nudo, e nessuna etichetta o URL di indicatore va hardcodata altrove. Le
 famiglie servite dallo strato esterno stanno in `sources.EXTERNAL_FAMILIES`;
 aggiungerne una tocca tre specchi (`app/sources.py`, `discovery.FEED_FAMILY`,
-`promote_candidates.PROMOTION_PARSERS`) e `tests/test_discovery.py` li tiene
+`promote_candidates.PROMOTION_PARSERS`) e `tests/integration/test_discovery.py` li tiene
 allineati. Mai hardcodare un prefisso: il codice che lo fece pubblico' una
 serie Istat sotto il nome di Eurostat.
 

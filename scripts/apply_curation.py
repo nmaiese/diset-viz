@@ -37,7 +37,7 @@ VALID_DIRECTIONS = {"higher_better", "lower_better", "higher_worse", "contextual
 
 
 # The reviewed description is shown as the quiz clue, so it has to fit the same
-# budget the rest of the catalogue respects (tests/test_indicator_descriptions).
+# budget the rest of the catalogue respects (tests/integration/test_indicator_descriptions).
 # Learned the expensive way: a 202-character description passed curation, landed
 # in the atlas and only failed at the end of the suite, after the indicator was
 # already integrated.

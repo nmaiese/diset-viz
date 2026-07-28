@@ -24,7 +24,7 @@ Two consequences worth knowing:
 
 - BES and Multiscopo pages gain aggregates they never had (median, gap and gap
   ratio, biggest movers, gap trend). Nothing they had changes: that is pinned by
-  ``tests/test_indicator_view.py`` against a fixture dumped from the old code.
+  ``tests/integration/test_indicator_view.py`` against a fixture dumped from the old code.
 - Provinces have no profile page (there is no ``/provincia/<key>`` route), so a
   level declares whether its territories are linkable rather than the template
   guessing from the level name.

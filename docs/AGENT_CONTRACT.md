@@ -276,7 +276,7 @@ un umano ad aprirla.
 
 ## 7. Regole del repo che valgono per tutti
 
-- Non rompere `/legacy` ne' lo schema dati (`tests/test_app.py` li sorveglia).
+- Non rompere `/legacy` ne' lo schema dati (`tests/integration/test_app.py` li sorveglia).
 - Mantenere la SEO tecnica: canonical, `noindex` sulle varianti, JSON-LD
   coerente con il visibile.
 - Stile dei testi: `content/STYLE.md`, vincolante. Niente em-dash, en-dash,

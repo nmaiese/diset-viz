@@ -12,7 +12,7 @@ curator. It reports two worklists:
     no article yet. This is the curator -> writer hand-off.
   - **stale**:   an article whose vintage is behind the indicator's current
     year_max, the refresh case the writer agent also handles (drift guard in
-    tests/test_indicator_texts.py).
+    tests/integration/test_indicator_texts.py).
 
 This is the *discovery pipeline* trigger and stays scoped to the externally
 sourced indicators the manifest tracks. For the editorial state of the whole
@@ -75,7 +75,7 @@ def integrated_targets(manifest_rows):
 
 # The four roles an article is made of, mirroring app/indicator_texts.ROLES.
 # Stdlib-only module, so the list is copied rather than imported; the mirror is
-# pinned by tests/test_pending_notes.py.
+# pinned by tests/unit/test_pending_notes.py.
 ARTICLE_ROLES = ("definizione", "quadro", "dinamica", "limiti")
 
 

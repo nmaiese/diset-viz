@@ -57,7 +57,7 @@ non vengono scartati: scendono solo in fondo alla coda.
    **propone**. Era l'unico punto della catena che aspettasse una firma umana, ed
    era per questo il tappo: la scoperta si fermava alla pull request dello scout e
    non ripartiva. Il controllo non è sparito, si è spostato dove può girare da
-   solo, in `tests/test_source_admission.py` e nella CI, perché la fonte decide
+   solo, in `tests/unit/test_source_admission.py` e nella CI, perché la fonte decide
    quale istituzione e quale licenza legge un utente in pagina e quella decisione
    va controllata, non approvata. Implementato per
    Istat da `scripts/scout_sources.py`, che legge il catalogo dataflow SDMX e
@@ -119,7 +119,7 @@ Colonne in `scripts/discovery.py:CANDIDATE_COLUMNS`. I campi chiave:
   secondo adapter attivo una serie Istat sarebbe uscita sotto il nome di
   Eurostat. La mappa fonte -> famiglia sta in `discovery.FEED_FAMILY`, rispecchia
   i `feeds` di `app/sources.py`, e i due mirror sono appaiati da
-  `tests/test_discovery.py`.
+  `tests/integration/test_discovery.py`.
 
 ## Fase 2 (implementata): indicatori nuovi come voci di catalogo di prima classe
 
@@ -273,7 +273,7 @@ questo `scripts/pending_notes.py` produce la **coda dello scrittore**, come
   curatore -> scrittore.
 - **da aggiornare** (`stale`): un articolo il cui `vintage` è rimasto indietro
   rispetto all'`year_max` corrente dell'indicatore (il caso di refresh, la stessa
-  deriva che controlla `tests/test_indicator_texts.py`).
+  deriva che controlla `tests/integration/test_indicator_texts.py`).
 
 `pending_notes.py` copre gli indicatori tracciati dal manifest. Per lo stato
 editoriale dell'intero catalogo, incluse le sezioni ancora composte dal template,
@@ -290,7 +290,7 @@ il `current_year`, del manifest), quindi la coda dello scrittore non richiede
 Flask. Il controllo `stale` si
 restringe così agli indicatori esterni/integrati che il manifest traccia, cioè
 proprio il perimetro dello scrittore come innesco della pipeline di discovery.
-La logica è testata (`tests/test_pending_notes.py`) senza toccare alcun file.
+La logica è testata (`tests/unit/test_pending_notes.py`) senza toccare alcun file.
 
 ## Fonte pilota: Eurostat regionale (NUTS2)
 

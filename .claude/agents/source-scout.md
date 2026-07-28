@@ -103,7 +103,7 @@ adapter would have to be written. That is a useful handoff, not a failure.
 
 Close the run as the `pipeline-close-run` skill prescribes, stage `scout`.
 Your merge mode is `checks`, and **nobody is going to read the pull request
-first**: `tests/test_source_admission.py` refuses a config row with a missing
+first**: `tests/unit/test_source_admission.py` refuses a config row with a missing
 field, an unknown direction, a category that does not exist or an unmapped
 theme, but what the test cannot see stays yours alone: whether the institution
 is citable, whether the licence is real and read on the source's own pages,

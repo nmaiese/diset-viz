@@ -1205,7 +1205,7 @@ def _with_article(text):
     # Unknown term (not in the curated gender lists): never leave it bare, which
     # would read "Misura popolazione..." with no article. Guess a definite article
     # so the generated sentence stays grammatical; a new term should still be added
-    # to the lists above, and tests/test_indicator_text.py flags a bare result.
+    # to the lists above, and tests/integration/test_indicator_text.py flags a bare result.
     if first[:1] in "aeiou":
         return f"l'{lowered}"
     if first.endswith("a") or re.search(r"(zione|sione|tà|trice|udine|aggine)$", first):

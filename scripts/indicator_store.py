@@ -132,7 +132,7 @@ def load_all(root=None, strict=True) -> dict:
 
     E' esattamente il dizionario che `json.load` restituiva sul file unico, e
     lo e' di proposito: ogni consumatore e' passato da una riga di `json.load`
-    a una chiamata qui senza toccare altro, e `tests/test_indicator_store.py`
+    a una chiamata qui senza toccare altro, e `tests/unit/test_indicator_store.py`
     verifica che le due letture coincidano.
 
     `root` accetta anche un vecchio file unico, come `read_journal` accetta un

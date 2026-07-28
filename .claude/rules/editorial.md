@@ -11,7 +11,7 @@ gratis da ripetere: niente em-dash `—`, niente en-dash `–`, niente `;`, nien
 `…`; virgole o due frasi, gli intervalli scritti "dal 1981 al 2024". Solo
 numeri veri e verificabili, mai una fonte inventata. I link a un indicatore
 usano il percorso canonico (`/indicatore/<slug>/ter-105`), mai
-`/?indicator=...` ne' `/atlante?indicator=...` (`tests/test_url_migration.py`
+`/?indicator=...` ne' `/atlante?indicator=...` (`tests/integration/test_url_migration.py`
 fallisce su quelli). Il Markdown ha `smarty` spento apposta: `--` e `...`
 restano come sono, tenere pulito il sorgente.
 

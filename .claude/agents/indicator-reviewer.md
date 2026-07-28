@@ -54,7 +54,7 @@ diligence.
 
 ## Division of labour
 
-The suite (`tests/test_indicator_texts.py`) covers structure, punctuation,
+The suite (`tests/integration/test_indicator_texts.py`) covers structure, punctuation,
 vintage drift, figures attributed to regions, thresholds and links: if it is
 green, do not re-check those by hand. `scripts/prose_lint.py` counts the
 mechanical tells; run `--summary` on a batch to see whether the catalogue is

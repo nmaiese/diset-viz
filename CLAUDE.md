@@ -138,7 +138,7 @@ drops it from every macro-area total, with nothing failing.
 
 ## Constraints
 
-- Do not break `/legacy` or the data schema (`tests/test_app.py` guards both).
+- Do not break `/legacy` or the data schema (`tests/integration/test_app.py` guards both).
 - Keep technical SEO intact (the list is in `.claude/rules/app.md`).
 - Keep the cartographic identity: navy `#15233b`, paper `#fbfaf7`, single
   accent `#e4572e`, fonts Archivo / Inter / Space Mono.

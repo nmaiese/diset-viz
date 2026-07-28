@@ -6,7 +6,7 @@ prose change on purpose, so an HTML comparison would be useless as a guard. The
 numbers must not change at all, and that is what this fixture pins.
 
 Run before the refactor to record the baseline, then let
-``tests/test_indicator_view.py`` assert that the new model reproduces it:
+``tests/integration/test_indicator_view.py`` assert that the new model reproduces it:
 
     .venv/bin/python -m scripts.dump_indicator_stats
 

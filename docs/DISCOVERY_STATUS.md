@@ -161,7 +161,7 @@ cose rotte e due mancanti.
 **Aggiunto:**
 
 - `scripts/pipeline_gate.py`, il verdetto deterministico con cui ogni stadio
-  chiude, con `tests/test_pipeline_gate.py` che costruisce prima l'input cattivo.
+  chiude, con `tests/integration/test_pipeline_gate.py` che costruisce prima l'input cattivo.
 - `scripts/pipeline_status.py`, lo stato di tutti e sei gli stadi in un comando.
 - Il rientro: `data_year` in `curation.csv`, `reviewed_vintage` negli articoli.
 - `source-scout`, il quinto agente, e `config/istat_series.yaml` /
@@ -187,7 +187,7 @@ il cancello è rosso. Verificato contro una PR vera, non solo con un `gh` finto.
 **Lo scout non aspetta più una firma.** Era l'unico stadio `manual`, cioè il
 tappo: la scoperta si fermava alla sua PR e non ripartiva. Ora è `checks`, e il
 controllo si è spostato dove può girare da solo, in
-`tests/test_source_admission.py`.
+`tests/unit/test_source_admission.py`.
 
 **Una riga di configurazione sbagliata uccideva l'intera scansione** del
 cacciatore, non solo la propria serie, con un traceback che nessuno leggeva. Da
@@ -253,7 +253,7 @@ concorrenza che il dispatcher toglie. Gli id sono nella tabella sopra.
 Per un giorno lo stadio uno è rimasto chiuso per costruzione. Lo scout aveva
 verificato e cablato due serie demografiche nuove sul dataflow
 `22_293_DF_DCIS_INDDEMOG1_1`, `NMIGRATEIN` e `BIRTHRATE`, ma
-`tests/test_discovery.py` congelava l'elenco esatto degli id ammessi in tre
+`tests/integration/test_discovery.py` congelava l'elenco esatto degli id ammessi in tre
 asserzioni, dentro una classe chiamata `AdmittingASeriesIsConfigNotCode` che
 faceva l'opposto del proprio nome. L'agente non aveva toccato i test, aveva
 scritto perché, e si era fermato: la terza volta che un agente della catena si
@@ -263,7 +263,7 @@ ragione.
 I tre test ora verificano il **meccanismo, non il contenuto**:
 
 - il config carica ogni serie ben formata, ma l'elenco può crescere. La forma di
-  ogni riga ammessa resta sorvegliata da `tests/test_source_admission.py`.
+  ogni riga ammessa resta sorvegliata da `tests/unit/test_source_admission.py`.
 - il round trip di uno scalare quotato (`"%"`) si prova su una riga di test
   controllata, non pretendendo che ogni serie sia in percentuale.
 - la discovery offline si confronta con le serie che hanno un fixture, così
