@@ -1,0 +1,21 @@
+{
+ "at": "2026-07-28T13:32:39+00:00",
+ "base_commit": "78428fd",
+ "branch": "automation/writer-2026-07-28",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "78428fd",
+ "detail": [
+  "Il dispatcher segnalava 33 in coda e ter-14 in testa, ma ter-14 e' stato fuso su master dalla run writer-20260728T122306Z-e547 (PR 70) mentre scrivevo: bozza di ter-14 scartata senza sovrascrivere il lavoro gia' fuso, coda ricalcolata su origin/master (32) e preso il primo elemento successivo, ter-15. L'articolo aveva lead, quadro e limiti di riempimento e mancava di definizione e dinamica, quindi riscritto per intero. Definizione dalla fonte Istat BDTPS (persone in cerca di occupazione 15-24 sulle forze di lavoro della stessa classe, media annua), definition_check senza rilievi. Cifre dal brief e dalla serie: media 20,59 contro mediana 19,82, salti 4,53 tra Calabria e Puglia e 6,32 tra Sicilia e Campania, tre regioni sopra il 30 per cento, Molise settimo con 15,80 e Basilicata undicesima con 20,33, media da 32,07 (2018) a 20,59 (2025), divario ristretto di 8,76, Calabria -25,04 e Molise -23,43 contro Emilia-Romagna -0,31 e Marche -0,61, ultimo anno -1,20 di media con 9 in calo e 11 in aumento, Molise da 39,77 a 15,80. Tre incroci: ter-407 (mappa opposta, rho -0,87), bes-03LAV002-N22 (rho +0,90, ruolo definitorio) e ter-401 (rho -0,05, mappa diversa) piu' hub del tema. Fonte verificata via API Eurostat une_rt_a: 272 mila disoccupati 15-24 in Italia nel 2025, 4,6 per cento della popolazione della stessa eta', 20,6 per cento delle forze di lavoro, UE-27 15,2. La somiglianza tra il 20,6 nazionale e la media semplice delle regioni e' dichiarata come coincidenza nel testo. prose_lint pulito, 702 parole, 4 link interni, suite 825 test verdi."
+ ],
+ "duration_seconds": 2235,
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 31,
+ "queue_before": 32,
+ "run_id": "writer-20260728T125611Z-20f6",
+ "session_id": "9e06c164-d01f-5265-973b-ffcec624002e",
+ "stage": "writer",
+ "summary": "Scritto l'articolo completo di ter-15, tasso di disoccupazione giovanile, livello regione, vintage 2025",
+ "trigger": "manuale"
+}
