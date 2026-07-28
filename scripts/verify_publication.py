@@ -115,7 +115,7 @@ def verify(url: str, entry: dict, fetcher=_fetch) -> dict:
     return result
 
 
-def build_url(code: str, slug: str = "", base: str = DEFAULT_BASE) -> str:
+def build_url(code: str, slug: str = "", base: str = DEFAULT_BASE, level: str = "") -> str:
     """L'URL canonico di una pagina indicatore, `/indicatore/<slug>/<acr>-<id>`.
 
     Il segmento `<acr>-<id>` (il `code`) e' la parte stabile e la sola che
@@ -124,9 +124,19 @@ def build_url(code: str, slug: str = "", base: str = DEFAULT_BASE) -> str:
     alla forma canonica con lo slug (vedi `sources.indicator_url`): il fetcher
     segue il redirect, quindi non serve conoscere lo slug in anticipo. Chi lo ha
     lo passa e salta il salto.
+
+    `level` aggiunge `?livello=<level>`, il parametro con cui l'app sceglie quale
+    livello territoriale rendere lato server (`app/views.py`, `request.args.get
+    ("livello")`). Senza, l'app serve il livello di default (regione), quindi la
+    pagina di un articolo **provinciale** non porterebbe mai il suo lead e
+    resterebbe `fusa` per sempre. L'app conserva la query oltre la
+    canonicalizzazione 301, quindi il parametro sopravvive al salto.
     """
     root = base.rstrip("/") + "/indicatore"
-    return f"{root}/{slug}/{code}" if slug else f"{root}/{code}"
+    path = f"{root}/{slug}/{code}" if slug else f"{root}/{code}"
+    if level:
+        path += f"?livello={level}"
+    return path
 
 
 # --- il registro delle prove (un file per record) ---------------------------
@@ -180,46 +190,187 @@ def load_proofs(root=None) -> list:
     return out
 
 
+# --- la coda del publisher: gli indicatori fusi non ancora provati (§8) ------
+#
+# La transizione `fusa -> pubblicata` e' l'unico stato che la catena non sapeva
+# osservare. Qui c'e' la sua coda, deterministica come le altre (si calcola dai
+# file committati, non da un giudizio), il suo referto nella forma di
+# `pipeline_status`, e il controllo puro che il cancello usa per imporre la
+# regola di prudenza invece di ricordarla. Il perimetro dello stadio
+# (`data/pipeline/pubblicazioni/`) vive in `pipeline_gate.STAGE_PATHS`.
+#
+# **Lo stadio e' agganciato ma spento.** Non e' in `pipeline_status.STAGE_ORDER`,
+# quindi il dispatcher non lo lancia: la macchina e' pronta, l'interruttore no,
+# esattamente come per la preemption per priorita'. Accenderlo (aggiungere
+# `publisher` all'ordine di catena, o farne un passo del dispatcher dopo il
+# deploy) e' la riga operativa del cutover, dopo il confronto delle metriche.
+
+
+def publication_queue(dossier=None, today: str = "", proofs_root=None) -> list:
+    """Gli indicatori in stato `fusa` che aspettano la verifica del sito.
+
+    Uno indicatore e' `fusa` quando il suo ciclo editoriale e' completo ed e' su
+    master, ma nessuna prova conferma che la pagina pubblica serva quella
+    versione. Puro se `dossier` e' passato, altrimenti lo ricostruisce dai file
+    reali. Ogni voce porta l'`id` d'indicatore e il `code` della sua pagina.
+    """
+    from scripts import practice_timeline
+    if dossier is None:
+        dossier = practice_timeline.load_real(today=today, proofs_root=proofs_root)
+    out = [{"id": d["id"], "code": practice_timeline.code_of(d["id"])}
+           for d in dossier.values() if d.get("state") == "fusa"]
+    return sorted(out, key=lambda r: r["id"])
+
+
+def stage_report(proofs_root=None) -> dict:
+    """La coda del publisher nella forma di `pipeline_status`.
+
+    Pronta per il giorno in cui il cutover aggiunge `publisher` all'ordine di
+    catena: fino ad allora nessuno la chiama nel giro del dispatcher, che legge
+    solo `STAGE_ORDER`.
+    """
+    queue = publication_queue(proofs_root=proofs_root)
+    n = len(queue)
+    return {
+        "stage": "publisher",
+        "waiting": n,
+        "detail": {"da_verificare_sul_sito": n,
+                   "indicatori": [r["id"] for r in queue][:10]},
+        "next": (f"verificare sul sito {n} indicatori fusi e non ancora provati"
+                 if n else "ogni indicatore fuso ha una prova di pubblicazione valida"),
+        "command": ("python3 scripts/verify_publication.py --all-fusa "
+                    "--base https://divarioitalia.it --write"),
+    }
+
+
+def publication_problems(proof: dict, valid_fingerprints: dict) -> list:
+    """Cosa non va in una prova di pubblicazione. Puro, cosi' il cancello lo
+    prova senza un albero git.
+
+    `valid_fingerprints` e' `{code: set(impronte accettabili)}`, l'impronta
+    `prosa` di adesso piu' quella della base. E' il gemello di
+    `verification_queue.row_problems`, e serve al cancello per **imporre** invece
+    di ricordare la prudenza di §8: una prova con `ok` diverso da True e' un
+    controllo che non ha confermato niente, e registrarla come pubblicazione e'
+    proprio il falso positivo che la Fase D esiste per non avere. Un'impronta che
+    non corrisponde a nessuna versione dell'articolo e' la prova di un testo che
+    non e' in pagina.
+    """
+    code = (proof.get("code") or "").strip()
+    if not code:
+        return ["una prova non ha code"]
+    problems = []
+    if proof.get("ok") is not True:
+        problems.append(
+            f"{code}: prova con ok={proof.get('ok')!r}, non si registra una "
+            "pubblicazione che il controllo non ha confermato")
+    if code not in valid_fingerprints:
+        problems.append(f"{code}: nessun articolo per questo code")
+        return problems
+    prosa = (proof.get("prosa") or "").strip()
+    if prosa not in valid_fingerprints[code]:
+        problems.append(
+            f"{code}: impronta prosa che non corrisponde a nessuna versione "
+            "dell'articolo, ne' quella di adesso ne' quella della base")
+    return problems
+
+
+def verify_one(indicator, base=DEFAULT_BASE, slug="", level=None,
+               write=False, proofs_root=None, url=None, fetcher=_fetch) -> dict | None:
+    """Verifica un indicatore contro il sito e, se combacia e `write`, registra
+    la prova. Ritorna il `result` (con `code`, ed eventuale `proof_path`) o None
+    se l'articolo non e' nel repo.
+
+    Il livello si ricava dall'articolo (`entry["level"]`) se non e' passato, e si
+    usa **sia** nell'URL (`?livello=`) **sia** nella prova: un articolo
+    provinciale va verificato contro la vista provinciale, e la sua prova va
+    etichettata `provincia`, altrimenti resterebbe `fusa` per sempre o porterebbe
+    un livello sbagliato.
+    """
+    from scripts import indicator_store, practice_timeline
+    entry = indicator_store.read(indicator)
+    if entry is None:
+        return None
+    code = practice_timeline.code_of(indicator)
+    lvl = level or (entry.get("level") or "regione")
+    result = verify(url or build_url(code, slug, base, level=lvl), entry, fetcher=fetcher)
+    result["code"] = code
+    if write and result["ok"] is True:
+        result["proof_path"] = str(
+            write_proof(build_proof(entry, result, level=lvl), root=proofs_root))
+    return result
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--indicator", help="chiave d'articolo, es. dem:NMIGRATEIN")
+    parser.add_argument("--all-fusa", action="store_true",
+                        help="verifica ogni indicatore in stato 'fusa' (la coda del publisher)")
+    parser.add_argument("--queue", action="store_true",
+                        help="stampa la coda del publisher e basta (nessuna rete)")
     parser.add_argument("--url", help="URL completo della pagina (altrimenti si costruisce dal code)")
     parser.add_argument("--slug", default="", help="slug della pagina, se noto (altrimenti la forma a solo code, che 301 reindirizza)")
     parser.add_argument("--base", default=DEFAULT_BASE)
-    parser.add_argument("--level", default="regione")
+    parser.add_argument("--level", default="",
+                        help="livello territoriale; vuoto = ricavato dall'articolo (regione/provincia)")
     parser.add_argument("--write", action="store_true",
                         help="se combacia, registra la prova in data/pipeline/pubblicazioni/")
     parser.add_argument("--proofs-root", default=None, help="cartella del registro prove (per i test)")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
-    if not args.indicator:
-        parser.error("serve --indicator")
+    if args.queue:
+        queue = publication_queue(proofs_root=args.proofs_root)
+        if args.json:
+            print(json.dumps(queue, ensure_ascii=False, indent=1))
+        else:
+            print(f"coda publisher: {len(queue)} indicatori fusi da verificare sul sito")
+            for row in queue:
+                print(f"  {row['id']:32.32} {row['code']}")
+        return 0
 
-    from scripts import indicator_store, practice_timeline
-    entry = indicator_store.read(args.indicator)
-    if entry is None:
+    if args.all_fusa:
+        queue = publication_queue(proofs_root=args.proofs_root)
+        results = []
+        for row in queue:
+            result = verify_one(row["id"], base=args.base, level=args.level,
+                                write=args.write, proofs_root=args.proofs_root)
+            if result is not None:
+                results.append(result)
+        if args.json:
+            print(json.dumps(results, ensure_ascii=False, indent=1))
+        else:
+            for result in results:
+                state = {True: "pubblicata", False: "NON combacia",
+                         None: "irraggiungibile"}[result["ok"]]
+                print(f"  {result['code']:24.24} {state}")
+                if result.get("proof_path"):
+                    print(f"    prova: {result['proof_path']}")
+            proved = sum(1 for r in results if r.get("proof_path"))
+            print(f"{len(results)} verificati, {proved} prove registrate.")
+        # Un mancato combaciamento (False) e' un fallimento; irraggiungibile
+        # (None) no, per la stessa prudenza del caso singolo.
+        return 1 if any(r["ok"] is False for r in results) else 0
+
+    if not args.indicator:
+        parser.error("serve --indicator, --all-fusa o --queue")
+
+    result = verify_one(args.indicator, base=args.base, slug=args.slug,
+                        level=args.level, write=args.write,
+                        proofs_root=args.proofs_root, url=args.url)
+    if result is None:
         print(f"nessun articolo per {args.indicator}", file=sys.stderr)
         return 2
-
-    code = practice_timeline.code_of(args.indicator)
-    url = args.url or build_url(code, args.slug, args.base)
-    result = verify(url, entry)
-    result["code"] = code
-
-    proof_path = None
-    if args.write and result["ok"] is True:
-        proof_path = write_proof(build_proof(entry, result, level=args.level), root=args.proofs_root)
 
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=1))
     else:
         state = {True: "pubblicata", False: "NON combacia", None: "irraggiungibile"}[result["ok"]]
-        print(f"{args.indicator}  {state}  <{url}>")
+        print(f"{args.indicator}  {state}  <{result.get('url', '')}>")
         if result.get("signature"):
             print(f"  atteso: lead '{result['signature']['snippet']}...' + anno {result['signature']['vintage']}")
-        if proof_path:
-            print(f"  prova registrata: {proof_path}")
+        if result.get("proof_path"):
+            print(f"  prova registrata: {result['proof_path']}")
     # irraggiungibile (None) non e' un fallimento del comando: esce 0. Solo un
     # mancato combaciamento (False) esce !=0.
     return 1 if result["ok"] is False else 0

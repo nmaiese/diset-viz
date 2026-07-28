@@ -356,6 +356,117 @@ def commit_tick(entry, runner=_run, cwd=None, log=print, attempts=3):
     return False
 
 
+# Fase F, opt-in: il passo del sito. Il sito pubblico e' il default perche' e'
+# l'unico posto dove la transizione `fusa -> pubblicata` significa qualcosa: una
+# verifica contro localhost proverebbe solo che il repo e' coerente con se stesso.
+DEFAULT_PUBLISH_BASE = "https://divarioitalia.it"
+
+
+def _commit_proofs(rels, runner=_run, cwd=None, log=print, attempts=3):
+    """Porta le prove di pubblicazione nuove su master, con le stesse guardie del
+    tick: sono file nuovi per record con un nome che nessun altro sceglie, quindi
+    il push diretto e' sicuro per la stessa ragione. HEAD deve essere master, e
+    nell'albero non ci deve essere altro oltre alle prove, perche'
+    `git push origin HEAD:master` spinge tutto cio' che sta sotto HEAD."""
+    rels = sorted(set(rels))
+    code, out = runner(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=cwd)
+    branch = out.strip() if code == 0 else ""
+    if branch != "master":
+        log(f"  prove: HEAD e' su '{branch or 'ignoto'}', non su master. Non committo.")
+        return False
+    code, out = runner(["git", "status", "--porcelain", "--untracked-files=all"], cwd=cwd)
+    if code != 0:
+        log(f"  prove: non riesco a leggere lo stato dell'albero ({out.strip()[:120]})")
+        return False
+    dirty = {line[3:].strip().split(" -> ")[-1] for line in out.splitlines() if line.strip()}
+    stray = sorted(dirty - set(rels))
+    if stray:
+        log(f"  prove: l'albero porta altro oltre alle prove ({', '.join(stray[:5])}). Non committo.")
+        return False
+
+    # Il commit si fa una volta sola, fuori dal ciclo di ritentativi. Rimetterlo
+    # dentro era un difetto: dopo un rebase riuscito la prova e' gia' committata,
+    # quindi la passata dopo `git add` non stagerebbe niente e `git commit`
+    # uscirebbe non-zero ("nothing to commit"), e la funzione tornerebbe senza mai
+    # ripushare il commit rebasato. Il ciclo ritenta solo il push, con il rebase
+    # in mezzo a riportare il commit in cima a origin/master.
+    code, out = runner(["git", "add", *rels], cwd=cwd)
+    if code != 0:
+        log(f"  prove: git add fallito ({out.strip()[:120]})")
+        return False
+    code, out = runner(
+        ["git", "commit", "-m",
+         f"Prove di pubblicazione: {len(rels)} indicatori verificati sul sito"],
+        cwd=cwd)
+    if code != 0:
+        log(f"  prove: commit fallito ({out.strip()[:120]})")
+        return False
+    for attempt in range(1, attempts + 1):
+        code, out = runner(["git", "push", "origin", "HEAD:master"], cwd=cwd)
+        if code == 0:
+            log(f"  prove: {len(rels)} su master")
+            return True
+        log(f"  prove: push perso, ritento ({attempt}/{attempts})")
+        runner(["git", "fetch", "origin", "master"], cwd=cwd)
+        code, out = runner(["git", "rebase", "origin/master"], cwd=cwd)
+        if code != 0:
+            runner(["git", "rebase", "--abort"], cwd=cwd)
+            log(f"  prove: rebase fallito ({out.strip()[:120]})")
+            return False
+    log("  PROVE NON REGISTRATE: master non sapra' di questa verifica del sito.")
+    return False
+
+
+def publish_step(base=DEFAULT_PUBLISH_BASE, fetcher=None, runner=_run, cwd=None,
+                 log=print, proofs_root=None, do_commit=True):
+    """La verifica del sito come passo meccanico del tick, non come stadio.
+
+    Per ogni indicatore in stato `fusa` prende la pagina pubblica e, se serve la
+    versione committata, scrive la prova e la porta su master. E' l'osservazione
+    della transizione `fusa -> pubblicata` (docs/EDITORIAL_PRACTICE.md, §8), e si
+    committa da sola come il tick, fuori dal passo di merge.
+
+    Perche' non uno stadio con un agente: e' deterministico. Non apre una PR e
+    non lancia una sessione Claude, quindi non ha bisogno del cancello, che
+    esiste per i giudizi di un agente. Il driver scrive **solo** dove `ok is
+    True` e l'impronta e' quella del testo committato, quindi le invarianti che
+    `check_publications` imporrebbe sono garantite per costruzione al momento
+    della scrittura, come per la riga del tick.
+
+    Opt-in: gira solo con --publish. Un sito irraggiungibile o una versione
+    ancora non dispiegata non scrivono niente (ok None/False): l'indicatore resta
+    `fusa` e si riprova al giro dopo, senza un falso positivo.
+    """
+    from scripts import verify_publication
+
+    queue = verify_publication.publication_queue(proofs_root=proofs_root)
+    checked, written = [], []
+    for row in queue:
+        try:
+            kwargs = {} if fetcher is None else {"fetcher": fetcher}
+            result = verify_publication.verify_one(
+                row["id"], base=base, write=True, proofs_root=proofs_root, **kwargs)
+        except Exception as exc:  # una pagina non deve fermare le altre
+            log(f"  prove: {row['code']} saltato ({type(exc).__name__})")
+            continue
+        if result is None:
+            continue
+        checked.append({"code": row["code"], "ok": result.get("ok")})
+        if result.get("proof_path"):
+            written.append(result["proof_path"])
+
+    summary = {"base": base, "fusa": len(queue), "verificati": len(checked),
+               "prove_scritte": len(written), "checked": checked}
+    if written and do_commit:
+        rels = []
+        for path in written:
+            p = Path(path)
+            rels.append(str(p.relative_to(PROJECT_ROOT)) if p.is_absolute() and
+                        str(p).startswith(str(PROJECT_ROOT)) else path)
+        summary["committed"] = _commit_proofs(rels, runner=runner, cwd=cwd, log=log)
+    return summary
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Quale stadio della catena tocca adesso, e uno solo.",
@@ -375,6 +486,13 @@ def main(argv=None):
     parser.add_argument("--priority", action="store_true",
                         help="Fase F opt-in: una pratica urgente (sopra soglia) precede "
                              "l'ordine di catena. Default spento: senza, ordine di catena puro.")
+    parser.add_argument("--publish", action="store_true",
+                        help="Fase F opt-in: il passo del sito. Verifica gli indicatori "
+                             "fusi contro il sito e committa le prove su master. Non e' uno "
+                             "stadio, non lancia un agente, non apre PR: meccanico come il tick. "
+                             "Default spento.")
+    parser.add_argument("--publish-base", default=DEFAULT_PUBLISH_BASE,
+                        help="il sito da verificare col passo del sito (default: il sito pubblico)")
     args = parser.parse_args(argv)
 
     pr_state, open_prs = "non-controllato", []
@@ -387,6 +505,16 @@ def main(argv=None):
         priorities = practice_timeline.stage_priorities(practice_timeline.load_real())
 
     plan = decide(open_prs=open_prs, pr_state=pr_state, priorities=priorities)
+
+    # Il passo del sito e' indipendente dalla scelta dello stadio: e'
+    # un'osservazione post-deploy, non uno stadio da lanciare. Gira prima del
+    # tick cosi' committa le sue prove e lascia l'albero pulito per la riga del
+    # tick, che ha la sua stessa guardia sull'albero.
+    if args.publish:
+        plan["publish"] = publish_step(
+            base=args.publish_base,
+            log=(lambda *_: None) if args.json else print)
+
     if args.record:
         # Il tick ha un `run_id` suo, che descrive la decisione. Quello dentro
         # `plan` descrive la run che lo stadio dovra' registrare, ed e' un'altra

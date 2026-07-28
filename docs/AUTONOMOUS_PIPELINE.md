@@ -131,6 +131,16 @@ scegliere. Senza questo passo la riga resterebbe nel checkout usa e getta della
 Routine e sparirebbe con la sessione, cioe' proprio nel caso, l'unico, per cui
 esiste.
 
+Con `--publish` (opt-in, spento di default) il dispatcher fa un secondo passo
+meccanico dello stesso genere, il **passo del sito**: verifica gli indicatori in
+stato `fusa` contro `divarioitalia.it` e committa le prove di pubblicazione su
+master, chiudendo la transizione `fusa -> pubblicata`
+(vedi [`EDITORIAL_PRACTICE.md`](EDITORIAL_PRACTICE.md), §8). Non e' uno stadio e
+non lancia un agente: e' deterministico, si committa da solo con le stesse
+guardie del tick (un file nuovo per record, solo su master), e scrive una prova
+solo dove il sito conferma la versione committata. Un sito irraggiungibile o non
+ancora dispiegato non scrive niente e l'indicatore resta `fusa` per il giro dopo.
+
 ## Gli store: perche' i conflitti non esistono piu'
 
 Tre registri della catena erano file unici a cui ogni stadio appendeva **in

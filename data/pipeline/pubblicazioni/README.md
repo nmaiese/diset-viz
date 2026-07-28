@@ -27,7 +27,16 @@ Nome del file: `<code>__<level>__<prosa>.json` (es.
 contenuto (frammento del lead + anno) combaciava, `prosa` ancora la prova alla
 versione.
 
-**In modalita' di controllo (Fase D pilota) questa cartella e' vuota nel repo.**
-Le prove vere si scrivono contro `divarioitalia.it` dopo un deploy, e legare la
-transizione a uno stadio della catena (con il suo perimetro nel cancello) e' la
-Fase F, non ancora fatta.
+**Finche' il passo del sito e' spento, questa cartella e' vuota nel repo.** La
+transizione e' gia' legata alla catena: perimetro nel cancello
+(`pipeline_gate.STAGE_PATHS["publisher"]`, con `check_publications`) e passo del
+dispatcher (`pipeline_dispatch.py --publish`, meccanico come il tick, che verifica
+gli indicatori fusi contro il sito e committa qui le prove). Le prove vere si
+scrivono contro `divarioitalia.it` dopo un deploy: manca solo passare `--publish`
+nella Routine del dispatcher (Fase F, operativa non codice).
+
+```bash
+# il passo del sito: verifica ogni indicatore fuso e committa le prove
+python3 scripts/verify_publication.py --queue                     # cosa aspetta la verifica
+python3 scripts/pipeline_dispatch.py --publish --publish-base https://divarioitalia.it
+```

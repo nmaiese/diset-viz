@@ -311,5 +311,128 @@ class AnOpenPullRequestIsRecognisedByWhatItTouches(unittest.TestCase):
         self.assertEqual(prs, [])
 
 
+class ThePublishStepObservesTheSite(unittest.TestCase):
+    """Il passo del sito: verifica gli indicatori fusi e scrive le prove, senza
+    lanciare un agente. Un sito che non conferma non scrive niente, e le prove si
+    committano solo con le stesse guardie del tick."""
+
+    def _fusa_indicator(self):
+        from scripts import verify_publication
+        queue = verify_publication.publication_queue()
+        if not queue:
+            self.skipTest("nessun indicatore in stato fusa da verificare")
+        return queue[0]["id"]
+
+    def test_a_confirming_site_writes_a_proof(self):
+        import tempfile
+        from scripts import indicator_store, verify_publication
+        ind = self._fusa_indicator()
+        entry = indicator_store.read(ind)
+        sig = verify_publication.page_signature(entry)
+
+        def good_fetcher(url):
+            return f"<html><body><p>{sig['snippet']} ...</p><p>anno {sig['vintage']}</p></body></html>"
+
+        root = tempfile.mkdtemp()
+        summary = pipeline_dispatch.publish_step(
+            fetcher=good_fetcher, proofs_root=root, do_commit=False)
+        self.assertGreaterEqual(summary["prove_scritte"], 1)
+        self.assertTrue(any(c["ok"] for c in summary["checked"]))
+
+    def test_an_unreachable_site_writes_nothing(self):
+        import tempfile
+
+        def dead_fetcher(url):
+            raise OSError("giu'")
+
+        root = tempfile.mkdtemp()
+        summary = pipeline_dispatch.publish_step(
+            fetcher=dead_fetcher, proofs_root=root, do_commit=False)
+        self.assertEqual(summary["prove_scritte"], 0)
+        # ne' successo ne' fallimento: ogni controllo e' irraggiungibile (ok None)
+        self.assertTrue(all(c["ok"] is None for c in summary["checked"]))
+
+    def test_a_wrong_version_writes_nothing(self):
+        import tempfile
+
+        def stale_fetcher(url):
+            return "<html><body>una pagina che non porta ne' lead ne' anno</body></html>"
+
+        root = tempfile.mkdtemp()
+        summary = pipeline_dispatch.publish_step(
+            fetcher=stale_fetcher, proofs_root=root, do_commit=False)
+        self.assertEqual(summary["prove_scritte"], 0)
+
+
+class TheProofsNeverPushAnythingButThemselves(unittest.TestCase):
+    """Il push diretto delle prove ha le stesse guardie del tick: un file per
+    record e nome che nessun altro sceglie, ma solo su master e solo se l'albero
+    non porta altro."""
+
+    REL = "data/pipeline/pubblicazioni/ter-651__regione__abc.json"
+
+    def runner(self, branch="master", dirty=()):
+        calls = []
+
+        def fake(argv, cwd=None):
+            calls.append(argv)
+            if argv[:2] == ["git", "rev-parse"]:
+                return 0, branch + "\n"
+            if argv[:2] == ["git", "status"]:
+                return 0, "".join(f"?? {path}\n" for path in dirty)
+            return 0, ""
+
+        fake.calls = calls
+        return fake
+
+    def test_it_refuses_when_head_is_not_master(self):
+        runner = self.runner(branch="claude/una-modifica", dirty=[self.REL])
+        ok = pipeline_dispatch._commit_proofs([self.REL], runner=runner, log=lambda *_: None)
+        self.assertFalse(ok)
+        self.assertNotIn(["git", "push", "origin", "HEAD:master"], runner.calls)
+
+    def test_it_refuses_when_the_tree_carries_anything_else(self):
+        runner = self.runner(dirty=[self.REL, "app/views.py"])
+        ok = pipeline_dispatch._commit_proofs([self.REL], runner=runner, log=lambda *_: None)
+        self.assertFalse(ok)
+        self.assertNotIn(["git", "push", "origin", "HEAD:master"], runner.calls)
+
+    def test_it_pushes_when_master_carries_only_the_proofs(self):
+        runner = self.runner(dirty=[self.REL])
+        ok = pipeline_dispatch._commit_proofs([self.REL], runner=runner, log=lambda *_: None)
+        self.assertTrue(ok)
+        self.assertIn(["git", "push", "origin", "HEAD:master"], runner.calls)
+
+    def test_it_retries_the_push_after_a_rebase(self):
+        """Il difetto che Codex ha visto: il commit deve stare fuori dal ciclo.
+        Dopo un rebase riuscito la prova e' gia' committata, quindi un secondo
+        `git commit` non stagerebbe niente ed uscirebbe non-zero (qui simulato),
+        e la vecchia forma tornava senza mai ripushare. Ora committa una volta e
+        ritenta solo il push."""
+        calls = []
+        state = {"pushes": 0, "commits": 0}
+
+        def fake(argv, cwd=None):
+            calls.append(argv)
+            if argv[:2] == ["git", "rev-parse"]:
+                return 0, "master\n"
+            if argv[:2] == ["git", "status"]:
+                return 0, f"?? {self.REL}\n"
+            if argv[:2] == ["git", "commit"]:
+                state["commits"] += 1
+                # il secondo commit non ha niente da committare, come git vero
+                return (0, "") if state["commits"] == 1 else (1, "nothing to commit")
+            if argv[:3] == ["git", "push", "origin"]:
+                state["pushes"] += 1
+                return (0, "") if state["pushes"] >= 2 else (1, "non-fast-forward")
+            return 0, ""
+
+        ok = pipeline_dispatch._commit_proofs([self.REL], runner=fake, log=lambda *_: None)
+        self.assertTrue(ok)
+        self.assertEqual(state["commits"], 1)  # committato una volta sola
+        self.assertEqual(state["pushes"], 2)   # ripushato dopo il rebase
+        self.assertIn(["git", "rebase", "origin/master"], calls)
+
+
 if __name__ == "__main__":
     unittest.main()
