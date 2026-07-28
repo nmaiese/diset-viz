@@ -592,9 +592,16 @@ pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
   `tests/integration/test_verify_publication_live.py`. **Resta da fare**: girarla
   contro `divarioitalia.it` dopo un deploy vero, e legare la scrittura della prova
   a uno stadio della catena col suo perimetro (Fase F).
-- **Fase E, manutenzione.** I tipi `aggiornamento`, `revisione`, `smentita`,
-  `integrazione`, `ritiro`, `rollback` (§2). Uscita: ogni indicatore mostra cicli
-  distinti ma collegati, senza PR eterna.
+- **Fase E, manutenzione. [implementata]** `practice_timeline.split_cycles`
+  spezza la storia di un indicatore in cicli distinti ma collegati: il primo e'
+  `nuovo`, poi ogni innesco su una pagina gia' a valle apre un ciclo nuovo (una
+  smentita, un anno nuovo della fonte), l'ultimo e' quello attivo e porta lo
+  stato corrente, i precedenti restano chiusi con esito `sostituita`. `--write`
+  scrive un record per ciclo. Sui dati veri, `eur:rd_e_gerdreg` risulta due
+  cicli, `nuovo-1` (sostituita) e `smentita-2` (attivo, invalidata), senza una PR
+  eterna. Ricostruibili sono `smentita` e `aggiornamento`; `ritiro`, `rollback`,
+  `integrazione` e `metadati` esistono nel modello ma vogliono un segnale
+  esplicito. Provata in `tests/unit/test_practice_timeline.py`.
 - **Fase F, sostituzione.** Il modello diventa autorevole solo con: nessuna
   perdita di osservabilita', perimetri non indeboliti, controlli non affidati ai
   prompt, nessuna dipendenza esclusiva dalla PR, recupero provato, pubblicazione

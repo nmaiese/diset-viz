@@ -172,6 +172,99 @@ class PublishedFrom(unittest.TestCase):
         self.assertTrue(t._published_from([{"ok": True}], "abc"))
 
 
+def _dossier(timeline, **kw):
+    base = dict(id="dem:X", type="nuovo", state="in-lavorazione", entered_at="2026-01-01",
+                completed_stages=[], required_stages=["writer", "reviewer", "verificatore"],
+                flags={}, error_class=None, score_eligible=False, published=None,
+                verification_valid=None, runs=[], priority=0.0, timeline=timeline)
+    base.update(kw)
+    return base
+
+
+def _ev(at, kind, **extra):
+    e = {"at": at, "stage": "", "kind": kind, "detail": ""}
+    e.update(extra)
+    return e
+
+
+class Cycles(unittest.TestCase):
+    def test_one_cycle_when_no_trigger(self):
+        d = _dossier([_ev("2026-01-01", "scritta", vintage=2023),
+                      _ev("2026-01-02", "firmata")], state="fusa")
+        cy = t.cycles_for(d)
+        self.assertEqual(len(cy), 1)
+        self.assertEqual((cy[0]["type"], cy[0]["seq"], cy[0]["active"]), ("nuovo", 1, True))
+        self.assertEqual(cy[0]["state"], "fusa")
+
+    def test_refutation_opens_a_second_linked_cycle(self):
+        d = _dossier([
+            _ev("2026-01-01", "scritta", vintage=2023),
+            _ev("2026-01-02", "firmata"),
+            _ev("2026-01-03", "verificata", esito="smentito"),
+        ], state="invalidata", flags={"open_smentita": True})
+        cy = t.cycles_for(d)
+        self.assertEqual([(c["type"], c["seq"]) for c in cy], [("nuovo", 1), ("smentita", 2)])
+        self.assertEqual(cy[0]["state"], "chiusa")
+        self.assertEqual(cy[0]["outcome"], "sostituita")
+        self.assertTrue(cy[1]["active"])
+        self.assertEqual(cy[1]["state"], "invalidata")
+        # collegati: stesso indicatore, sequenza che cresce
+        self.assertEqual({c["indicator_id"] for c in cy}, {"dem:X"})
+
+    def test_a_second_curation_opens_an_update_cycle(self):
+        d = _dossier([
+            _ev("2026-01-01", "curata"),
+            _ev("2026-01-02", "firmata"),
+            _ev("2027-01-01", "curata"),
+        ], state="in-lavorazione")
+        cy = t.cycles_for(d)
+        self.assertEqual([c["type"] for c in cy], ["nuovo", "aggiornamento"])
+
+    def test_a_newer_vintage_rewrite_opens_an_update_cycle(self):
+        d = _dossier([
+            _ev("2026-01-01", "scritta", vintage=2023),
+            _ev("2026-01-02", "firmata"),
+            _ev("2027-01-01", "scritta", vintage=2024),
+        ])
+        cy = t.cycles_for(d)
+        self.assertEqual([c["type"] for c in cy], ["nuovo", "aggiornamento"])
+
+    def test_empty_timeline_is_one_active_cycle(self):
+        cy = t.cycles_for(_dossier([]))
+        self.assertEqual(len(cy), 1)
+        self.assertTrue(cy[0]["active"])
+
+
+class ReadyStage(unittest.TestCase):
+    def test_refutation_waits_on_reviewer(self):
+        self.assertEqual(t.ready_stage(_dossier([], state="invalidata",
+                         flags={"open_smentita": True})), "reviewer")
+
+    def test_stale_curation_waits_on_curator(self):
+        self.assertEqual(t.ready_stage(_dossier([], state="invalidata",
+                         flags={"stale_curation": True})), "curator")
+
+    def test_proposal_waits_on_promoter(self):
+        self.assertEqual(t.ready_stage(_dossier([], state="proposta")), "promoter")
+
+    def test_in_progress_waits_on_next_required(self):
+        d = _dossier([], completed_stages=["writer"])
+        self.assertEqual(t.ready_stage(d), "reviewer")
+
+    def test_blocked_and_published_are_not_dispatchable(self):
+        self.assertIsNone(t.ready_stage(_dossier([], state="bloccata", flags={"needs_info": True})))
+        self.assertIsNone(t.ready_stage(_dossier([], state="pubblicata")))
+
+    def test_stage_priorities_takes_the_max_per_stage(self):
+        a = _dossier([], state="invalidata", flags={"open_smentita": True}, priority=120.0, id="a")
+        b = _dossier([], completed_stages=["writer"], priority=10.0, id="b")
+        c = _dossier([], completed_stages=["writer"], priority=45.0, id="c")
+        pri = t.stage_priorities({"a": a, "b": b, "c": c})
+        self.assertEqual(pri["reviewer"], 120.0)   # la pratica 'a', smentita, domina
+        # b e c aspettano entrambe il reviewer: il massimo e' comunque 'a'
+        self.assertNotIn("writer", pri)
+
+
 class Reconcile(unittest.TestCase):
     def _reconstructed(self):
         art = _article("651", 2023, "2026-07-27", 2023)

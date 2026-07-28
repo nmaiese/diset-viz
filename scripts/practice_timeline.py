@@ -375,10 +375,14 @@ def reconcile(declared: dict, reconstructed: dict) -> list:
     passa per assenza di lavoro."""
     # I record dichiarati sono indicizzati per `practice_id`, qui si riconcilia
     # per indicatore, quindi si normalizza sul campo `indicator_id` (o `id`).
+    # Con i cicli (Fase E) un indicatore ha piu' record dichiarati: si riconcilia
+    # il ciclo **attivo**, che porta lo stato corrente. Gli altri sono chiusi.
     by_ind = {}
     for rec in declared.values():
         ind = rec.get("indicator_id") or rec.get("id")
-        if ind:
+        if not ind:
+            continue
+        if ind not in by_ind or rec.get("active"):
             by_ind[ind] = rec
 
     out = []
@@ -413,27 +417,143 @@ def load_real(today: str = "", proofs_root=None):
                        verifiche, runs, verifications_site=proofs, today=today)
 
 
-def _dossier_to_record(d: dict) -> dict:
-    """Il dossier ricostruito nella forma di un record di pratica (prima pratica,
-    tipo `nuovo`). La ricostruzione storica multi-ciclo resta fuori: qui una
-    pratica per indicatore, con gli eventi di manutenzione marcati nella
-    timeline. E' il limite dichiarato della Fase B, non un buco silenzioso."""
-    return {
-        "practice_id": practice_model.practice_id(d["id"], d["type"], 1),
+# --- Fase E: i cicli di manutenzione, distinti ma collegati ------------------
+
+def _cycle_trigger(ev: dict, seen_kinds: set, last_vintage) -> str | None:
+    """Il tipo del ciclo che questo evento apre, o None se resta nel corrente.
+
+    Un ciclo nuovo si apre solo su una pagina gia' arrivata a valle: una smentita
+    e' una pratica nuova (§13), un anno nuovo della fonte e' un aggiornamento. Le
+    prime occorrenze (la prima curatela, la prima scrittura) appartengono al ciclo
+    di prima pubblicazione, non ne aprono uno.
+    """
+    kind = ev.get("kind")
+    if kind == "verificata" and ev.get("esito") == "smentito":
+        return "smentita"
+    if kind == "curata" and "curata" in seen_kinds:
+        return "aggiornamento"
+    if kind == "scritta" and "scritta" in seen_kinds:
+        v = ev.get("vintage")
+        if v is not None and last_vintage is not None and v > last_vintage:
+            return "aggiornamento"
+    return None
+
+
+def split_cycles(d: dict) -> list:
+    """Spezza la storia di un indicatore in cicli distinti ma collegati (Fase E).
+
+    Il primo ciclo e' la prima pubblicazione (`nuovo`). Dopo, ogni innesco
+    editoriale su una pagina gia' arrivata a valle apre un ciclo nuovo, legato
+    allo stesso indicatore. L'ultimo ciclo e' quello attivo e porta lo stato
+    corrente ricostruito; i precedenti sono chiusi con esito `sostituita`, e
+    restano nella storia (mai una PR eterna, mai un buco).
+
+    Ricostruibili dagli artefatti committati sono `smentita` e `aggiornamento`;
+    ritiro, rollback, integrazione e metadati esistono nel modello ma richiedono
+    un segnale esplicito, quindi non si inventano qui.
+    """
+    events = d["timeline"]
+    if not events:
+        return [_cycle_record(d, 1, d["type"], [], active=True)]
+    groups, cur, cur_type = [], [], "nuovo"
+    seen, last_vintage = set(), None
+    for ev in events:
+        trig = _cycle_trigger(ev, seen, last_vintage) if cur else None
+        if trig:
+            groups.append((cur_type, cur))
+            cur, cur_type = [], trig
+        cur.append(ev)
+        seen.add(ev.get("kind"))
+        if ev.get("kind") == "scritta" and ev.get("vintage") is not None:
+            last_vintage = ev.get("vintage")
+    groups.append((cur_type, cur))
+    return [_cycle_record(d, i, ctype, evs, active=(i == len(groups)))
+            for i, (ctype, evs) in enumerate(groups, start=1)]
+
+
+def _cycle_record(d: dict, seq: int, ctype: str, events: list, active: bool) -> dict:
+    dates = [e["at"] for e in events if e.get("at")]
+    rec = {
+        "practice_id": practice_model.practice_id(d["id"], ctype, seq),
         "indicator_id": d["id"],
-        "type": d["type"],
-        "state": d["state"],
-        "entered_at": d["entered_at"],
-        "completed_stages": d["completed_stages"],
-        "required_stages": d.get("required_stages", []),
-        "flags": d["flags"],
-        "error_class": d["error_class"],
-        "score_eligible": d["score_eligible"],
-        "published": d["published"],
-        "verification_valid": d["verification_valid"],
-        "runs": d["runs"],
-        "priority": d.get("priority"),
+        "type": ctype,
+        "seq": seq,
+        "active": active,
+        "opened_at": dates[0] if dates else d["entered_at"],
+        "closed_at": None if active else (dates[-1] if dates else ""),
+        "events": [e.get("kind") for e in events],
     }
+    if active:
+        rec.update({
+            "state": d["state"],
+            "outcome": None,
+            "completed_stages": d["completed_stages"],
+            "required_stages": d.get("required_stages", []),
+            "flags": d["flags"],
+            "error_class": d["error_class"],
+            "score_eligible": d["score_eligible"],
+            "published": d["published"],
+            "verification_valid": d["verification_valid"],
+            "runs": d["runs"],
+            "priority": d.get("priority"),
+        })
+    else:
+        rec.update({"state": "chiusa", "outcome": "sostituita"})
+    return rec
+
+
+def cycles_for(d: dict) -> list:
+    """Tutti i record di pratica di un indicatore, uno per ciclo (Fase E)."""
+    return split_cycles(d)
+
+
+def _dossier_to_record(d: dict) -> dict:
+    """Il record della pratica **attiva** (l'ultimo ciclo), che porta lo stato
+    corrente. I cicli precedenti stanno accanto, con `cycles_for`."""
+    return cycles_for(d)[-1]
+
+
+# --- Fase F: la priorita' della pratica, mappata sullo stadio pronto ---------
+
+def ready_stage(d: dict) -> str | None:
+    """Lo stadio su cui una pratica sta aspettando, o None se non e' dispatchabile.
+
+    E' il ponte fra la priorita' della pratica (§11) e il dispatcher, che nomina
+    uno stadio: una smentita aspetta il revisore, una curatela scaduta il
+    curatore, una rilettura il revisore, una proposta il promotore. Bloccata,
+    in quarantena, chiusa o pubblicata non hanno uno stadio che le muova.
+    """
+    f, st = d["flags"], d["state"]
+    if st in ("chiusa", "in-quarantena", "pubblicata"):
+        return None
+    if f.get("needs_info") or f.get("rejected"):
+        return None
+    if f.get("open_smentita"):
+        return "reviewer"
+    if f.get("stale_curation"):
+        return "curator"
+    if f.get("stale_vintage"):
+        return "reviewer"
+    if st == "proposta":
+        return "promoter"
+    for stage in d.get("required_stages") or ():
+        if stage not in d["completed_stages"]:
+            return stage
+    return None
+
+
+def stage_priorities(dossier: dict) -> dict:
+    """`{stadio: priorita' massima di una pratica pronta su quello stadio}`.
+
+    E' cio' che il dispatcher consulta, in modalita' priorita' (Fase F), per non
+    far aspettare una correzione urgente dietro una coda di candidature nuove.
+    """
+    out = {}
+    for d in dossier.values():
+        stage = ready_stage(d)
+        if stage:
+            out[stage] = max(out.get(stage, float("-inf")), d.get("priority", 0.0))
+    return out
 
 
 def main(argv=None) -> int:
@@ -467,9 +587,10 @@ def main(argv=None) -> int:
         from scripts import practice_store
         n = 0
         for d in dossier.values():
-            practice_store.save(_dossier_to_record(d))
-            n += 1
-        print(f"scritti {n} record in {practice_store.ROOT}")
+            for rec in cycles_for(d):
+                practice_store.save(rec)
+                n += 1
+        print(f"scritti {n} record ({len(dossier)} indicatori) in {practice_store.ROOT}")
         return 0
 
     if args.indicator:
