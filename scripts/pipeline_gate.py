@@ -84,6 +84,10 @@ RUN_JOURNAL = "data/pipeline/runs/"
 # Il registro delle verifiche. Sta nel perimetro del solo verificatore, ed e'
 # tutto quello che quello stadio produce.
 VERIFICATIONS = "data/pipeline/verifiche/"
+# Il registro delle prove di pubblicazione (§8 di EDITORIAL_PRACTICE.md). Sta nel
+# perimetro del solo `publisher`, lo stadio che verifica il sito e osserva la
+# transizione `fusa -> pubblicata`. Come gli altri store e' a un file per record.
+PUBLICATIONS = "data/pipeline/pubblicazioni/"
 
 # What each stage is allowed to change. Anything outside its list is a failure,
 # not a warning: the point of the list is that a prompt cannot widen it.
@@ -106,6 +110,12 @@ STAGE_PATHS = {
     # parola del revisore sul lavoro del revisore. Le smentite tornano al revisore
     # come il segnale `smentita` di `review_queue`, che le legge da qui.
     "verificatore": (VERIFICATIONS, RUN_JOURNAL),
+    # Il publisher verifica il sito dopo il merge e il deploy e scrive una prova
+    # in `pubblicazioni/`. Non tocca ne' l'articolo ne' la verifica: osserva, non
+    # ripara, come il verificatore. Lo stadio esiste nel cancello (perimetro e
+    # merge) ma **non** in `pipeline_status.STAGE_ORDER`, quindi il dispatcher non
+    # lo lancia: e' l'aggancio del cutover, con l'interruttore ancora spento.
+    "publisher": (PUBLICATIONS, RUN_JOURNAL),
 }
 
 # How far a green gate is allowed to go, per stage. Not uniform on purpose.
@@ -139,6 +149,10 @@ MERGE_POLICY = {
     # di due file il cancello ha poco da misurare, e la 3.3 del piano avvertiva
     # che un perimetro cortissimo rende il verdetto una tautologia verde.
     "verificatore": "checks",
+    # `checks` come il verificatore: la prova non cambia una pagina, ma dichiara
+    # che una versione e' pubblica e valida, e vale la pena che la CI ci stia in
+    # mezzo. La riga a un file per record e' comunque sicura da fondere.
+    "publisher": "checks",
 }
 
 # Borrowed, not restated. A local copy drifted from `curate.SCOREABLE_DIRECTIONS`
@@ -654,6 +668,76 @@ def _verification_rows_added(base=None, cwd=None):
     return rows
 
 
+def _publication_rows_added(base=None, cwd=None):
+    """Le prove di pubblicazione che questo branch aggiunge o riscrive.
+
+    Una prova puo' essere riscritta senza colpa: rifare la stessa verifica scrive
+    lo stesso nome di file (l'impronta `prosa` e' nel nome), ed e' idempotente.
+    Quindi qui bastano aggiunte e modifiche, senza la regola append-only del
+    diario o delle verifiche.
+    """
+    rows = []
+    touched = _touched_under(PUBLICATIONS, base, cwd=cwd)
+    for path in touched["added"] + touched["changed"]:
+        try:
+            data = json.loads((PROJECT_ROOT / path).read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if isinstance(data, dict):
+            rows.append(data)
+    return rows
+
+
+def check_publications(base=None, cwd=None):
+    """Il publisher consegna delle prove, quindi le prove devono reggere.
+
+    Impone la prudenza di §8 invece di ricordarla: una prova con `ok` diverso da
+    True e' un controllo che non ha confermato niente, e registrarla come
+    pubblicazione e' il falso positivo che tutta la Fase D esiste per non avere.
+    L'impronta `prosa` deve corrispondere a un testo che questo repo ha davvero
+    avuto, quello di adesso o quello della base, per la stessa ragione delle
+    verifiche: una prova ancorata a un'impronta che non e' di nessuna versione e'
+    la prova di un testo che non e' in pagina. Il grosso del giudizio e' in
+    `verify_publication.publication_problems`, puro e provato senza un albero git.
+    """
+    from scripts import practice_timeline, verify_publication, verification_queue
+
+    rows = _publication_rows_added(base, cwd=cwd)
+    if not rows:
+        return Check("pubblicazioni", True, "nessuna prova nuova da controllare")
+
+    resolved = resolve_base(base, cwd=cwd)
+    try:
+        entries = indicator_store.load_all()
+    except (OSError, ValueError, indicator_store.StoreError):
+        entries = {}
+
+    valid = {}
+    for row in rows:
+        code = (row.get("code") or "").strip()
+        if not code or code in valid:
+            continue
+        key = practice_timeline.key_of_code(code)
+        fingerprints = set()
+        entry = entries.get(key)
+        if entry is not None:
+            fingerprints.add(verification_queue.prose_fingerprint(entry))
+        if resolved:
+            old = _read_json_at(resolved, INDICATOR_TEXTS + indicator_store.filename_for(key), cwd=cwd)
+            if isinstance(old, dict):
+                fingerprints.add(verification_queue.prose_fingerprint(old))
+        if fingerprints:
+            valid[code] = fingerprints
+
+    problems = []
+    for row in rows:
+        problems.extend(verify_publication.publication_problems(row, valid))
+    if problems:
+        return Check("pubblicazioni", False, "; ".join(problems[:5]))
+    return Check("pubblicazioni", True,
+                 f"{len(rows)} prove, tutte confermate e ancorate al testo di adesso o della base")
+
+
 def check_reviewer_signature(base=None, cwd=None):
     """The reviewer's whole output is a signature, so a run that changed prose
     without signing has not reviewed, it has rewritten.
@@ -964,6 +1048,8 @@ def run(stage, base=None, skip_tests=False, cwd=None):
         checks.append(check_reviewer_signature(base, cwd=cwd))
     if stage == "verificatore":
         checks.append(check_verifications(base, cwd=cwd))
+    if stage == "publisher":
+        checks.append(check_publications(base, cwd=cwd))
     if stage in ("writer", "reviewer"):
         checks.append(check_writer_vintage(base, cwd=cwd))
     if not skip_tests:

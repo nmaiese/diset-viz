@@ -16,6 +16,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from scripts import indicator_store, pipeline_gate, verification_queue
+from scripts import verify_publication as vp
 
 
 class BlastRadius(unittest.TestCase):
@@ -777,6 +778,86 @@ class ADirectoryPerimeterTakesOnlyItsOwnFileType(unittest.TestCase):
         self.assertTrue(pipeline_gate.path_allowed(
             pipeline_gate.ISTAT_SERIES_CONFIG,
             pipeline_gate.STAGE_PATHS["scout"]))
+
+
+class ThePublisherProvesTheSite(unittest.TestCase):
+    """Lo stadio `publisher` (§8) su un repo git costruito qui.
+
+    `check_publications` legge l'albero per calcolare le impronte valide, quindi
+    come per le verifiche serve una base con l'articolo dentro. Il punto e'
+    sempre lo stesso: far dire no al cancello prima di fargli dire si'. Una prova
+    che il controllo non ha confermato (ok!=True), o ancorata a un testo che non
+    e' in pagina, non e' una pubblicazione e non deve passare.
+    """
+
+    def setUp(self):
+        self._tmp = TemporaryDirectory()
+        self.repo = Path(self._tmp.name)
+        self.addCleanup(self._tmp.cleanup)
+        self._run("git", "init", "-q", "-b", "main")
+        self._run("git", "config", "user.email", "t@example.com")
+        self._run("git", "config", "user.name", "t")
+        (self.repo / "content" / "indicators").mkdir(parents=True)
+        (self.repo / "data" / "pipeline" / "pubblicazioni").mkdir(parents=True)
+        self.entry = {
+            "lead": "Un lead pubblicato.", "level": "regione", "vintage": 2024,
+            "reviewed_at": "2026-07-27", "reviewed_vintage": 2024, "fonti": [],
+            "sections": [{"role": "quadro", "h": None, "body": "Il quadro."}],
+        }
+        indicator_store.write("651", self.entry, root=self.repo / "content" / "indicators")
+        self.fingerprint = verification_queue.prose_fingerprint(self.entry)
+        self._run("git", "add", "-A")
+        self._run("git", "commit", "-qm", "base")
+
+    def _run(self, *args):
+        return subprocess.run(args, cwd=self.repo, capture_output=True, text=True)
+
+    def _proof(self, ok=True, prosa=None):
+        return {
+            "code": "ter-651", "level": "regione", "at": "2026-07-28",
+            "url": "https://divarioitalia.it/indicatore/ter-651",
+            "ok": ok, "snippet_ok": ok, "vintage_ok": ok, "vintage": "2024",
+            "prosa": prosa if prosa is not None else self.fingerprint,
+            "reason": "combacia" if ok else "versione diversa",
+        }
+
+    def _write_proofs(self, proofs):
+        root = self.repo / "data" / "pipeline" / "pubblicazioni"
+        for stale in root.glob("*.json"):
+            stale.unlink()
+        for proof in proofs:
+            vp.write_proof(proof, root=root)
+
+    def _check(self):
+        original = indicator_store.ROOT
+        gate_root = pipeline_gate.PROJECT_ROOT
+        indicator_store.ROOT = self.repo / "content" / "indicators"
+        pipeline_gate.PROJECT_ROOT = self.repo
+        try:
+            return pipeline_gate.check_publications(base="HEAD", cwd=self.repo)
+        finally:
+            indicator_store.ROOT = original
+            pipeline_gate.PROJECT_ROOT = gate_root
+
+    def test_no_new_proof_passes(self):
+        self.assertTrue(self._check().ok)
+
+    def test_a_confirmed_anchored_proof_passes(self):
+        self._write_proofs([self._proof()])
+        check = self._check()
+        self.assertTrue(check.ok, check.detail)
+
+    def test_a_proof_the_check_did_not_confirm_is_refused(self):
+        self._write_proofs([self._proof(ok=False)])
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("ok=", check.detail)
+
+    def test_a_stale_fingerprint_is_refused(self):
+        self._write_proofs([self._proof(prosa="deadbeefdeadbeef")])
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("impronta", check.detail)
 
 
 if __name__ == "__main__":

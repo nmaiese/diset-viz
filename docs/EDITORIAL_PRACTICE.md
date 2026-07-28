@@ -589,9 +589,19 @@ pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
   prove e porta a `pubblicata` solo gli indicatori confermati, la transizione
   `fusa -> pubblicata` guidata da un artefatto e non da una modifica di stato.
   Provata end-to-end contro l'app servita in
-  `tests/integration/test_verify_publication_live.py`. **Resta da fare**: girarla
-  contro `divarioitalia.it` dopo un deploy vero, e legare la scrittura della prova
-  a uno stadio della catena col suo perimetro (Fase F).
+  `tests/integration/test_verify_publication_live.py` e, contro un gunicorn
+  reale, in `tests/integration/test_editorial_practice_e2e.py`. Lo stadio che
+  scrive la prova e' ora **agganciato al cancello**: `publisher` ha un perimetro
+  (`data/pipeline/pubblicazioni/`) e una politica di merge (`checks`) in
+  `pipeline_gate`, una coda deterministica (`verify_publication.publication_queue`,
+  gli indicatori in stato `fusa`), un driver (`--all-fusa`) e un controllo che
+  impone la prudenza (`check_publications`: una prova con `ok!=True`, o ancorata a
+  un testo che non e' in pagina, non e' una pubblicazione). **Ma l'interruttore e'
+  spento**: `publisher` non e' in `pipeline_status.STAGE_ORDER`, quindi il
+  dispatcher non lo lancia e il comportamento di default della catena non cambia.
+  **Resta da fare**: girarla contro `divarioitalia.it` dopo un deploy vero, e
+  accendere lo stadio (aggiungerlo all'ordine di catena, o farne un passo del
+  dispatcher dopo il deploy), che e' la riga operativa del cutover (Fase F).
 - **Fase E, manutenzione. [implementata]** `practice_timeline.split_cycles`
   spezza la storia di un indicatore in cicli distinti ma collegati: il primo e'
   `nuovo`, poi ogni innesco su una pagina gia' a valle apre un ciclo nuovo (una
@@ -652,11 +662,14 @@ python3 scripts/pipeline_dispatch.py --priority            # dispatch con la pre
 
 **Il cutover (Fase F) resta fuori, ed e' operativo non codice.** Accendere
 `--priority` di default, girare `practice_metrics.py` su run reali prima e dopo e
-documentare il confronto, e cambiare la Routine del dispatcher. Anche legare la
-scrittura della prova di pubblicazione e dei record di pratica a uno stadio della
-catena, col suo perimetro nel cancello, e' parte del cutover. Il modello non
-diventa autorevole al posto dello stato dedotto finche' quel confronto non e'
-documentato, come chiede il mandato: la macchina e' pronta, l'interruttore no.
+documentare il confronto, e cambiare la Routine del dispatcher. Lo stadio
+`publisher` che scrive la prova di pubblicazione e' gia' **agganciato al cancello**
+(perimetro `data/pipeline/pubblicazioni/`, merge `checks`, coda e controllo
+provati): resta da **accenderlo**, cioe' aggiungerlo all'ordine di catena o farne
+un passo del dispatcher dopo il deploy. Legare allo stesso modo la scrittura dei
+record di pratica e' l'ultimo pezzo. Il modello non diventa autorevole al posto
+dello stato dedotto finche' quel confronto non e' documentato, come chiede il
+mandato: la macchina e' pronta, l'interruttore no.
 
 ---
 
