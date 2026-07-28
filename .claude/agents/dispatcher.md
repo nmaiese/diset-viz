@@ -33,8 +33,15 @@ ignorava, e sei Routine indipendenti si pestavano i piedi.
 1. Lancia:
 
    ```bash
-   python3 scripts/pipeline_dispatch.py --json --check-open-prs --record --publish --publish-base https://divarioitalia.it
+   python3 scripts/pipeline_dispatch.py --json --check-open-prs --record --priority --publish --publish-base https://divarioitalia.it
    ```
+
+   `--priority` e' la preemption della Fase F: una pratica pronta sopra la
+   soglia (100, il peso di una smentita su una pagina online) precede l'ordine
+   di catena. Senza, un dato pubblico gia' smentito aspetta dietro la coda dello
+   scrittore finche' non si svuota, e ogni articolo nuovo la allunga. Sotto la
+   soglia l'ordine di catena resta quello provato, quindi la scoperta non viene
+   affamata: la preemption sceglie solo quale stadio, non ne lancia due.
 
    `--publish` e' il passo del sito (docs/EDITORIAL_PRACTICE.md, §8): oltre a
    nominare lo stadio, verifica gli indicatori in stato `fusa` contro

@@ -65,12 +65,59 @@ class ProposeSources(unittest.TestCase):
             self.assertTrue(p["reason"])
 
 
+class Uncapped(unittest.TestCase):
+    """Every uncovered regional domain must survive, not just the first N.
+
+    The cap used to default to 40 and the score is uniform, so the ranking fell
+    back to alphabetical: past the cap a genuinely new domain was invisible, and
+    the scout looked exhausted while the catalogue still held dozens. These
+    flows are five distinct new domains; the default must return all five.
+    """
+
+    FLOWS = [
+        {"id": f"{i}_DF_DCCV_{tok.upper()}_1", "name": f"{name} - regioni"}
+        for i, (tok, name) in enumerate([
+            ("turismo", "Notti trascorse per turismo"),
+            ("reddito", "Reddito disponibile delle famiglie"),
+            ("istruzione", "Popolazione per titolo di studio"),
+            ("giustizia", "Procedimenti definiti dai tribunali"),
+            ("cultura", "Spesa delle amministrazioni per cultura"),
+        ])
+    ]
+
+    def test_default_proposes_every_new_domain(self):
+        props = scout_sources.propose_sources(self.FLOWS, covered=set(), terms=set())
+        self.assertEqual(len(props), 5)
+
+    def test_limit_still_caps_when_asked(self):
+        props = scout_sources.propose_sources(
+            self.FLOWS, covered=set(), terms=set(), limit=2)
+        self.assertEqual(len(props), 2)
+
+
 class QueueShape(unittest.TestCase):
     def test_rows_carry_stable_ids_and_new_status(self):
         props = scout_sources.propose_sources(FLOWS, covered=COVERED, terms=TERMS)
         rows = scout_sources.to_rows(props)
         self.assertTrue(all(r["candidate_id"].startswith("istat_sdmx:") for r in rows))
         self.assertTrue(all(r["triage_status"] == "new" for r in rows))
+
+    def test_written_queue_uses_lf_not_crlf(self):
+        # csv.DictWriter defaults to CRLF; a stray CR at end of a changed line
+        # reads as trailing whitespace and trips the gate's git diff --check, so
+        # the scout could never commit an updated queue. The writer must emit LF.
+        import tempfile
+        from pathlib import Path
+
+        rows = scout_sources.to_rows(
+            scout_sources.propose_sources(FLOWS, covered=COVERED, terms=TERMS)
+        )
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "source_candidates.csv"
+            scout_sources.write_source_candidates(rows, path=path)
+            raw = path.read_bytes()
+        self.assertNotIn(b"\r\n", raw)
+        self.assertIn(b"\n", raw)
 
     def test_upsert_preserves_human_triage(self):
         rows = scout_sources.to_rows(
@@ -83,6 +130,54 @@ class QueueShape(unittest.TestCase):
         kept = next(r for r in merged if r["candidate_id"] == reviewed["candidate_id"])
         self.assertEqual(kept["triage_status"], "rejected")
         self.assertEqual(kept["triage_notes"], "gia coperto altrove")
+
+    def test_upsert_preserves_first_discovery_date(self):
+        # Un refresh ri-vede lo stesso dataflow, non lo ri-scopre: `discovered_at`
+        # deve restare quello della prima volta, non la data del refresh, o l'eta'
+        # di ogni candidato si azzererebbe a ogni run.
+        rows = scout_sources.to_rows(
+            scout_sources.propose_sources(FLOWS, covered=COVERED, terms=TERMS)
+        )
+        old = dict(rows[0])
+        old["discovered_at"] = "2026-07-25T00:00:00+00:00"
+        fresh = dict(rows[0])
+        fresh["discovered_at"] = "2026-07-28T00:00:00+00:00"
+        merged = scout_sources.upsert([old], [fresh])
+        kept = next(r for r in merged if r["candidate_id"] == old["candidate_id"])
+        self.assertEqual(kept["discovered_at"], "2026-07-25T00:00:00+00:00")
+
+    def test_upsert_dates_a_genuinely_new_candidate(self):
+        rows = scout_sources.to_rows(
+            scout_sources.propose_sources(FLOWS, covered=COVERED, terms=TERMS)
+        )
+        fresh = dict(rows[0])
+        fresh["discovered_at"] = "2026-07-28T00:00:00+00:00"
+        merged = scout_sources.upsert([], [fresh])  # nessun prior
+        self.assertEqual(merged[0]["discovered_at"], "2026-07-28T00:00:00+00:00")
+
+
+class RefreshFallsBackToCache(unittest.TestCase):
+    """Con --refresh lo scout forza il refetch del catalogo. Se Istat e' giu' o
+    bloccato, l'errore non deve abortire lo scout prima che triaghi la coda gia'
+    committata: il dispatcher gira uno stadio per tick e lo scout e' il primo,
+    quindi un guasto Istat persistente lo rilancerebbe e ucciderebbe ogni tick,
+    fermando tutta la catena. Si ripiega sulla cache quando c'e'."""
+
+    class _FakeClient:
+        def __init__(self, *a, **k):
+            pass
+
+        def dataflows(self, force=False):
+            if force:
+                from scripts import istat_sdmx
+                raise istat_sdmx.IstatBlockedError("403 dall'endpoint")
+            return [{"id": "cached_1", "name": "Dal catalogo in cache - regioni"}]
+
+    def test_forced_refresh_failure_falls_back_to_cache(self):
+        from unittest import mock
+        with mock.patch.object(scout_sources.istat_sdmx, "SdmxClient", self._FakeClient):
+            flows = scout_sources._load_flows(offline=False, cache_dir="/x", refresh=True)
+        self.assertEqual(flows, [{"id": "cached_1", "name": "Dal catalogo in cache - regioni"}])
 
 
 if __name__ == "__main__":

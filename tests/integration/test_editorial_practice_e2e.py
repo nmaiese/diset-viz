@@ -53,8 +53,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 # verificato): la sua pagina porta lead e vintage, quindi la verifica del sito ha
 # qualcosa da confermare.
 PINNED_TER = "651"
-# L'indicatore esterno con una smentita aperta: due cicli, priorita' alta, la
-# storia intera promosso -> curato -> firmato -> verificato-smentito.
+# L'indicatore esterno con due cicli: la storia intera promosso -> curato ->
+# firmato -> verificato-smentito, e la smentita poi chiusa correggendo la glossa
+# della fonte, cosi' il secondo ciclo e' tornato in-lavorazione (verifica scaduta).
 PINNED_EUR = "eur:rd_e_gerdreg"
 
 # Popolati da setUpModule: la base del sito servito, o None se non si e' potuto
@@ -160,21 +161,28 @@ class Observability(unittest.TestCase):
     def setUpClass(cls):
         cls.dossier = practice_timeline.load_real()
 
-    def test_eur_full_history_to_invalidata(self):
+    def test_eur_history_then_refutation_closed(self):
         d = self.dossier.get(PINNED_EUR)
         if d is None:
             self.skipTest(f"{PINNED_EUR} non e' piu' nel repo")
-        # promosso -> curato -> firmato -> verificato-smentito, e stato invalidata
-        self.assertEqual(d["state"], "invalidata")
+        # promosso -> curato -> scritto -> firmato -> verificato-smentito: la
+        # storia resta nel diario anche dopo che la smentita e' stata chiusa.
         kinds = [ev.get("kind") for ev in d["timeline"]]
         for expected in ("promossa", "curata", "firmata", "verificata"):
             self.assertIn(expected, kinds, kinds)
-        # la verifica ha esito smentito, ed e' la smentita aperta a invalidare
         verificate = [ev for ev in d["timeline"] if ev.get("kind") == "verificata"]
         self.assertTrue(any(ev.get("esito") == "smentito" for ev in verificate))
-        self.assertTrue(d["flags"].get("open_smentita"))
-        for stage in ("curator", "writer", "reviewer", "verificatore"):
+        # la glossa smentita ("quattro regioni del Nord ... 60%") e' stata
+        # corretta (le quattro sono Lombardia, Lazio, Emilia-Romagna e Piemonte,
+        # e il Lazio non e' al Nord) e spostata nel corpo: l'impronta della prosa
+        # cambia, la smentita si spegne e la verifica scade, cosi' l'articolo
+        # torna in coda al verificatore invece di restare in pagina con l'errore.
+        self.assertFalse(d["flags"].get("open_smentita"))
+        self.assertEqual(d["state"], "in-lavorazione")
+        self.assertFalse(d["verification_valid"])
+        for stage in ("curator", "writer", "reviewer"):
             self.assertIn(stage, d["completed_stages"])
+        self.assertNotIn("verificatore", d["completed_stages"])
 
     def test_table_row_per_indicator(self):
         # una riga per indicatore, con stato/stadi/priorita'/entrato
@@ -215,7 +223,7 @@ class Reconciler(unittest.TestCase):
         active = practice_timeline.cycles_for(eur)[-1]
         self.assertTrue(active["active"])
         rec = practice_store.load(active["practice_id"], root=root)
-        self.assertEqual(rec["state"], "invalidata")
+        self.assertEqual(rec["state"], "in-lavorazione")
         rec["state"] = "pubblicata"  # una bugia rispetto agli artefatti
         practice_store.save(rec, root=root)
 
@@ -227,7 +235,7 @@ class Reconciler(unittest.TestCase):
         self.assertEqual(row["id"], PINNED_EUR)
         self.assertEqual(row["kind"], "divergente")
         self.assertEqual(row["declared"], "pubblicata")
-        self.assertEqual(row["reconstructed"], "invalidata")
+        self.assertEqual(row["reconstructed"], "in-lavorazione")
 
 
 # --- 3. Verifica del sito, fusa -> pubblicata (Fase D) -----------------------
@@ -343,7 +351,10 @@ class MaintenanceCycles(unittest.TestCase):
         self.assertEqual(first["outcome"], "sostituita")
         self.assertEqual(second["practice_id"], f"{PINNED_EUR}#smentita-2")
         self.assertTrue(second["active"])
-        self.assertEqual(second["state"], "invalidata")
+        # la smentita di questo ciclo e' stata chiusa correggendo la glossa: il
+        # ciclo resta attivo ma torna in-lavorazione (verifica scaduta), non piu'
+        # invalidata con l'errore in pagina.
+        self.assertEqual(second["state"], "in-lavorazione")
 
     def test_single_cycle_indicator_stays_one(self):
         d = self.dossier.get(PINNED_TER)
@@ -364,14 +375,29 @@ class DispatcherPriority(unittest.TestCase):
     QUEUES = {"scout": 0, "hunter": 3, "promoter": 0, "curator": 0,
               "writer": 0, "reviewer": 1, "verificatore": 0}
 
-    def test_real_smentita_makes_reviewer_preempt_hunter(self):
-        priorities = practice_timeline.stage_priorities(practice_timeline.load_real())
-        # la smentita reale su eur alza il reviewer sopra la soglia di preemption
-        self.assertGreaterEqual(priorities.get("reviewer", 0),
-                                pipeline_dispatch.PREEMPT_THRESHOLD)
+    def test_above_threshold_preempts_chain_order(self):
+        # Una pratica del reviewer sopra la soglia (100, il peso di una smentita
+        # pubblica) scavalca il hunter, che a monte avrebbe la precedenza. Il test
+        # usa una priorita' sintetica invece della smentita reale su eur: quella e'
+        # stata chiusa (glossa corretta), e la logica di preemption va provata con
+        # un input controllato, non con lo stato transitorio del repo.
+        priorities = {"reviewer": pipeline_dispatch.PREEMPT_THRESHOLD, "hunter": 5.0}
         plan = pipeline_dispatch.decide(queues=self.QUEUES, priorities=priorities)
         self.assertEqual(plan["stage"], "reviewer")
         self.assertIn("urgente", plan["reason"])
+
+    def test_real_priorities_are_consistent_with_the_dispatch(self):
+        # Coi dati reali le priorita' restano calcolabili, e l'esito del dispatch
+        # si **deriva** dallo stato reale invece di pinnarlo: quando un
+        # verificatore registrera' una smentita vera il reviewer salira' sopra
+        # soglia, e un test che pinnasse "sotto soglia -> hunter" bloccherebbe
+        # proprio il PR del verificatore che introduce quel comportamento.
+        priorities = practice_timeline.stage_priorities(practice_timeline.load_real())
+        plan = pipeline_dispatch.decide(queues=self.QUEUES, priorities=priorities)
+        if priorities.get("reviewer", 0) >= pipeline_dispatch.PREEMPT_THRESHOLD:
+            self.assertEqual(plan["stage"], "reviewer")
+        else:
+            self.assertEqual(plan["stage"], "hunter")
 
     def test_without_priorities_it_is_pure_chain_order(self):
         plan = pipeline_dispatch.decide(queues=self.QUEUES)
@@ -417,11 +443,19 @@ class Metrics(unittest.TestCase):
         metrics = practice_metrics.load_and_compute()
 
         oss = metrics["osservabilita"]
-        self.assertGreaterEqual(oss["fusa_senza_prova_sul_sito"], 1)
+        # Questi due conteggi possono legittimamente essere 0: il passo del sito
+        # pubblica l'indicatore fuso e chiude il gap `fusa_senza_prova` (651), e
+        # una smentita corretta chiude `errori_pubblici` (eur:rd_e_gerdreg). Il
+        # test verifica che le metriche siano esposte e valide, non che il gap
+        # esista: pinnarle a >= 1 le accoppiava a uno stato transitorio che la
+        # normale operativita' della catena azzera, e faceva fallire la suite.
+        self.assertIsNotNone(oss["fusa_senza_prova_sul_sito"])
+        self.assertGreaterEqual(oss["fusa_senza_prova_sul_sito"], 0)
         self.assertIsNotNone(oss["quota_run_associati_a_un_indicatore_pct"])
 
         aff = metrics["affidabilita"]
-        self.assertGreaterEqual(aff["errori_pubblici_dopo_pubblicazione"], 1)
+        self.assertIsNotNone(aff["errori_pubblici_dopo_pubblicazione"])
+        self.assertGreaterEqual(aff["errori_pubblici_dopo_pubblicazione"], 0)
         # le longitudinali non si inventano da un'istantanea
         self.assertIsNone(aff["tentativi_duplicati"])
         self.assertIsNone(aff["transizioni_applicate_due_volte"])

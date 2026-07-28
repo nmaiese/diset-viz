@@ -5,7 +5,7 @@
    "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20241211-2"
   },
   {
-   "testo": "Istat, La ricerca e sviluppo in Italia (Anni 2023-2025): la Lombardia da sola vale circa il 20% della spesa nazionale in ricerca e sviluppo, e quattro regioni del Nord ne concentrano quasi il 60%.",
+   "testo": "Istat, La ricerca e sviluppo in Italia (Anni 2023-2025): la spesa in ricerca e sviluppo per regione in valore assoluto, con la Lombardia prima e circa un quinto del totale nazionale.",
    "url": "https://www.istat.it/comunicato-stampa/la-ricerca-e-sviluppo-in-italia-anni-2023-2025/"
   },
   {
@@ -25,7 +25,7 @@
    "role": "definizione"
   },
   {
-   "body": "La Lombardia investe in ricerca più euro di ogni altra regione, circa un quinto del totale nazionale ([Istat](https://www.istat.it/comunicato-stampa/la-ricerca-e-sviluppo-in-italia-anni-2023-2025/)), eppure la sua intensità resta media, all'1,19%, perché divide quella spesa per il PIL più alto del Paese. La Campania, all'1,20%, si piazza a metà graduatoria alla pari col Veneto, mentre Puglia, Calabria e Basilicata restano sotto lo 0,85%.\n\nIl taglio vero nella graduatoria cade subito dopo il secondo posto, dove si aprono 0,29 punti, e un secondo stacco da 0,25 punti arriva dopo il quarto. Poi la classifica si appiattisce. Dal settimo al diciassettesimo posto undici regioni stanno dentro 0,42 punti, ed è lì che la mappa smette di seguire la geografia attesa, con Campania e Sicilia davanti a Marche e Umbria. Nemmeno le due regioni di testa arrivano alla media dell'Unione europea, ferma al 2,2% ([Eurostat](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20241211-2)).",
+   "body": "La Lombardia investe in ricerca più euro di ogni altra regione, circa un quinto del totale nazionale, e insieme a Lazio, Emilia-Romagna e Piemonte arriva a quasi il 60% della spesa italiana ([Istat](https://www.istat.it/comunicato-stampa/la-ricerca-e-sviluppo-in-italia-anni-2023-2025/)), eppure la sua intensità resta media, all'1,19%, perché divide quella spesa per il PIL più alto del Paese. La Campania, all'1,20%, si piazza a metà graduatoria alla pari col Veneto, mentre Puglia, Calabria e Basilicata restano sotto lo 0,85%.\n\nIl taglio vero nella graduatoria cade subito dopo il secondo posto, dove si aprono 0,29 punti, e un secondo stacco da 0,25 punti arriva dopo il quarto. Poi la classifica si appiattisce. Dal settimo al diciassettesimo posto undici regioni stanno dentro 0,42 punti, ed è lì che la mappa smette di seguire la geografia attesa, con Campania e Sicilia davanti a Marche e Umbria. Nemmeno le due regioni di testa arrivano alla media dell'Unione europea, ferma al 2,2% ([Eurostat](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20241211-2)).",
    "h": "Due regioni davanti, undici accalcate a metà classifica",
    "role": "quadro"
   },

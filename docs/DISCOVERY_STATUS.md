@@ -320,10 +320,14 @@ le sue due righe di config e la segnalazione della licenza vivono in #43.
    `config/external_sources.yaml`, INVALSI, Terna, InfoCamere, Infratel,
    avrebbero ereditato la deed sbagliata). `test_license_is_stated_the_same_way_on_every_surface`
    pinna le tre superfici in prosa e la coerenza del registro.
-2. **`scout_sources.py` tronca la coda alfabeticamente.** Le proposte sono 87, il
-   `limit=40` con punteggio uniforme ordina per nome, quindi la coda si ferma a
-   "Notti in Italia" e le altre 47 non sono mai state viste da nessuno. Ancora
-   aperto.
+2. **`scout_sources.py` troncava la coda alfabeticamente.** Le proposte erano 87, il
+   `limit=40` con punteggio uniforme ordinava per nome, quindi la coda si fermava a
+   "Notti in Italia" e le altre non le vedeva nessuno. **Chiuso** (2026-07-28): il
+   tetto ora e' `None` di default (`propose_sources` propone ogni dataflow
+   superstite), la coda dello scout e' passata da 0 a 50 `new` sul catalogo reale
+   (90 proposte, 50 mai triate), e `--refresh` ri-sonda il catalogo cache-forever
+   cosi' i dataflow pubblicati dopo l'ultima run entrano in coda. Bloccato da
+   `tests/unit/test_scout_sources.py::Uncapped`.
 3. **`REGIONAL_HINT` non riconosce `- reg.`**, l'abbreviazione che Istat usa
    davvero: cerca `\b(region|nuts2)`. È il motivo per cui la spesa sociale dei
    comuni per regione non è mai arrivata in coda. Ancora aperto.
