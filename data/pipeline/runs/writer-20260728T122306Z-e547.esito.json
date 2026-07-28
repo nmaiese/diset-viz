@@ -1,0 +1,19 @@
+{
+ "at": "2026-07-28T12:55:25+00:00",
+ "base_commit": "e309a54",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "e309a54",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "duration_seconds": 2039,
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": "70",
+ "run_id": "writer-20260728T122306Z-e547",
+ "session_id": "7ae242ef-d1f2-568f-bc2c-011b5876c971",
+ "stage": "writer",
+ "summary": "PR #70 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}
