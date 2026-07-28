@@ -38,12 +38,14 @@ page, so a number quoted from this brief cannot disagree with the page.
 
 import argparse
 import json
+import re
 import sys
 
 from app import sources
 from app.atlas_catalog import get_atlas_catalog, get_atlas_indicator
 from app.indicator_texts import DEFAULT_HEADINGS, ROLE_ORDER, build_article, get_text
 from app.indicator_view import build_indicator_view
+from scripts import practice_timeline
 
 # How many indicators to show per relationship group (same map, opposite map,
 # unrelated map). Three groups of four is a menu an editor can read; the whole
@@ -139,6 +141,12 @@ def build_brief(family, raw_id, level_key=None):
         # the sibling series are regional, so a provincial brief still gets the
         # relationships, stated as what they are.
         "related": _related_indicators(meta, _anchor_territories(view)),
+        # Il registro errori: le smentite gia' confermate rilevanti per questo
+        # indicatore, cosi' il produttore rilegge piu' duro le classi che in
+        # questa famiglia hanno gia' fatto cadere qualcuno (learning loop). Il
+        # code va nella forma delle verifiche (ter-651, eur-rd_e_gerdreg), non
+        # quella interna coi due punti.
+        "known_errors": _known_errors(practice_timeline.code_of(meta["id"])),
     }
 
 
@@ -347,6 +355,94 @@ GROUP_TITLES = {
 }
 
 
+# --- Registro errori (il learning loop): le smentite gia' confermate ---------
+#
+# Gli agenti girano a freddo, quindi una lezione vive solo se sta su un percorso
+# che l'agente legge gia', sempre. Il brief lo e': il produttore ci parte a ogni
+# articolo. Il segnale sono le smentite in data/pipeline/verifiche/ (esito
+# `smentito`), ognuna con la sua classe nel campo `rilievi` ("classe/gravita:
+# ..."). Il registro e' una VISTA su quei file, non un secondo store: si
+# ricostruisce, git resta il registro. Solo smentite confermate, mai una sfida
+# grezza: una falsa smentita non deve avvelenare il registro.
+
+_CLASS_IN_RILIEVI = re.compile(r"\b([a-zA-Zà-ù]{4,})/[a-zA-Zà-ù]+\s*:", re.IGNORECASE)
+
+
+def _classes_in(rilievi):
+    """Le classi d'errore nominate in un campo `rilievi`, dal prefisso
+    'classe/gravita:' con cui il verificatore etichetta ogni smentita."""
+    return [m.group(1).lower() for m in _CLASS_IN_RILIEVI.finditer(rilievi or "")]
+
+
+def _family_prefix(code):
+    return code.split("-", 1)[0] if "-" in code else code
+
+
+def _known_errors(code, verifiche=None):
+    """Le smentite confermate rilevanti per questo indicatore, a cerchi
+    concentrici: su questo indicatore, nella sua famiglia (stessa forma di
+    dati), e le classi che ricorrono di piu' in assoluto. E' cio' che il
+    produttore rilegge piu' duro, e da dove il verificatore sa che ha gia'
+    trovato sangue."""
+    from collections import Counter
+    if verifiche is None:
+        from scripts import verification_queue
+        verifiche = verification_queue.load_verifications()
+
+    def _smentita(v):
+        n = str(v.get("smentite", "0")).strip()
+        return v.get("esito") == "smentito" and n.isdigit() and int(n) > 0
+
+    smentiti = [v for v in verifiche if _smentita(v)]
+    prefix = _family_prefix(code)
+    on_this, recurring, family_classes = [], Counter(), Counter()
+    for v in smentiti:
+        classes = _classes_in(v.get("rilievi", ""))
+        for c in classes:
+            recurring[c] += 1
+        vcode = v.get("code", "")
+        if vcode == code:
+            on_this.append({"at": v.get("at", ""), "rilievi": v.get("rilievi", ""),
+                            "classes": classes})
+        elif vcode and _family_prefix(vcode) == prefix:
+            for c in classes:
+                family_classes[c] += 1
+    return {
+        "count": len(smentiti),
+        "on_this": on_this,
+        "family_classes": family_classes.most_common(5),
+        "recurring": recurring.most_common(5),
+    }
+
+
+def _render_known_errors(brief):
+    ke = brief.get("known_errors") or {}
+    out = []
+    add = out.append
+    add("ERRORI NOTI  (smentite gia' confermate: rileggiti piu' duro su queste classi)")
+    if not ke.get("count"):
+        add("  registro pulito: nessuna smentita confermata in tutta la catena. Non e' un")
+        add("  lasciapassare, e' che nessuno ha ancora trovato sangue.")
+        add("")
+        return "\n".join(out)
+    if ke.get("on_this"):
+        add("  SU QUESTO INDICATORE una verifica ha gia' smentito (il segnale piu' forte):")
+        for e in ke["on_this"]:
+            cls = ", ".join(e["classes"]) or "senza classe"
+            add(f"    [{cls}] {e['at']}: {e['rilievi']}")
+    else:
+        add("  su questo indicatore nessuna smentita registrata (non e' un lasciapassare)")
+    if ke.get("family_classes"):
+        fam = ", ".join(f"{c} x{n}" for c, n in ke["family_classes"])
+        add(f"  Nella stessa famiglia (stessa forma di dati) sono cadute: {fam}")
+    if ke.get("recurring"):
+        rec = ", ".join(f"{c} x{n}" for c, n in ke["recurring"])
+        add(f"  Le classi che cadono di piu' in tutta la catena: {rec}")
+    add("  Rileggi il tuo testo per queste classi apposta, come farebbe il verificatore.")
+    add("")
+    return "\n".join(out)
+
+
 def _render_related(brief):
     related = brief["related"]
     out = []
@@ -485,6 +581,7 @@ def render(brief):
             f"stabili {annual['stable_count']}")
         add("")
 
+    add(_render_known_errors(brief))
     add(_render_related(brief))
 
     add("-" * 78)
@@ -540,6 +637,7 @@ def main(argv=None):
             "annual_change": brief["level"]["annual_change"],
             "article": brief["article"],
             "related": brief["related"],
+            "known_errors": brief["known_errors"],
         }
         print(json.dumps(payload, ensure_ascii=False, indent=1, default=str))
     else:

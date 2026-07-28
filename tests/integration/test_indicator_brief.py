@@ -13,6 +13,53 @@ import unittest
 from scripts import indicator_brief
 
 
+class KnownErrorsRegister(unittest.TestCase):
+    """Il registro errori (learning loop): le smentite confermate, a cerchi
+    concentrici. Vista pura su una lista di verifiche sintetiche."""
+
+    VERIFICHE = [
+        {"code": "eur-rd_e_gerdreg", "esito": "smentito", "smentite": "1",
+         "at": "2026-07-27", "rilievi": "fonti/grave: il Lazio non e' al Nord"},
+        {"code": "eur-rd_p_persreg", "esito": "smentito", "smentite": "2",
+         "at": "2026-07-20", "rilievi": "causale/media: una causa inventata; universale/lieve: 'tutte' e' falso"},
+        {"code": "ter-651", "esito": "smentito", "smentite": "1",
+         "at": "2026-07-18", "rilievi": "provincia/grave: una cifra provinciale sbagliata"},
+        {"code": "ter-12", "esito": "confermato", "smentite": "0", "rilievi": ""},
+    ]
+
+    def test_classes_are_read_from_the_rilievi_prefix(self):
+        classes = indicator_brief._classes_in(
+            "causale/media: x; universale/lieve: y")
+        self.assertEqual(classes, ["causale", "universale"])
+
+    def test_a_smentita_on_this_indicator_is_the_strongest_signal(self):
+        ke = indicator_brief._known_errors("eur-rd_e_gerdreg", self.VERIFICHE)
+        self.assertEqual(len(ke["on_this"]), 1)
+        self.assertIn("fonti", ke["on_this"][0]["classes"])
+
+    def test_the_family_ring_gathers_classes_from_siblings(self):
+        # eur-rd_e_gerdreg: nella stessa famiglia (eur-) c'e' rd_p_persreg,
+        # con causale e universale.
+        ke = indicator_brief._known_errors("eur-rd_e_gerdreg", self.VERIFICHE)
+        fam = dict(ke["family_classes"])
+        self.assertIn("causale", fam)
+        self.assertIn("universale", fam)
+        self.assertNotIn("fonti", fam)   # fonti e' su questo indicatore, non nel giro famiglia
+
+    def test_only_confirmed_smentite_count(self):
+        # la riga 'confermato' (ter-12) non entra da nessuna parte
+        ke = indicator_brief._known_errors("ter-12", self.VERIFICHE)
+        self.assertEqual(ke["count"], 3)   # tre smentite, non quattro righe
+        self.assertEqual(ke["on_this"], [])
+
+    def test_recurring_counts_across_the_whole_chain(self):
+        ke = indicator_brief._known_errors("ter-651", self.VERIFICHE)
+        rec = dict(ke["recurring"])
+        self.assertEqual(rec.get("fonti"), 1)
+        self.assertEqual(rec.get("causale"), 1)
+        self.assertEqual(rec.get("provincia"), 1)
+
+
 class SpearmanArithmetic(unittest.TestCase):
     def test_a_perfectly_monotonic_pair_is_one(self):
         first = {f"r{i}": i for i in range(20)}
