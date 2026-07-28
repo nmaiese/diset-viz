@@ -34,6 +34,11 @@ data/pipeline/cruscotto.html
 data/pipeline/.session_meta.json
 data/pipeline/tool_failures.jsonl
 
+# I battiti dei ruoli in volo: li scrive scripts/pipeline_monitor all'avvio e li
+# cancella alla chiusura, il cruscotto /_pipeline li legge per il "vivo". Sono
+# della sessione, non storia: la storia sta nel diario e nei file committati.
+data/pipeline/heartbeats/
+
 # Directory di lavoro delle eval degli agenti: le fixture sono committate,
 # quello che un agente produce durante una eval no.
 evals/out/

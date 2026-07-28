@@ -30,7 +30,10 @@ def redirect_www_to_apex():
 
 
 _NOINDEX_EXACT_PATHS = {"/data", "/legacy", "/legacy-reddito", "/quiz/classifica"}
-_NOINDEX_PATH_PREFIXES = ("/api/", "/download/")
+# `/_pipeline` e' il cruscotto interno della catena editoriale: noindex sempre,
+# e protetto da token nella view. L'underscore iniziale lo tiene fuori dallo
+# spazio delle URL pubbliche gia' per convenzione.
+_NOINDEX_PATH_PREFIXES = ("/api/", "/download/", "/_pipeline")
 
 
 def _build_content_security_policy():

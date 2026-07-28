@@ -429,6 +429,31 @@ def ricerca():
     return response
 
 
+@app.route("/_pipeline")
+def pipeline_dashboard():
+    """Cruscotto interno della catena editoriale, protetto e noindex.
+
+    Vista di lettura viva sul dossier per-indicatore (`scripts/pipeline_monitor`):
+    dov'e' fermo e perche' in testa, una riga per indicatore, le sessioni in volo
+    dai battiti, la storia recente dal diario. Ricalcolata a ogni caricamento dai
+    file committati, non da uno stato a parte: il monitoraggio e' una lettura
+    dello stesso modello che la catena produce, non un secondo modello.
+
+    Protetta: se `PIPELINE_TOKEN` e' impostato, serve solo con `?token=` giusto,
+    altrimenti 404, non 403, perche' una pagina interna non deve nemmeno
+    confermare di esistere. Vuoto (locale) = aperta. Il noindex lo mette
+    `add_security_headers` sul prefisso `/_pipeline`.
+    """
+    token = config.PIPELINE_TOKEN
+    if token and request.args.get("token") != token:
+        abort(404)
+    from scripts import pipeline_monitor
+    board = pipeline_monitor.load_board()
+    return render_template("pipeline.html", board=board,
+                           token=request.args.get("token", ""),
+                           site_name=SITE_NAME)
+
+
 @app.route("/api/indicator/<indicator_id>")
 def indicator(indicator_id):
     payload = get_atlas_indicator(indicator_id)

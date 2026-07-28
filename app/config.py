@@ -18,6 +18,11 @@ ADSENSE_SLOT_BANNER = os.getenv("ADSENSE_SLOT_BANNER", "")
 GOOGLE_SITE_VERIFICATION = os.getenv("GOOGLE_SITE_VERIFICATION", "")
 BING_SITE_VERIFICATION = os.getenv("BING_SITE_VERIFICATION", "")
 
+# Il token del cruscotto interno della catena (/_pipeline). Se impostato, la
+# rotta serve solo con ?token= corrispondente, altrimenti risponde 404 (non
+# rivela di esistere). Vuoto = aperta, per lo sviluppo in locale.
+PIPELINE_TOKEN = os.getenv("PIPELINE_TOKEN", "")
+
 # Deprecated: consent is managed by the CMP loaded in Google Tag Manager.
 FORCE_FUNDING_CHOICES_CMP = False
 ENABLE_CONSENT_BANNER = False
