@@ -207,57 +207,84 @@ class NothingToDoIsNotAFailure(unittest.TestCase):
                 pipeline_dispatch.cli(["--flag-che-non-esiste"])
 
 
-class TheTickNeverPushesAnythingButItself(unittest.TestCase):
-    """Il difetto piu' pericoloso dell'intera modifica, trovato rileggendola.
+class TheTickLandsOnMasterFromAnyBranch(unittest.TestCase):
+    """Il difetto per cui i tick non sono mai arrivati su master, e come e' chiuso.
 
-    `git push origin HEAD:master` spinge su master **tutto** cio' che sta sotto
-    HEAD. Lanciato da un branch di lavoro non pubblicherebbe una riga di
-    diario: pubblicherebbe quel branch intero, senza cancello, senza CI e senza
-    pull request. Il dispatcher gira su un checkout fresco di master e li' non
-    succede, ma "di solito non succede" e' la premessa sbagliata per un comando
-    che non si puo' disfare.
+    La sessione della Routine sta **sempre** su un branch `claude/*`, mai su
+    master. La vecchia forma rifiutava se HEAD non era master, quindi da li' non
+    pubblicava mai niente: la guardia proteggeva da `git push origin HEAD:master`
+    (che avrebbe spinto il branch intero) ma di fatto bloccava sempre. Ora il push
+    non passa da HEAD: si costruisce un commit **sopra origin/master** con dentro
+    **solo** la riga del tick, e lo si spinge da qualunque branch. L'invariante
+    'non spinge altro che se stesso' vale per costruzione, non per guardia.
     """
 
     ENTRY = {"run_id": "dispatch-20260727T090000Z-aaaa", "at": "2026-07-27T09:00:00+00:00"}
     REL = "data/pipeline/runs/dispatch-20260727T090000Z-aaaa.json"
 
-    def runner(self, branch="master", dirty=()):
+    def runner(self, push_fails_first=0):
         calls = []
+        state = {"pushes": 0}
 
-        def fake(argv, cwd=None):
-            calls.append(argv)
-            if argv[:2] == ["git", "rev-parse"]:
-                return 0, branch + "\n"
-            if argv[:2] == ["git", "status"]:
-                return 0, "".join(f"?? {path}\n" for path in dirty)
+        def fake(argv, cwd=None, env=None):
+            calls.append({"argv": argv, "env": env})
+            if argv[:2] == ["git", "write-tree"]:
+                return 0, "t" * 40 + "\n"
+            if argv[:2] == ["git", "commit-tree"]:
+                return 0, "c" * 40 + "\n"
+            if argv[:3] == ["git", "push", "origin"]:
+                state["pushes"] += 1
+                if state["pushes"] <= push_fails_first:
+                    return 1, "non-fast-forward"
+                return 0, ""
             return 0, ""
 
         fake.calls = calls
         return fake
 
-    def test_it_refuses_when_head_is_not_master(self):
-        runner = self.runner(branch="claude/una-modifica")
-        ok = pipeline_dispatch.commit_tick(
-            self.ENTRY, runner=runner, log=lambda *_: None)
-        self.assertFalse(ok)
-        self.assertNotIn(["git", "push", "origin", "HEAD:master"], runner.calls)
+    def _argvs(self, runner):
+        return [c["argv"] for c in runner.calls]
 
-    def test_it_refuses_when_the_tree_carries_anything_else(self):
-        """Su master ma con altro non committato, il push porterebbe via anche
-        quello alla prima passata di `git add` di qualcun altro."""
-        runner = self.runner(dirty=[self.REL, "app/views.py"])
-        ok = pipeline_dispatch.commit_tick(
-            self.ENTRY, runner=runner, log=lambda *_: None)
-        self.assertFalse(ok)
-        self.assertNotIn(["git", "push", "origin", "HEAD:master"], runner.calls)
-
-    def test_it_pushes_when_master_carries_only_the_tick(self):
-        runner = self.runner(dirty=[self.REL])
-        ok = pipeline_dispatch.commit_tick(
-            self.ENTRY, runner=runner, log=lambda *_: None)
+    def test_it_pushes_a_commit_built_on_master_never_head(self):
+        runner = self.runner()
+        ok = pipeline_dispatch.commit_tick(self.ENTRY, runner=runner, log=lambda *_: None)
         self.assertTrue(ok)
-        self.assertIn(["git", "push", "origin", "HEAD:master"], runner.calls)
-        self.assertIn(["git", "add", self.REL], runner.calls)
+        argvs = self._argvs(runner)
+        self.assertIn(["git", "read-tree", "origin/master"], argvs)
+        self.assertIn(["git", "add", "--", self.REL], argvs)
+        self.assertIn(
+            ["git", "commit-tree", "t" * 40, "-p", "origin/master", "-m",
+             "Diario: giro a vuoto del dispatch, 2026-07-27"], argvs)
+        self.assertIn(["git", "push", "origin", f"{'c' * 40}:master"], argvs)
+        self.assertNotIn(["git", "push", "origin", "HEAD:master"], argvs)
+
+    def test_it_does_not_gate_on_the_working_branch(self):
+        """Non chiede nemmeno su che branch e': il branch di lavoro non entra
+        nella decisione, quindi funziona identico da master e da un `claude/*`."""
+        runner = self.runner()
+        ok = pipeline_dispatch.commit_tick(self.ENTRY, runner=runner, log=lambda *_: None)
+        self.assertTrue(ok)
+        self.assertFalse(any(a[:2] == ["git", "rev-parse"] for a in self._argvs(runner)))
+
+    def test_only_the_named_file_enters_the_commit(self):
+        """L'indice parte da origin/master e ci si aggiunge SOLO la riga, contro un
+        indice temporaneo: gli altri file non committati dell'albero non entrano
+        perche' non vengono mai aggiunti."""
+        runner = self.runner()
+        pipeline_dispatch.commit_tick(self.ENTRY, runner=runner, log=lambda *_: None)
+        adds = [c for c in runner.calls if c["argv"][:2] == ["git", "add"]]
+        self.assertEqual([c["argv"] for c in adds], [["git", "add", "--", self.REL]])
+        self.assertIn("GIT_INDEX_FILE", adds[0]["env"])
+
+    def test_it_retries_the_push_on_a_lost_race(self):
+        """Chi perde la corsa si ricostruisce sopra un origin/master ri-fetchato e
+        ritenta: ogni tentativo e' un nuovo commit-tree, non un rebase."""
+        runner = self.runner(push_fails_first=1)
+        ok = pipeline_dispatch.commit_tick(self.ENTRY, runner=runner, log=lambda *_: None)
+        self.assertTrue(ok)
+        argvs = self._argvs(runner)
+        self.assertEqual(sum(a[:3] == ["git", "push", "origin"] for a in argvs), 2)
+        self.assertEqual(argvs.count(["git", "fetch", "origin", "master"]), 2)
 
 
 class AnOpenPullRequestIsRecognisedByWhatItTouches(unittest.TestCase):
@@ -364,74 +391,70 @@ class ThePublishStepObservesTheSite(unittest.TestCase):
         self.assertEqual(summary["prove_scritte"], 0)
 
 
-class TheProofsNeverPushAnythingButThemselves(unittest.TestCase):
-    """Il push diretto delle prove ha le stesse guardie del tick: un file per
-    record e nome che nessun altro sceglie, ma solo su master e solo se l'albero
-    non porta altro."""
+class TheProofsLandOnMasterFromAnyBranch(unittest.TestCase):
+    """Le prove di pubblicazione arrivano su master con lo stesso meccanismo del
+    tick: un commit costruito sopra origin/master con dentro solo le prove, spinto
+    da qualunque branch. Prima la guardia 'solo su master' non le faceva mai
+    arrivare, perche' la sessione non e' mai su master."""
 
     REL = "data/pipeline/pubblicazioni/ter-651__regione__abc.json"
 
-    def runner(self, branch="master", dirty=()):
+    def runner(self, push_fails_first=0):
         calls = []
+        state = {"pushes": 0}
 
-        def fake(argv, cwd=None):
-            calls.append(argv)
-            if argv[:2] == ["git", "rev-parse"]:
-                return 0, branch + "\n"
-            if argv[:2] == ["git", "status"]:
-                return 0, "".join(f"?? {path}\n" for path in dirty)
+        def fake(argv, cwd=None, env=None):
+            calls.append({"argv": argv, "env": env})
+            if argv[:2] == ["git", "write-tree"]:
+                return 0, "t" * 40 + "\n"
+            if argv[:2] == ["git", "commit-tree"]:
+                return 0, "c" * 40 + "\n"
+            if argv[:3] == ["git", "push", "origin"]:
+                state["pushes"] += 1
+                if state["pushes"] <= push_fails_first:
+                    return 1, "non-fast-forward"
+                return 0, ""
             return 0, ""
 
         fake.calls = calls
         return fake
 
-    def test_it_refuses_when_head_is_not_master(self):
-        runner = self.runner(branch="claude/una-modifica", dirty=[self.REL])
-        ok = pipeline_dispatch._commit_proofs([self.REL], runner=runner, log=lambda *_: None)
-        self.assertFalse(ok)
-        self.assertNotIn(["git", "push", "origin", "HEAD:master"], runner.calls)
+    def _argvs(self, runner):
+        return [c["argv"] for c in runner.calls]
 
-    def test_it_refuses_when_the_tree_carries_anything_else(self):
-        runner = self.runner(dirty=[self.REL, "app/views.py"])
-        ok = pipeline_dispatch._commit_proofs([self.REL], runner=runner, log=lambda *_: None)
-        self.assertFalse(ok)
-        self.assertNotIn(["git", "push", "origin", "HEAD:master"], runner.calls)
-
-    def test_it_pushes_when_master_carries_only_the_proofs(self):
-        runner = self.runner(dirty=[self.REL])
+    def test_it_pushes_a_commit_built_on_master_never_head(self):
+        runner = self.runner()
         ok = pipeline_dispatch._commit_proofs([self.REL], runner=runner, log=lambda *_: None)
         self.assertTrue(ok)
-        self.assertIn(["git", "push", "origin", "HEAD:master"], runner.calls)
+        argvs = self._argvs(runner)
+        self.assertIn(["git", "read-tree", "origin/master"], argvs)
+        self.assertIn(["git", "add", "--", self.REL], argvs)
+        self.assertIn(["git", "push", "origin", f"{'c' * 40}:master"], argvs)
+        self.assertNotIn(["git", "push", "origin", "HEAD:master"], argvs)
 
-    def test_it_retries_the_push_after_a_rebase(self):
-        """Il difetto che Codex ha visto: il commit deve stare fuori dal ciclo.
-        Dopo un rebase riuscito la prova e' gia' committata, quindi un secondo
-        `git commit` non stagerebbe niente ed uscirebbe non-zero (qui simulato),
-        e la vecchia forma tornava senza mai ripushare. Ora committa una volta e
-        ritenta solo il push."""
-        calls = []
-        state = {"pushes": 0, "commits": 0}
-
-        def fake(argv, cwd=None):
-            calls.append(argv)
-            if argv[:2] == ["git", "rev-parse"]:
-                return 0, "master\n"
-            if argv[:2] == ["git", "status"]:
-                return 0, f"?? {self.REL}\n"
-            if argv[:2] == ["git", "commit"]:
-                state["commits"] += 1
-                # il secondo commit non ha niente da committare, come git vero
-                return (0, "") if state["commits"] == 1 else (1, "nothing to commit")
-            if argv[:3] == ["git", "push", "origin"]:
-                state["pushes"] += 1
-                return (0, "") if state["pushes"] >= 2 else (1, "non-fast-forward")
-            return 0, ""
-
-        ok = pipeline_dispatch._commit_proofs([self.REL], runner=fake, log=lambda *_: None)
+    def test_it_does_not_gate_on_the_working_branch(self):
+        runner = self.runner()
+        ok = pipeline_dispatch._commit_proofs([self.REL], runner=runner, log=lambda *_: None)
         self.assertTrue(ok)
-        self.assertEqual(state["commits"], 1)  # committato una volta sola
-        self.assertEqual(state["pushes"], 2)   # ripushato dopo il rebase
-        self.assertIn(["git", "rebase", "origin/master"], calls)
+        self.assertFalse(any(a[:2] == ["git", "rev-parse"] for a in self._argvs(runner)))
+
+    def test_more_than_one_proof_rides_the_same_commit(self):
+        other = "data/pipeline/pubblicazioni/ter-14__regione__def.json"
+        runner = self.runner()
+        ok = pipeline_dispatch._commit_proofs([self.REL, other], runner=runner, log=lambda *_: None)
+        self.assertTrue(ok)
+        adds = [c["argv"] for c in runner.calls if c["argv"][:2] == ["git", "add"]]
+        # entrambe le prove nello stesso add, e un solo push
+        self.assertEqual(adds, [["git", "add", "--", other, self.REL]])
+        self.assertEqual(sum(a[:3] == ["git", "push", "origin"] for a in self._argvs(runner)), 1)
+
+    def test_it_retries_the_push_on_a_lost_race(self):
+        runner = self.runner(push_fails_first=1)
+        ok = pipeline_dispatch._commit_proofs([self.REL], runner=runner, log=lambda *_: None)
+        self.assertTrue(ok)
+        argvs = self._argvs(runner)
+        self.assertEqual(sum(a[:3] == ["git", "push", "origin"] for a in argvs), 2)
+        self.assertEqual(argvs.count(["git", "fetch", "origin", "master"]), 2)
 
 
 if __name__ == "__main__":

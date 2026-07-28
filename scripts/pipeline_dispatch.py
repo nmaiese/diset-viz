@@ -85,8 +85,13 @@ STAGE_ORDER = pipeline_status.STAGE_ORDER
 AGENT_OF = pipeline_status.AGENT_OF
 
 
-def _run(argv, cwd=None):
-    proc = subprocess.run(argv, cwd=cwd, capture_output=True, text=True)
+def _run(argv, cwd=None, env=None):
+    full_env = None
+    if env:
+        import os
+
+        full_env = {**os.environ, **env}
+    proc = subprocess.run(argv, cwd=cwd, capture_output=True, text=True, env=full_env)
     return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
 
 
@@ -284,76 +289,105 @@ def record_tick(plan):
     return entry, why
 
 
+def _land_on_master(rels, message, runner=_run, cwd=None, log=print, attempts=3,
+                    label="diario"):
+    """Mette file nuovi su master **da qualsiasi branch**, spingendo solo quei file.
+
+    Il dispatcher non e' uno stadio: non ha un perimetro, non apre pull request e
+    non passa dal cancello, quindi non c'e' nessuna pull request dentro cui i suoi
+    file possano viaggiare. E gira in una sessione Claude Code, che sta **sempre**
+    su un branch `claude/*`, mai su master. La vecchia forma faceva
+    `git push origin HEAD:master`, che spinge su master tutto cio' che sta sotto
+    HEAD: da un branch di lavoro avrebbe pubblicato il branch intero, senza
+    cancello. La guardia che lo impediva ('rifiuta se HEAD non e' master') non
+    proteggeva soltanto, **bloccava sempre**: su un branch di lavoro non arrivava
+    mai niente su master, ed e' il difetto per cui prove e tick non ci sono mai
+    finiti.
+
+    Qui il push non passa piu' da HEAD. Si costruisce un commit **sopra
+    origin/master** che contiene **solo** questi file (un indice temporaneo
+    seminato da origin/master, piu' i file aggiunti dall'albero di lavoro), e si
+    spinge quel commit su master. L'invariante 'non spinge altro che se stesso'
+    vale ora per costruzione, non per guardia, e vale da qualunque branch: HEAD,
+    l'indice di lavoro e gli altri file non committati non entrano nel commit.
+
+    Sono file nuovi per record con un nome che nessun altro sceglie, quindi due
+    sessioni non si sovrascrivono; chi perde la corsa del push si ricostruisce
+    sopra il master aggiornato e ritenta.
+    """
+    rels = sorted(set(rels))
+    if not rels:
+        return False
+
+    import os
+    import tempfile
+
+    fd, index = tempfile.mkstemp(prefix="dispatch-index-")
+    os.close(fd)
+    try:
+        for attempt in range(1, attempts + 1):
+            code, out = runner(["git", "fetch", "origin", "master"], cwd=cwd)
+            if code != 0:
+                log(f"  {label}: git fetch origin master fallito ({out.strip()[:120]})")
+                return False
+            # L'indice temporaneo parte dall'albero di origin/master e ci si
+            # aggiungono solo i file da pubblicare: nessun'altra modifica
+            # dell'albero di lavoro puo' entrarci.
+            code, out = runner(["git", "read-tree", "origin/master"], cwd=cwd,
+                               env={"GIT_INDEX_FILE": index})
+            if code != 0:
+                log(f"  {label}: read-tree origin/master fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "add", "--", *rels], cwd=cwd,
+                               env={"GIT_INDEX_FILE": index})
+            if code != 0:
+                log(f"  {label}: git add fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "write-tree"], cwd=cwd,
+                               env={"GIT_INDEX_FILE": index})
+            # write-tree/commit-tree stampano lo sha su stdout, che `_run` mette
+            # prima di stderr: il primo token e' lo sha anche se git aggiunge un
+            # warning in coda.
+            tree = out.split()[0] if code == 0 and out.split() else ""
+            if not tree:
+                log(f"  {label}: write-tree fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(
+                ["git", "commit-tree", tree, "-p", "origin/master", "-m", message],
+                cwd=cwd)
+            commit = out.split()[0] if code == 0 and out.split() else ""
+            if not commit:
+                log(f"  {label}: commit-tree fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "push", "origin", f"{commit}:master"], cwd=cwd)
+            if code == 0:
+                log(f"  {label}: {len(rels)} su master")
+                return True
+            log(f"  {label}: push perso, ritento ({attempt}/{attempts})")
+        log(f"  {label.upper()} NON SU MASTER: la corsa al push non si e' chiusa in "
+            f"{attempts} tentativi.")
+        return False
+    finally:
+        try:
+            os.remove(index)
+        except OSError:
+            pass
+
+
 def commit_tick(entry, runner=_run, cwd=None, log=print, attempts=3):
-    """Porta la riga su master, perche' scritta e non committata non esiste.
+    """Porta la riga del tick su master, perche' scritta e non committata non esiste.
 
-    Il dispatcher non e' uno stadio: non ha un perimetro, non apre pull request
-    e non passa dal cancello, quindi non c'e' nessuna pull request dentro cui la
-    sua riga possa viaggiare. Senza questo passo il file resterebbe nel checkout
-    usa e getta della Routine e sparirebbe con la sessione, cioe' proprio nel
-    caso, l'unico, per cui il tick esiste.
-
-    Va dritto su master ed e' sicuro che ci vada: e' **un file nuovo** in
-    `data/pipeline/runs/`, con un nome che nessun altro puo' scegliere. Se
-    perde la corsa contro un altro push si rilegge master e si riprova, come fa
-    `pipeline_merge.record_landing` per la riga di esito.
-
-    Le due condizioni qui sotto non sono prudenza, sono la cosa che rende vera
-    la frase precedente. `git push origin HEAD:master` spinge su master
-    **tutto** cio' che sta sotto HEAD, quindi lanciato da un branch di lavoro
-    non pubblicherebbe una riga di diario: pubblicherebbe quel branch intero,
-    senza cancello, senza CI e senza pull request. Il dispatcher gira su un
-    checkout fresco di master e li' non succede, ma "di solito non succede" e'
-    la premessa sbagliata per un comando che non si puo' disfare. Quindi si
-    rifiuta se HEAD non e' master, e si rifiuta se nell'albero c'e' qualcosa
-    oltre alla riga da registrare.
+    Il tick e' **un file nuovo** in `data/pipeline/runs/`, con un nome che nessun
+    altro puo' scegliere. Senza questo passo resterebbe nel checkout usa e getta
+    della Routine e sparirebbe con la sessione, cioe' proprio nel caso, l'unico,
+    per cui il tick esiste. Il come sta in `_land_on_master`: un commit costruito
+    sopra origin/master con dentro solo questa riga, spinto da qualunque branch.
     """
     rel = f"data/pipeline/runs/{pipeline_log.shard_name(entry)}"
-
-    code, out = runner(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=cwd)
-    branch = out.strip() if code == 0 else ""
-    if branch != "master":
-        log(f"  diario: HEAD e' su '{branch or 'ignoto'}', non su master. "
-            "Non committo: da qui un push su master pubblicherebbe l'intero branch.")
-        return False
-
-    code, out = runner(["git", "status", "--porcelain", "--untracked-files=all"], cwd=cwd)
-    if code != 0:
-        log(f"  diario: non riesco a leggere lo stato dell'albero ({out.strip()[:120]})")
-        return False
-    dirty = {line[3:].strip().split(" -> ")[-1] for line in out.splitlines() if line.strip()}
-    stray = sorted(dirty - {rel})
-    if stray:
-        log(f"  diario: l'albero porta altro oltre alla riga di diario "
-            f"({', '.join(stray[:5])}). Non committo.")
-        return False
-
-    for attempt in range(1, attempts + 1):
-        code, out = runner(["git", "add", rel], cwd=cwd)
-        if code != 0:
-            log(f"  diario: git add fallito ({out.strip()[:120]})")
-            return False
-        code, out = runner(
-            ["git", "commit", "-m",
-             f"Diario: giro a vuoto del dispatch, {entry['at'][:10]}"],
-            cwd=cwd,
-        )
-        if code != 0:
-            log(f"  diario: commit fallito ({out.strip()[:120]})")
-            return False
-        code, out = runner(["git", "push", "origin", "HEAD:master"], cwd=cwd)
-        if code == 0:
-            log(f"  diario: tick '{entry['run_id']}' su master")
-            return True
-        log(f"  diario: push perso, ritento ({attempt}/{attempts})")
-        runner(["git", "fetch", "origin", "master"], cwd=cwd)
-        code, out = runner(["git", "rebase", "origin/master"], cwd=cwd)
-        if code != 0:
-            runner(["git", "rebase", "--abort"], cwd=cwd)
-            log(f"  diario: rebase fallito ({out.strip()[:120]})")
-            return False
-    log("  TICK NON REGISTRATO: master non sapra' che questo giro e' avvenuto.")
-    return False
+    return _land_on_master(
+        [rel],
+        f"Diario: giro a vuoto del dispatch, {entry['at'][:10]}",
+        runner=runner, cwd=cwd, log=log, attempts=attempts, label="diario")
 
 
 # Fase F, opt-in: il passo del sito. Il sito pubblico e' il default perche' e'
@@ -363,58 +397,15 @@ DEFAULT_PUBLISH_BASE = "https://divarioitalia.it"
 
 
 def _commit_proofs(rels, runner=_run, cwd=None, log=print, attempts=3):
-    """Porta le prove di pubblicazione nuove su master, con le stesse guardie del
-    tick: sono file nuovi per record con un nome che nessun altro sceglie, quindi
-    il push diretto e' sicuro per la stessa ragione. HEAD deve essere master, e
-    nell'albero non ci deve essere altro oltre alle prove, perche'
-    `git push origin HEAD:master` spinge tutto cio' che sta sotto HEAD."""
-    rels = sorted(set(rels))
-    code, out = runner(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=cwd)
-    branch = out.strip() if code == 0 else ""
-    if branch != "master":
-        log(f"  prove: HEAD e' su '{branch or 'ignoto'}', non su master. Non committo.")
-        return False
-    code, out = runner(["git", "status", "--porcelain", "--untracked-files=all"], cwd=cwd)
-    if code != 0:
-        log(f"  prove: non riesco a leggere lo stato dell'albero ({out.strip()[:120]})")
-        return False
-    dirty = {line[3:].strip().split(" -> ")[-1] for line in out.splitlines() if line.strip()}
-    stray = sorted(dirty - set(rels))
-    if stray:
-        log(f"  prove: l'albero porta altro oltre alle prove ({', '.join(stray[:5])}). Non committo.")
-        return False
-
-    # Il commit si fa una volta sola, fuori dal ciclo di ritentativi. Rimetterlo
-    # dentro era un difetto: dopo un rebase riuscito la prova e' gia' committata,
-    # quindi la passata dopo `git add` non stagerebbe niente e `git commit`
-    # uscirebbe non-zero ("nothing to commit"), e la funzione tornerebbe senza mai
-    # ripushare il commit rebasato. Il ciclo ritenta solo il push, con il rebase
-    # in mezzo a riportare il commit in cima a origin/master.
-    code, out = runner(["git", "add", *rels], cwd=cwd)
-    if code != 0:
-        log(f"  prove: git add fallito ({out.strip()[:120]})")
-        return False
-    code, out = runner(
-        ["git", "commit", "-m",
-         f"Prove di pubblicazione: {len(rels)} indicatori verificati sul sito"],
-        cwd=cwd)
-    if code != 0:
-        log(f"  prove: commit fallito ({out.strip()[:120]})")
-        return False
-    for attempt in range(1, attempts + 1):
-        code, out = runner(["git", "push", "origin", "HEAD:master"], cwd=cwd)
-        if code == 0:
-            log(f"  prove: {len(rels)} su master")
-            return True
-        log(f"  prove: push perso, ritento ({attempt}/{attempts})")
-        runner(["git", "fetch", "origin", "master"], cwd=cwd)
-        code, out = runner(["git", "rebase", "origin/master"], cwd=cwd)
-        if code != 0:
-            runner(["git", "rebase", "--abort"], cwd=cwd)
-            log(f"  prove: rebase fallito ({out.strip()[:120]})")
-            return False
-    log("  PROVE NON REGISTRATE: master non sapra' di questa verifica del sito.")
-    return False
+    """Porta le prove di pubblicazione nuove su master. Come il tick: sono file
+    nuovi per record con un nome che nessun altro sceglie, quindi il commit mirato
+    di `_land_on_master` e' sicuro per la stessa ragione, e arriva su master anche
+    dal branch di lavoro su cui gira sempre la sessione della Routine."""
+    n = len(set(rels))
+    return _land_on_master(
+        rels,
+        f"Prove di pubblicazione: {n} indicatori verificati sul sito",
+        runner=runner, cwd=cwd, log=log, attempts=attempts, label="prove")
 
 
 def publish_step(base=DEFAULT_PUBLISH_BASE, fetcher=None, runner=_run, cwd=None,
