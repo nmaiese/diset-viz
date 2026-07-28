@@ -115,7 +115,7 @@ def verify(url: str, entry: dict, fetcher=_fetch) -> dict:
     return result
 
 
-def build_url(code: str, slug: str = "", base: str = DEFAULT_BASE) -> str:
+def build_url(code: str, slug: str = "", base: str = DEFAULT_BASE, level: str = "") -> str:
     """L'URL canonico di una pagina indicatore, `/indicatore/<slug>/<acr>-<id>`.
 
     Il segmento `<acr>-<id>` (il `code`) e' la parte stabile e la sola che
@@ -124,9 +124,19 @@ def build_url(code: str, slug: str = "", base: str = DEFAULT_BASE) -> str:
     alla forma canonica con lo slug (vedi `sources.indicator_url`): il fetcher
     segue il redirect, quindi non serve conoscere lo slug in anticipo. Chi lo ha
     lo passa e salta il salto.
+
+    `level` aggiunge `?livello=<level>`, il parametro con cui l'app sceglie quale
+    livello territoriale rendere lato server (`app/views.py`, `request.args.get
+    ("livello")`). Senza, l'app serve il livello di default (regione), quindi la
+    pagina di un articolo **provinciale** non porterebbe mai il suo lead e
+    resterebbe `fusa` per sempre. L'app conserva la query oltre la
+    canonicalizzazione 301, quindi il parametro sopravvive al salto.
     """
     root = base.rstrip("/") + "/indicatore"
-    return f"{root}/{slug}/{code}" if slug else f"{root}/{code}"
+    path = f"{root}/{slug}/{code}" if slug else f"{root}/{code}"
+    if level:
+        path += f"?livello={level}"
+    return path
 
 
 # --- il registro delle prove (un file per record) ---------------------------
@@ -265,21 +275,29 @@ def publication_problems(proof: dict, valid_fingerprints: dict) -> list:
     return problems
 
 
-def verify_one(indicator, base=DEFAULT_BASE, slug="", level="regione",
+def verify_one(indicator, base=DEFAULT_BASE, slug="", level=None,
                write=False, proofs_root=None, url=None, fetcher=_fetch) -> dict | None:
     """Verifica un indicatore contro il sito e, se combacia e `write`, registra
     la prova. Ritorna il `result` (con `code`, ed eventuale `proof_path`) o None
-    se l'articolo non e' nel repo."""
+    se l'articolo non e' nel repo.
+
+    Il livello si ricava dall'articolo (`entry["level"]`) se non e' passato, e si
+    usa **sia** nell'URL (`?livello=`) **sia** nella prova: un articolo
+    provinciale va verificato contro la vista provinciale, e la sua prova va
+    etichettata `provincia`, altrimenti resterebbe `fusa` per sempre o porterebbe
+    un livello sbagliato.
+    """
     from scripts import indicator_store, practice_timeline
     entry = indicator_store.read(indicator)
     if entry is None:
         return None
     code = practice_timeline.code_of(indicator)
-    result = verify(url or build_url(code, slug, base), entry, fetcher=fetcher)
+    lvl = level or (entry.get("level") or "regione")
+    result = verify(url or build_url(code, slug, base, level=lvl), entry, fetcher=fetcher)
     result["code"] = code
     if write and result["ok"] is True:
         result["proof_path"] = str(
-            write_proof(build_proof(entry, result, level=level), root=proofs_root))
+            write_proof(build_proof(entry, result, level=lvl), root=proofs_root))
     return result
 
 
@@ -293,7 +311,8 @@ def main(argv=None) -> int:
     parser.add_argument("--url", help="URL completo della pagina (altrimenti si costruisce dal code)")
     parser.add_argument("--slug", default="", help="slug della pagina, se noto (altrimenti la forma a solo code, che 301 reindirizza)")
     parser.add_argument("--base", default=DEFAULT_BASE)
-    parser.add_argument("--level", default="regione")
+    parser.add_argument("--level", default="",
+                        help="livello territoriale; vuoto = ricavato dall'articolo (regione/provincia)")
     parser.add_argument("--write", action="store_true",
                         help="se combacia, registra la prova in data/pipeline/pubblicazioni/")
     parser.add_argument("--proofs-root", default=None, help="cartella del registro prove (per i test)")

@@ -859,6 +859,20 @@ class ThePublisherProvesTheSite(unittest.TestCase):
         self.assertFalse(check.ok)
         self.assertIn("impronta", check.detail)
 
+    def test_deleting_a_proof_is_refused(self):
+        """Cancellare una prova la fa sparire e fa regredire un indicatore da
+        pubblicata a fusa senza traccia: il cancello deve dire no, come per il
+        registro delle verifiche."""
+        # una prova gia' nella base, poi tolta nel working tree
+        self._write_proofs([self._proof()])
+        self._run("git", "add", "-A")
+        self._run("git", "commit", "-qm", "prova")
+        for stale in (self.repo / "data" / "pipeline" / "pubblicazioni").glob("*.json"):
+            stale.unlink()
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("non si cancella", check.detail)
+
 
 if __name__ == "__main__":
     unittest.main()

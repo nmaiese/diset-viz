@@ -403,6 +403,36 @@ class TheProofsNeverPushAnythingButThemselves(unittest.TestCase):
         self.assertTrue(ok)
         self.assertIn(["git", "push", "origin", "HEAD:master"], runner.calls)
 
+    def test_it_retries_the_push_after_a_rebase(self):
+        """Il difetto che Codex ha visto: il commit deve stare fuori dal ciclo.
+        Dopo un rebase riuscito la prova e' gia' committata, quindi un secondo
+        `git commit` non stagerebbe niente ed uscirebbe non-zero (qui simulato),
+        e la vecchia forma tornava senza mai ripushare. Ora committa una volta e
+        ritenta solo il push."""
+        calls = []
+        state = {"pushes": 0, "commits": 0}
+
+        def fake(argv, cwd=None):
+            calls.append(argv)
+            if argv[:2] == ["git", "rev-parse"]:
+                return 0, "master\n"
+            if argv[:2] == ["git", "status"]:
+                return 0, f"?? {self.REL}\n"
+            if argv[:2] == ["git", "commit"]:
+                state["commits"] += 1
+                # il secondo commit non ha niente da committare, come git vero
+                return (0, "") if state["commits"] == 1 else (1, "nothing to commit")
+            if argv[:3] == ["git", "push", "origin"]:
+                state["pushes"] += 1
+                return (0, "") if state["pushes"] >= 2 else (1, "non-fast-forward")
+            return 0, ""
+
+        ok = pipeline_dispatch._commit_proofs([self.REL], runner=fake, log=lambda *_: None)
+        self.assertTrue(ok)
+        self.assertEqual(state["commits"], 1)  # committato una volta sola
+        self.assertEqual(state["pushes"], 2)   # ripushato dopo il rebase
+        self.assertIn(["git", "rebase", "origin/master"], calls)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -702,6 +702,20 @@ def check_publications(base=None, cwd=None):
     """
     from scripts import practice_timeline, verify_publication, verification_queue
 
+    # Cancellare una prova non e' mai legittimo: una prova scade quando il testo
+    # cambia (l'impronta non combacia piu' e la ricostruzione la ignora), non
+    # togliendola. Cancellarla farebbe regredire un indicatore da `pubblicata` a
+    # `fusa` senza lasciare traccia, che e' esattamente la sparizione di una prova
+    # che il cancello deve impedire. La riscrittura in posto invece si controlla
+    # come una riga nuova, sotto.
+    gone = _touched_under(PUBLICATIONS, base, cwd=cwd)["gone"]
+    if gone:
+        return Check(
+            "pubblicazioni", False,
+            f"il registro delle prove non si cancella: questa run toglie {len(gone)} "
+            f"prove ({', '.join(sorted(gone)[:5])}). Una prova scade cambiando il testo, "
+            "non cancellandola, e toglierla fa regredire un indicatore da pubblicata a fusa.")
+
     rows = _publication_rows_added(base, cwd=cwd)
     if not rows:
         return Check("pubblicazioni", True, "nessuna prova nuova da controllare")

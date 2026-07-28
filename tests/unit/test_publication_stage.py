@@ -42,6 +42,34 @@ class PublicationQueue(unittest.TestCase):
         self.assertIn("--all-fusa", report["command"])
 
 
+class TerritorialLevel(unittest.TestCase):
+    """Un articolo provinciale va verificato contro la vista provinciale
+    (`?livello=provincia`) e la sua prova etichettata `provincia`, altrimenti
+    resterebbe `fusa` per sempre o porterebbe un livello sbagliato."""
+
+    def test_build_url_appends_the_level_when_given(self):
+        self.assertEqual(
+            vp.build_url("ter-651", base="http://x", level="provincia"),
+            "http://x/indicatore/ter-651?livello=provincia")
+        # senza livello, nessun parametro (l'app serve il default)
+        self.assertNotIn("?", vp.build_url("ter-651", base="http://x"))
+
+    def test_verify_one_requests_the_articles_own_level(self):
+        from scripts import indicator_store
+        # 651 e' regione: la sua verifica deve chiedere ?livello=regione, cioe' il
+        # livello dell'articolo, non un default fisso
+        if indicator_store.read("651") is None:
+            self.skipTest("l'articolo 651 non e' piu' nel repo")
+        captured = {}
+
+        def capture(url):
+            captured["url"] = url
+            raise OSError("basta l'URL")
+
+        vp.verify_one("651", base="http://x", fetcher=capture)
+        self.assertIn("livello=regione", captured["url"])
+
+
 class PublicationProblems(unittest.TestCase):
     VALID = {"ter-651": {"abc123"}}
 

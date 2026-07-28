@@ -383,18 +383,25 @@ def _commit_proofs(rels, runner=_run, cwd=None, log=print, attempts=3):
     if stray:
         log(f"  prove: l'albero porta altro oltre alle prove ({', '.join(stray[:5])}). Non committo.")
         return False
+
+    # Il commit si fa una volta sola, fuori dal ciclo di ritentativi. Rimetterlo
+    # dentro era un difetto: dopo un rebase riuscito la prova e' gia' committata,
+    # quindi la passata dopo `git add` non stagerebbe niente e `git commit`
+    # uscirebbe non-zero ("nothing to commit"), e la funzione tornerebbe senza mai
+    # ripushare il commit rebasato. Il ciclo ritenta solo il push, con il rebase
+    # in mezzo a riportare il commit in cima a origin/master.
+    code, out = runner(["git", "add", *rels], cwd=cwd)
+    if code != 0:
+        log(f"  prove: git add fallito ({out.strip()[:120]})")
+        return False
+    code, out = runner(
+        ["git", "commit", "-m",
+         f"Prove di pubblicazione: {len(rels)} indicatori verificati sul sito"],
+        cwd=cwd)
+    if code != 0:
+        log(f"  prove: commit fallito ({out.strip()[:120]})")
+        return False
     for attempt in range(1, attempts + 1):
-        code, out = runner(["git", "add", *rels], cwd=cwd)
-        if code != 0:
-            log(f"  prove: git add fallito ({out.strip()[:120]})")
-            return False
-        code, out = runner(
-            ["git", "commit", "-m",
-             f"Prove di pubblicazione: {len(rels)} indicatori verificati sul sito"],
-            cwd=cwd)
-        if code != 0:
-            log(f"  prove: commit fallito ({out.strip()[:120]})")
-            return False
         code, out = runner(["git", "push", "origin", "HEAD:master"], cwd=cwd)
         if code == 0:
             log(f"  prove: {len(rels)} su master")
