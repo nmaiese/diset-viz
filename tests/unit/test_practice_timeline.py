@@ -265,6 +265,35 @@ class ReadyStage(unittest.TestCase):
         self.assertNotIn("writer", pri)
 
 
+class Recovery(unittest.TestCase):
+    """Fase F: la ripresa dopo un'interruzione. La ricostruzione e' una funzione
+    pura degli artefatti committati, quindi rieseguirla dopo una sessione
+    interrotta da' lo stesso risultato: nessuno stato vive solo nella sessione."""
+
+    def _inputs(self):
+        art = _article("dem:X", 2024, "2026-07-26", 2024)
+        return dict(candidates=[], manifest=[
+            {"target_indicator_id": "dem:X", "status": "integrated", "new_year": "2024"}],
+            curation=[{"target_indicator_id": "dem:X", "reviewed_at": "2026-07-25",
+                       "reviewed_direction": "higher_better", "direction_verdict": "corretto",
+                       "reviewed_category": "x", "score_eligible": "true", "data_year": "2024"}],
+            external=[{"target_indicator_id": "dem:X", "year": "2024"}],
+            articles={"dem:X": art}, verifiche=[_verifica("dem-X", art)], runs=[],
+            today="2026-07-28")
+
+    def test_reconstruction_is_deterministic(self):
+        a = t.reconstruct(**self._inputs())["dem:X"]
+        b = t.reconstruct(**self._inputs())["dem:X"]
+        self.assertEqual((a["state"], a["published"], a["priority"]),
+                         (b["state"], b["published"], b["priority"]))
+
+    def test_rewriting_the_records_twice_is_idempotent(self):
+        d = t.reconstruct(**self._inputs())["dem:X"]
+        first = [r["practice_id"] for r in t.cycles_for(d)]
+        second = [r["practice_id"] for r in t.cycles_for(d)]
+        self.assertEqual(first, second)
+
+
 class Reconcile(unittest.TestCase):
     def _reconstructed(self):
         art = _article("651", 2023, "2026-07-27", 2023)

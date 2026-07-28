@@ -445,10 +445,10 @@ def split_cycles(d: dict) -> list:
     Il primo ciclo e' la prima pubblicazione (`nuovo`). Dopo, ogni innesco
     editoriale su una pagina gia' arrivata a valle apre un ciclo nuovo, legato
     allo stesso indicatore. L'ultimo ciclo e' quello attivo e porta lo stato
-    corrente ricostruito; i precedenti sono chiusi con esito `sostituita`, e
+    corrente ricostruito, i precedenti sono chiusi con esito `sostituita`, e
     restano nella storia (mai una PR eterna, mai un buco).
 
-    Ricostruibili dagli artefatti committati sono `smentita` e `aggiornamento`;
+    Ricostruibili dagli artefatti committati sono `smentita` e `aggiornamento`,
     ritiro, rollback, integrazione e metadati esistono nel modello ma richiedono
     un segnale esplicito, quindi non si inventano qui.
     """

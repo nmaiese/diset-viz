@@ -141,12 +141,26 @@ def open_chain_prs(runner=_run, cwd=None):
     return "letto", prs
 
 
-def decide(queues=None, open_prs=None, pr_state="non-controllato"):
+# Fase F, opt-in: la soglia sopra cui una pratica precede l'ordine di catena.
+# 100 e' il peso di una smentita su una pagina online (errore pubblico, §11): una
+# correzione urgente di un dato pubblicato non aspetta dietro una coda di
+# candidature nuove. Sotto la soglia si tiene l'ordine di catena, che e' provato e
+# non affama la scoperta. La preemption non rompe "uno stadio per tick": sceglie
+# solo quale.
+PREEMPT_THRESHOLD = 100.0
+
+
+def decide(queues=None, open_prs=None, pr_state="non-controllato", priorities=None):
     """Quale stadio lanciare. Sempre un dizionario, mai un'eccezione.
 
     Separata dall'IO perche' e' la parte che va provata: le code e le pull
     request arrivano da fuori, cosi' un test costruisce lo stato che gli serve
     senza toccare git, GitHub o il catalogo.
+
+    `priorities` (`{stadio: priorita' massima di una pratica pronta}`) e'
+    l'aggancio opt-in della Fase F: se una pratica pronta supera
+    `PREEMPT_THRESHOLD`, il suo stadio precede l'ordine di catena. Senza
+    `priorities` il comportamento e' identico a prima, l'ordine di catena puro.
     """
     queues = pipeline_status.queue_sizes() if queues is None else queues
 
@@ -165,6 +179,29 @@ def decide(queues=None, open_prs=None, pr_state="non-controllato"):
             "open_prs": open_prs,
             "pr_state": pr_state,
         }
+
+    ready = [s for s in STAGE_ORDER if queues.get(s) is None or queues.get(s)]
+
+    # Fase F opt-in: una pratica urgente (sopra soglia) precede l'ordine di catena.
+    if priorities and ready:
+        urgent = [(priorities.get(s, float("-inf")), -STAGE_ORDER.index(s), s)
+                  for s in ready if priorities.get(s, float("-inf")) >= PREEMPT_THRESHOLD]
+        if urgent:
+            best = max(urgent)
+            stage = best[2]
+            return {
+                "stage": stage,
+                "agent": AGENT_OF[stage],
+                "reason": (f"pratica urgente in precedenza: priorita' {best[0]:.0f} "
+                           f"sopra la soglia {PREEMPT_THRESHOLD:.0f}, "
+                           f"scavalca l'ordine di catena"),
+                "waiting": queues.get(stage),
+                "queues": queues,
+                "open_prs": open_prs or [],
+                "pr_state": pr_state,
+                "priorities": priorities,
+                "run_id": pipeline_log.new_run_id(stage),
+            }
 
     for stage in STAGE_ORDER:
         waiting = queues.get(stage)
@@ -335,13 +372,21 @@ def main(argv=None):
                              "(lo fa la Routine, non una prova a mano)")
     parser.add_argument("--no-push", action="store_true",
                         help="scrivi il tick ma non committarlo (solo per prove)")
+    parser.add_argument("--priority", action="store_true",
+                        help="Fase F opt-in: una pratica urgente (sopra soglia) precede "
+                             "l'ordine di catena. Default spento: senza, ordine di catena puro.")
     args = parser.parse_args(argv)
 
     pr_state, open_prs = "non-controllato", []
     if args.check_open_prs:
         pr_state, open_prs = open_chain_prs()
 
-    plan = decide(open_prs=open_prs, pr_state=pr_state)
+    priorities = None
+    if args.priority:
+        from scripts import practice_timeline
+        priorities = practice_timeline.stage_priorities(practice_timeline.load_real())
+
+    plan = decide(open_prs=open_prs, pr_state=pr_state, priorities=priorities)
     if args.record:
         # Il tick ha un `run_id` suo, che descrive la decisione. Quello dentro
         # `plan` descrive la run che lo stadio dovra' registrare, ed e' un'altra

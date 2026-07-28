@@ -599,13 +599,20 @@ pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
   stato corrente, i precedenti restano chiusi con esito `sostituita`. `--write`
   scrive un record per ciclo. Sui dati veri, `eur:rd_e_gerdreg` risulta due
   cicli, `nuovo-1` (sostituita) e `smentita-2` (attivo, invalidata), senza una PR
-  eterna. Ricostruibili sono `smentita` e `aggiornamento`; `ritiro`, `rollback`,
+  eterna. Ricostruibili sono `smentita` e `aggiornamento`, `ritiro`, `rollback`,
   `integrazione` e `metadati` esistono nel modello ma vogliono un segnale
   esplicito. Provata in `tests/unit/test_practice_timeline.py`.
-- **Fase F, sostituzione.** Il modello diventa autorevole solo con: nessuna
-  perdita di osservabilita', perimetri non indeboliti, controlli non affidati ai
-  prompt, nessuna dipendenza esclusiva dalla PR, recupero provato, pubblicazione
-  verificata, storico migrato o classificato, confronto documentato delle metriche.
+- **Fase F, sostituzione. [macchina pronta, cutover no]** Le tre condizioni di
+  codice sono fatte e provate: la **priorita' nel dispatcher**
+  (`pipeline_dispatch.py --priority`, opt-in, una pratica urgente sopra soglia
+  scavalca l'ordine di catena senza affamare la scoperta), le **metriche** del
+  confronto prima/dopo (`practice_metrics.py`), il **recupero** provato (la
+  ricostruzione e' pura, rieseguirla dopo un'interruzione da' lo stesso stato).
+  Lo storico e' gia' classificato (`--write` materializza un record per ciclo).
+  Cio' che **resta**, ed e' operativo non codice: accendere l'opt-in di default,
+  girare il confronto delle metriche su run reali prima e dopo, e cambiare la
+  Routine del dispatcher. Il modello non diventa autorevole finche' quel
+  confronto non e' documentato, come chiede il mandato.
 
 Nessuna fase indebolisce i vincoli non negoziabili del mandato (sezione 6),
 tutti gia' presenti nella catena e da preservare: lo stato sopravvive alle
@@ -621,28 +628,35 @@ catena (quarantena), la PR e' una vista non la memoria (record di pratica).
 
 ### Stato dell'implementazione
 
-Le Fasi B, C e la parte nuova della D sono **codice, in modalita' di controllo**:
-girano accanto al flusso di oggi e non cambiano niente della pubblicazione.
+Le Fasi B, C, D, E e la **macchina** della F sono codice provato. Tutto gira
+**accanto** al flusso di oggi: nessun default cambiato, la pubblicazione e' quella
+di prima. L'unico aggancio che potrebbe cambiare il comportamento della catena,
+la priorita' nel dispatcher, e' **opt-in e spento di default**.
 
-| file | cosa | prova |
-| --- | --- | --- |
-| `scripts/practice_model.py` | stati, transizioni, tipi, errori, priorita' (§2-4, 9, 11) | `tests/unit/test_practice_model.py` |
-| `scripts/practice_store.py` | lo store un-file-per-record delle pratiche | `tests/unit/test_practice_store.py` |
-| `scripts/practice_timeline.py` | ricostruzione per indicatore + riconciliatore (Fase B/C) | `tests/unit/test_practice_timeline.py` |
-| `scripts/verify_publication.py` | la verifica del sito e il registro prove `data/pipeline/pubblicazioni/`, `fusa -> pubblicata` (§8) | `tests/unit/test_verify_publication.py`, `tests/integration/test_verify_publication_live.py` |
+| file | cosa | fase | prova |
+| --- | --- | --- | --- |
+| `scripts/practice_model.py` | stati, transizioni, tipi, errori, priorita' | A | `tests/unit/test_practice_model.py` |
+| `scripts/practice_store.py` | lo store un-file-per-record delle pratiche | A | `tests/unit/test_practice_store.py` |
+| `scripts/practice_timeline.py` | ricostruzione, riconciliatore, cicli, priorita' per stadio | B, C, E | `tests/unit/test_practice_timeline.py` |
+| `scripts/verify_publication.py` | verifica del sito + registro `pubblicazioni/`, `fusa -> pubblicata` | D | `test_verify_publication.py`, `test_verify_publication_live.py` |
+| `scripts/practice_metrics.py` | le metriche del confronto prima/dopo (mandato §5) | F | `tests/unit/test_practice_metrics.py` |
+| `pipeline_dispatch.py --priority` | preemption per priorita', opt-in, default spento | F | `tests/unit/test_dispatch_priority.py` |
 
 ```bash
 python3 scripts/practice_timeline.py                       # una riga per indicatore
 python3 scripts/practice_timeline.py --indicator eur:rd_e_gerdreg   # la storia intera
 python3 scripts/practice_timeline.py --check               # dichiarato vs artefatti
+python3 scripts/practice_metrics.py                        # le metriche, prima/dopo
+python3 scripts/pipeline_dispatch.py --priority            # dispatch con la preemption
 ```
 
-Cio' che **non** e' fatto, ed e' voluto: la **Fase F**, la sostituzione. Nessuna
-di queste cose rende il modello autorevole al posto dello stato dedotto, ne'
-tocca dispatcher, cancello o cadenza di merge. La priorita' (§11) e' una funzione
-pura esposta, non ancora consultata da `pipeline_dispatch.decide()`: rilevarla
-li' cambierebbe quale stadio gira, ed e' un cambiamento di comportamento che il
-mandato mette nel pilota, dopo il confronto misurabile.
+**Il cutover (Fase F) resta fuori, ed e' operativo non codice.** Accendere
+`--priority` di default, girare `practice_metrics.py` su run reali prima e dopo e
+documentare il confronto, e cambiare la Routine del dispatcher. Anche legare la
+scrittura della prova di pubblicazione e dei record di pratica a uno stadio della
+catena, col suo perimetro nel cancello, e' parte del cutover. Il modello non
+diventa autorevole al posto dello stato dedotto finche' quel confronto non e'
+documentato, come chiede il mandato: la macchina e' pronta, l'interruttore no.
 
 ---
 
