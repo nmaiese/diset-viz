@@ -1069,7 +1069,7 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
     vale anche per la prossima directory che qualcuno decidera' di importare.
     """
 
-    ROOT = Path(__file__).resolve().parents[1]
+    ROOT = Path(__file__).resolve().parents[2]
     # Quello che l'immagine ha comunque, senza bisogno di una COPY nel Dockerfile.
     ALWAYS_THERE = {"app", "flask", "werkzeug", "jinja2", "markdown", "yaml"}
 

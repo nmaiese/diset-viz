@@ -7,7 +7,7 @@ from app.external_data import EXTERNAL_COLUMNS, MANIFEST_COLUMNS, freshness_stat
 from app.quality_life_external import integrated_score_replacements, score_candidates
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 LEGACY_COLUMNS = [
     "idIndicatore",
     "Territorio",

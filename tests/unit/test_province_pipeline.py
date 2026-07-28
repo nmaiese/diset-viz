@@ -295,7 +295,7 @@ class ProposeDirectionTest(unittest.TestCase):
 
 
 class ProvinceDatasetSchemaTest(unittest.TestCase):
-    DATASET = Path(__file__).resolve().parents[1] / "app" / "static" / "data" / "Assoluti_Provincia.csv"
+    DATASET = Path(__file__).resolve().parents[2] / "app" / "static" / "data" / "Assoluti_Provincia.csv"
     EXPECTED_COLUMNS = [
         "idIndicatore", "Territorio", "Tema", "Indicatore", "UDM", "Fonte",
         "Archivio", "Anno", "Livello/Variazione", "Dato", "Benchmark", "Area",

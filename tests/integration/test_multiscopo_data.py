@@ -15,7 +15,7 @@ from app.multiscopo_data import (
 from app.taxonomy import CANONICAL_CATEGORIES
 from scripts.multiscopo_sources import MULTISCOPO_INDICATORS, QUALITY_LIFE_SCORE_IDS
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 LEGACY_COLUMNS = [
     "idIndicatore", "Territorio", "Tema", "Indicatore", "UDM", "Fonte",
     "Archivio", "Anno", "Livello/Variazione", "Dato", "Benchmark", "Area",

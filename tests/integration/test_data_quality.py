@@ -15,7 +15,7 @@ import csv
 import unittest
 from pathlib import Path
 
-DATA_PATH = Path(__file__).resolve().parent.parent / "app" / "static" / "data" / "Assoluti_Regione.csv"
+DATA_PATH = Path(__file__).resolve().parent.parent.parent / "app" / "static" / "data" / "Assoluti_Regione.csv"
 
 BOUNDED_RATE_PREFIXES = (
     "Tasso di occupazione",

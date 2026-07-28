@@ -24,7 +24,7 @@ from pathlib import Path
 
 from scripts import definition_check, fetch_definitions, xls_reader
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 # ---------------------------------------------------------------------------

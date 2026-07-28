@@ -100,7 +100,7 @@ class EditorialLinksAreCanonicalTest(unittest.TestCase):
     LEGACY = re.compile(r"\((/(?:atlante)?\?indicator=[^)]*)\)")
 
     def test_no_post_links_to_a_query_string_indicator(self):
-        posts = Path(__file__).resolve().parent.parent / "content" / "posts"
+        posts = Path(__file__).resolve().parent.parent.parent / "content" / "posts"
         offenders = [
             (md.name, match)
             for md in sorted(posts.glob("*.md"))
@@ -109,7 +109,7 @@ class EditorialLinksAreCanonicalTest(unittest.TestCase):
         self.assertEqual(offenders, [], f"legacy atlas links in posts: {offenders[:10]}")
 
     def test_every_indicator_link_in_posts_resolves(self):
-        posts = Path(__file__).resolve().parent.parent / "content" / "posts"
+        posts = Path(__file__).resolve().parent.parent.parent / "content" / "posts"
         client = app.test_client()
         link_re = re.compile(r"\((/indicatore/[^)\s]+)\)")
         seen = set()

@@ -82,10 +82,19 @@ cd frontend && npm run build && cd ..
 .venv/bin/gunicorn run:app -b 127.0.0.1:5050
 
 # tests, audit, whitespace
-.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python -m unittest discover -s tests -v          # tutta la suite (695 test, ~65s), prima di commit/push
+.venv/bin/python -m unittest discover -s tests/unit -v      # solo veloci (249 test, ~2s), durante lo sviluppo
+.venv/bin/python -m unittest discover -s tests/integration -v  # solo la parte pesante (446 test, ~65s): Flask/HTTP e catena e2e
 cd frontend && npm audit --audit-level=low
 git diff --check
 ```
+
+`tests/` e' pacchetto Python (ha `__init__.py`) apposta: e' cosi' che `tests/conftest.py`
+si aggancia sotto `unittest` (che, a differenza di pytest, non lo carica da solo). Un file va
+in `tests/integration/` se ha bisogno di un giro reale (client Flask, catena end-to-end su
+file temporanei, lettura di tutti gli articoli committati); il resto sta in `tests/unit/`.
+Un file che mescola le due cose va spaccato, non spostato per intero: e' successo a
+`test_indicator_view.py`, ora due file, uno per meta'.
 
 After editing `frontend/src/*`, always rebuild before testing the served app.
 After changing data, **restart gunicorn**: the core loaders cache for the life

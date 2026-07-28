@@ -1,14 +1,24 @@
 """Shared configuration for the test suite (unittest compatible).
 
-Clears all lru_cache decorators between tests to prevent state contamination,
-disables SimpleCache (not thread-safe), and provides common test setup.
+Clears all lru_cache decorators once, before the suite starts, so a run never
+inherits whatever a previous process left cached, and disables SimpleCache
+(not thread-safe).
 
-Works with both unittest (python -m unittest) and pytest.
+The data these caches hold (the parsed indicator CSVs, the built catalog) is
+read-only for the whole run: no test mutates it in place, so a single clear at
+import time is enough to guarantee a cold, deterministic first read. Clearing
+again before and after every single test method was tried and measured: it
+turned test_app.py alone from 10.7s to 58.6s, because app/data.py's lru_cache
+exists specifically to avoid re-filtering the ~110k-row dataset on every call
+(see the comment above INDICATOR_ROWS in app/data.py). Multiplied across the
+whole integration suite that pushed the run past 3 minutes for no isolation
+benefit anything here actually needs.
+
+Works with both unittest (python -m unittest, via tests/__init__.py importing
+this module) and pytest (which loads conftest.py on its own).
 """
 
 import os
-import unittest
-import sys
 
 
 def _clear_lru_caches():
@@ -42,19 +52,6 @@ def disable_simple_cache():
     os.environ.setdefault('CACHE_TYPE', 'null')
 
 
-# Module-level setup: disable SimpleCache before any tests run
+# Module-level setup: runs once, when this module is first imported.
 disable_simple_cache()
-
-
-# Monkey-patch unittest.TestCase to auto-clear caches before/after each test
-_original_run = unittest.TestCase.run
-
-def _run_with_cache_cleanup(self, result=None):
-    """Clear lru_caches before and after each test method."""
-    _clear_lru_caches()
-    try:
-        return _original_run(self, result)
-    finally:
-        _clear_lru_caches()
-
-unittest.TestCase.run = _run_with_cache_cleanup
+_clear_lru_caches()
