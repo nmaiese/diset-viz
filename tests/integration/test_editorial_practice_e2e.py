@@ -1,8 +1,8 @@
 """Il modello a pratica editoriale, provato end-to-end contro l'app servita.
 
 Questo test prende le primitive che il modello unifica (`practice_timeline`,
-`verify_publication`, `practice_store`, `practice_metrics`, la preemption di
-`pipeline_dispatch`) e le fa girare **insieme**, sul percorso reale di un
+`verify_publication`, `practice_store`, `practice_metrics`, la priorita' del
+lanciatore `pipeline_launch`) e le fa girare **insieme**, sul percorso reale di un
 indicatore, contro un sito **davvero servito**: un gunicorn su `run:app`, non il
 test client. E' la differenza che conta, perche' la transizione `fusa ->
 pubblicata` (docs/EDITORIAL_PRACTICE.md, §8) esiste apposta per distinguere "fuso
