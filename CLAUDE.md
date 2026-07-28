@@ -18,6 +18,7 @@ it).
 | se stai lavorando su... | leggi |
 | --- | --- |
 | la catena autonoma, gli agenti, il cancello, le Routine | [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md) |
+| la revisione a pratica editoriale (identita', stati, transizioni, PR come vista) | [`docs/EDITORIAL_PRACTICE.md`](docs/EDITORIAL_PRACTICE.md) |
 | come apre e chiude una run un agente qualsiasi | [`docs/AGENT_CONTRACT.md`](docs/AGENT_CONTRACT.md) |
 | una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
 | scoperta e promozione di indicatori multifonte | [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md) |
@@ -44,6 +45,7 @@ python3 scripts/pipeline_dashboard.py --open   # tutto in una pagina
 python3 scripts/pipeline_status.py             # solo dove si e' fermata
 python3 scripts/pipeline_log.py                # solo che cosa hanno fatto gli agenti
 python3 scripts/pipeline_dispatch.py           # solo chi tocca adesso
+python3 scripts/practice_timeline.py           # la storia per indicatore (Fase B/C, read-only)
 ```
 
 ## What this is
