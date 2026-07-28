@@ -33,8 +33,10 @@ Queste sono le regole che valgono sempre:
   Il cancello gira anche in CI sui branch `automation/*`, e la guardia
   per-agente (`scripts/agent_guard.py`, dichiarata nel frontmatter di ogni
   agente) applica lo stesso perimetro al momento del gesto.
-- **Nessuno stadio aspetta un umano.** La prosa si fonde da sola; cio' che
-  muove numeri vivi fonde a CI verde. Il controllo e' perimetro + cancello +
+- **Nessuno stadio aspetta un umano.** Ogni stadio fonde sul cancello locale,
+  che gira la suite intera prima del merge. La CI remota non parte sulle PR
+  aperte via il GitHub MCP, quindi aspettarla (`checks`) non comprava un
+  verdetto indipendente ma un deadlock. Il controllo e' perimetro + cancello +
   suite, mai un'approvazione.
 - **Mai `gh pr merge --auto`.** Non aspetta su questo repository: fonde subito.
   L'attesa vive in `scripts/pipeline_merge.py`.

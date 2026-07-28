@@ -93,11 +93,18 @@ class BlastRadius(unittest.TestCase):
         for stage, policy in pipeline_gate.MERGE_POLICY.items():
             self.assertNotEqual(policy, "manual", stage)
 
-    def test_admitting_a_source_still_goes_through_ci(self):
-        """Il merge e' automatico, il controllo no. Una fonte cambia quale
-        istituzione compare su una pagina pubblica, quindi resta lo stadio che
-        non puo' fondere senza che la CI sia verde."""
-        self.assertEqual(pipeline_gate.MERGE_POLICY["scout"], "checks")
+    def test_no_chain_stage_waits_on_the_remote_ci(self):
+        """Ogni stadio della catena fonde sul cancello locale, non sulla CI
+        remota. La CI remota non parte sulle PR aperte via il GitHub MCP, quindi
+        la vecchia policy `checks` non comprava un verdetto indipendente: comprava
+        un deadlock (la PR restava `pr-open` per sempre e il dispatcher non
+        lanciava piu' niente). Il cancello locale gira la stessa suite del job
+        CI `python` e lo stesso perimetro del job `gate`, e gira prima del merge
+        invece che mai. Se un giorno la CI parte su queste PR, gli stadi che
+        muovono numeri vivi sono quelli da riportare a `checks`."""
+        for stage in ("scout", "hunter", "promoter", "curator", "writer",
+                      "reviewer", "verificatore"):
+            self.assertEqual(pipeline_gate.MERGE_POLICY[stage], "auto", stage)
 
 
 class HunterDecisions(unittest.TestCase):
@@ -484,11 +491,14 @@ class Verdict(unittest.TestCase):
         self.assertTrue(verdict["ok"])
         self.assertEqual(verdict["merge"], "auto")
 
-    def test_a_green_curator_waits_for_the_remote_checks(self):
+    def test_a_green_curator_merges_on_the_local_gate(self):
+        """Un curatore verde fonde `auto`, come ogni stadio della catena: il
+        cancello locale ha gia' girato la suite, e la CI remota (che `checks`
+        aspetterebbe) non parte sulle PR via MCP."""
         verdict = pipeline_gate.build_verdict(
             "curator", [pipeline_gate.CURATION], [pipeline_gate.Check("finto", True)]
         )
-        self.assertEqual(verdict["merge"], "checks")
+        self.assertEqual(verdict["merge"], "auto")
 
 
 class TheVerificationRegisterIsAppendOnly(unittest.TestCase):

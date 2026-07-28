@@ -17,9 +17,14 @@ So the wait lives here, in code, where it can be read and tested, instead of in
 an agent's memory of a flag's semantics:
 
 - `blocked`  refuse. Not "warn": refuse, non-zero exit, no merge.
-- `auto`     merge now. Prose only, and the gate has already run the suite.
+- `auto`     merge now, on the local gate the caller has already run (suite,
+             perimeter, invariants). Every chain stage uses this today.
 - `checks`   poll the pull request until every check concludes, merge only if
              they all passed, refuse if any failed, give up loudly on timeout.
+             Kept and tested, but no chain stage is `checks` now: the remote CI
+             does not fire on a pull request opened through the MCP, so the wait
+             could never be satisfied and the pull request froze the chain. See
+             `pipeline_gate.MERGE_POLICY` for the full reasoning.
 
 The verdict is not taken from the caller. This script re-runs the gate itself,
 because a merge step that trusts the agent's report of its own verdict protects

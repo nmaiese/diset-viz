@@ -126,8 +126,10 @@ Eurostat namespace.
 ## Closing
 
 Close the run as the `pipeline-close-run` skill prescribes, stage `curator`.
-Your merge mode is `checks`: you have moved the quality-of-life score, so CI
-is what stands between your judgment and the site. Commit `curation.csv`, the
+Your merge mode is `auto`: you have moved the quality-of-life score, so the
+local gate runs the whole suite before the merge, which is what stands between
+your judgment and the site. It is not the remote CI, which does not start on a
+pull request opened through the MCP. Commit `curation.csv`, the
 external layer, the manifest, the curated descriptions and any
 `theme_categories.csv` row. In the body: the verso with the evidence that
 decided it, the category, `score_eligible` with the reason, the `data_year`,

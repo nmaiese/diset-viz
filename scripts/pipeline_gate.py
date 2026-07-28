@@ -120,38 +120,46 @@ STAGE_PATHS = {
 
 # How far a green gate is allowed to go, per stage. Not uniform on purpose.
 #
-#   auto     merge now. The change is prose in one file, it reaches no other
-#            page, and reverting it is one commit.
-#   checks   merge only once the remote checks have concluded green. The change
-#            moves live numbers (the quality-of-life score, the atlas catalogue,
-#            which institution a page names), so CI is what stands between the
-#            agent's judgment and the site.
-#   manual   never merged by an agent. No stage uses this today: the chain is
+#   auto     merge now, on the local gate's verdict. The gate this step re-runs
+#            has already run the whole suite, the perimeter check and the diff
+#            invariants, so a green `auto` is a change the chain has already
+#            measured everything it knows how to measure against.
+#   checks   merge only once the REMOTE checks have concluded green. Kept as a
+#            word the gate can still say, and the wait still lives in
+#            `pipeline_merge.py`, but no stage uses it today (see below).
+#   manual   never merged by an agent. No stage uses this: the chain is
 #            unattended by decision, and a mode that parks a pull request until
-#            somebody looks is a mode that parks it forever. Kept as a word the
-#            gate can still say, because a future stage may earn it.
+#            somebody looks is a mode that parks it forever.
+#
+# Why every chain stage is `auto` now, not just the prose ones. `checks` waited
+# on the remote CI, and on this repository the remote CI does NOT start on a
+# pull request opened through the GitHub MCP: GitHub does not run workflows for
+# an app-token event, so the checks never appear. `pipeline_merge` then refuses
+# a `checks` stage whose checks never showed up (correctly: it cannot merge on a
+# wait it cannot satisfy), the pull request sits `pr-open` forever, and the
+# dispatcher refuses to launch anything while a chain pull request is open. One
+# stuck pull request froze the whole chain. So `checks` bought no independent
+# remote verdict, only a deadlock. The local gate keeps the real guarantee (it
+# runs the same suite the CI `python` job runs, plus the perimeter the CI `gate`
+# job runs), and it runs before the merge instead of never. If the remote CI is
+# ever made to fire on these pull requests, the number-moving stages
+# (scout, hunter, promoter, curator, verificatore) are the ones to move back.
 #
 # The wait for `checks` lives in `scripts/pipeline_merge.py`, not in a `gh` flag.
 # `gh pr merge --auto` does NOT wait on this repository: with `allow_auto_merge`
 # false and `master` unprotected it falls back to merging immediately, and a
 # probe pull request proved it by merging with the test job still running.
 MERGE_POLICY = {
-    "scout": "checks",
-    "hunter": "checks",
-    "promoter": "checks",
-    "curator": "checks",
+    "scout": "auto",
+    "hunter": "auto",
+    "promoter": "auto",
+    "curator": "auto",
     "writer": "auto",
     "reviewer": "auto",
-    # `checks` e non `auto`, pur non scrivendo una riga di prosa. Il verificatore
-    # non cambia nessuna pagina, ma il suo output riordina la coda del revisore e
-    # mette per iscritto che una frase pubblicata e' falsa, quindi vale la pena
-    # che la suite ci stia in mezzo. E c'e' una ragione tecnica: con un perimetro
-    # di due file il cancello ha poco da misurare, e la 3.3 del piano avvertiva
-    # che un perimetro cortissimo rende il verdetto una tautologia verde.
-    "verificatore": "checks",
-    # `checks` come il verificatore: la prova non cambia una pagina, ma dichiara
-    # che una versione e' pubblica e valida, e vale la pena che la CI ci stia in
-    # mezzo. La riga a un file per record e' comunque sicura da fondere.
+    "verificatore": "auto",
+    # `publisher` non e' in STAGE_ORDER e il dispatcher non lo lancia: la prova di
+    # pubblicazione si committa nel passo `--publish` del tick, non via una PR e
+    # questo passo di merge. La sua policy resta inerte, la lasciamo `checks`.
     "publisher": "checks",
 }
 

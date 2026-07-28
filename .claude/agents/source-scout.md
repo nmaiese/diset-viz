@@ -108,8 +108,11 @@ adapter would have to be written. That is a useful handoff, not a failure.
 ## Closing
 
 Close the run as the `pipeline-close-run` skill prescribes, stage `scout`.
-Your merge mode is `checks`, and **nobody is going to read the pull request
-first**: `tests/unit/test_source_admission.py` refuses a config row with a missing
+Your merge mode is `auto`: you merge on the local gate, which runs the whole
+suite (`tests/unit/test_source_admission.py` included) before the merge, not on
+the remote CI, which does not start on a pull request opened through the MCP.
+And **nobody is going to read the pull request first**:
+`test_source_admission.py` refuses a config row with a missing
 field, an unknown direction, a category that does not exist or an unmapped
 theme, but what the test cannot see stays yours alone: whether the institution
 is citable, whether the licence is real and read on the source's own pages,

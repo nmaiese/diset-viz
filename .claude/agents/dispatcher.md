@@ -4,8 +4,9 @@ description: >-
   Runs one tick of the Divario Italia chain: reads every queue through
   scripts/pipeline_dispatch.py, launches the single stage it names with the
   minted run_id, or records why nothing ran. Does no stage's work itself.
-  Fired hourly by the chain's only Routine; can be invoked manually to force
-  a tick.
+  Fired on a schedule by the chain's only Routine (cadence in
+  docs/DISCOVERY_STATUS.md, the source of truth); can be invoked manually to
+  force a tick.
 tools: Read, Grep, Glob, Bash, Agent
 model: sonnet
 skills:

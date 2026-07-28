@@ -83,8 +83,8 @@ serve per la suite.
 
 | `merge` | che cosa fa il passo di merge |
 | --- | --- |
-| `auto` | fonde subito. E' prosa in un file solo, e la suite l'ha gia' girata il cancello |
-| `checks` | **aspetta davvero** che ogni check remoto concluda, poi fonde. Se uno fallisce, rifiuta |
+| `auto` | fonde subito, sul verdetto del cancello locale, che ha gia' girato la suite intera, il perimetro e gli invarianti del diff. E' la modalita' di ogni stadio della catena |
+| `checks` | **aspetta davvero** che ogni check remoto concluda, poi fonde. Resta una parola che il cancello sa dire, ma nessuno stadio la usa (vedi sotto) |
 | `blocked` | non fonde niente. Correggi il lavoro e rilancia il cancello |
 
 Non usare `gh pr merge --auto`. **Su questo repository non aspetta niente**:
@@ -94,13 +94,16 @@ e per tutto il tempo in cui il contratto ha detto di usare quel comando i tre
 stadi `checks` hanno fuso al buio credendo di aspettare. L'attesa vive dentro
 `scripts/pipeline_merge.py`, dove si puo' leggere e testare.
 
-La politica non e' uniforme, e il criterio e' il raggio d'azione:
-
-- la prosa (`writer`, `reviewer`) sta in un file solo, non raggiunge nessun'altra
-  pagina e si annulla con un commit,
-- tutto il resto (`scout`, `hunter`, `promoter`, `curator`) muove numeri vivi o
-  decide quale istituzione compare su una pagina pubblica, quindi non fonde
-  finche' la CI non e' verde.
+Ogni stadio della catena fonde `auto`, sul cancello locale. Prima non era
+cosi': gli stadi che muovono numeri vivi o decidono quale istituzione compare
+su una pagina pubblica (`scout`, `hunter`, `promoter`, `curator`, `verificatore`)
+aspettavano la CI remota (`checks`). Ma la CI remota non parte sulle PR aperte
+via il GitHub MCP, quindi `checks` non comprava un verdetto indipendente:
+comprava un deadlock. La PR restava `pr-open` per sempre e il dispatcher non
+lanciava piu' niente. Il cancello locale tiene la garanzia vera, perche' rilancia
+la stessa suite del job CI `python` e lo stesso perimetro del job `gate`, e gira
+**prima** del merge invece che mai. Se un giorno la CI parte su queste PR, quei
+cinque stadi sono quelli da riportare a `checks`.
 
 Nessuno stadio aspetta un umano. Se il tuo lavoro ha bisogno di una decisione che
 non puoi prendere, il posto dove scriverla e' il corpo della PR e la riga di

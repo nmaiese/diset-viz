@@ -58,6 +58,26 @@ class IstatRateLimitError(RuntimeError):
     """Raised after retries when the endpoint keeps throttling (429/503)."""
 
 
+class IstatServerError(RuntimeError):
+    """Raised after retries on a transient server fault (500/502/504).
+
+    The SDMX endpoint 500s intermittently on the dataflow catalogue, and a bare
+    500 that aborts the whole run is exactly how a scout dispatch run came back
+    with every proposal at `needs-info` and zero approvals: the fault was the
+    server's for one minute, not the catalogue's. A 5xx is transient far more
+    often than not, so it is retried with backoff like a 503, and only a run of
+    them in a row is a real outage worth stopping on.
+    """
+
+
+# Status codes worth a backoff-and-retry rather than an immediate abort: the
+# throttles (429/503) and the transient server faults (500/502/504). A 403 is
+# NOT here on purpose: it means a block, and retrying a block wastes the budget
+# that the wait needs.
+RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
+THROTTLE_STATUS = frozenset({429, 503})
+
+
 class IstatBlockedError(RuntimeError):
     """Raised when the endpoint looks like it has blocked the IP (403/empty)."""
 
@@ -215,14 +235,19 @@ class SdmxClient:
                         f"HTTP 403 for {url}: the IP may be blocked. Stop and wait "
                         "1-2 days before retrying."
                     ) from exc
-                if exc.code in (429, 503) and attempt < self.max_retries:
+                if exc.code in RETRYABLE_STATUS and attempt < self.max_retries:
                     self._sleep(backoff)
                     backoff *= 2
                     continue
-                if exc.code in (429, 503):
+                if exc.code in THROTTLE_STATUS:
                     raise IstatRateLimitError(
                         f"HTTP {exc.code} for {url} after {self.max_retries} retries. "
                         "Back off for several minutes."
+                    ) from exc
+                if exc.code in RETRYABLE_STATUS:
+                    raise IstatServerError(
+                        f"HTTP {exc.code} for {url} after {self.max_retries} retries. "
+                        "The endpoint is faulting, not blocking: retry in a few minutes."
                     ) from exc
                 raise
             except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
@@ -241,7 +266,7 @@ class SdmxClient:
                     f"Suspicious response ({status}, {len(body)} bytes) for {url}: "
                     "possible IP block. Stop and wait before retrying."
                 )
-            if status in (429, 503) and attempt < self.max_retries:
+            if status in RETRYABLE_STATUS and attempt < self.max_retries:
                 self._sleep(backoff)
                 backoff *= 2
                 continue

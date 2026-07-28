@@ -140,7 +140,9 @@ this project has already thrown away two reviews for exactly that. Write the
 rows you finished, say in the journal which article you left open, and stop.
 
 Close the run as the `pipeline-close-run` skill prescribes, stage
-`verificatore`. Your merge mode is `checks`. Batch of five to ten articles. In
+`verificatore`. Your merge mode is `auto`: you merge on the local gate, which
+has already run the whole suite, not on the remote CI, which does not start on a
+pull request opened through the MCP. Batch of five to ten articles. In
 the body, per article: the four counters, and for every refutation the
 sentence, the proof with its numbers, and its class. A refutation without a
 number in the proof is an opinion, and the reviewer who must act on it will

@@ -180,5 +180,21 @@ class RefreshFallsBackToCache(unittest.TestCase):
         self.assertEqual(flows, [{"id": "cached_1", "name": "Dal catalogo in cache - regioni"}])
 
 
+class RegionalHint(unittest.TestCase):
+    """`reg.` abbreviato deve contare come regionale (era il buco per cui la
+    spesa sociale dei comuni per regione non arrivava mai in coda), senza pescare
+    `registro` o `regime`, che iniziano per `reg` ma non sono territori."""
+
+    def test_the_abbreviation_counts_as_regional(self):
+        for name in ("spesa dei comuni per reg.", "Occupati - regioni e province",
+                     "Something NUTS2 breakdown"):
+            self.assertTrue(scout_sources.REGIONAL_HINT.search(name), name)
+
+    def test_it_does_not_fire_on_reg_words_that_are_not_regions(self):
+        for name in ("Registro nazionale imprese", "Regime forfettario per settore",
+                     "ripartizionale per area"):
+            self.assertFalse(scout_sources.REGIONAL_HINT.search(name), name)
+
+
 if __name__ == "__main__":
     unittest.main()

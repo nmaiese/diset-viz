@@ -8,10 +8,12 @@ dataflows that are **not yet covered** by any allowlisted source or curated
 adapter, so a human can decide whether to admit a genuinely new domain (health,
 justice, environment, culture, transport, ...) to the allowlist.
 
-Gate, deliberately: the scout writes ONLY to data/discovery/source_candidates.csv
+Gate, deliberately: this SCRIPT writes ONLY to data/discovery/source_candidates.csv
 (a reviewable queue). It never edits config/external_sources.yaml. Admitting a
-domain to the allowlist is a human merge; wiring its hunter adapter is a later
-step. This is the same PR-gated discipline as the indicator hunter, one rung up.
+source is the scout AGENT's decision, taken on the local gate with nobody reading
+the pull request first (docs/AUTONOMOUS_PIPELINE.md); wiring a non-SDMX adapter
+is code, and code is still a human step. This is the same gate-and-perimeter
+discipline as the indicator hunter, one rung up.
 
 Catalogue-level by design: the proposal uses only the dataflow list (one cached
 query, shared with scripts/discover_provinces.py) plus name signals. It does not
@@ -56,7 +58,12 @@ COLUMNS = [
 # NOT 'ripartiz': a "ripartizionale" flow is broken down by the 5 macro-areas,
 # not the 20 regions, so it neither gives regional coverage nor deserves the
 # regional label. Such macro-area-only flows are left out of the queue.
-REGIONAL_HINT = re.compile(r"\b(region|nuts2)", re.IGNORECASE)
+#
+# `reg\.` catches the abbreviated form ("... per reg.") that the bare `region`
+# stem misses: that gap is why the municipal social spending broken down by
+# region never reached the queue. It requires the trailing dot on purpose, so it
+# matches the territorial abbreviation and not `registro` or `regime`.
+REGIONAL_HINT = re.compile(r"\b(region|nuts2|reg\.)", re.IGNORECASE)
 # Generic words that carry no domain signal, so they never count as "already
 # covered" when matched against the allowlist.
 STOPWORDS = {

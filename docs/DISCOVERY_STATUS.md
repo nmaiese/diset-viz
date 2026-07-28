@@ -143,9 +143,12 @@ finché quella riga dice "mai", nessuno sta assegnando il lavoro.
 
 Nessuno stadio è `manual`, e non è una svista. La catena è non presidiata per
 decisione presa: un modo che parcheggia la pull request finché qualcuno guarda,
-in un sistema che nessuno guarda, vuol dire fermo per sempre. `checks` non è
-un'attesa di approvazione, è un'attesa della CI, e la esegue
-`scripts/pipeline_merge.py`.
+in un sistema che nessuno guarda, vuol dire fermo per sempre. E dal 28 luglio
+nessuno stadio è più `checks`: ogni stadio fonde `auto`, sul cancello locale che
+`scripts/pipeline_merge.py` rilegge (suite intera + perimetro + invarianti) prima
+del merge. `checks` aspettava la CI remota, che però non parte sulle PR aperte via
+il GitHub MCP, quindi non comprava un verdetto indipendente ma un deadlock (vedi
+la voce del 28 luglio più sotto).
 
 **Il prompt della Routine punta ai file, non li ricopia.** Vedi sotto perché.
 
@@ -259,6 +262,31 @@ Tre bug trovati strada facendo, tutti reali:
 creata e attiva (28 luglio, id nella tabella sopra), e le sei per stadio restano
 in pausa. Tenerle spente conta: se restassero accese insieme al dispatcher
 tornerebbe esattamente la concorrenza che il dispatcher toglie.
+
+## Cosa è successo il 2026-07-28: auto-merge su tutta la catena
+
+Due giorni di runtime hanno mostrato un deadlock che nessun test vedeva. La CI
+remota non parte sulle PR aperte via il GitHub MCP, quindi gli stadi `checks`
+(scout, hunter, promoter, curator, verificatore) aspettavano check che non
+comparivano mai. `pipeline_merge` rifiuta correttamente una PR `checks` i cui
+check non appaiono, la PR restava `pr-open`, e il dispatcher si rifiuta di
+lanciare finché una PR della catena è aperta: **una sola PR incastrata congelava
+tutta la catena.** Nel diario si vedeva il segno opposto della salute: la metà
+editoriale (writer/reviewer, già `auto`) girava, la metà di scoperta no.
+
+**La decisione:** ogni stadio passa a `auto`. Il cancello locale che
+`pipeline_merge` rilegge prima del merge gira già la stessa suite del job CI
+`python` e lo stesso perimetro del job `gate`, quindi la garanzia vera resta, e
+gira **prima** del merge invece che mai. `checks` resta una parola che il cancello
+sa dire e il meccanismo di attesa resta testato in `pipeline_merge`: se un giorno
+la CI parte su queste PR, i cinque stadi che muovono numeri vivi sono quelli da
+riportare a `checks`. Il razionale completo è nel commento di
+`pipeline_gate.MERGE_POLICY`.
+
+Insieme: lo scout ritenta i 5xx transitori del catalogo SDMX invece di abortire
+(un 500 di un minuto non deve produrre un giro a zero approvazioni), e
+`REGIONAL_HINT` riconosce la forma abbreviata `reg.` che prima lasciava fuori
+dalla coda, per esempio, la spesa sociale dei comuni per regione.
 
 ## Lo sblocco: il tappo è tolto
 
@@ -440,9 +468,12 @@ possono fare:
   `.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero> --run-id <run_id>`.
 - **La CI non parte da sola sulle PR aperte via il GitHub MCP.** GitHub non lancia
   i workflow per eventi creati dal token dell'app (anti-ricorsione), quindi una PR
-  aperta così resta senza check e il box di merge sembra bloccato pur non essendo
-  fallito niente. Si fa partire a mano con `workflow_dispatch` su `ci.yml` (o dalla
-  UI), oppure si apre la PR con `gh`, che usa il token dell'utente e li innesca.
+  aperta così resta senza check. Prima questo bloccava la catena: gli stadi
+  `checks` aspettavano check che non arrivavano, la PR restava `pr-open` e il
+  dispatcher non lanciava più niente. Dal 28 luglio **nessuno stadio è `checks`**
+  (fondono tutti `auto` sul cancello locale), quindi il deadlock non c'è più. La CI
+  remota resta un feedback utile e si può far partire a mano con `workflow_dispatch`
+  su `ci.yml`, ma il merge non la aspetta più.
 - **`pipeline_dashboard.py` non crasha più senza `gh`.** `open_pull_requests`
   cattura `FileNotFoundError`/`OSError` e la sezione PR dice solo che `gh` non c'è,
   invece di far morire tutto il cruscotto. È quello che pretende la classe di test

@@ -116,7 +116,9 @@ arrives `score_eligible=false` and waits for the curator.
 
 Close the run as the `pipeline-close-run` skill prescribes: stage `promoter`
 if you promoted, `hunter` if you only triaged, the same name in the gate, the
-merge step and the journal. Your merge mode is `checks`. In the body: what
+merge step and the journal. Your merge mode is `auto`: you merge on the local
+gate, which has already run the whole suite, not on the remote CI, which does
+not start on a pull request opened through the MCP. In the body: what
 ran, live or offline, against which sources; the queue diff in words; for
 every candidate the decision and the reason with real numbers; what you
 promoted and what public id it got; and explicitly what you did **not** decide
