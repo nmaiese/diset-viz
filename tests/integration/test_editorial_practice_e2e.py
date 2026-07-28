@@ -417,7 +417,14 @@ class Metrics(unittest.TestCase):
         metrics = practice_metrics.load_and_compute()
 
         oss = metrics["osservabilita"]
-        self.assertGreaterEqual(oss["fusa_senza_prova_sul_sito"], 1)
+        # `fusa_senza_prova_sul_sito` puo' legittimamente essere 0: il passo del
+        # sito pubblica l'indicatore fuso e chiude il gap (e' successo a 651, la
+        # cui prova la catena ha committato su master). Il test verifica che la
+        # metrica sia esposta e sia un conteggio valido, non che il gap esista:
+        # pinnare >= 1 accoppiava il test a uno stato transitorio che la normale
+        # operativita' della catena azzera, e faceva fallire la suite su master.
+        self.assertIsNotNone(oss["fusa_senza_prova_sul_sito"])
+        self.assertGreaterEqual(oss["fusa_senza_prova_sul_sito"], 0)
         self.assertIsNotNone(oss["quota_run_associati_a_un_indicatore_pct"])
 
         aff = metrics["affidabilita"]
