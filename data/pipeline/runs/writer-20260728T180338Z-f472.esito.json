@@ -1,0 +1,19 @@
+{
+ "at": "2026-07-28T18:29:40+00:00",
+ "base_commit": "6610f64",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "6610f64",
+ "detail": [
+  "il cancello e' rosso: suite"
+ ],
+ "duration_seconds": 1614,
+ "gate": "blocked",
+ "outcome": "blocked",
+ "pr": "75",
+ "run_id": "writer-20260728T180338Z-f472",
+ "session_id": "66bedae4-bae9-592e-afca-9383dd866d1b",
+ "stage": "writer",
+ "summary": "PR #75 non fusa: il cancello e' rosso",
+ "trigger": "manuale"
+}
