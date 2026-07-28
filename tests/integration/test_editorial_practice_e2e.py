@@ -386,14 +386,18 @@ class DispatcherPriority(unittest.TestCase):
         self.assertEqual(plan["stage"], "reviewer")
         self.assertIn("urgente", plan["reason"])
 
-    def test_real_priorities_stay_computable(self):
-        # Con i dati reali (nessuna smentita aperta) le priorita' restano
-        # calcolabili e sotto soglia: la preemption non scatta a vuoto.
+    def test_real_priorities_are_consistent_with_the_dispatch(self):
+        # Coi dati reali le priorita' restano calcolabili, e l'esito del dispatch
+        # si **deriva** dallo stato reale invece di pinnarlo: quando un
+        # verificatore registrera' una smentita vera il reviewer salira' sopra
+        # soglia, e un test che pinnasse "sotto soglia -> hunter" bloccherebbe
+        # proprio il PR del verificatore che introduce quel comportamento.
         priorities = practice_timeline.stage_priorities(practice_timeline.load_real())
-        self.assertLess(priorities.get("reviewer", 0),
-                        pipeline_dispatch.PREEMPT_THRESHOLD)
         plan = pipeline_dispatch.decide(queues=self.QUEUES, priorities=priorities)
-        self.assertEqual(plan["stage"], "hunter")
+        if priorities.get("reviewer", 0) >= pipeline_dispatch.PREEMPT_THRESHOLD:
+            self.assertEqual(plan["stage"], "reviewer")
+        else:
+            self.assertEqual(plan["stage"], "hunter")
 
     def test_without_priorities_it_is_pure_chain_order(self):
         plan = pipeline_dispatch.decide(queues=self.QUEUES)
