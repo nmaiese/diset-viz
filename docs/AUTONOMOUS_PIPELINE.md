@@ -131,6 +131,14 @@ scegliere. Senza questo passo la riga resterebbe nel checkout usa e getta della
 Routine e sparirebbe con la sessione, cioe' proprio nel caso, l'unico, per cui
 esiste.
 
+Il comando della Routine passa anche `--priority` (cutover del 2026-07-28): una
+pratica pronta sopra la soglia `PREEMPT_THRESHOLD` (100, il peso di una smentita
+su una pagina online) precede l'ordine di catena, cosi' un dato pubblico gia'
+smentito non aspetta dietro la coda dello scrittore. Sotto la soglia l'ordine di
+catena resta quello puro e provato, quindi la scoperta non viene affamata: la
+preemption sceglie solo quale stadio far girare, non ne lancia due
+(vedi [`EDITORIAL_PRACTICE.md`](EDITORIAL_PRACTICE.md), §11).
+
 Con `--publish` il dispatcher fa un secondo passo meccanico dello stesso genere,
 il **passo del sito**, e il comando della Routine (in `.claude/agents/dispatcher.md`)
 lo passa, quindi gira a ogni giro: verifica gli indicatori in
@@ -385,6 +393,18 @@ trovate, niente altro da scoprire. Due file rompono quel tetto, e sono entrambi
   che il catalogo non conosce fa sparire l'indicatore dai totali per macro-area
   pur lasciandolo in catalogo, cioe' un buco silenzioso, e la correzione stava
   dentro `app/taxonomy.py`, un modulo Python.
+
+C'era pero' un tappo a monte di quei due file: lo **scout stesso** proponeva al
+massimo 40 fonti per run (`scout_sources.py --limit 40` di default) e, con un
+punteggio uniforme, l'ordinamento cadeva sull'alfabeto. Su un catalogo di quasi
+5000 dataflow proponeva sempre gli stessi 40, quindi decine di domini regionali
+nuovi (turismo, occupazione per settore, reddito, popolazione per titolo di
+studio, giustizia) restavano invisibili e la coda dello scout appariva vuota
+mentre non lo era. Adesso il tetto e' tolto (proposte senza cap) e la query del
+catalogo, che e' cache-forever, si ri-sonda con `--refresh`: cosi' lo scout
+vede i dataflow che Istat pubblica dopo l'ultima run, e la scoperta non si ferma
+alla prima fotografia. La coda dello scout riflette lo stato del catalogo, non
+un troncamento.
 
 Resta codice, e quindi resta umano: un adapter per una fonte che **non** e' un
 dataflow SDMX Istat, e l'invenzione di una **categoria** nuova (che e' una

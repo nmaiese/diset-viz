@@ -618,17 +618,21 @@ pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
   eterna. Ricostruibili sono `smentita` e `aggiornamento`, `ritiro`, `rollback`,
   `integrazione` e `metadati` esistono nel modello ma vogliono un segnale
   esplicito. Provata in `tests/unit/test_practice_timeline.py`.
-- **Fase F, sostituzione. [macchina pronta, cutover no]** Le tre condizioni di
-  codice sono fatte e provate: la **priorita' nel dispatcher**
-  (`pipeline_dispatch.py --priority`, opt-in, una pratica urgente sopra soglia
-  scavalca l'ordine di catena senza affamare la scoperta), le **metriche** del
-  confronto prima/dopo (`practice_metrics.py`), il **recupero** provato (la
-  ricostruzione e' pura, rieseguirla dopo un'interruzione da' lo stesso stato).
-  Lo storico e' gia' classificato (`--write` materializza un record per ciclo).
-  Cio' che **resta**, ed e' operativo non codice: accendere l'opt-in di default,
-  girare il confronto delle metriche su run reali prima e dopo, e cambiare la
-  Routine del dispatcher. Il modello non diventa autorevole finche' quel
-  confronto non e' documentato, come chiede il mandato.
+- **Fase F, sostituzione. [macchina pronta, preemption dei soli errori pubblici accesa]**
+  Le tre condizioni di codice sono fatte e provate: la **priorita' nel dispatcher**
+  (`pipeline_dispatch.py --priority`, una pratica urgente sopra soglia scavalca
+  l'ordine di catena senza affamare la scoperta), le **metriche** del confronto
+  prima/dopo (`practice_metrics.py`), il **recupero** provato (la ricostruzione e'
+  pura, rieseguirla dopo un'interruzione da' lo stesso stato). Lo storico e' gia'
+  classificato (`--write` materializza un record per ciclo). Il **cutover del
+  dispatcher e' fatto** (2026-07-28): la Routine ora passa `--priority`, quindi una
+  smentita aperta su una pagina online (peso 100, sopra la soglia `PREEMPT_THRESHOLD`)
+  precede l'ordine di catena. E' la parte ad alta confidenza: **sotto** la soglia il
+  comportamento resta l'ordine di catena puro e provato, quindi accendere `--priority`
+  non rende il modello autorevole sull'ordinamento generale, attiva solo la valvola di
+  sicurezza per il dato pubblico sbagliato. Cio' che **resta**, ed e' operativo non
+  codice: girare il confronto delle metriche su run reali prima e dopo perche' il
+  modello diventi autorevole anche sotto soglia, come chiede il mandato.
 
 Nessuna fase indebolisce i vincoli non negoziabili del mandato (sezione 6),
 tutti gia' presenti nella catena e da preservare: lo stato sopravvive alle

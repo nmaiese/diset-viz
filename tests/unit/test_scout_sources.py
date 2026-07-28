@@ -65,12 +65,59 @@ class ProposeSources(unittest.TestCase):
             self.assertTrue(p["reason"])
 
 
+class Uncapped(unittest.TestCase):
+    """Every uncovered regional domain must survive, not just the first N.
+
+    The cap used to default to 40 and the score is uniform, so the ranking fell
+    back to alphabetical: past the cap a genuinely new domain was invisible, and
+    the scout looked exhausted while the catalogue still held dozens. These
+    flows are five distinct new domains; the default must return all five.
+    """
+
+    FLOWS = [
+        {"id": f"{i}_DF_DCCV_{tok.upper()}_1", "name": f"{name} - regioni"}
+        for i, (tok, name) in enumerate([
+            ("turismo", "Notti trascorse per turismo"),
+            ("reddito", "Reddito disponibile delle famiglie"),
+            ("istruzione", "Popolazione per titolo di studio"),
+            ("giustizia", "Procedimenti definiti dai tribunali"),
+            ("cultura", "Spesa delle amministrazioni per cultura"),
+        ])
+    ]
+
+    def test_default_proposes_every_new_domain(self):
+        props = scout_sources.propose_sources(self.FLOWS, covered=set(), terms=set())
+        self.assertEqual(len(props), 5)
+
+    def test_limit_still_caps_when_asked(self):
+        props = scout_sources.propose_sources(
+            self.FLOWS, covered=set(), terms=set(), limit=2)
+        self.assertEqual(len(props), 2)
+
+
 class QueueShape(unittest.TestCase):
     def test_rows_carry_stable_ids_and_new_status(self):
         props = scout_sources.propose_sources(FLOWS, covered=COVERED, terms=TERMS)
         rows = scout_sources.to_rows(props)
         self.assertTrue(all(r["candidate_id"].startswith("istat_sdmx:") for r in rows))
         self.assertTrue(all(r["triage_status"] == "new" for r in rows))
+
+    def test_written_queue_uses_lf_not_crlf(self):
+        # csv.DictWriter defaults to CRLF; a stray CR at end of a changed line
+        # reads as trailing whitespace and trips the gate's git diff --check, so
+        # the scout could never commit an updated queue. The writer must emit LF.
+        import tempfile
+        from pathlib import Path
+
+        rows = scout_sources.to_rows(
+            scout_sources.propose_sources(FLOWS, covered=COVERED, terms=TERMS)
+        )
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "source_candidates.csv"
+            scout_sources.write_source_candidates(rows, path=path)
+            raw = path.read_bytes()
+        self.assertNotIn(b"\r\n", raw)
+        self.assertIn(b"\n", raw)
 
     def test_upsert_preserves_human_triage(self):
         rows = scout_sources.to_rows(
