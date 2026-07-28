@@ -27,13 +27,14 @@ Nome del file: `<code>__<level>__<prosa>.json` (es.
 contenuto (frammento del lead + anno) combaciava, `prosa` ancora la prova alla
 versione.
 
-**Finche' il passo del sito e' spento, questa cartella e' vuota nel repo.** La
-transizione e' gia' legata alla catena: perimetro nel cancello
-(`pipeline_gate.STAGE_PATHS["publisher"]`, con `check_publications`) e passo del
+**Il passo del sito e' acceso, quindi questa cartella si popola da sola.** La
+transizione e' legata alla catena in due punti: il perimetro nel cancello
+(`pipeline_gate.STAGE_PATHS["publisher"]`, con `check_publications`) e il passo del
 dispatcher (`pipeline_dispatch.py --publish`, meccanico come il tick, che verifica
-gli indicatori fusi contro il sito e committa qui le prove). Le prove vere si
-scrivono contro `divarioitalia.it` dopo un deploy: manca solo passare `--publish`
-nella Routine del dispatcher (Fase F, operativa non codice).
+gli indicatori fusi contro il sito e committa qui le prove). Il comando in
+`.claude/agents/dispatcher.md` passa `--publish`, quindi a ogni giro (sessione
+fresca, ogni 3 ore) le prove nuove arrivano qui. Per spegnere il passo, togliere
+`--publish` da quel comando.
 
 ```bash
 # il passo del sito: verifica ogni indicatore fuso e committa le prove

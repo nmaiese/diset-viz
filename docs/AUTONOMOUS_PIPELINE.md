@@ -131,8 +131,9 @@ scegliere. Senza questo passo la riga resterebbe nel checkout usa e getta della
 Routine e sparirebbe con la sessione, cioe' proprio nel caso, l'unico, per cui
 esiste.
 
-Con `--publish` (opt-in, spento di default) il dispatcher fa un secondo passo
-meccanico dello stesso genere, il **passo del sito**: verifica gli indicatori in
+Con `--publish` il dispatcher fa un secondo passo meccanico dello stesso genere,
+il **passo del sito**, e il comando della Routine (in `.claude/agents/dispatcher.md`)
+lo passa, quindi gira a ogni giro: verifica gli indicatori in
 stato `fusa` contro `divarioitalia.it` e committa le prove di pubblicazione su
 master, chiudendo la transizione `fusa -> pubblicata`
 (vedi [`EDITORIAL_PRACTICE.md`](EDITORIAL_PRACTICE.md), §8). Non e' uno stadio e
