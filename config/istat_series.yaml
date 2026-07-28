@@ -78,3 +78,22 @@ series:
     theme: Indicatori demografici (Istat)
     quality_life_category: salute_cura
     direction: contextual
+  # Ammessa dallo stadio admissions (2026-07-28). Offerta di assistenza
+  # residenziale (posti letto), distinta dagli OSPITI gia in catalogo
+  # (occupazione). DATA_TYPE=75 = "posti letto operativi per 100.000 residenti"
+  # (DSD DCIS_PRESIDI1 verificata via structure query). Direzione contextual:
+  # piu posti letto residenziali non e univocamente meglio. Il dataflow ha piu
+  # delle tre dimensioni del pilota, quindi dimension_order/dimension_values
+  # fissano il codice 'totale' di ogni breakdown.
+  - id: "75"
+    dataflow: 49_37_DF_DCIS_PRESIDI1_6
+    dsd_label: DCIS_PRESIDI1
+    name: Posti letto operativi nei presidi residenziali socio-assistenziali e socio-sanitari per 100.000 abitanti (Istat, regioni)
+    unit: per 100.000 abitanti
+    decimals: 1
+    theme: Servizi di cura
+    quality_life_category: salute_cura
+    direction: contextual
+    indicator_dimension: DATA_TYPE
+    dimension_order: [FREQ, REF_AREA, DATA_TYPE, MAINLY_TARGET_USERS, TYPE_RESID_CARE_CENTRE, SOCIAL_PROT_FUNCTION, HEALTHCARE_LEVEL, LEGAL_STATUS_OF_HOLDER, TYPE_OF_ADMINISTRATOR, Y_PUBLIC_FUNDING, PROF_STATUS]
+    dimension_values: "MAINLY_TARGET_USERS=TOT;TYPE_RESID_CARE_CENTRE=ALL;SOCIAL_PROT_FUNCTION=99;HEALTHCARE_LEVEL=ALL;LEGAL_STATUS_OF_HOLDER=9;TYPE_OF_ADMINISTRATOR=TOT;Y_PUBLIC_FUNDING=9;PROF_STATUS=ALL"
