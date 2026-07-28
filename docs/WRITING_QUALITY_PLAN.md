@@ -1,5 +1,13 @@
 # Piano per la qualità di scrittura delle pagine indicatore
 
+> **Nota (2026-07-28, ri-architettura).** Questo piano cita gli agenti di stadio
+> `indicator-writer.md` e `indicator-reviewer.md`: sono stati **fusi nel
+> produttore** (`.claude/agents/producer.md`), che scrive e si rilegge in una
+> sessione sola, e `source-scout`/`indicator-hunter` nell'**ammissione**
+> (`.claude/agents/admissions.md`). I puntatori qui sotto valgono ancora come
+> storia della qualità editoriale, ma la guida di scrittura vive ora in
+> `producer.md`. Il resto del piano (rubrica, criteri, audit) e' invariato.
+
 Documento di progetto. Obiettivo unico: portare la prosa delle pagine indicatore
 al livello di un giornalista di dati di prima fascia, su **tutti gli agenti della
 pipeline che toccano il testo**. Non è un piano di prodotto né di SEO in senso
