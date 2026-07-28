@@ -1,19 +1,19 @@
 {
- "at": "2026-07-28T18:29:40+00:00",
- "base_commit": "6610f64",
+ "at": "2026-07-28T19:58:15+00:00",
+ "base_commit": "51f3cc0",
  "branch": "master",
  "claude_code_version": "2.1.220 (Claude Code)",
- "commit": "6610f64",
+ "commit": "51f3cc0",
  "detail": [
-  "il cancello e' rosso: suite"
+  "squash via API GitHub (gh non autenticato in sessione); cancello writer verde sul branch riallineato a master (suite 833 OK)"
  ],
- "duration_seconds": 1614,
- "gate": "blocked",
- "outcome": "blocked",
- "pr": "75",
+ "duration_seconds": 1009,
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": 75,
  "run_id": "writer-20260728T180338Z-f472",
- "session_id": "66bedae4-bae9-592e-afca-9383dd866d1b",
+ "session_id": "02c16309-e9ab-5142-a6ce-9b5e2027cd46",
  "stage": "writer",
- "summary": "PR #75 non fusa: il cancello e' rosso",
- "trigger": "manuale"
+ "summary": "PR #75 fusa in master dal passo di merge",
+ "trigger": "dispatch"
 }
