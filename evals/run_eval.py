@@ -32,9 +32,9 @@ PROMPTS = {
 Scrivi l'articolo per l'indicatore ter-178 (Tasso di occupazione, femmine)
 usando COME UNICA FONTE DEI NUMERI il brief congelato in {BRIEF}.
 Non consultare i dati vivi e non usare WebSearch: questa e' una eval, non una
-run di produzione. Segui content/STYLE.md e la struttura di
-.claude/agents/indicator-writer.md (lead + definizione, quadro, dinamica,
-limiti, con "level": "regione" e "vintage": 2025).
+run di produzione. Segui content/STYLE.md e la struttura di scrittura del
+produttore (.claude/agents/producer.md): lead + definizione, quadro, dinamica,
+limiti, con "level": "regione" e "vintage": 2025.
 Scrivi il risultato in evals/out/writer/article.json e fermati li': niente
 store, niente commit, niente pull request.
 Poi misura: python3 evals/score_eval.py writer evals/out/writer/article.json""",

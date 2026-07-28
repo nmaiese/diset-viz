@@ -15,10 +15,14 @@ Il documento che possiede la materia e'
 contratto di ogni run e' [`docs/AGENT_CONTRACT.md`](../../docs/AGENT_CONTRACT.md).
 Queste sono le regole che valgono sempre:
 
-- **Un dispatcher, uno stadio per tick.** `scripts/pipeline_dispatch.py` legge
-  le code e nomina il singolo stadio da far girare; il suo contratto da agente
-  e' `.claude/agents/dispatcher.md`. Gli stadi non hanno un cron proprio: mai
-  lanciare uno stadio a mano, mai ri-aggiungere una schedule per stadio.
+- **Un lanciatore, lavoro per-indicatore in parallelo.** `scripts/pipeline_launch.py`
+  legge il dossier per-indicatore e le code e restituisce una lista
+  prioritizzata di lanci (produttore e verificatore per-indicatore, ammissione
+  batch); il suo contratto da agente e' `.claude/agents/launcher.md`. Non c'e'
+  piu' un dispatcher a uno-stadio-per-tick ne' il lock una-PR-aperta: indicatori
+  diversi toccano file diversi, quindi non contendono e si lanciano insieme. Tre
+  ruoli soli: ammissione (scout+hunter+promoter), produttore
+  (curator+writer+reviewer), verificatore.
 - **Ogni registro e' un file per record**: `content/indicators/`,
   `data/pipeline/runs/`, `data/pipeline/verifiche/`. Mai ricompattarli in un
   file unico: il conflitto tra due stadi non e' improbabile, e' impossibile, e

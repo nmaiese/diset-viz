@@ -202,7 +202,27 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Dov'e' fermo la catena, e perche'.")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--today", default="", help="data di riferimento YYYY-MM-DD")
+    parser.add_argument("--beat-open", nargs=2, metavar=("RUOLO", "RUN_ID"),
+                        help="un ruolo che parte lascia il proprio battito (il vivo del cruscotto)")
+    parser.add_argument("--beat-close", metavar="RUN_ID",
+                        help="un ruolo che chiude cancella il proprio battito")
+    parser.add_argument("--indicator", default="",
+                        help="l'indicatore su cui batte il ruolo (con --beat-open)")
     args = parser.parse_args(argv)
+
+    # I battiti: due gesti che un agente fa in apertura e chiusura della sua run.
+    # Non stampano il cruscotto, aprono/chiudono il vivo e basta.
+    if args.beat_open:
+        role, run_id = args.beat_open
+        path = write_heartbeat(role, run_id, indicator=args.indicator)
+        if not args.json:
+            print(f"battito aperto: {role} su {args.indicator or '(coda)'} -> {path}")
+        return 0
+    if args.beat_close:
+        clear_heartbeat(args.beat_close)
+        if not args.json:
+            print(f"battito chiuso: {args.beat_close}")
+        return 0
 
     b = load_board(today=args.today)
     if args.json:

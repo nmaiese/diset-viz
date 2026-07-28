@@ -23,15 +23,27 @@ e si somigliano molto.
 
 Poi leggi la coda del tuo stadio, che e' quella che decide il lavoro.
 
-**Non decidi tu quando girare.** Chi ti ha lanciato e' il dispatcher
-(`scripts/pipeline_dispatch.py`), che gira a battito, guarda tutte le code e
-lancia **un solo stadio per volta**. E' l'unica ragione per cui non ti trovi
-mai un altro stadio addosso, quindi non lanciare mai un altro agente e non
-"portarti avanti" su uno stadio che non e' il tuo: e' esattamente la
-concorrenza che il dispatcher esiste per togliere.
+**Non decidi tu quando girare.** Chi ti ha lanciato e' il lanciatore
+(`scripts/pipeline_launch.py`), che legge il dossier per-indicatore e le code e
+lancia i ruoli pronti, anche piu' di uno in parallelo. Puoi trovarti un altro
+ruolo in volo insieme a te, ma su un **altro** indicatore: indicatori diversi
+toccano file diversi e non contendono. Tu lavori solo cio' che il lanciatore ti
+ha assegnato, non "ti porti avanti" su lavoro che non e' tuo.
 
-Se il dispatcher ti ha passato un `run_id`, usalo. Se non ce l'hai, lo conia
+Se il lanciatore ti ha passato un `run_id`, usalo. Se non ce l'hai, lo conia
 `pipeline_log` al passo 4.
+
+**Lascia il tuo battito, cosi' il cruscotto ti vede in volo.** Appena hai il
+`run_id`, all'inizio della run:
+
+```bash
+python3 scripts/pipeline_monitor.py --beat-open <ruolo> <run_id> --indicator <codice>
+```
+
+e' quello che fa apparire "produttore su ter-X dalle HH:MM" su `/_pipeline`
+mentre lavori, prima ancora che ci sia una commit. Alla chiusura lo cancelli
+(passo 4). Best effort: se salti il battito il cruscotto non ti vede vivo, ma il
+tuo lavoro committato resta.
 
 ## 2. Lavorare: una cosa per volta, sempre motivata
 
@@ -212,6 +224,17 @@ conoscerlo, e la scrive direttamente su master per ogni uscita terminale:
 `merged`, `blocked`, `stopped`, `error`. Non provare a scriverla tu e non
 aggiungerne una seconda dopo il merge. Due righe per run sono normali e attese:
 la tua dentro la PR, la sua su master.
+
+**Cancella il tuo battito** quando chiudi, cosi' il cruscotto non ti lascia in
+volo per sempre:
+
+```bash
+python3 scripts/pipeline_monitor.py --beat-close <run_id>
+```
+
+Se te ne dimentichi non e' un guasto: un battito piu' vecchio della soglia si
+scarta da solo (una sessione caduta senza pulire). Ma cancellarlo tiene il vivo
+onesto.
 
 Serviva perche' il buco era doppio. Il cacciatore ha scritto `pr-open` e si e'
 fuso trenta secondi dopo, e per mezza giornata il diario ha raccontato che

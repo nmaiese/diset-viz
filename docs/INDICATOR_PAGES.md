@@ -129,8 +129,9 @@ agli estremi di questa.
 
 Le regole editoriali complete stanno in `content/STYLE.md`, e le classi di
 errore che solo una lettura trova nella skill condivisa
-`.claude/skills/indicator-review/` (il prompt dello scrittore,
-`.claude/agents/indicator-writer.md`, ormai punta e non ricopia). La rubrica
+`.claude/skills/indicator-review/` (il prompt del produttore,
+`.claude/agents/producer.md`, che scrive e si rilegge, ormai punta e non
+ricopia). La rubrica
 con cui si misura il risultato, dieci criteri e una soglia sotto la quale
 l'articolo non è pronto, sta in [`WRITING_RUBRIC.md`](WRITING_RUBRIC.md). Le fonti secondarie ammesse stanno in
 [`SECONDARY_SOURCES.md`](SECONDARY_SOURCES.md), insieme alla trappola che nessuna
@@ -245,9 +246,10 @@ pagina viene resa per verificare che non ci siano 500.
 
 Restano **fuori dai test**, e vanno rivisti a mano. Non a memoria, però:
 `.venv/bin/python -m scripts.review_queue` cerca esattamente questi pattern e
-mette in fila gli articoli per quanto è probabile che siano sbagliati, e
-`.claude/agents/indicator-reviewer.md` è l'agente che li legge, e gira ogni
-giorno.
+mette in fila gli articoli per quanto è probabile che siano sbagliati. Li
+rilegge il produttore (`.claude/agents/producer.md`), che ha assorbito il
+revisore e si rilegge il proprio testo, e a valle il verificatore indipendente
+prova a smentirlo.
 
 Un articolo firmato porta **due** campi, `reviewed_at` e `reviewed_vintage`, e
 solo con entrambi esce dalla coda. Il secondo è il `vintage` che il revisore

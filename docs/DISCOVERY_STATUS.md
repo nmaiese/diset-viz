@@ -11,16 +11,23 @@ Aggiornato al **2026-07-28**.
 
 ## In una riga
 
-Sette stadi, sei agenti, **un dispatcher che ne lancia uno per volta**, e nessuno
-che aspetti una firma. Un indicatore va da un catalogo SDMX a una pagina pubblica
-senza intervento, e la catena ci ritorna sopra quando i dati si muovono.
+**Tre ruoli, per-indicatore, un lanciatore che ne mette piu' di uno in volo
+insieme**, e nessuno che aspetti una firma. Un indicatore va da un catalogo SDMX
+a una pagina pubblica senza intervento, e la catena ci ritorna sopra quando i
+dati si muovono.
 
-> **La Routine del dispatcher esiste ed è attiva** (dal 28 luglio), le cinque per
-> stadio restano in pausa dal 27: la catena assegna di nuovo il lavoro, un solo
-> stadio per tick. La Routine gira ogni 3 ore in una sessione nuova
-> nell'environment `divarioitalia`, e la sessione nuova è ciò che le fa ereditare
-> il checkout git. Vedi [Le Routine](#le-routine) per l'id e per l'inciampo del 28
-> luglio (una Routine creata nel modo sbagliato apriva sessioni senza repo).
+> **La ri-architettura del 28 luglio (sera).** La catena e' passata da sette
+> stadi a **tre ruoli** (ammissione = scout+hunter+promoter, produttore =
+> curator+writer+reviewer, verificatore invariato) e da uno **stadio per tick** a
+> un **lanciatore per-indicatore** (`scripts/pipeline_launch.py`, agente
+> `launcher`) che lancia in parallelo, perche' indicatori diversi toccano file
+> diversi e non contendono. Il dispatcher (`pipeline_dispatch.py`) e il lock
+> una-PR-aperta sono ritirati. Il monitoraggio e' la rotta viva `/_pipeline`
+> (piu' `scripts/pipeline_monitor.py`). **La Routine va ri-puntata**: il suo
+> prompt cita ancora il dispatcher, va cambiato a `launcher.md` (vedi
+> [Le Routine](#le-routine)); e' in pausa, quindi non fa danni finche' non si
+> riaccende. Il perche' della forma nuova sta in
+> [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 
 **Il tappo è tolto.** Il test che congelava l'elenco delle serie è stato
 liberato, e per provare la catena due serie demografiche sono arrivate fino a una
@@ -57,7 +64,12 @@ ignorava, e sei Routine indipendenti si pestavano i piedi.
 
 | Routine | cadenza (UTC) | che cosa fa | routine id |
 | --- | --- | --- | --- |
-| dispatcher | ogni 3 ore (minuto `:02`) | `pipeline_dispatch.py`, poi lancia lo stadio che ha nominato | `trig_01Dv3ZDB4ch561GFYy2QwEUJ` (attiva dal 28 luglio 2026) |
+| launcher | ogni 3 ore (minuto `:02`) | `pipeline_launch.py`, poi lancia in parallelo i ruoli che ha nominato | `trig_01Dv3ZDB4ch561GFYy2QwEUJ` (in pausa, il prompt va ri-puntato a `launcher.md`) |
+
+> **Da ri-puntare.** La Routine (stesso id) e' nata per il dispatcher: il suo
+> prompt cita `.claude/agents/dispatcher.md` e il comando `pipeline_dispatch.py`,
+> entrambi ritirati. Prima di riaccenderla, cambia il prompt a quello sotto (che
+> punta a `launcher.md`). Finche' e' in pausa non fa danni.
 
 **L'inciampo del 28 luglio, perché non si ripeta.** La Routine si crea anche via
 lo strumento MCP `create_trigger`, ma **deve essere in modalità sessione nuova**
@@ -84,16 +96,16 @@ che ha davanti.
 
 ### Il prompt, adesso un puntatore
 
-Il giro del dispatcher (le tre uscite, un solo stadio per volta, l'errore
-registrato senza indovinare) vive in **`.claude/agents/dispatcher.md`**, con
+Il giro del lanciatore (legge il piano per-indicatore, lancia i ruoli in
+parallelo, riporta come e' andata) vive in **`.claude/agents/launcher.md`**, con
 modello e guardia nel frontmatter come ogni altro agente della catena. Questo
 documento non lo ricopia più: la versione che stava qui era l'ultima copia di
 contratto dentro un prompt di Routine, cioè la forma esatta del drift di
 `analyst_notes.json` (vedi sotto). Il prompt della Routine si copia com'è:
 
 ```
-Agisci come il dispatcher della catena editoriale di Divario Italia. La tua
-definizione sta in .claude/agents/dispatcher.md ed è vincolante: leggila ed
+Agisci come il lanciatore della catena editoriale di Divario Italia. La tua
+definizione sta in .claude/agents/launcher.md ed è vincolante: leggila ed
 eseguila. Fai UN giro e fermati.
 ```
 

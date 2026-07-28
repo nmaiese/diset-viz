@@ -41,11 +41,10 @@ scatta prima di ogni cambio a modelli, prompt o hook degli agenti).
 Per guardare la catena senza aprire file:
 
 ```bash
-python3 scripts/pipeline_dashboard.py --open   # tutto in una pagina
-python3 scripts/pipeline_status.py             # solo dove si e' fermata
-python3 scripts/pipeline_log.py                # solo che cosa hanno fatto gli agenti
-python3 scripts/pipeline_dispatch.py           # solo chi tocca adesso
-python3 scripts/practice_timeline.py           # la storia per indicatore (Fase B/C, read-only)
+python3 scripts/pipeline_monitor.py            # dov'e' fermo e perche', in una schermata (nell'app: /_pipeline)
+python3 scripts/pipeline_launch.py             # cosa lanciare adesso, e in che ordine (per-indicatore)
+python3 scripts/practice_timeline.py           # la storia per indicatore (il dossier, read-only)
+python3 scripts/pipeline_status.py             # le code per (vecchio) stadio, ancora usate dal lanciatore
 ```
 
 ## What this is
@@ -104,16 +103,20 @@ of the process (`lru_cache`, not a TTL).
 
 ## The autonomous chain — READ [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md)
 
-Seven stages take an indicator from a source catalogue to a published page and
-come back when the data moves: **scout** -> **hunter** -> **promoter** ->
-**curator** -> **writer** -> **reviewer** -> **verificatore** (which repairs
-nothing: its refutations go back to the reviewer's queue). Each stage has an
-agent in `.claude/agents/`, a deterministic queue computed from committed
-files, and a verdict from `scripts/pipeline_gate.py` that decides whether it
-may publish.
+**Three roles**, per-indicator instead of per-stage, take an indicator from a
+source catalogue to a published page and come back when the data moves:
+**ammissione** (fuses scout+hunter+promoter: what enters, with auto-refutation)
+-> **produttore** (fuses curator+writer+reviewer: one indicator from admitted to
+published in one session, re-reading its own text) -> **verificatore** (repairs
+nothing: its refutations go back to the producer, which absorbed the reviewer).
+Each role has an agent in `.claude/agents/`, and a verdict from
+`scripts/pipeline_gate.py` that decides whether it may publish. A **launcher**
+(`scripts/pipeline_launch.py`, agent `launcher`) reads the per-indicator dossier
+and launches roles in parallel: different indicators touch different files, so
+there is no contention to serialise.
 
-The constitution of the chain (one dispatcher and one stage per tick, one file
-per record, `run_id` over PR number, the gate's perimeter, no human in the
+The constitution of the chain (one launcher, work per-indicator in parallel, one
+file per record, `run_id` over PR number, the gate's perimeter, no human in the
 loop, never `gh pr merge --auto`, data-driven re-entry, stdlib-pure scripts)
 lives in `.claude/rules/pipeline.md` and, in full, in the two documents above.
 Do not act on this paragraph: it is a table of contents.

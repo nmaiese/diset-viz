@@ -46,13 +46,17 @@ SOURCE_CANDIDATES = PROJECT_ROOT / "data" / "discovery" / "source_candidates.csv
 STAGE_ORDER = ["scout", "hunter", "promoter", "curator", "writer", "reviewer",
                "verificatore"]
 
+# Il ruolo che oggi copre ogni vecchio stadio, dopo la fusione in tre ruoli. Le
+# code restano per (vecchio) stadio, perche' i loro lettori sono deterministici e
+# distinti; l'etichetta dice chi le lavora adesso (ammissione = scout+hunter+
+# promoter, produttore = curator+writer+reviewer, verificatore invariato).
 AGENT_OF = {
-    "scout": "source-scout",
-    "hunter": "indicator-hunter",
-    "promoter": "indicator-hunter",
-    "curator": "indicator-curator",
-    "writer": "indicator-writer",
-    "reviewer": "indicator-reviewer",
+    "scout": "admissions",
+    "hunter": "admissions",
+    "promoter": "admissions",
+    "curator": "producer",
+    "writer": "producer",
+    "reviewer": "producer",
     "verificatore": "indicator-verifier",
 }
 
