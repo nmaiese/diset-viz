@@ -7,7 +7,7 @@ Per come funziona: [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 Per il meccanismo della scoperta: [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md).
 Per il contratto di ogni agente: [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md).
 
-Aggiornato al **2026-07-27**.
+Aggiornato al **2026-07-28**.
 
 ## In una riga
 
@@ -15,13 +15,12 @@ Sette stadi, sei agenti, **un dispatcher che ne lancia uno per volta**, e nessun
 che aspetti una firma. Un indicatore va da un catalogo SDMX a una pagina pubblica
 senza intervento, e la catena ci ritorna sopra quando i dati si muovono.
 
-> **Adesso però la catena è ferma, ed è voluto.** Le cinque Routine per stadio
-> sono in pausa dal 27 luglio e quella del dispatcher non è ancora stata creata,
-> quindi in questo momento **nessuno assegna il lavoro**. È l'ordine giusto,
-> prima spegnere e poi accendere, perché al contrario si apre una finestra in
-> cui girano tutti e sette. Manca l'ultimo passo, ed è
-> [creare la Routine del dispatcher](#le-routine): finché non esiste, il codice
-> è pronto e nessuno lo chiama, e gli stadi girano solo a mano.
+> **La Routine del dispatcher esiste ed è attiva** (dal 28 luglio), le cinque per
+> stadio restano in pausa dal 27: la catena assegna di nuovo il lavoro, un solo
+> stadio per tick. La Routine gira ogni 3 ore in una sessione nuova
+> nell'environment `divarioitalia`, e la sessione nuova è ciò che le fa ereditare
+> il checkout git. Vedi [Le Routine](#le-routine) per l'id e per l'inciampo del 28
+> luglio (una Routine creata nel modo sbagliato apriva sessioni senza repo).
 
 **Il tappo è tolto.** Il test che congelava l'elenco delle serie è stato
 liberato, e per provare la catena due serie demografiche sono arrivate fino a una
@@ -58,7 +57,19 @@ ignorava, e sei Routine indipendenti si pestavano i piedi.
 
 | Routine | cadenza (UTC) | che cosa fa | routine id |
 | --- | --- | --- | --- |
-| dispatcher | ogni 3 ore (minuto `:02`) | `pipeline_dispatch.py`, poi lancia lo stadio che ha nominato | `trig_0145qYivpUMeYVcTAjBTmGHQ` (attiva dal 27 luglio 2026) |
+| dispatcher | ogni 3 ore (minuto `:02`) | `pipeline_dispatch.py`, poi lancia lo stadio che ha nominato | `trig_01Dv3ZDB4ch561GFYy2QwEUJ` (attiva dal 28 luglio 2026) |
+
+**L'inciampo del 28 luglio, perché non si ripeta.** La Routine si crea anche via
+lo strumento MCP `create_trigger`, ma **deve essere in modalità sessione nuova**
+(`create_new_session_on_fire`): è la sessione nuova nell'environment
+`divarioitalia` che eredita il checkout git. Una prima Routine ricreata quel
+giorno (`trig_01262KRLPmE7xJrG8fbKMz2y`) apriva invece sessioni **senza il repo**
+(`is a git repository: false`, nessun `.claude/agents/`) e falliva a ogni firing
+prima ancora di leggere il proprio contratto: è stata cancellata e rifatta in
+modalità sessione nuova. `create_trigger` non aggancia connettori MCP, ma alla
+catena non servono: parla con GitHub via `gh` e il proxy di uscita, non via il
+connettore. La `trig_0145qYivpUMeYVcTAjBTmGHQ` citata nelle versioni precedenti di
+questo documento non esiste più.
 
 Impostazioni: **sessione nuova a ogni firing** (non legata a una sessione
 esistente), environment `divarioitalia`, modello quello di default. Il modello
@@ -244,9 +255,10 @@ Tre bug trovati strada facendo, tutti reali:
 - I sei prompt mettevano la riga di diario **dopo** `gh pr create`, mentre va
   committata prima perché viaggia dentro la pull request.
 
-**Cosa resta da fare, e non è nel repo:** creare la Routine del dispatcher e
-disattivare le sei per stadio. Se restano accese insieme torna esattamente la
-concorrenza che il dispatcher toglie. Gli id sono nella tabella sopra.
+**Cosa restava da fare fuori dal repo, ora fatto:** la Routine del dispatcher è
+creata e attiva (28 luglio, id nella tabella sopra), e le sei per stadio restano
+in pausa. Tenerle spente conta: se restassero accese insieme al dispatcher
+tornerebbe esattamente la concorrenza che il dispatcher toglie.
 
 ## Lo sblocco: il tappo è tolto
 
@@ -373,10 +385,9 @@ possono fare:
    alfabetico della coda e `REGIONAL_HINT` che non riconosce `- reg.`, entrambe
    sopra). La licenza Istat, che era il terzo punto, è stata corretta ovunque
    (vedi sopra).
-6. **La Routine del dispatcher**, ed è il solo motivo per cui in questo momento
-   la catena non gira. Le cinque vecchie sono in pausa dal 27 luglio, cioè la
-   prima metà del passaggio è fatta e nell'ordine giusto: manca la seconda.
-   Finché non esiste, il codice è pronto e nessuno lo chiama.
+6. ~~**La Routine del dispatcher**~~ Fatto il 28 luglio: creata e attiva, sessione
+   nuova a ogni firing nell'environment `divarioitalia`. Le cinque vecchie
+   restano in pausa dal 27 luglio. Il passaggio è completo e nell'ordine giusto.
 7. **Una voce per (indicatore, livello)** nello store degli articoli. Oggi è una
    per indicatore, con il livello come campo dentro, mentre le code dello
    scrittore e del revisore hanno già una riga per coppia. Non è un difetto
