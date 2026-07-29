@@ -69,11 +69,41 @@ def _days(start: str, today: str) -> int:
     return practice_model._days_between(start, today) if start and today else 0
 
 
-def row_of(d: dict, today: str = "") -> dict:
-    """La riga di monitoraggio di un indicatore, dal suo dossier."""
+def _run_history(run_ids, runs_by_id) -> list:
+    """Le run che hanno toccato l'indicatore, dalla piu' recente, gia' collassate.
+
+    Riusa `d["runs"]` (i run_id che `practice_timeline` ha gia' associato
+    all'indicatore) e li unisce alle run collassate indicizzate per run_id, cosi'
+    il dettaglio per-indicatore non fa un secondo giro sul diario."""
+    out = []
+    for rid in run_ids or []:
+        run = (runs_by_id or {}).get(rid)
+        if not run:
+            continue
+        out.append({
+            "run_id": rid,
+            "stage": run.get("stage", ""),
+            "outcome": run.get("outcome", ""),
+            "summary": run.get("summary", ""),
+            "at": run.get("at", ""),
+            "model": run.get("model", ""),
+            "duration_seconds": run.get("duration_seconds"),
+        })
+    out.sort(key=lambda r: r.get("at", ""), reverse=True)
+    return out
+
+
+def row_of(d: dict, today: str = "", runs_by_id: dict = None) -> dict:
+    """La riga di monitoraggio di un indicatore, dal suo dossier.
+
+    Con `runs_by_id` (le run collassate indicizzate per run_id) la riga porta
+    anche stadi fatti, stato di pubblicazione e verifica, e la storia delle run
+    che hanno toccato l'indicatore: cosi' il cruscotto puo' aprire un dettaglio
+    per-indicatore senza un secondo giro sul diario."""
     stage = practice_timeline.ready_stage(d)
     return {
         "id": d["id"],
+        "type": d.get("type", ""),
         "state": d.get("state", ""),
         "entered_at": d.get("entered_at", ""),
         "days": _days(d.get("entered_at", ""), today),
@@ -82,6 +112,10 @@ def row_of(d: dict, today: str = "") -> dict:
         "error_class": d.get("error_class"),
         "flags": sorted(k for k, v in (d.get("flags") or {}).items() if v is True),
         "reason": _reason(d),
+        "completed_stages": list(d.get("completed_stages") or []),
+        "published": d.get("published"),
+        "verification_valid": d.get("verification_valid"),
+        "runs": _run_history(d.get("runs"), runs_by_id),
     }
 
 
@@ -118,7 +152,8 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
     righe per indicatore, i fermi, il vivo, le PR aperte, la storia recente e i
     totali per stato.
     """
-    rows = [row_of(d, today) for d in dossier.values()]
+    runs_by_id = {r.get("run_id"): r for r in (runs or []) if r.get("run_id")}
+    rows = [row_of(d, today, runs_by_id) for d in dossier.values()]
     rows.sort(key=lambda r: (-r["priority"], -r["days"], r["id"]))
 
     totals: dict = {}

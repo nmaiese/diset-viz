@@ -58,6 +58,20 @@
     .ci.in-corsa { background: #fdf1dc; color: var(--warn); }
     .foot { color: var(--muted); font-size: .78rem; margin-top: 2rem; border-top: 1px solid var(--line); padding-top: .75rem; }
     .live { display: inline-block; width: .5rem; height: .5rem; border-radius: 50%; background: var(--ok); margin-right: .35rem; }
+    #filtro { width: 100%; max-width: 380px; padding: .45rem .65rem; border: 1px solid var(--line);
+      border-radius: 6px; font-size: .85rem; margin-bottom: .7rem; font-family: Inter, system-ui, sans-serif; }
+    .count { color: var(--muted); font-size: .78rem; margin-left: .5rem; }
+    details.ind { border: 1px solid var(--line); border-radius: 6px; background: #fff; margin-bottom: .35rem; }
+    details.ind > summary { cursor: pointer; padding: .5rem .7rem; display: flex; flex-wrap: wrap;
+      gap: .5rem; align-items: center; list-style: none; }
+    details.ind > summary::-webkit-details-marker { display: none; }
+    details.ind[open] > summary { border-bottom: 1px solid var(--line); }
+    .stages { font-family: "Space Mono", monospace; font-size: .75rem; color: var(--muted); }
+    .stages b { color: var(--accent); font-weight: 700; }
+    .pub { margin-left: auto; font-size: .78rem; color: var(--accent); text-decoration: none; white-space: nowrap; }
+    .pub-stale { margin-left: auto; font-size: .72rem; color: var(--warn); white-space: nowrap; }
+    .det { padding: .55rem .7rem .7rem; }
+    .det-meta { color: var(--muted); font-size: .78rem; margin-bottom: .5rem; }
   </style>
 </head>
 <body>
@@ -149,6 +163,52 @@
   </section>
 
   <section>
+    <h2>Tutti gli indicatori <span class="count">({{ board.rows|length }})</span></h2>
+    <input id="filtro" type="text" placeholder="filtra per id, stato, ruolo o bandiera..."
+           oninput="filtraIndicatori()" autocomplete="off">
+    <p class="count" id="conteggio"></p>
+    <div id="indicatori">
+      {% for r in board.rows %}
+      <details class="ind" data-key="{{ (r.id ~ ' ' ~ r.state ~ ' ' ~ (r.next_role or '') ~ ' ' ~ r.flags|join(' '))|lower }}">
+        <summary>
+          <span class="id">{{ r.id }}</span>
+          <span class="state {{ r.state }}">{{ r.state }}</span>
+          <span class="stages">{{ r.completed_stages|join(' &middot; ') or 'nessuno stadio' }}{% if r.next_role %} <b>&rarr; {{ r.next_role }}</b>{% endif %}</span>
+          {% if r.flags %}<span class="flags">{{ r.flags|join(', ') }}</span>{% endif %}
+          <span class="num">prio {{ r.priority }}</span>
+          {% if r.published_url %}<a class="pub" href="{{ r.published_url }}" target="_blank" rel="noopener">pagina pubblicata &#8599;</a>
+          {% elif r.published is false %}<span class="pub-stale">pubblicazione scaduta</span>{% endif %}
+        </summary>
+        <div class="det">
+          <div class="det-meta">
+            entrato {{ r.entered_at or '?' }} &middot; {{ r.days }} giorni &middot;
+            verifica {{ 'valida' if r.verification_valid else 'scaduta' if r.verification_valid is false else 'assente' }}
+            {%- if r.reason %} &middot; {{ r.reason }}{% endif %}
+          </div>
+          {% if r.runs %}
+          <div class="scroll"><table>
+            <tr><th>quando</th><th>stadio</th><th>esito</th><th>durata</th><th>modello</th><th>cosa ha fatto l'agente</th></tr>
+            {% for run in r.runs %}
+            <tr>
+              <td class="mono">{{ run.at[:16] }}</td>
+              <td class="role">{{ run.stage }}</td>
+              <td class="mono">{{ run.outcome }}</td>
+              <td class="num">{% if run.duration_seconds is not none %}{{ run.duration_seconds }}s{% else %}-{% endif %}</td>
+              <td class="mono">{{ run.model or '-' }}</td>
+              <td>{{ run.summary }}</td>
+            </tr>
+            {% endfor %}
+          </table></div>
+          {% else %}
+          <p class="empty">Nessuna run nel diario per questo indicatore (non e' ancora entrato in lavorazione).</p>
+          {% endif %}
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section>
     <h2>Storia recente (dal diario)</h2>
     <div class="scroll"><table>
       <tr><th>quando</th><th>stadio</th><th>esito</th><th>cosa</th></tr>
@@ -170,5 +230,20 @@
     Sorgente: <span class="mono">scripts/pipeline_monitor.py</span>, <span class="mono">app/pipeline_state.py</span>.
   </p>
 </div>
+<script>
+  function filtraIndicatori() {
+    var q = document.getElementById('filtro').value.toLowerCase().trim();
+    var items = document.querySelectorAll('#indicatori .ind');
+    var visibili = 0;
+    for (var i = 0; i < items.length; i++) {
+      var key = items[i].getAttribute('data-key') || '';
+      var mostra = !q || key.indexOf(q) !== -1;
+      items[i].style.display = mostra ? '' : 'none';
+      if (mostra) { visibili++; }
+    }
+    var c = document.getElementById('conteggio');
+    c.textContent = q ? (visibili + ' su ' + items.length + ' indicatori') : '';
+  }
+</script>
 </body>
 </html>
