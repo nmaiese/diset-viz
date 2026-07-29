@@ -252,13 +252,23 @@ python3 scripts/pipeline_monitor.py --json    # per la rotta o un altro programm
 ```
 
 E' servito vivo dalla rotta Flask protetta **`/_pipeline`** (noindex sempre,
-auto-refresh): una headline in testa ("2 indicatori bloccati: ter-X smentita
-aperta da 2 giorni, dem-Y aspetta il produttore da 5"), le sessioni in volo
-adesso, e la sezione **"Tutti gli indicatori"**, una riga espandibile per
-ognuno: stato, avanzamento stadi e prossimo ruolo in riga, e nel dettaglio la
-storia delle run (cosa ha fatto l'agente, esito, durata, modello, e il consumo
-token per step), piu' il link alla pagina pubblicata quando lo e'. Un filtro in
-testa alla sezione cerca per id, stato, ruolo o bandiera.
+auto-refresh che si puo' mettere in pausa). La vista ha tre livelli. In testa ci
+sono la frase di diagnosi e i numeri operativi: correzioni urgenti, azioni
+pronte, sessioni vive, indicatori fusi che aspettano il sito e pubblicazioni
+confermate. Subito sotto ci sono il flusso completo
+**ammissione -> produzione -> verifica -> pubblicazione**, le sessioni e le PR
+vive, e la coda prioritaria.
+
+La sezione **"Tutti gli indicatori"** e' il dossier leggibile. Ogni riga porta
+nome, id, stato, avanzamento nelle quattro fasi, ultima attivita' e una prossima
+azione espressa come gesto con il suo responsabile. Aprendola si vedono il
+percorso completo degli eventi e tutte le run associate, inclusi esito, durata,
+modello, trigger, PR, variazione della coda, token e motivazioni dettagliate.
+Ricerca, filtri per fase, stato e prossimo responsabile, e ordinamenti per
+priorita', attivita', avanzamento o nome permettono di leggere tutto il catalogo
+senza perdere il contesto. Filtri, schede aperte e pausa del refresh restano
+memorizzati nella sessione del browser. La pagina pubblicata e' collegata quando
+esiste una prova valida sul sito.
 Se `PIPELINE_TOKEN` e' impostato serve solo con `?token=` giusto, altrimenti 404
 (non 403: una pagina interna non conferma nemmeno di esistere); vuoto, in locale,
 e' aperta. Si ricalcola a ogni caricamento dai file committati, non da uno stato

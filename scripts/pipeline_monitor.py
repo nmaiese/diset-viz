@@ -27,6 +27,7 @@ disco, cosi' un test lo prova con un dossier sintetico. La CLI e la rotta Flask
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import sys
 from pathlib import Path
@@ -49,6 +50,62 @@ STUCK_STATES = {
     "invalidata": "un input e' cambiato, i passaggi a valle non valgono piu'",
     "in-quarantena": "bloccata terminale, tolta dalla coda",
 }
+
+STAGE_LABELS = {
+    "scout": "Scoperta fonte",
+    "hunter": "Valutazione candidatura",
+    "promoter": "Ammissione nel catalogo",
+    "curator": "Curatela",
+    "writer": "Scrittura",
+    "reviewer": "Rilettura e firma",
+    "producer": "Produzione",
+    "verificatore": "Verifica indipendente",
+    "publisher": "Pubblicazione",
+    "launch": "Lanciatore",
+}
+
+ROLE_LABELS = {
+    "admissions": "ammissione",
+    "producer": "produttore",
+    "verificatore": "verificatore",
+    "publisher": "passo del sito",
+}
+
+
+def _csv_rows(path: Path) -> list:
+    """Legge i manifest del catalogo senza dipendenze dall'app Flask."""
+    try:
+        with path.open(encoding="utf-8-sig", newline="") as stream:
+            return list(csv.DictReader(stream, delimiter=";"))
+    except OSError:
+        return []
+
+
+def indicator_labels(root=None) -> dict:
+    """Nome e famiglia leggibili per ogni id noto al catalogo.
+
+    Il dossier resta la fonte dello stato. Questi manifest aggiungono soltanto
+    il lessico umano che serve alla vista: cercare 379 codici nudi non e'
+    monitoraggio. Tutti i file sono CSV committati e si leggono con la stdlib.
+    """
+    base = Path(root or PROJECT_ROOT)
+    out = {}
+
+    def add(indicator_id, name, family):
+        if indicator_id and name:
+            out[str(indicator_id)] = {"name": str(name), "family": family}
+
+    for row in _csv_rows(base / "app/static/data/external_indicator_manifest.csv"):
+        add(row.get("target_indicator_id"), row.get("target_indicator_name"), "Territoriale")
+    for row in _csv_rows(base / "app/static/data/bes_regione_manifest.csv"):
+        add(f"bes:{row.get('id')}", row.get("name"), "BES")
+    for row in _csv_rows(base / "app/static/data/multiscopo_regione_manifest.csv"):
+        add(f"multiscopo:{row.get('id')}", row.get("name"), "Multiscopo")
+    for row in _csv_rows(base / "data/discovery/curation.csv"):
+        target = row.get("target_indicator_id")
+        family = "Eurostat" if str(target).startswith("eur:") else "Istat"
+        add(target, row.get("name"), family)
+    return out
 
 
 def _reason(d: dict) -> str:
@@ -88,12 +145,111 @@ def _run_history(run_ids, runs_by_id) -> list:
             "at": run.get("at", ""),
             "model": run.get("model", ""),
             "duration_seconds": run.get("duration_seconds"),
+            "detail": list(run.get("detail") or []),
+            "pr": run.get("pr", ""),
+            "trigger": run.get("trigger", ""),
+            "gate": run.get("gate", ""),
+            "queue_before": run.get("queue_before"),
+            "queue_after": run.get("queue_after"),
+            "claude_code_version": run.get("claude_code_version", ""),
         })
     out.sort(key=lambda r: r.get("at", ""), reverse=True)
     return out
 
 
-def row_of(d: dict, today: str = "", runs_by_id: dict = None) -> dict:
+def _next_step(d: dict, ready_stage: str | None) -> dict:
+    """La prossima azione, detta come gesto e proprietario, non come stato."""
+    flags = d.get("flags") or {}
+    state = d.get("state", "")
+    if flags.get("needs_info"):
+        return {"owner": "fonte esterna", "stage": "", "kind": "blocked",
+                "label": "Attendere il chiarimento richiesto alla fonte"}
+    if state == "chiusa" or flags.get("rejected"):
+        return {"owner": "nessuno", "stage": "", "kind": "closed",
+                "label": "Nessuna azione, candidatura chiusa"}
+    if flags.get("open_smentita"):
+        return {"owner": "produttore", "stage": "reviewer", "kind": "attention",
+                "label": "Correggere le affermazioni smentite e firmare di nuovo"}
+    if flags.get("stale_curation"):
+        return {"owner": "produttore", "stage": "curator", "kind": "attention",
+                "label": "Rivedere la curatela sui dati aggiornati"}
+    if flags.get("stale_vintage"):
+        return {"owner": "produttore", "stage": "reviewer", "kind": "attention",
+                "label": "Rileggere e firmare la nuova versione dei dati"}
+    if state == "fusa":
+        return {"owner": "passo del sito", "stage": "publisher", "kind": "publish",
+                "label": "Verificare il deploy e registrare la prova di pubblicazione"}
+    if state == "pubblicata":
+        return {"owner": "monitoraggio", "stage": "", "kind": "done",
+                "label": "Sorvegliare la fonte per nuovi dati o cambi di definizione"}
+    if ready_stage:
+        owner = pipeline_launch.ROLE_OF_STAGE.get(ready_stage) or ready_stage
+        labels = {
+            "promoter": "Ammettere la candidatura nel catalogo",
+            "curator": "Definire verso, categoria e ammissibilita' al punteggio",
+            "writer": "Scrivere l'articolo dell'indicatore",
+            "reviewer": "Rileggere, correggere e firmare l'articolo",
+            "verificatore": "Controllare in modo indipendente tutte le affermazioni",
+        }
+        return {"owner": ROLE_LABELS.get(owner, owner), "stage": ready_stage,
+                "kind": "ready", "label": labels.get(ready_stage, f"Eseguire {ready_stage}")}
+    return {"owner": "monitoraggio", "stage": "", "kind": "waiting",
+            "label": "Controllare gli artefatti: nessun passo lanciabile ricostruito"}
+
+
+def _lifecycle(d: dict, next_step: dict) -> tuple[list, int, str]:
+    """Quattro fasi stabili, dal primo ingresso alla prova sul sito."""
+    completed = set(d.get("completed_stages") or [])
+    required = list(d.get("required_stages") or [])
+    production_required = [s for s in required if s != "verificatore"]
+    has_downstream = bool(completed or d.get("timeline"))
+    admission_done = has_downstream and d.get("state") != "proposta"
+    production_done = bool(production_required) and set(production_required).issubset(completed)
+    verification_done = "verificatore" in completed and d.get("verification_valid") is True
+    publication_done = d.get("published") is True
+    current_stage = next_step.get("stage")
+    current_phase = (
+        "pubblicazione" if current_stage == "publisher" or publication_done else
+        "verifica" if current_stage == "verificatore" or (production_done and not verification_done) else
+        "ammissione" if current_stage == "promoter" or not admission_done else
+        "produzione"
+    )
+    if d.get("state") == "chiusa":
+        current_phase = "chiusa"
+
+    def status(key, done):
+        if key == current_phase and next_step.get("kind") in ("attention", "blocked"):
+            return "issue"
+        if done:
+            return "done"
+        if d.get("state") == "chiusa":
+            return "off"
+        if key == current_phase:
+            return "current"
+        return "pending"
+
+    phases = [
+        {"key": "ammissione", "label": "Ammissione", "status": status("ammissione", admission_done)},
+        {"key": "produzione", "label": "Produzione", "status": status("produzione", production_done)},
+        {"key": "verifica", "label": "Verifica", "status": status("verifica", verification_done)},
+        {"key": "pubblicazione", "label": "Pubblicazione", "status": status("pubblicazione", publication_done)},
+    ]
+    done_count = sum(p["status"] == "done" for p in phases)
+    return phases, done_count * 25, current_phase
+
+
+def _last_activity(timeline: list, runs: list) -> dict:
+    candidates = [
+        {"at": event.get("at", ""), "label": event.get("detail", ""),
+         "stage": event.get("stage", "")}
+        for event in timeline if event.get("at")
+    ]
+    candidates.extend({"at": run.get("at", ""), "label": run.get("summary", ""),
+                       "stage": run.get("stage", "")} for run in runs if run.get("at"))
+    return max(candidates, key=lambda item: item["at"]) if candidates else {}
+
+
+def row_of(d: dict, today: str = "", runs_by_id: dict = None, labels: dict = None) -> dict:
     """La riga di monitoraggio di un indicatore, dal suo dossier.
 
     Con `runs_by_id` (le run collassate indicizzate per run_id) la riga porta
@@ -101,13 +257,27 @@ def row_of(d: dict, today: str = "", runs_by_id: dict = None) -> dict:
     che hanno toccato l'indicatore: cosi' il cruscotto puo' aprire un dettaglio
     per-indicatore senza un secondo giro sul diario."""
     stage = practice_timeline.ready_stage(d)
+    next_step = _next_step(d, stage)
+    lifecycle, progress, phase = _lifecycle(d, next_step)
+    runs = _run_history(d.get("runs"), runs_by_id)
+    timeline = [dict(event, stage_label=STAGE_LABELS.get(event.get("stage"), event.get("stage", "")))
+                for event in (d.get("timeline") or [])]
+    label = (labels or {}).get(d["id"], {})
     return {
         "id": d["id"],
+        "name": label.get("name") or d["id"],
+        "family": label.get("family") or (str(d["id"]).split(":", 1)[0].upper()
+                                             if ":" in str(d["id"]) else "Territoriale"),
         "type": d.get("type", ""),
         "state": d.get("state", ""),
         "entered_at": d.get("entered_at", ""),
         "days": _days(d.get("entered_at", ""), today),
         "next_role": pipeline_launch.ROLE_OF_STAGE.get(stage) if stage else None,
+        "next_stage": stage,
+        "next_step": next_step,
+        "phase": phase,
+        "progress": progress,
+        "lifecycle": lifecycle,
         "priority": round(float(d.get("priority", 0.0) or 0.0), 1),
         "error_class": d.get("error_class"),
         "flags": sorted(k for k, v in (d.get("flags") or {}).items() if v is True),
@@ -115,7 +285,11 @@ def row_of(d: dict, today: str = "", runs_by_id: dict = None) -> dict:
         "completed_stages": list(d.get("completed_stages") or []),
         "published": d.get("published"),
         "verification_valid": d.get("verification_valid"),
-        "runs": _run_history(d.get("runs"), runs_by_id),
+        "runs": runs,
+        "timeline": timeline,
+        "last_activity": _last_activity(timeline, runs),
+        "required_stages": list(d.get("required_stages") or []),
+        "score_eligible": bool(d.get("score_eligible")),
     }
 
 
@@ -124,14 +298,12 @@ def headline(rows: list, today: str = "") -> str:
     stuck = [r for r in rows if r["state"] in STUCK_STATES]
     if stuck:
         stuck.sort(key=lambda r: (-r["days"], r["id"]))
-        parts = []
-        for r in stuck[:3]:
-            when = f" da {r['days']} giorni" if r["days"] else ""
-            parts.append(f"{r['id']} {r['reason']}{when}")
-        more = f", e altri {len(stuck) - 3}" if len(stuck) > 3 else ""
+        top = stuck[0]
+        when = f" da {top['days']} giorni" if top["days"] else ""
         n = len(stuck)
-        return (f"{n} indicatore bloccato: " if n == 1 else f"{n} indicatori bloccati: ") \
-            + "; ".join(parts) + more
+        prefix = f"{n} indicatore bloccato." if n == 1 else f"{n} indicatori bloccati."
+        more = f" Altri {n - 1} sono elencati nelle priorita'." if n > 1 else ""
+        return f"{prefix} Prima priorita': {top['id']}, {top['reason']}{when}.{more}"
     ready = [r for r in rows if r["next_role"]]
     if ready:
         top = ready[0]
@@ -141,7 +313,7 @@ def headline(rows: list, today: str = "") -> str:
 
 
 def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
-          recent: int = 12, open_runs=None) -> dict:
+          recent: int = 12, open_runs=None, labels=None) -> dict:
     """Il cruscotto intero, dai soli artefatti gia' letti. Puro.
 
     `dossier` e' l'uscita di `practice_timeline`. `runs` sono le run gia'
@@ -153,7 +325,7 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
     totali per stato.
     """
     runs_by_id = {r.get("run_id"): r for r in (runs or []) if r.get("run_id")}
-    rows = [row_of(d, today, runs_by_id) for d in dossier.values()]
+    rows = [row_of(d, today, runs_by_id, labels=labels) for d in dossier.values()]
     rows.sort(key=lambda r: (-r["priority"], -r["days"], r["id"]))
 
     totals: dict = {}
@@ -162,14 +334,46 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
 
     recent_runs = sorted((runs or []), key=lambda run: run.get("at", ""), reverse=True)[:recent]
 
+    in_flight = sorted(heartbeats or [], key=lambda h: h.get("since", ""))
+    open_items = sorted(open_runs or [], key=lambda p: (p.get("pr") or 0))
+    beats_by_indicator = {}
+    for beat in in_flight:
+        if beat.get("indicator"):
+            beats_by_indicator.setdefault(beat["indicator"], []).append(beat)
+    prs_by_run = {item.get("run_id"): item for item in open_items if item.get("run_id")}
+    for row in rows:
+        row["in_flight"] = beats_by_indicator.get(row["id"], [])
+        run_ids = {run.get("run_id") for run in row.get("runs", [])}
+        run_ids.update(beat.get("run_id") for beat in row["in_flight"])
+        row["open_prs"] = [prs_by_run[rid] for rid in run_ids if rid in prs_by_run]
+
+    phase_totals = {}
+    for row in rows:
+        phase_totals[row["phase"]] = phase_totals.get(row["phase"], 0) + 1
+    attention = [r for r in rows if r["next_step"]["kind"] in ("attention", "blocked")]
+    site_steps = [r for r in rows if r["next_step"]["kind"] == "publish"]
+    actionable = [r for r in rows if r["next_step"]["kind"] in ("attention", "ready", "publish")]
+
     return {
         "headline": headline(rows, today),
         "totals": totals,
         "stuck": [r for r in rows if r["state"] in STUCK_STATES],
         "ready": [r for r in rows if r["next_role"]],
+        "actionable": actionable,
+        "attention": attention,
+        "site_steps": site_steps,
         "rows": rows,
-        "in_flight": sorted(heartbeats or [], key=lambda h: h.get("since", "")),
-        "open_runs": sorted(open_runs or [], key=lambda p: (p.get("pr") or 0)),
+        "in_flight": in_flight,
+        "open_runs": open_items,
+        "phase_totals": phase_totals,
+        "metrics": {
+            "indicators": len(rows),
+            "attention": len(attention),
+            "actionable": len(actionable),
+            "in_flight": len(in_flight),
+            "published": sum(r["published"] is True for r in rows),
+            "waiting_site": len(site_steps),
+        },
         "recent": [{"at": run.get("at", ""), "stage": run.get("stage", ""),
                     "outcome": run.get("outcome", ""), "summary": run.get("summary", ""),
                     "run_id": run.get("run_id", "")} for run in recent_runs],
@@ -306,7 +510,7 @@ def load_board(today: str = "", proofs_root=None, recent: int = 12,
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
     beats = read_heartbeats(now=ref) if heartbeats is None else heartbeats
     return board(dossier, runs=runs, heartbeats=beats, today=ref, recent=recent,
-                 open_runs=open_runs)
+                 open_runs=open_runs, labels=indicator_labels())
 
 
 def main(argv=None) -> int:

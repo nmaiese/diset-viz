@@ -79,6 +79,22 @@ class PipelineDashboardRoute(unittest.TestCase):
         self.assertIn("cosa ha fatto l'agente", body)
         self.assertIn('details class="ind"', body)
 
+    def test_it_exposes_the_whole_indicator_journey_and_next_action(self):
+        body = self._client().get("/_pipeline").get_data(as_text=True)
+        self.assertIn("Il flusso completo", body)
+        self.assertIn("Ammissione", body)
+        self.assertIn("Produzione", body)
+        self.assertIn("Verifica", body)
+        self.assertIn("Pubblicazione", body)
+        self.assertIn("Prossima azione", body)
+        self.assertIn("Percorso completo", body)
+        self.assertIn("Attività più recente", body)
+
+    def test_it_shows_readable_indicator_names_not_only_internal_ids(self):
+        body = self._client().get("/_pipeline").get_data(as_text=True)
+        self.assertIn("Produttività del lavoro in agricoltura", body)
+        self.assertIn('data-id="1"', body)
+
     def test_a_published_indicator_links_to_its_page(self):
         # Costruito dai file veri: se un indicatore risulta pubblicato sul sito,
         # la sua riga porta il link canonico alla pagina; se nessuno lo e', il
