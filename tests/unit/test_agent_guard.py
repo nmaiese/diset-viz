@@ -24,7 +24,7 @@ class CommandVerdictTests(unittest.TestCase):
 
     def test_env_prefix_is_not_the_command(self):
         ok, _ = agent_guard.command_verdict(
-            "DI_PIPELINE_TRIGGER=dispatch python3 scripts/pipeline_log.py --write",
+            "DI_PIPELINE_TRIGGER=launch python3 scripts/pipeline_log.py --write",
             ["writer"])
         self.assertTrue(ok)
 

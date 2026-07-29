@@ -199,11 +199,10 @@ def load_proofs(root=None) -> list:
 # regola di prudenza invece di ricordarla. Il perimetro dello stadio
 # (`data/pipeline/pubblicazioni/`) vive in `pipeline_gate.STAGE_PATHS`.
 #
-# **Lo stadio e' agganciato ma spento.** Non e' in `pipeline_status.STAGE_ORDER`,
-# quindi il dispatcher non lo lancia: la macchina e' pronta, l'interruttore no,
-# esattamente come per la preemption per priorita'. Accenderlo (aggiungere
-# `publisher` all'ordine di catena, o farne un passo del dispatcher dopo il
-# deploy) e' la riga operativa del cutover, dopo il confronto delle metriche.
+# **Lo stadio e' agganciato e acceso.** Non e' in `pipeline_status.STAGE_ORDER`
+# perche' non e' uno stadio dell'ordine di catena: e' il passo del sito del
+# lanciatore, che lo esegue a ogni tick con `pipeline_launch.py --publish` dopo il
+# deploy. Committa la prova da se', fuori da una PR e da questo passo di merge.
 
 
 def publication_queue(dossier=None, today: str = "", proofs_root=None) -> list:
@@ -225,9 +224,10 @@ def publication_queue(dossier=None, today: str = "", proofs_root=None) -> list:
 def stage_report(proofs_root=None) -> dict:
     """La coda del publisher nella forma di `pipeline_status`.
 
-    Pronta per il giorno in cui il cutover aggiunge `publisher` all'ordine di
-    catena: fino ad allora nessuno la chiama nel giro del dispatcher, che legge
-    solo `STAGE_ORDER`.
+    Il publisher non e' uno stadio dell'ordine di catena (`STAGE_ORDER`): e' il
+    passo del sito del lanciatore. Questa vista la leggono a parte
+    `pipeline_status --json` e il cruscotto, cosi' un indicatore fuso in attesa
+    del deploy non resta invisibile.
     """
     queue = publication_queue(proofs_root=proofs_root)
     n = len(queue)
@@ -301,7 +301,7 @@ def verify_one(indicator, base=DEFAULT_BASE, slug="", level=None,
     return result
 
 
-# --- il passo del sito, meccanico e post-deploy (era nel dispatcher) ---------
+# --- il passo del sito, meccanico e post-deploy (passo del lanciatore) -------
 #
 # La verifica `fusa -> pubblicata` non e' uno stadio con un agente: e'
 # deterministica, non apre pull request e non lancia una sessione. E non puo'

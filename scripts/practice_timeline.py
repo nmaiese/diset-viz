@@ -526,9 +526,9 @@ def _dossier_to_record(d: dict) -> dict:
 # --- Fase F: la priorita' della pratica, mappata sullo stadio pronto ---------
 
 def ready_stage(d: dict) -> str | None:
-    """Lo stadio su cui una pratica sta aspettando, o None se non e' dispatchabile.
+    """Lo stadio su cui una pratica sta aspettando, o None se non e' lanciabile.
 
-    E' il ponte fra la priorita' della pratica (§11) e il dispatcher, che nomina
+    E' il ponte fra la priorita' della pratica (§11) e il lanciatore, che nomina
     uno stadio: una smentita aspetta il revisore, una curatela scaduta il
     curatore, una rilettura il revisore, una proposta il promotore. Bloccata,
     in quarantena, chiusa o pubblicata non hanno uno stadio che le muova.
@@ -555,7 +555,7 @@ def ready_stage(d: dict) -> str | None:
 def stage_priorities(dossier: dict) -> dict:
     """`{stadio: priorita' massima di una pratica pronta su quello stadio}`.
 
-    E' cio' che il dispatcher consulta, in modalita' priorita' (Fase F), per non
+    E' cio' che il lanciatore consulta, in modalita' priorita' (Fase F), per non
     far aspettare una correzione urgente dietro una coda di candidature nuove.
     """
     out = {}

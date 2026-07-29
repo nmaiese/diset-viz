@@ -119,5 +119,63 @@ class PlanLaunches(unittest.TestCase):
         self.assertEqual(plan, [])
 
 
+class TheLaunchTick(unittest.TestCase):
+    """Il battito del lanciatore: uno shard `launch` per tick, portato su master
+    con un runner iniettato, mai un git vero. Senza questo battito una Routine a
+    vuoto e' indistinguibile da una che non e' mai partita, che e' il guasto che
+    il diario esiste per non avere."""
+
+    def _tick(self, tmp, **kwargs):
+        from pathlib import Path
+
+        from scripts import pipeline_log
+
+        original = pipeline_log.RUNS_DIR
+        pipeline_log.RUNS_DIR = Path(tmp)
+        try:
+            entry = pipeline_launch.log_tick(
+                [{"role": "producer"}], {"prove_scritte": 3},
+                log=lambda *_: None, **kwargs)
+            shards = list(Path(tmp).glob("launch-*.json"))
+        finally:
+            pipeline_log.RUNS_DIR = original
+        return entry, shards
+
+    def test_the_tick_builds_a_launch_shard_and_lands_it(self):
+        import tempfile
+
+        calls = []
+
+        def fake_runner(cmd, cwd=None, env=None):
+            calls.append(cmd)
+            return 0, "deadbeef\n"
+
+        with tempfile.TemporaryDirectory() as tmp:
+            entry, shards = self._tick(tmp, runner=fake_runner)
+
+        self.assertEqual(entry["stage"], "launch")
+        self.assertEqual(entry["outcome"], "nothing")
+        self.assertEqual(entry["trigger"], "routine")
+        self.assertEqual(len(shards), 1)  # uno shard, mai un registro unico
+        # ha provato a portarlo su master, e solo attraverso il runner iniettato
+        self.assertTrue(any(c[:2] == ["git", "push"] for c in calls))
+        self.assertTrue(any("commit-tree" in c for c in calls))
+
+    def test_without_commit_it_writes_the_shard_but_touches_no_git(self):
+        import tempfile
+
+        calls = []
+
+        def fake_runner(*a, **k):
+            calls.append(a)
+            return 0, ""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            _, shards = self._tick(tmp, runner=fake_runner, do_commit=False)
+
+        self.assertEqual(len(shards), 1)
+        self.assertEqual(calls, [])  # do_commit=False: nessuna chiamata a git
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -298,8 +298,9 @@ def queue_sizes(stages=None):
     """`{stadio: quanti in attesa}`, con None dove la coda non si e' contata.
 
     La forma piu' piccola dello stato, per chi deve solo decidere. La usano il
-    dispatcher, per scegliere lo stadio da lanciare, e `pipeline_log.silence`,
-    per non segnalare fermo uno stadio che tace perche' non ha niente da fare.
+    lanciatore (`pipeline_launch`), per prioritizzare i lanci, e
+    `pipeline_log.silence`, per non segnalare fermo uno stadio che tace perche'
+    non ha niente da fare.
     """
     return {entry["stage"]: entry["waiting"] for entry in build_status(stages)["stages"]}
 
@@ -338,7 +339,23 @@ def main():
     args = parser.parse_args()
 
     status = build_status([args.stage] if args.stage else None)
+
+    # La coda del publisher (fusa -> pubblicata) vive fuori da STAGE_ORDER: il
+    # publisher non e' uno stadio dell'ordine di catena, e' il passo del sito del
+    # lanciatore. La superficie qui, a parte, cosi' un indicatore fuso in attesa
+    # del deploy non resta invisibile, senza aggiungerlo a build_status /
+    # queue_sizes (dove romperebbe il guardrail "publisher fuori da STAGE_ORDER").
+    # Import pigro e difensivo: su un checkout freddo il view model puo' fallire.
+    try:
+        from scripts import verify_publication
+
+        publication = verify_publication.stage_report()
+    except Exception:
+        publication = None
+
     if args.json:
+        if publication is not None:
+            status["publication"] = publication
         print(json.dumps(status, ensure_ascii=False, indent=2))
         return 0
 
@@ -349,6 +366,11 @@ def main():
         shown = "?" if waiting is None else str(waiting)
         print(f" {mark} {entry['stage']:9s} {entry['agent']:19s} in attesa: {shown:<5s} {entry['next']}")
     print()
+    if publication is not None:
+        n = publication["waiting"]
+        print(f"Coda publisher (fusa -> pubblicata): "
+              + (f"{n} indicatori da verificare sul sito." if n
+                 else "vuota, ogni indicatore fuso ha una prova valida."))
     if status["unknown_stages"]:
         print("Code non contate (il totale le esclude): "
               + ", ".join(status["unknown_stages"]))

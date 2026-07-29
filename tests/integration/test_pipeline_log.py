@@ -340,10 +340,10 @@ class TwoRunsNeverWriteTheSameFile(unittest.TestCase):
         self.assertEqual(collapsed[0]["outcome"], "merged")
 
 
-class SilenceMeansSomethingElseNowThatTheDispatcherAssignsTheWork(unittest.TestCase):
+class SilenceMeansSomethingElseNowThatTheLauncherAssignsTheWork(unittest.TestCase):
     """Uno stadio che tace perche' non ha niente da fare sta rispondendo.
 
-    Con sei cron, il silenzio del curatore era un ritardo. Con il dispatcher e'
+    Con sei cron, il silenzio del curatore era un ritardo. Con il lanciatore e'
     la risposta giusta a una coda vuota, e segnalarlo come guasto e' il modo
     piu' sicuro di insegnare a ignorare gli avvisi.
     """
@@ -374,13 +374,13 @@ class SilenceMeansSomethingElseNowThatTheDispatcherAssignsTheWork(unittest.TestC
         rows = pipeline_log.silence([self.entry("curator", 40)])
         self.assertTrue(self.group(rows, "curatore")["stale"])
 
-    def test_the_dispatcher_is_judged_on_its_heartbeat_and_nothing_else(self):
+    def test_the_launcher_is_judged_on_its_heartbeat_and_nothing_else(self):
         """Non ha una coda: quando tace, e' lui a non essere partito, e non c'e'
-        niente da interpretare."""
-        rows = pipeline_log.silence([self.entry("dispatch", 9)],
+        niente da interpretare. Il suo battito e' il tick `launch`."""
+        rows = pipeline_log.silence([self.entry("launch", 9)],
                                     queues={s: 0 for s in pipeline_log.STAGES})
-        self.assertTrue(self.group(rows, "dispatcher")["stale"])
-        self.assertIsNone(self.group(rows, "dispatcher")["waiting"])
+        self.assertTrue(self.group(rows, "lanciatore")["stale"])
+        self.assertIsNone(self.group(rows, "lanciatore")["waiting"])
 
 
 class ABrokenShardLeavesAMarkInsteadOfVanishing(unittest.TestCase):
