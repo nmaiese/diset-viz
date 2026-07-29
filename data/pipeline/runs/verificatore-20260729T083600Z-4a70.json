@@ -1,0 +1,27 @@
+{
+ "at": "2026-07-29T08:54:27+00:00",
+ "base_commit": "37ac00d",
+ "branch": "automation/verificatore-2026-07-29-4a70",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "6482779",
+ "detail": [
+  "Impronta prosa 49781291eb1a81db (la verifica del 2026-07-27, impronta 831617d415e01bd3, era scaduta: PR #74 ha riscritto il quadro). Perimetro pulito, 1 file, verifiche credibili secondo il cancello.",
+  "Serie: Eurostat rd_e_gerdreg, sectperf=TOTAL, unit=PC_GDP, 2019-2023, 20 regioni, 100 righe, completeness 1.0, nessun flag di rottura 'b' sulle regioni italiane nel fixture. 2024 pubblicato ma vuoto per l'Italia, quindi 2023 e' davvero l'ultimo anno.",
+  "Smentita precedente chiusa e riverificata: 'quattro regioni del Nord ne concentrano quasi il 60%' e' diventato 'Lombardia insieme a Lazio, Emilia-Romagna e Piemonte arriva a quasi il 60%'. Istat, La ricerca e sviluppo in Italia: 'Oltre meta' della spesa totale in R&S (il 59,8%, pari a circa 17,6 miliardi di euro), e' geograficamente concentrata in Lombardia, Lazio, Emilia-Romagna e Piemonte'. Lombardia 20,0% del totale, cioe' 'circa un quinto'. Confermata.",
+  "Classifica 2023 ricontrollata posizione per posizione: stacco 0,29 dopo il #2 (2,09 Piemonte/Emilia-Romagna -> 1,80 Lazio), 0,25 dopo il #4 (1,69 Friuli-Venezia Giulia -> 1,44 Liguria), dal #7 al #17 undici regioni in 0,42 punti (1,20 Campania/Veneto -> 0,78 Molise), Campania #7 e Sicilia #12 davanti a Marche #13 e Umbria #14, Campania 1,20 pari merito col Veneto. Tutte confermate.",
+  "Dinamica 2019-2023 ricalcolata sui valori grezzi: 12 regioni in calo, 7 in salita (4 nel Mezzogiorno: Abruzzo, Puglia, Calabria, Sicilia), Basilicata 0,64 = 0,64 esatto. Molise -0,38 (1,16 -> 0,78), Toscana -0,24, Piemonte e Veneto -0,18, Sicilia +0,14, Calabria +0,07, Abruzzo e Valle d'Aosta +0,04, Emilia-Romagna, Friuli-Venezia Giulia e Puglia +0,01. Divario 1,78 -> 1,56 = 0,22. Tutte confermate.",
+  "Esterne verificate presso l'istituzione: Eurostat ddn-20241211-2 'R&D intensity ... remained stable compared with 2022 (2.2%)' e cinque paesi sopra il 3% (confermata, e 2,09 < 2,2 per entrambe le regioni di testa). Eurostat Statistics Explained R&D expenditure: quattro settori esecutori e 'Expenditure data covers the research performed on the national territory, regardless of the source of funds' (confermata la definizione). Istat conti economici territoriali: Lombardia 23,0% del PIL nazionale, la piu' alta, quindi 'il PIL piu' alto del Paese' e' confermato e 20,0/23,0 spiega l'1,19% di intensita'.",
+  "Al limite ma confermata: 'la media delle venti regioni ha perso 0,07 punti dal 2019'. Il valore esatto e' 1,2315 -> 1,1665, cioe' 0,0650, che arrotonda a 0,07 per eccesso mentre il brief stampa 0,06 sottraendo medie gia' arrotondate (1,23 - 1,17). La cifra dell'articolo e' piu' precisa di quella del brief, non sbagliata.",
+  "BLOCCATO da tre test che appuntano proprio questo indicatore sullo stato precedente alla verifica: tests/integration/test_editorial_practice_e2e.py Observability.test_eur_history_then_refutation_closed, MaintenanceCycles.test_eur_has_two_linked_cycles, Reconciler.test_write_then_check_and_a_single_declared_divergence. Tutti e tre asseriscono state == 'in-lavorazione' su PINNED_EUR = 'eur:rd_e_gerdreg'. La mia verifica lo porta legittimamente a 'fusa', con verificatore in completed_stages e verification_valid True. I test sono fuori dal mio perimetro e non li tocco: serve un umano che sposti PINNED_EUR su un indicatore non ancora verificato o su una fixture sintetica.",
+  "Osservazione per il curatore, non una smentita: Eurostat non pubblica un NUTS2 'Trentino Alto Adige', pubblica ITH1 Bolzano (0,65 nel 2023) e ITH2 Trento (1,59). Il nostro layer ne fa la media semplice, (0,65+1,59)/2 = 1,12, che non e' il rapporto spesa/PIL della regione perche' non e' ponderato per il PIL. Nessuna affermazione dell'articolo cade (Trentino e' #10, non fa da estremo a nessun intervallo citato, e l'effetto sulla media delle venti e' sotto 0,002), ma il valore mostrato in pagina resta un costrutto."
+ ],
+ "gate": "blocked",
+ "outcome": "blocked",
+ "pr": "",
+ "queue_after": 32,
+ "queue_before": 33,
+ "run_id": "verificatore-20260729T083600Z-4a70",
+ "stage": "verificatore",
+ "summary": "eur-rd_e_gerdreg riverificato dopo la riscrittura: 36 affermazioni controllate, 36 confermate, 0 smentite, esito pulito. Il cancello blocca sulla suite, non sul mio lavoro.",
+ "trigger": "launch"
+}
