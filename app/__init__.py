@@ -4,6 +4,7 @@ from flask import Flask, jsonify, redirect, render_template, request
 from flask_compress import Compress
 
 from app import config
+from app import agent_discovery
 from app.cache import cache
 
 app = Flask(__name__, static_url_path="/static")
@@ -29,11 +30,13 @@ def redirect_www_to_apex():
     return redirect(target_url, code=301)
 
 
-_NOINDEX_EXACT_PATHS = {"/data", "/legacy", "/legacy-reddito", "/quiz/classifica"}
+_NOINDEX_EXACT_PATHS = {
+    "/data", "/legacy", "/legacy-reddito", "/quiz/classifica", "/openapi.json",
+}
 # `/_pipeline` e' il cruscotto interno della catena editoriale: noindex sempre,
 # e protetto da token nella view. L'underscore iniziale lo tiene fuori dallo
 # spazio delle URL pubbliche gia' per convenzione.
-_NOINDEX_PATH_PREFIXES = ("/api/", "/download/", "/_pipeline")
+_NOINDEX_PATH_PREFIXES = ("/api/", "/download/", "/_pipeline", "/.well-known/")
 
 
 def _build_content_security_policy():
@@ -75,6 +78,18 @@ def add_security_headers(response):
         # /indicatore/* before 2026-07-12) with nothing in our own responses to
         # override it.
         response.headers["X-Robots-Tag"] = "index, follow, max-snippet:-1, max-image-preview:large"
+
+    # Every HTML page exposes the same machine-readable entry points. Relative
+    # targets survive the apex/www redirect and local test hosts, while the
+    # registered relations remain parseable without inspecting the markup.
+    if response.status_code == 200 and (request.path == "/" or response.mimetype == "text/html"):
+        for link_value in agent_discovery.discovery_link_values():
+            response.headers.add("Link", link_value)
+
+    # Both variants must carry Vary, including cached HTML. Markdown responses
+    # already set it in their constructor, but adding the value is idempotent.
+    if response.status_code == 200 and agent_discovery.markdown_available(request.path):
+        response.vary.add("Accept")
     return response
 
 

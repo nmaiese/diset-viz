@@ -38,6 +38,7 @@ from app import leaderboard
 from app import moderation
 from app import public_urls
 from app import publisher
+from app import agent_discovery
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -79,17 +80,26 @@ _HOME_COMPARE_COLORS = ("var(--ink)", "var(--accent)", "var(--positive-ink)")
 PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
     "site_url": "https://divarioitalia.it",
     "index_header": "index, follow, max-snippet:-1, max-image-preview:large",
+    "machine_header": "noindex, nofollow, noarchive",
+    "link_relations": ("api-catalog", "service-doc", "service-desc"),
     "pages": (
         {"path": "/robots.txt", "content_type": "text/plain", "marker": "User-agent: *", "kind": "robots"},
         {"path": "/sitemap.xml", "content_type": "application/xml", "marker": "<urlset", "kind": "document"},
         {"path": "/llms.txt", "content_type": "text/plain", "marker": "# Divario Italia", "kind": "document"},
         {"path": "/llms-full.txt", "content_type": "text/plain", "marker": "# Divario Italia", "kind": "document"},
-        {"path": "/", "content_type": "text/html", "marker": "Un atlante per leggere l'Italia", "kind": "html"},
-        {"path": "/atlante", "content_type": "text/html", "marker": "Atlante degli indicatori territoriali italiani", "kind": "html"},
-        {"path": "/blog", "content_type": "text/html", "marker": "Analisi brevi e basate sui dati", "kind": "html"},
-        {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html"},
-        {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html"},
-        {"path": "/tema/lavoro-e-conciliazione", "content_type": "text/html", "marker": "page-theme", "kind": "html"},
+        {"path": "/.well-known/api-catalog", "content_type": "application/linkset+json", "marker": "\"linkset\"", "kind": "document", "x_robots": "noindex, nofollow, noarchive"},
+        {"path": "/openapi.json", "content_type": "application/json", "marker": "\"openapi\"", "kind": "document", "x_robots": "noindex, nofollow, noarchive"},
+        {"path": "/.well-known/agent-skills/index.json", "content_type": "application/json", "marker": "\"skills\"", "kind": "document", "x_robots": "noindex, nofollow, noarchive"},
+        {"path": "/.well-known/agent-skills/query-divario-italia/SKILL.md", "content_type": "text/markdown", "marker": "# Consultare Divario Italia", "kind": "document", "x_robots": "noindex, nofollow, noarchive"},
+        {"path": "/", "content_type": "text/html", "marker": "Un atlante per leggere l'Italia", "kind": "html", "markdown_marker": "# Divario Italia"},
+        {"path": "/atlante", "content_type": "text/html", "marker": "Atlante degli indicatori territoriali italiani", "kind": "html", "markdown_marker": "# Atlante degli indicatori territoriali italiani"},
+        {"path": "/catalogo-dati", "content_type": "text/html", "marker": "Catalogo dati di Divario Italia", "kind": "html", "markdown_marker": "# Catalogo dati di Divario Italia"},
+        {"path": "/blog", "content_type": "text/html", "marker": "Analisi brevi e basate sui dati", "kind": "html", "markdown_marker": "# Storie dai dati"},
+        {"path": "/blog/pil-pro-capite-regioni-divario-2024", "content_type": "text/html", "marker": "PIL pro capite per regione", "kind": "html", "markdown_marker": "# PIL pro capite per regione"},
+        {"path": "/metodologia", "content_type": "text/html", "marker": "Metodologia e fonti", "kind": "html", "markdown_marker": "# Metodologia e fonti"},
+        {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html", "markdown_marker": "# Tasso di turisticità"},
+        {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html", "markdown_marker": "# Lombardia: profilo territoriale"},
+        {"path": "/tema/lavoro-e-conciliazione", "content_type": "text/html", "marker": "page-theme", "kind": "html", "markdown_marker": "# Lavoro e conciliazione"},
     ),
     "robots": {
         "shared_disallow": ("/api/", "/data", "/legacy", "/legacy-reddito"),
@@ -230,13 +240,20 @@ def data():
 
 
 @app.route("/")
-@cache.cached(timeout=300, query_string=True)
+@cache.cached(timeout=300, query_string=True, unless=agent_discovery.prefers_markdown)
 def home():
     # The federated catalog, not the territorial family alone: the themes below
     # already aggregate every source, so counting one family here made the same
     # page show two different sizes for the same catalog.
     summary = catalog_summary()
     total_indicators = summary["total"]
+    featured = _home_featured_indicator_links()
+    recent_posts = get_posts()[:3]
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.home_markdown(summary, featured, recent_posts, SITE_URL),
+            f"{SITE_URL}/",
+        )
     return render_template(
         "home.html",
         site_url=SITE_URL,
@@ -253,18 +270,24 @@ def home():
         compare_preview=_home_compare_preview(),
         qol=_home_qol_preview(),
         quiz_games=_home_quiz_games(),
-        posts=get_posts()[:3],
+        posts=recent_posts,
     )
 
 
 @app.route("/atlante")
-@cache.cached(timeout=300)
+@cache.cached(timeout=300, unless=agent_discovery.prefers_markdown)
 def atlante():
-    return render_template('app.html', featured_indicators=_home_featured_indicator_links())
+    featured = _home_featured_indicator_links()
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.atlas_markdown(featured, SITE_URL),
+            f"{SITE_URL}/atlante",
+        )
+    return render_template('app.html', featured_indicators=featured)
 
 
 @app.route("/catalogo-dati")
-@cache.cached(timeout=300)
+@cache.cached(timeout=300, unless=agent_discovery.prefers_markdown)
 def data_catalog():
     """Indexable, human-readable inventory behind the DataCatalog entity.
 
@@ -288,6 +311,11 @@ def data_catalog():
         "Catalogo pubblico degli indicatori territoriali di Divario Italia, "
         "con schede, fonti e serie scaricabili."
     )
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.data_catalog_markdown(datasets, description, SITE_URL),
+            f"{SITE_URL}/catalogo-dati",
+        )
     catalog_jsonld = {
         "@context": "https://schema.org",
         "@type": "DataCatalog",
@@ -370,6 +398,41 @@ def legacy_reddito():
 @app.route("/api/catalog")
 def catalog():
     return jsonify(get_atlas_catalog())
+
+
+@app.route("/.well-known/api-catalog")
+def api_catalog_discovery():
+    """RFC 9727 Linkset for the deliberately small public data contract."""
+    response = jsonify(agent_discovery.api_catalog_document(SITE_URL))
+    response.headers["Content-Type"] = agent_discovery.api_catalog_content_type()
+    response.headers.add(
+        "Link",
+        f'<{SITE_URL}/openapi.json>; rel="service-desc"; '
+        'type="application/vnd.oai.openapi+json;version=3.1"',
+    )
+    response.headers.add(
+        "Link",
+        f'<{SITE_URL}/catalogo-dati>; rel="service-doc"; type="text/html"',
+    )
+    return response
+
+
+@app.route("/openapi.json")
+def openapi_spec():
+    return jsonify(agent_discovery.openapi_document(SITE_URL))
+
+
+@app.route("/.well-known/agent-skills/index.json")
+def agent_skills_index():
+    return jsonify(agent_discovery.skill_index_document(SITE_URL))
+
+
+@app.route("/.well-known/agent-skills/query-divario-italia/SKILL.md")
+def divario_agent_skill():
+    return Response(
+        agent_discovery.skill_text(),
+        content_type="text/markdown; charset=utf-8",
+    )
 
 
 @app.route("/api/external-indicators/manifest")
@@ -664,9 +727,15 @@ def analytics_event():
 
 @app.route("/blog")
 def blog_index():
+    posts = get_posts()
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.blog_index_markdown(posts, SITE_URL),
+            f"{SITE_URL}/blog",
+        )
     return render_template(
         "blog_list.html",
-        posts=get_posts(),
+        posts=posts,
         tags=all_tags(),
         site_url=SITE_URL,
         site_name=SITE_NAME,
@@ -686,6 +755,11 @@ def blog_post(slug):
             meta = indicator_payload["metadata"]
             post["indicator_path"] = meta["path"]
             post["indicator_meta"] = meta
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.blog_post_markdown(post, SITE_URL),
+            post["url"],
+        )
     related = [p for p in get_posts() if p["slug"] != slug][:3]
     return render_template(
         "blog_post.html",
@@ -719,6 +793,13 @@ def about():
 
 @app.route("/metodologia")
 def methodology():
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.methodology_markdown(
+                SITE_URL, sources.LICENSE_LABEL, sources.LICENSE_URL,
+            ),
+            f"{SITE_URL}/metodologia",
+        )
     return render_template(
         "methodology.html",
         site_url=SITE_URL,
@@ -792,6 +873,15 @@ def _render_indicator(family, raw_id):
     explore_state = seo_policy.has_explore_params(request.args)
     noindex = (not meta["indexable"]) or explore_state
 
+    if agent_discovery.prefers_markdown():
+        response = agent_discovery.markdown_response(
+            agent_discovery.indicator_markdown(meta, level, article, SITE_URL),
+            f"{SITE_URL}{meta['canonical_path']}",
+        )
+        if noindex:
+            response.headers["X-Robots-Tag"] = "noindex, follow"
+        return response
+
     response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
@@ -833,6 +923,11 @@ def region_page(region_key):
     profile = profiles.region_profile(region_key)
     if profile is None:
         abort(404)
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.region_markdown(profile, SITE_URL),
+            f"{SITE_URL}/regione/{region_key}",
+        )
     return render_template(
         "region_page.html",
         profile=profile,
@@ -872,6 +967,11 @@ def theme_page(theme_slug):
         abort(404)
     if request.path != profile["theme_path"]:
         return redirect(profile["theme_path"], code=301)
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.theme_markdown(profile, SITE_URL),
+            f"{SITE_URL}{profile['theme_path']}",
+        )
     return render_template(
         "theme_page.html",
         profile=profile,

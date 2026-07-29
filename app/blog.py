@@ -120,6 +120,10 @@ def _load_post(path):
         "indicator": _normalize_indicator(meta.get("indicator")),
         "indicator_label": meta.get("indicator_label"),
         "read_time": _read_time(post.content),
+        # Keep the source representation beside the rendered HTML so content
+        # negotiation can serve the article without reversing HTML back into
+        # lossy Markdown.
+        "body_markdown": post.content,
         "body_html": body_html,
         "url": f"{SITE_URL}/blog/{slug}",
     }

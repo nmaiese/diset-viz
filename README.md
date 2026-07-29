@@ -44,6 +44,9 @@ data-driven blog and quality-of-life rankings for regions and provinces.
 - `/qualita-della-vita/province` serves the provincial quality-of-life ranking
   when the BES provincial dataset is present.
 - `/sitemap.xml` and `/robots.txt` expose the site to crawlers.
+- `/.well-known/api-catalog`, `/openapi.json` and
+  `/.well-known/agent-skills/index.json` expose the public read-only contract to
+  agents. Canonical pages also support `Accept: text/markdown`.
 - `/legacy` keeps the original D3.js dashboard available as an archive view.
 - `/data` still returns the full legacy dataset for the archived D3 view.
 - `/api/catalog`, `/api/search`, `/api/indicator/<id>` and

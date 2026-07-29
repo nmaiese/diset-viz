@@ -4,6 +4,10 @@ from scripts import audit_public_discoverability as audit
 
 
 class PublicDiscoverabilityAuditTest(unittest.TestCase):
+    @staticmethod
+    def _discovery_links(contract):
+        return [f'<https://divarioitalia.it/{relation}>; rel="{relation}"' for relation in contract["link_relations"]]
+
     def test_contract_is_read_without_importing_application(self):
         contract = audit.load_contract()
         paths = {page["path"] for page in contract["pages"]}
@@ -37,7 +41,7 @@ class PublicDiscoverabilityAuditTest(unittest.TestCase):
         expected = next(page for page in contract["pages"] if page["path"] == "/")
         canonical = contract["site_url"] + "/"
         html = f'<html><head><link rel="canonical" href="{canonical}"><meta name="robots" content="{contract["index_header"]}"></head><body>{expected["marker"]}</body></html>'.encode()
-        raw = {"url": canonical, "final_url": canonical, "status": 200, "headers": {"content-type": "text/html; charset=utf-8", "x-robots-tag": contract["index_header"]}, "body": html, "redirects": []}
+        raw = {"url": canonical, "final_url": canonical, "status": 200, "headers": {"content-type": "text/html; charset=utf-8", "x-robots-tag": contract["index_header"], "link-all": self._discovery_links(contract)}, "body": html, "redirects": []}
         result = audit.inspect_result(raw, expected, contract)
         self.assertEqual(result["failures"], [])
         self.assertTrue(result["server_rendered"])
@@ -54,11 +58,33 @@ class PublicDiscoverabilityAuditTest(unittest.TestCase):
                 "content-type": "text/html; charset=utf-8",
                 "x-robots-tag": contract["index_header"],
                 "x-robots-tag-all": [contract["index_header"], "noindex"],
+                "link-all": self._discovery_links(contract),
             },
             "body": html, "redirects": [],
         }
         result = audit.inspect_result(raw, expected, contract)
         self.assertTrue(any("X-Robots-Tag" in failure for failure in result["failures"]))
+
+    def test_markdown_inspection_checks_media_type_vary_and_content_location(self):
+        contract = audit.load_contract()
+        expected = next(page for page in contract["pages"] if page["path"] == "/")
+        canonical = contract["site_url"] + "/"
+        raw = {
+            "url": canonical,
+            "final_url": canonical,
+            "status": 200,
+            "headers": {
+                "content-type": "text/markdown; charset=utf-8",
+                "content-location": canonical,
+                "vary": "Accept, Accept-Encoding",
+                "x-robots-tag": contract["index_header"],
+                "x-robots-tag-all": [contract["index_header"]],
+            },
+            "body": b"# Divario Italia\n",
+            "redirects": [],
+        }
+        result = audit.inspect_markdown(raw, expected, contract)
+        self.assertEqual(result["failures"], [])
 
     def test_robots_rejects_an_extra_disallow_for_a_contracted_agent(self):
         contract = audit.load_contract()

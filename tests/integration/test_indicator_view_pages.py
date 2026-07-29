@@ -49,6 +49,19 @@ class EveryIndicatorPageRenders(unittest.TestCase):
                 broken.append((indicator_id, f"{type(error).__name__}: {error}"))
         self.assertEqual(broken, [], f"indicator pages that do not render: {broken[:10]}")
 
+    def test_every_indicator_page_has_a_markdown_representation(self):
+        broken = []
+        for indicator_id in self.golden:
+            try:
+                response = self._get(indicator_id)
+                canonical = response.request.path
+                markdown = self.client.get(canonical, headers={"Accept": "text/markdown"})
+                if markdown.status_code != 200 or not markdown.content_type.startswith("text/markdown"):
+                    broken.append((indicator_id, markdown.status_code, markdown.content_type))
+            except Exception as error:  # noqa: BLE001 - report every family failure together
+                broken.append((indicator_id, f"{type(error).__name__}: {error}"))
+        self.assertEqual(broken, [], f"indicator Markdown pages that do not render: {broken[:10]}")
+
     def test_every_page_carries_the_full_article_skeleton(self):
         missing = []
         for indicator_id in self.golden:

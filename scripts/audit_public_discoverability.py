@@ -49,8 +49,8 @@ class _SeoParser(HTMLParser):
             self.robots = values.get("content")
 
 
-def _request(url: str, timeout: float) -> tuple[int, dict[str, str], bytes]:
-    request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
+def _request(url: str, timeout: float, accept: str = "*/*") -> tuple[int, dict[str, str], bytes]:
+    request = Request(url, headers={"User-Agent": USER_AGENT, "Accept": accept})
     try:
         response = build_opener(_NoRedirect).open(request, timeout=timeout)
     except HTTPError as error:
@@ -61,14 +61,15 @@ def _request(url: str, timeout: float) -> tuple[int, dict[str, str], bytes]:
     # second, restrictive X-Robots-Tag next to the app's own must not disappear
     # here, or the audit would report PASS while crawlers honour the noindex.
     headers["x-robots-tag-all"] = list(response.headers.get_all("X-Robots-Tag") or [])
+    headers["link-all"] = list(response.headers.get_all("Link") or [])
     return response.status, headers, body
 
 
-def fetch(url: str, timeout: float, max_redirects: int = 5) -> dict:
+def fetch(url: str, timeout: float, max_redirects: int = 5, accept: str = "*/*") -> dict:
     redirects = []
     current = url
     for _ in range(max_redirects + 1):
-        status, headers, body = _request(current, timeout)
+        status, headers, body = _request(current, timeout, accept=accept)
         location = headers.get("location")
         if status not in (301, 302, 303, 307, 308) or not location:
             break
@@ -180,7 +181,8 @@ def inspect_result(raw: dict, expected: dict, contract: dict) -> dict:
     x_robots_all = raw["headers"].get("x-robots-tag-all")
     if x_robots_all is None:
         x_robots_all = [result["x_robots_tag"]] if result["x_robots_tag"] is not None else []
-    if x_robots_all != [contract["index_header"]]:
+    expected_x_robots = expected.get("x_robots", contract["index_header"])
+    if x_robots_all != [expected_x_robots]:
         failures.append(f"unexpected X-Robots-Tag header(s): {x_robots_all!r}")
     if not result["server_rendered"]:
         failures.append(f"server-rendered marker missing: {expected['marker']!r}")
@@ -193,6 +195,47 @@ def inspect_result(raw: dict, expected: dict, contract: dict) -> dict:
         failures.append("non-HTML document unexpectedly exposes HTML SEO metadata")
     if expected["kind"] == "robots":
         failures.extend(audit_robots(text, contract["robots"]))
+    if expected["path"] == "/":
+        link_headers = raw["headers"].get("link-all", [])
+        for relation in contract["link_relations"]:
+            if not any(f'rel="{relation}"' in value for value in link_headers):
+                failures.append(f"homepage Link header missing relation {relation!r}")
+    return result
+
+
+def inspect_markdown(raw: dict, expected: dict, contract: dict) -> dict:
+    body = raw.pop("body")
+    text = body.decode("utf-8", errors="replace")
+    content_type = raw["headers"].get("content-type", "")
+    canonical = contract["site_url"] + expected["path"]
+    result = {
+        "url": raw["url"] + "#markdown",
+        "status": raw["status"],
+        "redirects": raw["redirects"],
+        "final_url": raw["final_url"],
+        "content_type": content_type,
+        "x_robots_tag": raw["headers"].get("x-robots-tag"),
+        "response_bytes": len(body),
+        "server_rendered": expected["markdown_marker"] in text,
+        "failures": [],
+    }
+    failures = result["failures"]
+    if raw["status"] != 200:
+        failures.append(f"expected status 200, got {raw['status']}")
+    if raw["redirects"]:
+        failures.append("canonical Markdown URL unexpectedly redirects")
+    if "text/markdown" not in content_type.lower():
+        failures.append(f"expected content type text/markdown, got {content_type or '<missing>'}")
+    if expected["markdown_marker"] not in text:
+        failures.append(f"Markdown marker missing: {expected['markdown_marker']!r}")
+    if "accept" not in raw["headers"].get("vary", "").lower():
+        failures.append("Markdown response must vary on Accept")
+    if raw["headers"].get("content-location") != canonical:
+        failures.append(f"expected Content-Location {canonical!r}")
+    expected_x_robots = expected.get("x_robots", contract["index_header"])
+    x_robots_all = raw["headers"].get("x-robots-tag-all", [])
+    if x_robots_all != [expected_x_robots]:
+        failures.append(f"unexpected X-Robots-Tag header(s): {x_robots_all!r}")
     return result
 
 
@@ -203,6 +246,10 @@ def run(timeout: float = 20.0) -> dict:
         url = contract["site_url"] + expected["path"]
         try:
             results.append(inspect_result(fetch(url, timeout), expected, contract))
+            if expected.get("markdown_marker"):
+                results.append(inspect_markdown(
+                    fetch(url, timeout, accept="text/markdown"), expected, contract,
+                ))
         except (OSError, RuntimeError, URLError) as error:
             results.append({"url": url, "failures": [f"request failed: {error}"]})
 
