@@ -1,19 +1,17 @@
 {
- "at": "2026-07-29T09:07:38+00:00",
- "base_commit": "e120ade",
+ "at": "2026-07-29T10:16:59+00:00",
+ "base_commit": "9e2ef75",
  "branch": "master",
  "claude_code_version": "2.1.220 (Claude Code)",
- "commit": "e120ade",
+ "commit": "9e2ef75",
  "detail": [
-  "il cancello e' rosso: suite"
+  "Pull Request successfully merged"
  ],
- "duration_seconds": 1934,
- "gate": "blocked",
- "outcome": "blocked",
+ "gate": "auto",
+ "outcome": "merged",
  "pr": "93",
  "run_id": "producer-20260729T083600Z-50bd",
- "session_id": "0741a253-6602-5bad-bb3e-edb3c5b56228",
  "stage": "producer",
- "summary": "PR #93 non fusa: il cancello e' rosso",
+ "summary": "PR #93 fusa in master dal passo di merge",
  "trigger": "manuale"
 }
