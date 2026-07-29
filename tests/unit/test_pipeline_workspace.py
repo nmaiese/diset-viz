@@ -103,6 +103,32 @@ class OpeningIsolatesTheRun(unittest.TestCase):
         self.assertIn("-b", checkout[0])
 
 
+class TheRunsRootFollowsTheMainCheckout(unittest.TestCase):
+    """Da un worktree, `PROJECT_ROOT` e' il worktree stesso: la runs-root va
+    ricavata dal `--git-common-dir` (il `.git` del principale, uguale per tutti
+    i worktree), o `--close` dal worktree cancellerebbe un percorso annidato
+    inesistente e lascerebbe il worktree registrato per sempre."""
+
+    def test_it_comes_from_the_git_common_dir(self):
+        def runner(argv, cwd=None):
+            if argv == ["git", "rev-parse", "--git-common-dir"]:
+                return 0, "/home/user/diset-viz/.git\n"
+            return 0, ""
+        self.assertEqual(str(ws._runs_root(runner=runner)), "/home/user/diset-viz-runs")
+
+    def test_close_derives_the_path_from_it(self):
+        seen = {}
+
+        def runner(argv, cwd=None):
+            if argv == ["git", "rev-parse", "--git-common-dir"]:
+                return 0, "/home/user/diset-viz/.git\n"
+            if argv[:3] == ["git", "worktree", "remove"]:
+                seen["remove"] = argv[-1]
+            return 0, ""
+        ws.close_workspace("producer-abcd", runner=runner)
+        self.assertEqual(seen["remove"], "/home/user/diset-viz-runs/producer-abcd")
+
+
 class ClosingRemovesAndPrunes(unittest.TestCase):
     def test_it_removes_the_worktree_then_prunes(self):
         runner = Runner()

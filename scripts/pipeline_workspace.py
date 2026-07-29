@@ -75,6 +75,25 @@ def branch_name(role, run_id, today=None):
     return f"automation/{role}-{day}-{suffix}" if suffix else f"automation/{role}-{day}"
 
 
+def _runs_root(runner=_run, cwd=None):
+    """La radice dei worktree delle run, ricavata dal checkout **principale**.
+
+    Non da `PROJECT_ROOT` (la cartella dello script): quando `--close` gira dal
+    worktree, `PROJECT_ROOT` e' il worktree stesso, e `PROJECT_ROOT.parent /
+    'diset-viz-runs'` diventerebbe `.../diset-viz-runs/diset-viz-runs`, un percorso
+    annidato inesistente, e la rimozione fallirebbe in silenzio lasciando il
+    worktree registrato per sempre. `--git-common-dir` invece e' lo stesso per
+    tutti i worktree (il `.git` del principale), quindi la sua cartella genitore e'
+    sempre il checkout principale, sia che si parta da li' sia da un worktree."""
+    code, out = runner(["git", "rev-parse", "--git-common-dir"], cwd=cwd)
+    if code == 0 and out.strip():
+        common = Path(out.strip().splitlines()[0])
+        if not common.is_absolute():
+            common = (Path(cwd) if cwd else PROJECT_ROOT) / common
+        return common.resolve().parent.parent / "diset-viz-runs"
+    return RUNS_ROOT
+
+
 def worktree_path(run_id, root=None):
     """La cartella del worktree di una run, deterministica dal `run_id`."""
     return Path(root or RUNS_ROOT) / (run_id or "run")
@@ -151,7 +170,7 @@ def open_workspace(role, run_id, base="origin/master", runner=_run, cwd=None,
             raise RuntimeError(f"git checkout -b {branch} fallito: {out.strip()[:200]}")
         return str(cwd or PROJECT_ROOT)
 
-    path = worktree_path(run_id, root=root)
+    path = worktree_path(run_id, root=root or _runs_root(runner, cwd))
     runner(["git", "worktree", "prune"], cwd=cwd)
     code, out = runner(
         ["git", "worktree", "add", "-b", branch, str(path), base], cwd=cwd)
@@ -168,7 +187,7 @@ def close_workspace(run_id, runner=_run, cwd=None, root=None):
     Due passaggi come in `record_landing`: `worktree remove --force` cancella la
     cartella, `worktree prune` toglie il riferimento se la cartella e' gia' sparita
     per altra via. Best effort: una run gia' chiusa non deve fallire qui."""
-    path = worktree_path(run_id, root=root)
+    path = worktree_path(run_id, root=root or _runs_root(runner, cwd))
     runner(["git", "worktree", "remove", "--force", str(path)], cwd=cwd)
     runner(["git", "worktree", "prune"], cwd=cwd)
     return str(path)

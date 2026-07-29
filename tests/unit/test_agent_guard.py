@@ -113,6 +113,7 @@ class PathVerdictTests(unittest.TestCase):
         ok, _ = agent_guard.path_verdict("/tmp/appunti.md", ["writer"])
         self.assertTrue(ok)
 
+
     def test_union_of_stages(self):
         # Il cacciatore chiude anche da promotore: il perimetro e' l'unione.
         ok, _ = agent_guard.path_verdict(
