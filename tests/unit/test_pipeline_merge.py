@@ -369,20 +369,30 @@ class TheRepositoryHasToBeFoundWithoutGh(unittest.TestCase):
             with self.subTest(url=url.strip()):
                 self.assertEqual(self.slug_for(url), "nmaiese/diset-viz")
 
-    def test_gh_repo_wins(self):
+    def test_gh_repo_is_ignored(self):
+        # GH_REPO non e' piu' un override: da environment ereditato faceva aprire
+        # o fondere sul repo sbagliato. Lo slug viene sempre dal remote.
         import os
 
         os.environ["GH_REPO"] = "altro/repo"
         try:
-            self.assertEqual(self.slug_for("https://github.com/a/b.git\n"), "altro/repo")
+            self.assertEqual(self.slug_for("https://github.com/a/b.git\n"), "a/b")
         finally:
             del os.environ["GH_REPO"]
 
-    def test_an_unreadable_remote_is_loud(self):
+    def test_an_unreadable_remote_is_loud_even_with_gh_repo_set(self):
+        # Il caso originale del bug: con GH_REPO ereditato, un remote illeggibile
+        # ora fallisce forte comunque, invece di corto-circuitare su una variabile.
+        import os
+
         def runner(argv, cwd=None):
             return (1, "fatal: no such remote") if argv[:2] == ["git", "remote"] else (0, "")
-        with self.assertRaises(RuntimeError):
-            pipeline_merge.repo_slug(runner=runner)
+        os.environ["GH_REPO"] = "altro/repo"
+        try:
+            with self.assertRaises(RuntimeError):
+                pipeline_merge.repo_slug(runner=runner)
+        finally:
+            del os.environ["GH_REPO"]
 
 
 class TheChainOpensPullRequestsOverRest(unittest.TestCase):
@@ -428,6 +438,16 @@ class TheChainOpensPullRequestsOverRest(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             pipeline_merge.create_pr("automation/x", "t", "b", runner=runner)
 
+    def test_it_embeds_the_run_id_in_the_body(self):
+        # Il branch porta solo il suffisso del run_id: l'id intero va nel corpo,
+        # cosi' il cruscotto correla la PR col battito e le righe di diario.
+        runner = fake_gh()
+        pipeline_merge.create_pr("automation/producer-2026-07-29-abcd", "t", "corpo",
+                                 runner=runner, run_id="producer-20260729T101010Z-abcd")
+        posted = [c for c in runner.calls if c[:2] == ["gh", "api"] and "--method" in c
+                  and c[c.index("--method") + 1] == "POST"][0]
+        self.assertIn("run_id: producer-20260729T101010Z-abcd", " ".join(posted))
+
 
 class ADirtyWorktreeIsRefusedBeforeMerging(unittest.TestCase):
     """La suite gira sui file su disco, il merge fonde il commit: un cambiamento
@@ -446,6 +466,18 @@ class ADirtyWorktreeIsRefusedBeforeMerging(unittest.TestCase):
                                        log=lambda *_: None, journal=False)
         self.assertFalse(result["merged"])
         self.assertEqual(result["outcome"], "blocked")
+
+    def test_it_asks_git_for_all_untracked_files(self):
+        # --untracked-files=all, o status.showUntrackedFiles=no nasconderebbe un
+        # modulo/una fixture nuova, e la suite verde fonderebbe un commit senza.
+        seen = {}
+
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "status"]:
+                seen["status"] = argv
+            return 0, ""
+        pipeline_merge._worktree_dirty(runner=runner)
+        self.assertIn("--untracked-files=all", seen["status"])
 
     def test_a_clean_worktree_reaches_the_gate(self):
         # Pulito: _worktree_dirty ritorna '' e si prosegue al cancello (qui finto).

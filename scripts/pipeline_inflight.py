@@ -42,9 +42,14 @@ def _ci_word(states: dict) -> str:
     if not states:
         return "nessuna"
     buckets = set(states.values())
-    if buckets & {"fail"}:
+    # Qualunque bucket non passante e non pendente e' rosso, con la stessa lingua
+    # del passo di merge (PASSING/PENDING): un check `cancelled` (bucket `cancel`)
+    # non e' verde, e il merge lo rifiuterebbe. Trattarlo come verde mostrerebbe
+    # sul cruscotto una CI superata che invece bloccherebbe il merge.
+    if any(b not in pipeline_merge.PASSING and b not in pipeline_merge.PENDING
+           for b in buckets):
         return "rossa"
-    if buckets & {"pending"}:
+    if buckets & pipeline_merge.PENDING:
         return "in-corsa"
     return "verde"
 

@@ -48,10 +48,11 @@ Queste sono le regole che valgono sempre:
   suite, mai un'approvazione.
 - **Mai `gh pr merge --auto`.** Non aspetta su questo repository: fonde subito.
   L'attesa vive in `scripts/pipeline_merge.py`.
-- **La PR si apre via REST, mai con `GH_REPO`.** `gh pr create` e' GraphQL e non
-  vede il remote proxato; `pipeline_merge.py --open` la apre sullo slug ricavato
-  da `repo_slug`, sulla stessa REST del merge. `GH_REPO` corto-circuita
-  `repo_slug`, gli rompe un test e causa rifiuti orfani su master: non impostarlo.
+- **La PR si apre via REST, e `GH_REPO` e' ignorato.** `gh pr create` e' GraphQL e
+  non vede il remote proxato; `pipeline_merge.py --open` la apre sullo slug
+  ricavato da `repo_slug`, sulla stessa REST del merge. `repo_slug` ricava lo slug
+  **sempre** dal remote: `GH_REPO` non e' piu' un override (da environment
+  ereditato apriva o fondeva sul repo sbagliato, i rifiuti orfani su master).
 - **Il vivo del cruscotto passa dal sito, non da file locali.** Battiti e PR
   aperte finiscono nel SQLite che Litestream replica su GCS (`app/pipeline_state.py`),
   scritti dai POST degli agenti a `/_pipeline/beat` (segreto `PIPELINE_INGEST_TOKEN`).

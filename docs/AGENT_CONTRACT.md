@@ -103,7 +103,7 @@ decide.
 ```bash
 git push -u origin HEAD
 PR=$(python3 scripts/pipeline_merge.py --open \
-       --stage <stadio> --head <il tuo branch> --title "..." --body "...")
+       --stage <stadio> --head <il tuo branch> --run-id <il tuo run_id> --title "..." --body "...")
 .venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <il tuo run_id>
 ```
 

@@ -39,6 +39,13 @@ class BuildSnapshotIsPure(unittest.TestCase):
         self.assertEqual(by_pr[12], "in-corsa")
         self.assertEqual(by_pr[13], "nessuna")
 
+    def test_a_cancelled_check_is_not_green(self):
+        # `cancel` non e' fra i bucket passanti: il merge lo rifiuterebbe, quindi
+        # il cruscotto non deve mostrarlo verde.
+        pulls = [{"number": 20, "head": {"ref": "automation/producer-2026-07-29-x"}}]
+        details = {20: {"states": {"python": "pass", "gate": "cancel"}}}
+        self.assertEqual(inflight.build_snapshot(pulls, details)[0]["ci"], "rossa")
+
     def test_run_id_comes_from_body_then_branch(self):
         from_body = inflight.build_snapshot(
             [{"number": 1, "head": {"ref": "automation/producer-2026-07-29-abcd"},

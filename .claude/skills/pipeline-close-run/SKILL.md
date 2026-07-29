@@ -58,7 +58,7 @@ due stadi sullo stesso file, e la regola e' il passo 3-bis del contratto.
 ```bash
 git push -u origin HEAD
 PR=$(python3 scripts/pipeline_merge.py --open \
-       --stage <stadio> --head <il tuo branch> --title "..." --body "...")
+       --stage <stadio> --head <il tuo branch> --run-id <run_id> --title "..." --body "...")
 .venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <run_id>
 ```
 

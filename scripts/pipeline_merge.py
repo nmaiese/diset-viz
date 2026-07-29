@@ -56,7 +56,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 import time
@@ -121,12 +120,17 @@ def _bucket(run):
 def _worktree_dirty(runner=_run, cwd=None):
     """I file non committati del worktree, o '' se e' pulito. Best effort.
 
-    `git status --porcelain` (default, quindi rispetta `.gitignore`: il symlink
-    `.venv`, il meta di sessione e i battiti locali non contano). Serve al passo
-    di merge per rifiutare un albero sporco: la suite gira sui file su disco, il
-    merge fonde il commit, e con un worktree per run un file non committato e'
-    lavoro di questa run che non finirebbe su master."""
-    code, out = runner(["git", "status", "--porcelain"], cwd=cwd)
+    `git status --porcelain --untracked-files=all`, come `changed_paths`.
+    `--untracked-files=all` e non il default: se l'ambiente ha
+    `status.showUntrackedFiles=no`, il default considererebbe pulito un albero con
+    file NUOVI, e la suite potrebbe usare un modulo o una fixture non tracciata,
+    risultare verde e fondere un commit che non la contiene, cioe' proprio il
+    guasto che questo controllo esiste per impedire. Rispetta comunque
+    `.gitignore` (il symlink `.venv`, il meta di sessione e i battiti locali non
+    contano). Serve al passo di merge per rifiutare un albero sporco: la suite gira
+    sui file su disco, il merge fonde il commit, e con un worktree per run un file
+    non committato e' lavoro di questa run che non finirebbe su master."""
+    code, out = runner(["git", "status", "--porcelain", "--untracked-files=all"], cwd=cwd)
     if code != 0 or not out.strip():
         return ""
     files = [line[3:].strip() for line in out.splitlines() if line.strip()]
@@ -135,20 +139,23 @@ def _worktree_dirty(runner=_run, cwd=None):
 
 
 def repo_slug(runner=_run, cwd=None):
-    """`owner/repo`, e non lo si chiede a `gh` perche' `gh` qui non lo sa.
+    """`owner/repo`, ricavato SEMPRE dal remote, mai da `GH_REPO`.
 
     Il proxy di uscita riscrive `origin` in qualcosa come
     `http://local_proxy@127.0.0.1:41729/git/nmaiese/diset-viz`, e davanti a quel
     remote `gh` dice "none of the git remotes point to a known GitHub host" e si
     ferma. Gli ultimi due segmenti del percorso pero' sono ancora owner e repo, e
     lo sono anche in `git@github.com:owner/repo.git` e in un URL https normale,
-    quindi si prendono da li'. `GH_REPO` vince su tutto, com'e' l'abitudine di
-    `gh`, cosi' un caso che non avessi previsto resta sbloccabile senza toccare
-    il codice.
+    quindi si prendono da li'.
+
+    `GH_REPO` **non** e' piu' un override, ed e' apposta. Era il workaround che gli
+    agenti impostavano per `gh pr create`, e da environment ereditato faceva
+    aprire (o fondere) la PR sul repo sbagliato, o fallire perche' li' il branch
+    non esiste: esattamente i rifiuti orfani che il resto di questa PR toglie.
+    Chiedere agli agenti di non impostarlo non basta se l'ambiente lo conserva,
+    quindi il percorso automatico lo ignora del tutto. Il remote lo risolve gia',
+    quindi la variabile e' solo un footgun.
     """
-    env = (os.environ.get("GH_REPO") or "").strip()
-    if env:
-        return env
     code, out = runner(["git", "remote", "get-url", "origin"], cwd=cwd)
     if code != 0:
         raise RuntimeError("non riesco a leggere l'URL di origin")
@@ -287,19 +294,25 @@ def merge(pr, runner=_run, cwd=None, slug=None, log=print):
     return True, detail
 
 
-def create_pr(head, title, body, base="master", runner=_run, cwd=None, slug=None):
+def create_pr(head, title, body, base="master", runner=_run, cwd=None, slug=None,
+              run_id=""):
     """Apre la pull request via REST, e ritorna il suo numero.
 
     Esiste per la stessa ragione per cui il merge sta su `gh api` e non su
     `gh pr merge`: `gh pr create` e' porcelain, cioe' GraphQL, e davanti al
     remote riscritto dal proxy dice "none of the git remotes point to a known
-    GitHub host" e si ferma. Il rimedio che gli agenti si erano inventati era
-    `GH_REPO`, che pero' corto-circuita `repo_slug` e ne rompe il test. Lo slug
-    lo sa gia' ricavare `repo_slug` dal remote proxato, quindi qui non serve
-    nessuna variabile d'ambiente: si apre la PR sulla stessa superficie REST del
+    GitHub host" e si ferma. Lo slug lo ricava `repo_slug` dal remote proxato,
+    ignorando `GH_REPO`, quindi si apre la PR sulla stessa superficie REST del
     merge, con lo stesso slug.
+
+    Il `run_id` va nel corpo (`run_id: <...>`) perche' il cruscotto possa
+    correlare la PR con il battito e le due righe di diario della run: il branch
+    ne porta solo il suffisso, non l'id intero, quindi ricavarlo dal branch
+    perderebbe la corrispondenza. Il lanciatore lo rilegge da li'.
     """
     slug = slug or repo_slug(runner=runner, cwd=cwd)
+    if run_id:
+        body = f"{body}\n\nrun_id: {run_id}"
     ok, data = api(
         f"repos/{slug}/pulls", runner=runner, cwd=cwd, method="POST",
         fields=[("title", title), ("head", head), ("base", base), ("body", body)],
@@ -523,7 +536,8 @@ def main():
     if args.open:
         if not args.head or not args.title:
             parser.error("--open vuole --head e --title")
-        number = create_pr(args.head, args.title, args.body, base=args.base)
+        number = create_pr(args.head, args.title, args.body, base=args.base,
+                            run_id=args.run_id or "")
         print(number)
         return 0
 

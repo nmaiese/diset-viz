@@ -396,13 +396,14 @@ scelta giusta anche a proxy spento. Tre conseguenze che vale la pena conoscere:
 - **`owner/repo` se lo ricava da solo** (`repo_slug`). Il proxy riscrive `origin`
   in un URL su `127.0.0.1`, e davanti a quello `gh` dice "none of the git remotes
   point to a known GitHub host" e si ferma. Gli ultimi due segmenti del percorso
-  pero' sono ancora owner e repo. `GH_REPO` resta un override, ma **non va
-  impostato dagli agenti**: corto-circuita `repo_slug` prima che legga il remote,
-  gli rompe il test `test_an_unreadable_remote_is_loud`, e ha causato almeno tre
-  rifiuti orfani "il cancello e' rosso" su master prima che si capisse. Per la
-  stessa ragione **anche la PR si apre via REST** (`pipeline_merge.py --open`,
-  `create_pr`), non con `gh pr create` (GraphQL, cieco al remote proxato): era
-  l'ostacolo per cui si impostava `GH_REPO`, e ora non serve piu'.
+  pero' sono ancora owner e repo. `GH_REPO` **e' ignorato**, non e' piu' un
+  override: da environment ereditato faceva aprire o fondere la PR sul repo
+  sbagliato (o fallire perche' li' il branch non esiste), ed erano i rifiuti
+  orfani "il cancello e' rosso" su master. Chiedere agli agenti di non impostarlo
+  non bastava se l'ambiente lo conservava, quindi il percorso automatico lo
+  ignora del tutto e ricava lo slug sempre dal remote. Per la stessa ragione
+  **anche la PR si apre via REST** (`pipeline_merge.py --open`, `create_pr`), non
+  con `gh pr create` (GraphQL, cieco al remote proxato).
 - **La classificazione dei check e' nostra** (`_bucket`). REST non ha il `bucket`
   di `gh`, quindi lo ricostruiamo dalle conclusioni grezze, con lo stesso
   vocabolario di prima. Davanti a una conclusione che non conosciamo il verso di
