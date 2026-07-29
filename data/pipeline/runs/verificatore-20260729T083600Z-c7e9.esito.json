@@ -1,17 +1,17 @@
 {
- "at": "2026-07-29T10:21:05+00:00",
- "base_commit": "41c0438",
+ "at": "2026-07-29T10:27:35+00:00",
+ "base_commit": "7c9c7e1",
  "branch": "master",
  "claude_code_version": "2.1.220 (Claude Code)",
- "commit": "41c0438",
+ "commit": "7c9c7e1",
  "detail": [
-  "il cancello e' rosso: suite"
+  "Pull Request successfully merged"
  ],
- "gate": "blocked",
- "outcome": "blocked",
+ "gate": "auto",
+ "outcome": "merged",
  "pr": "88",
  "run_id": "verificatore-20260729T083600Z-c7e9",
  "stage": "verificatore",
- "summary": "PR #88 non fusa: il cancello e' rosso",
+ "summary": "PR #88 fusa in master dal passo di merge",
  "trigger": "manuale"
 }
