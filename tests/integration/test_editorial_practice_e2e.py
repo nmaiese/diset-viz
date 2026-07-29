@@ -53,10 +53,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 # verificato): la sua pagina porta lead e vintage, quindi la verifica del sito ha
 # qualcosa da confermare.
 PINNED_TER = "651"
-# L'indicatore esterno con due cicli: la storia intera promosso -> curato ->
-# firmato -> verificato-smentito, e la smentita poi chiusa correggendo la glossa
-# della fonte, cosi' il secondo ciclo e' tornato in-lavorazione (verifica scaduta).
-PINNED_EUR = "eur:rd_e_gerdreg"
 
 # Popolati da setUpModule: la base del sito servito, o None se non si e' potuto
 # avviare gunicorn (in tal caso i soli test che toccano la rete si saltano).
@@ -249,6 +245,12 @@ class Reconciler(unittest.TestCase):
 
     def test_write_then_check_and_a_single_declared_divergence(self):
         dossier = practice_timeline.load_real()
+        # Il record da perturbare e' sintetico, non un indicatore reale: pinnarne
+        # uno allo stato "in-lavorazione" lo rompe appena il primo verificatore lo
+        # chiude (cosa che ha bloccato la #86). Il resto del dossier reale resta
+        # nel test, perche' la riconciliazione a zero divergenze e' la sua garanzia.
+        synth = _synthetic_expired_smentita()
+        dossier[_SYNTH_EUR] = synth
         root = tempfile.mkdtemp()
 
         # --write (in una practices-root temporanea): un record per ciclo
@@ -263,11 +265,8 @@ class Reconciler(unittest.TestCase):
         declared = practice_store.load_all(root=root, strict=False)
         self.assertEqual(practice_timeline.reconcile(declared, dossier), [])
 
-        # perturba lo stato del ciclo attivo di un record dichiarato
-        eur = dossier.get(PINNED_EUR)
-        if eur is None:
-            self.skipTest(f"{PINNED_EUR} non e' piu' nel repo")
-        active = practice_timeline.cycles_for(eur)[-1]
+        # perturba lo stato del ciclo attivo del record sintetico
+        active = practice_timeline.cycles_for(synth)[-1]
         self.assertTrue(active["active"])
         rec = practice_store.load(active["practice_id"], root=root)
         self.assertEqual(rec["state"], "in-lavorazione")
@@ -279,7 +278,7 @@ class Reconciler(unittest.TestCase):
         divergenze = practice_timeline.reconcile(declared2, dossier)
         self.assertEqual(len(divergenze), 1, divergenze)
         row = divergenze[0]
-        self.assertEqual(row["id"], PINNED_EUR)
+        self.assertEqual(row["id"], _SYNTH_EUR)
         self.assertEqual(row["kind"], "divergente")
         self.assertEqual(row["declared"], "pubblicata")
         self.assertEqual(row["reconstructed"], "in-lavorazione")
