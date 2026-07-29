@@ -58,6 +58,14 @@ class EveryIndicatorPageRenders(unittest.TestCase):
                     missing.append((indicator_id, role))
         self.assertEqual(missing, [], f"pages missing an article section: {missing[:10]}")
 
+    def test_question_navigation_points_to_visible_answers(self):
+        response = self._get("920")
+        html = response.get_data(as_text=True)
+        for intent in ("definizione", "dato", "classifica", "confronto", "andamento", "metodologia", "download"):
+            self.assertIn(f'data-query-intent="{intent}"', html)
+        for target in ("esplora", "classifica-dati", "serie-storica", "fonti-verifica", "download-dati"):
+            self.assertIn(f'id="{target}"', html)
+
     def test_the_sitemap_and_the_pages_agree_on_what_is_indexable(self):
         """A listed URL must not serve noindex, and vice versa.
 

@@ -82,6 +82,11 @@
   <p class="page-note">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
   {% endif %}
 
+  <nav class="page-note" aria-label="Domande a cui risponde questa scheda">
+    <strong>Domande sui dati:</strong>
+    {% for item in level.query_map %}<a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a>{{ " · " if not loop.last }}{% endfor %}
+  </nav>
+
   {# ---- Zona 1: il cruscotto. Ogni numero della pagina vive qui, una volta sola. ---- #}
   <section class="indicator-cockpit" id="esplora" data-explore-root aria-label="Esplora i dati dell'indicatore">
     <div class="page-facts">
@@ -93,7 +98,10 @@
       <span><small>Fonte</small><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a></span>
       {# One grid child, or `.page-facts span { display: grid }` puts the two
          links and the separator on three separate rows. #}
-      {% if meta.downloads %}<span><small>Download</small><span class="page-facts__inline"><a href="{{ meta.downloads.csv }}" title="Serie dell'indicatore in formato CSV">CSV</a> · <a href="{{ meta.downloads.json }}" title="Serie dell'indicatore in formato JSON">JSON</a></span></span>{% endif %}
+      {# The download routes serve the regional series (get_atlas_indicator), so
+         only the regional view may offer them: on the provincial cockpit a CSV
+         of 20 regions next to 103 provinces would be a mismatch. #}
+      {% if meta.downloads and level.key == 'regione' %}<span id="download-dati"><small>Download</small><span class="page-facts__inline"><a href="{{ meta.downloads.csv }}" title="Serie dell'indicatore in formato CSV">CSV</a> · <a href="{{ meta.downloads.json }}" title="Serie dell'indicatore in formato JSON">JSON</a></span></span>{% endif %}
     </div>
 
     <div class="cockpit-controls">
@@ -231,7 +239,7 @@
       </article>
       {% endif %}
 
-      <article class="data-card viz-card--ranking" data-tabpanel="ranking">
+      <article class="data-card viz-card--ranking" id="classifica-dati" data-tabpanel="ranking">
         <header><small><span data-explore="year-label">{{ level.year_max }}</span> · {{ meta.value_unit }}</small><h3>Classifica</h3></header>
         <p class="page-note">
           {% if meta.direction == 'higher_better' %}Più in alto nella lista, meglio è.
@@ -252,7 +260,7 @@
         </div>
       </article>
 
-      <article class="data-card viz-card--trend" data-tabpanel="trend">
+      <article class="data-card viz-card--trend" id="serie-storica" data-tabpanel="trend">
         <header><small data-explore="trend-region">Media delle {{ level.plural }}</small><h3>Serie storica {{ level.year_min }}-{{ level.year_max }}</h3></header>
         <figure class="indicator-explore__trend" data-explore="trend">
           <figcaption data-explore="trend-title"></figcaption>
@@ -269,7 +277,7 @@
   {{ article.body(page_article, meta, level) }}
 
   {# ---- Zona 3: l'apparato. Fonti, verifica, condivisione, percorso. ---- #}
-  <section class="indicator-apparatus">
+  <section class="indicator-apparatus" id="fonti-verifica">
     <h2>Fonti e verifica</h2>
     {# Level-specific: meta.year_min/year_max span every level at once, so on a
        provincial view they would claim a period the provincial series does not
