@@ -1,16 +1,34 @@
 {
- "fonti": [],
+ "fonti": [
+  {
+   "testo": "Istat, Banca dati degli indicatori territoriali per le politiche di sviluppo (aggiornamento 20 luglio 2026): 366 indicatori territoriali, fra cui il grado di dipendenza economica, definito come importazioni nette in percentuale del PIL.",
+   "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
+  }
+ ],
  "key": "100",
- "lead": "La dipendenza economica misura quanto una regione importa più di quanto esporta, rispetto al PIL. È negativa nelle regioni esportatrici come Lombardia, meno 17,5%, ed Emilia-Romagna, mentre è alta in Calabria, 35,7%, e Sicilia, 26,2%. La media delle regioni è del 7,5%.",
+ "lead": "Nel grado di dipendenza economica il confine che conta è lo zero, la riga che separa le regioni che vendono fuori più di quanto comprano da tutte le altre. Nel 2021 sono sette le regioni sotto quella riga, e il Piemonte non è più fra loro dal 2004.",
+ "level": "regione",
+ "reviewed_at": "2026-07-29",
+ "reviewed_vintage": 2021,
  "sections": [
   {
-   "body": "Un valore negativo indica una regione che esporta più di quanto compra, un valore alto una che dipende dall'esterno per ciò che consuma. Il Sud, con poca industria, produce meno di quanto usa e colma la differenza con beni prodotti altrove, spesso al Nord. È la fotografia economica del divario, non un giudizio. Un'economia che dipende dall'esterno può decidere il proprio sviluppo?",
-   "h": null,
+   "body": "Al numeratore ci sono le importazioni nette, quanto una regione compra da fuori meno quanto vende fuori. Al denominatore il PIL della stessa regione nello stesso anno. Ne esce una percentuale, e può essere negativa: è una delle poche colonne di questo atlante in cui il segno conta più della cifra.\n\nSopra lo zero una regione assorbe più di quanto colloca all'esterno, sotto lo zero è il contrario. In Calabria, prima in graduatoria, il saldo pesa poco più di un terzo di quello che la regione produce in un anno. In Lombardia, all'estremo opposto, l'eccedenza venduta fuori vale un sesto abbondante del prodotto regionale.\n\nIl nome promette più di quanto il numero misuri. Un saldo largamente positivo dice che quella differenza va coperta in qualche modo, e il numero non dice come. Per questo l'atlante lo tiene fra i contestuali, fuori dal punteggio: non è una graduatoria di merito.",
+   "h": "Un saldo diviso per il prodotto, e il segno che lo comanda",
+   "role": "definizione"
+  },
+  {
+   "body": "La graduatoria del 2021 ha due solitudini, una per estremo. Tra la Calabria e la Sicilia corrono 9,51 punti, il gradino più largo della classifica, e in fondo la Lombardia resta staccata di 8,24 punti dal Lazio. In mezzo diciotto regioni scendono con passi molto più corti, e la mediana finisce quasi sulla media: nel 1995 stava tre punti abbondanti sotto, con pochi valori alti a tirare su la media.\n\nLe sette regioni sotto lo zero non fanno il Nord. Sono le quattro del Nord-est, più Toscana, Lazio e Lombardia. Il Nord-ovest sta sui due lati della linea, con la Lombardia in fondo e Piemonte, Liguria e Valle d'Aosta sopra. La Valle d'Aosta è quinta per dipendenza e, nella [produttività del lavoro nel commercio](/indicatore/produttivita-del-lavoro-nel-commercio/ter-130) del 2023, dodicesima, davanti a tutte e otto le regioni del Mezzogiorno.\n\nUn ordine simile si ritrova invece in [quanto pesa il credito di piccolo taglio alle imprese](/indicatore/quota-valore-fidi-globali-fra-30-000-e-500-000-euro-utilizzati-dalle-imprese/ter-413), nello stesso anno: cinque delle prime sei sono le stesse. Vanno di pari passo, e una spiegazione possibile è il reddito di un'area e la taglia delle sue imprese, che nessuno dei due misura. La Valle d'Aosta rompe comunque l'accostamento, quinta qui e decima là. Gli altri incroci stanno nell'hub [imprese e competitività](/tema/imprese-e-competitivita).",
+   "h": "Il Nord-ovest sta sui due lati della linea",
    "role": "quadro"
   },
   {
-   "body": "È un saldo tra importazioni ed esportazioni sul PIL, che non dice quali beni né verso quali mercati. Non misura i flussi di reddito e trasferimenti che compensano, in parte, questa dipendenza.",
-   "h": null,
+   "body": "La Calabria è prima in tutti e ventisette gli anni della serie, dal 1995 al 2021, e l'ultimo posto è della Lombardia in ventitré anni e del Lazio negli altri quattro. I capi di questa classifica non si muovono.\n\nIl centro sì. La media delle venti regioni è salita di un punto scarso, la mediana di 4,19. Il Piemonte è il caso più netto: fino al 1999 vendeva fuori più di quanto comprava, poi ha oscillato intorno allo zero, e dal 2004 non è più tornato sotto, diciotto anni di fila dalla parte positiva. Il Trentino Alto Adige ha fatto la strada opposta, sopra lo zero dal 2001 al 2011 e da allora sempre sotto.\n\nLa serie ha anche una gobba. La media cresce fino al 2010, quando tocca 11,56, e nei tre anni successivi ne perde cinque. Nell'ultimo passaggio, dal 2020 al 2021, il rapporto sale in quindici regioni su venti e la media torna al livello più alto dal 2012. Il salto più grande è quello della Liguria, 6,33 punti in un anno, il più ampio della sua serie.",
+   "h": "Ventisette anni con gli stessi due estremi",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il rapporto cala quando una regione produce e vende di più, e cala anche quando compra di meno, cioè quando consumi e investimenti si fermano. Il numero non distingue le due strade, ed è la cautela da tenere per gli anni fra il 2011 e il 2013, quando è sceso in sei regioni del Mezzogiorno su otto.\n\nPoi c'è la fragilità dei due capi di una serie mobile. Il calo più grande dal 1995 è quello della Basilicata, 11,26 punti, ma quella linea nel mezzo era salita fino a 22,6 e ridiscesa più volte: due estremi non fanno una tendenza. Il saldo, infine, non guarda quali beni entrano ed escono né verso quali mercati, e la serie regionale si ferma al 2021.",
+   "h": "Un calo che vuol dire due cose opposte",
    "role": "limiti"
   }
  ],

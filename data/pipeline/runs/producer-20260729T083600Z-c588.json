@@ -1,0 +1,23 @@
+{
+ "at": "2026-07-29T09:01:18+00:00",
+ "base_commit": "7cf5ced",
+ "branch": "automation/producer-2026-07-29-c588",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "2ec3360",
+ "detail": [
+  "Verso contextual confermato sui dati 2021, nessuna riga da cambiare: in cima Calabria 35,73 e Sicilia 26,21, in fondo Lombardia -17,47 e Lazio -9,23, e nessuno dei due capi e' 'messo meglio'. La prova che chiude la questione e' la Valle d'Aosta, quinta per dipendenza (17,45) e terza per PIL pro capite (ter-901, 47.742,80 euro nel 2024): un higher/lower_better qui premierebbe o punirebbe a caso. score_eligible resta false, il tema Internazionalizzazione e' gia' mappato su imprese_competitivita in app/quality_life_config.py, quindi niente da scrivere in curation.csv ne' in theme_categories.csv (curate.py: nessun indicatore esterno da curare).",
+  "Articolo riscritto da capo: prima aveva solo lead + quadro + limiti, il quadro chiudeva con una domanda retorica e il lead ripeteva quattro cifre che il cruscotto stampa gia' (35,7 Calabria, 26,2 Sicilia, -17,5 Lombardia, media 7,5). Ora 705 parole, quattro sezioni con h2 propri, 3 link interni (ter-130, ter-413, hub del tema), livello regione, vintage 2021.",
+  "Cifre dal brief e dalla serie: salti 9,51 (Calabria-Sicilia) e 8,24 (Lazio-Lombardia), mediana 7,54 contro media 7,53 nel 2021 e 3,35 contro 6,54 nel 1995 (+4,19 di mediana contro +1,00 di media), 7 regioni sotto zero, Calabria prima in tutti e 27 gli anni e Lombardia ultima in 23 (Lazio negli altri 4), Piemonte sempre positivo dal 2004, Trentino Alto Adige positivo 2001-2011, media al picco 11,56 nel 2010 e -5,04 in tre anni, Liguria +6,33 nel 2021 (il suo salto annuo piu' grande), Basilicata -11,26 dal 1995 su una serie che nel 2010 era a 22,6, rapporto in calo in 6 regioni del Mezzogiorno su 8 fra 2011 e 2013.",
+  "Una fonte esterna, verificata: la pagina Istat della Banca dati territoriale (366 indicatori, aggiornamento 20 luglio 2026). Non ho trovato una fonte che dica se le importazioni nette comprendano anche gli scambi con le altre regioni: l'ipotesi e' plausibile ma non verificabile, quindi l'articolo non la scrive e la definizione resta alle parole della fonte (definition_check: nessun rilievo).",
+  "In autorevisione corretti quattro difetti miei: 'non e' il primo posto, e' lo zero' (struttura parallela, segnalata da prose_lint), la mediana descritta come 'tirata giu'' quando a essere tirata su e' la media, il verbo 'trainata dalla Liguria' (causale su un contributo aritmetico) e l'eco del cruscotto sui +1,37 punti, che la scheda stampa gia' come variazione dal 2020."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 342,
+ "queue_before": 343,
+ "run_id": "producer-20260729T083600Z-c588",
+ "stage": "producer",
+ "summary": "produttore: ter-100 (grado di dipendenza economica) curato, riscritto per intero e firmato",
+ "trigger": "launch"
+}
