@@ -99,6 +99,8 @@ def indicator_labels(root=None) -> dict:
         add(row.get("target_indicator_id"), row.get("target_indicator_name"), "Territoriale")
     for row in _csv_rows(base / "app/static/data/bes_regione_manifest.csv"):
         add(f"bes:{row.get('id')}", row.get("name"), "BES")
+    for row in _csv_rows(base / "app/static/data/Assoluti_Provincia.csv"):
+        add(f"bes:{row.get('idIndicatore')}", row.get("Indicatore"), "BES")
     for row in _csv_rows(base / "app/static/data/multiscopo_regione_manifest.csv"):
         add(f"multiscopo:{row.get('id')}", row.get("name"), "Multiscopo")
     for row in _csv_rows(base / "data/discovery/curation.csv"):
@@ -293,7 +295,7 @@ def row_of(d: dict, today: str = "", runs_by_id: dict = None, labels: dict = Non
     }
 
 
-def headline(rows: list, today: str = "") -> str:
+def headline(rows: list, today: str = "", admissions=None) -> str:
     """La frase in testa: dov'e' fermo, e perche'. Dai soli `rows` gia' calcolati."""
     stuck = [r for r in rows if r["state"] in STUCK_STATES]
     if stuck:
@@ -304,16 +306,18 @@ def headline(rows: list, today: str = "") -> str:
         prefix = f"{n} indicatore bloccato." if n == 1 else f"{n} indicatori bloccati."
         more = f" Altri {n - 1} sono elencati nelle priorita'." if n > 1 else ""
         return f"{prefix} Prima priorita': {top['id']}, {top['reason']}{when}.{more}"
-    ready = [r for r in rows if r["next_role"]]
+    ready = [r for r in rows if r["next_role"] and r["next_role"] != "admissions"]
     if ready:
         top = ready[0]
         return (f"{len(ready)} indicatori pronti al lavoro, niente e' bloccato. "
                 f"Il piu' urgente: {top['id']} -> {top['next_role']}.")
+    if admissions:
+        return "ammissione pronta al lavoro, niente e' bloccato. La coda a monte richiede un batch."
     return "catena in pari: nessun indicatore bloccato, niente in coda."
 
 
 def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
-          recent: int = 12, open_runs=None, labels=None) -> dict:
+          recent: int = 12, open_runs=None, labels=None, queues=None) -> dict:
     """Il cruscotto intero, dai soli artefatti gia' letti. Puro.
 
     `dossier` e' l'uscita di `practice_timeline`. `runs` sono le run gia'
@@ -352,10 +356,32 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
         phase_totals[row["phase"]] = phase_totals.get(row["phase"], 0) + 1
     attention = [r for r in rows if r["next_step"]["kind"] in ("attention", "blocked")]
     site_steps = [r for r in rows if r["next_step"]["kind"] == "publish"]
-    actionable = [r for r in rows if r["next_step"]["kind"] in ("attention", "ready", "publish")]
+    actionable = [
+        r for r in rows
+        if r["next_step"]["kind"] in ("attention", "ready", "publish")
+        and r["next_role"] != "admissions"
+    ]
+    admission_launch = next(
+        (item for item in pipeline_launch.plan_launches(dossier, queues=queues)
+         if item["role"] == "admissions"),
+        None,
+    )
+    if admission_launch:
+        actionable.append({
+            "id": "admissions",
+            "name": "Coda di ammissione",
+            "priority": admission_launch["priority"],
+            "next_step": {
+                "owner": "ammissione",
+                "stage": "promoter",
+                "kind": "ready",
+                "label": admission_launch["reason"],
+            },
+        })
+    actionable.sort(key=lambda row: (-row["priority"], row["id"]))
 
     return {
-        "headline": headline(rows, today),
+        "headline": headline(rows, today, admissions=admission_launch),
         "totals": totals,
         "stuck": [r for r in rows if r["state"] in STUCK_STATES],
         "ready": [r for r in rows if r["next_role"]],
@@ -504,13 +530,14 @@ def load_board(today: str = "", proofs_root=None, recent: int = 12,
     (agente e file sulla stessa macchina); sul server quei file sono sempre vuoti,
     ed e' esattamente il motivo per cui il cruscotto sembrava morto."""
     from datetime import datetime, timezone
-    from scripts import pipeline_log
+    from scripts import pipeline_log, pipeline_status
     ref = today or datetime.now(timezone.utc).date().isoformat()
     dossier = practice_timeline.load_real(today=ref, proofs_root=proofs_root)
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
     beats = read_heartbeats(now=ref) if heartbeats is None else heartbeats
     return board(dossier, runs=runs, heartbeats=beats, today=ref, recent=recent,
-                 open_runs=open_runs, labels=indicator_labels())
+                 open_runs=open_runs, labels=indicator_labels(),
+                 queues=pipeline_status.queue_sizes(pipeline_launch.ADMISSIONS_QUEUES))
 
 
 def main(argv=None) -> int:

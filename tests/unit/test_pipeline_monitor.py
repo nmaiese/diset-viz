@@ -48,6 +48,15 @@ class Board(unittest.TestCase):
         b = pipeline_monitor.board(dossier, today=self.TODAY)
         self.assertIn("in pari", b["headline"])
 
+    def test_admissions_queue_is_an_action_even_without_dossier_rows(self):
+        b = pipeline_monitor.board({}, today=self.TODAY,
+                                   queues={"scout": 206, "hunter": 0, "promoter": 0})
+
+        self.assertEqual(b["metrics"]["actionable"], 1)
+        self.assertEqual(b["actionable"][0]["id"], "admissions")
+        self.assertIn("fonti da valutare: 206", b["actionable"][0]["next_step"]["label"])
+        self.assertIn("ammissione pronta", b["headline"])
+
     def test_rows_map_the_next_role_from_the_ready_stage(self):
         dossier = {
             "ter-w": practice("ter-w", completed=["curator"]),                 # writer -> producer
@@ -172,10 +181,14 @@ class IndicatorLabels(unittest.TestCase):
                 "id;name\n10AMB002;Consumo materiale interno\n", encoding="utf-8")
             (path / "multiscopo_regione_manifest.csv").write_text(
                 "id;name\nMULTI_TEST;Indicatore test\n", encoding="utf-8")
+            (path / "Assoluti_Provincia.csv").write_text(
+                "idIndicatore;Indicatore\n10AMB001P;Concentrazione media annua di PM10\n",
+                encoding="utf-8")
             labels = pipeline_monitor.indicator_labels(root=root)
         self.assertEqual(labels["1"]["name"], "Produttivita agricola")
         self.assertEqual(labels["bes:10AMB002"]["family"], "BES")
         self.assertEqual(labels["multiscopo:MULTI_TEST"]["name"], "Indicatore test")
+        self.assertEqual(labels["bes:10AMB001P"]["name"], "Concentrazione media annua di PM10")
 
 
 class AttributeTokens(unittest.TestCase):
