@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-29T09:02:29+00:00",
+ "base_commit": "e74ddab",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "e74ddab",
+ "detail": [
+  "il cancello e' rosso: suite"
+ ],
+ "gate": "blocked",
+ "outcome": "blocked",
+ "pr": "88",
+ "run_id": "verificatore-20260729T083600Z-c7e9",
+ "stage": "verificatore",
+ "summary": "PR #88 non fusa: il cancello e' rosso",
+ "trigger": "manuale"
+}
