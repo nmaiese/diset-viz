@@ -177,6 +177,30 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
     }
 
 
+def attribute_tokens(rows, tokens_by_run):
+    """Attacca il consumo token a ogni run e somma il totale per indicatore.
+
+    Un `run_id` puo' comparire nella storia di piu' indicatori: `practice_timeline`
+    associa una run a ogni indicatore che il suo testo cita, compresi quelli di
+    confronto. Ma il costo e' di UNO solo, il bersaglio, che il record di
+    telemetria porta in `indicator`. Quindi si attribuisce solo dove combacia,
+    mai a un indicatore citato per confronto (ne' a un batch senza bersaglio, che
+    ha `indicator` vuoto e non combacia con nessuna riga). Puro: muta e ritorna
+    `rows`."""
+    tokens_by_run = tokens_by_run or {}
+    for row in rows:
+        total = 0
+        for run in row.get("runs", []):
+            entry = tokens_by_run.get(run.get("run_id"))
+            if entry and entry.get("indicator") == row.get("id"):
+                run["tokens"] = entry.get("tokens")
+                total += entry.get("tokens") or 0
+            else:
+                run["tokens"] = None
+        row["tokens_total"] = total or None
+    return rows
+
+
 # --- i battiti: il vivo, best effort ----------------------------------------
 
 def write_heartbeat(role: str, run_id: str, indicator: str = "", root=None,
@@ -234,6 +258,17 @@ def post_beat(payload: dict, url: str = "", token: str = "", timeout: int = 5,
         return False
 
 
+def post_tokens(run_id: str, tokens, indicator: str = "", stage: str = "",
+                role: str = "", **kw) -> bool:
+    """Il consumo token di una run all'endpoint del sito, best effort.
+
+    Chiavato sul `run_id` del RUOLO (non del lanciatore che lo POSTa), cosi' il
+    totale si attacca all'indicatore giusto. E' telemetria durevole: a differenza
+    di un battito non scade. Riusa `post_beat` (stesso endpoint, stesso segreto)."""
+    return post_beat({"action": "tokens", "run_id": run_id, "tokens": tokens,
+                      "indicator": indicator, "stage": stage, "role": role}, **kw)
+
+
 def read_heartbeats(root=None, now: str = "", stale_hours: int = HEARTBEAT_STALE_HOURS) -> list:
     """I battiti vivi: quelli piu' vecchi della soglia si scartano (sessione
     caduta senza pulire). `now` iniettabile per i test."""
@@ -283,8 +318,21 @@ def main(argv=None) -> int:
     parser.add_argument("--beat-close", metavar="RUN_ID",
                         help="un ruolo che chiude cancella il proprio battito")
     parser.add_argument("--indicator", default="",
-                        help="l'indicatore su cui batte il ruolo (con --beat-open)")
+                        help="l'indicatore su cui batte il ruolo (con --beat-open/--post-tokens)")
+    parser.add_argument("--post-tokens", nargs=2, metavar=("RUN_ID", "N"),
+                        help="POSTa il consumo token di una run (il lanciatore, a chiusura di un ruolo)")
+    parser.add_argument("--role", default="", help="ruolo, per --post-tokens")
+    parser.add_argument("--stage", default="", help="stadio, per --post-tokens")
     args = parser.parse_args(argv)
+
+    if args.post_tokens:
+        run_id, n = args.post_tokens
+        sent = post_tokens(run_id, n, indicator=args.indicator,
+                           stage=args.stage, role=args.role)
+        if not args.json:
+            print(f"token {n} per {run_id}: "
+                  + ("inviati al sito" if sent else "ingest spento o non raggiungibile"))
+        return 0
 
     # I battiti: due gesti che un agente fa in apertura e chiusura della sua run.
     # Non stampano il cruscotto, aprono/chiudono il vivo e basta.

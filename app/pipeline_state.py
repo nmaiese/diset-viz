@@ -47,6 +47,20 @@ CREATE TABLE IF NOT EXISTS pipeline_activity (
   updated_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_activity_kind ON pipeline_activity (kind, updated_at DESC);
+
+-- Il consumo token per run: telemetria durevole, NON un battito. Sta in una
+-- tabella a parte perche' i battiti scadono (finestra STALE_HOURS) e si
+-- cancellano alla chiusura, mentre il costo di una run e' storia da tenere. La
+-- chiave e' il run_id del RUOLO (produttore/verificatore/ammissione), non del
+-- lanciatore che lo POSTa, cosi' il totale si attacca all'indicatore giusto.
+CREATE TABLE IF NOT EXISTS pipeline_tokens (
+  run_id TEXT PRIMARY KEY,
+  indicator TEXT NOT NULL DEFAULT '',
+  stage TEXT NOT NULL DEFAULT '',
+  role TEXT NOT NULL DEFAULT '',
+  tokens INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL
+);
 """
 
 
@@ -133,6 +147,54 @@ def replace_prs(prs, now=None):
                 )
     finally:
         conn.close()
+
+
+def record_tokens(run_id, tokens, indicator="", stage="", role="", now=None):
+    """Il consumo token di una run, chiavato sul suo `run_id`. Idempotente:
+    l'ultimo POST vince (il lanciatore riporta il totale una volta a chiusura,
+    ma se ripete non si somma due volte)."""
+    if not run_id:
+        raise ValueError("run_id mancante")
+    try:
+        n = int(tokens)
+    except (TypeError, ValueError):
+        raise ValueError("tokens non numerico")
+    stamp = now or _now()
+    conn = _connect()
+    try:
+        with conn:
+            conn.execute(
+                """
+                INSERT INTO pipeline_tokens (run_id, indicator, stage, role, tokens, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(run_id) DO UPDATE SET
+                  tokens=excluded.tokens, indicator=excluded.indicator,
+                  stage=excluded.stage, role=excluded.role, updated_at=excluded.updated_at
+                """,
+                (run_id, indicator, stage, role, n, stamp),
+            )
+    finally:
+        conn.close()
+
+
+def tokens_by_run():
+    """Il consumo token per run_id, `{run_id: {tokens, indicator, stage, role, since}}`.
+
+    Durevole: **non** filtrato dalla finestra di freschezza, a differenza di
+    `live()`. Tollerante di una tabella non ancora creata (niente token = mappa
+    vuota, il cruscotto non deve cadere per la telemetria)."""
+    conn = _connect()
+    try:
+        rows = conn.execute(
+            "SELECT run_id, tokens, indicator, stage, role, updated_at FROM pipeline_tokens"
+        ).fetchall()
+    except sqlite3.OperationalError:
+        return {}
+    finally:
+        conn.close()
+    return {run_id: {"tokens": tokens, "indicator": indicator, "stage": stage,
+                     "role": role, "since": updated_at}
+            for run_id, tokens, indicator, stage, role, updated_at in rows}
 
 
 def live(now=None, stale_hours=STALE_HOURS):

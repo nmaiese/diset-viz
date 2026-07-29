@@ -110,6 +110,31 @@ class Board(unittest.TestCase):
         self.assertEqual(b["recent"][0]["run_id"], "r19")  # il piu' recente
 
 
+class AttributeTokens(unittest.TestCase):
+    """I token vanno solo all'indicatore bersaglio, non ai confronti."""
+
+    def test_tokens_go_to_the_target_not_to_comparison_indicators(self):
+        # v-1 compare nella storia di ter-1 (bersaglio) e di ter-2 (citato come
+        # confronto): il costo e' di ter-1 soltanto, e il record lo dice.
+        rows = [
+            {"id": "ter-1", "runs": [{"run_id": "v-1"}]},
+            {"id": "ter-2", "runs": [{"run_id": "v-1"}]},
+        ]
+        tokens = {"v-1": {"tokens": 5000, "indicator": "ter-1"}}
+        pipeline_monitor.attribute_tokens(rows, tokens)
+        self.assertEqual(rows[0]["runs"][0]["tokens"], 5000)   # bersaglio
+        self.assertEqual(rows[0]["tokens_total"], 5000)
+        self.assertIsNone(rows[1]["runs"][0]["tokens"])        # confronto, niente inflazione
+        self.assertIsNone(rows[1]["tokens_total"])
+
+    def test_a_batch_run_without_a_target_is_not_attributed(self):
+        rows = [{"id": "ter-1", "runs": [{"run_id": "adm-1"}]}]
+        tokens = {"adm-1": {"tokens": 9000, "indicator": ""}}  # ammissione batch
+        pipeline_monitor.attribute_tokens(rows, tokens)
+        self.assertIsNone(rows[0]["runs"][0]["tokens"])
+        self.assertIsNone(rows[0]["tokens_total"])
+
+
 class Heartbeats(unittest.TestCase):
     def test_write_read_clear_roundtrip(self):
         root = tempfile.mkdtemp()
@@ -139,6 +164,53 @@ class Heartbeats(unittest.TestCase):
                                          root=root, now="2026-07-28T10:00:00+00:00")
         live = pipeline_monitor.read_heartbeats(root=root, now="2026-07-28T10:05:00+00:00")
         self.assertEqual({h["run_id"] for h in live}, {"producer-1", "verificatore-2"})
+
+
+class PostTokens(unittest.TestCase):
+    """Il POST del consumo token: paga best effort, payload giusto."""
+
+    def _capture(self):
+        import json as _json
+        captured = {}
+
+        class FakeResp:
+            status = 200
+            def __enter__(self):
+                return self
+            def __exit__(self, *a):
+                return False
+
+        def opener(req, timeout=None):
+            captured["url"] = req.full_url
+            captured["body"] = _json.loads(req.data.decode("utf-8"))
+            return FakeResp()
+
+        return captured, opener
+
+    def test_post_tokens_builds_a_tokens_payload(self):
+        captured, opener = self._capture()
+        ok = pipeline_monitor.post_tokens(
+            "producer-r1", 46121, indicator="ter-178", stage="producer",
+            role="producer", url="https://divarioitalia.it", token="k", opener=opener)
+        self.assertTrue(ok)
+        self.assertTrue(captured["url"].endswith("/_pipeline/beat"))
+        body = captured["body"]
+        self.assertEqual(body["action"], "tokens")
+        self.assertEqual(body["run_id"], "producer-r1")
+        self.assertEqual(body["tokens"], 46121)
+        self.assertEqual(body["indicator"], "ter-178")
+        self.assertEqual(body["stage"], "producer")
+
+    def test_post_tokens_is_silent_without_env(self):
+        # senza url/segreto (ne' argomenti ne' ambiente) non fa nulla, e lo dice
+        import os
+        saved = {k: os.environ.pop(k, None) for k in ("PIPELINE_INGEST_URL", "PIPELINE_INGEST_TOKEN")}
+        try:
+            self.assertFalse(pipeline_monitor.post_tokens("r", 1))
+        finally:
+            for k, v in saved.items():
+                if v is not None:
+                    os.environ[k] = v
 
 
 if __name__ == "__main__":
