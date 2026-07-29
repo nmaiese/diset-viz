@@ -173,7 +173,7 @@
         <summary>
           <span class="id">{{ r.id }}</span>
           <span class="state {{ r.state }}">{{ r.state }}</span>
-          <span class="stages">{{ r.completed_stages|join(' &middot; ') or 'nessuno stadio' }}{% if r.next_role %} <b>&rarr; {{ r.next_role }}</b>{% endif %}</span>
+          <span class="stages">{{ r.completed_stages|join(' · ') or 'nessuno stadio' }}{% if r.next_role %} <b>&rarr; {{ r.next_role }}</b>{% endif %}</span>
           {% if r.flags %}<span class="flags">{{ r.flags|join(', ') }}</span>{% endif %}
           <span class="num">prio {{ r.priority }}</span>
           {% if r.published_url %}<a class="pub" href="{{ r.published_url }}" target="_blank" rel="noopener">pagina pubblicata &#8599;</a>
