@@ -37,6 +37,7 @@ from app import quiz_tokens
 from app import leaderboard
 from app import moderation
 from app import public_urls
+from app import publisher
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -110,6 +111,9 @@ def _inject_license():
         "data_license_url": sources.LICENSE_URL,
         "data_license_label": sources.LICENSE_LABEL,
         "data_licenses_label": sources.licenses_label,
+        "publisher": publisher.ORGANIZATION,
+        "publisher_jsonld": publisher.organization_json(),
+        "corrections_url": publisher.CORRECTIONS_URL,
     }
 
 
@@ -609,6 +613,16 @@ def privacy():
     )
 
 
+@app.route("/chi-siamo")
+def about():
+    return render_template(
+        "about.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/chi-siamo",
+    )
+
+
 @app.route("/metodologia")
 def methodology():
     return render_template(
@@ -699,6 +713,7 @@ def _render_indicator(family, raw_id):
         seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
         seo_description=seo_description,
         dataset_description=_dataset_description(lead, meta),
+        dataset_updated=publisher.dataset_updated(meta["family"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{meta['canonical_path']}",
@@ -1369,6 +1384,7 @@ def sitemap():
         {"loc": f"{SITE_URL}/confronto", "priority": "0.7"},
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
         {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/chi-siamo", "priority": "0.6"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
         {"loc": f"{SITE_URL}/quiz", "priority": "0.7"},
