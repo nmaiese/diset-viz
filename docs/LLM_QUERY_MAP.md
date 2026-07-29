@@ -20,6 +20,26 @@ La scheda deve dichiarare l'ultimo anno realmente disponibile e non sostituirlo
 con una stima. Le medie territoriali sono semplici e non vanno chiamate medie
 nazionali.
 
+## Interfacce per agenti
+
+Le pagine canoniche restano la fonte pubblica da citare. Un client può
+richiederne la variante Markdown inviando `Accept: text/markdown`; la risposta
+mantiene lo stesso URL canonico e dichiara `Vary: Accept` e `Content-Location`.
+La negoziazione è disponibile per home, atlante, catalogo dati, blog e articoli,
+metodologia, schede indicatore, profili regionali e temi.
+
+La scoperta automatica parte dagli header `Link` della home e prosegue su tre
+risorse che non entrano nella sitemap e rispondono con `X-Robots-Tag: noindex`:
+
+- `/.well-known/api-catalog`, catalogo RFC 9727 delle interfacce pubbliche;
+- `/openapi.json`, contratto OpenAPI dei soli endpoint di lettura documentati;
+- `/.well-known/agent-skills/index.json`, indice della skill pubblica
+  `query-divario-italia`, con digest SHA-256 verificabile.
+
+La skill descrive come interrogare e interpretare i dati. Non concede nuove
+capacità: restano esclusi endpoint di scrittura, giochi, classifiche utenti e
+strumenti interni della pipeline.
+
 ## Definizione
 
 | priorità | domanda reale | pubblico | URL canonica che deve rispondere | fonte | granularità | anno richiesto | formato ideale | lacune attuali |
