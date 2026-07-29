@@ -515,6 +515,23 @@ def ricerca():
     return response
 
 
+def _pipeline_published_url(indicator_id):
+    """Il path canonico della pagina pubblicata di un indicatore, o None.
+
+    Riusa il path precomputato dal catalogo (`build_indicator_view`), preferito
+    al ricalcolo dello slug come vuole `.claude/rules/app.md`. La view Flask puo'
+    importare il catalogo, cosi' `pipeline_monitor` resta stdlib-puro. Se l'id non
+    si risolve, niente link invece di un errore: il cruscotto non deve cadere per
+    una riga."""
+    try:
+        from app import indicator_view, sources
+        family, raw_id = sources.split_internal_id(indicator_id)
+        view = indicator_view.build_indicator_view(family, raw_id)
+        return (view or {}).get("meta", {}).get("canonical_path") or None
+    except Exception:  # noqa: BLE001
+        return None
+
+
 @app.route("/_pipeline")
 def pipeline_dashboard():
     """Cruscotto interno della catena editoriale, protetto e noindex.
@@ -544,6 +561,11 @@ def pipeline_dashboard():
         activity = {"beats": [], "prs": []}
     board = pipeline_monitor.load_board(heartbeats=activity["beats"],
                                         open_runs=activity["prs"])
+    # Le righe pubblicate portano il link alla pagina: poche righe (published=True),
+    # quindi il costo di build_indicator_view resta trascurabile.
+    for row in board.get("rows", []):
+        row["published_url"] = (_pipeline_published_url(row["id"])
+                                if row.get("published") is True else None)
     return render_template("pipeline.html", board=board,
                            token=request.args.get("token", ""),
                            site_name=SITE_NAME)

@@ -67,6 +67,40 @@ class Board(unittest.TestCase):
         self.assertEqual(b["totals"]["in-lavorazione"], 2)
         self.assertEqual(b["totals"]["pubblicata"], 1)
 
+    def test_rows_carry_stages_published_and_per_indicator_run_history(self):
+        d = practice("ter-x", state="fusa",
+                     completed=["curator", "writer", "reviewer"], priority=3.0)
+        d.update({"published": True, "verification_valid": True,
+                  "runs": ["producer-r1", "verificatore-r2"]})
+        runs = [
+            {"run_id": "producer-r1", "stage": "writer", "outcome": "merged",
+             "summary": "scritto e firmato", "at": "2026-07-02T09:00:00+00:00",
+             "model": "claude-opus-4-8", "duration_seconds": 120},
+            {"run_id": "verificatore-r2", "stage": "verificatore", "outcome": "merged",
+             "summary": "36 controllate, 0 smentite", "at": "2026-07-05T09:00:00+00:00",
+             "model": "claude-opus-4-8", "duration_seconds": 90},
+            {"run_id": "altro-r3", "stage": "writer", "outcome": "merged",
+             "summary": "un'altra run non collegata", "at": "2026-07-06T09:00:00+00:00"},
+        ]
+        b = pipeline_monitor.board({"ter-x": d}, runs=runs, today=self.TODAY)
+        row = b["rows"][0]
+        self.assertEqual(row["completed_stages"], ["curator", "writer", "reviewer"])
+        self.assertIs(row["published"], True)
+        self.assertIs(row["verification_valid"], True)
+        # solo le run in d["runs"], unite per run_id, la piu' recente prima
+        self.assertEqual([r["run_id"] for r in row["runs"]],
+                         ["verificatore-r2", "producer-r1"])
+        self.assertEqual(row["runs"][0]["summary"], "36 controllate, 0 smentite")
+        self.assertEqual(row["runs"][0]["duration_seconds"], 90)
+        self.assertEqual(row["runs"][1]["model"], "claude-opus-4-8")
+        self.assertNotIn("altro-r3", [r["run_id"] for r in row["runs"]])
+
+    def test_a_run_id_without_a_collapsed_run_is_skipped_not_crashed(self):
+        d = practice("ter-y", completed=["curator"])
+        d["runs"] = ["mancante-r9"]
+        b = pipeline_monitor.board({"ter-y": d}, runs=[], today=self.TODAY)
+        self.assertEqual(b["rows"][0]["runs"], [])
+
     def test_recent_history_is_newest_first_and_capped(self):
         runs = [{"at": f"2026-07-{d:02d}T09:00:00+00:00", "stage": "writer",
                  "outcome": "merged", "summary": f"run {d}", "run_id": f"r{d}"}

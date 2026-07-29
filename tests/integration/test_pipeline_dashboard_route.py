@@ -71,6 +71,28 @@ class PipelineDashboardRoute(unittest.TestCase):
         self.assertTrue(any(s in body for s in
                             ("bloccat", "pronti al lavoro", "in pari")))
 
+    def test_it_shows_the_per_indicator_explorer_with_run_history(self):
+        body = self._client().get("/_pipeline").get_data(as_text=True)
+        # la sezione esaustiva per-indicatore, il filtro e le colonne del dettaglio
+        self.assertIn("Tutti gli indicatori", body)
+        self.assertIn("filtraIndicatori", body)
+        self.assertIn("cosa ha fatto l'agente", body)
+        self.assertIn('details class="ind"', body)
+
+    def test_a_published_indicator_links_to_its_page(self):
+        # Costruito dai file veri: se un indicatore risulta pubblicato sul sito,
+        # la sua riga porta il link canonico alla pagina; se nessuno lo e', il
+        # test non ha nulla da provare e passa (lo stato di pubblicazione e' dato
+        # vivo, non un invariante del repo).
+        from scripts import pipeline_monitor
+        rows = pipeline_monitor.load_board()["rows"]
+        published = [r for r in rows if r.get("published") is True]
+        if not published:
+            self.skipTest("nessun indicatore risulta pubblicato sul sito ora")
+        body = self._client().get("/_pipeline").get_data(as_text=True)
+        self.assertIn("pagina pubblicata", body)
+        self.assertIn("/indicatore/", body)
+
     def test_a_token_locks_it(self):
         client = self._client(token="segreto123")
         self.assertEqual(client.get("/_pipeline").status_code, 404)
