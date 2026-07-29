@@ -56,9 +56,21 @@ due stadi sullo stesso file, e la regola e' il passo 3-bis del contratto.
 ## 4. La pull request e il merge, delegato
 
 ```bash
-gh pr create --base master --title "..." --body "..."
-.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero> --run-id <run_id>
+git push -u origin HEAD
+PR=$(python3 scripts/pipeline_merge.py --open \
+       --stage <stadio> --head <il tuo branch> --run-id <run_id> --title "..." --body "...")
+.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <run_id>
 ```
+
+L'apertura usa `python3` (stdlib pura, e il worktree non ha `.venv`); il merge usa
+`.venv/bin/python` perche' rilancia il cancello che importa l'app. Nel worktree il
+venv c'e': `pipeline_workspace.py --open` collega quello del checkout principale.
+
+La PR si apre con `pipeline_merge.py --open`, non con `gh pr create`, e **senza
+`GH_REPO`**: `gh pr create` e' GraphQL e non riconosce il remote proxato, e
+`GH_REPO` (il rimedio che si era diffuso) corto-circuita `repo_slug`, gli rompe un
+test e causa rifiuti orfani "il cancello e' rosso" su master. Lo slug lo ricava
+gia' `repo_slug` dal remote, e `--open` apre la PR sulla stessa REST del merge.
 
 Il tuo modo di merge (`auto` o `checks`) e' un ordine al passo di merge, non un
 permesso per te: **non fondi mai da solo**, in nessuna forma di `gh pr merge`.
@@ -70,3 +82,13 @@ un merge che si fida del verdetto raccontato dall'agente non protegge niente.
 
 Nel corpo della pull request: che cosa hai fatto, con i numeri veri, e che cosa
 hai deciso di NON fare, con il perche'. Nessun trailer `Co-Authored-By`.
+
+## 5. Chiudi il worktree
+
+```bash
+python3 scripts/pipeline_workspace.py --close --run-id <run_id>
+```
+
+Hai lavorato in un worktree isolato (passo 1 del contratto), non nel checkout
+principale: chiuderlo dopo il merge non lascia un albero orfano sul disco. Il
+passo di merge scrive su master da un worktree suo, quindi e' sicuro chiuderlo qui.

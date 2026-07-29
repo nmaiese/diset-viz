@@ -289,7 +289,7 @@ class TheSignatureCheckReadsStateNotDiffLines(unittest.TestCase):
         import unittest.mock as mock
 
         original = pipeline_gate.changed_text_keys
-        pipeline_gate.changed_text_keys = lambda base=None, cwd=None: keys
+        pipeline_gate.changed_text_keys = lambda base=None, cwd=None, include_worktree=True: keys
         try:
             with mock.patch.object(indicator_store, "load_all", lambda root=None: entries):
                 return pipeline_gate.check_reviewer_signature()
@@ -334,7 +334,7 @@ class ChecksThatCannotRunAreNotPasses(unittest.TestCase):
 
     def test_an_unverifiable_vintage_blocks_instead_of_passing(self):
         original = pipeline_gate.changed_text_keys
-        pipeline_gate.changed_text_keys = lambda base=None, cwd=None: ["eur:fake"]
+        pipeline_gate.changed_text_keys = lambda base=None, cwd=None, include_worktree=True: ["eur:fake"]
         try:
             import builtins
 
@@ -466,7 +466,7 @@ class ACrashIsNotAFailure(unittest.TestCase):
     def test_nothing_to_verify_is_still_a_pass(self):
         """Precision matters: a stage that touched no article owes no vintage."""
         original = pipeline_gate.changed_text_keys
-        pipeline_gate.changed_text_keys = lambda base=None, cwd=None: []
+        pipeline_gate.changed_text_keys = lambda base=None, cwd=None, include_worktree=True: []
         try:
             check = pipeline_gate.check_writer_vintage()
         finally:
@@ -749,6 +749,49 @@ class TheBaseCheckStoppedPunishingAMovingMaster(unittest.TestCase):
         self.assertFalse(check.ok)
         self.assertIn("antenato in comune", check.detail)
 
+    def _sibling_leaves_an_uncommitted_stray(self):
+        """Un altro ruolo, nello stesso checkout condiviso, lascia un file non
+        committato fuori dal perimetro di questo stadio. E' la forma esatta del
+        bug del checkout condiviso: il working tree porta l'incompiuto altrui."""
+        self._write("app/intruso.py", "print('lavoro di un altro')")
+
+    def test_committed_only_ignores_a_siblings_uncommitted_file(self):
+        self._diverge()
+        self._sibling_leaves_an_uncommitted_stray()
+        root = pipeline_gate.PROJECT_ROOT
+        pipeline_gate.PROJECT_ROOT = self.repo
+        try:
+            with_wt = pipeline_gate.changed_paths(
+                base="master", cwd=self.repo, include_worktree=True)
+            committed = pipeline_gate.changed_paths(
+                base="master", cwd=self.repo, include_worktree=False)
+        finally:
+            pipeline_gate.PROJECT_ROOT = root
+        self.assertIn("app/intruso.py", with_wt)
+        self.assertNotIn("app/intruso.py", committed)
+        self.assertEqual(committed, ["content/indicators/1.json"])
+
+    def test_a_siblings_stray_file_does_not_trip_blast_radius_when_committed_only(self):
+        """committed_only e' cio' che il passo di merge usa: al merge il lavoro
+        dello stadio e' gia' committato, e l'incompiuto di un altro ruolo nello
+        stesso albero non e' di questa run, quindi non deve bocciarla."""
+        self._diverge()
+        self._sibling_leaves_an_uncommitted_stray()
+        root = pipeline_gate.PROJECT_ROOT
+        pipeline_gate.PROJECT_ROOT = self.repo
+        try:
+            shared = pipeline_gate.changed_paths(
+                base="master", cwd=self.repo, include_worktree=True)
+            isolated = pipeline_gate.changed_paths(
+                base="master", cwd=self.repo, include_worktree=False)
+        finally:
+            pipeline_gate.PROJECT_ROOT = root
+        # Col working tree il perimetro del produttore boccia il file altrui...
+        self.assertFalse(pipeline_gate.check_blast_radius("writer", shared).ok)
+        # ...senza, resta verde: il diff committato e' tutto nel perimetro.
+        self.assertTrue(pipeline_gate.check_blast_radius("writer", isolated).ok)
+
+
 class TheJournalIsAppendOnlyToo(unittest.TestCase):
     """Il registro delle verifiche era gia' sorvegliato, il diario no.
 
@@ -925,6 +968,54 @@ class ThePublisherProvesTheSite(unittest.TestCase):
         check = self._check()
         self.assertFalse(check.ok)
         self.assertIn("non si cancella", check.detail)
+
+
+class TheGateReadsFilesFromTheSuppliedWorktree(unittest.TestCase):
+    """La guardia importa il cancello dal checkout principale ma passa
+    cwd=worktree (l'hook gira come $CLAUDE_PROJECT_DIR/scripts/agent_guard.py).
+    Se il cancello leggesse i file dal principale invece che dal worktree, un
+    diario appena committato nel worktree risulterebbe cancellato, e lo Stop
+    hook rifiuterebbe una run bloccata che aveva committato la sua riga."""
+
+    def setUp(self):
+        self._tmp = TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.main = Path(self._tmp.name) / "main"
+        self.main.mkdir()
+        self._git("init", "-q", "-b", "master")
+        self._git("config", "user.email", "t@example.com")
+        self._git("config", "user.name", "t")
+        (self.main / "data" / "pipeline" / "runs").mkdir(parents=True)
+        (self.main / "data" / "pipeline" / "runs" / ".gitkeep").write_text("")
+        self._git("add", "-A")
+        self._git("commit", "-qm", "base")
+        self.wt = Path(self._tmp.name) / "runs" / "r1"
+        self._git("worktree", "add", "-q", "-b", "automation/writer-x", str(self.wt), "master")
+        journal = self.wt / "data" / "pipeline" / "runs" / "writer-x.json"
+        journal.write_text('{"stage": "writer", "outcome": "blocked"}')
+        subprocess.run(("git", "add", "-A"), cwd=self.wt, capture_output=True)
+        subprocess.run(("git", "commit", "-qm", "diario"), cwd=self.wt, capture_output=True)
+        self._orig = pipeline_gate.PROJECT_ROOT
+        pipeline_gate.PROJECT_ROOT = self.main.resolve()
+        self.addCleanup(lambda: setattr(pipeline_gate, "PROJECT_ROOT", self._orig))
+
+    def _git(self, *args):
+        return subprocess.run(("git",) + args, cwd=self.main, capture_output=True, text=True)
+
+    def test_a_journal_committed_in_the_worktree_is_added_not_gone(self):
+        touched = pipeline_gate._touched_under(
+            pipeline_gate.RUN_JOURNAL, base="master", cwd=str(self.wt))
+        self.assertIn("data/pipeline/runs/writer-x.json", touched["added"])
+        self.assertEqual(touched["gone"], [])
+
+    def test_the_invariant_loaders_follow_the_worktree(self):
+        # _read_csv e indicator_store/verification_queue leggono dal worktree, non
+        # dal PROJECT_ROOT del modulo: un verdetto non valida la versione del
+        # principale al posto di quella cambiata nel worktree.
+        self.assertEqual(pipeline_gate._indicators_root(cwd=str(self.wt)),
+                         self.wt.resolve() / "content" / "indicators")
+        self.assertEqual(pipeline_gate._indicators_root(cwd=None),
+                         self.main.resolve() / "content" / "indicators")
 
 
 if __name__ == "__main__":

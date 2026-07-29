@@ -53,6 +53,30 @@ gcloud run services update diset-viz --region europe-west1 \
 | `LEADERBOARD_DB` | `/data/leaderboard.sqlite3` (default da `Dockerfile`) | Percorso locale del file SQLite nel container. |
 | `LITESTREAM_REPLICA_URL` | `gs://nil-automata-diset-viz-leaderboard/leaderboard` | Destinazione della replica continua Litestream. |
 
+### Cruscotto della catena `/_pipeline` — token e vivo
+
+Il cruscotto interno mostra lo stato **vivo** della catena editoriale (ruoli in
+volo e PR aperte). Il vivo non puo' passare da file locali: gli agenti girano su
+macchine effimere separate dal server. Passa invece dallo **stesso** SQLite della
+leaderboard (`LEADERBOARD_DB`, gia' replicato su GCS da Litestream): gli agenti
+fanno un POST a `/_pipeline/beat`, il sito scrive quella tabella (`pipeline_activity`),
+`/_pipeline` la legge. Due variabili nuove:
+
+| Variabile | Dove | A cosa serve |
+|---|---|---|
+| `PIPELINE_TOKEN` | env Cloud Run (o Secret Manager) | Se impostata, `/_pipeline` serve solo con `?token=` giusto, altrimenti 404. Vuota = aperta (solo locale). |
+| `PIPELINE_INGEST_TOKEN` | **Secret Manager**, su Cloud Run **e** nell'ambiente agenti `divarioitalia` | Il segreto con cui gli agenti autenticano il POST dei battiti (header `X-Pipeline-Key`). Vuoto = ingest spento (404). |
+
+L'ambiente agenti vuole anche `PIPELINE_INGEST_URL=https://divarioitalia.it`, cosi'
+`pipeline_monitor.py --beat-open/--beat-close` e `pipeline_inflight.py --post` sanno
+dove postare. Nessuna credenziale GCP sugli agenti: scrivono solo via l'endpoint.
+
+**Caveat.** La tabella del vivo condivide il file SQLite della leaderboard, quindi
+eredita la stessa assunzione: Litestream e' single-writer, e il modello regge
+perche' il traffico e' basso e `--min-instances=0` tiene di norma un solo
+container attivo. Sotto scale multi-istanza il vivo puo' risultare per-istanza
+finche' non arriva il prossimo restore; e' un limite accettato, non un bug nuovo.
+
 Per ricreare il setup da zero (nuovo progetto o servizio):
 
 ```bash

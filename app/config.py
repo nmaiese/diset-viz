@@ -23,6 +23,14 @@ BING_SITE_VERIFICATION = os.getenv("BING_SITE_VERIFICATION", "")
 # rivela di esistere). Vuoto = aperta, per lo sviluppo in locale.
 PIPELINE_TOKEN = os.getenv("PIPELINE_TOKEN", "")
 
+# Il segreto con cui gli agenti della catena inviano i battiti a /_pipeline/beat
+# (il vivo del cruscotto: chi lavora su cosa, e le PR aperte). Il sito lo scrive
+# nel SQLite che Litestream replica su GCS, cosi' il vivo e' condiviso fra le
+# macchine senza credenziali GCP sugli agenti. Vuoto = ingest disabilitato
+# (l'endpoint risponde 404, come /_pipeline senza token), che e' il default in
+# locale e finche' il segreto non e' provisionato in Cloud Run e nell'ambiente agenti.
+PIPELINE_INGEST_TOKEN = os.getenv("PIPELINE_INGEST_TOKEN", "")
+
 # Deprecated: consent is managed by the CMP loaded in Google Tag Manager.
 FORCE_FUNDING_CHOICES_CMP = False
 ENABLE_CONSENT_BANNER = False

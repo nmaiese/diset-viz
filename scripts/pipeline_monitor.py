@@ -107,13 +107,16 @@ def headline(rows: list, today: str = "") -> str:
 
 
 def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
-          recent: int = 12) -> dict:
+          recent: int = 12, open_runs=None) -> dict:
     """Il cruscotto intero, dai soli artefatti gia' letti. Puro.
 
     `dossier` e' l'uscita di `practice_timeline`. `runs` sono le run gia'
     collassate (`pipeline_log.collapse_runs`), per la storia recente.
-    `heartbeats` sono i battiti vivi. Ritorna la frase in testa, le righe per
-    indicatore, i fermi, il vivo, la storia recente e i totali per stato.
+    `heartbeats` sono i battiti vivi (un ruolo che lavora, prima ancora che ci
+    sia una PR); `open_runs` sono le PR aperte su `automation/*` con stato CI e
+    mergeabilita', fotografate dal lanciatore. Ritorna la frase in testa, le
+    righe per indicatore, i fermi, il vivo, le PR aperte, la storia recente e i
+    totali per stato.
     """
     rows = [row_of(d, today) for d in dossier.values()]
     rows.sort(key=lambda r: (-r["priority"], -r["days"], r["id"]))
@@ -131,6 +134,7 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
         "ready": [r for r in rows if r["next_role"]],
         "rows": rows,
         "in_flight": sorted(heartbeats or [], key=lambda h: h.get("since", "")),
+        "open_runs": sorted(open_runs or [], key=lambda p: (p.get("pr") or 0)),
         "recent": [{"at": run.get("at", ""), "stage": run.get("stage", ""),
                     "outcome": run.get("outcome", ""), "summary": run.get("summary", ""),
                     "run_id": run.get("run_id", "")} for run in recent_runs],
@@ -166,6 +170,35 @@ def clear_heartbeat(run_id: str, root=None) -> None:
         pass
 
 
+def post_beat(payload: dict, url: str = "", token: str = "", timeout: int = 5,
+              opener=None) -> bool:
+    """Manda un battito all'endpoint del sito, best effort. Ritorna se e' andata.
+
+    E' cio' che fa comparire il vivo su /_pipeline mentre un agente lavora, anche
+    prima che ci sia una commit: gli agenti girano su macchine effimere separate
+    dal server, e l'unico modo perche' il server veda il vivo senza dare a ognuno
+    una credenziale GCS e' che lo scriva il server, su richiesta. Puro urllib,
+    stdlib. `url`/`token` di default dall'ambiente; se mancano, non fa niente e lo
+    dice, cosi' in locale (o senza segreto) non e' un errore, e' silenzio."""
+    import json as _json
+    import os
+    import urllib.request
+
+    url = url or os.environ.get("PIPELINE_INGEST_URL", "")
+    token = token or os.environ.get("PIPELINE_INGEST_TOKEN", "")
+    if not url or not token:
+        return False
+    endpoint = url.rstrip("/") + "/_pipeline/beat"
+    data = _json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(endpoint, data=data, method="POST", headers={
+        "Content-Type": "application/json", "X-Pipeline-Key": token})
+    try:
+        with (opener or urllib.request.urlopen)(req, timeout=timeout) as resp:
+            return 200 <= getattr(resp, "status", 200) < 300
+    except Exception:  # noqa: BLE001  (best effort: un battito perso non ferma la run)
+        return False
+
+
 def read_heartbeats(root=None, now: str = "", stale_hours: int = HEARTBEAT_STALE_HOURS) -> list:
     """I battiti vivi: quelli piu' vecchi della soglia si scartano (sessione
     caduta senza pulire). `now` iniettabile per i test."""
@@ -187,15 +220,23 @@ def read_heartbeats(root=None, now: str = "", stale_hours: int = HEARTBEAT_STALE
     return out
 
 
-def load_board(today: str = "", proofs_root=None, recent: int = 12) -> dict:
-    """Collega i lettori reali (tutti stdlib puri) e ritorna il cruscotto."""
+def load_board(today: str = "", proofs_root=None, recent: int = 12,
+               heartbeats=None, open_runs=None) -> dict:
+    """Collega i lettori reali (tutti stdlib puri) e ritorna il cruscotto.
+
+    `heartbeats`/`open_runs` iniettabili: la rotta Flask li passa dal SQLite
+    vivo (scritto dai POST degli agenti, replicato su GCS). Quando `heartbeats`
+    e' None si torna ai battiti su file, che e' cio' che vuole la CLI in locale
+    (agente e file sulla stessa macchina); sul server quei file sono sempre vuoti,
+    ed e' esattamente il motivo per cui il cruscotto sembrava morto."""
     from datetime import datetime, timezone
     from scripts import pipeline_log
     ref = today or datetime.now(timezone.utc).date().isoformat()
     dossier = practice_timeline.load_real(today=ref, proofs_root=proofs_root)
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
-    heartbeats = read_heartbeats(now=ref)
-    return board(dossier, runs=runs, heartbeats=heartbeats, today=ref, recent=recent)
+    beats = read_heartbeats(now=ref) if heartbeats is None else heartbeats
+    return board(dossier, runs=runs, heartbeats=beats, today=ref, recent=recent,
+                 open_runs=open_runs)
 
 
 def main(argv=None) -> int:
@@ -215,11 +256,17 @@ def main(argv=None) -> int:
     if args.beat_open:
         role, run_id = args.beat_open
         path = write_heartbeat(role, run_id, indicator=args.indicator)
+        # Il file locale resta per la CLI in locale; il POST fa comparire il vivo
+        # sul sito servito (best effort: se l'ambiente non ha URL/segreto, tace).
+        sent = post_beat({"action": "beat", "run_id": run_id, "role": role,
+                          "indicator": args.indicator, "stage": role})
         if not args.json:
-            print(f"battito aperto: {role} su {args.indicator or '(coda)'} -> {path}")
+            print(f"battito aperto: {role} su {args.indicator or '(coda)'} -> {path}"
+                  + ("  (inviato al sito)" if sent else ""))
         return 0
     if args.beat_close:
         clear_heartbeat(args.beat_close)
+        post_beat({"action": "close", "run_id": args.beat_close})
         if not args.json:
             print(f"battito chiuso: {args.beat_close}")
         return 0

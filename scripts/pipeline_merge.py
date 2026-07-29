@@ -56,7 +56,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 import time
@@ -118,21 +117,50 @@ def _bucket(run):
     return _CONCLUSION_BUCKET.get(run.get("conclusion") or "", "fail")
 
 
+def _worktree_dirty(runner=_run, cwd=None):
+    """I file non committati del worktree, o '' se e' pulito. Best effort.
+
+    `git status --porcelain --untracked-files=all`, come `changed_paths`.
+    `--untracked-files=all` e non il default: se l'ambiente ha
+    `status.showUntrackedFiles=no`, il default considererebbe pulito un albero con
+    file NUOVI, e la suite potrebbe usare un modulo o una fixture non tracciata,
+    risultare verde e fondere un commit che non la contiene, cioe' proprio il
+    guasto che questo controllo esiste per impedire. Rispetta comunque
+    `.gitignore` (il symlink `.venv`, il meta di sessione e i battiti locali non
+    contano). Serve al passo di merge per rifiutare un albero sporco: la suite gira
+    sui file su disco, il merge fonde il commit, e con un worktree per run un file
+    non committato e' lavoro di questa run che non finirebbe su master."""
+    code, out = runner(["git", "status", "--porcelain", "--untracked-files=all"], cwd=cwd)
+    if code != 0:
+        # Fail closed: se non si riesce a leggere lo stato non si sa se e' pulito,
+        # e trattarlo come pulito lascerebbe fondere un albero forse sporco (una
+        # config `status.showUntrackedFiles` guasta puo' far fallire solo questo).
+        return f"git status non leggibile (codice {code}): {out.strip()[:120]}"
+    if not out.strip():
+        return ""
+    files = [line[3:].strip() for line in out.splitlines() if line.strip()]
+    shown = ", ".join(files[:6])
+    return shown + (f", e altri {len(files) - 6}" if len(files) > 6 else "")
+
+
 def repo_slug(runner=_run, cwd=None):
-    """`owner/repo`, e non lo si chiede a `gh` perche' `gh` qui non lo sa.
+    """`owner/repo`, ricavato SEMPRE dal remote, mai da `GH_REPO`.
 
     Il proxy di uscita riscrive `origin` in qualcosa come
     `http://local_proxy@127.0.0.1:41729/git/nmaiese/diset-viz`, e davanti a quel
     remote `gh` dice "none of the git remotes point to a known GitHub host" e si
     ferma. Gli ultimi due segmenti del percorso pero' sono ancora owner e repo, e
     lo sono anche in `git@github.com:owner/repo.git` e in un URL https normale,
-    quindi si prendono da li'. `GH_REPO` vince su tutto, com'e' l'abitudine di
-    `gh`, cosi' un caso che non avessi previsto resta sbloccabile senza toccare
-    il codice.
+    quindi si prendono da li'.
+
+    `GH_REPO` **non** e' piu' un override, ed e' apposta. Era il workaround che gli
+    agenti impostavano per `gh pr create`, e da environment ereditato faceva
+    aprire (o fondere) la PR sul repo sbagliato, o fallire perche' li' il branch
+    non esiste: esattamente i rifiuti orfani che il resto di questa PR toglie.
+    Chiedere agli agenti di non impostarlo non basta se l'ambiente lo conserva,
+    quindi il percorso automatico lo ignora del tutto. Il remote lo risolve gia',
+    quindi la variabile e' solo un footgun.
     """
-    env = (os.environ.get("GH_REPO") or "").strip()
-    if env:
-        return env
     code, out = runner(["git", "remote", "get-url", "origin"], cwd=cwd)
     if code != 0:
         raise RuntimeError("non riesco a leggere l'URL di origin")
@@ -271,6 +299,37 @@ def merge(pr, runner=_run, cwd=None, slug=None, log=print):
     return True, detail
 
 
+def create_pr(head, title, body, base="master", runner=_run, cwd=None, slug=None,
+              run_id=""):
+    """Apre la pull request via REST, e ritorna il suo numero.
+
+    Esiste per la stessa ragione per cui il merge sta su `gh api` e non su
+    `gh pr merge`: `gh pr create` e' porcelain, cioe' GraphQL, e davanti al
+    remote riscritto dal proxy dice "none of the git remotes point to a known
+    GitHub host" e si ferma. Lo slug lo ricava `repo_slug` dal remote proxato,
+    ignorando `GH_REPO`, quindi si apre la PR sulla stessa superficie REST del
+    merge, con lo stesso slug.
+
+    Il `run_id` va nel corpo (`run_id: <...>`) perche' il cruscotto possa
+    correlare la PR con il battito e le due righe di diario della run: il branch
+    ne porta solo il suffisso, non l'id intero, quindi ricavarlo dal branch
+    perderebbe la corrispondenza. Il lanciatore lo rilegge da li'.
+    """
+    slug = slug or repo_slug(runner=runner, cwd=cwd)
+    if run_id:
+        body = f"{body}\n\nrun_id: {run_id}"
+    ok, data = api(
+        f"repos/{slug}/pulls", runner=runner, cwd=cwd, method="POST",
+        fields=[("title", title), ("head", head), ("base", base), ("body", body)],
+    )
+    if not ok or not isinstance(data, dict):
+        raise RuntimeError(f"apertura PR fallita: {str(data)[:400]}")
+    number = data.get("number")
+    if not number:
+        raise RuntimeError(f"la risposta di apertura PR non ha un numero: {str(data)[:200]}")
+    return int(number)
+
+
 def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts=3,
                    run_id=None):
     """Scrive su master la riga di diario con l'esito vero, e la spinge.
@@ -387,7 +446,27 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
     that refused to merge still leaves the same kind of trace as one that did.
     """
     if verdict is None:
-        verdict = pipeline_gate.run(stage, skip_tests=skip_tests, cwd=cwd)
+        # Il worktree della run deve essere pulito prima del merge, e il perche'
+        # e' sottile. Il cancello guarda il solo diff committato (committed_only,
+        # vedi sotto), ma la suite gira sui file **su disco**: un fix lasciato non
+        # committato passerebbe la suite e poi non finirebbe su master, perche' il
+        # merge REST fonde il commit, e `--close` butterebbe il fix. Con un
+        # worktree isolato per run un file sporco e' lavoro non committato di
+        # QUESTA run, non di un sibling, quindi il rimedio giusto e' rifiutare e
+        # chiedere di committare, cosi' la suite prova esattamente cio' che si fonde.
+        dirty = _worktree_dirty(runner=runner, cwd=cwd)
+        if dirty:
+            verdict = {"merge": "blocked", "ok": False, "checks": [
+                {"check": f"worktree non pulito, committa prima di fondere ({dirty})",
+                 "ok": False}]}
+        else:
+            # committed_only: al merge il lavoro dello stadio e' gia' committato sul
+            # branch, quindi il cancello guarda il solo diff committato e non il
+            # working tree. Cosi' l'incompiuto di un altro ruolo in un checkout
+            # condiviso non viene attribuito a questa run (la seconda faccia del bug
+            # del checkout condiviso).
+            verdict = pipeline_gate.run(stage, skip_tests=skip_tests, cwd=cwd,
+                                        committed_only=True)
     mode = verdict["merge"]
     log(f"stadio {stage}, PR #{pr}, cancello: {mode}")
 
@@ -438,7 +517,14 @@ def main():
         epilog="uscita 0 = fusa, 1 = non fusa (e il motivo e' stampato).",
     )
     parser.add_argument("--stage", required=True, choices=sorted(pipeline_gate.STAGE_PATHS))
-    parser.add_argument("--pr", required=True, help="numero della pull request")
+    parser.add_argument("--pr", help="numero della pull request (per il merge)")
+    parser.add_argument("--open", action="store_true",
+                        help="apre la PR via REST e stampa il numero, invece di fondere. "
+                             "Vuole --head e --title; --body opzionale. Nessun GH_REPO.")
+    parser.add_argument("--head", help="il branch della PR da aprire (con --open)")
+    parser.add_argument("--title", help="il titolo della PR (con --open)")
+    parser.add_argument("--body", default="", help="il corpo della PR (con --open)")
+    parser.add_argument("--base", default="master", help="il branch di base (con --open)")
     parser.add_argument("--dry-run", action="store_true",
                         help="arriva fino al merge e non lo fa")
     parser.add_argument("--skip-tests", action="store_true",
@@ -451,6 +537,17 @@ def main():
                              "a quale run appartiene")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
+
+    if args.open:
+        if not args.head or not args.title:
+            parser.error("--open vuole --head e --title")
+        number = create_pr(args.head, args.title, args.body, base=args.base,
+                            run_id=args.run_id or "")
+        print(number)
+        return 0
+
+    if not args.pr:
+        parser.error("--pr e' obbligatorio per il merge (o usa --open per aprire la PR)")
 
     result = decide(args.stage, args.pr, dry_run=args.dry_run, skip_tests=args.skip_tests,
                     journal=not args.no_journal, run_id=args.run_id)

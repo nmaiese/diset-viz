@@ -49,6 +49,20 @@ promoter), **produttore** (curator+writer+reviewer), **verificatore**.
    `launches`: una lista ordinata per priorita' (una smentita pubblica, peso 100,
    apre il piano davanti a tutto).
 
+   Poi fotografa le PR aperte per il cruscotto (anche questo meccanico, una sola
+   chiamata a GitHub, la tua):
+
+   ```bash
+   python3 scripts/pipeline_inflight.py --post
+   ```
+
+   Elenca le PR aperte su `automation/*` con stato CI e mergeabilita' e le manda
+   a `/_pipeline/beat`, cosi' il cruscotto distingue "in lavorazione" da "PR
+   aperta con CI rossa" da "PR pronta che aspetta il merge". Sei l'unico punto
+   della catena che parla gia' con GitHub, quindi la sola chiamata sta qui, non
+   sul sito. Best effort: senza `PIPELINE_INGEST_URL`/`PIPELINE_INGEST_TOKEN`
+   nell'ambiente, tace e il giro continua.
+
 2. **Piano vuoto** (`launches` vuota, uscita 1): la catena e' ferma perche' ha
    finito, non perche' e' bloccata. Non lanciare niente, non aprire PR, non
    committare. Riporta in una riga e fermati.

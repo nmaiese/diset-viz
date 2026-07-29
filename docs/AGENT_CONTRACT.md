@@ -33,17 +33,43 @@ ha assegnato, non "ti porti avanti" su lavoro che non e' tuo.
 Se il lanciatore ti ha passato un `run_id`, usalo. Se non ce l'hai, lo conia
 `pipeline_log` al passo 4.
 
-**Lascia il tuo battito, cosi' il cruscotto ti vede in volo.** Appena hai il
-`run_id`, all'inizio della run:
+**Apri il tuo albero di lavoro isolato.** Appena hai il `run_id`, prima di
+toccare qualunque file:
+
+```bash
+python3 scripts/pipeline_workspace.py --open --role <ruolo> --run-id <run_id>
+# stampa il path del worktree: entra li' e lavora **solo** li' (percorsi assoluti).
+```
+
+Non lavori nel checkout principale. Piu' ruoli girano in parallelo nella stessa
+macchina, e un checkout git ha **un** HEAD, **un** indice e **un** branch
+corrente: se due run li condividono, il `git checkout -b` di una sposta il branch
+sotto i piedi dell'altra, le impila i commit, le cancella un file non committato,
+e nel caso peggiore riporta a master un articolo gia' committato, senza un solo
+errore. Il worktree ti da' HEAD e indice tuoi, su un branch unico keyed sul
+`run_id` (`automation/<ruolo>-<data>-<suffisso>`), partendo da `origin/master`
+aggiornato. La premessa "indicatori diversi toccano file diversi, quindi non
+contendono" vale per i **percorsi**, non per l'indice git ne' per HEAD: e' per
+quello che serve il worktree, non il solo nome di branch. Lo chiudi al passo 4.
+
+(Per lo sviluppo manuale, senza un albero separato, `--here` apre solo il branch
+unico nel checkout corrente. Le run lanciate in parallelo usano sempre il worktree.)
+
+**Lascia il tuo battito, cosi' il cruscotto ti vede in volo.** Appena aperto il
+worktree, dentro di esso:
 
 ```bash
 python3 scripts/pipeline_monitor.py --beat-open <ruolo> <run_id> --indicator <codice>
 ```
 
 e' quello che fa apparire "produttore su ter-X dalle HH:MM" su `/_pipeline`
-mentre lavori, prima ancora che ci sia una commit. Alla chiusura lo cancelli
-(passo 4). Best effort: se salti il battito il cruscotto non ti vede vivo, ma il
-tuo lavoro committato resta.
+mentre lavori, prima ancora che ci sia una commit. Se l'ambiente ha
+`PIPELINE_INGEST_URL` e `PIPELINE_INGEST_TOKEN`, il comando fa anche un POST al
+sito servito, cosi' il battito si vede su divarioitalia.it e non solo in locale
+(gli agenti girano su macchine effimere separate dal server: il POST e' l'unico
+modo perche' il server veda il vivo, senza dare credenziali GCS a ogni agente).
+Alla chiusura lo cancelli (passo 4). Best effort: se salti il battito, o l'ambiente
+non ha URL e segreto, il cruscotto non ti vede vivo ma il tuo lavoro committato resta.
 
 ## 2. Lavorare: una cosa per volta, sempre motivata
 
@@ -63,8 +89,8 @@ tuo lavoro committato resta.
 
 ## 3. Chiudere: il cancello decide, non tu
 
-Lavora su un branch dedicato (`automation/<stadio>-<YYYY-MM-DD>`), committa
-**senza** il trailer `Co-Authored-By`, poi:
+Sei gia' nel tuo worktree, sul branch della run (passo 1). Committa **senza** il
+trailer `Co-Authored-By`, poi:
 
 ```bash
 python3 scripts/pipeline_gate.py --stage <scout|hunter|promoter|curator|writer|reviewer|verificatore>
@@ -75,9 +101,26 @@ e passa il numero al passo di merge, che rilegge il cancello per conto suo e
 decide.
 
 ```bash
-gh pr create --title "..." --body "..."
-.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr <numero> --run-id <il tuo run_id>
+git push -u origin HEAD
+PR=$(python3 scripts/pipeline_merge.py --open \
+       --stage <stadio> --head <il tuo branch> --run-id <il tuo run_id> --title "..." --body "...")
+.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <il tuo run_id>
 ```
+
+L'apertura usa **`python3`** (e' stdlib pura, una sola chiamata REST, e il
+worktree non ha un `.venv`); il merge usa **`.venv/bin/python`** perche' rilancia
+il cancello, che per il vintage importa l'app. Nel worktree il venv c'e':
+`pipeline_workspace.py --open` ci collega quello del checkout principale (deps dal
+venv, codice dell'app dal worktree). Se manca del tutto, crealo prima
+(`python3 -m venv .venv`), come gia' serve per la suite.
+
+**La PR si apre con `pipeline_merge.py --open`, non con `gh pr create`, e senza
+`GH_REPO`.** `gh pr create` e' porcelain (GraphQL), e davanti al remote riscritto
+dal proxy dice "none of the git remotes point to a known GitHub host" e si ferma.
+Aggirarlo con `GH_REPO` era peggio del male: `GH_REPO` corto-circuita `repo_slug`,
+gli rompe un test e ha causato rifiuti orfani "il cancello e' rosso" su master.
+Lo slug `pipeline_merge` lo ricava gia' dal remote proxato, quindi **non impostare
+mai `GH_REPO`**: `--open` apre la PR sulla stessa superficie REST del merge.
 
 **Il `--run-id` non e' facoltativo in pratica.** E' l'unica cosa che lega la
 riga che hai scritto tu, dentro la pull request, alla riga di esito che questo
@@ -235,6 +278,17 @@ python3 scripts/pipeline_monitor.py --beat-close <run_id>
 Se te ne dimentichi non e' un guasto: un battito piu' vecchio della soglia si
 scarta da solo (una sessione caduta senza pulire). Ma cancellarlo tiene il vivo
 onesto.
+
+**Chiudi il tuo worktree** dopo il merge, cosi' non resta un albero orfano sul
+disco:
+
+```bash
+python3 scripts/pipeline_workspace.py --close --run-id <run_id>
+```
+
+Il passo di merge lavora su master da un worktree usa e getta suo, non dal tuo,
+quindi chiuderlo dopo il merge e' sicuro. Best effort: se lo salti, un
+`git worktree prune` alla run dopo lo raccoglie.
 
 Serviva perche' il buco era doppio. Il cacciatore ha scritto `pr-open` e si e'
 fuso trenta secondi dopo, e per mezza giornata il diario ha raccontato che
