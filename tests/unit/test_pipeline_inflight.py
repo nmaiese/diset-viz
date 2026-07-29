@@ -27,13 +27,13 @@ class BuildSnapshotIsPure(unittest.TestCase):
             {"number": 12, "head": {"ref": "automation/producer-2026-07-29-c"}, "title": "corsa"},
             {"number": 13, "head": {"ref": "automation/producer-2026-07-29-d"}, "title": "nessuna"},
         ]
-        checks = {
-            10: {"python": "pass", "gate": "pass"},
-            11: {"python": "pass", "gate": "fail"},
-            12: {"python": "pending"},
-            13: {},
+        details = {
+            10: {"states": {"python": "pass", "gate": "pass"}},
+            11: {"states": {"python": "pass", "gate": "fail"}},
+            12: {"states": {"python": "pending"}},
+            13: {"states": {}},
         }
-        by_pr = {p["pr"]: p["ci"] for p in inflight.build_snapshot(pulls, checks)}
+        by_pr = {p["pr"]: p["ci"] for p in inflight.build_snapshot(pulls, details)}
         self.assertEqual(by_pr[10], "verde")
         self.assertEqual(by_pr[11], "rossa")
         self.assertEqual(by_pr[12], "in-corsa")
@@ -49,11 +49,16 @@ class BuildSnapshotIsPure(unittest.TestCase):
               "body": ""}], {})[0]
         self.assertEqual(from_branch["run_id"], "verificatore-2026-07-29-c0de")
 
-    def test_mergeable_is_a_word(self):
-        rows = inflight.build_snapshot(
-            [{"number": 1, "head": {"ref": "automation/a-b"}, "mergeable": True},
-             {"number": 2, "head": {"ref": "automation/a-c"}, "mergeable": False},
-             {"number": 3, "head": {"ref": "automation/a-d"}, "mergeable": None}], {})
+    def test_mergeable_is_a_word_from_the_per_pr_detail(self):
+        # La mergeabilita' arriva dal dettaglio per-PR, non dalla lista (che non la
+        # porta): una lista senza dettaglio da' "?", non un falso "si"/"no".
+        pulls = [
+            {"number": 1, "head": {"ref": "automation/a-b"}},
+            {"number": 2, "head": {"ref": "automation/a-c"}},
+            {"number": 3, "head": {"ref": "automation/a-d"}},
+        ]
+        details = {1: {"mergeable": True}, 2: {"mergeable": False}, 3: {}}
+        rows = inflight.build_snapshot(pulls, details)
         self.assertEqual([r["mergeable"] for r in rows], ["si", "no", "?"])
 
 
@@ -85,7 +90,9 @@ class OpenRunsReadsRestWithoutGhRepo(unittest.TestCase):
             if path.endswith("/status") or "/status?" in path:
                 return 0, json.dumps({"statuses": []})
             if "/pulls/" in path:
-                return 0, json.dumps({"head": {"sha": "s7", "ref": "automation/producer-2026-07-29-abcd"}})
+                return 0, json.dumps({
+                    "head": {"sha": "s7", "ref": "automation/producer-2026-07-29-abcd"},
+                    "mergeable": True})
             return 0, "{}"
 
         runner.calls = calls
@@ -107,6 +114,26 @@ class OpenRunsReadsRestWithoutGhRepo(unittest.TestCase):
             if argv[:2] == ["git", "remote"]:
                 return 0, "http://local_proxy@127.0.0.1:41729/git/nmaiese/diset-viz\n"
             if "pulls?state=open" in argv[-1]:
+                return 1, "HTTP 502: Bad Gateway"
+            return 0, "{}"
+        with self.assertRaises(RuntimeError):
+            inflight.open_runs(runner=runner)
+
+    def test_a_per_pr_failure_also_raises_not_degrades_to_no_checks(self):
+        # La lista riesce, ma la GET per-PR fallisce: non si degrada a "nessuna"
+        # (che cancellerebbe uno stato rosso vero), si solleva e si tiene la
+        # fotografia precedente.
+        import json
+
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "remote"]:
+                return 0, "http://local_proxy@127.0.0.1:41729/git/nmaiese/diset-viz\n"
+            path = argv[-1]
+            if "pulls?state=open" in path:
+                return 0, json.dumps([
+                    {"number": 7, "head": {"ref": "automation/producer-2026-07-29-abcd"},
+                     "title": "produttore"}])
+            if "/pulls/" in path:
                 return 1, "HTTP 502: Bad Gateway"
             return 0, "{}"
         with self.assertRaises(RuntimeError):

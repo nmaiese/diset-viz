@@ -37,6 +37,7 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -79,25 +80,34 @@ def worktree_path(run_id, root=None):
     return Path(root or RUNS_ROOT) / (run_id or "run")
 
 
-def _ensure_master(runner, cwd, attempts=3):
+def _ensure_master(runner, cwd, attempts=5, sleep=time.sleep, backoff=0.5):
     """Aggiorna `origin/master`, tollerando la corsa fra run concorrenti.
 
     Piu' run partono insieme e fanno `git fetch` sullo **stesso** repo condiviso:
     i worktree isolano HEAD e indice, ma i ref remoti no, quindi due fetch corrono
     a scrivere `refs/remotes/origin/master` e git respinge il perdente con
-    "cannot lock ref". Non e' fatale: si ritenta, e se `origin/master` e' comunque
-    risolvibile (un sibling l'ha appena aggiornato) si procede da quello, invece
-    di abortire la run prima ancora che possa lasciare un battito o una riga."""
+    "cannot lock ref". E' transitorio: il lock e' tenuto dal fetch di un sibling e
+    si libera appena quello finisce, quindi si **ritenta con backoff** finche' il
+    nostro fetch riesce.
+
+    E si fallisce se non riesce mai. La sola prova che `origin/master` e' il tip
+    remoto vero e' un fetch nostro andato a buon fine: un `origin/master` che
+    "risolve" dice solo che una copia in cache esiste, non che e' fresca. Partire
+    da quella copia (fetch fallito per rete o auth, non per lock) farebbe girare il
+    cancello su codice vecchio e poi fondere in un master piu' nuovo senza aver mai
+    provato l'albero combinato. Meglio fallire l'apertura che partire da un tip non
+    verificato."""
     last = ""
-    for _ in range(max(1, attempts)):
+    for i in range(max(1, attempts)):
         code, out = runner(["git", "fetch", "origin", "master"], cwd=cwd)
         if code == 0:
             return
         last = out
-    code, _ = runner(["git", "rev-parse", "--verify", "--quiet", "origin/master"], cwd=cwd)
-    if code != 0:
-        raise RuntimeError(
-            f"git fetch origin master fallito e origin/master non risolve: {last.strip()[:200]}")
+        if i + 1 < attempts:
+            sleep(backoff * (i + 1))
+    raise RuntimeError(
+        f"git fetch origin master fallito dopo {attempts} tentativi (il ref non e' "
+        f"verificato fresco, non si parte da un tip stantio): {last.strip()[:200]}")
 
 
 def _link_venv(path):
@@ -121,7 +131,7 @@ def _link_venv(path):
 
 
 def open_workspace(role, run_id, base="origin/master", runner=_run, cwd=None,
-                   today=None, root=None, here=False):
+                   today=None, root=None, here=False, sleep=time.sleep):
     """Apre l'albero di lavoro privato della run e ne ritorna il path (stringa).
 
     Parte sempre da `origin/master` aggiornato, non da qualunque cosa HEAD porti
@@ -133,7 +143,7 @@ def open_workspace(role, run_id, base="origin/master", runner=_run, cwd=None,
     sviluppo manuale. Le run in parallelo non lo usano, li' la contesa e' reale.
     """
     branch = branch_name(role, run_id, today=today)
-    _ensure_master(runner, cwd)
+    _ensure_master(runner, cwd, sleep=sleep)
 
     if here:
         code, out = runner(["git", "checkout", "-b", branch, base], cwd=cwd)

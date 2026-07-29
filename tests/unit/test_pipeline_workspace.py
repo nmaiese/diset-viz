@@ -61,25 +61,31 @@ class OpeningIsolatesTheRun(unittest.TestCase):
         self.assertIn("origin/master", argv)
         self.assertTrue(path.endswith("producer-20260729T101010Z-abcd"))
 
-    def test_a_fetch_race_is_tolerated_when_master_resolves(self):
-        # Il fetch perde la corsa sul ref remoto condiviso ("cannot lock ref"),
-        # ma origin/master risolve gia' (un sibling l'ha aggiornato): si procede,
-        # non si aborta la run prima che possa battere.
-        runner = Runner(fail_on=("git", "fetch"))
-        ws.open_workspace("producer", "run-1", runner=runner, root="/tmp/runs")
-        self.assertIn(["git", "worktree", "add"], [c[:3] for c in runner.calls])
+    def test_a_transient_fetch_lock_is_retried_until_it_succeeds(self):
+        # Il fetch perde la corsa sul ref remoto condiviso ("cannot lock ref")
+        # un paio di volte, poi il lock del sibling si libera e riesce: si procede.
+        # Solo un fetch NOSTRO riuscito prova che il ref e' fresco.
+        fails = {"n": 2}
 
-    def test_a_failed_fetch_with_unresolvable_master_is_loud(self):
-        # Fetch fallito E origin/master che non risolve: li' non c'e' da cui
-        # partire, ed e' l'unico caso in cui aprire deve fallire forte.
         def runner(argv, cwd=None):
             if argv[:2] == ["git", "fetch"]:
-                return 1, "cannot lock ref"
-            if argv[:2] == ["git", "rev-parse"]:
-                return 1, ""
+                if fails["n"] > 0:
+                    fails["n"] -= 1
+                    return 1, "cannot lock ref refs/remotes/origin/master"
+                return 0, ""
+            runner.calls.append(argv)
             return 0, ""
+        runner.calls = []
+        ws.open_workspace("producer", "run-1", runner=runner, root="/tmp/runs",
+                          sleep=lambda _: None)
+        self.assertIn(["git", "worktree", "add"], [c[:3] for c in runner.calls])
+
+    def test_a_persistent_fetch_failure_is_loud(self):
+        # Il fetch non riesce mai (rete/auth, o lock che non si libera): non si
+        # parte da un origin/master non verificato fresco, si fallisce l'apertura.
+        runner = Runner(fail_on=("git", "fetch"))
         with self.assertRaises(RuntimeError):
-            ws.open_workspace("producer", "run-1", runner=runner)
+            ws.open_workspace("producer", "run-1", runner=runner, sleep=lambda _: None)
 
     def test_a_failed_worktree_add_is_loud(self):
         runner = Runner(fail_on=("git", "worktree", "add"))
