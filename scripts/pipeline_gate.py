@@ -262,6 +262,17 @@ def _root_for(cwd=None):
     return PROJECT_ROOT
 
 
+def _indicators_root(cwd=None):
+    """La cartella degli articoli nel working tree di `cwd` (o nel principale).
+
+    Serve a `indicator_store.load_all`/`verification_queue.load_texts`, i cui root
+    sono fissati all'import del modulo: se il cancello e' importato dal checkout
+    principale ma gira con `cwd=worktree`, senza questo leggerebbero gli articoli
+    del principale invece di quelli cambiati nel worktree, e un verdetto potrebbe
+    validare la versione sbagliata."""
+    return _root_for(cwd) / "content" / "indicators"
+
+
 def check_base_is_usable(base=None, cwd=None):
     """La base deve poter spiegare il diff, non deve essere in cima a master.
 
@@ -460,19 +471,19 @@ def check_no_coauthor_trailer(base=None, cwd=None):
     return Check("no-coauthor", True, "nessun trailer Co-Authored-By")
 
 
-def _read_csv(path):
-    full = PROJECT_ROOT / path
+def _read_csv(path, cwd=None):
+    full = _root_for(cwd) / path
     if not full.exists():
         return []
     return discovery.read_semicolon(full)
 
 
-def check_hunter_decisions(rows=None):
+def check_hunter_decisions(rows=None, cwd=None):
     """A triage decision with no written reason is not a decision, it is a
     coin toss with a CSV column. The chain has to be able to explain, months
     later, why a candidate was let in, and the only place that survives is the
     queue itself."""
-    rows = rows if rows is not None else _read_csv(CANDIDATES)
+    rows = rows if rows is not None else _read_csv(CANDIDATES, cwd=cwd)
     if not rows:
         return Check("triage-motivato", True, "coda vuota")
     silent = [
@@ -517,12 +528,12 @@ def check_hunter_decisions(rows=None):
     return Check("triage-motivato", True, f"{len(rows)} candidati, ogni decisione ha una motivazione")
 
 
-def check_curation_decisions(rows=None):
+def check_curation_decisions(rows=None, cwd=None):
     """`score_eligible=true` on a verso that is not directional would put an
     indicator with no "better" into the quality-of-life score, where every value
     is oriented. apply_curation refuses it too, but the gate says so before the
     PR exists rather than after."""
-    rows = rows if rows is not None else _read_csv(CURATION)
+    rows = rows if rows is not None else _read_csv(CURATION, cwd=cwd)
     if not rows:
         return Check("curatela-direzionale", True, "nessuna decisione di curatela")
     bad = [
@@ -563,7 +574,7 @@ def _prose_fingerprints(rows, resolved, cwd=None):
     """
     fingerprints = set()
     try:
-        texts = verification_queue.load_texts()
+        texts = verification_queue.load_texts(root=_indicators_root(cwd))
     except (OSError, ValueError, indicator_store.StoreError):
         texts = {}
     for key, entry in texts.items():
@@ -785,7 +796,7 @@ def check_publications(base=None, cwd=None, include_worktree=True):
 
     resolved = resolve_base(base, cwd=cwd)
     try:
-        entries = indicator_store.load_all()
+        entries = indicator_store.load_all(root=_indicators_root(cwd))
     except (OSError, ValueError, indicator_store.StoreError):
         entries = {}
 
@@ -836,7 +847,7 @@ def check_reviewer_signature(base=None, cwd=None, include_worktree=True):
     if not keys:
         return Check("firma-revisore", True, "nessuna modifica ai testi")
     try:
-        entries = indicator_store.load_all()
+        entries = indicator_store.load_all(root=_indicators_root(cwd))
     except (OSError, ValueError, indicator_store.StoreError) as exc:
         return Check("firma-revisore", False, f"testi illeggibili: {type(exc).__name__}")
     unsigned, mismatched = [], []
@@ -983,7 +994,7 @@ def check_writer_vintage(base=None, cwd=None, include_worktree=True):
             f"({type(exc).__name__}). Crea il venv "
             f"(python3 -m venv .venv && .venv/bin/pip install -r requirements.txt) e rilancia.",
         )
-    entries = indicator_store.load_all()
+    entries = indicator_store.load_all(root=_indicators_root(cwd))
     ahead = []
     for key in keys:
         entry = entries.get(key) or {}
@@ -1162,8 +1173,8 @@ def run(stage, base=None, skip_tests=False, cwd=None, committed_only=False):
     # diff** (piu' la firma, che e' del ruolo): `invariant_labels` decide quali,
     # ed e' pura, cosi' la composizione si prova senza git ne' disco.
     builders = {
-        "triage": lambda: check_hunter_decisions(),
-        "curation": lambda: check_curation_decisions(),
+        "triage": lambda: check_hunter_decisions(cwd=cwd),
+        "curation": lambda: check_curation_decisions(cwd=cwd),
         "vintage": lambda: check_writer_vintage(base, cwd=cwd, include_worktree=iw),
         "signature": lambda: check_reviewer_signature(base, cwd=cwd, include_worktree=iw),
         "verifications": lambda: check_verifications(base, cwd=cwd, include_worktree=iw),

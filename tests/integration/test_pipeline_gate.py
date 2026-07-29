@@ -1008,6 +1008,15 @@ class TheGateReadsFilesFromTheSuppliedWorktree(unittest.TestCase):
         self.assertIn("data/pipeline/runs/writer-x.json", touched["added"])
         self.assertEqual(touched["gone"], [])
 
+    def test_the_invariant_loaders_follow_the_worktree(self):
+        # _read_csv e indicator_store/verification_queue leggono dal worktree, non
+        # dal PROJECT_ROOT del modulo: un verdetto non valida la versione del
+        # principale al posto di quella cambiata nel worktree.
+        self.assertEqual(pipeline_gate._indicators_root(cwd=str(self.wt)),
+                         self.wt.resolve() / "content" / "indicators")
+        self.assertEqual(pipeline_gate._indicators_root(cwd=None),
+                         self.main.resolve() / "content" / "indicators")
+
 
 if __name__ == "__main__":
     unittest.main()

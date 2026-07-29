@@ -128,6 +128,22 @@ class TheRunsRootFollowsTheMainCheckout(unittest.TestCase):
         ws.close_workspace("producer-abcd", runner=runner)
         self.assertEqual(seen["remove"], "/home/user/diset-viz-runs/producer-abcd")
 
+    def test_close_runs_remove_and_prune_from_the_main_checkout(self):
+        # Dal worktree, rimuoverlo cancella la CWD del processo: il prune
+        # successivo fallirebbe "Unable to read current working directory". remove
+        # e prune girano quindi dal principale, che sopravvive alla rimozione.
+        calls = []
+
+        def runner(argv, cwd=None):
+            calls.append((argv, cwd))
+            if argv == ["git", "rev-parse", "--git-common-dir"]:
+                return 0, "/home/user/diset-viz/.git\n"
+            return 0, ""
+        ws.close_workspace("r1", runner=runner)
+        for argv, cwd in calls:
+            if argv[:3] in (["git", "worktree", "remove"], ["git", "worktree", "prune"]):
+                self.assertEqual(cwd, "/home/user/diset-viz")
+
 
 class ClosingRemovesAndPrunes(unittest.TestCase):
     def test_it_removes_the_worktree_then_prunes(self):
