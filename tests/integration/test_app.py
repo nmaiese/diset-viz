@@ -247,6 +247,22 @@ class AppSmokeTest(unittest.TestCase):
         self.assertEqual(llms_full.status_code, 200)
         self.assertIn(b"Classifica", llms_full.data)
         self.assertIn(b"Catalogo completo", llms_full.data)
+        self.assertNotIn(b"<id>", llms.data)
+        self.assertIn(b"/download/indicator/901.csv", llms.data)
+
+        sitemap_indicator_urls = set(re.findall(
+            r"<loc>(https://divarioitalia\.it/indicatore/[^<]+)</loc>",
+            sitemap.get_data(as_text=True),
+        ))
+        llms_full_text = llms_full.get_data(as_text=True)
+        missing_from_llms = sorted(
+            url for url in sitemap_indicator_urls if f"]({url})" not in llms_full_text
+        )
+        self.assertEqual(
+            missing_from_llms,
+            [],
+            f"indicatori in sitemap ma assenti da llms-full.txt: {missing_from_llms[:10]}",
+        )
 
         privacy = client.get("/privacy")
         self.assertEqual(privacy.status_code, 200)

@@ -1263,42 +1263,61 @@ def sitemap():
         pages.append({"loc": f"{SITE_URL}{region['path']}", "priority": "0.7"})
     for theme in all_atlas_themes_index():
         pages.append({"loc": f"{SITE_URL}{theme['path']}", "priority": "0.5"})
-    for item in get_catalog()["indicators"]:
-        if not profiles.is_search_indexable_indicator(item):
-            continue
+    for view in _indexable_indicator_views():
+        meta = view["meta"]
         pages.append({
-            "loc": f"{SITE_URL}{profiles.indicator_path(item['id'], item['name'])}",
-            "lastmod": f"{item['year_max']}-12-31",
+            "loc": f"{SITE_URL}{meta['canonical_path']}",
+            "lastmod": f"{meta['year_max']}-12-31",
             "priority": "0.6",
         })
-    for item in bes_data.all_bes_indicators():
-        if not item["indexable"]:
-            continue
-        pages.append({
-            "loc": f"{SITE_URL}{item['path']}",
-            "lastmod": f"{item['year_max']}-12-31",
-            "priority": "0.6",
-        })
-    if multiscopo_data.has_multiscopo_data():
-        for item in multiscopo_data.all_multiscopo_indicators():
-            if not item["indexable"]:
-                continue
-            pages.append({
-                "loc": f"{SITE_URL}{item['path']}",
-                "lastmod": f"{item['year_max']}-12-31",
-                "priority": "0.6",
-            })
-    if external_atlas.has_external_data():
-        for item in external_atlas.all_external_indicators():
-            if not item["indexable"]:
-                continue
-            pages.append({
-                "loc": f"{SITE_URL}{item['path']}",
-                "lastmod": f"{item['year_max']}-12-31",
-                "priority": "0.6",
-            })
     xml = render_template("sitemap.xml", pages=pages)
     return Response(xml, mimetype="application/xml")
+
+
+def _indexable_indicator_views():
+    """Return every canonical indicator document that search may index.
+
+    Sitemap and LLM indexes used to enumerate the source families separately.
+    That let ``llms-full.txt`` call a territorial-only list a complete catalog.
+    Keep the family-specific admission rules, but normalize the admitted records
+    through the common indicator view before either discovery surface sees them.
+    """
+    candidates = []
+    candidates.extend(
+        ("territorial", item["id"])
+        for item in get_catalog()["indicators"]
+        if profiles.is_search_indexable_indicator(item)
+    )
+    candidates.extend(
+        ("bes", item["id"])
+        for item in bes_data.all_bes_indicators()
+        if item["indexable"]
+    )
+    if multiscopo_data.has_multiscopo_data():
+        candidates.extend(
+            ("multiscopo", item["id"])
+            for item in multiscopo_data.all_multiscopo_indicators()
+            if item["indexable"]
+        )
+    if external_atlas.has_external_data():
+        candidates.extend(
+            sources.split_internal_id(item["id"])
+            for item in external_atlas.all_external_indicators()
+            if item["indexable"]
+        )
+
+    views = []
+    seen_paths = set()
+    for family, raw_id in candidates:
+        view = indicator_view.build_indicator_view(family, raw_id)
+        if view is None or not view["meta"]["indexable"]:
+            continue
+        path = view["meta"]["canonical_path"]
+        if path in seen_paths:
+            continue
+        seen_paths.add(path)
+        views.append(view)
+    return views
 
 
 # Content-Signals preamble + AI-bot blocklist. These were previously injected by
@@ -1435,7 +1454,9 @@ def llms_txt():
         "## Note per i modelli linguistici",
         "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori.",
         f"- Licenza dei dati: {sources.LICENSE_LABEL}. Cita \"Divario Italia\" e la fonte Istat.",
-        f"- Dati strutturati per indicatore: {SITE_URL}/download/indicator/<id>.csv e {SITE_URL}/download/indicator/<id>.json.",
+        "- Le pagine degli indicatori territoriali espongono link diretti ai download CSV e JSON quando disponibili.",
+        f"- Esempio CSV: {SITE_URL}/download/indicator/{_HOME_FEATURED_INDICATORS[0]}.csv.",
+        f"- Esempio JSON: {SITE_URL}/download/indicator/{_HOME_FEATURED_INDICATORS[0]}.json.",
         f"- Indice completo delle pagine: {SITE_URL}/sitemap.xml.",
         f"- Versione estesa con definizioni e classifiche complete: {SITE_URL}/llms-full.txt.",
         "- I confronti descrivono differenze osservate, non rapporti di causa. Anni e coperture possono variare tra indicatori.",
@@ -1516,15 +1537,15 @@ def llms_full_txt():
 
     lines.append("## Catalogo completo degli indicatori indicizzabili")
     lines.append("")
-    for item in get_catalog()["indicators"]:
-        if not profiles.is_search_indexable_indicator(item):
-            continue
+    for view in _indexable_indicator_views():
+        item = view["meta"]
         plain = " ".join(((item.get("explain") or {}).get("plain") or "").split())
-        path = profiles.indicator_path(item["id"], item["name"])
+        path = item["canonical_path"]
         detail = f" {plain}" if plain else ""
         lines.append(
             f"- [{item['name']}]({SITE_URL}{path}): tema {item['theme']}, "
-            f"unita {item.get('unit') or 'n.d.'}, copertura {item['year_min']}-{item['year_max']}.{detail}"
+            f"fonte {item['source_label']}, unita {item.get('unit') or 'n.d.'}, "
+            f"copertura {item['year_min']}-{item['year_max']}.{detail}"
         )
     lines.append("")
     return Response("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")

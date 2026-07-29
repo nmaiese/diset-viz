@@ -14,6 +14,7 @@ on every edit-save cycle.
 """
 
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -57,6 +58,13 @@ class EveryIndicatorPageRenders(unittest.TestCase):
                 if f'id="sezione-{role}"' not in html:
                     missing.append((indicator_id, role))
         self.assertEqual(missing, [], f"pages missing an article section: {missing[:10]}")
+
+    def test_territorial_dataset_markup_exposes_real_downloads(self):
+        html = self._get("901").get_data(as_text=True)
+        self.assertIn('"@type": "DataDownload"', html)
+        self.assertIn("/download/indicator/901.csv", html)
+        self.assertIn("/download/indicator/901.json", html)
+        self.assertIsNotNone(re.search(r'"license": "https://', html))
 
     def test_the_sitemap_and_the_pages_agree_on_what_is_indexable(self):
         """A listed URL must not serve noindex, and vice versa.
