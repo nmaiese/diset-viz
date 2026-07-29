@@ -232,7 +232,6 @@ def get_external_atlas_indicator(public_id):
         "institution": institution,
         "license": first.get("license") or default_license,
         "license_url": license_url,
-        "date_modified": max((row.get("retrieved_at") or "")[:10] for row in rows) or None,
         "archive": first.get("source_dataset") or source_label,
         "explain": _explain_with_curation(
             str(public_id),

@@ -33,8 +33,8 @@
   "temporalCoverage": "{{ level.year_min }}/{{ level.year_max }}",
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": { "@type": "Organization", "name": {{ (meta.source_label or meta.source) | tojson }}, "url": {{ meta.source_url | tojson }} },
-  "publisher": { "@type": "Organization", "name": {{ site_name | tojson }}, "url": "{{ site_url }}/" },{% if meta.date_modified %}
-  "dateModified": {{ meta.date_modified | tojson }},{% endif %}
+  "publisher": { "@type": "Organization", "name": {{ site_name | tojson }}, "url": "{{ site_url }}/" },{% if dataset_updated %}
+  "dateModified": {{ dataset_updated | tojson }},{% endif %}
   "isBasedOn": {{ (meta.source_data_url or meta.source_url) | tojson }},
   "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni",
   "variableMeasured": {{ meta.name | tojson }},
@@ -278,7 +278,7 @@
     {# How we compute, not what the source measures. It stays here so an authored
        "limiti" section can never drop it. #}
     <p>La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica di misurazione:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni.</p>
-    {% if meta.date_modified %}<p class="page-note"><strong>Aggiornamento del dataset:</strong> {{ meta.date_modified }}.</p>{% endif %}
+    {% if dataset_updated %}<p class="page-note"><strong>Aggiornamento del dataset:</strong> {{ dataset_updated }}.</p>{% endif %}
 
     {% if meta.quality_life_scored %}
     <p>Questa serie entra nel punteggio regionale della qualità della vita{% if meta.quality_life_category_label %}, nella categoria {{ meta.quality_life_category_label }}{% endif %}. Il punteggio ordina i dati, non sostituisce l'interpretazione del contesto territoriale.</p>
