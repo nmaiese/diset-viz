@@ -9,7 +9,7 @@ description: >-
   claim goes back to the reviewer as the `smentita` flag. Use after a reviewer run,
   or to work through the backlog of signed articles nobody has challenged.
 tools: Read, Grep, Glob, Bash, Write, WebSearch, WebFetch
-model: opus
+model: claude-opus-4-8
 skills:
   - pipeline-close-run
   - untrusted-web
