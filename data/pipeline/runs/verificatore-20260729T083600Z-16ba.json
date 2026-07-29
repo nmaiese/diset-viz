@@ -1,0 +1,24 @@
+{
+ "at": "2026-07-29T08:55:10+00:00",
+ "base_commit": "37ac00d",
+ "branch": "automation/verificatore-2026-07-29-birthrate",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "f9a0c93",
+ "detail": [
+  "Serie e graduatoria 2024 ricontrollate una per una sul brief: ordine 1 Trentino Alto Adige 7,60, 2 Campania 7,40, 3 Sicilia 7,00, 4 Calabria 6,90, poi Lombardia 6,50 ed Emilia-Romagna 6,30, gradino di 0,40 dopo la Calabria, mediana 5,80 sotto la media 6,04, stacco di 0,70 fra Valle d'Aosta 5,20 e Sardegna 4,50, il piu' largo. Tutte confermate.",
+  "Dinamica ricalcolata sulla serie 2015-2024: calo in tutte e 20 le regioni, media semplice da 7,80 a 6,045 cioe' -1,76, Lazio e Valle d'Aosta -2,50 il calo maggiore, Liguria -0,90 il minore, Friuli-Venezia Giulia -1,20, Trentino Alto Adige -2,00, Campania -1,40, ultimo passaggio 2023-2024 con 15 in calo, 1 in aumento (Liguria da 5,5 a 5,6) e 4 stabili. Tutte confermate.",
+  "Fatti esterni verificati sul PDF Istat: Indicatori demografici, Anno 2024 (31 marzo 2025) dice testualmente 'Con 1,18 figli per donna viene superato il minimo di 1,19 del 1995' e assegna il primato di fecondita' al Trentino-Alto Adige con 1,39, la Sardegna piu' bassa con 0,91. Natalita' e fecondita', Anno 2024 (21 ottobre 2025) da' 369.944 nati, quindi 'meno di 370 mila' regge.",
+  "SMENTITA fonti/medio: la seconda fonte attribuisce al comunicato Natalita' e fecondita' della popolazione residente, Anno 2024 la frase sul numero medio di figli per donna piu' alto in Trentino-Alto Adige, 1,39. In quel documento la stringa Trentino-Alto Adige non compare mai, il Prospetto 2 elenca le due province autonome separate (Bolzano 1,51 e Trento 1,27 nel 2024) e il testo assegna il primato a Bolzano/Bozen con 1,51. La cifra 1,39 per il Trentino-Alto Adige e' degli Indicatori demografici del 31 marzo 2025, gia' prima fonte dell'articolo. I numeri in prosa restano giusti, sbagliato e' il documento a cui sono attribuiti.",
+  "Non contate come smentite due imprecisioni minori: 'in dieci anni' per la finestra 2015-2024, che sono nove anni di variazione, e la seconda meta' della prima fonte ('i nati restano sotto le 370 mila unita'), che il comunicato del 31 marzo arrotonda a 370 mila e che regge solo grazie al dato definitivo 369.944 del comunicato di ottobre.",
+  "Lavorato in un worktree isolato: nel checkout condiviso altri ruoli in volo tenevano sporchi content/indicators/100-105.json e il cancello, che somma diff e status, li leggeva come miei."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 32,
+ "queue_before": 33,
+ "run_id": "verificatore-20260729T083600Z-16ba",
+ "stage": "verificatore",
+ "summary": "Verificato dem-BIRTHRATE: 25 affermazioni controllate, 24 confermate, 1 smentita, 0 non verificabili",
+ "trigger": "launch"
+}
