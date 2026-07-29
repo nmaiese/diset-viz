@@ -1,0 +1,19 @@
+{
+ "at": "2026-07-29T12:22:15+00:00",
+ "base_commit": "8756ab9",
+ "branch": "automation/verificatore-2026-07-29-ter101",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "8756ab9",
+ "detail": [
+  "Smentita 1 (quadro/medio): 'Media e mediana cadono a meno di un decimo di punto l'una dall'altra, cioe' manca la coda lunga che di solito sbilancia queste graduatorie da un lato'. Media 86,71 e mediana 86,74 coincidono perche' due tiri opposti si annullano, non perche' manchi la coda: tolte Sardegna 79,61 e Sicilia 78,73 la media delle altre diciotto vale 87,55, cioe' 0,84 punti sopra, ventotto volte lo scarto di 0,03 che l'articolo usa come prova, e l'asimmetria della distribuzione 2024 vale -0,49. Tre frasi dopo l'articolo descrive la stessa coda come uno scalino di 4,06 punti. Smentita 2 (quadro/medio): 'Le prime diciotto regioni stanno dentro 9,91 punti e si scendono un gradino alla volta ... E' l'unico posto dove la distribuzione si rompe'. Il gradino mediano fra le prime diciotto vale 0,26 punti, ma fra Molise 93,58 e Umbria 91,36 ce ne sono 2,22 (8,5 volte il mediano, 55 per cento dello stacco 4,06 dichiarato unico) e fra Liguria 86,44 e Trentino Alto Adige 84,53 altri 1,90. Confermate fra le altre: Eurostat edat_lfse_03 via API, Italia 81,4 nel 2018 e 86,5 nel 2024, Ue27 83,2 e 85,0, esatti; citazione MUR verbatim sul diploma come requisito di accesso; media 2018 81,80 e 2024 86,71 (+4,91), 4,05 entro il 2022 e 0,86 nei due anni dopo; Trentino Alto Adige unico sotto il punto di partenza, 84,63 -> 84,53; Molise undicesimo su venti nel 2018; Sardegna 67,91 nel 2018, 81,67 nel 2020, 74,98 nel 2022, 79,61 nel 2024; Valle d'Aosta settima su bes-02IST004 al 2023 e diciottesima qui; isole staccate di 3,20 punti dalla diciottesima su bes-02IST005-N22 al 2025; Toscana quarta di qua e quarta di la; rho -0,66 sopra la soglia 0,60 del repo; tre link interni a 200. Non verificabile: 'su una fascia larga cinque anni la stima si muove piu' di quanto possa muoversi la realta'', perche' gli errori campionari regionali della rilevazione forze di lavoro non stanno nel nostro dato. Nota di fonte, non contro l'articolo: Eurostat marca 'b' (rottura di serie) il 2021 sia per l'Italia sia per Ue27 nella edat_lfse_03, mentre la serie regionale Istat parte dal 2018 come tutti i 78 indicatori territoriali da rilevazione forze di lavoro, cioe' la finestra dell'articolo e' quella ricostruita."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 33,
+ "queue_before": 34,
+ "run_id": "verificatore-20260729T120750Z-2c7a",
+ "stage": "verificatore",
+ "summary": "ter-101 verificato: 37 affermazioni controllate, 34 confermate, 2 smentite, 1 non verificabile",
+ "trigger": "manuale"
+}
