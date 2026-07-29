@@ -58,7 +58,7 @@ PRACTICE_TYPES = (
 PRE_PRACTICE = ("candidato-fonte", "candidato-indicatore")
 
 # L'ordine di catena degli stadi editoriali (dopo la promozione). Coincide con
-# l'ordine di precedenza del dispatcher per gli stadi che toccano una pratica.
+# l'ordine di precedenza del lanciatore per gli stadi che toccano una pratica.
 EDITORIAL_STAGES = ("promoter", "curator", "writer", "reviewer", "verificatore")
 
 # Lo stadio in cui una pratica di ciascun tipo entra.
@@ -205,7 +205,7 @@ def priority_score(practice: dict, today: str) -> float:
     L'ordine di catena da solo e' insufficiente: una correzione urgente di un
     dato pubblicato non deve aspettare dietro una coda di candidature nuove. Il
     punteggio e' derivato da campi verificabili del record, mai da un giudizio,
-    e lo consulta il dispatcher a parita' di stadio pronto. Piu' alto = prima.
+    e lo consulta il lanciatore a parita' di stadio pronto. Piu' alto = prima.
 
     I fattori, in ordine di peso:
       - errore pubblico (una smentita su una pagina online): massimo;

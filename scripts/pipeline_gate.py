@@ -113,15 +113,16 @@ STAGE_PATHS = {
     # Il publisher verifica il sito dopo il merge e il deploy e scrive una prova
     # in `pubblicazioni/`. Non tocca ne' l'articolo ne' la verifica: osserva, non
     # ripara, come il verificatore. Lo stadio esiste nel cancello (perimetro e
-    # merge) ma **non** in `pipeline_status.STAGE_ORDER`, quindi il dispatcher non
-    # lo lancia: e' l'aggancio del cutover, con l'interruttore ancora spento.
+    # merge) ma **non** in `pipeline_status.STAGE_ORDER`: non e' uno stadio
+    # dell'ordine di catena, e' il passo del sito del lanciatore
+    # (`pipeline_launch.py --publish`), che committa la prova da se'.
     "publisher": (PUBLICATIONS, RUN_JOURNAL),
     # I due ruoli della ri-architettura per-indicatore. Nascono qui accanto ai
     # vecchi stadi: il perimetro e' l'unione di quelli che fondono, perche' un
-    # ruolo porta un indicatore da grezzo a pubblicato in una sola run. Non sono
-    # ancora in `pipeline_status.STAGE_ORDER` (il dispatcher non li lancia finche'
-    # non c'e' il lanciatore per-indicatore), ma il cancello e la guardia li
-    # riconoscono gia', cosi' il primo agente produttore ha dove committare.
+    # ruolo porta un indicatore da grezzo a pubblicato in una sola run. Restano
+    # fuori da `pipeline_status.STAGE_ORDER`, che tiene i vecchi stadi granulari,
+    # ma li lancia il lanciatore per-indicatore, e il cancello e la guardia li
+    # riconoscono, cosi' l'agente produttore ha dove committare.
     #
     # `producer` = curator + writer + reviewer: cura, scrive, si auto-critica,
     # firma. Il perimetro largo e' sicuro perche' gli invarianti del cancello si
@@ -181,9 +182,10 @@ MERGE_POLICY = {
     "writer": "auto",
     "reviewer": "auto",
     "verificatore": "auto",
-    # `publisher` non e' in STAGE_ORDER e il dispatcher non lo lancia: la prova di
-    # pubblicazione si committa nel passo `--publish` del tick, non via una PR e
-    # questo passo di merge. La sua policy resta inerte, la lasciamo `checks`.
+    # `publisher` non e' in STAGE_ORDER e non e' uno stadio dell'ordine di catena:
+    # la prova di pubblicazione si committa nel passo `--publish` del tick del
+    # lanciatore, non via una PR e questo passo di merge. La sua policy resta
+    # inerte, la lasciamo `checks`.
     "publisher": "checks",
     # I ruoli per-indicatore fondono `auto` come tutti gli altri: il cancello
     # locale gira la suite e gli invarianti prima del merge.

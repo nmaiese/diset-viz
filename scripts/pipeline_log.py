@@ -75,18 +75,23 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from scripts import pipeline_gate  # noqa: E402  (path bootstrap above)
+
 # Dove scrive chi registra una run: un file per run, mai contendibile.
 RUNS_DIR = PROJECT_ROOT / "data" / "pipeline" / "runs"
 # Il vecchio registro unico, travasato negli shard e non piu' in repo. Il
 # percorso resta perche' la migrazione sia rieseguibile e verificabile.
 JOURNAL = PROJECT_ROOT / "data" / "pipeline" / "runs.jsonl"
 
-# I sette stadi del cancello, piu' il dispatcher, che non e' uno stadio: non ha
+# Gli stadi che il cancello conosce (`pipeline_gate.STAGE_PATHS`), piu' `launch`,
+# il battito del lanciatore. `launch` non e' uno stadio del cancello: non ha
 # perimetro, non apre pull request e non passa dal cancello. Registra pero' un
 # tick per volta, ed e' quella riga a rendere misurabile il silenzio della
-# catena senza dover ricopiare qui il cron delle Routine.
-STAGES = ("scout", "hunter", "promoter", "curator", "writer", "reviewer",
-          "verificatore", "dispatch")
+# catena senza dover ricopiare qui il cron delle Routine. Si deriva da
+# STAGE_PATHS invece di riscriverla a mano: cosi' `build_entry` accetta ogni
+# stadio che il cancello sa fondere (produttore, ammissione, publisher inclusi),
+# e un ruolo nuovo non torna a crashare il passo di merge dopo che ha gia' fuso.
+STAGES = tuple(sorted(pipeline_gate.STAGE_PATHS)) + ("launch",)
 
 # Come e' finita una run. Il vocabolario e' corto di proposito: un campo libero
 # si riempirebbe di sinonimi e diventerebbe illeggibile in aggregato.
@@ -113,10 +118,16 @@ ATTENTION = {"blocked", "stopped", "error"}
 # bug che e' costato settimane: il silenzio letto come normalita'.
 #
 # **Il gruppo che conta davvero e' il primo.** Da quando il lavoro lo assegna il
-# dispatcher, uno stadio non ha piu' una cadenza propria: gira quando la sua
-# coda non e' vuota, quindi il suo silenzio e' una risposta legittima e non un
-# guasto. Chi ha una cadenza e' il dispatcher, ed e' l'unico la cui assenza
-# significa senza ambiguita' che la catena si e' fermata.
+# lanciatore, un ruolo non ha piu' una cadenza propria: gira quando la sua coda
+# non e' vuota, quindi il suo silenzio e' una risposta legittima e non un
+# guasto. Chi ha una cadenza e' il lanciatore, ed e' l'unico la cui assenza
+# significa senza ambiguita' che la catena si e' fermata: percio' il suo battito
+# (`launch`) e i ruoli che lancia (`admissions`, `producer`, `publisher`) stanno
+# tutti nel primo gruppo, l'unico esente dal conto delle code. Tenerli qui, e
+# non in gruppi per-ruolo, e' voluto: i gruppi a coda piena portano solo i nomi
+# dei vecchi stadi, che sono le uniche chiavi che `queue_sizes()` produce, cosi'
+# nessun ruolo finisce in un gruppo dove una coda non contata diventerebbe un
+# falso ritardo.
 #
 # Le attese per stadio restano, ma valgono **solo a coda piena**: `silence` le
 # applica se gli si passano le code, e uno stadio zitto con la coda a zero
@@ -127,7 +138,7 @@ ATTENTION = {"blocked", "stopped", "error"}
 # ha promosso niente e su `promoter` se ha promosso, quindi ci si aspetta una
 # riga dall'uno **o** dall'altro, mai da tutti e due.
 WATCH_GROUPS = (
-    ("dispatcher", ("dispatch",), 1),
+    ("lanciatore", ("launch", "admissions", "producer", "publisher"), 1),
     ("scout", ("scout",), 7),
     ("cacciatore", ("hunter", "promoter"), 7),
     ("curatore", ("curator",), 7),
@@ -142,10 +153,10 @@ WATCH_GROUPS = (
 GRACE = 2.5
 
 # Da dove e' partita una run. Corto come il vocabolario degli esiti, e per la
-# stessa ragione: serve a poter chiedere "quante ne ha lanciate il dispatcher"
+# stessa ragione: serve a poter chiedere "quante ne ha lanciate il lanciatore"
 # senza leggere trenta righe di prosa.
-TRIGGERS = ("dispatch", "routine", "manuale")
-# La variabile con cui il dispatcher si annuncia agli agenti che lancia, cosi'
+TRIGGERS = ("launch", "routine", "manuale")
+# La variabile con cui il lanciatore si annuncia agli agenti che lancia, cosi'
 # la provenienza non dipende dal fatto che l'agente si ricordi di dichiararla.
 TRIGGER_ENV = "DI_PIPELINE_TRIGGER"
 
@@ -173,8 +184,8 @@ def new_run_id(stage):
 
     Forma `<stadio>-<istante>-<quattro esadecimali>`, leggibile a occhio e
     ordinabile per tempo. I quattro esadecimali servono al caso in cui due run
-    dello stesso stadio partano nello stesso secondo, che con un dispatcher
-    non e' impossibile e con un ritentativo nemmeno improbabile.
+    dello stesso stadio partano nello stesso secondo, che con un lanciatore che
+    ne conia piu' d'uno non e' impossibile e con un ritentativo nemmeno improbabile.
     """
     import secrets
     from datetime import datetime, timezone
@@ -556,7 +567,7 @@ def silence(entries, today=None, queues=None):
     silenzio lungo e' un ritardo, che era vero quando ogni stadio aveva un
     cron. Con le code (`{stadio: quanti in attesa}`, come le calcola
     `pipeline_status`), un silenzio lungo con la coda vuota diventa `idle`
-    invece che `stale`: da quando il lavoro lo assegna il dispatcher, uno
+    invece che `stale`: da quando il lavoro lo assegna il lanciatore, uno
     stadio che tace perche' non ha niente da fare sta rispondendo, non si e'
     fermato. Le code arrivano da fuori invece che da un import perche' questo
     modulo resta senza dipendenze, il che e' anche cio' che permette di
@@ -577,7 +588,7 @@ def silence(entries, today=None, queues=None):
         last = max(stamps) if stamps else ""
         days = _days_since(last, today)
         late = days is not None and days > expected * GRACE
-        # Il dispatcher non ha una coda, ha un battito: quando tace non c'e'
+        # Il lanciatore non ha una coda, ha un battito: quando tace non c'e'
         # niente da interpretare, e' proprio lui a non essere partito.
         #
         # Una coda che nessuno ha potuto contare (`None`, che capita ai due
@@ -588,7 +599,7 @@ def silence(entries, today=None, queues=None):
         # la stessa scelta che fa `pipeline_status`, dove una coda non contata
         # vale come lavoro e non come lavoro finito.
         waiting = None
-        if queues is not None and name != "dispatcher":
+        if queues is not None and name != "lanciatore":
             counts = [queues.get(s) for s in stages]
             if all(c is not None for c in counts):
                 waiting = sum(int(c) for c in counts)
@@ -613,7 +624,7 @@ def silence(entries, today=None, queues=None):
 
 
 def queue_sizes():
-    """Le code dei sette stadi, o None se non si riescono a contare.
+    """Le code degli stadi, o None se non si riescono a contare.
 
     Importato qui dentro e non in testa: `pipeline_status` legge il catalogo e
     per due stadi ha bisogno del view model, quindi puo' fallire su un checkout

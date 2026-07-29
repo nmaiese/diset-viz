@@ -194,6 +194,39 @@ def load_plan(today="", proofs_root=None):
     return plan_launches(dossier, queues, mint=pipeline_log.new_run_id)
 
 
+def log_tick(launches, publish, runner=None, do_commit=True, log=print):
+    """Il battito del lanciatore: un tick `launch` nel diario, portato su master.
+
+    E' l'unico segno che il lanciatore e' partito. Senza, una Routine che gira
+    con il piano vuoto non lascia niente e ha lo stesso aspetto di una che non e'
+    mai partita, che e' il guasto piu' pericoloso della catena (il silenzio letto
+    come normalita'). Il tick rende misurabile quel silenzio: `silence` guarda il
+    gruppo `lanciatore`, e la sua unica fonte di dati e' questo shard.
+
+    Sta dentro il perimetro `launch` della guardia (solo journal + prove). Il
+    verso di prudenza del cancello vale anche qui: un push perso non e' un errore
+    del tick, si logga e si continua. `runner`/`do_commit` sono iniettabili cosi'
+    il test non tocca git.
+    """
+    from scripts import pipeline_log, verify_publication
+    prove = (publish or {}).get("prove_scritte", 0)
+    summary = f"tick: {len(launches)} unita' pronte, {prove} prove pubblicate"
+    entry = pipeline_log.build_entry("launch", "nothing", summary, trigger="routine")
+    pipeline_log.append(entry)
+    if not do_commit:
+        return entry
+    rel = f"data/pipeline/runs/{pipeline_log.shard_name(entry)}"
+    kwargs = {"log": log, "label": "battito"}
+    if runner is not None:
+        kwargs["runner"] = runner
+    try:
+        if not verify_publication.land_on_master([rel], "Diario: tick del lanciatore", **kwargs):
+            log("  battito: non su master (corsa al push persa), il tick resta locale")
+    except Exception as exc:  # un battito non deve far cadere il giro
+        log(f"  battito: land_on_master fallito ({type(exc).__name__}), il tick resta locale")
+    return entry
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Che cosa lanciare adesso nella catena per-indicatore, e in che ordine.",
@@ -222,6 +255,13 @@ def main(argv=None):
 
     launches = load_plan(today=args.today)
     shown = launches[:args.top] if args.top else launches
+
+    # Il battito, solo quando il lanciatore fa il passo del sito (cioe' a ogni
+    # tick vero della Routine, che gira `--publish`): una riga `launch` che rende
+    # il suo silenzio misurabile. In sola lettura (`--json` senza `--publish`,
+    # come nei test e nelle ispezioni a mano) non si scrive niente.
+    if args.publish:
+        log_tick(launches, publish, log=(lambda *_: None) if args.json else print)
 
     if args.json:
         payload = {"launches": shown, "publish": publish} if publish is not None else shown

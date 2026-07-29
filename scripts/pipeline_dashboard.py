@@ -347,6 +347,31 @@ def _pr_rows(prs):
             "<th>titolo</th></tr>" + "\n".join(rows) + "</table></div>")
 
 
+def _publication_section():
+    """La coda del publisher (fusa -> pubblicata), letta a parte da STAGE_ORDER.
+
+    Il publisher non e' uno stadio dell'ordine di catena (non e' in
+    `pipeline_status.STAGE_ORDER`): e' il passo del sito del lanciatore, e la sua
+    coda non entra nella tabella degli stadi. Vive comunque qui, cosi' un
+    indicatore fuso che aspetta il deploy non resta invisibile. Import pigro e a
+    prova di checkout freddo: se il view model non si ricostruisce, l'intestazione
+    resta e dice solo che non si e' potuto contare.
+    """
+    try:
+        from scripts import verify_publication
+
+        report = verify_publication.stage_report()
+    except Exception:
+        return "<p class='empty'>Coda del publisher non calcolabile su questo checkout.</p>"
+    n = report.get("waiting", 0)
+    ids = report.get("detail", {}).get("indicatori", [])
+    if not n:
+        return "<p class='empty'>Ogni indicatore fuso ha una prova di pubblicazione valida.</p>"
+    lst = ", ".join(_esc(str(i)) for i in ids)
+    return (f"<p>{n} indicatori <span class='mono'>fusa</span> in attesa di verifica sul "
+            f"sito: <span class='mono'>{lst}</span>.</p>")
+
+
 def render(out_path=None):
     status = pipeline_status.build_status()
     # Collassate: una run che apre una pull request lascia due righe, la propria
@@ -363,17 +388,17 @@ def render(out_path=None):
         headline = ("Niente in coda: la catena e ferma perche ha finito, "
                     "non perche e bloccata.")
 
-    # Il battito del dispatcher, prima di tutto il resto. E' l'unico segnale che
+    # Il battito del lanciatore, prima di tutto il resto. E' l'unico segnale che
     # distingue "nessuno stadio aveva lavoro" da "non e' partito niente": da
-    # quando il lavoro lo assegna lui, il silenzio di un singolo stadio e' una
+    # quando il lavoro lo assegna lui, il silenzio di un singolo ruolo e' una
     # risposta legittima, il suo no.
-    ticks = [e for e in entries if e.get("stage") == "dispatch"]
+    ticks = [e for e in entries if e.get("stage") == "launch"]
     if ticks:
         last_tick = max(ticks, key=lambda e: e.get("at") or "")
-        headline += (f" Ultimo giro del dispatch: "
+        headline += (f" Ultimo giro del lanciatore (launch): "
                      f"{_esc((last_tick.get('at') or '')[:16].replace('T', ' '))}.")
     else:
-        headline += (" Il <strong>dispatch</strong> non ha mai registrato un giro: "
+        headline += (" Il <strong>lanciatore</strong> (launch) non ha mai registrato un giro: "
                      "finche' non lo fa, nessuno assegna il lavoro.")
 
     # Un avviso sopra tutto il resto, perche' uno stadio fermo non si vede in
@@ -429,6 +454,11 @@ def render(out_path=None):
 <section>
 <h2>Gli stadi, in aggregato</h2>
 {_stage_metric_rows(entries)}
+</section>
+
+<section>
+<h2>Coda del publisher (fusa -&gt; pubblicata)</h2>
+{_publication_section()}
 </section>
 
 <section>
