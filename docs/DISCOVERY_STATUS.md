@@ -29,6 +29,21 @@ dati si muovono.
 > riaccende. Il perche' della forma nuova sta in
 > [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 
+> **L'irrobustimento del 29 luglio.** Un tick con dieci ruoli in volo ha
+> mostrato che la parallelizzazione non regge su un checkout condiviso: HEAD,
+> indice e branch corrente sono uno solo, e le run se li contendevano (branch
+> spostati sotto i piedi, articoli committati riportati a master). Rimedi:
+> ogni run apre ora un **git worktree isolato** (`scripts/pipeline_workspace.py`),
+> il cancello al merge misura il solo diff committato (`--committed-only`), la PR
+> si apre via REST senza `GH_REPO` (`pipeline_merge.py --open`), e due test EUR
+> pinnati sono stati ricostruiti su fixture sintetiche (sbloccavano la PR #86).
+> Il **cruscotto `/_pipeline` mostra ora il vivo**: gli agenti POSTano i battiti
+> e le PR aperte a `/_pipeline/beat`, il sito li scrive nel SQLite gia' replicato
+> su GCS da Litestream, e li serve. La Routine `launcher` resta **in pausa**: va
+> ri-puntata a `launcher.md` e riaccesa a mano, dopo aver verificato i fix su
+> qualche tick manuale (serve prima il segreto `PIPELINE_INGEST_TOKEN` in Cloud
+> Run e nell'ambiente agenti, con `PIPELINE_INGEST_URL`).
+
 **Il tappo è tolto.** Il test che congelava l'elenco delle serie è stato
 liberato, e per provare la catena due serie demografiche sono arrivate fino a una
 pagina pubblica: `dem:NMIGRATEIN` (saldo migratorio interno) dentro il punteggio,

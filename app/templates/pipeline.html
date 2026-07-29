@@ -52,6 +52,10 @@
     .role { font-family: "Space Mono", monospace; font-size: .78rem; }
     .flags { color: var(--warn); font-size: .75rem; }
     .empty { color: var(--muted); font-style: italic; }
+    .ci { font-size: .72rem; padding: .1rem .45rem; border-radius: 4px; background: #eee; white-space: nowrap; }
+    .ci.rossa { background: #fbe4dc; color: var(--accent); }
+    .ci.verde { background: #e0efe6; color: var(--ok); }
+    .ci.in-corsa { background: #fdf1dc; color: var(--warn); }
     .foot { color: var(--muted); font-size: .78rem; margin-top: 2rem; border-top: 1px solid var(--line); padding-top: .75rem; }
     .live { display: inline-block; width: .5rem; height: .5rem; border-radius: 50%; background: var(--ok); margin-right: .35rem; }
   </style>
@@ -83,6 +87,27 @@
     </table></div>
     {% else %}
     <p class="empty">Nessuna sessione sta battendo adesso (il vivo e' best effort: un ruolo che non batte non appare qui, ma il suo lavoro committato si').</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>PR aperte (su automation/*)</h2>
+    {% if board.open_runs %}
+    <div class="scroll"><table>
+      <tr><th>PR</th><th>ruolo</th><th>run</th><th>CI</th><th>mergeabile</th><th>branch</th></tr>
+      {% for p in board.open_runs %}
+      <tr>
+        <td class="num">#{{ p.pr }}</td>
+        <td class="role">{{ p.role }}</td>
+        <td class="mono">{{ p.run_id }}</td>
+        <td><span class="ci {{ p.ci }}">{{ p.ci }}</span></td>
+        <td class="mono">{{ p.mergeable }}</td>
+        <td class="mono">{{ p.branch }}</td>
+      </tr>
+      {% endfor %}
+    </table></div>
+    {% else %}
+    <p class="empty">Nessuna PR aperta della catena in questo momento (la fotografia la scrive il lanciatore a ogni tick).</p>
     {% endif %}
   </section>
 
@@ -139,9 +164,10 @@
   </section>
 
   <p class="foot">
-    Ricalcolato dai file committati al caricamento (riferimento {{ board.generated_for }}),
-    si aggiorna da solo ogni 45 secondi. Vista di sola lettura: non lancia e non tocca la catena.
-    Sorgente: <span class="mono">scripts/pipeline_monitor.py</span>.
+    Storia e stato ricalcolati dai file committati (riferimento {{ board.generated_for }}); il
+    vivo (in volo e PR aperte) dal SQLite replicato su GCS, scritto dai POST degli agenti.
+    Si aggiorna da solo ogni 45 secondi. Vista di sola lettura: non lancia e non tocca la catena.
+    Sorgente: <span class="mono">scripts/pipeline_monitor.py</span>, <span class="mono">app/pipeline_state.py</span>.
   </p>
 </div>
 </body>

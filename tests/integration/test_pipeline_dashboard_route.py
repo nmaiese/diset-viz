@@ -1,42 +1,60 @@
-"""La rotta /_pipeline: il cruscotto interno, protetto e noindex.
+"""La rotta /_pipeline: il cruscotto interno, protetto e noindex, e il suo vivo.
 
 Gira il client Flask reale, quindi e' un test d'integrazione: costruisce il
-board dai file veri del repo. Verifica lo stato, l'header noindex e la
-protezione a token."""
+board dai file veri del repo. Verifica lo stato, l'header noindex, la protezione
+a token, e l'endpoint di ingest dei battiti (il vivo, scritto nel SQLite che
+Litestream replica su GCS) con il suo segreto."""
 
 import importlib
+import json
 import os
+import tempfile
 import unittest
+from pathlib import Path
 
 
 class PipelineDashboardRoute(unittest.TestCase):
     def setUp(self):
         # Il client va costruito con l'ambiente voluto: ricarico config e views
-        # cosi' la view legge il PIPELINE_TOKEN di questo test, non quello del
-        # processo. Salvo e ripristino l'ambiente per non sporcare gli altri test.
-        self._saved = os.environ.get("PIPELINE_TOKEN")
+        # cosi' la view legge i token di questo test, non quelli del processo.
+        # Salvo e ripristino l'ambiente per non sporcare gli altri test.
+        self._saved = {k: os.environ.get(k) for k in
+                       ("PIPELINE_TOKEN", "PIPELINE_INGEST_TOKEN", "LEADERBOARD_DB")}
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        # Il vivo vive nello stesso SQLite della leaderboard: un DB temporaneo,
+        # cosi' il test non tocca (ne' dipende da) quello reale.
+        os.environ["LEADERBOARD_DB"] = str(Path(self._tmp.name) / "state.sqlite3")
 
     def tearDown(self):
-        if self._saved is None:
-            os.environ.pop("PIPELINE_TOKEN", None)
-        else:
-            os.environ["PIPELINE_TOKEN"] = self._saved
+        for key, value in self._saved.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
+        self._reload()
+
+    def _reload(self):
         from app import config
         importlib.reload(config)
         from app import views
         views.config = config
+        from app import pipeline_state
+        pipeline_state.config = config
+        return config
 
-    def _client(self, token=""):
+    def _client(self, token="", ingest_token=""):
+        os.environ.pop("PIPELINE_TOKEN", None)
+        os.environ.pop("PIPELINE_INGEST_TOKEN", None)
         if token:
             os.environ["PIPELINE_TOKEN"] = token
-        else:
-            os.environ.pop("PIPELINE_TOKEN", None)
-        from app import config
-        importlib.reload(config)
-        from app import views
-        views.config = config
+        if ingest_token:
+            os.environ["PIPELINE_INGEST_TOKEN"] = ingest_token
+        self._reload()
         from app import app
         return app.test_client()
+
+    # --- il cruscotto ---------------------------------------------------------
 
     def test_open_when_no_token_is_configured(self):
         r = self._client().get("/_pipeline")
@@ -50,7 +68,6 @@ class PipelineDashboardRoute(unittest.TestCase):
         body = self._client().get("/_pipeline").get_data(as_text=True)
         self.assertIn("headline", body)
         self.assertIn("Catena editoriale", body)
-        # la frase in testa e' una delle tre forme note
         self.assertTrue(any(s in body for s in
                             ("bloccat", "pronti al lavoro", "in pari")))
 
@@ -59,6 +76,60 @@ class PipelineDashboardRoute(unittest.TestCase):
         self.assertEqual(client.get("/_pipeline").status_code, 404)
         self.assertEqual(client.get("/_pipeline?token=sbagliato").status_code, 404)
         self.assertEqual(client.get("/_pipeline?token=segreto123").status_code, 200)
+
+    # --- l'ingest dei battiti (il vivo) --------------------------------------
+
+    def test_ingest_needs_the_secret(self):
+        client = self._client(ingest_token="ingest-xyz")
+        payload = {"action": "beat", "run_id": "producer-1", "role": "producer",
+                   "indicator": "ter-999"}
+        # senza header, o con header sbagliato: 404, non 403 (non conferma di esistere)
+        self.assertEqual(client.post("/_pipeline/beat", json=payload).status_code, 404)
+        self.assertEqual(
+            client.post("/_pipeline/beat", json=payload,
+                        headers={"X-Pipeline-Key": "sbagliato"}).status_code, 404)
+        ok = client.post("/_pipeline/beat", json=payload,
+                         headers={"X-Pipeline-Key": "ingest-xyz"})
+        self.assertEqual(ok.status_code, 200)
+
+    def test_ingest_is_off_when_no_secret_is_configured(self):
+        # Senza segreto l'endpoint e' 404 anche con un header qualsiasi: in locale
+        # e finche' il segreto non e' provisionato, l'ingest e' semplicemente spento.
+        client = self._client(ingest_token="")
+        r = client.post("/_pipeline/beat", json={"action": "beat", "run_id": "x"},
+                        headers={"X-Pipeline-Key": "qualsiasi"})
+        self.assertEqual(r.status_code, 404)
+
+    def test_a_beat_then_a_pr_snapshot_show_up_on_the_dashboard(self):
+        client = self._client(ingest_token="ingest-xyz")
+        hdr = {"X-Pipeline-Key": "ingest-xyz"}
+        client.post("/_pipeline/beat", headers=hdr, json={
+            "action": "beat", "run_id": "producer-20260729T101010Z-abcd",
+            "role": "producer", "indicator": "ter-777", "stage": "producer"})
+        client.post("/_pipeline/beat", headers=hdr, json={
+            "action": "prs", "prs": [{
+                "pr": 321, "branch": "automation/producer-2026-07-29-abcd",
+                "run_id": "producer-20260729T101010Z-abcd", "role": "producer",
+                "ci": "rossa", "mergeable": "no", "title": "produttore ter-777"}]})
+        body = client.get("/_pipeline").get_data(as_text=True)
+        self.assertIn("ter-777", body)      # il battito in volo
+        self.assertIn("#321", body)          # la PR aperta
+        self.assertIn("rossa", body)         # lo stato CI
+
+    def test_closing_a_beat_removes_it(self):
+        client = self._client(ingest_token="ingest-xyz")
+        hdr = {"X-Pipeline-Key": "ingest-xyz"}
+        client.post("/_pipeline/beat", headers=hdr, json={
+            "action": "beat", "run_id": "r-1", "role": "producer", "indicator": "ter-888"})
+        self.assertIn("ter-888", client.get("/_pipeline").get_data(as_text=True))
+        client.post("/_pipeline/beat", headers=hdr, json={"action": "close", "run_id": "r-1"})
+        self.assertNotIn("ter-888", client.get("/_pipeline").get_data(as_text=True))
+
+    def test_a_bad_action_is_a_clean_400(self):
+        client = self._client(ingest_token="ingest-xyz")
+        r = client.post("/_pipeline/beat", headers={"X-Pipeline-Key": "ingest-xyz"},
+                        json={"action": "boh"})
+        self.assertEqual(r.status_code, 400)
 
 
 if __name__ == "__main__":

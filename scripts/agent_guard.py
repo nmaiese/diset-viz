@@ -200,14 +200,41 @@ def command_verdict(command, stages):
     return True, ""
 
 
+def _enclosing_repo_root(resolved, cwd):
+    """La radice del working tree che contiene questo percorso.
+
+    Il perimetro si misura da qui, non dal solo `PROJECT_ROOT` dello script della
+    guardia. Con i worktree l'agente lavora in un albero sorella
+    (`diset-viz-runs/<run_id>`), e misurare sempre dal checkout principale
+    accettava come 'scratch esterno' qualunque scrittura nel worktree, cancello
+    compreso: la `relative_to(PROJECT_ROOT)` falliva e il gesto passava. Si chiede
+    a git a quale working tree appartiene il file (dalla sua cartella, poi dal
+    cwd), cosi' il perimetro vale nel worktree della run come nel principale. Se
+    il percorso non e' in nessun repo, si torna al principale, e li' la
+    `relative_to` fallira' come prima: scratch legittimo."""
+    for probe in (resolved.parent, Path(cwd) if cwd else None):
+        # Solo cartelle che esistono: un file nuovo puo' avere una cartella
+        # genitore non ancora creata, e git con un `cwd` inesistente solleva.
+        if probe is None or not probe.is_dir():
+            continue
+        try:
+            code, out, _ = pipeline_gate._git("rev-parse", "--show-toplevel", cwd=str(probe))
+        except OSError:
+            continue
+        if code == 0 and out.strip():
+            return Path(out.strip()).resolve()
+    return PROJECT_ROOT
+
+
 def path_verdict(path, stages, cwd=None):
     """(ok, ragione) per una scrittura via Edit/Write."""
     base = Path(cwd) if cwd else PROJECT_ROOT
     resolved = (base / path).resolve() if not Path(path).is_absolute() else Path(path).resolve()
+    root = _enclosing_repo_root(resolved, cwd)
     try:
-        relative = resolved.relative_to(PROJECT_ROOT)
+        relative = resolved.relative_to(root)
     except ValueError:
-        # Fuori dal repo: scratch legittimo, il perimetro non c'entra.
+        # Fuori da ogni repo: scratch legittimo, il perimetro non c'entra.
         return True, ""
     rel = str(relative)
     if rel in SERVICE_PATHS or any(rel.startswith(p) for p in SERVICE_PREFIXES):

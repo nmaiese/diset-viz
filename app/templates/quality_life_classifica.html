@@ -22,6 +22,7 @@
   "url": {{ canonical | tojson }},
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": {% if has_eurostat %}[{ "@type": "Organization", "name": "Istat" }, { "@type": "Organization", "name": "Eurostat" }]{% else %}{ "@type": "Organization", "name": "Istat" }{% endif %},
+  "publisher": {{ publisher_jsonld | safe }},
   "isAccessibleForFree": true,
   "license": {{ (data_licenses_label(('territorial', 'eurostat')) if has_eurostat else data_license_url) | tojson }},
   "distribution": [

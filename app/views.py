@@ -36,12 +36,16 @@ from app import quiz
 from app import quiz_tokens
 from app import leaderboard
 from app import moderation
+from app import public_urls
+from app import publisher
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
 import csv, hmac, io, json, os, re, time, unicodedata
 from collections import defaultdict
+import threading
+from functools import lru_cache
 from urllib.parse import quote_plus
 
 from app import config
@@ -67,6 +71,33 @@ _HOME_COMPARE_INDICATORS = ("901", "408", "910")
 _HOME_COMPARE_REGIONS = ("lombardia", "lazio", "campania")
 _HOME_COMPARE_COLORS = ("var(--ink)", "var(--accent)", "var(--positive-ink)")
 
+# Production contract consumed by scripts/audit_public_discoverability.py.  Keep
+# this literal (rather than deriving it inside the audit): app/views.py owns the
+# public routes and the external check must fail when what is deployed no longer
+# matches that contract.  ``marker`` is visible without running JavaScript and
+# therefore also proves that the useful part of each page is server-rendered.
+PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
+    "site_url": "https://divarioitalia.it",
+    "index_header": "index, follow, max-snippet:-1, max-image-preview:large",
+    "pages": (
+        {"path": "/robots.txt", "content_type": "text/plain", "marker": "User-agent: *", "kind": "robots"},
+        {"path": "/sitemap.xml", "content_type": "application/xml", "marker": "<urlset", "kind": "document"},
+        {"path": "/llms.txt", "content_type": "text/plain", "marker": "# Divario Italia", "kind": "document"},
+        {"path": "/llms-full.txt", "content_type": "text/plain", "marker": "# Divario Italia", "kind": "document"},
+        {"path": "/", "content_type": "text/html", "marker": "Un atlante per leggere l'Italia", "kind": "html"},
+        {"path": "/atlante", "content_type": "text/html", "marker": "Atlante degli indicatori territoriali italiani", "kind": "html"},
+        {"path": "/blog", "content_type": "text/html", "marker": "Analisi brevi e basate sui dati", "kind": "html"},
+        {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html"},
+        {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html"},
+        {"path": "/tema/lavoro-e-conciliazione", "content_type": "text/html", "marker": "page-theme", "kind": "html"},
+    ),
+    "robots": {
+        "shared_disallow": ("/api/", "/data", "/legacy", "/legacy-reddito"),
+        "answer_bots": ("OAI-SearchBot", "ChatGPT-User", "PerplexityBot", "Perplexity-User", "Claude-SearchBot", "Claude-User", "Google-Extended"),
+        "training_bots": ("Amazonbot", "Applebot-Extended", "Bytespider", "CCBot", "ClaudeBot", "CloudflareBrowserRenderingCrawler", "GPTBot", "meta-externalagent"),
+    },
+}
+
 
 @app.context_processor
 def _inject_license():
@@ -81,6 +112,9 @@ def _inject_license():
         "data_license_url": sources.LICENSE_URL,
         "data_license_label": sources.LICENSE_LABEL,
         "data_licenses_label": sources.licenses_label,
+        "publisher": publisher.ORGANIZATION,
+        "publisher_jsonld": publisher.organization_json(),
+        "corrections_url": publisher.CORRECTIONS_URL,
     }
 
 
@@ -227,6 +261,58 @@ def home():
 @cache.cached(timeout=300)
 def atlante():
     return render_template('app.html', featured_indicators=_home_featured_indicator_links())
+
+
+@app.route("/catalogo-dati")
+@cache.cached(timeout=300)
+def data_catalog():
+    """Indexable, human-readable inventory behind the DataCatalog entity.
+
+    Costruito dalla **stessa** proiezione di sitemap e llms-full
+    (`_indexable_indicator_catalog`), non dal solo inventario regionale
+    (`get_atlas_catalog`): quest'ultimo non vede gli indicatori BES con sole
+    osservazioni provinciali, che pero' hanno una pagina indicizzabile ed entrano
+    negli altri due export. Prenderli da fonti diverse lasciava decine di dataset
+    validi fuori dal catalogo pubblico e dal suo grafo `DataCatalog.dataset`.
+    """
+    datasets = []
+    for record in _indexable_indicator_catalog():
+        meta = record["meta"]
+        datasets.append({
+            "name": meta["name"],
+            "url": f"{SITE_URL}{meta['canonical_path']}",
+            "path": meta["canonical_path"],
+            "source": meta.get("source_label") or meta.get("family_label") or "",
+        })
+    description = (
+        "Catalogo pubblico degli indicatori territoriali di Divario Italia, "
+        "con schede, fonti e serie scaricabili."
+    )
+    catalog_jsonld = {
+        "@context": "https://schema.org",
+        "@type": "DataCatalog",
+        "@id": f"{SITE_URL}/catalogo-dati#catalogo",
+        "name": "Catalogo dati di Divario Italia",
+        "description": description,
+        "url": f"{SITE_URL}/catalogo-dati",
+        # L'entita' editore condivisa (con @id /chi-siamo#organizzazione), la
+        # stessa delle schede indicatore e della pagina Chi siamo, non una seconda
+        # Organization anonima: un solo publisher, collegato, in tutto il grafo.
+        "publisher": publisher.ORGANIZATION,
+        "dataset": [
+            {"@type": "Dataset", "name": item["name"], "url": item["url"]}
+            for item in datasets
+        ],
+    }
+    return render_template(
+        "data_catalog.html",
+        datasets=datasets,
+        catalog_description=description,
+        catalog_jsonld=catalog_jsonld,
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/catalogo-dati",
+    )
 
 
 @app.route("/divari-regionali")
@@ -448,10 +534,58 @@ def pipeline_dashboard():
     if token and request.args.get("token") != token:
         abort(404)
     from scripts import pipeline_monitor
-    board = pipeline_monitor.load_board()
+    from app import pipeline_state
+    # Il vivo arriva dal SQLite (scritto dai POST degli agenti, replicato su GCS),
+    # non piu' da file locali che sul server sarebbero sempre vuoti. La storia
+    # (dossier + diario) resta committata, come prima.
+    try:
+        activity = pipeline_state.live()
+    except Exception:  # noqa: BLE001  (il cruscotto non deve mai cadere per il vivo)
+        activity = {"beats": [], "prs": []}
+    board = pipeline_monitor.load_board(heartbeats=activity["beats"],
+                                        open_runs=activity["prs"])
     return render_template("pipeline.html", board=board,
                            token=request.args.get("token", ""),
                            site_name=SITE_NAME)
+
+
+@app.post("/_pipeline/beat")
+def pipeline_beat_ingest():
+    """Il vivo del cruscotto: gli agenti della catena POSTano qui i battiti.
+
+    Autenticato con `PIPELINE_INGEST_TOKEN` (header `X-Pipeline-Key`), come
+    l'endpoint admin della leaderboard: segreto sbagliato o assente -> 404, non
+    403, perche' un endpoint interno non conferma nemmeno di esistere. Il corpo e'
+    JSON con un campo `action`:
+
+      {"action":"beat","run_id":...,"role":...,"indicator":...,"stage":...}
+      {"action":"close","run_id":...}
+      {"action":"prs","prs":[{"pr":..,"branch":..,"run_id":..,"ci":..,"mergeable":..,"title":..}]}
+
+    Best effort per chi chiama: un agente che non riesce a battere non deve
+    fallire la propria run, quindi qui si e' solo tolleranti e si risponde presto.
+    """
+    token = config.PIPELINE_INGEST_TOKEN
+    provided = request.headers.get("X-Pipeline-Key", "")
+    if not token or not hmac.compare_digest(provided, token):
+        abort(404)
+    from app import pipeline_state
+    payload = request.get_json(silent=True) or {}
+    action = payload.get("action")
+    try:
+        if action == "beat":
+            pipeline_state.record_beat(
+                payload.get("run_id", ""), role=payload.get("role", ""),
+                indicator=payload.get("indicator", ""), stage=payload.get("stage", ""))
+        elif action == "close":
+            pipeline_state.close_beat(payload.get("run_id", ""))
+        elif action == "prs":
+            pipeline_state.replace_prs(payload.get("prs") or [])
+        else:
+            return jsonify({"error": "bad_action"}), 400
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    return jsonify({"ok": True})
 
 
 @app.route("/api/indicator/<indicator_id>")
@@ -533,6 +667,16 @@ def privacy():
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/privacy",
+    )
+
+
+@app.route("/chi-siamo")
+def about():
+    return render_template(
+        "about.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/chi-siamo",
     )
 
 
@@ -626,6 +770,7 @@ def _render_indicator(family, raw_id):
         seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
         seo_description=seo_description,
         dataset_description=_dataset_description(lead, meta),
+        dataset_updated=publisher.dataset_updated(meta["family"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{meta['canonical_path']}",
@@ -732,7 +877,7 @@ def themes_index():
 
 
 # User-facing URL level (plural) -> engine level (singular).
-URL_LEVEL = {"regioni": "regione", "province": "provincia"}
+URL_LEVEL = public_urls.QUALITY_LIFE_LEVELS
 
 
 def _quality_life_profile_arg():
@@ -927,7 +1072,11 @@ def quality_life_classifica(url_level):
         }
         if level == "regione" else {}
     )
-    return render_template(
+    public_matches = public_urls.quality_life_public_urls(url_level, slug)
+    if not public_matches:
+        abort(404)
+    canonical = public_matches[0]["loc"]
+    response = make_response(render_template(
         "quality_life_classifica.html",
         data=payload,
         quality_map_data=quality_map_data,
@@ -937,8 +1086,14 @@ def quality_life_classifica(url_level):
         default_profile=qb.DEFAULT_PROFILE,
         site_url=SITE_URL,
         site_name=SITE_NAME,
-        canonical=f"{SITE_URL}/qualita-della-vita/classifica/{url_level}{_profile_suffix(slug)}",
-    )
+        canonical=canonical,
+    ))
+    # Aliases and extra query state are useful for compatibility, but only the
+    # exact URL in the public inventory is an autonomous indexable document.
+    requested_path = request.full_path.removesuffix("?")
+    if requested_path != canonical.removeprefix(SITE_URL):
+        response.headers["X-Robots-Tag"] = "noindex, follow"
+    return response
 
 
 @app.route("/qualita-della-vita/classifica")
@@ -1232,15 +1387,96 @@ def game_guess_api():
     return jsonify(result)
 
 
+_indexable_catalog_lock = threading.Lock()
+
+
+def _indexable_indicator_catalog():
+    """Accessore single-flight al catalogo proiettato: serializza la prima
+    costruzione a freddo.
+
+    `lru_cache` non coalizza i miss concorrenti. Il worker gunicorn di produzione
+    ha un thread solo per processo? No: un worker, **otto thread** (vedi
+    `Dockerfile`), e `/sitemap.xml` e `/llms-full.txt` sono rotte non cached. Due
+    richieste crawler simultanee a freddo entrerebbero entrambe nel corpo prima
+    che il primo risultato sia in cache, e ognuna rifarebbe la traversata di
+    centinaia di indicatori (secondi di CPU), moltiplicando il lavoro fino al
+    timeout. Il lock fa costruire una volta sola: il primo popola la cache di
+    `_build_indexable_indicator_catalog`, gli altri aspettano e leggono il
+    risultato gia' pronto (un lookup, quindi il lock si tiene un istante)."""
+    with _indexable_catalog_lock:
+        return _build_indexable_indicator_catalog()
+
+
+@lru_cache(maxsize=1)
+def _build_indexable_indicator_catalog():
+    """One deduplicated catalog for indicator pages, sitemap and LLM exports.
+
+    ``build_indicator_view`` owns both canonical URLs and the family-specific
+    indexability policy.  Starting from every family registry also retains BES
+    series that only have provincial observations and therefore do not enter the
+    regional atlas catalog.
+
+    Building the full view for every indicator is expensive (hundreds of
+    histories and matrices), and ``sitemap.xml``/``llms-full.txt`` are
+    uncached crawler routes that would otherwise repeat that cost on every
+    hit. The source loaders already cache for the life of the process, so this
+    catalog is stable too: memoize it once instead of rebuilding per request.
+
+    **Cached is a compact projection, not the full views.** A full view carries
+    every level's observation history and year-by-territory explore matrix, and
+    retaining all of them for the process lifetime added roughly 110 MiB per
+    worker on the first crawler hit. The two callers only read ``meta`` and a
+    small per-level summary (label, year span, territory count in the last year),
+    so that is all this keeps: the heavy view is dropped as soon as the summary
+    is taken. Callers must not mutate the result.
+    """
+    candidates = []
+    candidates.extend(("territorial", str(item["id"])) for item in get_catalog()["indicators"])
+    candidates.extend(("bes", str(item["id"])) for item in bes_data.all_bes_indicators())
+    if multiscopo_data.has_multiscopo_data():
+        candidates.extend(
+            ("multiscopo", str(item["id"]))
+            for item in multiscopo_data.all_multiscopo_indicators()
+        )
+    if external_atlas.has_external_data():
+        candidates.extend(
+            sources.split_internal_id(item["id"])
+            for item in external_atlas.all_external_indicators()
+        )
+
+    catalog = []
+    seen_paths = set()
+    for family, raw_id in candidates:
+        view = indicator_view.build_indicator_view(family, raw_id)
+        if view is None or not view["meta"]["indexable"]:
+            continue
+        path = view["meta"]["canonical_path"]
+        if path in seen_paths:
+            continue
+        seen_paths.add(path)
+        catalog.append({
+            "meta": view["meta"],
+            "levels": [
+                {"label": level["label"], "year_min": level["year_min"],
+                 "year_max": level["year_max"],
+                 "territory_count": len(level["observations"])}
+                for level in view["levels"]
+            ],
+        })
+    return sorted(catalog, key=lambda record: record["meta"]["canonical_path"])
+
+
 @app.route("/sitemap.xml")
 def sitemap():
     pages = [
         {"loc": f"{SITE_URL}/", "priority": "1.0"},
         {"loc": f"{SITE_URL}/atlante", "priority": "0.9"},
+        {"loc": f"{SITE_URL}/catalogo-dati", "priority": "0.7"},
         {"loc": f"{SITE_URL}/divari-regionali", "priority": "0.9"},
         {"loc": f"{SITE_URL}/confronto", "priority": "0.7"},
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
         {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
+        {"loc": f"{SITE_URL}/chi-siamo", "priority": "0.6"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
         {"loc": f"{SITE_URL}/quiz", "priority": "0.7"},
@@ -1248,11 +1484,10 @@ def sitemap():
         {"loc": f"{SITE_URL}/quiz/chi-e-maggiore", "priority": "0.7"},
         {"loc": f"{SITE_URL}/quiz/ordina", "priority": "0.7"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
-        {"loc": f"{SITE_URL}/qualita-della-vita/classifica/regioni", "priority": "0.8"},
-        {"loc": f"{SITE_URL}/qualita-della-vita/classifica/province", "priority": "0.8"},
         {"loc": f"{SITE_URL}/qualita-della-vita/metodologia", "priority": "0.6"},
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
+    pages.extend({"loc": item["loc"], "priority": "0.8"} for item in public_urls.quality_life_public_urls())
     for post in get_posts():
         pages.append({
             "loc": post["url"],
@@ -1263,40 +1498,14 @@ def sitemap():
         pages.append({"loc": f"{SITE_URL}{region['path']}", "priority": "0.7"})
     for theme in all_atlas_themes_index():
         pages.append({"loc": f"{SITE_URL}{theme['path']}", "priority": "0.5"})
-    for item in get_catalog()["indicators"]:
-        if not profiles.is_search_indexable_indicator(item):
-            continue
+    for view in _indexable_indicator_catalog():
+        meta = view["meta"]
+        # No synthetic lastmod from year_max: an indexable page is not "modified"
+        # on 31 December of its last data year. Only posts carry a real date.
         pages.append({
-            "loc": f"{SITE_URL}{profiles.indicator_path(item['id'], item['name'])}",
-            "lastmod": f"{item['year_max']}-12-31",
+            "loc": f"{SITE_URL}{meta['canonical_path']}",
             "priority": "0.6",
         })
-    for item in bes_data.all_bes_indicators():
-        if not item["indexable"]:
-            continue
-        pages.append({
-            "loc": f"{SITE_URL}{item['path']}",
-            "lastmod": f"{item['year_max']}-12-31",
-            "priority": "0.6",
-        })
-    if multiscopo_data.has_multiscopo_data():
-        for item in multiscopo_data.all_multiscopo_indicators():
-            if not item["indexable"]:
-                continue
-            pages.append({
-                "loc": f"{SITE_URL}{item['path']}",
-                "lastmod": f"{item['year_max']}-12-31",
-                "priority": "0.6",
-            })
-    if external_atlas.has_external_data():
-        for item in external_atlas.all_external_indicators():
-            if not item["indexable"]:
-                continue
-            pages.append({
-                "loc": f"{SITE_URL}{item['path']}",
-                "lastmod": f"{item['year_max']}-12-31",
-                "priority": "0.6",
-            })
     xml = render_template("sitemap.xml", pages=pages)
     return Response(xml, mimetype="application/xml")
 
@@ -1417,8 +1626,13 @@ def llms_txt():
         f"- [Metodologia e fonti]({SITE_URL}/metodologia): metodo, fonti Istat, criteri di qualita e limiti dei confronti.",
         f"- [Blog]({SITE_URL}/blog): analisi data-driven sui divari territoriali, con numeri verificati e link all'atlante.",
         "",
-        "## Indicatori in evidenza",
+        "## Classifiche per profilo",
     ]
+    lines += [
+        f"- [Classifica {item['url_level']}, profilo {item['profile_name']}]({item['loc']})"
+        for item in public_urls.quality_life_public_urls()
+    ]
+    lines += ["", "## Indicatori in evidenza"]
     for item in featured:
         summary = " ".join((item.get("summary") or "").split())
         detail = f" {summary}" if summary else ""
@@ -1433,9 +1647,12 @@ def llms_txt():
     lines += [
         "",
         "## Note per i modelli linguistici",
-        "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori.",
-        f"- Licenza dei dati: {sources.LICENSE_LABEL}. Cita \"Divario Italia\" e la fonte Istat.",
-        f"- Dati strutturati per indicatore: {SITE_URL}/download/indicator/<id>.csv e {SITE_URL}/download/indicator/<id>.json.",
+        "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori. Alcuni indicatori provengono da altre istituzioni, indicate sulla singola scheda.",
+        f"- Licenza dei dati: {sources.LICENSE_LABEL}. Cita \"Divario Italia\" e la fonte indicata per ciascun indicatore.",
+        "- Per gli indicatori territoriali, i download seguono il pattern "
+        f"`/download/indicator/ID.csv` e `/download/indicator/ID.json`. Esempio reale: "
+        f"{SITE_URL}/download/indicator/{featured[0]['id']}.csv e "
+        f"{SITE_URL}/download/indicator/{featured[0]['id']}.json.",
         f"- Indice completo delle pagine: {SITE_URL}/sitemap.xml.",
         f"- Versione estesa con definizioni e classifiche complete: {SITE_URL}/llms-full.txt.",
         "- I confronti descrivono differenze osservate, non rapporti di causa. Anni e coperture possono variare tra indicatori.",
@@ -1493,9 +1710,11 @@ def llms_full_txt():
         "# Divario Italia, testo esteso per i modelli linguistici",
         "",
         "> Definizioni complete e classifiche regionali degli indicatori "
-        "territoriali Istat pubblicati su divarioitalia.it. I numeri coincidono "
-        "con le pagine indicatore del sito. Cita \"Divario Italia\" e la fonte "
-        "Istat.",
+        "pubblicati su divarioitalia.it. I numeri coincidono "
+        "con le pagine indicatore del sito. La fonte primaria e Istat, ma "
+        "alcuni indicatori provengono da altre istituzioni indicate su ogni "
+        "scheda. Cita \"Divario Italia\" e la fonte indicata per ciascun "
+        "indicatore.",
         "",
         "## Metodologia in breve",
         "La fonte primaria e la Banca dati territoriale per le politiche di "
@@ -1516,16 +1735,31 @@ def llms_full_txt():
 
     lines.append("## Catalogo completo degli indicatori indicizzabili")
     lines.append("")
-    for item in get_catalog()["indicators"]:
-        if not profiles.is_search_indexable_indicator(item):
-            continue
-        plain = " ".join(((item.get("explain") or {}).get("plain") or "").split())
-        path = profiles.indicator_path(item["id"], item["name"])
-        detail = f" {plain}" if plain else ""
-        lines.append(
-            f"- [{item['name']}]({SITE_URL}{path}): tema {item['theme']}, "
-            f"unita {item.get('unit') or 'n.d.'}, copertura {item['year_min']}-{item['year_max']}.{detail}"
+    for view in _indexable_indicator_catalog():
+        meta = view["meta"]
+        plain = " ".join(((meta.get("explain") or {}).get("plain") or "").split())
+        definition = plain or "Definizione sintetica non disponibile."
+        coverage = ", ".join(
+            f"{level['label'].lower()} {level['year_min']}-{level['year_max']} "
+            f"({level['territory_count']} territori nell'ultimo anno)"
+            for level in view["levels"]
         )
+        source_label = meta["source_label"]
+        source = (
+            f"[{source_label}]({meta['source_url']})"
+            if meta.get("source_url") else source_label
+        )
+        lines.append(
+            f"- [{meta['name']}]({SITE_URL}{meta['canonical_path']}): "
+            f"famiglia {meta['family_label']}; fonte {source}; "
+            f"unita {meta.get('unit') or 'n.d.'}; copertura {coverage}; "
+            f"definizione: {definition}"
+        )
+        if meta.get("downloads"):
+            lines.append(
+                f"  Download: CSV {SITE_URL}{meta['downloads']['csv']}; "
+                f"JSON {SITE_URL}{meta['downloads']['json']}."
+            )
     lines.append("")
     return Response("\n".join(lines) + "\n", content_type="text/plain; charset=utf-8")
 
@@ -1552,6 +1786,7 @@ def _home_featured_indicator_links():
         if not item or not profiles.is_search_indexable_indicator(item):
             continue
         featured.append({
+            "id": str(item["id"]),
             "name": item["name"],
             "theme": item["theme"],
             "year": item["year_max"],

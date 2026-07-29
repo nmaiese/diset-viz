@@ -1,0 +1,19 @@
+{
+ "at": "2026-07-29T09:06:41+00:00",
+ "base_commit": "d5bc89a",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "d5bc89a",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "duration_seconds": 1878,
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": "91",
+ "run_id": "producer-20260729T083600Z-b629",
+ "session_id": "0741a253-6602-5bad-bb3e-edb3c5b56228",
+ "stage": "producer",
+ "summary": "PR #91 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}

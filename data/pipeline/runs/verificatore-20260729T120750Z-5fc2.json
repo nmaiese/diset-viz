@@ -1,0 +1,19 @@
+{
+ "at": "2026-07-29T12:20:51+00:00",
+ "base_commit": "8756ab9",
+ "branch": "automation/verificatore-2026-07-29-ter100",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "8756ab9",
+ "detail": [
+  "ter-100 vintage 2021, prosa 3e8c730febe3c9c7. Graduatoria 2021 ricontrollata posizione per posizione contro la serie: 7 regioni sotto zero (FVG -0,21, TAA -1,22, Toscana -1,76, Veneto -5,51, Emilia-Romagna -7,39, Lazio -9,23, Lombardia -17,47), stacco Calabria-Sicilia 9,51 e Lazio-Lombardia 8,24, VdA quinta. Serie 1995-2021: Calabria prima in tutti i 27 anni, ultimo posto Lombardia 23 anni e Lazio 4 (2007, 2008, 2009, 2011). Media 6,5354 -> 7,5346 (+0,999, un punto scarso), mediana 3,3513 -> 7,5392 (+4,188). Massimo della media 2010 a 11,5552, 2013 a 6,5229 (-5,03). Piemonte positivo in tutti i 18 anni 2004-2021 (minimo 0,080 nel 2005), TAA positivo 2001-2011 (minimo 0,136 nel 2009) e negativo 2012-2021. Liguria 2020->2021 +6,328, massimo sia della sua serie sia dell ultimo passaggio. Basilicata -11,2628 dal 1995 e massimo 22,58 nel 2010. Mezzogiorno 2011->2013 in calo in 6 regioni su 8 (Abruzzo +0,68 e Molise +0,13 le eccezioni). Incroci: ter-130 2023 VdA dodicesima con le posizioni 13-20 esattamente le otto regioni del Mezzogiorno, ter-413 2021 cinque delle prime sei coincidono (Calabria, Sicilia, Molise, Sardegna, Puglia) e VdA e decima. Definizione confrontata con la banca dati (importazioni nette come saldo import-export di merci e servizi con l estero e con le altre regioni, in percentuale del PIL): la prosa dice fuori e non estero, corretto. Fonte verificata su istat.it: 366 indicatori e aggiornamento 20 luglio 2026, entrambi confermati. Nessuna rottura di serie dichiarata nel campo note. Contestuale e fuori dal punteggio confermato dal brief, 27 indicatori su 393 hanno valori negativi nell ultimo anno."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 33,
+ "queue_before": 34,
+ "run_id": "verificatore-20260729T120750Z-5fc2",
+ "stage": "verificatore",
+ "summary": "ter-100 (Grado di dipendenza economica) verificato in avversariale: 35 affermazioni controllate, 35 confermate, 0 smentite, esito pulito",
+ "trigger": "launch"
+}

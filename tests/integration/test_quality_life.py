@@ -1,4 +1,6 @@
 import unittest
+import re
+from html import unescape
 
 from app import app
 from app import quality_life_bes as qb
@@ -285,6 +287,34 @@ class QualityLifeBesEngineTest(unittest.TestCase):
             self.assertEqual(one.status_code, 200)
             self.assertEqual(one.get_json()["territory"]["key"], key)
             self.assertEqual(client.get(f"/api/quality-life/{url_level}/atlantide").status_code, 404)
+
+    def test_profile_canonicals_match_indexability_and_sitemap(self):
+        client = app.test_client()
+        sitemap = unescape(client.get("/sitemap.xml").get_data(as_text=True))
+        locs = re.findall(r"<loc>([^<]+)</loc>", sitemap)
+        self.assertEqual(len(locs), len(set(locs)))
+
+        profiles = [profile["slug"] for profile in qb.get_quality_life_profiles()]
+        for url_level in ("regioni", "province"):
+            for slug in profiles:
+                suffix = "" if slug == qb.DEFAULT_PROFILE else f"?profilo={slug}"
+                path = f"/qualita-della-vita/classifica/{url_level}{suffix}"
+                expected = f"https://divarioitalia.it{path}"
+                response = client.get(path)
+                html = response.get_data(as_text=True)
+                self.assertEqual(response.status_code, 200, path)
+                self.assertIn(f'rel="canonical" href="{expected}"', html, path)
+                self.assertFalse(response.headers["X-Robots-Tag"].startswith("noindex"), path)
+                self.assertIn(expected, locs, path)
+
+            invalid = f"/qualita-della-vita/classifica/{url_level}?profilo=inesistente"
+            self.assertEqual(client.get(invalid).status_code, 404)
+            self.assertNotIn(f"https://divarioitalia.it{invalid}", locs)
+
+            alias = f"/qualita-della-vita/classifica/{url_level}?profile=giovani"
+            alias_response = client.get(alias)
+            self.assertEqual(alias_response.status_code, 200)
+            self.assertTrue(alias_response.headers["X-Robots-Tag"].startswith("noindex"))
 
     def test_legacy_regional_api_alias(self):
         client = app.test_client()

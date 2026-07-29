@@ -58,6 +58,8 @@ def fake_gh(checks=None, merge_ok=True, script=None):
             method, rest = rest[1], rest[2:]
         path = rest[0] if rest else ""
 
+        if method == "POST" and path == f"repos/{REPO}/pulls":
+            return 0, json.dumps({"number": 123})
         if method == "PUT" and path.endswith("/merge"):
             if not merge_ok:
                 return 1, "HTTP 405: Pull Request is not mergeable"
@@ -217,7 +219,7 @@ class TheVerdictIsNotTakenFromTheCaller(unittest.TestCase):
         che ha sbagliato salterebbe."""
         seen = {}
 
-        def fake_gate(stage, skip_tests=False, cwd=None):
+        def fake_gate(stage, skip_tests=False, cwd=None, committed_only=False):
             seen["stage"] = stage
             return RED
 
@@ -367,20 +369,146 @@ class TheRepositoryHasToBeFoundWithoutGh(unittest.TestCase):
             with self.subTest(url=url.strip()):
                 self.assertEqual(self.slug_for(url), "nmaiese/diset-viz")
 
-    def test_gh_repo_wins(self):
+    def test_gh_repo_is_ignored(self):
+        # GH_REPO non e' piu' un override: da environment ereditato faceva aprire
+        # o fondere sul repo sbagliato. Lo slug viene sempre dal remote.
         import os
 
         os.environ["GH_REPO"] = "altro/repo"
         try:
-            self.assertEqual(self.slug_for("https://github.com/a/b.git\n"), "altro/repo")
+            self.assertEqual(self.slug_for("https://github.com/a/b.git\n"), "a/b")
         finally:
             del os.environ["GH_REPO"]
 
-    def test_an_unreadable_remote_is_loud(self):
+    def test_an_unreadable_remote_is_loud_even_with_gh_repo_set(self):
+        # Il caso originale del bug: con GH_REPO ereditato, un remote illeggibile
+        # ora fallisce forte comunque, invece di corto-circuitare su una variabile.
+        import os
+
         def runner(argv, cwd=None):
             return (1, "fatal: no such remote") if argv[:2] == ["git", "remote"] else (0, "")
+        os.environ["GH_REPO"] = "altro/repo"
+        try:
+            with self.assertRaises(RuntimeError):
+                pipeline_merge.repo_slug(runner=runner)
+        finally:
+            del os.environ["GH_REPO"]
+
+
+class TheChainOpensPullRequestsOverRest(unittest.TestCase):
+    """La PR si apre via REST, non con `gh pr create`, e senza `GH_REPO`.
+
+    `gh pr create` e' GraphQL, cieco al remote proxato: era il motivo per cui gli
+    agenti impostavano `GH_REPO`, che pero' corto-circuita `repo_slug`. Aprendo la
+    PR sulla stessa `api()` del merge, lo slug arriva dal remote e non serve
+    nessuna variabile d'ambiente.
+    """
+
+    def test_it_opens_a_pr_and_returns_its_number(self):
+        runner = fake_gh()
+        number = pipeline_merge.create_pr(
+            "automation/producer-2026-07-29-abc", "producer: ter-999", "corpo",
+            runner=runner,
+        )
+        self.assertEqual(number, 123)
+
+    def test_it_derives_the_slug_from_the_proxied_remote_without_gh_repo(self):
+        import os
+
+        self.assertNotIn("GH_REPO", os.environ,
+                         "il test presuppone GH_REPO non impostato nell'ambiente")
+        runner = fake_gh()
+        pipeline_merge.create_pr("automation/x", "t", "b", runner=runner)
+        posted = [c for c in runner.calls if c[:2] == ["gh", "api"] and "--method" in c
+                  and c[c.index("--method") + 1] == "POST"]
+        self.assertEqual(len(posted), 1, "una sola POST per aprire la PR")
+        argv = posted[0]
+        self.assertIn(f"repos/{REPO}/pulls", argv)
+        joined = " ".join(argv)
+        self.assertIn("head=automation/x", joined)
+        self.assertIn("base=master", joined)
+
+    def test_a_failed_open_is_loud(self):
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "remote"]:
+                return 0, f"http://local_proxy@127.0.0.1:41729/git/{REPO}\n"
+            if argv[:2] == ["gh", "api"]:
+                return 1, "HTTP 422: Validation Failed"
+            return 0, ""
         with self.assertRaises(RuntimeError):
-            pipeline_merge.repo_slug(runner=runner)
+            pipeline_merge.create_pr("automation/x", "t", "b", runner=runner)
+
+    def test_it_embeds_the_run_id_in_the_body(self):
+        # Il branch porta solo il suffisso del run_id: l'id intero va nel corpo,
+        # cosi' il cruscotto correla la PR col battito e le righe di diario.
+        runner = fake_gh()
+        pipeline_merge.create_pr("automation/producer-2026-07-29-abcd", "t", "corpo",
+                                 runner=runner, run_id="producer-20260729T101010Z-abcd")
+        posted = [c for c in runner.calls if c[:2] == ["gh", "api"] and "--method" in c
+                  and c[c.index("--method") + 1] == "POST"][0]
+        self.assertIn("run_id: producer-20260729T101010Z-abcd", " ".join(posted))
+
+
+class ADirtyWorktreeIsRefusedBeforeMerging(unittest.TestCase):
+    """La suite gira sui file su disco, il merge fonde il commit: un cambiamento
+    non committato passerebbe la suite e non finirebbe su master. Con un worktree
+    per run un file sporco e' lavoro di questa run, non di un sibling, quindi il
+    merge lo rifiuta invece di fondere una versione che la suite non ha provato."""
+
+    def test_it_refuses_and_does_not_merge(self):
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "status"]:
+                return 0, " M content/indicators/ter-1.json\n?? nuovo.json\n"
+            if argv[:2] == ["git", "remote"]:
+                return 0, f"http://local_proxy@127.0.0.1:41729/git/{REPO}\n"
+            return 0, ""
+        result = pipeline_merge.decide("writer", 5, runner=runner,
+                                       log=lambda *_: None, journal=False)
+        self.assertFalse(result["merged"])
+        self.assertEqual(result["outcome"], "blocked")
+
+    def test_an_unreadable_status_fails_closed(self):
+        # git status che fallisce non e' "pulito": si blocca invece di fondere un
+        # albero forse sporco (una config status.showUntrackedFiles guasta lo rompe).
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "status"]:
+                return 1, "fatal: bad config"
+            if argv[:2] == ["git", "remote"]:
+                return 0, f"http://local_proxy@127.0.0.1:41729/git/{REPO}\n"
+            return 0, ""
+        self.assertNotEqual(pipeline_merge._worktree_dirty(runner=runner), "")
+        result = pipeline_merge.decide("writer", 5, runner=runner,
+                                       log=lambda *_: None, journal=False)
+        self.assertEqual(result["outcome"], "blocked")
+
+    def test_it_asks_git_for_all_untracked_files(self):
+        # --untracked-files=all, o status.showUntrackedFiles=no nasconderebbe un
+        # modulo/una fixture nuova, e la suite verde fonderebbe un commit senza.
+        seen = {}
+
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "status"]:
+                seen["status"] = argv
+            return 0, ""
+        pipeline_merge._worktree_dirty(runner=runner)
+        self.assertIn("--untracked-files=all", seen["status"])
+
+    def test_a_clean_worktree_reaches_the_gate(self):
+        # Pulito: _worktree_dirty ritorna '' e si prosegue al cancello (qui finto).
+        def fake_gate(stage, skip_tests=False, cwd=None, committed_only=False):
+            return {"merge": "blocked", "ok": False,
+                    "checks": [{"check": "suite", "ok": False}]}
+        orig = pipeline_merge.pipeline_gate.run
+        pipeline_merge.pipeline_gate.run = fake_gate
+        try:
+            runner = fake_gh()  # git status -> "" (pulito)
+            result = pipeline_merge.decide("writer", 5, runner=runner,
+                                           log=lambda *_: None, journal=False)
+        finally:
+            pipeline_merge.pipeline_gate.run = orig
+        # il verdetto viene dal cancello, non dal controllo di pulizia
+        self.assertEqual(result["outcome"], "blocked")
+        self.assertEqual(merged_prs(runner), [])
 
 
 class TheBucketsSurviveTheMoveToRest(unittest.TestCase):

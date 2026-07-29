@@ -1,0 +1,21 @@
+{
+ "at": "2026-07-29T08:58:47+00:00",
+ "base_commit": "2ec3360",
+ "branch": "automation/producer-2026-07-29-50bd",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "0468ba4",
+ "detail": [
+  "Cura: direzione lower_better gia' curata e verificata sui dati (Molise 4,76 primo, Sicilia 15,19 ultimo: valore basso = situazione migliore), categoria reddito_accessibilita' via sottotema Inclusione sociale, nessuna modifica a curation o mappa temi necessaria. Scrittura: articolo da 716 parole, lead piu' quattro sezioni con h2 propri, level regione, vintage 2024. Rilettura: corretti tre rilievi trovati su me stesso, 'undici regioni sopra il 9%' era falso (Liguria 8,99985, sono dieci), 'fermi alla licenza media' non rendeva 'al piu' la licenza media', dato nazionale ora attribuito alla Commissione europea. Fonte esterna verificata: Education and Training Monitor 2025 scheda Italia, obiettivo UE sotto il 9% al 2030, Italia 9,8% nel 2024 dal 15% del 2014, tenuto separato dalla media semplice regionale. Firma: reviewed_at 2026-07-29, reviewed_vintage 2024."
+ ],
+ "duration_seconds": 1403,
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 336,
+ "queue_before": 337,
+ "run_id": "producer-20260729T083600Z-74db",
+ "session_id": "0741a253-6602-5bad-bb3e-edb3c5b56228",
+ "stage": "producer",
+ "summary": "Indicatore 102, abbandono scolastico precoce: verso confermato lower_better, articolo intero scritto, riletto e firmato sui dati 2024",
+ "trigger": "manuale"
+}

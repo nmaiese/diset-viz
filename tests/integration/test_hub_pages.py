@@ -392,9 +392,10 @@ class SitemapTest(unittest.TestCase):
             self.assertIn(f"https://divarioitalia.it{path}", locs, path)
         # La ricerca interna e' noindex per scelta, quindi non si annuncia.
         self.assertNotIn("https://divarioitalia.it/ricerca", locs)
-        # Nessuna URL con stato di esplorazione: la sitemap elenca canoniche.
+        # Le sole query sono profili autonomi della classifica.
         for loc in locs:
-            self.assertNotIn("?", loc, loc)
+            if "?" in loc:
+                self.assertRegex(loc, r"/qualita-della-vita/classifica/(regioni|province)\?profilo=[a-z_]+$")
         # Ogni pagina annunciata risponde 200 ed e' indicizzabile.
         for path in ("/divari-regionali", "/confronto"):
             response = client.get(path)

@@ -1,0 +1,21 @@
+{
+ "at": "2026-07-29T08:52:41+00:00",
+ "base_commit": "37ac00d",
+ "branch": "automation/verificatore-2026-07-29-16ba",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "319c350",
+ "detail": [
+  "Smentita quadro/medio: 'L'Italia nel suo insieme impiega nella ricerca l'1,41% della popolazione attiva'. L'1,41% e' il rapporto con il numeratore in equivalenti a tempo pieno (Eurostat rd_p_perslf, unit PC_ACT_FTE, sectperf TOTAL, prof_pos TOTAL, 2023, verificato via API); la quota di persone occupate in R&S sulla forza lavoro nello stesso anno e' 2,09% (PC_ACT_HC), e la sezione definizione dello stesso articolo avverte esplicitamente contro questa lettura. Confermati con la fonte primaria: UE 1,57% e Italia 1,41% nel 2023, tutti e venti i valori regionali 2023 (Emilia-Romagna 2,06, Calabria 0,50), prof_pos TOTAL contro RSE (Emilia-Romagna 2,06 contro 0,95), sectperf TOTAL uguale BES 1,44 piu GOV 0,15 piu HES 0,46 piu PNP 0,01. Nessuna rottura di serie dentro la finestra: il flag b di Eurostat sta sul 2016, fuori dal 2019-2023. Non smentito ma segnalato: l'incrocio con eur-rd_e_gerdreg dice 'Mezzogiorno in fondo' mentre l'ultima di quella graduatoria e' la Valle d'Aosta a 0,53 e la Campania e' settima a 1,20."
+ ],
+ "duration_seconds": 1037,
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 32,
+ "queue_before": 33,
+ "run_id": "verificatore-20260729T083600Z-c7e9",
+ "session_id": "0741a253-6602-5bad-bb3e-edb3c5b56228",
+ "stage": "verificatore",
+ "summary": "Verificato eur-rd_p_persreg: 26 affermazioni controllate, 25 confermate, 1 smentita",
+ "trigger": "manuale"
+}
