@@ -118,6 +118,22 @@ def _bucket(run):
     return _CONCLUSION_BUCKET.get(run.get("conclusion") or "", "fail")
 
 
+def _worktree_dirty(runner=_run, cwd=None):
+    """I file non committati del worktree, o '' se e' pulito. Best effort.
+
+    `git status --porcelain` (default, quindi rispetta `.gitignore`: il symlink
+    `.venv`, il meta di sessione e i battiti locali non contano). Serve al passo
+    di merge per rifiutare un albero sporco: la suite gira sui file su disco, il
+    merge fonde il commit, e con un worktree per run un file non committato e'
+    lavoro di questa run che non finirebbe su master."""
+    code, out = runner(["git", "status", "--porcelain"], cwd=cwd)
+    if code != 0 or not out.strip():
+        return ""
+    files = [line[3:].strip() for line in out.splitlines() if line.strip()]
+    shown = ", ".join(files[:6])
+    return shown + (f", e altri {len(files) - 6}" if len(files) > 6 else "")
+
+
 def repo_slug(runner=_run, cwd=None):
     """`owner/repo`, e non lo si chiede a `gh` perche' `gh` qui non lo sa.
 
@@ -412,14 +428,27 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
     that refused to merge still leaves the same kind of trace as one that did.
     """
     if verdict is None:
-        # committed_only: al merge il lavoro dello stadio e' gia' committato sul
-        # branch, quindi il cancello guarda il solo diff committato e non il
-        # working tree. Cosi' l'incompiuto di un altro ruolo in un checkout
-        # condiviso non viene attribuito a questa run (la seconda faccia del bug
-        # del checkout condiviso). Con i worktree isolati il working tree e' gia'
-        # pulito, ma questo lo rende vero anche se mai si tornasse a condividerlo.
-        verdict = pipeline_gate.run(stage, skip_tests=skip_tests, cwd=cwd,
-                                    committed_only=True)
+        # Il worktree della run deve essere pulito prima del merge, e il perche'
+        # e' sottile. Il cancello guarda il solo diff committato (committed_only,
+        # vedi sotto), ma la suite gira sui file **su disco**: un fix lasciato non
+        # committato passerebbe la suite e poi non finirebbe su master, perche' il
+        # merge REST fonde il commit, e `--close` butterebbe il fix. Con un
+        # worktree isolato per run un file sporco e' lavoro non committato di
+        # QUESTA run, non di un sibling, quindi il rimedio giusto e' rifiutare e
+        # chiedere di committare, cosi' la suite prova esattamente cio' che si fonde.
+        dirty = _worktree_dirty(runner=runner, cwd=cwd)
+        if dirty:
+            verdict = {"merge": "blocked", "ok": False, "checks": [
+                {"check": f"worktree non pulito, committa prima di fondere ({dirty})",
+                 "ok": False}]}
+        else:
+            # committed_only: al merge il lavoro dello stadio e' gia' committato sul
+            # branch, quindi il cancello guarda il solo diff committato e non il
+            # working tree. Cosi' l'incompiuto di un altro ruolo in un checkout
+            # condiviso non viene attribuito a questa run (la seconda faccia del bug
+            # del checkout condiviso).
+            verdict = pipeline_gate.run(stage, skip_tests=skip_tests, cwd=cwd,
+                                        committed_only=True)
     mode = verdict["merge"]
     log(f"stadio {stage}, PR #{pr}, cancello: {mode}")
 

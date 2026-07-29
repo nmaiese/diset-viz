@@ -429,6 +429,42 @@ class TheChainOpensPullRequestsOverRest(unittest.TestCase):
             pipeline_merge.create_pr("automation/x", "t", "b", runner=runner)
 
 
+class ADirtyWorktreeIsRefusedBeforeMerging(unittest.TestCase):
+    """La suite gira sui file su disco, il merge fonde il commit: un cambiamento
+    non committato passerebbe la suite e non finirebbe su master. Con un worktree
+    per run un file sporco e' lavoro di questa run, non di un sibling, quindi il
+    merge lo rifiuta invece di fondere una versione che la suite non ha provato."""
+
+    def test_it_refuses_and_does_not_merge(self):
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "status"]:
+                return 0, " M content/indicators/ter-1.json\n?? nuovo.json\n"
+            if argv[:2] == ["git", "remote"]:
+                return 0, f"http://local_proxy@127.0.0.1:41729/git/{REPO}\n"
+            return 0, ""
+        result = pipeline_merge.decide("writer", 5, runner=runner,
+                                       log=lambda *_: None, journal=False)
+        self.assertFalse(result["merged"])
+        self.assertEqual(result["outcome"], "blocked")
+
+    def test_a_clean_worktree_reaches_the_gate(self):
+        # Pulito: _worktree_dirty ritorna '' e si prosegue al cancello (qui finto).
+        def fake_gate(stage, skip_tests=False, cwd=None, committed_only=False):
+            return {"merge": "blocked", "ok": False,
+                    "checks": [{"check": "suite", "ok": False}]}
+        orig = pipeline_merge.pipeline_gate.run
+        pipeline_merge.pipeline_gate.run = fake_gate
+        try:
+            runner = fake_gh()  # git status -> "" (pulito)
+            result = pipeline_merge.decide("writer", 5, runner=runner,
+                                           log=lambda *_: None, journal=False)
+        finally:
+            pipeline_merge.pipeline_gate.run = orig
+        # il verdetto viene dal cancello, non dal controllo di pulizia
+        self.assertEqual(result["outcome"], "blocked")
+        self.assertEqual(merged_prs(runner), [])
+
+
 class TheBucketsSurviveTheMoveToRest(unittest.TestCase):
     """REST non ha il `bucket` che dava `gh`, quindi la classificazione l'abbiamo
     riscritta noi. Se scivola qui, tutta la politica dei check scivola con lei."""
