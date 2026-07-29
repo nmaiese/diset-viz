@@ -331,6 +331,18 @@ def _ranking_keys(level, profile_slug):
     return [k for k, _ in sorted(finals.items(), key=lambda kv: kv[1], reverse=True)]
 
 
+def bes_ranking_exists(level, profile_slug=DEFAULT_PROFILE):
+    """Whether a ranking document exists, without materialising its payload.
+
+    Mirrors the None guards of ``build_bes_ranking`` so URL enumerators can ask
+    "does this exist" cheaply (file-existence checks only) instead of building
+    all twelve rankings on a cold cache just to discover their URLs.
+    """
+    if level not in LEVELS or not has_bes_data(level):
+        return False
+    return _profile_payload(profile_slug) is not None
+
+
 @cache.memoize(timeout=3600)
 def build_bes_ranking(level, profile_slug=DEFAULT_PROFILE):
     """Full ranking payload for a level+profile, or None if missing."""
