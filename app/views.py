@@ -36,6 +36,7 @@ from app import quiz
 from app import quiz_tokens
 from app import leaderboard
 from app import moderation
+from app import public_urls
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
@@ -732,7 +733,7 @@ def themes_index():
 
 
 # User-facing URL level (plural) -> engine level (singular).
-URL_LEVEL = {"regioni": "regione", "province": "provincia"}
+URL_LEVEL = public_urls.QUALITY_LIFE_LEVELS
 
 
 def _quality_life_profile_arg():
@@ -927,7 +928,11 @@ def quality_life_classifica(url_level):
         }
         if level == "regione" else {}
     )
-    return render_template(
+    public_matches = public_urls.quality_life_public_urls(url_level, slug)
+    if not public_matches:
+        abort(404)
+    canonical = public_matches[0]["loc"]
+    response = make_response(render_template(
         "quality_life_classifica.html",
         data=payload,
         quality_map_data=quality_map_data,
@@ -937,8 +942,14 @@ def quality_life_classifica(url_level):
         default_profile=qb.DEFAULT_PROFILE,
         site_url=SITE_URL,
         site_name=SITE_NAME,
-        canonical=f"{SITE_URL}/qualita-della-vita/classifica/{url_level}{_profile_suffix(slug)}",
-    )
+        canonical=canonical,
+    ))
+    # Aliases and extra query state are useful for compatibility, but only the
+    # exact URL in the public inventory is an autonomous indexable document.
+    requested_path = request.full_path.removesuffix("?")
+    if requested_path != canonical.removeprefix(SITE_URL):
+        response.headers["X-Robots-Tag"] = "noindex, follow"
+    return response
 
 
 @app.route("/qualita-della-vita/classifica")
@@ -1248,11 +1259,10 @@ def sitemap():
         {"loc": f"{SITE_URL}/quiz/chi-e-maggiore", "priority": "0.7"},
         {"loc": f"{SITE_URL}/quiz/ordina", "priority": "0.7"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
-        {"loc": f"{SITE_URL}/qualita-della-vita/classifica/regioni", "priority": "0.8"},
-        {"loc": f"{SITE_URL}/qualita-della-vita/classifica/province", "priority": "0.8"},
         {"loc": f"{SITE_URL}/qualita-della-vita/metodologia", "priority": "0.6"},
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
+    pages.extend({"loc": item["loc"], "priority": "0.8"} for item in public_urls.quality_life_public_urls())
     for post in get_posts():
         pages.append({
             "loc": post["url"],
@@ -1268,7 +1278,6 @@ def sitemap():
             continue
         pages.append({
             "loc": f"{SITE_URL}{profiles.indicator_path(item['id'], item['name'])}",
-            "lastmod": f"{item['year_max']}-12-31",
             "priority": "0.6",
         })
     for item in bes_data.all_bes_indicators():
@@ -1276,7 +1285,6 @@ def sitemap():
             continue
         pages.append({
             "loc": f"{SITE_URL}{item['path']}",
-            "lastmod": f"{item['year_max']}-12-31",
             "priority": "0.6",
         })
     if multiscopo_data.has_multiscopo_data():
@@ -1285,7 +1293,6 @@ def sitemap():
                 continue
             pages.append({
                 "loc": f"{SITE_URL}{item['path']}",
-                "lastmod": f"{item['year_max']}-12-31",
                 "priority": "0.6",
             })
     if external_atlas.has_external_data():
@@ -1294,7 +1301,6 @@ def sitemap():
                 continue
             pages.append({
                 "loc": f"{SITE_URL}{item['path']}",
-                "lastmod": f"{item['year_max']}-12-31",
                 "priority": "0.6",
             })
     xml = render_template("sitemap.xml", pages=pages)
@@ -1417,8 +1423,13 @@ def llms_txt():
         f"- [Metodologia e fonti]({SITE_URL}/metodologia): metodo, fonti Istat, criteri di qualita e limiti dei confronti.",
         f"- [Blog]({SITE_URL}/blog): analisi data-driven sui divari territoriali, con numeri verificati e link all'atlante.",
         "",
-        "## Indicatori in evidenza",
+        "## Classifiche per profilo",
     ]
+    lines += [
+        f"- [Classifica {item['url_level']}, profilo {item['profile_name']}]({item['loc']})"
+        for item in public_urls.quality_life_public_urls()
+    ]
+    lines += ["", "## Indicatori in evidenza"]
     for item in featured:
         summary = " ".join((item.get("summary") or "").split())
         detail = f" {summary}" if summary else ""
