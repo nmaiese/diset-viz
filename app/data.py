@@ -5,6 +5,7 @@ import unicodedata
 from collections import defaultdict
 from functools import lru_cache
 
+from app import sources
 from app.external_data import enrich_indicator_metadata
 from app.indicator_notes import build_indicator_explain, display_unit
 from app.taxonomy import MACRO_AREA_ORDER, category_metadata
@@ -65,37 +66,9 @@ REGION_GEO_AREA = {
 # territoriale per le politiche di sviluppo (BDTPS); the "Reddito e ricchezza"
 # series are the Conti economici territoriali published on IstatData, so they
 # point to the Istat archive page for that release instead.
-SOURCE_BDTPS = {
-    "label": "Istat, Banca dati territoriale per le politiche di sviluppo",
-    "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/",
-}
-SOURCE_CONTI_TERRITORIALI = {
-    "label": "Istat, Conti economici territoriali",
-    "url": "https://www.istat.it/it/archivio/conti+territoriali",
-}
-SOURCE_DEMOGRAFICI = {
-    "label": "Istat, Indicatori demografici",
-    "url": "https://www.istat.it/statistiche-per-temi/popolazione-e-famiglie/",
-}
-SOURCE_EUSILC = {
-    "label": "Istat, Reddito e condizioni di vita (Eu-Silc)",
-    "url": "https://www.istat.it/statistiche-per-temi/reddito-e-condizioni-di-vita/",
-}
-CONTI_TERRITORIALI_IDS = {"901", "902", "903", "904", "905", "906", "907"}
-DEMOGRAFICI_IDS = {"910", "911", "912", "913", "920", "921", "922", "923"}
-EUSILC_IDS = {"930"}
-
-
 def source_for(indicator_id):
     """Authoritative Istat source link for an indicator (label + url)."""
-    iid = str(indicator_id)
-    if iid in CONTI_TERRITORIALI_IDS:
-        return SOURCE_CONTI_TERRITORIALI
-    if iid in DEMOGRAFICI_IDS:
-        return SOURCE_DEMOGRAFICI
-    if iid in EUSILC_IDS:
-        return SOURCE_EUSILC
-    return SOURCE_BDTPS
+    return sources.territorial_source(indicator_id)
 
 
 def _parse_number(value):

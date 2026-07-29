@@ -173,6 +173,7 @@ def _build_meta(family, raw_id, source_meta):
         "institution": source_meta.get("institution") or sources.family_institution(family),
         # No blanket default: a family that declares no licence renders none.
         "license_url": source_meta.get("license_url") or sources.family_license_url(family),
+        "date_modified": source_meta.get("date_modified"),
         "archive": source_meta.get("archive"),
         "quality_life_scored": source_meta.get("quality_life_scored", False),
         "quality_life_category_label": source_meta.get("quality_life_category_label"),
