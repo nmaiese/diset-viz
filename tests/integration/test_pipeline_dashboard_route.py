@@ -168,15 +168,16 @@ class PipelineDashboardRoute(unittest.TestCase):
         client = self._client(ingest_token="ingest-xyz")
         from scripts import pipeline_monitor
         from app import pipeline_state
-        # un run_id reale dalla storia di un indicatore committato
-        run_id = None
+        # un run_id reale dalla storia di un indicatore committato, col suo
+        # bersaglio: i token si attribuiscono solo dove il record combacia.
+        target, run_id = None, None
         for row in pipeline_monitor.load_board()["rows"]:
             if row.get("runs"):
-                run_id = row["runs"][0]["run_id"]
+                target, run_id = row["id"], row["runs"][0]["run_id"]
                 break
         if not run_id:
             self.skipTest("nessuna run nel dossier committato")
-        pipeline_state.record_tokens(run_id, 46121, stage="producer")
+        pipeline_state.record_tokens(run_id, 46121, indicator=target, stage="producer")
         body = client.get("/_pipeline").get_data(as_text=True)
         self.assertIn("46,121", body)   # formattato coi separatori delle migliaia
 

@@ -110,6 +110,31 @@ class Board(unittest.TestCase):
         self.assertEqual(b["recent"][0]["run_id"], "r19")  # il piu' recente
 
 
+class AttributeTokens(unittest.TestCase):
+    """I token vanno solo all'indicatore bersaglio, non ai confronti."""
+
+    def test_tokens_go_to_the_target_not_to_comparison_indicators(self):
+        # v-1 compare nella storia di ter-1 (bersaglio) e di ter-2 (citato come
+        # confronto): il costo e' di ter-1 soltanto, e il record lo dice.
+        rows = [
+            {"id": "ter-1", "runs": [{"run_id": "v-1"}]},
+            {"id": "ter-2", "runs": [{"run_id": "v-1"}]},
+        ]
+        tokens = {"v-1": {"tokens": 5000, "indicator": "ter-1"}}
+        pipeline_monitor.attribute_tokens(rows, tokens)
+        self.assertEqual(rows[0]["runs"][0]["tokens"], 5000)   # bersaglio
+        self.assertEqual(rows[0]["tokens_total"], 5000)
+        self.assertIsNone(rows[1]["runs"][0]["tokens"])        # confronto, niente inflazione
+        self.assertIsNone(rows[1]["tokens_total"])
+
+    def test_a_batch_run_without_a_target_is_not_attributed(self):
+        rows = [{"id": "ter-1", "runs": [{"run_id": "adm-1"}]}]
+        tokens = {"adm-1": {"tokens": 9000, "indicator": ""}}  # ammissione batch
+        pipeline_monitor.attribute_tokens(rows, tokens)
+        self.assertIsNone(rows[0]["runs"][0]["tokens"])
+        self.assertIsNone(rows[0]["tokens_total"])
+
+
 class Heartbeats(unittest.TestCase):
     def test_write_read_clear_roundtrip(self):
         root = tempfile.mkdtemp()

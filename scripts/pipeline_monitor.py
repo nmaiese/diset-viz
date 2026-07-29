@@ -177,6 +177,30 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
     }
 
 
+def attribute_tokens(rows, tokens_by_run):
+    """Attacca il consumo token a ogni run e somma il totale per indicatore.
+
+    Un `run_id` puo' comparire nella storia di piu' indicatori: `practice_timeline`
+    associa una run a ogni indicatore che il suo testo cita, compresi quelli di
+    confronto. Ma il costo e' di UNO solo, il bersaglio, che il record di
+    telemetria porta in `indicator`. Quindi si attribuisce solo dove combacia,
+    mai a un indicatore citato per confronto (ne' a un batch senza bersaglio, che
+    ha `indicator` vuoto e non combacia con nessuna riga). Puro: muta e ritorna
+    `rows`."""
+    tokens_by_run = tokens_by_run or {}
+    for row in rows:
+        total = 0
+        for run in row.get("runs", []):
+            entry = tokens_by_run.get(run.get("run_id"))
+            if entry and entry.get("indicator") == row.get("id"):
+                run["tokens"] = entry.get("tokens")
+                total += entry.get("tokens") or 0
+            else:
+                run["tokens"] = None
+        row["tokens_total"] = total or None
+    return rows
+
+
 # --- i battiti: il vivo, best effort ----------------------------------------
 
 def write_heartbeat(role: str, run_id: str, indicator: str = "", root=None,

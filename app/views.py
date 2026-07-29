@@ -566,19 +566,15 @@ def pipeline_dashboard():
         tokens = pipeline_state.tokens_by_run()
     except Exception:  # noqa: BLE001  (la telemetria non deve far cadere il cruscotto)
         tokens = {}
+    # I token si attribuiscono solo all'indicatore bersaglio della run (dal
+    # record), non a ogni indicatore che la run cita come confronto: la logica
+    # sta nel monitor stdlib-puro, cosi' e' testabile senza Flask.
+    pipeline_monitor.attribute_tokens(board.get("rows", []), tokens)
     # Le righe pubblicate portano il link alla pagina: poche righe (published=True),
-    # quindi il costo di build_indicator_view resta trascurabile. Sulla stessa
-    # passata attacco i token a ogni run e il totale per indicatore.
+    # quindi il costo di build_indicator_view resta trascurabile.
     for row in board.get("rows", []):
         row["published_url"] = (_pipeline_published_url(row["id"])
                                 if row.get("published") is True else None)
-        total = 0
-        for run in row.get("runs", []):
-            entry = tokens.get(run.get("run_id"))
-            run["tokens"] = entry["tokens"] if entry else None
-            if entry:
-                total += entry["tokens"]
-        row["tokens_total"] = total or None
     return render_template("pipeline.html", board=board,
                            token=request.args.get("token", ""),
                            site_name=SITE_NAME)
