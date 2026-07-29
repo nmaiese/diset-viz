@@ -120,6 +120,22 @@ class AgentDiscoveryTest(unittest.TestCase):
         self.assertEqual(explored.headers["X-Robots-Tag"], "noindex, follow")
         self.assertEqual(explored.headers["Content-Location"], "https://divarioitalia.it" + path)
 
+    def test_indicator_markdown_composes_missing_article_sections(self):
+        path = "/indicatore/aree-terrestri-protette/ter-264"
+        text = self.client.get(path, headers={"Accept": "text/markdown"}).get_data(as_text=True)
+
+        self.assertIn("## Come è cambiato nel tempo", text)
+        self.assertIn("la media semplice dei valori regionali è passata", text)
+
+    def test_indicator_markdown_uses_the_selected_levels_explanation(self):
+        path = "/indicatore/speranza-di-vita-alla-nascita/bes-01SAL001?livello=provincia"
+        response = self.client.get(path, headers={"Accept": "text/markdown"})
+        text = response.get_data(as_text=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Il confronto tra province", text)
+        self.assertNotIn("Il confronto tra regioni", text)
+
     def test_agent_skill_index_digest_and_artifact_match(self):
         index = self.client.get("/.well-known/agent-skills/index.json")
         self.assertEqual(index.status_code, 200)

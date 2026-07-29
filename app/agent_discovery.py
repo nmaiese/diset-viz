@@ -370,10 +370,90 @@ def methodology_markdown(site_url, license_label, license_url):
     )
 
 
+def _composed_indicator_section(role, meta, level):
+    """Project the HTML article fallbacks into plain Markdown.
+
+    ``build_article`` uses a missing body as an instruction to compose the
+    section from the live view model.  Markdown is another representation of
+    the same page, so it must preserve that instruction rather than treating a
+    missing body as an empty section.
+    """
+    explain = level.get("explain") or meta.get("explain") or {}
+    stats = level["stats"]
+
+    if role == "definizione":
+        return "\n\n".join(
+            text for text in (
+                explain.get("plain"),
+                explain.get("example"),
+                explain.get("scope"),
+                explain.get("reading"),
+            ) if text
+        )
+
+    if role == "quadro":
+        paragraphs = []
+        if level.get("best") and level.get("worst") and stats.get("gap_abs") is not None:
+            paragraphs.append(
+                f"Lo scarto tra {level['best']['name']} e {level['worst']['name']} è quello "
+                f"osservato nell'anno più recente, {level['year_max']}. Da solo non dice se "
+                "la differenza sia statisticamente significativa, e non spiega da che cosa dipenda."
+            )
+        if stats.get("above_avg_count") is not None and stats.get("below_avg_count") is not None:
+            paragraphs.append(
+                f"La media divide le {level['plural']} in due gruppi, "
+                f"{stats['above_avg_count']} sopra e {stats['below_avg_count']} sotto."
+            )
+        if not meta.get("scoreable"):
+            paragraphs.append(
+                "Questo indicatore non ha una direzione univoca. L'ordinamento descrive "
+                "l'intensità del fenomeno e non è una graduatoria di merito."
+            )
+        return "\n\n".join(paragraphs)
+
+    if role == "dinamica":
+        if not stats.get("has_multi_year"):
+            return (
+                f"La fonte pubblica un solo anno per questa serie, il {level['year_max']}. "
+                "Non è quindi possibile calcolare una variazione rispetto a un anno precedente "
+                "con la stessa definizione, e la fotografia va letta come tale."
+            )
+        paragraphs = []
+        if stats.get("avg_change_abs") is not None:
+            unit = meta.get("value_unit") or meta.get("unit") or "unità non specificata"
+            level_adjective = "regionali" if level["key"] == "regione" else "provinciali"
+            paragraphs.append(
+                f"Dal {stats['year_min']} al {stats['year_max']} la media semplice dei valori "
+                f"{level_adjective} è passata da {_number(stats['year_min_avg'])} a "
+                f"{_number(stats['year_avg'])} {unit}."
+            )
+        annual = level.get("annual_change")
+        if annual:
+            paragraphs.append(
+                f"Nell'ultimo passaggio disponibile, tra il {annual['previous_year']} e il "
+                f"{annual['year']}, il valore è diminuito in {annual['decrease_count']} "
+                f"{level['plural']}, è aumentato in {annual['increase_count']} e il confronto "
+                f"usa i {annual['common_count']} territori presenti in entrambi gli anni. "
+                f"{level.get('annual_note') or ''}"
+            )
+        return "\n\n".join(paragraphs)
+
+    if role == "limiti":
+        paragraphs = [explain.get("caveat")] if explain.get("caveat") else []
+        if level.get("coverage") is not None and level["coverage"] < 1:
+            paragraphs.append(
+                f"Nell'anno più recente la copertura è parziale, "
+                f"{len(level['observations'])} {level['plural']} su {level['territory_total']}. "
+                "I territori mancanti non entrano nei calcoli della pagina."
+            )
+        return "\n\n".join(paragraphs)
+    return ""
+
+
 def indicator_markdown(meta, level, article, site_url):
     canonical = f"{site_url}{meta['canonical_path']}"
     unit = meta.get("value_unit") or meta.get("unit") or "unità non specificata"
-    explain = meta.get("explain") or {}
+    explain = level.get("explain") or meta.get("explain") or {}
     lines = [
         f"# {meta['name']}",
         "",
@@ -400,8 +480,11 @@ def indicator_markdown(meta, level, article, site_url):
         lines += ["", "## Limiti", "", explain["caveat"]]
 
     for section in article.get("sections") or []:
-        if section.get("body"):
-            lines += ["", f"## {section['heading']}", "", section["body"].strip()]
+        body = section.get("body") or _composed_indicator_section(
+            section.get("role"), meta, level
+        )
+        if body:
+            lines += ["", f"## {section['heading']}", "", body.strip()]
 
     change = level.get("annual_change")
     if change:
