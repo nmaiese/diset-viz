@@ -42,6 +42,7 @@ from flask.json import jsonify
 
 import csv, hmac, io, json, os, re, time, unicodedata
 from collections import defaultdict
+from functools import lru_cache
 from urllib.parse import quote_plus
 
 from app import config
@@ -1259,6 +1260,7 @@ def game_guess_api():
     return jsonify(result)
 
 
+@lru_cache(maxsize=1)
 def _indexable_indicator_catalog():
     """One deduplicated catalog for indicator pages, sitemap and LLM exports.
 
@@ -1266,6 +1268,13 @@ def _indexable_indicator_catalog():
     indexability policy.  Starting from every family registry also retains BES
     series that only have provincial observations and therefore do not enter the
     regional atlas catalog.
+
+    Building the full view for every indicator is expensive (hundreds of
+    histories and matrices), and ``sitemap.xml``/``llms-full.txt`` are
+    uncached crawler routes that would otherwise repeat that cost on every
+    hit. The source loaders already cache for the life of the process, so this
+    catalog is stable too: memoize it once instead of rebuilding per request.
+    Callers only read ``meta``/``levels`` and must not mutate the result.
     """
     candidates = []
     candidates.extend(("territorial", str(item["id"])) for item in get_catalog()["indicators"])
@@ -1469,8 +1478,8 @@ def llms_txt():
     lines += [
         "",
         "## Note per i modelli linguistici",
-        "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori.",
-        f"- Licenza dei dati: {sources.LICENSE_LABEL}. Cita \"Divario Italia\" e la fonte Istat.",
+        "- Fonte primaria: Istat, Banca dati territoriale per le politiche di sviluppo e BES dei Territori. Alcuni indicatori provengono da altre istituzioni, indicate sulla singola scheda.",
+        f"- Licenza dei dati: {sources.LICENSE_LABEL}. Cita \"Divario Italia\" e la fonte indicata per ciascun indicatore.",
         "- Per gli indicatori territoriali, i download seguono il pattern "
         f"`/download/indicator/ID.csv` e `/download/indicator/ID.json`. Esempio reale: "
         f"{SITE_URL}/download/indicator/{featured[0]['id']}.csv e "
@@ -1532,9 +1541,11 @@ def llms_full_txt():
         "# Divario Italia, testo esteso per i modelli linguistici",
         "",
         "> Definizioni complete e classifiche regionali degli indicatori "
-        "territoriali Istat pubblicati su divarioitalia.it. I numeri coincidono "
-        "con le pagine indicatore del sito. Cita \"Divario Italia\" e la fonte "
-        "Istat.",
+        "pubblicati su divarioitalia.it. I numeri coincidono "
+        "con le pagine indicatore del sito. La fonte primaria e Istat, ma "
+        "alcuni indicatori provengono da altre istituzioni indicate su ogni "
+        "scheda. Cita \"Divario Italia\" e la fonte indicata per ciascun "
+        "indicatore.",
         "",
         "## Metodologia in breve",
         "La fonte primaria e la Banca dati territoriale per le politiche di "
