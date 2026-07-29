@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-29T08:36:00+00:00",
+ "base_commit": "c3a9ca2",
+ "branch": "claude/sleepy-mayer-ykf10g",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "1057b0d",
+ "detail": [],
+ "duration_seconds": 37,
+ "gate": "",
+ "outcome": "nothing",
+ "pr": "",
+ "run_id": "launch-20260729T083600Z-a1d8",
+ "session_id": "0741a253-6602-5bad-bb3e-edb3c5b56228",
+ "stage": "launch",
+ "summary": "tick: 376 unita' pronte, 0 prove pubblicate",
+ "trigger": "routine"
+}
