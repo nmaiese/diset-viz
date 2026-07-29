@@ -56,6 +56,15 @@ class BuildSnapshotIsPure(unittest.TestCase):
               "body": ""}], {})[0]
         self.assertEqual(from_branch["run_id"], "verificatore-2026-07-29-c0de")
 
+    def test_the_authoritative_marker_is_the_last_line_not_the_first(self):
+        # create_pr appende `run_id: <...>` in fondo: una riga-marcatore precedente
+        # (una run vecchia, o una menzione) non deve vincere. Ancorato e ultima.
+        body = ("run_id: producer-VECCHIA-run\n\ndescrizione\n\n"
+                "run_id: producer-20260729T101010Z-abcd")
+        pr = {"number": 1, "head": {"ref": "automation/producer-2026-07-29-abcd"}, "body": body}
+        self.assertEqual(inflight.build_snapshot([pr], {})[0]["run_id"],
+                         "producer-20260729T101010Z-abcd")
+
     def test_mergeable_is_a_word_from_the_per_pr_detail(self):
         # La mergeabilita' arriva dal dettaglio per-PR, non dalla lista (che non la
         # porta): una lista senza dettaglio da' "?", non un falso "si"/"no".

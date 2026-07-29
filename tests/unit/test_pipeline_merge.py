@@ -467,6 +467,20 @@ class ADirtyWorktreeIsRefusedBeforeMerging(unittest.TestCase):
         self.assertFalse(result["merged"])
         self.assertEqual(result["outcome"], "blocked")
 
+    def test_an_unreadable_status_fails_closed(self):
+        # git status che fallisce non e' "pulito": si blocca invece di fondere un
+        # albero forse sporco (una config status.showUntrackedFiles guasta lo rompe).
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "status"]:
+                return 1, "fatal: bad config"
+            if argv[:2] == ["git", "remote"]:
+                return 0, f"http://local_proxy@127.0.0.1:41729/git/{REPO}\n"
+            return 0, ""
+        self.assertNotEqual(pipeline_merge._worktree_dirty(runner=runner), "")
+        result = pipeline_merge.decide("writer", 5, runner=runner,
+                                       log=lambda *_: None, journal=False)
+        self.assertEqual(result["outcome"], "blocked")
+
     def test_it_asks_git_for_all_untracked_files(self):
         # --untracked-files=all, o status.showUntrackedFiles=no nasconderebbe un
         # modulo/una fixture nuova, e la suite verde fonderebbe un commit senza.

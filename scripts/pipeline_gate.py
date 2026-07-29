@@ -245,6 +245,23 @@ def resolve_base(base=None, cwd=None):
     return None
 
 
+def _root_for(cwd=None):
+    """La radice del working tree a cui `cwd` appartiene, da cui leggere i file.
+
+    Non il `PROJECT_ROOT` del modulo. La guardia importa `pipeline_gate` dal
+    checkout principale (l'hook gira come `$CLAUDE_PROJECT_DIR/scripts/agent_guard.py`)
+    ma passa `cwd=worktree`: git opera sul cwd, ma leggere i file sotto il
+    principale farebbe sparire quelli appena aggiunti nel worktree. Un diario
+    committato nel worktree risulterebbe cancellato, e lo Stop hook rifiuterebbe
+    una run bloccata/in errore che aveva committato correttamente la sua riga.
+    Senza cwd (o se non e' un working tree) resta il principale."""
+    if cwd:
+        code, out, _ = _git("rev-parse", "--show-toplevel", cwd=cwd)
+        if code == 0 and out.strip():
+            return Path(out.strip())
+    return PROJECT_ROOT
+
+
 def check_base_is_usable(base=None, cwd=None):
     """La base deve poter spiegare il diff, non deve essere in cima a master.
 
@@ -401,7 +418,7 @@ def _touched_under(prefix, base=None, cwd=None, include_worktree=True):
         if resolved:
             code, _, _ = _git("cat-file", "-e", f"{resolved}:{path}", cwd=cwd)
             at_base = code == 0
-        if not (PROJECT_ROOT / path).exists():
+        if not (_root_for(cwd) / path).exists():
             gone.append(path)
         elif at_base:
             changed.append(path)
@@ -706,7 +723,7 @@ def _verification_rows_added(base=None, cwd=None, include_worktree=True):
     rows = []
     for path in _touched_under(VERIFICATIONS, base, cwd=cwd, include_worktree=include_worktree)["added"]:
         try:
-            data = json.loads((PROJECT_ROOT / path).read_text(encoding="utf-8"))
+            data = json.loads((_root_for(cwd) / path).read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
         if isinstance(data, dict):
@@ -726,7 +743,7 @@ def _publication_rows_added(base=None, cwd=None, include_worktree=True):
     touched = _touched_under(PUBLICATIONS, base, cwd=cwd, include_worktree=include_worktree)
     for path in touched["added"] + touched["changed"]:
         try:
-            data = json.loads((PROJECT_ROOT / path).read_text(encoding="utf-8"))
+            data = json.loads((_root_for(cwd) / path).read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
         if isinstance(data, dict):
@@ -925,7 +942,7 @@ def _journal_lines_added(base=None, cwd=None, include_worktree=True):
     touched = _touched_under(RUN_JOURNAL, base, cwd=cwd, include_worktree=include_worktree)
     entries = []
     for path in touched["added"] + touched["changed"]:
-        full = PROJECT_ROOT / path
+        full = _root_for(cwd) / path
         try:
             data = json.loads(full.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):

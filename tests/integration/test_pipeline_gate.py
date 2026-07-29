@@ -970,5 +970,44 @@ class ThePublisherProvesTheSite(unittest.TestCase):
         self.assertIn("non si cancella", check.detail)
 
 
+class TheGateReadsFilesFromTheSuppliedWorktree(unittest.TestCase):
+    """La guardia importa il cancello dal checkout principale ma passa
+    cwd=worktree (l'hook gira come $CLAUDE_PROJECT_DIR/scripts/agent_guard.py).
+    Se il cancello leggesse i file dal principale invece che dal worktree, un
+    diario appena committato nel worktree risulterebbe cancellato, e lo Stop
+    hook rifiuterebbe una run bloccata che aveva committato la sua riga."""
+
+    def setUp(self):
+        self._tmp = TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        self.main = Path(self._tmp.name) / "main"
+        self.main.mkdir()
+        self._git("init", "-q", "-b", "master")
+        self._git("config", "user.email", "t@example.com")
+        self._git("config", "user.name", "t")
+        (self.main / "data" / "pipeline" / "runs").mkdir(parents=True)
+        (self.main / "data" / "pipeline" / "runs" / ".gitkeep").write_text("")
+        self._git("add", "-A")
+        self._git("commit", "-qm", "base")
+        self.wt = Path(self._tmp.name) / "runs" / "r1"
+        self._git("worktree", "add", "-q", "-b", "automation/writer-x", str(self.wt), "master")
+        journal = self.wt / "data" / "pipeline" / "runs" / "writer-x.json"
+        journal.write_text('{"stage": "writer", "outcome": "blocked"}')
+        subprocess.run(("git", "add", "-A"), cwd=self.wt, capture_output=True)
+        subprocess.run(("git", "commit", "-qm", "diario"), cwd=self.wt, capture_output=True)
+        self._orig = pipeline_gate.PROJECT_ROOT
+        pipeline_gate.PROJECT_ROOT = self.main.resolve()
+        self.addCleanup(lambda: setattr(pipeline_gate, "PROJECT_ROOT", self._orig))
+
+    def _git(self, *args):
+        return subprocess.run(("git",) + args, cwd=self.main, capture_output=True, text=True)
+
+    def test_a_journal_committed_in_the_worktree_is_added_not_gone(self):
+        touched = pipeline_gate._touched_under(
+            pipeline_gate.RUN_JOURNAL, base="master", cwd=str(self.wt))
+        self.assertIn("data/pipeline/runs/writer-x.json", touched["added"])
+        self.assertEqual(touched["gone"], [])
+
+
 if __name__ == "__main__":
     unittest.main()

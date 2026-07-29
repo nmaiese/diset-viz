@@ -131,7 +131,12 @@ def _worktree_dirty(runner=_run, cwd=None):
     sui file su disco, il merge fonde il commit, e con un worktree per run un file
     non committato e' lavoro di questa run che non finirebbe su master."""
     code, out = runner(["git", "status", "--porcelain", "--untracked-files=all"], cwd=cwd)
-    if code != 0 or not out.strip():
+    if code != 0:
+        # Fail closed: se non si riesce a leggere lo stato non si sa se e' pulito,
+        # e trattarlo come pulito lascerebbe fondere un albero forse sporco (una
+        # config `status.showUntrackedFiles` guasta puo' far fallire solo questo).
+        return f"git status non leggibile (codice {code}): {out.strip()[:120]}"
+    if not out.strip():
         return ""
     files = [line[3:].strip() for line in out.splitlines() if line.strip()]
     shown = ", ".join(files[:6])

@@ -67,9 +67,14 @@ def _run_id_of(pr: dict) -> str:
     del branch lo identifica comunque in modo univoco."""
     import re
     body = pr.get("body") or ""
-    m = re.search(r"run[_-]?id[:\s]+([A-Za-z0-9:_-]+)", body)
-    if m:
-        return m.group(1)
+    # Marcatore ancorato a riga, e l'ULTIMA occorrenza: `create_pr` appende
+    # `run_id: <...>` in fondo al corpo dell'agente, quindi un `run_id: <altro>`
+    # menzionato prima nella prosa (o il marcatore di una run precedente) non deve
+    # vincere. Con `re.search` (prima occorrenza) vinceva, e la fotografia
+    # associava la PR al battito e al diario sbagliati.
+    markers = re.findall(r"(?mi)^\s*run[_-]?id:\s*([A-Za-z0-9:_-]+)\s*$", body)
+    if markers:
+        return markers[-1]
     branch = ((pr.get("head") or {}).get("ref") or "")
     return branch[len(AUTOMATION_PREFIX):] if branch.startswith(AUTOMATION_PREFIX) else ""
 
