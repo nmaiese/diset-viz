@@ -43,6 +43,36 @@ class PublicDiscoverabilityAuditTest(unittest.TestCase):
         self.assertTrue(result["server_rendered"])
         self.assertEqual(result["response_bytes"], len(html))
 
+    def test_inspection_rejects_a_second_restrictive_x_robots_tag(self):
+        contract = audit.load_contract()
+        expected = next(page for page in contract["pages"] if page["path"] == "/")
+        canonical = contract["site_url"] + "/"
+        html = f'<html><head><link rel="canonical" href="{canonical}"><meta name="robots" content="{contract["index_header"]}"></head><body>{expected["marker"]}</body></html>'.encode()
+        raw = {
+            "url": canonical, "final_url": canonical, "status": 200,
+            "headers": {
+                "content-type": "text/html; charset=utf-8",
+                "x-robots-tag": contract["index_header"],
+                "x-robots-tag-all": [contract["index_header"], "noindex"],
+            },
+            "body": html, "redirects": [],
+        }
+        result = audit.inspect_result(raw, expected, contract)
+        self.assertTrue(any("X-Robots-Tag" in failure for failure in result["failures"]))
+
+    def test_robots_rejects_an_extra_disallow_for_a_contracted_agent(self):
+        contract = audit.load_contract()
+        robots = contract["robots"]
+        lines = ["# As a condition of accessing this website", "User-agent: *", "Allow: /"]
+        lines += [f"Disallow: {path}" for path in robots["shared_disallow"]]
+        lines += ["Disallow: /blog"]  # an extra rule that blocks an audited public page
+        lines += [f"User-agent: {agent}" for agent in robots["answer_bots"]]
+        lines += ["Allow: /"] + [f"Disallow: {path}" for path in robots["shared_disallow"]]
+        for agent in robots["training_bots"]:
+            lines += [f"User-agent: {agent}", "Disallow: /"]
+        failures = audit.audit_robots("\n".join(lines), robots)
+        self.assertTrue(any("must be exactly" in failure for failure in failures))
+
 
 if __name__ == "__main__":
     unittest.main()

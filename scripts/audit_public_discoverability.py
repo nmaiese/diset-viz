@@ -56,7 +56,12 @@ def _request(url: str, timeout: float) -> tuple[int, dict[str, str], bytes]:
     except HTTPError as error:
         response = error
     body = response.read()
-    return response.status, {key.lower(): value for key, value in response.headers.items()}, body
+    headers = {key.lower(): value for key, value in response.headers.items()}
+    # items() collapses repeated headers to the last value. A CDN that appends a
+    # second, restrictive X-Robots-Tag next to the app's own must not disappear
+    # here, or the audit would report PASS while crawlers honour the noindex.
+    headers["x-robots-tag-all"] = list(response.headers.get_all("X-Robots-Tag") or [])
+    return response.status, headers, body
 
 
 def fetch(url: str, timeout: float, max_redirects: int = 5) -> dict:
@@ -105,10 +110,13 @@ def audit_robots(text: str, contract: dict) -> list[str]:
     if sum("*" in group["agents"] for group in groups) != 1:
         failures.append("robots must contain exactly one default User-agent group (possible CDN injection)")
     for agent in ("*", *contract["answer_bots"]):
-        rules = by_agent.get(agent, [])
-        for rule in shared:
-            if rule not in rules:
-                failures.append(f"robots effective rules for {agent} are missing {rule[0].title()}: {rule[1]}")
+        # Exact match, not membership: an extra rule such as ``Disallow: /blog``
+        # keeps every required rule present yet blocks an audited public page.
+        crawl_rules = [rule for rule in by_agent.get(agent, []) if rule[0] in ("allow", "disallow")]
+        if crawl_rules != shared:
+            failures.append(
+                f"robots effective crawl rules for {agent} must be exactly {shared}, got {crawl_rules}"
+            )
     for agent in contract["training_bots"]:
         crawl_rules = [rule for rule in by_agent.get(agent, []) if rule[0] in ("allow", "disallow")]
         if crawl_rules != [("disallow", "/")]:
@@ -141,8 +149,11 @@ def inspect_result(raw: dict, expected: dict, contract: dict) -> dict:
         failures.append("canonical URL unexpectedly redirects")
     if expected["content_type"] not in content_type.lower():
         failures.append(f"expected content type {expected['content_type']}, got {content_type or '<missing>'}")
-    if result["x_robots_tag"] != contract["index_header"]:
-        failures.append(f"unexpected X-Robots-Tag: {result['x_robots_tag']!r}")
+    x_robots_all = raw["headers"].get("x-robots-tag-all")
+    if x_robots_all is None:
+        x_robots_all = [result["x_robots_tag"]] if result["x_robots_tag"] is not None else []
+    if x_robots_all != [contract["index_header"]]:
+        failures.append(f"unexpected X-Robots-Tag header(s): {x_robots_all!r}")
     if not result["server_rendered"]:
         failures.append(f"server-rendered marker missing: {expected['marker']!r}")
     if expected["kind"] == "html":
