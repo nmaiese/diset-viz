@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-29T06:00:48+00:00",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "4cd7866",
+ "detail": [
+  "Riga esito scritta a mano: pipeline_log/build_entry non conoscono ancora lo stadio producer e record_landing e uscito prima del proprio fallback. Merge avvenuto (gh api), contenuto in master come 4cd7866."
+ ],
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": 76,
+ "run_id": "producer-20260729T054258Z-36cc",
+ "session_id": "3d9738d8-3a3a-5860-b63c-f6595a71148c",
+ "stage": "producer",
+ "summary": "PR #76 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}
