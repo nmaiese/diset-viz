@@ -141,5 +141,52 @@ class Heartbeats(unittest.TestCase):
         self.assertEqual({h["run_id"] for h in live}, {"producer-1", "verificatore-2"})
 
 
+class PostTokens(unittest.TestCase):
+    """Il POST del consumo token: paga best effort, payload giusto."""
+
+    def _capture(self):
+        import json as _json
+        captured = {}
+
+        class FakeResp:
+            status = 200
+            def __enter__(self):
+                return self
+            def __exit__(self, *a):
+                return False
+
+        def opener(req, timeout=None):
+            captured["url"] = req.full_url
+            captured["body"] = _json.loads(req.data.decode("utf-8"))
+            return FakeResp()
+
+        return captured, opener
+
+    def test_post_tokens_builds_a_tokens_payload(self):
+        captured, opener = self._capture()
+        ok = pipeline_monitor.post_tokens(
+            "producer-r1", 46121, indicator="ter-178", stage="producer",
+            role="producer", url="https://divarioitalia.it", token="k", opener=opener)
+        self.assertTrue(ok)
+        self.assertTrue(captured["url"].endswith("/_pipeline/beat"))
+        body = captured["body"]
+        self.assertEqual(body["action"], "tokens")
+        self.assertEqual(body["run_id"], "producer-r1")
+        self.assertEqual(body["tokens"], 46121)
+        self.assertEqual(body["indicator"], "ter-178")
+        self.assertEqual(body["stage"], "producer")
+
+    def test_post_tokens_is_silent_without_env(self):
+        # senza url/segreto (ne' argomenti ne' ambiente) non fa nulla, e lo dice
+        import os
+        saved = {k: os.environ.pop(k, None) for k in ("PIPELINE_INGEST_URL", "PIPELINE_INGEST_TOKEN")}
+        try:
+            self.assertFalse(pipeline_monitor.post_tokens("r", 1))
+        finally:
+            for k, v in saved.items():
+                if v is not None:
+                    os.environ[k] = v
+
+
 if __name__ == "__main__":
     unittest.main()

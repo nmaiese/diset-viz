@@ -253,8 +253,12 @@ python3 scripts/pipeline_monitor.py --json    # per la rotta o un altro programm
 
 E' servito vivo dalla rotta Flask protetta **`/_pipeline`** (noindex sempre,
 auto-refresh): una headline in testa ("2 indicatori bloccati: ter-X smentita
-aperta da 2 giorni, dem-Y aspetta il produttore da 5"), una riga per indicatore
-con stato, da quando, prossimo ruolo e priorita', e le sessioni in volo adesso.
+aperta da 2 giorni, dem-Y aspetta il produttore da 5"), le sessioni in volo
+adesso, e la sezione **"Tutti gli indicatori"**, una riga espandibile per
+ognuno: stato, avanzamento stadi e prossimo ruolo in riga, e nel dettaglio la
+storia delle run (cosa ha fatto l'agente, esito, durata, modello, e il consumo
+token per step), piu' il link alla pagina pubblicata quando lo e'. Un filtro in
+testa alla sezione cerca per id, stato, ruolo o bandiera.
 Se `PIPELINE_TOKEN` e' impostato serve solo con `?token=` giusto, altrimenti 404
 (non 403: una pagina interna non conferma nemmeno di esistere); vuoto, in locale,
 e' aperta. Si ricalcola a ogni caricamento dai file committati, non da uno stato
@@ -265,6 +269,16 @@ ogni ruolo scrive un file all'avvio della sua run e lo cancella alla chiusura, u
 file per `run_id` cosi' due ruoli in volo insieme non si sovrascrivono. E' best
 effort: se un ruolo non ha battuto il vivo tace, il committato no. Un battito
 piu' vecchio della soglia si considera morto, una sessione caduta senza pulire.
+
+Il **consumo token** e' telemetria durevole, tenuta a parte dai battiti. Il
+lanciatore e' l'unico a vedere i `subagent_tokens` di ogni ruolo che lancia (il
+ruolo, dentro la sua sessione, non conosce il proprio totale), quindi e' lui a
+POSTarli a `/_pipeline/beat` (azione `tokens`) chiavati sul `run_id` del ruolo:
+finiscono in una tabella dedicata dello **stesso** SQLite replicato su GCS, che
+**non scade** come un battito. Il cruscotto li somma per indicatore e li mostra
+per step. E' **solo in avanti**: le run precedenti a questa telemetria non hanno
+un totale e non c'e' backfill (i token delle run passate non esistono da nessuna
+parte).
 
 Il **diario** (`data/pipeline/runs/`) e' la storia. Prima l'unico segno che una
 run fosse avvenuta era il commit che produceva: una run che non produce niente,

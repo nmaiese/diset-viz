@@ -83,6 +83,23 @@ promoter), **produttore** (curator+writer+reviewer), **verificatore**.
    non correggi il loro lavoro: quando chiudono, riporti in una riga come e'
    andata per ciascuno e ti fermi.
 
+4. Quando un ruolo chiude, l'`Agent` ti restituisce anche i suoi
+   `subagent_tokens`: registra quel numero per il cruscotto, chiavato sul
+   `run_id` di **quel ruolo** (non un tuo run_id: sei tu a POSTarlo, ma il costo
+   e' del ruolo, e cosi' si attacca all'indicatore giusto).
+
+   ```bash
+   python3 scripts/pipeline_monitor.py --post-tokens <run_id_del_ruolo> <subagent_tokens> \
+       --indicator <indicatore> --role <ruolo>
+   ```
+
+   E' telemetria durevole, non un battito: non scade, e il cruscotto la somma per
+   indicatore e la mostra per step su `/_pipeline`. Best effort, come la
+   fotografia delle PR: senza `PIPELINE_INGEST_URL`/`PIPELINE_INGEST_TOKEN`
+   nell'ambiente tace, e un token perso non e' un errore della run. Sei tu a
+   poterlo fare perche' sei l'unico a vedere i `subagent_tokens`: il ruolo, dentro
+   la sua sessione, non conosce il proprio totale.
+
 Non serve piu' rifiutare "perche' c'e' una PR aperta": due indicatori diversi
 non contendono, e il vecchio lock una-PR-aperta (che congelava l'intera catena)
 non esiste piu'. Se due voci toccassero lo stesso indicatore (non capita nel

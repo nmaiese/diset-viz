@@ -561,11 +561,24 @@ def pipeline_dashboard():
         activity = {"beats": [], "prs": []}
     board = pipeline_monitor.load_board(heartbeats=activity["beats"],
                                         open_runs=activity["prs"])
+    # Telemetria token: durevole, dal SQLite, chiavata sul run_id del ruolo.
+    try:
+        tokens = pipeline_state.tokens_by_run()
+    except Exception:  # noqa: BLE001  (la telemetria non deve far cadere il cruscotto)
+        tokens = {}
     # Le righe pubblicate portano il link alla pagina: poche righe (published=True),
-    # quindi il costo di build_indicator_view resta trascurabile.
+    # quindi il costo di build_indicator_view resta trascurabile. Sulla stessa
+    # passata attacco i token a ogni run e il totale per indicatore.
     for row in board.get("rows", []):
         row["published_url"] = (_pipeline_published_url(row["id"])
                                 if row.get("published") is True else None)
+        total = 0
+        for run in row.get("runs", []):
+            entry = tokens.get(run.get("run_id"))
+            run["tokens"] = entry["tokens"] if entry else None
+            if entry:
+                total += entry["tokens"]
+        row["tokens_total"] = total or None
     return render_template("pipeline.html", board=board,
                            token=request.args.get("token", ""),
                            site_name=SITE_NAME)
@@ -583,6 +596,7 @@ def pipeline_beat_ingest():
       {"action":"beat","run_id":...,"role":...,"indicator":...,"stage":...}
       {"action":"close","run_id":...}
       {"action":"prs","prs":[{"pr":..,"branch":..,"run_id":..,"ci":..,"mergeable":..,"title":..}]}
+      {"action":"tokens","run_id":...,"tokens":N,"indicator":...,"stage":...,"role":...}
 
     Best effort per chi chiama: un agente che non riesce a battere non deve
     fallire la propria run, quindi qui si e' solo tolleranti e si risponde presto.
@@ -603,6 +617,11 @@ def pipeline_beat_ingest():
             pipeline_state.close_beat(payload.get("run_id", ""))
         elif action == "prs":
             pipeline_state.replace_prs(payload.get("prs") or [])
+        elif action == "tokens":
+            pipeline_state.record_tokens(
+                payload.get("run_id", ""), payload.get("tokens"),
+                indicator=payload.get("indicator", ""), stage=payload.get("stage", ""),
+                role=payload.get("role", ""))
         else:
             return jsonify({"error": "bad_action"}), 400
     except ValueError as exc:

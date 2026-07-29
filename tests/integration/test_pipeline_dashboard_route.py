@@ -147,6 +147,39 @@ class PipelineDashboardRoute(unittest.TestCase):
         client.post("/_pipeline/beat", headers=hdr, json={"action": "close", "run_id": "r-1"})
         self.assertNotIn("ter-888", client.get("/_pipeline").get_data(as_text=True))
 
+    def test_tokens_are_stored_durably_and_gated_by_the_secret(self):
+        client = self._client(ingest_token="ingest-xyz")
+        from app import pipeline_state
+        # segreto sbagliato -> 404, come i battiti
+        self.assertEqual(
+            client.post("/_pipeline/beat", json={"action": "tokens", "run_id": "r", "tokens": 9},
+                        headers={"X-Pipeline-Key": "sbagliato"}).status_code, 404)
+        # col segreto giusto scrive
+        ok = client.post("/_pipeline/beat", headers={"X-Pipeline-Key": "ingest-xyz"},
+                         json={"action": "tokens", "run_id": "producer-1", "tokens": 46121,
+                               "indicator": "ter-178", "stage": "producer"})
+        self.assertEqual(ok.status_code, 200)
+        self.assertEqual(pipeline_state.tokens_by_run()["producer-1"]["tokens"], 46121)
+        # e un token vecchio NON scade come un battito: la telemetria e' storia
+        pipeline_state.record_tokens("producer-old", 12345, now="2026-01-01T00:00:00+00:00")
+        self.assertEqual(pipeline_state.tokens_by_run()["producer-old"]["tokens"], 12345)
+
+    def test_tokens_show_up_per_step_on_the_dashboard(self):
+        client = self._client(ingest_token="ingest-xyz")
+        from scripts import pipeline_monitor
+        from app import pipeline_state
+        # un run_id reale dalla storia di un indicatore committato
+        run_id = None
+        for row in pipeline_monitor.load_board()["rows"]:
+            if row.get("runs"):
+                run_id = row["runs"][0]["run_id"]
+                break
+        if not run_id:
+            self.skipTest("nessuna run nel dossier committato")
+        pipeline_state.record_tokens(run_id, 46121, stage="producer")
+        body = client.get("/_pipeline").get_data(as_text=True)
+        self.assertIn("46,121", body)   # formattato coi separatori delle migliaia
+
     def test_a_bad_action_is_a_clean_400(self):
         client = self._client(ingest_token="ingest-xyz")
         r = client.post("/_pipeline/beat", headers={"X-Pipeline-Key": "ingest-xyz"},

@@ -183,17 +183,19 @@
           <div class="det-meta">
             entrato {{ r.entered_at or '?' }} &middot; {{ r.days }} giorni &middot;
             verifica {{ 'valida' if r.verification_valid else 'scaduta' if r.verification_valid is false else 'assente' }}
+            {%- if r.tokens_total %} &middot; {{ "{:,}".format(r.tokens_total) }} token in totale{% endif %}
             {%- if r.reason %} &middot; {{ r.reason }}{% endif %}
           </div>
           {% if r.runs %}
           <div class="scroll"><table>
-            <tr><th>quando</th><th>stadio</th><th>esito</th><th>durata</th><th>modello</th><th>cosa ha fatto l'agente</th></tr>
+            <tr><th>quando</th><th>stadio</th><th>esito</th><th>durata</th><th>token</th><th>modello</th><th>cosa ha fatto l'agente</th></tr>
             {% for run in r.runs %}
             <tr>
               <td class="mono">{{ run.at[:16] }}</td>
               <td class="role">{{ run.stage }}</td>
               <td class="mono">{{ run.outcome }}</td>
               <td class="num">{% if run.duration_seconds is not none %}{{ run.duration_seconds }}s{% else %}-{% endif %}</td>
+              <td class="num">{% if run.tokens is not none %}{{ "{:,}".format(run.tokens) }}{% else %}-{% endif %}</td>
               <td class="mono">{{ run.model or '-' }}</td>
               <td>{{ run.summary }}</td>
             </tr>
