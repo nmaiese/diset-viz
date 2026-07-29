@@ -258,6 +258,50 @@ def atlante():
     return render_template('app.html', featured_indicators=_home_featured_indicator_links())
 
 
+@app.route("/catalogo-dati")
+@cache.cached(timeout=300)
+def data_catalog():
+    """Indexable, human-readable inventory behind the DataCatalog entity."""
+    datasets = []
+    for item in get_atlas_catalog()["indicators"]:
+        family = item["catalog_family"]
+        _, raw_id = sources.split_internal_id(item["id"])
+        if not indicator_view._is_indexable(family, raw_id, item):
+            continue
+        datasets.append({
+            "name": item["name"],
+            "url": f"{SITE_URL}{item['path']}",
+            "path": item["path"],
+            "source": item.get("source_label") or sources.family_label(family),
+        })
+    description = (
+        "Catalogo pubblico degli indicatori territoriali di Divario Italia, "
+        "con schede, fonti e serie scaricabili."
+    )
+    catalog_jsonld = {
+        "@context": "https://schema.org",
+        "@type": "DataCatalog",
+        "@id": f"{SITE_URL}/catalogo-dati#catalogo",
+        "name": "Catalogo dati di Divario Italia",
+        "description": description,
+        "url": f"{SITE_URL}/catalogo-dati",
+        "publisher": {"@type": "Organization", "name": SITE_NAME, "url": f"{SITE_URL}/"},
+        "dataset": [
+            {"@type": "Dataset", "name": item["name"], "url": item["url"]}
+            for item in datasets
+        ],
+    }
+    return render_template(
+        "data_catalog.html",
+        datasets=datasets,
+        catalog_description=description,
+        catalog_jsonld=catalog_jsonld,
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/catalogo-dati",
+    )
+
+
 @app.route("/divari-regionali")
 @cache.cached(timeout=300, query_string=True)
 def divari_regionali():
@@ -1320,6 +1364,7 @@ def sitemap():
     pages = [
         {"loc": f"{SITE_URL}/", "priority": "1.0"},
         {"loc": f"{SITE_URL}/atlante", "priority": "0.9"},
+        {"loc": f"{SITE_URL}/catalogo-dati", "priority": "0.7"},
         {"loc": f"{SITE_URL}/divari-regionali", "priority": "0.9"},
         {"loc": f"{SITE_URL}/confronto", "priority": "0.7"},
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},

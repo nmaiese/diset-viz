@@ -30,17 +30,20 @@
   "name": {{ meta.name | tojson }},
   "description": {{ dataset_description | tojson }},
   "url": {{ canonical | tojson }},
-  "temporalCoverage": "{{ meta.year_min }}/{{ meta.year_max }}",
+  "temporalCoverage": "{{ level.year_min }}/{{ level.year_max }}",
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": { "@type": "Organization", "name": {{ (meta.source_label or meta.source) | tojson }}, "url": {{ meta.source_url | tojson }} },
+  "publisher": { "@type": "Organization", "name": {{ site_name | tojson }}, "url": "{{ site_url }}/" },{% if meta.date_modified %}
+  "dateModified": {{ meta.date_modified | tojson }},{% endif %}
   "isBasedOn": {{ (meta.source_data_url or meta.source_url) | tojson }},
+  "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni",
   "variableMeasured": {{ meta.name | tojson }},
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}
   "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads %},
   "distribution": [
-    { "@type": "DataDownload", "encodingFormat": "text/csv", "contentUrl": "{{ site_url }}{{ meta.downloads.csv }}" },
-    { "@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": "{{ site_url }}{{ meta.downloads.json }}" }
+    { "@type": "DataDownload", "name": "Download CSV", "description": "Serie dell'indicatore in formato CSV", "encodingFormat": "text/csv", "contentUrl": "{{ site_url }}{{ meta.downloads.csv }}" },
+    { "@type": "DataDownload", "name": "Download JSON", "description": "Serie dell'indicatore in formato JSON", "encodingFormat": "application/json", "contentUrl": "{{ site_url }}{{ meta.downloads.json }}" }
   ]{% endif %}
 }
 </script>
@@ -89,7 +92,7 @@
       <span><small>Fonte</small><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a></span>
       {# One grid child, or `.page-facts span { display: grid }` puts the two
          links and the separator on three separate rows. #}
-      {% if meta.downloads %}<span><small>Download</small><span class="page-facts__inline"><a href="{{ meta.downloads.csv }}">CSV</a> · <a href="{{ meta.downloads.json }}">JSON</a></span></span>{% endif %}
+      {% if meta.downloads %}<span><small>Download</small><span class="page-facts__inline"><a href="{{ meta.downloads.csv }}" title="Serie dell'indicatore in formato CSV">CSV</a> · <a href="{{ meta.downloads.json }}" title="Serie dell'indicatore in formato JSON">JSON</a></span></span>{% endif %}
     </div>
 
     <div class="cockpit-controls">
@@ -274,7 +277,8 @@
 
     {# How we compute, not what the source measures. It stays here so an authored
        "limiti" section can never drop it. #}
-    <p>La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. Classifica e divario derivano dagli stessi valori pubblicati dalla fonte, senza riponderazioni.</p>
+    <p>La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica di misurazione:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni.</p>
+    {% if meta.date_modified %}<p class="page-note"><strong>Aggiornamento del dataset:</strong> {{ meta.date_modified }}.</p>{% endif %}
 
     {% if meta.quality_life_scored %}
     <p>Questa serie entra nel punteggio regionale della qualità della vita{% if meta.quality_life_category_label %}, nella categoria {{ meta.quality_life_category_label }}{% endif %}. Il punteggio ordina i dati, non sostituisce l'interpretazione del contesto territoriale.</p>
