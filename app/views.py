@@ -44,6 +44,7 @@ from flask.json import jsonify
 
 import csv, hmac, io, json, os, re, time, unicodedata
 from collections import defaultdict
+import threading
 from functools import lru_cache
 from urllib.parse import quote_plus
 
@@ -265,18 +266,23 @@ def atlante():
 @app.route("/catalogo-dati")
 @cache.cached(timeout=300)
 def data_catalog():
-    """Indexable, human-readable inventory behind the DataCatalog entity."""
+    """Indexable, human-readable inventory behind the DataCatalog entity.
+
+    Costruito dalla **stessa** proiezione di sitemap e llms-full
+    (`_indexable_indicator_catalog`), non dal solo inventario regionale
+    (`get_atlas_catalog`): quest'ultimo non vede gli indicatori BES con sole
+    osservazioni provinciali, che pero' hanno una pagina indicizzabile ed entrano
+    negli altri due export. Prenderli da fonti diverse lasciava decine di dataset
+    validi fuori dal catalogo pubblico e dal suo grafo `DataCatalog.dataset`.
+    """
     datasets = []
-    for item in get_atlas_catalog()["indicators"]:
-        family = item["catalog_family"]
-        _, raw_id = sources.split_internal_id(item["id"])
-        if not indicator_view._is_indexable(family, raw_id, item):
-            continue
+    for record in _indexable_indicator_catalog():
+        meta = record["meta"]
         datasets.append({
-            "name": item["name"],
-            "url": f"{SITE_URL}{item['path']}",
-            "path": item["path"],
-            "source": item.get("source_label") or sources.family_label(family),
+            "name": meta["name"],
+            "url": f"{SITE_URL}{meta['canonical_path']}",
+            "path": meta["canonical_path"],
+            "source": meta.get("source_label") or meta.get("family_label") or "",
         })
     description = (
         "Catalogo pubblico degli indicatori territoriali di Divario Italia, "
@@ -289,7 +295,10 @@ def data_catalog():
         "name": "Catalogo dati di Divario Italia",
         "description": description,
         "url": f"{SITE_URL}/catalogo-dati",
-        "publisher": {"@type": "Organization", "name": SITE_NAME, "url": f"{SITE_URL}/"},
+        # L'entita' editore condivisa (con @id /chi-siamo#organizzazione), la
+        # stessa delle schede indicatore e della pagina Chi siamo, non una seconda
+        # Organization anonima: un solo publisher, collegato, in tutto il grafo.
+        "publisher": publisher.ORGANIZATION,
         "dataset": [
             {"@type": "Dataset", "name": item["name"], "url": item["url"]}
             for item in datasets
@@ -1330,8 +1339,28 @@ def game_guess_api():
     return jsonify(result)
 
 
-@lru_cache(maxsize=1)
+_indexable_catalog_lock = threading.Lock()
+
+
 def _indexable_indicator_catalog():
+    """Accessore single-flight al catalogo proiettato: serializza la prima
+    costruzione a freddo.
+
+    `lru_cache` non coalizza i miss concorrenti. Il worker gunicorn di produzione
+    ha un thread solo per processo? No: un worker, **otto thread** (vedi
+    `Dockerfile`), e `/sitemap.xml` e `/llms-full.txt` sono rotte non cached. Due
+    richieste crawler simultanee a freddo entrerebbero entrambe nel corpo prima
+    che il primo risultato sia in cache, e ognuna rifarebbe la traversata di
+    centinaia di indicatori (secondi di CPU), moltiplicando il lavoro fino al
+    timeout. Il lock fa costruire una volta sola: il primo popola la cache di
+    `_build_indexable_indicator_catalog`, gli altri aspettano e leggono il
+    risultato gia' pronto (un lookup, quindi il lock si tiene un istante)."""
+    with _indexable_catalog_lock:
+        return _build_indexable_indicator_catalog()
+
+
+@lru_cache(maxsize=1)
+def _build_indexable_indicator_catalog():
     """One deduplicated catalog for indicator pages, sitemap and LLM exports.
 
     ``build_indicator_view`` owns both canonical URLs and the family-specific
