@@ -37,12 +37,15 @@ dati si muovono.
 > il cancello al merge misura il solo diff committato (`--committed-only`), la PR
 > si apre via REST senza `GH_REPO` (`pipeline_merge.py --open`), e due test EUR
 > pinnati sono stati ricostruiti su fixture sintetiche (sbloccavano la PR #86).
-> Il **cruscotto `/_pipeline` mostra ora il vivo**: gli agenti POSTano i battiti
+> Il **cruscotto `/_pipeline` mostra il vivo e il percorso end-to-end**: gli agenti POSTano i battiti
 > e le PR aperte a `/_pipeline/beat`, il sito li scrive nel SQLite gia' replicato
 > su GCS da Litestream, e li serve. La Routine `launcher` resta **in pausa**: va
 > ri-puntata a `launcher.md` e riaccesa a mano, dopo aver verificato i fix su
 > qualche tick manuale (serve prima il segreto `PIPELINE_INGEST_TOKEN` in Cloud
 > Run e nell'ambiente agenti, con `PIPELINE_INGEST_URL`).
+> Ogni indicatore espone ammissione, produzione, verifica e pubblicazione, la
+> timeline completa delle decisioni e delle run, e una prossima azione con il
+> suo responsabile.
 
 **Il tappo è tolto.** Il test che congelava l'elenco delle serie è stato
 liberato, e per provare la catena due serie demografiche sono arrivate fino a una

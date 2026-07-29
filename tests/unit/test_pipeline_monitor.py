@@ -6,6 +6,7 @@ senza toccare il disco. I battiti si provano su una cartella temporanea, con
 
 import tempfile
 import unittest
+from pathlib import Path
 
 from scripts import pipeline_monitor
 
@@ -46,6 +47,15 @@ class Board(unittest.TestCase):
                                      completed=["curator", "writer", "reviewer", "verificatore"])}
         b = pipeline_monitor.board(dossier, today=self.TODAY)
         self.assertIn("in pari", b["headline"])
+
+    def test_admissions_queue_is_an_action_even_without_dossier_rows(self):
+        b = pipeline_monitor.board({}, today=self.TODAY,
+                                   queues={"scout": 206, "hunter": 0, "promoter": 0})
+
+        self.assertEqual(b["metrics"]["actionable"], 1)
+        self.assertEqual(b["actionable"][0]["id"], "admissions")
+        self.assertIn("fonti da valutare: 206", b["actionable"][0]["next_step"]["label"])
+        self.assertIn("ammissione pronta", b["headline"])
 
     def test_rows_map_the_next_role_from_the_ready_stage(self):
         dossier = {
@@ -108,6 +118,77 @@ class Board(unittest.TestCase):
         b = pipeline_monitor.board({}, runs=runs, today=self.TODAY, recent=5)
         self.assertEqual(len(b["recent"]), 5)
         self.assertEqual(b["recent"][0]["run_id"], "r19")  # il piu' recente
+
+    def test_a_fused_indicator_names_the_site_step_instead_of_looking_finished(self):
+        d = practice("ter-fusa", state="fusa",
+                     completed=["curator", "writer", "reviewer", "verificatore"])
+        d.update({"published": None, "verification_valid": True})
+        row = pipeline_monitor.board({"ter-fusa": d}, today=self.TODAY)["rows"][0]
+        self.assertEqual(row["phase"], "pubblicazione")
+        self.assertEqual(row["next_step"]["owner"], "passo del sito")
+        self.assertIn("prova di pubblicazione", row["next_step"]["label"])
+        self.assertEqual(row["progress"], 75)
+
+    def test_an_open_smentita_is_an_explicit_producer_action(self):
+        d = practice("ter-bad", state="invalidata", flags={"open_smentita": True},
+                     completed=["writer", "reviewer", "verificatore"],
+                     required=["writer", "reviewer", "verificatore"])
+        d.update({"verification_valid": True, "timeline": []})
+        b = pipeline_monitor.board({"ter-bad": d}, today=self.TODAY)
+        row = b["rows"][0]
+        self.assertEqual(row["next_step"]["kind"], "attention")
+        self.assertEqual(row["next_step"]["owner"], "produttore")
+        self.assertEqual(row["lifecycle"][1]["status"], "issue")
+        self.assertEqual(b["metrics"]["attention"], 1)
+
+    def test_the_row_keeps_the_complete_timeline_and_operational_run_detail(self):
+        d = practice("ter-x", completed=["writer"], required=["writer", "reviewer", "verificatore"])
+        d.update({
+            "timeline": [{"at": "2026-07-01", "stage": "writer", "kind": "scritta",
+                          "detail": "prima versione"}],
+            "runs": ["producer-r1"],
+        })
+        runs = [{"run_id": "producer-r1", "stage": "producer", "outcome": "merged",
+                 "summary": "articolo scritto", "detail": ["controllati 20 territori"],
+                 "at": "2026-07-02T09:00:00+00:00", "trigger": "launch", "pr": "42"}]
+        row = pipeline_monitor.board({"ter-x": d}, runs=runs, today=self.TODAY)["rows"][0]
+        self.assertEqual(row["timeline"][0]["stage_label"], "Scrittura")
+        self.assertEqual(row["runs"][0]["detail"], ["controllati 20 territori"])
+        self.assertEqual(row["runs"][0]["trigger"], "launch")
+        self.assertEqual(row["last_activity"]["label"], "articolo scritto")
+
+    def test_live_and_pr_state_are_joined_back_to_the_indicator(self):
+        d = practice("ter-live", completed=["writer"], required=["writer", "reviewer", "verificatore"])
+        d["runs"] = ["producer-live"]
+        beat = {"indicator": "ter-live", "run_id": "producer-live", "role": "producer",
+                "since": "2026-07-28T10:00:00+00:00"}
+        pr = {"run_id": "producer-live", "pr": 77, "ci": "in-corsa"}
+        row = pipeline_monitor.board({"ter-live": d}, heartbeats=[beat], open_runs=[pr],
+                                     today=self.TODAY)["rows"][0]
+        self.assertEqual(row["in_flight"][0]["run_id"], "producer-live")
+        self.assertEqual(row["open_prs"][0]["pr"], 77)
+
+
+class IndicatorLabels(unittest.TestCase):
+    def test_names_come_from_committed_catalog_manifests(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / "app/static/data"
+            path.mkdir(parents=True)
+            (path / "external_indicator_manifest.csv").write_text(
+                "target_indicator_id;target_indicator_name\n1;Produttivita agricola\n", encoding="utf-8")
+            (path / "bes_regione_manifest.csv").write_text(
+                "id;name\n10AMB002;Consumo materiale interno\n", encoding="utf-8")
+            (path / "multiscopo_regione_manifest.csv").write_text(
+                "id;name\nMULTI_TEST;Indicatore test\n", encoding="utf-8")
+            (path / "Assoluti_Provincia.csv").write_text(
+                "idIndicatore;Indicatore\n10AMB001P;Concentrazione media annua di PM10\n",
+                encoding="utf-8")
+            labels = pipeline_monitor.indicator_labels(root=root)
+        self.assertEqual(labels["1"]["name"], "Produttivita agricola")
+        self.assertEqual(labels["bes:10AMB002"]["family"], "BES")
+        self.assertEqual(labels["multiscopo:MULTI_TEST"]["name"], "Indicatore test")
+        self.assertEqual(labels["bes:10AMB001P"]["name"], "Concentrazione media annua di PM10")
 
 
 class AttributeTokens(unittest.TestCase):
