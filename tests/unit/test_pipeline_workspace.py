@@ -61,8 +61,23 @@ class OpeningIsolatesTheRun(unittest.TestCase):
         self.assertIn("origin/master", argv)
         self.assertTrue(path.endswith("producer-20260729T101010Z-abcd"))
 
-    def test_a_failed_fetch_is_loud(self):
+    def test_a_fetch_race_is_tolerated_when_master_resolves(self):
+        # Il fetch perde la corsa sul ref remoto condiviso ("cannot lock ref"),
+        # ma origin/master risolve gia' (un sibling l'ha aggiornato): si procede,
+        # non si aborta la run prima che possa battere.
         runner = Runner(fail_on=("git", "fetch"))
+        ws.open_workspace("producer", "run-1", runner=runner, root="/tmp/runs")
+        self.assertIn(["git", "worktree", "add"], [c[:3] for c in runner.calls])
+
+    def test_a_failed_fetch_with_unresolvable_master_is_loud(self):
+        # Fetch fallito E origin/master che non risolve: li' non c'e' da cui
+        # partire, ed e' l'unico caso in cui aprire deve fallire forte.
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "fetch"]:
+                return 1, "cannot lock ref"
+            if argv[:2] == ["git", "rev-parse"]:
+                return 1, ""
+            return 0, ""
         with self.assertRaises(RuntimeError):
             ws.open_workspace("producer", "run-1", runner=runner)
 

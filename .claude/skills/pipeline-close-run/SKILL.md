@@ -57,10 +57,14 @@ due stadi sullo stesso file, e la regola e' il passo 3-bis del contratto.
 
 ```bash
 git push -u origin HEAD
-PR=$(.venv/bin/python scripts/pipeline_merge.py --open \
+PR=$(python3 scripts/pipeline_merge.py --open \
        --stage <stadio> --head <il tuo branch> --title "..." --body "...")
 .venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <run_id>
 ```
+
+L'apertura usa `python3` (stdlib pura, e il worktree non ha `.venv`); il merge usa
+`.venv/bin/python` perche' rilancia il cancello che importa l'app. Nel worktree il
+venv c'e': `pipeline_workspace.py --open` collega quello del checkout principale.
 
 La PR si apre con `pipeline_merge.py --open`, non con `gh pr create`, e **senza
 `GH_REPO`**: `gh pr create` e' GraphQL e non riconosce il remote proxato, e

@@ -100,6 +100,18 @@ class OpenRunsReadsRestWithoutGhRepo(unittest.TestCase):
         self.assertEqual(snap[0]["ci"], "verde")
         self.assertEqual(snap[0]["mergeable"], "si")
 
+    def test_a_github_failure_raises_instead_of_returning_empty(self):
+        # Un fallimento non e' "nessuna PR aperta": confonderli farebbe cancellare
+        # la fotografia al primo intoppo transitorio di GitHub o del proxy.
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "remote"]:
+                return 0, "http://local_proxy@127.0.0.1:41729/git/nmaiese/diset-viz\n"
+            if "pulls?state=open" in argv[-1]:
+                return 1, "HTTP 502: Bad Gateway"
+            return 0, "{}"
+        with self.assertRaises(RuntimeError):
+            inflight.open_runs(runner=runner)
+
 
 if __name__ == "__main__":
     unittest.main()

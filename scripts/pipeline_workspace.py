@@ -79,6 +79,47 @@ def worktree_path(run_id, root=None):
     return Path(root or RUNS_ROOT) / (run_id or "run")
 
 
+def _ensure_master(runner, cwd, attempts=3):
+    """Aggiorna `origin/master`, tollerando la corsa fra run concorrenti.
+
+    Piu' run partono insieme e fanno `git fetch` sullo **stesso** repo condiviso:
+    i worktree isolano HEAD e indice, ma i ref remoti no, quindi due fetch corrono
+    a scrivere `refs/remotes/origin/master` e git respinge il perdente con
+    "cannot lock ref". Non e' fatale: si ritenta, e se `origin/master` e' comunque
+    risolvibile (un sibling l'ha appena aggiornato) si procede da quello, invece
+    di abortire la run prima ancora che possa lasciare un battito o una riga."""
+    last = ""
+    for _ in range(max(1, attempts)):
+        code, out = runner(["git", "fetch", "origin", "master"], cwd=cwd)
+        if code == 0:
+            return
+        last = out
+    code, _ = runner(["git", "rev-parse", "--verify", "--quiet", "origin/master"], cwd=cwd)
+    if code != 0:
+        raise RuntimeError(
+            f"git fetch origin master fallito e origin/master non risolve: {last.strip()[:200]}")
+
+
+def _link_venv(path):
+    """Rende il venv del checkout principale visibile nel worktree.
+
+    Il worktree non contiene `.venv` (gitignored, quindi non tracciato), ma il
+    passo di merge ci gira dentro e ne ha bisogno: rilancia il cancello, che per
+    il vintage importa l'app, e la suite gira su quel venv. Un symlink al venv
+    principale fa risolvere `.venv/bin/python` dal worktree senza ricrearlo (deps
+    dal venv principale, codice dell'app dal worktree). Best effort: se il
+    principale non ha un venv (checkout cloud fresco), non fa niente, e il merge
+    lo creera' come gia' prevede il contratto."""
+    import os
+    main_venv = PROJECT_ROOT / ".venv"
+    link = Path(path) / ".venv"
+    if main_venv.is_dir() and Path(path).is_dir() and not link.exists():
+        try:
+            os.symlink(main_venv, link)
+        except OSError:
+            pass
+
+
 def open_workspace(role, run_id, base="origin/master", runner=_run, cwd=None,
                    today=None, root=None, here=False):
     """Apre l'albero di lavoro privato della run e ne ritorna il path (stringa).
@@ -92,9 +133,7 @@ def open_workspace(role, run_id, base="origin/master", runner=_run, cwd=None,
     sviluppo manuale. Le run in parallelo non lo usano, li' la contesa e' reale.
     """
     branch = branch_name(role, run_id, today=today)
-    code, out = runner(["git", "fetch", "origin", "master"], cwd=cwd)
-    if code != 0:
-        raise RuntimeError(f"git fetch origin master fallito: {out.strip()[:200]}")
+    _ensure_master(runner, cwd)
 
     if here:
         code, out = runner(["git", "checkout", "-b", branch, base], cwd=cwd)
@@ -109,6 +148,7 @@ def open_workspace(role, run_id, base="origin/master", runner=_run, cwd=None,
     if code != 0:
         raise RuntimeError(
             f"git worktree add -b {branch} {path} {base} fallito: {out.strip()[:200]}")
+    _link_venv(path)
     return str(path)
 
 

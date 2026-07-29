@@ -99,11 +99,19 @@ def build_snapshot(pulls, checks_by_pr) -> list:
 
 
 def open_runs(runner=pipeline_merge._run, cwd=None, slug=None) -> list:
-    """Legge da GitHub le PR aperte e ne costruisce la fotografia (I/O + puro)."""
+    """Legge da GitHub le PR aperte e ne costruisce la fotografia (I/O + puro).
+
+    Solleva `RuntimeError` se la chiamata REST fallisce o risponde malformata:
+    un fallimento non e' una lista vuota. Confonderli sarebbe un guasto silenzioso
+    del cruscotto, perche' chi chiama sostituisce in blocco la fotografia con il
+    risultato, e un vuoto autorevole cancellerebbe ogni PR aperta a ogni intoppo
+    transitorio di GitHub o del proxy."""
     slug = slug or pipeline_merge.repo_slug(runner=runner, cwd=cwd)
     ok, data = pipeline_merge.api(
         f"repos/{slug}/pulls?state=open&per_page=100", runner=runner, cwd=cwd)
-    pulls = data if (ok and isinstance(data, list)) else []
+    if not ok or not isinstance(data, list):
+        raise RuntimeError(f"impossibile leggere le PR aperte: {str(data)[:200]}")
+    pulls = data
     checks_by_pr = {}
     for pr in pulls:
         branch = ((pr.get("head") or {}).get("ref") or "")
@@ -122,7 +130,14 @@ def main(argv=None) -> int:
                         help="manda la fotografia al sito (PIPELINE_INGEST_URL/TOKEN)")
     args = parser.parse_args(argv)
 
-    snapshot = open_runs()
+    try:
+        snapshot = open_runs()
+    except RuntimeError as exc:
+        # GitHub o il proxy non disponibili: non si sostituisce la fotografia con
+        # un vuoto autorevole, che cancellerebbe le PR aperte dal cruscotto. Si
+        # lascia la fotografia precedente e si esce senza errore (il tick continua).
+        print(f"fotografia non aggiornata, tenuta la precedente: {exc}")
+        return 0
     if args.post:
         sent = pipeline_monitor.post_beat({"action": "prs", "prs": snapshot})
         if not args.json:
