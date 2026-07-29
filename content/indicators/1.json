@@ -1,16 +1,34 @@
 {
- "fonti": [],
+ "fonti": [
+  {
+   "testo": "Eurostat, Statistics Explained. L'equivalente a tempo pieno converte il lavoro a orario ridotto in posti a tempo pieno, per cui chi lavora venti ore su una settimana piena di quaranta vale mezza unità",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Glossary:Full-time_equivalent_(FTE)"
+  }
+ ],
  "key": "1",
- "lead": "La produttività del lavoro in agricoltura varia molto. In Lombardia ogni addetto agricolo genera circa 38 mila euro di valore, in Trentino Alto Adige 35 mila, contro gli 11 mila delle Marche e i 12,6 della Calabria. La media delle regioni è di circa 22,6 mila euro.",
+ "lead": "In agricoltura il valore prodotto per addetto non segue la solita mappa Nord-Sud: la Campania è tra le prime cinque regioni, le Marche chiudono ultime. Conta l'agricoltura intensiva della pianura più della latitudine, e in quasi trent'anni la distanza tra la prima e l'ultima si è ristretta invece di allargarsi.",
+ "level": "regione",
+ "reviewed_at": "2026-07-29",
+ "reviewed_vintage": 2023,
  "sections": [
   {
-   "body": "L'agricoltura non è tutta uguale: quella padana e alpina, intensiva e meccanizzata, rende il triplo di quella di collina o del Sud, più frammentata e faticosa. La produttività qui misura il valore prodotto per addetto, non la fatica né la qualità dei prodotti, dove il Sud spesso eccelle. Un ettaro di vigna pregiata e uno di pascolo magro contano diversamente. Più valore per addetto significa un'agricoltura migliore o solo più industriale?",
-   "h": null,
+   "body": "L'indicatore divide il valore aggiunto ai prezzi di base dell'agricoltura, della caccia e della silvicoltura per le unità di lavoro impiegate nello stesso settore, regione per regione. Al denominatore non ci sono le persone occupate ma le unità di lavoro a tempo pieno, perché due contratti da mezza giornata contano come una sola, secondo la convenzione europea dell'equivalente a tempo pieno.\n\nIstat esprime il risultato in migliaia di euro concatenati con anno di riferimento 2020, cioè in volumi già ripuliti dall'inflazione. È la ragione per cui il salto dal 1995 al 2023 si legge come quantità prodotta e non come rincaro dei prezzi.",
+   "h": "Quanto rende un anno di lavoro nei campi",
+   "role": "definizione"
+  },
+  {
+   "body": "Il valore aggiunto è ciò che resta al settore dopo aver pagato sementi, mangimi e servizi comprati da altri, e diviso per gli addetti dice quanto rende un anno di lavoro agricolo, molto più nella pianura irrigua e meccanizzata che sulla collina o sul pascolo di montagna.\n\nIn cima, nel 2023, ci sono due regioni sole, Lombardia e Trentino Alto Adige, e lo strappo più largo di tutta la classifica cade subito dopo, con oltre quattromila euro di distacco verso la Liguria. Sotto quel gradino la geografia attesa si sfalda: la Campania è quinta, sopra Veneto e Toscana, e con Molise e Sardegna porta tre regioni del Sud dentro i primi dieci posti, mentre il Piemonte scivola dodicesimo e le Marche restano ultime, sotto la Calabria. Media e mediana sono vicine, segno che nessuna coda tira la distribuzione da un lato, e più in basso quattro regioni tra la Valle d'Aosta e la Basilicata stanno raccolte in poco più di un punto.\n\nLa stessa idea, il valore per addetto, torna nella [produttività del lavoro nell'industria manifatturiera](/indicatore/produttivita-del-lavoro-nell-industria-manifatturiera/ter-124), e le due serie si accompagnano senza spiegarsi: la Lombardia sta in alto in entrambe. Il confondente ovvio, il reddito medio dell'area, non è misurato né qui né lì. Ma la somiglianza si ferma dove i campi fanno entrare il Sud tra i primi, con la Campania quinta, mentre la manifattura tiene in testa Emilia-Romagna e Liguria.",
+   "h": "La mappa che salta il Nord-Sud",
    "role": "quadro"
   },
   {
-   "body": "Rapporta il valore aggiunto agli addetti, quindi risente della meccanizzazione e del tipo di coltura. Non misura la qualità dei prodotti, la sostenibilità né il reddito effettivo di chi lavora la terra.",
-   "h": null,
+   "body": "Dal 1995 la media semplice delle venti regioni è salita di circa quattromila euro per addetto, ma la novità è un'altra: la distanza tra la prima e l'ultima si è ristretta di quasi altrettanto, mentre negli altri indicatori di produttività il divario di solito si allarga. Qui il fondo ha in parte recuperato e la vetta ha in parte ceduto.\n\nLa Campania è la regione che ha guadagnato di più, oltre diciassettemila euro, più che raddoppiando il suo valore e passando dalla parte bassa della classifica al quinto posto. In direzione opposta vanno quattro regioni che oggi rendono meno del 1995: Liguria, Toscana, Piemonte e le Marche. La Liguria ha perso più di tutte, oltre settemila euro, e resta comunque terza, mentre le Marche ne hanno persi sei e oggi sono ultime.\n\nL'ultimo anno va letto a parte. Tra il 2022 e il 2023 il valore per addetto è calato in quindici regioni su venti e la media è scesa. Un rapporto che cala non racconta per forza un'agricoltura che si restringe, perché il valore aggiunto dei campi dipende anche dall'annata, e un raccolto peggiore lo abbassa a parità di addetti.",
+   "h": "La Campania raddoppia, le Marche tornano indietro",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il valore aggiunto per addetto non misura la qualità dei prodotti, la sostenibilità del metodo né il reddito di chi lavora la terra, perché comprende anche i margini di chi possiede l'azienda e non dice come si dividano. Un ettaro di vigna pregiata e uno di pascolo magro entrano nel conto solo per gli euro che rendono.\n\nLa serie non dice nemmeno quanti siano gli addetti in ciascuna regione, così un territorio con un'agricoltura piccola può stare in alto senza pesare molto. E resta produttività del lavoro, non della terra: la [produttività dei terreni agricoli](/indicatore/produttivita-dei-terreni-agricoli/ter-31) misura il valore per ettaro e mette le regioni in un ordine simile ma non uguale. Il credito alle aziende e la nascita di nuove imprese stanno negli altri indicatori del tema [Imprese e competitività](/tema/imprese-e-competitivita).",
+   "h": "Il valore, non la fatica né il reddito di chi lavora",
    "role": "limiti"
   }
  ],
