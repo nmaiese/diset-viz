@@ -1,0 +1,54 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'progetto' %}
+
+{% block title %}Chi siamo | {{ site_name }}{% endblock %}
+{% block description %}Responsabilità editoriale, verifiche, fonti, correzioni, contatti, proprietà e istruzioni per citare Divario Italia.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {{ publisher_jsonld | safe }},
+    {
+      "@type": "AboutPage",
+      "name": "Chi siamo",
+      "url": {{ canonical | tojson }},
+      "publisher": { "@id": {{ publisher['@id'] | tojson }} },
+      "isPartOf": { "@type": "WebSite", "url": "{{ site_url }}/" }
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<article class="page prose-wrap">
+  <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
+  <h1>Chi siamo</h1>
+  <p class="page-lead">Divario Italia è un progetto editoriale indipendente che rende consultabili e comprensibili dati pubblici sui territori italiani. Divario Italia è l'editore e il proprietario del progetto, delle elaborazioni e delle visualizzazioni, non dei dati originali.</p>
+
+  <section>
+    <h2>Responsabilità editoriale</h2>
+    <p>Divario Italia sceglie gli indicatori, cura testi, calcoli e visualizzazioni e risponde della loro presentazione. Le istituzioni citate come fonti non partecipano alle scelte editoriali e non approvano le nostre interpretazioni.</p>
+  </section>
+  <section>
+    <h2>Come verifichiamo</h2>
+    <p>Ogni numero pubblicato deve essere ricostruibile dalla fonte indicata. Controlliamo definizione, unità, periodo, territorio e copertura. Separiamo i valori originali dalle elaborazioni e confrontiamo le variazioni solo su basi territoriali coerenti. I test automatici verificano anche pagine, download e dati strutturati.</p>
+    <p><a href="/metodologia">Leggi il metodo completo e i limiti dei confronti</a>.</p>
+  </section>
+  <section>
+    <h2>Fonti</h2>
+    <p>Il catalogo usa fonti istituzionali dichiarate su ogni scheda, tra cui Istat ed Eurostat. Ogni dataset indica fonte primaria, anni disponibili, licenza e collegamento ai dati originali. Divario Italia non si presenta come autore dei dati raccolti da queste istituzioni.</p>
+  </section>
+  <section id="correzioni">
+    <h2>Correzioni e contatto</h2>
+    <p>Correggiamo gli errori verificati appena possibile. Gli articoli mostrano la data di pubblicazione e quella dell'ultima revisione editoriale. Le schede dati mostrano la data di aggiornamento della fonte quando è disponibile.</p>
+    <p>Per segnalare un errore, <a href="{{ corrections_url }}">apri una segnalazione pubblica</a> indicando URL della pagina, passaggio o valore da controllare e, se possibile, la fonte corretta. Lo stesso percorso è il contatto operativo del progetto.</p>
+  </section>
+  <section>
+    <h2>Come citare</h2>
+    <p>Per una pagina: <strong>Divario Italia, titolo della pagina, data di aggiornamento, URL, data di consultazione.</strong> Per un dato, aggiungi la fonte primaria e l'anno mostrati nella scheda. Esempio: <q>Fonte: Istat, nome indicatore, anno. Elaborazione e visualizzazione: Divario Italia, URL, consultato il giorno mese anno.</q></p>
+  </section>
+</article>
+{% endblock %}

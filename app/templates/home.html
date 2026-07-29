@@ -16,19 +16,14 @@
       "url": "{{ SITE_URL }}/",
       "inLanguage": "it-IT",
       "description": {{ ("Atlante interattivo degli indicatori territoriali " ~ sources_label ~ ": " ~ total_indicators ~ " indicatori, 20 regioni, dal " ~ year_min ~ " al " ~ year_max ~ ".") | tojson }},
-      "publisher": { "@id": "{{ SITE_URL }}/#org" },
+      "publisher": { "@id": {{ publisher['@id'] | tojson }} },
       "potentialAction": {
         "@type": "SearchAction",
         "target": "{{ SITE_URL }}/ricerca?q={search_term_string}",
         "query-input": "required name=search_term_string"
       }
     },
-    {
-      "@type": "Organization",
-      "@id": "{{ SITE_URL }}/#org",
-      "name": "{{ site_name }}",
-      "url": "{{ SITE_URL }}/"
-    }
+    {{ publisher_jsonld | safe }}
   ]
 }
 </script>

@@ -28,7 +28,7 @@
   "datePublished": "{{ post.date.isoformat() }}",
   "dateModified": "{{ post.date_modified.isoformat() }}",
   "author": { "@type": "Organization", "name": {{ post.author | tojson }} },
-  "publisher": { "@type": "Organization", "name": {{ site_name | tojson }} },
+  "publisher": {{ publisher_jsonld | safe }},
   "mainEntityOfPage": { "@type": "WebPage", "@id": {{ canonical | tojson }} },
   {% if post.indicator_meta %}"about": {
     "@type": "Thing",
@@ -63,6 +63,7 @@
       <span>{{ post.read_time }} min di lettura</span>
       <span>{{ post.author }}</span>
     </div>
+    <p class="page-note">Ultima verifica editoriale: {{ post.date_modified.strftime('%d.%m.%Y') }}. <a href="{{ corrections_url }}">Segnala un errore</a>.</p>
   </div>
 
   {% if post.cover %}

@@ -33,6 +33,8 @@
   "temporalCoverage": "{{ meta.year_min }}/{{ meta.year_max }}",
   "spatialCoverage": { "@type": "Place", "name": "Italia" },
   "creator": { "@type": "Organization", "name": {{ (meta.source_label or meta.source) | tojson }}, "url": {{ meta.source_url | tojson }} },
+  "publisher": {{ publisher_jsonld | safe }},{% if dataset_updated %}
+  "dateModified": {{ dataset_updated | tojson }},{% endif %}
   "isBasedOn": {{ (meta.source_data_url or meta.source_url) | tojson }},
   "variableMeasured": {{ meta.name | tojson }},
   "isAccessibleForFree": true,{% if meta.license_url %}
@@ -74,6 +76,7 @@
 
   <h1>{{ meta.name }}</h1>
   <p class="page-lead">{{ page_lead | analyst_html }}</p>
+  <p class="page-note">{% if dataset_updated %}Fonte aggiornata il {{ dataset_updated }}. {% endif %}<a href="{{ corrections_url }}">Segnala un errore in questa scheda</a>.</p>
   {% if not meta.indexable %}
   <p class="page-note">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
   {% endif %}
