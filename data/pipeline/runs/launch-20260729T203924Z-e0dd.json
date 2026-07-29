@@ -1,0 +1,17 @@
+{
+ "at": "2026-07-29T20:39:24+00:00",
+ "base_commit": "4a86a79",
+ "branch": "claude/sleepy-mayer-jc39xl",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "75c690a",
+ "detail": [],
+ "duration_seconds": 43,
+ "gate": "",
+ "outcome": "nothing",
+ "pr": "",
+ "run_id": "launch-20260729T203924Z-e0dd",
+ "session_id": "caedbfb8-5c21-58ce-8f7f-90adb683cea7",
+ "stage": "launch",
+ "summary": "tick: 376 unita' pronte, 2 prove pubblicate",
+ "trigger": "routine"
+}
