@@ -67,6 +67,33 @@ _HOME_COMPARE_INDICATORS = ("901", "408", "910")
 _HOME_COMPARE_REGIONS = ("lombardia", "lazio", "campania")
 _HOME_COMPARE_COLORS = ("var(--ink)", "var(--accent)", "var(--positive-ink)")
 
+# Production contract consumed by scripts/audit_public_discoverability.py.  Keep
+# this literal (rather than deriving it inside the audit): app/views.py owns the
+# public routes and the external check must fail when what is deployed no longer
+# matches that contract.  ``marker`` is visible without running JavaScript and
+# therefore also proves that the useful part of each page is server-rendered.
+PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
+    "site_url": "https://divarioitalia.it",
+    "index_header": "index, follow, max-snippet:-1, max-image-preview:large",
+    "pages": (
+        {"path": "/robots.txt", "content_type": "text/plain", "marker": "User-agent: *", "kind": "robots"},
+        {"path": "/sitemap.xml", "content_type": "application/xml", "marker": "<urlset", "kind": "document"},
+        {"path": "/llms.txt", "content_type": "text/plain", "marker": "# Divario Italia", "kind": "document"},
+        {"path": "/llms-full.txt", "content_type": "text/plain", "marker": "# Divario Italia", "kind": "document"},
+        {"path": "/", "content_type": "text/html", "marker": "Un atlante per leggere l'Italia", "kind": "html"},
+        {"path": "/atlante", "content_type": "text/html", "marker": "Atlante degli indicatori territoriali italiani", "kind": "html"},
+        {"path": "/blog", "content_type": "text/html", "marker": "Analisi brevi e basate sui dati", "kind": "html"},
+        {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html"},
+        {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html"},
+        {"path": "/tema/lavoro-e-conciliazione", "content_type": "text/html", "marker": "page-theme", "kind": "html"},
+    ),
+    "robots": {
+        "shared_disallow": ("/api/", "/data", "/legacy", "/legacy-reddito"),
+        "answer_bots": ("OAI-SearchBot", "ChatGPT-User", "PerplexityBot", "Perplexity-User", "Claude-SearchBot", "Claude-User", "Google-Extended"),
+        "training_bots": ("Amazonbot", "Applebot-Extended", "Bytespider", "CCBot", "ClaudeBot", "CloudflareBrowserRenderingCrawler", "GPTBot", "meta-externalagent"),
+    },
+}
+
 
 @app.context_processor
 def _inject_license():
