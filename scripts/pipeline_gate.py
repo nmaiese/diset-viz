@@ -293,7 +293,7 @@ def check_base_is_usable(base=None, cwd=None):
     return Check("base", True, f"confronto contro {resolved}")
 
 
-def changed_paths(base=None, cwd=None):
+def changed_paths(base=None, cwd=None, include_worktree=True):
     """Repo-relative paths this branch touches, committed and uncommitted.
 
     Both halves matter. A cloud agent commits before opening its PR, so the diff
@@ -306,6 +306,13 @@ def changed_paths(base=None, cwd=None):
     a un file per record quella e' la forma normale del lavoro di uno stadio:
     il perimetro avrebbe giudicato un percorso che non e' un file, e
     `changed_text_keys` ne avrebbe ricavato la chiave inventata `indicators`.
+
+    `include_worktree=False` guarda i soli commit e ignora `git status`. Serve al
+    passo di merge, dove il lavoro dello stadio e' gia' committato sul branch: li'
+    il working tree o e' vuoto, o (in un checkout condiviso, prima che i worktree
+    isolino le run) porta l'incompiuto di un altro ruolo, che attribuire a questa
+    run era la seconda faccia del bug del checkout condiviso. Il cancello locale
+    interattivo tiene True: una prova locale ha il lavoro ancora da committare.
     """
     paths = set()
     resolved = resolve_base(base, cwd=cwd)
@@ -313,14 +320,15 @@ def changed_paths(base=None, cwd=None):
         code, out, _ = _git("diff", "--name-only", f"{resolved}...HEAD", cwd=cwd)
         if code == 0:
             paths.update(line.strip() for line in out.splitlines() if line.strip())
-    code, out, _ = _git("status", "--porcelain", "--untracked-files=all", cwd=cwd)
-    if code == 0:
-        for line in out.splitlines():
-            entry = line[3:].strip()
-            if not entry:
-                continue
-            # Renames arrive as "old -> new"; the destination is what changed.
-            paths.add(entry.split(" -> ")[-1].strip())
+    if include_worktree:
+        code, out, _ = _git("status", "--porcelain", "--untracked-files=all", cwd=cwd)
+        if code == 0:
+            for line in out.splitlines():
+                entry = line[3:].strip()
+                if not entry:
+                    continue
+                # Renames arrive as "old -> new"; the destination is what changed.
+                paths.add(entry.split(" -> ")[-1].strip())
     return sorted(p for p in paths if p)
 
 
@@ -369,7 +377,7 @@ def check_blast_radius(stage, paths):
     return Check("blast-radius", True, f"{len(paths)} file, tutti nel perimetro dello stadio")
 
 
-def _touched_under(prefix, base=None, cwd=None):
+def _touched_under(prefix, base=None, cwd=None, include_worktree=True):
     """Quali file di uno store questo branch aggiunge, cambia o toglie.
 
     Sostituisce il confronto riga per riga che serviva quando ogni registro era
@@ -384,7 +392,7 @@ def _touched_under(prefix, base=None, cwd=None):
     """
     resolved = resolve_base(base, cwd=cwd)
     touched = [
-        p for p in changed_paths(base, cwd=cwd)
+        p for p in changed_paths(base, cwd=cwd, include_worktree=include_worktree)
         if p.startswith(prefix) and p.endswith(".json")
     ]
     added, changed, gone = [], [], []
@@ -565,7 +573,7 @@ def _prose_fingerprints(rows, resolved, cwd=None):
     return fingerprints
 
 
-def check_verifications(base=None, cwd=None):
+def check_verifications(base=None, cwd=None, include_worktree=True):
     """Il verificatore consegna dei numeri, quindi i numeri devono reggere.
 
     Ogni verifica nuova deve dire quante affermazioni ha
@@ -594,7 +602,7 @@ def check_verifications(base=None, cwd=None):
     # verifica passata senza lasciare traccia. Una verifica si supera riscrivendo
     # l'articolo, cosa che cambia l'impronta e ne chiede una nuova, mai
     # modificando la riga vecchia.
-    removed = _verification_rows_removed(base, cwd=cwd)
+    removed = _verification_rows_removed(base, cwd=cwd, include_worktree=include_worktree)
     if removed:
         return Check(
             "verifiche", False,
@@ -603,7 +611,7 @@ def check_verifications(base=None, cwd=None):
             f"{', '.join(sorted(r.get('code') or '?' for r in removed)[:5])}. "
             "Per superare una verifica si riscrive l'articolo, non la sua riga.",
         )
-    rows = _verification_rows_added(base, cwd=cwd)
+    rows = _verification_rows_added(base, cwd=cwd, include_worktree=include_worktree)
     if not rows:
         return Check("verifiche", True, "nessuna verifica nuova da controllare")
 
@@ -672,7 +680,7 @@ def check_verifications(base=None, cwd=None):
                  f"{smentite} smentite")
 
 
-def _verification_rows_removed(base=None, cwd=None):
+def _verification_rows_removed(base=None, cwd=None, include_worktree=True):
     """Le verifiche della base che questo branch ha tolto o riscritto.
 
     Cancellare un file e riscriverlo in posto sono la stessa cosa per il
@@ -684,7 +692,7 @@ def _verification_rows_removed(base=None, cwd=None):
     resolved = resolve_base(base, cwd=cwd)
     if not resolved:
         return []
-    touched = _touched_under(VERIFICATIONS, base, cwd=cwd)
+    touched = _touched_under(VERIFICATIONS, base, cwd=cwd, include_worktree=include_worktree)
     rows = []
     for path in touched["gone"] + touched["changed"]:
         old = _read_json_at(resolved, path, cwd=cwd)
@@ -693,10 +701,10 @@ def _verification_rows_removed(base=None, cwd=None):
     return rows
 
 
-def _verification_rows_added(base=None, cwd=None):
+def _verification_rows_added(base=None, cwd=None, include_worktree=True):
     """Le verifiche che questo branch aggiunge, gia' interpretate."""
     rows = []
-    for path in _touched_under(VERIFICATIONS, base, cwd=cwd)["added"]:
+    for path in _touched_under(VERIFICATIONS, base, cwd=cwd, include_worktree=include_worktree)["added"]:
         try:
             data = json.loads((PROJECT_ROOT / path).read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
@@ -706,7 +714,7 @@ def _verification_rows_added(base=None, cwd=None):
     return rows
 
 
-def _publication_rows_added(base=None, cwd=None):
+def _publication_rows_added(base=None, cwd=None, include_worktree=True):
     """Le prove di pubblicazione che questo branch aggiunge o riscrive.
 
     Una prova puo' essere riscritta senza colpa: rifare la stessa verifica scrive
@@ -715,7 +723,7 @@ def _publication_rows_added(base=None, cwd=None):
     diario o delle verifiche.
     """
     rows = []
-    touched = _touched_under(PUBLICATIONS, base, cwd=cwd)
+    touched = _touched_under(PUBLICATIONS, base, cwd=cwd, include_worktree=include_worktree)
     for path in touched["added"] + touched["changed"]:
         try:
             data = json.loads((PROJECT_ROOT / path).read_text(encoding="utf-8"))
@@ -726,7 +734,7 @@ def _publication_rows_added(base=None, cwd=None):
     return rows
 
 
-def check_publications(base=None, cwd=None):
+def check_publications(base=None, cwd=None, include_worktree=True):
     """Il publisher consegna delle prove, quindi le prove devono reggere.
 
     Impone la prudenza di §8 invece di ricordarla: una prova con `ok` diverso da
@@ -746,7 +754,7 @@ def check_publications(base=None, cwd=None):
     # `fusa` senza lasciare traccia, che e' esattamente la sparizione di una prova
     # che il cancello deve impedire. La riscrittura in posto invece si controlla
     # come una riga nuova, sotto.
-    gone = _touched_under(PUBLICATIONS, base, cwd=cwd)["gone"]
+    gone = _touched_under(PUBLICATIONS, base, cwd=cwd, include_worktree=include_worktree)["gone"]
     if gone:
         return Check(
             "pubblicazioni", False,
@@ -754,7 +762,7 @@ def check_publications(base=None, cwd=None):
             f"prove ({', '.join(sorted(gone)[:5])}). Una prova scade cambiando il testo, "
             "non cancellandola, e toglierla fa regredire un indicatore da pubblicata a fusa.")
 
-    rows = _publication_rows_added(base, cwd=cwd)
+    rows = _publication_rows_added(base, cwd=cwd, include_worktree=include_worktree)
     if not rows:
         return Check("pubblicazioni", True, "nessuna prova nuova da controllare")
 
@@ -790,7 +798,7 @@ def check_publications(base=None, cwd=None):
                  f"{len(rows)} prove, tutte confermate e ancorate al testo di adesso o della base")
 
 
-def check_reviewer_signature(base=None, cwd=None):
+def check_reviewer_signature(base=None, cwd=None, include_worktree=True):
     """The reviewer's whole output is a signature, so a run that changed prose
     without signing has not reviewed, it has rewritten.
 
@@ -807,7 +815,7 @@ def check_reviewer_signature(base=None, cwd=None):
     added, this proves every article the run touched carries a valid signature
     that matches the data it describes.
     """
-    keys = changed_text_keys(base, cwd=cwd)
+    keys = changed_text_keys(base, cwd=cwd, include_worktree=include_worktree)
     if not keys:
         return Check("firma-revisore", True, "nessuna modifica ai testi")
     try:
@@ -840,7 +848,7 @@ def check_reviewer_signature(base=None, cwd=None):
     return Check("firma-revisore", True, f"{len(keys)} articoli toccati, tutti firmati e coerenti")
 
 
-def changed_text_keys(base=None, cwd=None):
+def changed_text_keys(base=None, cwd=None, include_worktree=True):
     """Gli articoli che questo branch ha davvero toccato.
 
     Adesso e' l'elenco dei file, e prima non poteva esserlo. Con un JSON unico
@@ -849,11 +857,11 @@ def changed_text_keys(base=None, cwd=None):
     oggetti interi da mezzo megabyte per sapere di quale indicatore si stesse
     parlando. Con un file per articolo la domanda e' gia' risposta dal nome.
     """
-    touched = _touched_under(INDICATOR_TEXTS, base, cwd=cwd)
+    touched = _touched_under(INDICATOR_TEXTS, base, cwd=cwd, include_worktree=include_worktree)
     return sorted(indicator_store.key_of(p) for p in touched["touched"])
 
 
-def check_run_is_recorded(stage, paths, base=None, cwd=None):
+def check_run_is_recorded(stage, paths, base=None, cwd=None, include_worktree=True):
     """Una run che ha prodotto qualcosa deve dire di averlo fatto.
 
     Imposto qui invece che ricordato nel prompt, per la stessa ragione per cui
@@ -873,7 +881,7 @@ def check_run_is_recorded(stage, paths, base=None, cwd=None):
     # altro, ed e' l'unico modo di far sparire un `blocked` dalla storia. La
     # riga dell'esito che il passo di merge scrive e' un file nuovo anche lei,
     # quindi nessun flusso legittimo passa di qui.
-    touched = _touched_under(RUN_JOURNAL, base, cwd=cwd)
+    touched = _touched_under(RUN_JOURNAL, base, cwd=cwd, include_worktree=include_worktree)
     rewritten = touched["changed"] + touched["gone"]
     if rewritten:
         return Check(
@@ -895,7 +903,7 @@ def check_run_is_recorded(stage, paths, base=None, cwd=None):
             f"Aggiungi la riga con: python3 scripts/pipeline_log.py --write --stage {stage} "
             f"--outcome <esito> --summary \"...\"",
         )
-    added = _journal_lines_added(base, cwd=cwd)
+    added = _journal_lines_added(base, cwd=cwd, include_worktree=include_worktree)
     mine = [entry for entry in added if entry.get("stage") == stage]
     if not mine:
         return Check(
@@ -906,7 +914,7 @@ def check_run_is_recorded(stage, paths, base=None, cwd=None):
     return Check("diario", True, f"{len(mine)} run registrate come '{stage}'")
 
 
-def _journal_lines_added(base=None, cwd=None):
+def _journal_lines_added(base=None, cwd=None, include_worktree=True):
     """Le run che questo branch registra, gia' interpretate.
 
     Un file per run, quindi "aggiunta" e' letteralmente un file nuovo. La
@@ -914,7 +922,7 @@ def _journal_lines_added(base=None, cwd=None):
     fossero nuove leggendo il testo, e sbagliava ogni volta che due stadi
     scrivevano nello stesso punto.
     """
-    touched = _touched_under(RUN_JOURNAL, base, cwd=cwd)
+    touched = _touched_under(RUN_JOURNAL, base, cwd=cwd, include_worktree=include_worktree)
     entries = []
     for path in touched["added"] + touched["changed"]:
         full = PROJECT_ROOT / path
@@ -927,7 +935,7 @@ def _journal_lines_added(base=None, cwd=None):
     return entries
 
 
-def check_writer_vintage(base=None, cwd=None):
+def check_writer_vintage(base=None, cwd=None, include_worktree=True):
     """The writer's contract is `vintage == year_max`, stricter than the drift
     guard in the suite, which only fails when the vintage falls *behind*. A
     vintage ahead of the data is prose written against numbers that do not exist
@@ -938,7 +946,7 @@ def check_writer_vintage(base=None, cwd=None):
     for staleness, and rebuilding 362 view models to re-check work nobody edited
     would make the gate the slowest step in an autonomous chain.
     """
-    keys = changed_text_keys(base, cwd=cwd)
+    keys = changed_text_keys(base, cwd=cwd, include_worktree=include_worktree)
     if not keys:
         return Check("vintage", True, "nessun articolo modificato")
     try:
@@ -1110,18 +1118,28 @@ def invariant_labels(stage, paths):
     return labels
 
 
-def run(stage, base=None, skip_tests=False, cwd=None):
-    """Every check for one stage, in the order a failure should be read."""
+def run(stage, base=None, skip_tests=False, cwd=None, committed_only=False):
+    """Every check for one stage, in the order a failure should be read.
+
+    `committed_only=True` misura il solo diff committato e non il working tree
+    (`include_worktree=False` ovunque). Lo usa il passo di merge: li' il lavoro
+    dello stadio e' gia' committato sul branch, quindi un file non committato o
+    non c'e', o e' l'incompiuto di un altro ruolo in un checkout condiviso, e
+    attribuirlo a questa run era la seconda faccia del bug del checkout condiviso.
+    Il cancello locale interattivo tiene False: una prova locale ha il lavoro
+    ancora da committare, e un cancello cieco al working tree la chiamerebbe pulita.
+    """
     if stage not in STAGE_PATHS:
         raise SystemExit(f"stadio sconosciuto '{stage}'. Noti: {', '.join(sorted(STAGE_PATHS))}")
-    paths = changed_paths(base, cwd=cwd)
+    iw = not committed_only
+    paths = changed_paths(base, cwd=cwd, include_worktree=iw)
     checks = [
         # First, because every check under it is measured against this base.
         check_base_is_usable(base, cwd=cwd),
         check_blast_radius(stage, paths),
         check_whitespace(cwd=cwd),
         check_no_coauthor_trailer(base, cwd=cwd),
-        check_run_is_recorded(stage, paths, base, cwd=cwd),
+        check_run_is_recorded(stage, paths, base, cwd=cwd, include_worktree=iw),
     ]
     # Gli invarianti di contenuto si smistano per **tipo-di-file toccato dal
     # diff** (piu' la firma, che e' del ruolo): `invariant_labels` decide quali,
@@ -1129,10 +1147,10 @@ def run(stage, base=None, skip_tests=False, cwd=None):
     builders = {
         "triage": lambda: check_hunter_decisions(),
         "curation": lambda: check_curation_decisions(),
-        "vintage": lambda: check_writer_vintage(base, cwd=cwd),
-        "signature": lambda: check_reviewer_signature(base, cwd=cwd),
-        "verifications": lambda: check_verifications(base, cwd=cwd),
-        "publications": lambda: check_publications(base, cwd=cwd),
+        "vintage": lambda: check_writer_vintage(base, cwd=cwd, include_worktree=iw),
+        "signature": lambda: check_reviewer_signature(base, cwd=cwd, include_worktree=iw),
+        "verifications": lambda: check_verifications(base, cwd=cwd, include_worktree=iw),
+        "publications": lambda: check_publications(base, cwd=cwd, include_worktree=iw),
     }
     for label in invariant_labels(stage, paths):
         checks.append(builders[label]())
@@ -1149,10 +1167,14 @@ def main():
     parser.add_argument("--stage", required=True, choices=sorted(STAGE_PATHS))
     parser.add_argument("--base", help="commit di confronto (default: origin/master, poi master)")
     parser.add_argument("--skip-tests", action="store_true", help="salta la suite (solo per un triage rapido)")
+    parser.add_argument("--committed-only", action="store_true",
+                        help="misura il solo diff committato, ignora il working tree "
+                             "(il passo di merge lo usa: al merge il lavoro e' gia' committato)")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    verdict = run(args.stage, args.base, skip_tests=args.skip_tests)
+    verdict = run(args.stage, args.base, skip_tests=args.skip_tests,
+                  committed_only=args.committed_only)
     if args.json:
         print(json.dumps(verdict, ensure_ascii=False, indent=2))
     else:

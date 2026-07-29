@@ -448,10 +448,58 @@ def pipeline_dashboard():
     if token and request.args.get("token") != token:
         abort(404)
     from scripts import pipeline_monitor
-    board = pipeline_monitor.load_board()
+    from app import pipeline_state
+    # Il vivo arriva dal SQLite (scritto dai POST degli agenti, replicato su GCS),
+    # non piu' da file locali che sul server sarebbero sempre vuoti. La storia
+    # (dossier + diario) resta committata, come prima.
+    try:
+        activity = pipeline_state.live()
+    except Exception:  # noqa: BLE001  (il cruscotto non deve mai cadere per il vivo)
+        activity = {"beats": [], "prs": []}
+    board = pipeline_monitor.load_board(heartbeats=activity["beats"],
+                                        open_runs=activity["prs"])
     return render_template("pipeline.html", board=board,
                            token=request.args.get("token", ""),
                            site_name=SITE_NAME)
+
+
+@app.post("/_pipeline/beat")
+def pipeline_beat_ingest():
+    """Il vivo del cruscotto: gli agenti della catena POSTano qui i battiti.
+
+    Autenticato con `PIPELINE_INGEST_TOKEN` (header `X-Pipeline-Key`), come
+    l'endpoint admin della leaderboard: segreto sbagliato o assente -> 404, non
+    403, perche' un endpoint interno non conferma nemmeno di esistere. Il corpo e'
+    JSON con un campo `action`:
+
+      {"action":"beat","run_id":...,"role":...,"indicator":...,"stage":...}
+      {"action":"close","run_id":...}
+      {"action":"prs","prs":[{"pr":..,"branch":..,"run_id":..,"ci":..,"mergeable":..,"title":..}]}
+
+    Best effort per chi chiama: un agente che non riesce a battere non deve
+    fallire la propria run, quindi qui si e' solo tolleranti e si risponde presto.
+    """
+    token = config.PIPELINE_INGEST_TOKEN
+    provided = request.headers.get("X-Pipeline-Key", "")
+    if not token or not hmac.compare_digest(provided, token):
+        abort(404)
+    from app import pipeline_state
+    payload = request.get_json(silent=True) or {}
+    action = payload.get("action")
+    try:
+        if action == "beat":
+            pipeline_state.record_beat(
+                payload.get("run_id", ""), role=payload.get("role", ""),
+                indicator=payload.get("indicator", ""), stage=payload.get("stage", ""))
+        elif action == "close":
+            pipeline_state.close_beat(payload.get("run_id", ""))
+        elif action == "prs":
+            pipeline_state.replace_prs(payload.get("prs") or [])
+        else:
+            return jsonify({"error": "bad_action"}), 400
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    return jsonify({"ok": True})
 
 
 @app.route("/api/indicator/<indicator_id>")

@@ -152,6 +152,54 @@ def _reconstruct(inputs, proofs=None):
         inputs["runs"], verifications_site=proofs)
 
 
+# Un id esterno inventato, cosi' la fixture non dipende da nessun artefatto
+# committato: la catena e' fatta apposta per portare un indicatore oltre lo
+# stato "non ancora verificato", quindi pinnare un indicatore reale a quello
+# stato lo rompe appena il primo verificatore lo chiude (cosa che ha bloccato
+# la PR #86). Lo stato lo ricostruiamo dagli input, come fa il resto del modulo.
+_SYNTH_EUR = "eur:synthreg"
+
+
+def _synthetic_expired_smentita():
+    """Ricostruisce un EUR con una smentita chiusa correggendo la prosa.
+
+    Ciclo editoriale completo (promosso, curato, scritto, firmato) piu' una
+    verifica smentita la cui impronta non combacia piu' con la prosa attuale:
+    e' scaduta, quindi il verificatore non risulta completo, la smentita non e'
+    piu' aperta, e l'articolo torna in-lavorazione invece di restare in pagina
+    con l'errore. E' lo stato transitorio che i vecchi test pinnavano su un
+    indicatore reale, qui riprodotto deterministicamente dai soli input.
+    """
+    candidates = [{
+        "triage_status": "promoted", "definition_match": "exact",
+        "duplicate_of": _SYNTH_EUR, "discovered_at": "2026-01-01",
+        "triage_notes": "promossa (sintetico)",
+    }]
+    curation = [{
+        "target_indicator_id": _SYNTH_EUR, "reviewed_at": "2026-02-01",
+        "reviewed_direction": "higher-better", "direction_verdict": "directional",
+        "reviewed_category": "ricerca", "data_year": 2022, "score_eligible": "true",
+    }]
+    article = {
+        "lead": "Una glossa sul divario nella spesa in ricerca.",
+        "vintage": 2022, "reviewed_at": "2026-03-01", "reviewed_vintage": 2022,
+        "sections": [{"role": r, "body": f"Il {r}."}
+                     for r in ("definizione", "quadro", "dinamica", "limiti")],
+    }
+    verifiche = [{
+        "code": "eur-synthreg", "level": "regione", "at": "2026-04-01",
+        "esito": "smentito", "smentite": "1", "controllate": "20",
+        "confermate": "19", "non_verificabili": "0",
+        # impronta di un testo che non e' piu' quello di adesso: la verifica e'
+        # scaduta, cosi' la smentita si spegne e l'articolo torna in coda.
+        "prosa": "0000000000000000",
+    }]
+    dossier = practice_timeline.reconstruct(
+        candidates, [], curation, [], {_SYNTH_EUR: article}, verifiche, [],
+        today="2026-05-01")
+    return dossier[_SYNTH_EUR]
+
+
 # --- 1. Osservabilita' (Fase B) ---------------------------------------------
 
 class Observability(unittest.TestCase):
@@ -161,22 +209,21 @@ class Observability(unittest.TestCase):
     def setUpClass(cls):
         cls.dossier = practice_timeline.load_real()
 
-    def test_eur_history_then_refutation_closed(self):
-        d = self.dossier.get(PINNED_EUR)
-        if d is None:
-            self.skipTest(f"{PINNED_EUR} non e' piu' nel repo")
+    def test_history_then_refutation_closed(self):
+        # Ricostruito da input sintetici: la catena e' fatta per superare lo stato
+        # "non ancora verificato", quindi questo non si pinna su un indicatore
+        # reale (lo romperebbe il primo verificatore che lo chiude, come per la #86).
+        d = _synthetic_expired_smentita()
         # promosso -> curato -> scritto -> firmato -> verificato-smentito: la
-        # storia resta nel diario anche dopo che la smentita e' stata chiusa.
+        # storia resta nella timeline anche dopo che la smentita e' stata chiusa.
         kinds = [ev.get("kind") for ev in d["timeline"]]
         for expected in ("promossa", "curata", "firmata", "verificata"):
             self.assertIn(expected, kinds, kinds)
         verificate = [ev for ev in d["timeline"] if ev.get("kind") == "verificata"]
         self.assertTrue(any(ev.get("esito") == "smentito" for ev in verificate))
-        # la glossa smentita ("quattro regioni del Nord ... 60%") e' stata
-        # corretta (le quattro sono Lombardia, Lazio, Emilia-Romagna e Piemonte,
-        # e il Lazio non e' al Nord) e spostata nel corpo: l'impronta della prosa
-        # cambia, la smentita si spegne e la verifica scade, cosi' l'articolo
-        # torna in coda al verificatore invece di restare in pagina con l'errore.
+        # La glossa smentita e' stata corretta e l'impronta della prosa e'
+        # cambiata: la smentita si spegne, la verifica scade, e l'articolo torna
+        # in coda al verificatore invece di restare in pagina con l'errore.
         self.assertFalse(d["flags"].get("open_smentita"))
         self.assertEqual(d["state"], "in-lavorazione")
         self.assertFalse(d["verification_valid"])
@@ -338,18 +385,19 @@ class MaintenanceCycles(unittest.TestCase):
     def setUpClass(cls):
         cls.dossier = practice_timeline.load_real()
 
-    def test_eur_has_two_linked_cycles(self):
-        d = self.dossier.get(PINNED_EUR)
-        if d is None:
-            self.skipTest(f"{PINNED_EUR} non e' piu' nel repo")
+    def test_a_smentita_opens_a_second_linked_cycle(self):
+        # Sintetico, per la stessa ragione dell'osservabilita': una verifica
+        # smentita su una pagina gia' a valle apre un secondo ciclo, legato al
+        # primo, senza dipendere dallo stato committato di un indicatore reale.
+        d = _synthetic_expired_smentita()
         cycles = practice_timeline.cycles_for(d)
         self.assertEqual(len(cycles), 2, [c["practice_id"] for c in cycles])
         first, second = cycles
-        self.assertEqual(first["practice_id"], f"{PINNED_EUR}#nuovo-1")
+        self.assertEqual(first["practice_id"], f"{_SYNTH_EUR}#nuovo-1")
         self.assertFalse(first["active"])
         self.assertEqual(first["state"], "chiusa")
         self.assertEqual(first["outcome"], "sostituita")
-        self.assertEqual(second["practice_id"], f"{PINNED_EUR}#smentita-2")
+        self.assertEqual(second["practice_id"], f"{_SYNTH_EUR}#smentita-2")
         self.assertTrue(second["active"])
         # la smentita di questo ciclo e' stata chiusa correggendo la glossa: il
         # ciclo resta attivo ma torna in-lavorazione (verifica scaduta), non piu'

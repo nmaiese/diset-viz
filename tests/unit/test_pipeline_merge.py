@@ -58,6 +58,8 @@ def fake_gh(checks=None, merge_ok=True, script=None):
             method, rest = rest[1], rest[2:]
         path = rest[0] if rest else ""
 
+        if method == "POST" and path == f"repos/{REPO}/pulls":
+            return 0, json.dumps({"number": 123})
         if method == "PUT" and path.endswith("/merge"):
             if not merge_ok:
                 return 1, "HTTP 405: Pull Request is not mergeable"
@@ -217,7 +219,7 @@ class TheVerdictIsNotTakenFromTheCaller(unittest.TestCase):
         che ha sbagliato salterebbe."""
         seen = {}
 
-        def fake_gate(stage, skip_tests=False, cwd=None):
+        def fake_gate(stage, skip_tests=False, cwd=None, committed_only=False):
             seen["stage"] = stage
             return RED
 
@@ -381,6 +383,50 @@ class TheRepositoryHasToBeFoundWithoutGh(unittest.TestCase):
             return (1, "fatal: no such remote") if argv[:2] == ["git", "remote"] else (0, "")
         with self.assertRaises(RuntimeError):
             pipeline_merge.repo_slug(runner=runner)
+
+
+class TheChainOpensPullRequestsOverRest(unittest.TestCase):
+    """La PR si apre via REST, non con `gh pr create`, e senza `GH_REPO`.
+
+    `gh pr create` e' GraphQL, cieco al remote proxato: era il motivo per cui gli
+    agenti impostavano `GH_REPO`, che pero' corto-circuita `repo_slug`. Aprendo la
+    PR sulla stessa `api()` del merge, lo slug arriva dal remote e non serve
+    nessuna variabile d'ambiente.
+    """
+
+    def test_it_opens_a_pr_and_returns_its_number(self):
+        runner = fake_gh()
+        number = pipeline_merge.create_pr(
+            "automation/producer-2026-07-29-abc", "producer: ter-999", "corpo",
+            runner=runner,
+        )
+        self.assertEqual(number, 123)
+
+    def test_it_derives_the_slug_from_the_proxied_remote_without_gh_repo(self):
+        import os
+
+        self.assertNotIn("GH_REPO", os.environ,
+                         "il test presuppone GH_REPO non impostato nell'ambiente")
+        runner = fake_gh()
+        pipeline_merge.create_pr("automation/x", "t", "b", runner=runner)
+        posted = [c for c in runner.calls if c[:2] == ["gh", "api"] and "--method" in c
+                  and c[c.index("--method") + 1] == "POST"]
+        self.assertEqual(len(posted), 1, "una sola POST per aprire la PR")
+        argv = posted[0]
+        self.assertIn(f"repos/{REPO}/pulls", argv)
+        joined = " ".join(argv)
+        self.assertIn("head=automation/x", joined)
+        self.assertIn("base=master", joined)
+
+    def test_a_failed_open_is_loud(self):
+        def runner(argv, cwd=None):
+            if argv[:2] == ["git", "remote"]:
+                return 0, f"http://local_proxy@127.0.0.1:41729/git/{REPO}\n"
+            if argv[:2] == ["gh", "api"]:
+                return 1, "HTTP 422: Validation Failed"
+            return 0, ""
+        with self.assertRaises(RuntimeError):
+            pipeline_merge.create_pr("automation/x", "t", "b", runner=runner)
 
 
 class TheBucketsSurviveTheMoveToRest(unittest.TestCase):

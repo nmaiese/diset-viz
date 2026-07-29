@@ -271,6 +271,31 @@ def merge(pr, runner=_run, cwd=None, slug=None, log=print):
     return True, detail
 
 
+def create_pr(head, title, body, base="master", runner=_run, cwd=None, slug=None):
+    """Apre la pull request via REST, e ritorna il suo numero.
+
+    Esiste per la stessa ragione per cui il merge sta su `gh api` e non su
+    `gh pr merge`: `gh pr create` e' porcelain, cioe' GraphQL, e davanti al
+    remote riscritto dal proxy dice "none of the git remotes point to a known
+    GitHub host" e si ferma. Il rimedio che gli agenti si erano inventati era
+    `GH_REPO`, che pero' corto-circuita `repo_slug` e ne rompe il test. Lo slug
+    lo sa gia' ricavare `repo_slug` dal remote proxato, quindi qui non serve
+    nessuna variabile d'ambiente: si apre la PR sulla stessa superficie REST del
+    merge, con lo stesso slug.
+    """
+    slug = slug or repo_slug(runner=runner, cwd=cwd)
+    ok, data = api(
+        f"repos/{slug}/pulls", runner=runner, cwd=cwd, method="POST",
+        fields=[("title", title), ("head", head), ("base", base), ("body", body)],
+    )
+    if not ok or not isinstance(data, dict):
+        raise RuntimeError(f"apertura PR fallita: {str(data)[:400]}")
+    number = data.get("number")
+    if not number:
+        raise RuntimeError(f"la risposta di apertura PR non ha un numero: {str(data)[:200]}")
+    return int(number)
+
+
 def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts=3,
                    run_id=None):
     """Scrive su master la riga di diario con l'esito vero, e la spinge.
@@ -387,7 +412,14 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
     that refused to merge still leaves the same kind of trace as one that did.
     """
     if verdict is None:
-        verdict = pipeline_gate.run(stage, skip_tests=skip_tests, cwd=cwd)
+        # committed_only: al merge il lavoro dello stadio e' gia' committato sul
+        # branch, quindi il cancello guarda il solo diff committato e non il
+        # working tree. Cosi' l'incompiuto di un altro ruolo in un checkout
+        # condiviso non viene attribuito a questa run (la seconda faccia del bug
+        # del checkout condiviso). Con i worktree isolati il working tree e' gia'
+        # pulito, ma questo lo rende vero anche se mai si tornasse a condividerlo.
+        verdict = pipeline_gate.run(stage, skip_tests=skip_tests, cwd=cwd,
+                                    committed_only=True)
     mode = verdict["merge"]
     log(f"stadio {stage}, PR #{pr}, cancello: {mode}")
 
@@ -438,7 +470,14 @@ def main():
         epilog="uscita 0 = fusa, 1 = non fusa (e il motivo e' stampato).",
     )
     parser.add_argument("--stage", required=True, choices=sorted(pipeline_gate.STAGE_PATHS))
-    parser.add_argument("--pr", required=True, help="numero della pull request")
+    parser.add_argument("--pr", help="numero della pull request (per il merge)")
+    parser.add_argument("--open", action="store_true",
+                        help="apre la PR via REST e stampa il numero, invece di fondere. "
+                             "Vuole --head e --title; --body opzionale. Nessun GH_REPO.")
+    parser.add_argument("--head", help="il branch della PR da aprire (con --open)")
+    parser.add_argument("--title", help="il titolo della PR (con --open)")
+    parser.add_argument("--body", default="", help="il corpo della PR (con --open)")
+    parser.add_argument("--base", default="master", help="il branch di base (con --open)")
     parser.add_argument("--dry-run", action="store_true",
                         help="arriva fino al merge e non lo fa")
     parser.add_argument("--skip-tests", action="store_true",
@@ -451,6 +490,16 @@ def main():
                              "a quale run appartiene")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
+
+    if args.open:
+        if not args.head or not args.title:
+            parser.error("--open vuole --head e --title")
+        number = create_pr(args.head, args.title, args.body, base=args.base)
+        print(number)
+        return 0
+
+    if not args.pr:
+        parser.error("--pr e' obbligatorio per il merge (o usa --open per aprire la PR)")
 
     result = decide(args.stage, args.pr, dry_run=args.dry_run, skip_tests=args.skip_tests,
                     journal=not args.no_journal, run_id=args.run_id)
