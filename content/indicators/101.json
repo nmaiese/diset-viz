@@ -1,16 +1,38 @@
 {
- "fonti": [],
+ "fonti": [
+  {
+   "testo": "Eurostat, edat_lfse_03. Popolazione 20-24 anni con almeno un titolo secondario superiore (ISCED 3-8): Italia 81,4 per cento nel 2018 e 86,5 nel 2024, Unione europea a ventisette 83,2 e 85,0 negli stessi due anni",
+   "url": "https://ec.europa.eu/eurostat/databrowser/view/edat_lfse_03/default/table?lang=en"
+  },
+  {
+   "testo": "Ministero dell'Università e della Ricerca. L'accesso alle università presuppone come requisito il diploma di scuola secondaria superiore, per le lauree di primo ciclo e le lauree magistrali a ciclo unico",
+   "url": "https://www.mur.gov.it/it/aree-tematiche/universita/lofferta-formativa-titoli-rilasciati/lauree-e-lauree-magistrali"
+  }
+ ],
  "key": "101",
- "lead": "Quanti giovani arrivano al diploma è la base del capitale umano di un territorio. Tra i 20-24enni ha almeno il diploma il 93,6% in Molise e il 91,4% in Umbria, contro il 78,7% della Sicilia e il 79,6% della Sardegna. La media delle regioni è dell'86,7%.",
+ "lead": "Il diploma tra i ventenni non separa più il Nord dal Sud, e diciotto regioni su venti oggi stanno dentro dieci punti. L'unico strappo largo della graduatoria 2024 arriva in fondo, dove le due isole si staccano di quattro punti da tutte le altre.",
+ "level": "regione",
+ "reviewed_at": "2026-07-29",
+ "reviewed_vintage": 2024,
  "sections": [
   {
-   "body": "Il diploma è ormai la soglia minima per entrare nel lavoro qualificato, e chi non lo raggiunge parte svantaggiato per tutta la vita. La geografia sorprende, con regioni piccole del Centro-Sud in testa e le isole in fondo, segno che il divario non è solo Nord-Sud. Ogni giovane senza diploma è un'opportunità persa per lui e per il territorio. Il diploma per tutti è un traguardo raggiunto o ancora lontano?",
-   "h": null,
+   "body": "Al numeratore stanno i residenti fra i 20 e i 24 anni che hanno già conseguito almeno il diploma di scuola secondaria superiore, al denominatore tutti i residenti della stessa età. Quell'almeno tiene dentro chi è andato oltre, e il risultato è una media annua, non una fotografia a una data.\n\nIl numero non misura il rendimento della scuola in un anno, ma quanti titoli ha in mano una generazione nel momento in cui la si guarda. Un ventenne all'ultimo anno di superiori conta come un no, lo stesso ragazzo a ventidue conta come un sì, e ogni anno un quinto del gruppo si rinnova.",
+   "h": "Un titolo che si ha in mano, non una scuola finita in tempo",
+   "role": "definizione"
+  },
+  {
+   "body": "Senza diploma l'università non si apre, ed è il titolo che tutto il resto del percorso dà per scontato. Quanti ce l'hanno entro i ventiquattro anni dice quante strade restano aperte. Nella regione più indietro resta senza più di un ventenne su cinque, in quella più avanti meno di uno su quindici.\n\nMedia e mediana cadono a meno di un decimo di punto l'una dall'altra, cioè manca la coda lunga che di solito sbilancia queste graduatorie da un lato. Le prime diciotto regioni stanno dentro 9,91 punti e si scendono un gradino alla volta.\n\nPoi, dopo la Valle d'Aosta, si apre uno scalino di 4,06 punti e cominciano le isole. È l'unico posto dove la distribuzione si rompe, e non cade fra Centro-Nord e Mezzogiorno. La Puglia è undicesima, sopra Piemonte, Basilicata e Liguria, e delle ultime sei regioni due sono del Centro-Nord, Trentino Alto Adige e Valle d'Aosta, con Calabria e Campania sopra la seconda.\n\nLo stesso strappo torna nell'[uscita precoce dal sistema di istruzione e formazione](/indicatore/uscita-precoce-dal-sistema-di-istruzione-e-formazione/bes-02IST005-N22), dove al 2025 le due isole si staccano dalla diciottesima regione di oltre tre punti. Le due serie ordinano i territori quasi allo stesso modo senza spiegarsi a vicenda, e il reddito dell'area, candidato ovvio, non è misurato né qui né lì. Non coincidono però, e la Toscana lo mostra, quarta per diplomati e quarta anche per abbandono precoce.",
+   "h": "Diciotto regioni dentro dieci punti, e poi il salto",
    "role": "quadro"
   },
   {
-   "body": "Misura chi ha conseguito il diploma tra i 20-24 anni, non la qualità della formazione ricevuta né le competenze reali. Non dice quanti proseguano gli studi o trovino lavoro coerente con il titolo.",
-   "h": null,
+   "body": "Dal 2018 la media semplice delle venti regioni è salita di 4,91 punti. Quattro erano però già arrivati entro il 2022, e nei due anni successivi il guadagno complessivo è stato di 0,86.\n\nLa convergenza è venuta dal fondo. La Sardegna ha guadagnato 11,70 punti dal 2018, quando partiva sotto il 68 per cento, la Puglia 9,78 e la Calabria 7,17, e la distanza fra la prima e l'ultima si è ristretta di 5,09 punti. Il Molise, che allora stava a metà classifica, ne ha guadagnati 10,09 ed è arrivato primo. Il Trentino Alto Adige è l'unico che non si è mosso con gli altri, da 84,63 nel 2018 a 84,53 adesso, il solo dei venti territori a chiudere il 2024 sotto il proprio punto di partenza.\n\nL'ultimo passaggio resta un anno solo, e il piccolo guadagno medio del 2024 nasconde due gruppi: tredici regioni salgono, sette scendono.\n\nNel frattempo l'Italia ha scavalcato l'Europa. Il dato nazionale Eurostat, pesato per popolazione e quindi un'altra quantità dalla media di questa pagina, valeva 81,4 nel 2018 contro un 83,2 dell'Unione a ventisette, e vale 86,5 nel 2024 contro 85,0.",
+   "h": "La rincorsa che si è quasi fermata dopo il 2022",
+   "role": "dinamica"
+  },
+  {
+   "body": "Un titolo è tutto quello che questa serie registra. Due diplomi con lo stesso nome e contenuti molto diversi pesano uguale.\n\nSu una fascia larga cinque anni la stima si muove più di quanto possa muoversi la realtà. La Sardegna segna 81,67 nel 2020, 74,98 nel 2022 e 79,61 nel 2024, e perché quel calo e quella risalita fossero veri servirebbe che coorti consecutive si fossero comportate in modo opposto. Meglio leggere la direzione di sei anni che il salto di uno.\n\nIl titolo non dice nemmeno dove porta. Nel [passaggio all'università](/indicatore/passaggio-all-universita/bes-02IST004), rilevato al 2023, la Valle d'Aosta è settima mentre qui è diciottesima. È un indicatore contestuale, senza un verso migliore, e chi arriva al diploma e chi prosegue restano due domande diverse. Il resto del percorso sta nel tema [Istruzione e formazione](/tema/istruzione-e-formazione).",
+   "h": "Un titolo contato, un percorso che resta fuori",
    "role": "limiti"
   }
  ],
