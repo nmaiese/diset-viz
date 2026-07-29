@@ -257,6 +257,42 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b"Metodologia e fonti", methodology.data)
         self.assertIn(b"application/ld+json", methodology.data)
 
+    def test_llms_catalog_matches_indexable_indicator_sitemap(self):
+        client = app.test_client()
+        sitemap = client.get("/sitemap.xml").get_data(as_text=True)
+        llms_full = client.get("/llms-full.txt").get_data(as_text=True)
+        indicator_url = re.compile(r"https://divarioitalia\.it/indicatore/[^<)\s]+")
+
+        sitemap_indicators = set(indicator_url.findall(sitemap))
+        llms_indicators = set(indicator_url.findall(llms_full))
+        self.assertTrue(sitemap_indicators)
+        self.assertEqual(sitemap_indicators, llms_indicators)
+        self.assertEqual(len(sitemap_indicators), sitemap.count("<loc>https://divarioitalia.it/indicatore/"))
+
+        for field in ("famiglia ", "fonte ", "unita ", "copertura ", "definizione: "):
+            self.assertIn(field, llms_full)
+        for family in (
+            "Istat, indicatori territoriali",
+            "Istat, benessere e qualità della vita",
+            "Istat, vita quotidiana delle famiglie",
+            "Eurostat, statistiche regionali",
+        ):
+            self.assertIn(f"famiglia {family}", llms_full)
+        self.assertIn("Download: CSV https://divarioitalia.it/download/indicator/", llms_full)
+        self.assertIn("; JSON https://divarioitalia.it/download/indicator/", llms_full)
+
+    def test_llms_download_examples_are_concrete(self):
+        llms = app.test_client().get("/llms.txt").get_data(as_text=True)
+        self.assertNotIn("<id>", llms)
+        urls = re.findall(
+            r"https://divarioitalia\.it/download/indicator/[^\s.]+\.(?:csv|json)",
+            llms,
+        )
+        self.assertGreaterEqual(len(urls), 2)
+        for url in urls:
+            response = app.test_client().get(url.removeprefix("https://divarioitalia.it"))
+            self.assertEqual(response.status_code, 200, url)
+
     def test_canonical_host_and_public_404(self):
         client = app.test_client()
 

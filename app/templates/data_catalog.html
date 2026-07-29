@@ -1,0 +1,30 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'atlas' %}
+
+{% block title %}Catalogo dati | Divario Italia{% endblock %}
+{% block description %}{{ catalog_description }}{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">{{ catalog_jsonld | tojson }}</script>
+{% endblock %}
+
+{% block content %}
+<main class="page wrap">
+  <nav class="breadcrumb"><a href="/atlante">Atlante</a> / Catalogo dati</nav>
+  <h1>Catalogo dati di Divario Italia</h1>
+  <p class="page-lead">{{ catalog_description }}</p>
+  <p class="page-note">Il catalogo collega {{ datasets | length }} dataset indicizzabili. Ogni scheda dichiara copertura, tecnica di elaborazione, fonte originale ed eventuali formati di download.</p>
+
+  <section aria-labelledby="dataset-title">
+    <h2 id="dataset-title">Dataset disponibili</h2>
+    <ul class="search-results">
+      {% for dataset in datasets %}
+      <li>
+        <a href="{{ dataset.path }}"><strong>{{ dataset.name }}</strong></a>
+        <span>{{ dataset.source }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+</main>
+{% endblock %}

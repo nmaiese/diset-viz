@@ -117,6 +117,8 @@ def _assemble(meta, levels):
     meta["freshness_status"] = freshness_status(meta["year_max"])
     meta["freshness_label"] = freshness_label(meta["freshness_status"])
     related, siblings = _theme_neighbours(meta)
+    for level in levels:
+        level["query_map"] = _query_map(meta, level)
     return {
         "meta": meta,
         "levels": levels,
@@ -184,7 +186,7 @@ def _build_meta(family, raw_id, source_meta):
         # and every existing link 301s away from. Defer, never recompute.
         "canonical_path": source_meta.get("path")
         or sources.indicator_url(family, raw_id, profiles.indicator_slug(name)),
-        "downloads": _downloads(family, source_meta["id"]),
+        "downloads": _downloads(source_meta["id"]),
     }
 
 
@@ -211,14 +213,43 @@ def _is_indexable(family, raw_id, source_meta):
     return profiles.is_search_indexable_indicator(source_meta)
 
 
-def _downloads(family, indicator_id):
-    """CSV/JSON endpoints, which only the territorial family exposes today."""
-    if family != "territorial":
-        return None
+def _downloads(indicator_id):
+    """CSV/JSON endpoints exposed by the shared atlas catalog."""
     return {
         "csv": f"/download/indicator/{indicator_id}.csv",
         "json": f"/download/indicator/{indicator_id}.json",
     }
+
+
+def _query_map(meta, level):
+    """Question-shaped paths into the page, backed only by this level's data.
+
+    This is navigation, not a second prose layer.  Keeping the requested year
+    and territorial vocabulary here means the template cannot advertise an
+    answer for a year or level different from the cockpit it is rendering.
+    """
+    questions = [
+        {"intent": "definizione", "label": f"Che cosa misura {meta['name']}?", "target": "sezione-definizione"},
+        {"intent": "dato", "label": f"Qual è il dato più recente, nel {level['year_max']}?", "target": "esplora"},
+        {"intent": "classifica", "label": f"Qual è la classifica delle {level['plural']} nel {level['year_max']}?", "target": "classifica-dati"},
+    ]
+    # Year-over-year framing, only when there is a previous year to compare to.
+    if level["annual_change"]:
+        questions.append({
+            "intent": "confronto",
+            "label": f"Che cosa è cambiato dal {level['annual_change']['previous_year']} al {level['year_max']}?",
+            "target": "sezione-dinamica",
+        })
+    # The long trend, only when the level spans more than one year: a single-year
+    # series cannot answer "come e cambiato dal 2005 al 2005".
+    if level["year_min"] != level["year_max"]:
+        questions.append({"intent": "andamento", "label": f"Come è cambiato dal {level['year_min']} al {level['year_max']}?", "target": "serie-storica"})
+    questions.append({"intent": "metodologia", "label": "Come sono calcolati confronti e medie?", "target": "fonti-verifica"})
+    # Downloads serve the regional series only, so the intent lives on the
+    # regional level alone, matching what the cockpit actually offers.
+    if meta.get("downloads") and level["key"] == "regione":
+        questions.append({"intent": "download", "label": "Dove posso scaricare la serie?", "target": "download-dati"})
+    return questions
 
 
 def _level_from_series(key, payload, meta):
@@ -448,6 +479,9 @@ def _view_from_bes_only(family, raw_id, page):
         "catalog_family_label": sources.family_label(family),
         "theme": page.get("category_name") or page.get("domain_name"),
     })
+    # A province-only BES series is outside get_atlas_indicator, which owns the
+    # two generic download routes. Do not publish links that would return 404.
+    meta["downloads"] = None
     levels = []
     for level in page["level_payloads"]:
         if level["level"] == "provincia":

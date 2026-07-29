@@ -84,6 +84,40 @@ SOURCES = {
     },
 }
 
+# Indicator-specific landing pages belong to provenance just as much as the
+# family names and licences above.  Keeping this routing here prevents the
+# structured data, visible source link and downloads from disagreeing about
+# which Istat product supplied a territorial series.
+TERRITORIAL_SOURCE_DEFAULT = {
+    "label": "Istat, Banca dati territoriale per le politiche di sviluppo",
+    "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/",
+}
+TERRITORIAL_SOURCE_OVERRIDES = {
+    **{
+        indicator_id: {
+            "label": "Istat, Conti economici territoriali",
+            "url": "https://www.istat.it/it/archivio/conti+territoriali",
+        }
+        for indicator_id in ("901", "902", "903", "904", "905", "906", "907")
+    },
+    **{
+        indicator_id: {
+            "label": "Istat, Indicatori demografici",
+            "url": "https://www.istat.it/statistiche-per-temi/popolazione-e-famiglie/",
+        }
+        for indicator_id in ("910", "911", "912", "913", "920", "921", "922", "923")
+    },
+    "930": {
+        "label": "Istat, Reddito e condizioni di vita (Eu-Silc)",
+        "url": "https://www.istat.it/statistiche-per-temi/reddito-e-condizioni-di-vita/",
+    },
+}
+
+
+def territorial_source(indicator_id):
+    """Authoritative visible label and landing URL for a territorial series."""
+    return TERRITORIAL_SOURCE_OVERRIDES.get(str(indicator_id), TERRITORIAL_SOURCE_DEFAULT)
+
 # Families whose indicators are published through the normalized external layer
 # (discovery -> promotion -> app.external_atlas), rather than from a committed
 # backbone CSV. `feeds` names the hunter adapters that write into them: several

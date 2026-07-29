@@ -377,6 +377,21 @@
     });
   }
 
+  // The question nav links to cards that, on mobile, live inside a hidden tab.
+  // A plain fragment jump would land on `display: none`, so activate the card's
+  // tab first. Harmless on desktop, where every card is shown regardless.
+  function wireQueryNav() {
+    all("a[data-query-intent]").forEach(function (link) {
+      link.addEventListener("click", function () {
+        var href = link.getAttribute("href") || "";
+        if (href.charAt(0) !== "#" || href.length < 2) return;
+        var target = one(href);
+        var panel = target && target.closest ? target.closest("[data-tabpanel]") : null;
+        if (panel) selectTab(panel.getAttribute("data-tabpanel"));
+      });
+    });
+  }
+
   // ---- Render -------------------------------------------------------------
   function render() {
     var lv = level();
@@ -539,6 +554,7 @@
 
   wireMap();
   wireTabs();
+  wireQueryNav();
   // The server deliberately ships no active-* class, so the no-JS mobile layout
   // shows every card. Now that the tabs work, pick one.
   selectTab(level().hasMap ? "map" : "ranking");

@@ -85,6 +85,36 @@ class UnifiedViewReproducesEveryFigure(unittest.TestCase):
         missing = [iid for iid, _, view in self._views() if view is None]
         self.assertEqual(missing, [], f"indicators the unified model cannot build: {missing[:10]}")
 
+    def test_query_map_uses_each_levels_actual_years_and_answers(self):
+        # Always answerable, regardless of the level's shape.
+        required = {"definizione", "dato", "classifica", "metodologia"}
+        for indicator_id, _, view in self._views():
+            if view is None:
+                continue
+            for level in view["levels"]:
+                with self.subTest(indicator=indicator_id, level=level["key"]):
+                    questions = level["query_map"]
+                    intents = {item["intent"] for item in questions}
+                    self.assertTrue(required <= intents)
+                    labels = " ".join(item["label"] for item in questions)
+                    self.assertIn(str(level["year_max"]), labels)
+                    self.assertEqual("confronto" in intents, level["annual_change"] is not None)
+                    # The long-trend question only when the level spans >1 year.
+                    self.assertEqual("andamento" in intents, level["year_min"] != level["year_max"])
+                    # Downloads are regional-only, so the intent is too.
+                    expected_download = view["meta"]["downloads"] is not None and level["key"] == "regione"
+                    self.assertEqual("download" in intents, expected_download)
+
+    def test_catalogued_families_expose_the_shared_downloads(self):
+        for indicator_id, _, view in self._views():
+            if view is None or view["meta"]["downloads"] is None:
+                continue
+            with self.subTest(indicator=indicator_id):
+                self.assertEqual(
+                    view["meta"]["downloads"]["json"],
+                    f"/download/indicator/{view['meta']['id']}.json",
+                )
+
     def test_levels_match_the_previous_render_paths(self):
         wrong = []
         for indicator_id, expected, view in self._views():
