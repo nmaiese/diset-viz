@@ -40,7 +40,7 @@
   "variableMeasured": {{ meta.name | tojson }},
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}
-  "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads %},
+  "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads and level.key == 'regione' %},
   "distribution": [
     { "@type": "DataDownload", "name": "Download CSV", "description": "Serie dell'indicatore in formato CSV", "encodingFormat": "text/csv", "contentUrl": "{{ site_url }}{{ meta.downloads.csv }}" },
     { "@type": "DataDownload", "name": "Download JSON", "description": "Serie dell'indicatore in formato JSON", "encodingFormat": "application/json", "contentUrl": "{{ site_url }}{{ meta.downloads.json }}" }

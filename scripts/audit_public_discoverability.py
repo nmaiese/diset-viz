@@ -105,20 +105,48 @@ def parse_robots(body: str) -> list[dict]:
 def audit_robots(text: str, contract: dict) -> list[str]:
     failures = []
     groups = parse_robots(text)
-    by_agent = {agent: group["rules"] for group in groups for agent in group["agents"]}
+    # Ogni agente puo' comparire in piu' gruppi, quindi si tiene la **lista** dei
+    # suoi gruppi, non l'ultimo che vince. Collassare in un dizionario nascondeva
+    # un gruppo restrittivo iniettato da un CDN (es. `OAI-SearchBot: Disallow: /`)
+    # dietro il gruppo permissivo dell'app che lo segue: l'audit passava mentre un
+    # crawler sotto contratto aveva regole contraddittorie. Un agente auditato con
+    # piu' di un gruppo e' esso stesso un fallimento (possibile iniezione).
+    by_agent: dict = {}
+    for group in groups:
+        for agent in group["agents"]:
+            by_agent.setdefault(agent, []).append(group["rules"])
     shared = [("allow", "/")] + [("disallow", path) for path in contract["shared_disallow"]]
     if sum("*" in group["agents"] for group in groups) != 1:
         failures.append("robots must contain exactly one default User-agent group (possible CDN injection)")
+
+    def _one_group(agent):
+        rule_sets = by_agent.get(agent, [])
+        if len(rule_sets) > 1:
+            # Il gruppo `*` doppio lo segnala gia' il controllo esplicito sopra,
+            # con il suo messaggio: qui non si raddoppia.
+            if agent != "*":
+                failures.append(
+                    f"robots must contain exactly one group for {agent} (possible CDN injection), got {len(rule_sets)}"
+                )
+            return None
+        return rule_sets[0] if rule_sets else []
+
     for agent in ("*", *contract["answer_bots"]):
+        rules = _one_group(agent)
+        if rules is None:
+            continue
         # Exact match, not membership: an extra rule such as ``Disallow: /blog``
         # keeps every required rule present yet blocks an audited public page.
-        crawl_rules = [rule for rule in by_agent.get(agent, []) if rule[0] in ("allow", "disallow")]
+        crawl_rules = [rule for rule in rules if rule[0] in ("allow", "disallow")]
         if crawl_rules != shared:
             failures.append(
                 f"robots effective crawl rules for {agent} must be exactly {shared}, got {crawl_rules}"
             )
     for agent in contract["training_bots"]:
-        crawl_rules = [rule for rule in by_agent.get(agent, []) if rule[0] in ("allow", "disallow")]
+        rules = _one_group(agent)
+        if rules is None:
+            continue
+        crawl_rules = [rule for rule in rules if rule[0] in ("allow", "disallow")]
         if crawl_rules != [("disallow", "/")]:
             failures.append(f"robots effective rules for {agent} must be exactly Disallow: /")
     if text.count("# As a condition of accessing this website") != 1:

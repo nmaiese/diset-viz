@@ -1344,7 +1344,14 @@ def _indexable_indicator_catalog():
     uncached crawler routes that would otherwise repeat that cost on every
     hit. The source loaders already cache for the life of the process, so this
     catalog is stable too: memoize it once instead of rebuilding per request.
-    Callers only read ``meta``/``levels`` and must not mutate the result.
+
+    **Cached is a compact projection, not the full views.** A full view carries
+    every level's observation history and year-by-territory explore matrix, and
+    retaining all of them for the process lifetime added roughly 110 MiB per
+    worker on the first crawler hit. The two callers only read ``meta`` and a
+    small per-level summary (label, year span, territory count in the last year),
+    so that is all this keeps: the heavy view is dropped as soon as the summary
+    is taken. Callers must not mutate the result.
     """
     candidates = []
     candidates.extend(("territorial", str(item["id"])) for item in get_catalog()["indicators"])
@@ -1370,8 +1377,16 @@ def _indexable_indicator_catalog():
         if path in seen_paths:
             continue
         seen_paths.add(path)
-        catalog.append(view)
-    return sorted(catalog, key=lambda view: view["meta"]["canonical_path"])
+        catalog.append({
+            "meta": view["meta"],
+            "levels": [
+                {"label": level["label"], "year_min": level["year_min"],
+                 "year_max": level["year_max"],
+                 "territory_count": len(level["observations"])}
+                for level in view["levels"]
+            ],
+        })
+    return sorted(catalog, key=lambda record: record["meta"]["canonical_path"])
 
 
 @app.route("/sitemap.xml")
@@ -1649,7 +1664,7 @@ def llms_full_txt():
         definition = plain or "Definizione sintetica non disponibile."
         coverage = ", ".join(
             f"{level['label'].lower()} {level['year_min']}-{level['year_max']} "
-            f"({len(level['observations'])} territori nell'ultimo anno)"
+            f"({level['territory_count']} territori nell'ultimo anno)"
             for level in view["levels"]
         )
         source_label = meta["source_label"]
