@@ -15,13 +15,17 @@ Il documento che possiede la materia e'
 contratto di ogni run e' [`docs/AGENT_CONTRACT.md`](../../docs/AGENT_CONTRACT.md).
 Queste sono le regole che valgono sempre:
 
-- **Un lanciatore, lavoro per-indicatore in parallelo.** `scripts/pipeline_launch.py`
-  legge il dossier per-indicatore e le code e restituisce una lista
-  prioritizzata di lanci (produttore e verificatore per-indicatore, ammissione
-  batch); il suo contratto da agente e' `.claude/agents/launcher.md`. Non c'e'
-  piu' un dispatcher a uno-stadio-per-tick ne' il lock una-PR-aperta: indicatori
-  diversi toccano file diversi, quindi non contendono e si lanciano insieme. Tre
-  ruoli soli: ammissione (scout+hunter+promoter), produttore
+- **Un lanciatore, lavoro per-indicatore in parallelo, ogni run in un worktree.**
+  `scripts/pipeline_launch.py` legge il dossier per-indicatore e le code e
+  restituisce una lista prioritizzata di lanci (produttore e verificatore
+  per-indicatore, ammissione batch); il suo contratto da agente e'
+  `.claude/agents/launcher.md`. Non c'e' piu' un dispatcher a uno-stadio-per-tick
+  ne' il lock una-PR-aperta. Indicatori diversi toccano file diversi, ma quella
+  separazione vale per i **percorsi**, non per l'indice git ne' per HEAD: un
+  checkout condiviso ne ha uno solo, e due run che se li contendono si spostano
+  il branch sotto i piedi. Per questo ogni run apre il proprio **git worktree**
+  isolato (`scripts/pipeline_workspace.py`, keyed sul `run_id`), non solo un branch
+  con nome diverso. Tre ruoli soli: ammissione (scout+hunter+promoter), produttore
   (curator+writer+reviewer), verificatore.
 - **Ogni registro e' un file per record**: `content/indicators/`,
   `data/pipeline/runs/`, `data/pipeline/verifiche/`. Mai ricompattarli in un
@@ -44,6 +48,16 @@ Queste sono le regole che valgono sempre:
   suite, mai un'approvazione.
 - **Mai `gh pr merge --auto`.** Non aspetta su questo repository: fonde subito.
   L'attesa vive in `scripts/pipeline_merge.py`.
+- **La PR si apre via REST, mai con `GH_REPO`.** `gh pr create` e' GraphQL e non
+  vede il remote proxato; `pipeline_merge.py --open` la apre sullo slug ricavato
+  da `repo_slug`, sulla stessa REST del merge. `GH_REPO` corto-circuita
+  `repo_slug`, gli rompe un test e causa rifiuti orfani su master: non impostarlo.
+- **Il vivo del cruscotto passa dal sito, non da file locali.** Battiti e PR
+  aperte finiscono nel SQLite che Litestream replica su GCS (`app/pipeline_state.py`),
+  scritti dai POST degli agenti a `/_pipeline/beat` (segreto `PIPELINE_INGEST_TOKEN`).
+  Gli agenti girano su macchine effimere separate dal server: i vecchi battiti su
+  file, ignorati da git, non lo raggiungevano, ed e' per quello che `/_pipeline`
+  sembrava morto. Il committato (dossier + diario) resta la storia.
 - **Il rientro e' guidato dai dati, mai dal calendario.** Una curatela scade
   quando la fonte pubblica un anno nuovo (`data_year`); una rilettura quando
   le cifre dell'articolo si rinfrescano (`reviewed_vintage`).
