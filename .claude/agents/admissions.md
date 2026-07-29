@@ -10,7 +10,7 @@ description: >-
   per questo, prima di scrivere "approvato", provi a demolire la tua stessa
   approvazione. Usa a settimana, o quando un'istituzione pubblica un rilascio.
 tools: Read, Grep, Glob, Bash, Edit, Write, WebSearch, WebFetch
-model: opus
+model: claude-opus-4-8
 skills:
   - pipeline-close-run
   - untrusted-web
