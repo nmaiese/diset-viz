@@ -1903,10 +1903,10 @@ def llms_full_txt():
 
 @app.route("/ads.txt")
 def ads_txt():
-    if not config.ADSENSE_CLIENT:
-        abort(404)
-    pub = config.ADSENSE_CLIENT.replace("ca-", "")
-    return Response(f"google.com, {pub}, DIRECT, f08c47fec0942fa0\n", mimetype="text/plain")
+    # ads.txt is a public publisher declaration, not runtime configuration.
+    # Serving the committed file keeps it available to the AdSense crawler even
+    # when a Cloud Run revision is deployed without the optional client env var.
+    return send_from_directory(app.static_folder, "ads.txt", mimetype="text/plain")
 
 
 @app.route('/favicon.ico')
