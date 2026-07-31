@@ -493,8 +493,8 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn('class="indicator-article', html)
         for role in ("definizione", "quadro", "dinamica", "limiti"):
             self.assertIn(f'id="sezione-{role}"', html)
-        # L'apparato "Fonti e verifica" ora e' un grid di schede.
-        self.assertIn("apparatus-card", html)
+        # L'apparato "Fonti e verifica" e' un unico blocco di specifiche.
+        self.assertIn("apparatus-specs", html)
         # Numbers live in the cockpit, once. The blocks that used to repeat them
         # further down the page must not come back.
         self.assertIn('class="indicator-cockpit"', html)
