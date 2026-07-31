@@ -1392,3 +1392,18 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 /* Sparkline SVG server-side: un solo accento, come l'identita' del sito. */
 .spark__line { stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
 .spark__dot { fill: var(--accent); }
+
+/* Pagina account (Fase 5.3). Solo site.css (pagina SSR, niente game.css). */
+.account-block { border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 16px 0; }
+.account-block h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
+.account-email { font-family: var(--font-mono); font-size: 13px; color: var(--ink-soft); margin: 0 0 10px; }
+.account-nick-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.account-nick-row input { flex: 1 1 200px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; font: 500 15px/1 var(--font-body); }
+.account-nick-msg { font-size: 13px; color: var(--ink-soft); margin: 8px 0 0; }
+.account-btn { display: inline-block; background: var(--accent); color: #fff; border: 0; border-radius: 999px; padding: 9px 18px; font: 600 14px/1 var(--font-body); cursor: pointer; text-decoration: none; }
+.account-btn--ghost { background: none; color: var(--ink); border: 1px solid var(--line); }
+.account-btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
+.account-data-cta { display: flex; gap: 10px; flex-wrap: wrap; }
+.account-danger { background: none; border: 1px solid var(--negative-soft); color: #b23b1e; border-radius: 999px; padding: 9px 18px; font: 600 14px/1 var(--font-body); cursor: pointer; }
+.account-danger:hover { background: #b23b1e; color: #fff; }
+.account-note { font-size: 12.5px; color: var(--muted); margin: 10px 0 0; line-height: 1.5; }

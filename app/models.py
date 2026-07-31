@@ -89,6 +89,22 @@ class Achievement(Base):
     unlocked_at: Mapped[str] = mapped_column(Text, nullable=False)
 
 
+class SavedComparison(Base):
+    """Un confronto salvato da un utente (Fase 5.3): titolo + configurazione
+    (indicatori, regioni, anni, tipo) come JSON di testo. Niente public_slug:
+    nessuna condivisione, quindi nessuna superficie RLS sfruttabile. Servito solo
+    dal backend. Invariante: auth_id dal JWT verificato."""
+
+    __tablename__ = "saved_comparisons"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    auth_id: Mapped[str] = mapped_column(Text, nullable=False)
+    title: Mapped[str] = mapped_column(Text, nullable=False)
+    config: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
+    updated_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
 class Score(Base):
     """La classifica del quiz. Il punteggio salvato e' sempre la miglior streak
     verificata di una sessione firmata (app/quiz_tokens.py): il client non manda

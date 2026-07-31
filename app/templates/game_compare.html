@@ -6,8 +6,8 @@
 {% block description %}Confronta due regioni su un indicatore Istat e scegli il valore più alto. Dieci secondi per round, difficoltà crescente e serie da battere.{% endblock %}
 
 {% block head_extra %}
-<link rel="stylesheet" crossorigin href="{{ url_for('static', filename='dist/assets/game.css') }}">
-<script type="module" crossorigin src="{{ url_for('static', filename='dist/assets/game.js') }}"></script>
+<link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
+<script type="module" crossorigin src="{{ asset_url('dist/assets/game.js') }}"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",

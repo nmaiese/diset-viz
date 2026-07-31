@@ -20,8 +20,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
-    <script type="module" crossorigin src="{{ url_for('static', filename='dist/assets/index.js') }}"></script>
-    <link rel="stylesheet" crossorigin href="{{ url_for('static', filename='dist/assets/index.css') }}">
+    <script type="module" crossorigin src="{{ asset_url('dist/assets/index.js') }}"></script>
+    <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/index.css') }}">
   </head>
   <body>
     {% include "_third_party_body.html" %}

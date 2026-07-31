@@ -1,6 +1,9 @@
+import hashlib
+import os
 import secrets
+from functools import lru_cache
 
-from flask import Flask, jsonify, redirect, render_template, request
+from flask import Flask, jsonify, redirect, render_template, request, url_for
 from flask_compress import Compress
 
 from app import config
@@ -15,6 +18,31 @@ app.secret_key = config.SECRET_KEY or secrets.token_hex(32)
 
 Compress(app)
 cache.init_app(app)
+
+
+@lru_cache(maxsize=64)
+def _asset_hash(rel):
+    """Hash breve del contenuto di un file statico, per il cache-busting. In
+    cache per la vita del processo: un deploy ricrea il processo (immagine nuova),
+    quindi l'hash si aggiorna a ogni rilascio."""
+    try:
+        with open(os.path.join(app.static_folder, rel), "rb") as f:
+            return hashlib.md5(f.read()).hexdigest()[:10]
+    except OSError:
+        return ""
+
+
+def asset_url(filename):
+    """`url_for('static')` piu' un `?v=<hash>` sul contenuto. Gli entry bundle
+    (index.js, game.js, site.js) hanno nome fisso ma i chunk che importano hanno
+    hash che cambiano: senza cache-busting, un browser con l'entry vecchio in
+    cache importa chunk spariti e la SPA resta bianca dopo un deploy. Il query
+    param rende l'URL unico per rilascio."""
+    ver = _asset_hash(filename)
+    return url_for("static", filename=filename, v=ver) if ver else url_for("static", filename=filename)
+
+
+app.jinja_env.globals["asset_url"] = asset_url
 
 
 @app.before_request
@@ -44,7 +72,7 @@ def monitor_subdomain_to_console():
 
 _NOINDEX_EXACT_PATHS = {
     "/data", "/legacy", "/legacy-reddito", "/quiz/classifica", "/openapi.json",
-    "/_keepalive",
+    "/_keepalive", "/account",
 }
 # `/_pipeline` e' il cruscotto interno della catena editoriale: noindex sempre,
 # e protetto da token nella view. L'underscore iniziale lo tiene fuori dallo
