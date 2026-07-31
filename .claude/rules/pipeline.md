@@ -54,8 +54,9 @@ Queste sono le regole che valgono sempre:
   **sempre** dal remote: `GH_REPO` non e' piu' un override (da environment
   ereditato apriva o fondeva sul repo sbagliato, i rifiuti orfani su master).
 - **Il vivo del cruscotto passa dal sito, non da file locali.** Battiti e PR
-  aperte finiscono nel SQLite che Litestream replica su GCS (`app/pipeline_state.py`),
-  scritti dai POST degli agenti a `/_pipeline/beat` (segreto `PIPELINE_INGEST_TOKEN`).
+  aperte finiscono su Supabase Postgres (`app/pipeline_state.py` via `app/db.py`;
+  Litestream ritirato con la Fase 4), scritti dai POST degli agenti a
+  `/_pipeline/beat` (segreto `PIPELINE_INGEST_TOKEN`).
   Gli agenti girano su macchine effimere separate dal server: i vecchi battiti su
   file, ignorati da git, non lo raggiungevano, ed e' per quello che `/_pipeline`
   sembrava morto. Il committato (dossier + diario) resta la storia.

@@ -2,8 +2,8 @@
 
 Gira il client Flask reale, quindi e' un test d'integrazione: costruisce il
 board dai file veri del repo. Verifica lo stato, l'header noindex, la protezione
-a token, e l'endpoint di ingest dei battiti (il vivo, scritto nel SQLite che
-Litestream replica su GCS) con il suo segreto."""
+a token, e l'endpoint di ingest dei battiti (il vivo, scritto sul backend
+mutabile: SQLite in test, Supabase Postgres in produzione) con il suo segreto."""
 
 import importlib
 import json
