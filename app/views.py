@@ -1499,9 +1499,22 @@ def game_order_answer_api():
 def auth_me_api():
     """Chi e' l'utente di questa richiesta, secondo il Bearer JWT. Anonimo
     (`{"user": null}`) se il token e' assente, invalido, o l'auth non e'
-    configurata: il frontend lo usa per mostrare stato login/logout."""
+    configurata: il frontend lo usa per mostrare stato login/logout.
+
+    Effetto collaterale, quando c'e' un utente valido: upsert del profilo e
+    aggiornamento di last_seen_at. Best-effort: se il DB non risponde, si torna
+    comunque l'identita' dal token (la UI non deve cadere per il profilo)."""
     user = auth.current_user(request.headers)
-    return jsonify({"user": user})
+    profile = None
+    if user:
+        try:
+            from app import accounts
+            profile = accounts.upsert_profile(
+                user["id"], email=user.get("email", ""),
+                nickname_seed=request.args.get("nick", ""))
+        except Exception:  # noqa: BLE001
+            profile = None
+    return jsonify({"user": user, "profile": profile})
 
 
 @app.route("/api/game/leaderboard")

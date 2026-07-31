@@ -142,7 +142,7 @@ export default function LeaderboardApp() {
         <div className="qz-side-card qz-side-card--accent">
           <p className="eb">Entra in classifica</p>
           <p className="qz-side-body">
-            Gioca una serie e invia il tuo risultato a fine partita. Il nickname è pubblico, senza registrazione.
+            Gioca una serie e invia il tuo risultato a fine partita. Il nickname è pubblico. Puoi giocare senza registrazione, o accedere per legare i punteggi al tuo account.
           </p>
           <div className="qz-side-cta">
             <a className="game-btn" href={mode === "order" ? "/quiz/ordina" : "/quiz/chi-e-maggiore"}>Gioca ora</a>

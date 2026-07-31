@@ -7,7 +7,7 @@ import {
   onAuthChange,
   signInWithGoogle,
   signOut,
-} from "./supabase.js";
+} from "../shared/supabase.js";
 
 const STORAGE_NICKNAME_KEY = "di-nickname";
 

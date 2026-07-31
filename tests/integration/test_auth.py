@@ -74,21 +74,28 @@ class AuthTokenTest(unittest.TestCase):
 
 class AuthMeRouteTest(unittest.TestCase):
     def setUp(self):
-        self._saved = (config.SUPABASE_JWT_SECRET, config.SUPABASE_URL)
+        self._saved = (config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB)
         config.SUPABASE_JWT_SECRET = _SECRET
         config.SUPABASE_URL = ""
+        # /api/auth/me fa upsert del profilo: DB temporaneo, non lo sqlite di dev.
+        self._tmp = tempfile.mkdtemp()
+        config.LEADERBOARD_DB = str(Path(self._tmp) / "auth.sqlite3")
 
     def tearDown(self):
-        config.SUPABASE_JWT_SECRET, config.SUPABASE_URL = self._saved
+        config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB = self._saved
+        shutil.rmtree(self._tmp, ignore_errors=True)
 
     def test_me_is_anonymous_without_a_token(self):
         body = app.test_client().get("/api/auth/me").get_json()
-        self.assertEqual(body, {"user": None})
+        self.assertEqual(body, {"user": None, "profile": None})
 
-    def test_me_reflects_a_valid_token(self):
+    def test_me_reflects_a_valid_token_and_upserts_profile(self):
         body = app.test_client().get(
             "/api/auth/me", headers={"Authorization": "Bearer " + _token()}).get_json()
         self.assertEqual(body["user"], {"id": "uuid-abc", "email": "player@example.com"})
+        # il profilo e' stato creato e torna nella risposta
+        self.assertEqual(body["profile"]["auth_id"], "uuid-abc")
+        self.assertEqual(body["profile"]["email"], "player@example.com")
 
 
 class ScoreUserIdTest(unittest.TestCase):
