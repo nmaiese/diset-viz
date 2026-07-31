@@ -35,6 +35,7 @@ from app import game
 from app import quiz
 from app import quiz_tokens
 from app import leaderboard
+from app import auth
 from app import moderation
 from app import public_urls
 from app import publisher
@@ -1462,6 +1463,15 @@ def game_order_answer_api():
     return jsonify(result)
 
 
+@app.route("/api/auth/me")
+def auth_me_api():
+    """Chi e' l'utente di questa richiesta, secondo il Bearer JWT. Anonimo
+    (`{"user": null}`) se il token e' assente, invalido, o l'auth non e'
+    configurata: il frontend lo usa per mostrare stato login/logout."""
+    user = auth.current_user(request.headers)
+    return jsonify({"user": user})
+
+
 @app.route("/api/game/leaderboard")
 def leaderboard_get_api():
     mode = request.args.get("mode", "")
@@ -1504,7 +1514,12 @@ def leaderboard_post_api():
         return jsonify({"error": error}), 400
 
     detail = {"count": state["c"]} if mode == "order" and state.get("c") else {}
-    leaderboard.submit(mode, state["sid"], nickname, score, detail)
+    # Se c'e' un JWT Supabase valido, la riga si lega all'account; senza, resta
+    # anonima (il gioco non richiede registrazione). L'anti-cheat non cambia: il
+    # punteggio viene sempre dal token quiz firmato, non dal client.
+    user = auth.current_user(request.headers)
+    user_id = user["id"] if user else None
+    leaderboard.submit(mode, state["sid"], nickname, score, detail, user_id=user_id)
     rank_all, rank_week = leaderboard.ranks_for_session(mode, state["sid"])
     return jsonify({"ok": True, "mode": mode, "score": score, "rank_all": rank_all, "rank_week": rank_week})
 

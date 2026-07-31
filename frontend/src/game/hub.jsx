@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchJson, trackGameEvent } from "./shared.jsx";
+import { AuthControl, fetchJson, trackGameEvent } from "./shared.jsx";
 
 function loadJson(key, fallback) {
   try {
@@ -123,9 +123,12 @@ export default function HubApp() {
   useHubCardTracking();
 
   return (
-    <section className="qz-two">
-      <StatsPanel stats={stats} />
-      <LeaderboardPanel />
-    </section>
+    <>
+      <AuthControl />
+      <section className="qz-two">
+        <StatsPanel stats={stats} />
+        <LeaderboardPanel />
+      </section>
+    </>
   );
 }

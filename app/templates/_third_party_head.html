@@ -8,6 +8,12 @@
 <meta name="google-adsense-account" content="{{ ADSENSE_CLIENT }}">
 {% endif %}
 
+{% if SUPABASE_URL and SUPABASE_ANON_KEY %}
+{# Identita' Supabase pubbliche (Auth Google + Realtime). Solo se configurate:
+   assenti, il gioco resta anonimo e la console non si abbona a nulla. #}
+<script>window.__supabase = {url: {{ SUPABASE_URL | tojson }}, anonKey: {{ SUPABASE_ANON_KEY | tojson }}};</script>
+{% endif %}
+
 {% if GOOGLE_TAG_MANAGER_ID or ADSENSE_CLIENT %}
 <!-- Google Consent Mode default -->
 <script>
