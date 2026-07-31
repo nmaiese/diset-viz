@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { fetchJson, formatValue, trackGameEvent, SourceStrip, SubmitScoreModal, prefersReducedMotion } from "./shared.jsx";
+import { fetchJson, formatValue, trackGameEvent, SourceStrip, SubmitScoreModal, prefersReducedMotion, postGame, notifyAchievements } from "./shared.jsx";
 
 const API = {
   round: (count, token) =>
@@ -134,20 +134,17 @@ export default function OrderApp() {
     if (status !== "ordering" || orderKeys.length !== round.count || submittingRef.current) return;
     submittingRef.current = true;
     setStatus("loading");
-    fetchJson(API.answer, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        indicator_id: round.indicator.id,
-        year: round.indicator.year,
-        region_keys: orderKeys,
-        token: tokenRef.current,
-      }),
+    postGame(API.answer, {
+      indicator_id: round.indicator.id,
+      year: round.indicator.year,
+      region_keys: orderKeys,
+      token: tokenRef.current,
     })
       .then((data) => {
         setResult(data);
         setStatus("revealed");
         tokenRef.current = data.token;
+        notifyAchievements(data.achievements);
         setStats((prev) => {
           const bestKey = round.count === 3 ? "bestScore3" : "bestScore5";
           const next = {

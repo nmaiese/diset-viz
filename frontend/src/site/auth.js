@@ -17,6 +17,7 @@ import {
   signInWithGoogle,
   signOut,
   syncProfile,
+  mergeLocalStatsOnce,
 } from "../shared/supabase.js";
 
 const root = document.getElementById("site-auth");
@@ -112,6 +113,7 @@ async function render() {
   if (user) {
     accountControl(user);
     syncProfile(); // upsert profilo, best-effort
+    mergeLocalStatsOnce(user.id); // fonde i progressi locali una volta (silenzioso qui)
   } else {
     loginButton();
   }

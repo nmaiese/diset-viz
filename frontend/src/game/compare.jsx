@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { fetchJson, formatValue, trackGameEvent, SourceStrip, SubmitScoreModal, prefersReducedMotion } from "./shared.jsx";
+import { fetchJson, formatValue, trackGameEvent, SourceStrip, SubmitScoreModal, prefersReducedMotion, postGame, notifyAchievements } from "./shared.jsx";
 
 const API = {
   round: (difficulty, token) =>
@@ -151,22 +151,19 @@ export default function CompareApp() {
     window.clearInterval(timerRef.current);
     setStatus("loading");
     setChoice(picked);
-    fetchJson(API.answer, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        indicator_id: currentRound.indicator.id,
-        year: currentRound.indicator.year,
-        region_a_key: currentRound.region_a.region_key,
-        region_b_key: currentRound.region_b.region_key,
-        choice: picked,
-        token: tokenRef.current,
-      }),
+    postGame(API.answer, {
+      indicator_id: currentRound.indicator.id,
+      year: currentRound.indicator.year,
+      region_a_key: currentRound.region_a.region_key,
+      region_b_key: currentRound.region_b.region_key,
+      choice: picked,
+      token: tokenRef.current,
     })
       .then((data) => {
         setResult(data);
         setStatus("revealed");
         tokenRef.current = data.token;
+        notifyAchievements(data.achievements);
         const prevStreak = stateRef.current.streak;
         const nextStreak = data.correct ? prevStreak + 1 : 0;
         setStreak(nextStreak);

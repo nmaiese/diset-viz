@@ -1,5 +1,62 @@
 import React, { useEffect, useState } from "react";
-import { AuthControl, fetchJson, trackGameEvent } from "./shared.jsx";
+import { AuthControl, fetchJson, trackGameEvent, notifyAchievements } from "./shared.jsx";
+import { getAccessToken, getUser, isAuthConfigured, mergeLocalStatsOnce, onAuthChange } from "../shared/supabase.js";
+
+// Statistiche e traguardi dell'account (quando loggato). Alla prima connessione
+// fonde i progressi locali nell'account (una volta), poi carica la vetrina.
+function useAccountAchievements() {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    if (!isAuthConfigured()) return undefined;
+    let active = true;
+    let unsub = () => {};
+    async function load(user) {
+      if (!user) {
+        if (active) setData(null);
+        return;
+      }
+      const unlocked = await mergeLocalStatsOnce(user.id);
+      if (unlocked && unlocked.length) notifyAchievements(unlocked);
+      const token = await getAccessToken();
+      if (!token || !active) return;
+      try {
+        const r = await fetch("/api/player/me", { headers: { Authorization: `Bearer ${token}` } });
+        if (r.ok && active) setData(await r.json());
+      } catch {
+        /* la vetrina non deve rompere l'hub */
+      }
+    }
+    getUser().then(load);
+    onAuthChange(load).then((fn) => (active ? (unsub = fn) : fn()));
+    return () => {
+      active = false;
+      unsub();
+    };
+  }, []);
+  return data;
+}
+
+function AchievementsPanel({ data }) {
+  if (!data || !Array.isArray(data.achievements) || data.achievements.length === 0) return null;
+  const list = data.achievements;
+  const unlocked = list.filter((a) => a.unlocked).length;
+  return (
+    <div className="qz-stats">
+      <p className="qz-section-eb" style={{ margin: 0 }}>Traguardi · {unlocked}/{list.length}</p>
+      <div className="achv-grid">
+        {list.map((a) => (
+          <div key={a.id} className={a.unlocked ? "achv-card" : "achv-card is-locked"}>
+            <span className="achv-card-ic" aria-hidden="true">{a.icon}</span>
+            <div>
+              <div className="achv-card-t">{a.title}</div>
+              <div className="achv-card-d">{a.description}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function loadJson(key, fallback) {
   try {
@@ -121,6 +178,7 @@ function LeaderboardPanel() {
 export default function HubApp() {
   const stats = useHubStats();
   useHubCardTracking();
+  const account = useAccountAchievements();
 
   return (
     <>
@@ -129,6 +187,7 @@ export default function HubApp() {
         <StatsPanel stats={stats} />
         <LeaderboardPanel />
       </section>
+      <AchievementsPanel data={account} />
     </>
   );
 }

@@ -92,3 +92,50 @@ export async function syncProfile() {
     return null;
   }
 }
+
+function _readJson(key) {
+  try {
+    return JSON.parse(window.localStorage.getItem(key) || "null") || {};
+  } catch {
+    return {};
+  }
+}
+
+// Fonde le statistiche locali del gioco (localStorage) nell'account, UNA sola
+// volta per account (flag one-time). I 'best' si fondono con max, i contatori con
+// somma: l'idempotenza la garantisce il flag qui, cosi' un secondo login non
+// raddoppia i contatori. Ritorna gli achievement eventualmente sbloccati.
+export async function mergeLocalStatsOnce(userId) {
+  if (!userId) return [];
+  const flag = `di-merged-into:${userId}`;
+  try {
+    if (window.localStorage.getItem(flag)) return [];
+  } catch {
+    return [];
+  }
+  const cmp = _readJson("di-compare-stats");
+  const ord = _readJson("di-order-stats");
+  const day = _readJson("di-game-stats");
+  const stats = {
+    compare: { best_streak: cmp.bestStreak || 0, rounds_played: cmp.totalRounds || 0, correct: cmp.totalCorrect || 0 },
+    order: { best_streak: Math.max(ord.bestScore3 || 0, ord.bestScore5 || 0), rounds_played: ord.totalRounds || 0 },
+    daily: { games_played: day.played || 0, wins: day.wins || 0, max_daily_streak: day.maxStreak || 0 },
+  };
+  const token = await getAccessToken();
+  if (!token) return [];
+  try {
+    const r = await fetch("/api/player/merge", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ stats }),
+    });
+    try {
+      window.localStorage.setItem(flag, "1"); // una volta sola, comunque vada
+    } catch {
+      /* noop */
+    }
+    return r.ok ? (await r.json()).achievements || [] : [];
+  } catch {
+    return [];
+  }
+}

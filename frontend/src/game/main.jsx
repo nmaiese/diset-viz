@@ -5,7 +5,7 @@ import CompareApp from "./compare.jsx";
 import OrderApp from "./order.jsx";
 import HubApp from "./hub.jsx";
 import LeaderboardApp from "./leaderboard.jsx";
-import { fetchJson, formatValue, prefersReducedMotion, trackGameEvent, SourceStrip, Modal } from "./shared.jsx";
+import { fetchJson, formatValue, prefersReducedMotion, trackGameEvent, SourceStrip, Modal, postGame, notifyAchievements } from "./shared.jsx";
 import "./game.css";
 
 const API = {
@@ -268,12 +268,9 @@ function GameApp() {
     const attempt = guesses.length + 1;
     setSubmitting(true);
     setError(null);
-    fetchJson(API.guess, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ puzzle_id: puzzle.puzzle_id, region_key: regionKey, attempt }),
-    })
+    postGame(API.guess, { puzzle_id: puzzle.puzzle_id, region_key: regionKey, attempt })
       .then((result) => {
+        notifyAchievements(result.achievements);
         const nextGuesses = [...guesses, result];
         const nextClues = result.next_clue ? [...clues, result.next_clue] : clues;
         const nextStatus = result.finished ? (result.correct ? "won" : "lost") : "playing";

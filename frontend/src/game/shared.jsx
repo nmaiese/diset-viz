@@ -22,6 +22,19 @@ export async function authHeaders() {
   }
 }
 
+// POST a un endpoint di gioco allegando il Bearer se c'e' una sessione: cosi' il
+// server puo' attribuire statistiche e achievement all'account (anonimo = nessun
+// header, comportamento invariato). Ritorna il JSON.
+export async function postGame(url, body) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`Request failed: ${url}`);
+  return res.json();
+}
+
 // Controllo login/logout Google, minimale. Non compare affatto se Supabase non
 // e' configurato (isAuthConfigured() falso), cosi' il gioco resta anonimo.
 export function AuthControl() {
@@ -128,6 +141,48 @@ export function trackGameEvent(name, params = {}) {
   }
 }
 
+// Toast di sblocco achievement in DOM puro: ogni pagina gioco monta un proprio
+// root React su un div diverso, quindi un toast imperativo appeso al body e' il
+// modo piu' semplice per mostrarlo da qualunque gioco.
+export function notifyAchievements(list) {
+  if (!Array.isArray(list) || list.length === 0) return;
+  if (typeof document === "undefined") return;
+  let stack = document.getElementById("achv-toast-stack");
+  if (!stack) {
+    stack = document.createElement("div");
+    stack.id = "achv-toast-stack";
+    stack.className = "achv-toast-stack";
+    stack.setAttribute("aria-live", "polite");
+    document.body.appendChild(stack);
+  }
+  list.forEach((achievement, index) => {
+    const toast = document.createElement("div");
+    toast.className = "achv-toast";
+    toast.setAttribute("role", "status");
+    const icon = document.createElement("span");
+    icon.className = "achv-toast-icon";
+    icon.textContent = achievement.icon || "🏅";
+    const text = document.createElement("div");
+    text.className = "achv-toast-text";
+    const kicker = document.createElement("strong");
+    kicker.textContent = "Traguardo sbloccato";
+    const title = document.createElement("span");
+    title.textContent = achievement.title || "";
+    text.appendChild(kicker);
+    text.appendChild(title);
+    toast.appendChild(icon);
+    toast.appendChild(text);
+    stack.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add("is-in"));
+    const life = 4200 + index * 400;
+    setTimeout(() => {
+      toast.classList.remove("is-in");
+      setTimeout(() => toast.remove(), 320);
+    }, life);
+    trackGameEvent("achievement_unlocked", { achievement_id: achievement.id });
+  });
+}
+
 export function SourceStrip({ year, sourceLabel, sourceUrl }) {
   return (
     <p className="quiz-source">
@@ -210,6 +265,17 @@ export function SubmitScoreModal({ mode, token, score, scoreLabel, onClose, onSu
   const [status, setStatus] = useState("idle"); // idle | sending | done | error
   const [error, setError] = useState("");
   const [rank, setRank] = useState(null);
+  // step: 'choice' (solo se auth configurata e non loggato) | 'form' | (done via status)
+  const [step, setStep] = useState(isAuthConfigured() ? "loading" : "form");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (!isAuthConfigured()) return;
+    getUser().then((u) => {
+      setUser(u);
+      setStep(u ? "form" : "choice"); // loggato -> salva sull'account; anonimo -> scelta
+    });
+  }, []);
 
   async function submit(event) {
     event.preventDefault();
@@ -250,10 +316,26 @@ export function SubmitScoreModal({ mode, token, score, scoreLabel, onClose, onSu
           </p>
           <a className="game-btn" href="/quiz/classifica">Vedi la classifica</a>
         </>
+      ) : step === "loading" ? (
+        <p>Un momento...</p>
+      ) : step === "choice" ? (
+        <div className="submit-score-choice">
+          <p>Il tuo risultato: <strong>{scoreLabel}</strong>. Come vuoi salvarlo?</p>
+          <button type="button" className="game-btn" onClick={() => signInWithGoogle()}>
+            Accedi e salvalo sul mio account
+          </button>
+          <button type="button" className="game-btn game-btn--ghost" onClick={() => setStep("form")}>
+            Solo in classifica pubblica (senza account)
+          </button>
+          <button type="button" className="game-btn game-btn--ghost" onClick={onClose}>
+            Tieni solo su questo browser
+          </button>
+        </div>
       ) : (
         <form className="submit-score-form" onSubmit={submit}>
           <p>
             Il tuo risultato: <strong>{scoreLabel}</strong>
+            {user && <> · salverai sul tuo account</>}
           </p>
           <label htmlFor="submit-score-nickname">Nickname pubblico</label>
           <input
