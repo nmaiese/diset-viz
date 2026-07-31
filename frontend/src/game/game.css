@@ -1426,3 +1426,25 @@
 .game-auth__who { color: var(--ink-soft); }
 .game-auth__btn { background: none; border: 1px solid var(--line); color: var(--ink); border-radius: 999px; padding: 5px 14px; font-size: 13px; cursor: pointer; font-weight: 600; }
 .game-auth__btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Toast di sblocco achievement (Fase 5.2), raccolto dal branch. */
+.achv-toast-stack { position: fixed; right: 16px; bottom: 16px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; max-width: min(340px, calc(100vw - 32px)); }
+.achv-toast { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--ink); color: var(--paper); border: 1px solid var(--ink); box-shadow: 0 8px 24px rgba(0,0,0,0.18); border-radius: 10px; transform: translateX(120%); opacity: 0; transition: transform .3s ease, opacity .3s ease; }
+.achv-toast.is-in { transform: translateX(0); opacity: 1; }
+.achv-toast-icon { font-size: 24px; line-height: 1; }
+.achv-toast-text { display: flex; flex-direction: column; gap: 2px; }
+.achv-toast-text strong { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); }
+.achv-toast-text span { font-family: var(--font-display); font-size: 15px; font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .achv-toast { transition: opacity .3s ease; transform: none; } }
+
+/* Vetrina traguardi nel profilo/hub (Fase 5.2). */
+.achv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+.achv-card { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.achv-card.is-locked { opacity: .5; }
+.achv-card-ic { font-size: 22px; line-height: 1; }
+.achv-card-t { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; }
+.achv-card-d { font-size: 12px; color: var(--ink-soft); line-height: 1.4; margin-top: 2px; }
+
+/* Scelta salva a 3 opzioni (Fase 5.2). */
+.submit-score-choice { display: flex; flex-direction: column; gap: 10px; }
+.submit-score-choice .game-btn { width: 100%; }
