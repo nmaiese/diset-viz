@@ -37,6 +37,25 @@ CREATE POLICY own_favorites ON public.favorites
   USING ( (auth.jwt() ->> 'sub') = auth_id )
   WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
 
+-- Stats, storico giornaliero, achievements (Fase 5.2): stessa forma own-rows.
+ALTER TABLE public.player_stats  ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS own_player_stats ON public.player_stats;
+CREATE POLICY own_player_stats ON public.player_stats
+  FOR ALL TO authenticated
+  USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
+
+ALTER TABLE public.daily_results ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS own_daily_results ON public.daily_results;
+CREATE POLICY own_daily_results ON public.daily_results
+  FOR ALL TO authenticated
+  USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
+
+ALTER TABLE public.achievements  ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS own_achievements ON public.achievements;
+CREATE POLICY own_achievements ON public.achievements
+  FOR ALL TO authenticated
+  USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
+
 -- scores: DENY-ALL deliberato per l'anon. Nessuna policy di lettura: la classifica
 -- pubblica si serve dal backend Flask, non dal browser. Funziona perche' l'app si
 -- connette come `postgres`, che ha BYPASSRLS: la RLS non lo tocca. NON aggiungere
