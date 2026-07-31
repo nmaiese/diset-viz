@@ -45,6 +45,50 @@ class Favorite(Base):
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
 
 
+class PlayerStat(Base):
+    """Aggregati di gioco per (utente, modalita'), server-authoritative (Fase 5.2).
+    Una riga per modalita' ('compare', 'order', 'daily'). Rekey da player_id ad
+    auth_id: le stesse statistiche del profilo leggero pre-Supabase, ora legate
+    all'account. Invariante: auth_id dal JWT verificato."""
+
+    __tablename__ = "player_stats"
+
+    auth_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    mode: Mapped[str] = mapped_column(Text, primary_key=True)
+    best_streak: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    rounds_played: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    correct: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    games_played: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    wins: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    current_daily_streak: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    max_daily_streak: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    last_played_at: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class DailyResult(Base):
+    """Lo storico della Regione del giorno per utente (Fase 5.2): una riga per
+    data, non sovrascrivibile (niente replay che gonfia i numeri). Alimenta la
+    streak giornaliera."""
+
+    __tablename__ = "daily_results"
+
+    auth_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    puzzle_date: Mapped[str] = mapped_column(Text, primary_key=True)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    solved: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+
+class Achievement(Base):
+    """Gli achievement sbloccati da un utente (Fase 5.2). Solo gli sblocchi: le
+    definizioni vivono nel catalogo in codice (app/achievements.py)."""
+
+    __tablename__ = "achievements"
+
+    auth_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    achievement_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    unlocked_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
 class Score(Base):
     """La classifica del quiz. Il punteggio salvato e' sempre la miglior streak
     verificata di una sessione firmata (app/quiz_tokens.py): il client non manda

@@ -1454,6 +1454,7 @@ def game_compare_answer_api():
     )
     result["session"] = _session_summary(session)
     result["token"] = token
+    result["achievements"] = _record_quiz(request, "compare", result["correct"], result["session"])
     return jsonify(result)
 
 
@@ -1492,7 +1493,59 @@ def game_order_answer_api():
     )
     result["session"] = _session_summary(session)
     result["token"] = token
+    result["achievements"] = _record_quiz(request, "order", is_perfect, result["session"])
     return jsonify(result)
+
+
+def _record_quiz(req, mode, correct, session_summary):
+    """Se la richiesta porta un JWT valido, aggiorna le statistiche account della
+    modalita' e valuta gli achievement, restituendo gli sblocchi appena ottenuti
+    (per il toast). Anonimo o DB giu' -> lista vuota, il gioco non cambia."""
+    user = auth.current_user(req.headers)
+    if not user:
+        return []
+    try:
+        from app import player_stats, achievements
+        best = (session_summary or {}).get("best", 0)
+        player_stats.record_quiz_answer(user["id"], mode, correct, best)
+        return achievements.evaluate(user["id"])
+    except Exception:  # noqa: BLE001
+        return []
+
+
+@app.route("/api/player/me")
+def player_me_api():
+    """Statistiche e traguardi dell'utente per la vetrina del profilo. Solo con
+    login (401 anonimo): non esistono stats server per gli anonimi (restano
+    locali)."""
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    from app import player_stats, achievements
+    try:
+        stats = player_stats.stats_map(user["id"])
+        unlocked = achievements.list_for(user["id"])
+    except Exception:  # noqa: BLE001
+        stats, unlocked = {}, []
+    return jsonify({"stats": stats, "achievements": unlocked})
+
+
+@app.post("/api/player/merge")
+def player_merge_api():
+    """Fonde le statistiche locali (localStorage) nell'account, UNA volta al
+    primo login (l'idempotenza la garantisce il client con un flag). Ritorna gli
+    achievement sbloccati dalla fusione."""
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    local = (request.get_json(silent=True) or {}).get("stats") or {}
+    from app import player_stats, achievements
+    try:
+        player_stats.merge_local(user["id"], local)
+        unlocked = achievements.evaluate(user["id"])
+    except Exception:  # noqa: BLE001
+        unlocked = []
+    return jsonify({"ok": True, "achievements": unlocked})
 
 
 @app.route("/api/auth/me")
@@ -1663,6 +1716,17 @@ def game_guess_api():
     result = game.evaluate_guess(puzzle_id, region_key, attempt)
     if result is None:
         abort(400)
+    # A partita finita, se loggato, registra la giornaliera e valuta i traguardi.
+    result["achievements"] = []
+    if result.get("finished"):
+        user = auth.current_user(request.headers)
+        if user:
+            try:
+                from app import player_stats, achievements
+                if player_stats.record_daily(user["id"], puzzle_id, attempt, result.get("correct")):
+                    result["achievements"] = achievements.evaluate(user["id"])
+            except Exception:  # noqa: BLE001
+                pass
     return jsonify(result)
 
 

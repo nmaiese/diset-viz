@@ -15,4 +15,7 @@ openpyxl==3.1.5
 SQLAlchemy==2.0.36
 psycopg[binary]==3.2.3
 alembic==1.14.0
-PyJWT==2.10.1
+# [crypto] tira dentro `cryptography`: senza, PyJWT NON verifica gli ES256/RS256
+# (il JWT asimmetrico di Supabase), quindi ogni richiesta autenticata cadeva a
+# 401 in produzione mentre in locale passava (cryptography gia' nel venv).
+PyJWT[crypto]==2.10.1
