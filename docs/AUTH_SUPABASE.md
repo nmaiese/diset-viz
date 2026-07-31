@@ -1,5 +1,11 @@
 # Account con Supabase (Postgres + auth)
 
+> **SUPERATO (Fase 5, 2026-07-31).** Il sistema account e' stato implementato e la
+> sua descrizione viva sta in [`ACCOUNT.md`](ACCOUNT.md). Login **Google** (non
+> magic-link), preferiti, statistiche+achievements sull'account, confronti
+> salvati, pagina account con export/cancellazione GDPR. Questo file resta come
+> storia del piano iniziale. **Non agire su questo doc: leggi `ACCOUNT.md`.**
+
 > **STATO (Fase 4, 2026-07-31).** Questo documento e' in parte **superato**
 > dall'implementazione effettiva. Cosa vale oggi, nel codice su `master`:
 > - **Auth: Google OAuth**, non magic link (email rimandata finche' non c'e' un

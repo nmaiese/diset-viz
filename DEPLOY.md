@@ -130,10 +130,18 @@ Per accendere Supabase, una volta creati il progetto e il client Google OAuth:
 |---|---|---|
 | `DATABASE_URL` | Secret Manager | Postgres app (pooler 6543 transaction). Vuota = SQLite. |
 | `DIRECT_URL` | Secret Manager | Postgres diretto (5432), solo Alembic. |
-| `SUPABASE_JWT_SECRET` | Secret Manager | Verifica HS256 dei JWT (vuoto -> JWKS). |
+| `SUPABASE_JWT_SECRET` | Secret Manager | Verifica HS256 dei JWT (vuoto -> JWKS, caso attuale). |
+| `SUPABASE_SECRET_KEY` | Secret Manager | Solo per la cancellazione account (admin API Supabase). |
 | `SUPABASE_URL` | env Cloud Run | Progetto Supabase (browser: auth + Realtime). |
 | `SUPABASE_ANON_KEY` | env Cloud Run | Chiave anon pubblica (protetta da RLS). |
 | `MONITOR_ADMIN_EMAIL` | env Cloud Run | Sola mail ammessa alla console. |
+
+Nota (Fase 5): la verifica JWT e' **ES256 via JWKS** e richiede `cryptography`
+(in `requirements.txt` come `PyJWT[crypto]`): senza, ogni richiesta autenticata
+cade a 401 in produzione. Il sistema account (login, preferiti, stats,
+achievements, confronti, GDPR) e' documentato in [`docs/ACCOUNT.md`](docs/ACCOUNT.md);
+le tabelle sono le migrazioni Alembic `0003..0006` + la RLS di
+`scripts/supabase_setup.sql`.
 
 Per ricreare il setup da zero (nuovo progetto o servizio):
 
