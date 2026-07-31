@@ -309,9 +309,9 @@ class ProvinceViewTest(unittest.TestCase):
             self.assertEqual(region_rows, 20, base)
             self.assertGreater(province_rows, 90, base)
 
-            # Il selettore del territorio a fuoco e' un select: su mobile e' il
+            # Il selettore del territorio in evidenza e' un select: su mobile e' il
             # menu a tendina con cui si sceglie una provincia.
-            self.assertIn('aria-label="Provincia a fuoco"', html)
+            self.assertIn('aria-label="Provincia in evidenza"', html)
             self.assertIn('href="' + base + '?livello=provincia"', regional.data.decode("utf-8"))
 
     def test_provincial_level_has_no_map_by_design(self):

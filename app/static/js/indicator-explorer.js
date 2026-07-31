@@ -188,7 +188,7 @@
       territorySelect.value = state.territoryKey || "";
       var label = territorySelect.closest(".cockpit-control");
       var span = label ? label.querySelector("span") : null;
-      if (span) span.textContent = lv.singular.charAt(0).toUpperCase() + lv.singular.slice(1) + " a fuoco";
+      if (span) span.textContent = lv.singular.charAt(0).toUpperCase() + lv.singular.slice(1) + " in evidenza";
     }
 
     if (yearInput) {
