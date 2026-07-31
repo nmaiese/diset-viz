@@ -282,21 +282,39 @@
     {# Level-specific: meta.year_min/year_max span every level at once, so on a
        provincial view they would claim a period the provincial series does not
        cover (10AMB011 is 2017-2020 by province, 2015-2024 by region). #}
-    <p class="data-callout"><strong>Dato più recente: {{ level.year_max }}.</strong>{% if level.year_min != level.year_max %} La serie copre il periodo {{ level.year_min }}-{{ level.year_max }}.{% endif %} Fonte <a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>.</p>
+    <div class="apparatus-grid">
+      <div class="apparatus-card">
+        <h3>Dato più recente</h3>
+        <p class="apparatus-card__big">{{ level.year_max }}</p>
+        <p class="apparatus-card__note">{% if level.year_min != level.year_max %}La serie copre il periodo {{ level.year_min }}-{{ level.year_max }}. {% endif %}Fonte <a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>.</p>
+      </div>
 
-    {# How we compute, not what the source measures. It stays here so an authored
-       "limiti" section can never drop it. #}
-    <p>La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica di misurazione:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni.</p>
+      {# How we compute, not what the source measures. It stays here so an authored
+         "limiti" section can never drop it. #}
+      <div class="apparatus-card">
+        <h3>Come è calcolato</h3>
+        <p class="apparatus-card__note">La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni.</p>
+      </div>
 
-    {% if meta.quality_life_scored %}
-    <p>Questa serie entra nel punteggio regionale della qualità della vita{% if meta.quality_life_category_label %}, nella categoria {{ meta.quality_life_category_label }}{% endif %}. Il punteggio ordina i dati, non sostituisce l'interpretazione del contesto territoriale.</p>
-    {% elif meta.family in ('bes', 'multiscopo') %}
-    <p>Questa serie resta descrittiva e non entra nel punteggio della qualità della vita, per evitare sovrapposizioni con altri indicatori o interpretazioni arbitrarie.</p>
-    {% endif %}
+      {% if meta.quality_life_scored %}
+      <div class="apparatus-card">
+        <h3>Qualità della vita</h3>
+        <p class="apparatus-card__note">Questa serie entra nel punteggio regionale della qualità della vita{% if meta.quality_life_category_label %}, nella categoria {{ meta.quality_life_category_label }}{% endif %}. Il punteggio ordina i dati, non sostituisce l'interpretazione del contesto territoriale.</p>
+      </div>
+      {% elif meta.family in ('bes', 'multiscopo') %}
+      <div class="apparatus-card">
+        <h3>Qualità della vita</h3>
+        <p class="apparatus-card__note">Questa serie resta descrittiva e non entra nel punteggio della qualità della vita, per evitare sovrapposizioni con altri indicatori o interpretazioni arbitrarie.</p>
+      </div>
+      {% endif %}
 
-    {% if meta.source_dataflow %}
-    <p class="page-note">Serie SDMX di origine: <a href="{{ meta.source_data_url or meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_dataflow }}</a>.</p>
-    {% endif %}
+      {% if meta.source_dataflow %}
+      <div class="apparatus-card">
+        <h3>Serie di origine</h3>
+        <p class="apparatus-card__note">Serie SDMX: <a href="{{ meta.source_data_url or meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_dataflow }}</a>.</p>
+      </div>
+      {% endif %}
+    </div>
 
     {% if page_article.fonti %}
     <div class="analyst-sources">
@@ -374,20 +392,24 @@
   {% if related %}
   <section class="indicator-related">
     <h2>Altri indicatori del tema {{ meta.theme }}</h2>
-    <div class="quality-table-wrap">
-      <table class="data-table indicator-related__table">
-        <thead><tr><th>Indicatore</th><th>Come si legge</th><th class="num">Ultimo dato</th></tr></thead>
-        <tbody>
-          {% for item in related %}
-          <tr>
-            <td><a href="{{ item.path }}">{{ item.name }}</a></td>
-            <td>{% if item.direction == 'higher_better' %}più alto è meglio{% elif item.direction in ('lower_better', 'higher_worse') %}più basso è meglio{% else %}senza direzione univoca{% endif %}</td>
-            <td class="num">{{ item.year_max }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    <ul class="indicator-related__grid">
+      {% for item in related %}
+      {% if item.direction == 'higher_better' %}{% set dcls = 'up' %}{% set dlabel = 'meglio se alto' %}
+      {% elif item.direction in ('lower_better', 'higher_worse') %}{% set dcls = 'down' %}{% set dlabel = 'meglio se basso' %}
+      {% else %}{% set dcls = 'flat' %}{% set dlabel = 'senza direzione' %}{% endif %}
+      <li class="related-card related-card--{{ dcls }}">
+        <a class="related-card__link" href="{{ item.path }}">
+          <span class="related-card__name">{{ item.name }}</span>
+          <span class="related-card__spark">{{ item.spark | sparkline }}</span>
+          <span class="related-card__foot">
+            {% if item.latest is not none %}<b class="related-card__value">{{ item.latest | it_num(1) }}{% if item.unit %} <small>{{ item.unit }}</small>{% endif %}</b>{% endif %}
+            <small class="related-card__year">dati {{ item.year_max }}</small>
+          </span>
+          <span class="related-card__dir">{{ dlabel }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
   </section>
   {% endif %}
 
