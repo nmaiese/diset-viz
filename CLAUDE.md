@@ -17,6 +17,7 @@ it).
 
 | se stai lavorando su... | leggi |
 | --- | --- |
+| account utente, login Google, preferiti, statistiche/achievements, confronti salvati, GDPR | [`docs/ACCOUNT.md`](docs/ACCOUNT.md) |
 | la catena autonoma, gli agenti, il cancello, le Routine | [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md) |
 | la revisione a pratica editoriale (identita', stati, transizioni, PR come vista) | [`docs/EDITORIAL_PRACTICE.md`](docs/EDITORIAL_PRACTICE.md) |
 | come apre e chiude una run un agente qualsiasi | [`docs/AGENT_CONTRACT.md`](docs/AGENT_CONTRACT.md) |

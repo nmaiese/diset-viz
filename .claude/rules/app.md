@@ -35,7 +35,15 @@ paths:
   su cio' che non dichiara altro. Fuori dalla sitemap e deliberatamente NON nel
   disallow di robots.txt: una pagina disallow non si fa mai leggere il noindex.
 - `/legacy` — la dashboard D3 originale: non romperla (`tests/integration/test_app.py`).
-- `/api/*` — catalogo, ricerca, indicatori, qualita' della vita.
+- `/account` — pagina account (noindex), si popola lato client col Bearer.
+- `/api/*` — catalogo, ricerca, indicatori, qualita' della vita, **e l'account**:
+  `/api/auth/me`, `/api/favorites`, `/api/player/{me,merge,nickname}`,
+  `/api/comparisons`, `/api/account/{export,delete}`. Tutti gli endpoint account
+  sono authed (401 anonimo) e ricavano l'`auth_id` **solo dal JWT verificato**,
+  mai dal body: la RLS e' difesa in profondita' (il backend gira BYPASSRLS), il
+  confine e' il `WHERE auth_id`. Leggere `docs/ACCOUNT.md` prima di toccarli.
+- `/_pipeline/console` — console catena in tempo reale (Supabase Realtime), su
+  `monitor.divarioitalia.it`, ristretta alla mail admin via RLS.
 
 Strato dati: `app/data.py` (legge `app/static/data/Assoluti_Regione.csv`).
 Strato blog: `app/blog.py` (legge `content/posts/*.md`).
