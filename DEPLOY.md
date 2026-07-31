@@ -27,7 +27,14 @@ gcloud run services update diset-viz --region europe-west1 \
 
 ### Quiz "Quanto conosci l'Italia?" — SECRET_KEY e classifica
 
-**Stato attuale (implementato su `nil-automata` / servizio `diset-viz`):**
+> **SUPERATO dalla Fase 4 (2026-07-31).** La classifica e lo stato vivo della
+> catena NON stanno piu' su SQLite + Litestream: sono su **Supabase Postgres**
+> (vedi la sezione "Fase 4" piu' sotto). `SECRET_KEY` resta (firma i token quiz).
+> Litestream, `LEADERBOARD_DB` in produzione e `LITESTREAM_REPLICA_URL` sono
+> **ritirati**: il testo qui sotto vale solo come storia. Il file SQLite locale
+> serve ancora solo in sviluppo (con `DATABASE_URL` vuota).
+
+**Stato storico (pre-Fase 4, non piu' in produzione):**
 
 - `SECRET_KEY` è un secret Secret Manager (`diset-viz-secret-key`), collegato al
   servizio con `--update-secrets` e leggibile dalla service account di runtime

@@ -18,8 +18,12 @@ ALTER TABLE public.scores            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pipeline_activity ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pipeline_tokens   ENABLE ROW LEVEL SECURITY;
 
--- scores: nessuna policy di lettura per l'anon (la classifica pubblica si serve
--- dal backend Flask, non dal browser). Deny-all e' il default con RLS attiva.
+-- scores: DENY-ALL deliberato per l'anon. Nessuna policy di lettura: la classifica
+-- pubblica si serve dal backend Flask, non dal browser. Funziona perche' l'app si
+-- connette come `postgres`, che ha BYPASSRLS: la RLS non lo tocca. NON aggiungere
+-- una policy anon qui e NON contare sulla RLS per proteggere scores: se un domani
+-- l'app girasse con un ruolo senza BYPASSRLS, la classifica tornerebbe vuota in
+-- silenzio (il backend ha un fallback tollerante che maschera il vuoto).
 
 -- pipeline_activity / pipeline_tokens: lettura SOLO per la mail admin.
 DROP POLICY IF EXISTS admin_reads_activity ON public.pipeline_activity;
