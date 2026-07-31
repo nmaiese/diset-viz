@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>Console catena · {{ site_name }}</title>
-    {% include "_third_party_head.html" %}
-    <script>window.__monitorAdminEmail = {{ monitor_admin_email | tojson }};</script>
+    {# Pagina admin interna: niente GTM/analytics/CMP (il banner privacy qui e'
+       rumore). Le identita' Supabase servono comunque, iniettate diritte. #}
+    <script>
+      window.__supabase = {url: {{ SUPABASE_URL | tojson }}, anonKey: {{ SUPABASE_ANON_KEY | tojson }}};
+      window.__monitorAdminEmail = {{ monitor_admin_email | tojson }};
+    </script>
     <style>
       :root { --navy:#15233b; --paper:#fbfaf7; --accent:#e4572e; --line:#d9d6cf; --ink:#15233b; --ink-soft:#5b6472; }
       * { box-sizing: border-box; }
