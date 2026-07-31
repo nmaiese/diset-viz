@@ -9,6 +9,7 @@ import {
   onAuthChange,
   signInWithGoogle,
   signOut,
+  syncProfile,
 } from "./supabase.js";
 
 export function AuthControl() {
@@ -20,8 +21,15 @@ export function AuthControl() {
     if (!isAuthConfigured()) return undefined;
     let active = true;
     let unsub = () => {};
-    getUser().then((u) => active && setUser(u));
-    onAuthChange((u) => setUser(u)).then((fn) => (active ? (unsub = fn) : fn()));
+    getUser().then((u) => {
+      if (!active) return;
+      setUser(u);
+      if (u) syncProfile(); // upsert profilo anche se il login avviene sull'atlante
+    });
+    onAuthChange((u) => {
+      setUser(u);
+      if (u) syncProfile();
+    }).then((fn) => (active ? (unsub = fn) : fn()));
     return () => {
       active = false;
       unsub();
