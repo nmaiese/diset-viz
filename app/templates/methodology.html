@@ -84,10 +84,77 @@
     <p>Le pagine fuori soglia di qualità non vengono spinte in sitemap quando l'indicatore è troppo vecchio, incompleto o duplicativo rispetto a una pagina migliore.</p>
   </section>
 
-  <section>
-    <h2>Qualità della vita</h2>
-    <p>La sezione qualità della vita seleziona indicatori dallo stesso catalogo dell'Atlante. Per le regioni combina BES nazionale e indicatori territoriali DISET, mentre per le province usa il BES dei Territori. Usa categorie curate, pesi dichiarati e normalizzazione tra territori dello stesso livello.</p>
-    <p><a href="/qualita-della-vita/metodologia">Leggi la metodologia della classifica qualità della vita</a>.</p>
+  {% set mr = methodology_regioni %}
+  {% set mp = methodology_province %}
+  <section id="qualita-della-vita">
+    <h2>Qualità della vita: come è costruita la classifica</h2>
+    <p>La classifica della qualità della vita parte dallo stesso catalogo dell'Atlante e ne documenta fonte, selezione, direzioni, copertura e pesi, così può essere verificata e discussa a partire dagli stessi dati.</p>
+
+    <h3>Un catalogo, una selezione per il punteggio</h3>
+    <p>Atlante, temi e qualità della vita partono dallo stesso catalogo. Per le regioni selezioniamo sia indicatori del BES nazionale con dati almeno al 2025, sia indicatori territoriali DISET completi e con dati almeno al 2023. Possono rientrare anche altre fonti istituzionali, come Eurostat, una volta verificati il verso e la copertura. I duplicati esatti vengono contati una sola volta. Per le province usiamo il BES dei Territori, l'unica fonte omogenea disponibile a quel livello.</p>
+
+    <h3>Cos'è uno z-score orientato</h3>
+    <p>Gli indicatori hanno unità diverse, euro, anni, percentuali, indici. Non si possono sommare così come sono. Per renderli confrontabili standardizziamo ogni indicatore dentro se stesso: misuriamo quanto ogni territorio si discosta dalla media, in deviazioni standard. A differenza del semplice ordinamento, lo z-score conserva le distanze: un divario grande resta grande, uno piccolo resta piccolo. Poi applichiamo la direzione. Per alcuni un valore alto è positivo, per esempio l'occupazione. Per altri un valore alto è negativo, per esempio la mortalità evitabile. Lo z-score orientato mette sempre il segno più dalla parte buona. In pagina lo mostriamo su una scala da 0 a 100 dove 50 è la media.</p>
+
+    {% if mr %}
+    <h3>Quali indicatori entrano</h3>
+    <p>Entrano nel punteggio solo gli indicatori con una direzione interpretabile e copertura sufficiente. La selezione regionale usa <strong>{{ mr.score_indicators_total }} indicatori</strong>: {% for s in mr.source_breakdown %}<strong>{{ s.count }}</strong> {{ s.label }}{% if not loop.last %} &middot; {% endif %}{% endfor %}. La selezione provinciale ne usa <strong>{{ mp.score_indicators_total }}</strong>. Tutti gli altri restano consultabili nell'Atlante e nelle pagine per tema, senza influire sullo score.</p>
+
+    <h3>Le categorie</h3>
+    <p>Usiamo le stesse dodici categorie dell'Atlante, inclusa una dimensione esplicita di benessere soggettivo. Nel punteggio entrano solo gli indicatori con una direzione interpretabile e una copertura sufficiente. Lo stesso schema vale per entrambi i livelli. Poiché il punteggio di una categoria è la media dei suoi indicatori, una categoria con pochi indicatori non pesa di più di una ricca solo perché contiene più misure.</p>
+    <table class="data-table">
+      <thead><tr><th>Categoria</th><th>Cosa misura</th><th class="num">Ind. regioni</th><th class="num">Ind. province</th></tr></thead>
+      <tbody>
+        {% for category in categories %}
+        <tr>
+          <td><strong>{{ category.name }}</strong></td>
+          <td>{{ category.description }}</td>
+          <td class="num">{{ mr.indicator_counts[category.slug] }}</td>
+          <td class="num">{{ mp.indicator_counts[category.slug] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+
+    <h3>Come si calcola il punteggio</h3>
+    <ul>
+      <li><strong>Punteggio indicatore</strong>: z-score orientato (segno più = meglio).</li>
+      <li><strong>Punteggio categoria</strong>: media degli z-score degli indicatori della categoria.</li>
+      <li><strong>Punteggio finale</strong>: media dei punteggi di categoria pesata secondo il profilo.</li>
+    </ul>
+    <p>Se per un territorio una categoria non ha indicatori disponibili, non blocchiamo la classifica: ridistribuiamo i pesi sulle categorie rimaste e mostriamo la copertura.</p>
+
+    <h3>I profili e il movimento</h3>
+    <p>Ogni profilo modifica i pesi delle dodici categorie, poi li normalizza a 1. Accanto al punteggio mostriamo il <strong>movimento</strong>: quante posizioni un territorio guadagna o perde rispetto al profilo Equilibrato. Il confronto rende visibile l'effetto concreto delle priorità scelte.</p>
+    <ul class="quality-category-list">
+      {% for profile in profiles %}
+      <li><h4>{{ profile.name }}</h4><p>{{ profile.description }}</p></li>
+      {% endfor %}
+    </ul>
+
+    <h3>I limiti, dichiarati</h3>
+    <p>La media di un territorio nasconde le differenze interne. Lo z-score misura una posizione relativa tra i territori, non una distanza dai valori ideali. La scelta delle categorie e dei pesi è una scelta editoriale, resa trasparente per poterla discutere. Sul livello provinciale resta un limite amministrativo: la provincia di Sud Sardegna non è presente nell'edizione usata, e le quattro province sarde soppresse prima del 2016 sono escluse.</p>
+
+    <h3>In cosa siamo diversi dal Sole 24 Ore e da ItaliaOggi</h3>
+    <p>La classifica Divario Italia è una sintesi autonoma su una selezione dichiarata di indicatori Istat. Non è la classifica del Sole 24 Ore e non usa il dataset del Sole come fonte primaria. Il nostro obiettivo è far vedere come cambia il quadro quando cambiano categorie e pesi, e dove ogni territorio eccelle.</p>
+
+    {% if quality_life_indicators %}
+    <div id="indicatori-usati">
+      <h3>Gli indicatori usati nel punteggio regionale</h3>
+      <p>Queste voci appartengono allo stesso catalogo dell'Atlante. L'etichetta della fonte distingue BES e indicatori territoriali, mentre la categoria indica dove ciascuna misura contribuisce.</p>
+      {% for category, items in quality_life_indicators | groupby('quality_life_category_label') %}
+      <h4>{{ category }}</h4>
+      <ul>
+        {% for item in items %}
+        <li><a href="{{ item.path }}">{{ item.name }}</a> <small>({{ item.catalog_family_label }}, dati {{ item.year_max }})</small></li>
+        {% endfor %}
+      </ul>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <p><a href="/qualita-della-vita/classifica/regioni">Apri la classifica e cambia profilo →</a></p>
   </section>
 
   <section>

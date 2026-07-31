@@ -800,11 +800,21 @@ def methodology():
             ),
             f"{SITE_URL}/metodologia",
         )
+    regioni = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
+    province = qb.build_bes_ranking("provincia", qb.DEFAULT_PROFILE)
     return render_template(
         "methodology.html",
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/metodologia",
+        methodology_regioni=regioni["methodology"] if regioni else None,
+        methodology_province=province["methodology"] if province else None,
+        categories=qb.get_quality_life_categories(),
+        profiles=qb.get_quality_life_profiles(),
+        quality_life_indicators=[
+            item for item in get_atlas_catalog()["indicators"]
+            if item["quality_life_scored"]
+        ],
     )
 
 
@@ -1263,22 +1273,10 @@ def quality_life_indicator_legacy(indicator_id, slug):
 
 @app.route("/qualita-della-vita/metodologia")
 def quality_life_methodology():
-    regioni = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
-    province = qb.build_bes_ranking("provincia", qb.DEFAULT_PROFILE)
-    return render_template(
-        "quality_life_methodology.html",
-        methodology_regioni=regioni["methodology"] if regioni else None,
-        methodology_province=province["methodology"] if province else None,
-        categories=qb.get_quality_life_categories(),
-        profiles=qb.get_quality_life_profiles(),
-        quality_life_indicators=[
-            item for item in get_atlas_catalog()["indicators"]
-            if item["quality_life_scored"]
-        ],
-        site_url=SITE_URL,
-        site_name=SITE_NAME,
-        canonical=f"{SITE_URL}/qualita-della-vita/metodologia",
-    )
+    # La metodologia della qualita' della vita e' stata unificata nell'unica
+    # pagina "Metodologia e fonti" (/metodologia#qualita-della-vita). Manteniamo
+    # la vecchia URL con un 301 per non perdere link e indicizzazione.
+    return redirect("/metodologia#qualita-della-vita", code=301)
 
 
 @app.route("/gioco")
@@ -1621,7 +1619,6 @@ def sitemap():
         {"loc": f"{SITE_URL}/quiz/chi-e-maggiore", "priority": "0.7"},
         {"loc": f"{SITE_URL}/quiz/ordina", "priority": "0.7"},
         {"loc": f"{SITE_URL}/qualita-della-vita", "priority": "0.8"},
-        {"loc": f"{SITE_URL}/qualita-della-vita/metodologia", "priority": "0.6"},
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
     pages.extend({"loc": item["loc"], "priority": "0.8"} for item in public_urls.quality_life_public_urls())

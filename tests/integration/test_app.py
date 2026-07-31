@@ -320,7 +320,7 @@ class AppSmokeTest(unittest.TestCase):
         for path in (
             "/", "/atlante", "/regioni", "/temi", "/qualita-della-vita",
             "/qualita-della-vita/classifica/regioni",
-            "/qualita-della-vita/metodologia", "/metodologia", "/blog",
+            "/metodologia", "/blog",
         ):
             self.assertEqual(client.get(path).headers.get("X-Robots-Tag"), expected, path)
 
