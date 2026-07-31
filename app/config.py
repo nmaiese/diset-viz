@@ -11,6 +11,25 @@ SECRET_KEY = os.getenv("SECRET_KEY", "")
 # file resta locale (WAL pieno supportato) senza bisogno di un volume condiviso.
 LEADERBOARD_DB = os.getenv("LEADERBOARD_DB", os.path.join(_REPO_ROOT, "data", "leaderboard.sqlite3"))
 
+# Il backend mutabile (classifica + stato vivo della catena). Vuoto = SQLite
+# locale ricavato da LEADERBOARD_DB (default in sviluppo, in test/CI e in
+# produzione finche' Supabase non e' provisionato): cosi' la suite gira senza un
+# server Postgres. Impostato (Supabase) = Postgres via pooler Supavisor 6543
+# transaction mode. DIRECT_URL (5432) lo usa solo Alembic per le migrazioni.
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+DIRECT_URL = os.getenv("DIRECT_URL", "")
+
+# Identita' Supabase esposte al browser (Auth Google + Realtime). Pubbliche per
+# natura (anon key protetta da RLS lato Postgres): stanno in env, non in Secret
+# Manager, e si iniettano nei template senza rebuild del frontend.
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+# Verifica del Bearer JWT lato server. HS256 con questo segreto condiviso, oppure
+# vuoto e si passa a JWKS (vedi app/auth.py). Segreto: Secret Manager.
+SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "")
+# La sola mail ammessa alla console di monitoraggio (sostituisce ?token=).
+MONITOR_ADMIN_EMAIL = os.getenv("MONITOR_ADMIN_EMAIL", "maiese.next@gmail.com")
+
 GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "")
 GOOGLE_TAG_MANAGER_ID = os.getenv("GOOGLE_TAG_MANAGER_ID", "")
 ADSENSE_CLIENT = os.getenv("ADSENSE_CLIENT", "")

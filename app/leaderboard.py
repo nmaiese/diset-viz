@@ -1,73 +1,72 @@
-"""Classifica globale del quiz, su un file SQLite (nessun server DB).
+"""Classifica globale del quiz, sul backend mutabile condiviso (Postgres in
+produzione, SQLite in test).
 
-Una connessione per chiamata: nessuna connessione condivisa tra thread, in
-linea con il modello di deploy attuale (gunicorn a più thread, un solo
-worker). Il punteggio salvato è sempre la miglior streak verificata di una
-sessione firmata (app.quiz_tokens): il client non manda mai un punteggio
-arbitrario, vedi app/views.py.
+Una Session per chiamata (vedi app/db.py): nessuna connessione condivisa tra
+thread, in linea col deploy (gunicorn a piu' thread, un solo worker). Il
+punteggio salvato e' sempre la miglior streak verificata di una sessione firmata
+(app/quiz_tokens.py): il client non manda mai un punteggio arbitrario, vedi
+app/views.py. `user_id` (opzionale) lega la riga a un account Supabase quando c'e'
+un JWT valido: il gioco resta anonimo per chi non si registra.
 """
 
 import json
-import os
-import sqlite3
+from datetime import datetime, timedelta, timezone
 
-from app import config
+from sqlalchemy import delete, func, select
+
+from app.db import session_scope
+from app.models import Score
 
 MODES = ("compare", "order")
 PERIODS = ("week", "all")
 MAX_LIMIT = 50
 DEFAULT_LIMIT = 20
 
-_SCHEMA = """
-CREATE TABLE IF NOT EXISTS scores (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  mode TEXT NOT NULL CHECK (mode IN ('compare','order')),
-  session_id TEXT NOT NULL,
-  nickname TEXT NOT NULL,
-  score INTEGER NOT NULL CHECK (score >= 1 AND score <= 10000),
-  detail TEXT NOT NULL DEFAULT '{}',
-  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now')),
-  UNIQUE (mode, session_id)
-);
-CREATE INDEX IF NOT EXISTS idx_scores_rank ON scores (mode, score DESC, created_at ASC);
-"""
+
+def _now_iso():
+    # ISO UTC con la Z finale: il confronto lessicografico e' cronologico, cosi'
+    # ordinamento e finestra settimanale non usano funzioni-tempo SQL.
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def _connect():
-    db_path = config.LEADERBOARD_DB
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
-    conn = sqlite3.connect(db_path, timeout=5)
-    conn.execute("PRAGMA busy_timeout=5000")
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA synchronous=NORMAL")
-    conn.executescript(_SCHEMA)
-    return conn
+def _week_cutoff():
+    return (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def submit(mode, session_id, nickname, score, detail=None):
-    """Upsert per (mode, session_id): un punteggio più alto sostituisce il
-    precedente, uno più basso non fa nulla (niente regressioni in classifica)."""
+def _upsert_if_higher(session, row):
+    """INSERT con ON CONFLICT(mode, session_id): un punteggio piu' alto sostituisce
+    il precedente, uno piu' basso non fa nulla (niente regressioni in classifica).
+    Atomico, un solo punto che distingue il dialetto."""
+    dialect = session.bind.dialect.name
+    if dialect == "postgresql":
+        from sqlalchemy.dialects.postgresql import insert as _insert
+    else:
+        from sqlalchemy.dialects.sqlite import insert as _insert
+    stmt = _insert(Score).values(**row)
+    stmt = stmt.on_conflict_do_update(
+        index_elements=["mode", "session_id"],
+        set_={
+            "score": stmt.excluded.score,
+            "nickname": stmt.excluded.nickname,
+            "detail": stmt.excluded.detail,
+            "user_id": stmt.excluded.user_id,
+            "created_at": stmt.excluded.created_at,
+        },
+        where=(stmt.excluded.score > Score.score),
+    )
+    session.execute(stmt)
+
+
+def submit(mode, session_id, nickname, score, detail=None, user_id=None):
+    """Upsert per (mode, session_id): sostituisce solo se il punteggio migliora."""
     if mode not in MODES:
         raise ValueError("bad_mode")
-    detail_json = json.dumps(detail or {})
-    conn = _connect()
-    try:
-        with conn:
-            conn.execute(
-                """
-                INSERT INTO scores (mode, session_id, nickname, score, detail)
-                VALUES (?, ?, ?, ?, ?)
-                ON CONFLICT(mode, session_id) DO UPDATE SET
-                  score = excluded.score,
-                  nickname = excluded.nickname,
-                  detail = excluded.detail,
-                  created_at = strftime('%Y-%m-%dT%H:%M:%SZ','now')
-                WHERE excluded.score > scores.score
-                """,
-                (mode, session_id, nickname, score, detail_json),
-            )
-    finally:
-        conn.close()
+    with session_scope() as s:
+        _upsert_if_higher(s, {
+            "mode": mode, "session_id": session_id, "nickname": nickname,
+            "score": int(score), "detail": json.dumps(detail or {}),
+            "user_id": user_id, "created_at": _now_iso(),
+        })
 
 
 def delete_entry(mode, nickname):
@@ -75,43 +74,35 @@ def delete_entry(mode, nickname):
     test, ecc). Usata dall'endpoint admin in app/views.py."""
     if mode not in MODES:
         raise ValueError("bad_mode")
-    conn = _connect()
-    try:
-        with conn:
-            cursor = conn.execute(
-                "DELETE FROM scores WHERE mode = ? AND nickname = ?", (mode, nickname)
-            )
-            return cursor.rowcount
-    finally:
-        conn.close()
+    with session_scope() as s:
+        result = s.execute(
+            delete(Score).where(Score.mode == mode, Score.nickname == nickname))
+        return result.rowcount
 
 
-def _rank(conn, mode, score, created_at, period_sql):
-    row = conn.execute(
-        f"SELECT COUNT(*) FROM scores WHERE mode = ? AND {period_sql} "
-        "AND (score > ? OR (score = ? AND created_at < ?))",
-        (mode, score, score, created_at),
-    ).fetchone()
-    return row[0] + 1
+def _rank(session, mode, score, created_at, week_cutoff=None):
+    q = select(func.count()).select_from(Score).where(Score.mode == mode)
+    if week_cutoff is not None:
+        q = q.where(Score.created_at >= week_cutoff)
+    q = q.where(
+        (Score.score > score)
+        | ((Score.score == score) & (Score.created_at < created_at)))
+    return session.execute(q).scalar_one() + 1
 
 
 def ranks_for_session(mode, session_id):
     """(rank_all, rank_week) per la riga appena inviata, o (None, None) se
-    non è stata salvata (punteggio peggiore di uno già registrato)."""
-    conn = _connect()
-    try:
-        row = conn.execute(
-            "SELECT score, created_at FROM scores WHERE mode = ? AND session_id = ?",
-            (mode, session_id),
-        ).fetchone()
+    non e' stata salvata (punteggio peggiore di uno gia' registrato)."""
+    with session_scope() as s:
+        row = s.execute(
+            select(Score.score, Score.created_at)
+            .where(Score.mode == mode, Score.session_id == session_id)).first()
         if row is None:
             return None, None
         score, created_at = row
-        rank_all = _rank(conn, mode, score, created_at, "1=1")
-        rank_week = _rank(conn, mode, score, created_at, "created_at >= datetime('now','-7 days')")
+        rank_all = _rank(s, mode, score, created_at)
+        rank_week = _rank(s, mode, score, created_at, week_cutoff=_week_cutoff())
         return rank_all, rank_week
-    finally:
-        conn.close()
 
 
 def top(mode, period="all", limit=DEFAULT_LIMIT):
@@ -120,18 +111,17 @@ def top(mode, period="all", limit=DEFAULT_LIMIT):
     if period not in PERIODS:
         raise ValueError("bad_period")
     limit = max(1, min(limit, MAX_LIMIT))
-    where = "mode = ?"
-    if period == "week":
-        where += " AND created_at >= datetime('now','-7 days')"
-    conn = _connect()
-    try:
-        rows = conn.execute(
-            f"SELECT nickname, score, detail, created_at FROM scores WHERE {where} "
-            "ORDER BY score DESC, created_at ASC LIMIT ?",
-            (mode, limit),
-        ).fetchall()
-    finally:
-        conn.close()
+    with session_scope() as s:
+        q = select(Score.nickname, Score.score, Score.detail, Score.created_at) \
+            .where(Score.mode == mode)
+        if period == "week":
+            q = q.where(Score.created_at >= _week_cutoff())
+        # id ASC come ultimo criterio: due invii nello stesso secondo hanno lo
+        # stesso created_at (risoluzione al secondo, come il vecchio strftime),
+        # quindi l'ordine di inserimento fa da spareggio deterministico sui due
+        # dialetti (prima lo faceva implicitamente il rowid di SQLite).
+        q = q.order_by(Score.score.desc(), Score.created_at.asc(), Score.id.asc()).limit(limit)
+        rows = s.execute(q).all()
     return [
         {
             "rank": idx + 1,

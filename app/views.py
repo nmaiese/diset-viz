@@ -1474,7 +1474,13 @@ def leaderboard_get_api():
         limit = int(request.args.get("limit", leaderboard.DEFAULT_LIMIT))
     except ValueError:
         limit = leaderboard.DEFAULT_LIMIT
-    entries = leaderboard.top(mode, period, limit)
+    # Tollerante: la classifica ora vive su un backend di rete (Supabase), che
+    # puo' andare in pausa. Un'outage e' un widget vuoto, mai un 500 sulla pagina
+    # del gioco. Stesso pattern del vivo di /_pipeline (pipeline_state.live()).
+    try:
+        entries = leaderboard.top(mode, period, limit)
+    except Exception:  # noqa: BLE001
+        entries = []
     return jsonify({"mode": mode, "period": period, "entries": entries})
 
 

@@ -9,3 +9,10 @@ gunicorn==23.0.0
 Markdown==3.10.2
 python-frontmatter==1.3.0
 openpyxl==3.1.5
+# Backend mutabile su Postgres (Supabase in produzione, SQLite in test/CI):
+# stesso ORM sui due dialetti. psycopg v3 col driver `postgresql+psycopg`.
+# Alembic possiede lo schema Postgres; PyJWT verifica i token Supabase (Fase 4).
+SQLAlchemy==2.0.36
+psycopg[binary]==3.2.3
+alembic==1.14.0
+PyJWT==2.10.1
