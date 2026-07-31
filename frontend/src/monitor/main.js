@@ -37,7 +37,7 @@ async function boot(supabase) {
   render(supabase, user);
 }
 
-function loginView() {
+function loginView(supabase) {
   h(
     '<div class="mon-gate">' +
       "<h1>Console catena</h1>" +
@@ -45,9 +45,8 @@ function loginView() {
       '<button id="mon-login" class="mon-btn">Accedi con Google</button>' +
       "</div>"
   );
-  document.getElementById("mon-login").onclick = () => {
-    window.__supabaseClientLogin();
-  };
+  document.getElementById("mon-login").onclick = () =>
+    supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href } });
 }
 
 function deniedView(supabase, email) {
@@ -62,10 +61,12 @@ function deniedView(supabase, email) {
 }
 
 async function render(supabase, currentUser) {
-  window.__supabaseClientLogin = () =>
-    supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: window.location.href } });
+  // Ogni render riparte da zero: rimuovi eventuali canali gia' aperti, cosi' un
+  // TOKEN_REFRESHED (che rida' lo stesso utente) non accumula sottoscrizioni ne'
+  // duplica le refresh().
+  supabase.removeAllChannels();
 
-  if (!currentUser) return loginView();
+  if (!currentUser) return loginView(supabase);
   const email = (currentUser.email || "").toLowerCase();
   if (adminEmail && email !== adminEmail) return deniedView(supabase, email);
 

@@ -33,6 +33,22 @@ CREATE POLICY admin_reads_tokens ON public.pipeline_tokens
   USING ( (auth.jwt() ->> 'email') = 'maiese.next@gmail.com' );
 
 -- === Realtime: le due tabelle nella publication ===
--- Idempotente: ignora l'errore se sono gia' nella publication.
-ALTER PUBLICATION supabase_realtime ADD TABLE public.pipeline_activity;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.pipeline_tokens;
+-- ALTER PUBLICATION ... ADD TABLE NON e' idempotente: rieseguirlo su una tabella
+-- gia' presente solleva duplicate_object e aborta lo script. Lo si avvolge, cosi'
+-- l'intero file resta rieseguibile (utile mentre si itera sulla mail della policy).
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.pipeline_activity;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.pipeline_tokens;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+-- Realtime deve poter portare la riga vecchia su UPDATE/DELETE (replace_prs e
+-- close_beat cancellano: e' il percorso di scrittura dominante). REPLICA IDENTITY
+-- FULL lo garantisce.
+ALTER TABLE public.pipeline_activity REPLICA IDENTITY FULL;
+ALTER TABLE public.pipeline_tokens   REPLICA IDENTITY FULL;
