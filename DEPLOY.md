@@ -77,6 +77,53 @@ perche' il traffico e' basso e `--min-instances=0` tiene di norma un solo
 container attivo. Sotto scale multi-istanza il vivo puo' risultare per-istanza
 finche' non arriva il prossimo restore; e' un limite accettato, non un bug nuovo.
 
+### Fase 4 — Backend mutabile su Supabase (attivazione)
+
+Lo stato mutabile (classifica + vivo della catena) e' su ORM SQLAlchemy: SQLite
+finche' `DATABASE_URL` e' vuota (produzione attuale, con Litestream), Postgres di
+Supabase quando la si imposta. Il codice e' gia' in produzione, **dormiente**.
+Per accendere Supabase, una volta creati il progetto e il client Google OAuth:
+
+1. **Secret Manager** (segreti): `DATABASE_URL` (pooler 6543, transaction mode,
+   `sslmode=require`), `DIRECT_URL` (diretta 5432, per Alembic), `SUPABASE_JWT_SECRET`.
+   Collega al servizio con `--update-secrets`, come `SECRET_KEY`.
+2. **Env pubbliche** su Cloud Run: `SUPABASE_URL`, `SUPABASE_ANON_KEY`
+   (`--update-env-vars`). Opzionale `MONITOR_ADMIN_EMAIL` (default gia' giusto).
+3. **Schema**: `DIRECT_URL=... alembic upgrade head` (crea `scores`,
+   `pipeline_activity`, `pipeline_tokens`). Da fare una volta a mano, o come step
+   `alembic upgrade head` in `cloudbuild.yaml` prima del deploy (richiede
+   `availableSecrets` con `DIRECT_URL`: aggiungerlo solo quando il secret esiste,
+   altrimenti il build fallisce).
+4. **RLS + Realtime**: esegui `scripts/supabase_setup.sql` nel SQL editor del
+   progetto (attiva la RLS, la policy admin sulle tabelle pipeline, la publication
+   Realtime). Senza, la console resta vuota **senza errore**.
+5. **Migrazione righe** (PRIMA di togliere Litestream):
+   ```bash
+   gsutil cp gs://nil-automata-diset-viz-leaderboard/leaderboard <lb>.sqlite3
+   DATABASE_URL=<pooler> .venv/bin/python scripts/migrate_leaderboard_to_postgres.py --source <lb>.sqlite3
+   ```
+   Confronta i conteggi riga stampati.
+6. **Keep-alive**: un Cloud Scheduler che colpisce `GET /_keepalive` ogni poche
+   ore (tiene sveglio Supabase contro la pausa 7 giorni):
+   ```bash
+   gcloud scheduler jobs create http diset-viz-keepalive --location europe-west1 \
+     --schedule "0 */6 * * *" --uri https://divarioitalia.it/_keepalive --http-method GET
+   ```
+7. **Console**: `monitor.divarioitalia.it` (domain mapping Cloud Run + DNS) ->
+   `/_pipeline/console`, login Google ristretto alla mail admin via RLS.
+8. **Solo dopo** la verifica delle righe: rimuovi Litestream dal `Dockerfile`
+   (stage, binario, `LEADERBOARD_DB`, `LITESTREAM_REPLICA_URL`, `litestream.yml`),
+   e dismetti il bucket GCS.
+
+| Variabile | Dove | A cosa serve |
+|---|---|---|
+| `DATABASE_URL` | Secret Manager | Postgres app (pooler 6543 transaction). Vuota = SQLite. |
+| `DIRECT_URL` | Secret Manager | Postgres diretto (5432), solo Alembic. |
+| `SUPABASE_JWT_SECRET` | Secret Manager | Verifica HS256 dei JWT (vuoto -> JWKS). |
+| `SUPABASE_URL` | env Cloud Run | Progetto Supabase (browser: auth + Realtime). |
+| `SUPABASE_ANON_KEY` | env Cloud Run | Chiave anon pubblica (protetta da RLS). |
+| `MONITOR_ADMIN_EMAIL` | env Cloud Run | Sola mail ammessa alla console. |
+
 Per ricreare il setup da zero (nuovo progetto o servizio):
 
 ```bash

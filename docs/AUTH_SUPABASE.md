@@ -1,4 +1,31 @@
-# Piano di implementazione: account con Supabase (Postgres + magic link)
+# Account con Supabase (Postgres + auth)
+
+> **STATO (Fase 4, 2026-07-31).** Questo documento e' in parte **superato**
+> dall'implementazione effettiva. Cosa vale oggi, nel codice su `master`:
+> - **Auth: Google OAuth**, non magic link (email rimandata finche' non c'e' un
+>   SMTP custom: l'email di default Supabase e' rate-limited). La verifica del
+>   JWT lato server (`app/auth.py`) e' la stessa comunque.
+> - **Stato mutabile su Postgres via SQLAlchemy**: `app/db.py` (engine a due
+>   dialetti, SQLite in test/CI, Postgres in produzione quando `DATABASE_URL` e'
+>   impostata), `app/models.py`, `migrations/` (Alembic). Migrati **sia** la
+>   classifica (`app/leaderboard.py`, con `user_id` opzionale) **sia** lo stato
+>   vivo della catena (`app/pipeline_state.py`) -- quest'ultimo NON e' in questo
+>   doc originale.
+> - **Console di monitoraggio in tempo reale** (`/_pipeline/console`, sottodominio
+>   `monitor.divarioitalia.it`) via **Supabase Realtime**, con **RLS** che
+>   restringe le tabelle pipeline alla mail admin (`scripts/supabase_setup.sql`).
+>   Sostituisce il `?token=`. Anche questo e' fuori dal doc originale.
+> - **Keep-alive** (`/_keepalive` + Cloud Scheduler) contro la pausa 7 giorni.
+> - **Litestream** si ritira solo **dopo** aver migrato le righe reali
+>   (`scripts/migrate_leaderboard_to_postgres.py`) e verificato i conteggi.
+>
+> **Sezione game-account rimandata.** Achievements, `player_stats`,
+> `daily_results`, `saved_comparisons`, e il flusso `claim` descritti sotto NON
+> sono su `master`: vivono sul branch `claude/game-user-db-achievements-5rlmrx`,
+> non mergiato. Restano un piano futuro, non lo scope della Fase 4 (che tiene lo
+> `user_id` opzionale sulla classifica e nient'altro sugli account di gioco). Il
+> piano operativo vivo e'
+> `/home/nilo/.claude/plans/lavori-sul-progetto-divario-playful-peacock.md`.
 
 ## Context
 
