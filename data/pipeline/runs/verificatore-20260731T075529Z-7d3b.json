@@ -1,0 +1,19 @@
+{
+ "at": "2026-07-31T08:03:02+00:00",
+ "base_commit": "86f5275",
+ "branch": "automation/verificatore-2026-07-31-7d3b",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "86f5275",
+ "detail": [
+  "Rango 2023, salti in cima e coda, mediana, incroci ter-124/ter-168, dinamica 1995-2023 e claim esterno Istat Nord-ovest +1,7% tutti confermati; nessuna frattura di serie visibile al 2008 nonostante la nota ATECO 2007"
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 29,
+ "queue_before": 30,
+ "run_id": "verificatore-20260731T075529Z-7d3b",
+ "stage": "verificatore",
+ "summary": "Verificato ter-130 (Produttivita del lavoro nel commercio): 20 affermazioni controllate, 0 smentite, esito pulito",
+ "trigger": "manuale"
+}
