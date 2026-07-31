@@ -16,6 +16,7 @@ import {
   onAuthChange,
   signInWithGoogle,
   signOut,
+  syncProfile,
 } from "../shared/supabase.js";
 
 const root = document.getElementById("site-auth");
@@ -106,30 +107,11 @@ function escapeHtml(s) {
   );
 }
 
-// Segnala al server il login (upsert profilo + last_seen), best-effort.
-async function pingProfile() {
-  try {
-    const token = await getAccessToken();
-    if (!token) return;
-    // Seed del nickname dal locale del gioco, solo alla creazione del profilo.
-    let nick = "";
-    try {
-      nick = window.localStorage.getItem("di-nickname") || "";
-    } catch {
-      /* localStorage negato */
-    }
-    const q = nick ? `?nick=${encodeURIComponent(nick)}` : "";
-    await fetch(`/api/auth/me${q}`, { headers: { Authorization: `Bearer ${token}` } });
-  } catch {
-    /* il profilo non deve mai bloccare la UI */
-  }
-}
-
 async function render() {
   const user = await getUser();
   if (user) {
     accountControl(user);
-    pingProfile();
+    syncProfile(); // upsert profilo, best-effort
   } else {
     loginButton();
   }

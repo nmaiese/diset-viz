@@ -70,3 +70,25 @@ export async function signOut() {
   if (!c) return;
   await c.auth.signOut();
 }
+
+// Segnala al server la sessione: upsert del profilo + last_seen (best-effort).
+// Da chiamare da OGNI punto in cui il frontend conferma un login, cosi' il
+// profilo nasce ovunque ci si logghi (atlante compreso). Seed del nickname dal
+// locale del gioco solo alla creazione. Ritorna il profilo o null.
+export async function syncProfile() {
+  const token = await getAccessToken();
+  if (!token) return null;
+  let nick = "";
+  try {
+    nick = window.localStorage.getItem("di-nickname") || "";
+  } catch {
+    /* localStorage negato */
+  }
+  const q = nick ? `?nick=${encodeURIComponent(nick)}` : "";
+  try {
+    const r = await fetch(`/api/auth/me${q}`, { headers: { Authorization: `Bearer ${token}` } });
+    return r.ok ? (await r.json()).profile : null;
+  } catch {
+    return null;
+  }
+}
