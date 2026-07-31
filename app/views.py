@@ -702,6 +702,9 @@ def keepalive():
     in pausa nulla lo terrebbe caldo. Un SELECT 1 basta. Tollerante: risponde
     sempre 200, con lo stato del db, cosi' lo scheduler non allarma per un
     guasto transitorio."""
+    token = config.KEEPALIVE_TOKEN
+    if token and not hmac.compare_digest(request.headers.get("X-Keepalive-Key", ""), token):
+        abort(404)
     from sqlalchemy import text
     from app.db import get_engine
     status = "up"

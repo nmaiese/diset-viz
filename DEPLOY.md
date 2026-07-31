@@ -93,7 +93,9 @@ Per accendere Supabase, una volta creati il progetto e il client Google OAuth:
    `pipeline_activity`, `pipeline_tokens`). Da fare una volta a mano, o come step
    `alembic upgrade head` in `cloudbuild.yaml` prima del deploy (richiede
    `availableSecrets` con `DIRECT_URL`: aggiungerlo solo quando il secret esiste,
-   altrimenti il build fallisce).
+   altrimenti il build fallisce). Lo step va **solo sul deploy, mai sul test**:
+   se `DATABASE_URL`/`DIRECT_URL` finiscono nell'env dello step di test, la suite
+   punterebbe a Postgres e il gate cadrebbe.
 4. **RLS + Realtime**: esegui `scripts/supabase_setup.sql` nel SQL editor del
    progetto (attiva la RLS, la policy admin sulle tabelle pipeline, la publication
    Realtime). Senza, la console resta vuota **senza errore**.
@@ -103,11 +105,13 @@ Per accendere Supabase, una volta creati il progetto e il client Google OAuth:
    DATABASE_URL=<pooler> .venv/bin/python scripts/migrate_leaderboard_to_postgres.py --source <lb>.sqlite3
    ```
    Confronta i conteggi riga stampati.
-6. **Keep-alive**: un Cloud Scheduler che colpisce `GET /_keepalive` ogni poche
-   ore (tiene sveglio Supabase contro la pausa 7 giorni):
+6. **Keep-alive**: imposta `KEEPALIVE_TOKEN` (Secret Manager) sul servizio, poi un
+   Cloud Scheduler che colpisce `GET /_keepalive` con l'header, ogni poche ore
+   (tiene sveglio Supabase contro la pausa 7 giorni; senza header 404):
    ```bash
    gcloud scheduler jobs create http diset-viz-keepalive --location europe-west1 \
-     --schedule "0 */6 * * *" --uri https://divarioitalia.it/_keepalive --http-method GET
+     --schedule "0 */6 * * *" --uri https://divarioitalia.it/_keepalive --http-method GET \
+     --update-headers "X-Keepalive-Key=<KEEPALIVE_TOKEN>"
    ```
 7. **Console**: `monitor.divarioitalia.it` (domain mapping Cloud Run + DNS) ->
    `/_pipeline/console`, login Google ristretto alla mail admin via RLS.

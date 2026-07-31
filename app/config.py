@@ -30,6 +30,12 @@ SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "")
 # La sola mail ammessa alla console di monitoraggio (sostituisce ?token=).
 MONITOR_ADMIN_EMAIL = os.getenv("MONITOR_ADMIN_EMAIL", "maiese.next@gmail.com")
 
+# Segreto del ping di keep-alive (/_keepalive), come gli altri endpoint interni:
+# se impostato, serve l'header X-Keepalive-Key giusto, altrimenti 404. Vuoto =
+# aperto (locale). Cloud Scheduler lo manda come header. Evita che un endpoint
+# che fa lavoro sul DB e tiene caldo il container sia colpibile da chiunque.
+KEEPALIVE_TOKEN = os.getenv("KEEPALIVE_TOKEN", "")
+
 GA_MEASUREMENT_ID = os.getenv("GA_MEASUREMENT_ID", "")
 GOOGLE_TAG_MANAGER_ID = os.getenv("GOOGLE_TAG_MANAGER_ID", "")
 ADSENSE_CLIENT = os.getenv("ADSENSE_CLIENT", "")

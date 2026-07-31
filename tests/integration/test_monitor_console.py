@@ -27,6 +27,17 @@ class MonitorConsoleTest(unittest.TestCase):
         self.assertTrue(r.get_json()["ok"])
         self.assertIn("noindex", r.headers.get("X-Robots-Tag", ""))
 
+    def test_keepalive_token_gates_when_configured(self):
+        from app import config
+        saved = config.KEEPALIVE_TOKEN
+        config.KEEPALIVE_TOKEN = "secret-ping"
+        try:
+            self.assertEqual(self.client.get("/_keepalive").status_code, 404)
+            ok = self.client.get("/_keepalive", headers={"X-Keepalive-Key": "secret-ping"})
+            self.assertEqual(ok.status_code, 200)
+        finally:
+            config.KEEPALIVE_TOKEN = saved
+
     def test_monitor_subdomain_root_redirects_to_console(self):
         r = self.client.get("/", headers={"Host": "monitor.divarioitalia.it"})
         self.assertEqual(r.status_code, 302)
