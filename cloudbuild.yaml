@@ -49,7 +49,7 @@ steps:
       - '--region=europe-west1'
       - '--allow-unauthenticated'
       - '--min-instances=0'
-      - '--memory=512Mi'
+      - '--memory=1Gi'
 
 images:
   - 'europe-west1-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/diset-viz:latest'
