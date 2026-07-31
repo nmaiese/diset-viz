@@ -16,7 +16,7 @@ possiede questo modulo, su Postgres lo possiede Alembic).
 import threading
 from contextlib import contextmanager
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 
 from app import config
@@ -48,6 +48,20 @@ def _make_engine(url):
             # una connessione per thread condivisa dai molti thread di gunicorn
             connect_args={"check_same_thread": False},
         )
+
+        @event.listens_for(engine, "connect")
+        def _sqlite_pragmas(dbapi_conn, _record):
+            # Gli STESSI PRAGMA del vecchio sqlite3 grezzo. WAL non e' opzionale:
+            # nel periodo di transizione (finche' DATABASE_URL non punta a
+            # Supabase) la produzione e' ancora SQLite + Litestream, e Litestream
+            # replica solo un DB in WAL. busy_timeout tiene i molti thread di
+            # gunicorn dal cadere su "database is locked".
+            cur = dbapi_conn.cursor()
+            cur.execute("PRAGMA journal_mode=WAL")
+            cur.execute("PRAGMA busy_timeout=5000")
+            cur.execute("PRAGMA synchronous=NORMAL")
+            cur.close()
+
         # Su SQLite non c'e' Alembic: lo schema lo crea qui, idempotente.
         Base.metadata.create_all(engine)
         return engine

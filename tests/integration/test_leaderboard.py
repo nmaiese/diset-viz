@@ -1,5 +1,4 @@
 import shutil
-import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
@@ -150,14 +149,17 @@ class LeaderboardStoreTest(LeaderboardTestBase):
         self.assertEqual([row["rank"] for row in top], [1, 2, 3])
 
     def test_period_week_excludes_old_rows(self):
+        from datetime import datetime, timedelta, timezone
+
+        from app.db import session_scope
+        from app.models import Score
+        from sqlalchemy import update
+
         leaderboard.submit("compare", "sid-recent", "Elena", 3, {})
         leaderboard.submit("compare", "sid-old", "Fabio", 9, {})
-        conn = sqlite3.connect(config.LEADERBOARD_DB)
-        conn.execute(
-            "UPDATE scores SET created_at = datetime('now', '-30 days') WHERE session_id = 'sid-old'"
-        )
-        conn.commit()
-        conn.close()
+        old_stamp = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        with session_scope() as s:
+            s.execute(update(Score).where(Score.session_id == "sid-old").values(created_at=old_stamp))
 
         week = leaderboard.top("compare", "week", 10)
         self.assertEqual([row["nickname"] for row in week], ["Elena"])

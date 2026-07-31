@@ -8,12 +8,42 @@ nessuna estensione Postgres-only in queste tabelle, quindi lo stesso modello gir
 identico su SQLite (test/CI) e su Postgres (produzione).
 """
 
-from sqlalchemy import Integer, String, Text
+from sqlalchemy import CheckConstraint, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
     pass
+
+
+class Score(Base):
+    """La classifica del quiz. Il punteggio salvato e' sempre la miglior streak
+    verificata di una sessione firmata (app/quiz_tokens.py): il client non manda
+    mai un punteggio arbitrario, vedi app/views.py. `user_id` e' l'UUID
+    dell'account Supabase quando c'e' un JWT valido, nullo per gli anonimi (il
+    gioco resta anonimo per chi non si registra).
+
+    `created_at` e' una stringa ISO UTC con la Z finale, generata in Python: il
+    confronto lessicografico su ISO e' cronologico, quindi ordinamento e finestra
+    settimanale non hanno bisogno di funzioni-tempo SQL (che divergono fra i
+    dialetti). `detail` e' JSON serializzato come testo, come prima."""
+
+    __tablename__ = "scores"
+    __table_args__ = (
+        UniqueConstraint("mode", "session_id", name="uq_scores_mode_session"),
+        Index("idx_scores_rank", "mode", "score", "created_at"),
+        CheckConstraint("mode IN ('compare','order')", name="ck_scores_mode"),
+        CheckConstraint("score >= 1 AND score <= 10000", name="ck_scores_range"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    mode: Mapped[str] = mapped_column(Text, nullable=False)
+    session_id: Mapped[str] = mapped_column(Text, nullable=False)
+    nickname: Mapped[str] = mapped_column(Text, nullable=False)
+    score: Mapped[int] = mapped_column(Integer, nullable=False)
+    detail: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
+    user_id: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
 
 
 class PipelineActivity(Base):
