@@ -34,6 +34,32 @@ function hasStoredSession() {
   return false;
 }
 
+function isOAuthReturn() {
+  // Ritorno dal login Google: Supabase rimanda con ?code=... (PKCE) o
+  // #access_token=... (implicito). In quel caso DOBBIAMO inizializzare il client
+  // (anche se non c'e' ancora sessione salvata) per consumare il codice e
+  // persistere la sessione, altrimenti il login "non attacca".
+  try {
+    const s = window.location.search || "";
+    const h = window.location.hash || "";
+    return /[?&](code|error)=/.test(s) || /access_token=|error=/.test(h);
+  } catch {
+    return false;
+  }
+}
+
+function cleanOAuthUrl() {
+  // Toglie i parametri OAuth dall'URL cosi' un refresh non li ri-processa.
+  try {
+    const url = new URL(window.location.href);
+    ["code", "state", "error", "error_description"].forEach((p) => url.searchParams.delete(p));
+    url.hash = "";
+    window.history.replaceState({}, document.title, url.pathname + url.search);
+  } catch {
+    /* best effort */
+  }
+}
+
 function loginButton() {
   root.innerHTML =
     '<button type="button" class="site-auth__login" id="site-auth-login">Accedi</button>';
@@ -110,9 +136,16 @@ async function render() {
 }
 
 if (root && isAuthConfigured()) {
-  if (hasStoredSession()) {
-    // C'e' una sessione da risolvere: carica supabase e mostra l'account.
-    render();
+  if (hasStoredSession() || isOAuthReturn()) {
+    // Sessione da risolvere, o ritorno dal login da consumare: carica supabase,
+    // processa l'eventuale codice OAuth (persiste la sessione) e mostra l'account.
+    if (isOAuthReturn()) {
+      // getUser() forza l'inizializzazione del client, che con detectSessionInUrl
+      // scambia il codice e salva la sessione; poi puliamo l'URL.
+      render().then(cleanOAuthUrl);
+    } else {
+      render();
+    }
     onAuthChange(() => render());
   } else {
     // Anonimo: bottone Accedi, e NIENTE supabase caricato (onAuthChange
