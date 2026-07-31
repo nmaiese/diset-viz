@@ -1383,3 +1383,15 @@ h1, h2, h3 { font-family: var(--font-display); }
   border-radius: 50%;
   animation: spin 900ms linear infinite;
 }
+
+/* Confronti salvati (Fase 5.3). */
+.saved-cmp { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; }
+.saved-cmp__save { background: var(--accent); color: #fff; border: 0; border-radius: 999px; padding: 8px 16px; font: 600 13.5px/1 var(--font-body); cursor: pointer; }
+.saved-cmp__save:disabled { opacity: .6; cursor: default; }
+.saved-cmp__list { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.saved-cmp__label { font-size: 12.5px; color: var(--muted); }
+.saved-cmp__item { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 6px 3px 12px; }
+.saved-cmp__load { background: none; border: 0; cursor: pointer; font: 500 13px/1 var(--font-body); color: var(--ink); }
+.saved-cmp__load:hover { color: var(--accent); }
+.saved-cmp__del { background: none; border: 0; cursor: pointer; color: var(--muted); display: flex; padding: 2px; }
+.saved-cmp__del:hover { color: var(--accent); }
