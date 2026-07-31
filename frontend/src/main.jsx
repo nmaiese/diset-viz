@@ -108,8 +108,6 @@ function App() {
   const [yearFromParam, setYearFromParam] = useUrlState("yfrom");
   const [yearToParam, setYearToParam] = useUrlState("yto");
   const [favParam, setFavParam] = useUrlState("fav");
-  // I preferiti dell'utente (Set di id), null finche' non caricati / se anonimo.
-  const [favorites, setFavorites] = useState(null);
 
   const view = viewParam || INITIAL_VIEW;
   const theme = themeParam || "Tutti";
@@ -118,7 +116,6 @@ function App() {
   const showPartial = partialParam === "1";
   const macroArea = areaParam || "Tutte";
   const sourceFamily = sourceParam || "all";
-  const favOnly = favParam === "1";
   // Default to atlas, but a shared ?indicator=… link (no explicit view) opens the detail.
   const activeView =
     view === "detail"
@@ -410,6 +407,8 @@ function App() {
         setYearToParam(to === null ? null : String(to));
         trackEvent("filter_year_range", { year_from: from, year_to: to });
       }}
+      favParam={favParam}
+      setFavParam={setFavParam}
       onOpen={openIndicator}
       onMode={goToMode}
     />
@@ -790,8 +789,12 @@ function HomeMapHero({ catalog, mapData, onOpenRegion }) {
 
 function AtlasView({
   catalog, mapData, onOpenRegion, theme, setTheme, query, setQuery, sort, setSort, showPartial, setShowPartial,
-  macroArea, setMacroArea, sourceFamily, setSourceFamily, yearFrom, yearTo, setYearRange, onOpen, onMode,
+  macroArea, setMacroArea, sourceFamily, setSourceFamily, yearFrom, yearTo, setYearRange,
+  favParam, setFavParam, onOpen, onMode,
 }) {
+  // Preferiti dell'utente (Set di id), null finche' non caricati / se anonimo.
+  const [favorites, setFavorites] = useState(null);
+  const favOnly = favParam === "1";
   const [fullMin, fullMax] = useMemo(() => {
     const mins = catalog.indicators.map((i) => i.year_min);
     const maxs = catalog.indicators.map((i) => i.year_max);
