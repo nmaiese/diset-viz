@@ -1,45 +1,11 @@
 import csv
 import math
 import os
-import threading
 import unicodedata
 from collections import defaultdict
-from functools import lru_cache, wraps
+from functools import lru_cache
 
-
-def _synchronized_cache(maxsize=1):
-    """`lru_cache` che serializza anche il *calcolo*, non solo l'aggiornamento.
-
-    `lru_cache` prende il lock solo per leggere/scrivere la tabella: su un miss
-    concorrente lascia che N thread eseguano il corpo insieme. Per i loader
-    pesanti (get_rows costruisce ~110k oggetti) questo significa, all'avvio a
-    freddo sotto gunicorn (8 thread, cache vuota), otto ricostruzioni simultanee
-    del dataset: spreco di CPU e un picco di RAM di N volte la tabella. In quella
-    condizione (rebuild concorrente forzato) si e' anche riprodotto un SIGSEGV
-    nel churn di allocazione. Qui il lock avvolge l'intera chiamata, quindi un
-    solo thread costruisce e gli altri aspettano il valore memoizzato. Preserva
-    l'API di lru_cache (`cache_clear`, `cache_info`) usata da test e strumenti.
-
-    NB: questo non e' la causa del SIGSEGV intermittente della suite (~1/25),
-    che si riproduce anche single-thread e senza churn (vedi DISCOVERY_STATUS):
-    quello e' un problema del build della struttura da 110k oggetti, che la
-    Fase 2 del piano elimina spostando i dati su uno store interrogato.
-    """
-    def deco(fn):
-        cached = lru_cache(maxsize=maxsize)(fn)
-        lock = threading.Lock()
-
-        @wraps(fn)
-        def wrapper(*args, **kwargs):
-            with lock:
-                return cached(*args, **kwargs)
-
-        wrapper.cache_clear = cached.cache_clear
-        wrapper.cache_info = cached.cache_info
-        wrapper.__wrapped__ = fn
-        return wrapper
-
-    return deco
+from app.cache_util import synchronized_cache as _synchronized_cache
 
 from app import sources
 from app.external_data import enrich_indicator_metadata
