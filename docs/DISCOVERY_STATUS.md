@@ -483,12 +483,29 @@ possono fare:
   `app.indicator_view.build_indicator_view`, raggiunto da
   `pipeline_dashboard.render` mentre costruisce la vista di ogni indicatore del
   catalogo. Non è quindi un artefatto dello spegnimento dell'interprete, come si
-  era creduto: può morire anche a metà, prima di qualunque referto. La causa vera
-  resta ignota. Di conseguenza `pipeline_gate.check_suite` e `ci.yml` distinguono
+  era creduto: può morire anche a metà, prima di qualunque referto. Di
+  conseguenza `pipeline_gate.check_suite` e `ci.yml` distinguono
   tre casi e non due: `FAILED` è rosso e **non si ritenta mai** (è un bug con un
   referto, e ritentarlo sarebbe nasconderlo), `OK` con uscita non-zero è verde e
   lo si dice a voce alta, morte **senza referto** è un'assenza di risposta e si
   ritenta una volta sola, con la seconda che è definitiva.
+  - **Indagine 2026-07-31 (parziale, non risolta).** Riprodotto fuori dalla suite
+    iterando `build_indicator_view` su tutto il catalogo. Frame di morte più
+    profondo: `app.data._Row.__getitem__` (un `getattr` su oggetto `__slots__`)
+    dentro `get_indicator`. Due fatti stabiliti: (1) **non è concorrenza** — si
+    riproduce anche single-thread; (2) il trigger è il **churn di allocazione**
+    sulla struttura da ~110k oggetti `_Row` (svuotando e ricostruendo le cache
+    in loop stretto crasha; la suite reale non fa churn per-test, svuota una
+    volta sola all'import, quindi il suo 1/25 è il singolo build che ogni tanto
+    muore). Sospetto il GC durante la grande allocazione, ma **non provato**: un
+    A/B da 300 iterazioni con `gc.disable()` vs abilitato è finito pulito su
+    entrambi (tasso troppo basso per confidenza statistica in tempi ragionevoli).
+    Fix di irrobustimento applicato in `app/data.py` (`_synchronized_cache` sui
+    tre loader pesanti) che elimina un **secondo** crash, quello del rebuild
+    concorrente a freddo su gunicorn (riprodotto in modo affidabile con i thread),
+    ma **non** questo. La cura vera è la Fase 2 del piano di rifondazione: togliere
+    la struttura da 110k oggetti dalla RAM e servire i dati da uno store
+    interrogato. Fino ad allora la logica a tre casi del gate **resta**.
 - In una shell dell'utente `python3` è una funzione che rilancia il comando
   quando esce non-zero, quindi l'output di uno script che fallisce **appare due
   volte**. Non è un bug del programma.
