@@ -233,13 +233,16 @@ def sparkline(series, width=140, height=36):
     values = [p["value"] for p in points]
     lo, hi = min(values), max(values)
     span = (hi - lo) or 1.0
-    pad = 3.0
-    inner = height - 2 * pad
+    # Inset on every side so the 2px stroke and the end dot never cross the box
+    # (the card container also clips with overflow:hidden as a safety net).
+    m = 4.0
+    inner_w = width - 2 * m
+    inner_h = height - 2 * m
     n = len(points)
     coords = [
         (
-            (i / (n - 1)) * (width - 2) + 1,
-            pad + inner * (1 - (0.5 if hi == lo else (p["value"] - lo) / span)),
+            m + (i / (n - 1)) * inner_w,
+            m + inner_h * (1 - (0.5 if hi == lo else (p["value"] - lo) / span)),
         )
         for i, p in enumerate(points)
     ]
@@ -249,7 +252,7 @@ def sparkline(series, width=140, height=36):
         f'<svg class="spark" viewBox="0 0 {width} {height}" preserveAspectRatio="none" '
         f'aria-hidden="true" focusable="false">'
         f'<polyline class="spark__line" fill="none" points="{poly}"/>'
-        f'<circle class="spark__dot" cx="{lx:.1f}" cy="{ly:.1f}" r="2.5"/>'
+        f'<circle class="spark__dot" cx="{lx:.1f}" cy="{ly:.1f}" r="2"/>'
         f'</svg>'
     )
 

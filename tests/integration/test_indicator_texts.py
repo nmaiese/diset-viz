@@ -677,7 +677,7 @@ class ProseStaysOnTheLevelItWasWrittenFor(unittest.TestCase):
         from app.indicator_view import build_indicator_view
 
         client = app.test_client()
-        pattern = re.compile(r'apparatus-card__big">(\d+)</p>.*?periodo (\d+)-(\d+)', re.S)
+        pattern = re.compile(r'Dato più recente</dt>\s*<dd>(\d+), serie (\d+)-(\d+)', re.S)
         for raw_id in self.two_level:
             view = build_indicator_view("bes", raw_id)
             levels = {level["key"]: level for level in view["levels"]}

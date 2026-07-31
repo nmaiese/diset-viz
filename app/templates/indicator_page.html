@@ -282,64 +282,58 @@
     {# Level-specific: meta.year_min/year_max span every level at once, so on a
        provincial view they would claim a period the provincial series does not
        cover (10AMB011 is 2017-2020 by province, 2015-2024 by region). #}
-    <div class="apparatus-grid">
-      <div class="apparatus-card">
-        <h3>Dato più recente</h3>
-        <p class="apparatus-card__big">{{ level.year_max }}</p>
-        <p class="apparatus-card__note">{% if level.year_min != level.year_max %}La serie copre il periodo {{ level.year_min }}-{{ level.year_max }}. {% endif %}Fonte <a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>.</p>
+    <dl class="apparatus-specs">
+      <div class="apparatus-specs__row">
+        <dt>Dato più recente</dt>
+        <dd>{{ level.year_max }}{% if level.year_min != level.year_max %}, serie {{ level.year_min }}-{{ level.year_max }}{% endif %}</dd>
       </div>
-
+      <div class="apparatus-specs__row">
+        <dt>Fonte</dt>
+        <dd><a href="{{ meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_label }}</a>{% if meta.source_dataflow %} · serie SDMX <a href="{{ meta.source_data_url or meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_dataflow }}</a>{% endif %}</dd>
+      </div>
       {# How we compute, not what the source measures. It stays here so an authored
          "limiti" section can never drop it. #}
-      <div class="apparatus-card">
-        <h3>Come è calcolato</h3>
-        <p class="apparatus-card__note">La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni.</p>
+      <div class="apparatus-specs__row">
+        <dt>Come è calcolato</dt>
+        <dd>La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni.</dd>
       </div>
-
       {% if meta.quality_life_scored %}
-      <div class="apparatus-card">
-        <h3>Qualità della vita</h3>
-        <p class="apparatus-card__note">Questa serie entra nel punteggio regionale della qualità della vita{% if meta.quality_life_category_label %}, nella categoria {{ meta.quality_life_category_label }}{% endif %}. Il punteggio ordina i dati, non sostituisce l'interpretazione del contesto territoriale.</p>
+      <div class="apparatus-specs__row">
+        <dt>Qualità della vita</dt>
+        <dd>Questa serie entra nel punteggio regionale della qualità della vita{% if meta.quality_life_category_label %}, nella categoria {{ meta.quality_life_category_label }}{% endif %}. Il punteggio ordina i dati, non sostituisce l'interpretazione del contesto territoriale.</dd>
       </div>
       {% elif meta.family in ('bes', 'multiscopo') %}
-      <div class="apparatus-card">
-        <h3>Qualità della vita</h3>
-        <p class="apparatus-card__note">Questa serie resta descrittiva e non entra nel punteggio della qualità della vita, per evitare sovrapposizioni con altri indicatori o interpretazioni arbitrarie.</p>
+      <div class="apparatus-specs__row">
+        <dt>Qualità della vita</dt>
+        <dd>Questa serie resta descrittiva e non entra nel punteggio della qualità della vita, per evitare sovrapposizioni con altri indicatori o interpretazioni arbitrarie.</dd>
       </div>
       {% endif %}
-
-      {% if meta.source_dataflow %}
-      <div class="apparatus-card">
-        <h3>Serie di origine</h3>
-        <p class="apparatus-card__note">Serie SDMX: <a href="{{ meta.source_data_url or meta.source_url }}" target="_blank" rel="noopener">{{ meta.source_dataflow }}</a>.</p>
+      {% if page_article.fonti %}
+      <div class="apparatus-specs__row">
+        <dt>Fonti dell'analisi</dt>
+        <dd>
+          <ul class="apparatus-specs__list">
+            {% for fonte in page_article.fonti %}
+            <li>{% if fonte.url %}<a href="{{ fonte.url }}" target="_blank" rel="noopener">{{ fonte.testo }}</a>{% else %}{{ fonte.testo }}{% endif %}</li>
+            {% endfor %}
+          </ul>
+        </dd>
       </div>
       {% endif %}
-    </div>
-
-    {% if page_article.fonti %}
-    <div class="analyst-sources">
-      <h3>Fonti dell'analisi</h3>
-      <ul>
-        {% for fonte in page_article.fonti %}
-        <li>{% if fonte.url %}<a href="{{ fonte.url }}" target="_blank" rel="noopener">{{ fonte.testo }}</a>{% else %}{{ fonte.testo }}{% endif %}</li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-
-    {% if meta.archive %}
-    <details class="indicator-source-definition">
-      <summary>Leggi la definizione originale della fonte</summary>
-      <p>{{ meta.archive }}</p>
-      <p><a href="{{ meta.source_url }}" target="_blank" rel="noopener">Consulta la fonte {{ meta.institution or "Istat" }} →</a></p>
-    </details>
-    {% endif %}
-
-    <details class="indicator-cite-details">
-      <summary>Come citare questo dato</summary>
-      <p><strong>Dato originale:</strong> {{ meta.source_label }}{% if meta.institution and meta.institution not in meta.source_label %} ({{ meta.institution }}){% endif %}, <em>{{ meta.name }}</em>, {{ level.year_max }}. <a href="{{ meta.source_url }}" target="_blank" rel="noopener">Fonte</a>.</p>
-      <p><strong>Elaborazione e visualizzazione:</strong> Divario Italia, <a href="{{ canonical }}">{{ canonical }}</a>. Il dato non è raccolto da noi, lo ripubblichiamo dalla fonte con calcoli derivati (media, divario, classifica) e grafici.</p>
-    </details>
+      {% if meta.archive %}
+      <div class="apparatus-specs__row">
+        <dt>Definizione della fonte</dt>
+        <dd>{{ meta.archive }} <a href="{{ meta.source_url }}" target="_blank" rel="noopener">Consulta la fonte {{ meta.institution or "Istat" }} →</a></dd>
+      </div>
+      {% endif %}
+      <div class="apparatus-specs__row">
+        <dt>Come citare</dt>
+        <dd>
+          <p><strong>Dato originale:</strong> {{ meta.source_label }}{% if meta.institution and meta.institution not in meta.source_label %} ({{ meta.institution }}){% endif %}, <em>{{ meta.name }}</em>, {{ level.year_max }}. <a href="{{ meta.source_url }}" target="_blank" rel="noopener">Fonte</a>.</p>
+          <p><strong>Elaborazione e visualizzazione:</strong> Divario Italia, <a href="{{ canonical }}">{{ canonical }}</a>. Il dato non è raccolto da noi, lo ripubblichiamo dalla fonte con calcoli derivati (media, divario, classifica) e grafici.</p>
+        </dd>
+      </div>
+    </dl>
 
     <p class="page-note"><a href="/metodologia">Definizioni, confronti e limiti</a>{% if meta.quality_life_scored %} · <a href="/metodologia#qualita-della-vita">Come entra nel punteggio della qualità della vita</a>{% endif %}</p>
   </section>
@@ -402,10 +396,10 @@
           <span class="related-card__name">{{ item.name }}</span>
           <span class="related-card__spark">{{ item.spark | sparkline }}</span>
           <span class="related-card__foot">
-            {% if item.latest is not none %}<b class="related-card__value">{{ item.latest | it_num(1) }}{% if item.unit %} <small>{{ item.unit }}</small>{% endif %}</b>{% endif %}
+            {% if item.latest is not none %}<b class="related-card__value">{{ item.latest | it_num(1) }}</b>{% endif %}
             <small class="related-card__year">dati {{ item.year_max }}</small>
           </span>
-          <span class="related-card__dir">{{ dlabel }}</span>
+          <span class="related-card__dir related-card__dir--{{ dcls }}">{{ dlabel }}</span>
         </a>
       </li>
       {% endfor %}
