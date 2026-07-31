@@ -497,13 +497,6 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
           <a href="/quiz">Quiz Italia</a>
           <a href="/metodologia">Metodologia</a>
           <a href="/blog">Blog</a>
-          <a
-            href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Fonte Istat <ArrowUpRight size={13} />
-          </a>
           <span className={`nav-underline${underlineStyle.opacity ? " is-visible" : ""}`} style={underlineStyle} aria-hidden="true" />
         </nav>
         <a

@@ -83,7 +83,7 @@
         <span><b>{{ data.data_freshness.dated }}</b> da aggiornare</span>
         <span><b>{{ data.data_freshness.stale }}</b> datati</span>
       </div>
-      <p class="page-note">{{ m.score_indicators_total }} indicatori nello score. <a href="/download/quality-life/{{ url_level }}{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}">Scarica CSV</a> · <a href="/download/quality-life/{{ url_level }}.json{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}">JSON</a> · <a href="/qualita-della-vita/metodologia">metodologia</a></p>
+      <p class="page-note">{{ m.score_indicators_total }} indicatori nello score. <a href="/download/quality-life/{{ url_level }}{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}">Scarica CSV</a> · <a href="/download/quality-life/{{ url_level }}.json{{ '?profilo=' ~ active_profile if active_profile != default_profile else '' }}">JSON</a> · <a href="/metodologia#qualita-della-vita">metodologia</a></p>
     </div>
   </div>
 
@@ -183,7 +183,7 @@
           <small>Continua</small>
           <strong>Metodologia e pesi delle categorie</strong>
         </span>
-        <a href="/qualita-della-vita/metodologia">Apri →</a>
+        <a href="/metodologia#qualita-della-vita">Apri →</a>
       </aside>
     </aside>
   </div>
@@ -213,6 +213,6 @@
   <p class="quality-note">Copertura: {{ data.ranking | length }} province. Sud Sardegna non è presente in questa edizione del BES. Le quattro province sarde soppresse prima del 2016 sono escluse.</p>
   {% endif %}
 
-  <p class="quality-note quality-disclaimer">Sintesi autonoma sugli indicatori selezionati dal catalogo federato ({{ m.catalog_institutions }}), con z-score orientato tra territori dello stesso livello. Categorie e direzioni sono curate ma rivedibili. Non è la classifica del Sole 24 Ore. <a href="/qualita-della-vita/metodologia">Metodologia</a>.</p>
+  <p class="quality-note quality-disclaimer">Sintesi autonoma sugli indicatori selezionati dal catalogo federato ({{ m.catalog_institutions }}), con z-score orientato tra territori dello stesso livello. Categorie e direzioni sono curate ma rivedibili. Non è la classifica del Sole 24 Ore. <a href="/metodologia#qualita-della-vita">Metodologia</a>.</p>
 </article>
 {% endblock %}

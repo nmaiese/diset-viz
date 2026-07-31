@@ -24,7 +24,12 @@ class QualityLifeStaticTest(unittest.TestCase):
         self.assertEqual(index.status_code, 200)
         self.assertIn(b"application/ld+json", index.data)
 
-        methodology = client.get("/qualita-della-vita/metodologia")
+        # La metodologia qualita' della vita e' stata unificata in /metodologia:
+        # la vecchia URL fa 301 verso la sezione ancorata.
+        redirect = client.get("/qualita-della-vita/metodologia")
+        self.assertEqual(redirect.status_code, 301)
+        self.assertIn("/metodologia", redirect.headers.get("Location", ""))
+        methodology = client.get("/qualita-della-vita/metodologia", follow_redirects=True)
         self.assertEqual(methodology.status_code, 200)
         self.assertIn("Sole 24 Ore".encode("utf-8"), methodology.data)
         self.assertIn("z-score".encode("utf-8"), methodology.data)
@@ -34,7 +39,7 @@ class QualityLifeStaticTest(unittest.TestCase):
         for path in (
             "/qualita-della-vita",
             "/qualita-della-vita/classifica/regioni",
-            "/qualita-della-vita/metodologia",
+            "/metodologia",
         ):
             page = client.get(path)
             self.assertEqual(page.status_code, 200, path)
