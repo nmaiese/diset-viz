@@ -1,0 +1,19 @@
+{
+ "at": "2026-07-31T08:17:00+00:00",
+ "base_commit": "2bc1704",
+ "branch": "automation/producer-2026-07-31-91b8",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "df6d6e3",
+ "detail": [
+  "Cura: nessuna modifica, verso contextual gia' confermato il 2026-07-26 e verificato di nuovo sui dati 2025 (Liguria 48,30 in cima, Campania 32,70 in fondo, nessuno dei due estremi e' un meglio), categoria salute_cura, score_eligible false, description 146 caratteri. Smentita 1 (grave, quadro): 'una sola discontinuita' vera, ed e' in cima' era falsa, la distribuzione si spezza due volte, 3,60 punti Liguria->Friuli-Venezia Giulia e 2,80 Trentino Alto Adige->Campania contro un massimo interno di 1,70. Smentita 2 (medio, quadro): la mediana 41,10 sopra la media 40,725 indica una coda in basso, non una vetta isolata, e senza la Campania la media sale a 41,15 e scavalca la mediana. Aggiunti: distinzione dal quasi omonimo indice di dipendenza strutturale (0-14 al numeratore) col glossario Istat verificato su demo.istat.it, tre link interni (tasso di natalita', speranza di vita maschi, hub del tema) dove prima erano zero, e la chiusura del lead sul secondo capo (Campania, stacco dalla penultima da 4,20 a 2,80). 714 parole, prose_lint pulito, suite 935 test verde."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 0,
+ "queue_before": 1,
+ "run_id": "producer-20260731T075529Z-91b8",
+ "stage": "producer",
+ "summary": "dem:OLDAGEDEPR riscritto e rifirmato: assorbite le due smentite del verificatore sul quadro",
+ "trigger": "manuale"
+}
