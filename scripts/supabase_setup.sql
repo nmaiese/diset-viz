@@ -30,6 +30,13 @@ CREATE POLICY own_profile ON public.profiles
   USING ( (auth.jwt() ->> 'sub') = auth_id )
   WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
 
+ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS own_favorites ON public.favorites;
+CREATE POLICY own_favorites ON public.favorites
+  FOR ALL TO authenticated
+  USING ( (auth.jwt() ->> 'sub') = auth_id )
+  WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
+
 -- scores: DENY-ALL deliberato per l'anon. Nessuna policy di lettura: la classifica
 -- pubblica si serve dal backend Flask, non dal browser. Funziona perche' l'app si
 -- connette come `postgres`, che ha BYPASSRLS: la RLS non lo tocca. NON aggiungere

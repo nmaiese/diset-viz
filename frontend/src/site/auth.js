@@ -49,6 +49,7 @@ function accountControl(user) {
     '<span class="site-auth__label">' + escapeHtml(label) + "</span>" +
     "</button>" +
     '<div class="site-auth__dropdown" id="site-auth-dropdown" hidden>' +
+    '<a class="site-auth__item" href="/atlante?fav=1">I miei preferiti</a>' +
     '<button type="button" class="site-auth__item" id="site-auth-logout">Esci</button>' +
     "</div>" +
     "</div>";
@@ -119,3 +120,67 @@ if (root && isAuthConfigured()) {
     loginButton();
   }
 }
+
+// --- Stella preferiti sulle pagine indicatore (Fase 5.1) ---
+// Solo con login. Da anonimo un clic invita ad accedere (e solo allora carica
+// supabase). Da loggato mostra lo stato e fa toggle via /api/favorites.
+async function authFetch(url, options = {}) {
+  const token = await getAccessToken();
+  if (!token) return null;
+  return fetch(url, {
+    ...options,
+    headers: { ...(options.headers || {}), Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+  });
+}
+
+function wireFavoriteStar() {
+  const star = document.getElementById("fav-star");
+  if (!star || !isAuthConfigured()) return;
+  const indicatorId = star.getAttribute("data-indicator-id");
+  if (!indicatorId) return;
+  star.hidden = false;
+
+  function paint(on) {
+    star.setAttribute("aria-pressed", on ? "true" : "false");
+    star.classList.toggle("is-on", !!on);
+    star.textContent = on ? "★" : "☆"; // ★ / ☆
+    star.setAttribute("aria-label", on ? "Togli dai preferiti" : "Aggiungi ai preferiti");
+  }
+
+  let known = false; // stato preferito conosciuto (solo da loggato)
+
+  async function refresh() {
+    if (!hasStoredSession()) return; // anonimo: stella vuota, nessun caricamento
+    try {
+      const res = await authFetch("/api/favorites");
+      if (!res || !res.ok) return;
+      const data = await res.json();
+      known = (data.favorites || []).includes(indicatorId);
+      paint(known);
+    } catch {
+      /* niente stato: resta vuota */
+    }
+  }
+
+  star.addEventListener("click", async () => {
+    if (!hasStoredSession()) {
+      signInWithGoogle(); // carica supabase e porta al login; al ritorno si aggiorna
+      return;
+    }
+    const next = !known;
+    paint(next); // ottimistico
+    try {
+      const res = next
+        ? await authFetch("/api/favorites", { method: "POST", body: JSON.stringify({ indicator_id: indicatorId }) })
+        : await authFetch(`/api/favorites/${encodeURIComponent(indicatorId)}`, { method: "DELETE" });
+      if (!res || !res.ok) throw new Error("fav failed");
+      known = next;
+    } catch {
+      paint(!next); // rollback
+    }
+  });
+
+  refresh();
+}
+
+wireFavoriteStar();

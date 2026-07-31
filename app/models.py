@@ -32,6 +32,19 @@ class Profile(Base):
     last_seen_at: Mapped[str] = mapped_column(Text, nullable=False)
 
 
+class Favorite(Base):
+    """Un indicatore messo tra i preferiti da un utente (Fase 5.1). Chiave =
+    l'id pubblico dell'indicatore (`meta.id` / SPA `item.id`, es. "105",
+    "bes:10AMB002"), lo stesso che /api/indicator/<id> accetta. Solo con login:
+    non esistono preferiti anonimi. Invariante: `auth_id` dal JWT verificato."""
+
+    __tablename__ = "favorites"
+
+    auth_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    indicator_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
 class Score(Base):
     """La classifica del quiz. Il punteggio salvato e' sempre la miglior streak
     verificata di una sessione firmata (app/quiz_tokens.py): il client non manda

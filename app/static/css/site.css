@@ -157,15 +157,26 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   min-width: 160px; padding: 6px; z-index: 60;
 }
 .site-auth__item {
-  display: block; width: 100%; text-align: left;
+  display: block; width: 100%; text-align: left; box-sizing: border-box;
   background: none; border: 0; padding: 8px 12px; border-radius: 6px;
   cursor: pointer; color: var(--ink); font: 500 14px/1 var(--font-body);
+  text-decoration: none;
 }
 .site-auth__item:hover { background: var(--accent-soft); color: var(--accent); }
 @media (max-width: 760px) {
   .site-auth { min-width: 44px; }
   .site-auth__label { display: none; }
 }
+
+/* Stella preferiti accanto al titolo indicatore (Fase 5.1). */
+.indicator-title { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.fav-star {
+  background: none; border: 0; cursor: pointer; padding: 0 4px;
+  font-size: 26px; line-height: 1; color: var(--muted);
+  transition: color .15s, transform .1s;
+}
+.fav-star:hover { color: var(--accent); transform: scale(1.1); }
+.fav-star.is-on { color: var(--accent); }
 
 /* Mobile navigation: a hamburger in the masthead opens a full-page menu.
    Both are mobile-only (shown in the <=760px block); the site footer carries

@@ -1517,6 +1517,44 @@ def auth_me_api():
     return jsonify({"user": user, "profile": profile})
 
 
+@app.route("/api/favorites")
+def favorites_list_api():
+    """Gli id indicatore preferiti dell'utente. Solo con login (401 se anonimo):
+    non esistono preferiti anonimi. Tollerante sul DB (mai 500 sulla UI)."""
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    from app import favorites
+    try:
+        ids = favorites.list_ids(user["id"])
+    except Exception:  # noqa: BLE001
+        ids = []
+    return jsonify({"favorites": ids})
+
+
+@app.post("/api/favorites")
+def favorites_add_api():
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    indicator_id = (request.get_json(silent=True) or {}).get("indicator_id", "")
+    if not isinstance(indicator_id, str) or not indicator_id or len(indicator_id) > 64:
+        return jsonify({"error": "bad_indicator"}), 400
+    from app import favorites
+    favorites.add(user["id"], indicator_id)
+    return jsonify({"ok": True})
+
+
+@app.delete("/api/favorites/<path:indicator_id>")
+def favorites_remove_api(indicator_id):
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    from app import favorites
+    favorites.remove(user["id"], indicator_id)
+    return jsonify({"ok": True})
+
+
 @app.route("/api/game/leaderboard")
 def leaderboard_get_api():
     mode = request.args.get("mode", "")

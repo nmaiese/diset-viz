@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "re
 import { createRoot } from "react-dom/client";
 import * as d3 from "d3";
 import { AuthControl } from "./shared/AuthControl.jsx";
+import { getAccessToken, isAuthConfigured } from "./shared/supabase.js";
 import {
   AlertTriangle,
   ArrowDownRight,
@@ -106,6 +107,9 @@ function App() {
   const [sourceParam, setSourceParam] = useUrlState("source");
   const [yearFromParam, setYearFromParam] = useUrlState("yfrom");
   const [yearToParam, setYearToParam] = useUrlState("yto");
+  const [favParam, setFavParam] = useUrlState("fav");
+  // I preferiti dell'utente (Set di id), null finche' non caricati / se anonimo.
+  const [favorites, setFavorites] = useState(null);
 
   const view = viewParam || INITIAL_VIEW;
   const theme = themeParam || "Tutti";
@@ -114,6 +118,7 @@ function App() {
   const showPartial = partialParam === "1";
   const macroArea = areaParam || "Tutte";
   const sourceFamily = sourceParam || "all";
+  const favOnly = favParam === "1";
   // Default to atlas, but a shared ?indicator=… link (no explicit view) opens the detail.
   const activeView =
     view === "detail"
@@ -800,6 +805,26 @@ function AtlasView({
     return catalog.themes.filter((t) => inArea.has(t.name));
   }, [catalog, macroArea]);
 
+  // Preferiti dell'utente: caricati una volta se c'e' una sessione. Solo con
+  // login (l'endpoint da 401 agli anonimi): in quel caso favorites resta [].
+  useEffect(() => {
+    if (!isAuthConfigured()) return;
+    let active = true;
+    getAccessToken().then((token) => {
+      if (!token || !active) {
+        if (active) setFavorites(new Set());
+        return;
+      }
+      fetch("/api/favorites", { headers: { Authorization: `Bearer ${token}` } })
+        .then((r) => (r.ok ? r.json() : { favorites: [] }))
+        .then((d) => active && setFavorites(new Set(d.favorites || [])))
+        .catch(() => active && setFavorites(new Set()));
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const pool = useMemo(() => {
     let list = showPartial ? catalog.indicators : catalog.indicators.filter((i) => i.complete);
     if (sourceFamily !== "all") list = list.filter((i) => i.catalog_family === sourceFamily);
@@ -808,8 +833,10 @@ function AtlasView({
     // "Dal X" keeps series that reach back to X; "Al Y" keeps series that run up to Y.
     if (yearFrom != null) list = list.filter((i) => i.year_min <= yearFrom);
     if (yearTo != null) list = list.filter((i) => i.year_max >= yearTo);
+    // Solo preferiti: intersezione con il Set dei preferiti (vuoto se anonimo).
+    if (favOnly) list = list.filter((i) => favorites && favorites.has(String(i.id)));
     return list;
-  }, [catalog, showPartial, sourceFamily, macroArea, yearFrom, yearTo]);
+  }, [catalog, showPartial, sourceFamily, macroArea, yearFrom, yearTo, favOnly, favorites]);
 
   const themeCounts = useMemo(() => {
     const counts = new Map();
@@ -883,6 +910,9 @@ function AtlasView({
               yearFrom={yearFrom}
               yearTo={yearTo}
               setYearRange={setYearRange}
+              favOnly={favOnly}
+              setFavOnly={(on) => setFavParam(on ? "1" : null)}
+              showFav={isAuthConfigured()}
             />
             <IndicatorIndex items={filtered} onOpen={onOpen} />
           </div>
@@ -955,6 +985,7 @@ function CommandBar({
   query, setQuery, sort, setSort, showPartial, setShowPartial, count, completeTotal,
   sourceFamilies, sourceFamily, setSourceFamily,
   fullMin, fullMax, yearFrom, yearTo, setYearRange,
+  favOnly, setFavOnly, showFav,
 }) {
   const years = useMemo(() => {
     const list = [];
@@ -1047,6 +1078,16 @@ function CommandBar({
         >
           <span className="toggle__dot" /> Mostra anche parziali
         </button>
+        {showFav && (
+          <button
+            type="button"
+            className={favOnly ? "toggle is-on" : "toggle"}
+            aria-pressed={favOnly}
+            onClick={() => setFavOnly(!favOnly)}
+          >
+            <span className="toggle__dot" /> Solo preferiti
+          </button>
+        )}
       </div>
       <p className="command-bar__count">
         <strong>{count}</strong> {count === 1 ? "indicatore" : "indicatori"}

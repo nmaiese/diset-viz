@@ -75,7 +75,13 @@
     <div class="indicator-finder__results" data-search-results hidden role="listbox" aria-label="Risultati della ricerca"></div>
   </form>
 
-  <h1>{{ meta.name }}</h1>
+  <h1 class="indicator-title">
+    {{ meta.name }}
+    {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
+    <button type="button" class="fav-star" id="fav-star" data-indicator-id="{{ meta.id }}"
+            aria-pressed="false" aria-label="Aggiungi ai preferiti" title="Preferiti" hidden>☆</button>
+    {% endif %}
+  </h1>
   <p class="page-lead">{{ page_lead | analyst_html }}</p>
   <p class="page-note">{% if dataset_updated %}Fonte aggiornata il {{ dataset_updated }}. {% endif %}<a href="{{ corrections_url }}">Segnala un errore in questa scheda</a>.</p>
   {% if not meta.indexable %}
