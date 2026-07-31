@@ -24,11 +24,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/site.css') }}">
     <script src="{{ url_for('static', filename='js/nav-underline.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/menu.js') }}" defer></script>
     {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
-    <script type="module" crossorigin src="{{ url_for('static', filename='dist/assets/site.js') }}"></script>
+    <script type="module" crossorigin src="{{ asset_url('dist/assets/site.js') }}"></script>
     {% endif %}
     {% block head_extra %}{% endblock %}
   </head>

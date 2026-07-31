@@ -1548,6 +1548,87 @@ def player_merge_api():
     return jsonify({"ok": True, "achievements": unlocked})
 
 
+@app.patch("/api/player/nickname")
+def player_nickname_api():
+    """Aggiorna il nickname dell'account (moderato). Solo con login."""
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    raw = (request.get_json(silent=True) or {}).get("nickname", "")
+    nickname, err = moderation.validate_nickname(raw)
+    if err:
+        return jsonify({"error": err}), 400
+    from app import account
+    account.set_nickname(user["id"], nickname)
+    return jsonify({"ok": True, "nickname": nickname})
+
+
+@app.route("/api/comparisons")
+def comparisons_list_api():
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    from app import comparisons
+    try:
+        items = comparisons.list_for(user["id"])
+    except Exception:  # noqa: BLE001
+        items = []
+    return jsonify({"comparisons": items})
+
+
+@app.post("/api/comparisons")
+def comparisons_save_api():
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    payload = request.get_json(silent=True) or {}
+    from app import comparisons
+    item = comparisons.save(user["id"], payload.get("title", ""), payload.get("config") or {})
+    if item is None:
+        return jsonify({"error": "limit_or_invalid"}), 400
+    return jsonify({"ok": True, "comparison": item})
+
+
+@app.delete("/api/comparisons/<int:comparison_id>")
+def comparisons_delete_api(comparison_id):
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    from app import comparisons
+    comparisons.remove(user["id"], comparison_id)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/account/export")
+def account_export_api():
+    """Portabilita': tutti i dati dell'utente in JSON (download)."""
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    from app import account
+    data = account.export_data(user["id"])
+    resp = jsonify(data)
+    resp.headers["Content-Disposition"] = "attachment; filename=divario-italia-dati-account.json"
+    return resp
+
+
+@app.delete("/api/account")
+def account_delete_api():
+    """Diritto all'oblio: cancella tutte le righe dell'utente e l'utente Supabase."""
+    user = auth.current_user(request.headers)
+    if not user:
+        return jsonify({"error": "auth_required"}), 401
+    from app import account
+    return jsonify(account.delete_account(user["id"]))
+
+
+@app.route("/account")
+def account_page():
+    """La pagina account: profilo, preferiti, dati (export/cancellazione). I dati
+    sono per-utente, quindi la pagina si popola lato client col Bearer."""
+    return render_template("account.html", site_name=SITE_NAME)
+
+
 @app.route("/api/auth/me")
 def auth_me_api():
     """Chi e' l'utente di questa richiesta, secondo il Bearer JWT. Anonimo

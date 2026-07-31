@@ -1,0 +1,20 @@
+{% extends "blog_base.html" %}
+{% set active_nav = 'account' %}
+
+{% block title %}Il mio account · {{ site_name }}{% endblock %}
+{% block description %}Gestisci il tuo account Divario Italia: nickname, preferiti, traguardi, esportazione e cancellazione dei dati.{% endblock %}
+{% block head_extra %}<meta name="robots" content="noindex, nofollow">{% endblock %}
+
+{% block content %}
+<main class="prose prose-wrap article-hero">
+  <nav class="breadcrumb"><a href="/">Divario Italia</a> / Il mio account</nav>
+  <h1>Il mio account</h1>
+  {% if not (SUPABASE_URL and SUPABASE_ANON_KEY) %}
+  <p>Gli account non sono attivi.</p>
+  {% else %}
+  <div id="account-root" data-account>
+    <p class="account-loading">Un momento...</p>
+  </div>
+  {% endif %}
+</main>
+{% endblock %}

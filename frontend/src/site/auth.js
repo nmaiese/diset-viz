@@ -78,6 +78,7 @@ function accountControl(user) {
     "</button>" +
     '<div class="site-auth__dropdown" id="site-auth-dropdown" hidden>' +
     '<a class="site-auth__item" href="/atlante?fav=1">I miei preferiti</a>' +
+    '<a class="site-auth__item" href="/account">Il mio account</a>' +
     '<button type="button" class="site-auth__item" id="site-auth-logout">Esci</button>' +
     "</div>" +
     "</div>";
@@ -201,3 +202,82 @@ function wireFavoriteStar() {
 }
 
 wireFavoriteStar();
+
+// --- Pagina account (Fase 5.3) ---
+async function wireAccountPage() {
+  const el = document.getElementById("account-root");
+  if (!el || !isAuthConfigured()) return;
+  if (!hasStoredSession()) {
+    el.innerHTML =
+      '<p>Accedi per gestire il tuo account.</p>' +
+      '<button type="button" class="account-btn" id="account-login">Accedi con Google</button>';
+    const b = document.getElementById("account-login");
+    if (b) b.onclick = () => signInWithGoogle();
+    return;
+  }
+  const user = await getUser();
+  if (!user) {
+    el.innerHTML = '<p>Sessione scaduta. <button type="button" class="site-auth__login" id="account-login">Accedi</button></p>';
+    const b = document.getElementById("account-login");
+    if (b) b.onclick = () => signInWithGoogle();
+    return;
+  }
+  const [meRes, favRes, playerRes] = await Promise.all([
+    authFetch("/api/auth/me"), authFetch("/api/favorites"), authFetch("/api/player/me"),
+  ]);
+  const me = meRes && meRes.ok ? await meRes.json() : {};
+  const fav = favRes && favRes.ok ? await favRes.json() : { favorites: [] };
+  const player = playerRes && playerRes.ok ? await playerRes.json() : { achievements: [] };
+  const nickname = (me.profile && me.profile.nickname) || "";
+  const favCount = (fav.favorites || []).length;
+  const achList = player.achievements || [];
+  const achUnlocked = achList.filter((a) => a.unlocked).length;
+
+  el.innerHTML =
+    '<section class="account-block"><h2>Profilo</h2>' +
+    '<p class="account-email">' + escapeHtml(user.email || "") + "</p>" +
+    '<label for="account-nick">Nickname pubblico</label>' +
+    '<div class="account-nick-row">' +
+    '<input id="account-nick" type="text" maxlength="16" value="' + escapeHtml(nickname) + '" placeholder="Il tuo nome in classifica">' +
+    '<button type="button" class="account-btn" id="account-nick-save">Salva</button></div>' +
+    '<p class="account-nick-msg" id="account-nick-msg"></p></section>' +
+    '<section class="account-block"><h2>Preferiti</h2>' +
+    "<p>Hai <strong>" + favCount + "</strong> " + (favCount === 1 ? "indicatore preferito" : "indicatori preferiti") + ".</p>" +
+    '<a class="account-btn account-btn--ghost" href="/atlante?fav=1">Vedi nell\'atlante</a></section>' +
+    '<section class="account-block"><h2>Traguardi</h2>' +
+    "<p><strong>" + achUnlocked + "/" + achList.length + "</strong> sbloccati.</p>" +
+    '<a class="account-btn account-btn--ghost" href="/quiz">Vai ai giochi</a></section>' +
+    '<section class="account-block"><h2>I tuoi dati</h2>' +
+    '<div class="account-data-cta">' +
+    '<button type="button" class="account-btn account-btn--ghost" id="account-export">Esporta i miei dati</button>' +
+    '<button type="button" class="account-danger" id="account-delete">Elimina account</button></div>' +
+    '<p class="account-note">La cancellazione elimina definitivamente profilo, preferiti, statistiche, traguardi e punteggi, e il tuo accesso Google al sito.</p></section>';
+
+  document.getElementById("account-nick-save").onclick = async () => {
+    const msg = document.getElementById("account-nick-msg");
+    const val = document.getElementById("account-nick").value;
+    const res = await authFetch("/api/player/nickname", { method: "PATCH", body: JSON.stringify({ nickname: val }) });
+    msg.textContent = res && res.ok ? "Nickname salvato." : "Nickname non valido o non ammesso.";
+  };
+  document.getElementById("account-export").onclick = async () => {
+    const res = await authFetch("/api/account/export");
+    if (!res || !res.ok) return;
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "divario-italia-dati-account.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  document.getElementById("account-delete").onclick = async () => {
+    if (!window.confirm("Eliminare l'account e tutti i dati? L'operazione non e' reversibile.")) return;
+    const res = await authFetch("/api/account", { method: "DELETE" });
+    if (res && res.ok) {
+      await signOut();
+      window.location.href = "/";
+    }
+  };
+}
+
+wireAccountPage();

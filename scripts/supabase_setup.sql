@@ -56,6 +56,13 @@ CREATE POLICY own_achievements ON public.achievements
   FOR ALL TO authenticated
   USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
 
+-- Confronti salvati (Fase 5.3): own-rows. Niente public_slug, nessuna condivisione.
+ALTER TABLE public.saved_comparisons ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS own_saved_comparisons ON public.saved_comparisons;
+CREATE POLICY own_saved_comparisons ON public.saved_comparisons
+  FOR ALL TO authenticated
+  USING ( (auth.jwt() ->> 'sub') = auth_id ) WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
+
 -- scores: DENY-ALL deliberato per l'anon. Nessuna policy di lettura: la classifica
 -- pubblica si serve dal backend Flask, non dal browser. Funziona perche' l'app si
 -- connette come `postgres`, che ha BYPASSRLS: la RLS non lo tocca. NON aggiungere

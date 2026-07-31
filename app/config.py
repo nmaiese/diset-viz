@@ -27,6 +27,9 @@ SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
 # Verifica del Bearer JWT lato server. HS256 con questo segreto condiviso, oppure
 # vuoto e si passa a JWKS (vedi app/auth.py). Segreto: Secret Manager.
 SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "")
+# Secret key Supabase (server-side): usata SOLO per la cancellazione account
+# (admin API che elimina l'utente su Supabase Auth). Segreto: Secret Manager.
+SUPABASE_SECRET_KEY = os.getenv("SUPABASE_SECRET_KEY", "")
 # La sola mail ammessa alla console di monitoraggio (sostituisce ?token=).
 MONITOR_ADMIN_EMAIL = os.getenv("MONITOR_ADMIN_EMAIL", "maiese.next@gmail.com")
 

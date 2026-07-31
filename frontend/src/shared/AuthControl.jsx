@@ -76,6 +76,7 @@ export function AuthControl() {
         {open && (
           <div className="site-auth__dropdown">
             <a className="site-auth__item" href="/atlante?fav=1">I miei preferiti</a>
+            <a className="site-auth__item" href="/account">Il mio account</a>
             <button type="button" className="site-auth__item" onClick={() => signOut()}>
               Esci
             </button>
