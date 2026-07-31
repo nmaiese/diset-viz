@@ -21,6 +21,10 @@ export default defineConfig({
         // Console di monitoraggio (Fase 4): JS puro, solo supabase-js Realtime,
         // niente React. pipeline_console.html carica dist/assets/monitor.js.
         monitor: resolve(__dirname, "src/monitor/main.js"),
+        // Controllo login/account nel masthead (Fase 5), su ogni pagina SSR.
+        // Vanilla, supabase caricato solo se serve. blog_base.html carica
+        // dist/assets/site.js.
+        site: resolve(__dirname, "src/site/auth.js"),
       },
       output: {
         entryFileNames: "assets/[name].js",

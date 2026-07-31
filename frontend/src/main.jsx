@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import * as d3 from "d3";
+import { AuthControl } from "./shared/AuthControl.jsx";
 import {
   AlertTriangle,
   ArrowDownRight,
@@ -507,6 +508,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
         >
           <Search size={18} />
         </a>
+        <AuthControl />
       </header>
 
       <nav className="tabbar" aria-label="Navigazione principale">

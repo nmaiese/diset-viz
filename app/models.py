@@ -16,6 +16,22 @@ class Base(DeclarativeBase):
     pass
 
 
+class Profile(Base):
+    """L'account: una riga per utente Supabase, upsert al primo login (e a ogni
+    /api/auth/me, che aggiorna last_seen_at). `auth_id` e' l'UUID di auth.users
+    dal JWT verificato, mai dal body. email/nickname denormalizzati per comodita'.
+    Su tutte le tabelle account l'invariante e' la stessa: si filtra su `auth_id`
+    ricavato dal JWT, la RLS e' difesa in profondita' (il backend gira BYPASSRLS)."""
+
+    __tablename__ = "profiles"
+
+    auth_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    email: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    nickname: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    created_at: Mapped[str] = mapped_column(Text, nullable=False)
+    last_seen_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
 class Score(Base):
     """La classifica del quiz. Il punteggio salvato e' sempre la miglior streak
     verificata di una sessione firmata (app/quiz_tokens.py): il client non manda

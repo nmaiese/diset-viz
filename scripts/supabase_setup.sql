@@ -11,12 +11,24 @@
 -- anche questa mail e ri-esegui le policy.
 
 -- === RLS attiva su tutte le tabelle dell'app ===
--- Le scritture dell'app passano dalla connection string (service role / owner),
--- che bypassa la RLS: il gioco e la catena continuano a scrivere. La RLS conta
--- solo per chi entra con l'anon key dal browser.
+-- Le scritture dell'app passano dalla connection string (ruolo `postgres`,
+-- BYPASSRLS): il gioco, la catena e l'account continuano a scrivere e la RLS non
+-- li tocca. La RLS conta solo per chi entra con l'anon key dal browser, ed e'
+-- difesa in profondita': il confine per-utente vero e' il WHERE auth_id nel
+-- backend. NON contare sulla RLS per le tabelle account.
 ALTER TABLE public.scores            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pipeline_activity ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pipeline_tokens   ENABLE ROW LEVEL SECURITY;
+
+-- Tabelle account (Fase 5): RLS attiva, ogni utente vede/scrive solo le proprie
+-- righe. Il browser non interroga queste tabelle direttamente (passa dal backend);
+-- le policy sono difesa in profondita'.
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS own_profile ON public.profiles;
+CREATE POLICY own_profile ON public.profiles
+  FOR ALL TO authenticated
+  USING ( (auth.jwt() ->> 'sub') = auth_id )
+  WITH CHECK ( (auth.jwt() ->> 'sub') = auth_id );
 
 -- scores: DENY-ALL deliberato per l'anon. Nessuna policy di lettura: la classifica
 -- pubblica si serve dal backend Flask, non dal browser. Funziona perche' l'app si

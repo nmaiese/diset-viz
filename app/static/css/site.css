@@ -116,6 +116,57 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 }
 .masthead__search:hover { color: var(--ink); }
 
+/* Controllo login/account (Fase 5). Il placeholder ha spazio riservato (min-width
+   + height fissi) cosi' il bundle site.js che lo riempie non fa saltare il
+   masthead. Identita' del sito: accento unico, font di sistema. */
+.site-auth {
+  min-width: 92px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+.site-auth__login {
+  font: 600 14px/1 var(--font-body);
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.site-auth__login:hover { border-color: var(--accent); color: var(--accent); }
+.site-auth__menu { position: relative; }
+.site-auth__btn {
+  display: flex; align-items: center; gap: 8px;
+  background: none; border: 0; cursor: pointer;
+  color: var(--ink); font: 600 13px/1 var(--font-body); padding: 4px;
+}
+.site-auth__avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font: 700 13px/1 var(--font-display); flex: 0 0 auto;
+}
+.site-auth__label { max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.site-auth__dropdown {
+  position: absolute; right: 0; top: calc(100% + 6px);
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 10px; box-shadow: var(--shadow);
+  min-width: 160px; padding: 6px; z-index: 60;
+}
+.site-auth__item {
+  display: block; width: 100%; text-align: left;
+  background: none; border: 0; padding: 8px 12px; border-radius: 6px;
+  cursor: pointer; color: var(--ink); font: 500 14px/1 var(--font-body);
+}
+.site-auth__item:hover { background: var(--accent-soft); color: var(--accent); }
+@media (max-width: 760px) {
+  .site-auth { min-width: 44px; }
+  .site-auth__label { display: none; }
+}
+
 /* Mobile navigation: a hamburger in the masthead opens a full-page menu.
    Both are mobile-only (shown in the <=760px block); the site footer carries
    the same links, so navigation still works with JavaScript disabled. */
