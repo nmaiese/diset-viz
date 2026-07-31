@@ -1419,3 +1419,10 @@
 .qz-side-cta { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .qz-rules { margin: 0; padding-left: 18px; font-size: 13px; color: var(--ink-soft); line-height: 1.6; }
 
+
+/* Controllo login Google del gioco: minimale, allineato all'identita' (accento
+   unico, font di sistema del gioco). Compare solo se Supabase e' configurato. */
+.game-auth { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 13px; }
+.game-auth__who { color: var(--ink-soft); }
+.game-auth__btn { background: none; border: 1px solid var(--line); color: var(--ink); border-radius: 999px; padding: 5px 14px; font-size: 13px; cursor: pointer; font-weight: 600; }
+.game-auth__btn:hover { border-color: var(--accent); color: var(--accent); }

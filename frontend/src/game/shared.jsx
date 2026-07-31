@@ -1,7 +1,65 @@
 import React, { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import {
+  getAccessToken,
+  getUser,
+  isAuthConfigured,
+  onAuthChange,
+  signInWithGoogle,
+  signOut,
+} from "./supabase.js";
 
 const STORAGE_NICKNAME_KEY = "di-nickname";
+
+// Header Authorization con il Bearer di Supabase, se c'e' una sessione. Vuoto
+// per gli anonimi: il gioco non richiede login, l'account e' un extra.
+export async function authHeaders() {
+  try {
+    const token = await getAccessToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
+// Controllo login/logout Google, minimale. Non compare affatto se Supabase non
+// e' configurato (isAuthConfigured() falso), cosi' il gioco resta anonimo.
+export function AuthControl() {
+  const [user, setUser] = useState(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthConfigured()) return undefined;
+    let active = true;
+    getUser().then((u) => {
+      if (active) {
+        setUser(u);
+        setReady(true);
+      }
+    });
+    return onAuthChange((u) => setUser(u));
+  }, []);
+
+  if (!isAuthConfigured()) return null;
+
+  const email = user?.email || "";
+  return (
+    <div className="game-auth" data-ready={ready ? "1" : "0"}>
+      {user ? (
+        <>
+          <span className="game-auth__who">{email}</span>
+          <button type="button" className="game-auth__btn" onClick={() => signOut()}>
+            Esci
+          </button>
+        </>
+      ) : (
+        <button type="button" className="game-auth__btn" onClick={() => signInWithGoogle()}>
+          Accedi con Google
+        </button>
+      )}
+    </div>
+  );
+}
 
 export async function fetchJson(url, options) {
   const response = await fetch(url, options);
@@ -150,9 +208,11 @@ export function SubmitScoreModal({ mode, token, score, scoreLabel, onClose, onSu
     setStatus("sending");
     setError("");
     try {
+      // Se c'e' una sessione Supabase, il Bearer lega il punteggio all'account;
+      // senza, resta anonimo (il server tratta lo user_id come opzionale).
       const response = await fetch("/api/game/leaderboard", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await authHeaders()) },
         body: JSON.stringify({ token, nickname }),
       });
       const data = await response.json();

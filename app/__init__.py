@@ -39,11 +39,24 @@ _NOINDEX_EXACT_PATHS = {
 _NOINDEX_PATH_PREFIXES = ("/api/", "/download/", "/_pipeline", "/.well-known/")
 
 
+def _supabase_connect_origins():
+    # Supabase Auth (fetch REST) e Realtime (websocket) verso il progetto: vanno
+    # in connect-src, altrimenti la CSP blocca login e tick della console. Il
+    # client @supabase/supabase-js e' bundlato in locale, quindi script-src non
+    # cambia. Vuoto se Supabase non e' configurato.
+    url = (config.SUPABASE_URL or "").strip().rstrip("/")
+    if "://" not in url:
+        return ""
+    host = url.split("://", 1)[1]
+    return f" https://{host} wss://{host}"
+
+
 def _build_content_security_policy():
     # Divario Italia usa ancora diversi inline script nei template server-side,
     # quindi una CSP strict a nonce richiederebbe una refactor più ampia.
     # Per ora teniamo una allowlist esplicita che lascia lavorare GTM, GA4,
     # AdSense, Iubenda, i font Google e Tag Assistant senza blocchi.
+    supabase = _supabase_connect_origins()
     return "; ".join(
         [
             "default-src 'self'",
@@ -56,7 +69,7 @@ def _build_content_security_policy():
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.googletagmanager.com https://tagmanager.google.com https://embeds.iubenda.com https://cdn.iubenda.com https://cs.iubenda.com https://www.iubenda.com",
             "img-src 'self' data: blob: https://www.googletagmanager.com https://*.googletagmanager.com https://tagmanager.google.com https://ssl.gstatic.com https://www.gstatic.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://www.google.it https://*.google.it https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://stats.g.doubleclick.net https://*.adtrafficquality.google https://ep1.adtrafficquality.google https://idb.iubenda.com https://*.cloudflareinsights.com",
             "font-src 'self' data: https://fonts.gstatic.com",
-            "connect-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://ad.doubleclick.net https://stats.g.doubleclick.net https://*.adtrafficquality.google https://ep1.adtrafficquality.google https://cdn.iubenda.com https://idb.iubenda.com https://cpl.iubenda.com https://cs.iubenda.com https://embeds.iubenda.com https://static.cloudflareinsights.com",
+            "connect-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://ad.doubleclick.net https://stats.g.doubleclick.net https://*.adtrafficquality.google https://ep1.adtrafficquality.google https://cdn.iubenda.com https://idb.iubenda.com https://cpl.iubenda.com https://cs.iubenda.com https://embeds.iubenda.com https://static.cloudflareinsights.com" + supabase,
             "frame-src 'self' https://www.googletagmanager.com https://tagmanager.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://www.google.com https://*.google.com https://*.googletagmanager.com https://*.adtrafficquality.google https://ep2.adtrafficquality.google https://www.iubenda.com https://*.iubenda.com",
         ]
     )
@@ -127,6 +140,10 @@ def inject_site_config():
         "ENABLE_CONSENT_BANNER": config.ENABLE_CONSENT_BANNER,
         "GOOGLE_SITE_VERIFICATION": config.GOOGLE_SITE_VERIFICATION,
         "BING_SITE_VERIFICATION": config.BING_SITE_VERIFICATION,
+        # Identita' Supabase pubbliche (Auth Google + Realtime): nei template
+        # cosi' cambiarle non richiede un rebuild del frontend. Vuote = auth off.
+        "SUPABASE_URL": config.SUPABASE_URL,
+        "SUPABASE_ANON_KEY": config.SUPABASE_ANON_KEY,
     }
 
 
