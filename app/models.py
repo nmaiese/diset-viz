@@ -1,0 +1,52 @@
+"""I modelli ORM dello stato mutabile.
+
+Un solo `Base` per tutte le tabelle mutabili (stato vivo della catena, e piu'
+avanti classifica e profili). Le colonne ricalcano bit per bit lo schema SQLite
+che questi dati avevano prima della migrazione a Postgres, cosi' il passaggio e'
+uno swap di store e non un cambio di semantica: tipi larghi (TEXT/INTEGER),
+nessuna estensione Postgres-only in queste tabelle, quindi lo stesso modello gira
+identico su SQLite (test/CI) e su Postgres (produzione).
+"""
+
+from sqlalchemy import Integer, String, Text
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+class PipelineActivity(Base):
+    """Lo stato vivo del cruscotto: una riga e' un battito (`beat`) o una PR
+    aperta (`pr`). La chiave e' `beat:<run_id>` o `pr:<numero>`, come nello
+    SQLite originale, cosi' l'upsert idempotente resta sullo stesso perno."""
+
+    __tablename__ = "pipeline_activity"
+
+    key: Mapped[str] = mapped_column(Text, primary_key=True)
+    kind: Mapped[str] = mapped_column(String(8), nullable=False)
+    role: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    indicator: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    stage: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    run_id: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    pr: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    branch: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    ci: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    mergeable: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    title: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    updated_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class PipelineToken(Base):
+    """Il consumo token per run: telemetria durevole, non un battito. Tabella a
+    parte perche' i battiti scadono e si cancellano, il costo di una run e'
+    storia da tenere. Chiave = il `run_id` del ruolo, non del lanciatore."""
+
+    __tablename__ = "pipeline_tokens"
+
+    run_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    indicator: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    stage: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    role: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    updated_at: Mapped[str] = mapped_column(Text, nullable=False)
