@@ -31,6 +31,8 @@ it).
 | che cosa ha misurato il primo lotto, e il giro dopo | [`docs/WRITING_QUALITY_PLAN.md`](docs/WRITING_QUALITY_PLAN.md), Parte terza |
 | quali fonti secondarie si possono citare | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
 | cambiare modello, prompt o hook degli agenti | [`docs/CANARY.md`](docs/CANARY.md), `evals/README.md` |
+| priorita' e lacune sulle domande che un motore o un assistente puo' porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
+| tracciamento, consenso, versione GTM | [`docs/tracking_spec.md`](docs/tracking_spec.md) |
 
 Le regole con uno scope stanno in `.claude/rules/` (app, editorial, pipeline,
 frontend, data) e si caricano da sole quando tocchi i file a cui si applicano.
@@ -83,9 +85,9 @@ cd frontend && npm run build && cd ..
 .venv/bin/gunicorn run:app -b 127.0.0.1:5050
 
 # tests, audit, whitespace
-.venv/bin/python -m unittest discover -s tests -v          # tutta la suite (695 test, ~65s), prima di commit/push
-.venv/bin/python -m unittest discover -s tests/unit -v      # solo veloci (249 test, ~2s), durante lo sviluppo
-.venv/bin/python -m unittest discover -s tests/integration -v  # solo la parte pesante (446 test, ~65s): Flask/HTTP e catena e2e
+.venv/bin/python -m unittest discover -s tests -v          # tutta la suite (935 test, ~45s), prima di commit/push
+.venv/bin/python -m unittest discover -s tests/unit -v      # solo veloci (412 test, ~1s), durante lo sviluppo
+.venv/bin/python -m unittest discover -s tests/integration -v  # solo la parte pesante (523 test, ~45s): Flask/HTTP e catena e2e
 cd frontend && npm audit --audit-level=low
 git diff --check
 ```
