@@ -12,7 +12,7 @@ Sono variabili pubbliche, quindi non serve Secret Manager:
 | `SITE_URL` | `https://divarioitalia.it` | URL canonico per sitemap, canonical e blog |
 | `GOOGLE_TAG_MANAGER_ID` | `GTM-PZ45BG7D` | Contenitore per Analytics, CMP e altri tag |
 | `GA_MEASUREMENT_ID` | `G-THTPZZ02QH` | Measurement ID GA4 da usare nei tag GTM |
-| `ADSENSE_CLIENT` | `ca-pub-6806451730012282` | Google AdSense e `/ads.txt` |
+| `ADSENSE_CLIENT` | `ca-pub-6806451730012282` | Loader e meta tag Google AdSense (`/ads.txt` e' versionato nell'app) |
 | `ADSENSE_SLOT_BANNER` | `1234567890` | Slot opzionale per banner futuri |
 | `GOOGLE_SITE_VERIFICATION` | `...` | Verifica Search Console |
 | `BING_SITE_VERIFICATION` | `...` | Verifica Bing Webmaster Tools |

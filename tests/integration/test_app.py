@@ -837,19 +837,21 @@ class AppSmokeTest(unittest.TestCase):
         svg_keys = set(re.findall(r'data-key="([^"]+)"', svg))
         self.assertEqual(svg_keys, keys)
 
-    def test_ads_txt_uses_adsense_env(self):
+    def test_ads_txt_is_available_without_adsense_env(self):
+        client = app.test_client()
         from app import config
 
-        client = app.test_client()
         original_client = config.ADSENSE_CLIENT
         try:
             config.ADSENSE_CLIENT = ""
-            self.assertEqual(client.get("/ads.txt").status_code, 404)
-
-            config.ADSENSE_CLIENT = "ca-pub-1234567890123456"
             ads = client.get("/ads.txt")
             self.assertEqual(ads.status_code, 200)
-            self.assertIn(b"google.com, pub-1234567890123456, DIRECT", ads.data)
+            self.assertEqual(ads.mimetype, "text/plain")
+            self.assertEqual(
+                ads.data,
+                b"google.com, pub-6806451730012282, DIRECT, f08c47fec0942fa0\n",
+            )
+            ads.close()
         finally:
             config.ADSENSE_CLIENT = original_client
 
