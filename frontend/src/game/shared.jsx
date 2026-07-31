@@ -31,13 +31,21 @@ export function AuthControl() {
   useEffect(() => {
     if (!isAuthConfigured()) return undefined;
     let active = true;
+    let unsub = () => {};
     getUser().then((u) => {
       if (active) {
         setUser(u);
         setReady(true);
       }
     });
-    return onAuthChange((u) => setUser(u));
+    onAuthChange((u) => setUser(u)).then((fn) => {
+      if (active) unsub = fn;
+      else fn();
+    });
+    return () => {
+      active = false;
+      unsub();
+    };
   }, []);
 
   if (!isAuthConfigured()) return null;

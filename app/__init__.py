@@ -30,8 +30,21 @@ def redirect_www_to_apex():
     return redirect(target_url, code=301)
 
 
+@app.before_request
+def monitor_subdomain_to_console():
+    # Il sottodominio della console (monitor.divarioitalia.it) mappa sullo stesso
+    # servizio Cloud Run: alla radice, serve la console della catena. Le altre
+    # rotte restano raggiungibili anche da qui (nessun blocco), ma la home del
+    # sottodominio e' la console, non l'atlante.
+    host_name = request.host.partition(":")[0].lower()
+    if host_name.startswith("monitor.") and request.path == "/":
+        return redirect("/_pipeline/console", code=302)
+    return None
+
+
 _NOINDEX_EXACT_PATHS = {
     "/data", "/legacy", "/legacy-reddito", "/quiz/classifica", "/openapi.json",
+    "/_keepalive",
 }
 # `/_pipeline` e' il cruscotto interno della catena editoriale: noindex sempre,
 # e protetto da token nella view. L'underscore iniziale lo tiene fuori dallo

@@ -684,6 +684,35 @@ def pipeline_dashboard():
                            site_name=SITE_NAME)
 
 
+@app.route("/_pipeline/console")
+def pipeline_console():
+    """La console di monitoraggio in tempo reale (Supabase Realtime). Sostituisce
+    il ?token= e il full-reload di /_pipeline: la guardia e' il login Google
+    ristretto via RLS su Postgres, non un segreto in URL. La pagina e' servibile
+    a chiunque (noindex per prefisso /_pipeline), ma senza la mail admin nel JWT
+    la RLS non restituisce alcuna riga."""
+    return render_template("pipeline_console.html", site_name=SITE_NAME,
+                           monitor_admin_email=config.MONITOR_ADMIN_EMAIL)
+
+
+@app.route("/_keepalive")
+def keepalive():
+    """Ping schedulato (Cloud Scheduler) che tiene sveglio il progetto Supabase:
+    dopo 7 giorni di inattivita' il free va in pausa, e con la Routine launcher
+    in pausa nulla lo terrebbe caldo. Un SELECT 1 basta. Tollerante: risponde
+    sempre 200, con lo stato del db, cosi' lo scheduler non allarma per un
+    guasto transitorio."""
+    from sqlalchemy import text
+    from app.db import get_engine
+    status = "up"
+    try:
+        with get_engine().connect() as conn:
+            conn.execute(text("SELECT 1"))
+    except Exception:  # noqa: BLE001
+        status = "down"
+    return jsonify({"ok": True, "db": status})
+
+
 @app.post("/_pipeline/beat")
 def pipeline_beat_ingest():
     """Il vivo del cruscotto: gli agenti della catena POSTano qui i battiti.

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Console catena · {{ site_name }}</title>
+    {% include "_third_party_head.html" %}
+    <script>window.__monitorAdminEmail = {{ monitor_admin_email | tojson }};</script>
+    <style>
+      :root { --navy:#15233b; --paper:#fbfaf7; --accent:#e4572e; --line:#d9d6cf; --ink:#15233b; --ink-soft:#5b6472; }
+      * { box-sizing: border-box; }
+      body { margin:0; background:var(--paper); color:var(--ink); font-family: Inter, system-ui, sans-serif; }
+      #monitor-root { max-width: 1100px; margin: 0 auto; padding: 32px 20px 64px; }
+      h1 { font-family: Archivo, sans-serif; font-size: 26px; margin: 0; }
+      h2 { font-family: Archivo, sans-serif; font-size: 16px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 28px 0 10px; }
+      .mon-gate { text-align:center; padding: 80px 16px; }
+      .mon-msg, .mon-empty { color: var(--ink-soft); }
+      .mon-btn { background: var(--accent); color:#fff; border:0; border-radius:999px; padding:10px 22px; font-size:14px; font-weight:600; cursor:pointer; margin-top:14px; }
+      .mon-btn--ghost { background:none; color:var(--ink); border:1px solid var(--line); }
+      .mon-head { display:flex; align-items:center; gap:12px; }
+      .mon-head h1 { flex: 0 0 auto; }
+      .mon-dot { width:9px; height:9px; border-radius:50%; background:#2e9e4f; box-shadow:0 0 0 0 rgba(46,158,79,.5); animation: pulse 2s infinite; }
+      @keyframes pulse { 70%{ box-shadow:0 0 0 8px rgba(46,158,79,0);} 100%{ box-shadow:0 0 0 0 rgba(46,158,79,0);} }
+      .mon-head .mon-btn { margin: 0 0 0 auto; }
+      .mon-table { overflow-x: auto; }
+      table { width:100%; border-collapse: collapse; font-size: 13.5px; font-family: "Space Mono", ui-monospace, monospace; }
+      th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); white-space: nowrap; }
+      th { color: var(--ink-soft); font-weight:700; }
+    </style>
+  </head>
+  <body>
+    <div id="monitor-root"><p class="mon-msg">Carico...</p></div>
+    <script type="module" crossorigin src="{{ url_for('static', filename='dist/assets/monitor.js') }}"></script>
+  </body>
+</html>
