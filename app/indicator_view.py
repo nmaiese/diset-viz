@@ -519,6 +519,13 @@ def _theme_siblings(theme):
                 "path": item["path"],
                 "direction": (item.get("explain") or {}).get("direction"),
                 "year_max": item["year_max"],
+                "unit": item.get("unit"),
+                # La sparkline delle card usa la stessa serie (media nazionale
+                # ridotta a 24 punti) gia' calcolata nel catalogo; `latest` e'
+                # l'ultimo punto, l'ordine di grandezza che accompagna la curva.
+                "spark": item.get("spark") or [],
+                "latest": (item["spark"][-1]["value"]
+                           if item.get("spark") else None),
             }
             for item in get_atlas_catalog()["indicators"]
             if item["theme"] == theme

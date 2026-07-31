@@ -217,6 +217,43 @@ def prose_html(text):
     return _markdown_html(text)
 
 
+@app.template_filter("sparkline")
+def sparkline(series, width=140, height=36):
+    """Inline SVG sparkline for a {year, value} series, server-side.
+
+    The React atlas has its own <Sparkline> component, but the indicator page is
+    server-rendered Jinja: this emits the same shape (a polyline plus a dot on
+    the last point, styled by .spark in site.css) without a second bundle. The
+    viewBox is fixed and CSS sizes it; a flat series draws a centred line.
+    """
+    from markupsafe import Markup
+    points = [p for p in (series or []) if p.get("value") is not None]
+    if len(points) < 2:
+        return Markup("")
+    values = [p["value"] for p in points]
+    lo, hi = min(values), max(values)
+    span = (hi - lo) or 1.0
+    pad = 3.0
+    inner = height - 2 * pad
+    n = len(points)
+    coords = [
+        (
+            (i / (n - 1)) * (width - 2) + 1,
+            pad + inner * (1 - (0.5 if hi == lo else (p["value"] - lo) / span)),
+        )
+        for i, p in enumerate(points)
+    ]
+    poly = " ".join(f"{x:.1f},{y:.1f}" for x, y in coords)
+    lx, ly = coords[-1]
+    return Markup(
+        f'<svg class="spark" viewBox="0 0 {width} {height}" preserveAspectRatio="none" '
+        f'aria-hidden="true" focusable="false">'
+        f'<polyline class="spark__line" fill="none" points="{poly}"/>'
+        f'<circle class="spark__dot" cx="{lx:.1f}" cy="{ly:.1f}" r="2.5"/>'
+        f'</svg>'
+    )
+
+
 def get_all_data():
     filepath = os.path.join(os.path.dirname(__file__), 'static/data/Assoluti_Regione.csv')
     with open(filepath, 'r', encoding='utf8') as f:

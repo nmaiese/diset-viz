@@ -1278,3 +1278,47 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   .divari-bars li { grid-template-columns: 70px 1fr auto; }
   .divari-table { font-size: 13.5px; min-width: 520px; }
 }
+
+/* ---- Fase 7.2: apparato in schede + card correlati con sparkline (server-side) ---- */
+.indicator-apparatus .apparatus-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px; margin: 18px 0 22px;
+}
+.apparatus-card {
+  border: 1px solid var(--line); background: var(--panel); padding: 14px 16px;
+}
+.apparatus-card h3 {
+  font-family: var(--font-mono); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted); margin: 0 0 8px;
+}
+.apparatus-card__big {
+  font-family: var(--font-display); font-size: 26px; line-height: 1; margin: 0 0 6px; color: var(--ink);
+}
+.apparatus-card__note { margin: 0; color: var(--ink-soft); font-size: 14px; line-height: 1.5; }
+.apparatus-card__note strong { font-family: var(--font-mono); font-size: 12.5px; }
+
+.indicator-related__grid {
+  list-style: none; padding: 0; margin: 18px 0 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px;
+}
+.related-card__link {
+  display: grid; gap: 10px; align-content: start; height: 100%;
+  border: 1px solid var(--line); background: var(--panel); padding: 14px 16px; color: var(--ink);
+  transition: border-color var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.related-card__link:hover { border-color: var(--accent); transform: translateY(-2px); text-decoration: none; }
+.related-card__name { font-family: var(--font-display); font-size: 15px; line-height: 1.25; }
+.related-card__spark { display: block; }
+.related-card__spark .spark { width: 100%; height: 34px; display: block; }
+.related-card__foot { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.related-card__value { font-family: var(--font-mono); font-size: 15px; color: var(--ink); white-space: nowrap; }
+.related-card__value small { color: var(--muted); font-weight: normal; }
+.related-card__year { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.related-card__dir {
+  font-family: var(--font-mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted);
+}
+
+/* Sparkline SVG server-side: un solo accento, come l'identita' del sito. */
+.spark { overflow: visible; }
+.spark__line { stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
+.spark__dot { fill: var(--accent); }
