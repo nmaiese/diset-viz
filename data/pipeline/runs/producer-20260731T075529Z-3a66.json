@@ -1,0 +1,22 @@
+{
+ "at": "2026-07-31T08:14:26+00:00",
+ "base_commit": "62cde04",
+ "branch": "automation/producer-2026-07-31-3a66",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "86f5275",
+ "detail": [
+  "Smentita del 2026-07-29 (classe fonti) assorbita: il primato di fecondita del Trentino-Alto Adige, 1,39 nel 2024, e il minimo della Sardegna, 0,91, erano attribuiti a Istat 'Natalita e fecondita' (21 ottobre 2025), che elenca le province separate. Verificato leggendo il PDF: le due cifre stanno in Istat 'Indicatori demografici, Anno 2024' del 31 marzo 2025. La seconda fonte e stata eliminata e tutte le cifre esterne ora poggiano su quel report, l'unico che ho letto.",
+  "Cura riconfermata senza modifiche: verso contextual, in cima 2024 Trentino Alto Adige 7,60 e Campania 7,40, in fondo Sardegna 4,50 e Valle d'Aosta 5,20, nessuno dei due estremi e un meglio. score_eligible resta false, categoria salute_cura, data_year 2024 uguale allo year_max.",
+  "Riscrittura: 712 parole, aggiunti il nut graf (651 mila morti contro 370 mila nati nel 2024, saldo naturale -281 mila), la digressione sul 1995 (1,19 figli per donna, 526 mila nati, quasi tre milioni di donne 15-49 in meno oggi), tre link interni (ter-922, ter-920, hub del tema) che prima erano zero, l'eccezione Liguria (nona per figli per donna con 1,17 e quindicesima per natalita, la regione piu anziana) e il caveat su Bolzano 1,51 contro 1,39 regionale.",
+  "Firmato reviewed_at 2026-07-31, reviewed_vintage 2024, uguale al vintage. Suite 935 test verde, prose_lint senza tell, pagina letta servita in locale."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 5,
+ "queue_before": 6,
+ "run_id": "producer-20260731T075529Z-3a66",
+ "stage": "producer",
+ "summary": "dem:BIRTHRATE riscritto e rifirmato: assorbita la smentita sulle fonti, aggiunti nut graf, incroci e caveat sulle due province autonome",
+ "trigger": "launch"
+}

@@ -1,0 +1,19 @@
+{
+ "at": "2026-07-31T08:03:55+00:00",
+ "base_commit": "86f5275",
+ "branch": "automation/verificatore-2026-07-31-3027",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "86f5275",
+ "detail": [
+  "Ranking 2024, code, media 9,52/mediana 9,01, senza le 4 peggiori 8,44, incroci ter-199/ter-200 (maschi 11,93 femmine 6,92, 18/20, Liguria F 3,07/M 14,49, Calabria M 9,51 4o F 12,22 19a), dinamica 2018 (Umbria migliore 8,35, Lombardia 13->4, TAA 4->15 unica +1,72), NEET ter-408 (Molise 18,96 16o, TAA 1o), ultimo anno 7 risalite, esterno EU 9,8% 2024 da 15% 2014 confermato su Education and Training Monitor 2025. Nessuna smentita, nessun salto di serie nel 2018-2024"
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 29,
+ "queue_before": 30,
+ "run_id": "verificatore-20260731T075529Z-3027",
+ "stage": "verificatore",
+ "summary": "Verificato ter-102 (uscita precoce dalla scuola, regione, vintage 2024): 28 affermazioni controllate, tutte confermate, esito pulito",
+ "trigger": "manuale"
+}

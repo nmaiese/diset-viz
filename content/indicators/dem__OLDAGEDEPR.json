@@ -1,29 +1,34 @@
 {
- "fonti": [],
+ "fonti": [
+  {
+   "testo": "Istat, glossario degli indicatori demografici: l'indice di dipendenza anziani è il rapporto tra la popolazione di 65 anni e più e quella in età attiva (15-64), moltiplicato per cento. L'indice di dipendenza strutturale mette invece al numeratore tutta la popolazione in età non attiva, cioè anche gli 0-14.",
+   "url": "https://demo.istat.it/tavole/?t=indicatori"
+  }
+ ],
  "key": "dem:OLDAGEDEPR",
- "lead": "In dieci anni le persone dai 65 anni in su ogni cento in età da lavoro sono aumentate in tutte e venti le regioni italiane, ma la Sardegna si è mossa quasi sette volte più della Liguria. La graduatoria che ne esce non separa il Nord dal Sud.",
+ "lead": "L'invecchiamento non taglia l'Italia lungo la faglia Nord-Sud: il Molise è quarto, la Sardegna quinta, la Lombardia e il Lazio stanno tra le ultime cinque. Ai due capi restano due regioni sole, staccate da tutte le altre, e in dieci anni si sono avvicinate al gruppo invece di allontanarsene.",
  "level": "regione",
- "reviewed_at": "2026-07-26",
+ "reviewed_at": "2026-07-31",
  "reviewed_vintage": 2025,
  "sections": [
   {
-   "body": "L'indicatore mette al numeratore i residenti dai 65 anni in su e al denominatore quelli tra i 15 e i 64, e moltiplica per cento. Un valore di 40 vuol dire quaranta persone dai 65 anni in su ogni cento in età da lavoro.\n\nIl nome inganna su un punto. La parola dipendenza qui non descrive nessuna dipendenza reale, è solo il rapporto tra due fasce anagrafiche. Chi lavora a sessantasette anni sta comunque al numeratore, chi a trenta non ha mai lavorato sta comunque al denominatore. Per sapere quante persone attive sostengono davvero quante inattive serve il tasso di occupazione, non questo numero.",
-   "h": "Un rapporto tra fasce di età, non tra chi lavora e chi no",
+   "body": "Al numeratore i residenti dai 65 anni in su, al denominatore quelli tra i 15 e i 64, il tutto moltiplicato per cento: un valore di 40 vuol dire quaranta anziani ogni cento persone in età da lavoro. Il nome però è una trappola. Istat chiama indice di dipendenza strutturale, senza altre parole, una quantità diversa, che al numeratore mette anche i minori di 15 anni ([glossario degli indicatori demografici Istat](https://demo.istat.it/tavole/?t=indicatori)). Qui i bambini non compaiono affatto, né sopra né sotto la linea di frazione.\n\nQuaranta su cento è l'aritmetica sotto le pensioni e sotto il lavoro di cura in famiglia: quante spalle adulte esistono per ogni persona anziana. La posta è reale, la parola dipendenza no. Chi lavora a sessantasette anni sta comunque al numeratore, e per sapere quante persone attive ne sostengano davvero quante inattive serve il tasso di occupazione, non questo numero.",
+   "h": "Al numeratore solo gli over 65, e il nome non lo dice",
    "role": "definizione"
   },
   {
-   "body": "L'invecchiamento non ricalca la faglia Nord Sud a cui questo atlante abitua. In alto insieme alla Liguria ci sono il Friuli-Venezia Giulia e l'Umbria, ma anche il Molise quarto e la Sardegna quinta, mentre la Lombardia e il Lazio stanno tra le ultime cinque.\n\nLa distribuzione ha una sola discontinuità vera, ed è in cima. I 3,60 punti che separano la Liguria dal Friuli-Venezia Giulia valgono esattamente quanto l'intervallo che dal Friuli, secondo, scende fino alla Valle d'Aosta, undicesima: dieci regioni stanno nello stesso spazio che separa la prima dalla seconda. Sotto quella vetta isolata il paese è compatto, e la mediana leggermente sopra la media dice la stessa cosa. Trattandosi di un indicatore contestuale, la classifica ordina i territori per struttura per età e non premia nessuno.",
-   "h": "La geografia non è quella che ci si aspetta",
+   "body": "Questa classifica è quasi il rovescio di quella del [tasso di natalità regionale](/indicatore/tasso-di-natalita-istat-regioni/dem-BIRTHRATE): Campania e Trentino Alto Adige, ultime qui, erano le prime due per nascite nel 2024. È una co-occorrenza, non una spiegazione: la partenza dei giovani adulti può muovere entrambe le misure, e nessuno dei due indici la registra. E qualcuno sfugge comunque, come la Valle d'Aosta, diciannovesima su venti per natalità e qui esattamente sulla mediana.\n\nLa distribuzione si spezza due volte, e alle estremità opposte. In cima i 3,60 punti tra la Liguria e il Friuli-Venezia Giulia valgono quanto l'intero intervallo che dal Friuli scende alla Valle d'Aosta, undicesima: dieci regioni nello spazio che separa la prima dalla seconda. In fondo lo strappo è quasi altrettanto netto, 2,80 punti tra il Trentino Alto Adige e la Campania. Le diciotto in mezzo occupano 9,20 punti, con un gradino massimo di 1,70.\n\nLa mediana, 41,10, sta sopra la media, e dice quale delle due code tira di più. È quella in basso: senza la sola Campania la media risalirebbe a 41,15 e scavalcherebbe la mediana, senza la Liguria scenderebbe. Il paese è compatto al centro e sbilanciato verso il basso, non appeso a una vetta isolata. Stare in fondo, del resto, vuol dire avere una popolazione più giovane, non un merito.",
+   "h": "Due regioni staccate ai due capi, diciotto ammassate in mezzo",
    "role": "quadro"
   },
   {
-   "body": "Dal 2015 al 2025 la media semplice dei valori regionali è salita di 5,54 punti. Non ci sono eccezioni da segnalare, perché non ce ne sono: il rapporto è cresciuto in tutte e venti le regioni sull'intero periodo e in tutte e venti anche nell'ultimo anno disponibile.\n\nA cambiare è la velocità. La Sardegna ha guadagnato 11,00 punti in dieci anni, il doppio della media, e ha attraversato mezza classifica. Nel 2015 stava a 32,70, cioè al livello a cui oggi si trova la regione più giovane d'Italia. La Liguria, che era già la più anziana, si è mossa di 1,60 punti e basta.\n\nÈ una convergenza, non un'inversione. Le regioni partite più in alto si muovono piano, quelle rimaste indietro recuperano in fretta, e il paese si sta uniformando verso l'alto invece di dividersi.",
-   "h": "Sale ovunque, ma la Sardegna corre e la Liguria si è fermata",
+   "body": "Dal 2015 al 2025 il rapporto è salito in tutte e venti le regioni, e in tutte e venti anche nell'ultimo passaggio dal 2024, con la media semplice in aumento di cinque punti e mezzo. A cambiare è la velocità: nel 2015 tra la prima e l'ultima correvano 20,40 punti, oggi ne corrono 15,60.\n\nLa Sardegna ha guadagnato 11,00 punti, il doppio della media, ed è salita dalla quattordicesima alla quinta posizione: nel 2015 stava a 32,70, cioè esattamente dove si trova oggi l'ultima della classifica.\n\nAi due capi il distacco si è ridotto. La Liguria, già la più anziana allora, si è mossa di 1,60 punti e basta, e il suo vantaggio sulla seconda è passato da 6,20 punti a 3,60. All'altro estremo la Campania ha accorciato lo stacco dalla penultima da 4,20 punti a 2,80.\n\nChi partiva in basso però non recupera per forza: il Trentino Alto Adige stava terzultimo nel 2015 ed è penultimo adesso, con 4,70 punti guadagnati, meno della media. È una tendenza, non una regola.",
+   "h": "In dieci anni la classifica si è accorciata di quasi cinque punti",
    "role": "dinamica"
   },
   {
-   "body": "Il rapporto conta teste per fascia di età e nient'altro. Non sa chi lavora, chi assiste qualcuno, chi è autosufficiente e chi no. Due regioni con lo stesso valore possono avere carichi previdenziali e di cura molto diversi, a seconda di quante persone in età da lavoro un impiego ce l'hanno davvero.\n\nC'è poi un modo di salire che non ha niente a che fare con l'invecchiamento. Il denominatore si assottiglia anche quando i giovani adulti se ne vanno, quindi l'emigrazione alza il rapporto senza che un solo residente in più superi i 65 anni. Il numero da solo non distingue le due strade.",
-   "h": "Che cosa non dice sul peso reale dell'invecchiamento",
+   "body": "Il rapporto conta teste per fascia d'età e nient'altro: non sa chi è autosufficiente e chi no, e due regioni con lo stesso valore possono avere carichi di cura molto diversi. Non misura nemmeno quanto a lungo si vive. Il Trentino Alto Adige, penultimo qui, è primo per [speranza di vita alla nascita dei maschi](/indicatore/speranza-di-vita-alla-nascita-maschi/ter-911), la Campania è ultima in entrambe, e i due ordini quasi non si assomigliano: essendo un rapporto, dipende dalla larghezza della fascia 15-64 quanto dal numero di anziani. Gli altri modi di guardare questa popolazione stanno nell'[hub su salute, demografia e cura](/tema/salute-demografia-e-cura).\n\nC'è infine un modo di salire che con l'invecchiamento non c'entra: il denominatore si assottiglia anche quando i venti-quarantenni se ne vanno, e un rapporto in crescita può raccontare una popolazione che invecchia oppure una che se ne va.",
+   "h": "Un rapporto che non sa nulla di salute né di longevità",
    "role": "limiti"
   }
  ],
