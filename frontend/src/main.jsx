@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "re
 import { createRoot } from "react-dom/client";
 import * as d3 from "d3";
 import { AuthControl } from "./shared/AuthControl.jsx";
-import { getAccessToken, isAuthConfigured } from "./shared/supabase.js";
+import { getAccessToken, getUser, isAuthConfigured } from "./shared/supabase.js";
 import {
   AlertTriangle,
   ArrowDownRight,
@@ -1645,6 +1645,72 @@ function CompareTimeline({ seriesList, averageSeries, selectedYear, onYear, unit
   );
 }
 
+// Confronti salvati (Fase 5.3): salva la configurazione corrente sull'account e
+// ricarica quelle salvate. Solo con login: senza, non compare.
+async function _authFetch(url, options = {}) {
+  const token = await getAccessToken();
+  if (!token) return null;
+  return fetch(url, {
+    ...options,
+    headers: { ...(options.headers || {}), Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+  });
+}
+
+function SavedComparisons({ config, onLoad }) {
+  const [user, setUser] = useState(null);
+  const [items, setItems] = useState([]);
+  const [busy, setBusy] = useState(false);
+
+  const reload = React.useCallback(async () => {
+    const res = await _authFetch("/api/comparisons");
+    if (res && res.ok) setItems((await res.json()).comparisons || []);
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthConfigured()) return;
+    getUser().then((u) => {
+      setUser(u);
+      if (u) reload();
+    });
+  }, [reload]);
+
+  if (!isAuthConfigured() || !user) return null;
+
+  async function save() {
+    const title = window.prompt("Nome del confronto:", config.title || "");
+    if (title === null) return;
+    setBusy(true);
+    await _authFetch("/api/comparisons", { method: "POST", body: JSON.stringify({ title, config }) });
+    await reload();
+    setBusy(false);
+  }
+  async function remove(id) {
+    await _authFetch(`/api/comparisons/${id}`, { method: "DELETE" });
+    await reload();
+  }
+
+  return (
+    <div className="saved-cmp">
+      <button type="button" className="saved-cmp__save" onClick={save} disabled={busy}>
+        Salva confronto
+      </button>
+      {items.length > 0 && (
+        <div className="saved-cmp__list">
+          <span className="saved-cmp__label">Le mie comparazioni:</span>
+          {items.map((it) => (
+            <span key={it.id} className="saved-cmp__item">
+              <button type="button" className="saved-cmp__load" onClick={() => onLoad(it.config)}>{it.title}</button>
+              <button type="button" className="saved-cmp__del" aria-label={`Elimina ${it.title}`} onClick={() => remove(it.id)}>
+                <X size={12} />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
   const [indId, setIndId] = useState(catalog.featured_indicator_id);
   const [indicator, setIndicator] = useState(null);
@@ -1760,6 +1826,14 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
             </div>
           </div>
         </div>
+
+        <SavedComparisons
+          config={{ indId, regionNames, year }}
+          onLoad={(cfg) => {
+            if (cfg && cfg.indId) setIndId(cfg.indId);
+            if (cfg && Array.isArray(cfg.regionNames)) setRegionNames(cfg.regionNames);
+          }}
+        />
 
         {!meta ? (
           <p className="map-empty">Caricamento…</p>
