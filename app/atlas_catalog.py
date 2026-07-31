@@ -10,6 +10,7 @@ from collections import Counter, defaultdict
 from functools import lru_cache
 import unicodedata
 
+from app.cache_util import synchronized_cache
 from app import sources
 from app.bes_data import BES_SOURCE_URLS, bes_indicator_path, get_bes_manifest, get_bes_rows
 from app.data import REGION_ORDER, get_catalog, get_indicator
@@ -90,7 +91,7 @@ def _downsample(points, limit=24):
     return [point for index, point in enumerate(points) if index in positions]
 
 
-@lru_cache(maxsize=1)
+@synchronized_cache(maxsize=1)
 def _bes_rows_by_indicator():
     index = defaultdict(list)
     for row in get_bes_rows("regione"):
@@ -173,7 +174,7 @@ def _multi_raw_id(indicator_id):
     return value[len(MULTI_ID_PREFIX):] if value.startswith(MULTI_ID_PREFIX) else None
 
 
-@lru_cache(maxsize=1)
+@synchronized_cache(maxsize=1)
 def _multiscopo_rows_by_indicator():
     index = defaultdict(list)
     for row in get_multiscopo_rows():
@@ -286,7 +287,7 @@ def _canonicalize_item(item):
     return {**item, **category_metadata(source_theme)}
 
 
-@lru_cache(maxsize=1)
+@synchronized_cache(maxsize=1)
 def get_atlas_catalog():
     """Merge legacy territorial metadata and BES metadata for atlas browsing."""
     legacy = get_catalog()

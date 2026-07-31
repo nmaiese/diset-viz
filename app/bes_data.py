@@ -11,6 +11,7 @@ import statistics
 from pathlib import Path
 
 from app.cache import cache
+from app.cache_util import synchronized_cache
 from app.data import _parse_number, indicator_year_over_year_stats
 from app.indicator_notes import (
     annual_change_framing,
@@ -177,9 +178,16 @@ def get_bes_manifest(level):
     return manifest
 
 
-@cache.memoize(timeout=3600)
+@synchronized_cache(maxsize=None)
 def get_bes_rows(level):
-    """Parsed observations with a territory_key for the level."""
+    """Parsed observations with a territory_key for the level.
+
+    `synchronized_cache` invece di `@cache.memoize`: i dati BES sono statici per
+    deploy, quindi non serve un TTL, e SimpleCache ripicklava l'intera lista a
+    ogni lettura anche in-process (~14MB misurati). Il lock serializza il parsing
+    del CSV da 9MB fra i thread a freddo, cosi' non si moltiplica il picco di RAM.
+    I chiamanti solo iterano e leggono le righe, non le mutano, quindi la lista
+    condivisa e' sicura."""
     dataset, _ = _paths(level)
     name_to_key = _name_to_key(level)
     rows = []

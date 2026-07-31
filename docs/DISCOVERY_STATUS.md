@@ -503,9 +503,16 @@ possono fare:
     Fix di irrobustimento applicato in `app/data.py` (`_synchronized_cache` sui
     tre loader pesanti) che elimina un **secondo** crash, quello del rebuild
     concorrente a freddo su gunicorn (riprodotto in modo affidabile con i thread),
-    ma **non** questo. La cura vera è la Fase 2 del piano di rifondazione: togliere
-    la struttura da 110k oggetti dalla RAM e servire i dati da uno store
-    interrogato. Fino ad allora la logica a tre casi del gate **resta**.
+    ma **non** questo. La cura definitiva sarebbe togliere la struttura da 110k
+    oggetti dalla RAM (store interrogato), ma la Fase 2 del piano ha **misurato**
+    che non conviene (il regionale e' solo ~28MB residenti, il problema di 512Mi
+    era il picco concorrente al build, non la memoria trattenuta): quindi quella
+    migrazione **non si fa**, e con essa non arriva questa cura. La mitigazione
+    adottata e' la serializzazione dei builder pesanti (`app/cache_util.py`,
+    applicata a data/atlas_catalog/bes_data), che taglia il picco concorrente da
+    ~463MB a ~215MB e riduce la finestra del churn, ma il churn single-thread (che
+    la suite reale non genera, svuota le cache una volta sola) resta teoricamente
+    possibile. Per questo la logica a tre casi del gate **resta**.
 - In una shell dell'utente `python3` è una funzione che rilancia il comando
   quando esce non-zero, quindi l'output di uno script che fallisce **appare due
   volte**. Non è un bug del programma.
