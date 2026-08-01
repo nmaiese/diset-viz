@@ -1,0 +1,25 @@
+{
+ "at": "2026-08-01T16:55:24+00:00",
+ "base_commit": "70521f5",
+ "branch": "automation/verificatore-2026-08-01-1ca8",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "70521f5",
+ "detail": [
+  "Assegnato dal lanciatore il solo dem:BIRTHRATE. Run a un articolo, non un batch troncato.",
+  "Graduatoria 2024 (brief) TAA 7,60 poi Campania 7,40 poi Sicilia 7,00 poi Calabria 6,90 poi gradino 0,40 a Lombardia 6,50. Quattro regioni sopra il salto. Confermata.",
+  "Cross-ref figli per donna 2024 (Assoluti_Regione ter-922) TAA 1,39 (max), Campania 1,26, Liguria 1,17 nona dietro tre regioni a 1,19, Sardegna 0,91 (min). Confermate.",
+  "Cross-ref eta media 2024 (ter-920) Liguria 49,5 piu anziana, Campania 44,2 piu giovane. Confermate.",
+  "Dinamica 2023-2024 verificata regione per regione (external layer). Sola Liguria in aumento 5,5 a 5,6 (+0,1), 4 stabili (Basilicata, Friuli, Toscana, Umbria), 15 in calo. Confermata.",
+  "Fonti. PDF citato Istat Indicatori demografici 2024 (31 marzo 2025) verificato. p6 Bolzano provincia 1,51, TAA 1,39, Sardegna 0,91, Campania 1,26. p5 donne 15-49 da 14,3 mln (1995) a 11,4 mln (2025). p1 e p5 fecondita 1,18. La smentita fonti del 2026-07-29 risulta chiusa dal produttore, il documento citato contiene davvero i dati provinciali.",
+  "Definizione (definition_check scoperto, fuori famiglia ter) verificata alla fonte. PDF p11 Natalita rapporto tra numero dei nati vivi dell anno e ammontare medio della popolazione residente. Coincide con la prosa. Confermata."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 30,
+ "queue_before": 31,
+ "run_id": "verificatore-20260801T164258Z-1ca8",
+ "stage": "verificatore",
+ "summary": "Verificato dem:BIRTHRATE (tasso di natalita, regioni, 2024). 25 affermazioni controllate, 0 smentite, esito pulito.",
+ "trigger": "launch"
+}
