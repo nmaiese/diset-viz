@@ -82,12 +82,15 @@ ignorava, e sei Routine indipendenti si pestavano i piedi.
 
 | Routine | cadenza (UTC) | che cosa fa | routine id |
 | --- | --- | --- | --- |
-| launcher | ogni 3 ore (minuto `:02`) | `pipeline_launch.py`, poi lancia in parallelo i ruoli che ha nominato | `trig_01Dv3ZDB4ch561GFYy2QwEUJ` (in pausa, il prompt va ri-puntato a `launcher.md`) |
+| launcher | ogni 3 ore (minuto `:02`) | `pipeline_launch.py`, poi lancia in parallelo i ruoli che ha nominato | `trig_01PGX3mKsLwUzz82snYMjVnA` (in pausa) |
 
-> **Da ri-puntare.** La Routine (stesso id) e' nata per il dispatcher: il suo
-> prompt cita `.claude/agents/dispatcher.md` e il comando `pipeline_dispatch.py`,
-> entrambi ritirati. Prima di riaccenderla, cambia il prompt a quello sotto (che
-> punta a `launcher.md`). Finche' e' in pausa non fa danni.
+> **Stato al 2026-08-01.** La Routine e' gia' puntata a `launcher.md` (il prompt
+> qui sotto), non al dispatcher ritirato: era stata ricreata il 29 luglio con l'id
+> nuovo `trig_01PGX3mKsLwUzz82snYMjVnA` (il vecchio `trig_01Dv3ZDB4ch561GFYy2QwEUJ`
+> non esiste piu'). Il 1 agosto `allowed_tools` e' stato corretto per includere
+> `Task`/`Agent`: senza, il lanciatore non poteva lanciare i ruoli in
+> sotto-sessione. Resta **in pausa** (`enabled:false`): un tick a mano si forza con
+> `RemoteTrigger action:run`, la schedulazione non e' accesa.
 
 **L'inciampo del 28 luglio, perché non si ripeta.** La Routine si crea anche via
 lo strumento MCP `create_trigger`, ma **deve essere in modalità sessione nuova**
