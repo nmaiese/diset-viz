@@ -1,0 +1,25 @@
+{
+ "at": "2026-08-01T16:56:02+00:00",
+ "base_commit": "70521f5",
+ "branch": "automation/producer-2026-08-01-e4d1",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "70521f5",
+ "detail": [
+  "Smentita chiusa. La frase sul Molise 'unico calo del 2024 che si veda a occhio, gli altri tre valgono un decimo di giornata o meno' era falsa per le Marche, che perdono 0,112 giornate (da 7,19 a 7,07), sopra il decimo. Riscritta sui quattro cali reali 2023-2024, Molise -0,125, Marche -0,112, Basilicata -0,015, Piemonte -0,004",
+  "Aggiunta la lettura che indicava il verificatore stesso, cali quasi uguali in giornate e opposti in peso, il 7 per cento delle presenze molisane contro meno del 2 per cento di quelle marchigiane, su basi 2023 di 1,71 e 7,19 giornate",
+  "Cura, nessuna modifica. ter-105 e' Istat territoriale, direzione contextual gia' corretta perche' alto non e' meglio, fuori dal punteggio, tema Cultura patrimonio e turismo gia' mappato. La direzione vive in app/indicator_notes.py, fuori dal perimetro dello stadio",
+  "Fonte verificata oggi con WebFetch, il glossario Istat risponde 200 e ha una voce propria per i bed and breakfast, che la sezione definizione elencava nel perimetro senza che la citazione lo sostenesse. Testo della fonte riscritto sulle parole del glossario",
+  "Riletto tutto contro il brief. Trentino Alto Adige e Valle d'Aosta primi due in tutti i 44 anni dal 1981 al 2024, verificato anno per anno. Basilicata 20a nel 1981 e 13a nel 2024, Sardegna sei posti guadagnati, Piemonte cinque persi. Medie 5,75 nel 1981 e 10,44 nel 2024, 9,77 nel 2019 e 5,37 nel 2020. Lazio al 24,2 per cento del 2019 nel 2020 e al 133,8 per cento nel 2024. Rimandi a ter-165 verificati, Sardegna sesta qui e undicesima li, Lazio ottavo qui e quarto li",
+  "Tolto un gerundio d'apertura in limiti, da 'Essendo un tasso' a 'E' poi un tasso'. Articolo 746 parole, sopra la fascia 500-700 di 46, non ho tagliato prosa gia' verificata per rientrarci",
+  "Firma, reviewed_at 2026-08-01 e reviewed_vintage 2024 uguale al vintage. review_queue ora segna ter-105 'ok', le smentite aperte passano da 1 a 0"
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 326,
+ "queue_before": 327,
+ "run_id": "producer-20260801T164258Z-e4d1",
+ "stage": "producer",
+ "summary": "ter-105 Tasso di turisticita, assorbita la smentita del verificatore sulla dinamica, riletto l'articolo intero, rifirmato su vintage 2024",
+ "trigger": "launch"
+}
