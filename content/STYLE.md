@@ -19,6 +19,31 @@ automatico.
    comunque non li vogliamo.
 5. Usa virgolette dritte normali (`"` e `'`).
 
+## La skill scrittura-italiana, e chi vince sul conflitto
+
+Per il mestiere della lingua (togliere i tic dell'italiano generato, dare voce,
+regolare ritmo e retorica) il progetto adotta la skill esterna
+**`scrittura-italiana`** (`.claude/skills/scrittura-italiana/`, CC BY-SA 4.0).
+Questa guida la **cita**, non la ricopia: le quattro virtu' retoriche, le cinque
+varianti del bipolare, l'antilingua e il lessico di plastica vivono nei suoi
+`references/`, e ripeterli qui li manderebbe fuori sincrono.
+
+**La precedenza e' esplicita, e non e' negoziabile: su ogni conflitto vincono
+gli assoluti di progetto.** La skill lavora nel registro *testo controllato* e
+li' consiglia i caporali `« »`, le lineette spaziate e il punto e virgola. Le
+regole tipografiche qui sopra li **vietano**: niente `—`, `–`, `;`, `…`,
+virgolette dritte. Quando la skill suggerisce una di quelle forme, si tiene la
+regola di progetto e si scioglie l'inciso con virgole o due frasi. Il conflitto
+e' sistematico, non un caso di bordo: sta nel registro esatto in cui vivono le
+nostre pagine. Il perche' e il cancello deterministico che lo fa rispettare
+(`tic_count.py`, campo `vietati` sempre vuoto) sono in
+[`evals/scrittura-italiana/PRECEDENZA.md`](../evals/scrittura-italiana/PRECEDENZA.md).
+
+Cambiare il prompt del produttore per agganciare la skill in rilettura e' un
+cambio gated da `canary` (obbligo di `CLAUDE.md`): la skill installata e'
+**disponibile**, ma finche' `producer.md` non la richiama il comportamento degli
+agenti non cambia.
+
 ## Tono: scrivi come una persona
 
 - Frasi di lunghezza varia. Ogni tanto una corta. Va bene iniziare con "Ma" o "E".
