@@ -49,7 +49,17 @@ from pathlib import Path
 # contare tra gli altri ma un cancello: gli assoluti di progetto vincono sempre
 # sulla skill, che invece in testo controllato ammette la lineetta e il punto e
 # virgola. Se compaiono in un "dopo", la riscrittura e' da rifare, non da pesare.
-BANNED = {"—": "em-dash", "–": "en-dash", ";": "punto e virgola", "…": "puntini"}
+# I caporali e le virgolette curve sono qui perche' content/STYLE.md (regola 5 e
+# la sezione sulla precedenza) impone virgolette dritte e vieta i caporali `« »`
+# che la skill consiglia nel registro testo controllato, e nomina proprio questo
+# campo `vietati` come il cancello che lo fa rispettare. Senza, il gate a cui
+# STYLE.md rimanda non vede i caratteri che STYLE.md dice che ferma.
+BANNED = {
+    "—": "em-dash", "–": "en-dash", ";": "punto e virgola", "…": "puntini",
+    "«": "caporale", "»": "caporale",
+    "“": "virgoletta curva", "”": "virgoletta curva",
+    "‘": "virgoletta curva", "’": "virgoletta curva",
+}
 
 # -mente ad alta frequenza AI (stile-naturale.md §15). L'euristica e' la
 # densita': un -mente ogni tanto e' italiano, cinque per pagina sono un tic.
@@ -159,9 +169,16 @@ def count_tics(text: str) -> dict:
 
     bipolare = sum(len(rx.findall(text)) for rx in BIPOLARE)
     lessico = sum(1 for w in words if w.lower() in LESSICO_PLASTICA)
+    # La cornice a inizio di ogni blocco, non solo del testo intero. _load_text
+    # unisce lead, titoli e corpi delle sezioni con "\n\n", quindi un articolo
+    # indicatore arriva qui come piu' blocchi: una cornice a inizio sezione (non
+    # a inizio articolo) e' proprio il tic da contare, e guardare solo
+    # sentences[0] la mancava sempre tranne quando apre l'intero pezzo.
     incipit = 0
-    if sentences and INCIPIT_CORNICE.search(sentences[0]):
-        incipit = 1
+    for block in re.split(r"\n\s*\n", text):
+        block_sentences = _sentences(block)
+        if block_sentences and INCIPIT_CORNICE.search(block_sentences[0]):
+            incipit += 1
 
     raw = {
         "mente": len(MENTE.findall(text)),
@@ -173,7 +190,8 @@ def count_tics(text: str) -> dict:
         "incipit_cornice": incipit,
         "lessico_plastica": lessico,
     }
-    banned = [label for char, label in BANNED.items() if char in text]
+    banned = list(dict.fromkeys(
+        label for char, label in BANNED.items() if char in text))
 
     mean_len = statistics.mean(lengths)
     stdev_len = statistics.pstdev(lengths) if len(lengths) > 1 else 0.0
@@ -224,8 +242,24 @@ def _self_test() -> int:
     vietato = count_tics("Questa frase ha un punto e virgola; e un trattino —.")
     if "punto e virgola" not in vietato["vietati"] or "em-dash" not in vietato["vietati"]:
         failures.append("il cancello non vede i caratteri vietati")
+    # I caporali e le virgolette curve che STYLE.md vieta e che la skill
+    # consiglia nel registro controllato: il cancello deve vederli, o non e' il
+    # cancello che STYLE.md dice che e'.
+    curve = count_tics("Il dato «cruciale» dice “tanto”.")
+    if "caporale" not in curve["vietati"] or "virgoletta curva" not in curve["vietati"]:
+        failures.append("il cancello non vede caporali o virgolette curve")
     if p["vietati"]:
         failures.append("falso positivo sui caratteri vietati")
+
+    # La cornice a inizio sezione, non a inizio articolo: due blocchi, il primo
+    # pulito, il secondo che apre con una cornice. Guardare solo la prima frase
+    # dell'intero testo la mancherebbe.
+    per_sezione = count_tics(
+        "Le Marche chiudono la classifica.\n\n"
+        "In questo contesto la distanza si allarga."
+    )
+    if per_sezione["tic"]["incipit_cornice"] < 1:
+        failures.append("la cornice a inizio sezione non e' contata")
 
     for line in failures:
         print(f"SELF-TEST FALLITO: {line}")
