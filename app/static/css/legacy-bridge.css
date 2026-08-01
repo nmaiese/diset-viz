@@ -1,0 +1,18 @@
+.legacy-bridge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 20px;
+  padding: 10px max(16px, calc((100vw - 1170px) / 2));
+  background: #fbfaf7;
+  border-bottom: 1px solid rgba(21, 35, 59, 0.2);
+  color: #15233b;
+  font: 14px/1.4 Inter, Arial, sans-serif;
+}
+.legacy-bridge strong { font-family: Archivo, Arial, sans-serif; }
+.legacy-bridge a { color: #e4572e; font-weight: 700; }
+.legacy-bridge a:hover { color: #15233b; }
+@media (max-width: 600px) {
+  .legacy-bridge { display: grid; padding: 10px 16px; }
+}

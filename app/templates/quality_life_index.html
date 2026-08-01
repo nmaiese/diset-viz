@@ -34,8 +34,28 @@
   <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
 
   <header class="quality-hero">
-    <h1>Qualità della vita nelle regioni italiane</h1>
-    <p class="page-lead">La classifica seleziona dal catalogo unico gli indicatori Istat adatti a descrivere la qualità della vita. Per le regioni combina BES nazionale e indicatori territoriali DISET. I pesi sono visibili e modificabili.</p>
+    <div class="quality-hero__copy">
+      <p class="eyebrow">Benessere territoriale · profili personalizzabili</p>
+      <h1>Qualità della vita nelle regioni italiane</h1>
+      <p class="page-lead">Una classifica trasparente costruita con indicatori Istat. Cambia il profilo per vedere come reddito, salute, ambiente e servizi spostano il risultato.</p>
+      <p class="quality-cta"><a class="quality-btn quality-btn--primary" href="/qualita-della-vita/classifica/regioni">Apri la classifica delle regioni →</a></p>
+    </div>
+    {% if preview_rows %}
+    <div class="quality-hero__ranking">
+      <p class="section-label">Prime regioni · profilo Equilibrato</p>
+      <ol class="quality-preview-list">
+        {% for row in preview_rows %}
+        <li>
+          <span class="quality-preview-rank">{{ row.rank }}</span>
+          <span class="quality-preview-name">{{ row.name }}</span>
+          <span class="quality-score-bar"><span style="width: {{ row.score | round | int }}%"></span></span>
+          <span class="quality-score">{{ row.score | it_num }}</span>
+        </li>
+        {% endfor %}
+      </ol>
+      <a class="quality-hero__ranking-link" href="/qualita-della-vita/classifica/regioni">Vedi tutte le regioni →</a>
+    </div>
+    {% endif %}
   </header>
 
   <div class="quality-grid quality-entry-grid">
@@ -57,22 +77,6 @@
       <p>Come vengono scelti gli indicatori e calcolato il punteggio.</p>
     </a>
   </div>
-
-  {% if preview_rows %}
-  <section class="quality-preview">
-    <p class="section-label">Anteprima: le prime regioni, profilo Equilibrato</p>
-    <ol class="quality-preview-list">
-      {% for row in preview_rows %}
-      <li>
-        <span class="quality-preview-rank">{{ row.rank }}</span>
-        <span class="quality-preview-name">{{ row.name }}</span>
-        <span class="quality-score-bar"><span style="width: {{ row.score | round | int }}%"></span></span>
-        <span class="quality-score">{{ row.score | it_num }}</span>
-      </li>
-      {% endfor %}
-    </ol>
-  </section>
-  {% endif %}
 
   {% if has_province_data %}
   <p class="quality-note quality-disclaimer">La classifica provinciale è un lavoro in corso: leggila insieme alla <a href="/metodologia#qualita-della-vita">metodologia</a>, prima di considerarla definitiva.</p>

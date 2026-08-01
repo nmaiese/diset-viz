@@ -9,22 +9,46 @@
 {% endblock %}
 
 {% block content %}
-<main class="page wrap">
+<main class="page page-catalog wrap">
   <nav class="breadcrumb"><a href="/atlante">Atlante</a> / Catalogo dati</nav>
   <h1>Catalogo dati di Divario Italia</h1>
   <p class="page-lead">{{ catalog_description }}</p>
-  <p class="page-note">Il catalogo collega {{ datasets | length }} dataset indicizzabili. Ogni scheda dichiara copertura, tecnica di elaborazione, fonte originale ed eventuali formati di download.</p>
+  <p class="page-note">{{ datasets | length }} dataset indicizzabili. Ogni scheda dichiara copertura, elaborazione, fonte originale e formati di download.</p>
+
+  <div class="catalog-filter search-box">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+    <input type="search" id="dataset-filter" placeholder="Cerca un dataset o una fonte" autocomplete="off" aria-label="Cerca nel catalogo dati">
+  </div>
 
   <section aria-labelledby="dataset-title">
     <h2 id="dataset-title">Dataset disponibili</h2>
-    <ul class="search-results">
+    <ul class="search-results catalog-list">
       {% for dataset in datasets %}
-      <li>
+      <li data-dataset="{{ dataset.name | lower }} {{ dataset.source | lower }}">
         <a href="{{ dataset.path }}"><strong>{{ dataset.name }}</strong></a>
         <span>{{ dataset.source }}</span>
       </li>
       {% endfor %}
     </ul>
+    <p class="card-empty" id="dataset-empty" hidden>Nessun dataset corrisponde alla ricerca.</p>
   </section>
 </main>
+<script>
+  (function () {
+    var input = document.getElementById("dataset-filter");
+    if (!input) return;
+    var rows = Array.prototype.slice.call(document.querySelectorAll(".catalog-list [data-dataset]"));
+    var empty = document.getElementById("dataset-empty");
+    input.addEventListener("input", function () {
+      var q = input.value.trim().toLowerCase();
+      var visible = 0;
+      rows.forEach(function (row) {
+        var match = !q || (row.getAttribute("data-dataset") || "").indexOf(q) !== -1;
+        row.hidden = !match;
+        if (match) visible += 1;
+      });
+      if (empty) empty.hidden = visible !== 0;
+    });
+  })();
+</script>
 {% endblock %}

@@ -25,6 +25,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
     <link rel="stylesheet" href="{{ asset_url('css/site.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/design-system.css') }}">
     <script src="{{ url_for('static', filename='js/nav-underline.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/menu.js') }}" defer></script>
     {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
@@ -42,14 +43,26 @@
           <small>Atlante degli indicatori territoriali</small>
         </span>
       </a>
-      <nav id="masthead-nav" class="masthead__links">
-        <a href="/atlante" class="{{ 'is-active' if active_nav == 'atlas' else '' }}">Atlante</a>
-        <a href="/regioni" class="{{ 'is-active' if active_nav == 'regioni' else '' }}">Regioni</a>
-        <a href="/temi" class="{{ 'is-active' if active_nav == 'temi' else '' }}">Temi</a>
+      <nav id="masthead-nav" class="masthead__links" aria-label="Navigazione principale">
+        <div class="masthead__group">
+          <a href="/atlante" class="{{ 'is-active' if active_nav in ['atlas', 'regioni', 'temi'] else '' }}">Esplora</a>
+          <div class="masthead__dropdown" aria-label="Esplora i dati">
+            <a href="/atlante"><strong>Atlante</strong><span>Cerca e filtra gli indicatori</span></a>
+            <a href="/regioni"><strong>Regioni</strong><span>Venti profili territoriali</span></a>
+            <a href="/temi"><strong>Temi</strong><span>Dodici chiavi di lettura</span></a>
+            <a href="/confronto"><strong>Confronta</strong><span>Due o tre regioni sullo stesso dato</span></a>
+          </div>
+        </div>
         <a href="/qualita-della-vita" class="{{ 'is-active' if active_nav == 'qualita-della-vita' else '' }}">Qualità della vita</a>
-        <a href="/quiz" class="{{ 'is-active' if active_nav == 'gioco' else '' }}">Quiz Italia</a>
-        <a href="/metodologia" class="{{ 'is-active' if active_nav == 'metodologia' else '' }}">Metodologia</a>
-        <a href="/blog" class="{{ 'is-active' if active_nav == 'blog' else '' }}">Blog</a>
+        <div class="masthead__group">
+          <a href="/blog" class="{{ 'is-active' if active_nav in ['blog', 'divari'] else '' }}">Storie</a>
+          <div class="masthead__dropdown masthead__dropdown--right" aria-label="Storie dai dati">
+            <a href="/blog"><strong>Storie dai dati</strong><span>Articoli e analisi territoriali</span></a>
+            <a href="/divari-regionali"><strong>Divari regionali</strong><span>Nord, Centro e Mezzogiorno</span></a>
+          </div>
+        </div>
+        <a href="/quiz" class="{{ 'is-active' if active_nav == 'gioco' else '' }}">Quiz</a>
+        <a href="/metodologia" class="{{ 'is-active' if active_nav == 'metodologia' else '' }}">Metodo</a>
         <span class="nav-underline" aria-hidden="true"></span>
       </nav>
       <a class="masthead__search" href="/ricerca" aria-label="Cerca nel sito">
@@ -105,9 +118,10 @@
         <a class="mobmenu__item {{ 'is-active' if active_nav == 'qualita-della-vita' }}" href="/qualita-della-vita/classifica/regioni"><span>Qualità della vita, regioni</span><span class="k">Classifica regioni</span></a>
         <a class="mobmenu__item" href="/qualita-della-vita/classifica/province"><span>Qualità della vita, province</span><span class="k">Classifica province</span></a>
 
-        <p class="mobmenu__group">Gioca e leggi</p>
+        <p class="mobmenu__group">Storie e quiz</p>
+        <a class="mobmenu__item {{ 'is-active' if active_nav == 'blog' }}" href="/blog"><span>Storie dai dati</span><span class="k">Articoli e analisi</span></a>
+        <a class="mobmenu__item {{ 'is-active' if active_nav == 'divari' }}" href="/divari-regionali"><span>Divari regionali</span><span class="k">Nord, Centro, Mezzogiorno</span></a>
         <a class="mobmenu__item {{ 'is-active' if active_nav == 'gioco' }}" href="/quiz"><span>Quiz Italia</span><span class="k">Tre giochi</span></a>
-        <a class="mobmenu__item {{ 'is-active' if active_nav == 'blog' }}" href="/blog"><span>Blog</span><span class="k">Data stories</span></a>
 
         <p class="mobmenu__group">Il progetto</p>
         <a class="mobmenu__item {{ 'is-active' if active_nav == 'metodologia' }}" href="/metodologia"><span>Metodologia</span><span class="k">Metodo e fonti</span></a>
@@ -121,8 +135,8 @@
     {% block content %}{% endblock %}
 
     <footer class="site-footer">
-      <span>{{ site_name }} · dati <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Istat</a>, indicatori territoriali per le politiche di sviluppo</span>
-      <span><a href="/atlante">Esplora l'atlante</a> · <a href="/divari-regionali">Divari regionali</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/chi-siamo">Chi siamo</a> · <a href="/blog">Tutti gli articoli</a> · <a href="/privacy">Privacy e cookie</a></span>
+      <span>{{ site_name }} · dati pubblici territoriali resi leggibili e confrontabili</span>
+      <nav aria-label="Collegamenti nel piè di pagina"><a href="/atlante">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/blog">Storie</a> · <a href="/quiz">Quiz</a> · <a href="/metodologia">Metodo</a> · <a href="/catalogo-dati">Catalogo dati</a> · <a href="/chi-siamo">Chi siamo</a> · <a href="/privacy">Privacy</a></nav>
       {% block footer_privacy_settings %}
       {% include "_funding_choices_revoke.html" %}
       {% endblock %}

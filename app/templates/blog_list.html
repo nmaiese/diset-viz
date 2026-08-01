@@ -30,17 +30,17 @@
 {% block content %}
 <section class="blog-hero">
   <div class="wrap">
-    <p class="eyebrow">Il blog di Divario Italia</p>
-    <h1>Leggere i numeri del divario.</h1>
-    <p>Analisi brevi e basate sui dati: come cambiano le distanze tra le regioni italiane, tema per tema. Ogni articolo parte da un indicatore ufficiale e ti porta dentro l'atlante.</p>
+    <p class="eyebrow">Storie dai dati</p>
+    <h1>I numeri che cambiano la mappa.</h1>
+    <p>Analisi territoriali costruite su indicatori pubblici. Ogni storia dichiara fonte, periodo e perimetro, poi ti porta alla serie completa.</p>
   </div>
 </section>
 
-<main class="wrap">
+<main class="wrap post-list">
   {% if posts %}
   <div class="post-grid">
     {% for post in posts %}
-    <a class="post-card" href="/blog/{{ post.slug }}">
+    <a class="post-card{{ ' post-card--lead' if loop.first else '' }}" href="/blog/{{ post.slug }}">
       <div class="post-card__cover">
         {% if post.cover %}<img src="{{ post.cover }}" alt="{{ post.cover_alt }}" loading="lazy" width="640" height="360">{% endif %}
       </div>

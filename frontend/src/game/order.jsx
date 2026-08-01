@@ -209,24 +209,11 @@ export default function OrderApp() {
       {status === "idle" && (
         <div className="order-start">
           <h2>Ordina le regioni</h2>
-          <ol className="game-onboarding-steps">
-            <li>
-              <strong>Trascina o usa le frecce.</strong> Le regioni partono in ordine casuale: trascina le
-              righe con l'icona ⋮⋮, oppure sposta ogni riga su o giù, finché non sono in ordine dal
-              valore più alto al più basso secondo la tua ipotesi.
-            </li>
-            <li>
-              <strong>Verifica quando l'ordine ti convince.</strong> Vedrai la classifica reale con i
-              valori Istat.
-            </li>
-            <li>
-              <strong>Un punto per ogni posizione azzeccata.</strong> Parti da tre regioni, passa a
-              cinque quando ti senti pronto.
-            </li>
-          </ol>
+          <p>Metti le regioni in ordine dal valore più alto al più basso, poi confronta la tua scelta con i dati reali.</p>
           <button type="button" className="game-btn" onClick={startGame}>
             {hasPlayedBefore ? "Inizia" : "Inizia a giocare"}
           </button>
+          <p className="game-start-note">Trascina le righe oppure usa i pulsanti su e giù.</p>
         </div>
       )}
 

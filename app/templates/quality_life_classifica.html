@@ -60,19 +60,25 @@
     <div class="quality-hero-row__main">
       <h1>Qualità della vita: {{ lvl_label }} italiane</h1>
       <p class="page-lead">{% if is_prov %}Indicatori <strong>BES dei Territori</strong>.{% else %}Indicatori del <strong>catalogo federato</strong> ({{ m.catalog_institutions }}), dal BES nazionale agli indicatori territoriali DISET, fino alle altre fonti istituzionali già integrate.{% endif %} Profilo <strong>{{ p.name }}</strong>: {{ p.description | lower }} Z-score orientato, mostrato da 0 a 100, dove 50 è la media.</p>
-      <p class="page-note">Il catalogo consultabile per questo livello contiene {{ m.manifest_indicators_total }} indicatori{% if not is_prov %} ({% for f in m.catalog_families %}{{ f.indicator_count }} {{ f.label }}{% if not loop.last %} &middot; {% endif %}{% endfor %}){% endif %}. Lo score ne seleziona {{ m.score_indicators_total }}, quelli con direzione chiara e dati sufficienti.{% if not is_prov %} La selezione comprende {% for s in m.source_breakdown %}{{ s.count }} {{ s.label }}{% if not loop.last %} &middot; {% endif %}{% endfor %}.{% endif %}</p>
 
-      <nav class="quality-level-toggle" aria-label="Livello territoriale">
-        <a href="/qualita-della-vita/classifica/regioni" class="{{ 'is-active' if not is_prov else '' }}">Regioni</a>
-        <a href="/qualita-della-vita/classifica/province" class="{{ 'is-active' if is_prov else '' }}">Province</a>
-      </nav>
+      <div class="quality-controls">
+        <nav class="quality-level-toggle" aria-label="Livello territoriale">
+          <a href="/qualita-della-vita/classifica/regioni" class="{{ 'is-active' if not is_prov else '' }}">Regioni</a>
+          <a href="/qualita-della-vita/classifica/province" class="{{ 'is-active' if is_prov else '' }}">Province</a>
+        </nav>
 
-      <nav class="quality-profile-tabs" aria-label="Profili di peso">
-        {% for profile in profiles %}
-        <a href="/qualita-della-vita/classifica/{{ url_level }}{{ '' if profile.slug == default_profile else '?profilo=' ~ profile.slug }}"
-           class="{{ 'is-active' if profile.slug == active_profile else '' }}">{{ profile.name }}</a>
-        {% endfor %}
-      </nav>
+        <nav class="quality-profile-tabs" aria-label="Profili di peso">
+          {% for profile in profiles %}
+          <a href="/qualita-della-vita/classifica/{{ url_level }}{{ '' if profile.slug == default_profile else '?profilo=' ~ profile.slug }}"
+             class="{{ 'is-active' if profile.slug == active_profile else '' }}">{{ profile.name }}</a>
+          {% endfor %}
+        </nav>
+      </div>
+
+      <details class="method-disclosure">
+        <summary>Come è composto questo punteggio</summary>
+        <p>Il catalogo consultabile per questo livello contiene {{ m.manifest_indicators_total }} indicatori{% if not is_prov %} ({% for f in m.catalog_families %}{{ f.indicator_count }} {{ f.label }}{% if not loop.last %} &middot; {% endif %}{% endfor %}){% endif %}. Lo score ne seleziona {{ m.score_indicators_total }}, quelli con direzione chiara e dati sufficienti.{% if not is_prov %} La selezione comprende {% for s in m.source_breakdown %}{{ s.count }} {{ s.label }}{% if not loop.last %} &middot; {% endif %}{% endfor %}.{% endif %}</p>
+      </details>
     </div>
 
     <div class="panel-card quality-hero-row__fresh">

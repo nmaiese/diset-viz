@@ -36,7 +36,7 @@
     <div class="theme-hero__main">
       <h1>{{ p.theme }}</h1>
       <p class="page-lead">{{ p.description }}</p>
-      <p class="page-intro">In questo tema trovi {{ p.indicator_count }} indicatori{% if p.complete_count %}, di cui {{ p.complete_count }} con dati completi e aggiornati su tutte e 20 le regioni{% endif %}{% if p.quality_life_count %}. {{ p.quality_life_count }} entrano nel punteggio della qualità della vita{% endif %}. Apri una scheda per la classifica aggiornata, oppure esplora mappa e andamento negli anni nell'atlante.</p>
+      <p class="page-intro">{{ p.indicator_count }} indicatori{% if p.complete_count %}, {{ p.complete_count }} completi su tutte e 20 le regioni{% endif %}{% if p.quality_life_count %}. {{ p.quality_life_count }} entrano nel punteggio della qualità della vita{% endif %}. Ogni scheda contiene classifica, mappa e andamento nel tempo.</p>
       <p class="page-note"><strong>Sottotemi delle fonti:</strong> {{ p.source_themes | join(', ') }}.</p>
     </div>
     <div class="panel-card theme-hero__stats">
@@ -50,9 +50,15 @@
     </div>
   </div>
 
+  <div class="theme-page-filter search-box">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+    <input type="search" id="indicator-filter" placeholder="Cerca tra gli indicatori di {{ p.theme }}" autocomplete="off" aria-label="Cerca un indicatore nel tema {{ p.theme }}">
+  </div>
+  <p class="card-empty" id="indicator-empty" hidden>Nessun indicatore corrisponde alla ricerca.</p>
+
   <div class="theme-grid">
     {% for ind in p.indicators %}
-    <a class="ind-card" href="{{ ind.path }}">
+    <a class="ind-card" href="{{ ind.path }}" data-indicator="{{ ind.name | lower }} {{ ind.plain | default('', true) | lower }}">
       <div class="ind-card__head">
         <h3>{{ ind.name }}</h3>
         <span class="ind-card__years">{{ ind.year_min }}-{{ ind.year_max }}</span>
@@ -67,4 +73,22 @@
   </div>
 
 </article>
+<script>
+  (function () {
+    var input = document.getElementById("indicator-filter");
+    if (!input) return;
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".theme-grid [data-indicator]"));
+    var empty = document.getElementById("indicator-empty");
+    input.addEventListener("input", function () {
+      var q = input.value.trim().toLowerCase();
+      var visible = 0;
+      cards.forEach(function (card) {
+        var match = !q || (card.getAttribute("data-indicator") || "").indexOf(q) !== -1;
+        card.hidden = !match;
+        if (match) visible += 1;
+      });
+      if (empty) empty.hidden = visible !== 0;
+    });
+  })();
+</script>
 {% endblock %}

@@ -67,18 +67,27 @@
 {% endblock %}
 
 {% block content %}
-<article class="page prose-wrap">
+<article class="page prose-wrap page-methodology">
   <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
   <h1>Metodologia e fonti</h1>
   <p class="page-lead">Divario Italia usa dati territoriali pubblici per rendere confrontabili regioni, temi e indicatori. Ogni pagina deve permettere di capire che cosa misura il dato, da dove arriva, quale anno copre e quali limiti ha.</p>
 
-  <section>
+  <nav class="page-toc" aria-label="Indice della metodologia">
+    <span>In questa pagina</span>
+    <a href="#fonte-principale">Fonte principale</a>
+    <a href="#lettura-indicatori">Come leggere gli indicatori</a>
+    <a href="#qualita-della-vita">Qualità della vita</a>
+    <a href="#limiti">Limiti</a>
+    <a href="#domande-frequenti">Domande frequenti</a>
+  </nav>
+
+  <section id="fonte-principale">
     <h2>Fonte principale</h2>
     <p>La fonte primaria dell'atlante è la Banca dati territoriale per le politiche di sviluppo di Istat. Le pagine indicatore riportano il nome dell'indicatore, il tema, l'unita di misura, l'ultimo anno disponibile, la copertura territoriale e la definizione leggibile.</p>
     <p><a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noreferrer">Consulta la fonte Istat</a>.</p>
   </section>
 
-  <section>
+  <section id="lettura-indicatori">
     <h2>Come leggere gli indicatori</h2>
     <p>Le schede indicatore mostrano il confronto tra territori e, quando i dati lo consentono, una serie storica. Le classifiche usano la direzione dell'indicatore solo quando il significato è chiaro: per alcuni dati un valore più alto è positivo, per altri è negativo, per altri ancora serve solo contesto.</p>
     <p>Le pagine fuori soglia di qualità non vengono spinte in sitemap quando l'indicatore è troppo vecchio, incompleto o duplicativo rispetto a una pagina migliore.</p>
@@ -157,12 +166,12 @@
     <p><a href="/qualita-della-vita/classifica/regioni">Apri la classifica e cambia profilo →</a></p>
   </section>
 
-  <section>
+  <section id="limiti">
     <h2>Limiti</h2>
     <p>I dati possono avere anni diversi, coperture diverse e interruzioni di serie. Un confronto territoriale descrive una differenza osservata, non dimostra da solo una causa. Quando un articolo interpreta un divario, deve distinguere il dato dalla spiegazione.</p>
   </section>
 
-  <section class="prose faq">
+  <section class="prose faq" id="domande-frequenti">
     <h2>Domande frequenti</h2>
     <h3>Da dove arrivano i dati di Divario Italia?</h3>
     <p>I dati provengono dalla Banca dati territoriale per le politiche di sviluppo di Istat e, per la qualità della vita, dal BES dei Territori. Ogni pagina indicatore riporta la fonte e l'ultimo anno disponibile.</p>

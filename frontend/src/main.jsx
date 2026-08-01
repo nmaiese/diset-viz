@@ -476,75 +476,51 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
           </span>
         </a>
         {children}
-        <nav id="masthead-nav" className="masthead__links" aria-label="Collegamenti" ref={navRef}>
-          <a
-            href="/atlante"
-            data-nav-key="atlas"
-            className={activeNav === "atlas" ? "is-active" : ""}
-            onClick={(event) => handleLocalNav(event, onNavAtlas)}
-          >
-            Atlante
-          </a>
-          <a
-            href="/regioni"
-            data-nav-key="regioni"
-            className={activeNav === "regioni" ? "is-active" : ""}
-            onClick={(event) => {
-              // Inside the SPA, keep the user in the interactive region mode
-              // instead of loading the server page (which stays for SEO/deep links).
-              handleLocalNav(event, onNavRegioni);
-            }}
-          >
-            Regioni
-          </a>
-          <a href="/temi">Temi</a>
+        <nav id="masthead-nav" className="masthead__links" aria-label="Navigazione principale" ref={navRef}>
+          <div className="masthead__group">
+            <a
+              href="/atlante"
+              data-nav-key="atlas"
+              className={activeNav === "atlas" || activeNav === "regioni" ? "is-active" : ""}
+              onClick={(event) => handleLocalNav(event, onNavAtlas)}
+            >
+              Esplora
+            </a>
+            <div className="masthead__dropdown" aria-label="Esplora i dati">
+              <a href="/atlante" onClick={(event) => handleLocalNav(event, onNavAtlas)}><strong>Atlante</strong><span>Cerca e filtra gli indicatori</span></a>
+              <a href="/regioni" onClick={(event) => handleLocalNav(event, onNavRegioni)}><strong>Regioni</strong><span>Venti profili territoriali</span></a>
+              <a href="/temi"><strong>Temi</strong><span>Dodici chiavi di lettura</span></a>
+              <a href="/confronto"><strong>Confronta</strong><span>Due o tre regioni sullo stesso dato</span></a>
+            </div>
+          </div>
           <a href="/qualita-della-vita">Qualità della vita</a>
-          <a href="/quiz">Quiz Italia</a>
-          <a href="/metodologia">Metodologia</a>
-          <a href="/blog">Blog</a>
+          <div className="masthead__group">
+            <a href="/blog">Storie</a>
+            <div className="masthead__dropdown masthead__dropdown--right" aria-label="Storie dai dati">
+              <a href="/blog"><strong>Storie dai dati</strong><span>Articoli e analisi territoriali</span></a>
+              <a href="/divari-regionali"><strong>Divari regionali</strong><span>Nord, Centro e Mezzogiorno</span></a>
+            </div>
+          </div>
+          <a href="/quiz">Quiz</a>
+          <a href="/metodologia">Metodo</a>
           <span className={`nav-underline${underlineStyle.opacity ? " is-visible" : ""}`} style={underlineStyle} aria-hidden="true" />
         </nav>
         <a
           className="masthead__search"
-          href="/atlante"
-          aria-label="Cerca nell'atlante"
-          onClick={(event) => handleLocalNav(event, onNavAtlas)}
+          href="/ricerca"
+          aria-label="Cerca nel sito"
         >
           <Search size={18} />
         </a>
         <AuthControl />
+        <details className="app-menu">
+          <summary aria-label="Apri menu"><span /><span /><span /></summary>
+          <nav aria-label="Menu mobile">
+            <a href="/atlante">Atlante</a><a href="/regioni">Regioni</a><a href="/temi">Temi</a><a href="/confronto">Confronta</a>
+            <a href="/qualita-della-vita">Qualità della vita</a><a href="/blog">Storie</a><a href="/quiz">Quiz</a><a href="/metodologia">Metodo</a>
+          </nav>
+        </details>
       </header>
-
-      <nav className="tabbar" aria-label="Navigazione principale">
-        <a
-          href="/atlante"
-          className={activeNav === "atlas" ? "tabbar__item is-active" : "tabbar__item"}
-          onClick={(event) => handleLocalNav(event, onNavAtlas)}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"></path></svg>
-          <span>Atlante</span>
-        </a>
-        <a
-          href="/regioni"
-          className={activeNav === "regioni" ? "tabbar__item is-active" : "tabbar__item"}
-          onClick={(event) => handleLocalNav(event, onNavRegioni)}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
-          <span>Regioni</span>
-        </a>
-        <a href="/qualita-della-vita" className="tabbar__item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
-          <span>Qualità</span>
-        </a>
-        <a href="/quiz" className="tabbar__item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16"></rect><circle cx="8" cy="8" r="1"></circle><circle cx="16" cy="8" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="8" cy="16" r="1"></circle><circle cx="16" cy="16" r="1"></circle></svg>
-          <span>Gioco</span>
-        </a>
-        <a href="/blog" className="tabbar__item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg>
-          <span>Blog</span>
-        </a>
-      </nav>
     </>
   );
 }
@@ -705,13 +681,10 @@ function HomeMapHero({ catalog, mapData, onOpenRegion }) {
   };
 
   return (
-    <section className="home-hero">
+    <section className="home-hero atlas-map-hero">
       <div className="home-hero__intro">
         <p className="eyebrow">Istat · {catalog.indicators.length} indicatori · 20 regioni · {coverageSpan(catalog)}</p>
-        <h1>
-          Un atlante per leggere l'Italia,<br />
-          regione per regione.
-        </h1>
+        <h1>Un atlante per leggere l'Italia, regione per regione.</h1>
         <p className="atlas-hero__lead">
           Indicatori territoriali e BES Istat per capire dove l'Italia corre e dove resta indietro.
           Filtra per area, tema o anni, poi apri la scheda di ogni indicatore con mappa,
@@ -769,7 +742,7 @@ function HomeMapHero({ catalog, mapData, onOpenRegion }) {
                   </>
                 ) : (
                   <span className="map-readout__hint">
-                    Passa sopra una regione per vederne il valore. Clicca per aprire il profilo completo.
+                    Passa su una regione per leggere il valore. Clicca per aprire il profilo.
                   </span>
                 )}
               </div>
@@ -1783,7 +1756,7 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
           <ModeSwitch active="confronto" onMode={onMode} />
         </ContextBar>
 
-        <section className="atlas-hero atlas-hero--compact">
+        <section className="atlas-hero atlas-hero--compact compare-hero">
           <p className="eyebrow">Confronto regioni</p>
           <h1>Metti due o tre regioni a confronto.</h1>
           <p className="atlas-hero__lead">

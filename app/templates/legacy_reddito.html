@@ -14,12 +14,19 @@
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/datatables.min.css') }}"/>
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-awesome.min.css') }}"/>
   <link rel="stylesheet" href="{{ url_for('static', filename='legacy_reddito/style.css') }}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=Inter:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="{{ asset_url('css/legacy-bridge.css') }}">
   <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
   {% include "_third_party_head.html" %}
 </head>
 
 <body>
   {% include "_third_party_body.html" %}
+
+  <aside class="legacy-bridge">
+    <span><strong>Archivio storico</strong> · Dati 2011-2015 conservati per continuità.</span>
+    <a href="/atlante">Vai all'atlante aggiornato →</a>
+  </aside>
 
   <nav class="navbar navbar-inverse navbar-top">
     <div class="container-fluid">

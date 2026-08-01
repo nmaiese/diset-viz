@@ -85,13 +85,8 @@
   <p class="page-lead">{{ page_lead | analyst_html }}</p>
   <p class="page-note">{% if dataset_updated %}Fonte aggiornata il {{ dataset_updated }}. {% endif %}<a href="{{ corrections_url }}">Segnala un errore in questa scheda</a>.</p>
   {% if not meta.indexable %}
-  <p class="page-note">Questa scheda resta consultabile, ma non è una priorità per l'indicizzazione: la serie è meno recente, incompleta o appartiene a una variante da leggere insieme alla pagina principale.</p>
+  <p class="data-notice">Serie da leggere con cautela. I dati sono meno recenti, incompleti o appartengono a una variante collegata a una pagina principale.</p>
   {% endif %}
-
-  <nav class="page-note" aria-label="Domande a cui risponde questa scheda">
-    <strong>Domande sui dati:</strong>
-    {% for item in level.query_map %}<a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a>{{ " · " if not loop.last }}{% endfor %}
-  </nav>
 
   {# ---- Zona 1: il cruscotto. Ogni numero della pagina vive qui, una volta sola. ---- #}
   <section class="indicator-cockpit" id="esplora" data-explore-root aria-label="Esplora i dati dell'indicatore">
@@ -278,6 +273,11 @@
       </article>
     </div>
   </section>
+
+  <nav class="indicator-questions" aria-label="Domande a cui risponde questa scheda">
+    <strong>Vai alla risposta</strong>
+    {% for item in level.query_map %}<a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a>{% endfor %}
+  </nav>
 
   {# ---- Zona 2: l'articolo. Quattro sezioni, una voce sola. ---- #}
   {{ article.body(page_article, meta, level) }}

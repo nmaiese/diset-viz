@@ -55,7 +55,7 @@
 {% block content %}
 <article>
   <div class="prose-wrap article-hero">
-    <nav class="breadcrumb"><a href="/blog">Blog</a> / {% if post.tags %}{{ post.tags[0] }}{% else %}Articolo{% endif %}</nav>
+    <nav class="breadcrumb"><a href="/blog">Storie</a> / {% if post.tags %}{{ post.tags[0] }}{% else %}Articolo{% endif %}</nav>
     <h1>{{ post.title }}</h1>
     <div class="article-meta">
       <span>Pubblicato il {{ post.date.strftime('%d.%m.%Y') }}</span>

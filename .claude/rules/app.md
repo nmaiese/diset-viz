@@ -5,7 +5,10 @@ paths:
 
 # Le rotte, e le regole che non si vedono rompendole
 
-- `/` — atlante React/Vite (sorgente in `frontend/`, build in `app/static/dist/`).
+- `/` — homepage server-rendered (Jinja), con ricerca e anteprima della mappa.
+- `/atlante` — atlante React/Vite (sorgente in `frontend/`, build in
+  `app/static/dist/`). La vista regione interattiva vive nello stesso bundle,
+  mentre `/regioni` resta l'indice server-rendered canonico.
 - `/blog`, `/blog/<slug>` — blog server-rendered (Jinja) dai Markdown in
   `content/posts/`.
 - `/qualita-della-vita`, `/classifica`, `/metodologia`, `/province` — pagine

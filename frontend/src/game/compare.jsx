@@ -222,24 +222,11 @@ export default function CompareApp() {
       {status === "idle" && (
         <div className="compare-start">
           <h2>Chi è maggiore?</h2>
-          <ol className="game-onboarding-steps">
-            <li>
-              <strong>Un indicatore, due regioni.</strong> Tocca la regione che secondo te ha il valore
-              più alto. Conta il numero, anche quando un valore alto non rappresenta un risultato migliore.
-              Hai dieci secondi.
-            </li>
-            <li>
-              <strong>La serie cresce, la sfida pure.</strong> Ogni risposta giusta di fila alza la
-              difficoltà: le coppie diventano sempre più vicine in classifica.
-            </li>
-            <li>
-              <strong>Un errore azzera la serie.</strong> Il tuo record resta salvato su questo
-              dispositivo. Da tastiera usa le frecce o i tasti A e B.
-            </li>
-          </ol>
+          <p>Scegli la regione con il valore più alto. Hai dieci secondi e la difficoltà cresce con la tua serie.</p>
           <button type="button" className="game-btn" onClick={startGame}>
             {hasPlayedBefore ? "Inizia" : "Inizia a giocare"}
           </button>
+          <p className="game-start-note">Da tastiera puoi usare le frecce oppure i tasti A e B.</p>
         </div>
       )}
 

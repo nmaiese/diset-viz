@@ -58,19 +58,18 @@
   {% with map_action = "/" %}{% include "_map_panel.html" %}{% endwith %}
 </section>
 
-<section class="home-section" aria-labelledby="cap-title">
+<section class="home-section home-section--gateway" aria-labelledby="cap-title">
   <div class="home-section__head">
     <p class="section-label">Cosa puoi fare qui</p>
     <h2 id="cap-title">Un sito, sei modi di leggere i divari territoriali</h2>
     <p class="home-section__lead">Mappe interattive, schede regione, confronti, un indice di qualità della vita, storie dai dati e quiz. Tutto costruito sugli indicatori {{ sources_label }}.</p>
   </div>
-  <div class="quality-grid">
+  <div class="home-capability-list">
     {% for cap in capabilities %}
-    <a class="quality-card" href="{{ cap.href }}">
-      <small>{{ cap.kicker }}</small>
-      <h3>{{ cap.title }}</h3>
-      <p>{{ cap.body }}</p>
-      <span class="quality-card__cta">{{ cap.cta }} &rarr;</span>
+    <a class="home-capability" href="{{ cap.href }}">
+      <small>{{ '%02d' | format(loop.index) }}</small>
+      <span><strong>{{ cap.title }}</strong><em>{{ cap.body }}</em></span>
+      <b>{{ cap.cta }} &rarr;</b>
     </a>
     {% endfor %}
   </div>

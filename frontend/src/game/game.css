@@ -1448,3 +1448,74 @@
 /* Scelta salva a 3 opzioni (Fase 5.2). */
 .submit-score-choice { display: flex; flex-direction: column; gap: 10px; }
 .submit-score-choice .game-btn { width: 100%; }
+
+/* ---------- Redesign 2026: action-first game surfaces ---------- */
+.game-page { padding-top: clamp(22px, 3.5vw, 42px); }
+.game-subnav-wrap { margin-bottom: clamp(18px, 3vw, 30px); }
+.game-subnav .game-tab { min-height: 42px; display: inline-flex; align-items: center; }
+
+.hub-layout { grid-template-columns: minmax(250px, 330px) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); }
+.hub-layout__hero .page-hero h1 { max-width: 8ch; font-size: clamp(40px, 5.8vw, 72px); line-height: 0.96; letter-spacing: -0.035em; }
+.hub-layout__hero .page-lead { max-width: 32ch; }
+.hub-cards { margin-top: 14px; }
+.hub-card { min-height: 250px; padding: clamp(20px, 2.5vw, 28px); border-top: 4px solid var(--ink); transition: transform 160ms ease, border-color 160ms ease; }
+.hub-card:hover { border-top-color: var(--accent); transform: translateY(-3px); }
+.hub-intro.method-disclosure { margin-top: 32px; }
+
+.compare-start,
+.order-start { padding: clamp(20px, 3vw, 30px); border-top: 4px solid var(--accent); box-shadow: 7px 7px 0 var(--grid); }
+.compare-start h2,
+.order-start h2 { font-size: clamp(23px, 3vw, 30px); margin-bottom: 8px; }
+.game-start-note { margin: 0 0 18px; max-width: 58ch; color: var(--ink-soft); line-height: 1.55; }
+.compare-start .game-btn,
+.order-start .game-btn { min-height: 46px; padding-inline: 24px; }
+
+.qz-question { padding: clamp(18px, 3vw, 28px); }
+.qz-question h2 { font-size: clamp(21px, 3vw, 31px); }
+.qz-region { min-height: 150px; }
+.order-row { min-height: 62px; }
+.order-move-btn { width: 42px; height: 42px; }
+
+@media (max-width: 1099px) {
+  .hub-layout__hero { max-width: 720px; }
+  .hub-layout__hero .page-hero h1 { max-width: 11ch; }
+}
+
+@media (max-width: 640px) {
+  .game-page { padding-top: 16px; }
+  .game-subnav-wrap { margin-inline: -16px; }
+  .game-subnav { padding-left: 16px; scroll-padding-inline: 16px; }
+  .game-subnav-wrap::after { width: 44px; }
+  .hub-layout__hero .page-hero h1 { font-size: 45px; }
+  .hub-card { min-height: 0; }
+  .qz-game .qz-meta { align-items: flex-end; gap: 10px; }
+  .compare-start,
+  .order-start { margin-inline: -4px; box-shadow: 4px 4px 0 var(--grid); }
+  .qz-region { min-height: 122px; }
+  .game-btn { min-height: 44px; }
+}
+
+/* Quiz refinement aligned with the shared data-card language. */
+.hub-cards { gap: 0; border: 1px solid var(--line); }
+.hub-card { border: 0; border-right: 1px solid var(--line); box-shadow: none; }
+.hub-card:last-child { border-right: 0; }
+.hub-card:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-2px); }
+.qz-game .qz-meta { gap: 18px; }
+.qz-game .qz-meta em { flex: 1 1 auto; min-width: 0; }
+.qz-game .qz-meta > span { flex: 0 0 auto; white-space: nowrap; }
+.compare-start,
+.order-start { border-top-width: 1px; box-shadow: none; }
+.game-auth__btn,
+.achv-toast,
+.achv-card { border-radius: 0; }
+.qz-question { box-shadow: none; }
+.qz-region { box-shadow: none; }
+@media (min-width: 1100px) {
+  .hub-layout { grid-template-columns: 320px minmax(0, 1fr); }
+  .hub-layout__hero { padding: 0; color: var(--ink); box-shadow: none; }
+  .hub-layout__hero .page-lead { color: var(--ink-soft); }
+}
+@media (max-width: 640px) {
+  .hub-cards { border: 0; gap: 10px; }
+  .hub-card { border: 1px solid var(--line); }
+}
