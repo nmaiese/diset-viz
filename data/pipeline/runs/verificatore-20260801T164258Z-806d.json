@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-01T16:56:19+00:00",
+ "base_commit": "70521f5",
+ "branch": "automation/verificatore-2026-08-01-806d",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "70521f5",
+ "detail": [
+  "Testo riscritto dopo la verifica del 29/07, impronta eb13b3173ca6eec2 confermata contro load_texts. Le 3 smentite precedenti risultano tutte corrette. Controllate 27 sulla serie 2015-2024: ranking 2024, i sei sotto meno 2, salto 2,10 dopo la Sardegna, Sardegna meno 0,10 minimo in modulo del decennio, 13 regioni positive massimo della serie, 8 del Mezzogiorno migliorano dal 2023 al 2024, 9 in calo tutte del Centro-Nord, somme Basilicata meno 46,80 ed Emilia piu 34,70 per mille, media dal 2015 al 2024 piu 0,135. Esterni verificati su Istat 20/06/2025: 241mila contro 125mila uguale meno 116mila, quasi tre su dieci in Lombardia. Definizione scoperta su dem, verificata alla fonte, tasso per mille su popolazione media, estero escluso. Break di serie: colonna notes vuota, comunicato non segnala discontinuita. UNICA SMENTITA dinamica/medio: Poi si e chiusa descrive due fasi, ma dopo il picco 2018 di 10,70 il divario cala a 7,60 nel 2021, RISALE a 9,30 nel 2023 di piu 1,70 e solo poi chiude a 7,40"
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 31,
+ "queue_before": 32,
+ "run_id": "verificatore-20260801T164258Z-806d",
+ "stage": "verificatore",
+ "summary": "Riverifica dem-NMIGRATEIN: 27 affermazioni controllate, 1 smentita sulla forma del decennio, esito smentito",
+ "trigger": "manuale"
+}
