@@ -295,7 +295,7 @@ def main(argv=None):
         target = item["indicator"] or "(coda intera)"
         print(f"  {item['priority']:6.1f}  {item['role']:12s} {target:24.24s} {item['reason']}")
         print(f"          agente {item['agent']}, run_id {item['run_id']}")
-    if cap and len(launches) > len(shown):
+    if len(launches) > len(shown):
         print(f"\n  ... e altre {len(launches) - len(shown)} voci sotto il cap "
               f"di parallelismo ({len(shown)} per tick), al prossimo tick.")
     return 0
