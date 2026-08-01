@@ -15,6 +15,7 @@ skills:
   - pipeline-close-run
   - untrusted-web
   - indicator-review
+  - scrittura-italiana
 hooks:
   PreToolUse:
     - matcher: "Bash|Edit|Write|NotebookEdit"
@@ -160,6 +161,16 @@ il lettore peggiore: cerca apposta di cadere.
   `universale`, `causale`, `esterno` con la trappola dell'aggregato ponderato,
   `provincia`, `eco`, `mestiere`) sulla tua prosa. Una bandierina e' un posto
   dove guardare, mai un verdetto.
+- **I tic dell'italiano generato**, con la skill `scrittura-italiana`: gli
+  avverbi in -mente a raffica, la gerundite in coda, la definizione bipolare, le
+  perifrasi al posto di "e'/sono", il lessico di plastica, l'incipit a cornice.
+  Sono i tell che fanno "sa di tradotto dall'inglese", e che `indicator-review`
+  non copre. **La precedenza e' assoluta e non negoziabile: vincono gli assoluti
+  di progetto** (`content/STYLE.md`). La skill lavora in *testo controllato* e
+  li' consiglia caporali, lineette e punto e virgola: qui sono vietati. Mai
+  reintrodurre `—`, `–`, `;`, `…` ne' le virgolette curve. Il contratto di
+  conservazione della skill (non inventare ne' rafforzare una cifra, una causa,
+  una fonte) e' lo stesso della catena: rileggere non e' riscrivere il dato.
 - **La rubrica**, i dieci criteri: sotto 14 su 20 non hai finito. Un articolo che
   ripete la definizione e la classifica non e' sbagliato, e' vuoto. Da' al nut
   graf il suo paragrafo, converti un decimale nudo nella scala umana che il brief

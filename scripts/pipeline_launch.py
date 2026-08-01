@@ -227,12 +227,29 @@ def log_tick(launches, publish, runner=None, do_commit=True, log=print):
     return entry
 
 
+def cap_for_tick(launches, *, max_parallel=3, top=None):
+    """Le voci che il lanciatore lancia in un solo tick.
+
+    Il piano e' gia' ordinato per priorita', quindi prendere le prime
+    `max_parallel` tiene il parallelismo basso senza mai tagliare la voce piu'
+    urgente (una smentita pubblica, peso 100, sta in testa e resta). `top` e' un
+    override esplicito di visualizzazione; un cap di 0 (o None) non taglia."""
+    cap = top if top is not None else (max_parallel or None)
+    return launches[:cap] if cap else launches
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Che cosa lanciare adesso nella catena per-indicatore, e in che ordine.",
         epilog="uscita 0 = c'e' lavoro da lanciare, 1 = niente da lanciare.",
     )
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--max-parallel", type=int, default=3,
+                        help="quante voci in cima al piano lanciare per tick "
+                             "(default 3, 0 = nessun cap). Il cap tiene basso il "
+                             "numero di ruoli che partono insieme a ogni tick "
+                             "della Routine: le voci sotto il taglio, gia' "
+                             "ordinate per priorita', aspettano il tick dopo.")
     parser.add_argument("--top", type=int, default=None,
                         help="mostra solo le prime N voci (le piu' prioritarie)")
     parser.add_argument("--today", default="",
@@ -254,7 +271,7 @@ def main(argv=None):
             base=base, log=(lambda *_: None) if args.json else print)
 
     launches = load_plan(today=args.today)
-    shown = launches[:args.top] if args.top else launches
+    shown = cap_for_tick(launches, max_parallel=args.max_parallel, top=args.top)
 
     # Il battito, solo quando il lanciatore fa il passo del sito (cioe' a ogni
     # tick vero della Routine, che gira `--publish`): una riga `launch` che rende
@@ -278,8 +295,9 @@ def main(argv=None):
         target = item["indicator"] or "(coda intera)"
         print(f"  {item['priority']:6.1f}  {item['role']:12s} {target:24.24s} {item['reason']}")
         print(f"          agente {item['agent']}, run_id {item['run_id']}")
-    if args.top and len(launches) > args.top:
-        print(f"\n  ... e altre {len(launches) - args.top} voci sotto soglia.")
+    if cap and len(launches) > len(shown):
+        print(f"\n  ... e altre {len(launches) - len(shown)} voci sotto il cap "
+              f"di parallelismo ({len(shown)} per tick), al prossimo tick.")
     return 0
 
 

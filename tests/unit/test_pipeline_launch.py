@@ -119,6 +119,37 @@ class PlanLaunches(unittest.TestCase):
         self.assertEqual(plan, [])
 
 
+class TheParallelismCap(unittest.TestCase):
+    """Il cap di parallelismo: un tick lancia al massimo tre ruoli, e taglia i
+    meno prioritari, non i piu'. Nasce dalla richiesta di non far partire dieci
+    subagent insieme."""
+
+    def _plan(self, n):
+        # gia' ordinato per priorita' decrescente, come load_plan restituisce
+        return [{"role": "producer", "indicator": f"ter-{i}", "priority": 100 - i}
+                for i in range(n)]
+
+    def test_default_cap_is_three(self):
+        shown = pipeline_launch.cap_for_tick(self._plan(10))
+        self.assertEqual(len(shown), 3)
+
+    def test_the_cap_keeps_the_most_urgent_and_drops_the_tail(self):
+        plan = self._plan(10)
+        shown = pipeline_launch.cap_for_tick(plan)
+        self.assertEqual(shown, plan[:3])
+        self.assertEqual(shown[0]["indicator"], "ter-0")  # priorita' piu' alta
+
+    def test_fewer_than_the_cap_passes_all_through(self):
+        self.assertEqual(len(pipeline_launch.cap_for_tick(self._plan(2))), 2)
+
+    def test_zero_means_no_cap(self):
+        plan = self._plan(7)
+        self.assertEqual(pipeline_launch.cap_for_tick(plan, max_parallel=0), plan)
+
+    def test_top_overrides_the_cap(self):
+        self.assertEqual(len(pipeline_launch.cap_for_tick(self._plan(9), top=5)), 5)
+
+
 class TheLaunchTick(unittest.TestCase):
     """Il battito del lanciatore: uno shard `launch` per tick, portato su master
     con un runner iniettato, mai un git vero. Senza questo battito una Routine a
