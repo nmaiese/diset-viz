@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-01T17:00:49+00:00",
+ "base_commit": "4f6cb99",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "4f6cb99",
+ "detail": [
+  "il cancello e' rosso: worktree non pulito, committa prima di fondere (.venv, data/pipeline/runs/verificatore-20260801T165522Z-47d8.json)"
+ ],
+ "gate": "blocked",
+ "outcome": "blocked",
+ "pr": "119",
+ "run_id": "verificatore-20260801T164258Z-806d",
+ "stage": "verificatore",
+ "summary": "PR #119 non fusa: il cancello e' rosso",
+ "trigger": "manuale"
+}
