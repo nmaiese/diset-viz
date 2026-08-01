@@ -67,9 +67,13 @@ promoter), **produttore** (curator+writer+reviewer), **verificatore**.
    finito, non perche' e' bloccata. Non lanciare niente, non aprire PR, non
    committare. Riporta in una riga e fermati.
 
-3. **Piano con lavoro**: lancia gli agenti in cima al piano, **in parallelo**
-   (piu' `Agent` nello stesso messaggio). Un blocco ragionevole per tick, dalle
-   voci piu' prioritarie. Per ogni voce:
+3. **Piano con lavoro**: lancia gli agenti che il piano nomina, **in parallelo**
+   (piu' `Agent` nello stesso messaggio). Il piano ti offre gia' **al massimo tre
+   voci per tick** (il cap `--max-parallel`, default 3): lanciale tutte, non di
+   piu'. Le sono gia' quelle a priorita' piu' alta, quindi una smentita pubblica
+   (peso 100) e' sempre dentro e non resta mai sotto il taglio. Le voci in eccesso
+   aspettano il tick dopo: e' voluto, tiene basso il numero di ruoli che partono
+   insieme. Per ogni voce:
 
    - `role: producer` -> agente `producer`, un indicatore (`indicator`): passagli
      il `run_id` e l'indicatore da portare da ammesso a pubblicato.

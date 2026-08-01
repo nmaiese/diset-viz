@@ -122,7 +122,12 @@ l'intera catena, e due stadi che partivano vicini finivano in conflitto di merge
 Al suo posto c'e' `scripts/pipeline_launch.py`, un **lanciatore per-indicatore**.
 Non sceglie uno stadio: legge il dossier per-indicatore (`practice_timeline`) e
 le code (`pipeline_status.queue_sizes`) e restituisce una **lista prioritizzata
-di lanci**, tutto il lavoro lanciabile insieme.
+di lanci**, ordinata per priorita' e **tagliata alle prime tre voci per tick**
+(`--max-parallel`, default 3; `--max-parallel 0` toglie il taglio, `--top N` lo
+forza a N). Il taglio tiene basso il numero di ruoli che partono insieme senza
+mai lasciare fuori la voce piu' urgente, perche' agisce dopo l'ordinamento: una
+smentita pubblica (peso 100) e' sempre dentro. Le voci in eccesso aspettano il
+tick dopo.
 
 - **Produttore e verificatore sono per-indicatore.** Ogni indicatore pronto e'
   una voce a se', perche' due produttori su due indicatori diversi toccano file
@@ -136,9 +141,9 @@ di lanci**, tutto il lavoro lanciabile insieme.
 
 **Niente piu' lock una-PR-aperta.** Indicatori diversi non contendono, quindi
 non c'e' niente da serializzare e niente da aspettare: il lanciatore elenca, e
-chi esegue (l'agente lanciatore, o una persona) ne mette in volo quanti ne vuole
-in parallelo. Un blocco su un indicatore malato non ferma un indicatore pronto e
-indipendente.
+chi esegue (l'agente lanciatore, o una persona) mette in volo in parallelo le
+voci che il piano gli offre, fino al cap di tre per tick. Un blocco su un
+indicatore malato non ferma un indicatore pronto e indipendente.
 
 Come il dispatcher, non lancia lui l'agente, e non potrebbe: un agente e' una
 sessione Claude Code, il lanciatore e' stdlib. Dice **che cosa** lanciare, con
