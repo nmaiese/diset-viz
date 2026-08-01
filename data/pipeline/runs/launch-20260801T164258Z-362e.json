@@ -1,0 +1,15 @@
+{
+ "at": "2026-08-01T16:42:58+00:00",
+ "base_commit": "718ef9d",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "718ef9d",
+ "detail": [],
+ "gate": "",
+ "outcome": "nothing",
+ "pr": "",
+ "run_id": "launch-20260801T164258Z-362e",
+ "stage": "launch",
+ "summary": "tick: 376 unita' pronte, 0 prove pubblicate",
+ "trigger": "routine"
+}
