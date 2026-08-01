@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-01T17:03:21+00:00",
+ "base_commit": "6a57f55",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "6a57f55",
+ "detail": [
+  "il cancello e' rosso: worktree non pulito, committa prima di fondere (.venv)"
+ ],
+ "gate": "blocked",
+ "outcome": "blocked",
+ "pr": "120",
+ "run_id": "producer-20260801T164258Z-e4d1",
+ "stage": "producer",
+ "summary": "PR #120 non fusa: il cancello e' rosso",
+ "trigger": "manuale"
+}
