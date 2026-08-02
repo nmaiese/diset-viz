@@ -64,7 +64,10 @@ function cleanOAuthUrl() {
 
 function loginButton() {
   root.innerHTML =
-    '<button type="button" class="site-auth__login" id="site-auth-login">Accedi</button>';
+    '<button type="button" class="site-auth__login" id="site-auth-login" aria-label="Accedi con Google">' +
+    '<svg class="site-auth__login-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">' +
+    '<circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path>' +
+    '</svg><span class="site-auth__login-label">Accedi</span></button>';
   document.getElementById("site-auth-login").onclick = () => signInWithGoogle();
 }
 

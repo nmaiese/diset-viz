@@ -3,6 +3,7 @@
 // due sistemi di rendering. Non compare se Supabase non e' configurato.
 
 import React, { useEffect, useRef, useState } from "react";
+import { UserRound } from "lucide-react";
 import {
   getUser,
   isAuthConfigured,
@@ -50,8 +51,14 @@ export function AuthControl() {
   if (!user) {
     return (
       <div className="site-auth">
-        <button type="button" className="site-auth__login" onClick={() => signInWithGoogle()}>
-          Accedi
+        <button
+          type="button"
+          className="site-auth__login"
+          aria-label="Accedi con Google"
+          onClick={() => signInWithGoogle()}
+        >
+          <UserRound className="site-auth__login-icon" size={16} aria-hidden="true" />
+          <span className="site-auth__login-label">Accedi</span>
         </button>
       </div>
     );

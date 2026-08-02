@@ -326,6 +326,19 @@ body { line-height: 1.55; }
   .brand-mark { width: 34px; height: 34px; }
   .brand-text strong { font-size: 15px; }
   .masthead__search { width: 40px; height: 40px; }
+  .site-auth { width: 40px; min-width: 40px; }
+  .site-auth .site-auth__login { width: 40px; height: 40px; min-height: 40px; padding: 0; gap: 0; }
+  .site-auth .site-auth__login-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
   .home-hero h1 { font-size: clamp(42px, 14vw, 64px); }
   .home-hero__lead { font-size: 17px; }

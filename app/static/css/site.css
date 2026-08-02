@@ -128,6 +128,11 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   flex: 0 0 auto;
 }
 .site-auth__login {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   font: 600 14px/1 var(--font-body);
   color: var(--ink);
   background: none;
@@ -136,6 +141,7 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   padding: 8px 16px;
   cursor: pointer;
 }
+.site-auth__login-icon { width: 16px; height: 16px; flex: 0 0 auto; }
 .site-auth__login:hover { border-color: var(--accent); color: var(--accent); }
 .site-auth__menu { position: relative; }
 .site-auth__btn {
