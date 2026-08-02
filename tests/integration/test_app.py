@@ -34,7 +34,8 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://tpc.googlesyndication.com", csp)
         self.assertIn(b"Un atlante per leggere l", home.data)
         self.assertIn(b"/atlante", home.data)
-        self.assertIn(b"Cosa puoi fare qui", home.data)
+        self.assertIn(b"Esplora l'atlante", home.data)
+        self.assertIn("Quattro indicatori per entrare nell'atlante".encode("utf-8"), home.data)
         self.assertIn(b'<main class="home-page wrap-wide">', home.data)
         self.assertIn(b'id="home-map-data"', home.data)
         # The "Temi e aree" and "Confronta" previews render with real data.
