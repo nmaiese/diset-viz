@@ -17,6 +17,24 @@
 html { scroll-behavior: smooth; }
 body { line-height: 1.55; }
 
+/* Component display rules must never override the semantic hidden state.
+   Theme, region and catalogue filters all depend on this contract. */
+:where([hidden]) { display: none !important; }
+
+/* Short utility pages still occupy the viewport, so their footer closes the
+   composition instead of floating halfway down a tall desktop screen. */
+.search-page,
+.page-account,
+.page-error { min-height: calc(100svh - var(--masthead-h) - 210px); }
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.table-scroll .data-table { min-width: 560px; }
+
 :where(a, button, input, select, summary):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
