@@ -1,0 +1,25 @@
+{
+ "at": "2026-08-03T20:15:44+00:00",
+ "base_commit": "3308544",
+ "branch": "automation/producer-2026-08-03-d374",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "d183ccf",
+ "detail": [
+  "Innesco: dem:NMIGRATEIN portato da contextual a higher_better, rho +0,89 con 923. Il rientro segue il data_year del proprio indicatore, quindi nessun meccanismo avrebbe riaperto 923.",
+  "Verso: contextual confermato. Sotto higher_better in cima ci sarebbe la Liguria in tutti e tre gli ultimi anni (9,20 nel 2023, 9,00 nel 2024, 9,80 nel 2025), sesta sugli scambi interni a +1,50 e prima per dipendenza anziani (dem:OLDAGEDEPR 48,3 nel 2025). Nel 2024 e nel 2025 sono in guadagno 19 regioni su 20.",
+  "Prova della composizione: 923 somma interno ed estero. Nel 2024 Molise +4,70 qui contro -3,40 sugli scambi interni, Calabria +2,00 contro -4,40, Basilicata +0,30 contro -4,80. La componente non interna vale +8,10 in Molise, il massimo delle venti regioni.",
+  "score_eligible resta false: NMIGRATEIN e gia nel punteggio sotto lavoro_opportunita, e a rho +0,89 contare 923 sotto salute_cura conterebbe lo stesso fatto due volte su due macro-aree.",
+  "Diff reale: solo review_notes nel manifest esterno piu' la riga in curation.csv (reviewed_at 2026-08-03, data_year 2025). Direzione, categoria e score_eligible invariati, nessuna riga di dati toccata, nessuna descrizione scritta.",
+  "Prosa non toccata: content/indicators/923.json e' un abbozzo gia' in coda allo scrittore (mancano definizione e dinamica), niente level, fonti vuote, non firmato. Il verso non cambia, quindi niente in quel testo diventa falso.",
+  "Fuori perimetro: per ter-923 il verso pubblicato viene da CURATED_DIRECTION in app/indicator_notes.py, non dal layer esterno. Verificato con una prova: flippando quella voce build_indicator_view passa a higher_better, cambiando il manifest no."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 0,
+ "queue_before": 1,
+ "run_id": "producer-20260803T201252Z-d374",
+ "stage": "producer",
+ "summary": "ter-923 (Saldo migratorio totale): rilettura di curatela fuori dal rientro automatico, verso riconfermato contextual con decisione datata",
+ "trigger": "manuale"
+}
