@@ -1,17 +1,17 @@
 {
- "at": "2026-08-03T20:58:04+00:00",
- "base_commit": "462d11a",
+ "at": "2026-08-03T21:05:55+00:00",
+ "base_commit": "fbad522",
  "branch": "master",
  "claude_code_version": "2.1.220 (Claude Code)",
- "commit": "462d11a",
+ "commit": "fbad522",
  "detail": [
-  "{\"message\":\"Pull Request has merge conflicts\",\"documentation_url\":\"https://docs.github.com/rest/pulls/pulls#merge-a-pull-request\",\"status\":\"405\"}gh: Pull Request has merge conflicts (HTTP 405)"
+  "Pull Request successfully merged"
  ],
  "gate": "auto",
- "outcome": "error",
+ "outcome": "merged",
  "pr": "131",
  "run_id": "producer-20260803T203758Z-9ec9",
  "stage": "producer",
- "summary": "PR #131 non fusa: il merge e' fallito",
+ "summary": "PR #131 fusa in master dal passo di merge",
  "trigger": "manuale"
 }
