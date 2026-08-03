@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-03T18:56:22+00:00",
+ "base_commit": "72111f5",
+ "branch": "automation/producer-2026-08-03-daf5",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "2eeb8cd",
+ "detail": [
+  "Verifica 2026-08-01 (26/27 confermate, 1 smentita): la dinamica diceva allargamento-poi-chiusura, la distanza tra prima e ultima regione fa invece 7,10 nel 2015, 10,70 nel 2018, 7,60 nel 2021, 9,30 nel 2023, 7,40 nel 2024. Riscritta la sezione con la sequenza vera e con la scomposizione del 2023-2024 (1,30 dei 1,90 punti recuperati vengono dal fondo che risale, il resto dalla cima che scende), nuovo h2. Aggiunti in definizione l azzeramento nazionale del saldo interno, in quadro la mediana positiva e la media negativa in tutti e dieci gli anni, in limiti l eccezione al rimando ter-923 (Calabria -4,40 qui e +2,0 sul saldo totale 2024). Corretti due difetti trovati in rilettura, non segnalati da nessuna guardia: Abruzzo positivo per la prima volta in dieci anni e non dal 2015 (era -1,00 nel 2015), e la definizione ricompattata che aveva perso la precisione sul comune di origine. Cura non toccata: coda curate vuota, verdetto higher_better del 2026-07-26 su data_year 2024 riconfermato guardando la classifica. Suite 974 test verde, prose_lint pulito, 3 link interni."
+ ],
+ "gate": "",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 0,
+ "queue_before": 1,
+ "run_id": "producer-20260803T183428Z-daf5",
+ "stage": "producer",
+ "summary": "dem:NMIGRATEIN: smentita della dinamica assorbita, articolo riscritto sulla forma vera del decennio e rifirmato",
+ "trigger": "manuale"
+}
