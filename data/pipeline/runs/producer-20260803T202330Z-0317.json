@@ -1,0 +1,24 @@
+{
+ "at": "2026-08-03T20:34:27+00:00",
+ "base_commit": "3e490c8",
+ "branch": "automation/producer-2026-08-03-0317",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "a194749",
+ "detail": [
+  "Smentita [dinamica/basso] del 2026-08-03: 'L'ultimo passaggio, dal 2022 al 2023, e' il piu' mosso' era falso. Calcolato sui dati: la somma degli scarti regionali vale 0,80 punti fra 2022 e 2023, meno di ogni altro passaggio (0,99 fra 2020 e 2021, 0,84 fra 2019 e 2020, 0,81 fra 2021 e 2022), e nessuna regione cambia di piu' di 0,07 punti. Riscritto come passaggio che sposta poco e quasi tutto nello stesso verso, con 13 regioni in salita, 6 in calo e 1 ferma.",
+  "Corretta una seconda affermazione che il verificatore non aveva preso: 'i due movimenti piu' ampi non toccano gli estremi' era falsa, perche' la Valle d'Aosta nel 2019 era diciannovesima su venti. Ora dice che sale dal diciannovesimo posto al sedicesimo con +0,20 punti, accanto all'Umbria che perde 0,22 e scivola dal dodicesimo al quattordicesimo.",
+  "Aggiunta la prova del gradino: fra 2022 e 2023 il salto fra nona e decima passa da 0,17 a 0,30 punti perche' la Liguria sale di 0,07 (1,32 -> 1,39) e la Campania scende di 0,06 (1,15 -> 1,09).",
+  "L'aggregato europeo ora e' nominato per quello che e': 'quella dell'Unione a 27, stimata in 1,57', mai confuso con la media semplice delle venti regioni. Verificato oggi sull'API di diffusione Eurostat (rd_p_perslf, PC_ACT_FTE, 2023): EU27_2020 1,57 con flag 'e', Italia 1,41, e Italia 2,09 in PC_ACT_HC.",
+  "Cura riconfermata senza toccare un file: verso higher_better (in cima Emilia-Romagna 2,06, Lazio 1,68, Friuli-Venezia Giulia 1,64, in fondo Calabria 0,50, Sardegna 0,64, Basilicata 0,65), categoria ricerca_innovazione_digitale, score_eligible=true, copertura 20 regioni su tutti gli anni 2019-2023, descrizione curata 172 caratteri con cifre che combaciano col brief.",
+  "Articolo firmato reviewed_at 2026-08-03 e reviewed_vintage 2023, uguale al vintage. Testo 712 parole con il lead, prose_lint senza tell meccanici, 3 link interni."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 0,
+ "queue_before": 1,
+ "run_id": "producer-20260803T202330Z-0317",
+ "stage": "producer",
+ "summary": "eur:rd_p_persreg riletto e rifirmato: assorbita la smentita aperta sulla dinamica, cura riconfermata senza modifiche",
+ "trigger": "launch"
+}
