@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-03T18:50:55+00:00",
+ "base_commit": "e1b46e2",
+ "branch": "automation/verificatore-2026-08-03-2a4f",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "e1b46e2",
+ "detail": [
+  "Rilettura dopo riscrittura del produttore. Nuova prosa a6533561c289d0a6, la vecchia 77a78e8f2dec2fea aveva 2 smentite su quadro. Le due smentite precedenti risultano corrette: il quadro ora dice si spezza due volte alle estremita opposte invece di una sola discontinuita in cima. 25 affermazioni verificate contro la serie regionale 2015-2025 del brief e i first_value grezzi, aritmetica confermata: stacchi 3,60 e 2,80, 18 in mezzo su 9,20 con gradino max 1,70, mediana 41,10 sopra media 40,73, senza Campania 41,15 scavalca la mediana e senza Liguria scende, range 2015 da 20,40 a 15,60 nel 2025, Sardegna +11,00 da 14a a 5a con 2015 uguale a 32,70 uguale a oggi ultima, Liguria vantaggio da 6,20 a 3,60, Campania penultima da 4,20 a 2,80, TAA terzultimo 2015 in tie con Calabria a 30,80. Incroci sui brief natalita 2024 TAA 1 Campania 2 VdA 19, ter-911 TAA 1 Campania 20 con rho +0,03. FONTI glossario demo.istat.it confermato via WebFetch. Serie senza rottura documentata, colonne NOTE vuote nel fixture, solo il 2026 e stima esclusa. esito pulito."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 30,
+ "queue_before": 31,
+ "run_id": "verificatore-20260803T183428Z-2a4f",
+ "stage": "verificatore",
+ "summary": "verificatore: dem:OLDAGEDEPR riverificato pulito, 25 controllate, 0 smentite",
+ "trigger": "manuale"
+}
