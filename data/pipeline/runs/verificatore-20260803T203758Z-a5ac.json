@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-03T20:49:29+00:00",
+ "base_commit": "7d443af",
+ "branch": "automation/verificatore-2026-08-03-a5ac",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "7d443af",
+ "detail": [
+  "Il lanciatore mi ha assegnato dem-NMIGRATEIN come 'riverificare'. Ho svolto comunque una passata avversariale completa sul testo corrente (fingerprint 541f38b1ba5bedcf, vintage 2024) contro la serie 2015-2024 e la fonte Istat: 20 affermazioni controllate, 0 smentite. Le due smentite precedenti (07-29 quadro su Sardegna/Abruzzo/Lombardia, 08-01 dinamica sulla forma del decennio) risultano risolte nella riscrittura. Verificato: divario 2024=7,40 e' il piu' basso dopo 7,10 del 2015 su tutti e dieci gli anni; mediana>0 e media<0 in tutti gli anni; 13 regioni sopra zero nel 2024 e' record; tutte 8 le regioni del Mezzogiorno migliorano 2023->2024, le 9 in calo tutte Centro-Nord; Emilia-Romagna prima tutti i dieci anni, fondo Calabria fino 2019 poi Basilicata; decennio 11 migliorate 8 peggiorate Toscana ferma; cross-ref ter-923 Calabria +2,0 nel 2024 (rho +0,89); esterni Istat confermati sul comunicato 20/6/2025 (241 mila / 125 mila / netto 116 mila / ~30% in Lombardia). Mentre lavoravo, una run verificatore concorrente sullo stesso indicatore ha gia' scritto su master la verifica pulita con impronta identica (541f38b1ba5bedcf, 29 controllate). Non aggiungo una riga: avrebbe la stessa impronta e quindi lo stesso nome file, cioe' riscriverebbe una verifica gia' data, che l'append-only del registro vieta. Il mio verdetto indipendente coincide (pulito). Nota fuori perimetro per l'umano: il lanciatore ha assegnato due run allo stesso indicatore."
+ ],
+ "gate": "auto",
+ "outcome": "nothing",
+ "pr": "",
+ "queue_after": 29,
+ "queue_before": 30,
+ "run_id": "verificatore-20260803T203758Z-a5ac",
+ "stage": "verificatore",
+ "summary": "dem-NMIGRATEIN gia' verificato pulito su master da una run concorrente (541f38b1ba5bedcf, 29 controllate); nessuna riga aggiunta",
+ "trigger": "manuale"
+}
