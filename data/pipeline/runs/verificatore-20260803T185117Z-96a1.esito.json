@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-03T18:55:01+00:00",
+ "base_commit": "ddb912a",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "ddb912a",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": "123",
+ "run_id": "verificatore-20260803T185117Z-96a1",
+ "stage": "verificatore",
+ "summary": "PR #123 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}
