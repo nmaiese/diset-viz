@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-03T20:39:37+00:00",
+ "base_commit": "9128f22",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "9128f22",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": "128",
+ "run_id": "producer-20260803T202330Z-0317",
+ "stage": "producer",
+ "summary": "PR #128 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}
