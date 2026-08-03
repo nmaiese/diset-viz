@@ -82,6 +82,22 @@ class RunsTimelineTest(unittest.TestCase):
         self.assertEqual(totals["tokens_by_day"]["2026-01-02"], 5000)
         self.assertEqual(totals["tokens"], 13000)
 
+    def test_costo_mai_attribuito_da_un_id_di_prosa(self):
+        # Il caso del batch di ammissione: telemetria senza bersaglio, ma il
+        # diario cita per caso un solo id. Il costo NON e' di quell'indicatore.
+        runs = [_run("b1", "promoter", "merged", "2026-02-01T10:00:00+00:00",
+                     summary="ammessa la candidatura dem:BIRTHRATE dalla coda")]
+        self._orig_read2 = pipeline_log.read_journal
+        pipeline_log.read_journal = lambda: runs
+        try:
+            out = pipeline_monitor.runs_timeline({"b1": {"tokens": 90000, "indicator": ""}})
+        finally:
+            pipeline_log.read_journal = self._orig_read2
+        row = out["runs"][0]
+        self.assertEqual(row["indicators"], ["dem:BIRTHRATE"])  # mostrato
+        self.assertEqual(row["tokens"], 90000)
+        self.assertEqual(out["totals"]["tokens_by_indicator"], {})  # ma non attribuito
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -460,46 +460,51 @@ def runs_timeline(tokens_by_run=None) -> dict:
 
     I totali aggregano cio' che si puo' sommare senza inventare: token per stadio,
     per giorno ed esito per conteggio sono sempre certi; i token per indicatore si
-    sommano solo dove la run ha un bersaglio non ambiguo (un solo indicatore),
-    perche' spartire il costo di una run fra i suoi indicatori di confronto sarebbe
-    la stessa associazione inventata che `attribute_tokens` esiste per evitare."""
+    sommano solo dove la telemetria porta un bersaglio esplicito (`token_entry`),
+    mai da un id pescato nella prosa, nemmeno quando ne compare uno solo: un batch
+    di ammissione posta il costo senza indicatore, e appenderlo all'unico id che il
+    diario cita darebbe a quell'indicatore il conto dell'intera coda. La prosa dice
+    quali id una run ha toccato, non di chi e' il costo."""
     from scripts import pipeline_log
     tokens_by_run = tokens_by_run or {}
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
     out = []
-    for run in runs:
-        run_id = run.get("run_id") or ""
-        token_entry = tokens_by_run.get(run_id) or {}
-        indicators = _run_indicators(run, token_entry)
-        out.append({
-            "at": run.get("at", ""),
-            "run_id": run_id,
-            "stage": run.get("stage", ""),
-            "indicators": indicators,
-            "outcome": run.get("outcome", ""),
-            "summary": run.get("summary", ""),
-            "duration_seconds": run.get("duration_seconds"),
-            "pr": run.get("pr", ""),
-            "commit": run.get("commit", ""),
-            "tokens": token_entry.get("tokens"),
-        })
-    out.sort(key=lambda r: r["at"], reverse=True)
-
     tokens_by_stage: dict = {}
     tokens_by_indicator: dict = {}
     tokens_by_day: dict = {}
     runs_by_outcome: dict = {}
-    for run in out:
-        tok = run["tokens"] or 0
-        stage = run["stage"] or ""
-        day = (run["at"] or "")[:10]
-        outcome = run["outcome"] or ""
-        tokens_by_stage[stage] = tokens_by_stage.get(stage, 0) + tok
-        tokens_by_day[day] = tokens_by_day.get(day, 0) + tok
+    for run in runs:
+        run_id = run.get("run_id") or ""
+        token_entry = tokens_by_run.get(run_id) or {}
+        indicators = _run_indicators(run, token_entry)
+        tok = token_entry.get("tokens")
+        stage = run.get("stage", "")
+        day = (run.get("at", ""))[:10]
+        outcome = run.get("outcome", "")
+        tokens_by_stage[stage] = tokens_by_stage.get(stage, 0) + (tok or 0)
+        tokens_by_day[day] = tokens_by_day.get(day, 0) + (tok or 0)
         runs_by_outcome[outcome] = runs_by_outcome.get(outcome, 0) + 1
-        if tok and len(run["indicators"]) == 1:
-            ind = run["indicators"][0]
-            tokens_by_indicator[ind] = tokens_by_indicator.get(ind, 0) + tok
+        # La proprieta' del costo la stabilisce SOLO il bersaglio esplicito della
+        # telemetria, mai un id pescato nella prosa: un batch di ammissione posta
+        # i token senza indicatore, e se il suo diario cita per caso un solo id il
+        # costo dell'intera coda finirebbe su quell'indicatore. La prosa va bene
+        # per dire "questa run ha toccato questi id", non per dire "il conto e' suo".
+        target = token_entry.get("indicator")
+        if tok and target:
+            tokens_by_indicator[target] = tokens_by_indicator.get(target, 0) + tok
+        out.append({
+            "at": run.get("at", ""),
+            "run_id": run_id,
+            "stage": stage,
+            "indicators": indicators,
+            "outcome": outcome,
+            "summary": run.get("summary", ""),
+            "duration_seconds": run.get("duration_seconds"),
+            "pr": run.get("pr", ""),
+            "commit": run.get("commit", ""),
+            "tokens": tok,
+        })
+    out.sort(key=lambda r: r["at"], reverse=True)
     return {
         "runs": out,
         "totals": {
