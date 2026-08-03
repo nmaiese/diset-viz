@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-03T20:33:39+00:00",
+ "base_commit": "d445131",
+ "branch": "master",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "d445131",
+ "detail": [
+  "il cancello e' rosso: suite"
+ ],
+ "gate": "blocked",
+ "outcome": "blocked",
+ "pr": "127",
+ "run_id": "verificatore-20260803T202330Z-e976",
+ "stage": "verificatore",
+ "summary": "PR #127 non fusa: il cancello e' rosso",
+ "trigger": "manuale"
+}
