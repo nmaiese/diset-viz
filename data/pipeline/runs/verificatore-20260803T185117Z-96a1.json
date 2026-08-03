@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-03T18:51:17+00:00",
+ "base_commit": "e1b46e2",
+ "branch": "automation/verificatore-2026-08-03-eba4",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "e1b46e2",
+ "detail": [
+  "Riverifica dopo riscrittura impronta 299cc8421f586251. Confermate 24 su 25 contro la serie e la fonte. Definizione ora corretta e verificata contro il fixture Eurostat prof_pos TOTAL sectperf All sectors unit PC_ACT_FTE piu le cifre nazionali IT 1.41 FTE e 2.09 HC ed EU27 1.57 FTE riconciliate su rd_p_perslf via API Eurostat. Una smentita dinamica gravita bassa la frase il piu mosso sul passaggio 2022-2023 e falsa quel passaggio e il piu calmo per magnitudine sum-delta 0.80 minimo e per churn di rango 8 minimo pareggia a 19 movers con 2019-2020 primeggia solo per numero di regioni in salita 13. Nessun break di serie non dichiarato nessuna cella italiana con flag b e o p nel fixture. La prova con i numeri e nel corpo della PR."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 30,
+ "queue_before": 31,
+ "run_id": "verificatore-20260803T185117Z-96a1",
+ "stage": "verificatore",
+ "summary": "eur rd_p_persreg verificato 25 controllate 1 smentita esito smentito",
+ "trigger": "manuale"
+}
