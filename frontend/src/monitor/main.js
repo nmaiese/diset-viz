@@ -75,20 +75,255 @@ async function render(supabase, currentUser) {
       '<div class="mon-head"><h1>Console catena</h1>' +
       '<span class="mon-dot" title="in ascolto"></span>' +
       '<button id="mon-logout" class="mon-btn mon-btn--ghost">Esci</button></div>' +
+      // Il vivo (push da Supabase Realtime): battiti dei ruoli in volo, token per run.
       '<section><h2>Battiti e PR</h2><div id="mon-activity" class="mon-table">Carico...</div></section>' +
       '<section><h2>Token per run</h2><div id="mon-tokens" class="mon-table">Carico...</div></section>' +
+      // La storia (fetch authed dai file git via /_pipeline/api): catalogo e cronologia.
+      "<section>" +
+        '<div class="mon-head2"><h2>Catalogo indicatori</h2><button id="cat-refresh" class="mon-btn mon-btn--ghost mon-btn--sm">Aggiorna</button></div>' +
+        '<div class="mon-filters">' +
+          '<input id="cat-q" type="search" placeholder="Cerca nome, codice, stato, bandiera">' +
+          '<select id="cat-phase"><option value="">Tutte le fasi</option></select>' +
+          '<select id="cat-state"><option value="">Tutti gli stati</option></select>' +
+          '<select id="cat-owner"><option value="">Tutti i prossimi ruoli</option></select>' +
+        "</div>" +
+        '<div id="cat-totals" class="mon-totals"></div>' +
+        '<div id="mon-catalog" class="mon-table">Carico...</div>' +
+      "</section>" +
+      "<section>" +
+        '<div class="mon-head2"><h2>Cronologia azioni</h2><button id="run-refresh" class="mon-btn mon-btn--ghost mon-btn--sm">Aggiorna</button></div>' +
+        '<div class="mon-filters">' +
+          '<input id="run-q" type="search" placeholder="Cerca indicatore, summary, run">' +
+          '<select id="run-stage"><option value="">Tutti gli stadi</option></select>' +
+          '<select id="run-outcome"><option value="">Tutti gli esiti</option></select>' +
+          '<label class="mon-date">da <input id="run-from" type="date"></label>' +
+          '<label class="mon-date">a <input id="run-to" type="date"></label>' +
+        "</div>" +
+        '<div id="run-totals" class="mon-totals"></div>' +
+        '<div id="mon-runs" class="mon-table">Carico...</div>' +
+      "</section>" +
       "</div>"
   );
   document.getElementById("mon-logout").onclick = () => supabase.auth.signOut();
 
   await refresh(supabase);
-  // Realtime: a ogni cambiamento sulle due tabelle, rileggi (le tabelle sono
-  // piccole, una rilettura completa e' piu' semplice del merge incrementale).
+  await loadHistory(supabase);
+  // Realtime: a ogni cambiamento sulle due tabelle, rileggi il vivo (le tabelle
+  // sono piccole, una rilettura completa e' piu' semplice del merge
+  // incrementale). Catalogo e cronologia sono storia dai file git, non push:
+  // fetch al caricamento e sul bottone Aggiorna, non a ogni tick.
   supabase
     .channel("pipeline")
     .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_activity" }, () => refresh(supabase))
     .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_tokens" }, () => refresh(supabase))
     .subscribe();
+
+  document.getElementById("cat-refresh").onclick = () => loadBoard(supabase);
+  document.getElementById("run-refresh").onclick = () => loadRuns(supabase);
+  ["cat-q", "cat-phase", "cat-state", "cat-owner"].forEach((id) => {
+    document.getElementById(id).oninput = renderCatalog;
+    document.getElementById(id).onchange = renderCatalog;
+  });
+  ["run-q", "run-stage", "run-outcome", "run-from", "run-to"].forEach((id) => {
+    document.getElementById(id).oninput = renderRuns;
+    document.getElementById(id).onchange = renderRuns;
+  });
+}
+
+// La storia authed. Il Bearer del login Google e' lo stesso confine mail-admin
+// del backend; senza, i due endpoint fanno 404 (endpoint interno, non conferma
+// di esistere). I due dati si tengono in modulo cosi' i filtri ridisegnano
+// senza rifetchare.
+let boardData = null;
+let runsData = null;
+
+async function getToken(supabase) {
+  const { data } = await supabase.auth.getSession();
+  return data?.session?.access_token || null;
+}
+
+async function authedJson(supabase, path) {
+  const token = await getToken(supabase);
+  if (!token) return null;
+  try {
+    const r = await fetch(path, { headers: { Authorization: "Bearer " + token } });
+    if (!r.ok) return null;
+    return await r.json();
+  } catch {
+    return null;
+  }
+}
+
+async function loadHistory(supabase) {
+  await Promise.all([loadBoard(supabase), loadRuns(supabase)]);
+}
+
+async function loadBoard(supabase) {
+  const data = await authedJson(supabase, "/_pipeline/api/board");
+  boardData = data;
+  const rows = (data && data.rows) || [];
+  fillOptions("cat-phase", uniq(rows.map((r) => r.phase)));
+  fillOptions("cat-state", uniq(rows.map((r) => r.state)));
+  fillOptions("cat-owner", uniq(rows.map((r) => r.next_step && r.next_step.owner)));
+  renderCatalog();
+}
+
+async function loadRuns(supabase) {
+  const data = await authedJson(supabase, "/_pipeline/api/runs");
+  runsData = data;
+  const runs = (data && data.runs) || [];
+  fillOptions("run-stage", uniq(runs.map((r) => r.stage)));
+  fillOptions("run-outcome", uniq(runs.map((r) => r.outcome)));
+  renderRuns();
+}
+
+function uniq(values) {
+  return Array.from(new Set(values.filter(Boolean))).sort((a, b) => String(a).localeCompare(String(b), "it"));
+}
+
+function fillOptions(id, values) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  const keep = sel.value;
+  const first = sel.options[0]; // "Tutte/Tutti ..."
+  sel.innerHTML = "";
+  sel.appendChild(first);
+  values.forEach((v) => {
+    const o = document.createElement("option");
+    o.value = v;
+    o.textContent = v;
+    sel.appendChild(o);
+  });
+  sel.value = keep;
+}
+
+const MINI_STATUS = { done: "●", current: "◐", issue: "◆", off: "○", waiting: "○" };
+
+function renderCatalog() {
+  const el = document.getElementById("mon-catalog");
+  if (!el) return;
+  if (!boardData) return (el.innerHTML = '<p class="mon-empty">Catalogo non disponibile (login o rete).</p>');
+  const q = (document.getElementById("cat-q").value || "").trim().toLowerCase();
+  const phase = document.getElementById("cat-phase").value;
+  const state = document.getElementById("cat-state").value;
+  const owner = document.getElementById("cat-owner").value;
+  const rows = (boardData.rows || []).filter((r) => {
+    const ns = r.next_step || {};
+    const key = [r.id, r.name, r.family, r.state, r.phase, ns.owner, ns.label, (r.flags || []).join(" ")]
+      .join(" ")
+      .toLowerCase();
+    return (
+      (!q || key.indexOf(q) !== -1) &&
+      (!phase || r.phase === phase) &&
+      (!state || r.state === state) &&
+      (!owner || (ns.owner || "") === owner)
+    );
+  });
+
+  const byState = {};
+  rows.forEach((r) => (byState[r.state] = (byState[r.state] || 0) + 1));
+  document.getElementById("cat-totals").innerHTML =
+    '<span class="mon-chip">' + rows.length + " indicatori</span>" +
+    Object.keys(byState)
+      .sort()
+      .map((s) => '<span class="mon-chip">' + escapeHtml(s) + ": " + byState[s] + "</span>")
+      .join("");
+
+  if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun indicatore col filtro attuale.</p>');
+  el.innerHTML =
+    "<table><thead><tr><th>Indicatore</th><th>Famiglia</th><th>Fase</th><th>Stato</th><th>Ciclo</th><th>Prossimo passo</th><th>Token</th></tr></thead><tbody>" +
+    rows
+      .map((r) => {
+        const ns = r.next_step || {};
+        const name = r.published_url
+          ? '<a href="' + escapeHtml(r.published_url) + '" target="_blank" rel="noopener">' + escapeHtml(r.name) + "</a>"
+          : escapeHtml(r.name);
+        const mini = (r.lifecycle || [])
+          .map((p) => '<span title="' + escapeHtml(p.label) + " (" + escapeHtml(p.status) + ')">' + (MINI_STATUS[p.status] || "○") + "</span>")
+          .join(" ");
+        return (
+          "<tr><td>" + name + "<br><small>" + escapeHtml(r.id) + "</small></td>" +
+          "<td>" + escapeHtml(r.family) + "</td>" +
+          "<td>" + escapeHtml(r.phase) + "</td>" +
+          "<td>" + escapeHtml(r.state) + "</td>" +
+          '<td class="mon-mini">' + mini + "</td>" +
+          "<td>" + escapeHtml(ns.owner || "") + "<br><small>" + escapeHtml(ns.label || "") + "</small></td>" +
+          "<td>" + (r.tokens_total != null ? Number(r.tokens_total).toLocaleString("it-IT") : "") + "</td></tr>"
+        );
+      })
+      .join("") +
+    "</tbody></table>";
+}
+
+function fmtDuration(sec) {
+  if (sec == null) return "";
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return m ? m + "m " + s + "s" : s + "s";
+}
+
+function renderRuns() {
+  const el = document.getElementById("mon-runs");
+  if (!el) return;
+  if (!runsData) return (el.innerHTML = '<p class="mon-empty">Cronologia non disponibile (login o rete).</p>');
+  const q = (document.getElementById("run-q").value || "").trim().toLowerCase();
+  const stage = document.getElementById("run-stage").value;
+  const outcome = document.getElementById("run-outcome").value;
+  const from = document.getElementById("run-from").value; // YYYY-MM-DD o ""
+  const to = document.getElementById("run-to").value;
+  const runs = (runsData.runs || []).filter((r) => {
+    const day = (r.at || "").slice(0, 10);
+    const key = [(r.indicators || []).join(" "), r.summary, r.run_id, r.stage].join(" ").toLowerCase();
+    return (
+      (!q || key.indexOf(q) !== -1) &&
+      (!stage || r.stage === stage) &&
+      (!outcome || r.outcome === outcome) &&
+      (!from || day >= from) &&
+      (!to || day <= to)
+    );
+  });
+
+  // Totali sul sottoinsieme filtrato: token totali, conteggio, per esito e per stadio.
+  const tokTotal = runs.reduce((a, r) => a + (r.tokens || 0), 0);
+  const byOutcome = {};
+  const byStage = {};
+  runs.forEach((r) => {
+    byOutcome[r.outcome] = (byOutcome[r.outcome] || 0) + 1;
+    byStage[r.stage] = (byStage[r.stage] || 0) + (r.tokens || 0);
+  });
+  document.getElementById("run-totals").innerHTML =
+    '<span class="mon-chip">' + runs.length + " run</span>" +
+    '<span class="mon-chip">' + tokTotal.toLocaleString("it-IT") + " token</span>" +
+    Object.keys(byOutcome)
+      .sort()
+      .map((o) => '<span class="mon-chip">' + escapeHtml(o) + ": " + byOutcome[o] + "</span>")
+      .join("") +
+    Object.keys(byStage)
+      .filter((s) => byStage[s] > 0)
+      .sort()
+      .map((s) => '<span class="mon-chip">' + escapeHtml(s) + ": " + byStage[s].toLocaleString("it-IT") + "</span>")
+      .join("");
+
+  if (!runs.length) return (el.innerHTML = '<p class="mon-empty">Nessuna run col filtro attuale.</p>');
+  el.innerHTML =
+    "<table><thead><tr><th>Quando</th><th>Stadio</th><th>Indicatore</th><th>Esito</th><th>Durata</th><th>Token</th><th>PR</th><th>Commit</th></tr></thead><tbody>" +
+    runs
+      .map((r) => {
+        const inds = (r.indicators || []);
+        const indCell = inds.length === 1 ? escapeHtml(inds[0]) : inds.length ? escapeHtml(inds.join(", ")) : "";
+        return (
+          "<tr><td>" + escapeHtml((r.at || "").replace("T", " ").slice(0, 16)) + "</td>" +
+          "<td>" + escapeHtml(r.stage) + "</td>" +
+          '<td title="' + escapeHtml(r.summary || "") + '">' + indCell + "</td>" +
+          "<td>" + escapeHtml(r.outcome) + "</td>" +
+          "<td>" + escapeHtml(fmtDuration(r.duration_seconds)) + "</td>" +
+          "<td>" + (r.tokens != null ? Number(r.tokens).toLocaleString("it-IT") : "") + "</td>" +
+          "<td>" + (r.pr ? "#" + escapeHtml(String(r.pr)) : "") + "</td>" +
+          "<td>" + escapeHtml(r.commit || "") + "</td></tr>"
+        );
+      })
+      .join("") +
+    "</tbody></table>";
 }
 
 async function refresh(supabase) {

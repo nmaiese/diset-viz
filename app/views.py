@@ -695,6 +695,78 @@ def pipeline_console():
                            monitor_admin_email=config.MONITOR_ADMIN_EMAIL)
 
 
+# --- la dashboard storica nella console: catalogo e cronologia ----------------
+# Il vivo (battiti, PR, token per run) resta Realtime da Supabase, letto diretto
+# dal browser. Ma catalogo e cronologia vivono nei file git (articoli, diari), che
+# la console (che parla solo a Supabase) non puo' leggere: questi due endpoint li
+# servono, dietro lo stesso confine mail-admin, e la console li fetcha col Bearer
+# del login Google.
+#
+# La cache sta su un helper memoizzato, non su `@cache.cached` della view: quel
+# decoratore corto-circuita il corpo della view su un hit, saltando il controllo
+# auth, e servirebbe il dato all'anonimo. Cosi' invece l'auth gira sempre nella
+# view, e solo il calcolo pesante (365 articoli, 118 diari) si riusa per 30s.
+
+@cache.memoize(timeout=30)
+def _pipeline_board_payload():
+    """Il catalogo per la dashboard: `load_board` col vivo da Supabase, i token
+    attribuiti, e il link alla pagina pubblicata sulle righe pubblicate. Memoizzato
+    (chiave sul nome, nessun argomento) perche' rilegge tutti gli articoli."""
+    from scripts import pipeline_monitor
+    from app import pipeline_state
+    try:
+        activity = pipeline_state.live()
+    except Exception:  # noqa: BLE001  (il vivo non deve far cadere la dashboard)
+        activity = {"beats": [], "prs": []}
+    board = pipeline_monitor.load_board(heartbeats=activity["beats"],
+                                        open_runs=activity["prs"])
+    try:
+        tokens = pipeline_state.tokens_by_run()
+    except Exception:  # noqa: BLE001  (la telemetria non deve far cadere la dashboard)
+        tokens = {}
+    pipeline_monitor.attribute_tokens(board.get("rows", []), tokens)
+    for row in board.get("rows", []):
+        row["published_url"] = (_pipeline_published_url(row["id"])
+                                if row.get("published") is True else None)
+    return board
+
+
+@cache.memoize(timeout=30)
+def _pipeline_runs_payload():
+    """La cronologia per la dashboard: `runs_timeline` joinato coi token da
+    Supabase sul `run_id`. Memoizzato perche' rilegge tutti i diari."""
+    from scripts import pipeline_monitor
+    from app import pipeline_state
+    try:
+        tokens = pipeline_state.tokens_by_run()
+    except Exception:  # noqa: BLE001
+        tokens = {}
+    return pipeline_monitor.runs_timeline(tokens)
+
+
+def _require_pipeline_admin():
+    """Il confine mail-admin dei due endpoint dashboard. 404, non 403: un endpoint
+    interno non conferma nemmeno di esistere, come `/_pipeline/beat`."""
+    if not auth.is_admin(auth.current_user(request.headers)):
+        abort(404)
+
+
+@app.route("/_pipeline/api/board")
+def pipeline_api_board():
+    """Il catalogo dei 365 indicatori (stato, prossimo passo, lifecycle, token,
+    vivo) in JSON, per la sezione catalogo della console. Authed mail-admin."""
+    _require_pipeline_admin()
+    return jsonify(_pipeline_board_payload())
+
+
+@app.route("/_pipeline/api/runs")
+def pipeline_api_runs():
+    """La cronologia di ogni azione degli agenti col consumo token per run, e i
+    totali aggregati, per la sezione timeline della console. Authed mail-admin."""
+    _require_pipeline_admin()
+    return jsonify(_pipeline_runs_payload())
+
+
 @app.route("/_keepalive")
 def keepalive():
     """Ping schedulato (Cloud Scheduler) che tiene sveglio il progetto Supabase:

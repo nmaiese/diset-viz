@@ -431,6 +431,93 @@ def attribute_tokens(rows, tokens_by_run):
     return rows
 
 
+def _run_indicators(run: dict, token_entry: dict) -> list:
+    """Gli indicatori a cui una run appartiene, dal piu' affidabile al meno.
+
+    Il record di telemetria porta l'unico bersaglio vero (`indicator`), quando
+    c'e': una lista di uno. Senza telemetria si ripiega sugli id citati nel testo
+    della run, che sono un insieme (un articolo cita gli indicatori di confronto),
+    quindi si torna una lista, mai una scelta. Attribuire i token a un indicatore
+    solo quando la lista ha un elemento solo (bersaglio non ambiguo) e' compito di
+    chi somma, non di qui: qui non si inventa mai un'associazione dove il dato ne
+    porta due o zero, la stessa cautela di `_ids_in_text`."""
+    target = (token_entry or {}).get("indicator")
+    if target:
+        return [target]
+    text = (run.get("summary") or "") + "\n" + "\n".join(run.get("detail") or [])
+    return sorted(practice_timeline._ids_in_text(text))
+
+
+def runs_timeline(tokens_by_run=None) -> dict:
+    """La cronologia di ogni azione della catena, una riga per run, con i token.
+
+    Joina le run collassate dal diario (`pipeline_log`) con la telemetria token
+    (`tokens_by_run`, iniettata dal chiamante perche' viene da Supabase e questo
+    modulo resta stdlib puro) **sul solo `run_id`**: diverso da `attribute_tokens`,
+    che scarta i token il cui indicatore non combacia con una riga di board. Qui
+    la chiave e' la run, e ogni run si conserva, anche senza token (`null`) e anche
+    senza un indicatore riconoscibile (lista vuota). Ordinata per `at` decrescente.
+
+    I totali aggregano cio' che si puo' sommare senza inventare: token per stadio,
+    per giorno ed esito per conteggio sono sempre certi; i token per indicatore si
+    sommano solo dove la telemetria porta un bersaglio esplicito (`token_entry`),
+    mai da un id pescato nella prosa, nemmeno quando ne compare uno solo: un batch
+    di ammissione posta il costo senza indicatore, e appenderlo all'unico id che il
+    diario cita darebbe a quell'indicatore il conto dell'intera coda. La prosa dice
+    quali id una run ha toccato, non di chi e' il costo."""
+    from scripts import pipeline_log
+    tokens_by_run = tokens_by_run or {}
+    runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
+    out = []
+    tokens_by_stage: dict = {}
+    tokens_by_indicator: dict = {}
+    tokens_by_day: dict = {}
+    runs_by_outcome: dict = {}
+    for run in runs:
+        run_id = run.get("run_id") or ""
+        token_entry = tokens_by_run.get(run_id) or {}
+        indicators = _run_indicators(run, token_entry)
+        tok = token_entry.get("tokens")
+        stage = run.get("stage", "")
+        day = (run.get("at", ""))[:10]
+        outcome = run.get("outcome", "")
+        tokens_by_stage[stage] = tokens_by_stage.get(stage, 0) + (tok or 0)
+        tokens_by_day[day] = tokens_by_day.get(day, 0) + (tok or 0)
+        runs_by_outcome[outcome] = runs_by_outcome.get(outcome, 0) + 1
+        # La proprieta' del costo la stabilisce SOLO il bersaglio esplicito della
+        # telemetria, mai un id pescato nella prosa: un batch di ammissione posta
+        # i token senza indicatore, e se il suo diario cita per caso un solo id il
+        # costo dell'intera coda finirebbe su quell'indicatore. La prosa va bene
+        # per dire "questa run ha toccato questi id", non per dire "il conto e' suo".
+        target = token_entry.get("indicator")
+        if tok and target:
+            tokens_by_indicator[target] = tokens_by_indicator.get(target, 0) + tok
+        out.append({
+            "at": run.get("at", ""),
+            "run_id": run_id,
+            "stage": stage,
+            "indicators": indicators,
+            "outcome": outcome,
+            "summary": run.get("summary", ""),
+            "duration_seconds": run.get("duration_seconds"),
+            "pr": run.get("pr", ""),
+            "commit": run.get("commit", ""),
+            "tokens": tok,
+        })
+    out.sort(key=lambda r: r["at"], reverse=True)
+    return {
+        "runs": out,
+        "totals": {
+            "tokens_by_stage": tokens_by_stage,
+            "tokens_by_indicator": tokens_by_indicator,
+            "tokens_by_day": tokens_by_day,
+            "runs_by_outcome": runs_by_outcome,
+            "runs": len(out),
+            "tokens": sum(r["tokens"] or 0 for r in out),
+        },
+    }
+
+
 # --- i battiti: il vivo, best effort ----------------------------------------
 
 def write_heartbeat(role: str, run_id: str, indicator: str = "", root=None,
