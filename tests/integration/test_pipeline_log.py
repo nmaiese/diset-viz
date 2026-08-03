@@ -11,11 +11,15 @@ temporanea.
 """
 
 import json
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from scripts import pipeline_dashboard, pipeline_log
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
 class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
@@ -306,6 +310,46 @@ class TheRunIdIsWhatActuallyIdentifiesARun(unittest.TestCase):
     def test_an_unknown_trigger_is_refused_like_an_unknown_outcome(self):
         with self.assertRaises(SystemExit):
             pipeline_log.build_entry("writer", "pr-open", "x", trigger="a-mano-di-notte")
+
+
+class TheCliRefusesToMintARunIdSilently(unittest.TestCase):
+    """Un agente che dimentica `--run-id` lasciava un file orfano che poi
+    bloccava il merge come "worktree non pulito": lo script coniava un id
+    nuovo invece di fermarsi, e la documentazione che dice gia' che
+    `--run-id` non e' facoltativo (AGENT_CONTRACT.md, pipeline-close-run)
+    non basta da sola a impedirlo."""
+
+    def _run(self, *extra_args):
+        return subprocess.run(
+            [sys.executable, "scripts/pipeline_log.py", "--write",
+             "--stage", "writer", "--outcome", "nothing", "--summary", "x", *extra_args],
+            cwd=REPO_ROOT, capture_output=True, text=True, timeout=30,
+        )
+
+    def test_write_without_a_run_id_is_refused(self):
+        result = self._run()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("--run-id", result.stderr)
+
+    def test_mint_run_id_is_accepted_as_the_explicit_opt_out(self):
+        """La chiamata coniera' comunque un id (coperto gia' da
+        `test_an_id_is_minted_and_printed_for_whoever_writes_first`); qui
+        conta solo che `--mint-run-id` faccia passare l'argparse invece di
+        essere respinto insieme a `--run-id` mancante. Scrive per davvero
+        nello shard reale (`RUNS_DIR` non e' configurabile da CLI): lo shard
+        va ripulito subito, non e' materia di questo test."""
+        runs_dir = REPO_ROOT / "data" / "pipeline" / "runs"
+        before = set(runs_dir.iterdir())
+        result = self._run("--mint-run-id")
+        after = set(runs_dir.iterdir())
+        created = after - before
+        try:
+            self.assertNotIn("--run-id mancante", result.stderr)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(len(created), 1)
+        finally:
+            for path in created:
+                path.unlink()
 
 
 class TwoRunsNeverWriteTheSameFile(unittest.TestCase):

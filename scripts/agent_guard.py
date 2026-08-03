@@ -156,6 +156,111 @@ def _bash_write_targets(segment, tokens):
     return targets
 
 
+def _split_top_level(command):
+    """Spacca su `&&`, `||`, `;`, `|`, newline, ma mai dentro le virgolette.
+
+    `re.split` sul comando grezzo spaccava anche dentro una stringa fra
+    virgolette: un `-m "riga\\n\\nparagrafo"` o un `--body "a; b"` si
+    spezzavano a meta', `shlex.split` falliva sul frammento con virgolette
+    sbilanciate, e il ripiego produceva un token a caso che `ALLOW_SINGLE`
+    respingeva. Qui si scorre il carattere per volta tenendo lo stato delle
+    virgolette (comprese le sequenze `\\x` dentro le doppie, come fa la shell),
+    e si spacca solo quando non si e' dentro una di esse. Le virgolette
+    restano sempre bilanciate in ogni segmento prodotto, perche' non si puo'
+    incontrare un operatore non quotato mentre se ne sta chiudendo una aperta.
+    """
+    segments = []
+    buf = []
+    quote = None
+    i, n = 0, len(command)
+    while i < n:
+        ch = command[i]
+        if quote:
+            buf.append(ch)
+            if quote == '"' and ch == "\\" and i + 1 < n:
+                buf.append(command[i + 1])
+                i += 2
+                continue
+            if ch == quote:
+                quote = None
+            i += 1
+            continue
+        if ch in ("'", '"'):
+            quote = ch
+            buf.append(ch)
+            i += 1
+            continue
+        if ch == "\\" and i + 1 < n:
+            buf.append(ch)
+            buf.append(command[i + 1])
+            i += 2
+            continue
+        if ch in ("\n", ";"):
+            segments.append("".join(buf))
+            buf = []
+            i += 1
+            continue
+        if ch in ("|", "&") and i + 1 < n and command[i + 1] == ch:
+            segments.append("".join(buf))
+            buf = []
+            i += 2
+            continue
+        if ch == "|":
+            segments.append("".join(buf))
+            buf = []
+            i += 1
+            continue
+        buf.append(ch)
+        i += 1
+    segments.append("".join(buf))
+    return segments
+
+
+# `NOME=$(comando interno)`: l'idioma sanzionato per aprire una PR
+# (AGENT_CONTRACT.md, pipeline-close-run/SKILL.md) cattura il numero della PR
+# cosi'. Va riconosciuto prima di tokenizzare, perche' shlex non sa cosa sia
+# `$(...)` e lo spogliatore di assegnazioni sotto avrebbe altrimenti fatto
+# match su `NOME=$(python3` come assegnazione semplice, scartando anche il
+# comando vero insieme al nome.
+_CAPTURED_ASSIGNMENT = re.compile(r"\A([A-Za-z_][A-Za-z0-9_]*)=\$\((.*)\)\s*\Z", re.DOTALL)
+
+
+def _segment_verdict(segment, stages):
+    """(ok, ragione) per un singolo gesto, gia' isolato da `_split_top_level`."""
+    captured = _CAPTURED_ASSIGNMENT.fullmatch(segment)
+    if captured:
+        return _segment_verdict(captured.group(2), stages)
+    try:
+        tokens = shlex.split(segment)
+    except ValueError:
+        tokens = segment.split()
+    # Le assegnazioni d'ambiente davanti al comando non sono il comando.
+    while tokens and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", tokens[0]):
+        tokens = tokens[1:]
+    if not tokens:
+        return True, ""
+    head = tokens[0]
+    second = tokens[1] if len(tokens) > 1 else None
+    allowed = head in ALLOW_SINGLE or any(
+        head == a and (b is None or second == b) for a, b in ALLOW_PAIRS
+    )
+    if not allowed:
+        return False, (
+            f"'{head}' non e' fra i comandi che questo stadio usa. Permessi: "
+            "python/python3 (script della catena e suite), git, gh pr/run/auth, "
+            "lettura file (ls, cat, grep, ...). Se il lavoro richiede altro, "
+            "fermati e segnalalo nella riga di diario invece di aggirare la guardia."
+        )
+    # Un comando permesso puo' ancora scrivere un file: un redirect o una
+    # copia sono una Write con un altro vestito, e passano dallo stesso
+    # perimetro.
+    for target in _bash_write_targets(segment, tokens):
+        ok, reason = path_verdict(target, stages)
+        if not ok:
+            return False, reason
+    return True, ""
+
+
 def command_verdict(command, stages):
     """(ok, ragione) per un comando Bash."""
     for pattern, label in DENY_PATTERNS:
@@ -165,38 +270,13 @@ def command_verdict(command, stages):
                 "Il perimetro e la procedura stanno in docs/AGENT_CONTRACT.md."
             )
     # Un segmento per volta: "a && b | c" sono tre gesti, non uno.
-    for segment in re.split(r"&&|\|\||\||;|\n", command):
+    for segment in _split_top_level(command):
         segment = segment.strip()
         if not segment:
             continue
-        try:
-            tokens = shlex.split(segment)
-        except ValueError:
-            tokens = segment.split()
-        # Le assegnazioni d'ambiente davanti al comando non sono il comando.
-        while tokens and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", tokens[0]):
-            tokens = tokens[1:]
-        if not tokens:
-            continue
-        head = tokens[0]
-        second = tokens[1] if len(tokens) > 1 else None
-        allowed = head in ALLOW_SINGLE or any(
-            head == a and (b is None or second == b) for a, b in ALLOW_PAIRS
-        )
-        if not allowed:
-            return False, (
-                f"'{head}' non e' fra i comandi che questo stadio usa. Permessi: "
-                "python/python3 (script della catena e suite), git, gh pr/run/auth, "
-                "lettura file (ls, cat, grep, ...). Se il lavoro richiede altro, "
-                "fermati e segnalalo nella riga di diario invece di aggirare la guardia."
-            )
-        # Un comando permesso puo' ancora scrivere un file: un redirect o una
-        # copia sono una Write con un altro vestito, e passano dallo stesso
-        # perimetro.
-        for target in _bash_write_targets(segment, tokens):
-            ok, reason = path_verdict(target, stages)
-            if not ok:
-                return False, reason
+        ok, reason = _segment_verdict(segment, stages)
+        if not ok:
+            return False, reason
     return True, ""
 
 

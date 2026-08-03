@@ -16,6 +16,7 @@ spread, gap ratio, biggest movers); those are additive and deliberately
 unpinned, because there is no previous value to preserve.
 """
 
+import argparse
 import json
 from pathlib import Path
 
@@ -134,6 +135,7 @@ def _family_ids(family):
 
 
 if __name__ == "__main__":
+    argparse.ArgumentParser(description=__doc__.splitlines()[0]).parse_args()
     golden = build()
     FIXTURE.parent.mkdir(parents=True, exist_ok=True)
     FIXTURE.write_text(

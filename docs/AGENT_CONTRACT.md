@@ -249,7 +249,15 @@ python3 scripts/pipeline_log.py --write \
 Stampa un `run_id`. **Prendilo**: e' quello che passi al passo di merge, ed e'
 l'unica cosa che lega questa riga a come andra' a finire. Non scrivere `--pr`:
 quando scrivi la riga la pull request non esiste ancora, ed e' proprio per
-questo che appaiare le due meta' sul numero non funzionava.
+questo che appaiare le due meta' sul numero non funzionava. `--run-id` non e'
+piu' facoltativo nemmeno per lo script: senza, `pipeline_log.py --write` si
+ferma invece di coniarne uno nuovo in silenzio.
+
+Ogni cifra dentro `--detail` va riletta dal file finale
+(`content/indicators/<file>.json`) nello stesso istante in cui scrivi il
+diario, mai da un draft che hai in mente: una cifra tagliata in rilettura e
+ancora citata nel diario e' la stessa classe di drift che il diario esiste
+per impedire altrove.
 
 Il caso che conta di piu' e' `nothing`. Una Routine che gira e non produce
 niente ha lo stesso aspetto di una Routine che non e' mai partita, ed e'

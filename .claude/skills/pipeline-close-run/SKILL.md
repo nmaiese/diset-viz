@@ -14,11 +14,18 @@ questo progetto ha gia' pagato (`docs/AUTONOMOUS_PIPELINE.md` racconta il caso
 `analyst_notes.json`). La regola che conta sta in `docs/AGENT_CONTRACT.md`,
 che resta vincolante: questa pagina e' la procedura, non il contratto.
 
-## 1. La suite, tutta
+## 1. La suite veloce, come primo controllo
 
 ```bash
-.venv/bin/python -m unittest discover -s tests
+.venv/bin/python -m unittest discover -s tests/unit
 ```
+
+Non la suite intera: il cancello (passo 3) la fa gia' girare tutta, e il
+passo di merge la ripete una terza volta di proposito (non fidarsi del
+verdetto auto-riportato). Farla girare tutta anche qui non aggiunge
+copertura, solo tempo: la sola cosa che ha senso prendere prima di scrivere
+il diario e' un errore grossolano (JSON rotto, import rotto), non i test
+catalogo-largo che il cancello controllera' comunque tra due passi.
 
 ## 2. Il diario, PRIMA della pull request
 
@@ -37,7 +44,15 @@ momento non c'e' ancora, ed e' esattamente il motivo per cui appaiare le due
 meta' della run sul numero della pull request non funzionava.
 
 Il comando stampa un `run_id`. **Prendilo e passalo al passo di merge**: e'
-l'unica cosa che lega questa riga a come finira'.
+l'unica cosa che lega questa riga a come finira'. Senza `--run-id` lo script
+si ferma (`--mint-run-id` esplicito se davvero non ne serve uno, come il
+lanciatore): un id coniato in silenzio lascia un file orfano nel worktree,
+che poi blocca il merge come "worktree non pulito".
+
+Ogni cifra dentro `--detail` va riletta dal file finale
+(`content/indicators/<file>.json`) proprio ora, mai da un draft che hai in
+mente: e' lo stesso drift che questo passo esiste per impedire, solo tra il
+diario e la prosa invece che tra la prosa e il file morto.
 
 ## 3. Il cancello
 

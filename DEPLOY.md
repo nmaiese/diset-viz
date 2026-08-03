@@ -62,12 +62,22 @@ gcloud run services update diset-viz --region europe-west1 \
 
 ### Cruscotto della catena `/_pipeline` — token e vivo
 
-Il cruscotto interno mostra lo stato **vivo** della catena editoriale (ruoli in
-volo e PR aperte). Il vivo non puo' passare da file locali: gli agenti girano su
-macchine effimere separate dal server. Passa invece dallo **stesso** SQLite della
-leaderboard (`LEADERBOARD_DB`, gia' replicato su GCS da Litestream): gli agenti
-fanno un POST a `/_pipeline/beat`, il sito scrive quella tabella (`pipeline_activity`),
-`/_pipeline` la legge. Due variabili nuove:
+**Attivo in produzione dal 2026-07-31** (Fase 4, sotto): lo stato vivo della
+catena editoriale (ruoli in volo, PR aperte) sta su **Supabase Postgres**, non
+su file locali ne' su SQLite/Litestream. Esistono **due percorsi dati
+distinti**, non uno:
+
+- `/_pipeline?token=...` (server-rendered) legge da Postgres via l'ORM
+  (`app/db.py`/`app/pipeline_state.py`), scritto dal POST degli agenti a
+  `/_pipeline/beat`, autenticato **solo** dall'header `X-Pipeline-Key`
+  (`PIPELINE_INGEST_TOKEN`).
+- `monitor.divarioitalia.it/_pipeline/console` **non passa da Flask**:
+  `frontend/src/monitor/main.js` parla direttamente a Supabase dal browser
+  (`pipeline_activity` via client JS + sottoscrizione Realtime), filtrato da
+  **Row Level Security** sul login Google (`MONITOR_ADMIN_EMAIL`), non dal
+  token. Questo percorso resta vuoto senza errore se RLS+Realtime non sono
+  stati applicati (`scripts/supabase_setup.sql`, punto 4 piu' sotto) — non
+  basta che gli agenti scrivano.
 
 | Variabile | Dove | A cosa serve |
 |---|---|---|
@@ -77,19 +87,18 @@ fanno un POST a `/_pipeline/beat`, il sito scrive quella tabella (`pipeline_acti
 L'ambiente agenti vuole anche `PIPELINE_INGEST_URL=https://divarioitalia.it`, cosi'
 `pipeline_monitor.py --beat-open/--beat-close` e `pipeline_inflight.py --post` sanno
 dove postare. Nessuna credenziale GCP sugli agenti: scrivono solo via l'endpoint.
+Nessun'altra variabile serve li': `gh api` (apertura PR) usa l'auth gia'
+presente nel sandbox cloud dell'agente, non un token in env.
 
-**Caveat.** La tabella del vivo condivide il file SQLite della leaderboard, quindi
-eredita la stessa assunzione: Litestream e' single-writer, e il modello regge
-perche' il traffico e' basso e `--min-instances=0` tiene di norma un solo
-container attivo. Sotto scale multi-istanza il vivo puo' risultare per-istanza
-finche' non arriva il prossimo restore; e' un limite accettato, non un bug nuovo.
-
-### Fase 4 — Backend mutabile su Supabase (attivazione)
+### Fase 4 — Backend mutabile su Supabase
 
 Lo stato mutabile (classifica + vivo della catena) e' su ORM SQLAlchemy: SQLite
-finche' `DATABASE_URL` e' vuota (produzione attuale, con Litestream), Postgres di
-Supabase quando la si imposta. Il codice e' gia' in produzione, **dormiente**.
-Per accendere Supabase, una volta creati il progetto e il client Google OAuth:
+solo quando `DATABASE_URL` e' vuota (sviluppo locale), Postgres di Supabase
+altrimenti. **Attivo in produzione**, Litestream **ritirato**: quanto segue
+descrive come e' stato acceso, non un passo ancora da fare.
+
+**Cronaca dell'accensione** (gia' fatta, i passi restano come riferimento se
+si dovesse rifare da un nuovo progetto Supabase):
 
 1. **Secret Manager** (segreti): `DATABASE_URL` (pooler 6543, transaction mode,
    `sslmode=require`), `DIRECT_URL` (diretta 5432, per Alembic), `SUPABASE_JWT_SECRET`.

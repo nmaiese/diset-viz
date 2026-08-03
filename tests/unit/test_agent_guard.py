@@ -90,6 +90,46 @@ class CommandVerdictTests(unittest.TestCase):
             "echo '{}' > content/indicators/ter__999.json", ["writer"])
         self.assertTrue(ok)
 
+    def test_semicolon_inside_a_quoted_argument_is_not_a_split_point(self):
+        # re.split spaccava anche dentro le virgolette: un --body con un
+        # punto e virgola produceva un token a caso dal frammento sbilanciato.
+        ok, _ = agent_guard.command_verdict(
+            'python3 scripts/pipeline_merge.py --open --stage writer '
+            '--head foo --run-id bar --title "t" --body "Fixed bug; updated docs"',
+            ["writer"])
+        self.assertTrue(ok)
+
+    def test_newline_inside_a_quoted_commit_message_is_not_a_split_point(self):
+        ok, _ = agent_guard.command_verdict(
+            'git commit -m "Summary line\n\nBody paragraph with details."',
+            ["writer"])
+        self.assertTrue(ok)
+
+    def test_captured_pr_number_idiom_is_allowed(self):
+        # L'idioma sanzionato di AGENT_CONTRACT.md/pipeline-close-run:
+        # NOME=$(comando) per catturare il numero della PR appena aperta.
+        ok, _ = agent_guard.command_verdict(
+            'PR=$(python3 scripts/pipeline_merge.py --open --stage writer '
+            '--head foo --run-id bar --title "t" --body "b")',
+            ["writer"])
+        self.assertTrue(ok)
+
+    def test_captured_assignment_does_not_hide_a_denied_inner_command(self):
+        # La ricorsione sull'interno di NOME=$(...) deve restare soggetta
+        # agli stessi divieti, non un modo per aggirarli.
+        ok, reason = agent_guard.command_verdict(
+            'X=$(gh pr merge 42 --squash)', ["writer"])
+        self.assertFalse(ok)
+        self.assertIn("pipeline_merge", reason)
+
+    def test_a_real_second_command_after_newline_is_still_checked(self):
+        # Il caso pericoloso che una fusione troppo permissiva di riga
+        # rischierebbe di far scivolare: un secondo comando su una riga
+        # nuova (non dentro virgolette) resta un gesto a se', giudicato.
+        ok, reason = agent_guard.command_verdict("ls\nnpm install evil", ["writer"])
+        self.assertFalse(ok)
+        self.assertIn("npm", reason)
+
 
 class PathVerdictTests(unittest.TestCase):
     def test_writer_may_write_an_article(self):

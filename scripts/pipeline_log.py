@@ -710,6 +710,9 @@ def main():
     write.add_argument("--gate", help="il campo merge del verdetto del cancello")
     write.add_argument("--pr", help="numero della pull request, se l'hai aperta")
     write.add_argument("--run-id", help="l'identita' della run, se ne hai gia' una")
+    write.add_argument("--mint-run-id", action="store_true",
+                       help="conia un run_id nuovo invece di richiederne uno esistente "
+                            "(solo per chi non apre mai una pull request, es. il lanciatore)")
     write.add_argument("--trigger", choices=TRIGGERS,
                        help=f"da dove parte la run (default: ${TRIGGER_ENV}, poi 'manuale')")
     write.add_argument("--queue-before", type=int, help="quanto c'era in coda quando hai aperto")
@@ -719,6 +722,13 @@ def main():
     if args.write:
         if not (args.stage and args.outcome and args.summary):
             raise SystemExit("per scrivere servono --stage, --outcome e --summary")
+        if not args.run_id and not args.mint_run_id:
+            raise SystemExit(
+                "--run-id mancante: e' l'unica cosa che lega questa riga alla pull "
+                "request che la porta (docs/AGENT_CONTRACT.md #4). Se davvero non "
+                "ne hai gia' uno (nessuna pull request in arrivo), passa "
+                "--mint-run-id."
+            )
         entry = append(build_entry(
             args.stage, args.outcome, args.summary,
             detail=args.detail, gate=args.gate, pr=args.pr,
