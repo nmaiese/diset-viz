@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-03T20:29:45+00:00",
+ "base_commit": "a194749",
+ "branch": "automation/verificatore-2026-08-03-e976",
+ "claude_code_version": "2.1.220 (Claude Code)",
+ "commit": "a194749",
+ "detail": [
+  "ter-1: 29 controllate, 29 confermate, 0 smentite, 0 non verificabili. Serie regione 1995-2023. Controlli adversarial contro la serie: graduatoria 2023 (Campania #5, Marche #20, Piemonte #12, Molise #7, Sardegna #10 -> 3 regioni Mezzogiorno nei primi 10), strappo piu largo dopo il #2 TAA->Liguria 4,04 (il piu ampio di tutta la graduatoria), media 22,56/mediana 21,60 (0,96), 4 regioni di fila in 1,02. Dinamica: media 18,46->22,56 (+4,10), divario ristretto 4,14 tutto dal fondo (vetta 38,06->38,16 +0,10, fondo 7,19->11,43), 2014 picco divario 43,08 (ER 52,13, Cal 9,05) confermato massimo della serie, Campania dal 16o (11,92) al 5o (29,00) +17,08 piu che raddoppiato. UNIVERSALE confermata: Calabria ultima ogni anno 1995-2022, Marche ultime per la prima volta nel 2023 (verificato su tutti i 28 anni). Marche calo 2022->2023 -5,84 = 96,6% della perdita sui 28 anni (-6,04). Incroci onesti: rho ter-124 0,74 (manifattura in testa ER e Liguria, confermato), rho ter-31 0,72, entrambi tema Imprese e competitivita. Esterno: Eurostat FTE confermato (20/40 ore = 0,5 FTE, testuale). definition_check: nessun rilievo. Nota metodologica istat_territoriali non e una rottura di serie non dichiarata (revisione applicata a tutta la serie 1995-2023)."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 28,
+ "queue_before": 29,
+ "run_id": "verificatore-20260803T202330Z-e976",
+ "stage": "verificatore",
+ "summary": "Verificato ter-1 (Produttivita del lavoro in agricoltura), primo controllo: 29 affermazioni, 0 smentite, esito pulito",
+ "trigger": "manuale"
+}
