@@ -1,14 +1,15 @@
 {
- "at": "2026-08-03T20:50:53+00:00",
- "base_commit": "7d443af",
+ "at": "2026-08-03T21:01:08+00:00",
+ "base_commit": "d24e521",
  "branch": "automation/producer-2026-08-03-9ec9",
  "claude_code_version": "2.1.220 (Claude Code)",
- "commit": "d11489c",
+ "commit": "2a2f0db",
  "detail": [
-  "Smentita 299cc8421f586251 (dinamica/basso, 2026-08-03) chiusa riscrivendo l'ultimo capoverso. Ricalcolo sui 20 valori regionali per i quattro intervalli: scarti sommati in valore assoluto 0,84 (2019-20), 0,99 (2020-21), 0,81 (2021-22), 0,80 (2022-23, minimo); cambi di posizione sommati 18, 12, 14, 8 (2022-23 minimo); regioni in salita 11, 7, 11, 13 (2022-23 massimo). Il testo ora dice che il 2022-2023 ha piu' regioni in salita di ogni altro anno ed e' al tempo stesso il piu' quieto, e attribuisce il gradino 9-10 che passa da 0,17 a 0,30 a Liguria +0,07 e Campania -0,06.",
-  "Definizione: aggiunto il perimetro Frascati (oltre ai ricercatori, tecnici e personale di supporto), verificato su https://ec.europa.eu/eurostat/cache/metadata/en/rd_esms.htm e aggiunto in fonti. Cifre nazionali riverificate da me sull'API Eurostat rd_p_perslf 2023: IT 1,41 PC_ACT_FTE, IT 2,09 PC_ACT_HC, EU27_2020 1,57 PC_ACT_FTE (flag e, stimato). L'aggregato europeo resta dichiarato come tale e non confrontato con la media semplice delle venti regioni.",
-  "Rilettura intera: verificate anno per anno le prime nove del 2019-2023 (insieme identico nei cinque anni), Piemonte 2 -> 6, Umbria 12 -> 14 con -0,22, Valle d'Aosta 19 -> 16 con +0,20, mediana 1,15 -> 1,06, nove regioni sotto 1,00 di cui sette del Mezzogiorno piu' Umbria e Valle d'Aosta, otto delle prime nove di eur-rd_e_gerdreg 2023 coincidenti, ter-92 2022 con Sardegna 2, Campania 4, Lombardia 19. Tolta la sola frase non verificabile contro il brief (un sistema di ricerca si costruisce in anni). Cura non toccata: verso higher_better gia' confermato, categoria ricerca_innovazione_digitale, data_year 2023 = vintage.",
-  "Articolo 722 parole, prose_lint pulito, 3 link interni, nessun carattere vietato. Suite intera verde: 982 test, 1 skip. reviewed_at 2026-08-03, reviewed_vintage 2023."
+  "Collisione dichiarata (contratto 3-bis, caso 'vintage uguale'). Una seconda run di produttore, producer-20260803T202330Z-0317, ha lavorato lo stesso indicatore in parallelo e ha fuso per prima con la PR #128, chiudendo la smentita 299cc8421f586251 su dinamica. Ho verificato la sua correzione per conto mio invece di fidarmene: 'nessuna cambia di piu' di 0,07 punti' e' vera, il massimo scarto 2022-2023 in valore assoluto e' 0,07 (Emilia-Romagna, Liguria, Sicilia, Trentino Alto Adige), e 13 in salita, 6 in calo, 1 ferma e' esatto. La sua versione e' corretta e piu' leggibile della mia sullo stesso punto, quindi ho SCARTATO la mia riscrittura integrale (che quantificava lo stesso fatto con scarti sommati 0,80 e 8 cambi di posizione, minimi dei quattro intervalli) e ho tenuto il suo testo.",
+  "Sul testo fuso ho applicato tre correzioni sole, non uno stile diverso. Causale: 'il confondente ovvio e' la dimensione dell'economia regionale' -> 'il reddito dell'area', perche' le due grandezze incrociate sono entrambe rapporti (quota sulla forza lavoro qui, quota sul PIL in eur-rd_e_gerdreg e ter-92) e la dimensione dell'economia e' gia' normalizzata via da tutti e due, quindi non poteva essere il confondente. Definizione: 'resta sotto una unita' ogni cento persone' -> 'sotto una unita' a tempo pieno ogni cento persone', cioe' la distinzione FTE/teste che regge tutta la pagina e su cui una verifica era gia' caduta (2ed9d3422463647a, 2026-07-29). Perimetro: 'non i soli ricercatori' reso concreto in 'non i soli ricercatori ma anche i tecnici e il personale di supporto'.",
+  "Fonti verificate in questa sessione. API Eurostat rd_p_perslf 2023 prof_pos=TOTAL sectperf=TOTAL sex=T: IT 1,41 PC_ACT_FTE, IT 2,09 PC_ACT_HC, EU27_2020 1,57 PC_ACT_FTE con flag 'e' (stimato). Le tre cifre dell'articolo combaciano e l'aggregato europeo resta separato dalla media semplice delle venti regioni. https://ec.europa.eu/eurostat/cache/metadata/en/rd_esms.htm letta e AGGIUNTA in fonti: il personale di R&S segue il Manuale di Frascati e comprende, oltre ai ricercatori, tecnici e personale di supporto, su quattro settori di esecuzione. E' la fonte che autorizza la precisazione nuova.",
+  "Rilettura intera del testo fuso, non solo delle righe toccate. Riverificate: prime nove identiche nei cinque anni 2019-2023 (insieme invariato), Piemonte 2 -> 6, Umbria 12 -> 14 con -0,22, Valle d'Aosta 19 -> 16 con +0,20, mediana 1,15 -> 1,06, media 1,158 -> 1,164, gradino 9-10 per anno 0,13 0,12 0,13 0,17 0,30, nove regioni sotto 1,00, Campania unica del Mezzogiorno sopra 1,00 (1,09), otto delle prime nove di eur-rd_e_gerdreg 2023 coincidenti, ter-92 2022 con Sardegna 2, Campania 4, Lombardia 19. Nessun altro rilievo. Cura non toccata: verso higher_better gia' confermato sui dati, categoria ricerca_innovazione_digitale, data_year 2023 = vintage.",
+  "Articolo 723 parole, prose_lint pulito, 3 link interni, nessun carattere vietato. reviewed_at 2026-08-03, reviewed_vintage 2023, vintage 2023, level regione."
  ],
  "gate": "auto",
  "outcome": "pr-open",
@@ -17,6 +18,6 @@
  "queue_before": 30,
  "run_id": "producer-20260803T203758Z-9ec9",
  "stage": "producer",
- "summary": "eur:rd_p_persreg riletto e firmato: chiusa la smentita aperta su dinamica, vintage 2023",
+ "summary": "eur:rd_p_persreg riletto in modo indipendente: tre correzioni sul testo gia' fuso con la PR #128",
  "trigger": "manuale"
 }
