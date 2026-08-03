@@ -31,6 +31,20 @@
       table { width:100%; border-collapse: collapse; font-size: 13.5px; font-family: "Space Mono", ui-monospace, monospace; }
       th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); white-space: nowrap; }
       th { color: var(--ink-soft); font-weight:700; }
+      td small { color: var(--ink-soft); font-size: 11px; }
+      td a { color: var(--accent); text-decoration: none; }
+      td a:hover { text-decoration: underline; }
+      .mon-head2 { display:flex; align-items:center; gap:12px; }
+      .mon-head2 h2 { margin: 28px 0 10px; }
+      .mon-head2 .mon-btn { margin-left:auto; }
+      .mon-btn--sm { padding:5px 14px; font-size:12px; }
+      .mon-filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+      .mon-filters input, .mon-filters select { font-family: Inter, system-ui, sans-serif; font-size:13px; padding:6px 9px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--ink); }
+      .mon-filters input[type=search] { flex:1 1 220px; min-width:180px; }
+      .mon-date { display:inline-flex; align-items:center; gap:5px; color:var(--ink-soft); font-size:12px; }
+      .mon-totals { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+      .mon-chip { font-family: "Space Mono", ui-monospace, monospace; font-size:11.5px; background:#eee9e0; color:var(--ink); border-radius:999px; padding:3px 10px; white-space:nowrap; }
+      .mon-mini { font-size:14px; letter-spacing:2px; }
     </style>
   </head>
   <body>
