@@ -1,17 +1,17 @@
 {
- "at": "2026-08-03T19:03:47+00:00",
- "base_commit": "72111f5",
+ "at": "2026-08-03T19:05:26+00:00",
+ "base_commit": "eea76d5",
  "branch": "master",
  "claude_code_version": "2.1.220 (Claude Code)",
- "commit": "72111f5",
+ "commit": "eea76d5",
  "detail": [
-  "il cancello e' rosso: worktree non pulito, committa prima di fondere (data/pipeline/runs/producer-20260803T185556Z-3d57.json)"
+  "Pull Request successfully merged"
  ],
- "gate": "blocked",
- "outcome": "blocked",
+ "gate": "auto",
+ "outcome": "merged",
  "pr": "124",
  "run_id": "producer-20260803T183428Z-daf5",
  "stage": "producer",
- "summary": "PR #124 non fusa: il cancello e' rosso",
+ "summary": "PR #124 fusa in master dal passo di merge",
  "trigger": "manuale"
 }
