@@ -20,14 +20,23 @@ from __future__ import annotations
 STATES = (
     "proposta",            # un candidato approved non ancora promosso
     "in-lavorazione",      # uno stadio obbligatorio non e' ancora completo
-    "in-attesa-di-monte",  # ferma perche' lo stadio precedente non ha prodotto
+    "in-attesa",           # ferma in attesa di una condizione (vedi IN_ATTESA_MOTIVI)
     "pronta-al-merge",     # tutti gli stadi del ciclo completi, cancello verde
     "fusa",                # il ciclo e' su master, non ancora verificato sul sito
     "pubblicata",          # visibile sul sito e verificata
     "invalidata",          # un input e' cambiato: passaggi a valle non valgono piu'
-    "bloccata",            # ferma per un motivo qualificato (vedi ERROR_CLASSES)
-    "in-quarantena",       # bloccata terminale, tolta dalla coda per non fermare le altre
+    "in-quarantena",       # in-attesa terminale, tolta dalla coda per non fermare le altre
     "chiusa",              # esito terminale raggiunto
+)
+
+# I motivi che qualificano `in-attesa`. Un solo stato di sosta, armonizzato dai due
+# di prima (`in-attesa-di-monte` + `bloccata`): il motivo dice perche', e porta la
+# classe d'errore giusta (monte-mancante e' un'attesa normale, senza errore; gli
+# altri aspettano un cambio esterno o una correzione tecnica).
+IN_ATTESA_MOTIVI = (
+    "monte-mancante",       # l'artefatto dello stadio a monte non esiste ancora
+    "dipendenza-esterna",   # aspetta un chiarimento o un cambio alla fonte / config
+    "tecnico",              # una correzione tecnica (cancello rosso, conflitto)
 )
 
 # --- Esiti terminali (§7) ----------------------------------------------------
@@ -95,26 +104,23 @@ REQUIRED_STAGES = {
 TRANSITIONS = frozenset({
     ("proposta", "in-lavorazione"),
     ("proposta", "chiusa"),
-    ("proposta", "bloccata"),
-    ("in-lavorazione", "in-attesa-di-monte"),
+    ("proposta", "in-attesa"),
+    ("in-lavorazione", "in-attesa"),
     ("in-lavorazione", "pronta-al-merge"),
-    ("in-lavorazione", "bloccata"),
     ("in-lavorazione", "invalidata"),
     ("in-lavorazione", "chiusa"),
-    ("in-attesa-di-monte", "in-lavorazione"),
-    ("in-attesa-di-monte", "bloccata"),
+    ("in-attesa", "in-lavorazione"),
+    ("in-attesa", "in-quarantena"),
+    ("in-attesa", "chiusa"),
     ("pronta-al-merge", "fusa"),
     ("pronta-al-merge", "invalidata"),
-    ("pronta-al-merge", "bloccata"),
+    ("pronta-al-merge", "in-attesa"),
     ("fusa", "pubblicata"),
     ("fusa", "invalidata"),
     ("pubblicata", "chiusa"),
     ("pubblicata", "invalidata"),
     ("invalidata", "in-lavorazione"),
     ("invalidata", "chiusa"),
-    ("bloccata", "in-lavorazione"),
-    ("bloccata", "in-quarantena"),
-    ("bloccata", "chiusa"),
     ("in-quarantena", "in-lavorazione"),
     ("in-quarantena", "chiusa"),
 })

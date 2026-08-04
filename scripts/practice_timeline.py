@@ -298,7 +298,7 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
         entry = (articles or {}).get(ind)
         fp = verification_queue.prose_fingerprint(entry) if entry else None
         d["published"] = _published_from(proofs_by_code.get(code_of(ind), []), fp)
-        d["state"], d["error_class"] = _state_of(d)
+        d["state"], d["error_class"], d["motivo"] = _state_of(d)
         d["priority"] = practice_model.priority_score(
             {"flags": d["flags"], "state": d["state"], "type": d["type"],
              "completed_stages": d["completed_stages"], "score_eligible": d["score_eligible"],
@@ -347,35 +347,37 @@ def _published_from(proofs: list, fingerprint):
 
 
 def _state_of(d: dict):
-    """Lo stato ricostruito dell'indicatore e la classe d'errore, dalle bandiere.
+    """Lo stato ricostruito, la classe d'errore e il motivo, dalle bandiere.
 
     Ogni ramo e' una condizione verificabile degli artefatti (§3): e' cio' che
-    rende lo stato riconciliabile e non solo dedotto una volta.
+    rende lo stato riconciliabile e non solo dedotto una volta. Il `motivo` e'
+    valorizzato solo per `in-attesa`, l'unico stato di sosta armonizzato: dice
+    perche' e' ferma e porta la classe d'errore giusta (§9).
     """
     f = d["flags"]
     if f.get("rejected"):
-        return "chiusa", "terminale"
+        return "chiusa", "terminale", ""
     if f.get("needs_info"):
-        return "bloccata", "ripetibile-dopo-cambio-esterno"
+        return "in-attesa", "ripetibile-dopo-cambio-esterno", "dipendenza-esterna"
     if f.get("open_smentita"):
-        return "invalidata", "editoriale"
+        return "invalidata", "editoriale", ""
     # approvato ma senza manifest: l'orfano di PR #62, non lo riprende nessuno
     if f.get("approved_candidate") and "curator" not in d["completed_stages"] \
             and "writer" not in d["completed_stages"]:
-        return "proposta", None
+        return "proposta", None, ""
     if f.get("stale_vintage") or f.get("stale_curation"):
-        return "invalidata", "cambiamento-in-corsa"
+        return "invalidata", "cambiamento-in-corsa", ""
     # ciclo editoriale completo?
     required = d.get("required_stages") or practice_model.REQUIRED_STAGES.get(d["type"], ())
     if required and set(required).issubset(set(d["completed_stages"])):
         if not f.get("article_complete", True):
-            return "in-lavorazione", None
+            return "in-lavorazione", None, ""
         if d.get("published") is True:
-            return "pubblicata", None
-        return "fusa", None
+            return "pubblicata", None, ""
+        return "fusa", None, ""
     if not d["completed_stages"]:
-        return "in-attesa-di-monte", None
-    return "in-lavorazione", None
+        return "in-attesa", None, "monte-mancante"
+    return "in-lavorazione", None, ""
 
 
 def reconcile(declared: dict, reconstructed: dict) -> list:

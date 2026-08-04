@@ -94,7 +94,7 @@ class PlanLaunches(unittest.TestCase):
 
     def test_blocked_and_terminal_practices_are_not_launched(self):
         dossier = {
-            "ter-6": practice("ter-6", state="bloccata", flags={"needs_info": True}),
+            "ter-6": practice("ter-6", state="in-attesa", flags={"needs_info": True}),
             "ter-7": practice("ter-7", state="chiusa", flags={"rejected": True}),
             "ter-8": practice("ter-8", state="pubblicata",
                               completed=["curator", "writer", "reviewer", "verificatore"]),

@@ -13,11 +13,12 @@ from scripts import pipeline_monitor
 
 def practice(code, *, state="in-lavorazione", flags=None, completed=(),
              required=("curator", "writer", "reviewer", "verificatore"),
-             priority=0.0, entered_at="2026-07-01"):
+             priority=0.0, entered_at="2026-07-01", motivo=""):
     return {
         "id": code, "state": state, "flags": dict(flags or {}),
         "completed_stages": list(completed), "required_stages": tuple(required),
         "priority": priority, "entered_at": entered_at, "error_class": None,
+        "motivo": motivo,
     }
 
 
@@ -47,6 +48,24 @@ class Board(unittest.TestCase):
                                      completed=["curator", "writer", "reviewer", "verificatore"])}
         b = pipeline_monitor.board(dossier, today=self.TODAY)
         self.assertIn("in pari", b["headline"])
+
+    def test_in_attesa_di_monte_is_not_counted_as_stuck(self):
+        # `in-attesa` con motivo monte-mancante e' contropressione normale, non un
+        # blocco: non deve finire fra i "bloccati" ne' nella testa.
+        dossier = {"ter-9": practice("ter-9", state="in-attesa", motivo="monte-mancante")}
+        b = pipeline_monitor.board(dossier, today=self.TODAY)
+        self.assertEqual(b["stuck"], [])
+        self.assertFalse(pipeline_monitor.is_stuck(b["rows"][0]))
+        self.assertEqual(b["rows"][0]["work_status"], "in attesa")
+
+    def test_in_attesa_external_dependency_is_stuck(self):
+        # Con un motivo diverso da monte-mancante (aspetta un cambio esterno) `in-attesa`
+        # e' un fermo vero, e va segnalato in testa.
+        dossier = {"ter-10": practice("ter-10", state="in-attesa", motivo="dipendenza-esterna",
+                                      flags={"needs_info": True})}
+        b = pipeline_monitor.board(dossier, today=self.TODAY)
+        self.assertEqual([r["id"] for r in b["stuck"]], ["ter-10"])
+        self.assertTrue(pipeline_monitor.is_stuck(b["rows"][0]))
 
     def test_admissions_queue_is_an_action_even_without_dossier_rows(self):
         b = pipeline_monitor.board({}, today=self.TODAY,

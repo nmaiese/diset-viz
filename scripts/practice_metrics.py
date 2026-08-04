@@ -58,7 +58,7 @@ def compute(dossier: dict, runs: list, today: str = "", soglia_giorni: int = 30,
                              if d["published"] is True and d["state"] == "invalidata"]
     errori_pubblici = [d for d in indicators if d["flags"].get("open_smentita")
                        and d["state"] in ("fusa", "pubblicata", "invalidata")]
-    bloccate = [d for d in indicators if d["state"] in ("bloccata", "in-quarantena")]
+    bloccate = [d for d in indicators if d["state"] in ("in-attesa", "in-quarantena")]
     invalidate = [d for d in indicators if d["state"] == "invalidata"]
     ferme_oltre = [d for d in aperte if days_open(d) > soglia_giorni]
 

@@ -146,20 +146,32 @@ se esiste una scheda in `verifiche/` la cui `prosa` combacia con l'impronta
 corrente. Utile come controllo, insufficiente come stato: non distingue "non
 iniziato" da "fallito", "completato ma invalidato" da "completato".
 
-Dieci stati, uno solo attivo per pratica, piu' i motivi che qualificano il blocco.
+Nove stati, uno solo attivo per pratica. Lo stato di sosta e' uno solo,
+`in-attesa`, e un `motivo` lo qualifica (armonizza i due di prima,
+`in-attesa-di-monte` e `bloccata`, che avevano lo stesso significato "ferma,
+aspetta qualcosa" con una linea sola di differenza).
 
 | stato | significato | condizione verificabile (contro gli artefatti) |
 | --- | --- | --- |
 | `proposta` | esiste un candidato `approved` non ancora promosso | candidato con `triage_status=approved`, nessuna riga manifest |
 | `in-lavorazione` | uno stadio obbligatorio non e' ancora completo | esiste l'artefatto di ingresso, manca almeno un artefatto obbligatorio a valle |
-| `in-attesa-di-monte` | ferma perche' lo stadio precedente non ha prodotto | l'artefatto atteso di monte non esiste ancora (es. curatela assente) |
+| `in-attesa` | ferma in attesa di una condizione; il `motivo` dice quale | vedi la tabella dei motivi qui sotto |
 | `pronta-al-merge` | tutti gli stadi del ciclo completi, il cancello e' verde | gli artefatti obbligatori esistono e passano `pipeline_gate` |
 | `fusa` | il ciclo e' su master, non ancora verificato sul sito | il commit e' su master, `published` non ancora confermato |
 | `pubblicata` | **la versione e' visibile sul sito e verificata** | verifica sito superata (vedi §8) |
 | `invalidata` | un input e' cambiato: uno o piu' passaggi non valgono piu' | uno stamp di dipendenza non combacia (§6) |
-| `bloccata` | ferma per un motivo che qualifica il blocco (vedi sotto) | c'e' un `motivo_blocco` da tassonomia (§9) |
-| `in-quarantena` | bloccata terminale sul contenuto, tolta dalla coda per non fermare le altre | `tentativi >= soglia` con errore non transitorio, o decisione umana |
+| `in-quarantena` | `in-attesa` terminale, tolta dalla coda per non fermare le altre | `tentativi >= soglia` con errore non transitorio, o decisione umana |
 | `chiusa` | esito terminale raggiunto (§7) | c'e' un `esito` da vocabolario di chiusura |
+
+I motivi di `in-attesa` (`scripts/practice_model.IN_ATTESA_MOTIVI`), ognuno con la
+sua classe d'errore (§9) e il suo peso sull'urgenza (solo il primo non conta come
+fermo, e' contropressione normale):
+
+| motivo | significato | classe d'errore | e' un fermo? |
+| --- | --- | --- | --- |
+| `monte-mancante` | l'artefatto dello stadio a monte non esiste ancora (es. curatela assente) | nessuna | no |
+| `dipendenza-esterna` | aspetta un chiarimento o un cambio alla fonte / config | `ripetibile-dopo-cambio-esterno` | si' |
+| `tecnico` | una correzione tecnica (cancello rosso, conflitto) | `tecnico` | si' |
 
 **Il record di pratica non sostituisce gli artefatti: li proietta.** Ogni stato ha
 una condizione verificabile contro i file, e un **riconciliatore** (Fase C)
