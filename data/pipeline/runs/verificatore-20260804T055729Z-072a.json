@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-04T06:04:20+00:00",
+ "base_commit": "e901b28",
+ "branch": "automation/verificatore-2026-08-04-072a",
+ "claude_code_version": "2.1.221 (Claude Code)",
+ "commit": "e901b28",
+ "detail": [
+  "Riverifica dopo riscrittura del revisore (impronta 92c607eb4c086dfd, ex 5256f027d17fda58 smentita 2026-07-29 con 2 rilievi in quadro). Le due smentite precedenti sono chiuse: la coincidenza media/mediana (86,71/86,74) e' ora descritta come netto di due tiri opposti (senza Sardegna e Sicilia media 87,55, coda -0,84) e le tre rotture 2,22/1,90/4,06 sono nominate. Controllo avverso: 24 affermazioni verificate contro serie e fonti primarie, tutte confermate. Serie Istat territoriale (Assoluti_Regione, id 101): media 2018 81,80 -> 2024 86,71 (+4,91), 2018->2022 +4,05, 2022->2024 +0,86; Molise 2018 #11 a 83,48 -> 2024 #1 93,58 (+10,09); Sardegna 67,91(2018)->79,61(2024) +11,70, serie limiti 81,67(2020)/74,98(2022)/79,61(2024); TAA unico in calo 84,63->84,53 (-0,10); ultimo passaggio 13 su 7 giu. Incroci: uscita precoce bes-02IST005-N22 2025, isole 13,70/13,60 staccate dalla 18a regione (VdA 10,40) di 3,30/3,20 >3, Toscana #4 uscita precoce e #4 qui; passaggio universita bes-02IST004 2023 VdA #7 (57,30) contro #18 qui. Eurostat edat_lfse_03 via API: Italia 81,4(2018)/86,5(2024), UE27 83,2/85,0 -> Italia scavalca la UE, confermato. Definizione: media annua confermata da definition_check."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 28,
+ "queue_before": 29,
+ "run_id": "verificatore-20260804T055729Z-072a",
+ "stage": "verificatore",
+ "summary": "Verificato ter-101 (Tasso di scolarizzazione superiore): 24 controllate, 24 confermate, 0 smentite, esito pulito",
+ "trigger": "manuale"
+}
