@@ -13,7 +13,7 @@ const STORAGE_NICKNAME_KEY = "di-nickname";
 
 // Header Authorization con il Bearer di Supabase, se c'e' una sessione. Vuoto
 // per gli anonimi: il gioco non richiede login, l'account e' un extra.
-export async function authHeaders() {
+async function authHeaders() {
   try {
     const token = await getAccessToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
@@ -233,7 +233,7 @@ export function Modal({ title, onClose, children, labelledBy }) {
   );
 }
 
-export function loadNickname() {
+function loadNickname() {
   try {
     return window.localStorage.getItem(STORAGE_NICKNAME_KEY) || "";
   } catch {
@@ -241,7 +241,7 @@ export function loadNickname() {
   }
 }
 
-export function saveNickname(nickname) {
+function saveNickname(nickname) {
   try {
     window.localStorage.setItem(STORAGE_NICKNAME_KEY, nickname);
   } catch {

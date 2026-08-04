@@ -58,7 +58,3 @@ PIPELINE_TOKEN = os.getenv("PIPELINE_TOKEN", "")
 # (l'endpoint risponde 404, come /_pipeline senza token), che e' il default in
 # locale e finche' il segreto non e' provisionato in Cloud Run e nell'ambiente agenti.
 PIPELINE_INGEST_TOKEN = os.getenv("PIPELINE_INGEST_TOKEN", "")
-
-# Deprecated: consent is managed by the CMP loaded in Google Tag Manager.
-FORCE_FUNDING_CHOICES_CMP = False
-ENABLE_CONSENT_BANNER = False

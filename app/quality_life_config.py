@@ -17,14 +17,14 @@ Design rules:
 
 PROVINCE (implemented — regional atlas + provincial BES both live)
 ------------------------------------------------------------------
-The categories below are deliberately territory-agnostic and are now reused for
+The categories below are deliberately territory-agnostic and are reused for
 the provincial ranking too. Provinces are implemented, outside this file, via:
 - the provincial dataset ``app/static/data/Assoluti_Provincia.csv`` (Istat "BES
   dei Territori" backbone);
-- the BES engine ``app/quality_life_bes.py``, parametrised on level region|province,
-  with ``app/quality_life_province.py`` for the provincial specifics;
-- routes ``/qualita-della-vita/province`` and
-  ``/qualita-della-vita/province/<slug>`` (see ``app/views.py``);
+- the single BES engine ``app/quality_life_bes.py``, parametrised on level
+  region|province;
+- routes ``/qualita-della-vita/classifica/regioni`` and
+  ``/qualita-della-vita/classifica/province`` (see ``app/views.py``);
 - see ``docs/PROVINCE_PIPELINE.md`` for the ingestion pipeline.
 Still future work: additional provincial geometries/maps and the vertical
 sources below. Vertical sources (OMI, ISPRA/SNPA, INAIL, Ministero della Salute,

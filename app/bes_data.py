@@ -47,62 +47,6 @@ BES_SOURCE_URLS = {
 }
 
 
-def _trim_words(text, limit):
-    if len(text) <= limit:
-        return text
-    cut = text[:limit].rsplit(" ", 1)[0].rstrip(" ,.;:-")
-    return cut or text[:limit].rstrip(" ,.;:-")
-
-
-def _trim_name_preserving_tail(text, limit):
-    if len(text) <= limit:
-        return text
-    words = text.split()
-    tail = " ".join(words[-2:]).rstrip(" ,.;:-")
-    separator = ": "
-    head = _trim_words(text, limit - len(separator) - len(tail))
-    if head and tail.lower() not in head.lower():
-        return f"{head}{separator}{tail}"
-    return _trim_words(text, limit)
-
-
-def bes_territory_label(indicator):
-    levels = set(indicator.get("levels") or {})
-    if levels == {"regione", "provincia"}:
-        return "regioni e province"
-    if levels == {"provincia"}:
-        return "province"
-    return "regioni"
-
-
-def bes_seo_title(name, site_name, territory_label="territori"):
-    topic_suffix = f": BES {territory_label}"
-    brand_suffix = f" | {site_name}"
-    candidate = f"{name}{topic_suffix}"
-    if len(candidate) + len(brand_suffix) <= 60:
-        return candidate + brand_suffix
-    if len(candidate) <= 60:
-        return candidate
-    return f"{_trim_name_preserving_tail(name, 60 - len(topic_suffix))}{topic_suffix}"
-
-
-def bes_seo_description(name, plain="", territory_label="regioni e province"):
-    body = (plain or "Consulta valori e significato dell'indicatore").strip()
-    body = body if body.endswith(".") else f"{body}."
-    suffix = f" Dati BES Istat per {territory_label}."
-    if len(body) + len(suffix) <= 155:
-        return body + suffix
-
-    fixed = f": cosa misura, unità e confronto tra {territory_label}. Dati BES Istat."
-    concise_name = {
-        "Rapporto tra i tassi di occupazione (25-49 anni) delle donne con figli in età prescolare e delle donne senza figli": (
-            "Occupazione delle donne con figli piccoli e senza figli"
-        ),
-    }.get(name, name)
-    label = _trim_name_preserving_tail(concise_name, 155 - len(fixed))
-    return f"{label}{fixed}"
-
-
 def _paths(level):
     cfg = LEVELS[level]
     return DATA_DIR / cfg["dataset"], DATA_DIR / cfg["manifest"]

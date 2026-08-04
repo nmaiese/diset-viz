@@ -79,10 +79,6 @@ from scripts import pipeline_gate  # noqa: E402  (path bootstrap above)
 
 # Dove scrive chi registra una run: un file per run, mai contendibile.
 RUNS_DIR = PROJECT_ROOT / "data" / "pipeline" / "runs"
-# Il vecchio registro unico, travasato negli shard e non piu' in repo. Il
-# percorso resta perche' la migrazione sia rieseguibile e verificabile.
-JOURNAL = PROJECT_ROOT / "data" / "pipeline" / "runs.jsonl"
-
 # Gli stadi che il cancello conosce (`pipeline_gate.STAGE_PATHS`), piu' `launch`,
 # il battito del lanciatore. `launch` non e' uno stadio del cancello: non ha
 # perimetro, non apre pull request e non passa dal cancello. Registra pero' un
@@ -295,44 +291,6 @@ def read_journal(path=None):
     if target.exists():
         return _read_jsonl(target)
     return []
-
-
-def legacy_run_id(entry):
-    """Il `run_id` di una run scritta prima che i run_id esistessero.
-
-    Non e' un dettaglio della migrazione: le due righe di una vecchia run si
-    riconoscevano da `(stadio, pr)`, quindi ricavare l'id da quella coppia e'
-    l'unico modo di non spezzare in due le run che il diario oggi mostra
-    unite. Le righe senza numero di pull request non erano appaiate a niente
-    nemmeno prima, e prendono un id dal proprio istante.
-    """
-    stage = entry.get("stage") or "ignoto"
-    pr = str(entry.get("pr") or "").strip()
-    if pr:
-        return f"legacy-{stage}-pr{pr}"
-    stamp = (entry.get("at") or "").replace("-", "").replace(":", "").replace("+0000", "")
-    return f"legacy-{stage}-{stamp or 'senza-data'}"
-
-
-def migrate_legacy(jsonl_path=None, root=None) -> int:
-    """Travasa il vecchio `runs.jsonl` negli shard. Ritorna quante run."""
-    source = Path(jsonl_path or JOURNAL)
-    if not source.exists():
-        return 0
-    entries = _read_jsonl(source)
-    seen = {}
-    for entry in entries:
-        run_id = legacy_run_id(entry)
-        seen[run_id] = seen.get(run_id, 0) + 1
-        row = dict(entry)
-        row["run_id"] = run_id
-        row.setdefault("trigger", "manuale")
-        # Le righe che condividono un run_id sono le due meta' della stessa
-        # run, e vanno in due file: il suffisso le distingue senza inventare
-        # due identita' dove ce n'e' una.
-        suffix = "" if seen[run_id] == 1 else f".{seen[run_id]}"
-        append(row, path=root, suffix=suffix)
-    return len(entries)
 
 
 def _read_shards(root):

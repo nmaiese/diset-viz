@@ -136,17 +136,14 @@ def parse_sheet(rows: list[list[object]]) -> list[dict[str, str]]:
         raise XlsError(f"the {SHEET!r} sheet has no column for {', '.join(missing)}")
 
     out: dict[str, dict[str, str]] = {}
-    skipped = 0
     for row in rows[header_index + 1:]:
-        raw_code = _clean(row[positions["id"]]) if positions["id"] < len(row) else ""
         code = _code(row[positions["id"]]) if positions["id"] < len(row) else ""
         if not code:
             # `060_P` and `472_C` are the provincial and municipal cuts of an
             # indicator whose regional cut is `060`. This project's provincial
             # pages come from Istat BES dei Territori and are keyed differently
             # (`docs/PROVINCE_PIPELINE.md`), so those rows have no page to check
-            # and are counted rather than kept.
-            skipped += bool(raw_code)
+            # and are ignored rather than kept.
             continue
         record = {"id": code}
         for name, position in positions.items():
