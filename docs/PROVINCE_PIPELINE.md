@@ -121,13 +121,10 @@ per le province. Le route sono `/qualita-della-vita/classifica/regioni` e
 `/api/quality-life/<livello>/<key>`. Il motore unico è
 [`app/quality_life_bes.py`](../app/quality_life_bes.py) (z-score orientato,
 delta-rank, campioni e classifiche per categoria), con loader
-[`app/bes_data.py`](../app/bes_data.py). La vecchia
-[`app/quality_life_province.py`](../app/quality_life_province.py) resta nel repo ma
-non è più collegata alle route. Storicamente leggeva
-`Assoluti_Provincia.csv` + `province_manifest.csv` tramite
-[`app/province_data.py`](../app/province_data.py), riusa profili, categorie e
-matematica di scoring di `app/quality_life.py`, e **non tocca** `app/data.py` né la
-soglia `len(regions)==20` del catalogo regionale.
+[`app/bes_data.py`](../app/bes_data.py). Il loader legge
+`Assoluti_Provincia.csv`, `province_manifest.csv` e `province_codes.csv`
+direttamente, senza passare da `app/data.py` e senza toccare la soglia
+`len(regions)==20` del catalogo regionale.
 
 Stato attuale:
 - **64 indicatori su 67** entrano nello score: le direzioni sono curate a mano in

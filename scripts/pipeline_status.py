@@ -368,7 +368,7 @@ def main():
     print()
     if publication is not None:
         n = publication["waiting"]
-        print(f"Coda publisher (fusa -> pubblicata): "
+        print("Coda publisher (fusa -> pubblicata): "
               + (f"{n} indicatori da verificare sul sito." if n
                  else "vuota, ogni indicatore fuso ha una prova valida."))
     if status["unknown_stages"]:

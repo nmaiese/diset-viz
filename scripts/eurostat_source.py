@@ -32,7 +32,6 @@ CACHE_DIR = PROJECT_ROOT / "data" / "eurostat_cache"
 CACHE_MAX_AGE = 6 * 24 * 3600
 
 API_BASE = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data"
-LANDING = "https://ec.europa.eu/eurostat/web/regions/data/database"
 LICENSE = "CC BY 4.0 (Eurostat)"
 
 # NUTS2 -> region_key (matching app.data / app.profiles.region_key_for slugs).

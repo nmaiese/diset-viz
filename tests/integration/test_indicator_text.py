@@ -145,14 +145,5 @@ class NoGeneratedFaq(unittest.TestCase):
         self.assertTrue(any('"Dataset"' in b for b in blocks))
         self.assertTrue(any('"BreadcrumbList"' in b for b in blocks))
 
-    def test_number_format_preserves_decimals(self):
-        # A value above 100 must keep its decimals (it_num-consistent), not round
-        # to a whole number that would disagree with the ranking.
-        self.assertEqual(indicator_notes._it_number(116.407), "116,41")
-        self.assertEqual(indicator_notes._it_number(68.9), "68,9")
-        self.assertEqual(indicator_notes._it_number(34500), "34.500")
-        self.assertEqual(indicator_notes._it_number(5.0), "5")
-
-
 if __name__ == "__main__":
     unittest.main()

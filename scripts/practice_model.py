@@ -25,7 +25,7 @@ STATES = (
     "fusa",                # il ciclo e' su master, non ancora verificato sul sito
     "pubblicata",          # visibile sul sito e verificata
     "invalidata",          # un input e' cambiato: passaggi a valle non valgono piu'
-    "bloccata",            # ferma per un motivo qualificato (vedi ERROR_CLASSES)
+    "bloccata",            # ferma per un motivo qualificato (vedi RETRY_CEILING)
     "in-quarantena",       # bloccata terminale, tolta dalla coda per non fermare le altre
     "chiusa",              # esito terminale raggiunto
 )
@@ -43,8 +43,6 @@ TERMINAL_OUTCOMES = (
 )
 
 # --- Tipi di pratica (§2) ----------------------------------------------------
-# Piu' due oggetti pre-pratica che non aprono un record: la ricognizione delle
-# fonti e la scoperta dei candidati restano batch (§5).
 PRACTICE_TYPES = (
     "nuovo",
     "aggiornamento",
@@ -55,11 +53,6 @@ PRACTICE_TYPES = (
     "rollback",
     "metadati",
 )
-PRE_PRACTICE = ("candidato-fonte", "candidato-indicatore")
-
-# L'ordine di catena degli stadi editoriali (dopo la promozione). Coincide con
-# l'ordine di precedenza del lanciatore per gli stadi che toccano una pratica.
-EDITORIAL_STAGES = ("promoter", "curator", "writer", "reviewer", "verificatore")
 
 # Lo stadio in cui una pratica di ciascun tipo entra.
 ENTRY_STAGE = {
@@ -130,9 +123,6 @@ RETRY_CEILING = {
 }
 # Classi che sono rientri, non fallimenti: non contano contro il tetto.
 RIENTRO_CLASSES = frozenset({"editoriale", "cambiamento-in-corsa"})
-ERROR_CLASSES = tuple(RETRY_CEILING) + tuple(sorted(RIENTRO_CLASSES))
-
-
 def can_transition(frm: str, to: str) -> bool:
     """Vero se `frm -> to` e' una transizione ammessa del ciclo di vita."""
     return (frm, to) in TRANSITIONS

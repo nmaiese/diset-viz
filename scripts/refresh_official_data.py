@@ -9,7 +9,6 @@ atomically and a compact, reviewable source-state/report pair is updated.
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
 import json
 import sys

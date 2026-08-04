@@ -16,8 +16,8 @@ First campaign sources (decided with the user):
    BES domain.
 2. Tavole provinciali degli Indicatori territoriali per le politiche di sviluppo.
 3. Demografia / popolazione provinciale.
-Only (1) is wired below; (2) and (3) plug into the same generic fetch/build by
-adding dataflows to OTHER_PROVINCIAL_FLOWS once their DSDs are inspected.
+Only (1) is wired below; (2) and (3) need dedicated adapters once their DSDs
+have been inspected.
 """
 
 from __future__ import annotations
@@ -29,7 +29,6 @@ from app.taxonomy import category_for_indicator
 # -- BES dei Territori (backbone) -------------------------------------------
 
 BES_DATAFLOW = "DF_BES_TERRIT_0T"   # "All indicators - All territories"
-BES_DSD = "BES_TERRIT"
 BES_START_PERIOD = 2015
 # DSD key order: FREQ.REF_AREA.DOMAIN.DATA_TYPE.SEX.EDITION
 BES_DOMAINS = [f"BES_{n:02d}" for n in range(1, 13)]
@@ -81,11 +80,6 @@ DEFUNCT_PROVINCES = {
     "Medio Campidano",
     "Carbonia-Iglesias",
 }
-
-# Other provincial dataflows to add after inspecting their DSDs (phase-2 of the
-# same campaign). Left empty on purpose so the first run stays focused on BES.
-OTHER_PROVINCIAL_FLOWS = []
-
 
 # -- proposed direction heuristic -------------------------------------------
 

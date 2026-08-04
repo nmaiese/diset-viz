@@ -278,36 +278,6 @@ _MASCULINE_PLURAL_I = {
 }
 
 
-THEME_EXAMPLES = {
-    "Ambiente, altro": "Esempio: aiuta a capire se un territorio è più esposto a pressioni ambientali, rischi naturali o consumo di suolo rispetto ad altri.",
-    "Capitale sociale": "Esempio: rende visibile la presenza di reti civiche, cooperative o organizzazioni che tengono insieme servizi e comunità.",
-    "Città": "Esempio: permette di confrontare la qualità della vita urbana, dai servizi quotidiani allo spazio pubblico disponibile.",
-    "Competitività": "Esempio: serve a leggere quanto il sistema produttivo regionale usa risorse, tecnologia e lavoro per stare sul mercato.",
-    "Cultura": "Esempio: fa vedere se musei, spettacoli e imprese culturali sono una parte viva dell'economia locale o restano marginali.",
-    "Demografia e popolazione": "Esempio: aiuta a leggere se una regione invecchia, si svuota o si rinnova, confrontando struttura per età, natalità e movimenti di popolazione.",
-    "Salute": "Esempio: traduce le condizioni di salute di un territorio in anni di vita attesi, un esito che riassume prevenzione, servizi e condizioni sociali.",
-    "Demografia di impresa": "Esempio: aiuta a distinguere territori dove nascono nuove attività da quelli in cui il tessuto produttivo si rinnova meno.",
-    "Dinamiche settoriali": "Esempio: mette a confronto la forza economica di un settore tra regioni, al netto della diversa dimensione dei territori.",
-    "Energia": "Esempio: consente di leggere consumi, continuità dei servizi e peso delle fonti rinnovabili nella vita economica e quotidiana.",
-    "Inclusione sociale": "Esempio: porta l'attenzione su persone, famiglie e servizi che spesso restano fuori dai soli indicatori economici.",
-    "Internazionalizzazione": "Esempio: mostra quanto una regione sia collegata ai mercati esteri, tra esportazioni, importazioni e investimenti.",
-    "Istruzione e formazione": "Esempio: aiuta a capire dove la scuola e la formazione riescono a trattenere, preparare e accompagnare le persone.",
-    "Lavoro": "Esempio: fa vedere quante persone lavorano, chi resta fuori e quanto è stabile la partecipazione al mercato del lavoro.",
-    "Legalità e sicurezza": "Esempio: segnala aspetti della sicurezza quotidiana e del funzionamento della giustizia che incidono sulla fiducia nei territori.",
-    "Mercato dei capitali e finanza d'impresa": "Esempio: racconta quanto sia facile o rischioso finanziare imprese e investimenti in una regione.",
-    "Pubblica Amministrazione": "Esempio: rende visibili tempi, trasparenza e capacità attuativa delle amministrazioni, cioè pezzi concreti della macchina pubblica.",
-    "Qualità dell'aria": "Esempio: aiuta a confrontare l'impatto ambientale di attività produttive, trasporti e consumi energetici.",
-    "Reddito e ricchezza": "Esempio: misura quanta ricchezza un territorio produce e quanto reddito resta davvero nelle tasche delle famiglie, al netto della sua dimensione.",
-    "Ricerca ed innovazione": "Esempio: mostra se università, imprese e istituzioni producono conoscenza, brevetti e innovazione in modo diffuso.",
-    "Rifiuti": "Esempio: serve a leggere quanto il ciclo dei rifiuti sia orientato al recupero o ancora dipendente dallo smaltimento.",
-    "Risorse idriche": "Esempio: fa emergere differenze molto concrete, come perdite di rete, qualità dell'acqua e continuità del servizio.",
-    "Servizi di cura": "Esempio: aiuta a capire se famiglie, bambini e anziani trovano servizi di cura accessibili nel territorio in cui vivono.",
-    "Società dell'informazione": "Esempio: misura quanto famiglie, imprese e pubbliche amministrazioni siano dentro la transizione digitale.",
-    "Trasporti e mobilità": "Esempio: racconta come persone e merci si muovono, e quanto una regione dipenda da strada, ferrovia, porti, aeroporti o trasporto pubblico.",
-    "Turismo": "Esempio: distingue i territori dove il turismo pesa molto sulla vita locale da quelli in cui resta un fenomeno più contenuto.",
-}
-
-
 THEME_CAVEATS = {
     "Ambiente, altro": "Da leggere insieme alla geografia fisica del territorio: montagne, coste, boschi e densità urbana cambiano molto il significato del confronto.",
     "Capitale sociale": "Non riassume da solo la qualità delle relazioni sociali, ma offre una traccia quantitativa di un fenomeno più ampio.",
@@ -419,7 +389,7 @@ CURATED_DIRECTION = {
     "285": "contextual",
     # Istruzione e formazione (education level / training participation = positive)
     "198": "higher_better", "197": "higher_better", "99": "higher_better", "77": "higher_better",
-    "190": "higher_better", "189": "higher_better", "104": "higher_better", "67": "higher_better",
+    "190": "higher_better", "189": "higher_better", "67": "higher_better",
     "188": "higher_better", "187": "higher_better", "63": "higher_better", "186": "higher_better",
     "185": "higher_better",
     "409": "contextual",  # quota di diplomati tecnici: composizione, non esito
@@ -569,25 +539,6 @@ def _compact_title(core, marker, max_len):
     if not head or tail.lower() in head.lower():
         return _truncate_words(core, max_len)
     return f"{head}{separator}{tail})"
-
-
-def _it_number(value, decimals=2):
-    """Italian number formatting for FAQ answers: dot thousands, comma decimals.
-
-    Mirrors the page's `it_num` filter (same 2-decimal rounding as the ranking,
-    table and downloads) so the FAQ never publishes a figure that differs from
-    the rest of the page. Trailing zeros are trimmed for readability, which does
-    not change the value (e.g. 34500 -> "34.500", 116.407 -> "116,41")."""
-    if value is None:
-        return ""
-    try:
-        formatted = f"{float(value):,.{decimals}f}"
-    except (TypeError, ValueError):
-        return str(value)
-    formatted = formatted.replace(",", "§").replace(".", ",").replace("§", ".")
-    if "," in formatted:
-        formatted = formatted.rstrip("0").rstrip(",")
-    return formatted
 
 
 def meta_description_from_attacco(attacco, max_len=_DESC_MAX):
@@ -1082,7 +1033,6 @@ def rate_label(unit):
     value = re.sub(r"\bper\s+(cento(?:mila)?\s+\S)", r"ogni \1", value, flags=re.I)
     return value
 
-
 def change_unit_label(name, unit):
     if is_percentage_unit(unit):
         return "punti percentuali"
@@ -1244,68 +1194,6 @@ def _lens(name):
     return ""
 
 
-def _specific_example(name):
-    lowered = name.lower()
-    if "turistic" in lowered:
-        return "Esempio: una regione piccola e molto visitata può avere un valore alto anche se registra meno presenze assolute di una regione più grande."
-    if "disoccupazione" in lowered:
-        return "Esempio: due regioni possono avere lo stesso numero di persone in cerca di lavoro, ma un tasso diverso se cambia la dimensione delle forze di lavoro."
-    if "tempo medio" in lowered or "durata media" in lowered or "giacenza media" in lowered or "ritardo" in lowered:
-        return "Esempio: traduce l'efficienza amministrativa o logistica in tempo atteso, cioè giorni, minuti o ritardi che persone e imprese sentono davvero."
-    if "occupazione" in lowered:
-        return "Esempio: mostra quanta parte della popolazione in età lavorativa ha effettivamente un impiego, senza fermarsi al numero assoluto di occupati."
-    if "neet" in lowered:
-        return "Esempio: intercetta i giovani che non studiano e non lavorano, una zona grigia che spesso anticipa esclusione e perdita di competenze."
-    if "abbandon" in lowered:
-        return "Esempio: segnala dove il percorso scolastico si interrompe prima del tempo, spesso prima che il problema emerga nel mercato del lavoro."
-    if "competen" in lowered or "apprendimento" in lowered:
-        return "Esempio: sposta l'attenzione dal titolo di studio a quello che gli studenti riescono davvero a fare in lettura, matematica o inglese."
-    if "povert" in lowered or "deprivazione" in lowered:
-        return "Esempio: aiuta a vedere dove il reddito e le condizioni materiali rendono più fragile la vita quotidiana delle persone."
-    if "disabil" in lowered:
-        return "Esempio: permette di osservare se scuole, presidi e servizi sono attrezzati per includere persone con bisogni specifici."
-    if "banda" in lowered or "internet" in lowered or "wi-fi" in lowered or "e-government" in lowered:
-        return "Esempio: fa capire se cittadini, imprese o amministrazioni possono usare servizi digitali senza partire svantaggiati."
-    if "rifiut" in lowered:
-        return "Esempio: mette in chiaro se il sistema locale recupera materiali o continua a dipendere dallo smaltimento."
-    if "acqua" in lowered or "idr" in lowered or "depurazione" in lowered:
-        return "Esempio: traduce il servizio idrico in esperienza concreta, tra acqua disponibile, reti efficienti e depurazione."
-    if "ferrovi" in lowered or "trasporto pubblico" in lowered or "tpl" in lowered:
-        return "Esempio: mostra se muoversi senza auto è una possibilità reale o un'opzione debole nel territorio."
-    if "merci" in lowered or "porto" in lowered or "interport" in lowered or "sdoganamento" in lowered:
-        return "Esempio: aiuta a leggere la logistica, cioè il modo in cui imprese e territori portano prodotti dentro e fuori dai mercati."
-    if "rinnovabil" in lowered or "bioenergie" in lowered or "cogenerazione" in lowered:
-        return "Esempio: segnala quanto il sistema energetico regionale si appoggia a fonti o processi meno tradizionali."
-    if "criminal" in lowered or "furti" in lowered or "rapine" in lowered or "omicidi" in lowered:
-        return "Esempio: rende confrontabili fenomeni di sicurezza che, guardati solo in valori assoluti, penalizzerebbero le regioni più popolose."
-    if "ricerca" in lowered or "r&s" in lowered or "brevett" in lowered or "innovazione" in lowered:
-        return "Esempio: fa emergere dove imprese, università e istituzioni investono in conoscenza invece di competere solo sui costi."
-    if "export" in lowered or "esport" in lowered or "import" in lowered or "estero" in lowered:
-        return "Esempio: mostra quanto l'economia regionale dialoghi con il resto del mondo, sia vendendo sia comprando beni e servizi."
-    if "credito" in lowered or "fidi" in lowered or "finanziamenti" in lowered or "capitale di rischio" in lowered:
-        return "Esempio: indica se il denaro per crescere arriva con relativa facilità o se il sistema finanziario è più prudente."
-    if "spettacolo" in lowered or "muse" in lowered or "cultural" in lowered:
-        return "Esempio: aiuta a capire se la domanda culturale è concentrata in pochi poli o diffusa nella vita ordinaria del territorio."
-    if "verde" in lowered:
-        return "Esempio: collega la qualità urbana a spazi che le persone possono usare ogni giorno, oltre i grandi parchi simbolici."
-    return ""
-
-
-def _unit_note(unit):
-    lowered = unit.lower()
-    if not lowered:
-        return ""
-    if "percentuale" in lowered:
-        return "La percentuale rende più pulito il confronto tra regioni grandi e piccole."
-    if "per abitante" in lowered or "per cento abitanti" in lowered or "per mille abitanti" in lowered or "centomila" in lowered:
-        return "Il rapporto sulla popolazione evita confronti falsati dalla dimensione."
-    if "migliaia di euro" in lowered or lowered == "euro" or "milioni di euro" in lowered:
-        return "Il valore economico va letto come intensità o produttività, non come ricchezza complessiva."
-    if "punteggio" in lowered or "numero indice" in lowered:
-        return "Il punteggio serve soprattutto per ordinare e confrontare."
-    return ""
-
-
 def _direction(name):
     lowered = name.lower()
     if any(token in lowered for token in LOWER_IS_BETTER):
@@ -1427,11 +1315,3 @@ def display_unit(unit):
     value = re.sub(r"\bM3\b", "m³", value, flags=re.I)
     value = re.sub(r"\bKm2\b", "km²", value, flags=re.I)
     return value
-
-
-def _pick(seed, modulo):
-    try:
-        number = int(seed)
-    except (TypeError, ValueError):
-        number = sum(ord(char) for char in str(seed))
-    return number % modulo

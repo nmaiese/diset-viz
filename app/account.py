@@ -6,7 +6,6 @@ secret key). Best-effort sull'admin API: se non risponde, le righe sono comunque
 cancellate e lo si segnala.
 """
 
-import json
 import urllib.error
 import urllib.request
 

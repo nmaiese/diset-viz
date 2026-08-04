@@ -57,10 +57,11 @@ dati.
 
 ## Uso nello scoring
 
-Il motore BES resta la fonte dello scoring. Il bridge `app/quality_life_external.py`
-espone candidati e sostituzioni esatte, ma non li applica automaticamente.
-Qualunque sostituzione deve avere `definition_match=exact`, copertura almeno 95%,
-direzione curata e test comparativo di stabilità dello scoring.
+Il motore BES resta la fonte principale dello scoring. Le serie esterne
+promosse entrano tramite `app/quality_life_selection.py` solo dopo le guardie di
+freschezza, copertura e direzione curata. Qualunque sostituzione di una serie BES
+deve avere `definition_match=exact`, copertura almeno 95% e un test comparativo
+di stabilità dello scoring.
 
 Per la qualità della vita regionale il motore legge direttamente il dataset BES
 nazionale separato. Qui la soglia operativa è anno almeno 2025, copertura almeno

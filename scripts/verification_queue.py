@@ -75,8 +75,6 @@ from scripts import indicator_store  # noqa: E402  (path bootstrap above)
 # articolo dopo una correzione produce un'impronta nuova, quindi un file nuovo,
 # quindi non si sovrascrive niente.
 VERIFICATIONS_DIR = PROJECT_ROOT / "data" / "pipeline" / "verifiche"
-# Il vecchio registro unico. Si legge, non si scrive piu'.
-LEGACY_VERIFICATIONS = PROJECT_ROOT / "data" / "pipeline" / "verifiche.csv"
 
 COLUMNS = [
     "code",
@@ -167,17 +165,6 @@ def load_verifications(path=None) -> list[dict]:
     if target.exists():
         return _read_verification_csv(target)
     return []
-
-
-def migrate_legacy(csv_path=None, root=None) -> int:
-    """Travasa il vecchio CSV negli shard. Ritorna quante verifiche."""
-    source = Path(csv_path or LEGACY_VERIFICATIONS)
-    if not source.exists():
-        return 0
-    rows = _read_verification_csv(source)
-    for row in rows:
-        write_verification(row, root=root)
-    return len(rows)
 
 
 def _read_verification_shards(root) -> list[dict]:

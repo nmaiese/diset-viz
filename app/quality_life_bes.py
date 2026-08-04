@@ -48,7 +48,6 @@ from app.bes_data import (
     has_bes_data,
 )
 from app.external_atlas import (
-    external_indicator_path,
     external_regional_scoreables,
     get_external_atlas_indicator,
     has_external_data,

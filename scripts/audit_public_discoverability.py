@@ -31,7 +31,7 @@ def load_contract(path: Path = ROOT / "app" / "views.py") -> dict:
 
 
 class _NoRedirect(HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
+    def redirect_request(self, req, fp, code, _msg, headers, _newurl):
         return None
 
 

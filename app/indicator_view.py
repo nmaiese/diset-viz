@@ -31,7 +31,6 @@ Two consequences worth knowing:
 """
 
 import functools
-import re
 
 from app import profiles, sources
 from app.atlas_catalog import get_atlas_indicator, get_atlas_catalog

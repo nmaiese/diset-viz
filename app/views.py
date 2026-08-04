@@ -1,14 +1,7 @@
 from app import app
 from app.cache import cache
 from app.blog import SITE_NAME, SITE_URL, all_tags, get_post, get_posts, posts_for_indicator
-from app.data import (
-    get_catalog,
-    get_indicator,
-    get_indicator_year,
-    get_rows,
-    indicator_trend_stats,
-    indicator_year_over_year_stats,
-)
+from app.data import get_catalog
 from app.atlas_catalog import (
     all_atlas_themes_index,
     atlas_themes_by_macro_area,
@@ -41,11 +34,10 @@ from app import public_urls
 from app import publisher
 from app import agent_discovery
 
-from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
+from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory
 from flask.json import jsonify
 
 import csv, hmac, io, json, os, re, time, unicodedata
-from collections import defaultdict
 import threading
 from functools import lru_cache
 from urllib.parse import quote_plus

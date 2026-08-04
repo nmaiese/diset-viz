@@ -26,10 +26,7 @@ from app.cache import cache
 from app.data import REGION_GEO_AREA, REGION_ORDER, get_catalog, get_rows
 from app.external_data import count_freshness, freshness_status
 from app.taxonomy import (
-    CANONICAL_CATEGORIES,
-    MACRO_AREA_ORDER,
     canonical_category_slug,
-    category_metadata,
     category_path,
 )
 
@@ -105,22 +102,6 @@ def indicator_slug(name):
 
 def indicator_path(indicator_id, name):
     return sources.indicator_url("territorial", indicator_id, indicator_slug(name))
-
-
-@cache.memoize(timeout=3600)
-def _theme_slug_map():
-    """Canonical public URL slug -> category name."""
-    return {
-        slugify(category["name"]): category["name"]
-        for category in CANONICAL_CATEGORIES.values()
-    }
-
-
-def theme_name(theme_slug):
-    category_slug = canonical_category_slug(theme_slug)
-    if category_slug:
-        return CANONICAL_CATEGORIES[category_slug]["name"]
-    return _theme_slug_map().get(theme_slug)
 
 
 def theme_path(name):
@@ -439,45 +420,6 @@ def _region_indicators(region_key):
 
 
 @cache.memoize(timeout=3600)
-def theme_profile(theme_slug):
-    """Indicator hub for one theme, or None if the slug is unknown."""
-    name = theme_name(theme_slug)
-    if name is None:
-        return None
-
-    indicators = [
-        {
-            "id": item["id"],
-            "name": item["name"],
-            "unit": item["unit"],
-            "path": indicator_path(item["id"], item["name"]),
-            "year_min": item["year_min"],
-            "year_max": item["year_max"],
-            "region_count": item["region_count"],
-            "completeness": item["completeness"],
-            "complete": item["complete"],
-            "spark": item["spark"],
-            "plain": (item.get("explain") or {}).get("plain"),
-        }
-        for item in get_catalog()["indicators"]
-        if item["theme"] == name
-    ]
-    indicators.sort(key=lambda i: (not i["complete"], i["name"]))
-
-    complete_count = sum(1 for i in indicators if i["complete"])
-    return {
-        "theme": name,
-        "theme_slug": slugify(name),
-        "theme_path": theme_path(name),
-        "macro_area": category_metadata(name)["macro_area"],
-        "description": CANONICAL_CATEGORIES[canonical_category_slug(slugify(name))]["description"],
-        "indicator_count": len(indicators),
-        "complete_count": complete_count,
-        "indicators": indicators,
-    }
-
-
-@cache.memoize(timeout=3600)
 def all_regions_index():
     return [
         {"region": region, "region_key": region_key_for(region), "path": f"/regione/{region_key_for(region)}"}
@@ -505,37 +447,3 @@ def regions_overview():
             "weak": [t["theme"] for t in profile["themes_weak"][:2]],
         }
     return overview
-
-
-@cache.memoize(timeout=3600)
-def all_themes_index():
-    counts = defaultdict(int)
-    for item in get_catalog()["indicators"]:
-        counts[item["theme"]] += 1
-    return [
-        {
-            "theme": category["name"],
-            "path": category_path(slug),
-            "indicator_count": counts[category["name"]],
-        }
-        for slug, category in CANONICAL_CATEGORIES.items()
-        if counts[category["name"]]
-    ]
-
-
-@cache.memoize(timeout=3600)
-def themes_by_macro_area():
-    """Canonical categories grouped under their navigation area."""
-    by_macro = defaultdict(list)
-    for theme in all_themes_index():
-        macro_area = category_metadata(theme["theme"])["macro_area"]
-        by_macro[macro_area].append(theme)
-    return [
-        {
-            "macro_area": area,
-            "indicator_count": sum(t["indicator_count"] for t in by_macro[area]),
-            "themes": sorted(by_macro[area], key=lambda t: t["theme"]),
-        }
-        for area in MACRO_AREA_ORDER
-        if by_macro[area]
-    ]
