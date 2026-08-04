@@ -427,10 +427,9 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
     for row in rows:
         phase_totals[row["phase"]] = phase_totals.get(row["phase"], 0) + 1
     attention = [r for r in rows if r["next_step"]["kind"] in ("attention", "blocked")]
-    site_steps = [r for r in rows if r["next_step"]["kind"] == "publish"]
     actionable = [
         r for r in rows
-        if r["next_step"]["kind"] in ("attention", "ready", "publish")
+        if r["next_step"]["kind"] in ("attention", "ready")
         and r["next_role"] != "admissions"
     ]
     admission_launch = next(
@@ -459,7 +458,6 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
         "ready": [r for r in rows if r["next_role"]],
         "actionable": actionable,
         "attention": attention,
-        "site_steps": site_steps,
         "rows": rows,
         "in_flight": in_flight,
         "open_runs": open_items,
@@ -472,7 +470,6 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
             "actionable": len(actionable),
             "in_flight": len(in_flight),
             "published": sum(r["published"] is True for r in rows),
-            "waiting_site": len(site_steps),
         },
         "recent": [{"at": run.get("at", ""), "stage": run.get("stage", ""),
                     "outcome": run.get("outcome", ""), "summary": run.get("summary", ""),

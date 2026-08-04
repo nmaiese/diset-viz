@@ -274,7 +274,11 @@ def main(argv=None):
         log_tick(launches, log=(lambda *_: None) if args.json else print)
 
     if args.json:
-        print(json.dumps(shown, ensure_ascii=False, indent=2))
+        # A un tick vero (`--publish`) la forma resta un oggetto con `launches`:
+        # e' cio' che l'agente lanciatore legge (`.claude/agents/launcher.md`). In
+        # sola lettura resta l'array nudo, comodo per ispezioni e test.
+        payload = {"launches": shown} if args.publish else shown
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0 if launches else 1
 
     if not launches:
