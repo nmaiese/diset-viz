@@ -45,11 +45,27 @@ HEARTBEATS_DIR = PROJECT_ROOT / "data" / "pipeline" / "heartbeats"
 HEARTBEAT_STALE_HOURS = 6
 
 # Stati che sono un "fermo" da mettere in testa, con la ragione leggibile.
+# `in-attesa` non e' qui perche' non e' sempre un blocco: quando aspetta il passo
+# a monte (`motivo=monte-mancante`) e' contropressione normale, non urgenza. Solo
+# gli altri motivi contano come fermo: lo decide `is_stuck`, non l'appartenenza.
 STUCK_STATES = {
-    "bloccata": "ferma, aspetta un cambio esterno",
     "invalidata": "un input e' cambiato, i passaggi a valle non valgono piu'",
-    "in-quarantena": "bloccata terminale, tolta dalla coda",
+    "in-quarantena": "in-attesa terminale, tolta dalla coda",
 }
+
+
+def is_stuck(row: dict) -> bool:
+    """Vero se la riga e' un fermo da segnalare in testa (§3, §9).
+
+    `invalidata` e `in-quarantena` lo sono sempre. `in-attesa` lo e' solo quando
+    il motivo e' un cambio esterno o una correzione tecnica: l'attesa del passo a
+    monte e' normale e non va contata fra i bloccati."""
+    st = row.get("state")
+    if st in STUCK_STATES:
+        return True
+    if st == "in-attesa":
+        return row.get("motivo") not in (None, "", "monte-mancante")
+    return False
 
 STAGE_LABELS = {
     "scout": "Scoperta fonte",
@@ -82,12 +98,11 @@ ROLE_LABELS = {
 # `frontend/src/monitor/main.js`.
 STATUS_ORDER = [
     "da correggere",
-    "bloccata",
     "in quarantena",
+    "in attesa",
     "in lavorazione",
     "in coda",
     "proposta",
-    "in attesa di monte",
     "da pubblicare",
     "pubblicata",
     "chiusa",
@@ -96,12 +111,11 @@ STATUS_ORDER = [
 STATUS_HELP = {
     "in lavorazione": "La pipeline ci sta lavorando: una run in corso o gia' fatta.",
     "in coda": "Nel catalogo ma mai lavorato dalla pipeline (nessuna run).",
-    "in attesa di monte": "Fermo perche' manca il passo a monte: l'artefatto atteso dallo stadio precedente (es. la curatela) non esiste ancora.",
+    "in attesa": "Ferma in attesa di una condizione. Il motivo la qualifica: manca il passo a monte (l'artefatto dello stadio precedente non esiste), oppure aspetta un cambio esterno alla fonte, oppure una correzione tecnica.",
     "da pubblicare": "Articolo fuso, in attesa della prova di pubblicazione sul sito.",
     "pubblicata": "Pubblicato sul sito, con prova registrata.",
     "da correggere": "Un input e' cambiato (dati aggiornati, definizione, o una smentita aperta): il lavoro a valle non vale piu' e va rifatto.",
-    "bloccata": "Fermo in attesa di un cambio esterno (es. un chiarimento dalla fonte).",
-    "in quarantena": "Bloccato in modo terminale, tolto dalla coda.",
+    "in quarantena": "Fermo in modo terminale, tolto dalla coda per non fermare le altre.",
     "proposta": "Candidato approvato, in attesa di essere promosso nel catalogo dal prossimo giro di ammissione (manca ancora curatela e articolo).",
     "chiusa": "Candidatura chiusa, nessuna azione.",
 }
@@ -110,11 +124,10 @@ _STATE_TO_WORK_STATUS = {
     "pubblicata": "pubblicata",
     "fusa": "da pubblicare",
     "invalidata": "da correggere",
-    "bloccata": "bloccata",
+    "in-attesa": "in attesa",
     "in-quarantena": "in quarantena",
     "chiusa": "chiusa",
     "proposta": "proposta",
-    "in-attesa-di-monte": "in attesa di monte",
 }
 
 
@@ -178,6 +191,9 @@ def _reason(d: dict) -> str:
         return "le cifre dell'articolo sono cambiate dopo la firma"
     if f.get("stale_curation"):
         return "la fonte ha pubblicato un anno nuovo, la curatela e' scaduta"
+    if d.get("state") == "in-attesa":
+        # needs_info (dipendenza-esterna) e' gia' uscito sopra: qui resta monte-mancante.
+        return "manca il passo a monte: l'artefatto dello stadio precedente non esiste ancora"
     return STUCK_STATES.get(d.get("state"), d.get("state") or "")
 
 
@@ -339,6 +355,7 @@ def row_of(d: dict, today: str = "", runs_by_id: dict = None, labels: dict = Non
         "lifecycle": lifecycle,
         "priority": round(float(d.get("priority", 0.0) or 0.0), 1),
         "error_class": d.get("error_class"),
+        "motivo": d.get("motivo", ""),
         "flags": sorted(k for k, v in (d.get("flags") or {}).items() if v is True),
         "reason": _reason(d),
         "completed_stages": list(d.get("completed_stages") or []),
@@ -354,7 +371,7 @@ def row_of(d: dict, today: str = "", runs_by_id: dict = None, labels: dict = Non
 
 def headline(rows: list, today: str = "", admissions=None) -> str:
     """La frase in testa: dov'e' fermo, e perche'. Dai soli `rows` gia' calcolati."""
-    stuck = [r for r in rows if r["state"] in STUCK_STATES]
+    stuck = [r for r in rows if is_stuck(r)]
     if stuck:
         stuck.sort(key=lambda r: (-r["days"], r["id"]))
         top = stuck[0]
@@ -408,7 +425,13 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
         run_ids.update(beat.get("run_id") for beat in row["in_flight"])
         row["open_prs"] = [prs_by_run[rid] for rid in run_ids if rid in prs_by_run]
         row["work_status"] = work_status(row)
-        row["work_status_help"] = STATUS_HELP.get(row["work_status"], "")
+        # Lo stato di sosta e' uno solo ("in attesa"), ma il tooltip del badge porta
+        # il motivo specifico (monte-mancante vs blocco esterno/tecnico), cosi'
+        # l'operatore vede la differenza pur con un solo stato armonizzato.
+        if row.get("state") == "in-attesa" and row.get("reason"):
+            row["work_status_help"] = row["reason"]
+        else:
+            row["work_status_help"] = STATUS_HELP.get(row["work_status"], "")
 
     phase_totals = {}
     for row in rows:
@@ -442,7 +465,7 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
     return {
         "headline": headline(rows, today, admissions=admission_launch),
         "totals": totals,
-        "stuck": [r for r in rows if r["state"] in STUCK_STATES],
+        "stuck": [r for r in rows if is_stuck(r)],
         "ready": [r for r in rows if r["next_role"]],
         "actionable": actionable,
         "attention": attention,

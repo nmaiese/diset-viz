@@ -350,7 +350,7 @@ function renderCatalog() {
   // Legenda visibile degli stati presenti: il title del badge non arriva a chi usa
   // touch o tastiera (ne', sul layout a schede mobile, a nessuno). Un <details>
   // nativo e' focusabile, toccabile e leggibile dallo screen reader, e serve la
-  // stessa domanda ("che vuol dire in attesa di monte?") a chiunque, sempre.
+  // stessa domanda ("che vuol dire in attesa?") a chiunque, sempre.
   const legendEl = document.getElementById("cat-legend");
   if (legendEl) {
     const items = statusOrder.filter((s) => byStatusAll[s])

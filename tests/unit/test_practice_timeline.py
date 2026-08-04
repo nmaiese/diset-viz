@@ -93,7 +93,8 @@ class Reconstruct(unittest.TestCase):
             "source_indicator_id": "foo", "definition_match": "new", "duplicate_of": "",
             "triage_status": "needs-info", "triage_notes": "DSD non verificabile.",
             "discovered_at": "2026-07-01"}])["eur:foo"]
-        self.assertEqual(d["state"], "bloccata")
+        self.assertEqual(d["state"], "in-attesa")
+        self.assertEqual(d["motivo"], "dipendenza-esterna")
         self.assertEqual(d["error_class"], "ripetibile-dopo-cambio-esterno")
 
     def test_stale_vintage_is_invalidata(self):
@@ -266,6 +267,15 @@ class Cycles(unittest.TestCase):
         cy = t.cycles_for(d)
         self.assertEqual([c["type"] for c in cy], ["nuovo", "aggiornamento"])
 
+    def test_active_record_persists_the_wait_motivo(self):
+        # Il record serializzato deve portare il motivo, o `in-attesa` perde
+        # l'urgenza (una sosta normale vs un blocco esterno diventano uguali).
+        d = _dossier([], state="in-attesa", motivo="dipendenza-esterna",
+                     error_class="ripetibile-dopo-cambio-esterno")
+        rec = t.cycles_for(d)[-1]
+        self.assertTrue(rec["active"])
+        self.assertEqual(rec["motivo"], "dipendenza-esterna")
+
     def test_empty_timeline_is_one_active_cycle(self):
         cy = t.cycles_for(_dossier([]))
         self.assertEqual(len(cy), 1)
@@ -289,7 +299,7 @@ class ReadyStage(unittest.TestCase):
         self.assertEqual(t.ready_stage(d), "reviewer")
 
     def test_blocked_and_published_are_not_dispatchable(self):
-        self.assertIsNone(t.ready_stage(_dossier([], state="bloccata", flags={"needs_info": True})))
+        self.assertIsNone(t.ready_stage(_dossier([], state="in-attesa", flags={"needs_info": True})))
         self.assertIsNone(t.ready_stage(_dossier([], state="pubblicata")))
 
     def test_stage_priorities_takes_the_max_per_stage(self):
