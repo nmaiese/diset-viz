@@ -88,6 +88,7 @@ async function render(supabase, currentUser) {
           '<select id="cat-owner"><option value="">Tutti i prossimi ruoli</option></select>' +
         "</div>" +
         '<div id="cat-totals" class="mon-totals"></div>' +
+        '<div id="cat-legend"></div>' +
         '<div id="mon-catalog" class="mon-table">Carico...</div>' +
       "</section>" +
       "<section>" +
@@ -343,6 +344,23 @@ function renderCatalog() {
       renderCatalogReset();
     };
   });
+
+  // Legenda visibile degli stati presenti: il title del badge non arriva a chi usa
+  // touch o tastiera (ne', sul layout a schede mobile, a nessuno). Un <details>
+  // nativo e' focusabile, toccabile e leggibile dallo screen reader, e serve la
+  // stessa domanda ("che vuol dire in attesa di monte?") a chiunque, sempre.
+  const legendEl = document.getElementById("cat-legend");
+  if (legendEl) {
+    const items = STATUS_ORDER.filter((s) => byStatusAll[s])
+      .map(
+        (s) =>
+          '<div class="mon-legend-row"><span class="mon-status mon-status--' + s.replace(/ /g, "-") + '">' +
+          escapeHtml(s) + "</span><span>" + escapeHtml(STATUS_HELP[s] || "") + "</span></div>"
+      )
+      .join("");
+    legendEl.innerHTML =
+      '<details class="mon-legend"><summary>Cosa vuol dire ogni stato</summary>' + items + "</details>";
+  }
 
   if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun indicatore col filtro attuale.</p>');
 
