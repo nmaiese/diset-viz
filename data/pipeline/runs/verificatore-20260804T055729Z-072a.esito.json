@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-04T06:08:52+00:00",
+ "base_commit": "51adb26",
+ "branch": "master",
+ "claude_code_version": "2.1.221 (Claude Code)",
+ "commit": "51adb26",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": "137",
+ "run_id": "verificatore-20260804T055729Z-072a",
+ "stage": "verificatore",
+ "summary": "PR #137 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}
