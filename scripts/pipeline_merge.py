@@ -438,6 +438,74 @@ def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts
     return False
 
 
+# I campi del dossier che compongono lo snapshot di stato. Sono quelli che la
+# board rilegge per riga (`pipeline_monitor._OVERLAY_FIELDS`), tenuti qui espliciti
+# perche' questo modulo e' stdlib puro e non importa la board se non al momento.
+_SNAPSHOT_FIELDS = ("state", "type", "entered_at", "completed_stages",
+                    "required_stages", "flags", "published", "verification_valid",
+                    "score_eligible", "error_class", "motivo", "priority")
+
+
+def _id_from_path(path):
+    """L'id-dossier di un file toccato dal merge, o None se il file non e' un
+    articolo ne' una verifica. `content/indicators/bes__02IST004.json` ->
+    `bes:02IST004`; `data/pipeline/verifiche/ter-167__regione__h.json` -> `167`."""
+    from scripts import practice_timeline
+    if not path.endswith(".json"):
+        return None
+    name = path.split("/")[-1][: -len(".json")]
+    if "content/indicators/" in path:
+        return name.replace("__", ":", 1)
+    if "data/pipeline/verifiche/" in path:
+        return practice_timeline.key_of_code(name.split("__", 1)[0])
+    return None
+
+
+def _targets_from_diff(dossier, runner=_run, cwd=None):
+    """Gli indicatori che questa run ha davvero cambiato: gli id dei file
+    `content/indicators/` e `data/pipeline/verifiche/` toccati dal ramo rispetto a
+    master. E' la sola derivazione dei target, e non `run_id in runs`: quel legame
+    include anche gli indicatori solo CITATI per confronto nell'articolo (che
+    `reconstruct` associa allo stesso run_id), e postarne lo snapshot
+    sovrascriverebbe lo stato genuino, magari piu' recente, di un indicatore che
+    questa run non ha toccato. Best effort."""
+    code, out = runner(["git", "diff", "--name-only", "origin/master...HEAD"], cwd=cwd)
+    if code != 0:
+        return []
+    ids = {i for i in (_id_from_path(p.strip()) for p in out.splitlines()) if i}
+    return [dossier[i] for i in ids if i in dossier]
+
+
+def emit_outcomes(run_id, cwd=None, runner=_run, log=print, today="", post=None):
+    """POSTa al sito lo snapshot di stato di ogni indicatore che questa run ha
+    toccato, cosi' il cruscotto riflette il merge senza aspettare il redeploy.
+
+    Best effort assoluto: gira dopo un merge gia' avvenuto, quindi nessuna
+    eccezione qui deve propagarsi (un overlay perso si sana da solo al deploy, che
+    porta comunque diario e verifica su master). Ricostruisce lo stato dal
+    worktree, che contiene il lavoro appena fuso: e' l'unico posto dove l'impronta
+    dell'articolo combacia con la verifica, cosa che il server, fermo all'immagine
+    deployata, non puo' calcolare. I target sono gli indicatori davvero cambiati
+    (i file del diff), non quelli che il diario cita per confronto."""
+    try:
+        from datetime import datetime, timezone
+        from scripts import pipeline_monitor, practice_timeline  # noqa: F401
+        poster = post or pipeline_monitor.post_outcome
+        dossier = practice_timeline.load_real(today=today)
+        targets = _targets_from_diff(dossier, runner=runner, cwd=cwd)
+        if not targets:
+            return
+        code, head = runner(["git", "rev-parse", "--short", "HEAD"], cwd=cwd)
+        base_commit = head.strip() if code == 0 else ""
+        at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        for d in targets:
+            snapshot = {field: d.get(field) for field in _SNAPSHOT_FIELDS}
+            poster(run_id, d["id"], snapshot, base_commit=base_commit, at=at)
+            log(f"  outcome POSTato: {d['id']} ({d.get('state')})")
+    except Exception as exc:  # noqa: BLE001  (un overlay perso non fa fallire un merge)
+        log(f"  outcome non POSTato ({str(exc)[:120]})")
+
+
 def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
            dry_run=False, log=print, skip_tests=False, journal=True, run_id=None):
     """Run the gate, obey it, and merge only if the gate and the checks agree.
@@ -479,6 +547,11 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
         if journal and not dry_run and result["outcome"] != "pr-open":
             record_landing(stage, pr, result, runner=runner, cwd=cwd, log=log,
                            run_id=run_id)
+        # Solo su `merged`: per gli esiti che non atterrano su master l'immagine
+        # deployata non e' indietro per quell'indicatore, e un overlay direbbe il
+        # falso (mostrerebbe come lavorato cio' che non e' stato fuso).
+        if not dry_run and result.get("outcome") == "merged":
+            emit_outcomes(run_id, cwd=cwd, runner=runner, log=log)
         return result
 
     if mode == "blocked":

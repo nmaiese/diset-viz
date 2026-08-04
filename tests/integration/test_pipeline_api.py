@@ -11,8 +11,10 @@ di cache e servirebbe il dato all'anonimo. Verifica che l'auth gira sempre prima
 del calcolo, qualunque sia il backend di cache (qui NullCache), mockando l'helper
 del payload: l'anonimo non deve mai raggiungerlo."""
 
+import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from unittest import mock
 
 import jwt
@@ -96,6 +98,66 @@ class PipelineApiAuthTest(unittest.TestCase):
             payload.reset_mock()
             self.assertEqual(c.get("/_pipeline/api/board").status_code, 404)
             payload.assert_not_called()
+
+
+class PipelineApiLiveOverlay(unittest.TestCase):
+    """L'overlay vivo (gli snapshot che gli agenti POSTano al merge) si riflette
+    sul catalogo senza redeploy, e si ritira quando il committato lo raggiunge."""
+
+    def setUp(self):
+        self._saved = (config.SUPABASE_JWT_SECRET, config.SUPABASE_URL,
+                       config.MONITOR_ADMIN_EMAIL, config.LEADERBOARD_DB)
+        config.SUPABASE_JWT_SECRET = _SECRET
+        config.SUPABASE_URL = ""
+        config.MONITOR_ADMIN_EMAIL = _ADMIN
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        config.LEADERBOARD_DB = str(Path(self._tmp.name) / "state.sqlite3")
+
+    def tearDown(self):
+        (config.SUPABASE_JWT_SECRET, config.SUPABASE_URL,
+         config.MONITOR_ADMIN_EMAIL, config.LEADERBOARD_DB) = self._saved
+
+    def _admin_headers(self):
+        return {"Authorization": "Bearer " + _token(_ADMIN)}
+
+    def test_a_live_outcome_shows_on_the_board_without_a_deploy(self):
+        from app import pipeline_state
+        from app.cache import cache
+        from scripts import pipeline_monitor
+        # `_pipeline_board_payload` e' memoizzato (30s): azzero cosi' la richiesta
+        # ricalcola sul DB di questo test e non su un payload scaldato altrove.
+        cache.clear()
+        # un indicatore reale che il committato NON da' ancora pubblicato
+        target = next((r for r in pipeline_monitor.load_board()["rows"]
+                       if r.get("published") is not True and r.get("id")), None)
+        self.assertIsNotNone(target)
+        tid = target["id"]
+        pipeline_state.record_outcome(tid, "outcome-int-r1", {
+            "state": "pubblicata", "published": True, "verification_valid": True,
+            "completed_stages": ["writer", "reviewer", "verificatore"],
+            "required_stages": ["writer", "reviewer", "verificatore"],
+            "flags": {"article_complete": True}}, at="2026-08-04T14:00:00+00:00")
+        r = app.test_client().get("/_pipeline/api/board", headers=self._admin_headers())
+        self.assertEqual(r.status_code, 200)
+        rows = {row["id"]: row for row in r.get_json()["rows"]}
+        self.assertIs(rows[tid]["published"], True)
+        self.assertEqual(rows[tid]["state"], "pubblicata")
+
+    def test_an_outcome_already_committed_is_reconciled_away(self):
+        from app import pipeline_state
+        from scripts import pipeline_monitor
+        row = next((r for r in pipeline_monitor.load_board()["rows"]
+                    if r.get("runs")), None)
+        if not row:
+            self.skipTest("nessuna run nel dossier committato")
+        tid, run_id, committed_state = row["id"], row["runs"][0]["run_id"], row["state"]
+        # un outcome con QUEL run_id (gia' su master) e uno stato diverso: ignorato.
+        pipeline_state.record_outcome(tid, run_id, {"state": "in-quarantena"},
+                                      at="2026-08-04T14:00:00+00:00")
+        rows = {r["id"]: r for r in pipeline_monitor.load_board(
+            outcomes=pipeline_state.outcomes_by_indicator())["rows"]}
+        self.assertEqual(rows[tid]["state"], committed_state)
 
 
 if __name__ == "__main__":

@@ -169,3 +169,43 @@ class PipelineToken(Base):
     role: Mapped[str] = mapped_column(Text, nullable=False, default="")
     tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     updated_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+
+class PipelineOutcome(Base):
+    """Lo stato di ciclo di vita di UN indicatore, come lo ha ricostruito
+    l'agente al momento del merge, POSTato al sito perche' il cruscotto sia
+    aggiornato senza aspettare il redeploy dell'immagine.
+
+    Durevole come `PipelineToken`, non un battito: non scade a 6h. Il dossier
+    committato in git resta la verita' e la storia; questa riga e' un overlay che
+    vive nella finestra fra 'fuso su master' e 'immagine deployata', e la board
+    lo ritira da sola quando il committato lo raggiunge (vedi
+    `scripts/pipeline_monitor.py::_apply_outcomes`).
+
+    Chiave = `indicator` (la forma-id del dossier: `651`, `dem:BIRTHRATE`,
+    `bes:09PAE009-N25`), un solo stato corrente per indicatore, l'ultimo vince.
+    Tipi larghi come le altre tabelle della catena: le strutture
+    (`completed_stages`, `required_stages`, `flags`) sono JSON serializzato in
+    `Text`, `published`/`verification_valid` sono interi nullable per tenere il
+    tri-stato (1/0/None = ignoto), cosi' il modello gira identico su SQLite
+    (test/CI) e Postgres (produzione)."""
+
+    __tablename__ = "pipeline_outcomes"
+
+    indicator: Mapped[str] = mapped_column(Text, primary_key=True)
+    run_id: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    at: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    base_commit: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    state: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    type: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    entered_at: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    completed_stages: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
+    required_stages: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
+    flags: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
+    published: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    verification_valid: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    score_eligible: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    error_class: Mapped[str | None] = mapped_column(Text, nullable=True)
+    motivo: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    priority: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    updated_at: Mapped[str] = mapped_column(Text, nullable=False)

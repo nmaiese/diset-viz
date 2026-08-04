@@ -765,8 +765,12 @@ def _pipeline_board_payload():
         activity = pipeline_state.live()
     except Exception:  # noqa: BLE001  (il vivo non deve far cadere la dashboard)
         activity = {"beats": [], "prs": []}
+    try:
+        outcomes = pipeline_state.outcomes_by_indicator()
+    except Exception:  # noqa: BLE001  (l'overlay non deve far cadere la dashboard)
+        outcomes = {}
     board = pipeline_monitor.load_board(heartbeats=activity["beats"],
-                                        open_runs=activity["prs"])
+                                        open_runs=activity["prs"], outcomes=outcomes)
     try:
         tokens = pipeline_state.tokens_by_run()
     except Exception:  # noqa: BLE001  (la telemetria non deve far cadere la dashboard)
@@ -853,6 +857,12 @@ def pipeline_beat_ingest():
       {"action":"close","run_id":...}
       {"action":"prs","prs":[{"pr":..,"branch":..,"run_id":..,"ci":..,"mergeable":..,"title":..}]}
       {"action":"tokens","run_id":...,"tokens":N,"indicator":...,"stage":...,"role":...}
+      {"action":"outcome","indicator":...,"run_id":...,"at":...,"base_commit":...,
+       "state":...,"completed_stages":[...],"flags":{...},"published":true,...}
+
+    L'`outcome` e' lo snapshot di stato di un indicatore al momento del merge: lo
+    scrive il passo di merge (`scripts/pipeline_merge.py`) perche' il cruscotto sia
+    aggiornato senza aspettare il redeploy dell'immagine.
 
     Best effort per chi chiama: un agente che non riesce a battere non deve
     fallire la propria run, quindi qui si e' solo tolleranti e si risponde presto.
@@ -878,6 +888,11 @@ def pipeline_beat_ingest():
                 payload.get("run_id", ""), payload.get("tokens"),
                 indicator=payload.get("indicator", ""), stage=payload.get("stage", ""),
                 role=payload.get("role", ""))
+        elif action == "outcome":
+            pipeline_state.record_outcome(
+                payload.get("indicator", ""), payload.get("run_id", ""),
+                snapshot=payload, at=payload.get("at", ""),
+                base_commit=payload.get("base_commit", ""))
         else:
             return jsonify({"error": "bad_action"}), 400
     except ValueError as exc:

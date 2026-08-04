@@ -19,6 +19,7 @@
 ALTER TABLE public.scores            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pipeline_activity ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pipeline_tokens   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pipeline_outcomes ENABLE ROW LEVEL SECURITY;
 
 -- Tabelle account (Fase 5): RLS attiva, ogni utente vede/scrive solo le proprie
 -- righe. Il browser non interroga queste tabelle direttamente (passa dal backend);
@@ -81,6 +82,11 @@ CREATE POLICY admin_reads_tokens ON public.pipeline_tokens
   FOR SELECT TO authenticated
   USING ( (auth.jwt() ->> 'email') = 'maiese.next@gmail.com' );
 
+DROP POLICY IF EXISTS admin_reads_outcomes ON public.pipeline_outcomes;
+CREATE POLICY admin_reads_outcomes ON public.pipeline_outcomes
+  FOR SELECT TO authenticated
+  USING ( (auth.jwt() ->> 'email') = 'maiese.next@gmail.com' );
+
 -- === Realtime: le due tabelle nella publication ===
 -- ALTER PUBLICATION ... ADD TABLE NON e' idempotente: rieseguirlo su una tabella
 -- gia' presente solleva duplicate_object e aborta lo script. Lo si avvolge, cosi'
@@ -95,9 +101,15 @@ BEGIN
   ALTER PUBLICATION supabase_realtime ADD TABLE public.pipeline_tokens;
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.pipeline_outcomes;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Realtime deve poter portare la riga vecchia su UPDATE/DELETE (replace_prs e
 -- close_beat cancellano: e' il percorso di scrittura dominante). REPLICA IDENTITY
 -- FULL lo garantisce.
 ALTER TABLE public.pipeline_activity REPLICA IDENTITY FULL;
 ALTER TABLE public.pipeline_tokens   REPLICA IDENTITY FULL;
+ALTER TABLE public.pipeline_outcomes REPLICA IDENTITY FULL;

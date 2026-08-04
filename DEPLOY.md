@@ -70,7 +70,14 @@ distinti**, non uno:
 - `/_pipeline?token=...` (server-rendered) legge da Postgres via l'ORM
   (`app/db.py`/`app/pipeline_state.py`), scritto dal POST degli agenti a
   `/_pipeline/beat`, autenticato **solo** dall'header `X-Pipeline-Key`
-  (`PIPELINE_INGEST_TOKEN`).
+  (`PIPELINE_INGEST_TOKEN`). Dal 2026-08-04 lo stesso POST porta anche lo
+  **snapshot di lifecycle per indicatore** (`pipeline_outcomes`, azione
+  `outcome`), scritto dal passo di merge a ogni PR fusa: il cruscotto lo
+  sovrappone al dossier committato, cosi' `pubblicata`/`verificato`/prossimo
+  passo sono aggiornati senza aspettare il redeploy dell'immagine (vedi
+  `scripts/pipeline_merge.py::emit_outcomes`,
+  `scripts/pipeline_monitor.py::_apply_outcomes`). Non tocca la pagina pubblica
+  dell'articolo, che resta legata al deploy.
 - `monitor.divarioitalia.it/_pipeline/console` **non passa da Flask**:
   `frontend/src/monitor/main.js` parla direttamente a Supabase dal browser
   (`pipeline_activity` via client JS + sottoscrizione Realtime), filtrato da
@@ -134,6 +141,14 @@ si dovesse rifare da un nuovo progetto Supabase):
 8. **Solo dopo** la verifica delle righe: rimuovi Litestream dal `Dockerfile`
    (stage, binario, `LEADERBOARD_DB`, `LITESTREAM_REPLICA_URL`, `litestream.yml`),
    e dismetti il bucket GCS.
+
+Le migrazioni successive alla Fase 4 aggiungono tabelle con lo stesso passo 3
+(`DIRECT_URL=... alembic upgrade head`) e vogliono lo stesso passo 4
+(`scripts/supabase_setup.sql`, idempotente) rieseguito: `0007_pipeline_outcomes`
+(2026-08-04) crea `pipeline_outcomes`, lo snapshot di lifecycle per indicatore
+del cruscotto (vedi sopra). Finche' i due passi non sono rifatti in produzione,
+l'overlay degrada in sicurezza a mappa vuota e la board mostra il solo dossier
+committato, come prima di questa migrazione.
 
 | Variabile | Dove | A cosa serve |
 |---|---|---|

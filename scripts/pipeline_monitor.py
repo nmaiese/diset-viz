@@ -693,6 +693,20 @@ def post_tokens(run_id: str, tokens, indicator: str = "", stage: str = "",
                       "indicator": indicator, "stage": stage, "role": role}, **kw)
 
 
+def post_outcome(run_id: str, indicator: str, snapshot: dict,
+                 base_commit: str = "", at: str = "", **kw) -> bool:
+    """Lo snapshot di stato di un indicatore all'endpoint del sito, best effort.
+
+    Lo POSTa il passo di merge dopo aver fuso, perche' il cruscotto rifletta
+    l'esito senza aspettare il redeploy dell'immagine. Riusa `post_beat` (stesso
+    endpoint, stesso segreto): `snapshot` e' il dossier del solo indicatore, le sue
+    liste/dict annidati viaggiano nativi nel JSON del POST."""
+    payload = {"action": "outcome", "run_id": run_id, "indicator": indicator,
+               "base_commit": base_commit, "at": at}
+    payload.update(snapshot or {})
+    return post_beat(payload, **kw)
+
+
 def read_heartbeats(root=None, now: str = "", stale_hours: int = HEARTBEAT_STALE_HOURS) -> list:
     """I battiti vivi: quelli piu' vecchi della soglia si scartano (sessione
     caduta senza pulire). `now` iniettabile per i test."""
@@ -714,19 +728,84 @@ def read_heartbeats(root=None, now: str = "", stale_hours: int = HEARTBEAT_STALE
     return out
 
 
+# I campi del dossier che uno snapshot sovrappone. `id`, `runs` e `timeline` non
+# ci sono: la chiave e i due registri li tiene la board, non l'overlay.
+_OVERLAY_FIELDS = ("state", "type", "entered_at", "completed_stages",
+                   "required_stages", "flags", "published", "verification_valid",
+                   "score_eligible", "error_class", "motivo", "priority")
+
+
+def _dossier_from_outcome(indicator: str, snap: dict) -> dict:
+    """Un dossier minimo per un indicatore che l'immagine deployata non conosce
+    ancora (interamente lavorato dopo la build). `runs`/`timeline` vuoti: `row_of`
+    li tollera (`_run_history` e `_last_activity` reggono le liste vuote)."""
+    run_id = snap.get("run_id") or ""
+    return {
+        "id": indicator,
+        "type": snap.get("type") or "nuovo",
+        "state": snap.get("state") or "in-lavorazione",
+        "entered_at": snap.get("entered_at") or "",
+        "completed_stages": list(snap.get("completed_stages") or []),
+        "flags": dict(snap.get("flags") or {}),
+        "error_class": snap.get("error_class"),
+        "score_eligible": bool(snap.get("score_eligible")),
+        "published": snap.get("published"),
+        "verification_valid": snap.get("verification_valid"),
+        "runs": [run_id] if run_id else [],
+        "timeline": [],
+        "required_stages": list(snap.get("required_stages") or []),
+        "motivo": snap.get("motivo") or "",
+        "priority": snap.get("priority") or 0.0,
+    }
+
+
+def _apply_outcomes(dossier: dict, outcomes: dict) -> None:
+    """Sovrappone gli snapshot vivi al dossier committato, in loco.
+
+    Riconciliazione, unica regola: uno snapshot si applica **solo se** il suo
+    `run_id` non e' gia' nei `runs` del dossier committato. Dopo il deploy che porta
+    quella run su master, `reconstruct` aggiunge quel `run_id` ai `runs` e l'overlay
+    si spegne da solo, senza uno stato da azzerare a mano ne' da confrontare campo a
+    campo: e' l'unico ritiro sicuro. Confrontare invece lo stato (es. 'stessi stadi
+    e stesso published') ritirava a torto proprio il caso che conta, una smentita su
+    un indicatore gia' pubblicato, dove cambiano solo `state`/`flags`, e lasciava il
+    cruscotto su `pubblicata` invece dell'invalidazione."""
+    for indicator, snap in outcomes.items():
+        d = dossier.get(indicator)
+        if d is None:
+            dossier[indicator] = _dossier_from_outcome(indicator, snap)
+            continue
+        run_id = snap.get("run_id")
+        if run_id and run_id in (d.get("runs") or []):
+            continue
+        for field in _OVERLAY_FIELDS:
+            if field in snap:
+                d[field] = snap[field]
+        if run_id and run_id not in (d.get("runs") or []):
+            d.setdefault("runs", []).append(run_id)
+
+
 def load_board(today: str = "", recent: int = 12,
-               heartbeats=None, open_runs=None) -> dict:
+               heartbeats=None, open_runs=None, outcomes=None) -> dict:
     """Collega i lettori reali (tutti stdlib puri) e ritorna il cruscotto.
 
     `heartbeats`/`open_runs` iniettabili: la rotta Flask li passa dal SQLite
     vivo (scritto dai POST degli agenti, replicato su GCS). Quando `heartbeats`
     e' None si torna ai battiti su file, che e' cio' che vuole la CLI in locale
     (agente e file sulla stessa macchina); sul server quei file sono sempre vuoti,
-    ed e' esattamente il motivo per cui il cruscotto sembrava morto."""
+    ed e' esattamente il motivo per cui il cruscotto sembrava morto.
+
+    `outcomes` iniettabile allo stesso modo: gli snapshot di stato che gli agenti
+    POSTano al merge, per indicatore. Si applicano al dossier **prima** di
+    costruire le righe, cosi' stato/lifecycle/prossimo passo e i contatori si
+    ricalcolano coerenti. Servono a chiudere la finestra fra 'fuso su master' e
+    'immagine deployata': la CLI in locale lascia `None` (legge i file freschi)."""
     from datetime import datetime, timezone
     from scripts import pipeline_log, pipeline_status
     ref = today or datetime.now(timezone.utc).date().isoformat()
     dossier = practice_timeline.load_real(today=ref)
+    if outcomes:
+        _apply_outcomes(dossier, outcomes)
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
     beats = read_heartbeats(now=ref) if heartbeats is None else heartbeats
     return board(dossier, runs=runs, heartbeats=beats, today=ref, recent=recent,
