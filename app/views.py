@@ -620,20 +620,72 @@ def ricerca():
 
 
 def _pipeline_published_url(indicator_id):
-    """Il path canonico della pagina pubblicata di un indicatore, o None.
+    """L'URL assoluto e canonico della pagina pubblicata di un indicatore, o None.
 
     Riusa il path precomputato dal catalogo (`build_indicator_view`), preferito
     al ricalcolo dello slug come vuole `.claude/rules/app.md`. La view Flask puo'
     importare il catalogo, cosi' `pipeline_monitor` resta stdlib-puro. Se l'id non
     si risolve, niente link invece di un errore: il cruscotto non deve cadere per
-    una riga."""
+    una riga.
+
+    Assoluto (SITE_URL + path), non relativo: `/_pipeline/console` e' servita
+    su `monitor.divarioitalia.it`, un host diverso dal dominio pubblico, quindi
+    un path relativo risolverebbe il link sul host sbagliato invece di aprire
+    la pagina canonica."""
     try:
         from app import indicator_view, sources
         family, raw_id = sources.split_internal_id(indicator_id)
         view = indicator_view.build_indicator_view(family, raw_id)
-        return (view or {}).get("meta", {}).get("canonical_path") or None
+        path = (view or {}).get("meta", {}).get("canonical_path")
+        return f"{SITE_URL}{path}" if path else None
     except Exception:  # noqa: BLE001
         return None
+
+
+@lru_cache(maxsize=1)
+def _pipeline_universe():
+    """`{indicator_id: {"indexable": bool, "reason": str|None}}` per ogni
+    indicatore di ogni catalogo di famiglia (ter, bes, multiscopo, eur/dem),
+    indipendentemente da cosa ne sa la pipeline editoriale.
+
+    E' l'universo vero che risponde a "quanti indicatori abbiamo in totale":
+    il dossier di `practice_timeline` (`board["rows"]`) copre solo cio' che ha
+    gia' toccato una pratica di ammissione, quindi da solo sottostima. Ogni
+    famiglia legge la propria indicizzabilita' dalla stessa fonte gia' usata
+    dalla sitemap (`indicator_view._is_indexable`), cosi' il cruscotto non puo'
+    mai divergere da cio' che Google vede davvero. `pipeline_monitor` resta
+    stdlib-puro: questa funzione vive qui, non li', perche' legge i cataloghi
+    (`app.data`, `app.bes_data`, `app.multiscopo_data`, `app.external_atlas`)."""
+    universe = {}
+
+    for item in get_catalog()["indicators"]:
+        ind_id = str(item["id"])
+        indexable = bool(profiles.is_search_indexable_indicator(item))
+        reason = None
+        if not indexable:
+            if profiles.is_gender_variant(item):
+                reason = "variante"
+            elif (item.get("region_count") or 0) < seo_policy.REQUIRED_REGION_COUNT \
+                    or (item.get("completeness") or 0) < seo_policy.MIN_COMPLETENESS:
+                reason = "copertura"
+            else:
+                reason = "vecchia"
+        universe[ind_id] = {"indexable": indexable, "reason": reason}
+
+    for family, reader in (("bes", bes_data.all_bes_indicators), ("multiscopo", multiscopo_data.all_multiscopo_indicators)):
+        for item in reader():
+            ind_id = f"{family}:{item['id']}"
+            indexable = bool(item.get("indexable"))
+            universe[ind_id] = {"indexable": indexable, "reason": None if indexable else "famiglia"}
+
+    for item in external_atlas.all_external_indicators():
+        indexable = bool(item.get("indexable"))
+        reason = None
+        if not indexable:
+            reason = "copertura" if item.get("region_count") != 20 else "vecchia"
+        universe[str(item["id"])] = {"indexable": indexable, "reason": reason}
+
+    return universe
 
 
 @app.route("/_pipeline")
@@ -710,8 +762,11 @@ def pipeline_console():
 @cache.memoize(timeout=30)
 def _pipeline_board_payload():
     """Il catalogo per la dashboard: `load_board` col vivo da Supabase, i token
-    attribuiti, e il link alla pagina pubblicata sulle righe pubblicate. Memoizzato
-    (chiave sul nome, nessun argomento) perche' rilegge tutti gli articoli."""
+    attribuiti, il link alla pagina pubblicata sulle righe pubblicate, e la
+    copertura del catalogo (`catalog_summary`: quanti indicatori esistono nei
+    cataloghi di famiglia in tutto, quanti indicizzabili, quanti scritti,
+    verificati, pubblicati). Memoizzato (chiave sul nome, nessun argomento)
+    perche' rilegge tutti gli articoli e tutti i cataloghi di famiglia."""
     from scripts import pipeline_monitor
     from app import pipeline_state
     try:
@@ -725,9 +780,14 @@ def _pipeline_board_payload():
     except Exception:  # noqa: BLE001  (la telemetria non deve far cadere la dashboard)
         tokens = {}
     pipeline_monitor.attribute_tokens(board.get("rows", []), tokens)
+    universe = _pipeline_universe()
     for row in board.get("rows", []):
         row["published_url"] = (_pipeline_published_url(row["id"])
                                 if row.get("published") is True else None)
+        entry = universe.get(row["id"])
+        row["indexable"] = entry["indexable"] if entry else None
+        row["indexable_reason"] = entry["reason"] if entry else None
+    board["catalog_summary"] = pipeline_monitor.summarize_catalog(board.get("rows", []), universe)
     return board
 
 

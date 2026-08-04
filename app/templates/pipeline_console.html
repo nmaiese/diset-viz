@@ -50,6 +50,13 @@
       .mon-filters input[type=search] { flex:1 1 220px; min-width:180px; }
       .mon-date { display:inline-flex; align-items:center; gap:5px; color:var(--ink-soft); font-size:12px; }
       .mon-totals { margin-bottom:10px; }
+      .mon-coverage { margin-bottom:14px; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; }
+      .mon-coverage:empty { display:none; }
+      {# I chip di copertura portano testo piu' lungo e piu' variabile (fino a due
+         motivi di esclusione) dei chip di stato: qui il nowrap generico dei chip
+         si toglie, cosi' un elenco lungo va a capo dentro il chip invece di
+         spingere la riga oltre la sezione. #}
+      .mon-coverage .mon-chip { white-space: normal; overflow-wrap: anywhere; }
       .mon-totals-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
       .mon-chip { font-family: "Space Mono", ui-monospace, monospace; font-size:11.5px; background:#eee9e0; color:var(--ink); border:1px solid transparent; border-radius:999px; padding:3px 10px; white-space:nowrap; }
       .mon-chip--strong { background:var(--navy); color:var(--paper); font-weight:700; }

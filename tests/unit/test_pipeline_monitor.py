@@ -125,7 +125,7 @@ class Board(unittest.TestCase):
         d.update({"published": None, "verification_valid": True})
         row = pipeline_monitor.board({"ter-fusa": d}, today=self.TODAY)["rows"][0]
         self.assertEqual(row["phase"], "pubblicazione")
-        self.assertEqual(row["next_step"]["owner"], "passo del sito")
+        self.assertEqual(row["next_step"]["owner"], "verifica automatica online")
         self.assertIn("prova di pubblicazione", row["next_step"]["label"])
         self.assertEqual(row["progress"], 75)
 
@@ -167,6 +167,84 @@ class Board(unittest.TestCase):
                                      today=self.TODAY)["rows"][0]
         self.assertEqual(row["in_flight"][0]["run_id"], "producer-live")
         self.assertEqual(row["open_prs"][0]["pr"], 77)
+
+
+class WorkStatus(unittest.TestCase):
+    """La lavorazione leggibile (row["work_status"]), unica fonte per /_pipeline
+    e la console: prima questa traduzione viveva duplicata in monitor.js."""
+
+    def test_state_maps_directly_for_most_states(self):
+        d = practice("ter-1", state="pubblicata")
+        row = pipeline_monitor.board({"ter-1": d}, today="2026-07-28")["rows"][0]
+        self.assertEqual(row["work_status"], "pubblicata")
+        self.assertTrue(row["work_status_help"])
+
+    def test_in_lavorazione_grezzo_splits_on_touched_vs_never_touched(self):
+        touched = practice("ter-touched", state="in-lavorazione", completed=["curator"])
+        touched["runs"] = ["r1"]   # risolto sotto, via `runs=` a board()
+        untouched = practice("ter-untouched", state="in-lavorazione", completed=["curator"])
+        runs = [{"run_id": "r1", "stage": "curator", "outcome": "merged",
+                 "summary": "curatela fatta", "at": "2026-07-02T09:00:00+00:00"}]
+        b = pipeline_monitor.board({"ter-touched": touched, "ter-untouched": untouched},
+                                   runs=runs, today="2026-07-28")
+        by_id = {r["id"]: r for r in b["rows"]}
+        self.assertEqual(by_id["ter-touched"]["work_status"], "in lavorazione")
+        self.assertEqual(by_id["ter-untouched"]["work_status"], "in coda")
+
+    def test_in_flight_counts_as_touched_even_without_a_collapsed_run(self):
+        d = practice("ter-live", state="in-lavorazione", completed=["curator"])
+        beat = {"indicator": "ter-live", "run_id": "producer-live", "role": "producer",
+                "since": "2026-07-28T10:00:00+00:00"}
+        row = pipeline_monitor.board({"ter-live": d}, heartbeats=[beat],
+                                     today="2026-07-28")["rows"][0]
+        self.assertEqual(row["work_status"], "in lavorazione")
+
+    def test_board_exposes_the_ordered_vocabulary_and_help_text(self):
+        b = pipeline_monitor.board({}, today="2026-07-28")
+        self.assertEqual(b["status_order"], pipeline_monitor.STATUS_ORDER)
+        self.assertEqual(b["status_help"], pipeline_monitor.STATUS_HELP)
+        self.assertEqual(set(pipeline_monitor.STATUS_HELP), set(pipeline_monitor.STATUS_ORDER))
+
+
+class SummarizeCatalog(unittest.TestCase):
+    """Il conto che deve tornare: universo dai cataloghi di famiglia (non solo
+    dal dossier), indicizzabilita', e il funnel scritti/verificati/pubblicati
+    ristretto agli indicatori ammessi e indicizzabili."""
+
+    def test_universe_bigger_than_dossier_surfaces_not_yet_admitted(self):
+        rows = [{"id": "1", "completed_stages": ["writer"], "published": None}]
+        universe = {
+            "1": {"indexable": True, "reason": None},
+            "2": {"indexable": True, "reason": None},   # mai entrato in una pratica
+            "3": {"indexable": False, "reason": "vecchia"},
+        }
+        summary = pipeline_monitor.summarize_catalog(rows, universe)
+        self.assertEqual(summary["total_universe"], 3)
+        self.assertEqual(summary["indexable"], 2)
+        self.assertEqual(summary["non_indexable"], 1)
+        self.assertEqual(summary["non_indexable_by_reason"], {"vecchia": 1})
+        self.assertEqual(summary["not_yet_admitted"], 2)   # "2" e "3"
+
+    def test_funnel_counts_only_indexable_admitted_rows(self):
+        rows = [
+            {"id": "written", "completed_stages": ["writer"], "published": None},
+            {"id": "verified", "completed_stages": ["writer", "verificatore"], "published": None},
+            {"id": "published", "completed_stages": ["writer", "verificatore"], "published": True},
+            {"id": "excluded", "completed_stages": ["writer", "verificatore"], "published": True},
+        ]
+        universe = {r["id"]: {"indexable": r["id"] != "excluded", "reason": None} for r in rows}
+        summary = pipeline_monitor.summarize_catalog(rows, universe)
+        self.assertEqual(summary["indexable_admitted"], 3)   # non "excluded"
+        self.assertEqual(summary["written"], 3)
+        self.assertEqual(summary["verified"], 2)
+        self.assertEqual(summary["published"], 1)
+
+    def test_rows_outside_the_universe_do_not_crash_or_count(self):
+        rows = [{"id": "orfano", "completed_stages": [], "published": None}]
+        summary = pipeline_monitor.summarize_catalog(rows, {})
+        self.assertEqual(summary["total_universe"], 0)
+        self.assertEqual(summary["not_yet_admitted"], 0)
+        self.assertEqual(summary["indexable_admitted"], 0)
 
 
 class IndicatorLabels(unittest.TestCase):

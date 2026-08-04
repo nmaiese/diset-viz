@@ -81,6 +81,7 @@ async function render(supabase, currentUser) {
       // La storia (fetch authed dai file git via /_pipeline/api): catalogo e cronologia.
       "<section>" +
         '<div class="mon-head2"><h2>Catalogo indicatori</h2><button id="cat-refresh" class="mon-btn mon-btn--ghost mon-btn--sm">Aggiorna</button></div>' +
+        '<div id="cat-coverage" class="mon-coverage"></div>' +
         '<div class="mon-filters">' +
           '<input id="cat-q" type="search" placeholder="Cerca nome, codice, stato, bandiera">' +
           '<select id="cat-status"><option value="">Tutte le lavorazioni</option></select>' +
@@ -139,8 +140,8 @@ async function render(supabase, currentUser) {
     document.getElementById(id).onchange = renderCatalogReset;
   });
   ["run-q", "run-stage", "run-outcome", "run-from", "run-to"].forEach((id) => {
-    document.getElementById(id).oninput = renderRuns;
-    document.getElementById(id).onchange = renderRuns;
+    document.getElementById(id).oninput = renderRunsReset;
+    document.getElementById(id).onchange = renderRunsReset;
   });
 }
 
@@ -160,6 +161,16 @@ const CAT_PAGE_SIZE = 50;
 function renderCatalogReset() {
   catPage = 0;
   renderCatalog();
+}
+
+// Stessa paginazione, sulla cronologia: senza pager la pagina renderizzava ogni
+// run del diario in un colpo solo (141 file oggi), un'unica tabella lunghissima.
+let runPage = 0;
+const RUN_PAGE_SIZE = 50;
+
+function renderRunsReset() {
+  runPage = 0;
+  renderRuns();
 }
 
 async function getToken(supabase) {
@@ -187,50 +198,15 @@ async function loadBoard(supabase) {
   const data = await authedJson(supabase, "/_pipeline/api/board");
   boardData = data;
   const rows = (data && data.rows) || [];
-  // La lavorazione, non lo stato grezzo del modello: STATUS_ORDER da' l'ordine.
-  fillOptions("cat-status", STATUS_ORDER.filter((s) => rows.some((r) => workStatus(r) === s)));
+  // La lavorazione (`work_status`) e la lista ordinata (`status_order`) sono
+  // decise una volta sola lato server (`scripts/pipeline_monitor.py`), non
+  // ridedotte qui: prima questa traduzione stato-grezzo -> etichetta viveva
+  // solo in questo file, una seconda verita' che poteva divergere da /_pipeline.
+  const order = (data && data.status_order) || [];
+  fillOptions("cat-status", order.filter((s) => rows.some((r) => r.work_status === s)));
   fillOptions("cat-phase", uniq(rows.map((r) => r.phase)));
   fillOptions("cat-owner", uniq(rows.map((r) => r.next_step && r.next_step.owner)));
   renderCatalog();
-}
-
-// La lavorazione come la intende chi guarda: "in lavorazione" e' solo cio' che la
-// pipeline ha davvero toccato (una run, o un ruolo in volo). Lo stato grezzo del
-// modello (`state`) marca "in-lavorazione" ogni indicatore non ancora pubblicato,
-// comprese le centinaia mai lavorate (prosa legacy, zero run): qui si separano.
-// Derivato lato console, senza toccare il modello condiviso con /_pipeline.
-const STATUS_ORDER = [
-  "da correggere",
-  "bloccata",
-  "in quarantena",
-  "in lavorazione",
-  "in coda",
-  "proposta",
-  "in attesa di monte",
-  "da pubblicare",
-  "pubblicata",
-  "chiusa",
-];
-
-// La lavorazione parte dallo `state` autorevole del modello, che gia' antepone
-// invalidazione e blocchi al pubblicato (una pagina pubblicata ma con una
-// smentita aperta o dati scaduti e' `invalidata`, non `pubblicata`, e va corretta):
-// leggere `published` per primo la nasconderebbe. L'unico affinamento e' spezzare
-// l'`in-lavorazione` grezzo, che marca anche le centinaia mai toccate, in cio' che
-// la pipeline lavora davvero (una run o un ruolo in volo) e cio' che e' solo in coda.
-function workStatus(r) {
-  switch (r.state) {
-    case "pubblicata": return "pubblicata";
-    case "fusa": return "da pubblicare";
-    case "invalidata": return "da correggere";
-    case "bloccata": return "bloccata";
-    case "in-quarantena": return "in quarantena";
-    case "chiusa": return "chiusa";
-    case "proposta": return "proposta";
-    case "in-attesa-di-monte": return "in attesa di monte";
-    default: // in-lavorazione e ogni stato non previsto
-      return (r.in_flight && r.in_flight.length) || (r.runs && r.runs.length) ? "in lavorazione" : "in coda";
-  }
 }
 
 async function loadRuns(supabase) {
@@ -264,21 +240,6 @@ function fillOptions(id, values) {
 
 const MINI_STATUS = { done: "●", current: "◐", issue: "◆", off: "○", waiting: "○" };
 
-// Cosa vuol dire ogni lavorazione, in chiaro: finisce nel title del badge, cosi'
-// "in attesa di monte" e simili non restano gergo. Testi da docs/EDITORIAL_PRACTICE.
-const STATUS_HELP = {
-  "in lavorazione": "La pipeline ci sta lavorando: una run in corso o gia' fatta.",
-  "in coda": "Nel catalogo ma mai lavorato dalla pipeline (nessuna run).",
-  "in attesa di monte": "Fermo perche' manca il passo a monte: l'artefatto atteso dallo stadio precedente (es. la curatela) non esiste ancora.",
-  "da pubblicare": "Articolo fuso, in attesa della prova di pubblicazione sul sito.",
-  "pubblicata": "Pubblicato sul sito, con prova registrata.",
-  "da correggere": "Un input e' cambiato (dati aggiornati, definizione, o una smentita aperta): il lavoro a valle non vale piu' e va rifatto.",
-  "bloccata": "Fermo in attesa di un cambio esterno (es. un chiarimento dalla fonte).",
-  "in quarantena": "Bloccato in modo terminale, tolto dalla coda.",
-  "proposta": "Candidato approvato, in attesa di essere promosso nel catalogo dal prossimo giro di ammissione (manca ancora curatela e articolo).",
-  "chiusa": "Candidatura chiusa, nessuna azione.",
-};
-
 function renderCatalog() {
   const el = document.getElementById("mon-catalog");
   if (!el) return;
@@ -288,9 +249,11 @@ function renderCatalog() {
   const status = document.getElementById("cat-status").value;
   const owner = document.getElementById("cat-owner").value;
   const allRows = boardData.rows || [];
+  const statusHelp = boardData.status_help || {};
+  const statusOrder = boardData.status_order || [];
   const rows = allRows.filter((r) => {
     const ns = r.next_step || {};
-    const st = workStatus(r);
+    const st = r.work_status;
     const key = [r.id, r.name, r.family, r.state, st, r.phase, ns.owner, ns.label, (r.flags || []).join(" ")]
       .join(" ")
       .toLowerCase();
@@ -309,18 +272,57 @@ function renderCatalog() {
   // il filtro attuale, separato dai totali globali.
   const byStatusAll = {};
   allRows.forEach((r) => {
-    const s = workStatus(r);
-    byStatusAll[s] = (byStatusAll[s] || 0) + 1;
+    byStatusAll[r.work_status] = (byStatusAll[r.work_status] || 0) + 1;
   });
   const published = byStatusAll["pubblicata"] || 0;
   const closed = byStatusAll["chiusa"] || 0;
   const remaining = allRows.length - published - closed;
+
+  // Copertura del catalogo: l'universo vero (tutti i cataloghi di famiglia,
+  // `_pipeline_universe` in app/views.py), non solo `allRows.length` (che e'
+  // solo cio' che ha gia' toccato una pratica di ammissione). Risponde a
+  // "quanti indicatori in totale, quanti indicizzati, se manca qualcosa da
+  // ammettere, e dentro quelli ammessi e indicizzabili a che punto siamo".
+  const coverageEl = document.getElementById("cat-coverage");
+  if (coverageEl) {
+    const cs = boardData.catalog_summary;
+    if (!cs) {
+      coverageEl.innerHTML = "";
+    } else {
+      const reasonLabel = { vecchia: "vecchi", copertura: "copertura incompleta", variante: "variante di genere", famiglia: "copertura insufficiente nella famiglia", altro: "altro" };
+      const reasonKeys = Object.keys(cs.non_indexable_by_reason || {})
+        .sort((a, b) => (cs.non_indexable_by_reason[b] || 0) - (cs.non_indexable_by_reason[a] || 0));
+      // Al massimo due motivi nel chip: una riga corta e leggibile, non un elenco
+      // che rischia di allungarsi oltre la larghezza della sezione.
+      const reasons = reasonKeys
+        .slice(0, 2)
+        .map((r) => (reasonLabel[r] || r) + " " + cs.non_indexable_by_reason[r])
+        .concat(reasonKeys.length > 2 ? ["altri " + reasonKeys.slice(2).reduce((a, r) => a + cs.non_indexable_by_reason[r], 0)] : [])
+        .join(", ");
+      coverageEl.innerHTML =
+        '<div class="mon-totals-row">' +
+          '<span class="mon-chip mon-chip--strong">Nel catalogo ' + cs.total_universe + "</span>" +
+          '<span class="mon-chip">Indicizzati ' + cs.indexable + "</span>" +
+          '<span class="mon-chip">Non indicizzati ' + cs.non_indexable + (reasons ? " (" + escapeHtml(reasons) + ")" : "") + "</span>" +
+          (cs.not_yet_admitted
+            ? '<span class="mon-chip mon-chip--strong">Non ancora ammessi ' + cs.not_yet_admitted + "</span>"
+            : "") +
+        "</div>" +
+        '<div class="mon-totals-row">' +
+          '<span class="mon-chip">Ammessi e indicizzati ' + cs.indexable_admitted + "</span>" +
+          '<span class="mon-chip">Scritti ' + cs.written + "</span>" +
+          '<span class="mon-chip">Verificati ' + cs.verified + "</span>" +
+          '<span class="mon-chip">Pubblicati ' + cs.published + "</span>" +
+        "</div>";
+    }
+  }
+
   const summary =
     '<span class="mon-chip mon-chip--strong">Totale ' + allRows.length + "</span>" +
     '<span class="mon-chip mon-chip--strong">Pubblicati ' + published + "</span>" +
     '<span class="mon-chip mon-chip--strong">Rimanenti ' + remaining + "</span>" +
     (rows.length !== allRows.length ? '<span class="mon-chip">Mostrati ' + rows.length + "</span>" : "");
-  const chips = STATUS_ORDER.filter((s) => byStatusAll[s])
+  const chips = statusOrder.filter((s) => byStatusAll[s])
     .map(
       (s) =>
         '<button type="button" class="mon-chip mon-chip--click' + (status === s ? " mon-chip--active" : "") +
@@ -351,11 +353,11 @@ function renderCatalog() {
   // stessa domanda ("che vuol dire in attesa di monte?") a chiunque, sempre.
   const legendEl = document.getElementById("cat-legend");
   if (legendEl) {
-    const items = STATUS_ORDER.filter((s) => byStatusAll[s])
+    const items = statusOrder.filter((s) => byStatusAll[s])
       .map(
         (s) =>
           '<div class="mon-legend-row"><span class="mon-status mon-status--' + s.replace(/ /g, "-") + '">' +
-          escapeHtml(s) + "</span><span>" + escapeHtml(STATUS_HELP[s] || "") + "</span></div>"
+          escapeHtml(s) + "</span><span>" + escapeHtml(statusHelp[s] || "") + "</span></div>"
       )
       .join("");
     legendEl.innerHTML =
@@ -385,7 +387,7 @@ function renderCatalog() {
     pageRows
       .map((r) => {
         const ns = r.next_step || {};
-        const st = workStatus(r);
+        const st = r.work_status;
         const link = r.published_url
           ? '<a href="' + escapeHtml(r.published_url) + '" target="_blank" rel="noopener">apri ' + String.fromCharCode(8599) + "</a>"
           : "";
@@ -398,7 +400,7 @@ function renderCatalog() {
         return (
           '<tr><td data-label="Indicatore">' + name + "<br><small>" + escapeHtml(r.id) + "</small></td>" +
           '<td data-label="Famiglia">' + escapeHtml(r.family) + "</td>" +
-          '<td data-label="Lavorazione"><span class="mon-status mon-status--' + st.replace(/ /g, "-") + '" title="' + escapeHtml(STATUS_HELP[st] || "") + '">' + escapeHtml(st) + "</span></td>" +
+          '<td data-label="Lavorazione"><span class="mon-status mon-status--' + st.replace(/ /g, "-") + '" title="' + escapeHtml(r.work_status_help || "") + '">' + escapeHtml(st) + "</span></td>" +
           '<td data-label="Fase">' + escapeHtml(r.phase) + "</td>" +
           '<td data-label="Ciclo" class="mon-mini">' + mini + "</td>" +
           '<td data-label="Prossimo passo">' + escapeHtml(ns.owner || "") + "<br><small>" + escapeHtml(ns.label || "") + "</small></td>" +
@@ -466,9 +468,25 @@ function renderRuns() {
       .join("");
 
   if (!runs.length) return (el.innerHTML = '<p class="mon-empty">Nessuna run col filtro attuale.</p>');
+
+  // Pagina: stesso pattern del catalogo (clampa la pagina, affetta le righe).
+  const totalPages = Math.max(1, Math.ceil(runs.length / RUN_PAGE_SIZE));
+  if (runPage > totalPages - 1) runPage = totalPages - 1;
+  if (runPage < 0) runPage = 0;
+  const pageRuns = runs.slice(runPage * RUN_PAGE_SIZE, runPage * RUN_PAGE_SIZE + RUN_PAGE_SIZE);
+  const first = runs.length ? runPage * RUN_PAGE_SIZE + 1 : 0;
+  const last = runPage * RUN_PAGE_SIZE + pageRuns.length;
+  const pager =
+    '<div class="mon-pager">' +
+      '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" id="run-prev"' + (runPage === 0 ? " disabled" : "") + ">Precedente</button>" +
+      '<span class="mon-pager-info">' + first + "-" + last + " di " + runs.length + " · pagina " + (runPage + 1) + "/" + totalPages + "</span>" +
+      '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" id="run-next"' + (runPage >= totalPages - 1 ? " disabled" : "") + ">Successiva</button>" +
+    "</div>";
+
   el.innerHTML =
+    pager +
     '<table class="mon-cards"><thead><tr><th>Quando</th><th>Stadio</th><th>Indicatore</th><th>Esito</th><th>Durata</th><th>Token</th><th>PR</th><th>Commit</th></tr></thead><tbody>' +
-    runs
+    pageRuns
       .map((r) => {
         const inds = (r.indicators || []);
         const indCell = inds.length === 1 ? escapeHtml(inds[0]) : inds.length ? escapeHtml(inds.join(", ")) : "";
@@ -484,7 +502,11 @@ function renderRuns() {
         );
       })
       .join("") +
-    "</tbody></table>";
+    "</tbody></table>" +
+    pager;
+
+  el.querySelectorAll("#run-prev").forEach((b) => (b.onclick = () => { runPage -= 1; renderRuns(); }));
+  el.querySelectorAll("#run-next").forEach((b) => (b.onclick = () => { runPage += 1; renderRuns(); }));
 }
 
 async function refresh(supabase) {

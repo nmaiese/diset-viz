@@ -68,8 +68,65 @@ ROLE_LABELS = {
     "admissions": "ammissione",
     "producer": "produttore",
     "verificatore": "verificatore",
-    "publisher": "passo del sito",
+    # Non un agente: uno script deterministico (`verify_publication.py`) che
+    # controlla il deploy e registra la prova. "passo del sito" si leggeva come
+    # "il sito non fa niente" a chi non conosce l'interno della catena.
+    "publisher": "verifica automatica online",
 }
+
+# La lavorazione come la intende chi guarda il cruscotto, non lo stato grezzo
+# del modello. `state` marca "in-lavorazione" ogni indicatore non ancora
+# pubblicato, comprese le centinaia mai toccate (prosa legacy, zero run): qui
+# si separa cio' che la pipeline lavora davvero (una run o un ruolo in volo)
+# da cio' che e' solo in coda. Unica fonte: prima viveva duplicata anche in
+# `frontend/src/monitor/main.js`.
+STATUS_ORDER = [
+    "da correggere",
+    "bloccata",
+    "in quarantena",
+    "in lavorazione",
+    "in coda",
+    "proposta",
+    "in attesa di monte",
+    "da pubblicare",
+    "pubblicata",
+    "chiusa",
+]
+
+STATUS_HELP = {
+    "in lavorazione": "La pipeline ci sta lavorando: una run in corso o gia' fatta.",
+    "in coda": "Nel catalogo ma mai lavorato dalla pipeline (nessuna run).",
+    "in attesa di monte": "Fermo perche' manca il passo a monte: l'artefatto atteso dallo stadio precedente (es. la curatela) non esiste ancora.",
+    "da pubblicare": "Articolo fuso, in attesa della prova di pubblicazione sul sito.",
+    "pubblicata": "Pubblicato sul sito, con prova registrata.",
+    "da correggere": "Un input e' cambiato (dati aggiornati, definizione, o una smentita aperta): il lavoro a valle non vale piu' e va rifatto.",
+    "bloccata": "Fermo in attesa di un cambio esterno (es. un chiarimento dalla fonte).",
+    "in quarantena": "Bloccato in modo terminale, tolto dalla coda.",
+    "proposta": "Candidato approvato, in attesa di essere promosso nel catalogo dal prossimo giro di ammissione (manca ancora curatela e articolo).",
+    "chiusa": "Candidatura chiusa, nessuna azione.",
+}
+
+_STATE_TO_WORK_STATUS = {
+    "pubblicata": "pubblicata",
+    "fusa": "da pubblicare",
+    "invalidata": "da correggere",
+    "bloccata": "bloccata",
+    "in-quarantena": "in quarantena",
+    "chiusa": "chiusa",
+    "proposta": "proposta",
+    "in-attesa-di-monte": "in attesa di monte",
+}
+
+
+def work_status(row: dict) -> str:
+    """La lavorazione leggibile di una riga (vedi commento sopra `STATUS_ORDER`).
+
+    Va chiamata dopo che `row["in_flight"]` e' stato attaccato in `board()`:
+    prima di quel punto ogni riga sarebbe letta come "in coda"."""
+    mapped = _STATE_TO_WORK_STATUS.get(row.get("state"))
+    if mapped:
+        return mapped
+    return "in lavorazione" if (row.get("in_flight") or row.get("runs")) else "in coda"
 
 
 def _csv_rows(path: Path) -> list:
@@ -179,7 +236,7 @@ def _next_step(d: dict, ready_stage: str | None) -> dict:
         return {"owner": "produttore", "stage": "reviewer", "kind": "attention",
                 "label": "Rileggere e firmare la nuova versione dei dati"}
     if state == "fusa":
-        return {"owner": "passo del sito", "stage": "publisher", "kind": "publish",
+        return {"owner": ROLE_LABELS["publisher"], "stage": "publisher", "kind": "publish",
                 "label": "Verificare il deploy e registrare la prova di pubblicazione"}
     if state == "pubblicata":
         return {"owner": "monitoraggio", "stage": "", "kind": "done",
@@ -350,6 +407,8 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
         run_ids = {run.get("run_id") for run in row.get("runs", [])}
         run_ids.update(beat.get("run_id") for beat in row["in_flight"])
         row["open_prs"] = [prs_by_run[rid] for rid in run_ids if rid in prs_by_run]
+        row["work_status"] = work_status(row)
+        row["work_status_help"] = STATUS_HELP.get(row["work_status"], "")
 
     phase_totals = {}
     for row in rows:
@@ -392,6 +451,8 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
         "in_flight": in_flight,
         "open_runs": open_items,
         "phase_totals": phase_totals,
+        "status_order": STATUS_ORDER,
+        "status_help": STATUS_HELP,
         "metrics": {
             "indicators": len(rows),
             "attention": len(attention),
@@ -404,6 +465,42 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
                     "outcome": run.get("outcome", ""), "summary": run.get("summary", ""),
                     "run_id": run.get("run_id", "")} for run in recent_runs],
         "generated_for": today,
+    }
+
+
+def summarize_catalog(rows: list, universe: dict) -> dict:
+    """Il conto che deve tornare: quanti indicatori esistono nei cataloghi di
+    famiglia in tutto (`universe`, gia' calcolato da `app.views._pipeline_universe`
+    perche' legge `app.data`/`app.bes_data`/`app.multiscopo_data`/
+    `app.external_atlas`: questo modulo resta stdlib-puro), quanti sono
+    indicizzabili (non vecchi, non duplicati, non a copertura incompleta), e
+    quanti di questi la pipeline ha gia' scritto, verificato, pubblicato.
+
+    `not_yet_admitted` e' la risposta a "se manca qualcosa inseriamo": indicatori
+    nel catalogo di una famiglia che non hanno ancora nessuna traccia in una
+    pratica di ammissione (`rows`, dal dossier di `practice_timeline`)."""
+    total_universe = len(universe)
+    indexable = sum(1 for v in universe.values() if v["indexable"])
+    non_indexable_by_reason: dict = {}
+    for v in universe.values():
+        if not v["indexable"]:
+            reason = v.get("reason") or "altro"
+            non_indexable_by_reason[reason] = non_indexable_by_reason.get(reason, 0) + 1
+
+    by_id = {r["id"]: r for r in rows}
+    admitted_ids = set(by_id) & set(universe)
+    indexable_admitted = [by_id[i] for i in admitted_ids if universe[i]["indexable"]]
+
+    return {
+        "total_universe": total_universe,
+        "indexable": indexable,
+        "non_indexable": total_universe - indexable,
+        "non_indexable_by_reason": non_indexable_by_reason,
+        "not_yet_admitted": total_universe - len(admitted_ids),
+        "indexable_admitted": len(indexable_admitted),
+        "written": sum(1 for r in indexable_admitted if "writer" in (r.get("completed_stages") or [])),
+        "verified": sum(1 for r in indexable_admitted if "verificatore" in (r.get("completed_stages") or [])),
+        "published": sum(1 for r in indexable_admitted if r.get("published") is True),
     }
 
 
