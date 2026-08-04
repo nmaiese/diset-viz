@@ -271,10 +271,10 @@ const STATUS_HELP = {
   "in attesa di monte": "Fermo perche' manca il passo a monte: l'artefatto atteso dallo stadio precedente (es. la curatela) non esiste ancora.",
   "da pubblicare": "Articolo fuso, in attesa della prova di pubblicazione sul sito.",
   "pubblicata": "Pubblicato sul sito, con prova registrata.",
-  "da correggere": "Pubblicato ma invalidato (smentita aperta o dati scaduti): va corretto.",
+  "da correggere": "Un input e' cambiato (dati aggiornati, definizione, o una smentita aperta): il lavoro a valle non vale piu' e va rifatto.",
   "bloccata": "Fermo in attesa di un cambio esterno (es. un chiarimento dalla fonte).",
   "in quarantena": "Bloccato in modo terminale, tolto dalla coda.",
-  "proposta": "Ammesso ma senza curatela ne' articolo: nessuno lo riprende.",
+  "proposta": "Candidato approvato, in attesa di essere promosso nel catalogo dal prossimo giro di ammissione (manca ancora curatela e articolo).",
   "chiusa": "Candidatura chiusa, nessuna azione.",
 };
 
