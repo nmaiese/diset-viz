@@ -181,11 +181,11 @@ class PathVerdictTests(unittest.TestCase):
         ok, _ = agent_guard.path_verdict("evals/writer/brief_ter-178.txt", ["writer"])
         self.assertFalse(ok)
 
-    def test_launch_may_write_the_journal_and_proofs_only(self):
+    def test_launch_may_write_the_journal_only(self):
         # Il lanciatore non e' uno stadio del cancello ma la guardia lo sorveglia
-        # come gli altri: diario e prove di pubblicazione si', code degli stadi no.
+        # come gli altri: il diario si' (il battito del tick), le code degli stadi no.
         ok, _ = agent_guard.path_verdict(
-            "data/pipeline/pubblicazioni/ter-651__regione__abc.json", ["launch"])
+            "data/pipeline/runs/launch-20260804.json", ["launch"])
         self.assertTrue(ok)
         ok, _ = agent_guard.path_verdict(
             "data/discovery/source_candidates.csv", ["launch"])

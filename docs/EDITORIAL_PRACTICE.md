@@ -42,12 +42,12 @@ dedotte invece che per pratica e dichiarate**:
 | validita' che scade quando cambia l'input | `data_year` (curatela), `vintage` vs `reviewed_vintage`, impronta `prosa` | che le dipendenze siano **dichiarate**, non riscoperte a ogni run |
 | stato dichiarato e verificabile | stato **dedotto** da presenza file + campi | un record di stato per pratica, **riconciliabile** con gli artefatti |
 | perimetri limitati per stadio | `pipeline_gate.STAGE_PATHS`, guardia, un file per record | classificare le **risorse** per decidere la concorrenza |
-| "run conclusa" != "pubblicato" | il merge chiude la run | una definizione di **pubblicato** che guarda il sito |
+| "run conclusa" e "pubblicato" coincidono | il merge chiude la run e pubblica | il progetto ha ratificato merge = pubblicazione (§8), non un controllo del sito mancante |
 
 Quindi il modello proposto non e' un impianto nuovo calato sopra. E' la
 **unificazione** di cose che ci sono: dare all'indicatore-in-un-ciclo un nome e un
-record, dichiarare le dipendenze che oggi sono impronte sparse, e separare il
-merge dalla pubblicazione. Tutto il resto della catena, un lanciatore che elenca
+record, dichiarare le dipendenze che oggi sono impronte sparse, e riconoscere il
+merge come pubblicazione (§8). Tutto il resto della catena, un lanciatore che elenca
 il lavoro per-indicatore lanciabile in parallelo, un file per record, il cancello
 come perimetro, il rientro guidato dai dati, resta in piedi e regge il modello.
 Anzi, l'unita' di osservazione che questo documento chiedeva, l'indicatore invece
@@ -72,7 +72,7 @@ cinque esistono nel repo, le ultime due vanno introdotte.
 | **indicatore** | l'identita' **permanente** di una voce d'atlante | `<famiglia>:<id>`, es. `dem:NMIGRATEIN`, o numerico `901`, o `bes:09PAE009-N25` | manifest, dataset esterno, `content/indicators/` |
 | **sessione autonoma** | un firing di Routine, checkout fresco | `session_id` (`.session_meta.json`), `run_id` per stadio | `data/pipeline/runs/`, `.session_meta.json` |
 | **pratica editoriale** *(nuovo)* | un **ciclo** dell'indicatore con un inizio, un esito, un tipo | `<indicator_id>#<tipo>-<seq>`, es. `dem:NMIGRATEIN#nuovo-1`, `901#aggiornamento-3` | da introdurre: `data/pipeline/practices/` |
-| **pubblicazione** *(nuovo)* | la versione effettivamente servita dal sito | impronta della versione pubblicata (commit + `prosa` + `vintage`) verificata sul sito | da introdurre: campo `published` nella pratica |
+| **pubblicazione** *(nuovo)* | la versione fusa su master, che il progetto tratta come pubblicata | impronta della versione (commit + `prosa` + `vintage`) fusa su master | campo `published` nella pratica, raggiunto al merge |
 
 La distinzione che il mandato chiede a 2.2 e' fra le ultime due righe e la riga
 "indicatore": **l'indicatore e' permanente, la pratica e' un ciclo, la
@@ -146,7 +146,7 @@ se esiste una scheda in `verifiche/` la cui `prosa` combacia con l'impronta
 corrente. Utile come controllo, insufficiente come stato: non distingue "non
 iniziato" da "fallito", "completato ma invalidato" da "completato".
 
-Nove stati, uno solo attivo per pratica. Lo stato di sosta e' uno solo,
+Otto stati, uno solo attivo per pratica. Lo stato di sosta e' uno solo,
 `in-attesa`, e un `motivo` lo qualifica (armonizza i due di prima,
 `in-attesa-di-monte` e `bloccata`, che avevano lo stesso significato "ferma,
 aspetta qualcosa" con una linea sola di differenza).
@@ -157,8 +157,7 @@ aspetta qualcosa" con una linea sola di differenza).
 | `in-lavorazione` | uno stadio obbligatorio non e' ancora completo | esiste l'artefatto di ingresso, manca almeno un artefatto obbligatorio a valle |
 | `in-attesa` | ferma in attesa di una condizione; il `motivo` dice quale | vedi la tabella dei motivi qui sotto |
 | `pronta-al-merge` | tutti gli stadi del ciclo completi, il cancello e' verde | gli artefatti obbligatori esistono e passano `pipeline_gate` |
-| `fusa` | il ciclo e' su master, non ancora verificato sul sito | il commit e' su master, `published` non ancora confermato |
-| `pubblicata` | **la versione e' visibile sul sito e verificata** | verifica sito superata (vedi §8) |
+| `pubblicata` | **fusa su master** (il progetto ha ratificato merge = pubblicazione, §8) | il ciclo obbligatorio e' completo e l'articolo e' committato su master |
 | `invalidata` | un input e' cambiato: uno o piu' passaggi non valgono piu' | uno stamp di dipendenza non combacia (§6) |
 | `in-quarantena` | `in-attesa` terminale, tolta dalla coda per non fermare le altre | `tentativi >= soglia` con errore non transitorio, o decisione umana |
 | `chiusa` | esito terminale raggiunto (§7) | c'e' un `esito` da vocabolario di chiusura |
@@ -225,8 +224,8 @@ La matrice completa delle transizioni ammesse per tipo e' l'allegato che la Fase
 deve produrre come tabella unica (una riga per `(tipo, da_stato, a_stato)`), ma la
 forma e' questa, e ogni riga e' gia' derivabile dagli stadi che esistono. Le
 transizioni **non ammesse** sono altrettanto importanti: writer -> pubblicata
-saltando reviewer non esiste, fusa -> pubblicata senza verifica sito non esiste
-(§8).
+saltando reviewer non esiste, pronta-al-merge -> pubblicata senza il verdetto
+verde del cancello non esiste (§8).
 
 ---
 
@@ -318,7 +317,7 @@ editoriale. Vocabolario finito di chiusura:
 
 | esito | significato |
 | --- | --- |
-| `pubblicata-verificata` | online e verificata sul sito (§8), il solo esito "riuscito" |
+| `pubblicata` | fuso su master (§8), il solo esito "riuscito" |
 | `rifiutata` | il candidato non e' ammissibile (resta la riga `rejected` con il motivo) |
 | `duplicata` | coincide con un indicatore esistente (`duplicate_of` puntato) |
 | `sostituita` | un ciclo successivo l'ha soppiantata |
@@ -328,7 +327,7 @@ editoriale. Vocabolario finito di chiusura:
 
 **Decisione 4 (quando una PR chiude senza pubblicazione):** una PR (cioe' un passo
 di ciclo, §10) chiude senza pubblicazione quando la pratica raggiunge uno degli
-esiti diversi da `pubblicata-verificata`, oppure quando il passo e' un passaggio
+esiti diversi da `pubblicata`, oppure quando il passo e' un passaggio
 intermedio di un ciclo che continua. Gli **artefatti invalidati restano nella
 storia** (mandato, vincolo non negoziabile): una pratica `sostituita` non
 cancella cio' che aveva prodotto, lo marca superato.
@@ -337,43 +336,51 @@ cancella cio' che aveva prodotto, lo marca superato.
 
 ## 8. Che cosa significa "pubblicato" (mandato 1.7, decisioni 7-8)
 
-Oggi **"pubblicato" = fuso su master**, e non c'e' nessuna verifica che il sito
-abbia davvero servito il cambiamento. Il verificatore controlla le **affermazioni
-della prosa contro i dati**, su file committati, non che la pagina sia viva. Sono
-due cose diverse, e il mandato chiede di non confonderle. Sette eventi che oggi
-collassano in uno:
+Il progetto ha **ratificato una scelta**: **merge = pubblicazione**. Un articolo
+fuso su master **e'** pubblicato, e lo stato `pubblicata` si raggiunge al merge.
+Non e' un'ovvieta' da nascondere ma una decisione presa con gli occhi aperti,
+perche' i due eventi si possono tenere distinti e per un periodo lo sono stati.
+Sette eventi che, sotto questa scelta, collassano in uno:
 
 1. **esito della run**, la sessione autonoma finisce (`outcome` nel diario).
 2. **esito dello stadio**, l'artefatto dello stadio e' completo.
 3. **approvazione tecnica**, `pipeline_gate` e' verde.
 4. **merge**, `pipeline_merge.py` fonde su master (squash via REST).
-5. **deploy**, il sito si ricostruisce (oggi **non osservato** dalla catena).
-6. **pubblicazione verificata**, la pagina pubblica mostra quella versione.
+5. **deploy**, il sito si ricostruisce (non osservato dalla catena).
+6. **pubblicazione sul sito**, la pagina pubblica mostra quella versione.
 7. **verifica del contenuto**, le affermazioni reggono contro i dati (verificatore).
 
-Il modello separa gli stati `fusa` (evento 4) e `pubblicata` (evento 6), con in
-mezzo il deploy (evento 5). Trattare il merge come pubblicazione e' il falso
-positivo che il mandato teme: il repository puo' essere avanti e il sito indietro.
+La ratifica dice che lo stato `pubblicata` scatta all'evento 4, il merge, e non
+aspetta gli eventi 5 e 6. Il deploy e la pubblicazione sul sito **seguono** il
+merge per costruzione (un push su master ridispiega il sito), ma la catena non
+li osserva piu': non c'e' un controllo che confronti la pagina pubblica con la
+versione attesa.
 
-**Decisione 8 (quando il sistema puo' dichiarare "pubblicato"):** quando una
-**verifica del sito** conferma che la pagina dell'indicatore (`/indicatore/<slug>/<acr>-<id>`)
-serve la versione attesa, riconosciuta da un'impronta della versione (commit +
-`prosa` + `vintage`). Questa verifica **non esiste ancora** ed e' il primo pezzo
-nuovo che la Fase B/D deve costruire: un controllo read-only che prende la pagina
-pubblica e confronta l'impronta. E' l'unico stato che la catena oggi non sa
-osservare, ed e' proprio quello che il mandato mette come metrica finale
-("se quella versione e' realmente visibile e ancora valida").
+**Il costo, dichiarato.** "Repo avanti / sito indietro" non e' piu' osservabile
+dalla catena: se un deploy fallisce in silenzio, il cruscotto continua a dire
+`pubblicata` mentre il sito serve la versione vecchia. E' il falso positivo che
+una verifica del sito avrebbe intercettato. Il progetto lo accetta come
+compromesso registrato, non come lacuna nascosta: in cambio si toglie una
+macchina intera (la verifica del sito, il suo registro di prove, il passo del
+lanciatore che la chiudeva) e lo stato `pubblicata` diventa deterministico,
+raggiunto dal solo fatto verificabile che l'articolo e' su master.
 
-**Decisione 7 (verifica prima o dopo la pubblicazione):** due verifiche distinte,
-e vanno tenute distinte.
-- La **verifica del contenuto** (il verificatore, evento 7) e' **prima** del merge,
-  su articoli firmati: e' una condizione editoriale del ciclo. Resta com'e'.
-- La **verifica del sito** (evento 6) e' **dopo** il merge e il deploy, per
-  definizione: si puo' verificare solo cio' che e' online. E' la transizione
-  `fusa -> pubblicata`.
+**La verifica del contenuto resta, ed e' un'altra cosa.** Il verificatore
+controlla le **affermazioni della prosa contro i dati** (evento 7), su file
+committati, non che la pagina sia viva. E' editoriale, indipendente dalla verifica
+del sito che e' stata rimossa, e resta **prima** del merge: e' una condizione del
+ciclo, non un controllo post-deploy.
 
-La pratica si considera conclusa con successo (`pubblicata-verificata`) **solo**
-dopo la verifica del sito, non al merge.
+**Decisione 7 (verifica prima o dopo la pubblicazione):** la **verifica del
+contenuto** (il verificatore, evento 7) e' **prima** del merge, su articoli
+firmati, ed e' una condizione editoriale del ciclo che resta com'e'. Non c'e'
+piu' una verifica del sito dopo il merge: la scelta merge = pubblicazione l'ha
+resa non necessaria.
+
+**Decisione 8 (quando il sistema puo' dichiarare "pubblicato"):** al **merge**.
+La pratica si considera conclusa con successo (`pubblicata`) quando il ciclo
+obbligatorio e' completo e l'articolo e' committato su master. Non c'e' un evento
+di sito ulteriore da attendere.
 
 ---
 
@@ -575,11 +582,11 @@ giudizio umano piu' che una deduzione dal sistema.
 | 1 | unita' fondamentale | indicatore = identita', pratica = unita' di avanzamento (§1) |
 | 2 | quando nasce una pratica | alla **promozione** di un candidato `approved` (§1, §5) |
 | 3 | quando si apre la PR | alla prima modifica destinata a master del passo di ciclo (§10) |
-| 4 | quando una PR chiude senza pubblicazione | quando la pratica raggiunge un esito diverso da `pubblicata-verificata`, o e' un passo intermedio (§7) |
+| 4 | quando una PR chiude senza pubblicazione | quando la pratica raggiunge un esito diverso da `pubblicata`, o e' un passo intermedio (§7) |
 | 5 | stadi obbligatori per un nuovo | curator, writer, reviewer, verificatore (§2) |
 | 6 | stadi obbligatori per un aggiornamento | writer, reviewer, gli altri se una condizione lo impone (§2) |
-| 7 | verifica prima o dopo la pubblicazione | contenuto **prima** del merge, sito **dopo** il deploy (§8) |
-| 8 | quando dichiarare "pubblicato" | quando la **verifica del sito** conferma la versione online (§8) |
+| 7 | verifica prima o dopo la pubblicazione | contenuto **prima** del merge, nessuna verifica del sito (rimossa, §8) |
+| 8 | quando dichiarare "pubblicato" | al **merge**: merge = pubblicazione (§8) |
 | 9 | cosa invalida una revisione | `reviewed_vintage != vintage`, o una smentita aperta (§6) |
 | 10 | cosa invalida una verifica | l'impronta `prosa` non combacia (§6) |
 | 11 | quante volte si ritenta | tetto per classe di errore, mai infinito (§9) |
@@ -597,7 +604,7 @@ giudizio umano piu' che una deduzione dal sistema.
 
 L'ordine e' quello del mandato, e non e' negoziabile: dominio, poi osservabilita',
 poi macchina a stati in controllo, poi recupero e invalidazione provati, poi il
-pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
+pilota, poi la manutenzione, poi la sostituzione.
 
 - **Fase A, dominio (questo documento).** Uscita: due sviluppatori descrivono lo
   stesso percorso con gli stessi stati. Nessun codice.
@@ -617,36 +624,19 @@ pilota, poi la verifica del sito, poi la manutenzione, poi la sostituzione.
   `scripts/practice_model.py`, provati da `tests/unit/test_practice_model.py`.
   Affianca il flusso senza pubblicare.
 - **Fase D, pilota della PR unica**, solo su nuovi indicatori a perimetro
-  limitato, con lo stato nel record di pratica e non nella PR. Il pezzo davvero
-  nuovo, la **verifica del sito** (§8), e' fatto: `scripts/verify_publication.py`
-  prende la pagina reale dalla forma a solo code (che l'app 301 reindirizza allo
-  slug canonico), confronta la firma di contenuto lead+vintage, e scrive una
-  **prova** in `data/pipeline/pubblicazioni/` (un file per record, con l'impronta
-  `prosa` che la fa scadere quando il testo cambia). La ricostruzione legge le
-  prove e porta a `pubblicata` solo gli indicatori confermati, la transizione
-  `fusa -> pubblicata` guidata da un artefatto e non da una modifica di stato.
-  Provata end-to-end contro l'app servita in
-  `tests/integration/test_verify_publication_live.py` e, contro un gunicorn
-  reale, in `tests/integration/test_editorial_practice_e2e.py`. Il passo che
-  scrive la prova e' **agganciato in due modi**. Nel cancello: `publisher` ha
-  un perimetro (`data/pipeline/pubblicazioni/`), una coda deterministica
-  (`verify_publication.publication_queue`, gli indicatori in stato `fusa`), un
-  driver (`--all-fusa`) e un controllo che impone la prudenza (`check_publications`:
-  una prova con `ok!=True`, o ancorata a un testo che non e' in pagina, non e' una
-  pubblicazione). E nel **lanciatore**, come **passo del sito** (`pipeline_launch.py
-  --publish`, che riusa `verify_publication.publish_step`): meccanico come il tick,
-  verifica gli indicatori fusi contro il sito e committa le prove su master
-  (`land_on_master`, un commit mirato sopra `origin/master`), senza lanciare un
-  agente ne' aprire una PR (e' deterministico, quindi le invarianti del cancello
-  sono garantite per costruzione al momento della scrittura). Non e' un passo del
-  **produttore**, e non potrebbe esserlo: il produttore gira **prima** del deploy,
-  quando il sito non serve ancora la versione nuova. **L'interruttore e' acceso**:
-  il comando in `.claude/agents/launcher.md` passa
-  `--publish --publish-base https://divarioitalia.it`, quindi a ogni giro (la
-  Routine e' a sessione fresca) il lanciatore verifica gli indicatori fusi contro
-  il sito e chiude da se' la transizione `fusa -> pubblicata`. Per spegnerlo,
-  togliere `--publish` da quel comando. `--publish` resta comunque opt-in a livello
-  di script (default spento): e' il comando della Routine a decidere.
+  limitato, con lo stato nel record di pratica e non nella PR. Il pezzo che un
+  tempo era davvero nuovo, la **verifica del sito**, e' stato **rimosso** quando
+  il progetto ha ratificato **merge = pubblicazione** (§8):
+  `scripts/verify_publication.py`, il registro delle prove in
+  `data/pipeline/pubblicazioni/`, lo stadio `publisher` del cancello e la
+  transizione `fusa -> pubblicata` non esistono piu'. Lo stato `pubblicata` si
+  raggiunge ora al merge, per costruzione, senza un controllo del sito a valle.
+  Cio' che **resta** e' il ricalcolo dello stato dai file committati (un articolo
+  su master e' pubblicato) e il pilota della PR unica sul solo ciclo di prima
+  pubblicazione, con lo stato autorevole nel record di pratica. Il flag `--publish`
+  del lanciatore sopravvive ma ora segna solo il battito del lanciatore nel
+  diario, non piu' una verifica del sito. Il compromesso accettato, "repo avanti /
+  sito indietro" non piu' osservabile dalla catena, e' registrato in §8.
 - **Fase E, manutenzione. [implementata]** `practice_timeline.split_cycles`
   spezza la storia di un indicatore in cicli distinti ma collegati: il primo e'
   `nuovo`, poi ogni innesco su una pagina gia' a valle apre un ciclo nuovo (una
@@ -680,15 +670,29 @@ sessioni (`run_id`, store committati), le decisioni sono motivate (`triage_notes
 (`STAGE_PATHS`), uno stadio non allarga le proprie autorizzazioni (il cancello non
 e' consultivo), i controlli sono indipendenti dal giudizio dell'agente
 (`pipeline_gate` rigira nel merge), un errore non osservabile non e' assenza di
-lavoro (il riconciliatore), una pratica non e' pubblicata perche' la PR e' fusa
-(stato `pubblicata` != `fusa`), gli artefatti invalidati restano nella storia, i
+lavoro (il riconciliatore), gli artefatti invalidati restano nella storia, i
 retry non sono infiniti (tetto per classe), un indicatore malato non ferma la
 catena (quarantena), la PR e' una vista non la memoria (record di pratica).
 
+**Un vincolo e' stato cambiato di proposito, e va registrato come decisione, non
+fatto sparire.** Il modello proponeva "una pratica non e' pubblicata perche' la PR
+e' fusa" (stato `pubblicata` != `fusa`), con una verifica del sito a separare il
+merge dalla pubblicazione. Il progetto ha **ratificato l'opposto**: **merge =
+pubblicazione**, quindi lo stato `pubblicata` si raggiunge al merge per
+costruzione e lo stato `fusa` non esiste piu' (§8). Il compromesso accettato,
+scritto per intero e non nascosto, e' la perdita dell'osservabilita' "repo avanti
+/ sito indietro": se un deploy fallisce in silenzio, la catena continua a dire
+`pubblicata`. In cambio si toglie una macchina intera e lo stato diventa
+deterministico. Resta intatta la **verifica del contenuto** (il verificatore, che
+smentisce le affermazioni **prima** del merge): e' editoriale, e non e' cio' che
+e' stato rimosso.
+
 ### Stato dell'implementazione
 
-Le Fasi B, C, D, E e la **macchina** della F sono codice provato, e la
-ri-architettura per-indicatore le ha portate dal fianco del flusso al flusso
+Le Fasi B, C, E e la **macchina** della F sono codice provato, la Fase D si e'
+ridotta quando la verifica del sito e' stata rimossa (§8, ne resta il ricalcolo
+dello stato dai file committati), e la ri-architettura per-indicatore le ha
+portate dal fianco del flusso al flusso
 stesso: il dossier per-indicatore che la Fase B ricostruiva e' ora la sorgente
 del **lanciatore** (`pipeline_launch.py`) e del **monitoraggio**
 (`pipeline_monitor.py`, la rotta `/_pipeline`), e la priorita' della pratica non
@@ -701,7 +705,6 @@ resta da rendere autorevole non e' un interruttore ma un confronto di metriche
 | `scripts/practice_model.py` | stati, transizioni, tipi, errori, priorita' | A | `tests/unit/test_practice_model.py` |
 | `scripts/practice_store.py` | lo store un-file-per-record delle pratiche | A | `tests/unit/test_practice_store.py` |
 | `scripts/practice_timeline.py` | ricostruzione, riconciliatore, cicli, priorita' per stadio | B, C, E | `tests/unit/test_practice_timeline.py` |
-| `scripts/verify_publication.py` | verifica del sito + registro `pubblicazioni/`, `fusa -> pubblicata`, il passo del sito | D | `tests/unit/test_verify_publication.py`, `tests/integration/test_verify_publication_live.py` |
 | `scripts/practice_metrics.py` | le metriche del confronto prima/dopo (mandato §5) | F | `tests/unit/test_practice_metrics.py` |
 | `scripts/pipeline_launch.py` | il piano di lancio per-indicatore, priorita' nativa | F | `tests/unit/test_pipeline_launch.py` |
 | `scripts/pipeline_monitor.py` | la vista di lettura "dov'e' fermo e perche'", `/_pipeline` | B | `tests/unit/test_pipeline_monitor.py` |
@@ -715,19 +718,19 @@ python3 scripts/pipeline_launch.py                         # il piano di lancio,
 python3 scripts/pipeline_monitor.py                        # dov'e' fermo, e perche'
 ```
 
-**Il passo del sito e' acceso.** La scrittura della prova di pubblicazione e'
-agganciata nel cancello (perimetro `data/pipeline/pubblicazioni/`,
-`check_publications`) e nel lanciatore come passo del sito (`pipeline_launch.py
---publish`, meccanico come il tick), e il comando in `.claude/agents/launcher.md`
-lo passa: la catena, a sessione fresca, chiude da se' la transizione
-`fusa -> pubblicata` contro `divarioitalia.it`.
+**Il passo del sito e' stato rimosso.** Con la ratifica di merge = pubblicazione
+(§8) lo stato `pubblicata` si raggiunge al merge, quindi non c'e' piu' una
+verifica del sito da agganciare: `scripts/verify_publication.py`, il registro
+`data/pipeline/pubblicazioni/` e lo stadio `publisher` del cancello non esistono
+piu'. Il flag `pipeline_launch.py --publish` sopravvive ma ora segna solo il
+battito del lanciatore nel diario, non una verifica contro il sito.
 
 **Resta fuori il cutover che rende il modello autorevole**, ed e' operativo non
 codice: girare `practice_metrics.py` su run reali prima e dopo e documentare il
 confronto. Legare allo stesso modo la scrittura dei record di pratica e' l'ultimo
 pezzo. Il modello non diventa autorevole al posto dello stato dedotto finche' quel
-confronto non e' documentato, come chiede il mandato: la verifica del sito gira,
-la sostituzione dello stato dedotto no.
+confronto non e' documentato, come chiede il mandato. La sostituzione dello stato
+dedotto con il record di pratica non e' ancora documentata su run reali.
 
 ---
 
@@ -741,8 +744,7 @@ proprio questo, e le soglie le fissa il team (decisione 18).
 
 - **Osservabilita'**: quota di pratiche con storia completa, quota di eventi
   (run) associati a un indicatore (oggi solo prosa + inferenza dai file), pratiche
-  con stato incoerente (le trova il riconciliatore), pubblicazioni senza prova sul
-  sito (oggi: tutte, la prova non esiste).
+  con stato incoerente (le trova il riconciliatore).
 - **Affidabilita'**: tentativi duplicati, transizioni applicate due volte,
   pratiche perse dopo una sessione interrotta, risultati invalidati pubblicati per
   errore, errori pubblici rilevati dopo la pubblicazione.
@@ -770,9 +772,6 @@ prima di scrivere codice:
 3. Se e quando spezzare i **CSV condivisi** (manifest, `curation.csv`) a un file
    per record (§11): serve solo quando la concorrenza sulle risorse condivise
    diventa reale, non prima.
-4. La tecnica della **verifica del sito** (§8): quale impronta, come si prende la
-   pagina, con quale cadenza. E' il solo pezzo davvero nuovo, e va progettato in
-   Fase D.
 
 Il resto e' unificazione di primitive che la catena ha gia'. Ed e' il motivo per
 cui questa revisione si puo' fare senza rompere niente: il modello a pratica non e'

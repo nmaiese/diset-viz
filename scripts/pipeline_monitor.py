@@ -76,7 +76,6 @@ STAGE_LABELS = {
     "reviewer": "Rilettura e firma",
     "producer": "Produzione",
     "verificatore": "Verifica indipendente",
-    "publisher": "Pubblicazione",
     "launch": "Lanciatore",
 }
 
@@ -84,10 +83,6 @@ ROLE_LABELS = {
     "admissions": "ammissione",
     "producer": "produttore",
     "verificatore": "verificatore",
-    # Non un agente: uno script deterministico (`verify_publication.py`) che
-    # controlla il deploy e registra la prova. "passo del sito" si leggeva come
-    # "il sito non fa niente" a chi non conosce l'interno della catena.
-    "publisher": "verifica automatica online",
 }
 
 # La lavorazione come la intende chi guarda il cruscotto, non lo stato grezzo
@@ -103,7 +98,6 @@ STATUS_ORDER = [
     "in lavorazione",
     "in coda",
     "proposta",
-    "da pubblicare",
     "pubblicata",
     "chiusa",
 ]
@@ -112,8 +106,7 @@ STATUS_HELP = {
     "in lavorazione": "La pipeline ci sta lavorando: una run in corso o gia' fatta.",
     "in coda": "Nel catalogo ma mai lavorato dalla pipeline (nessuna run).",
     "in attesa": "Ferma in attesa di una condizione. Il motivo la qualifica: manca il passo a monte (l'artefatto dello stadio precedente non esiste), oppure aspetta un cambio esterno alla fonte, oppure una correzione tecnica.",
-    "da pubblicare": "Articolo fuso, in attesa della prova di pubblicazione sul sito.",
-    "pubblicata": "Pubblicato sul sito, con prova registrata.",
+    "pubblicata": "Fusa su master: il progetto ha ratificato merge = pubblicazione.",
     "da correggere": "Un input e' cambiato (dati aggiornati, definizione, o una smentita aperta): il lavoro a valle non vale piu' e va rifatto.",
     "in quarantena": "Fermo in modo terminale, tolto dalla coda per non fermare le altre.",
     "proposta": "Candidato approvato, in attesa di essere promosso nel catalogo dal prossimo giro di ammissione (manca ancora curatela e articolo).",
@@ -122,7 +115,6 @@ STATUS_HELP = {
 
 _STATE_TO_WORK_STATUS = {
     "pubblicata": "pubblicata",
-    "fusa": "da pubblicare",
     "invalidata": "da correggere",
     "in-attesa": "in attesa",
     "in-quarantena": "in quarantena",
@@ -251,9 +243,6 @@ def _next_step(d: dict, ready_stage: str | None) -> dict:
     if flags.get("stale_vintage"):
         return {"owner": "produttore", "stage": "reviewer", "kind": "attention",
                 "label": "Rileggere e firmare la nuova versione dei dati"}
-    if state == "fusa":
-        return {"owner": ROLE_LABELS["publisher"], "stage": "publisher", "kind": "publish",
-                "label": "Verificare il deploy e registrare la prova di pubblicazione"}
     if state == "pubblicata":
         return {"owner": "monitoraggio", "stage": "", "kind": "done",
                 "label": "Sorvegliare la fonte per nuovi dati o cambi di definizione"}
@@ -273,7 +262,7 @@ def _next_step(d: dict, ready_stage: str | None) -> dict:
 
 
 def _lifecycle(d: dict, next_step: dict) -> tuple[list, int, str]:
-    """Quattro fasi stabili, dal primo ingresso alla prova sul sito."""
+    """Quattro fasi stabili, dall'ingresso al merge su master (= pubblicazione)."""
     completed = set(d.get("completed_stages") or [])
     required = list(d.get("required_stages") or [])
     production_required = [s for s in required if s != "verificatore"]
@@ -281,10 +270,11 @@ def _lifecycle(d: dict, next_step: dict) -> tuple[list, int, str]:
     admission_done = has_downstream and d.get("state") != "proposta"
     production_done = bool(production_required) and set(production_required).issubset(completed)
     verification_done = "verificatore" in completed and d.get("verification_valid") is True
-    publication_done = d.get("published") is True
+    # Pubblicazione = fuso su master (il progetto ha ratificato merge = pubblicazione).
+    publication_done = d.get("state") == "pubblicata"
     current_stage = next_step.get("stage")
     current_phase = (
-        "pubblicazione" if current_stage == "publisher" or publication_done else
+        "pubblicazione" if publication_done else
         "verifica" if current_stage == "verificatore" or (production_done and not verification_done) else
         "ammissione" if current_stage == "promoter" or not admission_done else
         "produzione"
@@ -437,10 +427,9 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
     for row in rows:
         phase_totals[row["phase"]] = phase_totals.get(row["phase"], 0) + 1
     attention = [r for r in rows if r["next_step"]["kind"] in ("attention", "blocked")]
-    site_steps = [r for r in rows if r["next_step"]["kind"] == "publish"]
     actionable = [
         r for r in rows
-        if r["next_step"]["kind"] in ("attention", "ready", "publish")
+        if r["next_step"]["kind"] in ("attention", "ready")
         and r["next_role"] != "admissions"
     ]
     admission_launch = next(
@@ -469,7 +458,6 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
         "ready": [r for r in rows if r["next_role"]],
         "actionable": actionable,
         "attention": attention,
-        "site_steps": site_steps,
         "rows": rows,
         "in_flight": in_flight,
         "open_runs": open_items,
@@ -482,7 +470,6 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
             "actionable": len(actionable),
             "in_flight": len(in_flight),
             "published": sum(r["published"] is True for r in rows),
-            "waiting_site": len(site_steps),
         },
         "recent": [{"at": run.get("at", ""), "stage": run.get("stage", ""),
                     "outcome": run.get("outcome", ""), "summary": run.get("summary", ""),
@@ -727,7 +714,7 @@ def read_heartbeats(root=None, now: str = "", stale_hours: int = HEARTBEAT_STALE
     return out
 
 
-def load_board(today: str = "", proofs_root=None, recent: int = 12,
+def load_board(today: str = "", recent: int = 12,
                heartbeats=None, open_runs=None) -> dict:
     """Collega i lettori reali (tutti stdlib puri) e ritorna il cruscotto.
 
@@ -739,7 +726,7 @@ def load_board(today: str = "", proofs_root=None, recent: int = 12,
     from datetime import datetime, timezone
     from scripts import pipeline_log, pipeline_status
     ref = today or datetime.now(timezone.utc).date().isoformat()
-    dossier = practice_timeline.load_real(today=ref, proofs_root=proofs_root)
+    dossier = practice_timeline.load_real(today=ref)
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
     beats = read_heartbeats(now=ref) if heartbeats is None else heartbeats
     return board(dossier, runs=runs, heartbeats=beats, today=ref, recent=recent,

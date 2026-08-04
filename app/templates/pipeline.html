@@ -363,12 +363,11 @@
     <article class="metric attention"><span class="label">Da controllare</span><strong>{{ board.metrics.attention }}</strong><small>blocchi e correzioni urgenti</small></article>
     <article class="metric"><span class="label">Prossime azioni</span><strong>{{ board.metrics.actionable }}</strong><small>indicatori che possono avanzare</small></article>
     <article class="metric live"><span class="label">In volo</span><strong>{{ board.metrics.in_flight }}</strong><small>sessioni vive adesso</small></article>
-    <article class="metric"><span class="label">In attesa del sito</span><strong>{{ board.metrics.waiting_site }}</strong><small>fusi, da confermare online</small></article>
-    <article class="metric"><span class="label">Pubblicati</span><strong>{{ board.metrics.published }}</strong><small>con prova valida sul sito</small></article>
+    <article class="metric"><span class="label">Pubblicati</span><strong>{{ board.metrics.published }}</strong><small>fusi su master</small></article>
   </div>
 
   <section aria-labelledby="flusso-title">
-    <div class="section-head"><div><h2 id="flusso-title">Il flusso completo</h2><p>Quattro passaggi leggibili, anche se sotto lavorano tre ruoli e un controllo meccanico del sito.</p></div><span class="count">{{ board.metrics.indicators }} indicatori osservati</span></div>
+    <div class="section-head"><div><h2 id="flusso-title">Il flusso completo</h2><p>Quattro passaggi leggibili, anche se sotto lavorano tre ruoli. Il merge e' la pubblicazione.</p></div><span class="count">{{ board.metrics.indicators }} indicatori osservati</span></div>
     <div class="flow-card">
       <div class="flow">
         <div class="flow-step"><b>1. Ammissione</b><span>{{ board.phase_totals.get('ammissione', 0) }} in questa fase</span></div>

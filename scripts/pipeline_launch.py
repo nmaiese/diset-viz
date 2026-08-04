@@ -183,18 +183,18 @@ def plan_launches(dossier, queues=None, mint=None):
     return launches
 
 
-def load_plan(today="", proofs_root=None):
+def load_plan(today=""):
     """Collega i lettori reali (tutti stdlib puri) e ritorna il piano di lancio.
 
     La meta' con l'IO, tenuta fuori da `plan_launches` cosi' il nucleo resta
     provabile senza disco."""
     from scripts import pipeline_log, pipeline_status
-    dossier = practice_timeline.load_real(today=today, proofs_root=proofs_root)
+    dossier = practice_timeline.load_real(today=today)
     queues = pipeline_status.queue_sizes()
     return plan_launches(dossier, queues, mint=pipeline_log.new_run_id)
 
 
-def log_tick(launches, publish, runner=None, do_commit=True, log=print):
+def log_tick(launches, runner=None, do_commit=True, log=print):
     """Il battito del lanciatore: un tick `launch` nel diario, portato su master.
 
     E' l'unico segno che il lanciatore e' partito. Senza, una Routine che gira
@@ -203,14 +203,13 @@ def log_tick(launches, publish, runner=None, do_commit=True, log=print):
     come normalita'). Il tick rende misurabile quel silenzio: `silence` guarda il
     gruppo `lanciatore`, e la sua unica fonte di dati e' questo shard.
 
-    Sta dentro il perimetro `launch` della guardia (solo journal + prove). Il
-    verso di prudenza del cancello vale anche qui: un push perso non e' un errore
-    del tick, si logga e si continua. `runner`/`do_commit` sono iniettabili cosi'
-    il test non tocca git.
+    Sta dentro il perimetro `launch` della guardia (solo journal). Il verso di
+    prudenza del cancello vale anche qui: un push perso non e' un errore del tick,
+    si logga e si continua. `runner`/`do_commit` sono iniettabili cosi' il test non
+    tocca git.
     """
-    from scripts import pipeline_log, verify_publication
-    prove = (publish or {}).get("prove_scritte", 0)
-    summary = f"tick: {len(launches)} unita' pronte, {prove} prove pubblicate"
+    from scripts import pipeline_log
+    summary = f"tick: {len(launches)} unita' pronte"
     entry = pipeline_log.build_entry("launch", "nothing", summary, trigger="routine")
     pipeline_log.append(entry)
     if not do_commit:
@@ -220,7 +219,7 @@ def log_tick(launches, publish, runner=None, do_commit=True, log=print):
     if runner is not None:
         kwargs["runner"] = runner
     try:
-        if not verify_publication.land_on_master([rel], "Diario: tick del lanciatore", **kwargs):
+        if not pipeline_log.land_on_master([rel], "Diario: tick del lanciatore", **kwargs):
             log("  battito: non su master (corsa al push persa), il tick resta locale")
     except Exception as exc:  # un battito non deve far cadere il giro
         log(f"  battito: land_on_master fallito ({type(exc).__name__}), il tick resta locale")
@@ -254,34 +253,31 @@ def main(argv=None):
                         help="mostra solo le prime N voci (le piu' prioritarie)")
     parser.add_argument("--today", default="",
                         help="data di riferimento YYYY-MM-DD per la priorita'")
+    # `--publish` non fa piu' la verifica-sito (rimossa: il progetto ha ratificato
+    # merge = pubblicazione). Il flag resta accettato, e a ogni tick vero della
+    # Routine segna il battito del lanciatore nel diario. `--publish-base` resta
+    # accettato e ignorato, cosi' la Routine viva non erra su un argomento ignoto.
     parser.add_argument("--publish", action="store_true",
-                        help="passo del sito, meccanico e post-deploy: verifica gli "
-                             "indicatori 'fusa' contro il sito e committa le prove su "
-                             "master. Non e' un ruolo, non lancia un agente, non apre "
-                             "PR. Default spento.")
+                        help="tick vero della Routine: segna il battito del lanciatore "
+                             "nel diario, su master. Default spento (sola lettura).")
     parser.add_argument("--publish-base", default=None,
-                        help="il sito da verificare col passo del sito (default: il sito pubblico)")
+                        help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
-
-    publish = None
-    if args.publish:
-        from scripts import verify_publication
-        base = args.publish_base or verify_publication.DEFAULT_BASE
-        publish = verify_publication.publish_step(
-            base=base, log=(lambda *_: None) if args.json else print)
 
     launches = load_plan(today=args.today)
     shown = cap_for_tick(launches, max_parallel=args.max_parallel, top=args.top)
 
-    # Il battito, solo quando il lanciatore fa il passo del sito (cioe' a ogni
-    # tick vero della Routine, che gira `--publish`): una riga `launch` che rende
-    # il suo silenzio misurabile. In sola lettura (`--json` senza `--publish`,
-    # come nei test e nelle ispezioni a mano) non si scrive niente.
+    # Il battito, solo a un tick vero della Routine (`--publish`): una riga `launch`
+    # che rende il suo silenzio misurabile. In sola lettura (`--json` senza
+    # `--publish`, come nei test e nelle ispezioni a mano) non si scrive niente.
     if args.publish:
-        log_tick(launches, publish, log=(lambda *_: None) if args.json else print)
+        log_tick(launches, log=(lambda *_: None) if args.json else print)
 
     if args.json:
-        payload = {"launches": shown, "publish": publish} if publish is not None else shown
+        # A un tick vero (`--publish`) la forma resta un oggetto con `launches`:
+        # e' cio' che l'agente lanciatore legge (`.claude/agents/launcher.md`). In
+        # sola lettura resta l'array nudo, comodo per ispezioni e test.
+        payload = {"launches": shown} if args.publish else shown
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0 if launches else 1
 

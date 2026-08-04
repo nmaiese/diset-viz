@@ -165,8 +165,7 @@ class TheLaunchTick(unittest.TestCase):
         pipeline_log.RUNS_DIR = Path(tmp)
         try:
             entry = pipeline_launch.log_tick(
-                [{"role": "producer"}], {"prove_scritte": 3},
-                log=lambda *_: None, **kwargs)
+                [{"role": "producer"}], log=lambda *_: None, **kwargs)
             shards = list(Path(tmp).glob("launch-*.json"))
         finally:
             pipeline_log.RUNS_DIR = original

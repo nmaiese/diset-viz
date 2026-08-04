@@ -97,8 +97,8 @@ class Board(unittest.TestCase):
         self.assertEqual(b["totals"]["pubblicata"], 1)
 
     def test_rows_carry_stages_published_and_per_indicator_run_history(self):
-        d = practice("ter-x", state="fusa",
-                     completed=["curator", "writer", "reviewer"], priority=3.0)
+        d = practice("ter-x", state="pubblicata",
+                     completed=["curator", "writer", "reviewer", "verificatore"], priority=3.0)
         d.update({"published": True, "verification_valid": True,
                   "runs": ["producer-r1", "verificatore-r2"]})
         runs = [
@@ -113,7 +113,7 @@ class Board(unittest.TestCase):
         ]
         b = pipeline_monitor.board({"ter-x": d}, runs=runs, today=self.TODAY)
         row = b["rows"][0]
-        self.assertEqual(row["completed_stages"], ["curator", "writer", "reviewer"])
+        self.assertEqual(row["completed_stages"], ["curator", "writer", "reviewer", "verificatore"])
         self.assertIs(row["published"], True)
         self.assertIs(row["verification_valid"], True)
         # solo le run in d["runs"], unite per run_id, la piu' recente prima
@@ -138,15 +138,18 @@ class Board(unittest.TestCase):
         self.assertEqual(len(b["recent"]), 5)
         self.assertEqual(b["recent"][0]["run_id"], "r19")  # il piu' recente
 
-    def test_a_fused_indicator_names_the_site_step_instead_of_looking_finished(self):
-        d = practice("ter-fusa", state="fusa",
+    def test_a_published_indicator_reaches_the_final_phase_at_100(self):
+        # Merge = pubblicazione: un indicatore fuso su master arriva all'ultima
+        # fase al 100%, non resta bloccato al 75 aspettando una verifica-sito che
+        # non esiste piu'. E' l'asserzione che tiene onesto il progresso della dashboard.
+        d = practice("ter-pub", state="pubblicata",
                      completed=["curator", "writer", "reviewer", "verificatore"])
-        d.update({"published": None, "verification_valid": True})
-        row = pipeline_monitor.board({"ter-fusa": d}, today=self.TODAY)["rows"][0]
+        d.update({"published": True, "verification_valid": True})
+        row = pipeline_monitor.board({"ter-pub": d}, today=self.TODAY)["rows"][0]
         self.assertEqual(row["phase"], "pubblicazione")
-        self.assertEqual(row["next_step"]["owner"], "verifica automatica online")
-        self.assertIn("prova di pubblicazione", row["next_step"]["label"])
-        self.assertEqual(row["progress"], 75)
+        self.assertEqual(row["work_status"], "pubblicata")
+        self.assertEqual(row["next_step"]["kind"], "done")
+        self.assertEqual(row["progress"], 100)
 
     def test_an_open_smentita_is_an_explicit_producer_action(self):
         d = practice("ter-bad", state="invalidata", flags={"open_smentita": True},

@@ -42,7 +42,7 @@ class Reconstruct(unittest.TestCase):
         base.update(kw)
         return t.reconstruct(**base)
 
-    def test_new_external_full_cycle_is_fusa(self):
+    def test_new_external_full_cycle_is_published(self):
         art = _article("dem:NMIGRATEIN", 2024, "2026-07-26", 2024)
         d = self._run(
             manifest=[{"target_indicator_id": "dem:NMIGRATEIN", "status": "integrated",
@@ -55,10 +55,10 @@ class Reconstruct(unittest.TestCase):
             articles={"dem:NMIGRATEIN": art},
             verifiche=[_verifica("dem-NMIGRATEIN", art)],
         )["dem:NMIGRATEIN"]
-        self.assertEqual(d["state"], "fusa")
+        self.assertEqual(d["state"], "pubblicata")  # merge = pubblicazione
         self.assertTrue(d["score_eligible"])
         self.assertTrue(d["verification_valid"])
-        self.assertEqual(d["published"], None)  # sito non ancora verificato (§8)
+        self.assertTrue(d["published"])  # fuso su master
 
     def test_open_refutation_is_invalidata_and_ranks_top(self):
         art = _article("eur:rd_e_gerdreg", 2023, "2026-07-26", 2023)
@@ -118,7 +118,7 @@ class Reconstruct(unittest.TestCase):
             verifiche=[_verifica("ter-651", art)],
         )["651"]
         self.assertNotIn("curator", d["required_stages"])
-        self.assertEqual(d["state"], "fusa")  # writer+reviewer+verificatore, ciclo pieno
+        self.assertEqual(d["state"], "pubblicata")  # writer+reviewer+verificatore, ciclo pieno = fuso su master
 
     def test_run_is_associated_to_the_indicator_it_names(self):
         d = self._run(runs=[{
@@ -164,50 +164,16 @@ class Reconstruct(unittest.TestCase):
         d = self._run(articles={"dem:Z": art}, verifiche=[stale_smentita])["dem:Z"]
         self.assertFalse(d["flags"].get("open_smentita"))
 
-    def test_site_proof_promotes_fusa_to_pubblicata(self):
+    def test_a_complete_cycle_on_master_is_published(self):
+        # Merge = pubblicazione: un articolo completo e committato (= su master)
+        # con il ciclo obbligatorio chiuso e' `pubblicata`, senza verifica-sito.
         art = _article("651", 2023, "2026-07-27", 2023)
         d = self._run(
             articles={"651": art},
             verifiche=[_verifica("ter-651", art)],
-            verifications_site=[{"code": "ter-651", "ok": True}],
         )["651"]
         self.assertEqual(d["state"], "pubblicata")
         self.assertTrue(d["published"])
-
-    def test_stale_proof_leaves_it_fusa(self):
-        # una prova per una versione vecchia (impronta diversa) non pubblica
-        art = _article("651", 2023, "2026-07-27", 2023)
-        d = self._run(
-            articles={"651": art},
-            verifiche=[_verifica("ter-651", art)],
-            verifications_site=[{"code": "ter-651", "ok": True, "prosa": "vecchia_impronta"}],
-        )["651"]
-        self.assertEqual(d["state"], "fusa")
-        self.assertFalse(d["published"])
-
-    def test_matching_proof_with_fingerprint_publishes(self):
-        art = _article("651", 2023, "2026-07-27", 2023)
-        fp = verification_queue.prose_fingerprint(art)
-        d = self._run(
-            articles={"651": art},
-            verifiche=[_verifica("ter-651", art)],
-            verifications_site=[{"code": "ter-651", "ok": True, "prosa": fp}],
-        )["651"]
-        self.assertEqual(d["state"], "pubblicata")
-
-
-class PublishedFrom(unittest.TestCase):
-    def test_none_when_no_proof(self):
-        self.assertIsNone(t._published_from([], "abc"))
-
-    def test_true_when_matching(self):
-        self.assertTrue(t._published_from([{"ok": True, "prosa": "abc"}], "abc"))
-
-    def test_false_when_only_stale(self):
-        self.assertFalse(t._published_from([{"ok": True, "prosa": "old"}], "abc"))
-
-    def test_unpinned_proof_counts_as_matching(self):
-        self.assertTrue(t._published_from([{"ok": True}], "abc"))
 
 
 def _dossier(timeline, **kw):
@@ -356,11 +322,11 @@ class Reconcile(unittest.TestCase):
     def test_declared_drift_is_reported(self):
         rec = self._reconstructed()
         record = t._dossier_to_record(rec["651"])
-        record["state"] = "pubblicata"  # dichiara pubblicato cio' che gli artefatti dicono fuso
+        record["state"] = "in-lavorazione"  # dichiara in corso cio' che gli artefatti dicono pubblicato
         div = t.reconcile({record["practice_id"]: record}, rec)
         self.assertEqual(len(div), 1)
         self.assertEqual(div[0]["kind"], "divergente")
-        self.assertEqual(div[0]["reconstructed"], "fusa")
+        self.assertEqual(div[0]["reconstructed"], "pubblicata")
 
     def test_missing_declaration_is_reported(self):
         rec = self._reconstructed()

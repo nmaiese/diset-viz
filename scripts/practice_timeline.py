@@ -101,24 +101,19 @@ def _as_int(value):
 
 
 def reconstruct(candidates, manifest, curation, external, articles, verifiche,
-                runs, verifications_site=None, today: str = "") -> dict:
+                runs, today: str = "") -> dict:
     """Ricostruisce, per ogni indicatore, timeline e stato, dai soli artefatti.
 
     Tutti gli argomenti sono dati gia' letti (liste di dict, o `articles` come
     `{key: entry}`), cosi' il nucleo resta puro e il test lo nutre a mano.
-    `verifications_site` e' opzionale: le prove di pubblicazione sul sito (§8),
-    che oggi non esistono ancora, quindi `published` resta `None` finche' non
-    arrivano.
+    `published` = fuso su master (il progetto ha ratificato merge = pubblicazione):
+    non c'e' piu' una verifica-sito ne' uno stato `fusa` intermedio.
 
     Restituisce `{indicator_id: dossier}`, dove ogni dossier porta: `id`,
     `type`, `state`, `entered_at`, `completed_stages`, `flags`, `error_class`,
     `published`, `verification_valid`, `score_eligible`, `runs`, `timeline`.
     """
     from scripts import verification_queue
-    proofs_by_code = {}
-    for proof in (verifications_site or []):
-        if proof.get("code"):
-            proofs_by_code.setdefault(proof["code"], []).append(proof)
 
     # 1. Costruisci l'universo degli indicatori e un evento per ogni traccia.
     dossier: dict = {}
@@ -295,10 +290,10 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
         d["timeline"].sort(key=lambda e: (e.get("at") or "", EDITORIAL_ORDER.get(e.get("stage"), 9)))
         d["runs"] = sorted({r for r in d["runs"] if r})
         d["required_stages"] = _required_for(ind, "curator" in d["completed_stages"])
-        entry = (articles or {}).get(ind)
-        fp = verification_queue.prose_fingerprint(entry) if entry else None
-        d["published"] = _published_from(proofs_by_code.get(code_of(ind), []), fp)
         d["state"], d["error_class"], d["motivo"] = _state_of(d)
+        # `published` = fuso su master (= pubblicata). Vero anche se poi invalidato:
+        # e' cio' che serve alla reliability (un risultato pubblicato che si e' rotto).
+        d["published"] = _reached_publication(d)
         d["priority"] = practice_model.priority_score(
             {"flags": d["flags"], "state": d["state"], "type": d["type"],
              "completed_stages": d["completed_stages"], "score_eligible": d["score_eligible"],
@@ -329,21 +324,21 @@ def _required_for(ind_id: str, has_curation: bool) -> tuple:
     return tuple(req)
 
 
-def _published_from(proofs: list, fingerprint):
-    """Lo stato di pubblicazione dell'indicatore dalle prove sul sito.
+def _reached_publication(d: dict) -> bool:
+    """Vero se l'indicatore e' arrivato alla pubblicazione, cioe' fuso su master:
+    il ciclo editoriale obbligatorio e' completo e l'articolo e' pieno.
 
-    `True` se esiste una prova riuscita la cui impronta `prosa` combacia con la
-    versione attuale (una prova senza impronta e' una prova non ancorata, e vale
-    come combaciante). `False` se ci sono prove ma nessuna combacia: la
-    pubblicazione e' scaduta, il sito serve un'altra versione o il controllo e'
-    fallito. `None` se non c'e' nessuna prova, che e' diverso da fallita.
+    Resta vero anche se lo stato attuale e' `invalidata` (un articolo pubblicato
+    che poi si e' rotto), perche' e' proprio quel caso che la reliability misura.
+    Rimpiazza la vecchia lettura dalle prove sul sito: il progetto ha ratificato
+    merge = pubblicazione, quindi l'articolo committato *e'* la pubblicazione.
     """
-    if not proofs:
-        return None
-    for p in proofs:
-        if p.get("ok") and (p.get("prosa") in (None, fingerprint)):
-            return True
-    return False
+    f = d["flags"]
+    if f.get("rejected") or f.get("approved_candidate") and not d["completed_stages"]:
+        return False
+    required = d.get("required_stages") or practice_model.REQUIRED_STAGES.get(d["type"], ())
+    return bool(required) and set(required).issubset(set(d["completed_stages"])) \
+        and f.get("article_complete", True)
 
 
 def _state_of(d: dict):
@@ -367,14 +362,14 @@ def _state_of(d: dict):
         return "proposta", None, ""
     if f.get("stale_vintage") or f.get("stale_curation"):
         return "invalidata", "cambiamento-in-corsa", ""
-    # ciclo editoriale completo?
+    # ciclo editoriale completo? Su master l'articolo e' committato, e il progetto
+    # ha ratificato merge = pubblicazione: ciclo completo + articolo pieno =
+    # `pubblicata`. Non c'e' piu' uno stato `fusa` intermedio ne' una verifica-sito.
     required = d.get("required_stages") or practice_model.REQUIRED_STAGES.get(d["type"], ())
     if required and set(required).issubset(set(d["completed_stages"])):
         if not f.get("article_complete", True):
             return "in-lavorazione", None, ""
-        if d.get("published") is True:
-            return "pubblicata", None, ""
-        return "fusa", None, ""
+        return "pubblicata", None, ""
     if not d["completed_stages"]:
         return "in-attesa", None, "monte-mancante"
     return "in-lavorazione", None, ""
@@ -414,9 +409,9 @@ def reconcile(declared: dict, reconstructed: dict) -> list:
 
 # --- collegamento ai lettori reali (tutti stdlib puri) ----------------------
 
-def load_real(today: str = "", proofs_root=None):
+def load_real(today: str = ""):
     from scripts import (curate, pending_notes, pipeline_log, indicator_store,
-                         verification_queue, verify_publication)
+                         verification_queue)
     candidates = discovery.read_candidates()
     manifest = pending_notes.read_manifest()
     curation = curate.read_curation()
@@ -424,9 +419,8 @@ def load_real(today: str = "", proofs_root=None):
     articles = indicator_store.load_all(strict=False)
     verifiche = verification_queue.load_verifications()
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
-    proofs = verify_publication.load_proofs(root=proofs_root)
     return reconstruct(candidates, manifest, curation, external, articles,
-                       verifiche, runs, verifications_site=proofs, today=today)
+                       verifiche, runs, today=today)
 
 
 # --- Fase E: i cicli di manutenzione, distinti ma collegati ------------------
@@ -579,10 +573,9 @@ def main(argv=None) -> int:
     parser.add_argument("--check", action="store_true",
                         help="riconcilia i record dichiarati con gli artefatti (esce !=0 se divergono)")
     parser.add_argument("--today", default="", help="data di riferimento YYYY-MM-DD per la priorita'")
-    parser.add_argument("--proofs-root", default=None, help="cartella del registro prove sito (per i test)")
     args = parser.parse_args(argv)
 
-    dossier = load_real(today=args.today, proofs_root=args.proofs_root)
+    dossier = load_real(today=args.today)
 
     if args.check:
         from scripts import practice_store

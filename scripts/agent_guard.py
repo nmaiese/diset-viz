@@ -47,11 +47,11 @@ from scripts import pipeline_gate  # noqa: E402  (bootstrap del path qui sopra)
 # lanciatore (`launch`), che del cancello non e' uno stadio (non apre pull
 # request, non ha una voce in STAGE_PATHS) ma un agente e': non fa il lavoro di
 # nessun ruolo, legge le code e lancia, e il solo gesto che scrive nel repo e' il
-# passo del sito (le prove di pubblicazione, portate su master dagli script, mai
-# da Edit/Write). La voce sta qui e non in STAGE_PATHS apposta: aggiungerla la'
+# battito del tick (una riga di diario, portata su master dagli script, mai da
+# Edit/Write). La voce sta qui e non in STAGE_PATHS apposta: aggiungerla la'
 # insegnerebbe al cancello uno stadio che non deve mai giudicare.
 GUARDED_STAGES = dict(pipeline_gate.STAGE_PATHS)
-GUARDED_STAGES["launch"] = (pipeline_gate.RUN_JOURNAL, pipeline_gate.PUBLICATIONS)
+GUARDED_STAGES["launch"] = (pipeline_gate.RUN_JOURNAL,)
 
 # Comandi che nessuno stadio ha motivo di dare, mai. Regex sul comando intero,
 # prima di ogni altra valutazione: un pattern qui vince anche su un prefisso

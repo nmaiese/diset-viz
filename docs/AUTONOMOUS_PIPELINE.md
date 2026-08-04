@@ -151,15 +151,13 @@ ruolo, indicatore e `run_id` gia' coniato, e l'agente lanciatore
 (`.claude/agents/launcher.md`) fa il resto. La decisione resta cosi'
 deterministica e verificabile da un test, l'esecuzione no.
 
-Con `--publish` il lanciatore fa anche il **passo del sito**, un secondo passo
-meccanico e post-deploy che riusa `verify_publication.publish_step`: verifica gli
-indicatori in stato `fusa` contro `divarioitalia.it` e committa le prove di
-pubblicazione su master, chiudendo la transizione `fusa -> pubblicata`
-(vedi [`EDITORIAL_PRACTICE.md`](EDITORIAL_PRACTICE.md), §8, e piu' sotto). Non e'
-un ruolo, non lancia un agente e non apre PR: e' deterministico, si committa da
-solo con un file nuovo per record, e scrive una prova solo dove il sito conferma
-la versione committata. Un sito irraggiungibile o non ancora dispiegato non
-scrive niente e l'indicatore resta `fusa` per il giro dopo.
+Con `--publish` il lanciatore segna il **battito del lanciatore** nel diario: una
+riga `launch` che `land_on_master` porta su master, cosi' un tick vero lascia una
+traccia anche quando non produce altro. Non e' piu' una verifica del sito: quel
+passo e' stato rimosso quando il progetto ha ratificato **merge = pubblicazione**
+(vedi [`EDITORIAL_PRACTICE.md`](EDITORIAL_PRACTICE.md), §8, e piu' sotto). Senza
+`--publish` (come nei test e nelle ispezioni a mano) il lanciatore e' di sola
+lettura e non scrive niente.
 
 ## Gli store: perche' i conflitti non esistono piu'
 
@@ -173,7 +171,6 @@ contraddicono. Adesso sono directory, un file per record:
 | `content/indicators/` | articolo | produttore | si' |
 | `data/pipeline/runs/` | run | tutti i ruoli | si' |
 | `data/pipeline/verifiche/` | verifica | verificatore | si' |
-| `data/pipeline/pubblicazioni/` | prova di pubblicazione | passo del sito | si' |
 | `data/pipeline/practices/` | pratica (record di stato) | riconciliatore | si' |
 | `data/pipeline/heartbeats/` | sessione in volo | ogni ruolo all'avvio | no (e' il vivo) |
 
@@ -259,8 +256,7 @@ python3 scripts/pipeline_monitor.py --json    # per la rotta o un altro programm
 E' servito vivo dalla rotta Flask protetta **`/_pipeline`** (noindex sempre,
 auto-refresh che si puo' mettere in pausa). La vista ha tre livelli. In testa ci
 sono la frase di diagnosi e i numeri operativi: correzioni urgenti, azioni
-pronte, sessioni vive, indicatori fusi che aspettano il sito e pubblicazioni
-confermate. Subito sotto ci sono il flusso completo
+pronte, sessioni vive e indicatori pubblicati. Subito sotto ci sono il flusso completo
 **ammissione -> produzione -> verifica -> pubblicazione**, le sessioni e le PR
 vive, e la coda prioritaria.
 
@@ -273,7 +269,7 @@ Ricerca, filtri per fase, stato e prossimo responsabile, e ordinamenti per
 priorita', attivita', avanzamento o nome permettono di leggere tutto il catalogo
 senza perdere il contesto. Filtri, schede aperte e pausa del refresh restano
 memorizzati nella sessione del browser. La pagina pubblicata e' collegata quando
-esiste una prova valida sul sito.
+l'articolo e' fuso su master.
 Se `PIPELINE_TOKEN` e' impostato serve solo con `?token=` giusto, altrimenti 404
 (non 403: una pagina interna non conferma nemmeno di esistere); vuoto, in locale,
 e' aperta. Si ricalcola a ogni caricamento dai file committati, non da uno stato
@@ -337,8 +333,8 @@ dall'opinione che l'agente ha del proprio lavoro.
 python3 scripts/pipeline_gate.py --stage producer
 ```
 
-Gli stadi che il cancello conosce sono ancora sette piu' `producer`, `admissions`
-e `publisher`: un ruolo chiude sul verdetto del proprio (`--stage producer`,
+Gli stadi che il cancello conosce sono ancora sette piu' `producer` e
+`admissions`: un ruolo chiude sul verdetto del proprio (`--stage producer`,
 `--stage admissions`, `--stage verificatore`). Controlla, in ordine di danno:
 
 1. **Il perimetro.** Ogni ruolo puo' toccare una lista corta di file, scritta in
@@ -442,44 +438,37 @@ scelta giusta anche a proxy spento. Tre conseguenze che vale la pena conoscere:
   seconda non puo' disfare la prima: se il branch non si cancella il merge resta
   fatto, e lo si dice invece di scrivere `error` su una PR che si e' fusa.
 
-## La pubblicazione: un passo meccanico del lanciatore, non del produttore
+## La pubblicazione: il merge, non un passo a se'
 
-"Fuso su master" non e' "pubblicato". Il repository puo' essere avanti e il sito
-indietro, quindi trattare il merge come pubblicazione e' un falso positivo. La
-transizione `fusa -> pubblicata` e' un passo a se', e vive **fuori** dal
-produttore per una ragione di tempo: il produttore gira **prima** del deploy,
-quando il sito non serve ancora la versione nuova, quindi non puo' verificarla.
-La verifica del sito si puo' fare solo dopo, sul sito gia' dispiegato.
+Il progetto ha ratificato **merge = pubblicazione**: un articolo fuso su master
+**e'** pubblicato. Prima la catena teneva distinti il merge e la pubblicazione,
+con uno stato `fusa` in mezzo e una verifica del sito che portava da `fusa` a
+`pubblicata`. Quella macchina e' stata **rimossa**: `scripts/verify_publication.py`,
+il registro delle prove in `data/pipeline/pubblicazioni/`, lo stadio `publisher`
+del cancello e la transizione `fusa -> pubblicata` non esistono piu'. Lo stato
+`pubblicata` si raggiunge al merge, per costruzione.
 
-Per questo e' il **passo del sito** del lanciatore (`pipeline_launch.py
---publish`, che l'agente lanciatore passa a ogni giro), non un passo del ciclo
-editoriale. Riusa `verify_publication.publish_step`:
+Il compromesso e' dichiarato, non nascosto (vedi
+[`EDITORIAL_PRACTICE.md`](EDITORIAL_PRACTICE.md), §8): "repo avanti / sito
+indietro" non e' piu' osservabile dalla catena. Il deploy segue il merge (un push
+su master ridispiega il sito), ma se fallisce in silenzio il cruscotto continua a
+dire `pubblicata`. In cambio la catena toglie una macchina intera e lo stato
+diventa deterministico, letto dal solo fatto che l'articolo e' su master.
 
-- `publication_queue` elenca gli indicatori in stato `fusa` senza una prova
-  valida.
-- per ciascuno prende la pagina pubblica (la forma a solo code, che l'app 301
-  reindirizza allo slug canonico) e confronta una **firma di contenuto** (un
-  frammento normalizzato del `lead` piu' l'anno del `vintage`) con l'HTML servito.
-- se combacia, `write_proof` scrive la prova in `data/pipeline/pubblicazioni/`
-  (un file per record, con l'impronta `prosa` che la fa scadere quando il testo
-  cambia), e `commit_proofs` -> `land_on_master` la porta su master.
+Il flag `--publish` del lanciatore **resta**, ma non fa piu' la verifica del sito:
+segna solo il **battito del lanciatore** nel diario, una riga `launch` che
+`land_on_master` porta su master cosi' un tick vero lascia una traccia anche
+quando non produce altro. `land_on_master` mette file **nuovi** su master da
+qualsiasi branch, costruendo un commit sopra `origin/master` che contiene **solo**
+quei file (un indice temporaneo seminato da `origin/master` piu' i soli percorsi
+da scrivere): l'invariante "non spinge altro che se stesso" vale per costruzione,
+non per guardia. Chi perde la corsa del push si ricostruisce sopra il master
+aggiornato e ritenta.
 
-`land_on_master` mette file **nuovi** su master da qualsiasi branch, costruendo
-un commit sopra `origin/master` che contiene **solo** quei file (un indice
-temporaneo seminato da `origin/master` piu' i soli percorsi da pubblicare):
-l'invariante "non spinge altro che se stesso" vale per costruzione, non per
-guardia. E' sicuro perche' sono file nuovi con un nome che nessun altro puo'
-scegliere, fuori da qualsiasi pull request. Chi perde la corsa del push si
-ricostruisce sopra il master aggiornato e ritenta.
-
-Regola di prudenza presa dal cancello: un controllo che non ha potuto girare
-**non passa**. Un sito irraggiungibile (`ok=None`) non scrive niente e non e' un
-fallimento, l'indicatore resta `fusa` per il giro dopo; solo un `ok=True` scrive
-la prova. Lo stesso e' agganciato anche nel cancello come stadio `publisher`
-(perimetro `data/pipeline/pubblicazioni/`, controllo `check_publications`: una
-prova con `ok!=True`, o ancorata a un testo che non e' in pagina, non e' una
-pubblicazione), inerte nel giro del lanciatore perche' quel passo committa da se'
-senza aprire PR.
+La **verifica del contenuto** e' un'altra cosa e resta intatta: il verificatore
+prova a smentire le affermazioni della prosa contro i dati, su file committati,
+**prima** del merge. E' editoriale, non e' la verifica del sito che e' stata
+rimossa.
 
 ## Il rientro: la catena lavora anche sul pubblicato
 
@@ -562,7 +551,7 @@ fuori sincrono senza che nessuno se ne accorga, un prompt che punta a un file no
 cron proprio. Anche il lanciatore e' un agente a pieno titolo
 (`.claude/agents/launcher.md`, con modello e guardia nel frontmatter): legge
 `scripts/pipeline_launch.py --json --publish --publish-base https://divarioitalia.it`,
-fa il passo del sito, poi lancia gli agenti in cima al piano **in parallelo**
+segna il battito del lanciatore nel diario, poi lancia gli agenti in cima al piano **in parallelo**
 (piu' `Agent` nello stesso messaggio), ciascuno con il suo `run_id` e il suo
 indicatore. A differenza del dispatcher non ne lancia uno solo: indicatori
 diversi non contendono. Il prompt della Routine e' un puntatore a quella
@@ -597,10 +586,6 @@ Sintomi ricorrenti e cosa significano davvero:
   monitoraggio (o `pipeline_log.py`). Se nessun ruolo registra da giorni il
   problema e' la Routine del lanciatore, non i ruoli: nessuno sta lanciando il
   lavoro.
-- **Un indicatore resta `fusa` e non passa a `pubblicata`.** Il passo del sito
-  non ha trovato la versione online: o il deploy non e' ancora avvenuto, o il
-  sito e' irraggiungibile, o la pagina non porta il lead atteso. Riprova al giro
-  dopo; se persiste, verifica a mano con `verify_publication.py --indicator <id>`.
 - **Un ruolo non apre PR da settimane.** Guarda il monitoraggio: se la sua coda
   e' a zero non e' fermo, e' in pari, e il diario lo distingue.
 - **Il cancello blocca su `blast-radius`.** L'agente ha toccato un file fuori

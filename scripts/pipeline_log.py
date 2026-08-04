@@ -118,7 +118,7 @@ ATTENTION = {"blocked", "stopped", "error"}
 # non e' vuota, quindi il suo silenzio e' una risposta legittima e non un
 # guasto. Chi ha una cadenza e' il lanciatore, ed e' l'unico la cui assenza
 # significa senza ambiguita' che la catena si e' fermata: percio' il suo battito
-# (`launch`) e i ruoli che lancia (`admissions`, `producer`, `publisher`) stanno
+# (`launch`) e i ruoli che lancia (`admissions`, `producer`) stanno
 # tutti nel primo gruppo, l'unico esente dal conto delle code. Tenerli qui, e
 # non in gruppi per-ruolo, e' voluto: i gruppi a coda piena portano solo i nomi
 # dei vecchi stadi, che sono le uniche chiavi che `queue_sizes()` produce, cosi'
@@ -134,7 +134,7 @@ ATTENTION = {"blocked", "stopped", "error"}
 # ha promosso niente e su `promoter` se ha promosso, quindi ci si aspetta una
 # riga dall'uno **o** dall'altro, mai da tutti e due.
 WATCH_GROUPS = (
-    ("lanciatore", ("launch", "admissions", "producer", "publisher"), 1),
+    ("lanciatore", ("launch", "admissions", "producer"), 1),
     ("scout", ("scout",), 7),
     ("cacciatore", ("hunter", "promoter"), 7),
     ("curatore", ("curator",), 7),
@@ -173,6 +173,84 @@ def _git(*args):
         ("git",) + args, cwd=str(PROJECT_ROOT), capture_output=True, text=True
     )
     return result.returncode, result.stdout, result.stderr
+
+
+def _run(argv, cwd=None, env=None):
+    full_env = None
+    if env:
+        full_env = {**os.environ, **env}
+    proc = subprocess.run(argv, cwd=cwd, capture_output=True, text=True, env=full_env)
+    return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
+
+
+def land_on_master(rels, message, runner=_run, cwd=None, log=print, attempts=3,
+                   label="battito"):
+    """Mette file **nuovi** su master da qualsiasi branch, spingendo solo quei file.
+
+    La sessione di una Routine sta sempre su un branch `claude/*`, mai su master, e
+    questi sono file nuovi per record (una riga di diario per run, un nome che
+    nessun altro sceglie), fuori da qualsiasi pull request. Si costruisce un commit
+    **sopra origin/master** che contiene **solo** questi file, seminando un indice
+    temporaneo da origin/master e aggiungendoci i soli percorsi da portare su, e si
+    spinge quel commit su master. L'invariante 'non spinge altro che se stesso' vale
+    per costruzione, non per guardia: HEAD e gli altri file non committati non
+    entrano. Chi perde la corsa del push si ricostruisce sopra il master aggiornato
+    e ritenta.
+
+    Vive qui, con il diario, perche' l'unico uso rimasto e' il battito del
+    lanciatore (`pipeline_launch.log_tick`): un tick `launch` committato a ogni giro,
+    cosi' una Routine che gira a vuoto non si confonde con una mai partita.
+    """
+    rels = sorted(set(rels))
+    if not rels:
+        return False
+
+    import tempfile
+
+    fd, index = tempfile.mkstemp(prefix="land-index-")
+    os.close(fd)
+    try:
+        for attempt in range(1, attempts + 1):
+            code, out = runner(["git", "fetch", "origin", "master"], cwd=cwd)
+            if code != 0:
+                log(f"  {label}: git fetch origin master fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "read-tree", "origin/master"], cwd=cwd,
+                               env={"GIT_INDEX_FILE": index})
+            if code != 0:
+                log(f"  {label}: read-tree origin/master fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "add", "--", *rels], cwd=cwd,
+                               env={"GIT_INDEX_FILE": index})
+            if code != 0:
+                log(f"  {label}: git add fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "write-tree"], cwd=cwd,
+                               env={"GIT_INDEX_FILE": index})
+            tree = out.split()[0] if code == 0 and out.split() else ""
+            if not tree:
+                log(f"  {label}: write-tree fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(
+                ["git", "commit-tree", tree, "-p", "origin/master", "-m", message],
+                cwd=cwd)
+            commit = out.split()[0] if code == 0 and out.split() else ""
+            if not commit:
+                log(f"  {label}: commit-tree fallito ({out.strip()[:120]})")
+                return False
+            code, out = runner(["git", "push", "origin", f"{commit}:master"], cwd=cwd)
+            if code == 0:
+                log(f"  {label}: {len(rels)} su master")
+                return True
+            log(f"  {label}: push perso, ritento ({attempt}/{attempts})")
+        log(f"  {label.upper()} NON SU MASTER: la corsa al push non si e' chiusa in "
+            f"{attempts} tentativi.")
+        return False
+    finally:
+        try:
+            os.remove(index)
+        except OSError:
+            pass
 
 
 def new_run_id(stage):

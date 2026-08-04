@@ -53,11 +53,10 @@ def compute(dossier: dict, runs: list, today: str = "", soglia_giorni: int = 30,
         return practice_model._days_between(d.get("entered_at", ""), end)
 
     aperte = [d for d in indicators if d["state"] not in TERMINAL_STATES]
-    fusa_senza_prova = [d for d in indicators if d["state"] == "fusa" and d["published"] is None]
     invalidati_pubblicati = [d for d in indicators
                              if d["published"] is True and d["state"] == "invalidata"]
     errori_pubblici = [d for d in indicators if d["flags"].get("open_smentita")
-                       and d["state"] in ("fusa", "pubblicata", "invalidata")]
+                       and d["state"] in ("pubblicata", "invalidata")]
     # Stesso predicato di `pipeline_monitor.is_stuck`: una `in-attesa` conta come
     # ferma solo se il motivo non e' monte-mancante (contropressione normale). Se
     # divergesse, la metrica prima/dopo direbbe "bloccate" cio' che il cruscotto
@@ -86,7 +85,6 @@ def compute(dossier: dict, runs: list, today: str = "", soglia_giorni: int = 30,
                                             if d["entered_at"] and d["timeline"]), n),
             "quota_run_associati_a_un_indicatore_pct": _pct(run_associati, len(runs)),
             "pratiche_stato_incoerente": incoerenti,
-            "fusa_senza_prova_sul_sito": len(fusa_senza_prova),
         },
         "affidabilita": {
             "risultati_invalidati_pubblicati": len(invalidati_pubblicati),
@@ -130,10 +128,10 @@ def _resolve_today(today: str = "") -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
 
-def load_and_compute(today: str = "", soglia_giorni: int = 30, proofs_root=None):
+def load_and_compute(today: str = "", soglia_giorni: int = 30):
     from scripts import pipeline_log, practice_store
     today = _resolve_today(today)
-    dossier = practice_timeline.load_real(today=today, proofs_root=proofs_root)
+    dossier = practice_timeline.load_real(today=today)
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
     declared = practice_store.load_all(strict=False) or None
     return compute(dossier, runs, today=today, soglia_giorni=soglia_giorni, declared=declared)

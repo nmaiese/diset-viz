@@ -32,12 +32,6 @@ class Compute(unittest.TestCase):
         self.assertEqual(out["affidabilita"]["errori_pubblici_dopo_pubblicazione"], 1)
         self.assertEqual(out["qualita"]["smentite_aperte"], 1)
 
-    def test_fusa_without_proof_is_flagged(self):
-        dossier = {"a": _d("a", "fusa", published=None),
-                   "b": _d("b", "pubblicata", published=True)}
-        out = self._metrics(dossier)
-        self.assertEqual(out["osservabilita"]["fusa_senza_prova_sul_sito"], 1)
-
     def test_invalidated_but_published_is_reliability_hit(self):
         dossier = {"a": _d("a", "invalidata", published=True)}
         out = self._metrics(dossier)

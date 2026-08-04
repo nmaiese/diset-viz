@@ -228,7 +228,7 @@ ri-architettura, e' tre ruoli, non sette stadi:
 
     ammissione (scout+hunter+promoter) -> produttore (cura+scrive+rilegge+firma) -> verificatore
                                                                                         |
-                                                                     cancello -> merge auto -> live -> passo del sito
+                                                                     cancello -> merge auto (= pubblicata)
 
 | ruolo | agente | code deterministiche che drena |
 | --- | --- | --- |
