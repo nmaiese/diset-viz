@@ -1156,6 +1156,18 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
     def test_the_store_is_the_case_that_made_this_necessary(self):
         self.assertIn("scripts", self._copied_dirs())
 
+    def test_the_pipeline_history_data_is_shipped(self):
+        """La dashboard (`/_pipeline` e `/_pipeline/api/*`) legge a runtime la storia
+        committata sotto `data/`: le prove di pubblicazione, i diari delle run, le
+        verifiche. Senza la COPY nel Dockerfile il server calcola ZERO pubblicati (le
+        prove mancano) e una cronologia vuota (i diari mancano), un guasto che si vede
+        solo in produzione, mai nella suite qui, che gira col repo intero."""
+        self.assertIn(
+            "data", self._copied_dirs(),
+            "il Dockerfile non copia data/: in produzione la dashboard mostra 0 "
+            "pubblicati e cronologia vuota (prove e diari assenti dall'immagine).",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
