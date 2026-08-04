@@ -58,7 +58,14 @@ def compute(dossier: dict, runs: list, today: str = "", soglia_giorni: int = 30,
                              if d["published"] is True and d["state"] == "invalidata"]
     errori_pubblici = [d for d in indicators if d["flags"].get("open_smentita")
                        and d["state"] in ("fusa", "pubblicata", "invalidata")]
-    bloccate = [d for d in indicators if d["state"] in ("in-attesa", "in-quarantena")]
+    # Stesso predicato di `pipeline_monitor.is_stuck`: una `in-attesa` conta come
+    # ferma solo se il motivo non e' monte-mancante (contropressione normale). Se
+    # divergesse, la metrica prima/dopo direbbe "bloccate" cio' che il cruscotto
+    # non chiama bloccato.
+    bloccate = [d for d in indicators
+                if d["state"] == "in-quarantena"
+                or (d["state"] == "in-attesa"
+                    and d.get("motivo") not in (None, "", "monte-mancante"))]
     invalidate = [d for d in indicators if d["state"] == "invalidata"]
     ferme_oltre = [d for d in aperte if days_open(d) > soglia_giorni]
 

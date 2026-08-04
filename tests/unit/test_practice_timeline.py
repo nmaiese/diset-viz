@@ -267,6 +267,15 @@ class Cycles(unittest.TestCase):
         cy = t.cycles_for(d)
         self.assertEqual([c["type"] for c in cy], ["nuovo", "aggiornamento"])
 
+    def test_active_record_persists_the_wait_motivo(self):
+        # Il record serializzato deve portare il motivo, o `in-attesa` perde
+        # l'urgenza (una sosta normale vs un blocco esterno diventano uguali).
+        d = _dossier([], state="in-attesa", motivo="dipendenza-esterna",
+                     error_class="ripetibile-dopo-cambio-esterno")
+        rec = t.cycles_for(d)[-1]
+        self.assertTrue(rec["active"])
+        self.assertEqual(rec["motivo"], "dipendenza-esterna")
+
     def test_empty_timeline_is_one_active_cycle(self):
         cy = t.cycles_for(_dossier([]))
         self.assertEqual(len(cy), 1)

@@ -8,10 +8,10 @@ import unittest
 from scripts import practice_metrics as m
 
 
-def _d(ind, state, published=None, flags=None, entered="2026-01-01", runs=None, timeline=None):
+def _d(ind, state, published=None, flags=None, entered="2026-01-01", runs=None, timeline=None, motivo=""):
     return {
         "id": ind, "state": state, "published": published,
-        "flags": flags or {}, "entered_at": entered,
+        "flags": flags or {}, "entered_at": entered, "motivo": motivo,
         "runs": runs or [], "timeline": timeline if timeline is not None else [{"at": entered}],
     }
 
@@ -53,6 +53,17 @@ class Compute(unittest.TestCase):
         old = _d("a", "in-lavorazione", entered="2025-01-01")
         out = self._metrics({"a": old}, soglia_giorni=30)
         self.assertEqual(out["velocita"]["ferme_oltre_soglia"], 1)
+
+    def test_bloccate_excludes_normal_upstream_wait(self):
+        # Stesso predicato di is_stuck: monte-mancante non e' bloccata, un blocco
+        # esterno si'. La metrica non deve dire "bloccato" cio' che il cruscotto non chiama tale.
+        dossier = {
+            "a": _d("a", "in-attesa", motivo="monte-mancante"),
+            "b": _d("b", "in-attesa", motivo="dipendenza-esterna"),
+            "c": _d("c", "in-quarantena"),
+        }
+        out = self._metrics(dossier)
+        self.assertEqual(out["velocita"]["bloccate"], 2)  # b + c, non a
 
     def test_longitudinal_metrics_are_none_not_zero(self):
         out = self._metrics({"a": _d("a", "fusa")})

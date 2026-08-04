@@ -503,6 +503,9 @@ def _cycle_record(d: dict, seq: int, ctype: str, events: list, active: bool) -> 
             "required_stages": d.get("required_stages", []),
             "flags": d["flags"],
             "error_class": d["error_class"],
+            # Il motivo distingue una sosta normale (monte-mancante) da un blocco
+            # esterno/tecnico: senza, il record `in-attesa` perde l'urgenza (§3, §9).
+            "motivo": d.get("motivo", ""),
             "score_eligible": d["score_eligible"],
             "published": d["published"],
             "verification_valid": d["verification_valid"],

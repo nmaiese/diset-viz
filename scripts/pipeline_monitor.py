@@ -425,7 +425,13 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
         run_ids.update(beat.get("run_id") for beat in row["in_flight"])
         row["open_prs"] = [prs_by_run[rid] for rid in run_ids if rid in prs_by_run]
         row["work_status"] = work_status(row)
-        row["work_status_help"] = STATUS_HELP.get(row["work_status"], "")
+        # Lo stato di sosta e' uno solo ("in attesa"), ma il tooltip del badge porta
+        # il motivo specifico (monte-mancante vs blocco esterno/tecnico), cosi'
+        # l'operatore vede la differenza pur con un solo stato armonizzato.
+        if row.get("state") == "in-attesa" and row.get("reason"):
+            row["work_status_help"] = row["reason"]
+        else:
+            row["work_status_help"] = STATUS_HELP.get(row["work_status"], "")
 
     phase_totals = {}
     for row in rows:
