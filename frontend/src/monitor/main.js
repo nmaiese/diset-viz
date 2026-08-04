@@ -83,8 +83,8 @@ async function render(supabase, currentUser) {
         '<div class="mon-head2"><h2>Catalogo indicatori</h2><button id="cat-refresh" class="mon-btn mon-btn--ghost mon-btn--sm">Aggiorna</button></div>' +
         '<div class="mon-filters">' +
           '<input id="cat-q" type="search" placeholder="Cerca nome, codice, stato, bandiera">' +
+          '<select id="cat-status"><option value="">Tutte le lavorazioni</option></select>' +
           '<select id="cat-phase"><option value="">Tutte le fasi</option></select>' +
-          '<select id="cat-state"><option value="">Tutti gli stati</option></select>' +
           '<select id="cat-owner"><option value="">Tutti i prossimi ruoli</option></select>' +
         "</div>" +
         '<div id="cat-totals" class="mon-totals"></div>' +
@@ -120,7 +120,7 @@ async function render(supabase, currentUser) {
 
   document.getElementById("cat-refresh").onclick = () => loadBoard(supabase);
   document.getElementById("run-refresh").onclick = () => loadRuns(supabase);
-  ["cat-q", "cat-phase", "cat-state", "cat-owner"].forEach((id) => {
+  ["cat-q", "cat-status", "cat-phase", "cat-owner"].forEach((id) => {
     document.getElementById(id).oninput = renderCatalog;
     document.getElementById(id).onchange = renderCatalog;
   });
@@ -162,10 +162,34 @@ async function loadBoard(supabase) {
   const data = await authedJson(supabase, "/_pipeline/api/board");
   boardData = data;
   const rows = (data && data.rows) || [];
+  // La lavorazione, non lo stato grezzo del modello: STATUS_ORDER da' l'ordine.
+  fillOptions("cat-status", STATUS_ORDER.filter((s) => rows.some((r) => workStatus(r) === s)));
   fillOptions("cat-phase", uniq(rows.map((r) => r.phase)));
-  fillOptions("cat-state", uniq(rows.map((r) => r.state)));
   fillOptions("cat-owner", uniq(rows.map((r) => r.next_step && r.next_step.owner)));
   renderCatalog();
+}
+
+// La lavorazione come la intende chi guarda: "in lavorazione" e' solo cio' che la
+// pipeline ha davvero toccato (una run, o un ruolo in volo). Lo stato grezzo del
+// modello (`state`) marca "in-lavorazione" ogni indicatore non ancora pubblicato,
+// comprese le centinaia mai lavorate (prosa legacy, zero run): qui si separano.
+// Derivato lato console, senza toccare il modello condiviso con /_pipeline.
+const STATUS_ORDER = [
+  "in lavorazione",
+  "in coda",
+  "in attesa di monte",
+  "da pubblicare",
+  "pubblicata",
+  "chiusa",
+];
+
+function workStatus(r) {
+  if (r.published === true) return "pubblicata";
+  if (r.state === "chiusa") return "chiusa";
+  if (r.state === "fusa") return "da pubblicare";
+  if (r.state === "in-attesa-di-monte") return "in attesa di monte";
+  if ((r.in_flight && r.in_flight.length) || (r.runs && r.runs.length)) return "in lavorazione";
+  return "in coda";
 }
 
 async function loadRuns(supabase) {
@@ -205,36 +229,45 @@ function renderCatalog() {
   if (!boardData) return (el.innerHTML = '<p class="mon-empty">Catalogo non disponibile (login o rete).</p>');
   const q = (document.getElementById("cat-q").value || "").trim().toLowerCase();
   const phase = document.getElementById("cat-phase").value;
-  const state = document.getElementById("cat-state").value;
+  const status = document.getElementById("cat-status").value;
   const owner = document.getElementById("cat-owner").value;
   const rows = (boardData.rows || []).filter((r) => {
     const ns = r.next_step || {};
-    const key = [r.id, r.name, r.family, r.state, r.phase, ns.owner, ns.label, (r.flags || []).join(" ")]
+    const st = workStatus(r);
+    const key = [r.id, r.name, r.family, r.state, st, r.phase, ns.owner, ns.label, (r.flags || []).join(" ")]
       .join(" ")
       .toLowerCase();
     return (
       (!q || key.indexOf(q) !== -1) &&
       (!phase || r.phase === phase) &&
-      (!state || r.state === state) &&
+      (!status || st === status) &&
       (!owner || (ns.owner || "") === owner)
     );
   });
 
-  const byState = {};
-  rows.forEach((r) => (byState[r.state] = (byState[r.state] || 0) + 1));
+  // Totali per lavorazione, nell'ordine di STATUS_ORDER: e' la riga che risponde
+  // a "perche' sono tutti in lavorazione", separando la coda da cio' che si lavora.
+  const byStatus = {};
+  rows.forEach((r) => {
+    const s = workStatus(r);
+    byStatus[s] = (byStatus[s] || 0) + 1;
+  });
   document.getElementById("cat-totals").innerHTML =
     '<span class="mon-chip">' + rows.length + " indicatori</span>" +
-    Object.keys(byState)
-      .sort()
-      .map((s) => '<span class="mon-chip">' + escapeHtml(s) + ": " + byState[s] + "</span>")
+    STATUS_ORDER.filter((s) => byStatus[s])
+      .map((s) => '<span class="mon-chip">' + escapeHtml(s) + ": " + byStatus[s] + "</span>")
       .join("");
 
   if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun indicatore col filtro attuale.</p>');
   el.innerHTML =
-    "<table><thead><tr><th>Indicatore</th><th>Famiglia</th><th>Fase</th><th>Stato</th><th>Ciclo</th><th>Prossimo passo</th><th>Token</th></tr></thead><tbody>" +
+    "<table><thead><tr><th>Indicatore</th><th>Famiglia</th><th>Lavorazione</th><th>Fase</th><th>Ciclo</th><th>Prossimo passo</th><th>Token</th><th>Articolo</th></tr></thead><tbody>" +
     rows
       .map((r) => {
         const ns = r.next_step || {};
+        const st = workStatus(r);
+        const link = r.published_url
+          ? '<a href="' + escapeHtml(r.published_url) + '" target="_blank" rel="noopener">apri ' + String.fromCharCode(8599) + "</a>"
+          : "";
         const name = r.published_url
           ? '<a href="' + escapeHtml(r.published_url) + '" target="_blank" rel="noopener">' + escapeHtml(r.name) + "</a>"
           : escapeHtml(r.name);
@@ -244,11 +277,12 @@ function renderCatalog() {
         return (
           "<tr><td>" + name + "<br><small>" + escapeHtml(r.id) + "</small></td>" +
           "<td>" + escapeHtml(r.family) + "</td>" +
+          '<td><span class="mon-status mon-status--' + st.replace(/ /g, "-") + '">' + escapeHtml(st) + "</span></td>" +
           "<td>" + escapeHtml(r.phase) + "</td>" +
-          "<td>" + escapeHtml(r.state) + "</td>" +
           '<td class="mon-mini">' + mini + "</td>" +
           "<td>" + escapeHtml(ns.owner || "") + "<br><small>" + escapeHtml(ns.label || "") + "</small></td>" +
-          "<td>" + (r.tokens_total != null ? Number(r.tokens_total).toLocaleString("it-IT") : "") + "</td></tr>"
+          "<td>" + (r.tokens_total != null ? Number(r.tokens_total).toLocaleString("it-IT") : "") + "</td>" +
+          "<td>" + link + "</td></tr>"
         );
       })
       .join("") +
