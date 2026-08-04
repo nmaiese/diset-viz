@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-04T05:57:29+00:00",
+ "base_commit": "d03f908",
+ "branch": "claude/sleepy-mayer-vcp2h4",
+ "claude_code_version": "2.1.221 (Claude Code)",
+ "commit": "23bb066",
+ "detail": [],
+ "duration_seconds": 13,
+ "gate": "",
+ "outcome": "nothing",
+ "pr": "",
+ "run_id": "launch-20260804T055729Z-b622",
+ "session_id": "2942ff79-88d1-591f-82ae-61ca6267fdb3",
+ "stage": "launch",
+ "summary": "tick: 373 unita' pronte, 2 prove pubblicate",
+ "trigger": "routine"
+}
