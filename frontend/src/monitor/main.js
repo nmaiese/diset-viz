@@ -260,7 +260,8 @@ function renderCatalog() {
   const phase = document.getElementById("cat-phase").value;
   const status = document.getElementById("cat-status").value;
   const owner = document.getElementById("cat-owner").value;
-  const rows = (boardData.rows || []).filter((r) => {
+  const allRows = boardData.rows || [];
+  const rows = allRows.filter((r) => {
     const ns = r.next_step || {};
     const st = workStatus(r);
     const key = [r.id, r.name, r.family, r.state, st, r.phase, ns.owner, ns.label, (r.flags || []).join(" ")]
@@ -274,22 +275,51 @@ function renderCatalog() {
     );
   });
 
-  // Totali per lavorazione, nell'ordine di STATUS_ORDER: e' la riga che risponde
-  // a "perche' sono tutti in lavorazione", separando la coda da cio' che si lavora.
-  const byStatus = {};
-  rows.forEach((r) => {
+  // Contatori COMPLETI, sul catalogo intero, non sul solo filtro: restano stabili
+  // mentre si filtra, cosi' "quanti pubblicati, quanti rimangono" si legge sempre.
+  // Ogni pastiglia e' un filtro con un clic (toggle) sulla lavorazione; "pubblicata"
+  // e' la scorciatoia per vedere solo i pubblicati. Il conteggio mostrato riflette
+  // il filtro attuale, separato dai totali globali.
+  const byStatusAll = {};
+  allRows.forEach((r) => {
     const s = workStatus(r);
-    byStatus[s] = (byStatus[s] || 0) + 1;
+    byStatusAll[s] = (byStatusAll[s] || 0) + 1;
   });
-  document.getElementById("cat-totals").innerHTML =
-    '<span class="mon-chip">' + rows.length + " indicatori</span>" +
-    STATUS_ORDER.filter((s) => byStatus[s])
-      .map((s) => '<span class="mon-chip">' + escapeHtml(s) + ": " + byStatus[s] + "</span>")
-      .join("");
+  const published = byStatusAll["pubblicata"] || 0;
+  const closed = byStatusAll["chiusa"] || 0;
+  const remaining = allRows.length - published - closed;
+  const summary =
+    '<span class="mon-chip mon-chip--strong">Totale ' + allRows.length + "</span>" +
+    '<span class="mon-chip mon-chip--strong">Pubblicati ' + published + "</span>" +
+    '<span class="mon-chip mon-chip--strong">Rimanenti ' + remaining + "</span>" +
+    (rows.length !== allRows.length ? '<span class="mon-chip">Mostrati ' + rows.length + "</span>" : "");
+  const chips = STATUS_ORDER.filter((s) => byStatusAll[s])
+    .map(
+      (s) =>
+        '<button type="button" class="mon-chip mon-chip--click' + (status === s ? " mon-chip--active" : "") +
+        '" data-status="' + escapeHtml(s) + '">' + escapeHtml(s) + ": " + byStatusAll[s] + "</button>"
+    )
+    .join("");
+  const totalsEl = document.getElementById("cat-totals");
+  totalsEl.innerHTML =
+    '<div class="mon-totals-row">' + summary + "</div>" +
+    '<div class="mon-totals-row">' +
+      '<button type="button" class="mon-chip mon-chip--click' + (!status ? " mon-chip--active" : "") + '" data-status="">tutti</button>' +
+      chips +
+    "</div>";
+  // Clic su una pastiglia = imposta (o azzera) il filtro lavorazione, poi ridisegna.
+  totalsEl.querySelectorAll(".mon-chip--click").forEach((btn) => {
+    btn.onclick = () => {
+      const sel = document.getElementById("cat-status");
+      const target = btn.getAttribute("data-status");
+      sel.value = sel.value === target ? "" : target; // ri-clic sull'attivo = azzera
+      renderCatalog();
+    };
+  });
 
   if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun indicatore col filtro attuale.</p>');
   el.innerHTML =
-    "<table><thead><tr><th>Indicatore</th><th>Famiglia</th><th>Lavorazione</th><th>Fase</th><th>Ciclo</th><th>Prossimo passo</th><th>Token</th><th>Articolo</th></tr></thead><tbody>" +
+    '<table class="mon-cards"><thead><tr><th>Indicatore</th><th>Famiglia</th><th>Lavorazione</th><th>Fase</th><th>Ciclo</th><th>Prossimo passo</th><th>Token</th><th>Articolo</th></tr></thead><tbody>' +
     rows
       .map((r) => {
         const ns = r.next_step || {};
@@ -304,14 +334,14 @@ function renderCatalog() {
           .map((p) => '<span title="' + escapeHtml(p.label) + " (" + escapeHtml(p.status) + ')">' + (MINI_STATUS[p.status] || "○") + "</span>")
           .join(" ");
         return (
-          "<tr><td>" + name + "<br><small>" + escapeHtml(r.id) + "</small></td>" +
-          "<td>" + escapeHtml(r.family) + "</td>" +
-          '<td><span class="mon-status mon-status--' + st.replace(/ /g, "-") + '">' + escapeHtml(st) + "</span></td>" +
-          "<td>" + escapeHtml(r.phase) + "</td>" +
-          '<td class="mon-mini">' + mini + "</td>" +
-          "<td>" + escapeHtml(ns.owner || "") + "<br><small>" + escapeHtml(ns.label || "") + "</small></td>" +
-          "<td>" + (r.tokens_total != null ? Number(r.tokens_total).toLocaleString("it-IT") : "") + "</td>" +
-          "<td>" + link + "</td></tr>"
+          '<tr><td data-label="Indicatore">' + name + "<br><small>" + escapeHtml(r.id) + "</small></td>" +
+          '<td data-label="Famiglia">' + escapeHtml(r.family) + "</td>" +
+          '<td data-label="Lavorazione"><span class="mon-status mon-status--' + st.replace(/ /g, "-") + '">' + escapeHtml(st) + "</span></td>" +
+          '<td data-label="Fase">' + escapeHtml(r.phase) + "</td>" +
+          '<td data-label="Ciclo" class="mon-mini">' + mini + "</td>" +
+          '<td data-label="Prossimo passo">' + escapeHtml(ns.owner || "") + "<br><small>" + escapeHtml(ns.label || "") + "</small></td>" +
+          '<td data-label="Token">' + (r.tokens_total != null ? Number(r.tokens_total).toLocaleString("it-IT") : "") + "</td>" +
+          '<td data-label="Articolo">' + link + "</td></tr>"
         );
       })
       .join("") +
@@ -369,20 +399,20 @@ function renderRuns() {
 
   if (!runs.length) return (el.innerHTML = '<p class="mon-empty">Nessuna run col filtro attuale.</p>');
   el.innerHTML =
-    "<table><thead><tr><th>Quando</th><th>Stadio</th><th>Indicatore</th><th>Esito</th><th>Durata</th><th>Token</th><th>PR</th><th>Commit</th></tr></thead><tbody>" +
+    '<table class="mon-cards"><thead><tr><th>Quando</th><th>Stadio</th><th>Indicatore</th><th>Esito</th><th>Durata</th><th>Token</th><th>PR</th><th>Commit</th></tr></thead><tbody>' +
     runs
       .map((r) => {
         const inds = (r.indicators || []);
         const indCell = inds.length === 1 ? escapeHtml(inds[0]) : inds.length ? escapeHtml(inds.join(", ")) : "";
         return (
-          "<tr><td>" + escapeHtml((r.at || "").replace("T", " ").slice(0, 16)) + "</td>" +
-          "<td>" + escapeHtml(r.stage) + "</td>" +
-          '<td title="' + escapeHtml(r.summary || "") + '">' + indCell + "</td>" +
-          "<td>" + escapeHtml(r.outcome) + "</td>" +
-          "<td>" + escapeHtml(fmtDuration(r.duration_seconds)) + "</td>" +
-          "<td>" + (r.tokens != null ? Number(r.tokens).toLocaleString("it-IT") : "") + "</td>" +
-          "<td>" + (r.pr ? "#" + escapeHtml(String(r.pr)) : "") + "</td>" +
-          "<td>" + escapeHtml(r.commit || "") + "</td></tr>"
+          '<tr><td data-label="Quando">' + escapeHtml((r.at || "").replace("T", " ").slice(0, 16)) + "</td>" +
+          '<td data-label="Stadio">' + escapeHtml(r.stage) + "</td>" +
+          '<td data-label="Indicatore" title="' + escapeHtml(r.summary || "") + '">' + indCell + "</td>" +
+          '<td data-label="Esito">' + escapeHtml(r.outcome) + "</td>" +
+          '<td data-label="Durata">' + escapeHtml(fmtDuration(r.duration_seconds)) + "</td>" +
+          '<td data-label="Token">' + (r.tokens != null ? Number(r.tokens).toLocaleString("it-IT") : "") + "</td>" +
+          '<td data-label="PR">' + (r.pr ? "#" + escapeHtml(String(r.pr)) : "") + "</td>" +
+          '<td data-label="Commit">' + escapeHtml(r.commit || "") + "</td></tr>"
         );
       })
       .join("") +
@@ -403,13 +433,13 @@ function renderActivity(rows) {
   if (!el) return;
   if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun lavoro in volo.</p>');
   el.innerHTML =
-    '<table><thead><tr><th>Tipo</th><th>Ruolo</th><th>Indicatore</th><th>PR</th><th>CI</th><th>Aggiornato</th></tr></thead><tbody>' +
+    '<table class="mon-cards"><thead><tr><th>Tipo</th><th>Ruolo</th><th>Indicatore</th><th>PR</th><th>CI</th><th>Aggiornato</th></tr></thead><tbody>' +
     rows
       .map(
         (r) =>
-          "<tr><td>" + escapeHtml(r.kind) + "</td><td>" + escapeHtml(r.role) + "</td><td>" +
-          escapeHtml(r.indicator) + "</td><td>" + (r.pr ? "#" + r.pr : "") + "</td><td>" +
-          escapeHtml(r.ci || "") + "</td><td>" + escapeHtml(r.updated_at) + "</td></tr>"
+          '<tr><td data-label="Tipo">' + escapeHtml(r.kind) + '</td><td data-label="Ruolo">' + escapeHtml(r.role) + '</td><td data-label="Indicatore">' +
+          escapeHtml(r.indicator) + '</td><td data-label="PR">' + (r.pr ? "#" + r.pr : "") + '</td><td data-label="CI">' +
+          escapeHtml(r.ci || "") + '</td><td data-label="Aggiornato">' + escapeHtml(r.updated_at) + "</td></tr>"
       )
       .join("") +
     "</tbody></table>";
@@ -420,13 +450,13 @@ function renderTokens(rows) {
   if (!el) return;
   if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun consumo registrato.</p>');
   el.innerHTML =
-    '<table><thead><tr><th>Run</th><th>Indicatore</th><th>Ruolo</th><th>Token</th><th>Aggiornato</th></tr></thead><tbody>' +
+    '<table class="mon-cards"><thead><tr><th>Run</th><th>Indicatore</th><th>Ruolo</th><th>Token</th><th>Aggiornato</th></tr></thead><tbody>' +
     rows
       .map(
         (r) =>
-          "<tr><td>" + escapeHtml(r.run_id) + "</td><td>" + escapeHtml(r.indicator) + "</td><td>" +
-          escapeHtml(r.role) + "</td><td>" + Number(r.tokens || 0).toLocaleString("it-IT") +
-          "</td><td>" + escapeHtml(r.updated_at) + "</td></tr>"
+          '<tr><td data-label="Run">' + escapeHtml(r.run_id) + '</td><td data-label="Indicatore">' + escapeHtml(r.indicator) + '</td><td data-label="Ruolo">' +
+          escapeHtml(r.role) + '</td><td data-label="Token">' + Number(r.tokens || 0).toLocaleString("it-IT") +
+          '</td><td data-label="Aggiornato">' + escapeHtml(r.updated_at) + "</td></tr>"
       )
       .join("") +
     "</tbody></table>";
