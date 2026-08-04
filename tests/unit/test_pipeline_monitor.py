@@ -445,14 +445,20 @@ class ApplyOutcomes(unittest.TestCase):
         pipeline_monitor._apply_outcomes(dossier, {"167": self._snap("v1")})
         self.assertEqual(dossier["167"]["state"], "in-lavorazione")
 
-    def test_overlay_retires_when_committed_has_caught_up(self):
+    def test_an_invalidation_of_a_published_indicator_is_not_retired(self):
+        # Il caso che una rete 'stessi stadi e stesso published' ritirava a torto:
+        # una smentita ha gli stessi stadi e published True del committato gia'
+        # pubblicato, cambiano solo state/flags. L'overlay deve passare.
         dossier = {"167": practice("167", state="pubblicata",
                                    completed=["writer", "reviewer", "verificatore"])}
-        dossier["167"]["runs"] = ["altra"]
+        dossier["167"]["runs"] = ["verifica-vecchia"]
         dossier["167"]["published"] = True
-        # run_id nuovo, ma il committato e' gia' pari: la rete lo ritira.
-        pipeline_monitor._apply_outcomes(dossier, {"167": self._snap("v2")})
-        self.assertNotIn("v2", dossier["167"]["runs"])
+        smentita = self._snap("smentita-r", state="invalidata", published=True,
+                              flags={"open_smentita": True}, verification_valid=True)
+        pipeline_monitor._apply_outcomes(dossier, {"167": smentita})
+        self.assertEqual(dossier["167"]["state"], "invalidata")
+        self.assertTrue(dossier["167"]["flags"].get("open_smentita"))
+        self.assertIn("smentita-r", dossier["167"]["runs"])
 
     def test_a_new_indicator_is_inserted(self):
         dossier = {}

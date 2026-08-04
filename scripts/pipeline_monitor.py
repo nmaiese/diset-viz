@@ -735,18 +735,6 @@ _OVERLAY_FIELDS = ("state", "type", "entered_at", "completed_stages",
                    "score_eligible", "error_class", "motivo", "priority")
 
 
-def _committed_caught_up(d: dict, snap: dict) -> bool:
-    """Vero se il dossier committato ha gia' raggiunto (o superato) lo snapshot,
-    nel qual caso l'overlay va ritirato anche se il `run_id` non lo lega ancora.
-
-    Rete di sicurezza per il caso in cui il target sia stato ricavato senza il
-    legame testuale `run_id in runs` (es. dal diff del merge): ritira solo quando
-    il committato e' almeno pari, quindi non maschera mai un ritardo reale."""
-    committed_stages = set(d.get("completed_stages") or [])
-    snap_stages = set(snap.get("completed_stages") or [])
-    return snap_stages.issubset(committed_stages) and d.get("published") == snap.get("published")
-
-
 def _dossier_from_outcome(indicator: str, snap: dict) -> dict:
     """Un dossier minimo per un indicatore che l'immagine deployata non conosce
     ancora (interamente lavorato dopo la build). `runs`/`timeline` vuoti: `row_of`
@@ -774,11 +762,14 @@ def _dossier_from_outcome(indicator: str, snap: dict) -> dict:
 def _apply_outcomes(dossier: dict, outcomes: dict) -> None:
     """Sovrappone gli snapshot vivi al dossier committato, in loco.
 
-    Regola di riconciliazione: uno snapshot si applica **solo se** il suo `run_id`
-    non e' gia' nei `runs` del dossier committato. Dopo il deploy che porta la run
-    su master, `reconstruct` aggiunge quel `run_id` ai `runs`, e l'overlay si spegne
-    da solo, senza uno stato da azzerare a mano. `_committed_caught_up` e' la rete
-    per i target ricavati senza quel legame."""
+    Riconciliazione, unica regola: uno snapshot si applica **solo se** il suo
+    `run_id` non e' gia' nei `runs` del dossier committato. Dopo il deploy che porta
+    quella run su master, `reconstruct` aggiunge quel `run_id` ai `runs` e l'overlay
+    si spegne da solo, senza uno stato da azzerare a mano ne' da confrontare campo a
+    campo: e' l'unico ritiro sicuro. Confrontare invece lo stato (es. 'stessi stadi
+    e stesso published') ritirava a torto proprio il caso che conta, una smentita su
+    un indicatore gia' pubblicato, dove cambiano solo `state`/`flags`, e lasciava il
+    cruscotto su `pubblicata` invece dell'invalidazione."""
     for indicator, snap in outcomes.items():
         d = dossier.get(indicator)
         if d is None:
@@ -786,8 +777,6 @@ def _apply_outcomes(dossier: dict, outcomes: dict) -> None:
             continue
         run_id = snap.get("run_id")
         if run_id and run_id in (d.get("runs") or []):
-            continue
-        if _committed_caught_up(d, snap):
             continue
         for field in _OVERLAY_FIELDS:
             if field in snap:

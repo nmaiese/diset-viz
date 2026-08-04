@@ -611,11 +611,19 @@ class EmitOutcomes(unittest.TestCase):
         practice_timeline.load_real = fn
         self.addCleanup(lambda: setattr(practice_timeline, "load_real", saved))
 
-    def test_it_posts_the_target_snapshot_linked_by_run_id(self):
+    def _diff_runner(self, diff_out):
+        def runner(argv, cwd=None):
+            if "diff" in argv:
+                return (0, diff_out)
+            return (0, "sha1")
+        return runner
+
+    def test_it_posts_the_snapshot_for_the_changed_indicator(self):
         self._with_load_real(lambda today="": self._dossier())
         posted = []
         pipeline_merge.emit_outcomes(
-            "v1", runner=lambda argv, cwd=None: (0, "sha1"), log=lambda *_: None,
+            "v1", runner=self._diff_runner("content/indicators/167.json\nREADME.md"),
+            log=lambda *_: None,
             post=lambda run_id, ind, snap, **kw: posted.append((run_id, ind, snap)))
         self.assertEqual(len(posted), 1)
         run_id, ind, snap = posted[0]
@@ -623,26 +631,35 @@ class EmitOutcomes(unittest.TestCase):
         self.assertEqual(snap["state"], "pubblicata")
         self.assertIs(snap["published"], True)
 
-    def test_it_falls_back_to_the_merge_diff_when_the_link_is_missing(self):
-        self._with_load_real(lambda today="": self._dossier(runs=["altra"]))
+    def test_it_posts_only_the_changed_indicator_not_the_cited_ones(self):
+        # 167 e' cambiato, 12 e' solo citato per confronto (stesso run_id nei suoi
+        # runs). Solo 167 e' nel diff, quindi solo 167 va POSTato: postare 12
+        # sovrascriverebbe il suo stato genuino con uno stale.
+        dossier = self._dossier()
+        dossier["12"] = dict(dossier["167"], id="12", runs=["v1"])
+        self._with_load_real(lambda today="": dossier)
         posted = []
-
-        def runner(argv, cwd=None):
-            if "diff" in argv:
-                return (0, "content/indicators/167.json\nREADME.md")
-            return (0, "sha1")
-
         pipeline_merge.emit_outcomes(
-            "v-none", runner=runner, log=lambda *_: None,
+            "v1", runner=self._diff_runner("content/indicators/167.json"),
+            log=lambda *_: None,
             post=lambda run_id, ind, snap, **kw: posted.append(ind))
         self.assertEqual(posted, ["167"])
 
-    def test_no_target_means_no_post(self):
-        self._with_load_real(lambda today="": self._dossier(runs=["altra"]))
+    def test_a_verification_file_change_maps_to_its_indicator(self):
+        self._with_load_real(lambda today="": self._dossier())
         posted = []
         pipeline_merge.emit_outcomes(
-            "v-none", runner=lambda argv, cwd=None: (0, ""), log=lambda *_: None,
-            post=lambda *a, **k: posted.append(a))
+            "v1", runner=self._diff_runner("data/pipeline/verifiche/ter-167__regione__abc.json"),
+            log=lambda *_: None,
+            post=lambda run_id, ind, snap, **kw: posted.append(ind))
+        self.assertEqual(posted, ["167"])
+
+    def test_no_changed_indicator_means_no_post(self):
+        self._with_load_real(lambda today="": self._dossier())
+        posted = []
+        pipeline_merge.emit_outcomes(
+            "v1", runner=self._diff_runner("README.md\ndata/pipeline/runs/x.json"),
+            log=lambda *_: None, post=lambda *a, **k: posted.append(a))
         self.assertEqual(posted, [])
 
     def test_it_is_best_effort_and_swallows_errors(self):

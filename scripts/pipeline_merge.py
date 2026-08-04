@@ -462,8 +462,13 @@ def _id_from_path(path):
 
 
 def _targets_from_diff(dossier, runner=_run, cwd=None):
-    """I target ricavati dai file che il ramo ha cambiato rispetto a master: rete
-    per quando il legame testuale `run_id in runs` non c'e'. Best effort."""
+    """Gli indicatori che questa run ha davvero cambiato: gli id dei file
+    `content/indicators/` e `data/pipeline/verifiche/` toccati dal ramo rispetto a
+    master. E' la sola derivazione dei target, e non `run_id in runs`: quel legame
+    include anche gli indicatori solo CITATI per confronto nell'articolo (che
+    `reconstruct` associa allo stesso run_id), e postarne lo snapshot
+    sovrascriverebbe lo stato genuino, magari piu' recente, di un indicatore che
+    questa run non ha toccato. Best effort."""
     code, out = runner(["git", "diff", "--name-only", "origin/master...HEAD"], cwd=cwd)
     if code != 0:
         return []
@@ -480,15 +485,14 @@ def emit_outcomes(run_id, cwd=None, runner=_run, log=print, today="", post=None)
     porta comunque diario e verifica su master). Ricostruisce lo stato dal
     worktree, che contiene il lavoro appena fuso: e' l'unico posto dove l'impronta
     dell'articolo combacia con la verifica, cosa che il server, fermo all'immagine
-    deployata, non puo' calcolare."""
+    deployata, non puo' calcolare. I target sono gli indicatori davvero cambiati
+    (i file del diff), non quelli che il diario cita per confronto."""
     try:
         from datetime import datetime, timezone
-        from scripts import practice_timeline, pipeline_monitor
+        from scripts import pipeline_monitor, practice_timeline  # noqa: F401
         poster = post or pipeline_monitor.post_outcome
         dossier = practice_timeline.load_real(today=today)
-        targets = [d for d in dossier.values() if run_id in (d.get("runs") or [])]
-        if not targets:
-            targets = _targets_from_diff(dossier, runner=runner, cwd=cwd)
+        targets = _targets_from_diff(dossier, runner=runner, cwd=cwd)
         if not targets:
             return
         code, head = runner(["git", "rev-parse", "--short", "HEAD"], cwd=cwd)
