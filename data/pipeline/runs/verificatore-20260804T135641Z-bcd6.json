@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-04T14:02:38+00:00",
+ "base_commit": "43c7c51",
+ "branch": "automation/verificatore-2026-08-04-bcd6",
+ "claude_code_version": "2.1.221 (Claude Code)",
+ "commit": "43c7c51",
+ "detail": [
+  "Classifica 2023 verificata a brief (Basilicata 28,65 #1, Piemonte 26,88 #2, VdA 24,36 #3; Lombardia #13, Lazio #19, Calabria #20). Salto piu' ampio Piemonte->VdA 2,52 confermato. 16 regioni dalla 5a entro <5 punti (range 4,61), mediana 20,49. Serie media annua ricalcolata: picco 2007 19,43, fondo 2014 15,17 (2,04 sotto il 1995 17,21), 2012-2020 ogni anno sotto 17,21, 2023 21,27 supera il 2007 per la prima volta ed e' il massimo della serie. 2022->2023 tutte 20 in aumento. Solo Campania (-1,62) e Calabria (-0,63) sotto il 1995; TAA +8,67 max, Piemonte +7,87 secondo. Incroci: ter-54 prime 3 natalita' (Campania, Lazio, Calabria)=ultime 3 qui; ter-437 (2022) Basilicata/Umbria/VdA/Molise tra le prime 7 per consumo energia, FVG massimo consumo e #10 qui. Identita' con ter-471: 580/580 righe regionali identiche, definizioni ufficiali diverse (fissi lordi vs privati), l'articolo lo dichiara onestamente. Claim esterno costruzioni 2023 confermato sul comunicato Istat (Nord-ovest +5,4% min, Centro +8,6% max, tutte le ripartizioni positive)."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 24,
+ "queue_before": 25,
+ "run_id": "verificatore-20260804T135641Z-bcd6",
+ "stage": "verificatore",
+ "summary": "Verificato ter-167 (intensita' di accumulazione del capitale): 19 affermazioni controllate, tutte confermate, esito pulito",
+ "trigger": "manuale"
+}
