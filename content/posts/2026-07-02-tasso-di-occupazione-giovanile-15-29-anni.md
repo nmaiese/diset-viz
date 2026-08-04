@@ -5,8 +5,8 @@ description: "Nel 2024 il tasso di occupazione 15-29 anni va dal 47,5% del Trent
 slug: tasso-di-occupazione-giovanile-15-29-anni
 date: 2026-07-02
 author: "Redazione Divario Italia"
-cover: /static/img/blog/tasso-di-occupazione-giovanile-15-29-anni.svg
-cover_alt: "Tasso di occupazione giovanile (15-29 anni) per regione (2024): da Trentino-Alto Adige (47,5) a Calabria (18,5). Grafico a barre."
+cover: /static/img/blog/tasso-di-occupazione-giovanile-15-29-anni.jpg
+cover_alt: "Tasso di occupazione giovanile tra i 15 e i 29 anni in Italia: giovani lavoratori e professionisti in uno studio di lavoro italiano."
 tags:
   - Lavoro e conciliazione dei tempi di vita
 indicator: 407
