@@ -4,8 +4,8 @@ description: "Nel 2023 il 32,6% dei ricoveri dei molisani è avvenuto in un'altr
 slug: emigrazione-ospedaliera-mobilita-sanitaria-regioni
 date: 2026-07-04
 author: "Redazione Divario Italia"
-cover: /static/img/blog/emigrazione-ospedaliera-mobilita-sanitaria-regioni.svg
-cover_alt: "Emigrazione ospedaliera in altra regione (2023): da Molise (32,6) a Lombardia (5,1). Grafico a barre."
+cover: /static/img/blog/emigrazione-ospedaliera-mobilita-sanitaria-regioni.jpg
+cover_alt: "Emigrazione ospedaliera e mobilità sanitaria in Italia: paziente anziano e familiare alla stazione ferroviaria con cartella clinica per un ricovero fuori regione."
 tags:
   - Servizi di cura
 indicator: 590

@@ -4,8 +4,8 @@ description: "Divario di genere nel lavoro in Italia: 19,4 punti, il più alto d
 slug: divario-genere-occupazione-regioni-2024
 date: 2026-07-06
 author: "Redazione Divario Italia"
-cover: /static/img/blog/divario-genere-occupazione-regioni-2024.svg
-cover_alt: "Differenza tra tasso di occupazione maschile e femminile per regione (2024): da Puglia (27,3) a Valle d'Aosta (7,5). Grafico a barre."
+cover: /static/img/blog/gender-gap-occupazione.jpg
+cover_alt: "Divario di genere nel lavoro in Italia: madre lavoratrice accompagna il figlio all'asilo nido comunale prima di andare in ufficio."
 tags:
   - Lavoro
 indicator: 57
