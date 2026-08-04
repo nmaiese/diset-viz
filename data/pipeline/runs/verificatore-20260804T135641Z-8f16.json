@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-04T14:01:03+00:00",
+ "base_commit": "43c7c51",
+ "branch": "automation/verificatore-2026-08-04-8f16",
+ "claude_code_version": "2.1.221 (Claude Code)",
+ "commit": "3a370d8",
+ "detail": [
+  "ter-158: 27 controllate, 27 confermate, 0 smentite, 0 non verificabili. Classifica ricontrollata posizione per posizione sul brief: Umbria #3 (23,80), Emilia-Romagna #13 (21,05), VdA #1 (34,71) staccata 9,57 dalla Liguria (25,14), 12 regioni da Liguria a Emilia-Romagna in 4,09 punti, Lombardia #14 (19,37) sola tra gruppo e coda (stacchi 1,68 e 1,70), Molise #11. Definizione verificata su dati_di_base istat_territoriali: e siti/siti al 30-09, non imprese, articolo corretto. Incrocio ter-54 natalita: Campania #1 e Calabria #3 (primi tre), qui #18 e #20; Molise sopra media in entrambi (21,41>20,90 e 7,34>7,09); co-occorrenza scritta come tale (rho -0,78). Incrocio ter-377 VdA #1 consumi, dato al 2023. Serie 1998: 6 regioni a zero (VdA, Umbria, Marche, Basilicata, Sicilia, Calabria), Molise primato 6,0606. 2024->2025: 17 in calo, 3 in aumento (VdA +2,04, Veneto +0,055, Liguria +0,011: due per centesimi), movimento massimo Molise -4,49 (25,90->21,41). Cifre ISPRA verificate alla fonte indicatoriambientali.isprambiente.it: 41.167 siti fine 2025, 37.540 nel 2024, meta al Nord (50%), Lombardia 8.258."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 25,
+ "queue_before": 26,
+ "run_id": "verificatore-20260804T135641Z-8f16",
+ "stage": "verificatore",
+ "summary": "Verificato ter-158 (Incidenza della certificazione ambientale): 27 affermazioni controllate, 0 smentite, esito pulito",
+ "trigger": "manuale"
+}
