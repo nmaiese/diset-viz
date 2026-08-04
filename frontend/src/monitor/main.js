@@ -114,8 +114,21 @@ async function render(supabase, currentUser) {
   // fetch al caricamento e sul bottone Aggiorna, non a ogni tick.
   supabase
     .channel("pipeline")
-    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_activity" }, () => refresh(supabase))
-    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_tokens" }, () => refresh(supabase))
+    // Un battito cambia gli in_flight: la board li fonde lato server, quindi
+    // rifetchala oltre alle tabelle vive, o un indicatore appena avviato resterebbe
+    // "in coda" nel catalogo fino a un Aggiorna manuale. La board e' memoizzata 30s
+    // lato server, quindi rifetchare a ogni evento e' a buon mercato.
+    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_activity" }, () => {
+      refresh(supabase);
+      loadBoard(supabase);
+    })
+    // I token cambiano i totali della board (tokens_total) e la colonna token
+    // della cronologia: rifetcha entrambe oltre alla tabella viva.
+    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_tokens" }, () => {
+      refresh(supabase);
+      loadBoard(supabase);
+      loadRuns(supabase);
+    })
     .subscribe();
 
   document.getElementById("cat-refresh").onclick = () => loadBoard(supabase);
