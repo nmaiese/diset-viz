@@ -393,6 +393,86 @@ class PostTokens(unittest.TestCase):
                 if v is not None:
                     os.environ[k] = v
 
+    def test_post_outcome_builds_an_outcome_payload_with_nested_structures(self):
+        captured, opener = self._capture()
+        snap = {"state": "pubblicata", "completed_stages": ["writer", "reviewer", "verificatore"],
+                "flags": {"article_complete": True}, "published": True}
+        ok = pipeline_monitor.post_outcome(
+            "verificatore-r1", "167", snap, base_commit="abc123",
+            at="2026-08-04T14:00:00+00:00",
+            url="https://divarioitalia.it", token="k", opener=opener)
+        self.assertTrue(ok)
+        body = captured["body"]
+        self.assertEqual(body["action"], "outcome")
+        self.assertEqual(body["indicator"], "167")
+        self.assertEqual(body["run_id"], "verificatore-r1")
+        self.assertEqual(body["base_commit"], "abc123")
+        self.assertEqual(body["state"], "pubblicata")
+        self.assertEqual(body["completed_stages"], ["writer", "reviewer", "verificatore"])
+        self.assertEqual(body["flags"], {"article_complete": True})
+        self.assertIs(body["published"], True)
+
+
+class ApplyOutcomes(unittest.TestCase):
+    """L'overlay vivo sovrapposto al dossier committato, in loco."""
+
+    def _snap(self, run_id, **over):
+        snap = {"run_id": run_id, "state": "pubblicata", "type": "esistente",
+                "entered_at": "2026-07-01",
+                "completed_stages": ["writer", "reviewer", "verificatore"],
+                "required_stages": ["writer", "reviewer", "verificatore"],
+                "flags": {"article_complete": True}, "published": True,
+                "verification_valid": True, "score_eligible": True,
+                "error_class": None, "motivo": "", "priority": 20.0}
+        snap.update(over)
+        return snap
+
+    def test_overlay_patches_an_uncommitted_indicator(self):
+        dossier = {"167": practice("167", state="in-lavorazione",
+                                   completed=["writer", "reviewer"])}
+        dossier["167"]["runs"] = ["vecchia"]
+        pipeline_monitor._apply_outcomes(dossier, {"167": self._snap("v1")})
+        d = dossier["167"]
+        self.assertEqual(d["state"], "pubblicata")
+        self.assertIs(d["published"], True)
+        self.assertIn("verificatore", d["completed_stages"])
+        self.assertIn("v1", d["runs"])
+
+    def test_overlay_is_skipped_when_the_run_is_already_committed(self):
+        dossier = {"167": practice("167", state="in-lavorazione",
+                                   completed=["writer", "reviewer"])}
+        dossier["167"]["runs"] = ["v1"]                    # il committato ha gia' quella run
+        pipeline_monitor._apply_outcomes(dossier, {"167": self._snap("v1")})
+        self.assertEqual(dossier["167"]["state"], "in-lavorazione")
+
+    def test_overlay_retires_when_committed_has_caught_up(self):
+        dossier = {"167": practice("167", state="pubblicata",
+                                   completed=["writer", "reviewer", "verificatore"])}
+        dossier["167"]["runs"] = ["altra"]
+        dossier["167"]["published"] = True
+        # run_id nuovo, ma il committato e' gia' pari: la rete lo ritira.
+        pipeline_monitor._apply_outcomes(dossier, {"167": self._snap("v2")})
+        self.assertNotIn("v2", dossier["167"]["runs"])
+
+    def test_a_new_indicator_is_inserted(self):
+        dossier = {}
+        pipeline_monitor._apply_outcomes(dossier, {"999": self._snap("v1")})
+        self.assertIn("999", dossier)
+        self.assertEqual(dossier["999"]["state"], "pubblicata")
+        self.assertEqual(dossier["999"]["runs"], ["v1"])
+        self.assertEqual(dossier["999"]["timeline"], [])
+
+    def test_a_patched_dossier_recomputes_the_row(self):
+        dossier = {"167": practice("167", state="in-lavorazione",
+                                   completed=["writer", "reviewer"])}
+        dossier["167"]["runs"] = ["vecchia"]
+        pipeline_monitor._apply_outcomes(dossier, {"167": self._snap("v1")})
+        b = pipeline_monitor.board(dossier, today="2026-08-04")
+        row = next(r for r in b["rows"] if r["id"] == "167")
+        self.assertEqual(row["state"], "pubblicata")
+        self.assertIs(row["published"], True)
+        self.assertEqual(row["work_status"], "pubblicata")
+
 
 if __name__ == "__main__":
     unittest.main()

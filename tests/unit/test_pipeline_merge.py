@@ -590,5 +590,93 @@ class DeletingTheBranchCannotUndoTheMerge(unittest.TestCase):
         self.assertIn("not mergeable", detail)
 
 
+class EmitOutcomes(unittest.TestCase):
+    """Lo snapshot di stato POSTato dopo il merge, ricostruito dal worktree."""
+
+    def _dossier(self, **over):
+        d = {"id": "167", "state": "pubblicata", "type": "esistente",
+             "entered_at": "2026-07-01",
+             "completed_stages": ["writer", "reviewer", "verificatore"],
+             "required_stages": ["writer", "reviewer", "verificatore"],
+             "flags": {"article_complete": True}, "published": True,
+             "verification_valid": True, "score_eligible": True,
+             "error_class": None, "motivo": "", "priority": 20.0,
+             "runs": ["v1"], "timeline": []}
+        d.update(over)
+        return {"167": d}
+
+    def _with_load_real(self, fn):
+        from scripts import practice_timeline
+        saved = practice_timeline.load_real
+        practice_timeline.load_real = fn
+        self.addCleanup(lambda: setattr(practice_timeline, "load_real", saved))
+
+    def test_it_posts_the_target_snapshot_linked_by_run_id(self):
+        self._with_load_real(lambda today="": self._dossier())
+        posted = []
+        pipeline_merge.emit_outcomes(
+            "v1", runner=lambda argv, cwd=None: (0, "sha1"), log=lambda *_: None,
+            post=lambda run_id, ind, snap, **kw: posted.append((run_id, ind, snap)))
+        self.assertEqual(len(posted), 1)
+        run_id, ind, snap = posted[0]
+        self.assertEqual((run_id, ind), ("v1", "167"))
+        self.assertEqual(snap["state"], "pubblicata")
+        self.assertIs(snap["published"], True)
+
+    def test_it_falls_back_to_the_merge_diff_when_the_link_is_missing(self):
+        self._with_load_real(lambda today="": self._dossier(runs=["altra"]))
+        posted = []
+
+        def runner(argv, cwd=None):
+            if "diff" in argv:
+                return (0, "content/indicators/167.json\nREADME.md")
+            return (0, "sha1")
+
+        pipeline_merge.emit_outcomes(
+            "v-none", runner=runner, log=lambda *_: None,
+            post=lambda run_id, ind, snap, **kw: posted.append(ind))
+        self.assertEqual(posted, ["167"])
+
+    def test_no_target_means_no_post(self):
+        self._with_load_real(lambda today="": self._dossier(runs=["altra"]))
+        posted = []
+        pipeline_merge.emit_outcomes(
+            "v-none", runner=lambda argv, cwd=None: (0, ""), log=lambda *_: None,
+            post=lambda *a, **k: posted.append(a))
+        self.assertEqual(posted, [])
+
+    def test_it_is_best_effort_and_swallows_errors(self):
+        def boom(today=""):
+            raise RuntimeError("db giu'")
+        self._with_load_real(boom)
+        # non solleva: un overlay perso non fa fallire un merge gia' avvenuto.
+        pipeline_merge.emit_outcomes(
+            "v1", runner=lambda argv, cwd=None: (0, ""), log=lambda *_: None,
+            post=lambda *a, **k: None)
+
+
+class FinishEmitsOnlyOnMerged(unittest.TestCase):
+    """`finish` POSTa lo snapshot solo quando la run atterra su master."""
+
+    def _spy(self):
+        calls = []
+        saved = pipeline_merge.emit_outcomes
+        pipeline_merge.emit_outcomes = lambda run_id, **kw: calls.append(run_id)
+        self.addCleanup(lambda: setattr(pipeline_merge, "emit_outcomes", saved))
+        return calls
+
+    def test_a_merged_run_emits(self):
+        calls = self._spy()
+        pipeline_merge.decide("verificatore", 9, verdict=AUTO, runner=fake_gh(),
+                              log=lambda *_: None, run_id="v1", journal=False)
+        self.assertEqual(calls, ["v1"])
+
+    def test_a_blocked_run_does_not_emit(self):
+        calls = self._spy()
+        pipeline_merge.decide("writer", 1, verdict=RED, runner=fake_gh(),
+                              log=lambda *_: None, run_id="v1", journal=False)
+        self.assertEqual(calls, [])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -203,6 +203,38 @@ class PipelineDashboardRoute(unittest.TestCase):
                         json={"action": "boh"})
         self.assertEqual(r.status_code, 400)
 
+    def test_an_outcome_is_stored_durably_and_gated_by_the_secret(self):
+        client = self._client(ingest_token="ingest-xyz")
+        from app import pipeline_state
+        payload = {"action": "outcome", "indicator": "167",
+                   "run_id": "verificatore-r1", "at": "2026-08-04T14:00:00+00:00",
+                   "state": "pubblicata", "published": True,
+                   "completed_stages": ["writer", "reviewer", "verificatore"],
+                   "flags": {"article_complete": True}}
+        # segreto sbagliato -> 404, come i battiti
+        self.assertEqual(
+            client.post("/_pipeline/beat", json=payload,
+                        headers={"X-Pipeline-Key": "sbagliato"}).status_code, 404)
+        # col segreto giusto scrive, e si rilegge deserializzato
+        ok = client.post("/_pipeline/beat", json=payload,
+                         headers={"X-Pipeline-Key": "ingest-xyz"})
+        self.assertEqual(ok.status_code, 200)
+        got = pipeline_state.outcomes_by_indicator()["167"]
+        self.assertEqual(got["state"], "pubblicata")
+        self.assertEqual(got["completed_stages"], ["writer", "reviewer", "verificatore"])
+        # un outcome vecchio NON scade come un battito: e' storia finche' il
+        # committato non lo raggiunge.
+        pipeline_state.record_outcome("999", "r-old", {"state": "pubblicata"},
+                                      now="2026-01-01T00:00:00+00:00",
+                                      at="2026-01-01T00:00:00+00:00")
+        self.assertIn("999", pipeline_state.outcomes_by_indicator())
+
+    def test_an_outcome_without_the_indicator_is_a_clean_400(self):
+        client = self._client(ingest_token="ingest-xyz")
+        r = client.post("/_pipeline/beat", headers={"X-Pipeline-Key": "ingest-xyz"},
+                        json={"action": "outcome", "run_id": "r1"})   # manca indicator
+        self.assertEqual(r.status_code, 400)
+
 
 if __name__ == "__main__":
     unittest.main()
