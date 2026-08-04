@@ -244,7 +244,7 @@ def outcomes_by_indicator():
             "score_eligible": bool(r.score_eligible),
             "error_class": r.error_class,
             "motivo": r.motivo,
-            "priority": float(r.priority) if r.priority else 0.0,
+            "priority": _to_float(r.priority, 0.0),
         }
     return out
 
@@ -256,5 +256,17 @@ def _load_json(text, default):
         return default
     try:
         return json.loads(text)
+    except (ValueError, TypeError):
+        return default
+
+
+def _to_float(text, default):
+    """Come `_load_json`, ma per `priority`: un valore non numerico degrada al
+    default invece di far cadere l'intera mappa (una riga sola non deve zittire
+    l'overlay di tutte le altre)."""
+    if not text:
+        return default
+    try:
+        return float(text)
     except (ValueError, TypeError):
         return default

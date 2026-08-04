@@ -133,6 +133,11 @@ class PipelineOutcomeStore(unittest.TestCase):
         with self.assertRaises(ValueError):
             pipeline_state.record_outcome("", "r1", self._snap())
 
+    def test_a_non_numeric_priority_degrades_to_zero(self):
+        # Una riga con `priority` non numerica non deve zittire l'intera mappa.
+        pipeline_state.record_outcome("167", "r1", self._snap(priority="non-numerica"))
+        self.assertEqual(pipeline_state.outcomes_by_indicator()["167"]["priority"], 0.0)
+
     def test_a_tristate_none_survives_the_roundtrip(self):
         pipeline_state.record_outcome("999", "r1",
                                       self._snap(published=None, verification_valid=None))
