@@ -35,19 +35,18 @@ promoter), **produttore** (curator+writer+reviewer), **verificatore**.
 
 ## Il giro
 
-1. Leggi il piano, e fai prima il passo del sito (post-deploy, meccanico):
+1. Leggi il piano, e a un tick vero segna il battito del lanciatore:
 
    ```bash
-   python3 scripts/pipeline_launch.py --json --publish --publish-base https://divarioitalia.it
+   python3 scripts/pipeline_launch.py --json --publish
    ```
 
-   `--publish` verifica gli indicatori in stato `fusa` contro `divarioitalia.it`
-   e committa le prove di pubblicazione su master, chiudendo `fusa -> pubblicata`
-   (docs/EDITORIAL_PRACTICE.md, §8). E' meccanico, non lancia un agente e non apre
-   PR: un sito irraggiungibile o non ancora dispiegato non scrive niente e
-   l'indicatore resta `fusa` per il giro dopo. Il resto dell'uscita e' il campo
-   `launches`: una lista ordinata per priorita' (una smentita pubblica, peso 100,
-   apre il piano davanti a tutto).
+   `--publish` a un tick vero della Routine segna il battito del lanciatore, una
+   riga `launch` committata su master, cosi' un giro a vuoto non si confonde con
+   una Routine mai partita (docs/EDITORIAL_PRACTICE.md, §8: merge = pubblicazione,
+   non c'e' piu' una verifica del sito). E' meccanico, non lancia un agente e non
+   apre PR. Il resto dell'uscita e' il campo `launches`: una lista ordinata per
+   priorita' (una smentita pubblica, peso 100, apre il piano davanti a tutto).
 
    Poi fotografa le PR aperte per il cruscotto (anche questo meccanico, una sola
    chiamata a GitHub, la tua):

@@ -212,10 +212,10 @@ sulla pagina: leggila. Poi chiudi come prescrive `pipeline-close-run`, stadio
 `producer`, merge `auto` (ordine al passo di merge, mai un permesso per te). Nel
 corpo della PR, per indicatore: il verso con la prova che l'ha deciso e se la
 classifica si muove, le cifre che hai usato e da dove nel brief, le fonti dei
-claim comparativi, il `vintage` e il `reviewed_vintage`. La verifica della
-pubblicazione sul sito (`fusa -> pubblicata`) e' un passo meccanico a valle del
-deploy (`scripts/verify_publication.py`), non qualcosa che blocchi in sessione:
-tu chiudi a firma e commit dietro il cancello.
+claim comparativi, il `vintage` e il `reviewed_vintage`. Il merge e' gia' la
+pubblicazione (il progetto ha ratificato merge = pubblicazione): tu chiudi a firma
+e commit dietro il cancello, e cio' che fondi e' pubblicato, senza un passo di
+verifica del sito a valle.
 
 ## Limiti onesti
 
