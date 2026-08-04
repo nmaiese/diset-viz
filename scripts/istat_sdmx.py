@@ -250,7 +250,7 @@ class SdmxClient:
                         "The endpoint is faulting, not blocking: retry in a few minutes."
                     ) from exc
                 raise
-            except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
+            except (urllib.error.URLError, TimeoutError, ConnectionError):
                 # A read timeout on a large SDMX response surfaces as a bare
                 # TimeoutError (not wrapped in URLError), so catch it here and
                 # retry with backoff instead of aborting the whole run.

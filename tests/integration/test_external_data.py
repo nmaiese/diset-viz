@@ -4,7 +4,6 @@ from pathlib import Path
 
 from app import app
 from app.external_data import EXTERNAL_COLUMNS, MANIFEST_COLUMNS, freshness_status
-from app.quality_life_external import integrated_score_replacements, score_candidates
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -68,8 +67,19 @@ class ExternalDataTest(unittest.TestCase):
             # only once the PR merges.
             self.assertIn(row["definition_match"], {"exact", "compatible", "proxy", "different", "new"})
             self.assertIn(row["status"], {"integrated", "candidate", "rejected", "needs_review", "unavailable", "proposed"})
-        self.assertFalse(score_candidates())
-        self.assertTrue(all(row["definition_match"] == "exact" for row in integrated_score_replacements()))
+        candidates = [
+            row for row in rows
+            if row["score_eligible"] == "true"
+            and row["status"] in {"candidate", "needs_review"}
+        ]
+        replacements = [
+            row for row in rows
+            if row["score_eligible"] == "true"
+            and row["status"] == "integrated"
+            and ":" not in row["target_indicator_id"]
+        ]
+        self.assertFalse(candidates)
+        self.assertTrue(all(row["definition_match"] == "exact" for row in replacements))
 
     def test_freshness_status(self):
         self.assertEqual(freshness_status(2025), "current")

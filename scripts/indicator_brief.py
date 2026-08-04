@@ -43,7 +43,7 @@ import sys
 
 from app import sources
 from app.atlas_catalog import get_atlas_catalog, get_atlas_indicator
-from app.indicator_texts import DEFAULT_HEADINGS, ROLE_ORDER, build_article, get_text
+from app.indicator_texts import DEFAULT_HEADINGS, build_article, get_text
 from app.indicator_view import build_indicator_view
 from scripts import practice_timeline
 

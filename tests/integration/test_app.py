@@ -330,8 +330,9 @@ class AppSmokeTest(unittest.TestCase):
         self.assertTrue(profiles.is_search_indexable_indicator(get_indicator(str(sample["id"]))["metadata"]))
         self.assertEqual(client.get(indicator_path).headers.get("X-Robots-Tag"), expected)
         self.assertEqual(client.get("/regione/lombardia").headers.get("X-Robots-Tag"), expected)
-        theme_slug = next(iter(profiles._theme_slug_map()))
-        self.assertEqual(client.get(f"/tema/{theme_slug}").headers.get("X-Robots-Tag"), expected)
+        from app.atlas_catalog import get_atlas_catalog
+        theme_path = get_atlas_catalog()["themes"][0]["path"]
+        self.assertEqual(client.get(theme_path).headers.get("X-Robots-Tag"), expected)
 
     def test_noindex_paths_unaffected_by_default_index_header(self):
         client = app.test_client()
@@ -398,8 +399,8 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn(b"application/ld+json", region.data)
         self.assertEqual(client.get("/regione/atlantide").status_code, 404)
 
-        theme_slug = next(iter(profiles._theme_slug_map()))
-        theme = client.get(f"/tema/{theme_slug}")
+        from app.atlas_catalog import get_atlas_catalog
+        theme = client.get(get_atlas_catalog()["themes"][0]["path"])
         self.assertEqual(theme.status_code, 200)
         self.assertIn(b"application/ld+json", theme.data)
         self.assertEqual(client.get("/tema/non-esiste").status_code, 404)

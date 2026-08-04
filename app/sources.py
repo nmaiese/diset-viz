@@ -182,19 +182,6 @@ def acronym(family):
     return SOURCES[family]["acronym"]
 
 
-def family_for_feed(feed):
-    """The catalog family a hunter adapter promotes into, e.g.
-    'istat_demografia' -> 'istat_demografia', 'eurostat_regional' -> 'eurostat'.
-
-    The promotion step needs this to mint the public id, and it lives here
-    rather than in scripts/ because the id namespace and the user-facing
-    institution have to agree: an Istat series published under the Eurostat
-    namespace would carry Eurostat's name and licence on the page. Returns None
-    for a feed with no family, which the promoter refuses rather than guesses.
-    """
-    return FAMILY_BY_FEED.get(feed)
-
-
 def family_license(family):
     """(license, license_url) for a family, empty strings if it declares none."""
     meta = SOURCES[family]

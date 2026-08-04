@@ -35,7 +35,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts import discover_provinces, istat_regional_source, istat_sdmx, multiscopo_sources
+from scripts import istat_regional_source, istat_sdmx, multiscopo_sources
 from scripts.external_sources import load_registry
 
 SOURCE_CANDIDATES_PATH = PROJECT_ROOT / "data" / "discovery" / "source_candidates.csv"

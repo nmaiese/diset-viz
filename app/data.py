@@ -627,33 +627,6 @@ def indicator_trend_stats(payload, year, values, best=None, worst=None):
     }
 
 
-def search_indicators(query="", theme=None, limit=50):
-    query = _normalize_search(query)
-    theme = _clean_text(theme)
-    results = []
-
-    for item in get_catalog()["indicators"]:
-        if theme and item["theme"] != theme:
-            continue
-        explain = item.get("explain") or {}
-        haystack = _normalize_search(
-            f"{item['name']} {item['theme']} {item['archive']} "
-            f"{explain.get('plain', '')} {explain.get('example', '')}"
-        )
-        if query and query not in haystack:
-            continue
-        results.append(item)
-        if len(results) >= limit:
-            break
-
-    return results
-
-
-def _normalize_search(value):
-    value = unicodedata.normalize("NFKD", value or "").encode("ascii", "ignore").decode("ascii")
-    return " ".join(value.lower().split())
-
-
 def _region_sort_key(region):
     try:
         return REGION_ORDER.index(region)

@@ -156,16 +156,3 @@ def composed_lead(meta, level):
         views = "con mappa e classifica" if level["has_map"] else "con la classifica completa"
     second = f"Dati {institution} per {count} {noun}, {span}, {views}."
     return f"{plain} {second}".strip() if plain else second
-
-
-def text_vintage(indicator_id):
-    """Data year the hand-written figures were validated against, or None.
-
-    The drift guard compares this to the indicator's current year_max, so an
-    article is flagged for review once the data moves past what it describes.
-    """
-    entry = get_text(indicator_id)
-    if not entry:
-        return None
-    value = entry.get("vintage")
-    return int(value) if isinstance(value, int) else None

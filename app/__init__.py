@@ -177,8 +177,6 @@ def inject_site_config():
         "GOOGLE_TAG_MANAGER_ID": config.GOOGLE_TAG_MANAGER_ID,
         "ADSENSE_CLIENT": config.ADSENSE_CLIENT,
         "ADSENSE_SLOT_BANNER": config.ADSENSE_SLOT_BANNER,
-        "FORCE_FUNDING_CHOICES_CMP": config.FORCE_FUNDING_CHOICES_CMP,
-        "ENABLE_CONSENT_BANNER": config.ENABLE_CONSENT_BANNER,
         "GOOGLE_SITE_VERIFICATION": config.GOOGLE_SITE_VERIFICATION,
         "BING_SITE_VERIFICATION": config.BING_SITE_VERIFICATION,
         # Identita' Supabase pubbliche (Auth Google + Realtime): nei template
@@ -188,7 +186,7 @@ def inject_site_config():
     }
 
 
-from app import views
+from app import views as views
 from app import profiles
 from app.seo_policy import is_search_indexable_indicator as _seo_indicator_policy
 

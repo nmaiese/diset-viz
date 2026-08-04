@@ -188,7 +188,3 @@ def count_freshness(items):
     for item in items:
         counts[freshness_status(item.get("year_max") or item.get("year"))] += 1
     return {key: counts.get(key, 0) for key in ("current", "recent", "dated", "stale", "unknown")}
-
-
-def quality_life_freshness_from_manifest(manifest):
-    return count_freshness(manifest.values())

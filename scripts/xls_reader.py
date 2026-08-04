@@ -37,7 +37,6 @@ from pathlib import Path
 
 OLE_MAGIC = b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"
 END_OF_CHAIN = 0xFFFFFFFE
-FREE_SECTOR = 0xFFFFFFFF
 
 # BIFF8 record ids. The set is small on purpose: everything not listed here is
 # skipped, which is what makes the reader short enough to trust.

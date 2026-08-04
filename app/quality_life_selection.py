@@ -102,7 +102,3 @@ def regional_quality_life_selection():
             selected[public_id] = info["category"]
             used_names.add(name)
     return selected
-
-
-def quality_life_category(indicator_id):
-    return regional_quality_life_selection().get(str(indicator_id))
