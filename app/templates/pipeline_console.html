@@ -42,8 +42,13 @@
       .mon-filters input, .mon-filters select { font-family: Inter, system-ui, sans-serif; font-size:13px; padding:6px 9px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--ink); }
       .mon-filters input[type=search] { flex:1 1 220px; min-width:180px; }
       .mon-date { display:inline-flex; align-items:center; gap:5px; color:var(--ink-soft); font-size:12px; }
-      .mon-totals { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
-      .mon-chip { font-family: "Space Mono", ui-monospace, monospace; font-size:11.5px; background:#eee9e0; color:var(--ink); border-radius:999px; padding:3px 10px; white-space:nowrap; }
+      .mon-totals { margin-bottom:10px; }
+      .mon-totals-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+      .mon-chip { font-family: "Space Mono", ui-monospace, monospace; font-size:11.5px; background:#eee9e0; color:var(--ink); border:1px solid transparent; border-radius:999px; padding:3px 10px; white-space:nowrap; }
+      .mon-chip--strong { background:var(--navy); color:var(--paper); font-weight:700; }
+      .mon-chip--click { cursor:pointer; }
+      .mon-chip--click:hover { border-color:var(--ink-soft); }
+      .mon-chip--active { background:var(--accent); color:var(--paper); border-color:var(--accent); }
       .mon-mini { font-size:14px; letter-spacing:2px; }
       {# Solo l'identita' cartografica: navy, carta, unico accento #e4572e. Gli
          stati si distinguono per peso, riempimento, bordo (pieno/tratteggiato) e
@@ -60,6 +65,24 @@
       .mon-status--in-attesa-di-monte { background:var(--paper); color:var(--ink); border-color:var(--ink-soft); border-style:dashed; }
       .mon-status--in-coda { background:var(--paper); color:var(--ink-soft); border-color:var(--line); }
       .mon-status--chiusa { background:var(--paper); color:var(--ink-soft); border-color:var(--line); opacity:.55; }
+      {# Mobile: le tabelle .mon-cards diventano schede impilate, una riga per
+         etichetta (dal data-label di ogni cella), invece di uno scroll orizzontale
+         illeggibile. Solo sotto i 640px; sopra restano tabelle. #}
+      @media (max-width: 640px) {
+        #monitor-root { padding: 20px 12px 48px; }
+        .mon-filters input[type=search] { flex-basis:100%; }
+        table.mon-cards, table.mon-cards tbody, table.mon-cards tr, table.mon-cards td { display:block; width:100%; }
+        table.mon-cards thead { position:absolute; left:-9999px; }
+        table.mon-cards { border:0; }
+        table.mon-cards tr { border:1px solid var(--line); border-radius:8px; margin-bottom:10px; padding:4px 2px; background:#fff; }
+        {# Cella a blocco, non flex: l'etichetta sta sopra e il valore sotto, cosi'
+           i <br> e i <small> di Indicatore e Prossimo passo restano su piu' righe
+           invece di accalcarsi in fila. #}
+        table.mon-cards td { border:0; border-bottom:1px solid var(--line); white-space:normal; display:block; padding:6px 10px; }
+        table.mon-cards tr td:last-child { border-bottom:0; }
+        table.mon-cards td:empty { display:none; }
+        table.mon-cards td::before { content: attr(data-label); display:block; color:var(--ink-soft); font-weight:700; text-transform:uppercase; font-size:10px; letter-spacing:.03em; margin-bottom:2px; }
+      }
     </style>
   </head>
   <body>
