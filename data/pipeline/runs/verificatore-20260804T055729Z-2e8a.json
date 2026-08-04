@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-04T06:03:27+00:00",
+ "base_commit": "e901b28",
+ "branch": "automation/verificatore-2026-08-04-2e8a",
+ "claude_code_version": "2.1.221 (Claude Code)",
+ "commit": "e901b28",
+ "detail": [
+  "Serie Eurostat rd_p_persreg 2019-2023, 20 regioni FTE% pop.attiva. Ranking/mediana/gradini verificati contro la serie grezza: top-9 identici in ogni anno 2019-2023 (ER,Lazio,Friuli,Lombardia,Trentino,Piemonte,Toscana,Veneto,Liguria); gradino 9a-10a 0,17->0,30 nel 2022-2023 (0,13 in 5 anni), Liguria +0,07 Campania -0,06; 9 regioni sotto 1,00; mediana 1,15->1,06 media piatta 1,158->1,164; 12 su 8 giu; 2022-2023 13su/6giu/1ferma nessuna oltre 0,07. Incroci: gerdreg 8/9 top uguali (Campania vs Trentino la differenza); ter-92 2022 Sardegna 2a Campania 4a Lombardia 19a. Esterni via API Eurostat rd_p_perslf 2023: EU27 FTE 1,57 (superata da 5 regioni), Italia FTE 1,41 e HC 2,09 (pagina usa FTE, confermato anche perche il max regionale 2,06<2,09). Le due smentite precedenti (1,41 come quota persone; 2022-2023 il piu mosso) risultano corrette nel testo attuale."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 28,
+ "queue_before": 29,
+ "run_id": "verificatore-20260804T055729Z-2e8a",
+ "stage": "verificatore",
+ "summary": "Verificato eur-rd_p_persreg (rilettura dopo riscrittura): 27 affermazioni controllate, 0 smentite, esito pulito",
+ "trigger": "manuale"
+}
