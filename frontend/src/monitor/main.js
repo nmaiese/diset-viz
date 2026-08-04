@@ -134,8 +134,8 @@ async function render(supabase, currentUser) {
   document.getElementById("cat-refresh").onclick = () => loadBoard(supabase);
   document.getElementById("run-refresh").onclick = () => loadRuns(supabase);
   ["cat-q", "cat-status", "cat-phase", "cat-owner"].forEach((id) => {
-    document.getElementById(id).oninput = renderCatalog;
-    document.getElementById(id).onchange = renderCatalog;
+    document.getElementById(id).oninput = renderCatalogReset;
+    document.getElementById(id).onchange = renderCatalogReset;
   });
   ["run-q", "run-stage", "run-outcome", "run-from", "run-to"].forEach((id) => {
     document.getElementById(id).oninput = renderRuns;
@@ -149,6 +149,17 @@ async function render(supabase, currentUser) {
 // senza rifetchare.
 let boardData = null;
 let runsData = null;
+
+// Paginazione del catalogo: 383 indicatori in una tabella sola sono troppi.
+// Pagina lato client, la pagina attiva in stato di modulo. Un cambio di filtro
+// riparte da pagina 1 (renderCatalogReset); i bottoni pagina non azzerano.
+let catPage = 0;
+const CAT_PAGE_SIZE = 50;
+
+function renderCatalogReset() {
+  catPage = 0;
+  renderCatalog();
+}
 
 async function getToken(supabase) {
   const { data } = await supabase.auth.getSession();
@@ -307,20 +318,38 @@ function renderCatalog() {
       '<button type="button" class="mon-chip mon-chip--click' + (!status ? " mon-chip--active" : "") + '" data-status="">tutti</button>' +
       chips +
     "</div>";
-  // Clic su una pastiglia = imposta (o azzera) il filtro lavorazione, poi ridisegna.
+  // Clic su una pastiglia = imposta (o azzera) il filtro lavorazione, poi ridisegna
+  // da pagina 1 (il filtro cambia, la pagina corrente non ha piu' senso).
   totalsEl.querySelectorAll(".mon-chip--click").forEach((btn) => {
     btn.onclick = () => {
       const sel = document.getElementById("cat-status");
       const target = btn.getAttribute("data-status");
       sel.value = sel.value === target ? "" : target; // ri-clic sull'attivo = azzera
-      renderCatalog();
+      renderCatalogReset();
     };
   });
 
   if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun indicatore col filtro attuale.</p>');
+
+  // Pagina: clampa la pagina corrente all'intervallo valido (un filtro puo' averla
+  // resa fuori range) e affetta le righe da mostrare.
+  const totalPages = Math.max(1, Math.ceil(rows.length / CAT_PAGE_SIZE));
+  if (catPage > totalPages - 1) catPage = totalPages - 1;
+  if (catPage < 0) catPage = 0;
+  const pageRows = rows.slice(catPage * CAT_PAGE_SIZE, catPage * CAT_PAGE_SIZE + CAT_PAGE_SIZE);
+  const first = rows.length ? catPage * CAT_PAGE_SIZE + 1 : 0;
+  const last = catPage * CAT_PAGE_SIZE + pageRows.length;
+  const pager =
+    '<div class="mon-pager">' +
+      '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" id="cat-prev"' + (catPage === 0 ? " disabled" : "") + ">Precedente</button>" +
+      '<span class="mon-pager-info">' + first + "-" + last + " di " + rows.length + " · pagina " + (catPage + 1) + "/" + totalPages + "</span>" +
+      '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" id="cat-next"' + (catPage >= totalPages - 1 ? " disabled" : "") + ">Successiva</button>" +
+    "</div>";
+
   el.innerHTML =
+    pager +
     '<table class="mon-cards"><thead><tr><th>Indicatore</th><th>Famiglia</th><th>Lavorazione</th><th>Fase</th><th>Ciclo</th><th>Prossimo passo</th><th>Token</th><th>Articolo</th></tr></thead><tbody>' +
-    rows
+    pageRows
       .map((r) => {
         const ns = r.next_step || {};
         const st = workStatus(r);
@@ -345,7 +374,13 @@ function renderCatalog() {
         );
       })
       .join("") +
-    "</tbody></table>";
+    "</tbody></table>" +
+    pager; // pager anche in fondo: con 50 righe lo scroll e' lungo
+
+  // Prev/Next compaiono due volte (sopra e sotto): querySelectorAll li prende
+  // entrambi. Cambiano solo la pagina e ridisegnano, senza azzerarla.
+  el.querySelectorAll("#cat-prev").forEach((b) => (b.onclick = () => { catPage -= 1; renderCatalog(); }));
+  el.querySelectorAll("#cat-next").forEach((b) => (b.onclick = () => { catPage += 1; renderCatalog(); }));
 }
 
 function fmtDuration(sec) {

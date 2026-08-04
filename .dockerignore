@@ -30,3 +30,18 @@ tests/
 .env.*
 client_secret_*.json
 *.apps.googleusercontent.com.json
+
+# `COPY data/` spedisce la storia committata della catena, ma un `docker build .`
+# da un working tree porterebbe anche lo stato di runtime che solo .gitignore
+# esclude: .gitignore NON protegge il build context, solo questo file lo fa. In
+# particolare data/leaderboard.sqlite3 contiene PII (email, UUID, nickname,
+# preferiti, confronti): non deve mai finire in un'immagine pubblicata. Questi
+# specchiano le esclusioni data/ del .gitignore.
+data/*.sqlite3
+data/*.sqlite3-*
+data/istat_cache/
+data/eurostat_cache/
+data/pipeline/cruscotto.html
+data/pipeline/.session_meta.json
+data/pipeline/tool_failures.jsonl
+data/pipeline/heartbeats/

@@ -1156,6 +1156,33 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
     def test_the_store_is_the_case_that_made_this_necessary(self):
         self.assertIn("scripts", self._copied_dirs())
 
+    def test_the_pipeline_history_data_is_shipped(self):
+        """La dashboard (`/_pipeline` e `/_pipeline/api/*`) legge a runtime la storia
+        committata sotto `data/`: le prove di pubblicazione, i diari delle run, le
+        verifiche. Senza la COPY nel Dockerfile il server calcola ZERO pubblicati (le
+        prove mancano) e una cronologia vuota (i diari mancano), un guasto che si vede
+        solo in produzione, mai nella suite qui, che gira col repo intero."""
+        self.assertIn(
+            "data", self._copied_dirs(),
+            "il Dockerfile non copia data/: in produzione la dashboard mostra 0 "
+            "pubblicati e cronologia vuota (prove e diari assenti dall'immagine).",
+        )
+
+    def test_dockerignore_keeps_runtime_state_out_of_the_image(self):
+        """`COPY data/` spedisce la storia committata, ma `.gitignore` NON protegge
+        il build context: solo `.dockerignore` lo fa. Un `docker build .` da un
+        working tree includerebbe altrimenti `data/leaderboard.sqlite3` (email, UUID,
+        nickname, preferiti: PII) e l'effimero. Qui si esige che le esclusioni di
+        runtime del `.gitignore` siano specchiate nel `.dockerignore`."""
+        dockerignore = (self.ROOT / ".dockerignore").read_text(encoding="utf-8").split()
+        for pattern in ("data/*.sqlite3", "data/istat_cache/", "data/eurostat_cache/",
+                        "data/pipeline/heartbeats/"):
+            self.assertIn(
+                pattern, dockerignore,
+                f".dockerignore non esclude {pattern}: un docker build da working tree "
+                f"potrebbe imbarcare stato di runtime o PII nell'immagine.",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
