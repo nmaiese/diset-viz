@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-04T06:01:36+00:00",
+ "base_commit": "e901b28",
+ "branch": "automation/verificatore-2026-08-04-b435",
+ "claude_code_version": "2.1.221 (Claude Code)",
+ "commit": "e901b28",
+ "detail": [
+  "ter-105 controllate=24 confermate=24 smentite=0 non_verificabili=0. Rilette in modo avversario le classi a piu' alto rischio: descrizione della graduatoria 2024 (Lombardia #15 sotto Basilicata #13 e Puglia #14; Piemonte #19 sotto Sicilia #18 e Campania #17), storia dei ranghi (coppia alpina TAA/VdA #1-#2 in tutti i 44 anni 1981-2024 senza eccezioni; Basilicata ultima #20 nei primi anni '80 e oggi #13; Sardegna 12->6 = +6 posti; Piemonte 14->19 = -5 posti), 2020 (media 9,77->5,37; Lazio conserva 0,242 = meno di un quarto, perde piu' di tutti; Marche 0,744 = tre quarti), recupero (media 2024 10,44 > 2019 9,77; esattamente cinque regioni sotto il 2019: Basilicata, Calabria, Campania, Piemonte, Toscana; Lazio 2024/2019=1,338 = un terzo sopra), ultimo anno (4 in calo; Molise -0,125 da 1,71 e Marche -0,112 da 7,19, entrambe poco piu' di un decimo, la vecchia smentita e' risolta; 0,125/1,71=7,3%, 0,112/7,19=1,56%), incrocio con ter-165 (Sardegna 6->11, Lazio 8->4). Definizione conforme al glossario Istat (definition_check: nessun rilievo)."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 28,
+ "queue_before": 29,
+ "run_id": "verificatore-20260804T055729Z-b435",
+ "stage": "verificatore",
+ "summary": "Verificato ter-105 (tasso di turisticita', regione, vintage 2024): 24 affermazioni controllate, 0 smentite, esito pulito. Articolo riscritto dopo la smentita del 2026-07-31, ora corretto.",
+ "trigger": "manuale"
+}
