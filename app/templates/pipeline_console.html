@@ -50,10 +50,14 @@
          opacita', non per colori nuovi. Accento pieno = cio' che si lavora ora;
          navy pieno = fatto; contorno accento = quasi fatto; neutro = in coda. #}
       .mon-status { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; padding:2px 8px; border-radius:4px; border:1px solid var(--line); background:var(--paper); color:var(--ink-soft); white-space:nowrap; }
-      .mon-status--in-lavorazione { background:var(--accent); color:var(--paper); border-color:var(--accent); }
+      .mon-status--da-correggere { background:var(--accent); color:var(--paper); border-color:var(--accent); }
+      .mon-status--bloccata { background:var(--paper); color:var(--accent); border-color:var(--accent); border-style:dashed; }
+      .mon-status--in-quarantena { background:var(--paper); color:var(--ink-soft); border-color:var(--ink-soft); border-style:dashed; opacity:.7; }
+      .mon-status--in-lavorazione { background:var(--paper); color:var(--accent); border-color:var(--accent); }
+      .mon-status--da-pubblicare { background:var(--paper); color:var(--navy); border-color:var(--navy); }
       .mon-status--pubblicata { background:var(--navy); color:var(--paper); border-color:var(--navy); }
-      .mon-status--da-pubblicare { background:var(--paper); color:var(--accent); border-color:var(--accent); }
-      .mon-status--in-attesa-di-monte { background:var(--paper); color:var(--ink); border-style:dashed; border-color:var(--ink-soft); }
+      .mon-status--proposta { background:var(--paper); color:var(--ink-soft); border-color:var(--ink-soft); border-style:dotted; }
+      .mon-status--in-attesa-di-monte { background:var(--paper); color:var(--ink); border-color:var(--ink-soft); border-style:dashed; }
       .mon-status--in-coda { background:var(--paper); color:var(--ink-soft); border-color:var(--line); }
       .mon-status--chiusa { background:var(--paper); color:var(--ink-soft); border-color:var(--line); opacity:.55; }
     </style>

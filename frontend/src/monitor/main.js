@@ -175,21 +175,37 @@ async function loadBoard(supabase) {
 // comprese le centinaia mai lavorate (prosa legacy, zero run): qui si separano.
 // Derivato lato console, senza toccare il modello condiviso con /_pipeline.
 const STATUS_ORDER = [
+  "da correggere",
+  "bloccata",
+  "in quarantena",
   "in lavorazione",
   "in coda",
+  "proposta",
   "in attesa di monte",
   "da pubblicare",
   "pubblicata",
   "chiusa",
 ];
 
+// La lavorazione parte dallo `state` autorevole del modello, che gia' antepone
+// invalidazione e blocchi al pubblicato (una pagina pubblicata ma con una
+// smentita aperta o dati scaduti e' `invalidata`, non `pubblicata`, e va corretta):
+// leggere `published` per primo la nasconderebbe. L'unico affinamento e' spezzare
+// l'`in-lavorazione` grezzo, che marca anche le centinaia mai toccate, in cio' che
+// la pipeline lavora davvero (una run o un ruolo in volo) e cio' che e' solo in coda.
 function workStatus(r) {
-  if (r.published === true) return "pubblicata";
-  if (r.state === "chiusa") return "chiusa";
-  if (r.state === "fusa") return "da pubblicare";
-  if (r.state === "in-attesa-di-monte") return "in attesa di monte";
-  if ((r.in_flight && r.in_flight.length) || (r.runs && r.runs.length)) return "in lavorazione";
-  return "in coda";
+  switch (r.state) {
+    case "pubblicata": return "pubblicata";
+    case "fusa": return "da pubblicare";
+    case "invalidata": return "da correggere";
+    case "bloccata": return "bloccata";
+    case "in-quarantena": return "in quarantena";
+    case "chiusa": return "chiusa";
+    case "proposta": return "proposta";
+    case "in-attesa-di-monte": return "in attesa di monte";
+    default: // in-lavorazione e ogni stato non previsto
+      return (r.in_flight && r.in_flight.length) || (r.runs && r.runs.length) ? "in lavorazione" : "in coda";
+  }
 }
 
 async function loadRuns(supabase) {
