@@ -1168,6 +1168,21 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
             "pubblicati e cronologia vuota (prove e diari assenti dall'immagine).",
         )
 
+    def test_dockerignore_keeps_runtime_state_out_of_the_image(self):
+        """`COPY data/` spedisce la storia committata, ma `.gitignore` NON protegge
+        il build context: solo `.dockerignore` lo fa. Un `docker build .` da un
+        working tree includerebbe altrimenti `data/leaderboard.sqlite3` (email, UUID,
+        nickname, preferiti: PII) e l'effimero. Qui si esige che le esclusioni di
+        runtime del `.gitignore` siano specchiate nel `.dockerignore`."""
+        dockerignore = (self.ROOT / ".dockerignore").read_text(encoding="utf-8").split()
+        for pattern in ("data/*.sqlite3", "data/istat_cache/", "data/eurostat_cache/",
+                        "data/pipeline/heartbeats/"):
+            self.assertIn(
+                pattern, dockerignore,
+                f".dockerignore non esclude {pattern}: un docker build da working tree "
+                f"potrebbe imbarcare stato di runtime o PII nell'immagine.",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
