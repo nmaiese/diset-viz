@@ -31,6 +31,13 @@
       table { width:100%; border-collapse: collapse; font-size: 13.5px; font-family: "Space Mono", ui-monospace, monospace; }
       th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); white-space: nowrap; }
       th { color: var(--ink-soft); font-weight:700; }
+      {# Su desktop le celle a testo lungo (nome indicatore, descrizione del
+         prossimo passo) restano in nowrap e gonfiano la tabella oltre la pagina.
+         Nelle tabelle .mon-cards le si lascia andare a capo e si tiene il testo
+         monospace fuori dalle celle lunghe, cosi' la tabella sta nella colonna. #}
+      table.mon-cards th, table.mon-cards td { white-space: normal; overflow-wrap: anywhere; vertical-align: top; }
+      table.mon-cards td.mon-mini { white-space: nowrap; overflow-wrap: normal; }
+      table.mon-cards td, table.mon-cards td small { font-family: Inter, system-ui, sans-serif; }
       td small { color: var(--ink-soft); font-size: 11px; }
       td a { color: var(--accent); text-decoration: none; }
       td a:hover { text-decoration: underline; }

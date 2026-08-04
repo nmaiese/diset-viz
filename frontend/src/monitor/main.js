@@ -263,6 +263,21 @@ function fillOptions(id, values) {
 
 const MINI_STATUS = { done: "●", current: "◐", issue: "◆", off: "○", waiting: "○" };
 
+// Cosa vuol dire ogni lavorazione, in chiaro: finisce nel title del badge, cosi'
+// "in attesa di monte" e simili non restano gergo. Testi da docs/EDITORIAL_PRACTICE.
+const STATUS_HELP = {
+  "in lavorazione": "La pipeline ci sta lavorando: una run in corso o gia' fatta.",
+  "in coda": "Nel catalogo ma mai lavorato dalla pipeline (nessuna run).",
+  "in attesa di monte": "Fermo perche' manca il passo a monte: l'artefatto atteso dallo stadio precedente (es. la curatela) non esiste ancora.",
+  "da pubblicare": "Articolo fuso, in attesa della prova di pubblicazione sul sito.",
+  "pubblicata": "Pubblicato sul sito, con prova registrata.",
+  "da correggere": "Pubblicato ma invalidato (smentita aperta o dati scaduti): va corretto.",
+  "bloccata": "Fermo in attesa di un cambio esterno (es. un chiarimento dalla fonte).",
+  "in quarantena": "Bloccato in modo terminale, tolto dalla coda.",
+  "proposta": "Ammesso ma senza curatela ne' articolo: nessuno lo riprende.",
+  "chiusa": "Candidatura chiusa, nessuna azione.",
+};
+
 function renderCatalog() {
   const el = document.getElementById("mon-catalog");
   if (!el) return;
@@ -365,7 +380,7 @@ function renderCatalog() {
         return (
           '<tr><td data-label="Indicatore">' + name + "<br><small>" + escapeHtml(r.id) + "</small></td>" +
           '<td data-label="Famiglia">' + escapeHtml(r.family) + "</td>" +
-          '<td data-label="Lavorazione"><span class="mon-status mon-status--' + st.replace(/ /g, "-") + '">' + escapeHtml(st) + "</span></td>" +
+          '<td data-label="Lavorazione"><span class="mon-status mon-status--' + st.replace(/ /g, "-") + '" title="' + escapeHtml(STATUS_HELP[st] || "") + '">' + escapeHtml(st) + "</span></td>" +
           '<td data-label="Fase">' + escapeHtml(r.phase) + "</td>" +
           '<td data-label="Ciclo" class="mon-mini">' + mini + "</td>" +
           '<td data-label="Prossimo passo">' + escapeHtml(ns.owner || "") + "<br><small>" + escapeHtml(ns.label || "") + "</small></td>" +
