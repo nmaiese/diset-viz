@@ -33,11 +33,11 @@ COPY content/ content/
 # produzione e la suite qui gira senza container.
 COPY scripts/ scripts/
 # `data/` porta la storia committata della catena che la dashboard legge a runtime
-# (`/_pipeline` e `/_pipeline/api/*`): le prove di pubblicazione in
-# `data/pipeline/pubblicazioni/` (senza le quali il server calcola ZERO pubblicati,
-# i 10 diventano "da pubblicare"), i diari in `data/pipeline/runs/` (senza i quali
-# la cronologia e' vuota e ogni indicatore risulta "in coda"), le verifiche e la
-# scoperta. Sono ~2 MB di file versionati; l'effimero (cache, battiti, sqlite) e'
+# (`/_pipeline` e `/_pipeline/api/*`): i diari in `data/pipeline/runs/` (senza i
+# quali la cronologia e' vuota e ogni indicatore risulta "in coda"), le verifiche
+# e la scoperta. Il cruscotto ricava `pubblicata` dagli articoli fusi su master,
+# non da un registro di prove di pubblicazione (quel registro e' stato rimosso).
+# Sono ~2 MB di file versionati. L'effimero (cache, battiti, sqlite) e'
 # gitignored, quindi non entra nel context di Cloud Build. `test_app.py` sorveglia
 # che questa COPY resti, perche' e' un buco che si vede solo in produzione.
 COPY data/ data/

@@ -22,8 +22,7 @@ STATES = (
     "in-lavorazione",      # uno stadio obbligatorio non e' ancora completo
     "in-attesa",           # ferma in attesa di una condizione (vedi IN_ATTESA_MOTIVI)
     "pronta-al-merge",     # tutti gli stadi del ciclo completi, cancello verde
-    "fusa",                # il ciclo e' su master, non ancora verificato sul sito
-    "pubblicata",          # visibile sul sito e verificata
+    "pubblicata",          # fusa su master (= pubblicata: il progetto ha ratificato merge=pubblicazione)
     "invalidata",          # un input e' cambiato: passaggi a valle non valgono piu'
     "in-quarantena",       # in-attesa terminale, tolta dalla coda per non fermare le altre
     "chiusa",              # esito terminale raggiunto
@@ -42,7 +41,7 @@ IN_ATTESA_MOTIVI = (
 # --- Esiti terminali (§7) ----------------------------------------------------
 # "PR chiusa" non e' un esito editoriale. Una pratica `chiusa` porta uno di questi.
 TERMINAL_OUTCOMES = (
-    "pubblicata-verificata",  # il solo esito "riuscito"
+    "pubblicata",             # il solo esito "riuscito": fusa su master
     "rifiutata",
     "duplicata",
     "sostituita",
@@ -93,7 +92,7 @@ REQUIRED_STAGES = {
 # --- Transizioni ammesse (§4) ------------------------------------------------
 # Il grafo degli stati e' universale; i tipi differiscono negli stadi
 # obbligatori, non nel grafo. Nessun salto implicito: una coppia non elencata e'
-# una transizione vietata (es. `in-lavorazione -> pubblicata` saltando `fusa`).
+# una transizione vietata (es. `in-lavorazione -> pubblicata` saltando `pronta-al-merge`).
 TRANSITIONS = frozenset({
     ("proposta", "in-lavorazione"),
     ("proposta", "chiusa"),
@@ -105,11 +104,9 @@ TRANSITIONS = frozenset({
     ("in-attesa", "in-lavorazione"),
     ("in-attesa", "in-quarantena"),
     ("in-attesa", "chiusa"),
-    ("pronta-al-merge", "fusa"),
+    ("pronta-al-merge", "pubblicata"),
     ("pronta-al-merge", "invalidata"),
     ("pronta-al-merge", "in-attesa"),
-    ("fusa", "pubblicata"),
-    ("fusa", "invalidata"),
     ("pubblicata", "chiusa"),
     ("pubblicata", "invalidata"),
     ("invalidata", "in-lavorazione"),
@@ -214,7 +211,7 @@ def priority_score(practice: dict, today: str) -> float:
     flags = practice.get("flags") or {}
     score = 0.0
 
-    if flags.get("open_smentita") and practice.get("state") in ("fusa", "pubblicata", "invalidata"):
+    if flags.get("open_smentita") and practice.get("state") in ("pubblicata", "invalidata"):
         score += 100.0
 
     ptype = practice.get("type", "nuovo")

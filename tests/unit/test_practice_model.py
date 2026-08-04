@@ -13,7 +13,8 @@ class Vocabulary(unittest.TestCase):
     def test_states_and_outcomes_are_finite_and_disjoint(self):
         self.assertEqual(len(set(m.STATES)), len(m.STATES))
         self.assertEqual(len(set(m.TERMINAL_OUTCOMES)), len(m.TERMINAL_OUTCOMES))
-        self.assertIn("pubblicata-verificata", m.TERMINAL_OUTCOMES)
+        self.assertIn("pubblicata", m.TERMINAL_OUTCOMES)
+        self.assertNotIn("fusa", m.STATES)  # merge = pubblicazione, niente stato intermedio
 
     def test_every_type_has_an_entry_stage_and_required_stages(self):
         for ptype in m.PRACTICE_TYPES:
@@ -22,14 +23,16 @@ class Vocabulary(unittest.TestCase):
 
 
 class Transitions(unittest.TestCase):
-    def test_merge_then_publish_is_allowed(self):
-        self.assertTrue(m.can_transition("pronta-al-merge", "fusa"))
-        self.assertTrue(m.can_transition("fusa", "pubblicata"))
+    def test_merge_publishes(self):
+        # Merge = pubblicazione: pronta-al-merge va diritta a pubblicata, senza
+        # uno stato `fusa` intermedio ne' una verifica-sito.
+        self.assertTrue(m.can_transition("pronta-al-merge", "pubblicata"))
+        self.assertFalse(m.can_transition("pronta-al-merge", "fusa"))
 
     def test_no_implicit_jump_to_published(self):
-        # Non si pubblica saltando il merge (§4): la coppia non esiste.
+        # Non si pubblica saltando il cancello (§4): la coppia non esiste.
         self.assertFalse(m.can_transition("in-lavorazione", "pubblicata"))
-        self.assertFalse(m.can_transition("pronta-al-merge", "pubblicata"))
+        self.assertFalse(m.can_transition("proposta", "pubblicata"))
 
     def test_closed_is_terminal(self):
         self.assertTrue(m.is_terminal_state("chiusa"))

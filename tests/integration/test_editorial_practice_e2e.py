@@ -1,34 +1,29 @@
 """Il modello a pratica editoriale, provato end-to-end contro l'app servita.
 
 Questo test prende le primitive che il modello unifica (`practice_timeline`,
-`verify_publication`, `practice_store`, `practice_metrics`, la priorita' del
-lanciatore `pipeline_launch`) e le fa girare **insieme**, sul percorso reale di un
+`practice_store`, `practice_metrics`, la priorita' del lanciatore
+`pipeline_launch`) e le fa girare **insieme**, sul percorso reale di un
 indicatore, contro un sito **davvero servito**: un gunicorn su `run:app`, non il
-test client. E' la differenza che conta, perche' la transizione `fusa ->
-pubblicata` (docs/EDITORIAL_PRACTICE.md, §8) esiste apposta per distinguere "fuso
-su master" da "la pagina pubblica serve questa versione", e la si puo' provare
-solo contro una pagina viva.
+test client. Il progetto ha ratificato **merge = pubblicazione**: un articolo
+fuso su master e' `pubblicata`, non c'e' piu' uno stato `fusa` intermedio ne' una
+verifica-sito.
 
 Copre, senza ricostruzioni a mano:
   1. osservabilita' (Fase B): la storia intera di un indicatore dai soli artefatti.
   2. riconciliatore (Fase C): scritto vs ricostruito, zero divergenze, poi una sola
      divergenza dopo una perturbazione dichiarata.
-  3. verifica del sito (Fase D): la prova promuove a `pubblicata`, un cambio di
-     prosa la fa scadere (tripwire), un sito irraggiungibile da' `ok=None`.
-  4. cicli di manutenzione (Fase E): due cicli distinti ma collegati.
-  5. priorita' del dispatcher (Fase F): una smentita reale scavalca l'ordine di catena.
-  6. associazione run->indicatore: un id BES col trattino non si tronca.
-  7. metriche (Fase F): la fotografia prima/dopo, con i suoi None dichiarati.
+  3. cicli di manutenzione (Fase E): due cicli distinti ma collegati.
+  4. priorita' del dispatcher (Fase F): una smentita reale scavalca l'ordine di catena.
+  5. associazione run->indicatore: un id BES col trattino non si tronca.
+  6. metriche (Fase F): la fotografia prima/dopo, con i suoi None dichiarati.
 
-Gli artefatti derivati (record di pratica, prove di pubblicazione) restano in
-cartelle temporanee: non si committano, si ricostruiscono a comando.
+Gli artefatti derivati (record di pratica) restano in cartelle temporanee: non si
+committano, si ricostruiscono a comando.
 
 Un solo indicatore committato regge tutto il percorso, e se un giorno sparisce il
 test lo dice invece di fingere di aver provato.
 """
 
-import copy
-import http.client
 import os
 import signal
 import socket
@@ -44,7 +39,6 @@ from pathlib import Path
 from scripts import (curate, discovery, indicator_store, pending_notes,
                      pipeline_launch, pipeline_log, practice_metrics,
                      practice_store, practice_timeline)
-from scripts import verify_publication as vp
 from scripts import verification_queue as vq
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -141,11 +135,11 @@ def _read_inputs():
     }
 
 
-def _reconstruct(inputs, proofs=None):
+def _reconstruct(inputs):
     return practice_timeline.reconstruct(
         inputs["candidates"], inputs["manifest"], inputs["curation"],
         inputs["external"], inputs["articles"], inputs["verifiche"],
-        inputs["runs"], verifications_site=proofs)
+        inputs["runs"])
 
 
 # Un id esterno inventato, cosi' la fixture non dipende da nessun artefatto
@@ -284,97 +278,7 @@ class Reconciler(unittest.TestCase):
         self.assertEqual(row["reconstructed"], "in-lavorazione")
 
 
-# --- 3. Verifica del sito, fusa -> pubblicata (Fase D) -----------------------
-
-class SiteVerificationLive(unittest.TestCase):
-    """Contro il gunicorn servito: la forma a solo code 301-reindirizza allo
-    slug canonico, la firma lead+vintage combacia, la prova promuove a
-    `pubblicata`, un cambio di prosa la fa scadere, un sito giu' da' `ok=None`."""
-
-    def setUp(self):
-        if not _SITE_BASE:
-            self.skipTest("gunicorn non e' stato avviato in questo ambiente")
-        self.entry = indicator_store.read(PINNED_TER)
-        if self.entry is None:
-            self.skipTest(f"l'articolo {PINNED_TER} non e' piu' nel repo")
-        self.code = practice_timeline.code_of(PINNED_TER)
-        self.url = vp.build_url(self.code, base=_SITE_BASE)
-
-    def test_code_only_url_301s_to_canonical_slug(self):
-        host = _SITE_BASE.split("://", 1)[1]
-        conn = http.client.HTTPConnection(host, timeout=10)
-        try:
-            conn.request("GET", f"/indicatore/{self.code}")
-            resp = conn.getresponse()
-            location = resp.getheader("Location") or ""
-            resp.read()
-        finally:
-            conn.close()
-        self.assertIn(resp.status, (301, 308))
-        self.assertIn("/indicatore/", location)
-        self.assertIn(self.code, location)
-
-    def test_publication_proof_promotes_to_pubblicata(self):
-        # la verifica gira contro la pagina vera, seguendo il 301
-        result = vp.verify(self.url, self.entry)
-        self.assertTrue(result["ok"], result)
-        self.assertTrue(result["snippet_ok"])
-        self.assertTrue(result["vintage_ok"])
-        result["code"] = self.code
-
-        # la prova, scritta in un registro temporaneo, porta la ricostruzione a
-        # `pubblicata`: la transizione e' guidata dall'artefatto, non da una
-        # modifica di stato a mano
-        root = tempfile.mkdtemp()
-        vp.write_proof(vp.build_proof(self.entry, result), root=root)
-        d = practice_timeline.load_real(proofs_root=root).get(PINNED_TER)
-        self.assertIsNotNone(d)
-        self.assertTrue(d["published"])
-        self.assertEqual(d["state"], "pubblicata")
-
-    def test_tripwire_prose_change_expires_the_proof(self):
-        # scrivo una prova vera (impronta della versione attuale) contro il sito
-        result = vp.verify(self.url, self.entry)
-        self.assertTrue(result["ok"], result)
-        result["code"] = self.code
-        root = tempfile.mkdtemp()
-        vp.write_proof(vp.build_proof(self.entry, result), root=root)
-        proofs = vp.load_proofs(root=root)
-
-        inputs = _read_inputs()
-        # baseline: la prova combacia con la prosa committata -> pubblicata
-        base = _reconstruct(inputs, proofs=proofs)[PINNED_TER]
-        self.assertTrue(base["published"])
-        self.assertEqual(base["state"], "pubblicata")
-
-        # il revisore riscrive il lead: l'articolo e la sua verifica prendono una
-        # nuova impronta, la prova sul sito resta ancorata alla vecchia. La prova
-        # scade: published torna False, lo stato torna `fusa` (non regredisce a
-        # in-lavorazione perche' la verifica del contenuto e' stata rifatta).
-        tam = copy.deepcopy(inputs)
-        tam["articles"][PINNED_TER]["lead"] = \
-            "Riscrittura del revisore. " + (tam["articles"][PINNED_TER].get("lead") or "")
-        new_fp = vq.prose_fingerprint(tam["articles"][PINNED_TER])
-        for row in tam["verifiche"]:
-            if row.get("code") == self.code:
-                row["prosa"] = new_fp
-        after = _reconstruct(tam, proofs=proofs)[PINNED_TER]
-        self.assertFalse(after["published"])
-        self.assertEqual(after["state"], "fusa")
-
-    def test_unreachable_site_is_none_not_a_pass(self):
-        def dead_fetcher(url):
-            raise OSError("connessione rifiutata")
-
-        result = vp.verify(self.url, self.entry, fetcher=dead_fetcher)
-        # ne' successo ne' fallimento: un controllo che non ha potuto girare non passa
-        self.assertIsNone(result["ok"])
-        self.assertEqual(result["reason"], "irraggiungibile")
-        # e non promuove niente: senza prova la ricostruzione resta non-pubblicata
-        self.assertNotEqual(practice_timeline._published_from([], None), True)
-
-
-# --- 4. Cicli di manutenzione (Fase E) --------------------------------------
+# --- 3. Cicli di manutenzione (Fase E) --------------------------------------
 
 class MaintenanceCycles(unittest.TestCase):
     """Un indicatore con una smentita ha due cicli distinti ma collegati; uno a
@@ -488,14 +392,6 @@ class Metrics(unittest.TestCase):
         metrics = practice_metrics.load_and_compute()
 
         oss = metrics["osservabilita"]
-        # Questi due conteggi possono legittimamente essere 0: il passo del sito
-        # pubblica l'indicatore fuso e chiude il gap `fusa_senza_prova` (651), e
-        # una smentita corretta chiude `errori_pubblici` (eur:rd_e_gerdreg). Il
-        # test verifica che le metriche siano esposte e valide, non che il gap
-        # esista: pinnarle a >= 1 le accoppiava a uno stato transitorio che la
-        # normale operativita' della catena azzera, e faceva fallire la suite.
-        self.assertIsNotNone(oss["fusa_senza_prova_sul_sito"])
-        self.assertGreaterEqual(oss["fusa_senza_prova_sul_sito"], 0)
         self.assertIsNotNone(oss["quota_run_associati_a_un_indicatore_pct"])
 
         aff = metrics["affidabilita"]

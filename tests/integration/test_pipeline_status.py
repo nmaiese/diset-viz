@@ -59,35 +59,15 @@ class ItRunsOnAColdCheckout(unittest.TestCase):
                 self.assertTrue(state.get("motivo"))
 
 
-class ThePublisherQueueIsSurfacedButNotAStage(unittest.TestCase):
-    """La coda `fusa -> pubblicata` va vista, ma il publisher non e' uno stadio
-    dell'ordine di catena: metterlo in STAGE_ORDER lo farebbe lanciare come un
-    ruolo, che non e' (e' il passo del sito del lanciatore). Quindi si espone a
-    parte, e la vista degli stadi resta pulita."""
+class ThePublisherIsGone(unittest.TestCase):
+    """Rimossa la verifica-sito (merge = pubblicazione), il `publisher` non esiste
+    piu' come stadio ne' come coda: la vista degli stadi non lo nomina."""
 
     def test_the_publisher_is_not_among_the_ordered_stages(self):
         stages = [s["stage"] for s in pipeline_status.build_status()["stages"]]
         self.assertNotIn("publisher", stages)
         self.assertNotIn("publisher", pipeline_status.queue_sizes())
         self.assertNotIn("publisher", pipeline_status.STAGE_ORDER)
-
-    def test_main_json_exposes_the_publication_queue(self):
-        import io
-        import json
-        import sys
-        from contextlib import redirect_stdout
-
-        # `main` legge sys.argv (argparse senza argv), quindi lo si pilota da li'.
-        argv, sys.argv = sys.argv, ["pipeline_status.py", "--json"]
-        buffer = io.StringIO()
-        try:
-            with redirect_stdout(buffer):
-                pipeline_status.main()
-        finally:
-            sys.argv = argv
-        payload = json.loads(buffer.getvalue())
-        self.assertIn("publication", payload)
-        self.assertEqual(payload["publication"]["stage"], "publisher")
 
 
 if __name__ == "__main__":

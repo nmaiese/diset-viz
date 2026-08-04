@@ -340,22 +340,7 @@ def main():
 
     status = build_status([args.stage] if args.stage else None)
 
-    # La coda del publisher (fusa -> pubblicata) vive fuori da STAGE_ORDER: il
-    # publisher non e' uno stadio dell'ordine di catena, e' il passo del sito del
-    # lanciatore. La superficie qui, a parte, cosi' un indicatore fuso in attesa
-    # del deploy non resta invisibile, senza aggiungerlo a build_status /
-    # queue_sizes (dove romperebbe il guardrail "publisher fuori da STAGE_ORDER").
-    # Import pigro e difensivo: su un checkout freddo il view model puo' fallire.
-    try:
-        from scripts import verify_publication
-
-        publication = verify_publication.stage_report()
-    except Exception:
-        publication = None
-
     if args.json:
-        if publication is not None:
-            status["publication"] = publication
         print(json.dumps(status, ensure_ascii=False, indent=2))
         return 0
 
@@ -366,11 +351,6 @@ def main():
         shown = "?" if waiting is None else str(waiting)
         print(f" {mark} {entry['stage']:9s} {entry['agent']:19s} in attesa: {shown:<5s} {entry['next']}")
     print()
-    if publication is not None:
-        n = publication["waiting"]
-        print("Coda publisher (fusa -> pubblicata): "
-              + (f"{n} indicatori da verificare sul sito." if n
-                 else "vuota, ogni indicatore fuso ha una prova valida."))
     if status["unknown_stages"]:
         print("Code non contate (il totale le esclude): "
               + ", ".join(status["unknown_stages"]))

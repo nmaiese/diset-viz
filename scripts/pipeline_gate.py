@@ -84,10 +84,6 @@ RUN_JOURNAL = "data/pipeline/runs/"
 # Il registro delle verifiche. Sta nel perimetro del solo verificatore, ed e'
 # tutto quello che quello stadio produce.
 VERIFICATIONS = "data/pipeline/verifiche/"
-# Il registro delle prove di pubblicazione (§8 di EDITORIAL_PRACTICE.md). Sta nel
-# perimetro del solo `publisher`, lo stadio che verifica il sito e osserva la
-# transizione `fusa -> pubblicata`. Come gli altri store e' a un file per record.
-PUBLICATIONS = "data/pipeline/pubblicazioni/"
 
 # What each stage is allowed to change. Anything outside its list is a failure,
 # not a warning: the point of the list is that a prompt cannot widen it.
@@ -110,13 +106,6 @@ STAGE_PATHS = {
     # parola del revisore sul lavoro del revisore. Le smentite tornano al revisore
     # come il segnale `smentita` di `review_queue`, che le legge da qui.
     "verificatore": (VERIFICATIONS, RUN_JOURNAL),
-    # Il publisher verifica il sito dopo il merge e il deploy e scrive una prova
-    # in `pubblicazioni/`. Non tocca ne' l'articolo ne' la verifica: osserva, non
-    # ripara, come il verificatore. Lo stadio esiste nel cancello (perimetro e
-    # merge) ma **non** in `pipeline_status.STAGE_ORDER`: non e' uno stadio
-    # dell'ordine di catena, e' il passo del sito del lanciatore
-    # (`pipeline_launch.py --publish`), che committa la prova da se'.
-    "publisher": (PUBLICATIONS, RUN_JOURNAL),
     # I due ruoli della ri-architettura per-indicatore. Nascono qui accanto ai
     # vecchi stadi: il perimetro e' l'unione di quelli che fondono, perche' un
     # ruolo porta un indicatore da grezzo a pubblicato in una sola run. Restano
@@ -182,11 +171,6 @@ MERGE_POLICY = {
     "writer": "auto",
     "reviewer": "auto",
     "verificatore": "auto",
-    # `publisher` non e' in STAGE_ORDER e non e' uno stadio dell'ordine di catena:
-    # la prova di pubblicazione si committa nel passo `--publish` del tick del
-    # lanciatore, non via una PR e questo passo di merge. La sua policy resta
-    # inerte, la lasciamo `checks`.
-    "publisher": "checks",
     # I ruoli per-indicatore fondono `auto` come tutti gli altri: il cancello
     # locale gira la suite e gli invarianti prima del merge.
     "producer": "auto",
@@ -742,90 +726,6 @@ def _verification_rows_added(base=None, cwd=None, include_worktree=True):
     return rows
 
 
-def _publication_rows_added(base=None, cwd=None, include_worktree=True):
-    """Le prove di pubblicazione che questo branch aggiunge o riscrive.
-
-    Una prova puo' essere riscritta senza colpa: rifare la stessa verifica scrive
-    lo stesso nome di file (l'impronta `prosa` e' nel nome), ed e' idempotente.
-    Quindi qui bastano aggiunte e modifiche, senza la regola append-only del
-    diario o delle verifiche.
-    """
-    rows = []
-    touched = _touched_under(PUBLICATIONS, base, cwd=cwd, include_worktree=include_worktree)
-    for path in touched["added"] + touched["changed"]:
-        try:
-            data = json.loads((_root_for(cwd) / path).read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        if isinstance(data, dict):
-            rows.append(data)
-    return rows
-
-
-def check_publications(base=None, cwd=None, include_worktree=True):
-    """Il publisher consegna delle prove, quindi le prove devono reggere.
-
-    Impone la prudenza di §8 invece di ricordarla: una prova con `ok` diverso da
-    True e' un controllo che non ha confermato niente, e registrarla come
-    pubblicazione e' il falso positivo che tutta la Fase D esiste per non avere.
-    L'impronta `prosa` deve corrispondere a un testo che questo repo ha davvero
-    avuto, quello di adesso o quello della base, per la stessa ragione delle
-    verifiche: una prova ancorata a un'impronta che non e' di nessuna versione e'
-    la prova di un testo che non e' in pagina. Il grosso del giudizio e' in
-    `verify_publication.publication_problems`, puro e provato senza un albero git.
-    """
-    from scripts import practice_timeline, verify_publication, verification_queue
-
-    # Cancellare una prova non e' mai legittimo: una prova scade quando il testo
-    # cambia (l'impronta non combacia piu' e la ricostruzione la ignora), non
-    # togliendola. Cancellarla farebbe regredire un indicatore da `pubblicata` a
-    # `fusa` senza lasciare traccia, che e' esattamente la sparizione di una prova
-    # che il cancello deve impedire. La riscrittura in posto invece si controlla
-    # come una riga nuova, sotto.
-    gone = _touched_under(PUBLICATIONS, base, cwd=cwd, include_worktree=include_worktree)["gone"]
-    if gone:
-        return Check(
-            "pubblicazioni", False,
-            f"il registro delle prove non si cancella: questa run toglie {len(gone)} "
-            f"prove ({', '.join(sorted(gone)[:5])}). Una prova scade cambiando il testo, "
-            "non cancellandola, e toglierla fa regredire un indicatore da pubblicata a fusa.")
-
-    rows = _publication_rows_added(base, cwd=cwd, include_worktree=include_worktree)
-    if not rows:
-        return Check("pubblicazioni", True, "nessuna prova nuova da controllare")
-
-    resolved = resolve_base(base, cwd=cwd)
-    try:
-        entries = indicator_store.load_all(root=_indicators_root(cwd))
-    except (OSError, ValueError, indicator_store.StoreError):
-        entries = {}
-
-    valid = {}
-    for row in rows:
-        code = (row.get("code") or "").strip()
-        if not code or code in valid:
-            continue
-        key = practice_timeline.key_of_code(code)
-        fingerprints = set()
-        entry = entries.get(key)
-        if entry is not None:
-            fingerprints.add(verification_queue.prose_fingerprint(entry))
-        if resolved:
-            old = _read_json_at(resolved, INDICATOR_TEXTS + indicator_store.filename_for(key), cwd=cwd)
-            if isinstance(old, dict):
-                fingerprints.add(verification_queue.prose_fingerprint(old))
-        if fingerprints:
-            valid[code] = fingerprints
-
-    problems = []
-    for row in rows:
-        problems.extend(verify_publication.publication_problems(row, valid))
-    if problems:
-        return Check("pubblicazioni", False, "; ".join(problems[:5]))
-    return Check("pubblicazioni", True,
-                 f"{len(rows)} prove, tutte confermate e ancorate al testo di adesso o della base")
-
-
 def check_reviewer_signature(base=None, cwd=None, include_worktree=True):
     """The reviewer's whole output is a signature, so a run that changed prose
     without signing has not reviewed, it has rewritten.
@@ -1141,8 +1041,6 @@ def invariant_labels(stage, paths):
             labels.append("signature")
     if touched(VERIFICATIONS):
         labels.append("verifications")
-    if touched(PUBLICATIONS):
-        labels.append("publications")
     return labels
 
 
@@ -1178,7 +1076,6 @@ def run(stage, base=None, skip_tests=False, cwd=None, committed_only=False):
         "vintage": lambda: check_writer_vintage(base, cwd=cwd, include_worktree=iw),
         "signature": lambda: check_reviewer_signature(base, cwd=cwd, include_worktree=iw),
         "verifications": lambda: check_verifications(base, cwd=cwd, include_worktree=iw),
-        "publications": lambda: check_publications(base, cwd=cwd, include_worktree=iw),
     }
     for label in invariant_labels(stage, paths):
         checks.append(builders[label]())
