@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-05T21:17:35+00:00",
+ "base_commit": "5be4fd7",
+ "branch": "automation/verificatore-2026-08-05-5388",
+ "claude_code_version": "2.1.222 (Claude Code)",
+ "commit": "5be4fd7",
+ "detail": [
+  "20/20 confermate. Serie 2024: Liguria chiude il blocco basso a 12,37 e Lazio riparte a 15,16 (vuoto 2,79); media 14,78 cade nella fascia vuota, 3,08 sopra la mediana 11,70; Lombardia 10,05 vs Umbria 10,07 (0,02); Puglia->Campania stacco 3,48 e' il piu' largo; Basilicata 17,04 prima delle 8 meridionali, 1,88 da Lazio e 9,19 da Calabria. Dinamica 2018-2024: calo in tutte 20; media -7,23; divario -7,26; Sicilia -12,62 (calo max); Abruzzo -3,31 (calo min), nel 2018 20,53 sopra Umbria 18,86 e Liguria 19,82; Basilicata passa Abruzzo per 0,18; Trentino 2018 12,5167 (~12,52, minimo storico), oggi Liguria 12,37 sotto; 2023->2024 sette regioni in aumento. Incroci ter-12 e bes-03LAV006-N25 verificati sui brief. Esterno Eurostat confermato alla fonte: UE 11,0%, Italia 25,7->13,3, calo in 22/27 paesi, Italia il piu' ampio (aggregato ponderato correttamente distinto dalla media semplice). Zero smentite."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 17,
+ "queue_before": 18,
+ "run_id": "verificatore-20260805T211242Z-5388",
+ "stage": "verificatore",
+ "summary": "Verificato ter-408 (Tasso giovani NEET totale): 20 affermazioni controllate, tutte confermate, esito pulito",
+ "trigger": "manuale"
+}
