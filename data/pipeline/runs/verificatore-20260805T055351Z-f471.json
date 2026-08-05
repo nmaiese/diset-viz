@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-05T05:59:44+00:00",
+ "base_commit": "bc64f1a",
+ "branch": "automation/verificatore-2026-08-05-f471",
+ "claude_code_version": "2.1.222 (Claude Code)",
+ "commit": "bc64f1a",
+ "detail": [
+  "ter-242: 21 controllate, 21 confermate, 0 smentite, esito pulito. Ranking 2023, dinamica delle medie 1996-2023 (2022 e 2023 i due minimi, -0,80 e -0,88), incroci ter-241/ter-157/ter-471 tutti verificati. Nota: la fonte segnala una distorsione su Umbria 1995-1996, ma l'articolo riporta il valore pubblicato (2,68) correttamente e la tesi regge."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 22,
+ "queue_before": 23,
+ "run_id": "verificatore-20260805T055351Z-f471",
+ "stage": "verificatore",
+ "summary": "Verificato ter-242 (tasso di iscrizione netto registro imprese), 21 affermazioni, nessuna smentita",
+ "trigger": "manuale"
+}
