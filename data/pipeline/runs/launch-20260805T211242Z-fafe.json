@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-05T21:12:42+00:00",
+ "base_commit": "22abe53",
+ "branch": "claude/sleepy-mayer-gikbb4",
+ "claude_code_version": "2.1.222 (Claude Code)",
+ "commit": "25aae5a",
+ "detail": [],
+ "duration_seconds": 8,
+ "gate": "",
+ "outcome": "nothing",
+ "pr": "",
+ "run_id": "launch-20260805T211242Z-fafe",
+ "session_id": "08f4332c-088d-523c-844c-888d5401f144",
+ "stage": "launch",
+ "summary": "tick: 365 unita' pronte",
+ "trigger": "routine"
+}
