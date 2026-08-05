@@ -1,0 +1,23 @@
+{
+ "at": "2026-08-05T21:26:39+00:00",
+ "base_commit": "0531f05",
+ "branch": "automation/producer-2026-08-05-1ed2",
+ "claude_code_version": "2.1.222 (Claude Code)",
+ "commit": "5be4fd7",
+ "detail": [
+  "Cura: nessun cambio. Verso lower_better verificato sulla classifica 2025 (Trentino Alto Adige 19,89 primo, Molise 70,83 ultimo), categoria Lavoro e conciliazione gia' mappata, score_eligible true su 20 regioni e 8 anni. curate.py: nessun indicatore esterno da curare.",
+  "Smentita chiusa: dinamica diceva 'arrivata a 47,06 nel 2020, il minimo della serie'. Falso, il minimo della media semplice e' 46,21 nel 2024. La dinamica ora e' costruita sulle due risalite (2021 +5,97 e 2025 +1,03) e dice 'Il punto piu' basso della serie resta il 2024, con una media di 46,21 per cento'.",
+  "Correzioni trovate in rilettura, non segnalate da nessuna guardia: 'La regione di mezzo sta al 44,35' -> 'Il valore mediano e' 44,35 per cento' (con 20 regioni la mediana e' il punto medio fra 43,10 e 45,59, nessuna regione ci sta); 'dieci punti guadagnati' -> 'dieci punti in meno' sulla Sardegna (-10,33, dal 14 al 10 posto); 'Il 2025 e' questo caso' -> 'Il 2025 somiglia al primo dei due casi', ambiguo dopo due meccanismi.",
+  "Aggiunte verificate: il salto piu' largo della graduatoria, quasi undici punti fra Trentino Alto Adige 19,89 e Valle d'Aosta 30,65, che l'articolo prima taceva pur dicendo che la graduatoria non scende con regolarita'; l'eccezione alla co-occorrenza con ter-12, il Molise ultimo qui e con sei regioni peggiori di lui sul tasso di disoccupazione; ter-17 media 3,24 nel 2025, minimo della sua serie.",
+  "Firma: reviewed_at 2026-08-05, reviewed_vintage 2025, vintage 2025, level regione. 784 parole, 4 link interni canonici, fonti vuote perche' nessun claim esce da questo dataset. prose_lint pulito, test_indicator_texts verde."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 0,
+ "queue_before": 1,
+ "run_id": "producer-20260805T211242Z-1ed2",
+ "stage": "producer",
+ "summary": "ter-16 (incidenza disoccupazione di lunga durata): assorbita la smentita sul minimo della serie, articolo riletto per intero e rifirmato",
+ "trigger": "manuale"
+}
