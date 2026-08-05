@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-05T20:44:32+00:00",
+ "base_commit": "81669e6",
+ "branch": "automation/verificatore-2026-08-05-c25b",
+ "claude_code_version": "2.1.222 (Claude Code)",
+ "commit": "81669e6",
+ "detail": [
+  "24 claim falsificabili tutti confermati contro la serie 2004-2023 e i brief incrociati: lead 2019 max=Valle d'Aosta 3,19 e 2023=0; 9 regioni diverse al vertice in 20 anni; 2004 max Trentino 8,40 oggi 0,46 sotto media; 2012 Umbria 14,81 poi 2013 1,57; Molise 2022 max 2,06 sceso a 1,38 (0,68); Campania unica alta in tutte e tre le graduatorie (282 #19, ter-134 #18, ims #17); Sardegna rompe schema con ter-542 554,81 (6a piu lunga) e tasso 0,19; Valle d'Aosta vuota 6 anni (2006,2009,2011,2014,2015,2016) e a zero 4 (2018,2020,2022,2023); mediana 0,43; 18/20 sotto 1,5; rho +0,66 con ter-542"
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 20,
+ "queue_before": 21,
+ "run_id": "verificatore-20260805T203916Z-c25b",
+ "stage": "verificatore",
+ "summary": "Verificato ter-282 (criminalita organizzata), 24 affermazioni controllate, 0 smentite, esito pulito",
+ "trigger": "manuale"
+}
