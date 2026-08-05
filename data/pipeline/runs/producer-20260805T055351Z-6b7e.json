@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-05T06:11:03+00:00",
+ "base_commit": "5ca6849",
+ "branch": "automation/producer-2026-08-05-6b7e",
+ "claude_code_version": "2.1.222 (Claude Code)",
+ "commit": "bb175b7",
+ "detail": [
+  "verso confermato lower_better: in cima Trentino Alto Adige 19,89, in fondo Molise 70,83, e una quota bassa di disoccupati fermi da oltre un anno e' la lettura migliore. Tema Lavoro (categoria lavoro_opportunita'), score_eligible resta true, nessun file di cura toccato. Smentita 1 (dinamica): riscritta la serie, media semplice delle venti regioni 54,45 nel 2018, 47,06 nel 2020 (minimo), 53,03 nel 2021, 46,21 nel 2024, 47,24 nel 2025: il rimbalzo del 2021 vale quasi sei punti ed e' il movimento piu' largo della serie, l'ultimo rialzo poco piu' di un sesto. Aggiunto che nel 2020 la quota scende in tutte e venti le regioni e nel 2021 risale in tutte e venti. Smentita 2 (quadro): sotto il salto di cinque punti dopo il Piemonte ci sono sette regioni del Mezzogiorno su otto piu' Lazio e Friuli-Venezia Giulia, la Sardegna e' decima e resta sopra. Limiti: aggiunto il contrasto 2025 con ter-17, quota +1,03 mentre il tasso di lunga durata scende da 3,51 a 3,24 (media semplice delle venti regioni). 766 parole, 4 link interni, fonti vuote perche' nessun claim esce da questo dataset. reviewed_at 2026-08-05, reviewed_vintage 2025, vintage 2025."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 0,
+ "queue_before": 1,
+ "run_id": "producer-20260805T055351Z-6b7e",
+ "stage": "producer",
+ "summary": "ter-16 (incidenza disoccupazione di lunga durata): assorbite le due smentite del verificatore, articolo riscritto su dinamica e quadro e rifirmato",
+ "trigger": "manuale"
+}
