@@ -39,6 +39,14 @@ nostre pagine. Il perche' e il cancello deterministico che lo fa rispettare
 (`tic_count.py`, campo `vietati` sempre vuoto) sono in
 [`evals/scrittura-italiana/PRECEDENZA.md`](../evals/scrittura-italiana/PRECEDENZA.md).
 
+**La precedenza non riguarda solo i caratteri.** La skill consiglia anche di
+variare il ritmo, e qui la varieta' e' lecita ma non e' il metro: il metro e' che
+la frase si prenda al primo passaggio (criterio 8 della rubrica, e la sezione
+"Tecniche da giornalista" qui sotto). Quando un suggerimento della skill allunga
+una frase o le aggiunge un inciso, vince la leggibilita'. Vale anche per due
+metriche del suo contatore: `mente` e `gerundite` possono salire su un testo piu'
+leggibile, e li' non sono un verdetto. Il campo `vietati` resta l'unico cancello.
+
 Cambiare il prompt del produttore per agganciare la skill in rilettura e' un
 cambio gated da `canary` (obbligo di `CLAUDE.md`): la skill installata e'
 **disponibile**, ma finche' `producer.md` non la richiama il comportamento degli
@@ -53,9 +61,16 @@ agenti non cambia.
 
 ## Tecniche da giornalista (fai così)
 
-I numeri, da soli, non sono un articolo. Un buon desk di data journalism
-(Openpolis, Pagella Politica, lavoce.info, Info Data del Sole 24 Ore) parte dalle
-stesse cifre e scrive un pezzo che il lettore ricorda. Sei mosse:
+I numeri, da soli, non sono un articolo. Un buon desk di data journalism parte
+dalle stesse cifre e scrive un pezzo che il lettore ricorda.
+
+**I modelli non sono descritti qui, sono in [`content/esempi/`](esempi/):** testi
+veri di Openpolis, Pagella Politica, lavoce.info, Info Data, YouTrend, il Post e
+Istat, scelti su un criterio solo, che si leggano al primo passaggio. Se ne
+sceglie **uno** prima di scrivere, quello con la forma di storia piu' vicina alla
+propria, e lo si tiene aperto. Non si mediano: otto registri mescolati fanno
+l'assenza di registro. Le sei mosse qui sotto dicono che cosa cercare in quel
+testo, non lo sostituiscono.
 
 - **Rispondi a "e allora?".** Ogni pezzo fa un punto, non un inventario. Il
   lettore deve finire sapendo perché quei numeri contano, non solo che forma ha la
@@ -75,39 +90,60 @@ stesse cifre e scrive un pezzo che il lettore ricorda. Sei mosse:
 - **Dai al pezzo un ancoraggio concreto.** Un solo contrasto vivido che il lettore
   porta via, due territori che quasi non si sfiorano, un valore che era il fondo e
   ora è la vetta. Uno che se lo merita, non una lista.
-- **Varia il ritmo, ma tieni le frasi collegate.** Quasi tutte le frasi hanno una
-  subordinata e portano alla successiva. Ogni tanto una no, e una riga breve dopo
-  una lunga fa cadere il punto. La frase corta però è uno strumento raro, per dare
-  enfasi, non la regola: un paragrafo di frasette secche di tre parole suona a
-  singhiozzo, ed è un tell da bot tanto quanto il periodare uniforme che sostituisce.
-  Il metro non è la lunghezza, è il flusso. Rileggi il paragrafo ad alta voce, ogni
-  frase deve nascere dalla precedente, non stare accanto come una voce di elenco.
+- **Un'idea per frase, e le clausole nell'ordine in cui si pensano.** È la mossa
+  che conta più di tutte, perché è quella che il lettore sente per prima. Una
+  seconda idea, anche quando è una cautela vera che va detta, prende la frase
+  successiva: non si aggancia con un'altra virgola a quella in corso. Il difetto
+  da cui questa regola nasce, preso da un articolo pubblicato che nessuna guardia
+  aveva fermato:
+
+  > "In alto due regioni si staccano, la Basilicata e il Piemonte, e fra il
+  > Piemonte e la terza, la Valle d'Aosta, corrono già due punti e mezzo, il salto
+  > più largo dell'intera graduatoria."
+
+  Tre idee, cinque virgole, e il lettore torna indietro. Scritto in tre frasi
+  dice le stesse tre cose e si prende al primo passaggio:
+
+  > "In alto due regioni si staccano, la Basilicata e il Piemonte. Fra il Piemonte
+  > e la terza, la Valle d'Aosta, corrono già due punti e mezzo. È il salto più
+  > largo dell'intera graduatoria."
+
+  Puoi variare la lunghezza delle frasi quanto vuoi, e va bene farlo: la varietà
+  è lecita, non è il metro. Il metro è che la frase non vada riletta. Rileggi il
+  paragrafo ad alta voce: se ti manca il fiato o perdi il soggetto per strada,
+  spezza.
 
 ## Imperfezione controllata
 
-La levigatura uniforme e' un tell da bot quanto la sciatteria. Un pezzo in cui
-tutte le sezioni pesano uguale, nessuna frase esce dallo schema e niente viene
-mai messo tra parentesi non e' stato scritto da nessuno, e si sente.
+La levigatura uniforme e' un tell da bot quanto la sciatteria, e un pezzo dove
+nessuna frase esce dallo schema non e' stato scritto da nessuno. Ma la libertà
+che questa sezione concede si ferma dove comincia la fatica del lettore: **prima
+la frase si legge al primo passaggio, poi ha una voce.** Nell'ordine, non in
+alternativa. Un inciso in piu' e' un lusso da spendere una volta per pezzo, non
+il modo normale di dire la seconda cosa.
 
 La regola d'oro, perche' questa sezione non venga letta come un permesso:
 **l'imperfezione e' concessa e richiesta nella forma, e' vietata nel contenuto.**
-Puoi variare il ritmo, spostare il peso tra le sezioni, concederti un inciso,
-aprire una frase con "Ma". Non puoi toccare l'aritmetica, aggiungere una causa
-che il dato non mostra, citare una fonte che non hai verificato. Quando chiedi a
-te stesso di essere piu' umano, l'errore facile e' diventare piu' libero anche
-sui numeri, ed e' l'unico errore che non si puo' correggere dopo.
+Puoi aprire una frase con "Ma", concederti un inciso, lasciare una sezione piu'
+corta dell'altra. Non puoi toccare l'aritmetica, aggiungere una causa che il dato
+non mostra, citare una fonte che non hai verificato. Quando chiedi a te stesso di
+essere piu' umano, l'errore facile e' diventare piu' libero anche sui numeri, ed
+e' l'unico errore che non si puo' correggere dopo.
 
 - **Nut graf.** Un paragrafo, non un accenno, che dice perche' questi numeri
   contano: quante persone tocca, quale sistema regge, quale scommessa e'. Di'
   l'importanza, non una causa.
-- **Asimmetria.** Le sezioni pesano dove pesa il dato. Se la storia sta nella
-  distribuzione, il quadro e' lungo e la dinamica corta, e va bene cosi'.
+- **Il peso lo decide il dato, non lo stile.** Se la storia sta nella
+  distribuzione, il quadro viene lungo e la dinamica corta, e va bene cosi'.
+  Sezioni di lunghezza diversa sono una conseguenza, mai un obiettivo: non
+  allungare una sezione per rompere la simmetria.
 - **Digressione.** Una per pezzo, che allarga il campo temporale o comparativo
   restando dentro la serie o citando una fonte reale. Mai un "probabilmente
   perche'".
-- **Caveat inline.** Sposta un limite dentro il testo, come inciso, dove il
-  numero puo' essere frainteso. Non ripetere il disclaimer sulla media non
-  ponderata, quello sta gia' nell'apparato.
+- **Il caveat prende la sua frase.** Un limite va detto dove il numero puo'
+  essere frainteso, e li' va detto in una frase sua: agganciarlo con la virgola
+  alla frase in corso e' il modo piu' rapido di renderla illeggibile. Non
+  ripetere il disclaimer sulla media non ponderata, quello sta gia' nell'apparato.
 - **Non scrivere il numero due volte.** O l'immagine ("una su due") o la cifra
   ("48%"), mai "quasi la meta' (48%)". Il lettore riceve lo stesso fatto due
   volte e la frase si ferma.

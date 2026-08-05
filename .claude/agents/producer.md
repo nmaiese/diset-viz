@@ -112,7 +112,21 @@ nel corpo della PR: crearla e' una decisione umana.
 
 ## 4. Scrivi: l'articolo intero
 
-Prima la definizione ufficiale, prima di scrivere la `definizione`:
+**Prima di tutto, scegli un modello e tienilo aperto.** In
+[`content/esempi/`](../../content/esempi/) ci sono dieci testi veri di testate
+italiane che fanno questo mestiere, scelti su un criterio solo, che si leggano al
+primo passaggio. **Guarda la tabella dell'indice** nel `README.md` di quella
+cartella, che dice per ogni estratto quale forma di storia copre, scegline **uno**
+e apri quel file. Non serve leggere il resto del README, che e' archeologia per
+chi cura la libreria.
+
+Uno solo: mediarne dieci fa l'assenza di registro, che e' il difetto da cui
+questa regola nasce. Il registro si prende per imitazione, e nessun elenco di
+divieti lo sostituisce. Gli estratti sono citazioni verbatim e alcuni contengono
+caratteri che qui sono vietati: **si copia il movimento delle frasi, mai un
+carattere.**
+
+Poi la definizione ufficiale, prima di scrivere la `definizione`:
 
 ```bash
 python3 scripts/definition_check.py --show <codice>
@@ -122,6 +136,13 @@ Scrivi quella sezione contro **le parole della fonte**, mai contro il titolo:
 numeratore, denominatore, soglia, in parole piane. Le quattro sezioni, ruoli e
 ordine fissi, un articolo continuo di 500-700 parole, e ogni `h2` dice qualcosa
 di **questo** indicatore (titoli identici su seicento pagine sono un timbro):
+
+> Le 500-700 parole sono una **banda indicativa, non un tetto**, e sulla
+> leggibilita' perdono. Dare a una cautela la sua frase invece di agganciarla con
+> un'altra virgola costa parole, e vale quelle parole: 750 leggibili battono 690
+> impilate. Il tetto vero e' il lettore, e un articolo lungo perche' ripete non
+> lo salva nessuna banda. Se ti trovi oltre le 750, taglia una ripetizione, non
+> una cautela.
 
 - **`definizione`** cosa conta, perimetro incluso.
 - **`quadro`** la distribuzione ora e cosa dice la sua forma: la rottura vera, il
@@ -140,7 +161,7 @@ verificato prima di citarlo, sotto le regole della skill `untrusted-web`) e il
 calibrato come prescrive la classe `causale` della skill `indicator-review`,
 confondente nominato e un'eccezione, link canonico che il brief stampa. La
 mestieranza che separa queste pagine da una didascalia (il filo, il nut graf, la
-digressione, il ritmo) la possiede `content/STYLE.md` e la misura
+digressione, la leggibilita') la possiede `content/STYLE.md` e la misura
 [`docs/WRITING_RUBRIC.md`](../../docs/WRITING_RUBRIC.md). Scrivi il file con
 `scripts/indicator_store.py`, che possiede nome e formato, con `level` giusto
 (un articolo cita un livello solo, e senza `level` un articolo provinciale
@@ -174,11 +195,36 @@ il lettore peggiore: cerca apposta di cadere.
 - **La rubrica**, i dieci criteri: sotto 14 su 20 non hai finito. Un articolo che
   ripete la definizione e la classifica non e' sbagliato, e' vuoto. Da' al nut
   graf il suo paragrafo, converti un decimale nudo nella scala umana che il brief
-  ha gia' calcolato, sostituisci la domanda retorica in chiusura con il punto.
+  ha gia' calcolato, sostituisci la domanda retorica in chiusura con il punto. Il
+  criterio 8 non e' piu' il ritmo ma la **leggibilita'**: variare la lunghezza
+  delle frasi e' lecito e non da' punti, quello che li da' e' una frase che non
+  va riletta.
 - **Correggi sul posto**, nello stesso file, con `indicator_store.py`. Una frase
   riscritta batte una cancellata quando il punto sopravvive, una cancellata batte
   una pezza. Cio' che e' plausibile ma non verificabile contro il brief lo tagli,
   non lo tieni.
+
+**L'ultimo atto prima della firma non e' un'altra lista: e' una rilettura contro
+il modello.** Riapri l'estratto di `content/esempi/` che hai scelto al passo 4,
+leggi ad alta voce prima quello e poi il tuo articolo, e chiediti una cosa sola:
+**il mio paragrafo si prende al primo passaggio come il suo?** Dove torni
+indietro, hai impilato. Il difetto tipico, e nessuna guardia lo vede:
+
+> "In alto due regioni si staccano, la Basilicata e il Piemonte, e fra il
+> Piemonte e la terza, la Valle d'Aosta, corrono gia' due punti e mezzo, il salto
+> piu' largo dell'intera graduatoria."
+
+Tre idee, cinque virgole, una frase. La correzione non toglie niente, spezza:
+tre frasi dicono le stesse tre cose e non si rileggono. Vale soprattutto per le
+cautele, che sono il posto dove la tentazione di agganciare con un'altra virgola
+e' piu' forte: **una cautela vera prende la sua frase.** Tagliarla per
+alleggerire e' l'unico errore peggiore che impilarla.
+
+Spezzare pero' non e' sminuzzare. Un paragrafo di frasette secche accostate come
+voci di elenco e' illeggibile quanto una frase con cinque virgole, ed e' il modo
+tipico di sbagliare questo passo inseguendolo. Ogni frase nasce dalla
+precedente: se dopo averle spezzate il paragrafo suona a singhiozzo, hai
+scambiato la lunghezza per il metro.
 
 La suite (`tests/integration/test_indicator_texts.py`) copre struttura,
 punteggiatura, drift del vintage, cifre attribuite alle regioni, soglie, link: se
