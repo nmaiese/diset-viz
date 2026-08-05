@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-05T21:17:23+00:00",
+ "base_commit": "5be4fd7",
+ "branch": "automation/verificatore-2026-08-05-8e12",
+ "claude_code_version": "2.1.222 (Claude Code)",
+ "commit": "3fa6526",
+ "detail": [
+  "Cifre chiave dal file finale content/indicators/285.json: totale 13,5 mln (somma regioni 13.525.068 = totale nazionale Istat 13.525.000), Campania 2.424.388 quasi doppio delle ultime nove (1.286.388, 1,88x), top5 8.715.026 quasi due terzi (64,4%), salto dopo il 5 posto Lombardia->Calabria 511.903, calo 2021->2024 -1.308.732, risalita 2023->2024 +133.442 in 12 regioni su 20 in calo, Emilia-Romagna 327.774->446.175. Incroci confermati: fine mese Calabria 3,00 Campania 4,70, Veneto 7 per persone e 3 per fine mese; rischio poverta bes-04BEC003 2025 Lombardia #4 (bassa) Calabria 3 piu alta. Esterni confermati su Istat (23,1%, 13.525.000, soglia 12.363 euro) ed EU target 15 mln di cui 5 mln bambini. Nessuna smentita."
+ ],
+ "gate": "",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 18,
+ "queue_before": 19,
+ "run_id": "verificatore-20260805T211242Z-8e12",
+ "stage": "verificatore",
+ "summary": "Verificato ter-285 (Persone a rischio poverta/esclusione, Europa 2030 totale): 17 affermazioni controllate, tutte confermate, esito pulito",
+ "trigger": "manuale"
+}
