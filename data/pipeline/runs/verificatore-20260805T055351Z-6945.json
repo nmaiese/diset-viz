@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-05T05:58:25+00:00",
+ "base_commit": "bc64f1a",
+ "branch": "automation/verificatore-2026-08-05-6945",
+ "claude_code_version": "2.1.222 (Claude Code)",
+ "commit": "bc64f1a",
+ "detail": [
+  "24/24 confermate. Serie 1991-2022, vintage 2022. Graduatoria: Basilicata 74,78 (#1, lead 'tre quarti' ok), Marche #5 (56,54), Lombardia #10 (34,84), Emilia-Romagna #13 (29,91), Veneto #16 (18,50). Top5 >56% e 6a (Liguria) 42,92 <43 ok. Prima Nord-Est = Friuli #12 ok. Salto metodo 2008->2009 verificato dai dati: 12 su 8 su/giu, Basilicata +17,38, Abruzzo -7,81, Marche +12,66 (art. '12,7'). Marche 1991=5,80 (ultima, '<6%') 2021=33,18 2022=56,54 (art. '33,2->56,5', 'quasi meta' della salita 50,74). Media 1991 27,47 -> 2022 36,00 (+8,53, art. '8,5'); divario +13,58 (art. '13,6'). 5 controcorrente: Sardegna -17,86, VdA -13,30. Cross-ref ter-267 (export/PIL) verificato: Emilia-R 3a, Toscana 5a li', 13a/14a qui, solo Marche nei top5 di entrambe. Cross-ref ter-123 estremi Basilicata/Sardegna a 11a/14a ok. Nota Ateco 2002->2007 dichiarata e corretta (data/definitions note). Esterno Banca d'Italia n.33 2023: 'esportazioni al netto del comparto farmaceutico hanno ristagnato' H1 2023 confermato alla fonte."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 21,
+ "queue_before": 22,
+ "run_id": "verificatore-20260805T055351Z-6945",
+ "stage": "verificatore",
+ "summary": "Verificato ter-168 (Capacita di esportare in settori a domanda mondiale dinamica): 24 affermazioni controllate, 0 smentite, esito pulito",
+ "trigger": "manuale"
+}
