@@ -1,0 +1,40 @@
+{
+    "fonti": [
+        {
+            "testo": "Istat, glossario degli indicatori demografici: la popolazione residente per classe di età è calcolata al 1° gennaio di ogni anno sui dati anagrafici comunali.",
+            "url": "https://demo.istat.it/tavole/?t=indicatori"
+        },
+        {
+            "testo": "Istat, Indicatori demografici, Anno 2024 (31 marzo 2025)",
+            "url": "https://www.istat.it/wp-content/uploads/2025/03/Indicatori_demografici_2024.pdf"
+        }
+    ],
+    "key": "dem:POP1564",
+    "lead": "Quasi due residenti su tre, in Italia, hanno tra 15 e 64 anni: l'età in cui si lavora, si studia da grandi, si cresce famiglia. La quota è scesa quasi ovunque in dieci anni, tranne in Emilia-Romagna e Liguria, le sole due regioni dove è salita.",
+    "level": "regione",
+    "reviewed_at": "2026-08-05",
+    "reviewed_vintage": 2025,
+    "sections": [
+        {
+            "body": "Il numero conta quanti residenti hanno tra 15 e 64 anni al 1° gennaio, in rapporto al totale della popolazione della regione. È la fascia convenzionalmente in età lavorativa, non necessariamente occupata: include studenti, disoccupati e chi si dedica alla famiglia.\n\nÈ la terza gamba della struttura per età, insieme a [POP014](/indicatore/quota-di-popolazione-0-14-anni-istat-regioni/dem-POP014) e [POP65OVER](/indicatore/quota-di-popolazione-65-anni-e-piu-istat-regioni/dem-POP65OVER): le tre quote sommate fanno sempre cento. Una regione con questa quota alta ha per forza meno peso nelle altre due, non necessariamente in modo uniforme tra giovani e anziani.",
+            "h": "L'età di mezzo, fra i bambini e gli anziani",
+            "role": "definizione"
+        },
+        {
+            "body": "Nel 2025 la media delle venti regioni è 62,86%, la mediana 62,95%: dieci regioni sopra la media, dieci sotto. In cima Campania (65,4%), Lazio (64,3%), Lombardia (64,0%). In fondo Liguria (60,5%), Umbria (61,5%), Friuli-Venezia Giulia (61,6%).\n\nLa Campania è in testa non perché attiri residenti in età lavorativa, ma perché ha ancora la quota di under 15 più alta dopo il Trentino Alto Adige: la sua piramide demografica è più larga alla base, quindi anche più larga nel mezzo.",
+            "h": "La Campania in testa, non per attrazione ma per struttura",
+            "role": "quadro"
+        },
+        {
+            "body": "Diciotto regioni su venti hanno perso quota tra 2015 e 2025, alcune molto: la Sardegna quasi quattro punti, la Basilicata e la Calabria oltre due e mezzo. Solo Emilia-Romagna (+0,4) e Liguria (+0,2) sono salite, entrambe restando comunque sotto o intorno alla media.\n\nLa Liguria colpisce di più: è la regione con la quota di 65 anni e più più alta d'Italia (dem:POP65OVER, 29,2%), eppure la sua fascia lavorativa non si è ridotta come nel resto del paese. Non basta a spiegare da sola perché, ma segnala che il suo invecchiamento non sta comprimendo l'età di mezzo quanto altrove.",
+            "h": "Cala quasi ovunque, sale solo in Emilia-Romagna e Liguria",
+            "role": "dinamica"
+        },
+        {
+            "body": "Il numero non dice quante di queste persone lavorano davvero: per quello serve il [tasso di occupazione](/indicatore/tasso-di-occupazione-totale/ter-13), che misura l'impiego effettivo, non il solo perimetro anagrafico dell'età. Una regione può avere una quota di popolazione lavorativa alta e un'occupazione bassa, o viceversa.\n\nNon distingue nemmeno tra chi in quella fascia studia, cerca lavoro o si prende cura della famiglia: è un confine di età, non una fotografia dell'attività economica. Le altre voci demografiche regionali stanno nel tema [Salute, demografia e cura](/tema/salute-demografia-e-cura).",
+            "h": "Un'età, non un impiego",
+            "role": "limiti"
+        }
+    ],
+    "vintage": 2025
+}

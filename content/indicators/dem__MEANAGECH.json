@@ -1,0 +1,40 @@
+{
+    "fonti": [
+        {
+            "testo": "Istat, glossario degli indicatori demografici: l'età media al parto è calcolata sui nati vivi dell'anno, riferita all'età della madre al momento della nascita.",
+            "url": "https://demo.istat.it/tavole/?t=indicatori"
+        },
+        {
+            "testo": "Istat, Indicatori demografici, Anno 2024 (31 marzo 2025)",
+            "url": "https://www.istat.it/wp-content/uploads/2025/03/Indicatori_demografici_2024.pdf"
+        }
+    ],
+    "key": "dem:MEANAGECH",
+    "lead": "In tutte le venti regioni, senza eccezioni, le donne diventano madri più tardi rispetto al 2015. La distanza tra prima e ultima è comunque piccola, un anno e mezzo: dal 31,7 della Sicilia al 33,2 di Basilicata, Lazio e Sardegna, appaiate in testa.",
+    "level": "regione",
+    "reviewed_at": "2026-08-05",
+    "reviewed_vintage": 2024,
+    "sections": [
+        {
+            "body": "Il numero è l'età media delle donne al momento del parto, calcolata su tutti i nati vivi dell'anno in quella regione. Non distingue tra primo figlio e figli successivi: una regione con più famiglie numerose può avere un'età media più bassa a parità di età al primo figlio, perché i figli successivi arrivano quando la madre è già più giovane della media dei soli primi parti.\n\nÈ diversa dall'[età media della popolazione](/indicatore/eta-media-della-popolazione/ter-920), che riguarda tutti i residenti di ogni età: qui l'età si misura solo sulle donne che hanno partorito in quell'anno.",
+            "h": "L'età delle madri, non quella di tutti i residenti",
+            "role": "definizione"
+        },
+        {
+            "body": "Nel 2024 la media delle venti regioni è 32,66 anni, la mediana 32,65: dieci regioni sopra la media, dieci sotto. In cima, appaiate a 33,2, Basilicata, Lazio e Sardegna. In fondo Sicilia (31,7), Valle d'Aosta (32,2), Trentino Alto Adige (32,3).\n\nLa distanza tra prima e ultima è la più stretta di tutta questa famiglia di indicatori demografici, un anno e mezzo appena: il comportamento riproduttivo per età, a differenza della struttura demografica, non varia molto da regione a regione.",
+            "h": "La classifica più stretta della famiglia demografica",
+            "role": "quadro"
+        },
+        {
+            "body": "In tutte le venti regioni l'età media al parto è salita tra il 2015 e il 2024, senza una sola eccezione. L'Umbria è quella che è cresciuta di più, un anno e due mesi, il Trentino Alto Adige quella che è cresciuta di meno, sette mesi soli, ma partiva già dal gruppo più giovane.\n\nÈ una tendenza che accompagna il calo della [natalità](/indicatore/tasso-di-natalita-istat-regioni/dem-BIRTHRATE) in tutte le regioni: le donne fanno figli più tardi ovunque, indipendentemente da quante ne facciano.",
+            "h": "Più tardi ovunque, senza eccezioni",
+            "role": "dinamica"
+        },
+        {
+            "body": "Il numero non dice se posticipare la maternità sia una scelta libera o una conseguenza di condizioni economiche e lavorative sfavorevoli: quella distinzione richiede altri dati, non questa sola serie. Due regioni con la stessa età media al parto possono avere dietro percorsi molto diversi.\n\nNon misura nemmeno la fecondità complessiva: per quella serve il [numero medio di figli per donna](/indicatore/numero-medio-di-figli-per-donna/ter-922), un indicatore diverso e già in catalogo. Le altre voci demografiche regionali stanno nel tema [Salute, demografia e cura](/tema/salute-demografia-e-cura).",
+            "h": "Quando si diventa madri, non perché così tardi",
+            "role": "limiti"
+        }
+    ],
+    "vintage": 2024
+}
