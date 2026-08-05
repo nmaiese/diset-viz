@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-05T20:43:33+00:00",
+ "base_commit": "81669e6",
+ "branch": "automation/verificatore-2026-08-05-243c",
+ "claude_code_version": "2.1.222 (Claude Code)",
+ "commit": "81669e6",
+ "detail": [
+  "ter-281 controllate=13 confermate=13 smentite=0 nonverif=0. Serie annuale ricalcolata dai 20 valori regionali: media 1995=1,4675 -> 2015=0,6982 (piu' che dimezzato, sceso al 47,6%) -> 2023=0,5411; ogni media 2016-2023 in [0,42;0,57], dentro la banda 'quattro-sei decimi'. Graduatoria 2023: Lombardia #4 0,42, Abruzzo #16 0,71 (scarto 0,29 < tre decimi); Sardegna 1,02 e Liguria 0,86 le due piu' alte, Sicilia #11 0,56 a meta'; Valle d'Aosta e Molise 0,00; Marche/Umbria/Friuli gli unici tre sopra il livello 1995. Esterni verificati alla fonte Istat 'Le vittime di omicidio 2023': tasso Italia 2023 0,57/100mila (esatto), tasso piu' basso d'Europa nel 2022 (confermato). Definizione: 'solo omicidi volontari consumati' coincide con la fonte. Nota serie: rottura 2004 (universo di rilevazione ampliato) non dichiarata, ma spinge la stima verso la SOTTO-stima del calo, quindi non falsifica la tesi del declino: al piu' un caveat in limiti, non una smentita."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 20,
+ "queue_before": 21,
+ "run_id": "verificatore-20260805T203916Z-243c",
+ "stage": "verificatore",
+ "summary": "Verificato ter-281 (Tasso di omicidi): 13 affermazioni controllate, 0 smentite, esito pulito",
+ "trigger": "manuale"
+}
