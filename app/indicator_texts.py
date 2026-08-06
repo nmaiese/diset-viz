@@ -120,7 +120,13 @@ def emitted_roles(entry):
     (sono stdlib puri e non importano `app`), e un test le tiene allineate.
     """
     declared = entry.get("roles_covered") if isinstance(entry, dict) else None
-    if not declared:
+    # Campo **assente** e lista **vuota** non sono la stessa cosa: assente vuol
+    # dire "non dichiaro niente", cioe' i quattro ruoli di sempre, mentre
+    # `roles_covered: []` e' una dichiarazione che non nomina la definizione, e
+    # quindi la assorbe esattamente come farebbe `["quadro"]`. Un test di verita'
+    # le confondeva, e la stessa entry rendeva quattro sezioni qui e tre nella
+    # forma equivalente.
+    if not isinstance(declared, (list, tuple)):
         return list(ROLE_ORDER)
     keep = {role for role in declared if role in DEFAULT_HEADINGS} | SUBSTANTIVE_ROLES
     return [role for role in ROLE_ORDER if role in keep]

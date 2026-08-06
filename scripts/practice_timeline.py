@@ -113,7 +113,9 @@ def _emitted_roles(entry) -> list:
     importata come le altre costanti di questo file, e un test le tiene allineate.
     """
     declared = entry.get("roles_covered") if isinstance(entry, dict) else None
-    if not declared:
+    # Campo assente e lista vuota non sono la stessa cosa: la seconda e' una
+    # dichiarazione che non nomina la definizione, quindi la assorbe.
+    if not isinstance(declared, (list, tuple)):
         return list(ARTICLE_ROLES)
     keep = {role for role in declared if role in ARTICLE_ROLES} | SUBSTANTIVE_ROLES
     return [role for role in ARTICLE_ROLES if role in keep]

@@ -117,9 +117,18 @@ def prose_fingerprint(entry: dict) -> str:
     repairing a refuted heading did not requeue the article.
     """
     parts = [("lead", "", entry.get("lead") or "")]
+    # Solo le sezioni che la pagina rende: una sezione assorbita dal blocco "Come
+    # leggere il dato" resta nel file ma non e' piu' in pagina, e il verificatore
+    # non puo' leggerla. Continuare a pesarla avrebbe fatto scadere la verifica a
+    # ogni ritocco di una `definizione` che nessuno vede: una riverifica per un
+    # testo invisibile, ogni volta.
+    rendered = set(_emitted_role_list(entry))
     for section in entry.get("sections") or []:
+        role = section.get("role") or ""
+        if role and role not in rendered:
+            continue
         parts.append((
-            section.get("role") or "",
+            role,
             section.get("h") or "",
             section.get("body") or "",
         ))
@@ -166,13 +175,26 @@ def _emitted_roles(entry):
     e passare da `["quadro"]` a `["quadro", "dinamica", "limiti"]` non cambia una
     riga di HTML ma cambiava l'impronta.
     """
-    declared = entry.get("roles_covered")
-    if not declared:
-        return None
-    emitted = ({role for role in declared if role in DEFAULT_ARTICLE_ROLES}
-               | SUBSTANTIVE_ROLES)
+    emitted = set(_emitted_role_list(entry))
     if emitted == set(DEFAULT_ARTICLE_ROLES):
         return None
+    return sorted(emitted)
+
+
+def _emitted_role_list(entry) -> list:
+    """L'insieme reso, sempre, anche quando e' quello di sempre.
+
+    Copia stdlib di `app.indicator_texts.emitted_roles`. Il campo **assente** e la
+    lista **vuota** non sono la stessa cosa: assente vuol dire "non dichiaro
+    niente", cioe' i quattro ruoli di sempre, mentre `roles_covered: []` e' una
+    dichiarazione che non nomina la definizione, quindi la assorbe come farebbe
+    `["quadro"]`. Distinguerle qui e non con un test di verita' e' il motivo per
+    cui questa funzione esiste separata dal marcatore.
+    """
+    declared = entry.get("roles_covered")
+    if not isinstance(declared, (list, tuple)):
+        return sorted(DEFAULT_ARTICLE_ROLES)
+    emitted = {role for role in declared if role in DEFAULT_ARTICLE_ROLES} | SUBSTANTIVE_ROLES
     return sorted(emitted)
 
 

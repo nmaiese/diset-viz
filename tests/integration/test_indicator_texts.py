@@ -209,6 +209,34 @@ class VariableSectionsAreOptIn(unittest.TestCase):
                          ["quadro", "dinamica", "limiti"])
         self.assertTrue(art["come_leggere"])
 
+    def test_an_empty_declaration_is_still_a_declaration(self):
+        """`roles_covered: []` non e' il campo assente: e' una dichiarazione che
+        non nomina la definizione, quindi la assorbe come farebbe `["quadro"]`.
+        Un test di verita' le confondeva, e la stessa entry rendeva quattro
+        sezioni in una forma e tre nell'altra."""
+        art = self._build(dict(self.LEGACY, roles_covered=[]))
+        self.assertEqual([s["role"] for s in art["sections"]],
+                         ["quadro", "dinamica", "limiti"])
+        self.assertTrue(art["come_leggere"])
+
+    def test_an_absorbed_section_stops_weighing_on_the_fingerprint(self):
+        """Una sezione assorbita resta nel file e non e' piu' in pagina, quindi il
+        verificatore non puo' leggerla: continuare a pesarla avrebbe fatto scadere
+        la verifica a ogni ritocco di un testo invisibile."""
+        from scripts import verification_queue as vq
+        absorbed = dict(self.LEGACY, roles_covered=["quadro", "dinamica", "limiti"])
+        edited = dict(absorbed, sections=[
+            dict(section, body="Definizione riscritta da capo.")
+            if section["role"] == "definizione" else section
+            for section in absorbed["sections"]
+        ])
+        self.assertEqual(vq.prose_fingerprint(absorbed), vq.prose_fingerprint(edited))
+        # La stessa modifica su un articolo che la definizione la rende cambia
+        # l'impronta, come e' sempre stato.
+        legacy_edited = dict(self.LEGACY, sections=edited["sections"])
+        self.assertNotEqual(vq.prose_fingerprint(dict(self.LEGACY)),
+                            vq.prose_fingerprint(legacy_edited))
+
     def test_a_legacy_entry_keeps_four_sections_and_no_block(self):
         art = self._build(self.LEGACY)
         self.assertEqual([s["role"] for s in art["sections"]],

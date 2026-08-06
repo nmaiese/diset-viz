@@ -122,6 +122,8 @@ class PendingNotesWorklist(unittest.TestCase):
             {"roles_covered": ["quadro"]},                    # parziale
             {"roles_covered": ["quadro", "dinamicha"]},       # refuso
             {"roles_covered": ["definizione"]},               # solo la assorbibile
+            {"roles_covered": []},                            # dichiarata vuota
+            {"roles_covered": None},                          # campo nullo
         ]
         for entry in cases:
             with self.subTest(entry=entry):
