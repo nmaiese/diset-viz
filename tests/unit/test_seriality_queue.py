@@ -72,6 +72,39 @@ class SerialPairsRiseToTheTop(unittest.TestCase):
         rows = {r["code"]: r for r in self._queue(texts)}
         self.assertEqual(rows["ter-1"]["headings_sim"], 1.0)
 
+    def test_a_body_match_over_threshold_beats_a_higher_lead_match_under_it(self):
+        """Le due soglie sono diverse, quindi i due numeri grezzi non si
+        confrontano fra loro: un attacco a 0,44 e' sotto la sua soglia, un corpo
+        a 0,42 e' sopra la sua. Tenendo il vicino col numero piu' alto la coppia
+        seriale vera veniva sostituita da una non seriale, e poi `serial()` la
+        scartava: la coppia spariva dalla coda invece di finirci.
+        """
+        lead_sim, body_sim = 0.44, 0.42
+        self.assertLess(lead_sim, sq.LEAD_SIM)      # sotto soglia
+        self.assertGreater(body_sim, sq.BODY_SIM)   # sopra soglia
+        self.assertGreater(lead_sim, body_sim)      # eppure il numero e' piu' grande
+        self.assertGreater(sq._pressure(0.0, body_sim), sq._pressure(lead_sim, 0.0))
+        self.assertGreaterEqual(sq._pressure(0.0, body_sim), 1.0)
+        self.assertLess(sq._pressure(lead_sim, 0.0), 1.0)
+
+    def test_the_serial_pair_survives_a_higher_scoring_peer_under_threshold(self):
+        """La stessa cosa dalla coda, non dall'aritmetica: `1` e `2` condividono
+        il corpo sopra soglia, `3` ha con `1` un attacco piu' simile in valore ma
+        sotto la sua soglia. La riga di `1` deve restare la coppia seriale."""
+        shared_body = ("Le regioni meridionali restano distanti dalla media nazionale "
+                       "mentre il divario territoriale non si chiude affatto.")
+        texts = {
+            "1": _entry("Attacco primo sulle nascite regionali.", [shared_body]),
+            "2": _entry("Attacco secondo sulla mortalita regionale.", [shared_body]),
+            "3": _entry("Attacco primo sulle nascite provinciali.",
+                        ["Corpo terzo, sui laboratori e i brevetti depositati."]),
+        }
+        rows = {r["code"]: r for r in self._queue(texts)}
+        self.assertEqual(rows["ter-1"]["peer"], "ter-2")
+        self.assertTrue(rows["ter-1"]["serial"])
+        self.assertEqual([r["code"] for r in sq.serial(self._queue(texts))][:2],
+                         ["ter-1", "ter-2"])
+
     def test_the_queue_is_ordered_by_similarity(self):
         lead = "Lo stesso identico attacco ripetuto su due articoli diversi qui."
         texts = {

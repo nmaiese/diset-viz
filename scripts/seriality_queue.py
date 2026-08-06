@@ -84,6 +84,21 @@ def _heading_overlap(a: tuple, b: tuple) -> float:
     return _jaccard(set(a) - {""}, set(b) - {""})
 
 
+def _pressure(lead_sim: float, body_sim: float) -> float:
+    """Quanto una coppia preme sulle soglie, in un numero solo.
+
+    Le due soglie sono diverse (0,45 sull'attacco, 0,40 sul corpo) perche' misurano
+    cose diverse, quindi confrontare i due valori grezzi fra loro non vuol dire
+    niente: 0,44 di attacco e' **sotto** la sua soglia, 0,42 di corpo e' **sopra**
+    la sua, e la coppia da guardare e' la seconda. Tenere il vicino col numero piu'
+    alto sceglieva la prima e buttava la seconda, che poi il filtro `serial()`
+    scartava perche' sotto soglia: la coppia seriale vera spariva dalla coda.
+    Rapportare ogni asse alla propria soglia rende i due confrontabili, e sopra
+    soglia vuol dire semplicemente `>= 1`.
+    """
+    return max(lead_sim / LEAD_SIM, body_sim / BODY_SIM)
+
+
 def build_queue(texts=None) -> list[dict]:
     """Una riga per articolo che ha un vicino troppo prossimo, ordinata per
     somiglianza decrescente. Ogni riga porta il codice, il vicino, e i tre assi."""
@@ -94,18 +109,19 @@ def build_queue(texts=None) -> list[dict]:
         if prof is not None:
             profiles[key] = prof
 
-    best = {}  # key -> (score, peer, lead_sim, body_sim, head_sim)
+    best = {}  # key -> (pressure, score, peer, lead_sim, body_sim, head_sim)
     for (key_a, pa), (key_b, pb) in itertools.combinations(profiles.items(), 2):
         lead_sim = _jaccard(pa["lead_tokens"], pb["lead_tokens"])
         body_sim = _jaccard(pa["body_tokens"], pb["body_tokens"])
         head_sim = _heading_overlap(pa["headings"], pb["headings"])
+        pressure = _pressure(lead_sim, body_sim)
         score = max(lead_sim, body_sim)
         for key, peer in ((key_a, key_b), (key_b, key_a)):
-            if key not in best or score > best[key][0]:
-                best[key] = (score, peer, lead_sim, body_sim, head_sim)
+            if key not in best or pressure > best[key][0]:
+                best[key] = (pressure, score, peer, lead_sim, body_sim, head_sim)
 
     rows = []
-    for key, (score, peer, lead_sim, body_sim, head_sim) in best.items():
+    for key, (pressure, score, peer, lead_sim, body_sim, head_sim) in best.items():
         rows.append({
             "code": verification_queue.code_of(key),
             "key": key,
@@ -114,9 +130,9 @@ def build_queue(texts=None) -> list[dict]:
             "lead_sim": round(lead_sim, 3),
             "body_sim": round(body_sim, 3),
             "headings_sim": round(head_sim, 3),
-            "serial": lead_sim >= LEAD_SIM or body_sim >= BODY_SIM,
+            "serial": pressure >= 1.0,
         })
-    return sorted(rows, key=lambda r: -r["score"])
+    return sorted(rows, key=lambda r: -_pressure(r["lead_sim"], r["body_sim"]))
 
 
 def serial(rows) -> list[dict]:
