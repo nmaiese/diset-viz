@@ -1048,6 +1048,22 @@ class AppSmokeTest(unittest.TestCase):
         plain = authored_seo_title("Dove si vive a lungo dopo i 65 anni", "Divario Italia")
         self.assertNotEqual(plain, titled)
 
+    def test_a_banned_character_in_a_title_is_caught(self):
+        """I titoli sono l'unico testo della pagina che le guardie deterministiche
+        non guardavano: un em-dash in un `h1` sarebbe stato pubblicato con la
+        suite verde."""
+        from scripts import prose_lint
+        entry = {
+            "h1": "Dove si vive a lungo — dopo i 65 anni",
+            "seo_title": "Dove si vive a lungo, per regione",
+            "lead": "Un lead.", "sections": [{"role": "quadro", "body": "Corpo."}],
+        }
+        fields = dict(prose_lint.prose_fields(entry))
+        self.assertIn("h1", fields)
+        self.assertIn("seo_title", fields)
+        # Il carattere vietato e' ora dentro il perimetro della guardia.
+        self.assertTrue([f for f, text in fields.items() if "—" in text])
+
     def test_the_authored_titles_reach_the_verifier(self):
         """Un campo dentro l'impronta e fuori da cio' che il verificatore legge
         produce una verifica pulita su una frase che nessuno ha guardato."""
