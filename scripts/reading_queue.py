@@ -166,6 +166,11 @@ def _score(value):
     return number if 0 <= number <= 2 else None
 
 
+def _text(value) -> str:
+    """Una cella di testo, o stringa vuota se non e' testo."""
+    return value.strip() if isinstance(value, str) else ""
+
+
 def _low_scores(row: dict) -> list:
     """I criteri che questa lettura ha messo sotto il massimo, dal piu' basso.
 
@@ -220,6 +225,19 @@ def row_problems(row: dict) -> list[str]:
         problems.append(f"verdetto 'pass' con fallimenti duri: {failures}")
     if verdict == "revise" and not below_max and not failures:
         problems.append("verdetto 'revise' senza un criterio sotto il massimo ne' un fallimento duro")
+    # La nota e' il punto d'inciampo, cioe' l'unica cosa che il produttore riceve
+    # per sapere DOVE riscrivere: una bocciatura muta e' un'opinione, e rimette la
+    # riscrittura a indovinare. Il tipo si controlla sempre, anche su un `pass`,
+    # per un motivo che non e' formale: `build_queue` fa `.strip()` su questo
+    # campo, quindi una nota scritta come lista (`"note": ["..."]`, l'errore piu'
+    # facile da fare a mano in un JSON) alzerebbe un AttributeError dopo il merge
+    # e fermerebbe la coda, il lanciatore e la coda del revisore per il catalogo
+    # intero.
+    note = row.get("note", "")
+    if not isinstance(note, str):
+        problems.append(f"nota che non e' una stringa: {type(note).__name__}")
+    elif verdict == "revise" and not note.strip():
+        problems.append("verdetto 'revise' senza nota: dove inciampa il lettore va scritto")
     return problems
 
 
@@ -305,7 +323,10 @@ def build_queue(texts=None, readings=None) -> list[dict]:
             # finche' il freno non parcheggia il codice. Il reader-editor la nota
             # la scrive gia' (`note`, obbligatoria su un `revise`), e buttarla via
             # qui era il modo piu' caro di non leggerla.
-            "note": (match.get("note") or "").strip() if match else "",
+            # `_text` e non `.strip()` diretto: il cancello rifiuta una nota che
+            # non e' una stringa, ma questa coda gira anche su cio' che e' gia'
+            # fuso e non deve poter morire su una scheggia storta.
+            "note": _text(match.get("note")) if match else "",
             "low_scores": _low_scores(match) if match else [],
             "revised_rounds": len(revised_versions),
         })

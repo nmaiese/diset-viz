@@ -738,7 +738,11 @@ class TheReadingRegisterIsAppendOnly(unittest.TestCase):
         row = {
             "code": code, "level": level, "at": "2026-08-01",
             "reviewed_at": "2026-07-27", "prosa": prosa or self.fingerprint,
-            "verdict": verdict, "hard_failures": [], "note": "",
+            "verdict": verdict, "hard_failures": [],
+            # Una bocciatura senza nota non passa il cancello: e' il punto
+            # d'inciampo, cioe' l'unica cosa che il produttore riceve per sapere
+            # dove riscrivere.
+            "note": "il quadro apre sulla meccanica" if verdict == "revise" else "",
         }
         for name in self.reading_queue.CRITERIA:
             row[name] = comprehension if name == "comprehension" else 2

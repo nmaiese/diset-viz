@@ -35,7 +35,11 @@ def _entry(lead="Un lead che apre sulla geografia.", **extra):
     return base
 
 
-def _reading(entry, code="ter-611", verdict="pass", hard_failures=None, note="", **scores):
+def _reading(entry, code="ter-611", verdict="pass", hard_failures=None, note=None, **scores):
+    if note is None:
+        # Un `revise` senza nota non e' una lettura credibile: `row_problems` lo
+        # rifiuta, quindi la fixture onesta ne porta una.
+        note = "il quadro apre sulla meccanica" if verdict == "revise" else ""
     row = {
         "code": code,
         "level": entry.get("level") or "regione",
@@ -161,6 +165,28 @@ class ARowIsBelievedOrItIsNot(unittest.TestCase):
 
     def test_a_clean_pass_row_has_no_problems(self):
         self.assertEqual(rq.row_problems(_reading(_entry(), verdict="pass")), [])
+
+    def test_a_mute_revise_is_not_believed(self):
+        """Una bocciatura senza il punto d'inciampo e' un'opinione, e rimette la
+        riscrittura a indovinare: e' esattamente la riscrittura cieca che questa
+        catena cerca di evitare."""
+        problems = rq.row_problems(self._valid(note="   "))
+        self.assertTrue(any("senza nota" in p for p in problems), problems)
+
+    def test_a_note_that_is_not_a_string_is_refused_before_it_can_crash_the_queue(self):
+        """`build_queue` fa `.strip()` su questo campo: una nota scritta come
+        lista (l'errore piu' facile in un JSON a mano) fermerebbe la coda, il
+        lanciatore e la coda del revisore per il catalogo intero."""
+        problems = rq.row_problems(self._valid(note=["la meccanica apre"]))
+        self.assertTrue(any("non e' una stringa" in p for p in problems), problems)
+
+    def test_the_queue_survives_a_shard_that_slipped_through(self):
+        """Difesa in profondita': il cancello rifiuta la nota storta, ma la coda
+        gira anche su cio' che e' gia' fuso e non deve morirci sopra."""
+        entry = _entry()
+        reading = _reading(entry, verdict="revise", note=["storta"])
+        rows = rq.build_queue({"611": entry}, [reading])
+        self.assertEqual(rows[0]["note"], "")
 
     def test_a_score_out_of_range_is_a_problem(self):
         self.assertTrue(rq.row_problems(self._valid(comprehension=3)))

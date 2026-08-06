@@ -159,7 +159,9 @@ Un file per lettura in `data/pipeline/letture/`, scritto con
   ha almeno un criterio sotto il 2 o almeno un fallimento duro (altrimenti si
   contraddice, come `esito=pulito` con smentite).
 - `note` e' un puntatore breve: dove il lettore inciampa e verso dove spostare, non
-  la frase nuova. La prova sta nel corpo della PR e nel `detail` del diario.
+  la frase nuova. La prova sta nel corpo della PR e nel `detail` del diario. Su un
+  `revise` non e' facoltativa e il cancello la pretende: e' cio' che il lanciatore
+  passa al produttore, quindi una bocciatura muta manda la riscrittura a indovinare.
 
 Controlla le tue righe prima di committare: `python3 scripts/reading_queue.py`
 mette in cima le non credibili. Il registro e' append-only: una lettura si
