@@ -616,6 +616,24 @@ def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX, source_quali
     return _compact_title(core, marker, max_len)
 
 
+def authored_seo_title(title, site_name="Divario Italia", max_len=_TITLE_MAX):
+    """Il titolo SERP quando l'autore ne ha scritto uno in lingua comune.
+
+    `seo_title` parte dal nome amministrativo e ci cuce " per regione" e la marca:
+    e' il derivato per le pagine che nessuno ha ancora titolato. Un titolo autorato
+    e' gia' completo ("Dove si lavora di piu' nella ricerca"), quindi qui NON si
+    aggiunge la coda "per regione", si aggiunge solo la marca se ci sta nel budget,
+    altrimenti si tiene il solo titolo tagliato a frase intera. Stesso budget
+    (`_TITLE_MAX`) del derivato: un titolo autorato non e' una scusa per sforare."""
+    text = " ".join((title or "").split())
+    if not text:
+        return ""
+    suffix = f" · {site_name}"
+    if len(text) + len(suffix) <= max_len:
+        return text + suffix
+    return meta_description_from_attacco(text, max_len=max_len)
+
+
 def seo_description(
     plain,
     year_max,

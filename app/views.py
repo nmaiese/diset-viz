@@ -1142,12 +1142,27 @@ def _render_indicator(family, raw_id):
         sources.family_short_label(family) if family == "bes" and raw_id in DUPLICATE_BES_IDS else None
     )
 
+    # Titolo H1 e SERP: autorati se il file dell'articolo li porta, altrimenti il
+    # derivato di oggi (H1 = nome amministrativo, title = boilerplate "per regione").
+    # Un titolo autorato passa comunque dal budget SEO: `authored_seo_title` clampa
+    # a `_TITLE_MAX` come il derivato, non e' una scusa per sforare.
+    page_h1 = article["h1"] or meta["name"]
+    if article["seo_title"] or article["h1"]:
+        seo_title_value = indicator_notes.authored_seo_title(
+            article["seo_title"] or article["h1"], SITE_NAME
+        )
+    else:
+        seo_title_value = indicator_notes.seo_title(
+            meta["name"], SITE_NAME, source_qualifier=source_qualifier
+        )
+
     response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
         levels=view["levels"],
         level=level,
         query_map=query_map,
+        page_h1=page_h1,
         related=view["related"],
         related_posts=posts_for_indicator(meta["id"]),
         siblings=view["siblings"],
@@ -1155,7 +1170,7 @@ def _render_indicator(family, raw_id):
         page_article=article,
         page_lead=lead,
         noindex=noindex,
-        seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME, source_qualifier=source_qualifier),
+        seo_title=seo_title_value,
         seo_description=seo_description,
         dataset_description=_dataset_description(lead, meta),
         dataset_updated=publisher.dataset_updated(meta["family"]),

@@ -960,6 +960,40 @@ class AppSmokeTest(unittest.TestCase):
         # which would make the browser's JSON.parse fail.
         json.dumps(get_catalog(), allow_nan=False)
 
+    def test_authored_title_de_boilerplates_within_budget(self):
+        """Un titolo autorato in lingua comune sostituisce il boilerplate
+        "per regione", tiene la marca se ci sta, e rispetta lo stesso budget."""
+        from app.indicator_notes import authored_seo_title, _TITLE_MAX
+        short = authored_seo_title("Dove si lavora di piu' nella ricerca", "Divario Italia")
+        self.assertEqual(short, "Dove si lavora di piu' nella ricerca · Divario Italia")
+        self.assertLessEqual(len(short), _TITLE_MAX)
+        self.assertNotIn("per regione", short)
+        # Un titolo autorato lungo non sfora: si taglia a frase intera, senza marca.
+        longtitle = ("Dove nascono piu' imprese e dove invece il tessuto produttivo "
+                     "resta fermo da anni interi in questa lunga analisi.")
+        clamped = authored_seo_title(longtitle, "Divario Italia")
+        self.assertLessEqual(len(clamped), _TITLE_MAX)
+        self.assertEqual("", authored_seo_title("", "Divario Italia"))
+
+    def test_an_authored_h1_and_title_replace_the_derived_ones(self):
+        import unittest.mock
+        from app import indicator_texts
+        authored = {
+            "level": "regione", "lead": "Un lead.", "vintage": 2023,
+            "h1": "Dove si vive a lungo dopo i 65 anni",
+            "seo_title": "Dove si vive a lungo dopo i 65 anni",
+            "sections": [{"role": r, "h": None, "body": f"Corpo {r}."}
+                         for r in ("definizione", "quadro", "dinamica", "limiti")],
+        }
+        from app import app as flask_app
+        with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: authored):
+            html = flask_app.test_client().get(
+                "/indicatore/eta-media-della-popolazione/ter-920",
+                follow_redirects=True).get_data(as_text=True)
+        self.assertIn("Dove si vive a lungo dopo i 65 anni", html)
+        self.assertIn("<title>Dove si vive a lungo dopo i 65 anni · Divario Italia</title>", html)
+        self.assertNotIn("Eta media della popolazione per regione", html)
+
     def test_seo_metadata_within_budget(self):
         from app.data import get_catalog
         from app.indicator_notes import seo_title, seo_description
