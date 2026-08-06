@@ -994,6 +994,43 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("<title>Dove si vive a lungo dopo i 65 anni · Divario Italia</title>", html)
         self.assertNotIn("Eta media della popolazione per regione", html)
 
+    def test_the_markdown_projection_carries_the_authored_h1(self):
+        """La proiezione markdown e' una rappresentazione di prima classe della
+        stessa pagina: dare all'agente il nome amministrativo mentre il lettore
+        HTML legge il titolo in lingua comune sono due pagine allo stesso URL."""
+        import unittest.mock
+        from app import indicator_texts
+        from app import app as flask_app
+        authored = {
+            "level": "regione", "lead": "Un lead.", "vintage": 2023,
+            "h1": "Dove si vive a lungo dopo i 65 anni",
+            "sections": [{"role": r, "h": None, "body": f"Corpo {r}."}
+                         for r in ("definizione", "quadro", "dinamica", "limiti")],
+        }
+        with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: authored):
+            body = flask_app.test_client().get(
+                "/indicatore/eta-media-della-popolazione/ter-920",
+                headers={"Accept": "text/markdown"},
+                follow_redirects=True).get_data(as_text=True)
+        self.assertIn("# Dove si vive a lungo dopo i 65 anni", body)
+
+    def test_an_authored_title_expires_the_verification(self):
+        """Un titolo e' prosa visibile, e quello SERP e' anche un'affermazione:
+        aggiungerlo o correggerlo dopo la firma non puo' lasciare buona una
+        verifica che non l'ha mai letto. Stesso buco che l'`h` di sezione ha gia'
+        aperto una volta."""
+        from scripts import verification_queue as vq
+        base = {"lead": "Un lead.", "sections": [
+            {"role": "quadro", "h": None, "body": "Corpo."}]}
+        self.assertNotEqual(vq.prose_fingerprint(base),
+                            vq.prose_fingerprint(dict(base, h1="Dove si vive a lungo")))
+        self.assertNotEqual(vq.prose_fingerprint(base),
+                            vq.prose_fingerprint(dict(base, seo_title="Dove si vive a lungo")))
+        # I campi assenti o vuoti non muovono niente: i trecento articoli di oggi
+        # non hanno questi campi e la loro impronta resta identica.
+        self.assertEqual(vq.prose_fingerprint(base),
+                         vq.prose_fingerprint(dict(base, h1="", seo_title=None)))
+
     def test_seo_metadata_within_budget(self):
         from app.data import get_catalog
         from app.indicator_notes import seo_title, seo_description
