@@ -119,9 +119,11 @@ class PlanLaunches(unittest.TestCase):
         self.assertEqual(plan, [])
 
 
-def _reading(key, status, code=None, hard_failures=None, level="regione"):
+def _reading(key, status, code=None, hard_failures=None, level="regione",
+             note="", low_scores=None):
     return {"key": key, "code": code or key, "level": level, "status": status,
-            "hard_failures": list(hard_failures or [])}
+            "hard_failures": list(hard_failures or []),
+            "note": note, "low_scores": list(low_scores or [])}
 
 
 class ReadingsFeedTheLauncher(unittest.TestCase):
@@ -146,7 +148,20 @@ class ReadingsFeedTheLauncher(unittest.TestCase):
         self.assertEqual(plan[0]["role"], "producer")
         self.assertEqual(plan[0]["indicator"], "eur:rd_p_persreg")
         self.assertIn("leggibilita", plan[0]["reason"])
-        self.assertIn("fallimento duro", plan[0]["reason"])
+        self.assertIn("fallimenti duri: numeric_overload", plan[0]["reason"])
+
+    def test_the_rewrite_carries_where_the_reader_stumbled(self):
+        """Il motivo del lancio e' l'unica cosa che il produttore riceve, quindi
+        se non porta l'indirizzo della bocciatura la riscrittura parte cieca e si
+        fa bocciare di nuovo finche' il freno non parcheggia il codice."""
+        readings = [_reading("eur:rd_p_persreg", "revise", code="eur-rd_p_persreg",
+                             note="la meccanica FTE apre la narrazione, spostala fuori dal corpo",
+                             low_scores=[("structure", 0), ("cognitive_load", 1)])]
+        plan = pipeline_launch.plan_launches({}, {}, mint=_mint, readings=readings)
+        reason = plan[0]["reason"]
+        self.assertIn("structure=0", reason)
+        self.assertIn("cognitive_load=1", reason)
+        self.assertIn("la meccanica FTE apre la narrazione", reason)
 
     def test_a_parked_reading_launches_nothing(self):
         # reading_queue non emette mai `parked` come lavoro; il piano non lo tocca.
@@ -175,6 +190,29 @@ class ReadingsFeedTheLauncher(unittest.TestCase):
         readings = [_reading("ter-5", "unread")]
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
         self.assertEqual([p["role"] for p in plan], ["producer"])
+
+    def test_a_signed_but_unread_article_is_read_before_it_is_verified(self):
+        """Il doppione vero, trovato in revisione: un articolo appena firmato sta
+        insieme fra i verificabili e fra i non letti, e il lanciatore metteva in
+        volo tutte e due le voci. Se poi la lettura boccia, la riscrittura fa
+        scadere la verifica appena fatta: una run opus buttata."""
+        dossier = {"ter-9": practice("ter-9",
+                                     completed=["curator", "writer", "reviewer"],
+                                     priority=15.0)}
+        readings = [_reading("ter-9", "unread")]
+        plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
+        self.assertEqual([p["role"] for p in plan], ["reader-editor"])
+        # e non scende nel piano per essere stato dedotto: tiene la priorita' alta
+        self.assertEqual(plan[0]["priority"], 15.0)
+
+    def test_the_deferred_role_comes_back_once_the_reading_exists(self):
+        """Scartare non e' perdere: il piano si ricalcola a ogni tick."""
+        dossier = {"ter-9": practice("ter-9",
+                                     completed=["curator", "writer", "reviewer"],
+                                     priority=15.0)}
+        readings = [_reading("ter-9", "clean")]
+        plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
+        self.assertEqual([p["role"] for p in plan], ["verificatore"])
 
     def test_the_reader_editor_sorts_before_the_verificatore_on_a_tie(self):
         # Stesso indicatore, stessa priorita': leggere prima, per non sprecare la

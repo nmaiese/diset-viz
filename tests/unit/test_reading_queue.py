@@ -35,7 +35,7 @@ def _entry(lead="Un lead che apre sulla geografia.", **extra):
     return base
 
 
-def _reading(entry, code="ter-611", verdict="pass", hard_failures=None, **scores):
+def _reading(entry, code="ter-611", verdict="pass", hard_failures=None, note="", **scores):
     row = {
         "code": code,
         "level": entry.get("level") or "regione",
@@ -44,11 +44,33 @@ def _reading(entry, code="ter-611", verdict="pass", hard_failures=None, **scores
         "prosa": vq.prose_fingerprint(entry),
         "verdict": verdict,
         "hard_failures": hard_failures or [],
-        "note": "",
+        "note": note,
     }
     for name in rq.CRITERIA:
         row[name] = scores.get(name, 2 if verdict == "pass" else 1)
     return row
+
+
+class TheQueueCarriesTheReadersAddress(unittest.TestCase):
+    """La riga di coda diventa il lancio di una riscrittura, quindi e' l'unico
+    canale per cui il lavoro del reader-editor arriva al produttore. Buttare la
+    nota e i criteri qui rendeva cieca la riscrittura."""
+
+    def test_a_revise_row_carries_the_note_and_the_fallen_criteria(self):
+        entry = _entry()
+        reading = _reading(entry, verdict="revise", structure=0, cognitive_load=1,
+                           focus=2, note="la meccanica FTE apre la narrazione")
+        rows = rq.build_queue({"611": entry}, [reading])
+        self.assertEqual(rows[0]["note"], "la meccanica FTE apre la narrazione")
+        # dal piu' basso, e i criteri al massimo non entrano
+        self.assertEqual(rows[0]["low_scores"][0], ("structure", 0))
+        self.assertIn(("cognitive_load", 1), rows[0]["low_scores"])
+        self.assertNotIn("focus", [name for name, _ in rows[0]["low_scores"]])
+
+    def test_an_unread_row_has_nothing_to_carry(self):
+        rows = rq.build_queue({"611": _entry()}, [])
+        self.assertEqual(rows[0]["note"], "")
+        self.assertEqual(rows[0]["low_scores"], [])
 
 
 class TheReadingCoversAText(unittest.TestCase):

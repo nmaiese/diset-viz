@@ -104,6 +104,31 @@ def _admissions_reason(batch, proposte=0):
     return "coda ammissione, " + ", ".join(parts) if parts else "coda ammissione"
 
 
+def _revise_reason(row):
+    """Il motivo di una riscrittura per leggibilita', con dentro l'indirizzo.
+
+    La riga di lancio e' l'unica cosa che il produttore riceve, quindi e' l'unico
+    posto in cui il lavoro del reader-editor puo' arrivargli: se porta solo
+    "bocciato per leggibilita'" la riscrittura parte cieca, il produttore rifa'
+    la meta' sbagliata dell'articolo e si fa bocciare di nuovo finche' il freno
+    non parcheggia il codice. Tre cose, in ordine di durezza: i fallimenti duri
+    (che sono classi, non opinioni), i criteri caduti sotto il massimo col loro
+    punteggio, e la nota, che e' il punto d'inciampo scritto da chi ha letto.
+    """
+    parts = [f"{row.get('code')} bocciato dal reader-editor per leggibilita'"]
+    hard = row.get("hard_failures") or []
+    if hard:
+        parts.append("fallimenti duri: " + ", ".join(hard))
+    low = row.get("low_scores") or []
+    if low:
+        parts.append("criteri sotto il massimo: "
+                     + ", ".join(f"{name}={value}" for name, value in low))
+    note = (row.get("note") or "").strip()
+    if note:
+        parts.append(f"dove inciampa: {note}")
+    return ". ".join(parts)
+
+
 def plan_launches(dossier, queues=None, mint=None, readings=None):
     """La lista prioritizzata di lanci, dai soli artefatti gia' letti.
 
@@ -195,14 +220,13 @@ def plan_launches(dossier, queues=None, mint=None, readings=None):
         producer_codes.add(key)
         d = (dossier or {}).get(key) or {}
         priority = float(d.get("priority", 0.0) or 0.0)
-        grave = " (fallimento duro)" if row.get("hard_failures") else ""
         launches.append({
             "role": "producer",
             "agent": AGENT_OF_ROLE["producer"],
             "indicator": key,
             "scope": "indicatore",
             "priority": priority,
-            "reason": f"{row.get('code')} bocciato dal reader-editor per leggibilita'{grave}",
+            "reason": _revise_reason(row),
             "run_id": mint("producer"),
         })
 
@@ -240,10 +264,47 @@ def plan_launches(dossier, queues=None, mint=None, readings=None):
             "run_id": mint("reader-editor"),
         })
 
+    launches = _one_role_per_indicator(launches)
     launches.sort(key=lambda item: (-item["priority"],
                                     ROLE_ORDER.index(item["role"]),
                                     item["indicator"] or ""))
     return launches
+
+
+def _one_role_per_indicator(launches):
+    """Un indicatore, un ruolo per tick: vince il primo di `ROLE_ORDER`.
+
+    Le liste sono indipendenti e possono nominare lo stesso indicatore. Il caso
+    reale e' un articolo appena firmato: entra fra i `verifier_items` (nessuno ha
+    provato a smentirlo) **e** fra gli `unread` (nessuno l'ha letto), ed erano due
+    voci che il lanciatore metteva in volo insieme. `ROLE_ORDER` non bastava a
+    evitarlo: e' solo il criterio che rompe i pari merito nell'ordinamento, e il
+    lanciatore lancia in parallelo le voci in cima. Se poi la lettura boccia, la
+    riscrittura cambia l'impronta e la verifica appena fatta scade: una run opus
+    buttata, e proprio l'ordine "leggi prima, verifica dopo" che questa PR dice di
+    volere. Nel piano vero erano 23 indicatori.
+
+    Scartare qui non e' perdere lavoro, e' rimandarlo: il piano si ricalcola a
+    ogni tick, quindi la verifica ricompare appena la lettura esiste. La voce che
+    resta si tiene la priorita' piu' alta fra quelle in collisione, cosi' un
+    indicatore non scende nel piano per il fatto di essere stato dedotto.
+    """
+    winner = {}
+    for item in launches:
+        code = item["indicator"]
+        if code is None:
+            continue
+        current = winner.get(code)
+        if current is None:
+            winner[code] = item
+            continue
+        if ROLE_ORDER.index(item["role"]) < ROLE_ORDER.index(current["role"]):
+            item["priority"] = max(item["priority"], current["priority"])
+            winner[code] = item
+        else:
+            current["priority"] = max(current["priority"], item["priority"])
+    return [item for item in launches
+            if item["indicator"] is None or winner[item["indicator"]] is item]
 
 
 def load_plan(today=""):

@@ -166,6 +166,19 @@ def _score(value):
     return number if 0 <= number <= 2 else None
 
 
+def _low_scores(row: dict) -> list:
+    """I criteri che questa lettura ha messo sotto il massimo, dal piu' basso.
+
+    Sono l'indirizzo della bocciatura: `structure` a 0 e `cognitive_load` a 1
+    dicono al produttore che deve rifare l'ordine e alleggerire i periodi, non
+    cambiare lessico. Un criterio a 2 non e' un problema e non entra.
+    """
+    scored = [(name, _score(row.get(name))) for name in CRITERIA]
+    return [(name, value) for name, value in sorted(
+        (pair for pair in scored if pair[1] is not None and pair[1] < 2),
+        key=lambda pair: (pair[1], pair[0]))]
+
+
 def _hard_failures(row: dict) -> list:
     raw = row.get("hard_failures") or []
     if isinstance(raw, str):
@@ -284,6 +297,16 @@ def build_queue(texts=None, readings=None) -> list[dict]:
             "status": status,
             "verdict": (match.get("verdict") or "").strip() if match else "",
             "hard_failures": _hard_failures(match) if match else [],
+            # Il punto d'inciampo e i criteri caduti, non solo che l'articolo e'
+            # caduto. La riga e' cio' che il lanciatore trasforma in un lancio del
+            # produttore, e senza queste due voci la riscrittura parte cieca: il
+            # produttore sa di essere stato bocciato e non sa dove, quindi puo'
+            # riscrivere l'altra meta' dell'articolo e farsi bocciare di nuovo
+            # finche' il freno non parcheggia il codice. Il reader-editor la nota
+            # la scrive gia' (`note`, obbligatoria su un `revise`), e buttarla via
+            # qui era il modo piu' caro di non leggerla.
+            "note": (match.get("note") or "").strip() if match else "",
+            "low_scores": _low_scores(match) if match else [],
             "revised_rounds": len(revised_versions),
         })
     return sorted(out, key=lambda r: (r["status"], r["code"]))
