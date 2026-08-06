@@ -1,0 +1,20 @@
+{
+ "at": "2026-08-06T07:10:26+00:00",
+ "base_commit": "1733a07",
+ "branch": "nmaiese/integrazione-nuovi-indicatori",
+ "claude_code_version": "2.1.223 (Claude Code)",
+ "commit": "ce7fec3",
+ "detail": [
+  "ter-152 Intensita brevettuale: dati backbone verificati 1995-2012 (max 2012). Match esatto Eurostat pat_ep_rtot verificato via API: anni 1977-2012, max 2012, ultimo update 2016-04-29, quindi zero guadagno di freschezza (stesso vicolo cieco). Nessun dataflow Istat SDMX brevetti nella coda scout. Comunicato Istat R&S 2023-2025 aperto (WebFetch): regionale, misura spesa/personale/intensita R&S fino al 2023, NESSUN brevetto, e comunque la R&S e gia in catalogo via Eurostat rd_e_gerdreg (2023) e rd_p_persreg (2023), misura diversa dai brevetti. Auto-refutazione: cercata qualunque fonte regionale fresca di brevetti EPO, tutte a 2012 o assenti, il caso contro il rifiuto e caduto. Esito: nessuna ammissione, refresh non possibile da fonte ammissibile. Match tipo: esatto ma congelato.",
+  "ter-90 Laureati in scienza e tecnologia: dati backbone max 2012. Successore Eurostat educ_uoe_grad04 (per 1000 pop 20-29, campi ISCED-F 2013) verificato via API senza filtro geo: solo codici nazione (IT, DE, FR), NESSUN NUTS2, fresco al 2024 ma non regionale. HRST regionale hrst_st_rcat verificato via API: NUTS2 presente (ITC4), fresco al 2025, ma misura uno stock di persone con istruzione terziaria e/o occupate in S&T, non i laureati per mille 20-29: proxy di fenomeno diverso, non sostituisce l'originale. MUR/USTAT dati-ustat.mur.gov.it (ministero, istituzionale, criterio 1 ok): elenca una serie storica Laureati, ma il portale NON conferma il dettaglio regione per area disciplinare insieme, ne gli anni esatti, ne una licenza specifica per quel dataset (dichiara Pubblico Dominio per 43 dataset, non verificato che copra Laureati). Auto-refutazione: MUR/USTAT e un lead reale ma non trasformabile in ammissione senza verificare licenza e crosstab e senza un nuovo family+adapter (codice, fuori perimetro). Esito: nessuna ammissione, needs-info con lead MUR/USTAT. Match tipo: nessun match regionale esatto fresco (successore Eurostat solo nazionale, HRST proxy)."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 2,
+ "queue_before": 2,
+ "run_id": "admissions-20260806T071026Z-ccea",
+ "stage": "admissions",
+ "summary": "Refresh ter-152 e ter-90 (fermi al 2012, noindex): valutate le fonti candidate, nessuna ammissibile questa run, zero righe cablate. ter-90 lascia un lead MUR/USTAT come needs-info.",
+ "trigger": "manuale"
+}
