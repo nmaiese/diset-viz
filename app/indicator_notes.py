@@ -642,7 +642,63 @@ def authored_seo_title(title, site_name="Divario Italia", max_len=_TITLE_MAX,
         return text + qualifier + suffix
     if len(text) + len(qualifier) <= max_len:
         return text + qualifier
-    return meta_description_from_attacco(text, max_len=max_len - len(qualifier)) + qualifier
+    # Sopra budget si accorcia con `_compact_title`, lo stesso accorciatore del
+    # titolo derivato, e non con il troncatore delle description. Quello taglia
+    # alla prima frase intera e ci mette un punto, il che fa due danni: sfora di
+    # un carattere (taglia a 60 e poi aggiunge il punto) e, peggio, butta via
+    # proprio la coda che distingue. Due titoli lunghi che aprono sulla stessa
+    # frase diventavano lo **stesso** `<title>` su due pagine indicizzabili, che
+    # e' la collisione che sul percorso derivato e' vietata da un test sul
+    # catalogo. `_compact_title` tiene invece testa e coda ("testa (coda)"), che
+    # e' come il derivato mantiene distinte le undici pagine della stessa scala.
+    return _clamp_title(_authored_short(text, max_len - len(qualifier)) + qualifier, max_len)
+
+
+def _authored_short(text, budget):
+    """Un titolo autorato sopra budget, accorciato **tenendo la coda**.
+
+    Tagliare in testa e basta e' quello che fa un troncatore di description, ed
+    e' sbagliato per un `<title>`: due titoli lunghi che aprono sulla stessa
+    frase diventano lo stesso titolo, e su due pagine indicizzabili la
+    collisione e' un difetto SEO vero (sul percorso derivato c'e' un test del
+    catalogo che la vieta). Cio' che distingue due titoli simili sta in fondo,
+    quindi in fondo si tiene: `testa (coda)`, la stessa forma con cui il derivato
+    tiene distinte le undici pagine di una scala.
+
+    Il budget si rispetta per costruzione, non per correzione a valle: la coda ha
+    una fetta fissa, la testa prende il resto.
+    """
+    if len(text) <= budget:
+        return text
+    tail_budget = max(8, min(20, budget // 3))
+    tail = text[-tail_budget:].lstrip(" ,.;:-")
+    head_budget = budget - len(tail) - 3          # " (" e ")"
+    head = _truncate_words(text, head_budget) if head_budget > 0 else ""
+    if not head:
+        head = text[:max(0, head_budget)]
+    head = head.rstrip(" ,.;:-(")
+    if not head or tail.lower() in head.lower():
+        return _truncate_words(text, budget) or text[:budget]
+    return f"{head} ({tail})"
+
+
+def _clamp_title(text, max_len):
+    """L'ultima rete sul budget: nessun titolo esce piu' lungo del suo tetto.
+
+    Serve perche' gli accorciatori ragionano a parole, e una parola sola piu'
+    lunga del budget non e' accorciabile a parole: `_compact_title` la
+    restituisce intera. Un titolo cosi' non e' realistico in redazione, ma il
+    budget e' una garanzia della funzione, e una garanzia che vale "quasi
+    sempre" non e' una garanzia. Taglio duro, e se il taglio lascia una parentesi
+    aperta si toglie anche quella: un `<title>` con la parentesi spaiata e' peggio
+    di uno piu' corto.
+    """
+    if len(text) <= max_len:
+        return text
+    cut = text[:max_len]
+    if cut.count("(") > cut.count(")"):
+        cut = cut[:cut.rfind("(")]
+    return cut.rstrip(" ,.;:-(")
 
 
 def seo_description(
