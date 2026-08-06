@@ -82,6 +82,19 @@ class EveryIndicatorPageRenders(unittest.TestCase):
         self.assertGreater(len(rows), 5)
         self.assertEqual(rows, sorted(rows))  # in ordine di anno
 
+    def test_the_markdown_representation_carries_the_series_too(self):
+        """Un agente che chiede `text/markdown` e' il lettore senza JavaScript per
+        definizione, quindi la rappresentazione alternativa non puo' essere
+        l'unica vista della pagina priva della serie storica."""
+        body = self.client.get(
+            "/indicatore/eta-media-della-popolazione/ter-920",
+            headers={"Accept": "text/markdown"}, follow_redirects=True,
+        ).get_data(as_text=True)
+        self.assertIn("## Serie storica, media delle regioni per anno", body)
+        years = re.findall(r"^\| (\d{4}) \| [-\d.,]+ \|$", body, flags=re.MULTILINE)
+        self.assertGreater(len(years), 5)
+        self.assertEqual(years, sorted(years))
+
     def test_question_navigation_points_to_visible_answers(self):
         response = self._get("920")
         html = response.get_data(as_text=True)
