@@ -1010,13 +1010,82 @@ class AppSmokeTest(unittest.TestCase):
                 seo_title(by_id["190"]["name"], "Divario Italia"),
             )
 
+    def test_seo_title_keeps_scale_level_distinct(self):
+        # Regression for the multiscopo satisfaction-level family: 11 pages
+        # ("pari a 0".."pari a 10"), each with the same trailing "(scala 0-10)"
+        # parenthetical, used to truncate to one identical <title> for all of
+        # them (the digit sat past the 60-char budget, only the shared scale
+        # marker survived).
+        from app.indicator_notes import seo_title
+
+        names = [
+            f"Persone di 14 anni e più con un livello di soddisfazione per la "
+            f"vita pari a {level} (scala 0-10)"
+            for level in range(11)
+        ]
+        titles = [seo_title(name, "Divario Italia") for name in names]
+        self.assertEqual(len(titles), len(set(titles)), titles)
+        for title in titles:
+            self.assertLessEqual(len(title), 60, title)
+
+    def test_seo_title_source_qualifier_disambiguates_duplicate_bes(self):
+        # A BES id in taxonomy.DUPLICATE_BES_IDS is hidden from browsing but its
+        # page stays indexable, so it must not share a <title> with the
+        # territorial series it duplicates.
+        from app.indicator_notes import seo_title
+        from app import sources
+
+        qualifier = sources.family_short_label("bes")
+        plain = seo_title("Speranza di vita alla nascita", "Divario Italia")
+        qualified = seo_title(
+            "Speranza di vita alla nascita", "Divario Italia", source_qualifier=qualifier,
+        )
+        self.assertNotEqual(plain, qualified)
+        self.assertLessEqual(len(qualified), 60, qualified)  # same budget as every other title
+        self.assertIn(qualifier.split()[0], qualified)  # institution context survives truncation
+
+    def test_all_duplicate_bes_titles_are_unique_and_within_budget(self):
+        # Every id in taxonomy.DUPLICATE_BES_IDS gets a qualified title (see
+        # views._render_indicator). None may exceed the 60-char budget, and two
+        # ids sharing a truncated core (e.g. "Competenza numerica"/"alfabetica")
+        # must not collapse onto the same qualified title either.
+        from app.bes_data import get_bes_rows
+        from app.indicator_notes import seo_title
+        from app.taxonomy import DUPLICATE_BES_IDS
+        from app import sources
+
+        qualifier = sources.family_short_label("bes")
+        names = {}
+        for row in get_bes_rows("regione"):
+            if row["id"] in DUPLICATE_BES_IDS and row["id"] not in names:
+                names[row["id"]] = row["name"]
+        self.assertEqual(set(names), DUPLICATE_BES_IDS)
+
+        titles = {
+            raw_id: seo_title(name, "Divario Italia", source_qualifier=qualifier)
+            for raw_id, name in names.items()
+        }
+        for raw_id, title in titles.items():
+            self.assertLessEqual(len(title), 60, f"{raw_id}: {title}")
+        self.assertEqual(len(titles), len(set(titles.values())), titles)
+
     def test_public_game_and_editorial_metadata_within_budget(self):
         client = app.test_client()
         paths = (
             "/quiz/chi-e-maggiore",
             "/quiz/ordina",
+            "/quiz",
+            "/quiz/indovina-la-regione",
             "/qualita-della-vita/classifica/regioni",
+            "/qualita-della-vita/classifica/province?profilo=accessibilita",
+            "/qualita-della-vita/classifica/regioni?profilo=accessibilita",
             "/blog/divario-turistico-nord-sud-2024",
+            "/blog/divario-genere-occupazione-regioni-2024",
+            "/blog/servizi-infanzia-regioni-2023",
+            # Longest region/theme names in the catalog: the tightest budget fits.
+            "/regione/friuli-venezia-giulia",
+            "/regione/trentino-alto-adige",
+            "/tema/reddito-inclusione-e-accessibilita",
         )
         for path in paths:
             response = client.get(path)

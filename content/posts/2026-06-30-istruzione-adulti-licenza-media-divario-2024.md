@@ -1,5 +1,6 @@
 ---
 title: "Quanti adulti si fermano alla licenza media? Il divario per regione"
+seo_title: "Licenza media: il divario per regione"
 slug: istruzione-adulti-licenza-media-divario-2024
 description: "Nel 2024 in Sicilia il 44% degli adulti 25-64 ha al più la licenza media, in Umbria il 24%. Un divario di istruzione che segue la linea Nord-Sud. Dati Istat."
 date: 2026-06-30

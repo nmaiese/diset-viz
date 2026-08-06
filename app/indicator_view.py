@@ -336,6 +336,20 @@ def _explain_for_level(meta, level_key, level_count):
     return explain
 
 
+def _annual_means(matrix):
+    """La media semplice sulle regioni per ogni anno, in ordine di anno.
+
+    Ignora le celle vuote come `data.indicator_year_average`. E' cio' che rende la
+    serie leggibile senza JavaScript: il grafico la ridisegna da `matrix`, la
+    tabella la stampa gia' pronta lato server."""
+    out = []
+    for year_str in sorted(matrix, key=int):
+        values = [v for v in matrix[year_str].values() if isinstance(v, (int, float))]
+        if values:
+            out.append({"year": int(year_str), "avg": sum(values) / len(values)})
+    return out
+
+
 def _build_level(key, series, meta, territory_total, coverage):
     conf = LEVELS[key]
     series = [row for row in series if row.get("value") is not None]
@@ -416,6 +430,12 @@ def _build_level(key, series, meta, territory_total, coverage):
         # informative default.
         "default_territory": _territory(observations[0]) if observations else None,
         "matrix": matrix,
+        # La serie annuale della media, un valore per anno. Il grafico di trend la
+        # disegna da JS leggendo `matrix`; questa e' la stessa serie gia' calcolata
+        # lato server, cosi' la tabella-serie della pagina si legge senza
+        # JavaScript (e un crawler la vede). Media semplice sulle regioni, celle
+        # vuote ignorate, come `data.indicator_year_average`.
+        "annual_means": _annual_means(matrix),
         "map_colors": region_choropleth_colors(observations) if conf["has_map"] else None,
         "cover_bars": cover_bars(observations, best, worst, meta["scoreable"]) if conf["has_map"] else None,
         "bar_max": max((row["value"] for row in observations), default=0),

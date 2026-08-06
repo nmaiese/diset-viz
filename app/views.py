@@ -33,6 +33,7 @@ from app import moderation
 from app import public_urls
 from app import publisher
 from app import agent_discovery
+from app.taxonomy import DUPLICATE_BES_IDS
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory
 from flask.json import jsonify
@@ -1104,6 +1105,15 @@ def _render_indicator(family, raw_id):
             response.headers["X-Robots-Tag"] = "noindex, follow"
         return response
 
+    # A handful of BES ids are exact duplicates of an existing territorial
+    # series (DUPLICATE_BES_IDS docstring): hidden from browsing, but the page
+    # itself stays reachable and indexable, so its <title> must not collide
+    # with its territorial twin's. Stays within the normal 60-char budget like
+    # every other title, same as the crawler flags on any other page.
+    source_qualifier = (
+        sources.family_short_label(family) if family == "bes" and raw_id in DUPLICATE_BES_IDS else None
+    )
+
     response = make_response(render_template(
         "indicator_page.html",
         meta=meta,
@@ -1116,7 +1126,7 @@ def _render_indicator(family, raw_id):
         page_article=article,
         page_lead=lead,
         noindex=noindex,
-        seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME),
+        seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME, source_qualifier=source_qualifier),
         seo_description=seo_description,
         dataset_description=_dataset_description(lead, meta),
         dataset_updated=publisher.dataset_updated(meta["family"]),

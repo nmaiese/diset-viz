@@ -1,6 +1,6 @@
 ---
 title: "L'Italia dei giovani: il divario nell'occupazione tra Nord e Sud"
-seo_title: "Occupazione giovanile 15-29 anni per regione"
+seo_title: "Occupazione giovanile 15-29 anni"
 description: "Nel 2024 il tasso di occupazione 15-29 anni va dal 47,5% del Trentino-Alto Adige al 18,5% della Calabria. Dati Istat per regione."
 slug: tasso-di-occupazione-giovanile-15-29-anni
 date: 2026-07-02

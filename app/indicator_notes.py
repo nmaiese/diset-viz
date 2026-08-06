@@ -492,21 +492,39 @@ def _truncate_words(text, budget, add_period=False):
     return cut
 
 
-def _variant_marker(name):
-    """Keep a compact parenthetical so sibling indicator titles stay unique."""
+def _variant_marker(name, extra=None):
+    """Keep a compact parenthetical so sibling indicator titles stay unique.
+
+    `extra`, when given (e.g. a source qualifier for a BES id that duplicates a
+    territorial series, see `DUPLICATE_BES_IDS`), is folded into the same
+    parenthetical instead of stacking a second one.
+    """
+    def _wrap(parts):
+        joined = _truncate_words(", ".join(p for p in parts if p), 40)
+        return f" ({joined})" if joined else ""
+
     low = (name or "").lower()
     for marker in ("femmine", "maschi", "totale"):
         if f"({marker})" in low:
-            return f" ({marker})"
+            return _wrap([marker, extra])
     groups = re.findall(r"\(([^()]*)\)", name or "")
+    # A "pari a N" clause (e.g. a satisfaction-level scale, one page per point)
+    # sits at the end of the name, right before a scale parenthetical shared by
+    # every sibling ("(scala 0-10)"): that shared parenthetical alone made all
+    # of them collapse onto the same truncated title. Fold the level into the
+    # marker itself, ahead of the truncatable core, so it survives the cut.
+    level_match = re.search(r"\bpari a (\d+)\b", name or "", flags=re.I)
+    if level_match:
+        level = f"livello {level_match.group(1)}"
+        return _wrap([level, groups[-1] if groups else None, extra])
     if groups:
         marker = groups[-1]
         marker = re.sub(r"studenti classi?\s+", "classe ", marker, flags=re.I)
         marker = re.sub(r"scuola secondaria primo grado", "secondaria I grado", marker, flags=re.I)
         marker = re.sub(r"scuola secondaria secondo grado", "secondaria II grado", marker, flags=re.I)
         marker = _truncate_words(marker, 27)
-        return f" ({marker})" if marker else ""
-    return ""
+        return _wrap([marker, extra])
+    return _wrap([extra])
 
 
 def _short_name_for_title(name):
@@ -514,6 +532,10 @@ def _short_name_for_title(name):
     # Drop parentheticals; the gender/total marker is re-added separately so it
     # survives truncation instead of being cut off with the tail of a long name.
     n = re.sub(r"\s*\([^)]*\)", "", n)
+    # Same for a trailing "pari a N" (a scale level): _variant_marker() carries
+    # it instead, so it is not left dangling at the end of a name long enough
+    # to be truncated before reaching it.
+    n = re.sub(r"\s*\bpari a \d+\s*$", "", n, flags=re.I)
     return re.sub(r"\s+", " ", n).strip()
 
 
@@ -569,9 +591,13 @@ def meta_description_from_attacco(attacco, max_len=_DESC_MAX):
     return kept or _truncate_words(text, max_len, add_period=True)
 
 
-def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX):
-    """Compact SERP title: shortened name + variant marker + 'per regione'."""
-    marker = _variant_marker(name)
+def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX, source_qualifier=None):
+    """Compact SERP title: shortened name + variant marker + 'per regione'.
+
+    `source_qualifier`, when given, disambiguates a name that another
+    indicator also carries (see `app.taxonomy.DUPLICATE_BES_IDS`), so the two
+    pages do not compete on an identical SERP title."""
+    marker = _variant_marker(name, extra=source_qualifier)
     core = _short_name_for_title(name) or (name or "").strip()
     core = core.rstrip(" ,.;:-(")  # a trailing comma/colon must not sit before the tail
     suffix = f" · {site_name}"

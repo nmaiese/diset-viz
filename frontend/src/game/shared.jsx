@@ -191,7 +191,7 @@ export function SourceStrip({ year, sourceLabel, sourceUrl }) {
         <a
           href={sourceUrl}
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           className="quiz-source-link"
           onClick={() => trackGameEvent("quiz_source_click", { source: sourceLabel })}
         >

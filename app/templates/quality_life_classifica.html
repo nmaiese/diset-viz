@@ -5,7 +5,7 @@
 {% set is_prov = data.level == 'provincia' %}
 {% set lvl_label = 'province' if is_prov else 'regioni' %}
 
-{% block title %}Qualità vita {{ lvl_label }}: {{ p.name }} | {{ site_name }}{% endblock %}
+{% block title %}Qualità {{ lvl_label }}: {{ p.name }} | {{ site_name }}{% endblock %}
 {% block description %}Classifica della qualità della vita per {{ lvl_label }}: indicatori Istat su scala 0-100, profilo {{ p.name }}, categorie e metodo trasparenti.{% endblock %}
 
 {% block head_extra %}
