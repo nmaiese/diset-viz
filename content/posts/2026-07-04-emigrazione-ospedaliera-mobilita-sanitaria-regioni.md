@@ -1,6 +1,6 @@
 ---
 title: "Emigrazione ospedaliera: la mobilità sanitaria regione per regione"
-description: "Nel 2023 il 32,6% dei ricoveri dei molisani è avvenuto in un'altra regione, oltre sei volte la Lombardia. Cosa dice il dato ISTAT sulla mobilità sanitaria, chi paga il divario Nord-Sud e perché non è libera scelta."
+description: "Nel 2023 il 32,6% dei ricoveri dei molisani è avvenuto in un'altra regione, oltre sei volte la Lombardia: la mobilità sanitaria vista con i dati Istat."
 slug: emigrazione-ospedaliera-mobilita-sanitaria-regioni
 date: 2026-07-04
 author: "Redazione Divario Italia"

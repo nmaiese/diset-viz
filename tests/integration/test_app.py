@@ -1010,6 +1010,39 @@ class AppSmokeTest(unittest.TestCase):
                 seo_title(by_id["190"]["name"], "Divario Italia"),
             )
 
+    def test_seo_title_keeps_scale_level_distinct(self):
+        # Regression for the multiscopo satisfaction-level family: 11 pages
+        # ("pari a 0".."pari a 10"), each with the same trailing "(scala 0-10)"
+        # parenthetical, used to truncate to one identical <title> for all of
+        # them (the digit sat past the 60-char budget, only the shared scale
+        # marker survived).
+        from app.indicator_notes import seo_title
+
+        names = [
+            f"Persone di 14 anni e più con un livello di soddisfazione per la "
+            f"vita pari a {level} (scala 0-10)"
+            for level in range(11)
+        ]
+        titles = [seo_title(name, "Divario Italia") for name in names]
+        self.assertEqual(len(titles), len(set(titles)), titles)
+        for title in titles:
+            self.assertLessEqual(len(title), 60, title)
+
+    def test_seo_title_source_qualifier_disambiguates_duplicate_bes(self):
+        # A BES id in taxonomy.DUPLICATE_BES_IDS is hidden from browsing but its
+        # page stays indexable, so it must not share a <title> with the
+        # territorial series it duplicates.
+        from app.indicator_notes import seo_title
+        from app import sources
+
+        qualifier = sources.family_short_label("bes")
+        plain = seo_title("Speranza di vita alla nascita", "Divario Italia")
+        qualified = seo_title(
+            "Speranza di vita alla nascita", "Divario Italia", max_len=68, source_qualifier=qualifier,
+        )
+        self.assertNotEqual(plain, qualified)
+        self.assertIn(qualifier.split()[0], qualified)  # institution context survives truncation
+
     def test_public_game_and_editorial_metadata_within_budget(self):
         client = app.test_client()
         paths = (

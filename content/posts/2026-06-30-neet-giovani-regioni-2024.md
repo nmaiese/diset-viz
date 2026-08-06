@@ -1,7 +1,7 @@
 ---
 title: "Giovani NEET per regione: il divario che si riduce ma non sparisce"
 slug: neet-giovani-regioni-2024
-description: "Nel 2024 in Calabria il 26,2% dei giovani non studia e non lavora, in Trentino-Alto Adige il 7,7%. Il dato è migliorato dal 2018, ma il divario resta. Dati Istat."
+description: "Nel 2024 in Calabria il 26,2% dei giovani non studia e non lavora, contro il 7,7% del Trentino-Alto Adige. Migliora dal 2018, ma il divario resta. Dati Istat."
 date: 2026-06-30
 author: "Redazione Divario Italia"
 cover: /static/img/blog/neet-giovani.svg
