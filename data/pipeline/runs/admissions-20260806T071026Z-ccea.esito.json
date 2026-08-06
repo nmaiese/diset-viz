@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-06T07:33:20+00:00",
+ "base_commit": "1f3ffc1",
+ "branch": "master",
+ "claude_code_version": "2.1.223 (Claude Code)",
+ "commit": "1f3ffc1",
+ "detail": [
+  "il cancello e' rosso: suite"
+ ],
+ "gate": "blocked",
+ "outcome": "blocked",
+ "pr": "163",
+ "run_id": "admissions-20260806T071026Z-ccea",
+ "stage": "admissions",
+ "summary": "PR #163 non fusa: il cancello e' rosso",
+ "trigger": "manuale"
+}
