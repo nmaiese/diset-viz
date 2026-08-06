@@ -175,6 +175,38 @@ class Reconstruct(unittest.TestCase):
         self.assertEqual(d["state"], "pubblicata")
         self.assertTrue(d["published"])
 
+    def test_an_opt_in_article_without_definizione_counts_as_complete(self):
+        # Sezioni variabili: un articolo che dichiara `roles_covered` senza
+        # `definizione` (assorbita dal blocco "Come leggere") e' completo con i tre
+        # ruoli sostanziali scritti. Senza il fallback, `article_complete` sarebbe
+        # False e l'articolo non passerebbe mai il gate pur essendo pieno.
+        art = {
+            "key": "432", "lead": "Lead di 432.", "vintage": 2023,
+            "reviewed_at": "2026-07-27", "reviewed_vintage": 2023,
+            "roles_covered": ["quadro", "dinamica", "limiti"],
+            "sections": [{"role": r, "h": None, "body": f"Corpo {r}."}
+                         for r in ("quadro", "dinamica", "limiti")],
+        }
+        d = self._run(
+            articles={"432": art},
+            verifiche=[_verifica("ter-432", art)],
+        )["432"]
+        self.assertTrue(d["flags"]["article_complete"])
+        self.assertEqual(d["state"], "pubblicata")
+
+    def test_an_opt_in_article_missing_a_substantive_role_is_incomplete(self):
+        # Solo la definizione e' omettibile: se manca un ruolo sostanziale
+        # (qui `limiti`), l'articolo non e' completo, anche se `roles_covered` non
+        # lo dichiara.
+        art = {
+            "key": "432", "lead": "Lead di 432.", "vintage": 2023,
+            "roles_covered": ["quadro", "dinamica"],
+            "sections": [{"role": r, "h": None, "body": f"Corpo {r}."}
+                         for r in ("quadro", "dinamica")],
+        }
+        d = self._run(articles={"432": art})["432"]
+        self.assertFalse(d["flags"]["article_complete"])
+
 
 def _dossier(timeline, **kw):
     base = dict(id="dem:X", type="nuovo", state="in-lavorazione", entered_at="2026-01-01",

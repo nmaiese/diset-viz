@@ -119,6 +119,113 @@ class PlanLaunches(unittest.TestCase):
         self.assertEqual(plan, [])
 
 
+def _reading(key, status, code=None, hard_failures=None, level="regione",
+             note="", low_scores=None):
+    return {"key": key, "code": code or key, "level": level, "status": status,
+            "hard_failures": list(hard_failures or []),
+            "note": note, "low_scores": list(low_scores or [])}
+
+
+class ReadingsFeedTheLauncher(unittest.TestCase):
+    """La quarta lista: i pubblicati entrano dalla coda di lettura, non da
+    `ready_stage` (terminale su `pubblicata`). Le letture restano fuori dalla
+    macchina a stati, quindi si passano al piano come una lista a parte."""
+
+    def test_an_unread_published_article_is_a_reader_editor_launch(self):
+        readings = [_reading("dem:POP014", "unread")]
+        plan = pipeline_launch.plan_launches({}, {}, mint=_mint, readings=readings)
+        self.assertEqual(len(plan), 1)
+        self.assertEqual(plan[0]["role"], "reader-editor")
+        self.assertEqual(plan[0]["agent"], "reader-editor")
+        self.assertEqual(plan[0]["indicator"], "dem:POP014")
+        self.assertEqual(plan[0]["run_id"], "reader-editor-RUNID")
+
+    def test_a_revise_reading_is_a_producer_rewrite(self):
+        readings = [_reading("eur:rd_p_persreg", "revise", code="eur-rd_p_persreg",
+                             hard_failures=["numeric_overload"])]
+        plan = pipeline_launch.plan_launches({}, {}, mint=_mint, readings=readings)
+        self.assertEqual(len(plan), 1)
+        self.assertEqual(plan[0]["role"], "producer")
+        self.assertEqual(plan[0]["indicator"], "eur:rd_p_persreg")
+        self.assertIn("leggibilita", plan[0]["reason"])
+        self.assertIn("fallimenti duri: numeric_overload", plan[0]["reason"])
+
+    def test_the_rewrite_carries_where_the_reader_stumbled(self):
+        """Il motivo del lancio e' l'unica cosa che il produttore riceve, quindi
+        se non porta l'indirizzo della bocciatura la riscrittura parte cieca e si
+        fa bocciare di nuovo finche' il freno non parcheggia il codice."""
+        readings = [_reading("eur:rd_p_persreg", "revise", code="eur-rd_p_persreg",
+                             note="la meccanica FTE apre la narrazione, spostala fuori dal corpo",
+                             low_scores=[("structure", 0), ("cognitive_load", 1)])]
+        plan = pipeline_launch.plan_launches({}, {}, mint=_mint, readings=readings)
+        reason = plan[0]["reason"]
+        self.assertIn("structure=0", reason)
+        self.assertIn("cognitive_load=1", reason)
+        self.assertIn("la meccanica FTE apre la narrazione", reason)
+
+    def test_a_parked_reading_launches_nothing(self):
+        # reading_queue non emette mai `parked` come lavoro; il piano non lo tocca.
+        readings = [_reading("ter-9", "parked")]
+        plan = pipeline_launch.plan_launches({}, {}, mint=_mint, readings=readings)
+        self.assertEqual(plan, [])
+
+    def test_a_clean_reading_launches_nothing(self):
+        readings = [_reading("ter-9", "clean")]
+        plan = pipeline_launch.plan_launches({}, {}, mint=_mint, readings=readings)
+        self.assertEqual(plan, [])
+
+    def test_a_revise_does_not_double_launch_a_producer_already_ready(self):
+        # ter-5 e' gia' pronto per il produttore da ready_stage (curata, da scrivere)
+        # E anche bocciato per leggibilita'. Un solo produttore, non due.
+        dossier = {"ter-5": practice("ter-5", completed=["curator"], priority=7.0)}
+        readings = [_reading("ter-5", "revise")]
+        plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
+        producers = [p for p in plan if p["role"] == "producer"]
+        self.assertEqual(len(producers), 1, "un solo produttore per indicatore nel tick")
+
+    def test_an_article_about_to_be_rewritten_is_not_read(self):
+        # ter-5 in produzione (ready_stage) e anche unread: non lo si legge ora,
+        # l'impronta cambiera' e la lettura scadrebbe subito.
+        dossier = {"ter-5": practice("ter-5", completed=["curator"], priority=7.0)}
+        readings = [_reading("ter-5", "unread")]
+        plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
+        self.assertEqual([p["role"] for p in plan], ["producer"])
+
+    def test_a_signed_but_unread_article_is_read_before_it_is_verified(self):
+        """Il doppione vero, trovato in revisione: un articolo appena firmato sta
+        insieme fra i verificabili e fra i non letti, e il lanciatore metteva in
+        volo tutte e due le voci. Se poi la lettura boccia, la riscrittura fa
+        scadere la verifica appena fatta: una run opus buttata."""
+        dossier = {"ter-9": practice("ter-9",
+                                     completed=["curator", "writer", "reviewer"],
+                                     priority=15.0)}
+        readings = [_reading("ter-9", "unread")]
+        plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
+        self.assertEqual([p["role"] for p in plan], ["reader-editor"])
+        # e non scende nel piano per essere stato dedotto: tiene la priorita' alta
+        self.assertEqual(plan[0]["priority"], 15.0)
+
+    def test_the_deferred_role_comes_back_once_the_reading_exists(self):
+        """Scartare non e' perdere: il piano si ricalcola a ogni tick."""
+        dossier = {"ter-9": practice("ter-9",
+                                     completed=["curator", "writer", "reviewer"],
+                                     priority=15.0)}
+        readings = [_reading("ter-9", "clean")]
+        plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
+        self.assertEqual([p["role"] for p in plan], ["verificatore"])
+
+    def test_the_reader_editor_sorts_before_the_verificatore_on_a_tie(self):
+        # Stesso indicatore, stessa priorita': leggere prima, per non sprecare la
+        # verifica su un testo che una bocciatura fara' riscrivere.
+        dossier = {"ter-9": practice("ter-9",
+                                     completed=["curator", "writer", "reviewer"],
+                                     priority=0.0)}
+        readings = [_reading("dem:POP014", "unread")]  # priorita' 0.0, non nel dossier
+        plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
+        roles = [p["role"] for p in plan]
+        self.assertLess(roles.index("reader-editor"), roles.index("verificatore"))
+
+
 class TheParallelismCap(unittest.TestCase):
     """Il cap di parallelismo: un tick lancia al massimo tre ruoli, e taglia i
     meno prioritari, non i piu'. Nasce dalla richiesta di non far partire dieci
@@ -148,6 +255,45 @@ class TheParallelismCap(unittest.TestCase):
 
     def test_top_overrides_the_cap(self):
         self.assertEqual(len(pipeline_launch.cap_for_tick(self._plan(9), top=5)), 5)
+
+
+class TheReaderEditorGetsAReservedSlotButDoesNotPreempt(unittest.TestCase):
+    """Le letture ereditano la priorita' alta di un articolo pubblicato: senza
+    riserva monopolizzerebbero il tick e fermerebbero il lavoro fattuale. La
+    riserva le tiene a una voce a tick, e gli altri due slot al resto."""
+
+    def _mixed(self, readers, others):
+        plan = ([{"role": "reader-editor", "indicator": f"r{i}", "priority": 100 - i}
+                 for i in range(readers)]
+                + [{"role": "producer", "indicator": f"p{i}", "priority": 50 - i}
+                   for i in range(others)])
+        plan.sort(key=lambda x: (-x["priority"],
+                                 pipeline_launch.ROLE_ORDER.index(x["role"]),
+                                 x["indicator"]))
+        return plan
+
+    def test_one_reader_slot_even_when_readers_have_the_top_priority(self):
+        # Cinque letture ad alta priorita', cinque produttori: il tick porta una
+        # sola lettura e due produttori, non tre letture.
+        tick = pipeline_launch.cap_for_tick(self._mixed(5, 5))
+        self.assertEqual(sum(1 for x in tick if x["role"] == "reader-editor"), 1)
+        self.assertEqual(sum(1 for x in tick if x["role"] == "producer"), 2)
+
+    def test_readers_fill_the_tick_when_there_is_no_other_work(self):
+        tick = pipeline_launch.cap_for_tick(self._mixed(5, 0))
+        self.assertEqual(len(tick), 3)
+        self.assertTrue(all(x["role"] == "reader-editor" for x in tick))
+
+    def test_no_readers_means_the_reservation_costs_nothing(self):
+        tick = pipeline_launch.cap_for_tick(self._mixed(0, 5))
+        self.assertEqual(len(tick), 3)
+        self.assertTrue(all(x["role"] == "producer" for x in tick))
+
+    def test_a_single_reader_still_drains_against_a_full_producer_queue(self):
+        # Il caso vero: un arretrato di letture dietro centinaia di produttori.
+        tick = pipeline_launch.cap_for_tick(self._mixed(1, 200))
+        self.assertEqual(sum(1 for x in tick if x["role"] == "reader-editor"), 1,
+                         "l'arretrato di lettura deve drenare, non morire di fame")
 
 
 class TheLaunchTick(unittest.TestCase):

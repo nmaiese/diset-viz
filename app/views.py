@@ -1060,6 +1060,29 @@ def indicator_page(first, second=None):
     return _render_indicator(family, raw_id)
 
 
+def _query_map_for_article(query_map, article):
+    """Il query_map del livello, adattato agli anchor che l'articolo rende davvero.
+
+    `query_map` (da `indicator_view._query_map`) e' per-livello e non conosce
+    l'articolo, quindi punta sempre a `sezione-definizione` e `sezione-dinamica`.
+    Con le sezioni variabili quegli H2 possono non esistere: la definizione va nel
+    blocco "Come leggere" (anchor `come-leggere`), e una domanda su una sezione
+    non resa si toglie invece di puntare nel vuoto. Per un articolo a quattro
+    sezioni (i trecento esistenti) non cambia niente.
+    """
+    emitted = {section["role"] for section in article["sections"]}
+    absorbed = bool(article.get("come_leggere"))
+    out = []
+    for question in query_map:
+        target = question["target"]
+        if question["intent"] == "definizione":
+            target = "come-leggere" if absorbed else "sezione-definizione"
+        elif question["intent"] == "confronto" and "dinamica" not in emitted:
+            continue
+        out.append({**question, "target": target})
+    return out
+
+
 def _render_indicator(family, raw_id):
     """The one indicator page, for every source family.
 
@@ -1088,6 +1111,11 @@ def _render_indicator(family, raw_id):
     level = next((item for item in view["levels"] if item["key"] == requested), view["levels"][0])
 
     article = indicator_texts.build_article(meta["id"], level["key"])
+    # Le domande-navigazione puntano ad anchor dell'articolo, che con le sezioni
+    # variabili non sono piu' fisse: se la definizione e' assorbita dal blocco
+    # "Come leggere", il suo intent punta la', e una domanda su una sezione che
+    # l'articolo non rende come H2 si toglie invece di puntare nel vuoto.
+    query_map = _query_map_for_article(level["query_map"], article)
     lead = article["lead"] or indicator_texts.composed_lead(meta, level)
     # The lead is the SERP description as well as the first thing on the page,
     # so the two can never describe the indicator differently.
@@ -1119,6 +1147,7 @@ def _render_indicator(family, raw_id):
         meta=meta,
         levels=view["levels"],
         level=level,
+        query_map=query_map,
         related=view["related"],
         related_posts=posts_for_indicator(meta["id"]),
         siblings=view["siblings"],

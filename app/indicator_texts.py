@@ -48,6 +48,12 @@ ROLES = (
 ROLE_ORDER = [role for role, _ in ROLES]
 DEFAULT_HEADINGS = dict(ROLES)
 
+# I tre ruoli che nessuna dichiarazione `roles_covered` puo' togliere dalla
+# pagina: il blocco "Come leggere il dato" copre la sola `definizione`, quindi e'
+# la sola omettibile. Rispecchiato in `scripts/pending_notes.SUBSTANTIVE_ROLES` e
+# in `scripts/practice_timeline`, che decidono se una pratica e' completa.
+SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
+
 # The level an entry describes when it does not say. Every article written so
 # far is regional, and every family except BES has regions as its only level.
 DEFAULT_LEVEL = "regione"
@@ -92,8 +98,42 @@ def get_text(indicator_id):
     return None
 
 
+def emitted_roles(entry):
+    """I ruoli che la pagina rende per questa entry: `roles_covered` normalizzato.
+
+    Una dichiarazione e' un **filtro sui quattro ruoli**, non un vocabolario
+    nuovo. Due normalizzazioni, e nessuna delle due e' cosmetica:
+
+    - un ruolo sconosciuto si ignora. Un refuso (`dinamicha`) lasciato passare
+      finiva in cio' che la pratica pretende, e l'articolo restava incompleto per
+      sempre mentre la lista di consegna diceva che non manca niente: il dossier
+      lo rilanciava a ogni tick senza che nessuna run potesse chiudere il buco.
+    - i tre sostanziali ci sono comunque. Solo la `definizione` e' assorbibile,
+      perche' e' l'unica che il blocco "Come leggere il dato" copre, e senza
+      l'unione una dichiarazione parziale toglieva `dinamica` e `limiti` dalla
+      pagina pubblica invece di comporli dallo scheletro.
+
+    E' l'unica fonte della regola: renderer, code e impronta della prosa devono
+    rispondere la stessa cosa, o lo stesso articolo risulta completo per una e
+    incompleto per l'altra. `scripts/practice_timeline.py`,
+    `scripts/pending_notes.py` e `scripts/verification_queue.py` la rispecchiano
+    (sono stdlib puri e non importano `app`), e un test le tiene allineate.
+    """
+    declared = entry.get("roles_covered") if isinstance(entry, dict) else None
+    # Campo **assente** e lista **vuota** non sono la stessa cosa: assente vuol
+    # dire "non dichiaro niente", cioe' i quattro ruoli di sempre, mentre
+    # `roles_covered: []` e' una dichiarazione che non nomina la definizione, e
+    # quindi la assorbe esattamente come farebbe `["quadro"]`. Un test di verita'
+    # le confondeva, e la stessa entry rendeva quattro sezioni qui e tre nella
+    # forma equivalente.
+    if not isinstance(declared, (list, tuple)):
+        return list(ROLE_ORDER)
+    keep = {role for role in declared if role in DEFAULT_HEADINGS} | SUBSTANTIVE_ROLES
+    return [role for role in ROLE_ORDER if role in keep]
+
+
 def build_article(indicator_id, level_key=DEFAULT_LEVEL):
-    """The four sections in order, each flagged authored or composed.
+    """The article sections in order, each flagged authored or composed.
 
     `body` is None for a composed section: the template renders that role from
     the data instead. Callers must not treat None as an empty section.
@@ -104,6 +144,17 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     Umbria and Piemonte under a cockpit of provinces. An entry therefore
     declares the level it describes and is used only there; every other level
     falls back to the composed skeleton, which reads the level it is given.
+
+    **Sezioni variabili (opt-in).** Di default l'articolo ha i quattro H2 in
+    ordine fisso, la `definizione` in apertura. Un'entry puo' pero' dichiarare
+    ``roles_covered``: la lista dei ruoli che scrive come H2. Se la `definizione`
+    non e' fra quelli, non apre piu' l'articolo: la sua meccanica va nel blocco
+    "Come leggere il dato" (``indicator_page.html``), che compone lo stesso
+    ``explain`` dai metadati. Il campo vive a livello di entry e **non entra nel
+    ``prose_fingerprint``** (che legge solo lead + ``sections[].{role,h,body}``),
+    quindi le entry senza il campo hanno impronta identica a prima: additivo, i
+    trecento articoli esistenti non cambiano. ``come_leggere`` nel risultato dice
+    al template quando rendere il blocco al posto dell'H2 definizione.
     """
     entry = get_text(indicator_id) or {}
     if (entry.get("level") or DEFAULT_LEVEL) != (level_key or DEFAULT_LEVEL):
@@ -113,8 +164,9 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
         for section in entry.get("sections") or []
         if section.get("role") in DEFAULT_HEADINGS and (section.get("body") or "").strip()
     }
+    role_sequence = emitted_roles(entry)
     sections = []
-    for role in ROLE_ORDER:
+    for role in role_sequence:
         written = authored.get(role)
         heading = (written.get("h") or "").strip() if written else ""
         sections.append({
@@ -126,6 +178,10 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     return {
         "lead": (entry.get("lead") or "").strip() or None,
         "sections": sections,
+        # La definizione e' assorbita dal blocco "Come leggere" quando non e' fra
+        # gli H2 emessi. Per un'entry senza `roles_covered` la definizione e'
+        # sempre presente, quindi `come_leggere` e' False e niente cambia.
+        "come_leggere": "definizione" not in role_sequence,
         "fonti": entry.get("fonti") or [],
         "vintage": entry.get("vintage") if isinstance(entry.get("vintage"), int) else None,
         "authored_count": len(authored),

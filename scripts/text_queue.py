@@ -65,6 +65,10 @@ def assess(family, raw_id, level_key=None):
         view["levels"][0],
     )
     article = build_article(meta["id"], level["key"])
+    # `missing` e' relativo alle sezioni che l'articolo emette: un'entry con
+    # `roles_covered` che assorbe la definizione nel blocco "Come leggere" non
+    # emette quella sezione, quindi non risulta "da scrivere" (altrimenti il
+    # produttore la riscriverebbe a ogni run).
     missing = [s["role"] for s in article["sections"] if not s["authored"]]
     vintage = article["vintage"]
     stale = vintage is not None and vintage < level["year_max"]
@@ -92,7 +96,11 @@ def assess(family, raw_id, level_key=None):
         "stale": stale,
         "lead": bool(article["lead"]),
         "missing": missing,
-        "written": len(ROLE_ORDER) - len(missing),
+        "written": len(article["sections"]) - len(missing),
+        # Il denominatore e' quello dell'articolo, non il quattro fisso: un
+        # articolo opt-in completo ne emette tre, e stamparlo come `3/4` accanto
+        # a `mancano: -` dava all'operatore due segnali che si contraddicono.
+        "sections": len(article["sections"]),
         "score": score,
     }
 
@@ -131,7 +139,7 @@ def main(argv=None):
         out = io.StringIO()
         writer = csv.DictWriter(out, fieldnames=[
             "code", "id", "level", "name", "theme", "indexable", "year_max", "vintage",
-            "stale", "lead", "written", "missing", "score",
+            "stale", "lead", "written", "sections", "missing", "score",
         ], extrasaction="ignore")
         writer.writeheader()
         for row in (rows if args.all else pending):
@@ -153,7 +161,7 @@ def main(argv=None):
         # The level is shown only where there is more than one, so 587 single
         # level rows stay readable and the 34 two-level ones are unambiguous.
         level = row["level"] if row["levels"] > 1 else ""
-        print(f"{row['code']:<16} {level:<10} {row['written']}/4 {flag:>6}  "
+        print(f"{row['code']:<16} {level:<10} {row['written']}/{row['sections']} {flag:>6}  "
               f"{'si' if row['indexable'] else 'no':<4} {missing:<34} {row['name'][:44]}")
     if not args.all and len(pending) > args.limit:
         print(f"\n... e altri {len(pending) - args.limit}. Usa --all per l'elenco completo.")

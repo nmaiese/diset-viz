@@ -79,11 +79,64 @@ class PendingNotesWorklist(unittest.TestCase):
         self.assertEqual(entry["unwritten"], [])
         self.assertFalse(entry["lead"])
 
+    def test_an_absorbed_definizione_is_not_missing_work(self):
+        """Sezioni variabili: un'entry che dichiara `roles_covered` senza la
+        definizione non la rende come H2, sta nel blocco "Come leggere il dato".
+        Contarla fra le mancanti teneva l'articolo completo nella lista di
+        consegna per sempre, e ogni run del produttore sarebbe stata invitata a
+        riscrivere proprio la sezione che il blocco assorbe."""
+        entry = _article("quadro", "dinamica", "limiti", vintage=2025)
+        entry["roles_covered"] = ["quadro", "dinamica", "limiti"]
+        missing, _ = pending_notes.pending(self._manifest(), {"12": entry}, self._year_max)
+        self.assertNotIn("12", [m["id"] for m in missing])
+
+    def test_the_three_substantive_roles_stay_required(self):
+        """Solo la definizione e' omettibile: e' l'unico ruolo che il blocco
+        copre. Una dichiarazione non puo' cancellare quadro, dinamica o limiti."""
+        entry = _article("quadro", vintage=2025)
+        entry["roles_covered"] = ["quadro"]
+        missing, _ = pending_notes.pending(self._manifest(), {"12": entry}, self._year_max)
+        found = next(m for m in missing if m["id"] == "12")
+        self.assertEqual(found["unwritten"], ["dinamica", "limiti"])
+
     def test_roles_mirror_the_app_schema(self):
         """Stdlib copy of app.indicator_texts.ROLES: pin it or it drifts."""
         from app.indicator_texts import ROLE_ORDER
 
         self.assertEqual(list(pending_notes.ARTICLE_ROLES), list(ROLE_ORDER))
+
+    def test_the_four_readers_of_roles_covered_agree(self):
+        """Renderer, pratica, consegna e impronta leggono la stessa
+        dichiarazione: se rispondono diverso, lo stesso articolo risulta completo
+        per una e incompleto per l'altra, e il dossier lo rilancia per sempre
+        mentre la lista di consegna dice che non manca niente. Copie stdlib
+        diverse, quindi la regola si pianta qui.
+        """
+        from app import indicator_texts
+        from scripts import practice_timeline, verification_queue
+
+        cases = [
+            {},                                              # nessuna dichiarazione
+            {"roles_covered": ["definizione", "quadro", "dinamica", "limiti"]},
+            {"roles_covered": ["quadro", "dinamica", "limiti"]},
+            {"roles_covered": ["quadro"]},                    # parziale
+            {"roles_covered": ["quadro", "dinamicha"]},       # refuso
+            {"roles_covered": ["definizione"]},               # solo la assorbibile
+            {"roles_covered": []},                            # dichiarata vuota
+            {"roles_covered": None},                          # campo nullo
+        ]
+        for entry in cases:
+            with self.subTest(entry=entry):
+                expected = indicator_texts.emitted_roles(entry)
+                self.assertEqual(pending_notes.emitted_roles(entry), expected)
+                self.assertEqual(practice_timeline._emitted_roles(entry), expected)
+                # L'impronta guarda lo stesso insieme, e tace quando e' quello
+                # di sempre (la pagina rende come prima, niente da riverificare).
+                emitted = verification_queue._emitted_roles(entry)
+                if set(expected) == set(pending_notes.ARTICLE_ROLES):
+                    self.assertIsNone(emitted)
+                else:
+                    self.assertEqual(emitted, sorted(expected))
 
     def test_proposed_indicator_is_not_on_the_worklist(self):
         missing, _ = pending_notes.pending(self._manifest(), self._notes(), self._year_max)

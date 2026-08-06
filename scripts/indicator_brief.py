@@ -99,6 +99,152 @@ def _text_for_level(indicator_id, level_key):
     return entry if (entry.get("level") or DEFAULT_LEVEL) == level_key else None
 
 
+def _annual_means(matrix):
+    """La serie annuale della media, un valore per ogni anno della matrice, con
+    il numero di territori che lo compongono.
+
+    E' la stessa media semplice che `stats` calcola per il primo e l'ultimo anno
+    (`year_min_avg`/`year_avg`), estesa a tutti gli anni in mezzo. Senza, il
+    brief dava solo i due estremi e un articolo non poteva citare un picco o un
+    fondo interno alla serie (il 2007 e il 15,17 del 2014 di ter-167) senza
+    prenderlo fuori dal brief, cosa che la regola "il brief e' la sola fonte dei
+    numeri" vieta. La media ignora le celle vuote, come
+    `data.indicator_year_average`.
+
+    `n` non e' decorazione, ed e' il motivo per cui questa lista non e' una lista
+    di sole medie: la copertura cambia da un anno all'altro, e due medie su
+    campioni diversi non sono lo stesso numero. Il BES provinciale `06POL001P`
+    ha 50 province nel 2020 e 5 nel 2021, e la media passa da 58,52 a 43,30: a
+    muoversi e' il campione, non il fenomeno. Un brief che stampasse le due cifre
+    di fila inviterebbe a chiamare il 2021 un fondo, ed e' l'errore che la
+    regola del trend di lungo periodo vieta (`docs/INDICATOR_PAGES.md`: gli anni,
+    l'unita' e **la base territoriale**).
+
+    Per la stessa ragione ogni anno porta anche **quali** territori rispondono, e
+    non solo quanti: due conteggi uguali non sono una base uguale. `bes-06POL007`
+    ha 19 regioni nel 2012 e 19 nel 2025, ma nel 2012 c'e' il Veneto e non la
+    Calabria e nel 2025 il contrario, quindi le due medie continuano a non essere
+    confrontabili mentre un controllo sui soli numeri le dichiarerebbe tali.
+    """
+    means = []
+    for year_str in sorted(matrix, key=int):
+        keys = sorted(key for key, value in matrix[year_str].items()
+                      if isinstance(value, (int, float)))
+        if keys:
+            values = [matrix[year_str][key] for key in keys]
+            means.append({
+                "year": int(year_str),
+                "avg": sum(values) / len(values),
+                "n": len(keys),
+                "territories": keys,
+            })
+    return means
+
+
+def _means_lines(means):
+    """Le righe con cui la serie annuale entra nel brief, base territoriale
+    compresa.
+
+    Due forme, e la regola che le sceglie e' meccanica invece che una soglia
+    inventata: **tutti gli anni hanno la stessa base territoriale oppure no**.
+    Stessa base vuol dire gli stessi territori, non lo stesso numero: 19 regioni
+    nel 2012 e 19 nel 2025 con una entrata e una uscita non sono la stessa base, e
+    fermarsi ai conteggi le avrebbe dichiarate confrontabili. Su base costante (il
+    caso comune, le venti regioni ogni anno) la base si dichiara una volta in
+    testa e le celle restano pulite, perche' ripetere lo stesso denominatore
+    trenta volte e' rumore. Quando la base si muove, ogni cella porta il suo
+    conteggio e la serie si apre dicendo che le medie di due anni diversi non sono
+    confrontabili: al produttore serve saperlo prima di scrivere "il fondo del
+    2021", non dopo che il verificatore glielo smentisce.
+    """
+    if len(means) <= 2:
+        return []
+    lines = []
+    if len({tuple(item["territories"]) for item in means}) == 1:
+        lines.append("  serie annuale della media (una sola fonte per un picco o un fondo interno), "
+                     f"base costante: {means[0]['n']} territori ogni anno")
+        cells = [f"{item['year']}: {_num(item['avg'])}" for item in means]
+        per_row = 6
+    else:
+        lines.append("  serie annuale della media, BASE TERRITORIALE VARIABILE: le medie di due anni "
+                     "diversi non sono confrontabili fra loro")
+        lines.append("    (fra parentesi i territori che rispondono. Dove il numero cambia, a muoversi "
+                     "e' il campione, non per forza il fenomeno: non chiamare picco o fondo un anno "
+                     "che ha una base sua)")
+        cells = [f"{item['year']}: {_num(item['avg'])} ({item['n']})" for item in means]
+        per_row = 4
+    # A capo ogni sei anni (quattro se ogni cella porta anche la base): una serie
+    # lunga (28 anni) resta leggibile e non sfonda la riga.
+    for start in range(0, len(cells), per_row):
+        lines.append("    " + "   ".join(cells[start:start + per_row]))
+    return lines
+
+
+def _common_endpoints(matrix, first_year, last_year):
+    """Il confronto primo-ultimo anno sui soli territori presenti in **entrambi**.
+
+    Serve quando le due basi non coincidono, ed e' l'unico modo di dare al
+    produttore una variazione di lungo periodo che sia vera. La media dei 19
+    territori del 2012 meno la media dei 19 del 2025 e' una sottrazione fra
+    popolazioni diverse: precisa e non valida, cioe' la cifra piu' pericolosa che
+    un brief possa stampare, perche' ha l'aria di essere derivata. Sui territori
+    comuni la sottrazione torna a voler dire qualcosa.
+
+    `None` quando l'intersezione e' vuota: li' non c'e' confronto da fare, e
+    dirlo e' meglio che stampare un numero.
+    """
+    first = {key: value for key, value in (matrix.get(str(first_year)) or {}).items()
+             if isinstance(value, (int, float))}
+    last = {key: value for key, value in (matrix.get(str(last_year)) or {}).items()
+            if isinstance(value, (int, float))}
+    common = sorted(set(first) & set(last))
+    if not common:
+        return None
+    first_values = [first[key] for key in common]
+    last_values = [last[key] for key in common]
+    first_avg = sum(first_values) / len(common)
+    last_avg = sum(last_values) / len(common)
+    first_gap = max(first_values) - min(first_values)
+    last_gap = max(last_values) - min(last_values)
+    return {
+        "n": len(common),
+        "territories": common,
+        "first_avg": first_avg,
+        "last_avg": last_avg,
+        "change": last_avg - first_avg,
+        # Il divario ha bisogno di almeno due territori per esistere: su uno solo
+        # il massimo e il minimo sono lo stesso numero, e il brief avrebbe detto
+        # "divario ristretto di 0,00" su un campione che non ha dispersione da
+        # confrontare. Uno zero calcolato e uno zero vero si leggono uguale, e in
+        # un brief che e' la sola fonte dei numeri questo basta a farlo scrivere.
+        # La variazione della media invece su un territorio solo vale, ed e' vera.
+        "gap_trend": (last_gap - first_gap) if len(common) > 1 else None,
+    }
+
+
+def _base_note(means, first_year, last_year):
+    """Il richiamo alla base sul confronto primo-ultimo anno, quando i due anni
+    non poggiano sugli stessi territori.
+
+    Lo stesso difetto della serie, sulla riga che il brief stampava gia' prima di
+    questa modifica: `media 2020 -> 2021` mette in fila due medie che possono
+    poggiare su campioni diversi. Il confronto e' fra gli insiemi, non fra i
+    conteggi: `bes-06POL007` ha 19 regioni a entrambi gli estremi, ma una entra e
+    una esce, e sui soli numeri la riga sarebbe passata per confrontabile.
+    """
+    by_year = {item["year"]: item for item in means}
+    first, last = by_year.get(first_year), by_year.get(last_year)
+    if first is None or last is None:
+        return ""
+    if first["territories"] == last["territories"]:
+        return ""
+    if first["n"] == last["n"]:
+        changed = sorted(set(first["territories"]) ^ set(last["territories"]))
+        return (f"   (base {first['n']} territori a entrambi gli estremi ma non gli stessi, "
+                f"cambia {', '.join(changed[:4])}: non confrontabili)")
+    return f"   (base {first['n']} territori -> {last['n']}, non confrontabili)"
+
+
 def build_brief(family, raw_id, level_key=None):
     view = build_indicator_view(family, raw_id)
     if view is None:
@@ -111,6 +257,8 @@ def build_brief(family, raw_id, level_key=None):
     first_values = {}
     for key, value in (level["matrix"].get(str(first_year)) or {}).items():
         first_values[key] = value
+
+    annual_means = _annual_means(level["matrix"])
 
     rows = []
     for position, row in enumerate(level["observations"], start=1):
@@ -129,6 +277,12 @@ def build_brief(family, raw_id, level_key=None):
         "level": level,
         "stats": stats,
         "rows": rows,
+        "annual_means": annual_means,
+        # Il confronto primo-ultimo anno sui soli territori comuni: serve quando
+        # le due basi non coincidono, dove la variazione sulle medie intere e'
+        # una sottrazione fra popolazioni diverse.
+        "endpoints_common": _common_endpoints(
+            level["matrix"], stats["year_min"], stats["year_max"]),
         # Both keyed on the level actually being briefed. Without it, asking for
         # `--level provincia` printed the state of the *regional* article: on a
         # two-level BES the brief said "lead scritto, quadro scritto" while the
@@ -548,10 +702,36 @@ def render(brief):
 
     add("ANDAMENTO")
     if stats["has_multi_year"]:
-        add(f"  media {stats['year_min']}: {_num(stats['year_min_avg'])}  ->  "
-            f"{stats['year_max']}: {_num(stats['year_avg'])}   "
-            f"({_num(stats['avg_change_abs'])} {meta['change_unit']})")
-        if stats["gap_trend"] is not None:
+        means = brief.get("annual_means") or []
+        note = _base_note(means, stats["year_min"], stats["year_max"])
+        common = brief.get("endpoints_common")
+        if not note:
+            add(f"  media {stats['year_min']}: {_num(stats['year_min_avg'])}  ->  "
+                f"{stats['year_max']}: {_num(stats['year_avg'])}   "
+                f"({_num(stats['avg_change_abs'])} {meta['change_unit']})")
+        else:
+            # Basi diverse ai due estremi: la variazione sulle medie intere e' una
+            # sottrazione fra popolazioni diverse, quindi **non si stampa**.
+            # Annotarla e lasciarla in pagina non basta: e' una cifra precisa e
+            # derivabile, cioe' quella che un articolo cita per prima. Al suo
+            # posto va il confronto sui territori comuni, che vuol dire qualcosa.
+            add(f"  media {stats['year_min']} e {stats['year_max']} su basi diverse,"
+                f" confronto diretto non valido{note}")
+            if common:
+                line = (f"  sui {common['n']} territori presenti in entrambi gli anni: "
+                        f"{stats['year_min']}: {_num(common['first_avg'])}  ->  "
+                        f"{stats['year_max']}: {_num(common['last_avg'])}   "
+                        f"({_num(common['change'])} {meta['change_unit']})")
+                if common["gap_trend"] is not None:
+                    verb = "allargato" if common["gap_trend"] > 0 else "ristretto"
+                    line += f", divario {verb} di {_num(abs(common['gap_trend']))}"
+                add(line)
+            else:
+                add("  nessun territorio presente in entrambi gli anni: "
+                    "il confronto di lungo periodo non si puo' fare")
+        for line in _means_lines(means):
+            add(line)
+        if not note and stats["gap_trend"] is not None:
             verb = "allargato" if stats["gap_trend"] > 0 else "ristretto"
             add(f"  il divario si e {verb} di {_num(abs(stats['gap_trend']))} {meta['change_unit']}")
         if stats["highest_delta"]:
@@ -632,6 +812,11 @@ def main(argv=None):
             "year_max": brief["level"]["year_max"],
             "stats": brief["stats"],
             "rows": brief["rows"],
+            # Con la base territoriale di ogni anno: il consumatore macchina
+            # riceve la stessa cosa del testo, denominatore compreso, e non deve
+            # ricalcolarsi la comparabilita' da se'.
+            "annual_means": brief["annual_means"],
+            "endpoints_common": brief["endpoints_common"],
             "breaks": brief["breaks"],
             "against_the_grain": brief["against_the_grain"],
             "annual_change": brief["level"]["annual_change"],

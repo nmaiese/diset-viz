@@ -14,6 +14,7 @@ on every edit-save cycle.
 """
 
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -63,13 +64,75 @@ class EveryIndicatorPageRenders(unittest.TestCase):
         self.assertEqual(broken, [], f"indicator Markdown pages that do not render: {broken[:10]}")
 
     def test_every_page_carries_the_full_article_skeleton(self):
+        """Ogni ruolo e' coperto: da un H2 `sezione-{role}`, oppure, per la sola
+        `definizione`, dal blocco "Come leggere il dato" (sezioni variabili). I
+        tre ruoli sostanziali restano sempre H2; la definizione puo' abitare il
+        blocco invece di aprire l'articolo con la metodologia."""
         missing = []
         for indicator_id in self.golden:
             html = self._get(indicator_id).get_data(as_text=True)
             for role in ROLE_ORDER:
-                if f'id="sezione-{role}"' not in html:
+                covered = f'id="sezione-{role}"' in html or (
+                    role == "definizione" and 'id="come-leggere"' in html
+                )
+                if not covered:
                     missing.append((indicator_id, role))
         self.assertEqual(missing, [], f"pages missing an article section: {missing[:10]}")
+
+    def test_an_opt_in_article_renders_the_come_leggere_block(self):
+        """Un articolo che dichiara `roles_covered` senza `definizione` la assorbe
+        nel blocco "Come leggere il dato", server-rendered (nessun JS): la storia
+        apre l'articolo, la meccanica sta nel blocco, e la nav punta al blocco
+        invece che a un anchor `sezione-definizione` che non esiste piu'."""
+        import unittest.mock
+        from app import indicator_texts
+        opt_in = {
+            "level": "regione", "lead": "Un lead che apre sulla geografia immobile.",
+            "vintage": 2023, "reviewed_at": "2026-08-01", "reviewed_vintage": 2023,
+            "roles_covered": ["quadro", "dinamica", "limiti"],
+            "sections": [
+                {"role": "quadro", "h": "Un vertice solo", "body": "Corpo quadro con prosa."},
+                {"role": "dinamica", "h": "Cinque anni fermi", "body": "Corpo dinamica con prosa."},
+                {"role": "limiti", "h": "Quanto lavoro", "body": "Corpo limiti con prosa."},
+            ],
+        }
+        with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: opt_in):
+            html = self._get("920").get_data(as_text=True)
+        self.assertIn('id="come-leggere"', html)
+        self.assertIn("Come leggere il dato", html)
+        self.assertNotIn('id="sezione-definizione"', html)
+        for role in ("quadro", "dinamica", "limiti"):
+            self.assertIn(f'id="sezione-{role}"', html)
+        self.assertIn('href="#come-leggere"', html)
+        self.assertNotIn('href="#sezione-definizione"', html)
+        # E sta DOPO la narrazione. Renderlo prima lasciava al lettore la stessa
+        # contabilita' in apertura, solo sotto un altro titolo: il blocco esiste
+        # per toglierla di li', non per rinominarla.
+        self.assertLess(html.index('id="sezione-quadro"'), html.index('id="come-leggere"'))
+        self.assertLess(html.index('id="sezione-limiti"'), html.index('id="come-leggere"'))
+
+    def test_the_historical_series_is_server_rendered_as_a_table(self):
+        """Il grafico di trend e' uno <svg> riempito da JS: senza JavaScript il
+        lettore e il crawler perderebbero la serie. La tabella-serie la porta a
+        tutti, un anno per riga, e per una serie a un solo anno non compare."""
+        multi = self._get("920").get_data(as_text=True)  # eta media, serie lunga
+        self.assertIn('class="trend-table"', multi)
+        rows = re.findall(r'<tr><th scope="row">(\d{4})</th><td>[^<]+</td>', multi)
+        self.assertGreater(len(rows), 5)
+        self.assertEqual(rows, sorted(rows))  # in ordine di anno
+
+    def test_the_markdown_representation_carries_the_series_too(self):
+        """Un agente che chiede `text/markdown` e' il lettore senza JavaScript per
+        definizione, quindi la rappresentazione alternativa non puo' essere
+        l'unica vista della pagina priva della serie storica."""
+        body = self.client.get(
+            "/indicatore/eta-media-della-popolazione/ter-920",
+            headers={"Accept": "text/markdown"}, follow_redirects=True,
+        ).get_data(as_text=True)
+        self.assertIn("## Serie storica, media delle regioni per anno", body)
+        years = re.findall(r"^\| (\d{4}) \| [-\d.,]+ \|$", body, flags=re.MULTILINE)
+        self.assertGreater(len(years), 5)
+        self.assertEqual(years, sorted(years))
 
     def test_question_navigation_points_to_visible_answers(self):
         response = self._get("920")
