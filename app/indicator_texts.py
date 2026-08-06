@@ -98,6 +98,34 @@ def get_text(indicator_id):
     return None
 
 
+def emitted_roles(entry):
+    """I ruoli che la pagina rende per questa entry: `roles_covered` normalizzato.
+
+    Una dichiarazione e' un **filtro sui quattro ruoli**, non un vocabolario
+    nuovo. Due normalizzazioni, e nessuna delle due e' cosmetica:
+
+    - un ruolo sconosciuto si ignora. Un refuso (`dinamicha`) lasciato passare
+      finiva in cio' che la pratica pretende, e l'articolo restava incompleto per
+      sempre mentre la lista di consegna diceva che non manca niente: il dossier
+      lo rilanciava a ogni tick senza che nessuna run potesse chiudere il buco.
+    - i tre sostanziali ci sono comunque. Solo la `definizione` e' assorbibile,
+      perche' e' l'unica che il blocco "Come leggere il dato" copre, e senza
+      l'unione una dichiarazione parziale toglieva `dinamica` e `limiti` dalla
+      pagina pubblica invece di comporli dallo scheletro.
+
+    E' l'unica fonte della regola: renderer, code e impronta della prosa devono
+    rispondere la stessa cosa, o lo stesso articolo risulta completo per una e
+    incompleto per l'altra. `scripts/practice_timeline.py`,
+    `scripts/pending_notes.py` e `scripts/verification_queue.py` la rispecchiano
+    (sono stdlib puri e non importano `app`), e un test le tiene allineate.
+    """
+    declared = entry.get("roles_covered") if isinstance(entry, dict) else None
+    if not declared:
+        return list(ROLE_ORDER)
+    keep = {role for role in declared if role in DEFAULT_HEADINGS} | SUBSTANTIVE_ROLES
+    return [role for role in ROLE_ORDER if role in keep]
+
+
 def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     """The article sections in order, each flagged authored or composed.
 
@@ -130,20 +158,7 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
         for section in entry.get("sections") or []
         if section.get("role") in DEFAULT_HEADINGS and (section.get("body") or "").strip()
     }
-    declared = entry.get("roles_covered")
-    if declared:
-        # I tre sostanziali restano sempre, qualunque cosa dichiari l'entry: solo
-        # la `definizione` e' omettibile, perche' e' l'unica che il blocco "Come
-        # leggere il dato" copre. Senza questa unione una dichiarazione parziale
-        # (`roles_covered: ["quadro"]`) toglieva dalla pagina `dinamica` e
-        # `limiti` invece di comporli dallo scheletro, e la pagina pubblica
-        # perdeva due sezioni per un errore di battitura in un JSON. La stessa
-        # invariante che `practice_timeline` e `pending_notes` usano per dire se
-        # una pratica e' completa, qui applicata a cio' che si rende.
-        keep = set(declared) | SUBSTANTIVE_ROLES
-        role_sequence = [role for role in ROLE_ORDER if role in keep]
-    else:
-        role_sequence = list(ROLE_ORDER)
+    role_sequence = emitted_roles(entry)
     sections = []
     for role in role_sequence:
         written = authored.get(role)

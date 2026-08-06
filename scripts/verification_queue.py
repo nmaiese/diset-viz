@@ -138,6 +138,7 @@ def prose_fingerprint(entry: dict) -> str:
 # non dichiara niente. Copiati e non importati da `app.indicator_texts`: questo
 # modulo e' stdlib puro, come ogni script della catena.
 DEFAULT_ARTICLE_ROLES = frozenset(("definizione", "quadro", "dinamica", "limiti"))
+SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
 
 
 def _emitted_roles(entry):
@@ -156,11 +157,20 @@ def _emitted_roles(entry):
     articoli esistenti) e anche per un `roles_covered` che dichiara tutti e
     quattro i ruoli: in quel caso la pagina rende esattamente com'era, e
     un'impronta diversa avrebbe invalidato una verifica ancora buona.
+
+    Legge la dichiarazione **come la legge chi rende** (`app.indicator_texts.
+    emitted_roles`, di cui questa e' la copia stdlib): i tre sostanziali entrano
+    comunque e un ruolo sconosciuto si ignora. Guardare la dichiarazione grezza
+    sbagliava in tutte e due le direzioni: `["definizione"]` rende le stesse
+    quattro sezioni di sempre e avrebbe fatto scadere una verifica ancora buona,
+    e passare da `["quadro"]` a `["quadro", "dinamica", "limiti"]` non cambia una
+    riga di HTML ma cambiava l'impronta.
     """
     declared = entry.get("roles_covered")
     if not declared:
         return None
-    emitted = {role for role in declared if role in DEFAULT_ARTICLE_ROLES}
+    emitted = ({role for role in declared if role in DEFAULT_ARTICLE_ROLES}
+               | SUBSTANTIVE_ROLES)
     if emitted == set(DEFAULT_ARTICLE_ROLES):
         return None
     return sorted(emitted)

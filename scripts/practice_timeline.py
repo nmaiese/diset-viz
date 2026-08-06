@@ -100,6 +100,25 @@ def _as_int(value):
         return None
 
 
+ARTICLE_ROLES = ("definizione", "quadro", "dinamica", "limiti")
+SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
+
+
+def _emitted_roles(entry) -> list:
+    """I ruoli che la pagina rende per questa entry.
+
+    Copia stdlib di `app.indicator_texts.emitted_roles`, che possiede la regola:
+    una dichiarazione `roles_covered` e' un filtro sui quattro ruoli (un ruolo
+    sconosciuto si ignora) e i tre sostanziali ci sono comunque. Copiata e non
+    importata come le altre costanti di questo file, e un test le tiene allineate.
+    """
+    declared = entry.get("roles_covered") if isinstance(entry, dict) else None
+    if not declared:
+        return list(ARTICLE_ROLES)
+    keep = {role for role in declared if role in ARTICLE_ROLES} | SUBSTANTIVE_ROLES
+    return [role for role in ARTICLE_ROLES if role in keep]
+
+
 def reconstruct(candidates, manifest, curation, external, articles, verifiche,
                 runs, today: str = "") -> dict:
     """Ricostruisce, per ogni indicatore, timeline e stato, dai soli artefatti.
@@ -219,10 +238,13 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
         # e' omettibile, perche' e' l'unico ruolo che il blocco copre. Senza
         # `roles_covered` (i trecento esistenti) la regola resta i quattro ruoli,
         # identica a prima. Additivo: nessun articolo esistente cambia stato.
-        declared = entry.get("roles_covered")
-        required = set(declared) | {"quadro", "dinamica", "limiti"} if declared \
-            else {"definizione", "quadro", "dinamica", "limiti"}
-        complete = bool((entry.get("lead") or "").strip()) and required.issubset(roles)
+        # Un ruolo sconosciuto (un refuso) si ignora invece di entrare fra i
+        # richiesti: tenerlo rendeva la pratica incompleta per sempre mentre la
+        # lista di consegna diceva che non manca niente, e il dossier la
+        # rilanciava a ogni tick senza che nessuna run potesse chiudere il buco.
+        # Stessa normalizzazione di `app.indicator_texts.emitted_roles`.
+        complete = bool((entry.get("lead") or "").strip()) \
+            and set(_emitted_roles(entry)).issubset(roles)
         if "writer" not in d["completed_stages"]:
             d["completed_stages"].append("writer")
         event(key, "", "writer", "scritta",

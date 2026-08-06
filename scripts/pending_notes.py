@@ -108,9 +108,23 @@ def unwritten_roles(entry):
         for section in entry.get("sections") or []
         if isinstance(section, dict) and (section.get("body") or "").strip()
     }
-    declared = entry.get("roles_covered")
-    required = (set(declared) | SUBSTANTIVE_ROLES) if declared else set(ARTICLE_ROLES)
+    required = set(emitted_roles(entry))
     return [role for role in ARTICLE_ROLES if role in required and role not in written]
+
+
+def emitted_roles(entry):
+    """I ruoli che la pagina rende per questa entry.
+
+    Copia stdlib di `app.indicator_texts.emitted_roles`, che possiede la regola:
+    `roles_covered` e' un filtro sui quattro ruoli (un ruolo sconosciuto si
+    ignora, altrimenti resterebbe richiesto per sempre da qualcuno e da nessun
+    altro) e i tre sostanziali ci sono comunque.
+    """
+    declared = entry.get("roles_covered") if isinstance(entry, dict) else None
+    if not declared:
+        return list(ARTICLE_ROLES)
+    keep = {role for role in declared if role in ARTICLE_ROLES} | SUBSTANTIVE_ROLES
+    return [role for role in ARTICLE_ROLES if role in keep]
 
 
 def pending(manifest_rows, notes, year_max_of):
