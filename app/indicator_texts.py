@@ -48,6 +48,12 @@ ROLES = (
 ROLE_ORDER = [role for role, _ in ROLES]
 DEFAULT_HEADINGS = dict(ROLES)
 
+# I tre ruoli che nessuna dichiarazione `roles_covered` puo' togliere dalla
+# pagina: il blocco "Come leggere il dato" copre la sola `definizione`, quindi e'
+# la sola omettibile. Rispecchiato in `scripts/pending_notes.SUBSTANTIVE_ROLES` e
+# in `scripts/practice_timeline`, che decidono se una pratica e' completa.
+SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
+
 # The level an entry describes when it does not say. Every article written so
 # far is regional, and every family except BES has regions as its only level.
 DEFAULT_LEVEL = "regione"
@@ -126,8 +132,16 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     }
     declared = entry.get("roles_covered")
     if declared:
-        role_sequence = [role for role in ROLE_ORDER
-                         if role in declared and role in DEFAULT_HEADINGS]
+        # I tre sostanziali restano sempre, qualunque cosa dichiari l'entry: solo
+        # la `definizione` e' omettibile, perche' e' l'unica che il blocco "Come
+        # leggere il dato" copre. Senza questa unione una dichiarazione parziale
+        # (`roles_covered: ["quadro"]`) toglieva dalla pagina `dinamica` e
+        # `limiti` invece di comporli dallo scheletro, e la pagina pubblica
+        # perdeva due sezioni per un errore di battitura in un JSON. La stessa
+        # invariante che `practice_timeline` e `pending_notes` usano per dire se
+        # una pratica e' completa, qui applicata a cio' che si rende.
+        keep = set(declared) | SUBSTANTIVE_ROLES
+        role_sequence = [role for role in ROLE_ORDER if role in keep]
     else:
         role_sequence = list(ROLE_ORDER)
     sections = []

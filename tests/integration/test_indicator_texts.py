@@ -199,6 +199,16 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         self.assertEqual([s["role"] for s in art["sections"]], ["quadro", "dinamica", "limiti"])
         self.assertTrue(art["come_leggere"])
 
+    def test_a_partial_declaration_still_renders_the_three_substantive_roles(self):
+        """Solo la definizione e' assorbibile. Senza questa invariante nel
+        renderer, un `roles_covered` scritto male (o parziale) toglieva dalla
+        pagina pubblica `dinamica` e `limiti` invece di comporli dallo
+        scheletro: due sezioni perse per un errore di battitura in un JSON."""
+        art = self._build(dict(self.LEGACY, roles_covered=["quadro"]))
+        self.assertEqual([s["role"] for s in art["sections"]],
+                         ["quadro", "dinamica", "limiti"])
+        self.assertTrue(art["come_leggere"])
+
     def test_a_legacy_entry_keeps_four_sections_and_no_block(self):
         art = self._build(self.LEGACY)
         self.assertEqual([s["role"] for s in art["sections"]],

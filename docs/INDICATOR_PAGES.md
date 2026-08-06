@@ -88,6 +88,40 @@ Il testo composto **non** viene congelato nel file, di proposito: così non può
 invecchiare in silenzio dietro un aggiornamento dei dati, e la guardia sul
 `vintage` si applica solo alle frasi davvero scritte da qualcuno.
 
+### `roles_covered`: la definizione può non aprire l'articolo
+
+I quattro ruoli qui sopra sono il default, non l'unica forma possibile. Con la
+`definizione` sempre in prima posizione ogni articolo apriva sulla contabilità
+prima che sulla notizia, ed è il difetto che il criterio 8 della rubrica
+(leggibilità) punisce.
+
+Un'entrata può quindi dichiarare `roles_covered`: la lista dei ruoli che scrive
+come `h2`. Se la `definizione` non è fra quelli, non apre più l'articolo, e la
+sua meccanica va nel blocco **«Come leggere il dato»** (`id="come-leggere"`),
+composto server-side dai metadati `explain` e reso **dopo** la narrazione, mai
+prima: il blocco esiste per togliere la contabilità dall'apertura, non per
+rinominarla.
+
+Le regole, tutte meccaniche:
+
+- **Solo la `definizione` è omettibile.** `quadro`, `dinamica` e `limiti`
+  restano sempre, anche se una dichiarazione parziale non li nomina: il blocco
+  copre quel ruolo lì e nessun altro.
+- **Il campo è opt-in e additivo.** Senza `roles_covered` la pagina rende i
+  quattro ruoli come ha sempre fatto, e i trecento articoli esistenti non
+  cambiano di un byte.
+- **Un ruolo assorbito non è un ruolo mancante.** `scripts/text_queue.py` e
+  `scripts/pending_notes.py` contano contro i ruoli emessi, altrimenti il
+  produttore troverebbe per sempre la `definizione` «da scrivere» e la
+  riscriverebbe a ogni run.
+- **Assorbire la definizione cambia l'impronta della prosa.** Cambia cosa la
+  pagina mostra senza toccare una parola, quindi `prose_fingerprint` mescola
+  l'insieme dei ruoli emessi quando non è quello di sempre: verifica e lettura
+  scadono e l'articolo torna in coda. Dichiarare tutti e quattro i ruoli invece
+  non muove l'impronta, perché la pagina rende identica.
+- **La navigazione segue.** La domanda di definizione punta a `#come-leggere`
+  invece che a `#sezione-definizione`, che in quella forma non esiste.
+
 **Un articolo vale per un livello territoriale solo.** Cita le cifre di quel
 livello, quindi non può viaggiare sull'altro: i 31 BES a due livelli avevano un
 lead che nominava l'Umbria e dava la media delle regioni sopra un cruscotto di
