@@ -147,6 +147,13 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
         # gli H2 emessi. Per un'entry senza `roles_covered` la definizione e'
         # sempre presente, quindi `come_leggere` e' False e niente cambia.
         "come_leggere": "definizione" not in role_sequence,
+        # Titolo H1 e titolo SERP autorati, opzionali. Quando assenti la pagina usa
+        # il derivato di oggi (H1 = nome amministrativo, title = boilerplate "per
+        # regione"). Un titolo in lingua comune ("Dove si lavora di piu' nella
+        # ricerca") e' un giudizio editoriale, non derivabile, quindi vive nel file
+        # dell'articolo. Campi di entry, non entrano nel `prose_fingerprint`.
+        "h1": (entry.get("h1") or "").strip() or None,
+        "seo_title": (entry.get("seo_title") or "").strip() or None,
         "fonti": entry.get("fonti") or [],
         "vintage": entry.get("vintage") if isinstance(entry.get("vintage"), int) else None,
         "authored_count": len(authored),
