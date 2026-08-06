@@ -45,7 +45,7 @@ import re
 
 from app import indicator_texts, sources
 from app.indicator_view import build_indicator_view
-from scripts import definition_check, indicator_store, prose_lint, verification_queue
+from scripts import definition_check, indicator_store, prose_lint, reading_queue, verification_queue
 from scripts.fetch_definitions import load_definitions
 
 # A claim that holds "everywhere" or "always" is false the moment one territory
@@ -99,6 +99,8 @@ DEFINITION_SIGNALS = ("contraddizione", "base", "soglia")
 
 FLAG_LABELS = {
     "smentita": "il verificatore ha fatto cadere un'affermazione, ed e' ancora in pagina",
+    "leggibilita_grave": "il reader-editor lo giudica illeggibile per un lettore comune (fallimento duro)",
+    "leggibilita": "il reader-editor lo giudica poco leggibile per un lettore comune",
     "definizione": "descrive una quantita' diversa da quella della fonte",
     "universale": "afferma un andamento generale",
     "causale": "attribuisce una causa",
@@ -119,6 +121,16 @@ FLAG_WEIGHT = {
     # a chi legge questa coda, quindi se questo segnale non fosse in cima il
     # cerchio non si chiuderebbe e la smentita resterebbe in un registro.
     "smentita": 60,
+    # I due flag di leggibilita', dal reader-editor. Sono un asse diverso da tutti
+    # gli altri qui (che marcano una possibile falsita' a livello di frase): questi
+    # marcano un articolo tutto vero ma che un lettore comune non capisce. Gradati
+    # per gravita', come lo schema fa per gli altri: `leggibilita_grave` (un
+    # fallimento duro, il lettore non capisce la pagina) sotto `smentita` e
+    # `definizione` (misinformare batte confondere) ma sopra i sospetti-di-rischio;
+    # `leggibilita` (revise sui soli criteri molli, prosa rigida ma vera) sopra i
+    # cosmetici (`mestiere`/`eco`) e sotto i sospetti fattuali. I numeri sono
+    # tarati sul gold set di `evals/reader-editor/`, non scelti nel vuoto.
+    "leggibilita_grave": 46,
     # `definizione` viene subito dopo, sopra `rilettura`, and it is the only
     # flag whose rank was decided by counting. Reading a batch of eleven
     # articles against the data found no arithmetic error and four wrong
@@ -132,7 +144,9 @@ FLAG_WEIGHT = {
     # that *might* be wrong; this one marks an article whose figures have been
     # rewritten since anybody read it, so nothing in it has been checked at all.
     "rilettura": 45,
-    "causale": 40, "esterno": 30, "universale": 25, "provincia": 20,
+    "causale": 40, "esterno": 30, "universale": 25,
+    "leggibilita": 22,
+    "provincia": 20,
     # Below `provincia` on purpose. A bot tell makes an article read badly, the
     # flags above mark one that may be false, and a false sentence outranks an
     # ugly one every time.
@@ -221,7 +235,31 @@ def open_refutations(texts=None, verifications=None):
     return out
 
 
-def assess(key, entry, view=None, definitions=None, refutations=None):
+def open_readings(texts=None):
+    """{(codice, livello): (grave, [dettaglio])} per le bocciature di leggibilita'
+    ancora aperte.
+
+    Aperta vuol dire lettura `revise` sull'impronta corrente e non parcheggiata:
+    il reader-editor scrive il verdetto, il produttore lo chiude riscrivendo, e le
+    due code si passano il lavoro senza cancellare righe l'una dell'altra, come per
+    le smentite. `grave` distingue un fallimento duro (peso alto) da un revise sui
+    soli criteri molli.
+    """
+    try:
+        revisions = reading_queue.open_revisions(
+            texts if texts is not None else reading_queue.load_texts()
+        )
+    except (OSError, ValueError):
+        return {}
+    out = {}
+    for (code, level), row in revisions.items():
+        grave = bool(row.get("hard_failures"))
+        detail = ", ".join(row.get("hard_failures") or []) or "poco leggibile"
+        out[(code, level)] = (grave, [detail])
+    return out
+
+
+def assess(key, entry, view=None, definitions=None, refutations=None, readings=None):
     """Risk flags and a reading-order score for one article."""
     if view is None:
         family, raw_id = sources.split_internal_id(key)
@@ -268,6 +306,17 @@ def assess(key, entry, view=None, definitions=None, refutations=None):
     if refuted:
         hits["smentita"] = refuted
 
+    # Le bocciature di leggibilita' aperte, dal registro del reader-editor. Come
+    # per le smentite, `None` da un chiamante significa "non guardato": non lo si
+    # confonde con "nessuna bocciatura". Un fallimento duro pesa piu' di un revise
+    # molle, e i due flag sono assi separati dai sospetti di falsita' qui sopra.
+    if readings is None:
+        readings = open_readings()
+    unreadable = readings.get((code_now, level_key))
+    if unreadable:
+        grave, detail = unreadable
+        hits["leggibilita_grave" if grave else "leggibilita"] = detail
+
     # The definitions CSV covers the territorial family only, and may not have
     # been fetched at all on a fresh checkout. Both cases mean "no opinion", not
     # "clean": `definition_check` says `scoperto` and the flag stays off.
@@ -313,8 +362,14 @@ def assess(key, entry, view=None, definitions=None, refutations=None):
     # coda, e il cerchio fra i due stadi non si chiudeva. Trovato provando il
     # segnale invece di fidarsi del fatto che comparisse.
     refuted = "smentita" in hits
+    # Una bocciatura di leggibilita' invalida la firma come una smentita: la firma
+    # dice "l'ho letto e regge", e un critico indipendente a valle ha mostrato che
+    # su un asse non regge. Senza questa riga il flag varrebbe 46 o 22 e poi lo
+    # azzereremmo perche' l'articolo e' firmato, e il cerchio col produttore non si
+    # chiuderebbe: stesso difetto che aveva `smentita` prima di essere aggiunta qui.
+    unreadable_now = "leggibilita" in hits or "leggibilita_grave" in hits
     stale_signature = bool(reviewed) and reviewed_vintage != vintage
-    if reviewed and not stale_signature and not refuted:
+    if reviewed and not stale_signature and not refuted and not unreadable_now:
         # Signed off and still current: it stays in --all for the record, out of
         # the reading order.
         score = 0
@@ -328,7 +383,7 @@ def assess(key, entry, view=None, definitions=None, refutations=None):
         "name": meta["name"],
         "indexable": meta["indexable"],
         "written": sum(1 for field, _ in fields if field.startswith("sections.")),
-        "reviewed_at": "" if (stale_signature or refuted) else reviewed,
+        "reviewed_at": "" if (stale_signature or refuted or unreadable_now) else reviewed,
         "signed_vintage": reviewed_vintage,
         "vintage": vintage,
         "flags": hits,
@@ -342,9 +397,11 @@ def build_queue(texts=None):
     # of the same CSV is the kind of thing that makes a tool too slow to run.
     definitions = load_definitions()
     refutations = open_refutations(texts)
+    readings = open_readings(texts)
     rows = []
     for key, entry in texts.items():
-        assessed = assess(key, entry, definitions=definitions, refutations=refutations)
+        assessed = assess(key, entry, definitions=definitions, refutations=refutations,
+                          readings=readings)
         if assessed is not None:
             rows.append(assessed)
     rows.sort(key=lambda row: (-row["score"], row["name"]))

@@ -521,7 +521,16 @@ class InvariantDispatch(unittest.TestCase):
         self.assertEqual(G.invariant_labels("curator", self._paths(G.CURATION)), ["curation"])
         self.assertEqual(G.invariant_labels("verificatore", self._paths(G.VERIFICATIONS)),
                          ["verifications"])
+        self.assertEqual(G.invariant_labels("reader-editor", self._paths(G.READINGS)),
+                         ["readings"])
         self.assertEqual(G.invariant_labels("scout", self._paths(G.SOURCE_CANDIDATES)), [])
+
+    def test_the_reader_editor_does_not_sign(self):
+        """Legge, non firma: come il verificatore, il suo verdetto e' un file, non
+        una responsabilita' sul testo altrui."""
+        G = pipeline_gate
+        self.assertNotIn("signature", G.invariant_labels("reader-editor", self._paths(G.READINGS)))
+        self.assertNotIn("reader-editor", G.ROLES_THAT_SIGN)
 
     def test_the_writer_must_not_sign_but_the_reviewer_and_producer_must(self):
         G = pipeline_gate
@@ -657,6 +666,164 @@ class TheVerificationRegisterIsAppendOnly(unittest.TestCase):
         check = self._check()
         self.assertFalse(check.ok)
         self.assertIn("impronta", check.detail)
+
+    def test_a_truncated_shard_is_refused_instead_of_skipped(self):
+        """Lo stesso buco che la revisione ha trovato sulle letture, sul registro
+        gemello: il caricatore delle letture e' nato copiando questo, e ne aveva
+        copiato il silenzio sui file illeggibili. Correggerne uno solo avrebbe
+        lasciato al verificatore, che gira da settimane, il difetto che il
+        reader-editor non ha piu'."""
+        (self.repo / "data" / "pipeline" / "verifiche" / "ter-72-regione.json").write_text(
+            '{"code": "ter-72", "contro', encoding="utf-8")
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("illeggibili", check.detail)
+
+    def test_a_run_that_adds_no_verification_stays_green(self):
+        check = self._check()
+        self.assertTrue(check.ok, check.detail)
+        self.assertIn("nessuna verifica nuova", check.detail)
+
+
+class TheReadingRegisterIsAppendOnly(unittest.TestCase):
+    """Il registro delle letture, protetto come quello delle verifiche.
+
+    Stesso repo git finto, stesse prove: append-only prima di tutto, righe
+    credibili, impronta che combacia con un testo reale. Il reader-editor e' un
+    critico indipendente esattamente come il verificatore, quindi il suo registro
+    non puo' essere piu' debole.
+    """
+
+    def setUp(self):
+        from scripts import reading_queue
+        self.reading_queue = reading_queue
+        self._tmp = TemporaryDirectory()
+        self.repo = Path(self._tmp.name)
+        self.addCleanup(self._tmp.cleanup)
+        self._run("git", "init", "-q", "-b", "main")
+        self._run("git", "config", "user.email", "t@example.com")
+        self._run("git", "config", "user.name", "t")
+        (self.repo / "data" / "pipeline" / "letture").mkdir(parents=True)
+        (self.repo / "content" / "indicators").mkdir(parents=True)
+        self.entry = {
+            "lead": "Un lead.", "level": "regione", "vintage": 2024,
+            "reviewed_at": "2026-07-27", "reviewed_vintage": 2024, "fonti": [],
+            "sections": [{"role": "quadro", "h": None, "body": "Il quadro."}],
+        }
+        self._write_texts({"611": self.entry})
+        self.fingerprint = verification_queue.prose_fingerprint(self.entry)
+        self._write_register([self._row()])
+        self._run("git", "add", "-A")
+        self._run("git", "commit", "-qm", "base")
+
+    def _run(self, *args):
+        return subprocess.run(args, cwd=self.repo, capture_output=True, text=True)
+
+    def _write_texts(self, texts):
+        root = self.repo / "content" / "indicators"
+        for stale in root.glob("*.json"):
+            stale.unlink()
+        for key, entry in texts.items():
+            indicator_store.write(key, entry, root=root)
+
+    def _write_register(self, rows):
+        root = self.repo / "data" / "pipeline" / "letture"
+        for stale in root.glob("*.json"):
+            stale.unlink()
+        for row in rows:
+            self.reading_queue.write_reading(row, root=root)
+
+    def _row(self, code="ter-611", level="regione", prosa=None, verdict="revise",
+             comprehension=1):
+        row = {
+            "code": code, "level": level, "at": "2026-08-01",
+            "reviewed_at": "2026-07-27", "prosa": prosa or self.fingerprint,
+            "verdict": verdict, "hard_failures": [],
+            # Una bocciatura senza nota non passa il cancello: e' il punto
+            # d'inciampo, cioe' l'unica cosa che il produttore riceve per sapere
+            # dove riscrivere.
+            "note": "il quadro apre sulla meccanica" if verdict == "revise" else "",
+        }
+        for name in self.reading_queue.CRITERIA:
+            row[name] = comprehension if name == "comprehension" else 2
+        return row
+
+    def _check(self):
+        original = indicator_store.ROOT
+        gate_root = pipeline_gate.PROJECT_ROOT
+        indicator_store.ROOT = self.repo / "content" / "indicators"
+        pipeline_gate.PROJECT_ROOT = self.repo
+        try:
+            return pipeline_gate.check_readings(base="HEAD", cwd=self.repo)
+        finally:
+            indicator_store.ROOT = original
+            pipeline_gate.PROJECT_ROOT = gate_root
+
+    def test_an_unchanged_register_passes(self):
+        self.assertTrue(self._check().ok, self._check().detail)
+
+    def test_appending_an_honest_row_passes(self):
+        self._write_texts({"611": self.entry, "72": self.entry})
+        self._write_register([self._row(), self._row(code="ter-72")])
+        check = self._check()
+        self.assertTrue(check.ok, check.detail)
+
+    def test_deleting_a_row_is_refused(self):
+        self._write_register([])
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("append-only", check.detail)
+
+    def test_rewriting_a_row_in_place_is_refused(self):
+        self._write_register([self._row(comprehension=0)])
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("append-only", check.detail)
+
+    def test_an_incredible_row_is_refused(self):
+        """Un verdetto ignoto non passa il cancello, come un contatore malformato
+        non passa per le verifiche."""
+        bad = self._row()
+        bad["verdict"] = "forse"
+        self._write_texts({"611": self.entry, "72": self.entry})
+        self._write_register([self._row(), dict(bad, code="ter-72")])
+        check = self._check()
+        self.assertFalse(check.ok)
+
+    def test_a_fingerprint_matching_nothing_is_refused(self):
+        self._write_texts({"611": self.entry, "72": self.entry})
+        self._write_register([self._row(), self._row(code="ter-72", prosa="deadbeefdeadbeef")])
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("impronta", check.detail)
+
+    def test_a_truncated_shard_is_refused_instead_of_skipped(self):
+        """Il caso peggiore, perche' e' quello che passava verde.
+
+        Una run che aggiunge una sola scheggia troncata non lascia nessuna riga
+        da controllare: saltandola in silenzio il cancello diceva "nessuna
+        lettura nuova" e il file veniva fuso lo stesso, illeggibile per la coda,
+        che continua a considerare quell'articolo da leggere e a rilanciarlo.
+        """
+        (self.repo / "data" / "pipeline" / "letture" / "ter-72-regione.json").write_text(
+            '{"code": "ter-72", "verd', encoding="utf-8")
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("illeggibili", check.detail)
+
+    def test_a_shard_that_is_not_an_object_is_refused(self):
+        (self.repo / "data" / "pipeline" / "letture" / "ter-72-regione.json").write_text(
+            '["ter-72"]', encoding="utf-8")
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("illeggibili", check.detail)
+
+    def test_a_run_that_adds_no_reading_stays_green(self):
+        """La controprova: il rifiuto e' delle schegge illeggibili aggiunte, non
+        di una run che non tocca il registro (il produttore, l'ammissione)."""
+        check = self._check()
+        self.assertTrue(check.ok, check.detail)
+        self.assertIn("nessuna lettura nuova", check.detail)
 
 
 if __name__ == "__main__":
