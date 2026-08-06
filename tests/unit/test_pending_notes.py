@@ -79,6 +79,26 @@ class PendingNotesWorklist(unittest.TestCase):
         self.assertEqual(entry["unwritten"], [])
         self.assertFalse(entry["lead"])
 
+    def test_an_absorbed_definizione_is_not_missing_work(self):
+        """Sezioni variabili: un'entry che dichiara `roles_covered` senza la
+        definizione non la rende come H2, sta nel blocco "Come leggere il dato".
+        Contarla fra le mancanti teneva l'articolo completo nella lista di
+        consegna per sempre, e ogni run del produttore sarebbe stata invitata a
+        riscrivere proprio la sezione che il blocco assorbe."""
+        entry = _article("quadro", "dinamica", "limiti", vintage=2025)
+        entry["roles_covered"] = ["quadro", "dinamica", "limiti"]
+        missing, _ = pending_notes.pending(self._manifest(), {"12": entry}, self._year_max)
+        self.assertNotIn("12", [m["id"] for m in missing])
+
+    def test_the_three_substantive_roles_stay_required(self):
+        """Solo la definizione e' omettibile: e' l'unico ruolo che il blocco
+        copre. Una dichiarazione non puo' cancellare quadro, dinamica o limiti."""
+        entry = _article("quadro", vintage=2025)
+        entry["roles_covered"] = ["quadro"]
+        missing, _ = pending_notes.pending(self._manifest(), {"12": entry}, self._year_max)
+        found = next(m for m in missing if m["id"] == "12")
+        self.assertEqual(found["unwritten"], ["dinamica", "limiti"])
+
     def test_roles_mirror_the_app_schema(self):
         """Stdlib copy of app.indicator_texts.ROLES: pin it or it drifts."""
         from app.indicator_texts import ROLE_ORDER

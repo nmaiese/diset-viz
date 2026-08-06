@@ -280,12 +280,17 @@
   </section>
 
   {# ---- Zona 2: l'articolo. Sezioni variabili, una voce sola. ---- #}
-  {# "Come leggere il dato": appare quando la definizione e' assorbita qui invece
-     di aprire l'articolo con la metodologia (sezioni variabili). `page_article.lead`
-     e' l'attacco autorato, None se composto: e' cosi' che il blocco sa se `plain`
-     e' gia' nel lead (eco) o va mostrato. #}
-  {% if page_article.come_leggere %}{{ article.come_leggere(meta, level, page_article.lead is not none) }}{% endif %}
   {{ article.body(page_article, meta, level) }}
+
+  {# "Come leggere il dato": appare quando la definizione e' assorbita qui invece
+     di aprire l'articolo con la metodologia (sezioni variabili). Sta **dopo** la
+     narrazione, e non e' un dettaglio di impaginazione: renderlo prima lasciava
+     al lettore la stessa contabilita' in apertura, solo sotto un altro titolo, e
+     lo scopo del blocco e' proprio togliergliela di li'. La meccanica si legge
+     quando serve, cioe' dopo aver capito che cosa dice il dato.
+     `page_article.lead` e' l'attacco autorato, None se composto: e' cosi' che il
+     blocco sa se `plain` e' gia' nel lead (eco) o va mostrato. #}
+  {% if page_article.come_leggere %}{{ article.come_leggere(meta, level, page_article.lead is not none) }}{% endif %}
 
   {# ---- Zona 3: l'apparato. Fonti, verifica, condivisione, percorso. ---- #}
   <section class="indicator-apparatus" id="fonti-verifica">

@@ -128,7 +128,42 @@ def prose_fingerprint(entry: dict) -> str:
         + ":" + WHITESPACE.sub(" ", text).strip()
         for role, heading, text in sorted(parts)
     )
+    emitted = _emitted_roles(entry)
+    if emitted is not None:
+        blob += "\nruoli-emessi:" + ",".join(emitted)
     return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:16]
+
+
+# I quattro ruoli dell'articolo, nell'insieme che la pagina rende quando l'entry
+# non dichiara niente. Copiati e non importati da `app.indicator_texts`: questo
+# modulo e' stdlib puro, come ogni script della catena.
+DEFAULT_ARTICLE_ROLES = frozenset(("definizione", "quadro", "dinamica", "limiti"))
+
+
+def _emitted_roles(entry):
+    """I ruoli che l'articolo rende come H2, ma solo quando non sono i quattro.
+
+    Serve a una cosa sola: un'entry gia' verificata puo' aggiungere
+    `roles_covered` e togliersi la definizione dalla pagina **senza toccare una
+    parola** di prosa. Con l'impronta calcolata sui soli testi quel cambio era
+    invisibile, la verifica vecchia continuava a combaciare, e una smentita
+    appesa alla definizione ora nascosta restava aperta su una sezione che
+    nessuno vede piu'. Cambiare che cosa la pagina mostra e' un cambio della
+    pagina, e va riverificato come tale.
+
+    Ritorna `None` quando l'insieme reso e' quello di sempre, cosi' l'impronta
+    resta **identica byte per byte** per le entry senza il campo (i trecento
+    articoli esistenti) e anche per un `roles_covered` che dichiara tutti e
+    quattro i ruoli: in quel caso la pagina rende esattamente com'era, e
+    un'impronta diversa avrebbe invalidato una verifica ancora buona.
+    """
+    declared = entry.get("roles_covered")
+    if not declared:
+        return None
+    emitted = {role for role in declared if role in DEFAULT_ARTICLE_ROLES}
+    if emitted == set(DEFAULT_ARTICLE_ROLES):
+        return None
+    return sorted(emitted)
 
 
 def load_texts(root=None) -> dict:

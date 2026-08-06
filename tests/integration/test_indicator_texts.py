@@ -206,12 +206,25 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         self.assertFalse(art["come_leggere"])
 
     def test_roles_covered_does_not_enter_the_prose_fingerprint(self):
-        """La chiave di sicurezza: aggiungere `roles_covered` a un'entry non tocca
-        l'impronta, perche' il fingerprint legge solo lead + sections."""
+        """La chiave di sicurezza: dichiarare i quattro ruoli non tocca
+        l'impronta, perche' la pagina rende esattamente come prima. I trecento
+        articoli esistenti, che il campo non ce l'hanno, tanto meno."""
         from scripts import verification_queue as vq
         without = dict(self.LEGACY)
         with_field = dict(self.LEGACY, roles_covered=["definizione", "quadro", "dinamica", "limiti"])
         self.assertEqual(vq.prose_fingerprint(without), vq.prose_fingerprint(with_field))
+
+    def test_absorbing_the_definizione_does_change_the_fingerprint(self):
+        """L'altra meta', e senza di essa il campo era una scorciatoia per
+        cambiare la pagina senza riverificarla: un'entry gia' verificata poteva
+        togliersi la definizione dalla pagina senza toccare una parola di prosa,
+        la verifica vecchia continuava a combaciare, e una smentita appesa alla
+        definizione ora nascosta restava aperta su una sezione che nessuno vede
+        piu'. Cambiare cio' che la pagina mostra e' un cambio della pagina."""
+        from scripts import verification_queue as vq
+        absorbed = dict(self.LEGACY, roles_covered=["quadro", "dinamica", "limiti"])
+        self.assertNotEqual(vq.prose_fingerprint(dict(self.LEGACY)),
+                            vq.prose_fingerprint(absorbed))
 
 
 class SectionsUseKnownRoles(unittest.TestCase):

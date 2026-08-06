@@ -78,6 +78,11 @@ def integrated_targets(manifest_rows):
 # pinned by tests/unit/test_pending_notes.py.
 ARTICLE_ROLES = ("definizione", "quadro", "dinamica", "limiti")
 
+# I tre che nessuna dichiarazione puo' togliere: il blocco "Come leggere il dato"
+# copre la sola definizione, quindi e' la sola omettibile. Stessa regola di
+# `practice_timeline.reconstruct`, che decide se una pratica e' completa.
+SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
+
 
 def unwritten_roles(entry):
     """The roles of an article that nobody has written yet.
@@ -86,6 +91,15 @@ def unwritten_roles(entry):
     "has an entry" and "is written" two different things, and this script only
     knew the first: with both external indicators sitting at two sections out of
     four, it printed "la catena e completa" and the writer stage never fired.
+
+    Le **sezioni variabili** sono la seconda meta' della stessa distinzione, al
+    contrario: un'entry che dichiara `roles_covered` senza la `definizione` non
+    la rende come H2, perche' la sua meccanica sta nel blocco "Come leggere il
+    dato". Contarla fra le mancanti teneva l'articolo completo nella lista di
+    consegna del produttore per sempre, e ogni run sarebbe stata invitata a
+    riscrivere la sezione che questa funzione esiste per assorbire. I tre ruoli
+    sostanziali restano sempre richiesti: solo la definizione e' omettibile,
+    perche' e' l'unico ruolo che il blocco copre.
     """
     if not isinstance(entry, dict):
         return list(ARTICLE_ROLES)
@@ -94,7 +108,9 @@ def unwritten_roles(entry):
         for section in entry.get("sections") or []
         if isinstance(section, dict) and (section.get("body") or "").strip()
     }
-    return [role for role in ARTICLE_ROLES if role not in written]
+    declared = entry.get("roles_covered")
+    required = (set(declared) | SUBSTANTIVE_ROLES) if declared else set(ARTICLE_ROLES)
+    return [role for role in ARTICLE_ROLES if role in required and role not in written]
 
 
 def pending(manifest_rows, notes, year_max_of):

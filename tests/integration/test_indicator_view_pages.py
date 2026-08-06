@@ -104,6 +104,11 @@ class EveryIndicatorPageRenders(unittest.TestCase):
             self.assertIn(f'id="sezione-{role}"', html)
         self.assertIn('href="#come-leggere"', html)
         self.assertNotIn('href="#sezione-definizione"', html)
+        # E sta DOPO la narrazione. Renderlo prima lasciava al lettore la stessa
+        # contabilita' in apertura, solo sotto un altro titolo: il blocco esiste
+        # per toglierla di li', non per rinominarla.
+        self.assertLess(html.index('id="sezione-quadro"'), html.index('id="come-leggere"'))
+        self.assertLess(html.index('id="sezione-limiti"'), html.index('id="come-leggere"'))
 
     def test_question_navigation_points_to_visible_answers(self):
         response = self._get("920")
