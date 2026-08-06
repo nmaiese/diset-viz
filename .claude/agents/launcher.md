@@ -78,6 +78,12 @@ promoter), **produttore** (curator+writer+reviewer), **verificatore**.
      il `run_id` e l'indicatore da portare da ammesso a pubblicato.
    - `role: verificatore` -> agente `indicator-verifier`, un indicatore: passagli
      il `run_id` e l'articolo firmato da provare a smentire.
+   - `role: reader-editor` -> agente `reader-editor`, un indicatore: passagli il
+     `run_id` e l'articolo pubblicato da giudicare sulla leggibilita'. Come il
+     verificatore, ne legge **uno solo**, quello che gli dai: e' cio' che rende
+     sicuro aprirne piu' d'uno nello stesso tick, perche' letture su indicatori
+     diversi scrivono file con nomi diversi. Un bersaglio non passato sarebbe una
+     lettura che se lo sceglie da se', cioe' due run sullo stesso articolo.
    - `role: admissions` -> agente `admissions`, batch: passagli il `run_id`, e
      triaghera' la coda di fonti e candidati da se'.
 

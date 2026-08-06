@@ -122,9 +122,18 @@ python3 scripts/reading_queue.py --unread               # i pubblicati che nessu
 python3 scripts/reading_queue.py --revise               # i bocciati che tornano al produttore
 ```
 
-Lavora prima gli `unread`: sono i pubblicati senza un tuo verdetto sulla prosa di
-adesso. Un `revise` gia' scritto e' lavoro del produttore, non tuo; non rileggere
-la stessa impronta due volte. Per capire cosa fa la pagina davvero, aprila con il
+**Leggi un indicatore solo: quello che il lanciatore ti passa.** La coda serve a
+confermare che il tuo bersaglio e' davvero `unread` (un `revise` gia' scritto e'
+lavoro del produttore, non tuo, e la stessa impronta non si rilegge due volte),
+non a scegliertene altri. Il motivo e' meccanico, non di stile: il piano e'
+per-indicatore e il lanciatore puo' aprire piu' letture nello stesso tick, in
+worktree diversi. Finche' ognuna sta sul suo indicatore i file che scrivete hanno
+nomi diversi e non vi vedete nemmeno; se ognuna si prendesse un lotto dalla coda
+scegliereste gli stessi articoli, scrivendo lo stesso file in due, e la catena
+guadagnerebbe conflitti di merge e giudizi doppi. Se qualcuno ti invoca a mano
+senza bersaglio, prendi la prima riga `unread` della coda, e sempre quella sola.
+
+Per capire cosa fa la pagina davvero, aprila con il
 client di test Flask (non lanciare gunicorn, non litiga per la porta): la pagina
 e' fatta di prosa **piu'** cruscotto, e un tecnicismo che la prosa non spiega puo'
 essere gia' spiegato da un blocco della pagina, o viceversa.
@@ -169,17 +178,17 @@ onestamente ogni impronta nuova che ti arriva, il parcheggio lo decide lo script
 ## Quando non chiudi
 
 Una chiusura dichiarata e' il segnale di completamento, non la presenza di un
-file. Se resti in dubbio su un articolo, non scrivere la sua riga: una lettura
-non finita che sembra finita e' peggio di una mancante. Scrivi le righe che hai
-finito, di' nel diario quale articolo lasci aperto, e fermati.
+file. Se resti in dubbio sull'articolo, non scrivere la sua riga: una lettura
+non finita che sembra finita e' peggio di una mancante. Di' nel diario che lo
+lasci aperto, e fermati senza scriverla.
 
 Chiudi la run come prescrive la skill `pipeline-close-run`, stadio
 `reader-editor`. Il tuo merge mode e' `auto`: fondi sul cancello locale, che ha
 gia' girato la suite intera, non sulla CI remota, che non parte sulle PR aperte
-via MCP. Un lotto di cinque-dieci articoli. Nel corpo, per articolo: il verdetto,
-gli otto punteggi, gli eventuali fallimenti duri, e per ognuno una riga che dice
-dove il lettore inciampa. Un `revise` senza un punto d'inciampo nominato e'
-un'opinione, e il produttore che deve agirci non sapra' dove mettere le mani.
+via MCP. Una run, un articolo, un file. Nel corpo: il verdetto, gli otto
+punteggi, gli eventuali fallimenti duri, e una riga che dice dove il lettore
+inciampa. Un `revise` senza un punto d'inciampo nominato e' un'opinione, e il
+produttore che deve agirci non sapra' dove mettere le mani.
 
 ## Limiti onesti
 

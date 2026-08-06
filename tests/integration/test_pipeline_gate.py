@@ -667,6 +667,23 @@ class TheVerificationRegisterIsAppendOnly(unittest.TestCase):
         self.assertFalse(check.ok)
         self.assertIn("impronta", check.detail)
 
+    def test_a_truncated_shard_is_refused_instead_of_skipped(self):
+        """Lo stesso buco che la revisione ha trovato sulle letture, sul registro
+        gemello: il caricatore delle letture e' nato copiando questo, e ne aveva
+        copiato il silenzio sui file illeggibili. Correggerne uno solo avrebbe
+        lasciato al verificatore, che gira da settimane, il difetto che il
+        reader-editor non ha piu'."""
+        (self.repo / "data" / "pipeline" / "verifiche" / "ter-72-regione.json").write_text(
+            '{"code": "ter-72", "contro', encoding="utf-8")
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("illeggibili", check.detail)
+
+    def test_a_run_that_adds_no_verification_stays_green(self):
+        check = self._check()
+        self.assertTrue(check.ok, check.detail)
+        self.assertIn("nessuna verifica nuova", check.detail)
+
 
 class TheReadingRegisterIsAppendOnly(unittest.TestCase):
     """Il registro delle letture, protetto come quello delle verifiche.
@@ -775,6 +792,34 @@ class TheReadingRegisterIsAppendOnly(unittest.TestCase):
         check = self._check()
         self.assertFalse(check.ok)
         self.assertIn("impronta", check.detail)
+
+    def test_a_truncated_shard_is_refused_instead_of_skipped(self):
+        """Il caso peggiore, perche' e' quello che passava verde.
+
+        Una run che aggiunge una sola scheggia troncata non lascia nessuna riga
+        da controllare: saltandola in silenzio il cancello diceva "nessuna
+        lettura nuova" e il file veniva fuso lo stesso, illeggibile per la coda,
+        che continua a considerare quell'articolo da leggere e a rilanciarlo.
+        """
+        (self.repo / "data" / "pipeline" / "letture" / "ter-72-regione.json").write_text(
+            '{"code": "ter-72", "verd', encoding="utf-8")
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("illeggibili", check.detail)
+
+    def test_a_shard_that_is_not_an_object_is_refused(self):
+        (self.repo / "data" / "pipeline" / "letture" / "ter-72-regione.json").write_text(
+            '["ter-72"]', encoding="utf-8")
+        check = self._check()
+        self.assertFalse(check.ok)
+        self.assertIn("illeggibili", check.detail)
+
+    def test_a_run_that_adds_no_reading_stays_green(self):
+        """La controprova: il rifiuto e' delle schegge illeggibili aggiunte, non
+        di una run che non tocca il registro (il produttore, l'ammissione)."""
+        check = self._check()
+        self.assertTrue(check.ok, check.detail)
+        self.assertIn("nessuna lettura nuova", check.detail)
 
 
 if __name__ == "__main__":

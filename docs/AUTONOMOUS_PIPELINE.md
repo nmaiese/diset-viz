@@ -129,11 +129,16 @@ mai lasciare fuori la voce piu' urgente, perche' agisce dopo l'ordinamento: una
 smentita pubblica (peso 100) e' sempre dentro. Le voci in eccesso aspettano il
 tick dopo.
 
-- **Produttore e verificatore sono per-indicatore.** Ogni indicatore pronto e'
-  una voce a se', perche' due produttori su due indicatori diversi toccano file
-  diversi (un articolo per record) e non si toccano mai. La priorita' viene dal
-  dossier, la stessa di `stage_priorities`: una smentita su una pagina online
-  (peso 100) apre il piano davanti a una candidatura nuova.
+- **Produttore, verificatore e reader-editor sono per-indicatore.** Ogni
+  indicatore pronto e' una voce a se', perche' due produttori su due indicatori
+  diversi toccano file diversi (un articolo per record) e non si toccano mai. La
+  priorita' viene dal dossier, la stessa di `stage_priorities`: una smentita su
+  una pagina online (peso 100) apre il piano davanti a una candidatura nuova. Per
+  il reader-editor la regola e' anche la sua sicurezza: legge **l'articolo che il
+  lanciatore gli passa e nessun altro**, cosi' due letture aperte nello stesso
+  tick scrivono file con nomi diversi. Una lettura che si scegliesse un lotto
+  dalla coda sceglierebbe gli stessi articoli dell'altra, e la catena
+  guadagnerebbe conflitti di merge e giudizi doppi.
 - **L'ammissione e' batch.** Una sessione triaga l'intera coda di fonti e
   candidati e promuove cio' che approva, quindi e' una voce sola. La sua
   esistenza si legge dalle code pre-pratica (scout, hunter, promoter) piu' le

@@ -639,7 +639,13 @@ def check_verifications(base=None, cwd=None, include_worktree=True):
             f"{', '.join(sorted(r.get('code') or '?' for r in removed)[:5])}. "
             "Per superare una verifica si riscrive l'articolo, non la sua riga.",
         )
-    rows = _verification_rows_added(base, cwd=cwd, include_worktree=include_worktree)
+    rows, unreadable = _rows_added(VERIFICATIONS, base, cwd=cwd, include_worktree=include_worktree)
+    if unreadable:
+        return Check(
+            "verifiche", False,
+            f"schegge illeggibili fra quelle aggiunte: {', '.join(unreadable[:5])}. "
+            "Riscrivile con verification_queue invece che a mano.",
+        )
     if not rows:
         return Check("verifiche", True, "nessuna verifica nuova da controllare")
 
@@ -729,17 +735,31 @@ def _verification_rows_removed(base=None, cwd=None, include_worktree=True):
     return rows
 
 
-def _verification_rows_added(base=None, cwd=None, include_worktree=True):
-    """Le verifiche che questo branch aggiunge, gia' interpretate."""
-    rows = []
-    for path in _touched_under(VERIFICATIONS, base, cwd=cwd, include_worktree=include_worktree)["added"]:
+def _rows_added(directory, base=None, cwd=None, include_worktree=True):
+    """Le righe che questo branch aggiunge sotto `directory`, gia' interpretate,
+    **piu'** i file che non si e' riusciti a interpretare.
+
+    Le due liste tornano insieme di proposito, ed e' la correzione di un buco che
+    i due registri (verifiche e letture) avevano uguale: un file troncato, malformato
+    o che non e' un oggetto JSON veniva saltato in silenzio. Una run che ne aggiunge
+    uno solo arrivava percio' al cancello senza righe da controllare, il cancello
+    diceva "nessuna nuova da controllare" col verde, e la scheggia veniva fusa lo
+    stesso: illeggibile per la coda, che continua a considerare quell'articolo da
+    fare e a rilanciarlo, e invisibile per chiunque legga il registro. Chi chiama
+    deve poter bocciare cio' che non sa leggere, e per farlo deve saperlo.
+    """
+    rows, unreadable = [], []
+    for path in _touched_under(directory, base, cwd=cwd, include_worktree=include_worktree)["added"]:
         try:
             data = json.loads((_root_for(cwd) / path).read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
+        except (OSError, json.JSONDecodeError) as exc:
+            unreadable.append(f"{path} ({type(exc).__name__})")
             continue
         if isinstance(data, dict):
             rows.append(data)
-    return rows
+        else:
+            unreadable.append(f"{path} (non e' un oggetto JSON)")
+    return rows, unreadable
 
 
 def check_readings(base=None, cwd=None, include_worktree=True):
@@ -765,7 +785,13 @@ def check_readings(base=None, cwd=None, include_worktree=True):
             f"{', '.join(sorted(r.get('code') or '?' for r in removed)[:5])}. "
             "Per superare una lettura si riscrive l'articolo, non la sua riga.",
         )
-    rows = _reading_rows_added(base, cwd=cwd, include_worktree=include_worktree)
+    rows, unreadable = _rows_added(READINGS, base, cwd=cwd, include_worktree=include_worktree)
+    if unreadable:
+        return Check(
+            "letture", False,
+            f"schegge illeggibili fra quelle aggiunte: {', '.join(unreadable[:5])}. "
+            "Scrivile con reading_queue.write_reading invece che a mano.",
+        )
     if not rows:
         return Check("letture", True, "nessuna lettura nuova da controllare")
 
@@ -824,19 +850,6 @@ def _reading_rows_removed(base=None, cwd=None, include_worktree=True):
         old = _read_json_at(resolved, path, cwd=cwd)
         if isinstance(old, dict):
             rows.append(old)
-    return rows
-
-
-def _reading_rows_added(base=None, cwd=None, include_worktree=True):
-    """Le letture che questo branch aggiunge, gia' interpretate."""
-    rows = []
-    for path in _touched_under(READINGS, base, cwd=cwd, include_worktree=include_worktree)["added"]:
-        try:
-            data = json.loads((_root_for(cwd) / path).read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        if isinstance(data, dict):
-            rows.append(data)
     return rows
 
 
