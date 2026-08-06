@@ -117,6 +117,17 @@ def prose_fingerprint(entry: dict) -> str:
     repairing a refuted heading did not requeue the article.
     """
     parts = [("lead", "", entry.get("lead") or "")]
+    # I titoli autorati (`h1`, `seo_title`) sono prosa a tutti gli effetti, per la
+    # stessa ragione per cui lo e' l'`h` di una sezione: sono visibili, e uno di
+    # loro e' anche cio' che si legge in SERP, quindi puo' fare un'affermazione.
+    # Sono campi vuoti su tutti gli articoli di oggi, percio' le trecento impronte
+    # non si muovono, ma senza di loro un titolo aggiunto o corretto dopo la firma
+    # lasciava la verifica vecchia a combaciare su una frase che nessuno ha mai
+    # controllato: il buco che l'`h` ha gia' aperto una volta.
+    for field in ("h1", "seo_title"):
+        value = entry.get(field)
+        if isinstance(value, str) and value.strip():
+            parts.append((field, "", value))
     for section in entry.get("sections") or []:
         parts.append((
             section.get("role") or "",
