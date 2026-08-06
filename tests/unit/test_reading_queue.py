@@ -166,6 +166,37 @@ class ARowIsBelievedOrItIsNot(unittest.TestCase):
     def test_a_clean_pass_row_has_no_problems(self):
         self.assertEqual(rq.row_problems(_reading(_entry(), verdict="pass")), [])
 
+    def test_a_nested_hard_failure_is_refused_before_it_can_crash_the_launcher(self):
+        """Il gemello della nota storta, sull'altro campo: `[["numeric_overload"]]`
+        e' una lista non vuota, quindi passava il controllo di coerenza, e poi
+        l'elemento interno finiva in `", ".join(...)` nel motivo del lancio e in
+        `review_queue`, con un TypeError che ferma il catalogo intero."""
+        problems = rq.row_problems(self._valid(hard_failures=[["numeric_overload"]]))
+        self.assertTrue(any("ignoti" in p for p in problems), problems)
+
+    def test_a_hard_failure_outside_the_vocabulary_is_refused(self):
+        """Le sette classi sono un vocabolario chiuso: una inventata da una run
+        non vorrebbe dire niente per il produttore che la legge."""
+        problems = rq.row_problems(self._valid(hard_failures=["troppo_lungo"]))
+        self.assertTrue(any("ignoti" in p for p in problems), problems)
+
+    def test_the_queue_drops_a_nested_failure_that_slipped_through(self):
+        entry = _entry()
+        reading = _reading(entry, verdict="revise",
+                           hard_failures=[["numeric_overload"], "filler_section"])
+        rows = rq.build_queue({"611": entry}, [reading])
+        self.assertEqual(rows[0]["hard_failures"], ["filler_section"])
+
+    def test_the_vocabulary_mirrors_the_prompt(self):
+        """Le sette classi vivono in `.claude/agents/reader-editor.md`: se una
+        cade o cambia nome li', questo test lo dice invece di lasciare il
+        cancello a rifiutare una classe legittima."""
+        from pathlib import Path
+        prompt = (Path(__file__).resolve().parents[2]
+                  / ".claude" / "agents" / "reader-editor.md").read_text(encoding="utf-8")
+        for name in rq.HARD_FAILURES:
+            self.assertIn(f"`{name}`", prompt)
+
     def test_a_mute_revise_is_not_believed(self):
         """Una bocciatura senza il punto d'inciampo e' un'opinione, e rimette la
         riscrittura a indovinare: e' esattamente la riscrittura cieca che questa
@@ -222,7 +253,7 @@ class TheStoreRoundTrips(unittest.TestCase):
         import tempfile
         from pathlib import Path
         entry = _entry()
-        row = _reading(entry, verdict="revise", hard_failures=["cognitive_overload"])
+        row = _reading(entry, verdict="revise", hard_failures=["numeric_overload"])
         with tempfile.TemporaryDirectory() as tmp:
             path = rq.write_reading(row, root=tmp)
             self.assertTrue(path.exists())

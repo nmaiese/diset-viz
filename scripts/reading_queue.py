@@ -105,6 +105,20 @@ COLUMNS = [
 # non ai fatti. Tre tentativi prima di fermare il loop.
 READABILITY_ROUNDS = 3
 
+# I fallimenti duri ammessi, gli stessi sette di `.claude/agents/reader-editor.md`.
+# Un vocabolario chiuso e non testo libero perche' queste stringhe non sono prosa:
+# `review_queue` e il lanciatore le uniscono in una riga per il produttore, e una
+# classe inventata da una run non vorrebbe dire niente per chi la legge dopo.
+HARD_FAILURES = (
+    "lead_requires_methodology",
+    "thesis_unidentifiable",
+    "what_is_measured_unclear",
+    "filler_section",
+    "undefined_key_jargon",
+    "numeric_overload",
+    "interchangeable_article",
+)
+
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 _REQUIRED_ROLES = {"definizione", "quadro", "dinamica", "limiti"}
@@ -185,10 +199,22 @@ def _low_scores(row: dict) -> list:
 
 
 def _hard_failures(row: dict) -> list:
+    """I fallimenti duri di una riga, sempre come lista di stringhe.
+
+    Difensivo di proposito: il cancello rifiuta una scheggia storta, ma questa
+    funzione gira anche su cio' che e' gia' fuso, e cio' che ne esce finisce in
+    `", ".join(...)` nel lanciatore e in `review_queue`. Un elemento che non e'
+    una stringa (`[["numeric_overload"]]`, la lista annidata piu' facile da
+    scrivere a mano) alzerebbe li' un TypeError, cioe' fermerebbe coda,
+    lanciatore e coda del revisore per il catalogo intero. Meglio perdere un
+    elemento illeggibile che la catena.
+    """
     raw = row.get("hard_failures") or []
     if isinstance(raw, str):
         raw = [part.strip() for part in raw.split(";") if part.strip()]
-    return list(raw)
+    if not isinstance(raw, (list, tuple)):
+        return []
+    return [item.strip() for item in raw if isinstance(item, str) and item.strip()]
 
 
 def row_problems(row: dict) -> list[str]:
@@ -233,6 +259,23 @@ def row_problems(row: dict) -> list[str]:
     # facile da fare a mano in un JSON) alzerebbe un AttributeError dopo il merge
     # e fermerebbe la coda, il lanciatore e la coda del revisore per il catalogo
     # intero.
+    # I fallimenti duri sono un vocabolario chiuso, e il controllo guarda il campo
+    # **grezzo**: `_hard_failures` scarta in silenzio cio' che non e' una stringa
+    # (per non far cadere la coda su una scheggia gia' fusa), quindi un cancello
+    # che leggesse solo il ripulito accetterebbe proprio la riga storta che deve
+    # fermare, e la lista annidata arriverebbe intatta al `join` del lanciatore.
+    raw_failures = row.get("hard_failures") or []
+    if isinstance(raw_failures, str):
+        raw_failures = [part.strip() for part in raw_failures.split(";") if part.strip()]
+    if not isinstance(raw_failures, (list, tuple)):
+        problems.append(f"fallimenti duri che non sono una lista: {type(raw_failures).__name__}")
+    else:
+        bad = [item for item in raw_failures
+               if not isinstance(item, str) or item.strip() not in HARD_FAILURES]
+        if bad:
+            problems.append(
+                "fallimenti duri ignoti: " + ", ".join(repr(item) for item in bad[:3])
+                + f". Ammessi: {', '.join(HARD_FAILURES)}")
     note = row.get("note", "")
     if not isinstance(note, str):
         problems.append(f"nota che non e' una stringa: {type(note).__name__}")
