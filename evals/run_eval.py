@@ -119,6 +119,13 @@ def prepare(name):
         )
     elif name == "reader-editor":
         import json
+        import sys
+
+        # Lo stesso modulo che poi ricalcola la corrispondenza: la regola degli id
+        # ciechi vive li', in un posto solo, o preparazione e punteggio divergono
+        # e la eval smette di sommare.
+        sys.path.insert(0, str(EVALS))
+        import score_eval
 
         gold = json.loads((EVALS / "reader-editor" / "cases.json").read_text(encoding="utf-8"))
         # Via il blocco `_`: e' commento per chi legge il gold, e se descrive quali
@@ -133,7 +140,18 @@ def prepare(name):
             # risposta. L'agente giudica la prosa, non il codice; lo score unisce
             # su `id`, che resta.
             row.pop("code", None)
+            # E via anche l'id parlante: `p01`-`p04` sono i quattro `pass` e
+            # `r01`-`rc04` i quattro `revise`, quindi il prefisso da' 8/8 a chi
+            # non legge nemmeno la prosa, e una baseline che si centra cosi' non
+            # vede piu' nessuna regressione. `score_eval.blind_id` ricalcola la
+            # corrispondenza da se': niente file di mappa accanto alla fixture,
+            # che sarebbe la stessa fuga con un passaggio in piu'.
+            row["id"] = score_eval.blind_id(row["id"])
             row["verdict"] = ""
+        # In ordine di id cieco: lasciarli nell'ordine del gold rimetterebbe in
+        # fila i quattro pass e poi i quattro revise, cioe' la risposta di prima
+        # travestita da posizione.
+        gold["cases"].sort(key=lambda row: row["id"])
         (workdir / "cases.json").write_text(
             json.dumps(gold, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )

@@ -30,6 +30,21 @@ VERIFIER_GOLD = EVALS / "verifier" / "claims.json"
 ADMISSIONS_GOLD = EVALS / "admissions" / "cases.json"
 READER_EDITOR_GOLD = EVALS / "reader-editor" / "cases.json"
 
+
+def blind_id(case_id: str) -> str:
+    """L'id con cui un caso del gold arriva all'agente sotto eval.
+
+    Gli id del gold dicono la risposta: `p01`-`p04` sono i `pass`, `r01`-`rc04`
+    i `revise`. Un giudice che li vede puo' prendere 8/8 leggendo il prefisso,
+    e una baseline che si puo' centrare senza leggere la prosa non misura piu'
+    niente. Derivato e non sorteggiato di proposito: cosi' non serve nessun file
+    di corrispondenza accanto alla fixture (che sarebbe la stessa fuga con un
+    passaggio in piu'), e lo scorer ricalcola la mappa da se'.
+    """
+    import hashlib
+
+    return "caso-" + hashlib.sha1(f"reader-editor:{case_id}".encode("utf-8")).hexdigest()[:8]
+
 # I caratteri che content/STYLE.md vieta in assoluto.
 BANNED = {"—": "em-dash", "–": "en-dash", ";": "punto e virgola",
           "…": "puntini"}
@@ -208,7 +223,13 @@ def score_reader_editor(verdicts_path, gold_path=None):
     right, wrong, missing, false_pass = [], [], [], []
     tp = fp = fn = 0
     for case_id, label in labels.items():
-        verdict = produced.get(case_id)
+        # L'agente vede l'id cieco (`blind_id`), non quello del gold: si accetta
+        # l'uno o l'altro perche' la baseline gia' registrata e' stata prodotta
+        # sugli id vecchi, e riscriverla per un cambio di etichette sarebbe
+        # riscrivere una misura invece di conservarla.
+        verdict = produced.get(blind_id(case_id))
+        if verdict in (None, ""):
+            verdict = produced.get(case_id)
         if verdict in (None, ""):
             missing.append(case_id)
             continue
