@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-06T07:28:36+00:00",
+ "base_commit": "d1b44c0",
+ "branch": "master",
+ "claude_code_version": "2.1.223 (Claude Code)",
+ "commit": "d1b44c0",
+ "detail": [
+  "il cancello e' rosso: suite"
+ ],
+ "gate": "blocked",
+ "outcome": "blocked",
+ "pr": "162",
+ "run_id": "admissions-20260806T071324Z-f6ee",
+ "stage": "admissions",
+ "summary": "PR #162 non fusa: il cancello e' rosso",
+ "trigger": "manuale"
+}
