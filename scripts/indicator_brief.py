@@ -119,15 +119,24 @@ def _annual_means(matrix):
     di fila inviterebbe a chiamare il 2021 un fondo, ed e' l'errore che la
     regola del trend di lungo periodo vieta (`docs/INDICATOR_PAGES.md`: gli anni,
     l'unita' e **la base territoriale**).
+
+    Per la stessa ragione ogni anno porta anche **quali** territori rispondono, e
+    non solo quanti: due conteggi uguali non sono una base uguale. `bes-06POL007`
+    ha 19 regioni nel 2012 e 19 nel 2025, ma nel 2012 c'e' il Veneto e non la
+    Calabria e nel 2025 il contrario, quindi le due medie continuano a non essere
+    confrontabili mentre un controllo sui soli numeri le dichiarerebbe tali.
     """
     means = []
     for year_str in sorted(matrix, key=int):
-        values = [v for v in matrix[year_str].values() if isinstance(v, (int, float))]
-        if values:
+        keys = sorted(key for key, value in matrix[year_str].items()
+                      if isinstance(value, (int, float)))
+        if keys:
+            values = [matrix[year_str][key] for key in keys]
             means.append({
                 "year": int(year_str),
                 "avg": sum(values) / len(values),
-                "n": len(values),
+                "n": len(keys),
+                "territories": keys,
             })
     return means
 
@@ -137,18 +146,21 @@ def _means_lines(means):
     compresa.
 
     Due forme, e la regola che le sceglie e' meccanica invece che una soglia
-    inventata: **i conteggi sono tutti uguali oppure no**. Su base costante (il
+    inventata: **tutti gli anni hanno la stessa base territoriale oppure no**.
+    Stessa base vuol dire gli stessi territori, non lo stesso numero: 19 regioni
+    nel 2012 e 19 nel 2025 con una entrata e una uscita non sono la stessa base, e
+    fermarsi ai conteggi le avrebbe dichiarate confrontabili. Su base costante (il
     caso comune, le venti regioni ogni anno) la base si dichiara una volta in
     testa e le celle restano pulite, perche' ripetere lo stesso denominatore
-    trenta volte e' rumore. Quando i conteggi ballano, ogni cella porta il suo e
-    la serie si apre dicendo che le medie di due anni diversi non sono
+    trenta volte e' rumore. Quando la base si muove, ogni cella porta il suo
+    conteggio e la serie si apre dicendo che le medie di due anni diversi non sono
     confrontabili: al produttore serve saperlo prima di scrivere "il fondo del
     2021", non dopo che il verificatore glielo smentisce.
     """
     if len(means) <= 2:
         return []
     lines = []
-    if len({item["n"] for item in means}) == 1:
+    if len({tuple(item["territories"]) for item in means}) == 1:
         lines.append("  serie annuale della media (una sola fonte per un picco o un fondo interno), "
                      f"base costante: {means[0]['n']} territori ogni anno")
         cells = [f"{item['year']}: {_num(item['avg'])}" for item in means]
@@ -170,18 +182,25 @@ def _means_lines(means):
 
 def _base_note(means, first_year, last_year):
     """Il richiamo alla base sul confronto primo-ultimo anno, quando i due anni
-    non hanno lo stesso numero di territori.
+    non poggiano sugli stessi territori.
 
     Lo stesso difetto della serie, sulla riga che il brief stampava gia' prima di
     questa modifica: `media 2020 -> 2021` mette in fila due medie che possono
-    poggiare su campioni diversi. I conteggi sono ormai in mano, quindi dirlo
-    costa una riga.
+    poggiare su campioni diversi. Il confronto e' fra gli insiemi, non fra i
+    conteggi: `bes-06POL007` ha 19 regioni a entrambi gli estremi, ma una entra e
+    una esce, e sui soli numeri la riga sarebbe passata per confrontabile.
     """
-    by_year = {item["year"]: item["n"] for item in means}
+    by_year = {item["year"]: item for item in means}
     first, last = by_year.get(first_year), by_year.get(last_year)
-    if first is None or last is None or first == last:
+    if first is None or last is None:
         return ""
-    return f"   (base {first} territori -> {last}, non confrontabili)"
+    if first["territories"] == last["territories"]:
+        return ""
+    if first["n"] == last["n"]:
+        changed = sorted(set(first["territories"]) ^ set(last["territories"]))
+        return (f"   (base {first['n']} territori a entrambi gli estremi ma non gli stessi, "
+                f"cambia {', '.join(changed[:4])}: non confrontabili)")
+    return f"   (base {first['n']} territori -> {last['n']}, non confrontabili)"
 
 
 def build_brief(family, raw_id, level_key=None):
@@ -724,6 +743,10 @@ def main(argv=None):
             "year_max": brief["level"]["year_max"],
             "stats": brief["stats"],
             "rows": brief["rows"],
+            # Con la base territoriale di ogni anno: il consumatore macchina
+            # riceve la stessa cosa del testo, denominatore compreso, e non deve
+            # ricalcolarsi la comparabilita' da se'.
+            "annual_means": brief["annual_means"],
             "breaks": brief["breaks"],
             "against_the_grain": brief["against_the_grain"],
             "annual_change": brief["level"]["annual_change"],
