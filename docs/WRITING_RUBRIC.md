@@ -11,6 +11,14 @@ Dieci criteri, da 0 a 2, massimo 20. Serve a tre cose e a nessun'altra:
 punteggio la pagina descrive una classifica invece di raccontare un dato, che e'
 esattamente lo stato da cui questa rubrica esiste per uscire.
 
+Ma il totale non basta, e questa e' la seconda regola: **i dieci criteri stanno
+su quattro assi, e un asse sotto il suo pavimento boccia l'articolo a prescindere
+dal totale.** La media unica nascondeva un asse debole dietro gli altri: un
+articolo tutto vero e ben strutturato ma illeggibile faceva 18/20 con il criterio
+8 a zero e passava, ed e' esattamente la pagina corretta-ma-illeggibile che questa
+rubrica esiste per non lasciar passare. I quattro assi e i loro pavimenti sono in
+fondo, dopo la tabella dei criteri.
+
 La voce editoriale sta in [`content/STYLE.md`](../content/STYLE.md), che resta
 l'unica fonte di verita'. Qui non si ripetono le regole, si misura se sono state
 seguite.
@@ -29,6 +37,33 @@ seguite.
 | 8 | **Leggibilita'** | clausole impilate, tre idee in una frase tenute insieme dalle virgole, il paragrafo si rilegge per capirlo, oppure il difetto opposto, frasi brevi slegate accostate come un elenco | si legge al primo passaggio, ma gli incisi tornano frase dopo frase | ogni frase si prende al primo passaggio e nasce dalla precedente, ogni cautela ha la sua frase invece di essere agganciata alla precedente, le clausole stanno nell'ordine in cui si pensano |
 | 9 | **Fonti** | un claim comparativo senza fonte, o una fonte inventata | fonte presente e verificata | fonte verificata, usata per contesto e non per il numero che il cruscotto gia' mostra, senza confondere un aggregato ponderato con la nostra media semplice |
 | 10 | **Igiene anti-tell** | piu' di un tell | un tell | nessun falso intervallo, regola del tre, riassunto compulsivo, lessico spia, domanda retorica in chiusura, numero scritto due volte |
+
+## I quattro assi, e il loro pavimento
+
+I dieci criteri non pesano uguale, e non falliscono nello stesso modo. Stanno su
+quattro assi, ognuno con un pavimento: **sotto il pavimento di un asse l'articolo
+non e' pronto, anche se il totale supera 14.** Un asse misura una cosa diversa
+dagli altri, e nessuna media le compensa fra loro.
+
+| asse | criteri | pavimento | come si misura |
+|---|---|---|---|
+| **1. Correttezza e onesta'** | 7 (onesta' causale), 9 (fonti) | **2 su ognuno** | il piu' duro: una causa che il dato non mostra o una fonte inventata boccia da sola. Le eval `writer`/`reviewer` (cifre fuori dal brief, classi d'errore) e il verificatore a valle |
+| **2. Leggibilita'** | 6 (scala umana), 8 (leggibilita') | **2 sul criterio 8** | la leggibilita' e' priorita' primaria: un lettore comune capisce al primo passaggio, o l'articolo torna indietro. Il **reader-editor**, giudice indipendente, e il confronto cieco a due giudici |
+| **3. Tesi e struttura** | 1 (apertura), 2 (nut graf), 3 (filo unico), 4 (ragionamento) | **media >= 1,5** | c'e' una tesi, un nut graf, un filo che attraversa le sezioni, un respiro oltre la propria serie. Lettura umana |
+| **4. Mestiere** | 5 (incroci e link), 10 (igiene anti-tell) | **1 su ognuno** | incroci con un ruolo chiaro, nessun tell da bot. `prose_lint` per la parte contabile, lettura per il resto |
+
+Perche' quattro assi e non una somma. Prima esisteva solo il totale, e un articolo
+poteva arrivare a 14 con la leggibilita' a zero, purche' fosse forte altrove: e'
+la pagina corretta-ma-tecnica, quella che un utente ha giudicato "macchinosa, si
+vede che e' tradotta in inglese", ed e' precisamente il difetto che il totale non
+vedeva. Il pavimento per asse lo prende: la leggibilita' non si compra con
+l'accuratezza, ne la struttura con le fonti.
+
+L'asse 2 e' l'unico che ha gia' un giudice indipendente suo, il **reader-editor**
+(`.claude/agents/reader-editor.md`): legge ogni articolo pubblicato e boccia i
+tecnici-ma-corretti, con la sua eval e la sua baseline nel canary. Gli altri tre
+assi restano giudizio del produttore che si rilegge (asse 1 anche del
+verificatore, a valle), finche' non avranno un giudice loro.
 
 ## Perche' il criterio 8 non premia piu' il ritmo
 
