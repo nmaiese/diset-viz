@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-06T06:19:55+00:00",
+ "base_commit": "40bd1e6",
+ "branch": "automation/admissions-2026-08-06-8dc4",
+ "claude_code_version": "2.1.223 (Claude Code)",
+ "commit": "40bd1e6",
+ "detail": [
+  "ter-399 e ter-400 sono compositi a due addendi (UL imprese in settori a contenuto sociale da ASIA + istituzioni non profit), current_year 2015, coverage 1.0, definition_match proxy, status needs_review, score_eligible false. Il censimento non profit (WebFetch 2026-08-06 istat.it/statistiche-per-temi/censimenti/istituzioni-non-profit/risultati/) copre solo l'addendo non profit, quindi resta proxy come movimprese copre solo le imprese. Licenza CC BY 4.0 (WebFetch 2026-08-06 istat.it/it/note-legali). Auto-refutazione: Istat non ha ricalcolato la serie oltre il 2015 (istat_territoriali.csv rifetch 2026-07-27, anno_finale 2015, periodicita Occasionale). Aggiornati solo i review_notes delle due righe nel manifest, source/definition_match/status invariati."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 206,
+ "queue_before": 206,
+ "run_id": "admissions-20260806T061804Z-8dc4",
+ "stage": "admissions",
+ "summary": "Valutata fonte candidata Censimento permanente istituzioni non profit per refresh ter-399/400, esito proxy non esatto, nessuna sostituzione",
+ "trigger": "manuale"
+}
