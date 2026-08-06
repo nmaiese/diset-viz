@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-06T07:22:36+00:00",
+ "base_commit": "d1b44c0",
+ "branch": "automation/admissions-20260806-ccea",
+ "claude_code_version": "2.1.223 (Claude Code)",
+ "commit": "485cbba",
+ "detail": [
+  "Verifiche fatte in questa run e passate, quattro. Uno, istituzione Istat citabile via archivio 234647 e note-legali. Due, licenza CC BY 4.0 con ripubblicazione permessa, verificata da me su note-legali in questa run. Tre, i dati esistono su esploradati SDMX come dataflow regionali IT1, 12_323 IMPDEP reg e 12_60 CONSACQUA reg. Quattro, la struttura DSD di IMPDEP ha la dimensione extra TYPE_OF_TREATMENT oltre le tre del pilota, WebFetch datastructure questa run. Auto-refutazione, un punto che regge contro l ammissione: cablare in istat_series.yaml pubblicherebbe l acqua sotto la famiglia Istat indicatori demografici, perche l adapter fissa il source a istat_demografia e la label lo conferma, quindi l esito e needs-info non approved. Verifiche NON fatte in questa run e dichiarate non-verificate: copertura 20 su 20 e ultimo anno non riverificati, per CONSACQUA 28 REF_AREA e ultimo anno 2022 sono ereditati dalla run del 2026-07-28. Codici DATA_TYPE immessa erogata dispersione non risolti. id 8 disponibilita idropotabili senza dataflow regionale identificato, PRELACQ non ha variante reg ed e assente dalla coda scout. Rottura di definizione su ter-10 inferita dai titoli, non dalle codelist. Il dato 93,7 per cento sui capoluoghi non controllato in questa run. Decisioni: CONSACQUA_1 needs-info per ter-9 ed ter-385, IMPDEP_1 needs-info per ter-10 ter-11 ter-253, zero approvate zero cablate zero promosse. Run fermata (STOPPED) per contesa di worktree condiviso con altre due run di ammissione in volo (id-f6ee e id-ccea): non ho aperto PR io stesso. Il commit 485cbba di questa run riparava anche la riga manifest ter-399/ter-400 (punto e virgola non quotato, 15 colonne invece di 14), ma quella riparazione e' stata superata da un hotfix indipendente e separato (PR #164), scritto contro un master piu recente: non riportata nel consolidamento. Il triage CONSACQUA/IMPDEP di questo record e' stato portato su master via PR #165 (consolidamento ammissioni 2026-08-06)."
+ ],
+ "gate": "auto",
+ "outcome": "stopped",
+ "pr": "165 (triage consolidato; questa run non ha aperto PR propria)",
+ "queue_after": 205,
+ "queue_before": 206,
+ "run_id": "admissions-20260806T072236Z-3e22",
+ "stage": "admissions",
+ "summary": "Censimento acque per uso civile per il refresh di 6 territoriali fermi: 2 fonti a needs-info, non ammissibili nel perimetro perche il cablaggio le pubblicherebbe sotto la famiglia demografia, serve famiglia e adapter dedicati. Riparata anche una riga manifest malformata che rendeva 500 la API manifest.",
+ "trigger": "manuale"
+}
