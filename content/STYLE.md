@@ -229,7 +229,8 @@ Il primo comando deve tornare vuoto. Il secondo elenca i tell di questa guida ch
 una regex sa trovare, sull'articolo di un indicatore. Non copre tutto e non
 pretende di farlo: quello che vuole un lettore sta in
 [`docs/WRITING_RUBRIC.md`](../docs/WRITING_RUBRIC.md), i dieci criteri con cui
-si misura un articolo prima di pubblicarlo. Per template, frontend e SVG testuali controlla
+si misura un articolo prima di pubblicarlo, su quattro assi con un pavimento
+ciascuno. Per template, frontend e SVG testuali controlla
 anche il testo visibile, ma ignora i punti e virgola di CSS, JS, JSON-LD e CSV.
 
 Controlla anche che non ci siano sequenze identiche di H2 tra piu articoli. I

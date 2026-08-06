@@ -231,7 +231,12 @@ il lettore peggiore: cerca apposta di cadere.
   reintrodurre `—`, `–`, `;`, `…` ne' le virgolette curve. Il contratto di
   conservazione della skill (non inventare ne' rafforzare una cifra, una causa,
   una fonte) e' lo stesso della catena: rileggere non e' riscrivere il dato.
-- **La rubrica**, i dieci criteri: sotto 14 su 20 non hai finito. Un articolo che
+- **La rubrica**, i dieci criteri: sotto 14 su 20 non hai finito, e il totale
+  non e' l'unica soglia. I criteri stanno su **quattro assi con un pavimento
+  ciascuno** (correttezza e onesta', leggibilita', tesi e struttura, mestiere), e
+  un asse sotto il pavimento boccia l'articolo anche se il totale e' alto: la
+  leggibilita' non si compra con l'accuratezza. Autovalutati asse per asse, mai
+  con una media sola. Un articolo che
   ripete la definizione e la classifica non e' sbagliato, e' vuoto. Da' al nut
   graf il suo paragrafo, converti un decimale nudo nella scala umana che il brief
   ha gia' calcolato, sostituisci la domanda retorica in chiusura con il punto. Il
