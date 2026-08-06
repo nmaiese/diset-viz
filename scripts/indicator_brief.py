@@ -212,7 +212,13 @@ def _common_endpoints(matrix, first_year, last_year):
         "first_avg": first_avg,
         "last_avg": last_avg,
         "change": last_avg - first_avg,
-        "gap_trend": last_gap - first_gap,
+        # Il divario ha bisogno di almeno due territori per esistere: su uno solo
+        # il massimo e il minimo sono lo stesso numero, e il brief avrebbe detto
+        # "divario ristretto di 0,00" su un campione che non ha dispersione da
+        # confrontare. Uno zero calcolato e uno zero vero si leggono uguale, e in
+        # un brief che e' la sola fonte dei numeri questo basta a farlo scrivere.
+        # La variazione della media invece su un territorio solo vale, ed e' vera.
+        "gap_trend": (last_gap - first_gap) if len(common) > 1 else None,
     }
 
 
@@ -712,12 +718,14 @@ def render(brief):
             add(f"  media {stats['year_min']} e {stats['year_max']} su basi diverse,"
                 f" confronto diretto non valido{note}")
             if common:
-                verb = "allargato" if common["gap_trend"] > 0 else "ristretto"
-                add(f"  sui {common['n']} territori presenti in entrambi gli anni: "
-                    f"{stats['year_min']}: {_num(common['first_avg'])}  ->  "
-                    f"{stats['year_max']}: {_num(common['last_avg'])}   "
-                    f"({_num(common['change'])} {meta['change_unit']}), "
-                    f"divario {verb} di {_num(abs(common['gap_trend']))}")
+                line = (f"  sui {common['n']} territori presenti in entrambi gli anni: "
+                        f"{stats['year_min']}: {_num(common['first_avg'])}  ->  "
+                        f"{stats['year_max']}: {_num(common['last_avg'])}   "
+                        f"({_num(common['change'])} {meta['change_unit']})")
+                if common["gap_trend"] is not None:
+                    verb = "allargato" if common["gap_trend"] > 0 else "ristretto"
+                    line += f", divario {verb} di {_num(abs(common['gap_trend']))}"
+                add(line)
             else:
                 add("  nessun territorio presente in entrambi gli anni: "
                     "il confronto di lungo periodo non si puo' fare")

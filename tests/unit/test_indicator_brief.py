@@ -94,6 +94,15 @@ class AnnualMeansBase(unittest.TestCase):
         self.assertAlmostEqual(common["first_avg"], 10.0)
         self.assertAlmostEqual(common["last_avg"], 14.0)
         self.assertAlmostEqual(common["change"], 4.0)
+        # Un territorio solo non ha dispersione: il divario non si calcola, e
+        # "ristretto di 0,00" sarebbe uno zero aritmetico che si legge come un
+        # fatto.
+        self.assertIsNone(common["gap_trend"])
+
+    def test_the_gap_needs_at_least_two_territories(self):
+        matrix = {"2020": {"a": 10.0, "b": 20.0}, "2022": {"a": 12.0, "b": 30.0}}
+        common = indicator_brief._common_endpoints(matrix, 2020, 2022)
+        self.assertAlmostEqual(common["gap_trend"], 8.0)   # da 10 a 18
 
     def test_no_shared_territory_is_no_comparison(self):
         matrix = {"2020": {"a": 1.0}, "2022": {"b": 2.0}}
