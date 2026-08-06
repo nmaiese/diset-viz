@@ -1,5 +1,6 @@
 ---
 title: "Speranza di vita per regione: quanto pesa il territorio"
+seo_title: "Speranza di vita per regione"
 slug: speranza-di-vita-regioni-2025
 description: "Nel 2025 in Trentino-Alto Adige si vive in media 84,8 anni, in Campania 82,1. Due anni e mezzo di differenza tra regioni italiane. I dati Istat."
 date: 2026-06-30

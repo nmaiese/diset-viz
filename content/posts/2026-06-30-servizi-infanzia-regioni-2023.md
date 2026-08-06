@@ -1,7 +1,8 @@
 ---
 title: "Asili e servizi per l'infanzia: quanti bambini coperti, regione per regione"
+seo_title: "Asili nido: la copertura per regione"
 slug: servizi-infanzia-regioni-2023
-description: "Nel 2023 in Friuli-Venezia Giulia il 40,5% dei bambini sotto i 3 anni usa un servizio per l'infanzia, in Calabria il 5,9%. Il divario di accesso. Dati Istat."
+description: "Nel 2023 in Friuli-Venezia Giulia il 40,5% dei bambini sotto i 3 anni usa un servizio per l'infanzia, in Calabria il 5,9%. Divario di accesso. Dati Istat."
 date: 2026-06-30
 author: "Redazione Divario Italia"
 cover: /static/img/blog/servizi-infanzia.svg

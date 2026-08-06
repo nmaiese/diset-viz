@@ -1,5 +1,6 @@
 ---
 title: "L'Italia che invecchia: l'indice di vecchiaia per regione nel 2026"
+seo_title: "L'indice di vecchiaia per regione"
 slug: italia-che-invecchia-indice-vecchiaia-2026
 description: "All'inizio del 2026 in Italia ci sono 233 anziani ogni 100 giovani. In Sardegna quasi 300, in Trentino-Alto Adige 168. La mappa dell'invecchiamento per regione."
 date: 2026-06-30
