@@ -82,6 +82,23 @@ class AnnualMeansBase(unittest.TestCase):
         self.assertEqual(means[0]["territories"], ["a", "b"])
         self.assertEqual(means[-1]["territories"], ["a", "c"])
 
+    def test_the_endpoints_are_compared_on_the_territories_they_share(self):
+        """La variazione sulle medie intere, quando le basi non coincidono, e' una
+        sottrazione fra popolazioni diverse: precisa e non valida, cioe' la cifra
+        piu' pericolosa che un brief possa stampare, perche' ha l'aria di essere
+        derivata. Sui territori comuni torna a voler dire qualcosa.
+        """
+        common = indicator_brief._common_endpoints(self.SCAMBIO, 2020, 2022)
+        self.assertEqual(common["n"], 1)              # solo `a` c'e' in entrambi
+        self.assertEqual(common["territories"], ["a"])
+        self.assertAlmostEqual(common["first_avg"], 10.0)
+        self.assertAlmostEqual(common["last_avg"], 14.0)
+        self.assertAlmostEqual(common["change"], 4.0)
+
+    def test_no_shared_territory_is_no_comparison(self):
+        matrix = {"2020": {"a": 1.0}, "2022": {"b": 2.0}}
+        self.assertIsNone(indicator_brief._common_endpoints(matrix, 2020, 2022))
+
     def test_the_same_count_is_not_the_same_base(self):
         """Il caso che un controllo sui soli numeri dichiarava confrontabile: due
         estremi con lo stesso `n` ma con un territorio entrato e uno uscito."""

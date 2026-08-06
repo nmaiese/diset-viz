@@ -180,6 +180,42 @@ def _means_lines(means):
     return lines
 
 
+def _common_endpoints(matrix, first_year, last_year):
+    """Il confronto primo-ultimo anno sui soli territori presenti in **entrambi**.
+
+    Serve quando le due basi non coincidono, ed e' l'unico modo di dare al
+    produttore una variazione di lungo periodo che sia vera. La media dei 19
+    territori del 2012 meno la media dei 19 del 2025 e' una sottrazione fra
+    popolazioni diverse: precisa e non valida, cioe' la cifra piu' pericolosa che
+    un brief possa stampare, perche' ha l'aria di essere derivata. Sui territori
+    comuni la sottrazione torna a voler dire qualcosa.
+
+    `None` quando l'intersezione e' vuota: li' non c'e' confronto da fare, e
+    dirlo e' meglio che stampare un numero.
+    """
+    first = {key: value for key, value in (matrix.get(str(first_year)) or {}).items()
+             if isinstance(value, (int, float))}
+    last = {key: value for key, value in (matrix.get(str(last_year)) or {}).items()
+            if isinstance(value, (int, float))}
+    common = sorted(set(first) & set(last))
+    if not common:
+        return None
+    first_values = [first[key] for key in common]
+    last_values = [last[key] for key in common]
+    first_avg = sum(first_values) / len(common)
+    last_avg = sum(last_values) / len(common)
+    first_gap = max(first_values) - min(first_values)
+    last_gap = max(last_values) - min(last_values)
+    return {
+        "n": len(common),
+        "territories": common,
+        "first_avg": first_avg,
+        "last_avg": last_avg,
+        "change": last_avg - first_avg,
+        "gap_trend": last_gap - first_gap,
+    }
+
+
 def _base_note(means, first_year, last_year):
     """Il richiamo alla base sul confronto primo-ultimo anno, quando i due anni
     non poggiano sugli stessi territori.
@@ -236,6 +272,11 @@ def build_brief(family, raw_id, level_key=None):
         "stats": stats,
         "rows": rows,
         "annual_means": annual_means,
+        # Il confronto primo-ultimo anno sui soli territori comuni: serve quando
+        # le due basi non coincidono, dove la variazione sulle medie intere e'
+        # una sottrazione fra popolazioni diverse.
+        "endpoints_common": _common_endpoints(
+            level["matrix"], stats["year_min"], stats["year_max"]),
         # Both keyed on the level actually being briefed. Without it, asking for
         # `--level provincia` printed the state of the *regional* article: on a
         # two-level BES the brief said "lead scritto, quadro scritto" while the
@@ -656,13 +697,33 @@ def render(brief):
     add("ANDAMENTO")
     if stats["has_multi_year"]:
         means = brief.get("annual_means") or []
-        add(f"  media {stats['year_min']}: {_num(stats['year_min_avg'])}  ->  "
-            f"{stats['year_max']}: {_num(stats['year_avg'])}   "
-            f"({_num(stats['avg_change_abs'])} {meta['change_unit']})"
-            + _base_note(means, stats["year_min"], stats["year_max"]))
+        note = _base_note(means, stats["year_min"], stats["year_max"])
+        common = brief.get("endpoints_common")
+        if not note:
+            add(f"  media {stats['year_min']}: {_num(stats['year_min_avg'])}  ->  "
+                f"{stats['year_max']}: {_num(stats['year_avg'])}   "
+                f"({_num(stats['avg_change_abs'])} {meta['change_unit']})")
+        else:
+            # Basi diverse ai due estremi: la variazione sulle medie intere e' una
+            # sottrazione fra popolazioni diverse, quindi **non si stampa**.
+            # Annotarla e lasciarla in pagina non basta: e' una cifra precisa e
+            # derivabile, cioe' quella che un articolo cita per prima. Al suo
+            # posto va il confronto sui territori comuni, che vuol dire qualcosa.
+            add(f"  media {stats['year_min']} e {stats['year_max']} su basi diverse,"
+                f" confronto diretto non valido{note}")
+            if common:
+                verb = "allargato" if common["gap_trend"] > 0 else "ristretto"
+                add(f"  sui {common['n']} territori presenti in entrambi gli anni: "
+                    f"{stats['year_min']}: {_num(common['first_avg'])}  ->  "
+                    f"{stats['year_max']}: {_num(common['last_avg'])}   "
+                    f"({_num(common['change'])} {meta['change_unit']}), "
+                    f"divario {verb} di {_num(abs(common['gap_trend']))}")
+            else:
+                add("  nessun territorio presente in entrambi gli anni: "
+                    "il confronto di lungo periodo non si puo' fare")
         for line in _means_lines(means):
             add(line)
-        if stats["gap_trend"] is not None:
+        if not note and stats["gap_trend"] is not None:
             verb = "allargato" if stats["gap_trend"] > 0 else "ristretto"
             add(f"  il divario si e {verb} di {_num(abs(stats['gap_trend']))} {meta['change_unit']}")
         if stats["highest_delta"]:
@@ -747,6 +808,7 @@ def main(argv=None):
             # riceve la stessa cosa del testo, denominatore compreso, e non deve
             # ricalcolarsi la comparabilita' da se'.
             "annual_means": brief["annual_means"],
+            "endpoints_common": brief["endpoints_common"],
             "breaks": brief["breaks"],
             "against_the_grain": brief["against_the_grain"],
             "annual_change": brief["level"]["annual_change"],
