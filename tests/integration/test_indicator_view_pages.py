@@ -14,6 +14,7 @@ on every edit-save cycle.
 """
 
 import json
+import re
 import unittest
 from pathlib import Path
 
@@ -70,6 +71,29 @@ class EveryIndicatorPageRenders(unittest.TestCase):
                 if f'id="sezione-{role}"' not in html:
                     missing.append((indicator_id, role))
         self.assertEqual(missing, [], f"pages missing an article section: {missing[:10]}")
+
+    def test_the_historical_series_is_server_rendered_as_a_table(self):
+        """Il grafico di trend e' uno <svg> riempito da JS: senza JavaScript il
+        lettore e il crawler perderebbero la serie. La tabella-serie la porta a
+        tutti, un anno per riga, e per una serie a un solo anno non compare."""
+        multi = self._get("920").get_data(as_text=True)  # eta media, serie lunga
+        self.assertIn('class="trend-table"', multi)
+        rows = re.findall(r'<tr><th scope="row">(\d{4})</th><td>[^<]+</td>', multi)
+        self.assertGreater(len(rows), 5)
+        self.assertEqual(rows, sorted(rows))  # in ordine di anno
+
+    def test_the_markdown_representation_carries_the_series_too(self):
+        """Un agente che chiede `text/markdown` e' il lettore senza JavaScript per
+        definizione, quindi la rappresentazione alternativa non puo' essere
+        l'unica vista della pagina priva della serie storica."""
+        body = self.client.get(
+            "/indicatore/eta-media-della-popolazione/ter-920",
+            headers={"Accept": "text/markdown"}, follow_redirects=True,
+        ).get_data(as_text=True)
+        self.assertIn("## Serie storica, media delle regioni per anno", body)
+        years = re.findall(r"^\| (\d{4}) \| [-\d.,]+ \|$", body, flags=re.MULTILINE)
+        self.assertGreater(len(years), 5)
+        self.assertEqual(years, sorted(years))
 
     def test_question_navigation_points_to_visible_answers(self):
         response = self._get("920")

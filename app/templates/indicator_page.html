@@ -275,6 +275,24 @@
             <div class="indicator-explore__tip" data-explore="trend-tip" hidden></div>
           </div>
         </figure>
+        {# La stessa serie in tabella, server-rendered: il grafico e' uno <svg>
+           riempito da JS, quindi senza JavaScript il lettore (e il crawler)
+           perderebbe la serie storica. La tabella la porta a tutti, chiusa di
+           default per non affollare, ma sempre nel DOM. #}
+        {% if level.annual_means | length > 1 %}
+        <details class="trend-table">
+          <summary>Serie storica in tabella</summary>
+          <table>
+            <caption class="sr-only">Media delle {{ level.plural }} per anno, dal {{ level.year_min }} al {{ level.year_max }}, in {{ meta.value_unit }}</caption>
+            <thead><tr><th scope="col">Anno</th><th scope="col">Media delle {{ level.plural }} ({{ meta.value_unit }})</th></tr></thead>
+            <tbody>
+              {% for point in level.annual_means %}
+              <tr><th scope="row">{{ point.year }}</th><td>{{ point.avg | it_num(2) }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </details>
+        {% endif %}
       </article>
     </div>
   </section>
