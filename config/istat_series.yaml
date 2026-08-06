@@ -78,6 +78,116 @@ series:
     theme: Indicatori demografici (Istat)
     quality_life_category: salute_cura
     direction: contextual
+  # Ammesse 2026-08-05: stesso dataflow pilota DCIS_INDDEMOG1, tre serie non
+  # ancora cablate fra i 23 DATA_TYPE della availableconstraint di questa
+  # dataflow version. LIFEEXP65M/F estendono la speranza di vita gia in
+  # catalogo (910-913 nel backbone territoriale) allo split per sesso a 65
+  # anni, che oggi esiste solo come totale (913): stessa logica di 910->911/912
+  # per la nascita. Direzione verificata contro il dato vero (vedi
+  # data/discovery/curation.csv): in cima Trentino Alto Adige, Umbria, Veneto,
+  # in fondo Campania, Molise, Sicilia, Calabria, lo stesso schema Nord-Sud di
+  # tutte le altre speranze di vita gia pubblicate. POP65OVER (quota di
+  # popolazione 65+) e' invece contextual: un valore alto riflette struttura
+  # per eta', non un vantaggio, stessa ragione di BIRTHRATE/OLDAGEDEPR.
+  - id: LIFEEXP65M
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Speranza di vita a 65 anni (maschi) (Istat, regioni)
+    unit: anni
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: higher_better
+  - id: LIFEEXP65F
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Speranza di vita a 65 anni (femmine) (Istat, regioni)
+    unit: anni
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: higher_better
+  - id: POP65OVER
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Quota di popolazione 65 anni e più (Istat, regioni)
+    unit: "%"
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
+  # Ammesse 2026-08-05, stesso giro delle tre sopra: altri sette DATA_TYPE
+  # della stessa availableconstraint, tutti contextual per la stessa ragione
+  # di POP65OVER/BIRTHRATE (quote di struttura o tassi compositi, nessun verso
+  # onesto). POP014/POP1564 completano il trio di struttura per eta' con
+  # POP65OVER. GROWTHRATET risultava "proxy" di 203 (Tasso di attivita'
+  # femminile) per solo overlap lessicale su "tasso"/"popolazione": dominio
+  # diverso, corretto a new. MEANAGECH risultava "proxy" di 920 (Eta' media
+  # della popolazione) per overlap su "eta' media": 920 e' la popolazione
+  # intera, questa e' l'eta' delle sole madri al parto, corretto a new.
+  - id: POP014
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Quota di popolazione 0-14 anni (Istat, regioni)
+    unit: "%"
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
+  - id: POP1564
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Quota di popolazione 15-64 anni (Istat, regioni)
+    unit: "%"
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
+  - id: NMIGRATEAB
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Saldo migratorio con l'estero (Istat, regioni)
+    unit: per mille abitanti
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
+  - id: MARRATE
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Tasso di nuzialità (Istat, regioni)
+    unit: per mille abitanti
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
+  - id: GROWTHRATEN
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Crescita naturale della popolazione (Istat, regioni)
+    unit: per mille abitanti
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
+  - id: GROWTHRATET
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Tasso di crescita totale della popolazione (Istat, regioni)
+    unit: per mille abitanti
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
+  - id: MEANAGECH
+    dataflow: 22_293_DF_DCIS_INDDEMOG1_1
+    dsd_label: DCIS_INDDEMOG1
+    name: Età media della madre al parto (Istat, regioni)
+    unit: anni
+    decimals: 1
+    theme: Indicatori demografici (Istat)
+    quality_life_category: salute_cura
+    direction: contextual
   # Ammessa dallo stadio admissions (2026-07-28). Offerta di assistenza
   # residenziale (posti letto), distinta dagli OSPITI gia in catalogo
   # (occupazione). DATA_TYPE=75 = "posti letto operativi per 100.000 residenti"
