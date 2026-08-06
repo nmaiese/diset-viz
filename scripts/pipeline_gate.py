@@ -55,6 +55,7 @@ from scripts import (  # noqa: E402  (path bootstrap above)
     curate,
     discovery,
     indicator_store,
+    reading_queue,
     verification_queue,
 )
 
@@ -84,6 +85,11 @@ RUN_JOURNAL = "data/pipeline/runs/"
 # Il registro delle verifiche. Sta nel perimetro del solo verificatore, ed e'
 # tutto quello che quello stadio produce.
 VERIFICATIONS = "data/pipeline/verifiche/"
+# Il registro delle letture. Sta nel perimetro del solo reader-editor, ed e'
+# tutto quello che quel ruolo produce: un verdetto di leggibilita' per articolo,
+# gemello del registro delle verifiche e protetto allo stesso modo (append-only,
+# righe credibili, impronta che combacia con un testo reale).
+READINGS = "data/pipeline/letture/"
 
 # What each stage is allowed to change. Anything outside its list is a failure,
 # not a warning: the point of the list is that a prompt cannot widen it.
@@ -106,6 +112,12 @@ STAGE_PATHS = {
     # parola del revisore sul lavoro del revisore. Le smentite tornano al revisore
     # come il segnale `smentita` di `review_queue`, che le legge da qui.
     "verificatore": (VERIFICATIONS, RUN_JOURNAL),
+    # Il reader-editor, gemello del verificatore su un altro asse. Il perimetro
+    # e' la stessa forma: il suo registro e il diario, niente `content/indicators/`
+    # (non porta l'Edit, non ripara), niente firma. La sua bocciatura non blocca
+    # il merge di nessuno: torna al produttore come il flag `leggibilita` della
+    # coda, non come un cancello.
+    "reader-editor": (READINGS, RUN_JOURNAL),
     # I due ruoli della ri-architettura per-indicatore. Nascono qui accanto ai
     # vecchi stadi: il perimetro e' l'unione di quelli che fondono, perche' un
     # ruolo porta un indicatore da grezzo a pubblicato in una sola run. Restano
@@ -175,6 +187,10 @@ MERGE_POLICY = {
     # locale gira la suite e gli invarianti prima del merge.
     "producer": "auto",
     "admissions": "auto",
+    # `auto` come tutti: il `soft` del reader-editor e' il suo verdetto che non
+    # blocca il produttore, non il merge della sua run, che passa dal cancello
+    # locale come ogni altra.
+    "reader-editor": "auto",
 }
 
 # Borrowed, not restated. A local copy drifted from `curate.SCOREABLE_DIRECTIONS`
@@ -623,7 +639,13 @@ def check_verifications(base=None, cwd=None, include_worktree=True):
             f"{', '.join(sorted(r.get('code') or '?' for r in removed)[:5])}. "
             "Per superare una verifica si riscrive l'articolo, non la sua riga.",
         )
-    rows = _verification_rows_added(base, cwd=cwd, include_worktree=include_worktree)
+    rows, unreadable = _rows_added(VERIFICATIONS, base, cwd=cwd, include_worktree=include_worktree)
+    if unreadable:
+        return Check(
+            "verifiche", False,
+            f"schegge illeggibili fra quelle aggiunte: {', '.join(unreadable[:5])}. "
+            "Riscrivile con verification_queue invece che a mano.",
+        )
     if not rows:
         return Check("verifiche", True, "nessuna verifica nuova da controllare")
 
@@ -713,16 +735,121 @@ def _verification_rows_removed(base=None, cwd=None, include_worktree=True):
     return rows
 
 
-def _verification_rows_added(base=None, cwd=None, include_worktree=True):
-    """Le verifiche che questo branch aggiunge, gia' interpretate."""
-    rows = []
-    for path in _touched_under(VERIFICATIONS, base, cwd=cwd, include_worktree=include_worktree)["added"]:
+def _rows_added(directory, base=None, cwd=None, include_worktree=True):
+    """Le righe che questo branch aggiunge sotto `directory`, gia' interpretate,
+    **piu'** i file che non si e' riusciti a interpretare.
+
+    Le due liste tornano insieme di proposito, ed e' la correzione di un buco che
+    i due registri (verifiche e letture) avevano uguale: un file troncato, malformato
+    o che non e' un oggetto JSON veniva saltato in silenzio. Una run che ne aggiunge
+    uno solo arrivava percio' al cancello senza righe da controllare, il cancello
+    diceva "nessuna nuova da controllare" col verde, e la scheggia veniva fusa lo
+    stesso: illeggibile per la coda, che continua a considerare quell'articolo da
+    fare e a rilanciarlo, e invisibile per chiunque legga il registro. Chi chiama
+    deve poter bocciare cio' che non sa leggere, e per farlo deve saperlo.
+    """
+    rows, unreadable = [], []
+    for path in _touched_under(directory, base, cwd=cwd, include_worktree=include_worktree)["added"]:
         try:
             data = json.loads((_root_for(cwd) / path).read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
+        except (OSError, json.JSONDecodeError) as exc:
+            unreadable.append(f"{path} ({type(exc).__name__})")
             continue
         if isinstance(data, dict):
             rows.append(data)
+        else:
+            unreadable.append(f"{path} (non e' un oggetto JSON)")
+    return rows, unreadable
+
+
+def check_readings(base=None, cwd=None, include_worktree=True):
+    """Il reader-editor consegna un verdetto, quindi il verdetto deve reggere.
+
+    La stessa forma di `check_verifications`, sull'altro registro: il reader-editor
+    e' gemello del verificatore e il suo registro va protetto uguale. Append-only
+    prima di tutto (togliere o riscrivere una lettura passata cambia in silenzio
+    che cosa un lettore aveva giudicato), poi righe credibili
+    (`reading_queue.row_problems`: verdetto noto, criteri in 0-2, coerenza fra
+    verdetto e criteri/fallimenti), poi l'impronta che deve corrispondere a un
+    testo che questo repo ha davvero avuto, adesso o alla base. Una lettura su
+    un'impronta che non combacia con niente sarebbe una lettura di un testo che
+    non e' in pagina, e la coda la scarterebbe in silenzio.
+    """
+    resolved = resolve_base(base, cwd=cwd)
+    removed = _reading_rows_removed(base, cwd=cwd, include_worktree=include_worktree)
+    if removed:
+        return Check(
+            "letture", False,
+            f"il registro e' append-only e questa run ne toglie o riscrive "
+            f"{len(removed)} righe: "
+            f"{', '.join(sorted(r.get('code') or '?' for r in removed)[:5])}. "
+            "Per superare una lettura si riscrive l'articolo, non la sua riga.",
+        )
+    rows, unreadable = _rows_added(READINGS, base, cwd=cwd, include_worktree=include_worktree)
+    if unreadable:
+        return Check(
+            "letture", False,
+            f"schegge illeggibili fra quelle aggiunte: {', '.join(unreadable[:5])}. "
+            "Scrivile con reading_queue.write_reading invece che a mano.",
+        )
+    if not rows:
+        return Check("letture", True, "nessuna lettura nuova da controllare")
+
+    problems = []
+    for row in rows:
+        for problem in reading_queue.row_problems(row):
+            problems.append(f"{row.get('code') or '?'}: {problem}")
+    if problems:
+        return Check("letture", False, "; ".join(problems[:5]))
+
+    fingerprints = _prose_fingerprints(rows, resolved, cwd=cwd)
+    if not fingerprints:
+        return Check("letture", False, "testi illeggibili, impossibile verificare le impronte")
+
+    known_codes = {code for code, _level, _hash in fingerprints}
+    known_pairs = {(code, level) for code, level, _hash in fingerprints}
+    orphans, wrong_level, drifted = [], [], []
+    for row in rows:
+        code = (row.get("code") or "").strip()
+        level = (row.get("level") or "").strip()
+        if code not in known_codes:
+            orphans.append(code)
+        elif (code, level) not in known_pairs:
+            wrong_level.append(f"{code} (livello {level!r})")
+        elif (code, level, (row.get("prosa") or "").strip()) not in fingerprints:
+            drifted.append(code)
+    if orphans:
+        return Check("letture", False,
+                     f"letture su articoli che non esistono: {', '.join(orphans[:5])}")
+    if wrong_level:
+        return Check(
+            "letture", False,
+            f"livello che non corrisponde all'articolo: {', '.join(wrong_level[:5])}. "
+            "La coda unisce su (codice, livello), quindi questa riga non coprirebbe niente.",
+        )
+    if drifted:
+        return Check(
+            "letture", False,
+            f"impronta della prosa che non corrisponde a nessuna versione di "
+            f"{', '.join(drifted[:5])}, ne' quella di adesso ne' quella della base. "
+            "Ricalcolala con reading_queue.prose_fingerprint invece di scriverla.",
+        )
+
+    revise = sum(1 for r in rows if (r.get("verdict") or "").strip() == "revise")
+    return Check("letture", True, f"{len(rows)} letture, {revise} da riscrivere")
+
+
+def _reading_rows_removed(base=None, cwd=None, include_worktree=True):
+    """Le letture della base che questo branch ha tolto o riscritto."""
+    resolved = resolve_base(base, cwd=cwd)
+    if not resolved:
+        return []
+    touched = _touched_under(READINGS, base, cwd=cwd, include_worktree=include_worktree)
+    rows = []
+    for path in touched["gone"] + touched["changed"]:
+        old = _read_json_at(resolved, path, cwd=cwd)
+        if isinstance(old, dict):
+            rows.append(old)
     return rows
 
 
@@ -1041,6 +1168,8 @@ def invariant_labels(stage, paths):
             labels.append("signature")
     if touched(VERIFICATIONS):
         labels.append("verifications")
+    if touched(READINGS):
+        labels.append("readings")
     return labels
 
 
@@ -1076,6 +1205,7 @@ def run(stage, base=None, skip_tests=False, cwd=None, committed_only=False):
         "vintage": lambda: check_writer_vintage(base, cwd=cwd, include_worktree=iw),
         "signature": lambda: check_reviewer_signature(base, cwd=cwd, include_worktree=iw),
         "verifications": lambda: check_verifications(base, cwd=cwd, include_worktree=iw),
+        "readings": lambda: check_readings(base, cwd=cwd, include_worktree=iw),
     }
     for label in invariant_labels(stage, paths):
         checks.append(builders[label]())
