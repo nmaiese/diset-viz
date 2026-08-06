@@ -134,7 +134,12 @@ ATTENTION = {"blocked", "stopped", "error"}
 # ha promosso niente e su `promoter` se ha promosso, quindi ci si aspetta una
 # riga dall'uno **o** dall'altro, mai da tutti e due.
 WATCH_GROUPS = (
-    ("lanciatore", ("launch", "admissions", "producer"), 1),
+    # Il reader-editor sta qui con gli altri ruoli che il lanciatore lancia:
+    # `queue_sizes()` non produce una chiave sua (la sua coda e' l'assenza di
+    # letture, non uno stadio contato), e la sua cadenza e' da arretrato, non
+    # giornaliera, quindi un gruppo a coda piena lo segnalerebbe fermo ogni volta
+    # che non c'e' niente da leggere.
+    ("lanciatore", ("launch", "admissions", "producer", "reader-editor"), 1),
     ("scout", ("scout",), 7),
     ("cacciatore", ("hunter", "promoter"), 7),
     ("curatore", ("curator",), 7),

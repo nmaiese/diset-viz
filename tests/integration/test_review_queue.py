@@ -76,6 +76,49 @@ class RiskFlags(unittest.TestCase):
         self.assertEqual(self.flags("La Sardegna ha guadagnato 11,00 punti in dieci anni."), {})
 
 
+class AReadabilityRevisionGoesBackToTheProducer(unittest.TestCase):
+    """Il flag `leggibilita` dal reader-editor: un asse diverso dai sospetti di
+    falsita', e come la smentita deve invalidare la firma, o il produttore non
+    riscriverebbe mai un articolo firmato ma illeggibile."""
+
+    def _signed(self):
+        return {
+            "lead": "Un lead.",
+            "sections": [{"role": "quadro", "h": None, "body": "Il quadro."}],
+            "reviewed_at": "2026-07-27", "vintage": 2024, "reviewed_vintage": 2024,
+        }
+
+    def test_a_hard_failure_uses_the_grave_flag_and_reopens_the_article(self):
+        entry = self._signed()
+        readings = {("ter-178", "regione"): (True, ["numeric_overload"])}
+        row = review_queue.assess("178", entry, _view(), definitions={},
+                                  refutations={}, readings=readings)
+        self.assertIn("leggibilita_grave", row["flags"])
+        self.assertNotIn("leggibilita", row["flags"])
+        self.assertGreater(row["score"], 0, "una bocciatura di leggibilita' riapre l'articolo")
+        self.assertEqual(row["reviewed_at"], "", "la firma non vale piu'")
+
+    def test_a_soft_revise_uses_the_light_flag(self):
+        entry = self._signed()
+        readings = {("ter-178", "regione"): (False, ["poco leggibile"])}
+        row = review_queue.assess("178", entry, _view(), definitions={},
+                                  refutations={}, readings=readings)
+        self.assertIn("leggibilita", row["flags"])
+        self.assertNotIn("leggibilita_grave", row["flags"])
+
+    def test_the_grave_flag_outranks_the_soft_one_and_sits_below_a_refutation(self):
+        W = review_queue.FLAG_WEIGHT
+        self.assertGreater(W["leggibilita_grave"], W["leggibilita"])
+        self.assertGreater(W["smentita"], W["leggibilita_grave"])
+        self.assertGreater(W["definizione"], W["leggibilita_grave"])
+        self.assertGreater(W["leggibilita"], W["eco"])
+
+    def test_without_a_revision_a_signed_article_stays_out(self):
+        row = review_queue.assess("178", self._signed(), _view(), definitions={},
+                                  refutations={}, readings={})
+        self.assertEqual(row["score"], 0)
+
+
 # The definitions are passed in everywhere above so these tests keep saying what
 # they were written to say. Here they are the subject, so they are supplied.
 DEFINITIONS = {

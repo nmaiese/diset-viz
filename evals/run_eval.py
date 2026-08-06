@@ -53,6 +53,19 @@ un campo "verdict" vuoto. Giudica ciascuna contro il brief congelato in
 confermata, smentita, non_verificabile. Sii avversariale: la domanda e' "posso
 farla cadere?", non "sembra plausibile?". Non modificare nient'altro del file.
 Poi misura: python3 evals/score_eval.py verifier evals/out/verifier/claims.json""",
+    "reader-editor": """\
+In evals/out/reader-editor/cases.json ci sono articoli indicatore congelati,
+ognuno col campo "verdict" vuoto e la prosa (lead piu' sezioni) dentro il caso.
+Giudica la LEGGIBILITA' di ognuno CONTRO LA PROSA CONGELATA nel caso, mai contro
+la pagina viva, i dati o il web (questa e' una eval, non una run): un lettore
+comune, non tecnico, capisce l'articolo al primo passaggio? Applica gli otto
+criteri e i fallimenti duri di .claude/agents/reader-editor.md, tenendo gli assi
+separati (mai una media unica), e ricorda che NON giudichi i fatti (li verifica
+un altro) ne' i tic (li prende prose_lint): solo se si legge. Riempi "verdict"
+con uno di: pass, revise. Un `revise` ha almeno un criterio sotto il 2 o un
+fallimento duro; un `pass` non porta fallimenti duri. Non modificare
+nient'altro del file.
+Poi misura: python3 evals/score_eval.py reader-editor evals/out/reader-editor/cases.json""",
     "admissions": """\
 In evals/out/admissions/cases.json ci sono casi di triage dell'ammissione,
 ognuno con un campo "verdict" vuoto. Ogni caso ha in "caso" TUTTI i fatti che
@@ -100,6 +113,26 @@ def prepare(name):
             row.pop("label", None)
             row.pop("classe", None)
             row.pop("why", None)
+            row["verdict"] = ""
+        (workdir / "cases.json").write_text(
+            json.dumps(gold, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+    elif name == "reader-editor":
+        import json
+
+        gold = json.loads((EVALS / "reader-editor" / "cases.json").read_text(encoding="utf-8"))
+        # Via il blocco `_`: e' commento per chi legge il gold, e se descrive quali
+        # casi siano revise (il primo `_` lo faceva) regala all'agente le risposte.
+        gold.pop("_", None)
+        for row in gold["cases"]:
+            row.pop("label", None)
+            row.pop("why", None)
+            # Via anche il `code`: per i casi reali e' l'id pubblico dell'articolo,
+            # e uno (eur-rd_p_persreg) e' nominato come esempio-revise nelle
+            # istruzioni stesse del reader-editor, quindi il codice tradirebbe la
+            # risposta. L'agente giudica la prosa, non il codice; lo score unisce
+            # su `id`, che resta.
+            row.pop("code", None)
             row["verdict"] = ""
         (workdir / "cases.json").write_text(
             json.dumps(gold, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

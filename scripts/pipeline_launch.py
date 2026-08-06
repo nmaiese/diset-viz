@@ -69,12 +69,16 @@ AGENT_OF_ROLE = {
     "admissions": "admissions",
     "producer": "producer",
     "verificatore": "indicator-verifier",
+    "reader-editor": "reader-editor",
 }
 
 # L'ordine di precedenza dei ruoli, a monte prima, come la catena: rompe solo i
 # pari merito di priorita'. Una smentita (priorita' 100) scavalca comunque tutto
-# perche' l'ordinamento e' prima sulla priorita'.
-ROLE_ORDER = ("admissions", "producer", "verificatore")
+# perche' l'ordinamento e' prima sulla priorita'. Il reader-editor sta PRIMA del
+# verificatore di proposito: se un indicatore e' insieme da leggere e da
+# verificare, leggerlo prima evita di sprecare una verifica su un testo che una
+# bocciatura di leggibilita' fara' riscrivere (l'hint d'ordine del piano).
+ROLE_ORDER = ("admissions", "producer", "reader-editor", "verificatore")
 
 # Le code pre-pratica che accendono l'ammissione ma non sono indicatori nel
 # dossier: proposte di fonti (scout), candidati da triare (hunter), approvati da
@@ -100,15 +104,18 @@ def _admissions_reason(batch, proposte=0):
     return "coda ammissione, " + ", ".join(parts) if parts else "coda ammissione"
 
 
-def plan_launches(dossier, queues=None, mint=None):
+def plan_launches(dossier, queues=None, mint=None, readings=None):
     """La lista prioritizzata di lanci, dai soli artefatti gia' letti.
 
     `dossier` e' l'uscita di `practice_timeline.reconstruct()`/`load_real()`:
     `{indicator_id: dossier}`. `queues` sono le dimensioni delle code
     (`pipeline_status.queue_sizes()`), da cui si legge il lavoro pre-pratica
-    dell'ammissione (le proposte di fonti non sono indicatori). `mint(role)` conia
-    il `run_id`, iniettato cosi' il nucleo resta puro e un test lo prova con un
-    dossier sintetico e un contatore finto.
+    dell'ammissione (le proposte di fonti non sono indicatori). `readings` sono le
+    righe di `reading_queue.build_queue()`: da qui nascono i lanci del
+    reader-editor (i pubblicati non ancora letti) e i lanci di riscrittura per
+    leggibilita' del produttore (i bocciati), SENZA passare da `ready_stage`, che
+    e' terminale su `pubblicata`. `mint(role)` conia il `run_id`, iniettato cosi'
+    il nucleo resta puro.
 
     Ritorna una lista di voci di lancio ordinate per priorita' decrescente, ogni
     voce con `role`, `agent`, `indicator` (None per l'ammissione batch), `scope`,
@@ -116,6 +123,7 @@ def plan_launches(dossier, queues=None, mint=None):
     """
     mint = mint or (lambda role: "")
     queues = queues or {}
+    readings = readings or []
     adm_batch = {stage: queues.get(stage) for stage in ADMISSIONS_QUEUES}
 
     adm_priorities = []
@@ -155,6 +163,12 @@ def plan_launches(dossier, queues=None, mint=None):
             "run_id": mint("admissions"),
         })
 
+    # `producer_codes` raccoglie gli indicatori che gia' hanno un produttore in
+    # questo tick, per non lanciarne due sullo stesso (il lanciatore non deduplica
+    # le run in volo, quindi il doppione va evitato almeno entro il tick). Serve a
+    # due sorgenti di produttore: la coda di `ready_stage` qui sotto e le
+    # bocciature di leggibilita' subito dopo.
+    producer_codes = set()
     for code, stage, priority in producer_items:
         launches.append({
             "role": "producer",
@@ -163,6 +177,32 @@ def plan_launches(dossier, queues=None, mint=None):
             "scope": "indicatore",
             "priority": priority,
             "reason": f"{code} pronto per il produttore (stadio d'ingresso {stage})",
+            "run_id": mint("producer"),
+        })
+        producer_codes.add(code)
+
+    # Le bocciature di leggibilita' (`revise`, gia' senza i parcheggiati per il
+    # freno K-round di reading_queue) tornano al produttore come una riscrittura.
+    # Dedup per indicatore contro la coda di `ready_stage`: un indicatore gia' in
+    # produzione per un altro motivo (un vintage scaduto) riscrivera' comunque, e
+    # un secondo lancio sarebbe il doppione che il lanciatore non sa evitare da se'.
+    for row in readings:
+        if row.get("status") != "revise":
+            continue
+        key = row.get("key")
+        if key in producer_codes:
+            continue
+        producer_codes.add(key)
+        d = (dossier or {}).get(key) or {}
+        priority = float(d.get("priority", 0.0) or 0.0)
+        grave = " (fallimento duro)" if row.get("hard_failures") else ""
+        launches.append({
+            "role": "producer",
+            "agent": AGENT_OF_ROLE["producer"],
+            "indicator": key,
+            "scope": "indicatore",
+            "priority": priority,
+            "reason": f"{row.get('code')} bocciato dal reader-editor per leggibilita'{grave}",
             "run_id": mint("producer"),
         })
 
@@ -177,6 +217,29 @@ def plan_launches(dossier, queues=None, mint=None):
             "run_id": mint("verificatore"),
         })
 
+    # I pubblicati che nessun reader-editor ha ancora letto sulla prosa di adesso.
+    # Non passano da `ready_stage` (terminale su `pubblicata`): la loro coda e'
+    # l'assenza di una lettura, letta qui. Salta gli indicatori che in questo tick
+    # hanno gia' un produttore: stanno per essere riscritti, leggerli ora e'
+    # sprecato (l'impronta cambiera' e la lettura scadrebbe subito).
+    for row in readings:
+        if row.get("status") != "unread":
+            continue
+        key = row.get("key")
+        if key in producer_codes:
+            continue
+        d = (dossier or {}).get(key) or {}
+        priority = float(d.get("priority", 0.0) or 0.0)
+        launches.append({
+            "role": "reader-editor",
+            "agent": AGENT_OF_ROLE["reader-editor"],
+            "indicator": key,
+            "scope": "indicatore",
+            "priority": priority,
+            "reason": f"{row.get('code')} pubblicato, nessuna lettura di leggibilita'",
+            "run_id": mint("reader-editor"),
+        })
+
     launches.sort(key=lambda item: (-item["priority"],
                                     ROLE_ORDER.index(item["role"]),
                                     item["indicator"] or ""))
@@ -188,10 +251,11 @@ def load_plan(today=""):
 
     La meta' con l'IO, tenuta fuori da `plan_launches` cosi' il nucleo resta
     provabile senza disco."""
-    from scripts import pipeline_log, pipeline_status
+    from scripts import pipeline_log, pipeline_status, reading_queue
     dossier = practice_timeline.load_real(today=today)
     queues = pipeline_status.queue_sizes()
-    return plan_launches(dossier, queues, mint=pipeline_log.new_run_id)
+    readings = reading_queue.build_queue()
+    return plan_launches(dossier, queues, mint=pipeline_log.new_run_id, readings=readings)
 
 
 def log_tick(launches, runner=None, do_commit=True, log=print):
@@ -226,15 +290,43 @@ def log_tick(launches, runner=None, do_commit=True, log=print):
     return entry
 
 
-def cap_for_tick(launches, *, max_parallel=3, top=None):
+def cap_for_tick(launches, *, max_parallel=3, top=None, reserve_reader=1):
     """Le voci che il lanciatore lancia in un solo tick.
 
     Il piano e' gia' ordinato per priorita', quindi prendere le prime
     `max_parallel` tiene il parallelismo basso senza mai tagliare la voce piu'
     urgente (una smentita pubblica, peso 100, sta in testa e resta). `top` e' un
-    override esplicito di visualizzazione; un cap di 0 (o None) non taglia."""
+    override esplicito di visualizzazione; un cap di 0 (o None) non taglia.
+
+    Uno slot e' pero' riservato al reader-editor (`reserve_reader`, default 1). Le
+    letture ereditano la priorita' del dossier, che per un articolo gia' pubblicato
+    e' alta: senza riserva monopolizzerebbero il tick e fermerebbero il lavoro
+    fattuale (produrre, verificare) per tutto lo smaltimento dell'arretrato. Con la
+    riserva l'arretrato di lettura drena di una voce a tick e gli altri due slot
+    restano al lavoro fattuale. Un reader-editor e' un critico `soft`: cammina
+    accanto alla catena, non le passa davanti. Se non c'e' lavoro fattuale gli slot
+    liberi si riempiono di letture; se non c'e' lettura, la riserva non toglie
+    niente."""
     cap = top if top is not None else (max_parallel or None)
-    return launches[:cap] if cap else launches
+    if not cap:
+        return launches
+    if top is not None:
+        # Override esplicito di visualizzazione: la testa del piano com'e', senza
+        # riserva (chi lo chiede vuole vedere l'ordine vero).
+        return launches[:cap]
+    readers = [item for item in launches if item.get("role") == "reader-editor"]
+    others = [item for item in launches if item.get("role") != "reader-editor"]
+    keep_readers = readers[:min(reserve_reader, cap)]
+    keep_others = others[:cap - len(keep_readers)]
+    chosen = keep_others + keep_readers
+    if len(chosen) < cap:
+        # Una delle due sponde e' finita: riempi con l'altra, in ordine.
+        pool = readers[len(keep_readers):] + others[len(keep_others):]
+        chosen += pool[:cap - len(chosen)]
+    chosen.sort(key=lambda item: (-item["priority"],
+                                  ROLE_ORDER.index(item["role"]),
+                                  item.get("indicator") or ""))
+    return chosen
 
 
 def main(argv=None):
