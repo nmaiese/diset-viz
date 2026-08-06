@@ -1,5 +1,6 @@
 ---
 title: "Disoccupazione di lunga durata per regione: il divario Nord-Sud"
+seo_title: "Disoccupazione di lunga durata per regione"
 slug: disoccupazione-lunga-durata-regioni-2024
 description: "Nel 2024 la disoccupazione di lunga durata va dallo 0,5% del Trentino-Alto Adige all'11,0% della Campania. Oltre venti volte. I dati Istat per regione."
 date: 2026-06-30

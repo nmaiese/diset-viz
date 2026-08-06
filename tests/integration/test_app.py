@@ -1048,8 +1048,18 @@ class AppSmokeTest(unittest.TestCase):
         paths = (
             "/quiz/chi-e-maggiore",
             "/quiz/ordina",
+            "/quiz",
+            "/quiz/indovina-la-regione",
             "/qualita-della-vita/classifica/regioni",
+            "/qualita-della-vita/classifica/province?profilo=accessibilita",
+            "/qualita-della-vita/classifica/regioni?profilo=accessibilita",
             "/blog/divario-turistico-nord-sud-2024",
+            "/blog/divario-genere-occupazione-regioni-2024",
+            "/blog/servizi-infanzia-regioni-2023",
+            # Longest region/theme names in the catalog: the tightest budget fits.
+            "/regione/friuli-venezia-giulia",
+            "/regione/trentino-alto-adige",
+            "/tema/reddito-inclusione-e-accessibilita",
         )
         for path in paths:
             response = client.get(path)

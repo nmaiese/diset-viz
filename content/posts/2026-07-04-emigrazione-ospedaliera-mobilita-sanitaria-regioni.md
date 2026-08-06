@@ -1,5 +1,6 @@
 ---
 title: "Emigrazione ospedaliera: la mobilità sanitaria regione per regione"
+seo_title: "Emigrazione ospedaliera per regione"
 description: "Nel 2023 il 32,6% dei ricoveri dei molisani è avvenuto in un'altra regione, oltre sei volte la Lombardia: la mobilità sanitaria vista con i dati Istat."
 slug: emigrazione-ospedaliera-mobilita-sanitaria-regioni
 date: 2026-07-04

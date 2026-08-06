@@ -1,5 +1,6 @@
 ---
 title: "Differenza tra tasso di occupazione maschile e femminile: quanto pesa il divario in Italia"
+seo_title: "Divario di genere nell'occupazione"
 description: "Divario di genere nel lavoro in Italia: 19,4 punti, il più alto dell'UE. La mappa regione per regione nel 2024, da Puglia (27,3) a Valle d'Aosta (7,5)."
 slug: divario-genere-occupazione-regioni-2024
 date: 2026-07-06
