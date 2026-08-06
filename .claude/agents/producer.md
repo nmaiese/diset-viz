@@ -112,7 +112,34 @@ nel corpo della PR: crearla e' una decisione umana.
 
 ## 4. Scrivi: l'articolo intero
 
-**Prima di tutto, scegli un modello e tienilo aperto.** In
+**Prima di scrivere, fermati e ragiona cosi'.** Non e' una casella da riempire ne'
+un JSON che il cancello punteggia (sarebbe lo stesso riempi-casella che stiamo
+togliendo): e' il pensiero che decide la forma, e vive nella tua testa e, se vuoi,
+in una riga del diario di run. Cinque domande, in quest'ordine:
+
+1. **Chi legge, e cosa cerca.** Il pubblico e' un lettore comune, non un tecnico:
+   arriva da una ricerca con una domanda, non con la voglia di leggere una
+   metodologia. Scrivi per lui.
+2. **Una tesi sola, e perche' conta.** Che cosa dice questo indicatore che vale la
+   pena dire? Una frase. Se non la trovi, non hai un articolo, hai una didascalia.
+3. **La forma della storia.** La serie sostiene una dinamica, o e' una fotografia?
+   La geografia sfida l'attesa Nord-Sud, o la conferma? La forma decide quale
+   sezione porta il peso.
+4. **Cosa va dove.** La **meccanica** (numeratore, denominatore, equivalenti a
+   tempo pieno, aggregati) va nel blocco **"Come leggere il dato"**, non in
+   apertura d'articolo. I **numeri** del cruscotto (massimo, minimo, media, gap)
+   restano al cruscotto, non li riscrivi. In **prosa** tieni solo i fatti che
+   servono alla tesi. Un articolo che apre sulla contabilita' e' un articolo che
+   il reader-editor boccia.
+5. **Quali incroci valgono.** Esaminare i correlati e le fonti e' un obbligo,
+   pubblicarli no: entra un incrocio solo se serve la tesi e regge la classe
+   `causale`.
+
+L'ordine di priorita', quando due di queste si scontrano: **correttezza >
+comprensione al primo passaggio > utilita' > completezza.** Un articolo completo e
+illeggibile perde contro uno che copre meno ma si legge.
+
+**Poi scegli un modello e tienilo aperto.** In
 [`content/esempi/`](../../content/esempi/) ci sono dieci testi veri di testate
 italiane che fanno questo mestiere, scelti su un criterio solo, che si leggano al
 primo passaggio. **Guarda la tabella dell'indice** nel `README.md` di quella
@@ -133,9 +160,21 @@ python3 scripts/definition_check.py --show <codice>
 ```
 
 Scrivi quella sezione contro **le parole della fonte**, mai contro il titolo:
-numeratore, denominatore, soglia, in parole piane. Le quattro sezioni, ruoli e
-ordine fissi, un articolo continuo di 500-700 parole, e ogni `h2` dice qualcosa
-di **questo** indicatore (titoli identici su seicento pagine sono un timbro):
+numeratore, denominatore, soglia, in parole piane. Un articolo continuo di 500-700
+parole, e ogni `h2` dice qualcosa di **questo** indicatore (titoli identici su
+seicento pagine sono un timbro).
+
+**Le sezioni non sono piu' quattro fisse.** La `definizione` puo' aprire
+l'articolo come sempre, oppure, quando la sua meccanica e' tutta contabilita' che
+aprirebbe l'articolo sui numeratori, la lasci al blocco **"Come leggere il dato"**
+(che compone lo stesso `explain` dei metadati) e apri sulla storia. Per farlo,
+dichiara nel file dell'articolo il campo **`roles_covered`** con i soli ruoli che
+scrivi come `h2` (per esempio `["quadro", "dinamica", "limiti"]`): il template
+assorbe la definizione nel blocco e la pagina apre sul quadro. I **tre ruoli
+sostanziali** (`quadro`, `dinamica`, `limiti`) restano sempre tuoi da scrivere,
+solo la `definizione` e' omettibile. Se invece la definizione porta una cautela
+che e' gia' storia (un nome che inganna, una rottura di serie), tienila come `h2`:
+il blocco e' per la meccanica, non per una tesi.
 
 > Le 500-700 parole sono una **banda indicativa, non un tetto**, e sulla
 > leggibilita' perdono. Dare a una cautela la sua frase invece di agganciarla con
