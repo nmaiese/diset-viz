@@ -92,7 +92,7 @@ series:
   - id: LIFEEXP65M
     dataflow: 22_293_DF_DCIS_INDDEMOG1_1
     dsd_label: DCIS_INDDEMOG1
-    name: Speranza di vita a 65 anni, maschi (Istat, regioni)
+    name: Speranza di vita a 65 anni (maschi) (Istat, regioni)
     unit: anni
     decimals: 1
     theme: Indicatori demografici (Istat)
@@ -101,7 +101,7 @@ series:
   - id: LIFEEXP65F
     dataflow: 22_293_DF_DCIS_INDDEMOG1_1
     dsd_label: DCIS_INDDEMOG1
-    name: Speranza di vita a 65 anni, femmine (Istat, regioni)
+    name: Speranza di vita a 65 anni (femmine) (Istat, regioni)
     unit: anni
     decimals: 1
     theme: Indicatori demografici (Istat)

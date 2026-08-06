@@ -16,7 +16,7 @@
     "reviewed_vintage": 2024,
     "sections": [
         {
-            "body": "Il numero è l'età media delle donne al momento del parto, calcolata su tutti i nati vivi dell'anno in quella regione. Non distingue tra primo figlio e figli successivi: una regione con più famiglie numerose può avere un'età media più bassa a parità di età al primo figlio, perché i figli successivi arrivano quando la madre è già più giovane della media dei soli primi parti.\n\nÈ diversa dall'[età media della popolazione](/indicatore/eta-media-della-popolazione/ter-920), che riguarda tutti i residenti di ogni età: qui l'età si misura solo sulle donne che hanno partorito in quell'anno.",
+            "body": "Il numero è l'età media delle donne al momento del parto, calcolata su tutti i nati vivi dell'anno in quella regione. Non distingue tra primo figlio e figli successivi: due regioni possono avere la stessa età media al parto per ragioni diverse, una perché le donne hanno il primo figlio tardi, l'altra perché hanno più figli nel tempo, e i parti successivi arrivano quando la madre è già più avanti negli anni del primo.\n\nÈ diversa dall'[età media della popolazione](/indicatore/eta-media-della-popolazione/ter-920), che riguarda tutti i residenti di ogni età: qui l'età si misura solo sulle donne che hanno partorito in quell'anno.",
             "h": "L'età delle madri, non quella di tutti i residenti",
             "role": "definizione"
         },
