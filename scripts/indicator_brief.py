@@ -112,6 +112,20 @@ def build_brief(family, raw_id, level_key=None):
     for key, value in (level["matrix"].get(str(first_year)) or {}).items():
         first_values[key] = value
 
+    # La serie annuale della media, un valore per ogni anno della matrice. E' la
+    # stessa media semplice sulle regioni che `stats` calcola per il primo e
+    # l'ultimo anno (`year_min_avg`/`year_avg`), estesa a tutti gli anni in mezzo.
+    # Senza, il brief dava solo i due estremi e un articolo non poteva citare un
+    # picco o un fondo interno alla serie (il 2007 e il 15,17 del 2014 di ter-167)
+    # senza prenderlo fuori dal brief, cosa che la regola "il brief e' la sola
+    # fonte dei numeri" vieta. La media ignora le celle vuote, come
+    # `data.indicator_year_average`.
+    annual_means = []
+    for year_str in sorted(level["matrix"], key=int):
+        values = [v for v in level["matrix"][year_str].values() if isinstance(v, (int, float))]
+        if values:
+            annual_means.append({"year": int(year_str), "avg": sum(values) / len(values)})
+
     rows = []
     for position, row in enumerate(level["observations"], start=1):
         start = first_values.get(row["key"])
@@ -129,6 +143,7 @@ def build_brief(family, raw_id, level_key=None):
         "level": level,
         "stats": stats,
         "rows": rows,
+        "annual_means": annual_means,
         # Both keyed on the level actually being briefed. Without it, asking for
         # `--level provincia` printed the state of the *regional* article: on a
         # two-level BES the brief said "lead scritto, quadro scritto" while the
@@ -551,6 +566,14 @@ def render(brief):
         add(f"  media {stats['year_min']}: {_num(stats['year_min_avg'])}  ->  "
             f"{stats['year_max']}: {_num(stats['year_avg'])}   "
             f"({_num(stats['avg_change_abs'])} {meta['change_unit']})")
+        means = brief.get("annual_means") or []
+        if len(means) > 2:
+            add("  serie annuale della media (una sola fonte per un picco o un fondo interno):")
+            # A capo ogni sei anni: una serie lunga (28 anni) resta leggibile e
+            # non sfonda la riga.
+            cells = [f"{m['year']}: {_num(m['avg'])}" for m in means]
+            for start in range(0, len(cells), 6):
+                add("    " + "   ".join(cells[start:start + 6]))
         if stats["gap_trend"] is not None:
             verb = "allargato" if stats["gap_trend"] > 0 else "ristretto"
             add(f"  il divario si e {verb} di {_num(abs(stats['gap_trend']))} {meta['change_unit']}")
