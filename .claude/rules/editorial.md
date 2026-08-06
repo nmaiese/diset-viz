@@ -17,7 +17,8 @@ restano come sono, tenere pulito il sorgente.
 
 La scala su cui si misura un articolo e'
 [`docs/WRITING_RUBRIC.md`](../../docs/WRITING_RUBRIC.md): dieci criteri, sotto
-14 su 20 non e' pronto.
+14 su 20 non e' pronto, e i dieci stanno su quattro assi con un pavimento
+ciascuno, dove un asse sotto il pavimento boccia a prescindere dal totale.
 
 ## Pagine indicatore
 

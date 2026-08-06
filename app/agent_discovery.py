@@ -500,6 +500,23 @@ def indicator_markdown(meta, level, article, site_url):
         if level.get("annual_note"):
             lines.append(level["annual_note"])
 
+    means = level.get("annual_means") or []
+    if len(means) > 1:
+        # La stessa serie della tabella HTML. Senza, la rappresentazione markdown
+        # restava l'unica vista della pagina priva della serie storica, cioe'
+        # esattamente cio' che questo cambio vuole rendere leggibile a chi non
+        # esegue JavaScript: e un agente che chiede `text/markdown` e' il lettore
+        # senza JavaScript per definizione.
+        lines += [
+            "",
+            f"## Serie storica, media delle {level['plural']} per anno",
+            "",
+            f"| Anno | Media ({unit}) |",
+            "| ---: | ---: |",
+        ]
+        for point in means:
+            lines.append(f"| {point['year']} | {_number(point['avg'])} |")
+
     lines += [
         "",
         f"## Valori per {level['plural']}, {level['year_max']}",

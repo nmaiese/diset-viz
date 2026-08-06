@@ -17,18 +17,22 @@ Queste sono le regole che valgono sempre:
 
 - **Un lanciatore, lavoro per-indicatore in parallelo, ogni run in un worktree.**
   `scripts/pipeline_launch.py` legge il dossier per-indicatore e le code e
-  restituisce una lista prioritizzata di lanci (produttore e verificatore
-  per-indicatore, ammissione batch); il suo contratto da agente e'
+  restituisce una lista prioritizzata di lanci (produttore, verificatore e
+  reader-editor per-indicatore, ammissione batch); il suo contratto da agente e'
   `.claude/agents/launcher.md`. Non c'e' piu' un dispatcher a uno-stadio-per-tick
   ne' il lock una-PR-aperta. Indicatori diversi toccano file diversi, ma quella
   separazione vale per i **percorsi**, non per l'indice git ne' per HEAD: un
   checkout condiviso ne ha uno solo, e due run che se li contendono si spostano
   il branch sotto i piedi. Per questo ogni run apre il proprio **git worktree**
   isolato (`scripts/pipeline_workspace.py`, keyed sul `run_id`), non solo un branch
-  con nome diverso. Tre ruoli soli: ammissione (scout+hunter+promoter), produttore
-  (curator+writer+reviewer), verificatore.
+  con nome diverso. Quattro ruoli: ammissione (scout+hunter+promoter), produttore
+  (curator+writer+reviewer), verificatore, reader-editor. I tre per-indicatore
+  lavorano **l'indicatore che il piano gli passa e nessun altro**: e' cio' che
+  rende sicuro aprirne piu' d'uno per tick, perche' bersagli distinti scrivono
+  file dal nome distinto. Una sessione che si scegliesse un lotto dalla propria
+  coda sceglierebbe gli stessi record dell'altra.
 - **Ogni registro e' un file per record**: `content/indicators/`,
-  `data/pipeline/runs/`, `data/pipeline/verifiche/`. Mai ricompattarli in un
+  `data/pipeline/runs/`, `data/pipeline/verifiche/`, `data/pipeline/letture/`. Mai ricompattarli in un
   file unico: il conflitto tra due stadi non e' improbabile, e' impossibile, e
   deve restare cosi'.
 - **Una run e' il suo `run_id`, mai il numero della PR.** La riga di diario

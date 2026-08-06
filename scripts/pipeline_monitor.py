@@ -76,6 +76,7 @@ STAGE_LABELS = {
     "reviewer": "Rilettura e firma",
     "producer": "Produzione",
     "verificatore": "Verifica indipendente",
+    "reader-editor": "Lettura di leggibilita'",
     "launch": "Lanciatore",
 }
 
@@ -83,6 +84,7 @@ ROLE_LABELS = {
     "admissions": "ammissione",
     "producer": "produttore",
     "verificatore": "verificatore",
+    "reader-editor": "reader-editor",
 }
 
 # La lavorazione come la intende chi guarda il cruscotto, non lo stato grezzo

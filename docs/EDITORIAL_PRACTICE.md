@@ -211,10 +211,16 @@ Esempio, la transizione **curator -> writer** per una pratica `nuovo`:
 - **responsabile**: `indicator-writer`, perimetro `content/indicators/` +
   `data/pipeline/runs/`.
 - **artefatti prodotti**: `content/indicators/<key>.json` con `lead`, quattro
-  sezioni, `fonti`, `vintage`.
+  sezioni, `fonti`, `vintage`. In forma opt-in (`roles_covered`, vedi
+  [`docs/INDICATOR_PAGES.md`](INDICATOR_PAGES.md)) le sezioni sono i soli ruoli
+  dichiarati, e la `definizione` puo' mancare perche' la copre il blocco "Come
+  leggere il dato".
 - **controlli**: `check_writer_vintage` (il `vintage` non supera `year_max`),
   suite, `check_blast_radius`, `check_run_is_recorded`.
-- **completamento**: le quattro sezioni hanno `body`, `lead` presente.
+- **completamento**: le sezioni **dichiarate** hanno `body` e il `lead` e'
+  presente. Senza `roles_covered` la dichiarazione sono i quattro ruoli, che e'
+  la regola di sempre; con `roles_covered` restano comunque richiesti `quadro`,
+  `dinamica` e `limiti`, perche' solo la `definizione` e' assorbibile.
 - **invalidazione**: se `data_year` della curatela si muove **mentre** la pratica e'
   aperta, l'output del writer nasce gia' contro un input vecchio: la pratica torna
   `invalidata`, il passaggio writer entra in `passaggi_invalidati`.

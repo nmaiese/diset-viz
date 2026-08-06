@@ -492,8 +492,11 @@ class AppSmokeTest(unittest.TestCase):
         # from the data. A missing role means the skeleton broke, which is the one
         # thing that would make 621 pages inconsistent again.
         self.assertIn('class="indicator-article', html)
-        for role in ("definizione", "quadro", "dinamica", "limiti"):
+        # I tre ruoli sostanziali sono sempre H2; la definizione puo' abitare il
+        # blocco "Come leggere" invece di aprire l'articolo (sezioni variabili).
+        for role in ("quadro", "dinamica", "limiti"):
             self.assertIn(f'id="sezione-{role}"', html)
+        self.assertTrue('id="sezione-definizione"' in html or 'id="come-leggere"' in html)
         # L'apparato "Fonti e verifica" e' un unico blocco di specifiche.
         self.assertIn("apparatus-specs", html)
         # Numbers live in the cockpit, once. The blocks that used to repeat them

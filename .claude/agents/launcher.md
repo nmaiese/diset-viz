@@ -75,9 +75,21 @@ promoter), **produttore** (curator+writer+reviewer), **verificatore**.
    insieme. Per ogni voce:
 
    - `role: producer` -> agente `producer`, un indicatore (`indicator`): passagli
-     il `run_id` e l'indicatore da portare da ammesso a pubblicato.
+     il `run_id` e l'indicatore da portare da ammesso a pubblicato, **piu' il
+     `reason` della voce, testuale**. Sulle riscritture per leggibilita' il
+     `reason` non e' una didascalia: porta i fallimenti duri, i criteri caduti e
+     la nota del reader-editor, cioe' dove il lettore inciampa. Senza, il
+     produttore sa solo di essere stato bocciato, rifa' la meta' sbagliata
+     dell'articolo e si fa bocciare di nuovo finche' il freno non parcheggia il
+     codice.
    - `role: verificatore` -> agente `indicator-verifier`, un indicatore: passagli
      il `run_id` e l'articolo firmato da provare a smentire.
+   - `role: reader-editor` -> agente `reader-editor`, un indicatore: passagli il
+     `run_id` e l'articolo pubblicato da giudicare sulla leggibilita'. Come il
+     verificatore, ne legge **uno solo**, quello che gli dai: e' cio' che rende
+     sicuro aprirne piu' d'uno nello stesso tick, perche' letture su indicatori
+     diversi scrivono file con nomi diversi. Un bersaglio non passato sarebbe una
+     lettura che se lo sceglie da se', cioe' due run sullo stesso articolo.
    - `role: admissions` -> agente `admissions`, batch: passagli il `run_id`, e
      triaghera' la coda di fonti e candidati da se'.
 

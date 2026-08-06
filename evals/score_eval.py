@@ -28,6 +28,22 @@ BRIEF = EVALS / "writer" / "brief_ter-178.txt"
 REVIEWER_EXPECTED = EVALS / "reviewer" / "expected.json"
 VERIFIER_GOLD = EVALS / "verifier" / "claims.json"
 ADMISSIONS_GOLD = EVALS / "admissions" / "cases.json"
+READER_EDITOR_GOLD = EVALS / "reader-editor" / "cases.json"
+
+
+def blind_id(case_id: str) -> str:
+    """L'id con cui un caso del gold arriva all'agente sotto eval.
+
+    Gli id del gold dicono la risposta: `p01`-`p04` sono i `pass`, `r01`-`rc04`
+    i `revise`. Un giudice che li vede puo' prendere 8/8 leggendo il prefisso,
+    e una baseline che si puo' centrare senza leggere la prosa non misura piu'
+    niente. Derivato e non sorteggiato di proposito: cosi' non serve nessun file
+    di corrispondenza accanto alla fixture (che sarebbe la stessa fuga con un
+    passaggio in piu'), e lo scorer ricalcola la mappa da se'.
+    """
+    import hashlib
+
+    return "caso-" + hashlib.sha1(f"reader-editor:{case_id}".encode("utf-8")).hexdigest()[:8]
 
 # I caratteri che content/STYLE.md vieta in assoluto.
 BANNED = {"—": "em-dash", "–": "en-dash", ";": "punto e virgola",
@@ -187,6 +203,58 @@ def score_admissions(verdicts_path, gold_path=None):
     }
 
 
+def score_reader_editor(verdicts_path, gold_path=None):
+    """Verdetti di leggibilita' del reader-editor contro il gold set, con
+    precision e recall sui REVISE.
+
+    L'errore che conta e' il FALSO PASS: un articolo corretto-ma-tecnico fatto
+    passare come leggibile resta illeggibile su una pagina pubblica, ed e' il
+    difetto stesso che il ruolo esiste per prendere (l'analogo della falsa
+    smentita mancata nel verificatore). Quindi la misura di testa e' il **recall
+    sui revise**: quanti dei tecnici il giudice becca. La precision sui revise e'
+    l'altra faccia: un falso revise manda il produttore a riscrivere per niente,
+    e ogni riscrittura costa due run. Un `pass` legittimo non e' un errore."""
+    gold = json.loads(Path(gold_path or READER_EDITOR_GOLD).read_text(encoding="utf-8"))
+    produced = json.loads(Path(verdicts_path).read_text(encoding="utf-8"))
+    if isinstance(produced, dict) and "cases" in produced:
+        produced = {row["id"]: row.get("verdict") for row in produced["cases"]}
+    labels = {row["id"]: row["label"] for row in gold["cases"]}
+
+    right, wrong, missing, false_pass = [], [], [], []
+    tp = fp = fn = 0
+    for case_id, label in labels.items():
+        # L'agente vede l'id cieco (`blind_id`), non quello del gold: si accetta
+        # l'uno o l'altro perche' la baseline gia' registrata e' stata prodotta
+        # sugli id vecchi, e riscriverla per un cambio di etichette sarebbe
+        # riscrivere una misura invece di conservarla.
+        verdict = produced.get(blind_id(case_id))
+        if verdict in (None, ""):
+            verdict = produced.get(case_id)
+        if verdict in (None, ""):
+            missing.append(case_id)
+            continue
+        (right if verdict == label else wrong).append(case_id)
+        if label == "revise" and verdict == "revise":
+            tp += 1
+        elif label == "pass" and verdict == "revise":
+            fp += 1
+        elif label == "revise" and verdict == "pass":
+            fn += 1
+            false_pass.append(case_id)
+    precision = tp / (tp + fp) if (tp + fp) else None
+    recall = tp / (tp + fn) if (tp + fn) else None
+    return {
+        "eval": "reader-editor",
+        "giusti": right,
+        "sbagliati": wrong,
+        "falsi_pass": false_pass,
+        "senza_verdetto": missing,
+        "accuratezza": f"{len(right)}/{len(labels)}",
+        "precision_revise": precision,
+        "recall_revise": recall,
+    }
+
+
 def self_test():
     """Il metro provato sul metro: fixture non corrette e gold contro se stesso."""
     failures = []
@@ -235,17 +303,50 @@ def self_test():
     if not naive_score["false_approvazioni"] or (naive_score["precision_approvati"] or 1) >= 1.0:
         failures.append("admissions: 'approva tutto' non fa crollare la precision, il metro e' cieco")
 
+    if READER_EDITOR_GOLD.exists():
+        reader_gold = {
+            row["id"]: row["label"]
+            for row in json.loads(READER_EDITOR_GOLD.read_text(encoding="utf-8"))["cases"]
+        }
+        tmp = EVALS / ".self_test_reader.json"
+        tmp.write_text(json.dumps(reader_gold), encoding="utf-8")
+        try:
+            reader = score_reader_editor(tmp)
+            # Un giudice pigro che promuove tutto: il recall sui revise deve
+            # crollare, o il metro non vede il falso pass (l'errore da prendere).
+            naive_pass = {cid: "pass" for cid in reader_gold}
+            tmp.write_text(json.dumps(naive_pass), encoding="utf-8")
+            naive_pass_score = score_reader_editor(tmp)
+            # E uno che boccia tutto: la precision deve crollare, o il metro non
+            # vede il falso revise (la riscrittura sprecata).
+            naive_revise = {cid: "revise" for cid in reader_gold}
+            tmp.write_text(json.dumps(naive_revise), encoding="utf-8")
+            naive_revise_score = score_reader_editor(tmp)
+        finally:
+            tmp.unlink()
+        if reader["sbagliati"] or reader["senza_verdetto"]:
+            failures.append("reader-editor: il gold contro se stesso non fa punteggio pieno")
+        if reader["precision_revise"] != 1.0 or reader["recall_revise"] != 1.0:
+            failures.append("reader-editor: il gold contro se stesso non da' precision/recall pieni")
+        naive_recall = naive_pass_score["recall_revise"]
+        if not naive_pass_score["falsi_pass"] or (naive_recall is not None and naive_recall >= 1.0):
+            failures.append("reader-editor: 'promuovi tutto' non fa crollare il recall, il metro e' cieco")
+        naive_prec = naive_revise_score["precision_revise"]
+        if naive_prec is not None and naive_prec >= 1.0:
+            failures.append("reader-editor: 'boccia tutto' non fa crollare la precision, il metro e' cieco")
+
     for line in failures:
         print(f"SELF-TEST FALLITO: {line}")
     if not failures:
-        print("self-test ok: writer, reviewer, verifier e admissions misurano quel che devono")
+        tail = " e admissions" if not READER_EDITOR_GOLD.exists() else ", admissions e reader-editor"
+        print(f"self-test ok: writer, reviewer, verifier{tail} misurano quel che devono")
     return 1 if failures else 0
 
 
 def main():
     parser = argparse.ArgumentParser(description="Punteggio deterministico delle eval.")
     parser.add_argument("eval", nargs="?",
-                        choices=("writer", "reviewer", "verifier", "admissions"))
+                        choices=("writer", "reviewer", "verifier", "admissions", "reader-editor"))
     parser.add_argument("target", nargs="?", help="il file o la directory da misurare")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
@@ -255,7 +356,8 @@ def main():
     if not (args.eval and args.target):
         parser.error("servono eval e target, oppure --self-test")
     scorer = {"writer": score_writer, "reviewer": score_reviewer,
-              "verifier": score_verifier, "admissions": score_admissions}[args.eval]
+              "verifier": score_verifier, "admissions": score_admissions,
+              "reader-editor": score_reader_editor}[args.eval]
     print(json.dumps(scorer(args.target), ensure_ascii=False, indent=2))
     return 0
 

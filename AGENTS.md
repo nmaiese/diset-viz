@@ -126,7 +126,9 @@ One voice for the blog and the indicator pages, owned by `content/STYLE.md`.
 The absolutes: no em-dash, no en-dash, no semicolon, no ellipsis; only real,
 verified numbers, never an invented source; canonical indicator links only
 (`/indicatore/<slug>/ter-105`, never `/?indicator=`). The bar is
-`docs/WRITING_RUBRIC.md`: ten criteria, under 14 out of 20 is not ready. The
+`docs/WRITING_RUBRIC.md`: ten criteria on four axes, each with its own floor
+(an axis below its floor fails the article whatever the total), and under 14 out
+of 20 is not ready. The
 deterministic tooling (brief, definition check, queues, prose lint) is listed
 in `.claude/rules/editorial.md`, and the error classes only a reading catches
 are the `indicator-review` skill.

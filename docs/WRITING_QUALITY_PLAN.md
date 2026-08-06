@@ -488,7 +488,8 @@ come coordinate. La 6.4 in particolare descrive un buco che adesso è chiuso.
 
 Scritta, con i dieci criteri e la scala 0-2, in
 [`docs/WRITING_RUBRIC.md`](WRITING_RUBRIC.md). Sotto 14 su 20 l'articolo non è
-pronto. Quel file dice anche quali criteri conta uno script e quali restano a un
+pronto, e i dieci criteri stanno su quattro assi con un pavimento ciascuno: un
+asse sotto il pavimento boccia a prescindere dal totale. Quel file dice anche quali criteri conta uno script e quali restano a un
 lettore, che è la parte che questo piano lasciava implicita.
 
 ---

@@ -157,6 +157,118 @@ class ArticleStructure(unittest.TestCase):
             unsigned, [], f"reviewed_at without reviewed_vintage: {unsigned[:10]}"
         )
 
+    def test_the_committed_articles_are_all_four_sections(self):
+        """Nessun articolo esistente dichiara `roles_covered`: le sezioni variabili
+        sono opt-in, e finche' nessuno opta i trecento restano a quattro sezioni,
+        impronta della prosa invariata. E' cio' che rende il cambio additivo."""
+        opted = [key for key, entry in self.texts.items() if entry.get("roles_covered")]
+        self.assertEqual(opted, [], f"articoli gia' opt-in (attesi nessuno): {opted[:10]}")
+
+
+class VariableSectionsAreOptIn(unittest.TestCase):
+    """Le sezioni variabili: un'entry che dichiara `roles_covered` assorbe la
+    definizione nel blocco "Come leggere" invece di aprire con la metodologia.
+    Senza il campo, il comportamento e' identico a prima."""
+
+    OPT_IN = {
+        "level": "regione", "lead": "Un lead che apre sulla geografia.",
+        "vintage": 2023, "reviewed_at": "2026-08-01", "reviewed_vintage": 2023,
+        "roles_covered": ["quadro", "dinamica", "limiti"],
+        "sections": [
+            {"role": "quadro", "h": "Un vertice solo", "body": "Corpo quadro."},
+            {"role": "dinamica", "h": "Cinque anni fermi", "body": "Corpo dinamica."},
+            {"role": "limiti", "h": "Quanto lavoro", "body": "Corpo limiti."},
+        ],
+    }
+    LEGACY = {
+        "level": "regione", "lead": "Un lead.", "vintage": 2023,
+        "sections": [
+            {"role": "definizione", "h": None, "body": "Che cosa misura."},
+            {"role": "quadro", "h": None, "body": "Come si distribuisce."},
+            {"role": "dinamica", "h": None, "body": "Come e' cambiato."},
+            {"role": "limiti", "h": None, "body": "Che cosa non dice."},
+        ],
+    }
+
+    def _build(self, entry):
+        with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: entry):
+            return indicator_texts.build_article("432", "regione")
+
+    def test_an_opt_in_entry_omits_the_definizione_h2(self):
+        art = self._build(self.OPT_IN)
+        self.assertEqual([s["role"] for s in art["sections"]], ["quadro", "dinamica", "limiti"])
+        self.assertTrue(art["come_leggere"])
+
+    def test_a_partial_declaration_still_renders_the_three_substantive_roles(self):
+        """Solo la definizione e' assorbibile. Senza questa invariante nel
+        renderer, un `roles_covered` scritto male (o parziale) toglieva dalla
+        pagina pubblica `dinamica` e `limiti` invece di comporli dallo
+        scheletro: due sezioni perse per un errore di battitura in un JSON."""
+        art = self._build(dict(self.LEGACY, roles_covered=["quadro"]))
+        self.assertEqual([s["role"] for s in art["sections"]],
+                         ["quadro", "dinamica", "limiti"])
+        self.assertTrue(art["come_leggere"])
+
+    def test_an_empty_declaration_is_still_a_declaration(self):
+        """`roles_covered: []` non e' il campo assente: e' una dichiarazione che
+        non nomina la definizione, quindi la assorbe come farebbe `["quadro"]`.
+        Un test di verita' le confondeva, e la stessa entry rendeva quattro
+        sezioni in una forma e tre nell'altra."""
+        art = self._build(dict(self.LEGACY, roles_covered=[]))
+        self.assertEqual([s["role"] for s in art["sections"]],
+                         ["quadro", "dinamica", "limiti"])
+        self.assertTrue(art["come_leggere"])
+
+    def test_an_absorbed_section_stops_weighing_on_the_fingerprint(self):
+        """Una sezione assorbita resta nel file e non e' piu' in pagina, quindi il
+        verificatore non puo' leggerla: continuare a pesarla avrebbe fatto scadere
+        la verifica a ogni ritocco di un testo invisibile."""
+        from scripts import verification_queue as vq
+        absorbed = dict(self.LEGACY, roles_covered=["quadro", "dinamica", "limiti"])
+        edited = dict(absorbed, sections=[
+            dict(section, body="Definizione riscritta da capo.")
+            if section["role"] == "definizione" else section
+            for section in absorbed["sections"]
+        ])
+        self.assertEqual(vq.prose_fingerprint(absorbed), vq.prose_fingerprint(edited))
+        # La stessa modifica su un articolo che la definizione la rende cambia
+        # l'impronta, come e' sempre stato.
+        legacy_edited = dict(self.LEGACY, sections=edited["sections"])
+        self.assertNotEqual(vq.prose_fingerprint(dict(self.LEGACY)),
+                            vq.prose_fingerprint(legacy_edited))
+
+    def test_a_legacy_entry_keeps_four_sections_and_no_block(self):
+        art = self._build(self.LEGACY)
+        self.assertEqual([s["role"] for s in art["sections"]],
+                         ["definizione", "quadro", "dinamica", "limiti"])
+        self.assertFalse(art["come_leggere"])
+
+    def test_roles_covered_does_not_enter_the_prose_fingerprint(self):
+        """La chiave di sicurezza: dichiarare i quattro ruoli non tocca
+        l'impronta, perche' la pagina rende esattamente come prima. I trecento
+        articoli esistenti, che il campo non ce l'hanno, tanto meno."""
+        from scripts import verification_queue as vq
+        without = dict(self.LEGACY)
+        with_field = dict(self.LEGACY, roles_covered=["definizione", "quadro", "dinamica", "limiti"])
+        self.assertEqual(vq.prose_fingerprint(without), vq.prose_fingerprint(with_field))
+
+    def test_absorbing_the_definizione_does_change_the_fingerprint(self):
+        """L'altra meta', e senza di essa il campo era una scorciatoia per
+        cambiare la pagina senza riverificarla: un'entry gia' verificata poteva
+        togliersi la definizione dalla pagina senza toccare una parola di prosa,
+        la verifica vecchia continuava a combaciare, e una smentita appesa alla
+        definizione ora nascosta restava aperta su una sezione che nessuno vede
+        piu'. Cambiare cio' che la pagina mostra e' un cambio della pagina."""
+        from scripts import verification_queue as vq
+        absorbed = dict(self.LEGACY, roles_covered=["quadro", "dinamica", "limiti"])
+        self.assertNotEqual(vq.prose_fingerprint(dict(self.LEGACY)),
+                            vq.prose_fingerprint(absorbed))
+
+
+class SectionsUseKnownRoles(unittest.TestCase):
+    def setUp(self):
+        self.texts = indicator_store.load_all()
+
     def test_sections_use_known_roles_once_each(self):
         offenders = []
         for key, entry in self.texts.items():

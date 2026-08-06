@@ -40,6 +40,24 @@
 {% endmacro %}
 
 
+{# "Come leggere il dato": dove abita la definizione quando non apre piu'
+   l'articolo (sezioni variabili). Compone lo stesso `explain` dei metadati che
+   la macro `definizione` componeva, cosi' la meccanica esce dalla narrazione e
+   il lettore trova la storia in apertura. `plain` solo quando il lead e'
+   autorato: se il lead e' composto viene gia' da `explain.plain`
+   (`composed_lead`), e ripeterlo qui sarebbe un'eco. #}
+{% macro come_leggere(meta, level, lead_authored) %}
+{% set explain = level.explain or meta.explain %}
+<section class="come-leggere" id="come-leggere" aria-label="Come leggere il dato">
+  <h2>Come leggere il dato</h2>
+  {% if explain.plain and lead_authored %}<p>{{ explain.plain }}</p>{% endif %}
+  {% if explain.example %}<p>{{ explain.example }}</p>{% endif %}
+  {% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
+  {% if explain.reading %}<p>{{ explain.reading }}</p>{% endif %}
+</section>
+{% endmacro %}
+
+
 {% macro definizione(meta, level) %}
 {# Level-scoped: `scope` and `caveat` name the territorial level, so they
    come from the rendered level, never from meta (which spans all levels). #}

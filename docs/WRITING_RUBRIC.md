@@ -65,6 +65,16 @@ tecnici-ma-corretti, con la sua eval e la sua baseline nel canary. Gli altri tre
 assi restano giudizio del produttore che si rilegge (asse 1 anche del
 verificatore, a valle), finche' non avranno un giudice loro.
 
+Il reader-editor non punteggia il criterio 8 direttamente, giudica su otto
+criteri suoi (comprensione, carico, struttura, traduzione dei tecnicismi...),
+quindi la corrispondenza va detta invece che dedotta: **un suo `revise` e' il
+criterio 8 sotto il pavimento**, e l'articolo torna al produttore qualunque sia
+il totale. Un suo `pass` non regala il 2: dice che l'asse 2 non blocca.
+
+I pavimenti valgono per un articolo che si dichiara **finito**. Un articolo a
+meta' e' semplicemente da scrivere, non bocciato: la coda che lo dice e'
+`scripts/text_queue.py`, non questa scala.
+
 ## Perche' il criterio 8 non premia piu' il ritmo
 
 Fino al 2026-08-04 il criterio 8 si chiamava **Ritmo e imperfezione** e dava 2 a
