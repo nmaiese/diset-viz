@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-06T06:25:19+00:00",
+ "base_commit": "bf4d3f1",
+ "branch": "master",
+ "claude_code_version": "2.1.223 (Claude Code)",
+ "commit": "bf4d3f1",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": "160",
+ "run_id": "admissions-20260806T061804Z-8dc4",
+ "stage": "admissions",
+ "summary": "PR #160 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}
