@@ -163,8 +163,18 @@ def resolve_key(texts, code):
 
 
 def prose_fields(entry):
-    """(field, text) for every piece of hand-written prose in an entry."""
+    """(field, text) for every piece of hand-written prose in an entry.
+
+    I titoli autorati (`h1`, `seo_title`) sono prosa scritta a mano e visibile,
+    quindi passano di qui come tutto il resto: un em-dash o un punto e virgola in
+    un titolo e' vietato quanto in un corpo, e senza questa riga sarebbe l'unico
+    testo della pagina che nessuna guardia deterministica guarda.
+    """
     out = []
+    for field in ("h1", "seo_title"):
+        value = entry.get(field)
+        if isinstance(value, str) and value.strip():
+            out.append((field, value))
     if (entry.get("lead") or "").strip():
         out.append(("lead", entry["lead"]))
     for section in entry.get("sections") or []:

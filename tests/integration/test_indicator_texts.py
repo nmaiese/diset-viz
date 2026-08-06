@@ -69,8 +69,16 @@ def _level_year_max(key, entry):
 
 
 def _prose(entry):
-    """Every piece of hand-written prose in an entry, as (field, text)."""
+    """Every piece of hand-written prose in an entry, as (field, text).
+
+    Titoli autorati compresi: sono prosa visibile, e i caratteri vietati non
+    conoscono l'eccezione del titolo.
+    """
     fields = []
+    for field in ("h1", "seo_title"):
+        value = entry.get(field)
+        if isinstance(value, str) and value.strip():
+            fields.append((field, value))
     if entry.get("lead"):
         fields.append(("lead", entry["lead"]))
     for section in entry.get("sections") or []:

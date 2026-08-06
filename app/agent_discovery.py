@@ -454,8 +454,12 @@ def indicator_markdown(meta, level, article, site_url):
     canonical = f"{site_url}{meta['canonical_path']}"
     unit = meta.get("value_unit") or meta.get("unit") or "unità non specificata"
     explain = level.get("explain") or meta.get("explain") or {}
+    # Il titolo autorato vale anche qui: la proiezione markdown e' una
+    # rappresentazione di prima classe della stessa pagina, non un ripiego, e
+    # dare all'agente il nome amministrativo mentre il lettore HTML legge il
+    # titolo in lingua comune vuol dire due pagine diverse allo stesso URL.
     lines = [
-        f"# {meta['name']}",
+        f"# {article.get('h1') or meta['name']}",
         "",
         article.get("lead") or explain.get("plain") or meta["name"],
         "",
@@ -463,6 +467,13 @@ def indicator_markdown(meta, level, article, site_url):
         "",
         "## Scheda",
         "",
+        # Il nome ufficiale della serie, sempre. Con un H1 autorato il titolo in
+        # lingua comune sostituisce quello amministrativo, e nella proiezione
+        # markdown non c'e' nessun altro posto dove il nome ricompaia (la pagina
+        # HTML ce l'ha nel blocco "Dato originale"): un agente avrebbe letto
+        # cifre e fonte senza sapere **quale** serie sta leggendo, che e' il modo
+        # piu' facile di citarla per un'altra.
+        f"- Serie: {meta['name']}",
         f"- Tema: [{meta['theme']}]({_absolute(site_url, meta['theme_path'])})",
         f"- Livello territoriale: {level['label']}",
         f"- Unità di misura: {unit}",
