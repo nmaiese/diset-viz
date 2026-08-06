@@ -1038,10 +1038,36 @@ class AppSmokeTest(unittest.TestCase):
         qualifier = sources.family_short_label("bes")
         plain = seo_title("Speranza di vita alla nascita", "Divario Italia")
         qualified = seo_title(
-            "Speranza di vita alla nascita", "Divario Italia", max_len=68, source_qualifier=qualifier,
+            "Speranza di vita alla nascita", "Divario Italia", source_qualifier=qualifier,
         )
         self.assertNotEqual(plain, qualified)
+        self.assertLessEqual(len(qualified), 60, qualified)  # same budget as every other title
         self.assertIn(qualifier.split()[0], qualified)  # institution context survives truncation
+
+    def test_all_duplicate_bes_titles_are_unique_and_within_budget(self):
+        # Every id in taxonomy.DUPLICATE_BES_IDS gets a qualified title (see
+        # views._render_indicator). None may exceed the 60-char budget, and two
+        # ids sharing a truncated core (e.g. "Competenza numerica"/"alfabetica")
+        # must not collapse onto the same qualified title either.
+        from app.bes_data import get_bes_rows
+        from app.indicator_notes import seo_title
+        from app.taxonomy import DUPLICATE_BES_IDS
+        from app import sources
+
+        qualifier = sources.family_short_label("bes")
+        names = {}
+        for row in get_bes_rows("regione"):
+            if row["id"] in DUPLICATE_BES_IDS and row["id"] not in names:
+                names[row["id"]] = row["name"]
+        self.assertEqual(set(names), DUPLICATE_BES_IDS)
+
+        titles = {
+            raw_id: seo_title(name, "Divario Italia", source_qualifier=qualifier)
+            for raw_id, name in names.items()
+        }
+        for raw_id, title in titles.items():
+            self.assertLessEqual(len(title), 60, f"{raw_id}: {title}")
+        self.assertEqual(len(titles), len(set(titles.values())), titles)
 
     def test_public_game_and_editorial_metadata_within_budget(self):
         client = app.test_client()

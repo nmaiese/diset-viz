@@ -1108,13 +1108,11 @@ def _render_indicator(family, raw_id):
     # A handful of BES ids are exact duplicates of an existing territorial
     # series (DUPLICATE_BES_IDS docstring): hidden from browsing, but the page
     # itself stays reachable and indexable, so its <title> must not collide
-    # with its territorial twin's.
+    # with its territorial twin's. Stays within the normal 60-char budget like
+    # every other title, same as the crawler flags on any other page.
     source_qualifier = (
         sources.family_short_label(family) if family == "bes" and raw_id in DUPLICATE_BES_IDS else None
     )
-    seo_title_kwargs = {"source_qualifier": source_qualifier}
-    if source_qualifier:
-        seo_title_kwargs["max_len"] = 68
 
     response = make_response(render_template(
         "indicator_page.html",
@@ -1128,7 +1126,7 @@ def _render_indicator(family, raw_id):
         page_article=article,
         page_lead=lead,
         noindex=noindex,
-        seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME, **seo_title_kwargs),
+        seo_title=indicator_notes.seo_title(meta["name"], SITE_NAME, source_qualifier=source_qualifier),
         seo_description=seo_description,
         dataset_description=_dataset_description(lead, meta),
         dataset_updated=publisher.dataset_updated(meta["family"]),

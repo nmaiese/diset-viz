@@ -500,7 +500,7 @@ def _variant_marker(name, extra=None):
     parenthetical instead of stacking a second one.
     """
     def _wrap(parts):
-        joined = _truncate_words(", ".join(p for p in parts if p), 48)
+        joined = _truncate_words(", ".join(p for p in parts if p), 40)
         return f" ({joined})" if joined else ""
 
     low = (name or "").lower()
