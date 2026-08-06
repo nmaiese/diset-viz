@@ -93,7 +93,7 @@ def get_text(indicator_id):
 
 
 def build_article(indicator_id, level_key=DEFAULT_LEVEL):
-    """The four sections in order, each flagged authored or composed.
+    """The article sections in order, each flagged authored or composed.
 
     `body` is None for a composed section: the template renders that role from
     the data instead. Callers must not treat None as an empty section.
@@ -104,6 +104,17 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     Umbria and Piemonte under a cockpit of provinces. An entry therefore
     declares the level it describes and is used only there; every other level
     falls back to the composed skeleton, which reads the level it is given.
+
+    **Sezioni variabili (opt-in).** Di default l'articolo ha i quattro H2 in
+    ordine fisso, la `definizione` in apertura. Un'entry puo' pero' dichiarare
+    ``roles_covered``: la lista dei ruoli che scrive come H2. Se la `definizione`
+    non e' fra quelli, non apre piu' l'articolo: la sua meccanica va nel blocco
+    "Come leggere il dato" (``indicator_page.html``), che compone lo stesso
+    ``explain`` dai metadati. Il campo vive a livello di entry e **non entra nel
+    ``prose_fingerprint``** (che legge solo lead + ``sections[].{role,h,body}``),
+    quindi le entry senza il campo hanno impronta identica a prima: additivo, i
+    trecento articoli esistenti non cambiano. ``come_leggere`` nel risultato dice
+    al template quando rendere il blocco al posto dell'H2 definizione.
     """
     entry = get_text(indicator_id) or {}
     if (entry.get("level") or DEFAULT_LEVEL) != (level_key or DEFAULT_LEVEL):
@@ -113,8 +124,14 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
         for section in entry.get("sections") or []
         if section.get("role") in DEFAULT_HEADINGS and (section.get("body") or "").strip()
     }
+    declared = entry.get("roles_covered")
+    if declared:
+        role_sequence = [role for role in ROLE_ORDER
+                         if role in declared and role in DEFAULT_HEADINGS]
+    else:
+        role_sequence = list(ROLE_ORDER)
     sections = []
-    for role in ROLE_ORDER:
+    for role in role_sequence:
         written = authored.get(role)
         heading = (written.get("h") or "").strip() if written else ""
         sections.append({
@@ -126,6 +143,10 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     return {
         "lead": (entry.get("lead") or "").strip() or None,
         "sections": sections,
+        # La definizione e' assorbita dal blocco "Come leggere" quando non e' fra
+        # gli H2 emessi. Per un'entry senza `roles_covered` la definizione e'
+        # sempre presente, quindi `come_leggere` e' False e niente cambia.
+        "come_leggere": "definizione" not in role_sequence,
         "fonti": entry.get("fonti") or [],
         "vintage": entry.get("vintage") if isinstance(entry.get("vintage"), int) else None,
         "authored_count": len(authored),

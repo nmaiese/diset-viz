@@ -212,8 +212,17 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
         reviewed_at = entry.get("reviewed_at")
         reviewed_vintage = _as_int(entry.get("reviewed_vintage"))
         roles = {s.get("role") for s in (entry.get("sections") or []) if (s.get("body") or "").strip()}
-        complete = bool((entry.get("lead") or "").strip()) and \
-            {"definizione", "quadro", "dinamica", "limiti"}.issubset(roles)
+        # Sezioni variabili (opt-in): un'entry puo' dichiarare `roles_covered`, i
+        # ruoli che scrive come H2, e assorbire la `definizione` nel blocco "Come
+        # leggere". "Completo" segue la dichiarazione, ma i tre ruoli sostanziali
+        # (quadro, dinamica, limiti) restano sempre richiesti: solo la definizione
+        # e' omettibile, perche' e' l'unico ruolo che il blocco copre. Senza
+        # `roles_covered` (i trecento esistenti) la regola resta i quattro ruoli,
+        # identica a prima. Additivo: nessun articolo esistente cambia stato.
+        declared = entry.get("roles_covered")
+        required = set(declared) | {"quadro", "dinamica", "limiti"} if declared \
+            else {"definizione", "quadro", "dinamica", "limiti"}
+        complete = bool((entry.get("lead") or "").strip()) and required.issubset(roles)
         if "writer" not in d["completed_stages"]:
             d["completed_stages"].append("writer")
         event(key, "", "writer", "scritta",

@@ -65,6 +65,10 @@ def assess(family, raw_id, level_key=None):
         view["levels"][0],
     )
     article = build_article(meta["id"], level["key"])
+    # `missing` e' relativo alle sezioni che l'articolo emette: un'entry con
+    # `roles_covered` che assorbe la definizione nel blocco "Come leggere" non
+    # emette quella sezione, quindi non risulta "da scrivere" (altrimenti il
+    # produttore la riscriverebbe a ogni run).
     missing = [s["role"] for s in article["sections"] if not s["authored"]]
     vintage = article["vintage"]
     stale = vintage is not None and vintage < level["year_max"]
@@ -92,7 +96,7 @@ def assess(family, raw_id, level_key=None):
         "stale": stale,
         "lead": bool(article["lead"]),
         "missing": missing,
-        "written": len(ROLE_ORDER) - len(missing),
+        "written": len(article["sections"]) - len(missing),
         "score": score,
     }
 

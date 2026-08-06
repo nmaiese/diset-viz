@@ -157,6 +157,67 @@ class ArticleStructure(unittest.TestCase):
             unsigned, [], f"reviewed_at without reviewed_vintage: {unsigned[:10]}"
         )
 
+    def test_the_committed_articles_are_all_four_sections(self):
+        """Nessun articolo esistente dichiara `roles_covered`: le sezioni variabili
+        sono opt-in, e finche' nessuno opta i trecento restano a quattro sezioni,
+        impronta della prosa invariata. E' cio' che rende il cambio additivo."""
+        opted = [key for key, entry in self.texts.items() if entry.get("roles_covered")]
+        self.assertEqual(opted, [], f"articoli gia' opt-in (attesi nessuno): {opted[:10]}")
+
+
+class VariableSectionsAreOptIn(unittest.TestCase):
+    """Le sezioni variabili: un'entry che dichiara `roles_covered` assorbe la
+    definizione nel blocco "Come leggere" invece di aprire con la metodologia.
+    Senza il campo, il comportamento e' identico a prima."""
+
+    OPT_IN = {
+        "level": "regione", "lead": "Un lead che apre sulla geografia.",
+        "vintage": 2023, "reviewed_at": "2026-08-01", "reviewed_vintage": 2023,
+        "roles_covered": ["quadro", "dinamica", "limiti"],
+        "sections": [
+            {"role": "quadro", "h": "Un vertice solo", "body": "Corpo quadro."},
+            {"role": "dinamica", "h": "Cinque anni fermi", "body": "Corpo dinamica."},
+            {"role": "limiti", "h": "Quanto lavoro", "body": "Corpo limiti."},
+        ],
+    }
+    LEGACY = {
+        "level": "regione", "lead": "Un lead.", "vintage": 2023,
+        "sections": [
+            {"role": "definizione", "h": None, "body": "Che cosa misura."},
+            {"role": "quadro", "h": None, "body": "Come si distribuisce."},
+            {"role": "dinamica", "h": None, "body": "Come e' cambiato."},
+            {"role": "limiti", "h": None, "body": "Che cosa non dice."},
+        ],
+    }
+
+    def _build(self, entry):
+        with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: entry):
+            return indicator_texts.build_article("432", "regione")
+
+    def test_an_opt_in_entry_omits_the_definizione_h2(self):
+        art = self._build(self.OPT_IN)
+        self.assertEqual([s["role"] for s in art["sections"]], ["quadro", "dinamica", "limiti"])
+        self.assertTrue(art["come_leggere"])
+
+    def test_a_legacy_entry_keeps_four_sections_and_no_block(self):
+        art = self._build(self.LEGACY)
+        self.assertEqual([s["role"] for s in art["sections"]],
+                         ["definizione", "quadro", "dinamica", "limiti"])
+        self.assertFalse(art["come_leggere"])
+
+    def test_roles_covered_does_not_enter_the_prose_fingerprint(self):
+        """La chiave di sicurezza: aggiungere `roles_covered` a un'entry non tocca
+        l'impronta, perche' il fingerprint legge solo lead + sections."""
+        from scripts import verification_queue as vq
+        without = dict(self.LEGACY)
+        with_field = dict(self.LEGACY, roles_covered=["definizione", "quadro", "dinamica", "limiti"])
+        self.assertEqual(vq.prose_fingerprint(without), vq.prose_fingerprint(with_field))
+
+
+class SectionsUseKnownRoles(unittest.TestCase):
+    def setUp(self):
+        self.texts = indicator_store.load_all()
+
     def test_sections_use_known_roles_once_each(self):
         offenders = []
         for key, entry in self.texts.items():

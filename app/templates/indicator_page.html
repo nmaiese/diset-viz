@@ -90,7 +90,7 @@
 
   <nav class="page-note" aria-label="Domande a cui risponde questa scheda">
     <strong>Domande sui dati:</strong>
-    {% for item in level.query_map %}<a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a>{{ " · " if not loop.last }}{% endfor %}
+    {% for item in query_map %}<a href="#{{ item.target }}" data-query-intent="{{ item.intent }}">{{ item.label }}</a>{{ " · " if not loop.last }}{% endfor %}
   </nav>
 
   {# ---- Zona 1: il cruscotto. Ogni numero della pagina vive qui, una volta sola. ---- #}
@@ -279,7 +279,12 @@
     </div>
   </section>
 
-  {# ---- Zona 2: l'articolo. Quattro sezioni, una voce sola. ---- #}
+  {# ---- Zona 2: l'articolo. Sezioni variabili, una voce sola. ---- #}
+  {# "Come leggere il dato": appare quando la definizione e' assorbita qui invece
+     di aprire l'articolo con la metodologia (sezioni variabili). `page_article.lead`
+     e' l'attacco autorato, None se composto: e' cosi' che il blocco sa se `plain`
+     e' gia' nel lead (eco) o va mostrato. #}
+  {% if page_article.come_leggere %}{{ article.come_leggere(meta, level, page_article.lead is not none) }}{% endif %}
   {{ article.body(page_article, meta, level) }}
 
   {# ---- Zona 3: l'apparato. Fonti, verifica, condivisione, percorso. ---- #}
