@@ -1149,7 +1149,8 @@ def _render_indicator(family, raw_id):
     page_h1 = article["h1"] or meta["name"]
     if article["seo_title"] or article["h1"]:
         seo_title_value = indicator_notes.authored_seo_title(
-            article["seo_title"] or article["h1"], SITE_NAME
+            article["seo_title"] or article["h1"], SITE_NAME,
+            source_qualifier=source_qualifier,
         )
     else:
         seo_title_value = indicator_notes.seo_title(

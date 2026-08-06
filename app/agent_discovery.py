@@ -467,6 +467,13 @@ def indicator_markdown(meta, level, article, site_url):
         "",
         "## Scheda",
         "",
+        # Il nome ufficiale della serie, sempre. Con un H1 autorato il titolo in
+        # lingua comune sostituisce quello amministrativo, e nella proiezione
+        # markdown non c'e' nessun altro posto dove il nome ricompaia (la pagina
+        # HTML ce l'ha nel blocco "Dato originale"): un agente avrebbe letto
+        # cifre e fonte senza sapere **quale** serie sta leggendo, che e' il modo
+        # piu' facile di citarla per un'altra.
+        f"- Serie: {meta['name']}",
         f"- Tema: [{meta['theme']}]({_absolute(site_url, meta['theme_path'])})",
         f"- Livello territoriale: {level['label']}",
         f"- Unità di misura: {unit}",

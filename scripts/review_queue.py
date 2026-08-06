@@ -181,8 +181,20 @@ def resolve_key(texts, code):
 
 
 def prose_fields(entry):
-    """(field, text) for every piece of hand-written prose in an entry."""
+    """(field, text) for every piece of hand-written prose in an entry.
+
+    I titoli autorati sono prosa e stanno qui, non perche' siano lunghi ma
+    perche' l'impronta della verifica li copre: un campo dentro l'impronta e
+    fuori da cio' che il verificatore legge produce una verifica pulita su una
+    frase che nessuno ha guardato, ed e' il caso peggiore, perche' ha l'aria di
+    essere stata controllata. Il `seo_title` in particolare e' cio' che si legge
+    in SERP e puo' affermare qualcosa che il dato non dice.
+    """
     out = []
+    for field in ("h1", "seo_title"):
+        value = entry.get(field)
+        if isinstance(value, str) and value.strip():
+            out.append((field, value))
     if entry.get("lead"):
         out.append(("lead", entry["lead"]))
     for section in entry.get("sections") or []:

@@ -1014,6 +1014,51 @@ class AppSmokeTest(unittest.TestCase):
                 follow_redirects=True).get_data(as_text=True)
         self.assertIn("# Dove si vive a lungo dopo i 65 anni", body)
 
+    def test_the_markdown_keeps_the_official_series_name(self):
+        """Con un H1 autorato il nome amministrativo sparisce dal titolo, e nella
+        proiezione markdown non ricompare da nessun'altra parte (la pagina HTML
+        ce l'ha nel blocco "Dato originale"): un agente leggerebbe cifre e fonte
+        senza sapere quale serie sta leggendo."""
+        import unittest.mock
+        from app import indicator_texts
+        from app import app as flask_app
+        authored = {
+            "level": "regione", "lead": "Un lead.", "vintage": 2023,
+            "h1": "Dove si vive a lungo dopo i 65 anni",
+            "sections": [{"role": r, "h": None, "body": f"Corpo {r}."}
+                         for r in ("definizione", "quadro", "dinamica", "limiti")],
+        }
+        with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: authored):
+            body = flask_app.test_client().get(
+                "/indicatore/eta-media-della-popolazione/ter-920",
+                headers={"Accept": "text/markdown"},
+                follow_redirects=True).get_data(as_text=True)
+        self.assertIn("# Dove si vive a lungo dopo i 65 anni", body)
+        self.assertIn("- Serie: Eta media della popolazione", body)
+
+    def test_an_authored_title_still_disambiguates_a_duplicate_bes_series(self):
+        """Le serie BES duplicate misurano lo stesso fenomeno della gemella
+        territoriale e restano indicizzabili: titolarle in lingua comune e'
+        proprio il caso in cui le due finiscono con lo stesso `<title>`."""
+        from app.indicator_notes import authored_seo_title, _TITLE_MAX
+        titled = authored_seo_title("Dove si vive a lungo dopo i 65 anni",
+                                    "Divario Italia", source_qualifier="Bes")
+        self.assertIn("(Bes)", titled)
+        self.assertLessEqual(len(titled), _TITLE_MAX)
+        plain = authored_seo_title("Dove si vive a lungo dopo i 65 anni", "Divario Italia")
+        self.assertNotEqual(plain, titled)
+
+    def test_the_authored_titles_reach_the_verifier(self):
+        """Un campo dentro l'impronta e fuori da cio' che il verificatore legge
+        produce una verifica pulita su una frase che nessuno ha guardato."""
+        from scripts import review_queue
+        fields = dict(review_queue.prose_fields({
+            "h1": "Dove si vive a lungo", "seo_title": "Dove si vive a lungo, per regione",
+            "lead": "Un lead.", "sections": [{"role": "quadro", "body": "Corpo."}],
+        }))
+        self.assertIn("h1", fields)
+        self.assertIn("seo_title", fields)
+
     def test_an_authored_title_expires_the_verification(self):
         """Un titolo e' prosa visibile, e quello SERP e' anche un'affermazione:
         aggiungerlo o correggerlo dopo la firma non puo' lasciare buona una

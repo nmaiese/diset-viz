@@ -616,7 +616,8 @@ def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX, source_quali
     return _compact_title(core, marker, max_len)
 
 
-def authored_seo_title(title, site_name="Divario Italia", max_len=_TITLE_MAX):
+def authored_seo_title(title, site_name="Divario Italia", max_len=_TITLE_MAX,
+                       source_qualifier=None):
     """Il titolo SERP quando l'autore ne ha scritto uno in lingua comune.
 
     `seo_title` parte dal nome amministrativo e ci cuce " per regione" e la marca:
@@ -624,14 +625,24 @@ def authored_seo_title(title, site_name="Divario Italia", max_len=_TITLE_MAX):
     e' gia' completo ("Dove si lavora di piu' nella ricerca"), quindi qui NON si
     aggiunge la coda "per regione", si aggiunge solo la marca se ci sta nel budget,
     altrimenti si tiene il solo titolo tagliato a frase intera. Stesso budget
-    (`_TITLE_MAX`) del derivato: un titolo autorato non e' una scusa per sforare."""
+    (`_TITLE_MAX`) del derivato: un titolo autorato non e' una scusa per sforare.
+
+    `source_qualifier` vale anche qui, e non e' una simmetria per eleganza: una
+    manciata di serie BES sono il duplicato esatto di una territoriale, restano
+    indicizzabili, e misurano lo stesso identico fenomeno. Titolarle in lingua
+    comune e' proprio il caso in cui le due gemelle finiscono con lo **stesso**
+    titolo, che e' la collisione che il qualificatore esiste per evitare. Sta
+    dentro il budget come tutto il resto: se non ci sta, cade prima la marca."""
     text = " ".join((title or "").split())
     if not text:
         return ""
+    qualifier = f" ({source_qualifier})" if source_qualifier else ""
     suffix = f" · {site_name}"
-    if len(text) + len(suffix) <= max_len:
-        return text + suffix
-    return meta_description_from_attacco(text, max_len=max_len)
+    if len(text) + len(qualifier) + len(suffix) <= max_len:
+        return text + qualifier + suffix
+    if len(text) + len(qualifier) <= max_len:
+        return text + qualifier
+    return meta_description_from_attacco(text, max_len=max_len - len(qualifier)) + qualifier
 
 
 def seo_description(
