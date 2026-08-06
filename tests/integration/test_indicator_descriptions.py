@@ -78,10 +78,10 @@ class IndicatorDescriptionCoverageTest(unittest.TestCase):
         response = app.test_client().get(indicator_path(item["id"], item["name"]))
         html = unescape(response.data.decode("utf-8"))
         self.assertEqual(response.status_code, 200)
-        # The explanation now opens the article's "definizione" section rather
-        # than a block of its own, but it must still be visible text, not only
-        # structured data.
-        self.assertIn('id="sezione-definizione"', html)
+        # La spiegazione vive nella sezione "definizione" oppure, con le sezioni
+        # variabili, nel blocco "Come leggere il dato": in entrambi i casi deve
+        # essere testo visibile, non solo dati strutturati.
+        self.assertTrue('id="sezione-definizione"' in html or 'id="come-leggere"' in html)
         self.assertIn(item["explain"]["plain"], html)
         self.assertIn(item["explain"]["example"], html)
         self.assertIn('"@type": "Dataset"', html)

@@ -78,6 +78,11 @@ def integrated_targets(manifest_rows):
 # pinned by tests/unit/test_pending_notes.py.
 ARTICLE_ROLES = ("definizione", "quadro", "dinamica", "limiti")
 
+# I tre che nessuna dichiarazione puo' togliere: il blocco "Come leggere il dato"
+# copre la sola definizione, quindi e' la sola omettibile. Stessa regola di
+# `practice_timeline.reconstruct`, che decide se una pratica e' completa.
+SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
+
 
 def unwritten_roles(entry):
     """The roles of an article that nobody has written yet.
@@ -86,6 +91,15 @@ def unwritten_roles(entry):
     "has an entry" and "is written" two different things, and this script only
     knew the first: with both external indicators sitting at two sections out of
     four, it printed "la catena e completa" and the writer stage never fired.
+
+    Le **sezioni variabili** sono la seconda meta' della stessa distinzione, al
+    contrario: un'entry che dichiara `roles_covered` senza la `definizione` non
+    la rende come H2, perche' la sua meccanica sta nel blocco "Come leggere il
+    dato". Contarla fra le mancanti teneva l'articolo completo nella lista di
+    consegna del produttore per sempre, e ogni run sarebbe stata invitata a
+    riscrivere la sezione che questa funzione esiste per assorbire. I tre ruoli
+    sostanziali restano sempre richiesti: solo la definizione e' omettibile,
+    perche' e' l'unico ruolo che il blocco copre.
     """
     if not isinstance(entry, dict):
         return list(ARTICLE_ROLES)
@@ -94,7 +108,25 @@ def unwritten_roles(entry):
         for section in entry.get("sections") or []
         if isinstance(section, dict) and (section.get("body") or "").strip()
     }
-    return [role for role in ARTICLE_ROLES if role not in written]
+    required = set(emitted_roles(entry))
+    return [role for role in ARTICLE_ROLES if role in required and role not in written]
+
+
+def emitted_roles(entry):
+    """I ruoli che la pagina rende per questa entry.
+
+    Copia stdlib di `app.indicator_texts.emitted_roles`, che possiede la regola:
+    `roles_covered` e' un filtro sui quattro ruoli (un ruolo sconosciuto si
+    ignora, altrimenti resterebbe richiesto per sempre da qualcuno e da nessun
+    altro) e i tre sostanziali ci sono comunque.
+    """
+    declared = entry.get("roles_covered") if isinstance(entry, dict) else None
+    # Campo assente e lista vuota non sono la stessa cosa: la seconda e' una
+    # dichiarazione che non nomina la definizione, quindi la assorbe.
+    if not isinstance(declared, (list, tuple)):
+        return list(ARTICLE_ROLES)
+    keep = {role for role in declared if role in ARTICLE_ROLES} | SUBSTANTIVE_ROLES
+    return [role for role in ARTICLE_ROLES if role in keep]
 
 
 def pending(manifest_rows, notes, year_max_of):
