@@ -671,15 +671,44 @@ def _authored_short(text, budget):
     if len(text) <= budget:
         return text
     tail_budget = max(8, min(20, budget // 3))
-    tail = text[-tail_budget:].lstrip(" ,.;:-")
+    tail = _balanced(text[-tail_budget:].lstrip(" ,.;:-"))
     head_budget = budget - len(tail) - 3          # " (" e ")"
     head = _truncate_words(text, head_budget) if head_budget > 0 else ""
     if not head:
         head = text[:max(0, head_budget)]
-    head = head.rstrip(" ,.;:-(")
+    # Anche la testa va bilanciata, e per il motivo speculare della coda: puo'
+    # finire **dentro** una parentesi dell'autore e portarsi via solo l'aperta.
+    head = _balanced(head).rstrip(" ,.;:-(")
     if not head or tail.lower() in head.lower():
         return _truncate_words(text, budget) or text[:budget]
     return f"{head} ({tail})"
+
+
+def _balanced(text):
+    """Un frammento senza parentesi spaiate.
+
+    La coda si taglia a caratteri dalla fine, quindi puo' cadere **dentro** una
+    parentesi dell'autore e portarsi via solo la chiusa: incastonata poi in
+    `testa (coda)` diventa `testa (coda))`, cioe' precisamente il titolo malformato
+    che la guardia nuova promette di non far uscire. Si tolgono le parentesi che
+    non hanno la loro compagna dentro il frammento, non il frammento intero: la
+    coda serve a distinguere, e buttarla via rimetterebbe il difetto di prima.
+    """
+    out = []
+    open_count = 0
+    for char in text:
+        if char == ")" and open_count == 0:
+            continue
+        if char == "(":
+            open_count += 1
+        elif char == ")":
+            open_count -= 1
+        out.append(char)
+    while open_count > 0:
+        index = "".join(out).rfind("(")
+        out.pop(index)
+        open_count -= 1
+    return "".join(out).strip(" ,;:-")
 
 
 def _clamp_title(text, max_len):
@@ -695,10 +724,7 @@ def _clamp_title(text, max_len):
     """
     if len(text) <= max_len:
         return text
-    cut = text[:max_len]
-    if cut.count("(") > cut.count(")"):
-        cut = cut[:cut.rfind("(")]
-    return cut.rstrip(" ,.;:-(")
+    return _balanced(text[:max_len]).rstrip(" ,.;:-(")
 
 
 def seo_description(

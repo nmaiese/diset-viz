@@ -1156,30 +1156,44 @@ class AppSmokeTest(unittest.TestCase):
         l'autorato quando c'e' e il derivato quando manca, ed e' un no-op finche'
         nessun articolo ne dichiara uno.
         """
-        from app.data import get_catalog
+        from app import sources
+        from app.atlas_catalog import get_atlas_catalog
         from app.indicator_notes import authored_seo_title, seo_title
-        from app import profiles
+        from app.indicator_view import build_indicator_view
+        from app.taxonomy import DUPLICATE_BES_IDS
         from scripts import indicator_store
 
         entries = indicator_store.load_all()
 
-        def rendered(item):
-            entry = entries.get(str(item["id"])) or {}
+        def rendered(indicator_id, name, family, raw_id):
+            """La stessa logica di `_render_indicator`, qualificatore compreso."""
+            qualifier = (sources.family_short_label(family)
+                         if family == "bes" and raw_id in DUPLICATE_BES_IDS else None)
+            entry = entries.get(str(indicator_id)) or {}
             authored = (entry.get("seo_title") or entry.get("h1") or "").strip()
             if authored:
-                return authored_seo_title(authored, "Divario Italia")
-            return seo_title(item["name"], "Divario Italia")
+                return authored_seo_title(authored, "Divario Italia",
+                                          source_qualifier=qualifier)
+            return seo_title(name, "Divario Italia", source_qualifier=qualifier)
 
-        titles = []
-        for item in get_catalog()["indicators"]:
-            title = rendered(item)
+        # Il catalogo d'atlante, non quello territoriale: un titolo autorato su un
+        # BES, un Multiscopo, un Eurostat o un demografico non sarebbe passato di
+        # qui, e la collisione che conta e' anche quella **fra famiglie** (una
+        # serie BES duplicata misura lo stesso fenomeno della gemella
+        # territoriale, ed e' il caso che il qualificatore esiste per separare).
+        titles = {}
+        for item in get_atlas_catalog()["indicators"]:
+            family, raw_id = sources.split_internal_id(str(item["id"]))
+            title = rendered(item["id"], item["name"], family, raw_id)
             self.assertLessEqual(len(title), 60, f"title too long for {item['id']}: {title}")
             self.assertEqual(title, title.strip())
             self.assertEqual(title.count("("), title.count(")"), title)
-            if profiles.is_search_indexable_indicator(item):
-                titles.append(title)
-        self.assertEqual(len(titles), len(set(titles)),
-                         "two indexable pages share a rendered <title>")
+            view = build_indicator_view(family, raw_id)
+            if view is not None and view["meta"]["indexable"]:
+                titles.setdefault(title, []).append(item["id"])
+        collisions = {title: ids for title, ids in titles.items() if len(ids) > 1}
+        self.assertEqual(collisions, {},
+                         f"pagine indicizzabili con lo stesso <title>: {list(collisions.items())[:5]}")
 
     def test_a_long_authored_title_keeps_what_distinguishes_it(self):
         """Due titoli lunghi che aprono sulla stessa frase non possono diventare
@@ -1195,6 +1209,25 @@ class AppSmokeTest(unittest.TestCase):
             self.assertEqual(title.count("("), title.count(")"))
         # E una parola sola piu' lunga del budget non lo sfora comunque.
         self.assertLessEqual(len(authored_seo_title("A" * 200)), _TITLE_MAX)
+
+    def test_shortening_never_leaves_a_dangling_parenthesis(self):
+        """Il taglio a caratteri puo' cadere dentro una parentesi dell'autore e
+        portarsi via solo meta' della coppia: incastonato in `testa (coda)`
+        diventa il titolo malformato che la guardia promette di non far uscire.
+        Testa e coda si bilanciano entrambe, e la coda resta quella che
+        distingue."""
+        from app.indicator_notes import authored_seo_title, _TITLE_MAX
+        cases = [
+            "Titolo comune abbastanza lungo per doverlo tagliare (qualificatore editoriale molto lungo)",
+            "Titolo (uno) e poi (due) e ancora (tre) con una coda lunghissima che sfora il budget",
+            "Apertura (parentesi mai chiusa nella prima meta del titolo lunghissimo che sfora",
+        ]
+        for text in cases:
+            with self.subTest(text=text[:30]):
+                title = authored_seo_title(text)
+                self.assertLessEqual(len(title), _TITLE_MAX)
+                self.assertEqual(title.count("("), title.count(")"), title)
+                self.assertEqual(title, title.strip())
 
     def test_seo_title_keeps_scale_level_distinct(self):
         # Regression for the multiscopo satisfaction-level family: 11 pages
