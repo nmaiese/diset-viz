@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-06T07:13:24+00:00",
+ "base_commit": "d1b44c0",
+ "branch": "automation/admissions-20260806-ccea",
+ "claude_code_version": "2.1.223 (Claude Code)",
+ "commit": "d1b44c0",
+ "detail": [
+  "Verificate da me 6 cose: istituzione ISPRA, disaggregazione provinciale dichiarata, griglia benchmark 1990-2023, griglie anni delle 4 serie esistenti (381/382/383=2010,2015,2017,2019 e 511=1995,2000,2005,2010,2015,2017,2019), licenza CC BY 4.0 su isprambiente.gov.it/it/note-legali, UDM/Archivio delle 4 serie. NON verificate 6 (distinte): licenza sul portale dati emissioni.sina (timeout x2), unita ISPRA, disaggregazione per settore (news page non la dettaglia), copertura regionale 20/20, stime 2017/2021 (ereditate dal lead), ISPRA upstream della serie Istat. Frequenza COMPATIBILE: il catalogo NON tratta queste serie come continue, sono gia benchmark, refuta la premessa del lead. Match: 511 tende a proxy (per abitante vs assoluto ISPRA), 381/382/383 non determinabile senza la disaggregazione per settore. Nessun exact. Scritta 1 riga needs-info in source_candidates.csv, direttamente in needs-info (mai transitata da new): la coda scout (triage_status=new) resta 206 su 206, invariata. Nessuna scrittura in candidates.csv, istat_series.yaml o layer esterno. Promozione richiede adapter+famiglia app/sources.py+FEED_FAMILY+parser: codice fuori perimetro, in PR."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 206,
+ "queue_before": 206,
+ "run_id": "admissions-20260806T071324Z-f6ee",
+ "stage": "admissions",
+ "summary": "ISPRA inventario emissioni territoriale valutato come refresh dei 4 ter gas serra (381,382,383,511): needs-info, non cablabile in ammissione (serve adapter, codice)",
+ "trigger": "manuale"
+}
