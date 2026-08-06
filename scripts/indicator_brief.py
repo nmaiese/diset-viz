@@ -99,6 +99,91 @@ def _text_for_level(indicator_id, level_key):
     return entry if (entry.get("level") or DEFAULT_LEVEL) == level_key else None
 
 
+def _annual_means(matrix):
+    """La serie annuale della media, un valore per ogni anno della matrice, con
+    il numero di territori che lo compongono.
+
+    E' la stessa media semplice che `stats` calcola per il primo e l'ultimo anno
+    (`year_min_avg`/`year_avg`), estesa a tutti gli anni in mezzo. Senza, il
+    brief dava solo i due estremi e un articolo non poteva citare un picco o un
+    fondo interno alla serie (il 2007 e il 15,17 del 2014 di ter-167) senza
+    prenderlo fuori dal brief, cosa che la regola "il brief e' la sola fonte dei
+    numeri" vieta. La media ignora le celle vuote, come
+    `data.indicator_year_average`.
+
+    `n` non e' decorazione, ed e' il motivo per cui questa lista non e' una lista
+    di sole medie: la copertura cambia da un anno all'altro, e due medie su
+    campioni diversi non sono lo stesso numero. Il BES provinciale `06POL001P`
+    ha 50 province nel 2020 e 5 nel 2021, e la media passa da 58,52 a 43,30: a
+    muoversi e' il campione, non il fenomeno. Un brief che stampasse le due cifre
+    di fila inviterebbe a chiamare il 2021 un fondo, ed e' l'errore che la
+    regola del trend di lungo periodo vieta (`docs/INDICATOR_PAGES.md`: gli anni,
+    l'unita' e **la base territoriale**).
+    """
+    means = []
+    for year_str in sorted(matrix, key=int):
+        values = [v for v in matrix[year_str].values() if isinstance(v, (int, float))]
+        if values:
+            means.append({
+                "year": int(year_str),
+                "avg": sum(values) / len(values),
+                "n": len(values),
+            })
+    return means
+
+
+def _means_lines(means):
+    """Le righe con cui la serie annuale entra nel brief, base territoriale
+    compresa.
+
+    Due forme, e la regola che le sceglie e' meccanica invece che una soglia
+    inventata: **i conteggi sono tutti uguali oppure no**. Su base costante (il
+    caso comune, le venti regioni ogni anno) la base si dichiara una volta in
+    testa e le celle restano pulite, perche' ripetere lo stesso denominatore
+    trenta volte e' rumore. Quando i conteggi ballano, ogni cella porta il suo e
+    la serie si apre dicendo che le medie di due anni diversi non sono
+    confrontabili: al produttore serve saperlo prima di scrivere "il fondo del
+    2021", non dopo che il verificatore glielo smentisce.
+    """
+    if len(means) <= 2:
+        return []
+    lines = []
+    if len({item["n"] for item in means}) == 1:
+        lines.append("  serie annuale della media (una sola fonte per un picco o un fondo interno), "
+                     f"base costante: {means[0]['n']} territori ogni anno")
+        cells = [f"{item['year']}: {_num(item['avg'])}" for item in means]
+        per_row = 6
+    else:
+        lines.append("  serie annuale della media, BASE TERRITORIALE VARIABILE: le medie di due anni "
+                     "diversi non sono confrontabili fra loro")
+        lines.append("    (fra parentesi i territori che rispondono. Dove il numero cambia, a muoversi "
+                     "e' il campione, non per forza il fenomeno: non chiamare picco o fondo un anno "
+                     "che ha una base sua)")
+        cells = [f"{item['year']}: {_num(item['avg'])} ({item['n']})" for item in means]
+        per_row = 4
+    # A capo ogni sei anni (quattro se ogni cella porta anche la base): una serie
+    # lunga (28 anni) resta leggibile e non sfonda la riga.
+    for start in range(0, len(cells), per_row):
+        lines.append("    " + "   ".join(cells[start:start + per_row]))
+    return lines
+
+
+def _base_note(means, first_year, last_year):
+    """Il richiamo alla base sul confronto primo-ultimo anno, quando i due anni
+    non hanno lo stesso numero di territori.
+
+    Lo stesso difetto della serie, sulla riga che il brief stampava gia' prima di
+    questa modifica: `media 2020 -> 2021` mette in fila due medie che possono
+    poggiare su campioni diversi. I conteggi sono ormai in mano, quindi dirlo
+    costa una riga.
+    """
+    by_year = {item["year"]: item["n"] for item in means}
+    first, last = by_year.get(first_year), by_year.get(last_year)
+    if first is None or last is None or first == last:
+        return ""
+    return f"   (base {first} territori -> {last}, non confrontabili)"
+
+
 def build_brief(family, raw_id, level_key=None):
     view = build_indicator_view(family, raw_id)
     if view is None:
@@ -112,19 +197,7 @@ def build_brief(family, raw_id, level_key=None):
     for key, value in (level["matrix"].get(str(first_year)) or {}).items():
         first_values[key] = value
 
-    # La serie annuale della media, un valore per ogni anno della matrice. E' la
-    # stessa media semplice sulle regioni che `stats` calcola per il primo e
-    # l'ultimo anno (`year_min_avg`/`year_avg`), estesa a tutti gli anni in mezzo.
-    # Senza, il brief dava solo i due estremi e un articolo non poteva citare un
-    # picco o un fondo interno alla serie (il 2007 e il 15,17 del 2014 di ter-167)
-    # senza prenderlo fuori dal brief, cosa che la regola "il brief e' la sola
-    # fonte dei numeri" vieta. La media ignora le celle vuote, come
-    # `data.indicator_year_average`.
-    annual_means = []
-    for year_str in sorted(level["matrix"], key=int):
-        values = [v for v in level["matrix"][year_str].values() if isinstance(v, (int, float))]
-        if values:
-            annual_means.append({"year": int(year_str), "avg": sum(values) / len(values)})
+    annual_means = _annual_means(level["matrix"])
 
     rows = []
     for position, row in enumerate(level["observations"], start=1):
@@ -563,17 +636,13 @@ def render(brief):
 
     add("ANDAMENTO")
     if stats["has_multi_year"]:
+        means = brief.get("annual_means") or []
         add(f"  media {stats['year_min']}: {_num(stats['year_min_avg'])}  ->  "
             f"{stats['year_max']}: {_num(stats['year_avg'])}   "
-            f"({_num(stats['avg_change_abs'])} {meta['change_unit']})")
-        means = brief.get("annual_means") or []
-        if len(means) > 2:
-            add("  serie annuale della media (una sola fonte per un picco o un fondo interno):")
-            # A capo ogni sei anni: una serie lunga (28 anni) resta leggibile e
-            # non sfonda la riga.
-            cells = [f"{m['year']}: {_num(m['avg'])}" for m in means]
-            for start in range(0, len(cells), 6):
-                add("    " + "   ".join(cells[start:start + 6]))
+            f"({_num(stats['avg_change_abs'])} {meta['change_unit']})"
+            + _base_note(means, stats["year_min"], stats["year_max"]))
+        for line in _means_lines(means):
+            add(line)
         if stats["gap_trend"] is not None:
             verb = "allargato" if stats["gap_trend"] > 0 else "ristretto"
             add(f"  il divario si e {verb} di {_num(abs(stats['gap_trend']))} {meta['change_unit']}")
