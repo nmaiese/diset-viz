@@ -172,6 +172,23 @@ ANOTHER_YEAR = re.compile(r"\s*(?:nel|del|in)\s+(?:19|20)\d\d\b", re.I)
 ANOTHER_INDICATOR = re.compile(r"\]\(/indicatore/")
 
 
+def year_stated_after(text, match):
+    """L'anno scritto subito dopo una cifra, se c'e'. `None` altrimenti.
+
+    **Una regola sola per i due versi in cui la prosa scrive una cifra.** Era
+    scritta in un verso solo, e la stessa affermazione vera prendeva due
+    verdetti opposti a seconda della sintassi: "la Sardegna segna 16,96 nel
+    2016" passava, "il 16,96% della Sardegna nel 2016" veniva bloccata come
+    `cifra-falsa`, perche' il secondo verso confrontava la cifra col valore
+    dell'anno dell'articolo. Un `blocca` su una cifra giusta rimanda chi scrive
+    a "correggere" un numero che era corretto.
+    """
+    stated = ANOTHER_YEAR.match(text[match.end():match.end() + 24])
+    if not stated:
+        return None
+    return int(re.search(r"(?:19|20)\d\d", stated.group(0)).group(0))
+
+
 def patterns(alternation):
     """I tre pattern numerici sopra un'alternativa di territori."""
     gap = r"(?:(?!" + alternation + r"|\d)[^.,;])"
@@ -288,12 +305,24 @@ def check_figures(entry, key=None, compiled=None, **_):
     for field, text in prose_of(entry):
         for match in compiled["value_of"].finditer(text):
             raw, territory = match.group(1), match.group(2)
-            if "," not in raw or territory not in values:
+            if "," not in raw:
                 continue
-            actual = values[territory]
+            # Anche questo verso onora l'anno scritto accanto. Vedi
+            # `year_stated_after`: la regola vale per come la cifra e' vera, non
+            # per come la frase e' girata.
+            year = year_stated_after(text, match)
+            if year is None:
+                if territory not in values:
+                    continue
+                actual, when = values[territory], ""
+            else:
+                historic = values_of(key, entry, year=year)
+                if territory not in historic:
+                    continue
+                actual, when = historic[territory], f" nel {year}"
             if abs(number_of(raw) - actual) > max(0.06, abs(actual) * 0.011):
                 found.append(_finding("cifra-falsa", BLOCKS,
-                                      f"{territory} detto {raw}, dato "
+                                      f"{territory} detto {raw}{when}, dato "
                                       f"{round(actual, 2)}", field))
         for match in compiled["states_value"].finditer(text):
             territory, raw = match.group(1), match.group(2)
@@ -306,9 +335,9 @@ def check_figures(entry, key=None, compiled=None, **_):
             # storici (rotture di pendenza, ritorni a un livello, sorpassi):
             # la prosa cita molte piu' cifre di anni passati di quante ne
             # citasse quella vecchia, e nessuna era controllata.
-            stated = ANOTHER_YEAR.match(text[match.end():match.end() + 24])
+            stated = year_stated_after(text, match)
             if stated:
-                year = int(re.search(r"(?:19|20)\d\d", stated.group(0)).group(0))
+                year = stated
                 historic = values_of(key, entry, year=year)
                 if territory not in historic:
                     continue

@@ -642,18 +642,29 @@ def group_divergence(matrix, groups):
     if len(shared) < 2:
         return []
 
-    high = max(shared, key=lambda group: last[group])
-    low = min(shared, key=lambda group: last[group])
-    # **Distanze, quindi valori assoluti.** I due gruppi si scelgono sull'ordine
-    # dell'**ultimo** anno, e nel primo quell'ordine puo' essere rovesciato: li'
-    # `first[high] - first[low]` e' negativo, e non e' una distanza, e' una
-    # distanza col segno di un ordinamento che non vale piu'. Con la sottrazione
-    # firmata un divario fermo attraverso un sorpasso (da -10 a 10) risultava
-    # +200% di divergenza, cioe' l'angolo piu' forte del pacchetto costruito su
-    # una distanza che non si e' mossa di un punto.
-    partenza = abs(first[high] - first[low])
-    now = last[high] - last[low]          # >= 0 per costruzione: high e' il max
-    invertito = (first[high] - first[low]) < 0
+    # **Il divario piu' largo di ciascun anno, misurato dentro quell'anno.**
+    #
+    # Prima i due gruppi si sceglievano una volta sola, sull'ordine dell'ultimo
+    # anno, e li' con due soli gruppi non c'e' differenza. Con tre o piu' si',
+    # ed e' il caso normale: le macroaree italiane sono tre o cinque, non due.
+    # Su medie `A=0 B=100 C=50` all'inizio e `A=60 B=50 C=0` alla fine il codice
+    # confrontava A con C e dichiarava `gruppi-che-divergono` a +20%, mentre il
+    # divario fra gruppi si era **ristretto** da 100 a 60. Non era un numero
+    # impreciso: era il verso sbagliato, cioe' il contrario della frase che
+    # questo progetto fa piu' spesso.
+    #
+    # Prendendo gli estremi dentro ciascun anno le due distanze sono non
+    # negative per costruzione, quindi il valore assoluto che serviva alla
+    # correzione precedente non serve piu': non c'e' piu' nessuna sottrazione
+    # firmata da cui difendersi.
+    def estremi(medie):
+        alto = max(shared, key=lambda group: medie[group])
+        basso = min(shared, key=lambda group: medie[group])
+        return alto, basso, medie[alto] - medie[basso]
+
+    alto_prima, basso_prima, partenza = estremi(first)
+    high, low, now = estremi(last)
+    invertito = (high, low) == (basso_prima, alto_prima)
     if partenza == 0:
         return []
     change = (now - partenza) / partenza
@@ -666,10 +677,16 @@ def group_divergence(matrix, groups):
          "distanza_primo_anno": round(partenza, 3),
          "distanza_ultimo_anno": round(now, 3),
          "variazione_relativa": round(change, 3),
-         # Quando l'ordine si e' rovesciato, "il divario si e' allargato" e'
-         # vero e insieme fuorviante: chi sta sopra oggi stava sotto allora, e un
-         # articolo che non lo dicesse racconterebbe una crescita al posto di un
-         # sorpasso. Il fatto viaggia col fatto, non lasciato dedurre.
+         # Chi stava agli estremi allora, per nome. Non e' un di piu': con tre
+         # gruppi o piu' la coppia che fa il divario puo' cambiare, e un
+         # articolo che dicesse "il divario si e' allargato" senza dire fra chi
+         # racconterebbe una crescita al posto di un cambio di protagonisti.
+         "gruppo_alto_primo_anno": alto_prima,
+         "gruppo_basso_primo_anno": basso_prima,
+         "estremi_cambiati": (high, low) != (alto_prima, basso_prima),
+         # Il caso stretto: gli stessi due gruppi, ai posti scambiati. Li' "il
+         # divario si e' allargato" e' vero e insieme fuorviante, perche' chi sta
+         # sopra oggi stava sotto allora. Il fatto viaggia col fatto.
          "ordine_invertito": invertito,
          "medie_ultimo_anno": {group: round(last[group], 3) for group in shared}},
         years=[years[0], years[-1]],

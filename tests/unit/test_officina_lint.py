@@ -172,6 +172,33 @@ class HistoricalFiguresAreCheckedNotSkipped(unittest.TestCase):
     def test_a_year_the_source_does_not_publish_is_not_invented(self):
         self.assertEqual(self._run("La Campania segna 99,00 nel 1999."), [])
 
+    def test_the_value_first_syntax_honours_the_year_too(self):
+        """La regola era scritta in un verso solo.
+
+        La prosa scrive una cifra in due modi, e questo file li copre tutti e
+        due da sempre ("il 24,3% del Molise" e "Gorizia si ferma a 18"). L'anno
+        accanto pero' lo leggeva **solo** il secondo: la stessa affermazione
+        vera passava girata in un modo e prendeva un `cifra-falsa` girata
+        nell'altro, cioe' un blocco che rimanda chi scrive a correggere un
+        numero corretto. E' il verso che l'officina usa piu' spesso, perche' un
+        angolo si apre nominando la cifra.
+        """
+        self.assertEqual(self._run("Il 10,00% della Campania nel 2020 era un altro paese."), [])
+
+    def test_and_it_still_catches_a_false_one(self):
+        found = self._run("Il 17,40% della Campania nel 2020 non torna.")
+        self.assertEqual(rules_fired(found), {"cifra-falsa"})
+        self.assertIn("nel 2020", found[0]["detail"])
+
+    def test_the_two_syntaxes_agree_on_every_case(self):
+        """La proprieta', non i due esempi: girare la frase non cambia il verdetto."""
+        for cifra, atteso in (("10,00", set()), ("17,40", {"cifra-falsa"}), ("20,00", {"cifra-falsa"})):
+            with self.subTest(cifra=cifra):
+                valore_prima = self._run(f"Il {cifra}% della Campania nel 2020 pesa.")
+                verbo_prima = self._run(f"La Campania segna {cifra} nel 2020.")
+                self.assertEqual(rules_fired(valore_prima), atteso)
+                self.assertEqual(rules_fired(verbo_prima), atteso)
+
 
 class DynamicsMustCiteASource(unittest.TestCase):
     """La regola nuova, quella che toglie il freddo."""

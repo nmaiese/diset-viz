@@ -245,6 +245,72 @@ class GroupDivergence(unittest.TestCase):
         self.assertEqual(angles.group_divergence(flat(), {}), [])
 
 
+class ThreeGroupsAreTheNormalCase(unittest.TestCase):
+    """Con due gruppi la coppia agli estremi e' sempre la stessa. Con tre no.
+
+    E tre e' il caso normale: le macroaree italiane sono tre o cinque. Scegliere
+    la coppia una volta sola sull'ultimo anno e misurarla anche nel primo puo'
+    dare il **verso opposto** a quello del divario fra gruppi, che e' la frase
+    che questo progetto fa piu' spesso.
+    """
+
+    GROUPS = {"a1": "A", "b1": "B", "c1": "C"}
+
+    @staticmethod
+    def _serie(primo, ultimo):
+        return {2015: dict(zip(("a1", "b1", "c1"), primo)),
+                2024: dict(zip(("a1", "b1", "c1"), ultimo))}
+
+    def test_a_narrowing_spread_is_not_called_a_divergence(self):
+        """A=0 B=100 C=50 -> A=60 B=50 C=0: il divario passa da 100 a 60.
+
+        Confrontando A con C (gli estremi del solo ultimo anno) usciva
+        `gruppi-che-divergono` al +20%. Non era un numero impreciso, era il
+        verso sbagliato.
+        """
+        found = angles.group_divergence(
+            self._serie((0.0, 100.0, 50.0), (60.0, 50.0, 0.0)), self.GROUPS)
+        self.assertEqual(kinds(found), ["gruppi-che-convergono"])
+        figure = found[0]["figures"]
+        self.assertEqual(figure["distanza_primo_anno"], 100.0)
+        self.assertEqual(figure["distanza_ultimo_anno"], 60.0)
+        self.assertLess(figure["variazione_relativa"], 0)
+
+    def test_and_it_names_who_was_at_the_extremes_before(self):
+        """"Il divario fra gruppi si e' mosso" senza dire fra chi racconterebbe
+        una crescita al posto di un cambio di protagonisti."""
+        found = angles.group_divergence(
+            self._serie((0.0, 100.0, 50.0), (60.0, 50.0, 0.0)), self.GROUPS)
+        figure = found[0]["figures"]
+        self.assertEqual((figure["gruppo_alto"], figure["gruppo_basso"]), ("A", "C"))
+        self.assertEqual((figure["gruppo_alto_primo_anno"],
+                          figure["gruppo_basso_primo_anno"]), ("B", "A"))
+        self.assertTrue(figure["estremi_cambiati"])
+        self.assertFalse(figure["ordine_invertito"],
+                         "non e' un sorpasso fra gli stessi due: sono altri due")
+
+    def test_a_spread_that_really_widens_still_says_so(self):
+        """La correzione non spegne il rilevatore: cambia chi confronta."""
+        found = angles.group_divergence(
+            self._serie((40.0, 50.0, 60.0), (10.0, 50.0, 90.0)), self.GROUPS)
+        self.assertEqual(kinds(found), ["gruppi-che-divergono"])
+        figure = found[0]["figures"]
+        self.assertEqual(figure["distanza_primo_anno"], 20.0)
+        self.assertEqual(figure["distanza_ultimo_anno"], 80.0)
+        self.assertFalse(figure["estremi_cambiati"])
+
+    def test_the_distances_are_non_negative_by_construction(self):
+        """Con gli estremi presi dentro ciascun anno non esiste piu' una
+        sottrazione firmata da cui difendersi: e' la correzione precedente che
+        diventa superflua invece di restare a fare la guardia."""
+        for primo, ultimo in ((( 0.0, 100.0, 50.0), (60.0, 50.0,  0.0)),
+                              ((40.0,  50.0, 60.0), (10.0, 50.0, 90.0)),
+                              ((10.0,  10.0, 90.0), (90.0, 10.0, 10.0))):
+            for found in angles.group_divergence(self._serie(primo, ultimo), self.GROUPS):
+                self.assertGreaterEqual(found["figures"]["distanza_primo_anno"], 0)
+                self.assertGreaterEqual(found["figures"]["distanza_ultimo_anno"], 0)
+
+
 class MethodBreaks(unittest.TestCase):
     def test_a_year_in_the_note_inside_the_window(self):
         found = angles.method_breaks(
