@@ -58,6 +58,20 @@ RUN_ID = re.compile(
     r"hunter|promoter|launch|reader-editor)-\d{8}T\d{6}Z-[0-9a-f]{4}\b"
 )
 
+# La coda di un `run_id`, per staccarne il ruolo. Era `split("-2026")`, cioe' un
+# anno di calendario scritto dentro il codice: dal primo gennaio 2027 quello
+# split non taglia piu' niente, nessun ruolo combacia con `WRITING`, e il
+# rapporto dichiara zero sessioni che producono prosa senza dire perche'. Un
+# guasto che aspetta una data e' peggio di uno che si vede: qui la data e' una
+# forma, non un valore.
+CODA_DEL_RUN_ID = re.compile(r"-\d{8}T\d{6}Z-[0-9a-f]{4}$")
+
+
+def role_of(run_id: str) -> str:
+    """Il ruolo dentro un `run_id`, qualunque sia l'anno."""
+    return CODA_DEL_RUN_ID.sub("", run_id)
+
+
 # I ruoli che producono prosa. **Elencati per inclusione, e non e' uno stile.**
 #
 # La lista era per esclusione, e una lista per esclusione mente per omissione:
@@ -345,7 +359,7 @@ def read_session(path: str) -> dict | None:
 
 
 def writing_only(runs) -> list:
-    return [r for r in runs if r.split("-2026")[0] in WRITING]
+    return [r for r in runs if role_of(r) in WRITING]
 
 
 def collect(since: str) -> list:
@@ -368,7 +382,7 @@ def report(sessions, articles: int) -> None:
           f"{'output':>9} {'$':>7}")
     for session in chain:
         use = session["use"]
-        label = ", ".join(r.split("-2026")[0] for r in session["runs"])[:40]
+        label = ", ".join(role_of(r) for r in session["runs"])[:40]
         print(f"{session['day']:11} {session['sid']:9} {label:40} "
               f"{session['turns']:6} {use['cache_r']:13,} {use['out']:9,} "
               f"{cost(use) + cost(session['advisor']):7.2f}")

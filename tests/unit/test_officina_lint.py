@@ -190,6 +190,41 @@ class HistoricalFiguresAreCheckedNotSkipped(unittest.TestCase):
         self.assertEqual(rules_fired(found), {"cifra-falsa"})
         self.assertIn("nel 2020", found[0]["detail"])
 
+    def test_a_threshold_honours_the_year_as_well(self):
+        """Il terzo ramo. La regola era scritta per uno su tre.
+
+        `check_figures` legge la prosa con tre pattern (valore-prima,
+        verbo-prima, soglia) e l'anno accanto lo leggeva solo il secondo. Una
+        soglia vera per l'anno che nomina veniva giudicata contro l'anno
+        dell'articolo, cioe' `soglia-falsa` su una frase corretta.
+        """
+        self.assertEqual(self._run("Restava sotto il 12,00 in Campania nel 2020."), [])
+
+    def test_and_a_false_threshold_in_that_year_still_blocks(self):
+        found = self._run("Supera il 18,00 in Campania nel 2020.")
+        self.assertEqual(rules_fired(found), {"soglia-falsa"})
+        self.assertIn("nel 2020", found[0]["detail"])
+
+    def test_a_threshold_without_a_year_is_judged_on_the_article_year(self):
+        self.assertEqual(rules_fired(self._run("Restava sotto il 12,00 in Campania.")),
+                         {"soglia-falsa"})
+        self.assertEqual(self._run("Supera il 18,00 in Campania."), [])
+
+    def test_a_threshold_is_not_also_read_as_a_value(self):
+        """Due regole sullo stesso pezzo di testo, e una delle due sbagliata.
+
+        "restava sotto il 12,00 in Campania" non dice che la Campania valga 12:
+        dice che sta sotto 12. Il ramo valore-prima la leggeva come un valore e
+        aggiungeva un `cifra-falsa` alla frase, anche quando la soglia era vera
+        e il ramo giusto taceva. E' la stessa soppressione che
+        `states_a_value` fa gia' per "circa" e "quasi", dall'altro lato.
+        """
+        for testo in ("Restava sotto il 12,00 in Campania nel 2020.",
+                      "Restava sotto il 12,00 in Campania.",
+                      "Supera il 18,00 in Campania nel 2020."):
+            with self.subTest(testo=testo):
+                self.assertNotIn("cifra-falsa", rules_fired(self._run(testo)))
+
     def test_the_two_syntaxes_agree_on_every_case(self):
         """La proprieta', non i due esempi: girare la frase non cambia il verdetto."""
         for cifra, atteso in (("10,00", set()), ("17,40", {"cifra-falsa"}), ("20,00", {"cifra-falsa"})):

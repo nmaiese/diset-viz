@@ -178,6 +178,25 @@ class OnlyProseCountsAsProse(unittest.TestCase):
     usciva gonfiato dalla parte sbagliata.
     """
 
+    def test_the_year_is_a_shape_not_a_value(self):
+        """Il ruolo si staccava con `split("-2026")`, un anno di calendario
+        scritto dentro il codice. Dal primo gennaio 2027 quello split non taglia
+        piu' niente, nessun ruolo combacia con `WRITING`, e il rapporto dichiara
+        zero sessioni che producono prosa senza dire perche': un guasto che
+        aspetta una data, invisibile finche' non e' tardi. `RUN_ID` e
+        `pipeline_log.new_run_id()` accettano qualunque anno da sempre."""
+        for anno in ("2026", "2027", "2031", "1999"):
+            with self.subTest(anno=anno):
+                self.assertEqual(bt.role_of(f"producer-{anno}0807T101010Z-abcd"), "producer")
+                self.assertEqual(bt.writing_only([f"producer-{anno}0807T101010Z-abcd"]),
+                                 [f"producer-{anno}0807T101010Z-abcd"])
+                self.assertEqual(bt.writing_only([f"verificatore-{anno}0807T101010Z-abcd"]), [])
+
+    def test_a_run_id_it_does_not_recognise_is_left_whole(self):
+        """Meglio un ruolo che non combacia con niente di uno troncato a caso."""
+        self.assertEqual(bt.role_of("qualcosa-che-non-e-un-run-id"),
+                         "qualcosa-che-non-e-un-run-id")
+
     def test_the_critics_are_not_writers(self):
         runs = ["verificatore-20260807T101010Z-aaaa",
                 "reader-editor-20260807T101010Z-bbbb",
@@ -221,7 +240,7 @@ class OnlyProseCountsAsProse(unittest.TestCase):
                 run_id = f"{stage}-20260807T101010Z-abcd"
                 trovato = bt.RUN_ID.search(run_id)
                 self.assertIsNotNone(trovato, f"{stage} non apre nessuna run agli occhi del rapporto")
-                ruolo = trovato.group(0).split("-2026")[0]
+                ruolo = bt.role_of(trovato.group(0))
                 atteso = stage[len("legacy-"):] if stage.startswith("legacy-") else stage
                 self.assertEqual(ruolo, atteso)
                 self.assertEqual(ruolo in bt.WRITING, atteso in bt.WRITING)

@@ -189,6 +189,15 @@ def year_stated_after(text, match):
     return int(re.search(r"(?:19|20)\d\d", stated.group(0)).group(0))
 
 
+# Una cifra governata da "supera"/"sotto" e' una **soglia**, non il valore di
+# quel territorio: "restava sotto il 12,00 in Campania" non dice che la Campania
+# valga 12. Il ramo `value_of` la leggeva come un valore e la bocciava come
+# `cifra-falsa` su una frase vera, mentre il ramo `threshold` la giudicava
+# correttamente: due regole sullo stesso pezzo di testo, una delle due sbagliata.
+# Stessa forma della soppressione che `states_a_value` fa gia' con `HEDGE`.
+A_THRESHOLD = re.compile(rf"(?:{ABOVE}|{BELOW})\s+(?:il|lo|la|i|gli|le|a|ai|al)?\s*$", re.I)
+
+
 def patterns(alternation):
     """I tre pattern numerici sopra un'alternativa di territori."""
     gap = r"(?:(?!" + alternation + r"|\d)[^.,;])"
@@ -307,6 +316,10 @@ def check_figures(entry, key=None, compiled=None, **_):
             raw, territory = match.group(1), match.group(2)
             if "," not in raw:
                 continue
+            # Una soglia non e' un valore: la giudica il ramo qui sotto, e
+            # leggerla come valore boccia una frase vera. Vedi `A_THRESHOLD`.
+            if A_THRESHOLD.search(text[max(0, match.start() - 30):match.start()]):
+                continue
             # Anche questo verso onora l'anno scritto accanto. Vedi
             # `year_stated_after`: la regola vale per come la cifra e' vera, non
             # per come la frase e' girata.
@@ -326,8 +339,6 @@ def check_figures(entry, key=None, compiled=None, **_):
                                       f"{round(actual, 2)}", field))
         for match in compiled["states_value"].finditer(text):
             territory, raw = match.group(1), match.group(2)
-            if territory not in values:
-                continue
             # Una cifra con l'anno scritto accanto ("segna 81,67 nel 2020") non
             # si salta piu': si controlla **contro quell'anno**. L'esclusione
             # nasceva da un falso allarme vero, ma nascondeva un buco che la
@@ -335,6 +346,14 @@ def check_figures(entry, key=None, compiled=None, **_):
             # storici (rotture di pendenza, ritorni a un livello, sorpassi):
             # la prosa cita molte piu' cifre di anni passati di quante ne
             # citasse quella vecchia, e nessuna era controllata.
+            #
+            # **L'anno si risolve prima di chiedere se il territorio esiste**, e
+            # l'ordine e' tutto. La copertura di una matrice cambia da un anno
+            # all'altro: un territorio con dati nel 2014 e assente nell'ultima
+            # riga usciva dal controllo alla prima riga, quindi "Liguria segna
+            # 99,00 nel 2014" passava anche se nel 2014 la Liguria segnava 30.
+            # Chiedere l'appartenenza a `values` ha senso solo per una cifra
+            # senza anno, che e' l'unica giudicata sull'anno dell'articolo.
             stated = year_stated_after(text, match)
             if stated:
                 year = stated
@@ -342,6 +361,8 @@ def check_figures(entry, key=None, compiled=None, **_):
                 if territory not in historic:
                     continue
                 actual, when = historic[territory], f" nel {year}"
+            elif territory not in values:
+                continue
             elif states_a_value(text, match):
                 actual, when = values[territory], ""
             else:
@@ -354,14 +375,20 @@ def check_figures(entry, key=None, compiled=None, **_):
         for match in compiled["threshold"].finditer(text):
             verb, raw, listed = match.group(1), match.group(2), match.group(3)
             threshold, above = number_of(raw), bool(re.match(ABOVE, verb, re.I))
+            # Il terzo ramo, e l'anno vale anche qui. Vedi `year_stated_after`:
+            # la regola era scritta per un ramo su tre, e "restava sotto il 12
+            # in Campania nel 2020" veniva giudicato contro l'anno dell'articolo.
+            year = year_stated_after(text, match)
+            against = values if year is None else values_of(key, entry, year=year)
+            when = "" if year is None else f" nel {year}"
             for territory in re.findall(compiled["alternation"], listed):
-                if territory not in values:
+                if territory not in against:
                     continue
-                actual = values[territory]
+                actual = against[territory]
                 ok = (actual >= threshold - 0.06) if above else (actual <= threshold + 0.06)
                 if not ok:
                     found.append(_finding("soglia-falsa", BLOCKS,
-                                          f"{territory} {verb} {raw}, dato "
+                                          f"{territory} {verb} {raw}{when}, dato "
                                           f"{round(actual, 2)}", field))
     return found
 
