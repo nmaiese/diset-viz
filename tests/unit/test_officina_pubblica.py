@@ -190,5 +190,29 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
                       "non la versione vecchia")
 
 
+    def test_a_gate_that_cannot_run_is_not_a_green_gate(self):
+        """Il verso della guardia e' scelto, e va nel senso prudente.
+
+        Se il lint stesso esplode (dati storti, vista che non si costruisce),
+        `origine` **non** si scrive: un guasto qui non deve promuovere niente.
+        La scrittura invece prosegue, perche' prima di questa funzione avveniva
+        sempre, e far sparire l'articolo per un errore del cancello sarebbe una
+        regressione peggiore del difetto che stiamo chiudendo.
+        """
+        with unittest.mock.patch.object(lint, "lint_entry",
+                                        side_effect=RuntimeError("vista rotta")):
+            fermi = pubblica.bloccanti("30", {"lead": "x", "sections": []})
+        self.assertEqual([f["rule"] for f in fermi], ["cancello-non-eseguibile"])
+        self.assertIn("vista rotta", fermi[0]["detail"])
+
+    def test_and_the_article_is_still_written(self):
+        with unittest.mock.patch.object(lint, "lint_entry",
+                                        side_effect=RuntimeError("vista rotta")):
+            codice, entry = self._main(BOZZA)
+        self.assertEqual(codice, 0)
+        self.assertNotIn("origine", entry)
+        self.assertEqual(entry["lead"], BOZZA["lead"])
+
+
 if __name__ == "__main__":
     unittest.main()

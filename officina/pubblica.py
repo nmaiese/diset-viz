@@ -135,14 +135,27 @@ def bloccanti(key: str, fatta: dict) -> list:
     """
     from officina import lint
 
-    texts = dict(indicator_store.load_all())
-    texts[key] = fatta
-    alternation = lint.territory_alternation(texts)
-    compiled = lint.patterns(alternation)
-    compiled["alternation"] = alternation
-    return [rilievo for rilievo in lint.lint_entry(key, fatta, texts=texts,
-                                                   compiled=compiled)
-            if rilievo["severity"] == lint.BLOCKS]
+    try:
+        texts = dict(indicator_store.load_all())
+        texts[key] = fatta
+        alternation = lint.territory_alternation(texts)
+        compiled = lint.patterns(alternation)
+        compiled["alternation"] = alternation
+        rilievi = lint.lint_entry(key, fatta, texts=texts, compiled=compiled)
+    except Exception as errore:  # noqa: BLE001
+        # Un cancello che non riesce a girare non e' un cancello verde. Il
+        # verso di questa guardia e' scelto: **non** si scrive `origine`, cosi'
+        # un guasto qui non promuove niente. La scrittura invece prosegue,
+        # perche' prima di questa funzione avveniva sempre, e far sparire
+        # l'articolo per un errore del lint sarebbe una regressione peggiore
+        # del difetto che stiamo chiudendo.
+        return [_finding_di_guasto(errore)]
+    return [rilievo for rilievo in rilievi if rilievo["severity"] == lint.BLOCKS]
+
+
+def _finding_di_guasto(errore: BaseException) -> dict:
+    return {"rule": "cancello-non-eseguibile", "severity": "blocca",
+            "detail": f"{type(errore).__name__}: {errore}"[:300], "field": None}
 
 
 def main(argv=None) -> int:
