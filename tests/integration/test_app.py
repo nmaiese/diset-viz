@@ -960,6 +960,138 @@ class AppSmokeTest(unittest.TestCase):
         # which would make the browser's JSON.parse fail.
         json.dumps(get_catalog(), allow_nan=False)
 
+    def test_authored_title_de_boilerplates_within_budget(self):
+        """Un titolo autorato in lingua comune sostituisce il boilerplate
+        "per regione", tiene la marca se ci sta, e rispetta lo stesso budget."""
+        from app.indicator_notes import authored_seo_title, _TITLE_MAX
+        short = authored_seo_title("Dove si lavora di piu' nella ricerca", "Divario Italia")
+        self.assertEqual(short, "Dove si lavora di piu' nella ricerca · Divario Italia")
+        self.assertLessEqual(len(short), _TITLE_MAX)
+        self.assertNotIn("per regione", short)
+        # Un titolo autorato lungo non sfora: si taglia a frase intera, senza marca.
+        longtitle = ("Dove nascono piu' imprese e dove invece il tessuto produttivo "
+                     "resta fermo da anni interi in questa lunga analisi.")
+        clamped = authored_seo_title(longtitle, "Divario Italia")
+        self.assertLessEqual(len(clamped), _TITLE_MAX)
+        self.assertEqual("", authored_seo_title("", "Divario Italia"))
+
+    def test_an_authored_h1_and_title_replace_the_derived_ones(self):
+        import unittest.mock
+        from app import indicator_texts
+        authored = {
+            "level": "regione", "lead": "Un lead.", "vintage": 2023,
+            "h1": "Dove si vive a lungo dopo i 65 anni",
+            "seo_title": "Dove si vive a lungo dopo i 65 anni",
+            "sections": [{"role": r, "h": None, "body": f"Corpo {r}."}
+                         for r in ("definizione", "quadro", "dinamica", "limiti")],
+        }
+        from app import app as flask_app
+        with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: authored):
+            html = flask_app.test_client().get(
+                "/indicatore/eta-media-della-popolazione/ter-920",
+                follow_redirects=True).get_data(as_text=True)
+        self.assertIn("Dove si vive a lungo dopo i 65 anni", html)
+        self.assertIn("<title>Dove si vive a lungo dopo i 65 anni · Divario Italia</title>", html)
+        self.assertNotIn("Eta media della popolazione per regione", html)
+
+    def test_the_markdown_projection_carries_the_authored_h1(self):
+        """La proiezione markdown e' una rappresentazione di prima classe della
+        stessa pagina: dare all'agente il nome amministrativo mentre il lettore
+        HTML legge il titolo in lingua comune sono due pagine allo stesso URL."""
+        import unittest.mock
+        from app import indicator_texts
+        from app import app as flask_app
+        authored = {
+            "level": "regione", "lead": "Un lead.", "vintage": 2023,
+            "h1": "Dove si vive a lungo dopo i 65 anni",
+            "sections": [{"role": r, "h": None, "body": f"Corpo {r}."}
+                         for r in ("definizione", "quadro", "dinamica", "limiti")],
+        }
+        with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: authored):
+            body = flask_app.test_client().get(
+                "/indicatore/eta-media-della-popolazione/ter-920",
+                headers={"Accept": "text/markdown"},
+                follow_redirects=True).get_data(as_text=True)
+        self.assertIn("# Dove si vive a lungo dopo i 65 anni", body)
+
+    def test_the_markdown_keeps_the_official_series_name(self):
+        """Con un H1 autorato il nome amministrativo sparisce dal titolo, e nella
+        proiezione markdown non ricompare da nessun'altra parte (la pagina HTML
+        ce l'ha nel blocco "Dato originale"): un agente leggerebbe cifre e fonte
+        senza sapere quale serie sta leggendo."""
+        import unittest.mock
+        from app import indicator_texts
+        from app import app as flask_app
+        authored = {
+            "level": "regione", "lead": "Un lead.", "vintage": 2023,
+            "h1": "Dove si vive a lungo dopo i 65 anni",
+            "sections": [{"role": r, "h": None, "body": f"Corpo {r}."}
+                         for r in ("definizione", "quadro", "dinamica", "limiti")],
+        }
+        with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: authored):
+            body = flask_app.test_client().get(
+                "/indicatore/eta-media-della-popolazione/ter-920",
+                headers={"Accept": "text/markdown"},
+                follow_redirects=True).get_data(as_text=True)
+        self.assertIn("# Dove si vive a lungo dopo i 65 anni", body)
+        self.assertIn("- Serie: Eta media della popolazione", body)
+
+    def test_an_authored_title_still_disambiguates_a_duplicate_bes_series(self):
+        """Le serie BES duplicate misurano lo stesso fenomeno della gemella
+        territoriale e restano indicizzabili: titolarle in lingua comune e'
+        proprio il caso in cui le due finiscono con lo stesso `<title>`."""
+        from app.indicator_notes import authored_seo_title, _TITLE_MAX
+        titled = authored_seo_title("Dove si vive a lungo dopo i 65 anni",
+                                    "Divario Italia", source_qualifier="Bes")
+        self.assertIn("(Bes)", titled)
+        self.assertLessEqual(len(titled), _TITLE_MAX)
+        plain = authored_seo_title("Dove si vive a lungo dopo i 65 anni", "Divario Italia")
+        self.assertNotEqual(plain, titled)
+
+    def test_a_banned_character_in_a_title_is_caught(self):
+        """I titoli sono l'unico testo della pagina che le guardie deterministiche
+        non guardavano: un em-dash in un `h1` sarebbe stato pubblicato con la
+        suite verde."""
+        from scripts import prose_lint
+        entry = {
+            "h1": "Dove si vive a lungo — dopo i 65 anni",
+            "seo_title": "Dove si vive a lungo, per regione",
+            "lead": "Un lead.", "sections": [{"role": "quadro", "body": "Corpo."}],
+        }
+        fields = dict(prose_lint.prose_fields(entry))
+        self.assertIn("h1", fields)
+        self.assertIn("seo_title", fields)
+        # Il carattere vietato e' ora dentro il perimetro della guardia.
+        self.assertTrue([f for f, text in fields.items() if "—" in text])
+
+    def test_the_authored_titles_reach_the_verifier(self):
+        """Un campo dentro l'impronta e fuori da cio' che il verificatore legge
+        produce una verifica pulita su una frase che nessuno ha guardato."""
+        from scripts import review_queue
+        fields = dict(review_queue.prose_fields({
+            "h1": "Dove si vive a lungo", "seo_title": "Dove si vive a lungo, per regione",
+            "lead": "Un lead.", "sections": [{"role": "quadro", "body": "Corpo."}],
+        }))
+        self.assertIn("h1", fields)
+        self.assertIn("seo_title", fields)
+
+    def test_an_authored_title_expires_the_verification(self):
+        """Un titolo e' prosa visibile, e quello SERP e' anche un'affermazione:
+        aggiungerlo o correggerlo dopo la firma non puo' lasciare buona una
+        verifica che non l'ha mai letto. Stesso buco che l'`h` di sezione ha gia'
+        aperto una volta."""
+        from scripts import verification_queue as vq
+        base = {"lead": "Un lead.", "sections": [
+            {"role": "quadro", "h": None, "body": "Corpo."}]}
+        self.assertNotEqual(vq.prose_fingerprint(base),
+                            vq.prose_fingerprint(dict(base, h1="Dove si vive a lungo")))
+        self.assertNotEqual(vq.prose_fingerprint(base),
+                            vq.prose_fingerprint(dict(base, seo_title="Dove si vive a lungo")))
+        # I campi assenti o vuoti non muovono niente: i trecento articoli di oggi
+        # non hanno questi campi e la loro impronta resta identica.
+        self.assertEqual(vq.prose_fingerprint(base),
+                         vq.prose_fingerprint(dict(base, h1="", seo_title=None)))
+
     def test_seo_metadata_within_budget(self):
         from app.data import get_catalog
         from app.indicator_notes import seo_title, seo_description
@@ -1012,6 +1144,90 @@ class AppSmokeTest(unittest.TestCase):
                 seo_title(by_id["189"]["name"], "Divario Italia"),
                 seo_title(by_id["190"]["name"], "Divario Italia"),
             )
+
+    def test_authored_titles_stay_inside_the_budget_and_stay_distinct(self):
+        """La guardia che al percorso autorato mancava.
+
+        Il titolo derivato ha un test sul catalogo che gli vieta di sforare i 60
+        caratteri e di collidere con un altro; il titolo autorato non aveva
+        niente, quindi il giorno in cui un editor ne scrive uno lungo (o due che
+        aprono sulla stessa frase) due pagine indicizzabili si sarebbero prese lo
+        stesso `<title>` in silenzio. Questo controlla i titoli **resi**, cioe'
+        l'autorato quando c'e' e il derivato quando manca, ed e' un no-op finche'
+        nessun articolo ne dichiara uno.
+        """
+        from app import sources
+        from app.atlas_catalog import get_atlas_catalog
+        from app.indicator_notes import authored_seo_title, seo_title
+        from app.indicator_view import build_indicator_view
+        from app.taxonomy import DUPLICATE_BES_IDS
+        from scripts import indicator_store
+
+        entries = indicator_store.load_all()
+
+        def rendered(indicator_id, name, family, raw_id):
+            """La stessa logica di `_render_indicator`, qualificatore compreso."""
+            qualifier = (sources.family_short_label(family)
+                         if family == "bes" and raw_id in DUPLICATE_BES_IDS else None)
+            entry = entries.get(str(indicator_id)) or {}
+            authored = (entry.get("seo_title") or entry.get("h1") or "").strip()
+            if authored:
+                return authored_seo_title(authored, "Divario Italia",
+                                          source_qualifier=qualifier)
+            return seo_title(name, "Divario Italia", source_qualifier=qualifier)
+
+        # Il catalogo d'atlante, non quello territoriale: un titolo autorato su un
+        # BES, un Multiscopo, un Eurostat o un demografico non sarebbe passato di
+        # qui, e la collisione che conta e' anche quella **fra famiglie** (una
+        # serie BES duplicata misura lo stesso fenomeno della gemella
+        # territoriale, ed e' il caso che il qualificatore esiste per separare).
+        titles = {}
+        for item in get_atlas_catalog()["indicators"]:
+            family, raw_id = sources.split_internal_id(str(item["id"]))
+            title = rendered(item["id"], item["name"], family, raw_id)
+            self.assertLessEqual(len(title), 60, f"title too long for {item['id']}: {title}")
+            self.assertEqual(title, title.strip())
+            self.assertEqual(title.count("("), title.count(")"), title)
+            view = build_indicator_view(family, raw_id)
+            if view is not None and view["meta"]["indexable"]:
+                titles.setdefault(title, []).append(item["id"])
+        collisions = {title: ids for title, ids in titles.items() if len(ids) > 1}
+        self.assertEqual(collisions, {},
+                         f"pagine indicizzabili con lo stesso <title>: {list(collisions.items())[:5]}")
+
+    def test_a_long_authored_title_keeps_what_distinguishes_it(self):
+        """Due titoli lunghi che aprono sulla stessa frase non possono diventare
+        lo stesso `<title>`: cio' che li distingue sta in fondo, quindi in fondo
+        si tiene."""
+        from app.indicator_notes import authored_seo_title, _TITLE_MAX
+        common = "Il divario fra Nord e Sud in questa lunghissima analisi "
+        first = authored_seo_title(common + "sulla natalita regionale")
+        second = authored_seo_title(common + "sulla mortalita regionale")
+        self.assertNotEqual(first, second)
+        for title in (first, second):
+            self.assertLessEqual(len(title), _TITLE_MAX)
+            self.assertEqual(title.count("("), title.count(")"))
+        # E una parola sola piu' lunga del budget non lo sfora comunque.
+        self.assertLessEqual(len(authored_seo_title("A" * 200)), _TITLE_MAX)
+
+    def test_shortening_never_leaves_a_dangling_parenthesis(self):
+        """Il taglio a caratteri puo' cadere dentro una parentesi dell'autore e
+        portarsi via solo meta' della coppia: incastonato in `testa (coda)`
+        diventa il titolo malformato che la guardia promette di non far uscire.
+        Testa e coda si bilanciano entrambe, e la coda resta quella che
+        distingue."""
+        from app.indicator_notes import authored_seo_title, _TITLE_MAX
+        cases = [
+            "Titolo comune abbastanza lungo per doverlo tagliare (qualificatore editoriale molto lungo)",
+            "Titolo (uno) e poi (due) e ancora (tre) con una coda lunghissima che sfora il budget",
+            "Apertura (parentesi mai chiusa nella prima meta del titolo lunghissimo che sfora",
+        ]
+        for text in cases:
+            with self.subTest(text=text[:30]):
+                title = authored_seo_title(text)
+                self.assertLessEqual(len(title), _TITLE_MAX)
+                self.assertEqual(title.count("("), title.count(")"), title)
+                self.assertEqual(title, title.strip())
 
     def test_seo_title_keeps_scale_level_distinct(self):
         # Regression for the multiscopo satisfaction-level family: 11 pages
@@ -1082,7 +1298,8 @@ class AppSmokeTest(unittest.TestCase):
         # della sitemap). Una collisione li' non l'avrebbe vista nessun test.
         from app import sources
         from app.config import SITE_NAME
-        from app.indicator_notes import seo_title
+        from app.indicator_notes import authored_seo_title, seo_title
+        from app.indicator_texts import build_article
         from app.taxonomy import DUPLICATE_BES_IDS, PROVINCE_ONLY_TITLE_COLLISIONS
         from app.views import _build_indexable_indicator_catalog
 
@@ -1106,7 +1323,20 @@ class AppSmokeTest(unittest.TestCase):
         for record in _build_indexable_indicator_catalog():
             meta = record["meta"]
             bare_id = str(meta["id"]).rsplit(":", 1)[-1]
-            title = seo_title(meta["name"], SITE_NAME, source_qualifier=qualifier_for(bare_id))
+            qualifier = qualifier_for(bare_id)
+            # Un titolo autorato (h1/seo_title) sostituisce il derivato quando
+            # c'e': stesso ramo di `views._render_indicator`, o la prova non
+            # vedrebbe una collisione fra due titoli autorati ne' fra uno
+            # autorato e uno derivato. `build_article` con il livello di
+            # default: un'entry autorata solo su un livello non regionale (oggi
+            # nessuna) resterebbe fuori da questo controllo, lo stesso limite
+            # del catalogo compatto che non porta la chiave di livello.
+            article = build_article(meta["id"])
+            authored = article["seo_title"] or article["h1"]
+            if authored:
+                title = authored_seo_title(authored, SITE_NAME, source_qualifier=qualifier)
+            else:
+                title = seo_title(meta["name"], SITE_NAME, source_qualifier=qualifier)
             self.assertLessEqual(len(title), 60, f"{meta['id']}: {title}")
             titles.setdefault(title, []).append(meta["id"])
         collisions = {title: ids for title, ids in titles.items() if len(ids) > 1}

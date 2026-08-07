@@ -1,0 +1,18 @@
+{
+ "at": "2026-08-07",
+ "code": "ter-923",
+ "cognitive_load": 1,
+ "comprehension": 2,
+ "focus": 2,
+ "hard_failures": [],
+ "level": "regione",
+ "note": "La sezione che porta la tesi nel titolo (Il segno piu' arriva anche dove si parte) apre su nati e morti del 2025, che sono un altro indicatore, poi sullo scalino della graduatoria, e la prova vera (Molise a 4,7 sul totale contro meno 3,4 sugli scambi interni) arriva solo al terzo paragrafo, dove tre coppie di cifre di fila costringono a tornare indietro per sapere quale numero e' quale saldo. La prova va portata sopra e alleggerita a una regione sola, il contesto nazionale sotto. Nella dinamica, il paragrafo che ricalca la media anno per anno (1,08 poi 2,42 poi 4,25) ripete la tabella della serie storica che sta appena sopra nella pagina. Due incisi parlano della disponibilita' del dato invece che della domanda del lettore (il conto si puo' fare fino al 2024, il 2019 non e' un punto di partenza scelto a caso). AIRE resta la sola sigla mai sciolta, e sta proprio nella frase che chiede di diffidare del confronto fra gli ultimi due anni.",
+ "prosa": "87026bd52206de0a",
+ "reader_relevance": 2,
+ "reviewed_at": "2026-08-07",
+ "search_intent_coverage": 2,
+ "structure": 1,
+ "technical_translation": 1,
+ "unique_value": 2,
+ "verdict": "revise"
+}

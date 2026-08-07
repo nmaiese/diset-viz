@@ -1,0 +1,24 @@
+{
+ "at": "2026-08-07T06:40:02+00:00",
+ "base_commit": "cb7bb25",
+ "branch": "automation/producer-2026-08-07-7dea",
+ "claude_code_version": "2.1.224 (Claude Code)",
+ "commit": "10232ca",
+ "detail": [
+  "Cura: nessun cambio. curation.csv riga 923 gia confermata il 2026-08-03 su data_year 2025, verso contextual, score_eligible false, categoria salute_cura. Il verso pubblicato di ter-923 viene da CURATED_DIRECTION in app/indicator_notes.py, fuori dal perimetro del produttore.",
+  "Tesi: il saldo totale e positivo in 19 regioni su 20 nel 2025 e somma due movimenti opposti, quindi il segno piu non dice che una regione trattiene i residenti. Prova al 2024, ultimo anno con entrambe le serie: Molise 4,7 sul totale contro -3,4 su dem-NMIGRATEIN, Calabria 2,0 contro -4,4, Basilicata 0,3 contro -4,8.",
+  "Dinamica ancorata al 2019 (media delle 20 regioni 1,79 per mille, 7 regioni negative) e non al 2002: il tratto 2014-2015 (11 regioni negative nel 2014, Liguria e Piemonte comprese, media 0,01 nel 2015) e dichiarato in prosa come non confrontabile invece di essere spiegato con una causa non verificabile. 2020 1,08, 2021 2,42, 2022 4,25.",
+  "Controcorrente 2024-2025: Molise da 4,7 a 1,4, Basilicata da 0,3 a -2,3 unica sotto zero, in calo anche Abruzzo e Calabria. Campania torna positiva per la prima volta dal 2010.",
+  "Fonti esterne verificate: Istat Indicatori demografici anno 2025 (355mila nati, 652mila decessi, saldo naturale circa -296mila, saldo con l'estero +296mila, Mezzogiorno -45mila e -2,3 per mille sul versante interno, Centro-Nord +45mila e +1,2 per mille, avvertenza sulle iscrizioni AIRE 2024) e demo.istat.it per la definizione ufficiale. Nessun aggregato ponderato Istat confrontato con la nostra media semplice.",
+  "Firmato reviewed_at 2026-08-07 reviewed_vintage 2025 dopo rilettura contro le classi indicator-review e la rubrica a quattro assi. prose_lint 0 tell, 3 link interni, suite 1090 test verde, pagina letta renderizzata (una duplicazione di frase trovata solo li e corretta)."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 325,
+ "queue_before": 326,
+ "run_id": "producer-20260807T061808Z-7dea",
+ "stage": "producer",
+ "summary": "ter-923 saldo migratorio totale portato da bozza a firmato: definizione e dinamica scritte, lead e quadro riscritti, limiti rifatto, level regione aggiunto",
+ "trigger": "manuale"
+}
