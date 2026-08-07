@@ -285,6 +285,25 @@ class TheMechanicalStagesTakeNoEditorialDecision(unittest.TestCase):
         self.assertIn("officina.pubblica", self.pubblica)
         self.assertNotIn("scripts.indicator_store", self.text)
 
+    def test_the_last_attempt_refuses_to_eat_a_good_article(self):
+        """`--ultimo-tentativo` sulla seconda chiamata, e **solo** su quella.
+
+        Sempre acceso rompe il giro di riparazione: dentro il giro la bozza
+        bocciata deve stare su disco, perche' il passo 2 la rilegge da li' con
+        `officina.lint` per riportare i rilievi a chi riscrive, e su un articolo
+        vecchio quei rilievi sarebbero di un altro testo. Mai acceso, invece, e'
+        il difetto: una riscrittura bocciata sostituisce l'articolo buono nel
+        working tree.
+
+        La condizione e' `${ultimo ? ...}` dentro il comando, e le chiamate `:2`
+        sono le sole a passare `true`.
+        """
+        codice = _senza_commenti(self.text)
+        self.assertIn("--ultimo-tentativo", self.pubblica)
+        self.assertEqual(codice.count("await pubblica(corrente, ':2', true)"), 2)
+        self.assertIn("await pubblica(corrente)\n", codice,
+                      "il primo tentativo non passa il flag")
+
     def test_the_pack_stage_does_not_run_as_the_publisher(self):
         prepara = self.text.split("async function prepara", 1)[1].split("\n}", 1)[0]
         self.assertIn("'preparatore-pacchetti'", prepara)

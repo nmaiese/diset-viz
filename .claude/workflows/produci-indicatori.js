@@ -632,7 +632,7 @@ const esiti = await pipeline(
       try {
         const bozza = await rivedi(corrente, ilRifiuto(esito.errore_scrittura))
         corrente = { ...corrente, bozza }
-        esito = await pubblica(corrente, ':2')
+        esito = await pubblica(corrente, ':2', true)
       } catch (errore) {
         log(`${scelto.pack.code}: la correzione della bozza e' fallita (${errore.message})`)
       }
@@ -645,7 +645,7 @@ const esiti = await pipeline(
       try {
         const bozza = await rivedi(corrente, ilBlocco(esito.rilievi))
         corrente = { ...corrente, bozza }
-        esito = await pubblica(corrente, ':2')
+        esito = await pubblica(corrente, ':2', true)
       } catch (errore) {
         log(`${scelto.pack.code}: la revisione del blocco e' fallita (${errore.message})`)
       }
@@ -673,14 +673,19 @@ const esiti = await pipeline(
   },
 )
 
-function pubblica(scelto, suffisso = '') {
+// `ultimo` accende `--ultimo-tentativo`, e si accende **solo** sulla seconda
+// chiamata. Dentro il giro di riparazione la bozza bocciata deve andare su
+// disco, perche' il passo 2 la rilegge da li' per riportare i rilievi a chi
+// riscrive; quando il giro e' finito no, perche' li' sovrascriverebbe per
+// sempre un articolo che il cancello aveva passato. Vedi `officina/pubblica.py`.
+function pubblica(scelto, suffisso = '', ultimo = false) {
   return conTipo(
       `Pubblica l'articolo ${scelto.pack.code}. Due comandi, in quest'ordine.
 
 1. Scrivi la bozza. Copia questo blocco intero, dalla prima riga all'ultima:
 
 \`\`\`
-${INTERPRETE} -m officina.pubblica ${scelto.pack.code} <<'BOZZA'
+${INTERPRETE} -m officina.pubblica ${scelto.pack.code}${ultimo ? ' --ultimo-tentativo' : ''} <<'BOZZA'
 ${JSON.stringify(bozzaDaScrivere(scelto.bozza))}
 BOZZA
 \`\`\`
@@ -689,7 +694,8 @@ BOZZA
    Se esce 2, **non e' scritto**: rispondi \`scritto: false\` e copia in
    \`errore_scrittura\` il messaggio esatto. E' sempre un difetto della bozza
    (un ruolo doppio, una sezione senza corpo, un livello che l'indicatore non
-   ha), mai un file da andare a cercare, e mai una cosa da aggiustare tu.
+   ha, oppure il cancello che blocca all'ultimo tentativo), mai un file da
+   andare a cercare, e mai una cosa da aggiustare tu.
 
 2. Esegui \`${INTERPRETE} -m officina.lint ${scelto.pack.code} --json\` e
    **riporta ogni rilievo**, sia \`blocca\` sia \`segnala\`, copiando \`rule\`,

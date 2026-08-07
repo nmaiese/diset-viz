@@ -131,25 +131,40 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
     bloccava, e l'articolo bloccato passava lo stesso.
     """
 
-    def _main(self, bozza, code="ter-30", root=None):
-        """Esegue `main` con la bozza su stdin, dentro uno store temporaneo."""
+    def _main(self, bozza, code="ter-30", root=None, extra=(), precedenti=None):
+        """Esegue `main` con la bozza su stdin, dentro uno store temporaneo.
+
+        `precedenti` sostituisce lo store letto prima di scrivere: `None` lo
+        lascia vivo (nessuno dei test che non passano `--ultimo-tentativo` lo
+        guarda), un dizionario decide se sotto la bozza c'e' gia' un articolo.
+        """
         scritte = {}
 
         def finta_write(key, entry, root=None):
             scritte["key"], scritte["entry"] = key, entry
             return f"/finto/{key}.json"
 
+        contesti = [
+            unittest.mock.patch.object(pubblica.indicator_store, "write", finta_write),
+            unittest.mock.patch.object(pubblica.sys, "stdin",
+                                       io.StringIO(json.dumps(bozza))),
+        ]
+        if precedenti is not None:
+            contesti.append(unittest.mock.patch.object(
+                pubblica.indicator_store, "load_all", lambda *a, **k: dict(precedenti)))
+
         rumore = io.StringIO()
-        with unittest.mock.patch.object(pubblica.indicator_store, "write", finta_write), \
-             unittest.mock.patch.object(pubblica.sys, "stdin",
-                                        io.StringIO(json.dumps(bozza))), \
-             contextlib.redirect_stdout(rumore), contextlib.redirect_stderr(rumore):
-            codice = pubblica.main([code])
-        return codice, scritte.get("entry", {})
+        with contextlib.ExitStack() as stack:
+            for contesto in contesti:
+                stack.enter_context(contesto)
+            stack.enter_context(contextlib.redirect_stdout(rumore))
+            stack.enter_context(contextlib.redirect_stderr(rumore))
+            codice = pubblica.main([code, *extra])
+        return codice, scritte.get("entry", {}), rumore.getvalue()
 
     def test_a_clean_draft_earns_it(self):
         with unittest.mock.patch.object(pubblica, "bloccanti", lambda key, fatta: []):
-            codice, entry = self._main(BOZZA)
+            codice, entry, _ = self._main(BOZZA)
         self.assertEqual(codice, 0)
         self.assertEqual(entry["origine"], "officina")
 
@@ -163,7 +178,7 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
         """
         fermo = [{"rule": "cifra-falsa", "severity": "blocca", "detail": "x", "field": None}]
         with unittest.mock.patch.object(pubblica, "bloccanti", lambda key, fatta: fermo):
-            codice, entry = self._main(BOZZA)
+            codice, entry, _ = self._main(BOZZA)
         self.assertEqual(codice, 0, "l'articolo e' scritto: l'uscita non cambia")
         self.assertNotIn("origine", entry)
 
@@ -208,7 +223,89 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
     def test_and_the_article_is_still_written(self):
         with unittest.mock.patch.object(lint, "lint_entry",
                                         side_effect=RuntimeError("vista rotta")):
-            codice, entry = self._main(BOZZA)
+            codice, entry, _ = self._main(BOZZA)
+        self.assertEqual(codice, 0)
+        self.assertNotIn("origine", entry)
+        self.assertEqual(entry["lead"], BOZZA["lead"])
+
+
+class ARejectedRewriteDoesNotEatTheGoodArticle(
+        OnlyAnArticleThatPassedTheGateGetsItsOrigin):
+    """`--ultimo-tentativo`: quando il giro di riparazione e' finito, una bozza
+    ancora rossa non sostituisce l'articolo che c'era.
+
+    Il difetto: l'officina scrive in `content/indicators/<chiave>.json` e la
+    scrittura non e' condizionata al verdetto. Su una prima pubblicazione non si
+    perde niente, su una **riscrittura** di un articolo gia' buono quello buono
+    spariva dal working tree, recuperabile solo da git.
+
+    Perche' il rimedio ha un flag invece di essere sempre acceso, che e' la
+    parte che si sbaglia: dentro il giro l'articolo bocciato **deve** andare su
+    disco, perche' il passo successivo del pubblicatore lo rilegge da li' con
+    `officina.lint` per riportare i rilievi a chi riscrive. Un rifiuto al primo
+    tentativo farebbe lintare l'articolo **vecchio** e attribuirebbe i suoi
+    rilievi alla bozza nuova: un verdetto falso, peggio della sovrascrittura,
+    che almeno si recupera. Il workflow accende il flag solo sulla seconda
+    chiamata.
+
+    Eredita la classe sopra per riusarne `_main` e ricontrollare, di fatto, che
+    il comportamento dentro il giro non sia cambiato.
+    """
+
+    FERMO = [{"rule": "cifra-falsa", "severity": "blocca", "detail": "x", "field": None}]
+
+    def test_the_previous_article_survives_a_blocked_rewrite(self):
+        with unittest.mock.patch.object(pubblica, "bloccanti",
+                                        lambda key, fatta: self.FERMO):
+            codice, entry, detto = self._main(
+                BOZZA, extra=["--ultimo-tentativo"],
+                precedenti={"30": {"lead": "Il buono di prima.", "sections": []}})
+        self.assertEqual(codice, 2, "non e' scritta, e l'uscita lo dice")
+        self.assertEqual(entry, {}, "nessuna scrittura, nemmeno una e ripristinata")
+        self.assertIn("cifra-falsa", detto)
+        self.assertIn("rimasto al suo posto", detto)
+
+    def test_a_first_publication_is_still_written(self):
+        """Senza un precedente non c'e' niente da proteggere, e rifiutare qui
+        perderebbe l'unica copia della bozza."""
+        with unittest.mock.patch.object(pubblica, "bloccanti",
+                                        lambda key, fatta: self.FERMO):
+            codice, entry, _ = self._main(
+                BOZZA, extra=["--ultimo-tentativo"], precedenti={})
+        self.assertEqual(codice, 0)
+        self.assertNotIn("origine", entry)
+        self.assertEqual(entry["lead"], BOZZA["lead"])
+
+    def test_inside_the_repair_loop_the_blocked_draft_still_lands(self):
+        """Senza il flag, niente cambia: e' il giro di riparazione."""
+        with unittest.mock.patch.object(pubblica, "bloccanti",
+                                        lambda key, fatta: self.FERMO):
+            codice, entry, _ = self._main(
+                BOZZA, precedenti={"30": {"lead": "Il buono di prima.", "sections": []}})
+        self.assertEqual(codice, 0)
+        self.assertEqual(entry["lead"], BOZZA["lead"])
+
+    def test_a_clean_rewrite_is_written_on_the_last_attempt_too(self):
+        with unittest.mock.patch.object(pubblica, "bloccanti", lambda key, fatta: []):
+            codice, entry, _ = self._main(
+                BOZZA, extra=["--ultimo-tentativo"],
+                precedenti={"30": {"lead": "Il buono di prima.", "sections": []}})
+        self.assertEqual(codice, 0)
+        self.assertEqual(entry["origine"], "officina")
+
+    def test_a_gate_that_cannot_run_does_not_throw_the_draft_away(self):
+        """`cancello-non-eseguibile` non e' una bocciatura editoriale.
+
+        Il verso della guardia e' lo stesso del resto del file: un guasto del
+        lint non promuove (niente `origine`) e non distrugge (la bozza si
+        scrive). Un rifiuto qui farebbe perdere il lavoro per un errore che non
+        riguarda la prosa.
+        """
+        with unittest.mock.patch.object(lint, "lint_entry",
+                                        side_effect=RuntimeError("vista rotta")):
+            codice, entry, _ = self._main(
+                BOZZA, extra=["--ultimo-tentativo"],
+                precedenti={"30": {"lead": "Il buono di prima.", "sections": []}})
         self.assertEqual(codice, 0)
         self.assertNotIn("origine", entry)
         self.assertEqual(entry["lead"], BOZZA["lead"])

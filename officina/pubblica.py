@@ -125,13 +125,17 @@ def bloccanti(key: str, fatta: dict) -> list:
     `lint_entry` che gira `officina.lint`, sullo stesso store con la bozza
     gia' sostituita al proprio posto, cosi' i due verdetti non possono divergere.
 
-    **L'articolo bocciato si scrive comunque**, e senza il campo. Rifiutare la
-    scrittura romperebbe il giro che l'officina fa per riparare: il workflow
+    **L'articolo bocciato si scrive comunque, dentro il giro di riparazione**, e
+    senza il campo. Rifiutare la scrittura li' romperebbe il giro: il workflow
     legge l'uscita 2 come "non e' scritta", tornerebbe a chi scrive con un
     messaggio di forma invece che con i rilievi, e il passo di lint successivo
-    girerebbe sull'articolo **vecchio**. Cio' che resta aperto e' dichiarato: la
-    riscrittura sovrascrive comunque il file precedente, che e' il modo in cui
-    il giro di riparazione funziona, ed e' recuperabile da git.
+    girerebbe sull'articolo **vecchio**, attribuendo i rilievi di quello alla
+    bozza nuova.
+
+    Fuori dal giro no: `--ultimo-tentativo` (vedi `main`) rifiuta la scrittura
+    quando il giro e' finito, la bozza e' ancora rossa e sotto c'e' un articolo
+    precedente. E' il punto in cui una riscrittura bocciata sostituiva un
+    articolo buono nel working tree, ed era recuperabile solo da git.
     """
     from officina import lint
 
@@ -158,12 +162,20 @@ def _finding_di_guasto(errore: BaseException) -> dict:
             "detail": f"{type(errore).__name__}: {errore}"[:300], "field": None}
 
 
+def _guasto_del_cancello(fermi: list) -> bool:
+    """Il cancello non ha girato, invece di aver bocciato."""
+    return any(rilievo["rule"] == "cancello-non-eseguibile" for rilievo in fermi)
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("code", help="il codice in forma URL, es. ter-30")
     parser.add_argument("--level", default=None, help=f"default {DEFAULT_LEVEL}")
     parser.add_argument("--bozza", default=None,
                         help="un file JSON invece di stdin")
+    parser.add_argument("--ultimo-tentativo", action="store_true",
+                        help="non sovrascrivere un articolo esistente con una "
+                             "bozza che il cancello blocca")
     args = parser.parse_args(argv)
 
     testo = open(args.bozza, encoding="utf-8").read() if args.bozza else sys.stdin.read()
@@ -176,7 +188,32 @@ def main(argv=None) -> int:
     try:
         fatta = entry(bozza, args.code, args.level)
         key = chiave(args.code)
+        precedente = indicator_store.load_all().get(key)
         fermi = bloccanti(key, fatta)
+        if fermi and args.ultimo_tentativo and precedente is not None \
+                and not _guasto_del_cancello(fermi):
+            # **Il giro di riparazione e' finito e la bozza e' ancora rossa.**
+            # Qui, e solo qui, non si scrive: sovrascrivere vorrebbe dire
+            # sostituire un articolo che il cancello aveva passato con uno che
+            # non passa, e la versione buona sparirebbe dal working tree.
+            #
+            # Perche' non prima: dentro il giro l'articolo bocciato **deve**
+            # andare su disco, perche' il passo di lint successivo lo rilegge da
+            # li' per riportare i rilievi a chi riscrive. Un ripristino al primo
+            # tentativo farebbe lintare l'articolo **vecchio** e attribuirebbe i
+            # suoi rilievi alla bozza nuova: un verdetto falso, che e' peggio di
+            # una sovrascrittura, perche' la sovrascrittura almeno si recupera
+            # da git.
+            #
+            # Un guasto del cancello e' escluso apposta: `cancello-non-eseguibile`
+            # non e' una bocciatura editoriale, e non deve buttare via una
+            # scrittura per un errore del lint.
+            print("non scritta: il cancello blocca su "
+                  + ", ".join(sorted({rilievo["rule"] for rilievo in fermi}))
+                  + f", e l'articolo precedente e' rimasto al suo posto ({key}). "
+                  + "Nessuna versione buona e' stata sovrascritta.",
+                  file=sys.stderr)
+            return 2
         if not fermi:
             fatta["origine"] = verification_queue.OFFICINA
         path = indicator_store.write(key, fatta)
