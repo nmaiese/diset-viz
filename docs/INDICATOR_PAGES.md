@@ -110,6 +110,13 @@ Le regole, tutte meccaniche:
 - **Il campo è opt-in e additivo.** Senza `roles_covered` la pagina rende i
   quattro ruoli come ha sempre fatto, e i trecento articoli esistenti non
   cambiano di un byte.
+- **Ed è usabile.** Fino ad agosto 2026 non lo era: un test asseriva che
+  l'elenco degli articoli opt-in fosse *vuoto*, quindi il solo meccanismo
+  costruito per non aprire sulla definizione era progettato, implementato,
+  documentato qui, e vietato. Zero file su 375 lo usavano, mentre 52 articoli
+  su 52 aprivano allo stesso modo: il freno di sicurezza di un rilascio
+  graduale era diventato il motivo per cui il rilascio non partiva. Adesso la
+  guardia controlla la coerenza di chi opta, non il fatto che qualcuno opti.
 - **Un ruolo assorbito non è un ruolo mancante.** `scripts/text_queue.py` e
   `scripts/pending_notes.py` contano contro i ruoli emessi, altrimenti il
   produttore troverebbe per sempre la `definizione` «da scrivere» e la
@@ -300,9 +307,14 @@ non è stato controllato niente. Vedi
   riformulano come contesto, non come causa accertata,
 - i confronti con l'estero ("tra i più alti d'Europa"): richiedono una fonte in
   `fonti`, verificata, altrimenti vanno tolti,
-- **le cifre attribuite a una provincia**: la regex delle guardie conosce solo le
-  venti regioni, quindi in un articolo BES a livello provinciale nessun controllo
-  automatico le verifica,
+- **una provincia scritta con un nome che il dataset non usa** ("Reggio Emilia"
+  per "Reggio nell'Emilia"): la guardia non trova il nome e passa. Manca
+  copertura, non inventa un errore. Fino ad agosto 2026 qui c'era un buco molto
+  più largo, cioè l'intero livello provinciale: la regex elencava a mano le venti
+  regioni, quindi 67 indicatori su 103 province non erano verificati da niente e
+  le guardie restavano verdi senza incontrare un solo nome. Ora l'elenco dei
+  territori si deriva dai dati, e `test_the_guard_actually_reaches_the_provinces`
+  fallisce se la copertura si rispegne,
 - **se l'incrocio con un altro indicatore è onesto**: il verbo calibrato sulla
   prova (una correlazione di rango è una co-occorrenza, non un meccanismo), il
   confondente nominato, almeno un'eccezione al pattern. Le guardie controllano

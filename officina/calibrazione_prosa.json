@@ -1,0 +1,25 @@
+{
+  "esempi": {
+    "densita_numerica": {
+      "q10": 1.63,
+      "q25": 1.995,
+      "q50": 3.541,
+      "q75": 6.797,
+      "q90": 11.535
+    },
+    "misurabili": 7,
+    "paragrafi_scoperti": {
+      "q10": 0.0,
+      "q25": 0.125,
+      "q50": 0.25,
+      "q75": 0.333,
+      "q90": 0.333
+    },
+    "paragrafi_scoperti_max": 0.333,
+    "testi": 10
+  },
+  "fonte": "content/esempi/",
+  "metodo": "quota di paragrafi sostanziali (>=25 parole) senza nemmeno una cifra; quantili del campione",
+  "perche": "Ipotesi provata e caduta: la densita' numerica di Thäsler-Kordonouri et al. (Journalism 26(9) 2025, n=3135) non separa i due corpora, i nostri articoli non sono piu' densi. Separa invece la quota di paragrafi senza cifre: esempi 0.25 di mediana e 0.33 di massimo, pubblicati 0.67 di mediana, con 313 articoli su 376 sopra il massimo degli esempi.",
+  "soglia_paragrafi_scoperti": 0.333
+}

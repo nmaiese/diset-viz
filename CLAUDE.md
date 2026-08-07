@@ -22,6 +22,9 @@ it).
 | la revisione a pratica editoriale (identita', stati, transizioni, PR come vista) | [`docs/EDITORIAL_PRACTICE.md`](docs/EDITORIAL_PRACTICE.md) |
 | come apre e chiude una run un agente qualsiasi | [`docs/AGENT_CONTRACT.md`](docs/AGENT_CONTRACT.md) |
 | una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
+| che cosa serve per scrivere un indicatore: cifre, angoli, contesto citabile | `packs/` (`angles.py`, `build.py`, `context.py`), [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
+| scrivere articoli indicatore adesso: il workflow, il lint, i pacchetti | `.claude/workflows/produci-indicatori.js`, `officina/` (`pacchetti.py`, `brief.py`, `lint.py`) |
+| quanto costa una run, e come si misura senza sbagliare | `scripts/baseline_tokens.py` (il contratto sta nel suo docstring) |
 | scoperta e promozione di indicatori multifonte | [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md) |
 | stato corrente del sistema, id delle Routine, cosa manca | [`docs/DISCOVERY_STATUS.md`](docs/DISCOVERY_STATUS.md) |
 | aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
@@ -75,8 +78,23 @@ Blog layer: `app/blog.py` (reads `content/posts/*.md`).
 
 ## Commands
 
+**L'interprete Python di questo progetto e' `bin/py`, sempre.** Non `python3`,
+che in questo ambiente e' una funzione di shell e senza `$VIRTUAL_ENV` cade su
+un interprete privo delle dipendenze; non `.venv/bin/python`, che in molti
+worktree non esiste. Nella prima run del workflow tutti e quattro gli scrittori
+hanno speso quattro turni a testa a cercarlo, e un pubblicatore ha eseguito il
+lint con l'interprete di **un altro worktree**: due codici possibili per lo
+stesso verdetto. `bin/py` risolve in un posto solo e fallisce dicendo perche'.
+
 ```bash
-# stato della catena editoriale, tutti gli stadi
+# scrivere articoli indicatore: il workflow, dalla lista dei codici
+#   Workflow({scriptPath: ".claude/workflows/produci-indicatori.js", args: ["ter-30"]})
+bin/py -m officina.pacchetti ter-30              # il pacchetto, a mano
+bin/py -m officina.lint ter-30                   # il cancello editoriale (11s su tutti)
+bin/py -m scripts.calibra_prosa --confronto      # gli esempi contro i pubblicati
+bin/py scripts/baseline_tokens.py --workflow wf_… --articles 1   # quanto e' costata una run
+
+# stato della catena editoriale, tutti gli stadi (vecchia catena)
 python3 scripts/pipeline_status.py
 
 # build the SPA (required after changing anything in frontend/)
@@ -86,9 +104,9 @@ cd frontend && npm run build && cd ..
 .venv/bin/gunicorn run:app -b 127.0.0.1:5050
 
 # tests, audit, whitespace
-.venv/bin/python -m unittest discover -s tests -v          # tutta la suite (935 test, ~45s), prima di commit/push
-.venv/bin/python -m unittest discover -s tests/unit -v      # solo veloci (412 test, ~1s), durante lo sviluppo
-.venv/bin/python -m unittest discover -s tests/integration -v  # solo la parte pesante (523 test, ~45s): Flask/HTTP e catena e2e
+bin/py -m unittest discover -s tests -v          # tutta la suite (1283 test, ~45s), prima di commit/push
+bin/py -m unittest discover -s tests/unit -v      # solo veloci (~660 test, ~4s), durante lo sviluppo
+bin/py -m unittest discover -s tests/integration -v  # solo la parte pesante (~620 test, ~45s): Flask/HTTP e catena e2e
 cd frontend && npm audit --audit-level=low
 git diff --check
 ```

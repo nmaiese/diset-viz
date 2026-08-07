@@ -29,31 +29,91 @@ confermasse l'altro, e non usare la nostra media per dire "in Italia".
 
 ## Il registro
 
+**Il registro vive in `data/corpus/sources.json`, non qui.** Questa pagina lo
+descriveva con una tabella, e una tabella e' una seconda copia: il giorno che
+qualcuno aggiunge una fonte in un posto solo, i due elenchi divergono senza che
+niente fallisca. E' la forma di deriva che questo progetto ha gia' pagato.
+
+Per leggerlo:
+
+```bash
+python3 -c "import json;[print(f\"{s['id']:32}{s['institution']:52}{s['citability']}\") for s in json.load(open('data/corpus/sources.json'))]"
+```
+
 Citabilita': **aperta** riuso libero con attribuzione, **report** PDF gratuito
 citabile per numero e pagina, **attenzione** parte a pagamento o presso terzi.
 
-| Fonte | Autorevole su | Dove | Citabilita' |
-|---|---|---|---|
-| Istat, Rapporto BES | benessere, i 12 domini, il territorio | [istat.it, misurazione del benessere](https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/) | aperta |
-| Istat, Rapporto Annuale | quadro del Paese, divari, letture di sintesi | [istat.it, rapporto annuale](https://www.istat.it/produzione-editoriale/rapporto-annuale/) | aperta |
-| Istat, Rapporto SDGs | Agenda 2030 declinata sul territorio | [istat.it, rapporto SDGs](https://www.istat.it/produzione-editoriale/rapporto-sdgs/) | aperta |
-| Istat, Indicatori demografici | natalita', mortalita', migrazioni, invecchiamento | [comunicato, anno 2025](https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/) | aperta |
-| Istat, Noi Italia | 100 statistiche tematiche con confronto UE | [noi-italia.istat.it](https://noi-italia.istat.it/) | aperta |
-| Eurostat, Regional Yearbook | confronto UE a livello NUTS2 e NUTS3 | [regional yearbook](https://ec.europa.eu/eurostat/web/interactive-publications/regional-yearbook) | aperta |
-| Eurostat, Statistics Explained | metodo, definizioni, articoli regionali | [statistics explained](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Main_Page) | aperta |
-| SVIMEZ, Rapporto sull'economia del Mezzogiorno | il divario Nord-Sud, con stime proprie | [svimez.it](https://www.svimez.it/) | attenzione, il volume e' a pagamento, i comunicati no |
-| Banca d'Italia, Economie regionali | economia regionale, credito, imprese | [economie regionali](https://www.bancaditalia.it/pubblicazioni/economie-regionali/) | report |
-| Commissione UE, Cohesion Report | divari regionali nell'Unione | [cohesion report](https://ec.europa.eu/regional_policy/information-sources/cohesion-report_en) | aperta |
-| OpenCoesione | politiche di coesione, progetti finanziati | [opencoesione.gov.it](https://opencoesione.gov.it/it/) | aperta (open data) |
-| Politiche di coesione, Governo | programmazione, CPT, documenti | [politichecoesione.governo.it](https://politichecoesione.governo.it/it/) | aperta |
-| OECD, Regional development | confronto subnazionale internazionale | [oecd.org](https://www.oecd.org/en/topics/policy-issues/regional-development.html) | attenzione, molto e' a pagamento |
-| INVALSI | competenze scolastiche per regione | [invalsi.it](https://www.invalsi.it/) | report |
-| ISPRA / SNPA | ambiente, consumo di suolo, rifiuti | [isprambiente.gov.it](https://www.isprambiente.gov.it/it), [snpambiente.it](https://www.snpambiente.it/) | report |
-| MIMIT | industria, imprese, ricerca e sviluppo | [mimit.gov.it](https://www.mimit.gov.it/it/) | report e dati |
-| IFEL (ANCI) | finanza e servizi dei Comuni | [fondazioneifel.it](https://www.fondazioneifel.it/) | report |
-| Openpolis | data journalism di controprova | [openpolis.it](https://www.openpolis.it/) | attenzione, e' una fonte secondaria su fonti primarie |
+## Il corpus: le citazioni gia' verificate
 
-Verificati il 26 luglio 2026, uno per uno, con una richiesta reale.
+Il registro dice *dove guardare*. Il corpus dice *che cosa c'e' scritto*, ed e'
+la novita': `data/corpus/claims/`, un file per affermazione, ognuna con il
+proprio identificatore, il testo **verbatim**, l'URL e la data di lettura.
+
+Esiste perche' il difetto peggiore degli articoli non era un errore, era il
+freddo: potevano descrivere solo la geometria della serie, mai perche' si
+muove. La causa non si inventa, si cita, e un'affermazione con un
+identificatore e' una causa che si puo' controllare.
+
+Due regole, e sono assolute.
+
+- **Verbatim, non parafrasi.** `python3 -m scripts.fetch_corpus --verify`
+  riscarica ogni URL con la sola libreria standard e cerca la citazione come
+  stringa. Nessun modello nel giro di verifica, perche' il rischio da cui
+  difendersi e' proprio un modello che riassume mentre copia. Alla prima prova
+  ha bocciato una citazione su due: il testo era vero, ma stava su un'altra
+  pagina di quello stesso sito e aveva perso l'incipit.
+- **Ogni sezione che racconta una dinamica porta almeno un identificatore.**
+  Controllo posizionale, non lessicale: cercare i connettivi causali non
+  funziona, perche' nei 375 articoli sono quasi tutti definitori ("dipende dal
+  denominatore") mentre la causalita' vera viaggia senza connettivi ("si e'
+  chiusa dal basso, pero', non dall'alto").
+
+### Il tema e' una cartella, non una pertinenza
+
+Un'affermazione dichiara i `themes` a cui si applica, e per un po' e' bastato.
+Non basta: nella prima run del workflow la stessa citazione Eurostat sulla
+sensibilita' ciclica della **disoccupazione di lunga durata** e' finita sia sul
+tasso di disoccupazione sia sul **tasso di attivita'**, perche' condividono il
+tema "Lavoro e conciliazione". Sul secondo era forzata, e una citazione forzata
+e' peggio di nessuna citazione: e' vera, verificabile, e non spiega quello che
+sembra spiegare.
+
+Da qui il campo facoltativo **`chiavi`**: una lista di parole che devono
+comparire nel nome dell'indicatore perche' l'affermazione arrivi per tema.
+
+```json
+{ "id": "eurostat-lunga-durata-ciclo",
+  "themes": ["Lavoro e conciliazione"],
+  "chiavi": ["disoccupazione", "disoccupati"] }
+```
+
+Un'affermazione che nomina l'indicatore in `indicators` **non passa dalle
+chiavi**: e' gia' pertinente per dichiarazione. Un'affermazione che vale per
+tutto un tema non le dichiara e continua a valere per tutto il tema. Le chiavi
+si aggiungono quando ci si accorge che una citazione e' andata dove non doveva,
+cioe' **leggendo una pagina**, che resta l'unico modo per trovare questa
+classe di errore.
+
+**Modificare un'affermazione puo' bloccare articoli gia' pubblicati.** Il lint
+ha una regola bloccante, `fonte-non-pertinente`, per un identificatore che
+esiste nel corpus ma non e' offerto a quell'indicatore: aggiungere `chiavi` a
+un'affermazione gia' citata la rende non pertinente **a posteriori**. E' voluto,
+perche' un'attribuzione falsa non diventa vera col tempo. Ma vuol dire che dopo
+ogni modifica a un file di `data/corpus/claims/` si esegue
+
+```bash
+bin/py -m officina.lint
+```
+
+e si riparano gli articoli che il cambio ha reso scoperti. Le chiavi sono un
+confronto per sottostringa sul **nome** dell'indicatore: `disoccupazione` prende
+"tasso di disoccupazione" e non prende "quota di occupati". Man mano che il
+corpus cresce, scegliere chiavi troppo strette blocca articoli buoni e troppo
+larghe non protegge da niente.
+
+Gli URL del registro sono stati verificati uno per uno con una richiesta reale
+il 26 luglio 2026. Le citazioni del corpus si riverificano invece a comando, e
+ognuna porta la propria data di lettura.
 
 **Due host rispondono 403 a una richiesta automatica** e non sono per questo
 morti: OpenCoesione e OECD bloccano gli user agent non browser. Se WebFetch

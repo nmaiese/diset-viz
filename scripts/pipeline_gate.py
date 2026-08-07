@@ -1049,11 +1049,43 @@ def _python():
     return str(venv) if venv.exists() else sys.executable
 
 
-def _run_suite(cwd=None):
+# I moduli che coprono la prosa e nient'altro. Una run che tocca solo articoli
+# non puo' rompere il resto: non tocca codice, non tocca dati, non tocca
+# template. Eseguire tutta la suite per 750 parole era il pezzo piu' grosso
+# della cerimonia che faceva costare trentotto dollari un articolo.
+CONTENT_ROOT = "content/indicators/"
+CONTENT_TESTS = (
+    "tests.integration.test_indicator_texts",
+    # La catena delle fonti si rompe scrivendo un articolo, non toccando il
+    # codice: un'entry che nomina un'istituzione senza citarla passerebbe il
+    # cancello veloce se questo modulo non ci fosse.
+    "tests.integration.test_source_chain",
+    "tests.unit.test_officina_lint",
+    "tests.unit.test_officina_prosa",
+    "tests.unit.test_packs_context",
+)
+
+
+def content_only(paths):
+    """Il diff tocca soltanto articoli, e almeno uno?
+
+    Deliberatamente stretto: basta un file fuori da `content/indicators/`
+    perche' la scorciatoia decada e la suite intera torni obbligatoria. Una
+    scorciatoia che si allarga da sola e' un cancello che si spegne da solo, ed
+    e' gia' successo in questo repo con un test che vietava `roles_covered`.
+    """
+    touched = [path for path in paths if path.strip()]
+    return bool(touched) and all(
+        path.startswith(CONTENT_ROOT) and path.endswith(".json") for path in touched)
+
+
+def _run_suite(cwd=None, modules=None):
     """Una passata di suite. Ritorna (verdetto, riassunto, codice di uscita),
     dove il verdetto e' 'ok', 'failed' o 'crashed'."""
+    command = [_python(), "-X", "faulthandler", "-m", "unittest"]
+    command += list(modules) if modules else ["discover", "-s", "tests"]
     result = subprocess.run(
-        [_python(), "-X", "faulthandler", "-m", "unittest", "discover", "-s", "tests"],
+        command,
         cwd=str(cwd or PROJECT_ROOT),
         capture_output=True,
         text=True,
@@ -1075,7 +1107,27 @@ def _run_suite(cwd=None):
     return "crashed", summary, result.returncode
 
 
-def check_suite(cwd=None):
+def check_content_lint(paths, cwd=None):
+    """Il cancello editoriale sugli articoli toccati, senza la suite.
+
+    `officina/lint.py` gira in undici secondi su tutto il catalogo e da' il
+    verdetto che conta: cifre false, caratteri vietati, gemelli, fonti
+    inesistenti. Prima viveva dentro i test, quindi l'unico modo di
+    interrogarlo era eseguire millecento test.
+    """
+    articles = [path for path in paths if path.startswith(CONTENT_ROOT)]
+    if not articles:
+        return Check("lint", True, "nessun articolo toccato")
+    result = subprocess.run(
+        [_python(), "-m", "officina.lint", "--severity", "blocca"],
+        cwd=str(cwd or PROJECT_ROOT), capture_output=True, text=True)
+    if result.returncode == 0:
+        return Check("lint", True, "nessun rilievo bloccante")
+    tail = (result.stdout or result.stderr or "").strip().splitlines()
+    return Check("lint", False, " / ".join(tail[:6])[:500] or "il lint blocca")
+
+
+def check_suite(cwd=None, paths=None):
     """Il verdetto lo da' il referto di unittest, non il codice di uscita.
 
     Sembra un cavillo ed e' invece la differenza fra una catena che gira e una
@@ -1100,10 +1152,14 @@ def check_suite(cwd=None):
     con un referto, e nasconderlo e' esattamente cio' che questo cancello esiste
     per impedire.
     """
-    verdict, summary, code = _run_suite(cwd=cwd)
+    fast = content_only(paths or [])
+    modules = CONTENT_TESTS if fast else None
+    verdict, summary, code = _run_suite(cwd=cwd, modules=modules)
+    if fast:
+        summary = f"{summary} (solo i moduli di contenuto: il diff tocca solo articoli)"
 
     if verdict == "crashed":
-        retry_verdict, retry_summary, retry_code = _run_suite(cwd=cwd)
+        retry_verdict, retry_summary, retry_code = _run_suite(cwd=cwd, modules=modules)
         if retry_verdict == "crashed":
             return Check("suite", False, (
                 f"la suite e' morta senza referto due volte (uscita {code} e {retry_code}). "
@@ -1209,8 +1265,10 @@ def run(stage, base=None, skip_tests=False, cwd=None, committed_only=False):
     }
     for label in invariant_labels(stage, paths):
         checks.append(builders[label]())
+    if any(path.startswith(CONTENT_ROOT) for path in paths):
+        checks.append(check_content_lint(paths, cwd=cwd))
     if not skip_tests:
-        checks.append(check_suite(cwd=cwd))
+        checks.append(check_suite(cwd=cwd, paths=paths))
     return build_verdict(stage, paths, checks, base=resolve_base(base, cwd=cwd))
 
 

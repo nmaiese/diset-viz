@@ -1,0 +1,304 @@
+"""Il cancello unico: ogni regola su prosa costruita apposta.
+
+Su prosa sintetica e non sul catalogo, per la ragione che ha lasciato passare
+67 indicatori provinciali: una guardia che non incontra niente da controllare
+resta verde e non lo dice. Qui ogni regola vede il caso che deve prendere e il
+caso che deve lasciar passare.
+"""
+import unittest
+
+from officina import lint
+
+
+def entry(**overrides):
+    base = {
+        "level": "regione",
+        "lead": "Una prima frase che sta dentro i limiti.",
+        "vintage": 2023,
+        "sections": [
+            {"role": "quadro", "h": "Un vertice", "body": "Corpo del quadro."},
+            {"role": "dinamica", "h": "Sei anni", "body": "Corpo della dinamica."},
+            {"role": "limiti", "h": "Che cosa non dice", "body": "Corpo dei limiti."},
+        ],
+    }
+    base.update(overrides)
+    return base
+
+
+def rules_fired(found):
+    return {finding["rule"] for finding in found}
+
+
+class BannedCharacters(unittest.TestCase):
+    def test_an_em_dash_blocks(self):
+        found = lint.check_banned_characters(entry(lead="Un lead — con il trattino."))
+        self.assertEqual(rules_fired(found), {"caratteri-vietati"})
+        self.assertEqual(found[0]["severity"], lint.BLOCKS)
+
+    def test_it_looks_inside_authored_titles_too(self):
+        found = lint.check_banned_characters(entry(h1="Un titolo; con punto e virgola"))
+        self.assertEqual(found[0]["field"], "h1")
+
+    def test_clean_prose_passes(self):
+        self.assertEqual(lint.check_banned_characters(entry()), [])
+
+
+class TheLead(unittest.TestCase):
+    def test_a_missing_lead_blocks(self):
+        self.assertEqual(rules_fired(lint.check_lead(entry(lead=""))), {"lead"})
+
+    def test_a_first_sentence_too_long_to_be_a_meta_description_blocks(self):
+        found = lint.check_lead(entry(lead="parola " * 60 + "."))
+        self.assertEqual(rules_fired(found), {"lead"})
+
+    def test_a_long_lead_with_a_short_first_sentence_passes(self):
+        """Conta la prima frase, non il lead: e' quella che finisce in SERP."""
+        self.assertEqual(lint.check_lead(entry(lead="Corta. " + "parola " * 60)), [])
+
+
+class Figures(unittest.TestCase):
+    ALTERNATION = "Emilia-Romagna|Campania|Gorizia|Molise"
+
+    def setUp(self):
+        self.compiled = lint.patterns(self.ALTERNATION)
+        self.compiled["alternation"] = self.ALTERNATION
+        self.values = {"Campania": 40.1, "Gorizia": 18.0, "Molise": 5.0}
+        # Un anno passato con valori diversi: serve a provare che una cifra con
+        # l'anno scritto accanto e' giudicata contro **quell'anno**.
+        self.storici = {2020: {"Campania": 21.8}}
+
+    def _run(self, text):
+        item = entry(sections=[{"role": "quadro", "h": "h", "body": text}])
+        saved = lint.values_of
+        lint.values_of = (lambda key, e, year=None:
+                          self.storici.get(year, self.values) if year else self.values)
+        try:
+            return lint.check_figures(item, key="ter:1", compiled=self.compiled)
+        finally:
+            lint.values_of = saved
+
+    def test_a_wrong_figure_before_the_territory_blocks(self):
+        self.assertEqual(rules_fired(self._run("Il 21,8% della Campania.")),
+                         {"cifra-falsa"})
+
+    def test_a_right_figure_before_the_territory_passes(self):
+        self.assertEqual(self._run("Il 40,1% della Campania."), [])
+
+    def test_a_wrong_figure_after_the_territory_blocks(self):
+        """Il verso che la prosa provinciale usa davvero."""
+        self.assertEqual(rules_fired(self._run("Gorizia si ferma a 44.")),
+                         {"cifra-falsa"})
+
+    def test_an_integer_close_enough_passes(self):
+        self.assertEqual(self._run("Gorizia si ferma a 18."), [])
+
+    def test_a_gap_is_not_a_level(self):
+        self.assertEqual(self._run("Il Molise sta 39,4 punti sopra le Marche."), [])
+
+    def test_an_explicit_other_year_is_judged_against_that_year(self):
+        """Non piu' saltata: controllata contro l'anno che nomina.
+
+        Prima veniva esclusa, per non giudicarla contro l'anno corrente. Ma
+        saltarla lasciava scoperte proprio le cifre storiche, che la macchina
+        nuova produce in quantita': gli angoli del pacchetto sono quasi tutti
+        nel tempo.
+        """
+        self.assertEqual(self._run("La Campania si ferma a 21,8 nel 2020."), [])
+
+    def test_a_wrong_figure_for_that_other_year_blocks(self):
+        found = self._run("La Campania si ferma a 40,1 nel 2020.")
+        self.assertEqual(rules_fired(found), {"cifra-falsa"})
+        self.assertIn("nel 2020", found[0]["detail"])
+
+    def test_figures_of_a_linked_series_are_not_ours(self):
+        self.assertEqual(
+            self._run("Il [tasso](/indicatore/x/ter-407), dove la Campania "
+                      "si ferma a 21,80."), [])
+
+    def test_a_false_threshold_blocks(self):
+        self.assertEqual(rules_fired(self._run("Supera il 50% in Campania.")),
+                         {"soglia-falsa"})
+
+    def test_a_true_threshold_passes(self):
+        self.assertEqual(self._run("Supera il 30% in Campania."), [])
+
+
+class HistoricalFiguresAreCheckedNotSkipped(unittest.TestCase):
+    """Una cifra con l'anno accanto si controlla contro quell'anno.
+
+    L'esclusione nasceva da un falso allarme vero ("la Sardegna segna 81,67 nel
+    2020" giudicato contro l'anno corrente), ma nascondeva un buco che la
+    macchina nuova allarga: gli angoli del pacchetto sono quasi tutti storici
+    (rotture di pendenza, ritorni a un livello, sorpassi), quindi la prosa cita
+    molte piu' cifre di anni passati di quante ne citasse quella vecchia, e
+    nessuna era controllata.
+    """
+
+    MATRICE = {"2020": {"cam": 10.0}, "2025": {"cam": 20.0}}
+
+    def setUp(self):
+        self.saved = lint.view_level
+        # `territories` e non `observations`: la mappa dei nomi si legge da li',
+        # perche' `observations` copre solo l'ultimo anno e un territorio con
+        # dati solo negli anni vecchi resterebbe senza nome, quindi fuori da
+        # ogni controllo. Uno stub che usasse `observations` proverebbe una
+        # versione del codice che non esiste piu'.
+        lint.view_level = lambda key, entry: {
+            "year_max": 2025, "matrix": self.MATRICE,
+            "territories": [{"key": "cam", "name": "Campania"}],
+            "observations": [{"key": "cam", "name": "Campania"}]}
+        self.addCleanup(lambda: setattr(lint, "view_level", self.saved))
+        self.compiled = lint.patterns("Campania")
+        self.compiled["alternation"] = "Campania"
+
+    def _run(self, text):
+        item = entry(vintage=2025,
+                     sections=[{"role": "quadro", "h": "h", "body": text}])
+        return lint.check_figures(item, key="ter:1", compiled=self.compiled)
+
+    def test_a_true_historical_figure_passes(self):
+        self.assertEqual(self._run("La Campania segna 10,00 nel 2020."), [])
+
+    def test_a_false_historical_figure_blocks(self):
+        found = self._run("La Campania segna 17,40 nel 2020.")
+        self.assertEqual(rules_fired(found), {"cifra-falsa"})
+        self.assertIn("nel 2020", found[0]["detail"])
+
+    def test_the_current_year_figure_is_not_judged_against_the_old_one(self):
+        """Il falso allarme che aveva prodotto l'esclusione, al contrario."""
+        self.assertEqual(self._run("La Campania segna 20,00."), [])
+
+    def test_a_year_the_source_does_not_publish_is_not_invented(self):
+        self.assertEqual(self._run("La Campania segna 99,00 nel 1999."), [])
+
+
+class DynamicsMustCiteASource(unittest.TestCase):
+    """La regola nuova, quella che toglie il freddo."""
+
+    def setUp(self):
+        self.saved_view = lint.view_of
+        self.saved_ctx = lint.context_module.for_indicator
+        self.saved_claims = lint.context_module.claims
+        lint.view_of = lambda key: {"meta": {"theme": "Un tema", "name": "Un nome"}}
+
+    def tearDown(self):
+        lint.view_of = self.saved_view
+        lint.context_module.for_indicator = self.saved_ctx
+        lint.context_module.claims = self.saved_claims
+
+    def _with_corpus(self, ids, esistenti=None):
+        """`ids` sono le affermazioni offerte a QUESTO indicatore.
+
+        `esistenti` sono tutte quelle del corpus: le due liste differiscono
+        quando un'affermazione esiste ma non riguarda questa serie, che e' il
+        caso `fonte-non-pertinente`.
+        """
+        lint.context_module.for_indicator = (
+            lambda k, t, limit=50, indicator_name=None: [{"id": n} for n in ids])
+        tutte = ids if esistenti is None else esistenti
+        lint.context_module.claims = lambda: [{"id": n} for n in tutte]
+
+    def test_no_source_when_the_corpus_has_some_is_flagged(self):
+        self._with_corpus(["a", "b"])
+        found = lint.check_dynamics_cite_a_source(entry(), key="ter:1")
+        self.assertEqual(rules_fired(found), {"dinamica-senza-fonte"})
+        self.assertEqual(found[0]["severity"], lint.FLAGS)
+
+    def test_citing_a_real_id_passes(self):
+        self._with_corpus(["a", "b"])
+        found = lint.check_dynamics_cite_a_source(entry(corpus=["a"]), key="ter:1")
+        self.assertEqual(found, [])
+
+    def test_citing_an_id_that_does_not_exist_blocks(self):
+        """Il modo piu' facile di zittire un lint e' inventare la fonte."""
+        self._with_corpus(["a"])
+        found = lint.check_dynamics_cite_a_source(entry(corpus=["inventata"]), key="ter:1")
+        self.assertEqual(rules_fired(found), {"fonte-inesistente"})
+        self.assertEqual(found[0]["severity"], lint.BLOCKS)
+
+    def test_an_empty_corpus_blames_the_corpus_not_the_article(self):
+        self._with_corpus([])
+        found = lint.check_dynamics_cite_a_source(entry(), key="ter:1")
+        self.assertIn("il corpus non ha niente", found[0]["detail"])
+
+    def test_an_article_without_a_dinamica_is_not_asked_for_a_source(self):
+        self._with_corpus(["a"])
+        item = entry(sections=[{"role": "quadro", "h": "h", "body": "x"}])
+        self.assertEqual(lint.check_dynamics_cite_a_source(item, key="ter:1"), [])
+
+    def test_a_real_quote_about_another_indicator_blocks(self):
+        """Il caso peggiore da leggere: regge a ogni controllo tranne quello che conta.
+
+        Nella prima run la citazione Eurostat sulla sensibilita' ciclica della
+        disoccupazione di lunga durata e' finita a spiegare il **tasso di
+        attivita'**, perche' condividono il tema. La frase esiste, l'URL c'e',
+        la verifica come stringa passa. E l'attribuzione e' falsa lo stesso.
+        """
+        self._with_corpus([], esistenti=["eurostat-lunga-durata-ciclo"])
+        found = lint.check_dynamics_cite_a_source(
+            entry(corpus=["eurostat-lunga-durata-ciclo"]), key="ter:1")
+        self.assertEqual(rules_fired(found), {"fonte-non-pertinente"})
+        self.assertEqual(found[0]["severity"], lint.BLOCKS,
+                         "un'attribuzione falsa su una pagina pubblica non e' un avviso")
+
+    def test_an_invented_id_and_a_misapplied_one_are_different_findings(self):
+        """Inventare una fonte e usarne male una vera sono due errori diversi,
+        e chi ripara deve sapere quale ha fatto."""
+        self._with_corpus(["a"], esistenti=["a", "b"])
+        inventata = lint.check_dynamics_cite_a_source(entry(corpus=["zzz"]), key="ter:1")
+        fuori = lint.check_dynamics_cite_a_source(entry(corpus=["b"]), key="ter:1")
+        self.assertEqual(rules_fired(inventata), {"fonte-inesistente"})
+        self.assertEqual(rules_fired(fuori), {"fonte-non-pertinente"})
+
+
+class PositiveRequirements(unittest.TestCase):
+    def test_an_article_that_never_says_what_the_number_cannot_say(self):
+        item = entry(sections=[{"role": "quadro", "h": "h", "body": "parola " * 400}])
+        self.assertIn("manca-il-limite", rules_fired(
+            lint.check_positive_requirements(item, key="ter:1")))
+
+    def test_too_short_is_flagged_not_blocked(self):
+        found = lint.check_positive_requirements(entry(), key="ter:1")
+        short = [f for f in found if f["rule"] == "troppo-corto"]
+        self.assertTrue(short)
+        self.assertEqual(short[0]["severity"], lint.FLAGS)
+
+
+class DistanceFromSiblings(unittest.TestCase):
+    def test_two_near_identical_articles_block_each_other(self):
+        body = " ".join(f"parola{index}" for index in range(200))
+        one = entry(sections=[{"role": "quadro", "h": "a", "body": body}])
+        two = entry(sections=[{"role": "quadro", "h": "b", "body": body}])
+        found = lint.check_distance_from_siblings(
+            one, key="ter:1", texts={"ter:1": one, "ter:2": two})
+        self.assertEqual(rules_fired(found), {"gemello"})
+        self.assertEqual(found[0]["severity"], lint.BLOCKS)
+
+    def test_two_different_articles_do_not(self):
+        one = entry(sections=[{"role": "quadro", "h": "a",
+                               "body": " ".join(f"alfa{i}" for i in range(200))}])
+        two = entry(sections=[{"role": "quadro", "h": "b",
+                               "body": " ".join(f"beta{i}" for i in range(200))}])
+        self.assertEqual(lint.check_distance_from_siblings(
+            one, key="ter:1", texts={"ter:1": one, "ter:2": two}), [])
+
+    def test_a_stub_is_too_short_to_judge(self):
+        one = entry(sections=[{"role": "quadro", "h": "a", "body": "due parole"}])
+        self.assertEqual(lint.check_distance_from_siblings(
+            one, key="ter:1", texts={"ter:1": one, "ter:2": one}), [])
+
+
+class Severities(unittest.TestCase):
+    def test_every_rule_declares_one_of_the_two(self):
+        self.assertEqual({lint.BLOCKS, lint.FLAGS}, {"blocca", "segnala"})
+
+    def test_a_rule_that_blocks_is_about_truth_not_taste(self):
+        """Il gusto non blocca. E' cio' che la rubrica a venti punti sbagliava."""
+        blocking = {"caratteri-vietati", "lead", "cifra-falsa", "soglia-falsa",
+                    "fonte-inesistente", "gemello"}
+        flagging = {"dinamica-senza-fonte", "manca-il-limite", "troppo-corto"}
+        self.assertFalse(blocking & flagging)
+
+
+if __name__ == "__main__":
+    unittest.main()

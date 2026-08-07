@@ -423,7 +423,7 @@ class ACrashIsNotAFailure(unittest.TestCase):
         calls = []
         queue = list(outcomes)
 
-        def fake(cwd=None):
+        def fake(cwd=None, modules=None):
             calls.append(1)
             return queue.pop(0)
 
@@ -1086,6 +1086,62 @@ class TheGateReadsFilesFromTheSuppliedWorktree(unittest.TestCase):
                          self.wt.resolve() / "content" / "indicators")
         self.assertEqual(pipeline_gate._indicators_root(cwd=None),
                          self.main.resolve() / "content" / "indicators")
+
+
+class TheContentShortcut(unittest.TestCase):
+    """Una run che tocca solo articoli non esegue la suite intera.
+
+    Vale il 92% del tempo del cancello (3,7 secondi contro 45), ed e' il pezzo
+    piu' grosso della cerimonia che faceva costare trentotto dollari un
+    articolo. E' anche il tipo di scorciatoia che si allarga da sola finche' non
+    protegge piu' niente, quindi qui si prova soprattutto quando **non** deve
+    scattare.
+    """
+
+    def test_it_applies_to_a_diff_made_only_of_articles(self):
+        self.assertTrue(pipeline_gate.content_only(
+            ["content/indicators/1.json", "content/indicators/bes__X.json"]))
+
+    def test_one_file_outside_the_articles_cancels_it(self):
+        self.assertFalse(pipeline_gate.content_only(
+            ["content/indicators/1.json", "app/data.py"]))
+
+    def test_an_empty_diff_does_not_qualify(self):
+        """Niente da controllare non e' un motivo per controllare meno."""
+        self.assertFalse(pipeline_gate.content_only([]))
+
+    def test_a_non_json_under_the_articles_cancels_it(self):
+        self.assertFalse(pipeline_gate.content_only(["content/indicators/README.md"]))
+
+    def test_a_test_file_never_qualifies(self):
+        self.assertFalse(pipeline_gate.content_only(
+            ["tests/integration/test_indicator_texts.py"]))
+
+    def test_the_shortcut_runs_the_content_modules_and_says_so(self):
+        seen = {}
+
+        def fake(cwd=None, modules=None):
+            seen["modules"] = modules
+            return "ok", "Ran 87 tests / OK", 0
+
+        original = pipeline_gate._run_suite
+        pipeline_gate._run_suite = fake
+        try:
+            check = pipeline_gate.check_suite(paths=["content/indicators/1.json"])
+            self.assertEqual(seen["modules"], pipeline_gate.CONTENT_TESTS)
+            self.assertIn("solo i moduli di contenuto", check.detail)
+
+            pipeline_gate.check_suite(paths=["app/data.py"])
+            self.assertIsNone(seen["modules"])
+        finally:
+            pipeline_gate._run_suite = original
+
+    def test_the_content_modules_include_the_prose_guards(self):
+        """Se qualcuno toglie di qui il modulo delle cifre, la scorciatoia
+        smette di controllare proprio cio' che una run di contenuto rischia."""
+        self.assertIn("tests.integration.test_indicator_texts",
+                      pipeline_gate.CONTENT_TESTS)
+        self.assertIn("tests.unit.test_officina_lint", pipeline_gate.CONTENT_TESTS)
 
 
 if __name__ == "__main__":
