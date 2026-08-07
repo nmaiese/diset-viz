@@ -275,6 +275,34 @@ class IDueVocabolariNonDivergono(unittest.TestCase):
             self.assertIn(stadio, pipeline_log.HISTORICAL_STAGES, stadio)
             self.assertIn(ruolo, pipeline_launch.ROLE_ORDER, ruolo)
 
+    def test_lo_stadio_va_al_ruolo_che_puo_scriverne_i_file(self):
+        """Portare a un ruolo vivo non basta: dev'essere il ruolo che ha i file
+        di quello stadio dentro il proprio perimetro.
+
+        `curator` puntava a `producer`, cioe' all'officina, il cui perimetro e'
+        `content/indicators/`. Ma curare vuol dire eseguire
+        `scripts/apply_curation.py`, che scrive il layer esterno, il manifest e
+        le descrizioni curate: file dell'ammissione. Il piano avrebbe mandato il
+        lavoro a chi non ha ne' il gesto ne' il permesso, e non e' mai successo
+        solo perche' la coda `curator` e' vuota. Un difetto che aspetta una riga
+        di dati per diventare vero non e' meno difetto.
+
+        Si controlla lo stadio di cui esiste uno script di scrittura
+        identificabile. Gli altri restano coperti dal test qui sopra.
+        """
+        from scripts import apply_curation, pipeline_launch
+
+        ruolo = pipeline_launch.ROLE_OF_STAGE["curator"]
+        perimetro = pipeline_gate.STAGE_PATHS.get(ruolo)
+        self.assertIsNotNone(perimetro, f"{ruolo} non ha un perimetro")
+        scritti = (apply_curation.EXTERNAL_DATASET,
+                   apply_curation.EXTERNAL_MANIFEST,
+                   apply_curation.CURATED_DESCRIPTIONS)
+        for percorso in scritti:
+            relativo = str(percorso.relative_to(RADICE))
+            self.assertIn(relativo, perimetro,
+                          f"la curazione scrive {relativo}, fuori dal perimetro di {ruolo}")
+
     def test_ogni_ruolo_del_piano_si_sa_lanciare(self):
         """Un ruolo o e' un agente che esiste, o e' un workflow che esiste. La
         terza possibilita' e' un puntatore morto che qualcuno lancia una volta

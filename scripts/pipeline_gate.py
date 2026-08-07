@@ -115,8 +115,15 @@ READINGS = "data/pipeline/letture/"
 STAGE_PATHS = {
     # `admissions` = scout + hunter + promoter: propone la fonte, triaga il
     # candidato, promuove nel layer esterno, in una run sola.
+    # `CURATED_DESCRIPTIONS` c'e' perche' l'ammissione copre anche il vecchio
+    # stadio `curator` (`pipeline_launch.ROLE_OF_STAGE`), e curare vuol dire
+    # eseguire `scripts/apply_curation.py`, che scrive tre file: il layer
+    # esterno, il manifest e le descrizioni curate. I primi due erano gia' qui e
+    # il terzo no, quindi una curazione sarebbe stata respinta dal cancello
+    # sull'ultima delle sue tre scritture. La costante esisteva gia', inutilizzata.
     "admissions": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, CANDIDATES,
-                   EXTERNAL_DATASET, EXTERNAL_MANIFEST, RUN_JOURNAL),
+                   EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS,
+                   RUN_JOURNAL),
     # Il verificatore NON ha `INDICATOR_TEXTS`, e l'assenza e' la definizione
     # dello stadio piu' che il suo prompt. Uno stadio che trova e ripara i propri
     # rilievi corregge i propri compiti, che e' esattamente il difetto che questo

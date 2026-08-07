@@ -335,6 +335,14 @@ decide autonomamente come riscrivere una frase.
 
 ### 4.12 Controlli indipendenti prima del merge
 
+> **Superata dal §15, e non a meta'.** Il §15.1 conta il *commit candidato* e
+> l'*impronta come protocollo fra worktree* fra i concetti in piu' che non
+> superano il metro dei quattro concetti vivi, e il §15.3 respinge con una misura
+> il reader-editor come blocco al merge. Quello che segue e' il disegno che il
+> verdetto ha esaminato, tenuto qui perche' il §15 lo cita: **non e' il piano da
+> implementare**. Cio' che resta davvero aperto e' l'involucro commit + pull
+> request intorno all'officina, e sta nel §15.7.
+
 Il produttore crea un commit candidato, non ancora pubblicato. Reader-editor e
 verificatore partono da quel commit in worktree distinti e giudicano la stessa
 impronta.
@@ -364,6 +372,11 @@ Il meccanismo consigliato non richiede un nuovo store di bozze:
 6. il branch viene fuso soltanto con entrambi i verdetti validi
 
 ### 4.13 Cancello e pubblicazione
+
+> **Superata dal §15**, per la stessa ragione della 4.12: due delle condizioni
+> qui sotto (*il reader-editor non presenta blocchi*, *i verdetti coprono
+> l'impronta corrente*) poggiano sui due concetti respinti. Il cancello vero e'
+> `scripts/pipeline_gate.py`, e il cancello editoriale e' `officina/lint.py`.
 
 Il merge e' ammesso soltanto se:
 

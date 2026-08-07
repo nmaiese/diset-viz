@@ -87,7 +87,14 @@ def role_of(run_id: str) -> str:
 # valore e' `producer`, piu' `producer` stesso: ricopiate e non importate,
 # perche' questo modulo e' stdlib pura (vedi il docstring). Un test tiene le due
 # liste allineate.
-WRITING = ("producer", "writer", "reviewer", "curator")
+#
+# `curator` e' uscito quando il vecchio stadio e' stato instradato all'ammissione
+# invece che al produttore: curare vuol dire decidere verso e categoria e
+# scriverli nel manifest, non scrivere prosa. Finche' era qui, le run di
+# curazione entravano nel costo per articolo e lo gonfiavano dalla parte
+# sbagliata, che e' lo stesso difetto che questa lista per inclusione esiste per
+# impedire.
+WRITING = ("producer", "writer", "reviewer")
 
 # Dollari per milione di token, listino Opus. Indicativo: serve a dare una
 # scala, non a fare fatturazione.
