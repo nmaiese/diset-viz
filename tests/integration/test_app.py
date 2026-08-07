@@ -1072,6 +1072,46 @@ class AppSmokeTest(unittest.TestCase):
             self.assertLessEqual(len(title), 60, f"{raw_id}: {title}")
         self.assertEqual(len(titles), len(set(titles.values())), titles)
 
+    def test_titles_are_unique_across_the_full_served_inventory(self):
+        # Rilievo Codex sulla #177: le due prove sopra guardano `get_catalog()`
+        # (solo territoriale) e il solo insieme di `DUPLICATE_BES_IDS` fra loro.
+        # Nessuna delle due copre l'inventario che il sito serve davvero: BES
+        # non duplicati, multiscopo, le famiglie esterne, e le pagine
+        # BES-solo-provincia che non entrano nel catalogo atlante ma restano
+        # indicizzabili (`_build_indexable_indicator_catalog`, la stessa base
+        # della sitemap). Una collisione li' non l'avrebbe vista nessun test.
+        from app import sources
+        from app.config import SITE_NAME
+        from app.indicator_notes import seo_title
+        from app.taxonomy import DUPLICATE_BES_IDS, PROVINCE_ONLY_TITLE_COLLISIONS
+        from app.views import _build_indexable_indicator_catalog
+
+        # Specchia la stessa logica di `views._render_indicator`: una prova che
+        # calcolasse il qualificatore in un altro modo potrebbe passare per
+        # ragioni sue, mentre la pagina vera collide ancora. Confronta sul solo
+        # codice grezzo (senza prefisso di famiglia): le pagine BES-solo-
+        # provincia arrivano da `_view_from_bes_only` con `meta["id"]` gia'
+        # senza il prefisso `bes:`, quindi risalire alla famiglia da
+        # `split_internal_id(meta["id"])` le farebbe passare per territoriali.
+        # I due insiemi sono codici BES per costruzione, cosi' il confronto sul
+        # solo codice non puo' incrociare un id territoriale per sbaglio.
+        def qualifier_for(raw_id):
+            if raw_id in DUPLICATE_BES_IDS:
+                return sources.family_short_label("bes")
+            if raw_id in PROVINCE_ONLY_TITLE_COLLISIONS:
+                return "dati provinciali"
+            return None
+
+        titles = {}
+        for record in _build_indexable_indicator_catalog():
+            meta = record["meta"]
+            bare_id = str(meta["id"]).rsplit(":", 1)[-1]
+            title = seo_title(meta["name"], SITE_NAME, source_qualifier=qualifier_for(bare_id))
+            self.assertLessEqual(len(title), 60, f"{meta['id']}: {title}")
+            titles.setdefault(title, []).append(meta["id"])
+        collisions = {title: ids for title, ids in titles.items() if len(ids) > 1}
+        self.assertEqual(collisions, {}, collisions)
+
     def test_public_game_and_editorial_metadata_within_budget(self):
         client = app.test_client()
         paths = (

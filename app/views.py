@@ -33,7 +33,7 @@ from app import moderation
 from app import public_urls
 from app import publisher
 from app import agent_discovery
-from app.taxonomy import DUPLICATE_BES_IDS
+from app.taxonomy import DUPLICATE_BES_IDS, PROVINCE_ONLY_TITLE_COLLISIONS
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory
 from flask.json import jsonify
@@ -1138,9 +1138,17 @@ def _render_indicator(family, raw_id):
     # itself stays reachable and indexable, so its <title> must not collide
     # with its territorial twin's. Stays within the normal 60-char budget like
     # every other title, same as the crawler flags on any other page.
-    source_qualifier = (
-        sources.family_short_label(family) if family == "bes" and raw_id in DUPLICATE_BES_IDS else None
-    )
+    if family == "bes" and raw_id in DUPLICATE_BES_IDS:
+        source_qualifier = sources.family_short_label(family)
+    # A handful of BES ids exist only at province level but share a name with a
+    # regional twin (PROVINCE_ONLY_TITLE_COLLISIONS docstring): the same
+    # collision as above, on the level dimension instead of the source, because
+    # the title tail below is fixed to "per regione" regardless of the page's
+    # actual level.
+    elif family == "bes" and raw_id in PROVINCE_ONLY_TITLE_COLLISIONS:
+        source_qualifier = "dati provinciali"
+    else:
+        source_qualifier = None
 
     response = make_response(render_template(
         "indicator_page.html",

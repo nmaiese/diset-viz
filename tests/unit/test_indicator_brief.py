@@ -119,5 +119,43 @@ class AnnualMeansBase(unittest.TestCase):
         self.assertIn("b, c", note)
 
 
+class AgainstTheGrainUsesTheComparableBase(unittest.TestCase):
+    """Rilievo Codex: `stats["avg_change_abs"]` sottrae due medie su popolazioni
+    diverse quando le basi ai due estremi non coincidono, la stessa cifra
+    pericolosa che `_common_endpoints` esiste per evitare. `_against_the_grain`
+    deve preferire `common["change"]`, non la cifra sulla popolazione intera.
+    """
+
+    def test_a_territory_matching_the_comparable_direction_is_not_flagged(self):
+        # avg_change_abs (popolazione intera) e' negativo: senza il fix un
+        # territorio che e' cresciuto sarebbe segnalato come controcorrente.
+        # Sui territori comuni pero' la direzione vera e' positiva (+4), e la
+        # riga cresciuta e' quindi allineata, non controcorrente.
+        rows = [{"name": "a", "value": 14.0, "delta": 4.0}]
+        stats = {"avg_change_abs": -1.0}
+        common = {"change": 4.0}
+        self.assertEqual(indicator_brief._against_the_grain(rows, stats, common), [])
+
+    def test_without_a_comparable_base_it_falls_back_to_the_population_figure(self):
+        rows = [{"name": "a", "value": 14.0, "delta": 4.0}]
+        stats = {"avg_change_abs": -1.0}
+        self.assertEqual(
+            indicator_brief._against_the_grain(rows, stats, common=None),
+            rows,
+        )
+
+
+class GapTrendZeroIsStableNotNarrowed(unittest.TestCase):
+    """Rilievo Codex: un divario comparabile esattamente a zero veniva
+    etichettato "ristretto di 0,00" invece di stabile: uno zero calcolato
+    letto come un fatto che non c'e'.
+    """
+
+    def test_an_unchanged_common_gap_is_stable(self):
+        matrix = {"2020": {"a": 10.0, "b": 20.0}, "2022": {"a": 12.0, "b": 22.0}}
+        common = indicator_brief._common_endpoints(matrix, 2020, 2022)
+        self.assertEqual(common["gap_trend"], 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()
