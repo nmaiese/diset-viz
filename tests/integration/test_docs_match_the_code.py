@@ -307,6 +307,20 @@ class IDueVocabolariNonDivergono(unittest.TestCase):
             self.assertIn(relativo, perimetro,
                           f"la curazione scrive {relativo}, fuori dal perimetro di {ruolo}")
 
+    def test_il_piano_e_lo_stato_leggono_la_stessa_mappa(self):
+        """Non due mappe uguali: la stessa.
+
+        Erano due dizionari identici in `pipeline_launch` e `pipeline_status`, e
+        sono usciti di sincrono alla prima occasione utile: `curator` e' passato
+        dal produttore all'ammissione da una parte e non dall'altra, quindi il
+        piano lanciava un ruolo e il cruscotto ne annunciava un altro sullo
+        stesso lavoro. Un `assertEqual` fra due copie avrebbe preso *questo*
+        caso e non il prossimo; un alias li rende impossibili tutti.
+        """
+        from scripts import pipeline_launch, pipeline_status
+
+        self.assertIs(pipeline_status.AGENT_OF, pipeline_launch.ROLE_OF_STAGE)
+
     def test_ogni_ruolo_del_piano_si_sa_lanciare(self):
         """Un ruolo o e' un agente che esiste, o e' un workflow che esiste. La
         terza possibilita' e' un puntatore morto che qualcuno lancia una volta
