@@ -1,0 +1,26 @@
+{
+ "angolo": "graduatoria-spezzata",
+ "corpus": [],
+ "fonti": [],
+ "key": "30",
+ "lead": "La domanda che arriva ai circuiti museali non si spalma sul paese, si raccoglie in un punto. Nell'ultimo anno della serie una regione sta da sola in cima e tutte le altre stanno strette in fondo. Il Lazio segna 68,2, la Toscana 12,2, la Campania 2,7, e l'unita' e' in migliaia. Tra la prima riga e la seconda corrono 56,0, cioe' piu' di tutta la graduatoria che viene sotto.",
+ "level": "regione",
+ "sections": [
+  {
+   "body": "Il primo della graduatoria nel 2020 e' il Lazio, con 68,2. Il secondo e' la Toscana, con 12,2. Il terzo e' la Campania, con 2,7. Dal secondo posto all'ultimo, che e' l'Umbria con 0,04, la classifica intera sta dentro poco piu' di dodici. Tra il primo e il secondo ce ne sono 56,0.\n\nUn salto si giudica contro gli altri salti della stessa classifica, e questo vale 442 volte quello tipico fra due regioni vicine in graduatoria. La rottura arriva subito, appena dopo la prima posizione, e sotto di li' la scala e' un'altra cosa.\n\nConviene dire che cosa conta questo numero, perche' e' facile leggerlo come una pagella. L'indicatore misura quanta domanda arriva ai circuiti museali di una regione, in migliaia, e non ha un verso: nessun valore e' buono o cattivo di per se'. Un 68,2 non e' un merito e uno 0,04 non e' una colpa. Dicono dove la domanda si raccoglie, non quanto una regione tenga ai suoi musei.",
+   "h": "Il primo posto, e poi un altro piano",
+   "role": "quadro"
+  },
+  {
+   "body": "L'indicatore e' una grandezza assoluta, e questo pesa sul confronto. La dimensione del territorio e della sua economia entra dentro la cifra, quindi la fila delle regioni dice anche quanto sono diverse per taglia, non solo quanto e' forte la loro domanda culturale.\n\nPoi c'e' la composizione. La matrice non contiene sempre gli stessi territori: sette nel 1999, dodici nel 2020, quindici in tutta la serie. Il Piemonte, che nel 2017 segnava 67,0, dopo quell'anno non compare piu'. La Lombardia tocca 173,2 nel 2019 e nel 2020 la matrice non la riporta. Mettere a confronto due anni distanti vuol dire quasi sempre confrontare due elenchi di regioni diversi.\n\nResta il crollo dell'ultimo anno. Una caduta di questa taglia in dodici mesi puo' essere il fenomeno che si muove oppure la misura che cambia, e una revisione del metodo di rilevazione produrrebbe lo stesso salto. Nel pacchetto non c'e' niente che permetta di stabilire quale delle due. Finche' non arriva l'anno dopo, il 2020 e' un punto isolato e non un livello nuovo.",
+   "h": "Dove il numero smette di essere confrontabile",
+   "role": "limiti"
+  },
+  {
+   "body": "Nel 2014 il Lazio segnava 424,4 e l'Umbria, ultima, 0,139. Nel 2020 il Lazio segna 68,2 e l'Umbria 0,04. La distanza fra la testa e il fondo si e' ridotta dell'83,9 per cento, e chi legge in fretta la chiamerebbe una convergenza. Non lo e'. Lo spostamento sta quasi tutto in alto, 356,2 persi dalla prima posizione contro un decimo in basso. Il fondo non e' salito, si e' mosso appena, e verso il basso.\n\nIl grosso di quella caduta sta in un anno solo. Fra il 2019 e il 2020 i dodici territori presenti in entrambi gli anni scendono tutti, senza eccezioni: la Toscana passa da 114,3 a 12,2, l'Emilia-Romagna da 18,6 a 0,16. Perche' la serie faccia questo salto, qui non lo scriviamo. Il pacchetto non porta nessuna fonte di contesto su questo indicatore, e una causa ricavata dai numeri sarebbe un'invenzione con l'aria di un fatto. Il dato racconta che cosa e' successo alla misura. Che cosa sia successo ai musei e' un'altra domanda, e per rispondere serve un'altra fonte.\n\nSe invece delle singole regioni si guardano i gruppi, il movimento va nel verso opposto. Nell'ultimo anno la media del Centro vale 20,7, quella del Mezzogiorno 0,88, quella del Nord 0,155. Fra Centro e Nord corrono 20,6, contro 4,2 al primo anno della serie. I due gruppi si sono allontanati mentre la distanza fra la prima e l'ultima regione si accorciava. Sono medie semplici dei territori di ciascun gruppo, non aggregati ponderati. Chi pubblica lo stesso divario con i pesi ottiene un altro numero, ed entrambi sono corretti.\n\nIl punto da tenere d'occhio adesso e' uno. Se il rilascio successivo riporta il Lazio verso i valori del decennio precedente, il 2020 e' un buco nella serie. Se lo lascia dov'e', la graduatoria che abbiamo appena letto e' la forma nuova dell'indicatore, e va riletta da capo.",
+   "h": "Il divario si chiude perche' scende la testa",
+   "role": "dinamica"
+  }
+ ],
+ "vintage": 2020
+}
