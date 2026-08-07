@@ -28,7 +28,10 @@ Queste sono le regole che valgono sempre:
   il branch sotto i piedi. Per questo ogni run apre il proprio **git worktree**
   isolato (`scripts/pipeline_workspace.py`, keyed sul `run_id`), non solo un branch
   con nome diverso. Tre ruoli, non piu' quattro: ammissione
-  (scout+hunter+promoter), verificatore, reader-editor. **Il produttore non
+  (scout+hunter+promoter+curator), verificatore, reader-editor. La composizione
+  non si ricopia: la mappa da vecchio stadio a ruolo vivo e'
+  `pipeline_launch.ROLE_OF_STAGE`, e sia `pipeline_status` sia
+  `pipeline_monitor` la importano. **Il produttore non
   esiste piu' come agente**: scrivere un articolo e' passato all'officina, dove
   lo fanno quattro tipi con pochi strumenti dentro un workflow, a un ventesimo
   del costo. Ammissione a monte e i due critici a valle restano agenti perche'
