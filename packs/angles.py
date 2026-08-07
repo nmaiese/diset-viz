@@ -41,8 +41,28 @@ from packs import calibration
 MIN_YEARS_FOR_TREND = 6
 MIN_YEARS_PER_SEGMENT = 4
 # Sotto dodici territori una dispersione descrive i pochi che rispondono, non
-# il paese. E' la stessa soglia che `indicator_brief` usa per la correlazione.
+# il paese. Regge da sola, e va detto: il commento diceva "e' la stessa soglia
+# che `indicator_brief` usa per la correlazione", e `scripts/indicator_brief.py`
+# e' stato cancellato. Non esiste piu' un modulo gemello con cui allinearsi, e
+# appellarsi a una coerenza non verificabile e' il difetto, non la soglia.
 MIN_TERRITORIES = 12
+
+# La stessa domanda, per i rilevatori temporali, e non e' lo stesso numero.
+#
+# `MIN_TERRITORIES` e' assoluta perche' i cinque rilevatori trasversali guardano
+# un anno alla volta su venti regioni. I tre rilevatori a coorte guardano invece
+# i territori presenti in **ogni** anno, e il livello provinciale ne ha 103: un
+# minimo assoluto di dodici li' non misura niente, zittisce zero serie su trenta
+# ed e' una guardia solo in apparenza. Una **quota** dice la cosa che si voleva
+# dire ("la maggior parte dei territori che l'indicatore copre") e vale
+# dodici su venti per le regioni e una sessantina su centotre per le province,
+# senza due numeri da giustificare separatamente.
+#
+# 0,60 misurata sul catalogo: zittisce 16 serie regione su 578 e 7 provinciali
+# su 30. Copre i casi che l'aprivano, `283` con quattro territori su venti e
+# `32`/`30` con quattro su quindici, dove la media raccontava quattro regioni e
+# la frase diceva il paese.
+MIN_COHORT_SHARE = 0.60
 
 # Una forza sotto questa non merita di essere proposta a chi scrive: e' un
 # effetto che esiste nei decimali e non nella storia.
@@ -148,6 +168,32 @@ def common_cohort(matrix):
     return set.intersection(*per_year) if per_year else set()
 
 
+def covered_territories(matrix):
+    """I territori che l'indicatore copre, cioe' presenti in **almeno** un anno.
+
+    E' il denominatore della rappresentativita': la coorte va confrontata con
+    quanti territori l'indicatore descrive, non con quanti ne esistono. Un
+    indicatore che copre solo cinque regioni e le copre tutte e cinque in ogni
+    anno parla per intero di cio' di cui dice di parlare, e una soglia sul
+    numero assoluto lo zittirebbe per una colpa che non ha.
+    """
+    return {name for year in matrix
+            for name, value in matrix[year].items() if value is not None}
+
+
+def cohort_is_representative(matrix):
+    """La coorte copre abbastanza dei territori dell'indicatore da parlarne?
+
+    La domanda che `annual_means` di proposito non decide, decisa qui: e' un
+    rilevatore a doversi rifiutare di parlare, non una media a mentire. La media
+    su quattro territori e' esatta, la frase che la chiama "l'Italia" no.
+    """
+    covered = covered_territories(matrix)
+    if not covered:
+        return False
+    return len(common_cohort(matrix)) / len(covered) >= MIN_COHORT_SHARE
+
+
 def annual_means(matrix):
     """{anno: media semplice}, sui territori presenti in **tutti** gli anni.
 
@@ -164,16 +210,18 @@ def annual_means(matrix):
     costante e' `accelerazione` a 0,410, cioe' il verso opposto. Il caso limite
     e' `283`, venti territori in tutto e quattro presenti in ogni anno.
 
-    E' la stessa decisione che il canary del 2026-08-06 ha gia' preso per
-    `indicator_brief` (`endpoints_common`): un confronto nel tempo si fa fra i
-    territori che ci sono in tutti e due i momenti, o non si fa.
+    E' la stessa decisione che il canary del 2026-08-06 ha gia' preso (vedi
+    `docs/CANARY.md`, la riga su `endpoints_common`): un confronto nel tempo si
+    fa fra i territori che ci sono in tutti e due i momenti, o non si fa.
 
-    Cio' che questa funzione **non** decide: se quattro territori su venti siano
-    abbastanza per parlare del paese. E' una soglia di rappresentativita', una
-    domanda diversa da quella della coorte, e inventarla qui vorrebbe dire
-    zittire dei rilevatori come effetto collaterale di una correzione di
-    esattezza. La coorte si dichiara invece (`quanti_territori` fra le cifre di
-    ogni angolo temporale), come il brief dichiara la propria base.
+    Cio' che questa funzione **non** decide, e continua a non decidere: se
+    quattro territori su venti bastino a parlare del paese. E' una soglia di
+    rappresentativita', una domanda diversa da quella della coorte, e la media
+    resta esatta anche quando la coorte e' sottile. A rifiutarsi di parlare sono
+    i tre rilevatori che la leggono (`cohort_is_representative`), che e' il posto
+    giusto: cosi' si perde un angolo, non si falsa una cifra. La coorte si
+    dichiara comunque (`quanti_territori` fra le cifre di ogni angolo temporale),
+    come il brief dichiara la propria base.
     """
     cohort = common_cohort(matrix)
     if not cohort:
@@ -270,6 +318,8 @@ def slope_break(matrix):
     che cambia regime, che e' quasi sempre la storia vera di un indicatore
     territoriale.
     """
+    if not cohort_is_representative(matrix):
+        return []
     means = annual_means(matrix)
     if len(means) < MIN_YEARS_FOR_TREND:
         return []
@@ -324,6 +374,8 @@ def acceleration(matrix):
     Distinto da `slope_break`: li' la serie cambia regime in un anno preciso,
     qui rallenta o accelera senza uno scalino.
     """
+    if not cohort_is_representative(matrix):
+        return []
     means = annual_means(matrix)
     if len(means) < MIN_YEARS_FOR_TREND:
         return []
@@ -368,6 +420,8 @@ def return_to_level(matrix, tolerance=0.02):
     Forza: quanto e' ampia l'escursione in mezzo, rapportata alla scala, piu' un
     premio per la distanza nel tempo.
     """
+    if not cohort_is_representative(matrix):
+        return []
     means = annual_means(matrix)
     if len(means) < MIN_YEARS_FOR_TREND:
         return []

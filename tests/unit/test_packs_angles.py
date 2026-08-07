@@ -311,6 +311,73 @@ class ThreeGroupsAreTheNormalCase(unittest.TestCase):
                 self.assertGreaterEqual(found["figures"]["distanza_ultimo_anno"], 0)
 
 
+class ARepresentativeCohort(unittest.TestCase):
+    """La coorte dice **quali** territori si confrontano, questa soglia dice se
+    sono abbastanza per chiamarli il paese.
+
+    Sono due domande diverse e la prima non risponde alla seconda: una media su
+    quattro regioni di venti e' esatta, e la frase che la chiama "l'Italia" no.
+    A rifiutarsi di parlare e' il rilevatore, non la media, cosi' si perde un
+    angolo invece di falsare una cifra.
+    """
+
+    @staticmethod
+    def _serie(width, cohort, years=range(2000, 2016)):
+        """Una serie con una rottura di pendenza vera, e `cohort` territori
+        presenti in ogni anno su `width` coperti."""
+        out = {}
+        for index, year in enumerate(years):
+            salto = 5 * max(0, index - 7)
+            riga = {f"t{i:02d}": 10.0 + i + salto for i in range(width)}
+            # I territori oltre la coorte mancano a turno, cosi' restano
+            # "coperti" (presenti in almeno un anno) ma fuori dall'intersezione.
+            if index % 2 == 0:
+                for i in range(cohort, width):
+                    riga.pop(f"t{i:02d}")
+            out[year] = riga
+        return out
+
+    def test_a_thin_cohort_silences_the_three_cohort_detectors(self):
+        """Quattro territori su venti: e' il caso `283`, che apriva la voce."""
+        serie = self._serie(width=20, cohort=4)
+        self.assertEqual(len(angles.common_cohort(serie)), 4)
+        self.assertEqual(len(angles.covered_territories(serie)), 20)
+        self.assertFalse(angles.cohort_is_representative(serie))
+        self.assertEqual(angles.slope_break(serie), [])
+        self.assertEqual(angles.acceleration(serie), [])
+        self.assertEqual(angles.return_to_level(serie), [])
+
+    def test_a_full_cohort_still_speaks(self):
+        serie = self._serie(width=20, cohort=20)
+        self.assertTrue(angles.cohort_is_representative(serie))
+        self.assertEqual(kinds(angles.slope_break(serie)), ["rottura-di-pendenza"])
+
+    def test_the_threshold_is_a_share_so_provinces_are_not_exempt(self):
+        """Una soglia **assoluta** di dodici non e' una guardia su 103 province:
+        settanta province su centotre passerebbero un minimo di dodici a occhi
+        chiusi, e sono meno di due terzi. E' la ragione per cui la costante e'
+        una quota e non un numero."""
+        sottile = self._serie(width=103, cohort=50)
+        self.assertGreater(len(angles.common_cohort(sottile)), angles.MIN_TERRITORIES)
+        self.assertFalse(angles.cohort_is_representative(sottile))
+        self.assertEqual(angles.slope_break(sottile), [])
+
+        piena = self._serie(width=103, cohort=70)
+        self.assertTrue(angles.cohort_is_representative(piena))
+        self.assertEqual(kinds(angles.slope_break(piena)), ["rottura-di-pendenza"])
+
+    def test_an_indicator_that_covers_few_territories_is_not_punished(self):
+        """La quota si misura su cio' che l'indicatore **copre**, non su venti.
+        Cinque regioni coperte e tutte e cinque presenti sempre: quell'indicatore
+        parla per intero di cio' di cui dice di parlare."""
+        serie = self._serie(width=5, cohort=5)
+        self.assertTrue(angles.cohort_is_representative(serie))
+        self.assertEqual(kinds(angles.slope_break(serie)), ["rottura-di-pendenza"])
+
+    def test_an_empty_matrix_is_not_representative(self):
+        self.assertFalse(angles.cohort_is_representative({}))
+
+
 class MethodBreaks(unittest.TestCase):
     def test_a_year_in_the_note_inside_the_window(self):
         found = angles.method_breaks(
