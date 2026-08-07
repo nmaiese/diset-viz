@@ -19,7 +19,6 @@ it).
 | --- | --- |
 | account utente, login Google, preferiti, statistiche/achievements, confronti salvati, GDPR | [`docs/ACCOUNT.md`](docs/ACCOUNT.md) |
 | la catena autonoma, gli agenti, il cancello, le Routine | [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md) |
-| la revisione a pratica editoriale (identita', stati, transizioni, PR come vista) | [`docs/EDITORIAL_PRACTICE.md`](docs/EDITORIAL_PRACTICE.md) |
 | come apre e chiude una run un agente qualsiasi | [`docs/AGENT_CONTRACT.md`](docs/AGENT_CONTRACT.md) |
 | una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
 | che cosa serve per scrivere un indicatore: cifre, angoli, contesto citabile | `packs/` (`angles.py`, `build.py`, `context.py`), [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |

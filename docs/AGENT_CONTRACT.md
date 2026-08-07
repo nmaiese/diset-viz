@@ -1,5 +1,21 @@
 # Il contratto comune degli agenti
 
+> **Chi possiede che cosa.** Quattro testi descrivevano la stessa catena, e
+> `run_id`, `pipeline_gate`, `STAGE_PATHS`, il perimetro e il diario comparivano
+> in tutti e quattro. Adesso ognuno possiede un soggetto e cita gli altri invece
+> di ripeterli:
+>
+> | soggetto | dove sta |
+> | --- | --- |
+> | le regole sempre vere, che si caricano da sole | `.claude/rules/pipeline.md` |
+> | che cosa fa la catena, perche', e che cosa manca | `docs/AUTONOMOUS_PIPELINE.md` |
+> | come apre e chiude una run (run_id, worktree, diario, perimetro, merge) | `docs/AGENT_CONTRACT.md` |
+> | come si scrive un articolo adesso | `.claude/workflows/produci-indicatori.js` e `officina/` |
+>
+> Se due di questi si contraddicono, ha ragione il codice. Se uno ripete l'altro,
+> il duplicato va tolto, non aggiornato: e' la lezione che questo repo ha gia'
+> pagato una volta.
+
 Ogni agente della catena (repo `nmaiese/diset-viz`) obbedisce a questo
 contratto. I file in `.claude/agents/` dicono **che cosa** fa ciascuno, questo
 dice **come** apre e chiude ogni run, e vale per tutti senza eccezioni.

@@ -3,7 +3,7 @@
 
 Questo modulo e' la Fase A resa eseguibile: gli stati finiti, i tipi di pratica,
 le transizioni ammesse, la tassonomia degli errori e il punteggio di priorita'
-descritti in `docs/EDITORIAL_PRACTICE.md`. Non tocca il disco e non conosce la
+descritti in `docs/archive/EDITORIAL_PRACTICE.md`. Non tocca il disco e non conosce la
 catena: sono definizioni pure, cosi' che una regola del dominio si possa provare
 con un test invece che discutere a voce.
 
@@ -13,7 +13,7 @@ checkout fresco, prima che esista il venv dell'app.
 
 from __future__ import annotations
 
-# --- Stati (docs/EDITORIAL_PRACTICE.md, §3) ---------------------------------
+# --- Stati (docs/archive/EDITORIAL_PRACTICE.md, §3) ---------------------------------
 # Uno solo attivo per pratica. Ogni stato ha una condizione verificabile contro
 # gli artefatti: e' cio' che rende lo stato "dichiarato ma riconciliabile" e non
 # semplicemente dedotto.

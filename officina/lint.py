@@ -47,7 +47,7 @@ from collections import Counter
 from app import indicator_texts, sources
 from app.indicator_view import build_indicator_view
 from packs import context as context_module
-from scripts import indicator_store
+from scripts import definition_check, indicator_store, verification_queue
 
 # `content/STYLE.md` li vieta in ogni prosa autorata, titoli compresi.
 BANNED = ("—", "–", ";", "…")
@@ -218,6 +218,20 @@ def states_a_value(text, match):
 
 def _finding(rule, severity, detail, field=None):
     return {"rule": rule, "severity": severity, "detail": detail, "field": field}
+
+
+@functools.lru_cache(maxsize=1)
+def _official_definitions():
+    """Le definizioni della fonte, lette una volta per processo.
+
+    Vuoto se il file non c'e': la regola si spegne invece di rompere il lint,
+    come la calibrazione della prosa qui sotto.
+    """
+    try:
+        from scripts.fetch_definitions import load_definitions
+        return load_definitions()
+    except Exception:
+        return {}
 
 
 @functools.lru_cache(maxsize=1)
@@ -563,6 +577,58 @@ def check_distance_from_siblings(entry, key=None, texts=None, **_):
     return found
 
 
+def check_definition(entry, key=None, **_):
+    """Che cosa l'articolo dice di misurare, contro le parole della fonte.
+
+    Ogni altra regola di questo file confronta la prosa con la **serie**: le
+    cifre, i paragrafi, le fonti. Nessuna guarda la **grandezza**, e la
+    grandezza e' dove stanno gli errori che sopravvivono a ogni lettura, perche'
+    l'aritmetica intorno e' giusta. `ter-30` ne ha appena dato l'esempio: un
+    articolo piu' fluido di tutti i precedenti che spiegava una domanda per
+    circuito museale mentre la fonte divide i visitatori per il numero di
+    istituti. Prima ancora, `ter-402` chiamava "imprese a guida femminile"
+    quello che Istat definisce come donne titolari di ditte individuali, e lo
+    ripeteva nella sezione dei limiti, che esiste apposta per dire che cosa
+    l'indicatore non misura.
+
+    Non c'e' una seconda implementazione: delega a `scripts.definition_check`,
+    che possiede il confronto e la calibrazione della copertura dei termini. Qui
+    si decide soltanto **che cosa blocca**.
+
+    `contraddizione` blocca: l'articolo dice una cosa diversa dalla fonte, non
+    una in meno. Sul catalogo di oggi (377 articoli, 181 con una definizione da
+    confrontare) non scatta nemmeno una volta, quindi non ferma niente di
+    esistente e prende la classe peggiore quando comparira'.
+
+    `base` (35 articoli), `soglia` (18) e `termini` (22) segnalano: dicono che
+    il denominatore, una soglia o quasi tutto il lessico della fonte non
+    compaiono nella prosa. Sono tanti perche' descrivono il catalogo scritto
+    prima che il pacchetto portasse la definizione: bloccare li' vorrebbe dire
+    fermare la produzione per riscrivere l'arretrato, che e' una decisione
+    editoriale e non un cancello.
+
+    `assente`, `vuoto` e `scoperto` non entrano: descrivono la nostra copertura,
+    non l'onesta' dell'articolo. `assente` in particolare scatta su 149 articoli
+    ed e' **il comportamento voluto** della macchina nuova, che la definizione la
+    omette quando l'angolo piu' forte non e' definitorio.
+    """
+    if not key:
+        return []
+    code = verification_queue.code_of(key)
+    official = definition_check.official_id(code)
+    if official is None:
+        return []
+    row = definition_check.check_entry(code, entry, _official_definitions().get(official))
+    found = []
+    for signal, detail in (row.get("hits") or {}).items():
+        if signal not in definition_check.SUBSTANTIVE:
+            continue
+        severity = BLOCKS if signal == "contraddizione" else FLAGS
+        found.append(_finding(f"definizione-{signal}", severity,
+                              "; ".join(detail)[:300], "sections.definizione"))
+    return found
+
+
 RULES = (
     check_banned_characters,
     check_lead,
@@ -572,6 +638,7 @@ RULES = (
     check_named_institutions_are_visible,
     check_unsupported_paragraphs,
     check_distance_from_siblings,
+    check_definition,
 )
 
 

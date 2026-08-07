@@ -24,7 +24,7 @@ dati si muovono.
 > diversi e non contendono. Il dispatcher (`pipeline_dispatch.py`) e il lock
 > una-PR-aperta sono ritirati. Il monitoraggio e' la rotta viva `/_pipeline`
 > (piu' `scripts/pipeline_monitor.py`). **La Routine va ri-puntata**: il suo
-> prompt cita ancora il dispatcher, va cambiato a `launcher.md` (vedi
+> prompt cita ancora il dispatcher, va cambiato al piano di `pipeline_launch.py` (vedi
 > [Le Routine](#le-routine)); e' in pausa, quindi non fa danni finche' non si
 > riaccende. Il perche' della forma nuova sta in
 > [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
@@ -40,7 +40,7 @@ dati si muovono.
 > Il **cruscotto `/_pipeline` mostra il vivo e il percorso end-to-end**: gli agenti POSTano i battiti
 > e le PR aperte a `/_pipeline/beat`, il sito li scrive nel SQLite gia' replicato
 > su GCS da Litestream, e li serve. La Routine `launcher` resta **in pausa**: va
-> ri-puntata a `launcher.md` e riaccesa a mano, dopo aver verificato i fix su
+> ri-puntata al piano di `pipeline_launch.py` e riaccesa a mano, dopo aver verificato i fix su
 > qualche tick manuale (serve prima il segreto `PIPELINE_INGEST_TOKEN` in Cloud
 > Run e nell'ambiente agenti, con `PIPELINE_INGEST_URL`).
 > Ogni indicatore espone ammissione, produzione, verifica e pubblicazione, la
@@ -84,7 +84,7 @@ ignorava, e sei Routine indipendenti si pestavano i piedi.
 | --- | --- | --- | --- |
 | launcher | ogni 3 ore (minuto `:02`) | `pipeline_launch.py`, poi lancia in parallelo i ruoli che ha nominato | `trig_01PGX3mKsLwUzz82snYMjVnA` (in pausa) |
 
-> **Stato al 2026-08-01.** La Routine e' gia' puntata a `launcher.md` (il prompt
+> **Stato al 2026-08-01.** La Routine era puntata a `launcher.md`, che non esiste piu' (il prompt
 > qui sotto), non al dispatcher ritirato: era stata ricreata il 29 luglio con l'id
 > nuovo `trig_01PGX3mKsLwUzz82snYMjVnA` (il vecchio `trig_01Dv3ZDB4ch561GFYy2QwEUJ`
 > non esiste piu'). Il 1 agosto `allowed_tools` e' stato corretto per includere
@@ -118,7 +118,7 @@ che ha davanti.
 ### Il prompt, adesso un puntatore
 
 Il giro del lanciatore (legge il piano per-indicatore, lancia i ruoli in
-parallelo, riporta come e' andata) vive in **`.claude/agents/launcher.md`**, con
+parallelo, riporta come e' andata) viveva in `.claude/agents/launcher.md`, cancellato con la demolizione: il piano lo produce `scripts/pipeline_launch.py` e lo legge chi lancia, con
 modello e guardia nel frontmatter come ogni altro agente della catena. Questo
 documento non lo ricopia più: la versione che stava qui era l'ultima copia di
 contratto dentro un prompt di Routine, cioè la forma esatta del drift di
@@ -126,7 +126,7 @@ contratto dentro un prompt di Routine, cioè la forma esatta del drift di
 
 ```
 Agisci come il lanciatore della catena editoriale di Divario Italia. La tua
-definizione sta in .claude/agents/launcher.md ed è vincolante: leggila ed
+definizione sta in scripts/pipeline_launch.py ed è vincolante: leggila ed
 eseguila. Fai UN giro e fermati.
 ```
 

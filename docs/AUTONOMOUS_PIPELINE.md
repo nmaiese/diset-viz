@@ -1,5 +1,21 @@
 # La catena autonoma
 
+> **Chi possiede che cosa.** Quattro testi descrivevano la stessa catena, e
+> `run_id`, `pipeline_gate`, `STAGE_PATHS`, il perimetro e il diario comparivano
+> in tutti e quattro. Adesso ognuno possiede un soggetto e cita gli altri invece
+> di ripeterli:
+>
+> | soggetto | dove sta |
+> | --- | --- |
+> | le regole sempre vere, che si caricano da sole | `.claude/rules/pipeline.md` |
+> | che cosa fa la catena, perche', e che cosa manca | `docs/AUTONOMOUS_PIPELINE.md` |
+> | come apre e chiude una run (run_id, worktree, diario, perimetro, merge) | `docs/AGENT_CONTRACT.md` |
+> | come si scrive un articolo adesso | `.claude/workflows/produci-indicatori.js` e `officina/` |
+>
+> Se due di questi si contraddicono, ha ragione il codice. Se uno ripete l'altro,
+> il duplicato va tolto, non aggiornato: e' la lezione che questo repo ha gia'
+> pagato una volta.
+
 Come Divario Italia trova, verifica, cura, scrive, rilegge e pubblica un
 indicatore **senza intervento umano**, e quali sono le tre cose che ancora lo
 richiedono e perche'.
@@ -10,7 +26,7 @@ vedi [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md); per lo strato dati sotto,
 [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md); per l'anatomia di una pagina
 indicatore, [`INDICATOR_PAGES.md`](INDICATOR_PAGES.md). Per il modello a pratica
 editoriale che dà un nome all'indicatore-lungo-un-ciclo,
-[`EDITORIAL_PRACTICE.md`](EDITORIAL_PRACTICE.md).
+[`archive/EDITORIAL_PRACTICE.md`](archive/EDITORIAL_PRACTICE.md).
 
 ## L'obiettivo, detto per intero
 
@@ -153,14 +169,14 @@ indicatore malato non ferma un indicatore pronto e indipendente.
 Come il dispatcher, non lancia lui l'agente, e non potrebbe: un agente e' una
 sessione Claude Code, il lanciatore e' stdlib. Dice **che cosa** lanciare, con
 ruolo, indicatore e `run_id` gia' coniato, e l'agente lanciatore
-(`.claude/agents/launcher.md`) fa il resto. La decisione resta cosi'
+(oggi un umano o un workflow: l'agente `launcher.md` non esiste piu', era un workflow scritto in prosa) fa il resto. La decisione resta cosi'
 deterministica e verificabile da un test, l'esecuzione no.
 
 Con `--publish` il lanciatore segna il **battito del lanciatore** nel diario: una
 riga `launch` che `land_on_master` porta su master, cosi' un tick vero lascia una
 traccia anche quando non produce altro. Non e' piu' una verifica del sito: quel
 passo e' stato rimosso quando il progetto ha ratificato **merge = pubblicazione**
-(vedi [`EDITORIAL_PRACTICE.md`](EDITORIAL_PRACTICE.md), §8, e piu' sotto). Senza
+(vedi [`archive/EDITORIAL_PRACTICE.md`](archive/EDITORIAL_PRACTICE.md), §8, e piu' sotto). Senza
 `--publish` (come nei test e nelle ispezioni a mano) il lanciatore e' di sola
 lettura e non scrive niente.
 
@@ -234,7 +250,7 @@ articolo e non garantisce niente.
 ### Il registro errori: il learning loop
 
 Le smentite confermate non restano solo un rilievo su un articolo: diventano
-memoria. `scripts/indicator_brief.py` (la sola fonte dei numeri per il
+memoria. `officina/brief.py`, che lo ha assorbito (la sola fonte dei numeri per il
 produttore) ha una sezione **ERRORI NOTI**, una vista sulle smentite gia'
 confermate in `data/pipeline/verifiche/` (`esito=smentito`), a **cerchi
 concentrici**: prima quelle su **questo** indicatore, poi quelle della sua
@@ -454,7 +470,7 @@ del cancello e la transizione `fusa -> pubblicata` non esistono piu'. Lo stato
 `pubblicata` si raggiunge al merge, per costruzione.
 
 Il compromesso e' dichiarato, non nascosto (vedi
-[`EDITORIAL_PRACTICE.md`](EDITORIAL_PRACTICE.md), §8): "repo avanti / sito
+[`archive/EDITORIAL_PRACTICE.md`](archive/EDITORIAL_PRACTICE.md), §8): "repo avanti / sito
 indietro" non e' piu' osservabile dalla catena. Il deploy segue il merge (un push
 su master ridispiega il sito), ma se fallisce in silenzio il cruscotto continua a
 dire `pubblicata`. In cambio la catena toglie una macchina intera e lo stato
@@ -554,7 +570,7 @@ fuori sincrono senza che nessuno se ne accorga, un prompt che punta a un file no
 
 **La Routine e' una sola**, ed e' quella del **lanciatore**: i ruoli non hanno un
 cron proprio. Anche il lanciatore e' un agente a pieno titolo
-(`.claude/agents/launcher.md`, con modello e guardia nel frontmatter): legge
+(non piu' un agente: il piano si legge e si lancia, vedi `.claude/rules/pipeline.md`): legge
 `scripts/pipeline_launch.py --json --publish --publish-base https://divarioitalia.it`,
 segna il battito del lanciatore nel diario, poi lancia gli agenti in cima al piano **in parallelo**
 (piu' `Agent` nello stesso messaggio), ciascuno con il suo `run_id` e il suo

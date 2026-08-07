@@ -237,8 +237,11 @@ ri-architettura, e' tre ruoli, non sette stadi:
 | verificatore | `indicator-verifier` | `scripts/verification_queue.py` |
 
 I file di agente dei vecchi stadi (`source-scout.md`, `indicator-hunter.md`,
-`indicator-curator.md`, `indicator-writer.md`, `indicator-reviewer.md`) esistono
-ancora, ma la Routine lancia solo i tre ruoli via `.claude/agents/launcher.md`.
+`indicator-curator.md`, `indicator-writer.md`, `indicator-reviewer.md`) non
+esistono piu', e con la demolizione se ne sono andati anche `producer.md` e
+`launcher.md`. Restano tre agenti: `admissions.md` a monte, `indicator-verifier.md`
+e `reader-editor.md` a valle. Gli articoli li scrive l'officina
+(`.claude/workflows/produci-indicatori.js`).
 
 Lo stato di tutte le code insieme:
 

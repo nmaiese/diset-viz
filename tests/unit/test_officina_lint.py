@@ -6,6 +6,7 @@ resta verde e non lo dice. Qui ogni regola vede il caso che deve prendere e il
 caso che deve lasciar passare.
 """
 import unittest
+import unittest.mock
 
 from officina import lint
 
@@ -302,3 +303,67 @@ class Severities(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TheDefinitionIsCheckedAgainstTheSource(unittest.TestCase):
+    """La grandezza, non le cifre intorno.
+
+    Ogni altra regola di `officina/lint.py` confronta la prosa con la serie.
+    Questa confronta cio' che l'articolo dice di misurare con le parole della
+    fonte, ed e' la classe di errore che sopravvive a ogni lettura perche'
+    l'aritmetica intorno e' giusta: `ter-30` spiegava una domanda per circuito
+    museale mentre la fonte divide i visitatori per il numero di istituti, e
+    `ter-402` chiamava "imprese a guida femminile" quello che Istat definisce
+    come donne titolari di ditte individuali.
+    """
+
+    DEFINIZIONE = {
+        "id": "30",
+        "indicatore": "Indice di domanda culturale (circuiti museali)",
+        "definizione": ("Numero di visitatori dei circuiti sul totale di musei e "
+                        "istituti similari appartenenti ai circuiti"),
+    }
+
+    def _rilievi(self, prosa):
+        voce = entry(sections=[
+            {"role": "definizione", "h": "Che cosa misura", "body": prosa},
+            {"role": "quadro", "h": "Un vertice", "body": "Corpo del quadro."},
+            {"role": "dinamica", "h": "Sei anni", "body": "Corpo della dinamica."},
+            {"role": "limiti", "h": "Che cosa non dice", "body": "Corpo dei limiti."},
+        ])
+        with unittest.mock.patch.object(lint, "_official_definitions",
+                                        lambda: {"30": self.DEFINIZIONE}):
+            return lint.check_definition(voce, key="30")
+
+    def test_an_article_that_paraphrases_the_source_passes(self):
+        buona = ("Istat divide il numero di visitatori dei circuiti per il totale "
+                 "di musei e istituti similari appartenenti ai circuiti: quello "
+                 "che esce e' un carico medio per istituto.")
+        self.assertEqual(self._rilievi(buona), [])
+
+    def test_a_missing_denominator_is_flagged_not_blocked(self):
+        """Trentacinque articoli del catalogo stanno qui, ed e' l'arretrato
+        scritto prima che il pacchetto portasse la definizione: bloccare
+        vorrebbe dire fermare la produzione per riscriverlo."""
+        muta = ("L'indicatore dice quanta domanda culturale arriva a una regione, "
+                "in migliaia, e non ha un verso.")
+        rilievi = self._rilievi(muta)
+        self.assertTrue(rilievi)
+        self.assertTrue(all(r["severity"] == lint.FLAGS for r in rilievi))
+        self.assertIn("definizione-base", {r["rule"] for r in rilievi})
+
+    def test_a_family_without_official_metadata_is_silent(self):
+        """`scoperto` descrive la nostra copertura, non l'onesta' dell'articolo:
+        centonovantasei articoli non hanno una definizione da confrontare."""
+        voce = entry()
+        self.assertEqual(lint.check_definition(voce, key="bes:10AMB004"), [])
+
+    def test_an_omitted_definition_section_does_not_fire(self):
+        """La macchina nuova omette la definizione quando l'angolo piu' forte non
+        e' definitorio, ed e' il comportamento voluto: `assente` scatta su 149
+        articoli e non entra fra i rilievi."""
+        voce = entry()
+        with unittest.mock.patch.object(lint, "_official_definitions",
+                                        lambda: {"30": self.DEFINIZIONE}):
+            rilievi = lint.check_definition(voce, key="30")
+        self.assertNotIn("definizione-assente", {r["rule"] for r in rilievi})

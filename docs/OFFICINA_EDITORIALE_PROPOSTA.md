@@ -16,7 +16,7 @@ Questa proposta parte da quattro fonti di verita' che non sostituisce:
 
 - [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md) per la catena e il rientro
   sul pubblicato
-- [`EDITORIAL_PRACTICE.md`](EDITORIAL_PRACTICE.md) per identita', stati e
+- [`archive/EDITORIAL_PRACTICE.md`](archive/EDITORIAL_PRACTICE.md) per identita', stati e
   pubblicazione
 - [`INDICATOR_PAGES.md`](INDICATOR_PAGES.md) per il contratto della pagina
 - [`SECONDARY_SOURCES.md`](SECONDARY_SOURCES.md) per corpus e fonti di contesto
@@ -872,7 +872,7 @@ Questa e' una mappa di implementazione, non un ordine di applicazione.
 ### Documenti da aggiornare soltanto dopo la ratifica
 
 - `docs/AUTONOMOUS_PIPELINE.md`
-- `docs/EDITORIAL_PRACTICE.md`
+- `docs/archive/EDITORIAL_PRACTICE.md`
 - `docs/AGENT_CONTRACT.md`
 - `docs/SECONDARY_SOURCES.md`
 - `docs/CANARY.md`
