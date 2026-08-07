@@ -453,7 +453,8 @@ possono fare:
    genere lo scrive nella PR e descrive che adapter servirebbe.
 2. **Creare una categoria** della qualità della vita. È una sezione del sito con
    un nome, una descrizione e una macro-area, non una riga di mappatura. Mappare
-   un tema a una categoria esistente invece è del curatore.
+   un tema a una categoria esistente invece è lavoro di curazione, cioè
+   dell'ammissione.
 
 ## Cosa non è ancora fatto
 
@@ -478,8 +479,8 @@ possono fare:
    nuova a ogni firing nell'environment `divarioitalia`. Le cinque vecchie
    restano in pausa dal 27 luglio. Il passaggio è completo e nell'ordine giusto.
 7. **Una voce per (indicatore, livello)** nello store degli articoli. Oggi è una
-   per indicatore, con il livello come campo dentro, mentre le code dello
-   scrittore e del revisore hanno già una riga per coppia. Non è un difetto
+   per indicatore, con il livello come campo dentro, mentre le code della
+   scrittura e della revisione hanno già una riga per coppia. Non è un difetto
    nuovo, è quello di prima lasciato dov'era di proposito: cambiare il modello
    dei dati dentro una modifica che serviva a togliere i conflitti avrebbe
    mescolato due cose che vanno potute rileggere separate.
@@ -495,8 +496,8 @@ possono fare:
   load-time): devono girare nell'agente schedulato senza Flask.
 - Cache grezza Eurostat (`data/eurostat_cache/`) e Istat (`data/istat_cache/`)
   gitignorate; committati solo i fixture in `data/discovery/fixtures/`.
-- Il curatore non dichiara mai `exact`; `score_eligible=true` è rifiutato se il
-  verso non è direzionale.
+- Una curazione non dichiara mai `exact`; `score_eligible=true` è rifiutato se
+  il verso non è direzionale.
 - **Bolzano+Trento**: BES e territoriali ricevono già da Istat l'aggregato
   Trentino Alto Adige. Eurostat e Multiscopo lo combinano con **media pesata per
   popolazione**, non con media semplice.

@@ -66,12 +66,16 @@ fino in fondo.
   la faccio cadere?"), perche' l'istituzione e la licenza che lascia passare
   finiscono su una pagina pubblica sotto il nome del progetto e nessuno legge la
   pull request prima del merge.
-- **Produttore** (agente `producer`) porta **un** indicatore da ammesso a
-  pubblicato in una sessione: cura il verso e la categoria, scrive l'intero
-  articolo, si rilegge, firma. Fonde curatore, scrittore e revisore. Il passo
-  distintivo e' la **rilettura sul proprio testo** (reflexion): ha appena
-  scritto, quindi e' il lettore peggiore, e si rilegge con la durezza con cui lo
-  farebbe il verificatore.
+- **Produttore** (l'officina, `.claude/workflows/produci-indicatori.js`) porta
+  **un** indicatore da ammesso a pubblicato: monta il pacchetto, fa scrivere due
+  bozze dai due angoli piu' forti, le fa scegliere a due giudici ciechi, applica
+  la diagnosi e chiude sul lint. Fonde curatore, scrittore e revisore. **Non e'
+  un agente**: quattro tipi stretti dentro un workflow fanno lo stesso lavoro a
+  un ventesimo del costo, e il coordinamento dentro un workflow non costa token.
+  Il passo distintivo e' il **giudizio cieco**, non la rilettura sul proprio
+  testo: chi ha appena scritto e' il lettore peggiore del proprio testo, e due
+  bozze confrontate da chi non ha il progetto in contesto dicono cio' che una
+  sola rilettura non dice.
 - **Verificatore** (agente `verificatore`) prova a falsificare ogni
   affermazione di un articolo firmato. E' rimasto **invariato** nella
   ri-architettura, ed e' l'unico ruolo che misura il lavoro di un altro ruolo
@@ -101,11 +105,11 @@ Le code sono ancora quelle dei sette stadi (il vocabolario interno non cambia:
 un produttore legge la coda del curatore e quella dello scrittore), ma chi le
 drena sono tre ruoli, non sette.
 
-| ruolo | agente | coda | comando |
+| ruolo | chi lo esegue | coda | comando |
 | --- | --- | --- | --- |
-| ammissione | `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` | `scripts/scout_sources.py`, `scripts/discover_candidates.py`, `scripts/promote_candidates.py` |
-| produttore | `producer` | `curate.worklist()` + `pending_notes` + `review_queue` | `scripts/curate.py`, `scripts/pending_notes.py`, `scripts/review_queue.py` |
-| verificatore | `verificatore` | `verification_queue` | `scripts/verification_queue.py` |
+| ammissione | agente `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` | `scripts/scout_sources.py`, `scripts/discover_candidates.py`, `scripts/promote_candidates.py` |
+| produttore | workflow `.claude/workflows/produci-indicatori.js` | `curate.worklist()` + `pending_notes` + `review_queue` | `scripts/curate.py`, `scripts/pending_notes.py`, `scripts/review_queue.py` |
+| verificatore | agente `verificatore` | `verification_queue` | `scripts/verification_queue.py` |
 
 Un solo comando dice lo stato di tutte le code:
 
@@ -168,9 +172,12 @@ indicatore malato non ferma un indicatore pronto e indipendente.
 
 Come il dispatcher, non lancia lui l'agente, e non potrebbe: un agente e' una
 sessione Claude Code, il lanciatore e' stdlib. Dice **che cosa** lanciare, con
-ruolo, indicatore e `run_id` gia' coniato, e l'agente lanciatore
-(oggi un umano o un workflow: l'agente `launcher.md` non esiste piu', era un workflow scritto in prosa) fa il resto. La decisione resta cosi'
-deterministica e verificabile da un test, l'esecuzione no.
+ruolo e indicatore, e per i ruoli che aprono una run anche il `run_id` gia'
+coniato: le voci `producer` non ne portano, perche' l'officina non apre una pull
+request e il diario rifiuterebbe quell'identificativo. Chi legge il piano (una
+persona, o la Routine) fa il resto: **l'agente `launcher.md` non esiste piu'**,
+era un workflow scritto in prosa. La decisione resta cosi' deterministica e
+verificabile da un test, l'esecuzione no.
 
 Con `--publish` il lanciatore segna il **battito del lanciatore** nel diario: una
 riga `launch` che `land_on_master` porta su master, cosi' un tick vero lascia una
@@ -189,9 +196,10 @@ contraddicono. Adesso sono directory, un file per record:
 
 | store | un file per | scritto da | committato |
 | --- | --- | --- | --- |
-| `content/indicators/` | articolo | produttore | si' |
+| `content/indicators/` | articolo | l'officina | si' |
 | `data/pipeline/runs/` | run | tutti i ruoli | si' |
 | `data/pipeline/verifiche/` | verifica | verificatore | si' |
+| `data/pipeline/letture/` | lettura di leggibilita' | reader-editor | si' |
 | `data/pipeline/practices/` | pratica (record di stato) | riconciliatore | si' |
 | `data/pipeline/heartbeats/` | sessione in volo | ogni ruolo all'avvio | no (e' il vivo) |
 
@@ -572,8 +580,8 @@ falliva, e non arrivava in nessuna pagina. Un prompt che ricopia una regola va
 fuori sincrono senza che nessuno se ne accorga, un prompt che punta a un file no.
 
 **La Routine e' una sola**, ed e' quella del **lanciatore**: i ruoli non hanno un
-cron proprio. Anche il lanciatore e' un agente a pieno titolo
-(non piu' un agente: il piano si legge e si lancia, vedi `.claude/rules/pipeline.md`): legge
+cron proprio. Il lanciatore non e' piu' un agente, e' uno script che si legge e
+un piano che si lancia (vedi `.claude/rules/pipeline.md`). La Routine legge
 `scripts/pipeline_launch.py --json --publish --publish-base https://divarioitalia.it`,
 segna il battito del lanciatore nel diario, poi lancia gli agenti in cima al piano **in parallelo**
 (piu' `Agent` nello stesso messaggio), ciascuno con il suo `run_id` e il suo
