@@ -27,9 +27,10 @@ Queste sono le regole che valgono sempre:
   checkout condiviso ne ha uno solo, e due run che se li contendono si spostano
   il branch sotto i piedi. Per questo ogni run apre il proprio **git worktree**
   isolato (`scripts/pipeline_workspace.py`, keyed sul `run_id`), non solo un branch
-  con nome diverso. Tre ruoli, non piu' quattro: ammissione
-  (scout+hunter+promoter+curator), verificatore, reader-editor. La composizione
-  non si ricopia: la mappa da vecchio stadio a ruolo vivo e'
+  con nome diverso. Quattro ruoli in `pipeline_launch.ROLE_ORDER`, e tre soli
+  sono agenti: ammissione (scout+hunter+promoter+curator), reader-editor,
+  verificatore. Il quarto e' **il produttore**, che e' l'officina. La
+  composizione non si ricopia: la mappa da vecchio stadio a ruolo vivo e'
   `pipeline_launch.ROLE_OF_STAGE`, e sia `pipeline_status` sia
   `pipeline_monitor` la importano. **Il produttore non
   esiste piu' come agente**: scrivere un articolo e' passato all'officina, dove

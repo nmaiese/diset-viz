@@ -125,9 +125,17 @@ STAGE_PATHS = {
     # prima scrittura e di nuovo sull'ultima. Le due costanti esistevano gia',
     # inutilizzate, e `check_curation_decisions` girava su un file che nessuno
     # stadio poteva scrivere.
+    # `THEME_CATEGORIES` c'e' per la stessa ragione, ed era il terzo buco della
+    # stessa forma: una serie con un tema non ancora registrato non risolve a
+    # nessuna categoria, cade in "Altro" e sparisce dai totali di macroarea
+    # senza che niente fallisca. Registrarlo e' **dati**, non codice
+    # (`app.taxonomy._curated_theme_map` legge il CSV, che ha perfino le colonne
+    # `added_by` e `added_at` perche' lo scriva la catena), e
+    # `tests/unit/test_source_admission.py` lo pretende: senza il file nel
+    # perimetro l'ammissione non poteva chiudere la propria run.
     "admissions": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, CANDIDATES, CURATION,
                    EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS,
-                   RUN_JOURNAL),
+                   THEME_CATEGORIES, RUN_JOURNAL),
     # Il verificatore NON ha `INDICATOR_TEXTS`, e l'assenza e' la definizione
     # dello stadio piu' che il suo prompt. Uno stadio che trova e ripara i propri
     # rilievi corregge i propri compiti, che e' esattamente il difetto che questo
