@@ -107,8 +107,8 @@ drena sono tre ruoli, non sette.
 
 | ruolo | chi lo esegue | coda | comando |
 | --- | --- | --- | --- |
-| ammissione | agente `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` | `scripts/scout_sources.py`, `scripts/discover_candidates.py`, `scripts/promote_candidates.py` |
-| produttore | workflow `.claude/workflows/produci-indicatori.js` | `curate.worklist()` + `pending_notes` + `review_queue` | `scripts/curate.py`, `scripts/pending_notes.py`, `scripts/review_queue.py` |
+| ammissione | agente `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved`, `curate.worklist()` | `scripts/scout_sources.py`, `scripts/discover_candidates.py`, `scripts/promote_candidates.py`, `scripts/curate.py`, `scripts/apply_curation.py` |
+| produttore | workflow `.claude/workflows/produci-indicatori.js` | `pending_notes` + `review_queue` | `scripts/pending_notes.py`, `scripts/review_queue.py` |
 | verificatore | agente `verificatore` | `verification_queue` | `scripts/verification_queue.py` |
 
 Un solo comando dice lo stato di tutte le code:

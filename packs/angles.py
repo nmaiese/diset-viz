@@ -760,7 +760,14 @@ def group_divergence(matrix, groups):
 
     alto_prima, basso_prima, partenza = estremi(first)
     high, low, now = estremi(last)
-    invertito = (high, low) == (basso_prima, alto_prima)
+    # **Un ordine che non esiste non si puo' rovesciare.** Con tutti i gruppi
+    # alla pari `estremi` restituisce lo stesso gruppo come alto e come basso,
+    # quindi le due coppie sono `(g, g)` e `(g, g)`: la sola uguaglianza le
+    # dichiarava invertite, e usciva un sorpasso a forza 0,8 con tutte e due le
+    # distanze a zero, cioe' due gruppi che si scambiano un posto che nessuno
+    # dei due aveva. Serve un alto e un basso distinti in tutti e due gli anni.
+    ordinati = alto_prima != basso_prima and high != low
+    invertito = ordinati and (high, low) == (basso_prima, alto_prima)
     # `None`, non zero, quando la distanza di partenza e' zero: li' la variazione
     # relativa non e' nulla, e' **indefinita**, e scriverci 0,0 direbbe a chi
     # scrive che il divario non si e' mosso mentre passava da zero a qualcosa.

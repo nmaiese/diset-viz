@@ -273,6 +273,18 @@ class GroupDivergence(unittest.TestCase):
         found = angles.group_divergence(self._serie(5.0, 5.0, 0.0, 10.0), self.GROUPS)
         self.assertEqual(found, [])
 
+    def test_groups_level_in_both_years_are_not_a_crossover(self):
+        """Il caso peggiore del pareggio, perche' passava.
+
+        Con tutti i gruppi alla pari in **tutti e due** gli anni, `estremi`
+        restituisce lo stesso gruppo come alto e come basso, quindi le due
+        coppie sono `(g, g)` e `(g, g)` e la sola uguaglianza le dichiarava
+        invertite: usciva un sorpasso a forza 0,8 con le due distanze a zero,
+        cioe' due gruppi che si scambiano un posto che nessuno dei due aveva.
+        """
+        found = angles.group_divergence(self._serie(5.0, 5.0, 7.0, 7.0), self.GROUPS)
+        self.assertEqual(found, [])
+
     def test_a_reversal_that_also_widens_says_that_it_reversed(self):
         """L'altra meta': quando il divario si allarga **e** l'ordine si rovescia
         l'angolo esce, e porta il sorpasso fra i fatti. "Il divario si e'

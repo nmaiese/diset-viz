@@ -120,15 +120,16 @@ decide.
 git push -u origin HEAD
 PR=$(python3 scripts/pipeline_merge.py --open \
        --stage <stadio> --head <il tuo branch> --run-id <il tuo run_id> --title "..." --body "...")
-.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <il tuo run_id>
+bin/py scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <il tuo run_id>
 ```
 
-L'apertura usa **`python3`** (e' stdlib pura, una sola chiamata REST, e il
-worktree non ha un `.venv`); il merge usa **`.venv/bin/python`** perche' rilancia
-il cancello, che per il vintage importa l'app. Nel worktree il venv c'e':
-`pipeline_workspace.py --open` ci collega quello del checkout principale (deps dal
-venv, codice dell'app dal worktree). Se manca del tutto, crealo prima
-(`python3 -m venv .venv`), come gia' serve per la suite.
+L'apertura usa **`python3`** (e' stdlib pura, una sola chiamata REST, e gira
+anche su un checkout che non ha ancora un venv); il merge usa **`bin/py`**
+perche' rilancia il cancello, che rilancia la suite, che importa l'app. Non
+scrivere `.venv/bin/python`: in molti worktree quel percorso non esiste, e il
+comando muore con `no such file or directory` prima ancora di provarci. `bin/py`
+risolve in un posto solo e, se non trova un interprete con le dipendenze,
+fallisce dicendo perche'.
 
 **La PR si apre con `pipeline_merge.py --open`, non con `gh pr create`, e senza
 `GH_REPO`.** `gh pr create` e' porcelain (GraphQL), e davanti al remote riscritto

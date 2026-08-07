@@ -211,12 +211,21 @@ def main(argv=None) -> int:
             #
             # `cancello-non-eseguibile` e' escluso apposta: un guasto del lint
             # non e' una bocciatura editoriale e non deve costare una scrittura.
-            print("RILIEVI " + json.dumps(rilievi, ensure_ascii=False))
+            # **Tutte e due le righe sullo stesso flusso, e non e' pignoleria.**
+            # Con l'uscita catturata (un agente non e' un terminale) stdout e'
+            # a blocchi e stderr no, quindi una riga su stdout e una su stderr
+            # arrivano a chi legge in ordine invertito. Il contratto del
+            # pubblicatore riconosce i rilievi da una riga `RILIEVI`, e con
+            # l'ordine rovesciato avrebbe riportato una lista vuota, mandando la
+            # riscrittura al giro sbagliato: `ilRifiuto` invece di `ilBlocco`,
+            # cioe' "correggi la forma" al posto dei rilievi editoriali veri.
             print("non scritta: il cancello blocca su "
                   + ", ".join(sorted({rilievo["rule"] for rilievo in fermi}))
                   + f", e l'articolo precedente e' rimasto al suo posto ({key}). "
                   + "Nessuna versione buona e' stata sovrascritta, e i rilievi "
-                  + "qui sopra sono della bozza, non di cio' che c'e' su disco.",
+                  + "qui sotto sono della bozza, non di cio' che c'e' su disco.",
+                  file=sys.stderr)
+            print("RILIEVI " + json.dumps(rilievi, ensure_ascii=False),
                   file=sys.stderr)
             return 2
         if not fermi:

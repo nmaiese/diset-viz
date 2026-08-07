@@ -701,8 +701,10 @@ BOZZA
 
    Se esce 2, **non e' scritto**: rispondi \`scritto: false\` e copia in
    \`errore_scrittura\` il messaggio esatto. Due casi, e si distinguono da soli:
-   se l'uscita comincia con una riga \`RILIEVI \` seguita da un array JSON,
-   copia quell'array in \`rilievi\` e **salta il passo 2**. Quei rilievi sono
+   se fra le righe dell'uscita ce n'e' una che comincia con \`RILIEVI \`
+   seguita da un array JSON, copia quell'array in \`rilievi\` e **salta il passo
+   2**. Non contano l'ordine delle righe ne' il flusso su cui arrivano: conta
+   che la riga ci sia. Quei rilievi sono
    della bozza; il lint su disco descriverebbe l'articolo precedente, che non e'
    stato sovrascritto. Se invece la riga \`RILIEVI\` non c'e', e' un difetto di
    forma della bozza (un ruolo doppio, una sezione senza corpo, un livello che
