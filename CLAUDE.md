@@ -23,7 +23,8 @@ it).
 | come apre e chiude una run un agente qualsiasi | [`docs/AGENT_CONTRACT.md`](docs/AGENT_CONTRACT.md) |
 | una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
 | che cosa serve per scrivere un indicatore: cifre, angoli, contesto citabile | `packs/` (`angles.py`, `build.py`, `context.py`), [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
-| scrivere articoli indicatore adesso: il workflow, il lint, i pacchetti | `.claude/workflows/produci-indicatori.js`, `officina/` (`pacchetti.py`, `brief.py`, `lint.py`) |
+| scrivere articoli indicatore adesso: il workflow, il lint, i pacchetti | `.claude/workflows/produci-indicatori.js`, `officina/` (`pacchetti.py`, `brief.py`, `pubblica.py`, `lint.py`) |
+| scrivere o cambiare un file di agente (contratto, non cronaca) | `.claude/rules/pipeline.md`, e il verdetto in [`docs/OFFICINA_EDITORIALE_PROPOSTA.md`](docs/OFFICINA_EDITORIALE_PROPOSTA.md) |
 | quanto costa una run, e come si misura senza sbagliare | `scripts/baseline_tokens.py` (il contratto sta nel suo docstring) |
 | scoperta e promozione di indicatori multifonte | [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md) |
 | stato corrente del sistema, id delle Routine, cosa manca | [`docs/DISCOVERY_STATUS.md`](docs/DISCOVERY_STATUS.md) |
@@ -90,7 +91,9 @@ stesso verdetto. `bin/py` risolve in un posto solo e fallisce dicendo perche'.
 # scrivere articoli indicatore: il workflow, dalla lista dei codici
 #   Workflow({scriptPath: ".claude/workflows/produci-indicatori.js", args: ["ter-30"]})
 bin/py -m officina.pacchetti ter-30              # il pacchetto, a mano
+bin/py -m officina.pubblica ter-30 < bozza.json  # la bozza diventa un articolo (rifiuta invece di scrivere male)
 bin/py -m officina.lint ter-30                   # il cancello editoriale (11s su tutti)
+bin/py scripts/tool_failures.py                  # i guasti che si ripetono (il file aveva solo chi lo scriveva)
 bin/py -m scripts.calibra_prosa --confronto      # gli esempi contro i pubblicati
 bin/py scripts/baseline_tokens.py --workflow wf_… --articles 1   # quanto e' costata una run
 
@@ -104,9 +107,9 @@ cd frontend && npm run build && cd ..
 .venv/bin/gunicorn run:app -b 127.0.0.1:5050
 
 # tests, audit, whitespace
-bin/py -m unittest discover -s tests -v          # tutta la suite (1283 test, ~45s), prima di commit/push
-bin/py -m unittest discover -s tests/unit -v      # solo veloci (~660 test, ~4s), durante lo sviluppo
-bin/py -m unittest discover -s tests/integration -v  # solo la parte pesante (~620 test, ~45s): Flask/HTTP e catena e2e
+bin/py -m unittest discover -s tests -v          # tutta la suite (1348 test, ~52s), prima di commit/push
+bin/py -m unittest discover -s tests/unit -v      # solo veloci (~700 test, ~4s), durante lo sviluppo
+bin/py -m unittest discover -s tests/integration -v  # solo la parte pesante (~650 test, ~51s): Flask/HTTP e catena e2e
 cd frontend && npm audit --audit-level=low
 git diff --check
 ```

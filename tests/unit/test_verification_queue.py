@@ -101,6 +101,16 @@ class TheQueueDrainsAndRefills(unittest.TestCase):
         self.assertEqual(vq.waiting(rows), [])
         self.assertFalse(rows[0]["verifiable"])
 
+    def test_an_article_from_the_officina_enters_without_a_signature(self):
+        """La macchina nuova non ha un revisore, e senza questa porta i suoi
+        articoli restavano invisibili all'unico passo di falsificazione
+        indipendente della catena: 377 in catalogo, 50 firmati, e i tre
+        dell'officina fuori."""
+        entry = _entry(reviewed_at="", reviewed_vintage=None, origine=vq.OFFICINA)
+        rows = vq.build_queue({"611": entry}, [])
+        self.assertTrue(rows[0]["verifiable"])
+        self.assertEqual(len(vq.waiting(rows)), 1)
+
     def test_a_signature_that_does_not_match_the_vintage_is_not_verifiable(self):
         entry = _entry(reviewed_vintage=2023)
         rows = vq.build_queue({"611": entry}, [])

@@ -17,6 +17,11 @@ import unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SCRIPT = os.path.join(ROOT, ".claude", "workflows", "produci-indicatori.js")
 AGENTI = os.path.join(ROOT, ".claude", "agents")
+# I quattro tipi che il workflow lancia. `preparatore-pacchetti` c'e' perche'
+# lo stadio dei pacchetti girava come `pubblicatore`, cioe' con il permesso di
+# scrivere in content/indicators/ che non gli serve.
+AGENTI_DELL_OFFICINA = ("preparatore-pacchetti.md", "scrittore-indicatore.md",
+                        "giudice-cieco.md", "pubblicatore.md")
 
 
 def _senza_commenti(text):
@@ -198,8 +203,21 @@ class TheDesignDecisions(unittest.TestCase):
         self.assertIn("officina.lint", self.text)
         self.assertIn("blocca", self.text)
 
-    def test_repairs_are_limited_to_what_the_lint_names(self):
-        self.assertIn("solo** cio' che il lint nomina", self.text)
+    def test_a_block_goes_back_to_whoever_writes_and_only_once(self):
+        """Il pubblicatore non ripara piu' niente, nemmeno un `blocca`.
+
+        Non ha Edit ne' Write, quindi ripararlo in casa vorrebbe dire ribattere
+        l'articolo intero come una riga JSON, oppure aprire `sed` sul file
+        appena scritto: cioe' l'editoria che gli abbiamo tolto, per la porta di
+        servizio. Un giro solo, perche' se una riscrittura mirata non basta il
+        problema non e' una frase.
+        """
+        self.assertIn("Non ripari niente, nemmeno un", self.text)
+        self.assertIn("ilBlocco", _senza_commenti(self.text))
+        # Tre chiamate: la prima, piu' un solo giro di ritorno per ciascuno dei
+        # due modi di non essere pubblicabile (bozza rifiutata dal comando di
+        # scrittura, articolo bocciato dal lint).
+        self.assertEqual(_senza_commenti(self.text).count("await pubblica(corrente"), 3)
 
     def test_it_forbids_inventing_a_source_to_silence_the_lint(self):
         self.assertIn("non inventare una fonte", self.text)
@@ -216,11 +234,127 @@ class TheDesignDecisions(unittest.TestCase):
         prompt e' legata alla directory, quindi un worktree e' un miss pieno."""
         self.assertNotIn("isolation:", _senza_commenti(self.text))
         with open(os.path.join(AGENTI, "pubblicatore.md"), encoding="utf-8") as handle:
-            self.assertIn("Tocca solo il file", handle.read())
+            self.assertIn("solo il file dell'articolo", handle.read())
 
     def test_no_agent_file_is_resurrected(self):
         for role in ("reader-editor", "indicator-verifier", "launcher", "producer.md"):
             self.assertNotIn(role, self.text)
+
+
+class TheMechanicalStagesTakeNoEditorialDecision(unittest.TestCase):
+    """Il difetto che questa classe presidia era due istruzioni opposte.
+
+    `pubblicatore.md` diceva "se il lint non blocca niente, hai finito: non
+    rileggere, non migliorare, non riordinare", e il prompt del workflow diceva
+    allo stesso agente, nello stesso momento, di riscrivere il paragrafo piu'
+    freddo. Un compito editoriale affidato al ruolo definito come meccanico, e
+    nessun modo di sapere quale delle due avesse vinto.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        with open(SCRIPT, encoding="utf-8") as handle:
+            cls.text = handle.read()
+        cls.codice = _senza_commenti(cls.text)
+        cls.pubblica = cls.text.split("Pubblica l'articolo", 1)[1]
+
+    def test_the_publisher_is_not_asked_to_rewrite(self):
+        self.assertNotIn("riscrivilo", self.pubblica)
+        self.assertIn("non riscriverlo", self.pubblica)
+
+    def test_the_diagnosis_is_applied_where_the_pack_still_is(self):
+        self.assertIn("function rivedi", self.codice)
+        self.assertIn("'scrittore-indicatore'",
+                      self.text.split("function rivedi", 1)[1].split("function", 1)[0])
+
+    def test_every_diagnosis_gets_an_explicit_outcome(self):
+        """Una diagnosi che il passo dopo puo' ignorare in silenzio non e' un
+        input del processo, e' un commento."""
+        for esito in ("applicato", "rifiutato", "non_applicabile"):
+            self.assertIn(f"'{esito}'", self.codice)
+        self.assertIn("feedback:", self.codice.split("return {")[-1],
+                      "il feedback non risale nell'esito della run")
+
+    def test_the_publisher_gets_the_exact_write_command(self):
+        """La forma dell'entry non e' una decisione editoriale, quindi non puo'
+        costare un turno: la scriveva a mano leggendo `indicator_store.py`."""
+        self.assertIn("officina.pubblica", self.pubblica)
+        self.assertNotIn("scripts.indicator_store", self.text)
+
+    def test_the_pack_stage_does_not_run_as_the_publisher(self):
+        prepara = self.text.split("async function prepara", 1)[1].split("\n}", 1)[0]
+        self.assertIn("'preparatore-pacchetti'", prepara)
+        self.assertNotIn("'pubblicatore'", prepara)
+
+    def test_work_notes_do_not_reach_the_published_file(self):
+        self.assertIn("function bozzaDaScrivere", self.codice)
+        self.assertIn("bozzaDaScrivere(scelto.bozza)", self.codice)
+
+    def test_a_silent_reviser_is_a_fault_not_a_verdict(self):
+        """Ripiegare su `non_applicabile` scriveva "il rilievo non si
+        applicava" al posto di "la revisione non e' avvenuta": indistinguibili
+        a valle, e proprio sul campo che serve a decidere se lo stadio vale il
+        suo prezzo."""
+        rivedi = self.codice.split("function rivedi", 1)[1].split("\n}", 1)[0]
+        self.assertIn("throw new Error", rivedi)
+        self.assertNotIn("non ha risposto'", rivedi)
+
+    def test_a_red_gate_does_not_count_as_written(self):
+        """"Il lint e' l'unico cancello" e' vero solo se un cancello rosso
+        arriva fino all'esito della run. `scritti` valeva `fatti.length`, quindi
+        una run col lint rosso su ogni articolo si chiudeva dicendo di aver
+        scritto tutto."""
+        self.assertIn("const bloccati = fatti.filter", self.codice)
+        self.assertIn("scritti: scritti.length", self.codice)
+        self.assertNotIn("scritti: fatti.length", self.codice)
+
+    def test_a_refused_draft_is_not_a_written_article(self):
+        """`scritto: false` non lo guardava nessuno: un articolo mai scritto
+        contava fra gli scritti, ed e' la stessa falla del cancello rosso su un
+        altro campo."""
+        self.assertIn("esito.scritto === false", self.codice)
+        self.assertIn("ilRifiuto", self.codice)
+        self.assertIn("errore_scrittura", self.codice)
+
+    def test_the_script_is_text(self):
+        """Un NUL dentro un template literal: Node lo accetta, `file` e `grep`
+        classificano il sorgente come binario e smettono di cercarci dentro."""
+        with open(SCRIPT, "rb") as handle:
+            self.assertNotIn(b"\x00", handle.read())
+
+
+class ThePermanentPromptsAgreeWithTheWorkflow(unittest.TestCase):
+    """Il prompt permanente e il messaggio della run sono due voci sullo stesso
+    agente, e possono contraddirsi in silenzio.
+
+    E' successo: il workflow ha smesso di chiedere riparazioni al pubblicatore,
+    e `pubblicatore.md` ha continuato a prometterle per un giro intero. I test
+    guardavano solo il prompt costruito dal workflow, quindi non l'hanno visto.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.prompt = {}
+        for name in AGENTI_DELL_OFFICINA:
+            with open(os.path.join(AGENTI, name), encoding="utf-8") as handle:
+                cls.prompt[name] = handle.read()
+
+    def test_the_publisher_never_promises_a_repair(self):
+        testo = self.prompt["pubblicatore.md"]
+        self.assertIn("non ripari niente", testo.lower())
+        self.assertNotIn("Ripari **solo**", testo)
+        self.assertNotIn("al massimo due giri", testo)
+
+    def test_the_publisher_still_reports_every_finding(self):
+        self.assertIn("severity", self.prompt["pubblicatore.md"])
+
+    def test_the_writer_declares_both_of_its_invocations(self):
+        """Lo stesso tipo scrive una bozza e ne rivede una: un contratto che
+        nomina solo la prima e' la stessa divergenza di `corpus` contro
+        `claims`."""
+        testo = self.prompt["scrittore-indicatore.md"]
+        self.assertIn("rivedi", testo)
+        self.assertIn("angolo", testo)
 
 
 class TheAgentTypesAreNarrow(unittest.TestCase):
@@ -259,10 +393,20 @@ class TheAgentTypesAreNarrow(unittest.TestCase):
         Il 26% del costo della prima run, e non compare in `usage`, non compare
         nel campo `tokens` del progresso, non compare da nessuna parte se non
         dentro `usage.iterations`.
+
+        Il divieto e' un **hook**, non `disallowedTools`. Quel campo elenca i
+        tool, e l'advisor non e' un tool: con il divieto gia' scritto nel
+        frontmatter, la prova su `ter-30` ha comunque letto nel trascritto
+        *"let me check my plan with the advisor"*. Questo test asseriva quel
+        campo, cioe' asseriva una restrizione che non restringeva niente.
         """
-        for name in ("scrittore-indicatore.md", "giudice-cieco.md", "pubblicatore.md"):
-            denied = self._frontmatter(name).get("disallowedTools", "")
-            self.assertIn("advisor", denied, f"{name} puo' ancora chiamare l'advisor")
+        for name in AGENTI_DELL_OFFICINA:
+            with open(os.path.join(AGENTI, name), encoding="utf-8") as handle:
+                testo = handle.read()
+            self.assertIn("no_advisor.py", testo,
+                          f"{name} non ha l'hook che nega l'advisor")
+            self.assertNotIn("disallowedTools: advisor", testo,
+                             f"{name} dichiara una restrizione che non funziona")
 
     def test_every_type_used_by_the_workflow_exists(self):
         with open(SCRIPT, encoding="utf-8") as handle:

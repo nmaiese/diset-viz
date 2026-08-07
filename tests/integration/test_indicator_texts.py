@@ -188,6 +188,31 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: entry):
             return indicator_texts.build_article("432", "regione")
 
+    DUE_DINAMICHE = {
+        "level": "regione", "lead": "Un lead.", "vintage": 2023,
+        "sections": [
+            {"role": "quadro", "h": "Il vertice", "body": "Corpo quadro."},
+            {"role": "dinamica", "h": "La distanza si chiude", "body": "Primo corpo dinamica."},
+            {"role": "dinamica", "h": "Il gruppo piu' in basso", "body": "Secondo corpo dinamica."},
+            {"role": "limiti", "h": "Che cosa non dice", "body": "Corpo limiti."},
+        ],
+    }
+
+    def test_two_sections_on_the_same_role_keep_both_bodies(self):
+        """Il difetto si vedeva in pagina e nessuna guardia lo prendeva.
+
+        `authored` era un dizionario per ruolo, quindi con due `dinamica` la
+        seconda sovrascriveva la prima: la pagina rendeva **due volte lo stesso
+        corpo** e perdeva l'altro. Uscito dal primo giro della macchina nuova su
+        `ter-30`. `officina.pubblica` adesso rifiuta i ruoli doppi, ma il
+        renderer deve reggere le entry gia' committate e quelle scritte a mano.
+        """
+        art = self._build(self.DUE_DINAMICHE)
+        corpi = [s["body"] for s in art["sections"]]
+        self.assertEqual(len(corpi), len(set(corpi)), "una sezione e' stata resa due volte")
+        self.assertIn("Primo corpo dinamica.", corpi)
+        self.assertIn("Secondo corpo dinamica.", corpi)
+
     def test_an_opt_in_entry_omits_the_definizione_h2(self):
         art = self._build(self.OPT_IN)
         self.assertEqual([s["role"] for s in art["sections"]], ["quadro", "dinamica", "limiti"])

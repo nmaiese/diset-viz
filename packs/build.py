@@ -109,14 +109,56 @@ def groups_by_name(level):
 
 
 @functools.lru_cache(maxsize=1)
-def _notes_by_id():
+def _definitions_by_id():
     try:
         with open(DEFINITIONS_PATH, encoding="utf-8-sig", newline="") as handle:
-            return {row["id"].strip(): (row.get("note") or "").strip()
-                    for row in csv.DictReader(handle, delimiter=";")
-                    if (row.get("note") or "").strip()}
+            return {row["id"].strip(): row for row in csv.DictReader(handle, delimiter=";")}
     except OSError:
         return {}
+
+
+def _notes_by_id():
+    return {key: (row.get("note") or "").strip()
+            for key, row in _definitions_by_id().items()
+            if (row.get("note") or "").strip()}
+
+
+def official_definition(family, raw_id):
+    """La definizione che pubblica la fonte, testuale, piu' i dati di base.
+
+    **E' il difetto piu' grave che la prima misura abbia trovato, e non era di
+    prosa.** Il pacchetto portava nome, unita', verso e anni: niente
+    numeratore, niente denominatore. Su `ter-30` la fonte scrive "visitatori
+    dei circuiti sul totale di musei e istituti similari appartenenti ai
+    circuiti", e i due scrittori, non avendolo, hanno dedotto dal nome
+    "domanda culturale" un rapporto per circuito e ragionato su regioni con uno
+    o molti circuiti. Prosa piu' fluida di prima, e l'indicatore era un altro.
+
+    Non e' un errore del modello: e' il perimetro informativo. A un agente che
+    non puo' cercare, cio' che non gli si da' non esiste, e la sola cosa che
+    resta da cui dedurre il senso e' il **nome**, che e' un'etichetta e non una
+    definizione. Le righe erano gia' su disco (378 definizioni in
+    `data/definitions/`), gia' lette da questo modulo, e questo modulo ne
+    prendeva solo la colonna `note`.
+
+    `dati_di_base` viaggia insieme perche' e' li' che numeratore e denominatore
+    si leggono separati, e `note` perche' e' dove la fonte dichiara i propri
+    limiti (per `ter-30`: un biglietto vale un visitatore, quindi i visitatori
+    "risultano sottostimati"), cioe' materiale per la sezione dei limiti che
+    l'articolo altrimenti si inventa o non scrive.
+
+    Solo per la famiglia territoriale, come `source_note`: e' l'unica per cui il
+    progetto ha scaricato i metadati. Per le altre si tace, e chi scrive vede
+    che la definizione manca invece di leggerne una sbagliata.
+    """
+    if family != "territorial":
+        return None
+    row = _definitions_by_id().get(str(raw_id).strip())
+    if not row:
+        return None
+    fatta = {campo: (row.get(campo) or "").strip()
+             for campo in ("definizione", "dati_di_base", "fonti", "periodicita")}
+    return fatta if fatta.get("definizione") else None
 
 
 def source_note(family, raw_id):
@@ -213,6 +255,10 @@ def build_pack(family, raw_id, level_key=None, notes=None):
             "source": meta.get("source"),
             "direction": meta.get("direction"),
         },
+        # Che cosa misura davvero questo indicatore, con le parole della fonte.
+        # Vedi `official_definition`: senza, chi scrive deduce il denominatore
+        # dal nome, ed e' cosi' che un articolo esce fluido e sbagliato.
+        "definition": official_definition(family, raw_id),
         "level": level["key"],
         "years": sorted(matrix),
         "territories": sorted({name for row in matrix.values() for name in row}),
@@ -247,6 +293,33 @@ def render(pack):
         f"  anni: {pack['years'][0]}-{pack['years'][-1]}"
         f"   territori: {len(pack['territories'])}",
         "",
+    ]
+    definition = pack.get("definition")
+    if definition:
+        out += [
+            "CHE COSA MISURA, PAROLE DELLA FONTE",
+            f"  {definition['definizione']}",
+        ]
+        if definition.get("dati_di_base"):
+            out.append(f"  dati di base: {definition['dati_di_base']}")
+        if definition.get("fonti"):
+            out.append(f"  {definition['fonti']}")
+        out += [
+            "  **Il nome dell'indicatore e' un'etichetta, non una definizione.**",
+            "  Quello che l'articolo dice che il numero misura deve combaciare con",
+            "  la riga qui sopra, denominatore compreso. Se le due cose divergono",
+            "  l'articolo e' sbagliato anche quando ogni cifra e' giusta, ed e' il",
+            "  modo peggiore di sbagliare: si legge bene.",
+            "",
+        ]
+    else:
+        out += [
+            "CHE COSA MISURA: la fonte non pubblica una definizione leggibile qui.",
+            "  Non dedurla dal nome. Descrivi la grandezza per come si comporta nella",
+            "  serie, e non dichiarare un numeratore o un denominatore che non hai.",
+            "",
+        ]
+    out += [
         f"STORIA TROVATA: {pack['total_strength']}",
         f"  ANGOLI DA SVILUPPARE: {pack['develop']}. Ognuno deve portare nel testo"
         f" almeno una delle proprie cifre.",

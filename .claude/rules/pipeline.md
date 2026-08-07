@@ -69,5 +69,18 @@ Queste sono le regole che valgono sempre:
   le cifre dell'articolo si rinfrescano (`reviewed_vintage`).
 - **Gli script della catena sono stdlib puro** e devono restarlo: un agente
   cloud li esegue su un checkout fresco, prima che esista un venv.
+- **Un file di agente e' un contratto, non una cronaca.** Quattro cose e basta:
+  che cosa **ricevi**, che cosa **restituisci**, che cosa ti e' **vietato**,
+  e la regola operativa che nessuno strumento puo' imporre al posto tuo. Il
+  perche' storico (quanto e' costata una run, quale difetto ha trovato una
+  lettura) sta nei commenti del workflow e nei documenti, con un puntatore: e'
+  contesto che il modello rilegge a ogni turno di ogni invocazione, e che un
+  lettore umano legge una volta sola. Due corollari che sono gia' costati:
+  **il background operativo si scrive dove il codice lo genera** (per lo
+  scrittore e' il pacchetto, che non puo' divergere dalla voce), mai in copia
+  nel prompt, perche' la copia diverge e l'ha gia' fatto; e **una restrizione
+  che non funziona non si dichiara**, come `disallowedTools: advisor`, che non
+  blocca niente perche' l'advisor non e' un tool di quella lista. Il divieto
+  che regge e' un hook (`.claude/hooks/no_advisor.py`).
 - Prima di cambiare modello, prompt, rubriche o hook degli agenti: il giro di
   canary di [`docs/CANARY.md`](../../docs/CANARY.md) e le eval in `evals/`.

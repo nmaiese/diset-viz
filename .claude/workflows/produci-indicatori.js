@@ -6,7 +6,8 @@ export const meta = {
     { title: 'Pacchetti', detail: 'un agente per tutta la run: scrive i pacchetti su disco' },
     { title: 'Scrittura', detail: 'due bozze per indicatore, dai due angoli piu\' forti' },
     { title: 'Giudizio', detail: 'due giudici ciechi, ordine invertito fra loro' },
-    { title: 'Lint', detail: 'cancello deterministico e riparazione mirata' },
+    { title: 'Revisione', detail: 'la diagnosi si applica, o si dichiara perche\' no' },
+    { title: 'Lint', detail: 'cancello deterministico, nessuna decisione editoriale' },
   ],
 }
 
@@ -125,6 +126,30 @@ const BOZZA = {
   },
 }
 
+// La bozza scelta, piu' il conto di che cosa e' stato fatto della diagnosi.
+//
+// Esiste perche' una diagnosi che il passo dopo puo' ignorare in silenzio non
+// e' un input del processo, e' un commento. Finora il paragrafo freddo veniva
+// passato al **pubblicatore**, che nello stesso momento aveva istruzione di non
+// migliorare la prosa: due ordini opposti allo stesso agente, e nessun modo di
+// sapere quale dei due avesse vinto. Qui la risposta e' obbligatoria e ha tre
+// esiti, uno dei quali e' "non l'ho fatto, ed ecco perche'".
+const REVISIONE = {
+  type: 'object',
+  required: ['lead', 'sections', 'corpus', 'angolo', 'feedback'],
+  properties: {
+    ...BOZZA.properties,
+    feedback: {
+      type: 'object',
+      required: ['stato', 'dettaglio'],
+      properties: {
+        stato: { type: 'string', enum: ['applicato', 'rifiutato', 'non_applicabile'] },
+        dettaglio: { type: 'string', description: 'che cosa hai cambiato, oppure la ragione per cui non lo hai fatto' },
+      },
+    },
+  },
+}
+
 const VERDETTO = {
   type: 'object',
   required: ['vince', 'paragrafo_piu_freddo', 'perche'],
@@ -152,6 +177,12 @@ const PUBBLICATO = {
   required: ['scritto', 'rilievi'],
   properties: {
     scritto: { type: 'boolean', description: 'il file esiste in content/indicators/' },
+    // Perche' il comando di scrittura ha rifiutato, testuale. `officina.pubblica`
+    // esce 2 e nomina la riga che lo ferma (un ruolo doppio, una sezione senza
+    // corpo, un livello che l'indicatore non ha): senza questo campo quel
+    // motivo moriva nel terminale dell'agente, e il workflow vedeva soltanto un
+    // `scritto: false` muto, che non si puo' rimandare a chi scrive.
+    errore_scrittura: { type: 'string' },
     parole: { type: 'number' },
     giri_di_lint: { type: 'number' },
     rilievi: {
@@ -215,7 +246,12 @@ Restituisci i percorsi ASSOLUTI e la soglia. Non leggere i pacchetti, non
 riassumerli, non scrivere altro: il loro contenuto lo legge chi scrive.
 Se un codice non ha un indicatore, omettilo dalla lista invece di inventarlo.`,
     { label: 'pacchetti', phase: 'Pacchetti', schema: PACCHETTI },
-    'pubblicatore',
+    // Ha il suo tipo, e non e' un dettaglio di igiene. Prima girava come
+    // `pubblicatore`, cioe' lo stadio che monta i pacchetti aveva il permesso
+    // di scrivere in content/indicators/: un perimetro piu' largo di quanto
+    // serva e' un perimetro che prima o poi qualcuno usa. Questo tipo ha solo
+    // Bash e nemmeno Read.
+    'preparatore-pacchetti',
   )
   return (risposta && risposta.packs) ? risposta : { packs: [], soglia_paragrafi_scoperti: 0 }
 }
@@ -379,6 +415,137 @@ function scegli(bozze, verdetti, soglia) {
 }
 
 // --------------------------------------------------------------------------
+// revisione: la diagnosi si applica dove c'e' ancora il pacchetto
+// --------------------------------------------------------------------------
+//
+// E' lo stadio che chiude la contraddizione peggiore di questa macchina.
+// `pubblicatore.md` diceva "se il lint non blocca niente, hai finito: non
+// rileggere, non migliorare, non riordinare", e il prompt del workflow diceva
+// allo stesso agente, nello stesso momento, "un giudice ha indicato come piu'
+// freddo: ... riscrivilo perche' dica perche' importa". Un compito editoriale
+// affidato al ruolo definito come meccanico, e nessun modo di sapere quale
+// delle due istruzioni avesse vinto.
+//
+// Lo fa un turno del tipo `scrittore-indicatore`, non un tipo nuovo: ha gia' il
+// perimetro giusto (solo Read, nessuna scrittura) e gli serve il pacchetto per
+// avere sotto mano il corpus, che e' l'unica cosa con cui un paragrafo freddo
+// si puo' riscaldare senza inventare una causa.
+//
+// Costa un agente in piu' per indicatore, e vale il prezzo solo se la diagnosi
+// dei giudici serve a qualcosa: se dopo dieci articoli `feedback.stato` e'
+// quasi sempre `non_applicabile`, allora i giudici stanno diagnosticando testi
+// che nessuno cambia, e va tolto uno dei due stadi, non tenuti entrambi.
+
+// Cio' che entra nel file, e nient'altro. `feedback` e' contabilita' di
+// lavorazione: si registra nell'esito della run, non nella pagina pubblica.
+// (`officina.pubblica` scarta comunque i campi che non conosce, ma un comando
+// che porta in giro un campo di troppo invita qualcuno a scriverlo.)
+function bozzaDaScrivere(bozza) {
+  const { lead, sections, corpus, angolo } = bozza
+  return { lead, sections, corpus, angolo }
+}
+
+// Quante sezioni sono cambiate. "Non toccare nient'altro" e' una frase in un
+// prompt, cioe' la categoria di vincolo che questa macchina ha smesso di
+// credere sulla parola: qui non blocca niente, ma rende visibile una revisione
+// che si allarga invece di restare sul rilievo. Costa zero token.
+function sezioniToccate(prima, dopo) {
+  const chiavi = (bozza) => (bozza.sections || []).map((s) => `${s.role}\u0000${s.body}`)
+  const vecchie = new Set(chiavi(prima))
+  return chiavi(dopo).filter((s) => !vecchie.has(s)).length
+}
+
+function rivedi(scelto, rilievo) {
+  if (!rilievo.voci.length) {
+    return Promise.resolve({ ...scelto.bozza,
+      feedback: { stato: 'non_applicabile', dettaglio: rilievo.vuoto } })
+  }
+  return conTipo(
+    `Rivedi la bozza gia' scelta per ${scelto.pack.code}, su cio' che segue e su nient'altro.
+
+Il pacchetto e' qui, e resta l'unica fonte di cifre e di contesto citabile:
+
+    ${scelto.pack.path}
+
+Aprilo con Read. Poi guarda il rilievo:
+
+${rilievo.testo}
+
+${JSON.stringify(rilievo.voci, null, 1)}
+
+${rilievo.istruzione}
+
+Non toccare nient'altro. Restituisci la bozza intera, cambiata solo dove serve,
+piu' il campo \`feedback\`.
+
+La bozza:
+${JSON.stringify(scelto.bozza, null, 1)}`,
+    { label: `rivedi:${scelto.pack.code}${rilievo.suffisso || ''}`,
+      phase: 'Revisione', schema: REVISIONE },
+    'scrittore-indicatore',
+  ).then((rivista) => {
+    // Un agente che non risponde e' un **guasto**, non un giudizio. Una prima
+    // versione ripiegava su `non_applicabile`, cioe' scriveva nel registro dei
+    // feedback la frase "il rilievo non si applicava" al posto di "la
+    // revisione non e' avvenuta": indistinguibili a valle, e proprio sul campo
+    // che serve a decidere se lo stadio vale il suo prezzo. Un guasto contato
+    // come esito e' peggio di un guasto, perche' sposta la statistica.
+    //
+    // `pipeline()` porta l'indicatore a null e lascia gli altri correre: e'
+    // esattamente il comportamento voluto, un articolo perso invece di un
+    // articolo falsamente a posto.
+    if (!rivista) throw new Error(`revisione muta per ${scelto.pack.code}: nessuna risposta dallo scrittore`)
+    return rivista
+  })
+}
+
+// Il rilievo del giudizio: il paragrafo inerte.
+function ilFreddo(scelto) {
+  return {
+    voci: (scelto.freddo || []).filter(Boolean),
+    vuoto: 'nessun giudice ha indicato un paragrafo freddo',
+    testo: 'due lettori hanno indicato questo come il paragrafo piu\' freddo, '
+      + 'cioe\' corretto e senza nessuna ragione per cui a qualcuno importi:',
+    istruzione: 'Se quel passaggio e\' nella bozza, riscrivilo perche\' dica perche\' importa, '
+      + 'appoggiandoti al corpus del pacchetto. **Se non hai un identificatore per farlo, '
+      + 'non riscriverlo e non inventare una fonte**: rispondi `rifiutato` e di\' che il '
+      + 'corpus non ha niente su cui appoggiarsi. Se quel passaggio non esiste nella bozza, '
+      + 'rispondi `non_applicabile`.',
+  }
+}
+
+// Il rilievo del comando di scrittura. `officina.pubblica` rifiuta invece di
+// scrivere male, e cio' che rifiuta e' sempre una proprieta' della bozza, mai
+// un problema di ambiente: quindi torna a chi la bozza l'ha fatta.
+function ilRifiuto(motivo) {
+  return {
+    voci: motivo ? [motivo] : [],
+    vuoto: 'il comando di scrittura non ha detto perche\' ha rifiutato',
+    suffisso: ':rifiuto',
+    testo: 'il comando che scrive l\'articolo ha rifiutato la bozza:',
+    istruzione: 'Correggi esattamente cio' + '\' che il messaggio nomina, e nient\'altro. '
+      + 'Non e\' un giudizio sul testo: e\' una regola di forma, e il messaggio dice quale.',
+  }
+}
+
+// Il rilievo del cancello. Torna qui e non al pubblicatore: riparare un
+// `blocca` vuol dire riscrivere una frase, e il pubblicatore e' definito come
+// meccanico. Senza questo giro l'unico modo che avrebbe di ripararlo sarebbe
+// ribattere l'articolo intero come una riga JSON, oppure aprire `sed` sul file
+// appena scritto, che e' esattamente l'editoria che gli abbiamo tolto.
+function ilBlocco(rilievi) {
+  return {
+    voci: (rilievi || []).filter((r) => r && r.severity === 'blocca'),
+    vuoto: 'il lint non ha bloccato niente',
+    suffisso: ':blocca',
+    testo: 'il cancello deterministico ha bocciato l\'articolo su questi rilievi:',
+    istruzione: 'Riscrivi solo i passaggi che li causano. La regola nominata dice gia\' '
+      + 'che cosa non va: non aggirarla, non inventare una fonte per farla tacere, e se '
+      + 'non si puo\' rispettare senza inventare, rispondi `rifiutato` con la ragione.',
+  }
+}
+
+// --------------------------------------------------------------------------
 // la catena
 // --------------------------------------------------------------------------
 
@@ -411,9 +578,21 @@ const esiti = await pipeline(
              freddo: verdetti.map((v) => v.paragrafo_piu_freddo) }
   },
 
+  // La diagnosi dei giudici si applica qui, con l'obbligo di dire che cosa ne
+  // e' stato fatto: `applicato`, `rifiutato` o `non_applicabile`, sempre con la
+  // ragione. Vedi `rivedi`.
+  async (scelto) => {
+    if (!scelto) return null
+    const bozza = await rivedi(scelto, ilFreddo(scelto))
+    const toccate = sezioniToccate(scelto.bozza, bozza)
+    log(`${scelto.pack.code}: feedback ${bozza.feedback.stato}, ${toccate} sezioni toccate `
+        + `(${bozza.feedback.dettaglio})`)
+    return { ...scelto, bozza, revisione: { ...bozza.feedback, sezioni_toccate: toccate } }
+  },
+
   // Il lint e' l'unico cancello, ed e' deterministico. L'agente qui non
-  // giudica: scrive il file, esegue il lint, e ripara solo cio' che il lint
-  // nomina come `blocca`.
+  // giudica e non scrive prosa: scrive il file, esegue il lint, e ripara solo
+  // cio' che il lint nomina come `blocca`.
   //
   // Niente `isolation: 'worktree'`, ed e' una decisione con due ragioni. Due
   // agenti che scrivono due file diversi non collidono, e qui non si fa
@@ -422,42 +601,130 @@ const esiti = await pipeline(
   // directory: un worktree in piu' e' un cache miss pieno per agente.
   async (scelto) => {
     if (!scelto) return null
-    return conTipo(
-      `Pubblica l'articolo ${scelto.pack.code}.
-
-1. Scrivi la bozza in \`content/indicators/\` con
-   \`${INTERPRETE} -m scripts.indicator_store\` (leggi il modulo per la forma
-   esatta del file, e usa \`${INTERPRETE}\`, mai \`python3\`).
-2. Esegui \`${INTERPRETE} -m officina.lint ${scelto.pack.code}\`.
-   Uscita 2 vuol dire che il codice non ha risolto: correggi il codice, non
-   il testo.
-3. Ripara **solo** cio' che il lint nomina come \`blocca\`. Al massimo due giri.
-4. Riesegui \`${INTERPRETE} -m officina.lint ${scelto.pack.code} --json\` e
-   **riporta ogni rilievo residuo**, sia \`blocca\` sia \`segnala\`, copiando
-   \`rule\`, \`severity\` e \`detail\`. I \`segnala\` non vanno riparati e non
-   vanno nascosti: servono ad aggregare, non a giudicare questo articolo.
-
-Un giudice ha indicato come piu' freddo: ${JSON.stringify(scelto.freddo)}.
-Se quel paragrafo e' nel testo, riscrivilo perche' dica perche' importa,
-appoggiandoti al corpus del pacchetto (${scelto.pack.path}). Se non hai un
-identificatore per farlo, lascialo com'e' e non inventare una fonte.
-
-La bozza:
-${JSON.stringify(scelto.bozza, null, 1)}`,
-      { label: `pubblica:${scelto.pack.code}`, phase: 'Lint', schema: PUBBLICATO },
-      'pubblicatore',
-    ).then((esito) => ({ code: scelto.pack.code, scelta: scelto.scelta, esito }))
+    let corrente = scelto
+    let esito = await pubblica(corrente)
+    // Un solo giro di ritorno, e solo per i `blocca`. Uno, non due: se la
+    // riscrittura mirata non basta, il problema non e' una frase, ed e' meglio
+    // che l'articolo esca con il rilievo scritto nell'esito della run che
+    // vederlo girare a spese piene finche' qualcuno se ne accorge.
+    const blocchi = (esito) => ((esito && esito.rilievi) || [])
+      .filter((r) => r.severity === 'blocca')
+    // Due modi di non essere pubblicabile, e vanno trattati uguale: il comando
+    // di scrittura ha rifiutato la bozza, oppure il lint l'ha bocciata. Il
+    // primo era invisibile: `scritto: false` non lo guardava nessuno, quindi un
+    // articolo mai scritto contava fra gli scritti.
+    const rifiutato = esito && esito.scritto === false
+    const primi = blocchi(esito)
+    if (rifiutato) {
+      log(`${scelto.pack.code}: la bozza e' stata rifiutata dal comando di scrittura `
+          + `(${esito.errore_scrittura || 'senza motivo dichiarato'}), torna a chi scrive`)
+      try {
+        const bozza = await rivedi(corrente, ilRifiuto(esito.errore_scrittura))
+        corrente = { ...corrente, bozza }
+        esito = await pubblica(corrente, ':2')
+      } catch (errore) {
+        log(`${scelto.pack.code}: la correzione della bozza e' fallita (${errore.message})`)
+      }
+    } else if (primi.length) {
+      log(`${scelto.pack.code}: il lint blocca (${primi.map((r) => r.rule).join(', ')}), torna a chi scrive`)
+      // Qui il guasto della revisione non puo' far cadere l'indicatore, come
+      // fa allo stadio prima: l'articolo e' **gia' su disco**, e sparire dagli
+      // esiti lo lascerebbe li' con un rilievo bloccante e nessuna riga che lo
+      // dica. Si tiene il primo esito, e finisce fra i `bloccati`.
+      try {
+        const bozza = await rivedi(corrente, ilBlocco(esito.rilievi))
+        corrente = { ...corrente, bozza }
+        esito = await pubblica(corrente, ':2')
+      } catch (errore) {
+        log(`${scelto.pack.code}: la revisione del blocco e' fallita (${errore.message})`)
+      }
+    }
+    // Cio' che il cancello dice **alla fine**, non all'inizio. Un residuo qui
+    // vuol dire che il giro di ritorno non e' bastato, e l'articolo resta su
+    // disco con un rilievo bloccante: non e' pubblicabile, e la run non deve
+    // contarlo fra gli scritti. "Il lint e' l'unico cancello" e' vero solo se
+    // un cancello rosso arriva fino all'esito.
+    const residui = blocchi(esito)
+    const nonScritto = esito && esito.scritto === false
+    if (residui.length || nonScritto) {
+      log(`${scelto.pack.code}: BLOCCATO anche dopo la revisione `
+          + `(${nonScritto ? (esito.errore_scrittura || 'bozza rifiutata')
+                           : residui.map((r) => r.rule).join(', ')})`
+          + ': non conta fra gli scritti')
+    }
+    return { code: scelto.pack.code, scelta: scelto.scelta,
+             revisione: scelto.revisione,
+             blocchi: primi.length + (rifiutato ? 1 : 0),
+             bloccanti: nonScritto
+               ? [{ rule: 'bozza-rifiutata', detail: esito.errore_scrittura || '' }, ...residui]
+               : residui,
+             esito }
   },
 )
 
+function pubblica(scelto, suffisso = '') {
+  return conTipo(
+      `Pubblica l'articolo ${scelto.pack.code}. Due comandi, in quest'ordine.
+
+1. Scrivi la bozza. Copia questo blocco intero, dalla prima riga all'ultima:
+
+\`\`\`
+${INTERPRETE} -m officina.pubblica ${scelto.pack.code} <<'BOZZA'
+${JSON.stringify(bozzaDaScrivere(scelto.bozza))}
+BOZZA
+\`\`\`
+
+   Se stampa un percorso, l'articolo e' scritto: rispondi \`scritto: true\`.
+   Se esce 2, **non e' scritto**: rispondi \`scritto: false\` e copia in
+   \`errore_scrittura\` il messaggio esatto. E' sempre un difetto della bozza
+   (un ruolo doppio, una sezione senza corpo, un livello che l'indicatore non
+   ha), mai un file da andare a cercare, e mai una cosa da aggiustare tu.
+
+2. Esegui \`${INTERPRETE} -m officina.lint ${scelto.pack.code} --json\` e
+   **riporta ogni rilievo**, sia \`blocca\` sia \`segnala\`, copiando \`rule\`,
+   \`severity\` e \`detail\`. Uscita 2 vuol dire che il codice non ha risolto.
+
+Non ripari niente, nemmeno un \`blocca\`: riparare vorrebbe dire riscrivere la
+prosa, e la prosa non e' compito tuo. Un \`blocca\` torna a chi scrive, e il
+workflow lo rimanda indietro da solo. I \`segnala\` non fermano niente e non si
+nascondono: servono ad aggregare, non a giudicare questo articolo.
+
+Il testo e' gia' deciso e gia' rivisto: non riscriverlo, non riordinarlo, non
+migliorarlo. Il tuo unico giudizio e' il lint.`,
+      { label: `pubblica:${scelto.pack.code}${suffisso}`, phase: 'Lint', schema: PUBBLICATO },
+      'pubblicatore',
+  )
+}
+
 const fatti = esiti.filter(Boolean)
-log(`${fatti.length} indicatori su ${codes.length}`)
+// Tre numeri e non uno, perche' erano tre cose diverse contate come una.
+// `fatti` sono gli indicatori arrivati in fondo alla catena; `bloccati` quelli
+// che ci sono arrivati con il cancello ancora rosso; `scritti` sono soltanto
+// quelli pubblicabili. Prima `scritti` valeva `fatti.length`, quindi una run
+// con il lint rosso su ogni articolo si chiudeva dicendo che aveva scritto
+// tutto. E `richiesti - fatti` sono gli indicatori persi per strada (pacchetto
+// mancante, bozze non valide, revisione muta): anche quelli non erano visibili.
+const bloccati = fatti.filter((f) => (f.bloccanti || []).length)
+const scritti = fatti.filter((f) => !(f.bloccanti || []).length)
+const persi = codes.filter((code) => !fatti.some((f) => f.code === code))
+log(`${scritti.length} scritti su ${codes.length} richiesti`
+    + (bloccati.length ? `, ${bloccati.length} bloccati dal lint` : '')
+    + (persi.length ? `, ${persi.length} persi per strada: ${persi.join(', ')}` : ''))
 return {
-  scritti: fatti.length,
+  scritti: scritti.length,
   richiesti: codes.length,
+  // Gli articoli che stanno su disco con un rilievo bloccante: esistono, e non
+  // sono pubblicabili. Vanno rimessi in coda, non dimenticati.
+  bloccati: bloccati.map((f) => ({ code: f.code,
+    regole: f.bloccanti.map((r) => r.rule) })),
+  persi,
   // La traccia per misurare l'accordo fra il giudice e la misura, dopo dieci
   // articoli. Senza registrarlo si finisce per assumerlo.
   scelte: fatti.map((f) => ({ code: f.code, ...f.scelta })),
+  // Che cosa e' stato fatto della diagnosi dei giudici, articolo per articolo.
+  // Se dopo dieci articoli e' quasi sempre `non_applicabile`, i giudici stanno
+  // diagnosticando testi che nessuno cambia, e uno dei due stadi va tolto.
+  feedback: fatti.map((f) => ({ code: f.code, blocchi: f.blocchi, ...(f.revisione || {}) })),
   // I rilievi residui, aggregati. Vedi `PUBBLICATO`: il `segnala` si registra,
   // non si ripara e non si perde.
   rilievi: fatti.flatMap((f) => ((f.esito && f.esito.rilievi) || [])

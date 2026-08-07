@@ -243,15 +243,27 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     entry = get_text(indicator_id) or {}
     if (entry.get("level") or DEFAULT_LEVEL) != (level_key or DEFAULT_LEVEL):
         entry = {}
-    authored = {
-        section["role"]: section
-        for section in entry.get("sections") or []
-        if section.get("role") in DEFAULT_HEADINGS and (section.get("body") or "").strip()
-    }
+    # Una **lista per ruolo**, non una sezione per ruolo, ed e' la riparazione
+    # di un difetto che si vedeva in pagina. Un'entry puo' scrivere due sezioni
+    # con lo stesso `role` (la macchina nuova l'ha fatto al primo giro: due
+    # `dinamica` con due titoli diversi), e con un dizionario la seconda
+    # sovrascriveva la prima: la pagina rendeva **due volte lo stesso corpo** e
+    # perdeva l'altro. Chi scrive lo vedeva impaginato, nessuna guardia lo
+    # vedeva, e il testo perso non lasciava traccia da nessuna parte.
+    #
+    # Lettore tollerante, scrittore severo: `officina.pubblica` rifiuta i ruoli
+    # doppi, perche' il contratto e' una sezione per ruolo. Questo ramo esiste
+    # per i trecento articoli gia' committati e per le entry scritte a mano, che
+    # nessun comando ha filtrato.
+    authored = {}
+    for section in entry.get("sections") or []:
+        if section.get("role") in DEFAULT_HEADINGS and (section.get("body") or "").strip():
+            authored.setdefault(section["role"], []).append(section)
     role_sequence = emitted_roles(entry)
     sections = []
     for role in role_sequence:
-        written = authored.get(role)
+        coda = authored.get(role) or []
+        written = coda.pop(0) if coda else None
         heading = (written.get("h") or "").strip() if written else ""
         sections.append({
             "role": role,

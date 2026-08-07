@@ -150,15 +150,30 @@ def tool_calls(record: dict) -> list[str]:
 
 # ---------------------------------------------------------------- workflow
 
-def find_workflow(name: str) -> str | None:
-    """La cartella dei trascritti di una run, dal suo id o da un percorso."""
+def find_workflow(name: str) -> list[str]:
+    """**Tutte** le cartelle dei trascritti di una run, dal suo id o da un percorso.
+
+    Plurale, e non e' pedanteria. Una run **ripresa** (`resumeFromRunId`) tiene
+    lo stesso `run_id` ma scrive nella cartella della sessione nuova, quindi lo
+    stesso identificatore esiste sotto due sessioni: gli agenti replicati da
+    cache stanno di qua, quelli rigirati di la'. Questa funzione restituiva il
+    **primo** che trovava, cioe' misurava meta' run e lo diceva con la stessa
+    faccia con cui dice un totale: su una ripresa vera ha stampato 3 agenti,
+    4 turni e $0,24 al posto di 7 agenti e ~$2.
+
+    E' lo stesso difetto che questo file esiste per chiudere, un piano piu' in
+    basso: un numero che sembra un totale e non lo e'. Il contratto di misura
+    e' uno solo, quindi qui si sommano tutte le cartelle e non se ne sceglie
+    una.
+    """
     if os.path.isdir(name):
-        return name
+        return [name]
+    trovate = []
     for root in glob.glob(os.path.expanduser(PROJECTS)):
         for hit in glob.glob(os.path.join(root, "*", "subagents", "workflows", name)):
             if os.path.isdir(hit):
-                return hit
-    return None
+                trovate.append(hit)
+    return sorted(trovate)
 
 
 def labels(directory: str) -> dict:
@@ -201,16 +216,31 @@ def read_agents(directory: str) -> list[dict]:
                 tools[name] = tools.get(name, 0) + 1
         agent_id = rows[0]["record"].get("agentId") or ""
         label = named.get(agent_id) or os.path.basename(path)[6:14]
-        agents.append({"label": label, "turns": len(rows), "model": model,
+        agents.append({"id": agent_id or os.path.basename(path),
+                       "label": label, "turns": len(rows), "model": model,
                        "advisor": advisor, "tools": tools,
                        "advisor_calls": sum(1 for r in rows if any(r["advisor"].values()))})
     agents.sort(key=lambda a: -cost(a["model"]) - cost(a["advisor"]))
     return agents
 
 
-def report_workflow(directory: str, articles: int) -> None:
-    agents = read_agents(directory)
-    print(f"RUN {os.path.basename(directory)}: {len(agents)} agenti\n")
+def report_workflow(directories, articles: int) -> None:
+    if isinstance(directories, str):
+        directories = [directories]
+    # Una run ripresa vive in due cartelle e un agente puo' comparire in
+    # entrambe (replicato da cache di la', rigirato di qua): si tiene una volta
+    # sola, per nome di file, altrimenti il totale conta due volte proprio i
+    # turni che la ripresa non ha pagato.
+    agents, visti = [], set()
+    for directory in directories:
+        for agent in read_agents(directory):
+            if agent["id"] in visti:
+                continue
+            visti.add(agent["id"])
+            agents.append(agent)
+    nome = os.path.basename(str(directories[0]).rstrip("/"))
+    dove = f" (ripresa: {len(directories)} sessioni)" if len(directories) > 1 else ""
+    print(f"RUN {nome}{dove}: {len(agents)} agenti\n")
     print(f"{'agente':28} {'turni':>6} {'tool':>5} {'cache lett':>12} "
           f"{'output':>8} {'advisor':>8} {'$':>7}")
     total, total_advisor = zero(), zero()
@@ -366,11 +396,11 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
 
     if args.workflow:
-        directory = find_workflow(args.workflow)
-        if not directory:
+        directories = find_workflow(args.workflow)
+        if not directories:
             print(f"nessuna run {args.workflow} sotto {PROJECTS}", file=sys.stderr)
             return 1
-        report_workflow(directory, args.articles)
+        report_workflow(directories, args.articles)
         return 0
 
     sessions = collect(args.since)

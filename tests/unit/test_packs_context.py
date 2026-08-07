@@ -8,6 +8,47 @@ una citazione puo' smettere di esserlo.
 """
 import unittest
 
+from packs import build as build_module
+
+
+class ThePackSaysWhatTheNumberMeasures(unittest.TestCase):
+    """Il difetto che la prima misura ha trovato, e non era di prosa.
+
+    Il pacchetto portava nome, unita', verso e anni: niente numeratore, niente
+    denominatore. Su `ter-30` la fonte scrive "visitatori dei circuiti sul
+    totale di musei e istituti similari appartenenti ai circuiti", e i due
+    scrittori, non avendolo, hanno dedotto dal nome "domanda culturale" un
+    rapporto per circuito. Prosa piu' fluida di prima, indicatore diverso.
+
+    A un agente che non puo' cercare, cio' che non gli si da' non esiste: le
+    righe erano gia' su disco e gia' lette da `packs/build.py`, che ne prendeva
+    solo la colonna delle note.
+    """
+
+    def test_the_official_definition_reaches_the_pack(self):
+        definizione = build_module.official_definition("territorial", "30")
+        self.assertIsNotNone(definizione)
+        self.assertIn("sul totale di musei", definizione["definizione"])
+        self.assertIn("Visitatori dei circuiti", definizione["dati_di_base"])
+
+    def test_a_family_without_metadata_says_nothing_instead_of_guessing(self):
+        self.assertIsNone(build_module.official_definition("bes", "10AMB004"))
+
+    def test_an_unknown_id_says_nothing(self):
+        self.assertIsNone(build_module.official_definition("territorial", "999999"))
+
+    def test_the_rendered_pack_carries_the_denominator(self):
+        pack = build_module.build_pack("territorial", "30")
+        testo = build_module.render(pack)
+        self.assertIn("CHE COSA MISURA", testo)
+        self.assertIn("sul totale di musei", testo)
+        self.assertIn("e' un'etichetta, non una definizione", testo)
+
+    def test_without_a_definition_the_pack_forbids_deducing_one(self):
+        pack = dict(build_module.build_pack("territorial", "30"), definition=None)
+        testo = build_module.render(pack)
+        self.assertIn("Non dedurla dal nome", testo)
+
 from packs import context
 
 

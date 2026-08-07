@@ -121,7 +121,14 @@ HARD_FAILURES = (
 
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
-_REQUIRED_ROLES = {"definizione", "quadro", "dinamica", "limiti"}
+# I tre sostanziali, non i quattro ruoli. `definizione` e' la sola omettibile,
+# perche' il blocco "Come leggere il dato" la copre, ed e' la regola che
+# `app.indicator_texts.SUBSTANTIVE_ROLES` possiede e che questo modulo
+# rispecchia (stdlib puro, non importa `app`). Pretendendone quattro, questa
+# coda dichiarava incompleto ogni articolo della macchina nuova, che la
+# definizione la omette apposta: `ter-30` scrive `quadro, limiti, dinamica`, e
+# la pagina lo rende completo mentre la coda lo teneva fuori.
+_REQUIRED_ROLES = verification_queue.SUBSTANTIVE_ROLES
 
 
 def reading_name(row: dict) -> str:
@@ -295,6 +302,11 @@ def _eligible(entry: dict) -> bool:
     che l'hint del lanciatore vuole (leggere prima di verificare, cosi' una
     bocciatura non spreca una verifica su un testo che verra' riscritto). Letto
     dai soli testi per tenere questo modulo indipendente dalla macchina a stati.
+
+    L'officina entra dalla seconda porta, come nella coda di verifica: non ha un
+    revisore, quindi la firma non arrivera' mai, e senza questa riga il reader
+    editor resterebbe in ombra su una macchina che non gli manda niente da
+    leggere. Resta `soft` in entrambi i casi: accoda, non ferma un merge.
     """
     lead = (entry.get("lead") or "").strip()
     roles = {
@@ -302,7 +314,8 @@ def _eligible(entry: dict) -> bool:
         for section in entry.get("sections") or []
         if (section.get("body") or "").strip()
     }
-    return bool(lead) and _REQUIRED_ROLES.issubset(roles) and bool(entry.get("reviewed_at"))
+    firmato = bool(entry.get("reviewed_at")) or entry.get("origine") == verification_queue.OFFICINA
+    return bool(lead) and _REQUIRED_ROLES.issubset(roles) and firmato
 
 
 def load_texts(root=None) -> dict:

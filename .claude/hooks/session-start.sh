@@ -16,12 +16,22 @@ set -uo pipefail
 # chiuda lo stream.
 hook_payload="$(cat 2>/dev/null || true)"
 
-# Solo nell'ambiente remoto: in locale l'utente gestisce il proprio setup.
+cd "${CLAUDE_PROJECT_DIR:-.}"
+
+# --- Il lettore dei guasti ripetuti -----------------------------------------
+# `data/pipeline/tool_failures.jsonl` aveva solo chi lo scriveva. L'errore
+# `.venv/bin/python: no such file` c'era dentro tre ore prima della prima run
+# del workflow, e in quella run quattro scrittori l'hanno ripagato da capo,
+# quattro turni a testa. Un canale che nessuno legge non e' un canale, quindi
+# qui lo legge qualcuno: al massimo tre righe, e silenzio quando non c'e'
+# niente che si ripete. Gira anche in locale, che e' dove i guasti succedono.
+python3 scripts/tool_failures.py --breve 2>/dev/null || true
+
+# Il resto prepara un checkout fresco, e serve solo in remoto: in locale
+# l'utente gestisce il proprio ambiente.
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
 fi
-
-cd "${CLAUDE_PROJECT_DIR:-.}"
 
 # --- Meta di sessione: chi e quando, per il diario ---------------------------
 # pipeline_log.py lo legge best-effort per scrivere session_id e durata nella
