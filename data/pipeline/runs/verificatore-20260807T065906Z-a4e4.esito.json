@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-07T07:03:18+00:00",
+ "base_commit": "784b7f5",
+ "branch": "master",
+ "claude_code_version": "2.1.224 (Claude Code)",
+ "commit": "784b7f5",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": "181",
+ "run_id": "verificatore-20260807T065906Z-a4e4",
+ "stage": "verificatore",
+ "summary": "PR #181 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}

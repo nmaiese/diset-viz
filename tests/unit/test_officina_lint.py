@@ -352,11 +352,20 @@ class TheDefinitionIsCheckedAgainstTheSource(unittest.TestCase):
         self.assertTrue(all(r["severity"] == lint.FLAGS for r in rilievi))
         self.assertIn("definizione-base", {r["rule"] for r in rilievi})
 
-    def test_a_family_without_official_metadata_is_silent(self):
+    def test_an_indicator_without_official_metadata_is_silent(self):
         """`scoperto` descrive la nostra copertura, non l'onesta' dell'articolo:
-        centonovantasei articoli non hanno una definizione da confrontare."""
+        un articolo senza definizione ufficiale da confrontare non prende
+        rilievi, prende silenzio.
+
+        Provato azzerando le definizioni invece che nominando una famiglia
+        scoperta. Il caso diceva `bes:10AMB004`, e nel frattempo
+        `data/definitions/federated.csv` ha coperto anche quello: il test
+        cadeva non perche' la regola fosse rotta, ma perche' la copertura era
+        migliorata. Un test sulla regola non deve dipendere da quanti metadati
+        abbiamo scaricato oggi."""
         voce = entry()
-        self.assertEqual(lint.check_definition(voce, key="bes:10AMB004"), [])
+        with unittest.mock.patch.object(lint, "_official_definitions", dict):
+            self.assertEqual(lint.check_definition(voce, key="bes:10AMB004"), [])
 
     def test_an_omitted_definition_section_does_not_fire(self):
         """La macchina nuova omette la definizione quando l'angolo piu' forte non

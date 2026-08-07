@@ -143,16 +143,25 @@ Lo garantisce `ProseStaysOnTheLevelItWasWrittenFor` in `tests/integration/test_i
 Si comincia sempre da qui:
 
 ```bash
-.venv/bin/python -m scripts.indicator_brief ter-178
-.venv/bin/python -m scripts.indicator_brief bes-01SAL001 --level provincia
+bin/py -m officina.pacchetti ter-178          # il pacchetto: cifre, angoli, contesto
+bin/py -m officina.brief ter-178              # il testo che si mette davanti a chi scrive
 ```
 
-Il brief è per livello, in ogni sua parte: cifre, stato dell'articolo e `vintage`
-richiesto. Chiudendo, stampa il valore che il campo `level` deve avere. Prima
-ignorava il livello nel blocco finale, quindi su `--level provincia` dichiarava
-scritte le sezioni dell'articolo *regionale* davanti a una pagina vuota.
+Non più `scripts/indicator_brief.py`: è stato **assorbito in `packs/`**, che ne
+era la riscrittura, e il file non esiste più. Chi scrive un articolo adesso non
+lancia niente a mano, lo fa il workflow:
 
-Il brief stampa la graduatoria completa con la variazione di ogni territorio dal
+```bash
+Workflow({scriptPath: ".claude/workflows/produci-indicatori.js", args: ["ter-178"]})
+```
+
+Il pacchetto è per livello, in ogni sua parte: cifre, stato dell'articolo e
+`vintage` richiesto. Chiudendo, stampa il valore che il campo `level` deve avere.
+Prima ignorava il livello nel blocco finale, quindi su `--level provincia`
+dichiarava scritte le sezioni dell'articolo *regionale* davanti a una pagina
+vuota.
+
+Il pacchetto stampa la graduatoria completa con la variazione di ogni territorio dal
 primo anno, dove la distribuzione si spezza davvero, chi si è mosso in
 controtendenza e che cosa la pagina dice già da sola. Esiste per una ragione
 precisa: scrivendo contro due o tre cifre pescate dall'API si finisce per
@@ -350,17 +359,25 @@ nella sezione `limiti`, cioè nel punto che serve a dire che cosa l'indicatore
 non misura. `ter-72` scriveva "almeno dieci addetti" dove la fonte dice "più di
 dieci addetti", che è un'altra popolazione con le stesse parole.
 
-Per la famiglia territoriale la definizione ufficiale sta nel foglio `Metadati`
-di `Metainformazione.xls` della Banca dati territoriale, ed è ora in repo:
+Le definizioni di fonte sono in due archivi committati. Il primo viene dal
+foglio `Metadati` di `Metainformazione.xls` della Banca dati territoriale. Il
+secondo federa i metadati BES e BES dei Territori, le codelist SDMX delle
+indagini Multiscopo e demografiche, i metadati Eurostat e le serie locali che
+il vecchio foglio territoriale non contiene:
 
 ```bash
 python3 scripts/fetch_definitions.py            # riscrive data/definitions/istat_territoriali.csv
+.venv/bin/python scripts/fetch_federated_definitions.py  # riscrive data/definitions/federated.csv
 python3 scripts/definition_check.py --show ter-402
 python3 scripts/definition_check.py --summary
 ```
 
 `scripts/xls_reader.py` legge il `.xls` con la sola libreria standard, perché
 gli script della catena girano su un checkout pulito prima che esista un venv.
+Il fetcher federato usa invece l'ambiente del progetto: legge i workbook `.xlsx`
+e interroga le strutture SDMX con cache e rispetto del limite della fonte. Ogni
+riga conserva URL e riferimento preciso al workbook, alla codelist o al dataset
+da cui deriva.
 
 Il confronto è **lessicale e lo dichiara**: cerca le parole su cui poggia la
 definizione ufficiale e chiede se l'articolo le usa mai. Un sinonimo risulta
@@ -375,9 +392,9 @@ la cosa sbagliata. Quattro segnali, in ordine di quanto vale fidarsene:
 | `termini` | l'articolo riprende meno di un terzo delle parole portanti della definizione. È la rete più larga e la più rumorosa, e per questo **non** entra nella coda |
 
 I primi tre diventano il segnale `definizione` di `scripts/review_queue.py`, che
-pesa più di ogni altro, `rilettura` compreso. Le famiglie senza foglio metadati
-(BES, Multiscopo, Eurostat, demografici) risultano `scoperto`: il controllo dice
-che non ha guardato, invece di dire che è tutto a posto.
+pesa più di ogni altro, `rilettura` compreso. `scoperto` significa che il codice
+non ha trovato una riga nell'archivio federato: non equivale mai a un controllo
+superato e segnala che una fonte nuova o non aggiornata va recuperata.
 
 ## SEO e struttura
 

@@ -25,10 +25,10 @@ text or its data changes.
 
 `definizione` is the newest and it sorts above all the others, including
 `rilettura`. It comes from `scripts/definition_check`, which reads the article
-against Istat's own wording in `data/definitions/istat_territoriali.csv`. Every
-other signal here marks a sentence that might be false about the numbers; this
-one marks a sentence that might be false about what the page is even measuring,
-and that is the one class a reader checking arithmetic will confirm as correct.
+against the source archive in `data/definitions/`. Every other signal here marks
+a sentence that might be false about the numbers; this one marks a sentence
+that might be false about what the page is even measuring, and that is the one
+class a reader checking arithmetic will confirm as correct.
 
     .venv/bin/python -m scripts.review_queue                # top of the queue
     .venv/bin/python -m scripts.review_queue --all
@@ -329,8 +329,8 @@ def assess(key, entry, view=None, definitions=None, refutations=None, readings=N
         grave, detail = unreadable
         hits["leggibilita_grave" if grave else "leggibilita"] = detail
 
-    # The definitions CSV covers the territorial family only, and may not have
-    # been fetched at all on a fresh checkout. Both cases mean "no opinion", not
+    # The merged definitions archive covers every published family, but a new
+    # or unrefreshed source may still be absent. That means "no opinion", not
     # "clean": `definition_check` says `scoperto` and the flag stays off.
     if definitions is None:
         definitions = load_definitions()

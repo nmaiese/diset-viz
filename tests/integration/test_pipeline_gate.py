@@ -293,11 +293,21 @@ class ARunThatProducedSomethingHasToSayItDid(unittest.TestCase):
     sta all'ultimo passo di una run lunga, cioe' nel punto in cui e' piu'
     facile saltarlo. Ed e' proprio la riga di diario a rendere osservabile la
     catena, quindi vale un controllo, non un'esortazione.
+
+    `base="HEAD"` e niente working tree, in tutti e tre i casi. La funzione
+    porta davanti un **secondo** controllo, quello append-only sul diario, che
+    legge il repo vero: senza una base fissata guarda `origin/master` o `master`,
+    e in un checkout dove `master` e' rimasto indietro di qualche commit le righe
+    di diario arrivate nel frattempo risultano riscritte. Il verdetto che ne
+    esce e' vero ma di un'altra cosa, e questi tre casi smettono di misurare
+    quello per cui esistono. Contro `HEAD` il diario e' fermo per costruzione.
     """
+
+    BASE = {"base": "HEAD", "include_worktree": False}
 
     def test_work_without_a_journal_line_is_refused(self):
         check = pipeline_gate.check_run_is_recorded(
-            "verificatore", [pipeline_gate.VERIFICATIONS]
+            "verificatore", [pipeline_gate.VERIFICATIONS], **self.BASE
         )
         self.assertFalse(check.ok)
         self.assertIn("pipeline_log.py --write", check.detail)
@@ -305,9 +315,10 @@ class ARunThatProducedSomethingHasToSayItDid(unittest.TestCase):
     def test_a_run_that_touched_nothing_owes_no_record(self):
         """Una run a mani vuote non passa nemmeno di qui: non ha un branch da
         giudicare, e la sua riga resta affidata al contratto."""
-        check = pipeline_gate.check_run_is_recorded("verificatore", [])
+        check = pipeline_gate.check_run_is_recorded("verificatore", [], **self.BASE)
         self.assertTrue(check.ok, check.detail)
-        check = pipeline_gate.check_run_is_recorded("verificatore", [pipeline_gate.RUN_JOURNAL])
+        check = pipeline_gate.check_run_is_recorded(
+            "verificatore", [pipeline_gate.RUN_JOURNAL], **self.BASE)
         self.assertTrue(check.ok, check.detail)
 
 
@@ -355,6 +366,53 @@ class TheSignatureCheckReadsStateNotDiffLines(unittest.TestCase):
         self.assertFalse(check.ok)
 
     def test_a_run_that_touched_no_article_owes_no_signature(self):
+        check = self._check_over({}, [])
+        self.assertTrue(check.ok, check.detail)
+
+
+class ATypoInRolesCoveredIsNotAnOmission(unittest.TestCase):
+    """Rilievo Codex sulla #171: un `roles_covered` con un ruolo sconosciuto
+    (refuso) rendeva esattamente le stesse sezioni di un'omissione voluta, e
+    niente lo segnalava prima che l'articolo raggiungesse la pagina pubblica.
+    A render time sollevare e' pericoloso (farebbe cadere ogni pagina gia'
+    pubblicata su un refuso storico), quindi il controllo vive qui, prima del
+    merge, dove la stringa grezza scritta dall'editor e' ancora leggibile.
+    """
+
+    def _check_over(self, entries, keys):
+        import unittest.mock as mock
+
+        original = pipeline_gate.changed_text_keys
+        pipeline_gate.changed_text_keys = lambda base=None, cwd=None, include_worktree=True: keys
+        try:
+            with mock.patch.object(indicator_store, "load_all", lambda root=None: entries):
+                return pipeline_gate.check_writer_roles()
+        finally:
+            pipeline_gate.changed_text_keys = original
+
+    def test_an_unknown_role_is_refused(self):
+        check = self._check_over({"178": {"roles_covered": ["quadro", "definizone"]}}, ["178"])
+        self.assertFalse(check.ok)
+        self.assertIn("178", check.detail)
+        self.assertIn("definizone", check.detail)
+
+    def test_the_four_known_roles_pass(self):
+        check = self._check_over(
+            {"178": {"roles_covered": ["definizione", "quadro", "dinamica", "limiti"]}}, ["178"]
+        )
+        self.assertTrue(check.ok, check.detail)
+
+    def test_a_missing_declaration_passes(self):
+        check = self._check_over({"178": {}}, ["178"])
+        self.assertTrue(check.ok, check.detail)
+
+    def test_an_empty_declaration_passes(self):
+        """`roles_covered: []` e' una dichiarazione valida (assorbe la
+        definizione), non un refuso."""
+        check = self._check_over({"178": {"roles_covered": []}}, ["178"])
+        self.assertTrue(check.ok, check.detail)
+
+    def test_a_run_that_touched_no_article_owes_no_check(self):
         check = self._check_over({}, [])
         self.assertTrue(check.ok, check.detail)
 
@@ -563,6 +621,23 @@ class InvariantDispatch(unittest.TestCase):
         self.assertEqual(G.invariant_labels("reader-editor", self._paths(G.READINGS)),
                          ["readings"])
 
+    def test_the_articles_keep_their_invariants_without_an_owner(self):
+        """Lo smistamento e' per **tipo di file**, e questa e' la prova che la
+        distinzione non era accademica.
+
+        Nessuno stadio ha piu' `content/indicators/` nel perimetro, quindi
+        nessuno arriva qui portando un articolo. Ma `vintage` e `roles` restano
+        agganciati al tipo di file e non a un nome di ruolo: il giorno in cui un
+        percorso ci riporta un articolo (una run che ne tocca uno per sbaglio, o
+        un ruolo futuro), i due controlli scattano da soli invece di essere
+        rimessi a mano. `roles` e' il controllo che master ha aggiunto mentre
+        questo ramo demoliva i perimetri: un refuso in `roles_covered` e
+        un'omissione voluta rendono la stessa pagina, e qui e' l'ultimo punto in
+        cui sono ancora distinguibili."""
+        etichette = pipeline_gate.invariant_labels(
+            "verificatore", self._paths(pipeline_gate.INDICATOR_TEXTS))
+        self.assertEqual(etichette, ["vintage", "roles"])
+
     def test_the_reader_editor_does_not_sign(self):
         """Legge, non firma: come il verificatore, il suo verdetto e' un file, non
         una responsabilita' sul testo altrui."""
@@ -581,6 +656,18 @@ class InvariantDispatch(unittest.TestCase):
         for stadio in G.STAGE_PATHS:
             self.assertNotIn("signature",
                              G.invariant_labels(stadio, self._paths(G.INDICATOR_TEXTS)), stadio)
+
+    def test_a_role_still_composes_the_invariants_of_everything_it_touches(self):
+        """La composizione resta, ed e' cio' che ha reso la demolizione un taglio
+        e non una riscrittura: un ruolo che tocca due tipi di file prende gli
+        invarianti di tutti e due, senza che nessuno li elenchi per lui. Lo
+        diceva il produttore (curation + vintage + roles + signature); lo dice
+        adesso l'ammissione, che e' il solo ruolo rimasto a toccare piu' di un
+        tipo."""
+        G = pipeline_gate
+        labels = G.invariant_labels(
+            "admissions", self._paths(G.CURATION, G.CANDIDATES))
+        self.assertEqual(set(labels), {"curation", "triage"})
 
     def test_admissions_composes_the_triage(self):
         G = pipeline_gate
@@ -749,7 +836,7 @@ class TheReadingRegisterIsAppendOnly(unittest.TestCase):
             "sections": [{"role": "quadro", "h": None, "body": "Il quadro."}],
         }
         self._write_texts({"611": self.entry})
-        self.fingerprint = verification_queue.prose_fingerprint(self.entry)
+        self.fingerprint = self.reading_queue.reading_fingerprint(self.entry)
         self._write_register([self._row()])
         self._run("git", "add", "-A")
         self._run("git", "commit", "-qm", "base")

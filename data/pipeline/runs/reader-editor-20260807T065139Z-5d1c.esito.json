@@ -1,0 +1,17 @@
+{
+ "at": "2026-08-07T06:59:59+00:00",
+ "base_commit": "b33786b",
+ "branch": "master",
+ "claude_code_version": "2.1.224 (Claude Code)",
+ "commit": "b33786b",
+ "detail": [
+  "Pull Request successfully merged"
+ ],
+ "gate": "auto",
+ "outcome": "merged",
+ "pr": "180",
+ "run_id": "reader-editor-20260807T065139Z-5d1c",
+ "stage": "reader-editor",
+ "summary": "PR #180 fusa in master dal passo di merge",
+ "trigger": "manuale"
+}

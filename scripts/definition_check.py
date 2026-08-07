@@ -16,9 +16,9 @@ word for word. A wrong figure dies at the first reader who opens the brief. A
 wrong definition survives every reading that checks arithmetic, because the
 arithmetic is right.
 
-So this compares prose to `data/definitions/istat_territoriali.csv`, the
-`Metadati` sheet of Istat's `Metainformazione.xls`
-(`scripts/fetch_definitions.py`).
+So this compares prose to the committed source archive in `data/definitions/`:
+the territorial `Metadati` sheet plus the federated BES, Multiscopo,
+demographic and Eurostat definitions produced by the two fetchers there.
 
     python3 scripts/definition_check.py                 # i peggiori, in ordine
     python3 scripts/definition_check.py --summary       # il totale del catalogo
@@ -55,6 +55,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from scripts import prose_lint  # noqa: E402
+from app import sources  # noqa: E402
 from scripts.fetch_definitions import load_definitions  # noqa: E402
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -340,7 +341,7 @@ SIGNAL_LABELS = {
     "termini": "l'articolo riprende quasi nulla della definizione ufficiale",
     "assente": "nessuna sezione definizione scritta a mano, la compone il template",
     "vuoto": "articolo senza prosa",
-    "scoperto": "nessuna definizione ufficiale da confrontare (fuori dalla famiglia ter)",
+    "scoperto": "nessuna definizione di fonte da confrontare nell'archivio",
 }
 # Only these mean "the article may be describing another quantity". `assente`,
 # `vuoto` and `scoperto` describe our coverage, not the article's honesty, and a
@@ -354,11 +355,15 @@ TERM_COVERAGE_FLOOR = 0.35
 
 
 def official_id(code: str) -> str | None:
-    """The territorial id inside a code, or None for the other families."""
-    if code.startswith("ter-"):
-        tail = code.split("-", 1)[1]
-        return tail if tail.isdigit() else None
-    return code if code.isdigit() else None
+    """Canonical definition key from an internal id or public URL code."""
+    parsed = sources.parse_indicator_code(str(code))
+    if parsed:
+        family, raw_id = parsed
+        return sources.internal_id(family, raw_id)
+    family, raw_id = sources.split_internal_id(str(code))
+    if family != "territorial":
+        return sources.internal_id(family, raw_id)
+    return raw_id if raw_id.isdigit() else None
 
 
 def build_report(texts: dict, definitions: dict) -> list[dict]:

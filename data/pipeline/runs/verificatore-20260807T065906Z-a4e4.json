@@ -1,0 +1,19 @@
+{
+ "at": "2026-08-07T07:00:25+00:00",
+ "base_commit": "0224e82",
+ "branch": "automation/verificatore-2026-08-07-a4e4",
+ "claude_code_version": "2.1.224 (Claude Code)",
+ "commit": "2413e14",
+ "detail": [
+  "31 claim confermate su serie 923, cross-ref dem-NMIGRATEIN (Molise interno -3,4; Calabria -4,4; Basilicata -4,8 nel 2024) e ter-922, piu' figure Istat verificate sul comunicato Indicatori demografici 2025 (355mila nati, 652mila morti, saldo naturale -296mila, estero +296mila, Mezzogiorno -45mila/-2,3, Centro-Nord +45mila/+1,2). Frase segnalata '2020, l'anno della pandemia, media 1,08': confermata come marcatore temporale (nessun verbo causale, entrambi i fatti veri), non classe causale. Osservazione non-smentita: Istat distingue una terza componente 'per altri motivi' oltre alle due porte estero/interno, empiricamente ~0 nel 2025 e coerente con la definizione-fonte 'per trasferimento di residenza'."
+ ],
+ "gate": "auto",
+ "outcome": "pr-open",
+ "pr": "",
+ "queue_after": 28,
+ "queue_before": 29,
+ "run_id": "verificatore-20260807T065906Z-a4e4",
+ "stage": "verificatore",
+ "summary": "Verificato ter-923 (saldo migratorio totale): 31 affermazioni controllate, 0 smentite, esito pulito",
+ "trigger": "manuale"
+}

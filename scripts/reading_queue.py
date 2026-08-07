@@ -19,12 +19,16 @@ rather than a link in a chain.
 
 A reading is a statement about **a text**, exactly like a verification, so it
 expires when that text changes and nothing else expires it. Each record carries
-`prose_fingerprint` of the prose it read, and a reading covers an article only
-while its prose still hashes to that value. Reusing the verifier's fingerprint is
-deliberate: a rewrite for readability changes it, which expires *both* the reading
-and the verification, and the article is re-read and re-verified. One file per
-reading in `data/pipeline/letture/`, append-only, named for the three fields a
-reading is an assertion about: `{code}__{level}__{fingerprint}.json`.
+`reading_fingerprint` of the prose it read, and a reading covers an article only
+while its prose still hashes to that value. It is **not** the verifier's
+fingerprint: that one sorts sections by role because a verifier does not care
+about order, while a reading judges `structure` among its criteria, where order
+is exactly what is being judged. A rewrite for readability still expires the
+verification too (the two fingerprints differ, but the verifier's own
+`prose_fingerprint` still changes with the wording), and the article is re-read
+and re-verified. One file per reading in `data/pipeline/letture/`, append-only,
+named for the three fields a reading is an assertion about:
+`{code}__{level}__{fingerprint}.json`.
 
 ## The brake, and why it lives here and not in the prompt
 
@@ -46,6 +50,7 @@ Pure stdlib, like every script in the chain.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -57,7 +62,43 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts import indicator_store  # noqa: E402  (path bootstrap above)
 from scripts import verification_queue  # noqa: E402
-from scripts.verification_queue import prose_fingerprint  # noqa: E402  (single source)
+
+
+def reading_fingerprint(entry: dict) -> str:
+    """A fingerprint of the prose a reading judged, sensitive to section order.
+
+    `verification_queue.prose_fingerprint` sorts sections by role on purpose: a
+    verifier checks facts, and reordering sections changes nothing it read. A
+    reader-editor judges *readability*, where order is part of what is being
+    judged (`structure` is one of `CRITERIA`): moving `limiti` ahead of
+    `dinamica` is exactly the kind of fix a `revise` on `structure` asks for,
+    and the role-sorted fingerprint cannot see it. Reusing it here meant a
+    structure-only rewrite left the stale `revise` reading in place: the
+    fingerprint still matched, so no new reading was scheduled and the
+    rewrite-brake counter stayed pinned to the old text forever.
+
+    Otherwise identical to `prose_fingerprint`: same rendered-only filter, same
+    whitespace normalisation, same emitted-roles suffix. Only the join key
+    changes (list order instead of role), so two readings of prose that only
+    differ in section order now land on different files, as they should.
+    """
+    rendered = set(verification_queue._emitted_role_list(entry))
+    parts = [("lead", "", entry.get("lead") or "")]
+    for section in entry.get("sections") or []:
+        role = section.get("role") or ""
+        if role and role not in rendered:
+            continue
+        parts.append((role, section.get("h") or "", section.get("body") or ""))
+    blob = "\n".join(
+        f"{index}:{role}:"
+        + verification_queue.WHITESPACE.sub(" ", heading).strip()
+        + ":" + verification_queue.WHITESPACE.sub(" ", text).strip()
+        for index, (role, heading, text) in enumerate(parts)
+    )
+    emitted = verification_queue._emitted_roles(entry)
+    if emitted is not None:
+        blob += "\nruoli-emessi:" + ",".join(emitted)
+    return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:16]
 
 # Il registro delle letture, un file per lettura. Perimetro del solo
 # reader-editor, come `verifiche/` lo e' del solo verificatore: un registro
@@ -347,7 +388,7 @@ def build_queue(texts=None, readings=None) -> list[dict]:
             continue
         code = verification_queue.code_of(key)
         level = (entry.get("level") or "regione")
-        fingerprint = prose_fingerprint(entry)
+        fingerprint = reading_fingerprint(entry)
         rows = by_key.get((code, level), [])
         match = next((r for r in rows if (r.get("prosa") or "").strip() == fingerprint), None)
         revised_versions = {

@@ -149,7 +149,7 @@ Un file per lettura in `data/pipeline/letture/`, scritto con
 
   ```bash
   python3 -c "import sys; sys.path.insert(0,'.'); from scripts import reading_queue as r; \
-      print(r.prose_fingerprint(r.load_texts()['432']))"
+      print(r.reading_fingerprint(r.load_texts()['432']))"
   ```
 
   E' cio' che fa scadere la lettura con onesta': il produttore riscrive, l'impronta
