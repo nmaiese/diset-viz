@@ -5,12 +5,12 @@ Three layers, tested separately because they fail in different ways:
 1. `scripts/xls_reader` walks an OLE2 container and a BIFF8 stream by hand. A
    parser that gets a byte offset wrong does not raise, it returns plausible
    nonsense, so the container is built here from scratch and read back.
-2. `scripts/fetch_definitions` turns Istat's sheet into the committed CSV. What
-   matters is the joins: the zero padding, the provincial suffixes, and the
-   header lookup that must not silently slide by one column.
-3. `scripts/definition_check` compares prose to that CSV. Every case is
-   synthetic except the two anchored on the real catalogue, because a check
-   calibrated on today's articles would pass forever by construction.
+2. The two definition fetchers turn source metadata into committed CSVs. What
+   matters is the joins: family namespaces, zero padding, provincial suffixes,
+   and header lookup that must not silently slide by one column.
+3. `scripts/definition_check` compares prose to their merged archive. Most
+   cases are synthetic; catalogue anchors protect the source joins and complete
+   coverage without calibrating the lexical heuristic on today's prose.
 """
 
 from __future__ import annotations
@@ -22,7 +22,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts import definition_check, fetch_definitions, xls_reader
+from scripts import (
+    definition_check,
+    fetch_definitions,
+    fetch_federated_definitions,
+    prose_lint,
+    xls_reader,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -398,7 +404,7 @@ class CheckEntry(unittest.TestCase):
         self.assertNotIn("base", row["hits"])
         self.assertNotIn("termini", row["hits"])
 
-    def test_a_family_without_a_metadata_sheet_says_so_instead_of_passing(self):
+    def test_a_missing_archive_record_says_so_instead_of_passing(self):
         row = definition_check.check_entry("bes-12SER003", _entry("Qualunque cosa."), None)
         self.assertEqual(list(row["hits"]), ["scoperto"])
 
@@ -430,7 +436,7 @@ class CheckEntry(unittest.TestCase):
 
 
 class AgainstTheRealCatalogue(unittest.TestCase):
-    """Two anchors on committed data. Everything else here is synthetic."""
+    """Anchors on committed data; the lexical behavior stays synthetic."""
 
     @classmethod
     def setUpClass(cls):
@@ -442,6 +448,23 @@ class AgainstTheRealCatalogue(unittest.TestCase):
         with fetch_definitions.OUTPUT_PATH.open(encoding="utf-8", newline="") as handle:
             reader = csv.DictReader(handle, delimiter=";")
             self.assertEqual(reader.fieldnames, fetch_definitions.COLUMNS)
+
+        self.assertTrue(fetch_definitions.FEDERATED_OUTPUT_PATH.exists(),
+                        "run python3 scripts/fetch_federated_definitions.py")
+        with fetch_definitions.FEDERATED_OUTPUT_PATH.open(
+            encoding="utf-8", newline=""
+        ) as handle:
+            reader = csv.DictReader(handle, delimiter=";")
+            self.assertEqual(
+                reader.fieldnames, fetch_federated_definitions.FEDERATED_COLUMNS
+            )
+
+    def test_the_two_archives_have_disjoint_ids(self):
+        native = fetch_definitions._load_csv(fetch_definitions.OUTPUT_PATH)
+        federated = fetch_definitions._load_csv(
+            fetch_definitions.FEDERATED_OUTPUT_PATH
+        )
+        self.assertEqual(set(native) & set(federated), set())
 
     def test_it_covers_most_of_the_territorial_archive(self):
         """A join that silently stops matching is the failure mode here.
@@ -466,6 +489,48 @@ class AgainstTheRealCatalogue(unittest.TestCase):
         row = self.definitions.get("402")
         self.assertIsNotNone(row, "id 402 is not in the definitions CSV")
         self.assertIn("titolari di imprese individuali", row["definizione"].lower())
+
+    def test_every_committed_article_has_a_source_definition(self):
+        uncovered = sorted(
+            code for code in prose_lint.load_texts()
+            if definition_check.official_id(code) not in self.definitions
+        )
+        self.assertEqual(uncovered, [])
+
+    def test_federated_definitions_keep_the_decisive_source_details(self):
+        expected_fragments = {
+            "76": "totale delle famiglie",
+            "bes:01SAL002": "salute percepita",
+            "bes:10AMB001P": "centraline fisse",
+            "multiscopo:MULTI_REDD_MEDIANO": "fitti imputati",
+            "dem:OLDAGEDEPR": "65",
+            "eur:rd_p_persreg": "equivalenti a tempo pieno",
+        }
+        for key, fragment in expected_fragments.items():
+            with self.subTest(key=key):
+                self.assertIn(
+                    fragment,
+                    self.definitions[key]["definizione"].lower(),
+                )
+
+
+class DefinitionKeys(unittest.TestCase):
+    def test_public_codes_map_to_the_archive_namespaces(self):
+        expected = {
+            "ter-402": "402",
+            "bes-10AMB004": "bes:10AMB004",
+            "ims-MULTI_ABIT_AFFITTO": "multiscopo:MULTI_ABIT_AFFITTO",
+            "dem-OLDAGEDEPR": "dem:OLDAGEDEPR",
+            "eur-rd_e_gerdreg": "eur:rd_e_gerdreg",
+        }
+        for public_code, archive_id in expected.items():
+            with self.subTest(public_code=public_code):
+                self.assertEqual(definition_check.official_id(public_code), archive_id)
+
+    def test_internal_ids_stay_canonical(self):
+        for archive_id in ("402", "bes:01SAL002", "multiscopo:MULTI_SATLIFE_AVG"):
+            with self.subTest(archive_id=archive_id):
+                self.assertEqual(definition_check.official_id(archive_id), archive_id)
 
 
 class CommandLine(unittest.TestCase):

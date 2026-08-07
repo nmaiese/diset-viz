@@ -32,9 +32,10 @@ python3 scripts/definition_check.py --show <codice>
 Si legge la definizione ufficiale, poi la sezione `definizione`, poi `limiti`,
 dove un perimetro sbagliato viene ripetuto come caveat. La prosa si corregge
 verso la fonte, mai il contrario. Numeratore, denominatore e soglie si copiano
-dalla fonte in parole piane, mai dedotti dal titolo. Il check copre la sola
-famiglia territoriale: su `bes-*`, `ims-*`, `eur-*` e `dem-*` risponde
-`scoperto`, cioe' nessuno ha guardato, e li' si va alla fonte.
+dalla fonte in parole piane, mai dedotti dal titolo. Il check usa gli archivi
+committati in `data/definitions/` e copre territoriali, BES, Multiscopo,
+Eurostat e demografici. `scoperto` significa che una serie nuova non e' ancora
+entrata nell'archivio: nessuno ha guardato, e li' si torna alla fonte.
 
 ## `universale` — "ovunque", "sempre", "da anni", "in tutte le regioni"
 

@@ -19,10 +19,11 @@ can be held to the source without a network call.
     python3 scripts/fetch_definitions.py --dry-run       # dice solo che cosa cambierebbe
     python3 scripts/fetch_definitions.py --from-file Metainformazione.xls
 
-Only the territorial family (`ter-*`) is covered, because only it has this
-sheet. BES, Multiscopo, Eurostat and the demographic indicators publish their
-definitions elsewhere and in other shapes, and the checker says "scoperto" for
-them rather than pretending to have looked.
+This fetcher owns only the native territorial sheet. BES, Multiscopo, Eurostat,
+demographic indicators and the local territorial additions publish their
+definitions elsewhere and in other shapes; the companion
+`scripts/fetch_federated_definitions.py` normalizes those into the second CSV
+that `load_definitions()` merges automatically.
 """
 
 from __future__ import annotations
@@ -44,6 +45,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_URL = "https://www.istat.it/storage/politiche-sviluppo/Metainformazione.xls"
 SHEET = "Metadati"
 OUTPUT_PATH = PROJECT_ROOT / "data" / "definitions" / "istat_territoriali.csv"
+FEDERATED_OUTPUT_PATH = PROJECT_ROOT / "data" / "definitions" / "federated.csv"
 
 COLUMNS = [
     "id",
@@ -168,13 +170,15 @@ def download(url: str) -> bytes:
         return response.read()
 
 
-def write_atomic(records: list[dict[str, str]], path: Path) -> None:
+def write_atomic(
+    records: list[dict[str, str]], path: Path, columns: list[str] | None = None
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
         "w", encoding="utf-8", newline="", delete=False, dir=path.parent
     ) as handle:
         writer = csv.DictWriter(
-            handle, fieldnames=COLUMNS, delimiter=";", lineterminator="\n"
+            handle, fieldnames=columns or COLUMNS, delimiter=";", lineterminator="\n"
         )
         writer.writeheader()
         writer.writerows(records)
@@ -183,13 +187,33 @@ def write_atomic(records: list[dict[str, str]], path: Path) -> None:
     os.chmod(path, 0o644)
 
 
-def load_definitions(path: Path | None = None) -> dict[str, dict[str, str]]:
-    """The committed definitions, keyed by indicator id. `{}` if never fetched."""
-    target = Path(path or OUTPUT_PATH)
+def _load_csv(target: Path) -> dict[str, dict[str, str]]:
     if not target.exists():
         return {}
     with target.open(encoding="utf-8", newline="") as handle:
         return {row["id"]: row for row in csv.DictReader(handle, delimiter=";")}
+
+
+def load_definitions(path: Path | None = None) -> dict[str, dict[str, str]]:
+    """Committed source definitions, keyed by the editorial store id.
+
+    An explicit path remains a single-file test/CLI seam.  The normal loader
+    merges the historical territorial sheet with the federated archive.  The
+    latter uses namespaced ids (``bes:*``, ``multiscopo:*``, ``dem:*``,
+    ``eur:*``), plus the few local territorial ids absent upstream, so the two
+    files cannot silently overwrite the same definition.
+    """
+    if path is not None:
+        return _load_csv(Path(path))
+    definitions = _load_csv(OUTPUT_PATH)
+    federated = _load_csv(FEDERATED_OUTPUT_PATH)
+    overlap = sorted(set(definitions) & set(federated))
+    if overlap:
+        raise ValueError(
+            "Definition ids occur in both committed archives: " + ", ".join(overlap)
+        )
+    definitions.update(federated)
+    return definitions
 
 
 def main(argv=None) -> int:

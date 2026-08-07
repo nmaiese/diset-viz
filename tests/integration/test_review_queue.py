@@ -173,8 +173,8 @@ class DefinitionFlag(unittest.TestCase):
             review_queue.FLAG_WEIGHT["smentita"], review_queue.FLAG_WEIGHT["definizione"]
         )
 
-    def test_a_family_with_no_metadata_sheet_is_silent_not_clean(self):
-        """No definitions on disk must read as "no opinion", never as a pass."""
+    def test_a_missing_archive_record_is_silent_not_clean(self):
+        """No definition on disk must read as "no opinion", never as a pass."""
         row = self.assess("Misura la quota di imprese a guida femminile.", definitions={})
         self.assertNotIn("definizione", row["flags"])
 
