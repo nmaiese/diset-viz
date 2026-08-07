@@ -285,24 +285,34 @@ class TheMechanicalStagesTakeNoEditorialDecision(unittest.TestCase):
         self.assertIn("officina.pubblica", self.pubblica)
         self.assertNotIn("scripts.indicator_store", self.text)
 
-    def test_the_last_attempt_refuses_to_eat_a_good_article(self):
-        """`--ultimo-tentativo` sulla seconda chiamata, e **solo** su quella.
+    def test_a_refused_write_carries_the_findings_of_the_draft(self):
+        """Quando `officina.pubblica` rifiuta di sovrascrivere, il passo 2 va
+        saltato, e il prompt deve dirlo.
 
-        Sempre acceso rompe il giro di riparazione: dentro il giro la bozza
-        bocciata deve stare su disco, perche' il passo 2 la rilegge da li' con
-        `officina.lint` per riportare i rilievi a chi riscrive, e su un articolo
-        vecchio quei rilievi sarebbero di un altro testo. Mai acceso, invece, e'
-        il difetto: una riscrittura bocciata sostituisce l'articolo buono nel
-        working tree.
-
-        La condizione e' `${ultimo ? ...}` dentro il comando, e le chiamate `:2`
-        sono le sole a passare `true`.
+        Il comando rifiuta quando il cancello blocca e sotto c'e' gia' un
+        articolo: li' non si scrive, quindi `officina.lint` descriverebbe il
+        **testo precedente** e ne attribuirebbe i rilievi alla bozza nuova. Per
+        questo il comando li stampa da se' su una riga `RILIEVI`, e il
+        pubblicatore copia quelli. Senza questa istruzione il giro di
+        riparazione riceve i rilievi di un altro testo, che e' un verdetto
+        falso, peggio della sovrascrittura che il rifiuto evita.
         """
+        self.assertIn("RILIEVI", self.pubblica)
+        self.assertIn("salta il passo 2", self.pubblica)
+        self.assertNotIn("--ultimo-tentativo", self.text,
+                         "il rifiuto non ha piu' un flag: vale a ogni tentativo, "
+                         "perche' il danno lo fa il primo")
+
+    def test_a_gate_block_is_not_reported_as_a_form_error(self):
+        """`ilRifiuto` dice "e' una regola di forma, correggi cio' che il
+        messaggio nomina": su un rilievo editoriale e' un'istruzione sbagliata.
+
+        Quindi `rifiutato` esclude il caso in cui la scrittura e' stata
+        rifiutata **con** dei rilievi bloccanti: quello e' un blocco, e va a
+        `ilBlocco`."""
         codice = _senza_commenti(self.text)
-        self.assertIn("--ultimo-tentativo", self.pubblica)
-        self.assertEqual(codice.count("await pubblica(corrente, ':2', true)"), 2)
-        self.assertIn("await pubblica(corrente)\n", codice,
-                      "il primo tentativo non passa il flag")
+        self.assertIn("esito.scritto === false && !primi.length", codice)
+        self.assertEqual(codice.count("await pubblica(corrente, ':2')"), 2)
 
     def test_the_pack_stage_does_not_run_as_the_publisher(self):
         prepara = self.text.split("async function prepara", 1)[1].split("\n}", 1)[0]

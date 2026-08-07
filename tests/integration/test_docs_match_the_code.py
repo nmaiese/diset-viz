@@ -290,12 +290,16 @@ class IDueVocabolariNonDivergono(unittest.TestCase):
         Si controlla lo stadio di cui esiste uno script di scrittura
         identificabile. Gli altri restano coperti dal test qui sopra.
         """
-        from scripts import apply_curation, pipeline_launch
+        from scripts import apply_curation, curate, pipeline_launch
 
         ruolo = pipeline_launch.ROLE_OF_STAGE["curator"]
         perimetro = pipeline_gate.STAGE_PATHS.get(ruolo)
         self.assertIsNotNone(perimetro, f"{ruolo} non ha un perimetro")
-        scritti = (apply_curation.EXTERNAL_DATASET,
+        # Quattro file, non tre: la decisione, e i tre che `apply_curation`
+        # produce leggendola. Il primo mancava, quindi la curazione sarebbe
+        # stata respinta prima ancora di cominciare.
+        scritti = (curate.CURATION_PATH,
+                   apply_curation.EXTERNAL_DATASET,
                    apply_curation.EXTERNAL_MANIFEST,
                    apply_curation.CURATED_DESCRIPTIONS)
         for percorso in scritti:

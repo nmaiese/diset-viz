@@ -115,13 +115,17 @@ READINGS = "data/pipeline/letture/"
 STAGE_PATHS = {
     # `admissions` = scout + hunter + promoter: propone la fonte, triaga il
     # candidato, promuove nel layer esterno, in una run sola.
-    # `CURATED_DESCRIPTIONS` c'e' perche' l'ammissione copre anche il vecchio
-    # stadio `curator` (`pipeline_launch.ROLE_OF_STAGE`), e curare vuol dire
-    # eseguire `scripts/apply_curation.py`, che scrive tre file: il layer
-    # esterno, il manifest e le descrizioni curate. I primi due erano gia' qui e
-    # il terzo no, quindi una curazione sarebbe stata respinta dal cancello
-    # sull'ultima delle sue tre scritture. La costante esisteva gia', inutilizzata.
-    "admissions": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, CANDIDATES,
+    # `CURATION` e `CURATED_DESCRIPTIONS` ci sono perche' l'ammissione copre
+    # anche il vecchio stadio `curator` (`pipeline_launch.ROLE_OF_STAGE`), e una
+    # curazione scrive **quattro** file, non due: la decisione
+    # (`data/discovery/curation.csv`, che e' l'input di
+    # `scripts/apply_curation.py`) e i tre che quello script produce, cioe' il
+    # layer esterno, il manifest e le descrizioni curate. Due erano gia' qui e
+    # due no, quindi una curazione sarebbe stata respinta dal cancello sulla
+    # prima scrittura e di nuovo sull'ultima. Le due costanti esistevano gia',
+    # inutilizzate, e `check_curation_decisions` girava su un file che nessuno
+    # stadio poteva scrivere.
+    "admissions": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, CANDIDATES, CURATION,
                    EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS,
                    RUN_JOURNAL),
     # Il verificatore NON ha `INDICATOR_TEXTS`, e l'assenza e' la definizione

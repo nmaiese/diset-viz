@@ -131,12 +131,13 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
     bloccava, e l'articolo bloccato passava lo stesso.
     """
 
-    def _main(self, bozza, code="ter-30", root=None, extra=(), precedenti=None):
+    def _main(self, bozza, code="ter-30", root=None, precedenti=None):
         """Esegue `main` con la bozza su stdin, dentro uno store temporaneo.
 
-        `precedenti` sostituisce lo store letto prima di scrivere: `None` lo
-        lascia vivo (nessuno dei test che non passano `--ultimo-tentativo` lo
-        guarda), un dizionario decide se sotto la bozza c'e' gia' un articolo.
+        `precedenti` sostituisce lo store che `main` legge per sapere se sotto
+        la bozza c'e' gia' un articolo: `{}` e' una prima pubblicazione, un
+        dizionario con la chiave dentro e' una riscrittura. `None` lascia lo
+        store vivo, dove `30` esiste.
         """
         scritte = {}
 
@@ -159,11 +160,11 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
                 stack.enter_context(contesto)
             stack.enter_context(contextlib.redirect_stdout(rumore))
             stack.enter_context(contextlib.redirect_stderr(rumore))
-            codice = pubblica.main([code, *extra])
+            codice = pubblica.main([code])
         return codice, scritte.get("entry", {}), rumore.getvalue()
 
     def test_a_clean_draft_earns_it(self):
-        with unittest.mock.patch.object(pubblica, "bloccanti", lambda key, fatta: []):
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi", lambda key, fatta: []):
             codice, entry, _ = self._main(BOZZA)
         self.assertEqual(codice, 0)
         self.assertEqual(entry["origine"], "officina")
@@ -177,8 +178,8 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
         girerebbe sull'articolo **vecchio**.
         """
         fermo = [{"rule": "cifra-falsa", "severity": "blocca", "detail": "x", "field": None}]
-        with unittest.mock.patch.object(pubblica, "bloccanti", lambda key, fatta: fermo):
-            codice, entry, _ = self._main(BOZZA)
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi", lambda key, fatta: fermo):
+            codice, entry, _ = self._main(BOZZA, precedenti={})
         self.assertEqual(codice, 0, "l'articolo e' scritto: l'uscita non cambia")
         self.assertNotIn("origine", entry)
 
@@ -231,65 +232,65 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
 
 class ARejectedRewriteDoesNotEatTheGoodArticle(
         OnlyAnArticleThatPassedTheGateGetsItsOrigin):
-    """`--ultimo-tentativo`: quando il giro di riparazione e' finito, una bozza
-    ancora rossa non sostituisce l'articolo che c'era.
+    """Una bozza che il cancello blocca non sostituisce l'articolo che c'era.
 
-    Il difetto: l'officina scrive in `content/indicators/<chiave>.json` e la
-    scrittura non e' condizionata al verdetto. Su una prima pubblicazione non si
-    perde niente, su una **riscrittura** di un articolo gia' buono quello buono
-    spariva dal working tree, recuperabile solo da git.
+    Il difetto: l'officina scriveva `content/indicators/<chiave>.json` senza
+    condizionare la scrittura al verdetto. Su una prima pubblicazione non si
+    perde niente; su una **riscrittura** di un articolo gia' buono, quello buono
+    spariva dal working tree e si recuperava solo da git.
 
-    Perche' il rimedio ha un flag invece di essere sempre acceso, che e' la
-    parte che si sbaglia: dentro il giro l'articolo bocciato **deve** andare su
-    disco, perche' il passo successivo del pubblicatore lo rilegge da li' con
-    `officina.lint` per riportare i rilievi a chi riscrive. Un rifiuto al primo
-    tentativo farebbe lintare l'articolo **vecchio** e attribuirebbe i suoi
-    rilievi alla bozza nuova: un verdetto falso, peggio della sovrascrittura,
-    che almeno si recupera. Il workflow accende il flag solo sulla seconda
-    chiamata.
+    **Vale a ogni tentativo, e questa e' la parte che si sbaglia.** Una prima
+    versione rifiutava solo la seconda scrittura, con un flag acceso dal
+    workflow sul giro di ritorno: inutile, perche' il danno lo fa il **primo**
+    tentativo, e dopo di lui l'articolo protetto e' gia' una bozza bocciata.
 
-    Eredita la classe sopra per riusarne `_main` e ricontrollare, di fatto, che
-    il comportamento dentro il giro non sia cambiato.
+    Si puo' rifiutare a ogni tentativo perche' il comando **stampa i rilievi**
+    (`RILIEVI <json>`). Erano loro il motivo per cui la scrittura doveva
+    avvenire comunque: il passo successivo del pubblicatore li rileggeva da
+    disco con `officina.lint`, e su un articolo non sovrascritto avrebbe
+    descritto il testo vecchio attribuendone i rilievi alla bozza nuova.
+
+    Eredita la classe sopra per riusarne `_main`.
     """
 
-    FERMO = [{"rule": "cifra-falsa", "severity": "blocca", "detail": "x", "field": None}]
+    FERMO = [{"rule": "cifra-falsa", "severity": "blocca", "detail": "x", "field": None},
+             {"rule": "troppo-corto", "severity": "segnala", "detail": "y", "field": None}]
+    PRECEDENTE = {"30": {"lead": "Il buono di prima.", "sections": []}}
 
     def test_the_previous_article_survives_a_blocked_rewrite(self):
-        with unittest.mock.patch.object(pubblica, "bloccanti",
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
                                         lambda key, fatta: self.FERMO):
-            codice, entry, detto = self._main(
-                BOZZA, extra=["--ultimo-tentativo"],
-                precedenti={"30": {"lead": "Il buono di prima.", "sections": []}})
+            codice, entry, detto = self._main(BOZZA, precedenti=self.PRECEDENTE)
         self.assertEqual(codice, 2, "non e' scritta, e l'uscita lo dice")
-        self.assertEqual(entry, {}, "nessuna scrittura, nemmeno una e ripristinata")
-        self.assertIn("cifra-falsa", detto)
+        self.assertEqual(entry, {}, "nessuna scrittura: il file precedente e' intatto")
         self.assertIn("rimasto al suo posto", detto)
+
+    def test_it_prints_the_findings_of_the_draft_not_of_the_disk(self):
+        """Senza questi, chi riscrive riceverebbe i rilievi del testo vecchio.
+
+        Sono tutti, `segnala` compresi, perche' e' lo stesso contratto del passo
+        di lint che questa uscita sostituisce.
+        """
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
+                                        lambda key, fatta: self.FERMO):
+            _, _, detto = self._main(BOZZA, precedenti=self.PRECEDENTE)
+        riga = next(r for r in detto.splitlines() if r.startswith("RILIEVI "))
+        self.assertEqual(json.loads(riga[len("RILIEVI "):]), self.FERMO)
 
     def test_a_first_publication_is_still_written(self):
         """Senza un precedente non c'e' niente da proteggere, e rifiutare qui
         perderebbe l'unica copia della bozza."""
-        with unittest.mock.patch.object(pubblica, "bloccanti",
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
                                         lambda key, fatta: self.FERMO):
-            codice, entry, _ = self._main(
-                BOZZA, extra=["--ultimo-tentativo"], precedenti={})
+            codice, entry, _ = self._main(BOZZA, precedenti={})
         self.assertEqual(codice, 0)
         self.assertNotIn("origine", entry)
         self.assertEqual(entry["lead"], BOZZA["lead"])
 
-    def test_inside_the_repair_loop_the_blocked_draft_still_lands(self):
-        """Senza il flag, niente cambia: e' il giro di riparazione."""
-        with unittest.mock.patch.object(pubblica, "bloccanti",
-                                        lambda key, fatta: self.FERMO):
-            codice, entry, _ = self._main(
-                BOZZA, precedenti={"30": {"lead": "Il buono di prima.", "sections": []}})
-        self.assertEqual(codice, 0)
-        self.assertEqual(entry["lead"], BOZZA["lead"])
-
-    def test_a_clean_rewrite_is_written_on_the_last_attempt_too(self):
-        with unittest.mock.patch.object(pubblica, "bloccanti", lambda key, fatta: []):
-            codice, entry, _ = self._main(
-                BOZZA, extra=["--ultimo-tentativo"],
-                precedenti={"30": {"lead": "Il buono di prima.", "sections": []}})
+    def test_a_clean_rewrite_is_written(self):
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
+                                        lambda key, fatta: []):
+            codice, entry, _ = self._main(BOZZA, precedenti=self.PRECEDENTE)
         self.assertEqual(codice, 0)
         self.assertEqual(entry["origine"], "officina")
 
@@ -303,9 +304,7 @@ class ARejectedRewriteDoesNotEatTheGoodArticle(
         """
         with unittest.mock.patch.object(lint, "lint_entry",
                                         side_effect=RuntimeError("vista rotta")):
-            codice, entry, _ = self._main(
-                BOZZA, extra=["--ultimo-tentativo"],
-                precedenti={"30": {"lead": "Il buono di prima.", "sections": []}})
+            codice, entry, _ = self._main(BOZZA, precedenti=self.PRECEDENTE)
         self.assertEqual(codice, 0)
         self.assertNotIn("origine", entry)
         self.assertEqual(entry["lead"], BOZZA["lead"])
