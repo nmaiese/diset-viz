@@ -94,13 +94,41 @@ def score_writer(article_path, brief_path=None):
     }
 
 
+NEGATION_WINDOW = 12
+NEGATION_CUES = ("non e'", "non è", "non sono", "non era", "non erano")
+
+
+def _corrected_by_negation(text, pattern):
+    """Vero quando ogni occorrenza del pattern sta dentro una confutazione
+    esplicita ("Non e' X: ...", mossa pedagogica legittima), non come
+    un'affermazione sopravvissuta alla revisione.
+
+    Il caso reale (CANARY.md, riga del 2026-08-06 sul produttore): l'errore
+    piantato `e02` era "quota di donne sul totale degli occupati", e la
+    revisione l'ha corretto scrivendo "**Non e'** la quota di donne sul totale
+    degli occupati: al denominatore c'e' la popolazione femminile". Il pattern
+    e' ancora nel testo, quindi contava come sopravvissuto: un falso negativo
+    dello scorer, non un errore reale, perche' un match a sola sottostringa non
+    distingue "afferma la frase sbagliata" da "la nomina per smontarla".
+    """
+    index = text.find(pattern)
+    while index != -1:
+        window = text[max(0, index - NEGATION_WINDOW):index].lower()
+        if not any(cue in window for cue in NEGATION_CUES):
+            return False
+        index = text.find(pattern, index + 1)
+    return True
+
+
 def score_reviewer(corrected_dir, expected_path=None):
     """Quanti errori piantati sono spariti dal testo corretto.
 
-    Un errore conta come trovato quando la sua frase non c'e' piu': riscritta,
-    etichettata o tagliata. Il metro non giudica la riscrittura, conta le
-    sopravvivenze, perche' un errore piantato che sopravvive a una revisione
-    e' esattamente cio' che questa eval esiste per misurare.
+    Un errore conta come trovato quando la sua frase non c'e' piu' (riscritta,
+    etichettata o tagliata) **o** quando compare solo dentro una confutazione
+    esplicita (`_corrected_by_negation`). Il metro non giudica la riscrittura,
+    conta le sopravvivenze, perche' un errore piantato che sopravvive a una
+    revisione senza essere nemmeno nominato per smentirlo e' esattamente cio'
+    che questa eval esiste per misurare.
     """
     expected = json.loads(Path(expected_path or REVIEWER_EXPECTED).read_text(encoding="utf-8"))
     root = Path(corrected_dir)
@@ -112,7 +140,8 @@ def score_reviewer(corrected_dir, expected_path=None):
         except (OSError, ValueError):
             unreadable.append(error["file"])
             continue
-        (missed if error["pattern"] in text else found).append(error["id"])
+        present = error["pattern"] in text and not _corrected_by_negation(text, error["pattern"])
+        (missed if present else found).append(error["id"])
     return {
         "eval": "reviewer",
         "dir": str(corrected_dir),
@@ -266,6 +295,32 @@ def self_test():
     reviewer = score_reviewer(EVALS / "reviewer")
     if reviewer["trovati"] or len(reviewer["mancati"]) != 7:
         failures.append(f"reviewer: sulle fixture non corrette atteso 0/7, avuto {reviewer['score']}")
+
+    # Il falso negativo del 2026-08-06 (CANARY.md): un pattern che sopravvive
+    # solo dentro una confutazione esplicita deve contare come trovato, non
+    # come sopravvissuto. Fixture sintetica, un solo errore.
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_root = Path(tmp_dir)
+        expected_path = tmp_root / "expected.json"
+        expected_path.write_text(json.dumps({
+            "errors": [{
+                "id": "neg01", "file": "article.json", "class": "definizione",
+                "pattern": "quota di donne sul totale degli occupati",
+            }],
+        }), encoding="utf-8")
+        (tmp_root / "article.json").write_text(json.dumps({
+            "lead": "Non e' la quota di donne sul totale degli occupati: "
+                    "al denominatore c'e' la popolazione femminile.",
+            "sections": [],
+        }), encoding="utf-8")
+        negation = score_reviewer(tmp_root, expected_path=expected_path)
+        if negation["mancati"]:
+            failures.append(
+                "reviewer: una confutazione esplicita ('Non e' X') conta ancora come "
+                "errore sopravvissuto, il falso negativo del 2026-08-06 e' tornato"
+            )
 
     gold_as_verdicts = {
         row["id"]: row["label"]

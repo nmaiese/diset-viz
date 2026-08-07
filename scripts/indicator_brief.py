@@ -259,6 +259,7 @@ def build_brief(family, raw_id, level_key=None):
         first_values[key] = value
 
     annual_means = _annual_means(level["matrix"])
+    common_endpoints = _common_endpoints(level["matrix"], stats["year_min"], stats["year_max"])
 
     rows = []
     for position, row in enumerate(level["observations"], start=1):
@@ -281,8 +282,7 @@ def build_brief(family, raw_id, level_key=None):
         # Il confronto primo-ultimo anno sui soli territori comuni: serve quando
         # le due basi non coincidono, dove la variazione sulle medie intere e'
         # una sottrazione fra popolazioni diverse.
-        "endpoints_common": _common_endpoints(
-            level["matrix"], stats["year_min"], stats["year_max"]),
+        "endpoints_common": common_endpoints,
         # Both keyed on the level actually being briefed. Without it, asking for
         # `--level provincia` printed the state of the *regional* article: on a
         # two-level BES the brief said "lead scritto, quadro scritto" while the
@@ -290,7 +290,7 @@ def build_brief(family, raw_id, level_key=None):
         "article": build_article(meta["id"], level["key"]),
         "has_text": _text_for_level(meta["id"], level["key"]) is not None,
         "breaks": _distribution_breaks(rows),
-        "against_the_grain": _against_the_grain(rows, stats),
+        "against_the_grain": _against_the_grain(rows, stats, common_endpoints),
         # Always computed over the regions, whatever level is being briefed:
         # the sibling series are regional, so a provincial brief still gets the
         # relationships, stated as what they are.
@@ -329,13 +329,23 @@ def _distribution_breaks(rows, top=3):
     return gaps[:top]
 
 
-def _against_the_grain(rows, stats):
+def _against_the_grain(rows, stats, common=None):
     """Territories that moved opposite to the overall average movement.
 
     These are the counter-examples that stop a sentence like "it grew
     everywhere" from being written when it is not true.
+
+    `stats["avg_change_abs"]` sottrae la media dell'ultimo anno da quella del
+    primo, ciascuna sui territori che riportano *in quell'anno*: quando le due
+    basi non coincidono e' la differenza fra due popolazioni diverse, la stessa
+    cifra pericolosa che `_common_endpoints` esiste per evitare altrove nel
+    brief. `common["change"]`, quando c'e', e' calcolato sui soli territori
+    comuni ai due estremi ed e' sempre la cifra valida: la si preferisce ogni
+    volta che esiste, non solo quando le basi risultano diverse.
     """
-    overall = stats.get("avg_change_abs")
+    overall = (common or {}).get("change")
+    if overall is None:
+        overall = stats.get("avg_change_abs")
     if overall is None:
         return []
     moved = [row for row in rows if row["delta"] is not None]
@@ -723,8 +733,11 @@ def render(brief):
                         f"{stats['year_max']}: {_num(common['last_avg'])}   "
                         f"({_num(common['change'])} {meta['change_unit']})")
                 if common["gap_trend"] is not None:
-                    verb = "allargato" if common["gap_trend"] > 0 else "ristretto"
-                    line += f", divario {verb} di {_num(abs(common['gap_trend']))}"
+                    if common["gap_trend"] == 0:
+                        line += ", divario stabile"
+                    else:
+                        verb = "allargato" if common["gap_trend"] > 0 else "ristretto"
+                        line += f", divario {verb} di {_num(abs(common['gap_trend']))}"
                 add(line)
             else:
                 add("  nessun territorio presente in entrambi gli anni: "
@@ -732,8 +745,11 @@ def render(brief):
         for line in _means_lines(means):
             add(line)
         if not note and stats["gap_trend"] is not None:
-            verb = "allargato" if stats["gap_trend"] > 0 else "ristretto"
-            add(f"  il divario si e {verb} di {_num(abs(stats['gap_trend']))} {meta['change_unit']}")
+            if stats["gap_trend"] == 0:
+                add("  il divario e rimasto stabile")
+            else:
+                verb = "allargato" if stats["gap_trend"] > 0 else "ristretto"
+                add(f"  il divario si e {verb} di {_num(abs(stats['gap_trend']))} {meta['change_unit']}")
         if stats["highest_delta"]:
             add(f"  delta massimo   {stats['highest_delta']['name']}  {_num(stats['highest_delta']['delta'])}")
         if stats["lowest_delta"]:

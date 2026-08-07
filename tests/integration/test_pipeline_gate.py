@@ -321,6 +321,53 @@ class TheSignatureCheckReadsStateNotDiffLines(unittest.TestCase):
         self.assertTrue(check.ok, check.detail)
 
 
+class ATypoInRolesCoveredIsNotAnOmission(unittest.TestCase):
+    """Rilievo Codex sulla #171: un `roles_covered` con un ruolo sconosciuto
+    (refuso) rendeva esattamente le stesse sezioni di un'omissione voluta, e
+    niente lo segnalava prima che l'articolo raggiungesse la pagina pubblica.
+    A render time sollevare e' pericoloso (farebbe cadere ogni pagina gia'
+    pubblicata su un refuso storico), quindi il controllo vive qui, prima del
+    merge, dove la stringa grezza scritta dall'editor e' ancora leggibile.
+    """
+
+    def _check_over(self, entries, keys):
+        import unittest.mock as mock
+
+        original = pipeline_gate.changed_text_keys
+        pipeline_gate.changed_text_keys = lambda base=None, cwd=None, include_worktree=True: keys
+        try:
+            with mock.patch.object(indicator_store, "load_all", lambda root=None: entries):
+                return pipeline_gate.check_writer_roles()
+        finally:
+            pipeline_gate.changed_text_keys = original
+
+    def test_an_unknown_role_is_refused(self):
+        check = self._check_over({"178": {"roles_covered": ["quadro", "definizone"]}}, ["178"])
+        self.assertFalse(check.ok)
+        self.assertIn("178", check.detail)
+        self.assertIn("definizone", check.detail)
+
+    def test_the_four_known_roles_pass(self):
+        check = self._check_over(
+            {"178": {"roles_covered": ["definizione", "quadro", "dinamica", "limiti"]}}, ["178"]
+        )
+        self.assertTrue(check.ok, check.detail)
+
+    def test_a_missing_declaration_passes(self):
+        check = self._check_over({"178": {}}, ["178"])
+        self.assertTrue(check.ok, check.detail)
+
+    def test_an_empty_declaration_passes(self):
+        """`roles_covered: []` e' una dichiarazione valida (assorbe la
+        definizione), non un refuso."""
+        check = self._check_over({"178": {"roles_covered": []}}, ["178"])
+        self.assertTrue(check.ok, check.detail)
+
+    def test_a_run_that_touched_no_article_owes_no_check(self):
+        check = self._check_over({}, [])
+        self.assertTrue(check.ok, check.detail)
+
+
 class ChecksThatCannotRunAreNotPasses(unittest.TestCase):
     """The weakest thing a gate can do is report green because it looked away.
 
@@ -513,9 +560,9 @@ class InvariantDispatch(unittest.TestCase):
 
     def test_old_stages_are_unchanged(self):
         G = pipeline_gate
-        self.assertEqual(G.invariant_labels("writer", self._paths(G.INDICATOR_TEXTS)), ["vintage"])
+        self.assertEqual(G.invariant_labels("writer", self._paths(G.INDICATOR_TEXTS)), ["vintage", "roles"])
         self.assertEqual(G.invariant_labels("reviewer", self._paths(G.INDICATOR_TEXTS)),
-                         ["vintage", "signature"])
+                         ["vintage", "roles", "signature"])
         self.assertEqual(G.invariant_labels("hunter", self._paths(G.CANDIDATES)), ["triage"])
         self.assertEqual(G.invariant_labels("promoter", self._paths(G.CANDIDATES)), ["triage"])
         self.assertEqual(G.invariant_labels("curator", self._paths(G.CURATION)), ["curation"])
@@ -542,7 +589,7 @@ class InvariantDispatch(unittest.TestCase):
     def test_the_producer_composes_curation_vintage_and_signature(self):
         G = pipeline_gate
         labels = G.invariant_labels("producer", self._paths(G.CURATION, G.INDICATOR_TEXTS))
-        self.assertEqual(set(labels), {"curation", "vintage", "signature"})
+        self.assertEqual(set(labels), {"curation", "vintage", "roles", "signature"})
 
     def test_admissions_composes_the_triage(self):
         G = pipeline_gate
@@ -711,7 +758,7 @@ class TheReadingRegisterIsAppendOnly(unittest.TestCase):
             "sections": [{"role": "quadro", "h": None, "body": "Il quadro."}],
         }
         self._write_texts({"611": self.entry})
-        self.fingerprint = verification_queue.prose_fingerprint(self.entry)
+        self.fingerprint = self.reading_queue.reading_fingerprint(self.entry)
         self._write_register([self._row()])
         self._run("git", "add", "-A")
         self._run("git", "commit", "-qm", "base")

@@ -244,6 +244,23 @@ DUPLICATE_BES_IDS = {
     "SDG-310",   # Competenza numerica non adeguata (III media) -> territoriale 618
     "SDG-311",   # Competenza alfabetica non adeguata (III media) -> territoriale 617
 }
+
+# BES ids che esistono **solo** a livello provincia (assenti dal manifest
+# regione) ma il cui nome coincide con quello di un gemello regionale, BES o
+# territoriale. `app.indicator_notes.seo_title` appende una coda " per
+# regione" fissa a ogni titolo indipendentemente dal livello: senza un
+# qualificatore i due titoli collassano sullo stesso <title>, esattamente il
+# rilievo di Codex sulla #177 su `DUPLICATE_BES_IDS`, qui sulla dimensione
+# livello invece che fonte. Il fix corretto e' rendere `_TITLE_TAIL`
+# consapevole del livello per ogni indicatore; nel frattempo questo insieme
+# riusa lo stesso meccanismo di `source_qualifier` gia' in `views._render_indicator`.
+PROVINCE_ONLY_TITLE_COLLISIONS = {
+    "06POL012P",  # Affollamento degli istituti di pena -> gemello regionale 06POL012
+    "07SIC001P",  # Omicidi volontari -> gemello regionale 07SIC001
+    "10AMB017",   # Raccolta differenziata dei rifiuti urbani -> territoriale 52
+    "10AMB018P",  # Impermeabilizzazione del suolo da copertura artificiale -> gemello regionale 10AMB018
+    "10AMB024P",  # Rifiuti urbani prodotti -> gemello regionale 10AMB024
+}
 CATEGORY_NAME_TO_SLUG = {
     category["name"]: slug for slug, category in CANONICAL_CATEGORIES.items()
 }

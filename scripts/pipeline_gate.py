@@ -562,7 +562,7 @@ def check_curation_decisions(rows=None, cwd=None):
     return Check("curatela-direzionale", True, f"{len(rows)} decisioni, versi e date coerenti")
 
 
-def _prose_fingerprints(rows, resolved, cwd=None):
+def _prose_fingerprints(rows, resolved, cwd=None, fingerprint_fn=None):
     """Le impronte valide: quelle di adesso, piu' quelle della base.
 
     Le due versioni e non solo la prima, per la ragione spiegata in
@@ -571,7 +571,16 @@ def _prose_fingerprints(rows, resolved, cwd=None):
     `git show`, adesso sono trecentosessantacinque file e leggerli tutti a ogni
     verdetto renderebbe il cancello il passo piu' lento della catena per
     rispondere a una domanda su tre articoli.
+
+    `fingerprint_fn` di default e' `verification_queue.prose_fingerprint`
+    (ordinata per ruolo: al verificatore l'ordine delle sezioni non dice
+    niente). `check_readings` passa `reading_queue.reading_fingerprint`
+    invece, perche' il reader-editor giudica anche `structure`, dove l'ordine
+    e' proprio cio' che si giudica: le due code non possono condividere la
+    stessa impronta senza che una delle due smetta di vedere cio' che le
+    tocca.
     """
+    fingerprint_fn = fingerprint_fn or verification_queue.prose_fingerprint
     fingerprints = set()
     try:
         texts = verification_queue.load_texts(root=_indicators_root(cwd))
@@ -581,7 +590,7 @@ def _prose_fingerprints(rows, resolved, cwd=None):
         fingerprints.add((
             verification_queue.code_of(key),
             (entry.get("level") or "regione"),
-            verification_queue.prose_fingerprint(entry),
+            fingerprint_fn(entry),
         ))
     if not resolved:
         return fingerprints
@@ -596,7 +605,7 @@ def _prose_fingerprints(rows, resolved, cwd=None):
         fingerprints.add((
             verification_queue.code_of(key),
             (old.get("level") or "regione"),
-            verification_queue.prose_fingerprint(old),
+            fingerprint_fn(old),
         ))
     return fingerprints
 
@@ -802,7 +811,7 @@ def check_readings(base=None, cwd=None, include_worktree=True):
     if problems:
         return Check("letture", False, "; ".join(problems[:5]))
 
-    fingerprints = _prose_fingerprints(rows, resolved, cwd=cwd)
+    fingerprints = _prose_fingerprints(rows, resolved, cwd=cwd, fingerprint_fn=reading_queue.reading_fingerprint)
     if not fingerprints:
         return Check("letture", False, "testi illeggibili, impossibile verificare le impronte")
 
@@ -832,7 +841,7 @@ def check_readings(base=None, cwd=None, include_worktree=True):
             "letture", False,
             f"impronta della prosa che non corrisponde a nessuna versione di "
             f"{', '.join(drifted[:5])}, ne' quella di adesso ne' quella della base. "
-            "Ricalcolala con reading_queue.prose_fingerprint invece di scriverla.",
+            "Ricalcolala con reading_queue.reading_fingerprint invece di scriverla.",
         )
 
     revise = sum(1 for r in rows if (r.get("verdict") or "").strip() == "revise")
@@ -1044,6 +1053,37 @@ def check_writer_vintage(base=None, cwd=None, include_worktree=True):
     return Check("vintage", True, f"{len(keys)} articoli toccati, nessun vintage oltre i dati")
 
 
+def check_writer_roles(base=None, cwd=None, include_worktree=True):
+    """`roles_covered` e' un filtro sui quattro ruoli noti, non un vocabolario
+    nuovo: `app.indicator_texts.emitted_roles` ignora in silenzio ogni stringa
+    che non riconosce, perche' a render time sollevare farebbe cadere ogni
+    pagina gia' pubblicata su un refuso storico. Ma quel silenzio a render time
+    ha un costo altrove: un refuso (`dinamicha` per `dinamica`, o peggio
+    `definizone` per `definizione`, l'unico ruolo omettibile) produce esattamente
+    lo stesso risultato di un'omissione voluta, e nessuna run futura puo'
+    distinguere "l'editor non voleva la definizione" da "l'editor ha sbagliato a
+    scriverla". Qui, prima del merge, e' l'ultimo punto in cui il refuso e
+    l'omissione sono ancora distinguibili, perche' qui c'e' ancora la stringa
+    grezza scritta dall'editor.
+    """
+    keys = changed_text_keys(base, cwd=cwd, include_worktree=include_worktree)
+    if not keys:
+        return Check("roles", True, "nessun articolo modificato")
+    entries = indicator_store.load_all(root=_indicators_root(cwd))
+    bad = []
+    for key in keys:
+        entry = entries.get(key) or {}
+        declared = entry.get("roles_covered")
+        if not isinstance(declared, (list, tuple)):
+            continue
+        unknown = sorted({role for role in declared if role not in verification_queue.DEFAULT_ARTICLE_ROLES})
+        if unknown:
+            bad.append(f"{key} ({', '.join(unknown)})")
+    if bad:
+        return Check("roles", False, f"roles_covered con ruoli sconosciuti: {', '.join(bad[:5])}")
+    return Check("roles", True, f"{len(keys)} articoli toccati, nessun ruolo sconosciuto in roles_covered")
+
+
 def _python():
     venv = PROJECT_ROOT / ".venv" / "bin" / "python"
     return str(venv) if venv.exists() else sys.executable
@@ -1164,6 +1204,7 @@ def invariant_labels(stage, paths):
         labels.append("curation")
     if touched(INDICATOR_TEXTS):
         labels.append("vintage")
+        labels.append("roles")
         if stage in ROLES_THAT_SIGN:
             labels.append("signature")
     if touched(VERIFICATIONS):
@@ -1203,6 +1244,7 @@ def run(stage, base=None, skip_tests=False, cwd=None, committed_only=False):
         "triage": lambda: check_hunter_decisions(cwd=cwd),
         "curation": lambda: check_curation_decisions(cwd=cwd),
         "vintage": lambda: check_writer_vintage(base, cwd=cwd, include_worktree=iw),
+        "roles": lambda: check_writer_roles(base, cwd=cwd, include_worktree=iw),
         "signature": lambda: check_reviewer_signature(base, cwd=cwd, include_worktree=iw),
         "verifications": lambda: check_verifications(base, cwd=cwd, include_worktree=iw),
         "readings": lambda: check_readings(base, cwd=cwd, include_worktree=iw),

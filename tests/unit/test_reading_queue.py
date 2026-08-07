@@ -2,9 +2,11 @@
 
 Il reader-editor non corregge niente, come il verificatore, quindi tutto quello
 che si puo' sbagliare sta in due posti: la regola che decide **quando una lettura
-copre ancora la prosa** (l'impronta, riusata dal verificatore) e i controlli che
-decidono **quando una riga di lettura si puo' credere**. Piu' il freno K-round,
-che e' l'unica logica nuova di questo modulo. Tutto su dati sintetici.
+copre ancora la prosa** (`reading_fingerprint`, sensibile all'ordine delle
+sezioni a differenza di quella del verificatore, perche' `structure` e' uno dei
+criteri) e i controlli che decidono **quando una riga di lettura si puo'
+credere**. Piu' il freno K-round, che e' l'unica logica nuova di questo modulo.
+Tutto su dati sintetici.
 """
 
 from __future__ import annotations
@@ -12,7 +14,6 @@ from __future__ import annotations
 import unittest
 
 from scripts import reading_queue as rq
-from scripts import verification_queue as vq
 
 
 def _entry(lead="Un lead che apre sulla geografia.", **extra):
@@ -45,7 +46,7 @@ def _reading(entry, code="ter-611", verdict="pass", hard_failures=None, note=Non
         "level": entry.get("level") or "regione",
         "at": "2026-08-01",
         "reviewed_at": entry.get("reviewed_at", ""),
-        "prosa": vq.prose_fingerprint(entry),
+        "prosa": rq.reading_fingerprint(entry),
         "verdict": verdict,
         "hard_failures": hard_failures or [],
         "note": note,
@@ -112,6 +113,19 @@ class TheReadingCoversAText(unittest.TestCase):
         stale = _reading(old, verdict="pass")
         new = _entry(lead="Lead riscritto per leggibilita'.")
         rows = rq.build_queue({"611": new}, [stale])
+        self.assertEqual(rows[0]["status"], "unread")
+
+    def test_reordering_sections_does_not_cover_the_new_order(self):
+        """Rilievo Codex: il verificatore ordina le sezioni per ruolo apposta
+        (l'ordine non gli dice niente), ma il reader-editor giudica anche
+        `structure`, dove l'ordine e' proprio cio' che si giudica. Una
+        riscrittura di sola struttura deve far scadere la lettura, non restare
+        invisibile all'impronta condivisa col verificatore."""
+        original = _entry()
+        stale = _reading(original, verdict="revise")
+        reordered = _entry()
+        reordered["sections"] = list(reversed(reordered["sections"]))
+        rows = rq.build_queue({"611": reordered}, [stale])
         self.assertEqual(rows[0]["status"], "unread")
 
 
@@ -260,13 +274,13 @@ class TheStoreRoundTrips(unittest.TestCase):
             loaded = rq.load_readings(tmp)
             self.assertEqual(len(loaded), 1)
             self.assertEqual(loaded[0]["verdict"], "revise")
-            self.assertEqual(loaded[0]["prosa"], vq.prose_fingerprint(entry))
+            self.assertEqual(loaded[0]["prosa"], rq.reading_fingerprint(entry))
 
     def test_the_file_name_is_the_three_key_fields(self):
         entry = _entry()
         row = _reading(entry)
         name = rq.reading_name(row)
-        self.assertEqual(name, f"ter-611__regione__{vq.prose_fingerprint(entry)}.json")
+        self.assertEqual(name, f"ter-611__regione__{rq.reading_fingerprint(entry)}.json")
 
 
 if __name__ == "__main__":
