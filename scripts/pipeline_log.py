@@ -6,10 +6,10 @@ durata della run non lasciano nessuna traccia: l'unico segno che qualcosa e'
 successo arriva alla fine, sotto forma di commit o di pull request. Se una run
 non produce niente (coda vuota, cancello che blocca, agente che si ferma a
 meta') non resta assolutamente nulla da leggere, e la domanda "che cosa ha fatto
-stanotte il revisore" non ha risposta. Peggio: una Routine che gira e non
+stanotte il verificatore" non ha risposta. Peggio: una Routine che gira e non
 produce ha lo stesso aspetto di una Routine che non e' mai partita, ed e'
-esattamente cosi' che lo scrittore ha lavorato per settimane su un file morto
-senza che nessuno se ne accorgesse.
+esattamente cosi' che uno degli agenti di scrittura ha lavorato per settimane su
+un file morto senza che nessuno se ne accorgesse.
 
 Il diario e' la risposta. Ogni agente, alla fine della run, registra qui che
 cosa ha fatto, **anche quando non ha prodotto niente**, che e' il caso in cui
@@ -47,17 +47,18 @@ Il `run_id` toglie il problema alla radice: lo conia chi scrive la prima riga,
 lo stampa, e l'agente lo passa al passo di merge. Non dipende da niente che
 succeda dopo.
 
-    python3 scripts/pipeline_log.py                    # la timeline
-    python3 scripts/pipeline_log.py --stage writer     # un agente solo
+    python3 scripts/pipeline_log.py                      # la timeline
+    python3 scripts/pipeline_log.py --stage verificatore # un agente solo
+    python3 scripts/pipeline_log.py --stage writer       # uno storico: si legge, non si scrive
     python3 scripts/pipeline_log.py --json
 
     # quello che scrive un agente alla fine della sua run
     python3 scripts/pipeline_log.py --write \\
-        --stage reviewer --outcome pr-open \\
-        --summary "5 articoli riletti, 2 correzioni causali" \\
-        --detail "eur-rd_e_gerdreg: tolta la domanda retorica" \\
+        --stage verificatore --outcome pr-open \\
+        --summary "5 articoli verificati, 2 smentite" \\
+        --detail "eur-rd_e_gerdreg: la posizione in graduatoria non regge" \\
         --gate auto --queue-before 41 --queue-after 36
-    # stampa: run_id: reviewer-20260727T110207Z-a3f1
+    # stampa: run_id: verificatore-20260727T110207Z-a3f1
 
 Stdlib puro come il resto della catena.
 """
@@ -79,15 +80,27 @@ from scripts import pipeline_gate  # noqa: E402  (path bootstrap above)
 
 # Dove scrive chi registra una run: un file per run, mai contendibile.
 RUNS_DIR = PROJECT_ROOT / "data" / "pipeline" / "runs"
-# Gli stadi che il cancello conosce (`pipeline_gate.STAGE_PATHS`), piu' `launch`,
-# il battito del lanciatore. `launch` non e' uno stadio del cancello: non ha
-# perimetro, non apre pull request e non passa dal cancello. Registra pero' un
-# tick per volta, ed e' quella riga a rendere misurabile il silenzio della
-# catena senza dover ricopiare qui il cron delle Routine. Si deriva da
-# STAGE_PATHS invece di riscriverla a mano: cosi' `build_entry` accetta ogni
-# stadio che il cancello sa fondere (produttore, ammissione, publisher inclusi),
-# e un ruolo nuovo non torna a crashare il passo di merge dopo che ha gia' fuso.
+# Gli stadi che si possono **scrivere**: quelli che il cancello conosce
+# (`pipeline_gate.STAGE_PATHS`), piu' `launch`, il battito del lanciatore.
+# `launch` non e' uno stadio del cancello: non ha perimetro, non apre pull
+# request e non passa dal cancello. Registra pero' un tick per volta, ed e'
+# quella riga a rendere misurabile il silenzio della catena senza ricopiare qui
+# il cron delle Routine. Si deriva da STAGE_PATHS invece di riscriverla a mano,
+# cosi' un ruolo nuovo non torna a crashare il passo di merge dopo che ha gia'
+# fuso.
 STAGES = tuple(sorted(pipeline_gate.STAGE_PATHS)) + ("launch",)
+
+# Gli stadi che si possono **leggere**: i vivi piu' quelli che il diario porta
+# nella sua storia. Sono due insiemi diversi apposta, e confonderli rompe una
+# delle due direzioni. Dopo la demolizione il cancello conosce tre perimetri, ma
+# in `data/pipeline/runs/` restano quaranta run `producer`, otto `writer`, nove
+# `scout` e le `legacy-*` della catena ancora precedente: derivare le scelte di
+# lettura dai soli stadi vivi renderebbe **illeggibile la meta' del diario**,
+# cioe' butterebbe la storia per aver cancellato del codice.
+HISTORICAL_STAGES = STAGES + (
+    "scout", "hunter", "promoter", "curator", "writer", "reviewer", "producer",
+    "legacy-writer", "legacy-reviewer", "legacy-hunter", "legacy-verificatore",
+)
 
 # Come e' finita una run. Il vocabolario e' corto di proposito: un campo libero
 # si riempirebbe di sinonimi e diventerebbe illeggibile in aggregato.
@@ -127,29 +140,46 @@ ATTENTION = {"blocked", "stopped", "error"}
 #
 # Le attese per stadio restano, ma valgono **solo a coda piena**: `silence` le
 # applica se gli si passano le code, e uno stadio zitto con la coda a zero
-# risulta `idle`, non in ritardo. Segnalare fermo il curatore perche' non c'e'
-# niente da curare e' il modo piu' sicuro di insegnare a ignorare gli avvisi.
+# risulta `idle`, non in ritardo. Segnalare fermo uno stadio perche' non ha
+# niente da fare e' il modo piu' sicuro di insegnare a ignorare gli avvisi.
 #
-# Cacciatore e promotore condividono un agente solo: chiude su `hunter` se non
-# ha promosso niente e su `promoter` se ha promosso, quindi ci si aspetta una
-# riga dall'uno **o** dall'altro, mai da tutti e due.
+# **Un gruppo si chiama come cio' che sorveglia, mai come un personaggio.** Ce
+# n'erano sette con nomi italiani inventati (`lanciatore`, `cacciatore`,
+# `curatore`, `scrittore`, `revisore`) che non corrispondevano a nessun agente e
+# a nessun ruolo, quindi chi leggeva un avviso sul cruscotto doveva tenere a
+# mente una mappa per sapere quale run andasse aperta. Adesso sono quattro e
+# portano il nome dello stadio, che e' anche il nome dell'agente
+# (`.claude/agents/<stadio>.md`) per i tre che ne hanno uno.
+#
+# I nomi vecchi restano leggibili nel diario storico via `HISTORICAL_STAGES`:
+# quello che sparisce e' il gruppo che li **aspettava**, perche' un gruppo che
+# aspetta una run che nessuno puo' piu' aprire segnala fermo per sempre.
 WATCH_GROUPS = (
-    # Il reader-editor sta qui con gli altri ruoli che il lanciatore lancia:
-    # `queue_sizes()` non produce una chiave sua (la sua coda e' l'assenza di
-    # letture, non uno stadio contato), e la sua cadenza e' da arretrato, non
-    # giornaliera, quindi un gruppo a coda piena lo segnalerebbe fermo ogni volta
-    # che non c'e' niente da leggere.
-    ("lanciatore", ("launch", "admissions", "producer", "reader-editor"), 1),
-    ("scout", ("scout",), 7),
-    ("cacciatore", ("hunter", "promoter"), 7),
-    ("curatore", ("curator",), 7),
-    ("scrittore", ("writer",), 7),
-    ("revisore", ("reviewer",), 1),
-    # Il verificatore gira dietro al revisore, quindi la sua attesa e' la
-    # stessa: se il revisore firma ogni giorno, ogni giorno c'e' qualcosa da
-    # provare a far cadere.
+    # Non e' uno stadio con un agente: e' il battito di `pipeline_launch.py`,
+    # ed e' per questo che sta in `SENZA_CODA` qui sotto.
+    ("launch", ("launch",), 1),
+    ("admissions", ("admissions",), 1),
+    # La sua coda e' l'assenza di letture, non uno stadio che `queue_sizes()`
+    # conta: `waiting` resta `None` e il gruppo non diventa mai `idle`. E'
+    # voluto, ed e' anche il motivo per cui non serve piu' un caso speciale in
+    # `silence` (vedi li').
+    ("reader-editor", ("reader-editor",), 1),
+    # L'unico gruppo la cui coda `queue_sizes()` conta davvero, perche'
+    # `verificatore` e' la sola voce di `WATCH_GROUPS` che compare anche in
+    # `pipeline_status.STAGE_ORDER`. Girava dietro al revisore, adesso dietro
+    # all'officina: se esce un articolo al giorno, ogni giorno c'e' qualcosa da
+    # far cadere.
     ("verificatore", ("verificatore",), 1),
 )
+
+# Gli stadi il cui silenzio non si interpreta con una coda. `launch` non e' uno
+# stadio con un agente: e' il battito di `pipeline_launch.py`, e quando tace non
+# c'e' niente da dedurre da quanto lavoro ci sarebbe stato, e' proprio lui a non
+# essere partito. Sta qui e non dentro `silence` perche' e' una proprieta' dello
+# stadio, non del gruppo che lo contiene: scritto come confronto col **nome** di
+# un gruppo (`name != "lanciatore"`) sarebbe sparito al primo rename, che e'
+# quello che stava per succedere.
+SENZA_CODA = ("launch",)
 # Una run saltata non e' una catena rotta. Due si'.
 GRACE = 2.5
 
@@ -629,18 +659,20 @@ def silence(entries, today=None, queues=None):
         last = max(stamps) if stamps else ""
         days = _days_since(last, today)
         late = days is not None and days > expected * GRACE
-        # Il lanciatore non ha una coda, ha un battito: quando tace non c'e'
-        # niente da interpretare, e' proprio lui a non essere partito.
-        #
-        # Una coda che nessuno ha potuto contare (`None`, che capita ai due
-        # stadi che hanno bisogno del view model) resta `None` e **non** diventa
-        # zero. Sommandola a zero, uno stadio zitto da un mese con la coda
-        # incalcolabile risultava `idle`, cioe' "tace perche' non ha niente da
-        # fare", che e' l'opposto di quello che si sa: non si sa niente. E'
+        # Una coda che nessuno ha potuto contare (`None`) resta `None` e **non**
+        # diventa zero. Sommandola a zero, uno stadio zitto da un mese con la
+        # coda incalcolabile risultava `idle`, cioe' "tace perche' non ha niente
+        # da fare", che e' l'opposto di quello che si sa: non si sa niente. E'
         # la stessa scelta che fa `pipeline_status`, dove una coda non contata
         # vale come lavoro e non come lavoro finito.
+        #
+        # L'esenzione si legge da `SENZA_CODA`, non dal nome del gruppo. Era
+        # scritta `name != "lanciatore"`, cioe' una proprieta' del battito
+        # travestita da confronto con un personaggio: rinominare il gruppo
+        # l'avrebbe tolta in silenzio, ed e' precisamente quello che stava per
+        # succedere.
         waiting = None
-        if queues is not None and name != "lanciatore":
+        if queues is not None and not set(stages) & set(SENZA_CODA):
             counts = [queues.get(s) for s in stages]
             if all(c is not None for c in counts):
                 waiting = sum(int(c) for c in counts)
@@ -652,8 +684,9 @@ def silence(entries, today=None, queues=None):
             "days_since": None if days is None else round(days, 1),
             "waiting": waiting,
             # Mai registrata una run non e' "in ritardo", e' "non ancora vista":
-            # dire che il revisore e' fermo da sempre il giorno in cui nasce il
-            # diario sarebbe un falso allarme che insegna a ignorare gli allarmi.
+            # dire che il verificatore e' fermo da sempre il giorno in cui nasce
+            # il diario sarebbe un falso allarme che insegna a ignorare gli
+            # allarmi.
             "stale": late and (waiting is None or waiting > 0),
             # Zitto perche' non ha niente da fare. E' una risposta, non un
             # guasto, e tenerla distinta e' cio' che permette all'avviso di
@@ -740,7 +773,8 @@ def _print_timeline(entries, limit, queues=None):
 
 def main():
     parser = argparse.ArgumentParser(description="Il diario della catena: chi ha girato, quando, con che esito.")
-    parser.add_argument("--stage", choices=STAGES, help="un solo stadio")
+    parser.add_argument("--stage", choices=HISTORICAL_STAGES,
+                        help="un solo stadio, anche uno storico")
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--json", action="store_true")
     write = parser.add_argument_group("scrittura (la usa l'agente a fine run)")

@@ -50,7 +50,7 @@ Per guardare la catena senza aprire file:
 python3 scripts/pipeline_monitor.py            # dov'e' fermo e perche', in una schermata (nell'app: /_pipeline)
 python3 scripts/pipeline_launch.py             # cosa lanciare adesso, e in che ordine (per-indicatore)
 python3 scripts/practice_timeline.py           # la storia per indicatore (il dossier, read-only)
-python3 scripts/pipeline_status.py             # le code per (vecchio) stadio, ancora usate dal lanciatore
+python3 scripts/pipeline_status.py             # le code per (vecchio) stadio, ancora lette da pipeline_launch.py
 ```
 
 ## What this is

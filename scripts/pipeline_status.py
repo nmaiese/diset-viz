@@ -48,8 +48,15 @@ STAGE_ORDER = ["scout", "hunter", "promoter", "curator", "writer", "reviewer",
 
 # Il ruolo che oggi copre ogni vecchio stadio, dopo la fusione in tre ruoli. Le
 # code restano per (vecchio) stadio, perche' i loro lettori sono deterministici e
-# distinti; l'etichetta dice chi le lavora adesso (ammissione = scout+hunter+
-# promoter, produttore = curator+writer+reviewer, verificatore invariato).
+# distinti; l'etichetta dice chi le lavora adesso (`admissions` = scout + hunter
+# + promoter, `producer` = curator + writer + reviewer, ed e' l'officina, non un
+# agente; il verificatore copre se stesso).
+#
+# Questa mappa **resta** anche dopo che ruolo e agente hanno lo stesso nome
+# (vedi `pipeline_launch.target`), perche' non e' un'identita': traduce il
+# vocabolario storico delle code in quello dei ruoli vivi. Le uniche due voci
+# che sarebbero identita' sono anche le uniche che il vocabolario non ha
+# rinominato.
 AGENT_OF = {
     "scout": "admissions",
     "hunter": "admissions",
@@ -57,7 +64,7 @@ AGENT_OF = {
     "curator": "producer",
     "writer": "producer",
     "reviewer": "producer",
-    "verificatore": "indicator-verifier",
+    "verificatore": "verificatore",
 }
 
 

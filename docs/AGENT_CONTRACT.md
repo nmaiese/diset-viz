@@ -109,7 +109,7 @@ Sei gia' nel tuo worktree, sul branch della run (passo 1). Committa **senza** il
 trailer `Co-Authored-By`, poi:
 
 ```bash
-python3 scripts/pipeline_gate.py --stage <scout|hunter|promoter|curator|writer|reviewer|verificatore>
+python3 scripts/pipeline_gate.py --stage <admissions|verificatore|reader-editor>
 ```
 
 Il verdetto porta un `merge`. **Non eseguire tu il merge**: apri la pull request
@@ -351,22 +351,34 @@ quale esito. Una PR vuota a settimana e' rumore che insegna a non leggere le PR.
 
 ## 6. Il perimetro, stadio per stadio
 
-Scritto in `scripts/pipeline_gate.py:STAGE_PATHS`, che e' l'unica versione che
-conta. Qui per comodita':
+**Sta in `scripts/pipeline_gate.py:STAGE_PATHS`, e non c'e' una copia.** Ce n'era
+una qui, introdotta "per comodita'", e ha fatto quello che fanno le copie: e'
+rimasta ferma mentre il codice andava avanti. Elencava sette perimetri, sei dei
+quali di stadi cancellati, e ne dava due su `content/indicators/`, che oggi non
+e' di nessuno. Un contratto che riassume male il cancello e' peggio di un
+contratto che non lo nomina, perche' viene creduto.
 
-| stadio | puo' scrivere in |
-| --- | --- |
-| `scout` | `data/discovery/source_candidates.csv`, `config/istat_series.yaml` |
-| `hunter` | `data/discovery/candidates.csv` |
-| `promoter` | la coda piu' il layer esterno e il manifest |
-| `curator` | `data/discovery/curation.csv`, layer esterno, manifest, descrizioni curate |
-| `writer` | `content/indicators/` |
-| `reviewer` | `content/indicators/` |
-| `verificatore` | `data/pipeline/verifiche/`, **e non i testi** |
+Per vederlo, dalla radice del repo:
 
-Ogni stadio puo' inoltre scrivere `data/pipeline/runs/`, il diario, e va
-committato con il resto: un prompt che ti dice "il tuo perimetro e' una cosa
-sola" sta riassumendo male.
+```bash
+python3 - <<'FINE'
+import sys; sys.path.insert(0, ".")
+from scripts import pipeline_gate
+for stadio, percorsi in sorted(pipeline_gate.STAGE_PATHS.items()):
+    print(stadio, "->", ", ".join(percorsi))
+FINE
+```
+
+Il cancello lo ristampa comunque a ogni rifiuto, nominando il percorso fuori
+perimetro: se non sei sicuro, provaci e leggi la ragione.
+
+Due cose che il dizionario non dice a voce e che valgono sempre. La prima: ogni
+stadio puo' scrivere `data/pipeline/runs/`, il diario, e va committato con il
+resto: un prompt che ti dice "il tuo perimetro e' una cosa sola" sta riassumendo
+male. La seconda: **`content/indicators/` non e' nel perimetro di nessuno**. Gli
+articoli li scrive l'officina (`.claude/workflows/produci-indicatori.js`), che
+non e' una run, non apre pull request e ha il proprio cancello in
+`officina/lint.py`.
 
 Le voci che finiscono con una barra sono directory, e il perimetro le tratta
 come prefissi. La barra e' quello che gli impedisce di allargarsi: dentro

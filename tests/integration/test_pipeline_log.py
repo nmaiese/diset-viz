@@ -16,8 +16,9 @@ import sys
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest import mock
 
-from scripts import pipeline_dashboard, pipeline_log
+from scripts import pipeline_dashboard, pipeline_log, pipeline_status
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -29,7 +30,7 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             path = Path(tmp) / "runs.jsonl"
             pipeline_log.append(
-                pipeline_log.build_entry("curator", "nothing", "coda vuota, niente da curare"),
+                pipeline_log.build_entry("admissions", "nothing", "coda vuota, niente da curare"),
                 path=path,
             )
             entries = pipeline_log.read_journal(path)
@@ -51,7 +52,7 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
                 "started_at": "2026-07-27T06:00:00+00:00",
             }), encoding="utf-8")
             with mock.patch.object(pipeline_log, "SESSION_META", meta):
-                entry = pipeline_log.build_entry("writer", "nothing", "x")
+                entry = pipeline_log.build_entry("verificatore", "nothing", "x")
         self.assertEqual(entry["session_id"], "sess-prova")
         self.assertIsInstance(entry["duration_seconds"], int)
         self.assertGreaterEqual(entry["duration_seconds"], 0)
@@ -76,7 +77,7 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
 
         with TemporaryDirectory() as tmp:
             with mock.patch.object(pipeline_log, "SESSION_META", Path(tmp) / "assente.json"):
-                entry = pipeline_log.build_entry("writer", "nothing", "x")
+                entry = pipeline_log.build_entry("verificatore", "nothing", "x")
         self.assertNotIn("session_id", entry)
         self.assertNotIn("duration_seconds", entry)
 
@@ -86,32 +87,70 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         with self.assertRaises(SystemExit):
             pipeline_log.build_entry("giornalista", "nothing", "x")
         with self.assertRaises(SystemExit):
-            pipeline_log.build_entry("writer", "andata-benino", "x")
+            pipeline_log.build_entry("verificatore", "andata-benino", "x")
+
+    def test_a_demolished_stage_can_be_read_but_never_written_again(self):
+        """`STAGES` e `HISTORICAL_STAGES` sono due insiemi diversi apposta, e
+        finora **nessuna riga della suite** guardava la differenza.
+
+        Scrivere una run `writer` non si puo' piu': quello stadio non ha un
+        agente, non ha un perimetro nel cancello, e una riga nuova col suo nome
+        sarebbe una run che nessuno ha aperto. Rileggere le run gia' scritte
+        invece si deve: in `data/pipeline/runs/` ce ne sono quaranta `producer`,
+        otto `writer` e nove `scout`, e derivare anche le scelte di **lettura**
+        dai soli stadi vivi renderebbe illeggibile meta' del diario, cioe'
+        butterebbe la storia per aver cancellato del codice.
+
+        Il modo in cui la separazione regredisce e' banale: qualcuno deriva
+        `--stage choices` da `STAGES` perche' sembra il piu' stretto dei due.
+        """
+        for morto in ("writer", "reviewer", "producer", "scout"):
+            self.assertIn(morto, pipeline_log.HISTORICAL_STAGES, morto)
+            self.assertNotIn(morto, pipeline_log.STAGES, morto)
+            with self.assertRaises(SystemExit, msg=morto):
+                pipeline_log.build_entry(morto, "merged", "x")
+
+    def test_the_history_written_by_the_demolished_stages_still_reads(self):
+        """La prova che la lettura regge, sulle righe vere e non su un elenco di
+        nomi: due righe `producer` con lo stesso `run_id` collassano in una run
+        sola, come farebbero oggi quelle di uno stadio vivo."""
+        rows = [
+            {"at": "2026-07-29T10:10:10+00:00", "stage": "producer", "outcome": "pr-open",
+             "summary": "scritto ter-1", "run_id": "producer-20260729T101010Z-abcd",
+             "pr": "77", "commit": "aaa1111", "branch": "automation/producer-2026-07-29"},
+            {"at": "2026-07-29T10:40:00+00:00", "stage": "producer", "outcome": "merged",
+             "summary": "PR #77 fusa", "run_id": "producer-20260729T101010Z-abcd",
+             "pr": "77", "commit": "bbb2222", "branch": "master"},
+        ]
+        collassate = pipeline_log.collapse_runs(rows)
+        self.assertEqual(len(collassate), 1)
+        self.assertEqual(collassate[0]["outcome"], "merged")
+        self.assertEqual(pipeline_log.summarize(collassate)["producer"]["runs"], 1)
 
     def test_a_corrupt_line_does_not_hide_the_rest(self):
         """E' un registro, non uno schema: la riga dopo vale ancora."""
         with TemporaryDirectory() as tmp:
             path = Path(tmp) / "runs.jsonl"
             path.write_text(
-                '{"stage":"writer","outcome":"merged","summary":"ok","at":"2026-07-01T00:00:00"}\n'
+                '{"stage":"verificatore","outcome":"merged","summary":"ok","at":"2026-07-01T00:00:00"}\n'
                 "{ questa riga e rotta\n"
-                '{"stage":"reviewer","outcome":"nothing","summary":"niente","at":"2026-07-02T00:00:00"}\n',
+                '{"stage":"verificatore","outcome":"nothing","summary":"niente","at":"2026-07-02T00:00:00"}\n',
                 encoding="utf-8",
             )
             entries = pipeline_log.read_journal(path)
         self.assertEqual(len(entries), 3)
-        self.assertEqual(entries[2]["stage"], "reviewer")
+        self.assertEqual(entries[2]["stage"], "verificatore")
 
     def test_the_summary_flags_the_runs_worth_looking_at(self):
         with TemporaryDirectory() as tmp:
             path = Path(tmp) / "runs.jsonl"
             for outcome in ("merged", "nothing", "blocked", "stopped"):
                 pipeline_log.append(
-                    pipeline_log.build_entry("writer", outcome, f"run {outcome}"), path=path
+                    pipeline_log.build_entry("verificatore", outcome, f"run {outcome}"), path=path
                 )
             state = pipeline_log.summarize(pipeline_log.read_journal(path))
-        self.assertEqual(state["writer"]["runs"], 4)
-        self.assertEqual(state["writer"]["attention"], 2, "blocked e stopped, non merged ne nothing")
+        self.assertEqual(state["verificatore"]["runs"], 4)
+        self.assertEqual(state["verificatore"]["attention"], 2, "blocked e stopped, non merged ne nothing")
 
     def test_nothing_is_not_a_problem(self):
         """Una coda vuota e' la risposta giusta, non un allarme: se finisse fra i
@@ -123,8 +162,8 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         """Due run non si sovrascrivono: e' JSON per riga proprio per questo."""
         with TemporaryDirectory() as tmp:
             path = Path(tmp) / "runs.jsonl"
-            pipeline_log.append(pipeline_log.build_entry("hunter", "nothing", "prima"), path=path)
-            pipeline_log.append(pipeline_log.build_entry("hunter", "merged", "seconda"), path=path)
+            pipeline_log.append(pipeline_log.build_entry("admissions", "nothing", "prima"), path=path)
+            pipeline_log.append(pipeline_log.build_entry("admissions", "merged", "seconda"), path=path)
             entries = pipeline_log.read_journal(path)
         self.assertEqual([e["summary"] for e in entries], ["prima", "seconda"])
 
@@ -144,27 +183,50 @@ class SilenceIsTheFailureNobodySees(unittest.TestCase):
         return next(r for r in rows if r["group"] == name)
 
     def test_a_daily_stage_quiet_for_a_week_is_flagged(self):
-        rows = pipeline_log.silence([self.entry("reviewer", 7)])
-        self.assertTrue(self.group(rows, "revisore")["stale"])
+        rows = pipeline_log.silence([self.entry("verificatore", 7)])
+        self.assertTrue(self.group(rows, "verificatore")["stale"])
 
     def test_a_daily_stage_that_skipped_one_day_is_not_flagged(self):
         """Con la grazia troppo stretta l'allarme suona ogni settimana per
         niente, e un allarme che suona sempre non e' un allarme."""
-        rows = pipeline_log.silence([self.entry("reviewer", 2)])
-        self.assertFalse(self.group(rows, "revisore")["stale"])
+        rows = pipeline_log.silence([self.entry("verificatore", 2)])
+        self.assertFalse(self.group(rows, "verificatore")["stale"])
 
-    def test_a_weekly_stage_quiet_for_ten_days_is_not_yet_late(self):
-        rows = pipeline_log.silence([self.entry("curator", 10)])
-        self.assertFalse(self.group(rows, "curatore")["stale"])
+    def test_the_grace_is_what_separates_a_skip_from_a_stop(self):
+        """La grazia misurata su una cadenza qualunque, non sui giorni dei
+        gruppi di oggi.
 
-    def test_the_hunter_and_the_promoter_are_one_routine(self):
-        """Chiude su `promoter` se ha promosso e su `hunter` se no, mai su tutti
-        e due: contarli separatamente segnalerebbe fermo l'uno ogni volta che
-        lavora l'altro."""
-        rows = pipeline_log.silence([self.entry("promoter", 1)])
-        group = self.group(rows, "cacciatore")
+        C'era un test che la provava su un gruppo settimanale (`curatore`,
+        cadenza 7): fermo da dieci giorni, non ancora in ritardo. Quel gruppo
+        non esiste piu' e nessuno dei quattro rimasti ha una cadenza diversa da
+        1, quindi la proprieta' non aveva piu' dove appoggiarsi. Provarla su un
+        `WATCH_GROUPS` finto e' l'unico modo di non perderla: `GRACE` e' il
+        numero che decide se un allarme suona, e nessun'altra riga della suite
+        lo guarda."""
+        finto = (("finto", ("verificatore",), 7),)
+        with mock.patch.object(pipeline_log, "WATCH_GROUPS", finto):
+            entro = pipeline_log.silence([self.entry("verificatore", 10)])
+            oltre = pipeline_log.silence([self.entry("verificatore", 20)])
+        self.assertFalse(self.group(entro, "finto")["stale"], "7 * 2.5 = 17,5 giorni")
+        self.assertTrue(self.group(oltre, "finto")["stale"])
+
+    def test_the_admissions_stage_is_one_group_even_if_it_was_three(self):
+        """Scout, cacciatore e promotore erano tre gruppi per un agente solo, e
+        chiudeva su uno dei tre a seconda di come era andata: contarli separati
+        segnalava fermo l'uno ogni volta che lavorava l'altro. Adesso e' un
+        gruppo perche' e' un agente, e il caso non e' piu' costruibile."""
+        rows = pipeline_log.silence([self.entry("admissions", 1)])
+        group = self.group(rows, "admissions")
         self.assertFalse(group["stale"])
         self.assertFalse(group["never"])
+
+    def test_a_group_is_named_after_what_it_watches(self):
+        """Niente piu' personaggi. Un avviso deve dire quale run aprire, e per
+        farlo deve chiamarsi come lo stadio, che e' anche il nome dell'agente
+        per i tre che ne hanno uno."""
+        for name, stages, _ in pipeline_log.WATCH_GROUPS:
+            self.assertIn(name, pipeline_log.STAGES, name)
+            self.assertIn(name, stages, name)
 
     def test_never_run_is_not_the_same_as_late(self):
         """Il giorno in cui nasce il diario nessuno stadio ha una storia. Dire
@@ -222,21 +284,25 @@ class TwoRowsAreOneRun(unittest.TestCase):
     stadi che aprono pull request, cioe' proprio quelli che lavorano."""
 
     ROWS = [
-        {"at": "2026-07-27T06:20:00+00:00", "stage": "hunter", "outcome": "pr-open",
+        {"at": "2026-07-27T06:20:00+00:00", "stage": "admissions", "outcome": "pr-open",
          "summary": "triage", "detail": ["DEPENDRATE respinto"], "gate": "checks",
          "pr": "45", "commit": "aaa1111", "branch": "automation/hunter-2026-07-27"},
-        {"at": "2026-07-27T06:28:30+00:00", "stage": "hunter", "outcome": "merged",
+        {"at": "2026-07-27T06:28:30+00:00", "stage": "admissions", "outcome": "merged",
          "summary": "PR #45 fusa", "detail": [], "gate": "checks",
          "pr": "45", "commit": "bbb2222", "branch": "master"},
-        {"at": "2026-07-27T07:00:00+00:00", "stage": "curator", "outcome": "nothing",
-         "summary": "niente da curare", "detail": [], "gate": "", "pr": "",
+        # Un altro stadio, di proposito: e' il rumore accanto alle due righe che
+        # devono collassare. Se anche questa fosse `admissions`, il conteggio
+        # dell'ammissione varrebbe 2 e il test smetterebbe di distinguere "due
+        # righe una run" da "due run".
+        {"at": "2026-07-27T07:00:00+00:00", "stage": "verificatore", "outcome": "nothing",
+         "summary": "niente da verificare", "detail": [], "gate": "", "pr": "",
          "commit": "ccc3333", "branch": "master"},
     ]
 
     def test_a_merged_run_counts_once(self):
         collapsed = pipeline_log.collapse_runs(self.ROWS)
         self.assertEqual(len(collapsed), 2)
-        self.assertEqual(pipeline_log.summarize(collapsed)["hunter"]["runs"], 1)
+        self.assertEqual(pipeline_log.summarize(collapsed)["admissions"]["runs"], 1)
 
     def test_the_outcome_is_the_one_the_merge_step_knew(self):
         row = pipeline_log.collapse_runs(self.ROWS)[0]
@@ -250,11 +316,13 @@ class TwoRowsAreOneRun(unittest.TestCase):
         self.assertIn("DEPENDRATE respinto", row["detail"])
 
     def test_a_run_without_a_pull_request_stays_alone(self):
+        """La terza riga non ha PR e non ha nessuno con cui unirsi: resta una
+        run per conto suo, accanto alla coppia collassata."""
         collapsed = pipeline_log.collapse_runs(self.ROWS)
-        self.assertEqual([r["stage"] for r in collapsed], ["hunter", "curator"])
+        self.assertEqual([r["stage"] for r in collapsed], ["admissions", "verificatore"])
 
     def test_rows_of_different_stages_never_merge(self):
-        rows = [dict(self.ROWS[0]), dict(self.ROWS[1], stage="writer")]
+        rows = [dict(self.ROWS[0]), dict(self.ROWS[1], stage="verificatore")]
         self.assertEqual(len(pipeline_log.collapse_runs(rows)), 2)
 
     def test_the_closing_time_is_what_the_silence_alarm_sees(self):
@@ -274,10 +342,10 @@ class TheRunIdIsWhatActuallyIdentifiesARun(unittest.TestCase):
 
     def rows(self, run_id="reviewer-20260727T110207Z-a3f1"):
         return [
-            {"at": "2026-07-27T11:02:07+00:00", "run_id": run_id, "stage": "reviewer",
+            {"at": "2026-07-27T11:02:07+00:00", "run_id": run_id, "stage": "verificatore",
              "outcome": "pr-open", "summary": "sei articoli", "detail": ["ter-920 corretto"],
              "gate": "auto", "pr": "", "commit": "aaa1111", "branch": "automation/x"},
-            {"at": "2026-07-27T11:07:01+00:00", "run_id": run_id, "stage": "reviewer",
+            {"at": "2026-07-27T11:07:01+00:00", "run_id": run_id, "stage": "verificatore",
              "outcome": "merged", "summary": "PR #47 fusa", "detail": [],
              "gate": "auto", "pr": "47", "commit": "bbb2222", "branch": "master"},
         ]
@@ -303,13 +371,13 @@ class TheRunIdIsWhatActuallyIdentifiesARun(unittest.TestCase):
         self.assertEqual(len(pipeline_log.collapse_runs(rows)), 2)
 
     def test_an_id_is_minted_and_printed_for_whoever_writes_first(self):
-        entry = pipeline_log.build_entry("writer", "pr-open", "x")
-        self.assertTrue(entry["run_id"].startswith("writer-"))
+        entry = pipeline_log.build_entry("verificatore", "pr-open", "x")
+        self.assertTrue(entry["run_id"].startswith("verificatore-"))
         self.assertEqual(entry["trigger"], "manuale")
 
     def test_an_unknown_trigger_is_refused_like_an_unknown_outcome(self):
         with self.assertRaises(SystemExit):
-            pipeline_log.build_entry("writer", "pr-open", "x", trigger="a-mano-di-notte")
+            pipeline_log.build_entry("verificatore", "pr-open", "x", trigger="a-mano-di-notte")
 
 
 class TheCliRefusesToMintARunIdSilently(unittest.TestCase):
@@ -322,7 +390,7 @@ class TheCliRefusesToMintARunIdSilently(unittest.TestCase):
     def _run(self, *extra_args):
         return subprocess.run(
             [sys.executable, "scripts/pipeline_log.py", "--write",
-             "--stage", "writer", "--outcome", "nothing", "--summary", "x", *extra_args],
+             "--stage", "verificatore", "--outcome", "nothing", "--summary", "x", *extra_args],
             cwd=REPO_ROOT, capture_output=True, text=True, timeout=30,
         )
 
@@ -363,8 +431,8 @@ class TwoRunsNeverWriteTheSameFile(unittest.TestCase):
     def test_two_stages_recording_at_once_touch_two_files(self):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
-            pipeline_log.append(pipeline_log.build_entry("writer", "pr-open", "a"), path=root)
-            pipeline_log.append(pipeline_log.build_entry("reviewer", "pr-open", "b"), path=root)
+            pipeline_log.append(pipeline_log.build_entry("verificatore", "pr-open", "a"), path=root)
+            pipeline_log.append(pipeline_log.build_entry("verificatore", "pr-open", "b"), path=root)
             names = sorted(p.name for p in root.glob("*.json"))
             self.assertEqual(len(names), 2)
             self.assertEqual(len(pipeline_log.read_journal(root)), 2)
@@ -372,10 +440,10 @@ class TwoRunsNeverWriteTheSameFile(unittest.TestCase):
     def test_the_outcome_row_sits_beside_the_agents_row_not_on_top_of_it(self):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
-            entry = pipeline_log.build_entry("writer", "pr-open", "a")
+            entry = pipeline_log.build_entry("verificatore", "pr-open", "a")
             pipeline_log.append(entry, path=root)
             pipeline_log.append(
-                pipeline_log.build_entry("writer", "merged", "fusa", run_id=entry["run_id"]),
+                pipeline_log.build_entry("verificatore", "merged", "fusa", run_id=entry["run_id"]),
                 path=root, suffix=".esito",
             )
             self.assertEqual(len(list(root.glob("*.json"))), 2)
@@ -403,28 +471,50 @@ class SilenceMeansSomethingElseNowThatTheLauncherAssignsTheWork(unittest.TestCas
         return next(r for r in rows if r["group"] == name)
 
     def test_a_quiet_stage_with_an_empty_queue_is_idle_not_late(self):
-        rows = pipeline_log.silence([self.entry("curator", 40)],
-                                    queues={"curator": 0})
-        self.assertFalse(self.group(rows, "curatore")["stale"])
-        self.assertTrue(self.group(rows, "curatore")["idle"])
+        rows = pipeline_log.silence([self.entry("verificatore", 40)],
+                                    queues={"verificatore": 0})
+        self.assertFalse(self.group(rows, "verificatore")["stale"])
+        self.assertTrue(self.group(rows, "verificatore")["idle"])
 
     def test_a_quiet_stage_with_work_waiting_is_still_late(self):
-        rows = pipeline_log.silence([self.entry("curator", 40)],
-                                    queues={"curator": 3})
-        self.assertTrue(self.group(rows, "curatore")["stale"])
-        self.assertFalse(self.group(rows, "curatore")["idle"])
+        rows = pipeline_log.silence([self.entry("verificatore", 40)],
+                                    queues={"verificatore": 3})
+        self.assertTrue(self.group(rows, "verificatore")["stale"])
+        self.assertFalse(self.group(rows, "verificatore")["idle"])
 
     def test_without_the_queues_it_behaves_as_it_always_did(self):
-        rows = pipeline_log.silence([self.entry("curator", 40)])
-        self.assertTrue(self.group(rows, "curatore")["stale"])
+        rows = pipeline_log.silence([self.entry("verificatore", 40)])
+        self.assertTrue(self.group(rows, "verificatore")["stale"])
 
-    def test_the_launcher_is_judged_on_its_heartbeat_and_nothing_else(self):
-        """Non ha una coda: quando tace, e' lui a non essere partito, e non c'e'
-        niente da interpretare. Il suo battito e' il tick `launch`."""
+    def test_only_the_verifier_actually_has_a_countable_queue(self):
+        """Perche' i tre test qui sopra girano tutti sul verificatore, e non su
+        un altro gruppo qualunque.
+
+        `queue_sizes()` ha per chiavi `pipeline_status.STAGE_ORDER`, che e' il
+        vocabolario **storico** delle code. Di tutto `WATCH_GROUPS` solo
+        `verificatore` compare anche li': per gli altri `queues.get()` torna
+        `None`, `waiting` resta `None`, e la distinzione `idle` / `stale` non si
+        puo' esercitare. Provarla su `admissions` darebbe un test verde che non
+        misura niente."""
+        contate = set(pipeline_status.STAGE_ORDER)
+        con_coda = [n for n, stages, _ in pipeline_log.WATCH_GROUPS
+                    if set(stages) <= contate]
+        self.assertEqual(con_coda, ["verificatore"])
+
+    def test_the_launch_heartbeat_is_judged_on_itself_and_nothing_else(self):
+        """Non ha una coda: quando tace, e' il lanciatore a non essere partito,
+        e non c'e' niente da interpretare. Il suo battito e' il tick `launch`,
+        e l'esenzione vive in `pipeline_log.SENZA_CODA`.
+
+        Le code arrivano qui da fuori, quindi un chiamante **puo'** passare un
+        conteggio per `launch` anche se `queue_sizes()` non lo produce mai: se
+        l'esenzione sparisse, un battito muto da nove giorni con quel conteggio
+        a zero risulterebbe `idle`, cioe' "tutto a posto, non c'era niente da
+        lanciare". E' il falso silenzio piu' costoso della catena."""
         rows = pipeline_log.silence([self.entry("launch", 9)],
                                     queues={s: 0 for s in pipeline_log.STAGES})
-        self.assertTrue(self.group(rows, "lanciatore")["stale"])
-        self.assertIsNone(self.group(rows, "lanciatore")["waiting"])
+        self.assertTrue(self.group(rows, "launch")["stale"])
+        self.assertIsNone(self.group(rows, "launch")["waiting"])
 
 
 class ABrokenShardLeavesAMarkInsteadOfVanishing(unittest.TestCase):
@@ -437,7 +527,7 @@ class ABrokenShardLeavesAMarkInsteadOfVanishing(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
             pipeline_log.append(
-                pipeline_log.build_entry("writer", "merged", "buona"), path=root)
+                pipeline_log.build_entry("verificatore", "merged", "buona"), path=root)
             (root / "rotta.json").write_text("{ meta riga", encoding="utf-8")
             entries = pipeline_log.read_journal(root)
         self.assertEqual(len(entries), 2)

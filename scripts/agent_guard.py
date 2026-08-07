@@ -16,9 +16,9 @@ gia' in disaccordo con l'originale la settimana prossima.
 
 Tre modi d'uso, tutti da hook (il JSON dell'evento arriva su stdin):
 
-    python3 scripts/agent_guard.py --stage writer                  # PreToolUse
-    python3 scripts/agent_guard.py --stage hunter --stage promoter # perimetro a due stadi
-    python3 scripts/agent_guard.py --stage writer --check close    # Stop / SubagentStop
+    python3 scripts/agent_guard.py --stage verificatore                # PreToolUse
+    python3 scripts/agent_guard.py --stage admissions --stage launch   # perimetro a due stadi
+    python3 scripts/agent_guard.py --stage verificatore --check close  # Stop / SubagentStop
 
 Uscita 0 = permesso, 2 = bloccato con la ragione su stderr, che e' il canale
 che l'harness rilegge all'agente. Un errore interno della guardia esce 0 con
@@ -357,7 +357,7 @@ def main():
     parser = argparse.ArgumentParser(description="La guardia per-agente della catena.")
     parser.add_argument("--stage", action="append", required=True,
                         choices=sorted(GUARDED_STAGES),
-                        help="ripetibile: il cacciatore chiude anche da promotore")
+                        help="ripetibile: un ruolo che copre due perimetri li somma")
     parser.add_argument("--check", choices=("tool", "close"), default="tool")
     args = parser.parse_args()
 

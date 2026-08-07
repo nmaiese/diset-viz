@@ -72,7 +72,7 @@ fino in fondo.
   distintivo e' la **rilettura sul proprio testo** (reflexion): ha appena
   scritto, quindi e' il lettore peggiore, e si rilegge con la durezza con cui lo
   farebbe il verificatore.
-- **Verificatore** (agente `indicator-verifier`) prova a falsificare ogni
+- **Verificatore** (agente `verificatore`) prova a falsificare ogni
   affermazione di un articolo firmato. E' rimasto **invariato** nella
   ri-architettura, ed e' l'unico ruolo che misura il lavoro di un altro ruolo
   invece dei dati. Non corregge niente: una smentita torna in coda al
@@ -105,7 +105,7 @@ drena sono tre ruoli, non sette.
 | --- | --- | --- | --- |
 | ammissione | `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` | `scripts/scout_sources.py`, `scripts/discover_candidates.py`, `scripts/promote_candidates.py` |
 | produttore | `producer` | `curate.worklist()` + `pending_notes` + `review_queue` | `scripts/curate.py`, `scripts/pending_notes.py`, `scripts/review_queue.py` |
-| verificatore | `indicator-verifier` | `verification_queue` | `scripts/verification_queue.py` |
+| verificatore | `verificatore` | `verification_queue` | `scripts/verification_queue.py` |
 
 Un solo comando dice lo stato di tutte le code:
 
@@ -351,12 +351,15 @@ scala". Restituisce un verdetto calcolato dal diff e dalla suite, mai
 dall'opinione che l'agente ha del proprio lavoro.
 
 ```bash
-python3 scripts/pipeline_gate.py --stage producer
+python3 scripts/pipeline_gate.py --stage verificatore
 ```
 
-Gli stadi che il cancello conosce sono ancora sette piu' `producer` e
-`admissions`: un ruolo chiude sul verdetto del proprio (`--stage producer`,
-`--stage admissions`, `--stage verificatore`). Controlla, in ordine di danno:
+**Gli stadi che il cancello conosce sono tre**, uno per agente esistente:
+`admissions`, `verificatore`, `reader-editor`. Erano dieci, e sette
+appartenevano a ruoli cancellati: un perimetro senza un agente non e' inerte, e'
+un permesso che resta aperto. L'officina non e' fra loro e non e' una
+dimenticanza: non e' una run, non apre pull request, e il suo cancello e'
+`officina/lint.py`. Il cancello controlla, in ordine di danno:
 
 1. **Il perimetro.** Ogni ruolo puo' toccare una lista corta di file, scritta in
    `STAGE_PATHS`. Un prompt si puo' modificare, fraintendere o ignorare, il repo

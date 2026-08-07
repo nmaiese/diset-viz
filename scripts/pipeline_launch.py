@@ -63,21 +63,13 @@ ROLE_OF_STAGE = {
     "verificatore": "verificatore",
 }
 
-# Chi esegue ogni ruolo. Il verificatore e' rimasto invariato nella
-# ri-architettura, quindi conserva il suo file storico.
-#
 # **Il produttore non e' piu' un agente.** Scrivere un articolo e' passato
 # all'officina, cioe' a un workflow con quattro tipi stretti, e il file
 # `.claude/agents/producer.md` non esiste piu'. Un piano che continuasse a
 # nominarlo sarebbe un puntatore morto che qualcuno lancia una volta sola,
 # scoprendo il guasto quando la run muore: quindi il ruolo resta (la coda dice
 # ancora "questo indicatore va scritto"), e cambia il bersaglio.
-AGENT_OF_ROLE = {
-    "admissions": "admissions",
-    "verificatore": "indicator-verifier",
-    "reader-editor": "reader-editor",
-}
-
+#
 # I ruoli che non si lanciano come agente ma come workflow, con l'indicatore
 # fra gli argomenti. Chi legge il piano trova il comando gia' scritto.
 WORKFLOW_OF_ROLE = {
@@ -86,12 +78,21 @@ WORKFLOW_OF_ROLE = {
 
 
 def target(role, indicator):
-    """Che cosa lanciare per questo ruolo: un agente, oppure un workflow."""
+    """Che cosa lanciare per questo ruolo: un agente, oppure un workflow.
+
+    Per i ruoli che sono agenti il nome del ruolo **e'** il nome dell'agente, e
+    non c'e' una mappa. Ce n'era una, e conteneva una sola voce che traducesse
+    davvero: il ruolo `verificatore` verso il file `indicator-verifier.md`. Un
+    dizionario identita' su tre voci non e' un'astrazione, e' una mappa che
+    aspetta di divergere: il file adesso si chiama `verificatore.md` e la
+    traduzione non serve piu'. Un test tiene l'invariante (ogni chiave di
+    `pipeline_gate.STAGE_PATHS` ha il suo `.claude/agents/<chiave>.md`).
+    """
     if role in WORKFLOW_OF_ROLE:
         return {"agent": None, "workflow": WORKFLOW_OF_ROLE[role],
                 "comando": f'Workflow({{scriptPath: "{WORKFLOW_OF_ROLE[role]}", '
                            f'args: ["{indicator}"]}})'}
-    return {"agent": AGENT_OF_ROLE[role]}
+    return {"agent": role}
 
 # L'ordine di precedenza dei ruoli, a monte prima, come la catena: rompe solo i
 # pari merito di priorita'. Una smentita (priorita' 100) scavalca comunque tutto
@@ -200,7 +201,7 @@ def plan_launches(dossier, queues=None, mint=None, readings=None):
     if adm_from_queue or adm_priorities:
         launches.append({
             "role": "admissions",
-            "agent": AGENT_OF_ROLE["admissions"],
+            **target("admissions", None),
             "indicator": None,
             "scope": "batch",
             "priority": max(adm_priorities) if adm_priorities else 0.0,
@@ -254,7 +255,7 @@ def plan_launches(dossier, queues=None, mint=None, readings=None):
     for code, stage, priority in verifier_items:
         launches.append({
             "role": "verificatore",
-            "agent": AGENT_OF_ROLE["verificatore"],
+            **target("verificatore", code),
             "indicator": code,
             "scope": "indicatore",
             "priority": priority,
@@ -277,7 +278,7 @@ def plan_launches(dossier, queues=None, mint=None, readings=None):
         priority = float(d.get("priority", 0.0) or 0.0)
         launches.append({
             "role": "reader-editor",
-            "agent": AGENT_OF_ROLE["reader-editor"],
+            **target("reader-editor", key),
             "indicator": key,
             "scope": "indicatore",
             "priority": priority,

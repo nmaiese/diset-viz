@@ -234,14 +234,17 @@ ri-architettura, e' tre ruoli, non sette stadi:
 | --- | --- | --- |
 | ammissione | `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` da promuovere |
 | produttore | `producer` | `scripts/curate.py --include-recheck`, `scripts/pending_notes.py`, `scripts/text_queue.py`, `scripts/review_queue.py` |
-| verificatore | `indicator-verifier` | `scripts/verification_queue.py` |
+| verificatore | `verificatore` | `scripts/verification_queue.py` |
 
 I file di agente dei vecchi stadi (`source-scout.md`, `indicator-hunter.md`,
 `indicator-curator.md`, `indicator-writer.md`, `indicator-reviewer.md`) non
 esistono piu', e con la demolizione se ne sono andati anche `producer.md` e
-`launcher.md`. Restano tre agenti: `admissions.md` a monte, `indicator-verifier.md`
-e `reader-editor.md` a valle. Gli articoli li scrive l'officina
-(`.claude/workflows/produci-indicatori.js`).
+`launcher.md`. Restano tre agenti: `admissions.md` a monte, `verificatore.md` e
+`reader-editor.md` a valle, **uno per perimetro di `pipeline_gate.STAGE_PATHS`,
+col nome del proprio stadio**. `verificatore.md` si chiamava
+`indicator-verifier.md`: era l'unico nome che andasse tradotto, e la traduzione
+e' stata tolta insieme alla mappa che la faceva. Gli articoli li scrive
+l'officina (`.claude/workflows/produci-indicatori.js`).
 
 Lo stato di tutte le code insieme:
 

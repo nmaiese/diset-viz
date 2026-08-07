@@ -53,7 +53,9 @@ class PlanLaunches(unittest.TestCase):
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint)
         self.assertEqual(len(plan), 1)
         self.assertEqual(plan[0]["role"], "verificatore")
-        self.assertEqual(plan[0]["agent"], "indicator-verifier")
+        # Il ruolo **e'** l'agente: non c'e' piu' una mappa da tradurre, e
+        # questa asserzione e' cio' che se ne accorgerebbe se tornasse.
+        self.assertEqual(plan[0]["agent"], "verificatore")
         self.assertEqual(plan[0]["indicator"], "ter-9")
 
     def test_the_source_queue_lights_up_the_admissions_batch(self):

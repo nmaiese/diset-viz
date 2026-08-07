@@ -240,10 +240,15 @@ class TheStageIsRegisteredEverywhere(unittest.TestCase):
     def test_it_is_the_last_stage(self):
         self.assertEqual(pipeline_status.STAGE_ORDER[-1], "verificatore")
 
-    def test_its_agent_file_exists(self):
-        agent = pipeline_gate.PROJECT_ROOT / ".claude" / "agents" / "indicator-verifier.md"
+    def test_its_agent_file_is_named_after_the_stage(self):
+        """Il file si chiamava `indicator-verifier.md` mentre lo stadio si
+        chiamava `verificatore`, e la differenza esisteva solo per essere
+        tradotta da un dizionario. Adesso combaciano, e questo test e' il
+        controllo per il solo stadio che aveva il problema (l'invariante su
+        tutti e tre sta in `test_docs_match_the_code.py`)."""
+        agent = pipeline_gate.PROJECT_ROOT / ".claude" / "agents" / "verificatore.md"
         self.assertTrue(agent.exists(), "lo stadio non ha un agente")
-        self.assertIn("verificatore", agent.read_text(encoding="utf-8"))
+        self.assertIn("name: verificatore", agent.read_text(encoding="utf-8"))
 
     def test_the_committed_register_is_readable_and_credible(self):
         rows = vq.load_verifications()

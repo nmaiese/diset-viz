@@ -14,7 +14,7 @@ Aggiornato al **2026-08-07**.
 > stato sbagliato e' piu' pericoloso di uno assente: leggi prima questo riquadro
 > e diffida di cio' che lo contraddice.
 >
-> - **Cinque agenti**, non sette: `admissions` a monte, `indicator-verifier` e
+> - **Cinque agenti**, non sette: `admissions` a monte, `verificatore` e
 >   `reader-editor` a valle, piu' `scrittore-indicatore`, `giudice-cieco`,
 >   `pubblicatore` e `preparatore-pacchetti` che vivono dentro l'officina.
 >   `producer.md` e `launcher.md` **sono stati cancellati**.
@@ -184,12 +184,17 @@ a mano.
 
 ### Come si controlla che sia partita
 
+> Il dispatcher non è mai esistito con questo nome: al suo posto è arrivato
+> `scripts/pipeline_launch.py`, che registra `launch` invece di `dispatch`. Il
+> comando qui sotto è aggiornato al nome vivo; il resto del paragrafo racconta
+> com'era il piano quando è stato scritto.
+
 ```bash
-python3 scripts/pipeline_log.py --stage dispatch   # i giri registrati
+python3 scripts/pipeline_log.py --stage launch     # i giri registrati
 python3 scripts/pipeline_dashboard.py --open       # il battito, in cima
 ```
 
-Il cruscotto dice in testa quando è stato l'ultimo giro del dispatch, e se non
+Il cruscotto dice in testa quando è stato l'ultimo giro del lanciatore, e se non
 ne ha mai visto uno lo scrive a lettere chiare invece di lasciare la riga vuota:
 finché quella riga dice "mai", nessuno sta assegnando il lavoro.
 

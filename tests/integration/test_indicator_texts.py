@@ -310,6 +310,21 @@ class VariableSectionsAreOptIn(unittest.TestCase):
 
 
 class SectionsUseKnownRoles(unittest.TestCase):
+    """Il contratto sui ruoli doppi ha **due meta' opposte, e sono volute**:
+
+    - **scrittore severo**: `officina.pubblica` rifiuta una bozza con due
+      sezioni dello stesso ruolo (`test_officina_pubblica.py`), e nessun
+      articolo committato ne ha (il test qui sotto);
+    - **lettore tollerante**: `indicator_texts.build_article` rende **entrambi**
+      i corpi se li trova (`ADuplicatedRoleLosesNoBody`).
+
+    Chi ne vedesse una sola meta' la leggerebbe come un'incoerenza e
+    "aggiusterebbe" quella sbagliata. La severita' in scrittura esiste perche' il
+    contratto e' una sezione per ruolo; la tolleranza in lettura esiste perche'
+    trecento entry scritte a mano non sono passate da nessun comando, e un corpo
+    perso in silenzio e' peggio di un articolo con un H2 di troppo.
+    """
+
     def setUp(self):
         self.texts = indicator_store.load_all()
 
@@ -378,6 +393,58 @@ class SectionsUseKnownRoles(unittest.TestCase):
             if char in text
         ]
         self.assertEqual(offenders, [], f"style violations: {offenders[:10]}")
+
+
+class ADuplicatedRoleLosesNoBody(unittest.TestCase):
+    """La meta' tollerante del contratto, che finora non provava nessuno.
+
+    `build_article` indicizzava le sezioni per ruolo. Un'entry con due
+    `dinamica` (la macchina nuova ne ha scritta una al primo giro, con due
+    titoli diversi) perdeva la prima: la pagina rendeva **due volte lo stesso
+    corpo** e l'altro spariva senza lasciare traccia. Chi scriveva lo vedeva
+    impaginato, e nessuna guardia lo vedeva.
+
+    I test che esistevano intorno provano tutti l'**assenza** di duplicati
+    (`officina.pubblica` li rifiuta, nessun articolo committato ne ha). Nessuno
+    provava la **tolleranza**, cioe' la riparazione vera, che protegge le
+    trecento entry scritte a mano che non sono passate da nessun comando.
+    """
+
+    ENTRY = {"sections": [
+        {"role": "quadro", "h": "Il quadro", "body": "Corpo del quadro."},
+        {"role": "dinamica", "h": "La rincorsa", "body": "Primo corpo di dinamica."},
+        {"role": "limiti", "h": "I limiti", "body": "Corpo dei limiti."},
+        {"role": "dinamica", "h": "Il sorpasso", "body": "Secondo corpo di dinamica."},
+    ]}
+
+    def _article(self):
+        with unittest.mock.patch.object(indicator_texts, "get_text", return_value=self.ENTRY):
+            return indicator_texts.build_article("__synthetic__")
+
+    def test_both_bodies_reach_the_page(self):
+        corpi = [section["body"] for section in self._article()["sections"]]
+        self.assertIn("Primo corpo di dinamica.", corpi)
+        self.assertIn("Secondo corpo di dinamica.", corpi)
+
+    def test_no_body_is_rendered_twice(self):
+        """Il difetto non era solo "un corpo perso": era anche "un corpo
+        duplicato". Perderne uno senza accorgersene e' invisibile, vederne due
+        uguali in pagina e' l'unico sintomo che qualcuno poteva notare."""
+        corpi = [s["body"] for s in self._article()["sections"] if s["body"]]
+        self.assertEqual(len(corpi), len(set(corpi)))
+
+    def test_each_body_keeps_its_own_heading(self):
+        """Le due sezioni hanno titoli diversi, ed e' il motivo per cui erano
+        due: appaiarle al corpo sbagliato sarebbe un altro modo di perderle."""
+        appaiati = {s["body"]: s["heading"] for s in self._article()["sections"] if s["body"]}
+        self.assertEqual(appaiati["Primo corpo di dinamica."], "La rincorsa")
+        self.assertEqual(appaiati["Secondo corpo di dinamica."], "Il sorpasso")
+
+    def test_the_authored_order_still_wins(self):
+        """La sequenza scritta sopravvive anche col ruolo ripetuto: la
+        tolleranza non deve costare la promessa fatta a chi scrive."""
+        self.assertEqual([s["role"] for s in self._article()["sections"]],
+                         ["quadro", "dinamica", "limiti", "dinamica"])
 
 
 class ParagraphsSurviveRendering(unittest.TestCase):

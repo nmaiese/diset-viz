@@ -2,10 +2,18 @@
 
 Dieci criteri, da 0 a 2, massimo 20. Serve a tre cose e a nessun'altra:
 
-- lo **scrittore** ci passa sopra la bozza prima di aprire la PR,
-- il **revisore** la usa come lista di cosa deve saper correggere in loco,
+- **`scrittore-indicatore`** ci passa sopra la bozza prima di consegnarla al
+  workflow (`.claude/workflows/produci-indicatori.js`),
+- **`giudice-cieco`** la usa come metro per dire quale delle due bozze si legge
+  fino in fondo, e `officina/lint.py` impone deterministicamente cio' che si
+  puo' contare,
 - un **lotto** di articoli si legge prima e dopo un cambio di prompt, e il
   punteggio medio dice se il cambio ha funzionato invece di lasciarlo all'occhio.
+
+I nomi contano: lo **scrittore** e il **revisore** erano due agenti separati e
+non esistono piu'. Scrivere un articolo e' passato all'officina, dove quattro
+tipi stretti lo fanno dentro un workflow, e chi cerca il file di un ruolo che
+questa pagina nomina deve trovarlo.
 
 **Sotto 14/20 l'articolo non e' pronto.** Non e' una soglia morbida: sotto quel
 punteggio la pagina descrive una classifica invece di raccontare un dato, che e'
@@ -62,14 +70,15 @@ l'accuratezza, ne la struttura con le fonti.
 L'asse 2 e' l'unico che ha gia' un giudice indipendente suo, il **reader-editor**
 (`.claude/agents/reader-editor.md`): legge ogni articolo pubblicato e boccia i
 tecnici-ma-corretti, con la sua eval e la sua baseline nel canary. Gli altri tre
-assi restano giudizio del produttore che si rilegge (asse 1 anche del
-verificatore, a valle), finche' non avranno un giudice loro.
+assi restano giudizio interno all'officina (lo stadio `rivedi` del workflow, piu'
+`giudice-cieco` sul confronto fra due bozze; l'asse 1 anche del verificatore, a
+valle), finche' non avranno un giudice loro.
 
 Il reader-editor non punteggia il criterio 8 direttamente, giudica su otto
 criteri suoi (comprensione, carico, struttura, traduzione dei tecnicismi...),
 quindi la corrispondenza va detta invece che dedotta: **un suo `revise` e' il
-criterio 8 sotto il pavimento**, e l'articolo torna al produttore qualunque sia
-il totale. Un suo `pass` non regala il 2: dice che l'asse 2 non blocca.
+criterio 8 sotto il pavimento**, e l'articolo torna all'officina per una
+riscrittura qualunque sia il totale. Un suo `pass` non regala il 2: dice che l'asse 2 non blocca.
 
 I pavimenti valgono per un articolo che si dichiara **finito**. Un articolo a
 meta' e' semplicemente da scrivere, non bocciato: la coda che lo dice e'
@@ -79,7 +88,7 @@ meta' e' semplicemente da scrivere, non bocciato: la coda che lo dice e'
 
 Fino al 2026-08-04 il criterio 8 si chiamava **Ritmo e imperfezione** e dava 2 a
 "ritmo vero, sezioni di peso diverso, una digressione". Premiava cioe' la
-varieta' del periodare, e il produttore la produceva: gli articoli firmati
+varieta' del periodare, e chi scriveva la produceva: gli articoli firmati
 suonavano scritti, e si leggevano due volte.
 
 Il difetto vero non era il ritmo, era l'**impilamento**. Da `ter-167`, un

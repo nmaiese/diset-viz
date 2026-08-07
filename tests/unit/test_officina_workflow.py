@@ -237,7 +237,11 @@ class TheDesignDecisions(unittest.TestCase):
             self.assertIn("solo il file dell'articolo", handle.read())
 
     def test_no_agent_file_is_resurrected(self):
-        for role in ("reader-editor", "indicator-verifier", "launcher", "producer.md"):
+        """I due critici della catena e i due agenti demoliti. `verificatore`
+        ha preso il posto di `indicator-verifier` quando il file e' stato
+        rinominato sullo stadio: e' lo stesso agente, e il workflow non deve
+        chiamarlo con nessuno dei due nomi."""
+        for role in ("reader-editor", "verificatore", "launcher", "producer.md"):
             self.assertNotIn(role, self.text)
 
 

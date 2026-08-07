@@ -9,11 +9,11 @@ from the test suite, never from the agent's own opinion of its work.
 What it checks, in order of how much damage the failure would do:
 
 1. **Blast radius.** Each stage may touch a fixed, short list of paths. The
-   writer may write prose and nothing else; the hunter may write the queue and
-   nothing else. An agent that edits `app/views.py` while claiming to be the
-   writer fails here, before anyone reads a word of its reasoning. This is the
-   single check that makes the rest safe to automate: a stage cannot widen its
-   own scope, because the list lives in the repo, not in the prompt.
+   verifier may write its register and nothing else; admissions may write the
+   queues and nothing else. An agent that edits `app/views.py` while claiming to
+   be the verifier fails here, before anyone reads a word of its reasoning. This
+   is the single check that makes the rest safe to automate: a stage cannot
+   widen its own scope, because the list lives in the repo, not in the prompt.
 2. **The suite.** All of it, not the stage's favourite subset. The guards on
    prose, vintage drift, figures attributed to a region, the CSV schema and
    `/legacy` are the accumulated memory of everything that has gone wrong here,
@@ -33,9 +33,9 @@ different answers.
 Pure stdlib, like the rest of the chain, so it runs in a cloud agent that has no
 venv yet.
 
-    python3 scripts/pipeline_gate.py --stage writer
-    python3 scripts/pipeline_gate.py --stage curator --base origin/master --json
-    python3 scripts/pipeline_gate.py --stage writer --skip-tests   # triage only
+    python3 scripts/pipeline_gate.py --stage verificatore
+    python3 scripts/pipeline_gate.py --stage admissions --base origin/master --json
+    python3 scripts/pipeline_gate.py --stage verificatore --skip-tests   # triage only
 """
 
 from __future__ import annotations
@@ -93,56 +93,55 @@ READINGS = "data/pipeline/letture/"
 
 # What each stage is allowed to change. Anything outside its list is a failure,
 # not a warning: the point of the list is that a prompt cannot widen it.
+# Il perimetro di ogni ruolo che ha una run. **Uno per agente esistente, e
+# nient'altro.**
+#
+# Fino alla demolizione ne conteneva dieci, e sette appartenevano a ruoli
+# cancellati: `scout`, `hunter` e `promoter` fusi in `admissions` mesi fa,
+# `curator`, `writer` e `reviewer` fusi in `producer`, e `producer` stesso
+# sostituito dall'officina. Un perimetro senza un agente non e' inerte: e' un
+# permesso che resta aperto e che il primo `--stage writer` di passaggio
+# riaprirebbe, con il diritto di scrivere in `content/indicators/` fuori da
+# ogni cancello editoriale. Un cancello che elenca porte per stanze demolite
+# non e' piu' stretto di uno che le tiene aperte: e' lo stesso, scritto peggio.
+#
+# I nomi vecchi restano leggibili nel diario storico (quaranta run `producer`,
+# otto `writer`, nove `scout`), e li conosce `pipeline_log.HISTORICAL_STAGES`:
+# **scrivere** una run con quel nome non si puo' piu', **rileggerla** si'.
+#
+# L'officina non compare qui, e non e' una dimenticanza: non e' una run. Scrive
+# un articolo per volta con `officina.pubblica`, il suo cancello e'
+# `officina/lint.py`, e non apre pull request.
 STAGE_PATHS = {
-    "scout": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, RUN_JOURNAL),
-    "hunter": (CANDIDATES, RUN_JOURNAL),
-    "promoter": (CANDIDATES, EXTERNAL_DATASET, EXTERNAL_MANIFEST, RUN_JOURNAL),
-    # The curator gets the theme map because a promoted indicator brings a theme
-    # name with it, and an unmapped theme drops it out of every macro-area total
-    # silently. That fix used to live in `app/taxonomy.py`, which no agent may
-    # touch, so it would have stalled the chain on a legitimate case.
-    "curator": (CURATION, EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS,
-                THEME_CATEGORIES, RUN_JOURNAL),
-    "writer": (INDICATOR_TEXTS, RUN_JOURNAL),
-    "reviewer": (INDICATOR_TEXTS, RUN_JOURNAL),
+    # `admissions` = scout + hunter + promoter: propone la fonte, triaga il
+    # candidato, promuove nel layer esterno, in una run sola.
+    "admissions": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, CANDIDATES,
+                   EXTERNAL_DATASET, EXTERNAL_MANIFEST, RUN_JOURNAL),
     # Il verificatore NON ha `INDICATOR_TEXTS`, e l'assenza e' la definizione
     # dello stadio piu' che il suo prompt. Uno stadio che trova e ripara i propri
     # rilievi corregge i propri compiti, che e' esattamente il difetto che questo
-    # stadio esiste per prendere un livello sopra: la firma del revisore era la
-    # parola del revisore sul lavoro del revisore. Le smentite tornano al revisore
+    # stadio esiste per prendere un livello sopra. Le smentite tornano indietro
     # come il segnale `smentita` di `review_queue`, che le legge da qui.
     "verificatore": (VERIFICATIONS, RUN_JOURNAL),
-    # Il reader-editor, gemello del verificatore su un altro asse. Il perimetro
-    # e' la stessa forma: il suo registro e il diario, niente `content/indicators/`
-    # (non porta l'Edit, non ripara), niente firma. La sua bocciatura non blocca
-    # il merge di nessuno: torna al produttore come il flag `leggibilita` della
-    # coda, non come un cancello.
+    # Il reader-editor, gemello del verificatore su un altro asse. Stessa forma:
+    # il suo registro e il diario, niente `content/indicators/` (non porta
+    # l'Edit, non ripara), niente firma. La sua bocciatura non blocca il merge di
+    # nessuno: accoda una riscrittura.
     "reader-editor": (READINGS, RUN_JOURNAL),
-    # I due ruoli della ri-architettura per-indicatore. Nascono qui accanto ai
-    # vecchi stadi: il perimetro e' l'unione di quelli che fondono, perche' un
-    # ruolo porta un indicatore da grezzo a pubblicato in una sola run. Restano
-    # fuori da `pipeline_status.STAGE_ORDER`, che tiene i vecchi stadi granulari,
-    # ma li lancia il lanciatore per-indicatore, e il cancello e la guardia li
-    # riconoscono, cosi' l'agente produttore ha dove committare.
-    #
-    # `producer` = curator + writer + reviewer: cura, scrive, si auto-critica,
-    # firma. Il perimetro largo e' sicuro perche' gli invarianti del cancello si
-    # smistano per tipo-di-file (vedi `run`), non per nome, quindi allargarlo non
-    # allarga cio' che sfugge al controllo.
-    "producer": (CURATION, EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS,
-                 THEME_CATEGORIES, INDICATOR_TEXTS, RUN_JOURNAL),
-    # `admissions` = scout + hunter + promoter: propone la fonte, triaga il
-    # candidato, promuove nel layer esterno, in una run.
-    "admissions": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, CANDIDATES,
-                   EXTERNAL_DATASET, EXTERNAL_MANIFEST, RUN_JOURNAL),
 }
 
-# I ruoli che firmano cio' che scrivono. La firma (`reviewed_at`/`reviewed_vintage`)
-# non e' un fatto del file ma una responsabilita' del ruolo: il writer tocca
-# `INDICATOR_TEXTS` e NON deve firmare (la firma e' del revisore), il reviewer e
-# il producer toccano lo stesso file e DEVONO firmare. Per questo `run` smista la
-# firma per ruolo e tutto il resto per tipo-di-file toccato.
-ROLES_THAT_SIGN = ("reviewer", "producer")
+# I ruoli che firmano cio' che scrivono, e adesso non ce n'e' nessuno.
+#
+# La firma (`reviewed_at`/`reviewed_vintage`) era la responsabilita' del
+# revisore, poi del produttore che lo aveva assorbito. Nessuno dei due esiste
+# piu': l'articolo lo scrive l'officina, che non e' una run, non passa da questo
+# cancello e al posto della firma ha `origine: officina` piu' il verdetto di
+# `officina/lint.py`. I tre ruoli rimasti non toccano `content/indicators/`,
+# quindi non hanno niente da firmare.
+#
+# La tupla resta, vuota, invece di sparire: `run` la interroga, e un ruolo
+# futuro che scriva articoli dentro una run dovra' dichiararsi qui.
+ROLES_THAT_SIGN = ()
 
 # How far a green gate is allowed to go, per stage. Not uniform on purpose.
 #
@@ -176,20 +175,15 @@ ROLES_THAT_SIGN = ("reviewer", "producer")
 # false and `master` unprotected it falls back to merging immediately, and a
 # probe pull request proved it by merging with the test job still running.
 MERGE_POLICY = {
-    "scout": "auto",
-    "hunter": "auto",
-    "promoter": "auto",
-    "curator": "auto",
-    "writer": "auto",
-    "reviewer": "auto",
-    "verificatore": "auto",
-    # I ruoli per-indicatore fondono `auto` come tutti gli altri: il cancello
-    # locale gira la suite e gli invarianti prima del merge.
-    "producer": "auto",
+    # `auto` per tutti e tre: il cancello locale gira la suite e gli invarianti
+    # prima del merge, e nessuno stadio aspetta un umano (era lo scout, ed e'
+    # una decisione presa). Un test tiene questa tabella allineata a
+    # `STAGE_PATHS`, che e' come la demolizione dei sette perimetri morti si e'
+    # accorta di dover passare anche di qui.
     "admissions": "auto",
-    # `auto` come tutti: il `soft` del reader-editor e' il suo verdetto che non
-    # blocca il produttore, non il merge della sua run, che passa dal cancello
-    # locale come ogni altra.
+    "verificatore": "auto",
+    # `auto` come gli altri: il `soft` del reader-editor e' il suo verdetto che
+    # non blocca una riscrittura, non il merge della sua run.
     "reader-editor": "auto",
 }
 
