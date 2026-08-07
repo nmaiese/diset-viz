@@ -3,6 +3,9 @@
 Il difetto che questa mappa corregge e' lo stesso di tutta la rifondazione: se
 la scelta la fa il modello, il modello sceglie quasi sempre uguale, e
 l'uniformita' rientra da una porta che nessuno guardava.
+
+Sintetico soltanto: la misura su sessanta pacchetti veri sta in
+`tests/integration/test_officina_esempi_live.py`.
 """
 import unittest
 
@@ -14,6 +17,14 @@ class TheMapPointsAtRealFiles(unittest.TestCase):
         missing = sorted({name for name in esempi.BY_ANGLE.values()
                           if name not in esempi.available()})
         self.assertEqual(missing, [], f"estratti mappati e assenti: {missing}")
+
+    def test_a_fixed_strength_angle_cannot_be_missing_from_the_map(self):
+        """Un tipo a forza fissa e alta apre quasi sempre, quindi non mapparlo
+        non e' una lacuna qualunque: `pick()` scenderebbe a un angolo piu'
+        debole o all'estratto del "nessuna storia" proprio sull'articolo in cui
+        la storia era la piu' forte."""
+        for tipo in ("gruppi-che-si-sorpassano", "sorpasso"):
+            self.assertIn(tipo, esempi.BY_ANGLE, tipo)
 
     def test_the_fallback_exists_too(self):
         self.assertIn(esempi.WHEN_THERE_IS_NO_STORY, esempi.available())
@@ -49,31 +60,6 @@ class Picking(unittest.TestCase):
     def test_it_is_deterministic(self):
         angles = [{"type": "controcorrente"}]
         self.assertEqual(esempi.pick(angles), esempi.pick(angles))
-
-
-class OnTheRealCatalogue(unittest.TestCase):
-    def test_the_choice_varies_across_indicators(self):
-        from app import sources
-        from app.atlas_catalog import get_atlas_catalog
-        from collections import Counter
-        from packs import build
-
-        chosen = Counter()
-        for item in get_atlas_catalog()["indicators"][:60]:
-            family, raw = sources.split_internal_id(item["id"])
-            try:
-                pack = build.build_pack(family, raw)
-            except Exception:
-                continue
-            if pack:
-                chosen[esempi.pick(pack["angles"])] += 1
-
-        self.assertGreater(sum(chosen.values()), 40)
-        self.assertGreaterEqual(len(chosen), 3,
-                                f"un solo modello per tutti: {chosen}")
-        top = chosen.most_common(1)[0][1] / sum(chosen.values())
-        self.assertLess(top, 0.7, f"un modello copre il {top:.0%}: {chosen}")
-
 
 if __name__ == "__main__":
     unittest.main()

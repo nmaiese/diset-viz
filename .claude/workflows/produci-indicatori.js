@@ -620,12 +620,19 @@ const esiti = await pipeline(
     // vederlo girare a spese piene finche' qualcuno se ne accorge.
     const blocchi = (esito) => ((esito && esito.rilievi) || [])
       .filter((r) => r.severity === 'blocca')
-    // Due modi di non essere pubblicabile, e vanno trattati uguale: il comando
-    // di scrittura ha rifiutato la bozza, oppure il lint l'ha bocciata. Il
-    // primo era invisibile: `scritto: false` non lo guardava nessuno, quindi un
-    // articolo mai scritto contava fra gli scritti.
-    const rifiutato = esito && esito.scritto === false
+    // Tre modi di non essere pubblicabile, e il terzo si distingue dal primo
+    // solo dai rilievi. Il comando di scrittura puo' rifiutare la bozza per
+    // **forma** (un ruolo doppio, una sezione senza corpo), e allora torna a chi
+    // scrive un messaggio; puo' rifiutarla perche' il **cancello** blocca e
+    // sotto c'e' gia' un articolo, e allora non e' un problema di forma, sono i
+    // rilievi del lint sulla bozza e vanno rimandati come tali; oppure
+    // l'articolo si scrive e il lint lo boccia dopo.
+    //
+    // Distinguere il secondo dal primo conta: `ilRifiuto` dice "correggi cio'
+    // che il messaggio nomina, e' una regola di forma", che su un rilievo
+    // editoriale e' un'istruzione sbagliata.
     const primi = blocchi(esito)
+    const rifiutato = esito && esito.scritto === false && !primi.length
     if (rifiutato) {
       log(`${scelto.pack.code}: la bozza e' stata rifiutata dal comando di scrittura `
           + `(${esito.errore_scrittura || 'senza motivo dichiarato'}), torna a chi scrive`)
@@ -639,9 +646,13 @@ const esiti = await pipeline(
     } else if (primi.length) {
       log(`${scelto.pack.code}: il lint blocca (${primi.map((r) => r.rule).join(', ')}), torna a chi scrive`)
       // Qui il guasto della revisione non puo' far cadere l'indicatore, come
-      // fa allo stadio prima: l'articolo e' **gia' su disco**, e sparire dagli
-      // esiti lo lascerebbe li' con un rilievo bloccante e nessuna riga che lo
-      // dica. Si tiene il primo esito, e finisce fra i `bloccati`.
+      // fa allo stadio prima: su una prima pubblicazione l'articolo e' **gia'
+      // su disco**, e sparire dagli esiti lo lascerebbe li' con un rilievo
+      // bloccante e nessuna riga che lo dica. Su una riscrittura non c'e'
+      // niente su disco (la scrittura e' stata rifiutata e il testo precedente
+      // e' intatto), ma l'esito va riportato lo stesso: un indicatore che
+      // sparisce dai conti e' un indicatore che nessuno rimette in coda. Si
+      // tiene il primo esito, e finisce fra i `bloccati`.
       try {
         const bozza = await rivedi(corrente, ilBlocco(esito.rilievi))
         corrente = { ...corrente, bozza }
@@ -685,11 +696,21 @@ ${JSON.stringify(bozzaDaScrivere(scelto.bozza))}
 BOZZA
 \`\`\`
 
-   Se stampa un percorso, l'articolo e' scritto: rispondi \`scritto: true\`.
+   Se stampa un percorso, l'articolo e' scritto: rispondi \`scritto: true\`, e
+   vai al passo 2.
+
    Se esce 2, **non e' scritto**: rispondi \`scritto: false\` e copia in
-   \`errore_scrittura\` il messaggio esatto. E' sempre un difetto della bozza
-   (un ruolo doppio, una sezione senza corpo, un livello che l'indicatore non
-   ha), mai un file da andare a cercare, e mai una cosa da aggiustare tu.
+   \`errore_scrittura\` il messaggio esatto. Due casi, e si distinguono da soli:
+   se fra le righe dell'uscita ce n'e' una che comincia con \`RILIEVI \`
+   seguita da un array JSON, copia quell'array in \`rilievi\` e **salta il passo
+   2**. Non contano l'ordine delle righe ne' il flusso su cui arrivano: conta
+   che la riga ci sia. Quei rilievi sono
+   della bozza; il lint su disco descriverebbe l'articolo precedente, che non e'
+   stato sovrascritto. Se invece la riga \`RILIEVI\` non c'e', e' un difetto di
+   forma della bozza (un ruolo doppio, una sezione senza corpo, un livello che
+   l'indicatore non ha): rispondi con \`rilievi\` vuoto e salta il passo 2.
+   In nessuno dei due casi c'e' un file da andare a cercare o una cosa da
+   aggiustare tu.
 
 2. Esegui \`${INTERPRETE} -m officina.lint ${scelto.pack.code} --json\` e
    **riporta ogni rilievo**, sia \`blocca\` sia \`segnala\`, copiando \`rule\`,

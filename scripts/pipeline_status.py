@@ -36,7 +36,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts import curate, discovery, pending_notes  # noqa: E402
+from scripts import curate, discovery, pending_notes, pipeline_launch  # noqa: E402
 
 CANDIDATES = PROJECT_ROOT / "data" / "discovery" / "candidates.csv"
 SOURCE_CANDIDATES = PROJECT_ROOT / "data" / "discovery" / "source_candidates.csv"
@@ -46,26 +46,25 @@ SOURCE_CANDIDATES = PROJECT_ROOT / "data" / "discovery" / "source_candidates.csv
 STAGE_ORDER = ["scout", "hunter", "promoter", "curator", "writer", "reviewer",
                "verificatore"]
 
-# Il ruolo che oggi copre ogni vecchio stadio, dopo la fusione in tre ruoli. Le
-# code restano per (vecchio) stadio, perche' i loro lettori sono deterministici e
-# distinti; l'etichetta dice chi le lavora adesso (`admissions` = scout + hunter
-# + promoter, `producer` = curator + writer + reviewer, ed e' l'officina, non un
-# agente; il verificatore copre se stesso).
+# Il ruolo che oggi copre ogni vecchio stadio. Le code restano per (vecchio)
+# stadio, perche' i loro lettori sono deterministici e distinti; l'etichetta dice
+# chi le lavora adesso. La mappa **resta** anche dove ruolo e stadio hanno lo
+# stesso nome, perche' non e' un'identita': traduce il vocabolario storico delle
+# code in quello dei ruoli vivi.
 #
-# Questa mappa **resta** anche dopo che ruolo e agente hanno lo stesso nome
-# (vedi `pipeline_launch.target`), perche' non e' un'identita': traduce il
-# vocabolario storico delle code in quello dei ruoli vivi. Le uniche due voci
-# che sarebbero identita' sono anche le uniche che il vocabolario non ha
-# rinominato.
-AGENT_OF = {
-    "scout": "admissions",
-    "hunter": "admissions",
-    "promoter": "admissions",
-    "curator": "producer",
-    "writer": "producer",
-    "reviewer": "producer",
-    "verificatore": "verificatore",
-}
+# **Non e' una copia della mappa del lanciatore, e' la stessa.** Lo era: due
+# dizionari identici in due file, e sono usciti di sincrono alla prima
+# occasione. Quando `curator` e' passato dal produttore all'ammissione (curare
+# scrive quattro file che solo l'ammissione ha nel perimetro), questa meta' e'
+# rimasta indietro, e per un commit il cruscotto annunciava come prossimo attore
+# un workflow che non sa curare e non ha il permesso di scrivere dove serve. Il
+# piano e lo stato dicevano due cose diverse sullo stesso lavoro.
+#
+# E' il difetto che questo progetto ha gia' pagato altrove, con un agente che
+# per settimane ha scritto in un file che l'app non leggeva piu': una regola
+# ricopiata in due posti va fuori sincrono senza che nessuno se ne accorga. Un
+# alias non puo'.
+AGENT_OF = pipeline_launch.ROLE_OF_STAGE
 
 
 def _rows(path):

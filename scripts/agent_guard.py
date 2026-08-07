@@ -85,6 +85,13 @@ DENY_PATTERNS = (
 # pip fuori dal venv, docker, ...) non serve a nessuno stadio, e uno stadio a
 # cui servisse davvero e' una conversazione da avere, non un buco da lasciare.
 ALLOW_SINGLE = {
+    # `bin/py` e' l'interprete del progetto (`CLAUDE.md`), e mancava: la guardia
+    # conosceva solo `python3` e `.venv/bin/python`, cioe' i due che questo
+    # ambiente non garantisce. Ogni comando che un agente e' **istruito** a
+    # eseguire cadeva qui prima ancora di partire, compresa la suite in coda a
+    # `admissions.md`. Una guardia che rifiuta il comando scritto nel contratto
+    # non protegge un perimetro: ferma il lavoro e basta.
+    "bin/py",
     "python", "python3", ".venv/bin/python", ".venv/bin/python3",
     "ls", "cat", "head", "tail", "wc", "grep", "rg", "find", "diff",
     "sort", "uniq", "cut", "tr", "sed", "awk", "date", "pwd", "echo",

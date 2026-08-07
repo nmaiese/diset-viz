@@ -7,7 +7,7 @@ l'istituzione quando ha pubblicato quel dato, portare un confronto europeo o
 storico che la nostra serie non copre, e reggere un claim comparativo che
 altrimenti andrebbe tagliato.
 
-Esiste perche' senza un elenco lo scrittore parte da una ricerca a freddo, e una
+Esiste perche' senza un elenco chi scrive parte da una ricerca a freddo, e una
 ricerca a freddo su un tema statistico italiano restituisce prima gli aggregatori
 e i blog che le fonti. Qui ci sono solo istituzioni, e una riga per capire in un
 colpo d'occhio se la fonte serve a questo articolo.

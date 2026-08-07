@@ -8,29 +8,21 @@ Three layers, tested separately because they fail in different ways:
 2. The two definition fetchers turn source metadata into committed CSVs. What
    matters is the joins: family namespaces, zero padding, provincial suffixes,
    and header lookup that must not silently slide by one column.
-3. `scripts/definition_check` compares prose to their merged archive. Most
-   cases are synthetic; catalogue anchors protect the source joins and complete
-   coverage without calibrating the lexical heuristic on today's prose.
+3. `scripts/definition_check` compares prose to their merged archive. Synthetic
+   only, here: the catalogue anchors that protect the source joins and complete
+   coverage read the committed CSVs and every published article, so they live in
+   `tests/integration/test_definition_check_live.py`.
 """
 
 from __future__ import annotations
 
-import csv
 import io
 import struct
 import tempfile
 import unittest
 from pathlib import Path
 
-from scripts import (
-    definition_check,
-    fetch_definitions,
-    fetch_federated_definitions,
-    prose_lint,
-    xls_reader,
-)
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+from scripts import definition_check, fetch_definitions, xls_reader
 
 
 # ---------------------------------------------------------------------------
@@ -433,86 +425,6 @@ class CheckEntry(unittest.TestCase):
             source,
         )
         self.assertNotIn("termini", row["hits"])
-
-
-class AgainstTheRealCatalogue(unittest.TestCase):
-    """Anchors on committed data; the lexical behavior stays synthetic."""
-
-    @classmethod
-    def setUpClass(cls):
-        cls.definitions = fetch_definitions.load_definitions()
-
-    def test_the_committed_csv_exists_and_carries_the_declared_columns(self):
-        self.assertTrue(fetch_definitions.OUTPUT_PATH.exists(),
-                        "run python3 scripts/fetch_definitions.py")
-        with fetch_definitions.OUTPUT_PATH.open(encoding="utf-8", newline="") as handle:
-            reader = csv.DictReader(handle, delimiter=";")
-            self.assertEqual(reader.fieldnames, fetch_definitions.COLUMNS)
-
-        self.assertTrue(fetch_definitions.FEDERATED_OUTPUT_PATH.exists(),
-                        "run python3 scripts/fetch_federated_definitions.py")
-        with fetch_definitions.FEDERATED_OUTPUT_PATH.open(
-            encoding="utf-8", newline=""
-        ) as handle:
-            reader = csv.DictReader(handle, delimiter=";")
-            self.assertEqual(
-                reader.fieldnames, fetch_federated_definitions.FEDERATED_COLUMNS
-            )
-
-    def test_the_two_archives_have_disjoint_ids(self):
-        native = fetch_definitions._load_csv(fetch_definitions.OUTPUT_PATH)
-        federated = fetch_definitions._load_csv(
-            fetch_definitions.FEDERATED_OUTPUT_PATH
-        )
-        self.assertEqual(set(native) & set(federated), set())
-
-    def test_it_covers_most_of_the_territorial_archive(self):
-        """A join that silently stops matching is the failure mode here.
-
-        The uncovered ids are real: locally curated series (the 9xx block) and
-        rows Istat has dropped from the sheet. What must not happen is the
-        coverage falling off a cliff because the padding, the float suffix or
-        the header lookup changed under us.
-        """
-        archive = PROJECT_ROOT / "app" / "static" / "data" / "Assoluti_Regione.csv"
-        with archive.open(encoding="utf-8", newline="") as handle:
-            ids = {row["idIndicatore"] for row in csv.DictReader(handle, delimiter=";")}
-        covered = ids & set(self.definitions)
-        self.assertGreater(len(covered) / len(ids), 0.85, "the join has come apart")
-
-    def test_the_source_still_defines_imprenditorialita_femminile_the_narrow_way(self):
-        """The one definition this whole guard was built around.
-
-        If Istat ever broadens it to all female-led firms, the article that says
-        so stops being wrong and this test is the place that finds out.
-        """
-        row = self.definitions.get("402")
-        self.assertIsNotNone(row, "id 402 is not in the definitions CSV")
-        self.assertIn("titolari di imprese individuali", row["definizione"].lower())
-
-    def test_every_committed_article_has_a_source_definition(self):
-        uncovered = sorted(
-            code for code in prose_lint.load_texts()
-            if definition_check.official_id(code) not in self.definitions
-        )
-        self.assertEqual(uncovered, [])
-
-    def test_federated_definitions_keep_the_decisive_source_details(self):
-        expected_fragments = {
-            "76": "totale delle famiglie",
-            "bes:01SAL002": "salute percepita",
-            "bes:10AMB001P": "centraline fisse",
-            "multiscopo:MULTI_REDD_MEDIANO": "fitti imputati",
-            "dem:OLDAGEDEPR": "65",
-            "eur:rd_p_persreg": "equivalenti a tempo pieno",
-        }
-        for key, fragment in expected_fragments.items():
-            with self.subTest(key=key):
-                self.assertIn(
-                    fragment,
-                    self.definitions[key]["definizione"].lower(),
-                )
-
 
 class DefinitionKeys(unittest.TestCase):
     def test_public_codes_map_to_the_archive_namespaces(self):

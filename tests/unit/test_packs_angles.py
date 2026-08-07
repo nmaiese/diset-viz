@@ -211,8 +211,78 @@ class GroupDivergence(unittest.TestCase):
         ordinamento che non vale piu'. Da -10 a 10 la sottrazione firmata dava
         +200% di divergenza su un divario che non si e' mosso di un punto, cioe'
         l'angolo piu' forte del pacchetto costruito sul nulla. Un articolo lo
-        avrebbe aperto: la forza decide la struttura."""
+        avrebbe aperto: la forza decide la struttura.
+
+        Resta vero, e adesso non e' piu' tutto: non e' una divergenza **ed e'
+        un sorpasso**. Vedi il test qui sotto."""
         found = angles.group_divergence(self._serie(0.0, 10.0, 10.0, 0.0), self.GROUPS)
+        self.assertNotIn("gruppi-che-divergono", kinds(found))
+        self.assertNotIn("gruppi-che-convergono", kinds(found))
+
+    def test_a_rank_reversal_at_an_unchanged_gap_is_an_overtake(self):
+        """La correzione precedente aveva tolto la frase falsa e lasciato il
+        silenzio, e il silenzio era l'altra meta' del difetto.
+
+        Il pavimento (`FLOOR`) taglia gli angoli deboli sulla variazione della
+        distanza, che qui e' zero: spariva l'angolo e con lui `ordine_invertito`,
+        cioe' proprio la cifra che in questo caso e' l'unica cosa da dire. Chi
+        stava sopra sta sotto, e questo non e' un effetto nei decimali.
+
+        La forza e' fissa e fuori dalla calibrazione, come `rottura-di-metodo`:
+        il catalogo produce un caso puro su 576 serie, e un quantile su un
+        campione non e' una misura.
+        """
+        found = angles.group_divergence(self._serie(0.0, 10.0, 10.0, 0.0), self.GROUPS)
+        self.assertEqual(kinds(found), ["gruppi-che-si-sorpassano"])
+        cifre = found[0]["figures"]
+        self.assertTrue(cifre["ordine_invertito"])
+        self.assertEqual(cifre["distanza_primo_anno"], cifre["distanza_ultimo_anno"])
+        self.assertEqual(cifre["gruppo_alto"], "nord")
+        self.assertEqual(cifre["gruppo_alto_primo_anno"], "sud")
+
+    def test_a_gap_that_barely_moves_without_a_reversal_stays_silent(self):
+        """Il pavimento non si e' aperto per tutti: senza inversione una
+        variazione sotto `FLOOR` resta cio' che era, un effetto nei decimali."""
+        found = angles.group_divergence(self._serie(0.0, 10.0, 0.0, 10.5), self.GROUPS)
+        self.assertEqual(found, [])
+
+    def test_a_crossover_with_a_small_gap_change_does_not_claim_it_stood_still(self):
+        """Il ramo del sorpasso copre anche una distanza che si muove **poco**,
+        non solo una ferma, e la cautela non deve dire il contrario delle cifre.
+
+        Da 100 a 110 con i gruppi che si scambiano: `variazione_relativa` vale
+        0,1, sotto il pavimento, quindi la storia non e' il divario. Una cautela
+        che dicesse "la distanza non si e' mossa" contraddirebbe la cifra che
+        l'angolo stesso porta, e la prosa puo' aprire su questo angolo.
+        """
+        found = angles.group_divergence(self._serie(100.0, 0.0, 0.0, 110.0), self.GROUPS)
+        self.assertEqual(kinds(found), ["gruppi-che-si-sorpassano"])
+        self.assertAlmostEqual(found[0]["figures"]["variazione_relativa"], 0.1)
+        self.assertNotIn("non si e' mossa", found[0]["caution"])
+        self.assertIn("100", found[0]["caution"])
+        self.assertIn("110", found[0]["caution"])
+
+    def test_you_do_not_overtake_someone_you_were_level_with(self):
+        """Distanza di partenza nulla: i due gruppi erano pari, quindi non
+        esiste un "chi stava sopra" da rovesciare, e non c'e' sorpasso.
+
+        Vale la pena pinnarlo perche' e' il caso in cui la variazione relativa
+        non e' zero ma **indefinita**, e un rilevatore che la trattasse come zero
+        aprirebbe un angolo su un ordine che nel primo anno non esisteva.
+        """
+        found = angles.group_divergence(self._serie(5.0, 5.0, 0.0, 10.0), self.GROUPS)
+        self.assertEqual(found, [])
+
+    def test_groups_level_in_both_years_are_not_a_crossover(self):
+        """Il caso peggiore del pareggio, perche' passava.
+
+        Con tutti i gruppi alla pari in **tutti e due** gli anni, `estremi`
+        restituisce lo stesso gruppo come alto e come basso, quindi le due
+        coppie sono `(g, g)` e `(g, g)` e la sola uguaglianza le dichiarava
+        invertite: usciva un sorpasso a forza 0,8 con le due distanze a zero,
+        cioe' due gruppi che si scambiano un posto che nessuno dei due aveva.
+        """
+        found = angles.group_divergence(self._serie(5.0, 5.0, 7.0, 7.0), self.GROUPS)
         self.assertEqual(found, [])
 
     def test_a_reversal_that_also_widens_says_that_it_reversed(self):
@@ -309,6 +379,73 @@ class ThreeGroupsAreTheNormalCase(unittest.TestCase):
             for found in angles.group_divergence(self._serie(primo, ultimo), self.GROUPS):
                 self.assertGreaterEqual(found["figures"]["distanza_primo_anno"], 0)
                 self.assertGreaterEqual(found["figures"]["distanza_ultimo_anno"], 0)
+
+
+class ARepresentativeCohort(unittest.TestCase):
+    """La coorte dice **quali** territori si confrontano, questa soglia dice se
+    sono abbastanza per chiamarli il paese.
+
+    Sono due domande diverse e la prima non risponde alla seconda: una media su
+    quattro regioni di venti e' esatta, e la frase che la chiama "l'Italia" no.
+    A rifiutarsi di parlare e' il rilevatore, non la media, cosi' si perde un
+    angolo invece di falsare una cifra.
+    """
+
+    @staticmethod
+    def _serie(width, cohort, years=range(2000, 2016)):
+        """Una serie con una rottura di pendenza vera, e `cohort` territori
+        presenti in ogni anno su `width` coperti."""
+        out = {}
+        for index, year in enumerate(years):
+            salto = 5 * max(0, index - 7)
+            riga = {f"t{i:02d}": 10.0 + i + salto for i in range(width)}
+            # I territori oltre la coorte mancano a turno, cosi' restano
+            # "coperti" (presenti in almeno un anno) ma fuori dall'intersezione.
+            if index % 2 == 0:
+                for i in range(cohort, width):
+                    riga.pop(f"t{i:02d}")
+            out[year] = riga
+        return out
+
+    def test_a_thin_cohort_silences_the_three_cohort_detectors(self):
+        """Quattro territori su venti: e' il caso `283`, che apriva la voce."""
+        serie = self._serie(width=20, cohort=4)
+        self.assertEqual(len(angles.common_cohort(serie)), 4)
+        self.assertEqual(len(angles.covered_territories(serie)), 20)
+        self.assertFalse(angles.cohort_is_representative(serie))
+        self.assertEqual(angles.slope_break(serie), [])
+        self.assertEqual(angles.acceleration(serie), [])
+        self.assertEqual(angles.return_to_level(serie), [])
+
+    def test_a_full_cohort_still_speaks(self):
+        serie = self._serie(width=20, cohort=20)
+        self.assertTrue(angles.cohort_is_representative(serie))
+        self.assertEqual(kinds(angles.slope_break(serie)), ["rottura-di-pendenza"])
+
+    def test_the_threshold_is_a_share_so_provinces_are_not_exempt(self):
+        """Una soglia **assoluta** di dodici non e' una guardia su 103 province:
+        settanta province su centotre passerebbero un minimo di dodici a occhi
+        chiusi, e sono meno di due terzi. E' la ragione per cui la costante e'
+        una quota e non un numero."""
+        sottile = self._serie(width=103, cohort=50)
+        self.assertGreater(len(angles.common_cohort(sottile)), angles.MIN_TERRITORIES)
+        self.assertFalse(angles.cohort_is_representative(sottile))
+        self.assertEqual(angles.slope_break(sottile), [])
+
+        piena = self._serie(width=103, cohort=70)
+        self.assertTrue(angles.cohort_is_representative(piena))
+        self.assertEqual(kinds(angles.slope_break(piena)), ["rottura-di-pendenza"])
+
+    def test_an_indicator_that_covers_few_territories_is_not_punished(self):
+        """La quota si misura su cio' che l'indicatore **copre**, non su venti.
+        Cinque regioni coperte e tutte e cinque presenti sempre: quell'indicatore
+        parla per intero di cio' di cui dice di parlare."""
+        serie = self._serie(width=5, cohort=5)
+        self.assertTrue(angles.cohort_is_representative(serie))
+        self.assertEqual(kinds(angles.slope_break(serie)), ["rottura-di-pendenza"])
+
+    def test_an_empty_matrix_is_not_representative(self):
+        self.assertFalse(angles.cohort_is_representative({}))
 
 
 class MethodBreaks(unittest.TestCase):

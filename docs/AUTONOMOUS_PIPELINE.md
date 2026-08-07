@@ -48,15 +48,15 @@ tenevano quell'indicatore peggio di quanto lo tenga una testa sola che lo porta
 fino in fondo.
 
 ```
-  ammissione                      produttore                    verificatore
-  (scout+hunter+promoter)         (curator+writer+reviewer)     (invariato)
-  quali fonti, quali indicatori   cura -> scrive -> si rilegge   prova a smentirlo
-  li promuove                     -> firma
-       |                               |                              |
-  batch, l'intera coda            un indicatore alla volta        un articolo alla volta
-       |                               |                              |
-  data/discovery/*                content/indicators/             data/pipeline/verifiche/
-                                  data/pipeline/runs/
+  ammissione                      produttore                 i due critici
+  (scout+hunter+promoter+curator) (writer+reviewer)          verificatore: i fatti
+  quali fonti, quali indicatori   due bozze -> giudizio       reader-editor: la prosa
+  li promuove, ne cura il verso   cieco -> revisione -> lint
+       |                               |                            |
+  batch, l'intera coda            un indicatore alla volta    un articolo alla volta
+       |                               |                            |
+  data/discovery/*                content/indicators/         data/pipeline/verifiche/
+                                  data/pipeline/runs/         data/pipeline/letture/
 ```
 
 - **Ammissione** (agente `admissions`) scandaglia i cataloghi, decide quali
@@ -66,20 +66,33 @@ fino in fondo.
   la faccio cadere?"), perche' l'istituzione e la licenza che lascia passare
   finiscono su una pagina pubblica sotto il nome del progetto e nessuno legge la
   pull request prima del merge.
-- **Produttore** (agente `producer`) porta **un** indicatore da ammesso a
-  pubblicato in una sessione: cura il verso e la categoria, scrive l'intero
-  articolo, si rilegge, firma. Fonde curatore, scrittore e revisore. Il passo
-  distintivo e' la **rilettura sul proprio testo** (reflexion): ha appena
-  scritto, quindi e' il lettore peggiore, e si rilegge con la durezza con cui lo
-  farebbe il verificatore.
+- **Produttore** (l'officina, `.claude/workflows/produci-indicatori.js`) porta
+  **un** indicatore da ammesso a pubblicato: monta il pacchetto, fa scrivere due
+  bozze dai due angoli piu' forti, le fa scegliere a due giudici ciechi, applica
+  la diagnosi e chiude sul lint. Fonde scrittore e revisore. La **cura** sta a
+  monte, con l'ammissione, che e' il ruolo che ne ha i file nel perimetro. **Non e'
+  un agente**: quattro tipi stretti dentro un workflow fanno lo stesso lavoro a
+  un ventesimo del costo, e il coordinamento dentro un workflow non costa token.
+  Il passo distintivo e' il **giudizio cieco**, non la rilettura sul proprio
+  testo: chi ha appena scritto e' il lettore peggiore del proprio testo, e due
+  bozze confrontate da chi non ha il progetto in contesto dicono cio' che una
+  sola rilettura non dice.
 - **Verificatore** (agente `verificatore`) prova a falsificare ogni
   affermazione di un articolo firmato. E' rimasto **invariato** nella
   ri-architettura, ed e' l'unico ruolo che misura il lavoro di un altro ruolo
   invece dei dati. Non corregge niente: una smentita torna in coda al
   produttore, che ha assorbito il revisore.
 
-Il verificatore e' arrivato per ultimo perche' e' servito misurarlo prima di
-credergli. Una firma di chi si e' riletto e' la parola del produttore sul lavoro
+- **Reader-editor** (agente `reader-editor`) e' il quarto, arrivato dopo, ed e'
+  il gemello del verificatore su un altro asse: lui misura se i fatti reggono,
+  questo se un lettore comune capisce la pagina al primo passaggio. Non corregge
+  niente nemmeno lui, e a differenza degli altri e' `soft`: accoda una
+  riscrittura, non blocca nessun merge. La sezione "I tre ruoli" tiene il nome
+  che aveva la ri-architettura, che ne fuse sette in tre; il reader-editor e'
+  nato dopo, e li porta a quattro.
+
+Il verificatore e' arrivato per ultimo fra i tre perche' e' servito misurarlo
+prima di credergli. Una firma di chi si e' riletto e' la parola del produttore sul lavoro
 del produttore, e finche' nessuno provava a farla cadere quanto valesse non si
 sapeva. Ora si sa:
 
@@ -94,20 +107,34 @@ qualcuno resta in pagina finche' qualcosa non prova a farlo cadere. E' il motivo
 per cui il produttore si rilegge (passo interno) **e** il verificatore rilegge
 di nuovo, indipendente, dopo la firma.
 
-Ogni ruolo ha tre cose, e sono sempre le stesse tre: una **coda deterministica**
-calcolata da file committati, un **agente** con un file di definizione in
-`.claude/agents/`, e un **verdetto del cancello** che decide se puo' pubblicare.
+Ogni ruolo ha una **coda deterministica** calcolata da file committati. I tre
+che sono **agenti** hanno anche un file di definizione in `.claude/agents/`, un
+perimetro in `pipeline_gate.STAGE_PATHS` e un **verdetto del cancello** che
+decide se possono pubblicare; il quarto, il produttore, e' un workflow, non apre
+una pull request e non ha un perimetro nel cancello, e il suo cancello e'
+editoriale (`officina/lint.py`).
+
 Le code sono ancora quelle dei sette stadi (il vocabolario interno non cambia:
-un produttore legge la coda del curatore e quella dello scrittore), ma chi le
-drena sono tre ruoli, non sette.
+il produttore legge la coda dello scrittore e quella del revisore, l'ammissione
+anche quella del curatore), ma chi le drena sono quattro ruoli, non sette. La
+mappa da vecchio stadio a ruolo vivo sta in un posto solo,
+`pipeline_launch.ROLE_OF_STAGE`, e `pipeline_status` e `pipeline_monitor` la
+importano invece di ricopiarla.
 
-| ruolo | agente | coda | comando |
+| ruolo | chi lo esegue | coda | comando |
 | --- | --- | --- | --- |
-| ammissione | `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` | `scripts/scout_sources.py`, `scripts/discover_candidates.py`, `scripts/promote_candidates.py` |
-| produttore | `producer` | `curate.worklist()` + `pending_notes` + `review_queue` | `scripts/curate.py`, `scripts/pending_notes.py`, `scripts/review_queue.py` |
-| verificatore | `verificatore` | `verification_queue` | `scripts/verification_queue.py` |
+| ammissione | agente `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved`, `curate.worklist()` | `scripts/scout_sources.py`, `scripts/discover_candidates.py`, `scripts/promote_candidates.py`, `scripts/curate.py`, `scripts/apply_curation.py` |
+| produttore | workflow `.claude/workflows/produci-indicatori.js` | `pending_notes` + `review_queue` | `scripts/pending_notes.py`, `scripts/review_queue.py` |
+| verificatore | agente `verificatore` | `verification_queue` | `scripts/verification_queue.py` |
+| reader-editor | agente `reader-editor` | `reading_queue` (i pubblicati che nessuno ha ancora letto) | `scripts/reading_queue.py` |
 
-Un solo comando dice lo stato di tutte le code:
+Il reader-editor e' arrivato dopo gli altri tre e non compare in
+`pipeline_status`, che ragiona ancora per **vecchio stadio**: la sua riga
+`reviewer` e' la coda del produttore, non questa. La coda di leggibilita' si
+legge dal suo comando, oppure dal piano (`pipeline_launch.py`), che invece
+ragiona per ruolo e la elenca.
+
+Un comando dice lo stato delle code per vecchio stadio:
 
 ```bash
 python3 scripts/pipeline_status.py            # leggibile
@@ -168,9 +195,12 @@ indicatore malato non ferma un indicatore pronto e indipendente.
 
 Come il dispatcher, non lancia lui l'agente, e non potrebbe: un agente e' una
 sessione Claude Code, il lanciatore e' stdlib. Dice **che cosa** lanciare, con
-ruolo, indicatore e `run_id` gia' coniato, e l'agente lanciatore
-(oggi un umano o un workflow: l'agente `launcher.md` non esiste piu', era un workflow scritto in prosa) fa il resto. La decisione resta cosi'
-deterministica e verificabile da un test, l'esecuzione no.
+ruolo e indicatore, e per i ruoli che aprono una run anche il `run_id` gia'
+coniato: le voci `producer` non ne portano, perche' l'officina non apre una pull
+request e il diario rifiuterebbe quell'identificativo. Chi legge il piano (una
+persona, o la Routine) fa il resto: **l'agente `launcher.md` non esiste piu'**,
+era un workflow scritto in prosa. La decisione resta cosi' deterministica e
+verificabile da un test, l'esecuzione no.
 
 Con `--publish` il lanciatore segna il **battito del lanciatore** nel diario: una
 riga `launch` che `land_on_master` porta su master, cosi' un tick vero lascia una
@@ -189,9 +219,10 @@ contraddicono. Adesso sono directory, un file per record:
 
 | store | un file per | scritto da | committato |
 | --- | --- | --- | --- |
-| `content/indicators/` | articolo | produttore | si' |
+| `content/indicators/` | articolo | l'officina | si' |
 | `data/pipeline/runs/` | run | tutti i ruoli | si' |
 | `data/pipeline/verifiche/` | verifica | verificatore | si' |
+| `data/pipeline/letture/` | lettura di leggibilita' | reader-editor | si' |
 | `data/pipeline/practices/` | pratica (record di stato) | riconciliatore | si' |
 | `data/pipeline/heartbeats/` | sessione in volo | ogni ruolo all'avvio | no (e' il vivo) |
 
@@ -501,15 +532,15 @@ poi restava fermo per sempre, il che faceva sembrare la catena finita mentre il
 catalogo invecchiava sotto. Oggi i tre innesco sono gli stessi, ma li drenano i
 tre ruoli:
 
-**Ammissione.** Non ha un rientro sul pubblicato: guarda solo i cataloghi. Il suo
-"rientro" e' che la coda dello scout riflette lo stato del catalogo (vedi sotto),
-non un troncamento.
+**Ammissione, lato cataloghi.** La coda dello scout riflette lo stato del
+catalogo (vedi sotto), non un troncamento.
 
-**Produttore, lato curatela.** `curation.csv` porta `data_year`, l'anno su cui il
-verso e' stato giudicato. Quando la fonte ne pubblica uno piu' recente,
-l'indicatore rientra in `recheck`. Un verso e' un'affermazione su quale estremo
-della classifica sia quello buono, ed e' esattamente cio' che una ridefinizione,
-un rebase o una rottura di serie possono invertire.
+**Ammissione, lato curatela**, ed e' il suo rientro sul pubblicato.
+`curation.csv` porta `data_year`, l'anno su cui il verso e' stato giudicato.
+Quando la fonte ne pubblica uno piu' recente, l'indicatore rientra in `recheck`.
+Un verso e' un'affermazione su quale estremo della classifica sia quello buono,
+ed e' esattamente cio' che una ridefinizione, un rebase o una rottura di serie
+possono invertire.
 
 **Produttore, lato testo.** Ha `stale` in `pending_notes` e `text_queue` (un
 articolo il cui `vintage` e' rimasto indietro) e, dopo un rinfresco,
@@ -537,7 +568,7 @@ tetto, e sono entrambi **dati** dentro il perimetro di un agente:
 - `config/istat_series.yaml` (ammissione): una riga = un indicatore Istat SDMX.
   `dataflow` e' un campo per serie, non piu' una costante di modulo, quindi un
   dominio nuovo non richiede un adapter nuovo.
-- `config/theme_categories.csv` (produttore): la mappa tema -> categoria. Un tema
+- `config/theme_categories.csv` (ammissione): la mappa tema -> categoria. Un tema
   che il catalogo non conosce fa sparire l'indicatore dai totali per macro-area
   pur lasciandolo in catalogo, cioe' un buco silenzioso, e la correzione stava
   dentro `app/taxonomy.py`, un modulo Python.
@@ -572,14 +603,25 @@ falliva, e non arrivava in nessuna pagina. Un prompt che ricopia una regola va
 fuori sincrono senza che nessuno se ne accorga, un prompt che punta a un file no.
 
 **La Routine e' una sola**, ed e' quella del **lanciatore**: i ruoli non hanno un
-cron proprio. Anche il lanciatore e' un agente a pieno titolo
-(non piu' un agente: il piano si legge e si lancia, vedi `.claude/rules/pipeline.md`): legge
+cron proprio. Il lanciatore non e' piu' un agente, e' uno script che si legge e
+un piano che si lancia (vedi `.claude/rules/pipeline.md`). La Routine legge
 `scripts/pipeline_launch.py --json --publish --publish-base https://divarioitalia.it`,
-segna il battito del lanciatore nel diario, poi lancia gli agenti in cima al piano **in parallelo**
-(piu' `Agent` nello stesso messaggio), ciascuno con il suo `run_id` e il suo
-indicatore. A differenza del dispatcher non ne lancia uno solo: indicatori
-diversi non contendono. Il prompt della Routine e' un puntatore a quella
-definizione, mai una copia.
+segna il battito del lanciatore nel diario, poi mette in volo le voci in cima al
+piano **in parallelo**. A differenza del dispatcher non ne lancia una sola:
+indicatori diversi non contendono.
+
+**Come si lancia una voce lo dice la voce**, e sono due forme, non una:
+
+- `agent` valorizzato: e' una sessione Claude Code (`Agent`, piu' d'uno nello
+  stesso messaggio), con il suo `run_id` e il suo indicatore.
+- `agent: null`: e' un **workflow**, e la voce porta gia' il comando in
+  `comando`. Non ha un `run_id`, e non e' una dimenticanza: l'officina non apre
+  una pull request e non scrive nel diario, quindi non e' una run (vedi
+  `plan_launches`). Una Routine che lanciasse solo `Agent`, o che pretendesse un
+  `run_id` da ogni voce, lascerebbe le voci `producer` a terra e la coda della
+  scrittura non si drenerebbe mai.
+
+Il prompt della Routine e' un puntatore a questa definizione, mai una copia.
 
 La stessa lezione anti-drift vale dentro `.claude/`. Ogni agente dichiara nel
 frontmatter il proprio **modello** (niente modello implicito ereditato dalla
@@ -631,8 +673,9 @@ Due cose, e nessuna delle due e' un'approvazione:
    del genere lo dice nella PR e descrive che adapter servirebbe.
 2. **Creare una categoria** della qualita' della vita. E' una sezione del sito,
    con un nome, una descrizione e una macro-area, non una riga di CSV. Mappare
-   un tema a una categoria che gia' esiste invece e' del produttore, e si fa in
-   `config/theme_categories.csv`.
+   un tema a una categoria che gia' esiste invece e' dell'**ammissione**, che ha
+   `config/theme_categories.csv` nel proprio perimetro, e non e' codice: quel
+   CSV ha le colonne `added_by` e `added_at` perche' lo scriva la catena.
 
 Tutto il resto, dalla fonte alla pagina pubblicata e poi rivisitata, gira da
 solo e si fonde da solo. Non c'e' nessun punto in cui la catena aspetta che

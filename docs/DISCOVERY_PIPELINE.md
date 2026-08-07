@@ -139,12 +139,17 @@ unificata keyword-first `/indicatore/<slug>/eur-<dataset>`. Le righe *enriching*
 duplica un indicatore Istat) NON diventano voci separate: restano agganciate all'id
 Istat che puntano.
 
-## Fase 3 (implementata): il curatore, il lavoro qualitativo
+## Fase 3 (implementata): la curazione, il lavoro qualitativo
 
-Lo scouting propone verso e categoria dai soli nomi. Il **curatore** (agente
-schedulato o umano) fa il lavoro qualitativo che manca: verifica il **verso**
-contro i dati veri, rivede la descrizione, e pubblica la mappatura così
-l'indicatore entra nel punteggio, nel quiz e nella qualità della vita.
+Lo scouting propone verso e categoria dai soli nomi. La **curazione** fa il
+lavoro qualitativo che manca: verifica il **verso** contro i dati veri, rivede la
+descrizione, e pubblica la mappatura così l'indicatore entra nel punteggio, nel
+quiz e nella qualità della vita.
+
+Non ha più un agente suo. `indicator-curator.md` è stato cancellato, e il vecchio
+stadio `curator` porta al ruolo **ammissione**
+(`pipeline_launch.ROLE_OF_STAGE`), che è quello che ha nel proprio perimetro i
+tre file che una curazione scrive. Chi cura è quindi l'ammissione, o una persona.
 
 Strumenti (stdlib):
 
@@ -154,7 +159,7 @@ Strumenti (stdlib):
   regioni che chiameremmo "migliori": se non è così, il verso va corretto.
   Esempio reale (R&S sul PIL): in cima Emilia-Romagna, Piemonte, Lazio; in fondo
   Calabria, Valle d'Aosta. Verso `higher_better` confermato.
-- Il curatore scrive la decisione in `data/discovery/curation.csv`: verso
+- La decisione si scrive in `data/discovery/curation.csv`: verso
   revisionato, verdetto (`confermato`/`corretto`), categoria, `score_eligible`
   (solo se il verso è davvero direzionale) e una descrizione rivista opzionale.
   La decisione è identificata da **target più fonte più serie di origine**, non
@@ -220,21 +225,26 @@ comparative e il `vintage` uguale all'`year_max` corrente (drift guard). È lo
 step che trasforma un indicatore appena integrato in una pagina che si legge come
 scritta da un giornalista.
 
-Cura, scrittura e revisione **non sono piu' tre agenti freddi** che si passano
-l'indicatore via CSV: sono i tre passi di un ruolo solo, il **produttore**
-(l'officina, `.claude/workflows/produci-indicatori.js`), che porta un indicatore da ammesso a firmato in
-una sessione e si rilegge il proprio testo prima di firmare. La catena, dopo la
-ri-architettura, e' tre ruoli, non sette stadi:
+Scrittura e revisione **non sono piu' tre agenti freddi** che si passano
+l'indicatore via CSV: scrivere e' un ruolo solo, il **produttore** (l'officina,
+`.claude/workflows/produci-indicatori.js`), che porta un indicatore da ammesso a
+pubblicato in una run, con due bozze e un giudizio cieco al posto della
+rilettura del proprio testo. La cura sta a monte, con l'ammissione, che e' il
+ruolo che ne ha i file nel perimetro. Nessuno firma piu' niente
+(`pipeline_gate.ROLES_THAT_SIGN` e' vuoto): il controllo sono i due critici a
+valle. La catena, dopo la ri-architettura, e' tre ruoli, non sette stadi:
 
-    ammissione (scout+hunter+promoter) -> produttore (cura+scrive+rilegge+firma) -> verificatore
-                                                                                        |
-                                                                     cancello -> merge auto (= pubblicata)
+    ammissione (scout+hunter+promoter+cura) -> produttore (scrive) -> verificatore
+                                                          |                 |
+                                                    reader-editor           |
+                                                                            |
+                                                    cancello -> merge auto (= pubblicata)
 
-| ruolo | agente | code deterministiche che drena |
+| ruolo | chi lo esegue | code deterministiche che drena |
 | --- | --- | --- |
-| ammissione | `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` da promuovere |
-| produttore | `producer` | `scripts/curate.py --include-recheck`, `scripts/pending_notes.py`, `scripts/text_queue.py`, `scripts/review_queue.py` |
-| verificatore | `verificatore` | `scripts/verification_queue.py` |
+| ammissione | agente `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` da promuovere, `scripts/curate.py --include-recheck` |
+| produttore | workflow `.claude/workflows/produci-indicatori.js` | `scripts/pending_notes.py`, `scripts/text_queue.py`, `scripts/review_queue.py` |
+| verificatore | agente `verificatore` | `scripts/verification_queue.py` |
 
 I file di agente dei vecchi stadi (`source-scout.md`, `indicator-hunter.md`,
 `indicator-curator.md`, `indicator-writer.md`, `indicator-reviewer.md`) non
@@ -257,10 +267,13 @@ precedente. È la condizione perché un agente schedulato sappia su che cosa
 lavorare partendo da zero, e perché due run su indicatori diversi non si pestino
 i piedi (file diversi, nessuna contesa).
 
-## Fase 5: il revisore, i testi che esistono già
+## Fase 5: la revisione, i testi che esistono già
 
-Lo scrittore produce articoli, il revisore è il motivo per cui ci si può fidare.
-Le guardie meccaniche coprono struttura, stile, `vintage`, le cifre decimali
+L'officina produce articoli, la revisione è il motivo per cui ci si può fidare.
+Non è più un agente solo che rilegge e firma: sono **due critici indipendenti su
+due assi**, il verificatore sui fatti e il reader-editor sulla leggibilità, e i
+loro rilievi tornano all'officina come i segnali `smentita` e `leggibilita` di
+`review_queue`. Le guardie meccaniche coprono struttura, stile, `vintage`, le cifre decimali
 attribuite a una regione e le soglie asserite su un elenco di regioni. Quello che
 non possono coprire, elencato in `docs/INDICATOR_PAGES.md`, è esattamente dove si
 nascondono gli errori, e `scripts/review_queue.py` lo cerca:
@@ -286,26 +299,26 @@ Per questo `scripts/pending_notes.py` produce la **coda della scrittura**, come
 
 - **da scrivere** (`missing`): un indicatore integrato nel manifest
   (`status=integrated`) senza articolo. È il passaggio di consegne
-  curatore -> scrittore.
+  curazione -> officina.
 - **da aggiornare** (`stale`): un articolo il cui `vintage` è rimasto indietro
   rispetto all'`year_max` corrente dell'indicatore (il caso di refresh, la stessa
   deriva che controlla `tests/integration/test_indicator_texts.py`).
 
 `pending_notes.py` copre gli indicatori tracciati dal manifest. Per lo stato
 editoriale dell'intero catalogo, incluse le sezioni ancora composte dal template,
-si usa `.venv/bin/python -m scripts.text_queue`.
+si usa `bin/py -m scripts.text_queue`.
 
 ```bash
 python3 scripts/pending_notes.py            # coda leggibile
 python3 scripts/pending_notes.py --json      # coda per l'agente
 ```
 
-Lo script è stdlib puro come i fratelli (cacciatore, curatore): sia la coda sia
-l'`year_max` corrente arrivano da file committati (il `new_year`, o in mancanza
-il `current_year`, del manifest), quindi la coda dello scrittore non richiede
-Flask. Il controllo `stale` si
+Lo script è stdlib puro come i fratelli (`discover_candidates.py`, `curate.py`):
+sia la coda sia l'`year_max` corrente arrivano da file committati (il `new_year`,
+o in mancanza il `current_year`, del manifest), quindi la coda della scrittura
+non richiede Flask. Il controllo `stale` si
 restringe così agli indicatori esterni/integrati che il manifest traccia, cioè
-proprio il perimetro dello scrittore come innesco della pipeline di discovery.
+proprio il perimetro della scrittura come innesco della pipeline di discovery.
 La logica è testata (`tests/unit/test_pending_notes.py`) senza toccare alcun file.
 
 ## Fonte pilota: Eurostat regionale (NUTS2)

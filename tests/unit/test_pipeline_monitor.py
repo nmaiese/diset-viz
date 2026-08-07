@@ -152,6 +152,14 @@ class Board(unittest.TestCase):
         self.assertEqual(row["progress"], 100)
 
     def test_an_open_smentita_is_an_explicit_producer_action(self):
+        """Il proprietario e' il **ruolo**, con il nome che porta nel diario.
+
+        Era la stringa italiana `produttore`, cablata qui e in altri due rami,
+        mentre il ramo generico applicava `ROLE_LABELS` e diceva `officina`: la
+        stessa riga del cruscotto cambiava nome a seconda di quale ramo l'aveva
+        prodotta, e i filtri per proprietario ci si appoggiano. Ora il ruolo si
+        legge dalla mappa e l'etichetta si applica nello stesso posto.
+        """
         d = practice("ter-bad", state="invalidata", flags={"open_smentita": True},
                      completed=["writer", "reviewer", "verificatore"],
                      required=["writer", "reviewer", "verificatore"])
@@ -159,9 +167,56 @@ class Board(unittest.TestCase):
         b = pipeline_monitor.board({"ter-bad": d}, today=self.TODAY)
         row = b["rows"][0]
         self.assertEqual(row["next_step"]["kind"], "attention")
-        self.assertEqual(row["next_step"]["owner"], "produttore")
+        self.assertEqual(row["next_step"]["owner"], "officina")
         self.assertEqual(row["lifecycle"][1]["status"], "issue")
         self.assertEqual(b["metrics"]["attention"], 1)
+
+    def test_stale_curation_belongs_to_admissions_not_to_the_workshop(self):
+        """Il ramo speciale scavalcava `ROLE_OF_STAGE`, e alla prima occasione
+        ha mentito: quando `curator` e' passato all'ammissione, il cruscotto ha
+        continuato a mandare chi lo legge a un workflow che non sa curare e non
+        ha nel perimetro i quattro file della curatela."""
+        d = practice("ter-vecchio", state="invalidata", flags={"stale_curation": True},
+                     completed=["writer"], required=["writer"])
+        d.update({"timeline": []})
+        b = pipeline_monitor.board({"ter-vecchio": d}, today=self.TODAY)
+        passo = b["rows"][0]["next_step"]
+        self.assertEqual(passo["stage"], "curator")
+        self.assertEqual(passo["owner"], "admissions")
+
+    def test_a_stale_curation_is_an_admission_phase_not_a_production_one(self):
+        """Proprietario e fase devono venire dallo stesso posto.
+
+        Venivano da due: il proprietario da `ROLE_OF_STAGE`, la fase da un
+        elenco scritto a mano in cui `promoter` era l'ammissione e tutto il
+        resto la produzione. Cosi' la stessa riga diceva proprietario
+        `admissions` e fase `produzione`, e i filtri per fase classificavano
+        male ogni curatela, iniziale o scaduta.
+        """
+        d = practice("ter-vecchio", state="invalidata", flags={"stale_curation": True},
+                     completed=["curator", "writer"])
+        d.update({"timeline": []})
+        row = pipeline_monitor.board({"ter-vecchio": d}, today=self.TODAY)["rows"][0]
+        self.assertEqual(row["next_step"]["owner"], "admissions")
+        fasi = {f["key"]: f["status"] for f in row["lifecycle"]}
+        self.assertEqual(fasi["ammissione"], "issue")
+        self.assertNotEqual(fasi["produzione"], "issue")
+
+    def test_an_indicator_waiting_for_its_first_curation_is_not_past_admission(self):
+        """`curator` mai fatto e' ammissione incompleta, non produzione in
+        corso: e' il ruolo che ha i file della curatela nel perimetro."""
+        d = practice("ter-nuovo", completed=[])
+        d.update({"timeline": []})
+        row = pipeline_monitor.board({"ter-nuovo": d}, today=self.TODAY)["rows"][0]
+        fasi = {f["key"]: f["status"] for f in row["lifecycle"]}
+        self.assertNotEqual(fasi["ammissione"], "done")
+
+    def test_the_special_paths_and_the_generic_one_name_the_owner_the_same_way(self):
+        """Due rami che producono la stessa riga non possono chiamarla in due
+        modi: i template rendono `next_step.owner` alla lettera."""
+        speciale = pipeline_monitor._next_step({"flags": {"stale_vintage": True}}, None)
+        generico = pipeline_monitor._next_step({"flags": {}}, "writer")
+        self.assertEqual(speciale["owner"], generico["owner"])
 
     def test_the_row_keeps_the_complete_timeline_and_operational_run_detail(self):
         d = practice("ter-x", completed=["writer"], required=["writer", "reviewer", "verificatore"])

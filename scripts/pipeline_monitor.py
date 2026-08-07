@@ -235,6 +235,20 @@ def _run_history(run_ids, runs_by_id) -> list:
     return out
 
 
+def _owner_of(stage: str) -> str:
+    """Il proprietario da mostrare per un vecchio stadio: dalla mappa, e con la
+    sua etichetta.
+
+    Le due meta' vanno insieme. Erano separate, e si vedeva: i rami speciali
+    scrivevano il ruolo a mano e il ramo generico applicava `ROLE_LABELS`,
+    quindi la stessa riga del cruscotto diceva `produttore` o `officina` a
+    seconda di quale ramo l'aveva prodotta. I template rendono questo campo
+    alla lettera, e i filtri per proprietario ci si appoggiano.
+    """
+    ruolo = pipeline_launch.ROLE_OF_STAGE.get(stage) or stage
+    return ROLE_LABELS.get(ruolo, ruolo)
+
+
 def _next_step(d: dict, ready_stage: str | None) -> dict:
     """La prossima azione, detta come gesto e proprietario, non come stato."""
     flags = d.get("flags") or {}
@@ -245,20 +259,26 @@ def _next_step(d: dict, ready_stage: str | None) -> dict:
     if state == "chiusa" or flags.get("rejected"):
         return {"owner": "nessuno", "stage": "", "kind": "closed",
                 "label": "Nessuna azione, candidatura chiusa"}
+    # Il proprietario si **legge** dalla mappa, non si scrive qui. Era scritto
+    # (`produttore` per tutti e tre), e alla prima occasione ha mentito: quando
+    # `curator` e' passato all'ammissione, il cruscotto ha continuato a mandare
+    # chi lo legge a un workflow che non sa curare e non ha nel perimetro i file
+    # della curatela. Sotto, il ramo generico gia' passava da `ROLE_OF_STAGE`:
+    # erano questi tre casi speciali a scavalcarla.
     if flags.get("open_smentita"):
-        return {"owner": "produttore", "stage": "reviewer", "kind": "attention",
+        return {"owner": _owner_of("reviewer"), "stage": "reviewer", "kind": "attention",
                 "label": "Correggere le affermazioni smentite e firmare di nuovo"}
     if flags.get("stale_curation"):
-        return {"owner": "produttore", "stage": "curator", "kind": "attention",
+        return {"owner": _owner_of("curator"), "stage": "curator", "kind": "attention",
                 "label": "Rivedere la curatela sui dati aggiornati"}
     if flags.get("stale_vintage"):
-        return {"owner": "produttore", "stage": "reviewer", "kind": "attention",
+        return {"owner": _owner_of("reviewer"), "stage": "reviewer", "kind": "attention",
                 "label": "Rileggere e firmare la nuova versione dei dati"}
     if state == "pubblicata":
         return {"owner": "monitoraggio", "stage": "", "kind": "done",
                 "label": "Sorvegliare la fonte per nuovi dati o cambi di definizione"}
     if ready_stage:
-        owner = pipeline_launch.ROLE_OF_STAGE.get(ready_stage) or ready_stage
+        owner = _owner_of(ready_stage)
         labels = {
             "promoter": "Ammettere la candidatura nel catalogo",
             "curator": "Definire verso, categoria e ammissibilita' al punteggio",
@@ -266,7 +286,7 @@ def _next_step(d: dict, ready_stage: str | None) -> dict:
             "reviewer": "Rileggere, correggere e firmare l'articolo",
             "verificatore": "Controllare in modo indipendente tutte le affermazioni",
         }
-        return {"owner": ROLE_LABELS.get(owner, owner), "stage": ready_stage,
+        return {"owner": owner, "stage": ready_stage,
                 "kind": "ready", "label": labels.get(ready_stage, f"Eseguire {ready_stage}")}
     return {"owner": "monitoraggio", "stage": "", "kind": "waiting",
             "label": "Controllare gli artefatti: nessun passo lanciabile ricostruito"}
@@ -276,9 +296,18 @@ def _lifecycle(d: dict, next_step: dict) -> tuple[list, int, str]:
     """Quattro fasi stabili, dall'ingresso al merge su master (= pubblicazione)."""
     completed = set(d.get("completed_stages") or [])
     required = list(d.get("required_stages") or [])
-    production_required = [s for s in required if s != "verificatore"]
+    # **Le fasi si ricavano dal ruolo, non da un elenco di stadi scritto qui.**
+    # Erano scritte: `promoter` era l'ammissione e tutto il resto la produzione,
+    # quindi quando `curator` e' passato all'ammissione la stessa riga del
+    # cruscotto diceva proprietario `admissions` e fase `produzione`, e i filtri
+    # per fase classificavano male ogni curatela, iniziale o scaduta.
+    di_ruolo = lambda ruolo: [s for s in required
+                              if pipeline_launch.ROLE_OF_STAGE.get(s) == ruolo]
+    admission_required = di_ruolo("admissions")
+    production_required = di_ruolo("producer")
     has_downstream = bool(completed or d.get("timeline"))
-    admission_done = has_downstream and d.get("state") != "proposta"
+    admission_done = (has_downstream and d.get("state") != "proposta"
+                      and set(admission_required).issubset(completed))
     production_done = bool(production_required) and set(production_required).issubset(completed)
     verification_done = "verificatore" in completed and d.get("verification_valid") is True
     # Pubblicazione = fuso su master (il progetto ha ratificato merge = pubblicazione).
@@ -287,7 +316,8 @@ def _lifecycle(d: dict, next_step: dict) -> tuple[list, int, str]:
     current_phase = (
         "pubblicazione" if publication_done else
         "verifica" if current_stage == "verificatore" or (production_done and not verification_done) else
-        "ammissione" if current_stage == "promoter" or not admission_done else
+        "ammissione" if pipeline_launch.ROLE_OF_STAGE.get(current_stage) == "admissions"
+        or not admission_done else
         "produzione"
     )
     if d.get("state") == "chiusa":

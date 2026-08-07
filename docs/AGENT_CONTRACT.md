@@ -120,15 +120,16 @@ decide.
 git push -u origin HEAD
 PR=$(python3 scripts/pipeline_merge.py --open \
        --stage <stadio> --head <il tuo branch> --run-id <il tuo run_id> --title "..." --body "...")
-.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <il tuo run_id>
+bin/py scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <il tuo run_id>
 ```
 
-L'apertura usa **`python3`** (e' stdlib pura, una sola chiamata REST, e il
-worktree non ha un `.venv`); il merge usa **`.venv/bin/python`** perche' rilancia
-il cancello, che per il vintage importa l'app. Nel worktree il venv c'e':
-`pipeline_workspace.py --open` ci collega quello del checkout principale (deps dal
-venv, codice dell'app dal worktree). Se manca del tutto, crealo prima
-(`python3 -m venv .venv`), come gia' serve per la suite.
+L'apertura usa **`python3`** (e' stdlib pura, una sola chiamata REST, e gira
+anche su un checkout che non ha ancora un venv); il merge usa **`bin/py`**
+perche' rilancia il cancello, che rilancia la suite, che importa l'app. Non
+scrivere `.venv/bin/python`: in molti worktree quel percorso non esiste, e il
+comando muore con `no such file or directory` prima ancora di provarci. `bin/py`
+risolve in un posto solo e, se non trova un interprete con le dipendenze,
+fallisce dicendo perche'.
 
 **La PR si apre con `pipeline_merge.py --open`, non con `gh pr create`, e senza
 `GH_REPO`.** `gh pr create` e' porcelain (GraphQL), e davanti al remote riscritto
@@ -143,14 +144,14 @@ riga che hai scritto tu, dentro la pull request, alla riga di esito che questo
 passo scrivera' su master. Senza, le due restano due run separate nel diario, e
 la domanda "che cosa ha fatto e come e' finita" torna a non avere risposta.
 
-**L'interprete e' quello del venv, e non e' un dettaglio.** Il passo di merge
-rilancia il cancello, e il cancello per verificare il vintage deve importare
-l'app. Con `python3` di sistema non ci riesce, dichiara il vintage non
-verificabile e rifiuta, che e' il verso giusto ma blocca ogni stadio che tocchi
-un articolo. Lo scrittore in quel modo e' bloccato **sempre**: stesso branch,
-stesso commit, `python3` da' `blocked` su `vintage` e `.venv/bin/python` da'
-`auto`. Se il venv non c'e', crealo prima (`python3 -m venv .venv`), come gia'
-serve per la suite.
+**L'interprete e' `bin/py`, e non e' un dettaglio.** Il passo di merge rilancia
+il cancello, e il cancello rilancia la suite intera, che importa l'app. Il
+cancello sceglie l'interprete da se' (`_python()` in `scripts/pipeline_gate.py`)
+ma solo a meta': se `.venv` non esiste, ripiega su quello con cui l'hai lanciato
+tu. Con `python3`, che in questo ambiente e' una funzione di shell e senza
+`$VIRTUAL_ENV` cade su un interprete privo delle dipendenze, la suite non parte e
+il cancello rifiuta: e' il verso giusto, ma e' un rifiuto che non riguarda il tuo
+lavoro. `bin/py` risolve in un posto solo e fallisce dicendo perche'.
 
 | `merge` | che cosa fa il passo di merge |
 | --- | --- |
@@ -215,37 +216,15 @@ diventare rosse tutte le pull request aperte, il passo di merge scrive su master
 anche quando **rifiuta**, quindi un rifiuto solo bastava a fermare tutti gli
 altri stadi con un'accusa che non riguardava il loro lavoro.
 
-Resta un solo caso che devi saper leggere, ed e' l'unico che significhi
-qualcosa: **due stadi che hanno modificato lo stesso articolo**. Non lo puo'
-risolvere una regola meccanica, quindi la regola sta qui sotto ed e' l'unico
-controllo che esiste.
+Restava un caso che nessuna regola meccanica sapeva risolvere, **due stadi che
+hanno modificato lo stesso articolo**, e qui c'era la procedura per deciderlo a
+mano, con i due rami del `vintage`. Non puo' piu' capitare, e per due ragioni
+indipendenti: nessuno stadio ha `content/indicators/` nel proprio perimetro
+(`STAGE_PATHS` in `scripts/pipeline_gate.py`), e nessun ruolo firma le riletture
+(`ROLES_THAT_SIGN` e' vuoto). Gli articoli li scrive l'officina, che non e' una
+run e non apre pull request.
 
-**`vintage` diverso: vince quello piu' alto, sempre.** Vuol dire che lo scrittore
-ha aggiornato l'articolo su un anno nuovo mentre il revisore firmava quello
-vecchio. La firma del revisore copre cifre che non esistono piu', quindi non vale
-niente: tenere il lato firmato butterebbe via l'aggiornamento e, peggio,
-lascerebbe un testo vecchio con `reviewed_vintage` che combacia, cioe' un
-articolo che **risulta riletto e non torna mai in coda**. E' esattamente il
-guasto che il rientro esiste per impedire. Quindi tieni il testo dello scrittore
-e **non riportare `reviewed_at` ne' `reviewed_vintage` dal lato che hai scartato**:
-lasciarli indietro e' ciò che rimette l'articolo in coda al revisore con il
-segnale `rilettura`, che e' il comportamento giusto. Se il revisore aveva
-corretto un errore vero, quella correzione non e' persa: e' un rilievo da
-riportare nel corpo della PR, e il revisore la rifara' sul testo nuovo.
-
-**`vintage` uguale: e' una scelta editoriale, e la fai.** Sono due versioni della
-stessa frase sulle stesse cifre. Tieni quella del revisore, che e' una passata in
-piu' sugli stessi dati, e **dichiara nel corpo della PR e nel diario che hai
-scelto**, con l'altra versione scritta accanto. E' l'unico punto della catena in
-cui un agente decide al posto di un altro, quindi e' anche l'unico che va
-lasciato leggibile.
-
-Nessuna guardia automatica vede una risoluzione sbagliata qui: il cancello
-controlla che il `vintage` non superi i dati e che una revisione firmi qualcosa,
-non che tu abbia tenuto il lato giusto. Questa regola e' l'unico controllo che
-esiste.
-
-Se il conflitto non e' su un articolo, non improvvisare: lascia il branch
+Quindi, per qualunque conflitto: **non improvvisare.** Lascia il branch
 committato, scrivi la riga di diario con esito `stopped` e di' quale file era.
 Fermarsi e' un esito legittimo, indovinare no.
 

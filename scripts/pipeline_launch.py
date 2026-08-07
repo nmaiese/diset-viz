@@ -7,7 +7,7 @@ request della catena era aperta. Serviva quando l'unita' di lavoro era lo
 **stadio** e sette stadi separati si scrivevano addosso i registri condivisi.
 Adesso l'unita' di lavoro e' l'**indicatore**, e tre soli ruoli lo lavorano:
 
-    ammissione (scout+hunter+promoter) -> produttore (curator+writer+reviewer)
+    ammissione (scout+hunter+promoter+curator) -> produttore (writer+reviewer)
     -> verificatore
 
 Indicatori diversi toccano file diversi, quindi non c'e' contesa da
@@ -25,13 +25,13 @@ ne mette in volo quanti ne vuole in parallelo senza rischio di collisione.
   esistenza si legge dalle code pre-pratica (`scout`, `hunter`, `promoter`), che
   non sono indicatori nel dossier, piu' le pratiche in stato `proposta`.
 
-Come il dispatcher, non lancia l'agente: un agente e' una sessione Claude Code,
-questo e' stdlib puro. Dice **che cosa** lanciare, con ruolo, indicatore e
-`run_id` gia' coniato, e l'agente lanciatore fa il resto. La decisione e'
-deterministica e verificabile da un test, l'esecuzione no.
+Come il dispatcher, non lancia niente: questo e' stdlib puro. Dice **che cosa**
+lanciare, con ruolo e indicatore, e per i ruoli che sono una run anche il
+`run_id` gia' coniato (l'officina non lo e', vedi `plan_launches`). La decisione
+e' deterministica e verificabile da un test, l'esecuzione no.
 
     python3 scripts/pipeline_launch.py            # il piano, leggibile
-    python3 scripts/pipeline_launch.py --json     # per l'agente lanciatore
+    python3 scripts/pipeline_launch.py --json     # per chi lancia
     python3 scripts/pipeline_launch.py --top 3    # solo le prime tre voci
 
 Stdlib puro come il resto della catena.
@@ -57,7 +57,14 @@ ROLE_OF_STAGE = {
     "scout": "admissions",
     "hunter": "admissions",
     "promoter": "admissions",
-    "curator": "producer",
+    # `curator` va all'ammissione, non al produttore, e la ragione e' il
+    # perimetro. Curare vuol dire eseguire `scripts/apply_curation.py`, che
+    # scrive il layer esterno, il manifest e le descrizioni curate: tutti file
+    # dell'ammissione in `pipeline_gate.STAGE_PATHS`. L'officina scrive
+    # `content/indicators/` e non sa curare. Mandarla li' significava mandare il
+    # lavoro a chi non ha ne' il gesto ne' il permesso. Non e' mai successo solo
+    # perche' la coda `curator` e' vuota da quando la mappa esiste.
+    "curator": "admissions",
     "writer": "producer",
     "reviewer": "producer",
     "verificatore": "verificatore",
@@ -177,7 +184,18 @@ def plan_launches(dossier, queues=None, mint=None, readings=None):
 
     Ritorna una lista di voci di lancio ordinate per priorita' decrescente, ogni
     voce con `role`, `agent`, `indicator` (None per l'ammissione batch), `scope`,
-    `priority`, `reason`, `run_id`.
+    `priority`, `reason`.
+
+    **`run_id` solo per i ruoli che sono una run.** Le voci `producer` non ce
+    l'hanno, e non e' una dimenticanza: un `run_id` esiste per legare la riga di
+    diario dentro la pull request alla riga di esito su master, e l'officina
+    (`.claude/workflows/produci-indicatori.js`) non apre una pull request e non
+    scrive nel diario. `pipeline_log.build_entry("producer", ...)` alza
+    `SystemExit`, perche' `producer` non e' in `STAGES` (`STAGES` deriva da
+    `pipeline_gate.STAGE_PATHS`, dove l'officina non compare per decisione: non
+    ha un perimetro nel cancello). Coniarlo lo stesso era promettere un
+    identificativo che il diario rifiuta. La chiave e' **assente**, non vuota,
+    cosi' un consumatore futuro fallisce invece di scrivere `""`.
     """
     mint = mint or (lambda role: "")
     queues = queues or {}
@@ -235,7 +253,6 @@ def plan_launches(dossier, queues=None, mint=None, readings=None):
             "scope": "indicatore",
             "priority": priority,
             "reason": f"{code} pronto per il produttore (stadio d'ingresso {stage})",
-            "run_id": mint("producer"),
         })
         producer_codes.add(code)
 
@@ -260,7 +277,6 @@ def plan_launches(dossier, queues=None, mint=None, readings=None):
             "scope": "indicatore",
             "priority": priority,
             "reason": _revise_reason(row),
-            "run_id": mint("producer"),
         })
 
     for code, stage, priority in verifier_items:

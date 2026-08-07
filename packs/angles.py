@@ -41,8 +41,28 @@ from packs import calibration
 MIN_YEARS_FOR_TREND = 6
 MIN_YEARS_PER_SEGMENT = 4
 # Sotto dodici territori una dispersione descrive i pochi che rispondono, non
-# il paese. E' la stessa soglia che `indicator_brief` usa per la correlazione.
+# il paese. Regge da sola, e va detto: il commento diceva "e' la stessa soglia
+# che `indicator_brief` usa per la correlazione", e `scripts/indicator_brief.py`
+# e' stato cancellato. Non esiste piu' un modulo gemello con cui allinearsi, e
+# appellarsi a una coerenza non verificabile e' il difetto, non la soglia.
 MIN_TERRITORIES = 12
+
+# La stessa domanda, per i rilevatori temporali, e non e' lo stesso numero.
+#
+# `MIN_TERRITORIES` e' assoluta perche' i cinque rilevatori trasversali guardano
+# un anno alla volta su venti regioni. I tre rilevatori a coorte guardano invece
+# i territori presenti in **ogni** anno, e il livello provinciale ne ha 103: un
+# minimo assoluto di dodici li' non misura niente, zittisce zero serie su trenta
+# ed e' una guardia solo in apparenza. Una **quota** dice la cosa che si voleva
+# dire ("la maggior parte dei territori che l'indicatore copre") e vale
+# dodici su venti per le regioni e una sessantina su centotre per le province,
+# senza due numeri da giustificare separatamente.
+#
+# 0,60 misurata sul catalogo: zittisce 16 serie regione su 578 e 7 provinciali
+# su 30. Copre i casi che l'aprivano, `283` con quattro territori su venti e
+# `32`/`30` con quattro su quindici, dove la media raccontava quattro regioni e
+# la frase diceva il paese.
+MIN_COHORT_SHARE = 0.60
 
 # Una forza sotto questa non merita di essere proposta a chi scrive: e' un
 # effetto che esiste nei decimali e non nella storia.
@@ -148,6 +168,32 @@ def common_cohort(matrix):
     return set.intersection(*per_year) if per_year else set()
 
 
+def covered_territories(matrix):
+    """I territori che l'indicatore copre, cioe' presenti in **almeno** un anno.
+
+    E' il denominatore della rappresentativita': la coorte va confrontata con
+    quanti territori l'indicatore descrive, non con quanti ne esistono. Un
+    indicatore che copre solo cinque regioni e le copre tutte e cinque in ogni
+    anno parla per intero di cio' di cui dice di parlare, e una soglia sul
+    numero assoluto lo zittirebbe per una colpa che non ha.
+    """
+    return {name for year in matrix
+            for name, value in matrix[year].items() if value is not None}
+
+
+def cohort_is_representative(matrix):
+    """La coorte copre abbastanza dei territori dell'indicatore da parlarne?
+
+    La domanda che `annual_means` di proposito non decide, decisa qui: e' un
+    rilevatore a doversi rifiutare di parlare, non una media a mentire. La media
+    su quattro territori e' esatta, la frase che la chiama "l'Italia" no.
+    """
+    covered = covered_territories(matrix)
+    if not covered:
+        return False
+    return len(common_cohort(matrix)) / len(covered) >= MIN_COHORT_SHARE
+
+
 def annual_means(matrix):
     """{anno: media semplice}, sui territori presenti in **tutti** gli anni.
 
@@ -164,16 +210,18 @@ def annual_means(matrix):
     costante e' `accelerazione` a 0,410, cioe' il verso opposto. Il caso limite
     e' `283`, venti territori in tutto e quattro presenti in ogni anno.
 
-    E' la stessa decisione che il canary del 2026-08-06 ha gia' preso per
-    `indicator_brief` (`endpoints_common`): un confronto nel tempo si fa fra i
-    territori che ci sono in tutti e due i momenti, o non si fa.
+    E' la stessa decisione che il canary del 2026-08-06 ha gia' preso (vedi
+    `docs/CANARY.md`, la riga su `endpoints_common`): un confronto nel tempo si
+    fa fra i territori che ci sono in tutti e due i momenti, o non si fa.
 
-    Cio' che questa funzione **non** decide: se quattro territori su venti siano
-    abbastanza per parlare del paese. E' una soglia di rappresentativita', una
-    domanda diversa da quella della coorte, e inventarla qui vorrebbe dire
-    zittire dei rilevatori come effetto collaterale di una correzione di
-    esattezza. La coorte si dichiara invece (`quanti_territori` fra le cifre di
-    ogni angolo temporale), come il brief dichiara la propria base.
+    Cio' che questa funzione **non** decide, e continua a non decidere: se
+    quattro territori su venti bastino a parlare del paese. E' una soglia di
+    rappresentativita', una domanda diversa da quella della coorte, e la media
+    resta esatta anche quando la coorte e' sottile. A rifiutarsi di parlare sono
+    i tre rilevatori che la leggono (`cohort_is_representative`), che e' il posto
+    giusto: cosi' si perde un angolo, non si falsa una cifra. La coorte si
+    dichiara comunque (`quanti_territori` fra le cifre di ogni angolo temporale),
+    come il brief dichiara la propria base.
     """
     cohort = common_cohort(matrix)
     if not cohort:
@@ -270,6 +318,8 @@ def slope_break(matrix):
     che cambia regime, che e' quasi sempre la storia vera di un indicatore
     territoriale.
     """
+    if not cohort_is_representative(matrix):
+        return []
     means = annual_means(matrix)
     if len(means) < MIN_YEARS_FOR_TREND:
         return []
@@ -324,6 +374,8 @@ def acceleration(matrix):
     Distinto da `slope_break`: li' la serie cambia regime in un anno preciso,
     qui rallenta o accelera senza uno scalino.
     """
+    if not cohort_is_representative(matrix):
+        return []
     means = annual_means(matrix)
     if len(means) < MIN_YEARS_FOR_TREND:
         return []
@@ -368,6 +420,8 @@ def return_to_level(matrix, tolerance=0.02):
     Forza: quanto e' ampia l'escursione in mezzo, rapportata alla scala, piu' un
     premio per la distanza nel tempo.
     """
+    if not cohort_is_representative(matrix):
+        return []
     means = annual_means(matrix)
     if len(means) < MIN_YEARS_FOR_TREND:
         return []
@@ -706,35 +760,84 @@ def group_divergence(matrix, groups):
 
     alto_prima, basso_prima, partenza = estremi(first)
     high, low, now = estremi(last)
-    invertito = (high, low) == (basso_prima, alto_prima)
-    if partenza == 0:
-        return []
-    change = (now - partenza) / partenza
-    if _saturate(abs(change)) < FLOOR:
-        return []
+    # **Un ordine che non esiste non si puo' rovesciare.** Con tutti i gruppi
+    # alla pari `estremi` restituisce lo stesso gruppo come alto e come basso,
+    # quindi le due coppie sono `(g, g)` e `(g, g)`: la sola uguaglianza le
+    # dichiarava invertite, e usciva un sorpasso a forza 0,8 con tutte e due le
+    # distanze a zero, cioe' due gruppi che si scambiano un posto che nessuno
+    # dei due aveva. Serve un alto e un basso distinti in tutti e due gli anni.
+    ordinati = alto_prima != basso_prima and high != low
+    invertito = ordinati and (high, low) == (basso_prima, alto_prima)
+    # `None`, non zero, quando la distanza di partenza e' zero: li' la variazione
+    # relativa non e' nulla, e' **indefinita**, e scriverci 0,0 direbbe a chi
+    # scrive che il divario non si e' mosso mentre passava da zero a qualcosa.
+    change = (now - partenza) / partenza if partenza else None
+
+    cifre = {
+        "gruppo_alto": high, "gruppo_basso": low,
+        "distanza_primo_anno": round(partenza, 3),
+        "distanza_ultimo_anno": round(now, 3),
+        "variazione_relativa": round(change, 3) if change is not None else None,
+        # Chi stava agli estremi allora, per nome. Non e' un di piu': con tre
+        # gruppi o piu' la coppia che fa il divario puo' cambiare, e un
+        # articolo che dicesse "il divario si e' allargato" senza dire fra chi
+        # racconterebbe una crescita al posto di un cambio di protagonisti.
+        "gruppo_alto_primo_anno": alto_prima,
+        "gruppo_basso_primo_anno": basso_prima,
+        "estremi_cambiati": (high, low) != (alto_prima, basso_prima),
+        # Il caso stretto: gli stessi due gruppi, ai posti scambiati. Li' "il
+        # divario si e' allargato" e' vero e insieme fuorviante, perche' chi sta
+        # sopra oggi stava sotto allora. Il fatto viaggia col fatto.
+        "ordine_invertito": invertito,
+        "medie_ultimo_anno": {group: round(last[group], 3) for group in shared},
+    }
+    medie_semplici = ("Medie semplici dei territori del gruppo, non aggregati "
+                      "ponderati: un'istituzione che pubblica lo stesso divario "
+                      "con i pesi ottiene un altro numero, ed entrambi sono "
+                      "corretti.")
+
+    forte_abbastanza = change is not None and _saturate(abs(change)) >= FLOOR
+    if not forte_abbastanza:
+        if not invertito:
+            return []
+        # **Il sorpasso puro.** Gli stessi due gruppi ai posti scambiati, e una
+        # distanza che non regge una storia: o si muove sotto il pavimento, o
+        # parte da zero e la variazione relativa non esiste. Il pavimento
+        # tagliava l'angolo e con lui `ordine_invertito`, cioe' la cifra spariva
+        # proprio nel caso in cui era l'unica cosa da dire. Chiamarlo "gruppi
+        # che divergono" sarebbe falso: a muoversi sono i protagonisti.
+        #
+        # La cautela non dice "la distanza non si e' mossa", e la differenza
+        # conta: il ramo copre anche una distanza che cresce del 10%, cioe' meno
+        # del pavimento ma non zero, e una frase che la desse per ferma
+        # contraddirebbe `variazione_relativa` due righe sopra.
+        #
+        # La forza e' **fissa e dichiarata**, come per `method_breaks`, e non
+        # calibrata: il catalogo produce un caso puro su 576 serie, e
+        # `calibration.build_table` scarta un tipo con meno di venti campioni
+        # (`QUANTILES`). Un quantile su un campione non e' una misura, e' un
+        # numero che sembra una misura. 0,8 e non 0,9 perche' quello e' di
+        # `rottura-di-metodo`, che non e' una storia ma un vincolo su tutte le
+        # altre; un sorpasso fra macroaree e' la storia piu' forte che una serie
+        # possa portare, ma resta una storia.
+        return [_angle(
+            "gruppi-che-si-sorpassano", 0.8, cifre,
+            years=[years[0], years[-1]],
+            caution="I due gruppi si sono scambiati di posto: chi stava sopra "
+                    f"sta sotto. La distanza fra loro passa da {partenza:.3g} a "
+                    f"{now:.3g}, e su quel movimento non c'e' una storia da "
+                    "raccontare: il fatto e' il sorpasso. **Non scrivere che il "
+                    "divario cresce o si chiude.** " + medie_semplici,
+        )]
+
+    # Quando la distanza si e' mossa abbastanza, la storia resta il divario, e
+    # l'inversione viaggia dentro `ordine_invertito`: sono i 13 casi su 14 in cui
+    # il catalogo gia' portava il fatto a chi scrive.
     return [_angle(
         "gruppi-che-divergono" if change > 0 else "gruppi-che-convergono",
-        _saturate(abs(change)),
-        {"gruppo_alto": high, "gruppo_basso": low,
-         "distanza_primo_anno": round(partenza, 3),
-         "distanza_ultimo_anno": round(now, 3),
-         "variazione_relativa": round(change, 3),
-         # Chi stava agli estremi allora, per nome. Non e' un di piu': con tre
-         # gruppi o piu' la coppia che fa il divario puo' cambiare, e un
-         # articolo che dicesse "il divario si e' allargato" senza dire fra chi
-         # racconterebbe una crescita al posto di un cambio di protagonisti.
-         "gruppo_alto_primo_anno": alto_prima,
-         "gruppo_basso_primo_anno": basso_prima,
-         "estremi_cambiati": (high, low) != (alto_prima, basso_prima),
-         # Il caso stretto: gli stessi due gruppi, ai posti scambiati. Li' "il
-         # divario si e' allargato" e' vero e insieme fuorviante, perche' chi sta
-         # sopra oggi stava sotto allora. Il fatto viaggia col fatto.
-         "ordine_invertito": invertito,
-         "medie_ultimo_anno": {group: round(last[group], 3) for group in shared}},
+        _saturate(abs(change)), cifre,
         years=[years[0], years[-1]],
-        caution="Medie semplici dei territori del gruppo, non aggregati "
-                "ponderati: un'istituzione che pubblica lo stesso divario con "
-                "i pesi ottiene un altro numero, ed entrambi sono corretti.",
+        caution=medie_semplici,
     )]
 
 

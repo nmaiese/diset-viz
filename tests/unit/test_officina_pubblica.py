@@ -131,25 +131,41 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
     bloccava, e l'articolo bloccato passava lo stesso.
     """
 
-    def _main(self, bozza, code="ter-30", root=None):
-        """Esegue `main` con la bozza su stdin, dentro uno store temporaneo."""
+    def _main(self, bozza, code="ter-30", root=None, precedenti=None):
+        """Esegue `main` con la bozza su stdin, dentro uno store temporaneo.
+
+        `precedenti` sostituisce lo store che `main` legge per sapere se sotto
+        la bozza c'e' gia' un articolo: `{}` e' una prima pubblicazione, un
+        dizionario con la chiave dentro e' una riscrittura. `None` lascia lo
+        store vivo, dove `30` esiste.
+        """
         scritte = {}
 
         def finta_write(key, entry, root=None):
             scritte["key"], scritte["entry"] = key, entry
             return f"/finto/{key}.json"
 
+        contesti = [
+            unittest.mock.patch.object(pubblica.indicator_store, "write", finta_write),
+            unittest.mock.patch.object(pubblica.sys, "stdin",
+                                       io.StringIO(json.dumps(bozza))),
+        ]
+        if precedenti is not None:
+            contesti.append(unittest.mock.patch.object(
+                pubblica.indicator_store, "load_all", lambda *a, **k: dict(precedenti)))
+
         rumore = io.StringIO()
-        with unittest.mock.patch.object(pubblica.indicator_store, "write", finta_write), \
-             unittest.mock.patch.object(pubblica.sys, "stdin",
-                                        io.StringIO(json.dumps(bozza))), \
-             contextlib.redirect_stdout(rumore), contextlib.redirect_stderr(rumore):
+        with contextlib.ExitStack() as stack:
+            for contesto in contesti:
+                stack.enter_context(contesto)
+            stack.enter_context(contextlib.redirect_stdout(rumore))
+            stack.enter_context(contextlib.redirect_stderr(rumore))
             codice = pubblica.main([code])
-        return codice, scritte.get("entry", {})
+        return codice, scritte.get("entry", {}), rumore.getvalue()
 
     def test_a_clean_draft_earns_it(self):
-        with unittest.mock.patch.object(pubblica, "bloccanti", lambda key, fatta: []):
-            codice, entry = self._main(BOZZA)
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi", lambda key, fatta: []):
+            codice, entry, _ = self._main(BOZZA)
         self.assertEqual(codice, 0)
         self.assertEqual(entry["origine"], "officina")
 
@@ -162,8 +178,8 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
         girerebbe sull'articolo **vecchio**.
         """
         fermo = [{"rule": "cifra-falsa", "severity": "blocca", "detail": "x", "field": None}]
-        with unittest.mock.patch.object(pubblica, "bloccanti", lambda key, fatta: fermo):
-            codice, entry = self._main(BOZZA)
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi", lambda key, fatta: fermo):
+            codice, entry, _ = self._main(BOZZA, precedenti={})
         self.assertEqual(codice, 0, "l'articolo e' scritto: l'uscita non cambia")
         self.assertNotIn("origine", entry)
 
@@ -205,10 +221,114 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
         self.assertEqual([f["rule"] for f in fermi], ["cancello-non-eseguibile"])
         self.assertIn("vista rotta", fermi[0]["detail"])
 
-    def test_and_the_article_is_still_written(self):
+    def test_and_a_first_publication_is_still_written(self):
+        """Su una prima pubblicazione la bozza si scrive lo stesso, senza
+        `origine`: non c'e' niente sotto da proteggere, e rifiutare perderebbe
+        l'unica copia per un errore che non riguarda la prosa.
+
+        Su una **riscrittura** il verso si rovescia, ed e' l'altra meta' della
+        stessa regola: vedi
+        `ARejectedRewriteDoesNotEatTheGoodArticle.test_a_gate_that_cannot_run_does_not_replace_the_article_either`.
+        """
         with unittest.mock.patch.object(lint, "lint_entry",
                                         side_effect=RuntimeError("vista rotta")):
-            codice, entry = self._main(BOZZA)
+            codice, entry, _ = self._main(BOZZA, precedenti={})
+        self.assertEqual(codice, 0)
+        self.assertNotIn("origine", entry)
+        self.assertEqual(entry["lead"], BOZZA["lead"])
+
+
+class ARejectedRewriteDoesNotEatTheGoodArticle(
+        OnlyAnArticleThatPassedTheGateGetsItsOrigin):
+    """Una bozza che il cancello blocca non sostituisce l'articolo che c'era.
+
+    Il difetto: l'officina scriveva `content/indicators/<chiave>.json` senza
+    condizionare la scrittura al verdetto. Su una prima pubblicazione non si
+    perde niente; su una **riscrittura** di un articolo gia' buono, quello buono
+    spariva dal working tree e si recuperava solo da git.
+
+    **Vale a ogni tentativo, e questa e' la parte che si sbaglia.** Una prima
+    versione rifiutava solo la seconda scrittura, con un flag acceso dal
+    workflow sul giro di ritorno: inutile, perche' il danno lo fa il **primo**
+    tentativo, e dopo di lui l'articolo protetto e' gia' una bozza bocciata.
+
+    Si puo' rifiutare a ogni tentativo perche' il comando **stampa i rilievi**
+    (`RILIEVI <json>`). Erano loro il motivo per cui la scrittura doveva
+    avvenire comunque: il passo successivo del pubblicatore li rileggeva da
+    disco con `officina.lint`, e su un articolo non sovrascritto avrebbe
+    descritto il testo vecchio attribuendone i rilievi alla bozza nuova.
+
+    Eredita la classe sopra per riusarne `_main`.
+    """
+
+    FERMO = [{"rule": "cifra-falsa", "severity": "blocca", "detail": "x", "field": None},
+             {"rule": "troppo-corto", "severity": "segnala", "detail": "y", "field": None}]
+    PRECEDENTE = {"30": {"lead": "Il buono di prima.", "sections": []}}
+
+    def test_the_previous_article_survives_a_blocked_rewrite(self):
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
+                                        lambda key, fatta: self.FERMO):
+            codice, entry, detto = self._main(BOZZA, precedenti=self.PRECEDENTE)
+        self.assertEqual(codice, 2, "non e' scritta, e l'uscita lo dice")
+        self.assertEqual(entry, {}, "nessuna scrittura: il file precedente e' intatto")
+        self.assertIn("rimasto al suo posto", detto)
+
+    def test_it_prints_the_findings_of_the_draft_not_of_the_disk(self):
+        """Senza questi, chi riscrive riceverebbe i rilievi del testo vecchio.
+
+        Sono tutti, `segnala` compresi, perche' e' lo stesso contratto del passo
+        di lint che questa uscita sostituisce.
+        """
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
+                                        lambda key, fatta: self.FERMO):
+            _, _, detto = self._main(BOZZA, precedenti=self.PRECEDENTE)
+        riga = next(r for r in detto.splitlines() if r.startswith("RILIEVI "))
+        self.assertEqual(json.loads(riga[len("RILIEVI "):]), self.FERMO)
+
+    def test_a_first_publication_is_still_written(self):
+        """Senza un precedente non c'e' niente da proteggere, e rifiutare qui
+        perderebbe l'unica copia della bozza."""
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
+                                        lambda key, fatta: self.FERMO):
+            codice, entry, _ = self._main(BOZZA, precedenti={})
+        self.assertEqual(codice, 0)
+        self.assertNotIn("origine", entry)
+        self.assertEqual(entry["lead"], BOZZA["lead"])
+
+    def test_a_clean_rewrite_is_written(self):
+        with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
+                                        lambda key, fatta: []):
+            codice, entry, _ = self._main(BOZZA, precedenti=self.PRECEDENTE)
+        self.assertEqual(codice, 0)
+        self.assertEqual(entry["origine"], "officina")
+
+    def test_a_gate_that_cannot_run_does_not_replace_the_article_either(self):
+        """Nemmeno un guasto del cancello sostituisce un articolo che esiste.
+
+        La regola "un guasto del lint non deve costare una scrittura" nasce
+        sulla **prima** pubblicazione, dove rifiutare perderebbe l'unica copia
+        della bozza. Su una riscrittura si rovescia: li' scrivere costa
+        l'articolo precedente, sostituito da un testo che nessuno ha potuto
+        controllare, e la bozza non e' persa in nessuno dei due casi (il
+        workflow la riporta, la run puo' ripartire) mentre l'articolo buono si'.
+
+        Resta quindi una regola sola: un articolo che esiste non viene mai
+        sostituito da qualcosa che il cancello non ha passato.
+        """
+        with unittest.mock.patch.object(lint, "lint_entry",
+                                        side_effect=RuntimeError("vista rotta")):
+            codice, entry, detto = self._main(BOZZA, precedenti=self.PRECEDENTE)
+        self.assertEqual(codice, 2)
+        self.assertEqual(entry, {})
+        self.assertIn("cancello-non-eseguibile", detto)
+
+    def test_a_gate_that_cannot_run_still_writes_a_first_publication(self):
+        """Qui invece la regola originale vale intera: senza un precedente,
+        rifiutare perderebbe l'unica copia della bozza per un errore che non
+        riguarda la prosa."""
+        with unittest.mock.patch.object(lint, "lint_entry",
+                                        side_effect=RuntimeError("vista rotta")):
+            codice, entry, _ = self._main(BOZZA, precedenti={})
         self.assertEqual(codice, 0)
         self.assertNotIn("origine", entry)
         self.assertEqual(entry["lead"], BOZZA["lead"])

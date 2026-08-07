@@ -125,13 +125,22 @@ def bloccanti(key: str, fatta: dict) -> list:
     `lint_entry` che gira `officina.lint`, sullo stesso store con la bozza
     gia' sostituita al proprio posto, cosi' i due verdetti non possono divergere.
 
-    **L'articolo bocciato si scrive comunque**, e senza il campo. Rifiutare la
-    scrittura romperebbe il giro che l'officina fa per riparare: il workflow
-    legge l'uscita 2 come "non e' scritta", tornerebbe a chi scrive con un
-    messaggio di forma invece che con i rilievi, e il passo di lint successivo
-    girerebbe sull'articolo **vecchio**. Cio' che resta aperto e' dichiarato: la
-    riscrittura sovrascrive comunque il file precedente, che e' il modo in cui
-    il giro di riparazione funziona, ed e' recuperabile da git.
+    **Su una prima pubblicazione l'articolo bocciato si scrive comunque**, e
+    senza il campo: li' non c'e' niente da proteggere, e rifiutare perderebbe
+    l'unica copia della bozza. Su una **riscrittura** no, vedi `main`.
+    """
+    return [rilievo for rilievo in tutti_i_rilievi(key, fatta)
+            if rilievo["severity"] == "blocca"]
+
+
+def tutti_i_rilievi(key: str, fatta: dict) -> list:
+    """Il verdetto intero del cancello editoriale su questa bozza, `segnala`
+    compresi.
+
+    Esiste perche' e' l'unico verdetto che parla della **bozza**. Il passo di
+    lint del pubblicatore rilegge l'articolo da disco, quindi quando la
+    scrittura viene rifiutata (`main`) descrive il testo precedente: i rilievi
+    da rimandare a chi riscrive devono venire da qui, non da li'.
     """
     from officina import lint
 
@@ -141,7 +150,7 @@ def bloccanti(key: str, fatta: dict) -> list:
         alternation = lint.territory_alternation(texts)
         compiled = lint.patterns(alternation)
         compiled["alternation"] = alternation
-        rilievi = lint.lint_entry(key, fatta, texts=texts, compiled=compiled)
+        return lint.lint_entry(key, fatta, texts=texts, compiled=compiled)
     except Exception as errore:  # noqa: BLE001
         # Un cancello che non riesce a girare non e' un cancello verde. Il
         # verso di questa guardia e' scelto: **non** si scrive `origine`, cosi'
@@ -150,12 +159,16 @@ def bloccanti(key: str, fatta: dict) -> list:
         # l'articolo per un errore del lint sarebbe una regressione peggiore
         # del difetto che stiamo chiudendo.
         return [_finding_di_guasto(errore)]
-    return [rilievo for rilievo in rilievi if rilievo["severity"] == lint.BLOCKS]
 
 
 def _finding_di_guasto(errore: BaseException) -> dict:
     return {"rule": "cancello-non-eseguibile", "severity": "blocca",
             "detail": f"{type(errore).__name__}: {errore}"[:300], "field": None}
+
+
+def _guasto_del_cancello(fermi: list) -> bool:
+    """Il cancello non ha girato, invece di aver bocciato."""
+    return any(rilievo["rule"] == "cancello-non-eseguibile" for rilievo in fermi)
 
 
 def main(argv=None) -> int:
@@ -176,7 +189,55 @@ def main(argv=None) -> int:
     try:
         fatta = entry(bozza, args.code, args.level)
         key = chiave(args.code)
-        fermi = bloccanti(key, fatta)
+        esiste_gia = key in indicator_store.load_all()
+        rilievi = tutti_i_rilievi(key, fatta)
+        fermi = [r for r in rilievi if r["severity"] == "blocca"]
+        if fermi and esiste_gia:
+            # **Una riscrittura bocciata non sostituisce l'articolo che c'era.**
+            #
+            # Vale a ogni tentativo, e non solo all'ultimo, perche' e' il
+            # **primo** a fare il danno: dopo di lui l'articolo buono non c'e'
+            # piu', e qualunque prudenza successiva starebbe proteggendo una
+            # bozza gia' bocciata. Una versione precedente rifiutava solo la
+            # seconda scrittura, e non serviva a niente.
+            #
+            # Perche' si puo' rifiutare senza rompere il giro di riparazione:
+            # i rilievi si stampano qui sotto. Erano il motivo per cui la
+            # scrittura doveva avvenire comunque, visto che il passo successivo
+            # del pubblicatore li rileggeva da disco con `officina.lint`, e su
+            # un articolo non sovrascritto avrebbe descritto il testo vecchio
+            # attribuendone i rilievi alla bozza nuova. Stampati qui parlano
+            # della bozza, che e' l'unica cosa che chi riscrive puo' correggere.
+            #
+            # **Anche un guasto del cancello**, e prima non era cosi'. La regola
+            # "un guasto non deve costare una scrittura" nasce sulla prima
+            # pubblicazione, dove rifiutare perderebbe l'unica copia della
+            # bozza; su una riscrittura si rovescia, perche' li' scrivere costa
+            # l'articolo **precedente**, sostituito da un testo che nessuno ha
+            # potuto controllare. La bozza non e' persa in nessuno dei due casi:
+            # il workflow la riporta e la run puo' ripartire. L'articolo buono
+            # si', e solo da git.
+            #
+            # La regola diventa quindi una sola, che vale per ogni rilievo
+            # bloccante: **un articolo che esiste non viene mai sostituito da
+            # qualcosa che il cancello non ha passato.**
+            # **Tutte e due le righe sullo stesso flusso, e non e' pignoleria.**
+            # Con l'uscita catturata (un agente non e' un terminale) stdout e'
+            # a blocchi e stderr no, quindi una riga su stdout e una su stderr
+            # arrivano a chi legge in ordine invertito. Il contratto del
+            # pubblicatore riconosce i rilievi da una riga `RILIEVI`, e con
+            # l'ordine rovesciato avrebbe riportato una lista vuota, mandando la
+            # riscrittura al giro sbagliato: `ilRifiuto` invece di `ilBlocco`,
+            # cioe' "correggi la forma" al posto dei rilievi editoriali veri.
+            print("non scritta: il cancello blocca su "
+                  + ", ".join(sorted({rilievo["rule"] for rilievo in fermi}))
+                  + f", e l'articolo precedente e' rimasto al suo posto ({key}). "
+                  + "Nessuna versione buona e' stata sovrascritta, e i rilievi "
+                  + "qui sotto sono della bozza, non di cio' che c'e' su disco.",
+                  file=sys.stderr)
+            print("RILIEVI " + json.dumps(rilievi, ensure_ascii=False),
+                  file=sys.stderr)
+            return 2
         if not fermi:
             fatta["origine"] = verification_queue.OFFICINA
         path = indicator_store.write(key, fatta)

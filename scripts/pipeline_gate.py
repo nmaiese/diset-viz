@@ -115,8 +115,27 @@ READINGS = "data/pipeline/letture/"
 STAGE_PATHS = {
     # `admissions` = scout + hunter + promoter: propone la fonte, triaga il
     # candidato, promuove nel layer esterno, in una run sola.
-    "admissions": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, CANDIDATES,
-                   EXTERNAL_DATASET, EXTERNAL_MANIFEST, RUN_JOURNAL),
+    # `CURATION` e `CURATED_DESCRIPTIONS` ci sono perche' l'ammissione copre
+    # anche il vecchio stadio `curator` (`pipeline_launch.ROLE_OF_STAGE`), e una
+    # curazione scrive **quattro** file, non due: la decisione
+    # (`data/discovery/curation.csv`, che e' l'input di
+    # `scripts/apply_curation.py`) e i tre che quello script produce, cioe' il
+    # layer esterno, il manifest e le descrizioni curate. Due erano gia' qui e
+    # due no, quindi una curazione sarebbe stata respinta dal cancello sulla
+    # prima scrittura e di nuovo sull'ultima. Le due costanti esistevano gia',
+    # inutilizzate, e `check_curation_decisions` girava su un file che nessuno
+    # stadio poteva scrivere.
+    # `THEME_CATEGORIES` c'e' per la stessa ragione, ed era il terzo buco della
+    # stessa forma: una serie con un tema non ancora registrato non risolve a
+    # nessuna categoria, cade in "Altro" e sparisce dai totali di macroarea
+    # senza che niente fallisca. Registrarlo e' **dati**, non codice
+    # (`app.taxonomy._curated_theme_map` legge il CSV, che ha perfino le colonne
+    # `added_by` e `added_at` perche' lo scriva la catena), e
+    # `tests/unit/test_source_admission.py` lo pretende: senza il file nel
+    # perimetro l'ammissione non poteva chiudere la propria run.
+    "admissions": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, CANDIDATES, CURATION,
+                   EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS,
+                   THEME_CATEGORIES, RUN_JOURNAL),
     # Il verificatore NON ha `INDICATOR_TEXTS`, e l'assenza e' la definizione
     # dello stadio piu' che il suo prompt. Uno stadio che trova e ripara i propri
     # rilievi corregge i propri compiti, che e' esattamente il difetto che questo

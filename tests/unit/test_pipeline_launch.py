@@ -44,7 +44,25 @@ class PlanLaunches(unittest.TestCase):
         self.assertIn("ter-5", plan[0]["comando"])
         self.assertEqual(plan[0]["indicator"], "ter-5")
         self.assertEqual(plan[0]["scope"], "indicatore")
-        self.assertEqual(plan[0]["run_id"], "producer-RUNID")
+
+    def test_a_producer_launch_carries_no_run_id(self):
+        """Un `run_id` si conia per chi apre una run, e l'officina non ne apre.
+
+        Il lanciatore coniava `producer-<istante>-<hex>` e
+        `pipeline_log.build_entry("producer", ...)` lo avrebbe rifiutato con
+        `SystemExit`: `producer` non e' in `STAGES` (che deriva da
+        `pipeline_gate.STAGE_PATHS`, dove l'officina non compare perche' non ha
+        un perimetro nel cancello). Era un identificativo che il piano prometteva
+        e il diario non accetta. Non rompeva niente solo perche' nessuno lo
+        leggeva.
+
+        La chiave dev'essere **assente**, non vuota: un consumatore futuro deve
+        fallire invece di scrivere `""` nel diario.
+        """
+        dossier = {"ter-5": practice("ter-5", completed=["curator"], priority=7.0)}
+        plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint)
+        self.assertEqual(plan[0]["role"], "producer")
+        self.assertNotIn("run_id", plan[0])
 
     def test_the_command_carries_the_public_code_not_the_store_key(self):
         """Il piano ragiona in chiavi, l'officina in codici URL, e il comando e'
