@@ -236,8 +236,17 @@ def _run_history(run_ids, runs_by_id) -> list:
 
 
 def _owner_of(stage: str) -> str:
-    """Il ruolo che oggi copre un vecchio stadio, dalla mappa e non a mano."""
-    return pipeline_launch.ROLE_OF_STAGE.get(stage) or stage
+    """Il proprietario da mostrare per un vecchio stadio: dalla mappa, e con la
+    sua etichetta.
+
+    Le due meta' vanno insieme. Erano separate, e si vedeva: i rami speciali
+    scrivevano il ruolo a mano e il ramo generico applicava `ROLE_LABELS`,
+    quindi la stessa riga del cruscotto diceva `produttore` o `officina` a
+    seconda di quale ramo l'aveva prodotta. I template rendono questo campo
+    alla lettera, e i filtri per proprietario ci si appoggiano.
+    """
+    ruolo = pipeline_launch.ROLE_OF_STAGE.get(stage) or stage
+    return ROLE_LABELS.get(ruolo, ruolo)
 
 
 def _next_step(d: dict, ready_stage: str | None) -> dict:
@@ -277,7 +286,7 @@ def _next_step(d: dict, ready_stage: str | None) -> dict:
             "reviewer": "Rileggere, correggere e firmare l'articolo",
             "verificatore": "Controllare in modo indipendente tutte le affermazioni",
         }
-        return {"owner": ROLE_LABELS.get(owner, owner), "stage": ready_stage,
+        return {"owner": owner, "stage": ready_stage,
                 "kind": "ready", "label": labels.get(ready_stage, f"Eseguire {ready_stage}")}
     return {"owner": "monitoraggio", "stage": "", "kind": "waiting",
             "label": "Controllare gli artefatti: nessun passo lanciabile ricostruito"}

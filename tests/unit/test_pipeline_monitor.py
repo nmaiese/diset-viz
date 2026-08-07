@@ -154,11 +154,11 @@ class Board(unittest.TestCase):
     def test_an_open_smentita_is_an_explicit_producer_action(self):
         """Il proprietario e' il **ruolo**, con il nome che porta nel diario.
 
-        Era la stringa italiana `produttore`, cablata qui e in altri due rami:
-        contraddiceva la decisione scritta accanto a `ROLE_LABELS`, cioe' che un
-        lettore non deve tenere a mente una mappa fra `ammissione` sul cruscotto
-        e `admissions` nel diario. L'etichetta umana la mette il rendering
-        (`producer` -> "officina"), non il modello.
+        Era la stringa italiana `produttore`, cablata qui e in altri due rami,
+        mentre il ramo generico applicava `ROLE_LABELS` e diceva `officina`: la
+        stessa riga del cruscotto cambiava nome a seconda di quale ramo l'aveva
+        prodotta, e i filtri per proprietario ci si appoggiano. Ora il ruolo si
+        legge dalla mappa e l'etichetta si applica nello stesso posto.
         """
         d = practice("ter-bad", state="invalidata", flags={"open_smentita": True},
                      completed=["writer", "reviewer", "verificatore"],
@@ -167,7 +167,7 @@ class Board(unittest.TestCase):
         b = pipeline_monitor.board({"ter-bad": d}, today=self.TODAY)
         row = b["rows"][0]
         self.assertEqual(row["next_step"]["kind"], "attention")
-        self.assertEqual(row["next_step"]["owner"], "producer")
+        self.assertEqual(row["next_step"]["owner"], "officina")
         self.assertEqual(row["lifecycle"][1]["status"], "issue")
         self.assertEqual(b["metrics"]["attention"], 1)
 
@@ -183,6 +183,13 @@ class Board(unittest.TestCase):
         passo = b["rows"][0]["next_step"]
         self.assertEqual(passo["stage"], "curator")
         self.assertEqual(passo["owner"], "admissions")
+
+    def test_the_special_paths_and_the_generic_one_name_the_owner_the_same_way(self):
+        """Due rami che producono la stessa riga non possono chiamarla in due
+        modi: i template rendono `next_step.owner` alla lettera."""
+        speciale = pipeline_monitor._next_step({"flags": {"stale_vintage": True}}, None)
+        generico = pipeline_monitor._next_step({"flags": {}}, "writer")
+        self.assertEqual(speciale["owner"], generico["owner"])
 
     def test_the_row_keeps_the_complete_timeline_and_operational_run_detail(self):
         d = practice("ter-x", completed=["writer"], required=["writer", "reviewer", "verificatore"])
