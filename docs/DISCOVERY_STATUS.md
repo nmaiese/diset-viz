@@ -7,7 +7,26 @@ Per come funziona: [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 Per il meccanismo della scoperta: [`DISCOVERY_PIPELINE.md`](DISCOVERY_PIPELINE.md).
 Per il contratto di ogni agente: [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md).
 
-Aggiornato al **2026-07-28**.
+Aggiornato al **2026-08-07**.
+
+> **Che cosa e' vero adesso, verificato contro il codice il 2026-08-07.** Il
+> resto di questo documento e' rimasto fermo al 28 luglio, e un documento di
+> stato sbagliato e' piu' pericoloso di uno assente: leggi prima questo riquadro
+> e diffida di cio' che lo contraddice.
+>
+> - **Cinque agenti**, non sette: `admissions` a monte, `indicator-verifier` e
+>   `reader-editor` a valle, piu' `scrittore-indicatore`, `giudice-cieco`,
+>   `pubblicatore` e `preparatore-pacchetti` che vivono dentro l'officina.
+>   `producer.md` e `launcher.md` **sono stati cancellati**.
+> - **Gli articoli non li scrive piu' un agente.** Li scrive un workflow,
+>   `.claude/workflows/produci-indicatori.js`, misurato a $1,97 per articolo
+>   contro i ~38 $ della catena vecchia.
+> - **Il piano di lancio resta** (`scripts/pipeline_launch.py`) e per il ruolo
+>   `producer` stampa il comando del workflow invece del nome di un agente.
+> - **La Routine resta in pausa**, e non e' verificabile da dentro il repo: il
+>   suo stato vero sta su <https://claude.ai/code/routines>.
+> - **Il cancello editoriale e' `officina/lint.py`**, che dal 2026-08-07
+>   controlla anche la definizione contro le parole della fonte.
 
 ## In una riga
 

@@ -215,14 +215,14 @@ l'utente legge. La scrittura produce l'intero articolo della pagina (`lead` piu
 le quattro sezioni `definizione`/`quadro`/`dinamica`/`limiti`, con `fonti` e
 `vintage`) in `content/indicators/`, un file per articolo, seguendo
 `content/STYLE.md`, con **solo numeri reali** presi dal brief
-(`scripts/indicator_brief.py`), le fonti verificate per le affermazioni
+(`officina/brief.py`, che lo ha assorbito), le fonti verificate per le affermazioni
 comparative e il `vintage` uguale all'`year_max` corrente (drift guard). È lo
 step che trasforma un indicatore appena integrato in una pagina che si legge come
 scritta da un giornalista.
 
 Cura, scrittura e revisione **non sono piu' tre agenti freddi** che si passano
 l'indicatore via CSV: sono i tre passi di un ruolo solo, il **produttore**
-(`.claude/agents/producer.md`), che porta un indicatore da ammesso a firmato in
+(l'officina, `.claude/workflows/produci-indicatori.js`), che porta un indicatore da ammesso a firmato in
 una sessione e si rilegge il proprio testo prima di firmare. La catena, dopo la
 ri-architettura, e' tre ruoli, non sette stadi:
 

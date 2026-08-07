@@ -205,7 +205,7 @@ senza un lock.
 Ne vengono due cose che non erano l'obiettivo e valgono quanto l'obiettivo. Il
 diff di una run del produttore adesso e' leggibile, perche' dice di quali
 articoli parla invece di mostrare hunk dentro mezzo megabyte di JSON. E
-`git log content/indicators/ter__920.json` e' la storia editoriale di quella
+`git log content/indicators/920.json` e' la storia editoriale di quella
 pagina, che prima non esisteva.
 
 Il perimetro del cancello capisce le directory: una voce di `STAGE_PATHS` che
