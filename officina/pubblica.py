@@ -103,13 +103,46 @@ def entry(bozza: dict, code: str, level: str | None = None) -> dict:
     fatta["sections"] = pulite
     fatta["level"] = chiave_livello
     fatta["vintage"] = anno
-    # La provenienza, che non e' una firma. L'officina non ha un revisore, e la
-    # coda di verifica prendeva solo gli articoli firmati: senza questo campo i
-    # testi della macchina nuova restavano invisibili all'unico passo di
-    # falsificazione indipendente della catena. Vedi
-    # `scripts/verification_queue.OFFICINA`.
-    fatta["origine"] = verification_queue.OFFICINA
+    # **`origine` non si mette qui.** Vedi `bloccanti`: il campo apre due code a
+    # valle, e metterlo mentre si monta il dizionario vuol dire metterlo prima
+    # che il cancello abbia parlato.
     return fatta
+
+
+def bloccanti(key: str, fatta: dict) -> list:
+    """I rilievi `blocca` del cancello editoriale su questa bozza.
+
+    Serve a decidere se scriverle `origine`, e non e' un dettaglio di
+    contabilita': `origine: officina` e' l'**unica** condizione che rende un
+    articolo idoneo per la coda di verifica (`verification_queue.py:391`) e per
+    quella di lettura (`reading_queue.py:358`), perche' l'officina non ha un
+    revisore che firmi. Il campo si scriveva mentre si montava il dizionario,
+    cioe' prima che il lint girasse, e un articolo bocciato lo portava lo
+    stesso: finiva in tutte e due le code, veniva reso dall'app, e i due critici
+    indipendenti sprecavano un giro su una prosa gia' respinta.
+
+    Il cancello resta uno solo. Qui non c'e' una seconda regola: gira lo stesso
+    `lint_entry` che gira `officina.lint`, sullo stesso store con la bozza
+    gia' sostituita al proprio posto, cosi' i due verdetti non possono divergere.
+
+    **L'articolo bocciato si scrive comunque**, e senza il campo. Rifiutare la
+    scrittura romperebbe il giro che l'officina fa per riparare: il workflow
+    legge l'uscita 2 come "non e' scritta", tornerebbe a chi scrive con un
+    messaggio di forma invece che con i rilievi, e il passo di lint successivo
+    girerebbe sull'articolo **vecchio**. Cio' che resta aperto e' dichiarato: la
+    riscrittura sovrascrive comunque il file precedente, che e' il modo in cui
+    il giro di riparazione funziona, ed e' recuperabile da git.
+    """
+    from officina import lint
+
+    texts = dict(indicator_store.load_all())
+    texts[key] = fatta
+    alternation = lint.territory_alternation(texts)
+    compiled = lint.patterns(alternation)
+    compiled["alternation"] = alternation
+    return [rilievo for rilievo in lint.lint_entry(key, fatta, texts=texts,
+                                                   compiled=compiled)
+            if rilievo["severity"] == lint.BLOCKS]
 
 
 def main(argv=None) -> int:
@@ -129,12 +162,24 @@ def main(argv=None) -> int:
 
     try:
         fatta = entry(bozza, args.code, args.level)
-        path = indicator_store.write(chiave(args.code), fatta)
+        key = chiave(args.code)
+        fermi = bloccanti(key, fatta)
+        if not fermi:
+            fatta["origine"] = verification_queue.OFFICINA
+        path = indicator_store.write(key, fatta)
     except Rifiutata as errore:
         print(f"non scritta: {errore}", file=sys.stderr)
         return 2
 
     print(path)
+    if fermi:
+        # Scritta, e senza `origine`: non entra in nessuna coda finche' il
+        # cancello non passa. Il verdetto per esteso lo stampa `officina.lint`,
+        # che il workflow esegue subito dopo: qui basta dire che e' successo.
+        print("scritta SENZA `origine`: il cancello blocca su "
+              + ", ".join(sorted({rilievo["rule"] for rilievo in fermi}))
+              + ". Non entra nella coda di verifica ne' in quella di lettura.",
+              file=sys.stderr)
     return 0
 
 

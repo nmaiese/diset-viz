@@ -9,12 +9,15 @@ possono costare un turno a ogni articolo.
 L'altra meta' e' che questo comando **rifiuta** invece di scrivere male: un
 cancello che accetta cio' che non capisce non e' un cancello.
 """
+import contextlib
+import io
 import json
 import os
 import tempfile
 import unittest
+import unittest.mock
 
-from officina import pubblica
+from officina import lint, pubblica
 from scripts import indicator_store
 
 BOZZA = {
@@ -41,10 +44,17 @@ class ItMapsADraftOntoAnEntry(unittest.TestCase):
         self.assertEqual([s["role"] for s in entry["sections"]],
                          ["quadro", "dinamica", "limiti"])
 
-    def test_the_entry_says_where_it_comes_from(self):
-        """Non e' una firma: e' la porta da cui l'articolo entra nella coda di
-        verifica, che prima prendeva solo i firmati dal revisore."""
-        self.assertEqual(pubblica.entry(BOZZA, "ter-30")["origine"], "officina")
+    def test_the_draft_does_not_carry_its_own_passport(self):
+        """`origine` non si mette montando il dizionario, si guadagna.
+
+        Non e' una firma: e' la porta da cui l'articolo entra nella coda di
+        verifica e in quella di lettura, che senza di lui non lo vedono. Scriverlo
+        qui vuol dire scriverlo **prima** che il cancello abbia parlato, e un
+        articolo bocciato lo portava lo stesso. Adesso lo mette `main` dopo aver
+        letto `bloccanti`, e questa prova esiste perche' rimettercelo per comodita'
+        e' una riga sola.
+        """
+        self.assertNotIn("origine", pubblica.entry(BOZZA, "ter-30"))
 
     def test_it_does_not_declare_roles_covered(self):
         # Lo deriva `app.indicator_texts.emitted_roles` dalle sezioni scritte.
@@ -105,6 +115,79 @@ class ItWritesWhereTheStoreExpects(unittest.TestCase):
                 letta = json.load(handle)
             self.assertEqual(letta["key"], "30")
             self.assertEqual(letta["lead"], BOZZA["lead"])
+
+
+class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
+    """`origine: officina` e' l'unica porta verso le due code a valle.
+
+    L'officina non ha un revisore che firmi, quindi
+    `verification_queue.build_queue()` e `reading_queue._eligible()` guardano
+    quel campo e nient'altro. Scritto mentre si montava il dizionario, cioe'
+    prima del lint, un articolo **bocciato** lo portava lo stesso: sovrascriveva
+    il precedente, veniva reso dall'app, ed entrava in tutte e due le code, dove
+    i due critici indipendenti sprecavano un giro su una prosa gia' respinta.
+
+    E riguardava anche la regola `angolo-non-rilevato` aggiunta due commit fa:
+    bloccava, e l'articolo bloccato passava lo stesso.
+    """
+
+    def _main(self, bozza, code="ter-30", root=None):
+        """Esegue `main` con la bozza su stdin, dentro uno store temporaneo."""
+        scritte = {}
+
+        def finta_write(key, entry, root=None):
+            scritte["key"], scritte["entry"] = key, entry
+            return f"/finto/{key}.json"
+
+        rumore = io.StringIO()
+        with unittest.mock.patch.object(pubblica.indicator_store, "write", finta_write), \
+             unittest.mock.patch.object(pubblica.sys, "stdin",
+                                        io.StringIO(json.dumps(bozza))), \
+             contextlib.redirect_stdout(rumore), contextlib.redirect_stderr(rumore):
+            codice = pubblica.main([code])
+        return codice, scritte.get("entry", {})
+
+    def test_a_clean_draft_earns_it(self):
+        with unittest.mock.patch.object(pubblica, "bloccanti", lambda key, fatta: []):
+            codice, entry = self._main(BOZZA)
+        self.assertEqual(codice, 0)
+        self.assertEqual(entry["origine"], "officina")
+
+    def test_a_blocked_draft_is_written_without_it(self):
+        """Scritta lo stesso, e senza il campo.
+
+        Rifiutare la scrittura romperebbe il giro di riparazione: il workflow
+        legge l'uscita 2 come "non e' scritta", tornerebbe a chi scrive con un
+        messaggio di forma invece che con i rilievi, e il lint successivo
+        girerebbe sull'articolo **vecchio**.
+        """
+        fermo = [{"rule": "cifra-falsa", "severity": "blocca", "detail": "x", "field": None}]
+        with unittest.mock.patch.object(pubblica, "bloccanti", lambda key, fatta: fermo):
+            codice, entry = self._main(BOZZA)
+        self.assertEqual(codice, 0, "l'articolo e' scritto: l'uscita non cambia")
+        self.assertNotIn("origine", entry)
+
+    def test_the_gate_it_runs_is_the_same_one(self):
+        """Non una seconda regola: lo stesso `lint_entry` di `officina.lint`.
+
+        Due cancelli che giudicano lo stesso articolo sono due cancelli che
+        prima o poi divergono, ed e' la classe di difetto che questa PR chiude.
+        """
+        visto = {}
+
+        def finto_lint_entry(key, entry, texts=None, compiled=None):
+            visto["key"], visto["entry"], visto["texts"] = key, entry, texts
+            return [{"rule": "gemello", "severity": lint.BLOCKS, "detail": "", "field": None},
+                    {"rule": "troppo-corto", "severity": lint.FLAGS, "detail": "", "field": None}]
+
+        with unittest.mock.patch.object(lint, "lint_entry", finto_lint_entry):
+            fermi = pubblica.bloccanti("30", {"lead": "x", "sections": []})
+        self.assertEqual([f["rule"] for f in fermi], ["gemello"],
+                         "solo i `blocca`: un `segnala` non chiude nessuna porta")
+        self.assertEqual(visto["key"], "30")
+        self.assertIs(visto["texts"]["30"], visto["entry"],
+                      "lo store che il lint vede porta la bozza al proprio posto, "
+                      "non la versione vecchia")
 
 
 if __name__ == "__main__":
