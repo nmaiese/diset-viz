@@ -134,17 +134,54 @@ def _saturate(ratio):
     return ratio / (1 + ratio)
 
 
+def common_cohort(matrix):
+    """I territori che rispondono in **ogni** anno della matrice.
+
+    Vuoto se non ce n'e' nessuno, ed e' la risposta onesta: li' non esiste una
+    serie confrontabile, quindi non esiste nessun andamento da raccontare.
+    """
+    years = sorted(matrix)
+    if not years:
+        return set()
+    per_year = [{name for name, value in matrix[year].items() if value is not None}
+                for year in years]
+    return set.intersection(*per_year) if per_year else set()
+
+
 def annual_means(matrix):
-    """{anno: media semplice dei territori che rispondono}, anni ordinati.
+    """{anno: media semplice}, sui territori presenti in **tutti** gli anni.
 
     Media semplice dei valori regionali, come tutto il resto del progetto: non
     e' l'aggregato nazionale ponderato, e chi scrive deve saperlo.
+
+    **A coorte costante, e non era cosi'.** La media si calcolava su chi
+    rispondeva quell'anno, e la copertura di una matrice cambia negli anni: 73
+    indicatori su 485 con abbastanza anni per un andamento hanno una coorte che
+    si muove, e su 67 di loro i rilevatori temporali cambiano risposta a
+    coorte fissa. Una media che cambia perche' cambia la popolazione non e' un
+    andamento, e `slope_break`, `acceleration` e `return_to_level` la leggono
+    come tale: su `244` la serie usciva `rallentamento` a 0,451 e a coorte
+    costante e' `accelerazione` a 0,410, cioe' il verso opposto. Il caso limite
+    e' `283`, venti territori in tutto e quattro presenti in ogni anno.
+
+    E' la stessa decisione che il canary del 2026-08-06 ha gia' preso per
+    `indicator_brief` (`endpoints_common`): un confronto nel tempo si fa fra i
+    territori che ci sono in tutti e due i momenti, o non si fa.
+
+    Cio' che questa funzione **non** decide: se quattro territori su venti siano
+    abbastanza per parlare del paese. E' una soglia di rappresentativita', una
+    domanda diversa da quella della coorte, e inventarla qui vorrebbe dire
+    zittire dei rilevatori come effetto collaterale di una correzione di
+    esattezza. La coorte si dichiara invece (`quanti_territori` fra le cifre di
+    ogni angolo temporale), come il brief dichiara la propria base.
     """
+    cohort = common_cohort(matrix)
+    if not cohort:
+        return {}
     means = {}
     for year in sorted(matrix):
-        values = [v for v in matrix[year].values() if v is not None]
-        if values:
-            means[year] = sum(values) / len(values)
+        values = [matrix[year][name] for name in cohort]
+        means[year] = sum(values) / len(values)
     return means
 
 
@@ -265,6 +302,9 @@ def slope_break(matrix):
          "pendenza_prima": round(before, 4),
          "pendenza_dopo": round(after, 4),
          "cambia_verso": turned,
+         # La coorte su cui l'andamento e' calcolato, dichiarata invece che
+         # sottintesa. Vedi `annual_means`.
+         "quanti_territori": len(common_cohort(matrix)),
          "quota_spiegata": round(gain, 3)},
         years=[year],
         caution="Una rottura nella serie puo' essere un cambio di metodo della "
@@ -310,6 +350,7 @@ def acceleration(matrix):
         "accelerazione" if abs(late) > abs(early) else "rallentamento", change,
         {"pendenza_prima_meta": round(early, 4),
          "pendenza_seconda_meta": round(late, 4),
+         "quanti_territori": len(common_cohort(matrix)),
          "anni": [points[0][0], points[half][0], points[-1][0]]},
         years=[points[0][0], points[-1][0]],
     )]
@@ -351,6 +392,7 @@ def return_to_level(matrix, tolerance=0.02):
              "valore_di_allora": round(means[year], 3),
              "anno_di_oggi": last_year,
              "valore_di_oggi": round(last, 3),
+             "quanti_territori": len(common_cohort(matrix)),
              "escursione_nel_mezzo": round(excursion, 3)},
             years=[year, last_year],
             caution="Tornare al livello di allora non vuol dire tornare alla "

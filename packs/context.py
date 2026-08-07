@@ -121,12 +121,59 @@ def problems(claim):
 FOR_PROSE = {"’": "'", "‘": "'", "“": '"', "”": '"',
              "—": ",", "–": "-", "…": "...", ";": ","}
 
+# I quattro che `content/STYLE.md` vieta davvero, ed e' la meta' che conta: gli
+# altri quattro di `FOR_PROSE` sono varianti di glifo delle stesse virgolette e
+# dello stesso apostrofo, e non cambiano una parola. Questi quattro invece
+# cambiano la frase: un `;` che diventa `,` e una lineata che diventa una
+# virgola spostano dove finisce un'idea e dove ne comincia un'altra.
+#
+# Unica copia. `officina/lint.BANNED` e' un alias di questa riga, e un test
+# tiene allineata anche quella di `scripts/apply_curation.py`, che non puo'
+# importare da qui.
+BANNED = ("—", "–", ";", "…")
+
+# La sola meta' di `FOR_PROSE` che si puo' applicare a una citazione senza
+# cambiare cio' che l'istituzione ha detto.
+GLYPHS = {wrong: right for wrong, right in FOR_PROSE.items() if wrong not in BANNED}
+
 
 def for_prose(text):
-    """La stessa citazione, con i caratteri che la prosa del progetto ammette."""
+    """La stessa citazione, con i caratteri che la prosa del progetto ammette.
+
+    **Serve a chi scrive**, per costruirci sopra senza far fallire il cancello
+    tipografico, e non a mostrarla. Vedi `for_quote`: `app.indicator_texts` la
+    usava per rendere la citazione fra caporali, cioe' presentava come parole
+    dell'istituzione una stringa che questa funzione aveva cambiato.
+    """
     for wrong, right in FOR_PROSE.items():
         text = text.replace(wrong, right)
     return text
+
+
+def for_quote(text):
+    """La citazione come si puo' **mostrare**: solo i glifi, nessuna parola.
+
+    Virgolette curve e apostrofi tipografici diventano dritti, che e' una
+    variante di disegno dello stesso segno. I quattro di `BANNED` restano dove
+    sono: sostituirli cambierebbe la punteggiatura di una frase altrui, e una
+    frase altrui cambiata fra caporali e' attribuita male.
+    """
+    for wrong, right in GLYPHS.items():
+        text = text.replace(wrong, right)
+    return text
+
+
+def quotable(text):
+    """Se questa citazione si puo' mostrare verbatim senza rompere le pagine.
+
+    Le pagine non portano i quattro caratteri di `BANNED`, ed e' un invariante
+    con dei test suoi. Quando una citazione ne contiene uno restano due strade
+    oneste, e questa funzione serve a prendere la seconda: cambiarla e
+    presentarla lo stesso come sua, oppure non mostrarla e lasciare
+    l'istituzione con il proprio link. La terza, mostrare parole che
+    l'istituzione non ha scritto, non e' una strada.
+    """
+    return not any(char in text for char in BANNED)
 
 
 def for_theme(theme, limit=PER_PACK):

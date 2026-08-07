@@ -51,7 +51,9 @@ from packs import context as context_module
 from scripts import definition_check, indicator_store, verification_queue
 
 # `content/STYLE.md` li vieta in ogni prosa autorata, titoli compresi.
-BANNED = ("—", "–", ";", "…")
+# Una copia sola: la riga canonica sta in `packs/context.py`, che e' il modulo
+# piu' basso dei due e quello che deve saperlo per rendere una citazione.
+BANNED = context_module.BANNED
 # Il lead e' anche la meta description: una prima frase piu' lunga di cosi' non
 # puo' funzionare come tale.
 LEAD_FIRST_SENTENCE_MAX = 200

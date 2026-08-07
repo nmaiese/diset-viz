@@ -25,9 +25,11 @@ import copy
 import json
 import os
 import unittest
+import unittest.mock
 
 from app import app, indicator_texts
 from officina import lint
+from packs import context
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -81,11 +83,83 @@ class SourcesAreDerivedNotTranscribed(unittest.TestCase):
         self.assertEqual(len(urls), len(set(urls)))
 
     def test_the_derived_quote_is_typographically_clean(self):
-        """Le citazioni vere portano caratteri che `content/STYLE.md` vieta."""
+        """Le pagine non portano i quattro caratteri vietati, citazioni comprese.
+
+        L'invariante resta. Quello che cambia e' **come** si tiene: prima la
+        citazione veniva riscritta e mostrata lo stesso fra caporali, adesso o
+        si mostra intera o non si mostra. Vedi
+        `AQuoteIsShownWholeOrNotAtAll`."""
         entry = {"sections": [{"claims": ["eurostat-lunga-durata-ciclo"]}]}
         for item in indicator_texts.visible_sources(entry):
             for banned in lint.BANNED:
                 self.assertNotIn(banned, item["testo"])
+
+
+class AQuoteIsShownWholeOrNotAtAll(unittest.TestCase):
+    """Fra caporali e attribuita a un'istituzione ci vanno le sue parole.
+
+    `for_prose` esiste per **chi scrive**, che ci costruisce sopra senza far
+    fallire il cancello tipografico, e il suo commento lo dice: cambia anche la
+    punteggiatura. `app.indicator_texts` la usava per **rendere** la citazione,
+    quindi la pagina attribuiva a un'istituzione una frase in cui un punto e
+    virgola era diventato una virgola, mentre `fetch_corpus --verify` l'aveva
+    controllata come stringa esatta.
+
+    Le pagine pero' non portano i quattro caratteri di `content/STYLE.md`, ed e'
+    un invariante con dei test suoi. Le strade oneste sono percio' due, e questa
+    e' la seconda: mostrarla intera, oppure non mostrarla e lasciare
+    l'istituzione con il proprio link, che e' la provenienza vera. La terza,
+    mostrare parole che l'istituzione non ha scritto, non e' una strada.
+    """
+
+    def _fonti(self, quote):
+        claim = {"id": "prova", "url": "https://example.org/x", "quote": quote,
+                 "source_id": "istat", "themes": ["Lavoro e conciliazione"],
+                 "fetched_at": "2026-08-07"}
+        entry = {"sections": [{"claims": ["prova"]}]}
+        with unittest.mock.patch.object(context, "claims", lambda: [claim]), \
+             unittest.mock.patch.object(context, "sources",
+                                        lambda: {"istat": {"institution": "Istat"}}):
+            return indicator_texts.visible_sources(entry)
+
+    def test_a_clean_quote_is_shown_verbatim(self):
+        fonti = self._fonti("Il divario resta ampio nel Mezzogiorno.")
+        self.assertEqual(fonti[0]["testo"],
+                         "Istat. «Il divario resta ampio nel Mezzogiorno.»")
+
+    def test_a_curly_apostrophe_is_only_a_glyph_and_is_straightened(self):
+        """`’` e `'` sono lo stesso segno con due disegni: nessuna parola cambia,
+        e non e' fra i vietati."""
+        fonti = self._fonti("L’accumulo degli inquinanti resta alto.")
+        self.assertIn("L'accumulo", fonti[0]["testo"])
+        self.assertIn("«", fonti[0]["testo"])
+
+    def test_a_quote_with_a_semicolon_is_not_rewritten_into_one(self):
+        """Il caso che faceva il danno: `;` diventava `,` e restava fra caporali."""
+        fonti = self._fonti("Il dato sale al Nord; scende al Sud.")
+        self.assertNotIn("«", fonti[0]["testo"],
+                         "meglio nessuna citazione che una citazione cambiata")
+        self.assertNotIn("Il dato sale al Nord, scende al Sud", fonti[0]["testo"])
+
+    def test_and_the_institution_keeps_its_link(self):
+        """Non si perde la provenienza: si perde solo la frase, che il lettore
+        va a leggere alla fonte."""
+        fonti = self._fonti("Il dato sale al Nord; scende al Sud.")
+        self.assertEqual(fonti[0]["testo"], "Istat")
+        self.assertEqual(fonti[0]["url"], "https://example.org/x")
+
+    def test_the_writer_still_gets_the_copyable_version(self):
+        """`for_prose` non cambia: chi scrive continua a ricevere una versione
+        che, copiata, non fa fallire il cancello. Sono due mestieri diversi."""
+        self.assertEqual(context.for_prose("Nord; Sud"), "Nord, Sud")
+        self.assertEqual(context.for_quote("Nord; Sud"), "Nord; Sud")
+
+    def test_the_banned_list_has_one_copy(self):
+        """Tre copie della stessa riga erano due di troppo. `apply_curation` non
+        puo' importare da `packs/`, quindi la sua la guarda un test."""
+        from scripts import apply_curation
+        self.assertEqual(lint.BANNED, context.BANNED)
+        self.assertEqual(tuple(apply_curation.BANNED_CHARS), tuple(context.BANNED))
 
 
 class TheDefectItselfCannotComeBack(unittest.TestCase):

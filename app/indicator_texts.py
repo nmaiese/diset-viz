@@ -209,9 +209,18 @@ def visible_sources(entry):
             continue
         institution = (registry.get(claim.get("source_id")) or {}).get(
             "institution") or claim.get("source_id") or ""
-        quote = context.for_prose((claim.get("quote") or "").strip())
-        derived.append({"testo": f"{institution}. «{quote}»".strip(),
-                        "url": claim.get("url")})
+        # `for_quote` e non `for_prose`: la seconda esiste per **chi scrive**,
+        # che ci costruisce sopra, e cambia anche la punteggiatura. Qui la
+        # stringa finisce fra caporali attribuita a un'istituzione, e
+        # `fetch_corpus --verify` l'ha controllata **come stringa**: presentare
+        # come sua una frase con il punto e virgola diventato virgola vuol dire
+        # attribuirle parole che non ha scritto. Se la citazione non si puo'
+        # mostrare intera resta l'istituzione con il proprio link, che e' la
+        # provenienza vera: il lettore la legge alla fonte.
+        quote = context.for_quote((claim.get("quote") or "").strip())
+        testo = (f"{institution}. «{quote}»".strip() if quote and context.quotable(quote)
+                 else institution.strip())
+        derived.append({"testo": testo, "url": claim.get("url")})
         known.add(claim.get("url"))
     return authored + derived
 
