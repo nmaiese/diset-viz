@@ -49,9 +49,9 @@ fino in fondo.
 
 ```
   ammissione                      produttore                    verificatore
-  (scout+hunter+promoter)         (curator+writer+reviewer)     (invariato)
-  quali fonti, quali indicatori   cura -> scrive -> si rilegge   prova a smentirlo
-  li promuove                     -> firma
+  (scout+hunter+promoter+curator) (writer+reviewer)             (invariato)
+  quali fonti, quali indicatori   due bozze -> giudizio cieco   prova a smentirlo
+  li promuove, ne cura il verso   -> revisione -> lint
        |                               |                              |
   batch, l'intera coda            un indicatore alla volta        un articolo alla volta
        |                               |                              |
@@ -69,7 +69,8 @@ fino in fondo.
 - **Produttore** (l'officina, `.claude/workflows/produci-indicatori.js`) porta
   **un** indicatore da ammesso a pubblicato: monta il pacchetto, fa scrivere due
   bozze dai due angoli piu' forti, le fa scegliere a due giudici ciechi, applica
-  la diagnosi e chiude sul lint. Fonde curatore, scrittore e revisore. **Non e'
+  la diagnosi e chiude sul lint. Fonde scrittore e revisore. La **cura** sta a
+  monte, con l'ammissione, che e' il ruolo che ne ha i file nel perimetro. **Non e'
   un agente**: quattro tipi stretti dentro un workflow fanno lo stesso lavoro a
   un ventesimo del costo, e il coordinamento dentro un workflow non costa token.
   Il passo distintivo e' il **giudizio cieco**, non la rilettura sul proprio
@@ -102,8 +103,11 @@ Ogni ruolo ha tre cose, e sono sempre le stesse tre: una **coda deterministica**
 calcolata da file committati, un **agente** con un file di definizione in
 `.claude/agents/`, e un **verdetto del cancello** che decide se puo' pubblicare.
 Le code sono ancora quelle dei sette stadi (il vocabolario interno non cambia:
-un produttore legge la coda del curatore e quella dello scrittore), ma chi le
-drena sono tre ruoli, non sette.
+il produttore legge la coda dello scrittore e quella del revisore, l'ammissione
+anche quella del curatore), ma chi le drena sono tre ruoli, non sette. La mappa
+da vecchio stadio a ruolo vivo sta in un posto solo,
+`pipeline_launch.ROLE_OF_STAGE`, e `pipeline_status` la importa invece di
+ricopiarla.
 
 | ruolo | chi lo esegue | coda | comando |
 | --- | --- | --- | --- |

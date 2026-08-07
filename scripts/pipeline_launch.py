@@ -7,7 +7,7 @@ request della catena era aperta. Serviva quando l'unita' di lavoro era lo
 **stadio** e sette stadi separati si scrivevano addosso i registri condivisi.
 Adesso l'unita' di lavoro e' l'**indicatore**, e tre soli ruoli lo lavorano:
 
-    ammissione (scout+hunter+promoter) -> produttore (curator+writer+reviewer)
+    ammissione (scout+hunter+promoter+curator) -> produttore (writer+reviewer)
     -> verificatore
 
 Indicatori diversi toccano file diversi, quindi non c'e' contesa da
