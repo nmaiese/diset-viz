@@ -48,7 +48,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from scripts import practice_timeline  # noqa: E402  (path bootstrap above)
+from scripts import practice_timeline, verification_queue  # noqa: E402  (path bootstrap above)
 
 # I tre ruoli fusi, e la mappa dal vecchio stadio (che il dossier ancora nomina,
 # perche' e' il vocabolario di `ready_stage`) al ruolo che oggi lo copre. Uno
@@ -87,11 +87,22 @@ def target(role, indicator):
     aspetta di divergere: il file adesso si chiama `verificatore.md` e la
     traduzione non serve piu'. Un test tiene l'invariante (ogni chiave di
     `pipeline_gate.STAGE_PATHS` ha il suo `.claude/agents/<chiave>.md`).
+
+    **Il comando porta il codice pubblico, non la chiave dello store.** Il piano
+    ragiona in chiavi, perche' e' cosi' che il dossier e le code nominano un
+    indicatore (`dem:DEPENDRATE`, `176`); l'officina ragiona in codici URL
+    (`dem-DEPENDRATE`, `ter-176`) e gli altri li rifiuta: `officina.pacchetti`
+    risponde "nessun indicatore per" al primo passo, `officina.pubblica.chiave`
+    solleva all'ultimo. Il piano scriveva percio' comandi che non partivano, e
+    non se ne accorgeva nessuno perche' il comando lo esegue chi legge il piano,
+    non chi lo calcola. La conversione e' `verification_queue.code_of`, che gia'
+    esisteva ed e' quella che usa `reading_queue`: una regola sola, non due.
     """
     if role in WORKFLOW_OF_ROLE:
+        codice = verification_queue.code_of(str(indicator)) if indicator else ""
         return {"agent": None, "workflow": WORKFLOW_OF_ROLE[role],
                 "comando": f'Workflow({{scriptPath: "{WORKFLOW_OF_ROLE[role]}", '
-                           f'args: ["{indicator}"]}})'}
+                           f'args: ["{codice}"]}})'}
     return {"agent": role}
 
 # L'ordine di precedenza dei ruoli, a monte prima, come la catena: rompe solo i

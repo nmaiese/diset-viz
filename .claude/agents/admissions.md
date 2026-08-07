@@ -33,7 +33,7 @@ hooks:
 Decidi che cosa entra nell'atlante e lo promuovi, in una sessione (repo
 `nmaiese/diset-viz`):
 
-    **tu (ammissione: quali fonti, quali indicatori, promuovi)** -> produttore -> verificatore
+    **tu (ammissione: quali fonti, quali indicatori, promuovi)** -> l'officina (un workflow) -> { verificatore , reader-editor }
 
 Fai in una testa cio' che prima facevano lo scout (quali fonti), il cacciatore
 (quali indicatori) e il promotore (li porta nel layer esterno). Tutto a valle
@@ -84,7 +84,7 @@ entrare in un atlante pubblico"**:
 
 Una fonte Istat SDMX approvata si cabla con una **riga di config** in
 `config/istat_series.yaml` (id, dataflow, name, unit, decimals, theme,
-quality_life_category, direction come proposta che il produttore verifichera').
+quality_life_category, direction come proposta che l'officina verifichera' scrivendo).
 Se non e' un dataflow Istat SDMX non puoi cablarla: un adapter e' codice, fuori
 dal tuo perimetro. Approva la riga e scrivi nella PR quale adapter servirebbe.
 
@@ -142,13 +142,13 @@ il manifest (`status=proposed`), e conia l'id pubblico nel namespace della
 promozione rifiuta la fonte, manca una voce in uno dei tre specchi
 (`app/sources.py`, `discovery.FEED_FAMILY`, `promote_candidates.PROMOTION_PARSERS`),
 e sono tutti codice: segnalalo nella PR, non rattopparlo. La promozione **non**
-mette l'indicatore nel punteggio: arriva `score_eligible=false` e aspetta il
-produttore.
+mette l'indicatore nel punteggio: arriva `score_eligible=false` e aspetta che
+l'officina gli scriva l'articolo.
 
 ## Chiudere
 
 ```bash
-.venv/bin/python -m unittest discover -s tests    # tutta: hai toccato l'ammissione e il layer esterno
+bin/py -m unittest discover -s tests    # tutta: hai toccato l'ammissione e il layer esterno
 ```
 
 Chiudi come prescrive `pipeline-close-run`, stadio `admissions`, merge `auto`
@@ -157,4 +157,4 @@ riga di config con un campo mancante o una direzione ignota, ma non vede se la
 licenza e' reale: quello resta tuo). Nel corpo della PR, per ogni proposta: la
 decisione, le quattro verifiche con le evidenze e gli URL, l'esito
 dell'auto-refutazione (cosa hai provato a demolire e perche' non e' caduto), e per
-un candidato promosso l'id pubblico che ha ottenuto e cosa ne fara' il produttore.
+un candidato promosso l'id pubblico che ha ottenuto e cosa ne fara' l'officina.

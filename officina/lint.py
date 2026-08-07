@@ -343,6 +343,25 @@ def check_dynamics_cite_a_source(entry, key=None, **_):
     corpus. Se il corpus non ha niente per quel tema, la colpa non e'
     dell'articolo e il rilievo lo dice, perche' altrimenti chi scrive
     imparerebbe a inventare una fonte per far tacere un lint.
+
+    **Due insiemi, non uno, ed e' la differenza fra dire e non dire niente.**
+    Il controllo si diceva posizionale e non lo era: leggeva
+    `indicator_texts.cited_claims`, che unisce il campo `corpus` a livello di
+    entry con i `claims` di **tutte** le sezioni. Lo schema della bozza rende
+    `corpus` obbligatorio e `claims` facoltativo, quindi una bozza normale
+    soddisfaceva il controllo senza attaccare niente alla dinamica: il rilievo
+    non usciva mai, e la regola che esiste per togliere il freddo era spenta nel
+    caso comune, non in un caso limite.
+
+    I due usi restano distinti perche' sono domande diverse. "Hai citato
+    qualcosa che non esiste" e "hai citato qualcosa che non riguarda questo
+    indicatore" valgono per l'entry intera, ovunque la citazione sia attaccata.
+    "Questo paragrafo si appoggia a qualcosa" vale per **quel** paragrafo, o non
+    e' posizionale.
+
+    Nessun articolo committato cambia verdetto: zero delle 377 entry usano
+    `corpus` a livello di entry, e l'unica con dei `claims` di sezione li ha
+    proprio sulla dinamica.
     """
     sections = entry.get("sections") or []
     dynamics = [section for section in sections if section.get("role") == "dinamica"]
@@ -358,11 +377,15 @@ def check_dynamics_cite_a_source(entry, key=None, **_):
     # una citazione buona c'era.
     available = {claim["id"] for claim in context_module.for_indicator(
         key, theme, limit=50, indicator_name=meta.get("name"))}
-    cited = set(indicator_texts.cited_claims(entry))
+    # Ovunque attaccata: serve alle due domande sull'entry intera.
+    ovunque = set(indicator_texts.cited_claims(entry))
+    # Solo sulla dinamica: serve alla domanda posizionale, l'ultima.
+    dalla_dinamica = {c for section in dynamics for c in (section.get("claims") or [])
+                      if isinstance(c, str) and c}
     esistenti = {claim["id"] for claim in context_module.claims()}
 
     # Prima i due modi in cui una citazione e' sbagliata, e sono diversi.
-    inventate = sorted(cited - esistenti)
+    inventate = sorted(ovunque - esistenti)
     if inventate:
         return [_finding("fonte-inesistente", BLOCKS,
                          f"identificatori non nel corpus: {inventate}",
@@ -374,7 +397,7 @@ def check_dynamics_cite_a_source(entry, key=None, **_):
     # attivita'. Bloccante come una fonte inventata: su una pagina pubblica una
     # spiegazione attribuita a chi non l'ha data e' un'attribuzione falsa,
     # anche se la frase esiste davvero da un'altra parte.
-    fuori_tema = sorted(cited - available)
+    fuori_tema = sorted(ovunque - available)
     if fuori_tema:
         return [_finding("fonte-non-pertinente", BLOCKS,
                          f"nel corpus ma non per questo indicatore: {fuori_tema}",
@@ -385,10 +408,11 @@ def check_dynamics_cite_a_source(entry, key=None, **_):
                          f"il corpus non ha niente per {meta.get('name') or key!r}: "
                          "l'articolo deve dire che non spiega, non spiegare "
                          "lo stesso", "sections.dinamica")]
-    if not cited:
+    if not dalla_dinamica:
+        altrove = " (ce ne sono, ma su altre sezioni)" if ovunque else ""
         return [_finding("dinamica-senza-fonte", FLAGS,
-                         f"nessun identificatore, ma il corpus ne offre "
-                         f"{len(available)}", "sections.dinamica")]
+                         f"nessun identificatore sulla dinamica{altrove}, ma il "
+                         f"corpus ne offre {len(available)}", "sections.dinamica")]
     return []
 
 

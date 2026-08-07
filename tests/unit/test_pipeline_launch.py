@@ -6,7 +6,7 @@ run_id e' iniettato, cosi' l'uscita e' deterministica."""
 
 import unittest
 
-from scripts import pipeline_launch
+from scripts import pipeline_launch, verification_queue
 
 
 def practice(code, *, state="in-lavorazione", flags=None, completed=(),
@@ -45,6 +45,42 @@ class PlanLaunches(unittest.TestCase):
         self.assertEqual(plan[0]["indicator"], "ter-5")
         self.assertEqual(plan[0]["scope"], "indicatore")
         self.assertEqual(plan[0]["run_id"], "producer-RUNID")
+
+    def test_the_command_carries_the_public_code_not_the_store_key(self):
+        """Il piano ragiona in chiavi, l'officina in codici URL, e il comando e'
+        il punto in cui i due vocabolari si incontrano.
+
+        Il dossier e le code nominano un indicatore con la chiave dello store
+        (`176`, `dem:DEPENDRATE`, `bes:10AMB004`); `officina.pacchetti` risponde
+        "nessun indicatore per" a quella forma, e `officina.pubblica.chiave`
+        solleva. Il piano scriveva percio' comandi che non partivano, e non se ne
+        accorgeva nessuno perche' il comando lo esegue chi legge il piano.
+
+        Il difetto era invisibile anche qui: le fixture di questo file usavano
+        `ter-5`, che e' **gia'** un codice pubblico, quindi la conversione
+        mancante non cambiava niente. Le tre forme sotto sono quelle vere.
+        """
+        for chiave, atteso in (("176", "ter-176"),
+                               ("dem:DEPENDRATE", "dem-DEPENDRATE"),
+                               ("bes:10AMB004", "bes-10AMB004"),
+                               ("eur:rd_e_gerdreg", "eur-rd_e_gerdreg")):
+            with self.subTest(chiave=chiave):
+                comando = pipeline_launch.target("producer", chiave)["comando"]
+                self.assertIn(f'args: ["{atteso}"]', comando)
+                # E il giro torna: il codice che il comando scrive e' quello che
+                # `officina.pubblica` sa riportare alla chiave di partenza.
+                self.assertEqual(verification_queue.code_of(chiave), atteso)
+
+    def test_a_readability_revise_is_launchable_too(self):
+        """La stessa conversione sul percorso che ci arriva da `reading_queue`,
+        che e' quello segnalato in revisione: una bocciatura di leggibilita'
+        produceva un comando che non pubblicava niente."""
+        letture = [{"status": "revise", "key": "bes:10AMB004",
+                    "code": "bes-10AMB004", "level": "regione", "rounds": 1}]
+        plan = pipeline_launch.plan_launches({}, {}, mint=_mint, readings=letture)
+        produttori = [p for p in plan if p["role"] == "producer"]
+        self.assertEqual(len(produttori), 1)
+        self.assertIn('args: ["bes-10AMB004"]', produttori[0]["comando"])
 
     def test_a_signed_unverified_indicator_goes_to_the_verificatore(self):
         dossier = {"ter-9": practice("ter-9",

@@ -6,9 +6,8 @@
   },
   "permissions": {
     "allow": [
+      "Bash(bin/py:*)",
       "Bash(python3 scripts/:*)",
-      "Bash(.venv/bin/python -m unittest:*)",
-      "Bash(.venv/bin/python -m scripts.:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",

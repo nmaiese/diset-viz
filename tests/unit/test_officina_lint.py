@@ -205,10 +205,55 @@ class DynamicsMustCiteASource(unittest.TestCase):
         self.assertEqual(rules_fired(found), {"dinamica-senza-fonte"})
         self.assertEqual(found[0]["severity"], lint.FLAGS)
 
-    def test_citing_a_real_id_passes(self):
+    def _dinamica_che_cita(self, *ids):
+        """Un'entry con l'identificatore attaccato **alla dinamica**, che e' la
+        forma che il controllo posizionale pretende."""
+        voce = entry()
+        for sezione in voce["sections"]:
+            if sezione["role"] == "dinamica":
+                sezione["claims"] = list(ids)
+        return voce
+
+    def test_citing_a_real_id_on_the_dynamics_passes(self):
+        self._with_corpus(["a", "b"])
+        found = lint.check_dynamics_cite_a_source(self._dinamica_che_cita("a"), key="ter:1")
+        self.assertEqual(found, [])
+
+    def test_a_corpus_field_alone_does_not_satisfy_a_positional_check(self):
+        """Il difetto che questo controllo aveva, scritto come caso.
+
+        Il campo `corpus` a livello di entry e' **obbligatorio** nello schema
+        della bozza, i `claims` di sezione no: leggendo l'unione dei due, una
+        bozza normale zittiva il controllo senza attaccare niente alla dinamica.
+        Il rilievo non usciva mai, e la regola che esiste per togliere il freddo
+        era spenta nel caso comune, non in un caso limite. Questo test asseriva
+        il contrario, cioe' era il difetto scritto come aspettativa."""
         self._with_corpus(["a", "b"])
         found = lint.check_dynamics_cite_a_source(entry(corpus=["a"]), key="ter:1")
-        self.assertEqual(found, [])
+        self.assertEqual(rules_fired(found), {"dinamica-senza-fonte"})
+        self.assertIn("altre sezioni", found[0]["detail"])
+
+    def test_a_claim_on_another_section_does_not_cover_the_dynamics(self):
+        """Stessa regola, l'altra meta': l'attribuzione ha un posto, e un
+        identificatore attaccato al `quadro` non dice niente sulla dinamica."""
+        self._with_corpus(["a", "b"])
+        voce = entry()
+        for sezione in voce["sections"]:
+            if sezione["role"] == "quadro":
+                sezione["claims"] = ["a"]
+        found = lint.check_dynamics_cite_a_source(voce, key="ter:1")
+        self.assertEqual(rules_fired(found), {"dinamica-senza-fonte"})
+
+    def test_a_wrong_citation_is_caught_wherever_it_hangs(self):
+        """Le altre due domande restano sull'entry intera, e devono restarci: una
+        fonte inventata o fuori tema e' un difetto della pagina pubblica
+        qualunque sezione la porti. Se anche queste diventassero posizionali,
+        spostare la citazione su un'altra sezione la farebbe sparire."""
+        self._with_corpus(["a"], esistenti=["a"])
+        voce = entry(corpus=["inesistente"])
+        found = lint.check_dynamics_cite_a_source(voce, key="ter:1")
+        self.assertEqual(rules_fired(found), {"fonte-inesistente"})
+        self.assertEqual(found[0]["severity"], lint.BLOCKS)
 
     def test_citing_an_id_that_does_not_exist_blocks(self):
         """Il modo piu' facile di zittire un lint e' inventare la fonte."""

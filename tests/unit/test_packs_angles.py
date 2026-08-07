@@ -196,6 +196,51 @@ class GroupDivergence(unittest.TestCase):
         self.assertEqual(found[0]["figures"]["gruppo_alto"], "nord")
         self.assertIn("ponderati", found[0]["caution"])
 
+    def _serie(self, nord_primo, sud_primo, nord_ultimo, sud_ultimo):
+        return {
+            2000: {f"t{i:02d}": (nord_primo if i < 10 else sud_primo) for i in range(20)},
+            2015: {f"t{i:02d}": (nord_ultimo if i < 10 else sud_ultimo) for i in range(20)},
+        }
+
+    def test_a_rank_reversal_at_an_unchanged_gap_is_not_a_divergence(self):
+        """Il difetto: una distanza ferma raccontata come +200%.
+
+        I due gruppi si scelgono sull'ordine dell'**ultimo** anno, e nel primo
+        quell'ordine puo' essere rovesciato: li' `first[high] - first[low]` e'
+        negativo, e non e' una distanza, e' una distanza col segno di un
+        ordinamento che non vale piu'. Da -10 a 10 la sottrazione firmata dava
+        +200% di divergenza su un divario che non si e' mosso di un punto, cioe'
+        l'angolo piu' forte del pacchetto costruito sul nulla. Un articolo lo
+        avrebbe aperto: la forza decide la struttura."""
+        found = angles.group_divergence(self._serie(0.0, 10.0, 10.0, 0.0), self.GROUPS)
+        self.assertEqual(found, [])
+
+    def test_a_reversal_that_also_widens_says_that_it_reversed(self):
+        """L'altra meta': quando il divario si allarga **e** l'ordine si rovescia
+        l'angolo esce, e porta il sorpasso fra i fatti. "Il divario si e'
+        allargato" li' e' vero e insieme fuorviante, perche' chi sta sopra oggi
+        stava sotto allora, e chi scrive non deve dedurlo da due medie."""
+        found = angles.group_divergence(self._serie(0.0, 2.0, 20.0, 0.0), self.GROUPS)
+        self.assertEqual(kinds(found), ["gruppi-che-divergono"])
+        figure = found[0]["figures"]
+        self.assertTrue(figure["ordine_invertito"])
+        self.assertEqual(figure["distanza_primo_anno"], 2.0)
+        self.assertEqual(figure["distanza_ultimo_anno"], 20.0)
+
+    def test_the_ordinary_case_says_the_order_held(self):
+        found = angles.group_divergence(self._serie(10.0, 8.0, 20.0, 8.0), self.GROUPS)
+        self.assertFalse(found[0]["figures"]["ordine_invertito"])
+
+    def test_the_distances_it_reports_are_never_negative(self):
+        """Una distanza col segno e' il sintomo leggibile del difetto: se
+        ricompare, e' tornata la sottrazione firmata."""
+        for serie in (self._serie(0.0, 2.0, 20.0, 0.0),
+                      self._serie(10.0, 8.0, 20.0, 8.0),
+                      self._serie(20.0, 2.0, 11.0, 10.0)):
+            for found in angles.group_divergence(serie, self.GROUPS):
+                self.assertGreaterEqual(found["figures"]["distanza_primo_anno"], 0)
+                self.assertGreaterEqual(found["figures"]["distanza_ultimo_anno"], 0)
+
     def test_without_a_grouping_it_says_nothing(self):
         self.assertEqual(angles.group_divergence(flat(), {}), [])
 

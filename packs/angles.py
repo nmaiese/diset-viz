@@ -588,20 +588,33 @@ def group_divergence(matrix, groups):
 
     high = max(shared, key=lambda group: last[group])
     low = min(shared, key=lambda group: last[group])
-    was = first[high] - first[low]
-    now = last[high] - last[low]
-    if was == 0:
+    # **Distanze, quindi valori assoluti.** I due gruppi si scelgono sull'ordine
+    # dell'**ultimo** anno, e nel primo quell'ordine puo' essere rovesciato: li'
+    # `first[high] - first[low]` e' negativo, e non e' una distanza, e' una
+    # distanza col segno di un ordinamento che non vale piu'. Con la sottrazione
+    # firmata un divario fermo attraverso un sorpasso (da -10 a 10) risultava
+    # +200% di divergenza, cioe' l'angolo piu' forte del pacchetto costruito su
+    # una distanza che non si e' mossa di un punto.
+    partenza = abs(first[high] - first[low])
+    now = last[high] - last[low]          # >= 0 per costruzione: high e' il max
+    invertito = (first[high] - first[low]) < 0
+    if partenza == 0:
         return []
-    change = (now - was) / abs(was)
+    change = (now - partenza) / partenza
     if _saturate(abs(change)) < FLOOR:
         return []
     return [_angle(
         "gruppi-che-divergono" if change > 0 else "gruppi-che-convergono",
         _saturate(abs(change)),
         {"gruppo_alto": high, "gruppo_basso": low,
-         "distanza_primo_anno": round(was, 3),
+         "distanza_primo_anno": round(partenza, 3),
          "distanza_ultimo_anno": round(now, 3),
          "variazione_relativa": round(change, 3),
+         # Quando l'ordine si e' rovesciato, "il divario si e' allargato" e'
+         # vero e insieme fuorviante: chi sta sopra oggi stava sotto allora, e un
+         # articolo che non lo dicesse racconterebbe una crescita al posto di un
+         # sorpasso. Il fatto viaggia col fatto, non lasciato dedurre.
+         "ordine_invertito": invertito,
          "medie_ultimo_anno": {group: round(last[group], 3) for group in shared}},
         years=[years[0], years[-1]],
         caution="Medie semplici dei territori del gruppo, non aggregati "

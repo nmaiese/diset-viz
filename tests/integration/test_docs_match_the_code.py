@@ -59,6 +59,11 @@ COMANDO = re.compile(
 STADIO = re.compile(r"--stage\s+(?P<nome>[^\s\\]+)")
 # Il registro datato di `docs/CANARY.md`: storia, non procedura.
 RIGA_DI_REGISTRO = re.compile(r"^\|\s*\d{4}-\d{2}-\d{2}")
+# Un comando che comincia con l'interprete sbagliato. `.venv/bin/python` non
+# esiste in un worktree fresco, dove gli agenti girano: esce 127 dicendo "no such
+# file or directory", che non suggerisce niente a chi legge. `bin/py` prova i
+# percorsi in ordine e, quando fallisce, dice quali ha provato e come crearne uno.
+INTERPRETE_VIETATO = re.compile(r"^\s*(?:[A-Z_]+=\S+\s+)*\.venv/bin/(?:python|gunicorn)\b")
 
 
 def _file_di_testo():
@@ -140,6 +145,48 @@ class UnComandoScrittoEUnComandoCheParte(unittest.TestCase):
                  for path, numero, script, nome in _comandi_con_stadio()
                  if nome not in VOCABOLARI[script]]
         self.assertEqual(rotti, [], "comandi che non partono:\n" + "\n".join(rotti))
+
+    def test_nessun_agente_lancia_un_interprete_che_puo_non_esserci(self):
+        """Il guasto piu' ripetuto che il repo abbia registrato: quattro volte in
+        quarantotto ore, `.venv/bin/python: no such file or directory`.
+
+        Gli agenti girano su un checkout fresco, dove `.venv` puo' non esserci, e
+        `python3` in questo ambiente e' una funzione di shell che senza
+        `$VIRTUAL_ENV` cade su un interprete privo delle dipendenze. `bin/py`
+        esiste per risolvere in un posto solo e fallire dicendo perche'.
+
+        Il controllo copre i file che un agente **esegue** (il proprio prompt e
+        le skill), non l'intera documentazione: li' `.venv/bin/python` compare
+        anche nelle frasi che spiegano perche' non si usa, ed e' corretto che ci
+        sia. Sono anche i file per cui il guasto e' stato misurato."""
+        eseguibili = sorted(
+            list((RADICE / ".claude" / "agents").glob("*.md"))
+            + list((RADICE / ".claude" / "skills").rglob("SKILL.md")))
+        self.assertTrue(eseguibili)
+        rotti = [f"{path.relative_to(RADICE)}:{numero}: {riga.strip()}"
+                 for path in eseguibili
+                 for numero, riga in enumerate(
+                     path.read_text(encoding="utf-8").splitlines(), 1)
+                 if INTERPRETE_VIETATO.match(riga)]
+        self.assertEqual(rotti, [],
+                         "comandi con un interprete che puo' non esistere:\n"
+                         + "\n".join(rotti))
+
+    def test_lopzione_giusta_e_quella_gia_permessa(self):
+        """La causa a monte, e non e' un documento: e' `.claude/settings.json`.
+
+        La lista `allow` pre-approvava `.venv/bin/python` e **non** `bin/py`,
+        cioe' l'unico interprete che il progetto impone. Un agente che seguiva
+        `CLAUDE.md` prendeva un prompt di permesso, e quello vietato girava senza
+        chiedere: l'incentivo puntava esattamente dalla parte sbagliata, ed e' la
+        spiegazione piu' semplice di perche' il guasto si ripeteva."""
+        import json
+
+        permessi = json.loads(
+            (RADICE / ".claude" / "settings.json").read_text(encoding="utf-8"))
+        allow = permessi["permissions"]["allow"]
+        self.assertIn("Bash(bin/py:*)", allow)
+        self.assertEqual([r for r in allow if ".venv" in r], [])
 
     def test_il_controllo_vede_davvero_qualcosa(self):
         """Un controllo che non trova mai niente da controllare e' verde per il
