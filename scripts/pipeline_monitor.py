@@ -235,6 +235,11 @@ def _run_history(run_ids, runs_by_id) -> list:
     return out
 
 
+def _owner_of(stage: str) -> str:
+    """Il ruolo che oggi copre un vecchio stadio, dalla mappa e non a mano."""
+    return pipeline_launch.ROLE_OF_STAGE.get(stage) or stage
+
+
 def _next_step(d: dict, ready_stage: str | None) -> dict:
     """La prossima azione, detta come gesto e proprietario, non come stato."""
     flags = d.get("flags") or {}
@@ -245,20 +250,26 @@ def _next_step(d: dict, ready_stage: str | None) -> dict:
     if state == "chiusa" or flags.get("rejected"):
         return {"owner": "nessuno", "stage": "", "kind": "closed",
                 "label": "Nessuna azione, candidatura chiusa"}
+    # Il proprietario si **legge** dalla mappa, non si scrive qui. Era scritto
+    # (`produttore` per tutti e tre), e alla prima occasione ha mentito: quando
+    # `curator` e' passato all'ammissione, il cruscotto ha continuato a mandare
+    # chi lo legge a un workflow che non sa curare e non ha nel perimetro i file
+    # della curatela. Sotto, il ramo generico gia' passava da `ROLE_OF_STAGE`:
+    # erano questi tre casi speciali a scavalcarla.
     if flags.get("open_smentita"):
-        return {"owner": "produttore", "stage": "reviewer", "kind": "attention",
+        return {"owner": _owner_of("reviewer"), "stage": "reviewer", "kind": "attention",
                 "label": "Correggere le affermazioni smentite e firmare di nuovo"}
     if flags.get("stale_curation"):
-        return {"owner": "produttore", "stage": "curator", "kind": "attention",
+        return {"owner": _owner_of("curator"), "stage": "curator", "kind": "attention",
                 "label": "Rivedere la curatela sui dati aggiornati"}
     if flags.get("stale_vintage"):
-        return {"owner": "produttore", "stage": "reviewer", "kind": "attention",
+        return {"owner": _owner_of("reviewer"), "stage": "reviewer", "kind": "attention",
                 "label": "Rileggere e firmare la nuova versione dei dati"}
     if state == "pubblicata":
         return {"owner": "monitoraggio", "stage": "", "kind": "done",
                 "label": "Sorvegliare la fonte per nuovi dati o cambi di definizione"}
     if ready_stage:
-        owner = pipeline_launch.ROLE_OF_STAGE.get(ready_stage) or ready_stage
+        owner = _owner_of(ready_stage)
         labels = {
             "promoter": "Ammettere la candidatura nel catalogo",
             "curator": "Definire verso, categoria e ammissibilita' al punteggio",

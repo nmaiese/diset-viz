@@ -192,7 +192,7 @@ def main(argv=None) -> int:
         esiste_gia = key in indicator_store.load_all()
         rilievi = tutti_i_rilievi(key, fatta)
         fermi = [r for r in rilievi if r["severity"] == "blocca"]
-        if fermi and esiste_gia and not _guasto_del_cancello(fermi):
+        if fermi and esiste_gia:
             # **Una riscrittura bocciata non sostituisce l'articolo che c'era.**
             #
             # Vale a ogni tentativo, e non solo all'ultimo, perche' e' il
@@ -209,8 +209,18 @@ def main(argv=None) -> int:
             # attribuendone i rilievi alla bozza nuova. Stampati qui parlano
             # della bozza, che e' l'unica cosa che chi riscrive puo' correggere.
             #
-            # `cancello-non-eseguibile` e' escluso apposta: un guasto del lint
-            # non e' una bocciatura editoriale e non deve costare una scrittura.
+            # **Anche un guasto del cancello**, e prima non era cosi'. La regola
+            # "un guasto non deve costare una scrittura" nasce sulla prima
+            # pubblicazione, dove rifiutare perderebbe l'unica copia della
+            # bozza; su una riscrittura si rovescia, perche' li' scrivere costa
+            # l'articolo **precedente**, sostituito da un testo che nessuno ha
+            # potuto controllare. La bozza non e' persa in nessuno dei due casi:
+            # il workflow la riporta e la run puo' ripartire. L'articolo buono
+            # si', e solo da git.
+            #
+            # La regola diventa quindi una sola, che vale per ogni rilievo
+            # bloccante: **un articolo che esiste non viene mai sostituito da
+            # qualcosa che il cancello non ha passato.**
             # **Tutte e due le righe sullo stesso flusso, e non e' pignoleria.**
             # Con l'uscita catturata (un agente non e' un terminale) stdout e'
             # a blocchi e stderr no, quindi una riga su stdout e una su stderr

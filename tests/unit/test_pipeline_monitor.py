@@ -152,6 +152,14 @@ class Board(unittest.TestCase):
         self.assertEqual(row["progress"], 100)
 
     def test_an_open_smentita_is_an_explicit_producer_action(self):
+        """Il proprietario e' il **ruolo**, con il nome che porta nel diario.
+
+        Era la stringa italiana `produttore`, cablata qui e in altri due rami:
+        contraddiceva la decisione scritta accanto a `ROLE_LABELS`, cioe' che un
+        lettore non deve tenere a mente una mappa fra `ammissione` sul cruscotto
+        e `admissions` nel diario. L'etichetta umana la mette il rendering
+        (`producer` -> "officina"), non il modello.
+        """
         d = practice("ter-bad", state="invalidata", flags={"open_smentita": True},
                      completed=["writer", "reviewer", "verificatore"],
                      required=["writer", "reviewer", "verificatore"])
@@ -159,9 +167,22 @@ class Board(unittest.TestCase):
         b = pipeline_monitor.board({"ter-bad": d}, today=self.TODAY)
         row = b["rows"][0]
         self.assertEqual(row["next_step"]["kind"], "attention")
-        self.assertEqual(row["next_step"]["owner"], "produttore")
+        self.assertEqual(row["next_step"]["owner"], "producer")
         self.assertEqual(row["lifecycle"][1]["status"], "issue")
         self.assertEqual(b["metrics"]["attention"], 1)
+
+    def test_stale_curation_belongs_to_admissions_not_to_the_workshop(self):
+        """Il ramo speciale scavalcava `ROLE_OF_STAGE`, e alla prima occasione
+        ha mentito: quando `curator` e' passato all'ammissione, il cruscotto ha
+        continuato a mandare chi lo legge a un workflow che non sa curare e non
+        ha nel perimetro i quattro file della curatela."""
+        d = practice("ter-vecchio", state="invalidata", flags={"stale_curation": True},
+                     completed=["writer"], required=["writer"])
+        d.update({"timeline": []})
+        b = pipeline_monitor.board({"ter-vecchio": d}, today=self.TODAY)
+        passo = b["rows"][0]["next_step"]
+        self.assertEqual(passo["stage"], "curator")
+        self.assertEqual(passo["owner"], "admissions")
 
     def test_the_row_keeps_the_complete_timeline_and_operational_run_detail(self):
         d = practice("ter-x", completed=["writer"], required=["writer", "reviewer", "verificatore"])

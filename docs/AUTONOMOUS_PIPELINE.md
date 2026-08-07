@@ -513,15 +513,15 @@ poi restava fermo per sempre, il che faceva sembrare la catena finita mentre il
 catalogo invecchiava sotto. Oggi i tre innesco sono gli stessi, ma li drenano i
 tre ruoli:
 
-**Ammissione.** Non ha un rientro sul pubblicato: guarda solo i cataloghi. Il suo
-"rientro" e' che la coda dello scout riflette lo stato del catalogo (vedi sotto),
-non un troncamento.
+**Ammissione, lato cataloghi.** La coda dello scout riflette lo stato del
+catalogo (vedi sotto), non un troncamento.
 
-**Produttore, lato curatela.** `curation.csv` porta `data_year`, l'anno su cui il
-verso e' stato giudicato. Quando la fonte ne pubblica uno piu' recente,
-l'indicatore rientra in `recheck`. Un verso e' un'affermazione su quale estremo
-della classifica sia quello buono, ed e' esattamente cio' che una ridefinizione,
-un rebase o una rottura di serie possono invertire.
+**Ammissione, lato curatela**, ed e' il suo rientro sul pubblicato.
+`curation.csv` porta `data_year`, l'anno su cui il verso e' stato giudicato.
+Quando la fonte ne pubblica uno piu' recente, l'indicatore rientra in `recheck`.
+Un verso e' un'affermazione su quale estremo della classifica sia quello buono,
+ed e' esattamente cio' che una ridefinizione, un rebase o una rottura di serie
+possono invertire.
 
 **Produttore, lato testo.** Ha `stale` in `pending_notes` e `text_queue` (un
 articolo il cui `vintage` e' rimasto indietro) e, dopo un rinfresco,

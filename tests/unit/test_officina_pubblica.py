@@ -221,10 +221,18 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
         self.assertEqual([f["rule"] for f in fermi], ["cancello-non-eseguibile"])
         self.assertIn("vista rotta", fermi[0]["detail"])
 
-    def test_and_the_article_is_still_written(self):
+    def test_and_a_first_publication_is_still_written(self):
+        """Su una prima pubblicazione la bozza si scrive lo stesso, senza
+        `origine`: non c'e' niente sotto da proteggere, e rifiutare perderebbe
+        l'unica copia per un errore che non riguarda la prosa.
+
+        Su una **riscrittura** il verso si rovescia, ed e' l'altra meta' della
+        stessa regola: vedi
+        `ARejectedRewriteDoesNotEatTheGoodArticle.test_a_gate_that_cannot_run_does_not_replace_the_article_either`.
+        """
         with unittest.mock.patch.object(lint, "lint_entry",
                                         side_effect=RuntimeError("vista rotta")):
-            codice, entry, _ = self._main(BOZZA)
+            codice, entry, _ = self._main(BOZZA, precedenti={})
         self.assertEqual(codice, 0)
         self.assertNotIn("origine", entry)
         self.assertEqual(entry["lead"], BOZZA["lead"])
@@ -294,17 +302,33 @@ class ARejectedRewriteDoesNotEatTheGoodArticle(
         self.assertEqual(codice, 0)
         self.assertEqual(entry["origine"], "officina")
 
-    def test_a_gate_that_cannot_run_does_not_throw_the_draft_away(self):
-        """`cancello-non-eseguibile` non e' una bocciatura editoriale.
+    def test_a_gate_that_cannot_run_does_not_replace_the_article_either(self):
+        """Nemmeno un guasto del cancello sostituisce un articolo che esiste.
 
-        Il verso della guardia e' lo stesso del resto del file: un guasto del
-        lint non promuove (niente `origine`) e non distrugge (la bozza si
-        scrive). Un rifiuto qui farebbe perdere il lavoro per un errore che non
-        riguarda la prosa.
+        La regola "un guasto del lint non deve costare una scrittura" nasce
+        sulla **prima** pubblicazione, dove rifiutare perderebbe l'unica copia
+        della bozza. Su una riscrittura si rovescia: li' scrivere costa
+        l'articolo precedente, sostituito da un testo che nessuno ha potuto
+        controllare, e la bozza non e' persa in nessuno dei due casi (il
+        workflow la riporta, la run puo' ripartire) mentre l'articolo buono si'.
+
+        Resta quindi una regola sola: un articolo che esiste non viene mai
+        sostituito da qualcosa che il cancello non ha passato.
         """
         with unittest.mock.patch.object(lint, "lint_entry",
                                         side_effect=RuntimeError("vista rotta")):
-            codice, entry, _ = self._main(BOZZA, precedenti=self.PRECEDENTE)
+            codice, entry, detto = self._main(BOZZA, precedenti=self.PRECEDENTE)
+        self.assertEqual(codice, 2)
+        self.assertEqual(entry, {})
+        self.assertIn("cancello-non-eseguibile", detto)
+
+    def test_a_gate_that_cannot_run_still_writes_a_first_publication(self):
+        """Qui invece la regola originale vale intera: senza un precedente,
+        rifiutare perderebbe l'unica copia della bozza per un errore che non
+        riguarda la prosa."""
+        with unittest.mock.patch.object(lint, "lint_entry",
+                                        side_effect=RuntimeError("vista rotta")):
+            codice, entry, _ = self._main(BOZZA, precedenti={})
         self.assertEqual(codice, 0)
         self.assertNotIn("origine", entry)
         self.assertEqual(entry["lead"], BOZZA["lead"])
