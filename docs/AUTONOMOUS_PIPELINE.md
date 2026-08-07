@@ -568,7 +568,7 @@ tetto, e sono entrambi **dati** dentro il perimetro di un agente:
 - `config/istat_series.yaml` (ammissione): una riga = un indicatore Istat SDMX.
   `dataflow` e' un campo per serie, non piu' una costante di modulo, quindi un
   dominio nuovo non richiede un adapter nuovo.
-- `config/theme_categories.csv` (produttore): la mappa tema -> categoria. Un tema
+- `config/theme_categories.csv` (ammissione): la mappa tema -> categoria. Un tema
   che il catalogo non conosce fa sparire l'indicatore dai totali per macro-area
   pur lasciandolo in catalogo, cioe' un buco silenzioso, e la correzione stava
   dentro `app/taxonomy.py`, un modulo Python.
@@ -662,8 +662,9 @@ Due cose, e nessuna delle due e' un'approvazione:
    del genere lo dice nella PR e descrive che adapter servirebbe.
 2. **Creare una categoria** della qualita' della vita. E' una sezione del sito,
    con un nome, una descrizione e una macro-area, non una riga di CSV. Mappare
-   un tema a una categoria che gia' esiste invece e' del produttore, e si fa in
-   `config/theme_categories.csv`.
+   un tema a una categoria che gia' esiste invece e' dell'**ammissione**, che ha
+   `config/theme_categories.csv` nel proprio perimetro, e non e' codice: quel
+   CSV ha le colonne `added_by` e `added_at` perche' lo scriva la catena.
 
 Tutto il resto, dalla fonte alla pagina pubblicata e poi rivisitata, gira da
 solo e si fonde da solo. Non c'e' nessun punto in cui la catena aspetta che
