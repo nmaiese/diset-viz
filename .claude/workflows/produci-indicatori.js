@@ -559,6 +559,17 @@ const esiti = await pipeline(
   // Due bozze dai due angoli piu' forti, che sono diversi per costruzione. La
   // scrittura e' la parte economica: la regressione alla media si rompe
   // scegliendo, non prescrivendo.
+  //
+  // **Sempre due, anche quando l'angolo 2 non esiste**, e non e' una svista: su
+  // 11 pacchetti su 594 l'elenco ne ha meno di due. Il ramo non si stringe qui
+  // perche' questo lato non sa quanti angoli abbia il pacchetto: il conteggio
+  // sta su disco, e portarlo fin qui vorrebbe dire allargare lo schema del
+  // preparatore e la sua istruzione, cioe' un cambio di prompt (e un giro di
+  // canary) per un ramo di controllo. Il caso e' chiuso dove il numero si sa
+  // gia': `packs/build.render` scrive nel pacchetto che l'angolo chiesto non
+  // esiste e che cosa fare invece, e `officina/lint.check_angle_was_detected`
+  // blocca l'articolo che ne dichiara uno mai rilevato. Restano due bozze e il
+  // giudice sceglie lo stesso, il che su quegli 11 e' comunque meglio di una.
   (pack) => parallel([() => scrivi(pack, 1), () => scrivi(pack, 2)]),
 
   // Due lenti diverse invece di due giudici identici: la ridondanza scopre gli
