@@ -184,6 +184,33 @@ class Board(unittest.TestCase):
         self.assertEqual(passo["stage"], "curator")
         self.assertEqual(passo["owner"], "admissions")
 
+    def test_a_stale_curation_is_an_admission_phase_not_a_production_one(self):
+        """Proprietario e fase devono venire dallo stesso posto.
+
+        Venivano da due: il proprietario da `ROLE_OF_STAGE`, la fase da un
+        elenco scritto a mano in cui `promoter` era l'ammissione e tutto il
+        resto la produzione. Cosi' la stessa riga diceva proprietario
+        `admissions` e fase `produzione`, e i filtri per fase classificavano
+        male ogni curatela, iniziale o scaduta.
+        """
+        d = practice("ter-vecchio", state="invalidata", flags={"stale_curation": True},
+                     completed=["curator", "writer"])
+        d.update({"timeline": []})
+        row = pipeline_monitor.board({"ter-vecchio": d}, today=self.TODAY)["rows"][0]
+        self.assertEqual(row["next_step"]["owner"], "admissions")
+        fasi = {f["key"]: f["status"] for f in row["lifecycle"]}
+        self.assertEqual(fasi["ammissione"], "issue")
+        self.assertNotEqual(fasi["produzione"], "issue")
+
+    def test_an_indicator_waiting_for_its_first_curation_is_not_past_admission(self):
+        """`curator` mai fatto e' ammissione incompleta, non produzione in
+        corso: e' il ruolo che ha i file della curatela nel perimetro."""
+        d = practice("ter-nuovo", completed=[])
+        d.update({"timeline": []})
+        row = pipeline_monitor.board({"ter-nuovo": d}, today=self.TODAY)["rows"][0]
+        fasi = {f["key"]: f["status"] for f in row["lifecycle"]}
+        self.assertNotEqual(fasi["ammissione"], "done")
+
     def test_the_special_paths_and_the_generic_one_name_the_owner_the_same_way(self):
         """Due rami che producono la stessa riga non possono chiamarla in due
         modi: i template rendono `next_step.owner` alla lettera."""

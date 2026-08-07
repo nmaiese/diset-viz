@@ -296,9 +296,18 @@ def _lifecycle(d: dict, next_step: dict) -> tuple[list, int, str]:
     """Quattro fasi stabili, dall'ingresso al merge su master (= pubblicazione)."""
     completed = set(d.get("completed_stages") or [])
     required = list(d.get("required_stages") or [])
-    production_required = [s for s in required if s != "verificatore"]
+    # **Le fasi si ricavano dal ruolo, non da un elenco di stadi scritto qui.**
+    # Erano scritte: `promoter` era l'ammissione e tutto il resto la produzione,
+    # quindi quando `curator` e' passato all'ammissione la stessa riga del
+    # cruscotto diceva proprietario `admissions` e fase `produzione`, e i filtri
+    # per fase classificavano male ogni curatela, iniziale o scaduta.
+    di_ruolo = lambda ruolo: [s for s in required
+                              if pipeline_launch.ROLE_OF_STAGE.get(s) == ruolo]
+    admission_required = di_ruolo("admissions")
+    production_required = di_ruolo("producer")
     has_downstream = bool(completed or d.get("timeline"))
-    admission_done = has_downstream and d.get("state") != "proposta"
+    admission_done = (has_downstream and d.get("state") != "proposta"
+                      and set(admission_required).issubset(completed))
     production_done = bool(production_required) and set(production_required).issubset(completed)
     verification_done = "verificatore" in completed and d.get("verification_valid") is True
     # Pubblicazione = fuso su master (il progetto ha ratificato merge = pubblicazione).
@@ -307,7 +316,8 @@ def _lifecycle(d: dict, next_step: dict) -> tuple[list, int, str]:
     current_phase = (
         "pubblicazione" if publication_done else
         "verifica" if current_stage == "verificatore" or (production_done and not verification_done) else
-        "ammissione" if current_stage == "promoter" or not admission_done else
+        "ammissione" if pipeline_launch.ROLE_OF_STAGE.get(current_stage) == "admissions"
+        or not admission_done else
         "produzione"
     )
     if d.get("state") == "chiusa":
