@@ -211,8 +211,39 @@ class GroupDivergence(unittest.TestCase):
         ordinamento che non vale piu'. Da -10 a 10 la sottrazione firmata dava
         +200% di divergenza su un divario che non si e' mosso di un punto, cioe'
         l'angolo piu' forte del pacchetto costruito sul nulla. Un articolo lo
-        avrebbe aperto: la forza decide la struttura."""
+        avrebbe aperto: la forza decide la struttura.
+
+        Resta vero, e adesso non e' piu' tutto: non e' una divergenza **ed e'
+        un sorpasso**. Vedi il test qui sotto."""
         found = angles.group_divergence(self._serie(0.0, 10.0, 10.0, 0.0), self.GROUPS)
+        self.assertNotIn("gruppi-che-divergono", kinds(found))
+        self.assertNotIn("gruppi-che-convergono", kinds(found))
+
+    def test_a_rank_reversal_at_an_unchanged_gap_is_an_overtake(self):
+        """La correzione precedente aveva tolto la frase falsa e lasciato il
+        silenzio, e il silenzio era l'altra meta' del difetto.
+
+        Il pavimento (`FLOOR`) taglia gli angoli deboli sulla variazione della
+        distanza, che qui e' zero: spariva l'angolo e con lui `ordine_invertito`,
+        cioe' proprio la cifra che in questo caso e' l'unica cosa da dire. Chi
+        stava sopra sta sotto, e questo non e' un effetto nei decimali.
+
+        La forza e' fissa e fuori dalla calibrazione, come `rottura-di-metodo`:
+        il catalogo produce un caso puro su 576 serie, e un quantile su un
+        campione non e' una misura.
+        """
+        found = angles.group_divergence(self._serie(0.0, 10.0, 10.0, 0.0), self.GROUPS)
+        self.assertEqual(kinds(found), ["gruppi-che-si-sorpassano"])
+        cifre = found[0]["figures"]
+        self.assertTrue(cifre["ordine_invertito"])
+        self.assertEqual(cifre["distanza_primo_anno"], cifre["distanza_ultimo_anno"])
+        self.assertEqual(cifre["gruppo_alto"], "nord")
+        self.assertEqual(cifre["gruppo_alto_primo_anno"], "sud")
+
+    def test_a_gap_that_barely_moves_without_a_reversal_stays_silent(self):
+        """Il pavimento non si e' aperto per tutti: senza inversione una
+        variazione sotto `FLOOR` resta cio' che era, un effetto nei decimali."""
+        found = angles.group_divergence(self._serie(0.0, 10.0, 0.0, 10.5), self.GROUPS)
         self.assertEqual(found, [])
 
     def test_a_reversal_that_also_widens_says_that_it_reversed(self):

@@ -761,34 +761,66 @@ def group_divergence(matrix, groups):
     alto_prima, basso_prima, partenza = estremi(first)
     high, low, now = estremi(last)
     invertito = (high, low) == (basso_prima, alto_prima)
-    if partenza == 0:
-        return []
-    change = (now - partenza) / partenza
-    if _saturate(abs(change)) < FLOOR:
-        return []
+    change = (now - partenza) / partenza if partenza else 0.0
+
+    cifre = {
+        "gruppo_alto": high, "gruppo_basso": low,
+        "distanza_primo_anno": round(partenza, 3),
+        "distanza_ultimo_anno": round(now, 3),
+        "variazione_relativa": round(change, 3),
+        # Chi stava agli estremi allora, per nome. Non e' un di piu': con tre
+        # gruppi o piu' la coppia che fa il divario puo' cambiare, e un
+        # articolo che dicesse "il divario si e' allargato" senza dire fra chi
+        # racconterebbe una crescita al posto di un cambio di protagonisti.
+        "gruppo_alto_primo_anno": alto_prima,
+        "gruppo_basso_primo_anno": basso_prima,
+        "estremi_cambiati": (high, low) != (alto_prima, basso_prima),
+        # Il caso stretto: gli stessi due gruppi, ai posti scambiati. Li' "il
+        # divario si e' allargato" e' vero e insieme fuorviante, perche' chi sta
+        # sopra oggi stava sotto allora. Il fatto viaggia col fatto.
+        "ordine_invertito": invertito,
+        "medie_ultimo_anno": {group: round(last[group], 3) for group in shared},
+    }
+    medie_semplici = ("Medie semplici dei territori del gruppo, non aggregati "
+                      "ponderati: un'istituzione che pubblica lo stesso divario "
+                      "con i pesi ottiene un altro numero, ed entrambi sono "
+                      "corretti.")
+
+    forte_abbastanza = partenza != 0 and _saturate(abs(change)) >= FLOOR
+    if not forte_abbastanza:
+        if not invertito:
+            return []
+        # **Il sorpasso puro.** Gli stessi due gruppi ai posti scambiati, con la
+        # distanza ferma: `change` e' circa zero, quindi il pavimento tagliava
+        # l'angolo e con lui `ordine_invertito`, cioe' la cifra spariva proprio
+        # nel caso in cui era l'unica cosa da dire. Chiamarlo "gruppi che
+        # divergono" sarebbe falso: il divario non si e' mosso di un punto, si
+        # sono mossi i protagonisti.
+        #
+        # La forza e' **fissa e dichiarata**, come per `method_breaks`, e non
+        # calibrata: il catalogo produce un caso puro su 576 serie, e
+        # `calibration.build_table` scarta un tipo con meno di venti campioni
+        # (`QUANTILES`). Un quantile su un campione non e' una misura, e' un
+        # numero che sembra una misura. 0,8 e non 0,9 perche' quello e' di
+        # `rottura-di-metodo`, che non e' una storia ma un vincolo su tutte le
+        # altre; un sorpasso fra macroaree e' la storia piu' forte che una serie
+        # possa portare, ma resta una storia.
+        return [_angle(
+            "gruppi-che-si-sorpassano", 0.8, cifre,
+            years=[years[0], years[-1]],
+            caution="I due gruppi si sono scambiati di posto e la distanza fra "
+                    "loro non si e' mossa: e' un cambio di protagonisti, non un "
+                    "divario che cresce o si chiude. " + medie_semplici,
+        )]
+
+    # Quando la distanza si e' mossa abbastanza, la storia resta il divario, e
+    # l'inversione viaggia dentro `ordine_invertito`: sono i 13 casi su 14 in cui
+    # il catalogo gia' portava il fatto a chi scrive.
     return [_angle(
         "gruppi-che-divergono" if change > 0 else "gruppi-che-convergono",
-        _saturate(abs(change)),
-        {"gruppo_alto": high, "gruppo_basso": low,
-         "distanza_primo_anno": round(partenza, 3),
-         "distanza_ultimo_anno": round(now, 3),
-         "variazione_relativa": round(change, 3),
-         # Chi stava agli estremi allora, per nome. Non e' un di piu': con tre
-         # gruppi o piu' la coppia che fa il divario puo' cambiare, e un
-         # articolo che dicesse "il divario si e' allargato" senza dire fra chi
-         # racconterebbe una crescita al posto di un cambio di protagonisti.
-         "gruppo_alto_primo_anno": alto_prima,
-         "gruppo_basso_primo_anno": basso_prima,
-         "estremi_cambiati": (high, low) != (alto_prima, basso_prima),
-         # Il caso stretto: gli stessi due gruppi, ai posti scambiati. Li' "il
-         # divario si e' allargato" e' vero e insieme fuorviante, perche' chi sta
-         # sopra oggi stava sotto allora. Il fatto viaggia col fatto.
-         "ordine_invertito": invertito,
-         "medie_ultimo_anno": {group: round(last[group], 3) for group in shared}},
+        _saturate(abs(change)), cifre,
         years=[years[0], years[-1]],
-        caution="Medie semplici dei territori del gruppo, non aggregati "
-                "ponderati: un'istituzione che pubblica lo stesso divario con "
-                "i pesi ottiene un altro numero, ed entrambi sono corretti.",
+        caution=medie_semplici,
     )]
 
 

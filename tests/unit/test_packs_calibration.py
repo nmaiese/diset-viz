@@ -62,13 +62,19 @@ class TheTableOnDisk(unittest.TestCase):
             self.assertEqual(len(table[kind]), calibration.QUANTILES + 1)
 
     def test_every_calibrated_type_is_a_type_a_detector_can_emit(self):
-        """Una tabella che calibra tipi inesistenti e' una tabella vecchia."""
+        """Una tabella che calibra tipi inesistenti e' una tabella vecchia.
+
+        L'elenco e' il registro dei nomi legali, e comprende anche i due tipi a
+        forza fissa che nella tabella non entrano mai (`rottura-di-metodo`,
+        `gruppi-che-si-sorpassano`): un tipo assente da qui e presente nella
+        tabella e' il difetto che questo test cerca, e il verso opposto e'
+        legittimo per costruzione."""
         emitted = {
             "rottura-di-pendenza", "accelerazione", "rallentamento",
             "ritorno-al-livello", "divario-che-si-allarga", "divario-che-si-chiude",
             "sorpasso", "valore-fuori-scala", "graduatoria-spezzata",
             "controcorrente", "gruppi-che-divergono", "gruppi-che-convergono",
-            "rottura-di-metodo",
+            "gruppi-che-si-sorpassano", "rottura-di-metodo",
         }
         self.assertLessEqual(set(calibration.reload_table()), emitted)
 
