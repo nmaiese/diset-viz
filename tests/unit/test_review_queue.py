@@ -1,7 +1,11 @@
 """The reviewer's worklist: which written articles are most likely to be wrong.
 
-Logic-only, on synthetic entries, so it never depends on what the live
-the article store happens to contain today.
+Logic-only, on synthetic entries, so it never depends on what the live article
+store happens to contain today. That claim was in this docstring while the file
+sat in `tests/integration/`, alongside one class that did read the committed
+store: the sentence and the location disagreed, and the class won. It now lives
+in `tests/integration/test_review_queue_live.py`, and this file is what it says
+it is.
 
 The patterns here are not style preferences. Each one is a class of claim the
 mechanical guards in tests/test_indicator_texts.py cannot check and that
@@ -309,15 +313,6 @@ class TheCraftFlagSeesEveryTellThePrinterCounts(unittest.TestCase):
         row = review_queue.assess("178", _entry("E allora che cosa resta?"), _view(), definitions={})
         self.assertNotIn("mestiere", row["flags"])
 
-
-class QueueAgainstTheLiveFile(unittest.TestCase):
-    def test_the_queue_builds_over_the_committed_articles(self):
-        rows = review_queue.build_queue()
-        self.assertGreater(len(rows), 100)
-        for row in rows[:20]:
-            self.assertIn(row["level"], ("regione", "provincia"))
-            self.assertTrue(row["code"])
-            self.assertTrue(set(row["flags"]) <= set(review_queue.FLAG_LABELS))
 
 
 if __name__ == "__main__":

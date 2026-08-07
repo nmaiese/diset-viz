@@ -1,14 +1,18 @@
 """Lo store degli articoli, un file per indicatore.
 
-Il guasto che chiude: scrittore e revisore condividono il perimetro, girano
-tutti e due ogni giorno, e finche' la prosa e' stata un JSON unico da 365 voci
-ogni loro modifica riscriveva l'intero file. Due run vicine su articoli diversi
-producevano un conflitto su un file che nessun agente puo' risolvere leggendolo.
+Il guasto che ha chiuso: scrittore e revisore condividevano il perimetro,
+giravano tutti e due ogni giorno, e finche' la prosa e' stata un JSON unico da
+365 voci ogni loro modifica riscriveva l'intero file. Due run vicine su articoli
+diversi producevano un conflitto su un file che nessun agente puo' risolvere
+leggendolo.
 
 Quello che i test qui devono garantire non e' che il formato sia bello: e' che
 il travaso non abbia perso niente e che la codifica delle chiavi sia
 reversibile. Una chiave che non torna indietro non e' un file mal chiamato, e'
 un articolo che sparisce dalla pagina senza che nessun errore lo dica.
+
+Qui c'e' solo cio' che gira su file temporanei e costanti. Le due letture dello
+store **committato** stanno in `tests/integration/test_indicator_store_live.py`.
 """
 
 import json
@@ -46,11 +50,6 @@ class TheKeyEncodingIsReversible(unittest.TestCase):
         accorgersene e' qui e non la pagina vuota di un indicatore."""
         with self.assertRaises(indicator_store.StoreError):
             indicator_store.filename_for("famiglia__strana")
-
-    def test_no_key_in_the_catalogue_breaks_the_assumption(self):
-        for key in indicator_store.load_all():
-            self.assertNotIn(indicator_store.FILENAME_SEP, key, key)
-            self.assertLessEqual(key.count(":"), 1, key)
 
 
 class TheStoreReadsBackWhatItWrote(unittest.TestCase):
@@ -123,13 +122,6 @@ class TheMigrationLostNothing(unittest.TestCase):
             # E la lettura del file unico passa dallo stesso ingresso, che e'
             # cio' che permette a `--texts` di puntare a una vecchia copia.
             self.assertEqual(indicator_store.load_all(source), legacy)
-
-    def test_the_committed_store_is_readable_and_not_empty(self):
-        entries = indicator_store.load_all()
-        self.assertGreater(len(entries), 300)
-        for key, entry in entries.items():
-            self.assertIsInstance(entry, dict, key)
-
 
 
 class TheUrlFormResolvesToTheInternalKey(unittest.TestCase):
