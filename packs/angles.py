@@ -761,13 +761,16 @@ def group_divergence(matrix, groups):
     alto_prima, basso_prima, partenza = estremi(first)
     high, low, now = estremi(last)
     invertito = (high, low) == (basso_prima, alto_prima)
-    change = (now - partenza) / partenza if partenza else 0.0
+    # `None`, non zero, quando la distanza di partenza e' zero: li' la variazione
+    # relativa non e' nulla, e' **indefinita**, e scriverci 0,0 direbbe a chi
+    # scrive che il divario non si e' mosso mentre passava da zero a qualcosa.
+    change = (now - partenza) / partenza if partenza else None
 
     cifre = {
         "gruppo_alto": high, "gruppo_basso": low,
         "distanza_primo_anno": round(partenza, 3),
         "distanza_ultimo_anno": round(now, 3),
-        "variazione_relativa": round(change, 3),
+        "variazione_relativa": round(change, 3) if change is not None else None,
         # Chi stava agli estremi allora, per nome. Non e' un di piu': con tre
         # gruppi o piu' la coppia che fa il divario puo' cambiare, e un
         # articolo che dicesse "il divario si e' allargato" senza dire fra chi
@@ -786,16 +789,21 @@ def group_divergence(matrix, groups):
                       "con i pesi ottiene un altro numero, ed entrambi sono "
                       "corretti.")
 
-    forte_abbastanza = partenza != 0 and _saturate(abs(change)) >= FLOOR
+    forte_abbastanza = change is not None and _saturate(abs(change)) >= FLOOR
     if not forte_abbastanza:
         if not invertito:
             return []
-        # **Il sorpasso puro.** Gli stessi due gruppi ai posti scambiati, con la
-        # distanza ferma: `change` e' circa zero, quindi il pavimento tagliava
-        # l'angolo e con lui `ordine_invertito`, cioe' la cifra spariva proprio
-        # nel caso in cui era l'unica cosa da dire. Chiamarlo "gruppi che
-        # divergono" sarebbe falso: il divario non si e' mosso di un punto, si
-        # sono mossi i protagonisti.
+        # **Il sorpasso puro.** Gli stessi due gruppi ai posti scambiati, e una
+        # distanza che non regge una storia: o si muove sotto il pavimento, o
+        # parte da zero e la variazione relativa non esiste. Il pavimento
+        # tagliava l'angolo e con lui `ordine_invertito`, cioe' la cifra spariva
+        # proprio nel caso in cui era l'unica cosa da dire. Chiamarlo "gruppi
+        # che divergono" sarebbe falso: a muoversi sono i protagonisti.
+        #
+        # La cautela non dice "la distanza non si e' mossa", e la differenza
+        # conta: il ramo copre anche una distanza che cresce del 10%, cioe' meno
+        # del pavimento ma non zero, e una frase che la desse per ferma
+        # contraddirebbe `variazione_relativa` due righe sopra.
         #
         # La forza e' **fissa e dichiarata**, come per `method_breaks`, e non
         # calibrata: il catalogo produce un caso puro su 576 serie, e
@@ -808,9 +816,11 @@ def group_divergence(matrix, groups):
         return [_angle(
             "gruppi-che-si-sorpassano", 0.8, cifre,
             years=[years[0], years[-1]],
-            caution="I due gruppi si sono scambiati di posto e la distanza fra "
-                    "loro non si e' mossa: e' un cambio di protagonisti, non un "
-                    "divario che cresce o si chiude. " + medie_semplici,
+            caution="I due gruppi si sono scambiati di posto: chi stava sopra "
+                    f"sta sotto. La distanza fra loro passa da {partenza:.3g} a "
+                    f"{now:.3g}, e su quel movimento non c'e' una storia da "
+                    "raccontare: il fatto e' il sorpasso. **Non scrivere che il "
+                    "divario cresce o si chiude.** " + medie_semplici,
         )]
 
     # Quando la distanza si e' mossa abbastanza, la storia resta il divario, e

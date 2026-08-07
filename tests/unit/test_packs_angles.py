@@ -246,6 +246,33 @@ class GroupDivergence(unittest.TestCase):
         found = angles.group_divergence(self._serie(0.0, 10.0, 0.0, 10.5), self.GROUPS)
         self.assertEqual(found, [])
 
+    def test_a_crossover_with_a_small_gap_change_does_not_claim_it_stood_still(self):
+        """Il ramo del sorpasso copre anche una distanza che si muove **poco**,
+        non solo una ferma, e la cautela non deve dire il contrario delle cifre.
+
+        Da 100 a 110 con i gruppi che si scambiano: `variazione_relativa` vale
+        0,1, sotto il pavimento, quindi la storia non e' il divario. Una cautela
+        che dicesse "la distanza non si e' mossa" contraddirebbe la cifra che
+        l'angolo stesso porta, e la prosa puo' aprire su questo angolo.
+        """
+        found = angles.group_divergence(self._serie(100.0, 0.0, 0.0, 110.0), self.GROUPS)
+        self.assertEqual(kinds(found), ["gruppi-che-si-sorpassano"])
+        self.assertAlmostEqual(found[0]["figures"]["variazione_relativa"], 0.1)
+        self.assertNotIn("non si e' mossa", found[0]["caution"])
+        self.assertIn("100", found[0]["caution"])
+        self.assertIn("110", found[0]["caution"])
+
+    def test_you_do_not_overtake_someone_you_were_level_with(self):
+        """Distanza di partenza nulla: i due gruppi erano pari, quindi non
+        esiste un "chi stava sopra" da rovesciare, e non c'e' sorpasso.
+
+        Vale la pena pinnarlo perche' e' il caso in cui la variazione relativa
+        non e' zero ma **indefinita**, e un rilevatore che la trattasse come zero
+        aprirebbe un angolo su un ordine che nel primo anno non esisteva.
+        """
+        found = angles.group_divergence(self._serie(5.0, 5.0, 0.0, 10.0), self.GROUPS)
+        self.assertEqual(found, [])
+
     def test_a_reversal_that_also_widens_says_that_it_reversed(self):
         """L'altra meta': quando il divario si allarga **e** l'ordine si rovescia
         l'angolo esce, e porta il sorpasso fra i fatti. "Il divario si e'
