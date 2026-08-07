@@ -606,11 +606,22 @@ fuori sincrono senza che nessuno se ne accorga, un prompt che punta a un file no
 cron proprio. Il lanciatore non e' piu' un agente, e' uno script che si legge e
 un piano che si lancia (vedi `.claude/rules/pipeline.md`). La Routine legge
 `scripts/pipeline_launch.py --json --publish --publish-base https://divarioitalia.it`,
-segna il battito del lanciatore nel diario, poi lancia gli agenti in cima al piano **in parallelo**
-(piu' `Agent` nello stesso messaggio), ciascuno con il suo `run_id` e il suo
-indicatore. A differenza del dispatcher non ne lancia uno solo: indicatori
-diversi non contendono. Il prompt della Routine e' un puntatore a quella
-definizione, mai una copia.
+segna il battito del lanciatore nel diario, poi mette in volo le voci in cima al
+piano **in parallelo**. A differenza del dispatcher non ne lancia una sola:
+indicatori diversi non contendono.
+
+**Come si lancia una voce lo dice la voce**, e sono due forme, non una:
+
+- `agent` valorizzato: e' una sessione Claude Code (`Agent`, piu' d'uno nello
+  stesso messaggio), con il suo `run_id` e il suo indicatore.
+- `agent: null`: e' un **workflow**, e la voce porta gia' il comando in
+  `comando`. Non ha un `run_id`, e non e' una dimenticanza: l'officina non apre
+  una pull request e non scrive nel diario, quindi non e' una run (vedi
+  `plan_launches`). Una Routine che lanciasse solo `Agent`, o che pretendesse un
+  `run_id` da ogni voce, lascerebbe le voci `producer` a terra e la coda della
+  scrittura non si drenerebbe mai.
+
+Il prompt della Routine e' un puntatore a questa definizione, mai una copia.
 
 La stessa lezione anti-drift vale dentro `.claude/`. Ogni agente dichiara nel
 frontmatter il proprio **modello** (niente modello implicito ereditato dalla
