@@ -32,6 +32,17 @@ COPY content/ content/
 # `tests/test_app.py` lo sorveglia, perche' e' un guasto che si vede solo in
 # produzione e la suite qui gira senza container.
 COPY scripts/ scripts/
+# `packs/` per la stessa ragione: `app/indicator_texts.py` importa
+# `packs.context` per derivare le fonti visibili in pagina dagli identificatori
+# di corpus citati dalle sezioni. Senza questa riga l'immagine non parte.
+#
+# L'import va in quel verso e non nell'altro: `packs/context.py` e' stdlib puro
+# e non conosce `app`, mentre `packs/build.py`, che invece importa `app`, non
+# entra mai nel giro di rendering. La direzione e' la ragione per cui non c'e'
+# un ciclo.
+COPY packs/ packs/
+# `data/corpus/` e' dentro `data/`, che gia' si copia qui sotto: e' li' che
+# stanno le affermazioni da cui le fonti si derivano.
 # `data/` porta la storia committata della catena che la dashboard legge a runtime
 # (`/_pipeline` e `/_pipeline/api/*`): i diari in `data/pipeline/runs/` (senza i
 # quali la cronologia e' vuota e ogni indicatore risulta "in coda"), le verifiche

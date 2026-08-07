@@ -35,6 +35,7 @@ resolve by reading it.
 import functools
 
 from app import sources
+from packs import context
 from scripts import indicator_store
 
 # Ordered. The default heading is a fallback for pages the agent has not reached
@@ -120,6 +121,26 @@ def emitted_roles(entry):
     (sono stdlib puri e non importano `app`), e un test le tiene allineate.
     """
     declared = entry.get("roles_covered") if isinstance(entry, dict) else None
+    # Un'entry che scrive le proprie sezioni **dichiara con quelle**: elencare i
+    # ruoli due volte, una in `sections` e una in `roles_covered`, e' un modo
+    # per farli divergere. Senza questa riga la macchina nuova pubblicava
+    # articoli senza definizione e la pagina la ricomponeva lo stesso in
+    # apertura, cioe' proprio il difetto che questa ricostruzione esiste per
+    # togliere: cinquantadue articoli su cinquantadue aprivano sulla
+    # definizione, e il cinquantatreesimo pure.
+    #
+    # **Solo un articolo completo dichiara.** Un articolo a meta' non sta
+    # scegliendo una forma, e' solo incompleto: trecentoventidue delle entry in
+    # `content/indicators/` hanno scritto `quadro` e `limiti` e nient'altro, e
+    # con la condizione debole ("almeno un ruolo sostanziale") sono passate
+    # tutte a `quadro, limiti, dinamica` con la definizione assorbita. Cioe' un
+    # cambio di pagina su 322 articoli che nessuno aveva chiesto, e che nessun
+    # test vedeva. La condizione e' quindi **tutti e tre i sostanziali**.
+    if declared is None and isinstance(entry, dict) and entry.get("sections"):
+        written = [section.get("role") for section in entry["sections"]
+                   if isinstance(section, dict) and (section.get("body") or "").strip()]
+        if SUBSTANTIVE_ROLES.issubset(set(written)):
+            declared = written
     # Campo **assente** e lista **vuota** non sono la stessa cosa: assente vuol
     # dire "non dichiaro niente", cioe' i quattro ruoli di sempre, mentre
     # `roles_covered: []` e' una dichiarazione che non nomina la definizione, e
@@ -129,7 +150,70 @@ def emitted_roles(entry):
     if not isinstance(declared, (list, tuple)):
         return list(ROLE_ORDER)
     keep = {role for role in declared if role in DEFAULT_HEADINGS} | SUBSTANTIVE_ROLES
-    return [role for role in ROLE_ORDER if role in keep]
+    # **L'ordine dichiarato vince, e non e' un dettaglio.** Il pacchetto dice a
+    # chi scrive che la sequenza nasce dall'angolo piu' forte, e la prima prova
+    # ha prodotto `quadro, limiti, dinamica`: la pagina lo riordinava in
+    # `definizione, quadro, dinamica, limiti`, cioe' buttava via l'unica cosa
+    # che rompe lo stampo. Una promessa fatta a chi scrive e disfatta al render
+    # e' peggio di una promessa non fatta.
+    #
+    # I ruoli sostanziali che la dichiarazione non nomina si compongono, e
+    # vanno in coda nell'ordine canonico: non hanno un posto scelto da nessuno.
+    ordered = [role for role in declared if role in keep]
+    return ordered + [role for role in ROLE_ORDER
+                      if role in keep and role not in ordered]
+
+
+def cited_claims(entry):
+    """Gli identificatori di corpus che questa entry usa, per sezione e in coda.
+
+    Le sezioni dichiarano `claims`, ed e' li' che l'attribuzione ha un posto:
+    dire *quale paragrafo* si appoggia a chi e' l'unica forma che un controllo
+    posizionale puo' verificare. Il campo `corpus` a livello di entry resta
+    letto per le entry scritte prima, che lo usavano da sole.
+    """
+    if not isinstance(entry, dict):
+        return []
+    found = list(entry.get("corpus") or [])
+    for section in entry.get("sections") or []:
+        if isinstance(section, dict):
+            found.extend(section.get("claims") or [])
+    seen, ordered = set(), []
+    for name in found:
+        if isinstance(name, str) and name and name not in seen:
+            seen.add(name)
+            ordered.append(name)
+    return ordered
+
+
+def visible_sources(entry):
+    """Le fonti che la pagina mostra: quelle autorate piu' quelle del corpus.
+
+    **Derivate, non trascritte a mano, ed e' una riparazione.** L'articolo di
+    `ter-176` scriveva "Eurostat scrive che..." mentre il blocco fonti visibile
+    portava solo Istat: l'identificatore stava in `corpus`, che la pagina non
+    rende. Un lettore vedeva un'attribuzione a un'istituzione senza un modo per
+    controllarla, che e' il difetto peggiore possibile su un sito di dati
+    pubblici, e nessuna guardia lo prendeva perche' le due liste non si
+    parlavano.
+
+    Ora si parlano qui, in un posto solo: cio' che la prosa attribuisce non puo'
+    restare invisibile, perche' non c'e' un passo umano che lo trascriva.
+    """
+    authored = [item for item in (entry.get("fonti") or []) if isinstance(item, dict)]
+    known = {item.get("url") for item in authored}
+    registry = context.sources()
+    derived = []
+    for claim in context.claims():
+        if claim.get("id") not in cited_claims(entry) or claim.get("url") in known:
+            continue
+        institution = (registry.get(claim.get("source_id")) or {}).get(
+            "institution") or claim.get("source_id") or ""
+        quote = context.for_prose((claim.get("quote") or "").strip())
+        derived.append({"testo": f"{institution}. «{quote}»".strip(),
+                        "url": claim.get("url")})
+        known.add(claim.get("url"))
+    return authored + derived
 
 
 def build_article(indicator_id, level_key=DEFAULT_LEVEL):
@@ -189,7 +273,7 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
         # dell'articolo. Campi di entry, non entrano nel `prose_fingerprint`.
         "h1": (entry.get("h1") or "").strip() or None,
         "seo_title": (entry.get("seo_title") or "").strip() or None,
-        "fonti": entry.get("fonti") or [],
+        "fonti": visible_sources(entry),
         "vintage": entry.get("vintage") if isinstance(entry.get("vintage"), int) else None,
         "authored_count": len(authored),
     }
