@@ -107,15 +107,19 @@ qualcuno resta in pagina finche' qualcosa non prova a farlo cadere. E' il motivo
 per cui il produttore si rilegge (passo interno) **e** il verificatore rilegge
 di nuovo, indipendente, dopo la firma.
 
-Ogni ruolo ha tre cose, e sono sempre le stesse tre: una **coda deterministica**
-calcolata da file committati, un **agente** con un file di definizione in
-`.claude/agents/`, e un **verdetto del cancello** che decide se puo' pubblicare.
+Ogni ruolo ha una **coda deterministica** calcolata da file committati. I tre
+che sono **agenti** hanno anche un file di definizione in `.claude/agents/`, un
+perimetro in `pipeline_gate.STAGE_PATHS` e un **verdetto del cancello** che
+decide se possono pubblicare; il quarto, il produttore, e' un workflow, non apre
+una pull request e non ha un perimetro nel cancello, e il suo cancello e'
+editoriale (`officina/lint.py`).
+
 Le code sono ancora quelle dei sette stadi (il vocabolario interno non cambia:
 il produttore legge la coda dello scrittore e quella del revisore, l'ammissione
-anche quella del curatore), ma chi le drena sono tre ruoli, non sette. La mappa
-da vecchio stadio a ruolo vivo sta in un posto solo,
-`pipeline_launch.ROLE_OF_STAGE`, e `pipeline_status` la importa invece di
-ricopiarla.
+anche quella del curatore), ma chi le drena sono quattro ruoli, non sette. La
+mappa da vecchio stadio a ruolo vivo sta in un posto solo,
+`pipeline_launch.ROLE_OF_STAGE`, e `pipeline_status` e `pipeline_monitor` la
+importano invece di ricopiarla.
 
 | ruolo | chi lo esegue | coda | comando |
 | --- | --- | --- | --- |

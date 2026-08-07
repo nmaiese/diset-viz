@@ -42,6 +42,13 @@ BY_ANGLE = {
     "graduatoria-spezzata": "infodata-mortalita-comuni.md",
     # dire che la lettura ovvia del dato e' sbagliata
     "sorpasso": "pagellapolitica-record-occupati.md",
+    # Stessa forma di storia, un piano sopra: non un territorio che ne scavalca
+    # un altro ma un gruppo che ne scavalca un altro. Mapparlo non e'
+    # facoltativo come per un tipo raro qualunque: la sua forza e' fissa e alta
+    # (0,8, vedi `packs.angles.group_divergence`), quindi quando esce apre
+    # quasi sempre l'articolo, e senza una riga qui `pick()` scenderebbe a un
+    # angolo piu' debole o all'estratto del "nessuna storia".
+    "gruppi-che-si-sorpassano": "pagellapolitica-record-occupati.md",
     "controcorrente": "pagellapolitica-record-occupati.md",
     # il luogo prima della cifra: un territorio estremo che vale nominare
     "valore-fuori-scala": "ilpost-borgo-albergo.md",

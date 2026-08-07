@@ -18,6 +18,14 @@ class TheMapPointsAtRealFiles(unittest.TestCase):
                           if name not in esempi.available()})
         self.assertEqual(missing, [], f"estratti mappati e assenti: {missing}")
 
+    def test_a_fixed_strength_angle_cannot_be_missing_from_the_map(self):
+        """Un tipo a forza fissa e alta apre quasi sempre, quindi non mapparlo
+        non e' una lacuna qualunque: `pick()` scenderebbe a un angolo piu'
+        debole o all'estratto del "nessuna storia" proprio sull'articolo in cui
+        la storia era la piu' forte."""
+        for tipo in ("gruppi-che-si-sorpassano", "sorpasso"):
+            self.assertIn(tipo, esempi.BY_ANGLE, tipo)
+
     def test_the_fallback_exists_too(self):
         self.assertIn(esempi.WHEN_THERE_IS_NO_STORY, esempi.available())
 
