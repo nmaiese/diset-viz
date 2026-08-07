@@ -48,15 +48,15 @@ tenevano quell'indicatore peggio di quanto lo tenga una testa sola che lo porta
 fino in fondo.
 
 ```
-  ammissione                      produttore                    verificatore
-  (scout+hunter+promoter+curator) (writer+reviewer)             (invariato)
-  quali fonti, quali indicatori   due bozze -> giudizio cieco   prova a smentirlo
-  li promuove, ne cura il verso   -> revisione -> lint
-       |                               |                              |
-  batch, l'intera coda            un indicatore alla volta        un articolo alla volta
-       |                               |                              |
-  data/discovery/*                content/indicators/             data/pipeline/verifiche/
-                                  data/pipeline/runs/
+  ammissione                      produttore                 i due critici
+  (scout+hunter+promoter+curator) (writer+reviewer)          verificatore: i fatti
+  quali fonti, quali indicatori   due bozze -> giudizio       reader-editor: la prosa
+  li promuove, ne cura il verso   cieco -> revisione -> lint
+       |                               |                            |
+  batch, l'intera coda            un indicatore alla volta    un articolo alla volta
+       |                               |                            |
+  data/discovery/*                content/indicators/         data/pipeline/verifiche/
+                                  data/pipeline/runs/         data/pipeline/letture/
 ```
 
 - **Ammissione** (agente `admissions`) scandaglia i cataloghi, decide quali
@@ -83,8 +83,16 @@ fino in fondo.
   invece dei dati. Non corregge niente: una smentita torna in coda al
   produttore, che ha assorbito il revisore.
 
-Il verificatore e' arrivato per ultimo perche' e' servito misurarlo prima di
-credergli. Una firma di chi si e' riletto e' la parola del produttore sul lavoro
+- **Reader-editor** (agente `reader-editor`) e' il quarto, arrivato dopo, ed e'
+  il gemello del verificatore su un altro asse: lui misura se i fatti reggono,
+  questo se un lettore comune capisce la pagina al primo passaggio. Non corregge
+  niente nemmeno lui, e a differenza degli altri e' `soft`: accoda una
+  riscrittura, non blocca nessun merge. La sezione "I tre ruoli" tiene il nome
+  che aveva la ri-architettura, che ne fuse sette in tre; il reader-editor e'
+  nato dopo, e li porta a quattro.
+
+Il verificatore e' arrivato per ultimo fra i tre perche' e' servito misurarlo
+prima di credergli. Una firma di chi si e' riletto e' la parola del produttore sul lavoro
 del produttore, e finche' nessuno provava a farla cadere quanto valesse non si
 sapeva. Ora si sa:
 
@@ -114,8 +122,15 @@ ricopiarla.
 | ammissione | agente `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved`, `curate.worklist()` | `scripts/scout_sources.py`, `scripts/discover_candidates.py`, `scripts/promote_candidates.py`, `scripts/curate.py`, `scripts/apply_curation.py` |
 | produttore | workflow `.claude/workflows/produci-indicatori.js` | `pending_notes` + `review_queue` | `scripts/pending_notes.py`, `scripts/review_queue.py` |
 | verificatore | agente `verificatore` | `verification_queue` | `scripts/verification_queue.py` |
+| reader-editor | agente `reader-editor` | `reading_queue` (i pubblicati che nessuno ha ancora letto) | `scripts/reading_queue.py` |
 
-Un solo comando dice lo stato di tutte le code:
+Il reader-editor e' arrivato dopo gli altri tre e non compare in
+`pipeline_status`, che ragiona ancora per **vecchio stadio**: la sua riga
+`reviewer` e' la coda del produttore, non questa. La coda di leggibilita' si
+legge dal suo comando, oppure dal piano (`pipeline_launch.py`), che invece
+ragiona per ruolo e la elenca.
+
+Un comando dice lo stato delle code per vecchio stadio:
 
 ```bash
 python3 scripts/pipeline_status.py            # leggibile
