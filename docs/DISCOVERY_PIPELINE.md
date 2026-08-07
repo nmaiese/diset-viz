@@ -215,14 +215,14 @@ l'utente legge. La scrittura produce l'intero articolo della pagina (`lead` piu
 le quattro sezioni `definizione`/`quadro`/`dinamica`/`limiti`, con `fonti` e
 `vintage`) in `content/indicators/`, un file per articolo, seguendo
 `content/STYLE.md`, con **solo numeri reali** presi dal brief
-(`scripts/indicator_brief.py`), le fonti verificate per le affermazioni
+(`officina/brief.py`, che lo ha assorbito), le fonti verificate per le affermazioni
 comparative e il `vintage` uguale all'`year_max` corrente (drift guard). È lo
 step che trasforma un indicatore appena integrato in una pagina che si legge come
 scritta da un giornalista.
 
 Cura, scrittura e revisione **non sono piu' tre agenti freddi** che si passano
 l'indicatore via CSV: sono i tre passi di un ruolo solo, il **produttore**
-(`.claude/agents/producer.md`), che porta un indicatore da ammesso a firmato in
+(l'officina, `.claude/workflows/produci-indicatori.js`), che porta un indicatore da ammesso a firmato in
 una sessione e si rilegge il proprio testo prima di firmare. La catena, dopo la
 ri-architettura, e' tre ruoli, non sette stadi:
 
@@ -234,11 +234,17 @@ ri-architettura, e' tre ruoli, non sette stadi:
 | --- | --- | --- |
 | ammissione | `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` da promuovere |
 | produttore | `producer` | `scripts/curate.py --include-recheck`, `scripts/pending_notes.py`, `scripts/text_queue.py`, `scripts/review_queue.py` |
-| verificatore | `indicator-verifier` | `scripts/verification_queue.py` |
+| verificatore | `verificatore` | `scripts/verification_queue.py` |
 
 I file di agente dei vecchi stadi (`source-scout.md`, `indicator-hunter.md`,
-`indicator-curator.md`, `indicator-writer.md`, `indicator-reviewer.md`) esistono
-ancora, ma la Routine lancia solo i tre ruoli via `.claude/agents/launcher.md`.
+`indicator-curator.md`, `indicator-writer.md`, `indicator-reviewer.md`) non
+esistono piu', e con la demolizione se ne sono andati anche `producer.md` e
+`launcher.md`. Restano tre agenti: `admissions.md` a monte, `verificatore.md` e
+`reader-editor.md` a valle, **uno per perimetro di `pipeline_gate.STAGE_PATHS`,
+col nome del proprio stadio**. `verificatore.md` si chiamava
+`indicator-verifier.md`: era l'unico nome che andasse tradotto, e la traduzione
+e' stata tolta insieme alla mappa che la faceva. Gli articoli li scrive
+l'officina (`.claude/workflows/produci-indicatori.js`).
 
 Lo stato di tutte le code insieme:
 

@@ -20,14 +20,22 @@ python3 evals/score_eval.py writer evals/out/writer/article.json
 python3 evals/score_eval.py --self-test    # il metro provato sul metro (in CI-spirito: sempre verde)
 ```
 
-Quattro eval, una per ogni ruolo che esercita giudizio, non codice:
+Cinque eval, una per ogni **giudizio** che la catena esercita, non per ogni
+agente che esiste:
 
 | eval | fixture | che cosa misura |
 | --- | --- | --- |
 | `writer` | il brief congelato di ter-178 | nessuna cifra fuori dal brief, niente caratteri vietati |
 | `reviewer` | due articoli con 7 errori piantati (`reviewer/expected.json`) | quanti errori spariscono dopo la revisione, per classe |
 | `verifier` | 12 affermazioni etichettate (`verifier/claims.json`) | accuratezza, e precision/recall sulle smentite |
+| `reader-editor` | 8 articoli congelati (`reader-editor/cases.json`), id ciechi | accuratezza sul verdetto di leggibilita' |
 | `admissions` | 11 casi di triage etichettati (`admissions/cases.json`) | accuratezza, e precision/recall sugli approvati (la falsa approvazione e' l'errore irreversibile) |
+
+`writer` e `reviewer` sono nomi di eval, non di agenti: quei due ruoli sono
+stati fusi nell'officina, ma i due giudizi che misurano (scrivere una bozza dal
+brief, correggere un articolo con errori dentro) l'officina li esercita ancora,
+e la baseline congelata e' l'unica cosa che rende confrontabile un modello col
+successivo. Rinominarle costerebbe la baseline e non comprerebbe niente.
 
 ## Le regole che tengono in piedi la misura
 

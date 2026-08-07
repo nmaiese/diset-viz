@@ -47,10 +47,12 @@ una frase o le aggiunge un inciso, vince la leggibilita'. Vale anche per due
 metriche del suo contatore: `mente` e `gerundite` possono salire su un testo piu'
 leggibile, e li' non sono un verdetto. Il campo `vietati` resta l'unico cancello.
 
-Cambiare il prompt del produttore per agganciare la skill in rilettura e' un
+Cambiare il prompt di chi scrive per agganciare la skill in rilettura e' un
 cambio gated da `canary` (obbligo di `CLAUDE.md`): la skill installata e'
-**disponibile**, ma finche' `producer.md` non la richiama il comportamento degli
-agenti non cambia.
+**disponibile**, ma finche' `.claude/agents/scrittore-indicatore.md` non la
+richiama il comportamento non cambia. (Il paragrafo diceva `producer.md`, un
+file cancellato: cosi' com'era prometteva un aggancio che nessuna modifica
+avrebbe potuto fare.)
 
 ## Tono: scrivi come una persona
 

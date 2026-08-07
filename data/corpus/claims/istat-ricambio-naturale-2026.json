@@ -1,0 +1,11 @@
+{
+ "id": "istat-ricambio-naturale-2026",
+ "source_id": "istat-demografia",
+ "title": "Indicatori demografici, anno 2025",
+ "url": "https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/",
+ "fetched_at": "2026-08-07",
+ "themes": ["Salute, demografia e cura"],
+ "indicators": ["ter:920"],
+ "about": "il meccanismo che tiene su la popolazione mentre invecchia",
+ "quote": "l'Italia rimane un Paese nel quale una dinamica migratoria molto positiva riesce a contrastare un ricambio naturale ampiamente negativo e nel quale la popolazione continua a invecchiare."
+}

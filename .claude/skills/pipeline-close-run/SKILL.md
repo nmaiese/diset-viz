@@ -3,7 +3,7 @@ name: pipeline-close-run
 description: >-
   Come uno stadio della catena Divario Italia chiude la propria run: diario
   prima della pull request, cancello, merge delegato. Da usare alla fine di
-  ogni run di scout, hunter, curator, writer, reviewer o verificatore.
+  ogni run di admissions, verificatore o reader-editor.
 ---
 
 # Chiudere una run della catena
@@ -17,7 +17,7 @@ che resta vincolante: questa pagina e' la procedura, non il contratto.
 ## 1. La suite veloce, come primo controllo
 
 ```bash
-.venv/bin/python -m unittest discover -s tests/unit
+bin/py -m unittest discover -s tests/unit
 ```
 
 Non la suite intera: il cancello (passo 3) la fa gia' girare tutta, e il
@@ -45,14 +45,15 @@ meta' della run sul numero della pull request non funzionava.
 
 Il comando stampa un `run_id`. **Prendilo e passalo al passo di merge**: e'
 l'unica cosa che lega questa riga a come finira'. Senza `--run-id` lo script
-si ferma (`--mint-run-id` esplicito se davvero non ne serve uno, come il
-lanciatore): un id coniato in silenzio lascia un file orfano nel worktree,
-che poi blocca il merge come "worktree non pulito".
+si ferma (`--mint-run-id` esplicito se davvero non ne serve uno, come
+`scripts/pipeline_launch.py` quando registra il proprio tick): un id coniato in
+silenzio lascia un file orfano nel worktree, che poi blocca il merge come
+"worktree non pulito".
 
-Ogni cifra dentro `--detail` va riletta dal file finale
-(`content/indicators/<file>.json`) proprio ora, mai da un draft che hai in
-mente: e' lo stesso drift che questo passo esiste per impedire, solo tra il
-diario e la prosa invece che tra la prosa e il file morto.
+Ogni cifra dentro `--detail` va riletta **dal file che hai scritto tu** proprio
+ora (il tuo registro in `data/pipeline/`), mai da un draft che hai in mente: e'
+lo stesso drift che questo passo esiste per impedire, solo tra il diario e cio'
+che hai prodotto invece che tra la prosa e il file morto.
 
 ## 3. Il cancello
 
@@ -74,12 +75,20 @@ due stadi sullo stesso file, e la regola e' il passo 3-bis del contratto.
 git push -u origin HEAD
 PR=$(python3 scripts/pipeline_merge.py --open \
        --stage <stadio> --head <il tuo branch> --run-id <run_id> --title "..." --body "...")
-.venv/bin/python scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <run_id>
+bin/py scripts/pipeline_merge.py --stage <stadio> --pr "$PR" --run-id <run_id>
 ```
 
-L'apertura usa `python3` (stdlib pura, e il worktree non ha `.venv`); il merge usa
-`.venv/bin/python` perche' rilancia il cancello che importa l'app. Nel worktree il
-venv c'e': `pipeline_workspace.py --open` collega quello del checkout principale.
+Due interpreti, e la differenza e' reale: l'apertura usa `python3` perche' e'
+stdlib pura e deve funzionare su un checkout fresco, prima che esista un venv;
+il merge rilancia il cancello, che importa l'app, quindi ha bisogno delle
+dipendenze.
+
+**Per il secondo si scrive `bin/py`, mai `.venv/bin/python`.** Il venv c'e'
+quasi sempre (`pipeline_workspace.py --open` collega quello del checkout
+principale), ma quando manca `.venv/bin/python` esce 127 con "no such file or
+directory" e chi legge non sa che cosa cercare. `bin/py` prova i percorsi in
+ordine e, se non ne trova nessuno, dice quali ha provato e come crearne uno.
+Sono quattro fallimenti in due giorni in `data/pipeline/tool_failures.jsonl`.
 
 La PR si apre con `pipeline_merge.py --open`, non con `gh pr create`, e **senza
 `GH_REPO`**: `gh pr create` e' GraphQL e non riconosce il remote proxato, e

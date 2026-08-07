@@ -10,6 +10,7 @@ Pure stdlib and side-effect free. Nothing here reads or writes the committed
 queues: every check takes its rows as an argument for exactly this reason.
 """
 
+import itertools
 import subprocess
 import unittest
 from pathlib import Path
@@ -22,54 +23,83 @@ class BlastRadius(unittest.TestCase):
     """The check that makes the rest safe to automate.
 
     An agent's prompt can be edited, misread or ignored. The path list lives in
-    the repo, so a writer that decides to "just fix" a view module fails here,
+    the repo, so a stage that decides to "just fix" a view module fails here,
     before its reasoning is ever read.
+
+    Le fixture di questa classe girano sul perimetro del **verificatore**
+    (`data/pipeline/verifiche/`), e non su `content/indicators/`, che era la
+    scelta ovvia finche' esisteva uno stadio che scriveva gli articoli. Dopo la
+    demolizione non ne esiste piu' nessuno: l'officina scrive li', ma non e' una
+    run e non passa dal cancello. Un test che usasse ancora gli articoli come
+    esempio di "dentro il perimetro" proverebbe il contrario di cio' che dice.
     """
+
+    DENTRO = "data/pipeline/verifiche/ter-30.json"
 
     def test_a_stage_that_edits_application_code_is_refused(self):
         check = pipeline_gate.check_blast_radius(
-            "writer",
-            ["content/indicators/ter__920.json", "app/views.py"],
+            "verificatore", [self.DENTRO, "app/views.py"],
         )
         self.assertFalse(check.ok)
         self.assertIn("app/views.py", check.detail)
 
     def test_a_stage_inside_its_perimeter_passes(self):
-        check = pipeline_gate.check_blast_radius(
-            "writer", ["content/indicators/ter__920.json"]
-        )
+        check = pipeline_gate.check_blast_radius("verificatore", [self.DENTRO])
         self.assertTrue(check.ok, check.detail)
+
+    def test_the_articles_are_nobodys_perimeter_any_more(self):
+        """La demolizione, detta come proprieta' invece che come cronaca.
+
+        Il produttore non esiste piu' e l'officina non e' una run: nessuno
+        stadio puo' scrivere un articolo passando dal cancello. Un perimetro
+        riaperto per comodita' su `content/indicators/` sarebbe il diritto di
+        pubblicare fuori da `officina/lint.py`, cioe' fuori da ogni cancello
+        editoriale."""
+        for stage, paths in pipeline_gate.STAGE_PATHS.items():
+            self.assertNotIn(pipeline_gate.INDICATOR_TEXTS, paths, stage)
+            self.assertFalse(
+                pipeline_gate.check_blast_radius(
+                    stage, ["content/indicators/ter__920.json"]).ok, stage)
 
     def test_a_directory_perimeter_does_not_leak_past_the_slash(self):
         """Il perimetro a directory e' l'unico modo di autorizzare uno store a
         un file per record senza elencarne trecento file, e la barra finale e'
         cio' che gli impedisce di allargarsi da solo. Senza, il prefisso
-        `content/indicators` autorizzerebbe anche `content/indicators-vecchi`,
-        cioe' un percorso che nessuno ha mai concesso a nessuno stadio."""
+        `data/pipeline/verifiche` autorizzerebbe anche
+        `data/pipeline/verifiche-bozze`, cioe' un percorso che nessuno ha mai
+        concesso a nessuno stadio."""
         check = pipeline_gate.check_blast_radius(
-            "writer", ["content/indicators-bozze/ter__920.json"]
+            "verificatore", ["data/pipeline/verifiche-bozze/ter-30.json"]
         )
         self.assertFalse(check.ok)
         self.assertTrue(
             pipeline_gate.path_allowed(
-                "content/indicators/bes__10AMB004.json",
-                pipeline_gate.STAGE_PATHS["writer"],
+                "data/pipeline/verifiche/bes__10AMB004.json",
+                pipeline_gate.STAGE_PATHS["verificatore"],
             )
         )
 
     def test_the_perimeters_do_not_overlap_where_it_would_matter(self):
-        """The writer and the hunter must not be able to touch each other's work.
+        """Nessuno stadio puo' toccare il lavoro di un altro.
 
         The run journal is the one deliberate exception, and it is shared on
         purpose: every stage records what it did, including the runs that produce
         nothing else, which are exactly the runs that would otherwise vanish.
         Stated as a test because the lists are short enough that widening one by
         hand looks harmless in a diff.
+
+        A coppie su `STAGE_PATHS`, non su due stadi scelti a mano: la versione
+        scritta a mano ne confrontava due su tre, e il perimetro del terzo
+        (`data/pipeline/letture/`) non veniva controllato da nessuno. Una
+        proprieta' che vale "per ogni coppia" non va enumerata, o la prossima
+        aggiunta la lascia indietro in silenzio.
         """
         shared = {pipeline_gate.RUN_JOURNAL}
-        writer = set(pipeline_gate.STAGE_PATHS["writer"]) - shared
-        hunter = set(pipeline_gate.STAGE_PATHS["hunter"]) - shared
-        self.assertEqual(writer & hunter, set())
+        perimetri = {stage: set(paths) - shared
+                     for stage, paths in pipeline_gate.STAGE_PATHS.items()}
+        for uno, altro in itertools.combinations(sorted(perimetri), 2):
+            self.assertEqual(perimetri[uno] & perimetri[altro], set(),
+                             f"{uno} e {altro} condividono un percorso")
 
     def test_every_stage_can_write_the_run_journal(self):
         """A stage that cannot record its run is a stage nobody can observe, and
@@ -100,10 +130,18 @@ class BlastRadius(unittest.TestCase):
         lanciava piu' niente). Il cancello locale gira la stessa suite del job
         CI `python` e lo stesso perimetro del job `gate`, e gira prima del merge
         invece che mai. Se un giorno la CI parte su queste PR, gli stadi che
-        muovono numeri vivi sono quelli da riportare a `checks`."""
-        for stage in ("scout", "hunter", "promoter", "curator", "writer",
-                      "reviewer", "verificatore"):
-            self.assertEqual(pipeline_gate.MERGE_POLICY[stage], "auto", stage)
+        muovono numeri vivi sono quelli da riportare a `checks`.
+
+        Si itera la tabella, non una lista scritta a mano. La lista c'e' stata,
+        con sette voci per tre stadi: nominava `admissions` quattro volte,
+        `verificatore` tre e **`reader-editor` mai**, quindi rimetterlo a
+        `checks` non avrebbe fatto diventare rosso niente. Cioe' il deadlock
+        che questo test esiste per impedire sarebbe rientrato dalla porta che
+        il test stesso lasciava aperta."""
+        self.assertEqual(sorted(pipeline_gate.MERGE_POLICY),
+                         sorted(pipeline_gate.STAGE_PATHS))
+        for stage, policy in pipeline_gate.MERGE_POLICY.items():
+            self.assertEqual(policy, "auto", stage)
 
 
 class HunterDecisions(unittest.TestCase):
@@ -255,11 +293,21 @@ class ARunThatProducedSomethingHasToSayItDid(unittest.TestCase):
     sta all'ultimo passo di una run lunga, cioe' nel punto in cui e' piu'
     facile saltarlo. Ed e' proprio la riga di diario a rendere osservabile la
     catena, quindi vale un controllo, non un'esortazione.
+
+    `base="HEAD"` e niente working tree, in tutti e tre i casi. La funzione
+    porta davanti un **secondo** controllo, quello append-only sul diario, che
+    legge il repo vero: senza una base fissata guarda `origin/master` o `master`,
+    e in un checkout dove `master` e' rimasto indietro di qualche commit le righe
+    di diario arrivate nel frattempo risultano riscritte. Il verdetto che ne
+    esce e' vero ma di un'altra cosa, e questi tre casi smettono di misurare
+    quello per cui esistono. Contro `HEAD` il diario e' fermo per costruzione.
     """
+
+    BASE = {"base": "HEAD", "include_worktree": False}
 
     def test_work_without_a_journal_line_is_refused(self):
         check = pipeline_gate.check_run_is_recorded(
-            "writer", [pipeline_gate.INDICATOR_TEXTS]
+            "verificatore", [pipeline_gate.VERIFICATIONS], **self.BASE
         )
         self.assertFalse(check.ok)
         self.assertIn("pipeline_log.py --write", check.detail)
@@ -267,9 +315,10 @@ class ARunThatProducedSomethingHasToSayItDid(unittest.TestCase):
     def test_a_run_that_touched_nothing_owes_no_record(self):
         """Una run a mani vuote non passa nemmeno di qui: non ha un branch da
         giudicare, e la sua riga resta affidata al contratto."""
-        check = pipeline_gate.check_run_is_recorded("writer", [])
+        check = pipeline_gate.check_run_is_recorded("verificatore", [], **self.BASE)
         self.assertTrue(check.ok, check.detail)
-        check = pipeline_gate.check_run_is_recorded("writer", [pipeline_gate.RUN_JOURNAL])
+        check = pipeline_gate.check_run_is_recorded(
+            "verificatore", [pipeline_gate.RUN_JOURNAL], **self.BASE)
         self.assertTrue(check.ok, check.detail)
 
 
@@ -470,7 +519,7 @@ class ACrashIsNotAFailure(unittest.TestCase):
         calls = []
         queue = list(outcomes)
 
-        def fake(cwd=None):
+        def fake(cwd=None, modules=None):
             calls.append(1)
             return queue.pop(0)
 
@@ -525,52 +574,69 @@ class Verdict(unittest.TestCase):
         """There is nothing to negotiate between "the checks failed" and "but
         only a little", so a blocked verdict does not carry the stage's policy."""
         verdict = pipeline_gate.build_verdict(
-            "writer", ["app/views.py"], [pipeline_gate.Check("finto", False, "rosso")]
+            "verificatore", ["app/views.py"], [pipeline_gate.Check("finto", False, "rosso")]
         )
         self.assertFalse(verdict["ok"])
         self.assertEqual(verdict["merge"], "blocked")
 
-    def test_a_green_writer_may_merge_on_its_own(self):
+    def test_a_green_stage_may_merge_on_its_own(self):
         verdict = pipeline_gate.build_verdict(
-            "writer", [pipeline_gate.INDICATOR_TEXTS], [pipeline_gate.Check("finto", True)]
+            "verificatore", [pipeline_gate.VERIFICATIONS], [pipeline_gate.Check("finto", True)]
         )
         self.assertTrue(verdict["ok"])
         self.assertEqual(verdict["merge"], "auto")
 
-    def test_a_green_curator_merges_on_the_local_gate(self):
-        """Un curatore verde fonde `auto`, come ogni stadio della catena: il
-        cancello locale ha gia' girato la suite, e la CI remota (che `checks`
-        aspetterebbe) non parte sulle PR via MCP."""
+    def test_the_admissions_stage_merges_on_the_local_gate_too(self):
+        """Ogni stadio verde fonde `auto`: il cancello locale ha gia' girato la
+        suite, e la CI remota (che `checks` aspetterebbe) non parte sulle PR via
+        MCP. Detto sull'ammissione perche' e' quella che muove numeri vivi, cioe'
+        la prima candidata a tornare `checks` se un giorno la CI partisse."""
         verdict = pipeline_gate.build_verdict(
-            "curator", [pipeline_gate.CURATION], [pipeline_gate.Check("finto", True)]
+            "admissions", [pipeline_gate.CURATION], [pipeline_gate.Check("finto", True)]
         )
         self.assertEqual(verdict["merge"], "auto")
 
 
 class InvariantDispatch(unittest.TestCase):
-    """Gli invarianti di contenuto si smistano per tipo-di-file toccato, la firma
-    per ruolo. Due cose insieme: i vecchi stadi devono restare identici al bit, e
-    i ruoli fusi (`producer`, `admissions`) devono comporre da soli i controlli
-    dei tipi che toccano. `invariant_labels` e' pura, quindi si prova senza git."""
+    """Gli invarianti di contenuto si smistano per **tipo-di-file toccato**, la
+    firma per ruolo. La distinzione regge la demolizione: i tre ruoli rimasti
+    compongono da soli i controlli dei tipi che toccano, senza che nessuno abbia
+    dovuto elencarli per stadio. `invariant_labels` e' pura, si prova senza git."""
 
     def _paths(self, *constants):
         # per un file la costante e' gia' il percorso; per una directory (barra
         # finale) serve un .json sotto, che e' la forma che il perimetro accetta.
         return [c + "x.json" if c.endswith("/") else c for c in constants]
 
-    def test_old_stages_are_unchanged(self):
+    def test_each_living_stage_gets_the_invariants_of_what_it_touches(self):
+        """Un invariante per tipo di file, non per nome di stadio: e' cio' che ha
+        reso la demolizione dei sette perimetri morti un taglio e non una
+        riscrittura."""
         G = pipeline_gate
-        self.assertEqual(G.invariant_labels("writer", self._paths(G.INDICATOR_TEXTS)), ["vintage", "roles"])
-        self.assertEqual(G.invariant_labels("reviewer", self._paths(G.INDICATOR_TEXTS)),
-                         ["vintage", "roles", "signature"])
-        self.assertEqual(G.invariant_labels("hunter", self._paths(G.CANDIDATES)), ["triage"])
-        self.assertEqual(G.invariant_labels("promoter", self._paths(G.CANDIDATES)), ["triage"])
-        self.assertEqual(G.invariant_labels("curator", self._paths(G.CURATION)), ["curation"])
+        self.assertEqual(G.invariant_labels("admissions", self._paths(G.CANDIDATES)), ["triage"])
+        self.assertEqual(G.invariant_labels("admissions", self._paths(G.CURATION)), ["curation"])
+        self.assertEqual(G.invariant_labels("admissions", self._paths(G.SOURCE_CANDIDATES)), [])
         self.assertEqual(G.invariant_labels("verificatore", self._paths(G.VERIFICATIONS)),
                          ["verifications"])
         self.assertEqual(G.invariant_labels("reader-editor", self._paths(G.READINGS)),
                          ["readings"])
-        self.assertEqual(G.invariant_labels("scout", self._paths(G.SOURCE_CANDIDATES)), [])
+
+    def test_the_articles_keep_their_invariants_without_an_owner(self):
+        """Lo smistamento e' per **tipo di file**, e questa e' la prova che la
+        distinzione non era accademica.
+
+        Nessuno stadio ha piu' `content/indicators/` nel perimetro, quindi
+        nessuno arriva qui portando un articolo. Ma `vintage` e `roles` restano
+        agganciati al tipo di file e non a un nome di ruolo: il giorno in cui un
+        percorso ci riporta un articolo (una run che ne tocca uno per sbaglio, o
+        un ruolo futuro), i due controlli scattano da soli invece di essere
+        rimessi a mano. `roles` e' il controllo che master ha aggiunto mentre
+        questo ramo demoliva i perimetri: un refuso in `roles_covered` e
+        un'omissione voluta rendono la stessa pagina, e qui e' l'ultimo punto in
+        cui sono ancora distinguibili."""
+        etichette = pipeline_gate.invariant_labels(
+            "verificatore", self._paths(pipeline_gate.INDICATOR_TEXTS))
+        self.assertEqual(etichette, ["vintage", "roles"])
 
     def test_the_reader_editor_does_not_sign(self):
         """Legge, non firma: come il verificatore, il suo verdetto e' un file, non
@@ -579,17 +645,29 @@ class InvariantDispatch(unittest.TestCase):
         self.assertNotIn("signature", G.invariant_labels("reader-editor", self._paths(G.READINGS)))
         self.assertNotIn("reader-editor", G.ROLES_THAT_SIGN)
 
-    def test_the_writer_must_not_sign_but_the_reviewer_and_producer_must(self):
+    def test_nobody_signs_any_more(self):
+        """La firma era del revisore, poi del produttore che lo aveva assorbito.
+        Nessuno dei due esiste: l'articolo lo scrive l'officina, che non e' una
+        run e al posto della firma ha `origine: officina` piu' il verdetto di
+        `officina/lint.py`. I tre ruoli rimasti non toccano `content/indicators/`,
+        quindi non hanno niente da firmare."""
         G = pipeline_gate
-        self.assertNotIn("signature", G.invariant_labels("writer", self._paths(G.INDICATOR_TEXTS)))
-        for signer in ("reviewer", "producer"):
-            self.assertIn("signature",
-                          G.invariant_labels(signer, self._paths(G.INDICATOR_TEXTS)), signer)
+        self.assertEqual(G.ROLES_THAT_SIGN, ())
+        for stadio in G.STAGE_PATHS:
+            self.assertNotIn("signature",
+                             G.invariant_labels(stadio, self._paths(G.INDICATOR_TEXTS)), stadio)
 
-    def test_the_producer_composes_curation_vintage_and_signature(self):
+    def test_a_role_still_composes_the_invariants_of_everything_it_touches(self):
+        """La composizione resta, ed e' cio' che ha reso la demolizione un taglio
+        e non una riscrittura: un ruolo che tocca due tipi di file prende gli
+        invarianti di tutti e due, senza che nessuno li elenchi per lui. Lo
+        diceva il produttore (curation + vintage + roles + signature); lo dice
+        adesso l'ammissione, che e' il solo ruolo rimasto a toccare piu' di un
+        tipo."""
         G = pipeline_gate
-        labels = G.invariant_labels("producer", self._paths(G.CURATION, G.INDICATOR_TEXTS))
-        self.assertEqual(set(labels), {"curation", "vintage", "roles", "signature"})
+        labels = G.invariant_labels(
+            "admissions", self._paths(G.CURATION, G.CANDIDATES))
+        self.assertEqual(set(labels), {"curation", "triage"})
 
     def test_admissions_composes_the_triage(self):
         G = pipeline_gate
@@ -913,12 +991,24 @@ class TheBaseCheckStoppedPunishingAMovingMaster(unittest.TestCase):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text + "\n", encoding="utf-8")
 
-    def _diverge(self):
-        """Un branch che lavora, e master che intanto va avanti da solo."""
+    def _diverge(self, lavoro=None):
+        """Un branch che lavora, e master che intanto va avanti da solo.
+
+        `lavoro` e' il file che il branch cambia. Il default e' un articolo
+        perche' quasi tutti i test qui misurano `changed_text_keys`, che legge
+        `content/indicators/`; chi invece deve far passare il **perimetro** di
+        uno stadio deve passare un percorso che uno stadio vivo possa toccare,
+        perche' dopo la demolizione gli articoli non sono di nessuno.
+        """
         base = self._git("rev-parse", "HEAD").stdout.strip()
         self._git("checkout", "-qb", "lavoro")
-        self._write("content/indicators/1.json", '{"key": "1", "lead": "riscritto"}')
-        self._git("commit", "-qam", "il mio lavoro")
+        if lavoro:
+            self._write(lavoro, '{"code": "ter-1", "esito": "pulito"}')
+            self._git("add", "-A")
+            self._git("commit", "-qm", "il mio lavoro")
+        else:
+            self._write("content/indicators/1.json", '{"key": "1", "lead": "riscritto"}')
+            self._git("commit", "-qam", "il mio lavoro")
         self._git("checkout", "-q", base)
         self._git("branch", "-qf", "master", base)
         self._git("checkout", "-q", "master")
@@ -985,8 +1075,13 @@ class TheBaseCheckStoppedPunishingAMovingMaster(unittest.TestCase):
     def test_a_siblings_stray_file_does_not_trip_blast_radius_when_committed_only(self):
         """committed_only e' cio' che il passo di merge usa: al merge il lavoro
         dello stadio e' gia' committato, e l'incompiuto di un altro ruolo nello
-        stesso albero non e' di questa run, quindi non deve bocciarla."""
-        self._diverge()
+        stesso albero non e' di questa run, quindi non deve bocciarla.
+
+        Qui il branch committa dentro `data/pipeline/verifiche/` e non un
+        articolo, perche' il soggetto e' il perimetro e nessuno stadio vivo ha
+        gli articoli nel proprio. Il `setUp` continua a fondare su un articolo:
+        e' cio' che serve ai test vicini, che misurano `changed_text_keys`."""
+        self._diverge(lavoro="data/pipeline/verifiche/ter-1.json")
         self._sibling_leaves_an_uncommitted_stray()
         root = pipeline_gate.PROJECT_ROOT
         pipeline_gate.PROJECT_ROOT = self.repo
@@ -997,10 +1092,12 @@ class TheBaseCheckStoppedPunishingAMovingMaster(unittest.TestCase):
                 base="master", cwd=self.repo, include_worktree=False)
         finally:
             pipeline_gate.PROJECT_ROOT = root
-        # Col working tree il perimetro del produttore boccia il file altrui...
-        self.assertFalse(pipeline_gate.check_blast_radius("writer", shared).ok)
+        # Col working tree il perimetro del verificatore boccia il file altrui...
+        self.assertIn("app/intruso.py", shared)
+        self.assertFalse(pipeline_gate.check_blast_radius("verificatore", shared).ok)
         # ...senza, resta verde: il diff committato e' tutto nel perimetro.
-        self.assertTrue(pipeline_gate.check_blast_radius("writer", isolated).ok)
+        self.assertEqual(isolated, ["data/pipeline/verifiche/ter-1.json"])
+        self.assertTrue(pipeline_gate.check_blast_radius("verificatore", isolated).ok)
 
 
 class TheJournalIsAppendOnlyToo(unittest.TestCase):
@@ -1021,7 +1118,7 @@ class TheJournalIsAppendOnlyToo(unittest.TestCase):
         self._git("config", "user.name", "t")
         self.runs = self.repo / "data" / "pipeline" / "runs"
         self.runs.mkdir(parents=True)
-        self._write("vecchia.json", '{"run_id": "vecchia", "stage": "writer", "outcome": "blocked"}')
+        self._write("vecchia.json", '{"run_id": "vecchia", "stage": "verificatore", "outcome": "blocked"}')
         self._git("add", "-A")
         self._git("commit", "-qm", "base")
 
@@ -1037,12 +1134,12 @@ class TheJournalIsAppendOnlyToo(unittest.TestCase):
         pipeline_gate.PROJECT_ROOT = self.repo
         try:
             return pipeline_gate.check_run_is_recorded(
-                "writer", paths, base="HEAD", cwd=self.repo)
+                "verificatore", paths, base="HEAD", cwd=self.repo)
         finally:
             pipeline_gate.PROJECT_ROOT = root
 
     def test_rewriting_an_older_run_is_refused(self):
-        self._write("vecchia.json", '{"run_id": "vecchia", "stage": "writer", "outcome": "merged"}')
+        self._write("vecchia.json", '{"run_id": "vecchia", "stage": "verificatore", "outcome": "merged"}')
         check = self._check(["data/pipeline/runs/vecchia.json"])
         self.assertFalse(check.ok)
         self.assertIn("append-only", check.detail)
@@ -1054,7 +1151,7 @@ class TheJournalIsAppendOnlyToo(unittest.TestCase):
         self.assertIn("append-only", check.detail)
 
     def test_adding_your_own_row_passes(self):
-        self._write("mia.json", '{"run_id": "mia", "stage": "writer", "outcome": "pr-open"}')
+        self._write("mia.json", '{"run_id": "mia", "stage": "verificatore", "outcome": "pr-open"}')
         check = self._check([
             "content/indicators/ter__920.json", "data/pipeline/runs/mia.json"])
         self.assertTrue(check.ok, check.detail)
@@ -1069,22 +1166,22 @@ class ADirectoryPerimeterTakesOnlyItsOwnFileType(unittest.TestCase):
 
     def test_a_json_inside_the_store_is_allowed(self):
         self.assertTrue(pipeline_gate.path_allowed(
-            "content/indicators/bes__10AMB004.json",
-            pipeline_gate.STAGE_PATHS["writer"]))
+            "data/pipeline/verifiche/bes__10AMB004.json",
+            pipeline_gate.STAGE_PATHS["verificatore"]))
 
     def test_anything_else_inside_the_store_is_not(self):
-        for stray in ("content/indicators/note.txt",
-                      "content/indicators/bozza.md",
+        for stray in ("data/pipeline/verifiche/note.txt",
+                      "data/pipeline/letture/bozza.md",
                       "data/pipeline/runs/appunti.yaml"):
             with self.subTest(path=stray):
                 self.assertFalse(pipeline_gate.path_allowed(
-                    stray, pipeline_gate.STAGE_PATHS["writer"]))
+                    stray, pipeline_gate.STAGE_PATHS["verificatore"]))
 
     def test_a_file_perimeter_is_untouched_by_the_rule(self):
         """Le voci senza barra restano uguaglianze esatte, estensione o no."""
         self.assertTrue(pipeline_gate.path_allowed(
             pipeline_gate.ISTAT_SERIES_CONFIG,
-            pipeline_gate.STAGE_PATHS["scout"]))
+            pipeline_gate.STAGE_PATHS["admissions"]))
 
 
 class TheGateReadsFilesFromTheSuppliedWorktree(unittest.TestCase):
@@ -1109,7 +1206,7 @@ class TheGateReadsFilesFromTheSuppliedWorktree(unittest.TestCase):
         self.wt = Path(self._tmp.name) / "runs" / "r1"
         self._git("worktree", "add", "-q", "-b", "automation/writer-x", str(self.wt), "master")
         journal = self.wt / "data" / "pipeline" / "runs" / "writer-x.json"
-        journal.write_text('{"stage": "writer", "outcome": "blocked"}')
+        journal.write_text('{"stage": "verificatore", "outcome": "blocked"}')
         subprocess.run(("git", "add", "-A"), cwd=self.wt, capture_output=True)
         subprocess.run(("git", "commit", "-qm", "diario"), cwd=self.wt, capture_output=True)
         self._orig = pipeline_gate.PROJECT_ROOT
@@ -1133,6 +1230,62 @@ class TheGateReadsFilesFromTheSuppliedWorktree(unittest.TestCase):
                          self.wt.resolve() / "content" / "indicators")
         self.assertEqual(pipeline_gate._indicators_root(cwd=None),
                          self.main.resolve() / "content" / "indicators")
+
+
+class TheContentShortcut(unittest.TestCase):
+    """Una run che tocca solo articoli non esegue la suite intera.
+
+    Vale il 92% del tempo del cancello (3,7 secondi contro 45), ed e' il pezzo
+    piu' grosso della cerimonia che faceva costare trentotto dollari un
+    articolo. E' anche il tipo di scorciatoia che si allarga da sola finche' non
+    protegge piu' niente, quindi qui si prova soprattutto quando **non** deve
+    scattare.
+    """
+
+    def test_it_applies_to_a_diff_made_only_of_articles(self):
+        self.assertTrue(pipeline_gate.content_only(
+            ["content/indicators/1.json", "content/indicators/bes__X.json"]))
+
+    def test_one_file_outside_the_articles_cancels_it(self):
+        self.assertFalse(pipeline_gate.content_only(
+            ["content/indicators/1.json", "app/data.py"]))
+
+    def test_an_empty_diff_does_not_qualify(self):
+        """Niente da controllare non e' un motivo per controllare meno."""
+        self.assertFalse(pipeline_gate.content_only([]))
+
+    def test_a_non_json_under_the_articles_cancels_it(self):
+        self.assertFalse(pipeline_gate.content_only(["content/indicators/README.md"]))
+
+    def test_a_test_file_never_qualifies(self):
+        self.assertFalse(pipeline_gate.content_only(
+            ["tests/integration/test_indicator_texts.py"]))
+
+    def test_the_shortcut_runs_the_content_modules_and_says_so(self):
+        seen = {}
+
+        def fake(cwd=None, modules=None):
+            seen["modules"] = modules
+            return "ok", "Ran 87 tests / OK", 0
+
+        original = pipeline_gate._run_suite
+        pipeline_gate._run_suite = fake
+        try:
+            check = pipeline_gate.check_suite(paths=["content/indicators/1.json"])
+            self.assertEqual(seen["modules"], pipeline_gate.CONTENT_TESTS)
+            self.assertIn("solo i moduli di contenuto", check.detail)
+
+            pipeline_gate.check_suite(paths=["app/data.py"])
+            self.assertIsNone(seen["modules"])
+        finally:
+            pipeline_gate._run_suite = original
+
+    def test_the_content_modules_include_the_prose_guards(self):
+        """Se qualcuno toglie di qui il modulo delle cifre, la scorciatoia
+        smette di controllare proprio cio' che una run di contenuto rischia."""
+        self.assertIn("tests.integration.test_indicator_texts",
+                      pipeline_gate.CONTENT_TESTS)
+        self.assertIn("tests.unit.test_officina_lint", pipeline_gate.CONTENT_TESTS)
 
 
 if __name__ == "__main__":

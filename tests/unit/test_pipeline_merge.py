@@ -98,13 +98,13 @@ def merged_prs(runner):
 class ABlockedGateIsNotAdvice(unittest.TestCase):
     def test_it_refuses_to_merge(self):
         runner = fake_gh(checks={"python": "pass"})
-        result = pipeline_merge.decide("writer", 1, verdict=RED, runner=runner, log=lambda *_: None)
+        result = pipeline_merge.decide("verificatore", 1, verdict=RED, runner=runner, log=lambda *_: None)
         self.assertFalse(result["merged"])
         self.assertEqual(result["outcome"], "blocked")
         self.assertEqual(merged_prs(runner), [], "ha fuso con il cancello rosso")
 
     def test_it_says_which_check_failed(self):
-        result = pipeline_merge.decide("writer", 1, verdict=RED, runner=fake_gh(), log=lambda *_: None)
+        result = pipeline_merge.decide("verificatore", 1, verdict=RED, runner=fake_gh(), log=lambda *_: None)
         self.assertIn("perimetro", result["detail"])
 
 
@@ -115,7 +115,7 @@ class ChecksHasToActuallyWait(unittest.TestCase):
         runner = fake_gh(script=[{"python": "pending", "frontend": "pass"}])
         slept = []
         result = pipeline_merge.decide(
-            "curator", 7, verdict=GREEN, runner=runner, sleep=slept.append,
+            "admissions", 7, verdict=GREEN, runner=runner, sleep=slept.append,
             log=lambda *_: None,
         )
         # La sequenza di risposte finisce, quindi il polling scade: l'importante
@@ -130,7 +130,7 @@ class ChecksHasToActuallyWait(unittest.TestCase):
             {"python": "pass", "frontend": "pass"},
         ])
         result = pipeline_merge.decide(
-            "curator", 7, verdict=GREEN, runner=runner, sleep=lambda _: None,
+            "admissions", 7, verdict=GREEN, runner=runner, sleep=lambda _: None,
             log=lambda *_: None,
         )
         self.assertTrue(result["merged"])
@@ -139,7 +139,7 @@ class ChecksHasToActuallyWait(unittest.TestCase):
     def test_a_failed_check_is_a_refusal_not_a_wait(self):
         runner = fake_gh(checks={"python": "fail", "frontend": "pass"})
         result = pipeline_merge.decide(
-            "curator", 7, verdict=GREEN, runner=runner, sleep=lambda _: None,
+            "admissions", 7, verdict=GREEN, runner=runner, sleep=lambda _: None,
             log=lambda *_: None,
         )
         self.assertFalse(result["merged"])
@@ -152,7 +152,7 @@ class ChecksHasToActuallyWait(unittest.TestCase):
         parte, la politica non e' soddisfacibile e la PR resta aperta."""
         runner = fake_gh(checks=None)
         result = pipeline_merge.decide(
-            "hunter", 3, verdict=GREEN, runner=runner, sleep=lambda _: None,
+            "admissions", 3, verdict=GREEN, runner=runner, sleep=lambda _: None,
             log=lambda *_: None,
         )
         self.assertFalse(result["merged"])
@@ -162,7 +162,7 @@ class ChecksHasToActuallyWait(unittest.TestCase):
     def test_a_cancelled_check_does_not_count_as_passed(self):
         runner = fake_gh(checks={"python": "cancel", "frontend": "pass"})
         result = pipeline_merge.decide(
-            "hunter", 3, verdict=GREEN, runner=runner, sleep=lambda _: None,
+            "admissions", 3, verdict=GREEN, runner=runner, sleep=lambda _: None,
             log=lambda *_: None,
         )
         self.assertFalse(result["merged"])
@@ -175,7 +175,7 @@ class AutoDoesNotWait(unittest.TestCase):
 
     def test_it_merges_without_looking_at_the_checks(self):
         runner = fake_gh(checks={"python": "pending"})
-        result = pipeline_merge.decide("writer", 9, verdict=AUTO, runner=runner, log=lambda *_: None)
+        result = pipeline_merge.decide("verificatore", 9, verdict=AUTO, runner=runner, log=lambda *_: None)
         self.assertTrue(result["merged"])
         self.assertEqual(merged_prs(runner), ["9"])
 
@@ -195,7 +195,7 @@ class TheOutcomeIsAlwaysReportable(unittest.TestCase):
         }
         for expected, (verdict, runner) in runners.items():
             result = pipeline_merge.decide(
-                "writer", 1, verdict=verdict, runner=runner, sleep=lambda _: None,
+                "verificatore", 1, verdict=verdict, runner=runner, sleep=lambda _: None,
                 log=lambda *_: None,
             )
             self.assertEqual(result["outcome"], expected)
@@ -204,7 +204,7 @@ class TheOutcomeIsAlwaysReportable(unittest.TestCase):
     def test_dry_run_leaves_the_pull_request_open(self):
         runner = fake_gh(checks={"python": "pass", "frontend": "pass"})
         result = pipeline_merge.decide(
-            "curator", 5, verdict=GREEN, runner=runner, sleep=lambda _: None,
+            "admissions", 5, verdict=GREEN, runner=runner, sleep=lambda _: None,
             dry_run=True, log=lambda *_: None,
         )
         self.assertFalse(result["merged"])
@@ -226,10 +226,10 @@ class TheVerdictIsNotTakenFromTheCaller(unittest.TestCase):
         original = pipeline_merge.pipeline_gate.run
         pipeline_merge.pipeline_gate.run = fake_gate
         try:
-            result = pipeline_merge.decide("reviewer", 2, runner=fake_gh(), log=lambda *_: None)
+            result = pipeline_merge.decide("verificatore", 2, runner=fake_gh(), log=lambda *_: None)
         finally:
             pipeline_merge.pipeline_gate.run = original
-        self.assertEqual(seen["stage"], "reviewer")
+        self.assertEqual(seen["stage"], "verificatore")
         self.assertFalse(result["merged"])
 
 
@@ -275,7 +275,7 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
 
     def test_a_refusal_is_recorded_on_master(self):
         runner = journalling_gh()
-        pipeline_merge.decide("scout", 41, verdict=RED, runner=runner, log=lambda *_: None)
+        pipeline_merge.decide("admissions", 41, verdict=RED, runner=runner, log=lambda *_: None)
         rows = runner.state["rows"]
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["outcome"], "blocked")
@@ -284,13 +284,13 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
 
     def test_checks_that_never_conclude_are_recorded_too(self):
         runner = journalling_gh(checks=None)
-        pipeline_merge.decide("curator", 7, verdict=GREEN, runner=runner,
+        pipeline_merge.decide("admissions", 7, verdict=GREEN, runner=runner,
                               sleep=lambda _: None, log=lambda *_: None)
         self.assertEqual([r["outcome"] for r in runner.state["rows"]], ["stopped"])
 
     def test_a_merge_is_recorded_on_master(self):
         runner = journalling_gh(checks={"python": "pass"})
-        pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
+        pipeline_merge.decide("admissions", 45, verdict=GREEN, runner=runner,
                               sleep=lambda _: None, log=lambda *_: None)
         rows = runner.state["rows"]
         self.assertEqual([r["outcome"] for r in rows], ["merged"])
@@ -301,7 +301,7 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
         l'agente ha gia' committato dentro di essa la descrive bene. Scriverne
         una seconda su master direbbe che e' finita quando non e' finita."""
         runner = journalling_gh(checks={"python": "pass"})
-        pipeline_merge.decide("writer", 9, verdict=AUTO, runner=runner,
+        pipeline_merge.decide("verificatore", 9, verdict=AUTO, runner=runner,
                               dry_run=True, log=lambda *_: None)
         self.assertEqual(runner.state["rows"], [])
         self.assertEqual(runner.state["pushes"], 0)
@@ -311,7 +311,7 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
         Il ritentativo rilegge origin/master, che intanto porta la riga
         dell'altro, e ci va dietro: su un file in coda e' sempre corretto."""
         runner = journalling_gh(checks={"python": "pass"}, push_failures=1)
-        pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
+        pipeline_merge.decide("admissions", 45, verdict=GREEN, runner=runner,
                               sleep=lambda _: None, log=lambda *_: None)
         self.assertEqual(runner.state["pushes"], 2)
         self.assertEqual([r["outcome"] for r in runner.state["rows"]], ["merged"])
@@ -320,7 +320,7 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
         """L'albero dell'agente e' su un branch appena cancellato dal remoto.
         Toccarlo per scrivere una riga di log e' un modo di perdere lavoro."""
         runner = journalling_gh(checks={"python": "pass"})
-        pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
+        pipeline_merge.decide("admissions", 45, verdict=GREEN, runner=runner,
                               sleep=lambda _: None, log=lambda *_: None)
         for argv in runner.calls:
             self.assertNotIn(argv[:2], ([  "git", "checkout"], ["git", "switch"]))
@@ -331,14 +331,14 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
         valida, e l'unica cosa che cambia e' che va detto forte."""
         runner = journalling_gh(checks={"python": "pass"}, push_failures=99)
         said = []
-        result = pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
+        result = pipeline_merge.decide("admissions", 45, verdict=GREEN, runner=runner,
                                        sleep=lambda _: None, log=said.append)
         self.assertTrue(result["merged"])
         self.assertTrue(any("DIARIO NON SCRITTO" in s for s in said))
 
     def test_the_journal_can_be_turned_off(self):
         runner = journalling_gh(checks={"python": "pass"})
-        pipeline_merge.decide("hunter", 45, verdict=GREEN, runner=runner,
+        pipeline_merge.decide("admissions", 45, verdict=GREEN, runner=runner,
                               sleep=lambda _: None, log=lambda *_: None, journal=False)
         self.assertEqual(runner.state["pushes"], 0)
 
@@ -462,7 +462,7 @@ class ADirtyWorktreeIsRefusedBeforeMerging(unittest.TestCase):
             if argv[:2] == ["git", "remote"]:
                 return 0, f"http://local_proxy@127.0.0.1:41729/git/{REPO}\n"
             return 0, ""
-        result = pipeline_merge.decide("writer", 5, runner=runner,
+        result = pipeline_merge.decide("verificatore", 5, runner=runner,
                                        log=lambda *_: None, journal=False)
         self.assertFalse(result["merged"])
         self.assertEqual(result["outcome"], "blocked")
@@ -477,7 +477,7 @@ class ADirtyWorktreeIsRefusedBeforeMerging(unittest.TestCase):
                 return 0, f"http://local_proxy@127.0.0.1:41729/git/{REPO}\n"
             return 0, ""
         self.assertNotEqual(pipeline_merge._worktree_dirty(runner=runner), "")
-        result = pipeline_merge.decide("writer", 5, runner=runner,
+        result = pipeline_merge.decide("verificatore", 5, runner=runner,
                                        log=lambda *_: None, journal=False)
         self.assertEqual(result["outcome"], "blocked")
 
@@ -502,7 +502,7 @@ class ADirtyWorktreeIsRefusedBeforeMerging(unittest.TestCase):
         pipeline_merge.pipeline_gate.run = fake_gate
         try:
             runner = fake_gh()  # git status -> "" (pulito)
-            result = pipeline_merge.decide("writer", 5, runner=runner,
+            result = pipeline_merge.decide("verificatore", 5, runner=runner,
                                            log=lambda *_: None, journal=False)
         finally:
             pipeline_merge.pipeline_gate.run = orig
@@ -594,6 +594,12 @@ class EmitOutcomes(unittest.TestCase):
     """Lo snapshot di stato POSTato dopo il merge, ricostruito dal worktree."""
 
     def _dossier(self, **over):
+        # Il vocabolario del **dossier**, non quello del cancello: `writer` e
+        # `reviewer` sono i nomi con cui la pratica di trecento indicatori e'
+        # scritta su disco (`practice_model.REQUIRED_STAGES`), e restano vivi
+        # anche adesso che i due agenti non esistono piu'. Una rinomina di
+        # comodo li aveva schiacciati tutti e tre su `verificatore`: la fixture
+        # restava verde e smetteva di somigliare a un dossier vero.
         d = {"id": "167", "state": "pubblicata", "type": "esistente",
              "entered_at": "2026-07-01",
              "completed_stages": ["writer", "reviewer", "verificatore"],
@@ -690,7 +696,7 @@ class FinishEmitsOnlyOnMerged(unittest.TestCase):
 
     def test_a_blocked_run_does_not_emit(self):
         calls = self._spy()
-        pipeline_merge.decide("writer", 1, verdict=RED, runner=fake_gh(),
+        pipeline_merge.decide("verificatore", 1, verdict=RED, runner=fake_gh(),
                               log=lambda *_: None, run_id="v1", journal=False)
         self.assertEqual(calls, [])
 

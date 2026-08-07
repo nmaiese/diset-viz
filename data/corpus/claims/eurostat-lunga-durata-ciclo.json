@@ -1,0 +1,20 @@
+{
+  "about": "perche' la disoccupazione di lunga durata reagisce al ciclo piu' del totale",
+  "chiavi": [
+    "disoccupazione",
+    "disoccupati"
+  ],
+  "fetched_at": "2026-08-07",
+  "id": "eurostat-lunga-durata-ciclo",
+  "indicators": [
+    "ter:16"
+  ],
+  "language": "en",
+  "quote": "Once the economy starts to pick up again, employers usually remain cautious about hiring new staff and it may take several months before unemployment rates start to fall. Male, youth and long-term unemployment appear to be more susceptible to cyclical economic changes than overall unemployment.",
+  "source_id": "eurostat-statistics-explained",
+  "themes": [
+    "Lavoro e conciliazione"
+  ],
+  "title": "Unemployment statistics",
+  "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Unemployment_statistics"
+}

@@ -6,7 +6,7 @@ run_id e' iniettato, cosi' l'uscita e' deterministica."""
 
 import unittest
 
-from scripts import pipeline_launch
+from scripts import pipeline_launch, verification_queue
 
 
 def practice(code, *, state="in-lavorazione", flags=None, completed=(),
@@ -29,14 +29,58 @@ def _mint(role):
 
 class PlanLaunches(unittest.TestCase):
     def test_a_writer_ready_indicator_is_one_producer_launch(self):
+        """Il ruolo resta, il bersaglio no: scrivere un articolo e' passato
+        all'officina, e `.claude/agents/producer.md` non esiste piu'.
+
+        Un piano che continuasse a nominarlo sarebbe un puntatore morto che
+        qualcuno lancia una volta sola, scoprendo il guasto quando la run muore.
+        """
         dossier = {"ter-5": practice("ter-5", completed=["curator"], priority=7.0)}
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint)
         self.assertEqual(len(plan), 1)
         self.assertEqual(plan[0]["role"], "producer")
-        self.assertEqual(plan[0]["agent"], "producer")
+        self.assertIsNone(plan[0]["agent"])
+        self.assertIn("produci-indicatori", plan[0]["workflow"])
+        self.assertIn("ter-5", plan[0]["comando"])
         self.assertEqual(plan[0]["indicator"], "ter-5")
         self.assertEqual(plan[0]["scope"], "indicatore")
         self.assertEqual(plan[0]["run_id"], "producer-RUNID")
+
+    def test_the_command_carries_the_public_code_not_the_store_key(self):
+        """Il piano ragiona in chiavi, l'officina in codici URL, e il comando e'
+        il punto in cui i due vocabolari si incontrano.
+
+        Il dossier e le code nominano un indicatore con la chiave dello store
+        (`176`, `dem:DEPENDRATE`, `bes:10AMB004`); `officina.pacchetti` risponde
+        "nessun indicatore per" a quella forma, e `officina.pubblica.chiave`
+        solleva. Il piano scriveva percio' comandi che non partivano, e non se ne
+        accorgeva nessuno perche' il comando lo esegue chi legge il piano.
+
+        Il difetto era invisibile anche qui: le fixture di questo file usavano
+        `ter-5`, che e' **gia'** un codice pubblico, quindi la conversione
+        mancante non cambiava niente. Le tre forme sotto sono quelle vere.
+        """
+        for chiave, atteso in (("176", "ter-176"),
+                               ("dem:DEPENDRATE", "dem-DEPENDRATE"),
+                               ("bes:10AMB004", "bes-10AMB004"),
+                               ("eur:rd_e_gerdreg", "eur-rd_e_gerdreg")):
+            with self.subTest(chiave=chiave):
+                comando = pipeline_launch.target("producer", chiave)["comando"]
+                self.assertIn(f'args: ["{atteso}"]', comando)
+                # E il giro torna: il codice che il comando scrive e' quello che
+                # `officina.pubblica` sa riportare alla chiave di partenza.
+                self.assertEqual(verification_queue.code_of(chiave), atteso)
+
+    def test_a_readability_revise_is_launchable_too(self):
+        """La stessa conversione sul percorso che ci arriva da `reading_queue`,
+        che e' quello segnalato in revisione: una bocciatura di leggibilita'
+        produceva un comando che non pubblicava niente."""
+        letture = [{"status": "revise", "key": "bes:10AMB004",
+                    "code": "bes-10AMB004", "level": "regione", "rounds": 1}]
+        plan = pipeline_launch.plan_launches({}, {}, mint=_mint, readings=letture)
+        produttori = [p for p in plan if p["role"] == "producer"]
+        self.assertEqual(len(produttori), 1)
+        self.assertIn('args: ["bes-10AMB004"]', produttori[0]["comando"])
 
     def test_a_signed_unverified_indicator_goes_to_the_verificatore(self):
         dossier = {"ter-9": practice("ter-9",
@@ -45,7 +89,9 @@ class PlanLaunches(unittest.TestCase):
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint)
         self.assertEqual(len(plan), 1)
         self.assertEqual(plan[0]["role"], "verificatore")
-        self.assertEqual(plan[0]["agent"], "indicator-verifier")
+        # Il ruolo **e'** l'agente: non c'e' piu' una mappa da tradurre, e
+        # questa asserzione e' cio' che se ne accorgerebbe se tornasse.
+        self.assertEqual(plan[0]["agent"], "verificatore")
         self.assertEqual(plan[0]["indicator"], "ter-9")
 
     def test_the_source_queue_lights_up_the_admissions_batch(self):

@@ -19,9 +19,12 @@ it).
 | --- | --- |
 | account utente, login Google, preferiti, statistiche/achievements, confronti salvati, GDPR | [`docs/ACCOUNT.md`](docs/ACCOUNT.md) |
 | la catena autonoma, gli agenti, il cancello, le Routine | [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md) |
-| la revisione a pratica editoriale (identita', stati, transizioni, PR come vista) | [`docs/EDITORIAL_PRACTICE.md`](docs/EDITORIAL_PRACTICE.md) |
 | come apre e chiude una run un agente qualsiasi | [`docs/AGENT_CONTRACT.md`](docs/AGENT_CONTRACT.md) |
 | una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
+| che cosa serve per scrivere un indicatore: cifre, angoli, contesto citabile | `packs/` (`angles.py`, `build.py`, `context.py`), [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
+| scrivere articoli indicatore adesso: il workflow, il lint, i pacchetti | `.claude/workflows/produci-indicatori.js`, `officina/` (`pacchetti.py`, `brief.py`, `pubblica.py`, `lint.py`) |
+| scrivere o cambiare un file di agente (contratto, non cronaca) | `.claude/rules/pipeline.md`, e il verdetto in [`docs/OFFICINA_EDITORIALE_PROPOSTA.md`](docs/OFFICINA_EDITORIALE_PROPOSTA.md) |
+| quanto costa una run, e come si misura senza sbagliare | `scripts/baseline_tokens.py` (il contratto sta nel suo docstring) |
 | scoperta e promozione di indicatori multifonte | [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md) |
 | stato corrente del sistema, id delle Routine, cosa manca | [`docs/DISCOVERY_STATUS.md`](docs/DISCOVERY_STATUS.md) |
 | aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
@@ -29,7 +32,7 @@ it).
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
 | la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
 | come si misura un articolo, i dieci criteri | [`docs/WRITING_RUBRIC.md`](docs/WRITING_RUBRIC.md) |
-| che cosa ha misurato il primo lotto, e il giro dopo | [`docs/WRITING_QUALITY_PLAN.md`](docs/WRITING_QUALITY_PLAN.md), Parte terza |
+| i piani gia' eseguiti, con le misure e le ipotesi cadute | [`docs/archive/`](docs/archive/) (non sono fonti di verita': se contraddicono il codice, ha ragione il codice) |
 | quali fonti secondarie si possono citare | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
 | cambiare modello, prompt o hook degli agenti | [`docs/CANARY.md`](docs/CANARY.md), `evals/README.md` |
 | priorita' e lacune sulle domande che un motore o un assistente puo' porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
@@ -47,7 +50,7 @@ Per guardare la catena senza aprire file:
 python3 scripts/pipeline_monitor.py            # dov'e' fermo e perche', in una schermata (nell'app: /_pipeline)
 python3 scripts/pipeline_launch.py             # cosa lanciare adesso, e in che ordine (per-indicatore)
 python3 scripts/practice_timeline.py           # la storia per indicatore (il dossier, read-only)
-python3 scripts/pipeline_status.py             # le code per (vecchio) stadio, ancora usate dal lanciatore
+python3 scripts/pipeline_status.py             # le code per (vecchio) stadio, ancora lette da pipeline_launch.py
 ```
 
 ## What this is
@@ -75,8 +78,25 @@ Blog layer: `app/blog.py` (reads `content/posts/*.md`).
 
 ## Commands
 
+**L'interprete Python di questo progetto e' `bin/py`, sempre.** Non `python3`,
+che in questo ambiente e' una funzione di shell e senza `$VIRTUAL_ENV` cade su
+un interprete privo delle dipendenze; non `.venv/bin/python`, che in molti
+worktree non esiste. Nella prima run del workflow tutti e quattro gli scrittori
+hanno speso quattro turni a testa a cercarlo, e un pubblicatore ha eseguito il
+lint con l'interprete di **un altro worktree**: due codici possibili per lo
+stesso verdetto. `bin/py` risolve in un posto solo e fallisce dicendo perche'.
+
 ```bash
-# stato della catena editoriale, tutti gli stadi
+# scrivere articoli indicatore: il workflow, dalla lista dei codici
+#   Workflow({scriptPath: ".claude/workflows/produci-indicatori.js", args: ["ter-30"]})
+bin/py -m officina.pacchetti ter-30              # il pacchetto, a mano
+bin/py -m officina.pubblica ter-30 < bozza.json  # la bozza diventa un articolo (rifiuta invece di scrivere male)
+bin/py -m officina.lint ter-30                   # il cancello editoriale (11s su tutti)
+bin/py scripts/tool_failures.py                  # i guasti che si ripetono (il file aveva solo chi lo scriveva)
+bin/py -m scripts.calibra_prosa --confronto      # gli esempi contro i pubblicati
+bin/py scripts/baseline_tokens.py --workflow wf_… --articles 1   # quanto e' costata una run
+
+# stato della catena editoriale, tutti gli stadi (vecchia catena)
 python3 scripts/pipeline_status.py
 
 # build the SPA (required after changing anything in frontend/)
@@ -86,9 +106,9 @@ cd frontend && npm run build && cd ..
 .venv/bin/gunicorn run:app -b 127.0.0.1:5050
 
 # tests, audit, whitespace
-.venv/bin/python -m unittest discover -s tests -v          # tutta la suite (935 test, ~45s), prima di commit/push
-.venv/bin/python -m unittest discover -s tests/unit -v      # solo veloci (412 test, ~1s), durante lo sviluppo
-.venv/bin/python -m unittest discover -s tests/integration -v  # solo la parte pesante (523 test, ~45s): Flask/HTTP e catena e2e
+bin/py -m unittest discover -s tests -v          # tutta la suite (1348 test, ~52s), prima di commit/push
+bin/py -m unittest discover -s tests/unit -v      # solo veloci (~700 test, ~4s), durante lo sviluppo
+bin/py -m unittest discover -s tests/integration -v  # solo la parte pesante (~650 test, ~51s): Flask/HTTP e catena e2e
 cd frontend && npm audit --audit-level=low
 git diff --check
 ```
@@ -106,17 +126,18 @@ of the process (`lru_cache`, not a TTL).
 
 ## The autonomous chain — READ [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md)
 
-**Three roles**, per-indicator instead of per-stage, take an indicator from a
-source catalogue to a published page and come back when the data moves:
-**ammissione** (fuses scout+hunter+promoter: what enters, with auto-refutation)
--> **produttore** (fuses curator+writer+reviewer: one indicator from admitted to
-published in one session, re-reading its own text) -> **verificatore** (repairs
-nothing: its refutations go back to the producer, which absorbed the reviewer).
-Each role has an agent in `.claude/agents/`, and a verdict from
-`scripts/pipeline_gate.py` that decides whether it may publish. A **launcher**
-(`scripts/pipeline_launch.py`, agent `launcher`) reads the per-indicator dossier
-and launches roles in parallel: different indicators touch different files, so
-there is no contention to serialise.
+An indicator goes from a source catalogue to a published page like this:
+**ammissione** (agent: what enters, with auto-refutation) -> **l'officina**
+(`.claude/workflows/produci-indicatori.js`: writes the article) ->
+**verificatore** and **reader-editor** (agents: two independent critics, facts
+and readability).
+
+**The `produttore` agent is gone**, and so is the `launcher` agent. Writing an
+article moved into the workshop, where four narrow types do it inside a
+workflow at a twentieth of the cost, and coordination inside a workflow costs
+zero tokens. What is left as an agent is what exercises a judgement no workflow
+can make deterministic. `scripts/pipeline_launch.py` still computes the launch
+plan, and `scripts/pipeline_gate.py` still decides whether a run may publish.
 
 The constitution of the chain (one launcher, work per-indicator in parallel, one
 file per record, `run_id` over PR number, the gate's perimeter, no human in the

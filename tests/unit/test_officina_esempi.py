@@ -1,0 +1,79 @@
+"""La scelta dell'esempio: deterministica, esistente, e non sempre la stessa.
+
+Il difetto che questa mappa corregge e' lo stesso di tutta la rifondazione: se
+la scelta la fa il modello, il modello sceglie quasi sempre uguale, e
+l'uniformita' rientra da una porta che nessuno guardava.
+"""
+import unittest
+
+from officina import esempi
+
+
+class TheMapPointsAtRealFiles(unittest.TestCase):
+    def test_every_mapped_extract_exists(self):
+        missing = sorted({name for name in esempi.BY_ANGLE.values()
+                          if name not in esempi.available()})
+        self.assertEqual(missing, [], f"estratti mappati e assenti: {missing}")
+
+    def test_the_fallback_exists_too(self):
+        self.assertIn(esempi.WHEN_THERE_IS_NO_STORY, esempi.available())
+
+    def test_the_library_is_not_mostly_unused(self):
+        """Una biblioteca di dieci testi con due usati e' una biblioteca finta."""
+        used = set(esempi.BY_ANGLE.values()) | {esempi.WHEN_THERE_IS_NO_STORY}
+        self.assertGreaterEqual(len(used), 5,
+                                f"solo {len(used)} estratti raggiungibili")
+
+
+class Picking(unittest.TestCase):
+    def test_the_strongest_angle_decides(self):
+        angles = [{"type": "graduatoria-spezzata"}, {"type": "sorpasso"}]
+        self.assertEqual(esempi.pick(angles), "infodata-mortalita-comuni.md")
+
+    def test_a_different_story_gets_a_different_model(self):
+        """Il punto di tutta la mappa, in un test."""
+        ranking = esempi.pick([{"type": "graduatoria-spezzata"}])
+        over_time = esempi.pick([{"type": "rottura-di-pendenza"}])
+        outlier = esempi.pick([{"type": "valore-fuori-scala"}])
+        self.assertEqual(len({ranking, over_time, outlier}), 3)
+
+    def test_an_unmapped_type_falls_to_the_next_angle_not_to_the_fallback(self):
+        angles = [{"type": "tipo-nuovo-mai-visto"}, {"type": "sorpasso"}]
+        self.assertEqual(esempi.pick(angles), "pagellapolitica-record-occupati.md")
+
+    def test_no_angles_means_no_article(self):
+        """Un indicatore senza storia si scrive come un comunicato asciutto."""
+        self.assertEqual(esempi.pick([]), esempi.WHEN_THERE_IS_NO_STORY)
+        self.assertEqual(esempi.pick(None), esempi.WHEN_THERE_IS_NO_STORY)
+
+    def test_it_is_deterministic(self):
+        angles = [{"type": "controcorrente"}]
+        self.assertEqual(esempi.pick(angles), esempi.pick(angles))
+
+
+class OnTheRealCatalogue(unittest.TestCase):
+    def test_the_choice_varies_across_indicators(self):
+        from app import sources
+        from app.atlas_catalog import get_atlas_catalog
+        from collections import Counter
+        from packs import build
+
+        chosen = Counter()
+        for item in get_atlas_catalog()["indicators"][:60]:
+            family, raw = sources.split_internal_id(item["id"])
+            try:
+                pack = build.build_pack(family, raw)
+            except Exception:
+                continue
+            if pack:
+                chosen[esempi.pick(pack["angles"])] += 1
+
+        self.assertGreater(sum(chosen.values()), 40)
+        self.assertGreaterEqual(len(chosen), 3,
+                                f"un solo modello per tutti: {chosen}")
+        top = chosen.most_common(1)[0][1] / sum(chosen.values())
+        self.assertLess(top, 0.7, f"un modello copre il {top:.0%}: {chosen}")
+
+
+if __name__ == "__main__":
+    unittest.main()

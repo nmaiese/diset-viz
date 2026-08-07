@@ -32,11 +32,17 @@ PROMPTS = {
 Scrivi l'articolo per l'indicatore ter-178 (Tasso di occupazione, femmine)
 usando COME UNICA FONTE DEI NUMERI il brief congelato in {BRIEF}.
 Non consultare i dati vivi e non usare WebSearch: questa e' una eval, non una
-run di produzione. Segui content/STYLE.md e la struttura di scrittura del
-produttore (.claude/agents/producer.md): lead + definizione, quadro, dinamica,
-limiti, con "level": "regione" e "vintage": 2025.
-Scrivi il risultato in evals/out/writer/article.json e fermati li': niente
-store, niente commit, niente pull request.
+run di produzione. Segui content/STYLE.md. I `role` sono quattro e solo
+quattro: definizione, quadro, dinamica, limiti. I tre sostanziali ci sono
+sempre, definizione e' la sola omettibile, l'ordine e' libero e una sola
+sezione per ruolo. Scrivi con "level": "regione" e "vintage": 2025.
+
+Il candidato da misurare e' il tipo `scrittore-indicatore`, che non puo'
+scrivere file: fallo girare sul brief e riporta tu la sua risposta strutturata
+in evals/out/writer/article.json, aggiungendo key, level e vintage. Il metro
+non cambia, il prompt misurato si'.
+
+Fermati li': niente store, niente commit, niente pull request.
 Poi misura: python3 evals/score_eval.py writer evals/out/writer/article.json""",
     "reviewer": f"""\
 In evals/out/reviewer/ ci sono due articoli su ter-178 con errori veri dentro.

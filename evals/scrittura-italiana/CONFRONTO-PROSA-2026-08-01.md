@@ -17,7 +17,7 @@ scrivere una riga:
 
 1. **Gli strumenti saturano proprio dove serve misurare.** Il produttore gia'
    scrive bene: su un suo articolo `prose_lint` non si muove e la rubrica sta a
-   19-20 (documentato in `docs/WRITING_QUALITY_PLAN.md`, Parte seconda). Per
+   19-20 (documentato in `docs/archive/WRITING_QUALITY_PLAN.md`, Parte seconda). Per
    vedere il contributo *marginale* della skill serviva uno strumento nuovo:
    [`tic_count.py`](tic_count.py), un contatore deterministico dei tic
    dell'italiano generato che `prose_lint` non copre (avverbi in -mente,

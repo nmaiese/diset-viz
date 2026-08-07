@@ -82,7 +82,7 @@ attribuita a una provincia non la controlla niente. Si verifica a mano, una
 per una, contro il brief:
 
 ```bash
-.venv/bin/python -m scripts.indicator_brief <codice> --level provincia
+bin/py -m officina.brief <codice> --level provincia
 ```
 
 ## `eco` — una cifra che il cruscotto gia' stampa

@@ -101,6 +101,16 @@ class TheQueueDrainsAndRefills(unittest.TestCase):
         self.assertEqual(vq.waiting(rows), [])
         self.assertFalse(rows[0]["verifiable"])
 
+    def test_an_article_from_the_officina_enters_without_a_signature(self):
+        """La macchina nuova non ha un revisore, e senza questa porta i suoi
+        articoli restavano invisibili all'unico passo di falsificazione
+        indipendente della catena: 377 in catalogo, 50 firmati, e i tre
+        dell'officina fuori."""
+        entry = _entry(reviewed_at="", reviewed_vintage=None, origine=vq.OFFICINA)
+        rows = vq.build_queue({"611": entry}, [])
+        self.assertTrue(rows[0]["verifiable"])
+        self.assertEqual(len(vq.waiting(rows)), 1)
+
     def test_a_signature_that_does_not_match_the_vintage_is_not_verifiable(self):
         entry = _entry(reviewed_vintage=2023)
         rows = vq.build_queue({"611": entry}, [])
@@ -230,10 +240,15 @@ class TheStageIsRegisteredEverywhere(unittest.TestCase):
     def test_it_is_the_last_stage(self):
         self.assertEqual(pipeline_status.STAGE_ORDER[-1], "verificatore")
 
-    def test_its_agent_file_exists(self):
-        agent = pipeline_gate.PROJECT_ROOT / ".claude" / "agents" / "indicator-verifier.md"
+    def test_its_agent_file_is_named_after_the_stage(self):
+        """Il file si chiamava `indicator-verifier.md` mentre lo stadio si
+        chiamava `verificatore`, e la differenza esisteva solo per essere
+        tradotta da un dizionario. Adesso combaciano, e questo test e' il
+        controllo per il solo stadio che aveva il problema (l'invariante su
+        tutti e tre sta in `test_docs_match_the_code.py`)."""
+        agent = pipeline_gate.PROJECT_ROOT / ".claude" / "agents" / "verificatore.md"
         self.assertTrue(agent.exists(), "lo stadio non ha un agente")
-        self.assertIn("verificatore", agent.read_text(encoding="utf-8"))
+        self.assertIn("name: verificatore", agent.read_text(encoding="utf-8"))
 
     def test_the_committed_register_is_readable_and_credible(self):
         rows = vq.load_verifications()

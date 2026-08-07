@@ -1,152 +1,23 @@
 # AGENTS.md
 
-Instructions for coding agents (Codex and others) in this repository. Claude
-Code reads `CLAUDE.md`; this file mirrors the essentials for everyone else.
+**Read [`CLAUDE.md`](CLAUDE.md). It is the router for every agent in this
+repository, not only for Claude Code.**
 
-This file is a router, like `CLAUDE.md`. For topics with depth, read the
-document that owns them, not the summary here — a rule copied into two
-places goes out of sync without anyone noticing, and this project has
-already paid for that once (a scheduled agent spent weeks writing into a
-file the app no longer read, because its prompt repeated a contract
-instead of pointing at it).
+This file used to mirror it: same map, same commands, same constraints, kept in
+two places by hand. It had already drifted, and it drifted on the subject both
+files open by warning about:
 
-## Dove sta scritto cosa
+> a rule copied into two places goes out of sync without anyone noticing, and
+> this project has already paid for that once (a scheduled agent spent weeks
+> writing into a file the app no longer read, because its prompt repeated a
+> contract instead of pointing at it).
 
-| se stai lavorando su... | leggi |
-| --- | --- |
-| la catena autonoma, gli agenti, il cancello, le Routine | `docs/AUTONOMOUS_PIPELINE.md` |
-| la revisione a pratica editoriale (identita', stati, transizioni, PR come vista) | `docs/EDITORIAL_PRACTICE.md` |
-| come apre e chiude una run un agente qualsiasi | `docs/AGENT_CONTRACT.md` |
-| una pagina indicatore, la sua prosa, le sue guardie | `docs/INDICATOR_PAGES.md` |
-| scoperta e promozione di indicatori multifonte | `docs/DISCOVERY_PIPELINE.md` |
-| stato corrente del sistema, id delle Routine, cosa manca | `docs/DISCOVERY_STATUS.md` |
-| aggiungere indicatori, temi o un dataset regionale | `docs/DATA_PIPELINE.md` |
-| dati provinciali | `docs/PROVINCE_PIPELINE.md` |
-| freschezza dei dati e monitoraggio delle fonti | `docs/DATA_FRESHNESS.md`, `docs/SOURCE_MONITORING.md` |
-| la voce editoriale, blog e pagine indicatore | `content/STYLE.md` |
-| come si misura un articolo, i dieci criteri | `docs/WRITING_RUBRIC.md` |
-| che cosa ha misurato il primo lotto, e il giro dopo | `docs/WRITING_QUALITY_PLAN.md`, Parte terza |
-| quali fonti secondarie si possono citare | `docs/SECONDARY_SOURCES.md` |
-| cambiare modello, prompt o hook degli agenti | `docs/CANARY.md`, `evals/README.md` |
-| priorita' e lacune sulle domande che un motore o un assistente puo' porre | `docs/LLM_QUERY_MAP.md` |
-| tracciamento, consenso, versione GTM | `docs/tracking_spec.md` |
+The mirror carried a map with no row for the workshop that writes the articles,
+and named an agent that no longer exists. A router that is wrong is worse than
+no router, because it is followed.
 
-Le regole con uno scope stanno in `.claude/rules/` (app, editorial, pipeline,
-frontend, data) e le procedure condivise dagli agenti della catena in
-`.claude/skills/`: Claude Code le carica da sola quando tocchi i file a cui
-si applicano, chiunque altro le legge come documenti normali, e valgono per
-tutti (`pipeline-close-run`, `untrusted-web`, `indicator-review`, e `canary`,
-che scatta prima di ogni cambio a modelli, prompt o hook degli agenti).
-
-Per guardare la catena senza aprire file:
-
-```bash
-python3 scripts/pipeline_monitor.py            # dov'e' fermo e perche', in una schermata (nell'app: /_pipeline)
-python3 scripts/pipeline_launch.py             # cosa lanciare adesso, e in che ordine (per-indicatore)
-python3 scripts/practice_timeline.py           # la storia per indicatore (il dossier, read-only)
-python3 scripts/pipeline_status.py             # le code per (vecchio) stadio, ancora usate dal lanciatore
-```
-
-## What this is
-
-**Divario Italia** (divarioitalia.it) is a Flask + React atlas of the Istat
-territorial development indicators, plus a server-rendered SEO blog and a
-quality-of-life section for regions and provinces. The atlas lives at `/`
-(source in `frontend/`, built into `app/static/dist/`); every indicator from
-every source family at `/indicatore/<slug>/<acronimo>-<id>`, served by one
-template over one view model; the blog at `/blog`; the editorial hub at
-`/divari-regionali`; the compare tool at `/confronto`; internal search at
-`/ricerca`; the original D3 dashboard at `/legacy` (do not break it); the JSON
-API under `/api/`. The route-by-route truths (what is canonical, what is
-noindex and why, what recomputes at render time) live in `.claude/rules/app.md`.
-
-**Source naming has a single source of truth in `app/sources.py`**, stated
-here because breaking it is invisible: user-facing labels are institution-first
-plain names, never a bare internal acronym, and no family label or indicator
-URL may be hardcoded anywhere else. The code that did published an Istat
-series under Eurostat's name.
-
-Data layer: `app/data.py` (reads `app/static/data/Assoluti_Regione.csv`).
-Blog layer: `app/blog.py` (reads `content/posts/*.md`).
-
-## Commands
-
-```bash
-# stato della catena editoriale, tutti gli stadi
-python3 scripts/pipeline_status.py
-
-# build the SPA (required after changing anything in frontend/)
-cd frontend && npm run build && cd ..
-
-# run locally (from the repo root)
-.venv/bin/gunicorn run:app -b 127.0.0.1:5050
-
-# tests, audit, whitespace
-.venv/bin/python -m unittest discover -s tests -v          # tutta la suite (935 test, ~45s), prima di commit/push
-.venv/bin/python -m unittest discover -s tests/unit -v      # solo veloci (412 test, ~1s), durante lo sviluppo
-.venv/bin/python -m unittest discover -s tests/integration -v  # solo la parte pesante (523 test, ~45s): Flask/HTTP e catena e2e
-cd frontend && npm audit --audit-level=low
-git diff --check
-```
-
-`tests/` e' pacchetto Python (ha `__init__.py`) apposta: e' cosi' che `tests/conftest.py`
-si aggancia sotto `unittest` (che, a differenza di pytest, non lo carica da solo). Un file va
-in `tests/integration/` se ha bisogno di un giro reale (client Flask, catena end-to-end su
-file temporanei, lettura di tutti gli articoli committati); il resto sta in `tests/unit/`.
-Un file che mescola le due cose va spaccato, non spostato per intero: e' successo a
-`test_indicator_view.py`, ora due file, uno per meta'.
-
-After editing `frontend/src/*`, always rebuild before testing the served app.
-After changing data, restart gunicorn: the core loaders cache for the life of
-the process (`lru_cache`, not a TTL).
-
-## The autonomous chain — READ `docs/AUTONOMOUS_PIPELINE.md`
-
-Three roles, per-indicator instead of per-stage, take an indicator from a
-source catalogue to a published page and come back when the data moves:
-**ammissione** (fuses scout+hunter+promoter: what enters, with auto-refutation)
--> **produttore** (fuses curator+writer+reviewer: one indicator from admitted to
-published in one session, re-reading its own text) -> **verificatore** (repairs
-nothing: its refutations go back to the producer, which absorbed the reviewer).
-Each role has an agent in `.claude/agents/`, and a verdict from
-`scripts/pipeline_gate.py` that decides whether it may publish. A launcher
-(`scripts/pipeline_launch.py`, agent `launcher`) reads the per-indicator dossier
-and launches roles in parallel: different indicators touch different files, so
-there is no contention to serialise.
-
-The constitution of the chain (one launcher, work per-indicator in parallel, one
-file per record, `run_id` over PR number, the gate's perimeter, no human in the
-loop, never `gh pr merge --auto`, data-driven re-entry, stdlib-pure scripts)
-lives in `.claude/rules/pipeline.md` and, in full, in the two documents above.
-Do not act on this paragraph: it is a table of contents.
-
-## Writing — READ `content/STYLE.md`
-
-One voice for the blog and the indicator pages, owned by `content/STYLE.md`.
-The absolutes: no em-dash, no en-dash, no semicolon, no ellipsis; only real,
-verified numbers, never an invented source; canonical indicator links only
-(`/indicatore/<slug>/ter-105`, never `/?indicator=`). The bar is
-`docs/WRITING_RUBRIC.md`: ten criteria on four axes, each with its own floor
-(an axis below its floor fails the article whatever the total), and under 14 out
-of 20 is not ready. The
-deterministic tooling (brief, definition check, queues, prose lint) is listed
-in `.claude/rules/editorial.md`, and the error classes only a reading catches
-are the `indicator-review` skill.
-
-## Data — READ `docs/DATA_PIPELINE.md`
-
-Themes, theme scores, region profiles and macro-areas are all derived from
-the data and recomputed at runtime; the wiring (directions in
-`CURATED_DIRECTION`, theme mapping in `config/theme_categories.csv`,
-provincial separation) is in `.claude/rules/data.md`. The quiet failure worth
-knowing everywhere: an unmapped theme keeps its indicator in the catalogue and
-drops it from every macro-area total, with nothing failing.
-
-## Constraints
-
-- Do not break `/legacy` or the data schema (`tests/integration/test_app.py` guards both).
-- Keep technical SEO intact (the list is in `.claude/rules/app.md`).
-- Keep the cartographic identity: navy `#15233b`, paper `#fbfaf7`, single
-  accent `#e4572e`, fonts Archivo / Inter / Space Mono.
-- Do not commit secrets (`.gitignore` already excludes `client_secret_*.json`).
-- Commit messages: no `Co-Authored-By` trailer.
+So there is one router now, and this is a pointer to it. If your harness does
+not load `CLAUDE.md` on its own, load it before doing anything else: it carries
+the map of which document owns which subject, the commands (starting with
+`bin/py`, the only interpreter of this project), and the constraints that are
+true everywhere.

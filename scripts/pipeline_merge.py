@@ -48,8 +48,8 @@ is to be reliable is better off on it. The cost is that REST has no `bucket`, so
 `_bucket` reproduces the classification `gh` was doing for us: the vocabulary is
 unchanged and everything downstream reads the same words.
 
-    python3 scripts/pipeline_merge.py --stage writer --pr 42
-    python3 scripts/pipeline_merge.py --stage curator --pr 43 --dry-run
+    python3 scripts/pipeline_merge.py --stage verificatore --pr 42
+    python3 scripts/pipeline_merge.py --stage admissions --pr 43 --dry-run
 """
 
 from __future__ import annotations

@@ -1,0 +1,30 @@
+{
+ "angolo": "divario-che-si-chiude",
+ "key": "30",
+ "lead": "Nel 2014 ogni museo dei circuiti del Lazio contava in media 424mila visitatori in piu' di ogni museo dei circuiti umbri. Sei anni dopo la distanza era scesa a 68mila. L'Umbria non aveva recuperato niente, si era abbassata la testa. Un indicatore cosi' dice quanto e' concentrato il pubblico dei circuiti museali, e quanto pesa su ogni singolo istituto che ne fa parte.",
+ "level": "regione",
+ "origine": "officina",
+ "sections": [
+  {
+   "body": "Nel 2014 il valore piu' alto della serie e' quello del Lazio, 424mila visitatori per istituto del circuito. Il piu' basso e' quello dell'Umbria, 139 visitatori per istituto in tutto l'anno. Nel 2020 il Lazio e' sceso a 68mila e l'Umbria a meno di quaranta. La distanza fra i due estremi si e' ridotta dell'84 per cento.\n\nIl modo in cui si e' ridotta conta piu' della riduzione. In quei sei anni il fondo della graduatoria si e' mosso di un centinaio di visitatori per istituto. La testa si e' mossa di 356mila. E fino all'anno prima andava nella direzione opposta: fra il 2014 e il 2019 il valore laziale era salito da 424mila a 476mila per istituto. Tutta la chiusura del divario sta in un anno solo, ed e' caduta dall'alto.\n\nPerche' il numero si sia mosso cosi', questo articolo non lo dice. Sul tema non c'e' nel pacchetto nessuna fonte citabile, e il 2020 e' l'ultimo anno disponibile della serie. Mettere una causa sotto una caduta del genere sarebbe una deduzione dai dati, non un'attribuzione, e su questa pagina le due cose non si scambiano.",
+   "h": "La distanza si e' accorciata perche' e' caduto il primo",
+   "role": "dinamica"
+  },
+  {
+   "body": "L'etichetta parla di domanda culturale, il calcolo dice una cosa piu' stretta. Istat, elaborando dati del Ministero della cultura, divide i visitatori dei circuiti museali per il numero di musei e istituti similari che a quei circuiti appartengono. Quello che esce e' un carico medio per istituto, non il pubblico di una regione.\n\nIl valore laziale del 2020 vuol dire che ogni istituto del circuito ha visto passare in media 68mila persone in un anno. Il denominatore e' piccolo quasi ovunque. Quando il denominatore e' piccolo, un solo luogo molto frequentato tira su la media dell'intero territorio, e un istituto in piu' nel conteggio la abbassa senza che sia entrato o uscito un visitatore.",
+   "h": "Non misura quanta gente va al museo",
+   "role": "definizione"
+  },
+  {
+   "body": "Nel 1999 la media dei territori del Centro superava quella del Nord di circa 2.900 visitatori per istituto. Nel 2020 il distacco e' di 20.600. E' sette volte quello di partenza.\n\nI tre gruppi chiudono la serie molto lontani. Il Centro sta a 20.700 visitatori per istituto, il Mezzogiorno a 880, il Nord a 155. La geografia che ci si aspetta da un indicatore territoriale italiano qui non tiene, e non perche' il Mezzogiorno vada bene: sta anche lui parecchio sotto il Centro. E' il Nord a stare in fondo, e a starci di un ordine di grandezza.\n\nDentro il Centro, poi, la media e' quasi tutta laziale. La Toscana chiude a 12.200 visitatori per istituto, le Marche a 2.400, l'Umbria a meno di quaranta. Le medie di gruppo sono medie dei territori che quell'anno compaiono nella matrice, e nel 2020 il Nord ne ha due.",
+   "h": "Qui il fondo della classifica e' il Nord",
+   "role": "quadro"
+  },
+  {
+   "body": "Il pannello cambia di anno in anno. La Lombardia entra nel 2003, sparisce fra il 2011 e il 2013 e nel 2020 non c'e'. La Basilicata compare dal 2012, le Marche per la prima volta nel 2017 e saltano il 2018, la Calabria arriva nel 2019. Nel 2020 la media del Nord sta in piedi su Emilia-Romagna e Veneto, perche' Piemonte, Lombardia e Liguria in quell'anno non compaiono. Un confronto fra gruppi in due anni diversi e' anche un confronto fra due elenchi diversi di territori.\n\nC'e' poi un cambio di verso segnalato nel 2008. Una rottura di quel tipo puo' venire dal fenomeno oppure da un cambio di metodo di chi pubblica i dati. Finche' non e' controllata contro le note metodologiche non si racconta come un fatto, e qui non la raccontiamo.\n\nResta il limite di fondo. E' un rapporto di intensita', quindi la dimensione del circuito pesa quanto il numero di visitatori, e un territorio con pochi istituti dentro i circuiti parte avvantaggiato in questa graduatoria. All'altro estremo i valori piu' bassi scendono a poche decine di visitatori per istituto in un anno, cioe' sotto la soglia in cui un rapporto dice ancora qualcosa. Per sapere che cosa e' successo davvero nel 2020 servono le note metodologiche della fonte e gli anni successivi, che questa serie non ha.",
+   "h": "Quello che il rapporto non dice",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2020
+}

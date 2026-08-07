@@ -14,6 +14,7 @@ from __future__ import annotations
 import unittest
 
 from scripts import reading_queue as rq
+from scripts import verification_queue as vq
 
 
 def _entry(lead="Un lead che apre sulla geografia.", **extra):
@@ -54,6 +55,40 @@ def _reading(entry, code="ter-611", verdict="pass", hard_failures=None, note=Non
     for name in rq.CRITERIA:
         row[name] = scores.get(name, 2 if verdict == "pass" else 1)
     return row
+
+
+class TheOfficinaEntersInShadow(unittest.TestCase):
+    """Il reader-editor non e' un cancello, ma deve avere qualcosa da leggere.
+
+    Due porte lo tenevano fuori dalla macchina nuova, e la seconda era un
+    difetto vero: la firma del revisore, che l'officina non ha, e i **quattro**
+    ruoli obbligatori, mentre `definizione` e' omettibile apposta ed e' cosi'
+    che la pagina la rende. `ter-30` scrive `quadro, limiti, dinamica`: questa
+    coda lo dichiarava incompleto e il renderer completo.
+    """
+
+    def _entry(self, **extra):
+        base = {
+            "lead": "Un lead.",
+            "level": "regione",
+            "vintage": 2024,
+            "sections": [{"role": role, "h": None, "body": f"Corpo di {role}."}
+                         for role in ("quadro", "limiti", "dinamica")],
+        }
+        base.update(extra)
+        return base
+
+    def test_an_article_from_the_officina_is_readable_without_a_signature(self):
+        rows = rq.build_queue({"30": self._entry(origine=vq.OFFICINA)}, [])
+        self.assertEqual(len(rows), 1)
+
+    def test_without_the_provenance_an_unsigned_article_stays_out(self):
+        self.assertEqual(rq.build_queue({"30": self._entry()}, []), [])
+
+    def test_the_missing_definition_does_not_make_it_incomplete(self):
+        entry = self._entry(origine=vq.OFFICINA)
+        self.assertNotIn("definizione", {s["role"] for s in entry["sections"]})
+        self.assertEqual(len(rq.build_queue({"30": entry}, [])), 1)
 
 
 class TheQueueCarriesTheReadersAddress(unittest.TestCase):

@@ -96,6 +96,12 @@ COLUMNS = [
     "rilievi",
 ]
 
+# Il valore di `origine` che l'officina scrive nelle entry che produce
+# (`officina/pubblica.py`). E' la provenienza, non una firma: dice che quel
+# testo e' uscito dalla macchina nuova, dove il posto del revisore lo prendono
+# il lint e la revisione della diagnosi.
+OFFICINA = "officina"
+
 OUTCOMES = ("pulito", "smentito")
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 WHITESPACE = re.compile(r"\s+")
@@ -370,7 +376,19 @@ def build_queue(texts=None, verifications=None) -> list[dict]:
         # verifier would be measuring the writer, which is a useful experiment
         # (it is how the 4,8% above was obtained) and a terrible standing queue:
         # the reviewer is about to rewrite the sentences anyway.
-        current = bool(DATE.fullmatch(signed)) and entry.get("reviewed_vintage") == vintage
+        #
+        # L'officina non ha un revisore, e per questo entra dalla seconda porta.
+        # La condizione vera non e' "qualcuno ha firmato": e' "nessuno sta per
+        # riscrivere queste frasi", e per un articolo dell'officina il momento
+        # e' quando il lint non blocca piu' ed e' stato scritto. Senza questa
+        # riga la macchina nuova produceva articoli che la coda **non vedeva**:
+        # trecentosettantasette in catalogo, cinquanta firmati, e i tre della
+        # macchina nuova invisibili a valle. Cioe' l'unico passo di
+        # falsificazione indipendente che questo repo possieda, e l'unico che
+        # abbia una misura dietro (4,8% contro 1,3%), non si sarebbe mai
+        # applicato a cio' che scriviamo adesso.
+        current = (bool(DATE.fullmatch(signed)) and entry.get("reviewed_vintage") == vintage
+                   or entry.get("origine") == OFFICINA)
         fingerprint = prose_fingerprint(entry)
         rows = by_key.get((code, level), [])
         match = next((r for r in rows if (r.get("prosa") or "").strip() == fingerprint), None)
@@ -430,7 +448,8 @@ def summarize(rows: list[dict]) -> dict:
 def _print(rows: list[dict], limit: int) -> None:
     summary = summarize(rows)
     print(
-        f"{summary['articoli']} articoli, {summary['firmati']} firmati dal revisore, "
+        f"{summary['articoli']} articoli, {summary['firmati']} verificabili "
+        f"(firmati o dall'officina), "
         f"{summary['verificati']} verificati, {summary['da_verificare']} da verificare."
     )
     if summary["riverificare"]:

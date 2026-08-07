@@ -13,7 +13,7 @@ varianza della lunghezza delle frasi).
 
 Senza questo contatore un confronto prima/dopo sullo stadio gia' curato dal
 produttore darebbe zero su prose_lint e satura sulla rubrica (vedi
-docs/WRITING_QUALITY_PLAN.md, Parte seconda, buchi 1 e 3): due strumenti ciechi
+docs/archive/WRITING_QUALITY_PLAN.md, Parte seconda, buchi 1 e 3): due strumenti ciechi
 proprio sul braccio che decide se la skill aggiunge valore. Questo e' lo
 strumento mancante.
 

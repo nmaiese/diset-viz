@@ -19,72 +19,31 @@ import unittest.mock
 
 from app import indicator_texts
 from app.atlas_catalog import get_atlas_indicator
+from officina import lint
 from scripts import indicator_store
 
-# STYLE.md bans these in prose: em-dash, en-dash, semicolon, ellipsis char.
-BANNED = ("—", "–", ";", "…")
-# The lead is also the meta description. Google truncates well before this, and a
-# first sentence longer than this cannot work as one.
-LEAD_FIRST_SENTENCE_MAX = 200
+# Le guardie vere vivono in `officina/lint.py`, non qui. Ci stavano, ed era il
+# motivo per cui controllare un articolo voleva dire eseguire millecento test:
+# adesso il lint gira da solo in undici secondi e questa suite lo chiama. Una
+# implementazione, due chiamanti, nessuna delle due che invecchia per conto suo.
+BANNED = lint.BANNED
+LEAD_FIRST_SENTENCE_MAX = lint.LEAD_FIRST_SENTENCE_MAX
+
+_level_of = lint.level_of
+_view = lint.view_of
+_view_level = lint.view_level
+_values_of = lint.values_of
+_territory_alternation = lint.territory_alternation
+_prose = lint.prose_of
 
 
 def _load():
     return indicator_store.load_all()
 
 
-def _level_of(entry):
-    return entry.get("level") or indicator_texts.DEFAULT_LEVEL
-
-
-def _view(key):
-    """The view model behind an article key, or None if nothing serves it.
-
-    This is the question the *page* answers, and it is wider than the catalog:
-    a province-only BES series has a page and no catalog entry at all.
-    """
-    from app import sources
-    from app.indicator_view import build_indicator_view
-
-    family, raw_id = sources.split_internal_id(key)
-    return build_indicator_view(family, raw_id)
-
-
-def _view_level(key, entry):
-    """The view model of the level an entry was written for, or None.
-
-    Everything level-specific has to come from `levels`, never from `meta`:
-    `meta.year_min/year_max` and `meta.explain` span all levels at once, which is
-    exactly how a provincial article ended up judged against regional years.
-    """
-    view = _view(key)
-    if view is None:
-        return None
-    wanted = _level_of(entry)
-    return next((lv for lv in view["levels"] if lv["key"] == wanted), None)
-
-
 def _level_year_max(key, entry):
     level = _view_level(key, entry)
     return level["year_max"] if level else None
-
-
-def _prose(entry):
-    """Every piece of hand-written prose in an entry, as (field, text).
-
-    Titoli autorati compresi: sono prosa visibile, e i caratteri vietati non
-    conoscono l'eccezione del titolo.
-    """
-    fields = []
-    for field in ("h1", "seo_title"):
-        value = entry.get(field)
-        if isinstance(value, str) and value.strip():
-            fields.append((field, value))
-    if entry.get("lead"):
-        fields.append(("lead", entry["lead"]))
-    for section in entry.get("sections") or []:
-        if section.get("body"):
-            fields.append((f"sections.{section.get('role')}", section["body"]))
-    return fields
 
 
 class ArticleStructure(unittest.TestCase):
@@ -165,12 +124,39 @@ class ArticleStructure(unittest.TestCase):
             unsigned, [], f"reviewed_at without reviewed_vintage: {unsigned[:10]}"
         )
 
-    def test_the_committed_articles_are_all_four_sections(self):
-        """Nessun articolo esistente dichiara `roles_covered`: le sezioni variabili
-        sono opt-in, e finche' nessuno opta i trecento restano a quattro sezioni,
-        impronta della prosa invariata. E' cio' che rende il cambio additivo."""
-        opted = [key for key, entry in self.texts.items() if entry.get("roles_covered")]
-        self.assertEqual(opted, [], f"articoli gia' opt-in (attesi nessuno): {opted[:10]}")
+    def test_an_opted_in_article_declares_a_coherent_set_of_roles(self):
+        """La coerenza di `roles_covered`, non il divieto di usarlo.
+
+        Fino ad agosto 2026 questo test asseriva che l'elenco fosse **vuoto**:
+        nessun articolo poteva dichiarare `roles_covered`, cioe' nessuno poteva
+        usare il solo meccanismo costruito per non aprire sulla definizione.
+        Progettato, implementato, documentato in `docs/INDICATOR_PAGES.md`, e
+        usato da 0 file su 375, perche' un test lo vietava. Il freno di
+        sicurezza di un rilascio graduale era diventato il motivo per cui il
+        rilascio non partiva mai, e intanto 52 articoli su 52 aprivano allo
+        stesso modo.
+
+        Adesso il vincolo e' quello vero: se opti, dichiara ruoli che esistono,
+        e `definizione` resta l'unico assorbibile, perche' quadro, dinamica e
+        limiti sono l'articolo.
+        """
+        wrong = []
+        for key, entry in self.texts.items():
+            declared = entry.get("roles_covered")
+            if not declared:
+                continue
+            if not isinstance(declared, list):
+                wrong.append((key, "roles_covered non e' una lista"))
+                continue
+            known = set(indicator_texts.DEFAULT_HEADINGS)
+            unknown = [role for role in declared if role not in known]
+            if unknown:
+                wrong.append((key, f"ruoli sconosciuti: {unknown}"))
+            written = {section.get("role") for section in entry.get("sections") or []}
+            for role in sorted(indicator_texts.SUBSTANTIVE_ROLES):
+                if role not in written:
+                    wrong.append((key, f"manca la sezione {role}"))
+        self.assertEqual(wrong, [], f"opt-in incoerenti: {wrong[:10]}")
 
 
 class VariableSectionsAreOptIn(unittest.TestCase):
@@ -202,10 +188,60 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: entry):
             return indicator_texts.build_article("432", "regione")
 
+    DUE_DINAMICHE = {
+        "level": "regione", "lead": "Un lead.", "vintage": 2023,
+        "sections": [
+            {"role": "quadro", "h": "Il vertice", "body": "Corpo quadro."},
+            {"role": "dinamica", "h": "La distanza si chiude", "body": "Primo corpo dinamica."},
+            {"role": "dinamica", "h": "Il gruppo piu' in basso", "body": "Secondo corpo dinamica."},
+            {"role": "limiti", "h": "Che cosa non dice", "body": "Corpo limiti."},
+        ],
+    }
+
+    def test_two_sections_on_the_same_role_keep_both_bodies(self):
+        """Il difetto si vedeva in pagina e nessuna guardia lo prendeva.
+
+        `authored` era un dizionario per ruolo, quindi con due `dinamica` la
+        seconda sovrascriveva la prima: la pagina rendeva **due volte lo stesso
+        corpo** e perdeva l'altro. Uscito dal primo giro della macchina nuova su
+        `ter-30`. `officina.pubblica` adesso rifiuta i ruoli doppi, ma il
+        renderer deve reggere le entry gia' committate e quelle scritte a mano.
+        """
+        art = self._build(self.DUE_DINAMICHE)
+        corpi = [s["body"] for s in art["sections"]]
+        self.assertEqual(len(corpi), len(set(corpi)), "una sezione e' stata resa due volte")
+        self.assertIn("Primo corpo dinamica.", corpi)
+        self.assertIn("Secondo corpo dinamica.", corpi)
+
     def test_an_opt_in_entry_omits_the_definizione_h2(self):
         art = self._build(self.OPT_IN)
         self.assertEqual([s["role"] for s in art["sections"]], ["quadro", "dinamica", "limiti"])
         self.assertTrue(art["come_leggere"])
+
+    def test_the_coherence_guard_accepts_a_well_formed_opt_in(self):
+        """Il divieto e' caduto davvero, non solo sulla carta.
+
+        La guardia che prima vietava `roles_covered` adesso ne controlla la
+        coerenza. Un test che gira su un catalogo dove nessuno opta ancora non
+        dimostra niente: qui l'entry opt-in viene passata alla guardia vera.
+        """
+        guard = ArticleStructure("test_an_opted_in_article_declares_a_coherent_set_of_roles")
+        guard.texts = {"432": self.OPT_IN}
+        guard.test_an_opted_in_article_declares_a_coherent_set_of_roles()
+
+    def test_the_coherence_guard_still_catches_a_broken_opt_in(self):
+        """E la guardia non e' diventata un colabrodo mentre smetteva di vietare."""
+        guard = ArticleStructure("test_an_opted_in_article_declares_a_coherent_set_of_roles")
+        guard.texts = {"432": dict(self.OPT_IN, roles_covered=["inventato"])}
+        with self.assertRaises(AssertionError):
+            guard.test_an_opted_in_article_declares_a_coherent_set_of_roles()
+
+        missing = dict(self.OPT_IN,
+                       sections=[s for s in self.OPT_IN["sections"]
+                                 if s["role"] != "dinamica"])
+        guard.texts = {"432": missing}
+        with self.assertRaises(AssertionError):
+            guard.test_an_opted_in_article_declares_a_coherent_set_of_roles()
 
     def test_a_partial_declaration_still_renders_the_three_substantive_roles(self):
         """Solo la definizione e' assorbibile. Senza questa invariante nel
@@ -274,6 +310,21 @@ class VariableSectionsAreOptIn(unittest.TestCase):
 
 
 class SectionsUseKnownRoles(unittest.TestCase):
+    """Il contratto sui ruoli doppi ha **due meta' opposte, e sono volute**:
+
+    - **scrittore severo**: `officina.pubblica` rifiuta una bozza con due
+      sezioni dello stesso ruolo (`test_officina_pubblica.py`), e nessun
+      articolo committato ne ha (il test qui sotto);
+    - **lettore tollerante**: `indicator_texts.build_article` rende **entrambi**
+      i corpi se li trova (`ADuplicatedRoleLosesNoBody`).
+
+    Chi ne vedesse una sola meta' la leggerebbe come un'incoerenza e
+    "aggiusterebbe" quella sbagliata. La severita' in scrittura esiste perche' il
+    contratto e' una sezione per ruolo; la tolleranza in lettura esiste perche'
+    trecento entry scritte a mano non sono passate da nessun comando, e un corpo
+    perso in silenzio e' peggio di un articolo con un H2 di troppo.
+    """
+
     def setUp(self):
         self.texts = indicator_store.load_all()
 
@@ -342,6 +393,58 @@ class SectionsUseKnownRoles(unittest.TestCase):
             if char in text
         ]
         self.assertEqual(offenders, [], f"style violations: {offenders[:10]}")
+
+
+class ADuplicatedRoleLosesNoBody(unittest.TestCase):
+    """La meta' tollerante del contratto, che finora non provava nessuno.
+
+    `build_article` indicizzava le sezioni per ruolo. Un'entry con due
+    `dinamica` (la macchina nuova ne ha scritta una al primo giro, con due
+    titoli diversi) perdeva la prima: la pagina rendeva **due volte lo stesso
+    corpo** e l'altro spariva senza lasciare traccia. Chi scriveva lo vedeva
+    impaginato, e nessuna guardia lo vedeva.
+
+    I test che esistevano intorno provano tutti l'**assenza** di duplicati
+    (`officina.pubblica` li rifiuta, nessun articolo committato ne ha). Nessuno
+    provava la **tolleranza**, cioe' la riparazione vera, che protegge le
+    trecento entry scritte a mano che non sono passate da nessun comando.
+    """
+
+    ENTRY = {"sections": [
+        {"role": "quadro", "h": "Il quadro", "body": "Corpo del quadro."},
+        {"role": "dinamica", "h": "La rincorsa", "body": "Primo corpo di dinamica."},
+        {"role": "limiti", "h": "I limiti", "body": "Corpo dei limiti."},
+        {"role": "dinamica", "h": "Il sorpasso", "body": "Secondo corpo di dinamica."},
+    ]}
+
+    def _article(self):
+        with unittest.mock.patch.object(indicator_texts, "get_text", return_value=self.ENTRY):
+            return indicator_texts.build_article("__synthetic__")
+
+    def test_both_bodies_reach_the_page(self):
+        corpi = [section["body"] for section in self._article()["sections"]]
+        self.assertIn("Primo corpo di dinamica.", corpi)
+        self.assertIn("Secondo corpo di dinamica.", corpi)
+
+    def test_no_body_is_rendered_twice(self):
+        """Il difetto non era solo "un corpo perso": era anche "un corpo
+        duplicato". Perderne uno senza accorgersene e' invisibile, vederne due
+        uguali in pagina e' l'unico sintomo che qualcuno poteva notare."""
+        corpi = [s["body"] for s in self._article()["sections"] if s["body"]]
+        self.assertEqual(len(corpi), len(set(corpi)))
+
+    def test_each_body_keeps_its_own_heading(self):
+        """Le due sezioni hanno titoli diversi, ed e' il motivo per cui erano
+        due: appaiarle al corpo sbagliato sarebbe un altro modo di perderle."""
+        appaiati = {s["body"]: s["heading"] for s in self._article()["sections"] if s["body"]}
+        self.assertEqual(appaiati["Primo corpo di dinamica."], "La rincorsa")
+        self.assertEqual(appaiati["Secondo corpo di dinamica."], "Il sorpasso")
+
+    def test_the_authored_order_still_wins(self):
+        """La sequenza scritta sopravvive anche col ruolo ripetuto: la
+        tolleranza non deve costare la promessa fatta a chi scrive."""
+        self.assertEqual([s["role"] for s in self._article()["sections"]],
+                         ["quadro", "dinamica", "limiti", "dinamica"])
 
 
 class ParagraphsSurviveRendering(unittest.TestCase):
@@ -566,95 +669,150 @@ class ArticleAgainstTheData(unittest.TestCase):
     Only figures carrying a decimal are checked: a bare integer in this prose is
     almost always an approximation ("circa 27%", "quasi 78%").
 
-    Known gap, unchanged from the previous guard and worth stating: REGIONS knows
-    only the twenty regions, so a figure attributed to a *province* in a BES
-    article is verified by nothing here.
+    The gap these used to carry is closed: the territory names come from the
+    data now, not from a list of the twenty regions typed into this file, so a
+    figure attributed to a *province* is checked against provinces. Under the
+    old list 67 provincial indicators over 103 provinces were verified by
+    nothing, and nothing failed to say so.
+
+    What is still uncovered, and stays uncovered on purpose: a name the prose
+    spells differently from the dataset ("Reggio Emilia" for "Reggio
+    nell'Emilia") matches nothing and passes. That misses coverage, it never
+    invents a failure.
     """
 
-    REGIONS = (
-        "Trentino Alto Adige|Friuli-Venezia Giulia|Emilia-Romagna|Valle d'Aosta|Lombardia|"
-        "Piemonte|Liguria|Veneto|Toscana|Umbria|Marche|Lazio|Abruzzo|Molise|Campania|Puglia|"
-        "Basilicata|Calabria|Sicilia|Sardegna"
-    )
-    NUMBER = r"(\d{1,3}(?:\.\d{3})*(?:,\d+)?|\d+(?:,\d+)?)"
-    # "il 24,3% del Molise": the number is bound to the region that follows it.
-    VALUE_OF_REGION = re.compile(
-        NUMBER + r"\s*(?:%|per cento|punti|anni|euro)?\s+"
-        r"(?:di|del|della|dell'|degli|delle|in|a|ad|nel|nella)\s+(" + REGIONS + r")"
-    )
-    ABOVE = r"(?:supera(?:no)?|sopra|oltre|più di|almeno|maggiore di)"
-    BELOW = r"(?:scende|scendono|sotto|meno di|inferiore a|non arriva)"
-    THRESHOLD_OVER_REGIONS = re.compile(
-        rf"\b({ABOVE}|{BELOW})\s+(?:il|lo|la|i|gli|le|a|ai|al)?\s*{NUMBER}\s*(?:%|per cento)?\s*"
-        rf"(?:in|a|nel|nella|per)\s+((?:{REGIONS})(?:\s*(?:,|e)\s*(?:{REGIONS}))*)",
-        re.I,
-    )
+    # I pattern, le esclusioni e la logica stanno in `officina/lint.py`: qui
+    # c'erano le uniche copie, e una copia in un file di test e' una copia che
+    # nessuno aggiorna quando cambia la prosa.
+    NUMBER, ABOVE, BELOW, STATE = lint.NUMBER, lint.ABOVE, lint.BELOW, lint.STATE
+    HEDGE, A_GAP = lint.HEDGE, lint.A_GAP
+    ANOTHER_YEAR, ANOTHER_INDICATOR = lint.ANOTHER_YEAR, lint.ANOTHER_INDICATOR
 
     @classmethod
     def setUpClass(cls):
         cls.texts = _load()
+        cls.TERRITORIES = lint.territory_alternation(cls.texts)
+        compiled = lint.patterns(cls.TERRITORIES)
+        cls.VALUE_OF_TERRITORY = compiled["value_of"]
+        cls.TERRITORY_STATES_VALUE = compiled["states_value"]
+        cls.THRESHOLD_OVER_TERRITORIES = compiled["threshold"]
 
     @staticmethod
     def _number(raw):
         return float(raw.replace(".", "").replace(",", "."))
 
-    def _values(self, key, entry):
-        """{territory: value} for the year and level the article describes.
-
-        Read from the level's own matrix rather than `payload["series"]`. On a
-        two-level BES that series carries the twenty regions only, so a
-        provincial article was being compared against a regional table in which
-        no province name exists: the two guards below did not fail, they simply
-        matched nothing. Now a provincial figure is checked against provinces,
-        and the REGIONS regex is the only thing still limiting the coverage.
-        """
-        level = _view_level(key, entry)
-        if level is None:
-            return {}
-        year = entry.get("vintage") or level["year_max"]
-        matrix = level["matrix"].get(str(year)) or {}
-        names = {row["key"]: row["name"] for row in level["observations"]}
-        return {
-            names.get(territory_key, territory_key): value
-            for territory_key, value in matrix.items()
-            if value is not None
-        }
-
-    def test_figures_attributed_to_a_region_match_that_region(self):
+    def test_figures_attributed_to_a_territory_match_that_territory(self):
         wrong = []
         for key, entry in self.texts.items():
-            values = self._values(key, entry)
+            values = _values_of(key, entry)
             if not values:
                 continue
             for field, text in _prose(entry):
-                for match in self.VALUE_OF_REGION.finditer(text):
-                    raw, region = match.group(1), match.group(2)
-                    if "," not in raw or region not in values:
+                for match in self.VALUE_OF_TERRITORY.finditer(text):
+                    raw, territory = match.group(1), match.group(2)
+                    if "," not in raw or territory not in values:
                         continue
-                    actual = values[region]
+                    actual = values[territory]
                     if abs(self._number(raw) - actual) > max(0.06, abs(actual) * 0.011):
-                        wrong.append((key, field, region, raw, round(actual, 2)))
+                        wrong.append((key, field, territory, raw, round(actual, 2)))
         self.assertEqual(wrong, [], f"figures that contradict the data: {wrong[:10]}")
 
-    def test_thresholds_hold_for_every_region_they_name(self):
+    @classmethod
+    def _states_a_value(cls, text, match):
+        return lint.states_a_value(text, match)
+
+    def test_figures_stated_after_the_territory_match_it(self):
+        """Il verso che la prosa provinciale usa davvero.
+
+        Qui gli interi contano, con una tolleranza di mezzo punto: su una serie
+        provinciale come il PM10 un intero e' il valore, non un'approssimazione,
+        e saltarlo lasciava scoperta l'intera famiglia.
+        """
         wrong = []
         for key, entry in self.texts.items():
-            values = self._values(key, entry)
+            values = _values_of(key, entry)
             if not values:
                 continue
             for field, text in _prose(entry):
-                for match in self.THRESHOLD_OVER_REGIONS.finditer(text):
+                for match in self.TERRITORY_STATES_VALUE.finditer(text):
+                    territory, raw = match.group(1), match.group(2)
+                    if territory not in values or not self._states_a_value(text, match):
+                        continue
+                    actual = values[territory]
+                    floor = 0.06 if "," in raw else 0.5
+                    if abs(self._number(raw) - actual) > max(floor, abs(actual) * 0.011):
+                        wrong.append((key, field, territory, raw, round(actual, 2)))
+        self.assertEqual(wrong, [], f"figures that contradict the data: {wrong[:10]}")
+
+    def test_thresholds_hold_for_every_territory_they_name(self):
+        wrong = []
+        for key, entry in self.texts.items():
+            values = _values_of(key, entry)
+            if not values:
+                continue
+            for field, text in _prose(entry):
+                for match in self.THRESHOLD_OVER_TERRITORIES.finditer(text):
                     verb, raw, listed = match.group(1), match.group(2), match.group(3)
                     threshold = self._number(raw)
                     above = bool(re.match(self.ABOVE, verb, re.I))
-                    for region in re.findall(self.REGIONS, listed):
-                        if region not in values:
+                    for territory in re.findall(self.TERRITORIES, listed):
+                        if territory not in values:
                             continue
-                        actual = values[region]
+                        actual = values[territory]
                         ok = (actual >= threshold - 0.06) if above else (actual <= threshold + 0.06)
                         if not ok:
-                            wrong.append((key, field, region, verb, raw, round(actual, 2)))
+                            wrong.append((key, field, territory, verb, raw, round(actual, 2)))
         self.assertEqual(wrong, [], f"claims the data contradicts: {wrong[:10]}")
+
+    def test_the_guard_actually_reaches_the_provinces(self):
+        """Una guardia che non copre piu' niente non lo dice da sola.
+
+        E' esattamente come sono passati i 67 indicatori provinciali: i test
+        sopra giravano, non incontravano nessun nome, e restavano verdi. Questo
+        e' il test che si accorge dello spegnimento.
+        """
+        provincial = {key: entry for key, entry in self.texts.items()
+                      if _level_of(entry) == "provincia"}
+        self.assertTrue(provincial, "nessun articolo provinciale da coprire")
+
+        names = set()
+        for key, entry in provincial.items():
+            names.update(_values_of(key, entry))
+        self.assertGreater(len(names), 50,
+                           f"solo {len(names)} nomi provinciali nell'alternativa")
+        province = sorted(names)[0]
+        self.assertRegex(f"il 24,3% di {province}", self.VALUE_OF_TERRITORY)
+        self.assertRegex(f"{province} si ferma a 18", self.TERRITORY_STATES_VALUE)
+
+    def test_a_wrong_figure_does_not_slip_through(self):
+        """Verde per merito, non per inerzia.
+
+        Le due guardie sono passate per mesi perche' non incontravano niente da
+        controllare. Qui la prosa e' sintetica: se una di queste smette di
+        vedere una cifra sbagliata, il test lo dice subito, senza dipendere da
+        che cosa c'e' scritto oggi negli articoli.
+        """
+        # I due pattern portano il numero in gruppi opposti: nel primo la cifra
+        # precede il territorio, nel secondo lo segue.
+        cases = (
+            ("il 40,1% della Campania", self.VALUE_OF_TERRITORY, 1, "40,1"),
+            ("la Campania si ferma a 40,1", self.TERRITORY_STATES_VALUE, 2, "40,1"),
+            ("Gorizia si ferma a 18", self.TERRITORY_STATES_VALUE, 2, "18"),
+        )
+        for text, pattern, group, expected in cases:
+            with self.subTest(text=text):
+                match = pattern.search(text)
+                self.assertIsNotNone(match, "la guardia non vede questa forma")
+                self.assertEqual(match.group(group), expected)
+
+        # e le tre esclusioni restano esclusioni
+        for text in ("il Molise sta 39,4 punti sopra le Marche",
+                     "la Sardegna segna 81,67 nel 2020",
+                     "il [tasso](/indicatore/x/ter-407), dove la Campania si ferma a 21,80"):
+            with self.subTest(text=text):
+                match = self.TERRITORY_STATES_VALUE.search(text)
+                self.assertFalse(match and self._states_a_value(text, match),
+                                 "questa non e' una cifra da confrontare")
 
 
 class ArticleRendering(unittest.TestCase):
@@ -708,10 +866,71 @@ class ArticleRendering(unittest.TestCase):
             article = indicator_texts.build_article("__synthetic__")
         by_role = {section["role"]: section for section in article["sections"]}
         self.assertEqual(by_role["quadro"]["heading"], "Un titolo scritto a mano")
+        # I ruoli che l'entry non scrive si compongono e prendono
+        # l'intestazione di default. Un articolo a meta' non dichiara niente,
+        # quindi la definizione resta: e' il caso dei trecento incompleti.
         self.assertEqual(
             by_role["definizione"]["heading"],
             indicator_texts.DEFAULT_HEADINGS["definizione"],
         )
+
+    def test_a_half_written_article_is_not_making_a_declaration(self):
+        """Incompleto non vuol dire "ho scelto questa forma".
+
+        Trecentoventidue entry in `content/indicators/` hanno scritto `quadro` e
+        `limiti` e nient'altro. Con la condizione debole ("almeno un ruolo
+        sostanziale") sono passate tutte a `quadro, limiti, dinamica` con la
+        definizione assorbita: un cambio di pagina su 322 articoli che nessuno
+        aveva chiesto. Dichiara solo chi scrive **tutti e tre** i sostanziali.
+        """
+        entry = {"sections": [{"role": "quadro", "h": "a", "body": "Corpo."},
+                              {"role": "limiti", "h": "b", "body": "Corpo."}]}
+        with unittest.mock.patch.object(indicator_texts, "get_text", return_value=entry):
+            article = indicator_texts.build_article("__synthetic__")
+        self.assertEqual([section["role"] for section in article["sections"]],
+                         list(indicator_texts.ROLE_ORDER))
+        self.assertFalse(article["come_leggere"])
+
+    def test_the_committed_catalogue_does_not_move(self):
+        """Il guardiano dei trecento, contato invece che promesso."""
+        from scripts import indicator_store
+        canonica = tuple(indicator_store.load_all() and indicator_texts.ROLE_ORDER)
+        mossi = [key for key, entry in indicator_store.load_all().items()
+                 if tuple(indicator_texts.emitted_roles(entry)) != canonica
+                 and not indicator_texts.SUBSTANTIVE_ROLES.issubset(
+                     {s.get("role") for s in entry.get("sections") or []
+                      if (s.get("body") or "").strip()})]
+        self.assertEqual(mossi, [],
+                         "un articolo incompleto ha cambiato forma in pagina")
+
+    def test_the_authored_order_survives_to_the_page(self):
+        """La sequenza che chi scrive sceglie non si riordina al render.
+
+        Il pacchetto gli dice che la struttura nasce dall'angolo piu' forte, e
+        la prima prova ha prodotto `quadro, limiti, dinamica`: la pagina lo
+        rimetteva in ordine canonico, cioe' buttava via l'unica cosa che rompe
+        lo stampo. Una promessa fatta a chi scrive e disfatta al render e'
+        peggio di una promessa non fatta.
+        """
+        entry = {"sections": [
+            {"role": "quadro", "h": "a", "body": "Corpo."},
+            {"role": "limiti", "h": "b", "body": "Corpo."},
+            {"role": "dinamica", "h": "c", "body": "Corpo."},
+        ]}
+        with unittest.mock.patch.object(indicator_texts, "get_text", return_value=entry):
+            article = indicator_texts.build_article("__synthetic__")
+        self.assertEqual([section["role"] for section in article["sections"]],
+                         ["quadro", "limiti", "dinamica"])
+
+    def test_a_committed_four_section_article_keeps_the_canonical_order(self):
+        """I trecento non si muovono: scrivono i quattro ruoli in ordine."""
+        entry = {"sections": [{"role": role, "h": role, "body": "Corpo."}
+                              for role in indicator_texts.ROLE_ORDER]}
+        with unittest.mock.patch.object(indicator_texts, "get_text", return_value=entry):
+            article = indicator_texts.build_article("__synthetic__")
+        self.assertEqual([section["role"] for section in article["sections"]],
+                         list(indicator_texts.ROLE_ORDER))
+        self.assertFalse(article["come_leggere"])
 
 
 class ProseStaysOnTheLevelItWasWrittenFor(unittest.TestCase):

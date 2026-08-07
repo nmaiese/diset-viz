@@ -44,14 +44,15 @@ quei calcoli altrove.
 `scripts/indicator_store.py`, che possiede la codifica e la spiega per intero.
 
 Era un JSON unico da 365 voci sotto `app/static/data/`, e il formato costava due
-cose distinte. Scrittore e revisore condividono il perimetro e girano tutti e
-due ogni giorno, quindi ogni loro modifica riscriveva l'intero file e due run
-vicine su articoli diversi finivano in conflitto su qualcosa che nessun agente
+cose distinte. Scrittore e revisore (due agenti che allora esistevano)
+condividevano il perimetro e giravano tutti e due ogni giorno, quindi ogni loro
+modifica riscriveva l'intero file e due run vicine su articoli diversi finivano
+in conflitto su qualcosa che nessun agente
 può risolvere leggendolo. E il diff di una revisione non diceva di quale
 indicatore parlasse, perché la chiave che possiede le righe cambiate poteva
 stare cento righe più su.
 
-Adesso `git log content/indicators/ter__920.json` è la storia editoriale di
+Adesso `git log content/indicators/920.json` è la storia editoriale di
 quella pagina, e due stadi che lavorano su articoli diversi non hanno niente da
 fondere.
 
@@ -110,10 +111,17 @@ Le regole, tutte meccaniche:
 - **Il campo è opt-in e additivo.** Senza `roles_covered` la pagina rende i
   quattro ruoli come ha sempre fatto, e i trecento articoli esistenti non
   cambiano di un byte.
+- **Ed è usabile.** Fino ad agosto 2026 non lo era: un test asseriva che
+  l'elenco degli articoli opt-in fosse *vuoto*, quindi il solo meccanismo
+  costruito per non aprire sulla definizione era progettato, implementato,
+  documentato qui, e vietato. Zero file su 375 lo usavano, mentre 52 articoli
+  su 52 aprivano allo stesso modo: il freno di sicurezza di un rilascio
+  graduale era diventato il motivo per cui il rilascio non partiva. Adesso la
+  guardia controlla la coerenza di chi opta, non il fatto che qualcuno opti.
 - **Un ruolo assorbito non è un ruolo mancante.** `scripts/text_queue.py` e
-  `scripts/pending_notes.py` contano contro i ruoli emessi, altrimenti il
-  produttore troverebbe per sempre la `definizione` «da scrivere» e la
-  riscriverebbe a ogni run.
+  `scripts/pending_notes.py` contano contro i ruoli emessi, altrimenti chi
+  scrive troverebbe per sempre la `definizione` «da scrivere» e la
+  riscriverebbe a ogni giro.
 - **Assorbire la definizione cambia l'impronta della prosa.** Cambia cosa la
   pagina mostra senza toccare una parola, quindi `prose_fingerprint` mescola
   l'insieme dei ruoli emessi quando non è quello di sempre: verifica e lettura
@@ -135,16 +143,25 @@ Lo garantisce `ProseStaysOnTheLevelItWasWrittenFor` in `tests/integration/test_i
 Si comincia sempre da qui:
 
 ```bash
-.venv/bin/python -m scripts.indicator_brief ter-178
-.venv/bin/python -m scripts.indicator_brief bes-01SAL001 --level provincia
+bin/py -m officina.pacchetti ter-178          # il pacchetto: cifre, angoli, contesto
+bin/py -m officina.brief ter-178              # il testo che si mette davanti a chi scrive
 ```
 
-Il brief è per livello, in ogni sua parte: cifre, stato dell'articolo e `vintage`
-richiesto. Chiudendo, stampa il valore che il campo `level` deve avere. Prima
-ignorava il livello nel blocco finale, quindi su `--level provincia` dichiarava
-scritte le sezioni dell'articolo *regionale* davanti a una pagina vuota.
+Non più `scripts/indicator_brief.py`: è stato **assorbito in `packs/`**, che ne
+era la riscrittura, e il file non esiste più. Chi scrive un articolo adesso non
+lancia niente a mano, lo fa il workflow:
 
-Il brief stampa la graduatoria completa con la variazione di ogni territorio dal
+```bash
+Workflow({scriptPath: ".claude/workflows/produci-indicatori.js", args: ["ter-178"]})
+```
+
+Il pacchetto è per livello, in ogni sua parte: cifre, stato dell'articolo e
+`vintage` richiesto. Chiudendo, stampa il valore che il campo `level` deve avere.
+Prima ignorava il livello nel blocco finale, quindi su `--level provincia`
+dichiarava scritte le sezioni dell'articolo *regionale* davanti a una pagina
+vuota.
+
+Il pacchetto stampa la graduatoria completa con la variazione di ogni territorio dal
 primo anno, dove la distribuzione si spezza davvero, chi si è mosso in
 controtendenza e che cosa la pagina dice già da sola. Esiste per una ragione
 precisa: scrivendo contro due o tre cifre pescate dall'API si finisce per
@@ -164,7 +181,7 @@ agli estremi di questa.
 Le regole editoriali complete stanno in `content/STYLE.md`, e le classi di
 errore che solo una lettura trova nella skill condivisa
 `.claude/skills/indicator-review/` (il prompt del produttore,
-`.claude/agents/producer.md`, che scrive e si rilegge, ormai punta e non
+L'officina, che scrive e si rilegge, ormai punta e non
 ricopia). La rubrica
 con cui si misura il risultato, dieci criteri e una soglia sotto la quale
 l'articolo non è pronto, sta in [`WRITING_RUBRIC.md`](WRITING_RUBRIC.md). Le fonti secondarie ammesse stanno in
@@ -279,15 +296,18 @@ indicatori è confrontato con una fixture estratta dal codice precedente, e ogni
 pagina viene resa per verificare che non ci siano 500.
 
 Restano **fuori dai test**, e vanno rivisti a mano. Non a memoria, però:
-`.venv/bin/python -m scripts.review_queue` cerca esattamente questi pattern e
+`bin/py -m scripts.review_queue` cerca esattamente questi pattern e
 mette in fila gli articoli per quanto è probabile che siano sbagliati. Li
-rilegge il produttore (`.claude/agents/producer.md`), che ha assorbito il
+rilegge l'officina (`.claude/workflows/produci-indicatori.js`), che ha assorbito il
 revisore e si rilegge il proprio testo, e a valle il verificatore indipendente
 prova a smentirlo.
 
 Un articolo firmato porta **due** campi, `reviewed_at` e `reviewed_vintage`, e
-solo con entrambi esce dalla coda. Il secondo è il `vintage` che il revisore
-aveva davanti: quando lo scrittore aggiorna l'articolo su un anno nuovo tutte le
+solo con entrambi esce dalla coda. I due campi restano vivi anche adesso che
+nessun agente firma: li scrivevano il revisore e poi il produttore, e oggi un
+articolo dell'officina esce dalla coda con `origine: officina` al loro posto. Il
+secondo è il `vintage` che chi ha riletto aveva davanti: quando l'articolo si
+aggiorna su un anno nuovo tutte le
 cifre cambiano, i due valori smettono di combaciare e l'articolo **rientra** in
 coda col segnale `rilettura`, che pesa più di ogni segnale di rischio. Gli altri
 marcano una frase che potrebbe essere sbagliata, quello marca un articolo in cui
@@ -300,9 +320,14 @@ non è stato controllato niente. Vedi
   riformulano come contesto, non come causa accertata,
 - i confronti con l'estero ("tra i più alti d'Europa"): richiedono una fonte in
   `fonti`, verificata, altrimenti vanno tolti,
-- **le cifre attribuite a una provincia**: la regex delle guardie conosce solo le
-  venti regioni, quindi in un articolo BES a livello provinciale nessun controllo
-  automatico le verifica,
+- **una provincia scritta con un nome che il dataset non usa** ("Reggio Emilia"
+  per "Reggio nell'Emilia"): la guardia non trova il nome e passa. Manca
+  copertura, non inventa un errore. Fino ad agosto 2026 qui c'era un buco molto
+  più largo, cioè l'intero livello provinciale: la regex elencava a mano le venti
+  regioni, quindi 67 indicatori su 103 province non erano verificati da niente e
+  le guardie restavano verdi senza incontrare un solo nome. Ora l'elenco dei
+  territori si deriva dai dati, e `test_the_guard_actually_reaches_the_provinces`
+  fallisce se la copertura si rispegne,
 - **se l'incrocio con un altro indicatore è onesto**: il verbo calibrato sulla
   prova (una correlazione di rango è una co-occorrenza, non un meccanismo), il
   confondente nominato, almeno un'eccezione al pattern. Le guardie controllano

@@ -1,0 +1,47 @@
+#!/bin/sh
+# L'interprete del progetto, in un posto solo.
+#
+# Non e' comodita': e' una correzione. Nella prima run del workflow tutti e
+# quattro gli scrittori hanno aperto con `python3 -m officina.brief`, che
+# fallisce perche' `python3` qui e' una funzione di shell che senza
+# $VIRTUAL_ENV cade su un interprete senza flask; poi con `.venv/bin/python`,
+# che in questo worktree non esiste (exit 127). Quattro turni di caccia a
+# testa, e i turni si rileggono col quadrato.
+#
+# Peggio: un pubblicatore ha finito per eseguire il lint con l'interprete di un
+# ALTRO worktree. Due interpreti nella stessa run vuol dire potenzialmente due
+# codici e due verdetti, ed e' un difetto di correttezza, non di costo.
+#
+# L'errore era gia' in data/pipeline/tool_failures.jsonl tre ore prima della
+# run, su ter-178. Un canale che nessuno legge non e' un canale.
+#
+#     bin/py -m officina.lint ter-176
+#     bin/py -m unittest discover -s tests
+#
+# Si sceglie il primo interprete che esiste, in ordine di specificita'. Se ne
+# aggiungi uno, mettilo prima del fallback, mai dopo.
+set -eu
+
+here=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+
+# Solo percorsi derivati: il worktree, l'ambiente attivo, oppure una variabile.
+# Una versione precedente inchiodava qui il percorso di un altro checkout, che
+# e' esattamente il difetto che questo file esiste per chiudere: un interprete
+# di un altro worktree e' potenzialmente un altro codice, quindi un altro
+# verdetto sullo stesso articolo. Un file committato non porta il percorso di
+# una macchina.
+for candidate in \
+    "${DIVARIO_PYTHON:-}" \
+    "$here/.venv/bin/python" \
+    "${VIRTUAL_ENV:+$VIRTUAL_ENV/bin/python}"
+do
+    [ -n "$candidate" ] && [ -x "$candidate" ] || continue
+    exec "$candidate" "$@"
+done
+
+echo "bin/py: nessun interprete con le dipendenze del progetto." >&2
+echo "Cercati, in ordine: \$DIVARIO_PYTHON, $here/.venv/bin/python, \$VIRTUAL_ENV/bin/python" >&2
+echo >&2
+echo "Crealo qui:  python3 -m venv $here/.venv && $here/.venv/bin/pip install -r requirements.txt" >&2
+echo "Oppure punta a uno che hai gia':  export DIVARIO_PYTHON=/percorso/al/venv/bin/python" >&2
+exit 127

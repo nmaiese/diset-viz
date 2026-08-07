@@ -50,18 +50,18 @@ class GuardIsAnchoredToTheRunWorktree(unittest.TestCase):
         # Il cancello stesso, dentro il worktree, con un percorso assoluto: prima
         # passava come scratch esterno, ora e' misurato dal worktree e bloccato.
         target = str(self.worktree / "scripts" / "pipeline_gate.py")
-        ok, reason = agent_guard.path_verdict(target, ["writer"])
+        ok, reason = agent_guard.path_verdict(target, ["verificatore"])
         self.assertFalse(ok)
         self.assertIn("perimetro", reason)
 
     def test_a_write_inside_the_perimeter_in_the_worktree_is_allowed(self):
-        target = str(self.worktree / "content" / "indicators" / "ter-1.json")
-        ok, _ = agent_guard.path_verdict(target, ["writer"])
+        target = str(self.worktree / "data" / "pipeline" / "verifiche" / "ter-1-regione-abc.json")
+        ok, _ = agent_guard.path_verdict(target, ["verificatore"])
         self.assertTrue(ok)
 
     def test_genuine_external_scratch_is_still_allowed(self):
         # Un percorso davvero fuori da ogni repo resta scratch legittimo.
-        ok, _ = agent_guard.path_verdict(str(Path(self._tmp.name) / "appunti.md"), ["writer"])
+        ok, _ = agent_guard.path_verdict(str(Path(self._tmp.name) / "appunti.md"), ["verificatore"])
         self.assertTrue(ok)
 
 

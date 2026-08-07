@@ -1,0 +1,128 @@
+[
+ {
+  "id": "istat-bes",
+  "institution": "Istat, Rapporto BES",
+  "about": "benessere, i 12 domini, il territorio",
+  "url": "https://www.istat.it/statistiche-per-temi/focus/benessere-e-sostenibilita/la-misurazione-del-benessere-bes/",
+  "citability": "aperta"
+ },
+ {
+  "id": "istat-rapporto-annuale",
+  "institution": "Istat, Rapporto annuale",
+  "about": "quadro del Paese, divari, letture di sintesi",
+  "url": "https://www.istat.it/produzione-editoriale/rapporto-annuale/",
+  "citability": "aperta"
+ },
+ {
+  "id": "istat-sdgs",
+  "institution": "Istat, Rapporto SDGs",
+  "about": "Agenda 2030 declinata sul territorio",
+  "url": "https://www.istat.it/produzione-editoriale/rapporto-sdgs/",
+  "citability": "aperta"
+ },
+ {
+  "id": "istat-demografia",
+  "institution": "Istat, Indicatori demografici",
+  "about": "natalita', mortalita', migrazioni, invecchiamento",
+  "url": "https://www.istat.it/comunicato-stampa/indicatori-demografici-anno-2025/",
+  "citability": "aperta"
+ },
+ {
+  "id": "istat-noi-italia",
+  "institution": "Istat, Noi Italia",
+  "about": "100 statistiche tematiche con confronto UE",
+  "url": "https://noi-italia.istat.it/",
+  "citability": "aperta"
+ },
+ {
+  "id": "eurostat-regional-yearbook",
+  "institution": "Eurostat, Regional Yearbook",
+  "about": "confronto UE a livello NUTS2 e NUTS3",
+  "url": "https://ec.europa.eu/eurostat/web/interactive-publications/regional-yearbook",
+  "citability": "aperta"
+ },
+ {
+  "id": "eurostat-statistics-explained",
+  "institution": "Eurostat, Statistics Explained",
+  "about": "metodo, definizioni, articoli regionali",
+  "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Main_Page",
+  "citability": "aperta"
+ },
+ {
+  "id": "svimez",
+  "institution": "SVIMEZ, Rapporto sull'economia del Mezzogiorno",
+  "about": "il divario Nord-Sud, con stime proprie",
+  "url": "https://www.svimez.it/",
+  "citability": "attenzione"
+ },
+ {
+  "id": "bankitalia-economie-regionali",
+  "institution": "Banca d'Italia, Economie regionali",
+  "about": "economia regionale, credito, imprese",
+  "url": "https://www.bancaditalia.it/pubblicazioni/economie-regionali/",
+  "citability": "report"
+ },
+ {
+  "id": "ue-cohesion-report",
+  "institution": "Commissione europea, Cohesion Report",
+  "about": "divari regionali nell'Unione",
+  "url": "https://ec.europa.eu/regional_policy/information-sources/cohesion-report_en",
+  "citability": "aperta"
+ },
+ {
+  "id": "opencoesione",
+  "institution": "OpenCoesione",
+  "about": "politiche di coesione, progetti finanziati",
+  "url": "https://opencoesione.gov.it/it/",
+  "citability": "aperta"
+ },
+ {
+  "id": "politiche-coesione",
+  "institution": "Politiche di coesione, Governo",
+  "about": "programmazione, CPT, documenti",
+  "url": "https://politichecoesione.governo.it/it/",
+  "citability": "aperta"
+ },
+ {
+  "id": "oecd-regional",
+  "institution": "OCSE, sviluppo regionale",
+  "about": "confronto subnazionale internazionale",
+  "url": "https://www.oecd.org/en/topics/policy-issues/regional-development.html",
+  "citability": "attenzione"
+ },
+ {
+  "id": "invalsi",
+  "institution": "Invalsi",
+  "about": "competenze scolastiche per regione",
+  "url": "https://www.invalsi.it/",
+  "citability": "report"
+ },
+ {
+  "id": "ispra-snpa",
+  "institution": "Ispra e SNPA",
+  "about": "ambiente, consumo di suolo, rifiuti",
+  "url": "https://www.isprambiente.gov.it/it",
+  "citability": "report"
+ },
+ {
+  "id": "mimit",
+  "institution": "Ministero delle imprese e del made in Italy",
+  "about": "industria, imprese, ricerca e sviluppo",
+  "url": "https://www.mimit.gov.it/it/",
+  "citability": "report"
+ },
+ {
+  "id": "ifel",
+  "institution": "Ifel, fondazione Anci",
+  "about": "finanza e servizi dei Comuni",
+  "url": "https://www.fondazioneifel.it/",
+  "citability": "report"
+ },
+ {
+  "id": "openpolis",
+  "institution": "Openpolis",
+  "about": "data journalism di controprova",
+  "url": "https://www.openpolis.it/",
+  "citability": "attenzione"
+ }
+]

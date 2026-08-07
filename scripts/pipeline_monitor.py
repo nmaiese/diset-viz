@@ -67,6 +67,10 @@ def is_stuck(row: dict) -> bool:
         return row.get("motivo") not in (None, "", "monte-mancante")
     return False
 
+# Che cosa fa uno stadio, non chi lo fa. Sono descrizioni per chi guarda uno
+# schermo, e restano anche per gli stadi storici, perche' il dossier li nomina
+# ancora e una riga senza etichetta si legge peggio di una con l'etichetta
+# vecchia.
 STAGE_LABELS = {
     "scout": "Scoperta fonte",
     "hunter": "Valutazione candidatura",
@@ -74,17 +78,22 @@ STAGE_LABELS = {
     "curator": "Curatela",
     "writer": "Scrittura",
     "reviewer": "Rilettura e firma",
-    "producer": "Produzione",
+    "producer": "Officina",
     "verificatore": "Verifica indipendente",
     "reader-editor": "Lettura di leggibilita'",
-    "launch": "Lanciatore",
+    "launch": "Lancio",
 }
 
+# Una sola voce, e non e' una traduzione: il ruolo si chiama ancora `producer`
+# perche' la coda dice ancora "questo indicatore va scritto", ma cio' che parte
+# e' l'officina, un workflow. Le altre tre voci erano personaggi italiani
+# (`ammissione`, `produttore`) sovrapposti a nomi che gia' esistevano: un
+# lettore che vede `ammissione` sul cruscotto e `admissions` nel diario deve
+# tenere a mente una mappa per capire che sono la stessa cosa. Il chiamante
+# (`:260`) fa `.get(owner, owner)`, quindi un ruolo assente stampa il proprio
+# nome, che e' esattamente cio' che si vuole.
 ROLE_LABELS = {
-    "admissions": "ammissione",
-    "producer": "produttore",
-    "verificatore": "verificatore",
-    "reader-editor": "reader-editor",
+    "producer": "officina",
 }
 
 # La lavorazione come la intende chi guarda il cruscotto, non lo stato grezzo

@@ -24,14 +24,28 @@ che deve succedere, nell'ordine:
    python3 evals/score_eval.py --self-test
    ```
 
-3. **Le tre eval sul candidato.** `python3 evals/run_eval.py writer` (poi
-   `reviewer`, poi `verifier`) stampa il compito: si fa girare l'agente CON IL
-   CAMBIO CANDIDATO su quel compito e si misura con `score_eval.py`. Il
-   confronto e' con l'ultimo punteggio annotato in `docs/CANARY.md`: un
-   punteggio che scende e' un no, non un dettaglio.
-4. **Il giro sui canary** come `docs/CANARY.md` prescrive: writer su due
-   indicatori del set, reviewer su altri due, in dry-run, letti contro il
-   brief.
+3. **Le cinque eval sul candidato**, tutte:
+
+   ```bash
+   python3 evals/run_eval.py writer
+   python3 evals/run_eval.py reviewer
+   python3 evals/run_eval.py verifier
+   python3 evals/run_eval.py reader-editor
+   python3 evals/run_eval.py admissions
+   ```
+
+   Ognuna stampa il compito: si fa girare l'agente CON IL CAMBIO CANDIDATO su
+   quel compito e si misura con `score_eval.py`. Il confronto e' con l'ultimo
+   punteggio annotato in `docs/CANARY.md`: un punteggio che scende e' un no, non
+   un dettaglio.
+
+   Erano tre in questa lista, e le altre due misurano i due giudizi piu'
+   irreversibili della catena (chi entra nel catalogo, e se un lettore comune
+   capisce). Saltarle non rendeva il canary piu' veloce: lo rendeva cieco su
+   meta' di cio' che giudica.
+4. **Il giro sui canary** come `docs/CANARY.md` prescrive: l'officina su due
+   indicatori del set (quelli con la definizione ingannevole), in dry-run,
+   letti contro il brief, piu' `bin/py -m officina.lint <codice>`.
 5. **Annota l'esito** nella tabella in coda a `docs/CANARY.md`, qualunque sia:
    un giro non annotato e' un giro che il prossimo cambio non puo' usare come
    confronto.

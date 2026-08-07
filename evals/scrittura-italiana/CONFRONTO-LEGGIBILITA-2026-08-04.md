@@ -310,5 +310,5 @@ canary suo, perche' arricchire il brief cambia quello che un articolo puo' dire.
   produzione produce il timbro che `content/STYLE.md` vieta. `producer.md` non
   mette in guardia.
 - L'autovalutazione sui dieci criteri satura (l'agente writer si e' dato 20/20),
-  come `docs/WRITING_QUALITY_PLAN.md` gia' segnalava. Il numero utile viene da
+  come `docs/archive/WRITING_QUALITY_PLAN.md` gia' segnalava. Il numero utile viene da
   fuori.
