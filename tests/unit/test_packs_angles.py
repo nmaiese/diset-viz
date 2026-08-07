@@ -389,5 +389,124 @@ class CitableFiguresAndDiagnostics(unittest.TestCase):
         self.assertEqual(diagnostic, {"z_modificato": 6.3})
 
 
+class ZeroHasNoDirection(unittest.TestCase):
+    """Ogni caso col suo specchio, perche' e' l'unico modo di vedere lo zero.
+
+    `(a < 0) != (b < 0)` tratta lo zero come positivo. Rileggendo la riga non si
+    vede: si vede solo dando a un rilevatore un fenomeno e poi lo stesso
+    fenomeno capovolto, e scoprendo che risponde in due modi. La stessa riga era
+    scritta in tre punti, e in due su tre sbagliava.
+    """
+
+    @staticmethod
+    def _series(values, width=1):
+        return {2015 + i: {f"t{n:02d}": v for n in range(width)}
+                for i, v in enumerate(values)}
+
+    @staticmethod
+    def _moves(fermi, mossi, delta):
+        """`fermi` territori immobili, `mossi` che si spostano di `delta`."""
+        names = [f"t{i:02d}" for i in range(fermi + mossi)]
+        return {
+            2020: {name: 100.0 for name in names},
+            2024: {name: (100.0 if index < fermi else 100.0 + delta)
+                   for index, name in enumerate(names)},
+        }
+
+    def test_a_territory_that_did_not_move_is_not_moving_against_the_trend(self):
+        """Il caso che valeva forza 1,00 su una tabella di movimenti tutti a zero."""
+        found = angles.against_the_grain(self._moves(fermi=16, mossi=4, delta=-40.0))
+        self.assertEqual(found, [], "sedici fermi non sono sedici controcorrente")
+
+    def test_and_its_mirror_answers_the_same_way(self):
+        """Stessa forma, media positiva: prima taceva solo questo dei due."""
+        self.assertEqual(angles.against_the_grain(self._moves(16, 4, 40.0)), [])
+
+    def test_a_real_countertrend_still_speaks(self):
+        """La correzione non spegne il rilevatore: toglie i fermi, non i contrari."""
+        names = [f"t{i:02d}" for i in range(20)]
+        series = {
+            2020: {name: 100.0 for name in names},
+            2024: {name: (90.0 if i < 12 else (100.0 if i < 16 else 110.0))
+                   for i, name in enumerate(names)},
+        }
+        found = angles.against_the_grain(series)
+        self.assertEqual(kinds(found), ["controcorrente"])
+        self.assertEqual(found[0]["figures"]["quanti"], 4)
+        self.assertEqual(found[0]["territories"], names[16:],
+                         "i quattro fermi non devono comparire fra i controcorrente")
+
+    def test_a_flat_first_half_is_not_an_acceleration(self):
+        """Senza un verso di partenza non c'e' una velocita' da confrontare."""
+        rising = self._series([100.0] * 7 + [105.0, 110.0, 115.0, 120.0, 125.0])
+        self.assertEqual(angles.acceleration(rising), [])
+
+    def test_and_its_mirror_answers_the_same_way_too(self):
+        falling = self._series([100.0] * 7 + [95.0, 90.0, 85.0, 80.0, 75.0])
+        self.assertEqual(angles.acceleration(falling), [])
+
+    def test_a_real_acceleration_still_speaks(self):
+        series = self._series([100.0, 101.0, 102.0, 103.0, 104.0, 105.0,
+                               110.0, 120.0, 130.0, 140.0, 150.0, 160.0])
+        self.assertEqual(kinds(angles.acceleration(series)), ["accelerazione"])
+
+    def test_a_flat_stretch_that_starts_falling_has_not_turned(self):
+        """`cambia_verso` e' una cifra citabile: finisce in una frase."""
+        falling = self._series([100.0] * 7 + [95.0, 90.0, 85.0, 80.0, 75.0])
+        found = angles.slope_break(falling)
+        self.assertTrue(found, "il campione doveva produrre una rottura di pendenza")
+        self.assertFalse(found[0]["figures"]["cambia_verso"])
+
+    def test_nor_has_one_that_starts_rising(self):
+        rising = self._series([100.0] * 7 + [105.0, 110.0, 115.0, 120.0, 125.0])
+        found = angles.slope_break(rising)
+        self.assertTrue(found)
+        self.assertFalse(found[0]["figures"]["cambia_verso"])
+
+    def test_but_a_series_that_goes_up_then_down_has(self):
+        series = self._series([100.0, 105.0, 110.0, 115.0, 120.0, 125.0,
+                               120.0, 115.0, 110.0, 105.0, 100.0, 95.0])
+        found = angles.slope_break(series)
+        self.assertTrue(found)
+        self.assertTrue(found[0]["figures"]["cambia_verso"])
+
+
+class ATiedRankingStillBreaks(unittest.TestCase):
+    """Quando meta' delle posizioni sono in pari, il salto tipico e' zero.
+
+    Misurare contro di lui vuol dire dividere per zero, e rinunciare vuol dire
+    perdere la spaccatura piu' netta che esista invece della piu' debole. Non e'
+    un caso di laboratorio: **13 indicatori su 594** del catalogo lo producono,
+    fra cui i quattro `MULTI_SATLIFE` e `bes:06POL002`-`005`, che sono
+    percentuali arrotondate su cui molti territori coincidono.
+    """
+
+    @staticmethod
+    def _split(high=100.0, low=0.0, each=10):
+        row = {f"a{i:02d}": high for i in range(each)}
+        row.update({f"b{i:02d}": low for i in range(each)})
+        return {2024: row}
+
+    def test_the_clearest_split_there_is_produces_an_angle(self):
+        found = angles.distribution_breaks(self._split())
+        self.assertEqual(kinds(found), ["graduatoria-spezzata"])
+        self.assertEqual(found[0]["figures"]["salto"], 100.0)
+        self.assertEqual(found[0]["figures"]["dopo_la_posizione"], 10)
+
+    def test_and_it_is_strong_not_a_rounding_error(self):
+        """La mediana dei soli salti positivi darebbe rapporto 1,00, forza 0,00."""
+        found = angles.distribution_breaks(self._split())
+        self.assertGreater(found[0]["strength"], 0.5)
+
+    def test_all_the_same_value_is_still_silent(self):
+        """Nessun salto: li' non c'e' nessuna graduatoria da spezzare."""
+        same = {2024: {f"t{i:02d}": 50.0 for i in range(20)}}
+        self.assertEqual(angles.distribution_breaks(same), [])
+
+    def test_a_regular_ladder_is_still_silent(self):
+        """La proprieta' che il rilevatore aveva gia': non spara sulla scaletta."""
+        self.assertEqual(angles.distribution_breaks(flat()), [])
+
+
 if __name__ == "__main__":
     unittest.main()

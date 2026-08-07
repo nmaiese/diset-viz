@@ -421,3 +421,67 @@ class TheDefinitionIsCheckedAgainstTheSource(unittest.TestCase):
                                         lambda: {"30": self.DEFINIZIONE}):
             rilievi = lint.check_definition(voce, key="30")
         self.assertNotIn("definizione-assente", {r["rule"] for r in rilievi})
+
+
+class TheAngleHasToBeOneThatWasDetected(unittest.TestCase):
+    """L'articolo dichiara su che angolo apre: quel nome dev'essere vero.
+
+    L'officina lancia sempre due scritture, sull'angolo 1 e sull'angolo 2, e su
+    11 indicatori su 594 il pacchetto ne ha meno di due. La seconda richiesta
+    non ha risposta valida, e lo schema della bozza controlla la **forma** del
+    campo `angolo` e non la sua provenienza: un nome inventato attraversava
+    giudizio, lint e pubblicazione senza che una riga lo nominasse.
+
+    Il pacchetto ora lo dice a chi scrive, e questa regola lo verifica: senza,
+    resterebbe un'istruzione che nessuno controlla, cioe' una speranza.
+
+    Il pacchetto e' finto apposta. Il vero costa una vista completa
+    dell'indicatore, e la regola non ha niente da imparare dai dati reali: deve
+    solo confrontare due stringhe e scegliere se parlare.
+    """
+
+    @staticmethod
+    def _pack(*tipi):
+        return {"angles": [{"type": t} for t in tipi]}
+
+    def _check(self, voce, tipi=("divario-che-si-chiude", "sorpasso")):
+        with unittest.mock.patch.object(lint.pack_build, "_resolve",
+                                        lambda code: ("territorial", "30")), \
+             unittest.mock.patch.object(lint.pack_build, "build_pack",
+                                        lambda *a, **k: self._pack(*tipi)):
+            return lint.check_angle_was_detected(voce, key="30")
+
+    def test_an_angle_the_pack_never_detected_blocks(self):
+        rilievi = self._check(entry(angolo="rimonta-del-mezzogiorno"))
+        self.assertEqual([r["rule"] for r in rilievi], ["angolo-non-rilevato"])
+        self.assertEqual(rilievi[0]["severity"], lint.BLOCKS)
+
+    def test_and_the_message_names_the_angles_that_did_exist(self):
+        """Chi legge il rilievo deve sapere su che cosa poteva aprire."""
+        rilievi = self._check(entry(angolo="rimonta-del-mezzogiorno"))
+        self.assertIn("divario-che-si-chiude", rilievi[0]["detail"])
+        self.assertIn("sorpasso", rilievi[0]["detail"])
+
+    def test_an_angle_that_was_detected_passes(self):
+        self.assertEqual(self._check(entry(angolo="sorpasso")), [])
+
+    def test_an_article_that_declares_nothing_is_left_alone(self):
+        """`angolo` e' facoltativo: 2 articoli su 377 lo scrivono. La regola
+        tace sugli altri 375 senza costruire un solo pacchetto, che e' anche
+        perche' `lint_all` resta a undici secondi."""
+        with unittest.mock.patch.object(lint.pack_build, "build_pack") as costruisci:
+            self.assertEqual(lint.check_angle_was_detected(entry(), key="30"), [])
+            self.assertEqual(lint.check_angle_was_detected(entry(angolo=""), key="30"), [])
+            costruisci.assert_not_called()
+
+    def test_an_indicator_with_no_pack_is_silent_not_red(self):
+        """Un pacchetto che non si costruisce e' un guasto di dati, non un
+        articolo che mente: la regola si spegne come fa quella sulle
+        definizioni, invece di rompere il lint su tutto il catalogo."""
+        voce = entry(angolo="sorpasso")
+        with unittest.mock.patch.object(lint.pack_build, "build_pack",
+                                        lambda *a, **k: None):
+            self.assertEqual(lint.check_angle_was_detected(voce, key="30"), [])
+        with unittest.mock.patch.object(lint.pack_build, "build_pack",
+                                        side_effect=KeyError("boom")):
+            self.assertEqual(lint.check_angle_was_detected(voce, key="30"), [])

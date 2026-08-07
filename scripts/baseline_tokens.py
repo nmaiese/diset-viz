@@ -58,8 +58,22 @@ RUN_ID = re.compile(
     r"hunter|promoter|launch|reader-editor)-\d{8}T\d{6}Z-[0-9a-f]{4}\b"
 )
 
-# I ruoli che non producono prosa: si escludono dal costo per articolo.
-NOT_WRITING = ("admissions", "scout", "hunter", "promoter")
+# I ruoli che producono prosa. **Elencati per inclusione, e non e' uno stile.**
+#
+# La lista era per esclusione, e una lista per esclusione mente per omissione:
+# `verificatore`, `reader-editor` e `launch` non c'erano, quindi una sessione
+# che conteneva solo un giro di verifica finiva sotto "SESSIONI CHE PRODUCONO
+# PROSA" con tutti i suoi token dentro il costo per articolo. I tre critici non
+# scrivono una riga, e il confronto fra la catena vecchia e l'officina, che e'
+# l'unica cosa che questo script serve a fare, ne usciva gonfiato dalla parte
+# sbagliata.
+#
+# Per inclusione, un ruolo nuovo resta fuori dal costo finche' qualcuno non lo
+# mette dentro apposta. Sono le chiavi di `pipeline_launch.ROLE_OF_STAGE` il cui
+# valore e' `producer`, piu' `producer` stesso: ricopiate e non importate,
+# perche' questo modulo e' stdlib pura (vedi il docstring). Un test tiene le due
+# liste allineate.
+WRITING = ("producer", "writer", "reviewer", "curator")
 
 # Dollari per milione di token, listino Opus. Indicativo: serve a dare una
 # scala, non a fare fatturazione.
@@ -331,7 +345,7 @@ def read_session(path: str) -> dict | None:
 
 
 def writing_only(runs) -> list:
-    return [r for r in runs if not r.split("-2026")[0] in NOT_WRITING]
+    return [r for r in runs if r.split("-2026")[0] in WRITING]
 
 
 def collect(since: str) -> list:

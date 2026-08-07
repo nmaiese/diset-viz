@@ -46,6 +46,7 @@ from collections import Counter
 
 from app import indicator_texts, sources
 from app.indicator_view import build_indicator_view
+from packs import build as pack_build
 from packs import context as context_module
 from scripts import definition_check, indicator_store, verification_queue
 
@@ -653,6 +654,50 @@ def check_definition(entry, key=None, **_):
     return found
 
 
+def check_angle_was_detected(entry, key=None, **_):
+    """L'angolo dichiarato dev'essere uno che il pacchetto ha davvero rilevato.
+
+    L'officina chiede due bozze, una sull'angolo 1 e una sull'angolo 2. Su 11
+    indicatori su 594 l'elenco ne ha meno di due, e li' "apri sull'angolo numero
+    2" non ha nessuna risposta valida: lo schema della bozza controlla la
+    **forma** del campo `angolo`, non la sua provenienza, quindi un angolo
+    inventato attraversava giudizio, lint e pubblicazione senza che una sola
+    riga lo nominasse. Il pacchetto adesso avverte chi scrive
+    (`packs/build.render`), e questa regola lo verifica, perche' un'istruzione
+    che nessuno controlla e' una speranza.
+
+    **Blocca, e la staleness non e' un'obiezione.** Dentro una run il pacchetto
+    e questo lint girano sulla stessa serie a un minuto di distanza, quindi qui
+    un rosso e' sempre invenzione. Su un articolo vecchio un aggiornamento della
+    fonte puo' far sparire l'angolo su cui apriva, e quel rosso e' comunque
+    l'informazione giusta: se la storia piu' forte della serie non e' piu'
+    quella, l'attacco dell'articolo e' da rileggere, non la regola da ammorbidire.
+
+    Si spegne da sola sugli articoli che non dichiarano niente: `angolo` e'
+    facoltativo e lo scrivono solo quelli usciti dall'officina, 2 su 377 alla
+    data in cui questa regola nasce. Cosi' non aggiunge un solo pacchetto al
+    costo di `lint_all` sugli altri 375.
+    """
+    dichiarato = entry.get("angolo")
+    if not isinstance(dichiarato, str) or not dichiarato.strip():
+        return []
+    code = verification_queue.code_of(str(key))
+    try:
+        family, raw_id = pack_build._resolve(code)
+        pack = pack_build.build_pack(family, raw_id, entry.get("level"))
+    except Exception:  # noqa: BLE001
+        return []          # nessun pacchetto ricostruibile: la regola tace
+    if pack is None:
+        return []
+    rilevati = [angle["type"] for angle in pack["angles"]]
+    if dichiarato.strip() in rilevati:
+        return []
+    elenco = ", ".join(dict.fromkeys(rilevati)) or "nessuno"
+    return [_finding("angolo-non-rilevato", BLOCKS,
+                     f"l'articolo dichiara di aprire su `{dichiarato}`, che non e' fra "
+                     f"gli angoli del pacchetto ({elenco})", "angolo")]
+
+
 RULES = (
     check_banned_characters,
     check_lead,
@@ -663,6 +708,7 @@ RULES = (
     check_unsupported_paragraphs,
     check_distance_from_siblings,
     check_definition,
+    check_angle_was_detected,
 )
 
 

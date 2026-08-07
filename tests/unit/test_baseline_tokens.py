@@ -166,5 +166,66 @@ class Cost(unittest.TestCase):
         self.assertAlmostEqual(bt.cost(million), sum(bt.PRICE.values()))
 
 
+class OnlyProseCountsAsProse(unittest.TestCase):
+    """Chi entra nel costo per articolo si dichiara, non si deduce per esclusione.
+
+    La lista era `NOT_WRITING`, cioe' per esclusione, e una lista per esclusione
+    mente per omissione: `verificatore`, `reader-editor` e `launch` non
+    c'erano, quindi una sessione con dentro **solo** un giro di verifica finiva
+    sotto "SESSIONI CHE PRODUCONO PROSA" con tutti i suoi token dentro il costo
+    per articolo. I tre non scrivono una riga, e il confronto fra la catena
+    vecchia e l'officina, che e' l'unica cosa per cui questo script esiste,
+    usciva gonfiato dalla parte sbagliata.
+    """
+
+    def test_the_critics_are_not_writers(self):
+        runs = ["verificatore-20260807T101010Z-aaaa",
+                "reader-editor-20260807T101010Z-bbbb",
+                "launch-20260807T101010Z-cccc",
+                "admissions-20260807T101010Z-dddd"]
+        self.assertEqual(bt.writing_only(runs), [])
+
+    def test_the_writers_still_are(self):
+        runs = ["producer-20260807T101010Z-aaaa",
+                "writer-20260728T101010Z-bbbb",
+                "verificatore-20260807T101010Z-cccc"]
+        self.assertEqual(bt.writing_only(runs),
+                         ["producer-20260807T101010Z-aaaa",
+                          "writer-20260728T101010Z-bbbb"])
+
+    def test_the_list_is_the_producer_role_and_nothing_else(self):
+        """Il commento in `baseline_tokens` promette questo allineamento, e un
+        commento che promette una guardia inesistente e' il difetto che questa
+        PR sta chiudendo. `baseline_tokens` resta stdlib pura e ricopia i nomi:
+        il test importa tutti e due e li confronta."""
+        from scripts import pipeline_launch
+        dal_lanciatore = {stage for stage, role in pipeline_launch.ROLE_OF_STAGE.items()
+                          if role == "producer"}
+        self.assertEqual(set(bt.WRITING), dal_lanciatore | {"producer"})
+
+    def test_every_stage_that_can_open_a_run_is_recognised(self):
+        """`RUN_ID` e' un'altra enumerazione, e un ruolo che le manca non viene
+        contato male: **sparisce**, e con lui l'intera sessione che lo conteneva,
+        senza che una riga del rapporto lo dica.
+
+        I quattro stadi `legacy-*` non combaciano per intero: la regex li tronca
+        al ruolo che portano dentro (`legacy-writer` -> `writer`). E' senza
+        conseguenze e vale la pena saperlo invece di scoprirlo: il prefisso
+        distingue da dove viene la run, non che cosa ha fatto, quindi i due che
+        scrivevano restano dentro il costo per articolo e i due che criticavano
+        restano fuori. Un prefisso che cambiasse anche il mestiere spaccherebbe
+        questa assunzione in silenzio."""
+        from scripts import pipeline_log
+        for stage in pipeline_log.HISTORICAL_STAGES:
+            with self.subTest(stage=stage):
+                run_id = f"{stage}-20260807T101010Z-abcd"
+                trovato = bt.RUN_ID.search(run_id)
+                self.assertIsNotNone(trovato, f"{stage} non apre nessuna run agli occhi del rapporto")
+                ruolo = trovato.group(0).split("-2026")[0]
+                atteso = stage[len("legacy-"):] if stage.startswith("legacy-") else stage
+                self.assertEqual(ruolo, atteso)
+                self.assertEqual(ruolo in bt.WRITING, atteso in bt.WRITING)
+
+
 if __name__ == "__main__":
     unittest.main()

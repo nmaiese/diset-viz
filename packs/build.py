@@ -348,10 +348,22 @@ def render(pack):
         out.append(f"     «{claim['citazione']}»")
         out.append(f"     {claim['url']}")
     out.append("")
+    # L'officina chiede due bozze, una sull'angolo 1 e una sull'angolo 2. Su
+    # **11 indicatori su 594** l'elenco ha meno di due voci, e li' quella
+    # richiesta non ha nessuna risposta valida: chi scrive puo' solo inventare
+    # un secondo angolo, e niente a valle se ne accorge, perche' lo schema della
+    # bozza controlla la forma del campo `angolo` e non la sua provenienza.
+    # Il pacchetto e' l'unico posto che sa quante voci ha, quindi lo dice qui.
     out.append("ANGOLI, DAL PIU' FORTE")
     if not pack["angles"]:
         out.append("  nessuno: questa serie non ha una storia strutturale.")
         out.append("  Un articolo qui e' una nota breve, non un pezzo.")
+        out.append("  Se ti hanno chiesto un angolo numerato, quel numero non esiste:")
+        out.append("  scrivilo nel campo `angolo` invece di inventarne uno.")
+    elif len(pack["angles"]) == 1:
+        out.append("  UNO SOLO: se ti hanno chiesto l'angolo numero 2, non esiste.")
+        out.append("  Apri su questo e dichiaralo. Una seconda storia si cerca in un")
+        out.append("  altro territorio o in un altro anno, non in un angolo inventato.")
     for position, angle in enumerate(pack["angles"], start=1):
         out.append(f"  {position}. [{angle['strength']:.2f}] {angle['type']}")
         for field, value in angle["figures"].items():

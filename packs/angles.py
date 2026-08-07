@@ -53,6 +53,28 @@ FLOOR = 0.15
 # minuteria statistica, stdlib
 # --------------------------------------------------------------------------
 
+def _opposite_signs(one, other):
+    """Se due quantita' vanno da parti opposte. **Lo zero non va da nessuna parte.**
+
+    `(a < 0) != (b < 0)` sembra la stessa cosa e non lo e': tratta lo zero come
+    positivo, quindi risponde in due modi diversi a un fenomeno e al suo
+    specchio. Il difetto e' uscito due volte dalla stessa riga scritta due volte.
+
+    In `against_the_grain` un territorio **fermo** risultava controcorrente
+    quando la media scendeva e non quando saliva: sedici territori immobili su
+    venti producevano `controcorrente` a forza 1,00 con una tabella di movimenti
+    tutti a zero, cioe' l'angolo piu' forte del pacchetto costruito su chi non
+    si e' mosso. In `acceleration` una prima meta' piatta dava `accelerazione`
+    a 0,50 se la seconda saliva e silenzio se scendeva.
+
+    Un'asimmetria cosi' non si vede rileggendo: si vede solo provando il caso e
+    il suo specchio, ed e' per questo che i test qui vanno a coppie.
+    """
+    if one == 0 or other == 0:
+        return False
+    return (one < 0) != (other < 0)
+
+
 def _slope(points):
     """Pendenza dei minimi quadrati su [(x, y), ...]. None se indefinita."""
     if len(points) < 2:
@@ -232,7 +254,11 @@ def slope_break(matrix):
     gain, year, before, after = best
     if gain < FLOOR or before is None or after is None:
         return []
-    turned = (before < 0) != (after < 0)
+    # Una pendenza nulla non ha un verso, quindi non puo' averlo cambiato. Vedi
+    # `_opposite_signs`: qui `cambia_verso` e' una cifra citabile, cioe' una
+    # frase che finisce nell'articolo, e diceva "cambia verso" di una serie
+    # piatta che comincia a scendere e non di una che comincia a salire.
+    turned = _opposite_signs(before, after)
     return [_angle(
         "rottura-di-pendenza", gain,
         {"anno": year,
@@ -266,7 +292,13 @@ def acceleration(matrix):
     early, late = _slope(points[:half + 1]), _slope(points[half:])
     if early is None or late is None:
         return []
-    if (early < 0) != (late < 0):
+    if early == 0:
+        # Senza un verso di partenza non c'e' nessuna "parita' di verso" da
+        # rispettare, e la formula misurerebbe una partenza invece di un cambio
+        # di velocita'. Il gradino piatto-poi-in-moto e' materia di
+        # `slope_break`, in tutte e due le direzioni: prima lo era in una sola.
+        return []
+    if _opposite_signs(early, late):
         return []  # cambio di verso: e' materia di slope_break, non di velocita'
     biggest = max(abs(early), abs(late))
     if biggest == 0:
@@ -353,6 +385,15 @@ def dispersion_trend(matrix):
     ordered = sorted(gaps)
     first, last = ordered[0], ordered[-1]
     if gaps[first] == 0:
+        # Tutti i territori sullo stesso valore nel primo anno: non c'e' un
+        # divario di partenza, quindi non c'e' una variazione relativa da
+        # misurare, e qualunque formula sostitutiva sarebbe inventata.
+        #
+        # Non e' la stessa cosa della guardia di `distribution_breaks`, che
+        # invece taceva su un caso vivo (13 indicatori su 594). Questo e' zero
+        # su 594, e anche se un giorno smettesse di esserlo la storia non si
+        # perderebbe: venti territori identici che si aprono lasciano nell'ultimo
+        # anno una graduatoria spezzata, ed e' quel rilevatore a raccontarla.
         return []
     change = (gaps[last] - gaps[first]) / abs(gaps[first])
     if _saturate(abs(change)) < FLOOR:
@@ -501,7 +542,19 @@ def distribution_breaks(matrix, top=2):
     steps = [(row[i][1] - row[i + 1][1], i) for i in range(len(row) - 1)]
     typical = statistics.median(size for size, _ in steps)
     if typical <= 0:
-        return []
+        # Meta' o piu' delle posizioni sono in pari e la mediana dei salti e'
+        # zero. Rinunciare qui non e' prudenza: e' perdere la spaccatura piu'
+        # netta che esista invece della piu' debole. Dieci territori a 100 e
+        # dieci a 0 non hanno un salto tipico, hanno **un salto solo**, ed e'
+        # tutta la storia della serie.
+        #
+        # La media dei salti e' positiva appena uno di loro lo e', e non misura
+        # il salto contro se' stesso: la mediana dei soli salti positivi, che
+        # sembra la scelta ovvia, su quel caso vale esattamente il salto, quindi
+        # rapporto 1,00, forza 0,00, e il rilevatore resta muto come prima.
+        typical = sum(size for size, _ in steps) / len(steps)
+    if typical <= 0:
+        return []  # tutti allo stesso valore: non c'e' nessuna graduatoria da spezzare
 
     angles = []
     for size, index in sorted(steps, reverse=True)[:top]:
@@ -542,7 +595,10 @@ def against_the_grain(matrix):
     overall = sum(moves.values()) / len(moves)
     if overall == 0:
         return []
-    counter = sorted(name for name, move in moves.items() if (move < 0) != (overall < 0))
+    # Chi non si e' mosso non si e' mosso **contro**: vedi `_opposite_signs`. Il
+    # denominatore resta `len(moves)` e non il numero di territori che si sono
+    # mossi, perche' la direzione generale la fanno tutti, fermi compresi.
+    counter = sorted(name for name, move in moves.items() if _opposite_signs(move, overall))
     if not counter:
         return []
     share = len(counter) / len(moves)

@@ -160,5 +160,47 @@ class ItIsDeterministic(unittest.TestCase):
         self.assertEqual(first["total_strength"], second["total_strength"])
 
 
+class APackWithFewerAnglesThanAsked(unittest.TestCase):
+    """Il pacchetto avverte chi scrive quando l'angolo chiesto non esiste.
+
+    L'officina lancia sempre due scritture, una sull'angolo 1 e una sull'angolo
+    2. Su **11 indicatori su 594** l'elenco ha meno di due voci, e li' la
+    seconda richiesta non ha nessuna risposta valida: chi scrive puo' solo
+    inventare, e lo schema della bozza controlla la forma del campo `angolo` e
+    non la sua provenienza, quindi l'invenzione arrivava fino alla pagina.
+
+    Gli angoli si tagliano su un pacchetto vero invece di fissare un indicatore
+    degenere per codice: quali indicatori siano poveri di angoli dipende dai
+    dati e cambia a ogni aggiornamento della fonte, mentre la regola di
+    `render` non deve cambiare mai. Chi controlla che quegli 11 esistano
+    davvero e' `officina.lint`, sull'articolo, non questo test.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = pack_of("ter-176")
+        assert len(cls.pack["angles"]) >= 2, "ter-176 doveva avere angoli da tagliare"
+
+    def _render_with(self, quanti):
+        pack = dict(self.pack, angles=self.pack["angles"][:quanti])
+        return build.render(pack)
+
+    def test_with_no_angle_it_says_the_number_does_not_exist(self):
+        text = self._render_with(0)
+        self.assertIn("quel numero non esiste", text)
+        self.assertIn("invece di inventarne uno", text)
+
+    def test_with_one_angle_it_says_which_one_to_open_on(self):
+        text = self._render_with(1)
+        self.assertIn("l'angolo numero 2, non esiste", text)
+        self.assertIn("non in un angolo inventato", text)
+
+    def test_with_two_angles_it_says_nothing_of_the_sort(self):
+        """L'avviso e' per il caso degenere: sugli altri 583 e' rumore."""
+        text = self._render_with(2)
+        self.assertNotIn("non esiste", text)
+        self.assertNotIn("inventat", text)
+
+
 if __name__ == "__main__":
     unittest.main()
