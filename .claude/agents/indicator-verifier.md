@@ -97,7 +97,7 @@ python3 scripts/verification_queue.py --show ter-611
 Work `riverificare` rows first: the text was rewritten after a verification,
 so the sentence you once checked may be gone and a new one arrived unchecked.
 
-Per article: the brief (`.venv/bin/python -m scripts.indicator_brief <codice>`)
+Per article: the brief (`bin/py -m officina.brief <codice>`)
 is the source of truth on the numbers; `review_queue --show`,
 `definition_check --show` and `prose_lint --show` frame it. For external
 claims use WebSearch/WebFetch against the publishing institution, under the

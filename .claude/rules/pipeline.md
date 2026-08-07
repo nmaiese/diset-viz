@@ -17,17 +17,24 @@ Queste sono le regole che valgono sempre:
 
 - **Un lanciatore, lavoro per-indicatore in parallelo, ogni run in un worktree.**
   `scripts/pipeline_launch.py` legge il dossier per-indicatore e le code e
-  restituisce una lista prioritizzata di lanci (produttore, verificatore e
-  reader-editor per-indicatore, ammissione batch); il suo contratto da agente e'
-  `.claude/agents/launcher.md`. Non c'e' piu' un dispatcher a uno-stadio-per-tick
+  restituisce una lista prioritizzata di lanci (verificatore e reader-editor
+  per-indicatore, ammissione batch). **Non ha piu' un agente lanciatore**:
+  `launcher.md` era un workflow scritto in prosa, e il coordinamento in un
+  workflow costa zero token. La scrittura degli articoli non passa piu' di qui,
+  la fa `.claude/workflows/produci-indicatori.js`. Non c'e' un dispatcher a uno-stadio-per-tick
   ne' il lock una-PR-aperta. Indicatori diversi toccano file diversi, ma quella
   separazione vale per i **percorsi**, non per l'indice git ne' per HEAD: un
   checkout condiviso ne ha uno solo, e due run che se li contendono si spostano
   il branch sotto i piedi. Per questo ogni run apre il proprio **git worktree**
   isolato (`scripts/pipeline_workspace.py`, keyed sul `run_id`), non solo un branch
-  con nome diverso. Quattro ruoli: ammissione (scout+hunter+promoter), produttore
-  (curator+writer+reviewer), verificatore, reader-editor. I tre per-indicatore
-  lavorano **l'indicatore che il piano gli passa e nessun altro**: e' cio' che
+  con nome diverso. Tre ruoli, non piu' quattro: ammissione
+  (scout+hunter+promoter), verificatore, reader-editor. **Il produttore non
+  esiste piu' come agente**: scrivere un articolo e' passato all'officina, dove
+  lo fanno quattro tipi con pochi strumenti dentro un workflow, a un ventesimo
+  del costo. Ammissione a monte e i due critici a valle restano agenti perche'
+  esercitano un giudizio che nessun workflow puo' rendere deterministico. I due
+  per-indicatore lavorano **l'indicatore che il piano gli passa e nessun
+  altro**: e' cio' che
   rende sicuro aprirne piu' d'uno per tick, perche' bersagli distinti scrivono
   file dal nome distinto. Una sessione che si scegliesse un lotto dalla propria
   coda sceglierebbe gli stessi record dell'altra.

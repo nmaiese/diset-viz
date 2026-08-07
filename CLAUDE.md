@@ -33,7 +33,7 @@ it).
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
 | la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
 | come si misura un articolo, i dieci criteri | [`docs/WRITING_RUBRIC.md`](docs/WRITING_RUBRIC.md) |
-| che cosa ha misurato il primo lotto, e il giro dopo | [`docs/WRITING_QUALITY_PLAN.md`](docs/WRITING_QUALITY_PLAN.md), Parte terza |
+| i piani gia' eseguiti, con le misure e le ipotesi cadute | [`docs/archive/`](docs/archive/) (non sono fonti di verita': se contraddicono il codice, ha ragione il codice) |
 | quali fonti secondarie si possono citare | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
 | cambiare modello, prompt o hook degli agenti | [`docs/CANARY.md`](docs/CANARY.md), `evals/README.md` |
 | priorita' e lacune sulle domande che un motore o un assistente puo' porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
@@ -127,17 +127,18 @@ of the process (`lru_cache`, not a TTL).
 
 ## The autonomous chain — READ [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md)
 
-**Three roles**, per-indicator instead of per-stage, take an indicator from a
-source catalogue to a published page and come back when the data moves:
-**ammissione** (fuses scout+hunter+promoter: what enters, with auto-refutation)
--> **produttore** (fuses curator+writer+reviewer: one indicator from admitted to
-published in one session, re-reading its own text) -> **verificatore** (repairs
-nothing: its refutations go back to the producer, which absorbed the reviewer).
-Each role has an agent in `.claude/agents/`, and a verdict from
-`scripts/pipeline_gate.py` that decides whether it may publish. A **launcher**
-(`scripts/pipeline_launch.py`, agent `launcher`) reads the per-indicator dossier
-and launches roles in parallel: different indicators touch different files, so
-there is no contention to serialise.
+An indicator goes from a source catalogue to a published page like this:
+**ammissione** (agent: what enters, with auto-refutation) -> **l'officina**
+(`.claude/workflows/produci-indicatori.js`: writes the article) ->
+**verificatore** and **reader-editor** (agents: two independent critics, facts
+and readability).
+
+**The `produttore` agent is gone**, and so is the `launcher` agent. Writing an
+article moved into the workshop, where four narrow types do it inside a
+workflow at a twentieth of the cost, and coordination inside a workflow costs
+zero tokens. What is left as an agent is what exercises a judgement no workflow
+can make deterministic. `scripts/pipeline_launch.py` still computes the launch
+plan, and `scripts/pipeline_gate.py` still decides whether a run may publish.
 
 The constitution of the chain (one launcher, work per-indicator in parallel, one
 file per record, `run_id` over PR number, the gate's perimeter, no human in the

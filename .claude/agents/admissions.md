@@ -96,7 +96,7 @@ questo indicatore e' sul sito). Approva quando valgono tutte:
 
 1. **Genuinamente additivo.** Cerca tu nel catalogo prima di fidarti di
    `definition_match=new`: nomina il vicino piu' prossimo anche quando approvi,
-   con cosa lo distingue (`indicator_brief <codice-simile>`).
+   con cosa lo distingue (`bin/py -m officina.brief <codice-simile>`).
 2. **Copertura vera**, non un anno di venti regioni di una serie rada. Il cancello
    rifiuta sotto 0.8, ma e' un pavimento, non un obiettivo: di' quant'e'.
 3. **La licenza permette la ripubblicazione** e la fonte e' istituzionale.

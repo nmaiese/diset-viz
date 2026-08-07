@@ -32,7 +32,7 @@ view model: [`docs/INDICATOR_PAGES.md`](../../docs/INDICATOR_PAGES.md).
 Sempre dal brief deterministico, mai da chiamate API ad hoc:
 
 ```bash
-.venv/bin/python -m scripts.indicator_brief ter-178     # tutto su un indicatore
+bin/py -m officina.brief ter-178                        # tutto su un indicatore
 python3 scripts/definition_check.py --show ter-178      # che cosa conta, per la fonte
 .venv/bin/python -m scripts.text_queue                  # che cosa manca a un editor
 .venv/bin/python -m scripts.review_queue                # che cosa manca a un lettore

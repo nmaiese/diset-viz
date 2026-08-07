@@ -29,11 +29,19 @@ def _mint(role):
 
 class PlanLaunches(unittest.TestCase):
     def test_a_writer_ready_indicator_is_one_producer_launch(self):
+        """Il ruolo resta, il bersaglio no: scrivere un articolo e' passato
+        all'officina, e `.claude/agents/producer.md` non esiste piu'.
+
+        Un piano che continuasse a nominarlo sarebbe un puntatore morto che
+        qualcuno lancia una volta sola, scoprendo il guasto quando la run muore.
+        """
         dossier = {"ter-5": practice("ter-5", completed=["curator"], priority=7.0)}
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint)
         self.assertEqual(len(plan), 1)
         self.assertEqual(plan[0]["role"], "producer")
-        self.assertEqual(plan[0]["agent"], "producer")
+        self.assertIsNone(plan[0]["agent"])
+        self.assertIn("produci-indicatori", plan[0]["workflow"])
+        self.assertIn("ter-5", plan[0]["comando"])
         self.assertEqual(plan[0]["indicator"], "ter-5")
         self.assertEqual(plan[0]["scope"], "indicatore")
         self.assertEqual(plan[0]["run_id"], "producer-RUNID")

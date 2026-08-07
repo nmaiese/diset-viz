@@ -539,7 +539,8 @@ def _shingles(text, size=5):
 def check_distance_from_siblings(entry, key=None, texts=None, **_):
     """Due articoli che si leggono come lo stesso stampo.
 
-    Assorbe `scripts/seriality_queue.py`, ed e' anche la difesa contro cio' che
+    Ha assorbito `scripts/seriality_queue.py`, che non esiste piu', ed e'
+    anche la difesa contro cio' che
     Google chiama abuso di contenuti in scala: non il volume, la mancanza di
     differenza vera fra pagine sorelle.
     """

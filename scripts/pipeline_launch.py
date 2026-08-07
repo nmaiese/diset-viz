@@ -63,14 +63,35 @@ ROLE_OF_STAGE = {
     "verificatore": "verificatore",
 }
 
-# L'agente che esegue ogni ruolo. Il verificatore e' rimasto invariato nella
+# Chi esegue ogni ruolo. Il verificatore e' rimasto invariato nella
 # ri-architettura, quindi conserva il suo file storico.
+#
+# **Il produttore non e' piu' un agente.** Scrivere un articolo e' passato
+# all'officina, cioe' a un workflow con quattro tipi stretti, e il file
+# `.claude/agents/producer.md` non esiste piu'. Un piano che continuasse a
+# nominarlo sarebbe un puntatore morto che qualcuno lancia una volta sola,
+# scoprendo il guasto quando la run muore: quindi il ruolo resta (la coda dice
+# ancora "questo indicatore va scritto"), e cambia il bersaglio.
 AGENT_OF_ROLE = {
     "admissions": "admissions",
-    "producer": "producer",
     "verificatore": "indicator-verifier",
     "reader-editor": "reader-editor",
 }
+
+# I ruoli che non si lanciano come agente ma come workflow, con l'indicatore
+# fra gli argomenti. Chi legge il piano trova il comando gia' scritto.
+WORKFLOW_OF_ROLE = {
+    "producer": ".claude/workflows/produci-indicatori.js",
+}
+
+
+def target(role, indicator):
+    """Che cosa lanciare per questo ruolo: un agente, oppure un workflow."""
+    if role in WORKFLOW_OF_ROLE:
+        return {"agent": None, "workflow": WORKFLOW_OF_ROLE[role],
+                "comando": f'Workflow({{scriptPath: "{WORKFLOW_OF_ROLE[role]}", '
+                           f'args: ["{indicator}"]}})'}
+    return {"agent": AGENT_OF_ROLE[role]}
 
 # L'ordine di precedenza dei ruoli, a monte prima, come la catena: rompe solo i
 # pari merito di priorita'. Una smentita (priorita' 100) scavalca comunque tutto
@@ -197,7 +218,7 @@ def plan_launches(dossier, queues=None, mint=None, readings=None):
     for code, stage, priority in producer_items:
         launches.append({
             "role": "producer",
-            "agent": AGENT_OF_ROLE["producer"],
+            **target("producer", code),
             "indicator": code,
             "scope": "indicatore",
             "priority": priority,
@@ -222,7 +243,7 @@ def plan_launches(dossier, queues=None, mint=None, readings=None):
         priority = float(d.get("priority", 0.0) or 0.0)
         launches.append({
             "role": "producer",
-            "agent": AGENT_OF_ROLE["producer"],
+            **target("producer", key),
             "indicator": key,
             "scope": "indicatore",
             "priority": priority,
@@ -428,8 +449,9 @@ def main(argv=None):
 
     if args.json:
         # A un tick vero (`--publish`) la forma resta un oggetto con `launches`:
-        # e' cio' che l'agente lanciatore legge (`.claude/agents/launcher.md`). In
-        # sola lettura resta l'array nudo, comodo per ispezioni e test.
+        # e' cio' che legge chi lancia. L'agente `launcher.md` non esiste piu'
+        # (era un workflow scritto in prosa), quindi oggi lo legge un umano o un
+        # workflow. In sola lettura resta l'array nudo, comodo per ispezioni.
         payload = {"launches": shown} if args.publish else shown
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0 if launches else 1
@@ -443,7 +465,12 @@ def main(argv=None):
     for item in shown:
         target = item["indicator"] or "(coda intera)"
         print(f"  {item['priority']:6.1f}  {item['role']:12s} {target:24.24s} {item['reason']}")
-        print(f"          agente {item['agent']}, run_id {item['run_id']}")
+        # Un ruolo che non e' un agente stampa il comando, non "agente None":
+        # il piano si legge per lanciare, quindi deve dire che cosa lanciare.
+        if item.get("agent"):
+            print(f"          agente {item['agent']}, run_id {item['run_id']}")
+        else:
+            print(f"          {item.get('comando', item.get('workflow', ''))}")
     if len(launches) > len(shown):
         print(f"\n  ... e altre {len(launches) - len(shown)} voci sotto il cap "
               f"di parallelismo ({len(shown)} per tick), al prossimo tick.")
