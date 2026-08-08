@@ -874,6 +874,11 @@ def keepalive():
     return jsonify({"ok": True, "db": status})
 
 
+# Il protocollo della presa, in un posto solo: `ping` lo restituisce, e chi sta
+# per spendere una run lo confronta con quello che ha intenzione di mandare.
+PIPELINE_AZIONI = ("ping", "run", "agente", "consuntivo")
+
+
 @app.post("/_pipeline/beat")
 def pipeline_beat_ingest():
     """La presa del cruscotto: `lab/cruscotto.py` POSTa qui quello che legge.
@@ -887,14 +892,23 @@ def pipeline_beat_ingest():
     403, perché un endpoint interno non conferma nemmeno di esistere. Il corpo è
     JSON con un campo `action`:
 
+      {"action":"ping"}
       {"action":"run","run_id":...,"fase_stimata":...,"agenti_visti":N,...}
       {"action":"agente","run_id":...,"agent_id":...,"agent_type":...,
        "stato_vivo":"aperto|chiuso","risultato":...}
       {"action":"consuntivo","run_id":...,"run":{...},"agenti":[{...}]}
 
-    Le prime due sono il **battito**, la terza il **consuntivo**, e scrivono
-    colonne disgiunte (vedi `app/pipeline_store.py`): possono arrivare in
-    qualsiasi ordine, anche a rovescio, senza che l'una cancelli l'altra.
+    `run` e `agente` sono il **battito**, `consuntivo` è il consuntivo, e
+    scrivono colonne disgiunte (vedi `app/pipeline_store.py`): possono arrivare
+    in qualsiasi ordine, anche a rovescio, senza che l'una cancelli l'altra.
+
+    `ping` **non scrive niente** ed esiste per questo. Chi sta per spendere una
+    run vuole sapere due cose prima di partire: che il segreto combaci, e che
+    l'immagine servita conosca il protocollo nuovo (una costruita da un master
+    più vecchio risponde `bad_action` e perde ogni battito). La domanda si
+    faceva con un `run` finto, che però è un battito vero: lasciava una run
+    fantasma in cima al cruscotto, senza agenti e per sempre in volo. Una
+    domanda non deve avere effetti.
 
     Best effort per chi chiama: un lettore che non riesce a postare non deve
     fermare niente, quindi qui si è tolleranti e si risponde presto.
@@ -907,6 +921,10 @@ def pipeline_beat_ingest():
     payload = request.get_json(silent=True) or {}
     action = payload.get("action")
     try:
+        if action == "ping":
+            # Elencare le azioni serve a chi chiama: sa se quello che sta per
+            # mandare verra' capito, invece di scoprirlo mandandolo.
+            return jsonify({"ok": True, "azioni": PIPELINE_AZIONI})
         if action == "run":
             pipeline_store.registra_run(payload.get("run_id", ""), payload)
         elif action == "agente":

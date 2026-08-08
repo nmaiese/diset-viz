@@ -50,7 +50,10 @@ paths:
   per workflow e `/_pipeline/api/indicatori` per indicatore, quest'ultima
   **derivata** dall'esito delle run e non da una tabella sua.
   `/_pipeline/beat` è la presa: la scrive `lab/cruscotto.py`, che legge i
-  trascritti **di fianco** al workflow. Nessun agente della catena batte, e
+  trascritti **di fianco** al workflow. `{"action":"ping"}` risponde senza
+  scrivere niente, ed è così che si chiede se la presa è viva prima di spendere
+  una run: chiederlo con un `run` finto lasciava una run fantasma in cima al
+  cruscotto. Nessun agente della catena batte, e
   nessun prompt lo sa: i turni sono il costo, e il monitoraggio non ne aggiunge.
   Il modello dati (`app/pipeline_store.py`) ha una regola sola da non rompere:
   **il battito e il consuntivo scrivono colonne disgiunte**, così la seconda

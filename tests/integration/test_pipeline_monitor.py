@@ -101,6 +101,25 @@ class LaPresa(CruscottoBase):
     def test_azione_sconosciuta_e_400(self):
         self.assertEqual(self.posta({"action": "boh"}).status_code, 400)
 
+    def test_ping_risponde_e_non_scrive_niente(self):
+        """Chiedere se la presa e' viva non deve lasciare una run sul cruscotto.
+
+        Prima si chiedeva con un `run` finto, che pero' e' un battito vero:
+        lasciava una riga fantasma in cima al cruscotto, senza agenti e per
+        sempre in volo, cioe' proprio dove l'occhio va per primo. Una domanda
+        non deve avere effetti."""
+        risposta = self.posta({"action": "ping"})
+        self.assertEqual(risposta.status_code, 200)
+        corpo = risposta.get_json()
+        self.assertTrue(corpo["ok"])
+        # Chi chiama deve poter sapere se quello che sta per mandare verra'
+        # capito, invece di scoprirlo mandandolo.
+        self.assertIn("consuntivo", corpo["azioni"])
+        self.assertEqual(self.runs(), [])
+
+    def test_ping_senza_segreto_e_404(self):
+        self.assertEqual(self.posta({"action": "ping"}, "sbagliato").status_code, 404)
+
     def test_run_senza_id_e_400(self):
         self.assertEqual(self.posta({"action": "run", "run_id": ""}).status_code, 400)
 
