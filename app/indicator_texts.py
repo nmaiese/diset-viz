@@ -33,6 +33,7 @@ resolve by reading it.
 """
 
 import functools
+from collections import Counter
 
 from app import sources
 from packs import context
@@ -273,12 +274,22 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
             authored.setdefault(section["role"], []).append(section)
     role_sequence = emitted_roles(entry)
     sections = []
+    # L'ancora è qui e non nel template, dove era `id="sezione-{{ role }}"`: il
+    # modello tiene una **lista per ruolo** apposta, quindi due `dinamica` sono
+    # una funzione voluta, e il template le rendeva con lo stesso `id`. HTML non
+    # valido, e sulla seconda non si poteva atterrare. Dalla seconda in poi
+    # l'ancora prende il suffisso; **la prima resta nuda** perché
+    # `indicator_view.query_map` punta per nome a `sezione-definizione` e
+    # `sezione-dinamica`, e un suffisso su tutte spegnerebbe quei due bersagli.
+    visti = Counter()
     for role in role_sequence:
         coda = authored.get(role) or []
         written = coda.pop(0) if coda else None
         heading = (written.get("h") or "").strip() if written else ""
+        visti[role] += 1
         sections.append({
             "role": role,
+            "anchor": f"sezione-{role}" if visti[role] == 1 else f"sezione-{role}-{visti[role]}",
             "heading": heading or DEFAULT_HEADINGS[role],
             "body": written["body"].strip() if written else None,
             "authored": written is not None,

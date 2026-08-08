@@ -54,7 +54,7 @@
 {% macro body(article, meta, level) %}
 <div class="indicator-article prose">
   {% for section in article.sections %}
-  <h2 id="sezione-{{ section.role }}">{{ section.heading }}</h2>
+  <h2 id="{{ section.anchor }}">{{ section.heading }}</h2>
   {% if section.authored %}
   {# prose_html, not analyst_html: this is block content and the macro opens no
      <p> around it, so the wrapper has to survive or a one-paragraph section
