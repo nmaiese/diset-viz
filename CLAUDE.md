@@ -22,6 +22,7 @@ it).
 | che cosa si può citare in un articolo | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
 | **scrivere articoli indicatore**: il workflow, il dossier, il controllo, il lint | [`lab/README.md`](lab/README.md), `.claude/workflows/indicatore-lite.js` |
 | quanto costa una run, e come si misura senza sbagliare | `scripts/baseline_tokens.py` (il contratto sta nel suo docstring) |
+| **guardare la catena mentre gira**, o dopo: il cruscotto | `lab/cruscotto.py`, [`lab/README.md`](lab/README.md), `.claude/rules/app.md` |
 | scoperta e promozione di indicatori multifonte | [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md) |
 | aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
 | dati provinciali | [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md) |
@@ -92,6 +93,10 @@ bin/py -m lab.lint content/indicators/30.json    # il metro della prosa (misura,
 bin/py scripts/tool_failures.py                  # i guasti che si ripetono
 bin/py scripts/baseline_tokens.py --workflow wf_… --articles 1   # quanto è costata una run
 
+# il cruscotto: si lancia PRIMA del workflow, in background, e non tocca la run
+bin/py -m lab.cruscotto --segui --per 5400        # il vivo, e il consuntivo da sé
+bin/py -m lab.cruscotto --leggi wf_… | head -40   # che cosa vedrebbe, senza postare
+
 # build the SPA (required after changing anything in frontend/)
 cd frontend && npm run build && cd ..
 
@@ -99,9 +104,9 @@ cd frontend && npm run build && cd ..
 .venv/bin/gunicorn run:app -b 127.0.0.1:5050
 
 # tests, audit, whitespace
-bin/py -m unittest discover -s tests -v          # tutta la suite (1348 test, ~52s), prima di commit/push
-bin/py -m unittest discover -s tests/unit -v      # solo veloci (~700 test, ~4s), durante lo sviluppo
-bin/py -m unittest discover -s tests/integration -v  # solo la parte pesante (~650 test, ~51s): Flask/HTTP e catena e2e
+bin/py -m unittest discover -s tests -v          # tutta la suite (607 test, ~20s), prima di commit/push
+bin/py -m unittest discover -s tests/unit -v      # solo veloci (213 test, <1s), durante lo sviluppo
+bin/py -m unittest discover -s tests/integration -v  # solo la parte pesante (394 test, ~19s): Flask/HTTP e catena e2e
 cd frontend && npm audit --audit-level=low
 git diff --check
 ```

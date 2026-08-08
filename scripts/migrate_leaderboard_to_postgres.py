@@ -14,6 +14,10 @@ Sequenza:
 Legge la sorgente con sqlite3 grezzo (nessuna assunzione sullo schema vecchio,
 che non ha `user_id`), scrive la destinazione con l'ORM (lo stesso di app/). Si
 rifiuta se la destinazione ha già righe in `scores`, salvo `--force`.
+
+Travasava anche `pipeline_activity` e `pipeline_tokens`: quelle tabelle sono
+state ritirate con la catena editoriale autonoma che le scriveva, quindi qui
+resta la sola classifica.
 """
 
 import argparse
@@ -24,7 +28,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.db import session_scope
-from app.models import PipelineActivity, PipelineToken, Score
+from app.models import Score
 
 
 def _rows(conn, table, columns):
@@ -39,11 +43,6 @@ def migrate(source_path, force=False):
     src = sqlite3.connect(source_path)
     try:
         scores = _rows(src, "scores", ["mode", "session_id", "nickname", "score", "detail", "created_at"])
-        activity = _rows(src, "pipeline_activity",
-                         ["key", "kind", "role", "indicator", "stage", "run_id", "pr",
-                          "branch", "ci", "mergeable", "title", "updated_at"])
-        tokens = _rows(src, "pipeline_tokens",
-                       ["run_id", "indicator", "stage", "role", "tokens", "updated_at"])
     finally:
         src.close()
 
@@ -56,15 +55,9 @@ def migrate(source_path, force=False):
         for r in scores:
             r.setdefault("user_id", None)  # lo schema vecchio non ha user_id
             s.add(Score(**r))
-        for r in activity:
-            s.add(PipelineActivity(**r))
-        for r in tokens:
-            s.merge(PipelineToken(**r))
 
     with session_scope() as s:
-        print(f"scores:            sorgente {len(scores):>5}  ->  destinazione {s.query(Score).count():>5}")
-        print(f"pipeline_activity: sorgente {len(activity):>5}  ->  destinazione {s.query(PipelineActivity).count():>5}")
-        print(f"pipeline_tokens:   sorgente {len(tokens):>5}  ->  destinazione {s.query(PipelineToken).count():>5}")
+        print(f"scores: sorgente {len(scores):>5}  ->  destinazione {s.query(Score).count():>5}")
     return 0
 
 

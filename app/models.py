@@ -8,7 +8,7 @@ nessuna estensione Postgres-only in queste tabelle, quindi lo stesso modello gir
 identico su SQLite (test/CI) e su Postgres (produzione).
 """
 
-from sqlalchemy import CheckConstraint, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import CheckConstraint, Float, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -135,77 +135,104 @@ class Score(Base):
     created_at: Mapped[str] = mapped_column(Text, nullable=False)
 
 
-class PipelineActivity(Base):
-    """Lo stato vivo del cruscotto: una riga è un battito (`beat`) o una PR
-    aperta (`pr`). La chiave è `beat:<run_id>` o `pr:<numero>`, come nello
-    SQLite originale, così l'upsert idempotente resta sullo stesso perno."""
+class PipelineRun(Base):
+    """Una run della catena, che adesso vuol dire **un workflow**.
 
-    __tablename__ = "pipeline_activity"
+    Le colonne stanno in due gruppi che non si toccano mai, ed è la cosa
+    importante di questa tabella. Il **battito** (`lab.cruscotto --segui`, che
+    legge i trascritti mentre girano) scrive il primo gruppo e non conosce i
+    token, perché il workflow non li conosce. Il **consuntivo** (lo stesso
+    lettore, quando vede comparire `<runId>.json`) scrive il secondo e non
+    tocca il primo. Così un consuntivo ripetuto, o arrivato in ritardo, non
+    può cancellare quello che il vivo aveva già registrato.
 
-    key: Mapped[str] = mapped_column(Text, primary_key=True)
-    kind: Mapped[str] = mapped_column(String(8), nullable=False)
-    role: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    indicator: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    stage: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    run_id: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    pr: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    branch: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    ci: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    mergeable: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    title: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    updated_at: Mapped[str] = mapped_column(Text, nullable=False)
+    `costo_pavimento` non è un vezzo: un trascritto reale ha registrato
+    `output_tokens: 2` sulla richiesta che restituiva una bozza intera, quindi
+    ogni totale è un **pavimento**, e a dirlo deve essere la riga, non
+    l'etichetta di una pagina che qualcuno può riscrivere.
 
+    Tipi larghi come le altre tabelle mutabili (TEXT/INTEGER, strutture in JSON
+    serializzato), così il modello gira identico su SQLite (test/CI) e su
+    Postgres (produzione)."""
 
-class PipelineToken(Base):
-    """Il consumo token per run: telemetria durevole, non un battito. Tabella a
-    parte perché i battiti scadono e si cancellano, il costo di una run è
-    storia da tenere. Chiave = il `run_id` del ruolo, non del lanciatore."""
-
-    __tablename__ = "pipeline_tokens"
+    __tablename__ = "pipeline_run"
 
     run_id: Mapped[str] = mapped_column(Text, primary_key=True)
-    indicator: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    stage: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    role: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    updated_at: Mapped[str] = mapped_column(Text, nullable=False)
+
+    # --- scritte solo dal battito ---
+    avviata_il: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    ultimo_battito: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    fase_stimata: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    agenti_visti: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    sessione: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    progetto: Mapped[str] = mapped_column(Text, nullable=False, default="")
+
+    # --- scritte solo dal consuntivo, nulle finché la run non è finita ---
+    # `workflow` e `args` sono qui e non fra i campi del battito perché dal vivo
+    # non esistono: il nome del workflow compare solo in `<runId>.json`.
+    workflow: Mapped[str | None] = mapped_column(Text, nullable=True)
+    args: Mapped[str | None] = mapped_column(Text, nullable=True)
+    stato: Mapped[str | None] = mapped_column(Text, nullable=True)
+    durata_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    fasi: Mapped[str | None] = mapped_column(Text, nullable=True)
+    esito: Mapped[str | None] = mapped_column(Text, nullable=True)
+    logs: Mapped[str | None] = mapped_column(Text, nullable=True)
+    agenti: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    turni: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    tool: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    token_in: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    token_cache_w: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    token_cache_r: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    token_out: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    advisor_in: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    advisor_out: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    advisor_chiamate: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    costo: Mapped[float | None] = mapped_column(Float, nullable=True)
+    costo_pavimento: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    consuntivo_il: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
-class PipelineOutcome(Base):
-    """Lo stato di ciclo di vita di UN indicatore, come lo ha ricostruito
-    l'agente al momento del merge, POSTato al sito perché il cruscotto sia
-    aggiornato senza aspettare il redeploy dell'immagine.
+class PipelineAgente(Base):
+    """Un agente dentro una run, con la stessa spaccatura in due gruppi.
 
-    Durevole come `PipelineToken`, non un battito: non scade a 6h. Il dossier
-    committato in git resta la verità e la storia; questa riga è un overlay che
-    vive nella finestra fra 'fuso su master' e 'immagine deployatà, e la board
-    lo ritira da sola quando il committato lo raggiunge (vedi
-    `scripts/pipeline_monitor.py::_apply_outcomes`).
+    Dal vivo si sa il `agent_type` (sta in `agent-<id>.meta.json`), da che
+    indicatore lavora (si legge nel prompt) e il **valore di ritorno completo**
+    quando chiude (`journal.jsonl`). Non si sa la `label` né la fase: quelle
+    stanno solo in `<runId>.json`, che il runtime scrive a run finita. Per
+    questo il vivo porta `fase_stimata`, derivata dal tipo di agente, e il
+    consuntivo porta `fase` e `label`, che sono la verità: due colonne, non una
+    che si sovrascrive.
 
-    Chiave = `indicator` (la forma-id del dossier: `651`, `dem:BIRTHRATE`,
-    `bes:09PAE009-N25`), un solo stato corrente per indicatore, l'ultimo vince.
-    Tipi larghi come le altre tabelle della catena: le strutture
-    (`completed_stages`, `required_stages`, `flags`) sono JSON serializzato in
-    `Text`, `published`/`verification_valid` sono interi nullable per tenere il
-    tri-stato (1/0/None = ignoto), così il modello gira identico su SQLite
-    (test/CI) e Postgres (produzione)."""
+    `risultato` è JSON troncato: la bozza di un articolo intero non deve
+    riempire una riga di cruscotto."""
 
-    __tablename__ = "pipeline_outcomes"
+    __tablename__ = "pipeline_agente"
 
-    indicator: Mapped[str] = mapped_column(Text, primary_key=True)
-    run_id: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    at: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    base_commit: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    state: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    type: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    entered_at: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    completed_stages: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
-    required_stages: Mapped[str] = mapped_column(Text, nullable=False, default="[]")
-    flags: Mapped[str] = mapped_column(Text, nullable=False, default="{}")
-    published: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    verification_valid: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    score_eligible: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    error_class: Mapped[str | None] = mapped_column(Text, nullable=True)
-    motivo: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    priority: Mapped[str] = mapped_column(Text, nullable=False, default="")
-    updated_at: Mapped[str] = mapped_column(Text, nullable=False)
+    run_id: Mapped[str] = mapped_column(Text, primary_key=True)
+    agent_id: Mapped[str] = mapped_column(Text, primary_key=True)
+
+    # --- scritte solo dal battito ---
+    agent_type: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    fase_stimata: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    indicatore: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    avviato_il: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    chiuso_il: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    stato_vivo: Mapped[str] = mapped_column(String(8), nullable=False, default="aperto")
+    risultato: Mapped[str] = mapped_column(Text, nullable=False, default="")
+
+    # --- scritte solo dal consuntivo ---
+    label: Mapped[str | None] = mapped_column(Text, nullable=True)
+    fase: Mapped[str | None] = mapped_column(Text, nullable=True)
+    modello: Mapped[str | None] = mapped_column(Text, nullable=True)
+    stato: Mapped[str | None] = mapped_column(Text, nullable=True)
+    turni: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    tool: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    strumenti: Mapped[str | None] = mapped_column(Text, nullable=True)
+    token_in: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    token_cache_w: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    token_cache_r: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    token_out: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    advisor_in: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    advisor_out: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    advisor_chiamate: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    costo: Mapped[float | None] = mapped_column(Float, nullable=True)

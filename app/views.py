@@ -683,19 +683,10 @@ def _pipeline_universe():
 
 @app.route("/_pipeline")
 def pipeline_dashboard():
-    """Il cruscotto interno, in ricostruzione.
+    """La porta del cruscotto: manda alla console, che è il cruscotto.
 
-    Leggeva il dossier per-indicatore della catena editoriale precedente
-    (`scripts/pipeline_monitor`), che non esiste più: la scrittura degli
-    articoli è passata alla catena minima di `lab/`, che gira dentro un
-    workflow e non lascia un dossier per-indicatore da leggere.
-
-    La rotta resta viva e manda alla console, che è l'unica parte del vecchio
-    impianto ancora vera: il vivo arriva da Supabase (`app/pipeline_state.py`),
-    scritto dai POST a `/_pipeline/beat`, ed è la stessa presa a cui un
-    monitoraggio dei workflow si attaccherà. Quello che manca, e che va
-    ricostruito, è il **modello** dietro: che cosa è una run quando la run è un
-    workflow e non una sequenza di agenti con un diario committato.
+    Non c'è una seconda pagina server-rendered, e non deve esserci: due viste
+    sullo stesso stato divergono, e questa ha già divergiuto una volta.
 
     Protetta: se `PIPELINE_TOKEN` è impostato, serve solo con `?token=` giusto,
     altrimenti 404, non 403, perché una pagina interna non deve nemmeno
@@ -719,58 +710,140 @@ def pipeline_console():
                            monitor_admin_email=config.MONITOR_ADMIN_EMAIL)
 
 
-# --- la dashboard storica nella console: catalogo e cronologia ----------------
-# Il vivo (battiti, PR, token per run) resta Realtime da Supabase, letto diretto
-# dal browser. Ma catalogo e cronologia vivono nei file git (articoli, diari), che
-# la console (che parla solo a Supabase) non può leggere: questi due endpoint li
-# servono, dietro lo stesso confine mail-admin, e la console li fetcha col Bearer
-# del login Google.
+# --- le due viste del cruscotto ----------------------------------------------
+# Il vivo arriva alla console anche in push (Supabase Realtime sulle due tabelle,
+# letto diritto dal browser). Questi endpoint servono la stessa storia già
+# montata, dietro il confine mail-admin: la vista per workflow, e quella per
+# indicatore, che è la stessa cosa guardata dall'altro lato.
 #
 # La cache sta su un helper memoizzato, non su `@cache.cached` della view: quel
 # decoratore corto-circuita il corpo della view su un hit, saltando il controllo
 # auth, e servirebbe il dato all'anonimo. Così invece l'auth gira sempre nella
-# view, e solo il calcolo pesante (365 articoli, 118 diari) si riusa per 30s.
+# view, e solo la lettura si riusa per 30s.
 
-@cache.memoize(timeout=30)
-def _pipeline_board_payload():
-    """Vuoto finché il monitoraggio non è ricostruito.
+# La forma dell'esito di `.claude/workflows/indicatore-lite.js`: `articoli` per
+# quelli scritti, `fermati` per quelli che non hanno raggiunto il disco. Un
+# indicatore fermato **non è** un guasto, e il cruscotto non deve confonderli.
+def _articoli_da_esito(esito, run):
+    """Le righe per-indicatore che una run ha prodotto.
 
-    Serviva `scripts/pipeline_monitor`, cioè il dossier della catena
-    precedente. La console regge la forma della risposta senza righe.
+    Derivate, non copiate in una tabella: il `result` del workflow le assembla
+    già tutte, e una seconda copia in Postgres sarebbe una verità in più da
+    tenere allineata. A questi volumi (poche run al giorno) la proiezione al
+    momento della richiesta costa niente.
     """
-    return {"rows": [], "headline": None, "catalog_summary": None,
-            "nota": "in ricostruzione: la catena editoriale è cambiata"}
-
+    if not isinstance(esito, dict):
+        return []
+    comune = {"run_id": run.get("run_id"), "workflow": run.get("workflow"),
+              "at": run.get("avviata_il"), "durata_ms": run.get("durata_ms"),
+              "costo": run.get("costo"), "costo_pavimento": run.get("costo_pavimento")}
+    righe = []
+    for voce in esito.get("articoli") or []:
+        if not isinstance(voce, dict):
+            continue
+        rilievi_aperti = voce.get("rilievi_aperti") or []
+        righe.append({
+            **comune,
+            "indicatore": voce.get("codice") or "",
+            "esito": "scritto con rilievi" if rilievi_aperti else "scritto",
+            "scritto": bool(voce.get("scritto")),
+            "sovrascritto": voce.get("sovrascritto"),
+            "vintage_precedente": voce.get("vintage_precedente"),
+            "percorso": voce.get("percorso"),
+            "parole": voce.get("parole"),
+            "angolo": voce.get("angolo"),
+            "giri_di_correzione": voce.get("giri_di_correzione"),
+            "cifre_verificate": voce.get("cifre_verificate"),
+            "sezioni": voce.get("sezioni") or [],
+            "impaginazione": voce.get("impaginazione") or [],
+            "rilievi": voce.get("rilievi") or [],
+            "rilievi_aperti": rilievi_aperti,
+            "motivo": None,
+        })
+    for voce in esito.get("fermati") or []:
+        if not isinstance(voce, dict):
+            continue
+        righe.append({
+            **comune,
+            "indicatore": voce.get("codice") or "",
+            "esito": "fermato",
+            "scritto": False,
+            "sovrascritto": None,
+            "vintage_precedente": None,
+            "percorso": None, "parole": None,
+            "angolo": (voce.get("bozza") or {}).get("angolo") if isinstance(voce.get("bozza"), dict) else None,
+            "giri_di_correzione": voce.get("giri"),
+            "cifre_verificate": (voce.get("verdetto") or {}).get("verificate")
+            if isinstance(voce.get("verdetto"), dict) else None,
+            "sezioni": [], "impaginazione": [], "rilievi": [],
+            "rilievi_aperti": (voce.get("verdetto") or {}).get("smentite") or []
+            if isinstance(voce.get("verdetto"), dict) else [],
+            "motivo": voce.get("motivo"),
+        })
+    return righe
 
 
 @cache.memoize(timeout=30)
 def _pipeline_runs_payload():
-    """Vuoto finché il monitoraggio non è ricostruito."""
-    return {"runs": [], "nota": "in ricostruzione"}
+    """Le run con dentro i loro agenti, la vista per workflow."""
+    from app import pipeline_store
+    return {"runs": pipeline_store.run()}
 
+
+@cache.memoize(timeout=30)
+def _pipeline_indicatori_payload():
+    """La vista per indicatore: una riga per (indicatore, run), la più recente
+    per prima, con il link alla pagina pubblica quando l'id si risolve."""
+    from app import pipeline_store
+    righe = []
+    for run in pipeline_store.run():
+        righe.extend(_articoli_da_esito(run.get("esito"), run))
+    righe.sort(key=lambda r: (r.get("at") or ""), reverse=True)
+    urls = {}
+    for riga in righe:
+        codice = riga["indicatore"]
+        if codice and codice not in urls:
+            urls[codice] = _pipeline_published_url(_id_da_codice(codice))
+        riga["published_url"] = urls.get(codice)
+    return {"indicatori": righe}
+
+
+def _id_da_codice(codice):
+    """`ter-105` -> `105`, `bes-10AMB002` -> `bes:10AMB002`.
+
+    I codici della catena minima usano il trattino, gli id del catalogo il
+    prefisso di famiglia con i due punti (o nessun prefisso per la famiglia
+    territoriale). Tradurre qui, in un posto solo: `app/sources.py` resta
+    l'unica verità sui nomi delle famiglie, e questo è solo l'adattatore fra
+    due scritture dello stesso id."""
+    famiglia, _, resto = (codice or "").partition("-")
+    if not resto:
+        return codice or ""
+    return resto if famiglia == "ter" else f"{famiglia}:{resto}"
 
 
 def _require_pipeline_admin():
-    """Il confine mail-admin dei due endpoint dashboard. 404, non 403: un endpoint
+    """Il confine mail-admin dei due endpoint. 404, non 403: un endpoint
     interno non conferma nemmeno di esistere, come `/_pipeline/beat`."""
     if not auth.is_admin(auth.current_user(request.headers)):
         abort(404)
 
 
-@app.route("/_pipeline/api/board")
-def pipeline_api_board():
-    """Il catalogo dei 365 indicatori (stato, prossimo passo, lifecycle, token,
-    vivo) in JSON, per la sezione catalogo della console. Authed mail-admin."""
-    _require_pipeline_admin()
-    return jsonify(_pipeline_board_payload())
-
-
 @app.route("/_pipeline/api/runs")
 def pipeline_api_runs():
-    """La cronologia di ogni azione degli agenti col consumo token per run, e i
-    totali aggregati, per la sezione timeline della console. Authed mail-admin."""
+    """Le run della catena, per workflow: fasi, agenti, modello, turni, token,
+    costo ed esito di ognuno. Authed mail-admin."""
     _require_pipeline_admin()
     return jsonify(_pipeline_runs_payload())
+
+
+@app.route("/_pipeline/api/indicatori")
+def pipeline_api_indicatori():
+    """La stessa storia per indicatore: che cosa è stato scritto o riscritto,
+    con quale tesi, quanti giri, quali rilievi restano aperti, e se ha
+    sovrascritto una pagina che esisteva. Authed mail-admin."""
+    _require_pipeline_admin()
+    return jsonify(_pipeline_indicatori_payload())
 
 
 @app.route("/_keepalive")
@@ -796,53 +869,46 @@ def keepalive():
 
 @app.post("/_pipeline/beat")
 def pipeline_beat_ingest():
-    """Il vivo del cruscotto: gli agenti della catena POSTano qui i battiti.
+    """La presa del cruscotto: `lab/cruscotto.py` POSTa qui quello che legge.
+
+    Non lo POSTa un agente della catena, ed è il punto: il monitoraggio non
+    aggiunge un turno a nessuno. Il lettore gira di fianco al workflow, legge i
+    trascritti che il runtime scrive comunque, e manda qui.
 
     Autenticato con `PIPELINE_INGEST_TOKEN` (header `X-Pipeline-Key`), come
     l'endpoint admin della leaderboard: segreto sbagliato o assente -> 404, non
     403, perché un endpoint interno non conferma nemmeno di esistere. Il corpo è
     JSON con un campo `action`:
 
-      {"action":"beat","run_id":...,"role":...,"indicator":...,"stage":...}
-      {"action":"close","run_id":...}
-      {"action":"prs","prs":[{"pr":..,"branch":..,"run_id":..,"ci":..,"mergeable":..,"title":..}]}
-      {"action":"tokens","run_id":...,"tokens":N,"indicator":...,"stage":...,"role":...}
-      {"action":"outcome","indicator":...,"run_id":...,"at":...,"base_commit":...,
-       "state":...,"completed_stages":[...],"flags":{...},"published":true,...}
+      {"action":"run","run_id":...,"fase_stimata":...,"agenti_visti":N,...}
+      {"action":"agente","run_id":...,"agent_id":...,"agent_type":...,
+       "stato_vivo":"aperto|chiuso","risultato":...}
+      {"action":"consuntivo","run_id":...,"run":{...},"agenti":[{...}]}
 
-    L'`outcome` è lo snapshot di stato di un indicatore al momento del merge: lo
-    scrive il passo di merge (`scripts/pipeline_merge.py`) perché il cruscotto sia
-    aggiornato senza aspettare il redeploy dell'immagine.
+    Le prime due sono il **battito**, la terza il **consuntivo**, e scrivono
+    colonne disgiunte (vedi `app/pipeline_store.py`): possono arrivare in
+    qualsiasi ordine, anche a rovescio, senza che l'una cancelli l'altra.
 
-    Best effort per chi chiama: un agente che non riesce a battere non deve
-    fallire la propria run, quindi qui si è solo tolleranti e si risponde presto.
+    Best effort per chi chiama: un lettore che non riesce a postare non deve
+    fermare niente, quindi qui si è tolleranti e si risponde presto.
     """
     token = config.PIPELINE_INGEST_TOKEN
     provided = request.headers.get("X-Pipeline-Key", "")
     if not token or not hmac.compare_digest(provided, token):
         abort(404)
-    from app import pipeline_state
+    from app import pipeline_store
     payload = request.get_json(silent=True) or {}
     action = payload.get("action")
     try:
-        if action == "beat":
-            pipeline_state.record_beat(
-                payload.get("run_id", ""), role=payload.get("role", ""),
-                indicator=payload.get("indicator", ""), stage=payload.get("stage", ""))
-        elif action == "close":
-            pipeline_state.close_beat(payload.get("run_id", ""))
-        elif action == "prs":
-            pipeline_state.replace_prs(payload.get("prs") or [])
-        elif action == "tokens":
-            pipeline_state.record_tokens(
-                payload.get("run_id", ""), payload.get("tokens"),
-                indicator=payload.get("indicator", ""), stage=payload.get("stage", ""),
-                role=payload.get("role", ""))
-        elif action == "outcome":
-            pipeline_state.record_outcome(
-                payload.get("indicator", ""), payload.get("run_id", ""),
-                snapshot=payload, at=payload.get("at", ""),
-                base_commit=payload.get("base_commit", ""))
+        if action == "run":
+            pipeline_store.registra_run(payload.get("run_id", ""), payload)
+        elif action == "agente":
+            pipeline_store.registra_agente(
+                payload.get("run_id", ""), payload.get("agent_id", ""), payload)
+        elif action == "consuntivo":
+            pipeline_store.registra_consuntivo(
+                payload.get("run_id", ""), payload.get("run") or {},
+                payload.get("agenti") or [])
         else:
             return jsonify({"error": "bad_action"}), 400
     except ValueError as exc:
@@ -1854,7 +1920,7 @@ def leaderboard_get_api():
         limit = leaderboard.DEFAULT_LIMIT
     # Tollerante: la classifica ora vive su un backend di rete (Supabase), che
     # può andare in pausa. Un'outage è un widget vuoto, mai un 500 sulla pagina
-    # del gioco. Stesso pattern del vivo di /_pipeline (pipeline_state.live()).
+    # del gioco. Stesso pattern del cruscotto (`pipeline_store.run()`).
     try:
         entries = leaderboard.top(mode, period, limit)
     except Exception:  # noqa: BLE001

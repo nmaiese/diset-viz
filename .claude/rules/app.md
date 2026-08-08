@@ -42,8 +42,19 @@ paths:
   sono authed (401 anonimo) e ricavano l'`auth_id` **solo dal JWT verificato**,
   mai dal body: la RLS è difesa in profondità (il backend gira BYPASSRLS), il
   confine è il `WHERE auth_id`. Leggere `docs/ACCOUNT.md` prima di toccarli.
-- `/_pipeline/console` — console catena in tempo reale (Supabase Realtime), su
-  `monitor.divarioitalia.it`, ristretta alla mail admin via RLS.
+- `/_pipeline`, `/_pipeline/console` — il cruscotto della catena, su
+  `monitor.divarioitalia.it`, ristretto alla mail admin via RLS. `/_pipeline` è
+  solo la porta e manda alla console: **una vista sola su questo stato**, perché
+  due divergono, e qui sono già divergiute una volta. Tre orizzonti (in tempo
+  reale, a passo finito, a run finita) e due punti di vista, `/_pipeline/api/runs`
+  per workflow e `/_pipeline/api/indicatori` per indicatore, quest'ultima
+  **derivata** dall'esito delle run e non da una tabella sua.
+  `/_pipeline/beat` è la presa: la scrive `lab/cruscotto.py`, che legge i
+  trascritti **di fianco** al workflow. Nessun agente della catena batte, e
+  nessun prompt lo sa: i turni sono il costo, e il monitoraggio non ne aggiunge.
+  Il modello dati (`app/pipeline_store.py`) ha una regola sola da non rompere:
+  **il battito e il consuntivo scrivono colonne disgiunte**, così la seconda
+  sorgente non riscrive quello che ha detto la prima.
 
 Strato dati: `app/data.py` (legge `app/static/data/Assoluti_Regione.csv`).
 Strato blog: `app/blog.py` (legge `content/posts/*.md`).

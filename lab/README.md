@@ -384,6 +384,43 @@ scelti per ruolo (haiku, sonnet, opus) e un delta contro una catena tutta su
 si è visto rilanciando lo stesso indicatore e ottenendo due scout vuoti dove
 prima ne erano tornati due pieni.
 
+## Guardarla mentre gira
+
+Il cruscotto sta a `monitor.divarioitalia.it/_pipeline/console` e non chiede
+niente alla catena: **nessun agente batte, nessun prompt cambia, i turni
+restano quelli**. Il monitoraggio è un processo che gira di fianco e legge i
+trascritti che il runtime dei workflow scrive comunque.
+
+```bash
+bin/py -m lab.cruscotto --segui --per 5400 &     # PRIMA del workflow
+Workflow({scriptPath: ".claude/workflows/indicatore-lite.js"})
+```
+
+Non serve dirgli quando la run è finita: lo vede, perché
+`<sessione>/workflows/<runId>.json` compare solo allora, e da lì legge il
+consuntivo (label, fase, modello, turni e costo per agente, riusando
+`scripts/baseline_tokens.py`) e lo posta da sé.
+
+Quello che si vede, e quello che non si può vedere:
+
+| orizzonte | da dove | che cosa porta |
+| --- | --- | --- |
+| mentre gira | `journal.jsonl`, `agent-<id>.meta.json` | quali agenti sono aperti, di che tipo, su che indicatore |
+| a passo finito | `journal.jsonl`, riga `result` | il **valore di ritorno completo** dell'agente che chiude |
+| a run finita | `<runId>.json` più i `agent-*.jsonl` | fasi, label, modello, turni, strumenti, token e costo |
+
+**Dal vivo la fase non esiste**: `label` e `phaseTitle` stanno solo in
+`<runId>.json`. Il cruscotto la stima dal tipo di agente
+(`lab/cruscotto.FASE_PER_TIPO`) e la mostra dichiarandola stimata finché non
+arriva quella vera. Un tipo `lab-*` nuovo va aggiunto a quella mappa, e la
+suite lo pretende: `tests/unit/test_cruscotto.py` rilegge questo workflow e
+fallisce se un `agentType` non ha una fase.
+
+**Ogni costo è un pavimento.** In una run reale un agente ha registrato
+`output_tokens: 2` sulla richiesta che restituiva una bozza intera: il
+trascritto è incompleto, la misura no. Le righe portano `costo_pavimento` e la
+console lo dice.
+
 ## Nota operativa
 
 Il registro degli agenti che il runtime dei workflow interroga è una fotografia

@@ -60,42 +60,61 @@ gcloud run services update diset-viz --region europe-west1 \
 | `LEADERBOARD_DB` | `/data/leaderboard.sqlite3` (default da `Dockerfile`) | Percorso locale del file SQLite nel container. |
 | `LITESTREAM_REPLICA_URL` | `gs://nil-automata-diset-viz-leaderboard/leaderboard` | Destinazione della replica continua Litestream. |
 
-### Cruscotto della catena `/_pipeline` — token e vivo
+### Cruscotto della catena `/_pipeline`
 
-**Attivo in produzione dal 2026-07-31** (Fase 4, sotto): lo stato vivo della
-catena editoriale (ruoli in volo, PR aperte) sta su **Supabase Postgres**, non
-su file locali né su SQLite/Litestream. Esistono **due percorsi dati
-distinti**, non uno:
+Il cruscotto guarda **le run del workflow** (`.claude/workflows/indicatore-lite.js`),
+non piu' un indicatore che attraversa stadi: la catena editoriale autonoma e' stata
+ritirata, e con lei le tabelle `pipeline_activity`, `pipeline_tokens` e
+`pipeline_outcomes`, che dal 2026-08-08 non esistono piu' (migrazione
+`0008_cruscotto_workflow`). Al loro posto due tabelle su Supabase Postgres:
 
-- `/_pipeline?token=...` (server-rendered) legge da Postgres via l'ORM
-  (`app/db.py`/`app/pipeline_state.py`), scritto dal POST degli agenti a
-  `/_pipeline/beat`, autenticato **solo** dall'header `X-Pipeline-Key`
-  (`PIPELINE_INGEST_TOKEN`). Dal 2026-08-04 lo stesso POST porta anche lo
-  **snapshot di lifecycle per indicatore** (`pipeline_outcomes`, azione
-  `outcome`), scritto dal passo di merge a ogni PR fusa: il cruscotto lo
-  sovrappone al dossier committato, così `pubblicata`/`verificato`/prossimo
-  passo sono aggiornati senza aspettare il redeploy dell'immagine (vedi
-  `scripts/pipeline_merge.py::emit_outcomes`,
-  `scripts/pipeline_monitor.py::_apply_outcomes`). Non tocca la pagina pubblica
-  dell'articolo, che resta legata al deploy.
-- `monitor.divarioitalia.it/_pipeline/console` **non passa da Flask**:
-  `frontend/src/monitor/main.js` parla direttamente a Supabase dal browser
-  (`pipeline_activity` via client JS + sottoscrizione Realtime), filtrato da
-  **Row Level Security** sul login Google (`MONITOR_ADMIN_EMAIL`), non dal
-  token. Questo percorso resta vuoto senza errore se RLS+Realtime non sono
-  stati applicati (`scripts/supabase_setup.sql`, punto 4 più sotto) — non
-  basta che gli agenti scrivano.
+- **`pipeline_run`**, una riga per workflow;
+- **`pipeline_agente`**, una riga per agente dentro quel workflow.
+
+**La regola del modello dati**, da non rompere: il **battito** (che arriva
+mentre la run gira) e il **consuntivo** (che arriva a run finita) scrivono
+colonne **disgiunte**. Vengono da due sorgenti diverse e arrivano in ordine non
+garantito, quindi se scrivessero le stesse colonne la seconda cancellerebbe
+quello che ha detto la prima, proprio sulla run che qualcuno sta guardando. Sta
+in `app/pipeline_store.py`.
+
+Chi scrive: **`lab/cruscotto.py`**, un processo che gira **di fianco** al
+workflow, legge i trascritti che il runtime scrive comunque e POSTa a
+`/_pipeline/beat`. Nessun agente della catena batte, e nessun prompt lo sa: i
+turni sono il costo di quell'architettura, e il monitoraggio non ne aggiunge.
+
+    bin/py -m lab.cruscotto --segui --per 5400 &   # PRIMA del workflow
+
+Il consuntivo lo posta da se', quando vede comparire
+`<sessione>/workflows/<runId>.json`, che il runtime scrive **solo a run finita**.
+
+Chi legge: `monitor.divarioitalia.it/_pipeline/console`. Due percorsi dati, come
+prima: il vivo arriva in push da **Supabase Realtime** letto diritto dal browser
+(filtrato da RLS sulla mail Google, non da un token), e la storia gia' montata
+da `/_pipeline/api/runs` e `/_pipeline/api/indicatori`, fetchate col Bearer del
+login. Il percorso Realtime resta vuoto **senza errore** se RLS e Realtime non
+sono stati applicati (`scripts/supabase_setup.sql`, punto 4 piu' sotto): non
+basta che il lettore scriva.
+
+**Un totale di costo e' un pavimento.** Un trascritto reale ha registrato
+`output_tokens: 2` sulla richiesta che restituiva una bozza intera: il
+trascritto e' incompleto, non lo e' la misura. Le righe portano
+`costo_pavimento`, e la console lo dice invece di mostrare il totale come esatto.
 
 | Variabile | Dove | A cosa serve |
 |---|---|---|
 | `PIPELINE_TOKEN` | env Cloud Run (o Secret Manager) | Se impostata, `/_pipeline` serve solo con `?token=` giusto, altrimenti 404. Vuota = aperta (solo locale). |
-| `PIPELINE_INGEST_TOKEN` | **Secret Manager**, su Cloud Run **e** nell'ambiente agenti `divarioitalia` | Il segreto con cui gli agenti autenticano il POST dei battiti (header `X-Pipeline-Key`). Vuoto = ingest spento (404). |
+| `PIPELINE_INGEST_TOKEN` | **Secret Manager**, su Cloud Run **e** nell'ambiente agenti `divarioitalia` | Il segreto con cui `lab/cruscotto.py` autentica il POST (header `X-Pipeline-Key`). Vuoto = ingest spento (404). |
+| `PIPELINE_INGEST_URL` | ambiente agenti `divarioitalia` | Dove postare: `https://divarioitalia.it`. Senza, il lettore legge e lo dice nel log invece di girare a vuoto. |
 
-L'ambiente agenti vuole anche `PIPELINE_INGEST_URL=https://divarioitalia.it`, così
-`pipeline_monitor.py --beat-open/--beat-close` e `pipeline_inflight.py --post` sanno
-dove postare. Nessuna credenziale GCP sugli agenti: scrivono solo via l'endpoint.
-Nessun'altra variabile serve lì: `gh api` (apertura PR) usa l'auth già
-presente nel sandbox cloud dell'agente, non un token in env.
+Nessuna credenziale GCP sugli agenti: scrivono solo via l'endpoint.
+
+**Attenzione all'ordine, quando si cambia il cruscotto.** Il lettore puo' girare
+sul ramo di lavoro, ma il POST arriva all'immagine Cloud Run costruita da
+`master`: finche' il codice non e' fuso e ridistribuito, l'ingest nuovo non
+esiste e la run gira lasciando il cruscotto vuoto. La sequenza e': merge su
+`master`, redeploy, `alembic upgrade head`, `scripts/supabase_setup.sql`, poi la
+run.
 
 ### Fase 4 — Backend mutabile su Supabase
 
@@ -113,7 +132,7 @@ si dovesse rifare da un nuovo progetto Supabase):
 2. **Env pubbliche** su Cloud Run: `SUPABASE_URL`, `SUPABASE_ANON_KEY`
    (`--update-env-vars`). Opzionale `MONITOR_ADMIN_EMAIL` (default già giusto).
 3. **Schema**: `DIRECT_URL=... alembic upgrade head` (crea `scores`,
-   `pipeline_activity`, `pipeline_tokens`). Da fare una volta a mano, o come step
+   `pipeline_run`, `pipeline_agente`). Da fare una volta a mano, o come step
    `alembic upgrade head` in `cloudbuild.yaml` prima del deploy (richiede
    `availableSecrets` con `DIRECT_URL`: aggiungerlo solo quando il secret esiste,
    altrimenti il build fallisce). Lo step va **solo sul deploy, mai sul test**:
@@ -121,7 +140,10 @@ si dovesse rifare da un nuovo progetto Supabase):
    punterebbe a Postgres e il gate cadrebbe.
 4. **RLS + Realtime**: esegui `scripts/supabase_setup.sql` nel SQL editor del
    progetto (attiva la RLS, la policy admin sulle tabelle pipeline, la publication
-   Realtime). Senza, la console resta vuota **senza errore**.
+   Realtime sulle due tabelle del cruscotto). Senza, la console resta vuota
+   **senza errore**. **Questo passo non lo puo' fare un agente**: va incollato a
+   mano nel SQL editor del progetto, e va rifatto ogni volta che le tabelle del
+   cruscotto cambiano nome.
 5. **Migrazione righe** (PRIMA di togliere Litestream):
    ```bash
    gsutil cp gs://nil-automata-diset-viz-leaderboard/leaderboard <lb>.sqlite3
@@ -142,13 +164,15 @@ si dovesse rifare da un nuovo progetto Supabase):
    (stage, binario, `LEADERBOARD_DB`, `LITESTREAM_REPLICA_URL`, `litestream.yml`),
    e dismetti il bucket GCS.
 
-Le migrazioni successive alla Fase 4 aggiungono tabelle con lo stesso passo 3
-(`DIRECT_URL=... alembic upgrade head`) e vogliono lo stesso passo 4
-(`scripts/supabase_setup.sql`, idempotente) rieseguito: `0007_pipeline_outcomes`
-(2026-08-04) crea `pipeline_outcomes`, lo snapshot di lifecycle per indicatore
-del cruscotto (vedi sopra). Finché i due passi non sono rifatti in produzione,
-l'overlay degrada in sicurezza a mappa vuota e la board mostra il solo dossier
-committato, come prima di questa migrazione.
+Le migrazioni successive alla Fase 4 vogliono gli stessi passi 3
+(`DIRECT_URL=... alembic upgrade head`) e 4 (`scripts/supabase_setup.sql`,
+idempotente). L'ultima e' `0008_cruscotto_workflow` (2026-08-08): droppa le tre
+tabelle della catena editoriale autonoma ritirata e crea `pipeline_run` e
+`pipeline_agente`. **Il drop e' irreversibile per le righe che c'erano dentro**:
+il `downgrade()` ricrea le tabelle vuote, e sono comunque righe di un modello
+che il cruscotto nuovo non sa leggere. Finche' i due passi non sono rifatti in
+produzione il cruscotto resta vuoto, e senza il passo 4 resta vuoto **senza dare
+errore**.
 
 | Variabile | Dove | A cosa serve |
 |---|---|---|
