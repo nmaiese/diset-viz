@@ -46,14 +46,24 @@ TETTO_RISULTATO = 20000
 # lavorando.
 SILENZIO_MASSIMO = 15 * 60
 
-# La forma di un runId, dichiarata dallo strumento Workflow per `resumeFromRunId`
-# (`^wf_[a-z0-9-]{6,}$`), piu' il trattino nella coda che ogni runId vero ha e
-# che le stringhe inventate no. Non e' esadecimale: una regex scritta a occhio
-# sui runId visti finora rifiuterebbe run vere, **in silenzio**, che e' il modo
-# peggiore di sbagliare qui. Serve perche' l'ingest accettava qualunque stringa,
-# e un controllo pre-run fatto con una `run` finta lasciava `wf_precheck` in cima
-# al cruscotto, senza agenti e per sempre in volo.
-FORMA_RUN_ID = re.compile(r"^wf_[a-z0-9]+-[a-z0-9-]+$")
+# La forma di un runId, **verbatim** come la dichiara lo strumento Workflow per
+# `resumeFromRunId`. Serve perche' l'ingest accettava qualunque stringa, quindi
+# `[object Object]` o una riga vuota diventavano una run.
+#
+# Aveva un trattino in piu' nella coda (`^wf_[a-z0-9]+-[a-z0-9-]+$`), preso dai
+# runId visti finora, e serviva a rifiutare `wf_precheck`. E' esattamente
+# l'errore contro cui questo commento metteva in guardia una riga piu' sopra:
+# una forma dedotta dai campioni invece che dal contratto. Il contratto ammette
+# `wf_abcdef`, e per una run cosi' il `Postino` inghiotte il 400
+# (`self.guasti += 1`, best effort) e il monitoraggio di quella run sparisce
+# **senza un errore leggibile**. Perdere dati veri in silenzio e' peggio di
+# accettare una riga finta.
+#
+# Quindi la forma **non separa** `wf_precheck` da un runId legale, e non e' li'
+# che sta la difesa: `{"action": "ping"}` risponde senza scrivere niente, ed e'
+# quello che chiede chi sta per spendere una run, mentre `battito_fermo` toglie
+# dal posto d'onore una riga che nessuno rinfresca piu'.
+FORMA_RUN_ID = re.compile(r"^wf_[a-z0-9-]{6,}$")
 
 
 def run_id_valido(run_id):

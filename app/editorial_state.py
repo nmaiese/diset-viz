@@ -12,9 +12,11 @@ riscrive articoli pubblici e' una superficie che non si ripaga. E `lab/coda.py`
 importa `app.*`, quindi si chiuderebbe un anello.
 """
 
+import hashlib
+
 from app import sources
 from app.cache_util import synchronized_cache
-from app.indicator_texts import build_article, get_text
+from app.indicator_texts import build_article, emitted_roles, get_text
 from app.indicator_universe import projection
 from scripts.prose_rules import rilievi as rilievi_prosa
 
@@ -30,6 +32,47 @@ def parole(entry):
     testo = " ".join([entry.get("lead") or ""] +
                      [s.get("body") or "" for s in entry.get("sections") or []])
     return len(testo.split())
+
+
+def impronta_prosa(entry):
+    """L'identita' della prosa di un articolo: lead piu' `sections[].{role,h,body}`.
+
+    E' il `prose_fingerprint` che `app/indicator_texts.build_article` e
+    `docs/INDICATOR_PAGES.md` gia' nominano: qui c'e' la funzione, e la
+    definizione e' quella che quei due testi dichiarano.
+
+    I conteggi non identificano un testo. Il cruscotto confrontava le sole
+    parole per dire se l'articolo servito e' quello che l'ultima run ha scritto,
+    e due riscritture della stessa lunghezza si leggevano `in linea` con
+    certezza `alta` mentre la pagina in produzione era un'altra: una
+    pubblicazione in attesa che spariva dalla vista.
+
+    **Non e' l'impronta della bozza** (`lab.controlla.impronta` e la sua gemella
+    JavaScript `improntaDi` in `.claude/workflows/indicatore-lite.js`), che
+    congela il testo *prima* che venga scritto e ci mette dentro anche le fonti,
+    per accorgersi se e' finita su disco una bozza diversa da quella verificata.
+    Due domande diverse, e i nomi restano diversi apposta: li' si chiede se il
+    testo pubblicato e' quello approvato, qui se il disco e' in linea col deploy.
+    """
+    # Spazi normalizzati dalle due parti: la run stampa l'impronta dell'entry
+    # che ha appena scritto, il sito la ricalcola dal JSON servito, e un a capo
+    # diverso fra i due non e' una riscrittura.
+    # I ruoli emessi entrano, e non e' un di piu': assorbire la definizione nel
+    # blocco "Come leggere il dato" cambia quello che la pagina mostra **senza
+    # toccare una parola**, quindi un'entry che riscrive solo `roles_covered`
+    # si leggerebbe "in linea" mentre in produzione c'e' un'altra pagina.
+    pezzi = [",".join(emitted_roles(entry)),
+             " ".join((entry.get("lead") or "").split())]
+    for sezione in entry.get("sections") or []:
+        if not isinstance(sezione, dict):
+            continue
+        pezzi.append("\x1f".join([
+            (sezione.get("role") or "").strip(),
+            (sezione.get("h") or "").strip(),
+            " ".join((sezione.get("body") or "").split()),
+        ]))
+    testo = "\x1e".join(pezzi)
+    return hashlib.sha256(testo.encode("utf-8")).hexdigest()[:16]
 
 
 @synchronized_cache(maxsize=1)
@@ -149,15 +192,16 @@ def catalogo():
     for row in build_queue():
         if row["id"] not in misurati:
             entry = get_text(row["id"])
-            misurati[row["id"]] = ((len(rilievi_prosa(entry)), parole(entry))
-                                   if entry else (0, 0))
+            misurati[row["id"]] = ((len(rilievi_prosa(entry)), parole(entry), impronta_prosa(entry))
+                                   if entry else (0, 0, None))
         # Un articolo vale per **un livello solo** (`entry["level"]`), mentre lo
         # store tiene un file per indicatore: la riga dell'altro livello vede
         # quello stesso file ma la sua pagina non ne rende una parola. Attribuirle
         # quelle parole direbbe che c'e' un testo dove non c'e', e il confronto
         # con le parole della run leggerebbe "non in linea" per sempre.
         serve_questo_livello = bool(row["written"]) or row["lead"]
-        conta_rilievi, conta_parole = misurati[row["id"]] if serve_questo_livello else (0, 0)
+        conta_rilievi, conta_parole, firma = (
+            misurati[row["id"]] if serve_questo_livello else (0, 0, None))
         righe.append({
             "id": row["id"],
             "codice": row["code"],
@@ -182,6 +226,7 @@ def catalogo():
             "punteggio": row["score"],
             "rilievi": conta_rilievi,
             "parole": conta_parole,
+            "impronta_prosa": firma,
         })
     return {"righe": righe, "totali": _totali(righe)}
 

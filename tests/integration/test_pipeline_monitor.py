@@ -327,8 +327,16 @@ CHIAVI_RIGA_CATALOGO = {
     "id", "codice", "nome", "famiglia", "famiglia_label", "tema", "livello",
     "livelli", "predefinito", "anno_dato", "vintage", "arretrato", "lead",
     "mancanti", "scritte", "sezioni", "ruoli", "indicizzabile", "motivo",
-    "percorso", "punteggio", "rilievi", "parole", "stato", "certezza", "url",
-    "ultima_run", "ultima_run_il",
+    "percorso", "punteggio", "rilievi", "parole", "impronta_prosa", "stato",
+    "certezza", "url", "ultima_run", "ultima_run_il",
+}
+
+CHIAVI_RIGA_INDICATORE = {
+    "run_id", "workflow", "at", "durata_ms", "costo", "costo_pavimento",
+    "indicatore", "esito", "scritto", "sovrascritto", "vintage_precedente",
+    "percorso", "parole", "impronta_prosa", "angolo", "giri_di_correzione",
+    "cifre_verificate", "sezioni", "impaginazione", "rilievi", "rilievi_aperti",
+    "motivo", "published_url",
 }
 
 
@@ -410,6 +418,59 @@ class LaFormaDelPayload(CruscottoBase):
         self.assertEqual(senza[0]["stato"], "in linea")
         self.assertEqual(senza[0]["certezza"], "assente")
 
+    def test_ogni_campo_di_una_riga_per_indicatore_ha_il_suo_tipo(self):
+        """Anche il ramo `fermati`, che compone la riga a mano da un'altra parte
+        del codice: due rami della stessa riga con due forme diverse sono
+        `[object Object]` che aspetta il suo turno."""
+        self.scrivi("wf_11111111-aa1", ESITO_CON_SOVRASCRITTURA, "2026-08-08T09:00:00+00:00")
+        self.scrivi("wf_22222222-bb2", ESITO_FERMATO, "2026-08-08T10:00:00+00:00")
+        for riga in self.indicatori():
+            self.assertEqual(set(riga), CHIAVI_RIGA_INDICATORE)
+            for campo in ("sezioni", "impaginazione", "rilievi", "rilievi_aperti"):
+                self.assertIsInstance(riga[campo], list)
+            self.assertIsInstance(riga["scritto"], bool)
+
+    def _riga_con_articolo(self):
+        righe = [r for r in self.catalogo()["righe"] if r["scritte"] and r["impronta_prosa"]]
+        self.assertTrue(righe, "serve almeno un articolo su disco")
+        return righe[0]
+
+    def _con_run(self, riga, **voce):
+        esito = {"richiesti": 1, "scritti": 1, "fermati": [],
+                 "articoli": [{"codice": riga["codice"], "scritto": True, **voce}]}
+        self.scrivi("wf_11111111-aa1", esito, "2026-08-08T09:00:00+00:00")
+        return {r["codice"]: r for r in self.catalogo()["righe"]}[riga["codice"]]
+
+    def test_l_impronta_decide_e_non_lascia_dubbi(self):
+        """Lead piu' `sections[].{role,h,body}`, la stessa funzione dalle due
+        parti: `lab.pubblica` la stampa dopo aver scritto, il sito la ricalcola
+        dal file servito."""
+        riga = self._riga_con_articolo()
+        dopo = self._con_run(riga, parole=riga["parole"], impronta_prosa=riga["impronta_prosa"])
+        self.assertEqual((dopo["stato"], dopo["certezza"]), ("in linea", "esatta"))
+
+    def test_un_impronta_diversa_e_una_pubblicazione_che_aspetta(self):
+        riga = self._riga_con_articolo()
+        dopo = self._con_run(riga, parole=riga["parole"], impronta_prosa="0" * 16)
+        self.assertEqual((dopo["stato"], dopo["certezza"]),
+                         ("scritto, non in linea", "esatta"))
+
+    def test_le_sole_parole_non_sono_una_certezza_alta(self):
+        """Le parole dicono **quanto**, non **che cosa**: una riscrittura della
+        stessa lunghezza si leggeva `in linea` con certezza `alta` mentre in
+        produzione c'era ancora l'altra. Nessuna run registrata prima
+        dell'impronta la porta, quindi questo ramo resta, ma dichiara quanto sa.
+        """
+        riga = self._riga_con_articolo()
+        dopo = self._con_run(riga, parole=riga["parole"])
+        self.assertEqual((dopo["stato"], dopo["certezza"]), ("in linea", "debole"))
+
+    def test_un_conteggio_diverso_invece_e_una_prova(self):
+        riga = self._riga_con_articolo()
+        dopo = self._con_run(riga, parole=riga["parole"] + 1)
+        self.assertEqual((dopo["stato"], dopo["certezza"]),
+                         ("scritto, non in linea", "alta"))
+
 
 class IlCruscottoNonContaPagineCheNonEsistono(CruscottoBase):
     """La console contro la sitemap servita, che e' l'incrocio che vale.
@@ -441,33 +502,40 @@ class IlCruscottoNonContaPagineCheNonEsistono(CruscottoBase):
 
 
 class LaFormaDelRunId(CruscottoBase):
-    """Un `run_id` inventato non deve poter diventare una run.
+    """La forma e' quella del contratto, e non una dedotta dai campioni.
 
-    `wf_precheck` e' entrato due volte da qui: chi stava per spendere una run
-    chiedeva se la presa fosse viva mandando una `run` finta, che pero' e' un
-    battito vero, e lasciava una riga in cima al cruscotto senza agenti e per
-    sempre in volo. Il `ping` e' la buona maniera, la forma del `run_id` e' la
-    difesa."""
+    L'ingest accettava qualunque stringa, quindi una riga vuota o
+    `[object Object]` diventavano una run. La forma la dichiara lo strumento
+    Workflow per `resumeFromRunId`, `^wf_[a-z0-9-]{6,}$`, e si prende
+    **verbatim**: pretendere in piu' il trattino che ogni runId visto finora ha
+    rifiuterebbe `wf_abcdef`, che il contratto ammette, e la rifiuterebbe in
+    silenzio, perche' il `Postino` inghiotte il 400. Perdere il monitoraggio di
+    una run vera e' peggio che accettare una riga finta.
 
-    def test_un_run_id_inventato_e_rifiutato_e_non_lascia_righe(self):
-        for finto in ("wf_precheck", "precheck", "wf_", "", "wf_nodash"):
-            self.assertEqual(self.posta({"action": "run", "run_id": finto}).status_code, 400)
+    Quindi la forma **non separa** `wf_precheck` da un runId legale: quella
+    difesa e' il `ping`, che risponde senza scrivere, piu' `battito_fermo`, che
+    toglie dal posto d'onore una riga che nessuno rinfresca."""
+
+    def test_una_stringa_che_non_e_un_run_id_e_rifiutata(self):
+        for finto in ("", "precheck", "wf_", "wf_abc", "wf_abc def",
+                      "[object Object]", "WF_239AD8CE-AF7", "wf_239ad8ce-af7/../x"):
+            self.assertEqual(self.posta({"action": "run", "run_id": finto}).status_code, 400,
+                             f"accettato come run_id: {finto!r}")
         self.assertEqual(self.runs(), [])
 
     def test_un_run_id_vero_passa(self):
-        """La forma autorevole e' quella dello strumento Workflow,
-        `^wf_[a-z0-9-]{6,}$`: **lettere oltre la f**, quindi una regex
-        esadecimale scritta a occhio sui runId visti finora rifiuterebbe run
-        vere, e le rifiuterebbe in silenzio."""
-        for vero in ("wf_239ad8ce-af7", "wf_2bb7c8b6-41f", "wf_zzzzzzzz-ppp"):
-            self.assertEqual(self.posta({"action": "run", "run_id": vero}).status_code, 200)
-        self.assertEqual(len(self.runs()), 3)
+        """Tutto quello che il contratto ammette: **lettere oltre la f** (non e'
+        esadecimale), e nessun trattino obbligatorio."""
+        for vero in ("wf_239ad8ce-af7", "wf_2bb7c8b6-41f", "wf_zzzzzzzz-ppp", "wf_abcdef"):
+            self.assertEqual(self.posta({"action": "run", "run_id": vero}).status_code, 200,
+                             f"rifiutato un run_id legale: {vero!r}")
+        self.assertEqual(len(self.runs()), 4)
 
     def test_anche_agente_e_consuntivo_rifiutano(self):
         self.assertEqual(self.posta(
-            {"action": "agente", "run_id": "wf_precheck", "agent_id": "a1"}).status_code, 400)
+            {"action": "agente", "run_id": "wf_", "agent_id": "a1"}).status_code, 400)
         self.assertEqual(self.posta(
-            {"action": "consuntivo", "run_id": "wf_precheck", "run": {}, "agenti": []}).status_code, 400)
+            {"action": "consuntivo", "run_id": "wf_", "run": {}, "agenti": []}).status_code, 400)
         self.assertEqual(self.runs(), [])
 
 

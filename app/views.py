@@ -707,6 +707,7 @@ def _articoli_da_esito(esito, run):
             "vintage_precedente": voce.get("vintage_precedente"),
             "percorso": voce.get("percorso"),
             "parole": voce.get("parole"),
+            "impronta_prosa": voce.get("impronta_prosa"),
             "angolo": voce.get("angolo"),
             "giri_di_correzione": voce.get("giri_di_correzione"),
             "cifre_verificate": voce.get("cifre_verificate"),
@@ -726,7 +727,7 @@ def _articoli_da_esito(esito, run):
             "scritto": False,
             "sovrascritto": None,
             "vintage_precedente": None,
-            "percorso": None, "parole": None,
+            "percorso": None, "parole": None, "impronta_prosa": None,
             "angolo": (voce.get("bozza") or {}).get("angolo") if isinstance(voce.get("bozza"), dict) else None,
             "giri_di_correzione": voce.get("giri"),
             "cifre_verificate": (voce.get("verdetto") or {}).get("verificate")
@@ -822,10 +823,17 @@ def _stato_in_linea(riga, scritture):
     `lab.pubblica` scrive direttamente sulla pagina pubblica e il merge è la
     pubblicazione.
 
-    Si confrontano le **parole**, con lo stesso conteggio dalle due parti
-    (`editorial_state.parole`, che usa anche `lab/pubblica.py`): due definizioni
-    diverse misurerebbero la differenza fra le definizioni invece che fra gli
-    articoli, e direbbero sempre "non in linea".
+    Si confronta l'**impronta della prosa** (`editorial_state.impronta`, che
+    stampa anche `lab/pubblica.py`): lead più `sections[].{role,h,body}`, la
+    stessa funzione dalle due parti, perché due definizioni diverse
+    misurerebbero la differenza fra le definizioni invece che fra gli articoli.
+
+    Le parole restano il **ripiego**, e con meno certezza: nessuna delle run già
+    registrate porta l'impronta, e i conteggi dicono quanto, non che cosa. Due
+    riscritture della stessa lunghezza si leggevano `in linea` con certezza
+    `alta` mentre in produzione c'era ancora l'altra, cioè una pubblicazione in
+    attesa che spariva dalla vista. Un conteggio **diverso** invece è una prova:
+    di quella si può dire `alta`.
 
     `sovrascritto` e `vintage_precedente` non servono qui: un rimaneggiamento
     sullo stesso anno di dato lascia `vintage` identico anche dopo il deploy,
@@ -837,14 +845,18 @@ def _stato_in_linea(riga, scritture):
         return ("scritto, non in linea", "esatta") if scrittura else ("mai scritto", "esatta")
     if scrittura is None:
         return "in linea", "assente"
+    impronta_run = scrittura.get("impronta_prosa")
+    if impronta_run and riga.get("impronta_prosa"):
+        return (("in linea", "esatta") if impronta_run == riga["impronta_prosa"]
+                else ("scritto, non in linea", "esatta"))
     parole_run = scrittura.get("parole")
     if parole_run is None:
-        # La run non ha registrato le parole: non c'è niente da confrontare, e
-        # `alta` direbbe che si è guardato. `certezza` è un campo di prima classe
-        # proprio per non sovrastimare quello che si sa.
+        # La run non ha registrato niente di confrontabile, e `alta` direbbe che
+        # si è guardato. `certezza` è un campo di prima classe proprio per non
+        # sovrastimare quello che si sa.
         return "in linea", "assente"
     if parole_run == riga["parole"]:
-        return "in linea", "alta"
+        return "in linea", "debole"
     return "scritto, non in linea", "alta"
 
 

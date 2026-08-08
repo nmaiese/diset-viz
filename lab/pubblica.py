@@ -203,6 +203,19 @@ def _parole(entry):
     return parole(entry)
 
 
+def _impronta_prosa(entry):
+    """L'identita' della prosa appena scritta, dalla stessa funzione del sito.
+
+    Le parole dicono **quanto**, non **che cosa**: due riscritture della stessa
+    lunghezza si leggevano `in linea` mentre in produzione c'era ancora l'altra.
+    Il conteggio resta accanto perche' dice che cosa e' cambiato quando le due
+    impronte non coincidono.
+    """
+    from app.editorial_state import impronta_prosa
+
+    return impronta_prosa(entry)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("codice")
@@ -261,6 +274,7 @@ def main(argv=None):
         "livello": entry["level"],
         "vintage": entry["vintage"],
         "parole": _parole(entry),
+        "impronta_prosa": _impronta_prosa(entry),
         # Gli H2 come li vedrebbe un lettore: è l'unico modo di controllare la
         # forma di un articolo che nessuna pagina rende, perché `data/lab/`
         # non è letto da niente.

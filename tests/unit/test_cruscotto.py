@@ -334,5 +334,54 @@ class IlGiro(unittest.TestCase):
         self.assertLessEqual(len(agenti[0]["risultato"]), cruscotto.TETTO_RISULTATO)
 
 
+class IlRinfrescoDelBattito(unittest.TestCase):
+    """Il silenzio del poller non e' il silenzio della run.
+
+    Mentre un agente lavora non cambia niente di leggibile da fuori, quindi
+    l'impronta resta identica e la soppressione ferma ogni POST. Ma
+    `ultimo_battito` lo stampa il server a ogni POST: senza rinfresco, un turno
+    lungo (la norma per chi scrive) faceva leggere la run come `battito fermo`
+    mentre il lettore stava benissimo."""
+
+    def setUp(self):
+        self.finta = CartellaFinta()
+        self.addCleanup(self.finta.via)
+        self.postino = PostinoFinto()
+        self.adesso = 0.0
+        self.giro = cruscotto.Giro(self.postino, self.finta.radice,
+                                   orologio=lambda: self.adesso)
+        self.finta.agente("wf_rinfresco", "a1", "lab-scrittore", "Scrivi ter-13")
+
+    def test_lo_stato_invariato_si_riposta_a_scadenza(self):
+        self.giro.passa()
+        self.adesso = cruscotto.RINFRESCO_BATTITO - 1
+        self.assertEqual(self.giro.passa(), 0)
+        self.adesso = cruscotto.RINFRESCO_BATTITO
+        self.assertEqual(self.giro.passa(), 1)
+        self.assertEqual(self.postino.azioni().count("run"), 2)
+
+    def test_il_rinfresco_non_riposta_gli_agenti(self):
+        """Il costo del monitoraggio deve crescere con quello che succede, non
+        con la durata della run: e' la ragione per cui `Giro` ha una memoria."""
+        self.giro.passa()
+        agenti_prima = self.postino.azioni().count("agente")
+        self.adesso = cruscotto.RINFRESCO_BATTITO
+        self.giro.passa()
+        self.assertEqual(self.postino.azioni().count("agente"), agenti_prima)
+
+    def test_la_scadenza_si_conta_dall_ultimo_invio(self):
+        """Anche da un invio partito per un cambio di stato. Contarla dal primo
+        battito farebbe scattare il rinfresco quando non serve, e quindi tacere
+        piu' a lungo quando serve."""
+        self.giro.passa()
+        self.adesso = 100.0
+        self.finta.agente("wf_rinfresco", "a2", "lab-scout", "Indicatore ter-13, la tua lente")
+        self.assertGreater(self.giro.passa(), 0)
+        self.adesso = 100.0 + cruscotto.RINFRESCO_BATTITO - 1
+        self.assertEqual(self.giro.passa(), 0)
+        self.adesso = 100.0 + cruscotto.RINFRESCO_BATTITO
+        self.assertEqual(self.giro.passa(), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

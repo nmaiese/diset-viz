@@ -525,6 +525,11 @@ function dettaglioAtlante(r) {
     r.rilievi ? r.rilievi + " rilievi di prosa" : null,
     "punteggio di coda " + r.punteggio,
     r.certezza === "assente" ? "nessuna run registrata su questa pagina" : null,
+    // Le parole dicono quanto, non che cosa: due riscritture della stessa
+    // lunghezza si somigliano solo qui. Le run registrate prima dell'impronta
+    // passano tutte di qui, e la riga deve dirlo invece di far leggere come
+    // certo un confronto che non lo è.
+    r.certezza === "debole" ? "in linea dalle sole parole, la run non ha registrato l'impronta" : null,
   ].filter(Boolean);
   pezzi.push("<p>" + escapeHtml(fatti.join(" · ")) + "</p>");
 
