@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nega l'advisor agli agenti dell'officina, come hook invece che come frase.
+"""Nega l'advisor agli agenti della catena, come hook invece che come frase.
 
 Perché esiste. Il campo `disallowedTools: advisor` nel frontmatter **non
 funziona**: l'advisor non è un tool della lista che quel campo filtra, e la
@@ -15,9 +15,12 @@ tipo `advisor_message`, che è il motivo per cui `scripts/baseline_tokens.py`
 le somma a mano.
 
 Uscita 0 = permesso, 2 = bloccato con la ragione su stderr, che è il canale
-che l'harness rilegge all'agente. Come `agent_guard.py`: un errore interno
-esce 0, perché un hook che si rompe non deve fermare una catena non
-presidiata per un guasto che non è dell'agente.
+che l'harness rilegge all'agente. Un errore interno esce 0: un hook che si
+rompe non deve fermare un workflow non presidiato per un guasto che non è
+dell'agente.
+
+Lo caricano tutti e sei i tipi `lab-*` più `giudice-cieco`, cioè ogni agente
+che questo progetto lancia dentro un workflow.
 
 Se al giro dopo il trascritto mostra ancora chiamate advisor, allora nemmeno
 `PreToolUse` vede quella chiamata, e la sola via rimasta è una configurazione
@@ -33,7 +36,7 @@ import json
 import sys
 
 MOTIVO = (
-    "L'advisor è negato agli agenti dell'officina. Hai già tutto ciò che ti "
+    "L'advisor è negato agli agenti di questa catena. Hai già tutto ciò che ti "
     "serve nel messaggio della run: se qualcosa sembra mancare, non manca, non "
     "è lì perché non deve entrare nel tuo lavoro. Una consulenza a contesto "
     "pieno e senza cache è la voce di costo più cara di questa catena "

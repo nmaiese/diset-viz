@@ -1,11 +1,22 @@
 #!/usr/bin/env python3
-"""Hook PreCompact: lo stato della run, ridetto prima che il contesto si accorci.
+"""Hook PreCompact: quello che sta su disco, ridetto prima che il contesto si accorci.
 
 Quando la conversazione viene compattata, quello che sta solo nella
-conversazione può perdersi. Le cose che una run della catena non può
-permettersi di dimenticare però stanno tutte in file committati o in git:
-questo hook le rilegge da lì e le ristampa, così il riassunto che entra nel
-nuovo contesto le porta con sé. Non inventa stato, lo cita.
+conversazione può perdersi. Quello che sta in un file no: questo hook lo rilegge
+da lì e lo ristampa, così il riassunto che entra nel nuovo contesto se lo porta
+dietro. Non inventa stato, lo cita.
+
+Leggeva le schede di run sotto `data/pipeline/runs/`, che erano lo stato della
+catena editoriale autonoma. Quella catena non esiste più, e le schede sono
+ferme a luglio: l'hook continuava a stampare "stadio writer, esito merged" a
+ogni compattazione, cioè a insegnare a chi legge il vocabolario di una macchina
+spenta, con in fondo il rimando a due file cancellati. È esattamente il guasto
+contro cui `CLAUDE.md` apre: un prompt che ripete un contratto invece di
+puntarlo.
+
+Adesso cita quello che la catena minima lascia davvero su disco: i dossier
+montati, le bozze congelate da `lab.controlla --salva` e gli articoli scritti.
+Sono le tre cose il cui percorso serve per riprendere un giro a metà.
 
 Best effort: stampare meno è sempre meglio che fallire.
 """
@@ -16,7 +27,25 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-RUNS = ROOT / "data" / "pipeline" / "runs"
+
+# Che cosa la catena minima lascia dietro di sé, nell'ordine in cui la si
+# attraversa. `content/indicators/` non è qui apposta: sono 300 file e solo gli
+# ultimi due o tre vengono da una run: i suoi cambiamenti si leggono in git,
+# che è la fonte giusta per un file versionato.
+TRACCE = (
+    ("dossier montati", Path("data") / "lab" / "dossier"),
+    ("bozze congelate", Path("data") / "lab" / "bozze"),
+    ("articoli di prova", Path("data") / "lab" / "articoli"),
+)
+
+
+def _recenti(cartella, quanti=3):
+    try:
+        file = [percorso for percorso in cartella.glob("*.json") if percorso.is_file()]
+    except OSError:
+        return []
+    file.sort(key=lambda percorso: percorso.stat().st_mtime, reverse=True)
+    return file[:quanti]
 
 
 def main():
@@ -34,21 +63,14 @@ def main():
             lines.append(f"- branch corrente: {branch}")
     except OSError:
         pass
-    try:
-        shards = sorted(RUNS.glob("*.json"))[-3:]
-        for shard in shards:
-            try:
-                row = json.loads(shard.read_text(encoding="utf-8"))
-            except (OSError, ValueError):
-                continue
-            lines.append(
-                f"- run {row.get('run_id', shard.stem)}: stadio {row.get('stage', '?')}, "
-                f"esito {row.get('outcome', '?')}, {row.get('summary', '')}"
-            )
-    except OSError:
-        pass
-    lines.append("- contratto e chiusura run: docs/AGENT_CONTRACT.md; "
-                 "stato code: python3 scripts/pipeline_status.py")
+    for etichetta, relativo in TRACCE:
+        recenti = _recenti(ROOT / relativo)
+        if recenti:
+            nomi = ", ".join(percorso.name for percorso in recenti)
+            lines.append(f"- {etichetta} più di recente ({relativo}): {nomi}")
+    lines.append("- la catena e i suoi comandi: lab/README.md; "
+                 "che cosa conviene scrivere adesso: "
+                 "bin/py -m lab.dossier --coda 5 --freschi 2025")
     print("\n".join(lines))
     return 0
 
