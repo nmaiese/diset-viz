@@ -139,8 +139,8 @@ async function render(supabase, currentUser) {
   // scritto quale colonna.
   supabase
     .channel("cruscotto")
-    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_run" }, () => carica(supabase))
-    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_agente" }, () => carica(supabase))
+    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_run" }, () => caricaFraPoco(supabase))
+    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_agente" }, () => caricaFraPoco(supabase))
     .subscribe();
 }
 
@@ -171,6 +171,16 @@ async function carica(supabase) {
   runsData = runs;
   indicatoriData = indicatori;
   disegna();
+}
+
+// Realtime spara un evento per riga cambiata, e durante una run le righe
+// cambiano a ogni giro del lettore: senza freno la console rifetcherebbe le due
+// API decine di volte al minuto per mostrare lo stesso stato. Si accumula e si
+// legge una volta sola.
+let attesa = null;
+function caricaFraPoco(supabase) {
+  if (attesa) return;
+  attesa = setTimeout(() => { attesa = null; carica(supabase); }, 1200);
 }
 
 // --- navigazione -----------------------------------------------------------
@@ -219,7 +229,14 @@ function disegna() {
 function disegnaAdesso() {
   const el = document.getElementById("mon-adesso");
   if (!el) return;
-  const runs = (runsData && runsData.runs) || [];
+  // Rete caduta e catena ferma sono due cose diverse, e il posto dove
+  // confonderle fa piu' danno e' proprio qui: "nessuna run" mentre una run gira
+  // e' la bugia peggiore che questa pagina possa dire.
+  if (!runsData) {
+    el.innerHTML = '<p class="mon-empty">Non riesco a leggere le run (login o rete).</p>';
+    return;
+  }
+  const runs = runsData.runs || [];
   if (!runs.length) {
     el.innerHTML = '<p class="mon-empty">Nessuna run registrata.</p>';
     return;
