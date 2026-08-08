@@ -9,10 +9,9 @@ Legge la bozza da un **percorso**, non da stdin: è quella congelata da
 approvato. Così fra la verifica e il disco non c'è nessun modello che ribatte
 il testo.
 
-L'ordine conta: prima scrive, poi misura. Il lint di `officina/` gira dentro un
-try/except e i suoi rilievi sono informativi, anche quelli che nella catena
-attuale bloccano: qui non c'è cancello, e un'eccezione della misura non deve
-portarsi via l'unico prodotto.
+L'ordine conta: prima scrive, poi misura. `lab.lint` gira dentro un try/except
+e i suoi rilievi sono informativi, anche quelli marcati `blocca`: qui non c'è
+cancello, e un'eccezione della misura non deve portarsi via l'unico prodotto.
 
     bin/py -m lab.pubblica ter-30 --bozza data/lab/bozze/ter-30.json
 """
@@ -170,18 +169,11 @@ def _impaginazione(entry):
 
 
 def _rilievi(chiave, entry):
-    """Il lint della catena attuale usato come metro, mai come cancello."""
-    try:
-        from officina import lint
-        from scripts import indicator_store
+    """Il metro della prosa. Misura e basta: qui non c'è cancello."""
+    from lab import lint
 
-        testi = indicator_store.load_all(strict=False)
-        compilati = lint.patterns(lint.territory_alternation({**testi, chiave: entry}))
-        return [
-            {"rule": r["rule"], "severity": r["severity"], "detail": r["detail"],
-             "field": r.get("field")}
-            for r in lint.lint_entry(chiave, entry, texts=testi, compiled=compilati)
-        ]
+    try:
+        return lint.rilievi(entry)
     except Exception as errore:  # la misura non porta via il prodotto
         return [{"rule": "lint-non-eseguito", "severity": "segnala",
                  "detail": f"{type(errore).__name__}: {errore}", "field": None}]

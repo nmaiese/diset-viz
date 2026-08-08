@@ -610,7 +610,7 @@ def costruisci(codice, chiave_livello=None):
 def da_coda(quanti, anno_minimo):
     """I primi `quanti` codici della coda editoriale con dati almeno di `anno_minimo`.
 
-    Il punteggio non lo calcola questo modulo: è `scripts.text_queue`, che
+    Il punteggio non lo calcola questo modulo: è `lab.coda`, che
     ordina il catalogo intero (cifre arretrate prima di tutto, poi le sezioni
     che mancano, poi se la pagina è indicizzabile). Qui si aggiungono i due
     filtri che la lite vuole e la coda non ha: **il dato dell'anno che chiedi**
@@ -620,7 +620,7 @@ def da_coda(quanti, anno_minimo):
     anche il livello: lo stesso indicatore su regioni e province è un altro
     articolo.
     """
-    from scripts.text_queue import build_queue
+    from lab.coda import build_queue
 
     return [{"codice": riga["code"], "livello": riga["level"], "nome": riga["name"],
              "anno_max": riga["year_max"], "punteggio": riga["score"]}
