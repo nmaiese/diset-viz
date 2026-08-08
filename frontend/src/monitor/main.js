@@ -65,6 +65,8 @@ const ORDINI = [
 let runsData = null;
 let indicatoriData = null;
 let catalogoData = null;
+let ultimoAggiornamento = null;
+let ultimoTentativoVuoto = false;
 let vista = "atlante";
 let pagina = 0;
 const PAGINA = 25;
@@ -131,6 +133,9 @@ async function render(supabase, currentUser) {
   h(
     '<div class="mon-head"><h1>Console catena</h1>' +
       '<span class="mon-dot" title="in ascolto"></span>' +
+      // La pagina si aggiorna da se': allora deve dire **quando** l'ha fatto,
+      // o una console ferma per un guasto si legge come una catena ferma.
+      '<span id="mon-orologio" class="mon-orologio">carico...</span>' +
       // I due bottoni stanno in un contenitore loro: sciolti nella testa vanno a
       // capo uno per volta, e su schermo stretto "Esci" finiva da solo a sinistra.
       '<div class="mon-azioni">' +
@@ -156,6 +161,7 @@ async function render(supabase, currentUser) {
   window.addEventListener("hashchange", () => { leggiHash(); disegna(); });
 
   await carica(supabase);
+  avviaBattito(supabase);
 
   // Realtime: a ogni cambiamento sulle due tabelle si rilegge tutto. Le tabelle
   // sono piccole e la rilettura completa e' piu' semplice (e meno fragile) di un
@@ -187,16 +193,98 @@ async function authedJson(supabase, path) {
   }
 }
 
-async function carica(supabase) {
-  const [runs, indicatori, catalogo] = await Promise.all([
+// Il catalogo pesa mezzo megabyte e cambia solo con un deploy, tranne la
+// colonna che lo lega alle run: si rilegge alla prima carica e poi solo quando
+// l'insieme delle run e' cambiato davvero. Le run invece si rileggono a ogni
+// giro, e sono poche righe.
+function firmaRuns(dati) {
+  return (dati?.runs || [])
+    .map((r) => `${r.run_id}:${r.stato || ""}:${r.consuntivo_il || ""}`)
+    .join(",");
+}
+
+async function carica(supabase, { soloRun = false } = {}) {
+  const primaFirma = firmaRuns(runsData);
+  const [runs, indicatori] = await Promise.all([
     authedJson(supabase, "/_pipeline/api/runs"),
     authedJson(supabase, "/_pipeline/api/indicatori"),
-    authedJson(supabase, "/_pipeline/api/catalogo"),
   ]);
-  runsData = runs;
-  indicatoriData = indicatori;
-  catalogoData = catalogo;
+  // Un giro automatico che non risponde non deve cancellare quello che c'e' in
+  // pagina: la rete cade per un secondo e la console direbbe "non riesco a
+  // leggere le run" a chi sta guardando una run girare. Il primo caricamento
+  // invece scrive anche il fallimento, perche' li' non c'e' niente da tenere.
+  if (runs || !soloRun) runsData = runs;
+  if (indicatori || !soloRun) indicatoriData = indicatori;
+
+  const cambiate = firmaRuns(runsData) !== primaFirma;
+  if (!soloRun || cambiate || !catalogoData) {
+    const catalogo = await authedJson(supabase, "/_pipeline/api/catalogo");
+    if (catalogo || !soloRun) catalogoData = catalogo;
+  }
+
+  if (runs || indicatori) ultimoAggiornamento = new Date();
+  ultimoTentativoVuoto = !runs;
   disegna();
+  orologio();
+}
+
+// L'aggiornamento da se'. Realtime c'e' gia', ma **dipende da come e'
+// configurata la pubblicazione di Supabase**, e se quelle due tabelle non ci
+// sono dentro non arriva un evento e la pagina resta ferma finche' non clicchi:
+// e' quello che si vedeva. Il tempo qui non dipende da nessuna configurazione.
+//
+// Due cadenze, perche' una sola sarebbe sbagliata due volte: con una run in
+// volo lo stato cambia ogni pochi secondi, e a catena ferma non cambia per ore.
+const PASSO_VIVO = 10000;
+const PASSO_FERMO = 60000;
+let battito = null;
+let vigilaVisibilita = false;
+let ultimoSupabase = null;
+
+function inVolo() {
+  return (runsData?.runs || []).some((r) => r.in_volo && !r.battito_fermo);
+}
+
+function avviaBattito(supabase) {
+  ultimoSupabase = supabase;
+  if (battito) clearInterval(battito);
+  let passo = null;
+  const arma = () => {
+    const prossimo = inVolo() ? PASSO_VIVO : PASSO_FERMO;
+    if (prossimo === passo) return;
+    passo = prossimo;
+    if (battito) clearInterval(battito);
+    battito = setInterval(() => {
+      // Una scheda in secondo piano non la guarda nessuno: fetchare per un
+      // pixel che nessuno vede e' costo puro, e al ritorno si ricarica comunque.
+      if (document.hidden) return;
+      carica(supabase, { soloRun: true }).then(arma);
+    }, passo);
+  };
+  arma();
+  // Una volta sola: `render()` rigira a ogni cambio di sessione (anche un
+  // TOKEN_REFRESHED, che rida' lo stesso utente), e un listener per render
+  // vorrebbe dire una fetch per render a ogni ritorno sulla scheda.
+  if (!vigilaVisibilita) {
+    vigilaVisibilita = true;
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && ultimoSupabase) {
+        carica(ultimoSupabase, { soloRun: true });
+      }
+    });
+  }
+}
+
+function orologio() {
+  const el = document.getElementById("mon-orologio");
+  if (!el) return;
+  const ora = ultimoAggiornamento
+    ? ultimoAggiornamento.toLocaleTimeString("it-IT")
+    : "mai";
+  el.textContent = ultimoTentativoVuoto
+    ? `aggiornato alle ${ora}, l'ultimo giro non ha risposto`
+    : `aggiornato alle ${ora}`;
+  el.classList.toggle("mon-orologio--muto", ultimoTentativoVuoto);
 }
 
 // Realtime spara un evento per riga cambiata, e durante una run le righe
@@ -205,7 +293,11 @@ async function carica(supabase) {
 let attesa = null;
 function caricaFraPoco(supabase) {
   if (attesa) return;
-  attesa = setTimeout(() => { attesa = null; carica(supabase); }, 1200);
+  // `soloRun`, come il battito: un evento realtime dice che una riga di run e'
+  // cambiata, e il catalogo si rilegge da se' quando l'insieme delle run cambia
+  // davvero. Rileggere mezzo megabyte a ogni battito del lettore sarebbe il
+  // costo che questa pagina esiste per non avere.
+  attesa = setTimeout(() => { attesa = null; carica(supabase, { soloRun: true }); }, 1200);
 }
 
 // --- navigazione -----------------------------------------------------------
@@ -310,8 +402,8 @@ function cardVolo(run) {
       '<div class="mon-spina">' + spina + "</div>" +
       (aperto.length
         ? '<div class="mon-aperto">aperto ' + aperto.map((a) =>
-            "<strong>" + escapeHtml(a.label || a.agent_type || a.agent_id) + "</strong> " +
-            escapeHtml(a.agent_type) + (a.modello ? " &middot; " + escapeHtml(a.modello) : "") +
+            "<strong>" + escapeHtml(nomeAgente(a)) + "</strong> " +
+            escapeHtml(a.indicatore || "") + (a.modello ? " &middot; " + escapeHtml(a.modello) : "") +
             " &middot; da " + escapeHtml(durataDa(a.avviato_il))).join(" &middot; ") + "</div>"
         : '<div class="mon-aperto">nessun agente aperto in questo momento</div>') +
     "</div>"
@@ -635,6 +727,37 @@ function rigaRun(run) {
   return apri ? riga + '<tr><td class="mon-dettaglio" colspan="8">' + dettaglioRun(run) + "</td></tr>" : riga;
 }
 
+// Il nome di un agente, non il suo numero di serie. `label` (`scrivi:ter-13`)
+// arriva col consuntivo, che compare a run finita: dal vivo esiste solo il
+// tipo, e finche' la tabella ripiegava su `agent_id` mostrava una stringa che
+// non dice nemmeno che mestiere faceva quell'agente. L'id resta nel `title`,
+// perche' serve a chi va a cercare il trascritto e a nessun altro.
+function nomeAgente(a) {
+  return a.label || a.agent_type || a.agent_id || "agente";
+}
+
+// Quello che un agente ha restituito, leggibile.
+//
+// `JSON.stringify` su una **stringa** produce una riga sola con gli a capo
+// scritti come `\n`: gli scout e chi scrive restituiscono prosa, quindi era
+// esattamente il caso normale, e quella riga sola allungava la tabella oltre lo
+// schermo. Una stringa si stampa com'e'; se contiene JSON si rientra; il resto
+// si rientra di due, che si legge meglio di uno.
+function testoRisultato(valore) {
+  if (typeof valore === "string") {
+    const testo = valore.trim();
+    if (testo.startsWith("{") || testo.startsWith("[")) {
+      try {
+        return JSON.stringify(JSON.parse(testo), null, 2);
+      } catch {
+        // non era JSON, e' prosa che comincia per parentesi
+      }
+    }
+    return valore;
+  }
+  return JSON.stringify(valore, null, 2);
+}
+
 function dettaglioRun(run) {
   const agenti = (run.agenti || []).slice().sort((a, b) => (a.avviato_il || "").localeCompare(b.avviato_il || ""));
   const tabella =
@@ -645,7 +768,7 @@ function dettaglioRun(run) {
     "</tr></thead><tbody>" +
     agenti.map((a) =>
       "<tr>" +
-        '<td class="mon-label">' + escapeHtml(a.label || a.agent_id) +
+        '<td class="mon-label" title="' + escapeHtml(a.agent_id || "") + '">' + escapeHtml(nomeAgente(a)) +
           (a.indicatore ? "<small>" + escapeHtml(a.indicatore) + "</small>" : "") + "</td>" +
         "<td>" + escapeHtml(a.fase || "") +
           (a.fase_stimata && a.fase ? ' <span class="mon-stimata">stimata</span>' : "") + "</td>" +
@@ -660,8 +783,8 @@ function dettaglioRun(run) {
       "</tr>" +
       (a.risultato != null
         ? '<tr><td colspan="10"><details class="mon-json"><summary>che cosa ha restituito ' +
-          escapeHtml(a.label || a.agent_id) + "</summary><pre>" +
-          escapeHtml(JSON.stringify(a.risultato, null, 1)) + "</pre></details></td></tr>"
+          escapeHtml(nomeAgente(a)) + "</summary><pre>" +
+          escapeHtml(testoRisultato(a.risultato)) + "</pre></details></td></tr>"
         : "")
     ).join("") +
     "</tbody></table>";

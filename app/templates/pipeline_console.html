@@ -41,7 +41,10 @@
       .mon-head h1 { flex: 0 0 auto; }
       {# Il margine che spinge a destra sta sul pallino, non sui bottoni: messo
          sui bottoni valeva per tutti e due, e il secondo finiva su una riga sua. #}
-      .mon-head .mon-dot { margin-right: auto; }
+      .mon-head .mon-dot { margin-right: 0; }
+      .mon-head .mon-orologio { margin-right: auto; }
+      .mon-orologio { font-family:"Space Mono", ui-monospace, monospace; font-size:11.5px; color:var(--ink-soft); }
+      .mon-orologio--muto { color:var(--accent); }
       .mon-head .mon-btn { margin: 0; }
       .mon-azioni { display:flex; gap:8px; flex:0 0 auto; }
       .mon-dot { width:9px; height:9px; border-radius:50%; background:#2e9e4f; box-shadow:0 0 0 0 rgba(46,158,79,.5); animation: pulse 2s infinite; }
@@ -178,7 +181,12 @@
       .mon-stimata { color:var(--ink-soft); font-style:italic; }
       details.mon-json { margin-top:6px; }
       details.mon-json > summary { cursor:pointer; color:var(--ink-soft); font-family:"Space Mono", ui-monospace, monospace; font-size:11.5px; padding:3px 0; }
-      details.mon-json pre { margin:4px 0 0; padding:10px; background:var(--paper); border:1px solid var(--line); border-radius:6px; overflow-x:auto; font-size:11.5px; line-height:1.45; max-height:340px; }
+      {# Il risultato di un agente e' prosa o JSON lungo, e dentro una tabella
+         una riga che non va a capo detta la larghezza di tutta la tabella: si
+         apriva il blocco e la pagina scorreva in orizzontale, con le colonne
+         dei numeri spinte fuori schermo. Andando a capo, la larghezza minima
+         del blocco torna zero e la tabella resta ferma dove sta. #}
+      details.mon-json pre { margin:4px 0 0; padding:10px; background:var(--paper); border:1px solid var(--line); border-radius:6px; font-size:11.5px; line-height:1.45; max-height:340px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; max-width:100%; }
       .mon-nota { color:var(--ink-soft); font-size:12px; margin:0 0 12px; }
       .mon-nota > summary { cursor:pointer; font-family:"Space Mono", ui-monospace, monospace; font-size:11.5px; padding:3px 0; }
       .mon-nota p { margin:4px 0 0; line-height:1.5; max-width:70ch; }
