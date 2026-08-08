@@ -19,13 +19,17 @@ dica) lo fa un agente, e il controllo è un altro agente che prova a smentirlo.
     |  lab-scout        Web, sonnet   che cosa è successo: eventi datati
     |  lab-scout-europa Web, sonnet   dove sta l'Italia, con le trappole di comparabilità
     |  lab-scout        Web, sonnet   perché conta: conseguenze documentate
+    |  prima l'ultimo anno del dato, che è quello che l'articolo descrive,
+    |  poi una finestra sul 2026, datata in `periodo` e mai confusa col dato
     |
  [3] lab-scrittore     Read, sonnet   una bozza sola. Tesi, temi, numero di sezioni,
     |                                 ordine, titoli e link: decide tutto lui
  [4] lab-verificatore  Bash+Web, opus bin/py -m lab.controlla --salva  -> data/lab/bozze/<codice>.json
-    |                                 cifre, fonti rifetchate, link risolti
-    |                                 smentite? [3] corregge una volta sola
-    |                                 ancora smentite? non si scrive niente
+    |                                 cinque classi passate in rassegna, non una
+    |                                 lettura: cifre, fonti rifetchate, causali,
+    |                                 definizione, coerenza fra titoli e corpi
+    |                                 smentite? [3] corregge, al massimo due giri
+    |                                 gravi all'ultimo giro? non si scrive niente
  [5] lab-pubblicatore  Bash, haiku    bin/py -m lab.pubblica --bozza   -> content/indicators/<key>.json
 ```
 
@@ -363,6 +367,16 @@ delle due era nel piano:
   il titolo della sezione, il `lead` e l'`angolo`, e gli altri punti con lo
   stesso difetto.
 
+E una terza, che viene dalla stessa misura letta dall'altro verso: se i rilievi
+nuovi arrivano su un testo che non è cambiato, il difetto non è la gravità, è
+**quando** si trovano. Il verificatore quindi non legge il pezzo dall'inizio
+alla fine, **passa in rassegna cinque classi** (cifra, fonte, causale,
+definizione, coerenza), attraversa tutto il testo una classe alla volta,
+rilegge le classi rimaste vuote prima di restituire, e dichiara in
+`classi_passate` quelle che ha davvero guardato. Una classe non dichiarata
+finisce nei log della run: senza quel campo, "non c'è niente" e "non ho
+guardato" escono identici, cioè zero smentite.
+
 ## Il confronto che non è mai stato fatto
 
 Questa catena è nata per essere misurata contro quella grande, sullo stesso
@@ -374,7 +388,11 @@ diversi, quindi non si sottraggono.
 Quello che si sa, e vale come ordine di grandezza e non come confronto:
 
 - una run di questa catena con sonnet a scrivere e due verifiche costa **3,89 $**;
-- con opus a scrivere e tre verifiche, **circa 7 $**;
+- con opus a scrivere e tre verifiche, **circa 7 $** (l'ultima misurata, 4,54 $
+  come pavimento su un articolo senza correzioni);
+- la forma di adesso, sonnet a scrivere e tre verifiche, sta fra le due e non è
+  ancora stata misurata: il ritorno a sonnet è per la scrittura, non per il
+  costo, e gli scout hanno più budget di prima;
 - la catena ritirata misurava 1,97 $ per articolo, ma non faceva **nessuna**
   ricerca web e la fetta contesto qui vale più di un dollaro.
 

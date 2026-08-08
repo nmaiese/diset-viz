@@ -73,6 +73,10 @@ const PERCORSI = {
           // una prosa provinciale verificata contro le cifre regionali e poi
           // scritta come articolo regionale non fa fallire niente.
           livello: { type: ['string', 'null'] },
+          // L'ultimo anno del dato. Viaggia fino agli scout, che cercano su
+          // quell'anno invece di dedurlo aprendo il dossier: un agente deve
+          // ricevere, non cercare, perché i turni sono il costo.
+          anno: { type: ['number', 'null'] },
           anomalie: { type: 'array', items: { type: 'string' } },
         },
       },
@@ -153,9 +157,16 @@ const BOZZA = {
   },
 }
 
+const CLASSI = ['cifra', 'fonte', 'causale', 'definizione', 'coerenza']
+
 const VERDETTO = {
   type: 'object',
-  required: ['smentite', 'verificate', 'impronta'],
+  // `classi_passate` è obbligatoria: la copertura dichiarata è l'unico modo di
+  // distinguere "non c'è niente" da "non ho guardato", e le due cose escono
+  // identiche (zero smentite) da un verdetto che non la porta. Non è
+  // burocrazia, è il difetto che ha fermato `ter-13`: rilievi nuovi al secondo
+  // e al terzo passaggio su un testo che non era cambiato.
+  required: ['smentite', 'verificate', 'impronta', 'classi_passate'],
   properties: {
     smentite: {
       type: 'array',
@@ -163,7 +174,7 @@ const VERDETTO = {
         type: 'object',
         required: ['tipo', 'dove', 'cosa_dice_il_testo', 'cosa_dicono_i_dati'],
         properties: {
-          tipo: { type: 'string', enum: ['cifra', 'fonte', 'causale', 'definizione'] },
+          tipo: { type: 'string', enum: ['cifra', 'fonte', 'causale', 'definizione', 'coerenza'] },
           dove: { type: 'string' },
           cosa_dice_il_testo: { type: 'string' },
           cosa_dicono_i_dati: { type: 'string' },
@@ -172,6 +183,7 @@ const VERDETTO = {
       },
     },
     verificate: { type: 'number' },
+    classi_passate: { type: 'array', items: { type: 'string', enum: CLASSI } },
     bozza_salvata: { type: ['string', 'null'] },
     // Obbligatoria, e con i campi obbligatori dentro: era `['object', 'null']`
     // con tutto facoltativo, cioè uno schema che permetteva di ometterla, e
@@ -361,7 +373,7 @@ phase('Dossier')
 const montati = await agent(
   `Esegui esattamente questo comando dalla radice del repository e restituisci quello che stampa:\n\n` +
   `    ${COMANDO_DOSSIER}\n\n` +
-  `Stampa JSON con \`dossier\` (codice, percorso, byte, anomalie) e \`mancanti\`.`,
+  `Stampa JSON con \`dossier\` (codice, percorso, livello, anno, byte, anomalie) e \`mancanti\`.`,
   { agentType: 'lab-dossierista', model: 'haiku', effort: 'low', schema: PERCORSI, label: 'dossier' },
 )
 
@@ -382,11 +394,29 @@ const esiti = await pipeline(
     `**La tua lente**: ${lente.mandato}\n\n` +
     `Anomalie già misurate sulla serie, come materiale:\n` +
     `${(d.anomalie ?? []).map((a) => `- ${a}`).join('\n') || '- nessuna'}\n\n` +
-    `Restituisci al massimo tre claim, ognuno con la citazione testuale cercata come ` +
+    // Due finestre, in quest'ordine, e non è una preferenza di stile: la prosa
+    // descrive l'ultimo anno del dato, quindi un claim su un altro anno spiega
+    // una fotografia diversa da quella in pagina. Ma un articolo che si ferma
+    // all'anno del dato nasce vecchio: fra la rilevazione e la lettura passano
+    // mesi, e quello che è successo dopo è ciò che il lettore ha in testa
+    // quando arriva. Va portato **e datato**, mai confuso col dato.
+    `**Su che anno cercare.** Il dato di questo indicatore arriva al ` +
+    `${d.anno ?? "più recente disponibile"}, ed è l'anno che l'articolo descrive: ` +
+    `quello che riguarda ${d.anno ?? "quell'anno"} viene prima di tutto. Poi guarda ` +
+    `l'anno in corso, il 2026: un fatto recente che cambia la lettura vale, e va ` +
+    `portato con la sua data nel campo \`periodo\`, perché chi scrive deve poter dire ` +
+    `"il dato si ferma al ${d.anno ?? "suo ultimo anno"}, ma da allora" invece di ` +
+    `spacciarlo per il dato. Un fatto senza data non è un claim.\n\n` +
+    `Restituisci al massimo cinque claim, ognuno con la citazione testuale cercata come ` +
     `stringa nella pagina fetchata. Lista vuota se non trovi niente che regga: è un buon ` +
     `esito, e va detto in \`note\`.\n\n` +
-    `Budget: due ricerche, tre fetch, poi restituisci. Un documento che non si legge col ` +
-    `fetch si scarta e se ne prende un altro, non si insegue con altri strumenti.`,
+    // Il budget era due ricerche e tre fetch, e bastava per fermarsi alla prima
+    // fonte plausibile. Cinque e sei danno spazio a una seconda strada quando la
+    // prima non regge, che è dove sta il materiale che nessun altro ha.
+    `Budget: cinque ricerche, sei fetch, poi restituisci. Un documento che non si legge col ` +
+    `fetch si scarta e se ne prende un altro, non si insegue con altri strumenti. Se una ` +
+    `strada non porta niente, cambiala invece di insistere: due ricerche identiche con ` +
+    `parole diverse contano come una.`,
     {
       agentType: lente.agentType, model: 'sonnet', effort: 'medium',
       phase: 'Contesto', schema: CLAIM, label: `${lente.chiave}:${d.codice}`,
@@ -410,11 +440,16 @@ const esiti = await pipeline(
       `Compito: **scrivi**. Decidi tu la tesi, quali temi coprire, quante sezioni, in che ` +
       `ordine, con che titoli, e quali indicatori imparentati linkare. Dichiara la tesi in ` +
       `\`angolo\`, dicendo perché quella e non un'altra.`,
-      // Opus a scrivere. Con sonnet la bozza costava 0,90 $ e reggeva, ma è
-      // l'unico stadio in cui il prodotto **è** il testo: quello che manca a
-      // un articolo debole non lo recupera nessun verificatore, che smentisce
-      // il falso e non aggiunge il buono.
-      { agentType: 'lab-scrittore', model: 'opus', effort: 'high', phase: 'Scrittura', schema: BOZZA, label: `scrivi:${d.codice}` },
+      // Sonnet a scrivere, e il verificatore resta opus. La prima versione
+      // teneva opus qui perché è l'unico stadio in cui il prodotto **è** il
+      // testo, e quello che manca a un articolo debole non lo recupera nessun
+      // verificatore: smentisce il falso, non aggiunge il buono. Resta vero, e
+      // il modello non è la sola leva: sonnet scrive con più libertà, resta
+      // meno incollato alle cifre del dossier, e le cifre qui non sono
+      // affidate alla memoria di chi scrive ma a tre passaggi che le
+      // ricontrollano tutte contro `lab.controlla`. Il rischio che questo
+      // scambio sposta è quindi verso il lato che la catena sa già prendere.
+      { agentType: 'lab-scrittore', model: 'sonnet', effort: 'high', phase: 'Scrittura', schema: BOZZA, label: `scrivi:${d.codice}` },
     ).then((bozza) => ({ bozza, claim }))
   },
 
@@ -444,6 +479,39 @@ const esiti = await pipeline(
         `L'uscita porta anche un blocco \`link\`. Un percorso con stato "non esiste" è una ` +
         `smentita: manda il lettore su una pagina che non c'è. Uno "esiste, fuori dai ` +
         `parenti" è solo una nota.\n\n` +
+        // Il difetto misurato non era la severità dei rilievi, era **quando**
+        // arrivavano: su `ter-13`, tre passaggi dello stesso verificatore sullo
+        // stesso testo hanno prodotto 3, poi 1, poi 2 rilievi, ogni volta nuovi
+        // e ogni volta su frasi che c'erano dalla prima bozza. Un lettore che
+        // segue il filo trova il primo difetto e si ferma lì. Le tre richieste
+        // qui sotto servono a farne una rassegna invece di una lettura: per
+        // classe, per tutte le occorrenze, e con una seconda passata sulle
+        // classi rimaste vuote, che è dove il giro dopo trova quello che a
+        // questo era sfuggito.
+        `**Passa in rassegna le classi, non le frasi.** Non leggere il pezzo dall'inizio ` +
+        `alla fine fermandoti al primo difetto: prendi una classe alla volta e ` +
+        `attraversa tutto il testo (\`angolo\`, \`lead\`, titoli delle sezioni, corpi, ` +
+        `\`fonti\`) prima di passare alla successiva. Le classi sono cinque:\n` +
+        `1. **cifra**: ogni numero contro il dossier, compresi quelli nei titoli e ` +
+        `nell'\`angolo\`, e ogni etichetta che dice che cos'è quel numero (media semplice ` +
+        `contro media pesata, valore contro scarto, punti contro percentuali).\n` +
+        `2. **fonte**: ogni url rifetchato e ogni citazione cercata **come stringa** nella ` +
+        `pagina, piu' l'anno e il territorio che il claim dichiara.\n` +
+        `3. **causale**: ogni "perché", "grazie a", "a causa di" che il materiale degli ` +
+        `scout non regge, e ogni correlazione presentata come causa.\n` +
+        `4. **definizione**: che cosa misura davvero l'indicatore, denominatore compreso, ` +
+        `e i confronti fra misure che non sono confrontabili.\n` +
+        `5. **coerenza**: titolo, \`lead\` e \`angolo\` contro quello che i corpi dicono. ` +
+        `Un titolo che dice il contrario del corpo è passato due volte per di qui.\n\n` +
+        `**Un rilievo vale sul claim, non sulla frase.** Quando ne trovi uno, cerca lo ` +
+        `stesso difetto **ovunque compaia** prima di scriverlo, e nominale tutte in ` +
+        `\`dove\`: la stessa cifra ri-etichettata in tre punti è un rilievo con tre ` +
+        `posti, non tre rilievi, e una che resta fuori torna al giro dopo.\n\n` +
+        `**Prima di restituire, rileggi una seconda volta le classi in cui non hai trovato ` +
+        `niente.** È lì che stava, ogni volta, quello che il passaggio successivo trovava ` +
+        `su un testo identico. Poi dichiara in \`classi_passate\` le classi che hai ` +
+        `davvero attraversato: una classe che non elenchi è una classe che nessuno ha ` +
+        `guardato, e va detto invece di sembrare pulita.\n\n` +
         `Restituisci le smentite, quante cifre e fonti hai verificato, il percorso ` +
         `\`bozza_salvata\` e l'\`impronta\`, entrambi copiati dall'uscita del comando ` +
         `senza modificarli: l'impronta serve a dimostrare che il file congelato è ` +
@@ -455,6 +523,12 @@ const esiti = await pipeline(
         { agentType: 'lab-verificatore', model: 'opus', effort: 'high', phase: 'Verifica', schema: VERDETTO, label: `verifica:${d.codice}${giro ? ` (${giro + 1})` : ''}` },
       )
       if (!verdetto) return { codice: d.codice, pubblicabile: false, motivo: 'verifica non conclusa', giri: giro }
+
+      // Una classe non attraversata non ferma l'articolo, si vede. Fermare qui
+      // vorrebbe dire far decidere la pubblicazione a una dichiarazione che
+      // l'agente scrive da sé, che è il modo di insegnargli a dichiararle tutte.
+      const scoperte = CLASSI.filter((c) => !(verdetto.classi_passate ?? []).includes(c))
+      if (scoperte.length) log(`${d.codice}: classi non passate al giro ${giro + 1}: ${scoperte.join(', ')}`)
 
       // Un rilievo ferma l'articolo se è `alta` **o se non porta gravità**:
       // una severità che nessuno ha dichiarato non è un permesso a pubblicare.
@@ -503,7 +577,10 @@ const esiti = await pipeline(
         `\`angolo\`), **e** gli altri punti che hanno lo stesso difetto anche se la ` +
         `smentita non li nomina. Il resto del testo non si tocca. Dichiara in ` +
         `\`correzioni\` che cosa hai cambiato e dove l'hai propagato:\n${json(verdetto.smentite)}`,
-        { agentType: 'lab-scrittore', model: 'opus', effort: 'high', phase: 'Scrittura', schema: BOZZA, label: `correggi:${d.codice}${giro ? ` (${giro + 1})` : ''}` },
+        // Lo stesso modello di chi ha scritto, e non è un dettaglio: correggere
+        // con un altro modello riscrive la voce dell'articolo dove tocca, e le
+        // due metà si sentono.
+        { agentType: 'lab-scrittore', model: 'sonnet', effort: 'high', phase: 'Scrittura', schema: BOZZA, label: `correggi:${d.codice}${giro ? ` (${giro + 1})` : ''}` },
       )
       if (!corretta) return { codice: d.codice, pubblicabile: false, motivo: 'correzione non conclusa', verdetto, giri: giro }
       corrente = corretta

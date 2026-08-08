@@ -708,6 +708,12 @@ def main(argv=None):
         # non esce una prosa provinciale etichettata come regionale.
         fatti.append({"codice": codice, "percorso": os.path.abspath(percorso),
                       "livello": dossier["livello"],
+                      # L'ultimo anno del dato esce **qui** e non solo dentro il
+                      # file: gli scout devono sapere su che anno cercare prima
+                      # di aprire il dossier, e un agente che deve cercare
+                      # l'informazione invece di riceverla spende turni, che sono
+                      # il costo di questa architettura.
+                      "anno": dossier["vintage"],
                       "byte": os.path.getsize(percorso), "anomalie": dossier["anomalie"]})
 
     # `--stdout` ristampa il dossier già costruito, non ne costruisce un
