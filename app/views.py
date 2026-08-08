@@ -809,17 +809,24 @@ def _pipeline_indicatori_payload():
 
 
 def _id_da_codice(codice):
-    """`ter-105` -> `105`, `bes-10AMB002` -> `bes:10AMB002`.
+    """`ter-105` -> `105`, `ims-MULTI_ABIT_AFFITTO` -> `multiscopo:MULTI_ABIT_AFFITTO`.
 
-    I codici della catena minima usano il trattino, gli id del catalogo il
-    prefisso di famiglia con i due punti (o nessun prefisso per la famiglia
-    territoriale). Tradurre qui, in un posto solo: `app/sources.py` resta
-    l'unica verità sui nomi delle famiglie, e questo è solo l'adattatore fra
-    due scritture dello stesso id."""
-    famiglia, _, resto = (codice or "").partition("-")
-    if not resto:
+    I codici della catena usano l'acronimo col trattino, gli id del catalogo la
+    **famiglia** con i due punti, e le due cose non coincidono: l'acronimo di
+    `multiscopo` è `ims`. La traduzione la fa `app/sources.py`, che è l'unica
+    verità su acronimi e famiglie.
+
+    Scritto a mano la prima volta (`resto if famiglia == "ter" else
+    f"{famiglia}:{resto}"`), sbagliava esattamente su `ims`, e sbagliava **in
+    silenzio**: `_pipeline_published_url` inghiotte l'eccezione e restituisce
+    None, quindi la riga usciva senza link invece che con un errore. È la stessa
+    classe di difetto per cui `.claude/rules/app.md` vieta di hardcodare un
+    prefisso, e che una volta ha pubblicato una serie Istat sotto il nome di
+    Eurostat."""
+    coppia = sources.parse_indicator_code(codice or "")
+    if not coppia:
         return codice or ""
-    return resto if famiglia == "ter" else f"{famiglia}:{resto}"
+    return sources.internal_id(*coppia)
 
 
 def _require_pipeline_admin():

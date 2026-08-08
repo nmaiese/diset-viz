@@ -238,6 +238,30 @@ class LaVistaPerIndicatore(CruscottoBase):
         # L'indicatore linka la pagina pubblica: `ter-13` e' l'id `13`.
         self.assertTrue((riga["published_url"] or "").endswith("/ter-13"))
 
+    def test_ogni_famiglia_risolve_la_sua_pagina_pubblica(self):
+        """Il link alla pagina, per un codice vero di ogni famiglia.
+
+        Non e' pignoleria: i codici della catena usano l'**acronimo**
+        (`ims-...`) e gli id del catalogo la **famiglia** (`multiscopo:...`),
+        e le due cose non coincidono. Scritta a mano, la traduzione sbagliava
+        su `ims` e sbagliava in silenzio, perche' `_pipeline_published_url`
+        inghiotte l'eccezione: la riga usciva senza link invece che con un
+        errore, ed e' il tipo di guasto che nessuno vede finche' non gli serve
+        proprio quel link."""
+        from app import bes_data, data, external_atlas, multiscopo_data
+        from app.views import _id_da_codice, _pipeline_published_url
+        campioni = {
+            "ter": "ter-" + str(data.get_catalog()["indicators"][0]["id"]),
+            "bes": "bes-" + str(next(iter(bes_data.all_bes_indicators()))["id"]),
+            "ims": "ims-" + str(next(iter(multiscopo_data.all_multiscopo_indicators()))["id"]),
+        }
+        for item in external_atlas.all_external_indicators():
+            famiglia, _, resto = str(item["id"]).partition(":")
+            campioni.setdefault(famiglia, f"{famiglia}-{resto}")
+        senza_link = [c for c in campioni.values()
+                      if not _pipeline_published_url(_id_da_codice(c))]
+        self.assertEqual(senza_link, [], f"codici che non risolvono: {senza_link}")
+
     def test_una_run_fermata_non_e_un_guasto(self):
         self.scrivi("wf_2", ESITO_FERMATO, "2026-08-08T10:00:00+00:00")
         riga = self.indicatori()[0]
