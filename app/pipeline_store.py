@@ -335,6 +335,25 @@ def run(limite=100):
         return []
 
 
+def db_vivo():
+    """`True` se il database risponde. Distingue "vuoto" da "irraggiungibile".
+
+    `run()` inghiotte `SQLAlchemyError` e restituisce `[]`, che e' la scelta
+    giusta per una pagina (il cruscotto resta vuoto invece di cadere) ed e' la
+    scelta sbagliata per un controllo pre-run: zero run e database giu'
+    uscirebbero identici, e chi sta per spendere sette dollari leggerebbe "presa
+    sana, nessuna run" da una presa che non scrive niente."""
+    from sqlalchemy import text
+
+    from app.db import get_engine
+    try:
+        with get_engine().connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return True
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def stato_presa():
     """Che cosa vede la presa adesso, senza scrivere niente.
 
@@ -343,10 +362,13 @@ def stato_presa():
     non aveva nessun motivo di preferire il `ping` a una `run` finta, e la `run`
     finta lasciava una riga fantasma. Un controllo che riporta lo stato vale la
     pena di essere chiamato."""
+    if not db_vivo():
+        return {"db": "giu", "run": None, "aperte": None, "mute": None, "ultima": None}
     righe = run(limite=20)
     aperte = [r for r in righe if r["in_volo"]]
     ultima = righe[0] if righe else None
     return {
+        "db": "su",
         "run": len(righe),
         "aperte": len(aperte),
         "mute": sum(1 for r in aperte if r["battito_fermo"]),

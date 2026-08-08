@@ -499,8 +499,26 @@ class IlBattitoCheSiFerma(CruscottoBase):
         self.posta({"action": "run", "run_id": "wf_11111111-aa1",
                     "avviata_il": "2026-08-08T09:00:00+00:00"})
         stato = self.posta({"action": "ping"}).get_json()["stato"]
+        self.assertEqual(stato["db"], "su")
         self.assertEqual(stato["aperte"], 1)
         self.assertEqual(stato["ultima"]["run_id"], "wf_11111111-aa1")
+
+    def test_col_database_giu_il_ping_lo_dice_invece_di_dire_zero(self):
+        """Zero run e database irraggiungibile non devono uscire uguali.
+
+        `run()` inghiotte l'errore e torna `[]`, che per una pagina e' giusto
+        (il cruscotto resta vuoto invece di cadere) e per un controllo pre-run
+        e' una bugia: chi sta per spendere sette dollari leggerebbe "presa sana,
+        nessuna run" da una presa che non scrive niente."""
+        from app import pipeline_store
+        vero = pipeline_store.db_vivo
+        pipeline_store.db_vivo = lambda: False
+        try:
+            stato = self.posta({"action": "ping"}).get_json()["stato"]
+        finally:
+            pipeline_store.db_vivo = vero
+        self.assertEqual(stato["db"], "giu")
+        self.assertIsNone(stato["run"])
 
 
 class IlConfine(CruscottoBase):

@@ -838,20 +838,28 @@ def _stato_in_linea(riga, scritture):
     if scrittura is None:
         return "in linea", "assente"
     parole_run = scrittura.get("parole")
-    if parole_run is None or parole_run == riga["parole"]:
+    if parole_run is None:
+        # La run non ha registrato le parole: non c'è niente da confrontare, e
+        # `alta` direbbe che si è guardato. `certezza` è un campo di prima classe
+        # proprio per non sovrastimare quello che si sa.
+        return "in linea", "assente"
+    if parole_run == riga["parole"]:
         return "in linea", "alta"
     return "scritto, non in linea", "alta"
 
 
-@cache.memoize(timeout=30)
 def _pipeline_catalogo_payload():
     """Tutti gli indicatori dell'atlante con il loro stato editoriale.
 
     La parte cara (la passata sui 634 e i rilievi) sta in
     `editorial_state.catalogo()`, in cache per la **vita del processo** perché è
-    funzione pura del contenuto dell'immagine. Qui si aggiunge solo la giunzione
-    con le run, che cambia mentre guardi: due cadenze diverse, due cache
-    diverse, e la memoize breve non deve trascinarsi dietro la passata."""
+    funzione pura del contenuto dell'immagine. Qui resta la sola giunzione con
+    le run, che cambia mentre guardi.
+
+    Niente `@cache.memoize` su questa: il backend è `simple`, che **pickla il
+    valore**, e qui il valore è mezzo megabyte. Ripiccarlo ogni trenta secondi
+    costerebbe più della giunzione che eviterebbe, che è un giro su un centinaio
+    di run e la copia di 668 dizionari."""
     from app import pipeline_store
 
     base = editorial_state.catalogo()
