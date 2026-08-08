@@ -1064,34 +1064,6 @@ class AppSmokeTest(unittest.TestCase):
         # Il carattere vietato è ora dentro il perimetro della guardia.
         self.assertTrue([f for f, text in fields.items() if "—" in text])
 
-    def test_the_authored_titles_reach_the_verifier(self):
-        """Un campo dentro l'impronta e fuori da ciò che il verificatore legge
-        produce una verifica pulita su una frase che nessuno ha guardato."""
-        from scripts import review_queue
-        fields = dict(review_queue.prose_fields({
-            "h1": "Dove si vive a lungo", "seo_title": "Dove si vive a lungo, per regione",
-            "lead": "Un lead.", "sections": [{"role": "quadro", "body": "Corpo."}],
-        }))
-        self.assertIn("h1", fields)
-        self.assertIn("seo_title", fields)
-
-    def test_an_authored_title_expires_the_verification(self):
-        """Un titolo è prosa visibile, e quello SERP è anche un'affermazione:
-        aggiungerlo o correggerlo dopo la firma non può lasciare buona una
-        verifica che non l'ha mai letto. Stesso buco che l'`h` di sezione ha già
-        aperto una volta."""
-        from scripts import verification_queue as vq
-        base = {"lead": "Un lead.", "sections": [
-            {"role": "quadro", "h": None, "body": "Corpo."}]}
-        self.assertNotEqual(vq.prose_fingerprint(base),
-                            vq.prose_fingerprint(dict(base, h1="Dove si vive a lungo")))
-        self.assertNotEqual(vq.prose_fingerprint(base),
-                            vq.prose_fingerprint(dict(base, seo_title="Dove si vive a lungo")))
-        # I campi assenti o vuoti non muovono niente: i trecento articoli di oggi
-        # non hanno questi campi e la loro impronta resta identica.
-        self.assertEqual(vq.prose_fingerprint(base),
-                         vq.prose_fingerprint(dict(base, h1="", seo_title=None)))
-
     def test_seo_metadata_within_budget(self):
         from app.data import get_catalog
         from app.indicator_notes import seo_title, seo_description

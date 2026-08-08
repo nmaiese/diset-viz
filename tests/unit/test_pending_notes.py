@@ -105,39 +105,6 @@ class PendingNotesWorklist(unittest.TestCase):
 
         self.assertEqual(list(pending_notes.ARTICLE_ROLES), list(ROLE_ORDER))
 
-    def test_the_four_readers_of_roles_covered_agree(self):
-        """Renderer, pratica, consegna e impronta leggono la stessa
-        dichiarazione: se rispondono diverso, lo stesso articolo risulta completo
-        per una e incompleto per l'altra, e il dossier lo rilancia per sempre
-        mentre la lista di consegna dice che non manca niente. Copie stdlib
-        diverse, quindi la regola si pianta qui.
-        """
-        from app import indicator_texts
-        from scripts import practice_timeline, verification_queue
-
-        cases = [
-            {},                                              # nessuna dichiarazione
-            {"roles_covered": ["definizione", "quadro", "dinamica", "limiti"]},
-            {"roles_covered": ["quadro", "dinamica", "limiti"]},
-            {"roles_covered": ["quadro"]},                    # parziale
-            {"roles_covered": ["quadro", "dinamicha"]},       # refuso
-            {"roles_covered": ["definizione"]},               # solo la assorbibile
-            {"roles_covered": []},                            # dichiarata vuota
-            {"roles_covered": None},                          # campo nullo
-        ]
-        for entry in cases:
-            with self.subTest(entry=entry):
-                expected = indicator_texts.emitted_roles(entry)
-                self.assertEqual(pending_notes.emitted_roles(entry), expected)
-                self.assertEqual(practice_timeline._emitted_roles(entry), expected)
-                # L'impronta guarda lo stesso insieme, e tace quando è quello
-                # di sempre (la pagina rende come prima, niente da riverificare).
-                emitted = verification_queue._emitted_roles(entry)
-                if set(expected) == set(pending_notes.ARTICLE_ROLES):
-                    self.assertIsNone(emitted)
-                else:
-                    self.assertEqual(emitted, sorted(expected))
-
     def test_proposed_indicator_is_not_on_the_worklist(self):
         missing, _ = pending_notes.pending(self._manifest(), self._notes(), self._year_max)
         self.assertNotIn("57", [m["id"] for m in missing])

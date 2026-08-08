@@ -9,10 +9,10 @@ of siblings is worth more than a noindex variant nobody reaches, and an article
 whose figures are older than the data is worse than one that was never written,
 because a stale figure is wrong while a composed section is merely plain.
 
-    .venv/bin/python -m scripts.text_queue                 # top of the queue
-    .venv/bin/python -m scripts.text_queue --all           # everything
-    .venv/bin/python -m scripts.text_queue --stale         # only stale vintages
-    .venv/bin/python -m scripts.text_queue --csv           # for a spreadsheet
+    bin/py -m lab.coda                 # top of the queue
+    bin/py -m lab.coda --all           # everything
+    bin/py -m lab.coda --stale         # only stale vintages
+    bin/py -m lab.coda --csv           # for a spreadsheet
 """
 
 import argparse

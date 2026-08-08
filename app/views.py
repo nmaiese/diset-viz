@@ -35,7 +35,7 @@ from app import publisher
 from app import agent_discovery
 from app.taxonomy import DUPLICATE_BES_IDS, PROVINCE_ONLY_TITLE_COLLISIONS
 
-from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory
+from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
 import csv, hmac, io, json, os, re, time, unicodedata
@@ -683,50 +683,29 @@ def _pipeline_universe():
 
 @app.route("/_pipeline")
 def pipeline_dashboard():
-    """Cruscotto interno della catena editoriale, protetto e noindex.
+    """Il cruscotto interno, in ricostruzione.
 
-    Vista di lettura viva sul dossier per-indicatore (`scripts/pipeline_monitor`):
-    dov'è fermo e perché in testa, una riga per indicatore, le sessioni in volo
-    dai battiti, la storia recente dal diario. Ricalcolata a ogni caricamento dai
-    file committati, non da uno stato a parte: il monitoraggio è una lettura
-    dello stesso modello che la catena produce, non un secondo modello.
+    Leggeva il dossier per-indicatore della catena editoriale precedente
+    (`scripts/pipeline_monitor`), che non esiste più: la scrittura degli
+    articoli è passata alla catena minima di `lab/`, che gira dentro un
+    workflow e non lascia un dossier per-indicatore da leggere.
+
+    La rotta resta viva e manda alla console, che è l'unica parte del vecchio
+    impianto ancora vera: il vivo arriva da Supabase (`app/pipeline_state.py`),
+    scritto dai POST a `/_pipeline/beat`, ed è la stessa presa a cui un
+    monitoraggio dei workflow si attaccherà. Quello che manca, e che va
+    ricostruito, è il **modello** dietro: che cosa è una run quando la run è un
+    workflow e non una sequenza di agenti con un diario committato.
 
     Protetta: se `PIPELINE_TOKEN` è impostato, serve solo con `?token=` giusto,
     altrimenti 404, non 403, perché una pagina interna non deve nemmeno
-    confermare di esistere. Vuoto (locale) = aperta. Il noindex lo mette
-    `add_security_headers` sul prefisso `/_pipeline`.
+    confermare di esistere. Il noindex lo mette `add_security_headers` sul
+    prefisso `/_pipeline`.
     """
     token = config.PIPELINE_TOKEN
     if token and request.args.get("token") != token:
         abort(404)
-    from scripts import pipeline_monitor
-    from app import pipeline_state
-    # Il vivo arriva dal SQLite (scritto dai POST degli agenti, replicato su GCS),
-    # non più da file locali che sul server sarebbero sempre vuoti. La storia
-    # (dossier + diario) resta committata, come prima.
-    try:
-        activity = pipeline_state.live()
-    except Exception:  # noqa: BLE001  (il cruscotto non deve mai cadere per il vivo)
-        activity = {"beats": [], "prs": []}
-    board = pipeline_monitor.load_board(heartbeats=activity["beats"],
-                                        open_runs=activity["prs"])
-    # Telemetria token: durevole, dal SQLite, chiavata sul run_id del ruolo.
-    try:
-        tokens = pipeline_state.tokens_by_run()
-    except Exception:  # noqa: BLE001  (la telemetria non deve far cadere il cruscotto)
-        tokens = {}
-    # I token si attribuiscono solo all'indicatore bersaglio della run (dal
-    # record), non a ogni indicatore che la run cita come confronto: la logica
-    # sta nel monitor stdlib-puro, così è testabile senza Flask.
-    pipeline_monitor.attribute_tokens(board.get("rows", []), tokens)
-    # Le righe pubblicate portano il link alla pagina: poche righe (published=True),
-    # quindi il costo di build_indicator_view resta trascurabile.
-    for row in board.get("rows", []):
-        row["published_url"] = (_pipeline_published_url(row["id"])
-                                if row.get("published") is True else None)
-    return render_template("pipeline.html", board=board,
-                           token=request.args.get("token", ""),
-                           site_name=SITE_NAME)
+    return redirect(url_for("pipeline_console"))
 
 
 @app.route("/_pipeline/console")
@@ -754,51 +733,21 @@ def pipeline_console():
 
 @cache.memoize(timeout=30)
 def _pipeline_board_payload():
-    """Il catalogo per la dashboard: `load_board` col vivo da Supabase, i token
-    attribuiti, il link alla pagina pubblicata sulle righe pubblicate, e la
-    copertura del catalogo (`catalog_summary`: quanti indicatori esistono nei
-    cataloghi di famiglia in tutto, quanti indicizzabili, quanti scritti,
-    verificati, pubblicati). Memoizzato (chiave sul nome, nessun argomento)
-    perché rilegge tutti gli articoli e tutti i cataloghi di famiglia."""
-    from scripts import pipeline_monitor
-    from app import pipeline_state
-    try:
-        activity = pipeline_state.live()
-    except Exception:  # noqa: BLE001  (il vivo non deve far cadere la dashboard)
-        activity = {"beats": [], "prs": []}
-    try:
-        outcomes = pipeline_state.outcomes_by_indicator()
-    except Exception:  # noqa: BLE001  (l'overlay non deve far cadere la dashboard)
-        outcomes = {}
-    board = pipeline_monitor.load_board(heartbeats=activity["beats"],
-                                        open_runs=activity["prs"], outcomes=outcomes)
-    try:
-        tokens = pipeline_state.tokens_by_run()
-    except Exception:  # noqa: BLE001  (la telemetria non deve far cadere la dashboard)
-        tokens = {}
-    pipeline_monitor.attribute_tokens(board.get("rows", []), tokens)
-    universe = _pipeline_universe()
-    for row in board.get("rows", []):
-        row["published_url"] = (_pipeline_published_url(row["id"])
-                                if row.get("published") is True else None)
-        entry = universe.get(row["id"])
-        row["indexable"] = entry["indexable"] if entry else None
-        row["indexable_reason"] = entry["reason"] if entry else None
-    board["catalog_summary"] = pipeline_monitor.summarize_catalog(board.get("rows", []), universe)
-    return board
+    """Vuoto finché il monitoraggio non è ricostruito.
+
+    Serviva `scripts/pipeline_monitor`, cioè il dossier della catena
+    precedente. La console regge la forma della risposta senza righe.
+    """
+    return {"rows": [], "headline": None, "catalog_summary": None,
+            "nota": "in ricostruzione: la catena editoriale è cambiata"}
+
 
 
 @cache.memoize(timeout=30)
 def _pipeline_runs_payload():
-    """La cronologia per la dashboard: `runs_timeline` joinato coi token da
-    Supabase sul `run_id`. Memoizzato perché rilegge tutti i diari."""
-    from scripts import pipeline_monitor
-    from app import pipeline_state
-    try:
-        tokens = pipeline_state.tokens_by_run()
-    except Exception:  # noqa: BLE001
-        tokens = {}
-    return pipeline_monitor.runs_timeline(tokens)
+    """Vuoto finché il monitoraggio non è ricostruito."""
+    return {"runs": [], "nota": "in ricostruzione"}
+
 
 
 def _require_pipeline_admin():

@@ -61,7 +61,7 @@ editoriale, e la fa chi scrive.
 
 ### La coda
 
-`--coda N` non calcola nessuna priorità: la prende da `scripts/text_queue.py`,
+`--coda N` non calcola nessuna priorità: la prende da `lab/coda.py`,
 che ordina il catalogo intero (cifre arretrate, poi sezioni mancanti, poi se la
 pagina è indicizzabile) e ci aggiunge i due filtri che la lite vuole, il dato
 dell'anno chiesto e la pagina non già completa.
