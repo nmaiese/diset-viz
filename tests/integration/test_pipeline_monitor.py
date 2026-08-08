@@ -386,6 +386,11 @@ class LaFormaDelPayload(CruscottoBase):
             self.assertIsInstance(riga[campo], list)
         for campo in ("scritte", "sezioni", "punteggio", "rilievi", "parole", "livelli"):
             self.assertIsInstance(riga[campo], int)
+        # `str` o `None`, mai stringa vuota: il confronto la leggerebbe come
+        # un'impronta che non torna, cioe' "non in linea" per sempre.
+        for r in self.catalogo()["righe"]:
+            self.assertTrue(r["impronta_prosa"] is None or isinstance(r["impronta_prosa"], str))
+            self.assertNotEqual(r["impronta_prosa"], "")
 
     def test_i_totali_contano_gli_indicatori_e_le_pagine(self):
         """634 indicatori, 668 righe: l'unita' e' la coppia (indicatore,
