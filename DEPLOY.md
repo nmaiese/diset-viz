@@ -88,6 +88,19 @@ turni sono il costo di quell'architettura, e il monitoraggio non ne aggiunge.
 Il consuntivo lo posta da se', quando vede comparire
 `<sessione>/workflows/<runId>.json`, che il runtime scrive **solo a run finita**.
 
+Prima di spendere una run si chiede alla presa se e' viva e se parla il
+protocollo giusto, e lo si chiede con `ping`, che **non scrive niente**:
+
+    curl -s -X POST "$PIPELINE_INGEST_URL/_pipeline/beat" \
+      -H "X-Pipeline-Key: $PIPELINE_INGEST_TOKEN" -H "Content-Type: application/json" \
+      -d '{"action":"ping"}'
+
+Risponde `{"ok": true, "azioni": [...]}`. Un **404** vuol dire segreto sbagliato,
+un **400** che l'immagine servita e' costruita da un master piu' vecchio e non
+conosce le azioni nuove: in quel caso ogni battito si perderebbe. La domanda si
+faceva con un `run` finto, che pero' e' un battito vero e lasciava una run
+fantasma in cima al cruscotto, senza agenti e per sempre in volo.
+
 Chi legge: `monitor.divarioitalia.it/_pipeline/console`. Due percorsi dati, come
 prima: il vivo arriva in push da **Supabase Realtime** letto diritto dal browser
 (filtrato da RLS sulla mail Google, non da un token), e la storia gia' montata
