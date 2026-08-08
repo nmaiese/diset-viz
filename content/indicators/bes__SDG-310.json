@@ -8,6 +8,10 @@
   {
    "testo": "Il Fatto Quotidiano, sul Rapporto Annuale Istat 2026",
    "url": "https://www.ilfattoquotidiano.it/2026/05/30/rapporto-istat-2026-istruzione-italia-notizie/8403611/"
+  },
+  {
+   "testo": "Istat, Rapporto Annuale 2026. La situazione del Paese",
+   "url": "https://www.istat.it/produzione-editoriale/rapporto-annuale-2026-la-situazione-del-paese/"
   }
  ],
  "key": "bes:SDG-310",
@@ -30,7 +34,7 @@
    "role": "quadro"
   },
   {
-   "body": "Il progetto non ha registrato per questo indicatore la definizione ufficiale Istat di competenza numerica adeguata: la soglia esatta resta quella della fonte, non un dettaglio ricostruibile da questi numeri. Sappiamo che \"non adeguata\" è l'etichetta usata da Istat, non il criterio con cui viene assegnata.\n\nIl 2020 manca del tutto dalla serie: le prove non si sono svolte, quindi non esiste un dato che dica come sono cambiate le competenze degli studenti durante il primo anno di pandemia, solo il salto misurato l'anno dopo.\n\nLe medie territoriali citate in questo articolo sono medie semplici sulle 19 regioni per cui il dossier ha dati, il Trentino-Alto Adige non compare nella serie, non pesate per il numero di studenti: una regione piccola come la Valle d'Aosta conta quanto la Lombardia nel calcolo. Il valore di 44,19% per il 2025 citato più volte in questo articolo è la stessa media semplice, non un tasso calcolato sulla popolazione studentesca italiana.\n\nInfine, la lettura di convergenza che emerge dallo spread, sceso da 31,6 punti nel 2018 a 28,4 punti nel 2025, non significa un miglioramento: le regioni si sono avvicinate fra loro attorno a un livello più alto di prima, non attorno a un livello migliore.",
+   "body": "La definizione ufficiale Istat è la quota di studenti delle classi III della scuola secondaria di primo grado che non raggiungono un livello sufficiente di competenza numerica, cioè restano al Livello I o al Livello II su una scala di cinque livelli: la soglia sta nel livello, non in un punteggio che questo articolo possa riportare.\n\nIl 2020 manca del tutto dalla serie: le prove non si sono svolte, quindi non esiste un dato che dica come sono cambiate le competenze degli studenti durante il primo anno di pandemia, solo il salto misurato l'anno dopo.\n\nLe medie territoriali citate in questo articolo sono medie semplici sulle 19 regioni per cui il dossier ha dati, il Trentino-Alto Adige non compare nella serie, non pesate per il numero di studenti: una regione piccola come la Valle d'Aosta conta quanto la Lombardia nel calcolo. Il valore di 44,19% per il 2025 citato più volte in questo articolo è la stessa media semplice, non un tasso calcolato sulla popolazione studentesca italiana.\n\nInfine, la lettura di convergenza che emerge dallo spread, sceso da 31,6 punti nel 2018 a 28,4 punti nel 2025, non significa un miglioramento: le regioni si sono avvicinate fra loro attorno a un livello più alto di prima, non attorno a un livello migliore.",
    "h": "Quello che il dato non dice",
    "role": "limiti"
   }
