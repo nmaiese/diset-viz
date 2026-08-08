@@ -84,7 +84,7 @@ e la citazione fedele è la condizione dell'art. 70. Nei file interessati c'è
 un'**avvertenza tipografica** che nomina i caratteri presenti.
 
 **Si copia il movimento delle frasi, mai un carattere.** Il cancello resta il
-campo `vietati` di `evals/scrittura-italiana/tic_count.py`, che sul nostro
+campo `vietati` di `la skill `scrittura-italiana``, che sul nostro
 output è duro e non si negozia.
 
 Dove l'originale ha un refuso (`Oltrettutto` in Openpolis, `e oggi ha oggi` nel
@@ -134,7 +134,7 @@ libreria sono perciò del 2023 e del 2024.
 ## Una cosa che il contatore non vede, e che questa cartella dimostra
 
 I due estratti Openpolis pesano **21,4 e 18,9 tic per mille parole** al
-contatore di `evals/scrittura-italiana/tic_count.py`. L'articolo `ter-167` da cui
+contatore di `la skill `scrittura-italiana``. L'articolo `ter-167` da cui
 è nato tutto questo lavoro, quello giudicato illeggibile, ne pesa **2,2**.
 
 Prosa professionale che lo strumento boccia, prosa faticosa che lo strumento

@@ -3,15 +3,15 @@
 Dieci criteri, da 0 a 2, massimo 20. Serve a tre cose e a nessun'altra:
 
 - **`scrittore-indicatore`** ci passa sopra la bozza prima di consegnarla al
-  workflow (`.claude/workflows/produci-indicatori.js`),
+  workflow (`.claude/workflows/indicatore-lite.js`),
 - **`giudice-cieco`** la usa come metro per dire quale delle due bozze si legge
-  fino in fondo, e `officina/lint.py` impone deterministicamente ciò che si
+  fino in fondo, e `lab/lint.py` impone deterministicamente ciò che si
   può contare,
 - un **lotto** di articoli si legge prima e dopo un cambio di prompt, e il
   punteggio medio dice se il cambio ha funzionato invece di lasciarlo all'occhio.
 
 I nomi contano: lo **scrittore** e il **revisore** erano due agenti separati e
-non esistono più. Scrivere un articolo è passato all'officina, dove quattro
+non esistono più. Scrivere un articolo è passato alla catena di `lab/`, dove sei
 tipi stretti lo fanno dentro un workflow, e chi cerca il file di un ruolo che
 questa pagina nomina deve trovarlo.
 
@@ -68,21 +68,21 @@ vedeva. Il pavimento per asse lo prende: la leggibilità non si compra con
 l'accuratezza, ne la struttura con le fonti.
 
 L'asse 2 è l'unico che ha già un giudice indipendente suo, il **reader-editor**
-(`.claude/agents/reader-editor.md`): legge ogni articolo pubblicato e boccia i
+(`.claude/agents/lab-verificatore.md`): legge ogni articolo pubblicato e boccia i
 tecnici-ma-corretti, con la sua eval e la sua baseline nel canary. Gli altri tre
-assi restano giudizio interno all'officina (lo stadio `rivedi` del workflow, più
+assi restano giudizio interno alla catena (il giro di correzione, più
 `giudice-cieco` sul confronto fra due bozze; l'asse 1 anche del verificatore, a
 valle), finché non avranno un giudice loro.
 
 Il reader-editor non punteggia il criterio 8 direttamente, giudica su otto
 criteri suoi (comprensione, carico, struttura, traduzione dei tecnicismi...),
 quindi la corrispondenza va detta invece che dedotta: **un suo `revise` è il
-criterio 8 sotto il pavimento**, e l'articolo torna all'officina per una
+criterio 8 sotto il pavimento**, e l'articolo torna a chi lo ha scritto per una
 riscrittura qualunque sia il totale. Un suo `pass` non regala il 2: dice che l'asse 2 non blocca.
 
 I pavimenti valgono per un articolo che si dichiara **finito**. Un articolo a
 metà è semplicemente da scrivere, non bocciato: la coda che lo dice è
-`scripts/text_queue.py`, non questa scala.
+`lab/coda.py`, non questa scala.
 
 ## Perché il criterio 8 non premia più il ritmo
 
@@ -115,7 +115,7 @@ questa descrizione: chi assegna il punteggio ne legge uno prima, così il 2 è
 ancorato a della prosa esistente invece che alla parola "leggibile".
 
 Attenzione a due strumenti che su questo criterio **non aiutano**. La
-`burstiness` di `evals/scrittura-italiana/tic_count.py` misura la varianza della
+`burstiness` di `la skill `scrittura-italiana`` misura la varianza della
 lunghezza delle frasi, che sotto il criterio nuovo non è né un bene né un
 male. E le categorie `mente` e `gerundite` dello stesso contatore possono salire
 su un testo più leggibile. Restano indicative, il cancello che vale lì dentro

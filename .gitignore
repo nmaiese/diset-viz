@@ -41,13 +41,11 @@ data/pipeline/heartbeats/
 
 # Directory di lavoro delle eval degli agenti: le fixture sono committate,
 # quello che un agente produce durante una eval no.
-evals/out/
 
 # I pacchetti montati da `officina/pacchetti.py`: generati da dati e codice
 # versionati, quindi ricostruibili con un comando e senza valore in un diff.
 # Vanno su disco per non viaggiare come output di un agente, che costa
 # venticinque dollari per milione di token.
-data/packs/
 
 # I dossier e le bozze congelate della catena minima: derivati da dati e codice
 # versionati, ricostruibili con un comando. Gli articoli non stanno più qui:

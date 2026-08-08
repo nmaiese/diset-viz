@@ -1,6 +1,6 @@
 ---
 name: giudice-cieco
-description: Legge due bozze dello stesso articolo e dice quale si legge fino in fondo e qual è il paragrafo più freddo. Non ha il progetto in contesto e non gli serve. Usato dal workflow produci-indicatori.
+description: Legge due bozze dello stesso articolo e dice quale si legge fino in fondo e qual è il paragrafo più freddo. Non ha il progetto in contesto e non gli serve. Usato per confrontare due testi dello stesso articolo.
 tools: Read
 disallowedTools: Bash, Edit, Write, Grep, Glob, WebSearch, WebFetch, Task, Skill
 model: inherit

@@ -82,7 +82,7 @@ attribuita a una provincia non la controlla niente. Si verifica a mano, una
 per una, contro il brief:
 
 ```bash
-bin/py -m officina.brief <codice> --level provincia
+bin/py -m lab.dossier <codice> --livello provincia --stdout
 ```
 
 ## `eco` — una cifra che il cruscotto già stampa

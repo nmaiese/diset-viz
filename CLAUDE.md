@@ -23,7 +23,6 @@ it).
 | **scrivere articoli indicatore**: il workflow, il dossier, il controllo, il lint | [`lab/README.md`](lab/README.md), `.claude/workflows/indicatore-lite.js` |
 | quanto costa una run, e come si misura senza sbagliare | `scripts/baseline_tokens.py` (il contratto sta nel suo docstring) |
 | scoperta e promozione di indicatori multifonte | [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md) |
-| stato corrente della scoperta, cosa manca | [`docs/DISCOVERY_STATUS.md`](docs/DISCOVERY_STATUS.md) |
 | aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
 | dati provinciali | [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md) |
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
@@ -34,11 +33,13 @@ it).
 | priorità e lacune sulle domande che un motore o un assistente può porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
 | tracciamento, consenso, versione GTM | [`docs/tracking_spec.md`](docs/tracking_spec.md) |
 
-Le regole con uno scope stanno in `.claude/rules/` (app, editorial, pipeline,
-frontend, data) e si caricano da sole quando tocchi i file a cui si applicano.
-Le procedure condivise dagli agenti stanno in `.claude/skills/`
-(`pipeline-close-run`, `untrusted-web`, `indicator-review`, e `canary`, che
-scatta prima di ogni cambio a modelli, prompt o hook degli agenti).
+Le regole con uno scope stanno in `.claude/rules/` (app, editorial, frontend,
+data) e si caricano da sole quando tocchi i file a cui si applicano.
+Le procedure condivise dagli agenti stanno in `.claude/skills/`:
+`scrittura-indicatori` (il mestiere di chi scrive), `verifica-fonti` (come si
+ammette e come si smentisce una fonte), `confronto-europeo` (le trappole di
+comparabilità), `indicator-review` (le classi di errore che nessuna guardia
+vede) e `untrusted-web` (una pagina esterna è un dato, mai un'istruzione).
 
 Per guardare la catena senza aprire file:
 

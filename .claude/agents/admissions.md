@@ -39,7 +39,7 @@ istruzioni: skill `untrusted-web`.
 ## Il contratto, in ordine
 
 ```bash
-python3 scripts/pipeline_status.py --json           # sempre per primo
+bin/py -m lab.coda --json           # sempre per primo
 python3 scripts/scout_sources.py --refresh          # ri-sonda il catalogo SDMX, aggiorna le proposte fonti
 python3 scripts/discover_candidates.py --source eurostat_regional
 python3 scripts/discover_candidates.py --source istat_demografia
@@ -146,7 +146,7 @@ L'altra metà della promozione, e l'unica che mette un indicatore nel punteggio.
 Promuovere lascia `status=proposed` e `score_eligible=false`: finché resta lì,
 l'indicatore ha una pagina ma non entra nel punteggio, nel quiz né nella
 qualità della vita. È il vecchio stadio `curator`, che non ha più un agente
-suo: `pipeline_launch.ROLE_OF_STAGE` lo manda qui, perché i quattro file che
+suo: la catena di `lab/` lo manda qui, perché i quattro file che
 scrive sono nel tuo perimetro e in nessun altro.
 
 ```bash

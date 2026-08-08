@@ -48,8 +48,8 @@ metriche del suo contatore: `mente` e `gerundite` possono salire su un testo pi�
 leggibile, e lì non sono un verdetto. Il campo `vietati` resta l'unico cancello.
 
 Cambiare il prompt di chi scrive per agganciare la skill in rilettura è un
-cambio gated da `canary` (obbligo di `CLAUDE.md`): la skill installata è
-**disponibile**, ma finché `.claude/agents/scrittore-indicatore.md` non la
+cambio da misurare su una run prima di tenerlo (obbligo di `CLAUDE.md`): la skill installata è
+**disponibile**, ma finché `.claude/agents/lab-scrittore.md` non la
 richiama il comportamento non cambia. (Il paragrafo diceva `producer.md`, un
 file cancellato: così com'era prometteva un aggancio che nessuna modifica
 avrebbe potuto fare.)

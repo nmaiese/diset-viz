@@ -1,7 +1,7 @@
 # Pipeline di discovery multifonte
 
 > **Come gira tutto insieme, senza intervento umano, sta in
-> [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).** Questo documento descrive
+> [`lab/README.md`](../lab/README.md).** Questo documento descrive
 > il **meccanismo** della scoperta: gli adapter, lo schema della coda, il
 > punteggio di priorità, cosa succede in promozione. Quello descrive **chi lo
 > muove**: i tre ruoli (ammissione, produttore, verificatore), il lanciatore, il
@@ -72,7 +72,7 @@ non vengono scartati: scendono solo in fondo alla coda.
 Ogni ruolo scrive **solo** dentro il proprio perimetro (l'ammissione nella coda
 fonti, la config Istat, la coda candidati e il layer esterno; il produttore
 nell'articolo, nella curatela e nella mappa temi) e chiude con
-`scripts/pipeline_gate.py`, che calcola il verdetto dal diff e dalla suite e
+`lab/pubblica.py`, che calcola il verdetto dal diff e dalla suite e
 decide se la PR si fonde. **Oggi ogni ruolo fonde `auto`** sul cancello locale,
 che gira la suite intera prima del merge: la CI remota non parte sulle PR aperte
 via il GitHub MCP, quindi aspettarla (`checks`) non comprava un verdetto
@@ -80,8 +80,8 @@ indipendente ma un deadlock, ed è il motivo per cui la vecchia politica non
 uniforme (prosa `auto`, promozione e ammissione `checks`) è stata portata tutta
 ad `auto`. Nessun ruolo aspetta una firma: in una catena che nessuno presidia,
 "aspetta che qualcuno guardi" vuol dire "aspetta per sempre". Regole complete e
-motivazioni in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md) e
-[`AGENT_CONTRACT.md`](AGENT_CONTRACT.md).
+motivazioni in [`lab/README.md`](../lab/README.md) e
+[`lab/README.md`](../lab/README.md).
 
 Restano vere le regole già scritte in `DATA_PIPELINE.md`: `exact` è l'unico caso
 che può sostituire una serie, e niente entra nello scoring senza direzione
@@ -148,7 +148,7 @@ quiz e nella qualità della vita.
 
 Non ha più un agente suo. `indicator-curator.md` è stato cancellato, e il vecchio
 stadio `curator` porta al ruolo **ammissione**
-(`pipeline_launch.ROLE_OF_STAGE`), che è quello che ha nel proprio perimetro i
+(`la catena di `lab/``), che è quello che ha nel proprio perimetro i
 tre file che una curazione scrive. Chi cura è quindi l'ammissione, o una persona.
 
 Strumenti (stdlib):
@@ -220,14 +220,14 @@ l'utente legge. La scrittura produce l'intero articolo della pagina (`lead` piu
 le quattro sezioni `definizione`/`quadro`/`dinamica`/`limiti`, con `fonti` e
 `vintage`) in `content/indicators/`, un file per articolo, seguendo
 `content/STYLE.md`, con **solo numeri reali** presi dal brief
-(`officina/brief.py`, che lo ha assorbito), le fonti verificate per le affermazioni
+(`lab/dossier.py`, che lo ha assorbito), le fonti verificate per le affermazioni
 comparative e il `vintage` uguale all'`year_max` corrente (drift guard). È lo
 step che trasforma un indicatore appena integrato in una pagina che si legge come
 scritta da un giornalista.
 
 Scrittura e revisione **non sono più tre agenti freddi** che si passano
-l'indicatore via CSV: scrivere è un ruolo solo, il **produttore** (l'officina,
-`.claude/workflows/produci-indicatori.js`), che porta un indicatore da ammesso a
+l'indicatore via CSV: scrivere è un ruolo solo, la catena di `lab/` (
+`.claude/workflows/indicatore-lite.js`), che porta un indicatore da ammesso a
 pubblicato in una run, con due bozze e un giudizio cieco al posto della
 rilettura del proprio testo. La cura sta a monte, con l'ammissione, che è il
 ruolo che ne ha i file nel perimetro. Nessuno firma più niente
@@ -243,8 +243,8 @@ valle. La catena, dopo la ri-architettura, è tre ruoli, non sette stadi:
 | ruolo | chi lo esegue | code deterministiche che drena |
 | --- | --- | --- |
 | ammissione | agente `admissions` | `source_candidates.csv`, `candidates.csv`, gli `approved` da promuovere, `scripts/curate.py --include-recheck` |
-| produttore | workflow `.claude/workflows/produci-indicatori.js` | `scripts/pending_notes.py`, `scripts/text_queue.py`, `scripts/review_queue.py` |
-| verificatore | agente `verificatore` | `scripts/verification_queue.py` |
+| produttore | workflow `.claude/workflows/indicatore-lite.js` | `scripts/pending_notes.py`, `lab/coda.py`, `lab/lint.py` |
+| verificatore | agente `verificatore` | `lab/controlla.py` |
 
 I file di agente dei vecchi stadi (`source-scout.md`, `indicator-hunter.md`,
 `indicator-curator.md`, `indicator-writer.md`, `indicator-reviewer.md`) non
@@ -254,12 +254,12 @@ esistono più, e con la demolizione se ne sono andati anche `producer.md` e
 col nome del proprio stadio**. `verificatore.md` si chiamava
 `indicator-verifier.md`: era l'unico nome che andasse tradotto, e la traduzione
 è stata tolta insieme alla mappa che la faceva. Gli articoli li scrive
-l'officina (`.claude/workflows/produci-indicatori.js`).
+la catena di `lab/` (`.claude/workflows/indicatore-lite.js`).
 
 Lo stato di tutte le code insieme:
 
 ```bash
-python3 scripts/pipeline_status.py
+python3 lab/coda.py
 ```
 
 Ogni coda si calcola dai file committati, non dalla memoria di una sessione
@@ -269,14 +269,14 @@ i piedi (file diversi, nessuna contesa).
 
 ## Fase 5: la revisione, i testi che esistono già
 
-L'officina produce articoli, la revisione è il motivo per cui ci si può fidare.
+La catena produce articoli, la verifica è il motivo per cui ci si può fidare.
 Non è più un agente solo che rilegge e firma: sono **due critici indipendenti su
 due assi**, il verificatore sui fatti e il reader-editor sulla leggibilità, e i
 loro rilievi tornano all'officina come i segnali `smentita` e `leggibilita` di
 `review_queue`. Le guardie meccaniche coprono struttura, stile, `vintage`, le cifre decimali
 attribuite a una regione e le soglie asserite su un elenco di regioni. Quello che
 non possono coprire, elencato in `docs/INDICATOR_PAGES.md`, è esattamente dove si
-nascondono gli errori, e `scripts/review_queue.py` lo cerca:
+nascondono gli errori, e `lab/lint.py` lo cerca:
 
     universale   "ovunque", "sempre", "da anni": basta un controesempio
     causale      "grazie a", "dipende dalle": l'indicatore non mostra meccanismi
@@ -299,14 +299,14 @@ Per questo `scripts/pending_notes.py` produce la **coda della scrittura**, come
 
 - **da scrivere** (`missing`): un indicatore integrato nel manifest
   (`status=integrated`) senza articolo. È il passaggio di consegne
-  curazione -> officina.
+  curazione -> scrittura.
 - **da aggiornare** (`stale`): un articolo il cui `vintage` è rimasto indietro
   rispetto all'`year_max` corrente dell'indicatore (il caso di refresh, la stessa
   deriva che controlla `tests/integration/test_indicator_texts.py`).
 
 `pending_notes.py` copre gli indicatori tracciati dal manifest. Per lo stato
 editoriale dell'intero catalogo, incluse le sezioni ancora composte dal template,
-si usa `bin/py -m scripts.text_queue`.
+si usa `bin/py -m lab.coda`.
 
 ```bash
 python3 scripts/pending_notes.py            # coda leggibile
@@ -352,9 +352,9 @@ copertura 20/20.
 
 La catena gira come **Routine Claude Code** (agenti cloud, sessione nuova a ogni
 firing, checkout git proprio). La cadenza, l'id e lo stato stanno in
-[`DISCOVERY_STATUS.md`](DISCOVERY_STATUS.md); il contratto che ogni agente segue a
-ogni run sta in [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md); come stanno insieme i
-tre ruoli sta in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
+[`lab/README.md`](../lab/README.md); il contratto che ogni agente segue a
+ogni run sta in [`lab/README.md`](../lab/README.md); come stanno insieme i
+tre ruoli sta in [`lab/README.md`](../lab/README.md).
 
 **I ruoli non hanno un cron proprio.** Gli stadi ne avevano uno a testa, e la
 forma aveva un difetto strutturale: le dipendenze della catena sono di dato e il
@@ -362,7 +362,7 @@ calendario le ignorava, quindi il curatore girava il giovedì comunque, a vuoto 
 a monte non era successo niente. Poi è arrivato un dispatcher unico, che
 serializzava a uno-stadio-per-tick e rifiutava di partire con una PR aperta,
 congelando tutto su un solo blocco. Ora una sola Routine gira a battito e lancia
-`scripts/pipeline_launch.py`, che **non nomina un solo stadio**: legge il dossier
+`lab/coda.py`, che **non nomina un solo stadio**: legge il dossier
 per-indicatore e le code e restituisce una **lista prioritizzata di lanci**
 (produttore e verificatore per-indicatore, ammissione batch). Indicatori diversi
 toccano file diversi, quindi il lanciatore ne mette in volo più d'uno in

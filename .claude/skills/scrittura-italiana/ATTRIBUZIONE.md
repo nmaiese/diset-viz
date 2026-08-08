@@ -33,7 +33,7 @@ lavoro derivato del progetto vive in file separati e chiaramente marcati:
 - [`evals/scrittura-italiana/PRECEDENZA.md`](../../../evals/scrittura-italiana/PRECEDENZA.md):
   la regola di precedenza degli assoluti di progetto sulle raccomandazioni
   tipografiche della skill, e il cancello deterministico che ne discende.
-- [`evals/scrittura-italiana/tic_count.py`](../../../evals/scrittura-italiana/tic_count.py):
+- [`la skill `scrittura-italiana``](../../../la skill `scrittura-italiana`):
   un contatore deterministico dei tic, il cui lessico è **distillato** dai
   `references/` della skill (`stile-naturale.md`, `cliche-e-parole-alla-moda.md`).
   È quindi anch'esso opera derivata sotto CC BY-SA 4.0.
