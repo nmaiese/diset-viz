@@ -51,9 +51,11 @@ posizione italiana in Europa, e perché la misura conta.
    ribattuta) e restituisce ogni numero del testo con il valore del dossier a
    cui corrisponde.
 
-   Restituisci `impronta` così come la stampa il comando. Chi ti ha chiamato
-   la confronta con la propria: se hai ribattuto male anche una riga, l'articolo
-   si ferma invece di finire su disco diverso da come l'hai verificato.
+   Restituisci `impronta` **intera e copiata**, `digest` compreso, così come la
+   stampa il comando. Chi ti ha chiamato la confronta con la propria: se hai
+   ribattuto male anche una riga, l'articolo si ferma invece di finire su disco
+   diverso da come l'hai verificato. Ometterla non fa passare l'articolo, lo
+   ferma: un'impronta che non torna vale come un'impronta diversa.
 
 2. **Leggi il `riepilogo`, non solo il conteggio.** Uno stato `trovata` dice
    che il numero esiste da qualche parte nei dati, non che la frase sia vera.

@@ -144,13 +144,42 @@ def cerca(dossier, matrice, valore):
     return fuori
 
 
-def impronta(bozza):
-    """Tre numeri che identificano il testo, calcolabili anche fuori da Python.
+def _digest(testo):
+    """FNV-1a a 32 bit sui punti di codice. Otto caratteri esadecimali.
 
-    Servono a chiudere l'unico punto in cui il testo passa ancora dentro un
-    prompt: fra chi lo scrive e chi lo verifica. Il workflow calcola gli stessi
-    tre numeri sulla bozza che ha in mano e li confronta con questi, e una
+    Non `hashlib`: dall'altra parte c'è uno script di workflow, che non ha
+    accesso alle API di Node e quindi non ha `crypto`. Serve una funzione che
+    si riscriva in dieci righe di JavaScript dando **esattamente** lo stesso
+    risultato, e FNV-1a lo è.
+
+    Sui punti di codice (`ord`) e non sulle unità UTF-16: in JavaScript si
+    itera con `for...of`, che dà punti di codice, mentre `charCodeAt`
+    spezzerebbe le coppie surrogate e divergerebbe da qui sul primo carattere
+    fuori dal piano base.
+
+    Non è un hash crittografico e non deve esserlo: qui non c'è un avversario
+    che cerca collisioni, c'è un modello che ribatte un testo e può sbagliarlo.
+    """
+    valore = 0x811C9DC5
+    for carattere in testo:
+        valore = ((valore ^ ord(carattere)) * 0x01000193) & 0xFFFFFFFF
+    return f"{valore:08x}"
+
+
+def impronta(bozza):
+    """Che cosa identifica il testo, in una forma calcolabile anche fuori da Python.
+
+    Serve a chiudere l'unico punto in cui il testo passa ancora dentro un
+    prompt: fra chi lo scrive e chi lo verifica. Il workflow ricalcola le stesse
+    cose sulla bozza che ha in mano e le confronta con queste, e una
     ribattitura infedele smette di essere invisibile.
+
+    **Il campo che decide è `digest`.** I conteggi da soli non identificano il
+    testo: cambiare `sale` in `cale` lascia identici caratteri, parole, cifre,
+    sezioni e fonti, e una ribattitura che ribalta il verso di una frase
+    passava. I conteggi restano accanto al digest perché servono a chi legge un
+    blocco: `caratteri: 4210 != 4208` dice **che cosa** è cambiato, un
+    esadecimale diverso dice solo che qualcosa lo è.
     """
     pezzi = [bozza.get("lead") or ""] + [
         (sezione.get("h") or "") + (sezione.get("body") or "")
@@ -161,8 +190,17 @@ def impronta(bozza):
     # arrivare su disco.
     pezzi += [(fonte.get("testo") or "") + (fonte.get("url") or "")
               for fonte in bozza.get("fonti") or []]
-    testo = "".join(pezzi)
+    # Uniti da un a capo e non incollati: senza separatore l'ultima parola del
+    # `lead` si fonde con la prima della sezione dopo ("isolato.In Calabria"),
+    # e allora uno spazio di troppo a un bordo cambia il conteggio delle parole
+    # e il digest. Con il separatore lo spazio non conta davvero, che e' quello
+    # che questo blocco promette.
+    testo = "\n".join(pezzi)
     return {
+        # Lo spazio non conta, qui come nei conteggi: un a capo in più in un
+        # heredoc non è una ribattitura infedele, e fermare un articolo per
+        # quello insegnerebbe a ignorare il blocco.
+        "digest": _digest(" ".join(testo.split())),
         "caratteri": len("".join(testo.split())),
         "parole": len(testo.split()),
         # `isdecimal` e non `isdigit`: `isdigit` è vero anche per l'esponente

@@ -1,13 +1,17 @@
 export const meta = {
   name: 'indicatore-lite',
-  description: 'Pipeline lite: dossier, contesto verificato, una bozza, verifica delle cifre e delle fonti, scrittura in data/lab/',
-  whenToUse: "Per scrivere articoli indicatore con la catena minima e confrontarla con produci-indicatori. Prende i codici in args, es. ['ter-30']. Senza args sceglie dalla coda editoriale l'indicatore più urgente con dati del 2025.",
+  // Il testo che vede chi sceglie il workflow da una lista. Diceva "scrittura
+  // in data/lab/", che era vero della prima versione e non lo è più: `lab.pubblica`
+  // scrive in `content/indicators/`. Chi lo leggeva poteva ragionevolmente
+  // lanciarlo come una prova isolata e trovarsi una pagina pubblica riscritta.
+  description: "Pipeline lite: dossier, contesto verificato, una bozza, verifica delle cifre e delle fonti, e PUBBLICAZIONE in content/indicators/, cioè sulla pagina pubblica (una pagina già scritta viene sovrascritta)",
+  whenToUse: "Per scrivere o rifare l'articolo di una pagina indicatore. **Pubblica sul sito**: l'articolo finisce in content/indicators/ e sovrascrive quello che c'era. Prende i codici in args, es. ['ter-30']. Senza args sceglie dalla coda editoriale l'indicatore più urgente con dati del 2025, quindi senza args non sai in anticipo quale pagina verrà riscritta.",
   phases: [
     { title: 'Dossier', detail: 'un agente per run: bin/py -m lab.dossier, dai codici o dalla coda' },
     { title: 'Contesto', detail: 'tre scout in parallelo per indicatore: eventi, Europa, perche conta' },
     { title: 'Scrittura', detail: 'una bozza sola, tesi e forma scelte da chi scrive' },
     { title: 'Verifica', detail: 'cifre contro il dossier, fonti rifetchate, link risolti, al massimo due giri di correzione' },
-    { title: 'Pubblicazione', detail: 'la bozza congelata diventa un file in data/lab/articoli/' },
+    { title: 'Pubblicazione', detail: 'la bozza congelata diventa un file in content/indicators/, cioè sulla pagina pubblica' },
   ],
 }
 
@@ -64,6 +68,11 @@ const PERCORSI = {
         properties: {
           codice: { type: 'string' },
           percorso: { type: 'string' },
+          // Il livello su cui il dossier è stato montato. Viaggia fino ai due
+          // comandi che verrebbero altrimenti eseguiti sul livello di default:
+          // una prosa provinciale verificata contro le cifre regionali e poi
+          // scritta come articolo regionale non fa fallire niente.
+          livello: { type: ['string', 'null'] },
           anomalie: { type: 'array', items: { type: 'string' } },
         },
       },
@@ -146,7 +155,7 @@ const BOZZA = {
 
 const VERDETTO = {
   type: 'object',
-  required: ['smentite', 'verificate'],
+  required: ['smentite', 'verificate', 'impronta'],
   properties: {
     smentite: {
       type: 'array',
@@ -164,9 +173,14 @@ const VERDETTO = {
     },
     verificate: { type: 'number' },
     bozza_salvata: { type: ['string', 'null'] },
+    // Obbligatoria, e con i campi obbligatori dentro: era `['object', 'null']`
+    // con tutto facoltativo, cioè uno schema che permetteva di ometterla, e
+    // ometterla valeva come farla coincidere.
     impronta: {
-      type: ['object', 'null'],
+      type: 'object',
+      required: ['digest', 'caratteri', 'parole', 'cifre', 'sezioni', 'fonti'],
       properties: {
+        digest: { type: 'string' },
         caratteri: { type: 'number' },
         parole: { type: 'number' },
         cifre: { type: 'number' },
@@ -178,17 +192,40 @@ const VERDETTO = {
   },
 }
 
+// FNV-1a a 32 bit sui punti di codice, gemello di `lab.controlla._digest`.
+// Non `crypto`: uno script di workflow non ha le API di Node.
+//
+// `Math.imul` e `>>> 0` non sono un vezzo: senza, la moltiplicazione esce dal
+// range degli interi esatti di JavaScript e il risultato diverge da quello che
+// Python calcola con `& 0xFFFFFFFF`. `for...of` e `codePointAt` e non
+// `charCodeAt`, perché `ord` in Python dà punti di codice e le coppie
+// surrogate spezzate divergerebbero.
+function digestDi(testo) {
+  let valore = 0x811c9dc5
+  for (const carattere of testo) {
+    valore = Math.imul(valore ^ carattere.codePointAt(0), 0x01000193) >>> 0
+  }
+  return valore.toString(16).padStart(8, '0')
+}
+
 // L'impronta della bozza come la calcola `lab.controlla`, ricostruita qui sulla
 // bozza che lo script ha in mano. È l'unico punto in cui il testo passa ancora
 // dentro un prompt (fra chi scrive e chi verifica): se il verificatore lo
-// ribatte male, i numeri non coincidono e l'articolo si ferma invece di finire
+// ribatte male, l'impronta non coincide e l'articolo si ferma invece di finire
 // su disco diverso da come è stato verificato.
 function improntaDi(bozza) {
   const pezzi = [bozza.lead ?? '']
     .concat((bozza.sections ?? []).map((s) => (s.h ?? '') + (s.body ?? '')))
     .concat((bozza.fonti ?? []).map((f) => (f.testo ?? '') + (f.url ?? '')))
-  const testo = pezzi.join('')
+  // `join('\n')` e non `join('')`: senza separatore l'ultima parola di un
+  // pezzo si fonde con la prima del pezzo dopo, e uno spazio di troppo a un
+  // bordo cambierebbe l'impronta. Deve restare uguale a `lab.controlla`.
+  const testo = pezzi.join('\n')
   return {
+    // I conteggi non identificano il testo: `sale` che diventa `cale` lascia
+    // identici caratteri, parole, cifre, sezioni e fonti. Il campo che decide
+    // è questo; i conteggi restano perché dicono **che cosa** è cambiato.
+    digest: digestDi(testo.split(/\s+/).filter(Boolean).join(' ')),
     caratteri: testo.replace(/\s+/g, '').length,
     parole: testo.split(/\s+/).filter(Boolean).length,
     // `\d` conta 0-9 e basta, come `isdecimal` in Python. Non `isdigit`, che
@@ -200,9 +237,29 @@ function improntaDi(bozza) {
   }
 }
 
+// Un'impronta che non torna indietro vale come un'impronta diversa, e non come
+// una uguale. Restituire `null` per `!trovata` era la stessa forma di difetto
+// che `lab.controlla` aveva sulle corrispondenze per ripiego: comprare il
+// silenzio con la cecità. Un verificatore che omette il campo fa passare la
+// bozza congelata senza che nessuno abbia stabilito che è quella giusta.
+// Il livello, scritto nei comandi invece che lasciato al default.
+//
+// `lab.controlla` e `lab.pubblica` ricostruiscono il dossier da soli, e senza
+// `--livello` lo ricostruiscono sul livello di **default** dell'indicatore. Se
+// il dossier era stato montato su un altro livello, il verificatore controlla
+// le cifre contro la matrice sbagliata e chi pubblica etichetta l'articolo col
+// livello sbagliato, senza che niente diventi rosso. Oggi `lab.dossier --coda`
+// restituisce solo righe al livello di default, quindi i due coinciderebbero
+// comunque: dirlo esplicitamente rende la catena giusta per costruzione invece
+// che per coincidenza.
+function conLivello(d) {
+  return d.livello ? ` --livello ${d.livello}` : ''
+}
+
 function improntaDiversa(attesa, trovata) {
-  if (!trovata) return null
-  const campi = ['caratteri', 'parole', 'cifre', 'sezioni', 'fonti']
+  if (!trovata) return 'impronta assente: il verificatore non l\'ha restituita'
+  if (!trovata.digest) return 'digest assente: solo i conteggi non identificano il testo'
+  const campi = ['digest', 'caratteri', 'parole', 'cifre', 'sezioni', 'fonti']
   const scarti = campi.filter((campo) => attesa[campo] !== trovata[campo])
   return scarti.length ? scarti.map((c) => `${c}: ${attesa[c]} != ${trovata[c]}`).join(', ') : null
 }
@@ -213,6 +270,11 @@ const PUBBLICATO = {
   properties: {
     scritto: { type: 'boolean' },
     sovrascritto: { type: ['boolean', 'null'] },
+    // `lab.pubblica` stampa anche il vintage di quello che c'era prima. Senza
+    // questo campo l'agente lo butta via prima del journal, e il cruscotto
+    // puo' dire che una pagina e' stata rifatta ma non quale dato ha coperto:
+    // e' la meta' dell'informazione che serve a decidere se e' stato un bene.
+    vintage_precedente: { type: ['string', 'number', 'null'] },
     percorso: { type: ['string', 'null'] },
     parole: { type: ['number', 'null'] },
     impaginazione: {
@@ -370,7 +432,7 @@ const esiti = await pipeline(
         `Bozza da giudicare:\n${json(corrente)}\n\n` +
         `Claim raccolti dai tre scout, con la lente da cui vengono:\n${json(claim ?? [])}\n\n` +
         `Comando da eseguire, con la bozza qui sopra copiata nel heredoc senza cambiare un carattere:\n\n` +
-        "    bin/py -m lab.controlla " + d.codice + " --salva <<'BOZZA'\n    ...\n    BOZZA\n\n" +
+        "    bin/py -m lab.controlla " + d.codice + conLivello(d) + " --salva <<'BOZZA'\n    ...\n    BOZZA\n\n" +
         `L'uscita porta anche un blocco \`link\`. Un percorso con stato "non esiste" è una ` +
         `smentita: manda il lettore su una pagina che non c'è. Uno "esiste, fuori dai ` +
         `parenti" è solo una nota.\n\n` +
@@ -449,9 +511,10 @@ const esiti = await pipeline(
     return agent(
       `Scrivi su disco l'articolo già verificato dell'indicatore ${d.codice}. ` +
       `Esegui esattamente questo comando e restituisci quello che stampa:\n\n` +
-      `    bin/py -m lab.pubblica ${d.codice} --bozza ${esito.bozza_salvata}\n\n` +
+      `    bin/py -m lab.pubblica ${d.codice}${conLivello(d)} --bozza ${esito.bozza_salvata}\n\n` +
       `Riporta \`impaginazione\` (gli H2 che la pagina renderebbe), \`sovrascritto\` `+
-      `(l'articolo scriveva su una pagina che esisteva gia') e tutti i rilievi, ` +
+      `e \`vintage_precedente\` (l'articolo scriveva su una pagina che esisteva ` +
+      `gia', e con che dato) e tutti i rilievi, ` +
       `anche quelli di severità \`segnala\`. Non correggere niente: se il comando ` +
       `rifiuta, riporta i problemi così come li stampa.`,
       { agentType: 'lab-pubblicatore', model: 'haiku', effort: 'low', phase: 'Pubblicazione', schema: PUBBLICATO, label: `pubblica:${d.codice}` },
@@ -459,6 +522,9 @@ const esiti = await pipeline(
       codice: d.codice,
       scritto: !!pubblicato?.scritto,
       sovrascritto: pubblicato?.sovrascritto ?? null,
+      // Rifare una pagina e' irreversibile per il lettore: il cruscotto deve
+      // poter dire su che cosa e' passata sopra, non solo che e' passata.
+      vintage_precedente: pubblicato?.vintage_precedente ?? null,
       percorso: pubblicato?.percorso ?? null,
       parole: pubblicato?.parole ?? null,
       angolo: esito.bozza?.angolo ?? null,

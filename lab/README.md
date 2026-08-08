@@ -69,13 +69,37 @@ editoriale, e la fa chi scrive.
 
 `--coda N` non calcola nessuna priorità: la prende da `lab/coda.py`,
 che ordina il catalogo intero (cifre arretrate, poi sezioni mancanti, poi se la
-pagina è indicizzabile) e ci aggiunge i due filtri che servono qui, il dato
-dell'anno chiesto e la pagina non già completa.
+pagina è indicizzabile) e ci aggiunge i filtri che servono qui: il dato
+dell'anno chiesto, la pagina non già completa, e il livello.
+
+"Non già completa" è il predicato di `lab.coda`, riusato e non riscritto:
+`missing or not lead or stale`. Scriverlo a mano come "sezioni scritte meno
+delle sezioni emesse" escludeva proprio la testa della coda, l'articolo completo
+ma con le cifre più vecchie del dato, che vale `+100` mentre una sezione
+mancante ne vale `10`.
+
+**Il livello dev'essere quello di default dell'indicatore**, e non è un
+dettaglio di comodo: `content/indicators/` ha un file per indicatore, non per
+coppia (indicatore, livello). Un articolo provinciale di un indicatore che di
+default è regionale finirebbe nello stesso `<key>.json` di quello regionale, e
+siccome la pagina sceglie che cosa rendere leggendo `level`, non si
+aggiungerebbe al primo: lo sostituirebbe, e la prosa regionale smetterebbe di
+comparire senza che niente diventi rosso. Il filtro è quindi `livello ==
+default`, non "salta le province": 33 delle 67 righe provinciali sono di
+indicatori che di default **sono** provinciali, e per quelle non c'è
+collisione. Le 34 che restano fuori diventeranno raggiungibili quando lo store
+saprà tenere due articoli per indicatore.
+
+Il livello viaggia poi fino ai comandi: `lab.controlla` e `lab.pubblica`
+ricostruiscono il dossier da soli e senza `--livello` lo ricostruiscono sul
+default, quindi il workflow glielo passa esplicitamente. Con il filtro qui
+sopra i due coinciderebbero comunque: dirlo rende la catena giusta per
+costruzione invece che per coincidenza.
 
 Numeri di oggi: la coda dice **0 articoli con vintage arretrato**, quindi il
 `+100` non scatta mai. Incrociandola con la freschezza restano **96 pagine con
 dati 2025, indicizzabili e incomplete**: 62 `bes`, 23 `ims`, 11 `ter`, di cui 83
-a 2/4 e 13 a 0/4.
+a 2/4 e 13 a 0/4, tutte e 96 al livello regione.
 
 Su una pagina a 2/4 si riscrive l'**articolo intero**, non una toppa alle due
 sezioni mancanti: chi scrive decide la forma quando ha il dossier davanti, e
@@ -173,18 +197,41 @@ fermarlo è chi verifica, non chi pubblica.
 ## Il testo passa in un prompt una volta sola
 
 Fra lo scrittore e il verificatore. Da lì in poi viaggia come file:
-`lab.controlla --salva` congela la bozza giudicata e ne stampa l'`impronta`
-(caratteri, parole, cifre, sezioni, fonti, calcolata su lead, sezioni **e**
-testo e url delle fonti); il workflow ricalcola la stessa impronta sulla bozza
-che ha in mano e, se non coincide, ferma l'articolo invece di scriverne uno
-diverso da quello verificato.
+`lab.controlla --salva` congela la bozza giudicata e ne stampa l'`impronta`,
+calcolata su lead, sezioni **e** testo e url delle fonti; il workflow ricalcola
+la stessa impronta sulla bozza che ha in mano e, se non coincide, ferma
+l'articolo invece di scriverne uno diverso da quello verificato.
 
-Le due implementazioni devono restare identiche. L'unico punto in cui hanno già
-divergito: `isdigit()` in Python è vero anche per l'esponente di `km²`, che
-`\d` in JavaScript non conta, quindi si usa `isdecimal()`. Se si tocca una delle
-due, si verifica così:
+**Il campo che decide è `digest`**, otto caratteri esadecimali. Gli altri
+cinque (caratteri, parole, cifre, sezioni, fonti) non identificano il testo:
+`sale` che diventa `cale` li lascia tutti identici e ribalta il verso della
+frase. Restano accanto al digest perché servono a chi legge un blocco:
+`caratteri: 4210 != 4208` dice **che cosa** è cambiato, un esadecimale diverso
+dice solo che qualcosa lo è.
 
-    bin/py -m lab.controlla ter-6 --bozza bozza.json | grep impronta
+Il digest è FNV-1a a 32 bit sui punti di codice, e non `hashlib`, perché
+dall'altra parte c'è uno script di workflow: niente API di Node, quindi niente
+`crypto`. Serve una funzione che si riscriva in dieci righe di JavaScript
+dando esattamente lo stesso risultato.
+
+**Un'impronta che non torna vale come diversa, non come uguale.** Il controllo
+restituiva `null` quando il verificatore ometteva il campo, cioè lo stesso
+esito di una che coincide: la bozza congelata finiva su disco senza che nessuno
+avesse stabilito che era quella giusta. Ora l'assenza è uno scarto, e lo schema
+del verdetto pretende l'impronta con tutti i suoi campi.
+
+Le due implementazioni devono restare identiche, ed è la forma che diverge.
+I punti in cui hanno già divergito o potrebbero: `isdigit()` in Python è vero
+anche per l'esponente di `km²`, che `\d` in JavaScript non conta, quindi si usa
+`isdecimal()`; il digest gira su `Math.imul` e `>>> 0`, senza i quali la
+moltiplicazione esce dagli interi esatti di JavaScript; si itera per punti di
+codice (`for...of`, `codePointAt`) e non per unità UTF-16, che spezzerebbero le
+coppie surrogate; e i pezzi si uniscono con un a capo, senza il quale l'ultima
+parola di uno si fonde con la prima del successivo.
+
+Non si controlla a vista: `tests/unit/test_lab_impronta.py` estrae le due
+funzioni dal workflow, le esegue con `node` sulla stessa bozza e confronta il
+risultato con quello di Python.
 
 **Attenzione a un'asimmetria voluta**: l'impronta conta il testo **grezzo**, url
 compresi, mentre la ricerca delle cifre gira sul testo **senza i bersagli dei

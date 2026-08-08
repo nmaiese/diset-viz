@@ -27,7 +27,7 @@ def _riga(codice, **cambia):
     non esiste in natura, e provare il filtro contro un dato impossibile
     proverebbe solo che il dato è impossibile.
     """
-    riga = {"code": codice, "level": "region", "name": f"nome di {codice}",
+    riga = {"code": codice, "level": "regione", "name": f"nome di {codice}",
             "year_max": 2025, "score": 10, "indexable": True,
             "stale": False, "lead": True, "missing": [],
             "sections": 4, "vintage": 2025}
@@ -37,8 +37,15 @@ def _riga(codice, **cambia):
 
 
 class LaCodaAutomatica(unittest.TestCase):
-    def _scelti(self, righe, quanti=10, anno=2025):
-        with mock.patch("lab.coda.build_queue", return_value=righe):
+    def _scelti(self, righe, quanti=10, anno=2025, default="regione"):
+        """`default` è il livello di default degli indicatori finti: si finge
+        anche quello, perché ricavarlo davvero vuol dire montare una vista per
+        candidata, e qui gli indicatori non esistono."""
+        livelli = default if isinstance(default, dict) else {}
+        with mock.patch("lab.coda.build_queue", return_value=righe), \
+             mock.patch("lab.dossier._livello_di_default",
+                        side_effect=lambda codice: livelli.get(codice, default)
+                        if livelli else default):
             return [voce["codice"] for voce in dossier.da_coda(quanti, anno)]
 
     def test_un_articolo_completo_ma_arretrato_e_il_primo_da_rifare(self):
@@ -77,6 +84,54 @@ class LaCodaAutomatica(unittest.TestCase):
         righe = [_riga("ter-8", stale=True), _riga("ter-9", lead=False),
                  _riga("ter-10", missing=["quadro"])]
         self.assertEqual(self._scelti(righe, quanti=2), ["ter-8", "ter-9"])
+
+
+class IlLivelloDeveEssereQuelloDiDefault(unittest.TestCase):
+    """`content/indicators/` ha un file per **indicatore**, non per coppia.
+
+    Un articolo provinciale di un indicatore che di default è regionale
+    finirebbe nello stesso `<key>.json` di quello regionale. Non si
+    aggiungerebbe: lo sostituirebbe, e siccome la pagina sceglie che cosa
+    rendere leggendo `level`, la prosa regionale smetterebbe di comparire senza
+    che niente diventi rosso.
+
+    Non è provabile sui dati veri: oggi tutte e 96 le righe selezionabili sono
+    `regione`, e le 34 righe con livello diverso dal default non passano il
+    filtro sull'anno. Il giorno in cui lo passeranno, questo test è l'unica cosa
+    che c'è fra loro e una pagina riscritta al livello sbagliato.
+    """
+
+    def _scelti(self, righe, default):
+        with mock.patch("lab.coda.build_queue", return_value=righe), \
+             mock.patch("lab.dossier._livello_di_default", side_effect=default.get):
+            return [voce["codice"] for voce in dossier.da_coda(10, 2025)]
+
+    def test_una_riga_provinciale_di_un_indicatore_regionale_non_si_sceglie(self):
+        righe = [_riga("ter-11", level="provincia", missing=["limiti"])]
+        self.assertEqual(self._scelti(righe, {"ter-11": "regione"}), [])
+
+    def test_una_riga_provinciale_di_un_indicatore_provinciale_si_sceglie(self):
+        """Il filtro giusto è "livello == default", non "salta le province": 33
+        delle 67 righe provinciali della coda sono di indicatori che di default
+        **sono** provinciali, e per quelle non c'è nessuna collisione."""
+        righe = [_riga("ter-12", level="provincia", missing=["limiti"])]
+        self.assertEqual(self._scelti(righe, {"ter-12": "provincia"}), ["ter-12"])
+
+    def test_un_indicatore_senza_vista_resta_fuori(self):
+        """`_livello_di_default` torna `None` quando la vista non si costruisce.
+        `None` non coincide con nessun livello, quindi esclude: è il verso
+        giusto del dubbio."""
+        righe = [_riga("ter-13", missing=["limiti"])]
+        self.assertEqual(self._scelti(righe, {"ter-13": None}), [])
+
+    def test_una_riga_scartata_non_consuma_il_posto_di_quelle_buone(self):
+        """Il filtro vive dentro il ciclo che conta fino a `quanti`: se
+        tagliasse dopo, una riga scartata lascerebbe la lista corta."""
+        righe = [_riga("ter-14", level="provincia", missing=["limiti"]),
+                 _riga("ter-15", missing=["limiti"])]
+        self.assertEqual(
+            self._scelti(righe, {"ter-14": "regione", "ter-15": "regione"}),
+            ["ter-15"])
 
 
 if __name__ == "__main__":

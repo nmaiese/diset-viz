@@ -625,16 +625,57 @@ def da_coda(quanti, anno_minimo):
     manca solo il `lead`, che è la meta description della pagina.
 
     L'unità della coda è la coppia (indicatore, livello), quindi si riporta
-    anche il livello: lo stesso indicatore su regioni e province è un altro
-    articolo.
+    anche il livello. Si tengono però **solo le righe al livello di default
+    dell'indicatore**, e non è un dettaglio di comodo: `content/indicators/`
+    ha un file per indicatore, non per coppia. Un articolo provinciale di un
+    indicatore che di default è regionale finirebbe nello stesso `<key>.json`
+    dell'articolo regionale, e siccome la pagina sceglie che cosa rendere
+    leggendo `level`, il secondo articolo non si aggiungerebbe al primo: lo
+    sostituirebbe, e la prosa regionale smetterebbe di comparire senza che
+    niente diventi rosso.
+
+    Il filtro giusto è quindi `livello == livello di default`, non "salta le
+    province": 33 delle 67 righe provinciali della coda sono di indicatori che
+    di default **sono** provinciali, e per quelle non c'è nessuna collisione. Le
+    34 che restano fuori diventeranno raggiungibili quando lo store saprà
+    tenere due articoli per indicatore.
+
+    La vista si costruisce **una candidata alla volta e solo per le candidate**:
+    è la parte cara di questa funzione, e montarne 668 per restituirne una
+    sarebbe il costo di un catalogo intero per una riga.
     """
     from lab.coda import build_queue
 
-    return [{"codice": riga["code"], "livello": riga["level"], "nome": riga["name"],
-             "anno_max": riga["year_max"], "punteggio": riga["score"]}
-            for riga in build_queue()
-            if riga["indexable"] and riga["year_max"] >= anno_minimo
-            and (riga["missing"] or not riga["lead"] or riga["stale"])][:quanti]
+    scelti = []
+    for riga in build_queue():
+        if len(scelti) >= quanti:
+            break
+        if not (riga["indexable"] and riga["year_max"] >= anno_minimo):
+            continue
+        if not (riga["missing"] or not riga["lead"] or riga["stale"]):
+            continue
+        if riga["level"] != _livello_di_default(riga["code"]):
+            continue
+        scelti.append({"codice": riga["code"], "livello": riga["level"],
+                       "nome": riga["name"], "anno_max": riga["year_max"],
+                       "punteggio": riga["score"]})
+    return scelti
+
+
+def _livello_di_default(codice):
+    """Il livello su cui `lab.controlla` e `lab.pubblica` lavorano se nessuno lo dice.
+
+    Un indicatore che non si risolve o senza vista restituisce `None`, che non
+    coincide con nessun livello e quindi esclude la riga. È il verso giusto del
+    dubbio: oggi le righe senza vista sono zero, e uno zero smette di essere
+    zero senza avvisare.
+    """
+    try:
+        famiglia, grezzo = risolvi(codice)
+        vista = build_indicator_view(famiglia, grezzo)
+    except Exception:
+        return None
+    return (vista or {}).get("default_level")
 
 
 def main(argv=None):
@@ -676,7 +717,12 @@ def main(argv=None):
         with open(percorso, "w", encoding="utf-8") as handle:
             json.dump(dossier, handle, ensure_ascii=False, indent=1, sort_keys=True)
             handle.write("\n")
+        # Il livello sta nell'uscita e non solo dentro il file: `lab.controlla`
+        # e `lab.pubblica` lo ricalcolano dal default se nessuno glielo dice, e
+        # un livello che si perde qui non si vede piu' da nessuna parte finche'
+        # non esce una prosa provinciale etichettata come regionale.
         fatti.append({"codice": codice, "percorso": os.path.abspath(percorso),
+                      "livello": dossier["livello"],
                       "byte": os.path.getsize(percorso), "anomalie": dossier["anomalie"]})
 
     # `--stdout` ristampa il dossier già costruito, non ne costruisce un
