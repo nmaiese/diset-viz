@@ -5,9 +5,9 @@
  "claude_code_version": "2.1.224 (Claude Code)",
  "commit": "39daf41",
  "detail": [
-  "Ambiguita' del clitico: 'sono nati 355mila bambini e ne sono morti 652mila' faceva leggere che 652mila di quei bambini fossero morti, perche' 'ne' prende 'bambini' come antecedente. Riscritto 'ci sono stati 355mila nati e 652mila morti'. Le due cifre Istat 2025 restano quelle.",
-  "Classe esterno: i 296mila del comunicato Istat sono il saldo con l'estero (348mila stranieri in ingresso meno 53mila italiani in uscita), non gli arrivi. La prosa diceva 'gli arrivi dall'estero ... 296mila unita' nette', ora dice 'il movimento con l'estero ... 296mila unita' di guadagno netto'.",
-  "Fonte 2: la riga citava come definizione del saldo migratorio totale anche il rapporto per mille, che su demo.istat.it e' invece la definizione del tasso migratorio totale. Le due definizioni sono ora separate nella citazione. La sezione definizione dell'articolo era gia' corretta.",
+  "Ambiguità del clitico: 'sono nati 355mila bambini e ne sono morti 652mila' faceva leggere che 652mila di quei bambini fossero morti, perché 'ne' prende 'bambini' come antecedente. Riscritto 'ci sono stati 355mila nati e 652mila mortì. Le due cifre Istat 2025 restano quelle.",
+  "Classe esterno: i 296mila del comunicato Istat sono il saldo con l'estero (348mila stranieri in ingresso meno 53mila italiani in uscita), non gli arrivi. La prosa diceva 'gli arrivi dall'estero ... 296mila unità nettè, ora dice 'il movimento con l'estero ... 296mila unità di guadagno nettò.",
+  "Fonte 2: la riga citava come definizione del saldo migratorio totale anche il rapporto per mille, che su demo.istat.it è invece la definizione del tasso migratorio totale. Le due definizioni sono ora separate nella citazione. La sezione definizione dell'articolo era già corretta.",
   "Nessun numero, nessuna sezione e nessuna scelta editoriale della run precedente toccata. Firma invariata: reviewed_at 2026-08-07, reviewed_vintage 2025, vintage 2025. prose_lint 0 tell, 3 link interni."
  ],
  "gate": "auto",

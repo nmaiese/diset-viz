@@ -1,27 +1,27 @@
 {
-  "_": "Fixture con errori piantati (e05-e07): NON e' un articolo vero. Vedi expected.json.",
-  "lead": "Tra la prima e l'ultima regione corrono trentacinque punti: l'occupazione femminile e' la mappa piu' netta del divario italiano.",
+  "_": "Fixture con errori piantati (e05-e07): NON è un articolo vero. Vedi expected.json.",
+  "lead": "Tra la prima e l'ultima regione corrono trentacinque punti: l'occupazione femminile è la mappa più netta del divario italiano.",
   "level": "regione",
   "sections": [
     {
       "role": "definizione",
       "h": "Occupate su popolazione, non su occupati",
-      "body": "Persone occupate tra 15 e 64 anni sulla popolazione femminile della stessa eta': il denominatore e' la popolazione, quindi il tasso sente sia chi trova lavoro sia chi smette di cercarlo."
+      "body": "Persone occupate tra 15 e 64 anni sulla popolazione femminile della stessa età: il denominatore è la popolazione, quindi il tasso sente sia chi trova lavoro sia chi smette di cercarlo."
     },
     {
       "role": "quadro",
       "h": "Dove si ferma il Sud",
-      "body": "L'Italia e' ultima in Europa per occupazione femminile, e la geografia interna spiega perche': la Puglia si ferma al 39,91%, la Sicilia al 34,61%, la Campania al 33,95%. Sopra la media stanno dodici regioni, tutte del Centro-Nord."
+      "body": "L'Italia è ultima in Europa per occupazione femminile, e la geografia interna spiega perché: la Puglia si ferma al 39,91%, la Sicilia al 34,61%, la Campania al 33,95%. Sopra la media stanno dodici regioni, tutte del Centro-Nord."
     },
     {
       "role": "dinamica",
       "h": "La rincorsa che non basta",
-      "body": "Il divario tra la prima e l'ultima si e' piu' che dimezzato dal 2018, ma la distanza resta di quasi 35 punti. La media nazionale delle regioni e' passata da 49,99 a 54,87."
+      "body": "Il divario tra la prima e l'ultima si è più che dimezzato dal 2018, ma la distanza resta di quasi 35 punti. La media nazionale delle regioni è passata da 49,99 a 54,87."
     },
     {
       "role": "limiti",
-      "h": "Un tasso, non un giudizio sulla qualita'",
-      "body": "Il tasso non dice quante ore si lavora, con che contratto, ne' con quale salario. E una media regionale nasconde differenze interne che qui non si vedono."
+      "h": "Un tasso, non un giudizio sulla qualità",
+      "body": "Il tasso non dice quante ore si lavora, con che contratto, né con quale salario. E una media regionale nasconde differenze interne che qui non si vedono."
     }
   ],
   "fonti": [],

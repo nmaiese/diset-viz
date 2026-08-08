@@ -5,7 +5,7 @@
  "claude_code_version": "2.1.220 (Claude Code)",
  "commit": "86f5275",
  "detail": [
-  "Smentita dinamica/media: la frase 'gli altri tre valgono un decimo di giornata o meno' e falsa per le Marche, che calano di 0,112 giornate 2023->2024 (da 7,19 a 7,07), sopra 0,1, e in valore assoluto quasi quanto il Molise (-0,125). I quattro cali 2024: Molise -0,125, Marche -0,112, Basilicata -0,015, Piemonte -0,004. Confermate tra le altre: coppia alpina TAA/VdA sempre ai primi due posti 1981-2024, Basilicata ultima nei primi anni Ottanta e oggi 13a, Sardegna +6 posti, Piemonte -5, media 2019->2020 da 9,77 a 5,37, Lazio 2020/2019 0,242 e 2024/2019 1,338, cinque regioni sotto il 2019 (Calabria, Toscana, Basilicata, Piemonte, Campania per un soffio), cross-ref ter-165 Sardegna 6->11 e Lazio 8->4. Definizione pulita, note senza rotture di serie."
+  "Smentita dinamica/media: la frase 'gli altri tre valgono un decimo di giornata o menò e falsa per le Marche, che calano di 0,112 giornate 2023->2024 (da 7,19 a 7,07), sopra 0,1, e in valore assoluto quasi quanto il Molise (-0,125). I quattro cali 2024: Molise -0,125, Marche -0,112, Basilicata -0,015, Piemonte -0,004. Confermate tra le altre: coppia alpina TAA/VdA sempre ai primi due posti 1981-2024, Basilicata ultima nei primi anni Ottanta e oggi 13a, Sardegna +6 posti, Piemonte -5, media 2019->2020 da 9,77 a 5,37, Lazio 2020/2019 0,242 e 2024/2019 1,338, cinque regioni sotto il 2019 (Calabria, Toscana, Basilicata, Piemonte, Campania per un soffio), cross-ref ter-165 Sardegna 6->11 e Lazio 8->4. Definizione pulita, note senza rotture di serie."
  ],
  "gate": "auto",
  "outcome": "pr-open",

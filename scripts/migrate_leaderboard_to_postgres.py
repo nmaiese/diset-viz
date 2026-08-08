@@ -1,7 +1,7 @@
 """Migrazione una-tantum: lo stato mutabile da SQLite a Postgres (Supabase).
 
 Si lancia UNA volta, quando si accende Supabase, PRIMA di rimuovere Litestream:
-finche' il bucket GCS c'e', le righe sono recuperabili; una volta tolto
+finché il bucket GCS c'è, le righe sono recuperabili; una volta tolto
 Litestream, il prossimo deploy le renderebbe irraggiungibili.
 
 Sequenza:
@@ -13,7 +13,7 @@ Sequenza:
 
 Legge la sorgente con sqlite3 grezzo (nessuna assunzione sullo schema vecchio,
 che non ha `user_id`), scrive la destinazione con l'ORM (lo stesso di app/). Si
-rifiuta se la destinazione ha gia' righe in `scores`, salvo `--force`.
+rifiuta se la destinazione ha già righe in `scores`, salvo `--force`.
 """
 
 import argparse
@@ -50,7 +50,7 @@ def migrate(source_path, force=False):
     with session_scope() as s:
         existing = s.query(Score).count()
         if existing and not force:
-            print(f"RIFIUTO: la destinazione ha gia' {existing} righe in scores. "
+            print(f"RIFIUTO: la destinazione ha già {existing} righe in scores. "
                   f"Usa --force per procedere comunque.", file=sys.stderr)
             return 1
         for r in scores:
@@ -71,7 +71,7 @@ def migrate(source_path, force=False):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--source", required=True, help="path allo SQLite scaricato da GCS")
-    ap.add_argument("--force", action="store_true", help="scrivi anche se scores non e' vuota")
+    ap.add_argument("--force", action="store_true", help="scrivi anche se scores non è vuota")
     args = ap.parse_args()
     return migrate(args.source, force=args.force)
 

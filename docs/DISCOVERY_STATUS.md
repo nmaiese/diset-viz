@@ -9,43 +9,43 @@ Per il contratto di ogni agente: [`AGENT_CONTRACT.md`](AGENT_CONTRACT.md).
 
 Aggiornato al **2026-08-07**.
 
-> **Che cosa e' vero adesso, verificato contro il codice il 2026-08-07.** Il
-> resto di questo documento e' rimasto fermo al 28 luglio, e un documento di
-> stato sbagliato e' piu' pericoloso di uno assente: leggi prima questo riquadro
-> e diffida di cio' che lo contraddice.
+> **Che cosa è vero adesso, verificato contro il codice il 2026-08-07.** Il
+> resto di questo documento è rimasto fermo al 28 luglio, e un documento di
+> stato sbagliato è più pericoloso di uno assente: leggi prima questo riquadro
+> e diffida di ciò che lo contraddice.
 >
 > - **Cinque agenti**, non sette: `admissions` a monte, `verificatore` e
->   `reader-editor` a valle, piu' `scrittore-indicatore`, `giudice-cieco`,
+>   `reader-editor` a valle, più `scrittore-indicatore`, `giudice-cieco`,
 >   `pubblicatore` e `preparatore-pacchetti` che vivono dentro l'officina.
 >   `producer.md` e `launcher.md` **sono stati cancellati**.
-> - **Gli articoli non li scrive piu' un agente.** Li scrive un workflow,
+> - **Gli articoli non li scrive più un agente.** Li scrive un workflow,
 >   `.claude/workflows/produci-indicatori.js`, misurato a $1,97 per articolo
 >   contro i ~38 $ della catena vecchia.
 > - **Il piano di lancio resta** (`scripts/pipeline_launch.py`) e per il ruolo
 >   `producer` stampa il comando del workflow invece del nome di un agente.
-> - **La Routine resta in pausa**, e non e' verificabile da dentro il repo: il
+> - **La Routine resta in pausa**, e non è verificabile da dentro il repo: il
 >   suo stato vero sta su <https://claude.ai/code/routines>.
-> - **Il cancello editoriale e' `officina/lint.py`**, che dal 2026-08-07
+> - **Il cancello editoriale è `officina/lint.py`**, che dal 2026-08-07
 >   controlla anche la definizione contro le parole della fonte.
 
 ## In una riga
 
-**Tre ruoli, per-indicatore, un lanciatore che ne mette piu' di uno in volo
+**Tre ruoli, per-indicatore, un lanciatore che ne mette più di uno in volo
 insieme**, e nessuno che aspetti una firma. Un indicatore va da un catalogo SDMX
 a una pagina pubblica senza intervento, e la catena ci ritorna sopra quando i
 dati si muovono.
 
-> **La ri-architettura del 28 luglio (sera).** La catena e' passata da sette
+> **La ri-architettura del 28 luglio (sera).** La catena è passata da sette
 > stadi a **tre ruoli** (ammissione = scout+hunter+promoter, produttore =
 > curator+writer+reviewer, verificatore invariato) e da uno **stadio per tick** a
 > un **lanciatore per-indicatore** (`scripts/pipeline_launch.py`, agente
-> `launcher`) che lancia in parallelo, perche' indicatori diversi toccano file
+> `launcher`) che lancia in parallelo, perché indicatori diversi toccano file
 > diversi e non contendono. Il dispatcher (`pipeline_dispatch.py`) e il lock
-> una-PR-aperta sono ritirati. Il monitoraggio e' la rotta viva `/_pipeline`
-> (piu' `scripts/pipeline_monitor.py`). **La Routine va ri-puntata**: il suo
+> una-PR-aperta sono ritirati. Il monitoraggio è la rotta viva `/_pipeline`
+> (più `scripts/pipeline_monitor.py`). **La Routine va ri-puntata**: il suo
 > prompt cita ancora il dispatcher, va cambiato al piano di `pipeline_launch.py` (vedi
-> [Le Routine](#le-routine)); e' in pausa, quindi non fa danni finche' non si
-> riaccende. Il perche' della forma nuova sta in
+> [Le Routine](#le-routine)); è in pausa, quindi non fa danni finché non si
+> riaccende. Il perché della forma nuova sta in
 > [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 
 > **L'irrobustimento del 29 luglio.** Un tick con dieci ruoli in volo ha
@@ -57,7 +57,7 @@ dati si muovono.
 > si apre via REST senza `GH_REPO` (`pipeline_merge.py --open`), e due test EUR
 > pinnati sono stati ricostruiti su fixture sintetiche (sbloccavano la PR #86).
 > Il **cruscotto `/_pipeline` mostra il vivo e il percorso end-to-end**: gli agenti POSTano i battiti
-> e le PR aperte a `/_pipeline/beat`, il sito li scrive nel SQLite gia' replicato
+> e le PR aperte a `/_pipeline/beat`, il sito li scrive nel SQLite già replicato
 > su GCS da Litestream, e li serve. La Routine `launcher` resta **in pausa**: va
 > ri-puntata al piano di `pipeline_launch.py` e riaccesa a mano, dopo aver verificato i fix su
 > qualche tick manuale (serve prima il segreto `PIPELINE_INGEST_TOKEN` in Cloud
@@ -103,13 +103,13 @@ ignorava, e sei Routine indipendenti si pestavano i piedi.
 | --- | --- | --- | --- |
 | launcher | ogni 3 ore (minuto `:02`) | `pipeline_launch.py`, poi lancia in parallelo i ruoli che ha nominato | `trig_01PGX3mKsLwUzz82snYMjVnA` (in pausa) |
 
-> **Stato al 2026-08-01.** La Routine era puntata a `launcher.md`, che non esiste piu' (il prompt
+> **Stato al 2026-08-01.** La Routine era puntata a `launcher.md`, che non esiste più (il prompt
 > qui sotto), non al dispatcher ritirato: era stata ricreata il 29 luglio con l'id
 > nuovo `trig_01PGX3mKsLwUzz82snYMjVnA` (il vecchio `trig_01Dv3ZDB4ch561GFYy2QwEUJ`
-> non esiste piu'). Il 1 agosto `allowed_tools` e' stato corretto per includere
+> non esiste più). Il 1 agosto `allowed_tools` è stato corretto per includere
 > `Task`/`Agent`: senza, il lanciatore non poteva lanciare i ruoli in
 > sotto-sessione. Resta **in pausa** (`enabled:false`): un tick a mano si forza con
-> `RemoteTrigger action:run`, la schedulazione non e' accesa.
+> `RemoteTrigger action:run`, la schedulazione non è accesa.
 
 **L'inciampo del 28 luglio, perché non si ripeta.** La Routine si crea anche via
 lo strumento MCP `create_trigger`, ma **deve essere in modalità sessione nuova**
@@ -128,7 +128,7 @@ esistente), environment `divarioitalia`, modello quello di default. Il modello
 della sessione decide solo il dispatcher: ogni agente di stadio dichiara il
 proprio nel frontmatter (`.claude/agents/`, campo `model`), e la riga di
 diario di ogni run registra `model` e `claude_code_version`, quindi una
-regressione osservata dopo il fatto si attribuisce da li'. La sessione
+regressione osservata dopo il fatto si attribuisce da lì. La sessione
 nuova non è un dettaglio: il prompt qui sotto è scritto per partire da zero, e
 una Routine legata a una sessione esistente accumulerebbe il contesto di tutti i
 giri precedenti, che è esattamente ciò che rende un agente incoerente con i file
@@ -137,7 +137,7 @@ che ha davanti.
 ### Il prompt, adesso un puntatore
 
 Il giro del lanciatore (legge il piano per-indicatore, lancia i ruoli in
-parallelo, riporta come e' andata) viveva in `.claude/agents/launcher.md`, cancellato con la demolizione: il piano lo produce `scripts/pipeline_launch.py` e lo legge chi lancia, con
+parallelo, riporta come è andata) viveva in `.claude/agents/launcher.md`, cancellato con la demolizione: il piano lo produce `scripts/pipeline_launch.py` e lo legge chi lancia, con
 modello e guardia nel frontmatter come ogni altro agente della catena. Questo
 documento non lo ricopia più: la versione che stava qui era l'ultima copia di
 contratto dentro un prompt di Routine, cioè la forma esatta del drift di
@@ -408,10 +408,10 @@ le sue due righe di config e la segnalazione della licenza vivono in #43.
 2. **`scout_sources.py` troncava la coda alfabeticamente.** Le proposte erano 87, il
    `limit=40` con punteggio uniforme ordinava per nome, quindi la coda si fermava a
    "Notti in Italia" e le altre non le vedeva nessuno. **Chiuso** (2026-07-28): il
-   tetto ora e' `None` di default (`propose_sources` propone ogni dataflow
-   superstite), la coda dello scout e' passata da 0 a 50 `new` sul catalogo reale
+   tetto ora è `None` di default (`propose_sources` propone ogni dataflow
+   superstite), la coda dello scout è passata da 0 a 50 `new` sul catalogo reale
    (90 proposte, 50 mai triate), e `--refresh` ri-sonda il catalogo cache-forever
-   cosi' i dataflow pubblicati dopo l'ultima run entrano in coda. Bloccato da
+   così i dataflow pubblicati dopo l'ultima run entrano in coda. Bloccato da
    `tests/unit/test_scout_sources.py::Uncapped`.
 3. **`REGIONAL_HINT` non riconosce `- reg.`**, l'abbreviazione che Istat usa
    davvero: cerca `\b(region|nuts2)`. È il motivo per cui la spesa sociale dei
@@ -533,10 +533,10 @@ possono fare:
     concorrente a freddo su gunicorn (riprodotto in modo affidabile con i thread),
     ma **non** questo. La cura definitiva sarebbe togliere la struttura da 110k
     oggetti dalla RAM (store interrogato), ma la Fase 2 del piano ha **misurato**
-    che non conviene (il regionale e' solo ~28MB residenti, il problema di 512Mi
+    che non conviene (il regionale è solo ~28MB residenti, il problema di 512Mi
     era il picco concorrente al build, non la memoria trattenuta): quindi quella
     migrazione **non si fa**, e con essa non arriva questa cura. La mitigazione
-    adottata e' la serializzazione dei builder pesanti (`app/cache_util.py`,
+    adottata è la serializzazione dei builder pesanti (`app/cache_util.py`,
     applicata a data/atlas_catalog/bes_data), che taglia il picco concorrente da
     ~463MB a ~215MB e riduce la finestra del churn, ma il churn single-thread (che
     la suite reale non genera, svuota le cache una volta sola) resta teoricamente

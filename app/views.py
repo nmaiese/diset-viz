@@ -328,7 +328,7 @@ def data_catalog():
     Costruito dalla **stessa** proiezione di sitemap e llms-full
     (`_indexable_indicator_catalog`), non dal solo inventario regionale
     (`get_atlas_catalog`): quest'ultimo non vede gli indicatori BES con sole
-    osservazioni provinciali, che pero' hanno una pagina indicizzabile ed entrano
+    osservazioni provinciali, che però hanno una pagina indicizzabile ed entrano
     negli altri due export. Prenderli da fonti diverse lasciava decine di dataset
     validi fuori dal catalogo pubblico e dal suo grafo `DataCatalog.dataset`.
     """
@@ -357,7 +357,7 @@ def data_catalog():
         "name": "Catalogo dati di Divario Italia",
         "description": description,
         "url": f"{SITE_URL}/catalogo-dati",
-        # L'entita' editore condivisa (con @id /chi-siamo#organizzazione), la
+        # L'entità editore condivisa (con @id /chi-siamo#organizzazione), la
         # stessa delle schede indicatore e della pagina Chi siamo, non una seconda
         # Organization anonima: un solo publisher, collegato, in tutto il grafo.
         "publisher": publisher.ORGANIZATION,
@@ -382,10 +382,10 @@ def data_catalog():
 def divari_regionali():
     """L'hub editoriale sui divari territoriali.
 
-    Non e' una seconda tassonomia sopra /temi e /regioni: quelle pagine servono a
-    sfogliare, questa sostiene una tesi (il divario non e' una linea sola) e la
-    misura sul catalogo, ripartizione per ripartizione. Ogni numero in pagina e'
-    ricalcolato dai dati a ogni render, cosi' la prosa non puo' invecchiare.
+    Non è una seconda tassonomia sopra /temi e /regioni: quelle pagine servono a
+    sfogliare, questa sostiene una tesi (il divario non è una linea sola) e la
+    misura sul catalogo, ripartizione per ripartizione. Ogni numero in pagina è
+    ricalcolato dai dati a ogni render, così la prosa non può invecchiare.
     """
     view = divari.build_divari_view()
     if view is None:
@@ -406,8 +406,8 @@ def confronto():
     """La casa canonica del comparatore.
 
     Il confronto tra regioni era solo uno stato della SPA (/atlante?view=confronto):
-    funzionava, ma non aveva una URL da condividere ne' un titolo suo. Qui la
-    pagina e' server-rendered, quindi chi arriva senza JavaScript legge un
+    funzionava, ma non aveva una URL da condividere né un titolo suo. Qui la
+    pagina è server-rendered, quindi chi arriva senza JavaScript legge un
     confronto vero con numeri reali, e il bundle monta sopra la vista giusta.
     """
     return render_template(
@@ -560,11 +560,11 @@ def _search_results(query):
 def ricerca():
     """Ricerca interna server-rendered, `noindex, follow` per scelta.
 
-    Uno spazio `?q=` e' illimitato per costruzione: indicizzarlo produrrebbe un
+    Uno spazio `?q=` è illimitato per costruzione: indicizzarlo produrrebbe un
     numero arbitrario di pagine sottili, ognuna un sottoinsieme di righe che
-    esistono gia' sulle schede. Qui la pagina serve a chi cerca, non a Google:
+    esistono già sulle schede. Qui la pagina serve a chi cerca, non a Google:
     funziona senza JavaScript, si condivide, e i suoi link restano `follow`
-    cosi' l'equity scorre verso le pagine indicatore e gli articoli.
+    così l'equity scorre verso le pagine indicatore e gli articoli.
     """
     query = (request.args.get("q") or "").strip()
     try:
@@ -616,12 +616,12 @@ def _pipeline_published_url(indicator_id):
     """L'URL assoluto e canonico della pagina pubblicata di un indicatore, o None.
 
     Riusa il path precomputato dal catalogo (`build_indicator_view`), preferito
-    al ricalcolo dello slug come vuole `.claude/rules/app.md`. La view Flask puo'
-    importare il catalogo, cosi' `pipeline_monitor` resta stdlib-puro. Se l'id non
+    al ricalcolo dello slug come vuole `.claude/rules/app.md`. La view Flask può
+    importare il catalogo, così `pipeline_monitor` resta stdlib-puro. Se l'id non
     si risolve, niente link invece di un errore: il cruscotto non deve cadere per
     una riga.
 
-    Assoluto (SITE_URL + path), non relativo: `/_pipeline/console` e' servita
+    Assoluto (SITE_URL + path), non relativo: `/_pipeline/console` è servita
     su `monitor.divarioitalia.it`, un host diverso dal dominio pubblico, quindi
     un path relativo risolverebbe il link sul host sbagliato invece di aprire
     la pagina canonica."""
@@ -641,13 +641,13 @@ def _pipeline_universe():
     indicatore di ogni catalogo di famiglia (ter, bes, multiscopo, eur/dem),
     indipendentemente da cosa ne sa la pipeline editoriale.
 
-    E' l'universo vero che risponde a "quanti indicatori abbiamo in totale":
-    il dossier di `practice_timeline` (`board["rows"]`) copre solo cio' che ha
-    gia' toccato una pratica di ammissione, quindi da solo sottostima. Ogni
-    famiglia legge la propria indicizzabilita' dalla stessa fonte gia' usata
-    dalla sitemap (`indicator_view._is_indexable`), cosi' il cruscotto non puo'
-    mai divergere da cio' che Google vede davvero. `pipeline_monitor` resta
-    stdlib-puro: questa funzione vive qui, non li', perche' legge i cataloghi
+    È l'universo vero che risponde a "quanti indicatori abbiamo in totale":
+    il dossier di `practice_timeline` (`board["rows"]`) copre solo ciò che ha
+    già toccato una pratica di ammissione, quindi da solo sottostima. Ogni
+    famiglia legge la propria indicizzabilità dalla stessa fonte già usata
+    dalla sitemap (`indicator_view._is_indexable`), così il cruscotto non può
+    mai divergere da ciò che Google vede davvero. `pipeline_monitor` resta
+    stdlib-puro: questa funzione vive qui, non lì, perché legge i cataloghi
     (`app.data`, `app.bes_data`, `app.multiscopo_data`, `app.external_atlas`)."""
     universe = {}
 
@@ -686,13 +686,13 @@ def pipeline_dashboard():
     """Cruscotto interno della catena editoriale, protetto e noindex.
 
     Vista di lettura viva sul dossier per-indicatore (`scripts/pipeline_monitor`):
-    dov'e' fermo e perche' in testa, una riga per indicatore, le sessioni in volo
+    dov'è fermo e perché in testa, una riga per indicatore, le sessioni in volo
     dai battiti, la storia recente dal diario. Ricalcolata a ogni caricamento dai
-    file committati, non da uno stato a parte: il monitoraggio e' una lettura
+    file committati, non da uno stato a parte: il monitoraggio è una lettura
     dello stesso modello che la catena produce, non un secondo modello.
 
-    Protetta: se `PIPELINE_TOKEN` e' impostato, serve solo con `?token=` giusto,
-    altrimenti 404, non 403, perche' una pagina interna non deve nemmeno
+    Protetta: se `PIPELINE_TOKEN` è impostato, serve solo con `?token=` giusto,
+    altrimenti 404, non 403, perché una pagina interna non deve nemmeno
     confermare di esistere. Vuoto (locale) = aperta. Il noindex lo mette
     `add_security_headers` sul prefisso `/_pipeline`.
     """
@@ -702,7 +702,7 @@ def pipeline_dashboard():
     from scripts import pipeline_monitor
     from app import pipeline_state
     # Il vivo arriva dal SQLite (scritto dai POST degli agenti, replicato su GCS),
-    # non piu' da file locali che sul server sarebbero sempre vuoti. La storia
+    # non più da file locali che sul server sarebbero sempre vuoti. La storia
     # (dossier + diario) resta committata, come prima.
     try:
         activity = pipeline_state.live()
@@ -717,7 +717,7 @@ def pipeline_dashboard():
         tokens = {}
     # I token si attribuiscono solo all'indicatore bersaglio della run (dal
     # record), non a ogni indicatore che la run cita come confronto: la logica
-    # sta nel monitor stdlib-puro, cosi' e' testabile senza Flask.
+    # sta nel monitor stdlib-puro, così è testabile senza Flask.
     pipeline_monitor.attribute_tokens(board.get("rows", []), tokens)
     # Le righe pubblicate portano il link alla pagina: poche righe (published=True),
     # quindi il costo di build_indicator_view resta trascurabile.
@@ -732,8 +732,8 @@ def pipeline_dashboard():
 @app.route("/_pipeline/console")
 def pipeline_console():
     """La console di monitoraggio in tempo reale (Supabase Realtime). Sostituisce
-    il ?token= e il full-reload di /_pipeline: la guardia e' il login Google
-    ristretto via RLS su Postgres, non un segreto in URL. La pagina e' servibile
+    il ?token= e il full-reload di /_pipeline: la guardia è il login Google
+    ristretto via RLS su Postgres, non un segreto in URL. La pagina è servibile
     a chiunque (noindex per prefisso /_pipeline), ma senza la mail admin nel JWT
     la RLS non restituisce alcuna riga."""
     return render_template("pipeline_console.html", site_name=SITE_NAME,
@@ -743,13 +743,13 @@ def pipeline_console():
 # --- la dashboard storica nella console: catalogo e cronologia ----------------
 # Il vivo (battiti, PR, token per run) resta Realtime da Supabase, letto diretto
 # dal browser. Ma catalogo e cronologia vivono nei file git (articoli, diari), che
-# la console (che parla solo a Supabase) non puo' leggere: questi due endpoint li
+# la console (che parla solo a Supabase) non può leggere: questi due endpoint li
 # servono, dietro lo stesso confine mail-admin, e la console li fetcha col Bearer
 # del login Google.
 #
 # La cache sta su un helper memoizzato, non su `@cache.cached` della view: quel
 # decoratore corto-circuita il corpo della view su un hit, saltando il controllo
-# auth, e servirebbe il dato all'anonimo. Cosi' invece l'auth gira sempre nella
+# auth, e servirebbe il dato all'anonimo. Così invece l'auth gira sempre nella
 # view, e solo il calcolo pesante (365 articoli, 118 diari) si riusa per 30s.
 
 @cache.memoize(timeout=30)
@@ -759,7 +759,7 @@ def _pipeline_board_payload():
     copertura del catalogo (`catalog_summary`: quanti indicatori esistono nei
     cataloghi di famiglia in tutto, quanti indicizzabili, quanti scritti,
     verificati, pubblicati). Memoizzato (chiave sul nome, nessun argomento)
-    perche' rilegge tutti gli articoli e tutti i cataloghi di famiglia."""
+    perché rilegge tutti gli articoli e tutti i cataloghi di famiglia."""
     from scripts import pipeline_monitor
     from app import pipeline_state
     try:
@@ -791,7 +791,7 @@ def _pipeline_board_payload():
 @cache.memoize(timeout=30)
 def _pipeline_runs_payload():
     """La cronologia per la dashboard: `runs_timeline` joinato coi token da
-    Supabase sul `run_id`. Memoizzato perche' rilegge tutti i diari."""
+    Supabase sul `run_id`. Memoizzato perché rilegge tutti i diari."""
     from scripts import pipeline_monitor
     from app import pipeline_state
     try:
@@ -827,9 +827,9 @@ def pipeline_api_runs():
 @app.route("/_keepalive")
 def keepalive():
     """Ping schedulato (Cloud Scheduler) che tiene sveglio il progetto Supabase:
-    dopo 7 giorni di inattivita' il free va in pausa, e con la Routine launcher
+    dopo 7 giorni di inattività il free va in pausa, e con la Routine launcher
     in pausa nulla lo terrebbe caldo. Un SELECT 1 basta. Tollerante: risponde
-    sempre 200, con lo stato del db, cosi' lo scheduler non allarma per un
+    sempre 200, con lo stato del db, così lo scheduler non allarma per un
     guasto transitorio."""
     token = config.KEEPALIVE_TOKEN
     if token and not hmac.compare_digest(request.headers.get("X-Keepalive-Key", ""), token):
@@ -851,7 +851,7 @@ def pipeline_beat_ingest():
 
     Autenticato con `PIPELINE_INGEST_TOKEN` (header `X-Pipeline-Key`), come
     l'endpoint admin della leaderboard: segreto sbagliato o assente -> 404, non
-    403, perche' un endpoint interno non conferma nemmeno di esistere. Il corpo e'
+    403, perché un endpoint interno non conferma nemmeno di esistere. Il corpo è
     JSON con un campo `action`:
 
       {"action":"beat","run_id":...,"role":...,"indicator":...,"stage":...}
@@ -861,12 +861,12 @@ def pipeline_beat_ingest():
       {"action":"outcome","indicator":...,"run_id":...,"at":...,"base_commit":...,
        "state":...,"completed_stages":[...],"flags":{...},"published":true,...}
 
-    L'`outcome` e' lo snapshot di stato di un indicatore al momento del merge: lo
-    scrive il passo di merge (`scripts/pipeline_merge.py`) perche' il cruscotto sia
+    L'`outcome` è lo snapshot di stato di un indicatore al momento del merge: lo
+    scrive il passo di merge (`scripts/pipeline_merge.py`) perché il cruscotto sia
     aggiornato senza aspettare il redeploy dell'immagine.
 
     Best effort per chi chiama: un agente che non riesce a battere non deve
-    fallire la propria run, quindi qui si e' solo tolleranti e si risponde presto.
+    fallire la propria run, quindi qui si è solo tolleranti e si risponde presto.
     """
     token = config.PIPELINE_INGEST_TOKEN
     provided = request.headers.get("X-Pipeline-Key", "")
@@ -1063,7 +1063,7 @@ def indicator_page(first, second=None):
 def _query_map_for_article(query_map, article):
     """Il query_map del livello, adattato agli anchor che l'articolo rende davvero.
 
-    `query_map` (da `indicator_view._query_map`) e' per-livello e non conosce
+    `query_map` (da `indicator_view._query_map`) è per-livello e non conosce
     l'articolo, quindi punta sempre a `sezione-definizione` e `sezione-dinamica`.
     Con le sezioni variabili quegli H2 possono non esistere: la definizione va nel
     blocco "Come leggere" (anchor `come-leggere`), e una domanda su una sezione
@@ -1112,8 +1112,8 @@ def _render_indicator(family, raw_id):
 
     article = indicator_texts.build_article(meta["id"], level["key"])
     # Le domande-navigazione puntano ad anchor dell'articolo, che con le sezioni
-    # variabili non sono piu' fisse: se la definizione e' assorbita dal blocco
-    # "Come leggere", il suo intent punta la', e una domanda su una sezione che
+    # variabili non sono più fisse: se la definizione è assorbita dal blocco
+    # "Come leggere", il suo intent punta là, e una domanda su una sezione che
     # l'articolo non rende come H2 si toglie invece di puntare nel vuoto.
     query_map = _query_map_for_article(level["query_map"], article)
     lead = article["lead"] or indicator_texts.composed_lead(meta, level)
@@ -1153,7 +1153,7 @@ def _render_indicator(family, raw_id):
     # Titolo H1 e SERP: autorati se il file dell'articolo li porta, altrimenti il
     # derivato di oggi (H1 = nome amministrativo, title = boilerplate "per regione").
     # Un titolo autorato passa comunque dal budget SEO: `authored_seo_title` clampa
-    # a `_TITLE_MAX` come il derivato, non e' una scusa per sforare.
+    # a `_TITLE_MAX` come il derivato, non è una scusa per sforare.
     page_h1 = article["h1"] or meta["name"]
     if article["seo_title"] or article["h1"]:
         seo_title_value = indicator_notes.authored_seo_title(
@@ -1224,7 +1224,7 @@ def region_page(region_key):
 
 @app.route("/api/regions/overview")
 def regions_overview_api():
-    """Compact per-region summary for the SPA 'per regione' selection map.
+    """Compact per-region summary for the SPA 'per regioné selection map.
 
     Same source as the /regioni page; no overall regional score is exposed here.
     """
@@ -1233,7 +1233,7 @@ def regions_overview_api():
 
 @app.route("/api/region/<region_key>")
 def region_api(region_key):
-    """JSON del profilo regione, per la vista 'per regione' della SPA.
+    """JSON del profilo regione, per la vista 'per regioné della SPA.
 
     Riusa la stessa funzione che alimenta la pagina server /regione/<key>, così
     atlante interattivo e pagina SEO restano coerenti su un'unica fonte dati.
@@ -1548,7 +1548,7 @@ def quality_life_indicator_legacy(indicator_id, slug):
 
 @app.route("/qualita-della-vita/metodologia")
 def quality_life_methodology():
-    # La metodologia della qualita' della vita e' stata unificata nell'unica
+    # La metodologia della qualità della vita è stata unificata nell'unica
     # pagina "Metodologia e fonti" (/metodologia#qualita-della-vita). Manteniamo
     # la vecchia URL con un 301 per non perdere link e indicizzazione.
     return redirect("/metodologia#qualita-della-vita", code=301)
@@ -1701,8 +1701,8 @@ def game_order_answer_api():
 
 def _record_quiz(req, mode, correct, session_summary):
     """Se la richiesta porta un JWT valido, aggiorna le statistiche account della
-    modalita' e valuta gli achievement, restituendo gli sblocchi appena ottenuti
-    (per il toast). Anonimo o DB giu' -> lista vuota, il gioco non cambia."""
+    modalità e valuta gli achievement, restituendo gli sblocchi appena ottenuti
+    (per il toast). Anonimo o DB giù -> lista vuota, il gioco non cambia."""
     user = auth.current_user(req.headers)
     if not user:
         return []
@@ -1803,7 +1803,7 @@ def comparisons_delete_api(comparison_id):
 
 @app.route("/api/account/export")
 def account_export_api():
-    """Portabilita': tutti i dati dell'utente in JSON (download)."""
+    """Portabilità: tutti i dati dell'utente in JSON (download)."""
     user = auth.current_user(request.headers)
     if not user:
         return jsonify({"error": "auth_required"}), 401
@@ -1833,13 +1833,13 @@ def account_page():
 
 @app.route("/api/auth/me")
 def auth_me_api():
-    """Chi e' l'utente di questa richiesta, secondo il Bearer JWT. Anonimo
-    (`{"user": null}`) se il token e' assente, invalido, o l'auth non e'
+    """Chi è l'utente di questa richiesta, secondo il Bearer JWT. Anonimo
+    (`{"user": null}`) se il token è assente, invalido, o l'auth non è
     configurata: il frontend lo usa per mostrare stato login/logout.
 
-    Effetto collaterale, quando c'e' un utente valido: upsert del profilo e
+    Effetto collaterale, quando c'è un utente valido: upsert del profilo e
     aggiornamento di last_seen_at. Best-effort: se il DB non risponde, si torna
-    comunque l'identita' dal token (la UI non deve cadere per il profilo)."""
+    comunque l'identità dal token (la UI non deve cadere per il profilo)."""
     user = auth.current_user(request.headers)
     profile = None
     if user:
@@ -1904,7 +1904,7 @@ def leaderboard_get_api():
     except ValueError:
         limit = leaderboard.DEFAULT_LIMIT
     # Tollerante: la classifica ora vive su un backend di rete (Supabase), che
-    # puo' andare in pausa. Un'outage e' un widget vuoto, mai un 500 sulla pagina
+    # può andare in pausa. Un'outage è un widget vuoto, mai un 500 sulla pagina
     # del gioco. Stesso pattern del vivo di /_pipeline (pipeline_state.live()).
     try:
         entries = leaderboard.top(mode, period, limit)
@@ -1933,7 +1933,7 @@ def leaderboard_post_api():
         return jsonify({"error": error}), 400
 
     detail = {"count": state["c"]} if mode == "order" and state.get("c") else {}
-    # Se c'e' un JWT Supabase valido, la riga si lega all'account; senza, resta
+    # Se c'è un JWT Supabase valido, la riga si lega all'account; senza, resta
     # anonima (il gioco non richiede registrazione). L'anti-cheat non cambia: il
     # punteggio viene sempre dal token quiz firmato, non dal client.
     user = auth.current_user(request.headers)
@@ -2028,7 +2028,7 @@ def _indexable_indicator_catalog():
     centinaia di indicatori (secondi di CPU), moltiplicando il lavoro fino al
     timeout. Il lock fa costruire una volta sola: il primo popola la cache di
     `_build_indexable_indicator_catalog`, gli altri aspettano e leggono il
-    risultato gia' pronto (un lookup, quindi il lock si tiene un istante)."""
+    risultato già pronto (un lookup, quindi il lock si tiene un istante)."""
     with _indexable_catalog_lock:
         return _build_indexable_indicator_catalog()
 
@@ -2523,7 +2523,7 @@ def _home_capabilities(total_indicators):
 
 
 def _home_story_cards():
-    """Real 'chi guida, chi resta indietro' highlights for the homepage,
+    """Real 'chi guida, chi resta indietrò highlights for the homepage,
     limited to indicators with a declared higher_better/lower_better
     direction so the framing is something the data actually supports."""
     cards = []
@@ -2615,7 +2615,7 @@ def _theme_leaders(theme, matrix, meta):
 
 
 def _home_themes_preview():
-    """'Temi e aree' cards: for each macro-area, its indicator/theme counts plus
+    """'Temi e areè cards: for each macro-area, its indicator/theme counts plus
     the region in front and the region trailing."""
     matrix = profiles._percentile_matrix()
     meta = profiles._indicator_meta()
@@ -2636,7 +2636,7 @@ def _home_themes_preview():
 
 
 def _themes_index_areas():
-    """Full '/temi' page: every macro-area with its themes, and for each theme
+    """Full '/temì page: every macro-area with its themes, and for each theme
     the indicator count, a preview of its indicators, an illustrative
     average-trend sparkline and the region in front / trailing (per-theme
     standings), matching the design's themes index."""
@@ -2744,7 +2744,7 @@ def _home_compare_preview():
             rows.append({
                 "theme": meta["theme"],
                 "name": meta["name"],
-                # /confronto rende lo stesso confronto senza JavaScript, e la'
+                # /confronto rende lo stesso confronto senza JavaScript, e là
                 # ogni riga deve poter aprire la scheda dell'indicatore: il
                 # percorso canonico viene dal catalogo, non ricostruito a mano.
                 "path": meta["path"],

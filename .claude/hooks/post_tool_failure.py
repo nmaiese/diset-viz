@@ -2,8 +2,8 @@
 """Hook PostToolUseFailure: ogni fallimento di uno strumento lascia una riga.
 
 Una run in cloud che inciampa su un comando non lascia niente da leggere: il
-diario registra come e' finita la run, non che cosa e' andato storto a meta'.
-Questa riga locale (mai committata, vedi .gitignore) e' il livello sotto il
+diario registra come è finita la run, non che cosa è andato storto a metà.
+Questa riga locale (mai committata, vedi .gitignore) è il livello sotto il
 diario: serve a diagnosticare una run bloccata senza doversela immaginare.
 
 Best effort fino in fondo: un hook di diagnostica che fa fallire qualcosa

@@ -44,7 +44,7 @@ Istat dell'archivio, e vanno riprese insieme a quello:
 ```bash
 python3 scripts/update_data.py                   # la serie
 python3 scripts/fetch_definitions.py             # le definizioni della stessa release
-python3 scripts/definition_check.py --summary    # chi non le rispecchia piu'
+python3 scripts/definition_check.py --summary    # chi non le rispecchia più
 ```
 
 `fetch_definitions` stampa quante definizioni sono **ridefinite**, ed è la riga

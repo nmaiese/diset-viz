@@ -1,19 +1,19 @@
 """Il modello a pratica editoriale, provato end-to-end contro l'app servita.
 
 Questo test prende le primitive che il modello unifica (`practice_timeline`,
-`practice_store`, `practice_metrics`, la priorita' del lanciatore
+`practice_store`, `practice_metrics`, la priorità del lanciatore
 `pipeline_launch`) e le fa girare **insieme**, sul percorso reale di un
 indicatore, contro un sito **davvero servito**: un gunicorn su `run:app`, non il
 test client. Il progetto ha ratificato **merge = pubblicazione**: un articolo
-fuso su master e' `pubblicata`, non c'e' piu' uno stato `fusa` intermedio ne' una
+fuso su master è `pubblicata`, non c'è più uno stato `fusa` intermedio né una
 verifica-sito.
 
 Copre, senza ricostruzioni a mano:
-  1. osservabilita' (Fase B): la storia intera di un indicatore dai soli artefatti.
+  1. osservabilità (Fase B): la storia intera di un indicatore dai soli artefatti.
   2. riconciliatore (Fase C): scritto vs ricostruito, zero divergenze, poi una sola
      divergenza dopo una perturbazione dichiarata.
   3. cicli di manutenzione (Fase E): due cicli distinti ma collegati.
-  4. priorita' del dispatcher (Fase F): una smentita reale scavalca l'ordine di catena.
+  4. priorità del dispatcher (Fase F): una smentita reale scavalca l'ordine di catena.
   5. associazione run->indicatore: un id BES col trattino non si tronca.
   6. metriche (Fase F): la fotografia prima/dopo, con i suoi None dichiarati.
 
@@ -48,7 +48,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 # qualcosa da confermare.
 PINNED_TER = "651"
 
-# Popolati da setUpModule: la base del sito servito, o None se non si e' potuto
+# Popolati da setUpModule: la base del sito servito, o None se non si è potuto
 # avviare gunicorn (in tal caso i soli test che toccano la rete si saltano).
 _SITE_BASE = None
 _PROC = None
@@ -65,7 +65,7 @@ def _free_port() -> int:
 def _wait_until_up(base: str, tries: int = 60, delay: float = 0.25) -> bool:
     for _ in range(tries):
         if _PROC is not None and _PROC.poll() is not None:
-            return False  # gunicorn e' morto in avvio, inutile insistere
+            return False  # gunicorn è morto in avvio, inutile insistere
         try:
             with urllib.request.urlopen(base + "/", timeout=2) as resp:
                 if resp.status == 200:
@@ -121,8 +121,8 @@ def tearDownModule():
 
 def _read_inputs():
     """Gli stessi lettori reali di `practice_timeline.load_real`, ma restituiti
-    grezzi, cosi' un test puo' perturbarne uno (per il tripwire) prima di
-    ricostruire. Tenere qui la stessa lista di load_real e' voluto: e' il modo di
+    grezzi, così un test può perturbarne uno (per il tripwire) prima di
+    ricostruire. Tenere qui la stessa lista di load_real è voluto: è il modo di
     provare la ricostruzione su input che nessun file committato porta ancora."""
     return {
         "candidates": discovery.read_candidates(),
@@ -142,8 +142,8 @@ def _reconstruct(inputs):
         inputs["runs"])
 
 
-# Un id esterno inventato, cosi' la fixture non dipende da nessun artefatto
-# committato: la catena e' fatta apposta per portare un indicatore oltre lo
+# Un id esterno inventato, così la fixture non dipende da nessun artefatto
+# committato: la catena è fatta apposta per portare un indicatore oltre lo
 # stato "non ancora verificato", quindi pinnare un indicatore reale a quello
 # stato lo rompe appena il primo verificatore lo chiude (cosa che ha bloccato
 # la PR #86). Lo stato lo ricostruiamo dagli input, come fa il resto del modulo.
@@ -153,11 +153,11 @@ _SYNTH_EUR = "eur:synthreg"
 def _synthetic_expired_smentita():
     """Ricostruisce un EUR con una smentita chiusa correggendo la prosa.
 
-    Ciclo editoriale completo (promosso, curato, scritto, firmato) piu' una
-    verifica smentita la cui impronta non combacia piu' con la prosa attuale:
-    e' scaduta, quindi il verificatore non risulta completo, la smentita non e'
-    piu' aperta, e l'articolo torna in-lavorazione invece di restare in pagina
-    con l'errore. E' lo stato transitorio che i vecchi test pinnavano su un
+    Ciclo editoriale completo (promosso, curato, scritto, firmato) più una
+    verifica smentita la cui impronta non combacia più con la prosa attuale:
+    è scaduta, quindi il verificatore non risulta completo, la smentita non è
+    più aperta, e l'articolo torna in-lavorazione invece di restare in pagina
+    con l'errore. È lo stato transitorio che i vecchi test pinnavano su un
     indicatore reale, qui riprodotto deterministicamente dai soli input.
     """
     candidates = [{
@@ -180,8 +180,8 @@ def _synthetic_expired_smentita():
         "code": "eur-synthreg", "level": "regione", "at": "2026-04-01",
         "esito": "smentito", "smentite": "1", "controllate": "20",
         "confermate": "19", "non_verificabili": "0",
-        # impronta di un testo che non e' piu' quello di adesso: la verifica e'
-        # scaduta, cosi' la smentita si spegne e l'articolo torna in coda.
+        # impronta di un testo che non è più quello di adesso: la verifica è
+        # scaduta, così la smentita si spegne e l'articolo torna in coda.
         "prosa": "0000000000000000",
     }]
     dossier = practice_timeline.reconstruct(
@@ -190,7 +190,7 @@ def _synthetic_expired_smentita():
     return dossier[_SYNTH_EUR]
 
 
-# --- 1. Osservabilita' (Fase B) ---------------------------------------------
+# --- 1. Osservabilità (Fase B) ---------------------------------------------
 
 class Observability(unittest.TestCase):
     """La storia intera di un indicatore, dai soli artefatti committati."""
@@ -200,18 +200,18 @@ class Observability(unittest.TestCase):
         cls.dossier = practice_timeline.load_real()
 
     def test_history_then_refutation_closed(self):
-        # Ricostruito da input sintetici: la catena e' fatta per superare lo stato
+        # Ricostruito da input sintetici: la catena è fatta per superare lo stato
         # "non ancora verificato", quindi questo non si pinna su un indicatore
         # reale (lo romperebbe il primo verificatore che lo chiude, come per la #86).
         d = _synthetic_expired_smentita()
         # promosso -> curato -> scritto -> firmato -> verificato-smentito: la
-        # storia resta nella timeline anche dopo che la smentita e' stata chiusa.
+        # storia resta nella timeline anche dopo che la smentita è stata chiusa.
         kinds = [ev.get("kind") for ev in d["timeline"]]
         for expected in ("promossa", "curata", "firmata", "verificata"):
             self.assertIn(expected, kinds, kinds)
         verificate = [ev for ev in d["timeline"] if ev.get("kind") == "verificata"]
         self.assertTrue(any(ev.get("esito") == "smentito" for ev in verificate))
-        # La glossa smentita e' stata corretta e l'impronta della prosa e'
+        # La glossa smentita è stata corretta e l'impronta della prosa è
         # cambiata: la smentita si spegne, la verifica scade, e l'articolo torna
         # in coda al verificatore invece di restare in pagina con l'errore.
         self.assertFalse(d["flags"].get("open_smentita"))
@@ -222,7 +222,7 @@ class Observability(unittest.TestCase):
         self.assertNotIn("verificatore", d["completed_stages"])
 
     def test_table_row_per_indicator(self):
-        # una riga per indicatore, con stato/stadi/priorita'/entrato
+        # una riga per indicatore, con stato/stadi/priorità/entrato
         self.assertIn(PINNED_TER, self.dossier)
         for d in self.dossier.values():
             self.assertIn("state", d)
@@ -239,10 +239,10 @@ class Reconciler(unittest.TestCase):
 
     def test_write_then_check_and_a_single_declared_divergence(self):
         dossier = practice_timeline.load_real()
-        # Il record da perturbare e' sintetico, non un indicatore reale: pinnarne
+        # Il record da perturbare è sintetico, non un indicatore reale: pinnarne
         # uno allo stato "in-lavorazione" lo rompe appena il primo verificatore lo
         # chiude (cosa che ha bloccato la #86). Il resto del dossier reale resta
-        # nel test, perche' la riconciliazione a zero divergenze e' la sua garanzia.
+        # nel test, perché la riconciliazione a zero divergenze è la sua garanzia.
         synth = _synthetic_expired_smentita()
         dossier[_SYNTH_EUR] = synth
         root = tempfile.mkdtemp()
@@ -289,8 +289,8 @@ class MaintenanceCycles(unittest.TestCase):
         cls.dossier = practice_timeline.load_real()
 
     def test_a_smentita_opens_a_second_linked_cycle(self):
-        # Sintetico, per la stessa ragione dell'osservabilita': una verifica
-        # smentita su una pagina gia' a valle apre un secondo ciclo, legato al
+        # Sintetico, per la stessa ragione dell'osservabilità: una verifica
+        # smentita su una pagina già a valle apre un secondo ciclo, legato al
         # primo, senza dipendere dallo stato committato di un indicatore reale.
         d = _synthetic_expired_smentita()
         cycles = practice_timeline.cycles_for(d)
@@ -302,29 +302,29 @@ class MaintenanceCycles(unittest.TestCase):
         self.assertEqual(first["outcome"], "sostituita")
         self.assertEqual(second["practice_id"], f"{_SYNTH_EUR}#smentita-2")
         self.assertTrue(second["active"])
-        # la smentita di questo ciclo e' stata chiusa correggendo la glossa: il
-        # ciclo resta attivo ma torna in-lavorazione (verifica scaduta), non piu'
+        # la smentita di questo ciclo è stata chiusa correggendo la glossa: il
+        # ciclo resta attivo ma torna in-lavorazione (verifica scaduta), non più
         # invalidata con l'errore in pagina.
         self.assertEqual(second["state"], "in-lavorazione")
 
     def test_single_cycle_indicator_stays_one(self):
         d = self.dossier.get(PINNED_TER)
         if d is None:
-            self.skipTest(f"{PINNED_TER} non e' piu' nel repo")
+            self.skipTest(f"{PINNED_TER} non è più nel repo")
         cycles = practice_timeline.cycles_for(d)
         self.assertEqual(len(cycles), 1, [c["practice_id"] for c in cycles])
         self.assertTrue(cycles[0]["active"])
 
 
-# --- 5. Priorita' del lanciatore per-indicatore -----------------------------
+# --- 5. Priorità del lanciatore per-indicatore -----------------------------
 
 class LauncherPriority(unittest.TestCase):
-    """Nel lanciatore la priorita' e' per-indicatore, non per-stadio: una smentita
-    pubblica (peso 100+) apre il piano davanti a tutto il resto, e il piano e'
-    ordinato per priorita' decrescente. Non c'e' piu' 'uno stadio scavalca
-    l'altro', ci sono unita' di lavoro lanciabili in parallelo, ordinate."""
+    """Nel lanciatore la priorità è per-indicatore, non per-stadio: una smentita
+    pubblica (peso 100+) apre il piano davanti a tutto il resto, e il piano è
+    ordinato per priorità decrescente. Non c'è più 'uno stadio scavalca
+    l'altrò, ci sono unità di lavoro lanciabili in parallelo, ordinate."""
 
-    # coda a monte con lavoro d'ammissione, piu' un dossier con una smentita urgente.
+    # coda a monte con lavoro d'ammissione, più un dossier con una smentita urgente.
     QUEUES = {"scout": 0, "hunter": 3, "promoter": 0, "curator": 0,
               "writer": 0, "reviewer": 0, "verificatore": 0}
 
@@ -337,8 +337,8 @@ class LauncherPriority(unittest.TestCase):
         }}
 
     def test_a_public_smentita_leads_the_plan(self):
-        # La smentita (produttore, il reviewer e' fuso li') apre il piano; la coda
-        # d'ammissione a monte (hunter=3) la segue, perche' 105 > 0.
+        # La smentita (produttore, il reviewer è fuso lì) apre il piano; la coda
+        # d'ammissione a monte (hunter=3) la segue, perché 105 > 0.
         plan = pipeline_launch.plan_launches(
             self.smentita_dossier(), self.QUEUES, mint=lambda role: f"{role}-x")
         self.assertEqual(plan[0]["indicator"], "eur-x")
@@ -346,8 +346,8 @@ class LauncherPriority(unittest.TestCase):
         self.assertEqual(plan[-1]["role"], "admissions")
 
     def test_the_plan_is_sorted_by_priority_descending(self):
-        # Coi dati reali il piano resta ordinato: e' l'invariante che sostituisce
-        # 'sopra soglia scavalca', e si deriva dallo stato reale invece di pinnarlo.
+        # Coi dati reali il piano resta ordinato: è l'invariante che sostituisce
+        # 'sopra soglia scavalcà, e si deriva dallo stato reale invece di pinnarlo.
         plan = pipeline_launch.load_plan()
         priorities = [item["priority"] for item in plan]
         self.assertEqual(priorities, sorted(priorities, reverse=True))
@@ -376,8 +376,8 @@ class RunAssociation(unittest.TestCase):
         dossier = practice_timeline.load_real()
         full = dossier.get("bes:03LAV006-N25")
         if full is None:
-            self.skipTest("bes:03LAV006-N25 non e' piu' nel repo")
-        self.assertTrue(full["runs"], "il run col trattino non si e' associato")
+            self.skipTest("bes:03LAV006-N25 non è più nel repo")
+        self.assertTrue(full["runs"], "il run col trattino non si è associato")
         self.assertNotIn("bes:03LAV006", dossier)  # nessun fantasma troncato
 
 
@@ -388,7 +388,7 @@ class Metrics(unittest.TestCase):
     quota di run associati; le metriche longitudinali sono None, non zero finto."""
 
     def test_metrics_expose_the_snapshot_and_declare_their_gaps(self):
-        # senza --today usa oggi, non zero giorni: le pratiche aperte hanno eta'
+        # senza --today usa oggi, non zero giorni: le pratiche aperte hanno età
         metrics = practice_metrics.load_and_compute()
 
         oss = metrics["osservabilita"]
@@ -404,7 +404,7 @@ class Metrics(unittest.TestCase):
         self.assertIsNone(metrics["qualita"]["controlli_saltati"])
 
     def test_today_default_is_not_zero_days(self):
-        # se ci sono pratiche aperte, la loro eta' media con la data di oggi e' > 0
+        # se ci sono pratiche aperte, la loro età media con la data di oggi è > 0
         metrics = practice_metrics.load_and_compute()
         if metrics["velocita"]["pratiche_aperte"] > 0:
             self.assertGreater(metrics["velocita"]["eta_media_aperte_giorni"], 0)

@@ -19,17 +19,17 @@ assoluti e la calibrazione richiesti dallo schema.
 
 **Non chiamare l'advisor.** Un hook lo nega, ma il conto viene prima dell'hook:
 nove chiamate in una run misurata sono costate **$5,58, il 26% del totale**, a
-contesto pieno e senza cache. Qui non c'e' niente da decidere: i comandi
+contesto pieno e senza cache. Qui non c'è niente da decidere: i comandi
 arrivano scritti.
 
-**L'interprete e' `bin/py`, sempre.** Non `python3`, che qui e' una funzione di
+**L'interprete è `bin/py`, sempre.** Non `python3`, che qui è una funzione di
 shell e cade su un interprete senza le dipendenze. Non `.venv/bin/python`, che
-in molti worktree non esiste, e in un altro worktree e' un altro codice.
+in molti worktree non esiste, e in un altro worktree è un altro codice.
 
 Esegui i comandi come sono scritti. Non cercarli, non cambiarli, non leggere i
-pacchetti e non riassumerli: il loro contenuto lo legge chi scrive, e cio' che
-tu restituisci e' output pagato a peso. Se un codice indicatore non risolve,
+pacchetti e non riassumerli: il loro contenuto lo legge chi scrive, e ciò che
+tu restituisci è output pagato a peso. Se un codice indicatore non risolve,
 riportalo come mancante invece di inventarlo.
 
 Non hai `Read` di proposito: questo ruolo esiste per **eseguire**, e un ruolo
-che puo' leggere il repo finisce per leggerlo.
+che può leggere il repo finisce per leggerlo.

@@ -82,16 +82,16 @@ DOUBLE_NUMBER = re.compile(
 # Structures that read as a template even when each instance is defensible.
 SLOGAN = re.compile(
     r"\b(non solo [^.,]{1,40},? ma anche|"
-    r"non (?:è|e') [^.,]{1,30},? (?:è|e') |"
+    r"non (?:è|è) [^.,]{1,30},? (?:è|è) |"
     r"leggere [^.]{1,30} significa leggere)",
     re.I,
 )
 
 # "quasi nove anni" in una sezione e "8,9" in un'altra: lo stesso fatto due
-# volte, che e' la regola ONS che STYLE.md gia' porta ("o l'immagine o la
+# volte, che è la regola ONS che STYLE.md già porta ("o l'immagine o la
 # cifra"), applicata a distanza invece che dentro la parentesi. Due giudici
 # indipendenti l'hanno indicata come il difetto residuo dei pezzi buoni, con tre
-# istanze verificate. Vive fuori da CHECKS perche' non e' una ricerca di
+# istanze verificate. Vive fuori da CHECKS perché non è una ricerca di
 # pattern nel testo: confronta due numeri.
 WORD_NUMBERS = {
     "mezzo": 0.5, "uno": 1, "una": 1, "due": 2, "tre": 3, "quattro": 4, "cinque": 5,
@@ -120,7 +120,7 @@ NEAR = 0.3
 EPSILON = 1e-9
 
 CHECKS = (
-    ("lessico", SPY_WORDS, "lessico spia, c'e' quasi sempre una parola piu comune"),
+    ("lessico", SPY_WORDS, "lessico spia, c'è quasi sempre una parola piu comune"),
     ("intervallo", FALSE_RANGE, "falso intervallo: gli estremi non stanno su un continuo"),
     ("riassunto", RECAP, "riassunto compulsivo in un pezzo da 600 parole"),
     ("doppio", DOUBLE_NUMBER, "il numero scritto due volte, immagine piu cifra"),
@@ -131,7 +131,7 @@ CHECKS = (
 # even at zero, and a check missing from that list reads as a check that passed.
 EXTRA_SIGNALS = {
     "domanda": "domanda retorica in chiusura di paragrafo",
-    "ripetuto": "la stessa quantita' come immagine e come cifra",
+    "ripetuto": "la stessa quantità come immagine e come cifra",
 }
 ALL_SIGNALS = tuple(name for name, _, _ in CHECKS) + tuple(EXTRA_SIGNALS)
 
@@ -139,7 +139,7 @@ LINK = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
 
 
 def load_texts(root=None):
-    """Tutti gli articoli. `root` e' una directory di store, non piu' un file."""
+    """Tutti gli articoli. `root` è una directory di store, non più un file."""
     return indicator_store.load_all(root)
 
 
@@ -167,7 +167,7 @@ def prose_fields(entry):
 
     I titoli autorati (`h1`, `seo_title`) sono prosa scritta a mano e visibile,
     quindi passano di qui come tutto il resto: un em-dash o un punto e virgola in
-    un titolo e' vietato quanto in un corpo, e senza questa riga sarebbe l'unico
+    un titolo è vietato quanto in un corpo, e senza questa riga sarebbe l'unico
     testo della pagina che nessuna guardia deterministica guarda.
     """
     out = []
@@ -304,7 +304,7 @@ def _print_summary(summary):
     print(f"ARTICOLI ESAMINATI  {summary['articles']}")
     print(f"  senza nessun tell meccanico   {summary['clean']}")
     print()
-    print(f"  {'segnale':<12} {'articoli':>9} {'occorrenze':>11}   che cos'e'")
+    print(f"  {'segnale':<12} {'articoli':>9} {'occorrenze':>11}   che cos'è")
     for name, data in sorted(
         summary["checks"].items(), key=lambda item: -item[1]["articles"]
     ):

@@ -5,10 +5,10 @@
  "claude_code_version": "2.1.220 (Claude Code)",
  "commit": "4f75286",
  "detail": [
-  "Cura: nessun cambio, verso higher_better riconfermato guardando la classifica 2023 (in cima Emilia-Romagna 2,06, Lazio 1,68, Friuli 1,64, in fondo Calabria 0,50, Sardegna 0,64), categoria ricerca_innovazione_digitale, data_year 2023 gia' allineato, descrizione 172 caratteri.",
-  "Smentita del 2026-07-29 assorbita: 1,41 e' PC_ACT_FTE (verificato sull'API Eurostat rd_p_perslf, IT 2023), 2,09 e' PC_ACT_HC, e adesso l'articolo dice tutte e due le letture invece di confonderle.",
+  "Cura: nessun cambio, verso higher_better riconfermato guardando la classifica 2023 (in cima Emilia-Romagna 2,06, Lazio 1,68, Friuli 1,64, in fondo Calabria 0,50, Sardegna 0,64), categoria ricerca_innovazione_digitale, data_year 2023 già allineato, descrizione 172 caratteri.",
+  "Smentita del 2026-07-29 assorbita: 1,41 è PC_ACT_FTE (verificato sull'API Eurostat rd_p_perslf, IT 2023), 2,09 è PC_ACT_HC, e adesso l'articolo dice tutte e due le letture invece di confonderle.",
   "Articolo riscritto per intero, 713 parole, filo: stessi nove territori in testa in tutti e cinque gli anni, mediana 1,15 -> 1,06 con media ferma a 1,16, gradino nona-decima 0,13 -> 0,30 punti (0,17 -> 0,30 nel solo ultimo anno).",
-  "Tre link interni (eur-rd_e_gerdreg, ter-92, hub del tema), h2 propri su tutte e quattro le sezioni, prima frase del lead 144 caratteri cosi' la meta description non viene troncata. Firmato reviewed_at 2026-07-31, reviewed_vintage 2023. Suite 935 test verde, prose_lint pulito, pagina servita letta intera."
+  "Tre link interni (eur-rd_e_gerdreg, ter-92, hub del tema), h2 propri su tutte e quattro le sezioni, prima frase del lead 144 caratteri così la meta description non viene troncata. Firmato reviewed_at 2026-07-31, reviewed_vintage 2023. Suite 935 test verde, prose_lint pulito, pagina servita letta intera."
  ],
  "gate": "auto",
  "outcome": "pr-open",

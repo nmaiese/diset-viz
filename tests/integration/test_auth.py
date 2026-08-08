@@ -1,8 +1,8 @@
 """Verifica del Bearer JWT Supabase e attribuzione opzionale dello user_id.
 
 Auth degrada ad anonimo per default: senza materiale di verifica configurato, un
-token e' semplicemente ignorato e il gioco resta com'era. Qui si prova che un
-token valido diventa identita', uno scaduto/manomesso no, e che un punteggio
+token è semplicemente ignorato e il gioco resta com'era. Qui si prova che un
+token valido diventa identità, uno scaduto/manomesso no, e che un punteggio
 inviato con un JWT valido si lega all'account."""
 
 import shutil
@@ -93,7 +93,7 @@ class AuthMeRouteTest(unittest.TestCase):
         body = app.test_client().get(
             "/api/auth/me", headers={"Authorization": "Bearer " + _token()}).get_json()
         self.assertEqual(body["user"], {"id": "uuid-abc", "email": "player@example.com"})
-        # il profilo e' stato creato e torna nella risposta
+        # il profilo è stato creato e torna nella risposta
         self.assertEqual(body["profile"]["auth_id"], "uuid-abc")
         self.assertEqual(body["profile"]["email"], "player@example.com")
 

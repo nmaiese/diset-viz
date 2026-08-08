@@ -81,8 +81,8 @@ PASSING = {"pass", "skipping"}
 PENDING = {"pending"}
 
 # La classificazione che `gh pr checks` faceva per noi, rifatta sulle conclusioni
-# grezze della REST. `neutral` sta con i verdi perche' li' stava, e `cancelled`
-# resta fuori da PASSING: un check annullato non e' un check passato.
+# grezze della REST. `neutral` sta con i verdi perché lì stava, e `cancelled`
+# resta fuori da PASSING: un check annullato non è un check passato.
 _CONCLUSION_BUCKET = {
     "success": "pass",
     "neutral": "pass",
@@ -118,23 +118,23 @@ def _bucket(run):
 
 
 def _worktree_dirty(runner=_run, cwd=None):
-    """I file non committati del worktree, o '' se e' pulito. Best effort.
+    """I file non committati del worktree, o '' se è pulito. Best effort.
 
     `git status --porcelain --untracked-files=all`, come `changed_paths`.
     `--untracked-files=all` e non il default: se l'ambiente ha
     `status.showUntrackedFiles=no`, il default considererebbe pulito un albero con
     file NUOVI, e la suite potrebbe usare un modulo o una fixture non tracciata,
-    risultare verde e fondere un commit che non la contiene, cioe' proprio il
+    risultare verde e fondere un commit che non la contiene, cioè proprio il
     guasto che questo controllo esiste per impedire. Rispetta comunque
     `.gitignore` (il symlink `.venv`, il meta di sessione e i battiti locali non
     contano). Serve al passo di merge per rifiutare un albero sporco: la suite gira
     sui file su disco, il merge fonde il commit, e con un worktree per run un file
-    non committato e' lavoro di questa run che non finirebbe su master."""
+    non committato è lavoro di questa run che non finirebbe su master."""
     code, out = runner(["git", "status", "--porcelain", "--untracked-files=all"], cwd=cwd)
     if code != 0:
-        # Fail closed: se non si riesce a leggere lo stato non si sa se e' pulito,
+        # Fail closed: se non si riesce a leggere lo stato non si sa se è pulito,
         # e trattarlo come pulito lascerebbe fondere un albero forse sporco (una
-        # config `status.showUntrackedFiles` guasta puo' far fallire solo questo).
+        # config `status.showUntrackedFiles` guasta può far fallire solo questo).
         return f"git status non leggibile (codice {code}): {out.strip()[:120]}"
     if not out.strip():
         return ""
@@ -149,17 +149,17 @@ def repo_slug(runner=_run, cwd=None):
     Il proxy di uscita riscrive `origin` in qualcosa come
     `http://local_proxy@127.0.0.1:41729/git/nmaiese/diset-viz`, e davanti a quel
     remote `gh` dice "none of the git remotes point to a known GitHub host" e si
-    ferma. Gli ultimi due segmenti del percorso pero' sono ancora owner e repo, e
+    ferma. Gli ultimi due segmenti del percorso però sono ancora owner e repo, e
     lo sono anche in `git@github.com:owner/repo.git` e in un URL https normale,
-    quindi si prendono da li'.
+    quindi si prendono da lì.
 
-    `GH_REPO` **non** e' piu' un override, ed e' apposta. Era il workaround che gli
+    `GH_REPO` **non** è più un override, ed è apposta. Era il workaround che gli
     agenti impostavano per `gh pr create`, e da environment ereditato faceva
-    aprire (o fondere) la PR sul repo sbagliato, o fallire perche' li' il branch
+    aprire (o fondere) la PR sul repo sbagliato, o fallire perché lì il branch
     non esiste: esattamente i rifiuti orfani che il resto di questa PR toglie.
     Chiedere agli agenti di non impostarlo non basta se l'ambiente lo conserva,
-    quindi il percorso automatico lo ignora del tutto. Il remote lo risolve gia',
-    quindi la variabile e' solo un footgun.
+    quindi il percorso automatico lo ignora del tutto. Il remote lo risolve già,
+    quindi la variabile è solo un footgun.
     """
     code, out = runner(["git", "remote", "get-url", "origin"], cwd=cwd)
     if code != 0:
@@ -196,7 +196,7 @@ def api(path, runner=_run, cwd=None, method=None, fields=()):
 
 
 def head_sha(pr, runner=_run, cwd=None, slug=None):
-    """Il commit in cima alla PR, che e' quello su cui girano i check."""
+    """Il commit in cima alla PR, che è quello su cui girano i check."""
     slug = slug or repo_slug(runner=runner, cwd=cwd)
     ok, data = api(f"repos/{slug}/pulls/{pr}", runner=runner, cwd=cwd)
     if not ok or not isinstance(data, dict):
@@ -208,8 +208,8 @@ def check_states(pr, runner=_run, cwd=None, slug=None):
     """The state of every check on a pull request, as {name: bucket}.
 
     Due endpoint e non uno: le check run moderne e le commit status storiche
-    vivono separate, e un repo puo' avere le une, le altre o entrambe. Le prime
-    vincono su un nome in comune, che e' il caso raro in cui lo stesso servizio
+    vivono separate, e un repo può avere le une, le altre o entrambe. Le prime
+    vincono su un nome in comune, che è il caso raro in cui lo stesso servizio
     scrive in tutti e due i posti.
 
     Un dizionario vuoto vuol dire "non risulta niente", e resta uno stato
@@ -251,7 +251,7 @@ def wait_for_checks(pr, runner=_run, cwd=None, sleep=time.sleep,
             if waited >= appear_timeout:
                 return False, (
                     f"nessun check risulta sulla PR #{pr} dopo {waited // 60} minuti. "
-                    "Con la politica 'checks' questo e' un rifiuto: non c'e' niente da aspettare."
+                    "Con la politica 'checks' questo è un rifiuto: non c'è niente da aspettare."
                 )
         else:
             failed = sorted(n for n, b in states.items() if b not in PASSING and b not in PENDING)
@@ -271,10 +271,10 @@ def merge(pr, runner=_run, cwd=None, slug=None, log=print):
     """Squash merge via REST, poi cancella il branch. Ritorna (ok, dettaglio).
 
     L'ordine conta e la separazione anche: fondere e cancellare erano un flag
-    solo (`--delete-branch`), qui sono due chiamate, e la seconda non puo'
+    solo (`--delete-branch`), qui sono due chiamate, e la seconda non può
     disfare la prima. Se la cancellazione fallisce il merge resta fatto, quindi
     si dice e si va avanti: restituire un fallimento manderebbe a master una riga
-    di diario che dice `error` su una PR che si e' fusa davvero, che e' il tipo
+    di diario che dice `error` su una PR che si è fusa davvero, che è il tipo
     di bugia che questo script esiste per non raccontare.
     """
     slug = slug or repo_slug(runner=runner, cwd=cwd)
@@ -304,16 +304,16 @@ def create_pr(head, title, body, base="master", runner=_run, cwd=None, slug=None
     """Apre la pull request via REST, e ritorna il suo numero.
 
     Esiste per la stessa ragione per cui il merge sta su `gh api` e non su
-    `gh pr merge`: `gh pr create` e' porcelain, cioe' GraphQL, e davanti al
+    `gh pr merge`: `gh pr create` è porcelain, cioè GraphQL, e davanti al
     remote riscritto dal proxy dice "none of the git remotes point to a known
     GitHub host" e si ferma. Lo slug lo ricava `repo_slug` dal remote proxato,
     ignorando `GH_REPO`, quindi si apre la PR sulla stessa superficie REST del
     merge, con lo stesso slug.
 
-    Il `run_id` va nel corpo (`run_id: <...>`) perche' il cruscotto possa
+    Il `run_id` va nel corpo (`run_id: <...>`) perché il cruscotto possa
     correlare la PR con il battito e le due righe di diario della run: il branch
     ne porta solo il suffisso, non l'id intero, quindi ricavarlo dal branch
-    perderebbe la corrispondenza. Il lanciatore lo rilegge da li'.
+    perderebbe la corrispondenza. Il lanciatore lo rilegge da lì.
     """
     slug = slug or repo_slug(runner=runner, cwd=cwd)
     if run_id:
@@ -334,41 +334,41 @@ def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts
                    run_id=None):
     """Scrive su master la riga di diario con l'esito vero, e la spinge.
 
-    Esiste perche' il diario non poteva quasi mai dire come e' finita, e il modo
-    in cui non poteva e' istruttivo. La riga sta nel perimetro dello stadio,
+    Esiste perché il diario non poteva quasi mai dire come è finita, e il modo
+    in cui non poteva è istruttivo. La riga sta nel perimetro dello stadio,
     quindi viaggia dentro la pull request e va committata **prima** che la pull
     request si fonda: quando l'agente la scrive non sa ancora l'esito, e scrive
-    `pr-open`. Il cacciatore ha scritto `pr-open` e si e' fuso trenta secondi
+    `pr-open`. Il cacciatore ha scritto `pr-open` e si è fuso trenta secondi
     dopo, e per mezza giornata il diario ha raccontato che nessuno stadio
     `checks` si fosse mai chiuso da solo, mentre la #45 diceva il contrario.
 
-    L'altra meta' del buco e' peggiore. Quando il cancello o i check rifiutano, la
+    L'altra metà del buco è peggiore. Quando il cancello o i check rifiutano, la
     riga dell'agente resta su un branch che non si fonde mai, quindi **da master
     non si vede affatto**: la run del 26 luglio dello scout esiste, dice
     `blocked`, e vive su `automation/scout-2026-07-26` dove nessuno strumento la
     legge. Una run rifiutata e una run mai avvenuta producono lo stesso master,
-    che e' esattamente la confusione che il diario esiste per togliere.
+    che è esattamente la confusione che il diario esiste per togliere.
 
-    Quindi la riga la scrive chi l'esito lo conosce, cioe' questo passo, per ogni
+    Quindi la riga la scrive chi l'esito lo conosce, cioè questo passo, per ogni
     uscita terminale e non solo per il merge. Il docstring di `decide` prometteva
-    gia' un dizionario "che il chiamante trasforma in una riga di diario": il
-    chiamante era l'agente, cioe' la parte che in un caso su due non l'ha fatto.
+    già un dizionario "che il chiamante trasforma in una riga di diario": il
+    chiamante era l'agente, cioè la parte che in un caso su due non l'ha fatto.
 
     Il lavoro avviene in un worktree usa e getta su `origin/master`, mai
-    nell'albero dell'agente, che a questo punto e' su un branch appena cancellato
+    nell'albero dell'agente, che a questo punto è su un branch appena cancellato
     dal remoto e non va toccato. Se il push perde una corsa contro un altro
     stadio si ricomincia da capo: si rilegge `origin/master`, che nel frattempo
     porta la riga dell'altro, e la nostra le va dietro.
 
-    Il ritentativo adesso e' anche piu' raro. Con un file per run le due righe
+    Il ritentativo adesso è anche più raro. Con un file per run le due righe
     non finiscono nello stesso file, quindi due passi di merge concorrenti non
     si contendono niente e il push perde la corsa solo per il normale
     non-fast-forward, non per un conflitto di contenuto.
 
-    Il `run_id` arriva da chi ha aperto la pull request, ed e' l'unica cosa che
+    Il `run_id` arriva da chi ha aperto la pull request, ed è l'unica cosa che
     lega questa riga alla riga dell'agente: quando l'agente ha scritto la sua,
     il numero della pull request non esisteva ancora, quindi appaiarle su
-    quello non funzionava e per meta' delle run non funzionava affatto.
+    quello non funzionava e per metà delle run non funzionava affatto.
     """
     import shutil
     import tempfile
@@ -376,9 +376,9 @@ def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts
     outcome = result["outcome"]
     summary = {
         "merged": f"PR #{pr} fusa in master dal passo di merge",
-        "blocked": f"PR #{pr} non fusa: il cancello e' rosso",
+        "blocked": f"PR #{pr} non fusa: il cancello è rosso",
         "stopped": f"PR #{pr} non fusa: i check non l'hanno permesso",
-        "error": f"PR #{pr} non fusa: il merge e' fallito",
+        "error": f"PR #{pr} non fusa: il merge è fallito",
     }.get(outcome, f"PR #{pr}: {outcome}")
 
     for attempt in range(1, attempts + 1):
@@ -403,8 +403,8 @@ def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts
                 gate=result.get("gate"), pr=pr, commit=tip, branch="master",
                 run_id=run_id, trigger=result.get("trigger"),
             )
-            # `.esito` e non un nome nuovo: le due meta' della run condividono
-            # il `run_id`, e il suffisso e' cio' che permette loro di stare in
+            # `.esito` e non un nome nuovo: le due metà della run condividono
+            # il `run_id`, e il suffisso è ciò che permette loro di stare in
             # due file senza contendersi un percorso.
             pipeline_log.append(
                 entry, path=Path(tmp) / "data" / "pipeline" / "runs", suffix=".esito"
@@ -423,14 +423,14 @@ def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts
             log(f"  diario: push perso, ritento ({attempt}/{attempts})")
         finally:
             # Due passaggi e non uno: `worktree remove` cancella la directory
-            # quando il worktree e' stato creato davvero, ma se `add` e' fallito
+            # quando il worktree è stato creato davvero, ma se `add` è fallito
             # resta la cartella vuota di mkdtemp, e una run al giorno che perde
-            # una cartella e' una perdita lenta che nessuno collega alla causa.
+            # una cartella è una perdita lenta che nessuno collega alla causa.
             runner(["git", "worktree", "remove", "--force", tmp], cwd=cwd)
             shutil.rmtree(tmp, ignore_errors=True)
 
-    # Non e' un fallimento del merge, che e' gia' avvenuto o gia' stato rifiutato.
-    # Va detto forte comunque: da qui in poi master non sa come e' finita.
+    # Non è un fallimento del merge, che è già avvenuto o già stato rifiutato.
+    # Va detto forte comunque: da qui in poi master non sa come è finita.
     log(f"  DIARIO NON SCRITTO dopo {attempts} tentativi. "
         f"Registrala a mano: pipeline_log.py --write --stage {stage} "
         f"--outcome {outcome} --pr {pr}"
@@ -440,15 +440,15 @@ def record_landing(stage, pr, result, runner=_run, cwd=None, log=print, attempts
 
 # I campi del dossier che compongono lo snapshot di stato. Sono quelli che la
 # board rilegge per riga (`pipeline_monitor._OVERLAY_FIELDS`), tenuti qui espliciti
-# perche' questo modulo e' stdlib puro e non importa la board se non al momento.
+# perché questo modulo è stdlib puro e non importa la board se non al momento.
 _SNAPSHOT_FIELDS = ("state", "type", "entered_at", "completed_stages",
                     "required_stages", "flags", "published", "verification_valid",
                     "score_eligible", "error_class", "motivo", "priority")
 
 
 def _id_from_path(path):
-    """L'id-dossier di un file toccato dal merge, o None se il file non e' un
-    articolo ne' una verifica. `content/indicators/bes__02IST004.json` ->
+    """L'id-dossier di un file toccato dal merge, o None se il file non è un
+    articolo né una verifica. `content/indicators/bes__02IST004.json` ->
     `bes:02IST004`; `data/pipeline/verifiche/ter-167__regione__h.json` -> `167`."""
     from scripts import practice_timeline
     if not path.endswith(".json"):
@@ -464,10 +464,10 @@ def _id_from_path(path):
 def _targets_from_diff(dossier, runner=_run, cwd=None):
     """Gli indicatori che questa run ha davvero cambiato: gli id dei file
     `content/indicators/` e `data/pipeline/verifiche/` toccati dal ramo rispetto a
-    master. E' la sola derivazione dei target, e non `run_id in runs`: quel legame
+    master. È la sola derivazione dei target, e non `run_id in runs`: quel legame
     include anche gli indicatori solo CITATI per confronto nell'articolo (che
     `reconstruct` associa allo stesso run_id), e postarne lo snapshot
-    sovrascriverebbe lo stato genuino, magari piu' recente, di un indicatore che
+    sovrascriverebbe lo stato genuino, magari più recente, di un indicatore che
     questa run non ha toccato. Best effort."""
     code, out = runner(["git", "diff", "--name-only", "origin/master...HEAD"], cwd=cwd)
     if code != 0:
@@ -478,14 +478,14 @@ def _targets_from_diff(dossier, runner=_run, cwd=None):
 
 def emit_outcomes(run_id, cwd=None, runner=_run, log=print, today="", post=None):
     """POSTa al sito lo snapshot di stato di ogni indicatore che questa run ha
-    toccato, cosi' il cruscotto riflette il merge senza aspettare il redeploy.
+    toccato, così il cruscotto riflette il merge senza aspettare il redeploy.
 
-    Best effort assoluto: gira dopo un merge gia' avvenuto, quindi nessuna
+    Best effort assoluto: gira dopo un merge già avvenuto, quindi nessuna
     eccezione qui deve propagarsi (un overlay perso si sana da solo al deploy, che
     porta comunque diario e verifica su master). Ricostruisce lo stato dal
-    worktree, che contiene il lavoro appena fuso: e' l'unico posto dove l'impronta
+    worktree, che contiene il lavoro appena fuso: è l'unico posto dove l'impronta
     dell'articolo combacia con la verifica, cosa che il server, fermo all'immagine
-    deployata, non puo' calcolare. I target sono gli indicatori davvero cambiati
+    deployata, non può calcolare. I target sono gli indicatori davvero cambiati
     (i file del diff), non quelli che il diario cita per confronto."""
     try:
         from datetime import datetime, timezone
@@ -514,23 +514,23 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
     that refused to merge still leaves the same kind of trace as one that did.
     """
     if verdict is None:
-        # Il worktree della run deve essere pulito prima del merge, e il perche'
-        # e' sottile. Il cancello guarda il solo diff committato (committed_only,
+        # Il worktree della run deve essere pulito prima del merge, e il perché
+        # è sottile. Il cancello guarda il solo diff committato (committed_only,
         # vedi sotto), ma la suite gira sui file **su disco**: un fix lasciato non
-        # committato passerebbe la suite e poi non finirebbe su master, perche' il
+        # committato passerebbe la suite e poi non finirebbe su master, perché il
         # merge REST fonde il commit, e `--close` butterebbe il fix. Con un
-        # worktree isolato per run un file sporco e' lavoro non committato di
-        # QUESTA run, non di un sibling, quindi il rimedio giusto e' rifiutare e
-        # chiedere di committare, cosi' la suite prova esattamente cio' che si fonde.
+        # worktree isolato per run un file sporco è lavoro non committato di
+        # QUESTA run, non di un sibling, quindi il rimedio giusto è rifiutare e
+        # chiedere di committare, così la suite prova esattamente ciò che si fonde.
         dirty = _worktree_dirty(runner=runner, cwd=cwd)
         if dirty:
             verdict = {"merge": "blocked", "ok": False, "checks": [
                 {"check": f"worktree non pulito, committa prima di fondere ({dirty})",
                  "ok": False}]}
         else:
-            # committed_only: al merge il lavoro dello stadio e' gia' committato sul
+            # committed_only: al merge il lavoro dello stadio è già committato sul
             # branch, quindi il cancello guarda il solo diff committato e non il
-            # working tree. Cosi' l'incompiuto di un altro ruolo in un checkout
+            # working tree. Così l'incompiuto di un altro ruolo in un checkout
             # condiviso non viene attribuito a questa run (la seconda faccia del bug
             # del checkout condiviso).
             verdict = pipeline_gate.run(stage, skip_tests=skip_tests, cwd=cwd,
@@ -541,27 +541,27 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
     def finish(result):
         """Ogni uscita terminale passa di qui, e nessuna sfugge al diario.
 
-        `pr-open` no: li' non e' finito niente, la pull request resta aperta e la
-        riga che l'agente ha gia' committato dentro la PR la descrive bene.
+        `pr-open` no: lì non è finito niente, la pull request resta aperta e la
+        riga che l'agente ha già committato dentro la PR la descrive bene.
         """
         if journal and not dry_run and result["outcome"] != "pr-open":
             record_landing(stage, pr, result, runner=runner, cwd=cwd, log=log,
                            run_id=run_id)
         # Solo su `merged`: per gli esiti che non atterrano su master l'immagine
-        # deployata non e' indietro per quell'indicatore, e un overlay direbbe il
-        # falso (mostrerebbe come lavorato cio' che non e' stato fuso).
+        # deployata non è indietro per quell'indicatore, e un overlay direbbe il
+        # falso (mostrerebbe come lavorato ciò che non è stato fuso).
         if not dry_run and result.get("outcome") == "merged":
             emit_outcomes(run_id, cwd=cwd, runner=runner, log=log)
         return result
 
     if mode == "blocked":
         failed = [c["check"] for c in verdict["checks"] if not c["ok"]]
-        detail = "il cancello e' rosso: " + ", ".join(failed)
+        detail = "il cancello è rosso: " + ", ".join(failed)
         log(f"  RIFIUTO. {detail}")
         return finish({"merged": False, "outcome": "blocked", "gate": mode, "detail": detail})
 
     # Dopo il ramo `blocked`, non prima: un cancello rosso non parla con GitHub,
-    # e non deve fallire perche' non si capisce da dove viene il remote.
+    # e non deve fallire perché non si capisce da dove viene il remote.
     slug = repo_slug(runner=runner, cwd=cwd)
 
     if mode == "checks":
@@ -578,7 +578,7 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
 
     ok, out = merge(pr, runner=runner, cwd=cwd, slug=slug, log=log)
     if not ok:
-        log(f"  il merge e' fallito: {out}")
+        log(f"  il merge è fallito: {out}")
         return finish({"merged": False, "outcome": "error", "gate": mode, "detail": out})
     log(f"  PR #{pr} fusa in master.")
     return finish({"merged": True, "outcome": "merged", "gate": mode, "detail": out})
@@ -587,7 +587,7 @@ def decide(stage, pr, verdict=None, runner=_run, cwd=None, sleep=time.sleep,
 def main():
     parser = argparse.ArgumentParser(
         description="Fonde la PR di uno stadio, ma solo se il cancello e i check lo permettono.",
-        epilog="uscita 0 = fusa, 1 = non fusa (e il motivo e' stampato).",
+        epilog="uscita 0 = fusa, 1 = non fusa (e il motivo è stampato).",
     )
     parser.add_argument("--stage", required=True, choices=sorted(pipeline_gate.STAGE_PATHS))
     parser.add_argument("--pr", help="numero della pull request (per il merge)")
@@ -605,7 +605,7 @@ def main():
     parser.add_argument("--no-journal", action="store_true",
                         help="non scrivere la riga di esito su master (solo per prove)")
     parser.add_argument("--run-id",
-                        help="l'identita' della run, quella che pipeline_log ha stampato. "
+                        help="l'identità della run, quella che pipeline_log ha stampato. "
                              "Senza, la riga di esito resta orfana e il diario non sa "
                              "a quale run appartiene")
     parser.add_argument("--json", action="store_true")
@@ -620,7 +620,7 @@ def main():
         return 0
 
     if not args.pr:
-        parser.error("--pr e' obbligatorio per il merge (o usa --open per aprire la PR)")
+        parser.error("--pr è obbligatorio per il merge (o usa --open per aprire la PR)")
 
     result = decide(args.stage, args.pr, dry_run=args.dry_run, skip_tests=args.skip_tests,
                     journal=not args.no_journal, run_id=args.run_id)

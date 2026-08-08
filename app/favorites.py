@@ -2,7 +2,7 @@
 
 Invariante di sicurezza: `auth_id` arriva SEMPRE dal JWT verificato
 (app/auth.current_user), mai dal body. Il backend gira BYPASSRLS, quindi la RLS
-non e' il confine: e' il `WHERE auth_id = ?` qui sotto. Un endpoint che accettasse
+non è il confine: è il `WHERE auth_id = ?` qui sotto. Un endpoint che accettasse
 `auth_id` dal client sarebbe una fuga completa dei dati account.
 """
 
@@ -19,7 +19,7 @@ def _now_iso():
 
 
 def list_ids(auth_id):
-    """Gli id indicatore preferiti dell'utente, piu' recenti prima."""
+    """Gli id indicatore preferiti dell'utente, più recenti prima."""
     if not auth_id:
         return []
     with session_scope() as s:
@@ -31,7 +31,7 @@ def list_ids(auth_id):
 
 
 def add(auth_id, indicator_id):
-    """Aggiunge un preferito. Idempotente (se c'e' gia', non fa nulla)."""
+    """Aggiunge un preferito. Idempotente (se c'è già, non fa nulla)."""
     if not auth_id or not indicator_id:
         return
     with session_scope() as s:

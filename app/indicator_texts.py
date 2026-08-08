@@ -49,10 +49,10 @@ ROLES = (
 ROLE_ORDER = [role for role, _ in ROLES]
 DEFAULT_HEADINGS = dict(ROLES)
 
-# I tre ruoli che nessuna dichiarazione `roles_covered` puo' togliere dalla
-# pagina: il blocco "Come leggere il dato" copre la sola `definizione`, quindi e'
+# I tre ruoli che nessuna dichiarazione `roles_covered` può togliere dalla
+# pagina: il blocco "Come leggere il dato" copre la sola `definizione`, quindi è
 # la sola omettibile. Rispecchiato in `scripts/pending_notes.SUBSTANTIVE_ROLES` e
-# in `scripts/practice_timeline`, che decidono se una pratica e' completa.
+# in `scripts/practice_timeline`, che decidono se una pratica è completa.
 SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
 
 # The level an entry describes when it does not say. Every article written so
@@ -102,19 +102,19 @@ def get_text(indicator_id):
 def emitted_roles(entry):
     """I ruoli che la pagina rende per questa entry: `roles_covered` normalizzato.
 
-    Una dichiarazione e' un **filtro sui quattro ruoli**, non un vocabolario
-    nuovo. Due normalizzazioni, e nessuna delle due e' cosmetica:
+    Una dichiarazione è un **filtro sui quattro ruoli**, non un vocabolario
+    nuovo. Due normalizzazioni, e nessuna delle due è cosmetica:
 
     - un ruolo sconosciuto si ignora. Un refuso (`dinamicha`) lasciato passare
-      finiva in cio' che la pratica pretende, e l'articolo restava incompleto per
+      finiva in ciò che la pratica pretende, e l'articolo restava incompleto per
       sempre mentre la lista di consegna diceva che non manca niente: il dossier
       lo rilanciava a ogni tick senza che nessuna run potesse chiudere il buco.
-    - i tre sostanziali ci sono comunque. Solo la `definizione` e' assorbibile,
-      perche' e' l'unica che il blocco "Come leggere il dato" copre, e senza
+    - i tre sostanziali ci sono comunque. Solo la `definizione` è assorbibile,
+      perché è l'unica che il blocco "Come leggere il dato" copre, e senza
       l'unione una dichiarazione parziale toglieva `dinamica` e `limiti` dalla
       pagina pubblica invece di comporli dallo scheletro.
 
-    E' l'unica fonte della regola: renderer, code e impronta della prosa devono
+    È l'unica fonte della regola: renderer, code e impronta della prosa devono
     rispondere la stessa cosa, o lo stesso articolo risulta completo per una e
     incompleto per l'altra. `scripts/practice_timeline.py`,
     `scripts/pending_notes.py` e `scripts/verification_queue.py` la rispecchiano
@@ -122,40 +122,40 @@ def emitted_roles(entry):
     """
     declared = entry.get("roles_covered") if isinstance(entry, dict) else None
     # Un'entry che scrive le proprie sezioni **dichiara con quelle**: elencare i
-    # ruoli due volte, una in `sections` e una in `roles_covered`, e' un modo
+    # ruoli due volte, una in `sections` e una in `roles_covered`, è un modo
     # per farli divergere. Senza questa riga la macchina nuova pubblicava
     # articoli senza definizione e la pagina la ricomponeva lo stesso in
-    # apertura, cioe' proprio il difetto che questa ricostruzione esiste per
+    # apertura, cioè proprio il difetto che questa ricostruzione esiste per
     # togliere: cinquantadue articoli su cinquantadue aprivano sulla
     # definizione, e il cinquantatreesimo pure.
     #
-    # **Solo un articolo completo dichiara.** Un articolo a meta' non sta
-    # scegliendo una forma, e' solo incompleto: trecentoventidue delle entry in
+    # **Solo un articolo completo dichiara.** Un articolo a metà non sta
+    # scegliendo una forma, è solo incompleto: trecentoventidue delle entry in
     # `content/indicators/` hanno scritto `quadro` e `limiti` e nient'altro, e
     # con la condizione debole ("almeno un ruolo sostanziale") sono passate
-    # tutte a `quadro, limiti, dinamica` con la definizione assorbita. Cioe' un
+    # tutte a `quadro, limiti, dinamica` con la definizione assorbita. Cioè un
     # cambio di pagina su 322 articoli che nessuno aveva chiesto, e che nessun
-    # test vedeva. La condizione e' quindi **tutti e tre i sostanziali**.
+    # test vedeva. La condizione è quindi **tutti e tre i sostanziali**.
     if declared is None and isinstance(entry, dict) and entry.get("sections"):
         written = [section.get("role") for section in entry["sections"]
                    if isinstance(section, dict) and (section.get("body") or "").strip()]
         if SUBSTANTIVE_ROLES.issubset(set(written)):
             declared = written
     # Campo **assente** e lista **vuota** non sono la stessa cosa: assente vuol
-    # dire "non dichiaro niente", cioe' i quattro ruoli di sempre, mentre
-    # `roles_covered: []` e' una dichiarazione che non nomina la definizione, e
-    # quindi la assorbe esattamente come farebbe `["quadro"]`. Un test di verita'
+    # dire "non dichiaro niente", cioè i quattro ruoli di sempre, mentre
+    # `roles_covered: []` è una dichiarazione che non nomina la definizione, e
+    # quindi la assorbe esattamente come farebbe `["quadro"]`. Un test di verità
     # le confondeva, e la stessa entry rendeva quattro sezioni qui e tre nella
     # forma equivalente.
     if not isinstance(declared, (list, tuple)):
         return list(ROLE_ORDER)
     keep = {role for role in declared if role in DEFAULT_HEADINGS} | SUBSTANTIVE_ROLES
-    # **L'ordine dichiarato vince, e non e' un dettaglio.** Il pacchetto dice a
-    # chi scrive che la sequenza nasce dall'angolo piu' forte, e la prima prova
+    # **L'ordine dichiarato vince, e non è un dettaglio.** Il pacchetto dice a
+    # chi scrive che la sequenza nasce dall'angolo più forte, e la prima prova
     # ha prodotto `quadro, limiti, dinamica`: la pagina lo riordinava in
-    # `definizione, quadro, dinamica, limiti`, cioe' buttava via l'unica cosa
+    # `definizione, quadro, dinamica, limiti`, cioè buttava via l'unica cosa
     # che rompe lo stampo. Una promessa fatta a chi scrive e disfatta al render
-    # e' peggio di una promessa non fatta.
+    # è peggio di una promessa non fatta.
     #
     # I ruoli sostanziali che la dichiarazione non nomina si compongono, e
     # vanno in coda nell'ordine canonico: non hanno un posto scelto da nessuno.
@@ -167,9 +167,9 @@ def emitted_roles(entry):
 def cited_claims(entry):
     """Gli identificatori di corpus che questa entry usa, per sezione e in coda.
 
-    Le sezioni dichiarano `claims`, ed e' li' che l'attribuzione ha un posto:
-    dire *quale paragrafo* si appoggia a chi e' l'unica forma che un controllo
-    posizionale puo' verificare. Il campo `corpus` a livello di entry resta
+    Le sezioni dichiarano `claims`, ed è lì che l'attribuzione ha un posto:
+    dire *quale paragrafo* si appoggia a chi è l'unica forma che un controllo
+    posizionale può verificare. Il campo `corpus` a livello di entry resta
     letto per le entry scritte prima, che lo usavano da sole.
     """
     if not isinstance(entry, dict):
@@ -187,18 +187,18 @@ def cited_claims(entry):
 
 
 def visible_sources(entry):
-    """Le fonti che la pagina mostra: quelle autorate piu' quelle del corpus.
+    """Le fonti che la pagina mostra: quelle autorate più quelle del corpus.
 
-    **Derivate, non trascritte a mano, ed e' una riparazione.** L'articolo di
+    **Derivate, non trascritte a mano, ed è una riparazione.** L'articolo di
     `ter-176` scriveva "Eurostat scrive che..." mentre il blocco fonti visibile
     portava solo Istat: l'identificatore stava in `corpus`, che la pagina non
     rende. Un lettore vedeva un'attribuzione a un'istituzione senza un modo per
-    controllarla, che e' il difetto peggiore possibile su un sito di dati
-    pubblici, e nessuna guardia lo prendeva perche' le due liste non si
+    controllarla, che è il difetto peggiore possibile su un sito di dati
+    pubblici, e nessuna guardia lo prendeva perché le due liste non si
     parlavano.
 
-    Ora si parlano qui, in un posto solo: cio' che la prosa attribuisce non puo'
-    restare invisibile, perche' non c'e' un passo umano che lo trascriva.
+    Ora si parlano qui, in un posto solo: ciò che la prosa attribuisce non può
+    restare invisibile, perché non c'è un passo umano che lo trascriva.
     """
     authored = [item for item in (entry.get("fonti") or []) if isinstance(item, dict)]
     known = {item.get("url") for item in authored}
@@ -214,8 +214,8 @@ def visible_sources(entry):
         # stringa finisce fra caporali attribuita a un'istituzione, e
         # `fetch_corpus --verify` l'ha controllata **come stringa**: presentare
         # come sua una frase con il punto e virgola diventato virgola vuol dire
-        # attribuirle parole che non ha scritto. Se la citazione non si puo'
-        # mostrare intera resta l'istituzione con il proprio link, che e' la
+        # attribuirle parole che non ha scritto. Se la citazione non si può
+        # mostrare intera resta l'istituzione con il proprio link, che è la
         # provenienza vera: il lettore la legge alla fonte.
         quote = context.for_quote((claim.get("quote") or "").strip())
         testo = (f"{institution}. «{quote}»".strip() if quote and context.quotable(quote)
@@ -239,9 +239,9 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     falls back to the composed skeleton, which reads the level it is given.
 
     **Sezioni variabili (opt-in).** Di default l'articolo ha i quattro H2 in
-    ordine fisso, la `definizione` in apertura. Un'entry puo' pero' dichiarare
+    ordine fisso, la `definizione` in apertura. Un'entry può però dichiarare
     ``roles_covered``: la lista dei ruoli che scrive come H2. Se la `definizione`
-    non e' fra quelli, non apre piu' l'articolo: la sua meccanica va nel blocco
+    non è fra quelli, non apre più l'articolo: la sua meccanica va nel blocco
     "Come leggere il dato" (``indicator_page.html``), che compone lo stesso
     ``explain`` dai metadati. Il campo vive a livello di entry e **non entra nel
     ``prose_fingerprint``** (che legge solo lead + ``sections[].{role,h,body}``),
@@ -252,8 +252,8 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     entry = get_text(indicator_id) or {}
     if (entry.get("level") or DEFAULT_LEVEL) != (level_key or DEFAULT_LEVEL):
         entry = {}
-    # Una **lista per ruolo**, non una sezione per ruolo, ed e' la riparazione
-    # di un difetto che si vedeva in pagina. Un'entry puo' scrivere due sezioni
+    # Una **lista per ruolo**, non una sezione per ruolo, ed è la riparazione
+    # di un difetto che si vedeva in pagina. Un'entry può scrivere due sezioni
     # con lo stesso `role` (la macchina nuova l'ha fatto al primo giro: due
     # `dinamica` con due titoli diversi), e con un dizionario la seconda
     # sovrascriveva la prima: la pagina rendeva **due volte lo stesso corpo** e
@@ -261,8 +261,8 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     # vedeva, e il testo perso non lasciava traccia da nessuna parte.
     #
     # Lettore tollerante, scrittore severo: `officina.pubblica` rifiuta i ruoli
-    # doppi, perche' il contratto e' una sezione per ruolo. Questo ramo esiste
-    # per i trecento articoli gia' committati e per le entry scritte a mano, che
+    # doppi, perché il contratto è una sezione per ruolo. Questo ramo esiste
+    # per i trecento articoli già committati e per le entry scritte a mano, che
     # nessun comando ha filtrato.
     authored = {}
     for section in entry.get("sections") or []:
@@ -283,14 +283,14 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     return {
         "lead": (entry.get("lead") or "").strip() or None,
         "sections": sections,
-        # La definizione e' assorbita dal blocco "Come leggere" quando non e' fra
-        # gli H2 emessi. Per un'entry senza `roles_covered` la definizione e'
-        # sempre presente, quindi `come_leggere` e' False e niente cambia.
+        # La definizione è assorbita dal blocco "Come leggere" quando non è fra
+        # gli H2 emessi. Per un'entry senza `roles_covered` la definizione è
+        # sempre presente, quindi `come_leggere` è False e niente cambia.
         "come_leggere": "definizione" not in role_sequence,
         # Titolo H1 e titolo SERP autorati, opzionali. Quando assenti la pagina usa
         # il derivato di oggi (H1 = nome amministrativo, title = boilerplate "per
-        # regione"). Un titolo in lingua comune ("Dove si lavora di piu' nella
-        # ricerca") e' un giudizio editoriale, non derivabile, quindi vive nel file
+        # regione"). Un titolo in lingua comune ("Dove si lavora di più nella
+        # ricerca") è un giudizio editoriale, non derivabile, quindi vive nel file
         # dell'articolo. Campi di entry, non entrano nel `prose_fingerprint`.
         "h1": (entry.get("h1") or "").strip() or None,
         "seo_title": (entry.get("seo_title") or "").strip() or None,

@@ -1,6 +1,6 @@
-# Versioni pinned, non range: la catena e' non presidiata e la CI installa a
+# Versioni pinned, non range: la catena è non presidiata e la CI installa a
 # ogni run, quindi "quello che pip risolve oggi" cambiava sotto i piedi senza
-# che nessun file lo registrasse. Con il pin, un aggiornamento e' un diff.
+# che nessun file lo registrasse. Con il pin, un aggiornamento è un diff.
 # Per aggiornare: alza la versione qui, fai girare la suite, committa.
 Flask==3.1.3
 Flask-Caching==2.4.1
@@ -17,5 +17,5 @@ psycopg[binary]==3.2.3
 alembic==1.14.0
 # [crypto] tira dentro `cryptography`: senza, PyJWT NON verifica gli ES256/RS256
 # (il JWT asimmetrico di Supabase), quindi ogni richiesta autenticata cadeva a
-# 401 in produzione mentre in locale passava (cryptography gia' nel venv).
+# 401 in produzione mentre in locale passava (cryptography già nel venv).
 PyJWT[crypto]==2.10.1

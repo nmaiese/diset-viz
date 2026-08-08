@@ -1,6 +1,6 @@
 """La rotta /_pipeline: il cruscotto interno, protetto e noindex, e il suo vivo.
 
-Gira il client Flask reale, quindi e' un test d'integrazione: costruisce il
+Gira il client Flask reale, quindi è un test d'integrazione: costruisce il
 board dai file veri del repo. Verifica lo stato, l'header noindex, la protezione
 a token, e l'endpoint di ingest dei battiti (il vivo, scritto sul backend
 mutabile: SQLite in test, Supabase Postgres in produzione) con il suo segreto."""
@@ -16,14 +16,14 @@ from pathlib import Path
 class PipelineDashboardRoute(unittest.TestCase):
     def setUp(self):
         # Il client va costruito con l'ambiente voluto: ricarico config e views
-        # cosi' la view legge i token di questo test, non quelli del processo.
+        # così la view legge i token di questo test, non quelli del processo.
         # Salvo e ripristino l'ambiente per non sporcare gli altri test.
         self._saved = {k: os.environ.get(k) for k in
                        ("PIPELINE_TOKEN", "PIPELINE_INGEST_TOKEN", "LEADERBOARD_DB")}
         self._tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self._tmp.cleanup)
         # Il vivo vive nello stesso SQLite della leaderboard: un DB temporaneo,
-        # cosi' il test non tocca (ne' dipende da) quello reale.
+        # così il test non tocca (né dipende da) quello reale.
         os.environ["LEADERBOARD_DB"] = str(Path(self._tmp.name) / "state.sqlite3")
 
     def tearDown(self):
@@ -97,8 +97,8 @@ class PipelineDashboardRoute(unittest.TestCase):
 
     def test_a_published_indicator_links_to_its_page(self):
         # Costruito dai file veri: se un indicatore risulta pubblicato sul sito,
-        # la sua riga porta il link canonico alla pagina; se nessuno lo e', il
-        # test non ha nulla da provare e passa (lo stato di pubblicazione e' dato
+        # la sua riga porta il link canonico alla pagina; se nessuno lo è, il
+        # test non ha nulla da provare e passa (lo stato di pubblicazione è dato
         # vivo, non un invariante del repo).
         from scripts import pipeline_monitor
         rows = pipeline_monitor.load_board()["rows"]
@@ -131,8 +131,8 @@ class PipelineDashboardRoute(unittest.TestCase):
         self.assertEqual(ok.status_code, 200)
 
     def test_ingest_is_off_when_no_secret_is_configured(self):
-        # Senza segreto l'endpoint e' 404 anche con un header qualsiasi: in locale
-        # e finche' il segreto non e' provisionato, l'ingest e' semplicemente spento.
+        # Senza segreto l'endpoint è 404 anche con un header qualsiasi: in locale
+        # e finché il segreto non è provisionato, l'ingest è semplicemente spento.
         client = self._client(ingest_token="")
         r = client.post("/_pipeline/beat", json={"action": "beat", "run_id": "x"},
                         headers={"X-Pipeline-Key": "qualsiasi"})
@@ -176,7 +176,7 @@ class PipelineDashboardRoute(unittest.TestCase):
                                "indicator": "ter-178", "stage": "producer"})
         self.assertEqual(ok.status_code, 200)
         self.assertEqual(pipeline_state.tokens_by_run()["producer-1"]["tokens"], 46121)
-        # e un token vecchio NON scade come un battito: la telemetria e' storia
+        # e un token vecchio NON scade come un battito: la telemetria è storia
         pipeline_state.record_tokens("producer-old", 12345, now="2026-01-01T00:00:00+00:00")
         self.assertEqual(pipeline_state.tokens_by_run()["producer-old"]["tokens"], 12345)
 
@@ -222,7 +222,7 @@ class PipelineDashboardRoute(unittest.TestCase):
         got = pipeline_state.outcomes_by_indicator()["167"]
         self.assertEqual(got["state"], "pubblicata")
         self.assertEqual(got["completed_stages"], ["writer", "reviewer", "verificatore"])
-        # un outcome vecchio NON scade come un battito: e' storia finche' il
+        # un outcome vecchio NON scade come un battito: è storia finché il
         # committato non lo raggiunge.
         pipeline_state.record_outcome("999", "r-old", {"state": "pubblicata"},
                                       now="2026-01-01T00:00:00+00:00",

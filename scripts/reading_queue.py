@@ -10,7 +10,7 @@ and which ones has no reader-editor looked at yet?**
 It exists because the producer writes, self-judges readability, and signs, so the
 one axis a factually clean article can still fail on is the one nobody
 independent checks. `eur-rd_p_persreg` is the case: every figure is right and the
-first H2 opens on "il numeratore e' in equivalenti a tempo pieno, il denominatore
+first H2 opens on "il numeratore è in equivalenti a tempo pieno, il denominatore
 no", accounting before the story. The reader-editor is that independent judge:
 read-only, `soft` (queues, never blocks the merge), a sibling of the verifier
 rather than a link in a chain.
@@ -101,14 +101,14 @@ def reading_fingerprint(entry: dict) -> str:
     return hashlib.sha1(blob.encode("utf-8")).hexdigest()[:16]
 
 # Il registro delle letture, un file per lettura. Perimetro del solo
-# reader-editor, come `verifiche/` lo e' del solo verificatore: un registro
-# append-only, un file per record, cosi' due letture concorrenti non collidono
+# reader-editor, come `verifiche/` lo è del solo verificatore: un registro
+# append-only, un file per record, così due letture concorrenti non collidono
 # mai su una coda condivisa.
 READINGS_DIR = PROJECT_ROOT / "data" / "pipeline" / "letture"
 
-# I criteri della leggibilita', ognuno 0-2, assi separati mai una media unica:
-# una grande accuratezza non deve poter compensare una pessima leggibilita', che
-# e' il difetto per cui la rubrica a punteggio unico non basta.
+# I criteri della leggibilità, ognuno 0-2, assi separati mai una media unica:
+# una grande accuratezza non deve poter compensare una pessima leggibilità, che
+# è il difetto per cui la rubrica a punteggio unico non basta.
 CRITERIA = (
     "comprehension",
     "focus",
@@ -127,8 +127,8 @@ COLUMNS = [
     "level",
     "at",
     "reviewed_at",
-    # L'impronta della prosa su cui questa lettura e' un'affermazione. Tutto il
-    # resto e' informativo, questo e' il campo su cui la coda fa il join.
+    # L'impronta della prosa su cui questa lettura è un'affermazione. Tutto il
+    # resto è informativo, questo è il campo su cui la coda fa il join.
     "prosa",
     "verdict",
     *CRITERIA,
@@ -142,12 +142,12 @@ COLUMNS = [
 ]
 
 # Dopo quante versioni distinte della prosa, ognuna bocciata, un codice si
-# parcheggia: e' il tetto ai round di riscrittura-per-leggibilita' del produttore,
+# parcheggia: è il tetto ai round di riscrittura-per-leggibilità del produttore,
 # non ai fatti. Tre tentativi prima di fermare il loop.
 READABILITY_ROUNDS = 3
 
 # I fallimenti duri ammessi, gli stessi sette di `.claude/agents/reader-editor.md`.
-# Un vocabolario chiuso e non testo libero perche' queste stringhe non sono prosa:
+# Un vocabolario chiuso e non testo libero perché queste stringhe non sono prosa:
 # `review_queue` e il lanciatore le uniscono in una riga per il produttore, e una
 # classe inventata da una run non vorrebbe dire niente per chi la legge dopo.
 HARD_FAILURES = (
@@ -162,8 +162,8 @@ HARD_FAILURES = (
 
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
-# I tre sostanziali, non i quattro ruoli. `definizione` e' la sola omettibile,
-# perche' il blocco "Come leggere il dato" la copre, ed e' la regola che
+# I tre sostanziali, non i quattro ruoli. `definizione` è la sola omettibile,
+# perché il blocco "Come leggere il dato" la copre, ed è la regola che
 # `app.indicator_texts.SUBSTANTIVE_ROLES` possiede e che questo modulo
 # rispecchia (stdlib puro, non importa `app`). Pretendendone quattro, questa
 # coda dichiarava incompleto ogni articolo della macchina nuova, che la
@@ -205,7 +205,7 @@ def write_reading(row: dict, root=None) -> Path:
     """Registra una lettura. Ritorna il file scritto.
 
     Una per volta e non una lista, come le verifiche: il reader-editor ne produce
-    una per articolo, e una funzione che riscrive tutto il registro e' il modo in
+    una per articolo, e una funzione che riscrive tutto il registro è il modo in
     cui un registro append-only smette di esserlo per sbaglio.
     """
     target = Path(root or READINGS_DIR)
@@ -220,7 +220,7 @@ def write_reading(row: dict, root=None) -> Path:
 
 
 def _score(value):
-    """Un criterio 0-2, o None quando la cella non e' un intero in quell'intervallo."""
+    """Un criterio 0-2, o None quando la cella non è un intero in quell'intervallo."""
     text = str(value).strip()
     if not text.lstrip("-").isdigit():
         return None
@@ -229,16 +229,16 @@ def _score(value):
 
 
 def _text(value) -> str:
-    """Una cella di testo, o stringa vuota se non e' testo."""
+    """Una cella di testo, o stringa vuota se non è testo."""
     return value.strip() if isinstance(value, str) else ""
 
 
 def _low_scores(row: dict) -> list:
-    """I criteri che questa lettura ha messo sotto il massimo, dal piu' basso.
+    """I criteri che questa lettura ha messo sotto il massimo, dal più basso.
 
     Sono l'indirizzo della bocciatura: `structure` a 0 e `cognitive_load` a 1
     dicono al produttore che deve rifare l'ordine e alleggerire i periodi, non
-    cambiare lessico. Un criterio a 2 non e' un problema e non entra.
+    cambiare lessico. Un criterio a 2 non è un problema e non entra.
     """
     scored = [(name, _score(row.get(name))) for name in CRITERIA]
     return [(name, value) for name, value in sorted(
@@ -250,10 +250,10 @@ def _hard_failures(row: dict) -> list:
     """I fallimenti duri di una riga, sempre come lista di stringhe.
 
     Difensivo di proposito: il cancello rifiuta una scheggia storta, ma questa
-    funzione gira anche su cio' che e' gia' fuso, e cio' che ne esce finisce in
-    `", ".join(...)` nel lanciatore e in `review_queue`. Un elemento che non e'
-    una stringa (`[["numeric_overload"]]`, la lista annidata piu' facile da
-    scrivere a mano) alzerebbe li' un TypeError, cioe' fermerebbe coda,
+    funzione gira anche su ciò che è già fuso, e ciò che ne esce finisce in
+    `", ".join(...)` nel lanciatore e in `review_queue`. Un elemento che non è
+    una stringa (`[["numeric_overload"]]`, la lista annidata più facile da
+    scrivere a mano) alzerebbe lì un TypeError, cioè fermerebbe coda,
     lanciatore e coda del revisore per il catalogo intero. Meglio perdere un
     elemento illeggibile che la catena.
     """
@@ -266,12 +266,12 @@ def _hard_failures(row: dict) -> list:
 
 
 def row_problems(row: dict) -> list[str]:
-    """Perche' una lettura non e' credibile, se non lo e'.
+    """Perché una lettura non è credibile, se non lo è.
 
     Lo strict per lo store, sul modello di `verification_queue.row_problems`. Il
     verdetto e i criteri devono essere coerenti: un `pass` con un fallimento duro,
     o un `revise` senza un solo criterio sotto il massimo e senza fallimenti duri,
-    e' una contraddizione, esattamente come `esito=pulito` con smentite.
+    è una contraddizione, esattamente come `esito=pulito` con smentite.
     """
     problems = []
     if not (row.get("code") or "").strip():
@@ -298,18 +298,18 @@ def row_problems(row: dict) -> list[str]:
     if verdict == "pass" and failures:
         problems.append(f"verdetto 'pass' con fallimenti duri: {failures}")
     if verdict == "revise" and not below_max and not failures:
-        problems.append("verdetto 'revise' senza un criterio sotto il massimo ne' un fallimento duro")
-    # La nota e' il punto d'inciampo, cioe' l'unica cosa che il produttore riceve
-    # per sapere DOVE riscrivere: una bocciatura muta e' un'opinione, e rimette la
+        problems.append("verdetto 'revise' senza un criterio sotto il massimo né un fallimento duro")
+    # La nota è il punto d'inciampo, cioè l'unica cosa che il produttore riceve
+    # per sapere DOVE riscrivere: una bocciatura muta è un'opinione, e rimette la
     # riscrittura a indovinare. Il tipo si controlla sempre, anche su un `pass`,
-    # per un motivo che non e' formale: `build_queue` fa `.strip()` su questo
-    # campo, quindi una nota scritta come lista (`"note": ["..."]`, l'errore piu'
+    # per un motivo che non è formale: `build_queue` fa `.strip()` su questo
+    # campo, quindi una nota scritta come lista (`"note": ["..."]`, l'errore più
     # facile da fare a mano in un JSON) alzerebbe un AttributeError dopo il merge
     # e fermerebbe la coda, il lanciatore e la coda del revisore per il catalogo
     # intero.
     # I fallimenti duri sono un vocabolario chiuso, e il controllo guarda il campo
-    # **grezzo**: `_hard_failures` scarta in silenzio cio' che non e' una stringa
-    # (per non far cadere la coda su una scheggia gia' fusa), quindi un cancello
+    # **grezzo**: `_hard_failures` scarta in silenzio ciò che non è una stringa
+    # (per non far cadere la coda su una scheggia già fusa), quindi un cancello
     # che leggesse solo il ripulito accetterebbe proprio la riga storta che deve
     # fermare, e la lista annidata arriverebbe intatta al `join` del lanciatore.
     raw_failures = row.get("hard_failures") or []
@@ -326,26 +326,26 @@ def row_problems(row: dict) -> list[str]:
                 + f". Ammessi: {', '.join(HARD_FAILURES)}")
     note = row.get("note", "")
     if not isinstance(note, str):
-        problems.append(f"nota che non e' una stringa: {type(note).__name__}")
+        problems.append(f"nota che non è una stringa: {type(note).__name__}")
     elif verdict == "revise" and not note.strip():
         problems.append("verdetto 'revise' senza nota: dove inciampa il lettore va scritto")
     return problems
 
 
 def _eligible(entry: dict) -> bool:
-    """Un articolo e' leggibile-da-un-lettore quando e' completo e firmato.
+    """Un articolo è leggibile-da-un-lettore quando è completo e firmato.
 
-    Completo = lead piu' i quattro ruoli con un corpo scritto; firmato =
-    `reviewed_at` valorizzato. E' vicino ma non identico a `pubblicata` di
+    Completo = lead più i quattro ruoli con un corpo scritto; firmato =
+    `reviewed_at` valorizzato. È vicino ma non identico a `pubblicata` di
     `practice_timeline`: quello pretende anche la verifica (`verificatore` fra i
-    `required_stages`), questo no. La differenza e' voluta e utile: un articolo
-    firmato ma non ancora verificato si puo' gia' leggere, ed e' proprio l'ordine
-    che l'hint del lanciatore vuole (leggere prima di verificare, cosi' una
-    bocciatura non spreca una verifica su un testo che verra' riscritto). Letto
+    `required_stages`), questo no. La differenza è voluta e utile: un articolo
+    firmato ma non ancora verificato si può già leggere, ed è proprio l'ordine
+    che l'hint del lanciatore vuole (leggere prima di verificare, così una
+    bocciatura non spreca una verifica su un testo che verrà riscritto). Letto
     dai soli testi per tenere questo modulo indipendente dalla macchina a stati.
 
     L'officina entra dalla seconda porta, come nella coda di verifica: non ha un
-    revisore, quindi la firma non arrivera' mai, e senza questa riga il reader
+    revisore, quindi la firma non arriverà mai, e senza questa riga il reader
     editor resterebbe in ombra su una macchina che non gli manda niente da
     leggere. Resta `soft` in entrambi i casi: accoda, non ferma un merge.
     """
@@ -366,12 +366,12 @@ def load_texts(root=None) -> dict:
 def build_queue(texts=None, readings=None) -> list[dict]:
     """Una riga per articolo pubblicato: il suo stato di lettura contro la prosa di adesso.
 
-    `status` e' uno di:
+    `status` è uno di:
       `unread`  nessuna lettura copre la prosa corrente -> tocca al reader-editor;
-      `revise`  la lettura corrente boccia, e il codice non e' parcheggiato -> tocca
-                al produttore (riscrittura per leggibilita');
+      `revise`  la lettura corrente boccia, e il codice non è parcheggiato -> tocca
+                al produttore (riscrittura per leggibilità);
       `parked`  la lettura corrente boccia ma `READABILITY_ROUNDS` versioni sono
-                gia' state bocciate -> il freno morde, non si lancia niente;
+                già state bocciate -> il freno morde, non si lancia niente;
       `clean`   la lettura corrente promuove -> niente da fare.
     """
     texts = texts if texts is not None else load_texts()
@@ -412,16 +412,16 @@ def build_queue(texts=None, readings=None) -> list[dict]:
             "status": status,
             "verdict": (match.get("verdict") or "").strip() if match else "",
             "hard_failures": _hard_failures(match) if match else [],
-            # Il punto d'inciampo e i criteri caduti, non solo che l'articolo e'
-            # caduto. La riga e' cio' che il lanciatore trasforma in un lancio del
+            # Il punto d'inciampo e i criteri caduti, non solo che l'articolo è
+            # caduto. La riga è ciò che il lanciatore trasforma in un lancio del
             # produttore, e senza queste due voci la riscrittura parte cieca: il
-            # produttore sa di essere stato bocciato e non sa dove, quindi puo'
-            # riscrivere l'altra meta' dell'articolo e farsi bocciare di nuovo
-            # finche' il freno non parcheggia il codice. Il reader-editor la nota
-            # la scrive gia' (`note`, obbligatoria su un `revise`), e buttarla via
-            # qui era il modo piu' caro di non leggerla.
+            # produttore sa di essere stato bocciato e non sa dove, quindi può
+            # riscrivere l'altra metà dell'articolo e farsi bocciare di nuovo
+            # finché il freno non parcheggia il codice. Il reader-editor la nota
+            # la scrive già (`note`, obbligatoria su un `revise`), e buttarla via
+            # qui era il modo più caro di non leggerla.
             # `_text` e non `.strip()` diretto: il cancello rifiuta una nota che
-            # non e' una stringa, ma questa coda gira anche su cio' che e' gia'
+            # non è una stringa, ma questa coda gira anche su ciò che è già
             # fuso e non deve poter morire su una scheggia storta.
             "note": _text(match.get("note")) if match else "",
             "low_scores": _low_scores(match) if match else [],
@@ -444,10 +444,10 @@ def open_revisions(texts=None, readings=None) -> dict:
     """{(codice, livello): riga} per gli articoli che una lettura corrente boccia
     e non sono parcheggiati.
 
-    E' la sorgente del flag `leggibilita` di `review_queue`, l'analogo di
+    È la sorgente del flag `leggibilita` di `review_queue`, l'analogo di
     `verification_queue.open_refutations` per l'altro critico: solo lo stato
-    `revise` (impronta corrente, sotto il tetto del freno), mai `parked`, cosi'
-    un articolo che non converge smette di tornare al produttore per leggibilita'
+    `revise` (impronta corrente, sotto il tetto del freno), mai `parked`, così
+    un articolo che non converge smette di tornare al produttore per leggibilità
     invece di restare in cima alla sua coda per sempre.
     """
     rows = build_queue(texts, readings)

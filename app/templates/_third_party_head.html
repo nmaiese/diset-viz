@@ -9,7 +9,7 @@
 {% endif %}
 
 {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
-{# Identita' Supabase pubbliche (Auth Google + Realtime). Solo se configurate:
+{# Identità Supabase pubbliche (Auth Google + Realtime). Solo se configurate:
    assenti, il gioco resta anonimo e la console non si abbona a nulla. #}
 <script>window.__supabase = {url: {{ SUPABASE_URL | tojson }}, anonKey: {{ SUPABASE_ANON_KEY | tojson }}};</script>
 {% endif %}

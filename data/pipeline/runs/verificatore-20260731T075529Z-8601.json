@@ -5,7 +5,7 @@
  "claude_code_version": "2.1.220 (Claude Code)",
  "commit": "86f5275",
  "detail": [
-  "Ranghi 2024 e 2018 ricalcolati dalla serie: Toscana 8->12 (calo di rango piu' lungo, -2,53); Umbria/Lazio ordine invertito dal 2018 (Lazio 1 Umbria 3 nel 2018). Medie: 2018->2022 -1,40, 2022->2024 -3,70, divario 19,76->19,85 (0,09). Quattro regioni >40% (Campania 41,72 Puglia Sardegna Sicilia); salto Calabria->Campania 2,99 il piu' largo. Incrocio uscita precoce bes-02IST005-N22: Calabria #6 atlante nel 2025 (val 6,5, taglio 20,0->6,5 = 13,5 pt), #16 qui. Esterni verificati presso Istat: 66,7% Italia 2024 e 80,5% Ue27; 22,8% vs 5,3% usciti precoci per titolo dei genitori. Definizione conforme alla fonte, nessuna rottura di serie. Articolo gia' riletto (reviewed_at 2026-07-29): esito pulito."
+  "Ranghi 2024 e 2018 ricalcolati dalla serie: Toscana 8->12 (calo di rango più lungo, -2,53); Umbria/Lazio ordine invertito dal 2018 (Lazio 1 Umbria 3 nel 2018). Medie: 2018->2022 -1,40, 2022->2024 -3,70, divario 19,76->19,85 (0,09). Quattro regioni >40% (Campania 41,72 Puglia Sardegna Sicilia); salto Calabria->Campania 2,99 il più largo. Incrocio uscita precoce bes-02IST005-N22: Calabria #6 atlante nel 2025 (val 6,5, taglio 20,0->6,5 = 13,5 pt), #16 qui. Esterni verificati presso Istat: 66,7% Italia 2024 e 80,5% Ue27; 22,8% vs 5,3% usciti precoci per titolo dei genitori. Definizione conforme alla fonte, nessuna rottura di serie. Articolo già riletto (reviewed_at 2026-07-29): esito pulito."
  ],
  "gate": "auto",
  "outcome": "pr-open",

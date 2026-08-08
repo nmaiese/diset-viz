@@ -12,32 +12,32 @@ Due modi, un solo contratto di misura:
     python3 scripts/baseline_tokens.py --since 2026-07-31 --articles 19
     python3 scripts/baseline_tokens.py --workflow wf_15ac7ba3-209 --articles 2
 
-## Il contratto di misura, e perche' serve scritto
+## Il contratto di misura, e perché serve scritto
 
-Tre trappole, tutte trovate misurando la prima run del workflow nuovo. Finche'
+Tre trappole, tutte trovate misurando la prima run del workflow nuovo. Finché
 la catena vecchia e quella nuova non passano dallo stesso codice, nessun
-bersaglio di costo e' aggiudicabile: si confrontano denominatori diversi.
+bersaglio di costo è aggiudicabile: si confrontano denominatori diversi.
 
 **Uno: il trascritto scrive due record per richiesta.** Un parziale e un
 finale, con lo stesso `requestId` e un `usage` sovrapposto. Sommandoli si conta
 due volte: sulla prima run faceva 406 turni invece di 224 e 26,1 milioni di
 lettura cache invece di 14,9. Fattore 1,75. Qui si tiene **un record per
-`requestId`**, il piu' completo.
+`requestId`**, il più completo.
 
 **Due: `usage` non conta i subagent.** La documentazione lo dice: *"the `usage`
-field undercounts as soon as nesting occurs"*. Per questo l'attribuzione e' per
+field undercounts as soon as nesting occurs"*. Per questo l'attribuzione è per
 file di agente, non per aggregato di sessione.
 
 **Tre: le chiamate all'advisor non compaiono da nessuna parte.** Stanno in
 `usage.iterations` con `type: "advisor_message"`, e l'aggregato di primo
 livello **le esclude**: un turno con aggregato `input_tokens: 4` portava
 un'iterazione advisor da 71.870 token di input non in cache. Sulla prima run
-erano 9 chiamate, 740 mila token di input e 75 mila di output, cioe' **il 35%
+erano 9 chiamate, 740 mila token di input e 75 mila di output, cioè **il 35%
 del costo del workflow**, invisibile in ogni contatore.
 
-Il consumo si riporta spaccato, perche' i pezzi non costano uguale: input non
+Il consumo si riporta spaccato, perché i pezzi non costano uguale: input non
 in cache, scrittura di cache, lettura di cache (un decimo), output. La voce che
-domina non e' quella che si crede.
+domina non è quella che si crede.
 
 Stdlib pura, sola lettura, non tocca il repo.
 """
@@ -58,11 +58,11 @@ RUN_ID = re.compile(
     r"hunter|promoter|launch|reader-editor)-\d{8}T\d{6}Z-[0-9a-f]{4}\b"
 )
 
-# La coda di un `run_id`, per staccarne il ruolo. Era `split("-2026")`, cioe' un
+# La coda di un `run_id`, per staccarne il ruolo. Era `split("-2026")`, cioè un
 # anno di calendario scritto dentro il codice: dal primo gennaio 2027 quello
-# split non taglia piu' niente, nessun ruolo combacia con `WRITING`, e il
-# rapporto dichiara zero sessioni che producono prosa senza dire perche'. Un
-# guasto che aspetta una data e' peggio di uno che si vede: qui la data e' una
+# split non taglia più niente, nessun ruolo combacia con `WRITING`, e il
+# rapporto dichiara zero sessioni che producono prosa senza dire perché. Un
+# guasto che aspetta una data è peggio di uno che si vede: qui la data è una
 # forma, non un valore.
 CODA_DEL_RUN_ID = re.compile(r"-\d{8}T\d{6}Z-[0-9a-f]{4}$")
 
@@ -72,27 +72,27 @@ def role_of(run_id: str) -> str:
     return CODA_DEL_RUN_ID.sub("", run_id)
 
 
-# I ruoli che producono prosa. **Elencati per inclusione, e non e' uno stile.**
+# I ruoli che producono prosa. **Elencati per inclusione, e non è uno stile.**
 #
 # La lista era per esclusione, e una lista per esclusione mente per omissione:
 # `verificatore`, `reader-editor` e `launch` non c'erano, quindi una sessione
 # che conteneva solo un giro di verifica finiva sotto "SESSIONI CHE PRODUCONO
 # PROSA" con tutti i suoi token dentro il costo per articolo. I tre critici non
-# scrivono una riga, e il confronto fra la catena vecchia e l'officina, che e'
+# scrivono una riga, e il confronto fra la catena vecchia e l'officina, che è
 # l'unica cosa che questo script serve a fare, ne usciva gonfiato dalla parte
 # sbagliata.
 #
-# Per inclusione, un ruolo nuovo resta fuori dal costo finche' qualcuno non lo
+# Per inclusione, un ruolo nuovo resta fuori dal costo finché qualcuno non lo
 # mette dentro apposta. Sono le chiavi di `pipeline_launch.ROLE_OF_STAGE` il cui
-# valore e' `producer`, piu' `producer` stesso: ricopiate e non importate,
-# perche' questo modulo e' stdlib pura (vedi il docstring). Un test tiene le due
+# valore è `producer`, più `producer` stesso: ricopiate e non importate,
+# perché questo modulo è stdlib pura (vedi il docstring). Un test tiene le due
 # liste allineate.
 #
-# `curator` e' uscito quando il vecchio stadio e' stato instradato all'ammissione
+# `curator` è uscito quando il vecchio stadio è stato instradato all'ammissione
 # invece che al produttore: curare vuol dire decidere verso e categoria e
-# scriverli nel manifest, non scrivere prosa. Finche' era qui, le run di
+# scriverli nel manifest, non scrivere prosa. Finché era qui, le run di
 # curazione entravano nel costo per articolo e lo gonfiavano dalla parte
-# sbagliata, che e' lo stesso difetto che questa lista per inclusione esiste per
+# sbagliata, che è lo stesso difetto che questa lista per inclusione esiste per
 # impedire.
 WRITING = ("producer", "writer", "reviewer")
 
@@ -129,10 +129,10 @@ def _from_usage(usage: dict) -> dict:
 def split_usage(usage: dict) -> tuple[dict, dict]:
     """(modello, advisor) da un `usage`, senza doppioni e senza buchi.
 
-    Quando `iterations` c'e', l'aggregato di primo livello somma **solo** le
+    Quando `iterations` c'è, l'aggregato di primo livello somma **solo** le
     iterazioni di tipo `message`: le `advisor_message` restano fuori da input e
-    output, e vanno raccolte a parte o si perdono. Quando non c'e', l'aggregato
-    e' tutto cio' che esiste.
+    output, e vanno raccolte a parte o si perdono. Quando non c'è, l'aggregato
+    è tutto ciò che esiste.
     """
     iterations = usage.get("iterations")
     if not iterations:
@@ -144,11 +144,11 @@ def split_usage(usage: dict) -> tuple[dict, dict]:
 
 
 def turns(path: str) -> list[dict]:
-    """Un record per `requestId`, il piu' completo, in ordine di comparsa.
+    """Un record per `requestId`, il più completo, in ordine di comparsa.
 
     Il parziale e il finale della stessa richiesta portano lo stesso `usage`
-    ma solo il finale porta `iterations`: si tiene quello che pesa di piu',
-    che e' anche quello che vede l'advisor.
+    ma solo il finale porta `iterations`: si tiene quello che pesa di più,
+    che è anche quello che vede l'advisor.
     """
     best: dict[str, dict] = {}
     with open(path, errors="replace") as handle:
@@ -188,17 +188,17 @@ def tool_calls(record: dict) -> list[str]:
 def find_workflow(name: str) -> list[str]:
     """**Tutte** le cartelle dei trascritti di una run, dal suo id o da un percorso.
 
-    Plurale, e non e' pedanteria. Una run **ripresa** (`resumeFromRunId`) tiene
+    Plurale, e non è pedanteria. Una run **ripresa** (`resumeFromRunId`) tiene
     lo stesso `run_id` ma scrive nella cartella della sessione nuova, quindi lo
     stesso identificatore esiste sotto due sessioni: gli agenti replicati da
-    cache stanno di qua, quelli rigirati di la'. Questa funzione restituiva il
-    **primo** che trovava, cioe' misurava meta' run e lo diceva con la stessa
+    cache stanno di qua, quelli rigirati di là. Questa funzione restituiva il
+    **primo** che trovava, cioè misurava metà run e lo diceva con la stessa
     faccia con cui dice un totale: su una ripresa vera ha stampato 3 agenti,
     4 turni e $0,24 al posto di 7 agenti e ~$2.
 
-    E' lo stesso difetto che questo file esiste per chiudere, un piano piu' in
-    basso: un numero che sembra un totale e non lo e'. Il contratto di misura
-    e' uno solo, quindi qui si sommano tutte le cartelle e non se ne sceglie
+    È lo stesso difetto che questo file esiste per chiudere, un piano più in
+    basso: un numero che sembra un totale e non lo è. Il contratto di misura
+    è uno solo, quindi qui si sommano tutte le cartelle e non se ne sceglie
     una.
     """
     if os.path.isdir(name):
@@ -262,8 +262,8 @@ def read_agents(directory: str) -> list[dict]:
 def report_workflow(directories, articles: int) -> None:
     if isinstance(directories, str):
         directories = [directories]
-    # Una run ripresa vive in due cartelle e un agente puo' comparire in
-    # entrambe (replicato da cache di la', rigirato di qua): si tiene una volta
+    # Una run ripresa vive in due cartelle e un agente può comparire in
+    # entrambe (replicato da cache di là, rigirato di qua): si tiene una volta
     # sola, per nome di file, altrimenti il totale conta due volte proprio i
     # turni che la ripresa non ha pagato.
     agents, visti = [], set()

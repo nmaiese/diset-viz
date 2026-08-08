@@ -2,10 +2,10 @@
 
 Lo scout fondeva a mano fino a oggi, e il motivo era buono: una fonte decide
 quale istituzione e quale licenza compaiono su una pagina pubblica. Adesso fonde
-da solo, quindi quel controllo deve esistere da qualche altra parte, ed e' qui.
-La CI e' l'unica cosa fra il giudizio dello scout e il sito.
+da solo, quindi quel controllo deve esistere da qualche altra parte, ed è qui.
+La CI è l'unica cosa fra il giudizio dello scout e il sito.
 
-Che cosa puo' andare storto davvero, in ordine di quanto e' silenzioso:
+Che cosa può andare storto davvero, in ordine di quanto è silenzioso:
 
 1. **Un tema che nessuno ha mappato.** L'indicatore resta in catalogo e sparisce
    da ogni totale per macro-area. Nessun errore, nessuna pagina rotta, solo un
@@ -16,7 +16,7 @@ Che cosa puo' andare storto davvero, in ordine di quanto e' silenzioso:
 3. **Una riga che non si scarica.** Prima uccideva l'intera scansione del
    cacciatore, per sempre, con un traceback che nessuno leggeva.
 
-Il primo e il secondo si vedono senza rete e stanno qui. Il terzo e' un problema
+Il primo e il secondo si vedono senza rete e stanno qui. Il terzo è un problema
 di robustezza e sta nella classe in fondo.
 """
 
@@ -34,14 +34,14 @@ def config_rows():
 
 
 class EveryAdmittedSeriesIsUsable(unittest.TestCase):
-    """Gira su `config/istat_series.yaml` committato, cioe' su quello che lo
+    """Gira su `config/istat_series.yaml` committato, cioè su quello che lo
     scout ha scritto davvero."""
 
     def setUp(self):
         self.rows = config_rows()
 
     def test_there_is_something_to_check(self):
-        self.assertTrue(self.rows, "config/istat_series.yaml e' vuoto")
+        self.assertTrue(self.rows, "config/istat_series.yaml è vuoto")
 
     def test_no_required_field_is_missing(self):
         for row in self.rows:
@@ -78,17 +78,17 @@ class EveryAdmittedSeriesIsUsable(unittest.TestCase):
             self.assertIn(
                 slug, taxonomy.CANONICAL_CATEGORIES,
                 f"la serie {row.get('id')} propone una categoria che non esiste: '{slug}'. "
-                "Inventare una categoria non e' una riga di CSV, e' una sezione del sito.",
+                "Inventare una categoria non è una riga di CSV, è una sezione del sito.",
             )
 
     def test_the_theme_resolves_to_a_category(self):
-        """Il fallimento piu' silenzioso di tutti: un tema non mappato non rompe
+        """Il fallimento più silenzioso di tutti: un tema non mappato non rompe
         niente, toglie solo l'indicatore da ogni totale per macro-area."""
         for row in self.rows:
             theme = str(row.get("theme", "")).strip()
             self.assertIn(
                 theme, taxonomy.SOURCE_THEME_TO_CATEGORY,
-                f"il tema '{theme}' della serie {row.get('id')} non e' mappato. "
+                f"il tema '{theme}' della serie {row.get('id')} non è mappato. "
                 "Si aggiunge una riga a config/theme_categories.csv, non si tocca il codice.",
             )
 
@@ -97,7 +97,7 @@ class EveryAdmittedSeriesIsUsable(unittest.TestCase):
             decimals = row.get("decimals", 1)
             self.assertIsInstance(
                 decimals, int,
-                f"la serie {row.get('id')} dichiara decimals={decimals!r}, che non e' un intero",
+                f"la serie {row.get('id')} dichiara decimals={decimals!r}, che non è un intero",
             )
 
 

@@ -2,7 +2,7 @@
 
 Nucleo puro: ogni test costruisce un dossier sintetico (la forma di
 `practice_timeline.reconstruct`) e code finte, senza toccare il disco. Coniare i
-run_id e' iniettato, cosi' l'uscita e' deterministica."""
+run_id è iniettato, così l'uscita è deterministica."""
 
 import unittest
 
@@ -23,14 +23,14 @@ def practice(code, *, state="in-lavorazione", flags=None, completed=(),
 
 
 def _mint(role):
-    # Deterministico: nessun timestamp, cosi' il test confronta stringhe fisse.
+    # Deterministico: nessun timestamp, così il test confronta stringhe fisse.
     return f"{role}-RUNID"
 
 
 class PlanLaunches(unittest.TestCase):
     def test_a_writer_ready_indicator_is_one_producer_launch(self):
-        """Il ruolo resta, il bersaglio no: scrivere un articolo e' passato
-        all'officina, e `.claude/agents/producer.md` non esiste piu'.
+        """Il ruolo resta, il bersaglio no: scrivere un articolo è passato
+        all'officina, e `.claude/agents/producer.md` non esiste più.
 
         Un piano che continuasse a nominarlo sarebbe un puntatore morto che
         qualcuno lancia una volta sola, scoprendo il guasto quando la run muore.
@@ -50,10 +50,10 @@ class PlanLaunches(unittest.TestCase):
 
         Il lanciatore coniava `producer-<istante>-<hex>` e
         `pipeline_log.build_entry("producer", ...)` lo avrebbe rifiutato con
-        `SystemExit`: `producer` non e' in `STAGES` (che deriva da
-        `pipeline_gate.STAGE_PATHS`, dove l'officina non compare perche' non ha
+        `SystemExit`: `producer` non è in `STAGES` (che deriva da
+        `pipeline_gate.STAGE_PATHS`, dove l'officina non compare perché non ha
         un perimetro nel cancello). Era un identificativo che il piano prometteva
-        e il diario non accetta. Non rompeva niente solo perche' nessuno lo
+        e il diario non accetta. Non rompeva niente solo perché nessuno lo
         leggeva.
 
         La chiave dev'essere **assente**, non vuota: un consumatore futuro deve
@@ -65,17 +65,17 @@ class PlanLaunches(unittest.TestCase):
         self.assertNotIn("run_id", plan[0])
 
     def test_the_command_carries_the_public_code_not_the_store_key(self):
-        """Il piano ragiona in chiavi, l'officina in codici URL, e il comando e'
+        """Il piano ragiona in chiavi, l'officina in codici URL, e il comando è
         il punto in cui i due vocabolari si incontrano.
 
         Il dossier e le code nominano un indicatore con la chiave dello store
         (`176`, `dem:DEPENDRATE`, `bes:10AMB004`); `officina.pacchetti` risponde
         "nessun indicatore per" a quella forma, e `officina.pubblica.chiave`
-        solleva. Il piano scriveva percio' comandi che non partivano, e non se ne
-        accorgeva nessuno perche' il comando lo esegue chi legge il piano.
+        solleva. Il piano scriveva perciò comandi che non partivano, e non se ne
+        accorgeva nessuno perché il comando lo esegue chi legge il piano.
 
         Il difetto era invisibile anche qui: le fixture di questo file usavano
-        `ter-5`, che e' **gia'** un codice pubblico, quindi la conversione
+        `ter-5`, che è **già** un codice pubblico, quindi la conversione
         mancante non cambiava niente. Le tre forme sotto sono quelle vere.
         """
         for chiave, atteso in (("176", "ter-176"),
@@ -85,13 +85,13 @@ class PlanLaunches(unittest.TestCase):
             with self.subTest(chiave=chiave):
                 comando = pipeline_launch.target("producer", chiave)["comando"]
                 self.assertIn(f'args: ["{atteso}"]', comando)
-                # E il giro torna: il codice che il comando scrive e' quello che
+                # E il giro torna: il codice che il comando scrive è quello che
                 # `officina.pubblica` sa riportare alla chiave di partenza.
                 self.assertEqual(verification_queue.code_of(chiave), atteso)
 
     def test_a_readability_revise_is_launchable_too(self):
         """La stessa conversione sul percorso che ci arriva da `reading_queue`,
-        che e' quello segnalato in revisione: una bocciatura di leggibilita'
+        che è quello segnalato in revisione: una bocciatura di leggibilità
         produceva un comando che non pubblicava niente."""
         letture = [{"status": "revise", "key": "bes:10AMB004",
                     "code": "bes-10AMB004", "level": "regione", "rounds": 1}]
@@ -107,8 +107,8 @@ class PlanLaunches(unittest.TestCase):
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint)
         self.assertEqual(len(plan), 1)
         self.assertEqual(plan[0]["role"], "verificatore")
-        # Il ruolo **e'** l'agente: non c'e' piu' una mappa da tradurre, e
-        # questa asserzione e' cio' che se ne accorgerebbe se tornasse.
+        # Il ruolo **è** l'agente: non c'è più una mappa da tradurre, e
+        # questa asserzione è ciò che se ne accorgerebbe se tornasse.
         self.assertEqual(plan[0]["agent"], "verificatore")
         self.assertEqual(plan[0]["indicator"], "ter-9")
 
@@ -141,7 +141,7 @@ class PlanLaunches(unittest.TestCase):
                                                        "promoter": 0}, mint=_mint)
         # smentita (100) prima, poi il produttore fresco (5), poi l'ammissione (0).
         self.assertEqual(plan[0]["indicator"], "ter-1")
-        self.assertEqual(plan[0]["role"], "producer")   # il reviewer e' fuso nel produttore
+        self.assertEqual(plan[0]["role"], "producer")   # il reviewer è fuso nel produttore
         self.assertEqual(plan[-1]["role"], "admissions")
         self.assertEqual([item["priority"] for item in plan], [100.0, 5.0, 0.0])
 
@@ -153,7 +153,7 @@ class PlanLaunches(unittest.TestCase):
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint)
         self.assertEqual(len(plan), 2)
         self.assertEqual({item["indicator"] for item in plan}, {"ter-3", "ter-4"})
-        # ordinati per priorita' decrescente
+        # ordinati per priorità decrescente
         self.assertEqual([item["indicator"] for item in plan], ["ter-4", "ter-3"])
 
     def test_blocked_and_terminal_practices_are_not_launched(self):
@@ -174,7 +174,7 @@ class PlanLaunches(unittest.TestCase):
                                                        "promoter": 0}, mint=_mint)
         self.assertEqual(len(plan), 1)
         self.assertEqual(plan[0]["role"], "admissions")
-        # la priorita' della batch e' quella della proposta piu' urgente
+        # la priorità della batch è quella della proposta più urgente
         self.assertEqual(plan[0]["priority"], 12.0)
 
     def test_nothing_ready_is_an_empty_plan(self):
@@ -211,13 +211,13 @@ class ReadingsFeedTheLauncher(unittest.TestCase):
         self.assertEqual(len(plan), 1)
         self.assertEqual(plan[0]["role"], "producer")
         self.assertEqual(plan[0]["indicator"], "eur:rd_p_persreg")
-        self.assertIn("leggibilita", plan[0]["reason"])
+        self.assertIn("leggibilità", plan[0]["reason"])
         self.assertIn("fallimenti duri: numeric_overload", plan[0]["reason"])
 
     def test_the_rewrite_carries_where_the_reader_stumbled(self):
-        """Il motivo del lancio e' l'unica cosa che il produttore riceve, quindi
+        """Il motivo del lancio è l'unica cosa che il produttore riceve, quindi
         se non porta l'indirizzo della bocciatura la riscrittura parte cieca e si
-        fa bocciare di nuovo finche' il freno non parcheggia il codice."""
+        fa bocciare di nuovo finché il freno non parcheggia il codice."""
         readings = [_reading("eur:rd_p_persreg", "revise", code="eur-rd_p_persreg",
                              note="la meccanica FTE apre la narrazione, spostala fuori dal corpo",
                              low_scores=[("structure", 0), ("cognitive_load", 1)])]
@@ -239,8 +239,8 @@ class ReadingsFeedTheLauncher(unittest.TestCase):
         self.assertEqual(plan, [])
 
     def test_a_revise_does_not_double_launch_a_producer_already_ready(self):
-        # ter-5 e' gia' pronto per il produttore da ready_stage (curata, da scrivere)
-        # E anche bocciato per leggibilita'. Un solo produttore, non due.
+        # ter-5 è già pronto per il produttore da ready_stage (curata, da scrivere)
+        # E anche bocciato per leggibilità. Un solo produttore, non due.
         dossier = {"ter-5": practice("ter-5", completed=["curator"], priority=7.0)}
         readings = [_reading("ter-5", "revise")]
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
@@ -249,7 +249,7 @@ class ReadingsFeedTheLauncher(unittest.TestCase):
 
     def test_an_article_about_to_be_rewritten_is_not_read(self):
         # ter-5 in produzione (ready_stage) e anche unread: non lo si legge ora,
-        # l'impronta cambiera' e la lettura scadrebbe subito.
+        # l'impronta cambierà e la lettura scadrebbe subito.
         dossier = {"ter-5": practice("ter-5", completed=["curator"], priority=7.0)}
         readings = [_reading("ter-5", "unread")]
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
@@ -266,11 +266,11 @@ class ReadingsFeedTheLauncher(unittest.TestCase):
         readings = [_reading("ter-9", "unread")]
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
         self.assertEqual([p["role"] for p in plan], ["reader-editor"])
-        # e non scende nel piano per essere stato dedotto: tiene la priorita' alta
+        # e non scende nel piano per essere stato dedotto: tiene la priorità alta
         self.assertEqual(plan[0]["priority"], 15.0)
 
     def test_the_deferred_role_comes_back_once_the_reading_exists(self):
-        """Scartare non e' perdere: il piano si ricalcola a ogni tick."""
+        """Scartare non è perdere: il piano si ricalcola a ogni tick."""
         dossier = {"ter-9": practice("ter-9",
                                      completed=["curator", "writer", "reviewer"],
                                      priority=15.0)}
@@ -279,12 +279,12 @@ class ReadingsFeedTheLauncher(unittest.TestCase):
         self.assertEqual([p["role"] for p in plan], ["verificatore"])
 
     def test_the_reader_editor_sorts_before_the_verificatore_on_a_tie(self):
-        # Stesso indicatore, stessa priorita': leggere prima, per non sprecare la
-        # verifica su un testo che una bocciatura fara' riscrivere.
+        # Stesso indicatore, stessa priorità: leggere prima, per non sprecare la
+        # verifica su un testo che una bocciatura farà riscrivere.
         dossier = {"ter-9": practice("ter-9",
                                      completed=["curator", "writer", "reviewer"],
                                      priority=0.0)}
-        readings = [_reading("dem:POP014", "unread")]  # priorita' 0.0, non nel dossier
+        readings = [_reading("dem:POP014", "unread")]  # priorità 0.0, non nel dossier
         plan = pipeline_launch.plan_launches(dossier, {}, mint=_mint, readings=readings)
         roles = [p["role"] for p in plan]
         self.assertLess(roles.index("reader-editor"), roles.index("verificatore"))
@@ -292,11 +292,11 @@ class ReadingsFeedTheLauncher(unittest.TestCase):
 
 class TheParallelismCap(unittest.TestCase):
     """Il cap di parallelismo: un tick lancia al massimo tre ruoli, e taglia i
-    meno prioritari, non i piu'. Nasce dalla richiesta di non far partire dieci
+    meno prioritari, non i più. Nasce dalla richiesta di non far partire dieci
     subagent insieme."""
 
     def _plan(self, n):
-        # gia' ordinato per priorita' decrescente, come load_plan restituisce
+        # già ordinato per priorità decrescente, come load_plan restituisce
         return [{"role": "producer", "indicator": f"ter-{i}", "priority": 100 - i}
                 for i in range(n)]
 
@@ -308,7 +308,7 @@ class TheParallelismCap(unittest.TestCase):
         plan = self._plan(10)
         shown = pipeline_launch.cap_for_tick(plan)
         self.assertEqual(shown, plan[:3])
-        self.assertEqual(shown[0]["indicator"], "ter-0")  # priorita' piu' alta
+        self.assertEqual(shown[0]["indicator"], "ter-0")  # priorità più alta
 
     def test_fewer_than_the_cap_passes_all_through(self):
         self.assertEqual(len(pipeline_launch.cap_for_tick(self._plan(2))), 2)
@@ -322,7 +322,7 @@ class TheParallelismCap(unittest.TestCase):
 
 
 class TheReaderEditorGetsAReservedSlotButDoesNotPreempt(unittest.TestCase):
-    """Le letture ereditano la priorita' alta di un articolo pubblicato: senza
+    """Le letture ereditano la priorità alta di un articolo pubblicato: senza
     riserva monopolizzerebbero il tick e fermerebbero il lavoro fattuale. La
     riserva le tiene a una voce a tick, e gli altri due slot al resto."""
 
@@ -337,7 +337,7 @@ class TheReaderEditorGetsAReservedSlotButDoesNotPreempt(unittest.TestCase):
         return plan
 
     def test_one_reader_slot_even_when_readers_have_the_top_priority(self):
-        # Cinque letture ad alta priorita', cinque produttori: il tick porta una
+        # Cinque letture ad alta priorità, cinque produttori: il tick porta una
         # sola lettura e due produttori, non tre letture.
         tick = pipeline_launch.cap_for_tick(self._mixed(5, 5))
         self.assertEqual(sum(1 for x in tick if x["role"] == "reader-editor"), 1)
@@ -363,7 +363,7 @@ class TheReaderEditorGetsAReservedSlotButDoesNotPreempt(unittest.TestCase):
 class TheLaunchTick(unittest.TestCase):
     """Il battito del lanciatore: uno shard `launch` per tick, portato su master
     con un runner iniettato, mai un git vero. Senza questo battito una Routine a
-    vuoto e' indistinguibile da una che non e' mai partita, che e' il guasto che
+    vuoto è indistinguibile da una che non è mai partita, che è il guasto che
     il diario esiste per non avere."""
 
     def _tick(self, tmp, **kwargs):

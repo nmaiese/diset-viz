@@ -146,7 +146,7 @@ def main():
         print(f"  SERIE NON LETTA  {series_id}: {message}", file=sys.stderr)
     if FAILURES and not discovered:
         # Nessuna serie letta. Uscire con zero direbbe all'agente "scansionato,
-        # niente di nuovo", che e' la cosa piu' sbagliata da fargli credere.
+        # niente di nuovo", che è la cosa più sbagliata da fargli credere.
         raise SystemExit(f"nessuna serie leggibile da {args.source}")
 
 

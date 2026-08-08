@@ -47,23 +47,23 @@ STAGE_ORDER = ["scout", "hunter", "promoter", "curator", "writer", "reviewer",
                "verificatore"]
 
 # Il ruolo che oggi copre ogni vecchio stadio. Le code restano per (vecchio)
-# stadio, perche' i loro lettori sono deterministici e distinti; l'etichetta dice
+# stadio, perché i loro lettori sono deterministici e distinti; l'etichetta dice
 # chi le lavora adesso. La mappa **resta** anche dove ruolo e stadio hanno lo
-# stesso nome, perche' non e' un'identita': traduce il vocabolario storico delle
+# stesso nome, perché non è un'identità: traduce il vocabolario storico delle
 # code in quello dei ruoli vivi.
 #
-# **Non e' una copia della mappa del lanciatore, e' la stessa.** Lo era: due
+# **Non è una copia della mappa del lanciatore, è la stessa.** Lo era: due
 # dizionari identici in due file, e sono usciti di sincrono alla prima
-# occasione. Quando `curator` e' passato dal produttore all'ammissione (curare
-# scrive quattro file che solo l'ammissione ha nel perimetro), questa meta' e'
+# occasione. Quando `curator` è passato dal produttore all'ammissione (curare
+# scrive quattro file che solo l'ammissione ha nel perimetro), questa metà è
 # rimasta indietro, e per un commit il cruscotto annunciava come prossimo attore
 # un workflow che non sa curare e non ha il permesso di scrivere dove serve. Il
 # piano e lo stato dicevano due cose diverse sullo stesso lavoro.
 #
-# E' il difetto che questo progetto ha gia' pagato altrove, con un agente che
-# per settimane ha scritto in un file che l'app non leggeva piu': una regola
+# È il difetto che questo progetto ha già pagato altrove, con un agente che
+# per settimane ha scritto in un file che l'app non leggeva più: una regola
 # ricopiata in due posti va fuori sincrono senza che nessuno se ne accorga. Un
-# alias non puo'.
+# alias non può.
 AGENT_OF = pipeline_launch.ROLE_OF_STAGE
 
 
@@ -186,11 +186,11 @@ def reviewer_stage():
     else:
         nxt = "ogni articolo e stato letto contro i dati correnti"
     return {
-        # `None`, mai `0`. La coda del revisore e' l'unica che serve il venv
-        # dell'app per essere contata, e riportare zero quando la risposta e'
+        # `None`, mai `0`. La coda del revisore è l'unica che serve il venv
+        # dell'app per essere contata, e riportare zero quando la risposta è
         # "non lo so" rende le due indistinguibili: un orchestratore che legge
         # `next_stage` salterebbe il revisore per sempre su un checkout senza
-        # venv, in silenzio. E' lo stesso difetto del diario che non vedeva la
+        # venv, in silenzio. È lo stesso difetto del diario che non vedeva la
         # differenza fra una Routine a vuoto e una mai partita.
         "stage": "reviewer",
         "waiting": waiting,
@@ -249,10 +249,10 @@ def _reading_order():
 def verificatore_stage():
     """Di quello che il revisore ha firmato, cosa nessuno ha provato a smentire.
 
-    Ultimo della catena e non per modo di dire: e' lo stadio che misura lo stadio
-    prima. Una firma e' la parola del revisore sul lavoro del revisore, e finche'
+    Ultimo della catena e non per modo di dire: è lo stadio che misura lo stadio
+    prima. Una firma è la parola del revisore sul lavoro del revisore, e finché
     nessuno provava a farla cadere il numero che diceva quanto valesse non
-    esisteva. Adesso esiste, ed e' 7 smentite su 529 affermazioni.
+    esisteva. Adesso esiste, ed è 7 smentite su 529 affermazioni.
     """
     try:
         from scripts import verification_queue
@@ -269,8 +269,8 @@ def verificatore_stage():
     waiting = summary["da_verificare"]
     aperte = summary["smentite_aperte"]
     if aperte:
-        # Prima di verificarne altri: una smentita aperta e' una frase falsa in
-        # pagina, e l'unico stadio che puo' chiuderla e' il revisore.
+        # Prima di verificarne altri: una smentita aperta è una frase falsa in
+        # pagina, e l'unico stadio che può chiuderla è il revisore.
         nxt = (f"{aperte} smentite aperte da chiudere, tocca al revisore, "
                f"poi {waiting} articoli da verificare")
     elif summary["riverificare"]:
@@ -279,7 +279,7 @@ def verificatore_stage():
     elif waiting:
         nxt = f"provare a smentire {waiting} articoli firmati e mai verificati"
     else:
-        nxt = "ogni articolo firmato e' stato verificato sul testo di adesso"
+        nxt = "ogni articolo firmato è stato verificato sul testo di adesso"
     return {
         "stage": "verificatore",
         "waiting": waiting,
@@ -301,11 +301,11 @@ BUILDERS = {
 
 
 def queue_sizes(stages=None):
-    """`{stadio: quanti in attesa}`, con None dove la coda non si e' contata.
+    """`{stadio: quanti in attesa}`, con None dove la coda non si è contata.
 
-    La forma piu' piccola dello stato, per chi deve solo decidere. La usano il
+    La forma più piccola dello stato, per chi deve solo decidere. La usano il
     lanciatore (`pipeline_launch`), per prioritizzare i lanci, e
-    `pipeline_log.silence`, per non segnalare fermo uno stadio che tace perche'
+    `pipeline_log.silence`, per non segnalare fermo uno stadio che tace perché
     non ha niente da fare.
     """
     return {entry["stage"]: entry["waiting"] for entry in build_status(stages)["stages"]}

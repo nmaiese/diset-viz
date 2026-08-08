@@ -1,44 +1,44 @@
 #!/usr/bin/env python3
-"""Il diario della catena: che cosa ha fatto ogni agente, quando, e come e' finita.
+"""Il diario della catena: che cosa ha fatto ogni agente, quando, e come è finita.
 
 Il problema che risolve. Gli agenti girano in cloud, a freddo, e per tutta la
-durata della run non lasciano nessuna traccia: l'unico segno che qualcosa e'
+durata della run non lasciano nessuna traccia: l'unico segno che qualcosa è
 successo arriva alla fine, sotto forma di commit o di pull request. Se una run
 non produce niente (coda vuota, cancello che blocca, agente che si ferma a
-meta') non resta assolutamente nulla da leggere, e la domanda "che cosa ha fatto
+metà) non resta assolutamente nulla da leggere, e la domanda "che cosa ha fatto
 stanotte il verificatore" non ha risposta. Peggio: una Routine che gira e non
-produce ha lo stesso aspetto di una Routine che non e' mai partita, ed e'
-esattamente cosi' che uno degli agenti di scrittura ha lavorato per settimane su
+produce ha lo stesso aspetto di una Routine che non è mai partita, ed è
+esattamente così che uno degli agenti di scrittura ha lavorato per settimane su
 un file morto senza che nessuno se ne accorgesse.
 
-Il diario e' la risposta. Ogni agente, alla fine della run, registra qui che
-cosa ha fatto, **anche quando non ha prodotto niente**, che e' il caso in cui
-serve di piu'. E' committato, quindi la storia sopravvive alla sessione che
+Il diario è la risposta. Ogni agente, alla fine della run, registra qui che
+cosa ha fatto, **anche quando non ha prodotto niente**, che è il caso in cui
+serve di più. È committato, quindi la storia sopravvive alla sessione che
 l'ha creata.
 
-## Un file per run, e non piu' un registro unico
+## Un file per run, e non più un registro unico
 
 Era `runs.jsonl`, una riga per run in fondo a un file solo, e la forma era la
-causa del guasto piu' frequente della catena. Sette stadi che appendono tutti
+causa del guasto più frequente della catena. Sette stadi che appendono tutti
 in coda allo stesso file collidono **sempre** quando girano vicini: git vede
-due modifiche sull'ultima riga e chiama conflitto quella che e' solo la somma
+due modifiche sull'ultima riga e chiama conflitto quella che è solo la somma
 di due righe che non si contraddicono. Il contratto degli agenti ci aveva
 costruito sopra un'intera sezione che spiegava come risolvere a mano tenendo
-tutte e due le parti, cioe' una pagina di prosa per rimediare a un problema che
+tutte e due le parti, cioè una pagina di prosa per rimediare a un problema che
 il formato non doveva avere.
 
 Adesso ogni run scrive il **proprio** file in `data/pipeline/runs/`, e due run
-diverse non toccano mai lo stesso percorso. Il conflitto non e' improbabile,
-non e' risolvibile: non esiste. Le trenta run del vecchio `runs.jsonl` sono
-state travasate una per file e il registro unico e' sparito: tenerlo e leggerlo
-accanto agli shard avrebbe contato due volte le stesse run, che e' proprio il
+diverse non toccano mai lo stesso percorso. Il conflitto non è improbabile,
+non è risolvibile: non esiste. Le trenta run del vecchio `runs.jsonl` sono
+state travasate una per file e il registro unico è sparito: tenerlo e leggerlo
+accanto agli shard avrebbe contato due volte le stesse run, che è proprio il
 genere di numero sbagliato che questo file esiste per non produrre.
 
 ## Chi ha fatto cosa: il `run_id`
 
 Le due righe di una run (quella dell'agente dentro la PR, quella del passo di
-merge su master) si univano su `(stadio, pr)`, e non funzionava, perche' la
-riga dell'agente **non puo' conoscere il numero della PR**: viaggia dentro la
+merge su master) si univano su `(stadio, pr)`, e non funzionava, perché la
+riga dell'agente **non può conoscere il numero della PR**: viaggia dentro la
 pull request, quindi va committata prima che la pull request esista. Sulle
 prime trenta run reali, diciannove non avevano il campo, il diario dichiarava
 ventuno run `pr-open` contro sei fuse, e nessuna delle due cifre era vera.
@@ -81,118 +81,118 @@ from scripts import pipeline_gate  # noqa: E402  (path bootstrap above)
 # Dove scrive chi registra una run: un file per run, mai contendibile.
 RUNS_DIR = PROJECT_ROOT / "data" / "pipeline" / "runs"
 # Gli stadi che si possono **scrivere**: quelli che il cancello conosce
-# (`pipeline_gate.STAGE_PATHS`), piu' `launch`, il battito del lanciatore.
-# `launch` non e' uno stadio del cancello: non ha perimetro, non apre pull
-# request e non passa dal cancello. Registra pero' un tick per volta, ed e'
+# (`pipeline_gate.STAGE_PATHS`), più `launch`, il battito del lanciatore.
+# `launch` non è uno stadio del cancello: non ha perimetro, non apre pull
+# request e non passa dal cancello. Registra però un tick per volta, ed è
 # quella riga a rendere misurabile il silenzio della catena senza ricopiare qui
 # il cron delle Routine. Si deriva da STAGE_PATHS invece di riscriverla a mano,
-# cosi' un ruolo nuovo non torna a crashare il passo di merge dopo che ha gia'
+# così un ruolo nuovo non torna a crashare il passo di merge dopo che ha già
 # fuso.
 STAGES = tuple(sorted(pipeline_gate.STAGE_PATHS)) + ("launch",)
 
-# Gli stadi che si possono **leggere**: i vivi piu' quelli che il diario porta
+# Gli stadi che si possono **leggere**: i vivi più quelli che il diario porta
 # nella sua storia. Sono due insiemi diversi apposta, e confonderli rompe una
 # delle due direzioni. Dopo la demolizione il cancello conosce tre perimetri, ma
 # in `data/pipeline/runs/` restano quaranta run `producer`, otto `writer`, nove
 # `scout` e le `legacy-*` della catena ancora precedente: derivare le scelte di
-# lettura dai soli stadi vivi renderebbe **illeggibile la meta' del diario**,
-# cioe' butterebbe la storia per aver cancellato del codice.
+# lettura dai soli stadi vivi renderebbe **illeggibile la metà del diario**,
+# cioè butterebbe la storia per aver cancellato del codice.
 HISTORICAL_STAGES = STAGES + (
     "scout", "hunter", "promoter", "curator", "writer", "reviewer", "producer",
     "legacy-writer", "legacy-reviewer", "legacy-hunter", "legacy-verificatore",
 )
 
-# Come e' finita una run. Il vocabolario e' corto di proposito: un campo libero
+# Come è finita una run. Il vocabolario è corto di proposito: un campo libero
 # si riempirebbe di sinonimi e diventerebbe illeggibile in aggregato.
 OUTCOMES = {
     "merged": "fatto e pubblicato",
     "pr-open": "PR aperta, aspetta",
     "blocked": "cancello bloccato",
     "nothing": "niente da fare",
-    "stopped": "fermato a meta'",
+    "stopped": "fermato a metà",
     "error": "errore",
 }
 
-# Quali esiti meritano di essere notati leggendo in fretta. `nothing` non e' un
-# problema, e' la risposta giusta quando la coda e' vuota.
+# Quali esiti meritano di essere notati leggendo in fretta. `nothing` non è un
+# problema, è la risposta giusta quando la coda è vuota.
 ATTENTION = {"blocked", "stopped", "error"}
 
 # Ogni quanto ci si aspetta che qualcuno registri una run, per gruppo di stadi.
 #
-# Serve perche' il diario da solo non vede il modo di fallire piu' pericoloso di
+# Serve perché il diario da solo non vede il modo di fallire più pericoloso di
 # tutti: una Routine che smette di partire. Una run andata male lascia una riga
 # `blocked` e si vede subito. Una run che non parte, o che muore prima di
-# scrivere, non lascia niente, e il diario di uno stadio fermo da un mese e'
-# identico a quello di uno stadio che ha finito il lavoro. E' la stessa forma del
-# bug che e' costato settimane: il silenzio letto come normalita'.
+# scrivere, non lascia niente, e il diario di uno stadio fermo da un mese è
+# identico a quello di uno stadio che ha finito il lavoro. È la stessa forma del
+# bug che è costato settimane: il silenzio letto come normalità.
 #
-# **Il gruppo che conta davvero e' il primo.** Da quando il lavoro lo assegna il
-# lanciatore, un ruolo non ha piu' una cadenza propria: gira quando la sua coda
-# non e' vuota, quindi il suo silenzio e' una risposta legittima e non un
-# guasto. Chi ha una cadenza e' il lanciatore, ed e' l'unico la cui assenza
-# significa senza ambiguita' che la catena si e' fermata: percio' il suo battito
+# **Il gruppo che conta davvero è il primo.** Da quando il lavoro lo assegna il
+# lanciatore, un ruolo non ha più una cadenza propria: gira quando la sua coda
+# non è vuota, quindi il suo silenzio è una risposta legittima e non un
+# guasto. Chi ha una cadenza è il lanciatore, ed è l'unico la cui assenza
+# significa senza ambiguità che la catena si è fermata: perciò il suo battito
 # (`launch`) e i ruoli che lancia (`admissions`, `producer`) stanno
 # tutti nel primo gruppo, l'unico esente dal conto delle code. Tenerli qui, e
-# non in gruppi per-ruolo, e' voluto: i gruppi a coda piena portano solo i nomi
-# dei vecchi stadi, che sono le uniche chiavi che `queue_sizes()` produce, cosi'
+# non in gruppi per-ruolo, è voluto: i gruppi a coda piena portano solo i nomi
+# dei vecchi stadi, che sono le uniche chiavi che `queue_sizes()` produce, così
 # nessun ruolo finisce in un gruppo dove una coda non contata diventerebbe un
 # falso ritardo.
 #
 # Le attese per stadio restano, ma valgono **solo a coda piena**: `silence` le
 # applica se gli si passano le code, e uno stadio zitto con la coda a zero
-# risulta `idle`, non in ritardo. Segnalare fermo uno stadio perche' non ha
-# niente da fare e' il modo piu' sicuro di insegnare a ignorare gli avvisi.
+# risulta `idle`, non in ritardo. Segnalare fermo uno stadio perché non ha
+# niente da fare è il modo più sicuro di insegnare a ignorare gli avvisi.
 #
-# **Un gruppo si chiama come cio' che sorveglia, mai come un personaggio.** Ce
+# **Un gruppo si chiama come ciò che sorveglia, mai come un personaggio.** Ce
 # n'erano sette con nomi italiani inventati (`lanciatore`, `cacciatore`,
 # `curatore`, `scrittore`, `revisore`) che non corrispondevano a nessun agente e
 # a nessun ruolo, quindi chi leggeva un avviso sul cruscotto doveva tenere a
 # mente una mappa per sapere quale run andasse aperta. Adesso sono quattro e
-# portano il nome dello stadio, che e' anche il nome dell'agente
+# portano il nome dello stadio, che è anche il nome dell'agente
 # (`.claude/agents/<stadio>.md`) per i tre che ne hanno uno.
 #
 # I nomi vecchi restano leggibili nel diario storico via `HISTORICAL_STAGES`:
-# quello che sparisce e' il gruppo che li **aspettava**, perche' un gruppo che
-# aspetta una run che nessuno puo' piu' aprire segnala fermo per sempre.
+# quello che sparisce è il gruppo che li **aspettava**, perché un gruppo che
+# aspetta una run che nessuno può più aprire segnala fermo per sempre.
 WATCH_GROUPS = (
-    # Non e' uno stadio con un agente: e' il battito di `pipeline_launch.py`,
-    # ed e' per questo che sta in `SENZA_CODA` qui sotto.
+    # Non è uno stadio con un agente: è il battito di `pipeline_launch.py`,
+    # ed è per questo che sta in `SENZA_CODA` qui sotto.
     ("launch", ("launch",), 1),
     ("admissions", ("admissions",), 1),
-    # La sua coda e' l'assenza di letture, non uno stadio che `queue_sizes()`
-    # conta: `waiting` resta `None` e il gruppo non diventa mai `idle`. E'
-    # voluto, ed e' anche il motivo per cui non serve piu' un caso speciale in
-    # `silence` (vedi li').
+    # La sua coda è l'assenza di letture, non uno stadio che `queue_sizes()`
+    # conta: `waiting` resta `None` e il gruppo non diventa mai `idle`. È
+    # voluto, ed è anche il motivo per cui non serve più un caso speciale in
+    # `silence` (vedi lì).
     ("reader-editor", ("reader-editor",), 1),
-    # L'unico gruppo la cui coda `queue_sizes()` conta davvero, perche'
-    # `verificatore` e' la sola voce di `WATCH_GROUPS` che compare anche in
+    # L'unico gruppo la cui coda `queue_sizes()` conta davvero, perché
+    # `verificatore` è la sola voce di `WATCH_GROUPS` che compare anche in
     # `pipeline_status.STAGE_ORDER`. Girava dietro al revisore, adesso dietro
-    # all'officina: se esce un articolo al giorno, ogni giorno c'e' qualcosa da
+    # all'officina: se esce un articolo al giorno, ogni giorno c'è qualcosa da
     # far cadere.
     ("verificatore", ("verificatore",), 1),
 )
 
-# Gli stadi il cui silenzio non si interpreta con una coda. `launch` non e' uno
-# stadio con un agente: e' il battito di `pipeline_launch.py`, e quando tace non
-# c'e' niente da dedurre da quanto lavoro ci sarebbe stato, e' proprio lui a non
-# essere partito. Sta qui e non dentro `silence` perche' e' una proprieta' dello
+# Gli stadi il cui silenzio non si interpreta con una coda. `launch` non è uno
+# stadio con un agente: è il battito di `pipeline_launch.py`, e quando tace non
+# c'è niente da dedurre da quanto lavoro ci sarebbe stato, è proprio lui a non
+# essere partito. Sta qui e non dentro `silence` perché è una proprietà dello
 # stadio, non del gruppo che lo contiene: scritto come confronto col **nome** di
-# un gruppo (`name != "lanciatore"`) sarebbe sparito al primo rename, che e'
+# un gruppo (`name != "lanciatore"`) sarebbe sparito al primo rename, che è
 # quello che stava per succedere.
 SENZA_CODA = ("launch",)
-# Una run saltata non e' una catena rotta. Due si'.
+# Una run saltata non è una catena rotta. Due sì.
 GRACE = 2.5
 
-# Da dove e' partita una run. Corto come il vocabolario degli esiti, e per la
+# Da dove è partita una run. Corto come il vocabolario degli esiti, e per la
 # stessa ragione: serve a poter chiedere "quante ne ha lanciate il lanciatore"
 # senza leggere trenta righe di prosa.
 TRIGGERS = ("launch", "routine", "manuale")
-# La variabile con cui il lanciatore si annuncia agli agenti che lancia, cosi'
+# La variabile con cui il lanciatore si annuncia agli agenti che lancia, così
 # la provenienza non dipende dal fatto che l'agente si ricordi di dichiararla.
 TRIGGER_ENV = "DI_PIPELINE_TRIGGER"
 
 # Lo stato che l'hook di inizio sessione lascia per chi scrive il diario:
-# session_id e istante di avvio. Locale e mai committato (.gitignore), perche'
+# session_id e istante di avvio. Locale e mai committato (.gitignore), perché
 # appartiene alla sessione e non alla storia. Sovrascrivibile nei test.
 SESSION_META = PROJECT_ROOT / "data" / "pipeline" / ".session_meta.json"
 
@@ -227,14 +227,14 @@ def land_on_master(rels, message, runner=_run, cwd=None, log=print, attempts=3,
     nessun altro sceglie), fuori da qualsiasi pull request. Si costruisce un commit
     **sopra origin/master** che contiene **solo** questi file, seminando un indice
     temporaneo da origin/master e aggiungendoci i soli percorsi da portare su, e si
-    spinge quel commit su master. L'invariante 'non spinge altro che se stesso' vale
+    spinge quel commit su master. L'invariante 'non spinge altro che se stessò vale
     per costruzione, non per guardia: HEAD e gli altri file non committati non
     entrano. Chi perde la corsa del push si ricostruisce sopra il master aggiornato
     e ritenta.
 
-    Vive qui, con il diario, perche' l'unico uso rimasto e' il battito del
+    Vive qui, con il diario, perché l'unico uso rimasto è il battito del
     lanciatore (`pipeline_launch.log_tick`): un tick `launch` committato a ogni giro,
-    cosi' una Routine che gira a vuoto non si confonde con una mai partita.
+    così una Routine che gira a vuoto non si confonde con una mai partita.
     """
     rels = sorted(set(rels))
     if not rels:
@@ -278,7 +278,7 @@ def land_on_master(rels, message, runner=_run, cwd=None, log=print, attempts=3,
                 log(f"  {label}: {len(rels)} su master")
                 return True
             log(f"  {label}: push perso, ritento ({attempt}/{attempts})")
-        log(f"  {label.upper()} NON SU MASTER: la corsa al push non si e' chiusa in "
+        log(f"  {label.upper()} NON SU MASTER: la corsa al push non si è chiusa in "
             f"{attempts} tentativi.")
         return False
     finally:
@@ -289,12 +289,12 @@ def land_on_master(rels, message, runner=_run, cwd=None, log=print, attempts=3,
 
 
 def new_run_id(stage):
-    """L'identita' di una run, coniata da chi la registra.
+    """L'identità di una run, coniata da chi la registra.
 
     Forma `<stadio>-<istante>-<quattro esadecimali>`, leggibile a occhio e
     ordinabile per tempo. I quattro esadecimali servono al caso in cui due run
     dello stesso stadio partano nello stesso secondo, che con un lanciatore che
-    ne conia piu' d'uno non e' impossibile e con un ritentativo nemmeno improbabile.
+    ne conia più d'uno non è impossibile e con un ritentativo nemmeno improbabile.
     """
     import secrets
     from datetime import datetime, timezone
@@ -310,9 +310,9 @@ def _claude_version():
     """La versione di Claude Code che sta facendo girare la run, o ''.
 
     Best effort e memoizzata: una run senza CLI in PATH (la CI, un checkout
-    locale) scrive semplicemente meno campi. Il campo esiste perche' hook e
-    subagent sono cambiati piu' volte nel corso del 2026, e una regressione di
-    comportamento senza la versione nel diario non e' diagnosticabile.
+    locale) scrive semplicemente meno campi. Il campo esiste perché hook e
+    subagent sono cambiati più volte nel corso del 2026, e una regressione di
+    comportamento senza la versione nel diario non è diagnosticabile.
     """
     if _CLAUDE_VERSION_CACHE:
         return _CLAUDE_VERSION_CACHE[0]
@@ -346,18 +346,18 @@ def _session_fields():
     """I campi con cui il diario dice CHI ha prodotto la run, non solo cosa.
 
     Tutti facoltativi e tutti best-effort: la riga di diario resta valida anche
-    scritta da un checkout senza sessione Claude. Quello che c'e' viene scritto,
+    scritta da un checkout senza sessione Claude. Quello che c'è viene scritto,
     quello che manca non diventa una stringa vuota da leggere per niente.
 
     - `model`: dall'ambiente della sessione, se dichiarato.
     - `claude_code_version`: dal CLI, se in PATH.
     - `session_id` e `duration_seconds`: dal meta che l'hook di inizio sessione
-      lascia in `SESSION_META`. La durata e' dall'avvio della sessione alla
+      lascia in `SESSION_META`. La durata è dall'avvio della sessione alla
       scrittura della riga, che per una run della catena (una sessione, una
-      run) e' la durata della run.
-    - `base_commit`: dove stava master quando la riga e' stata scritta. Il
-      campo `commit` e' l'HEAD del branch della run; senza la base, il diff che
-      il cancello ha giudicato non e' ricostruibile a distanza di mesi.
+      run) è la durata della run.
+    - `base_commit`: dove stava master quando la riga è stata scritta. Il
+      campo `commit` è l'HEAD del branch della run; senza la base, il diff che
+      il cancello ha giudicato non è ricostruibile a distanza di mesi.
     """
     fields = {}
     model = (os.environ.get("ANTHROPIC_MODEL") or os.environ.get("CLAUDE_MODEL") or "").strip()
@@ -394,7 +394,7 @@ def _session_fields():
 def read_journal(path=None):
     """Tutte le run registrate.
 
-    `path` accetta tutte e due le forme, e non e' una comodita': i test
+    `path` accetta tutte e due le forme, e non è una comodità: i test
     scrivono un `.jsonl` temporaneo, la catena scrive una directory, e una
     funzione che ne capisce una sola costringerebbe a duplicare la lettura.
     """
@@ -409,11 +409,11 @@ def read_journal(path=None):
 def _read_shards(root):
     """Un file per run. Un file illeggibile non nasconde gli altri.
 
-    Illeggibile pero' non vuol dire assente, e la differenza e' tutto il punto
+    Illeggibile però non vuol dire assente, e la differenza è tutto il punto
     di questo file. Saltare in silenzio uno shard rotto farebbe sparire una run
-    dal diario, cioe' produrrebbe esattamente l'invisibilita' che il diario
+    dal diario, cioè produrrebbe esattamente l'invisibilità che il diario
     esiste per togliere, e per giunta proprio sulle run andate male, che sono
-    quelle piu' probabilmente scritte a meta'. Quindi si lascia un segnaposto,
+    quelle più probabilmente scritte a metà. Quindi si lascia un segnaposto,
     come fa da sempre la lettura riga per riga del vecchio registro.
     """
     entries = []
@@ -450,7 +450,7 @@ def _read_jsonl(path):
         try:
             entries.append(json.loads(line))
         except json.JSONDecodeError:
-            # Una riga rotta non deve rendere illeggibile tutto il diario: e' un
+            # Una riga rotta non deve rendere illeggibile tutto il diario: è un
             # registro, non uno schema, e la riga dopo vale ancora.
             entries.append({"stage": "?", "outcome": "error", "summary": f"riga illeggibile: {line[:80]}"})
     return entries
@@ -459,10 +459,10 @@ def _read_jsonl(path):
 def shard_name(entry, suffix=""):
     """Il nome del file di una riga di diario.
 
-    Il `run_id` e' gia' unico, quindi il nome non ha bisogno di altro. Il
+    Il `run_id` è già unico, quindi il nome non ha bisogno di altro. Il
     suffisso distingue le due righe della stessa run: quella dell'agente,
     dentro la pull request, e quella dell'esito, che il passo di merge scrive
-    su master quando sa come e' finita. Nomi diversi, quindi nemmeno quelle due
+    su master quando sa come è finita. Nomi diversi, quindi nemmeno quelle due
     si contendono un percorso.
     """
     run_id = entry.get("run_id") or f"{entry.get('stage', 'ignoto')}-senza-id"
@@ -472,7 +472,7 @@ def shard_name(entry, suffix=""):
 def append(entry, path=None, suffix=""):
     """Registra una run. Su una directory scrive uno shard, su un file appende.
 
-    Il doppio comportamento non e' indecisione: la catena scrive shard, i test
+    Il doppio comportamento non è indecisione: la catena scrive shard, i test
     e chiunque abbia in mano un vecchio `.jsonl` continuano a poter appendere
     una riga, e le due strade portano allo stesso `read_journal`.
     """
@@ -524,9 +524,9 @@ def build_entry(stage, outcome, summary, detail=None, gate=None, pr=None,
     if queue_after is not None:
         entry["queue_after"] = queue_after
     # Chi ha prodotto la run: modello, versione del CLI, sessione, durata,
-    # base. Facoltativi tutti, perche' la riga deve restare scrivibile da
-    # qualsiasi checkout, ma quando ci sono trasformano "che cosa e' successo"
-    # in "che cosa e' successo, con che cosa": senza, una regressione dopo un
+    # base. Facoltativi tutti, perché la riga deve restare scrivibile da
+    # qualsiasi checkout, ma quando ci sono trasformano "che cosa è successo"
+    # in "che cosa è successo, con che cosa": senza, una regressione dopo un
     # cambio di modello o di runtime non ha nessuna pista nel diario.
     entry.update(_session_fields())
     return entry
@@ -540,26 +540,26 @@ def collapse_runs(entries):
     quando l'esito lo conosce. Chi legge le contava come due run, e siccome solo
     le run che aprono una PR ne producono due, il conteggio gonfiava proprio gli
     stadi che lavorano e lasciava intatti quelli fermi: il numero saliva quando
-    la catena andava bene, che e' il modo piu' subdolo di essere sbagliato.
+    la catena andava bene, che è il modo più subdolo di essere sbagliato.
 
-    Si uniscono per `run_id`, che e' l'unica cosa che identifica una run
+    Si uniscono per `run_id`, che è l'unica cosa che identifica una run
     davvero. Prima la chiave era `(stadio, pr)`, e su trenta run reali ne
-    apparava undici: la riga dell'agente **non puo'** portare il numero della
-    pull request, perche' viaggia dentro la pull request e va committata prima
+    apparava undici: la riga dell'agente **non può** portare il numero della
+    pull request, perché viaggia dentro la pull request e va committata prima
     che esista. Il diario finiva per dichiarare ventuno run in attesa quando le
     pull request aperte erano zero.
 
     `(stadio, pr)` resta come ripiego per le righe vecchie, scritte prima che
     esistesse il `run_id`, e per l'agente che si dimentica di passarlo al passo
-    di merge. Una riga senza ne' l'uno ne' l'altro resta per conto suo, che e'
+    di merge. Una riga senza né l'uno né l'altro resta per conto suo, che è
     la risposta giusta: non si sa a quale run appartenga, e inventarlo sarebbe
     peggio che dirlo.
 
-    L'unione tiene il meglio delle due, non la piu' recente. La riga dell'agente
+    L'unione tiene il meglio delle due, non la più recente. La riga dell'agente
     porta le motivazioni, una per decisione, e sono la parte che serve rileggere
     a distanza di mesi. La riga del passo di merge porta l'esito vero e il
     verdetto del cancello. Buttarne via una delle due sarebbe tornare a scegliere
-    fra sapere che cosa e' stato deciso e sapere come e' finita.
+    fra sapere che cosa è stato deciso e sapere come è finita.
     """
     order, index = [], {}
     for entry in sorted(entries, key=lambda r: r.get("at") or ""):
@@ -574,21 +574,21 @@ def collapse_runs(entries):
             order.append(dict(entry))
             continue
         first = order[index[key]]
-        # `pr-open` non e' un esito, e' l'assenza di un esito: vuol dire che
+        # `pr-open` non è un esito, è l'assenza di un esito: vuol dire che
         # chi ha scritto la riga non sapeva ancora come sarebbe finita. Non
-        # deve mai coprire un esito vero, e prendere semplicemente la riga piu'
+        # deve mai coprire un esito vero, e prendere semplicemente la riga più
         # recente lo faceva ogni volta che le due cadevano nello stesso secondo,
-        # perche' a parita' di istante l'ordine lo decide il nome del file.
+        # perché a parità di istante l'ordine lo decide il nome del file.
         incoming = entry.get("outcome")
         if incoming and (incoming != "pr-open" or first.get("outcome") == "pr-open"):
             first["outcome"] = incoming
         first["gate"] = entry.get("gate") or first.get("gate")
         first["commit"] = entry.get("commit") or first.get("commit")
-        # Il numero arriva quasi sempre dalla seconda riga, ed e' la ragione
+        # Il numero arriva quasi sempre dalla seconda riga, ed è la ragione
         # per cui la prima non lo poteva avere.
         first["pr"] = first.get("pr") or entry.get("pr") or ""
-        # `at` diventa quando la run si e' chiusa, non quando ha aperto la PR:
-        # e' la data che l'allarme del silenzio deve guardare. Il massimo e non
+        # `at` diventa quando la run si è chiusa, non quando ha aperto la PR:
+        # è la data che l'allarme del silenzio deve guardare. Il massimo e non
         # l'ultima letta, per la stessa ragione dell'esito qui sopra.
         first["at"] = max(entry.get("at") or "", first.get("at") or "")
         first["detail"] = (first.get("detail") or []) + (entry.get("detail") or [])
@@ -634,14 +634,14 @@ def silence(entries, today=None, queues=None):
     cruscotto che mostra solo i problemi non permette di distinguere "tutto a
     posto" da "il controllo non ha girato".
 
-    `queues` e' facoltativo e cambia il significato della risposta. Senza, un
-    silenzio lungo e' un ritardo, che era vero quando ogni stadio aveva un
+    `queues` è facoltativo e cambia il significato della risposta. Senza, un
+    silenzio lungo è un ritardo, che era vero quando ogni stadio aveva un
     cron. Con le code (`{stadio: quanti in attesa}`, come le calcola
     `pipeline_status`), un silenzio lungo con la coda vuota diventa `idle`
     invece che `stale`: da quando il lavoro lo assegna il lanciatore, uno
-    stadio che tace perche' non ha niente da fare sta rispondendo, non si e'
-    fermato. Le code arrivano da fuori invece che da un import perche' questo
-    modulo resta senza dipendenze, il che e' anche cio' che permette di
+    stadio che tace perché non ha niente da fare sta rispondendo, non si è
+    fermato. Le code arrivano da fuori invece che da un import perché questo
+    modulo resta senza dipendenze, il che è anche ciò che permette di
     provarlo senza toccare un file.
     """
     from datetime import datetime, timezone
@@ -661,15 +661,15 @@ def silence(entries, today=None, queues=None):
         late = days is not None and days > expected * GRACE
         # Una coda che nessuno ha potuto contare (`None`) resta `None` e **non**
         # diventa zero. Sommandola a zero, uno stadio zitto da un mese con la
-        # coda incalcolabile risultava `idle`, cioe' "tace perche' non ha niente
-        # da fare", che e' l'opposto di quello che si sa: non si sa niente. E'
+        # coda incalcolabile risultava `idle`, cioè "tace perché non ha niente
+        # da fare", che è l'opposto di quello che si sa: non si sa niente. È
         # la stessa scelta che fa `pipeline_status`, dove una coda non contata
         # vale come lavoro e non come lavoro finito.
         #
         # L'esenzione si legge da `SENZA_CODA`, non dal nome del gruppo. Era
-        # scritta `name != "lanciatore"`, cioe' una proprieta' del battito
+        # scritta `name != "lanciatore"`, cioè una proprietà del battito
         # travestita da confronto con un personaggio: rinominare il gruppo
-        # l'avrebbe tolta in silenzio, ed e' precisamente quello che stava per
+        # l'avrebbe tolta in silenzio, ed è precisamente quello che stava per
         # succedere.
         waiting = None
         if queues is not None and not set(stages) & set(SENZA_CODA):
@@ -683,13 +683,13 @@ def silence(entries, today=None, queues=None):
             "last": last,
             "days_since": None if days is None else round(days, 1),
             "waiting": waiting,
-            # Mai registrata una run non e' "in ritardo", e' "non ancora vista":
-            # dire che il verificatore e' fermo da sempre il giorno in cui nasce
+            # Mai registrata una run non è "in ritardo", è "non ancora vista":
+            # dire che il verificatore è fermo da sempre il giorno in cui nasce
             # il diario sarebbe un falso allarme che insegna a ignorare gli
             # allarmi.
             "stale": late and (waiting is None or waiting > 0),
-            # Zitto perche' non ha niente da fare. E' una risposta, non un
-            # guasto, e tenerla distinta e' cio' che permette all'avviso di
+            # Zitto perché non ha niente da fare. È una risposta, non un
+            # guasto, e tenerla distinta è ciò che permette all'avviso di
             # restare credibile.
             "idle": late and waiting == 0,
             "never": not last,
@@ -701,8 +701,8 @@ def queue_sizes():
     """Le code degli stadi, o None se non si riescono a contare.
 
     Importato qui dentro e non in testa: `pipeline_status` legge il catalogo e
-    per due stadi ha bisogno del view model, quindi puo' fallire su un checkout
-    appena clonato. Il diario deve restare leggibile anche li', e senza le code
+    per due stadi ha bisogno del view model, quindi può fallire su un checkout
+    appena clonato. Il diario deve restare leggibile anche lì, e senza le code
     `silence` torna semplicemente al comportamento di prima.
     """
     try:
@@ -784,7 +784,7 @@ def main():
     write.add_argument("--detail", action="append", default=[], help="ripetibile: una riga per decisione")
     write.add_argument("--gate", help="il campo merge del verdetto del cancello")
     write.add_argument("--pr", help="numero della pull request, se l'hai aperta")
-    write.add_argument("--run-id", help="l'identita' della run, se ne hai gia' una")
+    write.add_argument("--run-id", help="l'identità della run, se ne hai già una")
     write.add_argument("--mint-run-id", action="store_true",
                        help="conia un run_id nuovo invece di richiederne uno esistente "
                             "(solo per chi non apre mai una pull request, es. il lanciatore)")
@@ -799,9 +799,9 @@ def main():
             raise SystemExit("per scrivere servono --stage, --outcome e --summary")
         if not args.run_id and not args.mint_run_id:
             raise SystemExit(
-                "--run-id mancante: e' l'unica cosa che lega questa riga alla pull "
+                "--run-id mancante: è l'unica cosa che lega questa riga alla pull "
                 "request che la porta (docs/AGENT_CONTRACT.md #4). Se davvero non "
-                "ne hai gia' uno (nessuna pull request in arrivo), passa "
+                "ne hai già uno (nessuna pull request in arrivo), passa "
                 "--mint-run-id."
             )
         entry = append(build_entry(
@@ -811,8 +811,8 @@ def main():
             queue_before=args.queue_before, queue_after=args.queue_after,
         ))
         print(f"registrato: {entry['stage']} -> {entry['outcome']}")
-        # Stampato e non solo scritto: e' il valore che va passato al passo di
-        # merge, ed e' l'unica cosa che lega questa riga a come finira'.
+        # Stampato e non solo scritto: è il valore che va passato al passo di
+        # merge, ed è l'unica cosa che lega questa riga a come finirà.
         print(f"run_id: {entry['run_id']}")
         return 0
 

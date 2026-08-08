@@ -367,7 +367,7 @@
   </div>
 
   <section aria-labelledby="flusso-title">
-    <div class="section-head"><div><h2 id="flusso-title">Il flusso completo</h2><p>Quattro passaggi leggibili, anche se sotto lavorano tre ruoli. Il merge e' la pubblicazione.</p></div><span class="count">{{ board.metrics.indicators }} indicatori osservati</span></div>
+    <div class="section-head"><div><h2 id="flusso-title">Il flusso completo</h2><p>Quattro passaggi leggibili, anche se sotto lavorano tre ruoli. Il merge è la pubblicazione.</p></div><span class="count">{{ board.metrics.indicators }} indicatori osservati</span></div>
     <div class="flow-card">
       <div class="flow">
         <div class="flow-step"><b>1. Ammissione</b><span>{{ board.phase_totals.get('ammissione', 0) }} in questa fase</span></div>
@@ -554,7 +554,7 @@
         controls.forEach(function (id) { if (state[id] !== undefined) document.getElementById(id).value = state[id]; });
         paused = Boolean(state.paused);
         (state.open || []).forEach(function (id) { var item = document.querySelector('.ind[data-id="' + CSS.escape(id) + '"]'); if (item) item.open = true; });
-      } catch (e) { /* parte pulita se lo stato non e' leggibile */ }
+      } catch (e) { /* parte pulita se lo stato non è leggibile */ }
     }
 
     window.filtraIndicatori = function () {

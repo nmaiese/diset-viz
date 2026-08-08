@@ -59,14 +59,14 @@ class BoundedRatesStayWithinRange(unittest.TestCase):
 # than trusting a list.
 KNOWN_DUPLICATE_SERIES = {
     ("167", "471"): (
-        "Istat pubblica 167 'Intensità di accumulazione del capitale' "
+        "Istat pubblica 167 'Intensità di accumulazione del capitalè "
         "(dati di base: investimenti fissi lordi) e 471 'Investimenti privati "
         "sul PIL' (dati di base: investimenti privati) con valori identici su "
         "tutte e 986 le righe dell'archivio, non solo sulle venti regioni. "
         "I due elenchi di dati di base sono diversi, quindi al massimo una "
         "delle due etichette descrive i numeri pubblicati. Verificato "
         "scaricando Archivio_unico_indicatori_regionali.zip il 27 luglio 2026: "
-        "la duplicazione e' a monte e un refresh non la toglie."
+        "la duplicazione è a monte e un refresh non la toglie."
     ),
 }
 
@@ -128,11 +128,11 @@ class NoTwoIndicatorsPublishTheSameSeries(unittest.TestCase):
                  if r["idIndicatore"] == indicator}
                 for indicator in group
             ]
-            self.assertTrue(all(series), f"{group}: uno dei due id non e' piu' nel CSV")
+            self.assertTrue(all(series), f"{group}: uno dei due id non è più nel CSV")
             for other in series[1:]:
                 self.assertEqual(
                     series[0], other,
-                    f"{group} non sono piu' identici: togli la voce da "
+                    f"{group} non sono più identici: togli la voce da "
                     "KNOWN_DUPLICATE_SERIES e rimanda i due articoli in rilettura",
                 )
 

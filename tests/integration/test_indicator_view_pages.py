@@ -64,9 +64,9 @@ class EveryIndicatorPageRenders(unittest.TestCase):
         self.assertEqual(broken, [], f"indicator Markdown pages that do not render: {broken[:10]}")
 
     def test_every_page_carries_the_full_article_skeleton(self):
-        """Ogni ruolo e' coperto: da un H2 `sezione-{role}`, oppure, per la sola
+        """Ogni ruolo è coperto: da un H2 `sezione-{role}`, oppure, per la sola
         `definizione`, dal blocco "Come leggere il dato" (sezioni variabili). I
-        tre ruoli sostanziali restano sempre H2; la definizione puo' abitare il
+        tre ruoli sostanziali restano sempre H2; la definizione può abitare il
         blocco invece di aprire l'articolo con la metodologia."""
         missing = []
         for indicator_id in self.golden:
@@ -83,7 +83,7 @@ class EveryIndicatorPageRenders(unittest.TestCase):
         """Un articolo che dichiara `roles_covered` senza `definizione` la assorbe
         nel blocco "Come leggere il dato", server-rendered (nessun JS): la storia
         apre l'articolo, la meccanica sta nel blocco, e la nav punta al blocco
-        invece che a un anchor `sezione-definizione` che non esiste piu'."""
+        invece che a un anchor `sezione-definizione` che non esiste più."""
         import unittest.mock
         from app import indicator_texts
         opt_in = {
@@ -106,13 +106,13 @@ class EveryIndicatorPageRenders(unittest.TestCase):
         self.assertIn('href="#come-leggere"', html)
         self.assertNotIn('href="#sezione-definizione"', html)
         # E sta DOPO la narrazione. Renderlo prima lasciava al lettore la stessa
-        # contabilita' in apertura, solo sotto un altro titolo: il blocco esiste
-        # per toglierla di li', non per rinominarla.
+        # contabilità in apertura, solo sotto un altro titolo: il blocco esiste
+        # per toglierla di lì, non per rinominarla.
         self.assertLess(html.index('id="sezione-quadro"'), html.index('id="come-leggere"'))
         self.assertLess(html.index('id="sezione-limiti"'), html.index('id="come-leggere"'))
 
     def test_the_historical_series_is_server_rendered_as_a_table(self):
-        """Il grafico di trend e' uno <svg> riempito da JS: senza JavaScript il
+        """Il grafico di trend è uno <svg> riempito da JS: senza JavaScript il
         lettore e il crawler perderebbero la serie. La tabella-serie la porta a
         tutti, un anno per riga, e per una serie a un solo anno non compare."""
         multi = self._get("920").get_data(as_text=True)  # eta media, serie lunga
@@ -122,8 +122,8 @@ class EveryIndicatorPageRenders(unittest.TestCase):
         self.assertEqual(rows, sorted(rows))  # in ordine di anno
 
     def test_the_markdown_representation_carries_the_series_too(self):
-        """Un agente che chiede `text/markdown` e' il lettore senza JavaScript per
-        definizione, quindi la rappresentazione alternativa non puo' essere
+        """Un agente che chiede `text/markdown` è il lettore senza JavaScript per
+        definizione, quindi la rappresentazione alternativa non può essere
         l'unica vista della pagina priva della serie storica."""
         body = self.client.get(
             "/indicatore/eta-media-della-popolazione/ter-920",

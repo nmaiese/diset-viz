@@ -1,9 +1,9 @@
 """Il diario delle run, e il cruscotto che lo mostra.
 
 Il buco che chiudono: una Routine che gira e non produce niente ha lo stesso
-aspetto di una Routine che non e' mai partita. E' cosi' che lo scrittore ha
+aspetto di una Routine che non è mai partita. È così che lo scrittore ha
 lavorato per settimane su un file morto senza che nessuno se ne accorgesse, e
-finche' l'unica traccia di una run resta il commit che produce, quel modo di
+finché l'unica traccia di una run resta il commit che produce, quel modo di
 fallire resta invisibile per costruzione.
 
 Nessun test qui tocca il diario committato: ognuno scrive in una directory
@@ -25,7 +25,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
     def test_a_run_that_produced_nothing_is_still_a_record(self):
-        """Il caso che conta di piu'. Una coda vuota e' una risposta, e senza
+        """Il caso che conta di più. Una coda vuota è una risposta, e senza
         questa riga sarebbe indistinguibile da un agente mai partito."""
         with TemporaryDirectory() as tmp:
             path = Path(tmp) / "runs.jsonl"
@@ -56,9 +56,9 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         self.assertEqual(entry["session_id"], "sess-prova")
         self.assertIsInstance(entry["duration_seconds"], int)
         self.assertGreaterEqual(entry["duration_seconds"], 0)
-        # La base e' best-effort come tutto il resto: su un checkout con un
-        # ref di master c'e' ed e' distinta dall'HEAD della run, su un clone
-        # shallow (la CI fa cosi') manca, e mancare e' il comportamento
+        # La base è best-effort come tutto il resto: su un checkout con un
+        # ref di master c'è ed è distinta dall'HEAD della run, su un clone
+        # shallow (la CI fa così) manca, e mancare è il comportamento
         # giusto, non una stringa vuota da leggere per niente.
         import subprocess
         has_master = any(
@@ -82,7 +82,7 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         self.assertNotIn("duration_seconds", entry)
 
     def test_an_unknown_stage_or_outcome_is_refused(self):
-        """Il vocabolario e' corto di proposito: un campo libero si riempirebbe
+        """Il vocabolario è corto di proposito: un campo libero si riempirebbe
         di sinonimi e l'aggregato diventerebbe illeggibile."""
         with self.assertRaises(SystemExit):
             pipeline_log.build_entry("giornalista", "nothing", "x")
@@ -93,16 +93,16 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         """`STAGES` e `HISTORICAL_STAGES` sono due insiemi diversi apposta, e
         finora **nessuna riga della suite** guardava la differenza.
 
-        Scrivere una run `writer` non si puo' piu': quello stadio non ha un
+        Scrivere una run `writer` non si può più: quello stadio non ha un
         agente, non ha un perimetro nel cancello, e una riga nuova col suo nome
-        sarebbe una run che nessuno ha aperto. Rileggere le run gia' scritte
+        sarebbe una run che nessuno ha aperto. Rileggere le run già scritte
         invece si deve: in `data/pipeline/runs/` ce ne sono quaranta `producer`,
         otto `writer` e nove `scout`, e derivare anche le scelte di **lettura**
-        dai soli stadi vivi renderebbe illeggibile meta' del diario, cioe'
+        dai soli stadi vivi renderebbe illeggibile metà del diario, cioè
         butterebbe la storia per aver cancellato del codice.
 
-        Il modo in cui la separazione regredisce e' banale: qualcuno deriva
-        `--stage choices` da `STAGES` perche' sembra il piu' stretto dei due.
+        Il modo in cui la separazione regredisce è banale: qualcuno deriva
+        `--stage choices` da `STAGES` perché sembra il più stretto dei due.
         """
         for morto in ("writer", "reviewer", "producer", "scout"):
             self.assertIn(morto, pipeline_log.HISTORICAL_STAGES, morto)
@@ -128,7 +128,7 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         self.assertEqual(pipeline_log.summarize(collassate)["producer"]["runs"], 1)
 
     def test_a_corrupt_line_does_not_hide_the_rest(self):
-        """E' un registro, non uno schema: la riga dopo vale ancora."""
+        """È un registro, non uno schema: la riga dopo vale ancora."""
         with TemporaryDirectory() as tmp:
             path = Path(tmp) / "runs.jsonl"
             path.write_text(
@@ -153,13 +153,13 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
         self.assertEqual(state["verificatore"]["attention"], 2, "blocked e stopped, non merged ne nothing")
 
     def test_nothing_is_not_a_problem(self):
-        """Una coda vuota e' la risposta giusta, non un allarme: se finisse fra i
+        """Una coda vuota è la risposta giusta, non un allarme: se finisse fra i
         casi da guardare, il cruscotto urlerebbe ogni settimana per niente."""
         self.assertNotIn("nothing", pipeline_log.ATTENTION)
         self.assertNotIn("merged", pipeline_log.ATTENTION)
 
     def test_the_journal_is_append_only_across_runs(self):
-        """Due run non si sovrascrivono: e' JSON per riga proprio per questo."""
+        """Due run non si sovrascrivono: è JSON per riga proprio per questo."""
         with TemporaryDirectory() as tmp:
             path = Path(tmp) / "runs.jsonl"
             pipeline_log.append(pipeline_log.build_entry("admissions", "nothing", "prima"), path=path)
@@ -171,7 +171,7 @@ class TheJournalRecordsWhatWouldOtherwiseVanish(unittest.TestCase):
 class SilenceIsTheFailureNobodySees(unittest.TestCase):
     """Una run andata male lascia una riga `blocked` e si vede. Una Routine che
     smette di partire non lascia niente, e il diario di uno stadio fermo da un
-    mese e' identico a quello di uno stadio che ha finito il lavoro."""
+    mese è identico a quello di uno stadio che ha finito il lavoro."""
 
     def entry(self, stage, days_ago):
         from datetime import datetime, timedelta, timezone
@@ -188,7 +188,7 @@ class SilenceIsTheFailureNobodySees(unittest.TestCase):
 
     def test_a_daily_stage_that_skipped_one_day_is_not_flagged(self):
         """Con la grazia troppo stretta l'allarme suona ogni settimana per
-        niente, e un allarme che suona sempre non e' un allarme."""
+        niente, e un allarme che suona sempre non è un allarme."""
         rows = pipeline_log.silence([self.entry("verificatore", 2)])
         self.assertFalse(self.group(rows, "verificatore")["stale"])
 
@@ -198,9 +198,9 @@ class SilenceIsTheFailureNobodySees(unittest.TestCase):
 
         C'era un test che la provava su un gruppo settimanale (`curatore`,
         cadenza 7): fermo da dieci giorni, non ancora in ritardo. Quel gruppo
-        non esiste piu' e nessuno dei quattro rimasti ha una cadenza diversa da
-        1, quindi la proprieta' non aveva piu' dove appoggiarsi. Provarla su un
-        `WATCH_GROUPS` finto e' l'unico modo di non perderla: `GRACE` e' il
+        non esiste più e nessuno dei quattro rimasti ha una cadenza diversa da
+        1, quindi la proprietà non aveva più dove appoggiarsi. Provarla su un
+        `WATCH_GROUPS` finto è l'unico modo di non perderla: `GRACE` è il
         numero che decide se un allarme suona, e nessun'altra riga della suite
         lo guarda."""
         finto = (("finto", ("verificatore",), 7),)
@@ -213,16 +213,16 @@ class SilenceIsTheFailureNobodySees(unittest.TestCase):
     def test_the_admissions_stage_is_one_group_even_if_it_was_three(self):
         """Scout, cacciatore e promotore erano tre gruppi per un agente solo, e
         chiudeva su uno dei tre a seconda di come era andata: contarli separati
-        segnalava fermo l'uno ogni volta che lavorava l'altro. Adesso e' un
-        gruppo perche' e' un agente, e il caso non e' piu' costruibile."""
+        segnalava fermo l'uno ogni volta che lavorava l'altro. Adesso è un
+        gruppo perché è un agente, e il caso non è più costruibile."""
         rows = pipeline_log.silence([self.entry("admissions", 1)])
         group = self.group(rows, "admissions")
         self.assertFalse(group["stale"])
         self.assertFalse(group["never"])
 
     def test_a_group_is_named_after_what_it_watches(self):
-        """Niente piu' personaggi. Un avviso deve dire quale run aprire, e per
-        farlo deve chiamarsi come lo stadio, che e' anche il nome dell'agente
+        """Niente più personaggi. Un avviso deve dire quale run aprire, e per
+        farlo deve chiamarsi come lo stadio, che è anche il nome dell'agente
         per i tre che ne hanno uno."""
         for name, stages, _ in pipeline_log.WATCH_GROUPS:
             self.assertIn(name, pipeline_log.STAGES, name)
@@ -261,8 +261,8 @@ class TheDashboardReadsWithoutBreaking(unittest.TestCase):
             self.assertNotIn(tag, page, f"il cruscotto carica risorse esterne ({tag})")
 
     def test_chain_commits_are_recognised_by_the_files_they_touch(self):
-        """Non dai messaggi ne' dagli autori: un agente puo' scrivere qualunque
-        messaggio, ma non puo' uscire dal proprio perimetro senza che il cancello
+        """Non dai messaggi né dagli autori: un agente può scrivere qualunque
+        messaggio, ma non può uscire dal proprio perimetro senza che il cancello
         lo fermi."""
         commits = pipeline_dashboard.recent_chain_commits(limit=5)
         from scripts import pipeline_gate
@@ -281,7 +281,7 @@ if __name__ == "__main__":
 class TwoRowsAreOneRun(unittest.TestCase):
     """L'agente scrive la propria riga dentro la PR, il passo di merge scrive
     l'esito su master. Contarle come due run gonfia il totale **solo** per gli
-    stadi che aprono pull request, cioe' proprio quelli che lavorano."""
+    stadi che aprono pull request, cioè proprio quelli che lavorano."""
 
     ROWS = [
         {"at": "2026-07-27T06:20:00+00:00", "stage": "admissions", "outcome": "pr-open",
@@ -290,7 +290,7 @@ class TwoRowsAreOneRun(unittest.TestCase):
         {"at": "2026-07-27T06:28:30+00:00", "stage": "admissions", "outcome": "merged",
          "summary": "PR #45 fusa", "detail": [], "gate": "checks",
          "pr": "45", "commit": "bbb2222", "branch": "master"},
-        # Un altro stadio, di proposito: e' il rumore accanto alle due righe che
+        # Un altro stadio, di proposito: è il rumore accanto alle due righe che
         # devono collassare. Se anche questa fosse `admissions`, il conteggio
         # dell'ammissione varrebbe 2 e il test smetterebbe di distinguere "due
         # righe una run" da "due run".
@@ -311,7 +311,7 @@ class TwoRowsAreOneRun(unittest.TestCase):
 
     def test_the_agents_reasons_survive(self):
         """La riga del passo di merge non porta le motivazioni. Tenere solo la
-        piu' recente vorrebbe dire scambiare il perche' con il come e' finita."""
+        più recente vorrebbe dire scambiare il perché con il come è finita."""
         row = pipeline_log.collapse_runs(self.ROWS)[0]
         self.assertIn("DEPENDRATE respinto", row["detail"])
 
@@ -333,9 +333,9 @@ class TwoRowsAreOneRun(unittest.TestCase):
 class TheRunIdIsWhatActuallyIdentifiesARun(unittest.TestCase):
     """La chiave era `(stadio, pr)`, e su trenta run reali ne apparava undici.
 
-    Il motivo non e' una dimenticanza degli agenti ed e' istruttivo: la riga
+    Il motivo non è una dimenticanza degli agenti ed è istruttivo: la riga
     dell'agente viaggia **dentro** la pull request, quindi va committata prima
-    che la pull request esista, quindi non puo' portarne il numero. Il diario
+    che la pull request esista, quindi non può portarne il numero. Il diario
     finiva per dichiarare ventuno run in attesa mentre le pull request aperte
     erano zero.
     """
@@ -366,7 +366,7 @@ class TheRunIdIsWhatActuallyIdentifiesARun(unittest.TestCase):
         self.assertEqual(len(pipeline_log.collapse_runs(rows)), 2)
 
     def test_old_rows_without_an_id_still_join_on_the_pull_request(self):
-        """Il ripiego resta, perche' la storia gia' scritta non ha id."""
+        """Il ripiego resta, perché la storia già scritta non ha id."""
         rows = [dict(r) for r in TwoRowsAreOneRun.ROWS]
         self.assertEqual(len(pipeline_log.collapse_runs(rows)), 2)
 
@@ -383,8 +383,8 @@ class TheRunIdIsWhatActuallyIdentifiesARun(unittest.TestCase):
 class TheCliRefusesToMintARunIdSilently(unittest.TestCase):
     """Un agente che dimentica `--run-id` lasciava un file orfano che poi
     bloccava il merge come "worktree non pulito": lo script coniava un id
-    nuovo invece di fermarsi, e la documentazione che dice gia' che
-    `--run-id` non e' facoltativo (AGENT_CONTRACT.md, pipeline-close-run)
+    nuovo invece di fermarsi, e la documentazione che dice già che
+    `--run-id` non è facoltativo (AGENT_CONTRACT.md, pipeline-close-run)
     non basta da sola a impedirlo."""
 
     def _run(self, *extra_args):
@@ -400,12 +400,12 @@ class TheCliRefusesToMintARunIdSilently(unittest.TestCase):
         self.assertIn("--run-id", result.stderr)
 
     def test_mint_run_id_is_accepted_as_the_explicit_opt_out(self):
-        """La chiamata coniera' comunque un id (coperto gia' da
+        """La chiamata conierà comunque un id (coperto già da
         `test_an_id_is_minted_and_printed_for_whoever_writes_first`); qui
         conta solo che `--mint-run-id` faccia passare l'argparse invece di
         essere respinto insieme a `--run-id` mancante. Scrive per davvero
-        nello shard reale (`RUNS_DIR` non e' configurabile da CLI): lo shard
-        va ripulito subito, non e' materia di questo test."""
+        nello shard reale (`RUNS_DIR` non è configurabile da CLI): lo shard
+        va ripulito subito, non è materia di questo test."""
         runs_dir = REPO_ROOT / "data" / "pipeline" / "runs"
         before = set(runs_dir.iterdir())
         result = self._run("--mint-run-id")
@@ -424,7 +424,7 @@ class TwoRunsNeverWriteTheSameFile(unittest.TestCase):
     """Il conflitto che ha reso necessaria una sezione intera del contratto.
 
     Sette stadi che appendono in coda allo stesso `.jsonl` collidono sempre.
-    Con un file per run non c'e' niente da fondere, e questo test lo dice sul
+    Con un file per run non c'è niente da fondere, e questo test lo dice sul
     filesystem invece che in un commento.
     """
 
@@ -453,11 +453,11 @@ class TwoRunsNeverWriteTheSameFile(unittest.TestCase):
 
 
 class SilenceMeansSomethingElseNowThatTheLauncherAssignsTheWork(unittest.TestCase):
-    """Uno stadio che tace perche' non ha niente da fare sta rispondendo.
+    """Uno stadio che tace perché non ha niente da fare sta rispondendo.
 
-    Con sei cron, il silenzio del curatore era un ritardo. Con il lanciatore e'
-    la risposta giusta a una coda vuota, e segnalarlo come guasto e' il modo
-    piu' sicuro di insegnare a ignorare gli avvisi.
+    Con sei cron, il silenzio del curatore era un ritardo. Con il lanciatore è
+    la risposta giusta a una coda vuota, e segnalarlo come guasto è il modo
+    più sicuro di insegnare a ignorare gli avvisi.
     """
 
     def entry(self, stage, days_ago):
@@ -487,14 +487,14 @@ class SilenceMeansSomethingElseNowThatTheLauncherAssignsTheWork(unittest.TestCas
         self.assertTrue(self.group(rows, "verificatore")["stale"])
 
     def test_only_the_verifier_actually_has_a_countable_queue(self):
-        """Perche' i tre test qui sopra girano tutti sul verificatore, e non su
+        """Perché i tre test qui sopra girano tutti sul verificatore, e non su
         un altro gruppo qualunque.
 
-        `queue_sizes()` ha per chiavi `pipeline_status.STAGE_ORDER`, che e' il
+        `queue_sizes()` ha per chiavi `pipeline_status.STAGE_ORDER`, che è il
         vocabolario **storico** delle code. Di tutto `WATCH_GROUPS` solo
-        `verificatore` compare anche li': per gli altri `queues.get()` torna
+        `verificatore` compare anche lì: per gli altri `queues.get()` torna
         `None`, `waiting` resta `None`, e la distinzione `idle` / `stale` non si
-        puo' esercitare. Provarla su `admissions` darebbe un test verde che non
+        può esercitare. Provarla su `admissions` darebbe un test verde che non
         misura niente."""
         contate = set(pipeline_status.STAGE_ORDER)
         con_coda = [n for n, stages, _ in pipeline_log.WATCH_GROUPS
@@ -502,15 +502,15 @@ class SilenceMeansSomethingElseNowThatTheLauncherAssignsTheWork(unittest.TestCas
         self.assertEqual(con_coda, ["verificatore"])
 
     def test_the_launch_heartbeat_is_judged_on_itself_and_nothing_else(self):
-        """Non ha una coda: quando tace, e' il lanciatore a non essere partito,
-        e non c'e' niente da interpretare. Il suo battito e' il tick `launch`,
+        """Non ha una coda: quando tace, è il lanciatore a non essere partito,
+        e non c'è niente da interpretare. Il suo battito è il tick `launch`,
         e l'esenzione vive in `pipeline_log.SENZA_CODA`.
 
-        Le code arrivano qui da fuori, quindi un chiamante **puo'** passare un
+        Le code arrivano qui da fuori, quindi un chiamante **può** passare un
         conteggio per `launch` anche se `queue_sizes()` non lo produce mai: se
         l'esenzione sparisse, un battito muto da nove giorni con quel conteggio
-        a zero risulterebbe `idle`, cioe' "tutto a posto, non c'era niente da
-        lanciare". E' il falso silenzio piu' costoso della catena."""
+        a zero risulterebbe `idle`, cioè "tutto a posto, non c'era niente da
+        lanciare". È il falso silenzio più costoso della catena."""
         rows = pipeline_log.silence([self.entry("launch", 9)],
                                     queues={s: 0 for s in pipeline_log.STAGES})
         self.assertTrue(self.group(rows, "launch")["stale"])
@@ -519,9 +519,9 @@ class SilenceMeansSomethingElseNowThatTheLauncherAssignsTheWork(unittest.TestCas
 
 class ABrokenShardLeavesAMarkInsteadOfVanishing(unittest.TestCase):
     """Saltare in silenzio uno shard rotto farebbe sparire una run dal diario,
-    cioe' produrrebbe esattamente l'invisibilita' che il diario esiste per
-    togliere, e per giunta sulle run andate male, che sono quelle piu'
-    probabilmente scritte a meta'."""
+    cioè produrrebbe esattamente l'invisibilità che il diario esiste per
+    togliere, e per giunta sulle run andate male, che sono quelle più
+    probabilmente scritte a metà."""
 
     def test_the_run_still_shows_up_as_unreadable(self):
         with TemporaryDirectory() as tmp:

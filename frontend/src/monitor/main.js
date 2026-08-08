@@ -1,11 +1,11 @@
 // Console di monitoraggio della catena, in tempo reale.
 //
 // Sostituisce il ?token= e il full-reload ogni 60s: login Google ristretto (la
-// vera guardia e' la RLS su Postgres, questo controllo lato client e' solo per
+// vera guardia è la RLS su Postgres, questo controllo lato client è solo per
 // il messaggio), poi lettura iniziale e sottoscrizione Realtime alle tabelle
 // pipeline_activity e pipeline_tokens. Un tick appare senza refresh.
 //
-// Vanilla, nessun React: la console e' una tabella viva, non un'app.
+// Vanilla, nessun React: la console è una tabella viva, non un'app.
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -53,7 +53,7 @@ function deniedView(supabase, email) {
   h(
     '<div class="mon-gate">' +
       "<h1>Console catena</h1>" +
-      "<p>L'account <strong>" + escapeHtml(email) + "</strong> non e' autorizzato.</p>" +
+      "<p>L'account <strong>" + escapeHtml(email) + "</strong> non è autorizzato.</p>" +
       '<button id="mon-logout" class="mon-btn">Esci</button>' +
       "</div>"
   );
@@ -61,8 +61,8 @@ function deniedView(supabase, email) {
 }
 
 async function render(supabase, currentUser) {
-  // Ogni render riparte da zero: rimuovi eventuali canali gia' aperti, cosi' un
-  // TOKEN_REFRESHED (che rida' lo stesso utente) non accumula sottoscrizioni ne'
+  // Ogni render riparte da zero: rimuovi eventuali canali già aperti, così un
+  // TOKEN_REFRESHED (che ridà lo stesso utente) non accumula sottoscrizioni né
   // duplica le refresh().
   supabase.removeAllChannels();
 
@@ -111,15 +111,15 @@ async function render(supabase, currentUser) {
   await refresh(supabase);
   await loadHistory(supabase);
   // Realtime: a ogni cambiamento sulle due tabelle, rileggi il vivo (le tabelle
-  // sono piccole, una rilettura completa e' piu' semplice del merge
+  // sono piccole, una rilettura completa è più semplice del merge
   // incrementale). Catalogo e cronologia sono storia dai file git, non push:
   // fetch al caricamento e sul bottone Aggiorna, non a ogni tick.
   supabase
     .channel("pipeline")
     // Un battito cambia gli in_flight: la board li fonde lato server, quindi
     // rifetchala oltre alle tabelle vive, o un indicatore appena avviato resterebbe
-    // "in coda" nel catalogo fino a un Aggiorna manuale. La board e' memoizzata 30s
-    // lato server, quindi rifetchare a ogni evento e' a buon mercato.
+    // "in coda" nel catalogo fino a un Aggiorna manuale. La board è memoizzata 30s
+    // lato server, quindi rifetchare a ogni evento è a buon mercato.
     .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_activity" }, () => {
       refresh(supabase);
       loadBoard(supabase);
@@ -145,9 +145,9 @@ async function render(supabase, currentUser) {
   });
 }
 
-// La storia authed. Il Bearer del login Google e' lo stesso confine mail-admin
+// La storia authed. Il Bearer del login Google è lo stesso confine mail-admin
 // del backend; senza, i due endpoint fanno 404 (endpoint interno, non conferma
-// di esistere). I due dati si tengono in modulo cosi' i filtri ridisegnano
+// di esistere). I due dati si tengono in modulo così i filtri ridisegnano
 // senza rifetchare.
 let boardData = null;
 let runsData = null;
@@ -201,7 +201,7 @@ async function loadBoard(supabase) {
   // La lavorazione (`work_status`) e la lista ordinata (`status_order`) sono
   // decise una volta sola lato server (`scripts/pipeline_monitor.py`), non
   // ridedotte qui: prima questa traduzione stato-grezzo -> etichetta viveva
-  // solo in questo file, una seconda verita' che poteva divergere da /_pipeline.
+  // solo in questo file, una seconda verità che poteva divergere da /_pipeline.
   const order = (data && data.status_order) || [];
   fillOptions("cat-status", order.filter((s) => rows.some((r) => r.work_status === s)));
   fillOptions("cat-phase", uniq(rows.map((r) => r.phase)));
@@ -266,9 +266,9 @@ function renderCatalog() {
   });
 
   // Contatori COMPLETI, sul catalogo intero, non sul solo filtro: restano stabili
-  // mentre si filtra, cosi' "quanti pubblicati, quanti rimangono" si legge sempre.
-  // Ogni pastiglia e' un filtro con un clic (toggle) sulla lavorazione; "pubblicata"
-  // e' la scorciatoia per vedere solo i pubblicati. Il conteggio mostrato riflette
+  // mentre si filtra, così "quanti pubblicati, quanti rimangono" si legge sempre.
+  // Ogni pastiglia è un filtro con un clic (toggle) sulla lavorazione; "pubblicata"
+  // è la scorciatoia per vedere solo i pubblicati. Il conteggio mostrato riflette
   // il filtro attuale, separato dai totali globali.
   const byStatusAll = {};
   allRows.forEach((r) => {
@@ -279,8 +279,8 @@ function renderCatalog() {
   const remaining = allRows.length - published - closed;
 
   // Copertura del catalogo: l'universo vero (tutti i cataloghi di famiglia,
-  // `_pipeline_universe` in app/views.py), non solo `allRows.length` (che e'
-  // solo cio' che ha gia' toccato una pratica di ammissione). Risponde a
+  // `_pipeline_universe` in app/views.py), non solo `allRows.length` (che è
+  // solo ciò che ha già toccato una pratica di ammissione). Risponde a
   // "quanti indicatori in totale, quanti indicizzati, se manca qualcosa da
   // ammettere, e dentro quelli ammessi e indicizzabili a che punto siamo".
   const coverageEl = document.getElementById("cat-coverage");
@@ -337,7 +337,7 @@ function renderCatalog() {
       chips +
     "</div>";
   // Clic su una pastiglia = imposta (o azzera) il filtro lavorazione, poi ridisegna
-  // da pagina 1 (il filtro cambia, la pagina corrente non ha piu' senso).
+  // da pagina 1 (il filtro cambia, la pagina corrente non ha più senso).
   totalsEl.querySelectorAll(".mon-chip--click").forEach((btn) => {
     btn.onclick = () => {
       const sel = document.getElementById("cat-status");
@@ -348,8 +348,8 @@ function renderCatalog() {
   });
 
   // Legenda visibile degli stati presenti: il title del badge non arriva a chi usa
-  // touch o tastiera (ne', sul layout a schede mobile, a nessuno). Un <details>
-  // nativo e' focusabile, toccabile e leggibile dallo screen reader, e serve la
+  // touch o tastiera (né, sul layout a schede mobile, a nessuno). Un <details>
+  // nativo è focusabile, toccabile e leggibile dallo screen reader, e serve la
   // stessa domanda ("che vuol dire in attesa?") a chiunque, sempre.
   const legendEl = document.getElementById("cat-legend");
   if (legendEl) {
@@ -366,7 +366,7 @@ function renderCatalog() {
 
   if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun indicatore col filtro attuale.</p>');
 
-  // Pagina: clampa la pagina corrente all'intervallo valido (un filtro puo' averla
+  // Pagina: clampa la pagina corrente all'intervallo valido (un filtro può averla
   // resa fuori range) e affetta le righe da mostrare.
   const totalPages = Math.max(1, Math.ceil(rows.length / CAT_PAGE_SIZE));
   if (catPage > totalPages - 1) catPage = totalPages - 1;
@@ -410,7 +410,7 @@ function renderCatalog() {
       })
       .join("") +
     "</tbody></table>" +
-    pager; // pager anche in fondo: con 50 righe lo scroll e' lungo
+    pager; // pager anche in fondo: con 50 righe lo scroll è lungo
 
   // Prev/Next compaiono due volte (sopra e sotto): querySelectorAll li prende
   // entrambi. Cambiano solo la pagina e ridisegnano, senza azzerarla.

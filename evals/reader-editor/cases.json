@@ -1,13 +1,13 @@
 {
   "_": [
-    "Gold set del reader-editor: articoli indicatore da giudicare sulla LEGGIBILITA'",
+    "Gold set del reader-editor: articoli indicatore da giudicare sulla LEGGIBILITÀ",
     "CONTRO LA PROSA CONGELATA di ogni caso, mai contro la pagina viva (che cambia",
-    "quando il produttore riscrive). 'label' e' la verita' editoriale: pass = un",
+    "quando il produttore riscrive). 'label' è la verità editoriale: pass = un",
     "lettore comune lo capisce al primo passaggio, revise = no. L'agente sotto eval",
     "compila 'verdict' (pass/revise) e score_eval.py confronta. L'errore che costa",
-    "e' il FALSO PASS: un articolo corretto-ma-tecnico fatto passare come leggibile",
-    "resta illeggibile su una pagina pubblica, ed e' il difetto che il ruolo esiste",
-    "per prendere. Per questo la misura di testa e' il recall sui revise.",
+    "è il FALSO PASS: un articolo corretto-ma-tecnico fatto passare come leggibile",
+    "resta illeggibile su una pagina pubblica, ed è il difetto che il ruolo esiste",
+    "per prendere. Per questo la misura di testa è il recall sui revise.",
     "NB: questo blocco NON dice quali casi siano pass o revise, di proposito. La",
     "prima versione li nominava e regalava le risposte all'agente sotto eval; ora",
     "'label' vive solo per-caso, e run_eval.prepare() toglie sia le 'label' sia",
@@ -20,7 +20,7 @@
       "id": "p01",
       "code": "ter-16",
       "label": "pass",
-      "why": "Lead che traduce subito ('una fila che scorre o un blocco che non si smonta'), definizione con esempio a scala umana ('meta di chi cerca lo fa da piu di un anno, non meta della popolazione'). Apre sul significato, tiene una tesi sola. Legge al primo passaggio.",
+      "why": "Lead che traduce subito ('una fila che scorre o un blocco che non si smontà), definizione con esempio a scala umana ('meta di chi cerca lo fa da piu di un anno, non meta della popolazioné). Apre sul significato, tiene una tesi sola. Legge al primo passaggio.",
       "prose": {
         "lead": "La quota di chi cerca lavoro da più di un anno dice che tipo di disoccupazione ha un territorio, se una fila che scorre o un blocco che non si smonta. Nel 2025 è tornata a salire dopo tre anni di discesa, e la graduatoria regionale si spezza a metà.",
         "sections": [
@@ -51,7 +51,7 @@
       "id": "p02",
       "code": "bes-02IST023",
       "label": "pass",
-      "why": "Lead sul risultato ('il divario si e ridotto, a ridurlo e il vertice che scende'), heading concreto ('Quattro libri l'anno'). Soglia spiegata, cifre a scala umana. Pass netto.",
+      "why": "Lead sul risultato ('il divario si e ridotto, a ridurlo e il vertice che scendè), heading concreto ('Quattro libri l'annò). Soglia spiegata, cifre a scala umana. Pass netto.",
       "prose": {
         "lead": "Il divario nella lettura tra le regioni si è ridotto di dieci punti e mezzo in vent'anni, e a ridurlo è stato il vertice che scende, non il fondo che sale. Nel 2005 sei regioni leggevano più di quanto legga oggi il Trentino Alto Adige, che dall'inizio della serie non ha mai lasciato il primo posto.",
         "sections": [
@@ -82,7 +82,7 @@
       "id": "p03",
       "code": "dem-BIRTHRATE",
       "label": "pass",
-      "why": "Lead che dice subito la cautela ('la coppia dice subito che questo numero non misura chi sta meglio'), tasso grezzo tradotto ('un nato ogni centosessanta residenti'). Contextual da manuale, ben reso. Pass.",
+      "why": "Lead che dice subito la cautela ('la coppia dice subito che questo numero non misura chi sta megliò), tasso grezzo tradotto ('un nato ogni centosessanta residentì). Contextual da manuale, ben reso. Pass.",
       "prose": {
         "lead": "In cima al tasso di natalità il Trentino-Alto Adige sta accanto alla Campania, e la coppia dice subito che questo numero non misura chi sta meglio. Un tasso alto tiene insieme quanti figli nascono per donna e quante persone in età di averne vivono in una regione.",
         "sections": [
@@ -113,7 +113,7 @@
       "id": "p04",
       "code": "bes-06POL012",
       "label": "pass",
-      "why": "Lead sul risultato controintuitivo ('le carceri piu piene non stanno solo al Sud'), definizione tradotta ('centoquaranta che ogni cento posti ci sono quaranta persone in piu'). Pass.",
+      "why": "Lead sul risultato controintuitivo ('le carceri piu piene non stanno solo al Sud'), definizione tradotta ('centoquaranta che ogni cento posti ci sono quaranta persone in più). Pass.",
       "prose": {
         "lead": "Le carceri più piene d'Italia non stanno solo al Sud, e sopra il 140% della capienza ci sono Puglia e Friuli-Venezia Giulia insieme a Lombardia e Veneto. Nel 2024 le regioni con più posti regolamentari che detenuti sono tre, e il margine aperto a metà del decennio scorso si sta richiudendo.",
         "sections": [
@@ -144,7 +144,7 @@
       "id": "r01",
       "code": "eur-rd_p_persreg",
       "label": "revise",
-      "why": "Ogni cifra e giusta, ma il primo H2 apre su 'Il numeratore e in equivalenti a tempo pieno, il denominatore no': contabilita prima della storia. La geografia immobile, che e la notizia, resta sotto la meccanica FTE. structure, cognitive_load e technical_translation bassi. Il caso guida.",
+      "why": "Ogni cifra e giusta, ma il primo H2 apre su 'Il numeratore e in equivalenti a tempo pieno, il denominatore nò: contabilita prima della storia. La geografia immobile, che e la notizia, resta sotto la meccanica FTE. structure, cognitive_load e technical_translation bassi. Il caso guida.",
       "prose": {
         "lead": "In cinque anni la ricerca italiana non ha cambiato geografia: le stesse nove regioni in testa dal 2019 al 2023, e a cedere è la fascia di mezzo. Il gradino che separa la nona regione dalla decima è più che raddoppiato, e la mediana è scesa mentre la media restava dov'era.",
         "sections": [
@@ -175,14 +175,14 @@
       "id": "r02",
       "code": "ter-167",
       "label": "revise",
-      "why": "Un utente reale l'ha giudicato 'macchinoso, si vede che e tradotto in inglese'. La definizione infila una digressione metodologica lunga sul nome (986 righe, un altro indicatore), il quadro impila due incroci con causalita cauta. cognitive_load e structure bassi. E il caso che ha motivato il criterio 8.",
+      "why": "Un utente reale l'ha giudicato 'macchinoso, si vede che e tradotto in inglesé. La definizione infila una digressione metodologica lunga sul nome (986 righe, un altro indicatore), il quadro impila due incroci con causalita cauta. cognitive_load e structure bassi. E il caso che ha motivato il criterio 8.",
       "prose": {
         "lead": "Nel 2023 le regioni italiane hanno investito in media la quota di prodotto più alta dal 1995, e la risalita ha toccato tutte e venti. La mappa però non è quella che l'atlante abitua ad aspettarsi, con la Lombardia tredicesima e il Lazio diciannovesimo.",
         "sections": [
           {
             "role": "definizione",
             "h": "Quanta parte del prodotto torna in capitale",
-            "body": "L'intensità di accumulazione mette gli investimenti fissi lordi di un anno sopra il PIL dello stesso anno, e quello che ne esce è una quota. Gli investimenti fissi lordi sono la spesa in beni destinati a restare in produzione oltre l'anno, dagli edifici ai macchinari. Un valore di 20 dice che un quinto di quanto un territorio ha prodotto in dodici mesi è tornato in dotazione produttiva.\n\nTrattandosi di un rapporto, misura l'impegno e non il volume. Una regione piccola può stare in cima muovendo cifre assolute molto più basse di una regione grande ferma a metà classifica.\n\nUna cautela sul nome, prima di leggere le cifre. Istat pubblica questi stessi numeri, identici su tutte e 986 le righe dell'archivio unico e su tutti gli anni dal 1995, anche sotto la tavola [investimenti privati sul PIL](/indicatore/investimenti-privati-sul-pil/ter-471), che dichiara come dati di base gli investimenti privati invece degli investimenti fissi lordi. Le due etichette non possono essere giuste entrambe sopra la stessa serie, e da qui non si puo' dire quale lo sia. Quello che la quota misura in ogni caso e' l'intensita' di investimento di un territorio."
+            "body": "L'intensità di accumulazione mette gli investimenti fissi lordi di un anno sopra il PIL dello stesso anno, e quello che ne esce è una quota. Gli investimenti fissi lordi sono la spesa in beni destinati a restare in produzione oltre l'anno, dagli edifici ai macchinari. Un valore di 20 dice che un quinto di quanto un territorio ha prodotto in dodici mesi è tornato in dotazione produttiva.\n\nTrattandosi di un rapporto, misura l'impegno e non il volume. Una regione piccola può stare in cima muovendo cifre assolute molto più basse di una regione grande ferma a metà classifica.\n\nUna cautela sul nome, prima di leggere le cifre. Istat pubblica questi stessi numeri, identici su tutte e 986 le righe dell'archivio unico e su tutti gli anni dal 1995, anche sotto la tavola [investimenti privati sul PIL](/indicatore/investimenti-privati-sul-pil/ter-471), che dichiara come dati di base gli investimenti privati invece degli investimenti fissi lordi. Le due etichette non possono essere giuste entrambe sopra la stessa serie, e da qui non si può dire quale lo sia. Quello che la quota misura in ogni caso è l'intensità di investimento di un territorio."
           },
           {
             "role": "quadro",

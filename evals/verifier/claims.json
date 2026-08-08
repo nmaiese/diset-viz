@@ -2,8 +2,8 @@
   "_": [
     "Gold set del verificatore: dodici affermazioni su ter-178, da giudicare",
     "CONTRO IL BRIEF CONGELATO in evals/writer/brief_ter-178.txt, mai contro i",
-    "dati vivi: e' cio' che rende l'esito ripetibile nel tempo. label e' la",
-    "verita'; l'agente sotto eval compila verdict con gli stessi tre valori",
+    "dati vivi: è ciò che rende l'esito ripetibile nel tempo. label è la",
+    "verità; l'agente sotto eval compila verdict con gli stessi tre valori",
     "(confermata / smentita / non_verificabile) e score_eval.py confronta."
   ],
   "indicator": "ter-178",
@@ -11,28 +11,28 @@
   "claims": [
     {
       "id": "v01",
-      "claim": "Nel 2025 la Valle d'Aosta e' prima con il 68,9%.",
+      "claim": "Nel 2025 la Valle d'Aosta è prima con il 68,9%.",
       "label": "confermata"
     },
     {
       "id": "v02",
-      "claim": "Il divario tra la prima e l'ultima regione e' di quasi 35 punti percentuali.",
+      "claim": "Il divario tra la prima e l'ultima regione è di quasi 35 punti percentuali.",
       "label": "confermata"
     },
     {
       "id": "v03",
-      "claim": "La Campania e' ultima in classifica nel 2025.",
+      "claim": "La Campania è ultima in classifica nel 2025.",
       "label": "confermata"
     },
     {
       "id": "v04",
-      "claim": "Il Lazio sta nella meta' alta della classifica 2025.",
+      "claim": "Il Lazio sta nella metà alta della classifica 2025.",
       "label": "smentita",
-      "why": "e' dodicesimo su venti, quindi nella meta' bassa"
+      "why": "è dodicesimo su venti, quindi nella metà bassa"
     },
     {
       "id": "v05",
-      "claim": "Dal 2018 al 2025 il tasso e' cresciuto in tutte le regioni.",
+      "claim": "Dal 2018 al 2025 il tasso è cresciuto in tutte le regioni.",
       "label": "confermata",
       "why": "il blocco controcorrente dice: nessuno"
     },
@@ -44,36 +44,36 @@
     },
     {
       "id": "v07",
-      "claim": "L'indicatore misura le donne occupate tra 15 e 64 anni sulla popolazione femminile della stessa eta'.",
+      "claim": "L'indicatore misura le donne occupate tra 15 e 64 anni sulla popolazione femminile della stessa età.",
       "label": "confermata"
     },
     {
       "id": "v08",
       "claim": "L'indicatore misura la quota di donne sul totale degli occupati.",
       "label": "smentita",
-      "why": "il denominatore e' la popolazione femminile 15-64, non gli occupati"
+      "why": "il denominatore è la popolazione femminile 15-64, non gli occupati"
     },
     {
       "id": "v09",
-      "claim": "Il divario tra le regioni si e' piu' che dimezzato dal 2018.",
+      "claim": "Il divario tra le regioni si è più che dimezzato dal 2018.",
       "label": "smentita",
-      "why": "si e' ristretto di 0,92 punti percentuali, non della meta'"
+      "why": "si è ristretto di 0,92 punti percentuali, non della metà"
     },
     {
       "id": "v10",
-      "claim": "L'Umbria ha guadagnato piu' di 8 punti percentuali dal 2018.",
+      "claim": "L'Umbria ha guadagnato più di 8 punti percentuali dal 2018.",
       "label": "confermata",
       "why": "+8,39"
     },
     {
       "id": "v11",
-      "claim": "Nelle regioni dove l'occupazione femminile e' alta, il divario di attivita' tra uomini e donne tende a essere piu' basso.",
+      "claim": "Nelle regioni dove l'occupazione femminile è alta, il divario di attività tra uomini e donne tende a essere più basso.",
       "label": "confermata",
-      "why": "rho -0,94 con ter-61, e il verbo e' calibrato sulla co-occorrenza"
+      "why": "rho -0,94 con ter-61, e il verbo è calibrato sulla co-occorrenza"
     },
     {
       "id": "v12",
-      "claim": "La crescita dell'occupazione femminile e' dovuta all'espansione dei servizi per l'infanzia.",
+      "claim": "La crescita dell'occupazione femminile è dovuta all'espansione dei servizi per l'infanzia.",
       "label": "non_verificabile",
       "why": "una causa che l'indicatore non mostra e nessuna fonte nel brief sostiene"
     }

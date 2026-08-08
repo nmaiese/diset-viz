@@ -61,12 +61,12 @@ ULTIMO PASSAGGIO  2024 -> 2025  (base comune: 20)
 
 INDICATORI CORRELATI  (la materia prima di un incrocio e dei link interni)
   hub del tema  /tema/lavoro-e-conciliazione   (Lavoro e conciliazione, 57 indicatori)
-  rho e' la correlazione di rango sui valori regionali dell'ultimo anno di ciascuna
+  rho è la correlazione di rango sui valori regionali dell'ultimo anno di ciascuna
   serie. Dice se due indicatori mettono i territori nello stesso ordine, non che
-  uno causi l'altro: e' una co-occorrenza e va scritta come tale. Le posizioni
+  uno causi l'altro: è una co-occorrenza e va scritta come tale. Le posizioni
   sono per valore decrescente, non per merito.
-  Sopra 0,95 guarda il nome prima di scrivere: di solito e' lo stesso
-  fenomeno misurato su un'altra fascia o sull'altro sesso, e dirlo non e' una notizia.
+  Sopra 0,95 guarda il nome prima di scrivere: di solito è lo stesso
+  fenomeno misurato su un'altra fascia o sull'altro sesso, e dirlo non è una notizia.
 
   DISEGNANO LA STESSA MAPPA  (gli stessi territori in alto e in basso)
     rho +0,95 su 20 regioni   Tasso di occupazione 20-64 anni
@@ -96,7 +96,7 @@ INDICATORI CORRELATI  (la materia prima di un incrocio e dei link interni)
       /indicatore/tasso-di-disoccupazione-di-lunga-durata-femmine/ter-184   (lower_better, ultimo anno 2025)
       le due estreme di qui, su questa scala: Valle d'Aosta 1,22 (#19 su 20), Campania 10,31 (#1 su 20)
 
-  DISEGNANO UNA MAPPA DIVERSA  (la geografia qui non c'entra, ed e' spesso la cosa piu interessante da dire)
+  DISEGNANO UNA MAPPA DIVERSA  (la geografia qui non c'entra, ed è spesso la cosa piu interessante da dire)
     rho +0,01 su 20 regioni   Imprenditorialità giovanile (totale)
       /indicatore/imprenditorialita-giovanile-totale/ter-401   (higher_better, ultimo anno 2023)
       le due estreme di qui, su questa scala: Valle d'Aosta 5,49 (#7 su 20), Campania 6,67 (#1 su 20)

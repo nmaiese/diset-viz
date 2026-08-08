@@ -1,10 +1,10 @@
 """Misura i rilevatori su tutto il catalogo e scrive packs/calibration.json.
 
-Perche' esiste: la dimensione di un effetto non dice se quell'effetto e'
-notevole. Una graduatoria di venti valori ha sempre un salto piu' largo degli
+Perché esiste: la dimensione di un effetto non dice se quell'effetto è
+notevole. Una graduatoria di venti valori ha sempre un salto più largo degli
 altri, e in quasi ogni serie qualcuno si muove controcorrente: ordinare per
 dimensione grezza faceva aprire il 90% degli articoli a due soli tipi di
-angolo, il che e' l'uniformita' che il pacchetto esiste per togliere.
+angolo, il che è l'uniformità che il pacchetto esiste per togliere.
 
 Con questa tabella la forza di un angolo diventa il posto che occupa nella
 distribuzione del proprio tipo, quindi confrontabile fra tipi diversi davvero e
@@ -14,8 +14,8 @@ non per modo di dire.
     python3 -m scripts.calibrate_angles --dry-run    # mostra e non scrive
     python3 -m scripts.calibrate_angles --report     # come cambia chi apre
 
-Va rigenerata quando entra una famiglia di dati nuova. Non e' un file da
-scrivere a mano: e' una misura, e il giorno che qualcuno la ritocca a mano la
+Va rigenerata quando entra una famiglia di dati nuova. Non è un file da
+scrivere a mano: è una misura, e il giorno che qualcuno la ritocca a mano la
 forza torna a essere un'opinione.
 """
 from __future__ import annotations

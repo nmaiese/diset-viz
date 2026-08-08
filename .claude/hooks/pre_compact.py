@@ -2,12 +2,12 @@
 """Hook PreCompact: lo stato della run, ridetto prima che il contesto si accorci.
 
 Quando la conversazione viene compattata, quello che sta solo nella
-conversazione puo' perdersi. Le cose che una run della catena non puo'
-permettersi di dimenticare pero' stanno tutte in file committati o in git:
-questo hook le rilegge da li' e le ristampa, cosi' il riassunto che entra nel
-nuovo contesto le porta con se'. Non inventa stato, lo cita.
+conversazione può perdersi. Le cose che una run della catena non può
+permettersi di dimenticare però stanno tutte in file committati o in git:
+questo hook le rilegge da lì e le ristampa, così il riassunto che entra nel
+nuovo contesto le porta con sé. Non inventa stato, lo cita.
 
-Best effort: stampare meno e' sempre meglio che fallire.
+Best effort: stampare meno è sempre meglio che fallire.
 """
 
 import json

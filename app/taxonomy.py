@@ -251,9 +251,9 @@ DUPLICATE_BES_IDS = {
 # regione" fissa a ogni titolo indipendentemente dal livello: senza un
 # qualificatore i due titoli collassano sullo stesso <title>, esattamente il
 # rilievo di Codex sulla #177 su `DUPLICATE_BES_IDS`, qui sulla dimensione
-# livello invece che fonte. Il fix corretto e' rendere `_TITLE_TAIL`
+# livello invece che fonte. Il fix corretto è rendere `_TITLE_TAIL`
 # consapevole del livello per ogni indicatore; nel frattempo questo insieme
-# riusa lo stesso meccanismo di `source_qualifier` gia' in `views._render_indicator`.
+# riusa lo stesso meccanismo di `source_qualifier` già in `views._render_indicator`.
 PROVINCE_ONLY_TITLE_COLLISIONS = {
     "06POL012P",  # Affollamento degli istituti di pena -> gemello regionale 06POL012
     "07SIC001P",  # Omicidi volontari -> gemello regionale 07SIC001

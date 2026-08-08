@@ -1,11 +1,11 @@
 """I due endpoint JSON della dashboard nella console: catalogo e cronologia.
 
-Il calcolo sotto (`load_board`, `runs_timeline`) e' gia' coperto altrove; qui si
-prova solo il wrapper authed. Il confine e' la mail admin: anonimo e non-admin
+Il calcolo sotto (`load_board`, `runs_timeline`) è già coperto altrove; qui si
+prova solo il wrapper authed. Il confine è la mail admin: anonimo e non-admin
 vedono un 404 (non 403: un endpoint interno non conferma di esistere), l'admin
 vede la shape attesa.
 
-Il test che conta e' `test_admin_then_anonymous`: e' la rete contro chi un domani
+Il test che conta è `test_admin_then_anonymous`: è la rete contro chi un domani
 rimettesse `@cache.cached` sulla view, che corto-circuiterebbe il corpo su un hit
 di cache e servirebbe il dato all'anonimo. Verifica che l'auth gira sempre prima
 del calcolo, qualunque sia il backend di cache (qui NullCache), mockando l'helper
@@ -125,10 +125,10 @@ class PipelineApiLiveOverlay(unittest.TestCase):
         from app import pipeline_state
         from app.cache import cache
         from scripts import pipeline_monitor
-        # `_pipeline_board_payload` e' memoizzato (30s): azzero cosi' la richiesta
+        # `_pipeline_board_payload` è memoizzato (30s): azzero così la richiesta
         # ricalcola sul DB di questo test e non su un payload scaldato altrove.
         cache.clear()
-        # un indicatore reale che il committato NON da' ancora pubblicato
+        # un indicatore reale che il committato NON dà ancora pubblicato
         target = next((r for r in pipeline_monitor.load_board()["rows"]
                        if r.get("published") is not True and r.get("id")), None)
         self.assertIsNotNone(target)
@@ -152,7 +152,7 @@ class PipelineApiLiveOverlay(unittest.TestCase):
         if not row:
             self.skipTest("nessuna run nel dossier committato")
         tid, run_id, committed_state = row["id"], row["runs"][0]["run_id"], row["state"]
-        # un outcome con QUEL run_id (gia' su master) e uno stato diverso: ignorato.
+        # un outcome con QUEL run_id (già su master) e uno stato diverso: ignorato.
         pipeline_state.record_outcome(tid, run_id, {"state": "in-quarantena"},
                                       at="2026-08-04T14:00:00+00:00")
         rows = {r["id"]: r for r in pipeline_monitor.load_board(

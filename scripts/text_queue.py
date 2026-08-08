@@ -65,7 +65,7 @@ def assess(family, raw_id, level_key=None):
         view["levels"][0],
     )
     article = build_article(meta["id"], level["key"])
-    # `missing` e' relativo alle sezioni che l'articolo emette: un'entry con
+    # `missing` è relativo alle sezioni che l'articolo emette: un'entry con
     # `roles_covered` che assorbe la definizione nel blocco "Come leggere" non
     # emette quella sezione, quindi non risulta "da scrivere" (altrimenti il
     # produttore la riscriverebbe a ogni run).
@@ -97,7 +97,7 @@ def assess(family, raw_id, level_key=None):
         "lead": bool(article["lead"]),
         "missing": missing,
         "written": len(article["sections"]) - len(missing),
-        # Il denominatore e' quello dell'articolo, non il quattro fisso: un
+        # Il denominatore è quello dell'articolo, non il quattro fisso: un
         # articolo opt-in completo ne emette tre, e stamparlo come `3/4` accanto
         # a `mancano: -` dava all'operatore due segnali che si contraddicono.
         "sections": len(article["sections"]),

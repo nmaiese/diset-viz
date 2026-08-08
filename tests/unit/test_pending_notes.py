@@ -91,8 +91,8 @@ class PendingNotesWorklist(unittest.TestCase):
         self.assertNotIn("12", [m["id"] for m in missing])
 
     def test_the_three_substantive_roles_stay_required(self):
-        """Solo la definizione e' omettibile: e' l'unico ruolo che il blocco
-        copre. Una dichiarazione non puo' cancellare quadro, dinamica o limiti."""
+        """Solo la definizione è omettibile: è l'unico ruolo che il blocco
+        copre. Una dichiarazione non può cancellare quadro, dinamica o limiti."""
         entry = _article("quadro", vintage=2025)
         entry["roles_covered"] = ["quadro"]
         missing, _ = pending_notes.pending(self._manifest(), {"12": entry}, self._year_max)
@@ -130,7 +130,7 @@ class PendingNotesWorklist(unittest.TestCase):
                 expected = indicator_texts.emitted_roles(entry)
                 self.assertEqual(pending_notes.emitted_roles(entry), expected)
                 self.assertEqual(practice_timeline._emitted_roles(entry), expected)
-                # L'impronta guarda lo stesso insieme, e tace quando e' quello
+                # L'impronta guarda lo stesso insieme, e tace quando è quello
                 # di sempre (la pagina rende come prima, niente da riverificare).
                 emitted = verification_queue._emitted_roles(entry)
                 if set(expected) == set(pending_notes.ARTICLE_ROLES):

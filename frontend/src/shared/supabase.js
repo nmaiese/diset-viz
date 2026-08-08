@@ -1,11 +1,11 @@
 // Client Supabase per il gioco: login Google e token di sessione.
 //
-// Tutto e' opzionale. La configurazione arriva dal server via window.__supabase
+// Tutto è opzionale. La configurazione arriva dal server via window.__supabase
 // (URL + anon key pubbliche, iniettate nel template). Se manca, il gioco resta
 // esattamente anonimo com'era: nessun bottone di login, nessun header
 // Authorization, e -- importante -- la libreria @supabase/supabase-js NON viene
-// nemmeno scaricata (import dinamico dietro il flag di configurazione). Cosi' la
-// pagina del gioco non paga il peso di supabase finche' l'account non e' attivo.
+// nemmeno scaricata (import dinamico dietro il flag di configurazione). Così la
+// pagina del gioco non paga il peso di supabase finché l'account non è attivo.
 
 let _clientPromise = null;
 
@@ -72,7 +72,7 @@ export async function signOut() {
 }
 
 // Segnala al server la sessione: upsert del profilo + last_seen (best-effort).
-// Da chiamare da OGNI punto in cui il frontend conferma un login, cosi' il
+// Da chiamare da OGNI punto in cui il frontend conferma un login, così il
 // profilo nasce ovunque ci si logghi (atlante compreso). Seed del nickname dal
 // locale del gioco solo alla creazione. Ritorna il profilo o null.
 export async function syncProfile() {
@@ -103,7 +103,7 @@ function _readJson(key) {
 
 // Fonde le statistiche locali del gioco (localStorage) nell'account, UNA sola
 // volta per account (flag one-time). I 'best' si fondono con max, i contatori con
-// somma: l'idempotenza la garantisce il flag qui, cosi' un secondo login non
+// somma: l'idempotenza la garantisce il flag qui, così un secondo login non
 // raddoppia i contatori. Ritorna gli achievement eventualmente sbloccati.
 export async function mergeLocalStatsOnce(userId) {
   if (!userId) return [];

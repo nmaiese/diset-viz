@@ -196,15 +196,15 @@ integro, canary annotato in `docs/CANARY.md` (2026-08-06, baseline 8/8).
    sui revise, dedup per code, freno via `to_revise`, hint d'ordine
    (reader-editor prima del verificatore in `ROLE_ORDER`). I 300 restano
    `pubblicata` (+7 unit, +1 gruppo monitor). **Slot riservato** in
-   `cap_for_tick` (+4 unit): le letture ereditano la priorita' alta di un
+   `cap_for_tick` (+4 unit): le letture ereditano la priorità alta di un
    pubblicato e senza riserva monopolizzerebbero il tick (verificato: 3/3 letture)
    fermando il lavoro fattuale. Con la riserva l'arretrato drena a 1/tick e gli
    altri due slot restano a produrre/verificare. Trovato in review con l'advisor.
 
 **Attriti noti, non chiusi qui:** (a) il tipo-agente `reader-editor` hookato non
-puo' scrivere in `evals/out/` (serve una deroga in `agent_guard.py`) — il canary
+può scrivere in `evals/out/` (serve una deroga in `agent_guard.py`) — il canary
 gira col metodo documentato (subagent con istruzioni reali, no hook); (b) il gold
-ha 8 casi netti, non vede regressioni piccole finche' non si allarga.
+ha 8 casi netti, non vede regressioni piccole finché non si allarga.
 
 ## Decisioni chiuse
 

@@ -1,13 +1,13 @@
-"""Il workflow di scrittura: le proprieta' che non devono sparire in un edit.
+"""Il workflow di scrittura: le proprietà che non devono sparire in un edit.
 
-Uno script di orchestrazione non ha una suite propria, ed e' esattamente il
+Uno script di orchestrazione non ha una suite propria, ed è esattamente il
 tipo di file che si degrada in silenzio: qualcuno toglie la seconda bozza per
 risparmiare, e la regressione alla media torna senza che niente fallisca. Qui
 si controllano le poche decisioni su cui poggia il disegno, e ognuna viene da
 una misura della prima run, non da un'opinione.
 
 Non prova che il workflow *funzioni*: quello lo dice solo una run vera. Prova
-che continui a essere il workflow che e' stato deciso.
+che continui a essere il workflow che è stato deciso.
 """
 import json
 import os
@@ -17,8 +17,8 @@ import unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SCRIPT = os.path.join(ROOT, ".claude", "workflows", "produci-indicatori.js")
 AGENTI = os.path.join(ROOT, ".claude", "agents")
-# I quattro tipi che il workflow lancia. `preparatore-pacchetti` c'e' perche'
-# lo stadio dei pacchetti girava come `pubblicatore`, cioe' con il permesso di
+# I quattro tipi che il workflow lancia. `preparatore-pacchetti` c'è perché
+# lo stadio dei pacchetti girava come `pubblicatore`, cioè con il permesso di
 # scrivere in content/indicators/ che non gli serve.
 AGENTI_DELL_OFFICINA = ("preparatore-pacchetti.md", "scrittore-indicatore.md",
                         "giudice-cieco.md", "pubblicatore.md")
@@ -51,9 +51,9 @@ class AnAgentReceivesItDoesNotSearch(unittest.TestCase):
     """La regola da cui discende tutto, e la misura che la impone.
 
     Prima run: scrittori 162 turni e $2,90-3,66 ciascuno, giudici 4 turni e
-    $0,14 ciascuno, con lo stesso modello e un prompt di partenza piu' piccolo
+    $0,14 ciascuno, con lo stesso modello e un prompt di partenza più piccolo
     per gli scrittori (26.676 contro 30.434). La differenza erano i turni, e i
-    turni erano ricerca. E il costo dei turni e' quadratico: la lettura di
+    turni erano ricerca. E il costo dei turni è quadratico: la lettura di
     cache cresce di ~1.950 token a turno.
     """
 
@@ -68,7 +68,7 @@ class AnAgentReceivesItDoesNotSearch(unittest.TestCase):
                          "un pacchettaio per run, non uno per indicatore")
 
     def test_what_travels_is_the_path_not_the_pack(self):
-        """Cio' che un agente restituisce e' output, a 25 $/MTok.
+        """Ciò che un agente restituisce è output, a 25 $/MTok.
 
         Un pacchetto pesa 6-12 mila token: cinquanta indicatori sarebbero mezzo
         milione di token di puro transito da un agente solo.
@@ -79,10 +79,10 @@ class AnAgentReceivesItDoesNotSearch(unittest.TestCase):
     def test_the_writer_is_given_the_path_not_told_to_find_it(self):
         self.assertIn("${pack.path}", self.text)
         self.assertNotIn("officina.brief", self.text,
-                         "il brief eseguito dall'agente e' la riga che e' costata la run")
+                         "il brief eseguito dall'agente è la riga che è costata la run")
 
     def test_no_agent_is_told_to_run_bare_python3(self):
-        """`python3` qui e' una funzione di shell senza le dipendenze.
+        """`python3` qui è una funzione di shell senza le dipendenze.
 
         Tutti e quattro gli scrittori della prima run ci hanno sbattuto contro,
         e un pubblicatore ha finito per usare l'interprete di un altro
@@ -97,7 +97,7 @@ class AnAgentReceivesItDoesNotSearch(unittest.TestCase):
 
         Si contano le chiamate invece di analizzare gli oggetti di opzioni: un
         template literal contiene graffe, e una regex che le bilanci sarebbe
-        piu' fragile del controllo che deve fare.
+        più fragile del controllo che deve fare.
         """
         code = _senza_commenti(self.text)
         # Ogni spawn passa da `conTipo`, che aggiunge `agentType` e ripiega una
@@ -114,16 +114,16 @@ class AnAgentReceivesItDoesNotSearch(unittest.TestCase):
         """Il perimetro non si degrada: se manca, non si gira.
 
         Una prima versione ripiegava su un agente senza tipo, e la prova ha
-        mostrato perche' e' sbagliato: senza restrizione, due scrittori con
-        prompt identico hanno fatto 2 e 26 turni, e l'advisor e' rientrato per
-        il 29% del costo. Il ripiego toglieva esattamente cio' che il tipo
+        mostrato perché è sbagliato: senza restrizione, due scrittori con
+        prompt identico hanno fatto 2 e 26 turni, e l'advisor è rientrato per
+        il 29% del costo. Il ripiego toglieva esattamente ciò che il tipo
         esiste per imporre, e la run continuava sembrando riuscita.
         """
         code = _senza_commenti(self.text)
         self.assertIn("throw new Error", code)
         self.assertNotIn("tipiDisponibili", code,
-                         "il ripiego silenzioso e' tornato")
-        # Nessuno spawn senza tipo: `conTipo` e' l'unica porta.
+                         "il ripiego silenzioso è tornato")
+        # Nessuno spawn senza tipo: `conTipo` è l'unica porta.
         self.assertEqual(len(re.findall(r"\bagent\(", code)),
                          len(re.findall(r"agentType: tipo", code)))
 
@@ -135,7 +135,7 @@ class TheDesignDecisions(unittest.TestCase):
             cls.text = handle.read()
 
     def test_two_drafts_not_one(self):
-        """Scegliere fra due e' la sostituzione meccanica del gusto."""
+        """Scegliere fra due è la sostituzione meccanica del gusto."""
         self.assertIn("scrivi(pack, 1)", self.text)
         self.assertIn("scrivi(pack, 2)", self.text)
 
@@ -149,21 +149,21 @@ class TheDesignDecisions(unittest.TestCase):
                             "due giudici identici scoprono lo stesso errore due volte")
 
     def test_the_two_judges_see_the_drafts_in_opposite_order(self):
-        """Lo slot A vince 10-15 punti piu' spesso a parita' di contenuto.
+        """Lo slot A vince 10-15 punti più spesso a parità di contenuto.
 
         Prima l'angolo 1 stava sempre in A. Invertire fra i due giudici
         cancella il bias invece di randomizzarlo, e resta deterministico,
-        quindi la run si puo' riprendere.
+        quindi la run si può riprendere.
         """
         flags = re.findall(r"giudica\(pack\.code, bozze, '[^']+', (true|false)\)", self.text)
         self.assertEqual(sorted(flags), ["false", "true"])
 
     def test_a_tie_can_be_declared_as_a_tie(self):
-        """66,5% di pareggi nel best-of-N: il pareggio e' il caso normale."""
+        """66,5% di pareggi nel best-of-N: il pareggio è il caso normale."""
         self.assertIn("'pari'", self.text)
 
     def test_the_measure_selects_and_the_judge_only_breaks_ties(self):
-        """Il giudice e' debole sulla scelta e forte sulla diagnosi, misurato."""
+        """Il giudice è debole sulla scelta e forte sulla diagnosi, misurato."""
         body = self.text[self.text.index("function scegli("):
                          self.text.index("const preparati")]
         self.assertIn("soglia", body)
@@ -181,10 +181,10 @@ class TheDesignDecisions(unittest.TestCase):
         self.assertIn("quale leggerebbe fino in fondo", prompt)
         for banned in ("rubrica", "punteggio", "criteri", "su 20", "0-2"):
             self.assertNotIn(banned, prompt,
-                             f"il giudizio e' tornato a essere una griglia ({banned})")
+                             f"il giudizio è tornato a essere una griglia ({banned})")
 
     def test_the_judge_asks_for_the_coldest_paragraph(self):
-        """E' il difetto che ha fatto ripensare la pipeline: non falso, freddo."""
+        """È il difetto che ha fatto ripensare la pipeline: non falso, freddo."""
         self.assertIn("paragrafo_piu_freddo", self.text)
 
     def test_the_section_roles_are_an_enum(self):
@@ -204,17 +204,17 @@ class TheDesignDecisions(unittest.TestCase):
         self.assertIn("blocca", self.text)
 
     def test_a_block_goes_back_to_whoever_writes_and_only_once(self):
-        """Il pubblicatore non ripara piu' niente, nemmeno un `blocca`.
+        """Il pubblicatore non ripara più niente, nemmeno un `blocca`.
 
-        Non ha Edit ne' Write, quindi ripararlo in casa vorrebbe dire ribattere
+        Non ha Edit né Write, quindi ripararlo in casa vorrebbe dire ribattere
         l'articolo intero come una riga JSON, oppure aprire `sed` sul file
-        appena scritto: cioe' l'editoria che gli abbiamo tolto, per la porta di
-        servizio. Un giro solo, perche' se una riscrittura mirata non basta il
-        problema non e' una frase.
+        appena scritto: cioè l'editoria che gli abbiamo tolto, per la porta di
+        servizio. Un giro solo, perché se una riscrittura mirata non basta il
+        problema non è una frase.
         """
         self.assertIn("Non ripari niente, nemmeno un", self.text)
         self.assertIn("ilBlocco", _senza_commenti(self.text))
-        # Tre chiamate: la prima, piu' un solo giro di ritorno per ciascuno dei
+        # Tre chiamate: la prima, più un solo giro di ritorno per ciascuno dei
         # due modi di non essere pubblicabile (bozza rifiutata dal comando di
         # scrittura, articolo bocciato dal lint).
         self.assertEqual(_senza_commenti(self.text).count("await pubblica(corrente"), 3)
@@ -231,15 +231,15 @@ class TheDesignDecisions(unittest.TestCase):
 
     def test_it_does_not_isolate_what_does_not_collide(self):
         """Due ragioni, non una: niente git da serializzare, e la cache di
-        prompt e' legata alla directory, quindi un worktree e' un miss pieno."""
+        prompt è legata alla directory, quindi un worktree è un miss pieno."""
         self.assertNotIn("isolation:", _senza_commenti(self.text))
         with open(os.path.join(AGENTI, "pubblicatore.md"), encoding="utf-8") as handle:
             self.assertIn("solo il file dell'articolo", handle.read())
 
     def test_no_agent_file_is_resurrected(self):
         """I due critici della catena e i due agenti demoliti. `verificatore`
-        ha preso il posto di `indicator-verifier` quando il file e' stato
-        rinominato sullo stadio: e' lo stesso agente, e il workflow non deve
+        ha preso il posto di `indicator-verifier` quando il file è stato
+        rinominato sullo stadio: è lo stesso agente, e il workflow non deve
         chiamarlo con nessuno dei due nomi."""
         for role in ("reader-editor", "verificatore", "launcher", "producer.md"):
             self.assertNotIn(role, self.text)
@@ -250,7 +250,7 @@ class TheMechanicalStagesTakeNoEditorialDecision(unittest.TestCase):
 
     `pubblicatore.md` diceva "se il lint non blocca niente, hai finito: non
     rileggere, non migliorare, non riordinare", e il prompt del workflow diceva
-    allo stesso agente, nello stesso momento, di riscrivere il paragrafo piu'
+    allo stesso agente, nello stesso momento, di riscrivere il paragrafo più
     freddo. Un compito editoriale affidato al ruolo definito come meccanico, e
     nessun modo di sapere quale delle due avesse vinto.
     """
@@ -272,15 +272,15 @@ class TheMechanicalStagesTakeNoEditorialDecision(unittest.TestCase):
                       self.text.split("function rivedi", 1)[1].split("function", 1)[0])
 
     def test_every_diagnosis_gets_an_explicit_outcome(self):
-        """Una diagnosi che il passo dopo puo' ignorare in silenzio non e' un
-        input del processo, e' un commento."""
+        """Una diagnosi che il passo dopo può ignorare in silenzio non è un
+        input del processo, è un commento."""
         for esito in ("applicato", "rifiutato", "non_applicabile"):
             self.assertIn(f"'{esito}'", self.codice)
         self.assertIn("feedback:", self.codice.split("return {")[-1],
                       "il feedback non risale nell'esito della run")
 
     def test_the_publisher_gets_the_exact_write_command(self):
-        """La forma dell'entry non e' una decisione editoriale, quindi non puo'
+        """La forma dell'entry non è una decisione editoriale, quindi non può
         costare un turno: la scriveva a mano leggendo `indicator_store.py`."""
         self.assertIn("officina.pubblica", self.pubblica)
         self.assertNotIn("scripts.indicator_store", self.text)
@@ -289,26 +289,26 @@ class TheMechanicalStagesTakeNoEditorialDecision(unittest.TestCase):
         """Quando `officina.pubblica` rifiuta di sovrascrivere, il passo 2 va
         saltato, e il prompt deve dirlo.
 
-        Il comando rifiuta quando il cancello blocca e sotto c'e' gia' un
-        articolo: li' non si scrive, quindi `officina.lint` descriverebbe il
+        Il comando rifiuta quando il cancello blocca e sotto c'è già un
+        articolo: lì non si scrive, quindi `officina.lint` descriverebbe il
         **testo precedente** e ne attribuirebbe i rilievi alla bozza nuova. Per
-        questo il comando li stampa da se' su una riga `RILIEVI`, e il
+        questo il comando li stampa da sé su una riga `RILIEVI`, e il
         pubblicatore copia quelli. Senza questa istruzione il giro di
-        riparazione riceve i rilievi di un altro testo, che e' un verdetto
+        riparazione riceve i rilievi di un altro testo, che è un verdetto
         falso, peggio della sovrascrittura che il rifiuto evita.
         """
         self.assertIn("RILIEVI", self.pubblica)
         self.assertIn("salta il passo 2", self.pubblica)
         self.assertNotIn("--ultimo-tentativo", self.text,
-                         "il rifiuto non ha piu' un flag: vale a ogni tentativo, "
-                         "perche' il danno lo fa il primo")
+                         "il rifiuto non ha più un flag: vale a ogni tentativo, "
+                         "perché il danno lo fa il primo")
 
     def test_a_gate_block_is_not_reported_as_a_form_error(self):
-        """`ilRifiuto` dice "e' una regola di forma, correggi cio' che il
-        messaggio nomina": su un rilievo editoriale e' un'istruzione sbagliata.
+        """`ilRifiuto` dice "è una regola di forma, correggi ciò che il
+        messaggio nomina": su un rilievo editoriale è un'istruzione sbagliata.
 
-        Quindi `rifiutato` esclude il caso in cui la scrittura e' stata
-        rifiutata **con** dei rilievi bloccanti: quello e' un blocco, e va a
+        Quindi `rifiutato` esclude il caso in cui la scrittura è stata
+        rifiutata **con** dei rilievi bloccanti: quello è un blocco, e va a
         `ilBlocco`."""
         codice = _senza_commenti(self.text)
         self.assertIn("esito.scritto === false && !primi.length", codice)
@@ -325,15 +325,15 @@ class TheMechanicalStagesTakeNoEditorialDecision(unittest.TestCase):
 
     def test_a_silent_reviser_is_a_fault_not_a_verdict(self):
         """Ripiegare su `non_applicabile` scriveva "il rilievo non si
-        applicava" al posto di "la revisione non e' avvenuta": indistinguibili
+        applicava" al posto di "la revisione non è avvenuta": indistinguibili
         a valle, e proprio sul campo che serve a decidere se lo stadio vale il
         suo prezzo."""
         rivedi = self.codice.split("function rivedi", 1)[1].split("\n}", 1)[0]
         self.assertIn("throw new Error", rivedi)
-        self.assertNotIn("non ha risposto'", rivedi)
+        self.assertNotIn("non ha rispostò", rivedi)
 
     def test_a_red_gate_does_not_count_as_written(self):
-        """"Il lint e' l'unico cancello" e' vero solo se un cancello rosso
+        """"Il lint è l'unico cancello" è vero solo se un cancello rosso
         arriva fino all'esito della run. `scritti` valeva `fatti.length`, quindi
         una run col lint rosso su ogni articolo si chiudeva dicendo di aver
         scritto tutto."""
@@ -343,7 +343,7 @@ class TheMechanicalStagesTakeNoEditorialDecision(unittest.TestCase):
 
     def test_a_refused_draft_is_not_a_written_article(self):
         """`scritto: false` non lo guardava nessuno: un articolo mai scritto
-        contava fra gli scritti, ed e' la stessa falla del cancello rosso su un
+        contava fra gli scritti, ed è la stessa falla del cancello rosso su un
         altro campo."""
         self.assertIn("esito.scritto === false", self.codice)
         self.assertIn("ilRifiuto", self.codice)
@@ -360,7 +360,7 @@ class ThePermanentPromptsAgreeWithTheWorkflow(unittest.TestCase):
     """Il prompt permanente e il messaggio della run sono due voci sullo stesso
     agente, e possono contraddirsi in silenzio.
 
-    E' successo: il workflow ha smesso di chiedere riparazioni al pubblicatore,
+    È successo: il workflow ha smesso di chiedere riparazioni al pubblicatore,
     e `pubblicatore.md` ha continuato a prometterle per un giro intero. I test
     guardavano solo il prompt costruito dal workflow, quindi non l'hanno visto.
     """
@@ -383,7 +383,7 @@ class ThePermanentPromptsAgreeWithTheWorkflow(unittest.TestCase):
 
     def test_the_writer_declares_both_of_its_invocations(self):
         """Lo stesso tipo scrive una bozza e ne rivede una: un contratto che
-        nomina solo la prima e' la stessa divergenza di `corpus` contro
+        nomina solo la prima è la stessa divergenza di `corpus` contro
         `claims`."""
         testo = self.prompt["scrittore-indicatore.md"]
         self.assertIn("rivedi", testo)
@@ -391,11 +391,11 @@ class ThePermanentPromptsAgreeWithTheWorkflow(unittest.TestCase):
 
 
 class TheAgentTypesAreNarrow(unittest.TestCase):
-    """Un agente non deve poter fare cio' per cui pagheremmo turni.
+    """Un agente non deve poter fare ciò per cui pagheremmo turni.
 
-    E' l'altra meta' della regola: il prompt dice cosa fare, il tipo dice cosa
-    e' possibile. Un divieto scritto nel prompt e' un suggerimento; un tool
-    assente e' un fatto.
+    È l'altra metà della regola: il prompt dice cosa fare, il tipo dice cosa
+    è possibile. Un divieto scritto nel prompt è un suggerimento; un tool
+    assente è un fatto.
     """
 
     def _frontmatter(self, name):
@@ -427,11 +427,11 @@ class TheAgentTypesAreNarrow(unittest.TestCase):
         nel campo `tokens` del progresso, non compare da nessuna parte se non
         dentro `usage.iterations`.
 
-        Il divieto e' un **hook**, non `disallowedTools`. Quel campo elenca i
-        tool, e l'advisor non e' un tool: con il divieto gia' scritto nel
+        Il divieto è un **hook**, non `disallowedTools`. Quel campo elenca i
+        tool, e l'advisor non è un tool: con il divieto già scritto nel
         frontmatter, la prova su `ter-30` ha comunque letto nel trascritto
         *"let me check my plan with the advisor"*. Questo test asseriva quel
-        campo, cioe' asseriva una restrizione che non restringeva niente.
+        campo, cioè asseriva una restrizione che non restringeva niente.
         """
         for name in AGENTI_DELL_OFFICINA:
             with open(os.path.join(AGENTI, name), encoding="utf-8") as handle:
@@ -463,7 +463,7 @@ class ItDoesNotDependOnTheOldChain(unittest.TestCase):
             self.assertNotIn(old, self.text)
 
     def test_it_does_not_open_a_pull_request_per_article(self):
-        """La cerimonia esce dal per-articolo: e' il 92% del tempo del cancello."""
+        """La cerimonia esce dal per-articolo: è il 92% del tempo del cancello."""
         for ceremony in ("gh pr create", "pipeline_merge", "pipeline-close-run"):
             self.assertNotIn(ceremony, self.text)
 

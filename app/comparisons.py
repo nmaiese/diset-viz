@@ -1,7 +1,7 @@
 """Confronti salvati per-account (Fase 5.3).
 
 Invariante: `auth_id` sempre dal JWT verificato, mai dal body. Il backend gira
-BYPASSRLS: il confine per-utente e' il `WHERE auth_id = ?` qui. Serviti solo dal
+BYPASSRLS: il confine per-utente è il `WHERE auth_id = ?` qui. Serviti solo dal
 backend (niente accesso browser diretto, niente condivisione pubblica).
 """
 

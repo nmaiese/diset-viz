@@ -3,17 +3,17 @@
 
 Rispetta l'invariante della catena (`content/indicators/`, `data/pipeline/runs/`,
 `data/pipeline/verifiche/` sono tutti a un file per record): il conflitto fra due
-scrittori non e' meno probabile, e' impossibile. Un record vive in
-`data/pipeline/practices/<slug>.json`, e la sua identita' autorevole e' il campo
-`practice_id` **dentro** il file, non il nome del file. Il nome e' solo un
+scrittori non è meno probabile, è impossibile. Un record vive in
+`data/pipeline/practices/<slug>.json`, e la sua identità autorevole è il campo
+`practice_id` **dentro** il file, non il nome del file. Il nome è solo un
 raccoglitore leggibile e stabile.
 
-Perche' l'id sta dentro e non nel nome: una chiave di pratica contiene `:`, `#` e
-puo' contenere `-` (`bes:09PAE009-N25#nuovo-1`), e nessuna codifica di quei
-caratteri in un nome di file e' reversibile senza ambiguita'. Invece di
-inventarne una fragile, il nome e' uno slug ripulito piu' un'impronta corta e
+Perché l'id sta dentro e non nel nome: una chiave di pratica contiene `:`, `#` e
+può contenere `-` (`bes:09PAE009-N25#nuovo-1`), e nessuna codifica di quei
+caratteri in un nome di file è reversibile senza ambiguità. Invece di
+inventarne una fragile, il nome è uno slug ripulito più un'impronta corta e
 deterministica della chiave, che toglie ogni collisione senza dover tornare
-indietro dal nome all'id. E' la stessa filosofia dei nomi in `verifiche/`.
+indietro dal nome all'id. È la stessa filosofia dei nomi in `verifiche/`.
 
 Stdlib puro come il resto della catena.
 """
@@ -39,9 +39,9 @@ class StoreError(RuntimeError):
 def filename_for(practice_id: str) -> str:
     """Il nome del file che contiene la pratica `practice_id`.
 
-    Slug leggibile piu' impronta della chiave: due chiavi diverse che
-    ripuliscono allo stesso slug restano su due file diversi, perche' l'impronta
-    e' della chiave intera. Deterministica: nessun `random`, come ogni cosa che
+    Slug leggibile più impronta della chiave: due chiavi diverse che
+    ripuliscono allo stesso slug restano su due file diversi, perché l'impronta
+    è della chiave intera. Deterministica: nessun `random`, come ogni cosa che
     deve reggere una ripresa a freddo.
     """
     pid = str(practice_id)
@@ -94,7 +94,7 @@ def load(practice_id: str, root=None):
 
 
 def save(record: dict, root=None) -> Path:
-    """Scrive un record. Deve portare `practice_id`; il file prende il nome da li'."""
+    """Scrive un record. Deve portare `practice_id`; il file prende il nome da lì."""
     pid = record.get(ID_FIELD)
     if not pid:
         raise StoreError(f"il record non ha un campo '{ID_FIELD}': {record!r}")

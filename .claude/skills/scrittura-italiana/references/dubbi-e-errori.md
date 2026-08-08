@@ -26,8 +26,8 @@ tutti*); definizioni ed esempi originali. `✓` = corretto, `✗` = da evitare.
 - **Obbligatorio** sull'ultima sillaba tonica delle plurisillabe (città, andrò, virtù), sui
   monosillabi con dittongo (ciò, già, giù, può, più) e sui composti di tre/blu/re/su
   (trentatré, rossoblù, viceré, lassù). *qui* e *qua* non si accentano mai.
-- **Mai vocale + apostrofo** al posto dell'accento: ✗ perche', e', piu' → ✓ perché, è, più.
-  A inizio frase: ✓ È tardi / ✗ E' tardi.
+- **Mai vocale + apostrofo** al posto dell'accento: ✗ perché, è, più → ✓ perché, è, più.
+  A inizio frase: ✓ È tardi / ✗ È tardi.
 - **Omografi** distinguibili (facoltativo, di solito basta il contesto): pèsca (frutto) /
   pésca (attività); princìpi (valori) / prìncipi (sovrani).
 - **Accento spesso sbagliato di posizione:** amàca, baùle, edìle, ìlare, persuadére, pudìco,
@@ -40,8 +40,8 @@ tutti*); definizioni ed esempi originali. `✓` = corretto, `✗` = da evitare.
 - **né / ne** — congiunzione negativa (acuto) / pronome-avverbio. ✓ Non voglio né posso. /
   ✓ Non ne so nulla. (✗ nè)
 - **sì / si** — avverbio / pronome. ✓ Sì, certo. / ✓ Si lava.
-- **da / dà / da'** — preposizione (mai accento) / verbo *dare* 3ª sing. / imperativo (=dai).
-  ✓ Vengo da te. ✓ Mi dà ragione. ✓ Da' qua!
+- **da / dà / dà** — preposizione (mai accento) / verbo *dare* 3ª sing. / imperativo (=dai).
+  ✓ Vengo da te. ✓ Mi dà ragione. ✓ Dà qua!
 - **fa / fa'** — verbo/nota/«tempo fa» (niente accento né apostrofo) / imperativo (=fai).
   ✗ fà non esiste. ✓ Fa freddo. ✓ Fa' presto!
 - **li / lì — la / là** — pronome/articolo / avverbio di luogo. ✓ Li vedo là. ✓ La porta è lì.
@@ -63,7 +63,7 @@ tutti*); definizioni ed esempi originali. `✓` = corretto, `✗` = da evitare.
 - **Anni/secoli:** il '600, il '68; si toglie dopo un altro apostrofo: nell'800 (✗ nell''800).
 - **Troncamento** (cade vocale/sillaba, di norma SENZA apostrofo): un albero, buon giorno,
   nessun caso, bel gatto, gran signore, san Paolo, dottor Rossi, amor proprio, mal di testa.
-- **Troncamenti CON apostrofo (eccezioni):** imperativi da', di', fa', sta', va'; po' (=poco,
+- **Troncamenti CON apostrofo (eccezioni):** imperativi dà, di', fa', sta', va'; po' (=poco,
   ✗ pò / ✗ po), mo' (=modo), be' (=bene), to' (=tieni).
 - **qual è — sempre senza apostrofo** (è troncamento): ✓ Qual è il problema? / ✗ Qual'è.
   Così qual era, qual buon vento, la qual cosa; analogo *tal* (gente di tal fatta).
@@ -431,7 +431,7 @@ Quando due pronomi atoni si uniscono, il pronome di termine precede quello di og
 
 ⚠ *Me/te/ce/ve* in queste sequenze sono **atone** (≠ me/te/ce/ve tonici con rilievo): *me lo disse* ≠ *lo disse a me* (tonico, con enfasi contrastiva).
 
-**Enclitici dopo gli imperativi tronchi** (*da', di', fa', sta', va'*): la consonante del pronome
+**Enclitici dopo gli imperativi tronchi** (*dà, di', fa', sta', va'*): la consonante del pronome
 raddoppia. ✓ *dimmi*, *dammi*, *dacci retta*, *fammelo vedere*, *vattene* (✗ *dimi*, *famelo*).
 Eccezione: *gli* non raddoppia (✓ *digli*, *fagli*).
 

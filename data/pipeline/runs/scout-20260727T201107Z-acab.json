@@ -3,7 +3,7 @@
  "branch": "automation/scout-2026-07-27-correzione",
  "commit": "a4eae62",
  "detail": [
-  "istat_sdmx:34_727_DF_DCCV_POVERTA_8 e _10 approved->needs-info: verifica dal vivo (client SDMX reale, chiave a 11 dimensioni) mostra che DATA_TYPE=INCID_POVASS_FAM (e ogni altro codice di poverta assoluta) restituisce NoRecordsFound a ogni livello di REF_AREA in questo dataflow, solo INCID_POVREL_FAM (poverta relativa) e' pubblicato regionalmente, probabile doppione del BES gia' in catalogo. istat_sdmx:29_317_DF_DCIS_POPSTRCIT1_1 approved->needs-info: il limite tecnico e' risolto (#59, #61) ma manca ancora la verifica di quale DATA_TYPE/CITIZENSHIP dia davvero la percentuale di stranieri residenti. Segnalato da una review Codex su #58: un candidato approved senza riga in config/istat_series.yaml non viene mai ripreso da nessuno stadio successivo, resta orfano per sempre."
+  "istat_sdmx:34_727_DF_DCCV_POVERTA_8 e _10 approved->needs-info: verifica dal vivo (client SDMX reale, chiave a 11 dimensioni) mostra che DATA_TYPE=INCID_POVASS_FAM (e ogni altro codice di poverta assoluta) restituisce NoRecordsFound a ogni livello di REF_AREA in questo dataflow, solo INCID_POVREL_FAM (poverta relativa) è pubblicato regionalmente, probabile doppione del BES già in catalogo. istat_sdmx:29_317_DF_DCIS_POPSTRCIT1_1 approved->needs-info: il limite tecnico è risolto (#59, #61) ma manca ancora la verifica di quale DATA_TYPE/CITIZENSHIP dia davvero la percentuale di stranieri residenti. Segnalato da una review Codex su #58: un candidato approved senza riga in config/istat_series.yaml non viene mai ripreso da nessuno stadio successivo, resta orfano per sempre."
  ],
  "gate": "checks",
  "outcome": "pr-open",

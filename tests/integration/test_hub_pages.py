@@ -20,7 +20,7 @@ FORBIDDEN_CHARS = ("—", "–", "…", ";")
 
 
 def visible_text(html):
-    """Il testo che il lettore vede: via script, style, tag ed entita'."""
+    """Il testo che il lettore vede: via script, style, tag ed entità."""
     stripped = re.sub(r"<script.*?</script>|<style.*?</style>", " ", html, flags=re.S)
     return unescape(re.sub(r"<[^>]+>", " ", stripped))
 
@@ -49,7 +49,7 @@ class ConfrontoPageTest(unittest.TestCase):
         self.assertTrue(description)
         self.assertLessEqual(len(description), 155)
 
-        # Il bundle monta la vista confronto perche' il template lo dichiara: la
+        # Il bundle monta la vista confronto perché il template lo dichiara: la
         # SPA non conosce le rotte Flask.
         self.assertIn('window.__diInitialView = "confronto"', html)
         self.assertIn('id="root"', html)
@@ -131,7 +131,7 @@ class DivariRegionaliPageTest(unittest.TestCase):
 
         view = divari.build_divari_view()
         self.assertIsNotNone(view)
-        # La tesi della pagina e' un conto, non un'opinione: le tre ripartizioni
+        # La tesi della pagina è un conto, non un'opinione: le tre ripartizioni
         # in testa sommano agli indicatori confrontati.
         self.assertEqual(sum(view["tally"].values()), view["scanned"])
         self.assertGreater(view["scanned"], 100)
@@ -165,15 +165,15 @@ class DivariRegionaliPageTest(unittest.TestCase):
         self.assertIn("non pesate per popolazione", text)
 
     def test_the_simple_mean_is_never_called_national(self):
-        """docs/INDICATOR_PAGES.md: una media semplice di valori regionali non e'
+        """docs/INDICATOR_PAGES.md: una media semplice di valori regionali non è
         la media Italia. Qui la media di venti regioni guida ogni "meglio o
         peggio", quindi chiamarla nazionale sarebbe un numero dichiarato falso."""
         text = visible_text(self.html)
         self.assertIn("media delle venti regioni", text)
         self.assertNotIn("Media Italia", text)
-        # L'unica occorrenza ammessa e' la frase del metodo che spiega perche' la
+        # L'unica occorrenza ammessa è la frase del metodo che spiega perché la
         # pagina non usa quel nome.
-        self.assertEqual(text.count("media nazionale"), 1, "solo la nota di metodo puo' nominarla")
+        self.assertEqual(text.count("media nazionale"), 1, "solo la nota di metodo può nominarla")
         self.assertIn('mai "media nazionale"', text)
         self.assertNotIn("Media nazionale", text)
 
@@ -195,13 +195,13 @@ class DivariRegionaliPageTest(unittest.TestCase):
             for row in get_atlas_indicator_year(partial, meta["year_max"])["values"]
             if row.get("value") is not None
         }
-        self.assertLess(len(latest), 20, "il caso di prova non e' piu parziale, scegline un altro")
+        self.assertLess(len(latest), 20, "il caso di prova non è piu parziale, scegline un altro")
         year, values = divari._full_coverage_year(partial, meta["year_max"])
         self.assertIsNotNone(year)
         self.assertLess(year, meta["year_max"])
         self.assertEqual(len({row["region_key"] for row in values if row.get("value") is not None}), 20)
 
-        # E l'anno usato nel conto della tesi e' quello, non year_max.
+        # E l'anno usato nel conto della tesi è quello, non year_max.
         scanned = {row["id"]: row for row in divari._scan_catalog()}
         self.assertEqual(scanned[partial]["year"], year)
 
@@ -222,8 +222,8 @@ class SearchPageTest(unittest.TestCase):
 
         # Fuori dalla sitemap, ma non bloccata in robots.txt: una pagina
         # disallow non fa leggere il suo noindex. Confronto sulla <loc> esatta,
-        # perche' "/tema/ricerca-innovazione-e-digitale" contiene la stessa
-        # sottostringa ed e' una pagina vera, che in sitemap deve restare.
+        # perché "/tema/ricerca-innovazione-e-digitale" contiene la stessa
+        # sottostringa ed è una pagina vera, che in sitemap deve restare.
         sitemap = client.get("/sitemap.xml").data.decode("utf-8")
         self.assertNotIn("<loc>https://divarioitalia.it/ricerca</loc>", sitemap)
         self.assertNotIn("divarioitalia.it/ricerca?", sitemap)
@@ -271,7 +271,7 @@ class SearchPageTest(unittest.TestCase):
 
 
 class ProvinceViewTest(unittest.TestCase):
-    """Issue #27, path A: la vista provinciale e' uno stato, non una pagina nuova."""
+    """Issue #27, path A: la vista provinciale è uno stato, non una pagina nuova."""
 
     @staticmethod
     def indicators_with_province_level(limit=3):
@@ -309,7 +309,7 @@ class ProvinceViewTest(unittest.TestCase):
             self.assertEqual(region_rows, 20, base)
             self.assertGreater(province_rows, 90, base)
 
-            # Il selettore del territorio in evidenza e' un select: su mobile e' il
+            # Il selettore del territorio in evidenza è un select: su mobile è il
             # menu a tendina con cui si sceglie una provincia.
             self.assertIn('aria-label="Provincia in evidenza"', html)
             self.assertIn('href="' + base + '?livello=provincia"', regional.data.decode("utf-8"))
@@ -327,7 +327,7 @@ class ProvinceViewTest(unittest.TestCase):
 
 
 class MapAccessibilityTest(unittest.TestCase):
-    """Issue #28: la mappa dice quale dato disegna, non solo che e' una mappa."""
+    """Issue #28: la mappa dice quale dato disegna, non solo che è una mappa."""
 
     def test_server_rendered_maps_name_the_indicator(self):
         from app import bes_data, profiles
@@ -354,7 +354,7 @@ class MapAccessibilityTest(unittest.TestCase):
     def test_react_map_takes_a_label_and_keeps_the_legend_hidden(self):
         source = (Path(app.root_path).parent / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
         # Il contenitore accetta un'etichetta e ha ancora role="img": le path
-        # sotto restano presentazionali, quindi l'etichetta e' l'unica voce.
+        # sotto restano presentazionali, quindi l'etichetta è l'unica voce.
         self.assertIn('aria-label={label || "Mappa delle regioni italiane"}', source)
         self.assertIn('role="img"', source)
         # Ogni chiamata passa un'etichetta che nomina il dato.
@@ -366,12 +366,12 @@ class MapAccessibilityTest(unittest.TestCase):
 
 
 class PathScopedViewTest(unittest.TestCase):
-    """Una vista che possiede una URL non puo' essere lasciata via ?view=."""
+    """Una vista che possiede una URL non può essere lasciata via ?view=."""
 
     def test_every_exit_from_a_path_view_is_a_real_navigation(self):
         source = (Path(app.root_path).parent / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
         self.assertIn('window.__diInitialView || null', source)
-        # Cambio di modalita' e apertura di una regione: entrambi escono da
+        # Cambio di modalità e apertura di una regione: entrambi escono da
         # /confronto navigando, invece di lasciare /confronto?view=qualcos-altro.
         self.assertIn('window.location.assign(mode === "regioni" ? "/atlante?view=regioni" : "/atlante")', source)
         self.assertIn('window.location.assign(`/atlante?view=regioni&rk=${encodeURIComponent(key)}`)', source)
@@ -381,7 +381,7 @@ class PathScopedViewTest(unittest.TestCase):
 
 
 class SitemapTest(unittest.TestCase):
-    """Cosa entra e cosa resta fuori dalla sitemap, e perche'."""
+    """Cosa entra e cosa resta fuori dalla sitemap, e perché."""
 
     def test_new_public_pages_are_in_the_sitemap_and_search_is_not(self):
         client = app.test_client()
@@ -390,13 +390,13 @@ class SitemapTest(unittest.TestCase):
 
         for path in ("/", "/divari-regionali", "/confronto"):
             self.assertIn(f"https://divarioitalia.it{path}", locs, path)
-        # La ricerca interna e' noindex per scelta, quindi non si annuncia.
+        # La ricerca interna è noindex per scelta, quindi non si annuncia.
         self.assertNotIn("https://divarioitalia.it/ricerca", locs)
         # Le sole query sono profili autonomi della classifica.
         for loc in locs:
             if "?" in loc:
                 self.assertRegex(loc, r"/qualita-della-vita/classifica/(regioni|province)\?profilo=[a-z_]+$")
-        # Ogni pagina annunciata risponde 200 ed e' indicizzabile.
+        # Ogni pagina annunciata risponde 200 ed è indicizzabile.
         for path in ("/divari-regionali", "/confronto"):
             response = client.get(path)
             self.assertEqual(response.status_code, 200, path)

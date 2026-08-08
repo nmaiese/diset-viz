@@ -1,12 +1,12 @@
 """Verifica che ogni citazione del corpus esista davvero, parola per parola.
 
-Il corpus da' agli articoli la licenza di spiegare perche' i numeri si muovono,
+Il corpus dà agli articoli la licenza di spiegare perché i numeri si muovono,
 citando l'istituzione invece di dedurre la causa dai dati. Quella licenza vale
-solo se le citazioni sono vere: una parafrasi salvata come verbatim e' gia'
-un'invenzione a meta', e finirebbe su una pagina pubblica sotto il nome del
+solo se le citazioni sono vere: una parafrasi salvata come verbatim è già
+un'invenzione a metà, e finirebbe su una pagina pubblica sotto il nome del
 progetto.
 
-Il rischio e' concreto e vale la pena scriverlo: le citazioni si raccolgono con
+Il rischio è concreto e vale la pena scriverlo: le citazioni si raccolgono con
 strumenti che passano per un modello, e un modello che riassume mentre copia
 non lo dichiara. Quindi questo script non si fida di chi ha raccolto. Scarica
 la pagina con la sola libreria standard, la riduce a testo, e cerca la
@@ -15,11 +15,11 @@ citazione **come stringa**. Nessun modello nel giro di verifica.
     python3 -m scripts.fetch_corpus --verify
     python3 -m scripts.fetch_corpus --verify --id snpa-bacino-padano
 
-Uscita diversa da zero se una citazione non si trova: e' pensato per il
+Uscita diversa da zero se una citazione non si trova: è pensato per il
 cancello, non solo per l'occhio.
 
-Sui blocchi: un 403 o un 503 e' "bloccato", non "inesistente", e lo script lo
-dice cosi'. Non aggira niente e si presenta con uno user agent che dice chi e'.
+Sui blocchi: un 403 o un 503 è "bloccato", non "inesistente", e lo script lo
+dice così. Non aggira niente e si presenta con uno user agent che dice chi è.
 """
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ import urllib.request
 from packs import context
 
 # Ci presentiamo per quello che siamo. Fingersi un browser sarebbe aggirare un
-# blocco, e il blocco di una fonte istituzionale e' una sua decisione.
+# blocco, e il blocco di una fonte istituzionale è una sua decisione.
 USER_AGENT = ("DivarioItalia-corpus/1.0 (verifica citazioni; "
               "https://divarioitalia.it)")
 TIMEOUT = 30
@@ -46,7 +46,7 @@ _SPACE = re.compile(r"\s+")
 
 
 def page_text(url):
-    """(testo, errore). Il testo e' normalizzato negli spazi, non nel resto."""
+    """(testo, errore). Il testo è normalizzato negli spazi, non nel resto."""
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
         with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
@@ -69,9 +69,9 @@ def page_text(url):
 def normalise(text):
     """Spazi e apostrofi tipografici uniformati. Le parole restano intatte.
 
-    Solo cio' che un sito puo' cambiare senza cambiare il testo: un apostrofo
-    curvo al posto di uno dritto non e' una citazione diversa. Tutto il resto
-    deve combaciare, altrimenti non e' un verbatim.
+    Solo ciò che un sito può cambiare senza cambiare il testo: un apostrofo
+    curvo al posto di uno dritto non è una citazione diversa. Tutto il resto
+    deve combaciare, altrimenti non è un verbatim.
     """
     text = (text.replace("’", "'").replace("‘", "'")
                 .replace("“", '"').replace("”", '"')
@@ -92,7 +92,7 @@ def verify(claim):
     if normalise(claim["quote"]) in normalise(text):
         return "verificata", f"{len(claim['quote'])} caratteri trovati"
 
-    # Dove si rompe: aiuta a capire se e' una parafrasi o solo un troncamento.
+    # Dove si rompe: aiuta a capire se è una parafrasi o solo un troncamento.
     words = claim["quote"].split()
     longest = 0
     for size in range(len(words), 3, -1):

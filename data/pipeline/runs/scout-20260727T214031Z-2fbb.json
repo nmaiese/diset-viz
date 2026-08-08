@@ -5,7 +5,7 @@
  "claude_code_version": "2.1.220 (Claude Code)",
  "commit": "e2e6ece",
  "detail": [
-  "SDMX esploradati.istat.it/SDMXWS/rest -> HTTP 500 confermato di nuovo (anche su dataflow gia' cablato 22_293_DF_DCIS_INDDEMOG1_1); rejected: 2 dataset one-off Censimento industria/servizi 2011 (innovazione, internazionalizzazione) e 2 dataflow di trasporto marittimo duplicati di un indicatore di cabotaggio gia' in catalogo; needs-info: 4 permessi di costruire + 1 servizi sociali comuni + 2 conti flussi di materia (quattro controlli passati, solo il codice DATA_TYPE non verificabile per l'avaria), 1 imputati per reato e 2 chiamate 1522 (dominio gia' rappresentato), 3 percorsi diplomati (cadenza non confermata di recente), 2 ASIA imprese e addetti e 1 notti in viaggio (tema gia' denso, dubbio additivo)"
+  "SDMX esploradati.istat.it/SDMXWS/rest -> HTTP 500 confermato di nuovo (anche su dataflow già cablato 22_293_DF_DCIS_INDDEMOG1_1); rejected: 2 dataset one-off Censimento industria/servizi 2011 (innovazione, internazionalizzazione) e 2 dataflow di trasporto marittimo duplicati di un indicatore di cabotaggio già in catalogo; needs-info: 4 permessi di costruire + 1 servizi sociali comuni + 2 conti flussi di materia (quattro controlli passati, solo il codice DATA_TYPE non verificabile per l'avaria), 1 imputati per reato e 2 chiamate 1522 (dominio già rappresentato), 3 percorsi diplomati (cadenza non confermata di recente), 2 ASIA imprese e addetti e 1 notti in viaggio (tema già denso, dubbio additivo)"
  ],
  "gate": "",
  "outcome": "pr-open",

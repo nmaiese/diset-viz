@@ -8,14 +8,14 @@ indice e **un** branch corrente, condivisi da chiunque lavori in quella cartella
 Due ruoli in volo insieme se li contendono, e il `git checkout -b` di uno sposta
 il branch sotto i piedi dell'altro, gli impila i commit sopra, gli cancella un
 file non ancora committato, e nel caso peggiore riporta a master un articolo che
-un altro aveva gia' committato, senza un solo errore. La premessa "indicatori
-diversi toccano file diversi, quindi non contendono" e' vera per i **percorsi**
-dei file, non per l'indice git ne' per HEAD.
+un altro aveva già committato, senza un solo errore. La premessa "indicatori
+diversi toccano file diversi, quindi non contendono" è vera per i **percorsi**
+dei file, non per l'indice git né per HEAD.
 
-Il rimedio e' isolare la run, non solo il suo branch: un `git worktree`, cioe' un
+Il rimedio è isolare la run, non solo il suo branch: un `git worktree`, cioè un
 albero di lavoro separato con HEAD e indice propri, che condivide il solo archivio
-degli oggetti (`.git`). E' lo stesso meccanismo che `pipeline_merge.record_landing`
-gia' usa per scrivere il diario su master senza toccare l'albero dell'agente, qui
+degli oggetti (`.git`). È lo stesso meccanismo che `pipeline_merge.record_landing`
+già usa per scrivere il diario su master senza toccare l'albero dell'agente, qui
 generalizzato all'albero **dell'agente stesso**.
 
     # all'avvio di una run (lo stampa il path in cui lavorare):
@@ -25,10 +25,10 @@ generalizzato all'albero **dell'agente stesso**.
 
 `--here` non crea un worktree: apre un branch unico nel checkout corrente, per lo
 sviluppo manuale di chi non vuole un albero separato. Le run lanciate in parallelo
-usano sempre il worktree, perche' li' la contesa e' reale.
+usano sempre il worktree, perché lì la contesa è reale.
 
 Stdlib puro come il resto della catena: un agente cloud lo esegue su un checkout
-fresco, prima che esista un venv. Il `runner` e' iniettabile, cosi' un test prova
+fresco, prima che esista un venv. Il `runner` è iniettabile, così un test prova
 la sequenza dei comandi git senza un git vero.
 """
 
@@ -41,14 +41,14 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-# La radice dei worktree delle run: una cartella sorella del checkout, cosi' i
+# La radice dei worktree delle run: una cartella sorella del checkout, così i
 # file di lavoro di una run non compaiono mai come "non tracciati" nel checkout
-# principale (che e' la meta' del bug del checkout condiviso che si vuole togliere).
+# principale (che è la metà del bug del checkout condiviso che si vuole togliere).
 RUNS_ROOT = PROJECT_ROOT.parent / "diset-viz-runs"
 
 
 def _run(argv, cwd=None):
-    """Ogni comando esterno passa di qui, cosi' un test ne sostituisce uno solo."""
+    """Ogni comando esterno passa di qui, così un test ne sostituisce uno solo."""
     proc = subprocess.run(argv, cwd=cwd, capture_output=True, text=True)
     return proc.returncode, (proc.stdout or "") + (proc.stderr or "")
 
@@ -61,9 +61,9 @@ def _utc_today():
 def branch_name(role, run_id, today=None):
     """Il branch di una run: `automation/<ruolo>-<YYYY-MM-DD>-<suffisso run_id>`.
 
-    Il suffisso e' l'unica cosa che conta davvero: il `run_id` e' gia' unico
+    Il suffisso è l'unica cosa che conta davvero: il `run_id` è già unico
     (`<stadio>-<istante>-<quattro esadecimali>`), e portarne la coda nel nome del
-    branch e' cio' che rende unico anche il branch di due run dello stesso ruolo
+    branch è ciò che rende unico anche il branch di due run dello stesso ruolo
     nello stesso giorno. Era la loro collisione su un nome condiviso
     (`automation/producer-2026-07-29`) a far spostare i branch sotto i piedi.
     Resta dentro `automation/*`, quindi il cancello in CI e la guardia per-agente
@@ -78,9 +78,9 @@ def _main_root(runner=_run, cwd=None):
     """Il checkout **principale**, dal `--git-common-dir`.
 
     Non da `PROJECT_ROOT` (la cartella dello script): quando si parte da un
-    worktree, `PROJECT_ROOT` e' il worktree stesso. `--git-common-dir` invece e' lo
+    worktree, `PROJECT_ROOT` è il worktree stesso. `--git-common-dir` invece è lo
     stesso per tutti i worktree (il `.git` del principale), quindi la sua cartella
-    genitore e' sempre il checkout principale, sia da li' sia da un worktree."""
+    genitore è sempre il checkout principale, sia da lì sia da un worktree."""
     code, out = runner(["git", "rev-parse", "--git-common-dir"], cwd=cwd)
     if code == 0 and out.strip():
         common = Path(out.strip().splitlines()[0])
@@ -108,18 +108,18 @@ def worktree_path(run_id, root=None):
 def _ensure_master(runner, cwd, attempts=5, sleep=time.sleep, backoff=0.5):
     """Aggiorna `origin/master`, tollerando la corsa fra run concorrenti.
 
-    Piu' run partono insieme e fanno `git fetch` sullo **stesso** repo condiviso:
+    Più run partono insieme e fanno `git fetch` sullo **stesso** repo condiviso:
     i worktree isolano HEAD e indice, ma i ref remoti no, quindi due fetch corrono
     a scrivere `refs/remotes/origin/master` e git respinge il perdente con
-    "cannot lock ref". E' transitorio: il lock e' tenuto dal fetch di un sibling e
-    si libera appena quello finisce, quindi si **ritenta con backoff** finche' il
+    "cannot lock ref". È transitorio: il lock è tenuto dal fetch di un sibling e
+    si libera appena quello finisce, quindi si **ritenta con backoff** finché il
     nostro fetch riesce.
 
-    E si fallisce se non riesce mai. La sola prova che `origin/master` e' il tip
-    remoto vero e' un fetch nostro andato a buon fine: un `origin/master` che
-    "risolve" dice solo che una copia in cache esiste, non che e' fresca. Partire
+    E si fallisce se non riesce mai. La sola prova che `origin/master` è il tip
+    remoto vero è un fetch nostro andato a buon fine: un `origin/master` che
+    "risolve" dice solo che una copia in cache esiste, non che è fresca. Partire
     da quella copia (fetch fallito per rete o auth, non per lock) farebbe girare il
-    cancello su codice vecchio e poi fondere in un master piu' nuovo senza aver mai
+    cancello su codice vecchio e poi fondere in un master più nuovo senza aver mai
     provato l'albero combinato. Meglio fallire l'apertura che partire da un tip non
     verificato."""
     last = ""
@@ -131,7 +131,7 @@ def _ensure_master(runner, cwd, attempts=5, sleep=time.sleep, backoff=0.5):
         if i + 1 < attempts:
             sleep(backoff * (i + 1))
     raise RuntimeError(
-        f"git fetch origin master fallito dopo {attempts} tentativi (il ref non e' "
+        f"git fetch origin master fallito dopo {attempts} tentativi (il ref non è "
         f"verificato fresco, non si parte da un tip stantio): {last.strip()[:200]}")
 
 
@@ -144,7 +144,7 @@ def _link_venv(path):
     principale fa risolvere `.venv/bin/python` dal worktree senza ricrearlo (deps
     dal venv principale, codice dell'app dal worktree). Best effort: se il
     principale non ha un venv (checkout cloud fresco), non fa niente, e il merge
-    lo creera' come gia' prevede il contratto."""
+    lo creerà come già prevede il contratto."""
     import os
     main_venv = PROJECT_ROOT / ".venv"
     link = Path(path) / ".venv"
@@ -160,12 +160,12 @@ def open_workspace(role, run_id, base="origin/master", runner=_run, cwd=None,
     """Apre l'albero di lavoro privato della run e ne ritorna il path (stringa).
 
     Parte sempre da `origin/master` aggiornato, non da qualunque cosa HEAD porti
-    adesso: una run non deve ereditare l'incompiuto di un'altra, ne' finire su un
+    adesso: una run non deve ereditare l'incompiuto di un'altra, né finire su un
     master locale stantio (dove, per esempio, `scripts/pipeline_gate.py` potrebbe
     non esistere ancora). Prima il fetch, poi il worktree sul branch della run.
 
     `here=True` non crea un worktree: apre il branch nel checkout corrente, per lo
-    sviluppo manuale. Le run in parallelo non lo usano, li' la contesa e' reale.
+    sviluppo manuale. Le run in parallelo non lo usano, lì la contesa è reale.
     """
     branch = branch_name(role, run_id, today=today)
     _ensure_master(runner, cwd, sleep=sleep)
@@ -191,8 +191,8 @@ def close_workspace(run_id, runner=_run, cwd=None, root=None):
     """Rimuove il worktree della run e pota i riferimenti pendenti.
 
     Due passaggi come in `record_landing`: `worktree remove --force` cancella la
-    cartella, `worktree prune` toglie il riferimento se la cartella e' gia' sparita
-    per altra via. Best effort: una run gia' chiusa non deve fallire qui.
+    cartella, `worktree prune` toglie il riferimento se la cartella è già sparita
+    per altra via. Best effort: una run già chiusa non deve fallire qui.
 
     `remove` e `prune` girano dal **checkout principale**, non dal worktree: se il
     processo gira dentro il worktree (il flusso documentato di `--close`),

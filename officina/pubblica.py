@@ -1,28 +1,28 @@
-"""Scrive in `content/indicators/` una bozza gia' decisa. Un comando, niente giudizio.
+"""Scrive in `content/indicators/` una bozza già decisa. Un comando, niente giudizio.
 
-Perche' esiste. Il pubblicatore riceveva la bozza come oggetto e doveva
+Perché esiste. Il pubblicatore riceveva la bozza come oggetto e doveva
 comporre da solo l'entry dello store: chiave interna, livello, vintage, forma
-del file. Nessuna di quelle quattro cose e' una decisione editoriale, e per
+del file. Nessuna di quelle quattro cose è una decisione editoriale, e per
 scoprirle apriva `scripts/indicator_store.py`, i template e le viste. Otto turni
 nella prova, ventuno e ventiquattro nella prima run, per far uscire zero a un
-linter. Un turno che scopre una cosa che il codice gia' sa si paga due volte,
-perche' tutti i turni successivi lo rileggono.
+linter. Un turno che scopre una cosa che il codice già sa si paga due volte,
+perché tutti i turni successivi lo rileggono.
 
-Qui la mappa bozza -> entry e' codice, quindi e' la stessa a ogni articolo:
+Qui la mappa bozza -> entry è codice, quindi è la stessa a ogni articolo:
 
     bin/py -m officina.pubblica ter-30 <<'BOZZA'
     {"lead": "...", "sections": [...], "corpus": [], "angolo": "..."}
     BOZZA
 
 Rifiuta invece di scrivere male. Un ruolo fuori dai quattro, una sezione senza
-corpo, un codice che non e' nel catalogo: esce 2 e dice quale, perche' una
-guardia che accetta cio' che non capisce non e' una guardia (e' successo con
+corpo, un codice che non è nel catalogo: esce 2 e dice quale, perché una
+guardia che accetta ciò che non capisce non è una guardia (è successo con
 `officina.lint ter-176`, che selezionava zero articoli e stampava zero rilievi).
 
 Non decide niente di editoriale: non tocca il testo, non riordina le sezioni,
 non aggiunge fonti. `roles_covered` non lo scrive **apposta**: lo deriva
 `app.indicator_texts.emitted_roles` dalle sezioni scritte, e dichiararlo qui
-sarebbe la seconda copia della stessa lista, cioe' il modo per farle divergere.
+sarebbe la seconda copia della stessa lista, cioè il modo per farle divergere.
 """
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ from app.indicator_view import build_indicator_view
 from scripts import indicator_store, verification_queue
 
 RUOLI = ("definizione", "quadro", "dinamica", "limiti")
-# Cio' che passa dalla bozza all'entry, e nient'altro. Un campo in piu' nella
+# Ciò che passa dalla bozza all'entry, e nient'altro. Un campo in più nella
 # risposta di un agente non deve poter finire in un file pubblicato.
 CAMPI = ("lead", "sections", "corpus", "angolo")
 CAMPI_SEZIONE = ("role", "h", "body", "claims")
@@ -50,7 +50,7 @@ def chiave(code: str) -> str:
     """La chiave interna dello store per un codice in forma URL (`ter-30`)."""
     parsed = sources.parse_indicator_code(code)
     if not parsed:
-        raise Rifiutata(f"'{code}' non e' un codice indicatore (atteso es. ter-30, bes-10AMB004)")
+        raise Rifiutata(f"'{code}' non è un codice indicatore (atteso es. ter-30, bes-10AMB004)")
     family, raw_id = parsed
     return sources.internal_id(family, raw_id)
 
@@ -60,7 +60,7 @@ def livello(code: str, level: str | None):
     parsed = sources.parse_indicator_code(code)
     view = build_indicator_view(*parsed) if parsed else None
     if view is None:
-        raise Rifiutata(f"'{code}' non e' nel catalogo")
+        raise Rifiutata(f"'{code}' non è nel catalogo")
     wanted = level or DEFAULT_LEVEL
     trovato = next((lv for lv in view["levels"] if lv["key"] == wanted), None)
     if trovato is None:
@@ -72,7 +72,7 @@ def livello(code: str, level: str | None):
 def entry(bozza: dict, code: str, level: str | None = None) -> dict:
     """L'entry dello store per una bozza. Solleva `Rifiutata` invece di indovinare."""
     if not isinstance(bozza, dict):
-        raise Rifiutata("la bozza non e' un oggetto JSON")
+        raise Rifiutata("la bozza non è un oggetto JSON")
     if not (bozza.get("lead") or "").strip():
         raise Rifiutata("la bozza non ha un lead")
     sezioni = bozza.get("sections")
@@ -82,7 +82,7 @@ def entry(bozza: dict, code: str, level: str | None = None) -> dict:
     pulite = []
     for indice, sezione in enumerate(sezioni):
         if not isinstance(sezione, dict):
-            raise Rifiutata(f"la sezione {indice} non e' un oggetto")
+            raise Rifiutata(f"la sezione {indice} non è un oggetto")
         ruolo = sezione.get("role")
         if ruolo not in RUOLI:
             raise Rifiutata(f"ruolo '{ruolo}' nella sezione {indice}: i ruoli sono {', '.join(RUOLI)}")
@@ -90,9 +90,9 @@ def entry(bozza: dict, code: str, level: str | None = None) -> dict:
             raise Rifiutata(f"la sezione '{ruolo}' non ha corpo")
         # Una sezione per ruolo. Al primo giro della macchina nuova sono uscite
         # due `dinamica` con due titoli diversi: la pagina ne rendeva una due
-        # volte e perdeva l'altra, perche' il renderer indicizzava per ruolo.
+        # volte e perdeva l'altra, perché il renderer indicizzava per ruolo.
         # Il renderer ora regge il caso, ma il contratto resta uno: due sezioni
-        # sullo stesso ruolo vanno unite in una, ed e' chi scrive a doverlo
+        # sullo stesso ruolo vanno unite in una, ed è chi scrive a doverlo
         # fare, non chi rende.
         if any(fatta["role"] == ruolo for fatta in pulite):
             raise Rifiutata(f"due sezioni con ruolo '{ruolo}': uniscile in una")
@@ -112,21 +112,21 @@ def entry(bozza: dict, code: str, level: str | None = None) -> dict:
 def bloccanti(key: str, fatta: dict) -> list:
     """I rilievi `blocca` del cancello editoriale su questa bozza.
 
-    Serve a decidere se scriverle `origine`, e non e' un dettaglio di
-    contabilita': `origine: officina` e' l'**unica** condizione che rende un
+    Serve a decidere se scriverle `origine`, e non è un dettaglio di
+    contabilità: `origine: officina` è l'**unica** condizione che rende un
     articolo idoneo per la coda di verifica (`verification_queue.py:391`) e per
-    quella di lettura (`reading_queue.py:358`), perche' l'officina non ha un
+    quella di lettura (`reading_queue.py:358`), perché l'officina non ha un
     revisore che firmi. Il campo si scriveva mentre si montava il dizionario,
-    cioe' prima che il lint girasse, e un articolo bocciato lo portava lo
+    cioè prima che il lint girasse, e un articolo bocciato lo portava lo
     stesso: finiva in tutte e due le code, veniva reso dall'app, e i due critici
-    indipendenti sprecavano un giro su una prosa gia' respinta.
+    indipendenti sprecavano un giro su una prosa già respinta.
 
-    Il cancello resta uno solo. Qui non c'e' una seconda regola: gira lo stesso
+    Il cancello resta uno solo. Qui non c'è una seconda regola: gira lo stesso
     `lint_entry` che gira `officina.lint`, sullo stesso store con la bozza
-    gia' sostituita al proprio posto, cosi' i due verdetti non possono divergere.
+    già sostituita al proprio posto, così i due verdetti non possono divergere.
 
     **Su una prima pubblicazione l'articolo bocciato si scrive comunque**, e
-    senza il campo: li' non c'e' niente da proteggere, e rifiutare perderebbe
+    senza il campo: lì non c'è niente da proteggere, e rifiutare perderebbe
     l'unica copia della bozza. Su una **riscrittura** no, vedi `main`.
     """
     return [rilievo for rilievo in tutti_i_rilievi(key, fatta)
@@ -137,10 +137,10 @@ def tutti_i_rilievi(key: str, fatta: dict) -> list:
     """Il verdetto intero del cancello editoriale su questa bozza, `segnala`
     compresi.
 
-    Esiste perche' e' l'unico verdetto che parla della **bozza**. Il passo di
+    Esiste perché è l'unico verdetto che parla della **bozza**. Il passo di
     lint del pubblicatore rilegge l'articolo da disco, quindi quando la
     scrittura viene rifiutata (`main`) descrive il testo precedente: i rilievi
-    da rimandare a chi riscrive devono venire da qui, non da li'.
+    da rimandare a chi riscrive devono venire da qui, non da lì.
     """
     from officina import lint
 
@@ -152,10 +152,10 @@ def tutti_i_rilievi(key: str, fatta: dict) -> list:
         compiled["alternation"] = alternation
         return lint.lint_entry(key, fatta, texts=texts, compiled=compiled)
     except Exception as errore:  # noqa: BLE001
-        # Un cancello che non riesce a girare non e' un cancello verde. Il
-        # verso di questa guardia e' scelto: **non** si scrive `origine`, cosi'
+        # Un cancello che non riesce a girare non è un cancello verde. Il
+        # verso di questa guardia è scelto: **non** si scrive `origine`, così
         # un guasto qui non promuove niente. La scrittura invece prosegue,
-        # perche' prima di questa funzione avveniva sempre, e far sparire
+        # perché prima di questa funzione avveniva sempre, e far sparire
         # l'articolo per un errore del lint sarebbe una regressione peggiore
         # del difetto che stiamo chiudendo.
         return [_finding_di_guasto(errore)]
@@ -195,45 +195,45 @@ def main(argv=None) -> int:
         if fermi and esiste_gia:
             # **Una riscrittura bocciata non sostituisce l'articolo che c'era.**
             #
-            # Vale a ogni tentativo, e non solo all'ultimo, perche' e' il
-            # **primo** a fare il danno: dopo di lui l'articolo buono non c'e'
-            # piu', e qualunque prudenza successiva starebbe proteggendo una
-            # bozza gia' bocciata. Una versione precedente rifiutava solo la
+            # Vale a ogni tentativo, e non solo all'ultimo, perché è il
+            # **primo** a fare il danno: dopo di lui l'articolo buono non c'è
+            # più, e qualunque prudenza successiva starebbe proteggendo una
+            # bozza già bocciata. Una versione precedente rifiutava solo la
             # seconda scrittura, e non serviva a niente.
             #
-            # Perche' si puo' rifiutare senza rompere il giro di riparazione:
+            # Perché si può rifiutare senza rompere il giro di riparazione:
             # i rilievi si stampano qui sotto. Erano il motivo per cui la
             # scrittura doveva avvenire comunque, visto che il passo successivo
             # del pubblicatore li rileggeva da disco con `officina.lint`, e su
             # un articolo non sovrascritto avrebbe descritto il testo vecchio
             # attribuendone i rilievi alla bozza nuova. Stampati qui parlano
-            # della bozza, che e' l'unica cosa che chi riscrive puo' correggere.
+            # della bozza, che è l'unica cosa che chi riscrive può correggere.
             #
-            # **Anche un guasto del cancello**, e prima non era cosi'. La regola
+            # **Anche un guasto del cancello**, e prima non era così. La regola
             # "un guasto non deve costare una scrittura" nasce sulla prima
             # pubblicazione, dove rifiutare perderebbe l'unica copia della
-            # bozza; su una riscrittura si rovescia, perche' li' scrivere costa
+            # bozza; su una riscrittura si rovescia, perché lì scrivere costa
             # l'articolo **precedente**, sostituito da un testo che nessuno ha
-            # potuto controllare. La bozza non e' persa in nessuno dei due casi:
-            # il workflow la riporta e la run puo' ripartire. L'articolo buono
-            # si', e solo da git.
+            # potuto controllare. La bozza non è persa in nessuno dei due casi:
+            # il workflow la riporta e la run può ripartire. L'articolo buono
+            # sì, e solo da git.
             #
             # La regola diventa quindi una sola, che vale per ogni rilievo
             # bloccante: **un articolo che esiste non viene mai sostituito da
             # qualcosa che il cancello non ha passato.**
-            # **Tutte e due le righe sullo stesso flusso, e non e' pignoleria.**
-            # Con l'uscita catturata (un agente non e' un terminale) stdout e'
+            # **Tutte e due le righe sullo stesso flusso, e non è pignoleria.**
+            # Con l'uscita catturata (un agente non è un terminale) stdout è
             # a blocchi e stderr no, quindi una riga su stdout e una su stderr
             # arrivano a chi legge in ordine invertito. Il contratto del
             # pubblicatore riconosce i rilievi da una riga `RILIEVI`, e con
             # l'ordine rovesciato avrebbe riportato una lista vuota, mandando la
             # riscrittura al giro sbagliato: `ilRifiuto` invece di `ilBlocco`,
-            # cioe' "correggi la forma" al posto dei rilievi editoriali veri.
+            # cioè "correggi la forma" al posto dei rilievi editoriali veri.
             print("non scritta: il cancello blocca su "
                   + ", ".join(sorted({rilievo["rule"] for rilievo in fermi}))
-                  + f", e l'articolo precedente e' rimasto al suo posto ({key}). "
-                  + "Nessuna versione buona e' stata sovrascritta, e i rilievi "
-                  + "qui sotto sono della bozza, non di cio' che c'e' su disco.",
+                  + f", e l'articolo precedente è rimasto al suo posto ({key}). "
+                  + "Nessuna versione buona è stata sovrascritta, e i rilievi "
+                  + "qui sotto sono della bozza, non di ciò che c'è su disco.",
                   file=sys.stderr)
             print("RILIEVI " + json.dumps(rilievi, ensure_ascii=False),
                   file=sys.stderr)
@@ -247,12 +247,12 @@ def main(argv=None) -> int:
 
     print(path)
     if fermi:
-        # Scritta, e senza `origine`: non entra in nessuna coda finche' il
+        # Scritta, e senza `origine`: non entra in nessuna coda finché il
         # cancello non passa. Il verdetto per esteso lo stampa `officina.lint`,
-        # che il workflow esegue subito dopo: qui basta dire che e' successo.
+        # che il workflow esegue subito dopo: qui basta dire che è successo.
         print("scritta SENZA `origine`: il cancello blocca su "
               + ", ".join(sorted({rilievo["rule"] for rilievo in fermi}))
-              + ". Non entra nella coda di verifica ne' in quella di lettura.",
+              + ". Non entra nella coda di verifica né in quella di lettura.",
               file=sys.stderr)
     return 0
 

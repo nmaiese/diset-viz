@@ -2,25 +2,25 @@
 
 Il cruscotto sembrava morto per una ragione strutturale. I battiti che ogni
 ruolo lasciava erano file locali, ignorati da git, scritti sul disco effimero
-dell'agente cloud: il server che serve divarioitalia.it e' un'altra macchina, e
+dell'agente cloud: il server che serve divarioitalia.it è un'altra macchina, e
 quei file non la raggiungevano mai. L'unico canale condiviso era il commit su
-master, che pero' compare solo a merge avvenuto (e su Cloud Run solo dopo un
+master, che però compare solo a merge avvenuto (e su Cloud Run solo dopo un
 rebuild dell'immagine), quindi il lavoro in volo restava invisibile.
 
 Questo modulo chiude il buco riusando il backend mutabile condiviso: le stesse
 tabelle stanno su Postgres (Supabase) in produzione e su SQLite in test. Gli
 agenti non scrivono qui direttamente (non hanno credenziali): fanno un POST
-all'endpoint del sito, che scrive queste tabelle. Cosi' il battito e' vivo,
+all'endpoint del sito, che scrive queste tabelle. Così il battito è vivo,
 condiviso fra le macchine, e non sporca master di un commit per battito.
 
-Una riga e' `beat` (un ruolo che lavora, prima ancora che ci sia una PR) o `pr`
-(una PR aperta su `automation/*`, con stato CI e mergeabilita', che il lanciatore
-fotografa a ogni tick). Le righe piu' vecchie della soglia si considerano morte,
+Una riga è `beat` (un ruolo che lavora, prima ancora che ci sia una PR) o `pr`
+(una PR aperta su `automation/*`, con stato CI e mergeabilità, che il lanciatore
+fotografa a ogni tick). Le righe più vecchie della soglia si considerano morte,
 come i vecchi battiti su file: una sessione caduta senza chiudere non resta in
 pagina per sempre.
 
 Una Session per chiamata (vedi app/db.py), come prima: nessuna connessione
-condivisa fra thread, in linea col deploy (gunicorn a piu' thread, un solo
+condivisa fra thread, in linea col deploy (gunicorn a più thread, un solo
 worker).
 """
 
@@ -42,7 +42,7 @@ def _now():
 
 def _cutoff(now, stale_hours):
     from datetime import datetime, timedelta
-    # now e' ISO UTC; il confronto lessicografico su ISO e' cronologico.
+    # now è ISO UTC; il confronto lessicografico su ISO è cronologico.
     try:
         ref = datetime.fromisoformat(now)
     except ValueError:
@@ -52,7 +52,7 @@ def _cutoff(now, stale_hours):
 
 def record_beat(run_id, role="", indicator="", stage="", now=None):
     """Un ruolo che parte (o continua) lascia il proprio battito. Idempotente sul
-    `run_id`, cosi' un aggiornamento sostituisce il precedente."""
+    `run_id`, così un aggiornamento sostituisce il precedente."""
     if not run_id:
         raise ValueError("run_id mancante")
     stamp = now or _now()
@@ -77,7 +77,7 @@ def close_beat(run_id):
 
 def replace_prs(prs, now=None):
     """Sostituisce in blocco la fotografia delle PR aperte (il lanciatore la
-    riscrive a ogni tick). Atomico: o c'e' la nuova, o resta la vecchia."""
+    riscrive a ogni tick). Atomico: o c'è la nuova, o resta la vecchia."""
     stamp = now or _now()
     with session_scope() as s:
         s.execute(delete(PipelineActivity).where(PipelineActivity.kind == "pr"))
@@ -131,9 +131,9 @@ def tokens_by_run():
 
 
 def live(now=None, stale_hours=STALE_HOURS):
-    """Le righe vive: battiti e PR piu' recenti della soglia. `{beats, prs}`.
+    """Le righe vive: battiti e PR più recenti della soglia. `{beats, prs}`.
 
-    Tollerante di una tabella che non esiste ancora (il DB puo' non essere mai
+    Tollerante di una tabella che non esiste ancora (il DB può non essere mai
     stato scritto su una macchina appena avviata): in quel caso, niente vivo."""
     ref = now or _now()
     cutoff = _cutoff(ref, stale_hours)
@@ -171,12 +171,12 @@ def _tri_to_int(value):
 
 def record_outcome(indicator, run_id, snapshot, at="", base_commit="", now=None):
     """Lo snapshot di stato di un indicatore, chiavato su `indicator`. Idempotente,
-    l'ultimo vince, MA con una guardia su `at`: uno snapshot piu' vecchio non
-    sovrascrive uno piu' recente gia' registrato (due run sullo stesso indicatore
+    l'ultimo vince, MA con una guardia su `at`: uno snapshot più vecchio non
+    sovrascrive uno più recente già registrato (due run sullo stesso indicatore
     che fondono quasi insieme, o un POST che arriva fuori ordine). Durevole: non
     scade, a differenza dei battiti.
 
-    `snapshot` e' il payload dell'agente, da cui si leggono i campi del dossier
+    `snapshot` è il payload dell'agente, da cui si leggono i campi del dossier
     (`state`, `completed_stages`, `flags`, `published`, ...). I campi non presenti
     prendono un default neutro."""
     if not indicator:
@@ -205,7 +205,7 @@ def record_outcome(indicator, run_id, snapshot, at="", base_commit="", now=None)
     with session_scope() as s:
         row = s.get(PipelineOutcome, indicator)
         if row is not None and row.at and row.at > at:
-            # Arrivato dopo, ma piu' vecchio: non e' l'ultimo stato, lo ignoro.
+            # Arrivato dopo, ma più vecchio: non è l'ultimo stato, lo ignoro.
             return
         if row is None:
             s.add(PipelineOutcome(indicator=indicator, **values))
@@ -215,7 +215,7 @@ def record_outcome(indicator, run_id, snapshot, at="", base_commit="", now=None)
 
 
 def outcomes_by_indicator():
-    """Gli snapshot vivi per indicatore, `{indicator: {...}}`, gia' deserializzati.
+    """Gli snapshot vivi per indicatore, `{indicator: {...}}`, già deserializzati.
 
     Durevole: **non** filtrato dalla finestra di freschezza (come `tokens_by_run`,
     non come `live`). Tollerante di una tabella non ancora creata (niente overlay
@@ -250,7 +250,7 @@ def outcomes_by_indicator():
 
 
 def _load_json(text, default):
-    """Deserializza un campo JSON-in-Text, degradando al default se e' vuoto o
+    """Deserializza un campo JSON-in-Text, degradando al default se è vuoto o
     corrotto: una riga difettosa non deve far sparire tutte le altre."""
     if not text:
         return default

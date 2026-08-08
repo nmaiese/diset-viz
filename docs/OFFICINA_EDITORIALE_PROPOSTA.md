@@ -2,9 +2,9 @@
 
 **Stato:** discussa il 2026-08-07. Il verdetto sta nella
 [sezione 15](#15-verdetto-2026-08-07), in coda: tre pezzi presi, tre respinti
-perche' regrediscono su una misura locale, uno rimandato. Le sezioni 1-14 sono
-il testo originale della proposta e restano com'erano, perche' un verdetto
-senza il testo che giudica non si puo' rileggere.
+perché regrediscono su una misura locale, uno rimandato. Le sezioni 1-14 sono
+il testo originale della proposta e restano com'erano, perché un verdetto
+senza il testo che giudica non si può rileggere.
 
 **Destinatario:** chi mantiene la pipeline e i workflow Claude Code di Divario
 Italia.
@@ -12,11 +12,11 @@ Italia.
 **Decisione richiesta:** approvare, correggere o respingere il disegno prima di
 modificare agenti, prompt, modelli, permessi, hook o cancelli.
 
-Questa proposta parte da quattro fonti di verita' che non sostituisce:
+Questa proposta parte da quattro fonti di verità che non sostituisce:
 
 - [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md) per la catena e il rientro
   sul pubblicato
-- [`archive/EDITORIAL_PRACTICE.md`](archive/EDITORIAL_PRACTICE.md) per identita', stati e
+- [`archive/EDITORIAL_PRACTICE.md`](archive/EDITORIAL_PRACTICE.md) per identità, stati e
   pubblicazione
 - [`INDICATOR_PAGES.md`](INDICATOR_PAGES.md) per il contratto della pagina
 - [`SECONDARY_SOURCES.md`](SECONDARY_SOURCES.md) per corpus e fonti di contesto
@@ -27,31 +27,31 @@ rispettare dalla macchina, non ne crea una seconda copia.
 
 ## 1. Giudizio sintetico
 
-La direzione e' giusta: pacchetti congelati, agenti con pochi strumenti, due
+La direzione è giusta: pacchetti congelati, agenti con pochi strumenti, due
 angoli narrativi, giudizio cieco e lint unico sono una base migliore del vecchio
 produttore che esplorava il repository durante ogni articolo.
 
-La macchina non e' ancora pronta a sostituire il produttore corrente per cinque
+La macchina non è ancora pronta a sostituire il produttore corrente per cinque
 ragioni:
 
-1. la nuova officina non e' stata misurata con il canary obbligatorio
-2. la selezione premia la presenza di cifre nei paragrafi, un proxy che puo'
-   premiare la ripetizione del cruscotto invece della qualita'
+1. la nuova officina non è stata misurata con il canary obbligatorio
+2. la selezione premia la presenza di cifre nei paragrafi, un proxy che può
+   premiare la ripetizione del cruscotto invece della qualità
 3. le diagnosi dei giudici arrivano al pubblicatore, ma il workflow non dimostra
    che siano state applicate
 4. il pubblicatore mescola un compito editoriale con un compito meccanico
 5. lettura indipendente e falsificazione non proteggono in modo non ambiguo la
    versione finale prima del merge
 
-La modifica centrale proposta e' questa:
+La modifica centrale proposta è questa:
 
 > L'officina diventa il motore interno del produttore. Prima prepara le prove,
 > poi scrive, poi sintetizza. Reader-editor e verificatore controllano la stessa
-> impronta finale. Solo dopo il cancello puo' fondere.
+> impronta finale. Solo dopo il cancello può fondere.
 
 ## 2. Invarianti da conservare
 
-Il nuovo disegno non deve cambiare queste proprieta':
+Il nuovo disegno non deve cambiare queste proprietà:
 
 - un lanciatore deterministico
 - una pratica per indicatore
@@ -69,7 +69,7 @@ Il nuovo disegno non deve cambiare queste proprieta':
 - numeri della serie provenienti soltanto dal pacchetto
 - fonti secondarie usate per contesto, mai come sostituto del dato di base
 
-Non si propone un quinto ruolo top-level. Lo scout delle fonti contestuali e'
+Non si propone un quinto ruolo top-level. Lo scout delle fonti contestuali è
 una fase interna del produttore, diversa dall'ammissione delle fonti dati.
 
 ## 3. Pipeline target
@@ -146,7 +146,7 @@ ripartire. Gli inneschi sono:
 | nuovo vintage | pacchetto e scrittura |
 | definizione o metodo cambiato | curatela |
 | claim contestuale nuovo | verifica di pertinenza |
-| claim non piu' verificabile | corpus |
+| claim non più verificabile | corpus |
 | reader-editor boccia | sintesi o riscrittura |
 | verificatore smentisce un numero | scrittura |
 | verificatore smentisce una fonte | corpus |
@@ -154,14 +154,14 @@ ripartire. Gli inneschi sono:
 | run interrotta | ultimo artefatto completo |
 
 Il lanciatore deve continuare a emettere al massimo un ruolo per indicatore nello
-stesso tick. Una smentita su una pagina visibile resta la priorita' massima.
+stesso tick. Una smentita su una pagina visibile resta la priorità massima.
 
 ### 4.2 Curatela
 
 Prima di cercare contesto, il produttore deve fissare:
 
 - definizione ufficiale
-- unita'
+- unità
 - numeratore e denominatore, quando dichiarati
 - livello territoriale
 - periodo e vintage
@@ -170,23 +170,23 @@ Prima di cercare contesto, il produttore deve fissare:
 - tema e categoria
 - classi di errore note per indicatore e famiglia
 
-Se questa identita' e' instabile, la ricerca contestuale non parte. Una buona
-fonte sulla quantita' sbagliata e' peggiore dell'assenza di fonte.
+Se questa identità è instabile, la ricerca contestuale non parte. Una buona
+fonte sulla quantità sbagliata è peggiore dell'assenza di fonte.
 
 ### 4.3 Controllo della copertura del corpus
 
 Prima di usare il web si interroga `data/corpus/claims/`.
 
-Un claim e' riutilizzabile soltanto se:
+Un claim è riutilizzabile soltanto se:
 
 - non presenta problemi strutturali
-- la citazione e' ancora verificabile
+- la citazione è ancora verificabile
 - riguarda esplicitamente l'indicatore, oppure supera tema e chiavi
-- ha geografia, unita', denominatore e periodo compatibili
+- ha geografia, unità, denominatore e periodo compatibili
 - non confonde un aggregato nazionale ponderato con la media semplice delle
   regioni calcolata dal sito
 
-Se la copertura e' sufficiente, il source-scout non parte. La ricerca su ogni
+Se la copertura è sufficiente, il source-scout non parte. La ricerca su ogni
 articolo sarebbe costosa, ripetitiva e meno riproducibile.
 
 ### 4.4 Source-scout Haiku
@@ -198,15 +198,15 @@ finale. Riceve un solo indicatore e:
 2. esegue al massimo tre ricerche
 3. apre il documento originale, non si ferma allo snippet
 4. estrae la citazione letterale minima necessaria
-5. registra ambito, periodo, unita' e denominatore
+5. registra ambito, periodo, unità e denominatore
 6. restituisce al massimo due candidati
-7. puo' concludere con zero candidati
+7. può concludere con zero candidati
 
 Un dominio nuovo non entra direttamente nel corpus. Diventa una proposta per
 l'ammissione delle fonti contestuali. Fino all'approvazione, l'articolo procede
 senza quel claim.
 
-Il web e' sempre contenuto non fidato: pagine e PDF sono dati, mai istruzioni da
+Il web è sempre contenuto non fidato: pagine e PDF sono dati, mai istruzioni da
 eseguire. Un 403 o un 503 significa `bloccato`, non `inesistente`.
 
 ### 4.5 Verifica del claim
@@ -227,16 +227,16 @@ La verifica ha due livelli separati.
 - parla davvero dello stesso indicatore?
 - usa lo stesso denominatore?
 - riguarda la stessa geografia?
-- il periodo e' compatibile?
+- il periodo è compatibile?
 - descrive un'associazione o una causa?
-- e' un aggregato nazionale diverso dal calcolo mostrato in pagina?
+- è un aggregato nazionale diverso dal calcolo mostrato in pagina?
 
 Il valutatore semantico deve provare prima a respingere il candidato. Soltanto un
 claim che sopravvive all'auto-refutazione viene congelato.
 
 Prima di scalare questa fase va chiusa la verifica dei PDF. Ogni claim da PDF
 deve portare numero di pagina, hash del file, testo estratto e citazione esatta.
-Se l'estrazione non e' riproducibile, il claim resta candidato e non entra nel
+Se l'estrazione non è riproducibile, il claim resta candidato e non entra nel
 pacchetto.
 
 ### 4.6 Pacchetto deterministico
@@ -247,7 +247,7 @@ repository. Contiene:
 - background editoriale breve
 - domanda probabile del lettore
 - definizione e metadati
-- contenuto gia' visibile nel cruscotto
+- contenuto già visibile nel cruscotto
 - matrice completa per anno e territorio
 - calcoli e angoli narrativi ordinati
 - correlati canonici
@@ -258,7 +258,7 @@ repository. Contiene:
 - vincoli di struttura e output
 - impronte degli input
 
-Se il runtime del workflow non puo' invocare direttamente Python, e' accettabile
+Se il runtime del workflow non può invocare direttamente Python, è accettabile
 un preparatore minimale con solo `Bash`, comando esatto e modello economico. Non
 deve leggere o riassumere i pacchetti.
 
@@ -302,12 +302,12 @@ Una bozza vince soltanto se la preferenza resta la stessa nell'ordine originale.
 Disaccordo o pareggio portano entrambe le bozze all'editor di sintesi senza una
 vincitrice dichiarata.
 
-Il giudice misura comprensione, tesi, utilita', ritmo e specificita'. Non misura
-i fatti, gia' passati dal pre-lint e ancora destinati al verificatore.
+Il giudice misura comprensione, tesi, utilità, ritmo e specificità. Non misura
+i fatti, già passati dal pre-lint e ancora destinati al verificatore.
 
 La quota di paragrafi senza cifre resta una metrica diagnostica. Non decide il
-vincitore, perche' puo' essere migliorata ripetendo cifre che il cruscotto mostra
-gia'.
+vincitore, perché può essere migliorata ripetendo cifre che il cruscotto mostra
+già.
 
 ### 4.10 Editor di sintesi
 
@@ -335,19 +335,19 @@ decide autonomamente come riscrivere una frase.
 
 ### 4.12 Controlli indipendenti prima del merge
 
-> **Superata dal §15, e non a meta'.** Il §15.1 conta il *commit candidato* e
-> l'*impronta come protocollo fra worktree* fra i concetti in piu' che non
+> **Superata dal §15, e non a metà.** Il §15.1 conta il *commit candidato* e
+> l'*impronta come protocollo fra worktree* fra i concetti in più che non
 > superano il metro dei quattro concetti vivi, e il §15.3 respinge con una misura
-> il reader-editor come blocco al merge. Quello che segue e' il disegno che il
-> verdetto ha esaminato, tenuto qui perche' il §15 lo cita: **non e' il piano da
-> implementare**. Cio' che resta davvero aperto e' l'involucro commit + pull
+> il reader-editor come blocco al merge. Quello che segue è il disegno che il
+> verdetto ha esaminato, tenuto qui perché il §15 lo cita: **non è il piano da
+> implementare**. Ciò che resta davvero aperto è l'involucro commit + pull
 > request intorno all'officina, e sta nel §15.7.
 
 Il produttore crea un commit candidato, non ancora pubblicato. Reader-editor e
 verificatore partono da quel commit in worktree distinti e giudicano la stessa
 impronta.
 
-- il reader-editor registra leggibilita' e fallimenti duri
+- il reader-editor registra leggibilità e fallimenti duri
 - il verificatore prova a smentire ogni affermazione
 - nessuno dei due modifica `content/indicators/`
 - i loro record vengono riportati sul branch della pratica
@@ -359,7 +359,7 @@ Per una prima pubblicazione o una riscrittura sostanziale:
 - una smentita del verificatore blocca quella pratica
 - una nuova impronta fa scadere entrambi i verdetti
 
-Per l'arretrato gia' pubblicato, il reader-editor puo' restare `soft`: accoda una
+Per l'arretrato già pubblicato, il reader-editor può restare `soft`: accoda una
 riscrittura senza fermare gli altri indicatori.
 
 Il meccanismo consigliato non richiede un nuovo store di bozze:
@@ -375,10 +375,10 @@ Il meccanismo consigliato non richiede un nuovo store di bozze:
 
 > **Superata dal §15**, per la stessa ragione della 4.12: due delle condizioni
 > qui sotto (*il reader-editor non presenta blocchi*, *i verdetti coprono
-> l'impronta corrente*) poggiano sui due concetti respinti. Il cancello vero e'
-> `scripts/pipeline_gate.py`, e il cancello editoriale e' `officina/lint.py`.
+> l'impronta corrente*) poggiano sui due concetti respinti. Il cancello vero è
+> `scripts/pipeline_gate.py`, e il cancello editoriale è `officina/lint.py`.
 
-Il merge e' ammesso soltanto se:
+Il merge è ammesso soltanto se:
 
 - il pacchetto era costruibile
 - tutti i claim usati sono congelati e verificati
@@ -386,7 +386,7 @@ Il merge e' ammesso soltanto se:
 - il reader-editor non presenta blocchi applicabili al nuovo articolo
 - il verificatore non presenta smentite
 - i verdetti coprono l'impronta corrente
-- il perimetro della run e' rispettato
+- il perimetro della run è rispettato
 - suite e `git diff --check` sono verdi
 - il diario contiene costo, modello, scelte e rilievi
 
@@ -396,9 +396,9 @@ A quel punto resta valida la decisione del progetto:
 gate verde -> merge -> pubblicata
 ```
 
-## 5. Responsabilita' e modelli candidati
+## 5. Responsabilità e modelli candidati
 
-| componente | natura | modello candidato | puo' usare web | puo' scrivere il repo |
+| componente | natura | modello candidato | può usare web | può scrivere il repo |
 | --- | --- | --- | --- | --- |
 | lanciatore | deterministico | nessuno | no | solo diario previsto |
 | ammissione dati | giudizio ad alto rischio | modello corrente | si | perimetro ammissione |
@@ -412,7 +412,7 @@ gate verde -> merge -> pubblicata
 | reader-editor | giudizio indipendente | modello corrente | no | solo `letture/` |
 | verificatore | falsificazione | modello corrente | si | solo `verifiche/` |
 
-Il canary decide i modelli finali. La tabella e' un'ipotesi di allocazione, non
+Il canary decide i modelli finali. La tabella è un'ipotesi di allocazione, non
 una configurazione da applicare direttamente.
 
 ## 6. Schemi minimi degli output
@@ -513,7 +513,7 @@ una configurazione da applicare direttamente.
 
 ## 7. Prompt candidati completi
 
-I testi seguenti sono candidati per il canary. Sono volutamente piu' corti dei
+I testi seguenti sono candidati per il canary. Sono volutamente più corti dei
 prompt correnti. La storia delle run, dei costi e delle correzioni appartiene ai
 documenti e ai commenti del workflow, non al contesto operativo ripetuto a ogni
 invocazione.
@@ -594,7 +594,7 @@ Restituisci una decisione strutturata per ogni candidato, con i tentativi di
 confutazione e l'uso massimo consentito.
 ```
 
-### 7.3 Preparatore minimale, solo se il workflow non puo' eseguire Python
+### 7.3 Preparatore minimale, solo se il workflow non può eseguire Python
 
 ```markdown
 ---
@@ -770,7 +770,7 @@ fare commit e non aprire pull request.
 
 ### 7.8 Invocazione proposta del reader-editor
 
-Il prompt permanente del reader-editor puo' restare invariato. Va cambiato il
+Il prompt permanente del reader-editor può restare invariato. Va cambiato il
 contesto di invocazione:
 
 ```text
@@ -787,7 +787,7 @@ l'articolo.
 
 ### 7.9 Invocazione proposta del verificatore
 
-Anche il prompt permanente del verificatore puo' restare invariato. Va cambiato
+Anche il prompt permanente del verificatore può restare invariato. Va cambiato
 il bersaglio operativo:
 
 ```text
@@ -850,13 +850,13 @@ for (const indicator of indicators) {
 }
 ```
 
-Il codice reale deve avere retry espliciti e limitati. Il massimo consigliato e'
+Il codice reale deve avere retry espliciti e limitati. Il massimo consigliato è
 due giri di sintesi o riscrittura sulla stessa pratica. Dopo, l'indicatore viene
 parcheggiato con motivazione strutturata.
 
 ## 9. Modifiche previste ai file
 
-Questa e' una mappa di implementazione, non un ordine di applicazione.
+Questa è una mappa di implementazione, non un ordine di applicazione.
 
 ### Nuovi file candidati
 
@@ -897,7 +897,7 @@ Questa proposta cambia prompt, ruoli, modelli, strumenti e gate. La suite verde
 non dimostra che la prosa sia migliore. Prima di applicarla va eseguita la skill
 `canary` e il processo di `docs/CANARY.md`.
 
-### 10.1 Integrita' del metro
+### 10.1 Integrità del metro
 
 ```bash
 python3 evals/score_eval.py --self-test
@@ -926,7 +926,7 @@ Per lo scout dei claim serve inoltre un gold set separato:
 - denominatori incompatibili
 - geografie incompatibili
 - correlazioni presentate come cause
-- casi in cui la risposta corretta e' zero fonti
+- casi in cui la risposta corretta è zero fonti
 
 ### 10.3 Confronto
 
@@ -936,7 +936,7 @@ Per ogni indicatore si producono:
 - versione della nuova officina
 - confronto cieco a coppie, ordine invertito
 - verifica indipendente dei fatti
-- lettura di leggibilita'
+- lettura di leggibilità
 
 ### 10.4 Metriche
 
@@ -970,7 +970,7 @@ Il candidato non passa se si verifica almeno una di queste condizioni:
 - un agente usa strumenti fuori perimetro
 - costo o turni crescono senza un miglioramento misurabile
 
-La precisione dei claim ha priorita' sulla recall: e' accettabile perdere una
+La precisione dei claim ha priorità sulla recall: è accettabile perdere una
 fonte utile, non pubblicarne una fuori contesto.
 
 ## 11. Adozione graduale
@@ -1016,13 +1016,13 @@ produttore, il dossier e il rientro restano.
 
 ## 12. Criteri di accettazione finali
 
-La modifica e' riuscita quando:
+La modifica è riuscita quando:
 
 1. lo scrittore non usa web, shell, grep, glob o advisor
-2. il pacchetto contiene tutto cio' che entra nella prosa
+2. il pacchetto contiene tutto ciò che entra nella prosa
 3. nessun numero fuori dal pacchetto raggiunge il candidato
-4. ogni claim esterno e' verificato, pertinente e visibile
-5. zero claim e' un esito valido
+4. ogni claim esterno è verificato, pertinente e visibile
+5. zero claim è un esito valido
 6. due bozze sviluppano davvero due tesi
 7. il giudizio regge allo scambio oppure dichiara pareggio
 8. ogni feedback riceve un esito esplicito
@@ -1031,7 +1031,7 @@ La modifica e' riuscita quando:
 11. una loro bocciatura rimette in coda soltanto quell'indicatore
 12. il merge avviene soltanto dopo tutti i gate applicabili
 13. costi, turni, ricerche e qualità sono osservabili per fase
-14. il canary mostra almeno parita' sul rigore e miglioramento sulla leggibilita'
+14. il canary mostra almeno parità sul rigore e miglioramento sulla leggibilità
 
 ## 13. Cosa non fare
 
@@ -1040,7 +1040,7 @@ La modifica e' riuscita quando:
 - non permettere allo scout di ammettere il proprio claim
 - non usare il numero di cifre come sinonimo di sostanza
 - non chiedere al pubblicatore di essere anche editor
-- non lasciare diagnosi in prosa libera che il workflow puo' ignorare
+- non lasciare diagnosi in prosa libera che il workflow può ignorare
 - non pubblicare una nuova impronta con verifiche riferite a quella precedente
 - non copiare STYLE, rubriche e contratti dentro ogni prompt
 - non attivare i prompt candidati senza canary
@@ -1048,17 +1048,17 @@ La modifica e' riuscita quando:
 ## 14. Raccomandazione finale
 
 Implementare per prima la separazione fra sintesi editoriale e pubblicazione
-meccanica, insieme alla contabilita' obbligatoria dei feedback. E' il cambiamento
-piu' piccolo che corregge il difetto osservato nell'ultima run.
+meccanica, insieme alla contabilità obbligatoria dei feedback. È il cambiamento
+più piccolo che corregge il difetto osservato nell'ultima run.
 
 Subito dopo introdurre lo scout Haiku come alimentatore controllato del corpus,
 non come coautore. Infine spostare il controllo della versione finale prima del
 merge, mantenendo reader-editor e verificatore indipendenti e legati
 all'impronta.
 
-Il risultato cercato non e' una pipeline con piu' agenti. E' una pipeline in cui
+Il risultato cercato non è una pipeline con più agenti. È una pipeline in cui
 ogni agente prende una sola decisione, quella decisione lascia un artefatto
-verificabile e nessun passaggio successivo puo' ignorarla in silenzio.
+verificabile e nessun passaggio successivo può ignorarla in silenzio.
 
 ---
 
@@ -1068,130 +1068,130 @@ verificabile e nessun passaggio successivo puo' ignorarla in silenzio.
 macchina troppo grande. Si prendono le tre correzioni, si respinge
 l'impalcatura.**
 
-### 15.1 Il criterio, che e' gia' scritto
+### 15.1 Il criterio, che è già scritto
 
-Il piano in corso porta con se' un metro per giudicare esattamente questo tipo
-di proposta, ed e' l'ultima riga della sua tabella di verifica:
+Il piano in corso porta con sé un metro per giudicare esattamente questo tipo
+di proposta, ed è l'ultima riga della sua tabella di verifica:
 
-> **solidita'** | i concetti vivi nel codice sono quattro | se ne serve un
-> quinto, la demolizione non e' finita
+> **solidità** | i concetti vivi nel codice sono quattro | se ne serve un
+> quinto, la demolizione non è finita
 
 I quattro sono **indicatore, pacchetto, articolo, pubblicazione**. La proposta
 ne aggiunge cinque: *claim candidato*, *decisione sul claim*, *feedback_action*,
-*commit candidato*, *impronta come protocollo fra worktree*. Non e' un dettaglio
+*commit candidato*, *impronta come protocollo fra worktree*. Non è un dettaglio
 di conto: la diagnosi 2.3 del piano dice che la crepa vera non era il numero di
 agenti ma il numero di modelli dello stesso stato, tre modelli e quattordici
-concetti dove ne servivano quattro. La proposta e' scritta bene e va nella
+concetti dove ne servivano quattro. La proposta è scritta bene e va nella
 direzione da cui veniamo.
 
-Secondo criterio, piu' duro: **le posizioni del piano hanno una misura locale
+Secondo criterio, più duro: **le posizioni del piano hanno una misura locale
 dietro, quelle della proposta un ragionamento.** Dove si scontrano, vince la
 misura. Sono tre scontri, tutti e tre risolti contro la proposta, e sono nel
 15.3.
 
 ### 15.2 Cosa si prende (e si applica oggi)
 
-**1. Lo stadio dei pacchetti non e' il pubblicatore** (proposta 4.6 e 7.3). Il
-difetto e' reale e sta in una riga: `prepara()` chiamava `conTipo(...,
-'pubblicatore')`, cioe' lo stadio che monta i pacchetti girava col tipo di
+**1. Lo stadio dei pacchetti non è il pubblicatore** (proposta 4.6 e 7.3). Il
+difetto è reale e sta in una riga: `prepara()` chiamava `conTipo(...,
+'pubblicatore')`, cioè lo stadio che monta i pacchetti girava col tipo di
 agente che ha il permesso di scrivere in `content/indicators/`. Un perimetro
-che non serve e' un perimetro che prima o poi viene usato. Nuovo tipo
+che non serve è un perimetro che prima o poi viene usato. Nuovo tipo
 `preparatore-pacchetti`, solo `Bash`, nessuna scrittura.
 
-**2. Il pubblicatore non fa editoria** (proposta 4.11). Questo e' il difetto
-piu' grave che la proposta ha trovato, e nemmeno lei lo dice nella forma piu'
+**2. Il pubblicatore non fa editoria** (proposta 4.11). Questo è il difetto
+più grave che la proposta ha trovato, e nemmeno lei lo dice nella forma più
 netta: `pubblicatore.md` diceva *"Se il lint non blocca niente, hai finito: non
 rileggere, non migliorare, non riordinare"*, e il prompt del workflow diceva
-allo stesso agente *"Un giudice ha indicato come piu' freddo: ... riscrivilo
-perche' dica perche' importa"*. Due istruzioni opposte allo stesso agente,
-nello stesso momento. E' la quinta volta in questa ricostruzione che il difetto
+allo stesso agente *"Un giudice ha indicato come più freddo: ... riscrivilo
+perché dica perché importa"*. Due istruzioni opposte allo stesso agente,
+nello stesso momento. È la quinta volta in questa ricostruzione che il difetto
 si trova **leggendo** invece che testando.
 
 Si chiude spostando la riscrittura a monte, dove chi scrive ha ancora il
 pacchetto in mano, e non creando `editor-sintesi`: la revisione la fa un altro
-turno del tipo `scrittore-indicatore`, che ha gia' i permessi giusti (solo
+turno del tipo `scrittore-indicatore`, che ha già i permessi giusti (solo
 `Read`) e nessun potere di scrivere file.
 
-**3. La contabilita' dei feedback** (proposta 4.10). Il principio e' giusto e
-costa niente: una diagnosi che il passo successivo puo' ignorare in silenzio
-non e' un input del processo, e' un commento. Si prende **il principio, non lo
+**3. La contabilità dei feedback** (proposta 4.10). Il principio è giusto e
+costa niente: una diagnosi che il passo successivo può ignorare in silenzio
+non è un input del processo, è un commento. Si prende **il principio, non lo
 schema**: lo stadio di revisione dichiara per il paragrafo freddo `applicato`,
 `rifiutato` o `non_applicabile` con la ragione, e il workflow lo registra
-insieme alle scelte. Non serve un identificatore per rilievo finche' il rilievo
-e' uno.
+insieme alle scelte. Non serve un identificatore per rilievo finché il rilievo
+è uno.
 
 ### 15.3 Cosa si respinge, e con quale misura
 
-**Il reader-editor come blocco al merge** (proposta 4.12). Il piano ha gia'
+**Il reader-editor come blocco al merge** (proposta 4.12). Il piano ha già
 respinto il rientro del reader-editor, e con un dato: `data/pipeline/letture/`
-non esiste, cioe' zero letture in tutta la sua vita. Il 4,8% contro 1,3% di
+non esiste, cioè zero letture in tutta la sua vita. Il 4,8% contro 1,3% di
 affermazioni false che si cita per difenderlo misura il **verificatore**, che
 ha girato davvero, 33 verifiche su disco. Rimettere in catena un componente con
-zero evidenza di produzione perche' un altro componente funziona e' confondere
+zero evidenza di produzione perché un altro componente funziona è confondere
 due cose. Il verificatore torna (15.5), il reader-editor no.
 
 **La selezione che torna al giudice** (proposta 4.9). La proposta fa scegliere
-il vincitore al giudizio cieco e usa la misura solo come diagnostica. E'
+il vincitore al giudizio cieco e usa la misura solo come diagnostica. È
 esattamente il verso opposto della prova del 7 agosto: su `ter-30` **entrambi i
 giudici hanno risposto `pari`**, zero voti, e ha deciso la misura, 9% contro
 27% di paragrafi scoperti. Se avesse deciso il giudice non ci sarebbe stato un
 articolo. Il voto resta lo spareggio, la misura resta la selezione.
 
-**`disallowedTools: advisor` in ogni frontmatter** (proposta 7.1-7.7). Questa e'
-la piu' netta, perche' e' verificata: **quel campo non blocca l'advisor**, che
-non e' un tool della lista che filtra ma una funzione dell'harness. La prova su
+**`disallowedTools: advisor` in ogni frontmatter** (proposta 7.1-7.7). Questa è
+la più netta, perché è verificata: **quel campo non blocca l'advisor**, che
+non è un tool della lista che filtra ma una funzione dell'harness. La prova su
 `ter-30` lo ha visto nel trascritto, *"let me check my plan with the advisor"*,
-con `disallowedTools: advisor` gia' nel frontmatter. I prompt candidati della
-sezione 7 tolgono anche la sezione in prosa che oggi e' l'unica mitigazione:
+con `disallowedTools: advisor` già nel frontmatter. I prompt candidati della
+sezione 7 tolgono anche la sezione in prosa che oggi è l'unica mitigazione:
 adottarli alla lettera rimetterebbe in conto il 26-36% del costo per un
-consulto che nessuno legge. La strada e' un'altra ed e' nel 15.5: un hook
-`PreToolUse`, cioe' la stessa forma con cui `agent_guard.py` gia' impone i
+consulto che nessuno legge. La strada è un'altra ed è nel 15.5: un hook
+`PreToolUse`, cioè la stessa forma con cui `agent_guard.py` già impone i
 perimetri della catena vecchia.
 
-### 15.4 Cosa si rimanda, e perche' non e' un no
+### 15.4 Cosa si rimanda, e perché non è un no
 
 **Lo scout delle fonti contestuali** (proposta 4.3-4.5, agenti
 `source-scout-context` e `claim-curator`). La proposta punta al collo di
 bottiglia vero: `data/corpus/claims/` ha **tre affermazioni in tutto**, e due
-articoli su tre escono con `dinamica-senza-fonte` perche' non hanno niente da
-citare. La macchina e' pronta a spiegare e non ha materiale.
+articoli su tre escono con `dinamica-senza-fonte` perché non hanno niente da
+citare. La macchina è pronta a spiegare e non ha materiale.
 
-Ma passare da tre claim a trenta e' **un lavoro di acquisizione a lotti, non un
+Ma passare da tre claim a trenta è **un lavoro di acquisizione a lotti, non un
 ramo condizionale dentro la scrittura di ogni articolo**. Una ricerca web
-dentro il percorso caldo e' precisamente cio' che "un agente riceve, non cerca"
-vieta, ed e' la regola che ha portato uno scrittore da 40-51 turni a 2. Il modo
-giusto e': si riempie il corpus una volta, con un giro dedicato, e il pacchetto
-lo trova gia' li'.
+dentro il percorso caldo è precisamente ciò che "un agente riceve, non cerca"
+vieta, ed è la regola che ha portato uno scrittore da 40-51 turni a 2. Il modo
+giusto è: si riempie il corpus una volta, con un giro dedicato, e il pacchetto
+lo trova già lì.
 
-E prima di scrivere un agente nuovo va guardato cio' che c'e':
-`scripts/fetch_corpus.py --verify` gia' fa la verifica letterale della
-citazione (ed e' lo strumento che ha bocciato una citazione su due), il
-restringimento del corpus e la regola `fonte-non-pertinente` fanno gia' parte
-del livello semantico che la proposta 4.5 descrive. Quello che manca davvero e'
-il **volume**, e il volume non lo da' un'architettura.
+E prima di scrivere un agente nuovo va guardato ciò che c'è:
+`scripts/fetch_corpus.py --verify` già fa la verifica letterale della
+citazione (ed è lo strumento che ha bocciato una citazione su due), il
+restringimento del corpus e la regola `fonte-non-pertinente` fanno già parte
+del livello semantico che la proposta 4.5 descrive. Quello che manca davvero è
+il **volume**, e il volume non lo dà un'architettura.
 
 **Il pre-lint delle bozze** (proposta 4.8). Idea buona in astratto, trappola
 qui: il workflow gira in JavaScript senza accesso a Python o al filesystem,
 quindi un pre-lint sarebbe una **seconda implementazione** delle regole del
-lint. Abbiamo gia' pagato questo errore una volta, quando la misura dei
+lint. Abbiamo già pagato questo errore una volta, quando la misura dei
 paragrafi scoperti nel JS e quella in Python divergevano e venivano confrontate
 con la stessa soglia. Un solo metro, e sta in `officina/lint.py`. L'unica parte
-del pre-lint che esiste senza duplicare niente e' l'enum dei ruoli, che c'e'
-gia' nello schema della bozza.
+del pre-lint che esiste senza duplicare niente è l'enum dei ruoli, che c'è
+già nello schema della bozza.
 
 **Il giudice unico sui due ordini** (proposta 4.9, secondo pezzo). La proposta
 ha ragione sulla letteratura: la mitigazione che **isola** il bias di posizione
-e' lo stesso giudice sulla stessa coppia nei due ordini, con pareggio quando i
+è lo stesso giudice sulla stessa coppia nei due ordini, con pareggio quando i
 due esiti divergono. Noi usiamo due lenti diverse con ordini invertiti, che
-bilancia senza isolare, e sta scritto nel commento del workflow. Resta cosi'
-finche' il voto non decide: cio' che chiediamo davvero ai giudici e' la
-diagnosi, e sulla diagnosi la diversita' delle lenti vale piu' dell'isolamento
-del bias. Se un giorno il voto tornasse a scegliere, questa e' la prima riga da
+bilancia senza isolare, e sta scritto nel commento del workflow. Resta così
+finché il voto non decide: ciò che chiediamo davvero ai giudici è la
+diagnosi, e sulla diagnosi la diversità delle lenti vale più dell'isolamento
+del bias. Se un giorno il voto tornasse a scegliere, questa è la prima riga da
 riscrivere, e la proposta dice come.
 
 ### 15.5 Cosa la proposta non sapeva, e va corretto nel testo
 
-La proposta descrive come da fare alcune cose gia' fatte fra il 6 e il 7 agosto,
+La proposta descrive come da fare alcune cose già fatte fra il 6 e il 7 agosto,
 e va letta sapendolo:
 
 | proposta | stato reale |
@@ -1200,28 +1200,28 @@ e va letta sapendolo:
 | 7.4 enum dei ruoli nello schema | fatto, `RUOLI` nel workflow |
 | 4.7 claim dichiarati per sezione | fatto, `sections[].claims`, e la pagina ne deriva le fonti visibili |
 | 4.5 verifica letterale della citazione | fatto, `fetch_corpus.py --verify` |
-| 4.11 il lint come unico cancello | fatto, piu' `lint.resolve_codes` che esce 2 invece di promuovere in silenzio |
+| 4.11 il lint come unico cancello | fatto, più `lint.resolve_codes` che esce 2 invece di promuovere in silenzio |
 | 4.4 un dominio nuovo non entra da solo | fatto, regola bloccante `istituzione-senza-fonte` |
-| 5 tabella dei modelli | il vincolo vero non e' il modello: e' che il registro dei tipi si legge all'avvio della sessione |
+| 5 tabella dei modelli | il vincolo vero non è il modello: è che il registro dei tipi si legge all'avvio della sessione |
 
-### 15.6 Cosa e' stato applicato
+### 15.6 Cosa è stato applicato
 
-Tutto quello che segue e' nel repo dal 2026-08-07, suite a 1348 test verdi.
+Tutto quello che segue è nel repo dal 2026-08-07, suite a 1348 test verdi.
 
 1. **`preparatore-pacchetti` separato dal pubblicatore** *(15.2, punto 1)*.
    Nuovo tipo con solo `Bash` e nemmeno `Read`.
 2. **La riscrittura del paragrafo freddo esce dal pubblicatore** e diventa lo
    stadio `rivedi`, che gira come `scrittore-indicatore` e deve dichiarare
    `applicato`, `rifiutato` o `non_applicabile` con la ragione *(15.2, punti 2
-   e 3)*. Il conto risale nell'esito della run: se dopo dieci articoli e' quasi
+   e 3)*. Il conto risale nell'esito della run: se dopo dieci articoli è quasi
    sempre `non_applicabile`, i giudici stanno diagnosticando testi che nessuno
    cambia, e uno dei due stadi va tolto invece di tenerli entrambi.
-3. **Il divieto dell'advisor e' un hook**, `.claude/hooks/no_advisor.py`, e
-   `disallowedTools: advisor` esce dai frontmatter perche' dichiarava una
+3. **Il divieto dell'advisor è un hook**, `.claude/hooks/no_advisor.py`, e
+   `disallowedTools: advisor` esce dai frontmatter perché dichiarava una
    restrizione che non restringeva *(15.3, terzo punto)*. Il test che asseriva
-   quel campo asseriva il nulla, ed e' stato riscritto.
+   quel campo asseriva il nulla, ed è stato riscritto.
 4. **Il verificatore vede l'officina** *(15.3, primo punto)*. Il difetto era
-   piu' netto di come la proposta lo descrive: `verification_queue` prendeva
+   più netto di come la proposta lo descrive: `verification_queue` prendeva
    solo gli articoli con una firma del revisore, e l'officina non ne ha uno,
    quindi i suoi articoli erano **invisibili** all'unico passo di
    falsificazione indipendente della catena. Trecentosettantasette in
@@ -1230,63 +1230,63 @@ Tutto quello che segue e' nel repo dal 2026-08-07, suite a 1348 test verdi.
 
    **Il reader-editor entra in ombra, non come cancello.** Stessa porta, e la
    sua coda aveva anche un difetto proprio: pretendeva tutti e quattro i ruoli,
-   mentre `definizione` e' omettibile apposta ed e' cosi' che la pagina la
+   mentre `definizione` è omettibile apposta ed è così che la pagina la
    rende. `ter-30` scrive `quadro, limiti, dinamica`, quindi la coda lo
    dichiarava incompleto e il renderer completo. Corretto sui tre sostanziali,
-   che e' la regola di `app.indicator_texts`. Resta `soft`: accoda, non ferma
-   niente, e la promozione a cancello si discute quando `letture/` avra' una
+   che è la regola di `app.indicator_texts`. Resta `soft`: accoda, non ferma
+   niente, e la promozione a cancello si discute quando `letture/` avrà una
    storia invece di zero righe.
 5. **Un `blocca` del lint torna a chi scrive, non si ripara in casa.** Il
-   pubblicatore non ha `Edit` ne' `Write`, quindi ripararlo li' significava una
+   pubblicatore non ha `Edit` né `Write`, quindi ripararlo lì significava una
    delle due cose: ribattere l'articolo intero come una riga JSON (seimila
    token di output su prosa, a ogni giro), oppure aprire `sed` sul file appena
-   scritto, che e' l'editoria appena tolta rientrata dalla porta di servizio.
+   scritto, che è l'editoria appena tolta rientrata dalla porta di servizio.
    Il workflow rimanda il rilievo a `rivedi`, **un giro solo**: se una
-   riscrittura mirata non basta, il problema non e' una frase. Codice freddo
-   per ora, il lint ha bloccato zero volte in due run, ma la decisione e'
+   riscrittura mirata non basta, il problema non è una frase. Codice freddo
+   per ora, il lint ha bloccato zero volte in due run, ma la decisione è
    scritta prima di incontrarla e non dopo.
 6. **Il pubblicatore riceve il comando di scrittura**, `officina.pubblica`,
    invece di comporre l'entry leggendo `indicator_store.py`, i template e le
-   viste: otto turni nella prova per una mappa che e' sempre la stessa. Il
-   comando rifiuta invece di scrivere male, ed e' l'unico posto dove la forma
-   dell'entry e' scritta.
+   viste: otto turni nella prova per una mappa che è sempre la stessa. Il
+   comando rifiuta invece di scrivere male, ed è l'unico posto dove la forma
+   dell'entry è scritta.
 7. **I quattro prompt riscritti come contratto** (ricevi, restituisci, vietato),
    un terzo di testo in meno. La regola sta in `.claude/rules/pipeline.md`: un
-   file di agente e' un contratto, non una cronaca, e il background operativo
-   si scrive dove il codice lo genera. La copia nel prompt era gia' divergente,
+   file di agente è un contratto, non una cronaca, e il background operativo
+   si scrive dove il codice lo genera. La copia nel prompt era già divergente,
    diceva `corpus` dove il pacchetto dice `claims`.
 8. **`tool_failures.jsonl` ha un lettore**, `scripts/tool_failures.py`, che
-   raggruppa cio' che si **ripete** e lo stampa al SessionStart. E' il canale
+   raggruppa ciò che si **ripete** e lo stampa al SessionStart. È il canale
    che aveva registrato `.venv/bin/python: no such file` tre ore prima della
    run in cui quattro scrittori l'hanno ripagato da capo.
 
 Il canary resta obbligatorio come la proposta chiede nella sezione 10, con
 un'avvertenza che la proposta non poteva avere: **le eval di `evals/` misurano
 gli agenti della catena vecchia** (`writer`, `reviewer`, `verifier`), non i
-tipi dell'officina. Per questi la prova e' quella del piano, cioe' una run su
-un indicatore misurata con `scripts/baseline_tokens.py`. L'esito e' annotato in
-[`CANARY.md`](CANARY.md), riga "2026-08-07 (secondo giro)", con cio' che resta
+tipi dell'officina. Per questi la prova è quella del piano, cioè una run su
+un indicatore misurata con `scripts/baseline_tokens.py`. L'esito è annotato in
+[`CANARY.md`](CANARY.md), riga "2026-08-07 (secondo giro)", con ciò che resta
 non misurato.
 
 ### 15.7 Cosa resta aperto
 
-- **L'advisor e' a zero, ma l'hook resta non provato.** La run misurata
+- **L'advisor è a zero, ma l'hook resta non provato.** La run misurata
   (`wf_9fb8f663-fb4`) porta zero `advisor_message` su sette agenti, contro nove
-  della prima run. Nei trascritti pero' non c'e' nessuna traccia del hook:
-  nessun agente ci ha nemmeno provato, quindi a tenere e' stata la prosa col
-  numero, e il divieto meccanico e' un paracadute che non si e' ancora aperto.
+  della prima run. Nei trascritti però non c'è nessuna traccia del hook:
+  nessun agente ci ha nemmeno provato, quindi a tenere è stata la prosa col
+  numero, e il divieto meccanico è un paracadute che non si è ancora aperto.
   Vale la pena saperlo: il giorno in cui uno ci prova, sapremo se regge.
 - **Il giro va rifatto col pacchetto corretto.** La prova ha dato i numeri che
   il disegno prometteva e ha bocciato il proprio articolo sui fatti: il
   pacchetto non portava la definizione ufficiale, quindi entrambi gli scrittori
   hanno dedotto il denominatore dal nome dell'indicatore. Corretto in
-  `packs/build.py`, ma la misura che decide il canary e' quella dopo la
+  `packs/build.py`, ma la misura che decide il canary è quella dopo la
   correzione, non questa.
 - **Il rientro di una smentita.** Il verificatore adesso vede gli articoli
   dell'officina, ma una smentita torna a un revisore che l'officina non ha:
   oggi la si legge con `bin/py scripts/verification_queue.py --open` e si
-  rilancia il workflow su quel codice. Automatico non lo e' ancora.
+  rilancia il workflow su quel codice. Automatico non lo è ancora.
 - **La demolizione** (passo 6.7 del piano) resta ferma dietro la prova piena,
-  ed e' giusto: cancellare 250 KB di script mentre la voce di costo piu' grande
-  non e' ancora misurata toglie la possibilita' di attribuire una regressione
+  ed è giusto: cancellare 250 KB di script mentre la voce di costo più grande
+  non è ancora misurata toglie la possibilità di attribuire una regressione
   che comparisse dopo.

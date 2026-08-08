@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 """Il contatore deterministico dei tic dell'italiano generato (finder, non verdetto).
 
-Perche' esiste. `scripts/prose_lint.py` conta i tell che content/STYLE.md gia'
+Perché esiste. `scripts/prose_lint.py` conta i tell che content/STYLE.md già
 nomina (domanda retorica di chiusura, lessico spia, slogan, falso intervallo,
 numero doppio). Sono tutti tell di *superficie editoriale*. Restano fuori i tic
 *strutturali* dell'italiano AI, quelli che la skill scrittura-italiana esiste
 per togliere: gli avverbi in -mente a raffica, la gerundite in coda, la
 definizione bipolare nelle sue cinque varianti, le perifrasi al posto di
-"e'/sono", il lessico di plastica e ad alta frequenza AI, i latinismi e i
+"è/sono", il lessico di plastica e ad alta frequenza AI, i latinismi e i
 connettori sovrabbondanti, l'incipit a cornice, e il ritmo piatto (bassa
 varianza della lunghezza delle frasi).
 
-Senza questo contatore un confronto prima/dopo sullo stadio gia' curato dal
+Senza questo contatore un confronto prima/dopo sullo stadio già curato dal
 produttore darebbe zero su prose_lint e satura sulla rubrica (vedi
 docs/archive/WRITING_QUALITY_PLAN.md, Parte seconda, buchi 1 e 3): due strumenti ciechi
-proprio sul braccio che decide se la skill aggiunge valore. Questo e' lo
+proprio sul braccio che decide se la skill aggiunge valore. Questo è lo
 strumento mancante.
 
-Cosa NON e'. Non e' un cancello e non e' un giudice. Ogni categoria e' una
+Cosa NON è. Non è un cancello e non è un giudice. Ogni categoria è una
 *regex finder*: per costruzione prende anche falsi positivi (una gerundite
-legittima, un "rappresenta" che regge). Il numero misura una densita', da
-leggere insieme, mai una sola occorrenza come colpa. La lista lessicale e'
+legittima, un "rappresenta" che regge). Il numero misura una densità, da
+leggere insieme, mai una sola occorrenza come colpa. La lista lessicale è
 distillata da references/stile-naturale.md (§7, §8, §14, §15, §17, §18, §20,
 §39, §45) e references/cliche-e-parole-alla-moda.md della skill, sotto CC BY-SA
 4.0 (vedi .claude/skills/scrittura-italiana/ATTRIBUZIONE.md).
@@ -31,8 +31,8 @@ Uso:
     python3 evals/scrittura-italiana/tic_count.py --text "..."
     python3 evals/scrittura-italiana/tic_count.py --self-test
 
-Un file .json e' letto come articolo indicatore (lead + sezioni). Ogni altro
-file e' testo (il frontmatter e i marcatori Markdown piu' rumorosi sono tolti).
+Un file .json è letto come articolo indicatore (lead + sezioni). Ogni altro
+file è testo (il frontmatter e i marcatori Markdown più rumorosi sono tolti).
 Stdlib puro.
 """
 
@@ -48,8 +48,8 @@ from pathlib import Path
 # I caratteri che content/STYLE.md vieta in assoluto. Qui non sono un tic da
 # contare tra gli altri ma un cancello: gli assoluti di progetto vincono sempre
 # sulla skill, che invece in testo controllato ammette la lineetta e il punto e
-# virgola. Se compaiono in un "dopo", la riscrittura e' da rifare, non da pesare.
-# I caporali e le virgolette curve sono qui perche' content/STYLE.md (regola 5 e
+# virgola. Se compaiono in un "dopo", la riscrittura è da rifare, non da pesare.
+# I caporali e le virgolette curve sono qui perché content/STYLE.md (regola 5 e
 # la sezione sulla precedenza) impone virgolette dritte e vieta i caporali `« »`
 # che la skill consiglia nel registro testo controllato, e nomina proprio questo
 # campo `vietati` come il cancello che lo fa rispettare. Senza, il gate a cui
@@ -61,18 +61,18 @@ BANNED = {
     "‘": "virgoletta curva", "’": "virgoletta curva",
 }
 
-# -mente ad alta frequenza AI (stile-naturale.md §15). L'euristica e' la
-# densita': un -mente ogni tanto e' italiano, cinque per pagina sono un tic.
+# -mente ad alta frequenza AI (stile-naturale.md §15). L'euristica è la
+# densità: un -mente ogni tanto è italiano, cinque per pagina sono un tic.
 MENTE = re.compile(r"\b\w+mente\b", re.IGNORECASE)
 
 # Gerundite in coda di frase (stile-naturale.md §3, §14): il gerundio pleonastico
 # che allunga una frase che dovrebbe finire. Il finder cerca un gerundio dopo la
-# virgola. Prende anche gerundi legittimi: e' un candidato, non una colpa.
+# virgola. Prende anche gerundi legittimi: è un candidato, non una colpa.
 GERUNDITE = re.compile(
     r",\s+(?:cosi\s+)?\w+(?:ando|endo)\b", re.IGNORECASE
 )
 
-# Perifrasi al posto di "e'/sono/ha" (stile-naturale.md §8).
+# Perifrasi al posto di "è/sono/ha" (stile-naturale.md §8).
 PERIFRASI = re.compile(
     r"\b(?:si\s+configura\s+come|si\s+pone\s+come|si\s+presenta\s+come|"
     r"si\s+erge\s+a|assurge\s+a|si\s+rivela|risulta\s+essere|"
@@ -81,8 +81,8 @@ PERIFRASI = re.compile(
 )
 
 # Le cinque varianti del bipolare (stile-naturale.md §9). Sono finder, con falsi
-# positivi dichiarati (anafora triadica, citazione, tesi-manifesto): il numero e'
-# una densita' da leggere, non un verdetto sulla singola frase.
+# positivi dichiarati (anafora triadica, citazione, tesi-manifesto): il numero è
+# una densità da leggere, non un verdetto sulla singola frase.
 BIPOLARE = [
     re.compile(r"\bnon\s+è\s+[^.;:!?]{0,60},\s+ma\b", re.IGNORECASE),      # (a) letterale
     re.compile(r"\bnon\s+è\s+[^.;:!?]{0,60}:\s+è\b", re.IGNORECASE),        # (d) due punti
@@ -115,10 +115,10 @@ INCIPIT_CORNICE = re.compile(
 )
 
 # Lessico di plastica e vocabolario AI ad alta frequenza (stile-naturale.md §7,
-# §39; cliche-e-parole-alla-moda.md §1). Contato come densita' per mille parole.
+# §39; cliche-e-parole-alla-moda.md §1). Contato come densità per mille parole.
 # NB: alcune parole (cruciale, panorama, tessuto, sottolineare, evidenziare)
-# stanno gia' nel lessico-spia di prose_lint. Qui la lista e' piu' larga e la
-# metrica e' la densita', non la presenza: i due strumenti si leggono insieme.
+# stanno già nel lessico-spia di prose_lint. Qui la lista è più larga e la
+# metrica è la densità, non la presenza: i due strumenti si leggono insieme.
 LESSICO_PLASTICA = {
     "cruciale", "cruciali", "fondamentale", "fondamentali", "imprescindibile",
     "evidenziare", "sottolineare", "valorizzare", "esaltare", "intricato",
@@ -135,7 +135,7 @@ PAROLA = re.compile(r"[A-Za-zÀ-ÿ']+")
 
 
 def _strip_markdown(text: str) -> str:
-    """Toglie il frontmatter YAML e i marcatori Markdown piu' rumorosi, cosi'
+    """Toglie il frontmatter YAML e i marcatori Markdown più rumorosi, così
     il contatore misura la prosa e non la sintassi del formato."""
     text = re.sub(r"^---\n.*?\n---\n", "", text, count=1, flags=re.DOTALL)
     text = re.sub(r"\{:[^}]*\}", "", text)          # attributi Kramdown ({: .x})
@@ -171,8 +171,8 @@ def count_tics(text: str) -> dict:
     lessico = sum(1 for w in words if w.lower() in LESSICO_PLASTICA)
     # La cornice a inizio di ogni blocco, non solo del testo intero. _load_text
     # unisce lead, titoli e corpi delle sezioni con "\n\n", quindi un articolo
-    # indicatore arriva qui come piu' blocchi: una cornice a inizio sezione (non
-    # a inizio articolo) e' proprio il tic da contare, e guardare solo
+    # indicatore arriva qui come più blocchi: una cornice a inizio sezione (non
+    # a inizio articolo) è proprio il tic da contare, e guardare solo
     # sentences[0] la mancava sempre tranne quando apre l'intero pezzo.
     incipit = 0
     for block in re.split(r"\n\s*\n", text):
@@ -207,14 +207,14 @@ def count_tics(text: str) -> dict:
         "ritmo": {
             "lunghezza_media_frase": round(mean_len, 1),
             "deviazione_standard": round(stdev_len, 1),
-            # varianza del ritmo: piu' e' alta, meno piatto e' il periodare
+            # varianza del ritmo: più è alta, meno piatto è il periodare
             "burstiness": round(stdev_len / mean_len, 2) if mean_len else 0.0,
         },
     }
 
 
 def _self_test() -> int:
-    """Il metro provato sul metro: un testo pieno di tic deve pesare piu' di uno
+    """Il metro provato sul metro: un testo pieno di tic deve pesare più di uno
     pulito, e il cancello deve vedere i caratteri vietati."""
     failures = []
 
@@ -233,7 +233,7 @@ def _self_test() -> int:
     s = count_tics(sporco)
     p = count_tics(pulito)
     if s["tic_per_1000_parole"] <= p["tic_per_1000_parole"]:
-        failures.append("il testo sporco non pesa piu' del pulito")
+        failures.append("il testo sporco non pesa più del pulito")
     for k in ("mente", "perifrasi_essere", "bipolare", "latinismi",
               "connettori", "lessico_plastica", "incipit_cornice"):
         if s["tic"][k] == 0:
@@ -243,8 +243,8 @@ def _self_test() -> int:
     if "punto e virgola" not in vietato["vietati"] or "em-dash" not in vietato["vietati"]:
         failures.append("il cancello non vede i caratteri vietati")
     # I caporali e le virgolette curve che STYLE.md vieta e che la skill
-    # consiglia nel registro controllato: il cancello deve vederli, o non e' il
-    # cancello che STYLE.md dice che e'.
+    # consiglia nel registro controllato: il cancello deve vederli, o non è il
+    # cancello che STYLE.md dice che è.
     curve = count_tics("Il dato «cruciale» dice “tanto”.")
     if "caporale" not in curve["vietati"] or "virgoletta curva" not in curve["vietati"]:
         failures.append("il cancello non vede caporali o virgolette curve")
@@ -259,7 +259,7 @@ def _self_test() -> int:
         "In questo contesto la distanza si allarga."
     )
     if per_sezione["tic"]["incipit_cornice"] < 1:
-        failures.append("la cornice a inizio sezione non e' contata")
+        failures.append("la cornice a inizio sezione non è contata")
 
     for line in failures:
         print(f"SELF-TEST FALLITO: {line}")

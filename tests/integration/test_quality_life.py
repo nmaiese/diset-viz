@@ -21,7 +21,7 @@ class QualityLifeStaticTest(unittest.TestCase):
         self.assertEqual(index.status_code, 200)
         self.assertIn(b"application/ld+json", index.data)
 
-        # La metodologia qualita' della vita e' stata unificata in /metodologia:
+        # La metodologia qualità della vita è stata unificata in /metodologia:
         # la vecchia URL fa 301 verso la sezione ancorata.
         redirect = client.get("/qualita-della-vita/metodologia")
         self.assertEqual(redirect.status_code, 301)

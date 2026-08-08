@@ -12,6 +12,6 @@
  "pr": "38",
  "run_id": "legacy-reviewer-pr38",
  "stage": "reviewer",
- "summary": "Seconda run: corretti due errori nel proprio lavoro gia' pubblicato dalla #37",
+ "summary": "Seconda run: corretti due errori nel proprio lavoro già pubblicato dalla #37",
  "trigger": "manuale"
 }

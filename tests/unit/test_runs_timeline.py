@@ -1,10 +1,10 @@
 """Il join run+token della cronologia (`pipeline_monitor.runs_timeline`).
 
-La cronologia e' la vista che manca al cruscotto: una riga per run, ordinata nel
+La cronologia è la vista che manca al cruscotto: una riga per run, ordinata nel
 tempo, col consumo token. Qui si prova, su un diario sintetico e una telemetria
-iniettata, che il join e' sul solo `run_id` (conserva ogni run, anche senza
+iniettata, che il join è sul solo `run_id` (conserva ogni run, anche senza
 token), che l'indicatore non viene mai inventato dove il testo ne cita due o
-zero, e che i totali sommano solo cio' che si puo' sommare senza spartire un
+zero, e che i totali sommano solo ciò che si può sommare senza spartire un
 costo fra indicatori di confronto."""
 
 import unittest
@@ -21,7 +21,7 @@ def _run(run_id, stage, outcome, at, summary="", detail=None, **extra):
 
 class RunsTimelineTest(unittest.TestCase):
     def setUp(self):
-        # Un diario sintetico, iniettato dov'e' letto: niente file, niente git.
+        # Un diario sintetico, iniettato dov'è letto: niente file, niente git.
         self._runs = [
             _run("r1", "curator", "merged", "2026-01-02T10:00:00+00:00",
                  summary="curatela di dem:NMIGRATEIN", commit="aaa1", pr="10",
@@ -84,7 +84,7 @@ class RunsTimelineTest(unittest.TestCase):
 
     def test_costo_mai_attribuito_da_un_id_di_prosa(self):
         # Il caso del batch di ammissione: telemetria senza bersaglio, ma il
-        # diario cita per caso un solo id. Il costo NON e' di quell'indicatore.
+        # diario cita per caso un solo id. Il costo NON è di quell'indicatore.
         runs = [_run("b1", "promoter", "merged", "2026-02-01T10:00:00+00:00",
                      summary="ammessa la candidatura dem:BIRTHRATE dalla coda")]
         self._orig_read2 = pipeline_log.read_journal

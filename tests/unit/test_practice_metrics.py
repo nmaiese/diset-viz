@@ -24,7 +24,7 @@ class Compute(unittest.TestCase):
         dossier = {"a": _d("a", "fusa"), "b": _d("b", "chiusa"), "c": _d("c", "pubblicata")}
         out = self._metrics(dossier)
         self.assertEqual(out["osservabilita"]["indicatori_totali"], 3)
-        self.assertEqual(out["velocita"]["pratiche_aperte"], 1)  # solo 'fusa' e' aperta
+        self.assertEqual(out["velocita"]["pratiche_aperte"], 1)  # solo 'fusa' è aperta
 
     def test_public_error_is_counted(self):
         dossier = {"a": _d("a", "invalidata", flags={"open_smentita": True})}
@@ -49,8 +49,8 @@ class Compute(unittest.TestCase):
         self.assertEqual(out["velocita"]["ferme_oltre_soglia"], 1)
 
     def test_bloccate_excludes_normal_upstream_wait(self):
-        # Stesso predicato di is_stuck: monte-mancante non e' bloccata, un blocco
-        # esterno si'. La metrica non deve dire "bloccato" cio' che il cruscotto non chiama tale.
+        # Stesso predicato di is_stuck: monte-mancante non è bloccata, un blocco
+        # esterno sì. La metrica non deve dire "bloccato" ciò che il cruscotto non chiama tale.
         dossier = {
             "a": _d("a", "in-attesa", motivo="monte-mancante"),
             "b": _d("b", "in-attesa", motivo="dipendenza-esterna"),

@@ -5,11 +5,11 @@
  "claude_code_version": "2.1.220 (Claude Code)",
  "commit": "86f5275",
  "detail": [
-  "verso confermato higher_better (Lombardia 38,16 e Trentino 35,06 in cima, Calabria 12,62 e Marche 11,43 in coda: chi sta in alto e' chi un lettore direbbe messo meglio), categoria Imprese e competitivita' gia' corretta, nessuna riga di curatela da cambiare",
-  "smentita grave assorbita: tolta 'negli altri indicatori di produttivita il divario di solito si allarga', affermazione su altre serie che il brief di ter-1 non regge e che il verificatore ha misurato falsa (ristretto in 5 casi su 9 in valore assoluto, 8 su 9 in rapporto)",
-  "smentita media assorbita: la dinamica ora dice che il restringimento di 4,14 e' tutto del fondo (7,19 nel 1995), perche' il valore piu alto passa da 38,06 nel 1995 a 38,16 nel 2023",
-  "errore trovato in rilettura, nessuna guardia lo vedeva: 'le Marche restano ultime' era falso, il 2023 e' il primo anno in cui sono ultime, dal 1995 al 2022 il fondo della classifica era sempre la Calabria",
-  "aggiunta l'onda del divario: massimo 43,08 nel 2014 (Emilia-Romagna 52,13, Calabria 9,05), chiusura tutta dell'ultimo decennio ed e' la vetta a scendere",
+  "verso confermato higher_better (Lombardia 38,16 e Trentino 35,06 in cima, Calabria 12,62 e Marche 11,43 in coda: chi sta in alto è chi un lettore direbbe messo meglio), categoria Imprese e competitività già corretta, nessuna riga di curatela da cambiare",
+  "smentita grave assorbita: tolta 'negli altri indicatori di produttivita il divario di solito si allargà, affermazione su altre serie che il brief di ter-1 non regge e che il verificatore ha misurato falsa (ristretto in 5 casi su 9 in valore assoluto, 8 su 9 in rapporto)",
+  "smentita media assorbita: la dinamica ora dice che il restringimento di 4,14 è tutto del fondo (7,19 nel 1995), perché il valore piu alto passa da 38,06 nel 1995 a 38,16 nel 2023",
+  "errore trovato in rilettura, nessuna guardia lo vedeva: 'le Marche restano ultimè era falso, il 2023 è il primo anno in cui sono ultime, dal 1995 al 2022 il fondo della classifica era sempre la Calabria",
+  "aggiunta l'onda del divario: massimo 43,08 nel 2014 (Emilia-Romagna 52,13, Calabria 9,05), chiusura tutta dell'ultimo decennio ed è la vetta a scendere",
   "ultimo anno tenuto distinto dalla serie lunga: 15 regioni su 20 in calo, Marche -5,84 in dodici mesi su -6,04 in ventotto anni",
   "718 parole, prose_lint pulito, definition_check senza rilievi, fonte Eurostat FTE ri-verificata (HTTP 200), suite 935 test verde",
   "vintage 2023, reviewed_vintage 2023, reviewed_at 2026-07-31"

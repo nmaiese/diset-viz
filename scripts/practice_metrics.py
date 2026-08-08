@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """Le metriche della revisione (mandato, sezione 5).
 
-Il progetto non e' riuscito perche' usa una PR unica. E' riuscito se, per ogni
-indicatore, si sa senza ricostruzione manuale da dove e' partito, che decisioni
-ha attraversato, se e' pubblicato e se quella versione e' ancora valida. Questo
-script misura proprio questo, dai soli artefatti committati, cosi' il confronto
-prima/dopo il cutover (Fase F) e' un numero e non un'impressione.
+Il progetto non è riuscito perché usa una PR unica. È riuscito se, per ogni
+indicatore, si sa senza ricostruzione manuale da dove è partito, che decisioni
+ha attraversato, se è pubblicato e se quella versione è ancora valida. Questo
+script misura proprio questo, dai soli artefatti committati, così il confronto
+prima/dopo il cutover (Fase F) è un numero e non un'impressione.
 
-E' una **fotografia**, read-only: prende lo stato ricostruito e i run, e calcola
-il sottoinsieme di metriche che una fotografia puo' dare. Le metriche che vogliono
+È una **fotografia**, read-only: prende lo stato ricostruito e i run, e calcola
+il sottoinsieme di metriche che una fotografia può dare. Le metriche che vogliono
 una storia nel tempo (tentativi duplicati, pratiche perse dopo un'interruzione)
 non si inventano da un'istantanea: sono marcate `None` con il motivo, invece di
-un numero finto. Girarlo prima e dopo il cutover, e diffare, e' il confronto che
+un numero finto. Girarlo prima e dopo il cutover, e diffare, è il confronto che
 il mandato mette come condizione della Fase F.
 
     python3 scripts/practice_metrics.py
@@ -58,8 +58,8 @@ def compute(dossier: dict, runs: list, today: str = "", soglia_giorni: int = 30,
     errori_pubblici = [d for d in indicators if d["flags"].get("open_smentita")
                        and d["state"] in ("pubblicata", "invalidata")]
     # Stesso predicato di `pipeline_monitor.is_stuck`: una `in-attesa` conta come
-    # ferma solo se il motivo non e' monte-mancante (contropressione normale). Se
-    # divergesse, la metrica prima/dopo direbbe "bloccate" cio' che il cruscotto
+    # ferma solo se il motivo non è monte-mancante (contropressione normale). Se
+    # divergesse, la metrica prima/dopo direbbe "bloccate" ciò che il cruscotto
     # non chiama bloccato.
     bloccate = [d for d in indicators
                 if d["state"] == "in-quarantena"
@@ -118,9 +118,9 @@ def compute(dossier: dict, runs: list, today: str = "", soglia_giorni: int = 30,
 
 
 def _resolve_today(today: str = "") -> str:
-    """La data di riferimento, o oggi se non e' data. Senza, la fotografia userebbe
-    `entered_at` come fine e ogni pratica risulterebbe di zero giorni: eta' media
-    zero, niente oltre soglia, il confronto prima/dopo falsato. Oggi e' il default
+    """La data di riferimento, o oggi se non è data. Senza, la fotografia userebbe
+    `entered_at` come fine e ogni pratica risulterebbe di zero giorni: età media
+    zero, niente oltre soglia, il confronto prima/dopo falsato. Oggi è il default
     giusto per la CLI documentata, che gira senza `--today`."""
     if today:
         return today
@@ -152,7 +152,7 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--today", default="", help="data di riferimento YYYY-MM-DD")
     parser.add_argument("--soglia-giorni", type=int, default=30,
-                        help="soglia oltre cui una pratica aperta e' 'ferma'")
+                        help="soglia oltre cui una pratica aperta è 'ferma'")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
     metrics = load_and_compute(today=args.today, soglia_giorni=args.soglia_giorni)

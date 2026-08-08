@@ -6,9 +6,9 @@
  "commit": "b7ccced",
  "detail": [
   "Cura riconfermata senza modifiche: higher_better regge sulla classifica 2024 (in cima Emilia-Romagna 2,60, Piemonte 2,10, Valle d'Aosta 2,00, in fondo Basilicata -4,80, Calabria -4,40, Molise -3,40), categoria lavoro_opportunita, score_eligible true, copertura 1.0 sul 2015-2024, description 171 caratteri.",
-  "Smentita grave sanata: tolta 'la Sardegna sta davanti a tutto il Sud continentale', falsa perche' l'Abruzzo (+0,50, #12) supera la Sardegna (-0,10, #14).",
-  "Smentita media sanata: 'l'Abruzzo mantiene un saldo positivo' sostituita con 'chiude in positivo per la prima volta in dieci anni' (negativo dal -1,0 del 2015 al -0,1 del 2023).",
-  "Smentita media sanata: il 'quasi tre su dieci in Lombardia' e' ora agganciato ai 241 mila trasferimenti lordi del biennio 2023-2024 e non al saldo netto di 116 mila, come scrive Istat nel comunicato del 20 giugno 2025.",
+  "Smentita grave sanata: tolta 'la Sardegna sta davanti a tutto il Sud continentalè, falsa perché l'Abruzzo (+0,50, #12) supera la Sardegna (-0,10, #14).",
+  "Smentita media sanata: 'l'Abruzzo mantiene un saldo positivò sostituita con 'chiude in positivo per la prima volta in dieci annì (negativo dal -1,0 del 2015 al -0,1 del 2023).",
+  "Smentita media sanata: il 'quasi tre su dieci in Lombardià è ora agganciato ai 241 mila trasferimenti lordi del biennio 2023-2024 e non al saldo netto di 116 mila, come scrive Istat nel comunicato del 20 giugno 2025.",
   "Tolte due eco del cruscotto (divario 7,40 e variazione +0,33 dal 2023). Articolo 701 parole, 4 sezioni, 3 link interni, prose_lint pulito, vintage 2024, reviewed_vintage 2024."
  ],
  "gate": "auto",

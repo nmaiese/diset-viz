@@ -1,18 +1,18 @@
 """Dal view model dell'app al pacchetto, e la lunghezza che ne discende.
 
-Questo e' l'unico modulo di `packs` che conosce `app`. Fa tre cose che il brief
+Questo è l'unico modulo di `packs` che conosce `app`. Fa tre cose che il brief
 di oggi non fa:
 
 1. **Apre l'interno della matrice.** `scripts/indicator_brief.py` porta il primo
    e l'ultimo valore di ogni territorio e la serie delle medie, e nient'altro.
-   Gli articoli pubblicati citano valori a meta' serie ("nel 2014 l'Emilia-Romagna
-   arrivo' a 52,13") che da li' non si potevano prendere: `docs/CANARY.md` lo
-   chiama "un buco nel perimetro". Qui la matrice anno per territorio c'e'
+   Gli articoli pubblicati citano valori a metà serie ("nel 2014 l'Emilia-Romagna
+   arrivò a 52,13") che da lì non si potevano prendere: `docs/CANARY.md` lo
+   chiama "un buco nel perimetro". Qui la matrice anno per territorio c'è
    tutta, quindi ogni cifra citabile ha una provenienza.
-2. **Ordina gli angoli invece di stampare blocchi fissi.** E' il punto: la
+2. **Ordina gli angoli invece di stampare blocchi fissi.** È il punto: la
    forma del pacchetto cambia da un indicatore all'altro, quindi la prosa non
-   puo' ereditare una forma sola.
-3. **Deriva la lunghezza dalla storia.** Un minimo si', un massimo no.
+   può ereditare una forma sola.
+3. **Deriva la lunghezza dalla storia.** Un minimo sì, un massimo no.
 
 Uso:
 
@@ -46,7 +46,7 @@ DEFINITIONS_PATH = os.path.join(
     "data", "definitions", "istat_territoriali.csv")
 
 # Le tre ripartizioni con cui il divario viene raccontato: Istat separa Sud e
-# Isole, qui stanno insieme, come in `app/divari.py`. La mappa e' quella di
+# Isole, qui stanno insieme, come in `app/divari.py`. La mappa è quella di
 # `app/data.py`, non una seconda: due copie di una ripartizione sono due
 # ripartizioni che divergono.
 AREA_BY_KEY = {
@@ -54,9 +54,9 @@ AREA_BY_KEY = {
     for key, area in REGION_GEO_AREA.items()
 }
 
-# Il minimo sotto cui un articolo non e' un articolo, e il passo per ogni unita'
+# Il minimo sotto cui un articolo non è un articolo, e il passo per ogni unità
 # di storia trovata. Nessun massimo: la lunghezza la decide la storia, e un
-# indicatore con quarantasei anni e tre rotture merita piu' spazio di uno con
+# indicatore con quarantasei anni e tre rotture merita più spazio di uno con
 # otto anni piatti. Provvisori: si tarano quando ci sono articoli nuovi da
 # misurare.
 MIN_WORDS = 300
@@ -77,9 +77,9 @@ def matrix_by_name(level):
     """{anno: {nome territorio: valore}} dal livello del view model.
 
     Per nome e non per chiave: il pacchetto lo legge chi scrive, e una chiave
-    slug non e' un territorio che si possa nominare in una frase.
+    slug non è un territorio che si possa nominare in una frase.
     """
-    # Da `territories` e non da `observations`, ed e' una correzione.
+    # Da `territories` e non da `observations`, ed è una correzione.
     # `observations` copre **solo l'ultimo anno**: un territorio con dati nei
     # primi anni e assente nell'ultimo non ha un nome, e la chiave slug filtra
     # nel pacchetto. Su `ter-30` erano tre su quindici, e chi scriveva leggeva
@@ -124,30 +124,30 @@ def _notes_by_id():
 
 
 def official_definition(family, raw_id):
-    """La definizione che pubblica la fonte, testuale, piu' i dati di base.
+    """La definizione che pubblica la fonte, testuale, più i dati di base.
 
-    **E' il difetto piu' grave che la prima misura abbia trovato, e non era di
-    prosa.** Il pacchetto portava nome, unita', verso e anni: niente
+    **È il difetto più grave che la prima misura abbia trovato, e non era di
+    prosa.** Il pacchetto portava nome, unità, verso e anni: niente
     numeratore, niente denominatore. Su `ter-30` la fonte scrive "visitatori
     dei circuiti sul totale di musei e istituti similari appartenenti ai
     circuiti", e i due scrittori, non avendolo, hanno dedotto dal nome
     "domanda culturale" un rapporto per circuito e ragionato su regioni con uno
-    o molti circuiti. Prosa piu' fluida di prima, e l'indicatore era un altro.
+    o molti circuiti. Prosa più fluida di prima, e l'indicatore era un altro.
 
-    Non e' un errore del modello: e' il perimetro informativo. A un agente che
-    non puo' cercare, cio' che non gli si da' non esiste, e la sola cosa che
-    resta da cui dedurre il senso e' il **nome**, che e' un'etichetta e non una
-    definizione. Le righe erano gia' su disco (378 definizioni in
-    `data/definitions/`), gia' lette da questo modulo, e questo modulo ne
+    Non è un errore del modello: è il perimetro informativo. A un agente che
+    non può cercare, ciò che non gli si dà non esiste, e la sola cosa che
+    resta da cui dedurre il senso è il **nome**, che è un'etichetta e non una
+    definizione. Le righe erano già su disco (378 definizioni in
+    `data/definitions/`), già lette da questo modulo, e questo modulo ne
     prendeva solo la colonna `note`.
 
-    `dati_di_base` viaggia insieme perche' e' li' che numeratore e denominatore
-    si leggono separati, e `note` perche' e' dove la fonte dichiara i propri
+    `dati_di_base` viaggia insieme perché è lì che numeratore e denominatore
+    si leggono separati, e `note` perché è dove la fonte dichiara i propri
     limiti (per `ter-30`: un biglietto vale un visitatore, quindi i visitatori
-    "risultano sottostimati"), cioe' materiale per la sezione dei limiti che
+    "risultano sottostimati"), cioè materiale per la sezione dei limiti che
     l'articolo altrimenti si inventa o non scrive.
 
-    Solo per la famiglia territoriale, come `source_note`: e' l'unica per cui il
+    Solo per la famiglia territoriale, come `source_note`: è l'unica per cui il
     progetto ha scaricato i metadati. Per le altre si tace, e chi scrive vede
     che la definizione manca invece di leggerne una sbagliata.
     """
@@ -164,9 +164,9 @@ def official_definition(family, raw_id):
 def source_note(family, raw_id):
     """La nota metodologica di questo indicatore, se la fonte ne pubblica una.
 
-    Solo per la famiglia territoriale: e' l'unica per cui il progetto ha
+    Solo per la famiglia territoriale: è l'unica per cui il progetto ha
     scaricato i metadati. Le altre restano senza, e il rilevatore delle rotture
-    di metodo tace, che e' meglio di una rottura dedotta.
+    di metodo tace, che è meglio di una rottura dedotta.
     """
     if family != "territorial":
         return None
@@ -174,14 +174,14 @@ def source_note(family, raw_id):
 
 
 def human_scale(meta):
-    """La frase che traduce l'unita' in una vita, se il progetto ne ha una.
+    """La frase che traduce l'unità in una vita, se il progetto ne ha una.
 
-    Non la scrive questo modulo: la costruisce gia' `app/indicator_notes.py`
+    Non la scrive questo modulo: la costruisce già `app/indicator_notes.py`
     per il blocco "Come leggere il dato" della pagina, e ricalcolarla qui
-    sarebbe una seconda verita' sullo stesso fatto. Serve al pacchetto perche'
-    e' il primo dei tre requisiti positivi: un articolo che non dice mai che
+    sarebbe una seconda verità sullo stesso fatto. Serve al pacchetto perché
+    è il primo dei tre requisiti positivi: un articolo che non dice mai che
     cosa significa il numero per una persona resta freddo anche quando ogni
-    cifra e' giusta.
+    cifra è giusta.
     """
     try:
         explain = build_indicator_explain({
@@ -204,23 +204,23 @@ def suggested_words(total):
 
 
 # La soglia sotto cui un angolo non merita di essere sviluppato, espressa come
-# quota della forza del piu' forte. Mezzo: un angolo che vale meta' del
-# migliore ha ancora qualcosa da dire, uno che vale un quarto e' rumore.
+# quota della forza del più forte. Mezzo: un angolo che vale metà del
+# migliore ha ancora qualcosa da dire, uno che vale un quarto è rumore.
 DEVELOP_SHARE = 0.5
 
 
 def angles_to_develop(found):
     """Quanti angoli l'articolo deve sviluppare davvero. Almeno uno.
 
-    E' la lunghezza detta in modo che si possa verificare. Chiedere "765
+    È la lunghezza detta in modo che si possa verificare. Chiedere "765
     parole" non funziona: nella prima run il pacchetto ne chiedeva 765 e 540
     per due indicatori, una forbice del 42%, e le bozze sono uscite a 657 e
     619, una forbice del 13%. **La lunghezza convergeva invece di divergere**,
     che era il criterio di fallimento scritto nel piano.
 
-    Un numero di parole e' una richiesta che un modello media; un numero di
-    angoli da sviluppare e' una richiesta che si conta. E la lunghezza segue da
-    sola, perche' quattro angoli non stanno in quattrocento parole.
+    Un numero di parole è una richiesta che un modello media; un numero di
+    angoli da sviluppare è una richiesta che si conta. E la lunghezza segue da
+    sola, perché quattro angoli non stanno in quattrocento parole.
     """
     if not found:
         return 0
@@ -257,7 +257,7 @@ def build_pack(family, raw_id, level_key=None, notes=None):
         },
         # Che cosa misura davvero questo indicatore, con le parole della fonte.
         # Vedi `official_definition`: senza, chi scrive deduce il denominatore
-        # dal nome, ed e' cosi' che un articolo esce fluido e sbagliato.
+        # dal nome, ed è così che un articolo esce fluido e sbagliato.
         "definition": official_definition(family, raw_id),
         "level": level["key"],
         "years": sorted(matrix),
@@ -267,12 +267,12 @@ def build_pack(family, raw_id, level_key=None, notes=None):
         "stats": level["stats"],
         "angles": found,
         # I vincoli valgono su tutto l'articolo, non su un paragrafo: una
-        # rottura di metodo dentro la finestra decide che cosa si puo'
-        # confrontare, e non e' una storia con cui aprire.
+        # rottura di metodo dentro la finestra decide che cosa si può
+        # confrontare, e non è una storia con cui aprire.
         "constraints": constraints,
-        # La licenza di spiegare perche' i numeri si muovono. Senza questo
-        # blocco l'articolo puo' descrivere solo la geometria della serie, ed
-        # e' il motivo per cui i cinquantadue riscritti sono corretti e freddi.
+        # La licenza di spiegare perché i numeri si muovono. Senza questo
+        # blocco l'articolo può descrivere solo la geometria della serie, ed
+        # è il motivo per cui i cinquantadue riscritti sono corretti e freddi.
         "context": context_module.as_context(
             meta["id"], meta.get("theme"), human_scale(meta),
             indicator_name=meta.get("name")),
@@ -288,7 +288,7 @@ def render(pack):
     meta = pack["meta"]
     out = [
         f"{meta['id']}  {meta.get('name') or ''}",
-        f"  unita': {meta.get('unit') or '?'}   verso: {meta.get('direction') or '?'}"
+        f"  unità: {meta.get('unit') or '?'}   verso: {meta.get('direction') or '?'}"
         f"   livello: {pack['level']}",
         f"  anni: {pack['years'][0]}-{pack['years'][-1]}"
         f"   territori: {len(pack['territories'])}",
@@ -305,10 +305,10 @@ def render(pack):
         if definition.get("fonti"):
             out.append(f"  {definition['fonti']}")
         out += [
-            "  **Il nome dell'indicatore e' un'etichetta, non una definizione.**",
+            "  **Il nome dell'indicatore è un'etichetta, non una definizione.**",
             "  Quello che l'articolo dice che il numero misura deve combaciare con",
             "  la riga qui sopra, denominatore compreso. Se le due cose divergono",
-            "  l'articolo e' sbagliato anche quando ogni cifra e' giusta, ed e' il",
+            "  l'articolo è sbagliato anche quando ogni cifra è giusta, ed è il",
             "  modo peggiore di sbagliare: si legge bene.",
             "",
         ]
@@ -325,7 +325,7 @@ def render(pack):
         f" almeno una delle proprie cifre.",
         f"  Un angolo nominato e non sviluppato non conta. Da qui viene la"
         f" lunghezza: minimo {pack['words']['minimo']} parole, nessun massimo,"
-        f" e {pack['words']['atteso']} e' l'ordine di grandezza, non un bersaglio.",
+        f" e {pack['words']['atteso']} è l'ordine di grandezza, non un bersaglio.",
         "",
     ]
     for constraint in pack.get("constraints") or []:
@@ -338,7 +338,7 @@ def render(pack):
     if ctx.get("scala_umana"):
         out.append(f"SCALA UMANA: {ctx['scala_umana']}")
         out.append("")
-    out.append("PERCHE' SI MUOVE, CITABILE")
+    out.append("PERCHÉ SI MUOVE, CITABILE")
     if ctx.get("senza_contesto"):
         out.append("  niente nel corpus per questo tema.")
         out.append("  L'articolo non ha il diritto di spiegare la dinamica:")
@@ -349,15 +349,15 @@ def render(pack):
         out.append(f"     {claim['url']}")
     out.append("")
     # L'officina chiede due bozze, una sull'angolo 1 e una sull'angolo 2. Su
-    # **11 indicatori su 594** l'elenco ha meno di due voci, e li' quella
-    # richiesta non ha nessuna risposta valida: chi scrive puo' solo inventare
-    # un secondo angolo, e niente a valle se ne accorge, perche' lo schema della
+    # **11 indicatori su 594** l'elenco ha meno di due voci, e lì quella
+    # richiesta non ha nessuna risposta valida: chi scrive può solo inventare
+    # un secondo angolo, e niente a valle se ne accorge, perché lo schema della
     # bozza controlla la forma del campo `angolo` e non la sua provenienza.
-    # Il pacchetto e' l'unico posto che sa quante voci ha, quindi lo dice qui.
-    out.append("ANGOLI, DAL PIU' FORTE")
+    # Il pacchetto è l'unico posto che sa quante voci ha, quindi lo dice qui.
+    out.append("ANGOLI, DAL PIÙ FORTE")
     if not pack["angles"]:
         out.append("  nessuno: questa serie non ha una storia strutturale.")
-        out.append("  Un articolo qui e' una nota breve, non un pezzo.")
+        out.append("  Un articolo qui è una nota breve, non un pezzo.")
         out.append("  Se ti hanno chiesto un angolo numerato, quel numero non esiste:")
         out.append("  scrivilo nel campo `angolo` invece di inventarne uno.")
     elif len(pack["angles"]) == 1:

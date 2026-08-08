@@ -7,10 +7,10 @@
  "detail": [
   "Impronta letta 87026bd52206de0a, la stessa che la coda dava unread: nessuna lettura precedente su questo codice, primo round.",
   "Punteggi: comprehension 2, focus 2, reader_relevance 2, search_intent_coverage 2, cognitive_load 1, technical_translation 1, structure 1, unique_value 2.",
-  "structure 1: la sezione 'Il segno piu' arriva anche dove si parte' promette la tesi nel titolo e apre su 355mila nati e 652mila morti del 2025, che sono il saldo naturale e non questo indicatore, poi sullo scalino fra Abruzzo (4,80) e Sardegna (2,90), e la prova (Molise 4,7 sul totale contro meno 3,4 sugli scambi interni nel 2024) arriva terza.",
-  "cognitive_load 1: tre coppie di cifre di fila su due indicatori diversi (Molise 4,7 contro meno 3,4, Calabria 2,0 contro meno 4,4, Basilicata 0,3 contro meno 4,8), e nella dinamica un paragrafo che ricalca la media anno per anno (1,08 nel 2020, 2,42 nel 2021, 4,25 nel 2022) gia' stampata dalla tabella della serie storica sopra la prosa.",
-  "technical_translation 1: AIRE e' l'unica sigla mai sciolta, e sta nella frase dei limiti che chiede di diffidare del confronto 2024-2025.",
-  "Niente numeric_overload: la frase che precede le tre coppie dice la tesi a parole ('il segno piu' convive con una perdita di residenti verso il resto d'Italia'), quindi chi salta le cifre capisce lo stesso. Valutato e declinato, non trascurato.",
+  "structure 1: la sezione 'Il segno più arriva anche dove si partè promette la tesi nel titolo e apre su 355mila nati e 652mila morti del 2025, che sono il saldo naturale e non questo indicatore, poi sullo scalino fra Abruzzo (4,80) e Sardegna (2,90), e la prova (Molise 4,7 sul totale contro meno 3,4 sugli scambi interni nel 2024) arriva terza.",
+  "cognitive_load 1: tre coppie di cifre di fila su due indicatori diversi (Molise 4,7 contro meno 3,4, Calabria 2,0 contro meno 4,4, Basilicata 0,3 contro meno 4,8), e nella dinamica un paragrafo che ricalca la media anno per anno (1,08 nel 2020, 2,42 nel 2021, 4,25 nel 2022) già stampata dalla tabella della serie storica sopra la prosa.",
+  "technical_translation 1: AIRE è l'unica sigla mai sciolta, e sta nella frase dei limiti che chiede di diffidare del confronto 2024-2025.",
+  "Niente numeric_overload: la frase che precede le tre coppie dice la tesi a parole ('il segno più convive con una perdita di residenti verso il resto d'Italià), quindi chi salta le cifre capisce lo stesso. Valutato e declinato, non trascurato.",
   "Nessun altro indicatore letto in questa run: 44 unread prima, 43 dopo."
  ],
  "gate": "",

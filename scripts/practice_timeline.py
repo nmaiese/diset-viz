@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """La storia di ogni indicatore, ricostruita dai file committati.
 
-Questa e' la Fase B del mandato (osservabilita' senza cambiare la pubblicazione)
-piu' la Fase C in modalita' di controllo (macchina a stati affiancata al flusso,
+Questa è la Fase B del mandato (osservabilità senza cambiare la pubblicazione)
+più la Fase C in modalità di controllo (macchina a stati affiancata al flusso,
 che confronta lo stato dichiarato con gli artefatti). Non pubblica niente, non
-apre pull request, non tocca la catena: legge i registri che gia' esistono e
+apre pull request, non tocca la catena: legge i registri che già esistono e
 compone, per ogni indicatore, una **timeline** e uno **stato ricostruito**.
 
-Oggi lo stato e' emergente: sette code lo rideducono a ogni run scandendo i CSV e
+Oggi lo stato è emergente: sette code lo rideducono a ogni run scandendo i CSV e
 gli store. Qui lo si legge una volta e lo si mette in un posto solo, per
-indicatore invece che per stadio, cosi' si puo' rispondere senza analisi manuale:
-quando l'indicatore e' entrato, cosa e' successo, quali passaggi ha completato,
-quali run lo hanno toccato, se e' pubblicato, se la sua verifica regge.
+indicatore invece che per stadio, così si può rispondere senza analisi manuale:
+quando l'indicatore è entrato, cosa è successo, quali passaggi ha completato,
+quali run lo hanno toccato, se è pubblicato, se la sua verifica regge.
 
-Il nucleo (`reconstruct`) e' puro: prende i dati gia' letti e non tocca il disco,
-cosi' un test lo prova con artefatti sintetici. La CLI collega i lettori reali
+Il nucleo (`reconstruct`) è puro: prende i dati già letti e non tocca il disco,
+così un test lo prova con artefatti sintetici. La CLI collega i lettori reali
 della catena, tutti stdlib puri. Stdlib puro come il resto.
 
     python3 scripts/practice_timeline.py                 # una riga per indicatore
@@ -57,7 +57,7 @@ def key_of_code(code: str) -> str:
 def _target_of_candidate(row: dict):
     """L'id d'atlante a cui un candidato punta, versione tollerante di
     `promote_candidates._target_id` (che invece solleva). Restituisce None quando
-    non e' ricavabile, invece di fermare la ricostruzione di tutto il resto."""
+    non è ricavabile, invece di fermare la ricostruzione di tutto il resto."""
     match = row.get("definition_match")
     dup = row.get("duplicate_of")
     if match in ("exact", "compatible", "proxy") and dup:
@@ -73,7 +73,7 @@ def _target_of_candidate(row: dict):
 # famiglia (`dem:NMIGRATEIN`), i candidate_id (`istat_demografia:DEPENDRATE`) e i
 # code (`ter-651`, `eur-rd_e_gerdreg`). Le forme nude (`BIRTHRATE`) sono rumore e
 # si lasciano fuori di proposito: meglio un'associazione mancante e dichiarata
-# che una inventata. Il trattino nel corpo dell'id e' obbligatorio, non opzionale:
+# che una inventata. Il trattino nel corpo dell'id è obbligatorio, non opzionale:
 # gli id BES lo contengono (`bes:09PAE009-N25`, `bes-03LAV006-N25`), e fermarsi al
 # secondo trattino inventava `bes:03LAV006` lasciando la vera pratica senza il suo
 # run.
@@ -108,12 +108,12 @@ def _emitted_roles(entry) -> list:
     """I ruoli che la pagina rende per questa entry.
 
     Copia stdlib di `app.indicator_texts.emitted_roles`, che possiede la regola:
-    una dichiarazione `roles_covered` e' un filtro sui quattro ruoli (un ruolo
+    una dichiarazione `roles_covered` è un filtro sui quattro ruoli (un ruolo
     sconosciuto si ignora) e i tre sostanziali ci sono comunque. Copiata e non
     importata come le altre costanti di questo file, e un test le tiene allineate.
     """
     declared = entry.get("roles_covered") if isinstance(entry, dict) else None
-    # Campo assente e lista vuota non sono la stessa cosa: la seconda e' una
+    # Campo assente e lista vuota non sono la stessa cosa: la seconda è una
     # dichiarazione che non nomina la definizione, quindi la assorbe.
     if not isinstance(declared, (list, tuple)):
         return list(ARTICLE_ROLES)
@@ -125,10 +125,10 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
                 runs, today: str = "") -> dict:
     """Ricostruisce, per ogni indicatore, timeline e stato, dai soli artefatti.
 
-    Tutti gli argomenti sono dati gia' letti (liste di dict, o `articles` come
-    `{key: entry}`), cosi' il nucleo resta puro e il test lo nutre a mano.
+    Tutti gli argomenti sono dati già letti (liste di dict, o `articles` come
+    `{key: entry}`), così il nucleo resta puro e il test lo nutre a mano.
     `published` = fuso su master (il progetto ha ratificato merge = pubblicazione):
-    non c'e' piu' una verifica-sito ne' uno stato `fusa` intermedio.
+    non c'è più una verifica-sito né uno stato `fusa` intermedio.
 
     Restituisce `{indicator_id: dossier}`, dove ogni dossier porta: `id`,
     `type`, `state`, `entered_at`, `completed_stages`, `flags`, `error_class`,
@@ -233,11 +233,11 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
         reviewed_at = entry.get("reviewed_at")
         reviewed_vintage = _as_int(entry.get("reviewed_vintage"))
         roles = {s.get("role") for s in (entry.get("sections") or []) if (s.get("body") or "").strip()}
-        # Sezioni variabili (opt-in): un'entry puo' dichiarare `roles_covered`, i
+        # Sezioni variabili (opt-in): un'entry può dichiarare `roles_covered`, i
         # ruoli che scrive come H2, e assorbire la `definizione` nel blocco "Come
         # leggere". "Completo" segue la dichiarazione, ma i tre ruoli sostanziali
         # (quadro, dinamica, limiti) restano sempre richiesti: solo la definizione
-        # e' omettibile, perche' e' l'unico ruolo che il blocco copre. Senza
+        # è omettibile, perché è l'unico ruolo che il blocco copre. Senza
         # `roles_covered` (i trecento esistenti) la regola resta i quattro ruoli,
         # identica a prima. Additivo: nessun articolo esistente cambia stato.
         # Un ruolo sconosciuto (un refuso) si ignora invece di entrare fra i
@@ -275,12 +275,12 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
         if entry is not None:
             valid = verification_queue.prose_fingerprint(entry) == row.get("prosa")
         # Una verifica conta come stadio completo, e una smentita come aperta,
-        # solo se l'impronta combacia ancora con la prosa attuale. Se il testo e'
-        # cambiato dopo, la verifica e' scaduta: il verificatore deve rigirare, e
+        # solo se l'impronta combacia ancora con la prosa attuale. Se il testo è
+        # cambiato dopo, la verifica è scaduta: il verificatore deve rigirare, e
         # marcarlo completo terrebbe l'articolo 'fusa' senza che nessuno stadio
-        # pronto lo rimandi a valle. E' lo stesso principio con cui il revisore
+        # pronto lo rimandi a valle. È lo stesso principio con cui il revisore
         # spegne una smentita riscrivendo la frase: l'impronta cambia, la
-        # smentita non e' piu' aperta.
+        # smentita non è più aperta.
         if valid is True and "verificatore" not in d["completed_stages"]:
             d["completed_stages"].append("verificatore")
         event(key, row.get("at", ""), "verificatore", "verificata",
@@ -316,7 +316,7 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
                   run.get("summary", ""), run_id=run.get("run_id", ""),
                   pr=run.get("pr", ""), outcome=run.get("outcome", ""))
 
-    # 2. Stato ricostruito, entered_at, tipo, classe d'errore, priorita'.
+    # 2. Stato ricostruito, entered_at, tipo, classe d'errore, priorità.
     for ind, d in dossier.items():
         dates = sorted(ev["at"] for ev in d["timeline"] if ev.get("at"))
         d["entered_at"] = dates[0] if dates else ""
@@ -325,7 +325,7 @@ def reconstruct(candidates, manifest, curation, external, articles, verifiche,
         d["required_stages"] = _required_for(ind, "curator" in d["completed_stages"])
         d["state"], d["error_class"], d["motivo"] = _state_of(d)
         # `published` = fuso su master (= pubblicata). Vero anche se poi invalidato:
-        # e' cio' che serve alla reliability (un risultato pubblicato che si e' rotto).
+        # è ciò che serve alla reliability (un risultato pubblicato che si è rotto).
         d["published"] = _reached_publication(d)
         d["priority"] = practice_model.priority_score(
             {"flags": d["flags"], "state": d["state"], "type": d["type"],
@@ -341,7 +341,7 @@ EDITORIAL_ORDER = {s: i for i, s in enumerate(
 
 # Le famiglie che passano dal curatore: solo gli esterni verticali hanno un verso
 # da giudicare nel layer esterno. Il backbone territoriale (id numerici), il BES e
-# il Multiscopo non hanno una curatela, quindi per loro `curator` non e' uno stadio
+# il Multiscopo non hanno una curatela, quindi per loro `curator` non è uno stadio
 # obbligatorio, e pretenderlo li terrebbe per sempre "in-lavorazione".
 _EXTERNAL_PREFIXES = tuple(
     prefix for family, prefix in discovery.FAMILY_PREFIX.items()
@@ -358,13 +358,13 @@ def _required_for(ind_id: str, has_curation: bool) -> tuple:
 
 
 def _reached_publication(d: dict) -> bool:
-    """Vero se l'indicatore e' arrivato alla pubblicazione, cioe' fuso su master:
-    il ciclo editoriale obbligatorio e' completo e l'articolo e' pieno.
+    """Vero se l'indicatore è arrivato alla pubblicazione, cioè fuso su master:
+    il ciclo editoriale obbligatorio è completo e l'articolo è pieno.
 
-    Resta vero anche se lo stato attuale e' `invalidata` (un articolo pubblicato
-    che poi si e' rotto), perche' e' proprio quel caso che la reliability misura.
+    Resta vero anche se lo stato attuale è `invalidata` (un articolo pubblicato
+    che poi si è rotto), perché è proprio quel caso che la reliability misura.
     Rimpiazza la vecchia lettura dalle prove sul sito: il progetto ha ratificato
-    merge = pubblicazione, quindi l'articolo committato *e'* la pubblicazione.
+    merge = pubblicazione, quindi l'articolo committato *è* la pubblicazione.
     """
     f = d["flags"]
     if f.get("rejected") or f.get("approved_candidate") and not d["completed_stages"]:
@@ -377,10 +377,10 @@ def _reached_publication(d: dict) -> bool:
 def _state_of(d: dict):
     """Lo stato ricostruito, la classe d'errore e il motivo, dalle bandiere.
 
-    Ogni ramo e' una condizione verificabile degli artefatti (§3): e' cio' che
-    rende lo stato riconciliabile e non solo dedotto una volta. Il `motivo` e'
+    Ogni ramo è una condizione verificabile degli artefatti (§3): è ciò che
+    rende lo stato riconciliabile e non solo dedotto una volta. Il `motivo` è
     valorizzato solo per `in-attesa`, l'unico stato di sosta armonizzato: dice
-    perche' e' ferma e porta la classe d'errore giusta (§9).
+    perché è ferma e porta la classe d'errore giusta (§9).
     """
     f = d["flags"]
     if f.get("rejected"):
@@ -395,9 +395,9 @@ def _state_of(d: dict):
         return "proposta", None, ""
     if f.get("stale_vintage") or f.get("stale_curation"):
         return "invalidata", "cambiamento-in-corsa", ""
-    # ciclo editoriale completo? Su master l'articolo e' committato, e il progetto
+    # ciclo editoriale completo? Su master l'articolo è committato, e il progetto
     # ha ratificato merge = pubblicazione: ciclo completo + articolo pieno =
-    # `pubblicata`. Non c'e' piu' uno stato `fusa` intermedio ne' una verifica-sito.
+    # `pubblicata`. Non c'è più uno stato `fusa` intermedio né una verifica-sito.
     required = d.get("required_stages") or practice_model.REQUIRED_STAGES.get(d["type"], ())
     if required and set(required).issubset(set(d["completed_stages"])):
         if not f.get("article_complete", True):
@@ -410,12 +410,12 @@ def _state_of(d: dict):
 
 def reconcile(declared: dict, reconstructed: dict) -> list:
     """Confronta lo stato dichiarato (i record in practices/) con quello
-    ricostruito dagli artefatti (Fase C). Restituisce le divergenze: e' l'evento
-    che il mandato chiede a 1.6 e 3.5, cosi' una modifica fuori dalla pipeline non
+    ricostruito dagli artefatti (Fase C). Restituisce le divergenze: è l'evento
+    che il mandato chiede a 1.6 e 3.5, così una modifica fuori dalla pipeline non
     passa per assenza di lavoro."""
     # I record dichiarati sono indicizzati per `practice_id`, qui si riconcilia
     # per indicatore, quindi si normalizza sul campo `indicator_id` (o `id`).
-    # Con i cicli (Fase E) un indicatore ha piu' record dichiarati: si riconcilia
+    # Con i cicli (Fase E) un indicatore ha più record dichiarati: si riconcilia
     # il ciclo **attivo**, che porta lo stato corrente. Gli altri sono chiusi.
     by_ind = {}
     for rec in declared.values():
@@ -461,8 +461,8 @@ def load_real(today: str = ""):
 def _cycle_trigger(ev: dict, seen_kinds: set, last_vintage) -> str | None:
     """Il tipo del ciclo che questo evento apre, o None se resta nel corrente.
 
-    Un ciclo nuovo si apre solo su una pagina gia' arrivata a valle: una smentita
-    e' una pratica nuova (§13), un anno nuovo della fonte e' un aggiornamento. Le
+    Un ciclo nuovo si apre solo su una pagina già arrivata a valle: una smentita
+    è una pratica nuova (§13), un anno nuovo della fonte è un aggiornamento. Le
     prime occorrenze (la prima curatela, la prima scrittura) appartengono al ciclo
     di prima pubblicazione, non ne aprono uno.
     """
@@ -481,9 +481,9 @@ def _cycle_trigger(ev: dict, seen_kinds: set, last_vintage) -> str | None:
 def split_cycles(d: dict) -> list:
     """Spezza la storia di un indicatore in cicli distinti ma collegati (Fase E).
 
-    Il primo ciclo e' la prima pubblicazione (`nuovo`). Dopo, ogni innesco
-    editoriale su una pagina gia' arrivata a valle apre un ciclo nuovo, legato
-    allo stesso indicatore. L'ultimo ciclo e' quello attivo e porta lo stato
+    Il primo ciclo è la prima pubblicazione (`nuovo`). Dopo, ogni innesco
+    editoriale su una pagina già arrivata a valle apre un ciclo nuovo, legato
+    allo stesso indicatore. L'ultimo ciclo è quello attivo e porta lo stato
     corrente ricostruito, i precedenti sono chiusi con esito `sostituita`, e
     restano nella storia (mai una PR eterna, mai un buco).
 
@@ -555,12 +555,12 @@ def _dossier_to_record(d: dict) -> dict:
     return cycles_for(d)[-1]
 
 
-# --- Fase F: la priorita' della pratica, mappata sullo stadio pronto ---------
+# --- Fase F: la priorità della pratica, mappata sullo stadio pronto ---------
 
 def ready_stage(d: dict) -> str | None:
-    """Lo stadio su cui una pratica sta aspettando, o None se non e' lanciabile.
+    """Lo stadio su cui una pratica sta aspettando, o None se non è lanciabile.
 
-    E' il ponte fra la priorita' della pratica (§11) e il lanciatore, che nomina
+    È il ponte fra la priorità della pratica (§11) e il lanciatore, che nomina
     uno stadio: una smentita aspetta il revisore, una curatela scaduta il
     curatore, una rilettura il revisore, una proposta il promotore. Bloccata,
     in quarantena, chiusa o pubblicata non hanno uno stadio che le muova.
@@ -585,9 +585,9 @@ def ready_stage(d: dict) -> str | None:
 
 
 def stage_priorities(dossier: dict) -> dict:
-    """`{stadio: priorita' massima di una pratica pronta su quello stadio}`.
+    """`{stadio: priorità massima di una pratica pronta su quello stadio}`.
 
-    E' cio' che il lanciatore consulta, in modalita' priorita' (Fase F), per non
+    È ciò che il lanciatore consulta, in modalità priorità (Fase F), per non
     far aspettare una correzione urgente dietro una coda di candidature nuove.
     """
     out = {}
@@ -605,7 +605,7 @@ def main(argv=None) -> int:
     parser.add_argument("--write", action="store_true", help="scrive i record in practices/")
     parser.add_argument("--check", action="store_true",
                         help="riconcilia i record dichiarati con gli artefatti (esce !=0 se divergono)")
-    parser.add_argument("--today", default="", help="data di riferimento YYYY-MM-DD per la priorita'")
+    parser.add_argument("--today", default="", help="data di riferimento YYYY-MM-DD per la priorità")
     args = parser.parse_args(argv)
 
     dossier = load_real(today=args.today)
@@ -677,7 +677,7 @@ def _print_one(d: dict) -> None:
     flags = ", ".join(k for k, v in d["flags"].items() if v is True)
     if flags:
         print(f"  bandiere     {flags}")
-    print(f"  priorita'    {d.get('priority', 0)}")
+    print(f"  priorità    {d.get('priority', 0)}")
     print("  timeline:")
     for ev in d["timeline"]:
         at = ev.get("at") or "        ?"

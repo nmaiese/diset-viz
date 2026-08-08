@@ -1,4 +1,4 @@
-"""Lo stadio `pubblica`: la mappa bozza -> entry e' codice, non un turno di agente.
+"""Lo stadio `pubblica`: la mappa bozza -> entry è codice, non un turno di agente.
 
 Il pubblicatore componeva da solo l'entry dello store, e per farlo apriva
 `indicator_store.py`, i template e le viste: otto turni nella prova, ventuno e
@@ -6,8 +6,8 @@ ventiquattro nella prima run, per far uscire zero a un linter. Chiave interna,
 livello, vintage e forma del file non sono decisioni editoriali, quindi non
 possono costare un turno a ogni articolo.
 
-L'altra meta' e' che questo comando **rifiuta** invece di scrivere male: un
-cancello che accetta cio' che non capisce non e' un cancello.
+L'altra metà è che questo comando **rifiuta** invece di scrivere male: un
+cancello che accetta ciò che non capisce non è un cancello.
 """
 import contextlib
 import io
@@ -47,12 +47,12 @@ class ItMapsADraftOntoAnEntry(unittest.TestCase):
     def test_the_draft_does_not_carry_its_own_passport(self):
         """`origine` non si mette montando il dizionario, si guadagna.
 
-        Non e' una firma: e' la porta da cui l'articolo entra nella coda di
+        Non è una firma: è la porta da cui l'articolo entra nella coda di
         verifica e in quella di lettura, che senza di lui non lo vedono. Scriverlo
         qui vuol dire scriverlo **prima** che il cancello abbia parlato, e un
         articolo bocciato lo portava lo stesso. Adesso lo mette `main` dopo aver
-        letto `bloccanti`, e questa prova esiste perche' rimettercelo per comodita'
-        e' una riga sola.
+        letto `bloccanti`, e questa prova esiste perché rimettercelo per comodità
+        è una riga sola.
         """
         self.assertNotIn("origine", pubblica.entry(BOZZA, "ter-30"))
 
@@ -118,14 +118,14 @@ class ItWritesWhereTheStoreExpects(unittest.TestCase):
 
 
 class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
-    """`origine: officina` e' l'unica porta verso le due code a valle.
+    """`origine: officina` è l'unica porta verso le due code a valle.
 
     L'officina non ha un revisore che firmi, quindi
     `verification_queue.build_queue()` e `reading_queue._eligible()` guardano
-    quel campo e nient'altro. Scritto mentre si montava il dizionario, cioe'
+    quel campo e nient'altro. Scritto mentre si montava il dizionario, cioè
     prima del lint, un articolo **bocciato** lo portava lo stesso: sovrascriveva
     il precedente, veniva reso dall'app, ed entrava in tutte e due le code, dove
-    i due critici indipendenti sprecavano un giro su una prosa gia' respinta.
+    i due critici indipendenti sprecavano un giro su una prosa già respinta.
 
     E riguardava anche la regola `angolo-non-rilevato` aggiunta due commit fa:
     bloccava, e l'articolo bloccato passava lo stesso.
@@ -135,8 +135,8 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
         """Esegue `main` con la bozza su stdin, dentro uno store temporaneo.
 
         `precedenti` sostituisce lo store che `main` legge per sapere se sotto
-        la bozza c'e' gia' un articolo: `{}` e' una prima pubblicazione, un
-        dizionario con la chiave dentro e' una riscrittura. `None` lascia lo
+        la bozza c'è già un articolo: `{}` è una prima pubblicazione, un
+        dizionario con la chiave dentro è una riscrittura. `None` lascia lo
         store vivo, dove `30` esiste.
         """
         scritte = {}
@@ -173,21 +173,21 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
         """Scritta lo stesso, e senza il campo.
 
         Rifiutare la scrittura romperebbe il giro di riparazione: il workflow
-        legge l'uscita 2 come "non e' scritta", tornerebbe a chi scrive con un
+        legge l'uscita 2 come "non è scritta", tornerebbe a chi scrive con un
         messaggio di forma invece che con i rilievi, e il lint successivo
         girerebbe sull'articolo **vecchio**.
         """
         fermo = [{"rule": "cifra-falsa", "severity": "blocca", "detail": "x", "field": None}]
         with unittest.mock.patch.object(pubblica, "tutti_i_rilievi", lambda key, fatta: fermo):
             codice, entry, _ = self._main(BOZZA, precedenti={})
-        self.assertEqual(codice, 0, "l'articolo e' scritto: l'uscita non cambia")
+        self.assertEqual(codice, 0, "l'articolo è scritto: l'uscita non cambia")
         self.assertNotIn("origine", entry)
 
     def test_the_gate_it_runs_is_the_same_one(self):
         """Non una seconda regola: lo stesso `lint_entry` di `officina.lint`.
 
         Due cancelli che giudicano lo stesso articolo sono due cancelli che
-        prima o poi divergono, ed e' la classe di difetto che questa PR chiude.
+        prima o poi divergono, ed è la classe di difetto che questa PR chiude.
         """
         visto = {}
 
@@ -207,11 +207,11 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
 
 
     def test_a_gate_that_cannot_run_is_not_a_green_gate(self):
-        """Il verso della guardia e' scelto, e va nel senso prudente.
+        """Il verso della guardia è scelto, e va nel senso prudente.
 
         Se il lint stesso esplode (dati storti, vista che non si costruisce),
         `origine` **non** si scrive: un guasto qui non deve promuovere niente.
-        La scrittura invece prosegue, perche' prima di questa funzione avveniva
+        La scrittura invece prosegue, perché prima di questa funzione avveniva
         sempre, e far sparire l'articolo per un errore del cancello sarebbe una
         regressione peggiore del difetto che stiamo chiudendo.
         """
@@ -223,10 +223,10 @@ class OnlyAnArticleThatPassedTheGateGetsItsOrigin(unittest.TestCase):
 
     def test_and_a_first_publication_is_still_written(self):
         """Su una prima pubblicazione la bozza si scrive lo stesso, senza
-        `origine`: non c'e' niente sotto da proteggere, e rifiutare perderebbe
+        `origine`: non c'è niente sotto da proteggere, e rifiutare perderebbe
         l'unica copia per un errore che non riguarda la prosa.
 
-        Su una **riscrittura** il verso si rovescia, ed e' l'altra meta' della
+        Su una **riscrittura** il verso si rovescia, ed è l'altra metà della
         stessa regola: vedi
         `ARejectedRewriteDoesNotEatTheGoodArticle.test_a_gate_that_cannot_run_does_not_replace_the_article_either`.
         """
@@ -244,15 +244,15 @@ class ARejectedRewriteDoesNotEatTheGoodArticle(
 
     Il difetto: l'officina scriveva `content/indicators/<chiave>.json` senza
     condizionare la scrittura al verdetto. Su una prima pubblicazione non si
-    perde niente; su una **riscrittura** di un articolo gia' buono, quello buono
+    perde niente; su una **riscrittura** di un articolo già buono, quello buono
     spariva dal working tree e si recuperava solo da git.
 
-    **Vale a ogni tentativo, e questa e' la parte che si sbaglia.** Una prima
+    **Vale a ogni tentativo, e questa è la parte che si sbaglia.** Una prima
     versione rifiutava solo la seconda scrittura, con un flag acceso dal
-    workflow sul giro di ritorno: inutile, perche' il danno lo fa il **primo**
-    tentativo, e dopo di lui l'articolo protetto e' gia' una bozza bocciata.
+    workflow sul giro di ritorno: inutile, perché il danno lo fa il **primo**
+    tentativo, e dopo di lui l'articolo protetto è già una bozza bocciata.
 
-    Si puo' rifiutare a ogni tentativo perche' il comando **stampa i rilievi**
+    Si può rifiutare a ogni tentativo perché il comando **stampa i rilievi**
     (`RILIEVI <json>`). Erano loro il motivo per cui la scrittura doveva
     avvenire comunque: il passo successivo del pubblicatore li rileggeva da
     disco con `officina.lint`, e su un articolo non sovrascritto avrebbe
@@ -269,14 +269,14 @@ class ARejectedRewriteDoesNotEatTheGoodArticle(
         with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
                                         lambda key, fatta: self.FERMO):
             codice, entry, detto = self._main(BOZZA, precedenti=self.PRECEDENTE)
-        self.assertEqual(codice, 2, "non e' scritta, e l'uscita lo dice")
-        self.assertEqual(entry, {}, "nessuna scrittura: il file precedente e' intatto")
+        self.assertEqual(codice, 2, "non è scritta, e l'uscita lo dice")
+        self.assertEqual(entry, {}, "nessuna scrittura: il file precedente è intatto")
         self.assertIn("rimasto al suo posto", detto)
 
     def test_it_prints_the_findings_of_the_draft_not_of_the_disk(self):
         """Senza questi, chi riscrive riceverebbe i rilievi del testo vecchio.
 
-        Sono tutti, `segnala` compresi, perche' e' lo stesso contratto del passo
+        Sono tutti, `segnala` compresi, perché è lo stesso contratto del passo
         di lint che questa uscita sostituisce.
         """
         with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
@@ -286,7 +286,7 @@ class ARejectedRewriteDoesNotEatTheGoodArticle(
         self.assertEqual(json.loads(riga[len("RILIEVI "):]), self.FERMO)
 
     def test_a_first_publication_is_still_written(self):
-        """Senza un precedente non c'e' niente da proteggere, e rifiutare qui
+        """Senza un precedente non c'è niente da proteggere, e rifiutare qui
         perderebbe l'unica copia della bozza."""
         with unittest.mock.patch.object(pubblica, "tutti_i_rilievi",
                                         lambda key, fatta: self.FERMO):
@@ -307,10 +307,10 @@ class ARejectedRewriteDoesNotEatTheGoodArticle(
 
         La regola "un guasto del lint non deve costare una scrittura" nasce
         sulla **prima** pubblicazione, dove rifiutare perderebbe l'unica copia
-        della bozza. Su una riscrittura si rovescia: li' scrivere costa
+        della bozza. Su una riscrittura si rovescia: lì scrivere costa
         l'articolo precedente, sostituito da un testo che nessuno ha potuto
-        controllare, e la bozza non e' persa in nessuno dei due casi (il
-        workflow la riporta, la run puo' ripartire) mentre l'articolo buono si'.
+        controllare, e la bozza non è persa in nessuno dei due casi (il
+        workflow la riporta, la run può ripartire) mentre l'articolo buono sì.
 
         Resta quindi una regola sola: un articolo che esiste non viene mai
         sostituito da qualcosa che il cancello non ha passato.

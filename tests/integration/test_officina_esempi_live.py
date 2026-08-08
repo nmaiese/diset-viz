@@ -1,12 +1,12 @@
 """La scelta dell'esempio misurata sul **catalogo vero**.
 
 Costruisce sessanta pacchetti veri, quindi ha bisogno di un giro reale: era il
-file piu' lento di `tests/unit/` (2,1 s dei 4,7 s della suite veloce) per questa
+file più lento di `tests/unit/` (2,1 s dei 4,7 s della suite veloce) per questa
 sola classe. La mappa e la funzione di scelta, che girano su angoli sintetici,
 restano in `tests/unit/test_officina_esempi.py`.
 
 Che cosa compra: che la scelta **vari**. Una biblioteca di esempi che ne serve
-sempre uno e' l'uniformita' rientrata dalla porta che questa mappa esiste per
+sempre uno è l'uniformità rientrata dalla porta che questa mappa esiste per
 chiudere, e non la vedrebbe nessun test su un angolo inventato: serve la
 distribuzione degli angoli che il catalogo produce davvero.
 """

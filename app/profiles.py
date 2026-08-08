@@ -430,7 +430,7 @@ def all_regions_index():
 @cache.memoize(timeout=3600)
 def regions_overview():
     """Compact per-region data for the clickable map tooltips and the SPA
-    'per regione' selection map.
+    'per regioné selection map.
 
     This intentionally does not expose an overall regional score: the only
     aggregate territorial score in the product is the quality-of-life section.

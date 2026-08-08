@@ -1,14 +1,14 @@
 """Scrive i pacchetti su disco e restituisce i percorsi. Un comando, una volta.
 
-E' lo stadio `prepara` del workflow, e la sua forma nasce da una misura. Nella
+È lo stadio `prepara` del workflow, e la sua forma nasce da una misura. Nella
 prima run ogni scrittore cercava da solo il proprio pacchetto: quattro turni
 per trovare l'interprete, poi altri per capire quali `role` fossero legali,
 tutti e quattro con lo stesso `grep`. Ogni turno si rilegge da tutti i turni
 successivi, quindi il costo cresce col quadrato: 40-51 turni a scrittore, e
 $3,13 contro i $0,14 di un giudice che riceveva tutto nel prompt.
 
-**Il pacchetto va su disco, e cio' che viaggia e' il percorso.** Non il
-contenuto: cio' che un agente restituisce e' output, a venticinque dollari per
+**Il pacchetto va su disco, e ciò che viaggia è il percorso.** Non il
+contenuto: ciò che un agente restituisce è output, a venticinque dollari per
 milione di token. Un pacchetto pesa 6-12 mila token, quindi cinquanta
 indicatori sarebbero mezzo milione di token di puro transito da un agente solo,
 oltre i limiti pratici di una risposta. Il percorso ne pesa venti.
@@ -16,7 +16,7 @@ oltre i limiti pratici di una risposta. Il percorso ne pesa venti.
     bin/py -m officina.pacchetti ter-176 ter-203
     bin/py -m officina.pacchetti ter-176 --out data/packs --json
 
-Stdlib pura piu' `packs/`. Non tocca `content/`.
+Stdlib pura più `packs/`. Non tocca `content/`.
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ DEFAULT_OUT = os.path.join("data", "packs")
 
 
 def write_pack(code: str, out_dir: str, level: str | None = None) -> str | None:
-    """Il pacchetto di un indicatore, gia' montato come testo. None se non esiste."""
+    """Il pacchetto di un indicatore, già montato come testo. None se non esiste."""
     constant, variable = brief.compose(code, level)
     if constant is None:
         return None

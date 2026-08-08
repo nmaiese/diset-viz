@@ -1,6 +1,6 @@
 """Lo store delle pratiche: un file per record, id dentro il file.
 
-Su una directory temporanea, cosi' non tocca mai i registri committati.
+Su una directory temporanea, così non tocca mai i registri committati.
 """
 
 import tempfile

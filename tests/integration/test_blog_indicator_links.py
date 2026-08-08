@@ -74,7 +74,7 @@ class FrontmatterIndicatorTest(unittest.TestCase):
     def test_the_code_form_lands_on_a_real_non_territorial_id(self):
         """La trasformazione di stringa non basta: il valore normalizzato viene
         confrontato con `meta["id"]`, quindi deve coincidere con l'id vero di
-        una scheda BES. E la meta' della feature che nessun post usa ancora."""
+        una scheda BES. E la metà della feature che nessun post usa ancora."""
         from app.blog import _normalize_indicator
 
         bes = next(

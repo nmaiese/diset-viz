@@ -1,8 +1,8 @@
 """La ricostruzione della storia per indicatore (Fase B) e la riconciliazione
 dichiarato-vs-osservato (Fase C), su artefatti sintetici.
 
-Il nucleo `reconstruct` e' puro: gli si passano i registri gia' letti, cosi' il
-test non tocca disco ne' app.
+Il nucleo `reconstruct` è puro: gli si passano i registri già letti, così il
+test non tocca disco né app.
 """
 
 import unittest
@@ -137,7 +137,7 @@ class Reconstruct(unittest.TestCase):
         self.assertIn("writer-1", d["bes:03LAV006-N25"]["runs"])
 
     def test_stale_verification_reopens_the_verifier_stage(self):
-        # la prosa e' cambiata dopo la verifica: l'impronta non combacia piu'
+        # la prosa è cambiata dopo la verifica: l'impronta non combacia più
         art = _article("dem:Y", 2024, "2026-07-26", 2024)
         stale = {"code": "dem-Y", "level": "regione", "at": "2026-07-01",
                  "prosa": "impronta_vecchia", "esito": "pulito", "smentite": "0",
@@ -156,7 +156,7 @@ class Reconstruct(unittest.TestCase):
         self.assertEqual(t.ready_stage(d), "verificatore")       # torna al verificatore
 
     def test_stale_refutation_is_not_open(self):
-        # una vecchia smentita la cui prosa e' stata riscritta non e' piu' aperta (review #4)
+        # una vecchia smentita la cui prosa è stata riscritta non è più aperta (review #4)
         art = _article("dem:Z", 2024, "2026-07-26", 2024)
         stale_smentita = {"code": "dem-Z", "level": "regione", "at": "2026-07-01",
                           "prosa": "impronta_vecchia", "esito": "smentito", "smentite": "1",
@@ -166,7 +166,7 @@ class Reconstruct(unittest.TestCase):
 
     def test_a_complete_cycle_on_master_is_published(self):
         # Merge = pubblicazione: un articolo completo e committato (= su master)
-        # con il ciclo obbligatorio chiuso e' `pubblicata`, senza verifica-sito.
+        # con il ciclo obbligatorio chiuso è `pubblicata`, senza verifica-sito.
         art = _article("651", 2023, "2026-07-27", 2023)
         d = self._run(
             articles={"651": art},
@@ -177,7 +177,7 @@ class Reconstruct(unittest.TestCase):
 
     def test_an_opt_in_article_without_definizione_counts_as_complete(self):
         # Sezioni variabili: un articolo che dichiara `roles_covered` senza
-        # `definizione` (assorbita dal blocco "Come leggere") e' completo con i tre
+        # `definizione` (assorbita dal blocco "Come leggere") è completo con i tre
         # ruoli sostanziali scritti. Senza il fallback, `article_complete` sarebbe
         # False e l'articolo non passerebbe mai il gate pur essendo pieno.
         art = {
@@ -195,8 +195,8 @@ class Reconstruct(unittest.TestCase):
         self.assertEqual(d["state"], "pubblicata")
 
     def test_an_opt_in_article_missing_a_substantive_role_is_incomplete(self):
-        # Solo la definizione e' omettibile: se manca un ruolo sostanziale
-        # (qui `limiti`), l'articolo non e' completo, anche se `roles_covered` non
+        # Solo la definizione è omettibile: se manca un ruolo sostanziale
+        # (qui `limiti`), l'articolo non è completo, anche se `roles_covered` non
         # lo dichiara.
         art = {
             "key": "432", "lead": "Lead di 432.", "vintage": 2023,
@@ -306,14 +306,14 @@ class ReadyStage(unittest.TestCase):
         c = _dossier([], completed_stages=["writer"], priority=45.0, id="c")
         pri = t.stage_priorities({"a": a, "b": b, "c": c})
         self.assertEqual(pri["reviewer"], 120.0)   # la pratica 'a', smentita, domina
-        # b e c aspettano entrambe il reviewer: il massimo e' comunque 'a'
+        # b e c aspettano entrambe il reviewer: il massimo è comunque 'a'
         self.assertNotIn("writer", pri)
 
 
 class Recovery(unittest.TestCase):
-    """Fase F: la ripresa dopo un'interruzione. La ricostruzione e' una funzione
+    """Fase F: la ripresa dopo un'interruzione. La ricostruzione è una funzione
     pura degli artefatti committati, quindi rieseguirla dopo una sessione
-    interrotta da' lo stesso risultato: nessuno stato vive solo nella sessione."""
+    interrotta dà lo stesso risultato: nessuno stato vive solo nella sessione."""
 
     def _inputs(self):
         art = _article("dem:X", 2024, "2026-07-26", 2024)
@@ -354,7 +354,7 @@ class Reconcile(unittest.TestCase):
     def test_declared_drift_is_reported(self):
         rec = self._reconstructed()
         record = t._dossier_to_record(rec["651"])
-        record["state"] = "in-lavorazione"  # dichiara in corso cio' che gli artefatti dicono pubblicato
+        record["state"] = "in-lavorazione"  # dichiara in corso ciò che gli artefatti dicono pubblicato
         div = t.reconcile({record["practice_id"]: record}, rec)
         self.assertEqual(len(div), 1)
         self.assertEqual(div[0]["kind"], "divergente")

@@ -339,9 +339,9 @@ def _explain_for_level(meta, level_key, level_count):
 def _annual_means(matrix):
     """La media semplice sulle regioni per ogni anno, in ordine di anno.
 
-    Ignora le celle vuote come `data.indicator_year_average`. E' cio' che rende la
+    Ignora le celle vuote come `data.indicator_year_average`. È ciò che rende la
     serie leggibile senza JavaScript: il grafico la ridisegna da `matrix`, la
-    tabella la stampa gia' pronta lato server."""
+    tabella la stampa già pronta lato server."""
     out = []
     for year_str in sorted(matrix, key=int):
         values = [v for v in matrix[year_str].values() if isinstance(v, (int, float))]
@@ -431,8 +431,8 @@ def _build_level(key, series, meta, territory_total, coverage):
         "default_territory": _territory(observations[0]) if observations else None,
         "matrix": matrix,
         # La serie annuale della media, un valore per anno. Il grafico di trend la
-        # disegna da JS leggendo `matrix`; questa e' la stessa serie gia' calcolata
-        # lato server, cosi' la tabella-serie della pagina si legge senza
+        # disegna da JS leggendo `matrix`; questa è la stessa serie già calcolata
+        # lato server, così la tabella-serie della pagina si legge senza
         # JavaScript (e un crawler la vede). Media semplice sulle regioni, celle
         # vuote ignorate, come `data.indicator_year_average`.
         "annual_means": _annual_means(matrix),
@@ -540,7 +540,7 @@ def _theme_siblings(theme):
                 "year_max": item["year_max"],
                 "unit": item.get("unit"),
                 # La sparkline delle card usa la stessa serie (media nazionale
-                # ridotta a 24 punti) gia' calcolata nel catalogo; `latest` e'
+                # ridotta a 24 punti) già calcolata nel catalogo; `latest` è
                 # l'ultimo punto, l'ordine di grandezza che accompagna la curva.
                 "spark": item.get("spark") or [],
                 "latest": (item["spark"][-1]["value"]

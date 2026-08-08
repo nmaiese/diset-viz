@@ -1,8 +1,8 @@
 """I modelli ORM dello stato mutabile.
 
-Un solo `Base` per tutte le tabelle mutabili (stato vivo della catena, e piu'
+Un solo `Base` per tutte le tabelle mutabili (stato vivo della catena, e più
 avanti classifica e profili). Le colonne ricalcano bit per bit lo schema SQLite
-che questi dati avevano prima della migrazione a Postgres, cosi' il passaggio e'
+che questi dati avevano prima della migrazione a Postgres, così il passaggio è
 uno swap di store e non un cambio di semantica: tipi larghi (TEXT/INTEGER),
 nessuna estensione Postgres-only in queste tabelle, quindi lo stesso modello gira
 identico su SQLite (test/CI) e su Postgres (produzione).
@@ -18,10 +18,10 @@ class Base(DeclarativeBase):
 
 class Profile(Base):
     """L'account: una riga per utente Supabase, upsert al primo login (e a ogni
-    /api/auth/me, che aggiorna last_seen_at). `auth_id` e' l'UUID di auth.users
-    dal JWT verificato, mai dal body. email/nickname denormalizzati per comodita'.
-    Su tutte le tabelle account l'invariante e' la stessa: si filtra su `auth_id`
-    ricavato dal JWT, la RLS e' difesa in profondita' (il backend gira BYPASSRLS)."""
+    /api/auth/me, che aggiorna last_seen_at). `auth_id` è l'UUID di auth.users
+    dal JWT verificato, mai dal body. email/nickname denormalizzati per comodità.
+    Su tutte le tabelle account l'invariante è la stessa: si filtra su `auth_id`
+    ricavato dal JWT, la RLS è difesa in profondità (il backend gira BYPASSRLS)."""
 
     __tablename__ = "profiles"
 
@@ -46,8 +46,8 @@ class Favorite(Base):
 
 
 class PlayerStat(Base):
-    """Aggregati di gioco per (utente, modalita'), server-authoritative (Fase 5.2).
-    Una riga per modalita' ('compare', 'order', 'daily'). Rekey da player_id ad
+    """Aggregati di gioco per (utente, modalità), server-authoritative (Fase 5.2).
+    Una riga per modalità ('compare', 'order', 'daily'). Rekey da player_id ad
     auth_id: le stesse statistiche del profilo leggero pre-Supabase, ora legate
     all'account. Invariante: auth_id dal JWT verificato."""
 
@@ -106,16 +106,16 @@ class SavedComparison(Base):
 
 
 class Score(Base):
-    """La classifica del quiz. Il punteggio salvato e' sempre la miglior streak
+    """La classifica del quiz. Il punteggio salvato è sempre la miglior streak
     verificata di una sessione firmata (app/quiz_tokens.py): il client non manda
-    mai un punteggio arbitrario, vedi app/views.py. `user_id` e' l'UUID
-    dell'account Supabase quando c'e' un JWT valido, nullo per gli anonimi (il
+    mai un punteggio arbitrario, vedi app/views.py. `user_id` è l'UUID
+    dell'account Supabase quando c'è un JWT valido, nullo per gli anonimi (il
     gioco resta anonimo per chi non si registra).
 
-    `created_at` e' una stringa ISO UTC con la Z finale, generata in Python: il
-    confronto lessicografico su ISO e' cronologico, quindi ordinamento e finestra
+    `created_at` è una stringa ISO UTC con la Z finale, generata in Python: il
+    confronto lessicografico su ISO è cronologico, quindi ordinamento e finestra
     settimanale non hanno bisogno di funzioni-tempo SQL (che divergono fra i
-    dialetti). `detail` e' JSON serializzato come testo, come prima."""
+    dialetti). `detail` è JSON serializzato come testo, come prima."""
 
     __tablename__ = "scores"
     __table_args__ = (
@@ -136,9 +136,9 @@ class Score(Base):
 
 
 class PipelineActivity(Base):
-    """Lo stato vivo del cruscotto: una riga e' un battito (`beat`) o una PR
-    aperta (`pr`). La chiave e' `beat:<run_id>` o `pr:<numero>`, come nello
-    SQLite originale, cosi' l'upsert idempotente resta sullo stesso perno."""
+    """Lo stato vivo del cruscotto: una riga è un battito (`beat`) o una PR
+    aperta (`pr`). La chiave è `beat:<run_id>` o `pr:<numero>`, come nello
+    SQLite originale, così l'upsert idempotente resta sullo stesso perno."""
 
     __tablename__ = "pipeline_activity"
 
@@ -158,7 +158,7 @@ class PipelineActivity(Base):
 
 class PipelineToken(Base):
     """Il consumo token per run: telemetria durevole, non un battito. Tabella a
-    parte perche' i battiti scadono e si cancellano, il costo di una run e'
+    parte perché i battiti scadono e si cancellano, il costo di una run è
     storia da tenere. Chiave = il `run_id` del ruolo, non del lanciatore."""
 
     __tablename__ = "pipeline_tokens"
@@ -173,12 +173,12 @@ class PipelineToken(Base):
 
 class PipelineOutcome(Base):
     """Lo stato di ciclo di vita di UN indicatore, come lo ha ricostruito
-    l'agente al momento del merge, POSTato al sito perche' il cruscotto sia
+    l'agente al momento del merge, POSTato al sito perché il cruscotto sia
     aggiornato senza aspettare il redeploy dell'immagine.
 
     Durevole come `PipelineToken`, non un battito: non scade a 6h. Il dossier
-    committato in git resta la verita' e la storia; questa riga e' un overlay che
-    vive nella finestra fra 'fuso su master' e 'immagine deployata', e la board
+    committato in git resta la verità e la storia; questa riga è un overlay che
+    vive nella finestra fra 'fuso su master' e 'immagine deployatà, e la board
     lo ritira da sola quando il committato lo raggiunge (vedi
     `scripts/pipeline_monitor.py::_apply_outcomes`).
 
@@ -187,7 +187,7 @@ class PipelineOutcome(Base):
     Tipi larghi come le altre tabelle della catena: le strutture
     (`completed_stages`, `required_stages`, `flags`) sono JSON serializzato in
     `Text`, `published`/`verification_valid` sono interi nullable per tenere il
-    tri-stato (1/0/None = ignoto), cosi' il modello gira identico su SQLite
+    tri-stato (1/0/None = ignoto), così il modello gira identico su SQLite
     (test/CI) e Postgres (produzione)."""
 
     __tablename__ = "pipeline_outcomes"

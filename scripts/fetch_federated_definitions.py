@@ -120,14 +120,14 @@ def _finish(text):
 
 def _typographic(text):
     return (
-        text.replace("Eta'", "Età")
-        .replace("eta'", "età")
-        .replace("piu'", "più")
-        .replace("puo'", "può")
-        .replace("gia'", "già")
-        .replace("mortalita'", "mortalità")
-        .replace("ospitalita'", "ospitalità")
-        .replace("qualita'", "qualità")
+        text.replace("Età", "Età")
+        .replace("età", "età")
+        .replace("più", "più")
+        .replace("può", "può")
+        .replace("già", "già")
+        .replace("mortalità", "mortalità")
+        .replace("ospitalità", "ospitalità")
+        .replace("qualità", "qualità")
     )
 
 

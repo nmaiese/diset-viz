@@ -5,11 +5,11 @@ Nasce da una richiesta precisa: poter guardare la catena senza aprire file e
 senza ricordarsi sei comandi. Mette insieme le tre cose che oggi stanno in tre
 posti diversi:
 
-- **dove si e' fermata**, cioe' la coda di ogni stadio (`pipeline_status`),
-- **che cosa hanno fatto gli agenti**, cioe' il diario delle run
+- **dove si è fermata**, cioè la coda di ogni stadio (`pipeline_status`),
+- **che cosa hanno fatto gli agenti**, cioè il diario delle run
   (`pipeline_log`), incluse le run che non hanno prodotto niente,
-- **che cosa e' finito in pagina**, cioe' i commit e le pull request che la
-  catena ha generato (git, e `gh` se c'e').
+- **che cosa è finito in pagina**, cioè i commit e le pull request che la
+  catena ha generato (git, e `gh` se c'è).
 
 Una pagina HTML autonoma, senza rete e senza dipendenze: si apre da file, anche
 offline, e si rigenera in un secondo.
@@ -18,7 +18,7 @@ offline, e si rigenera in un secondo.
     python3 scripts/pipeline_dashboard.py --open     # e lo apre nel browser
     python3 scripts/pipeline_dashboard.py --out /tmp/catena.html
 
-Stdlib puro come il resto della catena, cosi' gira anche in un agente cloud
+Stdlib puro come il resto della catena, così gira anche in un agente cloud
 prima che esista il venv. Le due code che hanno bisogno del view model degradano
 da sole, come in `pipeline_status`.
 """
@@ -41,15 +41,15 @@ from scripts import pipeline_log, pipeline_status  # noqa: E402
 DEFAULT_OUT = PROJECT_ROOT / "data" / "pipeline" / "cruscotto.html"
 REPO = "nmaiese/diset-viz"
 
-# L'identita' cartografica del progetto (CLAUDE.md): navy, carta, un solo accento.
+# L'identità cartografica del progetto (CLAUDE.md): navy, carta, un solo accento.
 # Un cruscotto che sembra un altro prodotto si legge come un altro prodotto.
 #
 # I font veri del sito (Archivo, Inter, Space Mono) arrivano da Google Fonts, che
-# qui non si puo' caricare: la pagina deve restare autonoma e apribile offline.
+# qui non si può caricare: la pagina deve restare autonoma e apribile offline.
 # Quindi uno stack di sistema scelto, non un fallback silenzioso.
 #
 # I colori stanno tutti in token su :root e vengono ridefiniti tre volte: dal
-# sistema, e poi da data-theme nelle due direzioni, perche' l'interruttore di chi
+# sistema, e poi da data-theme nelle due direzioni, perché l'interruttore di chi
 # guarda deve poter vincere anche contro la preferenza del sistema.
 CSS = """
 :root {
@@ -120,9 +120,9 @@ def _git(*args):
 def recent_chain_commits(limit=12):
     """I commit che la catena ha prodotto, riconosciuti dai file che toccano.
 
-    Non dai messaggi ne' dagli autori: un agente puo' scrivere qualunque
-    messaggio, ma non puo' uscire dal proprio perimetro senza che il cancello lo
-    fermi. I file sono quindi la firma piu' affidabile che abbiamo.
+    Non dai messaggi né dagli autori: un agente può scrivere qualunque
+    messaggio, ma non può uscire dal proprio perimetro senza che il cancello lo
+    fermi. I file sono quindi la firma più affidabile che abbiamo.
     """
     from scripts import pipeline_gate
 
@@ -150,8 +150,8 @@ def recent_chain_commits(limit=12):
     for commit in commits:
         touched = set(commit["files"])
         # `path_allowed` e non l'appartenenza a un insieme: da quando i registri
-        # sono store a un file per record, un perimetro puo' essere una
-        # directory, e confrontare i percorsi uno a uno non riconoscerebbe piu'
+        # sono store a un file per record, un perimetro può essere una
+        # directory, e confrontare i percorsi uno a uno non riconoscerebbe più
         # nessun commit della catena.
         if not touched or not all(pipeline_gate.path_allowed(p, owned) for p in touched):
             continue
@@ -166,13 +166,13 @@ def recent_chain_commits(limit=12):
 
 
 def open_pull_requests():
-    """Le PR della catena, se `gh` c'e'. Senza, la sezione lo dice e basta.
+    """Le PR della catena, se `gh` c'è. Senza, la sezione lo dice e basta.
 
-    `gh` puo' mancare del tutto: la web app usa il GitHub MCP e non installa la
+    `gh` può mancare del tutto: la web app usa il GitHub MCP e non installa la
     CLI, e allora `subprocess.run` solleva FileNotFoundError prima ancora di
-    arrivare al controllo del returncode. Va trattato come "gh non c'e'", non
+    arrivare al controllo del returncode. Va trattato come "gh non c'è", non
     come un crash: il cruscotto deve leggere senza rompersi anche quando l'unica
-    cosa assente e' l'elenco delle PR (lo pretende TheDashboardReadsWithoutBreaking)."""
+    cosa assente è l'elenco delle PR (lo pretende TheDashboardReadsWithoutBreaking)."""
     try:
         result = subprocess.run(
             ["gh", "pr", "list", "-R", REPO, "--state", "all", "--limit", "10",
@@ -200,8 +200,8 @@ def _stage_rows(status):
     Un cruscotto si scorre, non si legge."""
     rows = []
     for entry in status["stages"]:
-        # `None` non e' zero: una coda che nessuno ha contato si accende come
-        # quelle piene, perche' "non lo so" e' un motivo per guardare, non per
+        # `None` non è zero: una coda che nessuno ha contato si accende come
+        # quelle piene, perché "non lo so" è un motivo per guardare, non per
         # spegnere la riga.
         waiting = entry["waiting"]
         css = "idle" if waiting == 0 else "flag"
@@ -217,15 +217,15 @@ def _stage_rows(status):
 
 def _summary_cells(status, entries, queues=None):
     """Il riassunto prima del dettaglio. Quattro numeri che dicono, in un colpo
-    d'occhio, se c'e' qualcosa da guardare o no."""
+    d'occhio, se c'è qualcosa da guardare o no."""
     attention = sum(1 for e in entries if e.get("outcome") in pipeline_log.ATTENTION)
     last = max((e.get("at", "") for e in entries), default="")
     late = [r for r in pipeline_log.silence(entries, queues=queues) if r["stale"]]
-    # Il totale non puo' portare l'etichetta "tutti gli stadi" quando uno stadio
-    # non e' stato contato: sarebbe lo zero silenzioso della riga di stadio
-    # spostato nel numero piu' grande della pagina, cioe' l'unico che si legge
+    # Il totale non può portare l'etichetta "tutti gli stadi" quando uno stadio
+    # non è stato contato: sarebbe lo zero silenzioso della riga di stadio
+    # spostato nel numero più grande della pagina, cioè l'unico che si legge
     # davvero in un colpo d'occhio. Quando manca un termine, la somma lo dice e
-    # si accende, perche' un totale parziale spacciato per completo e' peggio di
+    # si accende, perché un totale parziale spacciato per completo è peggio di
     # nessun totale.
     unknown = status.get("unknown_stages") or []
     if unknown:
@@ -237,8 +237,8 @@ def _summary_cells(status, entries, queues=None):
         (coda_label, coda_value, bool(unknown)),
         ("run registrate", str(len(entries)), False),
         ("run da guardare", str(attention), attention > 0),
-        # Il silenzio non entra fra le "run da guardare" perche' non e' una run:
-        # e' l'assenza di una run, ed e' il modo di fallire che non lascia tracce.
+        # Il silenzio non entra fra le "run da guardare" perché non è una run:
+        # è l'assenza di una run, ed è il modo di fallire che non lascia tracce.
         ("stadi fermi", str(len(late)), bool(late)),
         ("ultima run", (last[:10] or "mai"), False),
     ]
@@ -285,7 +285,7 @@ def _stage_metric_rows(entries):
     """L'aggregato per stadio: quante run, quante da guardare, quanto durano,
     con quale modello. I campi di provenienza sono best-effort nel diario,
     quindi qui una colonna vuota significa "le run vecchie non li avevano",
-    non un errore: la tabella diventa piu' piena a ogni run nuova.
+    non un errore: la tabella diventa più piena a ogni run nuova.
     """
     if not entries:
         return "<p class='empty'>Nessuna run registrata, quindi niente da aggregare.</p>"
@@ -327,12 +327,12 @@ def _commit_rows(commits):
             f"<td>{_esc(c['subject'])}<p class='detail'>{_esc(', '.join(c['files']))}</p></td></tr>"
         )
     return ("<div class='scroll'><table><tr><th>quando</th><th>commit</th><th>stadio</th>"
-            "<th>che cosa e' cambiato</th></tr>" + "\n".join(rows) + "</table></div>")
+            "<th>che cosa è cambiato</th></tr>" + "\n".join(rows) + "</table></div>")
 
 
 def _pr_rows(prs):
     if prs is None:
-        return "<p class='empty'>`gh` non e' disponibile qui, quindi le pull request non sono elencate.</p>"
+        return "<p class='empty'>`gh` non è disponibile qui, quindi le pull request non sono elencate.</p>"
     if not prs:
         return "<p class='empty'>Nessuna pull request aperta dalla catena.</p>"
     rows = []
@@ -341,7 +341,7 @@ def _pr_rows(prs):
             f"<tr><td class='mono'>{_esc(pr.get('createdAt', '')[:16].replace('T', ' '))}</td>"
             f"<td><a href='https://github.com/{REPO}/pull/{pr['number']}'>#{pr['number']}</a></td>"
             f"<td><span class='tag'>{_esc(pr.get('state'))}</span></td>"
-            f"<td>{_esc(pr.get('title'))}<p class='detail mono'>{_esc(pr.get('headRefName'))}</p></td></tr>"
+            f"<td>{_esc(pr.get('title'))}<p class='detail monò>{_esc(pr.get('headRefName'))}</p></td></tr>"
         )
     return ("<div class='scroll'><table><tr><th>quando</th><th>PR</th><th>stato</th>"
             "<th>titolo</th></tr>" + "\n".join(rows) + "</table></div>")
@@ -363,9 +363,9 @@ def render(out_path=None):
         headline = ("Niente in coda: la catena e ferma perche ha finito, "
                     "non perche e bloccata.")
 
-    # Il battito del lanciatore, prima di tutto il resto. E' l'unico segnale che
-    # distingue "nessuno stadio aveva lavoro" da "non e' partito niente": da
-    # quando il lavoro lo assegna lui, il silenzio di un singolo ruolo e' una
+    # Il battito del lanciatore, prima di tutto il resto. È l'unico segnale che
+    # distingue "nessuno stadio aveva lavoro" da "non è partito niente": da
+    # quando il lavoro lo assegna lui, il silenzio di un singolo ruolo è una
     # risposta legittima, il suo no.
     ticks = [e for e in entries if e.get("stage") == "launch"]
     if ticks:
@@ -374,17 +374,17 @@ def render(out_path=None):
                      f"{_esc((last_tick.get('at') or '')[:16].replace('T', ' '))}.")
     else:
         headline += (" Il <strong>lanciatore</strong> (launch) non ha mai registrato un giro: "
-                     "finche' non lo fa, nessuno assegna il lavoro.")
+                     "finché non lo fa, nessuno assegna il lavoro.")
 
-    # Un avviso sopra tutto il resto, perche' uno stadio fermo non si vede in
-    # nessuna delle tabelle sotto: quelle mostrano cio' che e' successo, e qui il
-    # problema e' che non e' successo niente.
-    # Le code arrivano dallo `status` gia' calcolato, non da una seconda
+    # Un avviso sopra tutto il resto, perché uno stadio fermo non si vede in
+    # nessuna delle tabelle sotto: quelle mostrano ciò che è successo, e qui il
+    # problema è che non è successo niente.
+    # Le code arrivano dallo `status` già calcolato, non da una seconda
     # `queue_sizes()`. Quella ricostruirebbe la vista di ogni indicatore del
-    # catalogo una seconda volta, che e' lavoro inutile e per giunta il punto
+    # catalogo una seconda volta, che è lavoro inutile e per giunta il punto
     # esatto in cui la suite va in segfault una run su venticinque (vedi
     # `pipeline_gate.check_suite`): raddoppiare quel passaggio raddoppierebbe
-    # la probabilita' di far morire il cruscotto a meta'.
+    # la probabilità di far morire il cruscotto a metà.
     queues = {entry["stage"]: entry["waiting"] for entry in status["stages"]}
     late = [r for r in pipeline_log.silence(entries, queues=queues) if r["stale"]]
     if late:

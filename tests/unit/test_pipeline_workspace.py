@@ -2,8 +2,8 @@
 
 Dieci agenti in volo nella stessa working directory si contendevano HEAD, indice
 e branch corrente: un `git checkout -b` altrui bastava a far sparire il lavoro
-gia' committato di un altro. Questi test non parlano con git vero: il `runner` e'
-iniettato, cosi' si prova la **sequenza** dei comandi, che e' dove sta la
+già committato di un altro. Questi test non parlano con git vero: il `runner` è
+iniettato, così si prova la **sequenza** dei comandi, che è dove sta la
 correttezza (fetch prima, poi worktree sul branch della run).
 """
 
@@ -64,7 +64,7 @@ class OpeningIsolatesTheRun(unittest.TestCase):
     def test_a_transient_fetch_lock_is_retried_until_it_succeeds(self):
         # Il fetch perde la corsa sul ref remoto condiviso ("cannot lock ref")
         # un paio di volte, poi il lock del sibling si libera e riesce: si procede.
-        # Solo un fetch NOSTRO riuscito prova che il ref e' fresco.
+        # Solo un fetch NOSTRO riuscito prova che il ref è fresco.
         fails = {"n": 2}
 
         def runner(argv, cwd=None):
@@ -104,7 +104,7 @@ class OpeningIsolatesTheRun(unittest.TestCase):
 
 
 class TheRunsRootFollowsTheMainCheckout(unittest.TestCase):
-    """Da un worktree, `PROJECT_ROOT` e' il worktree stesso: la runs-root va
+    """Da un worktree, `PROJECT_ROOT` è il worktree stesso: la runs-root va
     ricavata dal `--git-common-dir` (il `.git` del principale, uguale per tutti
     i worktree), o `--close` dal worktree cancellerebbe un percorso annidato
     inesistente e lascerebbe il worktree registrato per sempre."""

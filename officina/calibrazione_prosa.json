@@ -20,6 +20,6 @@
   },
   "fonte": "content/esempi/",
   "metodo": "quota di paragrafi sostanziali (>=25 parole) senza nemmeno una cifra; quantili del campione",
-  "perche": "Ipotesi provata e caduta: la densita' numerica di Thäsler-Kordonouri et al. (Journalism 26(9) 2025, n=3135) non separa i due corpora, i nostri articoli non sono piu' densi. Separa invece la quota di paragrafi senza cifre: esempi 0.25 di mediana e 0.33 di massimo, pubblicati 0.67 di mediana, con 313 articoli su 376 sopra il massimo degli esempi.",
+  "perche": "Ipotesi provata e caduta: la densità numerica di Thäsler-Kordonouri et al. (Journalism 26(9) 2025, n=3135) non separa i due corpora, i nostri articoli non sono più densi. Separa invece la quota di paragrafi senza cifre: esempi 0.25 di mediana e 0.33 di massimo, pubblicati 0.67 di mediana, con 313 articoli su 376 sopra il massimo degli esempi.",
   "soglia_paragrafi_scoperti": 0.333
 }

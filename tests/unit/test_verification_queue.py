@@ -1,9 +1,9 @@
 """Lo stadio che misura lo stadio prima.
 
-Il verificatore non corregge niente, quindi tutto quello che si puo' sbagliare sta
-in due posti: la regola che decide **quando una verifica e' ancora valida**, e i
-controlli che decidono **quando una riga si puo' credere**. Sono provati qui su
-dati sintetici, piu' due ancore sul repo vero per le cose che il codice non puo'
+Il verificatore non corregge niente, quindi tutto quello che si può sbagliare sta
+in due posti: la regola che decide **quando una verifica è ancora valida**, e i
+controlli che decidono **quando una riga si può credere**. Sono provati qui su
+dati sintetici, più due ancore sul repo vero per le cose che il codice non può
 sapere da solo (che lo stadio sia registrato in tutti i posti che lo pretendono).
 """
 
@@ -78,7 +78,7 @@ class TheFingerprintIsAboutTheText(unittest.TestCase):
         )
 
     def test_moving_a_sentence_between_sections_is_a_change(self):
-        """L'impronta e' per ruolo, non sul testo appiccicato: spostare una frase
+        """L'impronta è per ruolo, non sul testo appiccicato: spostare una frase
         dal quadro ai limiti cambia che cosa dice la pagina in quel punto."""
         one = _entry()
         one["sections"] = [{"role": "quadro", "body": "A B"}, {"role": "limiti", "body": ""}]
@@ -94,7 +94,7 @@ class TheQueueDrainsAndRefills(unittest.TestCase):
         self.assertFalse(rows[0]["verified"])
 
     def test_an_unsigned_article_is_not_waiting(self):
-        """Verificare un articolo non firmato misura lo scrittore, che e' un
+        """Verificare un articolo non firmato misura lo scrittore, che è un
         esperimento utile una volta e una coda inutile sempre: il revisore sta per
         riscrivere quelle frasi comunque."""
         rows = vq.build_queue({"611": _entry(reviewed_at="", reviewed_vintage=None)}, [])
@@ -141,7 +141,7 @@ class TheQueueDrainsAndRefills(unittest.TestCase):
 
     def test_a_verification_of_a_text_nobody_published_covers_nothing(self):
         """Una riga con un'impronta che non corrisponde a niente non deve poter
-        far uscire un articolo dalla coda: sarebbe il modo piu' semplice di
+        far uscire un articolo dalla coda: sarebbe il modo più semplice di
         dichiarare verificato tutto il catalogo."""
         rows = vq.build_queue({"611": _entry()}, [_row(_entry(), prosa="0000000000000000")])
         self.assertEqual(len(vq.waiting(rows)), 1)
@@ -168,14 +168,14 @@ class ARefutationGoesBackToTheReviewer(unittest.TestCase):
 
     def test_an_open_refutation_invalidates_the_signature(self):
         """Il difetto trovato provando il segnale invece di fidarsi: il peso era
-        60 e due righe dopo lo azzeravamo, perche' l'articolo e' firmato. Il
+        60 e due righe dopo lo azzeravamo, perché l'articolo è firmato. Il
         segnale c'era, l'articolo restava fuori dalla coda di lettura."""
         entry = _entry()
         refutations = review_queue.open_refutations({"611": entry}, [_row(entry, **self.REFUTED)])
         row = review_queue.assess("611", entry, _view(), definitions={}, refutations=refutations)
         self.assertIn("smentita", row["flags"])
         self.assertGreater(row["score"], 0, "una smentita aperta deve riaprire l'articolo")
-        self.assertEqual(row["reviewed_at"], "", "la firma non vale piu'")
+        self.assertEqual(row["reviewed_at"], "", "la firma non vale più")
 
     def test_without_a_refutation_a_signed_article_stays_out(self):
         row = review_queue.assess("611", _entry(), _view(), definitions={}, refutations={})
@@ -196,7 +196,7 @@ def _view():
 class ARowYouCannotBelieve(unittest.TestCase):
     def test_zero_checked_claims_is_refused(self):
         """Senza `controllate`, "zero smentite" e "non ho guardato" sono lo stesso
-        zero, ed e' l'unico modo in cui questo stadio puo' mentire."""
+        zero, ed è l'unico modo in cui questo stadio può mentire."""
         problems = vq.row_problems(_row(_entry(), controllate=0, confermate=0))
         self.assertTrue(any("non ha guardato" in p for p in problems), problems)
 
@@ -217,7 +217,7 @@ class ARowYouCannotBelieve(unittest.TestCase):
 
 
 class TheStageIsRegisteredEverywhere(unittest.TestCase):
-    """Uno stadio nuovo e' inchiodato in tre posti che non si parlano, e il
+    """Uno stadio nuovo è inchiodato in tre posti che non si parlano, e il
     cancello lo *rifiuta* invece di degradarlo se manca da uno."""
 
     def test_the_gate_knows_it_and_gives_it_a_merge_mode(self):
@@ -225,9 +225,9 @@ class TheStageIsRegisteredEverywhere(unittest.TestCase):
         self.assertIn("verificatore", pipeline_gate.MERGE_POLICY)
 
     def test_it_may_not_touch_the_prose(self):
-        """L'assenza di content/indicators/ dal perimetro *e'* la definizione
+        """L'assenza di content/indicators/ dal perimetro *è* la definizione
         dello stadio: uno stadio che ripara i propri rilievi corregge i propri
-        compiti, che e' il difetto che esiste per prendere."""
+        compiti, che è il difetto che esiste per prendere."""
         self.assertNotIn(pipeline_gate.INDICATOR_TEXTS,
                          pipeline_gate.STAGE_PATHS["verificatore"])
 
@@ -243,7 +243,7 @@ class TheStageIsRegisteredEverywhere(unittest.TestCase):
     def test_its_agent_file_is_named_after_the_stage(self):
         """Il file si chiamava `indicator-verifier.md` mentre lo stadio si
         chiamava `verificatore`, e la differenza esisteva solo per essere
-        tradotta da un dizionario. Adesso combaciano, e questo test e' il
+        tradotta da un dizionario. Adesso combaciano, e questo test è il
         controllo per il solo stadio che aveva il problema (l'invariante su
         tutti e tre sta in `test_docs_match_the_code.py`)."""
         agent = pipeline_gate.PROJECT_ROOT / ".claude" / "agents" / "verificatore.md"
@@ -252,7 +252,7 @@ class TheStageIsRegisteredEverywhere(unittest.TestCase):
 
     def test_the_committed_register_is_readable_and_credible(self):
         rows = vq.load_verifications()
-        self.assertTrue(rows, "il registro delle verifiche e' vuoto")
+        self.assertTrue(rows, "il registro delle verifiche è vuoto")
         for row in rows:
             with self.subTest(code=row.get("code")):
                 self.assertEqual(vq.row_problems(row), [])
@@ -262,8 +262,8 @@ class TheGateRefusesARowItCannotBelieve(unittest.TestCase):
     """I casi provati a mano contro il repo vero, inchiodati qui.
 
     `check_verifications` legge il git tree, quindi qui si prova la parte pura,
-    `row_problems`, piu' la regola sulle impronte, che e' l'unica del cancello che
-    non e' un inoltro.
+    `row_problems`, più la regola sulle impronte, che è l'unica del cancello che
+    non è un inoltro.
     """
 
     def test_every_bad_row_shape_is_named(self):
@@ -286,14 +286,14 @@ class TheGateRefusesARowItCannotBelieve(unittest.TestCase):
         """Il caso che ha corretto il cancello. Il verificatore legge un articolo,
         calcola l'impronta e apre la PR; nel frattempo la Routine del revisore
         fonde una correzione sullo stesso articolo. L'impronta della run resta
-        quella del testo che ha letto, ed e' onesta: pretendere quella di adesso
+        quella del testo che ha letto, ed è onesta: pretendere quella di adesso
         bloccava una run corretta ogni volta che due stadi si incrociavano."""
         read = _entry()
         meanwhile = _entry(quadro="Il quadro, corretto dal revisore.")
         row = _row(read)
         # La riga non corrisponde al testo di adesso...
         self.assertNotEqual(row["prosa"], vq.prose_fingerprint(meanwhile))
-        # ...ma corrisponde a una versione che il repo ha avuto, e non e' un errore
+        # ...ma corrisponde a una versione che il repo ha avuto, e non è un errore
         # di forma: `row_problems` non ha niente da dire.
         self.assertEqual(vq.row_problems(row), [])
 
@@ -303,7 +303,7 @@ class TheHeadingIsProseToo(unittest.TestCase):
 
     118 sezioni portano un h2 scritto a mano, sono visibili in pagina e fanno
     affermazioni. `ter-651` intitola la sua dinamica "Cinque anni di guadagni, un
-    anno che ne toglie piu' della meta'", e il verificatore di quell'articolo l'ha
+    anno che ne toglie più della metà", e il verificatore di quell'articolo l'ha
     contata e confermata (+1,413 contro -0,855, il 61%). Con l'impronta sul solo
     body, una verifica pulita continuava a coprire un titolo sostituito, e
     correggere un titolo smentito non riapriva l'articolo.

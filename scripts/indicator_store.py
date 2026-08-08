@@ -5,34 +5,34 @@ Prima stavano tutti dentro `app/static/data/indicator_texts.json`, un oggetto
 solo da 365 voci e mezzo megabyte, e il formato era la causa di due guasti
 distinti che sembravano scollegati.
 
-**Il primo e' la concorrenza.** Scrittore e revisore condividono il perimetro:
+**Il primo è la concorrenza.** Scrittore e revisore condividono il perimetro:
 sono gli unici due stadi che possono scrivere la prosa, girano tutti e due
 ogni giorno, e ogni loro modifica riscriveva l'intero file. Due run vicine su
 due articoli diversi producevano due versioni complete dello stesso oggetto, e
-il merge riusciva solo finche' le due voci erano lontane abbastanza nel testo.
-Quando non lo erano, il conflitto arrivava su un file che nessun agente puo'
-risolvere leggendolo, perche' e' un JSON serializzato di seicento chilobyte.
-Con un file per articolo il conflitto non e' improbabile, e' **impossibile**:
+il merge riusciva solo finché le due voci erano lontane abbastanza nel testo.
+Quando non lo erano, il conflitto arrivava su un file che nessun agente può
+risolvere leggendolo, perché è un JSON serializzato di seicento chilobyte.
+Con un file per articolo il conflitto non è improbabile, è **impossibile**:
 due stadi che lavorano su articoli diversi toccano percorsi diversi, e git non
 ha niente da fondere. Restano contendibili solo le modifiche allo stesso
-articolo, che e' l'unico caso in cui un conflitto significa davvero qualcosa e
+articolo, che è l'unico caso in cui un conflitto significa davvero qualcosa e
 va letto.
 
-**Il secondo e' la leggibilita' del diff.** La revisione di una frase compariva
+**Il secondo è la leggibilità del diff.** La revisione di una frase compariva
 come un hunk dentro un file enorme, senza che il diff dicesse di quale
 indicatore si stesse parlando: il `git show` di una run del revisore era
 illeggibile, e la history per articolo non esisteva. Adesso
-`git log content/indicators/ter__920.json` e' la storia editoriale di quella
+`git log content/indicators/ter__920.json` è la storia editoriale di quella
 pagina, e basta.
 
 ## Il formato
 
     content/indicators/<chiave>.json
 
-dove `<chiave>` e' la chiave interna con i due punti scritti `__`, perche' i
+dove `<chiave>` è la chiave interna con i due punti scritti `__`, perché i
 due punti sono ostili come nome di file e nessuna chiave del catalogo contiene
-gia' un doppio underscore (le sigle Multiscopo ne usano uno solo). La codifica
-e' quindi reversibile senza ambiguita' e senza tabelle:
+già un doppio underscore (le sigle Multiscopo ne usano uno solo). La codifica
+è quindi reversibile senza ambiguità e senza tabelle:
 
     1                        ->  content/indicators/1.json
     bes:10AMB004             ->  content/indicators/bes__10AMB004.json
@@ -41,22 +41,22 @@ e' quindi reversibile senza ambiguita' e senza tabelle:
 
 Dentro il file ci sono gli stessi campi di prima (`lead`, `sections`, `fonti`,
 `vintage`, e per gli articoli firmati `level`, `reviewed_at`,
-`reviewed_vintage`), piu' `key`, che ripete la chiave. Il campo `key` non fa
-parte del modello e `load_all` lo toglie: serve solo perche' un file aperto a
-mano dica di che cosa parla, e perche' un file rinominato per sbaglio sia
+`reviewed_vintage`), più `key`, che ripete la chiave. Il campo `key` non fa
+parte del modello e `load_all` lo toglie: serve solo perché un file aperto a
+mano dica di che cosa parla, e perché un file rinominato per sbaglio sia
 riconoscibile invece che silenziosamente perduto.
 
-Quello che **non** e' cambiato: una voce vale per un livello territoriale solo,
+Quello che **non** è cambiato: una voce vale per un livello territoriale solo,
 e il livello resta un campo dentro la voce (`level`, default `regione`). Il
 modello resta una voce per indicatore, non una per coppia (indicatore,
-livello). Era cosi' prima e resta cosi' adesso, di proposito: cambiare il
+livello). Era così prima e resta così adesso, di proposito: cambiare il
 modello dei dati dentro una modifica che serve a togliere i conflitti avrebbe
 mescolato due cose che vanno potute rileggere separate.
 
-Stdlib puro e senza nessun import di `app`, perche' lo leggono sia l'app Flask
+Stdlib puro e senza nessun import di `app`, perché lo leggono sia l'app Flask
 sia gli script della catena, che girano su un checkout senza venv. Sta in
 `scripts/` e non in `app/` proprio per questo: `app/__init__.py` importa Flask,
-quindi `from app import ...` e' fuori portata per meta' dei suoi lettori.
+quindi `from app import ...` è fuori portata per metà dei suoi lettori.
 
     python3 scripts/indicator_store.py --list
     python3 scripts/indicator_store.py --show ter-920
@@ -74,29 +74,29 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 ROOT = PROJECT_ROOT / "content" / "indicators"
 
-# Il vecchio file unico, non piu' in repo: il travaso e' avvenuto e la sua
-# storia vive in git. Il percorso resta perche' `--migrate` funzioni su un
-# checkout vecchio, e perche' dica da dove vengono questi file.
+# Il vecchio file unico, non più in repo: il travaso è avvenuto e la sua
+# storia vive in git. Il percorso resta perché `--migrate` funzioni su un
+# checkout vecchio, e perché dica da dove vengono questi file.
 #
 # Stava sotto `app/static/`, quindi era anche servito in chiaro come risorsa
-# statica pubblica. La prosa non e' un artefatto dell'app: sta in `content/`,
-# accanto ai post del blog, che e' dove il resto dei testi vive gia'.
+# statica pubblica. La prosa non è un artefatto dell'app: sta in `content/`,
+# accanto ai post del blog, che è dove il resto dei testi vive già.
 LEGACY_PATH = PROJECT_ROOT / "app" / "static" / "data" / "indicator_texts.json"
 
 # La codifica della chiave nel nome del file. Una costante e non un letterale
-# sparso, perche' compare in tutte e due le direzioni e sbagliarne una sola
-# renderebbe invisibile meta' del catalogo senza nessun errore.
+# sparso, perché compare in tutte e due le direzioni e sbagliarne una sola
+# renderebbe invisibile metà del catalogo senza nessun errore.
 NAMESPACE_SEP = ":"
 FILENAME_SEP = "__"
 
 # Il campo che ripete la chiave dentro il file. Fuori dal modello: `load_all`
-# lo toglie, cosi' quello che i consumatori vedono e' esattamente il dizionario
+# lo toglie, così quello che i consumatori vedono è esattamente il dizionario
 # che vedevano prima.
 KEY_FIELD = "key"
 
 
 class StoreError(RuntimeError):
-    """Un file dello store non e' leggibile o non e' dove dovrebbe."""
+    """Un file dello store non è leggibile o non è dove dovrebbe."""
 
 
 def filename_for(key: str) -> str:
@@ -104,8 +104,8 @@ def filename_for(key: str) -> str:
     key = str(key)
     if FILENAME_SEP in key:
         raise StoreError(
-            f"la chiave '{key}' contiene '{FILENAME_SEP}', che e' il separatore "
-            "usato nei nomi di file: non e' codificabile senza ambiguita'"
+            f"la chiave '{key}' contiene '{FILENAME_SEP}', che è il separatore "
+            "usato nei nomi di file: non è codificabile senza ambiguità"
         )
     return key.replace(NAMESPACE_SEP, FILENAME_SEP) + ".json"
 
@@ -130,8 +130,8 @@ def paths(root=None):
 def load_all(root=None, strict=True) -> dict:
     """Tutti gli articoli, come `{chiave: voce}`.
 
-    E' esattamente il dizionario che `json.load` restituiva sul file unico, e
-    lo e' di proposito: ogni consumatore e' passato da una riga di `json.load`
+    È esattamente il dizionario che `json.load` restituiva sul file unico, e
+    lo è di proposito: ogni consumatore è passato da una riga di `json.load`
     a una chiamata qui senza toccare altro, e `tests/unit/test_indicator_store.py`
     verifica che le due letture coincidano.
 
@@ -141,8 +141,8 @@ def load_all(root=None, strict=True) -> dict:
 
     `strict` decide che cosa costa un file rotto, e la risposta giusta dipende
     da chi chiede. Per il cancello, per la suite e per chi lavora sulla catena
-    un file illeggibile deve fermare tutto, forte: e' un difetto e va visto.
-    Per l'**app** no, e la differenza e' grossa. Con `strict` un solo file mal
+    un file illeggibile deve fermare tutto, forte: è un difetto e va visto.
+    Per l'**app** no, e la differenza è grossa. Con `strict` un solo file mal
     scritto solleva, il chiamante ripiega su un dizionario vuoto, e tutte e
     trecentosessantacinque le pagine perdono la prosa insieme senza che si
     veda un errore da nessuna parte. Un articolo rotto deve costare un
@@ -186,7 +186,7 @@ def resolve_key(keys, code):
     scritta nei prompt, e chi la incontra o la aggira o salta il passo: in
     nessuno dei due casi resta una traccia.
 
-    Sta qui perche' questo modulo possiede le chiavi e la loro codifica, ed e'
+    Sta qui perché questo modulo possiede le chiavi e la loro codifica, ed è
     la terza volta che questo difetto compare in questo repo. Le prime due hanno
     prodotto due copie della stessa funzione in due file. `prose_lint` adesso
     delega qui invece di tenerne una propria.
@@ -211,7 +211,7 @@ def write(key: str, entry: dict, root=None) -> Path:
 
     Ordina le chiavi e chiude con un a capo, come faceva il dump del file
     unico: un file che cambia ordine a ogni scrittura produrrebbe diff che non
-    dicono niente, ed e' meta' del motivo per cui questo store esiste.
+    dicono niente, ed è metà del motivo per cui questo store esiste.
     """
     path = path_for(key, root=root)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -236,15 +236,15 @@ def _read_file(path: Path, key: str) -> dict:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
-        raise StoreError(f"{path.name} non e' leggibile: {type(exc).__name__}") from exc
+        raise StoreError(f"{path.name} non è leggibile: {type(exc).__name__}") from exc
     if not isinstance(data, dict):
         raise StoreError(f"{path.name} non contiene un oggetto JSON")
     declared = data.get(KEY_FIELD)
     if declared is not None and str(declared) != key:
         # Un file rinominato a mano, o scritto sotto il nome sbagliato. Detto
         # invece che ignorato: la voce sarebbe raggiungibile con una chiave e
-        # descriverebbe un altro indicatore, che e' il modo peggiore di
-        # sbagliare perche' la pagina si renderizza lo stesso.
+        # descriverebbe un altro indicatore, che è il modo peggiore di
+        # sbagliare perché la pagina si renderizza lo stesso.
         raise StoreError(
             f"{path.name} dichiara la chiave '{declared}' ma il nome del file dice '{key}'"
         )
@@ -294,7 +294,7 @@ if __name__ == "__main__":
     try:
         raise SystemExit(main())
     except BrokenPipeError:
-        # `--list | head` chiude la pipe mentre stiamo ancora stampando. Non e'
+        # `--list | head` chiude la pipe mentre stiamo ancora stampando. Non è
         # un errore del programma, e lasciare uscire il traceback fa sembrare
         # rotto un comando che ha funzionato.
         sys.stderr.close()

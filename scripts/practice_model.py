@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Il vocabolario della pratica editoriale, come codice.
 
-Questo modulo e' la Fase A resa eseguibile: gli stati finiti, i tipi di pratica,
-le transizioni ammesse, la tassonomia degli errori e il punteggio di priorita'
+Questo modulo è la Fase A resa eseguibile: gli stati finiti, i tipi di pratica,
+le transizioni ammesse, la tassonomia degli errori e il punteggio di priorità
 descritti in `docs/archive/EDITORIAL_PRACTICE.md`. Non tocca il disco e non conosce la
-catena: sono definizioni pure, cosi' che una regola del dominio si possa provare
+catena: sono definizioni pure, così che una regola del dominio si possa provare
 con un test invece che discutere a voce.
 
 Nessun import fuori dalla stdlib, come ogni script della catena: gira su un
@@ -15,22 +15,22 @@ from __future__ import annotations
 
 # --- Stati (docs/archive/EDITORIAL_PRACTICE.md, §3) ---------------------------------
 # Uno solo attivo per pratica. Ogni stato ha una condizione verificabile contro
-# gli artefatti: e' cio' che rende lo stato "dichiarato ma riconciliabile" e non
+# gli artefatti: è ciò che rende lo stato "dichiarato ma riconciliabile" e non
 # semplicemente dedotto.
 STATES = (
     "proposta",            # un candidato approved non ancora promosso
-    "in-lavorazione",      # uno stadio obbligatorio non e' ancora completo
+    "in-lavorazione",      # uno stadio obbligatorio non è ancora completo
     "in-attesa",           # ferma in attesa di una condizione (vedi IN_ATTESA_MOTIVI)
     "pronta-al-merge",     # tutti gli stadi del ciclo completi, cancello verde
     "pubblicata",          # fusa su master (= pubblicata: il progetto ha ratificato merge=pubblicazione)
-    "invalidata",          # un input e' cambiato: passaggi a valle non valgono piu'
+    "invalidata",          # un input è cambiato: passaggi a valle non valgono più
     "in-quarantena",       # in-attesa terminale, tolta dalla coda per non fermare le altre
     "chiusa",              # esito terminale raggiunto
 )
 
 # I motivi che qualificano `in-attesa`. Un solo stato di sosta, armonizzato dai due
-# di prima (`in-attesa-di-monte` + `bloccata`): il motivo dice perche', e porta la
-# classe d'errore giusta (monte-mancante e' un'attesa normale, senza errore; gli
+# di prima (`in-attesa-di-monte` + `bloccata`): il motivo dice perché, e porta la
+# classe d'errore giusta (monte-mancante è un'attesa normale, senza errore; gli
 # altri aspettano un cambio esterno o una correzione tecnica).
 IN_ATTESA_MOTIVI = (
     "monte-mancante",       # l'artefatto dello stadio a monte non esiste ancora
@@ -39,7 +39,7 @@ IN_ATTESA_MOTIVI = (
 )
 
 # --- Esiti terminali (§7) ----------------------------------------------------
-# "PR chiusa" non e' un esito editoriale. Una pratica `chiusa` porta uno di questi.
+# "PR chiusa" non è un esito editoriale. Una pratica `chiusa` porta uno di questi.
 TERMINAL_OUTCOMES = (
     "pubblicata",             # il solo esito "riuscito": fusa su master
     "rifiutata",
@@ -76,8 +76,8 @@ ENTRY_STAGE = {
 
 # Gli stadi obbligatori per tipo (§2). Gli stadi non elencati sono saltabili, e
 # si saltano solo se una condizione verificabile lo consente (es. il
-# verificatore e' saltabile "se la prosa non cambia", controllabile con
-# l'impronta `prosa` che gia' esiste).
+# verificatore è saltabile "se la prosa non cambia", controllabile con
+# l'impronta `prosa` che già esiste).
 REQUIRED_STAGES = {
     "nuovo": ("curator", "writer", "reviewer", "verificatore"),
     "aggiornamento": ("writer", "reviewer"),
@@ -90,8 +90,8 @@ REQUIRED_STAGES = {
 }
 
 # --- Transizioni ammesse (§4) ------------------------------------------------
-# Il grafo degli stati e' universale; i tipi differiscono negli stadi
-# obbligatori, non nel grafo. Nessun salto implicito: una coppia non elencata e'
+# Il grafo degli stati è universale; i tipi differiscono negli stadi
+# obbligatori, non nel grafo. Nessun salto implicito: una coppia non elencata è
 # una transizione vietata (es. `in-lavorazione -> pubblicata` saltando `pronta-al-merge`).
 TRANSITIONS = frozenset({
     ("proposta", "in-lavorazione"),
@@ -127,7 +127,7 @@ RETRY_CEILING = {
 # Classi che sono rientri, non fallimenti: non contano contro il tetto.
 RIENTRO_CLASSES = frozenset({"editoriale", "cambiamento-in-corsa"})
 def can_transition(frm: str, to: str) -> bool:
-    """Vero se `frm -> to` e' una transizione ammessa del ciclo di vita."""
+    """Vero se `frm -> to` è una transizione ammessa del ciclo di vita."""
     return (frm, to) in TRANSITIONS
 
 
@@ -139,8 +139,8 @@ def next_required_stage(ptype: str, completed_stages) -> str | None:
     """Il primo stadio obbligatorio del tipo non ancora completato, in ordine di
     catena. `None` quando il ciclo ha finito gli stadi obbligatori.
 
-    E' il cuore della ripresa (§9): riprendere una pratica interrotta e' guardare
-    quali stadi hanno gia' l'artefatto atteso e ripartire dal primo che manca.
+    È il cuore della ripresa (§9): riprendere una pratica interrotta è guardare
+    quali stadi hanno già l'artefatto atteso e ripartire dal primo che manca.
     """
     done = set(completed_stages or ())
     for stage in REQUIRED_STAGES.get(ptype, ()):
@@ -153,9 +153,9 @@ def retry_ceiling(error_class: str) -> int | None:
     """Il numero massimo di tentativi per una classe di errore.
 
     `None` per le classi di rientro (editoriale, cambiamento-in-corsa): sono
-    rientri guidati dai dati, non fallimenti, e non hanno un tetto perche' non
+    rientri guidati dai dati, non fallimenti, e non hanno un tetto perché non
     contano come tentativi. Le classi note hanno un intero; una classe ignota
-    e' trattata come terminale (0), il default prudente.
+    è trattata come terminale (0), il default prudente.
     """
     if error_class in RIENTRO_CLASSES:
         return None
@@ -172,9 +172,9 @@ def retry_exhausted(error_class: str, attempts: int) -> bool:
 
 
 def _days_between(start: str, end: str) -> int:
-    """Giorni fra due date `YYYY-MM-DD`, 0 se una manca o non e' leggibile.
+    """Giorni fra due date `YYYY-MM-DD`, 0 se una manca o non è leggibile.
 
-    Aritmetica di calendario senza `datetime.now`, cosi' la funzione resta pura
+    Aritmetica di calendario senza `datetime.now`, così la funzione resta pura
     e il test deterministico: entrambe le date arrivano dal chiamante.
     """
     from datetime import date
@@ -193,20 +193,20 @@ def _days_between(start: str, end: str) -> int:
 
 
 def priority_score(practice: dict, today: str) -> float:
-    """Il punteggio di priorita' di una pratica (§11), non dello stadio.
+    """Il punteggio di priorità di una pratica (§11), non dello stadio.
 
-    L'ordine di catena da solo e' insufficiente: una correzione urgente di un
+    L'ordine di catena da solo è insufficiente: una correzione urgente di un
     dato pubblicato non deve aspettare dietro una coda di candidature nuove. Il
-    punteggio e' derivato da campi verificabili del record, mai da un giudizio,
-    e lo consulta il lanciatore a parita' di stadio pronto. Piu' alto = prima.
+    punteggio è derivato da campi verificabili del record, mai da un giudizio,
+    e lo consulta il lanciatore a parità di stadio pronto. Più alto = prima.
 
     I fattori, in ordine di peso:
       - errore pubblico (una smentita su una pagina online): massimo;
-      - prossimita' alla pubblicazione: un ciclo quasi concluso vale piu' di uno
-        appena nato, perche' chiude lavoro invece di aprirne;
+      - prossimità alla pubblicazione: un ciclo quasi concluso vale più di uno
+        appena nato, perché chiude lavoro invece di aprirne;
       - dati scaduti su un indicatore nel punteggio;
-      - anzianita' della pratica, per evitare la fame di una classe;
-      - tentativi gia' falliti, che abbassano, per non monopolizzare la coda.
+      - anzianità della pratica, per evitare la fame di una classe;
+      - tentativi già falliti, che abbassano, per non monopolizzare la coda.
     """
     flags = practice.get("flags") or {}
     score = 0.0
@@ -237,8 +237,8 @@ def priority_score(practice: dict, today: str) -> float:
 def practice_id(indicator_id: str, ptype: str, seq: int) -> str:
     """La chiave di una pratica: `<indicator_id>#<tipo>-<seq>`.
 
-    Lega i tre livelli senza confonderli: l'indicatore ancora l'identita'
-    permanente, il tipo dice che genere di ciclo e', la sequenza lo ordina nella
+    Lega i tre livelli senza confonderli: l'indicatore ancora l'identità
+    permanente, il tipo dice che genere di ciclo è, la sequenza lo ordina nella
     storia dell'indicatore (§1).
     """
     if ptype not in PRACTICE_TYPES:
@@ -248,7 +248,7 @@ def practice_id(indicator_id: str, ptype: str, seq: int) -> str:
 
 def parse_practice_id(pid: str):
     """`(indicator_id, tipo, seq)` da una chiave di pratica. L'inverso di
-    `practice_id`. L'indicatore puo' contenere trattini (`bes:09PAE009-N25`),
+    `practice_id`. L'indicatore può contenere trattini (`bes:09PAE009-N25`),
     quindi lo split parte da destra su `#` e poi sull'ultimo `-`."""
     indicator, _, rest = pid.rpartition("#")
     if not indicator or "-" not in rest:

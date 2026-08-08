@@ -82,7 +82,7 @@ class RiskFlags(unittest.TestCase):
 
 class AReadabilityRevisionGoesBackToTheProducer(unittest.TestCase):
     """Il flag `leggibilita` dal reader-editor: un asse diverso dai sospetti di
-    falsita', e come la smentita deve invalidare la firma, o il produttore non
+    falsità, e come la smentita deve invalidare la firma, o il produttore non
     riscriverebbe mai un articolo firmato ma illeggibile."""
 
     def _signed(self):
@@ -99,8 +99,8 @@ class AReadabilityRevisionGoesBackToTheProducer(unittest.TestCase):
                                   refutations={}, readings=readings)
         self.assertIn("leggibilita_grave", row["flags"])
         self.assertNotIn("leggibilita", row["flags"])
-        self.assertGreater(row["score"], 0, "una bocciatura di leggibilita' riapre l'articolo")
-        self.assertEqual(row["reviewed_at"], "", "la firma non vale piu'")
+        self.assertGreater(row["score"], 0, "una bocciatura di leggibilità riapre l'articolo")
+        self.assertEqual(row["reviewed_at"], "", "la firma non vale più")
 
     def test_a_soft_revise_uses_the_light_flag(self):
         entry = self._signed()

@@ -1,9 +1,9 @@
 """La fixture di una eval non deve regalare la risposta.
 
 Il gold del reader-editor nomina i casi per verdetto (`p01`-`p04` sono i `pass`,
-`r01`-`rc04` i `revise`), che e' comodo per chi legge il gold e fatale per chi
+`r01`-`rc04` i `revise`), che è comodo per chi legge il gold e fatale per chi
 misura: un giudice che vede quegli id prende 8/8 senza leggere una riga di prosa,
-e una baseline centrabile cosi' non vede piu' nessuna regressione. E' gia'
+e una baseline centrabile così non vede più nessuna regressione. È già
 successo una volta su questa eval, con il blocco `_` che descriveva i casi.
 """
 
@@ -48,7 +48,7 @@ class TheReaderEditorFixtureIsBlind(unittest.TestCase):
 
     def test_the_scorer_finds_the_cases_again(self):
         """Cieco per l'agente, non per il metro: se la corrispondenza si rompe la
-        eval smette di sommare, e il modo in cui lo direbbe e' un punteggio a
+        eval smette di sommare, e il modo in cui lo direbbe è un punteggio a
         zero che sembra una regressione del giudizio."""
         import tempfile
 
@@ -60,7 +60,7 @@ class TheReaderEditorFixtureIsBlind(unittest.TestCase):
         self.assertEqual(result["accuratezza"], f"{len(answers)}/{len(answers)}")
 
     def test_a_baseline_recorded_on_the_old_ids_still_scores(self):
-        """La baseline gia' annotata in docs/CANARY.md e' stata prodotta sugli id
+        """La baseline già annotata in docs/CANARY.md è stata prodotta sugli id
         vecchi: riscriverla per un cambio di etichette sarebbe riscrivere una
         misura invece di conservarla."""
         import tempfile

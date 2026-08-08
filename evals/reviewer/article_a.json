@@ -1,27 +1,27 @@
 {
-  "_": "Fixture con errori piantati (e01-e04): NON e' un articolo vero. Vedi expected.json.",
-  "lead": "Il lavoro femminile in Italia cresce da sette anni, ma in Italia lavora il 54,9% delle donne e il Mezzogiorno resta a meta' di quel livello.",
+  "_": "Fixture con errori piantati (e01-e04): NON è un articolo vero. Vedi expected.json.",
+  "lead": "Il lavoro femminile in Italia cresce da sette anni, ma in Italia lavora il 54,9% delle donne e il Mezzogiorno resta a metà di quel livello.",
   "level": "regione",
   "sections": [
     {
       "role": "definizione",
       "h": "Che cosa conta questo tasso",
-      "body": "L'indicatore misura la quota di donne sul totale degli occupati, ed e' percio' una fotografia di quanto spazio il mercato del lavoro riservi alla componente femminile. Un valore alto dice che le donne pesano di piu' tra chi lavora."
+      "body": "L'indicatore misura la quota di donne sul totale degli occupati, ed è perciò una fotografia di quanto spazio il mercato del lavoro riservi alla componente femminile. Un valore alto dice che le donne pesano di più tra chi lavora."
     },
     {
       "role": "quadro",
       "h": "Un gradino tra due Italie",
-      "body": "La classifica 2025 si spezza dopo la Basilicata: fino a li' i valori scendono con gradualita', poi lo stacco di sette punti e mezzo apre un altro paese. In cima la Valle d'Aosta con il 68,90%, in fondo la Campania con il 33,95%."
+      "body": "La classifica 2025 si spezza dopo la Basilicata: fino a lì i valori scendono con gradualità, poi lo stacco di sette punti e mezzo apre un altro paese. In cima la Valle d'Aosta con il 68,90%, in fondo la Campania con il 33,95%."
     },
     {
       "role": "dinamica",
       "h": "Sette anni di crescita",
-      "body": "Dal 2018 al 2025 la crescita ha riguardato ogni regione, e anche nell'ultimo anno tutte le regioni sono in aumento. La media e' salita di 4,88 punti percentuali, con la Basilicata che guadagna piu' di tutte, 8,47 punti."
+      "body": "Dal 2018 al 2025 la crescita ha riguardato ogni regione, e anche nell'ultimo anno tutte le regioni sono in aumento. La media è salita di 4,88 punti percentuali, con la Basilicata che guadagna più di tutte, 8,47 punti."
     },
     {
       "role": "limiti",
       "h": "Quel che il tasso non vede",
-      "body": "Il ritardo del Mezzogiorno dipende dalla carenza di asili nido, che tiene le madri fuori dal mercato. Il tasso inoltre non distingue tra tempo pieno e tempo parziale, ne' dice nulla sulla qualita' dell'impiego."
+      "body": "Il ritardo del Mezzogiorno dipende dalla carenza di asili nido, che tiene le madri fuori dal mercato. Il tasso inoltre non distingue tra tempo pieno e tempo parziale, né dice nulla sulla qualità dell'impiego."
     }
   ],
   "fonti": [],

@@ -2,12 +2,12 @@
 
 Il contratto diceva a tre stadi di chiudere con `gh pr merge --auto`, convinto
 che `--auto` parcheggiasse la PR fino ai check verdi. Su questo repo non lo fa:
-`allow_auto_merge` e' falso e `master` non e' protetto, quindi `gh` fonde subito.
-Una PR sonda e' stata fusa con il job `python` ancora `IN_PROGRESS`.
+`allow_auto_merge` è falso e `master` non è protetto, quindi `gh` fonde subito.
+Una PR sonda è stata fusa con il job `python` ancora `IN_PROGRESS`.
 
-Ogni test qui costruisce prima il caso cattivo, perche' e' l'unico che conta: un
+Ogni test qui costruisce prima il caso cattivo, perché è l'unico che conta: un
 passo di merge che fonde quando non deve non lo scopri guardandolo funzionare.
-Nessun test parla con la rete o con `gh`: il comando esterno e' iniettato.
+Nessun test parla con la rete o con `gh`: il comando esterno è iniettato.
 """
 
 import json
@@ -21,8 +21,8 @@ REPO = "nmaiese/diset-viz"
 SHA = "deadbee"
 BRANCH = "automation/prova"
 
-# I test si esprimono in bucket, che e' la lingua della politica. Il finto `gh`
-# li ritraduce nelle conclusioni grezze della REST, cosi' la classificazione di
+# I test si esprimono in bucket, che è la lingua della politica. Il finto `gh`
+# li ritraduce nelle conclusioni grezze della REST, così la classificazione di
 # `_bucket` viene esercitata davvero invece di essere scavalcata.
 _AS_RUN = {
     "pass": ("completed", "success"),
@@ -34,13 +34,13 @@ _AS_RUN = {
 
 
 def fake_gh(checks=None, merge_ok=True, script=None):
-    """Un finto `gh api`. `script` e' una lista di risposte successive alle check
-    run, cosi' un test puo' descrivere una CI che parte gialla e finisce verde.
+    """Un finto `gh api`. `script` è una lista di risposte successive alle check
+    run, così un test può descrivere una CI che parte gialla e finisce verde.
 
-    Parla REST perche' ci parla il passo di merge: `gh pr checks` e `gh pr merge`
-    sono GraphQL, e dietro un proxy di uscita GraphQL puo' non esserci. Il remote
-    che restituisce e' quello riscritto dal proxy, che e' il caso in cui `gh` da
-    solo non sa piu' di che repository si tratti.
+    Parla REST perché ci parla il passo di merge: `gh pr checks` e `gh pr merge`
+    sono GraphQL, e dietro un proxy di uscita GraphQL può non esserci. Il remote
+    che restituisce è quello riscritto dal proxy, che è il caso in cui `gh` da
+    solo non sa più di che repository si tratti.
     """
     calls = []
     pending = list(script or [])
@@ -119,7 +119,7 @@ class ChecksHasToActuallyWait(unittest.TestCase):
             log=lambda *_: None,
         )
         # La sequenza di risposte finisce, quindi il polling scade: l'importante
-        # e' che in nessun momento abbia fuso con un check ancora in corso.
+        # è che in nessun momento abbia fuso con un check ancora in corso.
         self.assertEqual(merged_prs(runner), [])
         self.assertFalse(result["merged"])
 
@@ -148,8 +148,8 @@ class ChecksHasToActuallyWait(unittest.TestCase):
         self.assertEqual(merged_prs(runner), [])
 
     def test_no_checks_at_all_is_a_refusal(self):
-        """'checks' senza check non e' una promozione ad 'auto'. Se la CI non
-        parte, la politica non e' soddisfacibile e la PR resta aperta."""
+        """'checks' senza check non è una promozione ad 'auto'. Se la CI non
+        parte, la politica non è soddisfacibile e la PR resta aperta."""
         runner = fake_gh(checks=None)
         result = pipeline_merge.decide(
             "admissions", 3, verdict=GREEN, runner=runner, sleep=lambda _: None,
@@ -170,7 +170,7 @@ class ChecksHasToActuallyWait(unittest.TestCase):
 
 
 class AutoDoesNotWait(unittest.TestCase):
-    """Prosa sola, e la suite l'ha gia' girata il cancello: aspettare la CI qui
+    """Prosa sola, e la suite l'ha già girata il cancello: aspettare la CI qui
     servirebbe solo a far scadere una sessione cloud."""
 
     def test_it_merges_without_looking_at_the_checks(self):
@@ -215,7 +215,7 @@ class TheOutcomeIsAlwaysReportable(unittest.TestCase):
 class TheVerdictIsNotTakenFromTheCaller(unittest.TestCase):
     def test_the_gate_runs_when_no_verdict_is_given(self):
         """Un passo di merge che si fida del rapporto dell'agente sul proprio
-        cancello non protegge niente: e' esattamente il momento che un agente
+        cancello non protegge niente: è esattamente il momento che un agente
         che ha sbagliato salterebbe."""
         seen = {}
 
@@ -235,7 +235,7 @@ class TheVerdictIsNotTakenFromTheCaller(unittest.TestCase):
 
 def journalling_gh(checks=None, merge_ok=True, push_failures=0):
     """Come `fake_gh`, ma tiene anche il conto dei comandi git del diario e sa
-    far perdere le prime N corse al push, che e' il caso che conta."""
+    far perdere le prime N corse al push, che è il caso che conta."""
     runner = fake_gh(checks=checks, merge_ok=merge_ok)
     inner, state = runner, {"pushes": 0, "rows": []}
 
@@ -246,9 +246,9 @@ def journalling_gh(checks=None, merge_ok=True, push_failures=0):
                 return 1, "rejected: non-fast-forward"
             return 0, ""
         if argv[:2] == ["git", "commit"]:
-            # La riga e' gia' stata scritta nel worktree: la leggiamo da li',
-            # perche' e' quello che finira' davvero su master. Un file per run,
-            # quindi si legge la directory e non piu' le righe di un `.jsonl`.
+            # La riga è già stata scritta nel worktree: la leggiamo da lì,
+            # perché è quello che finirà davvero su master. Un file per run,
+            # quindi si legge la directory e non più le righe di un `.jsonl`.
             runs = Path(cwd) / "data" / "pipeline" / "runs"
             state["rows"] = [
                 json.loads(shard.read_text(encoding="utf-8"))
@@ -265,7 +265,7 @@ def journalling_gh(checks=None, merge_ok=True, push_failures=0):
 
 
 class MasterHasToLearnHowItEnded(unittest.TestCase):
-    """Il buco che questo chiude e' doppio, e la meta' peggiore non e' il merge.
+    """Il buco che questo chiude è doppio, e la metà peggiore non è il merge.
 
     Una run rifiutata scrive la propria riga su un branch che non si fonde mai,
     quindi da master non si vede: la run dello scout del 26 luglio esiste, dice
@@ -297,9 +297,9 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
         self.assertEqual(rows[0]["gate"], "checks")
 
     def test_a_pull_request_left_open_writes_nothing(self):
-        """`pr-open` non e' un esito terminale: la PR resta aperta e la riga che
-        l'agente ha gia' committato dentro di essa la descrive bene. Scriverne
-        una seconda su master direbbe che e' finita quando non e' finita."""
+        """`pr-open` non è un esito terminale: la PR resta aperta e la riga che
+        l'agente ha già committato dentro di essa la descrive bene. Scriverne
+        una seconda su master direbbe che è finita quando non è finita."""
         runner = journalling_gh(checks={"python": "pass"})
         pipeline_merge.decide("verificatore", 9, verdict=AUTO, runner=runner,
                               dry_run=True, log=lambda *_: None)
@@ -309,7 +309,7 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
     def test_a_lost_push_race_is_retried(self):
         """Due stadi che finiscono insieme si contendono la coda del registro.
         Il ritentativo rilegge origin/master, che intanto porta la riga
-        dell'altro, e ci va dietro: su un file in coda e' sempre corretto."""
+        dell'altro, e ci va dietro: su un file in coda è sempre corretto."""
         runner = journalling_gh(checks={"python": "pass"}, push_failures=1)
         pipeline_merge.decide("admissions", 45, verdict=GREEN, runner=runner,
                               sleep=lambda _: None, log=lambda *_: None)
@@ -317,8 +317,8 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
         self.assertEqual([r["outcome"] for r in runner.state["rows"]], ["merged"])
 
     def test_it_never_writes_into_the_agents_own_tree(self):
-        """L'albero dell'agente e' su un branch appena cancellato dal remoto.
-        Toccarlo per scrivere una riga di log e' un modo di perdere lavoro."""
+        """L'albero dell'agente è su un branch appena cancellato dal remoto.
+        Toccarlo per scrivere una riga di log è un modo di perdere lavoro."""
         runner = journalling_gh(checks={"python": "pass"})
         pipeline_merge.decide("admissions", 45, verdict=GREEN, runner=runner,
                               sleep=lambda _: None, log=lambda *_: None)
@@ -327,8 +327,8 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
             self.assertNotIn(argv[:2], (["git", "reset"],))
 
     def test_a_journal_failure_does_not_undo_the_merge(self):
-        """Il merge e' gia' avvenuto. Se il diario non si scrive la run resta
-        valida, e l'unica cosa che cambia e' che va detto forte."""
+        """Il merge è già avvenuto. Se il diario non si scrive la run resta
+        valida, e l'unica cosa che cambia è che va detto forte."""
         runner = journalling_gh(checks={"python": "pass"}, push_failures=99)
         said = []
         result = pipeline_merge.decide("admissions", 45, verdict=GREEN, runner=runner,
@@ -344,11 +344,11 @@ class MasterHasToLearnHowItEnded(unittest.TestCase):
 
 
 class TheRepositoryHasToBeFoundWithoutGh(unittest.TestCase):
-    """`gh` da solo non ci arriva, ed e' la ragione per cui esiste `repo_slug`.
+    """`gh` da solo non ci arriva, ed è la ragione per cui esiste `repo_slug`.
 
     Il proxy di uscita riscrive `origin` in un URL su 127.0.0.1, e davanti a
     quello `gh` risponde "none of the git remotes point to a known GitHub host".
-    Owner e repo pero' sono ancora gli ultimi due segmenti del percorso.
+    Owner e repo però sono ancora gli ultimi due segmenti del percorso.
     """
 
     def slug_for(self, url):
@@ -370,7 +370,7 @@ class TheRepositoryHasToBeFoundWithoutGh(unittest.TestCase):
                 self.assertEqual(self.slug_for(url), "nmaiese/diset-viz")
 
     def test_gh_repo_is_ignored(self):
-        # GH_REPO non e' piu' un override: da environment ereditato faceva aprire
+        # GH_REPO non è più un override: da environment ereditato faceva aprire
         # o fondere sul repo sbagliato. Lo slug viene sempre dal remote.
         import os
 
@@ -398,8 +398,8 @@ class TheRepositoryHasToBeFoundWithoutGh(unittest.TestCase):
 class TheChainOpensPullRequestsOverRest(unittest.TestCase):
     """La PR si apre via REST, non con `gh pr create`, e senza `GH_REPO`.
 
-    `gh pr create` e' GraphQL, cieco al remote proxato: era il motivo per cui gli
-    agenti impostavano `GH_REPO`, che pero' corto-circuita `repo_slug`. Aprendo la
+    `gh pr create` è GraphQL, cieco al remote proxato: era il motivo per cui gli
+    agenti impostavano `GH_REPO`, che però corto-circuita `repo_slug`. Aprendo la
     PR sulla stessa `api()` del merge, lo slug arriva dal remote e non serve
     nessuna variabile d'ambiente.
     """
@@ -440,7 +440,7 @@ class TheChainOpensPullRequestsOverRest(unittest.TestCase):
 
     def test_it_embeds_the_run_id_in_the_body(self):
         # Il branch porta solo il suffisso del run_id: l'id intero va nel corpo,
-        # cosi' il cruscotto correla la PR col battito e le righe di diario.
+        # così il cruscotto correla la PR col battito e le righe di diario.
         runner = fake_gh()
         pipeline_merge.create_pr("automation/producer-2026-07-29-abcd", "t", "corpo",
                                  runner=runner, run_id="producer-20260729T101010Z-abcd")
@@ -452,7 +452,7 @@ class TheChainOpensPullRequestsOverRest(unittest.TestCase):
 class ADirtyWorktreeIsRefusedBeforeMerging(unittest.TestCase):
     """La suite gira sui file su disco, il merge fonde il commit: un cambiamento
     non committato passerebbe la suite e non finirebbe su master. Con un worktree
-    per run un file sporco e' lavoro di questa run, non di un sibling, quindi il
+    per run un file sporco è lavoro di questa run, non di un sibling, quindi il
     merge lo rifiuta invece di fondere una versione che la suite non ha provato."""
 
     def test_it_refuses_and_does_not_merge(self):
@@ -468,7 +468,7 @@ class ADirtyWorktreeIsRefusedBeforeMerging(unittest.TestCase):
         self.assertEqual(result["outcome"], "blocked")
 
     def test_an_unreadable_status_fails_closed(self):
-        # git status che fallisce non e' "pulito": si blocca invece di fondere un
+        # git status che fallisce non è "pulito": si blocca invece di fondere un
         # albero forse sporco (una config status.showUntrackedFiles guasta lo rompe).
         def runner(argv, cwd=None):
             if argv[:2] == ["git", "status"]:
@@ -558,8 +558,8 @@ class TheBucketsSurviveTheMoveToRest(unittest.TestCase):
 
 class DeletingTheBranchCannotUndoTheMerge(unittest.TestCase):
     """Erano un flag solo (`--delete-branch`), ora sono due chiamate. La seconda
-    puo' fallire, e se il suo fallimento diventasse l'esito, master leggerebbe
-    `error` su una PR che si e' fusa davvero."""
+    può fallire, e se il suo fallimento diventasse l'esito, master leggerebbe
+    `error` su una PR che si è fusa davvero."""
 
     def test_a_failed_branch_delete_still_reports_merged(self):
         def runner(argv, cwd=None):
@@ -586,7 +586,7 @@ class DeletingTheBranchCannotUndoTheMerge(unittest.TestCase):
             return 0, json.dumps({"head": {"sha": SHA, "ref": BRANCH}})
 
         ok, detail = pipeline_merge.merge(45, runner=runner, log=lambda *_: None)
-        self.assertFalse(ok, "`merged: false` con uscita 0 e' stato letto come un merge")
+        self.assertFalse(ok, "`merged: false` con uscita 0 è stato letto come un merge")
         self.assertIn("not mergeable", detail)
 
 
@@ -595,9 +595,9 @@ class EmitOutcomes(unittest.TestCase):
 
     def _dossier(self, **over):
         # Il vocabolario del **dossier**, non quello del cancello: `writer` e
-        # `reviewer` sono i nomi con cui la pratica di trecento indicatori e'
+        # `reviewer` sono i nomi con cui la pratica di trecento indicatori è
         # scritta su disco (`practice_model.REQUIRED_STAGES`), e restano vivi
-        # anche adesso che i due agenti non esistono piu'. Una rinomina di
+        # anche adesso che i due agenti non esistono più. Una rinomina di
         # comodo li aveva schiacciati tutti e tre su `verificatore`: la fixture
         # restava verde e smetteva di somigliare a un dossier vero.
         d = {"id": "167", "state": "pubblicata", "type": "esistente",
@@ -638,8 +638,8 @@ class EmitOutcomes(unittest.TestCase):
         self.assertIs(snap["published"], True)
 
     def test_it_posts_only_the_changed_indicator_not_the_cited_ones(self):
-        # 167 e' cambiato, 12 e' solo citato per confronto (stesso run_id nei suoi
-        # runs). Solo 167 e' nel diff, quindi solo 167 va POSTato: postare 12
+        # 167 è cambiato, 12 è solo citato per confronto (stesso run_id nei suoi
+        # runs). Solo 167 è nel diff, quindi solo 167 va POSTato: postare 12
         # sovrascriverebbe il suo stato genuino con uno stale.
         dossier = self._dossier()
         dossier["12"] = dict(dossier["167"], id="12", runs=["v1"])
@@ -670,9 +670,9 @@ class EmitOutcomes(unittest.TestCase):
 
     def test_it_is_best_effort_and_swallows_errors(self):
         def boom(today=""):
-            raise RuntimeError("db giu'")
+            raise RuntimeError("db giù")
         self._with_load_real(boom)
-        # non solleva: un overlay perso non fa fallire un merge gia' avvenuto.
+        # non solleva: un overlay perso non fa fallire un merge già avvenuto.
         pipeline_merge.emit_outcomes(
             "v1", runner=lambda argv, cwd=None: (0, ""), log=lambda *_: None,
             post=lambda *a, **k: None)

@@ -1,6 +1,6 @@
 """Il falso negativo del 2026-08-06 (CANARY.md): `score_reviewer` contava un
 errore piantato come sopravvissuto anche quando compariva solo dentro una
-confutazione esplicita ("Non e' X: ..."), perche' il match era una sola
+confutazione esplicita ("Non è X: ..."), perché il match era una sola
 sottostringa. Rilievo Codex: lo scorer va corretto e riprovato, non solo
 annotato come limite noto.
 """
@@ -31,14 +31,14 @@ def _score(text, pattern="quota di donne sul totale degli occupati"):
 
 class ANegatedPatternIsACorrectionNotASurvival(unittest.TestCase):
     def test_an_unqualified_survivor_is_still_missed(self):
-        result = _score("La quota di donne sul totale degli occupati e' alta.")
+        result = _score("La quota di donne sul totale degli occupati è alta.")
         self.assertEqual(result["mancati"], ["e01"])
         self.assertEqual(result["trovati"], [])
 
     def test_an_explicit_refutation_counts_as_found(self):
         result = _score(
-            "Non e' la quota di donne sul totale degli occupati: al denominatore "
-            "c'e' la popolazione femminile."
+            "Non è la quota di donne sul totale degli occupati: al denominatore "
+            "c'è la popolazione femminile."
         )
         self.assertEqual(result["trovati"], ["e01"])
         self.assertEqual(result["mancati"], [])
@@ -57,7 +57,7 @@ class ANegatedPatternIsACorrectionNotASurvival(unittest.TestCase):
         """Una sola comparsa non confutata basta a considerare l'errore vivo:
         la tolleranza vale caso per caso, non per il testo intero."""
         result = _score(
-            "Non e' la quota di donne sul totale degli occupati. Ma poi il "
+            "Non è la quota di donne sul totale degli occupati. Ma poi il "
             "testo scrive di nuovo la quota di donne sul totale degli occupati "
             "come se fosse vera."
         )

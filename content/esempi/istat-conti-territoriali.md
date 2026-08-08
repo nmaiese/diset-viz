@@ -6,9 +6,9 @@
 - **URL** https://www.istat.it/comunicato-stampa/conti-economici-territoriali-2022-2024/
 - **Forma di storia** il registro istituzionale asciutto, l'apertura di un
   comunicato
-- **Da usare quando** l'ultimo anno della tua serie non e' definitivo, o quando
+- **Da usare quando** l'ultimo anno della tua serie non è definitivo, o quando
   devi mettere in fila quattro ripartizioni senza che diventino un elenco
-- **E' la fonte diretta di `ter-167`**, l'indicatore da cui e' nata questa
+- **È la fonte diretta di `ter-167`**, l'indicatore da cui è nata questa
   libreria
 
 ## Il testo
@@ -28,34 +28,34 @@
 > quelle semi-definitive per il 2023 e quelle preliminari per il 2024, coerenti
 > con i dati nazionali diffusi a settembre 2025.
 
-**Nota di fedelta'.** Sono i primi tre paragrafi consecutivi del comunicato. Nel
-sorgente dopo "settembre 2025" c'e' un richiamo di nota in apice, tolto qui
-perche' e' tipografia, non testo. Il quarto paragrafo non e' riportato: contiene
+**Nota di fedeltà.** Sono i primi tre paragrafi consecutivi del comunicato. Nel
+sorgente dopo "settembre 2025" c'è un richiamo di nota in apice, tolto qui
+perché è tipografia, non testo. Il quarto paragrafo non è riportato: contiene
 un elenco lungo e un punto e virgola, e come modello non aggiunge niente.
 
-## Perche' si legge al primo passaggio
+## Perché si legge al primo passaggio
 
 **La coordinata temporale apre, il numero non apre mai.** "Nel 2024, il Pil in
-volume (+0,7% a livello nazionale) e' aumentato dell'1% nel Nord-ovest". Prima
+volume (+0,7% a livello nazionale) è aumentato dell'1% nel Nord-ovest". Prima
 quando, poi cosa, poi quanto. Il totale nazionale sta tra parentesi come termine
 di paragone, non come sesto elemento della lista.
 
 **Le quattro ripartizioni arrivano nella stessa forma sintattica.** "dell'1% nel
 Nord-ovest, dello 0,8% nel Centro, dello 0,7% nel Mezzogiorno e dello 0,1% nel
 Nord-est". Ripetere la preposizione fa leggere quattro voci come una frase sola.
-E' l'impilamento buono, quello tra elementi paralleli e intercambiabili.
+È l'impilamento buono, quello tra elementi paralleli e intercambiabili.
 
-**La cautela sulle stime e' un paragrafo suo, e dice tre cose in una riga.**
+**La cautela sulle stime è un paragrafo suo, e dice tre cose in una riga.**
 Definitive il 2022, semi-definitive il 2023, preliminari il 2024. Non attenua,
-non si scusa, non rimanda: qualifica ogni anno con una parola. E' esattamente il
-caveat che `ter-167` deve portare, ed e' il modello di come portarlo.
+non si scusa, non rimanda: qualifica ogni anno con una parola. È esattamente il
+caveat che `ter-167` deve portare, ed è il modello di come portarlo.
 
-**Non c'e' voce, e va bene cosi'.** Questo e' il registro piu' asciutto della
-libreria, ed e' qui apposta: quando l'articolo deve solo mettere in fila delle
-cifre qualificate, questa e' la forma. Le nostre pagine non devono suonare cosi'
-per intero, ma la loro sezione sulle revisioni si'.
+**Non c'è voce, e va bene così.** Questo è il registro più asciutto della
+libreria, ed è qui apposta: quando l'articolo deve solo mettere in fila delle
+cifre qualificate, questa è la forma. Le nostre pagine non devono suonare così
+per intero, ma la loro sezione sulle revisioni sì.
 
 **Il contatore.** 10,6 tic per mille parole e 31,5 parole per frase, il periodare
-piu' lungo della libreria. Regge lo stesso perche' le clausole lunghe sono
-parallele, non annidate. Il numero da guardare non e' la lunghezza, e' se una
+più lungo della libreria. Regge lo stesso perché le clausole lunghe sono
+parallele, non annidate. Il numero da guardare non è la lunghezza, è se una
 clausola dipende dalla precedente per essere capita.

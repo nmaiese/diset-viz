@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>Console catena · {{ site_name }}</title>
-    {# Pagina admin interna: niente GTM/analytics/CMP (il banner privacy qui e'
-       rumore). Le identita' Supabase servono comunque, iniettate diritte. #}
+    {# Pagina admin interna: niente GTM/analytics/CMP (il banner privacy qui è
+       rumore). Le identità Supabase servono comunque, iniettate diritte. #}
     <script>
       window.__supabase = {url: {{ SUPABASE_URL | tojson }}, anonKey: {{ SUPABASE_ANON_KEY | tojson }}};
       window.__monitorAdminEmail = {{ monitor_admin_email | tojson }};
@@ -34,7 +34,7 @@
       {# Su desktop le celle a testo lungo (nome indicatore, descrizione del
          prossimo passo) restano in nowrap e gonfiano la tabella oltre la pagina.
          Nelle tabelle .mon-cards le si lascia andare a capo e si tiene il testo
-         monospace fuori dalle celle lunghe, cosi' la tabella sta nella colonna. #}
+         monospace fuori dalle celle lunghe, così la tabella sta nella colonna. #}
       table.mon-cards th, table.mon-cards td { white-space: normal; overflow-wrap: anywhere; vertical-align: top; }
       table.mon-cards td.mon-mini { white-space: nowrap; overflow-wrap: normal; }
       table.mon-cards td, table.mon-cards td small { font-family: Inter, system-ui, sans-serif; }
@@ -52,9 +52,9 @@
       .mon-totals { margin-bottom:10px; }
       .mon-coverage { margin-bottom:14px; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; }
       .mon-coverage:empty { display:none; }
-      {# I chip di copertura portano testo piu' lungo e piu' variabile (fino a due
+      {# I chip di copertura portano testo più lungo e più variabile (fino a due
          motivi di esclusione) dei chip di stato: qui il nowrap generico dei chip
-         si toglie, cosi' un elenco lungo va a capo dentro il chip invece di
+         si toglie, così un elenco lungo va a capo dentro il chip invece di
          spingere la riga oltre la sezione. #}
       .mon-coverage .mon-chip { white-space: normal; overflow-wrap: anywhere; }
       .mon-totals-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
@@ -71,9 +71,9 @@
       .mon-pager { display:flex; align-items:center; gap:12px; justify-content:center; padding:8px 0; }
       .mon-pager .mon-btn[disabled] { opacity:.4; cursor:default; }
       .mon-pager-info { font-family: "Space Mono", ui-monospace, monospace; font-size:12px; color:var(--ink-soft); }
-      {# Solo l'identita' cartografica: navy, carta, unico accento #e4572e. Gli
+      {# Solo l'identità cartografica: navy, carta, unico accento #e4572e. Gli
          stati si distinguono per peso, riempimento, bordo (pieno/tratteggiato) e
-         opacita', non per colori nuovi. Accento pieno = cio' che si lavora ora;
+         opacità, non per colori nuovi. Accento pieno = ciò che si lavora ora;
          navy pieno = fatto; contorno accento = quasi fatto; neutro = in coda. #}
       .mon-status { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; padding:2px 8px; border-radius:4px; border:1px solid var(--line); background:var(--paper); color:var(--ink-soft); white-space:nowrap; }
       .mon-status--da-correggere { background:var(--accent); color:var(--paper); border-color:var(--accent); }
@@ -94,8 +94,8 @@
         table.mon-cards thead { position:absolute; left:-9999px; }
         table.mon-cards { border:0; }
         table.mon-cards tr { border:1px solid var(--line); border-radius:8px; margin-bottom:10px; padding:4px 2px; background:#fff; }
-        {# Cella a blocco, non flex: l'etichetta sta sopra e il valore sotto, cosi'
-           i <br> e i <small> di Indicatore e Prossimo passo restano su piu' righe
+        {# Cella a blocco, non flex: l'etichetta sta sopra e il valore sotto, così
+           i <br> e i <small> di Indicatore e Prossimo passo restano su più righe
            invece di accalcarsi in fila. #}
         table.mon-cards td { border:0; border-bottom:1px solid var(--line); white-space:normal; display:block; padding:6px 10px; }
         table.mon-cards tr td:last-child { border-bottom:0; }

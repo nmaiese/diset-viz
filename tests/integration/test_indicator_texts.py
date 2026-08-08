@@ -128,16 +128,16 @@ class ArticleStructure(unittest.TestCase):
         """La coerenza di `roles_covered`, non il divieto di usarlo.
 
         Fino ad agosto 2026 questo test asseriva che l'elenco fosse **vuoto**:
-        nessun articolo poteva dichiarare `roles_covered`, cioe' nessuno poteva
+        nessun articolo poteva dichiarare `roles_covered`, cioè nessuno poteva
         usare il solo meccanismo costruito per non aprire sulla definizione.
         Progettato, implementato, documentato in `docs/INDICATOR_PAGES.md`, e
-        usato da 0 file su 375, perche' un test lo vietava. Il freno di
+        usato da 0 file su 375, perché un test lo vietava. Il freno di
         sicurezza di un rilascio graduale era diventato il motivo per cui il
         rilascio non partiva mai, e intanto 52 articoli su 52 aprivano allo
         stesso modo.
 
-        Adesso il vincolo e' quello vero: se opti, dichiara ruoli che esistono,
-        e `definizione` resta l'unico assorbibile, perche' quadro, dinamica e
+        Adesso il vincolo è quello vero: se opti, dichiara ruoli che esistono,
+        e `definizione` resta l'unico assorbibile, perché quadro, dinamica e
         limiti sono l'articolo.
         """
         wrong = []
@@ -146,7 +146,7 @@ class ArticleStructure(unittest.TestCase):
             if not declared:
                 continue
             if not isinstance(declared, list):
-                wrong.append((key, "roles_covered non e' una lista"))
+                wrong.append((key, "roles_covered non è una lista"))
                 continue
             known = set(indicator_texts.DEFAULT_HEADINGS)
             unknown = [role for role in declared if role not in known]
@@ -162,7 +162,7 @@ class ArticleStructure(unittest.TestCase):
 class VariableSectionsAreOptIn(unittest.TestCase):
     """Le sezioni variabili: un'entry che dichiara `roles_covered` assorbe la
     definizione nel blocco "Come leggere" invece di aprire con la metodologia.
-    Senza il campo, il comportamento e' identico a prima."""
+    Senza il campo, il comportamento è identico a prima."""
 
     OPT_IN = {
         "level": "regione", "lead": "Un lead che apre sulla geografia.",
@@ -179,7 +179,7 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         "sections": [
             {"role": "definizione", "h": None, "body": "Che cosa misura."},
             {"role": "quadro", "h": None, "body": "Come si distribuisce."},
-            {"role": "dinamica", "h": None, "body": "Come e' cambiato."},
+            {"role": "dinamica", "h": None, "body": "Come è cambiato."},
             {"role": "limiti", "h": None, "body": "Che cosa non dice."},
         ],
     }
@@ -193,7 +193,7 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         "sections": [
             {"role": "quadro", "h": "Il vertice", "body": "Corpo quadro."},
             {"role": "dinamica", "h": "La distanza si chiude", "body": "Primo corpo dinamica."},
-            {"role": "dinamica", "h": "Il gruppo piu' in basso", "body": "Secondo corpo dinamica."},
+            {"role": "dinamica", "h": "Il gruppo più in basso", "body": "Secondo corpo dinamica."},
             {"role": "limiti", "h": "Che cosa non dice", "body": "Corpo limiti."},
         ],
     }
@@ -205,11 +205,11 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         seconda sovrascriveva la prima: la pagina rendeva **due volte lo stesso
         corpo** e perdeva l'altro. Uscito dal primo giro della macchina nuova su
         `ter-30`. `officina.pubblica` adesso rifiuta i ruoli doppi, ma il
-        renderer deve reggere le entry gia' committate e quelle scritte a mano.
+        renderer deve reggere le entry già committate e quelle scritte a mano.
         """
         art = self._build(self.DUE_DINAMICHE)
         corpi = [s["body"] for s in art["sections"]]
-        self.assertEqual(len(corpi), len(set(corpi)), "una sezione e' stata resa due volte")
+        self.assertEqual(len(corpi), len(set(corpi)), "una sezione è stata resa due volte")
         self.assertIn("Primo corpo dinamica.", corpi)
         self.assertIn("Secondo corpo dinamica.", corpi)
 
@@ -219,7 +219,7 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         self.assertTrue(art["come_leggere"])
 
     def test_the_coherence_guard_accepts_a_well_formed_opt_in(self):
-        """Il divieto e' caduto davvero, non solo sulla carta.
+        """Il divieto è caduto davvero, non solo sulla carta.
 
         La guardia che prima vietava `roles_covered` adesso ne controlla la
         coerenza. Un test che gira su un catalogo dove nessuno opta ancora non
@@ -230,7 +230,7 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         guard.test_an_opted_in_article_declares_a_coherent_set_of_roles()
 
     def test_the_coherence_guard_still_catches_a_broken_opt_in(self):
-        """E la guardia non e' diventata un colabrodo mentre smetteva di vietare."""
+        """E la guardia non è diventata un colabrodo mentre smetteva di vietare."""
         guard = ArticleStructure("test_an_opted_in_article_declares_a_coherent_set_of_roles")
         guard.texts = {"432": dict(self.OPT_IN, roles_covered=["inventato"])}
         with self.assertRaises(AssertionError):
@@ -244,7 +244,7 @@ class VariableSectionsAreOptIn(unittest.TestCase):
             guard.test_an_opted_in_article_declares_a_coherent_set_of_roles()
 
     def test_a_partial_declaration_still_renders_the_three_substantive_roles(self):
-        """Solo la definizione e' assorbibile. Senza questa invariante nel
+        """Solo la definizione è assorbibile. Senza questa invariante nel
         renderer, un `roles_covered` scritto male (o parziale) toglieva dalla
         pagina pubblica `dinamica` e `limiti` invece di comporli dallo
         scheletro: due sezioni perse per un errore di battitura in un JSON."""
@@ -254,9 +254,9 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         self.assertTrue(art["come_leggere"])
 
     def test_an_empty_declaration_is_still_a_declaration(self):
-        """`roles_covered: []` non e' il campo assente: e' una dichiarazione che
+        """`roles_covered: []` non è il campo assente: è una dichiarazione che
         non nomina la definizione, quindi la assorbe come farebbe `["quadro"]`.
-        Un test di verita' le confondeva, e la stessa entry rendeva quattro
+        Un test di verità le confondeva, e la stessa entry rendeva quattro
         sezioni in una forma e tre nell'altra."""
         art = self._build(dict(self.LEGACY, roles_covered=[]))
         self.assertEqual([s["role"] for s in art["sections"]],
@@ -264,8 +264,8 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         self.assertTrue(art["come_leggere"])
 
     def test_an_absorbed_section_stops_weighing_on_the_fingerprint(self):
-        """Una sezione assorbita resta nel file e non e' piu' in pagina, quindi il
-        verificatore non puo' leggerla: continuare a pesarla avrebbe fatto scadere
+        """Una sezione assorbita resta nel file e non è più in pagina, quindi il
+        verificatore non può leggerla: continuare a pesarla avrebbe fatto scadere
         la verifica a ogni ritocco di un testo invisibile."""
         from scripts import verification_queue as vq
         absorbed = dict(self.LEGACY, roles_covered=["quadro", "dinamica", "limiti"])
@@ -276,7 +276,7 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         ])
         self.assertEqual(vq.prose_fingerprint(absorbed), vq.prose_fingerprint(edited))
         # La stessa modifica su un articolo che la definizione la rende cambia
-        # l'impronta, come e' sempre stato.
+        # l'impronta, come è sempre stato.
         legacy_edited = dict(self.LEGACY, sections=edited["sections"])
         self.assertNotEqual(vq.prose_fingerprint(dict(self.LEGACY)),
                             vq.prose_fingerprint(legacy_edited))
@@ -289,7 +289,7 @@ class VariableSectionsAreOptIn(unittest.TestCase):
 
     def test_roles_covered_does_not_enter_the_prose_fingerprint(self):
         """La chiave di sicurezza: dichiarare i quattro ruoli non tocca
-        l'impronta, perche' la pagina rende esattamente come prima. I trecento
+        l'impronta, perché la pagina rende esattamente come prima. I trecento
         articoli esistenti, che il campo non ce l'hanno, tanto meno."""
         from scripts import verification_queue as vq
         without = dict(self.LEGACY)
@@ -297,12 +297,12 @@ class VariableSectionsAreOptIn(unittest.TestCase):
         self.assertEqual(vq.prose_fingerprint(without), vq.prose_fingerprint(with_field))
 
     def test_absorbing_the_definizione_does_change_the_fingerprint(self):
-        """L'altra meta', e senza di essa il campo era una scorciatoia per
-        cambiare la pagina senza riverificarla: un'entry gia' verificata poteva
+        """L'altra metà, e senza di essa il campo era una scorciatoia per
+        cambiare la pagina senza riverificarla: un'entry già verificata poteva
         togliersi la definizione dalla pagina senza toccare una parola di prosa,
         la verifica vecchia continuava a combaciare, e una smentita appesa alla
         definizione ora nascosta restava aperta su una sezione che nessuno vede
-        piu'. Cambiare cio' che la pagina mostra e' un cambio della pagina."""
+        più. Cambiare ciò che la pagina mostra è un cambio della pagina."""
         from scripts import verification_queue as vq
         absorbed = dict(self.LEGACY, roles_covered=["quadro", "dinamica", "limiti"])
         self.assertNotEqual(vq.prose_fingerprint(dict(self.LEGACY)),
@@ -310,7 +310,7 @@ class VariableSectionsAreOptIn(unittest.TestCase):
 
 
 class SectionsUseKnownRoles(unittest.TestCase):
-    """Il contratto sui ruoli doppi ha **due meta' opposte, e sono volute**:
+    """Il contratto sui ruoli doppi ha **due metà opposte, e sono volute**:
 
     - **scrittore severo**: `officina.pubblica` rifiuta una bozza con due
       sezioni dello stesso ruolo (`test_officina_pubblica.py`), e nessun
@@ -318,11 +318,11 @@ class SectionsUseKnownRoles(unittest.TestCase):
     - **lettore tollerante**: `indicator_texts.build_article` rende **entrambi**
       i corpi se li trova (`ADuplicatedRoleLosesNoBody`).
 
-    Chi ne vedesse una sola meta' la leggerebbe come un'incoerenza e
-    "aggiusterebbe" quella sbagliata. La severita' in scrittura esiste perche' il
-    contratto e' una sezione per ruolo; la tolleranza in lettura esiste perche'
+    Chi ne vedesse una sola metà la leggerebbe come un'incoerenza e
+    "aggiusterebbe" quella sbagliata. La severità in scrittura esiste perché il
+    contratto è una sezione per ruolo; la tolleranza in lettura esiste perché
     trecento entry scritte a mano non sono passate da nessun comando, e un corpo
-    perso in silenzio e' peggio di un articolo con un H2 di troppo.
+    perso in silenzio è peggio di un articolo con un H2 di troppo.
     """
 
     def setUp(self):
@@ -396,7 +396,7 @@ class SectionsUseKnownRoles(unittest.TestCase):
 
 
 class ADuplicatedRoleLosesNoBody(unittest.TestCase):
-    """La meta' tollerante del contratto, che finora non provava nessuno.
+    """La metà tollerante del contratto, che finora non provava nessuno.
 
     `build_article` indicizzava le sezioni per ruolo. Un'entry con due
     `dinamica` (la macchina nuova ne ha scritta una al primo giro, con due
@@ -406,7 +406,7 @@ class ADuplicatedRoleLosesNoBody(unittest.TestCase):
 
     I test che esistevano intorno provano tutti l'**assenza** di duplicati
     (`officina.pubblica` li rifiuta, nessun articolo committato ne ha). Nessuno
-    provava la **tolleranza**, cioe' la riparazione vera, che protegge le
+    provava la **tolleranza**, cioè la riparazione vera, che protegge le
     trecento entry scritte a mano che non sono passate da nessun comando.
     """
 
@@ -428,13 +428,13 @@ class ADuplicatedRoleLosesNoBody(unittest.TestCase):
 
     def test_no_body_is_rendered_twice(self):
         """Il difetto non era solo "un corpo perso": era anche "un corpo
-        duplicato". Perderne uno senza accorgersene e' invisibile, vederne due
-        uguali in pagina e' l'unico sintomo che qualcuno poteva notare."""
+        duplicato". Perderne uno senza accorgersene è invisibile, vederne due
+        uguali in pagina è l'unico sintomo che qualcuno poteva notare."""
         corpi = [s["body"] for s in self._article()["sections"] if s["body"]]
         self.assertEqual(len(corpi), len(set(corpi)))
 
     def test_each_body_keeps_its_own_heading(self):
-        """Le due sezioni hanno titoli diversi, ed e' il motivo per cui erano
+        """Le due sezioni hanno titoli diversi, ed è il motivo per cui erano
         due: appaiarle al corpo sbagliato sarebbe un altro modo di perderle."""
         appaiati = {s["body"]: s["heading"] for s in self._article()["sections"] if s["body"]}
         self.assertEqual(appaiati["Primo corpo di dinamica."], "La rincorsa")
@@ -634,29 +634,29 @@ class ArticleVintageDrift(unittest.TestCase):
         )
 
     def test_every_key_resolves_to_an_indicator(self):
-        """Due domande e non una, perche' ci sono due modi legittimi di esistere.
+        """Due domande e non una, perché ci sono due modi legittimi di esistere.
 
         La guardia chiedeva solo al catalogo dell'atlante, e il catalogo per
         costruzione non conosce le serie BES solo provinciali: senza copertura
-        regionale non c'e' niente da canonicalizzare, quindi non entrano. Una
-        pagina pero' ce l'hanno, e risponde 200 (`app/indicator_view.py`, il ramo
+        regionale non c'è niente da canonicalizzare, quindi non entrano. Una
+        pagina però ce l'hanno, e risponde 200 (`app/indicator_view.py`, il ramo
         `payload is None`).
 
-        Cosi' tre strumenti della catena si contraddicevano sulla stessa chiave:
+        Così tre strumenti della catena si contraddicevano sulla stessa chiave:
         `text_queue` offriva `bes-10AMB001P` come lavoro da scrivere, la pagina
         rendeva l'articolo, e questa guardia lo dichiarava orfano. L'articolo sul
-        PM10 e' rimasto scritto e non pubblicabile, e con lui ogni altro
+        PM10 è rimasto scritto e non pubblicabile, e con lui ogni altro
         indicatore solo provinciale della coda.
 
-        La protezione non si allarga: una chiave inventata non risolve ne' nel
-        catalogo ne' nella vista, e resta orfana come prima.
+        La protezione non si allarga: una chiave inventata non risolve né nel
+        catalogo né nella vista, e resta orfana come prima.
         """
         orphans = [key for key in self.texts
                    if get_atlas_indicator(key) is None and _view(key) is None]
         self.assertEqual(orphans, [], f"articles for missing indicators: {orphans[:10]}")
 
     def test_an_invented_key_is_still_an_orphan(self):
-        """Il rischio di allargare una guardia e' spegnerla. Questa resta accesa."""
+        """Il rischio di allargare una guardia è spegnerla. Questa resta accesa."""
         self.assertIsNone(get_atlas_indicator("bes:NON-ESISTE-999"))
         self.assertIsNone(_view("bes:NON-ESISTE-999"))
 
@@ -682,7 +682,7 @@ class ArticleAgainstTheData(unittest.TestCase):
     """
 
     # I pattern, le esclusioni e la logica stanno in `officina/lint.py`: qui
-    # c'erano le uniche copie, e una copia in un file di test e' una copia che
+    # c'erano le uniche copie, e una copia in un file di test è una copia che
     # nessuno aggiorna quando cambia la prosa.
     NUMBER, ABOVE, BELOW, STATE = lint.NUMBER, lint.ABOVE, lint.BELOW, lint.STATE
     HEDGE, A_GAP = lint.HEDGE, lint.A_GAP
@@ -725,7 +725,7 @@ class ArticleAgainstTheData(unittest.TestCase):
         """Il verso che la prosa provinciale usa davvero.
 
         Qui gli interi contano, con una tolleranza di mezzo punto: su una serie
-        provinciale come il PM10 un intero e' il valore, non un'approssimazione,
+        provinciale come il PM10 un intero è il valore, non un'approssimazione,
         e saltarlo lasciava scoperta l'intera famiglia.
         """
         wrong = []
@@ -765,11 +765,11 @@ class ArticleAgainstTheData(unittest.TestCase):
         self.assertEqual(wrong, [], f"claims the data contradicts: {wrong[:10]}")
 
     def test_the_guard_actually_reaches_the_provinces(self):
-        """Una guardia che non copre piu' niente non lo dice da sola.
+        """Una guardia che non copre più niente non lo dice da sola.
 
-        E' esattamente come sono passati i 67 indicatori provinciali: i test
+        È esattamente come sono passati i 67 indicatori provinciali: i test
         sopra giravano, non incontravano nessun nome, e restavano verdi. Questo
-        e' il test che si accorge dello spegnimento.
+        è il test che si accorge dello spegnimento.
         """
         provincial = {key: entry for key, entry in self.texts.items()
                       if _level_of(entry) == "provincia"}
@@ -787,10 +787,10 @@ class ArticleAgainstTheData(unittest.TestCase):
     def test_a_wrong_figure_does_not_slip_through(self):
         """Verde per merito, non per inerzia.
 
-        Le due guardie sono passate per mesi perche' non incontravano niente da
-        controllare. Qui la prosa e' sintetica: se una di queste smette di
+        Le due guardie sono passate per mesi perché non incontravano niente da
+        controllare. Qui la prosa è sintetica: se una di queste smette di
         vedere una cifra sbagliata, il test lo dice subito, senza dipendere da
-        che cosa c'e' scritto oggi negli articoli.
+        che cosa c'è scritto oggi negli articoli.
         """
         # I due pattern portano il numero in gruppi opposti: nel primo la cifra
         # precede il territorio, nel secondo lo segue.
@@ -812,7 +812,7 @@ class ArticleAgainstTheData(unittest.TestCase):
             with self.subTest(text=text):
                 match = self.TERRITORY_STATES_VALUE.search(text)
                 self.assertFalse(match and self._states_a_value(text, match),
-                                 "questa non e' una cifra da confrontare")
+                                 "questa non è una cifra da confrontare")
 
 
 class ArticleRendering(unittest.TestCase):
@@ -867,8 +867,8 @@ class ArticleRendering(unittest.TestCase):
         by_role = {section["role"]: section for section in article["sections"]}
         self.assertEqual(by_role["quadro"]["heading"], "Un titolo scritto a mano")
         # I ruoli che l'entry non scrive si compongono e prendono
-        # l'intestazione di default. Un articolo a meta' non dichiara niente,
-        # quindi la definizione resta: e' il caso dei trecento incompleti.
+        # l'intestazione di default. Un articolo a metà non dichiara niente,
+        # quindi la definizione resta: è il caso dei trecento incompleti.
         self.assertEqual(
             by_role["definizione"]["heading"],
             indicator_texts.DEFAULT_HEADINGS["definizione"],
@@ -906,10 +906,10 @@ class ArticleRendering(unittest.TestCase):
     def test_the_authored_order_survives_to_the_page(self):
         """La sequenza che chi scrive sceglie non si riordina al render.
 
-        Il pacchetto gli dice che la struttura nasce dall'angolo piu' forte, e
+        Il pacchetto gli dice che la struttura nasce dall'angolo più forte, e
         la prima prova ha prodotto `quadro, limiti, dinamica`: la pagina lo
-        rimetteva in ordine canonico, cioe' buttava via l'unica cosa che rompe
-        lo stampo. Una promessa fatta a chi scrive e disfatta al render e'
+        rimetteva in ordine canonico, cioè buttava via l'unica cosa che rompe
+        lo stampo. Una promessa fatta a chi scrive e disfatta al render è
         peggio di una promessa non fatta.
         """
         entry = {"sections": [

@@ -1,8 +1,8 @@
-"""La calibrazione: la forza e' quanto e' raro, non quanto e' grande.
+"""La calibrazione: la forza è quanto è raro, non quanto è grande.
 
 Il difetto che questa tabella corregge era misurabile, e i due test sul file
 vero lo tengono corretto: prima della calibrazione un tipo solo apriva il
-57,7% degli articoli, che e' l'uniformita' rientrata al livello dell'angolo.
+57,7% degli articoli, che è l'uniformità rientrata al livello dell'angolo.
 """
 import json
 import unittest
@@ -18,7 +18,7 @@ class TheTable(unittest.TestCase):
         })
         self.assertIn("abbondante", table)
         self.assertNotIn("scarso", table,
-                         "calibrare su tre osservazioni e' prendere il rumore "
+                         "calibrare su tre osservazioni è prendere il rumore "
                          "per una distribuzione")
         self.assertEqual(len(table["abbondante"]), calibration.QUANTILES + 1)
 
@@ -62,12 +62,12 @@ class TheTableOnDisk(unittest.TestCase):
             self.assertEqual(len(table[kind]), calibration.QUANTILES + 1)
 
     def test_every_calibrated_type_is_a_type_a_detector_can_emit(self):
-        """Una tabella che calibra tipi inesistenti e' una tabella vecchia.
+        """Una tabella che calibra tipi inesistenti è una tabella vecchia.
 
-        L'elenco e' il registro dei nomi legali, e comprende anche i due tipi a
+        L'elenco è il registro dei nomi legali, e comprende anche i due tipi a
         forza fissa che nella tabella non entrano mai (`rottura-di-metodo`,
         `gruppi-che-si-sorpassano`): un tipo assente da qui e presente nella
-        tabella e' il difetto che questo test cerca, e il verso opposto e'
+        tabella è il difetto che questo test cerca, e il verso opposto è
         legittimo per costruzione."""
         emitted = {
             "rottura-di-pendenza", "accelerazione", "rallentamento",
@@ -91,9 +91,9 @@ class ItChangesTheOrder(unittest.TestCase):
         saved = calibration._table
         try:
             calibration._table = {
-                # un tipo dove 0,8 e' ordinario
+                # un tipo dove 0,8 è ordinario
                 "comune": [0.7 + step / 100 for step in range(21)],
-                # e uno dove 0,8 e' fuori dal comune
+                # e uno dove 0,8 è fuori dal comune
                 "raro": [step / 100 for step in range(21)],
             }
             self.assertLess(calibration.calibrate("comune", 0.8),

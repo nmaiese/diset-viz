@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Il punteggio deterministico delle eval degli agenti.
 
-La meta' non deterministica (far girare un agente su una fixture) la prepara
-`run_eval.py`. Questa meta' e' solo aritmetica su file, quindi e' ripetibile e
-si puo' provare da sola (`--self-test`): un metro che nessuno ha tarato non
+La metà non deterministica (far girare un agente su una fixture) la prepara
+`run_eval.py`. Questa metà è solo aritmetica su file, quindi è ripetibile e
+si può provare da sola (`--self-test`): un metro che nessuno ha tarato non
 misura niente.
 
     python3 evals/score_eval.py writer   <articolo.json>
@@ -11,7 +11,7 @@ misura niente.
     python3 evals/score_eval.py verifier <verdetti.json>
     python3 evals/score_eval.py --self-test
 
-Uscita 0 quando il punteggio e' stato calcolato (il numero e' il risultato,
+Uscita 0 quando il punteggio è stato calcolato (il numero è il risultato,
 non un verdetto), 1 su input illeggibile o self-test fallito. Stdlib puro.
 """
 
@@ -35,11 +35,11 @@ def blind_id(case_id: str) -> str:
     """L'id con cui un caso del gold arriva all'agente sotto eval.
 
     Gli id del gold dicono la risposta: `p01`-`p04` sono i `pass`, `r01`-`rc04`
-    i `revise`. Un giudice che li vede puo' prendere 8/8 leggendo il prefisso,
-    e una baseline che si puo' centrare senza leggere la prosa non misura piu'
-    niente. Derivato e non sorteggiato di proposito: cosi' non serve nessun file
+    i `revise`. Un giudice che li vede può prendere 8/8 leggendo il prefisso,
+    e una baseline che si può centrare senza leggere la prosa non misura più
+    niente. Derivato e non sorteggiato di proposito: così non serve nessun file
     di corrispondenza accanto alla fixture (che sarebbe la stessa fuga con un
-    passaggio in piu'), e lo scorer ricalcola la mappa da se'.
+    passaggio in più), e lo scorer ricalcola la mappa da sé.
     """
     import hashlib
 
@@ -61,10 +61,10 @@ def _article_text(data):
 def score_writer(article_path, brief_path=None):
     """Ogni cifra dell'articolo deve stare nel brief congelato.
 
-    Il controllo e' volutamente grezzo: una cifra e' lecita se compare testuale
-    nel brief, se e' un anno, o se e' un intero da 0 a 20 (ranghi e conteggi su
+    Il controllo è volutamente grezzo: una cifra è lecita se compare testuale
+    nel brief, se è un anno, o se è un intero da 0 a 20 (ranghi e conteggi su
     venti regioni). Non giudica la prosa: quella resta al lettore. Quello che
-    prende e' la classe di guasto che conta di piu' in una eval, il numero che
+    prende è la classe di guasto che conta di più in una eval, il numero che
     non viene da nessuna parte.
     """
     data = json.loads(Path(article_path).read_text(encoding="utf-8"))
@@ -95,20 +95,20 @@ def score_writer(article_path, brief_path=None):
 
 
 NEGATION_WINDOW = 12
-NEGATION_CUES = ("non e'", "non è", "non sono", "non era", "non erano")
+NEGATION_CUES = ("non è", "non è", "non sono", "non era", "non erano")
 
 
 def _corrected_by_negation(text, pattern):
     """Vero quando ogni occorrenza del pattern sta dentro una confutazione
-    esplicita ("Non e' X: ...", mossa pedagogica legittima), non come
+    esplicita ("Non è X: ...", mossa pedagogica legittima), non come
     un'affermazione sopravvissuta alla revisione.
 
     Il caso reale (CANARY.md, riga del 2026-08-06 sul produttore): l'errore
     piantato `e02` era "quota di donne sul totale degli occupati", e la
-    revisione l'ha corretto scrivendo "**Non e'** la quota di donne sul totale
-    degli occupati: al denominatore c'e' la popolazione femminile". Il pattern
-    e' ancora nel testo, quindi contava come sopravvissuto: un falso negativo
-    dello scorer, non un errore reale, perche' un match a sola sottostringa non
+    revisione l'ha corretto scrivendo "**Non è** la quota di donne sul totale
+    degli occupati: al denominatore c'è la popolazione femminile". Il pattern
+    è ancora nel testo, quindi contava come sopravvissuto: un falso negativo
+    dello scorer, non un errore reale, perché un match a sola sottostringa non
     distingue "afferma la frase sbagliata" da "la nomina per smontarla".
     """
     index = text.find(pattern)
@@ -123,11 +123,11 @@ def _corrected_by_negation(text, pattern):
 def score_reviewer(corrected_dir, expected_path=None):
     """Quanti errori piantati sono spariti dal testo corretto.
 
-    Un errore conta come trovato quando la sua frase non c'e' piu' (riscritta,
+    Un errore conta come trovato quando la sua frase non c'è più (riscritta,
     etichettata o tagliata) **o** quando compare solo dentro una confutazione
     esplicita (`_corrected_by_negation`). Il metro non giudica la riscrittura,
-    conta le sopravvivenze, perche' un errore piantato che sopravvive a una
-    revisione senza essere nemmeno nominato per smentirlo e' esattamente cio'
+    conta le sopravvivenze, perché un errore piantato che sopravvive a una
+    revisione senza essere nemmeno nominato per smentirlo è esattamente ciò
     che questa eval esiste per misurare.
     """
     expected = json.loads(Path(expected_path or REVIEWER_EXPECTED).read_text(encoding="utf-8"))
@@ -155,7 +155,7 @@ def score_reviewer(corrected_dir, expected_path=None):
 def score_verifier(verdicts_path, gold_path=None):
     """Verdetti dell'agente contro il gold set, con precision e recall sulle
     smentite: una smentita falsa rimanda in lavorazione un articolo giusto,
-    quindi e' l'errore che va misurato per primo."""
+    quindi è l'errore che va misurato per primo."""
     gold = json.loads(Path(gold_path or VERIFIER_GOLD).read_text(encoding="utf-8"))
     produced = json.loads(Path(verdicts_path).read_text(encoding="utf-8"))
     if isinstance(produced, dict) and "claims" in produced:
@@ -193,9 +193,9 @@ def score_admissions(verdicts_path, gold_path=None):
     """Verdetti di triage dell'ammissione contro il gold set, con precision e
     recall sugli APPROVATI: una falsa approvazione fa entrare in una pagina
     pubblica, sotto il nome del progetto, una fonte o un indicatore che non
-    doveva passare, e nessuno la rilegge. E' l'errore irreversibile della
-    catena, quindi e' quello che va misurato per primo (l'analogo della falsa
-    smentita nel verificatore). Un rinvio 'needs-info' costa poco: e' un esito
+    doveva passare, e nessuno la rilegge. È l'errore irreversibile della
+    catena, quindi è quello che va misurato per primo (l'analogo della falsa
+    smentita nel verificatore). Un rinvio 'needs-info' costa poco: è un esito
     legittimo, non un errore."""
     gold = json.loads(Path(gold_path or ADMISSIONS_GOLD).read_text(encoding="utf-8"))
     produced = json.loads(Path(verdicts_path).read_text(encoding="utf-8"))
@@ -233,16 +233,16 @@ def score_admissions(verdicts_path, gold_path=None):
 
 
 def score_reader_editor(verdicts_path, gold_path=None):
-    """Verdetti di leggibilita' del reader-editor contro il gold set, con
+    """Verdetti di leggibilità del reader-editor contro il gold set, con
     precision e recall sui REVISE.
 
-    L'errore che conta e' il FALSO PASS: un articolo corretto-ma-tecnico fatto
-    passare come leggibile resta illeggibile su una pagina pubblica, ed e' il
+    L'errore che conta è il FALSO PASS: un articolo corretto-ma-tecnico fatto
+    passare come leggibile resta illeggibile su una pagina pubblica, ed è il
     difetto stesso che il ruolo esiste per prendere (l'analogo della falsa
-    smentita mancata nel verificatore). Quindi la misura di testa e' il **recall
-    sui revise**: quanti dei tecnici il giudice becca. La precision sui revise e'
+    smentita mancata nel verificatore). Quindi la misura di testa è il **recall
+    sui revise**: quanti dei tecnici il giudice becca. La precision sui revise è
     l'altra faccia: un falso revise manda il produttore a riscrivere per niente,
-    e ogni riscrittura costa due run. Un `pass` legittimo non e' un errore."""
+    e ogni riscrittura costa due run. Un `pass` legittimo non è un errore."""
     gold = json.loads(Path(gold_path or READER_EDITOR_GOLD).read_text(encoding="utf-8"))
     produced = json.loads(Path(verdicts_path).read_text(encoding="utf-8"))
     if isinstance(produced, dict) and "cases" in produced:
@@ -253,7 +253,7 @@ def score_reader_editor(verdicts_path, gold_path=None):
     tp = fp = fn = 0
     for case_id, label in labels.items():
         # L'agente vede l'id cieco (`blind_id`), non quello del gold: si accetta
-        # l'uno o l'altro perche' la baseline gia' registrata e' stata prodotta
+        # l'uno o l'altro perché la baseline già registrata è stata prodotta
         # sugli id vecchi, e riscriverla per un cambio di etichette sarebbe
         # riscrivere una misura invece di conservarla.
         verdict = produced.get(blind_id(case_id))
@@ -290,7 +290,7 @@ def self_test():
 
     writer = score_writer(EVALS / "reviewer" / "article_a.json")
     if "54,9" not in writer["cifre_fuori_brief"]:
-        failures.append("writer: la cifra inventata 54,9 non e' stata presa")
+        failures.append("writer: la cifra inventata 54,9 non è stata presa")
 
     reviewer = score_reviewer(EVALS / "reviewer")
     if reviewer["trovati"] or len(reviewer["mancati"]) != 7:
@@ -311,15 +311,15 @@ def self_test():
             }],
         }), encoding="utf-8")
         (tmp_root / "article.json").write_text(json.dumps({
-            "lead": "Non e' la quota di donne sul totale degli occupati: "
-                    "al denominatore c'e' la popolazione femminile.",
+            "lead": "Non è la quota di donne sul totale degli occupati: "
+                    "al denominatore c'è la popolazione femminile.",
             "sections": [],
         }), encoding="utf-8")
         negation = score_reviewer(tmp_root, expected_path=expected_path)
         if negation["mancati"]:
             failures.append(
-                "reviewer: una confutazione esplicita ('Non e' X') conta ancora come "
-                "errore sopravvissuto, il falso negativo del 2026-08-06 e' tornato"
+                "reviewer: una confutazione esplicita ('Non è X') conta ancora come "
+                "errore sopravvissuto, il falso negativo del 2026-08-06 è tornato"
             )
 
     gold_as_verdicts = {
@@ -354,9 +354,9 @@ def self_test():
     if admissions["sbagliati"] or admissions["senza_verdetto"]:
         failures.append("admissions: il gold contro se stesso non fa punteggio pieno")
     if admissions["precision_approvati"] != 1.0 or admissions["recall_approvati"] != 1.0:
-        failures.append("admissions: il gold contro se stesso non da' precision/recall pieni")
+        failures.append("admissions: il gold contro se stesso non dà precision/recall pieni")
     if not naive_score["false_approvazioni"] or (naive_score["precision_approvati"] or 1) >= 1.0:
-        failures.append("admissions: 'approva tutto' non fa crollare la precision, il metro e' cieco")
+        failures.append("admissions: 'approva tuttò non fa crollare la precision, il metro è cieco")
 
     if READER_EDITOR_GOLD.exists():
         reader_gold = {
@@ -382,13 +382,13 @@ def self_test():
         if reader["sbagliati"] or reader["senza_verdetto"]:
             failures.append("reader-editor: il gold contro se stesso non fa punteggio pieno")
         if reader["precision_revise"] != 1.0 or reader["recall_revise"] != 1.0:
-            failures.append("reader-editor: il gold contro se stesso non da' precision/recall pieni")
+            failures.append("reader-editor: il gold contro se stesso non dà precision/recall pieni")
         naive_recall = naive_pass_score["recall_revise"]
         if not naive_pass_score["falsi_pass"] or (naive_recall is not None and naive_recall >= 1.0):
-            failures.append("reader-editor: 'promuovi tutto' non fa crollare il recall, il metro e' cieco")
+            failures.append("reader-editor: 'promuovi tuttò non fa crollare il recall, il metro è cieco")
         naive_prec = naive_revise_score["precision_revise"]
         if naive_prec is not None and naive_prec >= 1.0:
-            failures.append("reader-editor: 'boccia tutto' non fa crollare la precision, il metro e' cieco")
+            failures.append("reader-editor: 'boccia tuttò non fa crollare la precision, il metro è cieco")
 
     for line in failures:
         print(f"SELF-TEST FALLITO: {line}")

@@ -68,25 +68,25 @@ CURATION = "data/discovery/curation.csv"
 ISTAT_SERIES_CONFIG = "config/istat_series.yaml"
 THEME_CATEGORIES = "config/theme_categories.csv"
 
-# I tre perimetri a directory. La barra finale non e' cosmetica: e' cio' che
+# I tre perimetri a directory. La barra finale non è cosmetica: è ciò che
 # `path_allowed` usa per distinguere una directory da un file, e senza di essa
 # `content/indicators` autorizzerebbe anche `content/indicators-vecchi.json`.
 #
-# Sono directory perche' i tre registri che contengono erano file unici a cui
-# tutti gli stadi appendevano in coda, cioe' la causa meccanica di ogni
+# Sono directory perché i tre registri che contengono erano file unici a cui
+# tutti gli stadi appendevano in coda, cioè la causa meccanica di ogni
 # conflitto fra due run vicine. Un file per record toglie il conflitto invece
 # di insegnare a risolverlo.
 INDICATOR_TEXTS = "content/indicators/"
 # Il diario delle run. Ogni stadio ci scrive a fine run, quindi sta nel
-# perimetro di tutti: senza, meta' delle run (quelle che non producono altro)
-# non lascerebbe nessuna traccia, che e' esattamente il buco che il diario
+# perimetro di tutti: senza, metà delle run (quelle che non producono altro)
+# non lascerebbe nessuna traccia, che è esattamente il buco che il diario
 # esiste per chiudere.
 RUN_JOURNAL = "data/pipeline/runs/"
-# Il registro delle verifiche. Sta nel perimetro del solo verificatore, ed e'
+# Il registro delle verifiche. Sta nel perimetro del solo verificatore, ed è
 # tutto quello che quello stadio produce.
 VERIFICATIONS = "data/pipeline/verifiche/"
-# Il registro delle letture. Sta nel perimetro del solo reader-editor, ed e'
-# tutto quello che quel ruolo produce: un verdetto di leggibilita' per articolo,
+# Il registro delle letture. Sta nel perimetro del solo reader-editor, ed è
+# tutto quello che quel ruolo produce: un verdetto di leggibilità per articolo,
 # gemello del registro delle verifiche e protetto allo stesso modo (append-only,
 # righe credibili, impronta che combacia con un testo reale).
 READINGS = "data/pipeline/letture/"
@@ -99,46 +99,46 @@ READINGS = "data/pipeline/letture/"
 # Fino alla demolizione ne conteneva dieci, e sette appartenevano a ruoli
 # cancellati: `scout`, `hunter` e `promoter` fusi in `admissions` mesi fa,
 # `curator`, `writer` e `reviewer` fusi in `producer`, e `producer` stesso
-# sostituito dall'officina. Un perimetro senza un agente non e' inerte: e' un
+# sostituito dall'officina. Un perimetro senza un agente non è inerte: è un
 # permesso che resta aperto e che il primo `--stage writer` di passaggio
 # riaprirebbe, con il diritto di scrivere in `content/indicators/` fuori da
 # ogni cancello editoriale. Un cancello che elenca porte per stanze demolite
-# non e' piu' stretto di uno che le tiene aperte: e' lo stesso, scritto peggio.
+# non è più stretto di uno che le tiene aperte: è lo stesso, scritto peggio.
 #
 # I nomi vecchi restano leggibili nel diario storico (quaranta run `producer`,
 # otto `writer`, nove `scout`), e li conosce `pipeline_log.HISTORICAL_STAGES`:
-# **scrivere** una run con quel nome non si puo' piu', **rileggerla** si'.
+# **scrivere** una run con quel nome non si può più, **rileggerla** sì.
 #
-# L'officina non compare qui, e non e' una dimenticanza: non e' una run. Scrive
-# un articolo per volta con `officina.pubblica`, il suo cancello e'
+# L'officina non compare qui, e non è una dimenticanza: non è una run. Scrive
+# un articolo per volta con `officina.pubblica`, il suo cancello è
 # `officina/lint.py`, e non apre pull request.
 STAGE_PATHS = {
     # `admissions` = scout + hunter + promoter: propone la fonte, triaga il
     # candidato, promuove nel layer esterno, in una run sola.
-    # `CURATION` e `CURATED_DESCRIPTIONS` ci sono perche' l'ammissione copre
+    # `CURATION` e `CURATED_DESCRIPTIONS` ci sono perché l'ammissione copre
     # anche il vecchio stadio `curator` (`pipeline_launch.ROLE_OF_STAGE`), e una
     # curazione scrive **quattro** file, non due: la decisione
-    # (`data/discovery/curation.csv`, che e' l'input di
-    # `scripts/apply_curation.py`) e i tre che quello script produce, cioe' il
-    # layer esterno, il manifest e le descrizioni curate. Due erano gia' qui e
+    # (`data/discovery/curation.csv`, che è l'input di
+    # `scripts/apply_curation.py`) e i tre che quello script produce, cioè il
+    # layer esterno, il manifest e le descrizioni curate. Due erano già qui e
     # due no, quindi una curazione sarebbe stata respinta dal cancello sulla
-    # prima scrittura e di nuovo sull'ultima. Le due costanti esistevano gia',
+    # prima scrittura e di nuovo sull'ultima. Le due costanti esistevano già,
     # inutilizzate, e `check_curation_decisions` girava su un file che nessuno
     # stadio poteva scrivere.
-    # `THEME_CATEGORIES` c'e' per la stessa ragione, ed era il terzo buco della
+    # `THEME_CATEGORIES` c'è per la stessa ragione, ed era il terzo buco della
     # stessa forma: una serie con un tema non ancora registrato non risolve a
     # nessuna categoria, cade in "Altro" e sparisce dai totali di macroarea
-    # senza che niente fallisca. Registrarlo e' **dati**, non codice
+    # senza che niente fallisca. Registrarlo è **dati**, non codice
     # (`app.taxonomy._curated_theme_map` legge il CSV, che ha perfino le colonne
-    # `added_by` e `added_at` perche' lo scriva la catena), e
+    # `added_by` e `added_at` perché lo scriva la catena), e
     # `tests/unit/test_source_admission.py` lo pretende: senza il file nel
     # perimetro l'ammissione non poteva chiudere la propria run.
     "admissions": (SOURCE_CANDIDATES, ISTAT_SERIES_CONFIG, CANDIDATES, CURATION,
                    EXTERNAL_DATASET, EXTERNAL_MANIFEST, CURATED_DESCRIPTIONS,
                    THEME_CATEGORIES, RUN_JOURNAL),
-    # Il verificatore NON ha `INDICATOR_TEXTS`, e l'assenza e' la definizione
-    # dello stadio piu' che il suo prompt. Uno stadio che trova e ripara i propri
-    # rilievi corregge i propri compiti, che e' esattamente il difetto che questo
+    # Il verificatore NON ha `INDICATOR_TEXTS`, e l'assenza è la definizione
+    # dello stadio più che il suo prompt. Uno stadio che trova e ripara i propri
+    # rilievi corregge i propri compiti, che è esattamente il difetto che questo
     # stadio esiste per prendere un livello sopra. Le smentite tornano indietro
     # come il segnale `smentita` di `review_queue`, che le legge da qui.
     "verificatore": (VERIFICATIONS, RUN_JOURNAL),
@@ -149,17 +149,17 @@ STAGE_PATHS = {
     "reader-editor": (READINGS, RUN_JOURNAL),
 }
 
-# I ruoli che firmano cio' che scrivono, e adesso non ce n'e' nessuno.
+# I ruoli che firmano ciò che scrivono, e adesso non ce n'è nessuno.
 #
-# La firma (`reviewed_at`/`reviewed_vintage`) era la responsabilita' del
+# La firma (`reviewed_at`/`reviewed_vintage`) era la responsabilità del
 # revisore, poi del produttore che lo aveva assorbito. Nessuno dei due esiste
-# piu': l'articolo lo scrive l'officina, che non e' una run, non passa da questo
-# cancello e al posto della firma ha `origine: officina` piu' il verdetto di
+# più: l'articolo lo scrive l'officina, che non è una run, non passa da questo
+# cancello e al posto della firma ha `origine: officina` più il verdetto di
 # `officina/lint.py`. I tre ruoli rimasti non toccano `content/indicators/`,
 # quindi non hanno niente da firmare.
 #
 # La tupla resta, vuota, invece di sparire: `run` la interroga, e un ruolo
-# futuro che scriva articoli dentro una run dovra' dichiararsi qui.
+# futuro che scriva articoli dentro una run dovrà dichiararsi qui.
 ROLES_THAT_SIGN = ()
 
 # How far a green gate is allowed to go, per stage. Not uniform on purpose.
@@ -195,13 +195,13 @@ ROLES_THAT_SIGN = ()
 # probe pull request proved it by merging with the test job still running.
 MERGE_POLICY = {
     # `auto` per tutti e tre: il cancello locale gira la suite e gli invarianti
-    # prima del merge, e nessuno stadio aspetta un umano (era lo scout, ed e'
+    # prima del merge, e nessuno stadio aspetta un umano (era lo scout, ed è
     # una decisione presa). Un test tiene questa tabella allineata a
-    # `STAGE_PATHS`, che e' come la demolizione dei sette perimetri morti si e'
+    # `STAGE_PATHS`, che è come la demolizione dei sette perimetri morti si è
     # accorta di dover passare anche di qui.
     "admissions": "auto",
     "verificatore": "auto",
-    # `auto` come gli altri: il `soft` del reader-editor e' il suo verdetto che
+    # `auto` come gli altri: il `soft` del reader-editor è il suo verdetto che
     # non blocca una riscrittura, non il merge della sua run.
     "reader-editor": "auto",
 }
@@ -267,7 +267,7 @@ def _root_for(cwd=None):
     principale farebbe sparire quelli appena aggiunti nel worktree. Un diario
     committato nel worktree risulterebbe cancellato, e lo Stop hook rifiuterebbe
     una run bloccata/in errore che aveva committato correttamente la sua riga.
-    Senza cwd (o se non e' un working tree) resta il principale."""
+    Senza cwd (o se non è un working tree) resta il principale."""
     if cwd:
         code, out, _ = _git("rev-parse", "--show-toplevel", cwd=cwd)
         if code == 0 and out.strip():
@@ -279,7 +279,7 @@ def _indicators_root(cwd=None):
     """La cartella degli articoli nel working tree di `cwd` (o nel principale).
 
     Serve a `indicator_store.load_all`/`verification_queue.load_texts`, i cui root
-    sono fissati all'import del modulo: se il cancello e' importato dal checkout
+    sono fissati all'import del modulo: se il cancello è importato dal checkout
     principale ma gira con `cwd=worktree`, senza questo leggerebbero gli articoli
     del principale invece di quelli cambiati nel worktree, e un verdetto potrebbe
     validare la versione sbagliata."""
@@ -290,27 +290,27 @@ def check_base_is_usable(base=None, cwd=None):
     """La base deve poter spiegare il diff, non deve essere in cima a master.
 
     Prima qui bastava che la base **non fosse un antenato** di HEAD per
-    bocciare lo stadio, e quella severita' e' stata il difetto piu' costoso
-    della catena. Master si muove di continuo, anche solo perche' un altro
+    bocciare lo stadio, e quella severità è stata il difetto più costoso
+    della catena. Master si muove di continuo, anche solo perché un altro
     stadio ha registrato l'esito di una run, quindi ogni pull request aperta da
-    piu' di qualche minuto diventava rossa senza che il suo lavoro fosse
+    più di qualche minuto diventava rossa senza che il suo lavoro fosse
     cambiato di una virgola. Il passo di merge che rifiutava una pull request
     scriveva una riga su master, quella riga faceva diventare rosse le pull
     request degli altri stadi, e un rifiuto solo bastava a fermare la catena
     intera: un anello di retroazione fatto di controlli tutti corretti presi
     uno per uno.
 
-    La severita' non serviva nemmeno. Il diff lo misura `changed_paths` con i
+    La severità non serviva nemmeno. Il diff lo misura `changed_paths` con i
     **tre punti** (`base...HEAD`), che confronta contro la base comune, quindi
-    resta esatto anche quando master e' andato avanti. `check_no_coauthor`
-    usa i due punti, che elencano i soli commit del branch, ed e' esatto per la
-    stessa ragione. Quello che serve davvero e' che una base comune **esista**:
-    senza, non c'e' nessun diff da misurare, e li' il verdetto e' fiction sul
+    resta esatto anche quando master è andato avanti. `check_no_coauthor`
+    usa i due punti, che elencano i soli commit del branch, ed è esatto per la
+    stessa ragione. Quello che serve davvero è che una base comune **esista**:
+    senza, non c'è nessun diff da misurare, e lì il verdetto è fiction sul
     serio.
 
-    Che master sia andato avanti resta scritto nel dettaglio, perche' spiega
-    perche' la CI potrebbe vedere qualcosa che il cancello locale non vede: i
-    check remoti girano sul merge commit, quindi su branch piu' master.
+    Che master sia andato avanti resta scritto nel dettaglio, perché spiega
+    perché la CI potrebbe vedere qualcosa che il cancello locale non vede: i
+    check remoti girano sul merge commit, quindi su branch più master.
     """
     resolved = resolve_base(base, cwd=cwd)
     if not resolved:
@@ -320,7 +320,7 @@ def check_base_is_usable(base=None, cwd=None):
         return Check(
             "base",
             False,
-            f"la base '{resolved}' e HEAD non hanno nessun antenato in comune: non c'e' un diff "
+            f"la base '{resolved}' e HEAD non hanno nessun antenato in comune: non c'è un diff "
             f"da misurare. Recupera la storia (git fetch --unshallow) o passa la base con --base.",
         )
     behind, _, _ = _git("merge-base", "--is-ancestor", resolved, "HEAD", cwd=cwd)
@@ -328,8 +328,8 @@ def check_base_is_usable(base=None, cwd=None):
         return Check(
             "base",
             True,
-            f"{resolved} e' andata avanti senza questo branch: il diff resta esatto (tre punti), "
-            f"ma i check remoti girano sul merge e possono vedere di piu'.",
+            f"{resolved} è andata avanti senza questo branch: il diff resta esatto (tre punti), "
+            f"ma i check remoti girano sul merge e possono vedere di più.",
         )
     return Check("base", True, f"confronto contro {resolved}")
 
@@ -344,13 +344,13 @@ def changed_paths(base=None, cwd=None, include_worktree=True):
 
     `--untracked-files=all` e non il default. Senza, git riassume una directory
     nuova in una voce sola (`content/indicators/`), e da quando gli store sono
-    a un file per record quella e' la forma normale del lavoro di uno stadio:
-    il perimetro avrebbe giudicato un percorso che non e' un file, e
+    a un file per record quella è la forma normale del lavoro di uno stadio:
+    il perimetro avrebbe giudicato un percorso che non è un file, e
     `changed_text_keys` ne avrebbe ricavato la chiave inventata `indicators`.
 
     `include_worktree=False` guarda i soli commit e ignora `git status`. Serve al
-    passo di merge, dove il lavoro dello stadio e' gia' committato sul branch: li'
-    il working tree o e' vuoto, o (in un checkout condiviso, prima che i worktree
+    passo di merge, dove il lavoro dello stadio è già committato sul branch: lì
+    il working tree o è vuoto, o (in un checkout condiviso, prima che i worktree
     isolino le run) porta l'incompiuto di un altro ruolo, che attribuire a questa
     run era la seconda faccia del bug del checkout condiviso. Il cancello locale
     interattivo tiene True: una prova locale ha il lavoro ancora da committare.
@@ -376,24 +376,24 @@ def changed_paths(base=None, cwd=None, include_worktree=True):
 def path_allowed(path, allowed):
     """Un percorso rientra nel perimetro `allowed`.
 
-    Due forme, e la differenza sta tutta nella barra finale. Senza, la voce e'
-    un file e vale l'uguaglianza esatta, come e' sempre stato. Con, e' una
-    directory e vale il prefisso, che e' l'unico modo di autorizzare uno store
+    Due forme, e la differenza sta tutta nella barra finale. Senza, la voce è
+    un file e vale l'uguaglianza esatta, come è sempre stato. Con, è una
+    directory e vale il prefisso, che è l'unico modo di autorizzare uno store
     a un file per record senza elencarne i trecento file.
 
-    Il prefisso e' ancorato alla barra di proposito. `content/indicators` come
-    prefisso nudo autorizzerebbe `content/indicators-bozze.json`, cioe' un
+    Il prefisso è ancorato alla barra di proposito. `content/indicators` come
+    prefisso nudo autorizzerebbe `content/indicators-bozze.json`, cioè un
     percorso fuori dallo store, e un perimetro che si allarga da solo su un
-    errore di battitura non e' un perimetro.
+    errore di battitura non è un perimetro.
 
-    Dentro una directory di store passa **solo `.json`**, e nemmeno questo e'
+    Dentro una directory di store passa **solo `.json`**, e nemmeno questo è
     zelo. I tre store contengono un tipo di file solo, e tutto il resto della
-    catena lo da' per scontato: `_touched_under` cerca `.json` per sapere che
-    cosa e' cambiato, quindi un file di altro tipo sarebbe dentro il perimetro
+    catena lo dà per scontato: `_touched_under` cerca `.json` per sapere che
+    cosa è cambiato, quindi un file di altro tipo sarebbe dentro il perimetro
     e insieme invisibile a ogni controllo che legge il contenuto. Un articolo
     scritto in `content/indicators/note.txt` non renderizzerebbe da nessuna
-    parte e non farebbe fallire niente, che e' la forma di guasto che questo
-    progetto ha gia' pagato con `analyst_notes.json`.
+    parte e non farebbe fallire niente, che è la forma di guasto che questo
+    progetto ha già pagato con `analyst_notes.json`.
     """
     for entry in allowed:
         if entry.endswith("/"):
@@ -411,7 +411,7 @@ def check_blast_radius(stage, paths):
         return Check(
             "blast-radius",
             False,
-            f"lo stadio '{stage}' puo' toccare solo {', '.join(allowed)}. Fuori perimetro: {', '.join(stray)}",
+            f"lo stadio '{stage}' può toccare solo {', '.join(allowed)}. Fuori perimetro: {', '.join(stray)}",
         )
     if not paths:
         return Check("blast-radius", True, "nessun file modificato")
@@ -422,12 +422,12 @@ def _touched_under(prefix, base=None, cwd=None, include_worktree=True):
     """Quali file di uno store questo branch aggiunge, cambia o toglie.
 
     Sostituisce il confronto riga per riga che serviva quando ogni registro era
-    un file solo. Con un file per record la domanda "che cosa e' cambiato" la
+    un file solo. Con un file per record la domanda "che cosa è cambiato" la
     risponde l'elenco dei percorsi, senza rileggere e ridiffare il contenuto, e
-    la risposta e' esatta invece che dedotta: prima un articolo modificato si
-    riconosceva confrontando due JSON interi, adesso e' il nome del file.
+    la risposta è esatta invece che dedotta: prima un articolo modificato si
+    riconosceva confrontando due JSON interi, adesso è il nome del file.
 
-    Unisce i commit e il working tree, come `changed_paths`, perche' una prova
+    Unisce i commit e il working tree, come `changed_paths`, perché una prova
     locale ha il lavoro ancora non committato e un cancello che la chiama
     pulita non serve a niente.
     """
@@ -514,7 +514,7 @@ def check_hunter_decisions(rows=None, cwd=None):
         return Check(
             "triage-motivato",
             False,
-            f"definition_match=exact non e' mai automatico: {', '.join(claimed_exact[:5])}",
+            f"definition_match=exact non è mai automatico: {', '.join(claimed_exact[:5])}",
         )
     # Hard floor under an approval. The hunter approves on its own now, so the
     # things that make an indicator unusable have to be refusable without
@@ -576,21 +576,21 @@ def check_curation_decisions(rows=None, cwd=None):
 
 
 def _prose_fingerprints(rows, resolved, cwd=None, fingerprint_fn=None):
-    """Le impronte valide: quelle di adesso, piu' quelle della base.
+    """Le impronte valide: quelle di adesso, più quelle della base.
 
     Le due versioni e non solo la prima, per la ragione spiegata in
-    `check_verifications`. Della base pero' si leggono **solo** gli articoli che
+    `check_verifications`. Della base però si leggono **solo** gli articoli che
     le righe nuove citano: prima il testo stava tutto in un file e bastava un
     `git show`, adesso sono trecentosessantacinque file e leggerli tutti a ogni
-    verdetto renderebbe il cancello il passo piu' lento della catena per
+    verdetto renderebbe il cancello il passo più lento della catena per
     rispondere a una domanda su tre articoli.
 
-    `fingerprint_fn` di default e' `verification_queue.prose_fingerprint`
+    `fingerprint_fn` di default è `verification_queue.prose_fingerprint`
     (ordinata per ruolo: al verificatore l'ordine delle sezioni non dice
     niente). `check_readings` passa `reading_queue.reading_fingerprint`
-    invece, perche' il reader-editor giudica anche `structure`, dove l'ordine
-    e' proprio cio' che si giudica: le due code non possono condividere la
-    stessa impronta senza che una delle due smetta di vedere cio' che le
+    invece, perché il reader-editor giudica anche `structure`, dove l'ordine
+    è proprio ciò che si giudica: le due code non possono condividere la
+    stessa impronta senza che una delle due smetta di vedere ciò che le
     tocca.
     """
     fingerprint_fn = fingerprint_fn or verification_queue.prose_fingerprint
@@ -627,28 +627,28 @@ def check_verifications(base=None, cwd=None, include_worktree=True):
     """Il verificatore consegna dei numeri, quindi i numeri devono reggere.
 
     Ogni verifica nuova deve dire quante affermazioni ha
-    controllato, e i tre parziali devono sommare a quel totale. Non e' pignoleria
+    controllato, e i tre parziali devono sommare a quel totale. Non è pignoleria
     contabile: senza `controllate` la frase "zero smentite" e la frase "non ho
     guardato" producono lo stesso file, e uno stadio che non sa distinguerle
     costa una pull request per articolo e non garantisce niente. La 3.3 del piano
-    lo chiama il campo che non si negozia, e qui e' meccanico invece che ricordato
+    lo chiama il campo che non si negozia, e qui è meccanico invece che ricordato
     in un prompt, per la stessa ragione per cui il perimetro sta nel repo.
 
     Controlla anche che la riga parli di un articolo che esiste e che l'impronta
     della prosa sia quella del testo di adesso. Una verifica registrata su
-    un'impronta che non corrisponde a niente e' una verifica di un testo che non
-    e' in pagina, e sarebbe invisibile: la coda la scarterebbe in silenzio come
+    un'impronta che non corrisponde a niente è una verifica di un testo che non
+    è in pagina, e sarebbe invisibile: la coda la scarterebbe in silenzio come
     "da riverificare" e il conto delle smentite non tornerebbe mai.
     """
     resolved = resolve_base(base, cwd=cwd)
-    # Il registro e' **append-only**, e questo controllo viene prima di guardare le
+    # Il registro è **append-only**, e questo controllo viene prima di guardare le
     # righe nuove. Contare solo le righe aggiunte non vede le sottrazioni, quindi
     # una run che cancella una smentita e non aggiunge niente passava come "nessuna
     # verifica nuova da controllare": il segnale sparisce dalla coda del revisore
-    # con il cancello verde, che e' il modo peggiore di perdere un rilievo.
+    # con il cancello verde, che è il modo peggiore di perdere un rilievo.
     #
-    # Append-only e non solo "niente cancellazioni", perche' riscrivere una riga
-    # in posto e' la stessa cosa con un passaggio in piu': cambia che cosa dice una
+    # Append-only e non solo "niente cancellazioni", perché riscrivere una riga
+    # in posto è la stessa cosa con un passaggio in più: cambia che cosa dice una
     # verifica passata senza lasciare traccia. Una verifica si supera riscrivendo
     # l'articolo, cosa che cambia l'impronta e ne chiede una nuova, mai
     # modificando la riga vecchia.
@@ -656,7 +656,7 @@ def check_verifications(base=None, cwd=None, include_worktree=True):
     if removed:
         return Check(
             "verifiche", False,
-            f"il registro e' append-only e questa run ne toglie o riscrive "
+            f"il registro è append-only e questa run ne toglie o riscrive "
             f"{len(removed)} righe: "
             f"{', '.join(sorted(r.get('code') or '?' for r in removed)[:5])}. "
             "Per superare una verifica si riscrive l'articolo, non la sua riga.",
@@ -680,20 +680,20 @@ def check_verifications(base=None, cwd=None, include_worktree=True):
 
     # L'impronta deve corrispondere a un testo che questo repo ha davvero avuto:
     # quello di adesso, oppure quello della base. Le due versioni, e non solo la
-    # prima, perche' la prima e' stata scritta e subito smentita da un caso reale.
+    # prima, perché la prima è stata scritta e subito smentita da un caso reale.
     #
     # Un verificatore legge l'articolo, calcola l'impronta e apre la pull request.
-    # Nel frattempo la Routine del revisore puo' aver fuso una correzione sullo
+    # Nel frattempo la Routine del revisore può aver fuso una correzione sullo
     # stesso articolo: l'impronta della run resta quella del testo che ha
-    # effettivamente letto, cioe' quella della base, ed e' onesta. Pretendere
+    # effettivamente letto, cioè quella della base, ed è onesta. Pretendere
     # l'impronta di adesso bloccava una run corretta ogni volta che due stadi si
-    # incrociavano, che in una catena con due Routine al giorno non e' un caso
-    # limite. Quello che va preso e' l'impronta che non corrisponde a **niente**,
-    # cioe' scritta a mano o calcolata su un checkout che non e' questo.
-    # La tupla porta anche il livello, e non e' pignoleria: `build_queue` unisce
+    # incrociavano, che in una catena con due Routine al giorno non è un caso
+    # limite. Quello che va preso è l'impronta che non corrisponde a **niente**,
+    # cioè scritta a mano o calcolata su un checkout che non è questo.
+    # La tupla porta anche il livello, e non è pignoleria: `build_queue` unisce
     # le righe agli articoli su `(code, level)`, quindi una riga con il livello
     # sbagliato passerebbe di qui e poi non coprirebbe niente. Una smentita
-    # registrata cosi' sarebbe scritta e invisibile allo stesso tempo, che e' il
+    # registrata così sarebbe scritta e invisibile allo stesso tempo, che è il
     # modo di fallire peggiore fra quelli disponibili.
     fingerprints = _prose_fingerprints(rows, resolved, cwd=cwd)
     if not fingerprints:
@@ -725,7 +725,7 @@ def check_verifications(base=None, cwd=None, include_worktree=True):
         return Check(
             "verifiche", False,
             f"impronta della prosa che non corrisponde a nessuna versione di "
-            f"{', '.join(drifted[:5])}, ne' quella di adesso ne' quella della base. "
+            f"{', '.join(drifted[:5])}, né quella di adesso né quella della base. "
             "Ricalcolala con verification_queue.prose_fingerprint invece di scriverla.",
         )
 
@@ -740,10 +740,10 @@ def _verification_rows_removed(base=None, cwd=None, include_worktree=True):
     """Le verifiche della base che questo branch ha tolto o riscritto.
 
     Cancellare un file e riscriverlo in posto sono la stessa cosa per il
-    registro, cioe' cambiare che cosa dice una verifica gia' data, ed e'
-    esattamente cio' che l'append-only vieta. Con un file per verifica la
-    distinzione fra "aggiunta" e "riscrittura" e' il nome del file invece che
-    un confronto di righe, quindi non c'e' piu' niente da dedurre.
+    registro, cioè cambiare che cosa dice una verifica già data, ed è
+    esattamente ciò che l'append-only vieta. Con un file per verifica la
+    distinzione fra "aggiunta" e "riscrittura" è il nome del file invece che
+    un confronto di righe, quindi non c'è più niente da dedurre.
     """
     resolved = resolve_base(base, cwd=cwd)
     if not resolved:
@@ -758,17 +758,17 @@ def _verification_rows_removed(base=None, cwd=None, include_worktree=True):
 
 
 def _rows_added(directory, base=None, cwd=None, include_worktree=True):
-    """Le righe che questo branch aggiunge sotto `directory`, gia' interpretate,
-    **piu'** i file che non si e' riusciti a interpretare.
+    """Le righe che questo branch aggiunge sotto `directory`, già interpretate,
+    **più** i file che non si è riusciti a interpretare.
 
-    Le due liste tornano insieme di proposito, ed e' la correzione di un buco che
+    Le due liste tornano insieme di proposito, ed è la correzione di un buco che
     i due registri (verifiche e letture) avevano uguale: un file troncato, malformato
-    o che non e' un oggetto JSON veniva saltato in silenzio. Una run che ne aggiunge
-    uno solo arrivava percio' al cancello senza righe da controllare, il cancello
+    o che non è un oggetto JSON veniva saltato in silenzio. Una run che ne aggiunge
+    uno solo arrivava perciò al cancello senza righe da controllare, il cancello
     diceva "nessuna nuova da controllare" col verde, e la scheggia veniva fusa lo
     stesso: illeggibile per la coda, che continua a considerare quell'articolo da
     fare e a rilanciarlo, e invisibile per chiunque legga il registro. Chi chiama
-    deve poter bocciare cio' che non sa leggere, e per farlo deve saperlo.
+    deve poter bocciare ciò che non sa leggere, e per farlo deve saperlo.
     """
     rows, unreadable = [], []
     for path in _touched_under(directory, base, cwd=cwd, include_worktree=include_worktree)["added"]:
@@ -780,7 +780,7 @@ def _rows_added(directory, base=None, cwd=None, include_worktree=True):
         if isinstance(data, dict):
             rows.append(data)
         else:
-            unreadable.append(f"{path} (non e' un oggetto JSON)")
+            unreadable.append(f"{path} (non è un oggetto JSON)")
     return rows, unreadable
 
 
@@ -788,21 +788,21 @@ def check_readings(base=None, cwd=None, include_worktree=True):
     """Il reader-editor consegna un verdetto, quindi il verdetto deve reggere.
 
     La stessa forma di `check_verifications`, sull'altro registro: il reader-editor
-    e' gemello del verificatore e il suo registro va protetto uguale. Append-only
+    è gemello del verificatore e il suo registro va protetto uguale. Append-only
     prima di tutto (togliere o riscrivere una lettura passata cambia in silenzio
     che cosa un lettore aveva giudicato), poi righe credibili
     (`reading_queue.row_problems`: verdetto noto, criteri in 0-2, coerenza fra
     verdetto e criteri/fallimenti), poi l'impronta che deve corrispondere a un
     testo che questo repo ha davvero avuto, adesso o alla base. Una lettura su
     un'impronta che non combacia con niente sarebbe una lettura di un testo che
-    non e' in pagina, e la coda la scarterebbe in silenzio.
+    non è in pagina, e la coda la scarterebbe in silenzio.
     """
     resolved = resolve_base(base, cwd=cwd)
     removed = _reading_rows_removed(base, cwd=cwd, include_worktree=include_worktree)
     if removed:
         return Check(
             "letture", False,
-            f"il registro e' append-only e questa run ne toglie o riscrive "
+            f"il registro è append-only e questa run ne toglie o riscrive "
             f"{len(removed)} righe: "
             f"{', '.join(sorted(r.get('code') or '?' for r in removed)[:5])}. "
             "Per superare una lettura si riscrive l'articolo, non la sua riga.",
@@ -853,7 +853,7 @@ def check_readings(base=None, cwd=None, include_worktree=True):
         return Check(
             "letture", False,
             f"impronta della prosa che non corrisponde a nessuna versione di "
-            f"{', '.join(drifted[:5])}, ne' quella di adesso ne' quella della base. "
+            f"{', '.join(drifted[:5])}, né quella di adesso né quella della base. "
             "Ricalcolala con reading_queue.reading_fingerprint invece di scriverla.",
         )
 
@@ -928,11 +928,11 @@ def check_reviewer_signature(base=None, cwd=None, include_worktree=True):
 def changed_text_keys(base=None, cwd=None, include_worktree=True):
     """Gli articoli che questo branch ha davvero toccato.
 
-    Adesso e' l'elenco dei file, e prima non poteva esserlo. Con un JSON unico
+    Adesso è l'elenco dei file, e prima non poteva esserlo. Con un JSON unico
     il diff mostrava le **righe** cambiate, e la chiave che le possiede poteva
-    stare cento righe piu' su, quindi bisognava rileggere e confrontare due
+    stare cento righe più su, quindi bisognava rileggere e confrontare due
     oggetti interi da mezzo megabyte per sapere di quale indicatore si stesse
-    parlando. Con un file per articolo la domanda e' gia' risposta dal nome.
+    parlando. Con un file per articolo la domanda è già risposta dal nome.
     """
     touched = _touched_under(INDICATOR_TEXTS, base, cwd=cwd, include_worktree=include_worktree)
     return sorted(indicator_store.key_of(p) for p in touched["touched"])
@@ -942,28 +942,28 @@ def check_run_is_recorded(stage, paths, base=None, cwd=None, include_worktree=Tr
     """Una run che ha prodotto qualcosa deve dire di averlo fatto.
 
     Imposto qui invece che ricordato nel prompt, per la stessa ragione per cui
-    il perimetro sta nel repo: un promemoria si puo' saltare, soprattutto
-    all'ultimo passo di una run lunga, ed e' proprio la riga di diario che
+    il perimetro sta nel repo: un promemoria si può saltare, soprattutto
+    all'ultimo passo di una run lunga, ed è proprio la riga di diario che
     trasforma la catena in una cosa osservabile. Senza, l'unica traccia di un
     agente resta il commit, e le run che non ne producono restano invisibili.
 
     Vincola solo le run che hanno toccato altro. Una run a mani vuote non passa
-    di qui, perche' non ha un branch da giudicare: la sua riga di diario resta
+    di qui, perché non ha un branch da giudicare: la sua riga di diario resta
     affidata al contratto.
     """
-    # Il diario e' append-only come il registro delle verifiche, e il controllo
-    # viene per primo perche' e' l'unico che riguarda le run **passate**. Una
-    # run puo' solo aggiungere il proprio file: riscrivere quello di una run
+    # Il diario è append-only come il registro delle verifiche, e il controllo
+    # viene per primo perché è l'unico che riguarda le run **passate**. Una
+    # run può solo aggiungere il proprio file: riscrivere quello di una run
     # vecchia, o cancellarlo, vuol dire cambiare che cosa ha detto qualcun
-    # altro, ed e' l'unico modo di far sparire un `blocked` dalla storia. La
-    # riga dell'esito che il passo di merge scrive e' un file nuovo anche lei,
+    # altro, ed è l'unico modo di far sparire un `blocked` dalla storia. La
+    # riga dell'esito che il passo di merge scrive è un file nuovo anche lei,
     # quindi nessun flusso legittimo passa di qui.
     touched = _touched_under(RUN_JOURNAL, base, cwd=cwd, include_worktree=include_worktree)
     rewritten = touched["changed"] + touched["gone"]
     if rewritten:
         return Check(
             "diario", False,
-            f"il diario e' append-only e questa run ne riscrive o cancella "
+            f"il diario è append-only e questa run ne riscrive o cancella "
             f"{len(rewritten)} righe: {', '.join(sorted(rewritten)[:5])}. "
             "Una run registra la propria e non tocca quelle di prima.",
         )
@@ -986,15 +986,15 @@ def check_run_is_recorded(stage, paths, base=None, cwd=None, include_worktree=Tr
         return Check(
             "diario",
             False,
-            f"il diario e' cambiato ma nessuna riga nuova e' dello stadio '{stage}'",
+            f"il diario è cambiato ma nessuna riga nuova è dello stadio '{stage}'",
         )
     return Check("diario", True, f"{len(mine)} run registrate come '{stage}'")
 
 
 def _journal_lines_added(base=None, cwd=None, include_worktree=True):
-    """Le run che questo branch registra, gia' interpretate.
+    """Le run che questo branch registra, già interpretate.
 
-    Un file per run, quindi "aggiunta" e' letteralmente un file nuovo. La
+    Un file per run, quindi "aggiunta" è letteralmente un file nuovo. La
     versione che confrontava le righe di un `.jsonl` doveva indovinare quali
     fossero nuove leggendo il testo, e sbagliava ogni volta che due stadi
     scrivevano nello stesso punto.
@@ -1039,7 +1039,7 @@ def check_writer_vintage(base=None, cwd=None, include_worktree=True):
         return Check(
             "vintage",
             False,
-            f"impossibile verificare il vintage di {len(keys)} articoli: l'app non e' importabile "
+            f"impossibile verificare il vintage di {len(keys)} articoli: l'app non è importabile "
             f"({type(exc).__name__}). Crea il venv "
             f"(python3 -m venv .venv && .venv/bin/pip install -r requirements.txt) e rilancia.",
         )
@@ -1067,16 +1067,16 @@ def check_writer_vintage(base=None, cwd=None, include_worktree=True):
 
 
 def check_writer_roles(base=None, cwd=None, include_worktree=True):
-    """`roles_covered` e' un filtro sui quattro ruoli noti, non un vocabolario
+    """`roles_covered` è un filtro sui quattro ruoli noti, non un vocabolario
     nuovo: `app.indicator_texts.emitted_roles` ignora in silenzio ogni stringa
-    che non riconosce, perche' a render time sollevare farebbe cadere ogni
-    pagina gia' pubblicata su un refuso storico. Ma quel silenzio a render time
+    che non riconosce, perché a render time sollevare farebbe cadere ogni
+    pagina già pubblicata su un refuso storico. Ma quel silenzio a render time
     ha un costo altrove: un refuso (`dinamicha` per `dinamica`, o peggio
     `definizone` per `definizione`, l'unico ruolo omettibile) produce esattamente
-    lo stesso risultato di un'omissione voluta, e nessuna run futura puo'
+    lo stesso risultato di un'omissione voluta, e nessuna run futura può
     distinguere "l'editor non voleva la definizione" da "l'editor ha sbagliato a
-    scriverla". Qui, prima del merge, e' l'ultimo punto in cui il refuso e
-    l'omissione sono ancora distinguibili, perche' qui c'e' ancora la stringa
+    scriverla". Qui, prima del merge, è l'ultimo punto in cui il refuso e
+    l'omissione sono ancora distinguibili, perché qui c'è ancora la stringa
     grezza scritta dall'editor.
     """
     keys = changed_text_keys(base, cwd=cwd, include_worktree=include_worktree)
@@ -1103,8 +1103,8 @@ def _python():
 
 
 # I moduli che coprono la prosa e nient'altro. Una run che tocca solo articoli
-# non puo' rompere il resto: non tocca codice, non tocca dati, non tocca
-# template. Eseguire tutta la suite per 750 parole era il pezzo piu' grosso
+# non può rompere il resto: non tocca codice, non tocca dati, non tocca
+# template. Eseguire tutta la suite per 750 parole era il pezzo più grosso
 # della cerimonia che faceva costare trentotto dollari un articolo.
 CONTENT_ROOT = "content/indicators/"
 CONTENT_TESTS = (
@@ -1123,9 +1123,9 @@ def content_only(paths):
     """Il diff tocca soltanto articoli, e almeno uno?
 
     Deliberatamente stretto: basta un file fuori da `content/indicators/`
-    perche' la scorciatoia decada e la suite intera torni obbligatoria. Una
-    scorciatoia che si allarga da sola e' un cancello che si spegne da solo, ed
-    e' gia' successo in questo repo con un test che vietava `roles_covered`.
+    perché la scorciatoia decada e la suite intera torni obbligatoria. Una
+    scorciatoia che si allarga da sola è un cancello che si spegne da solo, ed
+    è già successo in questo repo con un test che vietava `roles_covered`.
     """
     touched = [path for path in paths if path.strip()]
     return bool(touched) and all(
@@ -1134,7 +1134,7 @@ def content_only(paths):
 
 def _run_suite(cwd=None, modules=None):
     """Una passata di suite. Ritorna (verdetto, riassunto, codice di uscita),
-    dove il verdetto e' 'ok', 'failed' o 'crashed'."""
+    dove il verdetto è 'ok', 'failed' o 'crashed'."""
     command = [_python(), "-X", "faulthandler", "-m", "unittest"]
     command += list(modules) if modules else ["discover", "-s", "tests"]
     result = subprocess.run(
@@ -1163,7 +1163,7 @@ def _run_suite(cwd=None, modules=None):
 def check_content_lint(paths, cwd=None):
     """Il cancello editoriale sugli articoli toccati, senza la suite.
 
-    `officina/lint.py` gira in undici secondi su tutto il catalogo e da' il
+    `officina/lint.py` gira in undici secondi su tutto il catalogo e dà il
     verdetto che conta: cifre false, caratteri vietati, gemelli, fonti
     inesistenti. Prima viveva dentro i test, quindi l'unico modo di
     interrogarlo era eseguire millecento test.
@@ -1181,28 +1181,28 @@ def check_content_lint(paths, cwd=None):
 
 
 def check_suite(cwd=None, paths=None):
-    """Il verdetto lo da' il referto di unittest, non il codice di uscita.
+    """Il verdetto lo dà il referto di unittest, non il codice di uscita.
 
-    Sembra un cavillo ed e' invece la differenza fra una catena che gira e una
+    Sembra un cavillo ed è invece la differenza fra una catena che gira e una
     ferma. Questa suite muore di SIGSEGV circa una run su venticinque, e il
-    crash non e' dove sembrava: `-X faulthandler` lo ha inchiodato dentro
+    crash non è dove sembrava: `-X faulthandler` lo ha inchiodato dentro
     `app.indicator_view.build_indicator_view`, sulla passata in cui il cruscotto
-    costruisce la vista di ogni indicatore del catalogo. La causa vera non e'
+    costruisce la vista di ogni indicatore del catalogo. La causa vera non è
     ancora nota.
 
     Ne discendono due comportamenti diversi, e confonderli costa in entrambe le
     direzioni:
 
     - **`OK` e poi morto.** I test sono passati e lo si dice a voce alta invece
-      di ingoiarlo, perche' un crash resta una cosa da sistemare anche quando non
-      e' una bocciatura.
-    - **Morto senza referto.** Non e' un fallimento, e' un'assenza di risposta.
-      Trattarlo come rosso bloccherebbe uno stadio su un guasto che non c'e', e
-      la catena e' non presidiata: nessuno rilancerebbe. Quindi si rilancia qui,
-      **una volta sola**, e la seconda risposta e' definitiva.
+      di ingoiarlo, perché un crash resta una cosa da sistemare anche quando non
+      è una bocciatura.
+    - **Morto senza referto.** Non è un fallimento, è un'assenza di risposta.
+      Trattarlo come rosso bloccherebbe uno stadio su un guasto che non c'è, e
+      la catena è non presidiata: nessuno rilancerebbe. Quindi si rilancia qui,
+      **una volta sola**, e la seconda risposta è definitiva.
 
-    Ritentare un `FAILED` sarebbe tutt'altra cosa e non si fa: quello e' un bug
-    con un referto, e nasconderlo e' esattamente cio' che questo cancello esiste
+    Ritentare un `FAILED` sarebbe tutt'altra cosa e non si fa: quello è un bug
+    con un referto, e nasconderlo è esattamente ciò che questo cancello esiste
     per impedire.
     """
     fast = content_only(paths or [])
@@ -1215,8 +1215,8 @@ def check_suite(cwd=None, paths=None):
         retry_verdict, retry_summary, retry_code = _run_suite(cwd=cwd, modules=modules)
         if retry_verdict == "crashed":
             return Check("suite", False, (
-                f"la suite e' morta senza referto due volte (uscita {code} e {retry_code}). "
-                f"Non e' una bocciatura, e' un crash: {retry_summary[:300] or 'nessun referto'}"
+                f"la suite è morta senza referto due volte (uscita {code} e {retry_code}). "
+                f"Non è una bocciatura, è un crash: {retry_summary[:300] or 'nessun referto'}"
             ))
         verdict, summary, code = retry_verdict, retry_summary, retry_code
         summary = f"{summary} (al primo tentativo l'interprete era morto senza referto)"
@@ -1226,8 +1226,8 @@ def check_suite(cwd=None, paths=None):
     if code != 0:
         signal = -code if code < 0 else code
         return Check("suite", True, (
-            f"{summary[:160]} (l'interprete e' morto in uscita, segnale {signal}: "
-            "i test passano, il crash e' a valle)"
+            f"{summary[:160]} (l'interprete è morto in uscita, segnale {signal}: "
+            "i test passano, il crash è a valle)"
         ))
     return Check("suite", True, summary[:200] or "suite verde")
 
@@ -1256,10 +1256,10 @@ def invariant_labels(stage, paths):
 
     Pure (no git, no disk): the whole point is that the dispatch can be tested
     without a tree. Smistato per **tipo-di-file toccato**, non per nome-stadio,
-    cosi' un ruolo fuso (`producer`, `admissions`) compone da solo i controlli
+    così un ruolo fuso (`producer`, `admissions`) compone da solo i controlli
     dei tipi che tocca. Ogni vecchio stadio tocca esattamente i tipi che
-    innescavano i suoi controlli, quindi per loro il risultato e' identico a
-    prima. L'unica eccezione e' la **firma**: e' del ruolo, non del file, perche'
+    innescavano i suoi controlli, quindi per loro il risultato è identico a
+    prima. L'unica eccezione è la **firma**: è del ruolo, non del file, perché
     il writer tocca `INDICATOR_TEXTS` e non deve firmare, mentre il reviewer e il
     producer toccano lo stesso file e devono.
     """
@@ -1287,9 +1287,9 @@ def run(stage, base=None, skip_tests=False, cwd=None, committed_only=False):
     """Every check for one stage, in the order a failure should be read.
 
     `committed_only=True` misura il solo diff committato e non il working tree
-    (`include_worktree=False` ovunque). Lo usa il passo di merge: li' il lavoro
-    dello stadio e' gia' committato sul branch, quindi un file non committato o
-    non c'e', o e' l'incompiuto di un altro ruolo in un checkout condiviso, e
+    (`include_worktree=False` ovunque). Lo usa il passo di merge: lì il lavoro
+    dello stadio è già committato sul branch, quindi un file non committato o
+    non c'è, o è l'incompiuto di un altro ruolo in un checkout condiviso, e
     attribuirlo a questa run era la seconda faccia del bug del checkout condiviso.
     Il cancello locale interattivo tiene False: una prova locale ha il lavoro
     ancora da committare, e un cancello cieco al working tree la chiamerebbe pulita.
@@ -1307,8 +1307,8 @@ def run(stage, base=None, skip_tests=False, cwd=None, committed_only=False):
         check_run_is_recorded(stage, paths, base, cwd=cwd, include_worktree=iw),
     ]
     # Gli invarianti di contenuto si smistano per **tipo-di-file toccato dal
-    # diff** (piu' la firma, che e' del ruolo): `invariant_labels` decide quali,
-    # ed e' pura, cosi' la composizione si prova senza git ne' disco.
+    # diff** (più la firma, che è del ruolo): `invariant_labels` decide quali,
+    # ed è pura, così la composizione si prova senza git né disco.
     builders = {
         "triage": lambda: check_hunter_decisions(cwd=cwd),
         "curation": lambda: check_curation_decisions(cwd=cwd),
@@ -1329,7 +1329,7 @@ def run(stage, base=None, skip_tests=False, cwd=None, committed_only=False):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Il cancello: dice se lo stadio puo' pubblicare da solo.",
+        description="Il cancello: dice se lo stadio può pubblicare da solo.",
         epilog="uscita 0 = verde, 1 = bloccato.",
     )
     parser.add_argument("--stage", required=True, choices=sorted(STAGE_PATHS))
@@ -1337,7 +1337,7 @@ def main():
     parser.add_argument("--skip-tests", action="store_true", help="salta la suite (solo per un triage rapido)")
     parser.add_argument("--committed-only", action="store_true",
                         help="misura il solo diff committato, ignora il working tree "
-                             "(il passo di merge lo usa: al merge il lavoro e' gia' committato)")
+                             "(il passo di merge lo usa: al merge il lavoro è già committato)")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 

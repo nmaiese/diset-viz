@@ -4,7 +4,7 @@
  "commit": "e7f0bbd",
  "detail": [
   "Rilettura degli ultimi sei (ter-611, ter-72, bes-12SER003, ter-168, ter-432, ter-60): 205 affermazioni controllate, 39 rilievi, 15 false. Sul lotto intero 392 controllate, 57 rilievi, 19 false.",
-  "Verificatore, braccio positivo, undici articoli gia' riletti: 529 controllate, 7 smentite, 3 non verificabili. Tasso 1,3% contro il 9,7% del braccio negativo sui migrati mai riletti. Tutte e dieci corrette.",
+  "Verificatore, braccio positivo, undici articoli già riletti: 529 controllate, 7 smentite, 3 non verificabili. Tasso 1,3% contro il 9,7% del braccio negativo sui migrati mai riletti. Tutte e dieci corrette.",
   "Guardia nuova: scripts/xls_reader.py, scripts/fetch_definitions.py, scripts/definition_check.py e il flag definizione di review_queue (peso 50, 45 articoli). Il segnale contraddizione trova su 364 articoli lo stesso ter-72 che aveva trovato un revisore umano."
  ],
  "gate": "manual",
@@ -12,6 +12,6 @@
  "pr": "46",
  "run_id": "legacy-reviewer-pr46",
  "stage": "reviewer",
- "summary": "Lotto 2 chiuso: sei riletture e il verificatore su undici, piu' la guardia sulle definizioni contro il foglio Metadati Istat",
+ "summary": "Lotto 2 chiuso: sei riletture e il verificatore su undici, più la guardia sulle definizioni contro il foglio Metadati Istat",
  "trigger": "manuale"
 }

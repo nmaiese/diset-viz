@@ -4627,7 +4627,7 @@ DF_BULK_DCSP_FOI1B2025_TB1;1.0;Tabelle dei coefficienti di raccordo dalla base 1
 DF_BULK_DCSP_NIC1B2015_NUTS1;1.0;Tabella dei coefficienti di raccordo da base dicembre 1998 a base 2010 e da base 2010 a base 2015 - per ripartizione
 DF_BULK_DCSP_NIC1B2015_NUTS2;1.0;Tabella dei coefficienti di raccordo da base dicembre 1998 a base 2010 e da base 2010 a base 2015 - per regione
 DF_BULK_DCSP_NIC1B2015_NUTS3;1.0;Tabella dei coefficienti di raccordo dalla base precedente alla base 2010 e dalla base 2010 alla base 2015, per provincia
-DF_BULK_DCSP_NIC1B2015_RECONNIC;1.0;RICOSTRUZIONE STORICA DEGLI INDICI DEI PREZZI AL CONSUMO PER L'INTERA COLLETTIVITA' (NIC) IN BASE 2015 =100 PER GLI ANNI 1996-2015
+DF_BULK_DCSP_NIC1B2015_RECONNIC;1.0;RICOSTRUZIONE STORICA DEGLI INDICI DEI PREZZI AL CONSUMO PER L'INTERA COLLETTIVITÀ (NIC) IN BASE 2015 =100 PER GLI ANNI 1996-2015
 DF_BULK_DCSP_NIC1B2015_SPLICECO;1.0;Tabella dei coefficienti di raccordo da base Dicembre 1998 a base 2010 e da base 2010 a base 2015 per ECOICOP per area geografica
 DF_BULK_DCSP_NIC1B2015_SPLICI;1.0;Tabella dei coefficienti di raccordo da base 2010 a base 2015 per aggregati speciali e per area geografica
 DF_BULK_DCSP_NIC1B2015_TB2;1.0;Tabella di corrispondenza classificazione e coefficienti di raccordo da base 1995 a base 2010 e da base 2010 a base 2015
@@ -4679,7 +4679,7 @@ DF_BULK_STIMEPERGR;1.0;Stime per grandi comuni e errori campionari- aggiornament
 DF_BULK_SUBCOM1991;1.0;Censimento della popolazione e delle abitazioni 1991
 DF_BULK_SUBCOM2001;1.0;Censimento della popolazione e delle abitazioni 2001
 DF_BULK_SUBCOM2011;1.0;Censimento della popolazione e delle abitazioni 2011
-DF_BULK_SUBCOM2021;1.0;Dati comuni capoluogo delle citta' metropolitane_
+DF_BULK_SUBCOM2021;1.0;Dati comuni capoluogo delle città metropolitane_
 DF_BULK_SUBCOM2023;1.0;Dati comuni capoluogo delle città metropolitane
 DF_BULK_SUBREG2021;1.0;Dati regionali
 DF_BULK_SUBREG2023;1.0;Dati regionali

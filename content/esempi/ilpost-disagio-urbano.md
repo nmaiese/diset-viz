@@ -5,7 +5,7 @@
 - **Data** 18 dicembre 2025
 - **URL** https://www.ilpost.it/2025/12/18/mappe-disagio-citta-dati-grafici/
 - **Forma di storia** un indice composito nuovo, spiegato da zero
-- **Da usare quando** l'indicatore che devi scrivere e' costruito, non misurato
+- **Da usare quando** l'indicatore che devi scrivere è costruito, non misurato
   direttamente: un indice, un rapporto tra grandezze, una soglia convenzionale
 
 ## Il testo
@@ -38,24 +38,24 @@
 > o alla singola famiglia, ma per tutelare la riservatezza deve aggregarli alle
 > aree dove abitano almeno 250 persone.
 
-## Perche' si legge al primo passaggio
+## Perché si legge al primo passaggio
 
 **La domanda viene prima della sigla.** "Come si misura il disagio?" arriva
-prima di IDISE, quindi quando la sigla compare c'e' gia' un posto dove metterla.
-Il difetto opposto, che le nostre pagine fanno spesso, e' dare il nome e poi
+prima di IDISE, quindi quando la sigla compare c'è già un posto dove metterla.
+Il difetto opposto, che le nostre pagine fanno spesso, è dare il nome e poi
 spiegarlo: il lettore tiene in memoria una parola vuota per due righe.
 
 **I nove indicatori sono infilati in una frase sola, con la stessa forma.** "la
-percentuale di famiglie a basso reddito, la percentuale di persone con piu' di
+percentuale di famiglie a basso reddito, la percentuale di persone con più di
 70 anni..." Un elenco puntato avrebbe spezzato la lettura, la ripetizione della
-stessa apertura la tiene insieme. E' impilamento buono, perche' le clausole sono
+stessa apertura la tiene insieme. È impilamento buono, perché le clausole sono
 parallele e intercambiabili: diverso dall'impilare tre idee che non si somigliano.
 
-**La soglia e' spiegata nel momento in cui compare.** "un valore di riferimento
-pari a 100: nelle aree che lo superano il disagio e' maggiore." Non c'e' un
+**La soglia è spiegata nel momento in cui compare.** "un valore di riferimento
+pari a 100: nelle aree che lo superano il disagio è maggiore." Non c'è un
 paragrafo di metodo separato che il lettore deve tenere a mente.
 
-**La cautela metodologica e' raccontata come vincolo pratico, causa prima ed
+**La cautela metodologica è raccontata come vincolo pratico, causa prima ed
 effetto dopo.** "per tutelare la riservatezza deve aggregarli alle aree dove
 abitano almeno 250 persone". Non "i dati sono aggregati a 250 persone, per
-motivi di riservatezza": prima perche', poi cosa.
+motivi di riservatezza": prima perché, poi cosa.

@@ -3,13 +3,13 @@
  "branch": "master",
  "commit": "3579ea4",
  "detail": [
-  "il cancello e' rosso: vintage, suite"
+  "il cancello è rosso: vintage, suite"
  ],
  "gate": "blocked",
  "outcome": "blocked",
  "pr": "54",
  "run_id": "legacy-writer-pr54",
  "stage": "writer",
- "summary": "PR #54 non fusa: il cancello e' rosso",
+ "summary": "PR #54 non fusa: il cancello è rosso",
  "trigger": "manuale"
 }

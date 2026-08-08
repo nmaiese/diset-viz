@@ -2,7 +2,7 @@
 
 Nucleo puro (`board`, `headline`): ogni test costruisce un dossier sintetico,
 senza toccare il disco. I battiti si provano su una cartella temporanea, con
-`now` iniettato cosi' la staleness e' deterministica."""
+`now` iniettato così la staleness è deterministica."""
 
 import tempfile
 import unittest
@@ -50,8 +50,8 @@ class Board(unittest.TestCase):
         self.assertIn("in pari", b["headline"])
 
     def test_in_attesa_di_monte_is_not_counted_as_stuck(self):
-        # `in-attesa` con motivo monte-mancante e' contropressione normale, non un
-        # blocco: non deve finire fra i "bloccati" ne' nella testa.
+        # `in-attesa` con motivo monte-mancante è contropressione normale, non un
+        # blocco: non deve finire fra i "bloccati" né nella testa.
         dossier = {"ter-9": practice("ter-9", state="in-attesa", motivo="monte-mancante")}
         b = pipeline_monitor.board(dossier, today=self.TODAY)
         self.assertEqual(b["stuck"], [])
@@ -60,7 +60,7 @@ class Board(unittest.TestCase):
 
     def test_in_attesa_external_dependency_is_stuck(self):
         # Con un motivo diverso da monte-mancante (aspetta un cambio esterno) `in-attesa`
-        # e' un fermo vero, e va segnalato in testa.
+        # è un fermo vero, e va segnalato in testa.
         dossier = {"ter-10": practice("ter-10", state="in-attesa", motivo="dipendenza-esterna",
                                       flags={"needs_info": True})}
         b = pipeline_monitor.board(dossier, today=self.TODAY)
@@ -116,7 +116,7 @@ class Board(unittest.TestCase):
         self.assertEqual(row["completed_stages"], ["curator", "writer", "reviewer", "verificatore"])
         self.assertIs(row["published"], True)
         self.assertIs(row["verification_valid"], True)
-        # solo le run in d["runs"], unite per run_id, la piu' recente prima
+        # solo le run in d["runs"], unite per run_id, la più recente prima
         self.assertEqual([r["run_id"] for r in row["runs"]],
                          ["verificatore-r2", "producer-r1"])
         self.assertEqual(row["runs"][0]["summary"], "36 controllate, 0 smentite")
@@ -136,12 +136,12 @@ class Board(unittest.TestCase):
                 for d in range(1, 20)]
         b = pipeline_monitor.board({}, runs=runs, today=self.TODAY, recent=5)
         self.assertEqual(len(b["recent"]), 5)
-        self.assertEqual(b["recent"][0]["run_id"], "r19")  # il piu' recente
+        self.assertEqual(b["recent"][0]["run_id"], "r19")  # il più recente
 
     def test_a_published_indicator_reaches_the_final_phase_at_100(self):
         # Merge = pubblicazione: un indicatore fuso su master arriva all'ultima
         # fase al 100%, non resta bloccato al 75 aspettando una verifica-sito che
-        # non esiste piu'. E' l'asserzione che tiene onesto il progresso della dashboard.
+        # non esiste più. È l'asserzione che tiene onesto il progresso della dashboard.
         d = practice("ter-pub", state="pubblicata",
                      completed=["curator", "writer", "reviewer", "verificatore"])
         d.update({"published": True, "verification_valid": True})
@@ -152,7 +152,7 @@ class Board(unittest.TestCase):
         self.assertEqual(row["progress"], 100)
 
     def test_an_open_smentita_is_an_explicit_producer_action(self):
-        """Il proprietario e' il **ruolo**, con il nome che porta nel diario.
+        """Il proprietario è il **ruolo**, con il nome che porta nel diario.
 
         Era la stringa italiana `produttore`, cablata qui e in altri due rami,
         mentre il ramo generico applicava `ROLE_LABELS` e diceva `officina`: la
@@ -173,7 +173,7 @@ class Board(unittest.TestCase):
 
     def test_stale_curation_belongs_to_admissions_not_to_the_workshop(self):
         """Il ramo speciale scavalcava `ROLE_OF_STAGE`, e alla prima occasione
-        ha mentito: quando `curator` e' passato all'ammissione, il cruscotto ha
+        ha mentito: quando `curator` è passato all'ammissione, il cruscotto ha
         continuato a mandare chi lo legge a un workflow che non sa curare e non
         ha nel perimetro i quattro file della curatela."""
         d = practice("ter-vecchio", state="invalidata", flags={"stale_curation": True},
@@ -189,7 +189,7 @@ class Board(unittest.TestCase):
 
         Venivano da due: il proprietario da `ROLE_OF_STAGE`, la fase da un
         elenco scritto a mano in cui `promoter` era l'ammissione e tutto il
-        resto la produzione. Cosi' la stessa riga diceva proprietario
+        resto la produzione. Così la stessa riga diceva proprietario
         `admissions` e fase `produzione`, e i filtri per fase classificavano
         male ogni curatela, iniziale o scaduta.
         """
@@ -203,8 +203,8 @@ class Board(unittest.TestCase):
         self.assertNotEqual(fasi["produzione"], "issue")
 
     def test_an_indicator_waiting_for_its_first_curation_is_not_past_admission(self):
-        """`curator` mai fatto e' ammissione incompleta, non produzione in
-        corso: e' il ruolo che ha i file della curatela nel perimetro."""
+        """`curator` mai fatto è ammissione incompleta, non produzione in
+        corso: è il ruolo che ha i file della curatela nel perimetro."""
         d = practice("ter-nuovo", completed=[])
         d.update({"timeline": []})
         row = pipeline_monitor.board({"ter-nuovo": d}, today=self.TODAY)["rows"][0]
@@ -285,7 +285,7 @@ class WorkStatus(unittest.TestCase):
 
 class SummarizeCatalog(unittest.TestCase):
     """Il conto che deve tornare: universo dai cataloghi di famiglia (non solo
-    dal dossier), indicizzabilita', e il funnel scritti/verificati/pubblicati
+    dal dossier), indicizzabilità, e il funnel scritti/verificati/pubblicati
     ristretto agli indicatori ammessi e indicizzabili."""
 
     def test_universe_bigger_than_dossier_surfaces_not_yet_admitted(self):
@@ -351,7 +351,7 @@ class AttributeTokens(unittest.TestCase):
 
     def test_tokens_go_to_the_target_not_to_comparison_indicators(self):
         # v-1 compare nella storia di ter-1 (bersaglio) e di ter-2 (citato come
-        # confronto): il costo e' di ter-1 soltanto, e il record lo dice.
+        # confronto): il costo è di ter-1 soltanto, e il record lo dice.
         rows = [
             {"id": "ter-1", "runs": [{"run_id": "v-1"}]},
             {"id": "ter-2", "runs": [{"run_id": "v-1"}]},
@@ -388,7 +388,7 @@ class Heartbeats(unittest.TestCase):
         root = tempfile.mkdtemp()
         pipeline_monitor.write_heartbeat("producer", "producer-old", "ter-9",
                                          root=root, now="2026-07-20T10:00:00+00:00")
-        # otto giorni dopo: oltre la soglia, la sessione e' considerata caduta
+        # otto giorni dopo: oltre la soglia, la sessione è considerata caduta
         live = pipeline_monitor.read_heartbeats(root=root, now="2026-07-28T10:00:00+00:00")
         self.assertEqual(live, [])
 
@@ -438,7 +438,7 @@ class PostTokens(unittest.TestCase):
         self.assertEqual(body["stage"], "producer")
 
     def test_post_tokens_is_silent_without_env(self):
-        # senza url/segreto (ne' argomenti ne' ambiente) non fa nulla, e lo dice
+        # senza url/segreto (né argomenti né ambiente) non fa nulla, e lo dice
         import os
         saved = {k: os.environ.pop(k, None) for k in ("PIPELINE_INGEST_URL", "PIPELINE_INGEST_TOKEN")}
         try:
@@ -496,13 +496,13 @@ class ApplyOutcomes(unittest.TestCase):
     def test_overlay_is_skipped_when_the_run_is_already_committed(self):
         dossier = {"167": practice("167", state="in-lavorazione",
                                    completed=["writer", "reviewer"])}
-        dossier["167"]["runs"] = ["v1"]                    # il committato ha gia' quella run
+        dossier["167"]["runs"] = ["v1"]                    # il committato ha già quella run
         pipeline_monitor._apply_outcomes(dossier, {"167": self._snap("v1")})
         self.assertEqual(dossier["167"]["state"], "in-lavorazione")
 
     def test_an_invalidation_of_a_published_indicator_is_not_retired(self):
         # Il caso che una rete 'stessi stadi e stesso published' ritirava a torto:
-        # una smentita ha gli stessi stadi e published True del committato gia'
+        # una smentita ha gli stessi stadi e published True del committato già
         # pubblicato, cambiano solo state/flags. L'overlay deve passare.
         dossier = {"167": practice("167", state="pubblicata",
                                    completed=["writer", "reviewer", "verificatore"])}

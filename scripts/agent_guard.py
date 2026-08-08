@@ -3,16 +3,16 @@
 
 Il cancello (`pipeline_gate.py`) giudica il branch alla fine della run, e resta
 l'unico verdetto che conta. Ma tra l'inizio della run e quel verdetto un agente
-con Bash pieno puo' fare molte cose che il cancello non vede mai: un comando
+con Bash pieno può fare molte cose che il cancello non vede mai: un comando
 distruttivo non lascia un diff da giudicare, un `gh pr merge` diretto salta il
 passo di merge, una scrittura fuori perimetro viene scoperta solo quando il
-lavoro e' gia' tutto fatto. Questa guardia sposta il "no" al momento del gesto,
+lavoro è già tutto fatto. Questa guardia sposta il "no" al momento del gesto,
 come hook PreToolUse dichiarato nel frontmatter di ogni agente della catena.
 
-Non sostituisce niente: e' difesa in profondita'. La lista dei percorsi resta
+Non sostituisce niente: è difesa in profondità. La lista dei percorsi resta
 `pipeline_gate.STAGE_PATHS`, importata e mai ricopiata, per la stessa ragione
 per cui il perimetro sta nel repo e non nel prompt: una copia locale sarebbe
-gia' in disaccordo con l'originale la settimana prossima.
+già in disaccordo con l'originale la settimana prossima.
 
 Tre modi d'uso, tutti da hook (il JSON dell'evento arriva su stdin):
 
@@ -20,10 +20,10 @@ Tre modi d'uso, tutti da hook (il JSON dell'evento arriva su stdin):
     python3 scripts/agent_guard.py --stage admissions --stage launch   # perimetro a due stadi
     python3 scripts/agent_guard.py --stage verificatore --check close  # Stop / SubagentStop
 
-Uscita 0 = permesso, 2 = bloccato con la ragione su stderr, che e' il canale
+Uscita 0 = permesso, 2 = bloccato con la ragione su stderr, che è il canale
 che l'harness rilegge all'agente. Un errore interno della guardia esce 0 con
 una nota: il cancello a valle resta intero, e una guardia che si rompe non deve
-fermare una catena non presidiata su un guasto che non e' dell'agente.
+fermare una catena non presidiata su un guasto che non è dell'agente.
 
 Stdlib puro, come tutto il resto della catena.
 """
@@ -43,12 +43,12 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts import pipeline_gate  # noqa: E402  (bootstrap del path qui sopra)
 
-# Gli stadi che la guardia sa sorvegliare. Sono quelli del cancello piu' il
-# lanciatore (`launch`), che del cancello non e' uno stadio (non apre pull
-# request, non ha una voce in STAGE_PATHS) ma un agente e': non fa il lavoro di
-# nessun ruolo, legge le code e lancia, e il solo gesto che scrive nel repo e' il
+# Gli stadi che la guardia sa sorvegliare. Sono quelli del cancello più il
+# lanciatore (`launch`), che del cancello non è uno stadio (non apre pull
+# request, non ha una voce in STAGE_PATHS) ma un agente è: non fa il lavoro di
+# nessun ruolo, legge le code e lancia, e il solo gesto che scrive nel repo è il
 # battito del tick (una riga di diario, portata su master dagli script, mai da
-# Edit/Write). La voce sta qui e non in STAGE_PATHS apposta: aggiungerla la'
+# Edit/Write). La voce sta qui e non in STAGE_PATHS apposta: aggiungerla là
 # insegnerebbe al cancello uno stadio che non deve mai giudicare.
 GUARDED_STAGES = dict(pipeline_gate.STAGE_PATHS)
 GUARDED_STAGES["launch"] = (pipeline_gate.RUN_JOURNAL,)
@@ -64,11 +64,11 @@ DENY_PATTERNS = (
     (r"\bgit\s+filter-branch\b", "git filter-branch"),
     # Il merge della catena passa da scripts/pipeline_merge.py, che aspetta i
     # check remoti. `gh pr merge` diretto non aspetta niente (CLAUDE.md spiega
-    # il perche', un probe l'ha dimostrato) e qui e' vietato in ogni forma.
+    # il perché, un probe l'ha dimostrato) e qui è vietato in ogni forma.
     (r"\bgh\s+pr\s+merge\b", "gh pr merge (usa scripts/pipeline_merge.py)"),
-    # Il web per gli agenti e' WebFetch/WebSearch, che passano dai controlli
+    # Il web per gli agenti è WebFetch/WebSearch, che passano dai controlli
     # dell'harness. curl e wget li scavalcherebbero, e "scaricato ed eseguito"
-    # e' la forma di guasto che non vogliamo nemmeno dover ripulire.
+    # è la forma di guasto che non vogliamo nemmeno dover ripulire.
     (r"\bcurl\b", "curl (usa WebFetch)"),
     (r"\bwget\b", "wget (usa WebFetch)"),
     (r"\bsudo\b", "sudo"),
@@ -79,15 +79,15 @@ DENY_PATTERNS = (
 # token (o sui primi due per gh e git), un segmento per volta: un comando
 # composto con && o | viene giudicato pezzo per pezzo.
 #
-# La lista e' volutamente generosa sul leggere e stretta sull'agire fuori dal
+# La lista è volutamente generosa sul leggere e stretta sull'agire fuori dal
 # repo: python fa girare gli script della catena e la suite, git e gh pr
-# aprono la pull request, il resto e' consultazione. Quello che manca (npm,
+# aprono la pull request, il resto è consultazione. Quello che manca (npm,
 # pip fuori dal venv, docker, ...) non serve a nessuno stadio, e uno stadio a
-# cui servisse davvero e' una conversazione da avere, non un buco da lasciare.
+# cui servisse davvero è una conversazione da avere, non un buco da lasciare.
 ALLOW_SINGLE = {
-    # `bin/py` e' l'interprete del progetto (`CLAUDE.md`), e mancava: la guardia
-    # conosceva solo `python3` e `.venv/bin/python`, cioe' i due che questo
-    # ambiente non garantisce. Ogni comando che un agente e' **istruito** a
+    # `bin/py` è l'interprete del progetto (`CLAUDE.md`), e mancava: la guardia
+    # conosceva solo `python3` e `.venv/bin/python`, cioè i due che questo
+    # ambiente non garantisce. Ogni comando che un agente è **istruito** a
     # eseguire cadeva qui prima ancora di partire, compresa la suite in coda a
     # `admissions.md`. Una guardia che rifiuta il comando scritto nel contratto
     # non protegge un perimetro: ferma il lavoro e basta.
@@ -100,14 +100,14 @@ ALLOW_SINGLE = {
 }
 ALLOW_PAIRS = {
     ("git", None),          # tutto git, salvo i DENY_PATTERNS qui sopra
-    ("gh", "pr"),           # create/view/checks/diff/comment; merge e' negato sopra
+    ("gh", "pr"),           # create/view/checks/diff/comment; merge è negato sopra
     ("gh", "run"),
     ("gh", "auth"),
     (".venv/bin/pip", "install"),   # solo per ricreare l'ambiente che il gate pretende
     ("pip", "install"),
 }
 
-# Fuori dal repo l'agente puo' scrivere dove vuole: uno scratch in /tmp non
+# Fuori dal repo l'agente può scrivere dove vuole: uno scratch in /tmp non
 # arriva in nessuna pull request. Il perimetro riguarda solo il repo.
 SERVICE_PATHS = (
     # Il meta di sessione che session-start.sh scrive e pipeline_log.py legge:
@@ -117,11 +117,11 @@ SERVICE_PATHS = (
 )
 
 # Prefissi di servizio: directory usa-e-getta, fuori da ogni perimetro di stadio,
-# che pero' un agente hooked deve poter scrivere. `evals/out/` e' la cartella di
-# lavoro delle eval del canary: e' ignorata da git (non arriva in nessuna pull
-# request) e non e' in `STAGE_PATHS`, quindi senza questa deroga l'agente vero,
+# che però un agente hooked deve poter scrivere. `evals/out/` è la cartella di
+# lavoro delle eval del canary: è ignorata da git (non arriva in nessuna pull
+# request) e non è in `STAGE_PATHS`, quindi senza questa deroga l'agente vero,
 # con i suoi hook, non potrebbe girare la propria eval. La deroga chiude
-# quell'attrito senza allargare cio' che il cancello giudica.
+# quell'attrito senza allargare ciò che il cancello giudica.
 SERVICE_PREFIXES = (
     "evals/out/",
 )
@@ -142,7 +142,7 @@ def _bash_write_targets(segment, tokens):
     Best effort dichiarato: prende le redirezioni (`>`, `>>`), le destinazioni
     di `cp`/`mv` e gli argomenti di `tee`, che sono i modi ovvi di scrivere un
     file senza passare da Edit/Write. Non prova a essere una sandbox: un
-    `python3 -c` puo' scrivere dove vuole e li' restano il cancello e
+    `python3 -c` può scrivere dove vuole e lì restano il cancello e
     l'append-only. Questo controllo esiste per il caso comune, non per il
     caso ostile.
     """
@@ -168,12 +168,12 @@ def _split_top_level(command):
 
     `re.split` sul comando grezzo spaccava anche dentro una stringa fra
     virgolette: un `-m "riga\\n\\nparagrafo"` o un `--body "a; b"` si
-    spezzavano a meta', `shlex.split` falliva sul frammento con virgolette
+    spezzavano a metà, `shlex.split` falliva sul frammento con virgolette
     sbilanciate, e il ripiego produceva un token a caso che `ALLOW_SINGLE`
     respingeva. Qui si scorre il carattere per volta tenendo lo stato delle
     virgolette (comprese le sequenze `\\x` dentro le doppie, come fa la shell),
-    e si spacca solo quando non si e' dentro una di esse. Le virgolette
-    restano sempre bilanciate in ogni segmento prodotto, perche' non si puo'
+    e si spacca solo quando non si è dentro una di esse. Le virgolette
+    restano sempre bilanciate in ogni segmento prodotto, perché non si può
     incontrare un operatore non quotato mentre se ne sta chiudendo una aperta.
     """
     segments = []
@@ -225,7 +225,7 @@ def _split_top_level(command):
 
 # `NOME=$(comando interno)`: l'idioma sanzionato per aprire una PR
 # (AGENT_CONTRACT.md, pipeline-close-run/SKILL.md) cattura il numero della PR
-# cosi'. Va riconosciuto prima di tokenizzare, perche' shlex non sa cosa sia
+# così. Va riconosciuto prima di tokenizzare, perché shlex non sa cosa sia
 # `$(...)` e lo spogliatore di assegnazioni sotto avrebbe altrimenti fatto
 # match su `NOME=$(python3` come assegnazione semplice, scartando anche il
 # comando vero insieme al nome.
@@ -233,7 +233,7 @@ _CAPTURED_ASSIGNMENT = re.compile(r"\A([A-Za-z_][A-Za-z0-9_]*)=\$\((.*)\)\s*\Z",
 
 
 def _segment_verdict(segment, stages):
-    """(ok, ragione) per un singolo gesto, gia' isolato da `_split_top_level`."""
+    """(ok, ragione) per un singolo gesto, già isolato da `_split_top_level`."""
     captured = _CAPTURED_ASSIGNMENT.fullmatch(segment)
     if captured:
         return _segment_verdict(captured.group(2), stages)
@@ -253,12 +253,12 @@ def _segment_verdict(segment, stages):
     )
     if not allowed:
         return False, (
-            f"'{head}' non e' fra i comandi che questo stadio usa. Permessi: "
+            f"'{head}' non è fra i comandi che questo stadio usa. Permessi: "
             "python/python3 (script della catena e suite), git, gh pr/run/auth, "
             "lettura file (ls, cat, grep, ...). Se il lavoro richiede altro, "
             "fermati e segnalalo nella riga di diario invece di aggirare la guardia."
         )
-    # Un comando permesso puo' ancora scrivere un file: un redirect o una
+    # Un comando permesso può ancora scrivere un file: un redirect o una
     # copia sono una Write con un altro vestito, e passano dallo stesso
     # perimetro.
     for target in _bash_write_targets(segment, tokens):
@@ -293,14 +293,14 @@ def _enclosing_repo_root(resolved, cwd):
     Il perimetro si misura da qui, non dal solo `PROJECT_ROOT` dello script della
     guardia. Con i worktree l'agente lavora in un albero sorella
     (`diset-viz-runs/<run_id>`), e misurare sempre dal checkout principale
-    accettava come 'scratch esterno' qualunque scrittura nel worktree, cancello
+    accettava come 'scratch esternò qualunque scrittura nel worktree, cancello
     compreso: la `relative_to(PROJECT_ROOT)` falliva e il gesto passava. Si chiede
     a git a quale working tree appartiene il file (dalla sua cartella, poi dal
-    cwd), cosi' il perimetro vale nel worktree della run come nel principale. Se
-    il percorso non e' in nessun repo, si torna al principale, e li' la
-    `relative_to` fallira' come prima: scratch legittimo."""
+    cwd), così il perimetro vale nel worktree della run come nel principale. Se
+    il percorso non è in nessun repo, si torna al principale, e lì la
+    `relative_to` fallirà come prima: scratch legittimo."""
     for probe in (resolved.parent, Path(cwd) if cwd else None):
-        # Solo cartelle che esistono: un file nuovo puo' avere una cartella
+        # Solo cartelle che esistono: un file nuovo può avere una cartella
         # genitore non ancora creata, e git con un `cwd` inesistente solleva.
         if probe is None or not probe.is_dir():
             continue
@@ -330,7 +330,7 @@ def path_verdict(path, stages, cwd=None):
     if pipeline_gate.path_allowed(rel, allowed):
         return True, ""
     return False, (
-        f"'{rel}' e' fuori dal perimetro dello stadio "
+        f"'{rel}' è fuori dal perimetro dello stadio "
         f"({', '.join(stages)}): puoi toccare solo {', '.join(allowed)}. "
         "Il cancello bloccherebbe comunque questa run: meglio fermarla adesso."
     )
@@ -340,8 +340,8 @@ def close_verdict(stages, cwd=None):
     """(ok, ragione) alla chiusura: una run su automation/* deve avere il diario.
 
     Ripete via `pipeline_gate.check_run_is_recorded` lo stesso controllo che il
-    cancello fara' comunque, ma al momento in cui l'agente sta per fermarsi,
-    che e' l'unico momento in cui puo' ancora rimediare da solo.
+    cancello farà comunque, ma al momento in cui l'agente sta per fermarsi,
+    che è l'unico momento in cui può ancora rimediare da solo.
     """
     code, out, _ = pipeline_gate._git("rev-parse", "--abbrev-ref", "HEAD", cwd=cwd)
     branch = out.strip() if code == 0 else ""

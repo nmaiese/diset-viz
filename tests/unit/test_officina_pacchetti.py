@@ -1,7 +1,7 @@
-"""Lo stadio `prepara`: i pacchetti su disco, e cio' che viaggia e' il percorso.
+"""Lo stadio `prepara`: i pacchetti su disco, e ciò che viaggia è il percorso.
 
 Il vincolo che decide se il workflow smaltisce l'arretrato o solo due
-indicatori: cio' che un agente **restituisce** e' output, a venticinque dollari
+indicatori: ciò che un agente **restituisce** è output, a venticinque dollari
 per milione di token. Un pacchetto pesa 6-12 mila token, quindi cinquanta
 indicatori restituiti da un agente solo sarebbero mezzo milione di token di
 puro transito, oltre i limiti pratici di una risposta. Un percorso ne pesa
@@ -33,7 +33,7 @@ class ItWritesToDiskAndHandsBackPaths(unittest.TestCase):
         with open(path, encoding="utf-8") as handle:
             text = handle.read()
         for atteso in ("Come si scrive qui", "La voce", "Il modello di registro",
-                       "ANGOLI, DAL PIU' FORTE", "La matrice, anno per territorio"):
+                       "ANGOLI, DAL PIÙ FORTE", "La matrice, anno per territorio"):
             self.assertIn(atteso, text)
 
     def test_the_legal_roles_are_stated_so_nobody_greps_for_them(self):
@@ -49,7 +49,7 @@ class ItWritesToDiskAndHandsBackPaths(unittest.TestCase):
         """Le cifre che ordinano gli angoli non arrivano a chi scrive.
 
         Tutti e quattro i giudici ciechi della prima run hanno indicato come
-        paragrafo piu' freddo quello che le trascriveva.
+        paragrafo più freddo quello che le trascriveva.
         """
         path = pacchetti.write_pack("ter-176", self.dir)
         with open(path, encoding="utf-8") as handle:
@@ -57,7 +57,7 @@ class ItWritesToDiskAndHandsBackPaths(unittest.TestCase):
         for diagnostica in ("pendenza_prima", "pendenza_dopo", "quota_spiegata",
                             "z_modificato", "salto_tipico"):
             self.assertNotIn(f"{diagnostica}:", text,
-                             f"{diagnostica} e' arrivata a chi scrive")
+                             f"{diagnostica} è arrivata a chi scrive")
 
     def test_an_unknown_code_is_reported_not_invented(self):
         packs = pacchetti.build(["ter-999999"], self.dir)
@@ -78,8 +78,8 @@ class TheLengthIsStructuralNotAWordCount(unittest.TestCase):
     chiedeva 765 e 540, una forbice del 42%, e le bozze sono uscite a 657 e
     619, una forbice del 13%. **La lunghezza convergeva invece di divergere.**
 
-    Un numero di parole e' una richiesta che un modello media; un numero di
-    angoli da sviluppare e' una richiesta che si conta.
+    Un numero di parole è una richiesta che un modello media; un numero di
+    angoli da sviluppare è una richiesta che si conta.
     """
 
     def test_no_angles_means_nothing_to_develop(self):
@@ -95,7 +95,7 @@ class TheLengthIsStructuralNotAWordCount(unittest.TestCase):
         self.assertEqual(build_module.angles_to_develop(found), 3)
 
     def test_a_rich_series_and_a_thin_one_diverge(self):
-        """E' il punto: due indicatori devono chiedere lavori diversi."""
+        """È il punto: due indicatori devono chiedere lavori diversi."""
         ricca = [{"strength": 0.9}, {"strength": 0.8}, {"strength": 0.7},
                  {"strength": 0.6}, {"strength": 0.5}]
         magra = [{"strength": 0.9}, {"strength": 0.1}]

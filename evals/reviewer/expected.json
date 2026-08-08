@@ -1,10 +1,10 @@
 {
   "_": [
     "Gli errori piantati nei due articoli fixture, uno per classe della skill",
-    "indicator-review. pattern e' un'espressione regolare che aggancia la frase",
+    "indicator-review. pattern è un'espressione regolare che aggancia la frase",
     "sbagliata NEL TESTO ORIGINALE: dopo una revisione corretta il pattern non",
-    "deve piu' comparire (riscritto, etichettato o tagliato). score_eval.py",
-    "conta trovati e mancati cosi', senza giudicare la riscrittura."
+    "deve più comparire (riscritto, etichettato o tagliato). score_eval.py",
+    "conta trovati e mancati così, senza giudicare la riscrittura."
   ],
   "indicator": "ter-178",
   "brief": "evals/writer/brief_ter-178.txt",
@@ -21,7 +21,7 @@
       "file": "article_a.json",
       "class": "definizione",
       "pattern": "quota di donne sul totale degli occupati",
-      "why": "il denominatore vero e' la popolazione femminile 15-64, non gli occupati"
+      "why": "il denominatore vero è la popolazione femminile 15-64, non gli occupati"
     },
     {
       "id": "e03",
@@ -49,14 +49,14 @@
       "file": "article_b.json",
       "class": "cifra",
       "pattern": "Puglia si ferma al 39,91",
-      "why": "il valore vero della Puglia nel 2025 e' 37,91"
+      "why": "il valore vero della Puglia nel 2025 è 37,91"
     },
     {
       "id": "e07",
       "file": "article_b.json",
       "class": "dimezzato",
-      "pattern": "piu' che dimezzato dal 2018",
-      "why": "il divario si e' ristretto di 0,92 punti: non e' nemmeno vicino alla meta'"
+      "pattern": "più che dimezzato dal 2018",
+      "why": "il divario si è ristretto di 0,92 punti: non è nemmeno vicino alla metà"
     }
   ]
 }

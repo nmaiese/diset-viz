@@ -11,8 +11,8 @@ import {
 
 const STORAGE_NICKNAME_KEY = "di-nickname";
 
-// Header Authorization con il Bearer di Supabase, se c'e' una sessione. Vuoto
-// per gli anonimi: il gioco non richiede login, l'account e' un extra.
+// Header Authorization con il Bearer di Supabase, se c'è una sessione. Vuoto
+// per gli anonimi: il gioco non richiede login, l'account è un extra.
 async function authHeaders() {
   try {
     const token = await getAccessToken();
@@ -22,8 +22,8 @@ async function authHeaders() {
   }
 }
 
-// POST a un endpoint di gioco allegando il Bearer se c'e' una sessione: cosi' il
-// server puo' attribuire statistiche e achievement all'account (anonimo = nessun
+// POST a un endpoint di gioco allegando il Bearer se c'è una sessione: così il
+// server può attribuire statistiche e achievement all'account (anonimo = nessun
 // header, comportamento invariato). Ritorna il JSON.
 export async function postGame(url, body) {
   const res = await fetch(url, {
@@ -36,7 +36,7 @@ export async function postGame(url, body) {
 }
 
 // Controllo login/logout Google, minimale. Non compare affatto se Supabase non
-// e' configurato (isAuthConfigured() falso), cosi' il gioco resta anonimo.
+// è configurato (isAuthConfigured() falso), così il gioco resta anonimo.
 export function AuthControl() {
   const [user, setUser] = useState(null);
   const [ready, setReady] = useState(false);
@@ -142,8 +142,8 @@ export function trackGameEvent(name, params = {}) {
 }
 
 // Toast di sblocco achievement in DOM puro: ogni pagina gioco monta un proprio
-// root React su un div diverso, quindi un toast imperativo appeso al body e' il
-// modo piu' semplice per mostrarlo da qualunque gioco.
+// root React su un div diverso, quindi un toast imperativo appeso al body è il
+// modo più semplice per mostrarlo da qualunque gioco.
 export function notifyAchievements(list) {
   if (!Array.isArray(list) || list.length === 0) return;
   if (typeof document === "undefined") return;
@@ -282,7 +282,7 @@ export function SubmitScoreModal({ mode, token, score, scoreLabel, onClose, onSu
     setStatus("sending");
     setError("");
     try {
-      // Se c'e' una sessione Supabase, il Bearer lega il punteggio all'account;
+      // Se c'è una sessione Supabase, il Bearer lega il punteggio all'account;
       // senza, resta anonimo (il server tratta lo user_id come opzionale).
       const response = await fetch("/api/game/leaderboard", {
         method: "POST",

@@ -6,10 +6,10 @@
  "commit": "fd63026",
  "detail": [
   "ter-13 era 2/4 sezioni (mancavano definizione e dinamica) e il quadro esistente chiudeva con una domanda retorica: riscritte tutte e quattro le sezioni, il lead e gli h2, 751 parole",
-  "definizione scritta sulla dicitura della fonte (occupati 15-64 su popolazione della stessa classe, media annua) piu' la nozione di occupato dalle FAQ Istat sulla rilevazione forze di lavoro",
+  "definizione scritta sulla dicitura della fonte (occupati 15-64 su popolazione della stessa classe, media annua) più la nozione di occupato dalle FAQ Istat sulla rilevazione forze di lavoro",
   "cifre dal brief: mediana 68,12 contro media 63,04, salto 6,39 tra Basilicata sedicesima e Puglia diciassettesima contro i 5,04 fino all'Abruzzo, Lazio dodicesimo, 2018-2025 +4,28 punti di media da 58,76 con divario -3,70, Basilicata +8,02 ed Emilia-Romagna +1,82, 2024-2025 +0,41 con sei regioni in calo di cui cinque tra le prime dieci e Veneto -0,95",
-  "incroci: ter-12 (divario 11,93 punti, denominatore diverso), ter-203 (Calabria sotto quattro donne su dieci), bes-03LAV006-N25 (mappa diversa, poco piu' di un punto tra Trentino Alto Adige e Calabria), piu' l'hub /tema/lavoro-e-conciliazione",
-  "fonti esterne verificate una per una: Istat FAQ forze di lavoro, Eurostat 2024 (UE 75,8 e Italia 67,1 sulla fascia 20-64), Eurostat regional labour market (Calabria e Campania uniche regioni UE sotto meta' a 20-64), tutte etichettate come aggregati ponderati su altra classe d'eta'",
+  "incroci: ter-12 (divario 11,93 punti, denominatore diverso), ter-203 (Calabria sotto quattro donne su dieci), bes-03LAV006-N25 (mappa diversa, poco più di un punto tra Trentino Alto Adige e Calabria), più l'hub /tema/lavoro-e-conciliazione",
+  "fonti esterne verificate una per una: Istat FAQ forze di lavoro, Eurostat 2024 (UE 75,8 e Italia 67,1 sulla fascia 20-64), Eurostat regional labour market (Calabria e Campania uniche regioni UE sotto metà a 20-64), tutte etichettate come aggregati ponderati su altra classe d'età",
   "guardie: prose_lint nessun tell e 4 link interni, definition_check nessun rilievo, suite 695 test verdi, pagina letta servita a 127.0.0.1:5050"
  ],
  "gate": "auto",

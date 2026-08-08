@@ -5,9 +5,9 @@
 - **Data** 20 maggio 2026
 - **URL** https://www.infodata.ilsole24ore.com/2026/05/20/ecco-mappa-mortalita-comuni-italia/
 - **Forma di storia** una classifica di rapporti, letta dal primo
-- **Da usare quando** il tuo indicatore e' un rapporto tra due grandezze e la
-  storia sta in chi sta in cima: il caso piu' frequente su queste pagine
-- **Il piu' pulito della libreria** al contatore: 0 tic per mille parole, 17,8
+- **Da usare quando** il tuo indicatore è un rapporto tra due grandezze e la
+  storia sta in chi sta in cima: il caso più frequente su queste pagine
+- **Il più pulito della libreria** al contatore: 0 tic per mille parole, 17,8
   parole per frase
 
 ## Il testo
@@ -32,11 +32,11 @@
 > della provincia di Torino. Le 3 morti registrate lo scorso anno hanno portato ad
 > un tasso di mortalità di 63,8 persone ogni mille residenti.
 
-## Perche' si legge al primo passaggio
+## Perché si legge al primo passaggio
 
 **Costruisce il tasso davanti al lettore invece di annunciarlo.** Prima il luogo,
 poi il numeratore (12 morti), poi il denominatore (164 residenti), poi il
-rapporto (73,2 per mille), e solo alla fine il confronto con la media che da' la
+rapporto (73,2 per mille), e solo alla fine il confronto con la media che dà la
 scala. Sono cinque informazioni e cinque frasi. Impilate diventerebbero
 esattamente il difetto che questa libreria esiste per correggere.
 
@@ -45,11 +45,11 @@ aggiornato le statistiche". Non in una nota, non in coda, non tra parentesi.
 
 **La geografia serve a dare la dimensione, non a decorare.** "un paesino di poche
 decine di abitanti", "a due passi" dal Po. Quando poi arriva il denominatore di
-164 residenti, il lettore ha gia' capito che parliamo di un posto dove dodici
-morti sono un'enormita' statistica e una tragedia piccola. E' il modo di dire un
-limite senza scriverlo: un tasso su 164 persone e' volatile, e si vede.
+164 residenti, il lettore ha già capito che parliamo di un posto dove dodici
+morti sono un'enormità statistica e una tragedia piccola. È il modo di dire un
+limite senza scriverlo: un tasso su 164 persone è volatile, e si vede.
 
 **Il secondo paragrafo ripete la stessa struttura.** Luogo, residenti, morti,
-tasso. La ripetizione della forma e' quello che rende superfluo rileggere: il
-lettore sa dove guardare. Le nostre pagine hanno la stessa possibilita' quando
+tasso. La ripetizione della forma è quello che rende superfluo rileggere: il
+lettore sa dove guardare. Le nostre pagine hanno la stessa possibilità quando
 elencano i primi tre di una classifica, e quasi mai la usano.

@@ -4,20 +4,20 @@ Il difetto che questo file esiste per impedire, trovato leggendo `ter-176` e
 non da nessuna guardia: **l'articolo scriveva "Eurostat scrive che quando
 l'economia riparte..." e il blocco fonti visibile portava solo Istat.**
 
-Perche' nessun controllo lo vedeva. L'identificatore stava nel campo `corpus`
+Perché nessun controllo lo vedeva. L'identificatore stava nel campo `corpus`
 a livello di entry; il lint validava quel campo; la pagina rendeva `fonti`, un
 altro campo, trascritto a mano. Due liste che parlavano della stessa cosa e non
 si parlavano fra loro, con in mezzo un passaggio manuale che in una catena a
 zero tempo umano non esiste.
 
 Cosa vedeva il lettore: un'attribuzione a un'istituzione **senza un modo per
-controllarla**. Su un sito di dati pubblici e' peggio di un errore, perche' un
+controllarla**. Su un sito di dati pubblici è peggio di un errore, perché un
 errore si corregge e questa somiglia a una fonte inventata.
 
 La riparazione ha tre pezzi, e questo file li tiene insieme:
 
 1. l'attribuzione ha un posto, `sections[].claims`, non una lista in coda;
-2. le fonti visibili si **derivano** da li' (`visible_sources`), non si
+2. le fonti visibili si **derivano** da lì (`visible_sources`), non si
    trascrivono;
 3. il lint blocca chi nomina un'istituzione che la pagina non mostra.
 """
@@ -68,7 +68,7 @@ class SourcesAreDerivedNotTranscribed(unittest.TestCase):
                                "claims": ["eurostat-lunga-durata-ciclo"]}]}
         urls = [item["url"] for item in indicator_texts.visible_sources(entry)]
         self.assertTrue(any("eurostat" in url for url in urls),
-                        "cio' che la prosa attribuisce non puo' restare invisibile")
+                        "ciò che la prosa attribuisce non può restare invisibile")
 
     def test_the_authored_sources_survive(self):
         """Derivare non vuol dire sostituire: la fonte del dato resta."""
@@ -85,7 +85,7 @@ class SourcesAreDerivedNotTranscribed(unittest.TestCase):
     def test_the_derived_quote_is_typographically_clean(self):
         """Le pagine non portano i quattro caratteri vietati, citazioni comprese.
 
-        L'invariante resta. Quello che cambia e' **come** si tiene: prima la
+        L'invariante resta. Quello che cambia è **come** si tiene: prima la
         citazione veniva riscritta e mostrata lo stesso fra caporali, adesso o
         si mostra intera o non si mostra. Vedi
         `AQuoteIsShownWholeOrNotAtAll`."""
@@ -105,11 +105,11 @@ class AQuoteIsShownWholeOrNotAtAll(unittest.TestCase):
     virgola era diventato una virgola, mentre `fetch_corpus --verify` l'aveva
     controllata come stringa esatta.
 
-    Le pagine pero' non portano i quattro caratteri di `content/STYLE.md`, ed e'
-    un invariante con dei test suoi. Le strade oneste sono percio' due, e questa
-    e' la seconda: mostrarla intera, oppure non mostrarla e lasciare
-    l'istituzione con il proprio link, che e' la provenienza vera. La terza,
-    mostrare parole che l'istituzione non ha scritto, non e' una strada.
+    Le pagine però non portano i quattro caratteri di `content/STYLE.md`, ed è
+    un invariante con dei test suoi. Le strade oneste sono perciò due, e questa
+    è la seconda: mostrarla intera, oppure non mostrarla e lasciare
+    l'istituzione con il proprio link, che è la provenienza vera. La terza,
+    mostrare parole che l'istituzione non ha scritto, non è una strada.
     """
 
     def _fonti(self, quote):
@@ -129,7 +129,7 @@ class AQuoteIsShownWholeOrNotAtAll(unittest.TestCase):
 
     def test_a_curly_apostrophe_is_only_a_glyph_and_is_straightened(self):
         """`’` e `'` sono lo stesso segno con due disegni: nessuna parola cambia,
-        e non e' fra i vietati."""
+        e non è fra i vietati."""
         fonti = self._fonti("L’accumulo degli inquinanti resta alto.")
         self.assertIn("L'accumulo", fonti[0]["testo"])
         self.assertIn("«", fonti[0]["testo"])
@@ -156,7 +156,7 @@ class AQuoteIsShownWholeOrNotAtAll(unittest.TestCase):
 
     def test_the_banned_list_has_one_copy(self):
         """Tre copie della stessa riga erano due di troppo. `apply_curation` non
-        puo' importare da `packs/`, quindi la sua la guarda un test."""
+        può importare da `packs/`, quindi la sua la guarda un test."""
         from scripts import apply_curation
         self.assertEqual(lint.BANNED, context.BANNED)
         self.assertEqual(tuple(apply_curation.BANNED_CHARS), tuple(context.BANNED))
@@ -180,7 +180,7 @@ class TheDefectItselfCannotComeBack(unittest.TestCase):
             lint.check_named_institutions_are_visible(_entry(), key="176"), [])
 
     def test_the_source_of_the_data_is_not_an_attribution(self):
-        """"Istat lo calcola come media annua" e' definizione, non citazione.
+        """"Istat lo calcola come media annua" è definizione, non citazione.
 
         Senza questa esclusione la regola bocciava sei articoli veri: la fonte
         del dato la pagina la mostra sempre nella propria riga "Fonte".
@@ -190,8 +190,8 @@ class TheDefectItselfCannotComeBack(unittest.TestCase):
             lint.check_named_institutions_are_visible(entry, key="15"), [])
 
     def test_the_whole_catalogue_is_clean(self):
-        """Su una regola bloccante un falso positivo costa piu' di un falso
-        negativo: se questo cade, la lista di `_institution_names` e' troppo larga."""
+        """Su una regola bloccante un falso positivo costa più di un falso
+        negativo: se questo cade, la lista di `_institution_names` è troppo larga."""
         report = lint.lint_all()
         offenders = [key for key, found in report.items()
                      if any(f["rule"] == "istituzione-senza-fonte" for f in found)]

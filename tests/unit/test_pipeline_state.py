@@ -1,6 +1,6 @@
 """Lo store vivo del cruscotto: battiti e PR aperte, con la loro scadenza.
 
-Non e' la rotta (quella la prova test_pipeline_dashboard_route): qui si prova lo
+Non è la rotta (quella la prova test_pipeline_dashboard_route): qui si prova lo
 store da solo, in particolare che una sessione caduta senza chiudere non resti in
 pagina per sempre (la soglia dei battiti su file, riportata sul SQLite)."""
 
@@ -68,7 +68,7 @@ class PipelineStateStore(unittest.TestCase):
 
 class PipelineOutcomeStore(unittest.TestCase):
     """Lo snapshot di stato per indicatore: durevole (non scade), l'ultimo vince,
-    ma uno piu' vecchio non sovrascrive uno piu' recente."""
+    ma uno più vecchio non sovrascrive uno più recente."""
 
     def setUp(self):
         self._saved = config.LEADERBOARD_DB
@@ -114,7 +114,7 @@ class PipelineOutcomeStore(unittest.TestCase):
         pipeline_state.record_outcome("167", "r2", self._snap(state="pubblicata"),
                                       at="2026-08-04T15:00:00+00:00")
         pipeline_state.record_outcome("167", "r1", self._snap(state="in-lavorazione"),
-                                      at="2026-08-04T14:00:00+00:00")   # arriva dopo, ma piu' vecchio
+                                      at="2026-08-04T14:00:00+00:00")   # arriva dopo, ma più vecchio
         self.assertEqual(pipeline_state.outcomes_by_indicator()["167"]["state"],
                          "pubblicata")
 

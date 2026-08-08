@@ -129,9 +129,9 @@ def get_bes_rows(level):
     `synchronized_cache` invece di `@cache.memoize`: i dati BES sono statici per
     deploy, quindi non serve un TTL, e SimpleCache ripicklava l'intera lista a
     ogni lettura anche in-process (~14MB misurati). Il lock serializza il parsing
-    del CSV da 9MB fra i thread a freddo, cosi' non si moltiplica il picco di RAM.
+    del CSV da 9MB fra i thread a freddo, così non si moltiplica il picco di RAM.
     I chiamanti solo iterano e leggono le righe, non le mutano, quindi la lista
-    condivisa e' sicura."""
+    condivisa è sicura."""
     dataset, _ = _paths(level)
     name_to_key = _name_to_key(level)
     rows = []

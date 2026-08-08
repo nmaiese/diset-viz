@@ -72,7 +72,7 @@ STOPWORDS = {
     "nello", "non", "o", "od", "ogni", "oppure", "per", "piu", "poi", "quale",
     "quali", "quanto", "quello", "questa", "queste", "questi", "questo", "se",
     "sia", "sono", "su", "sui", "sul", "sull", "sulla", "sulle", "sullo", "tra",
-    "un", "una", "uno", "e'", "che'", "fra", "presso", "circa", "oltre",
+    "un", "una", "uno", "è", "ché", "fra", "presso", "circa", "oltre",
     # Statistical scaffolding: true of half the catalogue, so it distinguishes
     # nothing and would drown the signal.
     "percentuale", "percentuali", "quota", "quote", "indice", "indicatore",
@@ -238,7 +238,7 @@ def contradictions(definition: str, prose: str) -> list[str]:
     prose_bands = {(m.group(1), m.group(2)) for m in AGE_BAND.finditer(prose)}
     if source_bands and prose_bands and not (source_bands & prose_bands):
         found.append(
-            "eta': la fonte dice %s, l'articolo solo %s"
+            "età: la fonte dice %s, l'articolo solo %s"
             % (
                 ", ".join(f"{a}-{b} anni" for a, b in sorted(source_bands)),
                 ", ".join(f"{a}-{b} anni" for a, b in sorted(prose_bands)),
@@ -246,8 +246,8 @@ def contradictions(definition: str, prose: str) -> list[str]:
         )
 
     for pattern, opposite, source_words, prose_words in (
-        (EXCLUSIVE, INCLUSIVE, "piu' di", "almeno"),
-        (INCLUSIVE, EXCLUSIVE, "almeno", "piu' di"),
+        (EXCLUSIVE, INCLUSIVE, "più di", "almeno"),
+        (INCLUSIVE, EXCLUSIVE, "almeno", "più di"),
     ):
         for match in pattern.finditer(definition):
             number = _number(match.group("n"))
@@ -288,7 +288,7 @@ def check_entry(code: str, entry: dict, definition: dict | None) -> dict:
         row["hits"]["scoperto"] = ["nessuna definizione ufficiale in archivio"]
         return row
     if not row["definition"]:
-        row["hits"]["scoperto"] = ["la riga esiste ma la definizione e' vuota"]
+        row["hits"]["scoperto"] = ["la riga esiste ma la definizione è vuota"]
         return row
     if not all_prose.strip():
         row["hits"]["vuoto"] = ["nessuna prosa scritta a mano"]
@@ -337,7 +337,7 @@ SIGNAL_ORDER = ("contraddizione", "base", "soglia", "termini", "assente", "vuoto
 SIGNAL_LABELS = {
     "contraddizione": "l'articolo dice una cosa diversa dalla fonte, non una in meno",
     "base": "il denominatore della fonte non compare nella definizione scritta",
-    "soglia": "una soglia o una classe di eta' della fonte non compare nell'articolo",
+    "soglia": "una soglia o una classe di età della fonte non compare nell'articolo",
     "termini": "l'articolo riprende quasi nulla della definizione ufficiale",
     "assente": "nessuna sezione definizione scritta a mano, la compone il template",
     "vuoto": "articolo senza prosa",
@@ -409,7 +409,7 @@ def _print_summary(summary: dict) -> None:
     print(f"  con una definizione ufficiale da confrontare   {summary['covered']}")
     print(f"  di questi, senza nessun rilievo di sostanza    {summary['clean']}")
     print()
-    print(f"  {'segnale':<10} {'articoli':>9} {'occorrenze':>11}   che cos'e'")
+    print(f"  {'segnale':<10} {'articoli':>9} {'occorrenze':>11}   che cos'è")
     for name in SIGNAL_ORDER:
         data = summary["checks"][name]
         print(f"  {name:<10} {data['articles']:>9} {data['occurrences']:>11}   {SIGNAL_LABELS[name]}")

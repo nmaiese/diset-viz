@@ -1,21 +1,21 @@
-"""La forza di un angolo e' quanto e' raro, non quanto e' grande.
+"""La forza di un angolo è quanto è raro, non quanto è grande.
 
 Il primo giro misurava la dimensione dell'effetto e basta. Sul catalogo vero
 il risultato era che due tipi soli aprivano il 90% degli articoli
-(`graduatoria-spezzata` 57,7%, `controcorrente` 32,2%): non perche' quelle
-fossero le storie migliori, ma perche' quei due rilevatori sparano forte quasi
-sempre. Una graduatoria di venti valori ha *sempre* un salto piu' largo degli
+(`graduatoria-spezzata` 57,7%, `controcorrente` 32,2%): non perché quelle
+fossero le storie migliori, ma perché quei due rilevatori sparano forte quasi
+sempre. Una graduatoria di venti valori ha *sempre* un salto più largo degli
 altri, e in quasi ogni serie *qualcuno* si muove controcorrente.
 
 Ordinare per dimensione dell'effetto vuol dire quindi ordinare per tipo, e
-riportare l'uniformita' un livello sopra: tutti gli articoli aprirebbero allo
-stesso modo, che e' il difetto che questo pacchetto esiste per togliere.
+riportare l'uniformità un livello sopra: tutti gli articoli aprirebbero allo
+stesso modo, che è il difetto che questo pacchetto esiste per togliere.
 
 La correzione: si misura ogni rilevatore su tutto il catalogo una volta, si
 salvano i quantili, e a runtime la forza diventa **il posto che quell'effetto
 occupa nella distribuzione del proprio tipo**. Un salto di graduatoria vale
-0,9 solo se e' fra i piu' netti che quel rilevatore abbia mai visto, non
-perche' i salti di graduatoria sono grossi in generale.
+0,9 solo se è fra i più netti che quel rilevatore abbia mai visto, non
+perché i salti di graduatoria sono grossi in generale.
 
 La tabella si rigenera con `python3 -m scripts.calibrate_angles`, e va
 rigenerata quando entrano famiglie di dati nuove. Se manca, `strength` resta la
@@ -48,7 +48,7 @@ def _load():
 
 
 def is_loaded():
-    """C'e' una tabella, o si sta ordinando per dimensione grezza?"""
+    """C'è una tabella, o si sta ordinando per dimensione grezza?"""
     return bool(_load())
 
 
@@ -62,9 +62,9 @@ def reload_table():
 def calibrate(kind, raw):
     """Da dimensione dell'effetto a posto nella distribuzione del proprio tipo.
 
-    Interpolazione lineare fra i quantili, cosi' due effetti vicini non
+    Interpolazione lineare fra i quantili, così due effetti vicini non
     finiscono sullo stesso gradino e l'ordinamento resta informativo. Fuori
-    tabella si torna alla dimensione grezza, che e' il comportamento giusto per
+    tabella si torna alla dimensione grezza, che è il comportamento giusto per
     un tipo mai calibrato: meglio un ordine imperfetto che un ordine inventato.
     """
     edges = _load().get(kind)

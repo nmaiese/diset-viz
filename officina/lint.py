@@ -1,37 +1,37 @@
 """L'unico cancello editoriale: deterministico, senza modelli, eseguibile da solo.
 
-Sostituisce una rubrica a venti punti che non discriminava piu' (sei criteri su
+Sostituisce una rubrica a venti punti che non discriminava più (sei criteri su
 dieci a 2,0 per entrambi i giudici ciechi, punteggi finali 19,3 e 18,9) e un
-critico di leggibilita' che non ha mai girato nemmeno una volta.
+critico di leggibilità che non ha mai girato nemmeno una volta.
 
 Fa due cose che prima erano separate o assenti.
 
-**Raccoglie le guardie che gia' funzionavano.** Le verifiche numeriche vivevano
+**Raccoglie le guardie che già funzionavano.** Le verifiche numeriche vivevano
 dentro `tests/integration/test_indicator_texts.py`, quindi controllare un
 articolo voleva dire eseguire l'intera suite. Adesso stanno qui e la suite le
 importa: una implementazione, due chiamanti.
 
 **Aggiunge la regola che toglie il freddo.** Ogni sezione che racconta una
 dinamica deve portare almeno un identificatore del corpus
-(`data/corpus/claims/`). E' un controllo **posizionale**, non lessicale, e la
-differenza non e' un dettaglio: cercare i connettivi causali non funziona
-perche' nei 375 articoli sono quasi tutti definitori ("dipende dal
-denominatore") mentre la causalita' vera viaggia senza connettivi ("si e'
-chiusa dal basso, pero', non dall'alto"). Un lint lessicale segnalerebbe le
+(`data/corpus/claims/`). È un controllo **posizionale**, non lessicale, e la
+differenza non è un dettaglio: cercare i connettivi causali non funziona
+perché nei 375 articoli sono quasi tutti definitori ("dipende dal
+denominatore") mentre la causalità vera viaggia senza connettivi ("si è
+chiusa dal basso, però, non dall'alto"). Un lint lessicale segnalerebbe le
 definizioni, non vedrebbe i meccanismi, e insegnerebbe al modello a scrivere
-ancora piu' implicito, cioe' ancora piu' freddo.
+ancora più implicito, cioè ancora più freddo.
 
     python3 -m officina.lint                 # tutto il catalogo
     python3 -m officina.lint ter-105         # un articolo
     python3 -m officina.lint --json
     python3 -m officina.lint --severity blocca
 
-Uscita diversa da zero se qualcosa blocca. Le due severita':
+Uscita diversa da zero se qualcosa blocca. Le due severità:
 
 - `blocca`  l'articolo non esce. Cifre false, caratteri vietati, gemelli.
-- `segnala` va guardato, non ferma niente. E' dove stanno le regole nuove
-            finche' il catalogo non le rispetta: una regola che boccia
-            trecento articoli il giorno che nasce non e' un cancello, e'
+- `segnala` va guardato, non ferma niente. È dove stanno le regole nuove
+            finché il catalogo non le rispetta: una regola che boccia
+            trecento articoli il giorno che nasce non è un cancello, è
             un blocco della produzione.
 """
 from __future__ import annotations
@@ -51,18 +51,18 @@ from packs import context as context_module
 from scripts import definition_check, indicator_store, verification_queue
 
 # `content/STYLE.md` li vieta in ogni prosa autorata, titoli compresi.
-# Una copia sola: la riga canonica sta in `packs/context.py`, che e' il modulo
-# piu' basso dei due e quello che deve saperlo per rendere una citazione.
+# Una copia sola: la riga canonica sta in `packs/context.py`, che è il modulo
+# più basso dei due e quello che deve saperlo per rendere una citazione.
 BANNED = context_module.BANNED
-# Il lead e' anche la meta description: una prima frase piu' lunga di cosi' non
-# puo' funzionare come tale.
+# Il lead è anche la meta description: una prima frase più lunga di così non
+# può funzionare come tale.
 LEAD_FIRST_SENTENCE_MAX = 200
 # Sotto questa somiglianza due articoli fratelli si leggono come lo stesso
-# stampo. E' anche l'argine contro cio' che Google chiama scaled content abuse:
+# stampo. È anche l'argine contro ciò che Google chiama scaled content abuse:
 # "molte pagine generate allo scopo primario di manipolare il ranking".
 TWIN_SIMILARITY = 0.82
 MIN_WORDS = 300
-# Sotto le venticinque parole un blocco e' una didascalia, non un paragrafo che
+# Sotto le venticinque parole un blocco è una didascalia, non un paragrafo che
 # deve reggersi; sotto i tre paragrafi la quota vale 0, 1/2 o 1 e non misura.
 PARAGRAPH_MIN_WORDS = 25
 PARAGRAPH_MIN_COUNT = 3
@@ -87,11 +87,11 @@ def view_of(key):
 
 
 def view_level(key, entry):
-    """Il livello per cui l'articolo e' stato scritto.
+    """Il livello per cui l'articolo è stato scritto.
 
-    Tutto cio' che dipende dal livello si legge da `levels`, mai da `meta`:
-    `meta.year_min/year_max` valgono su tutti i livelli insieme, ed e'
-    esattamente cosi' che un articolo provinciale e' finito giudicato contro
+    Tutto ciò che dipende dal livello si legge da `levels`, mai da `meta`:
+    `meta.year_min/year_max` valgono su tutti i livelli insieme, ed è
+    esattamente così che un articolo provinciale è finito giudicato contro
     gli anni regionali.
     """
     view = view_of(key)
@@ -104,7 +104,7 @@ def view_level(key, entry):
 def values_of(key, entry, year=None):
     """{territorio: valore} per un anno del livello che l'articolo descrive.
 
-    Senza `year`, l'anno che l'articolo descrive. Con `year`, quell'anno: e' cio'
+    Senza `year`, l'anno che l'articolo descrive. Con `year`, quell'anno: è ciò
     che serve per controllare le cifre storiche invece di saltarle.
     """
     level = view_level(key, entry)
@@ -112,7 +112,7 @@ def values_of(key, entry, year=None):
         return {}
     wanted = year or entry.get("vintage") or level["year_max"]
     matrix = level["matrix"].get(str(wanted)) or {}
-    # Da `territories` e non da `observations`, ed e' una correzione.
+    # Da `territories` e non da `observations`, ed è una correzione.
     # `observations` copre **solo l'ultimo anno**: un territorio con dati nei
     # primi anni e assente nell'ultimo non ha un nome, e la chiave slug filtra
     # nel pacchetto. Su `ter-30` erano tre su quindici, e chi scriveva leggeva
@@ -144,7 +144,7 @@ def prose_of(entry):
 def territory_alternation(texts):
     """L'alternativa regex dei nomi di territorio, derivata dai dati.
 
-    Elencarli a mano e' il modo in cui 67 indicatori provinciali su 103
+    Elencarli a mano è il modo in cui 67 indicatori provinciali su 103
     province sono rimasti senza nessuna verifica: la lista diceva venti
     regioni, le guardie giravano, non incontravano nessun nome e restavano
     verdi. Una lista scritta a mano non si accorge di aver smesso di coprire.
@@ -175,13 +175,13 @@ ANOTHER_INDICATOR = re.compile(r"\]\(/indicatore/")
 
 
 def year_stated_after(text, match):
-    """L'anno scritto subito dopo una cifra, se c'e'. `None` altrimenti.
+    """L'anno scritto subito dopo una cifra, se c'è. `None` altrimenti.
 
     **Una regola sola per i due versi in cui la prosa scrive una cifra.** Era
     scritta in un verso solo, e la stessa affermazione vera prendeva due
     verdetti opposti a seconda della sintassi: "la Sardegna segna 16,96 nel
     2016" passava, "il 16,96% della Sardegna nel 2016" veniva bloccata come
-    `cifra-falsa`, perche' il secondo verso confrontava la cifra col valore
+    `cifra-falsa`, perché il secondo verso confrontava la cifra col valore
     dell'anno dell'articolo. Un `blocca` su una cifra giusta rimanda chi scrive
     a "correggere" un numero che era corretto.
     """
@@ -191,12 +191,12 @@ def year_stated_after(text, match):
     return int(re.search(r"(?:19|20)\d\d", stated.group(0)).group(0))
 
 
-# Una cifra governata da "supera"/"sotto" e' una **soglia**, non il valore di
+# Una cifra governata da "supera"/"sotto" è una **soglia**, non il valore di
 # quel territorio: "restava sotto il 12,00 in Campania" non dice che la Campania
 # valga 12. Il ramo `value_of` la leggeva come un valore e la bocciava come
 # `cifra-falsa` su una frase vera, mentre il ramo `threshold` la giudicava
 # correttamente: due regole sullo stesso pezzo di testo, una delle due sbagliata.
-# Stessa forma della soppressione che `states_a_value` fa gia' con `HEDGE`.
+# Stessa forma della soppressione che `states_a_value` fa già con `HEDGE`.
 A_THRESHOLD = re.compile(rf"(?:{ABOVE}|{BELOW})\s+(?:il|lo|la|i|gli|le|a|ai|al)?\s*$", re.I)
 
 
@@ -223,7 +223,7 @@ def number_of(raw):
 
 
 def states_a_value(text, match):
-    """Il match e' davvero un valore di quel territorio in quest'anno?
+    """Il match è davvero un valore di quel territorio in quest'anno?
 
     Le tre esclusioni vengono da tre falsi allarmi veri: un divario ("il Molise
     sta 39,4 punti sopra le Marche"), un anno esplicito ("la Sardegna segna
@@ -253,7 +253,7 @@ def _finding(rule, severity, detail, field=None):
 def _official_definitions():
     """Le definizioni della fonte, lette una volta per processo.
 
-    Vuoto se il file non c'e': la regola si spegne invece di rompere il lint,
+    Vuoto se il file non c'è: la regola si spegne invece di rompere il lint,
     come la calibrazione della prosa qui sotto.
     """
     try:
@@ -265,10 +265,10 @@ def _official_definitions():
 
 @functools.lru_cache(maxsize=1)
 def calibrazione_prosa():
-    """Le soglie misurate su `content/esempi/`. Vuoto se il file non c'e'.
+    """Le soglie misurate su `content/esempi/`. Vuoto se il file non c'è.
 
     Assente vuol dire regola spenta, non lint rotto: la calibrazione si
-    rigenera, e un cancello che muore perche' manca un file di misura ferma la
+    rigenera, e un cancello che muore perché manca un file di misura ferma la
     produzione per la ragione sbagliata.
     """
     try:
@@ -295,7 +295,7 @@ def check_lead(entry, **_):
     first = re.split(r"(?<=[.!?])\s", lead)[0]
     if len(first) > LEAD_FIRST_SENTENCE_MAX:
         return [_finding("lead", BLOCKS,
-                         f"prima frase di {len(first)} caratteri, non puo' "
+                         f"prima frase di {len(first)} caratteri, non può "
                          f"servire da meta description", "lead")]
     return []
 
@@ -303,10 +303,10 @@ def check_lead(entry, **_):
 def check_figures(entry, key=None, compiled=None, **_):
     """Ogni cifra attribuita a un territorio contro il valore vero.
 
-    Copre i due versi in cui la prosa lo scrive, perche' quella provinciale usa
+    Copre i due versi in cui la prosa lo scrive, perché quella provinciale usa
     l'opposto di quella regionale: "il 24,3% del Molise" e "Gorizia si ferma a
     18". Gli interi contano solo nel secondo verso e con mezzo punto di
-    tolleranza: su una serie provinciale un intero e' il valore, non
+    tolleranza: su una serie provinciale un intero è il valore, non
     un'approssimazione.
     """
     values = values_of(key, entry)
@@ -318,13 +318,13 @@ def check_figures(entry, key=None, compiled=None, **_):
             raw, territory = match.group(1), match.group(2)
             if "," not in raw:
                 continue
-            # Una soglia non e' un valore: la giudica il ramo qui sotto, e
+            # Una soglia non è un valore: la giudica il ramo qui sotto, e
             # leggerla come valore boccia una frase vera. Vedi `A_THRESHOLD`.
             if A_THRESHOLD.search(text[max(0, match.start() - 30):match.start()]):
                 continue
             # Anche questo verso onora l'anno scritto accanto. Vedi
-            # `year_stated_after`: la regola vale per come la cifra e' vera, non
-            # per come la frase e' girata.
+            # `year_stated_after`: la regola vale per come la cifra è vera, non
+            # per come la frase è girata.
             year = year_stated_after(text, match)
             if year is None:
                 if territory not in values:
@@ -342,20 +342,20 @@ def check_figures(entry, key=None, compiled=None, **_):
         for match in compiled["states_value"].finditer(text):
             territory, raw = match.group(1), match.group(2)
             # Una cifra con l'anno scritto accanto ("segna 81,67 nel 2020") non
-            # si salta piu': si controlla **contro quell'anno**. L'esclusione
+            # si salta più: si controlla **contro quell'anno**. L'esclusione
             # nasceva da un falso allarme vero, ma nascondeva un buco che la
-            # macchina nuova allarga, perche' gli angoli sono quasi tutti
+            # macchina nuova allarga, perché gli angoli sono quasi tutti
             # storici (rotture di pendenza, ritorni a un livello, sorpassi):
-            # la prosa cita molte piu' cifre di anni passati di quante ne
+            # la prosa cita molte più cifre di anni passati di quante ne
             # citasse quella vecchia, e nessuna era controllata.
             #
             # **L'anno si risolve prima di chiedere se il territorio esiste**, e
-            # l'ordine e' tutto. La copertura di una matrice cambia da un anno
+            # l'ordine è tutto. La copertura di una matrice cambia da un anno
             # all'altro: un territorio con dati nel 2014 e assente nell'ultima
             # riga usciva dal controllo alla prima riga, quindi "Liguria segna
             # 99,00 nel 2014" passava anche se nel 2014 la Liguria segnava 30.
             # Chiedere l'appartenenza a `values` ha senso solo per una cifra
-            # senza anno, che e' l'unica giudicata sull'anno dell'articolo.
+            # senza anno, che è l'unica giudicata sull'anno dell'articolo.
             stated = year_stated_after(text, match)
             if stated:
                 year = stated
@@ -399,11 +399,11 @@ def check_dynamics_cite_a_source(entry, key=None, **_):
     """La regola che toglie il freddo, e l'unica nuova che conta.
 
     Posizionale: la sezione `dinamica` porta almeno un identificatore del
-    corpus. Se il corpus non ha niente per quel tema, la colpa non e'
-    dell'articolo e il rilievo lo dice, perche' altrimenti chi scrive
+    corpus. Se il corpus non ha niente per quel tema, la colpa non è
+    dell'articolo e il rilievo lo dice, perché altrimenti chi scrive
     imparerebbe a inventare una fonte per far tacere un lint.
 
-    **Due insiemi, non uno, ed e' la differenza fra dire e non dire niente.**
+    **Due insiemi, non uno, ed è la differenza fra dire e non dire niente.**
     Il controllo si diceva posizionale e non lo era: leggeva
     `indicator_texts.cited_claims`, che unisce il campo `corpus` a livello di
     entry con i `claims` di **tutte** le sezioni. Lo schema della bozza rende
@@ -412,11 +412,11 @@ def check_dynamics_cite_a_source(entry, key=None, **_):
     non usciva mai, e la regola che esiste per togliere il freddo era spenta nel
     caso comune, non in un caso limite.
 
-    I due usi restano distinti perche' sono domande diverse. "Hai citato
+    I due usi restano distinti perché sono domande diverse. "Hai citato
     qualcosa che non esiste" e "hai citato qualcosa che non riguarda questo
     indicatore" valgono per l'entry intera, ovunque la citazione sia attaccata.
     "Questo paragrafo si appoggia a qualcosa" vale per **quel** paragrafo, o non
-    e' posizionale.
+    è posizionale.
 
     Nessun articolo committato cambia verdetto: zero delle 377 entry usano
     `corpus` a livello di entry, e l'unica con dei `claims` di sezione li ha
@@ -443,18 +443,18 @@ def check_dynamics_cite_a_source(entry, key=None, **_):
                       if isinstance(c, str) and c}
     esistenti = {claim["id"] for claim in context_module.claims()}
 
-    # Prima i due modi in cui una citazione e' sbagliata, e sono diversi.
+    # Prima i due modi in cui una citazione è sbagliata, e sono diversi.
     inventate = sorted(ovunque - esistenti)
     if inventate:
         return [_finding("fonte-inesistente", BLOCKS,
                          f"identificatori non nel corpus: {inventate}",
                          "corpus")]
     # Un'affermazione vera, verificabile, e che non riguarda questo indicatore.
-    # E' il caso peggiore da leggere, perche' regge a ogni controllo tranne
+    # È il caso peggiore da leggere, perché regge a ogni controllo tranne
     # quello che conta: nella prima run la citazione Eurostat sulla
-    # disoccupazione di lunga durata e' finita a spiegare il tasso di
-    # attivita'. Bloccante come una fonte inventata: su una pagina pubblica una
-    # spiegazione attribuita a chi non l'ha data e' un'attribuzione falsa,
+    # disoccupazione di lunga durata è finita a spiegare il tasso di
+    # attività. Bloccante come una fonte inventata: su una pagina pubblica una
+    # spiegazione attribuita a chi non l'ha data è un'attribuzione falsa,
     # anche se la frase esiste davvero da un'altra parte.
     fuori_tema = sorted(ovunque - available)
     if fuori_tema:
@@ -479,14 +479,14 @@ def check_positive_requirements(entry, key=None, **_):
     """I tre requisiti positivi: scala umana, dinamica citata, limite dichiarato.
 
     Requisiti, non divieti. Trenta divieti hanno prodotto articoli che
-    rispettavano ogni divieto e non somigliavano a niente, ed e' il README di
+    rispettavano ogni divieto e non somigliavano a niente, ed è il README di
     `content/esempi/` a dirlo per primo.
     """
     found = []
     roles = {section.get("role") for section in entry.get("sections") or []}
     if "limiti" not in roles:
         found.append(_finding("manca-il-limite", FLAGS,
-                              "nessuna sezione dice che cosa il numero non puo' dire"))
+                              "nessuna sezione dice che cosa il numero non può dire"))
     words = sum(len((text or "").split()) for _, text in prose_of(entry))
     if words < MIN_WORDS:
         found.append(_finding("troppo-corto", FLAGS,
@@ -497,23 +497,23 @@ def check_positive_requirements(entry, key=None, **_):
 def check_named_institutions_are_visible(entry, key=None, **_):
     """Un'istituzione nominata nella prosa deve avere una fonte in pagina.
 
-    E' la riparazione del difetto peggiore trovato finora, e nessuna guardia
+    È la riparazione del difetto peggiore trovato finora, e nessuna guardia
     esistente lo vedeva. `ter-176` scriveva "Eurostat scrive che quando
     l'economia riparte..." mentre il blocco fonti della pagina portava solo
     Istat: l'identificatore stava nel campo `corpus`, che la pagina non rende.
     Un lettore vedeva un'attribuzione a un'istituzione **senza un modo per
-    controllarla**. Su un sito di dati pubblici e' la cosa che consuma piu'
-    fiducia di un errore, perche' un errore si corregge e questa somiglia a una
+    controllarla**. Su un sito di dati pubblici è la cosa che consuma più
+    fiducia di un errore, perché un errore si corregge e questa somiglia a una
     fonte inventata.
 
-    Il controllo e' lessicale, e qui va bene, al contrario di quello sulla
-    causalita': il vocabolario e' **chiuso e nostro**, sono i nomi delle
+    Il controllo è lessicale, e qui va bene, al contrario di quello sulla
+    causalità: il vocabolario è **chiuso e nostro**, sono i nomi delle
     istituzioni in `data/corpus/sources.json`. Non si cerca un concetto, si
     cerca un nome proprio che qualcuno ha scritto in un registro.
 
     `app.indicator_texts.visible_sources` deriva ormai le fonti dagli
     identificatori citati, quindi in regime questo rilievo scatta solo quando la
-    prosa nomina un'istituzione **senza** citarne l'affermazione: cioe' quando
+    prosa nomina un'istituzione **senza** citarne l'affermazione: cioè quando
     l'attribuzione non ha proprio un appiglio.
     """
     prose = " ".join(text for _, text in prose_of(entry))
@@ -523,7 +523,7 @@ def check_named_institutions_are_visible(entry, key=None, **_):
         f"{item.get('testo', '')} {item.get('url', '')}"
         for item in indicator_texts.visible_sources(entry) if isinstance(item, dict))
     # La fonte del dato non conta: la pagina la mostra sempre nella riga
-    # "Fonte", e nominarla e' definitorio, non un'attribuzione. Senza questa
+    # "Fonte", e nominarla è definitorio, non un'attribuzione. Senza questa
     # esclusione la regola bocciava sei articoli per frasi come "Istat lo
     # calcola come media annua", che non attribuiscono niente a nessuno.
     meta = ((view_of(key) or {}).get("meta") or {})
@@ -537,26 +537,26 @@ def check_named_institutions_are_visible(entry, key=None, **_):
             continue
         found.append(_finding(
             "istituzione-senza-fonte", BLOCKS,
-            f"la prosa nomina {name}, che non e' la fonte del dato, e la pagina "
+            f"la prosa nomina {name}, che non è la fonte del dato, e la pagina "
             "non mostra una sua fonte: cita l'affermazione del corpus, o non "
             "attribuire", "fonti"))
     return found
 
 
 # Nomi che nel registro identificano un'istituzione ma in italiano sono anche
-# una frase comune. Su una regola bloccante il falso positivo costa piu' del
+# una frase comune. Su una regola bloccante il falso positivo costa più del
 # falso negativo, quindi si escludono per nome invece che con un'euristica.
 GENERIC_INSTITUTIONS = frozenset(("Politiche di coesione", "Commissione europea"))
 
 
 @functools.lru_cache(maxsize=1)
 def _institution_names():
-    """I nomi delle istituzioni del registro, dal piu' lungo al piu' corto.
+    """I nomi delle istituzioni del registro, dal più lungo al più corto.
 
     Il registro scrive `institution` come "istituzione, pubblicazione"
-    ("Istat, Rapporto BES"), e cio' che la prosa nomina e' la prima parte. Una
+    ("Istat, Rapporto BES"), e ciò che la prosa nomina è la prima parte. Una
     prima versione cercava la stringa intera e trovava cinque nomi su diciotto,
-    perdendo proprio Istat ed Eurostat, cioe' le due che compaiono davvero.
+    perdendo proprio Istat ed Eurostat, cioè le due che compaiono davvero.
 
     Tre filtri, tutti per non bloccare a torto: almeno cinque caratteri
     (cercare "UE" prenderebbe mezza lingua), al massimo tre parole, e nessun
@@ -581,14 +581,14 @@ def _paragraphs(text):
 
 
 def check_unsupported_paragraphs(entry, key=None, **_):
-    """Paragrafi che affermano senza portare niente: ne' una cifra ne' una fonte.
+    """Paragrafi che affermano senza portare niente: né una cifra né una fonte.
 
-    E' la misura che separa davvero il nostro corpus dal giornalismo vero, e
-    non e' quella che mi aspettavo. L'ipotesi era la **densita' numerica**, che
+    È la misura che separa davvero il nostro corpus dal giornalismo vero, e
+    non è quella che mi aspettavo. L'ipotesi era la **densità numerica**, che
     Thäsler-Kordonouri et al. (Journalism 26(9) 2025, n=3135) misurano come
-    mediatore della comprensibilita'. Provata su questo corpus, non regge: i
+    mediatore della comprensibilità. Provata su questo corpus, non regge: i
     nostri articoli hanno mediana 2,91 numeri ogni cento parole contro i 3,54
-    degli esempi, cioe' sono meno densi, non piu'.
+    degli esempi, cioè sono meno densi, non più.
 
     Regge invece la **quota di paragrafi scoperti**: esempi 0,25 di mediana e
     0,33 di massimo, pubblicati 0,67 di mediana, con 313 articoli su 376 sopra
@@ -597,10 +597,10 @@ def check_unsupported_paragraphs(entry, key=None, **_):
     Che cosa dice il numero: i nostri articoli separano le cifre dal
     significato. Un paragrafo ammucchia i dati e due commentano a vuoto, mentre
     il giornalismo vero intreccia. Un paragrafo senza una cifra e senza un
-    identificatore di corpus non e' sobrio, e' vuoto: e' `dinamica-senza-fonte`
-    vista da un'altra porta, la stessa che aveva gia' segnato 52 articoli su 52.
+    identificatore di corpus non è sobrio, è vuoto: è `dinamica-senza-fonte`
+    vista da un'altra porta, la stessa che aveva già segnato 52 articoli su 52.
 
-    La soglia e' il q90 degli esempi, da `officina/calibrazione_prosa.json`,
+    La soglia è il q90 degli esempi, da `officina/calibrazione_prosa.json`,
     rigenerabile con `bin/py -m scripts.calibra_prosa`. Non si scrive a mano.
     """
     threshold = calibrazione_prosa().get("soglia_paragrafi_scoperti")
@@ -613,12 +613,12 @@ def check_unsupported_paragraphs(entry, key=None, **_):
         return []
     # "Senza una cifra", e basta. Una prima versione lasciava passare anche i
     # paragrafi con un identificatore di corpus fra parentesi quadre: cercato
-    # sui 376 articoli, quel caso ricorre **zero volte**, perche' gli
-    # identificatori stanno nel campo `corpus` e non nel testo (ed e' la ragione
-    # per cui `check_dynamics_cite_a_source` e' posizionale invece che
+    # sui 376 articoli, quel caso ricorre **zero volte**, perché gli
+    # identificatori stanno nel campo `corpus` e non nel testo (ed è la ragione
+    # per cui `check_dynamics_cite_a_source` è posizionale invece che
     # lessicale). Una scappatoia che non scatta mai si legge come una garanzia
-    # e non lo e', e soprattutto rendeva la regola diversa dalla misura su cui
-    # e' calibrata: negli esempi il conteggio e' "paragrafi senza cifre".
+    # e non lo è, e soprattutto rendeva la regola diversa dalla misura su cui
+    # è calibrata: negli esempi il conteggio è "paragrafi senza cifre".
     bare = [block for block in blocks if not re.search(r"\d", block)]
     share = len(bare) / len(blocks)
     if share <= threshold:
@@ -636,8 +636,8 @@ def _shingles(text, size=5):
 def check_distance_from_siblings(entry, key=None, texts=None, **_):
     """Due articoli che si leggono come lo stesso stampo.
 
-    Ha assorbito `scripts/seriality_queue.py`, che non esiste piu', ed e'
-    anche la difesa contro cio' che
+    Ha assorbito `scripts/seriality_queue.py`, che non esiste più, ed è
+    anche la difesa contro ciò che
     Google chiama abuso di contenuti in scala: non il volume, la mancanza di
     differenza vera fra pagine sorelle.
     """
@@ -665,35 +665,35 @@ def check_definition(entry, key=None, **_):
 
     Ogni altra regola di questo file confronta la prosa con la **serie**: le
     cifre, i paragrafi, le fonti. Nessuna guarda la **grandezza**, e la
-    grandezza e' dove stanno gli errori che sopravvivono a ogni lettura, perche'
-    l'aritmetica intorno e' giusta. `ter-30` ne ha appena dato l'esempio: un
-    articolo piu' fluido di tutti i precedenti che spiegava una domanda per
+    grandezza è dove stanno gli errori che sopravvivono a ogni lettura, perché
+    l'aritmetica intorno è giusta. `ter-30` ne ha appena dato l'esempio: un
+    articolo più fluido di tutti i precedenti che spiegava una domanda per
     circuito museale mentre la fonte divide i visitatori per il numero di
     istituti. Prima ancora, `ter-402` chiamava "imprese a guida femminile"
     quello che Istat definisce come donne titolari di ditte individuali, e lo
     ripeteva nella sezione dei limiti, che esiste apposta per dire che cosa
     l'indicatore non misura.
 
-    Non c'e' una seconda implementazione: delega a `scripts.definition_check`,
+    Non c'è una seconda implementazione: delega a `scripts.definition_check`,
     che possiede il confronto e la calibrazione della copertura dei termini. Qui
     si decide soltanto **che cosa blocca**.
 
     `contraddizione` blocca: l'articolo dice una cosa diversa dalla fonte, non
     una in meno. Sul catalogo di oggi (377 articoli, 181 con una definizione da
     confrontare) non scatta nemmeno una volta, quindi non ferma niente di
-    esistente e prende la classe peggiore quando comparira'.
+    esistente e prende la classe peggiore quando comparirà.
 
     `base` (35 articoli), `soglia` (18) e `termini` (22) segnalano: dicono che
     il denominatore, una soglia o quasi tutto il lessico della fonte non
-    compaiono nella prosa. Sono tanti perche' descrivono il catalogo scritto
-    prima che il pacchetto portasse la definizione: bloccare li' vorrebbe dire
-    fermare la produzione per riscrivere l'arretrato, che e' una decisione
+    compaiono nella prosa. Sono tanti perché descrivono il catalogo scritto
+    prima che il pacchetto portasse la definizione: bloccare lì vorrebbe dire
+    fermare la produzione per riscrivere l'arretrato, che è una decisione
     editoriale e non un cancello.
 
     `assente`, `vuoto` e `scoperto` non entrano: descrivono la nostra copertura,
-    non l'onesta' dell'articolo. `assente` in particolare scatta su 149 articoli
-    ed e' **il comportamento voluto** della macchina nuova, che la definizione la
-    omette quando l'angolo piu' forte non e' definitorio.
+    non l'onestà dell'articolo. `assente` in particolare scatta su 149 articoli
+    ed è **il comportamento voluto** della macchina nuova, che la definizione la
+    omette quando l'angolo più forte non è definitorio.
     """
     if not key:
         return []
@@ -716,24 +716,24 @@ def check_angle_was_detected(entry, key=None, **_):
     """L'angolo dichiarato dev'essere uno che il pacchetto ha davvero rilevato.
 
     L'officina chiede due bozze, una sull'angolo 1 e una sull'angolo 2. Su 11
-    indicatori su 594 l'elenco ne ha meno di due, e li' "apri sull'angolo numero
+    indicatori su 594 l'elenco ne ha meno di due, e lì "apri sull'angolo numero
     2" non ha nessuna risposta valida: lo schema della bozza controlla la
     **forma** del campo `angolo`, non la sua provenienza, quindi un angolo
     inventato attraversava giudizio, lint e pubblicazione senza che una sola
     riga lo nominasse. Il pacchetto adesso avverte chi scrive
-    (`packs/build.render`), e questa regola lo verifica, perche' un'istruzione
-    che nessuno controlla e' una speranza.
+    (`packs/build.render`), e questa regola lo verifica, perché un'istruzione
+    che nessuno controlla è una speranza.
 
-    **Blocca, e la staleness non e' un'obiezione.** Dentro una run il pacchetto
+    **Blocca, e la staleness non è un'obiezione.** Dentro una run il pacchetto
     e questo lint girano sulla stessa serie a un minuto di distanza, quindi qui
-    un rosso e' sempre invenzione. Su un articolo vecchio un aggiornamento della
-    fonte puo' far sparire l'angolo su cui apriva, e quel rosso e' comunque
-    l'informazione giusta: se la storia piu' forte della serie non e' piu'
-    quella, l'attacco dell'articolo e' da rileggere, non la regola da ammorbidire.
+    un rosso è sempre invenzione. Su un articolo vecchio un aggiornamento della
+    fonte può far sparire l'angolo su cui apriva, e quel rosso è comunque
+    l'informazione giusta: se la storia più forte della serie non è più
+    quella, l'attacco dell'articolo è da rileggere, non la regola da ammorbidire.
 
-    Si spegne da sola sugli articoli che non dichiarano niente: `angolo` e'
+    Si spegne da sola sugli articoli che non dichiarano niente: `angolo` è
     facoltativo e lo scrivono solo quelli usciti dall'officina, 2 su 377 alla
-    data in cui questa regola nasce. Cosi' non aggiunge un solo pacchetto al
+    data in cui questa regola nasce. Così non aggiunge un solo pacchetto al
     costo di `lint_all` sugli altri 375.
     """
     dichiarato = entry.get("angolo")
@@ -752,7 +752,7 @@ def check_angle_was_detected(entry, key=None, **_):
         return []
     elenco = ", ".join(dict.fromkeys(rilevati)) or "nessuno"
     return [_finding("angolo-non-rilevato", BLOCKS,
-                     f"l'articolo dichiara di aprire su `{dichiarato}`, che non e' fra "
+                     f"l'articolo dichiara di aprire su `{dichiarato}`, che non è fra "
                      f"gli angoli del pacchetto ({elenco})", "angolo")]
 
 
@@ -793,7 +793,7 @@ def resolve_codes(codes, texts):
     `officina.lint ter-176` selezionava zero articoli e stampava "articoli con
     rilievi: 0", che si legge come promosso. Nella prima run il pubblicatore ha
     eseguito proprio quella forma e ha letto un verde che nessuno aveva
-    guadagnato. Un cancello che passa quando non capisce l'argomento non e' un
+    guadagnato. Un cancello che passa quando non capisce l'argomento non è un
     cancello.
     """
     selected, missing = set(), []

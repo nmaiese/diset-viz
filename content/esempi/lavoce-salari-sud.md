@@ -4,11 +4,11 @@
 - **Autori** Marco Leonardi, Giuseppe Migali, Leonzio Rizzo, Riccardo Secomandi
 - **Data** 7 luglio 2026
 - **URL** https://lavoce.info/archives/111866/al-sud-il-pil-cresce-di-piu-ma-i-salari-restano-al-palo/
-- **Forma di storia** perche' due grandezze vanno in direzioni diverse
-- **Da usare quando** devi spiegare una composizione o un confondente: perche'
-  una regione piccola sta in cima, perche' il denominatore muove il rapporto,
-  perche' due indicatori correlati raccontano cose diverse
-- Insieme a Info Data, il piu' pulito al contatore: 0 tic per mille parole, 15,1
+- **Forma di storia** perché due grandezze vanno in direzioni diverse
+- **Da usare quando** devi spiegare una composizione o un confondente: perché
+  una regione piccola sta in cima, perché il denominatore muove il rapporto,
+  perché due indicatori correlati raccontano cose diverse
+- Insieme a Info Data, il più pulito al contatore: 0 tic per mille parole, 15,1
   parole per frase
 
 ## Il testo
@@ -31,26 +31,26 @@
 > degli anni. L'industria, dove produttività e forza contrattuale sono maggiori,
 > pesa meno.
 
-## Perche' si legge al primo passaggio
+## Perché si legge al primo passaggio
 
 **Dice quante sono prima di elencarle.** "sono due", poi "La prima", poi "La
-seconda e piu' importante". Il lettore sa sempre a che punto della spiegazione
-si trova, e sa quando finisce. E' la mossa che rende inutile rileggere, e costa
+seconda e più importante". Il lettore sa sempre a che punto della spiegazione
+si trova, e sa quando finisce. È la mossa che rende inutile rileggere, e costa
 tre parole.
 
-**Ogni frase aggiunge un anello, nessuna ne subordina tre.** "L'inflazione non e'
-uguale per tutti. Le famiglie a reddito piu' basso spendono di piu' in beni
+**Ogni frase aggiunge un anello, nessuna ne subordina tre.** "L'inflazione non è
+uguale per tutti. Le famiglie a reddito più basso spendono di più in beni
 primari. Negli anni della fiammata inflazionistica questi prezzi sono cresciuti
 molto." Tre passaggi causali, tre frasi. Nella nostra prosa lo stesso
 ragionamento diventerebbe un periodo solo con due gerundi e una relativa, e
-sarebbe piu' difficile da controllare oltre che da leggere.
+sarebbe più difficile da controllare oltre che da leggere.
 
 **Frasi corte ma collegate, non accostate.** Quindici parole di media, e nessuna
-sta li' come voce di elenco: ognuna nasce dalla precedente. E' la differenza tra
-spezzare e sminuzzare, ed e' il pavimento del criterio 8.
+sta lì come voce di elenco: ognuna nasce dalla precedente. È la differenza tra
+spezzare e sminuzzare, ed è il pavimento del criterio 8.
 
 **Il meccanismo viene prima delle cifre, e qui le cifre non ci sono affatto.**
-Questo passaggio spiega e basta, perche' i numeri stanno nei paragrafi
+Questo passaggio spiega e basta, perché i numeri stanno nei paragrafi
 precedenti. Non prova a fare le due cose insieme. Le nostre sezioni `quadro` e
-`dinamica` provano quasi sempre a farle insieme, ed e' li' che nasce
+`dinamica` provano quasi sempre a farle insieme, ed è lì che nasce
 l'impilamento.

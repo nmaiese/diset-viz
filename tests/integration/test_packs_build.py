@@ -2,14 +2,14 @@
 
 Due promesse da tenere, e sono le due per cui `packs/` esiste.
 
-La prima e' il buco nel perimetro. `scripts/indicator_brief.py` porta il primo
+La prima è il buco nel perimetro. `scripts/indicator_brief.py` porta il primo
 e l'ultimo valore di ogni territorio e la serie delle medie: gli articoli
-pubblicati citano cifre di meta' serie che da li' non si potevano prendere, e
+pubblicati citano cifre di metà serie che da lì non si potevano prendere, e
 `docs/CANARY.md` lo dice apertamente. Se il pacchetto non porta la matrice
 intera, quel buco resta.
 
-La seconda e' che la forma cambi da un indicatore all'altro. Un inventario che
-mette lo stesso tipo di angolo in cima a tutti gli articoli e' uno scheletro
+La seconda è che la forma cambi da un indicatore all'altro. Un inventario che
+mette lo stesso tipo di angolo in cima a tutti gli articoli è uno scheletro
 fisso con un altro nome.
 """
 import unittest
@@ -25,7 +25,7 @@ def pack_of(code, level=None):
 
 
 class TheMatrixIsWhole(unittest.TestCase):
-    """Ogni anno, ogni territorio. E' la cifra che il brief non sapeva dare."""
+    """Ogni anno, ogni territorio. È la cifra che il brief non sapeva dare."""
 
     @classmethod
     def setUpClass(cls):
@@ -41,12 +41,12 @@ class TheMatrixIsWhole(unittest.TestCase):
     def test_a_figure_a_published_article_quotes_is_in_the_pack(self):
         """`content/indicators/1.json` cita l'Emilia-Romagna del 2014.
 
-        Quella cifra sta a meta' serie: e' esattamente il tipo di numero che il
+        Quella cifra sta a metà serie: è esattamente il tipo di numero che il
         produttore doveva andare a prendere fuori dal brief.
         """
         self.assertIn(2014, self.pack["matrix"])
         value = self.pack["matrix"][2014].get("Emilia-Romagna")
-        self.assertIsNotNone(value, "il 2014 dell'Emilia-Romagna non e' nel pacchetto")
+        self.assertIsNotNone(value, "il 2014 dell'Emilia-Romagna non è nel pacchetto")
         self.assertAlmostEqual(value, 52.13, delta=0.05)
 
     def test_territories_are_named_not_slugged(self):
@@ -58,9 +58,9 @@ class TheShapeVaries(unittest.TestCase):
     def test_two_indicators_do_not_open_on_the_same_angle_by_construction(self):
         """Non che sia impossibile: che non sia il caso su tutto il catalogo.
 
-        Il tetto e' quello del piano: nessun tipo apre piu' del 40% degli
+        Il tetto è quello del piano: nessun tipo apre più del 40% degli
         articoli. Prima della calibrazione `graduatoria-spezzata` ne apriva il
-        57,7%, e la prosa avrebbe ereditato quell'uniformita'.
+        57,7%, e la prosa avrebbe ereditato quell'uniformità.
         """
         from collections import Counter
 
@@ -164,8 +164,8 @@ class APackWithFewerAnglesThanAsked(unittest.TestCase):
     """Il pacchetto avverte chi scrive quando l'angolo chiesto non esiste.
 
     L'officina lancia sempre due scritture, una sull'angolo 1 e una sull'angolo
-    2. Su **11 indicatori su 594** l'elenco ha meno di due voci, e li' la
-    seconda richiesta non ha nessuna risposta valida: chi scrive puo' solo
+    2. Su **11 indicatori su 594** l'elenco ha meno di due voci, e lì la
+    seconda richiesta non ha nessuna risposta valida: chi scrive può solo
     inventare, e lo schema della bozza controlla la forma del campo `angolo` e
     non la sua provenienza, quindi l'invenzione arrivava fino alla pagina.
 
@@ -173,7 +173,7 @@ class APackWithFewerAnglesThanAsked(unittest.TestCase):
     degenere per codice: quali indicatori siano poveri di angoli dipende dai
     dati e cambia a ogni aggiornamento della fonte, mentre la regola di
     `render` non deve cambiare mai. Chi controlla che quegli 11 esistano
-    davvero e' `officina.lint`, sull'articolo, non questo test.
+    davvero è `officina.lint`, sull'articolo, non questo test.
     """
 
     @classmethod
@@ -196,7 +196,7 @@ class APackWithFewerAnglesThanAsked(unittest.TestCase):
         self.assertIn("non in un angolo inventato", text)
 
     def test_with_two_angles_it_says_nothing_of_the_sort(self):
-        """L'avviso e' per il caso degenere: sugli altri 583 e' rumore."""
+        """L'avviso è per il caso degenere: sugli altri 583 è rumore."""
         text = self._render_with(2)
         self.assertNotIn("non esiste", text)
         self.assertNotIn("inventat", text)

@@ -76,8 +76,8 @@ nell'articolo, nella curatela e nella mappa temi) e chiude con
 decide se la PR si fonde. **Oggi ogni ruolo fonde `auto`** sul cancello locale,
 che gira la suite intera prima del merge: la CI remota non parte sulle PR aperte
 via il GitHub MCP, quindi aspettarla (`checks`) non comprava un verdetto
-indipendente ma un deadlock, ed e' il motivo per cui la vecchia politica non
-uniforme (prosa `auto`, promozione e ammissione `checks`) e' stata portata tutta
+indipendente ma un deadlock, ed è il motivo per cui la vecchia politica non
+uniforme (prosa `auto`, promozione e ammissione `checks`) è stata portata tutta
 ad `auto`. Nessun ruolo aspetta una firma: in una catena che nessuno presidia,
 "aspetta che qualcuno guardi" vuol dire "aspetta per sempre". Regole complete e
 motivazioni in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md) e
@@ -225,14 +225,14 @@ comparative e il `vintage` uguale all'`year_max` corrente (drift guard). È lo
 step che trasforma un indicatore appena integrato in una pagina che si legge come
 scritta da un giornalista.
 
-Scrittura e revisione **non sono piu' tre agenti freddi** che si passano
-l'indicatore via CSV: scrivere e' un ruolo solo, il **produttore** (l'officina,
+Scrittura e revisione **non sono più tre agenti freddi** che si passano
+l'indicatore via CSV: scrivere è un ruolo solo, il **produttore** (l'officina,
 `.claude/workflows/produci-indicatori.js`), che porta un indicatore da ammesso a
 pubblicato in una run, con due bozze e un giudizio cieco al posto della
-rilettura del proprio testo. La cura sta a monte, con l'ammissione, che e' il
-ruolo che ne ha i file nel perimetro. Nessuno firma piu' niente
-(`pipeline_gate.ROLES_THAT_SIGN` e' vuoto): il controllo sono i due critici a
-valle. La catena, dopo la ri-architettura, e' tre ruoli, non sette stadi:
+rilettura del proprio testo. La cura sta a monte, con l'ammissione, che è il
+ruolo che ne ha i file nel perimetro. Nessuno firma più niente
+(`pipeline_gate.ROLES_THAT_SIGN` è vuoto): il controllo sono i due critici a
+valle. La catena, dopo la ri-architettura, è tre ruoli, non sette stadi:
 
     ammissione (scout+hunter+promoter+cura) -> produttore (scrive) -> verificatore
                                                           |                 |
@@ -248,12 +248,12 @@ valle. La catena, dopo la ri-architettura, e' tre ruoli, non sette stadi:
 
 I file di agente dei vecchi stadi (`source-scout.md`, `indicator-hunter.md`,
 `indicator-curator.md`, `indicator-writer.md`, `indicator-reviewer.md`) non
-esistono piu', e con la demolizione se ne sono andati anche `producer.md` e
+esistono più, e con la demolizione se ne sono andati anche `producer.md` e
 `launcher.md`. Restano tre agenti: `admissions.md` a monte, `verificatore.md` e
 `reader-editor.md` a valle, **uno per perimetro di `pipeline_gate.STAGE_PATHS`,
 col nome del proprio stadio**. `verificatore.md` si chiamava
 `indicator-verifier.md`: era l'unico nome che andasse tradotto, e la traduzione
-e' stata tolta insieme alla mappa che la faceva. Gli articoli li scrive
+è stata tolta insieme alla mappa che la faceva. Gli articoli li scrive
 l'officina (`.claude/workflows/produci-indicatori.js`).
 
 Lo stato di tutte le code insieme:
@@ -359,14 +359,14 @@ tre ruoli sta in [`AUTONOMOUS_PIPELINE.md`](AUTONOMOUS_PIPELINE.md).
 **I ruoli non hanno un cron proprio.** Gli stadi ne avevano uno a testa, e la
 forma aveva un difetto strutturale: le dipendenze della catena sono di dato e il
 calendario le ignorava, quindi il curatore girava il giovedì comunque, a vuoto se
-a monte non era successo niente. Poi e' arrivato un dispatcher unico, che
+a monte non era successo niente. Poi è arrivato un dispatcher unico, che
 serializzava a uno-stadio-per-tick e rifiutava di partire con una PR aperta,
 congelando tutto su un solo blocco. Ora una sola Routine gira a battito e lancia
 `scripts/pipeline_launch.py`, che **non nomina un solo stadio**: legge il dossier
 per-indicatore e le code e restituisce una **lista prioritizzata di lanci**
 (produttore e verificatore per-indicatore, ammissione batch). Indicatori diversi
-toccano file diversi, quindi il lanciatore ne mette in volo piu' d'uno in
-parallelo senza contesa, e non esiste piu' il lock una-PR-aperta.
+toccano file diversi, quindi il lanciatore ne mette in volo più d'uno in
+parallelo senza contesa, e non esiste più il lock una-PR-aperta.
 
 **Il prompt di una Routine non riproduce il contratto, lo indica.** È la lezione
 più cara di questo sistema: la Routine dello scrittore riproduceva il proprio

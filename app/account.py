@@ -18,7 +18,7 @@ from app.models import (Achievement, DailyResult, Favorite, PlayerStat, Profile,
 
 
 def set_nickname(auth_id, nickname):
-    """Aggiorna il nickname del profilo (gia' validato dal chiamante). Ritorna
+    """Aggiorna il nickname del profilo (già validato dal chiamante). Ritorna
     True se il profilo esiste."""
     if not auth_id:
         return False
@@ -31,7 +31,7 @@ def set_nickname(auth_id, nickname):
 
 
 def export_data(auth_id):
-    """Tutti i dati dell'utente, per il diritto di portabilita'."""
+    """Tutti i dati dell'utente, per il diritto di portabilità."""
     if not auth_id:
         return {}
     with session_scope() as s:
@@ -78,7 +78,7 @@ def _delete_supabase_user(auth_id):
         with urllib.request.urlopen(req, timeout=10) as resp:
             return 200 <= resp.status < 300
     except urllib.error.HTTPError as e:
-        return e.code == 404  # gia' assente = ok
+        return e.code == 404  # già assente = ok
     except Exception:  # noqa: BLE001
         return False
 

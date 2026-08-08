@@ -5,9 +5,9 @@
  "claude_code_version": "2.1.220 (Claude Code)",
  "commit": "74eec04",
  "detail": [
-  "verso lower_better confermato sui dati 2024: in cima Umbria 24,28 e Lazio 25,17, in fondo Sicilia 44,13, l'ordine che un lettore chiama migliore. Categoria istruzione_capitale_umano, score_eligible resta true. Nessuna riga di curation.csv da toccare: ter-104 e' della famiglia territoriale, l'override vive gia' in CURATED_DIRECTION.",
-  "articolo riscritto da 2 sezioni abbozzate a 4 piu' lead, 707 parole. Cifre dal brief: mediana 31,15 contro media 32,97, salto Calabria-Campania 2,99 il piu' largo, media 2018-2022 -1,40 punti contro 2022-2024 -3,70, Toscana -2,53 e dall'ottavo al dodicesimo posto, divario 19,76 nel 2018 e 19,85 nel 2024.",
-  "fonti esterne verificate: Istat Livelli di istruzione e ritorni occupazionali Anno 2024 (3 dicembre 2025), 25-64enni con almeno un titolo secondario superiore 63,0% nel 2022 e 66,7% nel 2024 contro 80,5% Ue27, etichettato in prosa come aggregato ponderato distinto dalla media semplice delle venti regioni. Stesso report: 22,8% di abbandono tra i 18-24enni con genitori al piu' con licenza media contro 5,3%.",
+  "verso lower_better confermato sui dati 2024: in cima Umbria 24,28 e Lazio 25,17, in fondo Sicilia 44,13, l'ordine che un lettore chiama migliore. Categoria istruzione_capitale_umano, score_eligible resta true. Nessuna riga di curation.csv da toccare: ter-104 è della famiglia territoriale, l'override vive già in CURATED_DIRECTION.",
+  "articolo riscritto da 2 sezioni abbozzate a 4 più lead, 707 parole. Cifre dal brief: mediana 31,15 contro media 32,97, salto Calabria-Campania 2,99 il più largo, media 2018-2022 -1,40 punti contro 2022-2024 -3,70, Toscana -2,53 e dall'ottavo al dodicesimo posto, divario 19,76 nel 2018 e 19,85 nel 2024.",
+  "fonti esterne verificate: Istat Livelli di istruzione e ritorni occupazionali Anno 2024 (3 dicembre 2025), 25-64enni con almeno un titolo secondario superiore 63,0% nel 2022 e 66,7% nel 2024 contro 80,5% Ue27, etichettato in prosa come aggregato ponderato distinto dalla media semplice delle venti regioni. Stesso report: 22,8% di abbandono tra i 18-24enni con genitori al più con licenza media contro 5,3%.",
   "firma reviewed_at 2026-07-29, reviewed_vintage 2024, uguale al vintage. Rilettura: tolta la domanda retorica di chiusura, tolta l'affermazione causale sul ricambio generazionale (non verificabile), tolto il riferimento alla qualifica professionale triennale (classificazione non verificata contro la fonte)."
  ],
  "duration_seconds": 1570,

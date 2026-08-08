@@ -12,7 +12,7 @@ Sono variabili pubbliche, quindi non serve Secret Manager:
 | `SITE_URL` | `https://divarioitalia.it` | URL canonico per sitemap, canonical e blog |
 | `GOOGLE_TAG_MANAGER_ID` | `GTM-PZ45BG7D` | Contenitore per Analytics, CMP e altri tag |
 | `GA_MEASUREMENT_ID` | `G-THTPZZ02QH` | Measurement ID GA4 da usare nei tag GTM |
-| `ADSENSE_CLIENT` | `ca-pub-6806451730012282` | Loader e meta tag Google AdSense (`/ads.txt` e' versionato nell'app) |
+| `ADSENSE_CLIENT` | `ca-pub-6806451730012282` | Loader e meta tag Google AdSense (`/ads.txt` è versionato nell'app) |
 | `ADSENSE_SLOT_BANNER` | `1234567890` | Slot opzionale per banner futuri |
 | `GOOGLE_SITE_VERIFICATION` | `...` | Verifica Search Console |
 | `BING_SITE_VERIFICATION` | `...` | Verifica Bing Webmaster Tools |
@@ -28,13 +28,13 @@ gcloud run services update diset-viz --region europe-west1 \
 ### Quiz "Quanto conosci l'Italia?" — SECRET_KEY e classifica
 
 > **SUPERATO dalla Fase 4 (2026-07-31).** La classifica e lo stato vivo della
-> catena NON stanno piu' su SQLite + Litestream: sono su **Supabase Postgres**
-> (vedi la sezione "Fase 4" piu' sotto). `SECRET_KEY` resta (firma i token quiz).
+> catena NON stanno più su SQLite + Litestream: sono su **Supabase Postgres**
+> (vedi la sezione "Fase 4" più sotto). `SECRET_KEY` resta (firma i token quiz).
 > Litestream, `LEADERBOARD_DB` in produzione e `LITESTREAM_REPLICA_URL` sono
 > **ritirati**: il testo qui sotto vale solo come storia. Il file SQLite locale
 > serve ancora solo in sviluppo (con `DATABASE_URL` vuota).
 
-**Stato storico (pre-Fase 4, non piu' in produzione):**
+**Stato storico (pre-Fase 4, non più in produzione):**
 
 - `SECRET_KEY` è un secret Secret Manager (`diset-viz-secret-key`), collegato al
   servizio con `--update-secrets` e leggibile dalla service account di runtime
@@ -64,7 +64,7 @@ gcloud run services update diset-viz --region europe-west1 \
 
 **Attivo in produzione dal 2026-07-31** (Fase 4, sotto): lo stato vivo della
 catena editoriale (ruoli in volo, PR aperte) sta su **Supabase Postgres**, non
-su file locali ne' su SQLite/Litestream. Esistono **due percorsi dati
+su file locali né su SQLite/Litestream. Esistono **due percorsi dati
 distinti**, non uno:
 
 - `/_pipeline?token=...` (server-rendered) legge da Postgres via l'ORM
@@ -73,7 +73,7 @@ distinti**, non uno:
   (`PIPELINE_INGEST_TOKEN`). Dal 2026-08-04 lo stesso POST porta anche lo
   **snapshot di lifecycle per indicatore** (`pipeline_outcomes`, azione
   `outcome`), scritto dal passo di merge a ogni PR fusa: il cruscotto lo
-  sovrappone al dossier committato, cosi' `pubblicata`/`verificato`/prossimo
+  sovrappone al dossier committato, così `pubblicata`/`verificato`/prossimo
   passo sono aggiornati senza aspettare il redeploy dell'immagine (vedi
   `scripts/pipeline_merge.py::emit_outcomes`,
   `scripts/pipeline_monitor.py::_apply_outcomes`). Non tocca la pagina pubblica
@@ -83,7 +83,7 @@ distinti**, non uno:
   (`pipeline_activity` via client JS + sottoscrizione Realtime), filtrato da
   **Row Level Security** sul login Google (`MONITOR_ADMIN_EMAIL`), non dal
   token. Questo percorso resta vuoto senza errore se RLS+Realtime non sono
-  stati applicati (`scripts/supabase_setup.sql`, punto 4 piu' sotto) — non
+  stati applicati (`scripts/supabase_setup.sql`, punto 4 più sotto) — non
   basta che gli agenti scrivano.
 
 | Variabile | Dove | A cosa serve |
@@ -91,27 +91,27 @@ distinti**, non uno:
 | `PIPELINE_TOKEN` | env Cloud Run (o Secret Manager) | Se impostata, `/_pipeline` serve solo con `?token=` giusto, altrimenti 404. Vuota = aperta (solo locale). |
 | `PIPELINE_INGEST_TOKEN` | **Secret Manager**, su Cloud Run **e** nell'ambiente agenti `divarioitalia` | Il segreto con cui gli agenti autenticano il POST dei battiti (header `X-Pipeline-Key`). Vuoto = ingest spento (404). |
 
-L'ambiente agenti vuole anche `PIPELINE_INGEST_URL=https://divarioitalia.it`, cosi'
+L'ambiente agenti vuole anche `PIPELINE_INGEST_URL=https://divarioitalia.it`, così
 `pipeline_monitor.py --beat-open/--beat-close` e `pipeline_inflight.py --post` sanno
 dove postare. Nessuna credenziale GCP sugli agenti: scrivono solo via l'endpoint.
-Nessun'altra variabile serve li': `gh api` (apertura PR) usa l'auth gia'
+Nessun'altra variabile serve lì: `gh api` (apertura PR) usa l'auth già
 presente nel sandbox cloud dell'agente, non un token in env.
 
 ### Fase 4 — Backend mutabile su Supabase
 
-Lo stato mutabile (classifica + vivo della catena) e' su ORM SQLAlchemy: SQLite
-solo quando `DATABASE_URL` e' vuota (sviluppo locale), Postgres di Supabase
+Lo stato mutabile (classifica + vivo della catena) è su ORM SQLAlchemy: SQLite
+solo quando `DATABASE_URL` è vuota (sviluppo locale), Postgres di Supabase
 altrimenti. **Attivo in produzione**, Litestream **ritirato**: quanto segue
-descrive come e' stato acceso, non un passo ancora da fare.
+descrive come è stato acceso, non un passo ancora da fare.
 
-**Cronaca dell'accensione** (gia' fatta, i passi restano come riferimento se
+**Cronaca dell'accensione** (già fatta, i passi restano come riferimento se
 si dovesse rifare da un nuovo progetto Supabase):
 
 1. **Secret Manager** (segreti): `DATABASE_URL` (pooler 6543, transaction mode,
    `sslmode=require`), `DIRECT_URL` (diretta 5432, per Alembic), `SUPABASE_JWT_SECRET`.
    Collega al servizio con `--update-secrets`, come `SECRET_KEY`.
 2. **Env pubbliche** su Cloud Run: `SUPABASE_URL`, `SUPABASE_ANON_KEY`
-   (`--update-env-vars`). Opzionale `MONITOR_ADMIN_EMAIL` (default gia' giusto).
+   (`--update-env-vars`). Opzionale `MONITOR_ADMIN_EMAIL` (default già giusto).
 3. **Schema**: `DIRECT_URL=... alembic upgrade head` (crea `scores`,
    `pipeline_activity`, `pipeline_tokens`). Da fare una volta a mano, o come step
    `alembic upgrade head` in `cloudbuild.yaml` prima del deploy (richiede
@@ -146,7 +146,7 @@ Le migrazioni successive alla Fase 4 aggiungono tabelle con lo stesso passo 3
 (`DIRECT_URL=... alembic upgrade head`) e vogliono lo stesso passo 4
 (`scripts/supabase_setup.sql`, idempotente) rieseguito: `0007_pipeline_outcomes`
 (2026-08-04) crea `pipeline_outcomes`, lo snapshot di lifecycle per indicatore
-del cruscotto (vedi sopra). Finche' i due passi non sono rifatti in produzione,
+del cruscotto (vedi sopra). Finché i due passi non sono rifatti in produzione,
 l'overlay degrada in sicurezza a mappa vuota e la board mostra il solo dossier
 committato, come prima di questa migrazione.
 
@@ -160,10 +160,10 @@ committato, come prima di questa migrazione.
 | `SUPABASE_ANON_KEY` | env Cloud Run | Chiave anon pubblica (protetta da RLS). |
 | `MONITOR_ADMIN_EMAIL` | env Cloud Run | Sola mail ammessa alla console. |
 
-Nota (Fase 5): la verifica JWT e' **ES256 via JWKS** e richiede `cryptography`
+Nota (Fase 5): la verifica JWT è **ES256 via JWKS** e richiede `cryptography`
 (in `requirements.txt` come `PyJWT[crypto]`): senza, ogni richiesta autenticata
 cade a 401 in produzione. Il sistema account (login, preferiti, stats,
-achievements, confronti, GDPR) e' documentato in [`docs/ACCOUNT.md`](docs/ACCOUNT.md);
+achievements, confronti, GDPR) è documentato in [`docs/ACCOUNT.md`](docs/ACCOUNT.md);
 le tabelle sono le migrazioni Alembic `0003..0006` + la RLS di
 `scripts/supabase_setup.sql`.
 

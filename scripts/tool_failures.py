@@ -1,23 +1,23 @@
 """Il lettore di `data/pipeline/tool_failures.jsonl`. Esisteva solo chi scriveva.
 
 Il file lo riempie l'hook `PostToolUseFailure` da mesi, una riga per strumento
-inciampato. Nessuno lo apriva mai, e si e' visto quanto costa: l'errore
-`.venv/bin/python: exit 127` era registrato li' **tre ore prima** della prima
+inciampato. Nessuno lo apriva mai, e si è visto quanto costa: l'errore
+`.venv/bin/python: exit 127` era registrato lì **tre ore prima** della prima
 run del workflow, su `ter-178`. In quella run tutti e quattro gli scrittori
 hanno speso quattro turni a testa a ricercarlo da capo, e un pubblicatore ha
 finito per eseguire il lint con l'interprete di un altro worktree. Un canale
-che nessuno legge non e' un canale: e' un costo di scrittura senza il ricavo.
+che nessuno legge non è un canale: è un costo di scrittura senza il ricavo.
 
-Quello che serve non e' l'elenco dei fallimenti, che sono quasi tutti unici e
-innocui: e' **cio' che si ripete**. Un gesto che fallisce una volta e' un
-incidente, lo stesso gesto che fallisce cinque volte in due giorni e' un pezzo
+Quello che serve non è l'elenco dei fallimenti, che sono quasi tutti unici e
+innocui: è **ciò che si ripete**. Un gesto che fallisce una volta è un
+incidente, lo stesso gesto che fallisce cinque volte in due giorni è un pezzo
 di ambiente rotto che ogni agente ripaga da solo.
 
-    bin/py scripts/tool_failures.py              # cio' che si ripete, ultime 48h
+    bin/py scripts/tool_failures.py              # ciò che si ripete, ultime 48h
     bin/py scripts/tool_failures.py --ore 168 --min 3
     bin/py scripts/tool_failures.py --breve      # una riga, per gli hook
 
-Stdlib pura. Non fallisce mai in modo rumoroso: se il file non c'e', non c'e'
+Stdlib pura. Non fallisce mai in modo rumoroso: se il file non c'è, non c'è
 niente da dire, ed esce zero.
 """
 from __future__ import annotations
@@ -37,7 +37,7 @@ ORE = 48
 MINIMO = 2
 SPAZI = re.compile(r"\s+")
 # I numeri variabili di un messaggio (pid, righe, byte, timestamp) fanno
-# sembrare unico lo stesso guasto ripetuto. La firma li appiattisce, cosi'
+# sembrare unico lo stesso guasto ripetuto. La firma li appiattisce, così
 # "exit code 127" ripetuto cinque volte si conta cinque volte.
 CIFRE = re.compile(r"\d+")
 USCITA = re.compile(r"(?i)exit code \d+\.?")
@@ -48,8 +48,8 @@ def firma(riga: dict) -> str:
 
     Non la prima riga e basta: quasi tutti i fallimenti di `Bash` cominciano
     con "Exit code 1", quindi raggrupparli per quella riga risponde "trentuno
-    volte lo stesso guasto" a trentuno guasti diversi, che e' peggio del
-    silenzio. La riga utile e' la prima che non sia solo il codice di uscita.
+    volte lo stesso guasto" a trentuno guasti diversi, che è peggio del
+    silenzio. La riga utile è la prima che non sia solo il codice di uscita.
     """
     errore = str(riga.get("error") or "").strip()
     for linea in errore.splitlines():
@@ -97,7 +97,7 @@ def recenti(righe: list[dict], ore: int = ORE, adesso=None) -> list[dict]:
 
 
 def ripetuti(righe: list[dict], minimo: int = MINIMO) -> list[tuple[str, int, dict]]:
-    """[(firma, quante volte, un esempio)], dal piu' ripetuto, sopra `minimo`."""
+    """[(firma, quante volte, un esempio)], dal più ripetuto, sopra `minimo`."""
     conteggio = Counter(firma(riga) for riga in righe if firma(riga))
     esempi = {}
     for riga in righe:
@@ -111,7 +111,7 @@ def main(argv=None) -> int:
     parser.add_argument("--ore", type=int, default=ORE)
     parser.add_argument("--min", dest="minimo", type=int, default=MINIMO)
     parser.add_argument("--breve", action="store_true",
-                        help="al massimo tre righe, niente se non c'e' niente")
+                        help="al massimo tre righe, niente se non c'è niente")
     args = parser.parse_args(argv)
 
     gruppi = ripetuti(recenti(leggi(), args.ore), args.minimo)

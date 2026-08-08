@@ -8,10 +8,10 @@ produzione.
 
 ## Problema
 
-L'officina sa descrivere la geometria di una serie, ma il corpus contestuale e'
-ancora troppo piccolo per spiegare in modo verificabile eventi, discontinuita' e
-dinamiche. Il caso guida e' un cambiamento nel 2020: il pacchetto puo' vedere la
-rottura nei dati, ma senza una fonte non puo' collegarla alla pandemia, neppure
+L'officina sa descrivere la geometria di una serie, ma il corpus contestuale è
+ancora troppo piccolo per spiegare in modo verificabile eventi, discontinuità e
+dinamiche. Il caso guida è un cambiamento nel 2020: il pacchetto può vedere la
+rottura nei dati, ma senza una fonte non può collegarla alla pandemia, neppure
 come semplice coincidenza documentata.
 
 La ricerca non deve entrare nello scrittore. Deve produrre memoria durevole e
@@ -46,7 +46,7 @@ Riferimenti ufficiali:
 - [Hook](https://code.claude.com/docs/en/hooks)
 - [Best practice Claude Code](https://code.claude.com/docs/en/best-practices)
 
-La versione verificata durante la proposta e' Claude Code 2.1.224.
+La versione verificata durante la proposta è Claude Code 2.1.224.
 
 ## Contratto di invocazione
 
@@ -63,9 +63,9 @@ Conservare la lista di codici attuale e aggiungere un oggetto facoltativo:
 }
 ```
 
-Modalita':
+Modalità:
 
-- `auto`: usa il corpus e cerca soltanto cio' che manca o e' scaduto;
+- `auto`: usa il corpus e cerca soltanto ciò che manca o è scaduto;
 - `reuse`: nessuna rete, usa soltanto il corpus corrente;
 - `refresh`: forza una nuova acquisizione;
 - `shadow`: misura candidati e decisioni senza mostrarli agli scrittori.
@@ -77,11 +77,11 @@ canary, il preflight registra l'override e interrompe la run.
 
 ### Pacchetti preliminari
 
-Il preparatore esistente monta i pacchetti e restituisce percorsi piu' un
+Il preparatore esistente monta i pacchetti e restituisce percorsi più un
 riepilogo piccolo e strutturato:
 
 - fingerprint di vintage, anni e angoli;
-- claim gia' pertinenti;
+- claim già pertinenti;
 - angoli che richiedono contesto;
 - stato `ready`, `missing`, `stale` o `blocked`;
 - fabbisogni con tema, anni e territori.
@@ -106,12 +106,12 @@ un 503 o un PDF non verificabile non dimostrano che la fonte non esista.
 
 Il pacchetto definitivo associa i claim ai singoli angoli:
 
-- due o piu' angoli eleggibili: due bozze, come oggi;
+- due o più angoli eleggibili: due bozze, come oggi;
 - un solo angolo eleggibile: una bozza e nessun confronto artificiale;
 - nessun angolo eleggibile: blocco prima della scrittura;
 - un angolo dinamico privo del contesto necessario non arriva allo scrittore.
 
-Giudizio, revisione, giro di ritorno sul lint e contabilita' degli esiti restano
+Giudizio, revisione, giro di ritorno sul lint e contabilità degli esiti restano
 quelli del workflow corrente.
 
 ## Subagent
@@ -146,7 +146,7 @@ background vive nei fabbisogni e nei pacchetti generati.
 
 ## Memoria del contesto
 
-La memoria e' `data/corpus/`, non la sessione Claude. Il resume di un dynamic
+La memoria è `data/corpus/`, non la sessione Claude. Il resume di un dynamic
 workflow conserva risultati soltanto nella stessa sessione, quindi ogni fatto
 destinato a run future deve essere versionato su disco.
 
@@ -157,20 +157,20 @@ Ogni claim aggiunge ai campi attuali:
   `external_comparison`;
 - periodo e territori;
 - data di pubblicazione e verifica;
-- eventuali numeri con misura, unita', periodo, territorio e aggregazione;
+- eventuali numeri con misura, unità, periodo, territorio e aggregazione;
 - `event_key` facoltativo per il riuso fra indicatori.
 
 Regole:
 
-- una testata puo' sostenere un'analisi attribuita;
+- una testata può sostenere un'analisi attribuita;
 - una testata da sola non autorizza un nesso causale;
-- la causalita' richiede una fonte primaria o uno studio che la dichiari;
+- la causalità richiede una fonte primaria o uno studio che la dichiari;
 - un evento autorizza la coincidenza, non la causa;
-- un aggregato nazionale ponderato non e' la media semplice delle regioni;
+- un aggregato nazionale ponderato non è la media semplice delle regioni;
 - nessuna conversione numerica viene affidata al modello;
 - la prima versione ammette automaticamente soltanto HTML verificabile.
 
-Una nuova testata non puo' essere ammessa e sostenere un claim nella stessa
+Una nuova testata non può essere ammessa e sostenere un claim nella stessa
 run: diventa utilizzabile dal tick successivo.
 
 ## Trasparenza e provenienza
@@ -189,7 +189,7 @@ Il renderer mostra alla prima esposizione:
 > Testo generato con intelligenza artificiale da dati e fonti verificati
 > automaticamente. Nessun controllo editoriale umano prima della pubblicazione.
 
-La disclosure e' necessaria per il testo AI su questioni di interesse pubblico
+La disclosure è necessaria per il testo AI su questioni di interesse pubblico
 senza revisione umana sostanziale. I controlli automatici della pipeline non
 sono revisione umana.
 
@@ -217,7 +217,7 @@ pubblica la nota di correzione e rimette l'indicatore nello stesso workflow.
 Prima di cambiare il default:
 
 1. aggiungere un'eval congelata per eventi, analisi, geografia, periodo,
-   aggregazioni e causalita';
+   aggregazioni e causalità;
 2. eseguire `contextMode: "shadow"` su 8-10 indicatori, incluso `ter-30` e un
    caso con rottura nel 2020;
 3. eseguire una canary reale su 2-3 indicatori;
@@ -228,7 +228,7 @@ Il canary passa soltanto con:
 
 - zero URL o citazioni inventati;
 - zero abbinamenti errati di anno o territorio;
-- zero causalita' oltre l'uso autorizzato;
+- zero causalità oltre l'uso autorizzato;
 - ogni claim ammesso verificato testualmente;
 - guasti tecnici distinti dalle smentite;
 - nessuna regressione nelle eval esistenti;
@@ -237,7 +237,7 @@ Il canary passa soltanto con:
 
 ## Esito atteso
 
-L'officina riceve contesto piu' ricco senza perdere le proprieta' che la prima
+L'officina riceve contesto più ricco senza perdere le proprietà che la prima
 run ha dimostrato utili: pacchetti congelati, pochi strumenti, risultati
 strutturati, selezione misurabile e cancello deterministico. La ricerca viene
 pagata soltanto quando la memoria non basta e il suo risultato diventa

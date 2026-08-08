@@ -2,12 +2,12 @@
 
 Uno store, due dialetti. In produzione `config.DATABASE_URL` punta al Postgres di
 Supabase (pooler Supavisor in transaction mode); in test e in CI, dove nessun
-server Postgres esiste, `DATABASE_URL` e' vuoto e si ricade su un file SQLite,
+server Postgres esiste, `DATABASE_URL` è vuoto e si ricade su un file SQLite,
 ricavato da `config.LEADERBOARD_DB` esattamente come prima della migrazione. Lo
 stesso codice ORM gira su entrambi: il gate della catena e i deploy, che girano
 la suite intera su checkout senza database, restano leggeri.
 
-L'Engine e' in cache **per URL risolta**, non globale: i test riassegnano
+L'Engine è in cache **per URL risolta**, non globale: i test riassegnano
 `config.LEADERBOARD_DB` a un file temporaneo per classe, quindi l'URL cambia e un
 nuovo Engine nasce da solo, con le tabelle create al volo (su SQLite lo schema lo
 possiede questo modulo, su Postgres lo possiede Alembic).
@@ -32,7 +32,7 @@ def _resolve_url():
     url = (config.DATABASE_URL or "").strip()
     if url:
         # Forza il driver psycopg v3 e non v2 (default storico dello schema
-        # `postgresql://`): e' quello nei requirements.
+        # `postgresql://`): è quello nei requirements.
         if url.startswith("postgresql://"):
             url = "postgresql+psycopg://" + url[len("postgresql://"):]
         elif url.startswith("postgres://"):
@@ -51,9 +51,9 @@ def _make_engine(url):
 
         @event.listens_for(engine, "connect")
         def _sqlite_pragmas(dbapi_conn, _record):
-            # Gli STESSI PRAGMA del vecchio sqlite3 grezzo. WAL non e' opzionale:
-            # nel periodo di transizione (finche' DATABASE_URL non punta a
-            # Supabase) la produzione e' ancora SQLite + Litestream, e Litestream
+            # Gli STESSI PRAGMA del vecchio sqlite3 grezzo. WAL non è opzionale:
+            # nel periodo di transizione (finché DATABASE_URL non punta a
+            # Supabase) la produzione è ancora SQLite + Litestream, e Litestream
             # replica solo un DB in WAL. busy_timeout tiene i molti thread di
             # gunicorn dal cadere su "database is locked".
             cur = dbapi_conn.cursor()
@@ -62,7 +62,7 @@ def _make_engine(url):
             cur.execute("PRAGMA synchronous=NORMAL")
             cur.close()
 
-        # Su SQLite non c'e' Alembic: lo schema lo crea qui, idempotente.
+        # Su SQLite non c'è Alembic: lo schema lo crea qui, idempotente.
         Base.metadata.create_all(engine)
         return engine
     # Postgres via pooler Supavisor (6543, transaction mode): niente prepared
@@ -97,7 +97,7 @@ def get_engine():
 @contextmanager
 def session_scope():
     """Una Session per chiamata, con commit/rollback/close automatici: lo stesso
-    modello 'una connessione per chiamata' del vecchio sqlite3 grezzo, cosi' non
+    modello 'una connessione per chiamatà del vecchio sqlite3 grezzo, così non
     serve un contesto di richiesta Flask (i test chiamano gli store diretti)."""
     session = _sessionmaker_for(_resolve_url())()
     try:

@@ -98,10 +98,10 @@ CRAFT_TELLS = tuple(name for name in prose_lint.ALL_SIGNALS if name != "domanda"
 DEFINITION_SIGNALS = ("contraddizione", "base", "soglia")
 
 FLAG_LABELS = {
-    "smentita": "il verificatore ha fatto cadere un'affermazione, ed e' ancora in pagina",
+    "smentita": "il verificatore ha fatto cadere un'affermazione, ed è ancora in pagina",
     "leggibilita_grave": "il reader-editor lo giudica illeggibile per un lettore comune (fallimento duro)",
     "leggibilita": "il reader-editor lo giudica poco leggibile per un lettore comune",
-    "definizione": "descrive una quantita' diversa da quella della fonte",
+    "definizione": "descrive una quantità diversa da quella della fonte",
     "universale": "afferma un andamento generale",
     "causale": "attribuisce una causa",
     "esterno": "confronto fuori dal dataset senza fonte",
@@ -113,18 +113,18 @@ FLAG_LABELS = {
 # Weights: how much each pattern moves an article up the reading order. A causal
 # claim is the worst because it is invisible to every guard and reads as fact.
 FLAG_WEIGHT = {
-    # Il primo di tutti, e l'unico che non e' un sospetto. Ogni altro segnale qui
+    # Il primo di tutti, e l'unico che non è un sospetto. Ogni altro segnale qui
     # marca una frase che *potrebbe* essere sbagliata: questo marca una frase che
-    # un verificatore avversariale ha gia' fatto cadere, con la prova, e che e'
-    # ancora in pagina perche' nessuno l'ha riscritta. Il verificatore non ha
-    # `content/indicators/` nel perimetro proprio perche' la riparazione tocchi
+    # un verificatore avversariale ha già fatto cadere, con la prova, e che è
+    # ancora in pagina perché nessuno l'ha riscritta. Il verificatore non ha
+    # `content/indicators/` nel perimetro proprio perché la riparazione tocchi
     # a chi legge questa coda, quindi se questo segnale non fosse in cima il
     # cerchio non si chiuderebbe e la smentita resterebbe in un registro.
     "smentita": 60,
-    # I due flag di leggibilita', dal reader-editor. Sono un asse diverso da tutti
-    # gli altri qui (che marcano una possibile falsita' a livello di frase): questi
+    # I due flag di leggibilità, dal reader-editor. Sono un asse diverso da tutti
+    # gli altri qui (che marcano una possibile falsità a livello di frase): questi
     # marcano un articolo tutto vero ma che un lettore comune non capisce. Gradati
-    # per gravita', come lo schema fa per gli altri: `leggibilita_grave` (un
+    # per gravità, come lo schema fa per gli altri: `leggibilita_grave` (un
     # fallimento duro, il lettore non capisce la pagina) sotto `smentita` e
     # `definizione` (misinformare batte confondere) ma sopra i sospetti-di-rischio;
     # `leggibilita` (revise sui soli criteri molli, prosa rigida ma vera) sopra i
@@ -155,7 +155,7 @@ FLAG_WEIGHT = {
 
 
 def load_texts(root=None):
-    """Tutti gli articoli. `root` e' una directory di store, non piu' un file."""
+    """Tutti gli articoli. `root` è una directory di store, non più un file."""
     return indicator_store.load_all(root)
 
 
@@ -183,12 +183,12 @@ def resolve_key(texts, code):
 def prose_fields(entry):
     """(field, text) for every piece of hand-written prose in an entry.
 
-    I titoli autorati sono prosa e stanno qui, non perche' siano lunghi ma
-    perche' l'impronta della verifica li copre: un campo dentro l'impronta e
-    fuori da cio' che il verificatore legge produce una verifica pulita su una
-    frase che nessuno ha guardato, ed e' il caso peggiore, perche' ha l'aria di
-    essere stata controllata. Il `seo_title` in particolare e' cio' che si legge
-    in SERP e puo' affermare qualcosa che il dato non dice.
+    I titoli autorati sono prosa e stanno qui, non perché siano lunghi ma
+    perché l'impronta della verifica li copre: un campo dentro l'impronta e
+    fuori da ciò che il verificatore legge produce una verifica pulita su una
+    frase che nessuno ha guardato, ed è il caso peggiore, perché ha l'aria di
+    essere stata controllata. Il `seo_title` in particolare è ciò che si legge
+    in SERP e può affermare qualcosa che il dato non dice.
     """
     out = []
     for field in ("h1", "seo_title"):
@@ -227,8 +227,8 @@ def _cockpit_figures(level):
 def open_refutations(texts=None, verifications=None):
     """{(codice, livello): [rilievi]} per le smentite ancora in pagina.
 
-    Aperta vuol dire che la prosa di adesso e' ancora quella che il verificatore
-    ha fatto cadere. Se qualcuno l'ha riscritta la smentita e' spenta, e
+    Aperta vuol dire che la prosa di adesso è ancora quella che il verificatore
+    ha fatto cadere. Se qualcuno l'ha riscritta la smentita è spenta, e
     l'articolo torna in coda al verificatore invece che qui: le due code si
     passano il lavoro senza che nessuna delle due debba cancellare una riga
     dell'altra.
@@ -248,7 +248,7 @@ def open_refutations(texts=None, verifications=None):
 
 
 def open_readings(texts=None):
-    """{(codice, livello): (grave, [dettaglio])} per le bocciature di leggibilita'
+    """{(codice, livello): (grave, [dettaglio])} per le bocciature di leggibilità
     ancora aperte.
 
     Aperta vuol dire lettura `revise` sull'impronta corrente e non parcheggiata:
@@ -318,10 +318,10 @@ def assess(key, entry, view=None, definitions=None, refutations=None, readings=N
     if refuted:
         hits["smentita"] = refuted
 
-    # Le bocciature di leggibilita' aperte, dal registro del reader-editor. Come
+    # Le bocciature di leggibilità aperte, dal registro del reader-editor. Come
     # per le smentite, `None` da un chiamante significa "non guardato": non lo si
-    # confonde con "nessuna bocciatura". Un fallimento duro pesa piu' di un revise
-    # molle, e i due flag sono assi separati dai sospetti di falsita' qui sopra.
+    # confonde con "nessuna bocciatura". Un fallimento duro pesa più di un revise
+    # molle, e i due flag sono assi separati dai sospetti di falsità qui sopra.
     if readings is None:
         readings = open_readings()
     unreadable = readings.get((code_now, level_key))
@@ -370,14 +370,14 @@ def assess(key, entry, view=None, definitions=None, refutations=None, readings=N
     # combacia, e per la stessa ragione: la firma dice "l'ho letto e regge", e un
     # verificatore ha mostrato con la prova che una frase non regge. Senza questa
     # riga il segnale `smentita` valeva 60 e poi lo azzeravamo due righe sotto,
-    # perche' l'articolo e' firmato: il peso c'era, l'articolo restava fuori dalla
+    # perché l'articolo è firmato: il peso c'era, l'articolo restava fuori dalla
     # coda, e il cerchio fra i due stadi non si chiudeva. Trovato provando il
     # segnale invece di fidarsi del fatto che comparisse.
     refuted = "smentita" in hits
-    # Una bocciatura di leggibilita' invalida la firma come una smentita: la firma
+    # Una bocciatura di leggibilità invalida la firma come una smentita: la firma
     # dice "l'ho letto e regge", e un critico indipendente a valle ha mostrato che
     # su un asse non regge. Senza questa riga il flag varrebbe 46 o 22 e poi lo
-    # azzereremmo perche' l'articolo e' firmato, e il cerchio col produttore non si
+    # azzereremmo perché l'articolo è firmato, e il cerchio col produttore non si
     # chiuderebbe: stesso difetto che aveva `smentita` prima di essere aggiunta qui.
     unreadable_now = "leggibilita" in hits or "leggibilita_grave" in hits
     stale_signature = bool(reviewed) and reviewed_vintage != vintage

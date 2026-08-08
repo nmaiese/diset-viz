@@ -2,12 +2,12 @@
 
 Un hub editoriale, non una seconda tassonomia. /temi e /regioni servono a
 sfogliare il catalogo; questa pagina sostiene una tesi e la misura: il divario
-italiano non e' una linea sola tra Nord e Sud, sono geografie diverse che non si
+italiano non è una linea sola tra Nord e Sud, sono geografie diverse che non si
 sovrappongono. Reddito e lavoro ordinano il paese in un modo, cultura e servizi
 digitali in un altro, sicurezza percepita e rinnovabili in un terzo.
 
 Tutti i numeri arrivano dal catalogo federato e vengono ricalcolati a ogni
-render, quindi la prosa in pagina non puo' invecchiare rispetto ai dati: le
+render, quindi la prosa in pagina non può invecchiare rispetto ai dati: le
 frasi contengono i valori, non li ripetono a mano.
 
 Una avvertenza che vale per tutta la pagina: le medie qui sono medie semplici dei
@@ -15,11 +15,11 @@ valori regionali, non pesate per popolazione. Servono a confrontare i territori
 tra loro, non a stimare il valore vero della ripartizione o dell'Italia, che per
 un indicatore per abitante richiederebbe i denominatori demografici. Per questo
 il campo si chiama `regions_mean` e non `national`, e in pagina si legge "media
-delle venti regioni": chiamarla media nazionale e' vietato dalle regole del
-repository (docs/INDICATOR_PAGES.md) perche' sarebbe un numero diverso.
+delle venti regioni": chiamarla media nazionale è vietato dalle regole del
+repository (docs/INDICATOR_PAGES.md) perché sarebbe un numero diverso.
 
 Le medie si calcolano solo su un anno con tutte e venti le regioni presenti. Se
-l'ultimo anno pubblicato e' parziale si scende all'ultimo completo, e se non
+l'ultimo anno pubblicato è parziale si scende all'ultimo completo, e se non
 esiste l'indicatore esce: mediare sottoinsiemi diversi restringe o allarga il
 divario a seconda di chi manca.
 """
@@ -31,9 +31,9 @@ from app import profiles
 
 
 # Le tre ripartizioni della pagina, nell'ordine in cui si leggono. Istat separa
-# Sud e Isole: qui stanno insieme come Mezzogiorno, che e' il modo in cui il
-# divario viene raccontato e cercato. La mappa chiave->ripartizione e' quella
-# gia' in app/data.py, non una seconda.
+# Sud e Isole: qui stanno insieme come Mezzogiorno, che è il modo in cui il
+# divario viene raccontato e cercato. La mappa chiave->ripartizione è quella
+# già in app/data.py, non una seconda.
 AREA_ORDER = ("Nord", "Centro", "Mezzogiorno")
 
 _AREA_BY_KEY = {
@@ -43,7 +43,7 @@ _AREA_BY_KEY = {
 
 # I tre divari che aprono la pagina, uno per dimensione: quanto si produce,
 # quanti lavorano, quanto si vive. Sono i tre su cui ogni ripartizione viene
-# misurata nella sua sezione, cosi' le tre sezioni si possono confrontare.
+# misurata nella sua sezione, così le tre sezioni si possono confrontare.
 CORE_DIVARI = ("901", "13", "910")
 
 # Gli altri divari della tabella finale. Set curato, non i primi N del catalogo:
@@ -70,7 +70,7 @@ OTHER_DIVARI = (
 )
 
 # Gli indicatori offerti dal selettore della mappa: gli stessi tre divari
-# d'apertura piu i NEET, che e' la query con cui questa pagina viene cercata.
+# d'apertura piu i NEET, che è la query con cui questa pagina viene cercata.
 MAP_DIVARI = ("901", "13", "910", "408")
 
 _MIN_YEAR = 2022
@@ -99,7 +99,7 @@ def _area_means(values):
     """Media semplice per ripartizione, solo a copertura piena.
 
     Un anno con qualche regione mancante non viene mediato: basta che manchi la
-    Lombardia perche' la media del Nord scenda e il divario si restringa da solo.
+    Lombardia perché la media del Nord scenda e il divario si restringa da solo.
     Fuori tutto l'anno, quindi, non la ripartizione incompleta.
     """
     buckets = {}
@@ -139,7 +139,7 @@ def _is_comparable(item):
 
     Serve una direzione dichiarata (senza verso "in testa" non vuol dire nulla),
     una serie completa e un anno recente. Le varianti di genere restano fuori:
-    raddoppierebbero lo stesso divario. La copertura dell'anno che verra' poi
+    raddoppierebbero lo stesso divario. La copertura dell'anno che verrà poi
     usato la controlla `_full_coverage_year`: `region_count` e `completeness`
     parlano della serie intera, non dell'ultimo anno pubblicato.
     """
@@ -155,10 +155,10 @@ def _is_comparable(item):
 def _scan_catalog():
     """Per ogni indicatore confrontabile: chi ha la media migliore, e di quanto.
 
-    E' il conto che sostiene la tesi della pagina. Gira su tutto il catalogo
+    È il conto che sostiene la tesi della pagina. Gira su tutto il catalogo
     federato, non su una selezione: 221 indicatori a oggi, in frazioni di secondo,
-    perche' le serie sono gia' in cache di processo. Per ciascuno usa l'ultimo
-    anno a copertura piena, che per cinque serie non e' l'ultimo pubblicato.
+    perché le serie sono già in cache di processo. Per ciascuno usa l'ultimo
+    anno a copertura piena, che per cinque serie non è l'ultimo pubblicato.
     """
     scanned = []
     for item in get_atlas_catalog()["indicators"]:
@@ -197,8 +197,8 @@ def _lead_tally(scanned):
 def _examples_led_by(scanned, area, limit=3):
     """Gli indicatori su cui una ripartizione ha la media migliore, i piu netti.
 
-    Ordinati per distanza dall'ultima ripartizione, cosi' gli esempi in pagina
-    sono quelli dove il vantaggio e' evidente e non un decimale.
+    Ordinati per distanza dall'ultima ripartizione, così gli esempi in pagina
+    sono quelli dove il vantaggio è evidente e non un decimale.
     """
     led = [row for row in scanned if row["leader"] == area]
     led.sort(key=lambda row: -row["spread_pct"])
@@ -208,10 +208,10 @@ def _examples_led_by(scanned, area, limit=3):
 def _divario(indicator_id):
     """Un divario: le tre medie di ripartizione, la media delle regioni, gli estremi.
 
-    `regions_mean` e' la media semplice dei venti valori regionali. Non e' il
-    valore italiano e non va chiamato cosi': per un indicatore per abitante il
+    `regions_mean` è la media semplice dei venti valori regionali. Non è il
+    valore italiano e non va chiamato così: per un indicatore per abitante il
     dato nazionale vuole i denominatori demografici, che qui non ci sono. Il nome
-    del campo lo dice, cosi' nessun template puo' scriverlo per sbaglio.
+    del campo lo dice, così nessun template può scriverlo per sbaglio.
     """
     payload = get_atlas_indicator(indicator_id)
     if payload is None:
@@ -229,7 +229,7 @@ def _divario(indicator_id):
     regions_mean = sum(row["value"] for row in values) / len(values)
     ordered = sorted(values, key=lambda row: row["value"], reverse=not better_low)
     unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
-    # L'unita' di una differenza non e' quella di un valore: su un indicatore in
+    # L'unità di una differenza non è quella di un valore: su un indicatore in
     # percentuale la distanza dalla media si misura in punti, non in %.
     change_unit = indicator_notes.change_unit_label(meta["name"], meta.get("unit"))
 
@@ -245,7 +245,7 @@ def _divario(indicator_id):
             "delta": delta,
             "delta_pct": (delta / regions_mean * 100) if regions_mean else 0.0,
             # "meglio" e "peggio" vengono dal verso dell'indicatore, non dal segno:
-            # su disoccupazione o NEET stare sotto la media e' un bene.
+            # su disoccupazione o NEET stare sotto la media è un bene.
             "better_than_mean": (delta < 0) if better_low else (delta > 0),
             "lead": {
                 "name": ranked_in_area[0]["region"],

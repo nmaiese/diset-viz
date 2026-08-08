@@ -1,10 +1,10 @@
-"""Il lint della prosa contro il **catalogo vero**, cioe' tutti i pubblicati.
+"""Il lint della prosa contro il **catalogo vero**, cioè tutti i pubblicati.
 
 Sta in `integration/` per la regola di `CLAUDE.md`: legge tutti gli articoli
 committati, quindi ha bisogno di un giro reale. I due test qui erano in
 `tests/unit/test_prose_lint.py`, dove la suite veloce li girava senza dirlo.
 
-La meta' sintetica del lint (ogni controllo pinnato da tutti e due i lati, la
+La metà sintetica del lint (ogni controllo pinnato da tutti e due i lati, la
 frase che deve farlo scattare e la prosa che non deve) resta in
 `tests/unit/test_prose_lint.py` e non tocca il disco.
 """

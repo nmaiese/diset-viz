@@ -2,7 +2,7 @@
 
 Prova le tre domande che la guardia sa rispondere (comando, scrittura,
 chiusura) senza passare da stdin: le funzioni di verdetto sono pure apposta,
-perche' un hook si prova male e una funzione si prova bene.
+perché un hook si prova male e una funzione si prova bene.
 """
 
 import unittest
@@ -60,7 +60,7 @@ class CommandVerdictTests(unittest.TestCase):
         self.assertFalse(ok)
 
     def test_redirect_is_a_write_with_another_dress(self):
-        # Un comando permesso che scrive fuori perimetro via redirect e' una
+        # Un comando permesso che scrive fuori perimetro via redirect è una
         # Write travestita, e passa dallo stesso perimetro.
         ok, reason = agent_guard.command_verdict(
             "echo pwned > app/views.py", ["verificatore"])
@@ -125,7 +125,7 @@ class CommandVerdictTests(unittest.TestCase):
     def test_a_real_second_command_after_newline_is_still_checked(self):
         # Il caso pericoloso che una fusione troppo permissiva di riga
         # rischierebbe di far scivolare: un secondo comando su una riga
-        # nuova (non dentro virgolette) resta un gesto a se', giudicato.
+        # nuova (non dentro virgolette) resta un gesto a sé, giudicato.
         ok, reason = agent_guard.command_verdict("ls\nnpm install evil", ["verificatore"])
         self.assertFalse(ok)
         self.assertIn("npm", reason)
@@ -144,7 +144,7 @@ class PathVerdictTests(unittest.TestCase):
 
     def test_a_stage_may_not_touch_the_articles(self):
         """Dopo la demolizione **nessuno** stadio scrive in
-        `content/indicators/`: il produttore non esiste piu' e l'officina non e'
+        `content/indicators/`: il produttore non esiste più e l'officina non è
         una run, scrive con `officina.pubblica` e passa da `officina/lint.py`.
         Il perimetro che glielo permetteva era rimasto aperto senza un agente
         che lo reclamasse."""
@@ -166,19 +166,19 @@ class PathVerdictTests(unittest.TestCase):
 
 
     def test_union_of_stages(self):
-        """`--stage` e' ripetibile e i perimetri si **sommano**, non si
+        """`--stage` è ripetibile e i perimetri si **sommano**, non si
         intersecano.
 
         Detto su una coppia in cui ciascuno porta qualcosa che l'altro non ha:
         `admissions` possiede il layer esterno, `verificatore` il registro delle
         verifiche, e la somma li tiene tutti e due. Una coppia in cui uno dei due
-        possiede gia' il percorso proverebbe solo che il primo perimetro
-        funziona, cioe' niente sull'unione."""
+        possiede già il percorso proverebbe solo che il primo perimetro
+        funziona, cioè niente sull'unione."""
         verifica = pipeline_gate.VERIFICATIONS + "ter-1-regione-abc.json"
         for percorso in (pipeline_gate.EXTERNAL_DATASET, verifica):
             ok, _ = agent_guard.path_verdict(percorso, ["admissions", "verificatore"])
             self.assertTrue(ok, percorso)
-        # E ciascuno da solo non arriva a cio' che e' dell'altro.
+        # E ciascuno da solo non arriva a ciò che è dell'altro.
         ok, _ = agent_guard.path_verdict(verifica, ["admissions"])
         self.assertFalse(ok)
         ok, _ = agent_guard.path_verdict(
@@ -192,7 +192,7 @@ class PathVerdictTests(unittest.TestCase):
 
     def test_evals_out_is_allowed_for_any_stage(self):
         # La deroga di servizio: un agente hooked deve poter girare la propria
-        # eval, la cui cartella di lavoro (evals/out/, ignorata da git) e' fuori
+        # eval, la cui cartella di lavoro (evals/out/, ignorata da git) è fuori
         # da ogni perimetro di stadio.
         ok, _ = agent_guard.path_verdict(
             "evals/out/admissions/cases.json", ["admissions"])
@@ -204,8 +204,8 @@ class PathVerdictTests(unittest.TestCase):
         self.assertFalse(ok)
 
     def test_launch_may_write_the_journal_only(self):
-        # Il lanciatore non e' uno stadio del cancello ma la guardia lo sorveglia
-        # come gli altri: il diario si' (il battito del tick), le code degli stadi no.
+        # Il lanciatore non è uno stadio del cancello ma la guardia lo sorveglia
+        # come gli altri: il diario sì (il battito del tick), le code degli stadi no.
         ok, _ = agent_guard.path_verdict(
             "data/pipeline/runs/launch-20260804.json", ["launch"])
         self.assertTrue(ok)

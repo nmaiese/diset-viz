@@ -2,8 +2,8 @@
 
 L'URL viene da `app.config.DIRECT_URL` (connessione diretta Supabase 5432, non il
 pooler in transaction mode, che non regge le migrazioni). In assenza di Postgres
-si ricade sullo stesso SQLite di app/db.py, cosi' `alembic upgrade head` gira
-anche in locale senza un server. `target_metadata` e' il Base ORM: da qui
+si ricade sullo stesso SQLite di app/db.py, così `alembic upgrade head` gira
+anche in locale senza un server. `target_metadata` è il Base ORM: da qui
 `--autogenerate` vede le tabelle.
 """
 

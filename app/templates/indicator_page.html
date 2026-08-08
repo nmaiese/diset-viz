@@ -147,7 +147,7 @@
         <small><span data-kpi="focus-name">{{ level.default_territory.name }}</span> · <span data-explore="year-label">{{ level.year_max }}</span></small>
         {# data-kpi sullo span interno, non sullo <strong>: l'explorer fa
            textContent= sul nodo che trova, e sullo <strong> cancellerebbe
-           l'unita' al primo cambio d'anno. L'unita' solo se corta: "%" sta
+           l'unità al primo cambio d'anno. L'unità solo se corta: "%" sta
            accanto alla cifra, "GWh per 100 milioni di euro" no. #}
         <strong><span data-kpi="focus-value">{{ level.default_territory.value | it_num(2) }}</span>{% if meta.value_unit and meta.value_unit | length <= 8 %} <span class="u">{{ meta.value_unit }}</span>{% endif %}</strong>
         <span class="kpi__sub"><span data-kpi="focus-rank">1ª su {{ level.observations | length }} {{ level.plural }}</span> <a data-kpi="focus-link" href="{{ level.profile_path or '#' }}{{ level.default_territory.key }}"{% if not level.profile_path %} hidden{% endif %}>profilo →</a></span>
@@ -275,7 +275,7 @@
             <div class="indicator-explore__tip" data-explore="trend-tip" hidden></div>
           </div>
         </figure>
-        {# La stessa serie in tabella, server-rendered: il grafico e' uno <svg>
+        {# La stessa serie in tabella, server-rendered: il grafico è uno <svg>
            riempito da JS, quindi senza JavaScript il lettore (e il crawler)
            perderebbe la serie storica. La tabella la porta a tutti, chiusa di
            default per non affollare, ma sempre nel DOM. #}
@@ -300,14 +300,14 @@
   {# ---- Zona 2: l'articolo. Sezioni variabili, una voce sola. ---- #}
   {{ article.body(page_article, meta, level) }}
 
-  {# "Come leggere il dato": appare quando la definizione e' assorbita qui invece
+  {# "Come leggere il dato": appare quando la definizione è assorbita qui invece
      di aprire l'articolo con la metodologia (sezioni variabili). Sta **dopo** la
-     narrazione, e non e' un dettaglio di impaginazione: renderlo prima lasciava
-     al lettore la stessa contabilita' in apertura, solo sotto un altro titolo, e
-     lo scopo del blocco e' proprio togliergliela di li'. La meccanica si legge
-     quando serve, cioe' dopo aver capito che cosa dice il dato.
-     `page_article.lead` e' l'attacco autorato, None se composto: e' cosi' che il
-     blocco sa se `plain` e' gia' nel lead (eco) o va mostrato. #}
+     narrazione, e non è un dettaglio di impaginazione: renderlo prima lasciava
+     al lettore la stessa contabilità in apertura, solo sotto un altro titolo, e
+     lo scopo del blocco è proprio togliergliela di lì. La meccanica si legge
+     quando serve, cioè dopo aver capito che cosa dice il dato.
+     `page_article.lead` è l'attacco autorato, None se composto: è così che il
+     blocco sa se `plain` è già nel lead (eco) o va mostrato. #}
   {% if page_article.come_leggere %}{{ article.come_leggere(meta, level, page_article.lead is not none) }}{% endif %}
 
   {# ---- Zona 3: l'apparato. Fonti, verifica, condivisione, percorso. ---- #}

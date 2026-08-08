@@ -4,7 +4,7 @@ Con i worktree ogni run lavora in un albero sorella (`diset-viz-runs/<run_id>`),
 non nel checkout principale. La guardia misura il perimetro chiedendo a git a
 quale working tree appartiene il file: se misurasse dal solo checkout principale,
 una scrittura nel worktree (il cancello stesso incluso) fallirebbe
-`relative_to(PROJECT_ROOT)` e passerebbe come 'scratch esterno', scavalcando il
+`relative_to(PROJECT_ROOT)` e passerebbe come 'scratch esternò, scavalcando il
 perimetro. Qui si costruisce un repo con un worktree vero e si prova che non lo fa.
 """
 
@@ -26,7 +26,7 @@ class GuardIsAnchoredToTheRunWorktree(unittest.TestCase):
         self._git("config", "user.email", "t@example.com")
         self._git("config", "user.name", "t")
         # Le cartelle che il perimetro conosce e una che non conosce, committate
-        # cosi' il worktree le porta con se'.
+        # così il worktree le porta con sé.
         (self.main / "content" / "indicators").mkdir(parents=True)
         (self.main / "content" / "indicators" / ".gitkeep").write_text("")
         (self.main / "scripts").mkdir()
@@ -48,7 +48,7 @@ class GuardIsAnchoredToTheRunWorktree(unittest.TestCase):
 
     def test_a_write_outside_the_perimeter_in_the_worktree_is_blocked(self):
         # Il cancello stesso, dentro il worktree, con un percorso assoluto: prima
-        # passava come scratch esterno, ora e' misurato dal worktree e bloccato.
+        # passava come scratch esterno, ora è misurato dal worktree e bloccato.
         target = str(self.worktree / "scripts" / "pipeline_gate.py")
         ok, reason = agent_guard.path_verdict(target, ["verificatore"])
         self.assertFalse(ok)

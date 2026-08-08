@@ -61,7 +61,7 @@ class ItRunsOnAColdCheckout(unittest.TestCase):
 
 class ThePublisherIsGone(unittest.TestCase):
     """Rimossa la verifica-sito (merge = pubblicazione), il `publisher` non esiste
-    piu' come stadio ne' come coda: la vista degli stadi non lo nomina."""
+    più come stadio né come coda: la vista degli stadi non lo nomina."""
 
     def test_the_publisher_is_not_among_the_ordered_stages(self):
         stages = [s["stage"] for s in pipeline_status.build_status()["stages"]]

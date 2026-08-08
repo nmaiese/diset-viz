@@ -1,10 +1,10 @@
 """Il corpus: la licenza di spiegare, e i modi in cui potrebbe diventare bugia.
 
-Questo modulo da' agli articoli il diritto di dire perche' i numeri si muovono.
-E' un potere che il progetto ha sempre negato, e per una buona ragione: da una
-serie non si deduce una causa. Il diritto regge solo finche' le citazioni sono
+Questo modulo dà agli articoli il diritto di dire perché i numeri si muovono.
+È un potere che il progetto ha sempre negato, e per una buona ragione: da una
+serie non si deduce una causa. Il diritto regge solo finché le citazioni sono
 vere e attribuite, quindi la maggior parte di questi test guarda i modi in cui
-una citazione puo' smettere di esserlo.
+una citazione può smettere di esserlo.
 """
 import unittest
 
@@ -14,14 +14,14 @@ from packs import build as build_module
 class ThePackSaysWhatTheNumberMeasures(unittest.TestCase):
     """Il difetto che la prima misura ha trovato, e non era di prosa.
 
-    Il pacchetto portava nome, unita', verso e anni: niente numeratore, niente
+    Il pacchetto portava nome, unità, verso e anni: niente numeratore, niente
     denominatore. Su `ter-30` la fonte scrive "visitatori dei circuiti sul
     totale di musei e istituti similari appartenenti ai circuiti", e i due
     scrittori, non avendolo, hanno dedotto dal nome "domanda culturale" un
-    rapporto per circuito. Prosa piu' fluida di prima, indicatore diverso.
+    rapporto per circuito. Prosa più fluida di prima, indicatore diverso.
 
-    A un agente che non puo' cercare, cio' che non gli si da' non esiste: le
-    righe erano gia' su disco e gia' lette da `packs/build.py`, che ne prendeva
+    A un agente che non può cercare, ciò che non gli si dà non esiste: le
+    righe erano già su disco e già lette da `packs/build.py`, che ne prendeva
     solo la colonna delle note.
     """
 
@@ -42,7 +42,7 @@ class ThePackSaysWhatTheNumberMeasures(unittest.TestCase):
         testo = build_module.render(pack)
         self.assertIn("CHE COSA MISURA", testo)
         self.assertIn("sul totale di musei", testo)
-        self.assertIn("e' un'etichetta, non una definizione", testo)
+        self.assertIn("è un'etichetta, non una definizione", testo)
 
     def test_without_a_definition_the_pack_forbids_deducing_one(self):
         pack = dict(build_module.build_pack("territorial", "30"), definition=None)
@@ -104,7 +104,7 @@ class Matching(unittest.TestCase):
         context.claims = self.saved
 
     def test_a_claim_about_the_indicator_beats_one_about_the_theme(self):
-        """Anche se e' piu' vecchia: e' piu' pertinente, e la pertinenza vince."""
+        """Anche se è più vecchia: è più pertinente, e la pertinenza vince."""
         found = context.for_indicator("ter:920", "Salute, demografia e cura")
         self.assertEqual(found[0]["id"], "indicatore")
 
@@ -146,7 +146,7 @@ class TheContextBlock(unittest.TestCase):
 
 
 class TypographyTrap(unittest.TestCase):
-    """La citazione verbatim puo' contenere cio' che la prosa vieta."""
+    """La citazione verbatim può contenere ciò che la prosa vieta."""
 
     def test_the_verbatim_is_kept_and_a_prose_version_is_offered(self):
         context_claim = claim(
@@ -176,13 +176,13 @@ class TheRealCorpus(unittest.TestCase):
 
     def test_there_is_something_in_it(self):
         self.assertTrue(context.reload_corpus(),
-                        "corpus vuoto: nessun articolo potra' spiegare niente")
+                        "corpus vuoto: nessun articolo potrà spiegare niente")
 
     def test_the_registry_is_not_also_listed_in_the_documentation(self):
         """Due copie di un elenco sono due elenchi che divergono.
 
-        `docs/SECONDARY_SOURCES.md` teneva la stessa tabella, e questa e' la
-        deriva che il progetto ha gia' pagato una volta. Il documento adesso
+        `docs/SECONDARY_SOURCES.md` teneva la stessa tabella, e questa è la
+        deriva che il progetto ha già pagato una volta. Il documento adesso
         punta al JSON: se qualcuno rimette la tabella, questo test lo dice.
         """
         import os

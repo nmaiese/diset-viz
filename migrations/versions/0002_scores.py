@@ -4,9 +4,9 @@ Revision ID: 0002_scores
 Revises: 0001_pipeline_state
 Create Date: 2026-07-31
 
-Ricalca lo schema SQLite della classifica, piu' la colonna `user_id` (UUID
-dell'account Supabase, nullable: gli anonimi restano). `created_at` e' testo ISO
-generato in Python, non un DEFAULT SQL, cosi' non dipende da funzioni-tempo di
+Ricalca lo schema SQLite della classifica, più la colonna `user_id` (UUID
+dell'account Supabase, nullable: gli anonimi restano). `created_at` è testo ISO
+generato in Python, non un DEFAULT SQL, così non dipende da funzioni-tempo di
 dialetto.
 """
 from alembic import op

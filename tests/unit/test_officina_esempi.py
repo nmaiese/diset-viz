@@ -1,8 +1,8 @@
 """La scelta dell'esempio: deterministica, esistente, e non sempre la stessa.
 
-Il difetto che questa mappa corregge e' lo stesso di tutta la rifondazione: se
+Il difetto che questa mappa corregge è lo stesso di tutta la rifondazione: se
 la scelta la fa il modello, il modello sceglie quasi sempre uguale, e
-l'uniformita' rientra da una porta che nessuno guardava.
+l'uniformità rientra da una porta che nessuno guardava.
 
 Sintetico soltanto: la misura su sessanta pacchetti veri sta in
 `tests/integration/test_officina_esempi_live.py`.
@@ -20,9 +20,9 @@ class TheMapPointsAtRealFiles(unittest.TestCase):
 
     def test_a_fixed_strength_angle_cannot_be_missing_from_the_map(self):
         """Un tipo a forza fissa e alta apre quasi sempre, quindi non mapparlo
-        non e' una lacuna qualunque: `pick()` scenderebbe a un angolo piu'
+        non è una lacuna qualunque: `pick()` scenderebbe a un angolo più
         debole o all'estratto del "nessuna storia" proprio sull'articolo in cui
-        la storia era la piu' forte."""
+        la storia era la più forte."""
         for tipo in ("gruppi-che-si-sorpassano", "sorpasso"):
             self.assertIn(tipo, esempi.BY_ANGLE, tipo)
 
@@ -30,7 +30,7 @@ class TheMapPointsAtRealFiles(unittest.TestCase):
         self.assertIn(esempi.WHEN_THERE_IS_NO_STORY, esempi.available())
 
     def test_the_library_is_not_mostly_unused(self):
-        """Una biblioteca di dieci testi con due usati e' una biblioteca finta."""
+        """Una biblioteca di dieci testi con due usati è una biblioteca finta."""
         used = set(esempi.BY_ANGLE.values()) | {esempi.WHEN_THERE_IS_NO_STORY}
         self.assertGreaterEqual(len(used), 5,
                                 f"solo {len(used)} estratti raggiungibili")

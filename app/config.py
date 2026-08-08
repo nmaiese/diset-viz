@@ -6,20 +6,20 @@ SITE_URL = os.getenv("SITE_URL", "https://divarioitalia.it").rstrip("/")
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv("SECRET_KEY", "")
-# Percorso del file SQLite locale, usato solo quando DATABASE_URL e' vuota (cioe'
-# sviluppo/test): in produzione lo stato mutabile e' su Supabase Postgres e questo
-# file non viene toccato. Litestream e' stato ritirato con la Fase 4.
+# Percorso del file SQLite locale, usato solo quando DATABASE_URL è vuota (cioè
+# sviluppo/test): in produzione lo stato mutabile è su Supabase Postgres e questo
+# file non viene toccato. Litestream è stato ritirato con la Fase 4.
 LEADERBOARD_DB = os.getenv("LEADERBOARD_DB", os.path.join(_REPO_ROOT, "data", "leaderboard.sqlite3"))
 
 # Il backend mutabile (classifica + stato vivo della catena). Vuoto = SQLite
 # locale ricavato da LEADERBOARD_DB (default in sviluppo, in test/CI e in
-# produzione finche' Supabase non e' provisionato): cosi' la suite gira senza un
+# produzione finché Supabase non è provisionato): così la suite gira senza un
 # server Postgres. Impostato (Supabase) = Postgres via pooler Supavisor 6543
 # transaction mode. DIRECT_URL (5432) lo usa solo Alembic per le migrazioni.
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 DIRECT_URL = os.getenv("DIRECT_URL", "")
 
-# Identita' Supabase esposte al browser (Auth Google + Realtime). Pubbliche per
+# Identità Supabase esposte al browser (Auth Google + Realtime). Pubbliche per
 # natura (anon key protetta da RLS lato Postgres): stanno in env, non in Secret
 # Manager, e si iniettano nei template senza rebuild del frontend.
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
@@ -53,8 +53,8 @@ PIPELINE_TOKEN = os.getenv("PIPELINE_TOKEN", "")
 
 # Il segreto con cui gli agenti della catena inviano i battiti a /_pipeline/beat
 # (il vivo del cruscotto: chi lavora su cosa, e le PR aperte). Il sito lo scrive
-# nel SQLite che Litestream replica su GCS, cosi' il vivo e' condiviso fra le
+# nel SQLite che Litestream replica su GCS, così il vivo è condiviso fra le
 # macchine senza credenziali GCP sugli agenti. Vuoto = ingest disabilitato
-# (l'endpoint risponde 404, come /_pipeline senza token), che e' il default in
-# locale e finche' il segreto non e' provisionato in Cloud Run e nell'ambiente agenti.
+# (l'endpoint risponde 404, come /_pipeline senza token), che è il default in
+# locale e finché il segreto non è provisionato in Cloud Run e nell'ambiente agenti.
 PIPELINE_INGEST_TOKEN = os.getenv("PIPELINE_INGEST_TOKEN", "")

@@ -24,34 +24,34 @@ automatico.
 Per il mestiere della lingua (togliere i tic dell'italiano generato, dare voce,
 regolare ritmo e retorica) il progetto adotta la skill esterna
 **`scrittura-italiana`** (`.claude/skills/scrittura-italiana/`, CC BY-SA 4.0).
-Questa guida la **cita**, non la ricopia: le quattro virtu' retoriche, le cinque
+Questa guida la **cita**, non la ricopia: le quattro virtù retoriche, le cinque
 varianti del bipolare, l'antilingua e il lessico di plastica vivono nei suoi
 `references/`, e ripeterli qui li manderebbe fuori sincrono.
 
-**La precedenza e' esplicita, e non e' negoziabile: su ogni conflitto vincono
+**La precedenza è esplicita, e non è negoziabile: su ogni conflitto vincono
 gli assoluti di progetto.** La skill lavora nel registro *testo controllato* e
-li' consiglia i caporali `« »`, le lineette spaziate e il punto e virgola. Le
+lì consiglia i caporali `« »`, le lineette spaziate e il punto e virgola. Le
 regole tipografiche qui sopra li **vietano**: niente `—`, `–`, `;`, `…`,
 virgolette dritte. Quando la skill suggerisce una di quelle forme, si tiene la
 regola di progetto e si scioglie l'inciso con virgole o due frasi. Il conflitto
-e' sistematico, non un caso di bordo: sta nel registro esatto in cui vivono le
-nostre pagine. Il perche' e il cancello deterministico che lo fa rispettare
+è sistematico, non un caso di bordo: sta nel registro esatto in cui vivono le
+nostre pagine. Il perché e il cancello deterministico che lo fa rispettare
 (`tic_count.py`, campo `vietati` sempre vuoto) sono in
 [`evals/scrittura-italiana/PRECEDENZA.md`](../evals/scrittura-italiana/PRECEDENZA.md).
 
 **La precedenza non riguarda solo i caratteri.** La skill consiglia anche di
-variare il ritmo, e qui la varieta' e' lecita ma non e' il metro: il metro e' che
+variare il ritmo, e qui la varietà è lecita ma non è il metro: il metro è che
 la frase si prenda al primo passaggio (criterio 8 della rubrica, e la sezione
 "Tecniche da giornalista" qui sotto). Quando un suggerimento della skill allunga
-una frase o le aggiunge un inciso, vince la leggibilita'. Vale anche per due
-metriche del suo contatore: `mente` e `gerundite` possono salire su un testo piu'
-leggibile, e li' non sono un verdetto. Il campo `vietati` resta l'unico cancello.
+una frase o le aggiunge un inciso, vince la leggibilità. Vale anche per due
+metriche del suo contatore: `mente` e `gerundite` possono salire su un testo più
+leggibile, e lì non sono un verdetto. Il campo `vietati` resta l'unico cancello.
 
-Cambiare il prompt di chi scrive per agganciare la skill in rilettura e' un
-cambio gated da `canary` (obbligo di `CLAUDE.md`): la skill installata e'
-**disponibile**, ma finche' `.claude/agents/scrittore-indicatore.md` non la
+Cambiare il prompt di chi scrive per agganciare la skill in rilettura è un
+cambio gated da `canary` (obbligo di `CLAUDE.md`): la skill installata è
+**disponibile**, ma finché `.claude/agents/scrittore-indicatore.md` non la
 richiama il comportamento non cambia. (Il paragrafo diceva `producer.md`, un
-file cancellato: cosi' com'era prometteva un aggancio che nessuna modifica
+file cancellato: così com'era prometteva un aggancio che nessuna modifica
 avrebbe potuto fare.)
 
 ## Tono: scrivi come una persona
@@ -69,7 +69,7 @@ dalle stesse cifre e scrive un pezzo che il lettore ricorda.
 **I modelli non sono descritti qui, sono in [`content/esempi/`](esempi/):** testi
 veri di Openpolis, Pagella Politica, lavoce.info, Info Data, YouTrend, il Post e
 Istat, scelti su un criterio solo, che si leggano al primo passaggio. Se ne
-sceglie **uno** prima di scrivere, quello con la forma di storia piu' vicina alla
+sceglie **uno** prima di scrivere, quello con la forma di storia più vicina alla
 propria, e lo si tiene aperto. Non si mediano: otto registri mescolati fanno
 l'assenza di registro. Le sei mosse qui sotto dicono che cosa cercare in quel
 testo, non lo sostituiscono.
@@ -117,37 +117,37 @@ testo, non lo sostituiscono.
 
 ## Imperfezione controllata
 
-La levigatura uniforme e' un tell da bot quanto la sciatteria, e un pezzo dove
-nessuna frase esce dallo schema non e' stato scritto da nessuno. Ma la libertà
+La levigatura uniforme è un tell da bot quanto la sciatteria, e un pezzo dove
+nessuna frase esce dallo schema non è stato scritto da nessuno. Ma la libertà
 che questa sezione concede si ferma dove comincia la fatica del lettore: **prima
 la frase si legge al primo passaggio, poi ha una voce.** Nell'ordine, non in
-alternativa. Un inciso in piu' e' un lusso da spendere una volta per pezzo, non
+alternativa. Un inciso in più è un lusso da spendere una volta per pezzo, non
 il modo normale di dire la seconda cosa.
 
-La regola d'oro, perche' questa sezione non venga letta come un permesso:
-**l'imperfezione e' concessa e richiesta nella forma, e' vietata nel contenuto.**
-Puoi aprire una frase con "Ma", concederti un inciso, lasciare una sezione piu'
+La regola d'oro, perché questa sezione non venga letta come un permesso:
+**l'imperfezione è concessa e richiesta nella forma, è vietata nel contenuto.**
+Puoi aprire una frase con "Ma", concederti un inciso, lasciare una sezione più
 corta dell'altra. Non puoi toccare l'aritmetica, aggiungere una causa che il dato
 non mostra, citare una fonte che non hai verificato. Quando chiedi a te stesso di
-essere piu' umano, l'errore facile e' diventare piu' libero anche sui numeri, ed
-e' l'unico errore che non si puo' correggere dopo.
+essere più umano, l'errore facile è diventare più libero anche sui numeri, ed
+è l'unico errore che non si può correggere dopo.
 
-- **Nut graf.** Un paragrafo, non un accenno, che dice perche' questi numeri
-  contano: quante persone tocca, quale sistema regge, quale scommessa e'. Di'
+- **Nut graf.** Un paragrafo, non un accenno, che dice perché questi numeri
+  contano: quante persone tocca, quale sistema regge, quale scommessa è. Di'
   l'importanza, non una causa.
 - **Il peso lo decide il dato, non lo stile.** Se la storia sta nella
-  distribuzione, il quadro viene lungo e la dinamica corta, e va bene cosi'.
+  distribuzione, il quadro viene lungo e la dinamica corta, e va bene così.
   Sezioni di lunghezza diversa sono una conseguenza, mai un obiettivo: non
   allungare una sezione per rompere la simmetria.
 - **Digressione.** Una per pezzo, che allarga il campo temporale o comparativo
   restando dentro la serie o citando una fonte reale. Mai un "probabilmente
-  perche'".
-- **Il caveat prende la sua frase.** Un limite va detto dove il numero puo'
-  essere frainteso, e li' va detto in una frase sua: agganciarlo con la virgola
-  alla frase in corso e' il modo piu' rapido di renderla illeggibile. Non
-  ripetere il disclaimer sulla media non ponderata, quello sta gia' nell'apparato.
+  perché".
+- **Il caveat prende la sua frase.** Un limite va detto dove il numero può
+  essere frainteso, e lì va detto in una frase sua: agganciarlo con la virgola
+  alla frase in corso è il modo più rapido di renderla illeggibile. Non
+  ripetere il disclaimer sulla media non ponderata, quello sta già nell'apparato.
 - **Non scrivere il numero due volte.** O l'immagine ("una su due") o la cifra
-  ("48%"), mai "quasi la meta' (48%)". Il lettore riceve lo stesso fatto due
+  ("48%"), mai "quasi la metà (48%)". Il lettore riceve lo stesso fatto due
   volte e la frase si ferma.
 
 ## Schemi da evitare (suonano da bot)
@@ -165,16 +165,16 @@ e' l'unico errore che non si puo' correggere dopo.
   si leggono come un elenco puntato travestito da paragrafo.
 - Gergo e paroloni quando basta una parola comune.
 - Falsi intervalli: "dal Nord al Sud", "dalle Alpi alla Sicilia", "dai piccoli
-  comuni alle grandi citta'", quando i due estremi non stanno su un continuo
-  vero. In un atlante il punto interessante e' quasi sempre in mezzo.
+  comuni alle grandi città", quando i due estremi non stanno su un continuo
+  vero. In un atlante il punto interessante è quasi sempre in mezzo.
 - La regola del tre: tre aggettivi in fila, tre esempi, tre cause. Se le cose da
   dire sono due, sono due.
 - Riassunti compulsivi in un pezzo da 600 parole: "Nel complesso", "In generale",
   "Tirando le somme". Il lettore ha appena letto, non serve ricapitolare.
 - Lessico spia: cruciale, panorama, tessuto, plasmare, sottolineare, evidenziare,
   giocare un ruolo, non da ultimo, a tal proposito, degno di nota. Nessuna di
-  queste parole e' vietata, ma quando ne trovi una nella tua bozza quasi sempre
-  ce n'e' una piu' comune che dice la stessa cosa meglio.
+  queste parole è vietata, ma quando ne trovi una nella tua bozza quasi sempre
+  ce n'è una più comune che dice la stessa cosa meglio.
 
 ## Struttura: utile, non seriale
 

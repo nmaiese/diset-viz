@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 """Il monitoraggio della catena, una vista di lettura sul dossier per-indicatore.
 
-Non e' un sottosistema a parte con un secondo modello di stato: e' una vista
+Non è un sottosistema a parte con un secondo modello di stato: è una vista
 sullo **stesso** dossier che `practice_timeline` ricostruisce dagli artefatti
 committati, promosso qui a sorgente unica del monitoraggio. La domanda che
-risponde e' quella che prima costava sette comandi e una testa che li teneva
-insieme: **dov'e' fermo, e perche'**.
+risponde è quella che prima costava sette comandi e una testa che li teneva
+insieme: **dov'è fermo, e perché**.
 
-Tre cose, tutte derivate dal dossier (piu' il diario per la storia recente e i
+Tre cose, tutte derivate dal dossier (più il diario per la storia recente e i
 battiti di sessione per il vivo):
 
 - **la frase in testa**: "2 indicatori bloccati: ter-X smentita aperta da 2
   giorni, dem-Y aspetta il produttore da 5". Non una tabella da interpretare.
-- **una riga per indicatore**: stato, da quando, prossimo ruolo, priorita'.
+- **una riga per indicatore**: stato, da quando, prossimo ruolo, priorità.
 - **le sessioni in volo adesso**, dai battiti che ogni ruolo lascia all'avvio
   (best effort: se un ruolo non ha battuto, il vivo tace, il committato no).
 
-Il nucleo (`board`, `headline`) e' puro: prende i dati gia' letti e non tocca il
-disco, cosi' un test lo prova con un dossier sintetico. La CLI e la rotta Flask
+Il nucleo (`board`, `headline`) è puro: prende i dati già letti e non tocca il
+disco, così un test lo prova con un dossier sintetico. La CLI e la rotta Flask
 `/_pipeline` collegano i lettori reali. Stdlib puro come il resto della catena.
 
-    python3 scripts/pipeline_monitor.py            # dov'e' fermo, in una schermata
+    python3 scripts/pipeline_monitor.py            # dov'è fermo, in una schermata
     python3 scripts/pipeline_monitor.py --json      # per la rotta o un altro programma
 """
 
@@ -38,28 +38,28 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from scripts import pipeline_launch, practice_model, practice_timeline  # noqa: E402
 
-# Il registro dei battiti: un file per run in volo, ignorato da git (e' vivo, non
+# Il registro dei battiti: un file per run in volo, ignorato da git (è vivo, non
 # storia). Ogni ruolo lo scrive all'avvio e lo cancella alla chiusura; un battito
-# piu' vecchio della soglia si considera morto (una sessione caduta senza pulire).
+# più vecchio della soglia si considera morto (una sessione caduta senza pulire).
 HEARTBEATS_DIR = PROJECT_ROOT / "data" / "pipeline" / "heartbeats"
 HEARTBEAT_STALE_HOURS = 6
 
 # Stati che sono un "fermo" da mettere in testa, con la ragione leggibile.
-# `in-attesa` non e' qui perche' non e' sempre un blocco: quando aspetta il passo
-# a monte (`motivo=monte-mancante`) e' contropressione normale, non urgenza. Solo
+# `in-attesa` non è qui perché non è sempre un blocco: quando aspetta il passo
+# a monte (`motivo=monte-mancante`) è contropressione normale, non urgenza. Solo
 # gli altri motivi contano come fermo: lo decide `is_stuck`, non l'appartenenza.
 STUCK_STATES = {
-    "invalidata": "un input e' cambiato, i passaggi a valle non valgono piu'",
+    "invalidata": "un input è cambiato, i passaggi a valle non valgono più",
     "in-quarantena": "in-attesa terminale, tolta dalla coda",
 }
 
 
 def is_stuck(row: dict) -> bool:
-    """Vero se la riga e' un fermo da segnalare in testa (§3, §9).
+    """Vero se la riga è un fermo da segnalare in testa (§3, §9).
 
-    `invalidata` e `in-quarantena` lo sono sempre. `in-attesa` lo e' solo quando
-    il motivo e' un cambio esterno o una correzione tecnica: l'attesa del passo a
-    monte e' normale e non va contata fra i bloccati."""
+    `invalidata` e `in-quarantena` lo sono sempre. `in-attesa` lo è solo quando
+    il motivo è un cambio esterno o una correzione tecnica: l'attesa del passo a
+    monte è normale e non va contata fra i bloccati."""
     st = row.get("state")
     if st in STUCK_STATES:
         return True
@@ -68,7 +68,7 @@ def is_stuck(row: dict) -> bool:
     return False
 
 # Che cosa fa uno stadio, non chi lo fa. Sono descrizioni per chi guarda uno
-# schermo, e restano anche per gli stadi storici, perche' il dossier li nomina
+# schermo, e restano anche per gli stadi storici, perché il dossier li nomina
 # ancora e una riga senza etichetta si legge peggio di una con l'etichetta
 # vecchia.
 STAGE_LABELS = {
@@ -80,18 +80,18 @@ STAGE_LABELS = {
     "reviewer": "Rilettura e firma",
     "producer": "Officina",
     "verificatore": "Verifica indipendente",
-    "reader-editor": "Lettura di leggibilita'",
+    "reader-editor": "Lettura di leggibilità",
     "launch": "Lancio",
 }
 
-# Una sola voce, e non e' una traduzione: il ruolo si chiama ancora `producer`
-# perche' la coda dice ancora "questo indicatore va scritto", ma cio' che parte
-# e' l'officina, un workflow. Le altre tre voci erano personaggi italiani
-# (`ammissione`, `produttore`) sovrapposti a nomi che gia' esistevano: un
+# Una sola voce, e non è una traduzione: il ruolo si chiama ancora `producer`
+# perché la coda dice ancora "questo indicatore va scritto", ma ciò che parte
+# è l'officina, un workflow. Le altre tre voci erano personaggi italiani
+# (`ammissione`, `produttore`) sovrapposti a nomi che già esistevano: un
 # lettore che vede `ammissione` sul cruscotto e `admissions` nel diario deve
 # tenere a mente una mappa per capire che sono la stessa cosa. Il chiamante
 # (`:260`) fa `.get(owner, owner)`, quindi un ruolo assente stampa il proprio
-# nome, che e' esattamente cio' che si vuole.
+# nome, che è esattamente ciò che si vuole.
 ROLE_LABELS = {
     "producer": "officina",
 }
@@ -99,8 +99,8 @@ ROLE_LABELS = {
 # La lavorazione come la intende chi guarda il cruscotto, non lo stato grezzo
 # del modello. `state` marca "in-lavorazione" ogni indicatore non ancora
 # pubblicato, comprese le centinaia mai toccate (prosa legacy, zero run): qui
-# si separa cio' che la pipeline lavora davvero (una run o un ruolo in volo)
-# da cio' che e' solo in coda. Unica fonte: prima viveva duplicata anche in
+# si separa ciò che la pipeline lavora davvero (una run o un ruolo in volo)
+# da ciò che è solo in coda. Unica fonte: prima viveva duplicata anche in
 # `frontend/src/monitor/main.js`.
 STATUS_ORDER = [
     "da correggere",
@@ -114,11 +114,11 @@ STATUS_ORDER = [
 ]
 
 STATUS_HELP = {
-    "in lavorazione": "La pipeline ci sta lavorando: una run in corso o gia' fatta.",
+    "in lavorazione": "La pipeline ci sta lavorando: una run in corso o già fatta.",
     "in coda": "Nel catalogo ma mai lavorato dalla pipeline (nessuna run).",
     "in attesa": "Ferma in attesa di una condizione. Il motivo la qualifica: manca il passo a monte (l'artefatto dello stadio precedente non esiste), oppure aspetta un cambio esterno alla fonte, oppure una correzione tecnica.",
     "pubblicata": "Fusa su master: il progetto ha ratificato merge = pubblicazione.",
-    "da correggere": "Un input e' cambiato (dati aggiornati, definizione, o una smentita aperta): il lavoro a valle non vale piu' e va rifatto.",
+    "da correggere": "Un input è cambiato (dati aggiornati, definizione, o una smentita aperta): il lavoro a valle non vale più e va rifatto.",
     "in quarantena": "Fermo in modo terminale, tolto dalla coda per non fermare le altre.",
     "proposta": "Candidato approvato, in attesa di essere promosso nel catalogo dal prossimo giro di ammissione (manca ancora curatela e articolo).",
     "chiusa": "Candidatura chiusa, nessuna azione.",
@@ -137,7 +137,7 @@ _STATE_TO_WORK_STATUS = {
 def work_status(row: dict) -> str:
     """La lavorazione leggibile di una riga (vedi commento sopra `STATUS_ORDER`).
 
-    Va chiamata dopo che `row["in_flight"]` e' stato attaccato in `board()`:
+    Va chiamata dopo che `row["in_flight"]` è stato attaccato in `board()`:
     prima di quel punto ogni riga sarebbe letta come "in coda"."""
     mapped = _STATE_TO_WORK_STATUS.get(row.get("state"))
     if mapped:
@@ -158,7 +158,7 @@ def indicator_labels(root=None) -> dict:
     """Nome e famiglia leggibili per ogni id noto al catalogo.
 
     Il dossier resta la fonte dello stato. Questi manifest aggiungono soltanto
-    il lessico umano che serve alla vista: cercare 379 codici nudi non e'
+    il lessico umano che serve alla vista: cercare 379 codici nudi non è
     monitoraggio. Tutti i file sono CSV committati e si leggono con la stdlib.
     """
     base = Path(root or PROJECT_ROOT)
@@ -184,7 +184,7 @@ def indicator_labels(root=None) -> dict:
 
 
 def _reason(d: dict) -> str:
-    """Perche' un indicatore e' dov'e', in una riga leggibile, dalle bandiere."""
+    """Perché un indicatore è dov'è, in una riga leggibile, dalle bandiere."""
     f = d.get("flags") or {}
     if f.get("open_smentita"):
         return "smentita aperta, una frase falsa in pagina"
@@ -193,9 +193,9 @@ def _reason(d: dict) -> str:
     if f.get("stale_vintage"):
         return "le cifre dell'articolo sono cambiate dopo la firma"
     if f.get("stale_curation"):
-        return "la fonte ha pubblicato un anno nuovo, la curatela e' scaduta"
+        return "la fonte ha pubblicato un anno nuovo, la curatela è scaduta"
     if d.get("state") == "in-attesa":
-        # needs_info (dipendenza-esterna) e' gia' uscito sopra: qui resta monte-mancante.
+        # needs_info (dipendenza-esterna) è già uscito sopra: qui resta monte-mancante.
         return "manca il passo a monte: l'artefatto dello stadio precedente non esiste ancora"
     return STUCK_STATES.get(d.get("state"), d.get("state") or "")
 
@@ -205,10 +205,10 @@ def _days(start: str, today: str) -> int:
 
 
 def _run_history(run_ids, runs_by_id) -> list:
-    """Le run che hanno toccato l'indicatore, dalla piu' recente, gia' collassate.
+    """Le run che hanno toccato l'indicatore, dalla più recente, già collassate.
 
-    Riusa `d["runs"]` (i run_id che `practice_timeline` ha gia' associato
-    all'indicatore) e li unisce alle run collassate indicizzate per run_id, cosi'
+    Riusa `d["runs"]` (i run_id che `practice_timeline` ha già associato
+    all'indicatore) e li unisce alle run collassate indicizzate per run_id, così
     il dettaglio per-indicatore non fa un secondo giro sul diario."""
     out = []
     for rid in run_ids or []:
@@ -239,7 +239,7 @@ def _owner_of(stage: str) -> str:
     """Il proprietario da mostrare per un vecchio stadio: dalla mappa, e con la
     sua etichetta.
 
-    Le due meta' vanno insieme. Erano separate, e si vedeva: i rami speciali
+    Le due metà vanno insieme. Erano separate, e si vedeva: i rami speciali
     scrivevano il ruolo a mano e il ramo generico applicava `ROLE_LABELS`,
     quindi la stessa riga del cruscotto diceva `produttore` o `officina` a
     seconda di quale ramo l'aveva prodotta. I template rendono questo campo
@@ -261,9 +261,9 @@ def _next_step(d: dict, ready_stage: str | None) -> dict:
                 "label": "Nessuna azione, candidatura chiusa"}
     # Il proprietario si **legge** dalla mappa, non si scrive qui. Era scritto
     # (`produttore` per tutti e tre), e alla prima occasione ha mentito: quando
-    # `curator` e' passato all'ammissione, il cruscotto ha continuato a mandare
+    # `curator` è passato all'ammissione, il cruscotto ha continuato a mandare
     # chi lo legge a un workflow che non sa curare e non ha nel perimetro i file
-    # della curatela. Sotto, il ramo generico gia' passava da `ROLE_OF_STAGE`:
+    # della curatela. Sotto, il ramo generico già passava da `ROLE_OF_STAGE`:
     # erano questi tre casi speciali a scavalcarla.
     if flags.get("open_smentita"):
         return {"owner": _owner_of("reviewer"), "stage": "reviewer", "kind": "attention",
@@ -281,7 +281,7 @@ def _next_step(d: dict, ready_stage: str | None) -> dict:
         owner = _owner_of(ready_stage)
         labels = {
             "promoter": "Ammettere la candidatura nel catalogo",
-            "curator": "Definire verso, categoria e ammissibilita' al punteggio",
+            "curator": "Definire verso, categoria e ammissibilità al punteggio",
             "writer": "Scrivere l'articolo dell'indicatore",
             "reviewer": "Rileggere, correggere e firmare l'articolo",
             "verificatore": "Controllare in modo indipendente tutte le affermazioni",
@@ -298,7 +298,7 @@ def _lifecycle(d: dict, next_step: dict) -> tuple[list, int, str]:
     required = list(d.get("required_stages") or [])
     # **Le fasi si ricavano dal ruolo, non da un elenco di stadi scritto qui.**
     # Erano scritte: `promoter` era l'ammissione e tutto il resto la produzione,
-    # quindi quando `curator` e' passato all'ammissione la stessa riga del
+    # quindi quando `curator` è passato all'ammissione la stessa riga del
     # cruscotto diceva proprietario `admissions` e fase `produzione`, e i filtri
     # per fase classificavano male ogni curatela, iniziale o scaduta.
     di_ruolo = lambda ruolo: [s for s in required
@@ -360,7 +360,7 @@ def row_of(d: dict, today: str = "", runs_by_id: dict = None, labels: dict = Non
 
     Con `runs_by_id` (le run collassate indicizzate per run_id) la riga porta
     anche stadi fatti, stato di pubblicazione e verifica, e la storia delle run
-    che hanno toccato l'indicatore: cosi' il cruscotto puo' aprire un dettaglio
+    che hanno toccato l'indicatore: così il cruscotto può aprire un dettaglio
     per-indicatore senza un secondo giro sul diario."""
     stage = practice_timeline.ready_stage(d)
     next_step = _next_step(d, stage)
@@ -401,7 +401,7 @@ def row_of(d: dict, today: str = "", runs_by_id: dict = None, labels: dict = Non
 
 
 def headline(rows: list, today: str = "", admissions=None) -> str:
-    """La frase in testa: dov'e' fermo, e perche'. Dai soli `rows` gia' calcolati."""
+    """La frase in testa: dov'è fermo, e perché. Dai soli `rows` già calcolati."""
     stuck = [r for r in rows if is_stuck(r)]
     if stuck:
         stuck.sort(key=lambda r: (-r["days"], r["id"]))
@@ -409,27 +409,27 @@ def headline(rows: list, today: str = "", admissions=None) -> str:
         when = f" da {top['days']} giorni" if top["days"] else ""
         n = len(stuck)
         prefix = f"{n} indicatore bloccato." if n == 1 else f"{n} indicatori bloccati."
-        more = f" Altri {n - 1} sono elencati nelle priorita'." if n > 1 else ""
-        return f"{prefix} Prima priorita': {top['id']}, {top['reason']}{when}.{more}"
+        more = f" Altri {n - 1} sono elencati nelle priorità." if n > 1 else ""
+        return f"{prefix} Prima priorità: {top['id']}, {top['reason']}{when}.{more}"
     ready = [r for r in rows if r["next_role"] and r["next_role"] != "admissions"]
     if ready:
         top = ready[0]
-        return (f"{len(ready)} indicatori pronti al lavoro, niente e' bloccato. "
-                f"Il piu' urgente: {top['id']} -> {top['next_role']}.")
+        return (f"{len(ready)} indicatori pronti al lavoro, niente è bloccato. "
+                f"Il più urgente: {top['id']} -> {top['next_role']}.")
     if admissions:
-        return "ammissione pronta al lavoro, niente e' bloccato. La coda a monte richiede un batch."
+        return "ammissione pronta al lavoro, niente è bloccato. La coda a monte richiede un batch."
     return "catena in pari: nessun indicatore bloccato, niente in coda."
 
 
 def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
           recent: int = 12, open_runs=None, labels=None, queues=None) -> dict:
-    """Il cruscotto intero, dai soli artefatti gia' letti. Puro.
+    """Il cruscotto intero, dai soli artefatti già letti. Puro.
 
-    `dossier` e' l'uscita di `practice_timeline`. `runs` sono le run gia'
+    `dossier` è l'uscita di `practice_timeline`. `runs` sono le run già
     collassate (`pipeline_log.collapse_runs`), per la storia recente.
     `heartbeats` sono i battiti vivi (un ruolo che lavora, prima ancora che ci
     sia una PR); `open_runs` sono le PR aperte su `automation/*` con stato CI e
-    mergeabilita', fotografate dal lanciatore. Ritorna la frase in testa, le
+    mergeabilità, fotografate dal lanciatore. Ritorna la frase in testa, le
     righe per indicatore, i fermi, il vivo, le PR aperte, la storia recente e i
     totali per stato.
     """
@@ -456,8 +456,8 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
         run_ids.update(beat.get("run_id") for beat in row["in_flight"])
         row["open_prs"] = [prs_by_run[rid] for rid in run_ids if rid in prs_by_run]
         row["work_status"] = work_status(row)
-        # Lo stato di sosta e' uno solo ("in attesa"), ma il tooltip del badge porta
-        # il motivo specifico (monte-mancante vs blocco esterno/tecnico), cosi'
+        # Lo stato di sosta è uno solo ("in attesa"), ma il tooltip del badge porta
+        # il motivo specifico (monte-mancante vs blocco esterno/tecnico), così
         # l'operatore vede la differenza pur con un solo stato armonizzato.
         if row.get("state") == "in-attesa" and row.get("reason"):
             row["work_status_help"] = row["reason"]
@@ -521,13 +521,13 @@ def board(dossier: dict, runs=None, heartbeats=None, today: str = "",
 
 def summarize_catalog(rows: list, universe: dict) -> dict:
     """Il conto che deve tornare: quanti indicatori esistono nei cataloghi di
-    famiglia in tutto (`universe`, gia' calcolato da `app.views._pipeline_universe`
-    perche' legge `app.data`/`app.bes_data`/`app.multiscopo_data`/
+    famiglia in tutto (`universe`, già calcolato da `app.views._pipeline_universe`
+    perché legge `app.data`/`app.bes_data`/`app.multiscopo_data`/
     `app.external_atlas`: questo modulo resta stdlib-puro), quanti sono
     indicizzabili (non vecchi, non duplicati, non a copertura incompleta), e
-    quanti di questi la pipeline ha gia' scritto, verificato, pubblicato.
+    quanti di questi la pipeline ha già scritto, verificato, pubblicato.
 
-    `not_yet_admitted` e' la risposta a "se manca qualcosa inseriamo": indicatori
+    `not_yet_admitted` è la risposta a "se manca qualcosa inseriamo": indicatori
     nel catalogo di una famiglia che non hanno ancora nessuna traccia in una
     pratica di ammissione (`rows`, dal dossier di `practice_timeline`)."""
     total_universe = len(universe)
@@ -558,11 +558,11 @@ def summarize_catalog(rows: list, universe: dict) -> dict:
 def attribute_tokens(rows, tokens_by_run):
     """Attacca il consumo token a ogni run e somma il totale per indicatore.
 
-    Un `run_id` puo' comparire nella storia di piu' indicatori: `practice_timeline`
+    Un `run_id` può comparire nella storia di più indicatori: `practice_timeline`
     associa una run a ogni indicatore che il suo testo cita, compresi quelli di
-    confronto. Ma il costo e' di UNO solo, il bersaglio, che il record di
+    confronto. Ma il costo è di UNO solo, il bersaglio, che il record di
     telemetria porta in `indicator`. Quindi si attribuisce solo dove combacia,
-    mai a un indicatore citato per confronto (ne' a un batch senza bersaglio, che
+    mai a un indicatore citato per confronto (né a un batch senza bersaglio, che
     ha `indicator` vuoto e non combacia con nessuna riga). Puro: muta e ritorna
     `rows`."""
     tokens_by_run = tokens_by_run or {}
@@ -580,13 +580,13 @@ def attribute_tokens(rows, tokens_by_run):
 
 
 def _run_indicators(run: dict, token_entry: dict) -> list:
-    """Gli indicatori a cui una run appartiene, dal piu' affidabile al meno.
+    """Gli indicatori a cui una run appartiene, dal più affidabile al meno.
 
     Il record di telemetria porta l'unico bersaglio vero (`indicator`), quando
-    c'e': una lista di uno. Senza telemetria si ripiega sugli id citati nel testo
+    c'è: una lista di uno. Senza telemetria si ripiega sugli id citati nel testo
     della run, che sono un insieme (un articolo cita gli indicatori di confronto),
     quindi si torna una lista, mai una scelta. Attribuire i token a un indicatore
-    solo quando la lista ha un elemento solo (bersaglio non ambiguo) e' compito di
+    solo quando la lista ha un elemento solo (bersaglio non ambiguo) è compito di
     chi somma, non di qui: qui non si inventa mai un'associazione dove il dato ne
     porta due o zero, la stessa cautela di `_ids_in_text`."""
     target = (token_entry or {}).get("indicator")
@@ -600,19 +600,19 @@ def runs_timeline(tokens_by_run=None) -> dict:
     """La cronologia di ogni azione della catena, una riga per run, con i token.
 
     Joina le run collassate dal diario (`pipeline_log`) con la telemetria token
-    (`tokens_by_run`, iniettata dal chiamante perche' viene da Supabase e questo
+    (`tokens_by_run`, iniettata dal chiamante perché viene da Supabase e questo
     modulo resta stdlib puro) **sul solo `run_id`**: diverso da `attribute_tokens`,
     che scarta i token il cui indicatore non combacia con una riga di board. Qui
-    la chiave e' la run, e ogni run si conserva, anche senza token (`null`) e anche
+    la chiave è la run, e ogni run si conserva, anche senza token (`null`) e anche
     senza un indicatore riconoscibile (lista vuota). Ordinata per `at` decrescente.
 
-    I totali aggregano cio' che si puo' sommare senza inventare: token per stadio,
+    I totali aggregano ciò che si può sommare senza inventare: token per stadio,
     per giorno ed esito per conteggio sono sempre certi; i token per indicatore si
     sommano solo dove la telemetria porta un bersaglio esplicito (`token_entry`),
     mai da un id pescato nella prosa, nemmeno quando ne compare uno solo: un batch
     di ammissione posta il costo senza indicatore, e appenderlo all'unico id che il
     diario cita darebbe a quell'indicatore il conto dell'intera coda. La prosa dice
-    quali id una run ha toccato, non di chi e' il costo."""
+    quali id una run ha toccato, non di chi è il costo."""
     from scripts import pipeline_log
     tokens_by_run = tokens_by_run or {}
     runs = pipeline_log.collapse_runs(pipeline_log.read_journal())
@@ -632,11 +632,11 @@ def runs_timeline(tokens_by_run=None) -> dict:
         tokens_by_stage[stage] = tokens_by_stage.get(stage, 0) + (tok or 0)
         tokens_by_day[day] = tokens_by_day.get(day, 0) + (tok or 0)
         runs_by_outcome[outcome] = runs_by_outcome.get(outcome, 0) + 1
-        # La proprieta' del costo la stabilisce SOLO il bersaglio esplicito della
+        # La proprietà del costo la stabilisce SOLO il bersaglio esplicito della
         # telemetria, mai un id pescato nella prosa: un batch di ammissione posta
         # i token senza indicatore, e se il suo diario cita per caso un solo id il
         # costo dell'intera coda finirebbe su quell'indicatore. La prosa va bene
-        # per dire "questa run ha toccato questi id", non per dire "il conto e' suo".
+        # per dire "questa run ha toccato questi id", non per dire "il conto è suo".
         target = token_entry.get("indicator")
         if tok and target:
             tokens_by_indicator[target] = tokens_by_indicator.get(target, 0) + tok
@@ -672,8 +672,8 @@ def write_heartbeat(role: str, run_id: str, indicator: str = "", root=None,
                     now: str = "") -> Path:
     """Un ruolo che parte lascia un battito: chi lavora su cosa, da quando.
 
-    File per run (il `run_id` e' unico), cosi' due ruoli in volo insieme non si
-    sovrascrivono. Ignorato da git: e' vivo, non storia. `now` iniettabile per i
+    File per run (il `run_id` è unico), così due ruoli in volo insieme non si
+    sovrascrivono. Ignorato da git: è vivo, non storia. `now` iniettabile per i
     test (niente `datetime.now` nel nucleo)."""
     from datetime import datetime, timezone
     base = Path(root or HEARTBEATS_DIR)
@@ -696,14 +696,14 @@ def clear_heartbeat(run_id: str, root=None) -> None:
 
 def post_beat(payload: dict, url: str = "", token: str = "", timeout: int = 5,
               opener=None) -> bool:
-    """Manda un battito all'endpoint del sito, best effort. Ritorna se e' andata.
+    """Manda un battito all'endpoint del sito, best effort. Ritorna se è andata.
 
-    E' cio' che fa comparire il vivo su /_pipeline mentre un agente lavora, anche
+    È ciò che fa comparire il vivo su /_pipeline mentre un agente lavora, anche
     prima che ci sia una commit: gli agenti girano su macchine effimere separate
-    dal server, e l'unico modo perche' il server veda il vivo senza dare a ognuno
-    una credenziale GCS e' che lo scriva il server, su richiesta. Puro urllib,
+    dal server, e l'unico modo perché il server veda il vivo senza dare a ognuno
+    una credenziale GCS è che lo scriva il server, su richiesta. Puro urllib,
     stdlib. `url`/`token` di default dall'ambiente; se mancano, non fa niente e lo
-    dice, cosi' in locale (o senza segreto) non e' un errore, e' silenzio."""
+    dice, così in locale (o senza segreto) non è un errore, è silenzio."""
     import json as _json
     import os
     import urllib.request
@@ -727,8 +727,8 @@ def post_tokens(run_id: str, tokens, indicator: str = "", stage: str = "",
                 role: str = "", **kw) -> bool:
     """Il consumo token di una run all'endpoint del sito, best effort.
 
-    Chiavato sul `run_id` del RUOLO (non del lanciatore che lo POSTa), cosi' il
-    totale si attacca all'indicatore giusto. E' telemetria durevole: a differenza
+    Chiavato sul `run_id` del RUOLO (non del lanciatore che lo POSTa), così il
+    totale si attacca all'indicatore giusto. È telemetria durevole: a differenza
     di un battito non scade. Riusa `post_beat` (stesso endpoint, stesso segreto)."""
     return post_beat({"action": "tokens", "run_id": run_id, "tokens": tokens,
                       "indicator": indicator, "stage": stage, "role": role}, **kw)
@@ -738,9 +738,9 @@ def post_outcome(run_id: str, indicator: str, snapshot: dict,
                  base_commit: str = "", at: str = "", **kw) -> bool:
     """Lo snapshot di stato di un indicatore all'endpoint del sito, best effort.
 
-    Lo POSTa il passo di merge dopo aver fuso, perche' il cruscotto rifletta
+    Lo POSTa il passo di merge dopo aver fuso, perché il cruscotto rifletta
     l'esito senza aspettare il redeploy dell'immagine. Riusa `post_beat` (stesso
-    endpoint, stesso segreto): `snapshot` e' il dossier del solo indicatore, le sue
+    endpoint, stesso segreto): `snapshot` è il dossier del solo indicatore, le sue
     liste/dict annidati viaggiano nativi nel JSON del POST."""
     payload = {"action": "outcome", "run_id": run_id, "indicator": indicator,
                "base_commit": base_commit, "at": at}
@@ -749,7 +749,7 @@ def post_outcome(run_id: str, indicator: str, snapshot: dict,
 
 
 def read_heartbeats(root=None, now: str = "", stale_hours: int = HEARTBEAT_STALE_HOURS) -> list:
-    """I battiti vivi: quelli piu' vecchi della soglia si scartano (sessione
+    """I battiti vivi: quelli più vecchi della soglia si scartano (sessione
     caduta senza pulire). `now` iniettabile per i test."""
     from datetime import datetime, timezone
     base = Path(root or HEARTBEATS_DIR)
@@ -804,12 +804,12 @@ def _apply_outcomes(dossier: dict, outcomes: dict) -> None:
     """Sovrappone gli snapshot vivi al dossier committato, in loco.
 
     Riconciliazione, unica regola: uno snapshot si applica **solo se** il suo
-    `run_id` non e' gia' nei `runs` del dossier committato. Dopo il deploy che porta
+    `run_id` non è già nei `runs` del dossier committato. Dopo il deploy che porta
     quella run su master, `reconstruct` aggiunge quel `run_id` ai `runs` e l'overlay
-    si spegne da solo, senza uno stato da azzerare a mano ne' da confrontare campo a
-    campo: e' l'unico ritiro sicuro. Confrontare invece lo stato (es. 'stessi stadi
+    si spegne da solo, senza uno stato da azzerare a mano né da confrontare campo a
+    campo: è l'unico ritiro sicuro. Confrontare invece lo stato (es. 'stessi stadi
     e stesso published') ritirava a torto proprio il caso che conta, una smentita su
-    un indicatore gia' pubblicato, dove cambiano solo `state`/`flags`, e lasciava il
+    un indicatore già pubblicato, dove cambiano solo `state`/`flags`, e lasciava il
     cruscotto su `pubblicata` invece dell'invalidazione."""
     for indicator, snap in outcomes.items():
         d = dossier.get(indicator)
@@ -832,15 +832,15 @@ def load_board(today: str = "", recent: int = 12,
 
     `heartbeats`/`open_runs` iniettabili: la rotta Flask li passa dal SQLite
     vivo (scritto dai POST degli agenti, replicato su GCS). Quando `heartbeats`
-    e' None si torna ai battiti su file, che e' cio' che vuole la CLI in locale
+    è None si torna ai battiti su file, che è ciò che vuole la CLI in locale
     (agente e file sulla stessa macchina); sul server quei file sono sempre vuoti,
-    ed e' esattamente il motivo per cui il cruscotto sembrava morto.
+    ed è esattamente il motivo per cui il cruscotto sembrava morto.
 
     `outcomes` iniettabile allo stesso modo: gli snapshot di stato che gli agenti
     POSTano al merge, per indicatore. Si applicano al dossier **prima** di
-    costruire le righe, cosi' stato/lifecycle/prossimo passo e i contatori si
+    costruire le righe, così stato/lifecycle/prossimo passo e i contatori si
     ricalcolano coerenti. Servono a chiudere la finestra fra 'fuso su master' e
-    'immagine deployata': la CLI in locale lascia `None` (legge i file freschi)."""
+    'immagine deployatà: la CLI in locale lascia `None` (legge i file freschi)."""
     from datetime import datetime, timezone
     from scripts import pipeline_log, pipeline_status
     ref = today or datetime.now(timezone.utc).date().isoformat()
@@ -855,7 +855,7 @@ def load_board(today: str = "", recent: int = 12,
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(description="Dov'e' fermo la catena, e perche'.")
+    parser = argparse.ArgumentParser(description="Dov'è fermo la catena, e perché.")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--today", default="", help="data di riferimento YYYY-MM-DD")
     parser.add_argument("--beat-open", nargs=2, metavar=("RUOLO", "RUN_ID"),

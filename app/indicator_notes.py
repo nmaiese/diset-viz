@@ -592,7 +592,7 @@ def meta_description_from_attacco(attacco, max_len=_DESC_MAX):
 
 
 def seo_title(name, site_name="Divario Italia", max_len=_TITLE_MAX, source_qualifier=None):
-    """Compact SERP title: shortened name + variant marker + 'per regione'.
+    """Compact SERP title: shortened name + variant marker + 'per regioné.
 
     `source_qualifier`, when given, disambiguates a name that another
     indicator also carries (see `app.taxonomy.DUPLICATE_BES_IDS`), so the two
@@ -621,17 +621,17 @@ def authored_seo_title(title, site_name="Divario Italia", max_len=_TITLE_MAX,
     """Il titolo SERP quando l'autore ne ha scritto uno in lingua comune.
 
     `seo_title` parte dal nome amministrativo e ci cuce " per regione" e la marca:
-    e' il derivato per le pagine che nessuno ha ancora titolato. Un titolo autorato
-    e' gia' completo ("Dove si lavora di piu' nella ricerca"), quindi qui NON si
+    è il derivato per le pagine che nessuno ha ancora titolato. Un titolo autorato
+    è già completo ("Dove si lavora di più nella ricerca"), quindi qui NON si
     aggiunge la coda "per regione", si aggiunge solo la marca se ci sta nel budget,
     altrimenti si tiene il solo titolo tagliato a frase intera. Stesso budget
-    (`_TITLE_MAX`) del derivato: un titolo autorato non e' una scusa per sforare.
+    (`_TITLE_MAX`) del derivato: un titolo autorato non è una scusa per sforare.
 
-    `source_qualifier` vale anche qui, e non e' una simmetria per eleganza: una
+    `source_qualifier` vale anche qui, e non è una simmetria per eleganza: una
     manciata di serie BES sono il duplicato esatto di una territoriale, restano
     indicizzabili, e misurano lo stesso identico fenomeno. Titolarle in lingua
-    comune e' proprio il caso in cui le due gemelle finiscono con lo **stesso**
-    titolo, che e' la collisione che il qualificatore esiste per evitare. Sta
+    comune è proprio il caso in cui le due gemelle finiscono con lo **stesso**
+    titolo, che è la collisione che il qualificatore esiste per evitare. Sta
     dentro il budget come tutto il resto: se non ci sta, cade prima la marca."""
     text = " ".join((title or "").split())
     if not text:
@@ -648,20 +648,20 @@ def authored_seo_title(title, site_name="Divario Italia", max_len=_TITLE_MAX,
     # un carattere (taglia a 60 e poi aggiunge il punto) e, peggio, butta via
     # proprio la coda che distingue. Due titoli lunghi che aprono sulla stessa
     # frase diventavano lo **stesso** `<title>` su due pagine indicizzabili, che
-    # e' la collisione che sul percorso derivato e' vietata da un test sul
+    # è la collisione che sul percorso derivato è vietata da un test sul
     # catalogo. `_compact_title` tiene invece testa e coda ("testa (coda)"), che
-    # e' come il derivato mantiene distinte le undici pagine della stessa scala.
+    # è come il derivato mantiene distinte le undici pagine della stessa scala.
     return _clamp_title(_authored_short(text, max_len - len(qualifier)) + qualifier, max_len)
 
 
 def _authored_short(text, budget):
     """Un titolo autorato sopra budget, accorciato **tenendo la coda**.
 
-    Tagliare in testa e basta e' quello che fa un troncatore di description, ed
-    e' sbagliato per un `<title>`: due titoli lunghi che aprono sulla stessa
+    Tagliare in testa e basta è quello che fa un troncatore di description, ed
+    è sbagliato per un `<title>`: due titoli lunghi che aprono sulla stessa
     frase diventano lo stesso titolo, e su due pagine indicizzabili la
-    collisione e' un difetto SEO vero (sul percorso derivato c'e' un test del
-    catalogo che la vieta). Cio' che distingue due titoli simili sta in fondo,
+    collisione è un difetto SEO vero (sul percorso derivato c'è un test del
+    catalogo che la vieta). Ciò che distingue due titoli simili sta in fondo,
     quindi in fondo si tiene: `testa (coda)`, la stessa forma con cui il derivato
     tiene distinte le undici pagine di una scala.
 
@@ -676,7 +676,7 @@ def _authored_short(text, budget):
     head = _truncate_words(text, head_budget) if head_budget > 0 else ""
     if not head:
         head = text[:max(0, head_budget)]
-    # Anche la testa va bilanciata, e per il motivo speculare della coda: puo'
+    # Anche la testa va bilanciata, e per il motivo speculare della coda: può
     # finire **dentro** una parentesi dell'autore e portarsi via solo l'aperta.
     head = _balanced(head).rstrip(" ,.;:-(")
     if not head or tail.lower() in head.lower():
@@ -687,9 +687,9 @@ def _authored_short(text, budget):
 def _balanced(text):
     """Un frammento senza parentesi spaiate.
 
-    La coda si taglia a caratteri dalla fine, quindi puo' cadere **dentro** una
+    La coda si taglia a caratteri dalla fine, quindi può cadere **dentro** una
     parentesi dell'autore e portarsi via solo la chiusa: incastonata poi in
-    `testa (coda)` diventa `testa (coda))`, cioe' precisamente il titolo malformato
+    `testa (coda)` diventa `testa (coda))`, cioè precisamente il titolo malformato
     che la guardia nuova promette di non far uscire. Si tolgono le parentesi che
     non hanno la loro compagna dentro il frammento, non il frammento intero: la
     coda serve a distinguere, e buttarla via rimetterebbe il difetto di prima.
@@ -712,15 +712,15 @@ def _balanced(text):
 
 
 def _clamp_title(text, max_len):
-    """L'ultima rete sul budget: nessun titolo esce piu' lungo del suo tetto.
+    """L'ultima rete sul budget: nessun titolo esce più lungo del suo tetto.
 
-    Serve perche' gli accorciatori ragionano a parole, e una parola sola piu'
-    lunga del budget non e' accorciabile a parole: `_compact_title` la
-    restituisce intera. Un titolo cosi' non e' realistico in redazione, ma il
-    budget e' una garanzia della funzione, e una garanzia che vale "quasi
-    sempre" non e' una garanzia. Taglio duro, e se il taglio lascia una parentesi
-    aperta si toglie anche quella: un `<title>` con la parentesi spaiata e' peggio
-    di uno piu' corto.
+    Serve perché gli accorciatori ragionano a parole, e una parola sola più
+    lunga del budget non è accorciabile a parole: `_compact_title` la
+    restituisce intera. Un titolo così non è realistico in redazione, ma il
+    budget è una garanzia della funzione, e una garanzia che vale "quasi
+    sempre" non è una garanzia. Taglio duro, e se il taglio lascia una parentesi
+    aperta si toglie anche quella: un `<title>` con la parentesi spaiata è peggio
+    di uno più corto.
     """
     if len(text) <= max_len:
         return text
@@ -872,7 +872,7 @@ def _plain_text(name, theme, archive, unit, indicator_id):
         return _finish_sentence(override)
 
     subject = _expand_terms(_subject_from_archive(archive) or name)
-    subject = subject.replace("puo'", "può").replace("piu'", "più")
+    subject = subject.replace("può", "può").replace("più", "più")
     if len(subject) < 8 or subject.startswith("("):
         subject = name
     return _finish_sentence(f"Misura {_with_article(subject)}")
@@ -1118,20 +1118,20 @@ def it_plural(count, singular, plural):
 
 
 def is_percentage_unit(unit):
-    """Se l'unita' e' una percentuale, non un tasso su base cento.
+    """Se l'unità è una percentuale, non un tasso su base cento.
 
-    La distinzione sembra pedante e non lo e': da qui esce l'etichetta stampata
+    La distinzione sembra pedante e non lo è: da qui esce l'etichetta stampata
     accanto a ogni cifra e la parola usata per ogni variazione. Il test cercava
-    la sottostringa "per cento", che compare dentro **"per centomila"**: cosi'
+    la sottostringa "per cento", che compare dentro **"per centomila"**: così
     "numero per centomila abitanti" passava per percentuale, e la pagina del
     tasso di omicidi diceva "0,54%" e "0,93 punti percentuali" su un tasso ogni
     centomila. Dodici indicatori ne erano toccati, fra cui "tonnellate per cento
     abitanti" e "chilometro per cento chilometri quadrati", che percentuali non
     sono in nessun senso.
 
-    Percentuale e' `%` (anche "% del PIL") o "percentuale". "X per cento Y" e'
+    Percentuale è `%` (anche "% del PIL") o "percentuale". "X per cento Y" è
     un rapporto: quante X ogni cento Y. Solo un "per cento" in fondo, senza
-    niente misurato dopo, e' davvero una percentuale.
+    niente misurato dopo, è davvero una percentuale.
     """
     lowered = (unit or "").strip().lower()
     if "%" in lowered or "percentual" in lowered:
@@ -1149,11 +1149,11 @@ def value_unit_label(name, unit):
 
 
 def rate_label(unit):
-    """L'unita' come si legge accanto a una cifra, non come sta nel CSV.
+    """L'unità come si legge accanto a una cifra, non come sta nel CSV.
 
-    Le unita' Istat sono descrizioni, non etichette: "numero per centomila
+    Le unità Istat sono descrizioni, non etichette: "numero per centomila
     abitanti" letto dopo un valore da "0,54 numero per centomila abitanti", che
-    e' corretto e non e' italiano. La forma naturale e' "0,54 ogni centomila
+    è corretto e non è italiano. La forma naturale è "0,54 ogni centomila
     abitanti".
 
     Solo presentazione: il CSV non si tocca, come per le altre correzioni in
@@ -1162,11 +1162,11 @@ def rate_label(unit):
     value = display_unit(unit)
     if not value:
         return value
-    # "numero per cento(mila) X" -> "ogni cento(mila) X". Il "numero" iniziale e'
-    # gia' detto dalla cifra che precede l'etichetta.
+    # "numero per cento(mila) X" -> "ogni cento(mila) X". Il "numero" iniziale è
+    # già detto dalla cifra che precede l'etichetta.
     value = re.sub(r"^numero\s+per\s+", "ogni ", value, flags=re.I)
     # "tonnellate per cento abitanti" -> "tonnellate ogni cento abitanti": qui la
-    # quantita' misurata serve, cambia solo la preposizione.
+    # quantità misurata serve, cambia solo la preposizione.
     value = re.sub(r"\bper\s+(cento(?:mila)?\s+\S)", r"ogni \1", value, flags=re.I)
     return value
 

@@ -1,14 +1,14 @@
 """La coda di revisione costruita sugli articoli **committati**.
 
-L'unica meta' di `test_review_queue` che ha bisogno di un giro reale, e per anni
-e' stata la ragione per cui l'altra meta', sintetica, girava in `integration/`
+L'unica metà di `test_review_queue` che ha bisogno di un giro reale, e per anni
+è stata la ragione per cui l'altra metà, sintetica, girava in `integration/`
 insieme a lei. Adesso la logica sta in `tests/unit/test_review_queue.py` e qui
 resta soltanto la lettura del disco.
 
-Quello che questo test compra: la coda non e' vuota, e ogni riga che ne esce ha
+Quello che questo test compra: la coda non è vuota, e ogni riga che ne esce ha
 un livello e un codice leggibili e nessun segnale fuori dal vocabolario. Un
 segnale nuovo che nessuna etichetta nomina esce comunque dalla coda, e in cima
-alla lista di lettura, senza che una riga dica che cos'e'.
+alla lista di lettura, senza che una riga dica che cos'è.
 """
 
 import unittest

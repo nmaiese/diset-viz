@@ -1,7 +1,7 @@
 """Il vocabolario della pratica editoriale come regole verificabili.
 
 Puro, senza disco e senza app: prova le transizioni ammesse, gli stadi
-obbligatori, i tetti di retry e l'ordine di priorita' di docs/EDITORIAL_PRACTICE.md.
+obbligatori, i tetti di retry e l'ordine di priorità di docs/EDITORIAL_PRACTICE.md.
 """
 
 import unittest
@@ -25,7 +25,7 @@ class Vocabulary(unittest.TestCase):
 class Transitions(unittest.TestCase):
     def test_merge_publishes(self):
         # Merge = pubblicazione: pronta-al-merge va diritta a pubblicata, senza
-        # uno stato `fusa` intermedio ne' una verifica-sito.
+        # uno stato `fusa` intermedio né una verifica-sito.
         self.assertTrue(m.can_transition("pronta-al-merge", "pubblicata"))
         self.assertFalse(m.can_transition("pronta-al-merge", "fusa"))
 

@@ -2,12 +2,12 @@
 
 Sta in `integration/` per la regola di `CLAUDE.md`: legge il CSV delle
 definizioni su disco e tutti gli articoli pubblicati. Il comportamento lessicale
-della guardia (che cosa conta come termine, che cosa no) e' sintetico e resta in
+della guardia (che cosa conta come termine, che cosa no) è sintetico e resta in
 `tests/unit/test_definition_check.py`.
 
-Il test che conta davvero e' `test_every_committed_article_has_a_source_definition`:
-finche' e' verde, nessun articolo cita una definizione che la fonte non ha
-scritto. E' un invariante sul catalogo, non sulla funzione, quindi non puo' che
+Il test che conta davvero è `test_every_committed_article_has_a_source_definition`:
+finché è verde, nessun articolo cita una definizione che la fonte non ha
+scritto. È un invariante sul catalogo, non sulla funzione, quindi non può che
 girare sul catalogo.
 """
 

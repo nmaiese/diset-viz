@@ -1,26 +1,26 @@
 # Account con Supabase (Postgres + auth)
 
-> **SUPERATO (Fase 5, 2026-07-31).** Il sistema account e' stato implementato e la
+> **SUPERATO (Fase 5, 2026-07-31).** Il sistema account è stato implementato e la
 > sua descrizione viva sta in [`ACCOUNT.md`](ACCOUNT.md). Login **Google** (non
 > magic-link), preferiti, statistiche+achievements sull'account, confronti
 > salvati, pagina account con export/cancellazione GDPR. Questo file resta come
 > storia del piano iniziale. **Non agire su questo doc: leggi `ACCOUNT.md`.**
 
-> **STATO (Fase 4, 2026-07-31).** Questo documento e' in parte **superato**
+> **STATO (Fase 4, 2026-07-31).** Questo documento è in parte **superato**
 > dall'implementazione effettiva. Cosa vale oggi, nel codice su `master`:
-> - **Auth: Google OAuth**, non magic link (email rimandata finche' non c'e' un
->   SMTP custom: l'email di default Supabase e' rate-limited). La verifica del
->   JWT lato server (`app/auth.py`) e' la stessa comunque.
+> - **Auth: Google OAuth**, non magic link (email rimandata finché non c'è un
+>   SMTP custom: l'email di default Supabase è rate-limited). La verifica del
+>   JWT lato server (`app/auth.py`) è la stessa comunque.
 > - **Stato mutabile su Postgres via SQLAlchemy**: `app/db.py` (engine a due
->   dialetti, SQLite in test/CI, Postgres in produzione quando `DATABASE_URL` e'
+>   dialetti, SQLite in test/CI, Postgres in produzione quando `DATABASE_URL` è
 >   impostata), `app/models.py`, `migrations/` (Alembic). Migrati **sia** la
 >   classifica (`app/leaderboard.py`, con `user_id` opzionale) **sia** lo stato
->   vivo della catena (`app/pipeline_state.py`) -- quest'ultimo NON e' in questo
+>   vivo della catena (`app/pipeline_state.py`) -- quest'ultimo NON è in questo
 >   doc originale.
 > - **Console di monitoraggio in tempo reale** (`/_pipeline/console`, sottodominio
 >   `monitor.divarioitalia.it`) via **Supabase Realtime**, con **RLS** che
 >   restringe le tabelle pipeline alla mail admin (`scripts/supabase_setup.sql`).
->   Sostituisce il `?token=`. Anche questo e' fuori dal doc originale.
+>   Sostituisce il `?token=`. Anche questo è fuori dal doc originale.
 > - **Keep-alive** (`/_keepalive` + Cloud Scheduler) contro la pausa 7 giorni.
 > - **Litestream** si ritira solo **dopo** aver migrato le righe reali
 >   (`scripts/migrate_leaderboard_to_postgres.py`) e verificato i conteggi.
@@ -30,7 +30,7 @@
 > sono su `master`: vivono sul branch `claude/game-user-db-achievements-5rlmrx`,
 > non mergiato. Restano un piano futuro, non lo scope della Fase 4 (che tiene lo
 > `user_id` opzionale sulla classifica e nient'altro sugli account di gioco). Il
-> piano operativo vivo e'
+> piano operativo vivo è
 > `/home/nilo/.claude/plans/lavori-sul-progetto-divario-playful-peacock.md`.
 
 ## Context

@@ -454,7 +454,7 @@ def indicator_markdown(meta, level, article, site_url):
     canonical = f"{site_url}{meta['canonical_path']}"
     unit = meta.get("value_unit") or meta.get("unit") or "unità non specificata"
     explain = level.get("explain") or meta.get("explain") or {}
-    # Il titolo autorato vale anche qui: la proiezione markdown e' una
+    # Il titolo autorato vale anche qui: la proiezione markdown è una
     # rappresentazione di prima classe della stessa pagina, non un ripiego, e
     # dare all'agente il nome amministrativo mentre il lettore HTML legge il
     # titolo in lingua comune vuol dire due pagine diverse allo stesso URL.
@@ -469,10 +469,10 @@ def indicator_markdown(meta, level, article, site_url):
         "",
         # Il nome ufficiale della serie, sempre. Con un H1 autorato il titolo in
         # lingua comune sostituisce quello amministrativo, e nella proiezione
-        # markdown non c'e' nessun altro posto dove il nome ricompaia (la pagina
+        # markdown non c'è nessun altro posto dove il nome ricompaia (la pagina
         # HTML ce l'ha nel blocco "Dato originale"): un agente avrebbe letto
-        # cifre e fonte senza sapere **quale** serie sta leggendo, che e' il modo
-        # piu' facile di citarla per un'altra.
+        # cifre e fonte senza sapere **quale** serie sta leggendo, che è il modo
+        # più facile di citarla per un'altra.
         f"- Serie: {meta['name']}",
         f"- Tema: [{meta['theme']}]({_absolute(site_url, meta['theme_path'])})",
         f"- Livello territoriale: {level['label']}",
@@ -514,9 +514,9 @@ def indicator_markdown(meta, level, article, site_url):
     means = level.get("annual_means") or []
     if len(means) > 1:
         # La stessa serie della tabella HTML. Senza, la rappresentazione markdown
-        # restava l'unica vista della pagina priva della serie storica, cioe'
-        # esattamente cio' che questo cambio vuole rendere leggibile a chi non
-        # esegue JavaScript: e un agente che chiede `text/markdown` e' il lettore
+        # restava l'unica vista della pagina priva della serie storica, cioè
+        # esattamente ciò che questo cambio vuole rendere leggibile a chi non
+        # esegue JavaScript: e un agente che chiede `text/markdown` è il lettore
         # senza JavaScript per definizione.
         lines += [
             "",

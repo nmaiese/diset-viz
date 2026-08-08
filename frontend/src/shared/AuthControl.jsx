@@ -1,6 +1,6 @@
 // Controllo login/account per la SPA (atlante). Stesso aspetto del widget
-// vanilla del masthead SSR (classi .site-auth), cosi' l'header e' coerente fra i
-// due sistemi di rendering. Non compare se Supabase non e' configurato.
+// vanilla del masthead SSR (classi .site-auth), così l'header è coerente fra i
+// due sistemi di rendering. Non compare se Supabase non è configurato.
 
 import React, { useEffect, useRef, useState } from "react";
 import {

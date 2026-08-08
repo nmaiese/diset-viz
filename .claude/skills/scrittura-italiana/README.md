@@ -70,7 +70,7 @@ L'esempio in alto è il caso più comune. Ma «sa l'italiano» vuol dire anche *
 toccare** e **rispondere ai dubbi di lingua**:
 
 <p align="center">
-  <img src="assets/demo-registro.gif" alt="Demo: una chat informale lasciata com'è — e', perché da tastiera e i puntini non sono errori, sono il registro" width="680">
+  <img src="assets/demo-registro.gif" alt="Demo: una chat informale lasciata com'è — è, perché da tastiera e i puntini non sono errori, sono il registro" width="680">
 </p>
 
 **Riconosce il registro** (*aptum*). Davanti a una chat informale non ipercorregge: `e'`,

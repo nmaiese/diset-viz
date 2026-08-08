@@ -27,7 +27,7 @@ homework, which is the problem it was built to solve one level up.
     python3 scripts/verification_queue.py --show ter-611
     python3 scripts/verification_queue.py --csv
 
-## Perche' un'impronta della prosa e non una data
+## Perché un'impronta della prosa e non una data
 
 A verification is a statement about **a text**, so it expires when that text
 changes, and nothing else expires it. The row carries a fingerprint of the prose
@@ -63,14 +63,14 @@ from scripts import indicator_store  # noqa: E402  (path bootstrap above)
 
 # Il registro delle verifiche, un file per verifica.
 #
-# Era un CSV unico a cui si appendeva in fondo, ed era la seconda meta' dello
+# Era un CSV unico a cui si appendeva in fondo, ed era la seconda metà dello
 # stesso guasto che ha fatto shardare il diario: due stadi che scrivono in coda
 # allo stesso file collidono sempre, e il contratto se la cavava dicendo agli
 # agenti di tenere entrambe le parti a mano. Peggio, il cancello pretende che
 # il registro sia append-only, quindi una risoluzione sbagliata di quel
 # conflitto era anche una violazione del cancello dello stadio che la faceva.
 #
-# Il nome del file e' la chiave naturale della verifica: quale articolo, a
+# Il nome del file è la chiave naturale della verifica: quale articolo, a
 # quale livello, e su quale versione della prosa. Riverificare lo stesso
 # articolo dopo una correzione produce un'impronta nuova, quindi un file nuovo,
 # quindi non si sovrascrive niente.
@@ -97,8 +97,8 @@ COLUMNS = [
 ]
 
 # Il valore di `origine` che l'officina scrive nelle entry che produce
-# (`officina/pubblica.py`). E' la provenienza, non una firma: dice che quel
-# testo e' uscito dalla macchina nuova, dove il posto del revisore lo prendono
+# (`officina/pubblica.py`). È la provenienza, non una firma: dice che quel
+# testo è uscito dalla macchina nuova, dove il posto del revisore lo prendono
 # il lint e la revisione della diagnosi.
 OFFICINA = "officina"
 
@@ -117,26 +117,26 @@ def prose_fingerprint(entry: dict) -> str:
     **The authored `h` counts as prose**, and leaving it out was a real hole.
     118 sections carry a hand-written heading, they are visible on the page, and
     they make claims: `ter-651` heads its `dinamica` with "Cinque anni di
-    guadagni, un anno che ne toglie piu' della meta'", which its verifier
+    guadagni, un anno che ne toglie più della metà", which its verifier
     checked and confirmed (+1,413 against -0,855, the 61%). Hashing only the
     body meant a clean verification kept covering a replaced heading, and
     repairing a refuted heading did not requeue the article.
     """
     parts = [("lead", "", entry.get("lead") or "")]
     # I titoli autorati (`h1`, `seo_title`) sono prosa a tutti gli effetti, per la
-    # stessa ragione per cui lo e' l'`h` di una sezione: sono visibili, e uno di
-    # loro e' anche cio' che si legge in SERP, quindi puo' fare un'affermazione.
-    # Sono campi vuoti su tutti gli articoli di oggi, percio' le trecento impronte
+    # stessa ragione per cui lo è l'`h` di una sezione: sono visibili, e uno di
+    # loro è anche ciò che si legge in SERP, quindi può fare un'affermazione.
+    # Sono campi vuoti su tutti gli articoli di oggi, perciò le trecento impronte
     # non si muovono, ma senza di loro un titolo aggiunto o corretto dopo la firma
     # lasciava la verifica vecchia a combaciare su una frase che nessuno ha mai
-    # controllato: il buco che l'`h` ha gia' aperto una volta.
+    # controllato: il buco che l'`h` ha già aperto una volta.
     for field in ("h1", "seo_title"):
         value = entry.get(field)
         if isinstance(value, str) and value.strip():
             parts.append((field, "", value))
     # Solo le sezioni che la pagina rende: una sezione assorbita dal blocco "Come
-    # leggere il dato" resta nel file ma non e' piu' in pagina, e il verificatore
-    # non puo' leggerla. Continuare a pesarla avrebbe fatto scadere la verifica a
+    # leggere il dato" resta nel file ma non è più in pagina, e il verificatore
+    # non può leggerla. Continuare a pesarla avrebbe fatto scadere la verifica a
     # ogni ritocco di una `definizione` che nessuno vede: una riverifica per un
     # testo invisibile, ogni volta.
     rendered = set(_emitted_role_list(entry))
@@ -162,7 +162,7 @@ def prose_fingerprint(entry: dict) -> str:
 
 # I quattro ruoli dell'articolo, nell'insieme che la pagina rende quando l'entry
 # non dichiara niente. Copiati e non importati da `app.indicator_texts`: questo
-# modulo e' stdlib puro, come ogni script della catena.
+# modulo è stdlib puro, come ogni script della catena.
 DEFAULT_ARTICLE_ROLES = frozenset(("definizione", "quadro", "dinamica", "limiti"))
 SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
 
@@ -170,22 +170,22 @@ SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
 def _emitted_roles(entry):
     """I ruoli che l'articolo rende come H2, ma solo quando non sono i quattro.
 
-    Serve a una cosa sola: un'entry gia' verificata puo' aggiungere
+    Serve a una cosa sola: un'entry già verificata può aggiungere
     `roles_covered` e togliersi la definizione dalla pagina **senza toccare una
     parola** di prosa. Con l'impronta calcolata sui soli testi quel cambio era
     invisibile, la verifica vecchia continuava a combaciare, e una smentita
     appesa alla definizione ora nascosta restava aperta su una sezione che
-    nessuno vede piu'. Cambiare che cosa la pagina mostra e' un cambio della
+    nessuno vede più. Cambiare che cosa la pagina mostra è un cambio della
     pagina, e va riverificato come tale.
 
-    Ritorna `None` quando l'insieme reso e' quello di sempre, cosi' l'impronta
+    Ritorna `None` quando l'insieme reso è quello di sempre, così l'impronta
     resta **identica byte per byte** per le entry senza il campo (i trecento
     articoli esistenti) e anche per un `roles_covered` che dichiara tutti e
     quattro i ruoli: in quel caso la pagina rende esattamente com'era, e
     un'impronta diversa avrebbe invalidato una verifica ancora buona.
 
     Legge la dichiarazione **come la legge chi rende** (`app.indicator_texts.
-    emitted_roles`, di cui questa e' la copia stdlib): i tre sostanziali entrano
+    emitted_roles`, di cui questa è la copia stdlib): i tre sostanziali entrano
     comunque e un ruolo sconosciuto si ignora. Guardare la dichiarazione grezza
     sbagliava in tutte e due le direzioni: `["definizione"]` rende le stesse
     quattro sezioni di sempre e avrebbe fatto scadere una verifica ancora buona,
@@ -199,13 +199,13 @@ def _emitted_roles(entry):
 
 
 def _emitted_role_list(entry) -> list:
-    """L'insieme reso, sempre, anche quando e' quello di sempre.
+    """L'insieme reso, sempre, anche quando è quello di sempre.
 
     Copia stdlib di `app.indicator_texts.emitted_roles`. Il campo **assente** e la
     lista **vuota** non sono la stessa cosa: assente vuol dire "non dichiaro
-    niente", cioe' i quattro ruoli di sempre, mentre `roles_covered: []` e' una
+    niente", cioè i quattro ruoli di sempre, mentre `roles_covered: []` è una
     dichiarazione che non nomina la definizione, quindi la assorbe come farebbe
-    `["quadro"]`. Distinguerle qui e non con un test di verita' e' il motivo per
+    `["quadro"]`. Distinguerle qui e non con un test di verità è il motivo per
     cui questa funzione esiste separata dal marcatore.
     """
     declared = entry.get("roles_covered")
@@ -216,14 +216,14 @@ def _emitted_role_list(entry) -> list:
 
 
 def load_texts(root=None) -> dict:
-    """Tutti gli articoli. `root` e' una directory di store, non piu' un file."""
+    """Tutti gli articoli. `root` è una directory di store, non più un file."""
     return indicator_store.load_all(root)
 
 
 def verification_name(row: dict) -> str:
     """Il nome del file di una verifica: articolo, livello, impronta della prosa.
 
-    Sono i tre campi su cui la verifica e' un'affermazione, quindi due file con
+    Sono i tre campi su cui la verifica è un'affermazione, quindi due file con
     lo stesso nome sarebbero la stessa verifica scritta due volte, e due
     verifiche diverse non possono mai ricadere sullo stesso nome.
     """
@@ -239,7 +239,7 @@ def load_verifications(path=None) -> list[dict]:
     `path` accetta una directory di shard o un `.csv`, per la stessa ragione
     per cui `pipeline_log.read_journal` accetta tutte e due le forme: i test
     ne scrivono uno temporaneo e la catena scrive l'altra. Il vecchio registro
-    unico non si legge piu' in automatico perche' non esiste piu': le sue righe
+    unico non si legge più in automatico perché non esiste più: le sue righe
     sono state travasate negli shard, e leggerle da tutte e due le parti le
     avrebbe contate due volte.
     """
@@ -272,7 +272,7 @@ def write_verification(row: dict, root=None) -> Path:
     """Registra una verifica. Ritorna il file scritto.
 
     Una per volta e non una lista: il verificatore ne produce una per articolo,
-    e una funzione che riscrive tutto il registro e' esattamente il modo in cui
+    e una funzione che riscrive tutto il registro è esattamente il modo in cui
     un registro append-only smette di esserlo per sbaglio.
     """
     target = Path(root or VERIFICATIONS_DIR)
@@ -378,15 +378,15 @@ def build_queue(texts=None, verifications=None) -> list[dict]:
         # the reviewer is about to rewrite the sentences anyway.
         #
         # L'officina non ha un revisore, e per questo entra dalla seconda porta.
-        # La condizione vera non e' "qualcuno ha firmato": e' "nessuno sta per
+        # La condizione vera non è "qualcuno ha firmato": è "nessuno sta per
         # riscrivere queste frasi", e per un articolo dell'officina il momento
-        # e' quando il lint non blocca piu' ed e' stato scritto. Senza questa
+        # è quando il lint non blocca più ed è stato scritto. Senza questa
         # riga la macchina nuova produceva articoli che la coda **non vedeva**:
         # trecentosettantasette in catalogo, cinquanta firmati, e i tre della
-        # macchina nuova invisibili a valle. Cioe' l'unico passo di
+        # macchina nuova invisibili a valle. Cioè l'unico passo di
         # falsificazione indipendente che questo repo possieda, e l'unico che
         # abbia una misura dietro (4,8% contro 1,3%), non si sarebbe mai
-        # applicato a cio' che scriviamo adesso.
+        # applicato a ciò che scriviamo adesso.
         current = (bool(DATE.fullmatch(signed)) and entry.get("reviewed_vintage") == vintage
                    or entry.get("origine") == OFFICINA)
         fingerprint = prose_fingerprint(entry)
@@ -453,7 +453,7 @@ def _print(rows: list[dict], limit: int) -> None:
         f"{summary['verificati']} verificati, {summary['da_verificare']} da verificare."
     )
     if summary["riverificare"]:
-        print(f"  di cui {summary['riverificare']} da riverificare: il testo e' cambiato dopo la verifica")
+        print(f"  di cui {summary['riverificare']} da riverificare: il testo è cambiato dopo la verifica")
     if summary["affermazioni_controllate"]:
         print(
             f"  finora: {summary['affermazioni_controllate']} affermazioni controllate, "

@@ -8,7 +8,7 @@
    "files": [],
    "expectations": [
     "Non aggiunge nomi, opere, dati o citazioni.",
-    "Preserva la distinzione 'non è se dimenticare, ma che cosa'.",
+    "Preserva la distinzione 'non è se dimenticare, ma che cosà.",
     "Nel testo revisionato conserva tutte le parole dell'input nello stesso ordine; sono ammesse soltanto differenze di spaziatura."
    ]
   },
@@ -19,8 +19,8 @@
    "files": [],
    "expectations": [
     "Preserva entrambi i poli della negazione informativa.",
-    "Non riduce la prima frase alla sola assertiva 'è una neutralizzazione'.",
-    "Non produce la forma inversa 'La pena detentiva è una neutralizzazione, non una misura rieducativa'."
+    "Non riduce la prima frase alla sola assertiva 'è una neutralizzazioné.",
+    "Non produce la forma inversa 'La pena detentiva è una neutralizzazione, non una misura rieducativà."
    ]
   },
   {
@@ -30,19 +30,19 @@
    "files": [],
    "expectations": [
     "Riduce i due costrutti bipolari ornamentali.",
-    "Non usa la pseudo-correzione 'soluzione completa, non semplice software'.",
+    "Non usa la pseudo-correzione 'soluzione completa, non semplice softwarè.",
     "Non inventa caratteristiche, clienti, metriche o risultati."
    ]
   },
   {
    "id": 4,
-   "prompt": "Controlla questa chat informale e correggi soltanto ciò che impedisce di capirla. Non formalizzare il tono:\n\nragazzi domani non ce la faccio a venire, ho un casino col lavoro... recuperiamo la prox settimana? perdonatemi, e' un periodo no",
+   "prompt": "Controlla questa chat informale e correggi soltanto ciò che impedisce di capirla. Non formalizzare il tono:\n\nragazzi domani non ce la faccio a venire, ho un casino col lavoro... recuperiamo la prox settimana? perdonatemi, è un periodo no",
    "expected_output": "Chat invariata o quasi: le convenzioni da tastiera e il lessico colloquiale restano coerenti col mezzo.",
    "files": [],
    "expectations": [
-    "Non converte automaticamente e' in è, prox in prossima o ... nel carattere tipografico ….",
+    "Non converte automaticamente è in è, prox in prossima o ... nel carattere tipografico ….",
     "Non sostituisce il tono colloquiale con una mail formale.",
-    "Nel testo revisionato conserva esattamente le forme 'perdonatemi', 'prox', \"e'\" e '...'."
+    "Nel testo revisionato conserva esattamente le forme 'perdonatemi', 'prox', \"è\" e '...'."
    ]
   },
   {
@@ -62,7 +62,7 @@
    "expected_output": "Riduzione di plastismi e aggettivi vuoti; eventuale segnalazione separata della mancanza di dati concreti.",
    "files": [],
    "expectations": [
-    "Riduce formule come 'altissima qualità', 'ogni esigenza' e 'semplice ed efficace'.",
+    "Riduce formule come 'altissima qualità', 'ogni esigenzà e 'semplice ed efficacè.",
     "Non inventa anni di attività, premi, sedi, prodotti o numeri di clienti.",
     "Non introduce entità, date, quantità, sedi, certificazioni, caratteristiche di prodotto o risultati assenti dall'input."
    ]
@@ -95,7 +95,7 @@
    "expected_output": "Periodo invariato o corretto soltanto nella forma, senza perdita di condizioni, modalità o ambito.",
    "files": [],
    "expectations": [
-    "Preserva 'può essere esercitato' e il termine di quattordici giorni.",
+    "Preserva 'può essere esercitatò e il termine di quattordici giorni.",
     "Preserva il rinvio all'articolo 59.",
     "Preserva entrambe le categorie escluse."
    ]
@@ -139,9 +139,9 @@
    "expected_output": "Taglia soltanto l'elevazione e l'antonimia davvero ridondante; preserva falso antonimo contestuale, citazione ed esclusione di categoria nella forma originaria.",
    "files": [],
    "expectations": [
-    "Riscrive l'elevazione 'non semplice archivio, ma piattaforma' in assertiva pura.",
-    "Riduce 'facoltativa, non obbligatoria' a 'facoltativa'.",
-    "Preserva 'sincrona, non asincrona' perché il testo assegna i termini ad assi distinti.",
+    "Riscrive l'elevazione 'non semplice archivio, ma piattaformà in assertiva pura.",
+    "Riduce 'facoltativa, non obbligatorià a 'facoltativa'.",
+    "Preserva 'sincrona, non asincronà perché il testo assegna i termini ad assi distinti.",
     "Lascia verbatim la citazione fornita dall'utente.",
     "Preserva 'non è un problema di budget: è un problema di priorità' senza invertirlo in 'di priorità, non di budget'."
    ]
@@ -152,8 +152,8 @@
    "expected_output": "Passaggio invariato o quasi; l'esclusione iniziale e la distinzione fra selezione e genealogia restano esplicite.",
    "files": [],
    "expectations": [
-    "Preserva la negazione 'non è cieco alla selezione' e la sua motivazione.",
-    "Preserva la limitazione 'soltanto alla genealogia'.",
+    "Preserva la negazione 'non è cieco alla selezioné e la sua motivazione.",
+    "Preserva la limitazione 'soltanto alla genealogià.",
     "Non fonde selezione e genealogia in una generica forma di cecità."
    ]
   },
@@ -175,7 +175,7 @@
    "expected_output": "Le transizioni fra autori e la glossa di pseudo-precisione vengono ridotte; restano soltanto i contenuti presenti.",
    "files": [],
    "expectations": [
-    "Riduce le formule-ponte 'porta il discorso', 'aggiunge un ulteriore livello' e 'in questo senso preciso'.",
+    "Riduce le formule-ponte 'porta il discorsò, 'aggiunge un ulteriore livellò e 'in questo senso precisò.",
     "Non inventa opere, date, citazioni o tesi specifiche dei due autori.",
     "Non sostituisce le formule con altri verbi-ponte ugualmente generici.",
     "Conserva il rapporto fra istituzioni, dispositivi e comprensione del presente."
@@ -187,8 +187,8 @@
    "expected_output": "Email invariata o quasi: saluto, ringraziamento e disponibilità sono appropriati al contesto.",
    "files": [],
    "expectations": [
-    "Preserva 'Gentile Professoressa' e 'Cordiali saluti'.",
-    "Non elimina 'Resto a disposizione' come se fosse slop conversazionale.",
+    "Preserva 'Gentile Professoressà e 'Cordiali salutì.",
+    "Non elimina 'Resto a disposizioné come se fosse slop conversazionale.",
     "Non aggiunge entusiasmo, scuse, urgenza o richieste assenti.",
     "Mantiene il tono formale e conciso."
    ]
@@ -393,7 +393,7 @@
    "files": [],
    "expectations": [
     "Non consegna una versione riscritta del paragrafo (micro-esempi puntuali ammessi).",
-    "Individua almeno tre problemi reali fra: incipit 'Nel panorama attuale', costruzione 'non si tratta... ma', gerundi in coda, perifrasi 'si configura come', lessico aziendale vuoto.",
+    "Individua almeno tre problemi reali fra: incipit 'Nel panorama attualè, costruzione 'non si tratta... mà, gerundi in coda, perifrasi 'si configura comè, lessico aziendale vuoto.",
     "Ogni rilievo è ancorato a parole precise del testo.",
     "Non aggiunge informazioni sul contenuto (nomi, dati, giudizi sull'ente)."
    ]
@@ -404,9 +404,9 @@
    "expected_output": "Traduzione naturale senza calchi semantici; significato e registro conservati.",
    "files": [],
    "expectations": [
-    "Non usa il calco 'fare senso' per make sense: rende con 'dare un senso', 'mettere ordine' o equivalente.",
+    "Non usa il calco 'fare sensò per make sense: rende con 'dare un sensò, 'mettere ordiné o equivalente.",
     "Non usa 'consistenti' per consistent: rende con 'coerenti', 'rigorosi' o equivalente.",
-    "Non usa 'realizziamo' per realize: rende con 'sappiamo', 'ci rendiamo conto' o equivalente.",
+    "Non usa 'realizziamo' per realize: rende con 'sappiamo', 'ci rendiamo contò o equivalente.",
     "Non usa 'evidenze' come calco di evidence: rende con 'dati', 'prove' o 'fatti'.",
     "Non aggiunge contenuti assenti dall'originale (nomi, numeri, promesse)."
    ]
@@ -420,7 +420,7 @@
     "Non modifica il primo capoverso e non ripropone la sostituzione di «va detto che».",
     "Non tratta la scelta dell'utente come un errore da correggere.",
     "Nel secondo capoverso toglie la virgola fra soggetto e verbo ('Il team, sta').",
-    "Nel secondo capoverso scioglie 'procedendo alla implementazione' in un verbo pieno (es. 'sta implementando', 'implementa').",
+    "Nel secondo capoverso scioglie 'procedendo alla implementazioné in un verbo pieno (es. 'sta implementandò, 'implementa').",
     "Nel secondo capoverso riduce i gerundi in coda ('garantendo... e sottolineando...').",
     "Non aggiunge informazioni."
    ]
@@ -431,7 +431,7 @@
    "expected_output": "Il capitolo 2 si allinea alle scelte del capitolo 1 (sé stesso; virgolette curve); il capitolo 1 resta intatto; scelte dichiarate.",
    "files": [],
    "expectations": [
-    "Uniforma il capitolo 2 alle scelte del capitolo 1: 'sé stesso' con l'accento e virgolette curve.",
+    "Uniforma il capitolo 2 alle scelte del capitolo 1: 'sé stessò con l'accento e virgolette curve.",
     "Non converte il capitolo 1 (né l'insieme) a caporali o ad altre scelte nuove.",
     "Dichiara in nota le scelte editoriali applicate.",
     "Non riscrive il contenuto dei capitoli e non aggiunge nulla."
@@ -468,9 +468,9 @@
    "files": [],
    "expectations": [
     "Scioglie la serializzazione concessiva (Certo/Ma, È vero/Tuttavia, Si può obiettare/Eppure) conservando i contenuti di entrambe le parti.",
-    "Riscrive in assertiva pura l'elevazione 'non un semplice servizio comunale, ma'; preserva invece 'non è uno spazio di custodia: è un servizio educativo'.",
-    "Toglie i 'non a caso' non argomentati e l'enfasi 'ben' davanti a 14.",
-    "Elimina i gerundi in coda ('sottolineando', 'configurandosi'), la meta-frase che annuncia la conclusione e la formula 'Resta vero che'.",
+    "Riscrive in assertiva pura l'elevazione 'non un semplice servizio comunale, mà; preserva invece 'non è uno spazio di custodia: è un servizio educativò.",
+    "Toglie i 'non a casò non argomentati e l'enfasi 'ben' davanti a 14.",
+    "Elimina i gerundi in coda ('sottolineando', 'configurandosi'), la meta-frase che annuncia la conclusione e la formula 'Resta vero ché.",
     "Sostituisce la chiusura 'In un mondo sempre più digitale, la vera sfida è' con una chiusura concreta.",
     "Conserva tutti i dati e i nomi (Modena, 2024, 410.000, 280.000, 14, nove del mattino) senza aggiungerne."
    ]
@@ -481,12 +481,12 @@
    "expected_output": "Cornice «Immagina» tolta; lo staccato in prosa ricomposto (il claim isolato può restare), «vero e proprio»/«ecosistema»/«a livello di» eliminati, titoletti variati, chiusura su un fatto; dati esatti conservati.",
    "files": [],
    "expectations": [
-    "Toglie la cornice 'Immagina un mondo in cui' ed entra sul concreto.",
+    "Toglie la cornice 'Immagina un mondo in cuì ed entra sul concreto.",
     "Ricompone lo staccato dentro la prosa ('Ordini in un minuto. Consegna al piano. Zero plastica.'); può conservare al più il claim d'apertura 'Fresca. Locale. Giusta.' come slogan isolato.",
-    "Elimina 'vero e proprio', l'uso figurato di 'ecosistema' e 'a livello di'.",
+    "Elimina 'vero e propriò, l'uso figurato di 'ecosistema' e 'a livello di'.",
     "Varia i due titoletti bipartiti seriali ('La qualità: come…', 'Il prezzo: perché…').",
     "Conserva l'informazione che non ci sono intermediari e tutti i dati esatti (martedì e venerdì, dodici aziende, trenta chilometri, due volte l'anno, 19,90 €, sei chili, senza penali).",
-    "Sostituisce la chiusura edificante ('cambiare il mondo, un ortaggio alla volta') con un fatto o un'azione concreta."
+    "Sostituisce la chiusura edificante ('cambiare il mondo, un ortaggio alla voltà) con un fatto o un'azione concreta."
    ]
   },
   {
@@ -495,8 +495,8 @@
    "expected_output": "Riempitivi e «attraverso» strumentali sciolti, hype ridimensionato ai fatti, «ben» tolto; numeri esatti e cautele epistemiche intatti; chiusura concreta.",
    "files": [],
    "expectations": [
-    "Apre sul contenuto senza 'Si tratta di' e senza hype ('rivoluzionari', 'cambiare per sempre' tolti o ridotti ai fatti).",
-    "Scioglie gli 'attraverso' strumentali, 'in grado di', 'ha dato vita a' e 'l'obiettivo è quello di'.",
+    "Apre sul contenuto senza 'Si tratta di' e senza hype ('rivoluzionari', 'cambiare per semprè tolti o ridotti ai fatti).",
+    "Scioglie gli 'attraverso' strumentali, 'in grado di', 'ha dato vita à e 'l'obiettivo è quello di'.",
     "Toglie 'ben' davanti a 1.204.",
     "Conserva tutti i numeri esatti (1.204, 14-18, 6 ore e 41 minuti, 8-10, 180, 12 minuti, 45 minuti, ingresso alle 8) senza arrotondare né aggiungere.",
     "Conserva la cautela epistemica: 'suggeriscono' resta tale e la precisazione su correlazione e causa resta.",
@@ -533,8 +533,8 @@
    "expected_output": "Nessun intervento sostanziale: gli usi legittimi (attraversare concreto, concessiva vera, «non a caso» argomentato, frammento ritmico) restano.",
    "files": [],
    "expectations": [
-    "Non altera 'Ho attraversato il paese' (moto reale, uso legittimo).",
-    "Preserva la concessiva ('È vero che… ma…') e il 'Non a caso', che qui è argomentato dal seguito.",
+    "Non altera 'Ho attraversato il paesé (moto reale, uso legittimo).",
+    "Preserva la concessiva ('È vero che… ma…') e il 'Non a casò, che qui è argomentato dal seguito.",
     "Preserva il frammento 'Una scoperta minuscola.' come scelta ritmica.",
     "Non fa riscritture stilistiche non richieste e non aggiunge nulla (al più segnala che il testo è già a posto)."
    ]

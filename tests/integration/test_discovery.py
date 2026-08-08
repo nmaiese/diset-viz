@@ -492,7 +492,7 @@ class IstatMultiDimensionAdapter(unittest.TestCase):
     def test_build_key_refuses_a_dimension_with_no_known_value(self):
         """A dimension missing from dimension_values must stop the query, not
         wildcard it: a wildcard here does not mean 'total', it means 'every
-        code of this dimension, mixed into the response'."""
+        code of this dimension, mixed into the responsé."""
         spec = self._spec(dimension_values={})
         with self.assertRaises(ValueError):
             istat_regional_source._build_key(spec)
