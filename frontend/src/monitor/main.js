@@ -71,6 +71,10 @@ let vista = "atlante";
 let pagina = 0;
 const PAGINA = 25;
 const aperte = new Set();
+// I `<details>` aperti, per chiave stabile (`risultato:<runId>:<agentId>`). Il
+// ridisegno butta il DOM: senza questa memoria il pannello che stai leggendo si
+// richiude da solo a ogni giro dell'aggiornamento.
+const apertiJson = new Set();
 
 function h(html) {
   root.innerHTML = html;
@@ -224,7 +228,9 @@ async function carica(supabase, { soloRun = false } = {}) {
 
   if (runs || indicatori) ultimoAggiornamento = new Date();
   ultimoTentativoVuoto = !runs;
-  disegna();
+  // Il giro automatico ridisegna solo se e' cambiato qualcosa; un clic
+  // sull'Aggiorna ridisegna comunque, perche' li' lo hai chiesto tu.
+  disegna(soloRun);
   orologio();
 }
 
@@ -331,7 +337,31 @@ function vaiA(prossima, chiave, filtro) {
 
 // --- disegno ---------------------------------------------------------------
 
-function disegna() {
+// Quello che di questi dati finisce in pagina. Non l'intero payload: se ci
+// entrasse `ultimo_battito`, il rinfresco del lettore (ogni due minuti, anche a
+// stato invariato) farebbe ridisegnare una pagina identica.
+function firmaVista() {
+  const runs = (runsData?.runs || []).map((r) =>
+    [r.run_id, r.stato, r.in_volo, r.battito_fermo, r.agenti_totali, r.turni, r.costo,
+     (r.agenti || []).map((a) => `${a.agent_id}${a.stato_vivo || ""}${a.turni ?? ""}`).join("|"),
+    ].join(":"));
+  return `${runs.join(";")}#${(indicatoriData?.indicatori || []).length}#${(catalogoData?.righe || []).length}`;
+}
+
+let firmaDisegnata = null;
+
+function disegna(seCambiato = false) {
+  // Il giro automatico non tocca il DOM se non e' cambiato niente. E' la meta'
+  // piu' importante della cura: un ridisegno inutile chiude i pannelli, sposta
+  // il fuoco e fa saltare la pagina, e a catena ferma sarebbero sei ridisegni al
+  // minuto per mostrare lo stesso identico stato.
+  const firma = firmaVista();
+  if (seCambiato && firma === firmaDisegnata) return;
+  firmaDisegnata = firma;
+
+  // Quando invece qualcosa e' cambiato davvero, il ridisegno non deve comunque
+  // portare via il punto in cui si sta leggendo.
+  const altezza = window.scrollY;
   disegnaAdesso();
   const tabAtl = document.getElementById("tab-atl");
   const tabRun = document.getElementById("tab-run");
@@ -339,6 +369,7 @@ function disegna() {
   if (tabRun) tabRun.setAttribute("aria-selected", String(vista === "run"));
   if (vista === "run") disegnaRun();
   else disegnaAtlante();
+  if (seCambiato && window.scrollY !== altezza) window.scrollTo(0, altezza);
 }
 
 // --- banda 1: ADESSO -------------------------------------------------------
@@ -782,19 +813,22 @@ function dettaglioRun(run) {
         '<td class="mon-num">' + (a.costo != null ? euro(a.costo) : "") + "</td>" +
       "</tr>" +
       (a.risultato != null
-        ? '<tr><td colspan="10"><details class="mon-json"><summary>che cosa ha restituito ' +
+        ? '<tr><td colspan="10"><details class="mon-json" data-json="' +
+          escapeHtml("risultato:" + run.run_id + ":" + a.agent_id) + '"><summary>che cosa ha restituito ' +
           escapeHtml(nomeAgente(a)) + "</summary><pre>" +
           escapeHtml(testoRisultato(a.risultato)) + "</pre></details></td></tr>"
         : "")
     ).join("") +
     "</tbody></table>";
   const logs = (run.logs || []).length
-    ? '<details class="mon-json"><summary>' + run.logs.length + " righe di log del workflow</summary><ul class=\"mon-elenco\">" +
+    ? '<details class="mon-json" data-json="' + escapeHtml("log:" + run.run_id) + '"><summary>' +
+      run.logs.length + " righe di log del workflow</summary><ul class=\"mon-elenco\">" +
       run.logs.map((l) => "<li>" + escapeHtml(l) + "</li>").join("") + "</ul></details>"
     : "";
   const esito = run.esito != null
-    ? '<details class="mon-json"><summary>esito della run</summary><pre>' +
-      escapeHtml(JSON.stringify(run.esito, null, 1)) + "</pre></details>"
+    ? '<details class="mon-json" data-json="' + escapeHtml("esito:" + run.run_id) +
+      '"><summary>esito della run</summary><pre>' +
+      escapeHtml(JSON.stringify(run.esito, null, 2)) + "</pre></details>"
     : "";
   return tabella + logs + esito;
 }
@@ -802,6 +836,19 @@ function dettaglioRun(run) {
 // --- pezzi comuni ----------------------------------------------------------
 
 function collega(el) {
+  // I blocchi aperti restano aperti attraverso un ridisegno. Il ridisegno
+  // riscrive l'HTML, quindi un `<details>` torna chiuso e si perde il punto in
+  // cui si stava leggendo: con l'aggiornamento da se' non e' un fastidio ogni
+  // tanto, e' ogni dieci secondi mentre una run gira, cioe' proprio quando quel
+  // pannello serve. La memoria sta fuori dal DOM perche' il DOM lo buttiamo.
+  el.querySelectorAll("details[data-json]").forEach((d) => {
+    const chiave = d.getAttribute("data-json");
+    d.open = apertiJson.has(chiave);
+    d.addEventListener("toggle", () => {
+      if (d.open) apertiJson.add(chiave);
+      else apertiJson.delete(chiave);
+    });
+  });
   el.querySelectorAll("[data-passo]").forEach((b) => {
     b.onclick = () => { pagina += Number(b.getAttribute("data-passo")); disegna(); };
   });
