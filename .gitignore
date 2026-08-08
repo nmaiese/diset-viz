@@ -48,3 +48,10 @@ evals/out/
 # Vanno su disco per non viaggiare come output di un agente, che costa
 # venticinque dollari per milione di token.
 data/packs/
+
+# I dossier e le bozze congelate della pipeline lite: derivati da dati e codice
+# versionati, ricostruibili con un comando. Gli articoli di `data/lab/articoli/`
+# restano invece committabili: sono il prodotto da confrontare con quelli della
+# catena attuale.
+data/lab/dossier/
+data/lab/bozze/

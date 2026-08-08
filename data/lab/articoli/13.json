@@ -1,0 +1,43 @@
+{
+ "angolo_scelto": "La convergenza tra le regioni è reale (lo spread scende da 30,17 punti nel 2018 a 26,48 nel 2025), ma nasconde due cose che il grafico da solo non mostra: il Centro Italia non tiene insieme, perché Toscana, Umbria e Marche lavorano come il Nord mentre il Lazio si allinea al Sud, e i salti più bruschi misurati tra il 2021 e il 2022 in diverse regioni coincidono con un cambio nel modo in cui l'Istat conta chi è occupato, introdotto proprio in quel periodo. Ho scelto questo angolo, e non il consueto Nord contro Sud, perché i tre gruppi che i dati formano da soli non ricalcano le tre macroaree ufficiali, e la tabella della pagina da sola non lo direbbe mai.",
+ "fonti": [
+  {
+   "testo": "Istat, comunicato stampa sul cambio della Rilevazione sulle forze di lavoro dal 2021",
+   "url": "https://www.istat.it/comunicato-stampa/cambia-la-rilevazione-sulle-forze-di-lavoro/"
+  },
+  {
+   "testo": "Istat, archivio sulla nuova serie storica ricostruita del mercato del lavoro",
+   "url": "https://www.istat.it/it/archivio/270013"
+  },
+  {
+   "testo": "Banca d'Italia, studio su occupazione femminile e fertilità nel Mezzogiorno, ripreso da ANSA il 5 luglio 2026",
+   "url": "https://www.ansa.it/sito/notizie/economia/2026/07/05/studio-bankitalia-se-luomo-aiuta-in-casa-aumenta-loccupazione-femminile_56a7b587-933d-44df-a015-7b29de2d2ba8.html"
+  }
+ ],
+ "key": "13",
+ "lead": "La media del tasso di occupazione nelle venti regioni italiane tocca il 63,04% nel 2025, il massimo dal 2018, ma il divario tra Nord e Mezzogiorno resta di 16,85 punti.",
+ "level": "regione",
+ "sections": [
+  {
+   "body": "Nel 2025 il tasso di occupazione italiano varia dal 46,41% della Calabria al 72,89% del Trentino Alto Adige, un rapporto di 1,57 volte tra la regione dove si lavora di più e quella dove si lavora di meno. La mediana, 68,12%, sta molto più vicina al valore massimo che al minimo: sono poche regioni, e sono tutte del Sud, a tirare giù la media delle venti regioni, ferma al 63,04%.\n\nI dati si dividono da soli in tre gruppi, e le macroaree Istat spiegano l'80% di questa divisione, non il 100%. Il primo gruppo, tra 46,41 e 51,01%, è compatto e tutto meridionale: Calabria, Campania, Sicilia, Puglia. Il terzo, da 67,49 a 72,89%, comprende undici regioni a maggioranza settentrionale, ma dentro ci sono anche Toscana, Umbria e Marche, che per tasso di occupazione si comportano come il Nord, non come il Centro a cui appartengono ufficialmente. In mezzo, tra 57,39 e 64,17%, sta un gruppo di regioni del Sud a livello intermedio, Basilicata, Molise, Sardegna e Abruzzo, insieme al Lazio: la regione della capitale, anch'essa ufficialmente del Centro, si allinea qui e non alle vicine Toscana o Marche. Il Centro, insomma, non tiene insieme: si spacca tra chi lavora come il Nord e chi lavora come il Sud.",
+   "h": "Un'Italia spaccata in tre, non in due",
+   "role": "quadro"
+  },
+  {
+   "body": "Tra il 2020, l'anno del crollo pandemico, e il 2025 la media delle venti regioni è salita di 5,19 punti, da 57,85 a 63,04%. Il punto più basso dell'intera serie è stato toccato proprio nel 2020, in Campania, al 40,25%: cinque anni dopo la stessa regione è al 46,67%, sei punti più in alto ma ancora la penultima in classifica.\n\nLa ripresa più veloce è del Mezzogiorno, ma non solo. Tra il 2020 e il 2025 le regioni cresciute di più sono la Basilicata (+7,34 punti), la Liguria (+7,3), la Sicilia (+6,85), la Sardegna (+6,49) e la Campania (+6,42): quattro del Sud e una del Nord. All'estremo opposto il Friuli-Venezia Giulia è cresciuto solo di 2,88 punti, la variazione più bassa di tutta la serie. Il risultato è una convergenza reale: lo spread tra la regione migliore e quella peggiore scende da 30,17 punti nel 2018 a 26,48 nel 2025. Ma il divario tra Nord e Mezzogiorno, misurato sulle medie di macroarea, resta comunque di 16,85 punti: la forbice si stringe, non si chiude.",
+   "h": "Il Sud rincorre, ma il divario non si chiude",
+   "role": "dinamica"
+  },
+  {
+   "body": "Ogni punto di tasso di occupazione è una persona su cento, tra i 15 e i 64 anni, che ha un lavoro invece di non averlo. Ma quel punto non pesa uguale per tutti: in Calabria, la regione con il tasso più basso, nel 2025 lavora il 58,06% degli uomini e appena il 34,86% delle donne, un divario che il [tasso di occupazione femminile](/indicatore/tasso-di-occupazione-femmine/ter-178) e il [tasso di occupazione maschile](/indicatore/tasso-di-occupazione-maschi/ter-177) misurano regione per regione. In Trentino Alto Adige, la regione con il tasso più alto, lavora invece il 77,8% degli uomini e il 67,88% delle donne: la distanza tra i due sessi è molto più stretta.\n\nUno studio di Banca d'Italia, ripreso da ANSA nel luglio 2026, osserva un'associazione che aiuta a leggere questo squilibrio: nelle aree del Mezzogiorno dove l'offerta di asili nido è più bassa, a una maggiore occupazione femminile corrisponde un tasso di fertilità più basso. Non è una prova che l'una causi l'altra, ma il dato racconta una co-occorrenza netta: più lavoro femminile e meno figli vanno insieme, proprio nelle aree dove gli asili nido scarseggiano.",
+   "h": "Perché un punto di occupazione pesa di più sulle donne",
+   "role": "quadro"
+  },
+  {
+   "body": "Sei degli otto salti più bruschi della serie cadono tra il 2021 e il 2022: la Basilicata nel 2021 (+2,5 punti), poi nel 2022 la Valle d'Aosta (+3,23), la Toscana (+2,96), il Trentino Alto Adige (+2,78), la Puglia (+2,74) e le Marche (+2,7). Gli altri due salti della serie, Abruzzo e Sicilia, arrivano nel 2023.\n\nDal 1 gennaio 2021 l'Istat ha cambiato il modo di misurare chi è occupato, per adeguarsi al nuovo regolamento europeo sulla rilevazione delle forze di lavoro: un lavoratore in cassa integrazione guadagni non è più considerato occupato se l'assenza dal lavoro supera i tre mesi. Nello stesso momento è cambiata anche la base di popolazione, agganciata al nuovo Censimento permanente. L'Istat stessa avverte che i confronti temporali vanno fatti solo sulla serie storica ricostruita, non con i dati diffusi prima del cambio. Il cambio di definizione precede il periodo in cui si concentrano i salti più bruschi della serie, ma la coincidenza di per sé non basta a dire quanto di quella crescita sia lavoro in più e quanto sia un modo diverso di contarlo: i dati soli non permettono di separare le due cose.",
+   "h": "Il balzo del 2022 e il cambio di righello: una coincidenza, non una prova",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

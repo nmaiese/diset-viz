@@ -23,6 +23,7 @@ it).
 | una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
 | che cosa serve per scrivere un indicatore: cifre, angoli, contesto citabile | `packs/` (`angles.py`, `build.py`, `context.py`), [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
 | scrivere articoli indicatore adesso: il workflow, il lint, i pacchetti | `.claude/workflows/produci-indicatori.js`, `officina/` (`pacchetti.py`, `brief.py`, `pubblica.py`, `lint.py`) |
+| la catena minima di confronto (sei agenti, tre scout in parallelo, nessun cancello, scrive in `data/lab/`) | [`lab/README.md`](lab/README.md), `.claude/workflows/indicatore-lite.js` |
 | scrivere o cambiare un file di agente (contratto, non cronaca) | `.claude/rules/pipeline.md`, e il verdetto in [`docs/OFFICINA_EDITORIALE_PROPOSTA.md`](docs/OFFICINA_EDITORIALE_PROPOSTA.md) |
 | quanto costa una run, e come si misura senza sbagliare | `scripts/baseline_tokens.py` (il contratto sta nel suo docstring) |
 | scoperta e promozione di indicatori multifonte | [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md) |
@@ -32,10 +33,10 @@ it).
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
 | la voce editoriale, blog e pagine indicatore | [`content/STYLE.md`](content/STYLE.md) |
 | come si misura un articolo, i dieci criteri | [`docs/WRITING_RUBRIC.md`](docs/WRITING_RUBRIC.md) |
-| i piani gia' eseguiti, con le misure e le ipotesi cadute | [`docs/archive/`](docs/archive/) (non sono fonti di verita': se contraddicono il codice, ha ragione il codice) |
+| i piani già eseguiti, con le misure e le ipotesi cadute | [`docs/archive/`](docs/archive/) (non sono fonti di verità: se contraddicono il codice, ha ragione il codice) |
 | quali fonti secondarie si possono citare | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
 | cambiare modello, prompt o hook degli agenti | [`docs/CANARY.md`](docs/CANARY.md), `evals/README.md` |
-| priorita' e lacune sulle domande che un motore o un assistente puo' porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
+| priorità e lacune sulle domande che un motore o un assistente può porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
 | tracciamento, consenso, versione GTM | [`docs/tracking_spec.md`](docs/tracking_spec.md) |
 
 Le regole con uno scope stanno in `.claude/rules/` (app, editorial, pipeline,
@@ -47,7 +48,7 @@ scatta prima di ogni cambio a modelli, prompt o hook degli agenti).
 Per guardare la catena senza aprire file:
 
 ```bash
-python3 scripts/pipeline_monitor.py            # dov'e' fermo e perche', in una schermata (nell'app: /_pipeline)
+python3 scripts/pipeline_monitor.py            # dov'è fermo e perché, in una schermata (nell'app: /_pipeline)
 python3 scripts/pipeline_launch.py             # cosa lanciare adesso, e in che ordine (per-indicatore)
 python3 scripts/practice_timeline.py           # la storia per indicatore (il dossier, read-only)
 python3 scripts/pipeline_status.py             # le code per (vecchio) stadio, ancora lette da pipeline_launch.py
@@ -78,13 +79,13 @@ Blog layer: `app/blog.py` (reads `content/posts/*.md`).
 
 ## Commands
 
-**L'interprete Python di questo progetto e' `bin/py`, sempre.** Non `python3`,
-che in questo ambiente e' una funzione di shell e senza `$VIRTUAL_ENV` cade su
+**L'interprete Python di questo progetto è `bin/py`, sempre.** Non `python3`,
+che in questo ambiente è una funzione di shell e senza `$VIRTUAL_ENV` cade su
 un interprete privo delle dipendenze; non `.venv/bin/python`, che in molti
 worktree non esiste. Nella prima run del workflow tutti e quattro gli scrittori
 hanno speso quattro turni a testa a cercarlo, e un pubblicatore ha eseguito il
 lint con l'interprete di **un altro worktree**: due codici possibili per lo
-stesso verdetto. `bin/py` risolve in un posto solo e fallisce dicendo perche'.
+stesso verdetto. `bin/py` risolve in un posto solo e fallisce dicendo perché.
 
 ```bash
 # scrivere articoli indicatore: il workflow, dalla lista dei codici
@@ -94,7 +95,7 @@ bin/py -m officina.pubblica ter-30 < bozza.json  # la bozza diventa un articolo 
 bin/py -m officina.lint ter-30                   # il cancello editoriale (11s su tutti)
 bin/py scripts/tool_failures.py                  # i guasti che si ripetono (il file aveva solo chi lo scriveva)
 bin/py -m scripts.calibra_prosa --confronto      # gli esempi contro i pubblicati
-bin/py scripts/baseline_tokens.py --workflow wf_… --articles 1   # quanto e' costata una run
+bin/py scripts/baseline_tokens.py --workflow wf_… --articles 1   # quanto è costata una run
 
 # stato della catena editoriale, tutti gli stadi (vecchia catena)
 python3 scripts/pipeline_status.py
@@ -113,12 +114,12 @@ cd frontend && npm audit --audit-level=low
 git diff --check
 ```
 
-`tests/` e' pacchetto Python (ha `__init__.py`) apposta: e' cosi' che `tests/conftest.py`
+`tests/` è pacchetto Python (ha `__init__.py`) apposta: è così che `tests/conftest.py`
 si aggancia sotto `unittest` (che, a differenza di pytest, non lo carica da solo). Un file va
 in `tests/integration/` se ha bisogno di un giro reale (client Flask, catena end-to-end su
 file temporanei, lettura di tutti gli articoli committati); il resto sta in `tests/unit/`.
-Un file che mescola le due cose va spaccato, non spostato per intero: e' successo a
-`test_indicator_view.py`, ora due file, uno per meta'.
+Un file che mescola le due cose va spaccato, non spostato per intero: è successo a
+`test_indicator_view.py`, ora due file, uno per metà.
 
 After editing `frontend/src/*`, always rebuild before testing the served app.
 After changing data, **restart gunicorn**: the core loaders cache for the life
