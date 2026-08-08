@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>Console catena · {{ site_name }}</title>
-    {# Pagina admin interna: niente GTM/analytics/CMP (il banner privacy qui e'
-       rumore). Le identita' Supabase servono comunque, iniettate diritte. #}
+    {# Pagina admin interna: niente GTM/analytics/CMP (il banner privacy qui è
+       rumore). Le identità Supabase servono comunque, iniettate diritte. #}
     <script>
       window.__supabase = {url: {{ SUPABASE_URL | tojson }}, anonKey: {{ SUPABASE_ANON_KEY | tojson }}};
       window.__monitorAdminEmail = {{ monitor_admin_email | tojson }};
@@ -15,92 +15,117 @@
       :root { --navy:#15233b; --paper:#fbfaf7; --accent:#e4572e; --line:#d9d6cf; --ink:#15233b; --ink-soft:#5b6472; }
       * { box-sizing: border-box; }
       body { margin:0; background:var(--paper); color:var(--ink); font-family: Inter, system-ui, sans-serif; }
-      #monitor-root { max-width: 1100px; margin: 0 auto; padding: 32px 20px 64px; }
+      #monitor-root { max-width: 1180px; margin: 0 auto; padding: 32px 20px 64px; }
       h1 { font-family: Archivo, sans-serif; font-size: 26px; margin: 0; }
-      h2 { font-family: Archivo, sans-serif; font-size: 16px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); margin: 28px 0 10px; }
+      h2 { font-family: Archivo, sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); margin: 30px 0 10px; }
+      a { color: var(--accent); }
       .mon-gate { text-align:center; padding: 80px 16px; }
       .mon-msg, .mon-empty { color: var(--ink-soft); }
+      .mon-empty { padding: 14px 0; }
       .mon-btn { background: var(--accent); color:#fff; border:0; border-radius:999px; padding:10px 22px; font-size:14px; font-weight:600; cursor:pointer; margin-top:14px; }
-      .mon-btn--ghost { background:none; color:var(--ink); border:1px solid var(--line); }
+      .mon-btn--ghost { background:none; color:var(--ink); border:1px solid var(--line); margin-top:0; }
+      .mon-btn--sm { padding:5px 14px; font-size:12px; }
       .mon-head { display:flex; align-items:center; gap:12px; }
       .mon-head h1 { flex: 0 0 auto; }
+      .mon-head .mon-btn { margin: 0 0 0 auto; }
       .mon-dot { width:9px; height:9px; border-radius:50%; background:#2e9e4f; box-shadow:0 0 0 0 rgba(46,158,79,.5); animation: pulse 2s infinite; }
       @keyframes pulse { 70%{ box-shadow:0 0 0 8px rgba(46,158,79,0);} 100%{ box-shadow:0 0 0 0 rgba(46,158,79,0);} }
-      .mon-head .mon-btn { margin: 0 0 0 auto; }
-      .mon-table { overflow-x: auto; }
-      table { width:100%; border-collapse: collapse; font-size: 13.5px; font-family: "Space Mono", ui-monospace, monospace; }
-      th, td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); white-space: nowrap; }
-      th { color: var(--ink-soft); font-weight:700; }
-      {# Su desktop le celle a testo lungo (nome indicatore, descrizione del
-         prossimo passo) restano in nowrap e gonfiano la tabella oltre la pagina.
-         Nelle tabelle .mon-cards le si lascia andare a capo e si tiene il testo
-         monospace fuori dalle celle lunghe, cosi' la tabella sta nella colonna. #}
-      table.mon-cards th, table.mon-cards td { white-space: normal; overflow-wrap: anywhere; vertical-align: top; }
-      table.mon-cards td.mon-mini { white-space: nowrap; overflow-wrap: normal; }
-      table.mon-cards td, table.mon-cards td small { font-family: Inter, system-ui, sans-serif; }
-      td small { color: var(--ink-soft); font-size: 11px; }
-      td a { color: var(--accent); text-decoration: none; }
-      td a:hover { text-decoration: underline; }
-      .mon-head2 { display:flex; align-items:center; gap:12px; }
-      .mon-head2 h2 { margin: 28px 0 10px; }
-      .mon-head2 .mon-btn { margin-left:auto; }
-      .mon-btn--sm { padding:5px 14px; font-size:12px; }
-      .mon-filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+
+      {# --- ADESSO: la run in volo, sempre in cima. È la risposta alla sola
+         domanda che ha fretta, quindi non sta dentro un filtro né dietro una
+         scheda. --- #}
+      .mon-adesso { border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:8px; background:#fff; padding:14px 16px; }
+      .mon-adesso--ferma { border-left-color: var(--line); }
+      .mon-adesso-testa { display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; font-family:"Space Mono", ui-monospace, monospace; font-size:13px; }
+      .mon-adesso-testa strong { font-family: Archivo, sans-serif; font-size:16px; }
+      .mon-spina { display:flex; flex-wrap:wrap; gap:18px; margin:12px 0 4px; }
+      .mon-fase { display:flex; flex-direction:column; gap:3px; }
+      .mon-fase-nome { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); font-weight:700; }
+      .mon-fase--corrente .mon-fase-nome { color:var(--accent); }
+      .mon-pallini { font-size:15px; letter-spacing:3px; line-height:1; color:var(--navy); }
+      .mon-pallini .attesa { color:var(--line); }
+      .mon-pallini .aperto { color:var(--accent); animation: pulse-testo 1.6s ease-in-out infinite; }
+      @keyframes pulse-testo { 50% { opacity:.35; } }
+      .mon-aperto { margin-top:8px; font-family:"Space Mono", ui-monospace, monospace; font-size:12.5px; color:var(--ink-soft); }
+      .mon-aperto strong { color:var(--ink); }
+
+      {# --- Le due viste: due bottoni, non due pagine. Lo stesso fatto guardato
+         da due lati, e il filtro è comune. --- #}
+      .mon-tabs { display:flex; gap:8px; margin:28px 0 12px; border-bottom:1px solid var(--line); }
+      .mon-tab { background:none; border:0; border-bottom:2px solid transparent; padding:8px 4px; margin-right:14px; font-family: Archivo, sans-serif; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); cursor:pointer; }
+      .mon-tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--accent); }
+      .mon-filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; align-items:center; }
       .mon-filters input, .mon-filters select { font-family: Inter, system-ui, sans-serif; font-size:13px; padding:6px 9px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--ink); }
-      .mon-filters input[type=search] { flex:1 1 220px; min-width:180px; }
+      .mon-filters input[type=search] { flex:1 1 240px; min-width:180px; }
       .mon-date { display:inline-flex; align-items:center; gap:5px; color:var(--ink-soft); font-size:12px; }
-      .mon-totals { margin-bottom:10px; }
-      .mon-coverage { margin-bottom:14px; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; }
-      .mon-coverage:empty { display:none; }
-      {# I chip di copertura portano testo piu' lungo e piu' variabile (fino a due
-         motivi di esclusione) dei chip di stato: qui il nowrap generico dei chip
-         si toglie, cosi' un elenco lungo va a capo dentro il chip invece di
-         spingere la riga oltre la sezione. #}
-      .mon-coverage .mon-chip { white-space: normal; overflow-wrap: anywhere; }
-      .mon-totals-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+      .mon-totals-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; align-items:center; }
       .mon-chip { font-family: "Space Mono", ui-monospace, monospace; font-size:11.5px; background:#eee9e0; color:var(--ink); border:1px solid transparent; border-radius:999px; padding:3px 10px; white-space:nowrap; }
       .mon-chip--strong { background:var(--navy); color:var(--paper); font-weight:700; }
-      .mon-chip--click { cursor:pointer; }
-      .mon-chip--click:hover { border-color:var(--ink-soft); }
-      .mon-chip--active { background:var(--accent); color:var(--paper); border-color:var(--accent); }
-      .mon-mini { font-size:14px; letter-spacing:2px; }
-      .mon-legend { margin-bottom:12px; font-size:13px; }
-      .mon-legend > summary { cursor:pointer; color:var(--ink-soft); font-family: "Space Mono", ui-monospace, monospace; font-size:12px; padding:4px 0; }
-      .mon-legend-row { display:flex; gap:10px; align-items:baseline; padding:4px 0; line-height:1.35; }
-      .mon-legend-row > span:first-child { flex:0 0 auto; }
-      .mon-pager { display:flex; align-items:center; gap:12px; justify-content:center; padding:8px 0; }
+
+      .mon-table { overflow-x: auto; }
+      table { width:100%; border-collapse: collapse; font-size: 13.5px; }
+      th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align: top; }
+      th { color: var(--ink-soft); font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; }
+      td.mon-num, th.mon-num { text-align:right; font-family:"Space Mono", ui-monospace, monospace; white-space:nowrap; }
+      td small { color: var(--ink-soft); font-size: 11px; display:block; }
+      tr.mon-riga { cursor:pointer; }
+      tr.mon-riga:hover { background:#fff; }
+      tr.mon-aperta { background:#fff; }
+      td.mon-dettaglio { background:#fff; padding:0 10px 14px; }
+
+      {# Gli esiti sono quattro e devono restare quattro: uno scritto pulito, uno
+         scritto con rilievi che viaggiano col pezzo, uno fermato prima del disco
+         (che è un buon funzionamento della verifica) e un guasto. Confonderli
+         farebbe leggere come rotto ciò che ha funzionato. Solo l'identità
+         cartografica: navy pieno = fatto, accento = attenzione, contorno = fermo. #}
+      .mon-esito { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; padding:2px 8px; border-radius:4px; border:1px solid var(--line); background:var(--paper); color:var(--ink-soft); white-space:nowrap; }
+      .mon-esito--scritto { background:var(--navy); color:var(--paper); border-color:var(--navy); }
+      .mon-esito--rilievi { background:var(--paper); color:var(--accent); border-color:var(--accent); }
+      .mon-esito--fermato { background:var(--paper); color:var(--ink); border-color:var(--ink-soft); border-style:dashed; }
+      .mon-esito--guasto { background:var(--accent); color:var(--paper); border-color:var(--accent); }
+      .mon-esito--volo { background:var(--paper); color:var(--accent); border-color:var(--accent); border-style:dotted; }
+
+      {# Rifare una pagina è irreversibile per il lettore: la colonna che lo dice
+         non può avere lo stesso peso delle altre. #}
+      .mon-sovra { font-family:"Space Mono", ui-monospace, monospace; font-size:12px; color:var(--accent); font-weight:700; }
+      .mon-sovra small { color:var(--ink-soft); font-weight:400; }
+      {# Il salto fra le due viste e' un bottone, non un link: non porta a una
+         pagina, cambia quale lato dello stesso fatto si guarda. Ma deve
+         somigliare a un link, perche' e' cosi' che si legge. #}
+      .mon-link { background:none; border:0; padding:0; font:inherit; color:var(--accent); cursor:pointer; text-align:left; }
+      .mon-link:hover { text-decoration:underline; }
+
+      .mon-agenti { width:100%; margin-top:6px; }
+      .mon-agenti th, .mon-agenti td { border-bottom:1px dotted var(--line); font-size:12.5px; padding:6px 8px; }
+      .mon-agenti .mon-label { font-family:"Space Mono", ui-monospace, monospace; }
+      .mon-stimata { color:var(--ink-soft); font-style:italic; }
+      details.mon-json { margin-top:6px; }
+      details.mon-json > summary { cursor:pointer; color:var(--ink-soft); font-family:"Space Mono", ui-monospace, monospace; font-size:11.5px; padding:3px 0; }
+      details.mon-json pre { margin:4px 0 0; padding:10px; background:var(--paper); border:1px solid var(--line); border-radius:6px; overflow-x:auto; font-size:11.5px; line-height:1.45; max-height:340px; }
+      .mon-nota { color:var(--ink-soft); font-size:12px; margin:0 0 12px; }
+      .mon-nota > summary { cursor:pointer; font-family:"Space Mono", ui-monospace, monospace; font-size:11.5px; padding:3px 0; }
+      .mon-nota p { margin:4px 0 0; line-height:1.5; max-width:70ch; }
+      .mon-elenco { margin:6px 0 0; padding-left:18px; line-height:1.5; }
+      .mon-elenco li { margin-bottom:3px; }
+      .mon-pager { display:flex; align-items:center; gap:12px; justify-content:center; padding:10px 0; }
       .mon-pager .mon-btn[disabled] { opacity:.4; cursor:default; }
       .mon-pager-info { font-family: "Space Mono", ui-monospace, monospace; font-size:12px; color:var(--ink-soft); }
-      {# Solo l'identita' cartografica: navy, carta, unico accento #e4572e. Gli
-         stati si distinguono per peso, riempimento, bordo (pieno/tratteggiato) e
-         opacita', non per colori nuovi. Accento pieno = cio' che si lavora ora;
-         navy pieno = fatto; contorno accento = quasi fatto; neutro = in coda. #}
-      .mon-status { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; padding:2px 8px; border-radius:4px; border:1px solid var(--line); background:var(--paper); color:var(--ink-soft); white-space:nowrap; }
-      .mon-status--da-correggere { background:var(--accent); color:var(--paper); border-color:var(--accent); }
-      .mon-status--in-attesa { background:var(--paper); color:var(--ink); border-color:var(--ink-soft); border-style:dashed; }
-      .mon-status--in-quarantena { background:var(--paper); color:var(--ink-soft); border-color:var(--ink-soft); border-style:dashed; opacity:.7; }
-      .mon-status--in-lavorazione { background:var(--paper); color:var(--accent); border-color:var(--accent); }
-      .mon-status--pubblicata { background:var(--navy); color:var(--paper); border-color:var(--navy); }
-      .mon-status--proposta { background:var(--paper); color:var(--ink-soft); border-color:var(--ink-soft); border-style:dotted; }
-      .mon-status--in-coda { background:var(--paper); color:var(--ink-soft); border-color:var(--line); }
-      .mon-status--chiusa { background:var(--paper); color:var(--ink-soft); border-color:var(--line); opacity:.55; }
+
       {# Mobile: le tabelle .mon-cards diventano schede impilate, una riga per
-         etichetta (dal data-label di ogni cella), invece di uno scroll orizzontale
-         illeggibile. Solo sotto i 640px; sopra restano tabelle. #}
-      @media (max-width: 640px) {
+         etichetta (dal data-label di ogni cella), invece di uno scroll
+         orizzontale illeggibile. Solo sotto i 720px; sopra restano tabelle. #}
+      @media (max-width: 720px) {
         #monitor-root { padding: 20px 12px 48px; }
         .mon-filters input[type=search] { flex-basis:100%; }
         table.mon-cards, table.mon-cards tbody, table.mon-cards tr, table.mon-cards td { display:block; width:100%; }
         table.mon-cards thead { position:absolute; left:-9999px; }
         table.mon-cards { border:0; }
-        table.mon-cards tr { border:1px solid var(--line); border-radius:8px; margin-bottom:10px; padding:4px 2px; background:#fff; }
-        {# Cella a blocco, non flex: l'etichetta sta sopra e il valore sotto, cosi'
-           i <br> e i <small> di Indicatore e Prossimo passo restano su piu' righe
-           invece di accalcarsi in fila. #}
-        table.mon-cards td { border:0; border-bottom:1px solid var(--line); white-space:normal; display:block; padding:6px 10px; }
+        table.mon-cards tr.mon-riga { border:1px solid var(--line); border-radius:8px; margin-bottom:10px; padding:4px 2px; background:#fff; }
+        table.mon-cards td { border:0; border-bottom:1px solid var(--line); text-align:left; display:block; padding:6px 10px; }
         table.mon-cards tr td:last-child { border-bottom:0; }
         table.mon-cards td:empty { display:none; }
         table.mon-cards td::before { content: attr(data-label); display:block; color:var(--ink-soft); font-weight:700; text-transform:uppercase; font-size:10px; letter-spacing:.03em; margin-bottom:2px; }
+        .mon-agenti th, .mon-agenti td { font-size:11.5px; padding:5px 4px; }
       }
     </style>
   </head>

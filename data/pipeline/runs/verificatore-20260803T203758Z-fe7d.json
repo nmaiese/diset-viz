@@ -5,7 +5,7 @@
  "claude_code_version": "2.1.220 (Claude Code)",
  "commit": "7d443af",
  "detail": [
-  "Il piano diceva 'ter-1 firmato, nessuno ha provato a smentirlo', ma tra la generazione del piano e l'apertura del mio worktree la verifica e' gia' arrivata su origin/master (data/pipeline/verifiche/ter-1__regione__ab2d5ebd059245fa.json, 29 confermate 0 smentite). Ho comunque riverificato in modo indipendente le 24 affermazioni falsificabili contro la serie 1995-2023 e la definizione Istat: tutte confermate, esito pulito, stesso verdetto. Punti piu' forti controllati: Calabria ultima ogni anno 1995-2022 e Marche prime ultime solo nel 2023 (verificato su tutti i 28 anni); picco divario 2014 (ER 52,13 - Calabria 9,05 = 43,08, max serie); vetta invariata (38,06->38,16) e restringimento tutto dal fondo (7,19->11,43), cioe' la riscrittura ha risolto le due smentite del 2026-07-29. Non riscrivo la riga esistente: il registro e' append-only e il cancello lo impedisce giustamente."
+  "Il piano diceva 'ter-1 firmato, nessuno ha provato a smentirlò, ma tra la generazione del piano e l'apertura del mio worktree la verifica è già arrivata su origin/master (data/pipeline/verifiche/ter-1__regione__ab2d5ebd059245fa.json, 29 confermate 0 smentite). Ho comunque riverificato in modo indipendente le 24 affermazioni falsificabili contro la serie 1995-2023 e la definizione Istat: tutte confermate, esito pulito, stesso verdetto. Punti più forti controllati: Calabria ultima ogni anno 1995-2022 e Marche prime ultime solo nel 2023 (verificato su tutti i 28 anni); picco divario 2014 (ER 52,13 - Calabria 9,05 = 43,08, max serie); vetta invariata (38,06->38,16) e restringimento tutto dal fondo (7,19->11,43), cioè la riscrittura ha risolto le due smentite del 2026-07-29. Non riscrivo la riga esistente: il registro è append-only e il cancello lo impedisce giustamente."
  ],
  "gate": "auto",
  "outcome": "nothing",
@@ -14,6 +14,6 @@
  "queue_before": 30,
  "run_id": "verificatore-20260803T203758Z-fe7d",
  "stage": "verificatore",
- "summary": "ter-1 gia' verificato da una run concorrente sul testo corrente (fingerprint ab2d5ebd059245fa, 29 controllate, pulito): niente da aggiungere al registro append-only",
+ "summary": "ter-1 già verificato da una run concorrente sul testo corrente (fingerprint ab2d5ebd059245fa, 29 controllate, pulito): niente da aggiungere al registro append-only",
  "trigger": "manuale"
 }

@@ -1,0 +1,35 @@
+{
+ "angolo_scelto": "Il salto del 2022 in Calabria, confermato da Istat, dentro la regione più instabile di tutta la serie: la storia non è un trend che peggiora in linea retta, ma un indicatore diventato instabile proprio dove il divario Nord-Mezzogiorno resta più ampio.",
+ "fonti": [
+  {
+   "testo": "In Calabria si registra la quota più elevata di famiglie che lamentano irregolarità nel servizio di erogazione dell'acqua (45,1%), con un sensibile peggioramento rispetto all'anno precedente (+16 punti percentuali).",
+   "url": "https://www.istat.it/it/files/2023/03/GMA-21marzo2023.pdf"
+  }
+ ],
+ "key": "6",
+ "lead": "Nel 2022 la Calabria segna il salto più netto della serie: +16 punti in un anno. Nel 2025 resta la peggiore regione d'Italia, con il 37,33% delle famiglie che denuncia irregolarità nell'acqua.",
+ "level": "regione",
+ "sections": [
+  {
+   "body": "L'indicatore conta la quota di famiglie che, intervistate da Istat nell'Indagine Multiscopo, dichiara di aver subito irregolarità nell'erogazione dell'acqua: al numeratore le famiglie che segnalano il problema, al denominatore il totale delle famiglie della regione. È un dato di percezione, raccolto ogni anno dal 1995, con un'eccezione: nel 2004 la rilevazione slitta da novembre a gennaio-febbraio per allinearsi agli standard europei, e quell'anno resta senza dati.",
+   "h": "Che cosa misura",
+   "role": "definizione"
+  },
+  {
+   "body": "Nel 2025 la Calabria è la regione con la quota più alta, 37,33%, più del triplo della media semplice delle regioni, 11,76%. All'estremo opposto il Trentino Alto Adige si ferma all'1,23%: il rapporto fra le due punte è di 30,3 volte. La mediana, 6,28%, sta ben sotto la media, segno che poche regioni del Mezzogiorno trascinano il dato verso l'alto mentre la maggioranza delle altre resta bassa. Calcolando la media semplice delle regioni di ciascuna area, la differenza fra Nord e Mezzogiorno è di 19,78 punti: 3,08% al Nord contro 22,86% nel Mezzogiorno.",
+   "h": "Chi sta peggio, chi sta meglio",
+   "role": "quadro"
+  },
+  {
+   "body": "Nel 2022 la quota calabrese sale al 45,1%, la più alta fra tutte le regioni italiane, con un peggioramento di 16 punti percentuali rispetto al 2021 secondo Istat: il salto più netto misurato in trent'anni di serie per questo indicatore in una singola regione. Non è un episodio isolato: nel 2023 il dato scende a 38,66%, nel 2024 crolla a 29,91%, poi nel 2025 risale a 37,33%, un balzo di 7,42 punti in un solo anno. La Calabria è la regione con la volatilità più alta della serie, indice 6,92, seguita dalla Sardegna, 6,2. Anche l'Abruzzo, fra il 2020 e il 2025, segna la variazione a cinque anni più ampia fra le regioni, +13,45 punti, e nel 2025 arriva al 30,35%, seconda peggiore regione dopo la Calabria. Sullo sfondo, il divario fra le regioni si restringe appena: da uno spread di 41,32 punti nel 1995 a 36,1 oggi.",
+   "h": "Il salto del 2022 e le onde della Calabria",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il dato è una percezione dichiarata dalle famiglie, non una misura tecnica della rete idrica: non distingue un guasto locale da un problema strutturale. Le oscillazioni di 7 o 16 punti in un solo anno non hanno una causa accertata nei dati disponibili: una possibile spiegazione è un evento puntuale, come un'interruzione prolungata, ma il dossier non lo conferma. Manca inoltre il dato del 2004, perché quell'anno Istat ha spostato il periodo di rilevazione da novembre a gennaio-febbraio per allinearsi agli standard europei.",
+   "h": "Che cosa non dice questo numero",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

@@ -133,7 +133,7 @@ class QueueShape(unittest.TestCase):
 
     def test_upsert_preserves_first_discovery_date(self):
         # Un refresh ri-vede lo stesso dataflow, non lo ri-scopre: `discovered_at`
-        # deve restare quello della prima volta, non la data del refresh, o l'eta'
+        # deve restare quello della prima volta, non la data del refresh, o l'età
         # di ogni candidato si azzererebbe a ogni run.
         rows = scout_sources.to_rows(
             scout_sources.propose_sources(FLOWS, covered=COVERED, terms=TERMS)
@@ -157,11 +157,11 @@ class QueueShape(unittest.TestCase):
 
 
 class RefreshFallsBackToCache(unittest.TestCase):
-    """Con --refresh lo scout forza il refetch del catalogo. Se Istat e' giu' o
-    bloccato, l'errore non deve abortire lo scout prima che triaghi la coda gia'
-    committata: il dispatcher gira uno stadio per tick e lo scout e' il primo,
+    """Con --refresh lo scout forza il refetch del catalogo. Se Istat è giù o
+    bloccato, l'errore non deve abortire lo scout prima che triaghi la coda già
+    committata: il dispatcher gira uno stadio per tick e lo scout è il primo,
     quindi un guasto Istat persistente lo rilancerebbe e ucciderebbe ogni tick,
-    fermando tutta la catena. Si ripiega sulla cache quando c'e'."""
+    fermando tutta la catena. Si ripiega sulla cache quando c'è."""
 
     class _FakeClient:
         def __init__(self, *a, **k):

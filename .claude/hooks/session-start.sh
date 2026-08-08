@@ -6,15 +6,13 @@
 #   - .venv con i requirements (test via .venv/bin/python, gunicorn)
 #   - dipendenze frontend (dist e' committato: npm serve solo per ribuildare)
 #   - GitHub CLI (gh) installato
-#   - il meta di sessione che pipeline_log.py legge per arricchire il diario
 #
 # Idempotente e non interattivo. Gira solo in remoto (Claude Code sul web).
 set -uo pipefail
 
-# L'hook riceve il JSON dell'evento su stdin: session_id e' l'unico campo che
-# serve, e va letto SUBITO, prima che qualsiasi comando qui sotto consumi o
-# chiuda lo stream.
-hook_payload="$(cat 2>/dev/null || true)"
+# Lo stdin dell'evento si consuma comunque: se resta aperto, il primo comando
+# che legge da stdin qui sotto si blocca.
+cat >/dev/null 2>&1 || true
 
 cd "${CLAUDE_PROJECT_DIR:-.}"
 
@@ -33,32 +31,12 @@ if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
 fi
 
-# --- Meta di sessione: chi e quando, per il diario ---------------------------
-# pipeline_log.py lo legge best-effort per scrivere session_id e durata nella
-# riga di run. Locale e ignorato da git: appartiene alla sessione, non alla
-# storia.
-# Il payload viaggia in una variabile d'ambiente e non in una pipe: con
-# `python3 -` lo stdin e' gia' occupato dal programma stesso (l'heredoc), e la
-# pipe si perdeva in silenzio, scrivendo un session_id sempre vuoto.
-DI_HOOK_PAYLOAD="$hook_payload" python3 - <<'PY' || true
-import json, os
-from datetime import datetime, timezone
-from pathlib import Path
-
-try:
-    payload = json.loads(os.environ.get("DI_HOOK_PAYLOAD") or "{}")
-except Exception:
-    payload = {}
-if not isinstance(payload, dict):
-    payload = {}
-meta = {
-    "session_id": str(payload.get("session_id") or ""),
-    "started_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-}
-target = Path("data/pipeline/.session_meta.json")
-target.parent.mkdir(parents=True, exist_ok=True)
-target.write_text(json.dumps(meta, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
-PY
+# Qui si scriveva `data/pipeline/.session_meta.json`, che `pipeline_log.py`
+# rileggeva per mettere session_id e durata nella riga di diario di una run.
+# Quel programma e quel diario se ne sono andati con la catena editoriale
+# autonoma: il file lo scriveva questo hook e non lo apriva piu' nessuno.
+# Quando il cruscotto verra' rifatto (issue #187) dira' lui di che cosa ha
+# bisogno, invece di ereditare un formato pensato per stadi che non esistono.
 
 # --- Python: venv + requirements (critico per test e gunicorn) --------------
 # L'install gira solo quando requirements.txt cambia davvero: l'hash sta in

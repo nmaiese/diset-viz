@@ -72,7 +72,7 @@ HEADER_MAP = {
     "AMBITO TERRITORIALE": "unita_territoriale",
     "ANNO INIZIALE": "anno_iniziale",
     "ANNO FINALE": "anno_finale",
-    "PERIODICITA'": "periodicita",
+    "PERIODICITÀ": "periodicita",
     "FONTI": "fonti",
     "NOTE": "note",
 }
@@ -219,7 +219,7 @@ def load_definitions(path: Path | None = None) -> dict[str, dict[str, str]]:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--url", default=SOURCE_URL)
-    parser.add_argument("--from-file", type=Path, help="un .xls gia' scaricato")
+    parser.add_argument("--from-file", type=Path, help="un .xls già scaricato")
     parser.add_argument("--output", type=Path, default=OUTPUT_PATH)
     parser.add_argument("--dry-run", action="store_true",
                         help="non scrive, dice solo quante righe cambierebbero")

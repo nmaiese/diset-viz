@@ -3,7 +3,7 @@
  "branch": "master",
  "commit": "3704cb1",
  "detail": [
-  "dem:OLDAGEDEPR quadro: 'nove regioni' -> 'dieci regioni' (Friuli #2..Valle d'Aosta #11, conteggio inclusivo).",
+  "dem:OLDAGEDEPR quadro: 'nove regionì -> 'dieci regionì (Friuli #2..Valle d'Aosta #11, conteggio inclusivo).",
   "dem:OLDAGEDEPR dinamica: rimosso il meccanismo causale (transizione demografica/effetto soffitto), riscritto come convergenza osservata.",
   "eur:rd_p_persreg: lead riscritto senza gli echi del cruscotto (max 2,06/min 0,50/rapporto 4:1); tolto anche l'eco della variazione 0,02. eco residuo solo su 1,16 (media, in contrasto con la mediana)."
  ],

@@ -154,18 +154,18 @@ class PercentageUnitsAreNotRates(unittest.TestCase):
         self.assertEqual(
             indicator_notes.change_unit_label("Tasso di omicidi", "numero per centomila abitanti"),
             "ogni centomila abitanti",
-            "e l'etichetta si legge accanto a una cifra, non e' la descrizione del CSV",
+            "e l'etichetta si legge accanto a una cifra, non è la descrizione del CSV",
         )
 
     def test_a_quantity_per_hundred_people_is_not_a_percentage(self):
-        """"tonnellate per cento abitanti" non e' una percentuale in nessun senso:
+        """"tonnellate per cento abitanti" non è una percentuale in nessun senso:
         misura tonnellate, non una quota."""
         for unit in ("tonnellate per cento abitanti", "numero per cento abitanti",
                      "chilometro per cento chilometri quadrati"):
             self.assertFalse(indicator_notes.is_percentage_unit(unit), unit)
 
     def test_a_rate_reads_as_italian_next_to_a_figure(self):
-        """"0,54 numero per centomila abitanti" e' corretto e non e' italiano."""
+        """"0,54 numero per centomila abitanti" è corretto e non è italiano."""
         for unit, label in (
             ("numero per centomila abitanti", "ogni centomila abitanti"),
             ("numero per cento abitanti", "ogni cento abitanti"),
@@ -184,7 +184,7 @@ class PercentageUnitsAreNotRates(unittest.TestCase):
             self.assertEqual(indicator_notes.change_unit_label("x", unit), "punti percentuali")
 
     def test_no_catalogue_unit_is_misread(self):
-        """La guardia sul catalogo vero: se una fonte introduce un'unita' nuova
+        """La guardia sul catalogo vero: se una fonte introduce un'unità nuova
         che finisce nella trappola, il test lo dice subito."""
         from app.atlas_catalog import get_atlas_catalog
 
@@ -198,4 +198,4 @@ class PercentageUnitsAreNotRates(unittest.TestCase):
             and "percentual" not in (item.get("unit") or "").lower()
             and not (item.get("unit") or "").strip().lower().endswith("per cento")
         ]
-        self.assertEqual(wrong, [], f"unita' scambiate per percentuali: {wrong[:8]}")
+        self.assertEqual(wrong, [], f"unità scambiate per percentuali: {wrong[:8]}")

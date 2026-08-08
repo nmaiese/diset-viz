@@ -5,9 +5,9 @@
 - **Data** 3 gennaio 2025
 - **URL** https://pagellapolitica.it/articoli/lavoro-bugie-record-occupati-governo-opposizione
 - **Forma di storia** un confronto che non regge, smontato per gradi
-- **Da usare quando** il tuo articolo deve dire che una lettura ovvia del dato e'
+- **Da usare quando** il tuo articolo deve dire che una lettura ovvia del dato è
   sbagliata: un primato che dipende dalla popolazione, una serie non
-  confrontabile, una definizione cambiata a meta' strada
+  confrontabile, una definizione cambiata a metà strada
 
 ## Il testo
 
@@ -31,27 +31,27 @@
 > su dieci avevano un legame con il mondo del lavoro, ma qui dentro erano
 > conteggiati anche i bambini dai dieci anni in su.
 
-**Avvertenza tipografica.** Il testo qui sopra e' verbatim e contiene i caporali
+**Avvertenza tipografica.** Il testo qui sopra è verbatim e contiene i caporali
 `« »` della citazione originale, che `content/STYLE.md` vieta nelle nostre
 pagine. Si copia il movimento delle frasi, mai un carattere. Da noi una
 citazione va tra virgolette dritte.
 
-## Perche' si legge al primo passaggio
+## Perché si legge al primo passaggio
 
 **Prima la citazione intera, poi una frase corta che annuncia l'obiezione senza
-ancora farla.** "Bisogna fare attenzione, pero', ai confronti con il passato."
-Il lettore sa che sta per arrivare una demolizione e puo' smettere di indovinare
+ancora farla.** "Bisogna fare attenzione, però, ai confronti con il passato."
+Il lettore sa che sta per arrivare una demolizione e può smettere di indovinare
 dove va a parare.
 
 **"Da un lato / Dall'altro lato" dice quante obiezioni sono e dove finisce
-ciascuna.** E' l'opposto dell'impilamento: due idee, due frasi, marcate. Il
-nostro difetto tipico e' invece agganciare la seconda obiezione con una virgola
-alla prima, e a quel punto il lettore non sa piu' quante ne ha lette.
+ciascuna.** È l'opposto dell'impilamento: due idee, due frasi, marcate. Il
+nostro difetto tipico è invece agganciare la seconda obiezione con una virgola
+alla prima, e a quel punto il lettore non sa più quante ne ha lette.
 
 **Le cautele metodologiche qui sono il contenuto, non la premessa.** Il limite
 della serie (i dati mensili confrontabili partono dal 2004) e la definizione
 cambiata (nell'Ottocento contavano i bambini dai dieci anni) non sono un
-disclaimer in coda: sono esattamente il colpo che smonta l'affermazione. E' il
+disclaimer in coda: sono esattamente il colpo che smonta l'affermazione. È il
 modello per la nostra sezione `limiti`, che troppo spesso si legge come un
 obbligo assolto invece che come il seguito dell'argomento.
 

@@ -1,7 +1,7 @@
 """La console di monitoraggio e il keep-alive (Fase 4).
 
-La console non e' gated da un segreto in URL: la serve a chiunque (noindex), ma
-la vera guardia e' la RLS su Postgres, che senza la mail admin nel JWT non
+La console non è gated da un segreto in URL: la serve a chiunque (noindex), ma
+la vera guardia è la RLS su Postgres, che senza la mail admin nel JWT non
 restituisce righe. Qui si prova solo il guscio (rotta, noindex, redirect del
 sottodominio) e che il keep-alive risponda sempre 200."""
 

@@ -33,7 +33,7 @@ def _asset_hash(rel):
 
 
 def asset_url(filename):
-    """`url_for('static')` piu' un `?v=<hash>` sul contenuto. Gli entry bundle
+    """`url_for('static')` più un `?v=<hash>` sul contenuto. Gli entry bundle
     (index.js, game.js, site.js) hanno nome fisso ma i chunk che importano hanno
     hash che cambiano: senza cache-busting, un browser con l'entry vecchio in
     cache importa chunk spariti e la SPA resta bianca dopo un deploy. Il query
@@ -63,7 +63,7 @@ def monitor_subdomain_to_console():
     # Il sottodominio della console (monitor.divarioitalia.it) mappa sullo stesso
     # servizio Cloud Run: alla radice, serve la console della catena. Le altre
     # rotte restano raggiungibili anche da qui (nessun blocco), ma la home del
-    # sottodominio e' la console, non l'atlante.
+    # sottodominio è la console, non l'atlante.
     host_name = request.host.partition(":")[0].lower()
     if host_name.startswith("monitor.") and request.path == "/":
         return redirect("/_pipeline/console", code=302)
@@ -74,17 +74,17 @@ _NOINDEX_EXACT_PATHS = {
     "/data", "/legacy", "/legacy-reddito", "/quiz/classifica", "/openapi.json",
     "/_keepalive", "/account",
 }
-# `/_pipeline` e' il cruscotto interno della catena editoriale: noindex sempre,
+# `/_pipeline` è il cruscotto interno della catena editoriale: noindex sempre,
 # e protetto da token nella view. L'underscore iniziale lo tiene fuori dallo
-# spazio delle URL pubbliche gia' per convenzione.
+# spazio delle URL pubbliche già per convenzione.
 _NOINDEX_PATH_PREFIXES = ("/api/", "/download/", "/_pipeline", "/.well-known/")
 
 
 def _supabase_connect_origins():
     # Supabase Auth (fetch REST) e Realtime (websocket) verso il progetto: vanno
     # in connect-src, altrimenti la CSP blocca login e tick della console. Il
-    # client @supabase/supabase-js e' bundlato in locale, quindi script-src non
-    # cambia. Vuoto se Supabase non e' configurato.
+    # client @supabase/supabase-js è bundlato in locale, quindi script-src non
+    # cambia. Vuoto se Supabase non è configurato.
     url = (config.SUPABASE_URL or "").strip().rstrip("/")
     if "://" not in url:
         return ""
@@ -179,8 +179,8 @@ def inject_site_config():
         "ADSENSE_SLOT_BANNER": config.ADSENSE_SLOT_BANNER,
         "GOOGLE_SITE_VERIFICATION": config.GOOGLE_SITE_VERIFICATION,
         "BING_SITE_VERIFICATION": config.BING_SITE_VERIFICATION,
-        # Identita' Supabase pubbliche (Auth Google + Realtime): nei template
-        # cosi' cambiarle non richiede un rebuild del frontend. Vuote = auth off.
+        # Identità Supabase pubbliche (Auth Google + Realtime): nei template
+        # così cambiarle non richiede un rebuild del frontend. Vuote = auth off.
         "SUPABASE_URL": config.SUPABASE_URL,
         "SUPABASE_ANON_KEY": config.SUPABASE_ANON_KEY,
     }

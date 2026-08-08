@@ -19,8 +19,8 @@
   </style>
   <div class="home-map-body">
     {# role="img" sul partial rende presentazionali le venti path, quindi questa
-       etichetta e' l'unica cosa che uno screen reader sente: deve dire quale
-       dato e' disegnato, non solo che c'e' una mappa. #}
+       etichetta è l'unica cosa che uno screen reader sente: deve dire quale
+       dato è disegnato, non solo che c'è una mappa. #}
     {% with map_label = "Mappa cliccabile delle regioni italiane per " ~ map_hero.indicator_name ~ ", " ~ map_hero.year %}
     {% include "_italy_map.html" %}
     {% endwith %}

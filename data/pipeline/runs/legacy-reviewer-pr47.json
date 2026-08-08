@@ -3,7 +3,7 @@
  "branch": "master",
  "commit": "5016a5d",
  "detail": [
-  "Il passo di merge ha riletto il cancello per conto proprio (verdetto auto) ma non ha potuto chiamare gh: in questa sessione GH_TOKEN e' invalido e i remote non puntano a un host GitHub noto. Merge squash eseguito via API GitHub con lo stesso verdetto, con i due check remoti (python, frontend) gia' conclusi verdi."
+  "Il passo di merge ha riletto il cancello per conto proprio (verdetto auto) ma non ha potuto chiamare gh: in questa sessione GH_TOKEN è invalido e i remote non puntano a un host GitHub noto. Merge squash eseguito via API GitHub con lo stesso verdetto, con i due check remoti (python, frontend) già conclusi verdi."
  ],
  "gate": "auto",
  "outcome": "merged",

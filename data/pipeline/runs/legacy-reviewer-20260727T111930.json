@@ -3,7 +3,7 @@
  "branch": "automation/reviewer-2026-07-27-fix",
  "commit": "f1a7511",
  "detail": [
-  "ter-72: riscrivendo il lead per togliere il tasso nazionale avevo tolto anche il perimetro, cioe' che l'indicatore copre le sole imprese con almeno dieci addetti. Il vincolo sta in AGENTS.md (popolazione, denominatore e unita' vanno dichiarati) e pesa il doppio qui, perche' app/views.py usa il lead come meta description autonoma in SERP: chi lo legge li' non arriva mai ai limiti dove il perimetro era scritto. Perimetro reintrodotto nella prima frase, che resta a 152 caratteri e quindi entra intera nella description senza troncamenti."
+  "ter-72: riscrivendo il lead per togliere il tasso nazionale avevo tolto anche il perimetro, cioè che l'indicatore copre le sole imprese con almeno dieci addetti. Il vincolo sta in AGENTS.md (popolazione, denominatore e unità vanno dichiarati) e pesa il doppio qui, perché app/views.py usa il lead come meta description autonoma in SERP: chi lo legge lì non arriva mai ai limiti dove il perimetro era scritto. Perimetro reintrodotto nella prima frase, che resta a 152 caratteri e quindi entra intera nella description senza troncamenti."
  ],
  "gate": "auto",
  "outcome": "pr-open",

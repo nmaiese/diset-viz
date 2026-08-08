@@ -2,10 +2,10 @@
 
 Articolo 50(4) del regolamento europeo sull'intelligenza artificiale, in vigore
 dal **2 agosto 2026**. Chi pubblica un testo "with the purpose of informing the
-public on matters of public interest" deve dichiarare che e' generato, e
-l'esenzione e' **cumulativa**: revisione o controllo editoriale umano **e** una
-persona fisica o giuridica che detenga la responsabilita' editoriale. Una
-catena a zero tempo umano per articolo non puo' invocarla.
+public on matters of public interest" deve dichiarare che è generato, e
+l'esenzione è **cumulativa**: revisione o controllo editoriale umano **e** una
+persona fisica o giuridica che detenga la responsabilità editoriale. Una
+catena a zero tempo umano per articolo non può invocarla.
 
 Il comma 5 chiede la dichiarazione "in a clear and distinguishable manner at
 the latest at the time of the first ... exposure": in pagina, quindi, non in
@@ -51,7 +51,7 @@ class TheDisclosureIsOnThePage(unittest.TestCase):
 
         L'indicatore si sceglie a run-time fra quelli senza articolo firmato:
         fissarne uno a mano vorrebbe dire che il test fallisce il giorno in cui
-        la catena lo scrive, cioe' per il motivo giusto ma col messaggio
+        la catena lo scrive, cioè per il motivo giusto ma col messaggio
         sbagliato.
         """
         from scripts import indicator_store
@@ -85,12 +85,12 @@ class TheMethodPage(unittest.TestCase):
         self.assertIn("riverificata contro il valore vero", self.page)
 
     def test_it_says_what_the_verification_does_not_catch(self):
-        """Una pagina di metodo che elenca solo le garanzie e' marketing."""
+        """Una pagina di metodo che elenca solo le garanzie è marketing."""
         self.assertIn("non garantisce", self.page)
         self.assertIn("Non c'è una rilettura umana", self.page)
 
     def test_it_names_a_responsibility_and_refuses_invented_bylines(self):
-        """Un nome finto non e' una persona che detiene responsabilita'
+        """Un nome finto non è una persona che detiene responsabilità
         editoriale: la simula. E le linee guida di Google danno il rating
         minimo a una pagina che attribuisce il contenuto a una fonte fittizia
         "even if the page assigns credit for the content to another source".

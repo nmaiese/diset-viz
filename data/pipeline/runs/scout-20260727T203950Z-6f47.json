@@ -5,7 +5,7 @@
  "claude_code_version": "2.1.220 (Claude Code)",
  "commit": "1676260",
  "detail": [
-  "DF_DCSS_HUDW_3_PROV (superficie/occupanti): needs-info, licenza generale confermata ma pagina e struttura dataset non raggiungibili. | DF_DCSS_HUDW_4_PROV (densita' abitativa): needs-info, dubbio concreto di sovrapposizione con MULTI_ABIT_AFFOLLAMENTO gia' in catalogo. | DF_DCSS_HUDW_5_PROV (riscaldamento): needs-info, dominio nuovo ma struttura SDMX non verificabile. | DF_DCSS_HUDW_2_PROV (epoca costruzione): needs-info, dominio nuovo ma struttura SDMX non verificabile. | DF_DCSE_CPA_ATECO2007_COE_A_Q_CONJ_REG: needs-info, nessuna pagina di atterraggio trovata e misura non chiara. 27 candidati new restano in coda, non toccati in questa run."
+  "DF_DCSS_HUDW_3_PROV (superficie/occupanti): needs-info, licenza generale confermata ma pagina e struttura dataset non raggiungibili. | DF_DCSS_HUDW_4_PROV (densità abitativa): needs-info, dubbio concreto di sovrapposizione con MULTI_ABIT_AFFOLLAMENTO già in catalogo. | DF_DCSS_HUDW_5_PROV (riscaldamento): needs-info, dominio nuovo ma struttura SDMX non verificabile. | DF_DCSS_HUDW_2_PROV (epoca costruzione): needs-info, dominio nuovo ma struttura SDMX non verificabile. | DF_DCSE_CPA_ATECO2007_COE_A_Q_CONJ_REG: needs-info, nessuna pagina di atterraggio trovata e misura non chiara. 27 candidati new restano in coda, non toccati in questa run."
  ],
  "gate": "",
  "outcome": "pr-open",
@@ -14,6 +14,6 @@
  "queue_before": 32,
  "run_id": "scout-20260727T203950Z-6f47",
  "stage": "scout",
- "summary": "Triage di 5 dataflow SDMX Istat (i piu' alti per priority_score, tutti a 0.9): tutti needs-info, refresh del catalogo fallito (HTTP 500 su dataflow/IT1) e pagina del dataset censimento (dati-censimentipermanenti.istat.it) irraggiungibile (HTTP 503).",
+ "summary": "Triage di 5 dataflow SDMX Istat (i più alti per priority_score, tutti a 0.9): tutti needs-info, refresh del catalogo fallito (HTTP 500 su dataflow/IT1) e pagina del dataset censimento (dati-censimentipermanenti.istat.it) irraggiungibile (HTTP 503).",
  "trigger": "dispatch"
 }

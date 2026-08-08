@@ -1,7 +1,7 @@
 """Preferiti indicatore (Fase 5.1): store per-utente e endpoint authed.
 
 Solo con login: gli endpoint danno 401 agli anonimi. L'`auth_id` viene sempre dal
-JWT verificato, mai dal body: un utente non puo' leggere o scrivere i preferiti di
+JWT verificato, mai dal body: un utente non può leggere o scrivere i preferiti di
 un altro."""
 
 import shutil

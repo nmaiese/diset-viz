@@ -210,7 +210,7 @@ def _build_key(spec):
         else:
             raise ValueError(
                 f"{spec['dsd_label']}/{spec['data_type']}: la dimensione '{dim}' "
-                f"non ha un valore noto (non e' REF_AREA, non e' la dimensione "
+                f"non ha un valore noto (non è REF_AREA, non è la dimensione "
                 f"indicatore '{spec['indicator_dimension']}', non compare in "
                 "dimension_values). Serve il codice 'totale' di questa "
                 "dimensione prima di poter interrogare il dataflow."

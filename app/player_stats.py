@@ -1,15 +1,15 @@
 """Statistiche di gioco per-account (Fase 5.2), server-authoritative.
 
 Raccolte dal profilo leggero pre-Supabase (branch game-user-db-achievements) e
-ri-chiavate da player_id ad auth_id, sopra l'ORM. Gli aggregati per modalita'
+ri-chiavate da player_id ad auth_id, sopra l'ORM. Gli aggregati per modalità
 ('compare', 'order', 'daily') si aggiornano dagli endpoint di gioco dove il
-risultato e' gia' verificato dal server. Lo storico giornaliero
+risultato è già verificato dal server. Lo storico giornaliero
 (`daily_results`) alimenta la streak ed evita che rigiocare lo stesso giorno
 gonfi i numeri.
 
 Invariante: `auth_id` viene sempre dal JWT verificato, mai dal body. Read-modify-
 write in una Session per chiamata (un utente per volta, traffico basso): niente
-ON CONFLICT con espressioni SQL, cosi' la semantica e' identica sui due dialetti.
+ON CONFLICT con espressioni SQL, così la semantica è identica sui due dialetti.
 """
 
 from datetime import date, datetime, timedelta, timezone
@@ -45,8 +45,8 @@ def _get_or_new(session, auth_id, mode):
 
 
 def record_quiz_answer(auth_id, mode, correct, best_streak):
-    """Aggiorna gli aggregati di una modalita' quiz dopo una risposta verificata:
-    un round in piu', un colpito in piu' se corretto, record di streak se
+    """Aggiorna gli aggregati di una modalità quiz dopo una risposta verificata:
+    un round in più, un colpito in più se corretto, record di streak se
     migliorato. Da chiamare una volta per risposta (il chiamante lo garantisce)."""
     if not auth_id or mode not in QUIZ_MODES:
         return
@@ -60,7 +60,7 @@ def record_quiz_answer(auth_id, mode, correct, best_streak):
 
 def _daily_streaks(solved_dates):
     """(current, max) run di giorni consecutivi risolti. `current` risale dalla
-    data risolta piu' recente, cosi' l'ordine di arrivo non falsa il conteggio."""
+    data risolta più recente, così l'ordine di arrivo non falsa il conteggio."""
     if not solved_dates:
         return 0, 0
     days = sorted({date.fromisoformat(d) for d in solved_dates})
@@ -79,7 +79,7 @@ def _daily_streaks(solved_dates):
 
 def record_daily(auth_id, puzzle_date, attempts, solved):
     """Registra il risultato di una giornaliera. Non sovrascrive un risultato
-    gia' presente per quella data (niente replay che gonfia i numeri). Ricalcola
+    già presente per quella data (niente replay che gonfia i numeri). Ricalcola
     le streak dallo storico. Ritorna True se il risultato era nuovo."""
     if not auth_id or not puzzle_date:
         return False
@@ -104,7 +104,7 @@ def record_daily(auth_id, puzzle_date, attempts, solved):
 
 
 def stats_map(auth_id):
-    """{mode: stats} per tutte le modalita', con default a zero. Usato dagli
+    """{mode: stats} per tutte le modalità, con default a zero. Usato dagli
     achievement e dall'endpoint profilo."""
     result = {mode: _empty_mode_stats() for mode in _ALL_MODES}
     if not auth_id:
@@ -127,7 +127,7 @@ def merge_local(auth_id, local):
     volta. I campi 'best' si fondono con max, i contatori con somma. Idempotenza
     la garantisce il chiamante (flag one-time lato client); qui si applica e basta.
 
-    `local` e' `{mode: {best_streak, rounds_played, correct, games_played, wins,
+    `local` è `{mode: {best_streak, rounds_played, correct, games_played, wins,
     max_daily_streak}}` con le chiavi che il client sa produrre; le mancanti = 0."""
     if not auth_id or not isinstance(local, dict):
         return

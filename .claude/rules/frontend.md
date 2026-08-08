@@ -16,7 +16,7 @@ cd frontend && npm run build && cd ..
 La build finisce committata in `app/static/dist/`. Audit:
 `cd frontend && npm audit --audit-level=low`.
 
-Identita' cartografica, da non diluire (`frontend/src/styles.css`,
+Identità cartografica, da non diluire (`frontend/src/styles.css`,
 `app/static/css/site.css`): navy `#15233b`, carta `#fbfaf7`, un solo accento
 `#e4572e`, font Archivo / Inter / Space Mono.
 

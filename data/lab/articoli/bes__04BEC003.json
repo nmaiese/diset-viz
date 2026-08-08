@@ -1,0 +1,45 @@
+{
+ "angolo_scelto": "Tesi: il calo degli ultimi tre anni riporta il rischio di povertà quasi esattamente al livello del 2004 senza aver ridotto di un punto la distanza fra le regioni, quindi la notizia non è il miglioramento ma la sua irrilevanza sul divario. Scelgo questa e non il calo recente perché la serie lunga e lo spread stabile la reggono insieme, mentre i movimenti segnalati dal dossier stanno quasi tutti in regioni piccole e volatili.",
+ "fonti": [
+  {
+   "testo": "Istat, analisi sugli effetti delle misure 2023 sul rischio di povertà, ripresa dall'Ansa il 6 marzo 2024",
+   "url": "https://www.ansa.it/sito/notizie/economia/2024/03/06/istat-con-le-misure-2023-cala-il-rischio-poverta_fd8c1108-18f2-46ef-ba7f-3d794587e4ec.html"
+  }
+ ],
+ "key": "bes:04BEC003",
+ "lead": "La media semplice delle regioni è 18,37, nel 2004 era 17,97. Ventun anni di rischio di povertà per tornare al punto di partenza, con la stessa distanza fra la Sicilia e l'Emilia-Romagna.",
+ "level": "regione",
+ "sections": [
+  {
+   "body": "In Sicilia il rischio di povertà riguarda 38,4 persone ogni cento. In Emilia-Romagna e in Trentino Alto Adige, appaiate in testa, ne riguarda 6,7. Il tasso siciliano vale 5,73 volte quello emiliano, ed è un rapporto fra due quote su cento abitanti, non fra il numero di persone, che dipende anche da quante ne vivono in ciascuna regione. Fra i due estremi ci sono 31,7 punti, e la mediana della classifica è la Liguria, a 17,1. Il vuoto interessante però sta poco sopra la metà: il gruppo di testa si ferma a 14,0, il gruppo successivo comincia a 17,1, e in quello spazio non cade nessuna regione.",
+   "h": "Dalla Sicilia all'Emilia-Romagna, quasi sei volte",
+   "role": "quadro"
+  },
+  {
+   "body": "I valori si dispongono da soli in tre blocchi: nove regioni fra 6,7 e 14,0, sei fra 17,1 e 26,1, quattro fra 27,6 e 38,4. Quella divisione tiene con un punteggio di 0,89. Se si prova a spiegare la stessa classifica con Nord, Centro e Mezzogiorno il punteggio scende a 0,69, e la sovrapposizione fra i blocchi e le ripartizioni si ferma a 0,74. Il Nord non è compatto: la Liguria è a 9,0 punti dalla Sardegna e a 10,4 dall'Emilia-Romagna, cioè più vicina al Mezzogiorno che alla capolista di casa sua. Il Centro sta in media a 13,5, ma dentro ha l'Umbria a 11,3 e il Lazio a 17,9. Il Mezzogiorno va dal 17,5 del Molise al 38,4 della Sicilia, un intervallo più largo dei 16,75 punti che separano la media del Nord, 10,74, da quella del Mezzogiorno, 27,49. Sono medie semplici delle regioni, non pesate sugli abitanti.",
+   "h": "La frattura non coincide con le ripartizioni",
+   "role": "quadro"
+  },
+  {
+   "body": "Nel 2004 la media semplice delle regioni era 17,97 e fra la prima e l'ultima ci stavano 30,9 punti. Oggi la media è 18,37 e la distanza è 31,7. In mezzo c'è stato di tutto: la risalita fino al 20,35 del 2016, il massimo del 2020 a 21,22, poi il calo dal 20,62 del 2022 al 19,01 del 2023 e al 18,56 del 2024. Il verdetto sulla convergenza resta \"stabile\". Le medie si muovono, la distanza fra chi sta bene e chi sta male no, ed è la cosa che il grafico non fa vedere perché le linee si muovono insieme.\n\nIl gradino del 2023 cade nello stesso anno di una stima che riguarda però il piano nazionale. Secondo un'analisi Istat ripresa dall'Ansa, le modifiche al sistema di tasse e benefici introdotte nel corso del 2023 abbassano il rischio di povertà stimato dal 20% al 18,8%. Non è un confronto fra l'anno prima e l'anno dopo: è l'uscita di una microsimulazione, cioè lo scarto fra lo scenario con quelle misure e lo scenario senza, dentro lo stesso anno. Nello stesso 2023 circa un milione di famiglie ha visto ridursi o azzerarsi il Reddito o la Pensione di Cittadinanza, e questo è un conteggio nazionale di famiglie. Nessuna delle due cifre è regionale, e le medie di questa pagina sono medie semplici delle 19 regioni.",
+   "h": "Ventun anni, e il ventaglio è largo uguale",
+   "role": "dinamica"
+  },
+  {
+   "body": "Le variazioni più grandi degli ultimi cinque anni stanno quasi tutte nel gruppo di mezzo. Il Molise ha perso 18,2 punti, la Basilicata 14,6, il Friuli-Venezia Giulia 5,5. L'Abruzzo ha cambiato verso due volte: 9,8 punti in salita nei cinque anni precedenti, 9,6 in discesa negli ultimi tre.\n\nIn cima e in fondo alla classifica non succede quasi niente. La Campania nel 2004 stava a 35,6 e oggi sta a 35,6, con uno spostamento di 0,1 in dieci anni. La Sicilia era a 39,5 nel 2004 ed è a 38,4, e il record storico della serie è suo, 44,6 nel 2011. All'altro capo il movimento è altrettanto piccolo: l'Emilia-Romagna era a 8,6 nel 2004, il Trentino Alto Adige a 8,8, e oggi sono entrambe a 6,7, con il minimo di tutta la serie che è del Trentino, 5,7 nel 2023.\n\nLe regioni che peggiorano ci sono. I peggioramenti decennali più grandi stanno al Centro-Nord: la Toscana ha guadagnato 3,2 punti in dieci anni, il Piemonte 2,1, il Veneto 1,5. Ma non è una faccenda solo settentrionale: sui dieci anni salgono anche la Sardegna, di 0,6 punti, e la Campania, di 0,1. Sui cinque anni il Veneto guadagna 2,1 punti, la variazione a cinque anni più alta di tutta la serie, e dietro di lui vengono l'Umbria con 1,8 e, terza, la Puglia con 1,7.",
+   "h": "Si muove il centro, gli estremi stanno fermi",
+   "role": "dinamica"
+  },
+  {
+   "body": "Questa serie arriva al 2025, ed è fra le più aggiornate del suo tema. [La disuguaglianza del reddito netto](/indicatore/disuguaglianza-del-reddito-netto-s80-s20/bes-04BEC002), espressa come rapporto fra redditi, si ferma al 2024, e allo stesso anno si fermano [le famiglie che arrivano a fine mese con difficoltà](/indicatore/famiglie-che-arrivano-a-fine-mese-con-difficolta/ims-MULTI_DISAGIO_DIFFICOLTA), che contano una fatica dichiarata invece che una soglia di reddito. L'unico indicatore vicino che tiene il passo del 2025 è [la bassa intensità di lavoro](/indicatore/bassa-intensita-di-lavoro-europa-2030/bes-04BEC010-N23). Chi vuole capire se il calo del 2023 e del 2024 ha davvero cambiato qualcosa dentro le case, e non solo nelle statistiche sui redditi, per ora ha un anno di dati in meno da cui guardarlo.",
+   "h": "Gli altri modi di misurare il reddito si fermano al 2024",
+   "role": "quadro"
+  },
+  {
+   "body": "Non tutte le regioni si muovono con lo stesso passo, e la differenza non racconta solo come vanno le cose. La volatilità del Molise è 4,75 e quella della Basilicata 4,11, contro l'1,23 dell'Emilia-Romagna e l'1,24 della Lombardia. I quattro salti più larghi della serie stanno tutti lì: il Molise perde 9,9 punti nel 2023, la Basilicata ne guadagna 9,4 nel 2020 e ne perde 8,9 l'anno dopo, l'Abruzzo scende di 9,4 punti nel 2024 e ne recupera 4,5 nell'ultimo anno. Ma i salti non sono solo delle piccole: la Campania guadagna 7,1 punti nel 2018 e la Puglia 6,4 nel 2024, con volatilità di 2,16 e 3,17. Anche la Liguria finisce nel gruppo di mezzo per un salto di 6,3 punti nel 2025. Prima di leggere un balzo come un cambiamento nella vita delle persone, conviene aspettare l'anno dopo.\n\nPoi manca un pezzo di mappa. La Valle d'Aosta non ha valori dal 2020, quindi la classifica e le medie di questa pagina stanno su 19 regioni invece di 20, e la regione che manca era fra le più basse: 7,0 nel 2015. Infine la media, la mediana e le medie di ripartizione sono calcoli fatti sulle regioni una per una, che pesano il Molise quanto la Lombardia. Non sono il dato nazionale.",
+   "h": "Le regioni piccole ballano, e la Valle d'Aosta non c'è più",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}

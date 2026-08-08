@@ -14,12 +14,12 @@ steps:
       - -c
       - |
         set -euo pipefail
-        # git non e' nell'immagine slim, e da fine luglio la suite lo invoca
+        # git non è nell'immagine slim, e da fine luglio la suite lo invoca
         # davvero: pipeline_log.build_entry legge HEAD e la base per popolare
         # il diario (commit, base_commit), non solo nei test dedicati ma in
         # ogni test che passa da build_entry. Senza, qui falliva con
         # FileNotFoundError prima ancora di arrivare a build+deploy, e il
-        # fallimento non si vedeva mai in CI perche' i runner di GitHub
+        # fallimento non si vedeva mai in CI perché i runner di GitHub
         # Actions hanno git di serie.
         apt-get update -qq && apt-get install -y -qq --no-install-recommends git
         pip install --quiet -r requirements.txt

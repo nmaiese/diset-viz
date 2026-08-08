@@ -6,7 +6,7 @@
 - **URL** https://www.openpolis.it/nellabruzzo-in-spopolamento-serve-un-nuovo-approccio-ai-bisogni-del-territorio/
 - **Forma di storia** un dato che copre meno di quello che sembra
 - **Da usare quando** scrivi la sezione `limiti`, o quando la copertura della
-  serie e' il fatto principale invece di una nota a pie' di pagina
+  serie è il fatto principale invece di una nota a piè di pagina
 
 ## Il testo
 
@@ -36,33 +36,33 @@
 > comuni interni della regione che probabilmente affronteranno più di altri gli
 > effetti dello spopolamento.
 
-**Nota di fedelta'.** "Oltrettutto" e' un refuso dell'originale, lasciato dov'era:
-e' una citazione, non una bozza da correggere.
+**Nota di fedeltà.** "Oltrettutto" è un refuso dell'originale, lasciato dov'era:
+è una citazione, non una bozza da correggere.
 
-## Perche' si legge al primo passaggio
+## Perché si legge al primo passaggio
 
 **Annuncia quanti sono i limiti prima di elencarli, e li chiude con una formula
-di ripresa.** "e' molto difficile per due motivi", poi "In primo luogo", poi
+di ripresa.** "è molto difficile per due motivi", poi "In primo luogo", poi
 "Oltrettutto", poi **"Con questi caveat emerge che"**. La cautela scandisce il
 testo invece di bloccarlo, e il lettore sa esattamente quando la parentesi
-metodologica si e' chiusa. Le nostre sezioni `limiti` non hanno mai quella
+metodologica si è chiusa. Le nostre sezioni `limiti` non hanno mai quella
 formula di ripresa, e infatti si leggono come un obbligo assolto in coda.
 
-**Il limite e' quantificato, non dichiarato.** Non "la copertura e' parziale", ma
+**Il limite è quantificato, non dichiarato.** Non "la copertura è parziale", ma
 "lascia comunque fuori oltre 8 comuni abruzzesi su 10". Un limite con un numero
-e' un fatto, un limite senza numero e' una scusa.
+è un fatto, un limite senza numero è una scusa.
 
-**La citazione della fonte e' corta e sta dentro il ragionamento.** Due righe di
-Istat, non un paragrafo. Serve a dire che la cautela non e' un'opinione della
+**La citazione della fonte è corta e sta dentro il ragionamento.** Due righe di
+Istat, non un paragrafo. Serve a dire che la cautela non è un'opinione della
 redazione.
 
-**"E purtroppo" e' una parola di voce, e si e' guadagnata il posto.** L'ultima
+**"E purtroppo" è una parola di voce, e si è guadagnata il posto.** L'ultima
 frase ammette quello che i dati non dicono, con un avverbio che in prosa
-istituzionale sarebbe fuori posto. E' l'unica in tutto l'estratto: una per pezzo,
+istituzionale sarebbe fuori posto. È l'unica in tutto l'estratto: una per pezzo,
 esattamente come chiede `content/STYLE.md`.
 
 **Nota sul contatore.** Questo testo pesa 18,9 tic per mille parole, quasi nove
-volte il ter-167 pubblicato che l'utente ha trovato illeggibile. E' prosa
-professionale, chiara, e lo strumento la boccia. E' la prova che
-`tic_count.py` misura un asse diverso dalla leggibilita', e che su questo
-criterio il metro e' la lettura.
+volte il ter-167 pubblicato che l'utente ha trovato illeggibile. È prosa
+professionale, chiara, e lo strumento la boccia. È la prova che
+`tic_count.py` misura un asse diverso dalla leggibilità, e che su questo
+criterio il metro è la lettura.

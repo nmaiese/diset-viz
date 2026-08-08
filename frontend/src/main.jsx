@@ -143,7 +143,7 @@ function App() {
       .catch(() => setError("Non è stato possibile caricare l'archivio degli indicatori."));
   }, []);
 
-  // Il boot-loader (app.html) copre la pagina SEO finche' non c'e' davvero
+  // Il boot-loader (app.html) copre la pagina SEO finché non c'è davvero
   // qualcosa da mostrare: lo rimuoviamo solo qui, non al mount, altrimenti
   // l'utente vedrebbe comunque il passaggio pagina SEO -> scheletro.
   useEffect(() => {
@@ -253,9 +253,9 @@ function App() {
   // Switch between reading modes ("per indicatore" / "per regione" / "confronta").
   const goToMode = (mode) => {
     trackEvent("switch_mode", { mode });
-    // Su una pagina che possiede la sua vista (/confronto) cambiare modalita' e'
+    // Su una pagina che possiede la sua vista (/confronto) cambiare modalità è
     // una navigazione vera: altrimenti resteremmo su /confronto con ?view=atlas,
-    // cioe' una URL che dice il contrario di quello che mostra.
+    // cioè una URL che dice il contrario di quello che mostra.
     if (INITIAL_VIEW) {
       if (mode === INITIAL_VIEW) {
         window.scrollTo({ top: 0, behavior: "auto" });
@@ -792,7 +792,7 @@ function AtlasView({
   macroArea, setMacroArea, sourceFamily, setSourceFamily, yearFrom, yearTo, setYearRange,
   favParam, setFavParam, onOpen, onMode,
 }) {
-  // Preferiti dell'utente (Set di id), null finche' non caricati / se anonimo.
+  // Preferiti dell'utente (Set di id), null finché non caricati / se anonimo.
   const [favorites, setFavorites] = useState(null);
   const favOnly = favParam === "1";
   const [fullMin, fullMax] = useMemo(() => {
@@ -808,7 +808,7 @@ function AtlasView({
     return catalog.themes.filter((t) => inArea.has(t.name));
   }, [catalog, macroArea]);
 
-  // Preferiti dell'utente: caricati una volta se c'e' una sessione. Solo con
+  // Preferiti dell'utente: caricati una volta se c'è una sessione. Solo con
   // login (l'endpoint da 401 agli anonimi): in quel caso favorites resta [].
   useEffect(() => {
     if (!isAuthConfigured()) return;
@@ -1749,7 +1749,7 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
   const valueByRegion = useMemo(() => new Map(yearValues.map((row) => [row.region, row])), [yearValues]);
   // Media semplice dei valori regionali, non il valore italiano: la riga in
   // tabella e la legenda devono chiamarla con il suo nome (il testo introduttivo
-  // qui sopra lo faceva gia', la legenda no).
+  // qui sopra lo faceva già, la legenda no).
   const regionsAvg = yearValues.length ? yearValues.reduce((sum, row) => sum + row.value, 0) / yearValues.length : null;
   const bestRegion = useMemo(() => {
     if (!regionNames.length) return null;
@@ -2259,8 +2259,8 @@ function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false
   return (
     <div className="map-wrap">
       {/* role="img" rende presentazionali le venti path che stanno sotto, quindi
-          questa etichetta e' l'unica cosa che uno screen reader sente della
-          mappa: deve dire che dato sta disegnando, non solo che e' una mappa.
+          questa etichetta è l'unica cosa che uno screen reader sente della
+          mappa: deve dire che dato sta disegnando, non solo che è una mappa.
           Stessa formula del partial server (_italy_map.html, map_label). */}
       <svg
         className="italy-map"

@@ -5,12 +5,12 @@
  "claude_code_version": "2.1.220 (Claude Code)",
  "commit": "23e1108",
  "detail": [
-  "Cura: nessuna modifica. Verso higher_better confermato guardando la classifica 2024 (Molise 93,58 in cima, Sicilia 78,73 in fondo: piu' diplomi a 20-24 anni e' meglio, non contestuale), tema 'Istruzione e formazione' gia' mappato su istruzione_capitale_umano (macro-area Persone e conoscenza), score_eligible resta true, coda curator vuota.",
-  "Smentita 1 (quadro): 'media e mediana a meno di un decimo di punto, cioe' manca la coda lunga' era falsa. Ricalcolato: media 86,71, mediana 86,74, asimmetria -0,49, e tolte Sardegna e Sicilia le altre diciotto fanno 87,55, cioe' la coda in basso pesa 0,84 punti mentre il Molise tira in su di 0,36. Riscritta come pareggio fra due strappi opposti.",
-  "Smentita 2 (quadro): 'le prime diciotto scendono un gradino alla volta, unico posto dove la distribuzione si rompe' era falsa. Gradino mediano fra le prime diciotto 0,26 punti, ma i salti larghi sono tre: 2,22 Molise-Umbria, 1,90 Liguria-Trentino Alto Adige, 4,06 Valle d'Aosta-Sardegna. Quadro e h2 rifatti sui tre salti.",
+  "Cura: nessuna modifica. Verso higher_better confermato guardando la classifica 2024 (Molise 93,58 in cima, Sicilia 78,73 in fondo: più diplomi a 20-24 anni è meglio, non contestuale), tema 'Istruzione e formazioné già mappato su istruzione_capitale_umano (macro-area Persone e conoscenza), score_eligible resta true, coda curator vuota.",
+  "Smentita 1 (quadro): 'media e mediana a meno di un decimo di punto, cioè manca la coda lungà era falsa. Ricalcolato: media 86,71, mediana 86,74, asimmetria -0,49, e tolte Sardegna e Sicilia le altre diciotto fanno 87,55, cioè la coda in basso pesa 0,84 punti mentre il Molise tira in su di 0,36. Riscritta come pareggio fra due strappi opposti.",
+  "Smentita 2 (quadro): 'le prime diciotto scendono un gradino alla volta, unico posto dove la distribuzione si rompè era falsa. Gradino mediano fra le prime diciotto 0,26 punti, ma i salti larghi sono tre: 2,22 Molise-Umbria, 1,90 Liguria-Trentino Alto Adige, 4,06 Valle d'Aosta-Sardegna. Quadro e h2 rifatti sui tre salti.",
   "Errore mio intercettato in rilettura: una stesura intermedia diceva che sotto Calabria e Campania non c'era nessuna delle due regioni del Centro-Nord in coda, falso per il Trentino Alto Adige 84,53 che sta sopra Calabria 84,03. Corretto: solo la Valle d'Aosta 83,67 chiude sotto le due.",
-  "Lead rifatto: 'l'unico strappo largo' ripeteva la smentita, e 'non separa piu' il Nord dal Sud' presupponeva una separazione che nel 2018 non c'era (Valle d'Aosta gia' diciottesima).",
-  "Fonti riverificate alla fonte primaria: Eurostat edat_lfse_03 via API (IT 81,4 nel 2018 con flag b di rottura di serie, 86,5 nel 2024, EU27 83,2 e 85,0, HTTP 200) e MUR (HTTP 200, 'l'accesso alle universita' presuppone come requisito il Diploma di scuola secondaria superiore').",
+  "Lead rifatto: 'l'unico strappo largò ripeteva la smentita, e 'non separa più il Nord dal Sud' presupponeva una separazione che nel 2018 non c'era (Valle d'Aosta già diciottesima).",
+  "Fonti riverificate alla fonte primaria: Eurostat edat_lfse_03 via API (IT 81,4 nel 2018 con flag b di rottura di serie, 86,5 nel 2024, EU27 83,2 e 85,0, HTTP 200) e MUR (HTTP 200, 'l'accesso alle università presuppone come requisito il Diploma di scuola secondaria superiorè).",
   "Firma 2026-07-31 su reviewed_vintage 2024, uguale al vintage. 731 parole, prose_lint pulito, suite 935 test verde."
  ],
  "gate": "auto",

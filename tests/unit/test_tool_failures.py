@@ -1,4 +1,4 @@
-"""Il lettore dei guasti ripetuti: cio' che si ripete, non l'elenco.
+"""Il lettore dei guasti ripetuti: ciò che si ripete, non l'elenco.
 
 Il file lo scriveva un hook da mesi e non lo apriva nessuno. L'errore
 `.venv/bin/python: no such file` era registrato tre ore prima della prima run
@@ -30,8 +30,8 @@ class TheSignatureIsTheFaultNotTheOccurrence(unittest.TestCase):
 
     def test_the_exit_code_alone_is_not_a_signature(self):
         """Quasi ogni fallimento di Bash apre con "Exit code 1": raggrupparli
-        li' risponde "trentuno volte lo stesso guasto" a trentuno guasti
-        diversi, che e' peggio del silenzio."""
+        lì risponde "trentuno volte lo stesso guasto" a trentuno guasti
+        diversi, che è peggio del silenzio."""
         firma = tool_failures.firma(_riga("Exit code 1\n.venv/bin/python: not found"))
         self.assertNotIn("Exit code", firma)
         self.assertIn("not found", firma)
@@ -60,7 +60,7 @@ class ItReportsWhatRepeats(unittest.TestCase):
         self.assertEqual(len(tool_failures.recenti(righe, ore=200, adesso=ADESSO)), 5)
 
     def test_a_row_without_a_readable_date_is_kept(self):
-        """Un guasto senza data e' comunque un guasto: scartarlo sarebbe la
+        """Un guasto senza data è comunque un guasto: scartarlo sarebbe la
         stessa disattenzione che questo file esiste per correggere."""
         righe = [{"tool": "Bash", "error": "Exit code 1\nsenza data"}] * 2
         self.assertEqual(len(tool_failures.recenti(righe, adesso=ADESSO)), 2)

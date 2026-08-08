@@ -71,7 +71,7 @@ class AnnualChangeFramingAgreement(unittest.TestCase):
 
 
 class ItPluralAgreement(unittest.TestCase):
-    """A2: singular/plural agreement so a count of 1 never reads as '1 regioni'."""
+    """A2: singular/plural agreement so a count of 1 never reads as '1 regionì."""
 
     def test_singular_and_plural_forms(self):
         self.assertEqual(indicator_notes.it_plural(1, "regione", "regioni"), "regione")

@@ -26,15 +26,15 @@ jobs:
         # Il referto di unittest, non il codice di uscita.
         #
         # Questa suite va in segfault DOPO aver stampato OK, circa una run su
-        # quattro, e la causa non e' stata trovata (sei run con -X faulthandler
-        # non l'hanno riprodotta). Finche' resta cosi', leggere solo il codice di
+        # quattro, e la causa non è stata trovata (sei run con -X faulthandler
+        # non l'hanno riprodotta). Finché resta così, leggere solo il codice di
         # uscita vuol dire un quarto delle pull request della catena bloccate da
-        # un fallimento che non e' successo, e la catena e' non presidiata:
+        # un fallimento che non è successo, e la catena è non presidiata:
         # nessuno rilancerebbe.
         #
-        # Non e' una rete di sicurezza allentata. Un crash a meta' suite non
+        # Non è una rete di sicurezza allentata. Un crash a metà suite non
         # stampa nessun OK e fallisce qui come prima: passa solo il caso in cui
-        # unittest ha gia' dichiarato tutto verde.
+        # unittest ha già dichiarato tutto verde.
         run: |
           run_suite() {
             python -X faulthandler -m unittest discover -s tests 2>&1 | tee suite.log
@@ -51,56 +51,33 @@ jobs:
             failed)  echo "::error::la suite ha fallito"; exit 1 ;;
             ok)
               if [ "$status" -ne 0 ]; then
-                echo "::warning::suite verde, ma l'interprete e' morto in uscita (exit $status)"
+                echo "::warning::suite verde, ma l'interprete è morto in uscita (exit $status)"
               fi
               exit 0 ;;
           esac
 
-          # Nessun verdetto: l'interprete e' morto prima di scriverne uno. Un
+          # Nessun verdetto: l'interprete è morto prima di scriverne uno. Un
           # ritentativo solo, e il secondo conta come definitivo. Ritentare un
-          # fallimento vero sarebbe nascondere un bug, ma qui non c'e' nessun
-          # fallimento da nascondere: non c'e' nessun referto.
-          echo "::warning::la suite e' morta senza referto (exit $status), ritento una volta"
+          # fallimento vero sarebbe nascondere un bug, ma qui non c'è nessun
+          # fallimento da nascondere: non c'è nessun referto.
+          echo "::warning::la suite è morta senza referto (exit $status), ritento una volta"
           run_suite; status=$?
           case "$(verdict)" in
             ok) exit 0 ;;
             failed) echo "::error::la suite ha fallito al secondo tentativo"; exit 1 ;;
-            *) echo "::error::la suite e' morta senza referto due volte (exit $status)"; exit 1 ;;
+            *) echo "::error::la suite è morta senza referto due volte (exit $status)"; exit 1 ;;
           esac
 
-  # Il cancello della catena, fatto rispettare anche dal lato remoto. Finora
-  # lo ri-eseguiva solo scripts/pipeline_merge.py prima di fondere, cioe' un
-  # controllo agent-side su un master non protetto: un merge manuale o un push
-  # diretto non lo incontrava mai. Qui diventa un check remoto come la suite,
-  # quindi pipeline_merge --policy checks lo aspetta insieme al resto.
+  # Qui stava il job `gate`, che sui branch `automation/*` eseguiva
+  # `scripts/pipeline_gate.py`. Se ne va con il file: la catena editoriale
+  # autonoma non esiste più, e la catena minima non ha cancello per scelta (il
+  # controllo è il verificatore, dentro il workflow, prima che l'articolo tocchi
+  # il disco).
   #
-  # Solo sui branch automation/*: fuori dalla catena non c'e' uno stadio da
-  # giudicare. Lo stadio e' il primo segmento del nome del branch
-  # (automation/<stadio>-<data>, docs/AGENT_CONTRACT.md). --skip-tests perche'
-  # la suite intera gira gia' nel job qui sopra: rifarla qui raddoppierebbe il
-  # tempo del check piu' lento senza aggiungere un verdetto.
-  gate:
-    if: startsWith(github.head_ref || github.ref_name, 'automation/')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # Il cancello misura il diff contro origin/master: serve la storia.
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install deps
-        # Il check del vintage importa l'app, e senza dipendenze il cancello
-        # boccia apposta invece di saltare il controllo.
-        run: pip install -r requirements.txt
-      - name: Run the gate
-        run: |
-          ref="${{ github.head_ref || github.ref_name }}"
-          stage="${ref#automation/}"
-          stage="${stage%%-*}"
-          echo "cancello per lo stadio: $stage"
-          python scripts/pipeline_gate.py --stage "$stage" --skip-tests
+  # Non è stato lasciato al suo posto perché un job che invoca un file
+  # cancellato non è inerte: `if:` è valutato dopo lo scheduling, quindi ogni
+  # PR da un branch `automation/*` ancora aperto sarebbe fallita su "file non
+  # trovato", cioè un rosso che non parla del suo contenuto.
 
   frontend:
     runs-on: ubuntu-latest

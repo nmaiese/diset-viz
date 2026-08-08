@@ -79,9 +79,9 @@
     <p class="section-label">Ripartizione</p>
     <h2 id="divari-{{ a.name | lower }}-title">{{ a.name }}</h2>
     {# "meglio" e "peggio" della media, non "sopra" e "sotto": su un indicatore
-       come i NEET stare sotto la media e' una buona notizia, e la frase deve
-       restare vera anche se il set d'apertura cambia. La media e' quella delle
-       venti regioni, mai chiamata nazionale: e' un numero diverso. #}
+       come i NEET stare sotto la media è una buona notizia, e la frase deve
+       restare vera anche se il set d'apertura cambia. La media è quella delle
+       venti regioni, mai chiamata nazionale: è un numero diverso. #}
     {% set n = a.above_mean %}{% set tot = a.cards | length %}
     {% set all_of_them = "tutti e tre i" if tot == 3 else "tutti i " ~ tot %}
     {% set standing %}{% if n == tot %}sta meglio della media delle venti regioni su {{ all_of_them }} divari d'apertura{% elif n == 0 %}sta peggio della media delle venti regioni su {{ all_of_them }} divari d'apertura{% else %}sta meglio della media delle venti regioni su {{ n }} dei {{ tot }} divari d'apertura{% endif %}{% endset %}

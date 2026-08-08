@@ -1,13 +1,13 @@
 // Controllo login/account nel masthead, su OGNI pagina server-rendered.
 //
-// Vive in un placeholder gia' reso dal server (#site-auth) a dimensioni fisse:
-// il modulo e' async e getUser() pure, quindi senza il placeholder il masthead
+// Vive in un placeholder già reso dal server (#site-auth) a dimensioni fisse:
+// il modulo è async e getUser() pure, quindi senza il placeholder il masthead
 // salterebbe a ogni caricamento. Riempiamo il placeholder, non lo creiamo.
 //
-// Ottimizzazione peso: se in localStorage NON c'e' una sessione Supabase, l'utente
-// e' anonimo e mostriamo "Accedi" SENZA scaricare @supabase/supabase-js (208kB).
-// La libreria si carica solo (a) se c'e' gia' una sessione da risolvere, oppure
-// (b) al clic su "Accedi". Cosi' le pagine pubbliche anonime restano leggere.
+// Ottimizzazione peso: se in localStorage NON c'è una sessione Supabase, l'utente
+// è anonimo e mostriamo "Accedi" SENZA scaricare @supabase/supabase-js (208kB).
+// La libreria si carica solo (a) se c'è già una sessione da risolvere, oppure
+// (b) al clic su "Accedi". Così le pagine pubbliche anonime restano leggere.
 
 import {
   getAccessToken,
@@ -39,7 +39,7 @@ function hasStoredSession() {
 function isOAuthReturn() {
   // Ritorno dal login Google: Supabase rimanda con ?code=... (PKCE) o
   // #access_token=... (implicito). In quel caso DOBBIAMO inizializzare il client
-  // (anche se non c'e' ancora sessione salvata) per consumare il codice e
+  // (anche se non c'è ancora sessione salvata) per consumare il codice e
   // persistere la sessione, altrimenti il login "non attacca".
   try {
     const s = window.location.search || "";
@@ -51,7 +51,7 @@ function isOAuthReturn() {
 }
 
 function cleanOAuthUrl() {
-  // Toglie i parametri OAuth dall'URL cosi' un refresh non li ri-processa.
+  // Toglie i parametri OAuth dall'URL così un refresh non li ri-processa.
   try {
     const url = new URL(window.location.href);
     ["code", "state", "error", "error_description"].forEach((p) => url.searchParams.delete(p));
@@ -271,7 +271,7 @@ async function wireAccountPage() {
     URL.revokeObjectURL(url);
   };
   document.getElementById("account-delete").onclick = async () => {
-    if (!window.confirm("Eliminare l'account e tutti i dati? L'operazione non e' reversibile.")) return;
+    if (!window.confirm("Eliminare l'account e tutti i dati? L'operazione non è reversibile.")) return;
     const res = await authFetch("/api/account", { method: "DELETE" });
     if (res && res.ok) {
       await signOut();

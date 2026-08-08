@@ -7,7 +7,7 @@ paths:
 
 # Dati: indicatori, temi, province
 
-Il documento che possiede la materia e'
+Il documento che possiede la materia è
 [`docs/DATA_PIPELINE.md`](../../docs/DATA_PIPELINE.md); per le province,
 [`docs/PROVINCE_PIPELINE.md`](../../docs/PROVINCE_PIPELINE.md); per freschezza
 e monitoraggio delle fonti, [`docs/DATA_FRESHNESS.md`](../../docs/DATA_FRESHNESS.md)
@@ -18,8 +18,8 @@ e [`docs/SOURCE_MONITORING.md`](../../docs/SOURCE_MONITORING.md).
   (`app/indicator_notes.py`). Per ogni tema nuovo: una riga in
   `config/theme_categories.csv` verso una delle 12 categorie canoniche. Le
   categorie e le quattro macro-aree vivono in `app/taxonomy.py` e inventarne
-  una e' codice, non dati.
-- **Un tema non mappato e' il guasto silenzioso da conoscere**: l'indicatore
+  una è codice, non dati.
+- **Un tema non mappato è il guasto silenzioso da conoscere**: l'indicatore
   resta nel catalogo e sparisce da ogni totale di macro-area, senza che niente
   fallisca.
 - Dopo un cambio dati: **riavvia gunicorn** (i loader usano `lru_cache`, non un

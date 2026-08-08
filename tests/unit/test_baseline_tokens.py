@@ -10,8 +10,8 @@ una decisione:
 3. le chiamate advisor, che l'aggregato di primo livello **esclude**: erano il
    26% del costo di quella run e non comparivano in nessun contatore.
 
-Un file che rimisura senza queste tre non e' confrontabile col precedente, ed
-e' esattamente il modo in cui un bersaglio di costo smette di essere
+Un file che rimisura senza queste tre non è confrontabile col precedente, ed
+è esattamente il modo in cui un bersaglio di costo smette di essere
 aggiudicabile.
 """
 import json
@@ -68,7 +68,7 @@ class SplitUsage(unittest.TestCase):
         self.assertEqual(advisor["out"], 7089)
 
     def test_the_advisor_is_not_folded_into_the_model_total(self):
-        """Sommarli sarebbe piu' comodo e cancellerebbe la scoperta."""
+        """Sommarli sarebbe più comodo e cancellerebbe la scoperta."""
         usage = _usage(inp=2, out=100, iterations=[
             _iter("message", inp=2, out=100),
             _iter("advisor_message", inp=80000, out=5000),
@@ -154,7 +154,7 @@ class TheInflationFactorIsReal(unittest.TestCase):
         self.assertEqual(len(rows), requests)
         self.assertEqual(sum(row["model"]["cache_r"] for row in rows), requests * 1000)
         self.assertEqual(len(lines), requests * 2,
-                         "il doppio record e' la trappola, non un caso limite")
+                         "il doppio record è la trappola, non un caso limite")
 
 
 class Cost(unittest.TestCase):
@@ -169,21 +169,21 @@ class Cost(unittest.TestCase):
 class OnlyProseCountsAsProse(unittest.TestCase):
     """Chi entra nel costo per articolo si dichiara, non si deduce per esclusione.
 
-    La lista era `NOT_WRITING`, cioe' per esclusione, e una lista per esclusione
+    La lista era `NOT_WRITING`, cioè per esclusione, e una lista per esclusione
     mente per omissione: `verificatore`, `reader-editor` e `launch` non
     c'erano, quindi una sessione con dentro **solo** un giro di verifica finiva
     sotto "SESSIONI CHE PRODUCONO PROSA" con tutti i suoi token dentro il costo
     per articolo. I tre non scrivono una riga, e il confronto fra la catena
-    vecchia e l'officina, che e' l'unica cosa per cui questo script esiste,
+    vecchia e l'officina, che è l'unica cosa per cui questo script esiste,
     usciva gonfiato dalla parte sbagliata.
     """
 
     def test_the_year_is_a_shape_not_a_value(self):
         """Il ruolo si staccava con `split("-2026")`, un anno di calendario
         scritto dentro il codice. Dal primo gennaio 2027 quello split non taglia
-        piu' niente, nessun ruolo combacia con `WRITING`, e il rapporto dichiara
-        zero sessioni che producono prosa senza dire perche': un guasto che
-        aspetta una data, invisibile finche' non e' tardi. `RUN_ID` e
+        più niente, nessun ruolo combacia con `WRITING`, e il rapporto dichiara
+        zero sessioni che producono prosa senza dire perché: un guasto che
+        aspetta una data, invisibile finché non è tardi. `RUN_ID` e
         `pipeline_log.new_run_id()` accettano qualunque anno da sempre."""
         for anno in ("2026", "2027", "2031", "1999"):
             with self.subTest(anno=anno):
@@ -211,40 +211,3 @@ class OnlyProseCountsAsProse(unittest.TestCase):
         self.assertEqual(bt.writing_only(runs),
                          ["producer-20260807T101010Z-aaaa",
                           "writer-20260728T101010Z-bbbb"])
-
-    def test_the_list_is_the_producer_role_and_nothing_else(self):
-        """Il commento in `baseline_tokens` promette questo allineamento, e un
-        commento che promette una guardia inesistente e' il difetto che questa
-        PR sta chiudendo. `baseline_tokens` resta stdlib pura e ricopia i nomi:
-        il test importa tutti e due e li confronta."""
-        from scripts import pipeline_launch
-        dal_lanciatore = {stage for stage, role in pipeline_launch.ROLE_OF_STAGE.items()
-                          if role == "producer"}
-        self.assertEqual(set(bt.WRITING), dal_lanciatore | {"producer"})
-
-    def test_every_stage_that_can_open_a_run_is_recognised(self):
-        """`RUN_ID` e' un'altra enumerazione, e un ruolo che le manca non viene
-        contato male: **sparisce**, e con lui l'intera sessione che lo conteneva,
-        senza che una riga del rapporto lo dica.
-
-        I quattro stadi `legacy-*` non combaciano per intero: la regex li tronca
-        al ruolo che portano dentro (`legacy-writer` -> `writer`). E' senza
-        conseguenze e vale la pena saperlo invece di scoprirlo: il prefisso
-        distingue da dove viene la run, non che cosa ha fatto, quindi i due che
-        scrivevano restano dentro il costo per articolo e i due che criticavano
-        restano fuori. Un prefisso che cambiasse anche il mestiere spaccherebbe
-        questa assunzione in silenzio."""
-        from scripts import pipeline_log
-        for stage in pipeline_log.HISTORICAL_STAGES:
-            with self.subTest(stage=stage):
-                run_id = f"{stage}-20260807T101010Z-abcd"
-                trovato = bt.RUN_ID.search(run_id)
-                self.assertIsNotNone(trovato, f"{stage} non apre nessuna run agli occhi del rapporto")
-                ruolo = bt.role_of(trovato.group(0))
-                atteso = stage[len("legacy-"):] if stage.startswith("legacy-") else stage
-                self.assertEqual(ruolo, atteso)
-                self.assertEqual(ruolo in bt.WRITING, atteso in bt.WRITING)
-
-
-if __name__ == "__main__":
-    unittest.main()

@@ -1,17 +1,17 @@
 """Lo store degli articoli, un file per indicatore.
 
 Il guasto che ha chiuso: scrittore e revisore condividevano il perimetro,
-giravano tutti e due ogni giorno, e finche' la prosa e' stata un JSON unico da
+giravano tutti e due ogni giorno, e finché la prosa è stata un JSON unico da
 365 voci ogni loro modifica riscriveva l'intero file. Due run vicine su articoli
-diversi producevano un conflitto su un file che nessun agente puo' risolvere
+diversi producevano un conflitto su un file che nessun agente può risolvere
 leggendolo.
 
-Quello che i test qui devono garantire non e' che il formato sia bello: e' che
+Quello che i test qui devono garantire non è che il formato sia bello: è che
 il travaso non abbia perso niente e che la codifica delle chiavi sia
-reversibile. Una chiave che non torna indietro non e' un file mal chiamato, e'
+reversibile. Una chiave che non torna indietro non è un file mal chiamato, è
 un articolo che sparisce dalla pagina senza che nessun errore lo dica.
 
-Qui c'e' solo cio' che gira su file temporanei e costanti. Le due letture dello
+Qui c'è solo ciò che gira su file temporanei e costanti. Le due letture dello
 store **committato** stanno in `tests/integration/test_indicator_store_live.py`.
 """
 
@@ -24,7 +24,7 @@ from scripts import indicator_store
 
 
 class TheKeyEncodingIsReversible(unittest.TestCase):
-    """Il nome del file e' la chiave, quindi deve tornare indietro esatta."""
+    """Il nome del file è la chiave, quindi deve tornare indietro esatta."""
 
     CASES = (
         "1",
@@ -45,9 +45,9 @@ class TheKeyEncodingIsReversible(unittest.TestCase):
                 self.assertNotIn(":", name)
 
     def test_a_key_that_would_be_ambiguous_is_refused_instead_of_mangled(self):
-        """La codifica regge perche' nessuna chiave del catalogo contiene gia'
+        """La codifica regge perché nessuna chiave del catalogo contiene già
         un doppio underscore. Se un giorno ne arrivasse una, il posto dove
-        accorgersene e' qui e non la pagina vuota di un indicatore."""
+        accorgersene è qui e non la pagina vuota di un indicatore."""
         with self.assertRaises(indicator_store.StoreError):
             indicator_store.filename_for("famiglia__strana")
 
@@ -60,7 +60,7 @@ class TheStoreReadsBackWhatItWrote(unittest.TestCase):
 
     def test_an_entry_comes_back_identical(self):
         entry = {
-            "lead": "Un lead con accenti: perche' no.",
+            "lead": "Un lead con accenti: perché no.",
             "sections": [{"role": "quadro", "h": None, "body": "Il quadro."}],
             "fonti": [], "vintage": 2024, "level": "regione",
         }
@@ -69,8 +69,8 @@ class TheStoreReadsBackWhatItWrote(unittest.TestCase):
         self.assertEqual(indicator_store.load_all(self.root), {"bes:10AMB004": entry})
 
     def test_the_key_field_is_written_but_never_returned(self):
-        """Il file dice di che cosa parla, cosi' uno aperto a mano si capisce e
-        uno rinominato per sbaglio si riconosce. Fuori dal modello pero': i
+        """Il file dice di che cosa parla, così uno aperto a mano si capisce e
+        uno rinominato per sbaglio si riconosce. Fuori dal modello però: i
         consumatori devono vedere lo stesso dizionario di prima del travaso, o
         il travaso non sarebbe stato a costo zero per loro."""
         indicator_store.write("920", {"lead": "x"}, root=self.root)
@@ -88,7 +88,7 @@ class TheStoreReadsBackWhatItWrote(unittest.TestCase):
             indicator_store.load_all(self.root)
 
     def test_two_writes_of_two_articles_touch_two_files(self):
-        """E' tutta la ragione per cui lo store esiste. Se scrivere un articolo
+        """È tutta la ragione per cui lo store esiste. Se scrivere un articolo
         toccasse un file condiviso, due stadi che lavorano su articoli diversi
         continuerebbero a collidere."""
         indicator_store.write("920", {"lead": "a"}, root=self.root)
@@ -100,8 +100,8 @@ class TheStoreReadsBackWhatItWrote(unittest.TestCase):
 
 
 class TheMigrationLostNothing(unittest.TestCase):
-    """Il travaso e' avvenuto una volta sola e non e' piu' ripetibile sul file
-    vero, che non e' piu' in repo. Quello che resta verificabile per sempre e'
+    """Il travaso è avvenuto una volta sola e non è più ripetibile sul file
+    vero, che non è più in repo. Quello che resta verificabile per sempre è
     che le due letture siano la stessa: un vecchio file unico e la directory
     che ne nasce devono produrre lo stesso dizionario, chiave per chiave."""
 
@@ -119,20 +119,20 @@ class TheMigrationLostNothing(unittest.TestCase):
             count = indicator_store.migrate(source, root=root)
             self.assertEqual(count, len(legacy))
             self.assertEqual(indicator_store.load_all(root), legacy)
-            # E la lettura del file unico passa dallo stesso ingresso, che e'
-            # cio' che permette a `--texts` di puntare a una vecchia copia.
+            # E la lettura del file unico passa dallo stesso ingresso, che è
+            # ciò che permette a `--texts` di puntare a una vecchia copia.
             self.assertEqual(indicator_store.load_all(source), legacy)
 
 
 class TheUrlFormResolvesToTheInternalKey(unittest.TestCase):
-    """Il difetto che questo repo ha gia' pagato tre volte.
+    """Il difetto che questo repo ha già pagato tre volte.
 
     La catena scrive i codici come `ter-920` e `bes-10AMB004`, lo store li tiene
     come `920` e `bes:10AMB004`. Un comando che accetta solo la seconda forma
     risponde "nessun articolo" proprio all'invocazione scritta nei prompt, e chi
-    la incontra o la aggira o salta il passo. E' successo in `review_queue`,
+    la incontra o la aggira o salta il passo. È successo in `review_queue`,
     poi in `prose_lint` una settimana dopo, poi in questo store il giorno in cui
-    e' stato scritto. Adesso la funzione e' una sola e sta dove stanno le chiavi.
+    è stato scritto. Adesso la funzione è una sola e sta dove stanno le chiavi.
     """
 
     KEYS = ("1", "920", "bes:10AMB004", "bes:09PAE009-N25", "eur:rd_e_gerdreg")
@@ -152,7 +152,7 @@ class TheUrlFormResolvesToTheInternalKey(unittest.TestCase):
             indicator_store.resolve_key(self.KEYS, "bes:10AMB004"), "bes:10AMB004")
 
     def test_a_bes_id_with_its_own_dashes_survives(self):
-        """Gli id BES contengono trattini, quindi il taglio e' sul primo e uno
+        """Gli id BES contengono trattini, quindi il taglio è sul primo e uno
         solo: tagliare su tutti perderebbe `-N25`."""
         self.assertEqual(
             indicator_store.resolve_key(self.KEYS, "bes-09PAE009-N25"),
@@ -172,7 +172,7 @@ class OneBrokenArticleCostsOneArticle(unittest.TestCase):
     """Chi legge decide che cosa costa un file rotto, e le due risposte sono
     opposte per una ragione.
 
-    Il cancello e la suite devono fermarsi forte: un file illeggibile e' un
+    Il cancello e la suite devono fermarsi forte: un file illeggibile è un
     difetto e va visto. L'app no. Con la lettura severa un solo file mal
     scritto solleva, il chiamante ripiega su un dizionario vuoto, e tutte e
     trecentosessantacinque le pagine perdono la prosa insieme senza un errore
@@ -183,7 +183,7 @@ class OneBrokenArticleCostsOneArticle(unittest.TestCase):
         self.root = Path(self._tmp.name)
         self.addCleanup(self._tmp.cleanup)
         indicator_store.write("920", {"lead": "buono"}, root=self.root)
-        (self.root / "999.json").write_text("{ questo non e' json", encoding="utf-8")
+        (self.root / "999.json").write_text("{ questo non è json", encoding="utf-8")
 
     def test_the_strict_read_refuses_and_says_which_file(self):
         with self.assertRaises(indicator_store.StoreError) as caught:
@@ -196,7 +196,7 @@ class OneBrokenArticleCostsOneArticle(unittest.TestCase):
         self.assertEqual(entries["920"]["lead"], "buono")
 
     def test_the_app_reads_leniently(self):
-        """La prova che la scelta e' cablata dove serve, non solo possibile."""
+        """La prova che la scelta è cablata dove serve, non solo possibile."""
         import unittest.mock as mock
 
         from app import indicator_texts

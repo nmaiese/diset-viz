@@ -106,12 +106,12 @@ def parse_robots(body: str) -> list[dict]:
 def audit_robots(text: str, contract: dict) -> list[str]:
     failures = []
     groups = parse_robots(text)
-    # Ogni agente puo' comparire in piu' gruppi, quindi si tiene la **lista** dei
+    # Ogni agente può comparire in più gruppi, quindi si tiene la **lista** dei
     # suoi gruppi, non l'ultimo che vince. Collassare in un dizionario nascondeva
     # un gruppo restrittivo iniettato da un CDN (es. `OAI-SearchBot: Disallow: /`)
     # dietro il gruppo permissivo dell'app che lo segue: l'audit passava mentre un
     # crawler sotto contratto aveva regole contraddittorie. Un agente auditato con
-    # piu' di un gruppo e' esso stesso un fallimento (possibile iniezione).
+    # più di un gruppo è esso stesso un fallimento (possibile iniezione).
     by_agent: dict = {}
     for group in groups:
         for agent in group["agents"]:
@@ -123,7 +123,7 @@ def audit_robots(text: str, contract: dict) -> list[str]:
     def _one_group(agent):
         rule_sets = by_agent.get(agent, [])
         if len(rule_sets) > 1:
-            # Il gruppo `*` doppio lo segnala gia' il controllo esplicito sopra,
+            # Il gruppo `*` doppio lo segnala già il controllo esplicito sopra,
             # con il suo messaggio: qui non si raddoppia.
             if agent != "*":
                 failures.append(

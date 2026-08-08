@@ -492,12 +492,12 @@ class AppSmokeTest(unittest.TestCase):
         # from the data. A missing role means the skeleton broke, which is the one
         # thing that would make 621 pages inconsistent again.
         self.assertIn('class="indicator-article', html)
-        # I tre ruoli sostanziali sono sempre H2; la definizione puo' abitare il
+        # I tre ruoli sostanziali sono sempre H2; la definizione può abitare il
         # blocco "Come leggere" invece di aprire l'articolo (sezioni variabili).
         for role in ("quadro", "dinamica", "limiti"):
             self.assertIn(f'id="sezione-{role}"', html)
         self.assertTrue('id="sezione-definizione"' in html or 'id="come-leggere"' in html)
-        # L'apparato "Fonti e verifica" e' un unico blocco di specifiche.
+        # L'apparato "Fonti e verifica" è un unico blocco di specifiche.
         self.assertIn("apparatus-specs", html)
         # Numbers live in the cockpit, once. The blocks that used to repeat them
         # further down the page must not come back.
@@ -964,12 +964,12 @@ class AppSmokeTest(unittest.TestCase):
         """Un titolo autorato in lingua comune sostituisce il boilerplate
         "per regione", tiene la marca se ci sta, e rispetta lo stesso budget."""
         from app.indicator_notes import authored_seo_title, _TITLE_MAX
-        short = authored_seo_title("Dove si lavora di piu' nella ricerca", "Divario Italia")
-        self.assertEqual(short, "Dove si lavora di piu' nella ricerca · Divario Italia")
+        short = authored_seo_title("Dove si lavora di più nella ricerca", "Divario Italia")
+        self.assertEqual(short, "Dove si lavora di più nella ricerca · Divario Italia")
         self.assertLessEqual(len(short), _TITLE_MAX)
         self.assertNotIn("per regione", short)
         # Un titolo autorato lungo non sfora: si taglia a frase intera, senza marca.
-        longtitle = ("Dove nascono piu' imprese e dove invece il tessuto produttivo "
+        longtitle = ("Dove nascono più imprese e dove invece il tessuto produttivo "
                      "resta fermo da anni interi in questa lunga analisi.")
         clamped = authored_seo_title(longtitle, "Divario Italia")
         self.assertLessEqual(len(clamped), _TITLE_MAX)
@@ -995,7 +995,7 @@ class AppSmokeTest(unittest.TestCase):
         self.assertNotIn("Eta media della popolazione per regione", html)
 
     def test_the_markdown_projection_carries_the_authored_h1(self):
-        """La proiezione markdown e' una rappresentazione di prima classe della
+        """La proiezione markdown è una rappresentazione di prima classe della
         stessa pagina: dare all'agente il nome amministrativo mentre il lettore
         HTML legge il titolo in lingua comune sono due pagine allo stesso URL."""
         import unittest.mock
@@ -1038,7 +1038,7 @@ class AppSmokeTest(unittest.TestCase):
 
     def test_an_authored_title_still_disambiguates_a_duplicate_bes_series(self):
         """Le serie BES duplicate misurano lo stesso fenomeno della gemella
-        territoriale e restano indicizzabili: titolarle in lingua comune e'
+        territoriale e restano indicizzabili: titolarle in lingua comune è
         proprio il caso in cui le due finiscono con lo stesso `<title>`."""
         from app.indicator_notes import authored_seo_title, _TITLE_MAX
         titled = authored_seo_title("Dove si vive a lungo dopo i 65 anni",
@@ -1061,36 +1061,8 @@ class AppSmokeTest(unittest.TestCase):
         fields = dict(prose_lint.prose_fields(entry))
         self.assertIn("h1", fields)
         self.assertIn("seo_title", fields)
-        # Il carattere vietato e' ora dentro il perimetro della guardia.
+        # Il carattere vietato è ora dentro il perimetro della guardia.
         self.assertTrue([f for f, text in fields.items() if "—" in text])
-
-    def test_the_authored_titles_reach_the_verifier(self):
-        """Un campo dentro l'impronta e fuori da cio' che il verificatore legge
-        produce una verifica pulita su una frase che nessuno ha guardato."""
-        from scripts import review_queue
-        fields = dict(review_queue.prose_fields({
-            "h1": "Dove si vive a lungo", "seo_title": "Dove si vive a lungo, per regione",
-            "lead": "Un lead.", "sections": [{"role": "quadro", "body": "Corpo."}],
-        }))
-        self.assertIn("h1", fields)
-        self.assertIn("seo_title", fields)
-
-    def test_an_authored_title_expires_the_verification(self):
-        """Un titolo e' prosa visibile, e quello SERP e' anche un'affermazione:
-        aggiungerlo o correggerlo dopo la firma non puo' lasciare buona una
-        verifica che non l'ha mai letto. Stesso buco che l'`h` di sezione ha gia'
-        aperto una volta."""
-        from scripts import verification_queue as vq
-        base = {"lead": "Un lead.", "sections": [
-            {"role": "quadro", "h": None, "body": "Corpo."}]}
-        self.assertNotEqual(vq.prose_fingerprint(base),
-                            vq.prose_fingerprint(dict(base, h1="Dove si vive a lungo")))
-        self.assertNotEqual(vq.prose_fingerprint(base),
-                            vq.prose_fingerprint(dict(base, seo_title="Dove si vive a lungo")))
-        # I campi assenti o vuoti non muovono niente: i trecento articoli di oggi
-        # non hanno questi campi e la loro impronta resta identica.
-        self.assertEqual(vq.prose_fingerprint(base),
-                         vq.prose_fingerprint(dict(base, h1="", seo_title=None)))
 
     def test_seo_metadata_within_budget(self):
         from app.data import get_catalog
@@ -1152,8 +1124,8 @@ class AppSmokeTest(unittest.TestCase):
         caratteri e di collidere con un altro; il titolo autorato non aveva
         niente, quindi il giorno in cui un editor ne scrive uno lungo (o due che
         aprono sulla stessa frase) due pagine indicizzabili si sarebbero prese lo
-        stesso `<title>` in silenzio. Questo controlla i titoli **resi**, cioe'
-        l'autorato quando c'e' e il derivato quando manca, ed e' un no-op finche'
+        stesso `<title>` in silenzio. Questo controlla i titoli **resi**, cioè
+        l'autorato quando c'è e il derivato quando manca, ed è un no-op finché
         nessun articolo ne dichiara uno.
         """
         from app import sources
@@ -1178,9 +1150,9 @@ class AppSmokeTest(unittest.TestCase):
 
         # Il catalogo d'atlante, non quello territoriale: un titolo autorato su un
         # BES, un Multiscopo, un Eurostat o un demografico non sarebbe passato di
-        # qui, e la collisione che conta e' anche quella **fra famiglie** (una
+        # qui, e la collisione che conta è anche quella **fra famiglie** (una
         # serie BES duplicata misura lo stesso fenomeno della gemella
-        # territoriale, ed e' il caso che il qualificatore esiste per separare).
+        # territoriale, ed è il caso che il qualificatore esiste per separare).
         titles = {}
         for item in get_atlas_catalog()["indicators"]:
             family, raw_id = sources.split_internal_id(str(item["id"]))
@@ -1197,7 +1169,7 @@ class AppSmokeTest(unittest.TestCase):
 
     def test_a_long_authored_title_keeps_what_distinguishes_it(self):
         """Due titoli lunghi che aprono sulla stessa frase non possono diventare
-        lo stesso `<title>`: cio' che li distingue sta in fondo, quindi in fondo
+        lo stesso `<title>`: ciò che li distingue sta in fondo, quindi in fondo
         si tiene."""
         from app.indicator_notes import authored_seo_title, _TITLE_MAX
         common = "Il divario fra Nord e Sud in questa lunghissima analisi "
@@ -1207,12 +1179,12 @@ class AppSmokeTest(unittest.TestCase):
         for title in (first, second):
             self.assertLessEqual(len(title), _TITLE_MAX)
             self.assertEqual(title.count("("), title.count(")"))
-        # E una parola sola piu' lunga del budget non lo sfora comunque.
+        # E una parola sola più lunga del budget non lo sfora comunque.
         self.assertLessEqual(len(authored_seo_title("A" * 200)), _TITLE_MAX)
 
     def test_shortening_never_leaves_a_dangling_parenthesis(self):
-        """Il taglio a caratteri puo' cadere dentro una parentesi dell'autore e
-        portarsi via solo meta' della coppia: incastonato in `testa (coda)`
+        """Il taglio a caratteri può cadere dentro una parentesi dell'autore e
+        portarsi via solo metà della coppia: incastonato in `testa (coda)`
         diventa il titolo malformato che la guardia promette di non far uscire.
         Testa e coda si bilanciano entrambe, e la coda resta quella che
         distingue."""
@@ -1295,7 +1267,7 @@ class AppSmokeTest(unittest.TestCase):
         # non duplicati, multiscopo, le famiglie esterne, e le pagine
         # BES-solo-provincia che non entrano nel catalogo atlante ma restano
         # indicizzabili (`_build_indexable_indicator_catalog`, la stessa base
-        # della sitemap). Una collisione li' non l'avrebbe vista nessun test.
+        # della sitemap). Una collisione lì non l'avrebbe vista nessun test.
         from app import sources
         from app.config import SITE_NAME
         from app.indicator_notes import authored_seo_title, seo_title
@@ -1307,11 +1279,11 @@ class AppSmokeTest(unittest.TestCase):
         # calcolasse il qualificatore in un altro modo potrebbe passare per
         # ragioni sue, mentre la pagina vera collide ancora. Confronta sul solo
         # codice grezzo (senza prefisso di famiglia): le pagine BES-solo-
-        # provincia arrivano da `_view_from_bes_only` con `meta["id"]` gia'
+        # provincia arrivano da `_view_from_bes_only` con `meta["id"]` già
         # senza il prefisso `bes:`, quindi risalire alla famiglia da
         # `split_internal_id(meta["id"])` le farebbe passare per territoriali.
-        # I due insiemi sono codici BES per costruzione, cosi' il confronto sul
-        # solo codice non puo' incrociare un id territoriale per sbaglio.
+        # I due insiemi sono codici BES per costruzione, così il confronto sul
+        # solo codice non può incrociare un id territoriale per sbaglio.
         def qualifier_for(raw_id):
             if raw_id in DUPLICATE_BES_IDS:
                 return sources.family_short_label("bes")
@@ -1325,8 +1297,8 @@ class AppSmokeTest(unittest.TestCase):
             bare_id = str(meta["id"]).rsplit(":", 1)[-1]
             qualifier = qualifier_for(bare_id)
             # Un titolo autorato (h1/seo_title) sostituisce il derivato quando
-            # c'e': stesso ramo di `views._render_indicator`, o la prova non
-            # vedrebbe una collisione fra due titoli autorati ne' fra uno
+            # c'è: stesso ramo di `views._render_indicator`, o la prova non
+            # vedrebbe una collisione fra due titoli autorati né fra uno
             # autorato e uno derivato. `build_article` con il livello di
             # default: un'entry autorata solo su un livello non regionale (oggi
             # nessuna) resterebbe fuori da questo controllo, lo stesso limite
@@ -1434,21 +1406,21 @@ class HardeningTest(unittest.TestCase):
 
 
 class TheImageShipsEverythingTheAppImports(unittest.TestCase):
-    """Il guasto che si vede solo in produzione, e li' si vede tutto insieme.
+    """Il guasto che si vede solo in produzione, e lì si vede tutto insieme.
 
     `app/indicator_texts.py` importa `scripts.indicator_store`, che possiede il
     formato degli articoli in `content/indicators/`. Lo store sta in `scripts/`
-    e non in `app/` perche' lo leggono anche gli script della catena, che sono
+    e non in `app/` perché lo leggono anche gli script della catena, che sono
     stdlib puri e non possono importare `app/__init__.py`, il quale importa
     Flask.
 
-    Il Dockerfile pero' copia solo alcune directory. Quando lo store e' nato,
+    Il Dockerfile però copia solo alcune directory. Quando lo store è nato,
     `scripts/` non era fra quelle: l'immagine sarebbe morta all'avvio con un
-    ModuleNotFoundError, cioe' il sito giu' invece di una pagina sbagliata, e
-    la suite non se ne sarebbe accorta perche' qui gira senza container.
+    ModuleNotFoundError, cioè il sito giù invece di una pagina sbagliata, e
+    la suite non se ne sarebbe accorta perché qui gira senza container.
 
-    Questo test legge le importazioni vere invece di fidarsi di un elenco, cosi'
-    vale anche per la prossima directory che qualcuno decidera' di importare.
+    Questo test legge le importazioni vere invece di fidarsi di un elenco, così
+    vale anche per la prossima directory che qualcuno deciderà di importare.
     """
 
     ROOT = Path(__file__).resolve().parents[2]

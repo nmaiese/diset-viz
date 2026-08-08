@@ -2,10 +2,10 @@
 produzione, SQLite in test).
 
 Una Session per chiamata (vedi app/db.py): nessuna connessione condivisa tra
-thread, in linea col deploy (gunicorn a piu' thread, un solo worker). Il
-punteggio salvato e' sempre la miglior streak verificata di una sessione firmata
+thread, in linea col deploy (gunicorn a più thread, un solo worker). Il
+punteggio salvato è sempre la miglior streak verificata di una sessione firmata
 (app/quiz_tokens.py): il client non manda mai un punteggio arbitrario, vedi
-app/views.py. `user_id` (opzionale) lega la riga a un account Supabase quando c'e'
+app/views.py. `user_id` (opzionale) lega la riga a un account Supabase quando c'è
 un JWT valido: il gioco resta anonimo per chi non si registra.
 """
 
@@ -24,7 +24,7 @@ DEFAULT_LIMIT = 20
 
 
 def _now_iso():
-    # ISO UTC con la Z finale: il confronto lessicografico e' cronologico, cosi'
+    # ISO UTC con la Z finale: il confronto lessicografico è cronologico, così
     # ordinamento e finestra settimanale non usano funzioni-tempo SQL.
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -34,8 +34,8 @@ def _week_cutoff():
 
 
 def _upsert_if_higher(session, row):
-    """INSERT con ON CONFLICT(mode, session_id): un punteggio piu' alto sostituisce
-    il precedente, uno piu' basso non fa nulla (niente regressioni in classifica).
+    """INSERT con ON CONFLICT(mode, session_id): un punteggio più alto sostituisce
+    il precedente, uno più basso non fa nulla (niente regressioni in classifica).
     Atomico, un solo punto che distingue il dialetto."""
     dialect = session.bind.dialect.name
     if dialect == "postgresql":
@@ -92,7 +92,7 @@ def _rank(session, mode, score, created_at, week_cutoff=None):
 
 def ranks_for_session(mode, session_id):
     """(rank_all, rank_week) per la riga appena inviata, o (None, None) se
-    non e' stata salvata (punteggio peggiore di uno gia' registrato)."""
+    non è stata salvata (punteggio peggiore di uno già registrato)."""
     with session_scope() as s:
         row = s.execute(
             select(Score.score, Score.created_at)

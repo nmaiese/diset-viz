@@ -25,26 +25,18 @@ data/eurostat_cache/
 data/*.sqlite3
 data/*.sqlite3-*
 
-# Cruscotto della catena: rigenerato da scripts/pipeline_dashboard.py.
-# Il diario (data/pipeline/runs.jsonl) invece e' committato: e' la storia.
-data/pipeline/cruscotto.html
-
-# Stato locale della sessione Claude Code: lo scrivono gli hook, lo legge
-# pipeline_log.py per arricchire il diario. Mai committato: e' della sessione.
-data/pipeline/.session_meta.json
+# I guasti degli strumenti, che `scripts/tool_failures.py` scrive e rilegge per
+# non far ripagare due volte lo stesso errore. Della macchina, non della storia.
 data/pipeline/tool_failures.jsonl
 
-# I battiti dei ruoli in volo: li scrive scripts/pipeline_monitor all'avvio e li
-# cancella alla chiusura, il cruscotto /_pipeline li legge per il "vivo". Sono
-# della sessione, non storia: la storia sta nel diario e nei file committati.
-data/pipeline/heartbeats/
+# Le altre righe di questo blocco nominavano `pipeline_dashboard.py`,
+# `pipeline_log.py` e `pipeline_monitor`, cioè tre programmi cancellati con la
+# catena editoriale autonoma. Un ignore per un file che nessuno scrive più non
+# fa danno, ma insegna a chi legge il nome di una macchina che non c'è.
 
-# Directory di lavoro delle eval degli agenti: le fixture sono committate,
-# quello che un agente produce durante una eval no.
-evals/out/
-
-# I pacchetti montati da `officina/pacchetti.py`: generati da dati e codice
-# versionati, quindi ricostruibili con un comando e senza valore in un diff.
-# Vanno su disco per non viaggiare come output di un agente, che costa
-# venticinque dollari per milione di token.
-data/packs/
+# I dossier e le bozze congelate della catena minima: derivati da dati e codice
+# versionati, ricostruibili con un comando. Gli articoli non stanno più qui:
+# `lab.pubblica` scrive in `content/indicators/`, cioè sulla pagina pubblica.
+# `data/lab/articoli/` resta committabile per le prove fatte con `--out`.
+data/lab/dossier/
+data/lab/bozze/

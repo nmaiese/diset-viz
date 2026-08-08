@@ -4,8 +4,8 @@
  "commit": "07cebb6",
  "detail": [
   "STAGE_PATHS = (verifiche.csv, runs.jsonl): il verificatore non ha i testi nel perimetro, e le smentite tornano al revisore come il segnale smentita di review_queue, peso 60.",
-  "Una verifica scade sull'impronta della prosa e non su una data. Delle undici verifiche del lotto 2 ne resta una nel registro, ter-651: le altre dieci riguardano prosa che non esiste piu' perche' gli articoli sono stati corretti dopo.",
-  "Routine non ancora creata, per scelta: DISCOVERY_STATUS.md dice perche'."
+  "Una verifica scade sull'impronta della prosa e non su una data. Delle undici verifiche del lotto 2 ne resta una nel registro, ter-651: le altre dieci riguardano prosa che non esiste più perché gli articoli sono stati corretti dopo.",
+  "Routine non ancora creata, per scelta: DISCOVERY_STATUS.md dice perché."
  ],
  "gate": "manual",
  "outcome": "nothing",

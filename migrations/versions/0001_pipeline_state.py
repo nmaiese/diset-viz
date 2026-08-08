@@ -5,7 +5,7 @@ Revises:
 Create Date: 2026-07-31
 
 Prima migrazione del backend mutabile. Ricalca lo schema SQLite che queste due
-tabelle avevano prima: colonne larghe, nessun tipo Postgres-only, cosi' la
+tabelle avevano prima: colonne larghe, nessun tipo Postgres-only, così la
 semantica non cambia col dialetto.
 """
 from alembic import op

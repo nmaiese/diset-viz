@@ -197,7 +197,7 @@ class ParseSheet(unittest.TestCase):
     HEADER = [
         "CODICE", "INDICATORE", "DEFINIZIONE TECNICA INDICATORE",
         "DATI DI BASE ASSOCIATI", "AMBITO TERRITORIALE",
-        "ANNO INIZIALE", "ANNO FINALE", "PERIODICITA'", "FONTI", "NOTE",
+        "ANNO INIZIALE", "ANNO FINALE", "PERIODICITÀ", "FONTI", "NOTE",
     ]
 
     def _parse(self, *rows):

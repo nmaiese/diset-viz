@@ -1,13 +1,13 @@
 """Catalogo achievement e valutazione server-side (Fase 5.2).
 
-Il catalogo e' dichiarativo e vive nel codice (`CATALOG`): ogni voce ha un
+Il catalogo è dichiarativo e vive nel codice (`CATALOG`): ogni voce ha un
 criterio, una funzione pura sugli aggregati di `player_stats.stats_map`. Il DB
 conserva solo gli sblocchi (tabella `achievements`), non le definizioni: aggiungere
-o ritoccare un traguardo e' codice, senza migrazioni.
+o ritoccare un traguardo è codice, senza migrazioni.
 
 Raccolto dal branch pre-Supabase e ri-chiavato da player_id ad auth_id, sopra
 l'ORM. Solo con login: le stats anonime stanno in localStorage e il server non le
-vede, quindi non c'e' un secondo percorso di valutazione non fidato.
+vede, quindi non c'è un secondo percorso di valutazione non fidato.
 """
 
 from datetime import datetime, timezone
@@ -39,7 +39,7 @@ def _played_all(stats):
 
 
 # id, icona (emoji), titolo, descrizione, criterio(stats_map) -> bool.
-# L'ordine e' quello di visualizzazione nella vetrina del profilo.
+# L'ordine è quello di visualizzazione nella vetrina del profilo.
 CATALOG = [
     {"id": "first_correct", "icon": "🎯", "title": "Battesimo del fuoco",
      "description": "La tua prima risposta giusta.",
@@ -77,7 +77,7 @@ def _public(item, unlocked=False, unlocked_at=None):
 
 
 def unlocked_map(auth_id):
-    """{achievement_id: unlocked_at} degli achievement gia' sbloccati."""
+    """{achievement_id: unlocked_at} degli achievement già sbloccati."""
     if not auth_id:
         return {}
     with session_scope() as s:
@@ -89,7 +89,7 @@ def unlocked_map(auth_id):
 
 def evaluate(auth_id):
     """Registra gli achievement appena raggiunti e li restituisce (voci
-    pubbliche). Idempotente: uno gia' sbloccato non si ripropone. Tollerante:
+    pubbliche). Idempotente: uno già sbloccato non si ripropone. Tollerante:
     se il DB non risponde, nessuno sblocco (la risposta di gioco non deve cadere)."""
     if not auth_id:
         return []

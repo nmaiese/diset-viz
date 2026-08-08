@@ -995,7 +995,7 @@ T18018;Ambito di RENDE;ITF6
 T18019;Ambito di ROGLIANO;ITF6
 T18020;Ambito di SAN GIOVANNI IN FIORE;ITF6
 T18021;Ambito di CROTONE;ITF6
-T18022;Ambito di CIRO' MARINA;ITF6
+T18022;Ambito di CIRÒ MARINA;ITF6
 T18023;Ambito di MESORACA;ITF6
 T18024;Distretto di Reggio Calabria 2;ITF6_OTH_TERR
 T18025;Distretto di Reggio Calabria 1;ITF6_OTH_TERR
@@ -2950,7 +2950,7 @@ ITF31_NC;comuni non capoluogo;ITF31
 029013;Castelnovo Bariano;ITD37
 093011;Castelnovo del Friuli;ITD41
 035015;Castelnovo di Sotto;ITD53
-035016;Castelnovo ne' Monti;ITD53
+035016;Castelnovo né Monti;ITD53
 022049;Castelnuovo;ITD20
 005029;Castelnuovo Belbo;ITC17
 052006;Castelnuovo Berardenga;ITE19
@@ -7913,7 +7913,7 @@ ITF35_NC;comuni non capoluogo;ITF35
 030099;San Daniele del Friuli;ITD42
 019089;San Daniele Po;ITC4A
 078114;San Demetrio Corone;ITF61
-066087;San Demetrio ne' Vestini;ITF11
+066087;San Demetrio né Vestini;ITF11
 001239;San Didero;ITC11
 027033;San Donà di Piave;ITD35
 074013;San Donaci;ITF44
@@ -10045,7 +10045,7 @@ ITE41_NC;comuni non capoluogo;ITE41
 087054;Vizzini;ITG17
 012140;Vizzola Ticino;ITC41
 015244;Vizzolo Predabissi;ITC45
-028105;Vo';ITD36
+028105;Vò;ITD36
 017204;Vobarno;ITC47
 010066;Vobbia;ITC33
 002166;Vocca;ITC12
@@ -10334,7 +10334,7 @@ SLL_197;Borgo Val Di Taro;IT_OTH_TERR
 SLL_198;Fidenza;IT_OTH_TERR
 SLL_199;Langhirano;IT_OTH_TERR
 SLL_200;Parma;IT_OTH_TERR
-SLL_201;Castelnovo ne' Monti;IT_OTH_TERR
+SLL_201;Castelnovo né Monti;IT_OTH_TERR
 SLL_202;Guastalla;IT_OTH_TERR
 SLL_203;Reggio Nell'emilia;IT_OTH_TERR
 SLL_204;Villa Minozzo;IT_OTH_TERR
@@ -11015,7 +11015,7 @@ SLL_2011_804;Borgo Val Di Taro;IT_OTH_TERR
 SLL_2011_805;Fidenza;IT_OTH_TERR
 SLL_2011_806;Langhirano;IT_OTH_TERR
 SLL_2011_807;Parma;IT_OTH_TERR
-SLL_2011_808;Castelnovo Ne' Monti;IT_OTH_TERR
+SLL_2011_808;Castelnovo Né Monti;IT_OTH_TERR
 SLL_2011_809;Correggio;IT_OTH_TERR
 SLL_2011_810;Guastalla;IT_OTH_TERR
 SLL_2011_811;Reggio Nell'Emilia;IT_OTH_TERR
@@ -11731,7 +11731,7 @@ SLL_2021_802;Piacenza;IT_OTH_TERR
 SLL_2021_803;Borgo Val Di Taro;IT_OTH_TERR
 SLL_2021_804;Fidenza;IT_OTH_TERR
 SLL_2021_805;Parma;IT_OTH_TERR
-SLL_2021_806;Castelnovo Ne' Monti;IT_OTH_TERR
+SLL_2021_806;Castelnovo Né Monti;IT_OTH_TERR
 SLL_2021_807;Guastalla;IT_OTH_TERR
 SLL_2021_808;Reggio Nell'Emilia;IT_OTH_TERR
 SLL_2021_809;Carpi;IT_OTH_TERR

@@ -1,4 +1,4 @@
-"""Gioco 'Indovina la Regione': un indicatore alla volta, sei tentativi.
+"""Gioco 'Indovina la Regioné: un indicatore alla volta, sei tentativi.
 
 Stateless per design (come il resto del backend, nessuna sessione/DB): il
 puzzle è ricostruito deterministicamente da un puzzle_id a ogni chiamata,

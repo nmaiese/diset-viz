@@ -5,7 +5,7 @@
 - **Data** 1 maggio 2026
 - **URL** https://www.youtrend.it/2026/05/01/primo-maggio-gli-italiani-e-il-lavoro-cuneo-fiscale-e-salario-minimo-le-priorita/
 - **Forma di storia** una distribuzione di risposte letta cifra per cifra
-- **Da usare quando** il tuo articolo e' fatto soprattutto di percentuali da
+- **Da usare quando** il tuo articolo è fatto soprattutto di percentuali da
   mettere in fila: un `quadro` con la classifica, una distribuzione che si
   commenta da sola
 
@@ -32,29 +32,29 @@
 > d'acquisto trasversale, più che un'adesione a una specifica visione ideologica
 > del lavoro.
 
-**Avvertenza tipografica.** Il testo qui sopra e' verbatim e contiene due
+**Avvertenza tipografica.** Il testo qui sopra è verbatim e contiene due
 lineette lunghe `—` nell'inciso del primo paragrafo, che `content/STYLE.md`
 vieta. Da noi quell'inciso si scioglie con le virgole o si spezza in due frasi.
 Si copia il movimento, mai un carattere.
 
-## Perche' si legge al primo passaggio
+## Perché si legge al primo passaggio
 
 **Ogni percentuale sta in fondo alla clausola, come esito.** "la indica il 40%
 degli intervistati", "che raccoglie il 35% delle preferenze", "citato solo dal
-9%". Mai in apertura, dove non avrebbe ancora un referente. E' la mossa piu'
+9%". Mai in apertura, dove non avrebbe ancora un referente. È la mossa più
 copiabile di tutte per le nostre pagine, dove il numero tende a partire per
-primo perche' e' quello che il brief stampa per primo.
+primo perché è quello che il brief stampa per primo.
 
 **La somma la fa lui, non il lettore.** "Insieme, le due opzioni rappresentano i
-tre quarti degli italiani". E il residuo dei "non so" e' dichiarato nella stessa
-frase, cosi' il totale torna e nessuno resta a contare.
+tre quarti degli italiani". E il residuo dei "non so" è dichiarato nella stessa
+frase, così il totale torna e nessuno resta a contare.
 
 **Il commento arriva dopo i due punti, separato dal dato.** "citato solo dal 9%:
 un dato che suggerisce come..." Il lettore vede dove finisce la misura e comincia
-l'interpretazione. Da noi questo confine e' il posto dove nasce la classe di
+l'interpretazione. Da noi questo confine è il posto dove nasce la classe di
 errore `causale`, e tenerlo tipograficamente visibile aiuta a non attraversarlo
 per sbaglio.
 
-**Il verbo e' calibrato.** "suggerisce come", "riflette una domanda", "non sono
-necessariamente in contraddizione". Nessuna causa affermata, e la cautela non e'
-un inciso appiccicato: e' il verbo stesso.
+**Il verbo è calibrato.** "suggerisce come", "riflette una domanda", "non sono
+necessariamente in contraddizione". Nessuna causa affermata, e la cautela non è
+un inciso appiccicato: è il verbo stesso.

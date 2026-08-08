@@ -1,11 +1,18 @@
-// Console di monitoraggio della catena, in tempo reale.
+// La console della catena: tre orizzonti, due punti di vista, una pagina.
 //
-// Sostituisce il ?token= e il full-reload ogni 60s: login Google ristretto (la
-// vera guardia e' la RLS su Postgres, questo controllo lato client e' solo per
-// il messaggio), poi lettura iniziale e sottoscrizione Realtime alle tabelle
-// pipeline_activity e pipeline_tokens. Un tick appare senza refresh.
+// Una run adesso è **un workflow** con dentro N agenti, non un indicatore che
+// attraversa stadi. La console lo mostra così:
 //
-// Vanilla, nessun React: la console e' una tabella viva, non un'app.
+//   ADESSO        che sta girando ora, in push da Supabase Realtime;
+//   Run           una riga per workflow, apribile sui suoi agenti;
+//   Indicatori    lo stesso fatto per indicatore: che cosa è stato scritto o
+//                 riscritto, con quale tesi, e se ha coperto una pagina che
+//                 esisteva.
+//
+// Le due viste sono due bottoni e non due rotte: sono lo stesso stato guardato
+// da due lati, e un clic passa dall'uno all'altro portandosi dietro il filtro.
+//
+// Vanilla, nessun React: è una tabella viva, non un'app.
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -13,12 +20,26 @@ const cfg = window.__supabase || null;
 const adminEmail = (window.__monitorAdminEmail || "").toLowerCase();
 const root = document.getElementById("monitor-root");
 
+// Le cinque fasi della catena, nell'ordine in cui girano. Serve alla spina
+// dorsale di ADESSO, che deve mostrare anche le fasi non ancora arrivate: senza
+// quelle si vedrebbe il passato e non a che punto è la run.
+const FASI = ["Dossier", "Contesto", "Scrittura", "Verifica", "Pubblicazione"];
+
+// Stato di modulo: i dati fetchati e i filtri, così un cambio di filtro
+// ridisegna senza rifetchare.
+let runsData = null;
+let indicatoriData = null;
+let vista = "run";
+let pagina = 0;
+const PAGINA = 25;
+const aperte = new Set();
+
 function h(html) {
   root.innerHTML = html;
 }
 
 if (!cfg || !cfg.url || !cfg.anonKey) {
-  h('<p class="mon-msg">Console non configurata: mancano le identita' + " Supabase.</p>");
+  h('<p class="mon-msg">Console non configurata: mancano le identità Supabase.</p>');
 } else {
   boot(createClient(cfg.url, cfg.anonKey, { auth: { persistSession: true, detectSessionInUrl: true } }));
 }
@@ -53,7 +74,7 @@ function deniedView(supabase, email) {
   h(
     '<div class="mon-gate">' +
       "<h1>Console catena</h1>" +
-      "<p>L'account <strong>" + escapeHtml(email) + "</strong> non e' autorizzato.</p>" +
+      "<p>L'account <strong>" + escapeHtml(email) + "</strong> non è autorizzato.</p>" +
       '<button id="mon-logout" class="mon-btn">Esci</button>' +
       "</div>"
   );
@@ -61,117 +82,69 @@ function deniedView(supabase, email) {
 }
 
 async function render(supabase, currentUser) {
-  // Ogni render riparte da zero: rimuovi eventuali canali gia' aperti, cosi' un
-  // TOKEN_REFRESHED (che rida' lo stesso utente) non accumula sottoscrizioni ne'
-  // duplica le refresh().
+  // Ogni render riparte da zero: rimuovi i canali già aperti, così un
+  // TOKEN_REFRESHED (che ridà lo stesso utente) non accumula sottoscrizioni.
   supabase.removeAllChannels();
 
   if (!currentUser) return loginView(supabase);
   const email = (currentUser.email || "").toLowerCase();
   if (adminEmail && email !== adminEmail) return deniedView(supabase, email);
 
+  leggiHash();
+
   h(
-    '<div class="mon-live">' +
-      '<div class="mon-head"><h1>Console catena</h1>' +
+    '<div class="mon-head"><h1>Console catena</h1>' +
       '<span class="mon-dot" title="in ascolto"></span>' +
-      '<button id="mon-logout" class="mon-btn mon-btn--ghost">Esci</button></div>' +
-      // Il vivo (push da Supabase Realtime): battiti dei ruoli in volo, token per run.
-      '<section><h2>Battiti e PR</h2><div id="mon-activity" class="mon-table">Carico...</div></section>' +
-      '<section><h2>Token per run</h2><div id="mon-tokens" class="mon-table">Carico...</div></section>' +
-      // La storia (fetch authed dai file git via /_pipeline/api): catalogo e cronologia.
-      "<section>" +
-        '<div class="mon-head2"><h2>Catalogo indicatori</h2><button id="cat-refresh" class="mon-btn mon-btn--ghost mon-btn--sm">Aggiorna</button></div>' +
-        '<div id="cat-coverage" class="mon-coverage"></div>' +
-        '<div class="mon-filters">' +
-          '<input id="cat-q" type="search" placeholder="Cerca nome, codice, stato, bandiera">' +
-          '<select id="cat-status"><option value="">Tutte le lavorazioni</option></select>' +
-          '<select id="cat-phase"><option value="">Tutte le fasi</option></select>' +
-          '<select id="cat-owner"><option value="">Tutti i prossimi ruoli</option></select>' +
-        "</div>" +
-        '<div id="cat-totals" class="mon-totals"></div>' +
-        '<div id="cat-legend"></div>' +
-        '<div id="mon-catalog" class="mon-table">Carico...</div>' +
-      "</section>" +
-      "<section>" +
-        '<div class="mon-head2"><h2>Cronologia azioni</h2><button id="run-refresh" class="mon-btn mon-btn--ghost mon-btn--sm">Aggiorna</button></div>' +
-        '<div class="mon-filters">' +
-          '<input id="run-q" type="search" placeholder="Cerca indicatore, summary, run">' +
-          '<select id="run-stage"><option value="">Tutti gli stadi</option></select>' +
-          '<select id="run-outcome"><option value="">Tutti gli esiti</option></select>' +
-          '<label class="mon-date">da <input id="run-from" type="date"></label>' +
-          '<label class="mon-date">a <input id="run-to" type="date"></label>' +
-        "</div>" +
-        '<div id="run-totals" class="mon-totals"></div>' +
-        '<div id="mon-runs" class="mon-table">Carico...</div>' +
-      "</section>" +
-      "</div>"
+      '<button id="mon-logout" class="mon-btn mon-btn--ghost mon-btn--sm">Esci</button></div>' +
+
+      '<h2>Adesso</h2><div id="mon-adesso"><p class="mon-empty">Carico...</p></div>' +
+
+      '<div class="mon-tabs" role="tablist">' +
+        '<button class="mon-tab" id="tab-run" role="tab">Run</button>' +
+        '<button class="mon-tab" id="tab-ind" role="tab">Indicatori</button>' +
+      "</div>" +
+      '<div class="mon-filters">' +
+        '<input id="f-q" type="search" placeholder="Cerca indicatore, run, tesi, agente">' +
+        '<select id="f-esito"><option value="">Tutti gli esiti</option></select>' +
+        '<label class="mon-date">da <input id="f-da" type="date"></label>' +
+        '<label class="mon-date">a <input id="f-a" type="date"></label>' +
+        '<button id="f-aggiorna" class="mon-btn mon-btn--ghost mon-btn--sm">Aggiorna</button>' +
+      "</div>" +
+      '<div id="mon-totali" class="mon-totals-row"></div>' +
+      '<details class="mon-nota"><summary>Perché il costo è un pavimento</summary>' +
+        "<p>Il costo si misura leggendo i trascritti, e un trascritto può essere " +
+        "incompleto: in una run reale un agente ha registrato due token di output " +
+        "sulla richiesta che restituiva una bozza intera. La misura è fedele a " +
+        "quello che il trascritto dice, quindi ogni totale è un minimo e non una " +
+        "cifra esatta.</p></details>" +
+      '<div id="mon-lista" class="mon-table"><p class="mon-empty">Carico...</p></div>'
   );
+
   document.getElementById("mon-logout").onclick = () => supabase.auth.signOut();
+  document.getElementById("tab-run").onclick = () => cambiaVista("run");
+  document.getElementById("tab-ind").onclick = () => cambiaVista("indicatori");
+  document.getElementById("f-aggiorna").onclick = () => carica(supabase);
+  ["f-q", "f-esito", "f-da", "f-a"].forEach((id) => {
+    const el = document.getElementById(id);
+    el.oninput = () => { pagina = 0; disegna(); };
+    el.onchange = () => { pagina = 0; disegna(); };
+  });
+  window.addEventListener("hashchange", () => { leggiHash(); disegna(); });
 
-  await refresh(supabase);
-  await loadHistory(supabase);
-  // Realtime: a ogni cambiamento sulle due tabelle, rileggi il vivo (le tabelle
-  // sono piccole, una rilettura completa e' piu' semplice del merge
-  // incrementale). Catalogo e cronologia sono storia dai file git, non push:
-  // fetch al caricamento e sul bottone Aggiorna, non a ogni tick.
+  await carica(supabase);
+
+  // Realtime: a ogni cambiamento sulle due tabelle si rilegge tutto. Le tabelle
+  // sono piccole e la rilettura completa è più semplice (e meno fragile) di un
+  // merge incrementale, che dovrebbe conoscere quale delle due sorgenti ha
+  // scritto quale colonna.
   supabase
-    .channel("pipeline")
-    // Un battito cambia gli in_flight: la board li fonde lato server, quindi
-    // rifetchala oltre alle tabelle vive, o un indicatore appena avviato resterebbe
-    // "in coda" nel catalogo fino a un Aggiorna manuale. La board e' memoizzata 30s
-    // lato server, quindi rifetchare a ogni evento e' a buon mercato.
-    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_activity" }, () => {
-      refresh(supabase);
-      loadBoard(supabase);
-    })
-    // I token cambiano i totali della board (tokens_total) e la colonna token
-    // della cronologia: rifetcha entrambe oltre alla tabella viva.
-    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_tokens" }, () => {
-      refresh(supabase);
-      loadBoard(supabase);
-      loadRuns(supabase);
-    })
+    .channel("cruscotto")
+    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_run" }, () => caricaFraPoco(supabase))
+    .on("postgres_changes", { event: "*", schema: "public", table: "pipeline_agente" }, () => caricaFraPoco(supabase))
     .subscribe();
-
-  document.getElementById("cat-refresh").onclick = () => loadBoard(supabase);
-  document.getElementById("run-refresh").onclick = () => loadRuns(supabase);
-  ["cat-q", "cat-status", "cat-phase", "cat-owner"].forEach((id) => {
-    document.getElementById(id).oninput = renderCatalogReset;
-    document.getElementById(id).onchange = renderCatalogReset;
-  });
-  ["run-q", "run-stage", "run-outcome", "run-from", "run-to"].forEach((id) => {
-    document.getElementById(id).oninput = renderRunsReset;
-    document.getElementById(id).onchange = renderRunsReset;
-  });
 }
 
-// La storia authed. Il Bearer del login Google e' lo stesso confine mail-admin
-// del backend; senza, i due endpoint fanno 404 (endpoint interno, non conferma
-// di esistere). I due dati si tengono in modulo cosi' i filtri ridisegnano
-// senza rifetchare.
-let boardData = null;
-let runsData = null;
-
-// Paginazione del catalogo: 383 indicatori in una tabella sola sono troppi.
-// Pagina lato client, la pagina attiva in stato di modulo. Un cambio di filtro
-// riparte da pagina 1 (renderCatalogReset); i bottoni pagina non azzerano.
-let catPage = 0;
-const CAT_PAGE_SIZE = 50;
-
-function renderCatalogReset() {
-  catPage = 0;
-  renderCatalog();
-}
-
-// Stessa paginazione, sulla cronologia: senza pager la pagina renderizzava ogni
-// run del diario in un colpo solo (141 file oggi), un'unica tabella lunghissima.
-let runPage = 0;
-const RUN_PAGE_SIZE = 50;
-
-function renderRunsReset() {
-  runPage = 0;
-  renderRuns();
-}
+// --- dati ------------------------------------------------------------------
 
 async function getToken(supabase) {
   const { data } = await supabase.auth.getSession();
@@ -190,366 +163,484 @@ async function authedJson(supabase, path) {
   }
 }
 
-async function loadHistory(supabase) {
-  await Promise.all([loadBoard(supabase), loadRuns(supabase)]);
+async function carica(supabase) {
+  const [runs, indicatori] = await Promise.all([
+    authedJson(supabase, "/_pipeline/api/runs"),
+    authedJson(supabase, "/_pipeline/api/indicatori"),
+  ]);
+  runsData = runs;
+  indicatoriData = indicatori;
+  disegna();
 }
 
-async function loadBoard(supabase) {
-  const data = await authedJson(supabase, "/_pipeline/api/board");
-  boardData = data;
-  const rows = (data && data.rows) || [];
-  // La lavorazione (`work_status`) e la lista ordinata (`status_order`) sono
-  // decise una volta sola lato server (`scripts/pipeline_monitor.py`), non
-  // ridedotte qui: prima questa traduzione stato-grezzo -> etichetta viveva
-  // solo in questo file, una seconda verita' che poteva divergere da /_pipeline.
-  const order = (data && data.status_order) || [];
-  fillOptions("cat-status", order.filter((s) => rows.some((r) => r.work_status === s)));
-  fillOptions("cat-phase", uniq(rows.map((r) => r.phase)));
-  fillOptions("cat-owner", uniq(rows.map((r) => r.next_step && r.next_step.owner)));
-  renderCatalog();
+// Realtime spara un evento per riga cambiata, e durante una run le righe
+// cambiano a ogni giro del lettore: senza freno la console rifetcherebbe le due
+// API decine di volte al minuto per mostrare lo stesso stato. Si accumula e si
+// legge una volta sola.
+let attesa = null;
+function caricaFraPoco(supabase) {
+  if (attesa) return;
+  attesa = setTimeout(() => { attesa = null; carica(supabase); }, 1200);
 }
 
-async function loadRuns(supabase) {
-  const data = await authedJson(supabase, "/_pipeline/api/runs");
-  runsData = data;
-  const runs = (data && data.runs) || [];
-  fillOptions("run-stage", uniq(runs.map((r) => r.stage)));
-  fillOptions("run-outcome", uniq(runs.map((r) => r.outcome)));
-  renderRuns();
+// --- navigazione -----------------------------------------------------------
+
+function leggiHash() {
+  const hash = (window.location.hash || "").replace(/^#/, "");
+  // `chiave` e non `valore`: `valore()` e' la funzione che legge i filtri, e
+  // ombreggiarla qui dentro sarebbe una trappola per chi tocca questa funzione.
+  const [nome, chiave] = hash.split("/");
+  if (nome === "indicatori") vista = "indicatori";
+  else if (nome === "run") vista = "run";
+  if (chiave) aperte.add(decodeURIComponent(chiave));
 }
 
-function uniq(values) {
-  return Array.from(new Set(values.filter(Boolean))).sort((a, b) => String(a).localeCompare(String(b), "it"));
+function cambiaVista(prossima) {
+  vista = prossima;
+  pagina = 0;
+  window.location.hash = prossima;
+  disegna();
 }
 
-function fillOptions(id, values) {
+// Un clic su un indicatore dalla vista Run porta alla sua storia, e viceversa:
+// le due viste sono lo stesso fatto, non due destinazioni separate.
+function vaiA(prossima, chiave, filtro) {
+  vista = prossima;
+  pagina = 0;
+  aperte.add(chiave);
+  const q = document.getElementById("f-q");
+  if (q && filtro != null) q.value = filtro;
+  window.location.hash = prossima + "/" + encodeURIComponent(chiave);
+  disegna();
+}
+
+// --- disegno ---------------------------------------------------------------
+
+function disegna() {
+  disegnaAdesso();
+  const tabRun = document.getElementById("tab-run");
+  const tabInd = document.getElementById("tab-ind");
+  if (tabRun) tabRun.setAttribute("aria-selected", String(vista === "run"));
+  if (tabInd) tabInd.setAttribute("aria-selected", String(vista === "indicatori"));
+  if (vista === "run") disegnaRun();
+  else disegnaIndicatori();
+}
+
+function disegnaAdesso() {
+  const el = document.getElementById("mon-adesso");
+  if (!el) return;
+  // Rete caduta e catena ferma sono due cose diverse, e il posto dove
+  // confonderle fa piu' danno e' proprio qui: "nessuna run" mentre una run gira
+  // e' la bugia peggiore che questa pagina possa dire.
+  if (!runsData) {
+    el.innerHTML = '<p class="mon-empty">Non riesco a leggere le run (login o rete).</p>';
+    return;
+  }
+  const runs = runsData.runs || [];
+  if (!runs.length) {
+    el.innerHTML = '<p class="mon-empty">Nessuna run registrata.</p>';
+    return;
+  }
+  const volo = runs.filter((r) => r.in_volo);
+  if (!volo.length) {
+    const ultima = runs[0];
+    el.innerHTML =
+      '<div class="mon-adesso mon-adesso--ferma">' +
+        '<div class="mon-adesso-testa"><strong>Nessuna run in volo</strong>' +
+        "<span>ultima " + escapeHtml(quando(ultima.avviata_il)) + " · " +
+        escapeHtml(ultima.workflow || ultima.run_id) + " · " +
+        badgeEsitoRun(ultima) + "</span></div></div>";
+    return;
+  }
+  el.innerHTML = volo.map(cardVolo).join("");
+}
+
+function cardVolo(run) {
+  const agenti = run.agenti || [];
+  const aperto = agenti.filter((a) => a.stato_vivo === "aperto");
+  const spina = FASI.map((fase) => {
+    const dentro = agenti.filter((a) => a.fase === fase);
+    const pallini = dentro.length
+      ? dentro.map((a) => '<span class="' + (a.stato_vivo === "aperto" ? "aperto" : "fatto") + '">' +
+          (a.stato_vivo === "aperto" ? "◐" : "●") + "</span>").join("")
+      : '<span class="attesa">○</span>';
+    const corrente = dentro.some((a) => a.stato_vivo === "aperto");
+    return '<div class="mon-fase' + (corrente ? " mon-fase--corrente" : "") + '">' +
+      '<span class="mon-fase-nome">' + escapeHtml(fase) + "</span>" +
+      '<span class="mon-pallini">' + pallini + "</span></div>";
+  }).join("");
+  const codici = uniq(agenti.map((a) => a.indicatore));
+  return (
+    '<div class="mon-adesso">' +
+      '<div class="mon-adesso-testa">' +
+        // Il nome del workflow arriva col consuntivo: mentre gira si mostra
+        // quello che si sa davvero, cioe' la run e i suoi indicatori.
+        "<strong>" + escapeHtml(run.workflow || "Run in corso") + "</strong>" +
+        "<span>" + escapeHtml(codici.join(", ") || "indicatore non ancora noto") + "</span>" +
+        "<span>da " + escapeHtml(durataDa(run.avviata_il)) + "</span>" +
+        "<span>" + escapeHtml(run.run_id) + "</span>" +
+      "</div>" +
+      '<div class="mon-spina">' + spina + "</div>" +
+      (aperto.length
+        ? '<div class="mon-aperto">aperto ' + aperto.map((a) =>
+            "<strong>" + escapeHtml(a.label || a.agent_type || a.agent_id) + "</strong> " +
+            escapeHtml(a.agent_type) + (a.modello ? " · " + escapeHtml(a.modello) : "") +
+            " · da " + escapeHtml(durataDa(a.avviato_il))).join(" &middot; ") + "</div>"
+        : '<div class="mon-aperto">nessun agente aperto in questo momento</div>') +
+    "</div>"
+  );
+}
+
+// --- vista Run -------------------------------------------------------------
+
+function disegnaRun() {
+  const el = document.getElementById("mon-lista");
+  if (!el) return;
+  if (!runsData) return (el.innerHTML = '<p class="mon-empty">Run non disponibili (login o rete).</p>');
+  const tutte = runsData.runs || [];
+  opzioni("f-esito", uniq(tutte.map((r) => etichettaEsitoRun(r))));
+  const righe = tutte.filter((r) => passaFiltro(chiaveRun(r), r.avviata_il, etichettaEsitoRun(r)));
+
+  totali([
+    ['<span class="mon-chip mon-chip--strong">' + righe.length + " run</span>"],
+    ['<span class="mon-chip">' + somma(righe, "agenti") + " agenti</span>"],
+    ['<span class="mon-chip">' + somma(righe, "turni") + " turni</span>"],
+    ['<span class="mon-chip">' + euro(righe.reduce((a, r) => a + (r.costo || 0), 0)) + " pavimento</span>"],
+  ]);
+
+  if (!righe.length) return (el.innerHTML = '<p class="mon-empty">Nessuna run col filtro attuale.</p>');
+  const { fetta, pager } = impagina(righe);
+
+  el.innerHTML =
+    pager +
+    '<table class="mon-cards"><thead><tr>' +
+      "<th>Quando</th><th>Workflow</th><th>Indicatore</th><th>Esito</th>" +
+      '<th class="mon-num">Durata</th><th class="mon-num">Agenti</th>' +
+      '<th class="mon-num">Turni</th><th class="mon-num">Costo</th>' +
+    "</tr></thead><tbody>" +
+    fetta.map(rigaRun).join("") +
+    "</tbody></table>" +
+    pager;
+
+  collega(el);
+}
+
+function rigaRun(run) {
+  const codici = uniq((run.agenti || []).map((a) => a.indicatore));
+  const apri = aperte.has(run.run_id);
+  const riga =
+    '<tr class="mon-riga' + (apri ? " mon-aperta" : "") + '" data-chiave="' + escapeHtml(run.run_id) + '">' +
+      '<td data-label="Quando">' + escapeHtml(quando(run.avviata_il)) + "<small>" + escapeHtml(run.run_id) + "</small></td>" +
+      '<td data-label="Workflow">' + escapeHtml(run.workflow || "") + "</td>" +
+      '<td data-label="Indicatore">' + (codici.length
+        ? codici.map((c) => '<button type="button" class="mon-link" data-vai="' + escapeHtml(c) + '">' + escapeHtml(c) + "</button>").join(", ")
+        : "") + "</td>" +
+      '<td data-label="Esito">' + badgeEsitoRun(run) + "</td>" +
+      '<td data-label="Durata" class="mon-num">' + escapeHtml(durata(run.durata_ms)) + "</td>" +
+      '<td data-label="Agenti" class="mon-num">' + (run.agenti != null ? run.agenti : (run.agenti_visti || "")) + "</td>" +
+      '<td data-label="Turni" class="mon-num">' + (run.turni != null ? run.turni : "") + "</td>" +
+      '<td data-label="Costo" class="mon-num">' + (run.costo != null ? euro(run.costo) : "") + "</td>" +
+    "</tr>";
+  return apri ? riga + '<tr><td class="mon-dettaglio" colspan="8">' + dettaglioRun(run) + "</td></tr>" : riga;
+}
+
+function dettaglioRun(run) {
+  const agenti = (run.agenti || []).slice().sort((a, b) => (a.avviato_il || "").localeCompare(b.avviato_il || ""));
+  const tabella =
+    '<table class="mon-agenti"><thead><tr>' +
+      "<th>Agente</th><th>Fase</th><th>Tipo</th><th>Modello</th><th>Stato</th>" +
+      '<th class="mon-num">Turni</th><th class="mon-num">Tool</th>' +
+      '<th class="mon-num">Cache letta</th><th class="mon-num">Output</th><th class="mon-num">Costo</th>' +
+    "</tr></thead><tbody>" +
+    agenti.map((a) =>
+      "<tr>" +
+        '<td class="mon-label">' + escapeHtml(a.label || a.agent_id) +
+          (a.indicatore ? "<small>" + escapeHtml(a.indicatore) + "</small>" : "") + "</td>" +
+        "<td>" + escapeHtml(a.fase || "") +
+          (a.fase_stimata && a.fase ? ' <span class="mon-stimata">stimata</span>' : "") + "</td>" +
+        "<td>" + escapeHtml(a.agent_type || "") + "</td>" +
+        "<td>" + escapeHtml(a.modello || "") + "</td>" +
+        "<td>" + escapeHtml(a.stato || a.stato_vivo || "") + "</td>" +
+        '<td class="mon-num">' + (a.turni != null ? a.turni : "") + "</td>" +
+        '<td class="mon-num">' + (a.tool != null ? a.tool : "") + "</td>" +
+        '<td class="mon-num">' + numero(a.token && a.token.cache_r) + "</td>" +
+        '<td class="mon-num">' + numero(a.token && a.token.out) + "</td>" +
+        '<td class="mon-num">' + (a.costo != null ? euro(a.costo) : "") + "</td>" +
+      "</tr>" +
+      (a.risultato != null
+        ? '<tr><td colspan="10"><details class="mon-json"><summary>che cosa ha restituito ' +
+          escapeHtml(a.label || a.agent_id) + "</summary><pre>" +
+          escapeHtml(JSON.stringify(a.risultato, null, 1)) + "</pre></details></td></tr>"
+        : "")
+    ).join("") +
+    "</tbody></table>";
+  const logs = (run.logs || []).length
+    ? '<details class="mon-json"><summary>' + run.logs.length + " righe di log del workflow</summary><ul class=\"mon-elenco\">" +
+      run.logs.map((l) => "<li>" + escapeHtml(l) + "</li>").join("") + "</ul></details>"
+    : "";
+  const esito = run.esito != null
+    ? '<details class="mon-json"><summary>esito della run</summary><pre>' +
+      escapeHtml(JSON.stringify(run.esito, null, 1)) + "</pre></details>"
+    : "";
+  return tabella + logs + esito;
+}
+
+// --- vista Indicatori ------------------------------------------------------
+
+function disegnaIndicatori() {
+  const el = document.getElementById("mon-lista");
+  if (!el) return;
+  if (!indicatoriData) return (el.innerHTML = '<p class="mon-empty">Indicatori non disponibili (login o rete).</p>');
+  const tutti = indicatoriData.indicatori || [];
+  opzioni("f-esito", uniq(tutti.map((r) => r.esito)));
+  const righe = tutti.filter((r) => passaFiltro(chiaveIndicatore(r), r.at, r.esito));
+
+  const riscritti = righe.filter((r) => r.sovrascritto).length;
+  totali([
+    ['<span class="mon-chip mon-chip--strong">' + righe.length + " scritture</span>"],
+    ['<span class="mon-chip">' + righe.filter((r) => r.scritto).length + " arrivate a pagina</span>"],
+    ['<span class="mon-chip">' + riscritti + " hanno sovrascritto</span>"],
+    ['<span class="mon-chip">' + righe.filter((r) => r.esito === "fermato").length + " fermate</span>"],
+  ]);
+
+  if (!righe.length) return (el.innerHTML = '<p class="mon-empty">Nessuna scrittura col filtro attuale.</p>');
+  const { fetta, pager } = impagina(righe);
+
+  el.innerHTML =
+    pager +
+    '<table class="mon-cards"><thead><tr>' +
+      "<th>Indicatore</th><th>Quando</th><th>Esito</th><th>Tesi</th>" +
+      '<th class="mon-num">Parole</th><th class="mon-num">Giri</th>' +
+      '<th class="mon-num">Rilievi</th><th>Sovrascritto</th>' +
+    "</tr></thead><tbody>" +
+    fetta.map(rigaIndicatore).join("") +
+    "</tbody></table>" +
+    pager;
+
+  collega(el);
+}
+
+function chiaveRiga(r) {
+  return r.indicatore + "@" + r.run_id;
+}
+
+function rigaIndicatore(r) {
+  const apri = aperte.has(chiaveRiga(r));
+  const nome = r.published_url
+    ? '<a href="' + escapeHtml(r.published_url) + '" target="_blank" rel="noopener">' + escapeHtml(r.indicatore) + " &#8599;</a>"
+    : escapeHtml(r.indicatore);
+  const riga =
+    '<tr class="mon-riga' + (apri ? " mon-aperta" : "") + '" data-chiave="' + escapeHtml(chiaveRiga(r)) + '">' +
+      '<td data-label="Indicatore">' + nome + "</td>" +
+      '<td data-label="Quando">' + escapeHtml(quando(r.at)) +
+        '<small><button type="button" class="mon-link" data-vai-run="' + escapeHtml(r.run_id) + '">' +
+        escapeHtml(r.run_id) + "</button></small></td>" +
+      '<td data-label="Esito">' + badgeEsito(r.esito) +
+        (r.motivo ? "<small>" + escapeHtml(r.motivo) + "</small>" : "") + "</td>" +
+      '<td data-label="Tesi">' + escapeHtml(taglia(r.angolo, 90)) + "</td>" +
+      '<td data-label="Parole" class="mon-num">' + (r.parole != null ? r.parole : "") + "</td>" +
+      '<td data-label="Giri" class="mon-num">' + (r.giri_di_correzione != null ? r.giri_di_correzione : "") + "</td>" +
+      '<td data-label="Rilievi" class="mon-num">' + ((r.rilievi_aperti || []).length || "") + "</td>" +
+      '<td data-label="Sovrascritto">' + (r.sovrascritto
+        ? '<span class="mon-sovra">sì' + (r.vintage_precedente != null
+            ? "<small>copriva il " + escapeHtml(String(r.vintage_precedente)) + "</small>" : "") + "</span>"
+        : (r.sovrascritto === false ? "no" : "")) + "</td>" +
+    "</tr>";
+  return apri ? riga + '<tr><td class="mon-dettaglio" colspan="8">' + dettaglioIndicatore(r) + "</td></tr>" : riga;
+}
+
+function dettaglioIndicatore(r) {
+  const pezzi = [];
+  if (r.angolo) pezzi.push("<p><strong>Tesi</strong>: " + escapeHtml(r.angolo) + "</p>");
+  if ((r.impaginazione || []).length) {
+    pezzi.push("<p><strong>Come la vede un lettore</strong></p><ul class=\"mon-elenco\">" +
+      r.impaginazione.map((s) => "<li>" + escapeHtml((s.role || "") + ": " + (s.h2 || "")) +
+        (s.scritta === false ? " (persa)" : "") + "</li>").join("") + "</ul>");
+  }
+  if ((r.rilievi_aperti || []).length) {
+    pezzi.push("<p><strong>Rilievi aperti, usciti col pezzo</strong></p><ul class=\"mon-elenco\">" +
+      r.rilievi_aperti.map((s) => "<li>" + escapeHtml(
+        typeof s === "string" ? s
+          : [s.gravita || "senza gravità", s.tipo, s.dove, s.cosa_dice_il_testo].filter(Boolean).join(" | ")
+      ) + "</li>").join("") + "</ul>");
+  }
+  if ((r.rilievi || []).length) {
+    pezzi.push("<p><strong>Rilievi del lint</strong></p><ul class=\"mon-elenco\">" +
+      r.rilievi.map((s) => "<li>" + escapeHtml([s.severity, s.rule, s.detail].filter(Boolean).join(" · ")) + "</li>").join("") +
+      "</ul>");
+  }
+  const dettagli = [
+    r.cifre_verificate != null ? r.cifre_verificate + " cifre verificate" : null,
+    r.percorso ? "scritto in " + r.percorso : null,
+    r.costo != null ? euro(r.costo) + " la run (pavimento)" : null,
+  ].filter(Boolean);
+  if (dettagli.length) pezzi.push("<p>" + escapeHtml(dettagli.join(" · ")) + "</p>");
+  return pezzi.join("") || '<p class="mon-empty">Nessun dettaglio registrato.</p>';
+}
+
+// --- pezzi comuni ----------------------------------------------------------
+
+function collega(el) {
+  el.querySelectorAll("[data-passo]").forEach((b) => {
+    b.onclick = () => { pagina += Number(b.getAttribute("data-passo")); disegna(); };
+  });
+  el.querySelectorAll("tr.mon-riga").forEach((tr) => {
+    tr.onclick = (ev) => {
+      const vai = ev.target.closest("[data-vai]");
+      if (vai) {
+        ev.stopPropagation();
+        const codice = vai.getAttribute("data-vai");
+        return vaiA("indicatori", codice, codice);
+      }
+      const vaiRun = ev.target.closest("[data-vai-run]");
+      if (vaiRun) {
+        ev.stopPropagation();
+        const runId = vaiRun.getAttribute("data-vai-run");
+        return vaiA("run", runId, runId);
+      }
+      if (ev.target.closest("a, details, summary")) return;
+      const chiave = tr.getAttribute("data-chiave");
+      if (aperte.has(chiave)) aperte.delete(chiave);
+      else aperte.add(chiave);
+      disegna();
+    };
+  });
+}
+
+function impagina(righe) {
+  const pagine = Math.max(1, Math.ceil(righe.length / PAGINA));
+  if (pagina > pagine - 1) pagina = pagine - 1;
+  if (pagina < 0) pagina = 0;
+  const fetta = righe.slice(pagina * PAGINA, pagina * PAGINA + PAGINA);
+  if (pagine === 1) return { fetta, pager: "" };
+  // I bottoni li aggancia `collega()`, dopo che l'HTML e' finito nel DOM: qui si
+  // costruisce solo il markup.
+  const pager =
+    '<div class="mon-pager">' +
+      '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" data-passo="-1"' + (pagina === 0 ? " disabled" : "") + ">Precedente</button>" +
+      '<span class="mon-pager-info">pagina ' + (pagina + 1) + "/" + pagine + " · " + righe.length + " righe</span>" +
+      '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" data-passo="1"' + (pagina >= pagine - 1 ? " disabled" : "") + ">Successiva</button>" +
+    "</div>";
+  return { fetta, pager };
+}
+
+function passaFiltro(chiave, quandoIso, esito) {
+  const q = (valore("f-q") || "").trim().toLowerCase();
+  const filtroEsito = valore("f-esito");
+  const da = valore("f-da");
+  const a = valore("f-a");
+  const giorno = (quandoIso || "").slice(0, 10);
+  return (
+    (!q || chiave.toLowerCase().indexOf(q) !== -1) &&
+    (!filtroEsito || esito === filtroEsito) &&
+    (!da || giorno >= da) &&
+    (!a || giorno <= a)
+  );
+}
+
+function chiaveRun(r) {
+  return [r.run_id, r.workflow, (r.agenti || []).map((a) => a.indicatore + " " + (a.label || "") + " " + a.agent_type).join(" ")].join(" ");
+}
+
+function chiaveIndicatore(r) {
+  return [r.indicatore, r.run_id, r.angolo, r.motivo, r.esito].filter(Boolean).join(" ");
+}
+
+// I quattro esiti reali della catena, tenuti distinti perché lo sono: un
+// articolo fermato prima del disco è la verifica che ha funzionato, e non va
+// letto come un guasto.
+function etichettaEsitoRun(run) {
+  if (run.in_volo) return "in volo";
+  if (run.stato && run.stato !== "completed") return "guasto";
+  const esito = run.esito || {};
+  if ((esito.fermati || []).length && !(esito.articoli || []).length) return "fermato";
+  const rilievi = (esito.articoli || []).some((a) => (a.rilievi_aperti || []).length);
+  if ((esito.articoli || []).length) return rilievi ? "scritto con rilievi" : "scritto";
+  return run.stato === "completed" ? "senza articoli" : "guasto";
+}
+
+const CLASSE_ESITO = {
+  "scritto": "scritto",
+  "scritto con rilievi": "rilievi",
+  "fermato": "fermato",
+  "guasto": "guasto",
+  "in volo": "volo",
+};
+
+function badgeEsitoRun(run) {
+  return badgeEsito(etichettaEsitoRun(run));
+}
+
+function badgeEsito(etichetta) {
+  const classe = CLASSE_ESITO[etichetta] || "";
+  return '<span class="mon-esito' + (classe ? " mon-esito--" + classe : "") + '">' + escapeHtml(etichetta || "") + "</span>";
+}
+
+function totali(pezzi) {
+  const el = document.getElementById("mon-totali");
+  if (el) el.innerHTML = pezzi.flat().join("");
+}
+
+function opzioni(id, valori) {
   const sel = document.getElementById(id);
   if (!sel) return;
-  const keep = sel.value;
-  const first = sel.options[0]; // "Tutte/Tutti ..."
+  const tieni = sel.value;
+  const primo = sel.options[0];
   sel.innerHTML = "";
-  sel.appendChild(first);
-  values.forEach((v) => {
+  sel.appendChild(primo);
+  valori.forEach((v) => {
     const o = document.createElement("option");
     o.value = v;
     o.textContent = v;
     sel.appendChild(o);
   });
-  sel.value = keep;
+  sel.value = tieni;
 }
 
-const MINI_STATUS = { done: "●", current: "◐", issue: "◆", off: "○", waiting: "○" };
-
-function renderCatalog() {
-  const el = document.getElementById("mon-catalog");
-  if (!el) return;
-  if (!boardData) return (el.innerHTML = '<p class="mon-empty">Catalogo non disponibile (login o rete).</p>');
-  const q = (document.getElementById("cat-q").value || "").trim().toLowerCase();
-  const phase = document.getElementById("cat-phase").value;
-  const status = document.getElementById("cat-status").value;
-  const owner = document.getElementById("cat-owner").value;
-  const allRows = boardData.rows || [];
-  const statusHelp = boardData.status_help || {};
-  const statusOrder = boardData.status_order || [];
-  const rows = allRows.filter((r) => {
-    const ns = r.next_step || {};
-    const st = r.work_status;
-    const key = [r.id, r.name, r.family, r.state, st, r.phase, ns.owner, ns.label, (r.flags || []).join(" ")]
-      .join(" ")
-      .toLowerCase();
-    return (
-      (!q || key.indexOf(q) !== -1) &&
-      (!phase || r.phase === phase) &&
-      (!status || st === status) &&
-      (!owner || (ns.owner || "") === owner)
-    );
-  });
-
-  // Contatori COMPLETI, sul catalogo intero, non sul solo filtro: restano stabili
-  // mentre si filtra, cosi' "quanti pubblicati, quanti rimangono" si legge sempre.
-  // Ogni pastiglia e' un filtro con un clic (toggle) sulla lavorazione; "pubblicata"
-  // e' la scorciatoia per vedere solo i pubblicati. Il conteggio mostrato riflette
-  // il filtro attuale, separato dai totali globali.
-  const byStatusAll = {};
-  allRows.forEach((r) => {
-    byStatusAll[r.work_status] = (byStatusAll[r.work_status] || 0) + 1;
-  });
-  const published = byStatusAll["pubblicata"] || 0;
-  const closed = byStatusAll["chiusa"] || 0;
-  const remaining = allRows.length - published - closed;
-
-  // Copertura del catalogo: l'universo vero (tutti i cataloghi di famiglia,
-  // `_pipeline_universe` in app/views.py), non solo `allRows.length` (che e'
-  // solo cio' che ha gia' toccato una pratica di ammissione). Risponde a
-  // "quanti indicatori in totale, quanti indicizzati, se manca qualcosa da
-  // ammettere, e dentro quelli ammessi e indicizzabili a che punto siamo".
-  const coverageEl = document.getElementById("cat-coverage");
-  if (coverageEl) {
-    const cs = boardData.catalog_summary;
-    if (!cs) {
-      coverageEl.innerHTML = "";
-    } else {
-      const reasonLabel = { vecchia: "vecchi", copertura: "copertura incompleta", variante: "variante di genere", famiglia: "copertura insufficiente nella famiglia", altro: "altro" };
-      const reasonKeys = Object.keys(cs.non_indexable_by_reason || {})
-        .sort((a, b) => (cs.non_indexable_by_reason[b] || 0) - (cs.non_indexable_by_reason[a] || 0));
-      // Al massimo due motivi nel chip: una riga corta e leggibile, non un elenco
-      // che rischia di allungarsi oltre la larghezza della sezione.
-      const reasons = reasonKeys
-        .slice(0, 2)
-        .map((r) => (reasonLabel[r] || r) + " " + cs.non_indexable_by_reason[r])
-        .concat(reasonKeys.length > 2 ? ["altri " + reasonKeys.slice(2).reduce((a, r) => a + cs.non_indexable_by_reason[r], 0)] : [])
-        .join(", ");
-      coverageEl.innerHTML =
-        '<div class="mon-totals-row">' +
-          '<span class="mon-chip mon-chip--strong">Nel catalogo ' + cs.total_universe + "</span>" +
-          '<span class="mon-chip">Indicizzati ' + cs.indexable + "</span>" +
-          '<span class="mon-chip">Non indicizzati ' + cs.non_indexable + (reasons ? " (" + escapeHtml(reasons) + ")" : "") + "</span>" +
-          (cs.not_yet_admitted
-            ? '<span class="mon-chip mon-chip--strong">Non ancora ammessi ' + cs.not_yet_admitted + "</span>"
-            : "") +
-        "</div>" +
-        '<div class="mon-totals-row">' +
-          '<span class="mon-chip">Ammessi e indicizzati ' + cs.indexable_admitted + "</span>" +
-          '<span class="mon-chip">Scritti ' + cs.written + "</span>" +
-          '<span class="mon-chip">Verificati ' + cs.verified + "</span>" +
-          '<span class="mon-chip">Pubblicati ' + cs.published + "</span>" +
-        "</div>";
-    }
-  }
-
-  const summary =
-    '<span class="mon-chip mon-chip--strong">Totale ' + allRows.length + "</span>" +
-    '<span class="mon-chip mon-chip--strong">Pubblicati ' + published + "</span>" +
-    '<span class="mon-chip mon-chip--strong">Rimanenti ' + remaining + "</span>" +
-    (rows.length !== allRows.length ? '<span class="mon-chip">Mostrati ' + rows.length + "</span>" : "");
-  const chips = statusOrder.filter((s) => byStatusAll[s])
-    .map(
-      (s) =>
-        '<button type="button" class="mon-chip mon-chip--click' + (status === s ? " mon-chip--active" : "") +
-        '" data-status="' + escapeHtml(s) + '">' + escapeHtml(s) + ": " + byStatusAll[s] + "</button>"
-    )
-    .join("");
-  const totalsEl = document.getElementById("cat-totals");
-  totalsEl.innerHTML =
-    '<div class="mon-totals-row">' + summary + "</div>" +
-    '<div class="mon-totals-row">' +
-      '<button type="button" class="mon-chip mon-chip--click' + (!status ? " mon-chip--active" : "") + '" data-status="">tutti</button>' +
-      chips +
-    "</div>";
-  // Clic su una pastiglia = imposta (o azzera) il filtro lavorazione, poi ridisegna
-  // da pagina 1 (il filtro cambia, la pagina corrente non ha piu' senso).
-  totalsEl.querySelectorAll(".mon-chip--click").forEach((btn) => {
-    btn.onclick = () => {
-      const sel = document.getElementById("cat-status");
-      const target = btn.getAttribute("data-status");
-      sel.value = sel.value === target ? "" : target; // ri-clic sull'attivo = azzera
-      renderCatalogReset();
-    };
-  });
-
-  // Legenda visibile degli stati presenti: il title del badge non arriva a chi usa
-  // touch o tastiera (ne', sul layout a schede mobile, a nessuno). Un <details>
-  // nativo e' focusabile, toccabile e leggibile dallo screen reader, e serve la
-  // stessa domanda ("che vuol dire in attesa?") a chiunque, sempre.
-  const legendEl = document.getElementById("cat-legend");
-  if (legendEl) {
-    const items = statusOrder.filter((s) => byStatusAll[s])
-      .map(
-        (s) =>
-          '<div class="mon-legend-row"><span class="mon-status mon-status--' + s.replace(/ /g, "-") + '">' +
-          escapeHtml(s) + "</span><span>" + escapeHtml(statusHelp[s] || "") + "</span></div>"
-      )
-      .join("");
-    legendEl.innerHTML =
-      '<details class="mon-legend"><summary>Cosa vuol dire ogni stato</summary>' + items + "</details>";
-  }
-
-  if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun indicatore col filtro attuale.</p>');
-
-  // Pagina: clampa la pagina corrente all'intervallo valido (un filtro puo' averla
-  // resa fuori range) e affetta le righe da mostrare.
-  const totalPages = Math.max(1, Math.ceil(rows.length / CAT_PAGE_SIZE));
-  if (catPage > totalPages - 1) catPage = totalPages - 1;
-  if (catPage < 0) catPage = 0;
-  const pageRows = rows.slice(catPage * CAT_PAGE_SIZE, catPage * CAT_PAGE_SIZE + CAT_PAGE_SIZE);
-  const first = rows.length ? catPage * CAT_PAGE_SIZE + 1 : 0;
-  const last = catPage * CAT_PAGE_SIZE + pageRows.length;
-  const pager =
-    '<div class="mon-pager">' +
-      '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" id="cat-prev"' + (catPage === 0 ? " disabled" : "") + ">Precedente</button>" +
-      '<span class="mon-pager-info">' + first + "-" + last + " di " + rows.length + " · pagina " + (catPage + 1) + "/" + totalPages + "</span>" +
-      '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" id="cat-next"' + (catPage >= totalPages - 1 ? " disabled" : "") + ">Successiva</button>" +
-    "</div>";
-
-  el.innerHTML =
-    pager +
-    '<table class="mon-cards"><thead><tr><th>Indicatore</th><th>Famiglia</th><th>Lavorazione</th><th>Fase</th><th>Ciclo</th><th>Prossimo passo</th><th>Token</th><th>Articolo</th></tr></thead><tbody>' +
-    pageRows
-      .map((r) => {
-        const ns = r.next_step || {};
-        const st = r.work_status;
-        const link = r.published_url
-          ? '<a href="' + escapeHtml(r.published_url) + '" target="_blank" rel="noopener">apri ' + String.fromCharCode(8599) + "</a>"
-          : "";
-        const name = r.published_url
-          ? '<a href="' + escapeHtml(r.published_url) + '" target="_blank" rel="noopener">' + escapeHtml(r.name) + "</a>"
-          : escapeHtml(r.name);
-        const mini = (r.lifecycle || [])
-          .map((p) => '<span title="' + escapeHtml(p.label) + " (" + escapeHtml(p.status) + ')">' + (MINI_STATUS[p.status] || "○") + "</span>")
-          .join(" ");
-        return (
-          '<tr><td data-label="Indicatore">' + name + "<br><small>" + escapeHtml(r.id) + "</small></td>" +
-          '<td data-label="Famiglia">' + escapeHtml(r.family) + "</td>" +
-          '<td data-label="Lavorazione"><span class="mon-status mon-status--' + st.replace(/ /g, "-") + '" title="' + escapeHtml(r.work_status_help || "") + '">' + escapeHtml(st) + "</span></td>" +
-          '<td data-label="Fase">' + escapeHtml(r.phase) + "</td>" +
-          '<td data-label="Ciclo" class="mon-mini">' + mini + "</td>" +
-          '<td data-label="Prossimo passo">' + escapeHtml(ns.owner || "") + "<br><small>" + escapeHtml(ns.label || "") + "</small></td>" +
-          '<td data-label="Token">' + (r.tokens_total != null ? Number(r.tokens_total).toLocaleString("it-IT") : "") + "</td>" +
-          '<td data-label="Articolo">' + link + "</td></tr>"
-        );
-      })
-      .join("") +
-    "</tbody></table>" +
-    pager; // pager anche in fondo: con 50 righe lo scroll e' lungo
-
-  // Prev/Next compaiono due volte (sopra e sotto): querySelectorAll li prende
-  // entrambi. Cambiano solo la pagina e ridisegnano, senza azzerarla.
-  el.querySelectorAll("#cat-prev").forEach((b) => (b.onclick = () => { catPage -= 1; renderCatalog(); }));
-  el.querySelectorAll("#cat-next").forEach((b) => (b.onclick = () => { catPage += 1; renderCatalog(); }));
+function valore(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : "";
 }
 
-function fmtDuration(sec) {
-  if (sec == null) return "";
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return m ? m + "m " + s + "s" : s + "s";
+function somma(righe, campo) {
+  return righe.reduce((a, r) => a + (r[campo] || 0), 0).toLocaleString("it-IT");
 }
 
-function renderRuns() {
-  const el = document.getElementById("mon-runs");
-  if (!el) return;
-  if (!runsData) return (el.innerHTML = '<p class="mon-empty">Cronologia non disponibile (login o rete).</p>');
-  const q = (document.getElementById("run-q").value || "").trim().toLowerCase();
-  const stage = document.getElementById("run-stage").value;
-  const outcome = document.getElementById("run-outcome").value;
-  const from = document.getElementById("run-from").value; // YYYY-MM-DD o ""
-  const to = document.getElementById("run-to").value;
-  const runs = (runsData.runs || []).filter((r) => {
-    const day = (r.at || "").slice(0, 10);
-    const key = [(r.indicators || []).join(" "), r.summary, r.run_id, r.stage].join(" ").toLowerCase();
-    return (
-      (!q || key.indexOf(q) !== -1) &&
-      (!stage || r.stage === stage) &&
-      (!outcome || r.outcome === outcome) &&
-      (!from || day >= from) &&
-      (!to || day <= to)
-    );
-  });
-
-  // Totali sul sottoinsieme filtrato: token totali, conteggio, per esito e per stadio.
-  const tokTotal = runs.reduce((a, r) => a + (r.tokens || 0), 0);
-  const byOutcome = {};
-  const byStage = {};
-  runs.forEach((r) => {
-    byOutcome[r.outcome] = (byOutcome[r.outcome] || 0) + 1;
-    byStage[r.stage] = (byStage[r.stage] || 0) + (r.tokens || 0);
-  });
-  document.getElementById("run-totals").innerHTML =
-    '<span class="mon-chip">' + runs.length + " run</span>" +
-    '<span class="mon-chip">' + tokTotal.toLocaleString("it-IT") + " token</span>" +
-    Object.keys(byOutcome)
-      .sort()
-      .map((o) => '<span class="mon-chip">' + escapeHtml(o) + ": " + byOutcome[o] + "</span>")
-      .join("") +
-    Object.keys(byStage)
-      .filter((s) => byStage[s] > 0)
-      .sort()
-      .map((s) => '<span class="mon-chip">' + escapeHtml(s) + ": " + byStage[s].toLocaleString("it-IT") + "</span>")
-      .join("");
-
-  if (!runs.length) return (el.innerHTML = '<p class="mon-empty">Nessuna run col filtro attuale.</p>');
-
-  // Pagina: stesso pattern del catalogo (clampa la pagina, affetta le righe).
-  const totalPages = Math.max(1, Math.ceil(runs.length / RUN_PAGE_SIZE));
-  if (runPage > totalPages - 1) runPage = totalPages - 1;
-  if (runPage < 0) runPage = 0;
-  const pageRuns = runs.slice(runPage * RUN_PAGE_SIZE, runPage * RUN_PAGE_SIZE + RUN_PAGE_SIZE);
-  const first = runs.length ? runPage * RUN_PAGE_SIZE + 1 : 0;
-  const last = runPage * RUN_PAGE_SIZE + pageRuns.length;
-  const pager =
-    '<div class="mon-pager">' +
-      '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" id="run-prev"' + (runPage === 0 ? " disabled" : "") + ">Precedente</button>" +
-      '<span class="mon-pager-info">' + first + "-" + last + " di " + runs.length + " · pagina " + (runPage + 1) + "/" + totalPages + "</span>" +
-      '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" id="run-next"' + (runPage >= totalPages - 1 ? " disabled" : "") + ">Successiva</button>" +
-    "</div>";
-
-  el.innerHTML =
-    pager +
-    '<table class="mon-cards"><thead><tr><th>Quando</th><th>Stadio</th><th>Indicatore</th><th>Esito</th><th>Durata</th><th>Token</th><th>PR</th><th>Commit</th></tr></thead><tbody>' +
-    pageRuns
-      .map((r) => {
-        const inds = (r.indicators || []);
-        const indCell = inds.length === 1 ? escapeHtml(inds[0]) : inds.length ? escapeHtml(inds.join(", ")) : "";
-        return (
-          '<tr><td data-label="Quando">' + escapeHtml((r.at || "").replace("T", " ").slice(0, 16)) + "</td>" +
-          '<td data-label="Stadio">' + escapeHtml(r.stage) + "</td>" +
-          '<td data-label="Indicatore" title="' + escapeHtml(r.summary || "") + '">' + indCell + "</td>" +
-          '<td data-label="Esito">' + escapeHtml(r.outcome) + "</td>" +
-          '<td data-label="Durata">' + escapeHtml(fmtDuration(r.duration_seconds)) + "</td>" +
-          '<td data-label="Token">' + (r.tokens != null ? Number(r.tokens).toLocaleString("it-IT") : "") + "</td>" +
-          '<td data-label="PR">' + (r.pr ? "#" + escapeHtml(String(r.pr)) : "") + "</td>" +
-          '<td data-label="Commit">' + escapeHtml(r.commit || "") + "</td></tr>"
-        );
-      })
-      .join("") +
-    "</tbody></table>" +
-    pager;
-
-  el.querySelectorAll("#run-prev").forEach((b) => (b.onclick = () => { runPage -= 1; renderRuns(); }));
-  el.querySelectorAll("#run-next").forEach((b) => (b.onclick = () => { runPage += 1; renderRuns(); }));
+function uniq(valori) {
+  return Array.from(new Set((valori || []).filter(Boolean))).sort((a, b) =>
+    String(a).localeCompare(String(b), "it"));
 }
 
-async function refresh(supabase) {
-  const [{ data: activity }, { data: tokens }] = await Promise.all([
-    supabase.from("pipeline_activity").select("*").order("updated_at", { ascending: false }),
-    supabase.from("pipeline_tokens").select("*").order("updated_at", { ascending: false }),
-  ]);
-  renderActivity(activity || []);
-  renderTokens(tokens || []);
+function numero(n) {
+  return n == null ? "" : Number(n).toLocaleString("it-IT");
 }
 
-function renderActivity(rows) {
-  const el = document.getElementById("mon-activity");
-  if (!el) return;
-  if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun lavoro in volo.</p>');
-  el.innerHTML =
-    '<table class="mon-cards"><thead><tr><th>Tipo</th><th>Ruolo</th><th>Indicatore</th><th>PR</th><th>CI</th><th>Aggiornato</th></tr></thead><tbody>' +
-    rows
-      .map(
-        (r) =>
-          '<tr><td data-label="Tipo">' + escapeHtml(r.kind) + '</td><td data-label="Ruolo">' + escapeHtml(r.role) + '</td><td data-label="Indicatore">' +
-          escapeHtml(r.indicator) + '</td><td data-label="PR">' + (r.pr ? "#" + r.pr : "") + '</td><td data-label="CI">' +
-          escapeHtml(r.ci || "") + '</td><td data-label="Aggiornato">' + escapeHtml(r.updated_at) + "</td></tr>"
-      )
-      .join("") +
-    "</tbody></table>";
+function euro(n) {
+  return n == null ? "" : Number(n).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " $";
 }
 
-function renderTokens(rows) {
-  const el = document.getElementById("mon-tokens");
-  if (!el) return;
-  if (!rows.length) return (el.innerHTML = '<p class="mon-empty">Nessun consumo registrato.</p>');
-  el.innerHTML =
-    '<table class="mon-cards"><thead><tr><th>Run</th><th>Indicatore</th><th>Ruolo</th><th>Token</th><th>Aggiornato</th></tr></thead><tbody>' +
-    rows
-      .map(
-        (r) =>
-          '<tr><td data-label="Run">' + escapeHtml(r.run_id) + '</td><td data-label="Indicatore">' + escapeHtml(r.indicator) + '</td><td data-label="Ruolo">' +
-          escapeHtml(r.role) + '</td><td data-label="Token">' + Number(r.tokens || 0).toLocaleString("it-IT") +
-          '</td><td data-label="Aggiornato">' + escapeHtml(r.updated_at) + "</td></tr>"
-      )
-      .join("") +
-    "</tbody></table>";
+function quando(iso) {
+  if (!iso) return "";
+  return iso.replace("T", " ").slice(0, 16);
+}
+
+function durata(ms) {
+  if (ms == null) return "";
+  const s = Math.round(ms / 1000);
+  const m = Math.floor(s / 60);
+  return m ? m + "m " + (s % 60) + "s" : s + "s";
+}
+
+function durataDa(iso) {
+  if (!iso) return "?";
+  const da = Date.parse(iso);
+  if (Number.isNaN(da)) return "?";
+  return durata(Math.max(0, Date.now() - da));
+}
+
+function taglia(testo, n) {
+  const s = String(testo == null ? "" : testo);
+  return s.length > n ? s.slice(0, n - 3) + "..." : s;
 }
 
 function escapeHtml(s) {
