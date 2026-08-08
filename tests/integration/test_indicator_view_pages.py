@@ -111,6 +111,51 @@ class EveryIndicatorPageRenders(unittest.TestCase):
         self.assertLess(html.index('id="sezione-quadro"'), html.index('id="come-leggere"'))
         self.assertLess(html.index('id="sezione-limiti"'), html.index('id="come-leggere"'))
 
+    def test_repeated_roles_get_unique_anchors(self):
+        """Un articolo può scrivere lo stesso ruolo due volte, ed è voluto: il
+        modello tiene una **lista per ruolo** perché con un dizionario la seconda
+        sezione sovrascriveva la prima e la pagina perdeva un corpo. Il template
+        però componeva l'ancora dal solo ruolo, quindi la stessa pagina usciva
+        con `id` duplicati e sulla seconda `dinamica` non si poteva atterrare.
+
+        La **prima** occorrenza tiene l'ancora nuda: `indicator_view.query_map`
+        punta per nome a `sezione-definizione` e `sezione-dinamica`, e un
+        suffisso su tutte spegnerebbe quei due bersagli senza che niente
+        diventi rosso.
+        """
+        import unittest.mock
+        from app import indicator_texts
+        ripetuto = {
+            "level": "regione", "lead": "Un lead che apre sulla distanza fra due Italie.",
+            "vintage": 2023, "reviewed_at": "2026-08-01", "reviewed_vintage": 2023,
+            "sections": [
+                {"role": "dinamica", "h": "Il decennio che non ha chiuso niente", "body": "Corpo uno."},
+                {"role": "quadro", "h": "Dove sta il divario oggi", "body": "Corpo due."},
+                {"role": "dinamica", "h": "L'anno che ha cambiato il segno", "body": "Corpo tre."},
+                {"role": "quadro", "h": "Le due code della classifica", "body": "Corpo quattro."},
+                {"role": "limiti", "h": "Quello che questa misura non vede", "body": "Corpo cinque."},
+            ],
+        }
+        with unittest.mock.patch.object(indicator_texts, "get_text", lambda _id: ripetuto):
+            html = self._get("920").get_data(as_text=True)
+
+        ancore = re.findall(r'\sid="([^"]+)"', html)
+        doppie = sorted({a for a in ancore if ancore.count(a) > 1})
+        self.assertEqual(doppie, [], f"id duplicati nella pagina: {doppie}")
+
+        # I cinque H2 dell'articolo ci sono tutti, e i due ripetuti si
+        # distinguono: senza il suffisso il quinto corpo sarebbe irraggiungibile.
+        for ancora in ("sezione-dinamica", "sezione-quadro",
+                       "sezione-dinamica-2", "sezione-quadro-2", "sezione-limiti"):
+            self.assertIn(f'id="{ancora}"', html)
+
+        # Ogni link interno atterra da qualche parte. Il suffisso sulla prima
+        # occorrenza romperebbe questo, non l'HTML.
+        bersagli = set(ancore)
+        appesi = sorted({href for href in re.findall(r'href="#([^"]+)"', html)
+                         if href not in bersagli})
+        self.assertEqual(appesi, [], f"link interni che non atterrano: {appesi}")
+
     def test_the_historical_series_is_server_rendered_as_a_table(self):
         """Il grafico di trend è uno <svg> riempito da JS: senza JavaScript il
         lettore e il crawler perderebbero la serie. La tabella-serie la porta a
