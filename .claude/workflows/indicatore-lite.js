@@ -212,6 +212,7 @@ const PUBBLICATO = {
   required: ['scritto'],
   properties: {
     scritto: { type: 'boolean' },
+    sovrascritto: { type: ['boolean', 'null'] },
     percorso: { type: ['string', 'null'] },
     parole: { type: ['number', 'null'] },
     impaginazione: {
@@ -449,13 +450,15 @@ const esiti = await pipeline(
       `Scrivi su disco l'articolo già verificato dell'indicatore ${d.codice}. ` +
       `Esegui esattamente questo comando e restituisci quello che stampa:\n\n` +
       `    bin/py -m lab.pubblica ${d.codice} --bozza ${esito.bozza_salvata}\n\n` +
-      `Riporta \`impaginazione\` (gli H2 che la pagina renderebbe) e tutti i rilievi, ` +
+      `Riporta \`impaginazione\` (gli H2 che la pagina renderebbe), \`sovrascritto\` `+
+      `(l'articolo scriveva su una pagina che esisteva gia') e tutti i rilievi, ` +
       `anche quelli di severità \`segnala\`. Non correggere niente: se il comando ` +
       `rifiuta, riporta i problemi così come li stampa.`,
       { agentType: 'lab-pubblicatore', model: 'haiku', effort: 'low', phase: 'Pubblicazione', schema: PUBBLICATO, label: `pubblica:${d.codice}` },
     ).then((pubblicato) => ({
       codice: d.codice,
       scritto: !!pubblicato?.scritto,
+      sovrascritto: pubblicato?.sovrascritto ?? null,
       percorso: pubblicato?.percorso ?? null,
       parole: pubblicato?.parole ?? null,
       angolo: esito.bozza?.angolo ?? null,

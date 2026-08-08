@@ -1,8 +1,15 @@
 """La bozza verificata diventa un file. E poi si misura, senza mai rifiutarla.
 
-Scrive in `data/lab/articoli/`, non in `content/indicators/`: la pipeline lite
-non deve poter sovrascrivere un articolo della catena attuale, perché i due
-output servono a essere confrontati fianco a fianco.
+Scrive in `content/indicators/`, cioè **sulla pagina pubblica**: da quando la
+catena editoriale precedente è stata ritirata, questa è l'unica che produce
+articoli. Il nome del file e la struttura sono quelli di sempre, quindi le
+pagine già scritte restano come sono finché non le si rifà una per una: il
+ricambio è per indicatore, non un'operazione unica.
+
+Sovrascrivere un articolo pubblicato è irreversibile per il lettore e
+invisibile in un diff se nessuno lo dice: l'uscita porta `sovrascritto` e il
+vintage di ciò che c'era prima, così chi legge l'esito sa se ha aggiunto una
+pagina o ne ha rifatta una.
 
 Legge la bozza da un **percorso**, non da stdin: è quella congelata da
 `lab.controlla --salva`, cioè esattamente l'oggetto che il verificatore ha
@@ -27,7 +34,11 @@ from lab.dossier import risolvi
 from app.indicator_view import build_indicator_view
 from app import sources
 
-ARTICOLI = os.path.join("data", "lab", "articoli")
+ARTICOLI = os.path.join("content", "indicators")
+
+# Dove si scriveva prima, e dove si scrive ancora con `--out` quando si vuole
+# una bozza su disco senza toccare il sito.
+LABORATORIO = os.path.join("data", "lab", "articoli")
 
 # I quattro ruoli che la pagina indicatore sa rendere. Una sezione con un ruolo
 # diverso verrebbe scartata in silenzio dal template.
@@ -225,6 +236,10 @@ def main(argv=None):
     nome = f"{chiave.replace(':', '__')}.json"
     os.makedirs(args.out, exist_ok=True)
     percorso = os.path.join(args.out, nome)
+    prima = None
+    if os.path.exists(percorso):
+        with open(percorso, encoding="utf-8") as handle:
+            prima = json.load(handle)
     assert entry["key"] == os.path.basename(percorso)[:-5].replace("__", ":")
     with open(percorso, "w", encoding="utf-8") as handle:
         json.dump(entry, handle, ensure_ascii=False, indent=1, sort_keys=True)
@@ -232,6 +247,8 @@ def main(argv=None):
 
     json.dump({
         "scritto": True,
+        "sovrascritto": prima is not None,
+        "vintage_precedente": (prima or {}).get("vintage"),
         "percorso": os.path.abspath(percorso),
         "chiave": chiave,
         "livello": entry["level"],

@@ -49,9 +49,9 @@ evals/out/
 # venticinque dollari per milione di token.
 data/packs/
 
-# I dossier e le bozze congelate della pipeline lite: derivati da dati e codice
-# versionati, ricostruibili con un comando. Gli articoli di `data/lab/articoli/`
-# restano invece committabili: sono il prodotto da confrontare con quelli della
-# catena attuale.
+# I dossier e le bozze congelate della catena minima: derivati da dati e codice
+# versionati, ricostruibili con un comando. Gli articoli non stanno più qui:
+# `lab.pubblica` scrive in `content/indicators/`, cioè sulla pagina pubblica.
+# `data/lab/articoli/` resta committabile per le prove fatte con `--out`.
 data/lab/dossier/
 data/lab/bozze/

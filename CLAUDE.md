@@ -18,16 +18,12 @@ it).
 | se stai lavorando su... | leggi |
 | --- | --- |
 | account utente, login Google, preferiti, statistiche/achievements, confronti salvati, GDPR | [`docs/ACCOUNT.md`](docs/ACCOUNT.md) |
-| la catena autonoma, gli agenti, il cancello, le Routine | [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md) |
-| come apre e chiude una run un agente qualsiasi | [`docs/AGENT_CONTRACT.md`](docs/AGENT_CONTRACT.md) |
 | una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
-| che cosa serve per scrivere un indicatore: cifre, angoli, contesto citabile | `packs/` (`angles.py`, `build.py`, `context.py`), [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
-| scrivere articoli indicatore adesso: il workflow, il lint, i pacchetti | `.claude/workflows/produci-indicatori.js`, `officina/` (`pacchetti.py`, `brief.py`, `pubblica.py`, `lint.py`) |
-| la catena minima di confronto (sei agenti, tre scout in parallelo, nessun cancello, scrive in `data/lab/`) | [`lab/README.md`](lab/README.md), `.claude/workflows/indicatore-lite.js` |
-| scrivere o cambiare un file di agente (contratto, non cronaca) | `.claude/rules/pipeline.md`, e il verdetto in [`docs/OFFICINA_EDITORIALE_PROPOSTA.md`](docs/OFFICINA_EDITORIALE_PROPOSTA.md) |
+| che cosa si può citare in un articolo | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
+| **scrivere articoli indicatore**: il workflow, il dossier, il controllo, il lint | [`lab/README.md`](lab/README.md), `.claude/workflows/indicatore-lite.js` |
 | quanto costa una run, e come si misura senza sbagliare | `scripts/baseline_tokens.py` (il contratto sta nel suo docstring) |
 | scoperta e promozione di indicatori multifonte | [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md) |
-| stato corrente del sistema, id delle Routine, cosa manca | [`docs/DISCOVERY_STATUS.md`](docs/DISCOVERY_STATUS.md) |
+| stato corrente della scoperta, cosa manca | [`docs/DISCOVERY_STATUS.md`](docs/DISCOVERY_STATUS.md) |
 | aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
 | dati provinciali | [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md) |
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
@@ -35,7 +31,6 @@ it).
 | come si misura un articolo, i dieci criteri | [`docs/WRITING_RUBRIC.md`](docs/WRITING_RUBRIC.md) |
 | i piani già eseguiti, con le misure e le ipotesi cadute | [`docs/archive/`](docs/archive/) (non sono fonti di verità: se contraddicono il codice, ha ragione il codice) |
 | quali fonti secondarie si possono citare | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
-| cambiare modello, prompt o hook degli agenti | [`docs/CANARY.md`](docs/CANARY.md), `evals/README.md` |
 | priorità e lacune sulle domande che un motore o un assistente può porre | [`docs/LLM_QUERY_MAP.md`](docs/LLM_QUERY_MAP.md) |
 | tracciamento, consenso, versione GTM | [`docs/tracking_spec.md`](docs/tracking_spec.md) |
 
@@ -48,10 +43,7 @@ scatta prima di ogni cambio a modelli, prompt o hook degli agenti).
 Per guardare la catena senza aprire file:
 
 ```bash
-python3 scripts/pipeline_monitor.py            # dov'è fermo e perché, in una schermata (nell'app: /_pipeline)
-python3 scripts/pipeline_launch.py             # cosa lanciare adesso, e in che ordine (per-indicatore)
-python3 scripts/practice_timeline.py           # la storia per indicatore (il dossier, read-only)
-python3 scripts/pipeline_status.py             # le code per (vecchio) stadio, ancora lette da pipeline_launch.py
+bin/py -m lab.dossier --coda 5 --freschi 2025 --stdout   # che cosa conviene scrivere adesso
 ```
 
 ## What this is
@@ -89,16 +81,15 @@ stesso verdetto. `bin/py` risolve in un posto solo e fallisce dicendo perché.
 
 ```bash
 # scrivere articoli indicatore: il workflow, dalla lista dei codici
-#   Workflow({scriptPath: ".claude/workflows/produci-indicatori.js", args: ["ter-30"]})
-bin/py -m officina.pacchetti ter-30              # il pacchetto, a mano
-bin/py -m officina.pubblica ter-30 < bozza.json  # la bozza diventa un articolo (rifiuta invece di scrivere male)
-bin/py -m officina.lint ter-30                   # il cancello editoriale (11s su tutti)
-bin/py scripts/tool_failures.py                  # i guasti che si ripetono (il file aveva solo chi lo scriveva)
-bin/py -m scripts.calibra_prosa --confronto      # gli esempi contro i pubblicati
+#   Workflow({scriptPath: ".claude/workflows/indicatore-lite.js", args: ["ter-30"]})
+bin/py -m lab.dossier ter-30 --stdout            # le cifre che chi scrive riceve
+bin/py -m lab.dossier --coda 5 --freschi 2025    # che cosa conviene scrivere adesso
+bin/py -m lab.controlla ter-30 --bozza b.json    # ogni cifra e ogni link contro il dossier
+bin/py -m lab.controlla ter-30 --cerca 19,10     # che cosa può essere questo numero
+bin/py -m lab.pubblica ter-30 --bozza data/lab/bozze/ter-30.json   # scrive in content/indicators/
+bin/py -m lab.lint content/indicators/30.json    # il metro della prosa (misura, non ferma)
+bin/py scripts/tool_failures.py                  # i guasti che si ripetono
 bin/py scripts/baseline_tokens.py --workflow wf_… --articles 1   # quanto è costata una run
-
-# stato della catena editoriale, tutti gli stadi (vecchia catena)
-python3 scripts/pipeline_status.py
 
 # build the SPA (required after changing anything in frontend/)
 cd frontend && npm run build && cd ..
@@ -125,26 +116,34 @@ After editing `frontend/src/*`, always rebuild before testing the served app.
 After changing data, **restart gunicorn**: the core loaders cache for the life
 of the process (`lru_cache`, not a TTL).
 
-## The autonomous chain — READ [`docs/AUTONOMOUS_PIPELINE.md`](docs/AUTONOMOUS_PIPELINE.md)
+## La catena che scrive — READ [`lab/README.md`](lab/README.md)
 
-An indicator goes from a source catalogue to a published page like this:
-**ammissione** (agent: what enters, with auto-refutation) -> **l'officina**
-(`.claude/workflows/produci-indicatori.js`: writes the article) ->
-**verificatore** and **reader-editor** (agents: two independent critics, facts
-and readability).
+Un indicatore diventa una pagina così, dentro **un solo workflow**
+(`.claude/workflows/indicatore-lite.js`), senza cancello e senza umani in mezzo:
 
-**The `produttore` agent is gone**, and so is the `launcher` agent. Writing an
-article moved into the workshop, where four narrow types do it inside a
-workflow at a twentieth of the cost, and coordination inside a workflow costs
-zero tokens. What is left as an agent is what exercises a judgement no workflow
-can make deterministic. `scripts/pipeline_launch.py` still computes the launch
-plan, and `scripts/pipeline_gate.py` still decides whether a run may publish.
+**dossier** (le cifre, già calcolate) -> **tre scout in parallelo** (eventi,
+Europa, perché conta) -> **chi scrive** (decide tesi, temi, forma e link) ->
+**chi verifica** (fino a tre passaggi, due giri di correzione) -> **chi
+pubblica** (scrive in `content/indicators/`).
 
-The constitution of the chain (one launcher, work per-indicator in parallel, one
-file per record, `run_id` over PR number, the gate's perimeter, no human in the
-loop, never `gh pr merge --auto`, data-driven re-entry, stdlib-pure scripts)
-lives in `.claude/rules/pipeline.md` and, in full, in the two documents above.
-Do not act on this paragraph: it is a table of contents.
+Le tre cose che questa catena ha imparato correndo, e che non erano nel piano:
+
+- **si esce sulla gravità, non sul silenzio.** Tre passaggi dello stesso
+  verificatore sullo stesso testo trovano ogni volta rilievi nuovi: non è il
+  testo che non converge, è la lettura. All'ultimo passaggio l'articolo esce se
+  non restano rilievi `alta`, e gli altri viaggiano col pezzo.
+- **una smentita vale sul claim, non sulla frase**: chi corregge tocca anche il
+  titolo, il `lead` e l'`angolo`.
+- **il budget sta nel prompt, non nel frontmatter**: `maxTurns` dentro un
+  workflow non viene rispettato.
+
+`lab.pubblica` scrive **sulla pagina pubblica**, con la struttura di sempre: le
+pagine già scritte restano come sono finché non le si rifà una per una. L'uscita
+dice `sovrascritto`, perché rifare una pagina non deve essere invisibile.
+
+La catena editoriale autonoma precedente (cancello, diario, worktree,
+`officina/`, i cinque agenti) **non esiste più**. Restano l'ammissione
+(`admissions`, a monte: decide che cosa entra nell'atlante) e `giudice-cieco`.
 
 ## Writing — READ [`content/STYLE.md`](content/STYLE.md)
 
