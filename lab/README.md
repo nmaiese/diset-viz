@@ -1,8 +1,14 @@
-# La pipeline lite
+# La catena che scrive gli articoli
 
-Una seconda catena editoriale, indipendente da `officina/` e `packs/`, tenuta al
-minimo apposta: serve a misurare quanto della macchina attuale sia necessario.
-Non sostituisce niente e non tocca `content/`.
+L'unica catena editoriale del progetto. Nasce come esperimento accanto a una
+macchina molto più grande, per misurare quanto di quella fosse necessario: la
+risposta è stata poca, e la macchina grande è stata ritirata.
+
+Il principio è uno: **più lavoro al modello, meno a script che non possono
+intercettare tutto**. Python calcola le cifre, che sono l'unica cosa che un
+calcolo fa meglio di un modello; tutto ciò che richiede un giudizio (che storia
+raccontare, se una fonte regge, se una frase promette più di quanto la fonte
+dica) lo fa un agente, e il controllo è un altro agente che prova a smentirlo.
 
 ```
   ter-6, oppure niente e la sceglie la coda
@@ -20,23 +26,23 @@ Non sostituisce niente e non tocca `content/`.
     |                                 cifre, fonti rifetchate, link risolti
     |                                 smentite? [3] corregge una volta sola
     |                                 ancora smentite? non si scrive niente
- [5] lab-pubblicatore  Bash, haiku    bin/py -m lab.pubblica --bozza   -> data/lab/articoli/<key>.json
+ [5] lab-pubblicatore  Bash, haiku    bin/py -m lab.pubblica --bozza   -> content/indicators/<key>.json
 ```
 
 Nove agenti per articolo nel caso peggiore, quindi **un codice per run**.
 
-Le differenze che contano rispetto a `.claude/workflows/produci-indicatori.js`:
+Le scelte che la distinguono da una catena editoriale ordinaria, ognuna pagata
+da una run che è andata storta prima:
 
-| | catena attuale | lite |
+| | come si fa qui | perché |
 | --- | --- | --- |
-| bozze per articolo | due, più giudizio cieco e selezione | una |
-| contesto esterno | corpus preesistente in `data/corpus/` | tre scout web per run, lenti distinte, claim non persistiti |
-| chi sceglie l'angolo | `packs/angles.py`, punteggio calibrato sui quantili | chi scrive, quando ha tutto davanti |
-| forma dell'articolo | quattro sezioni, un ruolo ciascuna | variabile: ruoli ripetibili, ordine e titoli scelti |
-| cancello | `scripts/pipeline_gate.py` + lint bloccante | nessuno |
-| unico controllo | 14 regole di lint, di cui 8 bloccanti | cifre, fonti e link inventati, giudicati dal verificatore |
-| codice | `officina/` 1473 + `packs/` 1789 righe | `lab/` 1342 righe |
-| dove scrive | `content/indicators/` | `data/lab/articoli/` |
+| bozze per articolo | una | due bozze più un giudice costano il doppio per scegliere fra due testi che lo stesso modello ha scritto a dieci secondi di distanza |
+| contesto esterno | tre scout web per run, lenti distinte, claim non persistiti | un corpus preesistente invecchia e nessuno se ne accorge; tre contesti corti costano meno di uno lungo |
+| chi sceglie l'angolo | chi scrive, quando ha tutto davanti | un punteggio calcolato a monte propone la stessa storia a metà del catalogo |
+| forma dell'articolo | variabile: ruoli ripetibili, ordine e titoli scelti | il renderer lo sapeva già fare e nessuno l'aveva usato |
+| cancello | nessuno | l'unica cosa che ferma un articolo è una cifra o una fonte che non esiste, e la ferma un agente che legge, non una regola |
+| quando esce | all'ultimo passaggio, se non restano rilievi `alta` | tre letture dello stesso testo trovano ogni volta rilievi nuovi: non è il testo che non converge, è la lettura |
+| dove scrive | `content/indicators/` | è la pagina pubblica, con la struttura di sempre: il ricambio è per indicatore |
 
 ## I tre comandi
 
@@ -63,7 +69,7 @@ editoriale, e la fa chi scrive.
 
 `--coda N` non calcola nessuna priorità: la prende da `lab/coda.py`,
 che ordina il catalogo intero (cifre arretrate, poi sezioni mancanti, poi se la
-pagina è indicizzabile) e ci aggiunge i due filtri che la lite vuole, il dato
+pagina è indicizzabile) e ci aggiunge i due filtri che servono qui, il dato
 dell'anno chiesto e la pagina non già completa.
 
 Numeri di oggi: la coda dice **0 articoli con vintage arretrato**, quindi il
@@ -71,9 +77,11 @@ Numeri di oggi: la coda dice **0 articoli con vintage arretrato**, quindi il
 dati 2025, indicizzabili e incomplete**: 62 `bes`, 23 `ims`, 11 `ter`, di cui 83
 a 2/4 e 13 a 0/4.
 
-Su una pagina a 2/4 la lite scrive un **articolo intero concorrente** in
-`data/lab/`, non una toppa alle due sezioni mancanti: è un'operazione diversa
-da quella della catena vera, e il confronto va letto sapendolo.
+Su una pagina a 2/4 si riscrive l'**articolo intero**, non una toppa alle due
+sezioni mancanti: chi scrive decide la forma quando ha il dossier davanti, e
+non può farlo dentro il perimetro di una pagina già impostata da qualcun altro.
+L'uscita di `lab.pubblica` dice `sovrascritto`, così rifare una pagina non è
+mai una cosa che succede in silenzio.
 
 ### I gruppi della classifica
 
@@ -142,7 +150,7 @@ Quattro cose, tutte deterministiche, tutte con un'etichetta accanto: dire
 "trovata" non aiuta nessuno, dire che il 41,73 di una frase sulla Toscana è la
 **media nazionale del 2007** fa decidere in un colpo solo.
 
-- **Le cifre**, contro i valori del dossier, con la tolleranza di officina
+- **Le cifre**, contro i valori del dossier, con la tolleranza dell'1,1%
   (l'1,1%, perché la prosa arrotonda) e lo scarto stampato quando la
   corrispondenza non è esatta.
 - **Gli anni, in modo esatto e mai per tolleranza.** L'1,1% di 2025 vale
@@ -159,8 +167,8 @@ Quattro cose, tutte deterministiche, tutte con un'etichetta accanto: dire
   togliere link buoni: `nel dossier` (copiato dai parenti), `esiste, fuori dai
   parenti` (composto a mano, è una nota), `non esiste` (è una smentita).
 
-Nella catena attuale i link sono validati solo dalla suite, che gira su
-`content/indicators/` e non vede i file della lite.
+Il link inventato è la stessa classe di difetto della cifra inventata, e a
+fermarlo è chi verifica, non chi pubblica.
 
 ## Il testo passa in un prompt una volta sola
 
@@ -215,19 +223,27 @@ Due conseguenze da non dimenticare:
   derivazione non scatta, la forma scelta collassa in quella fissa e le sezioni
   in eccesso spariscono senza errore. `lab.pubblica` rifiuta quando succede,
   nominando la sezione che si perderebbe, e stampa sempre `impaginazione`, cioè
-  gli H2 come li vedrebbe un lettore. È l'unico modo di controllare la forma di
-  un articolo che nessuna pagina rende, perché `data/lab/articoli/` non è
-  letto da niente.
+  gli H2 come li vedrebbe un lettore. Una sezione persa non dà errore da
+  nessuna parte: non la vede l'app, non la vede il lint, e chi l'ha scritta la
+  crede pubblicata.
 
 ## Il lint è un metro, non un cancello
 
-`lab.pubblica` scrive **prima** e misura **dopo**, chiamando
-`officina.lint.lint_entry` dentro un try/except. I rilievi finiscono nell'uscita
-del comando, compresi quelli che nella catena attuale bloccano. Due regole non
-si applicano alla lite e vanno lette sapendolo: `angolo-non-rilevato` (la lite
-non produce gli angoli calibrati di `packs/angles.py`, quindi l'angolo scelto è
-registrato come `angolo_scelto`) e `gemello`, che confronta con gli articoli
-pubblicati.
+`lab.pubblica` scrive **prima** e misura **dopo**, chiamando `lab.lint` dentro
+un try/except: un'eccezione della misura non deve portarsi via l'unico prodotto.
+I rilievi finiscono nell'uscita del comando, compresi quelli marcati `blocca`.
+
+`lab/lint.py` tiene solo le regole che questa catena usa e che `lab.controlla`
+non copre già: i caratteri vietati dallo stile, il lead sopra i 200 caratteri,
+il link non canonico, l'articolo troppo corto, una dinamica che spiega senza
+fonti, e la quota di paragrafi senza cifre. Le cifre non le rimisura, e non è
+una svista: il lint precedente lo faceva con un metro più grossolano e ha dato
+tre `cifra-falsa` bloccanti su due articoli, tutte e tre **volatilità** dette
+correttamente dal testo e accostate al valore della regione nominata accanto.
+
+Ciò che ferma davvero un articolo sta in `lab.pubblica._valida`, ed è solo ciò
+che rende la pagina rotta: un lead vuoto, una sezione senza corpo, un ruolo
+inesistente, un accento scritto con l'apostrofo.
 
 ## Il primo giro reale (ter-6, 2026-08-08)
 
@@ -255,10 +271,8 @@ La fonte Istat era un PDF: il fetch non ne restituisce il testo, quindi è
 finita in `note` come **non verificabile**, che non blocca.
 
 Costo, con `scripts/baseline_tokens.py`: **3,99 $** il percorso riuscito, di cui
-1,62 $ il solo scout web (uno stadio che la catena attuale non ha). La fetta
-confrontabile con la catena attuale, dossier più scrittura più verifica più
-pubblicazione, è **2,37 $**. La catena attuale misura 1,97 $ per articolo, ma
-senza nessuna ricerca di contesto.
+1,62 $ il solo scout web. Senza la fetta contesto, dossier più scrittura più
+verifica più pubblicazione, **2,37 $**.
 
 Due cose che il giro ha smentito, entrambe scritte nel piano come da verificare:
 
@@ -286,7 +300,7 @@ ragionato, e i quattro difetti da correggere. In breve:
   link interni risultano entrambi "nel dossier";
 - il guasto vero era il **giro di correzione**, che toccava il corpo e lasciava
   il titolo e l'`angolo` a dire il contrario. Corretto, e l'articolo è uscito:
-  `data/lab/articoli/13.json`, 782 parole, due giri di correzione, un solo
+  `content/indicators/13.json`, 782 parole, due giri di correzione, un solo
   rilievo di lint.
 
 Da quel giro vengono le due regole che oggi governano la verifica, e nessuna
@@ -302,30 +316,26 @@ delle due era nel piano:
   il titolo della sezione, il `lead` e l'`angolo`, e gli altri punti con lo
   stesso difetto.
 
-## Come si confrontano le due pipeline
+## Il confronto che non è mai stato fatto
 
-1. **Un codice `ter-*` per run**, senza articolo committato: la definizione
-   ufficiale esiste solo per la famiglia territoriale, quindi le due pipeline
-   ricevono lo stesso input. Nel repository ce ne sono 195. Un codice e non due,
-   perché la lite adesso spende nove agenti per articolo nel caso peggiore e il
-   consiglio di sessione è `medium`, sotto i quindici.
-2. Le due run **in serie**: agenti in parallelo sullo stesso HEAD collidono.
-3. Costo e turni: `bin/py scripts/baseline_tokens.py --workflow wf_… --articles N`,
-   separando la fetta contesto dal resto come si è fatto alla prima run.
-4. Qualità: l'agente `giudice-cieco`, che esiste già, legge i due testi senza
-   sapere da dove vengono.
+Questa catena è nata per essere misurata contro quella grande, sullo stesso
+indicatore, con `giudice-cieco` a leggere i due testi senza sapere da dove
+vengono. Il confronto **non è mai stato eseguito**: la catena grande è stata
+ritirata prima, e i numeri che restano sono di run diverse su indicatori
+diversi, quindi non si sottraggono.
 
-Poi **una seconda run della sola lite su un `bes`/`ims` a 0/4**, dove la
-definizione ufficiale non esiste: è lì che si vede se l'assorbimento della
-definizione nel blocco "Come leggere il dato" funziona davvero, e sono 85 delle
-96 pagine della coda 2025.
+Quello che si sa, e vale come ordine di grandezza e non come confronto:
 
-Attenzione a due cose nel confronto dei costi. I modelli della lite sono scelti
-per ruolo (haiku, sonnet, opus) mentre gli agenti della catena attuale girano
-tutti su `inherit`: il delta mescola architettura e tier, e per isolare
-l'architettura serve un giro della lite con `model: inherit` ovunque. E la lite
-adesso fa tre ricerche web dove la catena attuale non ne fa nessuna: la fetta
-contesto va tolta prima di confrontare, o si confrontano due cose diverse.
+- una run di questa catena con sonnet a scrivere e due verifiche costa **3,89 $**;
+- con opus a scrivere e tre verifiche, **circa 7 $**;
+- la catena ritirata misurava 1,97 $ per articolo, ma non faceva **nessuna**
+  ricerca web e la fetta contesto qui vale più di un dollaro.
+
+Le due cose da non confondere se un confronto si rifarà: i modelli qui sono
+scelti per ruolo (haiku, sonnet, opus) e un delta contro una catena tutta su
+`inherit` mescola architettura e tier; e la ricerca web non è ripetibile, come
+si è visto rilanciando lo stesso indicatore e ottenendo due scout vuoti dove
+prima ne erano tornati due pieni.
 
 ## Nota operativa
 
@@ -346,7 +356,7 @@ Se un tipo `lab-*` continua a non comparire, il primo sospetto è il frontmatter
 un `description` su una riga sola che contiene `: ` non è YAML valido e il file
 viene scartato in silenzio. **Vale identico per le skill**, e lì non si vede
 proprio: una skill scartata non viene precaricata e l'agente lavora senza, senza
-che niente lo dica. Due delle tre skill della lite erano così. Si controllano
+che niente lo dica. Due delle tre skill nuove erano così. Si controllano
 tutti insieme:
 
     bin/py -c "import glob,yaml
@@ -355,9 +365,9 @@ tutti insieme:
         except Exception as e: print(p, e)"
 
 La cura è lo scalare a blocco `>-`, che è come sono scritti adesso tutti i
-`description` della lite.
+`description` di questa catena.
 
-Fuori dalla lite ne resta uno rotto, `.claude/agents/scrittore-indicatore.md`
-della catena attuale: non è stato toccato qui perché cambiare un prompt di
-quella catena vuole il giro di canary di `docs/CANARY.md`, e farlo alla vigilia
-del confronto fra le due pipeline confonderebbe la misura.
+Adesso il controllo è anche un test: `tests/integration/test_docs_match_the_code.py`
+carica il frontmatter di ogni agente e di ogni skill, verifica che le skill
+precaricate esistano e che ogni `bin/py -m` citato sia un modulo vero. Alla
+prima esecuzione ha trovato due difetti che nessuno vedeva.

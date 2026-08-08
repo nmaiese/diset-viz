@@ -142,9 +142,10 @@ Le tre cose che questa catena ha imparato correndo, e che non erano nel piano:
 pagine già scritte restano come sono finché non le si rifà una per una. L'uscita
 dice `sovrascritto`, perché rifare una pagina non deve essere invisibile.
 
-La catena editoriale autonoma precedente (cancello, diario, worktree,
-`officina/`, i cinque agenti) **non esiste più**. Restano l'ammissione
-(`admissions`, a monte: decide che cosa entra nell'atlante) e `giudice-cieco`.
+Gli altri due agenti del progetto stanno fuori da questa catena:
+**`admissions`** decide che cosa entra nell'atlante, ed è a monte della
+scrittura; **`giudice-cieco`** legge due bozze e dice quale si legge fino in
+fondo, senza avere il progetto in contesto.
 
 ## Writing — READ [`content/STYLE.md`](content/STYLE.md)
 
