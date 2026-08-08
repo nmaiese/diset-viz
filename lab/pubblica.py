@@ -191,9 +191,29 @@ def _rilievi(chiave, entry):
 
 
 def _parole(entry):
-    testo = " ".join([entry.get("lead") or ""] +
-                     [s.get("body") or "" for s in entry.get("sections") or []])
-    return len(testo.split())
+    """Lo stesso conteggio che usa il cruscotto, non uno suo.
+
+    La console confronta le parole dell'articolo servito con quelle che la run ha
+    registrato, per dire se una scrittura e' gia' in linea o aspetta un deploy.
+    Con due definizioni di "parola" quel confronto misurerebbe la differenza fra
+    le definizioni invece che fra gli articoli, e direbbe sempre "non in linea".
+    """
+    from app.editorial_state import parole
+
+    return parole(entry)
+
+
+def _impronta_prosa(entry):
+    """L'identita' della prosa appena scritta, dalla stessa funzione del sito.
+
+    Le parole dicono **quanto**, non **che cosa**: due riscritture della stessa
+    lunghezza si leggevano `in linea` mentre in produzione c'era ancora l'altra.
+    Il conteggio resta accanto perche' dice che cosa e' cambiato quando le due
+    impronte non coincidono.
+    """
+    from app.editorial_state import impronta_prosa
+
+    return impronta_prosa(entry)
 
 
 def main(argv=None):
@@ -254,6 +274,7 @@ def main(argv=None):
         "livello": entry["level"],
         "vintage": entry["vintage"],
         "parole": _parole(entry),
+        "impronta_prosa": _impronta_prosa(entry),
         # Gli H2 come li vedrebbe un lettore: è l'unico modo di controllare la
         # forma di un articolo che nessuna pagina rende, perché `data/lab/`
         # non è letto da niente.

@@ -175,6 +175,12 @@ def all_bes_indicators():
             and level_info["year_max"] >= 2023
             for level_info in levels.values()
         )
+        # Il motivo si calcola qui, accanto alla clausola, o si perde: chi legge
+        # solo il booleano puo' dire "famiglia" e basta, che non distingue una
+        # serie ferma al 2019 da una che copre mezza Italia. Le due cose si
+        # riparano in modi diversi.
+        recenti = [lv for lv in levels.values() if lv["year_max"] >= 2023]
+        motivo = None if indexable else ("vecchia" if not recenti else "copertura")
         public_scope = (
             "regioni e province"
             if set(levels) == {"regione", "provincia"}
@@ -185,6 +191,7 @@ def all_bes_indicators():
             "explain": build_bes_indicator_explain(info, public_scope),
             "path": bes_indicator_path(indicator_id, info["name"]),
             "indexable": indexable,
+            "indexable_reason": motivo,
             "levels": levels,
         })
     return indicators

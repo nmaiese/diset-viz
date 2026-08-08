@@ -27,6 +27,7 @@ il cruscotto deve restare vuoto, non cadere.
 """
 
 import json
+import re
 
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -38,6 +39,35 @@ from app.models import PipelineAgente, PipelineRun
 # di cruscotto non ci sta e non ci serve: si tronca qui, dove il troncamento e'
 # visibile, invece che nel browser dove sembrerebbe un dato mancante.
 TETTO_RISULTATO = 20000
+
+# Oltre questo silenzio una run senza consuntivo non si racconta piu' come viva.
+# Un quarto d'ora e' largo di proposito: il lettore batte ogni cinque secondi, e
+# un ritardo di rete non deve far sparire dal posto d'onore una run che sta
+# lavorando.
+SILENZIO_MASSIMO = 15 * 60
+
+# La forma di un runId, **verbatim** come la dichiara lo strumento Workflow per
+# `resumeFromRunId`. Serve perche' l'ingest accettava qualunque stringa, quindi
+# `[object Object]` o una riga vuota diventavano una run.
+#
+# Aveva un trattino in piu' nella coda (`^wf_[a-z0-9]+-[a-z0-9-]+$`), preso dai
+# runId visti finora, e serviva a rifiutare `wf_precheck`. E' esattamente
+# l'errore contro cui questo commento metteva in guardia una riga piu' sopra:
+# una forma dedotta dai campioni invece che dal contratto. Il contratto ammette
+# `wf_abcdef`, e per una run cosi' il `Postino` inghiotte il 400
+# (`self.guasti += 1`, best effort) e il monitoraggio di quella run sparisce
+# **senza un errore leggibile**. Perdere dati veri in silenzio e' peggio di
+# accettare una riga finta.
+#
+# Quindi la forma **non separa** `wf_precheck` da un runId legale, e non e' li'
+# che sta la difesa: `{"action": "ping"}` risponde senza scrivere niente, ed e'
+# quello che chiede chi sta per spendere una run, mentre `battito_fermo` toglie
+# dal posto d'onore una riga che nessuno rinfresca piu'.
+FORMA_RUN_ID = re.compile(r"^wf_[a-z0-9-]{6,}$")
+
+
+def run_id_valido(run_id):
+    return bool(FORMA_RUN_ID.match(run_id or ""))
 
 # Le colonne che ogni sorgente puo' scrivere. Elencate per **inclusione**: una
 # colonna nuova resta fuori finche' qualcuno non decide a quale delle due
@@ -71,6 +101,26 @@ _JSON_AGENTE = ("risultato", "strumenti")
 def _now():
     from datetime import datetime, timezone
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _muto_da(ultimo_battito, adesso=None):
+    """Vero se l'ultimo battito e' piu' vecchio di `SILENZIO_MASSIMO`.
+
+    Un battito illeggibile non e' silenzio: nel dubbio la run resta viva, perche'
+    declassarla per un timestamp storto sarebbe dire una cosa falsa su una run
+    che magari sta scrivendo."""
+    from datetime import datetime, timezone
+
+    if not ultimo_battito:
+        return False
+    try:
+        quando = datetime.fromisoformat(ultimo_battito)
+    except (TypeError, ValueError):
+        return False
+    if quando.tzinfo is None:
+        quando = quando.replace(tzinfo=timezone.utc)
+    ora = adesso or datetime.now(timezone.utc)
+    return (ora - quando).total_seconds() > SILENZIO_MASSIMO
 
 
 def _testo(valore, tetto=None):
@@ -127,8 +177,8 @@ def registra_run(run_id, payload, now=None):
     Scrive solo `CAMPI_BATTITO_RUN`. `ultimo_battito` lo mette il server e non
     chi chiama, cosi' la freschezza si legge sull'orologio di una macchina sola.
     """
-    if not run_id:
-        raise ValueError("run_id mancante")
+    if not run_id_valido(run_id):
+        raise ValueError(f"run_id non e' un runId: {run_id!r}")
     dati = dict(payload or {})
     dati["ultimo_battito"] = now or _now()
     dati.setdefault("avviata_il", dati["ultimo_battito"])
@@ -154,8 +204,8 @@ def registra_run(run_id, payload, now=None):
 def registra_agente(run_id, agent_id, payload):
     """Il battito di un agente: aperto quando compare, chiuso col suo valore di
     ritorno quando il journal lo registra. Scrive solo `CAMPI_BATTITO_AGENTE`."""
-    if not run_id or not agent_id:
-        raise ValueError("run_id o agent_id mancante")
+    if not run_id_valido(run_id) or not agent_id:
+        raise ValueError(f"run_id non e' un runId, o manca agent_id: {run_id!r}")
     with session_scope() as s:
         # La run si legge partendo da `pipeline_run`: un agente la cui run non
         # esiste sparirebbe dal cruscotto senza che niente lo dica. Succede se
@@ -177,8 +227,8 @@ def registra_consuntivo(run_id, run, agenti, now=None):
     Scrive solo le colonne di consuntivo, quindi puo' arrivare in qualsiasi
     ordine rispetto ai battiti, anche prima (una run gia' finita quando il
     lettore parte) e anche due volte, senza cancellare niente."""
-    if not run_id:
-        raise ValueError("run_id mancante")
+    if not run_id_valido(run_id):
+        raise ValueError(f"run_id non e' un runId: {run_id!r}")
     dati = dict(run or {})
     dati["consuntivo_il"] = now or _now()
     with session_scope() as s:
@@ -200,7 +250,8 @@ def registra_consuntivo(run_id, run, agenti, now=None):
 
 # ------------------------------------------------------------------- lettura
 
-def _riga_run(r, agenti):
+def _riga_run(r, agenti, adesso=None):
+    in_volo = r.stato is None
     return {
         "run_id": r.run_id,
         "workflow": r.workflow,
@@ -212,12 +263,25 @@ def _riga_run(r, agenti):
         "sessione": r.sessione,
         "progetto": r.progetto,
         "stato": r.stato,
-        "in_volo": r.stato is None,
+        "in_volo": in_volo,
+        # Quello che si osserva non e' che la run si sia fermata, e' che **il
+        # lettore ha smesso di battere**: il lettore muore anche mentre la run e'
+        # viva, basta che la run superi il `--per` del poller. Chiamarla
+        # "interrotta" sarebbe la stessa bugia gia' riparata una volta, quando la
+        # console diceva "nessuna run" a una rete caduta. Senza questo campo una
+        # run senza consuntivo resta in cima al cruscotto per sempre.
+        "battito_fermo": in_volo and _muto_da(r.ultimo_battito, adesso),
         "durata_ms": r.durata_ms,
         "fasi": _carica(r.fasi, []),
         "esito": _carica(r.esito, None),
         "logs": _carica(r.logs, []),
         "agenti": agenti,
+        # La lista e il conteggio sono due cose e vogliono due nomi. Erano la
+        # stessa chiave: `lab/cruscotto.py` mandava `len(agenti)` alla colonna
+        # `Integer` e la lettura la riscriveva con la lista, quindi il conteggio
+        # era irraggiungibile nel JSON e la console stampava
+        # `[object Object],[object Object],...` dove voleva un numero.
+        "agenti_totali": len(agenti) or r.agenti or 0,
         "turni": r.turni,
         "tool": r.tool,
         "token": {"in": r.token_in, "cache_w": r.token_cache_w,
@@ -279,3 +343,50 @@ def run(limite=100):
             return [_riga_run(r, per_run.get(r.run_id, [])) for r in righe]
     except SQLAlchemyError:
         return []
+
+
+def db_vivo():
+    """`True` se il database risponde. Distingue "vuoto" da "irraggiungibile".
+
+    `run()` inghiotte `SQLAlchemyError` e restituisce `[]`, che e' la scelta
+    giusta per una pagina (il cruscotto resta vuoto invece di cadere) ed e' la
+    scelta sbagliata per un controllo pre-run: zero run e database giu'
+    uscirebbero identici, e chi sta per spendere sette dollari leggerebbe "presa
+    sana, nessuna run" da una presa che non scrive niente."""
+    from sqlalchemy import text
+
+    from app.db import get_engine
+    try:
+        with get_engine().connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return True
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def stato_presa():
+    """Che cosa vede la presa adesso, senza scrivere niente.
+
+    E' la risposta di `{"action":"ping"}`. Rispondere `{"ok": true}` e basta
+    confermava il segreto e nient'altro, quindi chi stava per spendere una run
+    non aveva nessun motivo di preferire il `ping` a una `run` finta, e la `run`
+    finta lasciava una riga fantasma. Un controllo che riporta lo stato vale la
+    pena di essere chiamato."""
+    if not db_vivo():
+        return {"db": "giu", "run": None, "aperte": None, "mute": None, "ultima": None}
+    righe = run(limite=20)
+    aperte = [r for r in righe if r["in_volo"]]
+    ultima = righe[0] if righe else None
+    return {
+        "db": "su",
+        "run": len(righe),
+        "aperte": len(aperte),
+        "mute": sum(1 for r in aperte if r["battito_fermo"]),
+        "ultima": None if ultima is None else {
+            "run_id": ultima["run_id"],
+            "avviata_il": ultima["avviata_il"],
+            "ultimo_battito": ultima["ultimo_battito"],
+            "in_volo": ultima["in_volo"],
+            "agenti_totali": ultima["agenti_totali"],
+        },
+    }

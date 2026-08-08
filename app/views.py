@@ -18,7 +18,9 @@ from app import sources
 from app import seo_policy
 from app import indicator_notes
 from app import indicator_texts
+from app import indicator_universe
 from app import indicator_view
+from app import editorial_state
 from app import quality_life_bes as qb
 from app import bes_data
 from app import multiscopo_data
@@ -635,52 +637,6 @@ def _pipeline_published_url(indicator_id):
         return None
 
 
-@lru_cache(maxsize=1)
-def _pipeline_universe():
-    """`{indicator_id: {"indexable": bool, "reason": str|None}}` per ogni
-    indicatore di ogni catalogo di famiglia (ter, bes, multiscopo, eur/dem),
-    indipendentemente da cosa ne sa la pipeline editoriale.
-
-    È l'universo vero che risponde a "quanti indicatori abbiamo in totale":
-    il dossier di `practice_timeline` (`board["rows"]`) copre solo ciò che ha
-    già toccato una pratica di ammissione, quindi da solo sottostima. Ogni
-    famiglia legge la propria indicizzabilità dalla stessa fonte già usata
-    dalla sitemap (`indicator_view._is_indexable`), così il cruscotto non può
-    mai divergere da ciò che Google vede davvero. `pipeline_monitor` resta
-    stdlib-puro: questa funzione vive qui, non lì, perché legge i cataloghi
-    (`app.data`, `app.bes_data`, `app.multiscopo_data`, `app.external_atlas`)."""
-    universe = {}
-
-    for item in get_catalog()["indicators"]:
-        ind_id = str(item["id"])
-        indexable = bool(profiles.is_search_indexable_indicator(item))
-        reason = None
-        if not indexable:
-            if profiles.is_gender_variant(item):
-                reason = "variante"
-            elif (item.get("region_count") or 0) < seo_policy.REQUIRED_REGION_COUNT \
-                    or (item.get("completeness") or 0) < seo_policy.MIN_COMPLETENESS:
-                reason = "copertura"
-            else:
-                reason = "vecchia"
-        universe[ind_id] = {"indexable": indexable, "reason": reason}
-
-    for family, reader in (("bes", bes_data.all_bes_indicators), ("multiscopo", multiscopo_data.all_multiscopo_indicators)):
-        for item in reader():
-            ind_id = f"{family}:{item['id']}"
-            indexable = bool(item.get("indexable"))
-            universe[ind_id] = {"indexable": indexable, "reason": None if indexable else "famiglia"}
-
-    for item in external_atlas.all_external_indicators():
-        indexable = bool(item.get("indexable"))
-        reason = None
-        if not indexable:
-            reason = "copertura" if item.get("region_count") != 20 else "vecchia"
-        universe[str(item["id"])] = {"indexable": indexable, "reason": reason}
-
-    return universe
-
-
 @app.route("/_pipeline")
 def pipeline_dashboard():
     """La porta del cruscotto: manda alla console, che è il cruscotto.
@@ -751,6 +707,7 @@ def _articoli_da_esito(esito, run):
             "vintage_precedente": voce.get("vintage_precedente"),
             "percorso": voce.get("percorso"),
             "parole": voce.get("parole"),
+            "impronta_prosa": voce.get("impronta_prosa"),
             "angolo": voce.get("angolo"),
             "giri_di_correzione": voce.get("giri_di_correzione"),
             "cifre_verificate": voce.get("cifre_verificate"),
@@ -770,7 +727,7 @@ def _articoli_da_esito(esito, run):
             "scritto": False,
             "sovrascritto": None,
             "vintage_precedente": None,
-            "percorso": None, "parole": None,
+            "percorso": None, "parole": None, "impronta_prosa": None,
             "angolo": (voce.get("bozza") or {}).get("angolo") if isinstance(voce.get("bozza"), dict) else None,
             "giri_di_correzione": voce.get("giri"),
             "cifre_verificate": (voce.get("verdetto") or {}).get("verificate")
@@ -848,9 +805,111 @@ def pipeline_api_runs():
 def pipeline_api_indicatori():
     """La stessa storia per indicatore: che cosa è stato scritto o riscritto,
     con quale tesi, quanti giri, quali rilievi restano aperti, e se ha
-    sovrascritto una pagina che esisteva. Authed mail-admin."""
+    sovrascritto una pagina che esisteva. Authed mail-admin.
+
+    Non è l'elenco degli indicatori, è **la storia delle run** su di essi: una
+    riga esiste solo se una run l'ha prodotta, quindi qui si vedono gli ultimi
+    due o tre. L'elenco è `/_pipeline/api/catalogo`."""
     _require_pipeline_admin()
     return jsonify(_pipeline_indicatori_payload())
+
+
+def _stato_in_linea(riga, scritture):
+    """`in linea` contro `scritto, non ancora in linea`, e quanto ne siamo certi.
+
+    L'immagine servita porta `content/indicators/` **al commit del deploy**,
+    mentre `pipeline_run.esito` può contenere un articolo scritto dopo: è
+    l'unica differenza vera fra "scritto" e "pubblicato" in questo repo, dove
+    `lab.pubblica` scrive direttamente sulla pagina pubblica e il merge è la
+    pubblicazione.
+
+    Si confronta l'**impronta della prosa** (`editorial_state.impronta`, che
+    stampa anche `lab/pubblica.py`): lead più `sections[].{role,h,body}`, la
+    stessa funzione dalle due parti, perché due definizioni diverse
+    misurerebbero la differenza fra le definizioni invece che fra gli articoli.
+
+    Le parole restano il **ripiego**, e con meno certezza: nessuna delle run già
+    registrate porta l'impronta, e i conteggi dicono quanto, non che cosa. Due
+    riscritture della stessa lunghezza si leggevano `in linea` con certezza
+    `alta` mentre in produzione c'era ancora l'altra, cioè una pubblicazione in
+    attesa che spariva dalla vista. Un conteggio **diverso** invece è una prova:
+    di quella si può dire `alta`.
+
+    `sovrascritto` e `vintage_precedente` non servono qui: un rimaneggiamento
+    sullo stesso anno di dato lascia `vintage` identico anche dopo il deploy,
+    quindi sembrano decisivi e non lo sono.
+    """
+    servito = bool(riga["scritte"]) or riga["lead"]
+    scrittura = scritture.get(riga["codice"])
+    if not servito:
+        return ("scritto, non in linea", "esatta") if scrittura else ("mai scritto", "esatta")
+    if scrittura is None:
+        return "in linea", "assente"
+    impronta_run = scrittura.get("impronta_prosa")
+    if impronta_run and riga.get("impronta_prosa"):
+        return (("in linea", "esatta") if impronta_run == riga["impronta_prosa"]
+                else ("scritto, non in linea", "esatta"))
+    parole_run = scrittura.get("parole")
+    if parole_run is None:
+        # La run non ha registrato niente di confrontabile, e `alta` direbbe che
+        # si è guardato. `certezza` è un campo di prima classe proprio per non
+        # sovrastimare quello che si sa.
+        return "in linea", "assente"
+    if parole_run == riga["parole"]:
+        return "in linea", "debole"
+    return "scritto, non in linea", "alta"
+
+
+def _pipeline_catalogo_payload():
+    """Tutti gli indicatori dell'atlante con il loro stato editoriale.
+
+    La parte cara (la passata sui 634 e i rilievi) sta in
+    `editorial_state.catalogo()`, in cache per la **vita del processo** perché è
+    funzione pura del contenuto dell'immagine. Qui resta la sola giunzione con
+    le run, che cambia mentre guardi.
+
+    Niente `@cache.memoize` su questa: il backend è `simple`, che **pickla il
+    valore**, e qui il valore è mezzo megabyte. Ripiccarlo ogni trenta secondi
+    costerebbe più della giunzione che eviterebbe, che è un giro su un centinaio
+    di run e la copia di 668 dizionari."""
+    from app import pipeline_store
+
+    base = editorial_state.catalogo()
+    scritture, ultime = {}, {}
+    for run in pipeline_store.run():
+        for voce in _articoli_da_esito(run.get("esito"), run):
+            codice = voce["indicatore"]
+            if codice and codice not in scritture and voce["scritto"]:
+                scritture[codice] = voce
+            if codice and codice not in ultime:
+                ultime[codice] = {"run_id": voce["run_id"], "at": voce["at"],
+                                  "esito": voce["esito"]}
+    righe = []
+    for riga in base["righe"]:
+        stato, certezza = _stato_in_linea(riga, scritture)
+        ultima = ultime.get(riga["codice"])
+        righe.append({**riga, "stato": stato, "certezza": certezza,
+                      "url": f"{SITE_URL}{riga['percorso']}" if riga["percorso"] else None,
+                      "ultima_run": (ultima or {}).get("run_id"),
+                      "ultima_run_il": (ultima or {}).get("at")})
+    predefinite = [r for r in righe if r["predefinito"]]
+    totali = {**base["totali"],
+              "in_linea": sum(1 for r in predefinite if r["stato"] == "in linea"),
+              "scritti_non_in_linea": sum(1 for r in predefinite
+                                          if r["stato"] == "scritto, non in linea"),
+              "mai_scritti": sum(1 for r in predefinite if r["stato"] == "mai scritto")}
+    return {"righe": righe, "totali": totali}
+
+
+@app.route("/_pipeline/api/catalogo")
+def pipeline_api_catalogo():
+    """Tutti e 634 gli indicatori con una pagina, e che cosa è scritto di ognuno.
+
+    Una riga per (indicatore, livello), che è l'unità della coda editoriale
+    verbatim: 668 righe, di cui 634 al livello predefinito. Due unità diverse per
+    la stessa cosa divergono. Authed mail-admin."""
+    _require_pipeline_admin()
+    return jsonify(_pipeline_catalogo_payload())
 
 
 @app.route("/_keepalive")
@@ -903,12 +962,17 @@ def pipeline_beat_ingest():
     in qualsiasi ordine, anche a rovescio, senza che l'una cancelli l'altra.
 
     `ping` **non scrive niente** ed esiste per questo. Chi sta per spendere una
-    run vuole sapere due cose prima di partire: che il segreto combaci, e che
+    run vuole sapere tre cose prima di partire: che il segreto combaci, che
     l'immagine servita conosca il protocollo nuovo (una costruita da un master
-    più vecchio risponde `bad_action` e perde ogni battito). La domanda si
-    faceva con un `run` finto, che però è un battito vero: lasciava una run
-    fantasma in cima al cruscotto, senza agenti e per sempre in volo. Una
-    domanda non deve avere effetti.
+    più vecchio risponde `bad_action` e perde ogni battito), e che cosa c'è già
+    registrato. La domanda si faceva con un `run` finto, che però è un battito
+    vero: lasciava una run fantasma in cima al cruscotto, senza agenti e per
+    sempre in volo. Una domanda non deve avere effetti.
+
+    E un `run_id` che non ha la forma di un runId viene rifiutato con 400
+    (`pipeline_store.FORMA_RUN_ID`): la buona maniera non basta come difesa
+    finché la porta accetta qualunque stringa, e `wf_precheck` è entrato due
+    volte da lì.
 
     Best effort per chi chiama: un lettore che non riesce a postare non deve
     fermare niente, quindi qui si è tolleranti e si risponde presto.
@@ -923,8 +987,12 @@ def pipeline_beat_ingest():
     try:
         if action == "ping":
             # Elencare le azioni serve a chi chiama: sa se quello che sta per
-            # mandare verra' capito, invece di scoprirlo mandandolo.
-            return jsonify({"ok": True, "azioni": PIPELINE_AZIONI})
+            # mandare verra' capito, invece di scoprirlo mandandolo. E lo stato
+            # serve perche' un controllo che risponde solo `ok` conferma il
+            # segreto e nient'altro: chi lo chiama non ha nessun motivo di
+            # preferirlo a una `run` finta, che invece lascia una riga fantasma.
+            return jsonify({"ok": True, "azioni": PIPELINE_AZIONI,
+                            "stato": pipeline_store.stato_presa()})
         if action == "run":
             pipeline_store.registra_run(payload.get("run_id", ""), payload)
         elif action == "agente":
@@ -2053,83 +2121,25 @@ def game_guess_api():
     return jsonify(result)
 
 
-_indexable_catalog_lock = threading.Lock()
-
-
 def _indexable_indicator_catalog():
-    """Accessore single-flight al catalogo proiettato: serializza la prima
-    costruzione a freddo.
+    """Il catalogo deduplicato delle pagine indicizzabili, per sitemap e LLM.
 
-    `lru_cache` non coalizza i miss concorrenti. Il worker gunicorn di produzione
-    ha un thread solo per processo? No: un worker, **otto thread** (vedi
-    `Dockerfile`), e `/sitemap.xml` e `/llms-full.txt` sono rotte non cached. Due
-    richieste crawler simultanee a freddo entrerebbero entrambe nel corpo prima
-    che il primo risultato sia in cache, e ognuna rifarebbe la traversata di
-    centinaia di indicatori (secondi di CPU), moltiplicando il lavoro fino al
-    timeout. Il lock fa costruire una volta sola: il primo popola la cache di
-    `_build_indexable_indicator_catalog`, gli altri aspettano e leggono il
-    risultato già pronto (un lookup, quindi il lock si tiene un istante)."""
-    with _indexable_catalog_lock:
-        return _build_indexable_indicator_catalog()
+    La costruzione sta in `app/indicator_universe.py`, che fa **la stessa
+    passata** anche per il cruscotto editoriale: prima la sitemap la faceva sui
+    soli indicizzabili e chi doveva guardare tutto l'atlante ne avrebbe fatta una
+    seconda, cioe' una seconda traversata e un secondo picco di memoria per gli
+    stessi 634 indicatori. Allargarla e' costato 0,2 s.
+
+    Il lock single-flight che stava qui e' dentro `synchronized_cache`: `lru_cache`
+    non coalizza i miss concorrenti, e il worker gunicorn ha otto thread mentre
+    `/sitemap.xml` e `/llms-full.txt` non sono cached. Due crawler simultanei a
+    freddo rifacevano entrambi la traversata per intero."""
+    return indicator_universe.indexable_catalog()
 
 
-@lru_cache(maxsize=1)
-def _build_indexable_indicator_catalog():
-    """One deduplicated catalog for indicator pages, sitemap and LLM exports.
-
-    ``build_indicator_view`` owns both canonical URLs and the family-specific
-    indexability policy.  Starting from every family registry also retains BES
-    series that only have provincial observations and therefore do not enter the
-    regional atlas catalog.
-
-    Building the full view for every indicator is expensive (hundreds of
-    histories and matrices), and ``sitemap.xml``/``llms-full.txt`` are
-    uncached crawler routes that would otherwise repeat that cost on every
-    hit. The source loaders already cache for the life of the process, so this
-    catalog is stable too: memoize it once instead of rebuilding per request.
-
-    **Cached is a compact projection, not the full views.** A full view carries
-    every level's observation history and year-by-territory explore matrix, and
-    retaining all of them for the process lifetime added roughly 110 MiB per
-    worker on the first crawler hit. The two callers only read ``meta`` and a
-    small per-level summary (label, year span, territory count in the last year),
-    so that is all this keeps: the heavy view is dropped as soon as the summary
-    is taken. Callers must not mutate the result.
-    """
-    candidates = []
-    candidates.extend(("territorial", str(item["id"])) for item in get_catalog()["indicators"])
-    candidates.extend(("bes", str(item["id"])) for item in bes_data.all_bes_indicators())
-    if multiscopo_data.has_multiscopo_data():
-        candidates.extend(
-            ("multiscopo", str(item["id"]))
-            for item in multiscopo_data.all_multiscopo_indicators()
-        )
-    if external_atlas.has_external_data():
-        candidates.extend(
-            sources.split_internal_id(item["id"])
-            for item in external_atlas.all_external_indicators()
-        )
-
-    catalog = []
-    seen_paths = set()
-    for family, raw_id in candidates:
-        view = indicator_view.build_indicator_view(family, raw_id)
-        if view is None or not view["meta"]["indexable"]:
-            continue
-        path = view["meta"]["canonical_path"]
-        if path in seen_paths:
-            continue
-        seen_paths.add(path)
-        catalog.append({
-            "meta": view["meta"],
-            "levels": [
-                {"label": level["label"], "year_min": level["year_min"],
-                 "year_max": level["year_max"],
-                 "territory_count": len(level["observations"])}
-                for level in view["levels"]
-            ],
-        })
-    return sorted(catalog, key=lambda record: record["meta"]["canonical_path"])
+# Il nome vecchio, per i test che lo importano da qui: la funzione si e' spostata,
+# la domanda che risponde no.
+_build_indexable_indicator_catalog = _indexable_indicator_catalog
 
 
 @app.route("/sitemap.xml")

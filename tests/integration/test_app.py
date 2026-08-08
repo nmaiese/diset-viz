@@ -1405,6 +1405,69 @@ class HardeningTest(unittest.TestCase):
         self.assertTrue(codes.count(429) >= 1)
 
 
+class LUniversoHaUnProprietarioSolo(unittest.TestCase):
+    """Chi risponde a "questa pagina va in indice" deve essere uno.
+
+    Ce n'erano due: `indicator_view` (che la sitemap legge) e una copia dentro
+    `app/views.py` scritta per il cruscotto. Non davano la stessa risposta:
+    `dem:LIFEEXP65F` e `dem:LIFEEXP65M` sono varianti di genere, la sitemap non
+    le pubblica, e il cruscotto le contava fra le indicizzabili. Un cruscotto che
+    conta pagine che non esistono e' peggio di un cruscotto vuoto, perche' non lo
+    dice. La copia e' stata cancellata: questo test e' quello che l'avrebbe
+    trovata, e resta perche' la prossima nascerebbe uguale.
+    """
+
+    def test_l_universo_editoriale_e_quello_delle_pagine_pubbliche(self):
+        from app import indicator_universe
+        refs = indicator_universe.all_indicator_refs()
+        self.assertEqual(len(refs), len(set(refs)), "un indicatore contato due volte")
+        # 594 e' il catalogo dell'atlante: 40 serie BES hanno solo osservazioni
+        # provinciali, quindi non ci entrano ma la loro pagina esiste.
+        self.assertGreater(len(refs), 594)
+
+    def test_le_varianti_di_genere_restano_fuori_indice(self):
+        """I due casi su cui la copia cancellata sbagliava, per nome.
+
+        Un test sui numeri totali non li avrebbe nominati, e un totale che torna
+        per compensazione e' il modo in cui questa classe di difetto sopravvive
+        a una suite verde. L'incrocio vero (la console contro la sitemap
+        servita) sta in `test_pipeline_monitor.py`, dove c'e' il client
+        autenticato."""
+        # `dem` è l'acronimo dell'URL, `istat_demografia` la chiave di famiglia:
+        # non coincidono, ed è la stessa trappola per cui `ims` non è `multiscopo`.
+        from app import indicator_view, sources
+        famiglia = sources.parse_indicator_code("dem-LIFEEXP65F")[0]
+        for raw_id in ("LIFEEXP65F", "LIFEEXP65M"):
+            vista = indicator_view.build_indicator_view(famiglia, raw_id)
+            self.assertIsNotNone(vista, f"dem-{raw_id} non si risolve piu'")
+            self.assertFalse(vista["meta"]["indexable"], f"dem-{raw_id}")
+            self.assertEqual(vista["meta"]["indexable_reason"], "variante")
+
+    def test_un_motivo_per_ogni_pagina_fuori_indice(self):
+        """`variante`, `copertura` e `vecchia` si riparano in tre modi diversi:
+        un motivo unico li appiattirebbe e la riga si leggerebbe come un guasto
+        invece che come una scelta."""
+        from app import indicator_universe
+        for record in indicator_universe.projection():
+            meta = record["meta"]
+            if meta["indexable"]:
+                self.assertIsNone(meta["indexable_reason"])
+            else:
+                self.assertIn(meta["indexable_reason"], ("variante", "copertura", "vecchia"))
+
+    def test_allargare_la_passata_non_cambia_la_sitemap(self):
+        """Il dedup su `canonical_path` resta **dentro** il sottoinsieme
+        indicizzabile: deduplicando prima di filtrare, un non indicizzabile che
+        occupa il path butterebbe fuori dalla sitemap il suo gemello."""
+        from app import indicator_universe
+        catalogo = indicator_universe.indexable_catalog()
+        percorsi = [r["meta"]["canonical_path"] for r in catalogo]
+        self.assertEqual(len(percorsi), len(set(percorsi)))
+        self.assertTrue(all(r["meta"]["indexable"] for r in catalogo))
+        attesi = sum(1 for r in indicator_universe.projection() if r["meta"]["indexable"])
+        self.assertEqual(len(catalogo), attesi)
+
+
 class TheImageShipsEverythingTheAppImports(unittest.TestCase):
     """Il guasto che si vede solo in produzione, e lì si vede tutto insieme.
 

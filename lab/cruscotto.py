@@ -14,10 +14,16 @@ e qui lo si legge da fuori.
 
 Sonda vera (`wf_90bf85dd-65e`, due agenti, file guardati ogni otto secondi):
 
+  dentro `<sessione>/subagents/workflows/<runId>/`:
     journal.jsonl            VIVO   `started` e `result`, col valore di ritorno
     agent-<id>.meta.json     VIVO   solo {"agentType", "spawnDepth"}
     agent-<id>.jsonl         VIVO   il prompt, poi un `usage` per richiesta
+
+  altrove, e questo e' il punto:
     <sessione>/workflows/<runId>.json   SOLO A RUN FINITA
+
+Il quarto file **non** sta sotto `subagents/`: elencarlo di seguito agli altri
+tre ha gia' fatto cercare il consuntivo nella cartella sbagliata.
 
 Da qui discendono le due regole del file:
 
@@ -86,6 +92,14 @@ CODICE = re.compile(r"\b(?:ter|bes|ims|eur|dem)-[0-9A-Za-z_.:-]+\b")
 
 TETTO_RISULTATO = 20000
 UA = "divarioitalia-cruscotto/1 (+https://divarioitalia.it)"
+
+# Ogni quanto la riga di una run viene riposta anche se non e' cambiato niente.
+# Non e' un intervallo di lettura, e' quello che tiene onesto `battito_fermo`:
+# il server stampa `ultimo_battito` a ogni POST, e senza rinfresco un agente che
+# lavora a lungo lo lasciava fermo. Due minuti contro i quindici di
+# `app.pipeline_store.SILENZIO_MASSIMO`: sette rinfreschi di margine, e nessuno
+# ha bisogno che questo file importi `app` per restare d'accordo.
+RINFRESCO_BATTITO = 120
 
 
 def _ora():
@@ -444,10 +458,12 @@ class Giro:
     intervallo riposterebbe tutta la storia, e il costo del monitoraggio
     crescerebbe con la durata della run invece che con quello che succede."""
 
-    def __init__(self, postino, radice):
+    def __init__(self, postino, radice, orologio=time.monotonic):
         self.postino = postino
         self.radice = radice
         self.viste = {}       # run_id -> impronta dell'ultimo battito mandato
+        self.mandate = {}     # run_id -> quando l'abbiamo mandato l'ultima volta
+        self.orologio = orologio
         self.consuntivate = set()
 
     def passa(self):
@@ -466,16 +482,35 @@ class Giro:
         return mandati
 
     def _battito(self, run_id, dove, vivo):
+        """La riga della run, e gli agenti solo quando qualcosa e' cambiato.
+
+        Il **rinfresco** e' la meta' che mancava, e senza si mentiva in pagina.
+        Mentre un agente lavora non cambia niente di quello che si legge da
+        fuori (`journal.jsonl` non scrive finche' non chiude, e le mtime che
+        entrano nell'impronta sono quelle di file gia' scritti), quindi
+        l'impronta resta identica e nessun POST parte. Ma `ultimo_battito` lo
+        stampa il server a ogni POST: un agente che lavora piu' di
+        `SILENZIO_MASSIMO` faceva leggere la run come `battito fermo` mentre il
+        lettore stava benissimo, ed e' la stessa bugia che quel campo esiste per
+        togliere. Un turno lungo non e' raro, e' la norma di chi scrive.
+
+        Il rinfresco riposta **la sola riga della run**: gli agenti restano
+        soppressi, che e' la ragione per cui questa classe ha una memoria."""
         impronta = json.dumps(vivo, ensure_ascii=False, sort_keys=True)
-        if self.viste.get(run_id) == impronta:
+        adesso = self.orologio()
+        invariato = self.viste.get(run_id) == impronta
+        if invariato and adesso - self.mandate.get(run_id, adesso) < RINFRESCO_BATTITO:
             return 0
         self.viste[run_id] = impronta
+        self.mandate[run_id] = adesso
         self.postino.manda({
             "action": "run", "run_id": run_id,
             "avviata_il": vivo["avviata_il"], "fase_stimata": vivo["fase_stimata"],
             "agenti_visti": vivo["agenti_visti"],
             "sessione": dove["sessione"], "progetto": dove["progetto"],
         })
+        if invariato:
+            return 1
 
         for agente in vivo["agenti"]:
             self.postino.manda({

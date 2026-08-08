@@ -244,11 +244,14 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     ``roles_covered``: la lista dei ruoli che scrive come H2. Se la `definizione`
     non è fra quelli, non apre più l'articolo: la sua meccanica va nel blocco
     "Come leggere il dato" (``indicator_page.html``), che compone lo stesso
-    ``explain`` dai metadati. Il campo vive a livello di entry e **non entra nel
-    ``prose_fingerprint``** (che legge solo lead + ``sections[].{role,h,body}``),
-    quindi le entry senza il campo hanno impronta identica a prima: additivo, i
-    trecento articoli esistenti non cambiano. ``come_leggere`` nel risultato dice
-    al template quando rendere il blocco al posto dell'H2 definizione.
+    ``explain`` dai metadati. Il campo vive a livello di entry, e l'impronta
+    della prosa (``app/editorial_state.impronta_prosa``, che legge lead +
+    ``sections[].{role,h,body}``) ci mescola **la sequenza emessa**: una
+    dichiarazione che assorbe la definizione cambia la pagina senza toccare una
+    parola, e senza questo si leggerebbe identica a quella di prima. Dichiarare
+    tutti e quattro i ruoli non la muove, perché la sequenza resta quella di
+    sempre. ``come_leggere`` nel risultato dice al template quando rendere il
+    blocco al posto dell'H2 definizione.
     """
     entry = get_text(indicator_id) or {}
     if (entry.get("level") or DEFAULT_LEVEL) != (level_key or DEFAULT_LEVEL):
@@ -302,7 +305,7 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
         # il derivato di oggi (H1 = nome amministrativo, title = boilerplate "per
         # regione"). Un titolo in lingua comune ("Dove si lavora di più nella
         # ricerca") è un giudizio editoriale, non derivabile, quindi vive nel file
-        # dell'articolo. Campi di entry, non entrano nel `prose_fingerprint`.
+        # dell'articolo. Campi di entry, non entrano nell'impronta della prosa.
         "h1": (entry.get("h1") or "").strip() or None,
         "seo_title": (entry.get("seo_title") or "").strip() or None,
         "fonti": visible_sources(entry),

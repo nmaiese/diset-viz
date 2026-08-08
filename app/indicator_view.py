@@ -32,7 +32,7 @@ Two consequences worth knowing:
 
 import functools
 
-from app import profiles, sources
+from app import profiles, seo_policy, sources
 from app.atlas_catalog import get_atlas_indicator, get_atlas_catalog
 from app.bes_data import all_bes_indicators, get_bes_indicator_page, get_bes_rows, get_bes_territories
 from app.data import indicator_trend_stats, indicator_year_over_year_stats
@@ -138,6 +138,7 @@ def _build_meta(family, raw_id, source_meta):
     name = source_meta["name"]
     explain = source_meta.get("explain") or {}
     direction = explain.get("direction") or source_meta.get("direction")
+    indexable, motivo_indice = indexability(family, raw_id, source_meta)
     return {
         "id": source_meta["id"],
         "raw_id": raw_id,
@@ -177,7 +178,9 @@ def _build_meta(family, raw_id, source_meta):
         "archive": source_meta.get("archive"),
         "quality_life_scored": source_meta.get("quality_life_scored", False),
         "quality_life_category_label": source_meta.get("quality_life_category_label"),
-        "indexable": _is_indexable(family, raw_id, source_meta),
+        "indexable": indexable,
+        # Perche' no: `variante`, `copertura`, `vecchia`. Nullo quando e' si'.
+        "indexable_reason": motivo_indice,
         # The catalog already computed the canonical path for every family, and
         # the families do not agree on the slug: the atlas truncates it at 80
         # characters, the quality-of-life ones do not. Rebuilding it here silently
@@ -191,14 +194,14 @@ def _build_meta(family, raw_id, source_meta):
 
 @functools.lru_cache(maxsize=2)
 def _family_indexability(family):
-    """{raw_id: indexable} as the family's own catalog computes it."""
-    if family == "bes":
-        return {item["id"]: bool(item["indexable"]) for item in all_bes_indicators()}
-    return {item["id"]: bool(item["indexable"]) for item in all_multiscopo_indicators()}
+    """{raw_id: (indexable, motivo)} as the family's own catalog computes it."""
+    reader = all_bes_indicators if family == "bes" else all_multiscopo_indicators
+    return {item["id"]: (bool(item["indexable"]), item.get("indexable_reason"))
+            for item in reader()}
 
 
-def _is_indexable(family, raw_id, source_meta):
-    """One indexability answer, applying each family's own rule unchanged.
+def indexability(family, raw_id, source_meta):
+    """`(indexable, motivo)`: una risposta sola, e il motivo quando è no.
 
     The two rules are genuinely different: the atlas wants complete regional
     coverage, no gender variant and a recent year, while the quality-of-life
@@ -206,10 +209,30 @@ def _is_indexable(family, raw_id, source_meta):
     (app/views.py) still branches on the family catalog's own `indexable` flag,
     so reading anything else here puts 47 BES and Multiscopo pages out of step
     with the sitemap that lists them. Picking between the rules is all this does.
+
+    Il motivo non è decorazione del cruscotto: `variante`, `copertura` e
+    `vecchia` si riparano in tre modi diversi, e senza di esso una pagina fuori
+    indice si legge come un guasto invece che come una scelta. Sta qui e non
+    dove lo si consuma perché **questa deve restare l'unica risposta**: una
+    seconda copia della regola in `app/views.py` diceva indicizzabili due
+    varianti di genere (`dem:LIFEEXP65F` e `dem:LIFEEXP65M`) che la sitemap non
+    pubblica, cioè un cruscotto che contava pagine inesistenti.
     """
     if family in ("bes", "multiscopo"):
-        return _family_indexability(family).get(raw_id, False)
-    return profiles.is_search_indexable_indicator(source_meta)
+        return _family_indexability(family).get(raw_id, (False, "copertura"))
+    if profiles.is_search_indexable_indicator(source_meta):
+        return True, None
+    if profiles.is_gender_variant(source_meta):
+        return False, "variante"
+    if (source_meta.get("region_count", len(source_meta.get("regions", []))) < seo_policy.REQUIRED_REGION_COUNT
+            or (source_meta.get("completeness") or 0) < seo_policy.MIN_COMPLETENESS):
+        return False, "copertura"
+    return False, "vecchia"
+
+
+def _is_indexable(family, raw_id, source_meta):
+    """Il solo booleano, per chi non ha bisogno del motivo."""
+    return indexability(family, raw_id, source_meta)[0]
 
 
 def _downloads(indicator_id):

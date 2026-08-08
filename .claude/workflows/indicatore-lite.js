@@ -277,6 +277,14 @@ const PUBBLICATO = {
     vintage_precedente: { type: ['string', 'number', 'null'] },
     percorso: { type: ['string', 'null'] },
     parole: { type: ['number', 'null'] },
+    // L'identita' della prosa scritta su disco, che il sito ricalcola dal file
+    // servito per dire se la pagina in linea e' questa o una precedente. Non e'
+    // il `digest` di `improntaDi` qui sopra: quello congela la **bozza** prima
+    // della scrittura e ci mette dentro le fonti, per accorgersi se e' stata
+    // pubblicata una bozza diversa da quella verificata. Senza questo campo il
+    // cruscotto confronta le sole parole, e due riscritture della stessa
+    // lunghezza si leggono `in linea` mentre in produzione c'e' ancora l'altra.
+    impronta_prosa: { type: ['string', 'null'] },
     impaginazione: {
       type: 'array',
       items: {
@@ -514,7 +522,8 @@ const esiti = await pipeline(
       `    bin/py -m lab.pubblica ${d.codice}${conLivello(d)} --bozza ${esito.bozza_salvata}\n\n` +
       `Riporta \`impaginazione\` (gli H2 che la pagina renderebbe), \`sovrascritto\` `+
       `e \`vintage_precedente\` (l'articolo scriveva su una pagina che esisteva ` +
-      `gia', e con che dato) e tutti i rilievi, ` +
+      `gia', e con che dato), \`parole\` e \`impronta_prosa\` cosi' come li stampa il ` +
+      `comando, e tutti i rilievi, ` +
       `anche quelli di severità \`segnala\`. Non correggere niente: se il comando ` +
       `rifiuta, riporta i problemi così come li stampa.`,
       { agentType: 'lab-pubblicatore', model: 'haiku', effort: 'low', phase: 'Pubblicazione', schema: PUBBLICATO, label: `pubblica:${d.codice}` },
@@ -527,6 +536,7 @@ const esiti = await pipeline(
       vintage_precedente: pubblicato?.vintage_precedente ?? null,
       percorso: pubblicato?.percorso ?? null,
       parole: pubblicato?.parole ?? null,
+      impronta_prosa: pubblicato?.impronta_prosa ?? null,
       angolo: esito.bozza?.angolo ?? null,
       giri_di_correzione: esito.giri ?? 0,
       cifre_verificate: esito.verdetto?.verificate ?? null,

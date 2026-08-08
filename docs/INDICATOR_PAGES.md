@@ -123,10 +123,12 @@ Le regole, tutte meccaniche:
   scrive troverebbe per sempre la `definizione` «da scrivere» e la
   riscriverebbe a ogni giro.
 - **Assorbire la definizione cambia l'impronta della prosa.** Cambia cosa la
-  pagina mostra senza toccare una parola, quindi `prose_fingerprint` mescola
-  l'insieme dei ruoli emessi quando non è quello di sempre: verifica e lettura
-  scadono e l'articolo torna in coda. Dichiarare tutti e quattro i ruoli invece
-  non muove l'impronta, perché la pagina rende identica.
+  pagina mostra senza toccare una parola, quindi
+  `app/editorial_state.impronta_prosa` mescola l'insieme dei ruoli emessi: due
+  entry con le stesse parole e `roles_covered` diverso non sono la stessa
+  pagina, e il cruscotto non deve leggerle "in linea" l'una per l'altra.
+  Dichiarare tutti e quattro i ruoli invece non muove l'impronta, perché la
+  sequenza emessa resta quella di sempre.
 - **La navigazione segue.** La domanda di definizione punta a `#come-leggere`
   invece che a `#sezione-definizione`, che in quella forma non esiste.
 

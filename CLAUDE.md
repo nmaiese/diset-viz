@@ -23,6 +23,7 @@ it).
 | **scrivere articoli indicatore**: il workflow, il dossier, il controllo, il lint | [`lab/README.md`](lab/README.md), `.claude/workflows/indicatore-lite.js` |
 | quanto costa una run, e come si misura senza sbagliare | `scripts/baseline_tokens.py` (il contratto sta nel suo docstring) |
 | **guardare la catena mentre gira**, o dopo: il cruscotto | `lab/cruscotto.py`, [`lab/README.md`](lab/README.md), `.claude/rules/app.md` |
+| **a che punto è la prosa dell'atlante**: lo stato dei 634 indicatori | `app/editorial_state.py` (il criterio, uno solo), `app/indicator_universe.py` (la passata, una sola) |
 | scoperta e promozione di indicatori multifonte | [`docs/DISCOVERY_PIPELINE.md`](docs/DISCOVERY_PIPELINE.md) |
 | aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
 | dati provinciali | [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md) |
@@ -104,9 +105,9 @@ cd frontend && npm run build && cd ..
 .venv/bin/gunicorn run:app -b 127.0.0.1:5050
 
 # tests, audit, whitespace
-bin/py -m unittest discover -s tests -v          # tutta la suite (607 test, ~20s), prima di commit/push
-bin/py -m unittest discover -s tests/unit -v      # solo veloci (213 test, <1s), durante lo sviluppo
-bin/py -m unittest discover -s tests/integration -v  # solo la parte pesante (394 test, ~19s): Flask/HTTP e catena e2e
+bin/py -m unittest discover -s tests -v          # tutta la suite (646 test, ~22s), prima di commit/push
+bin/py -m unittest discover -s tests/unit -v      # solo veloci (225 test, <1s), durante lo sviluppo
+bin/py -m unittest discover -s tests/integration -v  # solo la parte pesante (421 test, ~21s): Flask/HTTP e catena e2e
 cd frontend && npm audit --audit-level=low
 git diff --check
 ```
