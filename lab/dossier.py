@@ -640,11 +640,12 @@ def da_coda(quanti, anno_minimo):
     34 che restano fuori diventeranno raggiungibili quando lo store saprà
     tenere due articoli per indicatore.
 
-    La vista si costruisce **una candidata alla volta e solo per le candidate**:
-    è la parte cara di questa funzione, e montarne 668 per restituirne una
-    sarebbe il costo di un catalogo intero per una riga.
+    Il livello di default lo porta ormai la riga stessa (`default_level`), che è
+    la stessa cosa che `build_indicator_view` dice alla pagina: prima si
+    ricostruiva una vista per ogni candidata, cioè si rifaceva un pezzo della
+    passata che la coda aveva già fatto.
     """
-    from lab.coda import build_queue
+    from lab.coda import build_queue, da_scrivere
 
     scelti = []
     for riga in build_queue():
@@ -652,30 +653,14 @@ def da_coda(quanti, anno_minimo):
             break
         if not (riga["indexable"] and riga["year_max"] >= anno_minimo):
             continue
-        if not (riga["missing"] or not riga["lead"] or riga["stale"]):
+        if not da_scrivere(riga):
             continue
-        if riga["level"] != _livello_di_default(riga["code"]):
+        if riga["level"] != riga["default_level"]:
             continue
         scelti.append({"codice": riga["code"], "livello": riga["level"],
                        "nome": riga["name"], "anno_max": riga["year_max"],
                        "punteggio": riga["score"]})
     return scelti
-
-
-def _livello_di_default(codice):
-    """Il livello su cui `lab.controlla` e `lab.pubblica` lavorano se nessuno lo dice.
-
-    Un indicatore che non si risolve o senza vista restituisce `None`, che non
-    coincide con nessun livello e quindi esclude la riga. È il verso giusto del
-    dubbio: oggi le righe senza vista sono zero, e uno zero smette di essere
-    zero senza avvisare.
-    """
-    try:
-        famiglia, grezzo = risolvi(codice)
-        vista = build_indicator_view(famiglia, grezzo)
-    except Exception:
-        return None
-    return (vista or {}).get("default_level")
 
 
 def main(argv=None):

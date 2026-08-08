@@ -45,19 +45,28 @@ paths:
 - `/_pipeline`, `/_pipeline/console` — il cruscotto della catena, su
   `monitor.divarioitalia.it`, ristretto alla mail admin via RLS. `/_pipeline` è
   solo la porta e manda alla console: **una vista sola su questo stato**, perché
-  due divergono, e qui sono già divergiute una volta. Tre orizzonti (in tempo
-  reale, a passo finito, a run finita) e due punti di vista, `/_pipeline/api/runs`
-  per workflow e `/_pipeline/api/indicatori` per indicatore, quest'ultima
-  **derivata** dall'esito delle run e non da una tabella sua.
+  due divergono, e qui sono già divergiute una volta. Tre API:
+  `/_pipeline/api/catalogo` è l'elenco, **tutti e 634 gli indicatori con una
+  pagina** e il loro stato editoriale, una riga per (indicatore, livello) come la
+  coda; `/_pipeline/api/runs` è la vista per workflow; `/_pipeline/api/indicatori`
+  è la storia delle run per indicatore, **derivata** dall'esito e non da una
+  tabella sua. Il criterio editoriale vive in `app/editorial_state.py` e la
+  passata sui 634 in `app/indicator_universe.py`, che serve **anche la sitemap**:
+  una seconda passata sarebbe un secondo picco di memoria, e una seconda regola
+  di indicizzabilità è già costata due pagine contate e mai pubblicate.
+  **`indicator_view.indexability()` è l'unico proprietario di quella domanda.**
   `/_pipeline/beat` è la presa: la scrive `lab/cruscotto.py`, che legge i
-  trascritti **di fianco** al workflow. `{"action":"ping"}` risponde senza
-  scrivere niente, ed è così che si chiede se la presa è viva prima di spendere
-  una run: chiederlo con un `run` finto lasciava una run fantasma in cima al
+  trascritti **di fianco** al workflow. `{"action":"ping"}` risponde con lo stato
+  senza scrivere niente, ed è così che si chiede se la presa è viva prima di
+  spendere una run; un `run_id` che non ha la forma di un runId è rifiutato con
+  400, perché chiederlo con un `run` finto lasciava una run fantasma in cima al
   cruscotto. Nessun agente della catena batte, e
   nessun prompt lo sa: i turni sono il costo, e il monitoraggio non ne aggiunge.
   Il modello dati (`app/pipeline_store.py`) ha una regola sola da non rompere:
   **il battito e il consuntivo scrivono colonne disgiunte**, così la seconda
-  sorgente non riscrive quello che ha detto la prima.
+  sorgente non riscrive quello che ha detto la prima. E due chiavi per due cose:
+  `agenti` è la lista, `agenti_totali` il conteggio, perché quando erano una sola
+  la console stampava `[object Object]` dove voleva un numero.
 
 Strato dati: `app/data.py` (legge `app/static/data/Assoluti_Regione.csv`).
 Strato blog: `app/blog.py` (legge `content/posts/*.md`).

@@ -12,9 +12,19 @@
       window.__monitorAdminEmail = {{ monitor_admin_email | tojson }};
     </script>
     <style>
-      :root { --navy:#15233b; --paper:#fbfaf7; --accent:#e4572e; --line:#d9d6cf; --ink:#15233b; --ink-soft:#5b6472; }
+      {# La rampa sequenziale è la stessa logica delle mappe dell'atlante: un
+         solo colore, più scuro dove c'è più scritto. Non è un arcobaleno di
+         stati, è una quantità. L'accento resta uno e si spende in due posti
+         soli: la run in volo e l'articolo arretrato, che è il solo stato
+         **sbagliato** e quindi il solo che merita di gridare. #}
+      :root { --navy:#15233b; --paper:#fbfaf7; --accent:#e4572e; --line:#d9d6cf; --ink:#15233b; --ink-soft:#5b6472;
+              --g1:#15233b; --g2:#3c4a5e; --g3:#5b6472; --g4:#8b929c; --g5:#b9bec6; --g6:#e6e3dc; }
       * { box-sizing: border-box; }
-      body { margin:0; background:var(--paper); color:var(--ink); font-family: Inter, system-ui, sans-serif; }
+      {# I codici (`wf_239ad8ce-af7`, `bes-06POL012P`) e i percorsi non hanno un
+         punto dove andare a capo, quindi su schermo stretto spingono il corpo
+         oltre la finestra e la pagina scorre in orizzontale: succede una volta e
+         poi ogni riga della tabella e' tagliata a destra. #}
+      body { margin:0; background:var(--paper); color:var(--ink); font-family: Inter, system-ui, sans-serif; overflow-wrap:anywhere; }
       #monitor-root { max-width: 1180px; margin: 0 auto; padding: 32px 20px 64px; }
       h1 { font-family: Archivo, sans-serif; font-size: 26px; margin: 0; }
       h2 { font-family: Archivo, sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-soft); margin: 30px 0 10px; }
@@ -22,14 +32,32 @@
       .mon-gate { text-align:center; padding: 80px 16px; }
       .mon-msg, .mon-empty { color: var(--ink-soft); }
       .mon-empty { padding: 14px 0; }
-      .mon-btn { background: var(--accent); color:#fff; border:0; border-radius:999px; padding:10px 22px; font-size:14px; font-weight:600; cursor:pointer; margin-top:14px; }
+      {# `overflow-wrap:anywhere` sul corpo spezza anche le etichette dei
+         bottoni, e "Esci" diventa "Esc i". Un bottone non va mai a capo. #}
+      .mon-btn { background: var(--accent); color:#fff; border:0; border-radius:999px; padding:10px 22px; font-size:14px; font-weight:600; cursor:pointer; margin-top:14px; white-space:nowrap; overflow-wrap:normal; }
       .mon-btn--ghost { background:none; color:var(--ink); border:1px solid var(--line); margin-top:0; }
       .mon-btn--sm { padding:5px 14px; font-size:12px; }
-      .mon-head { display:flex; align-items:center; gap:12px; }
+      .mon-head { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
       .mon-head h1 { flex: 0 0 auto; }
-      .mon-head .mon-btn { margin: 0 0 0 auto; }
+      {# Il margine che spinge a destra sta sul pallino, non sui bottoni: messo
+         sui bottoni valeva per tutti e due, e il secondo finiva su una riga sua. #}
+      .mon-head .mon-dot { margin-right: auto; }
+      .mon-head .mon-btn { margin: 0; }
+      .mon-azioni { display:flex; gap:8px; flex:0 0 auto; }
       .mon-dot { width:9px; height:9px; border-radius:50%; background:#2e9e4f; box-shadow:0 0 0 0 rgba(46,158,79,.5); animation: pulse 2s infinite; }
       @keyframes pulse { 70%{ box-shadow:0 0 0 8px rgba(46,158,79,0);} 100%{ box-shadow:0 0 0 0 rgba(46,158,79,0);} }
+      .mon-eyebrow { font-family: Archivo, sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:var(--ink-soft); margin:0 0 10px; }
+      .mon-banda { display:block; margin-top:26px; }
+      {# 634 nomi in accento e sottolineati sono 634 richiami: il link si legge
+         dalla freccia e dal passaggio del mouse, non da una riga sotto ognuno. #}
+      td a { color:var(--ink); text-decoration:none; }
+      td a:hover { color:var(--accent); text-decoration:underline; }
+      :focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+      {# Chi ha chiesto meno movimento non deve inseguire un pallino che pulsa
+         per capire quale agente è aperto: il colore lo dice già. #}
+      @media (prefers-reduced-motion: reduce) {
+        .mon-dot, .mon-pallini .aperto { animation: none; }
+      }
 
       {# --- ADESSO: la run in volo, sempre in cima. È la risposta alla sola
          domanda che ha fretta, quindi non sta dentro un filtro né dietro una
@@ -37,6 +65,11 @@
       .mon-adesso { border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:8px; background:#fff; padding:14px 16px; }
       .mon-adesso--ferma { border-left-color: var(--line); }
       .mon-adesso-testa { display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; font-family:"Space Mono", ui-monospace, monospace; font-size:13px; }
+      {# Un figlio di flex non scende sotto la larghezza del suo contenuto finche'
+         ha `min-width:auto`, quindi `overflow-wrap` da solo non basta: un runId
+         allargava la scheda, e con lei tutta la pagina, e su telefono ogni riga
+         della tabella finiva tagliata a destra. #}
+      .mon-adesso-testa > *, .mon-legende > *, .mon-filters > * { min-width:0; }
       .mon-adesso-testa strong { font-family: Archivo, sans-serif; font-size:16px; }
       .mon-spina { display:flex; flex-wrap:wrap; gap:18px; margin:12px 0 4px; }
       .mon-fase { display:flex; flex-direction:column; gap:3px; }
@@ -84,6 +117,50 @@
       .mon-esito--fermato { background:var(--paper); color:var(--ink); border-color:var(--ink-soft); border-style:dashed; }
       .mon-esito--guasto { background:var(--accent); color:var(--paper); border-color:var(--accent); }
       .mon-esito--volo { background:var(--paper); color:var(--accent); border-color:var(--accent); border-style:dotted; }
+      .mon-esito--muta { background:var(--paper); color:var(--ink-soft); border-color:var(--ink-soft); border-style:dotted; }
+      .mon-muta { color:var(--ink-soft); }
+
+      {# --- La firma: l'anatomia. Un articolo è un attacco più esattamente
+         quattro ruoli, quindi il glifo ha cinque parti. Ripetuto 634 volte in
+         colonna diventa la trama della pagina: lo stato dell'atlante si legge
+         socchiudendo gli occhi, prima di leggere una parola. --- #}
+      .mon-anat { display:inline-flex; align-items:center; gap:2px; }
+      .mon-anat-lead { width:2px; height:13px; background:var(--g6); margin-right:3px; }
+      .mon-anat-lead--si { background:var(--navy); }
+      .mon-anat-pieno, .mon-anat-assente, .mon-anat-vuoto { width:9px; height:9px; border:1px solid var(--navy); }
+      .mon-anat-pieno { background:var(--navy); }
+      .mon-anat-assente { background:transparent; }
+      .mon-anat-vuoto { border-color:var(--g6); background:transparent; }
+
+      {# --- Il recap: la stessa idea alla scala dell'atlante. Ogni indicatore è
+         un filo, i gruppi sono contigui, quindi la banda si legge insieme come
+         634 fatti singoli e come una barra proporzionale. La legenda sotto **è**
+         il filtro: un oggetto solo fa il riepilogo e la navigazione. --- #}
+      .mon-grande { font-family: Archivo, sans-serif; font-size:15px; margin:0 0 10px; color:var(--ink-soft); }
+      .mon-grande strong { font-size:40px; font-weight:700; color:var(--ink); letter-spacing:-.02em; margin-right:6px; }
+      .mon-banda-fili { display:flex; height:34px; gap:0; border:1px solid var(--line); background:#fff; overflow:hidden; }
+      .mon-filo { flex:1 1 0; min-width:0; }
+      .mon-filo--completo { background:var(--g1); }
+      .mon-filo--senza-lead { background:var(--g2); }
+      .mon-filo--manca-1 { background:var(--g3); }
+      .mon-filo--manca-2 { background:var(--g4); }
+      .mon-filo--manca-3 { background:var(--g5); }
+      .mon-filo--senza-testo { background:var(--g6); }
+      .mon-filo--arretrato { background:var(--accent); }
+      .mon-legende { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 4px; }
+      .mon-legenda { display:inline-flex; align-items:center; gap:6px; background:none; border:1px solid transparent; border-radius:999px; padding:3px 10px 3px 6px; font-family:"Space Mono", ui-monospace, monospace; font-size:11.5px; color:var(--ink-soft); cursor:pointer; }
+      .mon-legenda:hover { border-color:var(--line); }
+      .mon-legenda--scelta { border-color:var(--ink); color:var(--ink); }
+      .mon-legenda strong { color:var(--ink); }
+      .mon-quadro { width:10px; height:10px; border:1px solid rgba(21,35,59,.25); flex:0 0 auto; }
+      .mon-sotto { font-family:"Space Mono", ui-monospace, monospace; font-size:11.5px; color:var(--ink-soft); margin:6px 0 0; }
+      .mon-conteggio { font-family:"Space Mono", ui-monospace, monospace; font-size:11.5px; color:var(--ink-soft); margin:14px 0 4px; }
+      .mon-stato { display:inline-flex; align-items:center; gap:6px; font-size:12px; white-space:nowrap; }
+      .mon-stato--arretrato { color:var(--accent); font-weight:700; }
+      .mon-fuori { color:var(--ink-soft); font-style:italic; }
+      .mon-attesa-deploy { color:var(--accent); }
+      .mon-ordina { display:inline-flex; align-items:center; gap:5px; color:var(--ink-soft); font-size:12px; margin-left:auto; }
+      .mon-ruoli li strong { font-family:"Space Mono", ui-monospace, monospace; font-size:11.5px; text-transform:uppercase; margin-right:6px; }
 
       {# Rifare una pagina è irreversibile per il lettore: la colonna che lo dice
          non può avere lo stesso peso delle altre. #}
@@ -117,6 +194,22 @@
       @media (max-width: 720px) {
         #monitor-root { padding: 20px 12px 48px; }
         .mon-filters input[type=search] { flex-basis:100%; }
+        {# I filtri restano raggiungibili mentre si scorrono 634 righe: senza
+           questo, cambiare filtro vuol dire risalire tutta la pagina. #}
+        .mon-filters { position:sticky; top:0; z-index:2; background:var(--paper); padding:8px 0; margin:0 0 8px; border-bottom:1px solid var(--line); }
+        {# `min-width:0` o una `<select>` non scende sotto la larghezza della sua
+           opzione piu' lunga, e due affiancate escono dalla finestra. #}
+        .mon-filters select { flex:1 1 45%; min-width:0; max-width:100%; }
+        .mon-ordina { margin-left:0; flex-basis:100%; min-width:0; }
+        .mon-ordina select { flex:1 1 auto; min-width:0; }
+        .mon-num, td.mon-num, th.mon-num { white-space:normal; }
+        .mon-adesso-testa, .mon-aperto, .mon-sotto { word-break:break-word; }
+        {# La banda resta a larghezza piena: sotto il pixel per filo si legge
+           come texture, che è quello che deve fare a questa scala. #}
+        .mon-banda-fili { height:24px; }
+        .mon-grande strong { font-size:32px; }
+        .mon-legenda { font-size:11px; padding:3px 8px 3px 5px; }
+        td[data-label="Anatomia"], td[data-label="Famiglia"] { display:inline-block; width:auto; border-bottom:0; }
         table.mon-cards, table.mon-cards tbody, table.mon-cards tr, table.mon-cards td { display:block; width:100%; }
         table.mon-cards thead { position:absolute; left:-9999px; }
         table.mon-cards { border:0; }

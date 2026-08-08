@@ -1,18 +1,22 @@
-// La console della catena: tre orizzonti, due punti di vista, una pagina.
+// La console della catena: l'atlante e la macchina che lo scrive.
 //
-// Una run adesso è **un workflow** con dentro N agenti, non un indicatore che
-// attraversa stadi. La console lo mostra così:
+// Tre bande, in ordine di urgenza:
 //
-//   ADESSO        che sta girando ora, in push da Supabase Realtime;
-//   Run           una riga per workflow, apribile sui suoi agenti;
-//   Indicatori    lo stesso fatto per indicatore: che cosa è stato scritto o
-//                 riscritto, con quale tesi, e se ha coperto una pagina che
-//                 esisteva.
+//   ADESSO      che sta girando ora, in push da Supabase Realtime. Compare solo
+//               quando c'e' qualcosa da vedere.
+//   L'ATLANTE   tutti e 634 gli indicatori con una pagina e che cosa e' scritto
+//               di ognuno. E' la vista principale: la domanda che ci si fa piu'
+//               spesso non e' "che ha fatto la run", e' "a che punto siamo".
+//   LE RUN      una riga per workflow, apribile sui suoi agenti.
 //
-// Le due viste sono due bottoni e non due rotte: sono lo stesso stato guardato
-// da due lati, e un clic passa dall'uno all'altro portandosi dietro il filtro.
+// La firma della pagina e' **l'anatomia**: un articolo indicatore e' un lead
+// piu' esattamente quattro ruoli, e ogni riga porta quel glifo di cinque parti.
+// Ripetuto 634 volte diventa la trama della pagina, e alla scala dell'atlante e'
+// la banda del recap, dove ogni indicatore e' un filo. Non e' decorazione: e' il
+// contratto editoriale disegnato, e la banda e' anche il filtro, cosi' un solo
+// oggetto fa il riepilogo e la navigazione.
 //
-// Vanilla, nessun React: è una tabella viva, non un'app.
+// Vanilla, nessun React: e' una tabella viva, non un'app.
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -22,14 +26,46 @@ const root = document.getElementById("monitor-root");
 
 // Le cinque fasi della catena, nell'ordine in cui girano. Serve alla spina
 // dorsale di ADESSO, che deve mostrare anche le fasi non ancora arrivate: senza
-// quelle si vedrebbe il passato e non a che punto è la run.
+// quelle si vedrebbe il passato e non a che punto e' la run.
 const FASI = ["Dossier", "Contesto", "Scrittura", "Verifica", "Pubblicazione"];
 
-// Stato di modulo: i dati fetchati e i filtri, così un cambio di filtro
+// I quattro ruoli di un articolo, nell'ordine in cui la pagina li rende.
+const RUOLI = ["definizione", "quadro", "dinamica", "limiti"];
+
+// I gruppi della banda, dal piu' fatto al meno: **quanto manca**, che e' quello
+// che il glifo dice a livello di riga, cosi' banda e glifo sono la stessa idea a
+// due scale.
+//
+// I gruppi vuoti non si stampano nella legenda, e oggi ne restano tre pieni: 55
+// completi, 321 a cui mancano esattamente due sezioni (le stesse due, la
+// definizione e la dinamica) e 257 senza testo. L'atlante e' cosi', a scalini, e
+// una legenda con quattro voci a zero direbbe che la distribuzione ha una coda
+// che non ha. `da rivedere` resta anche a zero: quello zero e' la notizia, ed e'
+// il solo stato che si vuole vuoto.
+const GRUPPI = [
+  { chiave: "completo", nome: "completi" },
+  { chiave: "senza-lead", nome: "senza attacco" },
+  { chiave: "manca-1", nome: "manca 1 sezione" },
+  { chiave: "manca-2", nome: "mancano 2 sezioni" },
+  { chiave: "manca-3", nome: "mancano 3 o piu" },
+  { chiave: "senza-testo", nome: "senza testo" },
+  { chiave: "arretrato", nome: "da rivedere" },
+];
+
+const ORDINI = [
+  { chiave: "coda", nome: "da scrivere" },
+  { chiave: "nome", nome: "nome" },
+  { chiave: "dato", nome: "anno del dato" },
+  { chiave: "famiglia", nome: "famiglia" },
+  { chiave: "parole", nome: "parole scritte" },
+];
+
+// Stato di modulo: i dati fetchati e i filtri, cosi' un cambio di filtro
 // ridisegna senza rifetchare.
 let runsData = null;
 let indicatoriData = null;
-let vista = "run";
+let catalogoData = null;
+let vista = "atlante";
 let pagina = 0;
 const PAGINA = 25;
 const aperte = new Set();
@@ -39,7 +75,7 @@ function h(html) {
 }
 
 if (!cfg || !cfg.url || !cfg.anonKey) {
-  h('<p class="mon-msg">Console non configurata: mancano le identità Supabase.</p>');
+  h('<p class="mon-msg">Console non configurata: mancano le identità Supabase.</p>');
 } else {
   boot(createClient(cfg.url, cfg.anonKey, { auth: { persistSession: true, detectSessionInUrl: true } }));
 }
@@ -74,7 +110,7 @@ function deniedView(supabase, email) {
   h(
     '<div class="mon-gate">' +
       "<h1>Console catena</h1>" +
-      "<p>L'account <strong>" + escapeHtml(email) + "</strong> non è autorizzato.</p>" +
+      "<p>L'account <strong>" + escapeHtml(email) + "</strong> non è autorizzato.</p>" +
       '<button id="mon-logout" class="mon-btn">Esci</button>' +
       "</div>"
   );
@@ -82,8 +118,8 @@ function deniedView(supabase, email) {
 }
 
 async function render(supabase, currentUser) {
-  // Ogni render riparte da zero: rimuovi i canali già aperti, così un
-  // TOKEN_REFRESHED (che ridà lo stesso utente) non accumula sottoscrizioni.
+  // Ogni render riparte da zero: rimuovi i canali gia' aperti, cosi' un
+  // TOKEN_REFRESHED (che rida' lo stesso utente) non accumula sottoscrizioni.
   supabase.removeAllChannels();
 
   if (!currentUser) return loginView(supabase);
@@ -95,46 +131,34 @@ async function render(supabase, currentUser) {
   h(
     '<div class="mon-head"><h1>Console catena</h1>' +
       '<span class="mon-dot" title="in ascolto"></span>' +
-      '<button id="mon-logout" class="mon-btn mon-btn--ghost mon-btn--sm">Esci</button></div>' +
+      // I due bottoni stanno in un contenitore loro: sciolti nella testa vanno a
+      // capo uno per volta, e su schermo stretto "Esci" finiva da solo a sinistra.
+      '<div class="mon-azioni">' +
+        '<button id="mon-aggiorna" class="mon-btn mon-btn--ghost mon-btn--sm">Aggiorna</button>' +
+        '<button id="mon-logout" class="mon-btn mon-btn--ghost mon-btn--sm">Esci</button>' +
+      "</div></div>" +
 
-      '<h2>Adesso</h2><div id="mon-adesso"><p class="mon-empty">Carico...</p></div>' +
+      '<section id="mon-adesso" class="mon-banda"></section>' +
 
       '<div class="mon-tabs" role="tablist">' +
-        '<button class="mon-tab" id="tab-run" role="tab">Run</button>' +
-        '<button class="mon-tab" id="tab-ind" role="tab">Indicatori</button>' +
+        '<button class="mon-tab" id="tab-atl" role="tab">L\'atlante</button>' +
+        '<button class="mon-tab" id="tab-run" role="tab">Le run</button>' +
       "</div>" +
-      '<div class="mon-filters">' +
-        '<input id="f-q" type="search" placeholder="Cerca indicatore, run, tesi, agente">' +
-        '<select id="f-esito"><option value="">Tutti gli esiti</option></select>' +
-        '<label class="mon-date">da <input id="f-da" type="date"></label>' +
-        '<label class="mon-date">a <input id="f-a" type="date"></label>' +
-        '<button id="f-aggiorna" class="mon-btn mon-btn--ghost mon-btn--sm">Aggiorna</button>' +
-      "</div>" +
-      '<div id="mon-totali" class="mon-totals-row"></div>' +
-      '<details class="mon-nota"><summary>Perché il costo è un pavimento</summary>' +
-        "<p>Il costo si misura leggendo i trascritti, e un trascritto può essere " +
-        "incompleto: in una run reale un agente ha registrato due token di output " +
-        "sulla richiesta che restituiva una bozza intera. La misura è fedele a " +
-        "quello che il trascritto dice, quindi ogni totale è un minimo e non una " +
-        "cifra esatta.</p></details>" +
+      '<section id="mon-recap"></section>' +
+      '<div id="mon-filtri" class="mon-filters"></div>' +
       '<div id="mon-lista" class="mon-table"><p class="mon-empty">Carico...</p></div>'
   );
 
   document.getElementById("mon-logout").onclick = () => supabase.auth.signOut();
+  document.getElementById("mon-aggiorna").onclick = () => carica(supabase);
+  document.getElementById("tab-atl").onclick = () => cambiaVista("atlante");
   document.getElementById("tab-run").onclick = () => cambiaVista("run");
-  document.getElementById("tab-ind").onclick = () => cambiaVista("indicatori");
-  document.getElementById("f-aggiorna").onclick = () => carica(supabase);
-  ["f-q", "f-esito", "f-da", "f-a"].forEach((id) => {
-    const el = document.getElementById(id);
-    el.oninput = () => { pagina = 0; disegna(); };
-    el.onchange = () => { pagina = 0; disegna(); };
-  });
   window.addEventListener("hashchange", () => { leggiHash(); disegna(); });
 
   await carica(supabase);
 
   // Realtime: a ogni cambiamento sulle due tabelle si rilegge tutto. Le tabelle
-  // sono piccole e la rilettura completa è più semplice (e meno fragile) di un
+  // sono piccole e la rilettura completa e' piu' semplice (e meno fragile) di un
   // merge incrementale, che dovrebbe conoscere quale delle due sorgenti ha
   // scritto quale colonna.
   supabase
@@ -164,19 +188,20 @@ async function authedJson(supabase, path) {
 }
 
 async function carica(supabase) {
-  const [runs, indicatori] = await Promise.all([
+  const [runs, indicatori, catalogo] = await Promise.all([
     authedJson(supabase, "/_pipeline/api/runs"),
     authedJson(supabase, "/_pipeline/api/indicatori"),
+    authedJson(supabase, "/_pipeline/api/catalogo"),
   ]);
   runsData = runs;
   indicatoriData = indicatori;
+  catalogoData = catalogo;
   disegna();
 }
 
 // Realtime spara un evento per riga cambiata, e durante una run le righe
-// cambiano a ogni giro del lettore: senza freno la console rifetcherebbe le due
-// API decine di volte al minuto per mostrare lo stesso stato. Si accumula e si
-// legge una volta sola.
+// cambiano a ogni giro del lettore: senza freno la console rifetcherebbe le API
+// decine di volte al minuto per mostrare lo stesso stato.
 let attesa = null;
 function caricaFraPoco(supabase) {
   if (attesa) return;
@@ -187,11 +212,9 @@ function caricaFraPoco(supabase) {
 
 function leggiHash() {
   const hash = (window.location.hash || "").replace(/^#/, "");
-  // `chiave` e non `valore`: `valore()` e' la funzione che legge i filtri, e
-  // ombreggiarla qui dentro sarebbe una trappola per chi tocca questa funzione.
   const [nome, chiave] = hash.split("/");
-  if (nome === "indicatori") vista = "indicatori";
-  else if (nome === "run") vista = "run";
+  if (nome === "run") vista = "run";
+  else if (nome === "atlante") vista = "atlante";
   if (chiave) aperte.add(decodeURIComponent(chiave));
 }
 
@@ -202,29 +225,31 @@ function cambiaVista(prossima) {
   disegna();
 }
 
-// Un clic su un indicatore dalla vista Run porta alla sua storia, e viceversa:
-// le due viste sono lo stesso fatto, non due destinazioni separate.
+// Un clic su un indicatore dalla vista Run porta alla sua riga nell'atlante, e
+// viceversa: sono lo stesso fatto guardato da due lati, non due destinazioni.
 function vaiA(prossima, chiave, filtro) {
   vista = prossima;
   pagina = 0;
   aperte.add(chiave);
-  const q = document.getElementById("f-q");
-  if (q && filtro != null) q.value = filtro;
   window.location.hash = prossima + "/" + encodeURIComponent(chiave);
   disegna();
+  const q = document.getElementById("f-q");
+  if (q && filtro != null) { q.value = filtro; disegna(); }
 }
 
 // --- disegno ---------------------------------------------------------------
 
 function disegna() {
   disegnaAdesso();
+  const tabAtl = document.getElementById("tab-atl");
   const tabRun = document.getElementById("tab-run");
-  const tabInd = document.getElementById("tab-ind");
+  if (tabAtl) tabAtl.setAttribute("aria-selected", String(vista === "atlante"));
   if (tabRun) tabRun.setAttribute("aria-selected", String(vista === "run"));
-  if (tabInd) tabInd.setAttribute("aria-selected", String(vista === "indicatori"));
   if (vista === "run") disegnaRun();
-  else disegnaIndicatori();
+  else disegnaAtlante();
 }
+
+// --- banda 1: ADESSO -------------------------------------------------------
 
 function disegnaAdesso() {
   const el = document.getElementById("mon-adesso");
@@ -241,18 +266,20 @@ function disegnaAdesso() {
     el.innerHTML = '<p class="mon-empty">Nessuna run registrata.</p>';
     return;
   }
-  const volo = runs.filter((r) => r.in_volo);
+  // Una run che non batte da un quarto d'ora non e' in volo: scende dal posto
+  // d'onore e va nell'elenco. Cosi' `wf_precheck` non ci resta per sempre.
+  const volo = runs.filter((r) => r.in_volo && !r.battito_fermo);
   if (!volo.length) {
     const ultima = runs[0];
     el.innerHTML =
       '<div class="mon-adesso mon-adesso--ferma">' +
         '<div class="mon-adesso-testa"><strong>Nessuna run in volo</strong>' +
-        "<span>ultima " + escapeHtml(quando(ultima.avviata_il)) + " · " +
-        escapeHtml(ultima.workflow || ultima.run_id) + " · " +
+        "<span>ultima " + escapeHtml(quando(ultima.avviata_il)) + " &middot; " +
+        escapeHtml(ultima.workflow || ultima.run_id) + " &middot; " +
         badgeEsitoRun(ultima) + "</span></div></div>";
     return;
   }
-  el.innerHTML = volo.map(cardVolo).join("");
+  el.innerHTML = '<h2 class="mon-eyebrow">Adesso</h2>' + volo.map(cardVolo).join("");
 }
 
 function cardVolo(run) {
@@ -284,29 +311,284 @@ function cardVolo(run) {
       (aperto.length
         ? '<div class="mon-aperto">aperto ' + aperto.map((a) =>
             "<strong>" + escapeHtml(a.label || a.agent_type || a.agent_id) + "</strong> " +
-            escapeHtml(a.agent_type) + (a.modello ? " · " + escapeHtml(a.modello) : "") +
-            " · da " + escapeHtml(durataDa(a.avviato_il))).join(" &middot; ") + "</div>"
+            escapeHtml(a.agent_type) + (a.modello ? " &middot; " + escapeHtml(a.modello) : "") +
+            " &middot; da " + escapeHtml(durataDa(a.avviato_il))).join(" &middot; ") + "</div>"
         : '<div class="mon-aperto">nessun agente aperto in questo momento</div>') +
     "</div>"
   );
 }
 
-// --- vista Run -------------------------------------------------------------
+// --- banda 2: L'ATLANTE ----------------------------------------------------
+
+// Il gruppo di una riga: primo che calza, dal peggio al meglio. Un articolo
+// arretrato e' il solo stato **sbagliato** e vince su tutto, perche' una cifra
+// vecchia e' falsa mentre una sezione assente e' soltanto scarna.
+function gruppoDi(r) {
+  if (r.arretrato) return "arretrato";
+  if (!r.scritte && !r.lead) return "senza-testo";
+  const mancanti = (r.mancanti || []).length;
+  if (!mancanti && r.lead) return "completo";
+  if (!mancanti) return "senza-lead";
+  if (mancanti === 1) return "manca-1";
+  if (mancanti === 2) return "manca-2";
+  return "manca-3";
+}
+
+function disegnaAtlante() {
+  const filtri = document.getElementById("mon-filtri");
+  const recap = document.getElementById("mon-recap");
+  const el = document.getElementById("mon-lista");
+  if (!el) return;
+  if (!catalogoData) {
+    recap.innerHTML = "";
+    filtri.innerHTML = "";
+    el.innerHTML = '<p class="mon-empty">Catalogo non disponibile (login o rete).</p>';
+    return;
+  }
+  const tutte = (catalogoData.righe || []).filter((r) => r.predefinito);
+  montaFiltriAtlante(filtri, tutte);
+  disegnaRecap(recap, tutte);
+
+  const righe = ordina(tutte.filter(passaFiltroAtlante));
+  if (!righe.length) return (el.innerHTML = '<p class="mon-empty">Nessun indicatore col filtro attuale.</p>');
+
+  // Niente impaginazione: 634 righe di tabella non pesano niente, e un elenco
+  // esplorativo diviso in 26 pagine non si esplora. Cosi' funzionano anche lo
+  // scorrimento e la ricerca del browser.
+  el.innerHTML =
+    '<p class="mon-conteggio">' + righe.length + " indicatori</p>" +
+    // Niente colonna "famiglia": la porta gia' il codice (`ter-`, `bes-`,
+    // `ims-`), e stamparla a parte vorrebbe dire stampare la chiave interna
+    // (`territorial`, `multiscopo`), che e' proprio cio' che `app/sources.py`
+    // vieta di mostrare a un lettore. Resta come filtro, dove serve.
+    '<table class="mon-cards"><thead><tr>' +
+      "<th>Indicatore</th><th>Anatomia</th>" +
+      '<th class="mon-num">Parole</th><th class="mon-num">Dati</th>' +
+      '<th>Stato</th><th class="mon-num">Ultima run</th>' +
+    "</tr></thead><tbody>" +
+    righe.map(rigaAtlante).join("") +
+    "</tbody></table>";
+
+  collega(el);
+}
+
+function disegnaRecap(el, righe) {
+  if (!el) return;
+  const totali = catalogoData.totali || {};
+  const conta = {};
+  GRUPPI.forEach((g) => { conta[g.chiave] = 0; });
+  righe.forEach((r) => { conta[gruppoDi(r)] += 1; });
+
+  // Ogni indicatore e' un filo. Ordinati per gruppo, i colori si raggruppano in
+  // blocchi contigui, quindi la banda si legge in due modi insieme: come 634
+  // fatti singoli e come una barra proporzionale.
+  const fili = GRUPPI.flatMap((g) =>
+    righe.filter((r) => gruppoDi(r) === g.chiave)
+      .sort((a, b) => a.nome.localeCompare(b.nome, "it"))
+      .map((r) => '<span class="mon-filo mon-filo--' + g.chiave + '" title="' +
+        escapeHtml(r.nome + " (" + r.codice + "): " + g.nome) + '"></span>')
+  ).join("");
+
+  const scelto = valore("f-gruppo");
+  const legenda = GRUPPI.filter((g) => conta[g.chiave] || g.chiave === "arretrato").map((g) =>
+    '<button type="button" class="mon-legenda' + (scelto === g.chiave ? " mon-legenda--scelta" : "") +
+      '" data-gruppo="' + g.chiave + '">' +
+      '<span class="mon-quadro mon-filo--' + g.chiave + '"></span>' +
+      "<strong>" + conta[g.chiave] + "</strong> " + escapeHtml(g.nome) + "</button>"
+  ).join("");
+
+  // Niente occhiello qui: la scheda sopra dice gia' "L'atlante", e ripeterlo a
+  // due centimetri di distanza e' rumore.
+  el.innerHTML =
+    '<p class="mon-grande"><strong>' + (totali.indicatori || righe.length) + "</strong> indicatori con una pagina</p>" +
+    '<div class="mon-banda-fili" role="img" aria-label="stato editoriale dei ' +
+      (totali.indicatori || righe.length) + ' indicatori">' + fili + "</div>" +
+    '<div class="mon-legende">' + legenda + "</div>" +
+    '<p class="mon-sotto">' + (totali.con_articolo || 0) + " con testo &middot; " +
+      (totali.indicizzabili || 0) + " in indice &middot; " +
+      (totali.scritti_non_in_linea || 0) + " scritti e non ancora in linea &middot; " +
+      (totali.rilievi || 0) + " rilievi di prosa</p>";
+
+  el.querySelectorAll("[data-gruppo]").forEach((b) => {
+    b.onclick = () => {
+      const sel = document.getElementById("f-gruppo");
+      const g = b.getAttribute("data-gruppo");
+      if (sel) sel.value = sel.value === g ? "" : g;
+      disegna();
+    };
+  });
+}
+
+function montaFiltriAtlante(el, righe) {
+  if (!el || el.getAttribute("data-vista") === "atlante") return;
+  el.setAttribute("data-vista", "atlante");
+  el.innerHTML =
+    '<input id="f-q" type="search" placeholder="Cerca nome, codice o tema">' +
+    '<select id="f-famiglia"><option value="">Tutte le famiglie</option></select>' +
+    '<select id="f-tema"><option value="">Tutti i temi</option></select>' +
+    '<select id="f-gruppo"><option value="">Tutti gli stati</option>' +
+      GRUPPI.map((g) => '<option value="' + g.chiave + '">' + escapeHtml(g.nome) + "</option>").join("") +
+      '<option value="fuori-indice">fuori indice</option></select>' +
+    '<label class="mon-ordina">ordina per <select id="f-ordina">' +
+      ORDINI.map((o) => '<option value="' + o.chiave + '">' + escapeHtml(o.nome) + "</option>").join("") +
+    "</select></label>";
+  el.querySelectorAll("input, select").forEach((c) => {
+    c.oninput = () => disegna();
+    c.onchange = () => disegna();
+  });
+  opzioni("f-famiglia", uniq(righe.map((r) => r.famiglia_label)));
+  opzioni("f-tema", uniq(righe.map((r) => r.tema)));
+}
+
+function passaFiltroAtlante(r) {
+  const q = (valore("f-q") || "").trim().toLowerCase();
+  const famiglia = valore("f-famiglia");
+  const tema = valore("f-tema");
+  const gruppo = valore("f-gruppo");
+  const testo = [r.nome, r.codice, r.tema, r.famiglia_label].filter(Boolean).join(" ").toLowerCase();
+  if (q && testo.indexOf(q) === -1) return false;
+  if (famiglia && r.famiglia_label !== famiglia) return false;
+  if (tema && r.tema !== tema) return false;
+  if (gruppo === "fuori-indice") return !r.indicizzabile;
+  if (gruppo && gruppoDi(r) !== gruppo) return false;
+  return true;
+}
+
+function ordina(righe) {
+  const come = valore("f-ordina") || "coda";
+  const copia = righe.slice();
+  if (come === "nome") copia.sort((a, b) => a.nome.localeCompare(b.nome, "it"));
+  else if (come === "dato") copia.sort((a, b) => (b.anno_dato || 0) - (a.anno_dato || 0) || a.nome.localeCompare(b.nome, "it"));
+  else if (come === "famiglia") copia.sort((a, b) => a.famiglia_label.localeCompare(b.famiglia_label, "it") || a.nome.localeCompare(b.nome, "it"));
+  else if (come === "parole") copia.sort((a, b) => (b.parole || 0) - (a.parole || 0));
+  // `coda` e' l'ordine che sceglie la catena: la prima riga qui e' la stessa che
+  // sceglierebbe `lab.dossier --coda 1`. La console e la catena guardano una
+  // classifica sola.
+  else copia.sort((a, b) => (b.punteggio || 0) - (a.punteggio || 0) || a.nome.localeCompare(b.nome, "it"));
+  return copia;
+}
+
+// Il glifo: un trattino per il lead, un quadro per ogni ruolo emesso, pieno se
+// scritto da una persona e vuoto se composto dal template.
+function anatomia(r) {
+  const per = {};
+  (r.ruoli || []).forEach((s) => { per[s.role] = s; });
+  const pezzi = RUOLI.map((ruolo) => {
+    const s = per[ruolo];
+    if (!s) return '<span class="mon-anat-vuoto" title="' + ruolo + ': non resa"></span>';
+    return '<span class="mon-anat-' + (s.authored ? "pieno" : "assente") + '" title="' +
+      escapeHtml(ruolo + (s.authored ? ": " + (s.heading || "scritta") : ": composta dal template")) + '"></span>';
+  }).join("");
+  return '<span class="mon-anat">' +
+    '<span class="mon-anat-lead' + (r.lead ? " mon-anat-lead--si" : "") +
+      '" title="' + (r.lead ? "attacco scritto" : "attacco composto") + '"></span>' + pezzi + "</span>";
+}
+
+function rigaAtlante(r) {
+  const apri = aperte.has(r.codice);
+  const gruppo = gruppoDi(r);
+  const nome = r.url
+    ? '<a href="' + escapeHtml(r.url) + '" target="_blank" rel="noopener">' + escapeHtml(r.nome) + " &#8599;</a>"
+    : escapeHtml(r.nome);
+  const sotto = [r.codice, r.tema].filter(Boolean).join(" &middot; ") +
+    (r.indicizzabile ? "" : ' &middot; <span class="mon-fuori">fuori indice: ' + escapeHtml(r.motivo || "non dichiarato") + "</span>");
+  const riga =
+    '<tr class="mon-riga' + (apri ? " mon-aperta" : "") + '" data-chiave="' + escapeHtml(r.codice) + '">' +
+      '<td data-label="Indicatore">' + nome + "<small>" + sotto + "</small></td>" +
+      '<td data-label="Anatomia">' + anatomia(r) + "</td>" +
+      '<td data-label="Parole" class="mon-num">' + (r.parole || "") + "</td>" +
+      '<td data-label="Dati" class="mon-num">' + (r.anno_dato || "") +
+        (r.vintage != null && r.vintage !== r.anno_dato ? "<small>testo " + r.vintage + "</small>" : "") + "</td>" +
+      '<td data-label="Stato">' + badgeGruppo(gruppo) +
+        (r.stato === "scritto, non in linea" ? '<small class="mon-attesa-deploy">scritto, non ancora in linea</small>' : "") + "</td>" +
+      '<td data-label="Ultima run" class="mon-num">' + (r.ultima_run
+        ? '<button type="button" class="mon-link" data-vai-run="' + escapeHtml(r.ultima_run) + '">' +
+          escapeHtml(quando(r.ultima_run_il)) + "</button>"
+        : "") + "</td>" +
+    "</tr>";
+  return apri ? riga + '<tr><td class="mon-dettaglio" colspan="6">' + dettaglioAtlante(r) + "</td></tr>" : riga;
+}
+
+function dettaglioAtlante(r) {
+  const pezzi = [];
+  pezzi.push('<ul class="mon-elenco mon-ruoli">' + (r.ruoli || []).map((s) =>
+    "<li><strong>" + escapeHtml(s.role) + "</strong> " +
+    (s.authored ? escapeHtml(s.heading || "scritta") : '<span class="mon-fuori">composta dal template</span>') +
+    "</li>").join("") + "</ul>");
+
+  const fatti = [
+    "attacco " + (r.lead ? "scritto" : "composto"),
+    r.parole ? r.parole + " parole" : null,
+    "dati " + (r.anno_dato || "?") + (r.vintage != null ? ", testo scritto sul " + r.vintage : ""),
+    r.arretrato ? "il testo cita un anno più vecchio del dato" : null,
+    r.indicizzabile ? "in indice" : "fuori indice: " + (r.motivo || "non dichiarato"),
+    r.rilievi ? r.rilievi + " rilievi di prosa" : null,
+    "punteggio di coda " + r.punteggio,
+    r.certezza === "assente" ? "nessuna run registrata su questa pagina" : null,
+  ].filter(Boolean);
+  pezzi.push("<p>" + escapeHtml(fatti.join(" · ")) + "</p>");
+
+  const storia = (indicatoriData?.indicatori || []).filter((v) => v.indicatore === r.codice);
+  if (storia.length) {
+    pezzi.push("<p><strong>Le run su questa pagina</strong></p><ul class=\"mon-elenco\">" +
+      storia.map((v) =>
+        "<li>" + escapeHtml(quando(v.at)) + " &middot; " + badgeEsito(v.esito) +
+        (v.angolo ? " &middot; " + escapeHtml(taglia(v.angolo, 110)) : "") +
+        (v.sovrascritto ? ' &middot; <span class="mon-sovra">ha sovrascritto' +
+          (v.vintage_precedente != null ? ", copriva il " + escapeHtml(String(v.vintage_precedente)) : "") + "</span>" : "") +
+        ' &middot; <button type="button" class="mon-link" data-vai-run="' + escapeHtml(v.run_id) + '">' +
+        escapeHtml(v.run_id) + "</button></li>").join("") + "</ul>");
+  } else {
+    pezzi.push('<p class="mon-empty">Nessuna run ha ancora toccato questa pagina.</p>');
+  }
+  return pezzi.join("");
+}
+
+// --- banda 3: LE RUN -------------------------------------------------------
+
+function montaFiltriRun(el, righe) {
+  if (!el) return;
+  if (el.getAttribute("data-vista") !== "run") {
+    el.setAttribute("data-vista", "run");
+    el.innerHTML =
+      '<input id="f-q" type="search" placeholder="Cerca run, indicatore, agente">' +
+      '<select id="f-esito"><option value="">Tutti gli esiti</option></select>' +
+      '<label class="mon-date">da <input id="f-da" type="date"></label>' +
+      '<label class="mon-date">a <input id="f-a" type="date"></label>';
+    el.querySelectorAll("input, select").forEach((c) => {
+      c.oninput = () => { pagina = 0; disegna(); };
+      c.onchange = () => { pagina = 0; disegna(); };
+    });
+  }
+  opzioni("f-esito", uniq(righe.map(etichettaEsitoRun)));
+}
 
 function disegnaRun() {
   const el = document.getElementById("mon-lista");
+  const recap = document.getElementById("mon-recap");
+  const filtri = document.getElementById("mon-filtri");
   if (!el) return;
-  if (!runsData) return (el.innerHTML = '<p class="mon-empty">Run non disponibili (login o rete).</p>');
+  if (!runsData) {
+    recap.innerHTML = "";
+    return (el.innerHTML = '<p class="mon-empty">Run non disponibili (login o rete).</p>');
+  }
   const tutte = runsData.runs || [];
-  opzioni("f-esito", uniq(tutte.map((r) => etichettaEsitoRun(r))));
-  const righe = tutte.filter((r) => passaFiltro(chiaveRun(r), r.avviata_il, etichettaEsitoRun(r)));
+  montaFiltriRun(filtri, tutte);
+  const righe = tutte.filter((r) => passaFiltroRun(chiaveRun(r), r.avviata_il, etichettaEsitoRun(r)));
 
-  totali([
-    ['<span class="mon-chip mon-chip--strong">' + righe.length + " run</span>"],
-    ['<span class="mon-chip">' + somma(righe, "agenti") + " agenti</span>"],
-    ['<span class="mon-chip">' + somma(righe, "turni") + " turni</span>"],
-    ['<span class="mon-chip">' + euro(righe.reduce((a, r) => a + (r.costo || 0), 0)) + " pavimento</span>"],
-  ]);
+  recap.innerHTML =
+    '<div class="mon-totals-row">' +
+      '<span class="mon-chip mon-chip--strong">' + righe.length + " run</span>" +
+      '<span class="mon-chip">' + somma(righe, "agenti_totali") + " agenti</span>" +
+      '<span class="mon-chip">' + somma(righe, "turni") + " turni</span>" +
+      '<span class="mon-chip">' + euro(righe.reduce((a, r) => a + (r.costo || 0), 0)) + " pavimento</span>" +
+    "</div>" +
+    '<details class="mon-nota"><summary>Perchè il costo è un pavimento</summary>' +
+      "<p>Il costo si misura leggendo i trascritti, e un trascritto può essere " +
+      "incompleto: in una run reale un agente ha registrato due token di output " +
+      "sulla richiesta che restituiva una bozza intera. La misura è fedele a " +
+      "quello che il trascritto dice, quindi ogni totale è un minimo e non una " +
+      "cifra esatta.</p></details>";
 
   if (!righe.length) return (el.innerHTML = '<p class="mon-empty">Nessuna run col filtro attuale.</p>');
   const { fetta, pager } = impagina(righe);
@@ -335,9 +617,13 @@ function rigaRun(run) {
       '<td data-label="Indicatore">' + (codici.length
         ? codici.map((c) => '<button type="button" class="mon-link" data-vai="' + escapeHtml(c) + '">' + escapeHtml(c) + "</button>").join(", ")
         : "") + "</td>" +
-      '<td data-label="Esito">' + badgeEsitoRun(run) + "</td>" +
+      '<td data-label="Esito">' + badgeEsitoRun(run) +
+        (run.battito_fermo ? '<small class="mon-muta">nessun battito da ' +
+          escapeHtml(durataDa(run.ultimo_battito)) + ", la run può essere ancora viva</small>" : "") + "</td>" +
       '<td data-label="Durata" class="mon-num">' + escapeHtml(durata(run.durata_ms)) + "</td>" +
-      '<td data-label="Agenti" class="mon-num">' + (run.agenti != null ? run.agenti : (run.agenti_visti || "")) + "</td>" +
+      // `agenti` e' la lista, `agenti_totali` il conteggio: erano la stessa
+      // chiave, e la cella stampava `[object Object],[object Object],...`.
+      '<td data-label="Agenti" class="mon-num">' + (run.agenti_totali != null ? run.agenti_totali : "") + "</td>" +
       '<td data-label="Turni" class="mon-num">' + (run.turni != null ? run.turni : "") + "</td>" +
       '<td data-label="Costo" class="mon-num">' + (run.costo != null ? euro(run.costo) : "") + "</td>" +
     "</tr>";
@@ -385,99 +671,6 @@ function dettaglioRun(run) {
   return tabella + logs + esito;
 }
 
-// --- vista Indicatori ------------------------------------------------------
-
-function disegnaIndicatori() {
-  const el = document.getElementById("mon-lista");
-  if (!el) return;
-  if (!indicatoriData) return (el.innerHTML = '<p class="mon-empty">Indicatori non disponibili (login o rete).</p>');
-  const tutti = indicatoriData.indicatori || [];
-  opzioni("f-esito", uniq(tutti.map((r) => r.esito)));
-  const righe = tutti.filter((r) => passaFiltro(chiaveIndicatore(r), r.at, r.esito));
-
-  const riscritti = righe.filter((r) => r.sovrascritto).length;
-  totali([
-    ['<span class="mon-chip mon-chip--strong">' + righe.length + " scritture</span>"],
-    ['<span class="mon-chip">' + righe.filter((r) => r.scritto).length + " arrivate a pagina</span>"],
-    ['<span class="mon-chip">' + riscritti + " hanno sovrascritto</span>"],
-    ['<span class="mon-chip">' + righe.filter((r) => r.esito === "fermato").length + " fermate</span>"],
-  ]);
-
-  if (!righe.length) return (el.innerHTML = '<p class="mon-empty">Nessuna scrittura col filtro attuale.</p>');
-  const { fetta, pager } = impagina(righe);
-
-  el.innerHTML =
-    pager +
-    '<table class="mon-cards"><thead><tr>' +
-      "<th>Indicatore</th><th>Quando</th><th>Esito</th><th>Tesi</th>" +
-      '<th class="mon-num">Parole</th><th class="mon-num">Giri</th>' +
-      '<th class="mon-num">Rilievi</th><th>Sovrascritto</th>' +
-    "</tr></thead><tbody>" +
-    fetta.map(rigaIndicatore).join("") +
-    "</tbody></table>" +
-    pager;
-
-  collega(el);
-}
-
-function chiaveRiga(r) {
-  return r.indicatore + "@" + r.run_id;
-}
-
-function rigaIndicatore(r) {
-  const apri = aperte.has(chiaveRiga(r));
-  const nome = r.published_url
-    ? '<a href="' + escapeHtml(r.published_url) + '" target="_blank" rel="noopener">' + escapeHtml(r.indicatore) + " &#8599;</a>"
-    : escapeHtml(r.indicatore);
-  const riga =
-    '<tr class="mon-riga' + (apri ? " mon-aperta" : "") + '" data-chiave="' + escapeHtml(chiaveRiga(r)) + '">' +
-      '<td data-label="Indicatore">' + nome + "</td>" +
-      '<td data-label="Quando">' + escapeHtml(quando(r.at)) +
-        '<small><button type="button" class="mon-link" data-vai-run="' + escapeHtml(r.run_id) + '">' +
-        escapeHtml(r.run_id) + "</button></small></td>" +
-      '<td data-label="Esito">' + badgeEsito(r.esito) +
-        (r.motivo ? "<small>" + escapeHtml(r.motivo) + "</small>" : "") + "</td>" +
-      '<td data-label="Tesi">' + escapeHtml(taglia(r.angolo, 90)) + "</td>" +
-      '<td data-label="Parole" class="mon-num">' + (r.parole != null ? r.parole : "") + "</td>" +
-      '<td data-label="Giri" class="mon-num">' + (r.giri_di_correzione != null ? r.giri_di_correzione : "") + "</td>" +
-      '<td data-label="Rilievi" class="mon-num">' + ((r.rilievi_aperti || []).length || "") + "</td>" +
-      '<td data-label="Sovrascritto">' + (r.sovrascritto
-        ? '<span class="mon-sovra">sì' + (r.vintage_precedente != null
-            ? "<small>copriva il " + escapeHtml(String(r.vintage_precedente)) + "</small>" : "") + "</span>"
-        : (r.sovrascritto === false ? "no" : "")) + "</td>" +
-    "</tr>";
-  return apri ? riga + '<tr><td class="mon-dettaglio" colspan="8">' + dettaglioIndicatore(r) + "</td></tr>" : riga;
-}
-
-function dettaglioIndicatore(r) {
-  const pezzi = [];
-  if (r.angolo) pezzi.push("<p><strong>Tesi</strong>: " + escapeHtml(r.angolo) + "</p>");
-  if ((r.impaginazione || []).length) {
-    pezzi.push("<p><strong>Come la vede un lettore</strong></p><ul class=\"mon-elenco\">" +
-      r.impaginazione.map((s) => "<li>" + escapeHtml((s.role || "") + ": " + (s.h2 || "")) +
-        (s.scritta === false ? " (persa)" : "") + "</li>").join("") + "</ul>");
-  }
-  if ((r.rilievi_aperti || []).length) {
-    pezzi.push("<p><strong>Rilievi aperti, usciti col pezzo</strong></p><ul class=\"mon-elenco\">" +
-      r.rilievi_aperti.map((s) => "<li>" + escapeHtml(
-        typeof s === "string" ? s
-          : [s.gravita || "senza gravità", s.tipo, s.dove, s.cosa_dice_il_testo].filter(Boolean).join(" | ")
-      ) + "</li>").join("") + "</ul>");
-  }
-  if ((r.rilievi || []).length) {
-    pezzi.push("<p><strong>Rilievi del lint</strong></p><ul class=\"mon-elenco\">" +
-      r.rilievi.map((s) => "<li>" + escapeHtml([s.severity, s.rule, s.detail].filter(Boolean).join(" · ")) + "</li>").join("") +
-      "</ul>");
-  }
-  const dettagli = [
-    r.cifre_verificate != null ? r.cifre_verificate + " cifre verificate" : null,
-    r.percorso ? "scritto in " + r.percorso : null,
-    r.costo != null ? euro(r.costo) + " la run (pavimento)" : null,
-  ].filter(Boolean);
-  if (dettagli.length) pezzi.push("<p>" + escapeHtml(dettagli.join(" · ")) + "</p>");
-  return pezzi.join("") || '<p class="mon-empty">Nessun dettaglio registrato.</p>';
-}
-
 // --- pezzi comuni ----------------------------------------------------------
 
 function collega(el) {
@@ -490,7 +683,7 @@ function collega(el) {
       if (vai) {
         ev.stopPropagation();
         const codice = vai.getAttribute("data-vai");
-        return vaiA("indicatori", codice, codice);
+        return vaiA("atlante", codice, codice);
       }
       const vaiRun = ev.target.closest("[data-vai-run]");
       if (vaiRun) {
@@ -505,6 +698,10 @@ function collega(el) {
       disegna();
     };
   });
+  el.querySelectorAll("[data-vai-run]").forEach((b) => {
+    if (b.closest("tr.mon-riga")) return;
+    b.onclick = (ev) => { ev.stopPropagation(); vaiA("run", b.getAttribute("data-vai-run"), b.getAttribute("data-vai-run")); };
+  });
 }
 
 function impagina(righe) {
@@ -513,18 +710,16 @@ function impagina(righe) {
   if (pagina < 0) pagina = 0;
   const fetta = righe.slice(pagina * PAGINA, pagina * PAGINA + PAGINA);
   if (pagine === 1) return { fetta, pager: "" };
-  // I bottoni li aggancia `collega()`, dopo che l'HTML e' finito nel DOM: qui si
-  // costruisce solo il markup.
   const pager =
     '<div class="mon-pager">' +
       '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" data-passo="-1"' + (pagina === 0 ? " disabled" : "") + ">Precedente</button>" +
-      '<span class="mon-pager-info">pagina ' + (pagina + 1) + "/" + pagine + " · " + righe.length + " righe</span>" +
+      '<span class="mon-pager-info">pagina ' + (pagina + 1) + "/" + pagine + " &middot; " + righe.length + " righe</span>" +
       '<button type="button" class="mon-btn mon-btn--ghost mon-btn--sm" data-passo="1"' + (pagina >= pagine - 1 ? " disabled" : "") + ">Successiva</button>" +
     "</div>";
   return { fetta, pager };
 }
 
-function passaFiltro(chiave, quandoIso, esito) {
+function passaFiltroRun(chiave, quandoIso, esito) {
   const q = (valore("f-q") || "").trim().toLowerCase();
   const filtroEsito = valore("f-esito");
   const da = valore("f-da");
@@ -542,15 +737,11 @@ function chiaveRun(r) {
   return [r.run_id, r.workflow, (r.agenti || []).map((a) => a.indicatore + " " + (a.label || "") + " " + a.agent_type).join(" ")].join(" ");
 }
 
-function chiaveIndicatore(r) {
-  return [r.indicatore, r.run_id, r.angolo, r.motivo, r.esito].filter(Boolean).join(" ");
-}
-
-// I quattro esiti reali della catena, tenuti distinti perché lo sono: un
-// articolo fermato prima del disco è la verifica che ha funzionato, e non va
+// I cinque esiti reali della catena, tenuti distinti perche' lo sono: un
+// articolo fermato prima del disco e' la verifica che ha funzionato, e non va
 // letto come un guasto.
 function etichettaEsitoRun(run) {
-  if (run.in_volo) return "in volo";
+  if (run.in_volo) return run.battito_fermo ? "battito fermo" : "in volo";
   if (run.stato && run.stato !== "completed") return "guasto";
   const esito = run.esito || {};
   if ((esito.fermati || []).length && !(esito.articoli || []).length) return "fermato";
@@ -565,6 +756,7 @@ const CLASSE_ESITO = {
   "fermato": "fermato",
   "guasto": "guasto",
   "in volo": "volo",
+  "battito fermo": "muta",
 };
 
 function badgeEsitoRun(run) {
@@ -576,9 +768,10 @@ function badgeEsito(etichetta) {
   return '<span class="mon-esito' + (classe ? " mon-esito--" + classe : "") + '">' + escapeHtml(etichetta || "") + "</span>";
 }
 
-function totali(pezzi) {
-  const el = document.getElementById("mon-totali");
-  if (el) el.innerHTML = pezzi.flat().join("");
+function badgeGruppo(chiave) {
+  const g = GRUPPI.find((x) => x.chiave === chiave);
+  return '<span class="mon-stato mon-stato--' + chiave + '">' +
+    '<span class="mon-quadro mon-filo--' + chiave + '"></span>' + escapeHtml(g ? g.nome : chiave) + "</span>";
 }
 
 function opzioni(id, valori) {

@@ -14,10 +14,16 @@ e qui lo si legge da fuori.
 
 Sonda vera (`wf_90bf85dd-65e`, due agenti, file guardati ogni otto secondi):
 
+  dentro `<sessione>/subagents/workflows/<runId>/`:
     journal.jsonl            VIVO   `started` e `result`, col valore di ritorno
     agent-<id>.meta.json     VIVO   solo {"agentType", "spawnDepth"}
     agent-<id>.jsonl         VIVO   il prompt, poi un `usage` per richiesta
+
+  altrove, e questo e' il punto:
     <sessione>/workflows/<runId>.json   SOLO A RUN FINITA
+
+Il quarto file **non** sta sotto `subagents/`: elencarlo di seguito agli altri
+tre ha gia' fatto cercare il consuntivo nella cartella sbagliata.
 
 Da qui discendono le due regole del file:
 

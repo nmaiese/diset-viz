@@ -191,9 +191,16 @@ def _rilievi(chiave, entry):
 
 
 def _parole(entry):
-    testo = " ".join([entry.get("lead") or ""] +
-                     [s.get("body") or "" for s in entry.get("sections") or []])
-    return len(testo.split())
+    """Lo stesso conteggio che usa il cruscotto, non uno suo.
+
+    La console confronta le parole dell'articolo servito con quelle che la run ha
+    registrato, per dire se una scrittura e' gia' in linea o aspetta un deploy.
+    Con due definizioni di "parola" quel confronto misurerebbe la differenza fra
+    le definizioni invece che fra gli articoli, e direbbe sempre "non in linea".
+    """
+    from app.editorial_state import parole
+
+    return parole(entry)
 
 
 def main(argv=None):

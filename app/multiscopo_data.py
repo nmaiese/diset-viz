@@ -124,10 +124,14 @@ def all_multiscopo_indicators():
     indicators = []
     for indicator_id, info in sorted(manifest.items()):
         indexable = info["coverage_latest"] >= MIN_PUBLIC_COVERAGE and info["year_max"] >= 2023
+        # Il motivo accanto alla clausola, come in `bes_data`: una serie vecchia
+        # e una scoperta si riparano in modi diversi, e "famiglia" non lo dice.
+        motivo = None if indexable else ("vecchia" if info["year_max"] < 2023 else "copertura")
         indicators.append({
             **info,
             "path": multiscopo_indicator_path(indicator_id, info["name"]),
             "indexable": indexable,
+            "indexable_reason": motivo,
             "territory_total": len(get_multiscopo_territories()),
         })
     return indicators

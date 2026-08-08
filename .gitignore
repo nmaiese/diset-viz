@@ -29,6 +29,13 @@ data/*.sqlite3-*
 # non far ripagare due volte lo stesso errore. Della macchina, non della storia.
 data/pipeline/tool_failures.jsonl
 
+# Un orfano: lo scriveva `.claude/hooks/session-start.sh` per `pipeline_log.py`,
+# e non lo legge piu' nessuno da quando quel programma e' stato cancellato. Non
+# essendo ignorato, compariva come file non tracciato in ogni sessione, e la
+# catena ci ha perso un turno a decidere se andasse committato. `.dockerignore`
+# lo escludeva gia'.
+data/pipeline/.session_meta.json
+
 # Le altre righe di questo blocco nominavano `pipeline_dashboard.py`,
 # `pipeline_log.py` e `pipeline_monitor`, cioè tre programmi cancellati con la
 # catena editoriale autonoma. Un ignore per un file che nessuno scrive più non
