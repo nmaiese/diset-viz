@@ -68,39 +68,16 @@ jobs:
             *) echo "::error::la suite è morta senza referto due volte (exit $status)"; exit 1 ;;
           esac
 
-  # Il cancello della catena, fatto rispettare anche dal lato remoto. Finora
-  # lo ri-eseguiva solo scripts/pipeline_merge.py prima di fondere, cioè un
-  # controllo agent-side su un master non protetto: un merge manuale o un push
-  # diretto non lo incontrava mai. Qui diventa un check remoto come la suite,
-  # quindi pipeline_merge --policy checks lo aspetta insieme al resto.
+  # Qui stava il job `gate`, che sui branch `automation/*` eseguiva
+  # `scripts/pipeline_gate.py`. Se ne va con il file: la catena editoriale
+  # autonoma non esiste più, e la catena minima non ha cancello per scelta (il
+  # controllo è il verificatore, dentro il workflow, prima che l'articolo tocchi
+  # il disco).
   #
-  # Solo sui branch automation/*: fuori dalla catena non c'è uno stadio da
-  # giudicare. Lo stadio è il primo segmento del nome del branch
-  # (automation/<stadio>-<data>, docs/AGENT_CONTRACT.md). --skip-tests perché
-  # la suite intera gira già nel job qui sopra: rifarla qui raddoppierebbe il
-  # tempo del check più lento senza aggiungere un verdetto.
-  gate:
-    if: startsWith(github.head_ref || github.ref_name, 'automation/')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # Il cancello misura il diff contro origin/master: serve la storia.
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install deps
-        # Il check del vintage importa l'app, e senza dipendenze il cancello
-        # boccia apposta invece di saltare il controllo.
-        run: pip install -r requirements.txt
-      - name: Run the gate
-        run: |
-          ref="${{ github.head_ref || github.ref_name }}"
-          stage="${ref#automation/}"
-          stage="${stage%%-*}"
-          echo "cancello per lo stadio: $stage"
-          python scripts/pipeline_gate.py --stage "$stage" --skip-tests
+  # Non è stato lasciato al suo posto perché un job che invoca un file
+  # cancellato non è inerte: `if:` è valutato dopo lo scheduling, quindi ogni
+  # PR da un branch `automation/*` ancora aperto sarebbe fallita su "file non
+  # trovato", cioè un rosso che non parla del suo contenuto.
 
   frontend:
     runs-on: ubuntu-latest

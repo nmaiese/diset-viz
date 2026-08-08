@@ -612,9 +612,17 @@ def da_coda(quanti, anno_minimo):
 
     Il punteggio non lo calcola questo modulo: è `lab.coda`, che
     ordina il catalogo intero (cifre arretrate prima di tutto, poi le sezioni
-    che mancano, poi se la pagina è indicizzabile). Qui si aggiungono i due
-    filtri che la lite vuole e la coda non ha: **il dato dell'anno che chiedi**
-    e la pagina non già completa.
+    che mancano, poi se la pagina è indicizzabile). Qui si aggiunge l'unico
+    filtro che la lite vuole e la coda non ha, **il dato dell'anno che chiedi**,
+    e si riusa il predicato di incompletezza della coda invece di riscriverlo.
+
+    Riscriverlo era un difetto: `written < sections` esclude proprio l'articolo
+    che la coda mette per primo, quello **completo ma con le cifre più vecchie
+    del dato**, che vale `+100` mentre una sezione mancante ne vale `10`. Oggi
+    non se ne vede nessuno perché nessun articolo è arretrato, ma il giorno in
+    cui Istat pubblica un anno nuovo l'insieme da rifare diventa esattamente
+    quello, e `--coda` lo salterebbe tutto. Stessa sorte per un articolo a cui
+    manca solo il `lead`, che è la meta description della pagina.
 
     L'unità della coda è la coppia (indicatore, livello), quindi si riporta
     anche il livello: lo stesso indicatore su regioni e province è un altro
@@ -626,7 +634,7 @@ def da_coda(quanti, anno_minimo):
              "anno_max": riga["year_max"], "punteggio": riga["score"]}
             for riga in build_queue()
             if riga["indexable"] and riga["year_max"] >= anno_minimo
-            and riga["written"] < riga["sections"]][:quanti]
+            and (riga["missing"] or not riga["lead"] or riga["stale"])][:quanti]
 
 
 def main(argv=None):
