@@ -27,10 +27,10 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
 import sys
 
 from lab.dossier import risolvi
+from lab.validazione import RUOLI, bloccanti
 from app.indicator_view import build_indicator_view
 from app import sources
 
@@ -40,78 +40,16 @@ ARTICOLI = os.path.join("content", "indicators")
 # una bozza su disco senza toccare il sito.
 LABORATORIO = os.path.join("data", "lab", "articoli")
 
-# I quattro ruoli che la pagina indicatore sa rendere. Una sezione con un ruolo
-# diverso verrebbe scartata in silenzio dal template.
-#
-# **Quattro ruoli non vuol dire quattro sezioni.** La pagina tiene una lista per
-# ruolo (`app/indicator_texts.py:267-282`) e la sequenza degli H2 la deriva
-# dalle sezioni scritte conservando ordine e ripetizioni: due `quadro` con due
-# titoli diversi rendono due H2. È così che i sette temi di un articolo stanno
-# dentro quattro ruoli, col titolo a portare il tema.
-#
-# La derivazione però scatta **solo** se le sezioni scritte coprono tutti e tre
-# i ruoli sostanziali. Se ne manca uno, la forma scelta collassa nei quattro
-# fissi e le sezioni in eccesso spariscono senza errore: è il guasto che
-# `_impaginazione` esiste per intercettare.
-RUOLI = ("definizione", "quadro", "dinamica", "limiti")
 
 # Ciò che un articolo può portare. `claims` non c'è apposta: un id di claim
 # inventato non deve poter entrare, e le fonti web della lite stanno in `fonti`.
 CAMPI = ("lead", "sections", "fonti")
 CAMPI_SEZIONE = ("role", "h", "body")
 
-# Un accento scritto con l'apostrofo: "poverta" seguito da apice, "perche"
-# seguito da apice, la "e" verbo seguita da apice. In italiano nessuna parola
-# finisce con vocale più apostrofo, tranne il troncamento `po'` e qualche
-# imperativo (`va'`, `fa'`, `di'`), che qui non compare mai.
-# Le elisioni non c'entrano: hanno l'apostrofo dopo una consonante (`l'anno`).
-ACCENTO_APOSTROFO = re.compile(r"\b\w*[aeiouAEIOU]'(?![a-zA-Zà-ÿ])")
-APOSTROFO_LEGITTIMO = {"po", "va", "fa", "da", "di", "sta"}
-
-
-def _accenti(bozza):
-    """Le parole in cui un accento è stato scritto come apostrofo.
-
-    Non è una preferenza di stile: "poverta" con l'apice al posto dell'accento
-    è italiano sbagliato su una pagina pubblica, e la forma giusta è
-    "povertà". Serve una guardia e non basta la regola scritta, perché
-    il difetto non nasce da una svista ma dall'imitazione: le istruzioni che
-    il modello legge sono scritte così, e un modello forte ne copia il
-    registro. La prima bozza scritta con opus aveva diciannove apostrofi e
-    zero accenti, quella scritta con sonnet sullo stesso impianto ne aveva
-    trentasei veri e nessun apostrofo.
-    """
-    pezzi = [("lead", bozza.get("lead") or "")]
-    for indice, sezione in enumerate(bozza.get("sections") or []):
-        pezzi.append((f"sezione {indice} (titolo)", sezione.get("h") or ""))
-        pezzi.append((f"sezione {indice}", sezione.get("body") or ""))
-    problemi = []
-    for dove, testo in pezzi:
-        parole = sorted({t for t in ACCENTO_APOSTROFO.findall(testo)
-                         if t[:-1].lower() not in APOSTROFO_LEGITTIMO})
-        if parole:
-            problemi.append(f"{dove}: accento scritto come apostrofo in {', '.join(parole)}")
-    return problemi
-
-
-def _valida(bozza):
-    """Gli errori che rendono l'articolo invisibile o rotto. Nient'altro."""
-    problemi = _accenti(bozza)
-    if not (bozza.get("lead") or "").strip():
-        problemi.append("manca il lead")
-    sezioni = bozza.get("sections") or []
-    if not sezioni:
-        problemi.append("nessuna sezione")
-    for indice, sezione in enumerate(sezioni):
-        if sezione.get("role") not in RUOLI:
-            problemi.append(f"sezione {indice}: ruolo '{sezione.get('role')}' "
-                            f"non fra {', '.join(RUOLI)}")
-        if not (sezione.get("body") or "").strip():
-            problemi.append(f"sezione {indice}: corpo vuoto")
-    for indice, fonte in enumerate(bozza.get("fonti") or []):
-        if not (fonte.get("url") or "").strip() or not (fonte.get("testo") or "").strip():
-            problemi.append(f"fonte {indice}: servono testo e url")
-    return problemi
+# I controlli che una bozza deve passare stanno in `lab/validazione.py`, e chi
+# li fa valere e' **chi verifica**, dentro `lab.controlla`, dove il testo si puo'
+# ancora correggere. Qui si contano e si stampano, non si rifiuta: rifiutare
+# all'ultimo passo non ripara niente, butta la run intera.
 
 
 def _entry(codice, bozza, livello_chiesto=None):
@@ -227,11 +165,13 @@ def main(argv=None):
     with open(args.bozza, encoding="utf-8") as handle:
         bozza = json.load(handle)
 
-    problemi = _valida(bozza)
-    if problemi:
-        json.dump({"scritto": False, "problemi": problemi}, sys.stdout, ensure_ascii=False, indent=1)
-        print()
-        return 2
+    # I controlli di `lab.validazione` **non rifiutano piu' qui**. Li esegue chi
+    # verifica, dentro `lab.controlla`, dove il testo si puo' ancora correggere:
+    # rifiutare all'ultimo passo non riparava niente, buttava la run intera
+    # (`wf_32afde53-c4e`, 4,10 $, 11 agenti, e per giunta su un falso positivo).
+    # Restano nell'uscita, perche' un difetto che nessuno vede piu' e' peggio di
+    # un difetto che ferma.
+    rimasti = bloccanti(bozza)
 
     chiave, entry = _entry(args.codice, bozza, args.livello)
     if entry is None:
@@ -267,6 +207,10 @@ def main(argv=None):
 
     json.dump({
         "scritto": True,
+        # Non ferma piu' niente, e resta scritto: sono i controlli che il
+        # verificatore aveva il compito di chiudere, e quello che ne resta dice
+        # se quel passaggio ha fatto il suo lavoro.
+        "bloccanti": rimasti,
         "sovrascritto": prima is not None,
         "vintage_precedente": (prima or {}).get("vintage"),
         "percorso": os.path.abspath(percorso),

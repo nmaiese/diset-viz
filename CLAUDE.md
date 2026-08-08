@@ -105,8 +105,8 @@ cd frontend && npm run build && cd ..
 .venv/bin/gunicorn run:app -b 127.0.0.1:5050
 
 # tests, audit, whitespace
-bin/py -m unittest discover -s tests -v          # tutta la suite (646 test, ~22s), prima di commit/push
-bin/py -m unittest discover -s tests/unit -v      # solo veloci (225 test, <1s), durante lo sviluppo
+bin/py -m unittest discover -s tests -v          # tutta la suite (656 test, ~22s), prima di commit/push
+bin/py -m unittest discover -s tests/unit -v      # solo veloci (235 test, <1s), durante lo sviluppo
 bin/py -m unittest discover -s tests/integration -v  # solo la parte pesante (421 test, ~21s): Flask/HTTP e catena e2e
 cd frontend && npm audit --audit-level=low
 git diff --check

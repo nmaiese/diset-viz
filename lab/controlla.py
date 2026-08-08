@@ -26,6 +26,7 @@ import sys
 from app.atlas_catalog import get_atlas_catalog
 from app.indicator_view import build_indicator_view
 from lab.dossier import costruisci, matrice_per_nome, risolvi
+from lab.validazione import bloccanti
 
 BOZZE = os.path.join("data", "lab", "bozze")
 
@@ -571,6 +572,12 @@ def controlla(dossier, matrice, bozza):
     link = _link(bozza, dossier)
     return {
         "codice": dossier["codice"],
+        # I controlli che `lab.pubblica` rifara' prima di scrivere, fatti **qui**,
+        # dove il testo si puo' ancora correggere. Non sono giudizi: se questa
+        # lista non e' vuota il file non viene scritto, punto. Girare solo
+        # all'ultimo passo e' costato una run intera (4,10 $, verifica pulita a
+        # tre passaggi) per un accento scritto come apostrofo in una sezione.
+        "bloccanti": bloccanti(bozza),
         "cifre_controllate": len(cifre),
         "non_trovate": len(non_trovate),
         "link": link,

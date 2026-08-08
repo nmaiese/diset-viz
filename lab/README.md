@@ -292,9 +292,20 @@ una svista: il lint precedente lo faceva con un metro più grossolano e ha dato
 tre `cifra-falsa` bloccanti su due articoli, tutte e tre **volatilità** dette
 correttamente dal testo e accostate al valore della regione nominata accanto.
 
-Ciò che ferma davvero un articolo sta in `lab.pubblica._valida`, ed è solo ciò
-che rende la pagina rotta: un lead vuoto, una sezione senza corpo, un ruolo
-inesistente, un accento scritto con l'apostrofo.
+Ciò che rende la pagina rotta sta in `lab/validazione.py`, ed è solo quello: un
+lead vuoto, una sezione senza corpo, un ruolo inesistente, una fonte senza url,
+un accento scritto con l'apostrofo. **Lo esegue chi verifica**, dentro
+`lab.controlla`, che lo restituisce in `bloccanti`: da lì il testo torna a chi
+scrive e il giro riparte, e quella riparazione non consuma un passaggio di
+verifica, perché non c'è niente da giudicare.
+
+Stava dentro `lab.pubblica`, che rifiutava. Rifiutare lì non riparava niente:
+una run intera (`wf_32afde53-c4e`, 4,10 $, 11 agenti, 42 turni) è finita con
+verifica pulita a tre passaggi, cinque classi passate, zero cifre inventate, e
+nessun file scritto per un `adeguata'` in una sezione, che per giunta era una
+**citazione fra apici** e non un accento sbagliato. Adesso `lab.pubblica` li
+conta e li stampa, e scrive: un controllo che ferma dove non si può più
+correggere non protegge la pagina, butta il lavoro.
 
 ## Il primo giro reale (ter-6, 2026-08-08)
 

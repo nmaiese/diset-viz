@@ -166,7 +166,12 @@ const VERDETTO = {
   // identiche (zero smentite) da un verdetto che non la porta. Non è
   // burocrazia, è il difetto che ha fermato `ter-13`: rilievi nuovi al secondo
   // e al terzo passaggio su un testo che non era cambiato.
-  required: ['smentite', 'verificate', 'impronta', 'classi_passate'],
+  // `bloccanti` e' obbligatoria come `classi_passate`, e per la stessa ragione:
+  // e' una lista che `lab.controlla` stampa gia', e ometterla vuol dire far
+  // decidere a chi non guarda. Sono i controlli deterministici che
+  // `lab.pubblica` rifara' prima di scrivere: se ne resta uno, il file non si
+  // scrive e la run e' persa per intero.
+  required: ['smentite', 'verificate', 'impronta', 'classi_passate', 'bloccanti'],
   properties: {
     smentite: {
       type: 'array',
@@ -184,6 +189,7 @@ const VERDETTO = {
     },
     verificate: { type: 'number' },
     classi_passate: { type: 'array', items: { type: 'string', enum: CLASSI } },
+    bloccanti: { type: 'array', items: { type: 'string' } },
     bozza_salvata: { type: ['string', 'null'] },
     // Obbligatoria, e con i campi obbligatori dentro: era `['object', 'null']`
     // con tutto facoltativo, cioè uno schema che permetteva di ometterla, e
@@ -297,6 +303,10 @@ const PUBBLICATO = {
     // cruscotto confronta le sole parole, e due riscritture della stessa
     // lunghezza si leggono `in linea` mentre in produzione c'e' ancora l'altra.
     impronta_prosa: { type: ['string', 'null'] },
+    // Quello che i controlli deterministici trovano ancora sul testo scritto.
+    // Non ferma piu' la scrittura (fermare all'ultimo passo buttava la run senza
+    // riparare niente): dice se il passaggio che doveva chiuderli ha funzionato.
+    bloccanti: { type: 'array', items: { type: 'string' } },
     impaginazione: {
       type: 'array',
       items: {
@@ -464,6 +474,46 @@ const esiti = await pipeline(
   async ({ bozza, claim }, d) => {
     if (!bozza) return { codice: d.codice, pubblicabile: false, motivo: 'nessuna bozza' }
     let corrente = bozza
+    // Un giro solo, riservato ai controlli di pubblicazione, che non consuma un
+    // passaggio di verifica.
+    let extra = 1
+
+    const correggi = (bozzaAttuale, smentite, bloccanti_, sfx) => agent(
+      `Correggi il tuo articolo dell'indicatore ${d.codice}. Compito: **correggi**.\n\n` +
+      `Dossier: ${d.percorso}\n\n` +
+      `Bozza attuale:\n${json(bozzaAttuale)}\n\n` +
+      (bloccanti_?.length
+        // Prima di tutto il resto, e con parole diverse: qui non c'e' niente da
+        // valutare. Sono controlli deterministici, e finche' ne resta uno il
+        // file **non viene scritto**, quindi tutto il lavoro della run e' perso.
+        ? `**Controlli di pubblicazione da riparare.** Non sono giudizi e non si ` +
+          `discutono: finche' ne resta uno, il comando che scrive l'articolo lo ` +
+          `rifiuta e la run finisce senza pagina. Riparali tutti, e ripara **ogni ` +
+          `altra occorrenza dello stesso difetto** anche dove il controllo non la ` +
+          `nomina (un accento scritto come apostrofo non e' quasi mai da solo: ` +
+          `"poverta'" va scritto "povertà", "perche'" va scritto "perché", "e'" ` +
+          `verbo va scritto "è"). Non cambiare nient'altro:\n` +
+          bloccanti_.map((p) => `- ${p}`).join('\n') + `\n\n`
+        : '') +
+      (smentite?.length
+        // Una smentita nomina una frase, ma vale sul claim. Al secondo giro
+        // reale (ter-13) il corpo della sezione `limiti` è stato corretto
+        // bene e il titolo, che diceva il contrario, è rimasto: smentito una
+        // seconda volta, con gravità alta. Stessa run: le tre occorrenze del
+        // 63,04 ri-etichettate una per una e il 16,85 del lead, che ha lo
+        // stesso difetto identico, lasciato dov'era.
+        ? `Smentite del verificatore. Per ognuna cambia ciò che nomina, **e** ogni altro ` +
+          `posto dove quello stesso claim compare (titolo della sezione, \`lead\`, ` +
+          `\`angolo\`), **e** gli altri punti che hanno lo stesso difetto anche se la ` +
+          `smentita non li nomina. Il resto del testo non si tocca. Dichiara in ` +
+          `\`correzioni\` che cosa hai cambiato e dove l'hai propagato:\n${json(smentite)}`
+        : `Dichiara in \`correzioni\` che cosa hai cambiato.`),
+      // Lo stesso modello di chi ha scritto, e non è un dettaglio: correggere
+      // con un altro modello riscrive la voce dell'articolo dove tocca, e le
+      // due metà si sentono.
+      { agentType: 'lab-scrittore', model: 'sonnet', effort: 'high', phase: 'Scrittura', schema: BOZZA, label: `correggi:${d.codice}${sfx ? ` (${sfx})` : ''}` },
+    )
+
     for (let giro = 0; giro < VERIFICHE; giro++) {
       // Il verificatore può anche non tornare (schema non chiamato, turni
       // finiti). Non deve portarsi via l'articolo in silenzio: si registra il
@@ -512,6 +562,13 @@ const esiti = await pipeline(
         `su un testo identico. Poi dichiara in \`classi_passate\` le classi che hai ` +
         `davvero attraversato: una classe che non elenchi è una classe che nessuno ha ` +
         `guardato, e va detto invece di sembrare pulita.\n\n` +
+        `L'uscita porta anche **\`bloccanti\`**: i controlli deterministici che ` +
+        `\`lab.pubblica\` rifara' prima di scrivere il file (accenti scritti come ` +
+        `apostrofo, lead mancante, corpo vuoto, ruolo sconosciuto, fonte senza url). ` +
+        `Copiali nel campo \`bloccanti\` **cosi' come li stampa il comando**, anche ` +
+        `quando ti sembrano dettagli di battitura: non sono giudizi tuoi, sono l'unico ` +
+        `motivo per cui un articolo verificato puo' finire non scritto, e a quel punto ` +
+        `nessuno lo corregge piu'. Lista vuota se non ce ne sono.\n\n` +
         `Restituisci le smentite, quante cifre e fonti hai verificato, il percorso ` +
         `\`bozza_salvata\` e l'\`impronta\`, entrambi copiati dall'uscita del comando ` +
         `senza modificarli: l'impronta serve a dimostrare che il file congelato è ` +
@@ -543,7 +600,34 @@ const esiti = await pipeline(
       // se lo si richiama. Quindi il freno non è il silenzio del critico, è la
       // gravità che il critico stesso assegna, e i rilievi che restano
       // viaggiano col pezzo invece di sparire.
+      // I controlli deterministici che `lab.pubblica` rifara' prima di
+      // scrivere. Non sono rilievi e non si giudicano per gravita': o sono
+      // vuoti, o il file non si scrive. Una run intera (`wf_32afde53-c4e`,
+      // 4,10 $, 11 agenti, 42 turni) e' finita cosi': verifica pulita a tre
+      // passaggi, tutte e cinque le classi passate, nessuna cifra inventata, e
+      // l'articolo mai scritto per un `adeguata'` in una sezione.
+      const blocca = verdetto.bloccanti ?? []
+
       if (!verdetto.smentite.length || (ultimo && !gravi.length)) {
+        if (blocca.length) {
+          // Si corregge **senza consumare un passaggio**: qui non c'e' niente da
+          // giudicare, c'e' una battitura da riparare, e spendere per questo uno
+          // dei tre passaggi vorrebbe dire togliere una lettura vera al testo.
+          // Il giro in piu' e' uno solo: se dopo quello i controlli non passano
+          // ancora, il difetto non e' una svista e l'articolo si ferma dicendolo.
+          if (!extra) {
+            log(`${d.codice}: i controlli di pubblicazione non passano nemmeno dopo la riparazione: ${blocca.join('; ')}`)
+            return { codice: d.codice, pubblicabile: false, verdetto, giri: giro,
+                     motivo: `la bozza non passa i controlli di pubblicazione: ${blocca.join('; ')}` }
+          }
+          extra -= 1
+          log(`${d.codice}: da riparare prima di pubblicare: ${blocca.join('; ')}`)
+          const riparata = await correggi(corrente, verdetto.smentite, blocca, `${giro + 1}b`)
+          if (!riparata) return { codice: d.codice, pubblicabile: false, motivo: 'riparazione non conclusa', verdetto, giri: giro }
+          corrente = riparata
+          giro -= 1
+          continue
+        }
         const scarto = improntaDiversa(improntaDi(corrente), verdetto.impronta)
         if (scarto) {
           log(`${d.codice}: la bozza congelata non coincide con quella scritta (${scarto})`)
@@ -562,26 +646,7 @@ const esiti = await pipeline(
         log(`${d.codice}: ${gravi.length} rilievi gravi dopo ${VERIFICHE} passaggi, non scritto`)
         return { codice: d.codice, pubblicabile: false, motivo: `smentito ${VERIFICHE} volte`, verdetto, giri: giro }
       }
-      const corretta = await agent(
-        `Correggi il tuo articolo dell'indicatore ${d.codice}. Compito: **correggi**.\n\n` +
-        `Dossier: ${d.percorso}\n\n` +
-        `Bozza attuale:\n${json(corrente)}\n\n` +
-        // Una smentita nomina una frase, ma vale sul claim. Al secondo giro
-        // reale (ter-13) il corpo della sezione `limiti` è stato corretto
-        // bene e il titolo, che diceva il contrario, è rimasto: smentito una
-        // seconda volta, con gravità alta. Stessa run: le tre occorrenze del
-        // 63,04 ri-etichettate una per una e il 16,85 del lead, che ha lo
-        // stesso difetto identico, lasciato dov'era.
-        `Smentite del verificatore. Per ognuna cambia ciò che nomina, **e** ogni altro ` +
-        `posto dove quello stesso claim compare (titolo della sezione, \`lead\`, ` +
-        `\`angolo\`), **e** gli altri punti che hanno lo stesso difetto anche se la ` +
-        `smentita non li nomina. Il resto del testo non si tocca. Dichiara in ` +
-        `\`correzioni\` che cosa hai cambiato e dove l'hai propagato:\n${json(verdetto.smentite)}`,
-        // Lo stesso modello di chi ha scritto, e non è un dettaglio: correggere
-        // con un altro modello riscrive la voce dell'articolo dove tocca, e le
-        // due metà si sentono.
-        { agentType: 'lab-scrittore', model: 'sonnet', effort: 'high', phase: 'Scrittura', schema: BOZZA, label: `correggi:${d.codice}${giro ? ` (${giro + 1})` : ''}` },
-      )
+      const corretta = await correggi(corrente, verdetto.smentite, blocca, giro ? `${giro + 1}` : '')
       if (!corretta) return { codice: d.codice, pubblicabile: false, motivo: 'correzione non conclusa', verdetto, giri: giro }
       corrente = corretta
     }
@@ -607,6 +672,16 @@ const esiti = await pipeline(
     ).then((pubblicato) => ({
       codice: d.codice,
       scritto: !!pubblicato?.scritto,
+      // Un rifiuto del pubblicatore **e' un articolo fermato**, e va detto con
+      // quel nome. Senza queste due righe finiva in nessuna delle due liste
+      // (`articoli` vuole `scritto`, `fermati` vuole `pubblicabile === false`):
+      // la run tornava `scritti: 0, articoli: [], fermati: []`, cioe' un
+      // indicatore sparito, e il motivo restava solo nel trascritto dell'agente.
+      ...(pubblicato?.scritto ? {} : {
+        pubblicabile: false,
+        motivo: `il comando che scrive ha rifiutato la bozza: ${(pubblicato?.problemi ?? ['motivo non riportato']).join('; ')}`,
+        problemi: pubblicato?.problemi ?? [],
+      }),
       sovrascritto: pubblicato?.sovrascritto ?? null,
       // Rifare una pagina e' irreversibile per il lettore: il cruscotto deve
       // poter dire su che cosa e' passata sopra, non solo che e' passata.
@@ -614,6 +689,10 @@ const esiti = await pipeline(
       percorso: pubblicato?.percorso ?? null,
       parole: pubblicato?.parole ?? null,
       impronta_prosa: pubblicato?.impronta_prosa ?? null,
+      // Se qui resta qualcosa, l'articolo e' uscito lo stesso e il difetto e'
+      // sulla pagina: viaggia col pezzo come i rilievi aperti, invece di
+      // sparire perche' nessuno lo rifiuta piu'.
+      bloccanti_rimasti: pubblicato?.bloccanti ?? [],
       angolo: esito.bozza?.angolo ?? null,
       giri_di_correzione: esito.giri ?? 0,
       cifre_verificate: esito.verdetto?.verificate ?? null,
