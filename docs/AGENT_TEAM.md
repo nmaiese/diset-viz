@@ -16,8 +16,12 @@ La sessione principale è l'editor-in-chief e coordina cinque sessioni autonome:
 | `skeptical-editor` | stress test e verdetto | no |
 
 Solo il lead esegue `lab.dossier`, salva gli artefatti, lancia
-`lab.controlla`, pubblica e avvia i test. I teammate comunicano direttamente e
-usano la lista task condivisa. Non sono ammessi team annidati o subagenti.
+`lab.controlla`, pubblica e avvia i test. L'exit code 0 di `lab.controlla`
+non basta: `non_trovate` e `link_inesistenti` devono essere zero,
+`bloccanti` deve essere vuoto e la pubblicazione deve usare esclusivamente il
+percorso `bozza_salvata` restituito dal controllo. I teammate comunicano
+direttamente e usano la lista task condivisa. Non sono ammessi team annidati o
+subagenti.
 
 ## Avvio
 
