@@ -89,7 +89,10 @@ class GliAgentiSonoDichiarati(unittest.TestCase):
     def test_i_teammate_con_memoria_restano_senza_scrittura_generica(self):
         for nome in MEMORIA_TEAM:
             meta = _frontmatter(AGENTI / f"{nome}.md") or {}
-            strumenti = set(meta.get("tools") or [])
+            dichiarati = meta.get("tools") or []
+            if isinstance(dichiarati, str):
+                dichiarati = [voce.strip() for voce in dichiarati.split(",")]
+            strumenti = set(dichiarati)
             self.assertNotIn("Write", strumenti)
             self.assertNotIn("Edit", strumenti)
             self.assertNotIn("Bash", strumenti)
