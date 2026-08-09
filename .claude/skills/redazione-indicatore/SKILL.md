@@ -31,6 +31,33 @@ Usare esattamente questi teammate e nomi:
 Nel prompt di spawn ordinare a ciascuno di invocare le skill nominate nel corpo
 della sua definizione. Il frontmatter `skills` non viene applicato ai teammate.
 
+## Memoria editoriale
+
+Usano memoria soltanto `source-researcher` e `skeptical-editor`, entrambi con
+scope `project`. All'avvio devono consultare il proprio `MEMORY.md`:
+
+- `.claude/agent-memory/source-researcher/MEMORY.md`
+- `.claude/agent-memory/skeptical-editor/MEMORY.md`
+
+La memoria orienta domande e controlli, non prova fatti. Ogni claim, URL, metodo
+o limite usato nel pezzo va verificato nella run corrente. I teammate restano
+in sola lettura e restituiscono `memory_candidates`; solo il lead promuove una
+voce, modificando esclusivamente i due file sopra. Rifiutare valori correnti,
+classifiche, deduzioni sul singolo articolo, preferenze stilistiche e URL senza
+contesto.
+
+Un candidato deve contenere almeno `categoria`, `apprendimento`,
+`verified_on`, `recheck_after`, `ambito`, `limiti` e una prova
+(`evidence_url` per le fonti, `evidenza` per la revisione). Promuovere solo
+con prova riaperta nella run e utilità oltre l'indicatore corrente. Accorpare i
+duplicati, rimuovere le voci scadute non riconfermate e mantenere `MEMORY.md`
+breve.
+
+Nelle Routine ogni run parte da un nuovo clone della branch predefinita:
+l'aggiornamento diventa memoria delle run future soltanto dopo il merge della
+PR che lo contiene. Non scrivere direttamente su `main` per accelerare questa
+persistenza.
+
 ## Protocollo dei task e dashboard
 
 Creare i task appena diventano eseguibili, non tutti in anticipo. Il subject
@@ -51,10 +78,12 @@ Completarla soltanto dopo controlli e pubblicazione, oppure dopo avere deciso
 esplicitamente di fermare il pezzo. Prima di completarla, aggiornare la sua
 descrizione con l'esito JSON usato dal cruscotto:
 
-- pubblicato: `{"articoli":[<uscita di lab.pubblica>],"fermati":[]}`
-- fermato: `{"articoli":[],"fermati":[{"codice":"<codice>","motivo":"<motivo>"}]}`
+- pubblicato: `{"articoli":[<uscita di lab.pubblica>],"fermati":[],"memoria":<consuntivo>}`
+- fermato: `{"articoli":[],"fermati":[{"codice":"<codice>","motivo":"<motivo>"}],"memoria":<consuntivo>}`
 
-Gli hook traducono task ed esito nella stessa dashboard del workflow attuale.
+Il `consuntivo` ha `consultata` e `aggiornata` come liste di ruoli, più i
+conteggi `candidati`, `promossi` e `scartati`. Gli hook lo conservano
+nell'esito della run, visibile nel dettaglio della dashboard.
 
 ## Sequenza
 
@@ -69,11 +98,13 @@ Gli hook traducono task ed esito nella stessa dashboard del workflow attuale.
    `search-strategist` e `skeptical-editor`.
 6. Fare al massimo una correzione mirata con `data-journalist`. Se resta un
    rilievo `alta`, fermare senza pubblicare.
-7. Il lead salva la bozza, esegue
+7. Valutare i `memory_candidates` di ricercatore e revisore. Il lead promuove
+   solo apprendimenti durevoli e registra candidati, promossi e scartati.
+8. Il lead salva la bozza, esegue
    `bin/py -m lab.controlla <codice> --bozza <percorso> --salva`, poi
    `bin/py -m lab.pubblica <codice> --bozza <percorso>` e i test pertinenti.
-8. Copiare l'uscita di pubblicazione o arresto nella descrizione JSON della
-   sentinella, completarla e chiedere ai teammate di chiudersi.
+9. Copiare uscita e consuntivo memoria nella descrizione JSON della sentinella,
+   completarla e chiedere ai teammate di chiudersi.
 
 Persistenza consigliata, senza aggiungere script:
 
