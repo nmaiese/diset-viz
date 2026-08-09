@@ -101,11 +101,21 @@ nell'esito della run, visibile nel dettaglio della dashboard.
    rilievo `alta`, fermare senza pubblicare.
 7. Valutare i `memory_candidates` di ricercatore e revisore. Il lead promuove
    solo apprendimenti durevoli e registra candidati, promossi e scartati.
-8. Il lead salva la bozza, esegue
-   `bin/py -m lab.controlla <codice> --bozza <percorso> --salva`, poi
-   `bin/py -m lab.pubblica <codice> --bozza <percorso>` e i test pertinenti.
-9. Copiare uscita e consuntivo memoria nella descrizione JSON della sentinella,
-   completarla e chiedere ai teammate di chiudersi.
+8. Il lead salva la bozza ed esegue
+   `bin/py -m lab.controlla <codice> --bozza <percorso> --salva`, acquisendo
+   l'oggetto JSON restituito. Questo comando ritorna exit code 0 anche quando
+   trova problemi: il gate è quindi sui campi, non sul codice di uscita.
+9. Pubblicare soltanto se `non_trovate == 0`,
+   `link_inesistenti == 0`, `bloccanti` è vuoto e `bozza_salvata` esiste.
+   In caso contrario inviare tutti i problemi nell'unica correzione ancora
+   disponibile, rieseguire `lab.controlla` e rivalutare gli stessi quattro
+   requisiti. Se la correzione era già stata usata o il secondo controllo non è
+   pulito, fermare il pezzo e registrare i problemi nella sentinella.
+10. Eseguire `bin/py -m lab.pubblica <codice> --bozza <bozza_salvata>`
+    esclusivamente sul percorso restituito dal controllo pulito, quindi i test
+    pertinenti. Non pubblicare il file di input originale.
+11. Copiare uscita e consuntivo memoria nella descrizione JSON della sentinella,
+    completarla e chiedere ai teammate di chiudersi.
 
 Persistenza consigliata, senza aggiungere script:
 
