@@ -2,7 +2,8 @@
   "env": {
     "ANTHROPIC_CUSTOM_MODEL_OPTION": "claude-opus-4-8",
     "ANTHROPIC_CUSTOM_MODEL_OPTION_NAME": "Opus 4.8",
-    "ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION": "Claude Opus 4.8"
+    "ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION": "Claude Opus 4.8",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
     "allow": [
@@ -57,6 +58,27 @@
           }
         ]
       }
+    ],
+    "TaskCreated": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/team_monitor.py\""
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/team_monitor.py\""
+          }
+        ]
+      }
     ]
-  }
+  },
+  "teammateMode": "in-process"
 }

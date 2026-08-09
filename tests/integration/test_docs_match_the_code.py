@@ -32,6 +32,11 @@ SKILL = RADICE / ".claude" / "skills"
 LITE = {"lab-dossierista", "lab-scout", "lab-scout-europa",
         "lab-scrittore", "lab-verificatore", "lab-pubblicatore"}
 
+# I cinque ruoli riusabili dal vero Agent Team editoriale. Il lead e la
+# sessione principale, quindi non ha una definizione da teammate.
+TEAM = {"data-editor", "source-researcher", "search-strategist",
+        "data-journalist", "skeptical-editor"}
+
 # Il giudice cieco non appartiene alla catena: legge due bozze e dice quale si
 # legge fino in fondo, senza avere il progetto in contesto. È un lavoro che
 # sopravvive a qualunque catena produca i due testi. `admissions` decide che
@@ -49,7 +54,7 @@ def _frontmatter(percorso):
 class GliAgentiSonoDichiarati(unittest.TestCase):
     def test_nessun_agente_avanza_senza_un_posto_dove_stare(self):
         sul_disco = {percorso.stem for percorso in AGENTI.glob("*.md")}
-        self.assertEqual(sul_disco, LITE | ALTRI)
+        self.assertEqual(sul_disco, LITE | TEAM | ALTRI)
 
     def test_ogni_agente_ha_un_frontmatter_che_si_carica(self):
         """Un `: ` dentro un `description` su riga sola non è YAML valido, e il

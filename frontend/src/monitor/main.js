@@ -24,10 +24,10 @@ const cfg = window.__supabase || null;
 const adminEmail = (window.__monitorAdminEmail || "").toLowerCase();
 const root = document.getElementById("monitor-root");
 
-// Le cinque fasi della catena, nell'ordine in cui girano. Serve alla spina
+// Le fasi dei due motori editoriali, nell'ordine in cui possono girare. Serve alla spina
 // dorsale di ADESSO, che deve mostrare anche le fasi non ancora arrivate: senza
 // quelle si vedrebbe il passato e non a che punto e' la run.
-const FASI = ["Dossier", "Contesto", "Scrittura", "Verifica", "Pubblicazione"];
+const FASI = ["Dossier", "Contesto", "Ricerca", "Angolo", "Scrittura", "Verifica", "Pubblicazione"];
 
 // I quattro ruoli di un articolo, nell'ordine in cui la pagina li rende.
 const RUOLI = ["definizione", "quadro", "dinamica", "limiti"];
