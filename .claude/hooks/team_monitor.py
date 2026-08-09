@@ -52,11 +52,18 @@ def _ora():
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+def _slug(valore):
+    return re.sub(r"[^a-z0-9-]+", "-", str(valore or "").lower()).strip("-")
+
+
 def _run_id(evento):
-    """Un id stabile per il team corrente, nel formato già accettato dall'API."""
-    seme = evento.get("team_name") or evento.get("session_id") or ""
-    slug = re.sub(r"[^a-z0-9-]+", "-", str(seme).lower()).strip("-")
-    return f"wf_team-{slug}" if len(slug) >= 3 else ""
+    """Un id stabile e univoco per la singola sessione del team."""
+    sessione = _slug(evento.get("session_id"))
+    if len(sessione) < 3:
+        return ""
+    squadra = _slug(evento.get("team_name"))
+    suffisso = f"{squadra}-{sessione}" if squadra else sessione
+    return f"wf_team-{suffisso}"
 
 
 def _task(evento):
