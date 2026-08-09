@@ -61,8 +61,9 @@ voce ha data di verifica, data di ricontrollo, ambito, prova e limiti.
 Una Routine crea una nuova sessione e clona la branch predefinita a ogni run.
 Quindi la memoria di progetto è disponibile nel cloud, ma un aggiornamento
 prodotto dalla run diventa visibile alle run future solo dopo il merge della
-relativa PR. La Routine non deve scrivere direttamente su `main` e non deve
-usare la pipeline baseline come fallback silenzioso.
+relativa PR. La Routine non deve scrivere direttamente sulla branch predefinita (`master`
+in questa repository) e non deve usare la pipeline baseline come fallback
+silenzioso.
 
 Prompt operativo:
 
@@ -83,7 +84,8 @@ devono consultare la propria memoria, verificare di nuovo ogni fatto e
 restituire memory_candidates. Solo il lead può modificare i MEMORY.md, dopo
 aver verificato prova, durata e ambito del candidato.
 
-Non scrivere né pubblicare direttamente su main. Lavora sulla branch claude/
+Non scrivere né pubblicare direttamente sulla branch predefinita (`master`).
+Lavora sulla branch claude/
 della run e apri una PR revisionabile. Prima di chiudere la sentinella inserisci
 nell'esito articoli/fermati e il consuntivo memoria con consultata, candidati,
 promossi, scartati e aggiornata. Esegui i controlli e i test richiesti dalla
