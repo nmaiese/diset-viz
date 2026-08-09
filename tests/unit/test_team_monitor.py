@@ -72,6 +72,13 @@ class TeamMonitorTest(unittest.TestCase):
             task_description=json.dumps({
                 "articoli": [{"codice": "ter-13", "scritto": True, "parole": 700}],
                 "fermati": [],
+                "memoria": {
+                    "consultata": ["source-researcher", "skeptical-editor"],
+                    "candidati": 3,
+                    "promossi": 1,
+                    "scartati": 2,
+                    "aggiornata": ["source-researcher"],
+                },
             }),
         ))
         self.assertEqual(len(righe), 3)
@@ -81,6 +88,13 @@ class TeamMonitorTest(unittest.TestCase):
         self.assertEqual(righe[2]["run"]["stato"], "completed")
         self.assertEqual(righe[2]["run"]["esito"]["articoli"][0]["codice"], "ter-13")
         self.assertEqual(righe[2]["run"]["esito"]["fermati"], [])
+        memoria = righe[2]["run"]["esito"]["memoria"]
+        self.assertEqual(memoria["consultata"],
+                         ["source-researcher", "skeptical-editor"])
+        self.assertEqual(memoria["candidati"], 3)
+        self.assertEqual(memoria["promossi"], 1)
+        self.assertEqual(memoria["scartati"], 2)
+        self.assertEqual(memoria["aggiornata"], ["source-researcher"])
 
     def test_sentinella_senza_esito_non_finge_una_pubblicazione(self):
         righe = team_monitor.payload(evento(
@@ -90,6 +104,36 @@ class TeamMonitorTest(unittest.TestCase):
         fermato = righe[2]["run"]["esito"]["fermati"][0]
         self.assertEqual(fermato["codice"], "ter-13")
         self.assertIn("senza esito", fermato["motivo"])
+        self.assertEqual(righe[2]["run"]["esito"]["memoria"], {
+            "consultata": [],
+            "candidati": 0,
+            "promossi": 0,
+            "scartati": 0,
+            "aggiornata": [],
+        })
+
+    def test_memoria_malformata_non_sporca_il_consuntivo(self):
+        righe = team_monitor.payload(evento(
+            "TaskCompleted",
+            "[redazione:lead:chiusura] ter-13 - chiusura del run",
+            task_description=json.dumps({
+                "articoli": [],
+                "fermati": [{"codice": "ter-13", "motivo": "fonte insufficiente"}],
+                "memoria": {
+                    "consultata": "source-researcher",
+                    "candidati": "non-un-numero",
+                    "promossi": -4,
+                    "aggiornata": [None, "skeptical-editor"],
+                },
+            }),
+        ))
+        self.assertEqual(righe[2]["run"]["esito"]["memoria"], {
+            "consultata": [],
+            "candidati": 0,
+            "promossi": 0,
+            "scartati": 0,
+            "aggiornata": ["skeptical-editor"],
+        })
 
     def test_il_follow_rinfresca_finche_la_sentinella_e_aperta(self):
         class PostinoFinto:
