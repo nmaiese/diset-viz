@@ -13,8 +13,8 @@ Conservare soltanto:
 - correzioni minime che hanno risolto un'intera classe di problemi
 - limiti metodologici ricorrenti nelle famiglie di indicatori
 
-Non conservare gusti stilistici, rilievi isolati, testo di singole bozze o
-giudizi su persone e agenti.
+Non conservare gusti stilistici, rilievi isolati, testo di singole bozze,
+giudizi su persone e agenti, segreti, token o dati personali.
 
 ## Pattern editoriali
 
