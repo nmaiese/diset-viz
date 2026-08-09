@@ -162,7 +162,7 @@ class IlGateDiPubblicazioneECompleto(unittest.TestCase):
             "--bozza <bozza_salvata>",
         ):
             with self.subTest(requisito=requisito):
-                self.assertIn(requisito.replace("\\`", "`"), testo)
+                self.assertIn(requisito, testo)
         self.assertIn("ritorna exit code 0 anche quando", testo)
         self.assertIn("secondo controllo non è", testo)
 
