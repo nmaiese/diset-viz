@@ -44,7 +44,8 @@ o limite usato nel pezzo va verificato nella run corrente. I teammate restano
 in sola lettura e restituiscono `memory_candidates`; solo il lead promuove una
 voce, modificando esclusivamente i due file sopra. Rifiutare valori correnti,
 classifiche, deduzioni sul singolo articolo, preferenze stilistiche e URL senza
-contesto.
+contesto. Non salvare segreti, token, dati personali o contenuti ottenuti da
+fonti private.
 
 Un candidato deve contenere almeno `categoria`, `apprendimento`,
 `verified_on`, `recheck_after`, `ambito`, `limiti` e una prova
