@@ -50,11 +50,46 @@ class TeamMonitorTest(unittest.TestCase):
             "[redazione:data-editor:ricerca] ter-6 - leggere il dossier",
         ), now="2026-08-09T08:00:00+00:00")
         self.assertEqual(len(righe), 2)
-        self.assertEqual(righe[0]["run_id"], "wf_team-session-a1b2c3d4")
+        self.assertEqual(
+            righe[0]["run_id"],
+            "wf_team-session-a1b2c3d4-a1b2c3d4-resto",
+        )
         self.assertEqual(righe[0]["fase_stimata"], "Ricerca")
         self.assertEqual(righe[1]["agent_type"], "data-editor")
         self.assertEqual(righe[1]["stato_vivo"], "aperto")
         self.assertEqual(righe[1]["indicatore"], "ter-6")
+
+    def test_due_sessioni_con_lo_stesso_team_non_collidono(self):
+        subject = "[redazione:data-editor:ricerca] ter-6 - leggere il dossier"
+        prima = evento(
+            "TaskCreated", subject,
+            team_name="redazione-indicatore",
+            session_id="sessione-uno",
+        )
+        seconda = evento(
+            "TaskCreated", subject,
+            team_name="redazione-indicatore",
+            session_id="sessione-due",
+        )
+        run_prima = team_monitor.payload(prima)[0]["run_id"]
+        run_seconda = team_monitor.payload(seconda)[0]["run_id"]
+        self.assertNotEqual(run_prima, run_seconda)
+        self.assertEqual(
+            run_prima,
+            "wf_team-redazione-indicatore-sessione-uno",
+        )
+        self.assertEqual(
+            run_seconda,
+            "wf_team-redazione-indicatore-sessione-due",
+        )
+
+    def test_senza_sessione_non_crea_una_run_ambigua(self):
+        self.assertEqual(team_monitor.payload(evento(
+            "TaskCreated",
+            "[redazione:data-editor:ricerca] ter-6 - leggere il dossier",
+            session_id="",
+            team_name="redazione-indicatore",
+        )), [])
 
     def test_completamento_chiude_solo_il_task(self):
         righe = team_monitor.payload(evento(
