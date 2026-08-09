@@ -160,7 +160,9 @@ la sessione principale è `editor-in-chief` e coordina `data-editor`,
 `source-researcher`, `search-strategist`, `data-journalist` e
 `skeptical-editor`. Avvio: `/redazione-indicatore <codice>`. I teammate sono in
 sola lettura, comunicano direttamente e non creano subagenti; solo il lead
-salva, controlla e pubblica. Protocollo, dashboard e limiti sono in
+salva, controlla e pubblica. `source-researcher` e `skeptical-editor` usano
+memoria di progetto governata dal lead, mai come fonte fattuale. Protocollo,
+Routine, dashboard e limiti sono in
 [`docs/AGENT_TEAM.md`](docs/AGENT_TEAM.md). Il workflow corrente resta la
 baseline finché i canary non giustificano la promozione.
 
