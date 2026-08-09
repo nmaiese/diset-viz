@@ -149,5 +149,23 @@ class IComandiScrittiSonoEseguibili(unittest.TestCase):
                                     f"{percorso.stem} esegue `bin/py -m {modulo}`, che non esiste")
 
 
+class IlGateDiPubblicazioneECompleto(unittest.TestCase):
+    def test_la_skill_non_pubblica_solo_per_exit_code_zero(self):
+        testo = (SKILL / "redazione-indicatore" / "SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        for requisito in (
+            "non_trovate == 0",
+            "link_inesistenti == 0",
+            "`bloccanti` è vuoto",
+            "`bozza_salvata` esiste",
+            "--bozza <bozza_salvata>",
+        ):
+            with self.subTest(requisito=requisito):
+                self.assertIn(requisito.replace("\\`", "`"), testo)
+        self.assertIn("ritorna exit code 0 anche quando", testo)
+        self.assertIn("secondo controllo non è", testo)
+
+
 if __name__ == "__main__":
     unittest.main()
