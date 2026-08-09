@@ -1,19 +1,10 @@
 import importlib.util
-import sys
-import types
 import unittest
 from pathlib import Path
 
 
 RADICE = Path(__file__).resolve().parents[2]
 PERCORSO = RADICE / ".claude" / "hooks" / "team_monitor.py"
-if "lab.cruscotto" not in sys.modules:
-    lab = types.ModuleType("lab")
-    cruscotto = types.ModuleType("lab.cruscotto")
-    cruscotto.Postino = object
-    lab.cruscotto = cruscotto
-    sys.modules["lab"] = lab
-    sys.modules["lab.cruscotto"] = cruscotto
 SPEC = importlib.util.spec_from_file_location("team_monitor", PERCORSO)
 team_monitor = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(team_monitor)
