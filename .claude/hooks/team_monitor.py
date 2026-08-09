@@ -86,6 +86,34 @@ def _stop_path(run_id):
     return radice / f"{run_id}.stop"
 
 
+def _intero_non_negativo(valore):
+    try:
+        return max(0, int(valore))
+    except (TypeError, ValueError):
+        return 0
+
+
+def _memoria(dichiarato):
+    """Normalizza il consuntivo della memoria senza accettare payload arbitrari."""
+    memoria = dichiarato.get("memoria")
+    if not isinstance(memoria, dict):
+        memoria = {}
+
+    def nomi(chiave):
+        valori = memoria.get(chiave)
+        if not isinstance(valori, list):
+            return []
+        return [str(valore)[:120] for valore in valori if valore][:20]
+
+    return {
+        "consultata": nomi("consultata"),
+        "candidati": _intero_non_negativo(memoria.get("candidati")),
+        "promossi": _intero_non_negativo(memoria.get("promossi")),
+        "scartati": _intero_non_negativo(memoria.get("scartati")),
+        "aggiornata": nomi("aggiornata"),
+    }
+
+
 def _esito(evento, task):
     """L'esito per-indicatore dichiarato dal lead nella sentinella."""
     try:
@@ -101,7 +129,12 @@ def _esito(evento, task):
             "codice": task["indicatore"],
             "motivo": "sentinella completata senza esito articoli/fermati",
         }]
-    return {"articoli": articoli, "fermati": fermati, "team": True}
+    return {
+        "articoli": articoli,
+        "fermati": fermati,
+        "team": True,
+        "memoria": _memoria(dichiarato),
+    }
 
 
 def payload(evento, now=None):
