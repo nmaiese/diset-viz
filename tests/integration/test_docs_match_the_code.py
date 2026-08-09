@@ -36,6 +36,7 @@ LITE = {"lab-dossierista", "lab-scout", "lab-scout-europa",
 # sessione principale, quindi non ha una definizione da teammate.
 TEAM = {"data-editor", "source-researcher", "search-strategist",
         "data-journalist", "skeptical-editor"}
+MEMORIA_TEAM = {"source-researcher", "skeptical-editor"}
 
 # Il giudice cieco non appartiene alla catena: legge due bozze e dice quale si
 # legge fino in fondo, senza avere il progetto in contesto. È un lavoro che
@@ -66,6 +67,32 @@ class GliAgentiSonoDichiarati(unittest.TestCase):
                 meta = _frontmatter(percorso)
                 self.assertIsNotNone(meta, f"{percorso.name} senza frontmatter")
                 self.assertEqual(meta.get("name"), percorso.stem)
+
+    def test_solo_i_ruoli_durevoli_hanno_memoria_di_progetto(self):
+        con_memoria = set()
+        for nome in TEAM:
+            meta = _frontmatter(AGENTI / f"{nome}.md") or {}
+            if meta.get("memory"):
+                con_memoria.add(nome)
+                self.assertEqual(meta["memory"], "project")
+                self.assertTrue(
+                    (RADICE / ".claude" / "agent-memory" / nome / "MEMORY.md").exists(),
+                    f"{nome} dichiara memoria senza MEMORY.md versionato",
+                )
+        self.assertEqual(con_memoria, MEMORIA_TEAM)
+
+        settings = yaml.safe_load(
+            (RADICE / ".claude" / "settings.json").read_text(encoding="utf-8")
+        )
+        self.assertIs(settings.get("autoMemoryEnabled"), True)
+
+    def test_i_teammate_con_memoria_restano_senza_scrittura_generica(self):
+        for nome in MEMORIA_TEAM:
+            meta = _frontmatter(AGENTI / f"{nome}.md") or {}
+            strumenti = set(meta.get("tools") or [])
+            self.assertNotIn("Write", strumenti)
+            self.assertNotIn("Edit", strumenti)
+            self.assertNotIn("Bash", strumenti)
 
     def test_le_skill_dichiarate_da_un_agente_esistono(self):
         """Una skill precaricata che non esiste non fa fallire niente: l'agente
