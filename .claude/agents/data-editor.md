@@ -4,7 +4,7 @@ description: >-
   Legge il dossier deterministico di un indicatore, trova le strutture
   territoriali e temporali che reggono una tesi e segnala i limiti del dato.
   Usato come teammate in sola lettura dal team editoriale.
-tools: Read, Grep, Glob
+tools: Read, Grep, Glob, Skill
 disallowedTools: Bash, Edit, Write, Task
 model: sonnet
 effort: high

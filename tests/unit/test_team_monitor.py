@@ -1,4 +1,6 @@
 import importlib.util
+import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -24,16 +26,20 @@ def evento(nome, subject, **altro):
 
 class TeamMonitorTest(unittest.TestCase):
     def test_settings_e_frontend_conoscono_il_team(self):
-        import json
         settings = json.loads((RADICE / ".claude" / "settings.json").read_text())
         self.assertEqual(settings["env"]["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"], "1")
         self.assertEqual(settings["teammateMode"], "in-process")
         self.assertIn("TaskCreated", settings["hooks"])
         self.assertIn("TaskCompleted", settings["hooks"])
+        creati = settings["hooks"]["TaskCreated"][0]["hooks"]
+        self.assertTrue(any(h.get("async") and "--follow" in h.get("command", "")
+                            for h in creati))
         frontend = (RADICE / "frontend" / "src" / "monitor" / "main.js").read_text()
+        bundle = (RADICE / "app" / "static" / "dist" / "assets" / "monitor.js").read_text()
         for fase in team_monitor.FASI.values():
             if fase != "Chiusura":
                 self.assertIn(f'"{fase}"', frontend)
+                self.assertIn(f'`{fase}`', bundle)
 
     def test_ignora_i_task_non_editoriali(self):
         self.assertEqual(team_monitor.payload(evento("TaskCreated", "Refactor auth")), [])
@@ -63,12 +69,51 @@ class TeamMonitorTest(unittest.TestCase):
         righe = team_monitor.payload(evento(
             "TaskCompleted",
             "[redazione:lead:chiusura] ter-13 - chiusura del run",
+            task_description=json.dumps({
+                "articoli": [{"codice": "ter-13", "scritto": True, "parole": 700}],
+                "fermati": [],
+            }),
         ))
         self.assertEqual(len(righe), 3)
         self.assertNotIn("fase_stimata", righe[0])
         self.assertEqual(righe[2]["action"], "consuntivo")
         self.assertEqual(righe[2]["run"]["workflow"], "editorial-agent-team")
         self.assertEqual(righe[2]["run"]["stato"], "completed")
+        self.assertEqual(righe[2]["run"]["esito"]["articoli"][0]["codice"], "ter-13")
+        self.assertEqual(righe[2]["run"]["esito"]["fermati"], [])
+
+    def test_sentinella_senza_esito_non_finge_una_pubblicazione(self):
+        righe = team_monitor.payload(evento(
+            "TaskCompleted",
+            "[redazione:lead:chiusura] ter-13 - chiusura del run",
+        ))
+        fermato = righe[2]["run"]["esito"]["fermati"][0]
+        self.assertEqual(fermato["codice"], "ter-13")
+        self.assertIn("senza esito", fermato["motivo"])
+
+    def test_il_follow_rinfresca_finche_la_sentinella_e_aperta(self):
+        class PostinoFinto:
+            def __init__(self):
+                self.righe = []
+
+            def manda(self, payload):
+                self.righe.append(payload)
+
+        with tempfile.TemporaryDirectory() as cartella:
+            stop = Path(cartella) / "stop"
+            originale = team_monitor._stop_path
+            team_monitor._stop_path = lambda run_id: stop
+            try:
+                postino = PostinoFinto()
+                inviati = team_monitor.segui_battito(evento(
+                    "TaskCreated",
+                    "[redazione:lead:chiusura] ter-6 - chiusura del run",
+                ), postino, intervallo=1, per=10,
+                    pausa=lambda _: stop.touch(), orologio=lambda: 0)
+            finally:
+                team_monitor._stop_path = originale
+        self.assertEqual(inviati, 1)
+        self.assertEqual(postino.righe[0]["action"], "run")
 
     def test_ruolo_o_fase_non_previsti_non_sporcano_il_cruscotto(self):
         for subject in (

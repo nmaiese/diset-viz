@@ -4,7 +4,7 @@ description: >-
   Propone l'angolo e compone la bozza strutturata di una pagina indicatore
   usando soltanto dossier e claim verificati. Usato come teammate scrittore in
   sola lettura dal team editoriale.
-tools: Read, Grep, Glob
+tools: Read, Grep, Glob, Skill
 disallowedTools: Bash, Edit, Write, Task
 model: sonnet
 effort: high

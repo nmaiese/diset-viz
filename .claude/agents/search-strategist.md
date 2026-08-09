@@ -4,7 +4,7 @@ description: >-
   Ricostruisce l'intento di ricerca di una pagina indicatore e valuta titolo,
   lead, copertura semantica e leggibilità senza forzare parole chiave.
   Usato come teammate dal team editoriale.
-tools: WebSearch, WebFetch, Read
+tools: WebSearch, WebFetch, Read, Skill
 disallowedTools: Bash, Edit, Write, Task
 model: sonnet
 effort: medium

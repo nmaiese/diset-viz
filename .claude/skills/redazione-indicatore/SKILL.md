@@ -48,8 +48,13 @@ Creare subito una sentinella e lasciarla aperta:
 `[redazione:lead:chiusura] <codice> - chiusura del run`
 
 Completarla soltanto dopo controlli e pubblicazione, oppure dopo avere deciso
-esplicitamente di fermare il pezzo. Gli hook traducono questi task nella stessa
-dashboard del workflow attuale.
+esplicitamente di fermare il pezzo. Prima di completarla, aggiornare la sua
+descrizione con l'esito JSON usato dal cruscotto:
+
+- pubblicato: `{"articoli":[<uscita di lab.pubblica>],"fermati":[]}`
+- fermato: `{"articoli":[],"fermati":[{"codice":"<codice>","motivo":"<motivo>"}]}`
+
+Gli hook traducono task ed esito nella stessa dashboard del workflow attuale.
 
 ## Sequenza
 
@@ -64,9 +69,11 @@ dashboard del workflow attuale.
    `search-strategist` e `skeptical-editor`.
 6. Fare al massimo una correzione mirata con `data-journalist`. Se resta un
    rilievo `alta`, fermare senza pubblicare.
-7. Il lead salva la bozza, esegue `bin/py -m lab.controlla <codice> --salva`,
-   poi `bin/py -m lab.pubblica <codice> --bozza <percorso>` e i test pertinenti.
-8. Completare la sentinella e chiedere ai teammate di chiudersi.
+7. Il lead salva la bozza, esegue
+   `bin/py -m lab.controlla <codice> --bozza <percorso> --salva`, poi
+   `bin/py -m lab.pubblica <codice> --bozza <percorso>` e i test pertinenti.
+8. Copiare l'uscita di pubblicazione o arresto nella descrizione JSON della
+   sentinella, completarla e chiedere ai teammate di chiudersi.
 
 Persistenza consigliata, senza aggiungere script:
 

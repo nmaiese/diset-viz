@@ -4,7 +4,7 @@ description: >-
   Prova a smentire angolo e bozza di un indicatore, separa difetti bloccanti da
   preferenze e controlla coerenza, causalità e limiti. Usato come teammate di
   revisione dal team editoriale.
-tools: Read, Grep, Glob, WebFetch
+tools: Read, Grep, Glob, WebFetch, Skill
 disallowedTools: Bash, Edit, Write, Task
 model: opus
 effort: high

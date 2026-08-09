@@ -45,8 +45,11 @@ Gli hook nativi `TaskCreated` e `TaskCompleted` passano per
 `/_pipeline/beat`. Non legge né modifica `~/.claude/teams`, perché quella
 directory è stato interno e transitorio del runtime.
 
-La task `[redazione:lead:chiusura]` è la sentinella. Il suo completamento invia
-il consuntivo e chiude la run nella dashboard.
+La task `[redazione:lead:chiusura]` è la sentinella. Prima di completarla il lead
+scrive nella descrizione il JSON `articoli`/`fermati`; il completamento invia il
+consuntivo, aggiorna la storia dell'indicatore e chiude la run nella dashboard.
+Un hook asincrono riposta il battito ogni due minuti finché la sentinella resta
+aperta, senza consumare turni del team.
 
 Se `PIPELINE_INGEST_URL` o `PIPELINE_INGEST_TOKEN` non sono presenti, il team
 continua senza telemetria. Per ispezionare i payload senza rete:

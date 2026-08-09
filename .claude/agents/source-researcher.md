@@ -4,7 +4,7 @@ description: >-
   Cerca fonti primarie e autorevoli che contestualizzano le anomalie di un
   indicatore e restituisce claim verificabili, senza scrivere l'articolo.
   Usato come teammate web dal team editoriale.
-tools: WebSearch, WebFetch, Read
+tools: WebSearch, WebFetch, Read, Skill
 disallowedTools: Bash, Edit, Write, Task
 model: sonnet
 effort: high

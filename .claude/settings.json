@@ -65,6 +65,12 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/team_monitor.py\""
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/team_monitor.py\" --follow",
+            "async": true,
+            "timeout": 7200
           }
         ]
       }
@@ -82,3 +88,4 @@
   },
   "teammateMode": "in-process"
 }
+

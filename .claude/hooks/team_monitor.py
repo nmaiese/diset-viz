@@ -13,13 +13,15 @@ import json
 import os
 import re
 import sys
+import tempfile
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
 PROJECT_ROOT = Path(os.environ.get("CLAUDE_PROJECT_DIR") or Path(__file__).resolve().parents[2])
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from lab.cruscotto import Postino  # noqa: E402
+from lab.cruscotto import Postino, RINFRESCO_BATTITO  # noqa: E402
 
 
 RUOLI = {
@@ -68,6 +70,40 @@ def _task(evento):
     return task
 
 
+def _sentinella(evento, nome=None):
+    task = _task(evento)
+    return bool(
+        task
+        and task["ruolo"] == "lead"
+        and task["fase"] == "chiusura"
+        and (nome is None or evento.get("hook_event_name") == nome)
+    )
+
+
+def _stop_path(run_id):
+    radice = Path(tempfile.gettempdir()) / "divario-team-monitor"
+    radice.mkdir(parents=True, exist_ok=True)
+    return radice / f"{run_id}.stop"
+
+
+def _esito(evento, task):
+    """L'esito per-indicatore dichiarato dal lead nella sentinella."""
+    try:
+        dichiarato = json.loads(evento.get("task_description") or "")
+    except (TypeError, json.JSONDecodeError):
+        dichiarato = {}
+    articoli = [dict(v) for v in dichiarato.get("articoli") or [] if isinstance(v, dict)]
+    fermati = [dict(v) for v in dichiarato.get("fermati") or [] if isinstance(v, dict)]
+    for voce in articoli + fermati:
+        voce.setdefault("codice", task["indicatore"])
+    if not articoli and not fermati:
+        fermati = [{
+            "codice": task["indicatore"],
+            "motivo": "sentinella completata senza esito articoli/fermati",
+        }]
+    return {"articoli": articoli, "fermati": fermati, "team": True}
+
+
 def payload(evento, now=None):
     """Restituisce i POST da inviare per un singolo hook Claude Code."""
     nome = evento.get("hook_event_name")
@@ -114,19 +150,52 @@ def payload(evento, now=None):
                 "args": [task["indicatore"]],
                 "stato": "completed",
                 "fasi": ["Dossier", "Ricerca", "Angolo", "Scrittura", "Verifica", "Pubblicazione"],
-                "esito": {"indicatore": task["indicatore"], "team": True},
+                "esito": _esito(evento, task),
             },
             "agenti": [],
         })
     return uscita
 
 
-def main():
+def segui_battito(evento, postino, intervallo=RINFRESCO_BATTITO, per=7200,
+                   pausa=time.sleep, orologio=time.monotonic):
+    """Rinfresca il run mentre la sentinella resta aperta, senza turni LLM."""
+    if not _sentinella(evento, "TaskCreated"):
+        return 0
+    run_id = _run_id(evento)
+    stop = _stop_path(run_id)
+    try:
+        stop.unlink()
+    except FileNotFoundError:
+        pass
+    battiti = payload(evento)
+    if not battiti:
+        return 0
+    run = battiti[0]
+    scadenza = orologio() + per
+    inviati = 0
+    while not stop.exists() and orologio() < scadenza:
+        postino.manda(run)
+        inviati += 1
+        attesa = 0
+        while attesa < intervallo and not stop.exists():
+            passo = min(5, intervallo - attesa)
+            pausa(passo)
+            attesa += passo
+    return inviati
+
+
+def main(argv=None):
     try:
         evento = json.load(sys.stdin)
         postino = Postino(stampa=os.environ.get("TEAM_MONITOR_STDOUT") == "1")
+        if "--follow" in (argv if argv is not None else sys.argv[1:]):
+            segui_battito(evento, postino)
+            return 0
         for voce in payload(evento):
             postino.manda(voce)
+        if _sentinella(evento, "TaskCompleted"):
+            _stop_path(_run_id(evento)).touch()
     except Exception as errore:  # noqa: BLE001 - la telemetria non blocca il team
         print(f"team-monitor: {errore}", file=sys.stderr)
     return 0
