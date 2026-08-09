@@ -55,8 +55,8 @@ breve.
 
 Nelle Routine ogni run parte da un nuovo clone della branch predefinita:
 l'aggiornamento diventa memoria delle run future soltanto dopo il merge della
-PR che lo contiene. Non scrivere direttamente su `main` per accelerare questa
-persistenza.
+PR che lo contiene. Non scrivere direttamente sulla branch predefinita (`master` in questa
+repository) per accelerare questa persistenza.
 
 ## Protocollo dei task e dashboard
 
