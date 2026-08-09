@@ -93,3 +93,6 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Check committed bundle
+        run: git diff --exit-code -- ../app/static/dist
+

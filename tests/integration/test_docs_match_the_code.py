@@ -32,6 +32,12 @@ SKILL = RADICE / ".claude" / "skills"
 LITE = {"lab-dossierista", "lab-scout", "lab-scout-europa",
         "lab-scrittore", "lab-verificatore", "lab-pubblicatore"}
 
+# I cinque ruoli riusabili dal vero Agent Team editoriale. Il lead e la
+# sessione principale, quindi non ha una definizione da teammate.
+TEAM = {"data-editor", "source-researcher", "search-strategist",
+        "data-journalist", "skeptical-editor"}
+MEMORIA_TEAM = {"source-researcher", "skeptical-editor"}
+
 # Il giudice cieco non appartiene alla catena: legge due bozze e dice quale si
 # legge fino in fondo, senza avere il progetto in contesto. È un lavoro che
 # sopravvive a qualunque catena produca i due testi. `admissions` decide che
@@ -49,7 +55,7 @@ def _frontmatter(percorso):
 class GliAgentiSonoDichiarati(unittest.TestCase):
     def test_nessun_agente_avanza_senza_un_posto_dove_stare(self):
         sul_disco = {percorso.stem for percorso in AGENTI.glob("*.md")}
-        self.assertEqual(sul_disco, LITE | ALTRI)
+        self.assertEqual(sul_disco, LITE | TEAM | ALTRI)
 
     def test_ogni_agente_ha_un_frontmatter_che_si_carica(self):
         """Un `: ` dentro un `description` su riga sola non è YAML valido, e il
@@ -61,6 +67,35 @@ class GliAgentiSonoDichiarati(unittest.TestCase):
                 meta = _frontmatter(percorso)
                 self.assertIsNotNone(meta, f"{percorso.name} senza frontmatter")
                 self.assertEqual(meta.get("name"), percorso.stem)
+
+    def test_solo_i_ruoli_durevoli_hanno_memoria_di_progetto(self):
+        con_memoria = set()
+        for nome in TEAM:
+            meta = _frontmatter(AGENTI / f"{nome}.md") or {}
+            if meta.get("memory"):
+                con_memoria.add(nome)
+                self.assertEqual(meta["memory"], "project")
+                self.assertTrue(
+                    (RADICE / ".claude" / "agent-memory" / nome / "MEMORY.md").exists(),
+                    f"{nome} dichiara memoria senza MEMORY.md versionato",
+                )
+        self.assertEqual(con_memoria, MEMORIA_TEAM)
+
+        settings = yaml.safe_load(
+            (RADICE / ".claude" / "settings.json").read_text(encoding="utf-8")
+        )
+        self.assertIs(settings.get("autoMemoryEnabled"), True)
+
+    def test_i_teammate_con_memoria_restano_senza_scrittura_generica(self):
+        for nome in MEMORIA_TEAM:
+            meta = _frontmatter(AGENTI / f"{nome}.md") or {}
+            dichiarati = meta.get("tools") or []
+            if isinstance(dichiarati, str):
+                dichiarati = [voce.strip() for voce in dichiarati.split(",")]
+            strumenti = set(dichiarati)
+            self.assertNotIn("Write", strumenti)
+            self.assertNotIn("Edit", strumenti)
+            self.assertNotIn("Bash", strumenti)
 
     def test_le_skill_dichiarate_da_un_agente_esistono(self):
         """Una skill precaricata che non esiste non fa fallire niente: l'agente
@@ -112,6 +147,24 @@ class IComandiScrittiSonoEseguibili(unittest.TestCase):
                 with self.subTest(agente=percorso.stem, modulo=modulo):
                     self.assertTrue(self._esiste(modulo),
                                     f"{percorso.stem} esegue `bin/py -m {modulo}`, che non esiste")
+
+
+class IlGateDiPubblicazioneECompleto(unittest.TestCase):
+    def test_la_skill_non_pubblica_solo_per_exit_code_zero(self):
+        testo = (SKILL / "redazione-indicatore" / "SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        for requisito in (
+            "non_trovate == 0",
+            "link_inesistenti == 0",
+            "`bloccanti` è vuoto",
+            "`bozza_salvata` esiste",
+            "--bozza <bozza_salvata>",
+        ):
+            with self.subTest(requisito=requisito):
+                self.assertIn(requisito, testo)
+        self.assertIn("ritorna exit code 0 anche quando", testo)
+        self.assertIn("secondo controllo non è", testo)
 
 
 if __name__ == "__main__":

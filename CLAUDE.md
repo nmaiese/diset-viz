@@ -125,7 +125,7 @@ of the process (`lru_cache`, not a TTL).
 
 ## La catena che scrive — READ [`lab/README.md`](lab/README.md)
 
-Un indicatore diventa una pagina così, dentro **un solo workflow**
+Il percorso stabile trasforma un indicatore in una pagina dentro **un solo workflow**
 (`.claude/workflows/indicatore-lite.js`), senza cancello e senza umani in mezzo:
 
 **dossier** (le cifre, già calcolate) -> **tre scout in parallelo** (eventi,
@@ -152,6 +152,19 @@ Gli altri due agenti del progetto stanno fuori da questa catena:
 **`admissions`** decide che cosa entra nell'atlante, ed è a monte della
 scrittura; **`giudice-cieco`** legge due bozze e dice quale si legge fino in
 fondo, senza avere il progetto in contesto.
+
+### Agent Team sperimentale
+
+Il branch sperimentale affianca al workflow un vero Agent Team Claude Code:
+la sessione principale è `editor-in-chief` e coordina `data-editor`,
+`source-researcher`, `search-strategist`, `data-journalist` e
+`skeptical-editor`. Avvio: `/redazione-indicatore <codice>`. I teammate sono in
+sola lettura, comunicano direttamente e non creano subagenti; solo il lead
+salva, controlla e pubblica. `source-researcher` e `skeptical-editor` usano
+memoria di progetto governata dal lead, mai come fonte fattuale. Protocollo,
+Routine, dashboard e limiti sono in
+[`docs/AGENT_TEAM.md`](docs/AGENT_TEAM.md). Il workflow corrente resta la
+baseline finché i canary non giustificano la promozione.
 
 ## Writing — READ [`content/STYLE.md`](content/STYLE.md)
 
