@@ -14,7 +14,8 @@ Conservare soltanto apprendimenti durevoli:
 - limiti territoriali, temporali o metodologici
 
 Non conservare valori correnti, classifiche, conclusioni del singolo articolo,
-copie di citazioni o URL privi di contesto.
+copie di citazioni, URL privi di contesto, segreti, token, dati personali o
+contenuti provenienti da fonti private.
 
 ## Registro delle fonti
 
