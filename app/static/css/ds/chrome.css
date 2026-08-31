@@ -1,0 +1,193 @@
+/* DivarioItalia — shared chrome (header + footer) for the 2026 design system.
+ * Ported from the handoff bundle's ui_kits/atlante/chrome.css. Single source of
+ * truth for every migrated page: brand lockup, dropdown navigation, persistent
+ * search, theme toggle, mobile drawer, columned footer. Never fork per page.
+ *
+ * Scoped under .sitechrome (set on <body> together with .ds) so it cannot
+ * touch a page still rendering the legacy .masthead. */
+
+.sitechrome { display: flex; flex-direction: column; min-height: 100vh; }
+
+.sitechrome .skiplink {
+  position: absolute; left: 8px; top: -60px; z-index: 90;
+  background: var(--surface-inverse); color: var(--text-on-inverse);
+  padding: 11px 16px; font-family: var(--font-sans); font-weight: 600; font-size: 14px;
+  transition: top var(--dur-fast) var(--ease);
+}
+.sitechrome .skiplink:focus { top: 8px; text-decoration: none; color: var(--text-on-inverse); }
+
+/* --- header ------------------------------------------------------------- */
+.sitechrome .hdr {
+  position: sticky; top: 0; z-index: var(--z-sticky);
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--line);
+}
+.sitechrome .hdr__bar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 20px; max-width: var(--container-atlas); margin: 0 auto;
+}
+.sitechrome .hdr__brand { display: inline-flex; align-items: center; gap: var(--logo-gap); }
+.sitechrome .hdr__brand img { display: block; object-fit: contain; }
+.sitechrome .hdr__brand:hover { text-decoration: none; }
+.sitechrome .brandword {
+  font-family: var(--font-display); font-weight: 600; font-size: 19px;
+  letter-spacing: -0.012em; color: var(--text-strong);
+}
+
+.sitechrome .hdr__nav { display: none; }
+.sitechrome .navlink { position: relative; }
+/* the dropdowns are <details>/<summary>: they open, close and are keyboard
+ * operable with no JavaScript at all. ds-chrome.js only adds Escape and
+ * click-outside on top. */
+.sitechrome .navlink > summary,
+.sitechrome .navlink > a {
+  font: inherit; font-family: var(--font-sans); font-size: 15px; font-weight: 600;
+  color: var(--text-body); background: none; border: none; padding: 8px 2px;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+  min-height: var(--target-min); list-style: none;
+}
+.sitechrome .navlink > summary::-webkit-details-marker { display: none; }
+.sitechrome .navlink > summary::marker { content: ""; }
+.sitechrome .navlink > summary:hover,
+.sitechrome .navlink > a:hover { color: var(--accent-text); text-decoration: none; }
+.sitechrome .navlink > a[aria-current="page"],
+.sitechrome .navlink > summary.is-active {
+  color: var(--text-strong); box-shadow: inset 0 -2px 0 var(--accent);
+}
+.sitechrome .navlink > summary svg { transition: transform var(--dur-fast) var(--ease); }
+.sitechrome .navlink[open] > summary svg { transform: rotate(180deg); }
+
+.sitechrome .dropdown {
+  position: absolute; top: 100%; left: 0; min-width: 250px;
+  background: var(--surface-card); border: 1px solid var(--line);
+  box-shadow: var(--shadow-panel); padding: 8px; z-index: var(--z-dropdown);
+}
+.sitechrome .dropdown a {
+  display: block; padding: 10px 12px; font-size: 14px; color: var(--text-body);
+  min-height: var(--target-min);
+}
+.sitechrome .dropdown a:hover { background: var(--surface-sunk); color: var(--text-strong); text-decoration: none; }
+
+.sitechrome .iconbtn {
+  width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  background: none; border: 1px solid var(--line); border-radius: var(--radius-0);
+  cursor: pointer; color: var(--text-body);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.sitechrome .iconbtn:hover { background: var(--surface-sunk); }
+.sitechrome .hdr__right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+/* --- search ------------------------------------------------------------- */
+.sitechrome .hdr__search { position: relative; width: 260px; }
+.sitechrome .searchbox {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  background: var(--surface-page); border: 1px solid var(--line);
+  border-radius: var(--radius-0); padding: 9px 13px;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+.sitechrome .searchbox:focus-within { border-color: var(--accent); background: var(--surface-card); }
+.sitechrome .searchbox input {
+  flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+  font-family: var(--font-sans); font-size: 15px; color: var(--text-strong);
+}
+.sitechrome .searchbox input::placeholder { color: var(--text-muted); }
+.sitechrome .searchbox svg { flex: 0 0 auto; color: var(--text-muted); }
+
+.sitechrome .searchpanel {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--surface-card); border: 1px solid var(--line);
+  box-shadow: var(--shadow-panel); z-index: var(--z-dropdown);
+  max-height: 360px; overflow: auto;
+}
+.sitechrome .sg { padding: 6px 0; border-top: 1px solid var(--line-soft); }
+.sitechrome .sg:first-child { border-top: none; }
+.sitechrome .sg__label {
+  font-family: var(--font-mono); font-size: 12px; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--text-muted); padding: 8px 14px 4px;
+}
+.sitechrome .sg__item {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 9px 14px; min-height: 44px; color: var(--text-body); font-size: 15px;
+}
+.sitechrome .sg__item:hover,
+.sitechrome .sg__item[aria-selected="true"] { background: var(--surface-sunk); color: var(--text-strong); text-decoration: none; }
+.sitechrome .sg__kind { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+.sitechrome .sg__empty { padding: 14px; font-size: 14px; color: var(--text-muted); }
+
+.sitechrome .msearch {
+  display: block; background: var(--surface-card);
+  border-bottom: 1px solid var(--line); padding: 10px 20px; position: relative;
+}
+
+/* --- mobile drawer ------------------------------------------------------ */
+.sitechrome .drawer { position: fixed; inset: 0; background: var(--scrim); z-index: var(--z-modal); }
+.sitechrome .drawer__panel {
+  position: absolute; top: 0; right: 0; width: 86%; max-width: 344px; height: 100%;
+  background: var(--surface-card); border-left: 1px solid var(--line);
+  padding: 16px 18px 24px; overflow: auto;
+}
+.sitechrome .drawer__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.sitechrome .drawer__top > span {
+  font-family: var(--font-mono); font-size: 12px; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--text-muted);
+}
+.sitechrome .drawer__actions { display: flex; gap: 8px; align-items: center; }
+.sitechrome .drawer__group { margin-bottom: 16px; }
+.sitechrome .drawer__group h4 {
+  font-family: var(--font-mono); font-size: 12px; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--text-muted); margin: 0 0 8px; font-weight: 500;
+}
+.sitechrome .drawer__group a {
+  display: block; padding: 11px 0; font-size: 15px; color: var(--text-body);
+  border-bottom: 1px solid var(--line-soft); min-height: 44px;
+}
+
+/* --- footer ------------------------------------------------------------- */
+.sitechrome .ftr { background: var(--surface-card); border-top: 1px solid var(--line); margin-top: auto; }
+.sitechrome .ftr__grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 28px 20px;
+  padding: 44px 20px; max-width: var(--container-atlas); margin: 0 auto;
+}
+.sitechrome .ftr h4 {
+  font-family: var(--font-mono); font-size: 12px; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--text-muted); margin: 0 0 12px; font-weight: 500;
+}
+.sitechrome .ftr a { display: block; padding: 7px 0; font-size: 14px; color: var(--text-secondary); }
+.sitechrome .ftr a:hover { color: var(--accent-text); }
+.sitechrome .ftr__close { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 24px; }
+.sitechrome .ftr__tag {
+  font-family: var(--font-display); font-size: 20px; color: var(--text-strong);
+  max-width: 440px; margin: 0;
+}
+.sitechrome .ftr__legal {
+  border-top: 1px solid var(--line);
+  padding: 18px 20px; max-width: var(--container-atlas); margin: 0 auto;
+  display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center;
+}
+.sitechrome .ftr__legal p { margin: 0; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+.sitechrome .ftr__legal a { display: inline; padding: 0; font-size: 12px; font-family: var(--font-mono); }
+
+/* --- visibility helpers ------------------------------------------------- */
+.sitechrome .mobile-only { display: block; }
+.sitechrome .desktop-only { display: none; }
+/* Il bottone del drawer apre un pannello che vive solo in JavaScript. Senza JS
+ * resterebbe un bottone morto, quindi compare solo quando ds-chrome.js puo
+ * rispondere: la navigazione completa e comunque nel footer. */
+.sitechrome .hdr__menubtn { display: none; }
+.ds-js .sitechrome .hdr__menubtn { display: inline-flex; }
+
+@media (min-width: 680px) {
+  .sitechrome .hdr__bar { padding: 12px 32px; }
+  .sitechrome .msearch { padding: 10px 32px; }
+  .sitechrome .ftr__grid { grid-template-columns: repeat(4, 1fr); padding: 44px 32px; }
+  .sitechrome .ftr__legal { padding: 18px 32px; }
+}
+@media (min-width: 960px) {
+  .sitechrome .hdr__bar { padding: 12px 48px; gap: 22px; }
+  .sitechrome .mobile-only { display: none; }
+  .sitechrome .desktop-only { display: flex; }
+  .ds-js .sitechrome .hdr__menubtn { display: none; }
+  .sitechrome .hdr__nav { display: flex; align-items: center; gap: 22px; }
+  .sitechrome .ftr__grid { padding: 44px 48px; }
+  .sitechrome .ftr__legal { padding: 18px 48px; }
+}

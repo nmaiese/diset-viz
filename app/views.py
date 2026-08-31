@@ -22,6 +22,7 @@ from app import indicator_universe
 from app import indicator_view
 from app import editorial_state
 from app import quality_life_bes as qb
+from app.quality_life_config import QUALITY_LIFE_PROFILES
 from app import bes_data
 from app import multiscopo_data
 from app import external_atlas
@@ -67,6 +68,27 @@ _HOME_STORY_INDICATORS = ("901", "408", "910", "102")
 _HOME_COMPARE_INDICATORS = ("901", "408", "910")
 _HOME_COMPARE_REGIONS = ("lombardia", "lazio", "campania")
 _HOME_COMPARE_COLORS = ("var(--ink)", "var(--accent)", "var(--positive-ink)")
+
+# --- Homepage 2026 design system ------------------------------------------
+# The indicator whose regional time series drives the homepage comparison
+# module, and the regions offered as toggles. Three are selected on load; the
+# module accepts at most three at a time, like /confronto.
+_HOME_SERIES_INDICATOR = "901"
+_HOME_SERIES_CHOICES = (
+    "lombardia", "emilia-romagna", "lazio", "campania", "sicilia", "piemonte",
+)
+_HOME_SERIES_DEFAULT = ("lombardia", "lazio", "campania")
+
+# Categorical data-viz palette (tokens --cat-1..4). Series colours, not brand:
+# a line's colour identifies a region, it does not rate it.
+_HOME_SERIES_COLORS = ("var(--cat-1)", "var(--cat-2)", "var(--cat-3)", "var(--cat-4)")
+
+# Sequential teal ramp of the 2026 design system. These are emitted as CSS
+# custom properties, not as hex: --seq-1..6 are redefined under
+# <html data-theme="dark">, so a baked colour would leave the choropleth stuck
+# on the light ramp while the rest of the page goes dark. Every page still on
+# the legacy stylesheet keeps the old blue ramp until it is migrated in turn.
+_DS_SEQ_RAMP = tuple(f"var(--seq-{step})" for step in range(1, 7))
 
 # Production contract consumed by scripts/audit_public_discoverability.py.  Keep
 # this literal (rather than deriving it inside the audit): app/views.py owns the
@@ -290,6 +312,7 @@ def home():
             agent_discovery.home_markdown(summary, featured, recent_posts, SITE_URL),
             f"{SITE_URL}/",
         )
+    themes_preview = _home_themes_preview()
     return render_template(
         "home.html",
         site_url=SITE_URL,
@@ -299,14 +322,18 @@ def home():
         sources_label=summary["institutions_label"],
         year_min=summary["year_min"],
         year_max=summary["year_max"],
-        map_hero=_home_map_hero(),
-        capabilities=_home_capabilities(total_indicators),
-        stories=_home_story_cards(),
-        themes_preview=_home_themes_preview(),
-        compare_preview=_home_compare_preview(),
+        themes_preview=themes_preview,
         qol=_home_qol_preview(),
         quiz_games=_home_quiz_games(),
         posts=recent_posts,
+        # 2026 design system modules
+        hero_map=_home_hero_map(),
+        paths=_home_paths(summary, themes_preview),
+        featured_story=_home_featured_story(),
+        insight_cards=_home_insight_cards(),
+        series_module=_home_series_module(),
+        qol_module=_home_qol_module(),
+        trust_cards=_home_trust_cards(summary),
     )
 
 
@@ -2521,97 +2548,6 @@ def _map_hero(indicator_ids):
     }
 
 
-def _home_map_hero():
-    return _map_hero(_HOME_MAP_INDICATORS)
-
-
-def _home_capabilities(total_indicators):
-    return [
-        {
-            "kicker": "Atlante",
-            "title": f"{total_indicators} indicatori esplorabili",
-            "body": "Tutti gli indicatori Istat delle politiche di sviluppo, per tema e completezza.",
-            "href": "/atlante",
-            "cta": "Apri l'atlante",
-        },
-        {
-            "kicker": "Regioni",
-            "title": "Schede regione",
-            "body": "Punti di forza, punti deboli e ranking tematico per tutte le 20 regioni.",
-            "href": "/regioni",
-            "cta": "Sfoglia le regioni",
-        },
-        {
-            "kicker": "Confronta",
-            "title": "Regione contro regione",
-            "body": "Metti a confronto due o tre regioni su qualsiasi indicatore, con mappa e serie storica.",
-            "href": "/confronto",
-            "cta": "Confronta ora",
-        },
-        {
-            "kicker": "Temi",
-            "title": "Aree e temi",
-            "body": "Economia, lavoro, salute, ambiente: ogni tema raccoglie i suoi indicatori in una pagina.",
-            "href": "/temi",
-            "cta": "Scopri i temi",
-        },
-        {
-            "kicker": "Qualità della vita",
-            "title": "Classifica composita",
-            "body": "Un indice sperimentale che unisce salute, lavoro, istruzione e ambiente.",
-            "href": "/qualita-della-vita",
-            "cta": "Vedi la classifica",
-        },
-        {
-            "kicker": "Quiz",
-            "title": "Metti alla prova quello che sai",
-            "body": "Tre giochi rapidi sui dati Istat, con una classifica settimanale.",
-            "href": "/quiz",
-            "cta": "Gioca ora",
-        },
-    ]
-
-
-def _home_story_cards():
-    """Real 'chi guida, chi resta indietrò highlights for the homepage,
-    limited to indicators with a declared higher_better/lower_better
-    direction so the framing is something the data actually supports."""
-    cards = []
-    for indicator_id in _HOME_STORY_INDICATORS:
-        payload = get_atlas_indicator(indicator_id)
-        if payload is None:
-            continue
-        meta = payload["metadata"]
-        year = meta["year_max"]
-        values = get_atlas_indicator_year(indicator_id, year)["values"]
-        direction = (meta.get("explain") or {}).get("direction")
-        ranked = list(reversed(values)) if direction in ("lower_better", "higher_worse") else values
-        best, worst = ranked[0], ranked[-1]
-        unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
-        if direction == "lower_better":
-            note = (
-                f"{worst['region']} resta indietro con {it_num(worst['value'], 2)} {unit}, "
-                f"{best['region']} fa meglio di tutte."
-            )
-        else:
-            note = (
-                f"{best['region']} guida con {it_num(best['value'], 2)} {unit}, "
-                f"{worst['region']} chiude a {it_num(worst['value'], 2)} {unit}."
-            )
-        cards.append({
-            "theme": meta["theme"],
-            "name": meta["name"],
-            "value": it_num(best["value"], 2),
-            "unit": unit,
-            "best_region": best["region"],
-            "year": year,
-            "note": note,
-            "spark_points": indicator_notes.sparkline_points(meta.get("spark") or [], width=84, height=36),
-            "path": profiles.indicator_path(indicator_id, meta["name"]),
-        })
-    return cards
-
-
 def _home_qol_preview():
     payload = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
     if payload is None:
@@ -2829,6 +2765,477 @@ def _home_quiz_games():
             "desc": "Cinque regioni da ordinare dal valore più alto al più basso, con credito parziale.",
             "meta": "credito parziale",
             "href": "/quiz/ordina",
+        },
+    ]
+
+
+# ===========================================================================
+# Homepage 2026 — data for the redesigned surface.
+#
+# Every module below reads the real catalog. The design prototype shipped
+# illustrative numbers; nothing here is illustrative, so what the page claims
+# is always what the data says. The legacy _home_* helpers above still serve
+# /divari-regionali and stay untouched.
+# ===========================================================================
+
+
+def _ds_ramp_color(fraction):
+    """Bucket a 0..1 position into the six-stop sequential teal ramp."""
+    steps = len(_DS_SEQ_RAMP)
+    return _DS_SEQ_RAMP[min(steps - 1, max(0, int(fraction * steps)))]
+
+
+def _ds_choropleth(values):
+    """{region_key: hex} over the design system's sequential ramp.
+
+    Colour encodes the VALUE, not a verdict: the ramp always runs pale-to-deep
+    with the magnitude, whatever the indicator's direction. The legend and the
+    prose carry the "meglio se piu alto / piu basso" reading instead."""
+    numeric = [row["value"] for row in values if row.get("value") is not None]
+    if not numeric:
+        return {}
+    low, high = min(numeric), max(numeric)
+    span = (high - low) or 1.0
+    return {
+        row["region_key"]: _ds_ramp_color((row["value"] - low) / span)
+        for row in values
+        if row.get("value") is not None
+    }
+
+
+def _ds_short_value(value, unit):
+    """Compact axis label for the map legend: thousands folded to k."""
+    if value is None:
+        return "n.d."
+    if abs(value) >= 10000:
+        return f"{round(value / 1000)}k"
+    return it_num(value, 0 if abs(value) >= 100 else 1)
+
+
+def _home_hero_map():
+    """The hero choropleth: a curated indicator picker, per-region fills on the
+    2026 sequential ramp, the two extremes the hero calls out, and a readout
+    payload for ds-home.js.
+
+    The chosen indicator lives in ?indicator= and the picker is a plain form,
+    so the hero changes indicator without JavaScript."""
+    by_id = {str(item["id"]): item for item in get_catalog()["indicators"]}
+    options = [
+        {"id": indicator_id, "name": by_id[indicator_id]["name"]}
+        for indicator_id in _HOME_MAP_INDICATORS
+        if indicator_id in by_id
+    ]
+    requested = request.args.get("indicator")
+    selected_id = (
+        requested
+        if requested in _HOME_MAP_INDICATORS and requested in by_id
+        else _HOME_MAP_INDICATORS[0]
+    )
+
+    payload = get_atlas_indicator(selected_id)
+    meta = payload["metadata"]
+    year = meta["year_max"]
+    # already sorted by value, descending
+    values = get_atlas_indicator_year(selected_id, year)["values"]
+    if not values:
+        return None
+
+    explain = meta.get("explain") or {}
+    direction = explain.get("direction")
+    unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+    colors = _ds_choropleth(values)
+
+    # Ranking is oriented by direction (1 = doing best), while high/low stay
+    # purely about the value, matching what the two callouts actually say.
+    ranked = list(reversed(values)) if direction in ("lower_better", "higher_worse") else values
+    rank_by_key = {row["region_key"]: position for position, row in enumerate(ranked, 1)}
+    total = len(ranked)
+
+    readout = {
+        row["region_key"]: {
+            "name": row["region"],
+            "value": it_num(row["value"], 2),
+            "unit": unit,
+            "rank": rank_by_key[row["region_key"]],
+            "total": total,
+        }
+        for row in values
+    }
+
+    def extreme(row, label):
+        return {
+            "key": row["region_key"],
+            "name": row["region"],
+            "value": it_num(row["value"], 2),
+            "color": colors.get(row["region_key"]),
+            "label": label,
+        }
+
+    highest, lowest = values[0], values[-1]
+    return {
+        "options": options,
+        "selected_id": selected_id,
+        "indicator_name": meta["name"],
+        "indicator_path": meta["path"],
+        "theme": meta["theme"],
+        "year": year,
+        "unit": unit,
+        "source_label": meta.get("catalog_family_label"),
+        "direction": direction,
+        "colors": colors,
+        "readout": readout,
+        "high": extreme(highest, "Valore più alto"),
+        "low": extreme(lowest, "Valore più basso"),
+        "scale_low": _ds_short_value(lowest["value"], unit),
+        "scale_high": _ds_short_value(highest["value"], unit),
+        "ramp": list(_DS_SEQ_RAMP[:5]),
+    }
+
+
+def _home_series_module():
+    """The comparison module: one indicator's regional time series, a set of
+    regions to toggle, and the simple mean of the regions as the reference.
+
+    The three default regions are rendered server-side so the chart is already
+    drawn without JavaScript; ds-home.js redraws it when the selection
+    changes."""
+    payload = get_atlas_indicator(_HOME_SERIES_INDICATOR)
+    if payload is None:
+        return None
+    meta = payload["metadata"]
+    unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+
+    by_region = {}
+    for row in payload["series"]:
+        if row.get("value") is None:
+            continue
+        by_region.setdefault(row["region_key"], {})[row["year"]] = row["value"]
+
+    available = [key for key in _HOME_SERIES_CHOICES if key in by_region]
+    if len(available) < 2:
+        return None
+
+    # Only the years every offered region covers, so no line has a hole in it.
+    years = sorted(set.intersection(*(set(by_region[key]) for key in available)))
+    if len(years) < 2:
+        return None
+
+    # The reference is the simple mean of the regions, described as such: it is
+    # not an official national aggregate and must never be labelled as one.
+    all_regions = [key for key in by_region if set(years) <= set(by_region[key])]
+    reference = [
+        sum(by_region[key][year] for key in all_regions) / len(all_regions)
+        for year in years
+    ]
+
+    latest = years[-1]
+    direction = (meta.get("explain") or {}).get("direction")
+    latest_values = get_atlas_indicator_year(_HOME_SERIES_INDICATOR, latest)["values"]
+    ranked = list(reversed(latest_values)) if direction in ("lower_better", "higher_worse") else latest_values
+    rank_by_key = {row["region_key"]: position for position, row in enumerate(ranked, 1)}
+
+    regions = []
+    for index, key in enumerate(available):
+        series = [by_region[key][year] for year in years]
+        regions.append({
+            "key": key,
+            "name": profiles.region_name(key),
+            "color": _HOME_SERIES_COLORS[index % len(_HOME_SERIES_COLORS)],
+            "series": series,
+            "value": it_num(series[-1], 2),
+            "rank": rank_by_key.get(key),
+            "total": len(ranked),
+        })
+
+    defaults = [key for key in _HOME_SERIES_DEFAULT if key in by_region][:3]
+    if not defaults:
+        defaults = [region["key"] for region in regions[:3]]
+
+    initial = _home_series_polylines(regions, reference, defaults)
+    if initial is None:
+        return None
+
+    return {
+        "indicator_name": meta["name"],
+        "indicator_path": meta["path"],
+        "theme": meta["theme"],
+        "unit": unit,
+        "source_label": meta.get("catalog_family_label"),
+        "years": years,
+        "regions": regions,
+        "default_keys": defaults,
+        "initial": initial,
+        "reference": {
+            "label": f"Media semplice delle {len(all_regions)} regioni",
+            "short_label": "Media delle regioni",
+            "series": reference,
+            "value": it_num(reference[-1], 2),
+        },
+    }
+
+
+# Geometria del grafico di confronto. Deve restare identica a quella in
+# static/js/ds-home.js: il server disegna la selezione iniziale e il client
+# ridisegna quando cambia, quindi le due versioni devono sovrapporsi esatte.
+# Il viewBox e volutamente largo (260x60, circa 4.3:1) e il grafico lo rende
+# con il preserveAspectRatio predefinito: con "none" le coordinate venivano
+# schiacciate in orizzontale e i punti finali delle serie uscivano come ellissi.
+_CHART_W, _CHART_H = 260.0, 60.0
+_CHART_PAD_L, _CHART_PAD_R, _CHART_PAD_T, _CHART_PAD_B = 4.0, 30.0, 4.0, 6.0
+
+
+def _home_series_polylines(regions, reference, selected_keys):
+    """Polilinee della selezione iniziale, cosi il grafico e gia disegnato
+    nell'HTML invece di restare un rettangolo vuoto senza JavaScript."""
+    chosen = [region for region in regions if region["key"] in selected_keys]
+    if not chosen or len(reference) < 2:
+        return None
+
+    numbers = [value for region in chosen for value in region["series"]] + list(reference)
+    low, high = min(numbers), max(numbers)
+    span = (high - low) or 1.0
+    last_index = len(reference) - 1
+    plot_w = _CHART_W - _CHART_PAD_L - _CHART_PAD_R
+    plot_h = _CHART_H - _CHART_PAD_T - _CHART_PAD_B
+
+    def position(index, value):
+        x = _CHART_PAD_L + (index / last_index) * plot_w
+        y = _CHART_PAD_T + (1 - (value - low) / span) * plot_h
+        return x, y
+
+    def points(series):
+        return " ".join(
+            "{:.1f},{:.1f}".format(*position(index, value))
+            for index, value in enumerate(series)
+        )
+
+    return {
+        "baseline": {
+            "x1": f"{_CHART_PAD_L:.1f}",
+            "x2": f"{_CHART_W - _CHART_PAD_R:.1f}",
+            "y": f"{_CHART_H - _CHART_PAD_B:.1f}",
+        },
+        "reference": points(reference),
+        "lines": [
+            {
+                "key": region["key"],
+                "name": region["name"],
+                "color": region["color"],
+                "points": points(region["series"]),
+                "end": dict(zip(("x", "y"), (
+                    f"{position(last_index, region['series'][-1])[0]:.1f}",
+                    f"{position(last_index, region['series'][-1])[1]:.1f}",
+                ))),
+            }
+            for region in chosen
+        ],
+    }
+
+
+def _home_qol_module():
+    """Quality-of-life ranking for every published weighting profile, so the
+    homepage can switch profile without a round trip. Each profile carries its
+    own top three, bottom three and score spread: changing the weights changes
+    the answer, which is the point the module is making."""
+    profiles_payload = []
+    for slug, config_entry in QUALITY_LIFE_PROFILES.items():
+        payload = qb.build_bes_ranking("regione", slug)
+        if payload is None:
+            continue
+        ranking = payload["ranking"]
+        if len(ranking) < 6:
+            continue
+        profiles_payload.append({
+            "slug": slug,
+            "name": config_entry["name"],
+            "description": config_entry["description"],
+            "top": [
+                {"rank": row["rank"], "name": row["name"], "score": round(row["score"])}
+                for row in ranking[:3]
+            ],
+            "bottom": [
+                {"rank": row["rank"], "name": row["name"], "score": round(row["score"])}
+                for row in reversed(ranking[-3:])
+            ],
+            "gap": round(ranking[0]["score"] - ranking[-1]["score"]),
+        })
+    if not profiles_payload:
+        return None
+    return {"profiles": profiles_payload, "default_slug": qb.DEFAULT_PROFILE}
+
+
+def _home_featured_story():
+    """The lead data story: the first story indicator, with the two leading
+    regions, the mean of the regions and the two trailing ones as bars, so the
+    spread the headline talks about is visible in one glance."""
+    for indicator_id in _HOME_STORY_INDICATORS:
+        payload = get_atlas_indicator(indicator_id)
+        if payload is None:
+            continue
+        meta = payload["metadata"]
+        year = meta["year_max"]
+        values = get_atlas_indicator_year(indicator_id, year)["values"]
+        if len(values) < 6:
+            continue
+
+        explain = meta.get("explain") or {}
+        direction = explain.get("direction")
+        invert = direction in ("lower_better", "higher_worse")
+        unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+
+        numbers = [row["value"] for row in values]
+        low, high = min(numbers), max(numbers)
+        span = (high - low) or 1.0
+        mean = sum(numbers) / len(numbers)
+
+        def bar(name, value):
+            fraction = (value - low) / span
+            return {
+                "name": name,
+                "value": it_num(value, 2),
+                "pct": max(4, round(fraction * 100)),
+                "color": _ds_ramp_color(fraction),
+            }
+
+        rows = [bar(row["region"], row["value"]) for row in values[:2]]
+        rows.append(bar("Media delle regioni", mean))
+        rows.extend(bar(row["region"], row["value"]) for row in values[-2:])
+
+        ranked = list(reversed(values)) if invert else values
+        best, worst = ranked[0], ranked[-1]
+        return {
+            "theme": meta["theme"],
+            "name": meta["name"],
+            "path": meta["path"],
+            "year": year,
+            "unit": unit,
+            "source_label": meta.get("catalog_family_label"),
+            "rows": rows,
+            "spread": it_num(high - low, 2),
+            "lead_region": best["region"],
+            "lead_value": it_num(best["value"], 2),
+            "lag_region": worst["region"],
+            "lag_value": it_num(worst["value"], 2),
+            "summary": explain.get("plain") or "",
+            "direction_note": (
+                "Per questo indicatore un valore più basso indica una situazione migliore."
+                if invert else
+                "Per questo indicatore un valore più alto indica una situazione migliore."
+                if direction in ("higher_better", "lower_worse") else
+                "Questo indicatore non ha una direzione migliore o peggiore dichiarata."
+            ),
+        }
+    return None
+
+
+def _home_insight_cards():
+    """Two secondary readings under the lead story, built from the remaining
+    story indicators so nothing on the page is written by hand."""
+    cards = []
+    for indicator_id in _HOME_STORY_INDICATORS[1:]:
+        payload = get_atlas_indicator(indicator_id)
+        if payload is None:
+            continue
+        meta = payload["metadata"]
+        year = meta["year_max"]
+        values = get_atlas_indicator_year(indicator_id, year)["values"]
+        if len(values) < 2:
+            continue
+        direction = (meta.get("explain") or {}).get("direction")
+        invert = direction in ("lower_better", "higher_worse")
+        ranked = list(reversed(values)) if invert else values
+        best, worst = ranked[0], ranked[-1]
+        unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+        cards.append({
+            "theme": meta["theme"],
+            "name": meta["name"],
+            "path": meta["path"],
+            "year": year,
+            "unit": unit,
+            "source_label": meta.get("catalog_family_label"),
+            "lead_region": best["region"],
+            "lead_value": it_num(best["value"], 2),
+            "lag_region": worst["region"],
+            "lag_value": it_num(worst["value"], 2),
+            "summary": (meta.get("explain") or {}).get("plain") or "",
+        })
+        if len(cards) == 2:
+            break
+    return cards
+
+
+def _home_paths(summary, themes_preview):
+    """The four exploration entry points, with the counts each one actually
+    opens onto. A path that cannot state its size is a path nobody trusts."""
+    theme_count = sum(card["theme_count"] for card in themes_preview) if themes_preview else 0
+    area_count = len(themes_preview or [])
+    return [
+        {
+            "eyebrow": "Una regione",
+            "body": "Apri il profilo di un territorio: dove emerge, dove fatica, come si è mosso.",
+            "meta": "20 profili regionali",
+            "href": "/regioni",
+            "cta": "Sfoglia le regioni",
+            "path": "regione",
+        },
+        {
+            "eyebrow": "Un tema",
+            "body": "Economia, lavoro, salute, ambiente e gli altri grandi ambiti territoriali.",
+            "meta": f"{area_count} aree, {theme_count} temi",
+            "href": "/temi",
+            "cta": "Esplora i temi",
+            "path": "tema",
+        },
+        {
+            "eyebrow": "Un confronto",
+            "body": "Metti due o tre territori sullo stesso indicatore e segui la loro evoluzione.",
+            "meta": "Fino a 3 territori",
+            "href": "/confronto",
+            "cta": "Confronta le regioni",
+            "path": "confronto",
+        },
+        {
+            "eyebrow": "Il divario territoriale",
+            "body": "Leggi le differenze tra Nord, Centro e Mezzogiorno oltre le semplificazioni.",
+            "meta": "Nord, Centro, Mezzogiorno",
+            "href": "/divari-regionali",
+            "cta": "Esplora i divari",
+            "path": "divari",
+        },
+    ]
+
+
+def _home_trust_cards(summary):
+    """Sources, updates, method and corrections: the four things a reader has
+    to be able to check before trusting a number on this site."""
+    return [
+        {
+            "kicker": "Fonti",
+            "title": f"{summary['institutions_label']} e altre fonti istituzionali",
+            "body": "Ogni serie riporta l'ente che la produce e l'ultimo anno disponibile.",
+            "href": "/metodologia",
+            "cta": "Tutte le fonti",
+        },
+        {
+            "kicker": "Copertura",
+            "title": f"{summary['total']} indicatori, 20 regioni, dal {summary['year_min']} al {summary['year_max']}",
+            "body": "Il catalogo viene rivisto a ogni nuovo rilascio ufficiale.",
+            "href": "/catalogo-dati",
+            "cta": "Sfoglia il catalogo",
+        },
+        {
+            "kicker": "Metodo",
+            "title": "Definizione, unità, fonte e copertura restano su ogni indicatore",
+            "body": "Le scelte metodologiche sono documentate e citabili.",
+            "href": "/metodologia",
+            "cta": "Consulta la metodologia",
+        },
+        {
+            "kicker": "Correzioni",
+            "title": "Segnala un errore o consulta le correzioni pubblicate",
+            "body": "Le rettifiche restano tracciate e pubbliche.",
+            "href": "/chi-siamo",
+            "cta": "Correzioni e contatti",
         },
     ]
 
