@@ -36,12 +36,29 @@
     {% include "_third_party_head.html" %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+    {# Stessa migrazione di app.html, e va fatta INSIEME a quella: questa pagina
+       monta lo stesso bundle dell'atlante, quindi se una delle due shell resta
+       senza `ds` la stessa applicazione React si vede in due palette diverse a
+       seconda della URL da cui la si apre. #}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Public+Sans:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
     <script type="module" crossorigin src="{{ asset_url('dist/assets/index.js') }}"></script>
     <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/index.css') }}">
+    <script>
+      document.documentElement.classList.add('ds-js');
+      try {
+        if (localStorage.getItem('divario-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    </script>
   </head>
-  <body>
+  <body class="ds">
     {% include "_third_party_body.html" %}
+    {# La fascia serve QUI come su ogni altra pagina: senza, /confronto sullo
+       stage e' indistinguibile da quella di produzione, che e' esattamente
+       l'errore che la fascia esiste per impedire. #}
+    {% if STAGING %}{% include "_staging_banner.html" %}{% endif %}
     <div id="root">
       <main class="spa-seo-fallback">
         <nav aria-label="Percorso">

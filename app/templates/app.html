@@ -19,11 +19,31 @@
     {% include "_third_party_head.html" %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+    {# Migrato al design system 2026, con lo stesso meccanismo delle pagine
+       Jinja: `ds/system.css` dichiara le primitive nuove e, sotto `body.ds`,
+       ripunta su di esse i ~20 nomi di token che l'atlante gia' usava
+       (--paper, --ink, --accent, --font-display...). `body.ds` ha specificita'
+       (0,1,1) e batte il `:root` di styles.css qualunque sia l'ordine di
+       caricamento, quindi la SPA si ridipinge senza che il suo foglio cambi
+       riga. Va PRIMA del bundle: cosi' index.css puo' comunque vincere dove
+       serve. #}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Public+Sans:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
     <script type="module" crossorigin src="{{ asset_url('dist/assets/index.js') }}"></script>
     <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/index.css') }}">
+    {# Il tema va applicato prima del primo paint, o chi ha il tema scuro vede
+       un lampo di pagina chiara a ogni ingresso nell'atlante. Stessa chiave di
+       localStorage del resto del sito, o i due chrome si contraddirebbero. #}
+    <script>
+      document.documentElement.classList.add('ds-js');
+      try {
+        if (localStorage.getItem('divario-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    </script>
   </head>
-  <body>
+  <body class="ds">
     {% include "_third_party_body.html" %}
     {% if STAGING %}{% include "_staging_banner.html" %}{% endif %}
     <div id="root">

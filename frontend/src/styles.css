@@ -1,3 +1,17 @@
+/* I token qui sotto sono il RIPIEGO, non la verita'.
+ *
+ * L'atlante e' migrato al design system 2026: `app/templates/app.html` carica
+ * `css/ds/system.css` e mette `class="ds"` sul body, e da li' in poi e'
+ * `body.ds` (specificita' 0,1,1) a ripuntare questi stessi nomi sulle
+ * primitive nuove, battendo questo `:root` (0,1,0) qualunque sia l'ordine di
+ * caricamento. Quindi i valori scritti qui NON sono quelli che vedi nel
+ * browser: sono quelli che vedresti senza il foglio del design system.
+ *
+ * Non aggiornarli sperando di cambiare l'aspetto dell'atlante, e non fidarti
+ * di questi colori quando leggi il resto del file: i colori veri stanno in
+ * `app/static/css/ds/system.css`. Spariranno insieme al `:root` di site.css,
+ * col commit che migra l'ultima pagina.
+ */
 :root {
   color-scheme: light;
   --paper: #fbfaf7;
@@ -91,12 +105,33 @@ h1, h2, h3 { font-family: var(--font-display); }
   align-items: center;
   gap: 16px;
   padding: 14px clamp(16px, 4vw, 48px);
-  background: rgba(251, 250, 247, 0.9);
-  backdrop-filter: blur(14px);
+  /* Superficie piena e non translucida, come il chrome del resto del sito
+     (`.sitechrome .hdr` in ds/chrome.css): la carta cotta come rgba restava
+     chiara nel tema scuro, ed era l'unico pezzo di atlante che non seguiva il
+     tema. */
+  background: var(--panel);
   border-bottom: 1px solid var(--line);
 }
 
 .brand { display: flex; align-items: center; gap: 11px; }
+
+/* Interruttore del tema, stessa forma dell'`.iconbtn` del chrome del sito
+   (ds/chrome.css), perche' e' lo stesso comando in due posti diversi. */
+.masthead__theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  color: var(--ink-soft);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.masthead__theme:hover { background: var(--paper); color: var(--ink); }
 
 .brand-mark {
   display: block;
@@ -358,7 +393,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 .macro-tab em { font-style: normal; color: var(--muted); }
 .macro-tab:hover { border-color: var(--accent); color: var(--ink); }
 .macro-tab.is-active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-.macro-tab.is-active em { color: rgba(251, 250, 247, 0.7); }
+.macro-tab.is-active em { color: var(--text-on-inverse); opacity: 0.72; }
 
 /* ---------- Atlas layout ---------- */
 .atlas {
@@ -798,7 +833,7 @@ h1, h2, h3 { font-family: var(--font-display); }
    dashboard out of the viewport; width follows the aspect ratio and is centred. */
 .italy-map { display: block; margin: 0 auto; height: clamp(320px, 48vh, 500px); width: auto; max-width: 100%; }
 .italy-map path {
-  stroke: rgba(21, 35, 59, 0.35);
+  stroke: var(--map-region-stroke, rgba(21, 35, 59, 0.35));
   stroke-width: 1;
   transition: fill var(--dur) var(--ease-out), stroke-width 160ms ease;
   outline: none;
@@ -1151,7 +1186,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   padding: 18px 20px; background: var(--ink); color: var(--paper);
 }
-.region-cta small { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(251, 250, 247, 0.7); }
+.region-cta small { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-on-inverse); opacity: 0.72; }
 .region-cta strong { display: block; margin-top: 3px; font-size: 15px; }
 .region-cta:hover { background: #0f1a2d; }
 
