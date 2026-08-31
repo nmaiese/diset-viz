@@ -23,17 +23,46 @@
     {% include "_third_party_head.html" %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    {# Migrazione al design system 2026. Le pagine gia convertite dichiarano
+       `{% set ds_page = true %}` e ricevono i font, i token e il chrome nuovi;
+       tutte le altre restano esattamente come sono finche non tocca a loro.
+       Quando l'ultima pagina sara migrata, il ramo `else` e css/site.css
+       spariscono insieme. #}
+    {% if ds_page %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Public+Sans:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/site.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/ds/chrome.css') }}">
+    <script src="{{ url_for('static', filename='js/ds-chrome.js') }}" defer></script>
+    {# Il tema scelto va applicato prima del primo paint, altrimenti chi ha il
+       tema scuro vede un lampo di pagina chiara a ogni navigazione. #}
+    <script>
+      // `ds-js` sblocca i controlli che senza JavaScript non farebbero nulla
+      // (il bottone del drawer): senza classe restano nascosti e la
+      // navigazione passa dal footer, che e completo.
+      document.documentElement.classList.add('ds-js');
+      try {
+        if (localStorage.getItem('divario-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    </script>
+    {% else %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
     <link rel="stylesheet" href="{{ asset_url('css/site.css') }}">
     <script src="{{ url_for('static', filename='js/nav-underline.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/menu.js') }}" defer></script>
+    {% endif %}
     {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
     <script type="module" crossorigin src="{{ asset_url('dist/assets/site.js') }}"></script>
     {% endif %}
     {% block head_extra %}{% endblock %}
   </head>
-  <body>
+  <body{% if ds_page %} class="ds sitechrome"{% endif %}>
     {% include "_third_party_body.html" %}
+    {% if ds_page %}
+    {% include "_ds_header.html" %}
+    {% else %}
     <header class="masthead">
       <a class="brand" href="/">
         <img class="brand-mark" src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="" width="38" height="38">
@@ -117,15 +146,67 @@
         <a href="/privacy">Privacy e cookie</a>
       </div>
     </div>
+    {% endif %}
 
     {% block content %}{% endblock %}
 
+    {% if ds_page %}
+    {# Footer del design system 2026. Vive qui e non in un include perche
+       privacy.html deve poter svuotare `footer_privacy_settings`, e un blocco
+       dentro un include non e sovrascrivibile dalle pagine figlie. #}
+    <footer class="ftr">
+      <div class="ftr__grid">
+        <div>
+          <h4>Esplora</h4>
+          <a href="/atlante">Atlante</a>
+          <a href="/regioni">Regioni</a>
+          <a href="/temi">Temi</a>
+          <a href="/confronto">Confronta</a>
+          <a href="/divari-regionali">Divari regionali</a>
+        </div>
+        <div>
+          <h4>Classifiche</h4>
+          <a href="/qualita-della-vita/classifica/regioni">Qualità della vita, regioni</a>
+          <a href="/qualita-della-vita/classifica/province">Qualità della vita, province</a>
+          <a href="/metodologia">Metodologia della classifica</a>
+        </div>
+        <div>
+          <h4>Contenuti</h4>
+          <a href="/blog">Storie e analisi</a>
+          <a href="/quiz">Quiz</a>
+          <a href="/ricerca">Cerca nel sito</a>
+          <a href="/catalogo-dati">Catalogo dati</a>
+        </div>
+        <div>
+          <h4>Progetto</h4>
+          <a href="/chi-siamo">Chi siamo</a>
+          <a href="/metodologia">Metodologia e fonti</a>
+          <a href="/privacy">Privacy e cookie</a>
+        </div>
+        <div class="ftr__close">
+          <a class="hdr__brand" href="/">
+            <img src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="" width="26" height="26">
+            <span class="brandword">{{ site_name }}</span>
+          </a>
+          <p class="ftr__tag">L'Italia, regione per regione. Nei dati.</p>
+        </div>
+      </div>
+      <div class="ftr__legal">
+        <p>Dati <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noopener noreferrer">Istat</a>, indicatori territoriali per le politiche di sviluppo.</p>
+        {# Il blocco e definito qui e richiamato con self.* nel ramo legacy, cosi
+           privacy.html continua a poterlo svuotare e il markup viene reso una
+           volta sola qualunque sia il chrome attivo. #}
+        {% block footer_privacy_settings %}
+        {% include "_funding_choices_revoke.html" %}
+        {% endblock %}
+      </div>
+    </footer>
+    {% else %}
     <footer class="site-footer">
       <span>{{ site_name }} · dati <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noopener noreferrer">Istat</a>, indicatori territoriali per le politiche di sviluppo</span>
       <span><a href="/atlante">Esplora l'atlante</a> · <a href="/divari-regionali">Divari regionali</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/chi-siamo">Chi siamo</a> · <a href="/blog">Tutti gli articoli</a> · <a href="/privacy">Privacy e cookie</a></span>
-      {% block footer_privacy_settings %}
-      {% include "_funding_choices_revoke.html" %}
-      {% endblock %}
+      {{ self.footer_privacy_settings() }}
     </footer>
+    {% endif %}
   </body>
 </html>

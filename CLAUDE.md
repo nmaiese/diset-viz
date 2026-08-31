@@ -192,7 +192,22 @@ drops it from every macro-area total, with nothing failing.
 
 - Do not break `/legacy` or the data schema (`tests/integration/test_app.py` guards both).
 - Keep technical SEO intact (the list is in `.claude/rules/app.md`).
-- Keep the cartographic identity: navy `#15233b`, paper `#fbfaf7`, single
-  accent `#e4572e`, fonts Archivo / Inter / Space Mono.
+- **Visual identity: two systems live side by side, on purpose.** The 2026
+  design system (warm paper `#f5f3ee`, ink `#18201e`, coral accent `#e24b3c`,
+  teal `#0f9e86`, sequential teal data ramp, square corners, Newsreader /
+  Public Sans / Spline Sans Mono) is the target, and its tokens are
+  `app/static/css/ds/system.css`. A page opts in with `{% set ds_page = true %}`
+  and gets the new fonts, tokens and chrome; the homepage is the first and so
+  far the only one. Every page that has not opted in still renders the previous
+  cartographic identity (navy `#15233b`, paper `#fbfaf7`, accent `#e4572e`,
+  Archivo / Inter / Space Mono) from `app/static/css/site.css`, and must keep
+  it until it is migrated in turn. Do not "restore" the old palette on a
+  migrated page, and do not push the new one onto a page that has not opted in:
+  the two stylesheets ship together and share ~20 token names, which is why the
+  colliding ones live under `body.ds`. The `else` branch in `blog_base.html`
+  and `site.css` are deleted together, by the commit that migrates the last
+  page. Brand vs interface vs data colour must stay separate: a data colour
+  never carries a verdict, and the map ramp is emitted as `--seq-*` custom
+  properties so it follows the dark theme.
 - Do not commit secrets (`.gitignore` already excludes `client_secret_*.json`).
 - Commit messages: no `Co-Authored-By` trailer.

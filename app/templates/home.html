@@ -1,7 +1,10 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'home' %}
+{# Prima pagina migrata al design system 2026: attiva font, token e chrome
+   nuovi. Vedi blog_base.html per il meccanismo. #}
+{% set ds_page = true %}
 
-{% block title %}Divario Italia: l'atlante degli indicatori territoriali Istat{% endblock %}
+{% block title %}{{ site_name }}: l'atlante degli indicatori territoriali {{ sources_label }}{% endblock %}
 {% block description %}{{ total_indicators }} indicatori {{ sources_label }}, 20 regioni, dal {{ year_min }} al {{ year_max }}. Mappa interattiva, schede regione, confronti, qualità della vita, quiz e storie dai dati.{% endblock %}
 
 {% block head_extra %}
@@ -27,239 +30,562 @@
   ]
 }
 </script>
+<link rel="stylesheet" href="{{ asset_url('css/ds/home.css') }}">
+<script src="{{ url_for('static', filename='js/ds-home.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
-<main class="home-page wrap-wide">
-<section class="home-hero" aria-labelledby="home-hero-title">
-  <div>
-    <p class="home-hero__eyebrow">{{ sources_label }} &middot; {{ total_indicators }} indicatori &middot; 20 regioni &middot; dal {{ year_min }} al {{ year_max }}</p>
-    <h1 id="home-hero-title">Un atlante per leggere l'Italia, regione per regione.</h1>
-    <p class="home-hero__lead">Scegli un indicatore, guarda come si colora la mappa, poi apri una regione o l'atlante completo. I divari territoriali, resi navigabili.</p>
-    <div class="home-entry-cards">
-      <a class="home-entry-card" href="/regioni">
-        <strong>Parti da una regione</strong>
-        <span>Scegli una regione per aprirne il profilo, con punti di forza e ranking.</span>
-        <span class="home-entry-card__go">Sfoglia le regioni &rarr;</span>
-      </a>
-      <a class="home-entry-card" href="/temi">
-        <strong>Parti da un tema</strong>
-        <span>Sfoglia gli indicatori per area: economia, lavoro, salute, ambiente.</span>
-        <span class="home-entry-card__go">Vai ai temi &rarr;</span>
-      </a>
-      <a class="home-entry-card" href="/divari-regionali">
-        <strong>Parti dal divario</strong>
-        <span>Nord, Centro e Mezzogiorno a confronto su reddito, lavoro e salute.</span>
-        <span class="home-entry-card__go">Leggi i divari &rarr;</span>
-      </a>
-    </div>
-  </div>
+<main class="home" id="contenuto">
 
-  {% with map_action = "/" %}{% include "_map_panel.html" %}{% endwith %}
-</section>
-
-<section class="home-section" aria-labelledby="cap-title">
-  <div class="home-section__head">
-    <p class="section-label">Cosa puoi fare qui</p>
-    <h2 id="cap-title">Un sito, sei modi di leggere i divari territoriali</h2>
-    <p class="home-section__lead">Mappe interattive, schede regione, confronti, un indice di qualità della vita, storie dai dati e quiz. Tutto costruito sugli indicatori {{ sources_label }}.</p>
-  </div>
-  <div class="quality-grid">
-    {% for cap in capabilities %}
-    <a class="quality-card" href="{{ cap.href }}">
-      <small>{{ cap.kicker }}</small>
-      <h3>{{ cap.title }}</h3>
-      <p>{{ cap.body }}</p>
-      <span class="quality-card__cta">{{ cap.cta }} &rarr;</span>
-    </a>
-    {% endfor %}
-  </div>
-</section>
-
-{% if stories %}
-<section class="home-section" aria-labelledby="stories-title">
-  <div class="home-section__head">
-    <p class="section-label">Storie dai dati</p>
-    <h2 id="stories-title">Dove l'Italia corre e dove resta indietro</h2>
-  </div>
-  <div class="home-stories-grid">
-    {% for s in stories %}
-    <a class="home-story-card" href="{{ s.path }}">
-      <small>{{ s.theme }}</small>
-      <h3>{{ s.name }}</h3>
-      <div class="home-story-card__stat">
-        <span class="home-story-card__value">{{ s.value }} {{ s.unit }}<em>{{ s.best_region }}, {{ s.year }}</em></span>
-        <svg viewBox="0 0 84 36" width="84" height="36" preserveAspectRatio="none" aria-hidden="true"><polyline points="{{ s.spark_points }}"></polyline></svg>
+{# =========================================================================
+   HERO — l'affermazione editoriale accanto alla mappa viva. Il selettore
+   dell'indicatore e un form GET: cambiare mappa e una normale navigazione e
+   funziona senza JavaScript.
+   ====================================================================== #}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="sec hero-grid">
+    <div class="hero-lede">
+      <p class="eyebrow">Atlante degli indicatori territoriali</p>
+      <h1 class="h1" id="hero-title">L'Italia, regione per regione.</h1>
+      <p class="lede">Dati ufficiali, mappe e confronti per capire come cambiano economia, lavoro, salute, ambiente e qualità della vita nei territori italiani.</p>
+      <div class="ctarow">
+        <a class="btn btn--primary btn--lg" href="/atlante">Esplora l'atlante</a>
+        <a class="btn btn--outline btn--lg" href="/regioni">Scegli una regione</a>
       </div>
-      <p>{{ s.note }}</p>
-      <span class="home-story-card__go">Apri la scheda &rarr;</span>
-    </a>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}
-
-{% if themes_preview %}
-<section class="home-section" aria-labelledby="themes-title">
-  <div class="home-section__head home-section__head--row">
-    <div>
-      <p class="section-label">Temi e aree</p>
-      <h2 id="themes-title">Ogni tema è una lente sull'Italia</h2>
-      <p class="home-section__lead">Gli indicatori sono raggruppati per macro-area. Vedi subito chi è avanti e chi resta indietro, poi apri i temi per la lettura completa.</p>
-    </div>
-    <a href="/temi">Tutte le aree &rarr;</a>
-  </div>
-  <div class="home-themes-grid">
-    {% for a in themes_preview %}
-    <a class="home-theme-card" href="/temi">
-      <div class="home-theme-card__head">
-        <span class="home-theme-card__kicker">Area</span>
-        <h3>{{ a.area }}</h3>
-      </div>
-      <p class="home-theme-card__count"><strong>{{ a.count }}</strong> indicatori &middot; {{ a.theme_count }} temi</p>
-      <ul class="home-theme-card__themes">
-        {% for t in a.themes %}<li>{{ t }}</li>{% endfor %}
-      </ul>
-      <dl class="home-theme-card__ends">
-        <div><dt>In testa</dt><dd class="is-top">{{ a.best }}</dd></div>
-        <div><dt>In coda</dt><dd class="is-bottom">{{ a.worst }}</dd></div>
-      </dl>
-      <span class="home-theme-card__go">Apri i temi &rarr;</span>
-    </a>
-    {% endfor %}
-  </div>
-</section>
-{% endif %}
-
-{% if compare_preview %}
-<section class="home-section" aria-labelledby="compare-title">
-  <div class="home-section__head home-section__head--row">
-    <div>
-      <p class="section-label">Confronta</p>
-      <h2 id="compare-title">Metti a paragone regioni, indicatore per indicatore</h2>
-      <p class="home-section__lead">Un esempio con tre regioni. Nell'atlante puoi confrontarle sulla mappa e sulla serie storica, indicatore per indicatore.</p>
-    </div>
-    <a href="/confronto">Apri il comparatore &rarr;</a>
-  </div>
-  <div class="home-compare-panel">
-    <div class="home-compare-legend" aria-hidden="true">
-      {% for l in compare_preview.legend %}
-      <span><i style="background: {{ l.color }}"></i>{{ l.name }}</span>
-      {% endfor %}
-    </div>
-    <div class="home-compare-grid">
-      {% for row in compare_preview.rows %}
-      <div class="home-cmp-mini">
-        <div class="home-cmp-mini__head">
-          <span class="home-cmp-mini__kicker">{{ row.theme }}</span>
-          <span class="home-cmp-mini__name">{{ row.name }}</span>
+      <div class="hero-cover">
+        <div class="hero-cover__stats">
+          <span><strong>{{ total_indicators }}</strong> indicatori</span>
+          <span><strong>20</strong> regioni</span>
+          <span><strong>{{ year_min }}-{{ year_max }}</strong></span>
         </div>
-        <ul class="home-cmp-mini__bars">
-          {% for e in row.entries %}
-          <li>
-            <span class="home-cmp-mini__reg">{{ e.name }}</span>
-            <span class="home-cmp-mini__bar"><i style="width: {{ e.pct }}%; background: {{ e.color }}"></i></span>
-            <span class="home-cmp-mini__val">{{ e.value }}<small>{{ e.rank }}ª</small></span>
-          </li>
+        <p class="meta">Dati {{ sources_label }} e altre fonti ufficiali</p>
+      </div>
+    </div>
+
+    {% if hero_map %}
+    <div class="mapcard heromap" data-ds-heromap
+         data-readout='{{ hero_map.readout | tojson }}'
+         data-high="{{ hero_map.high.key }}" data-low="{{ hero_map.low.key }}">
+      <div class="mapcard__head">
+        <div class="heromap__label">
+          <span class="eyebrow heromap__live"><span class="livedot"></span>Indicatore in evidenza</span>
+          <span class="heromap__title">{{ hero_map.indicator_name }}</span>
+        </div>
+        <div class="heromap__meta">
+          <span class="meta">{{ hero_map.source_label or sources_label }}</span>
+          <span class="meta">{{ hero_map.year }} · {{ hero_map.unit }}</span>
+        </div>
+      </div>
+
+      <form class="heromap__pick" method="get" action="/">
+        <label for="hero-indicator">Colora la mappa per</label>
+        <select id="hero-indicator" name="indicator" onchange="this.form.submit()">
+          {% for opt in hero_map.options %}
+          <option value="{{ opt.id }}"{{ " selected" if opt.id == hero_map.selected_id }}>{{ opt.name }}</option>
           {% endfor %}
-        </ul>
+        </select>
+        <noscript><button type="submit" class="btn btn--outline btn--sm">Aggiorna</button></noscript>
+      </form>
+
+      {# Riempimenti per regione: stessa tecnica di _map_panel.html, con una
+         specificita piu alta della regola di default in ds/home.css. #}
+      <style>
+        {% for key, color in hero_map.colors.items() %}.home .heromap__canvas .rmap-region[data-key="{{ key }}"] { fill: {{ color }}; }
+        {% endfor %}
+      </style>
+
+      <div class="mapcard__body">
+        <div class="heromap__stage">
+          <div class="heromap__canvas">
+            {# Stessa forma di etichetta delle altre mappe del sito (vedi
+               MapAccessibilityTest): nomina l'indicatore e l'anno, e finisce
+               lì. La lettura del colore sta nella legenda qui sotto. #}
+            {% with map_label = "Mappa cliccabile delle regioni italiane per " ~ hero_map.indicator_name ~ ", " ~ hero_map.year %}
+            {% include "_italy_map.html" %}
+            {% endwith %}
+
+            <div class="callout callout--high" data-ds-callout="high" hidden>
+              <span class="callout__tag"><span class="callout__dot" style="background: {{ hero_map.high.color }}"></span>{{ hero_map.high.label }}</span>
+              <span class="callout__name">{{ hero_map.high.name }}</span>
+              <span class="callout__val">{{ hero_map.high.value }} {{ hero_map.unit }}</span>
+            </div>
+            <div class="callout callout--low" data-ds-callout="low" hidden>
+              <span class="callout__tag"><span class="callout__dot" style="background: {{ hero_map.low.color }}"></span>{{ hero_map.low.label }}</span>
+              <span class="callout__name">{{ hero_map.low.name }}</span>
+              <span class="callout__val">{{ hero_map.low.value }} {{ hero_map.unit }}</span>
+            </div>
+          </div>
+
+          {# Equivalente testuale della mappa: senza questa tabella il
+             choropleth non e leggibile da uno screen reader. #}
+          <div class="sr-only">
+            <table>
+              <caption>{{ hero_map.indicator_name }}, {{ hero_map.unit }}, per regione, {{ hero_map.year }}.</caption>
+              <thead><tr><th scope="col">Regione</th><th scope="col">Valore</th><th scope="col">Posizione</th></tr></thead>
+              <tbody>
+                {% for key, row in hero_map.readout.items() %}
+                <tr><th scope="row">{{ row.name }}</th><td>{{ row.value }} {{ row.unit }}</td><td>{{ row.rank }} su {{ row.total }}</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="heromap__foot">
+        <div class="heromap__legend">
+          <span class="meta">{{ hero_map.scale_low }}</span>
+          <span class="rampbar" aria-hidden="true">
+            {% for stop in hero_map.ramp %}<span style="background: {{ stop }}"></span>{% endfor %}
+          </span>
+          <span class="meta">{{ hero_map.scale_high }}</span>
+          {# "più chiaro / più scuro" sarebbe falso nel tema scuro, dove la
+             rampa si inverte. L'intensità invece cresce col valore in
+             entrambi i temi, e gli estremi numerici stanno già ai due lati. #}
+          <span class="meta heromap__dir">Colore più intenso, valore più alto.</span>
+        </div>
+
+        <div class="heromap__extremes">
+          <div class="extreme extreme--high">
+            <span class="extreme__tag">{{ hero_map.high.label }}</span>
+            <span class="extreme__row"><span class="extreme__dot" style="background: {{ hero_map.high.color }}"></span><span class="extreme__name">{{ hero_map.high.name }}</span></span>
+            <span class="extreme__val">{{ hero_map.high.value }} {{ hero_map.unit }}</span>
+          </div>
+          <div class="extreme extreme--low">
+            <span class="extreme__tag">{{ hero_map.low.label }}</span>
+            <span class="extreme__row"><span class="extreme__dot" style="background: {{ hero_map.low.color }}"></span><span class="extreme__name">{{ hero_map.low.name }}</span></span>
+            <span class="extreme__val">{{ hero_map.low.value }} {{ hero_map.unit }}</span>
+          </div>
+        </div>
+
+        <div class="heromap__actions">
+          <span class="label heromap__readout" data-ds-readout aria-live="polite">Passa sulle regioni per leggerne il valore. Clicca per aprire la scheda.</span>
+          <a class="heromap__open" href="{{ hero_map.indicator_path }}">Apri la scheda dell'indicatore &rarr;</a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{# =========================================================================
+   PERCORSI — quattro modi di entrare nei dati, ognuno con la sua misura.
+   ====================================================================== #}
+<section class="sec" aria-labelledby="paths-title">
+  <div class="sec-head">
+    <div class="sec-head__titles">
+      <p class="eyebrow muted">Percorsi di esplorazione</p>
+      <h2 class="h2" id="paths-title">Da dove vuoi iniziare?</h2>
+    </div>
+  </div>
+  <div class="grid paths">
+    {% for path in paths %}
+    <a class="pathcard" href="{{ path.href }}">
+      <p class="eyebrow">{{ path.eyebrow }}</p>
+      <p class="body">{{ path.body }}</p>
+      <p class="meta">{{ path.meta }}</p>
+      <span class="linkcta linkcta--push">{{ path.cta }} &rarr;</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+{# =========================================================================
+   STORIA IN EVIDENZA — un indicatore letto per esteso, con le due regioni in
+   testa, la media delle regioni e le due in coda.
+   ====================================================================== #}
+{% if featured_story %}
+<section class="sec--band" aria-labelledby="story-title">
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-head__titles">
+        <p class="eyebrow muted">Cosa raccontano i dati</p>
+        <h2 class="h2" id="story-title">Un dato per capire l'Italia di oggi</h2>
+      </div>
+      <a class="linkcta" href="/atlante">Tutti gli indicatori &rarr;</a>
+    </div>
+
+    <div class="storyfeat">
+      <div class="storyfeat__viz" data-ds-reveal>
+        <div class="storyfeat__vizhead">
+          <span class="label">{{ featured_story.name }}</span>
+          <span class="meta">{{ featured_story.year }} · {{ featured_story.unit }}</span>
+        </div>
+        <div class="storyfeat__bars">
+          {% for row in featured_story.rows %}
+          <div class="minibar minibar--lg">
+            <span class="minibar__name">{{ row.name }}</span>
+            <span class="minibar__track"><span class="minibar__fill" style="--w: {{ row.pct }}%; background: {{ row.color }}"></span></span>
+            <span class="minibar__val">{{ row.value }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="meta storyfeat__note">Fonte {{ featured_story.source_label or sources_label }}, {{ featured_story.year }}. La media è la media semplice delle regioni.</p>
+      </div>
+
+      <div class="storyfeat__body">
+        <span class="badge badge--teal">{{ featured_story.theme }}</span>
+        <h3 class="h3">Tra la prima e l'ultima regione ci sono {{ featured_story.spread }} {{ featured_story.unit }}</h3>
+        {% if featured_story.summary %}<p class="body">{{ featured_story.summary }}</p>{% endif %}
+        <p class="body body--secondary">Nel {{ featured_story.year }} {{ featured_story.lead_region }} segna {{ featured_story.lead_value }} {{ featured_story.unit }}, {{ featured_story.lag_region }} si ferma a {{ featured_story.lag_value }}. {{ featured_story.direction_note }}</p>
+        <div class="ctarow storyfeat__cta">
+          <a class="linkcta" href="{{ featured_story.path }}">Apri la scheda dell'indicatore &rarr;</a>
+          <a class="linkcta linkcta--quiet" href="/divari-regionali">Leggi i divari territoriali</a>
+        </div>
+      </div>
+    </div>
+
+    {% if insight_cards %}
+    <div class="insights-grid">
+      {% for card in insight_cards %}
+      <div class="insight{{ ' insight--alt' if not loop.first }}">
+        <span class="meta">{{ card.theme }} · {{ card.year }}</span>
+        <p class="h4 insight__title">{{ card.lead_region }} guida, {{ card.lag_region }} chiude</p>
+        <p class="body insight__body">{{ card.name }}: da {{ card.lead_value }} a {{ card.lag_value }} {{ card.unit }}.{% if card.summary %} {{ card.summary }}{% endif %}</p>
+        <a class="meta insight__meta" href="{{ card.path }}">Apri la scheda &rarr;</a>
       </div>
       {% endfor %}
     </div>
-    <a class="home-compare-cta" href="/confronto">Prova con le tue regioni &rarr;</a>
+    {% endif %}
   </div>
 </section>
 {% endif %}
 
-{% if qol %}
-<section class="home-section home-qol" aria-labelledby="qol-title">
-  <div>
-    <p class="section-label">Qualità della vita</p>
-    <h2 id="qol-title">Un indice per misurare il benessere regionale</h2>
-    <p>Un punteggio composito che combina reddito, lavoro, salute, istruzione, ambiente e altre otto dimensioni. Sperimentale e non ufficiale: serve a leggere in una sola lettura chi è avanti e chi indietro.</p>
-    <dl class="region-facts">
-      <div><small>Divario massimo</small><strong>{{ qol.spread }} punti su 100</strong></div>
-      <div><small>In testa</small><strong>{{ qol.leader }}</strong></div>
-      <div><small>Ultima</small><strong>{{ qol.last }}</strong></div>
-    </dl>
-    <p><a href="/qualita-della-vita/classifica/regioni">Apri la classifica completa &rarr;</a></p>
-  </div>
-  <ol class="home-qol-list">
-    {% for r in qol.top5 %}
-    <li class="home-qol-row">
-      <span class="home-qol-row__rank">{{ r.rank }}</span>
-      <span class="home-qol-row__name">{{ r.name }}</span>
-      <span class="quality-score-bar"><span style="width: {{ r.score | round | int }}%"></span></span>
-      <span class="quality-score">{{ r.score | it_num }}</span>
-    </li>
-    {% endfor %}
-    <li class="home-qol-sep" aria-hidden="true">&middot;&middot;&middot;</li>
-    {% for r in qol.bottom3 %}
-    <li class="home-qol-row is-bottom">
-      <span class="home-qol-row__rank">{{ r.rank }}</span>
-      <span class="home-qol-row__name">{{ r.name }}</span>
-      <span class="quality-score-bar"><span style="width: {{ r.score | round | int }}%"></span></span>
-      <span class="quality-score">{{ r.score | it_num }}</span>
-    </li>
-    {% endfor %}
-  </ol>
-</section>
-{% endif %}
-
-<section class="home-section" aria-labelledby="quiz-title">
-  <div class="home-section__head">
-    <p class="section-label">Quiz</p>
-    <h2 id="quiz-title">Metti alla prova quello che sai dell'Italia</h2>
-    <p class="home-section__lead">Tre giochi rapidi, tutti basati sui numeri {{ sources_label }}. Una classifica settimanale unica.</p>
-  </div>
-  <div class="home-quiz-grid">
-    {% for g in quiz_games %}
-    <a class="quality-card" href="{{ g.href }}">
-      <h3>{{ g.name }}</h3>
-      <p>{{ g.desc }}</p>
-      <span class="quality-card__cta">{{ g.meta }}</span>
-    </a>
-    {% endfor %}
-    <a class="quality-card" href="/quiz/classifica">
-      <h3>Classifica</h3>
-      <p>I migliori giocatori di questa settimana su tutti e tre i giochi.</p>
-      <span class="quality-card__cta">Vedi la classifica &rarr;</span>
-    </a>
-  </div>
-</section>
-
-{% if posts %}
-<section class="home-section" aria-labelledby="blog-title">
-  <div class="home-section__head home-section__head--row">
-    <div>
-      <p class="section-label">Dal blog</p>
-      <h2 id="blog-title">Storie e metodo, dietro i numeri</h2>
+{# =========================================================================
+   CONFRONTO — serie storica reale. Le tre regioni di partenza sono gia
+   disegnate lato server; ds-home.js ridisegna quando la selezione cambia.
+   ====================================================================== #}
+{% if series_module %}
+<section class="sec" aria-labelledby="compare-title" data-ds-compare
+         data-series='{{ series_module | tojson }}'>
+  <div class="sec-head">
+    <div class="sec-head__titles">
+      <p class="eyebrow muted">Confronto tra territori</p>
+      <h2 class="h2" id="compare-title">Metti due o tre territori sullo stesso piano</h2>
     </div>
-    <a href="/blog">Tutti gli articoli &rarr;</a>
+    <a class="btn btn--secondary btn--md" href="/confronto">Apri il confronto completo</a>
   </div>
-  <div class="post-grid">
-    {% for post in posts %}
-    <a class="post-card" href="/blog/{{ post.slug }}">
-      <div class="post-card__cover">
-        {% if post.cover %}<img src="{{ post.cover }}" alt="{{ post.cover_alt }}" loading="lazy" width="640" height="360">{% endif %}
+
+  <div class="compare-grid">
+    <div class="cmpcard">
+      <div class="cmpcard__head">
+        <span class="label">{{ series_module.indicator_name }}, {{ series_module.unit }}, {{ series_module.years | first }}-{{ series_module.years | last }}</span>
+        <span class="meta">Fonte {{ series_module.source_label or sources_label }}</span>
       </div>
-      <div class="post-card__body">
-        <span class="post-card__meta">{{ post.date.strftime('%d.%m.%Y') }} &middot; {{ post.read_time }} min{% if post.tags %} &middot; {{ post.tags[0] }}{% endif %}</span>
-        <h2>{{ post.title }}</h2>
-        <p>{{ post.description }}</p>
+      {# La selezione iniziale e gia disegnata qui: ds-home.js ridisegna con la
+         stessa geometria (vedi _CHART_* in views.py) solo quando la selezione
+         cambia, quindi senza JavaScript il grafico resta corretto. #}
+      <svg class="cmpchart" viewBox="0 0 260 60" role="img"
+           data-ds-chart
+           aria-label="Serie storica di {{ series_module.indicator_name }} dal {{ series_module.years | first }} al {{ series_module.years | last }} per {% for line in series_module.initial.lines %}{{ line.name }}{{ ', ' if not loop.last }}{% endfor %}, confrontate con la media delle regioni.">
+        {% if series_module.initial %}
+        <line x1="{{ series_module.initial.baseline.x1 }}" y1="{{ series_module.initial.baseline.y }}"
+              x2="{{ series_module.initial.baseline.x2 }}" y2="{{ series_module.initial.baseline.y }}"
+              stroke="var(--chart-axis)" stroke-width="0.4" vector-effect="non-scaling-stroke"/>
+        <polyline points="{{ series_module.initial.reference }}" fill="none"
+                  stroke="var(--data-reference)" stroke-width="1" stroke-dasharray="3 2"
+                  vector-effect="non-scaling-stroke"/>
+        {% for line in series_module.initial.lines %}
+        <polyline class="cmp-line" points="{{ line.points }}" fill="none"
+                  stroke="{{ line.color }}" stroke-width="1.8" stroke-linejoin="round"
+                  stroke-linecap="round" vector-effect="non-scaling-stroke"
+                  style="animation-delay: {{ loop.index0 * 140 }}ms"/>
+        <circle class="cmp-dot" cx="{{ line.end.x }}" cy="{{ line.end.y }}" r="1.7"
+                fill="{{ line.color }}" vector-effect="non-scaling-stroke"
+                style="animation-delay: {{ loop.index0 * 140 + 760 }}ms"/>
+        {% endfor %}
+        {% endif %}
+      </svg>
+
+      <div class="cmplegend" data-ds-legend>
+        <span class="meta"><span class="cmplegend__rule"></span>{{ series_module.reference.short_label }}</span>
+        {% for line in series_module.initial.lines %}
+        <span class="meta"><span class="cmplegend__sw" style="background: {{ line.color }}"></span>{{ line.name }}</span>
+        {% endfor %}
       </div>
-    </a>
-    {% endfor %}
+
+      {# Equivalente tabellare della serie: un grafico da solo non e leggibile
+         da uno screen reader. #}
+      <div class="sr-only" data-ds-chart-table>
+        <table>
+          <caption>{{ series_module.indicator_name }}, {{ series_module.unit }}, per anno.</caption>
+          <thead>
+            <tr>
+              <th scope="col">Anno</th>
+              {% for line in series_module.initial.lines %}<th scope="col">{{ line.name }}</th>{% endfor %}
+              <th scope="col">{{ series_module.reference.short_label }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for year in series_module.years %}
+            {# il ciclo interno ridefinisce `loop`, quindi l'indice dell'anno va
+               catturato prima di entrarci #}
+            {% set year_index = loop.index0 %}
+            <tr>
+              <th scope="row">{{ year }}</th>
+              {% for region in series_module.regions if region.key in series_module.default_keys %}
+              <td>{{ region.series[year_index] | it_num(1) }}</td>
+              {% endfor %}
+              <td>{{ series_module.reference.series[year_index] | it_num(1) }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <p class="label">Seleziona i territori</p>
+      <div class="cmppick" role="group" aria-label="Territori da confrontare">
+        {% for region in series_module.regions %}
+        <button type="button" class="chip" data-ds-region="{{ region.key }}"
+                aria-pressed="{{ 'true' if region.key in series_module.default_keys else 'false' }}">
+          <span class="chip__dot" style="background: {{ region.color if region.key in series_module.default_keys else 'var(--line-strong)' }}"></span>{{ region.name }}
+        </button>
+        {% endfor %}
+      </div>
+      <p class="meta">Fino a tre territori alla volta. La riga tratteggiata è la media semplice delle regioni, non un dato ufficiale nazionale.</p>
+      <div class="cmprows" data-ds-rows>
+        {% for region in series_module.regions if region.key in series_module.default_keys %}
+        <div class="cmprow cmprow--anim">
+          <span class="cmprow__sw" style="background: {{ region.color }}"></span>
+          <span class="cmprow__name">{{ region.name }}</span>
+          <span class="cmprow__rank">{{ region.rank }} su {{ region.total }}</span>
+          <span class="cmprow__val">{{ region.value }}</span>
+        </div>
+        {% endfor %}
+        <div class="cmprow">
+          <span class="cmprow__sw" style="background: var(--data-reference)"></span>
+          <span class="cmprow__name cmprow__name--ref">{{ series_module.reference.short_label }}</span>
+          <span class="cmprow__rank"></span>
+          <span class="cmprow__val">{{ series_module.reference.value }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 {% endif %}
 
-<aside class="indicator-cta">
-  <span>
-    <small>Tutto l'archivio</small>
-    <strong>{{ total_indicators }} indicatori {{ sources_label }}, 20 regioni, dal {{ year_min }} al {{ year_max }}.</strong>
-  </span>
-  <a href="/atlante">Vai all'atlante &rarr;</a>
-</aside>
+{# =========================================================================
+   TEMI — le macro-aree con i conteggi reali e chi guida / chi chiude.
+   ====================================================================== #}
+{% if themes_preview %}
+<section class="sec--band" aria-labelledby="themes-title">
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-head__titles">
+        <p class="eyebrow muted">Temi e aree</p>
+        <h2 class="h2" id="themes-title">Ogni tema è una lente sull'Italia</h2>
+      </div>
+      <a class="linkcta" href="/temi">Tutte le aree &rarr;</a>
+    </div>
+    <div class="grid topics">
+      {% for area in themes_preview %}
+      <div class="topcard">
+        <p class="eyebrow">{{ area.area }}</p>
+        <p class="meta">{{ area.count }} indicatori · {{ area.theme_count }} {{ area.theme_count | it_plural('tema', 'temi') }}</p>
+        <div class="topiclist">
+          {% for theme in area.themes %}<span>{{ theme }}</span>{% endfor %}
+        </div>
+        <dl class="topcard__ends">
+          <div><dt>In testa</dt><dd>{{ area.best }}</dd></div>
+          <div><dt>In coda</dt><dd>{{ area.worst }}</dd></div>
+        </dl>
+        <a class="linkcta linkcta--push" href="/temi">Esplora l'area &rarr;</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# =========================================================================
+   QUALITA DELLA VITA — sei profili di pesi, sei classifiche. Cambiare
+   priorita cambia la risposta: e esattamente il punto del modulo.
+   ====================================================================== #}
+{% if qol_module %}
+<section class="sec" aria-labelledby="qol-title" data-ds-qol
+         data-profiles='{{ qol_module | tojson }}'>
+  <div class="qol">
+    <div class="qol__head">
+      <span class="badge">Indice sperimentale {{ site_name }}</span>
+      <h2 class="h2" id="qol-title">Qualità della vita, secondo priorità diverse</h2>
+      <p class="body qol__lede" data-ds-qol-desc>La classifica combina indicatori di reddito, lavoro, salute, istruzione, ambiente e altre dimensioni. Pesi e metodo sono pubblici.</p>
+    </div>
+
+    <div class="qol__profiles" role="group" aria-label="Profilo di priorità">
+      {% for profile in qol_module.profiles %}
+      <button type="button" class="chip" data-ds-profile="{{ profile.slug }}"
+              aria-pressed="{{ 'true' if profile.slug == qol_module.default_slug else 'false' }}">{{ profile.name }}</button>
+      {% endfor %}
+    </div>
+
+    {% set active = (qol_module.profiles | selectattr('slug', 'equalto', qol_module.default_slug) | list | first) or qol_module.profiles[0] %}
+    <div class="qol__cols">
+      <div class="qol__col qol__col--high">
+        <p class="label qol__collabel" data-ds-qol-toplabel>Punteggi più alti · profilo {{ active.name }}</p>
+        <div data-ds-qol-top>
+          {% for row in active.top %}
+          <div class="qolrow qolrow--anim">
+            <span class="qolrow__rank">{{ '%02d' | format(row.rank) }}</span>
+            <span class="qolrow__name">{{ row.name }}</span>
+            <span class="qolrow__bar"><span class="qolrow__fill" style="width: {{ row.score }}%"></span></span>
+            <span class="qolrow__score">{{ row.score }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="qol__col qol__col--low">
+        <p class="label qol__collabel" data-ds-qol-bottomlabel>Punteggi più bassi · profilo {{ active.name }}</p>
+        <div data-ds-qol-bottom>
+          {% for row in active.bottom %}
+          <div class="qolrow qolrow--anim">
+            <span class="qolrow__rank">{{ '%02d' | format(row.rank) }}</span>
+            <span class="qolrow__name">{{ row.name }}</span>
+            <span class="qolrow__bar"><span class="qolrow__fill" style="width: {{ row.score }}%"></span></span>
+            <span class="qolrow__score">{{ row.score }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="qol__foot">
+      <div class="qolgap">
+        <span class="meta qolgap__label">Distanza massima di punteggio</span>
+        <span class="qolgap__val" data-ds-qol-gap>{{ active.gap }} punti</span>
+      </div>
+      <span class="meta meta--warning">Indice sperimentale e non ufficiale</span>
+      <a class="linkcta linkcta--quiet" href="/metodologia">Metodo e pesi &rarr;</a>
+      <a class="btn btn--primary btn--sm" href="/qualita-della-vita/classifica/regioni">Esplora la classifica</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# =========================================================================
+   REDAZIONE — gli ultimi articoli pubblicati.
+   ====================================================================== #}
+{% if posts %}
+<section class="sec--band" aria-labelledby="blog-title">
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-head__titles">
+        <p class="eyebrow muted">Storie dall'Italia dei dati</p>
+        <h2 class="h2" id="blog-title">Le analisi della redazione</h2>
+      </div>
+      <a class="linkcta" href="/blog">Tutte le storie &rarr;</a>
+    </div>
+
+    <div class="edit-feat">
+      {% set lead = posts[0] %}
+      {# Il titolo vive una volta sola, nella copertina scura: e l'unico
+         heading del riquadro, cosi il blocco resta navigabile da tastiera e da
+         screen reader senza ripetere la stessa frase due volte. #}
+      <a class="feat" href="/blog/{{ lead.slug }}">
+        {% if lead.cover %}
+        <div class="feat__cover feat__cover--image">
+          <img src="{{ lead.cover }}" alt="{{ lead.cover_alt or '' }}" loading="lazy" width="640" height="360">
+        </div>
+        {% else %}
+        <div class="feat__cover">
+          <div class="feat__coverhead">
+            <span class="k">{{ lead.tags[0] if lead.tags else 'Analisi' }}</span>
+            <span class="s">{{ lead.date.strftime('%d.%m.%Y') }} · {{ lead.read_time }} min di lettura</span>
+          </div>
+          <h3 class="feat__fig">{{ lead.title }}</h3>
+        </div>
+        {% endif %}
+        <div class="feat__body">
+          {% if lead.tags %}<span class="badge badge--teal">{{ lead.tags[0] }}</span>{% endif %}
+          {% if lead.cover %}<h3 class="h3">{{ lead.title }}</h3>{% endif %}
+          <p class="body body--secondary">{{ lead.description }}</p>
+          <div class="feat__meta">
+            <span class="meta">{{ lead.date.strftime('%d.%m.%Y') }}</span>
+            <span class="meta">{{ lead.read_time }} min di lettura</span>
+          </div>
+          <span class="feat__cta">Leggi l'analisi &rarr;</span>
+        </div>
+      </a>
+
+      {% if posts | length > 1 %}
+      <div class="edit-side">
+        {% for post in posts[1:3] %}
+        <a class="sidecard" href="/blog/{{ post.slug }}">
+          <span class="linkcta">{{ post.tags[0] if post.tags else 'Analisi' }}</span>
+          <h3 class="h4">{{ post.title }}</h3>
+          <p class="body body--secondary">{{ post.description }}</p>
+          <div class="sidecard__meta">
+            <span class="meta">{{ post.date.strftime('%d.%m.%Y') }}</span>
+            <span class="meta">{{ post.read_time }} min</span>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# =========================================================================
+   QUIZ — i tre giochi, con la stessa lista che serve /quiz.
+   ====================================================================== #}
+{% if quiz_games %}
+<section class="sec" aria-labelledby="quiz-title">
+  <div class="quizbanner">
+    <div class="quizbanner__body">
+      <p class="eyebrow">Quanto conosci l'Italia?</p>
+      <h2 class="h2" id="quiz-title">Tre giochi sui numeri veri</h2>
+      <p class="body quizbanner__lede">Mappe, indizi e classifiche costruiti sugli stessi indicatori {{ sources_label }} che trovi nell'atlante.</p>
+      <div class="ctarow">
+        <a class="btn btn--primary btn--md" href="/quiz">Gioca ora</a>
+        <a class="linkcta" href="/quiz/classifica">Vedi la classifica &rarr;</a>
+      </div>
+      <div class="quizbanner__meta">
+        <span class="meta">Sfida settimanale</span>
+        <span class="meta">Nessuna registrazione richiesta</span>
+      </div>
+    </div>
+    <div class="quizclues">
+      {% for game in quiz_games %}
+      <a class="quizclue" href="{{ game.href }}">
+        <span class="n">{{ '%02d' | format(loop.index) }}</span>
+        <span class="quizclue__text">
+          <span class="body">{{ game.name }}</span>
+          <span class="meta">{{ game.meta }}</span>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# =========================================================================
+   FIDUCIA — fonti, copertura, metodo, correzioni.
+   ====================================================================== #}
+<section class="sec" aria-labelledby="trust-title">
+  <div class="sec-head">
+    <div class="sec-head__titles">
+      <p class="eyebrow muted">Fonti e metodo</p>
+      <h2 class="h2" id="trust-title">Dati leggibili, metodo verificabile</h2>
+    </div>
+  </div>
+  <div class="grid trust">
+    {% for card in trust_cards %}
+    <div class="trustcard">
+      <p class="eyebrow muted">{{ card.kicker }}</p>
+      {# h3, non h4: queste schede stanno sotto l'h2 della sezione e saltare un
+         livello rompe l'indice per chi naviga per intestazioni. La classe .h4
+         porta solo la dimensione. #}
+      <h3 class="h4">{{ card.title }}</h3>
+      <p class="body body--secondary">{{ card.body }}</p>
+      <a class="linkcta linkcta--push" href="{{ card.href }}">{{ card.cta }} &rarr;</a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
 </main>
 {% endblock %}
