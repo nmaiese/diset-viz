@@ -271,11 +271,15 @@ class SearchPageTest(unittest.TestCase):
         self.assertIn('class="msearch mobile-only" role="search" action="/ricerca"', home)
         self.assertIn("/ricerca?q={search_term_string}", home)
 
-        # Le pagine non ancora migrate usano ancora il masthead legacy, con lo
-        # stesso punto di arrivo. Questa riga sparisce con l'ultima migrazione.
+        # E ogni altra pagina ha lo stesso punto di arrivo, perche' ormai
+        # servono tutte lo stesso chrome: il masthead legacy non esiste piu'.
         blog = client.get("/blog").data.decode("utf-8")
-        self.assertIn('class="masthead__search" href="/ricerca"', blog)
-        self.assertIn('<form action="/ricerca" method="get" role="search">', blog)
+        self.assertIn('class="hdr__search desktop-only" role="search" action="/ricerca"', blog)
+        self.assertIn('class="msearch mobile-only" role="search" action="/ricerca"', blog)
+        # Il vecchio punto d'ingresso non e' rimasto accanto al nuovo: due
+        # ricerche nella stessa pagina sono due comportamenti da tenere
+        # allineati, ed e' esattamente cio' che la migrazione toglieva.
+        self.assertNotIn('class="masthead__search"', blog)
 
 
 class ProvinceViewTest(unittest.TestCase):
