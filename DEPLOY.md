@@ -272,11 +272,13 @@ dettagli:
 | `--set-env-vars STAGING=1` e nient'altro | azzera l'ambiente. GTM, GA4, AdSense e le verifiche di proprietà sono già env-gated: assenti, restano spenti. |
 | nessuna `DATABASE_URL` | l'app cade sullo SQLite effimero del container. Lo stage **non può scrivere** sul Postgres di produzione: nessun account e nessuna classifica reale vengono toccati. |
 | `STAGING=1` | ogni risposta esce `noindex, nofollow, noarchive`, `/robots.txt` diventa `Disallow: /`, e una fascia rossa in cima dichiara che non è il sito vero. |
+| `STAGING_PASSWORD` | tutto lo stage sta dietro un Basic Auth. `noindex` parla ai crawler educati e la fascia rossa parla a chi guarda: la password parla a tutti gli altri. La imposta lo script, non serve sceglierla. |
 
 La terza riga è quella che conta di più: senza, Google si troverebbe un
 duplicato completo di divarioitalia.it su un secondo dominio. Lo script verifica
-tutte e quattro le condizioni dopo il deploy (header, robots, fascia, assenza di
-analytics) ed esce rosso se una salta, anche a deploy riuscito.
+tutte le condizioni dopo il deploy (401 senza password, 401 con la password
+sbagliata, 200 con quella giusta, header, robots, fascia, assenza di analytics)
+ed esce rosso se una salta, anche a deploy riuscito.
 `tests/integration/test_staging.py` sorveglia le stesse cose nella suite, così
 la modalità non si rompe in silenzio fra un deploy e l'altro.
 
@@ -286,10 +288,57 @@ Per spegnerlo:
 gcloud run services delete diset-viz-staging --region europe-west1
 ```
 
-Se preferisci uno stage che si aggiorni da sé a ogni push di un branch, il
-sostituto è un secondo trigger Cloud Build su `cloudbuild.yaml` con il servizio
-e `STAGING=1` diversi. Lo script resta comunque il modo più corto per guardare
-un worktree che non hai ancora committato.
+### La password
+
+Non si sceglie e non sta nel repo. Al primo deploy lo script ne genera una, la
+lascia sul servizio Cloud Run e la stampa; ai deploy successivi la **rilegge da
+lì**, così il link che hai dato a qualcuno continua a funzionare dopo ogni
+rilascio. Per rileggerla:
+
+```bash
+gcloud run services describe diset-viz-staging --region europe-west1 \
+  --format='value(spec.template.spec.containers[0].env.filter("name:STAGING_PASSWORD").extract("value"))'
+```
+
+Per imporne una tua: `STAGING_PASSWORD=... bin/deploy-staging` (solo lettere,
+cifre e `. _ ~ -`: la virgola separa le variabili d'ambiente di `gcloud`, e una
+password troncata rifiuterebbe proprio chi usa quella giusta).
+
+L'utente è `divario`, e si cambia con `STAGING_USER`.
+
+`/robots.txt` resta leggibile **senza** password, apposta: è il documento che
+vieta la scansione, e dietro un 401 un crawler vedrebbe un errore invece di un
+divieto. Su stage quel file nega tutto, quindi non espone niente.
+
+In locale, `STAGING=1` senza password lascia lo stage aperto: l'anteprima sul
+proprio portatile non ha niente da proteggere. Sul servizio deployato la
+password c'è sempre, perché la mette lo script.
+
+### Il branch `stage`, che si deploya da sé
+
+```bash
+bin/setup-staging-trigger     # una volta sola
+git push origin stage         # da qui in poi, ogni volta
+```
+
+`bin/setup-staging-trigger` crea un trigger Cloud Build gemello di quello di
+`master`, puntato su `cloudbuild-staging.yaml` e sul branch `stage`. È
+idempotente: se il trigger c'è già lo dice e si ferma, invece di crearne un
+secondo che deployerebbe due volte a ogni push.
+
+`cloudbuild-staging.yaml` fa girare la suite, costruisce l'immagine, la pubblica
+nello **stesso** Artifact Registry della produzione con un nome diverso
+(`diset-viz-staging`), e poi esegue `bin/deploy-staging` passandogli l'immagine
+in `STAGING_IMAGE`. Il deploy automatico e quello a mano sono quindi **lo stesso
+script**, e passano dalle stesse verifiche: due copie della stessa procedura
+restano uguali finché qualcuno non ne cambia una sola, e quel giorno lo stage
+smetterebbe di proteggersi senza che nessun test se ne accorga.
+
+Se la build fallisce sul passo di deploy, alla service account di Cloud Build
+mancano `roles/run.admin` e `roles/iam.serviceAccountUser`.
+
+Lo script a mano resta il modo più corto per guardare un worktree che non hai
+ancora committato.
 
 ## Deploy automatico
 

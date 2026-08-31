@@ -18,6 +18,20 @@ SITE_URL = os.getenv("SITE_URL", "https://divarioitalia.it").rstrip("/")
 # quelle variabili non si impostano.
 STAGING = os.getenv("STAGING", "").strip().lower() in ("1", "true", "yes", "on")
 
+# Password dello stage. Una copia intera del sito su una URL pubblica resta
+# leggibile da chiunque la indovini o la trovi in un Referer, e `noindex` parla
+# ai crawler educati, non alle persone: la fascia rossa dice che non e' il sito
+# vero, non impedisce di leggerlo. Con `STAGING_PASSWORD` impostata ogni
+# risposta passa da un Basic Auth (vedi `staging_password_gate`).
+#
+# Vuota lo stage resta aperto, ed e' voluto: serve alla anteprima locale
+# (`STAGING=1 gunicorn ...`), dove non c'e' niente da proteggere. Sul servizio
+# deployato la password c'e' sempre, perche' `bin/deploy-staging` ne genera una
+# quando non gliene viene data una, e verifica via HTTP che senza credenziali
+# si prenda un 401.
+STAGING_USER = os.getenv("STAGING_USER", "").strip() or "divario"
+STAGING_PASSWORD = os.getenv("STAGING_PASSWORD", "")
+
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv("SECRET_KEY", "")
