@@ -1,0 +1,70 @@
+# Build + deploy dello STAGE a ogni push sul branch `stage`.
+#
+# Gemello di cloudbuild.yaml, che fa la stessa cosa da `master` verso la
+# produzione. Le differenze sono tre e stanno tutte qui sotto:
+#
+#   1. il servizio e' `diset-viz-staging`, non `diset-viz`;
+#   2. l'ambiente lo imposta bin/deploy-staging (STAGING=1 e la password), non
+#      questo file;
+#   3. il deploy non e' l'ultimo passo: dopo c'e' la verifica via HTTP che lo
+#      stage sia davvero chiuso e davvero noindex, e se salta il build e' rosso.
+#
+# Il passo di deploy esegue **lo stesso script** che si lancia dal portatile
+# (`bin/deploy-staging`), passandogli l'immagine gia' costruita in STAGING_IMAGE.
+# Non e' pigrizia: e' l'unico modo perche' il deploy automatico e quello a mano
+# non divergano. Due copie della stessa procedura restano uguali finche' qualcuno
+# non ne cambia una sola, e quel giorno lo stage smette di proteggersi senza che
+# nessun test se ne accorga.
+#
+# L'Artifact Registry e' quello che c'e' gia' (`cloud-run-source-deploy`), con
+# un nome immagine diverso: niente da creare.
+steps:
+  # GATE: gli stessi test della produzione. Uno stage che gira codice che non
+  # passa i test non dice niente su cosa succedera' in master.
+  - name: 'python:3.12-slim'
+    id: test
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        apt-get update -qq && apt-get install -y -qq --no-install-recommends git
+        pip install --quiet -r requirements.txt
+        python -m unittest discover -s tests
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: build
+    args:
+      - 'build'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/diset-viz-staging:${SHORT_SHA}'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: push
+    args:
+      - 'push'
+      - 'europe-west1-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/diset-viz-staging:${SHORT_SHA}'
+
+  # Deploy + verifiche, con lo script di sempre. La password non sta qui e non
+  # sta nel repo: al primo deploy lo script ne genera una e la lascia sul
+  # servizio, ai deploy successivi la rilegge da li'. Quindi il link che hai in
+  # mano continua a funzionare a ogni push, e la password si legge con
+  #   gcloud run services describe diset-viz-staging --region europe-west1 \
+  #     --format='value(spec.template.spec.containers[0].env.filter("name:STAGING_PASSWORD").extract("value"))'
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: deploy-and-verify
+    entrypoint: bash
+    env:
+      - 'STAGING_IMAGE=europe-west1-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/diset-viz-staging:${SHORT_SHA}'
+    args:
+      - -c
+      - |
+        set -euo pipefail
+        bin/deploy-staging
+
+images:
+  - 'europe-west1-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/diset-viz-staging:${SHORT_SHA}'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

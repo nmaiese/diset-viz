@@ -1,9 +1,10 @@
 import hashlib
+import hmac
 import os
 import secrets
 from functools import lru_cache
 
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import Flask, Response, jsonify, redirect, render_template, request, url_for
 from flask_compress import Compress
 
 from app import config
@@ -43,6 +44,62 @@ def asset_url(filename):
 
 
 app.jinja_env.globals["asset_url"] = asset_url
+
+
+# /robots.txt resta leggibile senza password anche sullo stage. Non e' una
+# concessione: e' il documento che dice ai crawler di non entrare, e vale solo
+# se lo possono leggere. Dietro al 401 un crawler vedrebbe un errore, non un
+# divieto, e le due cose non si equivalgono per tutti i bot. Non espone niente:
+# su stage quel file e' due righe che negano tutto.
+_STAGING_OPEN_PATHS = frozenset({"/robots.txt"})
+
+
+@app.before_request
+def staging_password_gate():
+    """Basic Auth su tutto lo stage, quando `STAGING_PASSWORD` e' impostata.
+
+    Registrata prima di ogni altro `before_request` apposta: un redirect o una
+    view che rispondesse prima del controllo servirebbe contenuto a chi non ha
+    la password, che e' esattamente cio' che questa funzione esiste per
+    impedire.
+
+    A stage spento non fa niente, e non deve: la produzione non ha una password
+    e questo ramo non e' un posto dove aggiungergliela per sbaglio.
+    """
+    if not (config.STAGING and config.STAGING_PASSWORD):
+        return None
+    if request.path in _STAGING_OPEN_PATHS:
+        return None
+
+    auth = request.authorization
+    if auth is not None and (auth.type or "").lower() == "basic":
+        # `compare_digest` su byte, non su str: la versione str esplode con
+        # TypeError se la password contiene un carattere non ASCII, e una
+        # password rifiutata con un 500 invece che con un 401 e' un guasto che
+        # si scopre tardi. I due confronti si valutano entrambi prima dell'`and`
+        # per non far dipendere il tempo di risposta dal nome utente.
+        user_ok = hmac.compare_digest(
+            (auth.username or "").encode("utf-8"), config.STAGING_USER.encode("utf-8")
+        )
+        password_ok = hmac.compare_digest(
+            (auth.password or "").encode("utf-8"), config.STAGING_PASSWORD.encode("utf-8")
+        )
+        if user_ok and password_ok:
+            return None
+
+    return Response(
+        "Ambiente di stage di Divario Italia. Serve la password.\n"
+        "Il sito pubblico e' su https://divarioitalia.it\n",
+        status=401,
+        headers={
+            "WWW-Authenticate": 'Basic realm="Divario Italia, ambiente di stage", charset="UTF-8"',
+            "Content-Type": "text/plain; charset=utf-8",
+            # Una risposta di autenticazione non si mette in cache: ne' nel
+            # browser, ne' in un proxy davanti a Cloud Run.
+            "Cache-Control": "no-store",
+        },
+    )
+
 
 
 @app.before_request
