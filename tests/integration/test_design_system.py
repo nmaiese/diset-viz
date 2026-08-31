@@ -1,7 +1,7 @@
-"""La migrazione al design system 2026, e i due modi in cui puo' rompersi.
+"""Il design system 2026, e i tre modi in cui puo' tornare indietro.
 
-Non sorveglia l'aspetto, che non e' cosa da test: sorveglia le due invarianti
-che, saltando, non fanno fallire niente e si vedono solo aprendo il sito.
+Non sorveglia l'aspetto, che non e' cosa da test: sorveglia le invarianti che,
+saltando, non fanno fallire niente e si vedono solo aprendo il sito.
 
 1. **Le due shell dell'atlante si migrano insieme.** `app.html` e
    `confronto.html` montano lo STESSO bundle React. Se una delle due perde
@@ -9,10 +9,19 @@ che, saltando, non fanno fallire niente e si vedono solo aprendo il sito.
    due palette diverse a seconda della URL da cui la si apre, e nessuna pagina
    e' rotta abbastanza da accorgersene.
 
-2. **La migrazione resta opt-in.** Una pagina non ancora migrata deve restare
-   esattamente com'era. Il modo silenzioso di sbagliare e' il contrario di
-   quello che si teme: non "la pagina nuova non e' migrata", ma "il chrome
-   nuovo e' finito addosso a venti pagine che nessuno ha guardato".
+2. **Il chrome vecchio non torna.** Finche' i due sistemi convivevano, questo
+   file sorvegliava il confine: che il chrome nuovo non debordasse sulle pagine
+   non ancora migrate. Quel confine non esiste piu' e la domanda si e'
+   rovesciata, perche' ora il guasto e' il ritorno del masthead legacy, non la
+   sua sopravvivenza.
+
+3. **La rampa dei dati resta `var(--seq-N)`.** Un colore cotto nel markup non
+   segue il tema scuro: lascia la mappa sulla scala chiara mentre il resto
+   della pagina e' scuro, e nessuna pagina risulta rotta.
+
+Le shell della SPA restano fuori dai controlli sul markup del chrome: hanno un
+masthead React proprio, che porta la navigazione dentro l'applicazione senza
+ricaricare. Con le altre pagine devono condividere il design system, non l'HTML.
 """
 import re
 import unittest
@@ -25,10 +34,8 @@ from app.cache import cache
 # aggiunta qui, ed e' il punto: la lista e' il contratto.
 SPA_ROUTES = ("/atlante", "/confronto")
 
-# Un campione di ogni famiglia di pagina. Da quando la migrazione e' finita non
-# ci sono piu' due elenchi: c'e' un elenco solo, e la seconda invariante non e'
-# piu' "il chrome nuovo non deborda" ma "il chrome vecchio non torna".
-# Le pagine servite da Jinja col chrome condiviso (`_ds_header.html`).
+# Un campione di ogni famiglia di pagina servita da Jinja, cioe' quelle che
+# condividono `_ds_header.html`.
 JINJA_PAGES = ("/", "/blog", "/regioni", "/temi", "/metodologia",
                "/qualita-della-vita", "/quiz", "/ricerca?q=lavoro",
                "/divari-regionali", "/chi-siamo", "/privacy", "/catalogo-dati",
