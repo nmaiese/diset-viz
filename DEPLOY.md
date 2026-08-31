@@ -250,6 +250,47 @@ gcloud run deploy diset-viz \
   --memory 512Mi
 ```
 
+## Ambiente di stage
+
+Una copia intera del sito su una seconda URL, per guardare una modifica prima
+che tocchi la produzione. Dalla radice del repo, sul branch che vuoi vedere:
+
+```bash
+bin/deploy-staging
+```
+
+Lo script deploya un servizio Cloud Run **separato** (`diset-viz-staging`,
+stessa region) e stampa la URL. Deploya il worktree **com'è**, comprese le
+modifiche non committate: uno stage che deploya `master` non servirebbe a
+decidere se mandare qualcosa in `master`.
+
+Il servizio non eredita niente dalla produzione, e sono tre proprietà, non tre
+dettagli:
+
+| | perché |
+|---|---|
+| `--set-env-vars STAGING=1` e nient'altro | azzera l'ambiente. GTM, GA4, AdSense e le verifiche di proprietà sono già env-gated: assenti, restano spenti. |
+| nessuna `DATABASE_URL` | l'app cade sullo SQLite effimero del container. Lo stage **non può scrivere** sul Postgres di produzione: nessun account e nessuna classifica reale vengono toccati. |
+| `STAGING=1` | ogni risposta esce `noindex, nofollow, noarchive`, `/robots.txt` diventa `Disallow: /`, e una fascia rossa in cima dichiara che non è il sito vero. |
+
+La terza riga è quella che conta di più: senza, Google si troverebbe un
+duplicato completo di divarioitalia.it su un secondo dominio. Lo script verifica
+tutte e quattro le condizioni dopo il deploy (header, robots, fascia, assenza di
+analytics) ed esce rosso se una salta, anche a deploy riuscito.
+`tests/integration/test_staging.py` sorveglia le stesse cose nella suite, così
+la modalità non si rompe in silenzio fra un deploy e l'altro.
+
+Per spegnerlo:
+
+```bash
+gcloud run services delete diset-viz-staging --region europe-west1
+```
+
+Se preferisci uno stage che si aggiorni da sé a ogni push di un branch, il
+sostituto è un secondo trigger Cloud Build su `cloudbuild.yaml` con il servizio
+e `STAGING=1` diversi. Lo script resta comunque il modo più corto per guardare
+un worktree che non hai ancora committato.
+
 ## Deploy automatico
 
 Configura un trigger Cloud Build sul repository GitHub, branch `^master$`, build

@@ -2276,6 +2276,15 @@ _ROBOTS_DISALLOW_PATHS = ("/api/", "/data", "/legacy", "/legacy-reddito")
 
 @app.route("/robots.txt")
 def robots():
+    if config.STAGING:
+        # Una copia intera del sito su una seconda URL non va scansionata da
+        # nessuno, e il robots.txt di produzione qui direbbe il contrario
+        # (`Allow: /` piu' la sitemap del dominio vero).
+        return Response(
+            "# Ambiente di stage di Divario Italia. Non e' il sito pubblico.\n"
+            "User-agent: *\nDisallow: /\n",
+            mimetype="text/plain",
+        )
     lines = [_ROBOTS_CONTENT_SIGNALS_PREAMBLE, ""]
     # Default group: content signals, then the shared path rules for all crawlers.
     lines += ["User-agent: *", f"Content-Signal: {_ROBOTS_CONTENT_SIGNAL}", "Allow: /"]

@@ -122,7 +122,13 @@ def add_security_headers(response):
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Content-Security-Policy"] = _build_content_security_policy()
     request_path = request.path
-    if request_path in _NOINDEX_EXACT_PATHS or request_path.startswith(_NOINDEX_PATH_PREFIXES):
+    if config.STAGING:
+        # Lo stage è il sito intero su una seconda URL: qui il default-deny va
+        # rovesciato, e senza eccezioni. Sovrascrive anche l'`X-Robots-Tag` che
+        # una view ha già impostato, perché su stage nessuna pagina è più
+        # indicizzabile di così, mai.
+        response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
+    elif request_path in _NOINDEX_EXACT_PATHS or request_path.startswith(_NOINDEX_PATH_PREFIXES):
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive"
     elif "X-Robots-Tag" not in response.headers:
         # Default-deny: force an explicit index signal on every public response
@@ -173,6 +179,7 @@ def inject_site_config():
     return {
         "SITE_NAME": config.SITE_NAME,
         "SITE_URL": config.SITE_URL,
+        "STAGING": config.STAGING,
         "GA_MEASUREMENT_ID": config.GA_MEASUREMENT_ID,
         "GOOGLE_TAG_MANAGER_ID": config.GOOGLE_TAG_MANAGER_ID,
         "ADSENSE_CLIENT": config.ADSENSE_CLIENT,

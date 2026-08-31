@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Confronta le regioni italiane</title>
     <meta name="description" content="Scegli due o tre regioni e mettile a confronto su un indicatore: valore dell'ultimo anno, posizione in classifica e serie storica.">
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    {% if STAGING %}<meta name="robots" content="noindex, nofollow, noarchive">{% else %}<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">{% endif %}
     <link rel="canonical" href="{{ SITE_URL }}/confronto">
     <meta property="og:title" content="Confronta le regioni italiane">
     <meta property="og:type" content="website">

@@ -3,6 +3,21 @@ import os
 SITE_NAME = "Divario Italia"
 SITE_URL = os.getenv("SITE_URL", "https://divarioitalia.it").rstrip("/")
 
+# Ambiente di stage: una copia intera del sito su un'altra URL, per guardare una
+# modifica prima che tocchi la produzione. Cambia tre cose e nient'altro:
+#
+#   1. ogni risposta esce `noindex, nofollow, noarchive`,
+#   2. /robots.txt vieta tutto,
+#   3. una fascia in cima dichiara che non è il sito vero.
+#
+# I punti 1 e 2 non sono cosmesi: senza, Google indicizzerebbe un duplicato
+# completo del sito su un secondo dominio, e la SEO tecnica di divarioitalia.it
+# è una cosa che questo repo si è già dovuto riprendere una volta (vedi il
+# default-deny in `add_security_headers`). Analytics, AdSense e le verifiche di
+# proprietà si spengono da sé: sono già env-gated, e sul servizio di stage
+# quelle variabili non si impostano.
+STAGING = os.getenv("STAGING", "").strip().lower() in ("1", "true", "yes", "on")
+
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = os.getenv("SECRET_KEY", "")

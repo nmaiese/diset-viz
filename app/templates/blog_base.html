@@ -6,7 +6,7 @@
     <title>{% block title %}{{ site_name }}{% endblock %}</title>
     <meta name="description" content="{% block description %}Dati e analisi sul divario territoriale italiano.{% endblock %}">
     {% block robots_meta %}
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    {% if STAGING %}<meta name="robots" content="noindex, nofollow, noarchive">{% else %}<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">{% endif %}
     {% endblock %}
     <link rel="canonical" href="{{ canonical }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
@@ -60,6 +60,7 @@
   </head>
   <body{% if ds_page %} class="ds sitechrome"{% endif %}>
     {% include "_third_party_body.html" %}
+    {% if STAGING %}{% include "_staging_banner.html" %}{% endif %}
     {% if ds_page %}
     {% include "_ds_header.html" %}
     {% else %}

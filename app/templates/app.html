@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Divario Italia: Atlante degli indicatori territoriali</title>
     <meta name="description" content="Atlante di indicatori territoriali Istat: confronta regioni, temi, serie storiche e dati sullo sviluppo dei territori italiani.">
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    {% if STAGING %}<meta name="robots" content="noindex, nofollow, noarchive">{% else %}<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">{% endif %}
     <link rel="canonical" href="{{ SITE_URL }}/atlante">
     <meta property="og:title" content="Divario Italia: Atlante degli indicatori territoriali">
     <meta property="og:type" content="website">
@@ -25,6 +25,7 @@
   </head>
   <body>
     {% include "_third_party_body.html" %}
+    {% if STAGING %}{% include "_staging_banner.html" %}{% endif %}
     <div id="root">
       <main class="spa-seo-fallback">
         <h1>Atlante degli indicatori territoriali italiani</h1>
