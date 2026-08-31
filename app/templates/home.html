@@ -2,7 +2,6 @@
 {% set active_nav = 'home' %}
 {# Prima pagina migrata al design system 2026: attiva font, token e chrome
    nuovi. Vedi blog_base.html per il meccanismo. #}
-{% set ds_page = true %}
 
 {% block title %}{{ site_name }}: l'atlante degli indicatori territoriali {{ sources_label }}{% endblock %}
 {% block description %}{{ total_indicators }} indicatori {{ sources_label }}, 20 regioni, dal {{ year_min }} al {{ year_max }}. Mappa interattiva, schede regione, confronti, qualità della vita, quiz e storie dai dati.{% endblock %}

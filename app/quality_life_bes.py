@@ -20,18 +20,23 @@ BES); provinces use BES dei Territori, the only source available at that level.
 import statistics
 from collections import defaultdict
 
-# Sequential choropleth ramp, matching --map-ramp-from/--map-ramp-to in the
-# frontend tokens (frontend/src/styles.css, app/static/css/site.css).
-_MAP_RAMP_FROM = (0xE7, 0xEC, 0xF3)
-_MAP_RAMP_TO = (0x15, 0x23, 0x3B)
+# La rampa sequenziale del design system, la stessa di ogni altra mappa del
+# sito. Importata e non ricopiata: questo modulo ne aveva una copia propria dei
+# due estremi blu legacy, ed e' cosi' che due mappe della stessa Italia
+# finiscono con due scale diverse.
+from app.indicator_notes import ds_ramp_color as _ds_ramp_color
 
 
 def _score_color(score, lo, hi):
-    """Hex fill for a 0-100 score, interpolated along the brand's map ramp."""
+    """Gradino della rampa per un punteggio 0-100.
+
+    Restituisce `var(--seq-N)` e non un hex: i gradini sono ridefiniti sotto
+    <html data-theme="dark">, quindi un colore cotto qui lascerebbe la mappa
+    sulla rampa chiara con il resto della pagina scuro.
+    """
     span = hi - lo
     t = 0.5 if span <= 0 else max(0.0, min(1.0, (score - lo) / span))
-    rgb = tuple(round(a + (b - a) * t) for a, b in zip(_MAP_RAMP_FROM, _MAP_RAMP_TO))
-    return "#{:02x}{:02x}{:02x}".format(*rgb)
+    return _ds_ramp_color(t)
 
 from app import sources
 from app.cache import cache

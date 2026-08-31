@@ -2552,7 +2552,11 @@ def _map_hero(indicator_ids):
         "indicator_path": meta["path"],
         "theme": meta["theme"],
         "year": year,
-        "colors": indicator_notes.region_choropleth_colors(values),
+        # La rampa del design system, come ogni altra mappa del sito da quando
+        # la migrazione e' finita: `_map_panel.html` lo usa la home e lo usa
+        # /divari-regionali, e due mappe della stessa Italia non possono avere
+        # due scale di colore.
+        "colors": indicator_notes.ds_choropleth_colors(values),
         "tooltip_data": tooltip_data,
     }
 

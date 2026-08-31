@@ -23,12 +23,14 @@
     {% include "_third_party_head.html" %}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    {# Migrazione al design system 2026. Le pagine gia convertite dichiarano
-       `{% set ds_page = true %}` e ricevono i font, i token e il chrome nuovi;
-       tutte le altre restano esattamente come sono finche non tocca a loro.
-       Quando l'ultima pagina sara migrata, il ramo `else` e css/site.css
-       spariscono insieme. #}
-    {% if ds_page %}
+    {# Design system 2026, per tutte le pagine. La migrazione era opt-in per
+       pagina (`ds_page`) finche' i due sistemi convivevano: ora che non ne
+       resta nessuna sul chrome vecchio, il ramo e' sparito e non c'e' piu' una
+       pagina che possa dimenticarsi di dichiararlo.
+
+       L'ordine conta: `ds/system.css` porta i token, `site.css` le componenti
+       delle pagine (scritte sui nomi di quei token), `ds/chrome.css` l'header
+       e il footer condivisi. #}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&family=Public+Sans:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
     <link rel="stylesheet" href="{{ asset_url('css/site.css') }}">
@@ -47,111 +49,18 @@
         }
       } catch (e) {}
     </script>
-    {% else %}
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
-    <link rel="stylesheet" href="{{ asset_url('css/site.css') }}">
-    <script src="{{ url_for('static', filename='js/nav-underline.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/menu.js') }}" defer></script>
-    {% endif %}
     {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
     <script type="module" crossorigin src="{{ asset_url('dist/assets/site.js') }}"></script>
     {% endif %}
     {% block head_extra %}{% endblock %}
   </head>
-  <body{% if ds_page %} class="ds sitechrome"{% endif %}>
+  <body class="ds sitechrome">
     {% include "_third_party_body.html" %}
     {% if STAGING %}{% include "_staging_banner.html" %}{% endif %}
-    {% if ds_page %}
     {% include "_ds_header.html" %}
-    {% else %}
-    <header class="masthead">
-      <a class="brand" href="/">
-        <img class="brand-mark" src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="" width="38" height="38">
-        <span class="brand-text">
-          <strong>Divario Italia</strong>
-          <small>Atlante degli indicatori territoriali</small>
-        </span>
-      </a>
-      <nav id="masthead-nav" class="masthead__links">
-        <a href="/atlante" class="{{ 'is-active' if active_nav == 'atlas' else '' }}">Atlante</a>
-        <a href="/regioni" class="{{ 'is-active' if active_nav == 'regioni' else '' }}">Regioni</a>
-        <a href="/temi" class="{{ 'is-active' if active_nav == 'temi' else '' }}">Temi</a>
-        <a href="/qualita-della-vita" class="{{ 'is-active' if active_nav == 'qualita-della-vita' else '' }}">Qualità della vita</a>
-        <a href="/quiz" class="{{ 'is-active' if active_nav == 'gioco' else '' }}">Quiz Italia</a>
-        <a href="/metodologia" class="{{ 'is-active' if active_nav == 'metodologia' else '' }}">Metodologia</a>
-        <a href="/blog" class="{{ 'is-active' if active_nav == 'blog' else '' }}">Blog</a>
-        <span class="nav-underline" aria-hidden="true"></span>
-      </nav>
-      <a class="masthead__search" href="/ricerca" aria-label="Cerca nel sito">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="m21 21-4.3-4.3"></path>
-        </svg>
-      </a>
-      {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
-      {# Placeholder a dimensioni fisse per il controllo login: il bundle site.js
-         lo riempie. Riservare lo spazio evita il layout shift su ogni pagina. #}
-      <div id="site-auth" class="site-auth" aria-label="Account"></div>
-      {% endif %}
-      <button type="button" class="masthead__menu" id="menu-toggle" aria-label="Apri menu" aria-expanded="false" aria-controls="mobile-menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-          <path d="M3 6h18"></path><path d="M3 12h18"></path><path d="M3 18h18"></path>
-        </svg>
-      </button>
-    </header>
-
-    <div class="mobmenu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu di navigazione" hidden>
-      <div class="mobmenu__head">
-        <a class="brand" href="/">
-          <img class="brand-mark" src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="" width="30" height="30">
-          <strong>Divario Italia</strong>
-        </a>
-        <button type="button" class="mobmenu__close" id="menu-close" aria-label="Chiudi menu">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-            <path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>
-          </svg>
-        </button>
-      </div>
-      <div class="mobmenu__search">
-        <p class="mobmenu__eyebrow">Menu</p>
-        {# /ricerca, non /atlante: la ricerca del sito deve rispondere anche senza
-           JavaScript e comprendere gli articoli, non solo il catalogo. #}
-        <form action="/ricerca" method="get" role="search">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-            <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>
-          </svg>
-          <input type="search" name="q" id="menu-search" placeholder="Cerca un indicatore, una regione" aria-label="Cerca un indicatore o una regione">
-        </form>
-      </div>
-      <nav class="mobmenu__nav" aria-label="Tutte le sezioni">
-        <p class="mobmenu__group">Esplora i dati</p>
-        <a class="mobmenu__item {{ 'is-active' if active_nav == 'atlas' }}" href="/atlante"><span>Atlante</span><span class="k">Mappa e indicatori</span></a>
-        <a class="mobmenu__item {{ 'is-active' if active_nav == 'regioni' }}" href="/regioni"><span>Regioni</span><span class="k">20 schede</span></a>
-        <a class="mobmenu__item {{ 'is-active' if active_nav == 'temi' }}" href="/temi"><span>Temi</span><span class="k">Per macro-area</span></a>
-        <a class="mobmenu__item" href="/confronto"><span>Confronta</span><span class="k">Regione contro regione</span></a>
-        <a class="mobmenu__item {{ 'is-active' if active_nav == 'divari' }}" href="/divari-regionali"><span>Divari regionali</span><span class="k">Nord, Centro, Mezzogiorno</span></a>
-
-        <p class="mobmenu__group">Classifiche</p>
-        <a class="mobmenu__item {{ 'is-active' if active_nav == 'qualita-della-vita' }}" href="/qualita-della-vita/classifica/regioni"><span>Qualità della vita, regioni</span><span class="k">Classifica regioni</span></a>
-        <a class="mobmenu__item" href="/qualita-della-vita/classifica/province"><span>Qualità della vita, province</span><span class="k">Classifica province</span></a>
-
-        <p class="mobmenu__group">Gioca e leggi</p>
-        <a class="mobmenu__item {{ 'is-active' if active_nav == 'gioco' }}" href="/quiz"><span>Quiz Italia</span><span class="k">Tre giochi</span></a>
-        <a class="mobmenu__item {{ 'is-active' if active_nav == 'blog' }}" href="/blog"><span>Blog</span><span class="k">Data stories</span></a>
-
-        <p class="mobmenu__group">Il progetto</p>
-        <a class="mobmenu__item {{ 'is-active' if active_nav == 'metodologia' }}" href="/metodologia"><span>Metodologia</span><span class="k">Metodo e fonti</span></a>
-        <a class="mobmenu__item {{ 'is-active' if active_nav == 'progetto' }}" href="/chi-siamo"><span>Chi siamo</span><span class="k">Editore e correzioni</span></a>
-      </nav>
-      <div class="mobmenu__foot">
-        <a href="/privacy">Privacy e cookie</a>
-      </div>
-    </div>
-    {% endif %}
 
     {% block content %}{% endblock %}
 
-    {% if ds_page %}
     {# Footer del design system 2026. Vive qui e non in un include perche
        privacy.html deve poter svuotare `footer_privacy_settings`, e un blocco
        dentro un include non e sovrascrivibile dalle pagine figlie. #}
@@ -202,12 +111,5 @@
         {% endblock %}
       </div>
     </footer>
-    {% else %}
-    <footer class="site-footer">
-      <span>{{ site_name }} · dati <a href="https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/" target="_blank" rel="noopener noreferrer">Istat</a>, indicatori territoriali per le politiche di sviluppo</span>
-      <span><a href="/atlante">Esplora l'atlante</a> · <a href="/divari-regionali">Divari regionali</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/chi-siamo">Chi siamo</a> · <a href="/blog">Tutti gli articoli</a> · <a href="/privacy">Privacy e cookie</a></span>
-      {{ self.footer_privacy_settings() }}
-    </footer>
-    {% endif %}
   </body>
 </html>
