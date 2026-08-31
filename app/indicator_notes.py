@@ -308,7 +308,6 @@ THEME_CAVEATS = {
 }
 
 
-
 LOWER_IS_BETTER = (
     "abbandono",
     "criminal",
@@ -1351,13 +1350,6 @@ def _direction(name):
     return "contextual"
 
 
-# Same two hex stops as --map-ramp-from/--map-ramp-to (colors.css) and the
-# SPA's MAP_RAMP (frontend/src/main.jsx): a linear RGB interpolation, not a
-# perceptual color space, to stay pixel-identical with the interactive map.
-_MAP_RAMP_FROM = (0xE7, 0xEC, 0xF3)
-_MAP_RAMP_TO = (0x15, 0x23, 0x3B)
-
-
 # Rampa sequenziale teal del design system 2026, per le pagine gia' migrate.
 #
 # Sono nomi di custom property e non hex apposta: `--seq-1..6` vengono
@@ -1384,8 +1376,8 @@ def ds_ramp_color(fraction):
 def ds_choropleth_colors(values):
     """{region_key: "var(--seq-N)"} sulla rampa del design system.
 
-    Stessa scalatura di `region_choropleth_colors`, che resta la rampa blu
-    legacy finche' le pagine che la usano non sono migrate a loro volta.
+    Unica rampa del sito: la migrazione al design system e' finita, e la
+    vecchia scala blu (interpolata fra due estremi) non ha piu' chiamanti.
     """
     numeric = [row["value"] for row in values if row.get("value") is not None]
     if not numeric:
@@ -1399,32 +1391,10 @@ def ds_choropleth_colors(values):
     }
 
 
-def region_choropleth_colors(values):
-    """Per-region hex fill for the static indicator-page choropleth: {region_key: "#rrggbb"},
-    scaled over the raw value range like the SPA's d3.scaleSequential(MAP_RAMP)."""
-    numeric = [row["value"] for row in values if row.get("value") is not None]
-    if not numeric:
-        return {}
-    lo, hi = min(numeric), max(numeric)
-    span = hi - lo
-    colors = {}
-    for row in values:
-        value = row.get("value")
-        if value is None:
-            continue
-        t = (value - lo) / span if span else 1.0
-        rgb = tuple(
-            round(_MAP_RAMP_FROM[i] + (_MAP_RAMP_TO[i] - _MAP_RAMP_FROM[i]) * t)
-            for i in range(3)
-        )
-        colors[row["region_key"]] = "#%02x%02x%02x" % rgb
-    return colors
-
-
 def cover_bars(values, best, worst, scoreable, limit=4):
     """Top `limit` regions (already best-to-worst ordered) plus the worst one,
     for the auto-generated indicator cover card's bar chart. Bar width is the
-    value scaled over the full observed range, like region_choropleth_colors."""
+    value scaled over the full observed range, like ds_choropleth_colors."""
     if not values:
         return []
     numeric = [row["value"] for row in values if row.get("value") is not None]
