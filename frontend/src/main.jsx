@@ -19,7 +19,9 @@ import {
   LineChart,
   MapPinned,
   Minus,
+  Moon,
   Search,
+  Sun,
   TrendingDown,
   TrendingUp,
   Trophy,
@@ -49,8 +51,64 @@ const SORTS = [
   { id: "theme", label: "Tema" },
 ];
 
-const MAP_RAMP = (t) => d3.interpolate("#E7ECF3", "#15233B")(t);
-const MISSING_FILL = "#E2E0D8";
+// Rampa sequenziale del design system 2026, a sei gradini. Sono nomi di custom
+// property e non colori: `--seq-1..6` vengono ridefinite sotto
+// <html data-theme="dark">, quindi la mappa segue il tema invece di restare
+// sulla rampa chiara. Sono gli stessi sei gradini che dipinge il server
+// (DS_SEQ_RAMP in app/indicator_notes.py), cosi' l'atlante e la pagina
+// indicatore non mostrano due mappe diverse dello stesso dato.
+//
+// Sceglie il gradino invece di interpolare: `var()` non si puo' interpolare, e
+// una legenda a sei blocchi netti e' anche piu' onesta di una sfumatura
+// continua, perche' la mappa ha davvero sei livelli e non un continuo.
+// Interruttore del tema, gemello di quello di `_ds_header.html`.
+//
+// Esiste in React e non riusa ds-chrome.js perche' quello script lega i bottoni
+// una volta sola all'esecuzione, quando l'atlante non ha ancora montato niente:
+// un bottone renderizzato dopo non verrebbe mai agganciato. Stessa chiave di
+// localStorage e stesso effetto sul DOM, cosi' il tema scelto qui vale su tutto
+// il sito e viceversa. Senza, l'atlante era l'unica pagina che il tema scuro lo
+// subiva e non lo sapeva cambiare.
+const THEME_KEY = "divario-theme";
+
+function readStoredTheme() {
+  try {
+    return localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
+  } catch (e) {
+    return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+  }
+}
+
+function ThemeToggle() {
+  const [theme, setTheme] = useState(readStoredTheme);
+
+  useEffect(() => {
+    if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
+    else document.documentElement.removeAttribute("data-theme");
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch (e) {}
+  }, [theme]);
+
+  const dark = theme === "dark";
+  const label = dark ? "Passa al tema chiaro" : "Passa al tema scuro";
+  return (
+    <button
+      type="button"
+      className="masthead__theme"
+      onClick={() => setTheme(dark ? "light" : "dark")}
+      aria-pressed={dark}
+      aria-label={label}
+      title={label}
+    >
+      {dark ? <Sun size={18} /> : <Moon size={18} />}
+    </button>
+  );
+}
+
+const SEQ_STOPS = ["var(--seq-1)", "var(--seq-2)", "var(--seq-3)", "var(--seq-4)", "var(--seq-5)", "var(--seq-6)"];
+const MAP_RAMP = (t) => SEQ_STOPS[Math.min(SEQ_STOPS.length - 1, Math.max(0, Math.floor(t * SEQ_STOPS.length)))];
+const MISSING_FILL = "var(--data-null)";
 
 // Vista da aprire quando la pagina che ha montato il bundle ne ha una sua e la
 // query non dice altro. La imposta il template server (window.__diInitialView in
@@ -512,6 +570,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
         >
           <Search size={18} />
         </a>
+        <ThemeToggle />
         <AuthControl />
       </header>
 
@@ -1581,7 +1640,12 @@ function MovementList({ items, moveMax, dir, onOpen }) {
 /* Compare (multi-region) view                                        */
 /* ------------------------------------------------------------------ */
 
-const COMPARE_SERIES_COLORS = ["var(--accent)", "var(--ink)", "var(--positive)"];
+// Serie categoriali del design system, ordinate per separazione e sicure per
+// i daltonismi. Erano accento/inchiostro/verde: l'inchiostro e' il colore del
+// TESTO, e una serie dipinta col nero pesa piu' delle altre due senza volerlo
+// dire, mentre il verde diceva "buono" su un grafico dove le tre regioni sono
+// solo tre regioni. Qui il colore identifica una serie e basta.
+const COMPARE_SERIES_COLORS = ["var(--cat-1)", "var(--cat-2)", "var(--cat-3)"];
 const COMPARE_MAX_REGIONS = 3;
 
 function CompareTimeline({ seriesList, averageSeries, selectedYear, onYear, unit }) {
@@ -2285,7 +2349,7 @@ function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false
               key={key}
               d={path(feature)}
               className={isSelected ? "is-selected" : ""}
-              fill={neutral ? MISSING_FILL : hasValue ? color(row.value) : MISSING_FILL}
+              style={{ fill: neutral ? MISSING_FILL : hasValue ? color(row.value) : MISSING_FILL }}
               onClick={() => row && onSelect(row.region)}
               onMouseEnter={() => onHover && onHover(row || null)}
               onMouseLeave={() => onHover && onHover(null)}
@@ -2314,8 +2378,10 @@ function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false
 }
 
 function MapLegend({ min, max, unit }) {
-  const stops = d3.range(0, 1.0001, 0.1);
-  const gradient = `linear-gradient(90deg, ${stops.map((s) => MAP_RAMP(s)).join(", ")})`;
+  const step = 100 / SEQ_STOPS.length;
+  const gradient = `linear-gradient(90deg, ${SEQ_STOPS
+    .map((c, i) => `${c} ${i * step}% ${(i + 1) * step}%`)
+    .join(", ")})`;
   const mid = min + (max - min) / 2;
   // aria-hidden per scelta: la scala colore da sola non aggiunge informazione a
   // chi non vede la mappa, e gli stessi valori stanno in forma testuale nella
