@@ -1,0 +1,25 @@
+{# Fascia dell'ambiente di stage. Compare solo con STAGING=1 (vedi
+   app/config.py) e serve a una cosa sola: rendere impossibile scambiare questa
+   copia per divarioitalia.it, che e' l'errore che uno stage identico
+   all'originale invita a fare.
+
+   Gli stili sono qui dentro e non nei fogli del sito apposta: la fascia deve
+   apparire uguale sulle pagine col chrome legacy, su quelle gia' migrate al
+   design system 2026 e sulla SPA, senza dipendere da quale dei due CSS e'
+   caricato e senza ereditarne i token. #}
+<div style="
+  position: sticky; top: 0; z-index: 2147483647;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;
+  padding: 7px clamp(16px, 4vw, 48px);
+  background: #7a1d12; color: #ffffff;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 12px; line-height: 1.4; letter-spacing: .04em;
+  border-bottom: 1px solid rgba(255,255,255,.25);
+" role="status">
+  <strong style="text-transform: uppercase; letter-spacing: .09em;">Ambiente di stage</strong>
+  <span style="opacity: .88;">Copia di prova, non il sito pubblico. Dati reali, nessuna indicizzazione.</span>
+  <a href="https://divarioitalia.it{{ request.full_path[:-1] if request.full_path.endswith('?') else request.full_path }}"
+     style="color: #ffffff; text-decoration: underline; text-underline-offset: 3px; margin-left: auto;">
+    Apri la stessa pagina in produzione &rarr;
+  </a>
+</div>

@@ -104,6 +104,12 @@ cd frontend && npm run build && cd ..
 # run locally (from the repo root)
 .venv/bin/gunicorn run:app -b 127.0.0.1:5050
 
+# lo stesso, ma in modalità stage (noindex ovunque, robots chiuso, fascia rossa)
+STAGING=1 .venv/bin/gunicorn run:app -b 127.0.0.1:5050
+
+# una copia del worktree su una URL pubblica, per guardarla prima di master
+bin/deploy-staging                                # vedi DEPLOY.md
+
 # tests, audit, whitespace
 bin/py -m unittest discover -s tests -v          # tutta la suite (656 test, ~22s), prima di commit/push
 bin/py -m unittest discover -s tests/unit -v      # solo veloci (235 test, <1s), durante lo sviluppo

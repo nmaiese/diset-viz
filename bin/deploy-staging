@@ -1,0 +1,135 @@
+#!/bin/sh
+# Una copia del sito su una seconda URL, per guardarla prima che il branch
+# tocchi master.
+#
+# Deploya il worktree COM'E', non un branch remoto: `gcloud run deploy
+# --source .` manda a Cloud Build il contenuto della cartella, quindi si guarda
+# esattamente quello che si ha davanti, anche non committato. E' il punto:
+# uno stage che deploya `master` non serve a decidere se mandare una modifica
+# in master.
+#
+#     bin/deploy-staging
+#
+# Il servizio e' separato da quello di produzione e non ne eredita niente:
+#
+#   - `--set-env-vars` (non `--update-env-vars`) azzera l'ambiente e imposta
+#     solo STAGING=1. Quindi niente GTM, niente GA, niente AdSense, niente
+#     verifiche di proprieta': sono tutte env-gated e qui non ci sono.
+#   - Senza DATABASE_URL l'app cade sullo SQLite locale del container, che e'
+#     effimero. Lo stage NON puo' scrivere sul Postgres di produzione: nessuna
+#     classifica vera, nessun account vero, nessun dato utente toccato.
+#   - STAGING=1 rende ogni risposta `noindex, nofollow, noarchive` e fa dire a
+#     /robots.txt `Disallow: /`. Senza, Google si troverebbe un duplicato
+#     completo di divarioitalia.it su un secondo dominio.
+#
+# Le tre cose qui sopra sono verificate alla fine da questo script: se una
+# salta, il deploy e' andato ma lo script esce rosso e lo dice.
+set -eu
+
+SERVICE="${STAGING_SERVICE:-diset-viz-staging}"
+REGION="${STAGING_REGION:-europe-west1}"
+
+here=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+cd "$here"
+
+if ! command -v gcloud >/dev/null 2>&1; then
+    echo "deploy-staging: gcloud non e' installato." >&2
+    echo "  https://cloud.google.com/sdk/docs/install" >&2
+    exit 127
+fi
+
+account=$(gcloud auth list --filter=status:ACTIVE --format='value(account)' 2>/dev/null || true)
+if [ -z "$account" ]; then
+    echo "deploy-staging: nessun account gcloud attivo. Esegui:  gcloud auth login" >&2
+    exit 1
+fi
+
+project=$(gcloud config get-value project 2>/dev/null || true)
+if [ -z "$project" ] || [ "$project" = "(unset)" ]; then
+    echo "deploy-staging: nessun progetto impostato. Esegui:  gcloud config set project IL_TUO_PROGETTO" >&2
+    exit 1
+fi
+
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?")
+dirty=""
+if ! git diff --quiet HEAD 2>/dev/null; then
+    dirty=" (con modifiche non committate)"
+fi
+
+echo "Stage di Divario Italia"
+echo "  progetto: $project"
+echo "  servizio: $SERVICE ($REGION)"
+echo "  sorgente: $branch$dirty"
+echo
+
+# Primo deploy: crea il servizio e imposta l'ambiente minimo. SITE_URL non si
+# conosce ancora (la assegna Cloud Run), quindi si sistema subito dopo.
+gcloud run deploy "$SERVICE" \
+    --source . \
+    --region "$REGION" \
+    --allow-unauthenticated \
+    --min-instances 0 \
+    --memory 1Gi \
+    --set-env-vars STAGING=1 \
+    --quiet
+
+url=$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')
+if [ -z "$url" ]; then
+    echo "deploy-staging: deploy fatto ma non riesco a leggere la URL del servizio." >&2
+    exit 1
+fi
+
+# SITE_URL deve essere quella dello stage, non quella di produzione: canonical,
+# og:url e i link assoluti altrimenti rimandano al sito vero, e ci si ritrova a
+# guardare la produzione credendo di guardare lo stage.
+current_site_url=$(gcloud run services describe "$SERVICE" --region "$REGION" \
+    --format='value(spec.template.spec.containers[0].env.filter("name:SITE_URL").extract("value"))' 2>/dev/null || true)
+if [ "$current_site_url" != "$url" ]; then
+    gcloud run services update "$SERVICE" --region "$REGION" \
+        --update-env-vars "SITE_URL=$url" --quiet >/dev/null
+fi
+
+echo
+echo "Stage online:  $url"
+echo
+
+# --- verifiche ------------------------------------------------------------
+# Non "il deploy e' riuscito", ma "lo stage si comporta da stage". Un 200 sulla
+# home non dice niente sul rischio vero, che e' l'indicizzazione.
+fail=0
+
+robots_header=$(curl -sS -I "$url/" | tr -d '\r' | awk -F': ' 'tolower($1)=="x-robots-tag"{print $2}')
+case "$robots_header" in
+    *noindex*) echo "  ok    X-Robots-Tag: $robots_header" ;;
+    *) echo "  ROTTO X-Robots-Tag sulla home: '${robots_header:-assente}', doveva essere noindex" >&2; fail=1 ;;
+esac
+
+robots_txt=$(curl -sS "$url/robots.txt")
+case "$robots_txt" in
+    *"Disallow: /"*) echo "  ok    /robots.txt vieta la scansione" ;;
+    *) echo "  ROTTO /robots.txt non contiene 'Disallow: /'" >&2; fail=1 ;;
+esac
+
+home=$(curl -sS "$url/")
+case "$home" in
+    *"Ambiente di stage"*) echo "  ok    la fascia di stage e' in pagina" ;;
+    *) echo "  ROTTO la fascia di stage non compare: la copia e' indistinguibile dal sito vero" >&2; fail=1 ;;
+esac
+
+case "$home" in
+    *googletagmanager*) echo "  ROTTO Google Tag Manager e' attivo sullo stage" >&2; fail=1 ;;
+    *) echo "  ok    nessun tag di analytics" ;;
+esac
+
+echo
+if [ "$fail" -ne 0 ]; then
+    echo "Lo stage e' online ma NON si comporta da stage: leggi i ROTTO qui sopra." >&2
+    exit 1
+fi
+
+echo "Da guardare:"
+echo "  $url/                     la home (design system 2026)"
+echo "  $url/blog                 una pagina non ancora migrata"
+echo "  $url/atlante              la SPA"
+echo
+echo "Per spegnerlo:  gcloud run services delete $SERVICE --region $REGION"
