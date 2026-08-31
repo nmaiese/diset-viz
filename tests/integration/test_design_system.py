@@ -25,10 +25,21 @@ from app.cache import cache
 # aggiunta qui, ed e' il punto: la lista e' il contratto.
 SPA_ROUTES = ("/atlante", "/confronto")
 
-# Pagine gia' migrate, e pagine che devono restare sul chrome legacy.
-MIGRATED = ("/", "/atlante", "/confronto",
-            "/indicatore/adulti-che-partecipano-all-apprendimento-permanente-totale/ter-99")
-LEGACY = ("/blog", "/regioni", "/temi", "/metodologia", "/qualita-della-vita")
+# Un campione di ogni famiglia di pagina. Da quando la migrazione e' finita non
+# ci sono piu' due elenchi: c'e' un elenco solo, e la seconda invariante non e'
+# piu' "il chrome nuovo non deborda" ma "il chrome vecchio non torna".
+# Le pagine servite da Jinja col chrome condiviso (`_ds_header.html`).
+JINJA_PAGES = ("/", "/blog", "/regioni", "/temi", "/metodologia",
+               "/qualita-della-vita", "/quiz", "/ricerca?q=lavoro",
+               "/divari-regionali", "/chi-siamo", "/privacy", "/catalogo-dati",
+               "/regione/lombardia", "/blog/divario-turistico-nord-sud-2024",
+               "/indicatore/adulti-che-partecipano-all-apprendimento-permanente-totale/ter-99")
+
+# Tutte. Le shell della SPA hanno un chrome proprio (il masthead React, che
+# porta la navigazione dentro l'applicazione senza ricaricare), quindi non
+# hanno l'header di Jinja: quello che devono avere in comune con le altre e' il
+# design system, non il markup.
+MIGRATED = JINJA_PAGES + SPA_ROUTES
 
 
 class DesignSystemMigration(unittest.TestCase):
@@ -77,14 +88,33 @@ class DesignSystemMigration(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertRegex(self._html(path), r'<body[^>]*class="[^"]*\bds\b')
 
-    def test_unmigrated_pages_are_untouched(self):
-        for path in LEGACY:
+    def test_the_legacy_chrome_is_gone_everywhere(self):
+        """Il masthead legacy e il suo menu mobile non esistono piu'.
+
+        Non e' pulizia: finche' i due chrome convivevano, una pagina poteva
+        servirne uno e linkare l'altro, e nessuno se ne accorgeva. Ora ce n'e'
+        uno solo, e questo test e' il posto dove si scopre se ne rispunta un
+        secondo.
+        """
+        for path in JINJA_PAGES:
             with self.subTest(path=path):
                 html = self._html(path)
-                self.assertNotRegex(html, r'<body[^>]*class="[^"]*\bds\b',
-                                    f"{path} non e' migrata ma ha il chrome nuovo")
-                # Il chrome legacy e' ancora quello che serve la pagina.
-                self.assertIn("masthead", html, f"{path}: manca il chrome legacy")
+                self.assertNotIn('class="mobmenu"', html)
+                self.assertIn('<header class="hdr">', html)
+                # Il masthead legacy di Jinja. Quello React della SPA si chiama
+                # allo stesso modo ed e' un'altra cosa, per questo il confronto
+                # e' sulla riga esatta del template cancellato.
+                self.assertNotIn('<header class="masthead">', html)
+
+    def test_every_page_offers_the_skip_link_target(self):
+        # Lo skiplink del chrome punta a #contenuto su OGNI pagina: se una non
+        # ha il bersaglio, "Vai al contenuto" non va da nessuna parte, ed e' un
+        # guasto che si vede solo con la tastiera.
+        for path in JINJA_PAGES:
+            with self.subTest(path=path):
+                html = self._html(path)
+                self.assertIn('href="#contenuto"', html)
+                self.assertIn('id="contenuto"', html)
 
     # --- la rampa dei dati -------------------------------------------------
     def test_the_indicator_map_uses_the_design_system_ramp(self):

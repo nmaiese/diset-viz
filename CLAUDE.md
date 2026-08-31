@@ -198,22 +198,27 @@ drops it from every macro-area total, with nothing failing.
 
 - Do not break `/legacy` or the data schema (`tests/integration/test_app.py` guards both).
 - Keep technical SEO intact (the list is in `.claude/rules/app.md`).
-- **Visual identity: two systems live side by side, on purpose.** The 2026
-  design system (warm paper `#f5f3ee`, ink `#18201e`, coral accent `#e24b3c`,
-  teal `#0f9e86`, sequential teal data ramp, square corners, Newsreader /
-  Public Sans / Spline Sans Mono) is the target, and its tokens are
-  `app/static/css/ds/system.css`. A page opts in with `{% set ds_page = true %}`
-  and gets the new fonts, tokens and chrome; the homepage is the first and so
-  far the only one. Every page that has not opted in still renders the previous
-  cartographic identity (navy `#15233b`, paper `#fbfaf7`, accent `#e4572e`,
-  Archivo / Inter / Space Mono) from `app/static/css/site.css`, and must keep
-  it until it is migrated in turn. Do not "restore" the old palette on a
-  migrated page, and do not push the new one onto a page that has not opted in:
-  the two stylesheets ship together and share ~20 token names, which is why the
-  colliding ones live under `body.ds`. The `else` branch in `blog_base.html`
-  and `site.css` are deleted together, by the commit that migrates the last
-  page. Brand vs interface vs data colour must stay separate: a data colour
-  never carries a verdict, and the map ramp is emitted as `--seq-*` custom
-  properties so it follows the dark theme.
+- **Visual identity: one system, everywhere.** The 2026 design system (warm
+  paper `#f5f3ee`, ink `#18201e`, coral accent `#e24b3c`, teal `#0f9e86`,
+  sequential teal data ramp, square corners, Newsreader / Public Sans / Spline
+  Sans Mono) is the identity of the whole site, and its tokens are
+  `app/static/css/ds/system.css` - the only place to change a colour, a font or
+  a shadow. The migration is finished: the per-page opt-in (`ds_page`), the
+  legacy chrome branch in `blog_base.html` and the old navy/Archivo identity
+  are gone, and `/legacy` is the only page left on its own styling, on purpose.
+  `site.css` survives as the **component layer**: it styles the pages, but it
+  no longer declares an identity - its rules read the same token names
+  (`--ink`, `--paper`, `--accent`, `--font-display`...) that `system.css`
+  defines. That naming bridge is how the whole migration was done, and it is
+  still how the components get their colours.
+  Two rules that break silently. **Never bake a colour** (a hex or an `rgba()`)
+  into a rule: `--seq-*` and the neutrals are redefined under
+  `<html data-theme="dark">`, so a baked colour keeps that one element on the
+  light palette while the page goes dark - which is exactly how the atlas
+  masthead stayed white. And **brand, interface and data colour stay
+  separate**: coral is the interaction accent, so a row of twenty ranking bars
+  is `--cmp-*` and only the highlighted one is coral; a data colour never
+  carries a verdict, and the map ramp always runs pale-to-deep with the
+  magnitude whatever the indicator's direction.
 - Do not commit secrets (`.gitignore` already excludes `client_secret_*.json`).
 - Commit messages: no `Co-Authored-By` trailer.
