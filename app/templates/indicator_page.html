@@ -1,5 +1,11 @@
 {% extends "blog_base.html" %}
 {% import "_indicator_article.html" as article %}
+{# Migrata al design system 2026: font, token e chrome nuovi. Il grosso
+   della pagina si ridipinge da se', perche' le regole di site.css che la
+   riguardano sono scritte sui nomi dei token (--ink, --paper, --accent...)
+   che `body.ds` ripunta sulle primitive nuove. Quello che non bastava sta
+   in css/ds/indicator.css. #}
+{% set ds_page = true %}
 
 {# One template for every indicator, whatever the source family, in three zones:
 
@@ -23,6 +29,7 @@
 {% endblock %}
 
 {% block head_extra %}
+<link rel="stylesheet" href="{{ asset_url('css/ds/indicator.css') }}">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -62,7 +69,7 @@
 {% endblock %}
 
 {% block content %}
-<article class="page page-indicator wrap">
+<article class="page page-indicator wrap" id="contenuto">
   <nav class="breadcrumb"><a href="/temi">Temi</a> / <a href="{{ meta.theme_path }}">{{ meta.theme }}</a></nav>
 
   {# Same catalog search the atlas offered: without JS it submits to /atlante, with JS it

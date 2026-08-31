@@ -47,7 +47,15 @@
   var higherBetter = data.higherBetter !== false;
   var unit = data.unit || "";
   var changeUnit = data.changeUnit || "";
-  var ramp = data.ramp || { from: [0xe7, 0xec, 0xf3], to: [0x15, 0x23, 0x3b] };
+  // I gradini della rampa sequenziale, come nomi di custom property: la mappa
+  // deve seguire il tema scuro, e un colore interpolato in JS resterebbe quello
+  // chiaro. Stessi sei gradini del server (DS_SEQ_RAMP in indicator_notes.py),
+  // quindi la mappa ridipinta al cambio d'anno combacia con quella dipinta a
+  // render invece di somigliarle.
+  var rampStops = data.rampStops || [
+    "var(--seq-1)", "var(--seq-2)", "var(--seq-3)",
+    "var(--seq-4)", "var(--seq-5)", "var(--seq-6)"
+  ];
   var basePath = location.pathname;
   var SVGNS = "http://www.w3.org/2000/svg";
 
@@ -127,9 +135,9 @@
   }
 
   function rampColor(t) {
-    var c = [0, 0, 0];
-    for (var i = 0; i < 3; i++) c[i] = Math.round(ramp.from[i] + (ramp.to[i] - ramp.from[i]) * t);
-    return "#" + c.map(function (n) { var h = n.toString(16); return h.length === 1 ? "0" + h : h; }).join("");
+    // Sceglie il gradino, non interpola: i valori della rampa sono `var(--seq-N)`.
+    var i = Math.floor(t * rampStops.length);
+    return rampStops[Math.min(rampStops.length - 1, Math.max(0, i))];
   }
 
   // ---- Elements (all optional) --------------------------------------------

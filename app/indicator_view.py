@@ -43,7 +43,8 @@ from app.indicator_notes import (
     change_unit_label,
     cover_bars,
     is_percentage_unit,
-    region_choropleth_colors,
+    ds_choropleth_colors,
+    DS_SEQ_RAMP,
     trend_framing,
     value_unit_label,
 )
@@ -51,7 +52,14 @@ from app.indicator_notes import (
 # Colour ramp for the choropleth. It used to be declared twice, in the view's
 # explore payload and again in the stylesheet's legend gradient; the page now
 # reads it from here so the map and its legend cannot drift apart.
-MAP_RAMP = {"from": [0xE7, 0xEC, 0xF3], "to": [0x15, 0x23, 0x3B]}
+#
+# Dalla migrazione al design system 2026 e' la rampa teal a sei gradini, e sono
+# nomi di custom property invece che hex: cosi' la mappa segue il tema scuro
+# insieme al resto della pagina. Il JS non interpola piu due estremi, sceglie il
+# gradino (vedi `rampColor` in indicator-explorer.js): stessa scalatura del
+# server, quindi la mappa dipinta a render e quella ridipinta al cambio d'anno
+# non possono divergere.
+MAP_RAMP = list(DS_SEQ_RAMP)
 
 # Territorial levels, in the order the cockpit offers them. `profile_path`
 # is the prefix of the territory's own page, or None when it has none.
@@ -459,7 +467,7 @@ def _build_level(key, series, meta, territory_total, coverage):
         # JavaScript (e un crawler la vede). Media semplice sulle regioni, celle
         # vuote ignorate, come `data.indicator_year_average`.
         "annual_means": _annual_means(matrix),
-        "map_colors": region_choropleth_colors(observations) if conf["has_map"] else None,
+        "map_colors": ds_choropleth_colors(observations) if conf["has_map"] else None,
         "cover_bars": cover_bars(observations, best, worst, meta["scoreable"]) if conf["has_map"] else None,
         "bar_max": max((row["value"] for row in observations), default=0),
     }
@@ -589,7 +597,7 @@ def _explore_payload(meta, levels):
         "direction": meta["direction"],
         "higherBetter": meta["direction"] not in ("lower_better", "higher_worse"),
         "scoreable": meta["scoreable"],
-        "ramp": MAP_RAMP,
+        "rampStops": MAP_RAMP,
         "defaultLevel": levels[0]["key"],
         "levels": [
             {

@@ -1358,6 +1358,47 @@ _MAP_RAMP_FROM = (0xE7, 0xEC, 0xF3)
 _MAP_RAMP_TO = (0x15, 0x23, 0x3B)
 
 
+# Rampa sequenziale teal del design system 2026, per le pagine gia' migrate.
+#
+# Sono nomi di custom property e non hex apposta: `--seq-1..6` vengono
+# ridefinite sotto <html data-theme="dark">, e un colore cotto nel markup
+# lascerebbe la mappa sulla rampa chiara mentre il resto della pagina passa al
+# tema scuro. Il colore codifica il VALORE, mai un giudizio: la rampa va sempre
+# da pallido a intenso al crescere della misura, qualunque sia la direzione
+# dell'indicatore, e sono la legenda e la prosa a dire se e' meglio alto o
+# basso.
+#
+# Vive qui, e non nella view che l'ha usata per prima, perche' la usano sia la
+# home sia la pagina indicatore: due copie della stessa rampa si scostano al
+# primo ritocco, e una mappa e la sua legenda che non concordano sono un errore
+# che nessun test vede.
+DS_SEQ_RAMP = tuple(f"var(--seq-{step})" for step in range(1, 7))
+
+
+def ds_ramp_color(fraction):
+    """Colloca una posizione 0..1 in uno dei sei gradini della rampa."""
+    steps = len(DS_SEQ_RAMP)
+    return DS_SEQ_RAMP[min(steps - 1, max(0, int(fraction * steps)))]
+
+
+def ds_choropleth_colors(values):
+    """{region_key: "var(--seq-N)"} sulla rampa del design system.
+
+    Stessa scalatura di `region_choropleth_colors`, che resta la rampa blu
+    legacy finche' le pagine che la usano non sono migrate a loro volta.
+    """
+    numeric = [row["value"] for row in values if row.get("value") is not None]
+    if not numeric:
+        return {}
+    low, high = min(numeric), max(numeric)
+    span = (high - low) or 1.0
+    return {
+        row["region_key"]: ds_ramp_color((row["value"] - low) / span)
+        for row in values
+        if row.get("value") is not None
+    }
+
+
 def region_choropleth_colors(values):
     """Per-region hex fill for the static indicator-page choropleth: {region_key: "#rrggbb"},
     scaled over the raw value range like the SPA's d3.scaleSequential(MAP_RAMP)."""

@@ -83,12 +83,12 @@ _HOME_SERIES_DEFAULT = ("lombardia", "lazio", "campania")
 # a line's colour identifies a region, it does not rate it.
 _HOME_SERIES_COLORS = ("var(--cat-1)", "var(--cat-2)", "var(--cat-3)", "var(--cat-4)")
 
-# Sequential teal ramp of the 2026 design system. These are emitted as CSS
-# custom properties, not as hex: --seq-1..6 are redefined under
-# <html data-theme="dark">, so a baked colour would leave the choropleth stuck
-# on the light ramp while the rest of the page goes dark. Every page still on
-# the legacy stylesheet keeps the old blue ramp until it is migrated in turn.
-_DS_SEQ_RAMP = tuple(f"var(--seq-{step})" for step in range(1, 7))
+# Sequential teal ramp of the 2026 design system. Lives in indicator_notes
+# (with the reason it is CSS custom properties and not hex) because the
+# indicator page uses the same one: keeping a second copy here is how a map and
+# its legend start disagreeing. Every page still on the legacy stylesheet keeps
+# the old blue ramp until it is migrated in turn.
+_DS_SEQ_RAMP = indicator_notes.DS_SEQ_RAMP
 
 # Production contract consumed by scripts/audit_public_discoverability.py.  Keep
 # this literal (rather than deriving it inside the audit): app/views.py owns the
@@ -2788,28 +2788,10 @@ def _home_quiz_games():
 # ===========================================================================
 
 
-def _ds_ramp_color(fraction):
-    """Bucket a 0..1 position into the six-stop sequential teal ramp."""
-    steps = len(_DS_SEQ_RAMP)
-    return _DS_SEQ_RAMP[min(steps - 1, max(0, int(fraction * steps)))]
+_ds_ramp_color = indicator_notes.ds_ramp_color
 
 
-def _ds_choropleth(values):
-    """{region_key: hex} over the design system's sequential ramp.
-
-    Colour encodes the VALUE, not a verdict: the ramp always runs pale-to-deep
-    with the magnitude, whatever the indicator's direction. The legend and the
-    prose carry the "meglio se piu alto / piu basso" reading instead."""
-    numeric = [row["value"] for row in values if row.get("value") is not None]
-    if not numeric:
-        return {}
-    low, high = min(numeric), max(numeric)
-    span = (high - low) or 1.0
-    return {
-        row["region_key"]: _ds_ramp_color((row["value"] - low) / span)
-        for row in values
-        if row.get("value") is not None
-    }
+_ds_choropleth = indicator_notes.ds_choropleth_colors
 
 
 def _ds_short_value(value, unit):
