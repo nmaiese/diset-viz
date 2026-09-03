@@ -1,38 +1,46 @@
 {
+ "angolo_scelto": "Nel 2023 la quota di PIL investita sale in tutte le venti regioni su ogni orizzonte temporale (uno, cinque, dieci anni): non è una gara Nord-Sud ma un movimento comune da livelli di partenza molto diversi. I balzi del 2021 e del 2023 coincidono con gli anni dei bonus edilizi alle case, per cui la Banca d'Italia stima una spesa di oltre centosettanta miliardi di euro: una coincidenza datata, non una causa attribuita a una singola regione.",
  "fonti": [
   {
-   "testo": "Istat, Conti economici territoriali, Anni 2021-2023 (28 gennaio 2025): nel 2023 il valore aggiunto delle costruzioni cresce in tutte le ripartizioni, dal +5,4% del Nord-ovest all'+8,6% del Centro.",
-   "url": "https://www.istat.it/comunicato-stampa/conti-economici-territoriali-anni-2021-2023/"
+   "testo": "Le due misure hanno comportato una spesa di oltre 170 miliardi nel periodo 2021-23 (circa il 3 per cento del PIL in media d'anno).",
+   "url": "https://www.bancaditalia.it/pubblicazioni/qef/2024-0860/index.html"
   },
   {
-   "testo": "Istat, Conti economici territoriali 2022-2024 (22 dicembre 2025): le stime del 2022 sono definitive, quelle del 2023 semidefinitive, quelle del 2024 preliminari.",
-   "url": "https://www.istat.it/comunicato-stampa/conti-economici-territoriali-2022-2024/"
+   "testo": "Si stima che circa un quarto della spesa relativa agli investimenti sussidiati (oltre 45 miliardi) sarebbe stata effettuata anche in assenza degli incentivi.",
+   "url": "https://www.bancaditalia.it/pubblicazioni/qef/2024-0860/index.html"
+  },
+  {
+   "testo": "Questo risultato implica che il moltiplicatore fiscale sia stato inferiore all'unità, ossia che i benefici per il complesso dell'economia in termini di valore aggiunto siano stati più bassi rispetto ai costi sostenuti per le agevolazioni.",
+   "url": "https://www.bancaditalia.it/pubblicazioni/qef/2024-0860/index.html"
   }
  ],
  "key": "167",
- "lead": "Nel 2023 le regioni italiane hanno investito in media la quota di prodotto più alta dal 1995, e la risalita ha toccato tutte e venti. La mappa però non è quella che l'atlante abitua ad aspettarsi, con la Lombardia tredicesima e il Lazio diciannovesimo.",
+ "lead": "Nel 2023 la quota di PIL investita sale in tutte le venti regioni italiane, ma parte da livelli molto diversi: la Calabria è ultima con il 18,23%, la Basilicata prima con il 28,65%.",
  "level": "regione",
- "reviewed_at": "2026-07-26",
- "reviewed_vintage": 2023,
  "sections": [
   {
-   "body": "L'intensità di accumulazione mette gli investimenti fissi lordi di un anno sopra il PIL dello stesso anno, e quello che ne esce è una quota. Gli investimenti fissi lordi sono la spesa in beni destinati a restare in produzione oltre l'anno, dagli edifici ai macchinari. Un valore di 20 dice che un quinto di quanto un territorio ha prodotto in dodici mesi è tornato in dotazione produttiva.\n\nTrattandosi di un rapporto, misura l'impegno e non il volume. Una regione piccola può stare in cima muovendo cifre assolute molto più basse di una regione grande ferma a metà classifica.\n\nUna cautela sul nome, prima di leggere le cifre. Istat pubblica questi stessi numeri, identici su tutte e 986 le righe dell'archivio unico e su tutti gli anni dal 1995, anche sotto la tavola [investimenti privati sul PIL](/indicatore/investimenti-privati-sul-pil/ter-471), che dichiara come dati di base gli investimenti privati invece degli investimenti fissi lordi. Le due etichette non possono essere giuste entrambe sopra la stessa serie, e da qui non si può dire quale lo sia. Quello che la quota misura in ogni caso è l'intensità di investimento di un territorio.",
-   "h": "Quanta parte del prodotto torna in capitale",
-   "role": "definizione"
-  },
-  {
-   "body": "La distribuzione del 2023 ha una forma netta, e non è una scala continua. In alto due regioni si staccano, la Basilicata e il Piemonte, e fra il Piemonte e la terza, la Valle d'Aosta, corrono già due punti e mezzo, il salto più largo dell'intera graduatoria. Dalla quinta in giù comincia il mucchio, con sedici regioni schiacciate dentro meno di cinque punti e la mediana a 20,49.\n\nQuella forma conta perché questa quota è la parte del prodotto di un anno che non finisce con l'anno, le macchine e i capannoni con cui si lavorerà nel decennio successivo. Un valore alto una volta sola pesa poco, è la ripetizione a costruire la dotazione.\n\nDue incroci nel tema [imprese e competitività](/tema/imprese-e-competitivita) aiutano a leggere la mappa. Le tre regioni dove nel 2023 sono nate più imprese in rapporto a quelle attive, secondo [il tasso di natalità delle imprese](/indicatore/tasso-di-natalita-delle-imprese/ter-54), sono le stesse tre che chiudono la graduatoria dell'accumulazione, Campania, Lazio e Calabria. I due indicatori contano oggetti diversi, le imprese da una parte e gli euro sul PIL dall'altra, e una spiegazione possibile è che un'economia fatta di attività piccole ne registri parecchie senza che il rapporto si muova. Resta un'ipotesi, e il Molise rompe comunque la simmetria, visto che sta nella metà alta di entrambe.\n\nIn cima l'accostamento è un altro. Dove la quota investita è più alta tende a essere più alto anche [il consumo di energia per unità di lavoro](/indicatore/consumi-finali-di-energia-per-unita-di-lavoro/ter-437), fermo al 2022, e Basilicata, Umbria, Valle d'Aosta e Molise stanno tra le prime sette per entrambe le misure. Il peso dell'industria pesante e delle grandi opere è la spiegazione comune più ovvia, e nessuno dei due indicatori la misura. Il Friuli-Venezia Giulia, che di energia per unità di lavoro ne consuma più di ogni altra regione, qui è appena decimo.",
-   "h": "Due regioni staccate e sedici nel mucchio",
+   "body": "Nel 2023 gli investimenti fissi lordi, in percentuale del PIL, crescono in ognuna delle venti regioni italiane, sull'anno, sui cinque anni e sui dieci: non c'è un'eccezione. Sull'anno cresce meno di tutte il Piemonte, con un aumento di 0,56 punti, e più di tutte la Valle d'Aosta, con 4,79. Sui cinque anni il passo più lento è quello della Liguria, 3,44 punti, il più veloce ancora la Valle d'Aosta, 9,04. Sui dieci anni la Calabria guadagna meno di chiunque altro, appena 1,75 punti, mentre la Valle d'Aosta arriva a 8,89.\n\nNon è una gara fra Nord e Sud: le tre macroaree, ciascuna la media semplice delle proprie regioni, restano vicine tra loro, il Nord al 22,16%, il Mezzogiorno al 20,92%, il Centro al 20,19%. Il Mezzogiorno supera il Centro solo perché include la Basilicata: senza quella regione l'ordine si invertirebbe. La vera distanza corre fra le singole regioni.",
+   "h": "La quota investita cresce in tutte le venti regioni",
    "role": "quadro"
   },
   {
-   "body": "La serie dal 1995 in poi ha una gobba e un buco. La media semplice delle venti regioni cresce fino al 2007, la crisi la riporta indietro, e dal 2012 al 2020 resta ogni anno sotto il livello da cui era partita. Il fondo è il 2014, con 15,17, oltre due punti sotto il 1995.\n\nLa risalita comincia nel 2021 e nel 2023 la media supera per la prima volta il picco del 2007. Nello stesso anno, nei conti economici territoriali Istat, il valore aggiunto delle costruzioni cresce in ogni ripartizione, dal 5,4% del Nord-ovest all'8,6% del Centro. Sono variazioni del valore aggiunto per ripartizione, un'altra cosa rispetto a queste venti quote regionali, e stanno accanto alla risalita senza spiegarla.\n\nIl lungo periodo lascia però due arretramenti. La Campania investe oggi una quota di 1,62 punti più bassa di quella del 1995 e la Calabria di 0,63, uniche due regioni sotto il proprio punto di partenza dopo ventotto anni. Dall'altra parte il Trentino Alto Adige ha aggiunto 8,67 punti, il guadagno più grande tra le venti, e il Piemonte lo segue.",
-   "h": "Nove anni sotto il livello del 1995",
+   "body": "Dal 1995 al 2007 la media delle venti regioni sale, dal 17,21% al 19,43%. Poi scende fino al minimo del 15,17% nel 2014. Da lì la risalita è lenta fino al 16,32% del 2020, poi il primo balzo porta al 19,04% del 2021. Nel 2022 la crescita si ferma quasi del tutto, al 19,17%, praticamente lo stesso livello dell'anno prima. Poi il secondo balzo: nel 2023 la media delle venti regioni arriva al 21,27%, il massimo di questa media dal 1995.",
+   "h": "Il minimo del 2014, la ripresa, l'anno fermo del 2022",
    "role": "dinamica"
   },
   {
-   "body": "Il rapporto ha due gambe e anche la seconda si muove. Se il prodotto arretra la quota sale a parità di investimenti, quindi una posizione guadagnata in graduatoria non è di per sé una macchina in più.\n\nPoi c'è quello che l'aggregato non distingue. Edilizia e macchinari stanno dentro lo stesso numero, e la quota non dice se viene da molte operazioni diffuse o da pochi cantieri grandi, differenza non da poco per un territorio. Gli investimenti sono lordi, per di più, quindi comprendono anche la sostituzione di quello che si è consumato e non solo la dotazione in più. E il rendimento futuro di quel capitale qui non si vede.\n\nIl punto più recente, infine, non è ancora fermo. Nei conti economici territoriali il 2023 è una stima semidefinitiva, quindi l'ultimo anno della serie può ancora spostarsi con la prossima revisione.",
-   "h": "Il denominatore, e quello che l'aggregato non separa",
+   "body": "Il 2021 e il 2023, i due anni dei balzi più forti, sono anche gli anni di due incentivi alle ristrutturazioni delle case, il superbonus e il bonus facciate. La quota che racconta questa pagina è più ampia: comprende anche macchinari, mezzi di trasporto e altri impianti, non solo gli edifici. Ma anche il 2022 è un anno di superbonus, e in quell'anno la media delle venti regioni non si muove, ferma al 19,17%: la coincidenza non regge in modo uniforme.\n\nLa Banca d'Italia ha stimato che le due misure abbiano comportato una spesa di oltre centosettanta miliardi di euro nel triennio dal 2021 al 2023, circa il tre per cento del prodotto interno lordo nazionale in media ogni anno. Secondo la stessa fonte, circa un quarto di quella spesa sarebbe stato sostenuto comunque, anche senza gli incentivi. Per differenza, la parte aggiuntiva sarebbe quindi la maggioranza: è una lettura di chi scrive, non un dato della fonte.\n\nLo studio stima inoltre che il moltiplicatore fiscale delle due misure sia stato inferiore a uno: per il complesso dell'economia, il beneficio in valore aggiunto sarebbe stato più basso del costo sostenuto per le agevolazioni.",
+   "h": "Gli anni dei bonus edilizi",
+   "role": "quadro"
+  },
+  {
+   "body": "Perché sia proprio la Basilicata a stare in testa, questa pagina non lo dice: il dato mostra il livello, non la ragione, e il rapporto sale anche quando è il PIL della regione a scendere.\n\nLa quota investita non misura quanto una regione è ricca, misura quanto di ciò che produce rimette in capitale ogni anno. La Calabria lo fa meno delle altre diciannove regioni, il 18,23% nel 2023, e negli ultimi dieci anni è anche la regione in cui quella quota cresce meno, un aumento di appena 1,75 punti, contro gli 8,89 della Valle d'Aosta. Il PIL pro capite è un'altra misura, e questa pagina non lo contiene.\n\nPer chi vuole sapere se le imprese calabresi vendono anche fuori dai confini regionali, un punto di partenza è la [capacità di esportare](/indicatore/capacita-di-esportare/ter-267), con dati fermi al 2022.",
+   "h": "Perché la Calabria è ultima",
+   "role": "quadro"
+  },
+  {
+   "body": "L'indicatore è un rapporto: investimenti fissi lordi diviso PIL. Sale anche se il PIL scende, non solo se gli investimenti aumentano: la quota sul PIL e il livello assoluto degli investimenti non sono la stessa cosa. Quella quota è ciò che in un anno viene speso in capannoni, macchinari, mezzi di trasporto e case rispetto a tutto quello che il territorio produce. Quando resta bassa a lungo, il capitale con cui si lavora invecchia.\n\nIl 21,27% del 2023 è la media semplice delle venti regioni, con lo stesso peso per la Valle d'Aosta e per la Lombardia: non è pesata sulla popolazione né sul PIL di ciascun territorio.",
+   "h": "Che cosa misura davvero questo numero",
    "role": "limiti"
   }
  ],
