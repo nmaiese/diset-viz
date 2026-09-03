@@ -1,0 +1,50 @@
+{
+  "codice": "ter-167",
+  "deciso_da": "editor-in-chief",
+  "data": "2026-09-03",
+  "angolo_scelto": {
+    "id": "C_sale_ovunque",
+    "tesi": "Nel 2023 la quota di PIL investita sale in tutte e venti le regioni, sull'anno, sui cinque anni e sui dieci: non e una gara fra Nord e Sud, e un movimento comune che pero parte da livelli molto diversi.",
+    "origine": "Non e nessuno dei due angoli proposti. Nasce dal contro-fatto che lo skeptical-editor ha trovato attaccandoli, e che il lead ha riverificato sul dossier."
+  },
+  "verifica_del_lead": {
+    "tutte_e_venti_salgono_su_un_anno": "delta_1a: tutti positivi, minimo Piemonte 0.56, massimo Valle d'Aosta 4.79",
+    "tutte_e_venti_salgono_su_cinque_anni": "delta_5a: tutti positivi, minimo Liguria 3.44, massimo Valle d'Aosta 9.04",
+    "tutte_e_venti_salgono_su_dieci_anni": "delta_10a: tutti positivi, minimo Calabria 1.75, massimo Valle d'Aosta 8.89",
+    "esito": "confermato leggendo il dossier riga per riga, non sulla parola del revisore"
+  },
+  "angoli_scartati": [
+    {
+      "id": "A_geografia_non_spiega",
+      "motivo": "Smentito dal dossier stesso. Il Nord ha la media di macroarea piu alta (22.16) e tre delle prime quattro regioni (Piemonte, Valle d'Aosta, Trentino Alto Adige): dire che il record non e una vittoria del Nord e falso. E il Piemonte, che l'angolo faceva trainare, e la regione che nel 2023 cresce MENO di tutte (delta_1a 0.56).",
+      "prova": "macroaree; ultimo[1..3]; dinamica.delta_1a.Piemonte = 0.56, minimo dei venti",
+      "difetto_aggiuntivo": "La sua prova portante era il contrasto 0.91 contro 0.08, cioe' esattamente il vocabolario che il proprietario vieta di scrivere. Un angolo la cui prova non e scrivibile costringe alla parafrasi, e la parafrasi di una misura di raggruppamento dice sempre piu del numero."
+    },
+    {
+      "id": "B_bolla_da_incentivi",
+      "motivo": "La tesi e nazionale e l'articolo e regionale: tutte le prove esterne sono nazionali e nessuna fonte lega il salto di una singola regione agli incentivi. Inoltre il profilo temporale non somiglia a quello dei bonus: fra 2021 (19.04) e 2022 (19.17) la media e praticamente ferma, quindi non e una rampa continua.",
+      "prova": "dinamica.media_per_anno 2020 16.32, 2021 19.04, 2022 19.17, 2023 21.27",
+      "difetto_aggiuntivo": "La citazione sul moltiplicatore fiscale parla del rendimento della spesa, non della sua natura temporanea: usarla per provare la bolla e una deriva di significato. E la citazione sul quarto non addizionale tira nel verso opposto alla tesi, perche implica che la maggioranza della spesa era aggiuntiva davvero.",
+      "recuperato_come": "L'ipotesi degli incentivi resta nel pezzo, ma retrocessa da tesi a contesto datato e a domanda aperta nei limiti."
+    }
+  ],
+  "claim_esterni_ammessi": [
+    "Banca d'Italia QEF n.860: dimensione della spesa di superbonus e bonus facciate nel 2021-2023",
+    "Banca d'Italia QEF n.860: circa un quarto della spesa sarebbe stata fatta comunque, da riportare col segno giusto",
+    "Banca d'Italia QEF n.860: moltiplicatore fiscale sotto l'unita, ammesso solo come stima attribuita e mai come prova che il record sia gonfiato",
+    "Banca d'Italia Economie regionali n.39: edilizia pubblica lucana sostenuta dal PNRR, con l'avvertenza che la stessa fonte descrive l'automotive lucano in calo, cioe un denominatore che si accorcia"
+  ],
+  "claim_esterni_scartati": [
+    {
+      "claim": "Istat, Conti economici trimestrali, gli investimenti fissi lordi crescono del 2,4% nel IV trimestre 2023",
+      "motivo": "Sbaglia periodo, unita e territorio insieme: e un trimestre, e una variazione di volume, ed e nazionale, mentre l'indicatore e un rapporto annuale regionale. Accostato al dato del 2023 sembrerebbe spiegarlo e non spiega niente."
+    },
+    {
+      "claim": "Stellantis Melfi come motore degli investimenti lucani (stampa locale)",
+      "motivo": "Smentito dalla fonte istituzionale sulla stessa regione, che descrive la fabbricazione di autoveicoli in forte calo. Verificato e scartato dal source-researcher prima che entrasse nel pezzo."
+    }
+  ],
+  "vincolo_meccanico_scoperto_dal_lead": "lab.controlla segnala come non trovata ogni cifra della prosa che non sia un valore del dossier o un anno della serie 1995-2023. Quindi le quantita delle fonti esterne (miliardi, percentuali di spesa) e le date di pubblicazione 2024 NON possono comparire come cifre nei corpi: vanno nel blocco fonti, che il controllo non ispeziona per le cifre, oppure scritte in lettere.",
+  "domanda_reale_dei_lettori_scelta": "pil pro capite calabria (Search Console, ultimi 90 giorni). La pagina non risponde sul PIL pro capite e non deve fingere di farlo: risponde su quanto la Calabria investe rispetto alla propria economia, ed e la regione con il valore piu basso nel 2023 e con il minor guadagno in dieci anni.",
+  "parente_scelto": "ter-267 Capacita di esportare, /indicatore/capacita-di-esportare/ter-267, rimando tematico con l'anno del parente dichiarato e senza cifre, perche il dossier non contiene i valori regionali dei parenti."
+}
