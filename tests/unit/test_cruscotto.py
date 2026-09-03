@@ -102,7 +102,7 @@ class MappaDelleFasi(unittest.TestCase):
         percorso = os.path.join(RADICE_REPO, ".claude", "workflows", "indicatore-lite.js")
         with open(percorso, encoding="utf-8") as handle:
             sorgente = handle.read()
-        tipi = set(re.findall(r"agentType:\s*['\"]([^'\"]+)['\"]", sorgente))
+        tipi = {cruscotto.tipo_base(t) for t in re.findall(r"agentType:\s*['\"]([^'\"]+)['\"]", sorgente)}
         self.assertTrue(tipi, "nessun agentType trovato nel workflow: regex da rifare")
         mancanti = sorted(t for t in tipi if t not in cruscotto.FASE_PER_TIPO)
         self.assertEqual(mancanti, [], f"tipi senza fase in FASE_PER_TIPO: {mancanti}")
