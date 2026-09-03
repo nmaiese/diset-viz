@@ -442,14 +442,19 @@ const esiti = await pipeline(
     if (vuote.length) log(`${d.codice}: nessun claim da ${vuote.join(', ')}`)
     return agent(
       `Scrivi l'articolo dell'indicatore ${d.codice} di Divario Italia.\n\n` +
-      `Dossier da aprire con Read (leggilo tutto prima di scrivere: porta anche i gruppi in ` +
-      `cui la classifica si spacca e gli indicatori imparentati con i loro valori):\n\n` +
+      `Dossier da aprire con Read (leggilo tutto prima di scrivere: i gruppi in cui la ` +
+      `classifica si spacca e gli indicatori imparentati ti servono per scegliere la storia, ` +
+      `non per riempire il testo):\n\n` +
       `    ${d.percorso}\n\n` +
       `Claim verificati da tre scout, ognuno con la lente da cui viene. Sono l'unica fonte ` +
       `esterna che puoi citare, e nessuno di loro ti propone un angolo:\n${json(claim)}\n\n` +
       `Compito: **scrivi**. Decidi tu la tesi, quali temi coprire, quante sezioni, in che ` +
       `ordine, con che titoli, e quali indicatori imparentati linkare. Dichiara la tesi in ` +
-      `\`angolo\`, dicendo perché quella e non un'altra.`,
+      `\`angolo\`, dicendo perché quella e non un'altra.\n\n` +
+      `Per chi scrivi (skill motore:scrittura-indicatori, sezione "Per chi si scrive"): il ` +
+      `lettore comune vuole capire il fenomeno, le correlazioni con gli indicatori imparentati ` +
+      `e le notizie o i dati esterni che lo spiegano. Bontà del raggruppamento, mediana, ` +
+      `spread, coefficiente di variazione restano nel dossier: nel testo non compaiono.`,
       // Sonnet a scrivere, e il verificatore resta opus. La prima versione
       // teneva opus qui perché è l'unico stadio in cui il prodotto **è** il
       // testo, e quello che manca a un articolo debole non lo recupera nessun
