@@ -1,0 +1,67 @@
+{
+  "ruolo": "data-editor",
+  "codice": "ter-167",
+  "fatti": [
+    {
+      "percorso_json": "ultimo[0], sintesi.massimo, dinamica.record.massimo_storico",
+      "valore": "Basilicata 2023 = 28.65%, rango 1/20",
+      "formulazione_prudente": "Nel 2023 la Basilicata e la regione dove gli investimenti pesano di piu sul PIL.",
+      "cosa_non_dice": "Non dice che la Basilicata investe di piu in valore assoluto: il denominatore PIL e piccolo. Nessun nesso causale senza fonte."
+    },
+    {
+      "percorso_json": "ultimo[1], matrice_ridotta.2023.Piemonte, dinamica.rotture (2021, +4.38)",
+      "valore": "Piemonte 2023 = 26.88%, rango 2/20; nel 2021 +4.38 punti in un anno",
+      "formulazione_prudente": "Il Piemonte e secondo nel 2023, un livello raggiunto solo di recente.",
+      "cosa_non_dice": "Non spiega la causa del salto 2021."
+    },
+    {
+      "percorso_json": "dinamica.convergenza, sintesi.rapporto_max_min",
+      "valore": "da 11.51 (1995) a 10.42 (2023), convergenza; rapporto max/min 1.57",
+      "formulazione_prudente": "La distanza fra la prima e l'ultima regione si e ridotta di poco e resta ampia: la prima ha una quota una volta e mezza quella dell'ultima.",
+      "cosa_non_dice": "Non dice che il riavvicinamento sia stato costante o che il divario si sia chiuso."
+    },
+    {
+      "percorso_json": "macroaree",
+      "valore": "Nord 22.16, Mezzogiorno 20.92, Centro 20.19, divario Nord-Mezzogiorno 1.24",
+      "formulazione_prudente": "Nel 2023 il Centro ha la quota piu bassa fra le tre grandi aree, non il Mezzogiorno.",
+      "cosa_non_dice": "Non autorizza a dire che il Mezzogiorno stia meglio del Centro in senso ampio."
+    },
+    {
+      "percorso_json": "dinamica.rotture (Molise 2009 e 2021), dinamica.volatilita.Molise",
+      "valore": "Molise: -5.45 nel 2009, +5.31 nel 2021; volatilita 2.15, la piu alta",
+      "formulazione_prudente": "Il Molise e la regione con gli sbalzi piu ampi della serie.",
+      "cosa_non_dice": "Non spiega la causa: in un'economia piccola un solo investimento sposta molto la quota."
+    },
+    {
+      "percorso_json": "gruppi.gruppi, gruppi.bonta_delle_macroaree, gruppi.sovrapposizione_con_macroaree",
+      "valore": "bonta 0.91 contro 0.08 delle macroaree; sovrapposizione 0.5; coincide_con_macroaree false",
+      "formulazione_prudente": "Le regioni che si assomigliano non sono raggruppate per area geografica: le due in cima, Piemonte e Basilicata, stanno in aree opposte.",
+      "cosa_non_dice": "Non autorizza un racconto Nord contro Sud per questo indicatore."
+    }
+  ],
+  "struttura_territoriale": "La geografia Nord/Centro/Mezzogiorno non spiega questo indicatore (0.08 contro 0.91). Nord contro Sud sarebbe una lettura falsa.",
+  "rotture_utili": {
+    "fatti_di_serie": [
+      "media nazionale a U: massimo 19.43 nel 2007, minimo 15.17 nel 2014, poi 21.27 nel 2023",
+      "minimo storico Lazio 1996 (11.82), massimo storico Basilicata 2023 (28.65)",
+      "convergenza da 11.51 a 10.42"
+    ],
+    "chiedono_una_fonte_esterna": [
+      "cali 2008-2009 (Campania -4.27, Molise -5.45, Umbria -4.82)",
+      "salti 2021 (Molise +5.31, Liguria +4.76, Piemonte +4.38) accanto alla risalita nazionale 16.32 -> 19.04",
+      "inversioni di Basilicata e Calabria",
+      "Valle d'Aosta +4.79 nel 2023"
+    ],
+    "anni_mancanti": "nessuno, serie 1995-2023 completa"
+  },
+  "limiti": [
+    "Il denominatore e il PIL, che nello stesso periodo si e mosso molto: una quota che sale puo riflettere piu investimento oppure un PIL che cresce meno. Il dossier non separa numeratore e denominatore.",
+    "La media nazionale del dossier (21.27) e la media semplice delle venti regioni, non un aggregato ponderato: non va presentata come la quota di investimento dell'Italia.",
+    "definizione.note segnala una revisione metodologica completa della contabilita nazionale (Ateco 2007 / Nace Rev. 2) che sostituisce integralmente gli aggregati precedenti; il dossier non dice da quale anno si applica."
+  ],
+  "sfida_angolo_ovvio": "Nord contro Mezzogiorno e debole: 0.08 di bonta, divario 1.24 punti contro una distanza fra prima e ultima regione di 10.42, e nel 2023 la quota piu bassa e del Centro. L'arco temporale 2007-2014-2023 racconta di piu.",
+  "parenti_utili": {
+    "utili": ["ter-267 Capacita di esportare (2022)", "ter-168 (2022)", "ter-115 (2022)", "ter-94 Capacita di finanziamento (2018, ma datato)"],
+    "avvertenza": "Il dossier riporta solo nome, codice e percorso canonico dei parenti, non i loro valori regione per regione: si possono linkare, non si possono citare loro cifre."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "ruolo": "search-strategist",
+  "codice": "ter-167",
+  "intento_primario": "La mia regione sta investendo abbastanza per costruire il futuro, o rischia di restare indietro?",
+  "domande_secondarie": [
+    "Perche negli ultimi anni si investe cosi tanto in Italia rispetto a prima (dal 15% del PIL nel 2014 al 21% nel 2023)?",
+    "Perche la Basilicata, una regione piccola, risulta quella che investe di piu in proporzione alla sua economia?"
+  ],
+  "query_pertinenti": [],
+  "query_scartate_motivi": {
+    "pil pro capite calabria": "la query cerca il PIL pro capite, non la quota di investimenti sul PIL: rispondere con questa pagina sarebbe una promessa vuota",
+    "produttivita media del lavoro": "stesso macrotema ma indicatore diverso, non nei parenti, il dossier non ha dati di produttivita",
+    "disoccupazione per regione": "nessun dato occupazionale nel dossier",
+    "occupazione giovanile": "nessun dato occupazionale nel dossier",
+    "classifica regioni italiane per qualita della vita": "query troppo ampia per un solo indicatore",
+    "altre": "gestione dati r&s, distribuzione di acqua, livello di istruzione, fruizione biblioteche, abitanti equivalenti, indice di vecchiaia: nessuna relazione tematica"
+  },
+  "termini_del_lettore": "investimenti, quanto si investe, soldi investiti nella mia regione, PIL e investimenti, chi investe di piu in Italia, cantieri e opere pubbliche. Da usare per orientare lead e titoli, non da infilare come lista.",
+  "titoli": [
+    "Gli investimenti in Italia non sono mai stati cosi alti: nel 2023 il 21% del PIL, record della serie",
+    "Perche la Basilicata investe piu di ogni altra regione italiana"
+  ],
+  "controllo_lead": "sotto 200 caratteri, sulla tesi e non sulla definizione. Da scartare qualunque lead che apra con la definizione Istat.",
+  "buchi_informativi": [
+    "manca una spiegazione verificata dell'anomalia Basilicata",
+    "manca l'aggancio a che cosa l'aumento produce per le persone: il dossier ha solo la quota sul PIL",
+    "manca il contesto verificato del salto 2021-2023",
+    "nessun parente aiuta a rispondere a che cosa cambia per le persone: la lista contiene solo export, energia elettrica delle imprese, occupazione pesca"
+  ],
+  "rilievo_del_lead_su_questa_consegna": "L'esempio di lead proposto dal search-strategist ('A guidare la crescita non e il Sud ma il Nord') e stato RESPINTO dal lead: contraddice il dossier, dove la geografia spiega 0.08 contro 0.91 e il divario Nord-Mezzogiorno vale 1.24 punti su una distanza di 10.42 fra prima e ultima regione."
+}

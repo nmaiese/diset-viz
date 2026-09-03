@@ -1,0 +1,665 @@
+{
+ "anni": [
+  1995,
+  1996,
+  1997,
+  1998,
+  1999,
+  2000,
+  2001,
+  2002,
+  2003,
+  2004,
+  2005,
+  2006,
+  2007,
+  2008,
+  2009,
+  2010,
+  2011,
+  2012,
+  2013,
+  2014,
+  2015,
+  2016,
+  2017,
+  2018,
+  2019,
+  2020,
+  2021,
+  2022,
+  2023
+ ],
+ "anni_mancanti": [],
+ "anomalie": [
+  "Basilicata: 28.65, fuori scala rispetto alla mediana (20.49)",
+  "Valle d'Aosta: +9.04 in cinque anni, la variazione più alta della serie",
+  "Liguria: +3.44 in cinque anni, la variazione più bassa della serie",
+  "Molise: salto di -5.45 nel 2009",
+  "Molise: salto di +5.31 nel 2021",
+  "Umbria: salto di -4.82 nel 2009",
+  "Basilicata: cambia direzione, -1.25 nei cinque anni prima, +7.09 negli ultimi tre",
+  "Calabria: cambia direzione, -1.99 nei cinque anni prima, +5.6 negli ultimi tre",
+  "il divario è in convergenza: da 11.51 (1995) a 10.42"
+ ],
+ "buchi": [],
+ "codice": "ter-167",
+ "definizione": {
+  "anno_finale": "2023",
+  "anno_iniziale": "1995",
+  "dati_di_base": "Investimenti fissi lordi (prezzi correnti), Investimenti fissi lordi (prezzi anno precedente), PIL (valori correnti), PIL (prezzi dell'anno precedente)",
+  "definizione": "Investimenti fissi lordi in percentuale del PIL (percentuale)",
+  "fonti": "Fonte: Istat",
+  "note": "Gli aggregati di contabilità nazionale utilizzati nella tavola sostituiscono integralmente i precedenti in quanto risultato di una complessa revisione metodologica e definitoria. La revisione ha riguardato anche il passaggio alla nuova classificazione delle attività economiche (Ateco 2007, versione italiana della Nace Rev. 2). Per ulteriori informazioni si rinvia al seguente link: http://www.istat.it/it/archivio/75111",
+  "periodicita": "Annuale",
+  "unita_territoriale": "REGIONI"
+ },
+ "dinamica": {
+  "convergenza": {
+   "anno_iniziale": 1995,
+   "spread_finale": 10.42,
+   "spread_iniziale": 11.51,
+   "verdetto": "convergenza"
+  },
+  "delta_10a": {
+   "Abruzzo": 4.24,
+   "Basilicata": 8.61,
+   "Calabria": 1.75,
+   "Campania": 5.17,
+   "Emilia-Romagna": 5.13,
+   "Friuli-Venezia Giulia": 5.17,
+   "Lazio": 5.46,
+   "Liguria": 4.9,
+   "Lombardia": 4.53,
+   "Marche": 6.51,
+   "Molise": 5.95,
+   "Piemonte": 8.47,
+   "Puglia": 5.37,
+   "Sardegna": 6.19,
+   "Sicilia": 6.7,
+   "Toscana": 5.42,
+   "Trentino Alto Adige": 8.07,
+   "Umbria": 6.4,
+   "Valle d'Aosta": 8.89,
+   "Veneto": 6.31
+  },
+  "delta_1a": {
+   "Abruzzo": 2.82,
+   "Basilicata": 4.17,
+   "Calabria": 1.95,
+   "Campania": 1.43,
+   "Emilia-Romagna": 1.95,
+   "Friuli-Venezia Giulia": 2.33,
+   "Lazio": 1.4,
+   "Liguria": 2.14,
+   "Lombardia": 1.14,
+   "Marche": 2.21,
+   "Molise": 1.88,
+   "Piemonte": 0.56,
+   "Puglia": 1.08,
+   "Sardegna": 1.27,
+   "Sicilia": 2.32,
+   "Toscana": 1.87,
+   "Trentino Alto Adige": 1.62,
+   "Umbria": 3.26,
+   "Valle d'Aosta": 4.79,
+   "Veneto": 1.83
+  },
+  "delta_5a": {
+   "Abruzzo": 5.41,
+   "Basilicata": 7.91,
+   "Calabria": 4.91,
+   "Campania": 3.7,
+   "Emilia-Romagna": 3.62,
+   "Friuli-Venezia Giulia": 4.17,
+   "Lazio": 4.16,
+   "Liguria": 3.44,
+   "Lombardia": 3.7,
+   "Marche": 5.48,
+   "Molise": 6.1,
+   "Piemonte": 6.32,
+   "Puglia": 4.2,
+   "Sardegna": 5.52,
+   "Sicilia": 5.88,
+   "Toscana": 4.55,
+   "Trentino Alto Adige": 5.1,
+   "Umbria": 5.19,
+   "Valle d'Aosta": 9.04,
+   "Veneto": 3.97
+  },
+  "inversioni": [
+   {
+    "poi": 7.09,
+    "prima": -1.25,
+    "territorio": "Basilicata"
+   },
+   {
+    "poi": 5.6,
+    "prima": -1.99,
+    "territorio": "Calabria"
+   }
+  ],
+  "media_per_anno": {
+   "1995": 17.21,
+   "1996": 17.1,
+   "1997": 17.44,
+   "1998": 17.49,
+   "1999": 17.67,
+   "2000": 18.24,
+   "2001": 18.28,
+   "2002": 18.59,
+   "2003": 18.59,
+   "2004": 18.57,
+   "2005": 18.86,
+   "2006": 19.38,
+   "2007": 19.43,
+   "2008": 19.37,
+   "2009": 17.47,
+   "2010": 17.74,
+   "2011": 17.54,
+   "2012": 16.1,
+   "2013": 15.31,
+   "2014": 15.17,
+   "2015": 15.2,
+   "2016": 15.44,
+   "2017": 15.56,
+   "2018": 16.15,
+   "2019": 16.19,
+   "2020": 16.32,
+   "2021": 19.04,
+   "2022": 19.17,
+   "2023": 21.27
+  },
+  "nazionale": {
+   "delta_10a": 5.96,
+   "delta_1a": 2.1,
+   "delta_5a": 5.12,
+   "ultimo": 21.27
+  },
+  "record": {
+   "massimo_storico": {
+    "anno": 2023,
+    "territorio": "Basilicata",
+    "valore": 28.65
+   },
+   "minimo_storico": {
+    "anno": 1996,
+    "territorio": "Lazio",
+    "valore": 11.82
+   }
+  },
+  "rotture": [
+   {
+    "anno": 2009,
+    "salto": -5.45,
+    "territorio": "Molise"
+   },
+   {
+    "anno": 2021,
+    "salto": 5.31,
+    "territorio": "Molise"
+   },
+   {
+    "anno": 2009,
+    "salto": -4.82,
+    "territorio": "Umbria"
+   },
+   {
+    "anno": 2023,
+    "salto": 4.79,
+    "territorio": "Valle d'Aosta"
+   },
+   {
+    "anno": 2021,
+    "salto": 4.76,
+    "territorio": "Liguria"
+   },
+   {
+    "anno": 2021,
+    "salto": 4.38,
+    "territorio": "Piemonte"
+   },
+   {
+    "anno": 2022,
+    "salto": -4.28,
+    "territorio": "Liguria"
+   },
+   {
+    "anno": 2008,
+    "salto": -4.27,
+    "territorio": "Campania"
+   }
+  ],
+  "volatilita": {
+   "Abruzzo": 1.15,
+   "Basilicata": 1.77,
+   "Calabria": 1.32,
+   "Campania": 1.16,
+   "Emilia-Romagna": 1.09,
+   "Friuli-Venezia Giulia": 0.83,
+   "Lazio": 0.71,
+   "Liguria": 1.82,
+   "Lombardia": 0.77,
+   "Marche": 1.02,
+   "Molise": 2.15,
+   "Piemonte": 1.25,
+   "Puglia": 0.8,
+   "Sardegna": 1.52,
+   "Sicilia": 1.01,
+   "Toscana": 1.04,
+   "Trentino Alto Adige": 1.27,
+   "Umbria": 1.96,
+   "Valle d'Aosta": 1.57,
+   "Veneto": 0.91
+  }
+ },
+ "gruppi": {
+  "bonta": 0.91,
+  "bonta_delle_macroaree": 0.08,
+  "coincide_con_macroaree": false,
+  "gruppi": [
+   {
+    "a": 20.69,
+    "da": 18.23,
+    "macroarea_prevalente": "Mezzogiorno",
+    "territori": [
+     "Calabria",
+     "Lazio",
+     "Campania",
+     "Liguria",
+     "Puglia",
+     "Sicilia",
+     "Toscana",
+     "Lombardia",
+     "Sardegna",
+     "Marche",
+     "Friuli-Venezia Giulia"
+    ]
+   },
+   {
+    "a": 24.36,
+    "da": 21.46,
+    "macroarea_prevalente": "Nord",
+    "territori": [
+     "Veneto",
+     "Emilia-Romagna",
+     "Molise",
+     "Abruzzo",
+     "Umbria",
+     "Trentino Alto Adige",
+     "Valle d'Aosta"
+    ]
+   },
+   {
+    "a": 28.65,
+    "da": 26.88,
+    "macroarea_prevalente": "Nord",
+    "territori": [
+     "Piemonte",
+     "Basilicata"
+    ]
+   }
+  ],
+  "motivo": null,
+  "sovrapposizione_con_macroaree": 0.5
+ },
+ "livello": "regione",
+ "macroaree": {
+  "Centro": 20.19,
+  "Mezzogiorno": 20.92,
+  "Nord": 22.16,
+  "divario_nord_mezzogiorno": 1.24
+ },
+ "matrice_ridotta": {
+  "1995": {
+   "Abruzzo": 15.2,
+   "Basilicata": 24.14,
+   "Calabria": 18.87,
+   "Campania": 19.96,
+   "Emilia-Romagna": 19.44,
+   "Friuli-Venezia Giulia": 15.16,
+   "Lazio": 12.62,
+   "Liguria": 14.93,
+   "Lombardia": 14.97,
+   "Marche": 16.53,
+   "Molise": 19.0,
+   "Piemonte": 19.02,
+   "Puglia": 13.89,
+   "Sardegna": 19.43,
+   "Sicilia": 15.45,
+   "Toscana": 16.4,
+   "Trentino Alto Adige": 14.97,
+   "Umbria": 19.58,
+   "Valle d'Aosta": 17.34,
+   "Veneto": 17.34
+  },
+  "2009": {
+   "Abruzzo": 19.22,
+   "Basilicata": 23.84,
+   "Calabria": 19.82,
+   "Campania": 15.58,
+   "Emilia-Romagna": 19.87,
+   "Friuli-Venezia Giulia": 18.39,
+   "Lazio": 12.59,
+   "Liguria": 16.71,
+   "Lombardia": 17.51,
+   "Marche": 15.2,
+   "Molise": 16.52,
+   "Piemonte": 17.94,
+   "Puglia": 16.34,
+   "Sardegna": 21.88,
+   "Sicilia": 14.69,
+   "Toscana": 15.09,
+   "Trentino Alto Adige": 14.14,
+   "Umbria": 19.76,
+   "Valle d'Aosta": 16.56,
+   "Veneto": 17.71
+  },
+  "2021": {
+   "Abruzzo": 19.34,
+   "Basilicata": 24.21,
+   "Calabria": 16.06,
+   "Campania": 16.56,
+   "Emilia-Romagna": 20.12,
+   "Friuli-Venezia Giulia": 17.82,
+   "Lazio": 15.65,
+   "Liguria": 21.14,
+   "Lombardia": 16.72,
+   "Marche": 17.29,
+   "Molise": 21.11,
+   "Piemonte": 25.11,
+   "Puglia": 17.07,
+   "Sardegna": 17.59,
+   "Sicilia": 15.87,
+   "Toscana": 17.56,
+   "Trentino Alto Adige": 22.56,
+   "Umbria": 19.79,
+   "Valle d'Aosta": 20.25,
+   "Veneto": 18.88
+  },
+  "2022": {
+   "Abruzzo": 19.47,
+   "Basilicata": 24.49,
+   "Calabria": 16.28,
+   "Campania": 16.91,
+   "Emilia-Romagna": 19.95,
+   "Friuli-Venezia Giulia": 18.36,
+   "Lazio": 16.92,
+   "Liguria": 16.87,
+   "Lombardia": 18.22,
+   "Marche": 18.08,
+   "Molise": 20.06,
+   "Piemonte": 26.33,
+   "Puglia": 18.01,
+   "Sardegna": 18.36,
+   "Sicilia": 16.84,
+   "Toscana": 17.46,
+   "Trentino Alto Adige": 22.03,
+   "Umbria": 19.58,
+   "Valle d'Aosta": 19.57,
+   "Veneto": 19.63
+  },
+  "2023": {
+   "Abruzzo": 22.3,
+   "Basilicata": 28.65,
+   "Calabria": 18.23,
+   "Campania": 18.34,
+   "Emilia-Romagna": 21.9,
+   "Friuli-Venezia Giulia": 20.69,
+   "Lazio": 18.32,
+   "Liguria": 19.01,
+   "Lombardia": 19.36,
+   "Marche": 20.28,
+   "Molise": 21.94,
+   "Piemonte": 26.88,
+   "Puglia": 19.09,
+   "Sardegna": 19.63,
+   "Sicilia": 19.17,
+   "Toscana": 19.34,
+   "Trentino Alto Adige": 23.65,
+   "Umbria": 22.84,
+   "Valle d'Aosta": 24.36,
+   "Veneto": 21.46
+  }
+ },
+ "meta": {
+  "archivio": "Investimenti fissi lordi in percentuale del PIL (percentuale)",
+  "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo",
+  "id": "167",
+  "istituzione": "Istat",
+  "nome": "Intensità di accumulazione del capitale",
+  "percentuale": true,
+  "percorso_canonico": "/indicatore/intensita-di-accumulazione-del-capitale/ter-167",
+  "scala_umana": "Un valore di 20 indica che il fenomeno misurato equivale al 20% del PIL.",
+  "tema": "Imprese e competitività",
+  "unita": "percentuale",
+  "unita_del_valore": "%",
+  "unita_della_variazione": "punti percentuali",
+  "verso": "higher_better"
+ },
+ "parenti": [
+  {
+   "anno_max": 2019,
+   "codice": "ter-436",
+   "nome": "Addetti occupati nelle unità locali delle imprese italiane a controllo estero",
+   "percorso_canonico": "/indicatore/addetti-occupati-nelle-unita-locali-delle-imprese-italiane-a-controllo-estero/ter-436",
+   "relazione": "stesso tema",
+   "unita": "percentuale"
+  },
+  {
+   "anno_max": 2023,
+   "codice": "ter-249",
+   "nome": "Andamento dell'occupazione del settore della pesca",
+   "percorso_canonico": "/indicatore/andamento-dell-occupazione-del-settore-della-pesca/ter-249",
+   "relazione": "stesso tema",
+   "unita": "percentuale"
+  },
+  {
+   "anno_max": 2022,
+   "codice": "ter-267",
+   "nome": "Capacità di esportare",
+   "percorso_canonico": "/indicatore/capacita-di-esportare/ter-267",
+   "relazione": "stesso tema",
+   "unita": "percentuale"
+  },
+  {
+   "anno_max": 2022,
+   "codice": "ter-168",
+   "nome": "Capacità di esportare in settori a domanda mondiale dinamica",
+   "percorso_canonico": "/indicatore/capacita-di-esportare-in-settori-a-domanda-mondiale-dinamica/ter-168",
+   "relazione": "stesso tema",
+   "unita": "percentuale"
+  },
+  {
+   "anno_max": 2018,
+   "codice": "ter-94",
+   "nome": "Capacità di finanziamento",
+   "percorso_canonico": "/indicatore/capacita-di-finanziamento/ter-94",
+   "relazione": "stesso tema",
+   "unita": "percentuale"
+  },
+  {
+   "anno_max": 2022,
+   "codice": "ter-115",
+   "nome": "Capacità di sviluppo dei servizi alle imprese",
+   "percorso_canonico": "/indicatore/capacita-di-sviluppo-dei-servizi-alle-imprese/ter-115",
+   "relazione": "stesso tema",
+   "unita": "percentuale"
+  },
+  {
+   "anno_max": 2023,
+   "codice": "ter-375",
+   "nome": "Consumi di energia elettrica delle imprese dell'agricoltura",
+   "percorso_canonico": "/indicatore/consumi-di-energia-elettrica-delle-imprese-dell-agricoltura/ter-375",
+   "relazione": "stesso tema",
+   "unita": "GWh per 100 milioni di euro"
+  },
+  {
+   "anno_max": 2023,
+   "codice": "ter-376",
+   "nome": "Consumi di energia elettrica delle imprese dell'industria",
+   "percorso_canonico": "/indicatore/consumi-di-energia-elettrica-delle-imprese-dell-industria/ter-376",
+   "relazione": "stesso tema",
+   "unita": "GWh per 100 milioni di euro"
+  }
+ ],
+ "sintesi": {
+  "coeff_variazione": 13.2,
+  "massimo": {
+   "territorio": "Basilicata",
+   "valore": 28.65
+  },
+  "media": 21.27,
+  "mediana": 20.49,
+  "minimo": {
+   "territorio": "Calabria",
+   "valore": 18.23
+  },
+  "rapporto_max_min": 1.57,
+  "spread": 10.42,
+  "territori": 20
+ },
+ "ultimo": [
+  {
+   "percentile": 100.0,
+   "rango": 1,
+   "scarto_dalla_mediana": 8.16,
+   "territorio": "Basilicata",
+   "valore": 28.65
+  },
+  {
+   "percentile": 94.7,
+   "rango": 2,
+   "scarto_dalla_mediana": 6.4,
+   "territorio": "Piemonte",
+   "valore": 26.88
+  },
+  {
+   "percentile": 89.5,
+   "rango": 3,
+   "scarto_dalla_mediana": 3.87,
+   "territorio": "Valle d'Aosta",
+   "valore": 24.36
+  },
+  {
+   "percentile": 84.2,
+   "rango": 4,
+   "scarto_dalla_mediana": 3.16,
+   "territorio": "Trentino Alto Adige",
+   "valore": 23.65
+  },
+  {
+   "percentile": 78.9,
+   "rango": 5,
+   "scarto_dalla_mediana": 2.35,
+   "territorio": "Umbria",
+   "valore": 22.84
+  },
+  {
+   "percentile": 73.7,
+   "rango": 6,
+   "scarto_dalla_mediana": 1.81,
+   "territorio": "Abruzzo",
+   "valore": 22.3
+  },
+  {
+   "percentile": 68.4,
+   "rango": 7,
+   "scarto_dalla_mediana": 1.45,
+   "territorio": "Molise",
+   "valore": 21.94
+  },
+  {
+   "percentile": 63.2,
+   "rango": 8,
+   "scarto_dalla_mediana": 1.41,
+   "territorio": "Emilia-Romagna",
+   "valore": 21.9
+  },
+  {
+   "percentile": 57.9,
+   "rango": 9,
+   "scarto_dalla_mediana": 0.97,
+   "territorio": "Veneto",
+   "valore": 21.46
+  },
+  {
+   "percentile": 52.6,
+   "rango": 10,
+   "scarto_dalla_mediana": 0.2,
+   "territorio": "Friuli-Venezia Giulia",
+   "valore": 20.69
+  },
+  {
+   "percentile": 47.4,
+   "rango": 11,
+   "scarto_dalla_mediana": -0.2,
+   "territorio": "Marche",
+   "valore": 20.28
+  },
+  {
+   "percentile": 42.1,
+   "rango": 12,
+   "scarto_dalla_mediana": -0.86,
+   "territorio": "Sardegna",
+   "valore": 19.63
+  },
+  {
+   "percentile": 36.8,
+   "rango": 13,
+   "scarto_dalla_mediana": -1.13,
+   "territorio": "Lombardia",
+   "valore": 19.36
+  },
+  {
+   "percentile": 31.6,
+   "rango": 14,
+   "scarto_dalla_mediana": -1.15,
+   "territorio": "Toscana",
+   "valore": 19.34
+  },
+  {
+   "percentile": 26.3,
+   "rango": 15,
+   "scarto_dalla_mediana": -1.32,
+   "territorio": "Sicilia",
+   "valore": 19.17
+  },
+  {
+   "percentile": 21.1,
+   "rango": 16,
+   "scarto_dalla_mediana": -1.39,
+   "territorio": "Puglia",
+   "valore": 19.09
+  },
+  {
+   "percentile": 15.8,
+   "rango": 17,
+   "scarto_dalla_mediana": -1.48,
+   "territorio": "Liguria",
+   "valore": 19.01
+  },
+  {
+   "percentile": 10.5,
+   "rango": 18,
+   "scarto_dalla_mediana": -2.15,
+   "territorio": "Campania",
+   "valore": 18.34
+  },
+  {
+   "percentile": 5.3,
+   "rango": 19,
+   "scarto_dalla_mediana": -2.17,
+   "territorio": "Lazio",
+   "valore": 18.32
+  },
+  {
+   "percentile": 0.0,
+   "rango": 20,
+   "scarto_dalla_mediana": -2.26,
+   "territorio": "Calabria",
+   "valore": 18.23
+  }
+ ],
+ "vintage": 2023
+}
