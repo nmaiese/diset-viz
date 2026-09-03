@@ -53,6 +53,7 @@ PASSI = (1, 5, 10)
 # solo con i valori per territorio, e quelli costano una vista ciascuno.
 PARENTI_MAX = 8
 VARIANTI_CON_VALORI = 3
+TEMA_CON_VALORI = 3  # vicini di tema con i valori regione per regione
 
 # Quanta della varianza fra territori deve stare **fra** i gruppi perché una
 # divisione valga la pena di essere raccontata. È la soglia classica della
@@ -415,6 +416,18 @@ def _parenti(vista, meta, famiglia, chiave_livello):
             "relazione": "stesso tema",
         })
     for voce in [v for v in voci if v["relazione"] != "stesso tema"][:VARIANTI_CON_VALORI]:
+        anno, valori = _valori_del_parente(voce["codice"], chiave_livello)
+        if valori:
+            voce["anno"] = anno
+            voce["valori"] = valori
+    # Anche i vicini di tema portano i valori, altrimenti chi scrive non può fare
+    # il confronto che il lettore chiede (feedback del 2026-09-03: "correlazioni
+    # con altri indicatori") e `lab.controlla` fermerebbe qualunque cifra di un
+    # parente come non trovata. Pochi, perché ogni parente con valori allarga
+    # l'insieme delle cifre che il controllo accetta.
+    di_tema = sorted([v for v in voci if v["relazione"] == "stesso tema"],
+                     key=lambda v: (v.get("anno_max") or 0), reverse=True)  # prima i più aggiornati
+    for voce in di_tema[:TEMA_CON_VALORI]:
         anno, valori = _valori_del_parente(voce["codice"], chiave_livello)
         if valori:
             voce["anno"] = anno
