@@ -1,0 +1,656 @@
+{
+ "anni": [
+  2018,
+  2019,
+  2020,
+  2021,
+  2022,
+  2023,
+  2024,
+  2025
+ ],
+ "anni_mancanti": [],
+ "anomalie": [
+  "Basilicata: +7.34 in cinque anni, la variazione più alta della serie",
+  "Friuli-Venezia Giulia: +2.88 in cinque anni, la variazione più bassa della serie",
+  "Valle d'Aosta: salto di +3.23 nel 2022",
+  "Toscana: salto di +2.96 nel 2022",
+  "Abruzzo: salto di +2.91 nel 2023",
+  "il divario è in convergenza: da 30.17 (2018) a 26.48"
+ ],
+ "buchi": [],
+ "codice": "ter-13",
+ "definizione": {
+  "anno_finale": "2025",
+  "anno_iniziale": "2018",
+  "dati_di_base": "Occupati 15-64 anni, Popolazione 15-64 anni",
+  "definizione": "Persone occupate in età 15-64 anni sulla popolazione nella corrispondente classe di età (%) (media annua)",
+  "fonti": "Fonte: Istat",
+  "note": "La definizione di tasso di occupazione utilizzata è quella ufficiale di Eurostat riportata sul Coded (The Eurostat Concepts and Definitions Database) alla pagina web: http://forum.europa.eu.int/irc/dsis/coded/info/data/coded/en.htm o sul volume dal titolo \"The European Union labour force survey\", Methods and definitions, 1998 edition, Eurostat, p.13.",
+  "periodicita": "Annuale",
+  "unita_territoriale": "REGIONI"
+ },
+ "dinamica": {
+  "convergenza": {
+   "anno_iniziale": 2018,
+   "spread_finale": 26.48,
+   "spread_iniziale": 30.17,
+   "verdetto": "convergenza"
+  },
+  "delta_10a": {},
+  "delta_1a": {
+   "Abruzzo": 0.35,
+   "Basilicata": 1.44,
+   "Calabria": 1.61,
+   "Campania": 1.25,
+   "Emilia-Romagna": 1.08,
+   "Friuli-Venezia Giulia": -0.35,
+   "Lazio": 0.17,
+   "Liguria": 1.45,
+   "Lombardia": 0.17,
+   "Marche": 0.26,
+   "Molise": 0.06,
+   "Piemonte": -0.06,
+   "Puglia": -0.15,
+   "Sardegna": 0.55,
+   "Sicilia": 0.52,
+   "Toscana": -0.38,
+   "Trentino Alto Adige": 0.21,
+   "Umbria": 1.1,
+   "Valle d'Aosta": -0.18,
+   "Veneto": -0.95
+  },
+  "delta_5a": {
+   "Abruzzo": 5.82,
+   "Basilicata": 7.34,
+   "Calabria": 5.63,
+   "Campania": 6.42,
+   "Emilia-Romagna": 3.22,
+   "Friuli-Venezia Giulia": 2.88,
+   "Lazio": 4.78,
+   "Liguria": 7.3,
+   "Lombardia": 3.42,
+   "Marche": 4.07,
+   "Molise": 4.87,
+   "Piemonte": 4.8,
+   "Puglia": 5.43,
+   "Sardegna": 6.49,
+   "Sicilia": 6.85,
+   "Toscana": 5.19,
+   "Trentino Alto Adige": 3.67,
+   "Umbria": 6.21,
+   "Valle d'Aosta": 5.46,
+   "Veneto": 4.05
+  },
+  "inversioni": [],
+  "media_per_anno": {
+   "2018": 58.76,
+   "2019": 59.36,
+   "2020": 57.85,
+   "2021": 58.68,
+   "2022": 60.51,
+   "2023": 61.9,
+   "2024": 62.63,
+   "2025": 63.04
+  },
+  "nazionale": {
+   "delta_1a": 0.41,
+   "delta_5a": 5.19,
+   "ultimo": 63.04
+  },
+  "record": {
+   "massimo_storico": {
+    "anno": 2025,
+    "territorio": "Trentino Alto Adige",
+    "valore": 72.89
+   },
+   "minimo_storico": {
+    "anno": 2020,
+    "territorio": "Campania",
+    "valore": 40.25
+   }
+  },
+  "rotture": [
+   {
+    "anno": 2022,
+    "salto": 3.23,
+    "territorio": "Valle d'Aosta"
+   },
+   {
+    "anno": 2022,
+    "salto": 2.96,
+    "territorio": "Toscana"
+   },
+   {
+    "anno": 2023,
+    "salto": 2.91,
+    "territorio": "Abruzzo"
+   },
+   {
+    "anno": 2022,
+    "salto": 2.78,
+    "territorio": "Trentino Alto Adige"
+   },
+   {
+    "anno": 2022,
+    "salto": 2.74,
+    "territorio": "Puglia"
+   },
+   {
+    "anno": 2022,
+    "salto": 2.7,
+    "territorio": "Marche"
+   },
+   {
+    "anno": 2021,
+    "salto": 2.5,
+    "territorio": "Basilicata"
+   },
+   {
+    "anno": 2023,
+    "salto": 2.33,
+    "territorio": "Sicilia"
+   }
+  ],
+  "volatilita": {
+   "Abruzzo": 1.23,
+   "Basilicata": 0.91,
+   "Calabria": 0.94,
+   "Campania": 0.97,
+   "Emilia-Romagna": 1.11,
+   "Friuli-Venezia Giulia": 0.52,
+   "Lazio": 1.08,
+   "Liguria": 1.35,
+   "Lombardia": 1.14,
+   "Marche": 1.15,
+   "Molise": 1.38,
+   "Piemonte": 1.12,
+   "Puglia": 1.03,
+   "Sardegna": 1.19,
+   "Sicilia": 0.97,
+   "Toscana": 1.32,
+   "Trentino Alto Adige": 1.34,
+   "Umbria": 1.11,
+   "Valle d'Aosta": 1.49,
+   "Veneto": 1.61
+  }
+ },
+ "gruppi": {
+  "bonta": 0.95,
+  "bonta_delle_macroaree": 0.8,
+  "coincide_con_macroaree": true,
+  "gruppi": [
+   {
+    "a": 51.01,
+    "da": 46.41,
+    "macroarea_prevalente": "Mezzogiorno",
+    "territori": [
+     "Calabria",
+     "Campania",
+     "Sicilia",
+     "Puglia"
+    ]
+   },
+   {
+    "a": 64.17,
+    "da": 57.39,
+    "macroarea_prevalente": "Mezzogiorno",
+    "territori": [
+     "Basilicata",
+     "Molise",
+     "Sardegna",
+     "Abruzzo",
+     "Lazio"
+    ]
+   },
+   {
+    "a": 72.89,
+    "da": 67.49,
+    "macroarea_prevalente": "Nord",
+    "territori": [
+     "Marche",
+     "Liguria",
+     "Piemonte",
+     "Umbria",
+     "Veneto",
+     "Friuli-Venezia Giulia",
+     "Lombardia",
+     "Toscana",
+     "Emilia-Romagna",
+     "Valle d'Aosta",
+     "Trentino Alto Adige"
+    ]
+   }
+  ],
+  "motivo": null,
+  "sovrapposizione_con_macroaree": 0.8
+ },
+ "livello": "regione",
+ "macroaree": {
+  "Centro": 67.82,
+  "Mezzogiorno": 53.42,
+  "Nord": 70.27,
+  "divario_nord_mezzogiorno": 16.85
+ },
+ "matrice_ridotta": {
+  "2018": {
+   "Abruzzo": 57.93,
+   "Basilicata": 49.37,
+   "Calabria": 42.09,
+   "Campania": 41.54,
+   "Emilia-Romagna": 69.58,
+   "Friuli-Venezia Giulia": 66.22,
+   "Lazio": 60.87,
+   "Liguria": 62.99,
+   "Lombardia": 67.65,
+   "Marche": 64.34,
+   "Molise": 53.44,
+   "Piemonte": 65.85,
+   "Puglia": 45.48,
+   "Sardegna": 52.56,
+   "Sicilia": 40.83,
+   "Toscana": 66.49,
+   "Trentino Alto Adige": 71.0,
+   "Umbria": 62.78,
+   "Valle d'Aosta": 67.63,
+   "Veneto": 66.57
+  },
+  "2022": {
+   "Abruzzo": 58.42,
+   "Basilicata": 53.11,
+   "Calabria": 43.47,
+   "Campania": 43.42,
+   "Emilia-Romagna": 69.72,
+   "Friuli-Venezia Giulia": 68.5,
+   "Lazio": 61.82,
+   "Liguria": 65.97,
+   "Lombardia": 68.21,
+   "Marche": 66.84,
+   "Molise": 54.84,
+   "Piemonte": 66.31,
+   "Puglia": 49.41,
+   "Sardegna": 54.86,
+   "Sicilia": 42.58,
+   "Toscana": 68.6,
+   "Trentino Alto Adige": 71.78,
+   "Umbria": 64.85,
+   "Valle d'Aosta": 69.78,
+   "Veneto": 67.81
+  },
+  "2023": {
+   "Abruzzo": 61.33,
+   "Basilicata": 54.87,
+   "Calabria": 44.63,
+   "Campania": 44.45,
+   "Emilia-Romagna": 70.63,
+   "Friuli-Venezia Giulia": 68.75,
+   "Lazio": 63.23,
+   "Liguria": 67.41,
+   "Lombardia": 69.26,
+   "Marche": 67.38,
+   "Molise": 56.91,
+   "Piemonte": 67.14,
+   "Puglia": 50.68,
+   "Sardegna": 56.11,
+   "Sicilia": 44.91,
+   "Toscana": 69.33,
+   "Trentino Alto Adige": 72.29,
+   "Umbria": 66.49,
+   "Valle d'Aosta": 71.75,
+   "Veneto": 70.45
+  },
+  "2024": {
+   "Abruzzo": 62.08,
+   "Basilicata": 55.95,
+   "Calabria": 44.8,
+   "Campania": 45.42,
+   "Emilia-Romagna": 70.33,
+   "Friuli-Venezia Giulia": 69.76,
+   "Lazio": 64.0,
+   "Liguria": 67.31,
+   "Lombardia": 69.38,
+   "Marche": 67.23,
+   "Molise": 57.85,
+   "Piemonte": 68.99,
+   "Puglia": 51.16,
+   "Sardegna": 57.69,
+   "Sicilia": 46.82,
+   "Toscana": 70.88,
+   "Trentino Alto Adige": 72.69,
+   "Umbria": 68.02,
+   "Valle d'Aosta": 72.14,
+   "Veneto": 70.2
+  },
+  "2025": {
+   "Abruzzo": 62.43,
+   "Basilicata": 57.39,
+   "Calabria": 46.41,
+   "Campania": 46.67,
+   "Emilia-Romagna": 71.41,
+   "Friuli-Venezia Giulia": 69.41,
+   "Lazio": 64.17,
+   "Liguria": 68.76,
+   "Lombardia": 69.55,
+   "Marche": 67.49,
+   "Molise": 57.91,
+   "Piemonte": 68.94,
+   "Puglia": 51.01,
+   "Sardegna": 58.24,
+   "Sicilia": 47.33,
+   "Toscana": 70.49,
+   "Trentino Alto Adige": 72.89,
+   "Umbria": 69.11,
+   "Valle d'Aosta": 71.96,
+   "Veneto": 69.26
+  }
+ },
+ "meta": {
+  "archivio": "Persone occupate in età 15-64 anni sulla popolazione nella corrispondente classe di età (percentuale)",
+  "fonte": "Istat, Banca dati territoriale per le politiche di sviluppo",
+  "id": "13",
+  "istituzione": "Istat",
+  "nome": "Tasso di occupazione (totale)",
+  "percentuale": true,
+  "percorso_canonico": "/indicatore/tasso-di-occupazione-totale/ter-13",
+  "scala_umana": "Un valore di 20 indica che il fenomeno misurato equivale al 20% della popolazione nella corrispondente classe di età.",
+  "tema": "Lavoro e conciliazione",
+  "unita": "percentuale",
+  "unita_del_valore": "%",
+  "unita_della_variazione": "punti percentuali",
+  "verso": "higher_better"
+ },
+ "parenti": [
+  {
+   "anno": 2025,
+   "anno_max": 2025,
+   "codice": "bes-03LAV001-N22",
+   "nome": "Tasso di occupazione (20-64 anni)",
+   "percorso_canonico": "/indicatore/tasso-di-occupazione-20-64-anni/bes-03LAV001-N22",
+   "relazione": "stessa misura, altra famiglia",
+   "unita": "Valori percentuali",
+   "valori": {
+    "Abruzzo": 67.2,
+    "Basilicata": 61.8,
+    "Calabria": 50.3,
+    "Campania": 50.8,
+    "Emilia-Romagna": 77.0,
+    "Friuli-Venezia Giulia": 74.7,
+    "Lazio": 69.3,
+    "Liguria": 73.8,
+    "Lombardia": 75.1,
+    "Marche": 72.9,
+    "Molise": 62.3,
+    "Piemonte": 74.3,
+    "Puglia": 55.2,
+    "Sardegna": 62.3,
+    "Sicilia": 51.4,
+    "Toscana": 76.0,
+    "Trentino Alto Adige": 78.8,
+    "Umbria": 74.6,
+    "Valle d'Aosta": 77.8,
+    "Veneto": 74.7
+   }
+  },
+  {
+   "anno": 2025,
+   "anno_max": 2025,
+   "codice": "ter-178",
+   "nome": "Tasso di occupazione (femmine)",
+   "percorso_canonico": "/indicatore/tasso-di-occupazione-femmine/ter-178",
+   "relazione": "variante",
+   "unita": "percentuale",
+   "valori": {
+    "Abruzzo": 52.62,
+    "Basilicata": 45.41,
+    "Calabria": 34.86,
+    "Campania": 33.95,
+    "Emilia-Romagna": 64.72,
+    "Friuli-Venezia Giulia": 64.17,
+    "Lazio": 56.2,
+    "Liguria": 62.04,
+    "Lombardia": 62.13,
+    "Marche": 62.66,
+    "Molise": 47.28,
+    "Piemonte": 62.96,
+    "Puglia": 37.91,
+    "Sardegna": 51.1,
+    "Sicilia": 34.61,
+    "Toscana": 64.34,
+    "Trentino Alto Adige": 67.88,
+    "Umbria": 62.99,
+    "Valle d'Aosta": 68.9,
+    "Veneto": 60.74
+   }
+  },
+  {
+   "anno": 2025,
+   "anno_max": 2025,
+   "codice": "ter-177",
+   "nome": "Tasso di occupazione (maschi)",
+   "percorso_canonico": "/indicatore/tasso-di-occupazione-maschi/ter-177",
+   "relazione": "variante",
+   "unita": "percentuale",
+   "valori": {
+    "Abruzzo": 72.14,
+    "Basilicata": 69.05,
+    "Calabria": 58.06,
+    "Campania": 59.54,
+    "Emilia-Romagna": 78.0,
+    "Friuli-Venezia Giulia": 74.53,
+    "Lazio": 72.24,
+    "Liguria": 75.43,
+    "Lombardia": 76.77,
+    "Marche": 72.23,
+    "Molise": 68.11,
+    "Piemonte": 74.83,
+    "Puglia": 64.18,
+    "Sardegna": 65.23,
+    "Sicilia": 60.17,
+    "Toscana": 76.64,
+    "Trentino Alto Adige": 77.8,
+    "Umbria": 75.29,
+    "Valle d'Aosta": 74.98,
+    "Veneto": 77.57
+   }
+  },
+  {
+   "anno_max": 2023,
+   "codice": "ter-398",
+   "nome": "Addetti delle nuove imprese",
+   "percorso_canonico": "/indicatore/addetti-delle-nuove-imprese/ter-398",
+   "relazione": "stesso tema",
+   "unita": "percentuale"
+  },
+  {
+   "anno_max": 2024,
+   "codice": "ter-466",
+   "nome": "Condizione occupazionale dei laureati dopo 1-3 anni dal conseguimento del titolo",
+   "percorso_canonico": "/indicatore/condizione-occupazionale-dei-laureati-dopo-1-3-anni-dal-conseguimento-del-titolo/ter-466",
+   "relazione": "stesso tema",
+   "unita": "percentuale"
+  },
+  {
+   "anno_max": 2025,
+   "codice": "ter-61",
+   "nome": "Differenza tra tasso di attività maschile e femminile",
+   "percorso_canonico": "/indicatore/differenza-tra-tasso-di-attivita-maschile-e-femminile/ter-61",
+   "relazione": "stesso tema",
+   "unita": "percentuale"
+  },
+  {
+   "anno_max": 2025,
+   "codice": "ter-57",
+   "nome": "Differenza tra tasso di occupazione maschile e femminile",
+   "percorso_canonico": "/indicatore/differenza-tra-tasso-di-occupazione-maschile-e-femminile/ter-57",
+   "relazione": "stesso tema",
+   "unita": "percentuale"
+  },
+  {
+   "anno_max": 2020,
+   "codice": "bes-03LAV005",
+   "nome": "Dipendenti con bassa paga",
+   "percorso_canonico": "/indicatore/dipendenti-con-bassa-paga/bes-03LAV005",
+   "relazione": "stesso tema",
+   "unita": "Valori percentuali"
+  }
+ ],
+ "sintesi": {
+  "coeff_variazione": 14.0,
+  "massimo": {
+   "territorio": "Trentino Alto Adige",
+   "valore": 72.89
+  },
+  "media": 63.04,
+  "mediana": 68.12,
+  "minimo": {
+   "territorio": "Calabria",
+   "valore": 46.41
+  },
+  "rapporto_max_min": 1.57,
+  "spread": 26.48,
+  "territori": 20
+ },
+ "ultimo": [
+  {
+   "percentile": 100.0,
+   "rango": 1,
+   "scarto_dalla_mediana": 4.77,
+   "territorio": "Trentino Alto Adige",
+   "valore": 72.89
+  },
+  {
+   "percentile": 94.7,
+   "rango": 2,
+   "scarto_dalla_mediana": 3.83,
+   "territorio": "Valle d'Aosta",
+   "valore": 71.96
+  },
+  {
+   "percentile": 89.5,
+   "rango": 3,
+   "scarto_dalla_mediana": 3.28,
+   "territorio": "Emilia-Romagna",
+   "valore": 71.41
+  },
+  {
+   "percentile": 84.2,
+   "rango": 4,
+   "scarto_dalla_mediana": 2.37,
+   "territorio": "Toscana",
+   "valore": 70.49
+  },
+  {
+   "percentile": 78.9,
+   "rango": 5,
+   "scarto_dalla_mediana": 1.43,
+   "territorio": "Lombardia",
+   "valore": 69.55
+  },
+  {
+   "percentile": 73.7,
+   "rango": 6,
+   "scarto_dalla_mediana": 1.29,
+   "territorio": "Friuli-Venezia Giulia",
+   "valore": 69.41
+  },
+  {
+   "percentile": 68.4,
+   "rango": 7,
+   "scarto_dalla_mediana": 1.13,
+   "territorio": "Veneto",
+   "valore": 69.26
+  },
+  {
+   "percentile": 63.2,
+   "rango": 8,
+   "scarto_dalla_mediana": 0.99,
+   "territorio": "Umbria",
+   "valore": 69.11
+  },
+  {
+   "percentile": 57.9,
+   "rango": 9,
+   "scarto_dalla_mediana": 0.81,
+   "territorio": "Piemonte",
+   "valore": 68.94
+  },
+  {
+   "percentile": 52.6,
+   "rango": 10,
+   "scarto_dalla_mediana": 0.63,
+   "territorio": "Liguria",
+   "valore": 68.76
+  },
+  {
+   "percentile": 47.4,
+   "rango": 11,
+   "scarto_dalla_mediana": -0.63,
+   "territorio": "Marche",
+   "valore": 67.49
+  },
+  {
+   "percentile": 42.1,
+   "rango": 12,
+   "scarto_dalla_mediana": -3.96,
+   "territorio": "Lazio",
+   "valore": 64.17
+  },
+  {
+   "percentile": 36.8,
+   "rango": 13,
+   "scarto_dalla_mediana": -5.69,
+   "territorio": "Abruzzo",
+   "valore": 62.43
+  },
+  {
+   "percentile": 31.6,
+   "rango": 14,
+   "scarto_dalla_mediana": -9.88,
+   "territorio": "Sardegna",
+   "valore": 58.24
+  },
+  {
+   "percentile": 26.3,
+   "rango": 15,
+   "scarto_dalla_mediana": -10.21,
+   "territorio": "Molise",
+   "valore": 57.91
+  },
+  {
+   "percentile": 21.1,
+   "rango": 16,
+   "scarto_dalla_mediana": -10.73,
+   "territorio": "Basilicata",
+   "valore": 57.39
+  },
+  {
+   "percentile": 15.8,
+   "rango": 17,
+   "scarto_dalla_mediana": -17.12,
+   "territorio": "Puglia",
+   "valore": 51.01
+  },
+  {
+   "percentile": 10.5,
+   "rango": 18,
+   "scarto_dalla_mediana": -20.79,
+   "territorio": "Sicilia",
+   "valore": 47.33
+  },
+  {
+   "percentile": 5.3,
+   "rango": 19,
+   "scarto_dalla_mediana": -21.45,
+   "territorio": "Campania",
+   "valore": 46.67
+  },
+  {
+   "percentile": 0.0,
+   "rango": 20,
+   "scarto_dalla_mediana": -21.71,
+   "territorio": "Calabria",
+   "valore": 46.41
+  }
+ ],
+ "vintage": 2025
+}

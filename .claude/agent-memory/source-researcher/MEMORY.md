@@ -93,3 +93,25 @@ contenuti provenienti da fonti private.
 
 Una voce scaduta può suggerire dove cercare, ma non deve guidare una conclusione
 finché non viene verificata di nuovo.
+
+- categoria: problema di accesso ricorrente
+  apprendimento: >
+    I PDF Istat serviti da istat.it/wp-content/uploads spesso falliscono
+    l'estrazione del testo via WebFetch (contenuto binario compresso) anche
+    quando il documento esiste ed è pubblico. Cercare per prima la pagina HTML
+    gemella (comunicato-stampa o notizia) e inseguire il PDF solo dopo. Se
+    nemmeno la pagina HTML porta la cifra, la domanda resta aperta: dichiararlo
+    è un esito, non una rinuncia.
+  evidence_url: https://www.istat.it/wp-content/uploads/2025/03/istat-cnel.pdf
+  verified_on: 2026-09-03
+  recheck_after: 2027-03-01
+  ambito: Istat, report scaricabili in PDF
+  limiti: >
+    Non testato se altri strumenti di fetch riescano dove WebFetch fallisce.
+    Osservato su un documento; trattarlo come indizio su dove cercare, non come
+    prova che quel PDF sia inaccessibile per sempre.
+```
+
+Formato di una voce:
+
+```yaml
