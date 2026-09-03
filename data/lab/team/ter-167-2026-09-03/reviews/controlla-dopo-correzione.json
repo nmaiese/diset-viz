@@ -1,0 +1,827 @@
+{
+ "codice": "ter-167",
+ "bloccanti": [],
+ "cifre_controllate": 43,
+ "non_trovate": 0,
+ "link": [
+  {
+   "percorso": "/indicatore/capacita-di-esportare/ter-267",
+   "dove": "quadro",
+   "stato": "nel dossier",
+   "nota": "stesso tema: Capacità di esportare"
+  }
+ ],
+ "link_inesistenti": 0,
+ "riepilogo": [
+  "2023 (lead) -> l'anno 2023 della serie",
+  "18,23 (lead) -> estremo basso del gruppo 1",
+  "28,65 (lead) -> estremo alto del gruppo 3",
+  "2023 (quadro) -> l'anno 2023 della serie",
+  "0,56 (quadro) -> delta_1a di Piemonte",
+  "4,79 (quadro) -> delta_1a di Valle d'Aosta",
+  "3,44 (quadro) -> delta_5a di Liguria",
+  "9,04 (quadro) -> delta_5a di Valle d'Aosta",
+  "1,75 (quadro) -> delta_10a di Calabria",
+  "8,89 (quadro) -> delta_10a di Valle d'Aosta",
+  "22,16 (quadro) -> media di Nord",
+  "20,92 (quadro) -> media di Mezzogiorno",
+  "20,19 (quadro) -> media di Centro",
+  "2014 (dinamica/h) -> l'anno 2014 della serie",
+  "2022 (dinamica/h) -> l'anno 2022 della serie",
+  "1995 (dinamica) -> l'anno 1995 della serie",
+  "2007 (dinamica) -> l'anno 2007 della serie",
+  "17,21 (dinamica) -> media nazionale nel 1995",
+  "19,43 (dinamica) -> media nazionale nel 2007",
+  "15,17 (dinamica) -> media nazionale nel 2014",
+  "2014 (dinamica) -> l'anno 2014 della serie",
+  "16,32 (dinamica) -> media nazionale nel 2020",
+  "2020 (dinamica) -> l'anno 2020 della serie",
+  "19,04 (dinamica) -> media nazionale nel 2021",
+  "2021 (dinamica) -> l'anno 2021 della serie",
+  "2022 (dinamica) -> l'anno 2022 della serie",
+  "19,17 (dinamica) -> media nazionale nel 2022",
+  "2023 (dinamica) -> l'anno 2023 della serie",
+  "21,27 (dinamica) -> media dell'ultimo anno",
+  "1995 (dinamica) -> l'anno 1995 della serie",
+  "2021 (quadro) -> l'anno 2021 della serie",
+  "2023 (quadro) -> l'anno 2023 della serie",
+  "2022 (quadro) -> l'anno 2022 della serie",
+  "19,17 (quadro) -> media nazionale nel 2022   [ATTENZIONE: l'etichetta parla del 2022, la frase del 2023]",
+  "2021 (quadro) -> l'anno 2021 della serie",
+  "2023 (quadro) -> l'anno 2023 della serie",
+  "18,23 (quadro) -> estremo basso del gruppo 1",
+  "2023 (quadro) -> l'anno 2023 della serie",
+  "1,75 (quadro) -> delta_10a di Calabria",
+  "8,89 (quadro) -> delta_10a di Valle d'Aosta",
+  "2022 (quadro) -> l'anno 2022 della serie",
+  "21,27 (limiti) -> media dell'ultimo anno",
+  "2023 (limiti) -> l'anno 2023 della serie"
+ ],
+ "cifre": [
+  {
+   "numero": "2023",
+   "dove": "lead",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "Nel 2023 la quota di PIL investita sale in tutte le v",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2023 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "18,23",
+   "dove": "lead",
+   "territori_in_frase": [
+    "Basilicata",
+    "Calabria"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "i molto diversi: la Calabria è ultima con il 18,23%, la Basilicata prima con il 28,65%.",
+   "stato": "trovata",
+   "corrisponde_a": "estremo basso del gruppo 1",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "28,65",
+   "dove": "lead",
+   "territori_in_frase": [
+    "Basilicata",
+    "Calabria"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "ma con il 18,23%, la Basilicata prima con il 28,65%.",
+   "stato": "trovata",
+   "corrisponde_a": "estremo alto del gruppo 3",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2023",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "Nel 2023 gli investimenti fissi lordi, in percentuale",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2023 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "0,56",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Valle d'Aosta",
+    "Piemonte"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "meno di tutte il Piemonte, con un aumento di 0,56 punti, e più di tutte la Valle d'Aosta, con",
+   "stato": "trovata",
+   "corrisponde_a": "delta_1a di Piemonte",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "4,79",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Valle d'Aosta"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "punti, e più di tutte la Valle d'Aosta, con 4,79. Sui cinque anni il passo più lento è quello",
+   "stato": "trovata",
+   "corrisponde_a": "delta_1a di Valle d'Aosta",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "3,44",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Liguria"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "i il passo più lento è quello della Liguria, 3,44 punti, il più veloce ancora la Valle d'Aosta",
+   "stato": "trovata",
+   "corrisponde_a": "delta_5a di Liguria",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "9,04",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Valle d'Aosta",
+    "Calabria",
+    "Liguria"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "unti, il più veloce ancora la Valle d'Aosta, 9,04. Sui dieci anni la Calabria guadagna meno di",
+   "stato": "trovata",
+   "corrisponde_a": "delta_5a di Valle d'Aosta",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "1,75",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Valle d'Aosta",
+    "Calabria"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "bria guadagna meno di chiunque altro, appena 1,75 punti, mentre la Valle d'Aosta arriva a 8,89",
+   "stato": "trovata",
+   "corrisponde_a": "delta_10a di Calabria",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "8,89",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Valle d'Aosta"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "1,75 punti, mentre la Valle d'Aosta arriva a 8,89.\n\nNon è una gara fra Nord e Sud: le tre macr",
+   "stato": "trovata",
+   "corrisponde_a": "delta_10a di Valle d'Aosta",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "22,16",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Valle d'Aosta"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "regioni, restano vicine tra loro, il Nord al 22,16%, il Mezzogiorno al 20,92%, il Centro al 20,",
+   "stato": "trovata",
+   "corrisponde_a": "media di Nord",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "20,92",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Valle d'Aosta"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "a loro, il Nord al 22,16%, il Mezzogiorno al 20,92%, il Centro al 20,19%. Il Mezzogiorno supera",
+   "stato": "trovata",
+   "corrisponde_a": "media di Mezzogiorno",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "20,19",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Valle d'Aosta"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": ",16%, il Mezzogiorno al 20,92%, il Centro al 20,19%. Il Mezzogiorno supera il Centro solo perch",
+   "stato": "trovata",
+   "corrisponde_a": "media di Centro",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2014",
+   "dove": "dinamica/h",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2014,
+    2022
+   ],
+   "contesto": "Il minimo del 2014, la ripresa, l'anno fermo del 2022",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2014 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2022",
+   "dove": "dinamica/h",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2014,
+    2022
+   ],
+   "contesto": "inimo del 2014, la ripresa, l'anno fermo del 2022",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2022 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "1995",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    1995,
+    2007
+   ],
+   "contesto": "Dal 1995 al 2007 la media delle venti regioni sale, d",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 1995 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2007",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    1995,
+    2007
+   ],
+   "contesto": "Dal 1995 al 2007 la media delle venti regioni sale, dal 17,21",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2007 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "17,21",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    1995,
+    2007
+   ],
+   "contesto": "2007 la media delle venti regioni sale, dal 17,21% al 19,43%. Poi scende fino al minimo del 15",
+   "stato": "trovata",
+   "corrisponde_a": "media nazionale nel 1995",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "19,43",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2007
+   ],
+   "contesto": "edia delle venti regioni sale, dal 17,21% al 19,43%. Poi scende fino al minimo del 15,17% nel 2",
+   "stato": "trovata",
+   "corrisponde_a": "media nazionale nel 2007",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "15,17",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2014
+   ],
+   "contesto": "21% al 19,43%. Poi scende fino al minimo del 15,17% nel 2014. Da lì la risalita è lenta fino al",
+   "stato": "trovata",
+   "corrisponde_a": "media nazionale nel 2014",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2014",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2014
+   ],
+   "contesto": "3%. Poi scende fino al minimo del 15,17% nel 2014. Da lì la risalita è lenta fino al 16,32% de",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2014 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "16,32",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2014,
+    2020
+   ],
+   "contesto": "nel 2014. Da lì la risalita è lenta fino al 16,32% del 2020, poi il primo balzo porta al 19,04",
+   "stato": "trovata",
+   "corrisponde_a": "media nazionale nel 2020",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2020",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2014,
+    2020
+   ],
+   "contesto": "Da lì la risalita è lenta fino al 16,32% del 2020, poi il primo balzo porta al 19,04% del 2021",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2020 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "19,04",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2020,
+    2021,
+    2022
+   ],
+   "contesto": "16,32% del 2020, poi il primo balzo porta al 19,04% del 2021. Nel 2022 la crescita si ferma qua",
+   "stato": "trovata",
+   "corrisponde_a": "media nazionale nel 2021",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2021",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2020,
+    2021,
+    2022
+   ],
+   "contesto": "2020, poi il primo balzo porta al 19,04% del 2021. Nel 2022 la crescita si ferma quasi del tut",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2021 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2022",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2020,
+    2021,
+    2022
+   ],
+   "contesto": "il primo balzo porta al 19,04% del 2021. Nel 2022 la crescita si ferma quasi del tutto, al 19,",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2022 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "19,17",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2021,
+    2022
+   ],
+   "contesto": "022 la crescita si ferma quasi del tutto, al 19,17%, praticamente lo stesso livello dell'anno p",
+   "stato": "trovata",
+   "corrisponde_a": "media nazionale nel 2022",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2023",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "o dell'anno prima. Poi il secondo balzo: nel 2023 la media delle venti regioni arriva al 21,27",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2023 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "21,27",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    1995,
+    2023
+   ],
+   "contesto": "2023 la media delle venti regioni arriva al 21,27%, il massimo di questa media dal 1995.",
+   "stato": "trovata",
+   "corrisponde_a": "media dell'ultimo anno",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "1995",
+   "dove": "dinamica",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    1995
+   ],
+   "contesto": "va al 21,27%, il massimo di questa media dal 1995.",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 1995 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2021",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2021,
+    2023
+   ],
+   "contesto": "Il 2021 e il 2023, i due anni dei balzi più forti, s",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2021 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2023",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2021,
+    2023
+   ],
+   "contesto": "Il 2021 e il 2023, i due anni dei balzi più forti, sono anche",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2023 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2022",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2022
+   ],
+   "contesto": "impianti, non solo gli edifici. Ma anche il 2022 è un anno di superbonus, e in quell'anno la",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2022 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "19,17",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "a delle venti regioni non si muove, ferma al 19,17%: la coincidenza non regge in modo uniforme.",
+   "stato": "trovata",
+   "corrisponde_a": "media nazionale nel 2022",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": "l'etichetta parla del 2022, la frase del 2023",
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2021",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2021,
+    2023
+   ],
+   "contesto": "tosettanta miliardi di euro nel triennio dal 2021 al 2023, circa il tre per cento del prodotto",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2021 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2023",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2021,
+    2023
+   ],
+   "contesto": "ta miliardi di euro nel triennio dal 2021 al 2023, circa il tre per cento del prodotto interno",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2023 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "18,23",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Calabria"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "o fa meno delle altre diciannove regioni, il 18,23% nel 2023, e negli ultimi dieci anni è anche",
+   "stato": "trovata",
+   "corrisponde_a": "estremo basso del gruppo 1",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2023",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Calabria"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "elle altre diciannove regioni, il 18,23% nel 2023, e negli ultimi dieci anni è anche la region",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2023 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "1,75",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Calabria"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "ella quota cresce meno, un aumento di appena 1,75 punti, contro gli 8,89 della Valle d'Aosta.",
+   "stato": "trovata",
+   "corrisponde_a": "delta_10a di Calabria",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "8,89",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Valle d'Aosta"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "un aumento di appena 1,75 punti, contro gli 8,89 della Valle d'Aosta. Il PIL pro capite è un'",
+   "stato": "trovata",
+   "corrisponde_a": "delta_10a di Valle d'Aosta",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2022",
+   "dove": "quadro",
+   "territori_in_frase": [
+    "Valle d'Aosta"
+   ],
+   "anni_in_frase": [
+    2022
+   ],
+   "contesto": "a [capacità di esportare], con dati fermi al 2022.",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2022 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "21,27",
+   "dove": "limiti",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "il capitale con cui si lavora invecchia.\n\nIl 21,27% del 2023 è la media semplice delle venti re",
+   "stato": "trovata",
+   "corrisponde_a": "media dell'ultimo anno",
+   "via": "diretta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  },
+  {
+   "numero": "2023",
+   "dove": "limiti",
+   "territori_in_frase": [
+    "nessuno"
+   ],
+   "anni_in_frase": [
+    2023
+   ],
+   "contesto": "con cui si lavora invecchia.\n\nIl 21,27% del 2023 è la media semplice delle venti regioni, con",
+   "stato": "trovata",
+   "corrisponde_a": "l'anno 2023 della serie",
+   "via": "etichetta",
+   "alternative": [],
+   "fuori_anno": null,
+   "valore_piu_vicino": null
+  }
+ ],
+ "impronta": {
+  "digest": "4136b012",
+  "caratteri": 4180,
+  "parole": 812,
+  "cifre": 203,
+  "sezioni": 5,
+  "fonti": 3
+ },
+ "bozza_salvata": "/home/user/diset-viz/data/lab/bozze/ter-167.json"
+}

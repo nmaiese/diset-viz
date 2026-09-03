@@ -1,0 +1,49 @@
+{
+  "key": "167",
+  "level": "regione",
+  "vintage": 2023,
+  "titolo": "La quota di PIL investita sale ovunque, ma non allo stesso ritmo",
+  "angolo": "Nel 2023 la quota di PIL investita sale in tutte le venti regioni su ogni orizzonte temporale (uno, cinque, dieci anni): non è una gara Nord-Sud ma un movimento comune da livelli di partenza molto diversi. I balzi del 2021 e del 2023 coincidono con gli anni dei bonus edilizi alle case, per cui la Banca d'Italia stima una spesa di oltre centosettanta miliardi di euro: una coincidenza datata, non una causa attribuita a una singola regione.",
+  "lead": "Nel 2023 la quota di PIL investita sale in tutte le venti regioni italiane, ma parte da livelli molto diversi: la Calabria è ultima con il 18,23%, la Basilicata prima con il 28,65%.",
+  "sections": [
+    {
+      "h": "La quota investita cresce in tutte le venti regioni",
+      "role": "quadro",
+      "body": "Nel 2023 gli investimenti fissi lordi, in percentuale del PIL, crescono in ognuna delle venti regioni italiane, sull'anno, sui cinque anni e sui dieci: non c'è un'eccezione. Sull'anno cresce meno di tutte il Piemonte, con un aumento di 0,56 punti, e più di tutte la Valle d'Aosta, con 4,79. Sui cinque anni il passo più lento è quello della Liguria, 3,44 punti, il più veloce ancora la Valle d'Aosta, 9,04. Sui dieci anni la Calabria guadagna meno di chiunque altro, appena 1,75 punti, mentre la Valle d'Aosta arriva a 8,89.\n\nNon è una gara fra Nord e Sud: le tre macroaree, ciascuna la media semplice delle proprie regioni, restano vicine tra loro, il Nord al 22,16%, il Mezzogiorno al 20,92%, il Centro al 20,19%. Il Mezzogiorno supera il Centro solo perché include la Basilicata: senza quella regione l'ordine si invertirebbe. La vera distanza corre fra le singole regioni."
+    },
+    {
+      "h": "Il minimo del 2014, la ripresa, l'anno fermo del 2022",
+      "role": "dinamica",
+      "body": "Dal 1995 al 2007 la media delle venti regioni sale, dal 17,21% al 19,43%. Poi scende fino al minimo del 15,17% nel 2014. Da lì la risalita è lenta fino al 16,32% del 2020, poi il primo balzo porta al 19,04% del 2021. Nel 2022 la crescita si ferma quasi del tutto, al 19,17%, praticamente lo stesso livello dell'anno prima. Poi il secondo balzo: nel 2023 la media delle venti regioni arriva al 21,27%, il massimo di questa media dal 1995."
+    },
+    {
+      "h": "Gli anni dei bonus edilizi",
+      "role": "quadro",
+      "body": "Il 2021 e il 2023, i due anni dei balzi più forti, sono anche gli anni di due incentivi alle ristrutturazioni delle case, il superbonus e il bonus facciate. La quota che racconta questa pagina è più ampia: comprende anche macchinari, mezzi di trasporto e altri impianti, non solo gli edifici. Ma anche il 2022 è un anno di superbonus, e in quell'anno la media delle venti regioni non si muove, ferma al 19,17%: la coincidenza non regge in modo uniforme.\n\nLa Banca d'Italia ha stimato che le due misure abbiano comportato una spesa di oltre centosettanta miliardi di euro nel triennio dal 2021 al 2023, circa il tre per cento del prodotto interno lordo nazionale in media ogni anno. Secondo la stessa fonte, circa un quarto di quella spesa sarebbe stato sostenuto comunque, anche senza gli incentivi. Per differenza, la parte aggiuntiva sarebbe quindi la maggioranza: è una lettura di chi scrive, non un dato della fonte.\n\nLo studio stima inoltre che il moltiplicatore fiscale delle due misure sia stato inferiore a uno: per il complesso dell'economia, il beneficio in valore aggiunto sarebbe stato più basso del costo sostenuto per le agevolazioni."
+    },
+    {
+      "h": "Perché la Calabria è ultima",
+      "role": "quadro",
+      "body": "Perché sia proprio la Basilicata a stare in testa, questa pagina non lo dice: il dato mostra il livello, non la ragione, e il rapporto sale anche quando è il PIL della regione a scendere.\n\nLa quota investita non misura quanto una regione è ricca, misura quanto di ciò che produce rimette in capitale ogni anno. La Calabria lo fa meno delle altre diciannove regioni, il 18,23% nel 2023, e negli ultimi dieci anni è anche la regione in cui quella quota cresce meno, un aumento di appena 1,75 punti, contro gli 8,89 della Valle d'Aosta. Il PIL pro capite è un'altra misura, e questa pagina non lo contiene.\n\nPer chi vuole sapere se le imprese calabresi vendono anche fuori dai confini regionali, un punto di partenza è la [capacità di esportare](/indicatore/capacita-di-esportare/ter-267), con dati fermi al 2022."
+    },
+    {
+      "h": "Che cosa misura davvero questo numero",
+      "role": "limiti",
+      "body": "L'indicatore è un rapporto: investimenti fissi lordi diviso PIL. Sale anche se il PIL scende, non solo se gli investimenti aumentano: la quota sul PIL e il livello assoluto degli investimenti non sono la stessa cosa. Quella quota è ciò che in un anno viene speso in capannoni, macchinari, mezzi di trasporto e case rispetto a tutto quello che il territorio produce. Quando resta bassa a lungo, il capitale con cui si lavora invecchia.\n\nIl 21,27% del 2023 è la media semplice delle venti regioni, con lo stesso peso per la Valle d'Aosta e per la Lombardia: non è pesata sulla popolazione né sul PIL di ciascun territorio."
+    }
+  ],
+  "fonti": [
+    {
+      "testo": "Le due misure hanno comportato una spesa di oltre 170 miliardi nel periodo 2021-23 (circa il 3 per cento del PIL in media d'anno).",
+      "url": "https://www.bancaditalia.it/pubblicazioni/qef/2024-0860/index.html"
+    },
+    {
+      "testo": "Si stima che circa un quarto della spesa relativa agli investimenti sussidiati (oltre 45 miliardi) sarebbe stata effettuata anche in assenza degli incentivi.",
+      "url": "https://www.bancaditalia.it/pubblicazioni/qef/2024-0860/index.html"
+    },
+    {
+      "testo": "Questo risultato implica che il moltiplicatore fiscale sia stato inferiore all'unità, ossia che i benefici per il complesso dell'economia in termini di valore aggiunto siano stati più bassi rispetto ai costi sostenuti per le agevolazioni.",
+      "url": "https://www.bancaditalia.it/pubblicazioni/qef/2024-0860/index.html"
+    }
+  ]
+}
