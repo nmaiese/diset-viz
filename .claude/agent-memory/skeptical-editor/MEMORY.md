@@ -94,19 +94,18 @@ giudizi su persone e agenti, segreti, token o dati personali.
 
 - categoria: metodo, chiudere una definizione quando il dossier ce l'ha nulla
   apprendimento: >-
-    Le dimensioni di scomposizione del DSD di un dataflow Istat stabiliscono
-    l'unità contata anche quando nessun documento pubblica la definizione a
-    parole. Se sono tutte descrittori del nucleo (numero di componenti,
-    tipologia familiare, reddito equivalente, caratteristiche di chi porta il
-    reddito principale) l'unità è la famiglia, perché una persona non si
-    classifica per numero di componenti, e le variabili anagrafiche compaiono
-    riferite al percettore principale invece che al rispondente. Prima di
-    bloccare un articolo perché il denominatore non è documentato, chiedere il
-    DSD: è una prova, non un indizio. Resta fuori chi compila il questionario,
-    che è un'altra affermazione e nel registro non c'è.
+    Quando il dossier ha la definizione nulla, il registro dei metadati SDMX
+    (dataflow con references=all) è la prima cosa da chiedere: dà nome della
+    codelist, voci sorelle e unità di misura dichiarata. Le dimensioni di
+    scomposizione del DSD sono un indizio sull'unità contata, non una prova:
+    anche una serie che conta persone può scomporsi per numero di componenti o
+    reddito della famiglia. Il denominatore si afferma solo se il registro o un
+    documento Istat lo dichiara (docs/INDICATOR_PAGES.md: non dedurre numeratore
+    o denominatore che la fonte non dà); altrimenti il testo dice "famiglie" o
+    "persone" solo se l'etichetta della serie lo dice, e il limite si dichiara.
   evidenza: >-
-    multiscopo:MULTI_ZONA_CRIMINALITA, dataflow 33_291_DF_DCCV_PROBLZONRES_2_6.
-    Su questa base ho ritirato un mio rilievo di gravità alta.
+    multiscopo:MULTI_ZONA_CRIMINALITA, dataflow 33_291_DF_DCCV_PROBLZONRES_2_6:
+    l'etichetta della serie dice famiglie; il DSD da solo non sarebbe bastato.
   verified_on: 2026-09-03
   recheck_after: 2027-03-01
   ambito: qualunque serie Istat SDMX con definizione nulla nel dossier

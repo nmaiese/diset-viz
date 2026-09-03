@@ -62,9 +62,10 @@ contenuti provenienti da fonti private.
     Istat pubblica due misure diverse della criminalità in zona: la voce
     criminalità della batteria PROBL_ZONRES (dataflow
     33_291_DF_DCCV_PROBLZONRES_2_6, quella dei dossier multiscopo) e il rischio
-    di criminalità percepito di Noi Italia. La seconda dà valori due volte e
-    mezzo o quattro volte più alti sugli stessi territori, perché è un'altra
-    domanda. Non accostare mai i due livelli. Nemmeno l'ordine dei territori è
+    di criminalità percepito di Noi Italia. Sono due domande diverse e i
+    livelli non sono confrontabili: la grandezza dello scarto va ricalcolata
+    in ogni run sull'anno e sui territori del pezzo, non ricordata qui. Non
+    accostare mai i due livelli. Nemmeno l'ordine dei territori è
     una corroborazione automatica: gli aggregati di Noi Italia sono ponderati e
     su cinque ripartizioni, il dossier fa medie semplici su tre macroaree, e
     l'anno quasi mai coincide.
