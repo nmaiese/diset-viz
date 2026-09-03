@@ -37,7 +37,7 @@ it).
 
 Le regole con uno scope stanno in `.claude/rules/` (app, editorial, frontend,
 data) e si caricano da sole quando tocchi i file a cui si applicano.
-Le procedure condivise dagli agenti stanno in `.claude/skills/`:
+Agent, skill, comandi e hook condivisi stanno nel plugin `motore` di `~/dev/platform/plugin/` (abilitato da `.claude/settings.json`; le rules `motore-*.md` in `.claude/rules/` sono copie sincronizzate con `motore plugin sync-rules`). Le skill:
 `scrittura-indicatori` (il mestiere di chi scrive), `verifica-fonti` (come si
 ammette e come si smentisce una fonte), `confronto-europeo` (le trappole di
 comparabilità), `indicator-review` (le classi di errore che nessuna guardia

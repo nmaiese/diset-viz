@@ -87,6 +87,16 @@
       }
     ]
   },
-  "teammateMode": "in-process"
+  "teammateMode": "in-process",
+  "extraKnownMarketplaces": {
+    "platform-locale": {
+      "source": {
+        "source": "directory",
+        "path": "/home/nilo/dev/platform"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "motore@platform-locale": true
+  }
 }
-
