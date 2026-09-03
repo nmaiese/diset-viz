@@ -1,0 +1,45 @@
+{
+  "codice": "ter-167",
+  "giro": "primo e unico giro di revisione",
+  "revisori": ["data-editor", "source-researcher", "search-strategist", "skeptical-editor"],
+  "controllo_deterministico_prima_della_correzione": {
+    "cifre_controllate": 44, "non_trovate": 0, "link_inesistenti": 0, "bloccanti": [], "parole": 707
+  },
+  "alta_aperte": 11,
+  "alta": [
+    {"id": "R1", "da": "skeptical-editor", "classe": "definizione", "rilievo": "Titolo e h dicono che salgono gli investimenti, ma la quantita che sale e il rapporto fra investimenti e PIL. La sezione limiti dello stesso pezzo nega cio che il titolo afferma."},
+    {"id": "R2", "da": "skeptical-editor", "classe": "coerenza", "rilievo": "Il lead promette la Basilicata al 28,65% e il pezzo non ci torna mai: ne il perche documentato ne la riga onesta che dice che non c'e."},
+    {"id": "R3", "da": "skeptical-editor", "classe": "causale", "rilievo": "Coincidenza selezionata: anche il 2022 e anno di superbonus e la media resta ferma, ma il pezzo tace il terzo anno. La coincidenza lavora come causa."},
+    {"id": "R4", "da": "skeptical-editor", "classe": "causale", "rilievo": "'E il conto che paga chi versa le tasse' non e nella fonte, che parla di costi e benefici aggregati e non di contribuenti."},
+    {"id": "R5", "da": "skeptical-editor", "classe": "fonte", "rilievo": "'costate' converte un volume di spesa mossa in un costo. La fonte dice 'hanno comportato una spesa'."},
+    {"id": "R6", "da": "skeptical-editor e source-researcher", "classe": "fonte", "rilievo": "Tre citazioni incollate in un campo unico formano un blocco che non esiste in nessuna pagina, e la terza e stata staccata dal suo reggente e resa con la maiuscola: citazione mutilata, cioe modificata."},
+    {"id": "R7", "da": "skeptical-editor", "classe": "fonte", "rilievo": "L'url depositato porta il parametro di lingua. RISOLTO DAL LEAD: la pagina senza quel parametro e italiana ed e il paper giusto. Il rilievo era un artefatto dello strumento di fetch, che riassume in inglese. Si adotta comunque l'url pulito."},
+    {"id": "R8", "da": "skeptical-editor", "classe": "definizione", "rilievo": "Il pezzo non dice mai che superbonus e bonus facciate riguardano le ristrutturazioni residenziali, mentre l'indicatore comprende tutti gli investimenti fissi lordi: il lettore mette le due quantita nello stesso recipiente."},
+    {"id": "R9", "da": "skeptical-editor", "classe": "coerenza", "rilievo": "Manca il terzo punto imposto dal proprietario, che cosa cambia per le persone. L'unica candidata e una conversione di unita copiata dalla scala umana."},
+    {"id": "R10-DE", "da": "data-editor", "classe": "coerenza", "rilievo": "Contraddizione interna sul 2021: la dinamica lo mette dentro 'risale piano', mentre e il piu grande incremento annuo dell'intera serie, e la sezione dopo lo chiama uno dei due balzi piu forti."},
+    {"id": "R11-SS", "da": "search-strategist", "classe": "coerenza", "rilievo": "La quarta sezione si intitola su una misura che la pagina non ha e la nega nella prima riga: attira una ricerca per poi deluderla."}
+  ],
+  "attribuzioni_eccessive_verificate_da_source_researcher": [
+    "'la parte aggiuntiva resta la maggioranza' e un'inferenza della redazione ma e introdotta da 'secondo la stessa fonte'",
+    "'e stato piu basso' rende indicativo e certo cio che la fonte dice al congiuntivo come stima",
+    "'E il conto che paga chi versa le tasse' non compare nella fonte in nessuna forma"
+  ],
+  "citazioni_verificate": {
+    "prima": "presente, carattere per carattere",
+    "seconda": "presente, carattere per carattere",
+    "terza": "alterata nella bozza. Forma reale recuperata con un secondo fetch cieco: 'Questo risultato implica che il moltiplicatore fiscale sia stato inferiore all'unità, ossia che i benefici per il complesso dell'economia in termini di valore aggiunto siano stati più bassi rispetto ai costi sostenuti per le agevolazioni.'"
+  },
+  "fonte_basilicata_scartata_definitivamente": "Il source-researcher ha rifatto il fetch chiedendo il periodo frase per frase: sia la frase sul PNRR sia quella sull'automotive si riferiscono al primo semestre 2024, non al 2023 del dato. Usarle per spiegare il primato lucano del 2023 sarebbe un errore di periodo. Si adotta la riga onesta.",
+  "media_e_bassa_accolte_nella_stessa_correzione": [
+    "le tre medie di macroarea sono anch'esse medie semplici e vanno etichettate; il Mezzogiorno supera il Centro solo per effetto della Basilicata",
+    "'il massimo dell'intera serie' e ambiguo col record regionale della Basilicata",
+    "'un quinto dell'economia' sposta il referente rispetto al PIL, e scrive il numero due volte",
+    "nell'angolo l'attribuzione a Banca d'Italia e messa sulla coincidenza invece che sulla spesa",
+    "il tre per cento non e etichettato come nazionale mentre il 21,27 lo e come media delle regioni",
+    "il link al parente non ha un ruolo nella frase",
+    "'la Calabria resta ultima' afferma una continuita che nel 2021 non c'era",
+    "la cautela finale della terza sezione e scritta per chi revisiona, non per chi legge",
+    "'La serie non e stata sempre in salita' consegna meta della forma della serie",
+    "il secondo capoverso della prima sezione riecheggia il cruscotto"
+  ]
+}
