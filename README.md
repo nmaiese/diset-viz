@@ -89,6 +89,24 @@ example, and [`content/STYLE.md`](content/STYLE.md) for the editorial style
 (human voice, no em-dashes/semicolons, real data only). Agents should also read
 `CLAUDE.md` / `AGENTS.md`.
 
+## Come si lavora con Claude Code
+
+`CLAUDE.md` è il router: dice quale documento possiede ogni argomento e non va
+letto come riassunto. Agent, skill, comandi e hook condivisi vivono nel plugin
+`motore` di `~/dev/platform/plugin/` (abilitato da `.claude/settings.json`) e
+si chiamano con il prefisso `motore:`; in questo repo restano il workflow
+`.claude/workflows/indicatore-lite.js`, il pacchetto `lab/`, le memorie dei
+teammate in `.claude/agent-memory/` e le regole con scope in `.claude/rules/`.
+
+- Interprete Python: `bin/py`, sempre (`export DIVARIO_PYTHON=...` se il
+  worktree non ha un venv).
+- Articoli indicatore, baseline schedulata: il workflow `indicatore-lite`
+  (`/motore:pezzo divarioitalia <codice>` lo esegue e apre la PR), descritto in
+  [`lab/README.md`](lab/README.md).
+- Articoli indicatore, run presidiata: l'Agent Team, `/redazione-indicatore <codice>`,
+  descritto in [`docs/AGENT_TEAM.md`](docs/AGENT_TEAM.md).
+- Prima di commit e push: `bin/py -m unittest discover -s tests -v`.
+
 Public indicator sheets follow [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md):
 specific definition and perimeter, concrete value example, latest-year change
 on a common territorial base, long-term trend, limits, source and download.

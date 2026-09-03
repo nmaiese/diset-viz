@@ -83,6 +83,12 @@ FASE_PER_TIPO = {
     "lab-pubblicatore": "Pubblicazione",
 }
 
+
+def tipo_base(tipo):
+    """Gli agenti vivono nel plugin `motore` e il runtime li chiama `motore:lab-x`: la mappa usa il nome nudo."""
+    return (tipo or "").split(":", 1)[-1]
+
+
 # L'ordine delle fasi, per dire quale e' la piu' avanzata fra gli agenti aperti.
 ORDINE_FASI = ["Dossier", "Contesto", "Scrittura", "Verifica", "Pubblicazione"]
 
@@ -274,7 +280,7 @@ def stato_vivo(cartelle):
     for agent_id, voce in agenti.items():
         cartella = dove_sta[agent_id]
         voce["agent_type"] = tipo_di(cartella, agent_id)
-        voce["fase_stimata"] = FASE_PER_TIPO.get(voce["agent_type"], "")
+        voce["fase_stimata"] = FASE_PER_TIPO.get(tipo_base(voce["agent_type"]), "")
         meta = os.path.join(cartella, f"agent-{agent_id}.meta.json")
         trascritto = os.path.join(cartella, f"agent-{agent_id}.jsonl")
         voce["avviato_il"] = _iso(_mtime(meta) or _mtime(trascritto))

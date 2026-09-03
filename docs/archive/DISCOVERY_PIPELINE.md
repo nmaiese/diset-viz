@@ -1,7 +1,9 @@
+> Archiviato il 2026-09-03: descrive una pipeline ritirata; vedi lab/README.md e docs/AGENT_TEAM.md
+
 # Pipeline di discovery multifonte
 
 > **Come gira tutto insieme, senza intervento umano, sta in
-> [`lab/README.md`](../lab/README.md).** Questo documento descrive
+> [`lab/README.md`](../../lab/README.md).** Questo documento descrive
 > il **meccanismo** della scoperta: gli adapter, lo schema della coda, il
 > punteggio di priorità, cosa succede in promozione. Quello descrive **chi lo
 > muove**: i tre ruoli (ammissione, produttore, verificatore), il lanciatore, il
@@ -12,7 +14,7 @@ Questo documento descrive lo strato di **scoperta e messa in coda** degli
 indicatori, cioè il pezzo che rende Divario Italia un aggregatore multifonte con
 priorità ai dati freschi e regionali (poi provinciali). È il livello che sta
 **davanti** alla pipeline dati già esistente
-([`DATA_PIPELINE.md`](DATA_PIPELINE.md), [`PROVINCE_PIPELINE.md`](PROVINCE_PIPELINE.md)),
+([`DATA_PIPELINE.md`](../DATA_PIPELINE.md), [`PROVINCE_PIPELINE.md`](../PROVINCE_PIPELINE.md)),
 non la sostituisce.
 
 ## Perché
@@ -80,8 +82,8 @@ indipendente ma un deadlock, ed è il motivo per cui la vecchia politica non
 uniforme (prosa `auto`, promozione e ammissione `checks`) è stata portata tutta
 ad `auto`. Nessun ruolo aspetta una firma: in una catena che nessuno presidia,
 "aspetta che qualcuno guardi" vuol dire "aspetta per sempre". Regole complete e
-motivazioni in [`lab/README.md`](../lab/README.md) e
-[`lab/README.md`](../lab/README.md).
+motivazioni in [`lab/README.md`](../../lab/README.md) e
+[`lab/README.md`](../../lab/README.md).
 
 Restano vere le regole già scritte in `DATA_PIPELINE.md`: `exact` è l'unico caso
 che può sostituire una serie, e niente entra nello scoring senza direzione
@@ -352,9 +354,9 @@ copertura 20/20.
 
 La catena gira come **Routine Claude Code** (agenti cloud, sessione nuova a ogni
 firing, checkout git proprio). La cadenza, l'id e lo stato stanno in
-[`lab/README.md`](../lab/README.md); il contratto che ogni agente segue a
-ogni run sta in [`lab/README.md`](../lab/README.md); come stanno insieme i
-tre ruoli sta in [`lab/README.md`](../lab/README.md).
+[`lab/README.md`](../../lab/README.md); il contratto che ogni agente segue a
+ogni run sta in [`lab/README.md`](../../lab/README.md); come stanno insieme i
+tre ruoli sta in [`lab/README.md`](../../lab/README.md).
 
 **I ruoli non hanno un cron proprio.** Gli stadi ne avevano uno a testa, e la
 forma aveva un difetto strutturale: le dipendenze della catena sono di dato e il
