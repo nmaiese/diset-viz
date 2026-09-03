@@ -1,0 +1,27 @@
+{
+  "ruolo": "data-journalist",
+  "fase": "conferenza d'angolo",
+  "codice": "ter-167",
+  "angoli": [
+    {
+      "id": "A_geografia_non_spiega",
+      "tesi": "Il record 2023 non e una vittoria del Nord: a trainarlo sono due regioni isolate, Basilicata e Piemonte, che stanno in aree opposte, mentre il Centro segna la quota piu bassa fra le grandi aree.",
+      "perche_interessa": "Chi vive al Centro scopre che la propria regione resta indietro non per essere al Sud, ma nonostante sia al Centro.",
+      "prove_dossier": ["media 21.27 nel 2023, massimo di serie", "Basilicata 28.65 rango 1", "Piemonte 26.88 rango 2", "0.91 contro 0.08 delle macroaree", "Centro 20.19 sotto Mezzogiorno 20.92", "Basilicata inverte: -1.25 poi +7.09"],
+      "claim_esterni": ["Economie regionali n.39 sull'edilizia pubblica PNRR", "stessa fonte sull'automotive in calo"],
+      "limite": "Non si puo dire perche il Piemonte e secondo: nessuna fonte lo spiega. Nessuna causa comune documentata fra Basilicata e Piemonte.",
+      "fragilita": "Si basa su un solo anno, il 2023.",
+      "domanda_del_lettore": "La mia regione investe di piu o di meno perche e al Nord o al Sud, o per un motivo diverso dalla geografia?"
+    },
+    {
+      "id": "B_bolla_da_incentivi",
+      "tesi": "Il salto al 21,27% si concentra nel triennio 2021-2023, lo stesso in cui superbonus e bonus facciate hanno pesato circa il 3% del PIL l'anno: parte del record potrebbe essere una spinta temporanea.",
+      "perche_interessa": "Chi vive dove il boom e piu forte scopre che quella spinta potrebbe non durare quando l'incentivo finisce.",
+      "prove_dossier": ["16.32 nel 2020, 19.04 nel 2021, 21.27 nel 2023", "salti 2021: Molise +5.31, Liguria +4.76, Piemonte +4.38", "Molise la piu sbalzata", "Valle d'Aosta +4.79 nel 2023 e +9.04 in cinque anni"],
+      "claim_esterni": ["QEF 860: 170 miliardi, 3% del PIL", "QEF 860: un quarto sarebbe stato speso comunque", "QEF 860: moltiplicatore sotto l'unita", "Istat: +2,4% nel IV trimestre 2023"],
+      "limite": "I claim di Banca d'Italia sono nazionali, non regionali. Non si puo quantificare quanta parte del salto venga dagli incentivi.",
+      "fragilita": "Se i dati 2024-2025 mostrassero la quota reggere dopo la fine degli incentivi, la lettura bolla cadrebbe.",
+      "domanda_del_lettore": "Il boom di investimenti che vedo nella mia regione durera, o e legato a un incentivo che sta per finire?"
+    }
+  ]
+}

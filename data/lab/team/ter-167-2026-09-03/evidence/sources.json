@@ -1,0 +1,77 @@
+{
+  "ruolo": "source-researcher",
+  "codice": "ter-167",
+  "memoria_consultata": ".claude/agent-memory/source-researcher/MEMORY.md (letta, non modificata, quasi vuota)",
+  "claim": [
+    {
+      "testo": "Superbonus e Bonus facciate hanno comportato una spesa di oltre 170 miliardi nel 2021-2023, circa il 3 per cento del PIL in media d'anno.",
+      "citazione": "Le due misure hanno comportato una spesa di oltre 170 miliardi nel periodo 2021-23 (circa il 3 per cento del PIL in media d'anno).",
+      "url": "https://www.bancaditalia.it/pubblicazioni/qef/2024-0860/index.html?com.dotmarketing.htmlpage.language=102",
+      "istituzione": "Banca d'Italia, Questioni di Economia e Finanza n. 860",
+      "data_pubblicazione": "2024-06",
+      "periodo": "2021-2023",
+      "territorio": "Italia",
+      "relation_type": "descriptive",
+      "confidenza": "alta"
+    },
+    {
+      "testo": "Circa un quarto della spesa per investimenti sussidiati, oltre 45 miliardi, sarebbe stata effettuata anche senza gli incentivi.",
+      "citazione": "Si stima che circa un quarto della spesa relativa agli investimenti sussidiati (oltre 45 miliardi) sarebbe stata effettuata anche in assenza degli incentivi.",
+      "url": "https://www.bancaditalia.it/pubblicazioni/qef/2024-0860/index.html?com.dotmarketing.htmlpage.language=102",
+      "istituzione": "Banca d'Italia, Questioni di Economia e Finanza n. 860",
+      "data_pubblicazione": "2024-06",
+      "periodo": "2021-2023",
+      "territorio": "Italia",
+      "relation_type": "causal",
+      "confidenza": "alta"
+    },
+    {
+      "testo": "Il moltiplicatore fiscale degli incentivi edilizi e stimato sotto l'unita: i benefici in valore aggiunto sono stati inferiori ai costi sostenuti.",
+      "citazione": "il moltiplicatore fiscale sia stato inferiore all'unità, ossia che i benefici per il complesso dell'economia in termini di valore aggiunto siano stati più bassi rispetto ai costi sostenuti per le agevolazioni.",
+      "url": "https://www.bancaditalia.it/pubblicazioni/qef/2024-0860/index.html?com.dotmarketing.htmlpage.language=102",
+      "istituzione": "Banca d'Italia, Questioni di Economia e Finanza n. 860",
+      "data_pubblicazione": "2024-06",
+      "periodo": "2021-2023",
+      "territorio": "Italia",
+      "relation_type": "causal",
+      "confidenza": "alta"
+    },
+    {
+      "testo": "Nel quarto trimestre 2023 gli investimenti fissi lordi crescono del 2,4 per cento congiunturale, con le costruzioni a +4,7 per cento.",
+      "citazione": "gli investimenti fissi lordi crescono del 2,4%",
+      "url": "https://www.istat.it/it/archivio/294472",
+      "istituzione": "Istat, Conti economici trimestrali",
+      "data_pubblicazione": "2024-03-05",
+      "periodo": "IV trimestre 2023",
+      "territorio": "Italia",
+      "relation_type": "descriptive",
+      "confidenza": "alta"
+    },
+    {
+      "testo": "In Basilicata l'edilizia pubblica e stata sostenuta dagli interventi finanziati dal PNRR.",
+      "citazione": "L'edilizia pubblica ha continuato a essere sostenuta dagli interventi finanziati dal Piano nazionale di ripresa e resilienza (PNRR)",
+      "url": "https://www.bancaditalia.it/pubblicazioni/economie-regionali/2024/2024-0039/index.html",
+      "istituzione": "Banca d'Italia, Economie regionali n. 39, L'economia della Basilicata",
+      "data_pubblicazione": "2024-11-13",
+      "periodo": "2023 e primo semestre 2024",
+      "territorio": "Basilicata",
+      "relation_type": "possible_explanation",
+      "confidenza": "media"
+    },
+    {
+      "testo": "Il comparto automotive lucano e descritto in calo, il che smonta l'attribuzione del primato regionale al solo stabilimento di Melfi.",
+      "citazione": "ha risentito del forte calo della fabbricazione di autoveicoli",
+      "url": "https://www.bancaditalia.it/pubblicazioni/economie-regionali/2024/2024-0039/index.html",
+      "istituzione": "Banca d'Italia, Economie regionali n. 39, L'economia della Basilicata",
+      "data_pubblicazione": "2024-11-13",
+      "periodo": "2024, non il 2023 del dato",
+      "territorio": "Basilicata",
+      "relation_type": "descriptive",
+      "confidenza": "media"
+    }
+  ],
+  "lente_1_eventi": "Coperta: QEF 860 quantifica i bonus edilizi, Istat conferma la spinta 2023 delle costruzioni. NON trovata una fonte primaria datata che isoli l'effetto PNRR sugli investimenti fissi lordi in percentuale del PIL 2021-2023.",
+  "lente_2_perche_conta": "NON coperta da una fonte su occupazione, produttivita o infrastrutture: il budget e stato assorbito dalle lenti 1 e 3. Resta usabile il moltiplicatore sotto l'unita come conseguenza documentata per il contribuente.",
+  "lente_3_anomalie": "Basilicata: driver documentato l'edilizia pubblica PNRR, NON l'automotive, che la stessa fonte descrive in calo. La narrativa di stampa su Stellantis Melfi e stata scartata. Piemonte secondo e Calabria ultima: nessuna spiegazione istituzionale datata trovata entro il budget, assenza dichiarata.",
+  "memory_candidates": 4
+}
