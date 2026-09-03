@@ -87,13 +87,13 @@
     ]
   },
   "enabledPlugins": {
-    "motore@platform-locale": true
+    "motore@platform": true
   },
   "extraKnownMarketplaces": {
-    "platform-locale": {
+    "platform": {
       "source": {
-        "source": "directory",
-        "path": "/home/nilo/dev/platform"
+        "source": "github",
+        "repo": "nmaiese/platform"
       }
     }
   },

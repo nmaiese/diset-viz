@@ -78,7 +78,7 @@ prodotto dalla run diventa visibile alle run future solo dopo il merge della
 relativa PR. La Routine non deve scrivere direttamente sulla branch predefinita (`master`
 in questa repository) e non deve usare la pipeline baseline come fallback
 silenzioso. Nel cloud il plugin `motore` va reso disponibile alla sessione
-(marketplace `platform-locale` di `.claude/settings.json`, o `--plugin-dir`):
+(marketplace `platform` su GitHub `nmaiese/platform`, dichiarato in `.claude/settings.json`; in locale `settings.local.json` può puntare alla cartella `~/dev/platform`; in alternativa `--plugin-dir`):
 senza plugin i tipi `motore:*` non esistono e la run va fermata.
 
 Prompt operativo:
