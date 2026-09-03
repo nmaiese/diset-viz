@@ -1,0 +1,47 @@
+{
+ "fonti": [
+  {
+   "testo": "Istat, registro dei metadati SDMX del dataflow 33_291_DF_DCCV_PROBLZONRES_2_6: l'elenco \"Presenza di problemi nella zona di residenza\" ha tre voci, inquinamento, rumori e criminalità, e i valori sono espressi per cento.",
+   "url": "https://esploradati.istat.it/SDMXWS/rest/dataflow/IT1/33_291_DF_DCCV_PROBLZONRES_2_6/1.0/?detail=Full&references=all"
+  },
+  {
+   "testo": "Istat, Noi Italia, Criminalità e sicurezza: Istat pubblica anche una misura diversa del rischio di criminalità percepito dalle famiglie, con una domanda che non è quella di questa pagina e valori molto più alti, non confrontabili con questi.",
+   "url": "https://noi-italia.istat.it/pagina.php?id=3&categoria=9&action=show&L=0"
+  },
+  {
+   "testo": "Istat, Noi Italia, Criminalità e sicurezza: nel 2023 aumentano i furti, 1.731 ogni 100 mila abitanti contro 1.632 nel 2022, con un aumento particolarmente elevato nel Centro (+ 253 furti ogni 100 mila residenti).",
+   "url": "https://noi-italia.istat.it/pagina.php?id=3&categoria=9&action=show&L=0"
+  }
+ ],
+ "key": "multiscopo:MULTI_ZONA_CRIMINALITA",
+ "lead": "Nel 2025 le famiglie che segnalano la criminalità come problema della zona salgono in quattordici regioni su diciassette, scendono solo in Calabria, Liguria e Umbria.",
+ "level": "regione",
+ "sections": [
+  {
+   "body": "L'indagine Multiscopo di Istat chiede alle famiglie quali problemi ha la zona in cui vivono, e la criminalità è una delle voci di un elenco che comprende anche l'inquinamento e i rumori. Il registro dei metadati di Istat descrive queste tre voci nello stesso archivio, con i valori espressi in famiglie ogni cento. Il dato è riferito alla famiglia, non alla singola persona: i tratti con cui Istat descrive la famiglia, dal numero di componenti al reddito fino a chi porta il reddito principale, riguardano sempre il nucleo e mai una persona sola. Il registro non pubblica invece la formulazione esatta della domanda posta alle famiglie.",
+   "h": "Che cosa conta questo numero",
+   "role": "definizione"
+  },
+  {
+   "body": "Nel 2025 la quota di famiglie che segnala la criminalità come problema della zona sale in quattordici regioni su diciassette. Il Veneto arriva a 12,0, con un aumento di 5,1 punti sull'anno precedente. La Toscana e l'Emilia-Romagna salgono entrambe di 4,7 punti, fino a 11,2 e 10,2. Scendono solo tre regioni: la Calabria, di 0,3 punti, la Liguria, di 1,5, e l'Umbria, che scende dal 14,5 del 2024 all'11,3 del 2025.\n\nIl caso più netto è la Lombardia, che sale dal 6,5 del 2024 al 13,1 del 2025, la variazione più grande fra tutte le regioni in quell'anno. Il dossier non registra una causa: il salto potrebbe riguardare davvero la zona in cui vivono le famiglie lombarde, ma potrebbe anche dipendere dalla rilevazione, e questo numero da solo non permette di distinguere le due possibilità. Anche le Marche salgono molto, dal 2,3 del 2024, il valore più basso che questa serie registri, al 5,9 del 2025.\n\nAnche la media delle regioni disponibili racconta la stessa risalita: 5,96 nel 2023, 7,23 nel 2024, 9,19 nel 2025. Non è una media nazionale, ma il valore medio delle sole regioni per cui esiste un dato in ciascun anno, e il numero di regioni non è lo stesso ogni anno.",
+   "h": "Nel 2025 la quota sale quasi ovunque",
+   "role": "dinamica"
+  },
+  {
+   "body": "Nel 2025 la Campania è al primo posto con 15,5, seguita dal Lazio con 14,8. Nel 2024 la Campania era già prima, alla pari con l'Umbria. Il terzo posto è la novità dell'anno: la Lombardia, che nel 2024 valeva 6,5, arriva a 13,1 e si avvicina alle prime due. Ci arriva in un anno in cui salgono quattordici regioni su diciassette.\n\nIn fondo alla classifica ci sono la Calabria con 3,2, la Liguria con 5,6, la Sardegna con 5,7 e le Marche con 5,9. La Liguria è una delle tre regioni che scendono nel 2025, dal 7,1 del 2024 al 5,6.\n\nIn Campania poco più di quindici famiglie su cento segnalano la criminalità nella propria zona, in Calabria poco più di tre.",
+   "h": "Dove sono le regioni nel 2025",
+   "role": "quadro"
+  },
+  {
+   "body": "Lo stesso elenco di problemi della zona comprende anche [l'inquinamento](/indicatore/famiglie-che-lamentano-inquinamento-nella-zona-di-residenza/ims-MULTI_ZONA_INQUINAMENTO) e [i rumori](/indicatore/famiglie-che-lamentano-rumori-nella-zona-di-residenza/ims-MULTI_ZONA_RUMORI). Stessa domanda, stessa rilevazione: sono le pagine più vicine a questa, perché nascono dalla stessa fonte.\n\nUn'altra coppia di indicatori guarda invece a un fenomeno diverso. [I furti in abitazione](/indicatore/furti-in-abitazione/bes-07SIC002) e [i borseggi](/indicatore/borseggi/bes-07SIC003) contano i reati denunciati alle forze dell'ordine, non quello che le famiglie dichiarano in un'indagine. Sono numeri di un altro tipo, e questa pagina non li confronta cifra per cifra.\n\nIstat segnala che nel 2023 l'aumento dei furti è stato particolarmente elevato nel Centro. Nello stesso anno la Toscana scende dal 5,1 del 2022 al 3,8 del 2023, mentre l'Umbria sale dal 9,8 al 10,9: nel Centro quella quota si muove poco, e non tutte le regioni nella stessa direzione. Sapere quanti reati vengono denunciati non dice quante famiglie segnalano un problema nella propria zona.",
+   "h": "Gli indicatori imparentati e che cosa misurano davvero",
+   "role": "quadro"
+  },
+  {
+   "body": "Questo numero conta le famiglie che, rispondendo a un sondaggio Istat, segnalano la criminalità come uno dei problemi della zona in cui vivono. Non è un conteggio di reati, e il registro di Istat non pubblica la formulazione esatta della domanda che è stata posta alle famiglie.\n\nIstat misura la stessa area anche in un altro modo, con una domanda diversa da questa e numeri molto più alti: le due misure non si sommano e non si confrontano.\n\nNessuna fonte pubblica spiega perché la quota sia salita nel 2025.\n\nLa serie non copre tutte le regioni allo stesso modo. La Valle d'Aosta non compare mai, il Molise ha un solo valore, nel 2024, e il Trentino-Alto Adige è presente solo fra il 2019 e il 2021. Per quegli stessi anni, dal 2019 al 2021, non esistono valori regione per regione: restano solo le medie delle regioni disponibili in ciascun anno.\n\nAnche dove i dati regionali esistono, non sono completi allo stesso modo per tutti gli anni: per alcune regioni, come l'Abruzzo, la Basilicata, la Calabria e la Sardegna, il dossier non permette di calcolare la variazione sui cinque anni precedenti.",
+   "h": "Che cosa questo numero non dice",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}
