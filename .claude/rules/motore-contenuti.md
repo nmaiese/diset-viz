@@ -8,6 +8,7 @@ paths:
 
 # Contenuti pubblicati e intent
 
+- Ogni pezzo pubblicato risponde alla prova dell'insight (skill `voce-editoriale`): notizia nel lead, il perché documentato, che cosa cambia per le persone, un confronto con un parente, la domanda con cui il lettore è arrivato. Il pubblico è nel campo `pubblico` di `sites/<sito>.yaml`.
 - La voce è in `voce-editoriale` (skill del plugin): niente trattini lunghi, niente `;`, accenti veri, un fatto detto una volta, l'anno accanto a ogni numero non dell'ultimo anno.
 - I numeri nuovi seguono `grounding-fatti`: `{{fact:id}}` e `facts_used` nel frontmatter. Se il dato manca, la frase si omette.
 - Le fonti stanno in `fonti` (o `sources`) con `testo` e `url`; un post senza fonti non passa `motore validate`.
