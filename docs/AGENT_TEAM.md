@@ -1,19 +1,25 @@
 # Agent Team editoriale
 
-Questo branch affianca a `indicatore-lite` un esperimento basato sugli Agent
-Team nativi di Claude Code. Non sostituisce ancora la pipeline corrente.
+L'Agent Team nativo di Claude Code è il runtime di riferimento per le run
+**presidiate**: un lead che coordina teammate paralleli, che si parlano e
+condividono una lista di task (piano di platform, `docs/30-piano.md` §D8 e
+§6.5). Il workflow `indicatore-lite` resta la baseline **schedulata** finché la
+regola di promozione in fondo non decide.
 
 ## Architettura
 
-La sessione principale è l'editor-in-chief e coordina cinque sessioni autonome:
+La sessione principale è l'editor-in-chief e coordina cinque sessioni autonome.
+Le definizioni vivono nel plugin `motore` di `~/dev/platform/plugin/agents/`;
+il tipo porta il prefisso `motore:`, il nome del teammate resta senza prefisso
+perché i subject dei task e il monitor usano quello.
 
-| teammate | responsabilità | scrive file |
-| --- | --- | --- |
-| `data-editor` | evidenza quantitativa e limiti | no |
-| `source-researcher` | fonti e contesto verificabile | no |
-| `search-strategist` | intento, titolo e copertura | no |
-| `data-journalist` | angolo e bozza strutturata | no |
-| `skeptical-editor` | stress test e verdetto | no |
+| teammate | tipo | responsabilità | scrive file |
+| --- | --- | --- | --- |
+| `data-editor` | `motore:data-editor` | evidenza quantitativa e limiti | no |
+| `source-researcher` | `motore:source-researcher` | fonti e contesto verificabile | no |
+| `search-strategist` | `motore:search-strategist` | intento, titolo e copertura | no |
+| `data-journalist` | `motore:data-journalist` | angolo e bozza strutturata | no |
+| `skeptical-editor` | `motore:skeptical-editor` | stress test e verdetto | no |
 
 Solo il lead esegue `lab.dossier`, salva gli artefatti, lancia
 `lab.controlla`, pubblica e avvia i test. L'exit code 0 di `lab.controlla`
@@ -21,7 +27,8 @@ non basta: `non_trovate` e `link_inesistenti` devono essere zero,
 `bloccanti` deve essere vuoto e la pubblicazione deve usare esclusivamente il
 percorso `bozza_salvata` restituito dal controllo. I teammate comunicano
 direttamente e usano la lista task condivisa. Non sono ammessi team annidati o
-subagenti.
+subagenti. Il frontmatter `skills` non viene applicato ai teammate: il prompt
+di spawn ordina a ciascuno di invocare le skill nominate nella sua definizione.
 
 ## Avvio
 
@@ -29,10 +36,11 @@ Aprire una sessione Claude Code nuova e invocare:
 
 `/redazione-indicatore ter-6`
 
-La skill `redazione-indicatore` contiene protocollo, nomi, task e criteri di
-uscita. Il progetto abilita l'esperimento con
-`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` e usa la modalità `in-process`,
-compatibile anche con terminale integrato e Windows Terminal.
+La skill `motore:redazione-indicatore` (nel plugin, `skills/redazione-indicatore/SKILL.md`)
+contiene protocollo, nomi, task e criteri di uscita. Il progetto abilita i team
+con `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in `.claude/settings.json` e usa
+la modalità `in-process`, compatibile anche con terminale integrato e Windows
+Terminal.
 
 Una sessione gestisce un solo indicatore. Il team non è ripristinato da
 `/resume`: dopo una ripresa il lead deve creare nuovi teammate e riagganciare i
@@ -41,7 +49,8 @@ task rimasti.
 ## Memoria selettiva
 
 Solo `source-researcher` e `skeptical-editor` dichiarano `memory: project`.
-Le directory versionate sono:
+Le definizioni stanno nel plugin, le memorie restano **in questo repo**,
+versionate:
 
 - `.claude/agent-memory/source-researcher/`
 - `.claude/agent-memory/skeptical-editor/`
@@ -53,7 +62,8 @@ subagente: abilita gli strumenti della memoria e carica l'inizio di
 Per questo il contratto non dipende da un comportamento implicito: il teammate
 legge il file con `Read`, propone `memory_candidates` e il lead è l'unico che
 promuove le voci. Gli strumenti generici `Write`, `Edit` e `Bash` restano
-fuori dall'allowlist dei teammate.
+fuori dall'allowlist dei teammate, e `tests/integration/test_docs_match_the_code.py`
+lo verifica sulle definizioni del plugin.
 
 La memoria conserva percorsi di ricerca, qualità delle fonti, endpoint,
 comparabilità, difetti ricorrenti e falsi positivi. Non conserva fatti correnti,
@@ -67,7 +77,9 @@ Quindi la memoria di progetto è disponibile nel cloud, ma un aggiornamento
 prodotto dalla run diventa visibile alle run future solo dopo il merge della
 relativa PR. La Routine non deve scrivere direttamente sulla branch predefinita (`master`
 in questa repository) e non deve usare la pipeline baseline come fallback
-silenzioso.
+silenzioso. Nel cloud il plugin `motore` va reso disponibile alla sessione
+(marketplace `platform-locale` di `.claude/settings.json`, o `--plugin-dir`):
+senza plugin i tipi `motore:*` non esistono e la run va fermata.
 
 Prompt operativo:
 
@@ -76,11 +88,14 @@ Nel repository nmaiese/diset-viz esegui una run editoriale per un solo
 indicatore usando un vero Agent Team Claude Code.
 
 Prima di iniziare:
-1. verifica che esistano .claude/skills/redazione-indicatore/SKILL.md e le
-   memorie di source-researcher e skeptical-editor;
+1. verifica che il plugin motore sia caricato (la skill
+   motore:redazione-indicatore e i tipi motore:data-editor, motore:source-researcher,
+   motore:search-strategist, motore:data-journalist, motore:skeptical-editor
+   devono risolversi) e che esistano le memorie in
+   .claude/agent-memory/source-researcher/ e .claude/agent-memory/skeptical-editor/;
 2. verifica che autoMemoryEnabled sia true;
-3. se questi file non esistono, ferma la run e spiega che la branch predefinita
-   non contiene ancora il team. Non usare indicatore-lite come fallback.
+3. se manca qualcosa, ferma la run e spiega che cosa manca. Non usare
+   indicatore-lite come fallback.
 
 Invoca /redazione-indicatore <codice> e segui integralmente quella skill.
 Crea i cinque teammate con i tipi e i nomi dichiarati. Ricercatore e revisore
@@ -96,9 +111,7 @@ promossi, scartati e aggiornata. Esegui i controlli e i test richiesti dalla
 skill; una run verde senza esito editoriale esplicito non è un successo.
 ```
 
-Sostituire `<codice>` con l'indicatore assegnato alla Routine. Attivare questa
-Routine sulla branch predefinita solo dopo il merge del team; prima del merge
-usare una run manuale sulla branch sperimentale.
+Sostituire `<codice>` con l'indicatore assegnato alla Routine.
 
 ## Monitoraggio
 
@@ -107,9 +120,10 @@ I subject dei task seguono il contratto:
 `[redazione:<ruolo>:<fase>] <codice> - <titolo>`
 
 Gli hook nativi `TaskCreated` e `TaskCompleted` passano per
-`.claude/hooks/team_monitor.py`, che li converte nel contratto già usato da
-`/_pipeline/beat`. Non legge né modifica `~/.claude/teams`, perché quella
-directory è stato interno e transitorio del runtime.
+`.claude/hooks/team_monitor.py` (che resta in questo repo), e li converte nel
+contratto già usato da `/_pipeline/beat`. Non legge né modifica
+`~/.claude/teams`, perché quella directory è stato interno e transitorio del
+runtime.
 
 La task `[redazione:lead:chiusura]` è la sentinella. Prima di completarla il lead
 scrive nella descrizione il JSON `articoli`/`fermati` e il consuntivo

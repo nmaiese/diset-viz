@@ -10,27 +10,33 @@ calcolo fa meglio di un modello; tutto ciò che richiede un giudizio (che storia
 raccontare, se una fonte regge, se una frase promette più di quanto la fonte
 dica) lo fa un agente, e il controllo è un altro agente che prova a smentirlo.
 
+I sei tipi `lab-*` sono definiti nel plugin `motore` di platform
+(`~/dev/platform/plugin/agents/lab-*.md`, una definizione per tutti i siti) e il
+workflow li chiama con il prefisso `motore:`. I comandi `bin/py -m lab.*` e il
+workflow restano in questo repo. `/motore:pezzo divarioitalia <codice>` esegue
+lo stesso workflow e in più apre la PR.
+
 ```
   ter-6, oppure niente e la sceglie la coda
     |
- [1] lab-dossierista   Bash, haiku    bin/py -m lab.dossier      -> data/lab/dossier/<codice>.json
+ [1] motore:lab-dossierista   Bash, haiku    bin/py -m lab.dossier      -> data/lab/dossier/<codice>.json
     |
  [2] tre scout in parallelo, lenti distinte, ciechi l'uno all'altro
-    |  lab-scout        Web, sonnet   che cosa è successo: eventi datati
-    |  lab-scout-europa Web, sonnet   dove sta l'Italia, con le trappole di comparabilità
-    |  lab-scout        Web, sonnet   perché conta: conseguenze documentate
+    |  motore:lab-scout        Web, sonnet   che cosa è successo: eventi datati
+    |  motore:lab-scout-europa Web, sonnet   dove sta l'Italia, con le trappole di comparabilità
+    |  motore:lab-scout        Web, sonnet   perché conta: conseguenze documentate
     |  prima l'ultimo anno del dato, che è quello che l'articolo descrive,
     |  poi una finestra sul 2026, datata in `periodo` e mai confusa col dato
     |
- [3] lab-scrittore     Read, sonnet   una bozza sola. Tesi, temi, numero di sezioni,
-    |                                 ordine, titoli e link: decide tutto lui
- [4] lab-verificatore  Bash+Web, opus bin/py -m lab.controlla --salva  -> data/lab/bozze/<codice>.json
-    |                                 cinque classi passate in rassegna, non una
-    |                                 lettura: cifre, fonti rifetchate, causali,
-    |                                 definizione, coerenza fra titoli e corpi
-    |                                 smentite? [3] corregge, al massimo due giri
-    |                                 gravi all'ultimo giro? non si scrive niente
- [5] lab-pubblicatore  Bash, haiku    bin/py -m lab.pubblica --bozza   -> content/indicators/<key>.json
+ [3] motore:lab-scrittore     Read, sonnet   una bozza sola. Tesi, temi, numero di sezioni,
+    |                                        ordine, titoli e link: decide tutto lui
+ [4] motore:lab-verificatore  Bash+Web, opus bin/py -m lab.controlla --salva  -> data/lab/bozze/<codice>.json
+    |                                        cinque classi passate in rassegna, non una
+    |                                        lettura: cifre, fonti rifetchate, causali,
+    |                                        definizione, coerenza fra titoli e corpi
+    |                                        smentite? [3] corregge, al massimo due giri
+    |                                        gravi all'ultimo giro? non si scrive niente
+ [5] motore:lab-pubblicatore  Bash, haiku    bin/py -m lab.pubblica --bozza   -> content/indicators/<key>.json
 ```
 
 Nove agenti per articolo nel caso peggiore, quindi **un codice per run**.
@@ -150,9 +156,9 @@ sono ciechi l'uno all'altro.
 
 | lente | agente | cerca |
 | --- | --- | --- |
-| che cosa è successo | `lab-scout` | eventi datati che si affiancano ai movimenti della serie |
-| dove sta l'Italia | `lab-scout-europa` | valore italiano in fonte europea, media UE, paesi vicini per valore |
-| perché conta | `lab-scout` | conseguenze documentate, chi ne è toccato |
+| che cosa è successo | `motore:lab-scout` | eventi datati che si affiancano ai movimenti della serie |
+| dove sta l'Italia | `motore:lab-scout-europa` | valore italiano in fonte europea, media UE, paesi vicini per valore |
+| perché conta | `motore:lab-scout` | conseguenze documentate, chi ne è toccato |
 
 Il budget sta nel **prompt**, non nel frontmatter: `maxTurns` dentro un workflow
 non viene rispettato (sedici dichiarati, trentuno fatti al primo giro reale), e
@@ -391,7 +397,7 @@ guardato" escono identici, cioè zero smentite.
 ## Il confronto che non è mai stato fatto
 
 Questa catena è nata per essere misurata contro quella grande, sullo stesso
-indicatore, con `giudice-cieco` a leggere i due testi senza sapere da dove
+indicatore, con `motore:giudice-cieco` a leggere i due testi senza sapere da dove
 vengono. Il confronto **non è mai stato eseguito**: la catena grande è stata
 ritirata prima, e i numeri che restano sono di run diverse su indicatori
 diversi, quindi non si sottraggono.
@@ -453,17 +459,18 @@ console lo dice.
 ## Nota operativa
 
 Il registro degli agenti che il runtime dei workflow interroga è una fotografia
-presa all'avvio della sessione. Nella sessione in cui un file `lab-*` viene
-creato il workflow fallisce subito con `agent type '...' not found`: serve **una
-sessione nuova**. Da lì in poi:
+presa all'avvio della sessione. Nella sessione in cui un agent `lab-*` viene
+aggiunto al plugin il workflow fallisce subito con `agent type '...' not found`:
+serve **una sessione nuova**. Da lì in poi:
 
     Workflow({scriptPath: ".claude/workflows/indicatore-lite.js", args: ["ter-6"]})
     Workflow({scriptPath: ".claude/workflows/indicatore-lite.js"})   // lo sceglie la coda
 
 Un agente nuovo va anche **dichiarato nella suite**:
-`tests/integration/test_docs_match_the_code.py` elenca per nome chi non ha un
-perimetro nel cancello, ed è l'unico modo di accorgersi che ne è comparso uno
-senza che nessuno abbia deciso dove sta. I sei `lab-*` sono nell'insieme `lite`.
+`tests/integration/test_docs_match_the_code.py` legge `plugin/agents/` di platform
+(o `MOTORE_PLUGIN_DIR`) ed elenca per nome chi esiste, ed è l'unico modo di
+accorgersi che ne è comparso uno senza che nessuno abbia deciso dove sta. I sei
+`lab-*` sono nell'insieme `LITE`, i cinque teammate in `TEAM`.
 
 Se un tipo `lab-*` continua a non comparire, il primo sospetto è il frontmatter:
 un `description` su una riga sola che contiene `: ` non è YAML valido e il file
@@ -473,7 +480,8 @@ che niente lo dica. Due delle tre skill nuove erano così. Si controllano
 tutti insieme:
 
     bin/py -c "import glob,yaml
-    for p in glob.glob('.claude/agents/*.md') + glob.glob('.claude/skills/*/SKILL.md'):
+    P='/home/nilo/dev/platform/plugin'
+    for p in glob.glob(P+'/agents/*.md') + glob.glob(P+'/skills/*/SKILL.md'):
         try: yaml.safe_load(open(p).read().split('---')[1])
         except Exception as e: print(p, e)"
 

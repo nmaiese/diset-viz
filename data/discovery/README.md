@@ -40,5 +40,6 @@ python3 scripts/promote_candidates.py --offline --dry-run
 python3 scripts/promote_candidates.py --offline
 ```
 
-Vedi [`docs/DISCOVERY_PIPELINE.md`](../../docs/DISCOVERY_PIPELINE.md) per
-l'architettura completa e il contratto dell'agente schedulato.
+Vedi [`docs/archive/DISCOVERY_PIPELINE.md`](../../docs/archive/DISCOVERY_PIPELINE.md)
+per l'architettura completa (archiviato: l'agente schedulato che descrive non
+esiste più; oggi l'ammissione è l'agent `motore:admissions` del plugin).

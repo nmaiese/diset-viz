@@ -2,9 +2,9 @@
 
 Dieci criteri, da 0 a 2, massimo 20. Serve a tre cose e a nessun'altra:
 
-- **`scrittore-indicatore`** ci passa sopra la bozza prima di consegnarla al
-  workflow (`.claude/workflows/indicatore-lite.js`),
-- **`giudice-cieco`** la usa come metro per dire quale delle due bozze si legge
+- **`motore:lab-scrittore`** ci passa sopra la bozza prima di consegnarla al
+  verificatore, dentro il workflow (`.claude/workflows/indicatore-lite.js`),
+- **`motore:giudice-cieco`** la usa come metro per dire quale delle due bozze si legge
   fino in fondo, e `lab/lint.py` impone deterministicamente ciò che si
   può contare,
 - un **lotto** di articoli si legge prima e dopo un cambio di prompt, e il
@@ -12,8 +12,9 @@ Dieci criteri, da 0 a 2, massimo 20. Serve a tre cose e a nessun'altra:
 
 I nomi contano: lo **scrittore** e il **revisore** erano due agenti separati e
 non esistono più. Scrivere un articolo è passato alla catena di `lab/`, dove sei
-tipi stretti lo fanno dentro un workflow, e chi cerca il file di un ruolo che
-questa pagina nomina deve trovarlo.
+tipi stretti (`motore:lab-*`, definiti nel plugin `motore` di platform, non in
+questo repo) lo fanno dentro un workflow, e chi cerca il file di un ruolo che
+questa pagina nomina deve trovarlo lì.
 
 **Sotto 14/20 l'articolo non è pronto.** Non è una soglia morbida: sotto quel
 punteggio la pagina descrive una classifica invece di raccontare un dato, che è
@@ -56,7 +57,7 @@ dagli altri, e nessuna media le compensa fra loro.
 | asse | criteri | pavimento | come si misura |
 |---|---|---|---|
 | **1. Correttezza e onestà** | 7 (onestà causale), 9 (fonti) | **2 su ognuno** | il più duro: una causa che il dato non mostra o una fonte inventata boccia da sola. Le eval `writer`/`reviewer` (cifre fuori dal brief, classi d'errore) e il verificatore a valle |
-| **2. Leggibilità** | 6 (scala umana), 8 (leggibilità) | **2 sul criterio 8** | la leggibilità è priorità primaria: un lettore comune capisce al primo passaggio, o l'articolo torna indietro. Il **reader-editor**, giudice indipendente, e il confronto cieco a due giudici |
+| **2. Leggibilità** | 6 (scala umana), 8 (leggibilità) | **2 sul criterio 8** | la leggibilità è priorità primaria: un lettore comune capisce al primo passaggio, o l'articolo torna indietro. `motore:skeptical-editor` nelle run presidiate, e il confronto cieco di `motore:giudice-cieco` |
 | **3. Tesi e struttura** | 1 (apertura), 2 (nut graf), 3 (filo unico), 4 (ragionamento) | **media >= 1,5** | c'è una tesi, un nut graf, un filo che attraversa le sezioni, un respiro oltre la propria serie. Lettura umana |
 | **4. Mestiere** | 5 (incroci e link), 10 (igiene anti-tell) | **1 su ognuno** | incroci con un ruolo chiaro, nessun tell da bot. `prose_lint` per la parte contabile, lettura per il resto |
 
@@ -67,18 +68,18 @@ vede che è tradotta in inglese", ed è precisamente il difetto che il totale no
 vedeva. Il pavimento per asse lo prende: la leggibilità non si compra con
 l'accuratezza, ne la struttura con le fonti.
 
-L'asse 2 è l'unico che ha già un giudice indipendente suo, il **reader-editor**
-(`.claude/agents/lab-verificatore.md`): legge ogni articolo pubblicato e boccia i
-tecnici-ma-corretti, con la sua eval e la sua baseline nel canary. Gli altri tre
-assi restano giudizio interno alla catena (il giro di correzione, più
-`giudice-cieco` sul confronto fra due bozze; l'asse 1 anche del verificatore, a
-valle), finché non avranno un giudice loro.
+L'asse 2 aveva un giudice indipendente suo, il **reader-editor**, ritirato con
+la catena grande. Dentro il workflow nessuno lo misura: `motore:lab-verificatore`
+passa in rassegna cifre, fonti, causali, definizione e coerenza, non la
+leggibilità. La leggibilità la giudica `motore:skeptical-editor` nelle run
+presidiate dell'Agent Team, e `motore:giudice-cieco` quando si confrontano due
+bozze. Gli altri tre assi restano giudizio interno alla catena (il giro di
+correzione; l'asse 1 anche del verificatore, a valle).
 
-Il reader-editor non punteggia il criterio 8 direttamente, giudica su otto
-criteri suoi (comprensione, carico, struttura, traduzione dei tecnicismi...),
-quindi la corrispondenza va detta invece che dedotta: **un suo `revise` è il
+Un rilievo di leggibilità non punteggia il criterio 8 direttamente, quindi la
+corrispondenza va detta invece che dedotta: **un `revise` per leggibilità è il
 criterio 8 sotto il pavimento**, e l'articolo torna a chi lo ha scritto per una
-riscrittura qualunque sia il totale. Un suo `pass` non regala il 2: dice che l'asse 2 non blocca.
+riscrittura qualunque sia il totale. Un `pass` non regala il 2: dice che l'asse 2 non blocca.
 
 I pavimenti valgono per un articolo che si dichiara **finito**. Un articolo a
 metà è semplicemente da scrivere, non bocciato: la coda che lo dice è

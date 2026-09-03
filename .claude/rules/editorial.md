@@ -42,4 +42,4 @@ La seconda riga è la meno ovvia: confronta la prosa con la **definizione**
 della fonte, non con la serie. Esiste perché rileggere undici articoli contro
 i dati ha trovato zero errori aritmetici e quattro descrizioni sbagliate di
 che cosa l'indicatore conta. Le classi di errore che solo una lettura trova
-stanno nella skill `indicator-review` (`.claude/skills/indicator-review/`).
+stanno nella skill `motore:indicator-review` (nel plugin `motore` di platform).
