@@ -1,0 +1,47 @@
+{
+  "subject": "[redazione:lead:chiusura] ter-13 - chiusura del run",
+  "stato": "completata",
+  "nota": "Nessun tool di task disponibile in questa sessione: la sentinella e' tenuta come file. Il cruscotto e team_monitor.py leggono i subject dei task e non vedranno questa run.",
+  "esito": {
+    "articoli": [
+      {
+        "scritto": true,
+        "bloccanti": [],
+        "sovrascritto": true,
+        "vintage_precedente": 2025,
+        "percorso": "content/indicators/13.json",
+        "chiave": "13",
+        "livello": "regione",
+        "vintage": 2025,
+        "parole": 542,
+        "impronta_prosa": "f978390182563cfa",
+        "rilievi_lint": [
+          {
+            "rule": "lead-lungo",
+            "severity": "segnala",
+            "detail": "250 caratteri: il lead diventa la meta description, sopra 200 viene tagliato",
+            "field": "lead",
+            "decisione_del_lead": "Non riparato. La correzione unica era gia' spesa e il lead e' prosa: il lead non tocca frasi a mano. Rilievo non bloccante, lasciato a una decisione umana."
+          }
+        ],
+        "gate": {
+          "cifre_controllate": 47,
+          "non_trovate": 0,
+          "link_inesistenti": 0,
+          "bloccanti": [],
+          "bozza_salvata": "data/lab/bozze/ter-13.json"
+        },
+        "angolo": "Il divario territoriale del lavoro e' molto piu' largo fra le donne che fra gli uomini, e un solo numero per regione lo nasconde."
+      }
+    ],
+    "fermati": [],
+    "memoria": {
+      "consultata": ["source-researcher", "skeptical-editor"],
+      "aggiornata": ["source-researcher", "skeptical-editor"],
+      "candidati": 8,
+      "promossi": 3,
+      "scartati": 5
+    }
+  },
+  "test": "670 test, tutti passati"
+}

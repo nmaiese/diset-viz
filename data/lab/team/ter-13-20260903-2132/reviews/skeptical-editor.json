@@ -1,0 +1,13 @@
+{
+  "verdetto": "da correggere",
+  "rilievi": [
+    {"dove": "quadro", "citazione": "Per un uomo la regione in cui vive sposta poco le sue possibilità di lavorare. Per una donna le sposta molto.", "problema": "Causa senza fonte, e contraddice la riga sotto che dichiara che il dato descrive e non spiega.", "gravita": "alta", "e_bloccante": true},
+    {"dove": "dinamica", "citazione": "Chi vive in Calabria ha davanti un mercato del lavoro più largo di sette anni fa, e resta il più stretto del paese.", "problema": "Passa dal rapporto allo stock: il tasso sale anche se la popolazione 15-64 cala. Composizione non sciolta da nessuna fonte.", "gravita": "alta", "e_bloccante": true},
+    {"dove": "quadro", "citazione": "Il rapporto Cnel-Istat su carichi di cura, asili nido e part time involontario non è risultato leggibile in questa ricerca, e senza una fonte non scriviamo una causa.", "problema": "Nominando i tre temi pianta la spiegazione che dichiara di non dare, citando una fonte assente da fonti. Voce di retrobottega.", "gravita": "media", "e_bloccante": true},
+    {"dove": "limiti", "citazione": "Il numero delle notizie europee non è questo", "problema": "Limite vero ma non quello di questo angolo: il tasso conta le persone, non le ore, ed è lì che la misura femminile è più debole.", "gravita": "media", "e_bloccante": true},
+    {"dove": "lead", "citazione": "In Trentino Alto Adige lavorano 72,89 persone su cento in età da lavoro, in Calabria 46,41.", "problema": "Eco del cruscotto: massimo e minimo sono le prime cose che la pagina stampa da sé.", "gravita": "media", "e_bloccante": false},
+    {"dove": "limiti", "citazione": "prima di mettere due numeri uno accanto all'altro conviene guardare sempre la fascia d'età e l'anno", "problema": "Didascalia, non voce editoriale. 'sempre' è un universale gratuito.", "gravita": "bassa", "e_bloccante": false},
+    {"dove": "definizione", "citazione": "In metà delle regioni il valore supera 68,12.", "problema": "Eco del cruscotto, non fa lavoro dentro una sezione sulla differenza fra occupazione e disoccupazione.", "gravita": "bassa", "e_bloccante": false},
+    {"dove": "definizione", "citazione": "quindi conta anche chi ha smesso di cercare, chi studia e chi si occupa della famiglia", "problema": "Ambiguo: 'conta' può leggersi come conteggiati fra gli occupati, mentre stanno solo al denominatore.", "gravita": "bassa", "e_bloccante": false}
+  ]
+}

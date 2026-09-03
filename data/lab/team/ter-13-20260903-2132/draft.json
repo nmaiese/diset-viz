@@ -1,0 +1,30 @@
+{
+  "lead": "In Trentino Alto Adige lavorano 72,89 persone su cento in età da lavoro, in Calabria 46,41. Ma la distanza fra le regioni non è la stessa per tutti: fra le donne è molto più larga che fra gli uomini.",
+  "angolo": "Il divario territoriale del lavoro è molto più largo fra le donne che fra gli uomini, e un solo numero per regione lo nasconde.",
+  "sections": [
+    {
+      "role": "definizione",
+      "h": "Occupazione non è il contrario di disoccupazione",
+      "body": "Il tasso di occupazione dice quante persone fra i 15 e i 64 anni hanno un lavoro, ogni cento residenti della stessa età. Molti arrivano qui cercando la disoccupazione per regione, e i due numeri non sono l'uno il rovescio dell'altro. La disoccupazione si calcola solo su chi un lavoro lo sta cercando in modo attivo. L'occupazione si calcola su tutta la popolazione fra i 15 e i 64 anni, quindi conta anche chi ha smesso di cercare, chi studia e chi si occupa della famiglia. Per questo una regione può avere insieme pochi disoccupati e pochi occupati.\n\nIn metà delle regioni il valore supera 68,12. In fondo alla classifica la Campania sta a 46,67, con la Calabria subito sotto."
+    },
+    {
+      "role": "quadro",
+      "h": "Per una donna la regione in cui vive conta molto di più",
+      "body": "Il divario territoriale del lavoro è molto più largo fra le donne che fra gli uomini. Fra le donne il [tasso di occupazione femminile](/indicatore/tasso-di-occupazione-femmine/ter-178) va da 33,95 in Campania a 68,90 in Valle d'Aosta. Fra gli uomini il [tasso di occupazione maschile](/indicatore/tasso-di-occupazione-maschi/ter-177) va da 58,06 in Calabria a 78,00 in Emilia-Romagna.\n\nPer un uomo la regione in cui vive sposta poco le sue possibilità di lavorare. Per una donna le sposta molto. In Puglia hanno un lavoro 64,18 uomini su cento e 37,91 donne. In Trentino Alto Adige 77,80 uomini e 67,88 donne.\n\nPerché la forbice femminile sia così larga, nessuna fonte istituzionale verificata lo dice. Il rapporto Cnel-Istat su carichi di cura, asili nido e part time involontario non è risultato leggibile in questa ricerca, e senza una fonte non scriviamo una causa. Qui il dato descrive, non spiega."
+    },
+    {
+      "role": "dinamica",
+      "h": "Sale ovunque, la distanza resta",
+      "body": "Dal 2018 il valore è salito in tutte le regioni. Nel 2018 la Calabria stava a 42,09 e il Trentino Alto Adige a 71,00. Nel 2022 la Valle d'Aosta guadagna 3,23 punti in un anno solo, la Toscana 2,96. Negli ultimi cinque anni le due regioni cresciute di più sono la Basilicata, 7,34 punti, e la Liguria, 7,30.\n\nLa distanza fra la regione più alta e la più bassa era 30,17 punti nel 2018, oggi è 26,48. Si accorcia, ma poco.\n\nE la salita non è continua dappertutto. Nel 2025 sei regioni arretrano, e cinque di queste stanno fra le prime dieci: il Veneto perde 0,95 punti, la Toscana 0,38, il Friuli-Venezia Giulia 0,35. La sesta è la Puglia, che lascia 0,15.\n\nChi vive in Calabria ha davanti un mercato del lavoro più largo di sette anni fa, e resta il più stretto del paese."
+    },
+    {
+      "role": "limiti",
+      "h": "Il numero delle notizie europee non è questo",
+      "body": "Un avvertimento solo, ed è quello che cambia la lettura. I confronti europei sull'occupazione, compreso quello in cui Eurostat colloca l'Italia fra i paesi con il valore più basso dell'Unione, sono costruiti sulla fascia 20-64 anni e riferiti al 2024. Le cifre di questa pagina sono 15-64 anni e arrivano al 2025. Le due misure non si affiancano: prima di mettere due numeri uno accanto all'altro conviene guardare sempre la fascia d'età e l'anno."
+    }
+  ],
+  "fonti": [
+    {"testo": "Istat, Banca dati territoriale per le politiche di sviluppo: tasso di occupazione, occupati 15-64 anni sulla popolazione della stessa classe di età, media annua", "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"},
+    {"testo": "Eurostat, tasso di occupazione nell'Unione europea nel 2024, fascia 20-64 anni", "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20250415-1"}
+  ]
+}

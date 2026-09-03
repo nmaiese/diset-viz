@@ -133,3 +133,43 @@ giudizi su persone e agenti, segreti, token o dati personali.
 
 Ogni pattern va verificato contro la bozza corrente. La memoria può aprire una
 domanda, non chiuderla.
+
+- categoria: causa senza fonte, forma ricorrente
+  apprendimento: >
+    Su un indicatore espresso come quota, la frase che passa dal rapporto allo
+    stock (mercato del lavoro più largo, più posti, più occupati) è una causa
+    senza fonte anche quando nessun verbo causale compare: il denominatore può
+    muoversi da solo. Trattarla come gravità alta finché una fonte non scioglie
+    la composizione. La riparazione è riportare la frase alla quota.
+  evidenza: >
+    ter-13, sezione dinamica: Calabria da 42,09 (2018) a 46,41 (2025), con il
+    contributo del calo della popolazione 15-64 fra le domande rimaste senza
+    fonte nella stessa run.
+  verified_on: 2026-09-03
+  recheck_after: 2027-03-01
+  ambito: indicatori espressi come quota su una popolazione di riferimento
+  limiti: >
+    Osservato su un indicatore in una run. Confermare su un'altra famiglia prima
+    di trattarlo come regola automatica.
+
+- categoria: criterio di gravità sulla scelta dell'angolo
+  apprendimento: >
+    Quando il blocco gruppi del dossier ha coincide_con_macroaree true e una
+    sovrapposizione alta, un angolo della forma "X non è un blocco" è gravità
+    alta: il dossier afferma il contrario e il lettore ricava una conclusione
+    falsa. La struttura interna resta raccontabile, ma come secondo divario
+    dentro il blocco, non come smentita del blocco.
+  evidenza: >
+    ter-13: coincide_con_macroaree true, sovrapposizione 0.8, le ultime quattro
+    regioni tutte del Mezzogiorno senza eccezioni.
+  verified_on: 2026-09-03
+  recheck_after: 2027-03-01
+  ambito: scelta dell'angolo su indicatori con blocco gruppi nel dossier
+  limiti: >
+    Non vale a soglie basse di sovrapposizione, dove l'angolo contro-macroaree è
+    invece la notizia. La soglia esatta non è stata misurata.
+```
+
+Formato di una voce:
+
+```yaml

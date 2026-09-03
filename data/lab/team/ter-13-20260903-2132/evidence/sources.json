@@ -1,0 +1,82 @@
+{
+  "eventi": {
+    "claim": [
+      {
+        "claim": "Dal 1 gennaio 2024 il Reddito di cittadinanza e' stato sostituito dall'Assegno di inclusione, istituito dal Decreto Legge 4 maggio 2023 n. 48 (L. 85/2023); il Supporto per la formazione e il lavoro e' attivo dal 1 settembre 2023.",
+        "url": "https://www.lavoro.gov.it/priorita/pagine/assegno-di-inclusione-e-supporto-la-formazione-e-il-lavoro",
+        "istituzione": "Ministero del Lavoro e delle Politiche Sociali",
+        "citazione_testuale": "Viene istituito dal primo gennaio 2024",
+        "verificata_come_stringa": true,
+        "periodo": "2023-2024",
+        "territorio": "Italia",
+        "relazione": "contesto"
+      },
+      {
+        "claim": "In Veneto nel 2025 il numero di occupati si e' ridotto, in controtendenza rispetto al dato nazionale, con calo piu' forte per donne e part time.",
+        "url": "https://www.bancaditalia.it/media/notizia/presentazione-del-rapporto-annuale-sul-2025-l-economia-del-veneto/",
+        "istituzione": "Banca d'Italia",
+        "citazione_testuale": "Nel 2025 il numero di occupati si e' ridotto, differentemente da quanto avvenuto nel Paese; il calo e' stato piu' intensa per la componente femminile e per gli occupati a tempo parziale.",
+        "verificata_come_stringa": true,
+        "data_pubblicazione": "2026-06-17",
+        "periodo": "2025",
+        "territorio": "Veneto",
+        "relazione": "contesto"
+      }
+    ],
+    "non_trovato": [
+      "Nessuna fonte istituzionale primaria verificata come stringa sul contributo della componente over-50 e del calo della popolazione 15-64 (denominatore) alla ripresa 2021-2023.",
+      "Nessuna valutazione istituzionale datata sull'effetto di Assegno di inclusione e Supporto formazione lavoro sull'occupazione nel Mezzogiorno.",
+      "Nessun rilievo istituzionale che leghi esplicitamente il calo occupazionale 2025 in Veneto a manifattura, export o cassa integrazione."
+    ]
+  },
+  "perche_conta": {
+    "claim": [
+      {
+        "claim": "Dal 2002 al 2024 quasi 350mila laureati under 35 hanno lasciato il Mezzogiorno per il Centro-Nord, per una perdita netta di 270mila; il costo stimato della sola mobilita' interna e' 6,8 miliardi di euro l'anno.",
+        "url": "https://www.svimez.it/un-paese-due-emigrazioni-i-il-report-svimez-save-the-children/",
+        "istituzione": "Svimez (con Save the Children)",
+        "citazione_testuale": "quasi 350mila laureati under 35 hanno lasciato il Mezzogiorno in direzione del Centro-Nord",
+        "verificata_come_stringa": true,
+        "data_pubblicazione": "2026-02-17",
+        "periodo": "2002-2024",
+        "territorio": "Mezzogiorno",
+        "relazione": "contesto"
+      },
+      {
+        "claim": "Nel 2024 il Mezzogiorno e' l'area del paese con la quota piu' alta di popolazione a rischio di poverta' o esclusione sociale, 39,2%, in crescita dal 39,0% del 2023.",
+        "url": "https://www.istat.it/it/comunicato-stampa/condizioni-di-vita-e-reddito-delle-famiglie-anni-2023-e-2024/",
+        "istituzione": "Istat",
+        "citazione_testuale": "il Mezzogiorno come l'area del paese con la percentuale piu' alta (39,2%, era 39,0% nel 2023)",
+        "verificata_come_stringa": true,
+        "data_pubblicazione": "2025-03-26",
+        "periodo": "2023-2024",
+        "territorio": "Mezzogiorno",
+        "relazione": "contesto"
+      }
+    ],
+    "non_trovato": [
+      "Occupazione femminile e servizi (carico di cura, asili nido, part time involontario): il rapporto Cnel-Istat esiste ma il PDF non e' leggibile dal fetch; nessuna citazione verificabile come stringa.",
+      "Reddito disponibile medio delle famiglie per ripartizione geografica: non trovato nel testo estratto del comunicato Istat consultato."
+    ]
+  },
+  "memory_candidates": [
+    {
+      "categoria": "trappola di comparabilita",
+      "apprendimento": "Le 'Economie regionali' di Banca d'Italia hanno piu' edizioni per la stessa regione nello stesso anno solare con periodi diversi: un aggiornamento congiunturale a fine anno (su primo semestre) e il rapporto annuale a giugno dell'anno successivo sull'anno intero. Controllare codice pubblicazione e periodo coperto prima di citare.",
+      "evidence_url": "https://www.bancaditalia.it/media/notizia/presentazione-del-rapporto-annuale-sul-2025-l-economia-del-veneto/",
+      "verified_on": "2026-09-03",
+      "recheck_after": "2027-06-01",
+      "ambito": "Banca d'Italia, economie regionali",
+      "limiti": "Verificato solo per Veneto 2025; da confermare se lo schema vale per tutte le regioni."
+    },
+    {
+      "categoria": "endpoint",
+      "apprendimento": "istat.it/it/archivio/occupati e' un indice di comunicati, non contiene il testo: per claim sui driver serve risalire al comunicato specifico linkato, non fermarsi alla pagina archivio.",
+      "evidence_url": "https://www.istat.it/it/archivio/occupati",
+      "verified_on": "2026-09-03",
+      "recheck_after": "2027-03-01",
+      "ambito": "Istat, comunicati occupazione",
+      "limiti": "Non testato quale comunicato specifico contenga il claim su over-50 e demografia."
+    }
+  ]
+}

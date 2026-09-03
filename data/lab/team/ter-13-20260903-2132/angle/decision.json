@@ -1,0 +1,22 @@
+{
+  "angolo_scelto": "B riformulato: il divario territoriale del lavoro e' molto piu' largo fra le donne che fra gli uomini. Fra le donne l'Italia va da 33,95 (Campania) a 68,90 (Valle d'Aosta); fra gli uomini da 58,06 (Calabria) a 78,00 (Emilia-Romagna). La regione in cui si nasce pesa sul lavoro molto piu' per una donna che per un uomo.",
+  "deciso_da": "lead, dopo un giro di conferenza",
+  "motivazione": "E' l'unico dei tre candidati che sopravvive alla riformulazione dello skeptical-editor. Poggia su valori dello stesso anno, stessa fascia 15-64 verificata alla definizione ufficiale (data/definitions/istat_territoriali.csv righe 121-122), regioni nominabili con link canonico, e cifre tutte presenti nel dossier. Risponde alla domanda reale del lettore (dove si lavora di piu' e di meno) aggiungendo il fatto che la classifica da sola non mostra.",
+  "condizioni_imposte": [
+    "Vietata la parola Sud per il confronto di gruppo: si nominano le regioni.",
+    "Vietato 'deficit soprattutto femminile': e' una decomposizione che i dati non calcolano.",
+    "Il testo dichiara in una riga che nessuna fonte istituzionale verificata spiega il fenomeno.",
+    "Vietata ogni sottrazione fra le cifre dei parenti: si mostrano i quattro estremi, non la differenza.",
+    "Ogni cifra di un parente richiede il link canonico di quel parente nella stessa sezione (vincolo di lab/controlla.py:302-316)."
+  ],
+  "angoli_scartati": {
+    "A_convergenza": "L'estrapolazione dei cinquant'anni e' una previsione travestita: retta su sette punti, con matrice_ridotta che salta 2019-2021 e uno spread non monotono. Senza l'estrapolazione l'angolo non esiste.",
+    "C_il_Sud_non_e_un_blocco": "Smentito dal dossier stesso: gruppi.coincide_con_macroaree e' true, sovrapposizione 0.8, le ultime quattro sono tutte del Mezzogiorno. Lascerebbe al lettore una conclusione falsa."
+  },
+  "prove_scartate": [
+    "Banca d'Italia, Veneto 2025: la citazione registrata ('piu' intensa') non esiste sulla pagina ('piu' intenso') e riguarda il numero di occupati, non il tasso. Claim rimosso, non riparato a mano.",
+    "Svimez, 270mila netti e 6,8 miliardi: fuori dalla stringa verificata, non citabili. Il solo 'quasi 350mila laureati under 35' regge ma non serve questo angolo.",
+    "Istat 39,2% a rischio poverta': la stringa ritrovata e' un frammento senza soggetto, e l'indicatore include la bassa intensita' lavorativa, quindi usarlo come conseguenza e' in parte circolare.",
+    "Divari di gruppo 15.34 e 28.62: non stanno nel dossier, servono a scegliere l'angolo e non entrano nel testo."
+  ]
+}
