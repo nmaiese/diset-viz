@@ -1,0 +1,34 @@
+{
+  "nota_metodo": "Medie di gruppo = medie semplici delle regioni, non ponderate. Coerente con dossier.macroaree.",
+  "evidenze": [
+    {"claim": "Nel 2025 la Calabria (46.41) resta sotto il valore che ogni regione del Nord aveva gia' nel 2018: la piu' bassa di quelle era la Liguria, 62.99", "cifre": [46.41, 62.99], "forza": "alta"},
+    {"claim": "I cinque incrementi a cinque anni piu' piccoli sono tutti in regioni del Nord (FVG 2.88, Emilia-Romagna 3.22, Lombardia 3.42, Trentino 3.67, Veneto 4.05)", "cifre": [2.88, 3.22, 3.42, 3.67, 4.05], "forza": "alta"},
+    {"claim": "Struttura a tre bande, non binaria: due dei tre gruppi hanno macroarea prevalente Mezzogiorno, separati fra 51.01 e 57.39", "cifre": [51.01, 57.39], "forza": "alta"},
+    {"claim": "Il 2022 concentra cinque delle otto rotture della serie", "cifre": [3.23, 2.96, 2.78, 2.74, 2.7], "forza": "media"},
+    {"claim": "Nel 2025 sei regioni arretrano, cinque nel gruppo alto (Veneto -0.95, Toscana -0.38, FVG -0.35, Valle d'Aosta -0.18, Piemonte -0.06); la sesta e' la Puglia -0.15", "cifre": [-0.95, -0.38, -0.35, -0.18, -0.15, -0.06], "forza": "media"}
+  ],
+  "verdetto_angolo_A": {
+    "regge": true,
+    "perche": "Nessuna delle 8 regioni del Nord scende sotto 46.41 nel 2018 (minimo Liguria 62.99). Vale anche col gruppo alto (minimo Umbria 62.78).",
+    "correzione": "Premessa falsa come scritta: la seconda crescita a cinque anni e' la Liguria (+7.30), Nord-Ovest. Usare invece i cinque incrementi minori, tutti al Nord. Estrapolazione: 30.17 a 26.48 in 7 anni = -0.53 l'anno, 26.48/0.53 circa 50 anni. Estrapolazione lineare, non previsione. Convergenza non monotona: 2023 27.84, 2024 27.89."
+  },
+  "verdetto_angolo_B": {
+    "regge": true,
+    "perche": "Medie semplici, stessi territori. Maschile: gruppo alto 75.82 contro basso 60.49, divario 15.34. Femminile: 63.96 contro 35.33, divario 28.62. Il femminile e' 1.87 volte il maschile, 13.29 punti in piu'. Controprova col totale: 69.93 contro 47.86, divario 22.08, in mezzo ai due.",
+    "correzione": "Non chiamarlo divario Nord-Sud: il gruppo alto contiene Marche, Umbria e Toscana, il basso esclude Abruzzo, Molise, Basilicata, Sardegna. Il 22.08 non e' il 16.85 di macroaree.divario_nord_mezzogiorno."
+  },
+  "sfida_angolo_ovvio": "L'angolo ovvio e' Nord contro Sud, 16.85 punti. Il dossier lo indebolisce: la separazione piu' netta cade DENTRO il Mezzogiorno, fra il gruppo che arriva a 51.01 e quello che parte da 57.39, entrambi a prevalenza Mezzogiorno. Il pezzo che tratta il Sud come blocco unico cancella il fatto piu' interessante.",
+  "limiti": [
+    "bes-03LAV001-N22 e' 20-64; ter-13, ter-177, ter-178 sono 15-64. Mai accostati senza dirlo.",
+    "Il tasso di occupazione non e' il complemento del tasso di disoccupazione.",
+    "63.04 e' la media semplice delle 20 regioni (1260.83/20), NON il tasso nazionale ponderato Istat. Non scrivere in Italia il tasso e' 63.04 senza dirlo.",
+    "matrice_ridotta ha solo 2018, 2022, 2023, 2024, 2025. Nessuna affermazione regionale sul 2020, benche' il minimo storico sia Campania 40.25 nel 2020."
+  ],
+  "cifre_fragili": [
+    "Basilicata +7.34 contro Liguria +7.30: 0.04 punti. Dire le due che crescono di piu'.",
+    "Calabria 46.41 e Campania 46.67 distano 0.26: ultima si', staccata no.",
+    "Spread non monotono fra 2023 (27.84) e 2024 (27.89).",
+    "dinamica.inversioni vuoto ma l'ultima cambia identita' (Sicilia 2018, Calabria 2025): non dedurre nessun sorpasso.",
+    "delta_10a vuoto: nessuna affermazione a dieci anni."
+  ]
+}

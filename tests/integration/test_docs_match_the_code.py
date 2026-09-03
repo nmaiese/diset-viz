@@ -16,6 +16,7 @@ minima, ed è la ragione per cui il file non è stato cancellato con il resto: �
 il posto dove si dichiara che cosa esiste.
 """
 
+import os
 import re
 import unittest
 from pathlib import Path
@@ -23,8 +24,12 @@ from pathlib import Path
 import yaml
 
 RADICE = Path(__file__).resolve().parents[2]
-AGENTI = RADICE / ".claude" / "agents"
-SKILL = RADICE / ".claude" / "skills"
+# Agent e skill vivono nel plugin `motore` del repo platform (una sola definizione
+# per tutti i siti), caricato da `.claude/settings.json`. In CI il plugin può non
+# esserci: i controlli che lo leggono si saltano, non falliscono.
+PLUGIN = Path(os.environ.get("MOTORE_PLUGIN_DIR", Path.home() / "dev" / "platform" / "plugin"))
+AGENTI = PLUGIN / "agents"
+SKILL = PLUGIN / "skills"
 
 # I sei tipi della catena minima. Uno in più su disco senza una riga qui è un
 # agente che nessuno sa di avere; uno in meno è un workflow che chiama un tipo
@@ -44,6 +49,11 @@ MEMORIA_TEAM = {"source-researcher", "skeptical-editor"}
 # cosa entra nell'atlante, ed è a monte della scrittura.
 ALTRI = {"giudice-cieco", "admissions"}
 
+# I ruoli del modello operativo di platform (analytics, intake, SEO, sviluppo,
+# postmortem, strategia): vivono nel plugin, non nella catena di questo repo.
+OPERATIVI = {"analista", "scopritore", "auditor-seo", "pianificatore",
+             "costruttore", "revisore", "postmortem", "direttore"}
+
 
 def _frontmatter(percorso):
     testo = percorso.read_text(encoding="utf-8")
@@ -52,10 +62,11 @@ def _frontmatter(percorso):
     return yaml.safe_load(testo.split("---")[1])
 
 
+@unittest.skipUnless(AGENTI.exists(), "plugin motore non presente (MOTORE_PLUGIN_DIR)")
 class GliAgentiSonoDichiarati(unittest.TestCase):
     def test_nessun_agente_avanza_senza_un_posto_dove_stare(self):
         sul_disco = {percorso.stem for percorso in AGENTI.glob("*.md")}
-        self.assertEqual(sul_disco, LITE | TEAM | ALTRI)
+        self.assertEqual(sul_disco, LITE | TEAM | ALTRI | OPERATIVI)
 
     def test_ogni_agente_ha_un_frontmatter_che_si_carica(self):
         """Un `: ` dentro un `description` su riga sola non è YAML valido, e il
@@ -108,6 +119,7 @@ class GliAgentiSonoDichiarati(unittest.TestCase):
                                     f"{percorso.stem} precarica la skill inesistente {nome}")
 
 
+@unittest.skipUnless(SKILL.exists(), "plugin motore non presente (MOTORE_PLUGIN_DIR)")
 class LeSkillSiCaricano(unittest.TestCase):
     def test_ogni_skill_ha_un_frontmatter_valido(self):
         for percorso in sorted(SKILL.glob("*/SKILL.md")):
@@ -142,6 +154,8 @@ class IComandiScrittiSonoEseguibili(unittest.TestCase):
                                 f"il README cita `bin/py -m {modulo}`, che non esiste")
 
     def test_i_moduli_citati_dagli_agenti_esistono(self):
+        if not AGENTI.exists():
+            self.skipTest("plugin motore non presente")
         for percorso in sorted(AGENTI.glob("*.md")):
             for modulo in sorted(self._moduli_citati(percorso)):
                 with self.subTest(agente=percorso.stem, modulo=modulo):
@@ -149,6 +163,7 @@ class IComandiScrittiSonoEseguibili(unittest.TestCase):
                                     f"{percorso.stem} esegue `bin/py -m {modulo}`, che non esiste")
 
 
+@unittest.skipUnless(SKILL.exists(), "plugin motore non presente (MOTORE_PLUGIN_DIR)")
 class IlGateDiPubblicazioneECompleto(unittest.TestCase):
     def test_la_skill_non_pubblica_solo_per_exit_code_zero(self):
         testo = (SKILL / "redazione-indicatore" / "SKILL.md").read_text(

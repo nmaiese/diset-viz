@@ -23,7 +23,7 @@ automatico.
 
 Per il mestiere della lingua (togliere i tic dell'italiano generato, dare voce,
 regolare ritmo e retorica) il progetto adotta la skill esterna
-**`scrittura-italiana`** (`.claude/skills/scrittura-italiana/`, CC BY-SA 4.0).
+**`scrittura-italiana`** (`motore:scrittura-italiana`, nel plugin `motore` di platform, CC BY-SA 4.0).
 Questa guida la **cita**, non la ricopia: le quattro virtù retoriche, le cinque
 varianti del bipolare, l'antilingua e il lessico di plastica vivono nei suoi
 `references/`, e ripeterli qui li manderebbe fuori sincrono.
@@ -35,9 +35,9 @@ regole tipografiche qui sopra li **vietano**: niente `—`, `–`, `;`, `…`,
 virgolette dritte. Quando la skill suggerisce una di quelle forme, si tiene la
 regola di progetto e si scioglie l'inciso con virgole o due frasi. Il conflitto
 è sistematico, non un caso di bordo: sta nel registro esatto in cui vivono le
-nostre pagine. Il perché e il cancello deterministico che lo fa rispettare
-(`tic_count.py`, campo `vietati` sempre vuoto) sono in
-[`evals/scrittura-italiana/PRECEDENZA.md`](../evals/scrittura-italiana/PRECEDENZA.md).
+nostre pagine. Il cancello deterministico che lo fa rispettare è `lab/lint.py`
+(i caratteri vietati dallo stile) e, nel contatore della skill, il campo
+`vietati` sempre vuoto.
 
 **La precedenza non riguarda solo i caratteri.** La skill consiglia anche di
 variare il ritmo, e qui la varietà è lecita ma non è il metro: il metro è che
@@ -49,10 +49,9 @@ leggibile, e lì non sono un verdetto. Il campo `vietati` resta l'unico cancello
 
 Cambiare il prompt di chi scrive per agganciare la skill in rilettura è un
 cambio da misurare su una run prima di tenerlo (obbligo di `CLAUDE.md`): la skill installata è
-**disponibile**, ma finché `.claude/agents/lab-scrittore.md` non la
-richiama il comportamento non cambia. (Il paragrafo diceva `producer.md`, un
-file cancellato: così com'era prometteva un aggancio che nessuna modifica
-avrebbe potuto fare.)
+**disponibile** nel plugin, ma finché la definizione di `motore:lab-scrittore`
+(`plugin/agents/lab-scrittore.md` di platform) non la richiama il comportamento
+non cambia.
 
 ## Tono: scrivi come una persona
 

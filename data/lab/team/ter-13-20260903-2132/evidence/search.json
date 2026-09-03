@@ -1,0 +1,59 @@
+{
+  "domanda_del_lettore": "In quali regioni italiane lavora la percentuale piu alta e piu bassa di popolazione in eta da lavoro, e come si confronta con il resto d'Europa?",
+  "titolo_proposto": "Tasso di occupazione per regione: dove lavora piu (e meno) popolazione in Italia",
+  "description_proposta": "Il tasso di occupazione 15-64 anni regione per regione: valori, distanza dal Centro-Nord e confronto con la media UE.",
+  "copertura_da_garantire": [
+    "il valore per ogni regione, dal piu alto al piu basso, non solo la media nazionale",
+    "che cos'e esattamente il tasso di occupazione (occupati 15-64 su popolazione 15-64) in una riga comprensibile, non da manuale",
+    "la differenza fra tasso di occupazione e tasso di disoccupazione, spiegata subito perche la maggioranza di chi cerca usa la parola sbagliata",
+    "un confronto con l'Europa che dichiari fascia d'eta e anno, senza mescolare 15-64 e 20-64",
+    "un cenno alla componente femminile, perche e li che i divari regionali sono piu ampi"
+  ],
+  "trappola_disoccupazione": "Non e il contrario del tasso di disoccupazione: quello si calcola solo su chi cerca lavoro attivamente, questo su tutta la popolazione 15-64, quindi include anche chi ha smesso di cercare.",
+  "altre_misure": [
+    {
+      "misura": "Tasso di occupazione 20-64 anni",
+      "istituzione": "Eurostat",
+      "che_cosa_aggiunge": "e la fascia usata nei confronti europei e nel target 2030 della UE; con la 15-64 di Istat i due numeri non sono la stessa cosa e non vanno sommati nella stessa frase",
+      "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20250415-1"
+    },
+    {
+      "misura": "Tasso di mancata partecipazione al lavoro",
+      "istituzione": "Istat",
+      "che_cosa_aggiunge": "include anche gli inattivi disponibili a lavorare ma che non cercano attivamente: nel Mezzogiorno e circa tre volte quello del Centro-Nord",
+      "url": "https://noi-italia.istat.it/pagina.php?L=0&categoria=16&dove=ITALIA"
+    },
+    {
+      "misura": "Unita di lavoro (ULA) e ore lavorate",
+      "istituzione": "Istat, Conti economici territoriali",
+      "che_cosa_aggiunge": "misura il volume di lavoro effettivo, non le persone occupate: due regioni con lo stesso tasso possono avere ore lavorate molto diverse per il part time",
+      "url": "https://www.istat.it/it/lavoro-e-retribuzioni"
+    }
+  ],
+  "claim_europei": [
+    {
+      "claim": "Nel 2024 il tasso di occupazione UE (20-64 anni) e al 75,8%, l'Italia al 67,1% ed e tra i piu bassi dell'Unione insieme a Grecia e Romania",
+      "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20250415-1",
+      "istituzione": "Eurostat",
+      "citazione_testuale": "In 2024, 75.8% (197.6 million people) of the EU's 20 to 64-year-olds were employed / The lowest rates were recorded in Italy (67.1%), Greece (69.3%) and Romania (69.5%).",
+      "verificata_come_stringa": true,
+      "fascia_eta": "20-64",
+      "anno": "2024",
+      "denominatore": "popolazione 20-64 anni"
+    },
+    {
+      "claim": "Il target UE per il 2030 e il 78% di tasso di occupazione (fascia 20-64); nel 2024 la UE era 2,2 punti sotto",
+      "url": "https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20251013-3",
+      "istituzione": "Eurostat",
+      "citazione_testuale": "the EU's employment rate was at a historical high of 75.8%, 2.2 points below the 78% target set by the European Pillar of Social Rights Action Plan for 2030",
+      "verificata_come_stringa": true,
+      "fascia_eta": "20-64",
+      "anno": "2024",
+      "denominatore": "popolazione 20-64 anni"
+    }
+  ],
+  "non_trovato": [
+    "citazione testuale con l'elenco completo delle regioni NUTS2 italiane e valori esatti (2024): confermate solo Calabria 48,5%, Campania 49,4%, Sicilia 50,7%, Lazio 69,0%",
+    "una fonte primaria Istat con confronto esplicito 15-64 vs 20-64 gia raccordato"
+  ]
+}

@@ -357,7 +357,7 @@ async function verifica(prompt, opzioni) {
 const LENTI = [
   {
     chiave: 'eventi',
-    agentType: 'lab-scout',
+    agentType: 'motore:lab-scout',
     mandato: 'Che cosa e successo. Cerca eventi datati e verificabili che si affiancano ai ' +
       'movimenti della serie: provvedimenti, chiusure, riforme, eventi naturali, cambi di ' +
       'rilevazione. Le anomalie gia misurate sono il posto piu probabile dove un evento ' +
@@ -365,14 +365,14 @@ const LENTI = [
   },
   {
     chiave: 'europa',
-    agentType: 'lab-scout-europa',
+    agentType: 'motore:lab-scout-europa',
     mandato: 'Dove sta l Italia. Cerca il valore italiano in una fonte europea, la media UE e ' +
       'i paesi vicini per valore, e controlla la comparabilita prima del numero. Se le due ' +
       'misure non sono confrontabili, dillo in note e restituisci una lista vuota.',
   },
   {
     chiave: 'perche-conta',
-    agentType: 'lab-scout',
+    agentType: 'motore:lab-scout',
     mandato: 'Perche conta. Cerca che cosa questo fenomeno produce nella vita di chi ci abita: ' +
       'conseguenze documentate, chi ne e toccato, che cosa ne dicono le istituzioni che se ne ' +
       'occupano. Non cercare eventi e non cercare confronti europei: li fanno gli altri due.',
@@ -384,7 +384,7 @@ const montati = await agent(
   `Esegui esattamente questo comando dalla radice del repository e restituisci quello che stampa:\n\n` +
   `    ${COMANDO_DOSSIER}\n\n` +
   `Stampa JSON con \`dossier\` (codice, percorso, livello, anno, byte, anomalie) e \`mancanti\`.`,
-  { agentType: 'lab-dossierista', model: 'haiku', effort: 'low', schema: PERCORSI, label: 'dossier' },
+  { agentType: 'motore:lab-dossierista', model: 'haiku', effort: 'low', schema: PERCORSI, label: 'dossier' },
 )
 
 if (!montati || !montati.dossier?.length) {
@@ -442,14 +442,19 @@ const esiti = await pipeline(
     if (vuote.length) log(`${d.codice}: nessun claim da ${vuote.join(', ')}`)
     return agent(
       `Scrivi l'articolo dell'indicatore ${d.codice} di Divario Italia.\n\n` +
-      `Dossier da aprire con Read (leggilo tutto prima di scrivere: porta anche i gruppi in ` +
-      `cui la classifica si spacca e gli indicatori imparentati con i loro valori):\n\n` +
+      `Dossier da aprire con Read (leggilo tutto prima di scrivere: i gruppi in cui la ` +
+      `classifica si spacca e gli indicatori imparentati ti servono per scegliere la storia, ` +
+      `non per riempire il testo):\n\n` +
       `    ${d.percorso}\n\n` +
       `Claim verificati da tre scout, ognuno con la lente da cui viene. Sono l'unica fonte ` +
       `esterna che puoi citare, e nessuno di loro ti propone un angolo:\n${json(claim)}\n\n` +
       `Compito: **scrivi**. Decidi tu la tesi, quali temi coprire, quante sezioni, in che ` +
       `ordine, con che titoli, e quali indicatori imparentati linkare. Dichiara la tesi in ` +
-      `\`angolo\`, dicendo perché quella e non un'altra.`,
+      `\`angolo\`, dicendo perché quella e non un'altra.\n\n` +
+      `Per chi scrivi (skill motore:scrittura-indicatori, sezione "Per chi si scrive"): il ` +
+      `lettore comune vuole capire il fenomeno, le correlazioni con gli indicatori imparentati ` +
+      `e le notizie o i dati esterni che lo spiegano. Bontà del raggruppamento, mediana, ` +
+      `spread, coefficiente di variazione restano nel dossier: nel testo non compaiono.`,
       // Sonnet a scrivere, e il verificatore resta opus. La prima versione
       // teneva opus qui perché è l'unico stadio in cui il prodotto **è** il
       // testo, e quello che manca a un articolo debole non lo recupera nessun
@@ -459,7 +464,7 @@ const esiti = await pipeline(
       // affidate alla memoria di chi scrive ma a tre passaggi che le
       // ricontrollano tutte contro `lab.controlla`. Il rischio che questo
       // scambio sposta è quindi verso il lato che la catena sa già prendere.
-      { agentType: 'lab-scrittore', model: 'sonnet', effort: 'high', phase: 'Scrittura', schema: BOZZA, label: `scrivi:${d.codice}` },
+      { agentType: 'motore:lab-scrittore', model: 'sonnet', effort: 'high', phase: 'Scrittura', schema: BOZZA, label: `scrivi:${d.codice}` },
     ).then((bozza) => ({ bozza, claim }))
   },
 
@@ -511,7 +516,7 @@ const esiti = await pipeline(
       // Lo stesso modello di chi ha scritto, e non è un dettaglio: correggere
       // con un altro modello riscrive la voce dell'articolo dove tocca, e le
       // due metà si sentono.
-      { agentType: 'lab-scrittore', model: 'sonnet', effort: 'high', phase: 'Scrittura', schema: BOZZA, label: `correggi:${d.codice}${sfx ? ` (${sfx})` : ''}` },
+      { agentType: 'motore:lab-scrittore', model: 'sonnet', effort: 'high', phase: 'Scrittura', schema: BOZZA, label: `correggi:${d.codice}${sfx ? ` (${sfx})` : ''}` },
     )
 
     for (let giro = 0; giro < VERIFICHE; giro++) {
@@ -577,7 +582,7 @@ const esiti = await pipeline(
         `Un documento che non si legge col fetch è \`non verificabile\` e va in \`note\`: ` +
         `non si insegue con altri strumenti. Finiti i controlli, restituisci subito ` +
         `il risultato strutturato.`,
-        { agentType: 'lab-verificatore', model: 'opus', effort: 'high', phase: 'Verifica', schema: VERDETTO, label: `verifica:${d.codice}${giro ? ` (${giro + 1})` : ''}` },
+        { agentType: 'motore:lab-verificatore', model: 'opus', effort: 'high', phase: 'Verifica', schema: VERDETTO, label: `verifica:${d.codice}${giro ? ` (${giro + 1})` : ''}` },
       )
       if (!verdetto) return { codice: d.codice, pubblicabile: false, motivo: 'verifica non conclusa', giri: giro }
 
@@ -668,7 +673,7 @@ const esiti = await pipeline(
       `comando, e tutti i rilievi, ` +
       `anche quelli di severità \`segnala\`. Non correggere niente: se il comando ` +
       `rifiuta, riporta i problemi così come li stampa.`,
-      { agentType: 'lab-pubblicatore', model: 'haiku', effort: 'low', phase: 'Pubblicazione', schema: PUBBLICATO, label: `pubblica:${d.codice}` },
+      { agentType: 'motore:lab-pubblicatore', model: 'haiku', effort: 'low', phase: 'Pubblicazione', schema: PUBBLICATO, label: `pubblica:${d.codice}` },
     ).then((pubblicato) => ({
       codice: d.codice,
       scritto: !!pubblicato?.scritto,

@@ -182,7 +182,7 @@ agli estremi di questa.
 
 Le regole editoriali complete stanno in `content/STYLE.md`, e le classi di
 errore che solo una lettura trova nella skill condivisa
-`.claude/skills/indicator-review/` (i prompt di chi scrive ormai puntano alla
+`motore:indicator-review` del plugin `motore` di platform (i prompt di chi scrive puntano alla
 skill invece di ricopiarla: una regola copiata in due posti va fuori sincrono
 senza che nessuno se ne accorga). La rubrica
 con cui si misura il risultato, dieci criteri e una soglia sotto la quale
@@ -306,8 +306,8 @@ prova a smentirlo.
 
 Un articolo firmato porta **due** campi, `reviewed_at` e `reviewed_vintage`, e
 solo con entrambi esce dalla coda. I due campi restano vivi anche adesso che
-nessun agente firma: li scrivevano il revisore e poi il produttore, e oggi un
-articolo dell'officina esce dalla coda con `origine: officina` al loro posto. Il
+nessun agente firma: li scrivevano il revisore e poi il produttore della catena
+ritirata, e oggi la catena di `lab/` riscrive l'articolo intero con `lab.pubblica`. Il
 secondo è il `vintage` che chi ha riletto aveva davanti: quando l'articolo si
 aggiorna su un anno nuovo tutte le
 cifre cambiano, i due valori smettono di combaciare e l'articolo **rientra** in

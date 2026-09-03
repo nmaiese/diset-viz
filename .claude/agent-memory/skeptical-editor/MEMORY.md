@@ -19,40 +19,165 @@ giudizi su persone e agenti, segreti, token o dati personali.
 ## Pattern editoriali
 
 ```yaml
-- categoria: limite_metodologico_ricorrente
+- categoria: classe di errore che il controllo deterministico non vede
   apprendimento: >-
-    Nel dossier il blocco dinamica.nazionale non è un aggregato nazionale: è
-    costruito sulla media semplice delle regioni, con lo stesso peso per la
-    Valle d'Aosta e per la Lombardia. Un articolo che scrive "in Italia" o "il
-    dato nazionale" accanto a quel numero sbaglia quantità, e nessuna guardia
-    lo ferma perché il numero è davvero nel dossier. Vale anche per le medie di
-    macroarea. Il rilievo va aperto sulla frase che chiama nazionale quel
-    valore, e la riparazione è etichettarlo come media delle regioni.
+    Le affermazioni di conteggio ("le uniche tre regioni sotto i sei punti",
+    "solo due superano", "nessuna regione sotto") passano il controllo
+    automatico anche quando sono false, perché il controllo verifica che ogni
+    cifra citata esista e sia attribuita al territorio giusto, e in queste
+    frasi le cifre sono tutte vere: falso è il quantificatore, che non è una
+    cifra. Vanno ricontate a mano dal blocco `ultimo` a ogni revisione.
   evidenza: >-
-    lab/dossier.py:250-255, medie_annue costruito con statistics.fmean sui
-    valori regionali dell'anno, e nazionale derivato da quello. Confermato in
-    codice, non solo per coincidenza numerica sul dossier di ter-167.
+    multiscopo:MULTI_ZONA_CRIMINALITA, 2026-09-03: "le uniche tre regioni sotto
+    i sei punti" con quattro regioni sotto sei nel dossier, e il valore che
+    smentisce la frase era citato dall'articolo stesso in un'altra sezione.
+    Controllo deterministico passato pulito.
   verified_on: 2026-09-03
-  recheck_after: 2027-03-31
-  ambito: tutti i dossier a livello regione
+  recheck_after: 2027-03-01
+  ambito: revisione di qualunque articolo indicatore
+  limiti: se il controllo imparasse a leggere i quantificatori, la voce va rivista.
+
+- categoria: criterio di gravità, angolo costruito sull'ultimo anno
+  apprendimento: >-
+    Un angolo che descrive la classifica dell'ultimo anno va riapplicato agli
+    altri anni della matrice prima di accettarlo. Se regge in meno della metà
+    degli anni osservabili non è una struttura dell'indicatore, ed è un rilievo
+    alta finché la frase resta al presente generico: diventa bassa appena ogni
+    occorrenza porta l'anno e viene nominato un anno in cui non vale. Lo stesso
+    controllo, letto al contrario, fa emergere il fatto stabile che l'angolo
+    stava ignorando.
+  evidenza: >-
+    multiscopo:MULTI_ZONA_CRIMINALITA: "massimo e minimo entrambi nel
+    Mezzogiorno" vale in due anni su cinque osservabili. Lo stesso controllo ha
+    fatto emergere il fatto poi diventato l'angolo pubblicato, la salita del
+    2025 in quattordici regioni su diciassette.
+  verified_on: 2026-09-03
+  recheck_after: 2027-03-01
+  ambito: conferenza d'angolo di qualunque indicatore con matrice pluriennale
+  limiti: serve una matrice con abbastanza anni a panel confrontabile.
+
+- categoria: limite metodologico ricorrente, medie di macroarea
+  apprendimento: >-
+    Le medie per macroarea sono medie semplici delle sole regioni presenti in
+    quell'anno, e il numero di regioni per area è molto diverso. Il Centro sono
+    al massimo quattro regioni, quindi una sola ne decide la posizione rispetto
+    a Nord e Mezzogiorno. Prima di lasciar scrivere quale area sta peggio,
+    ricontare i territori per area e togliere la regione più estrema: se
+    l'ordine non tiene, l'ordine delle aree non è un fatto. Lo stesso concetto
+    si dice senza medie e senza statistica: dentro ogni area c'è quasi tutta la
+    distanza fra la prima regione e l'ultima.
+  evidenza: >-
+    multiscopo:MULTI_ZONA_CRIMINALITA 2025: Centro su 4 regioni, Nord su 6 di 8,
+    Mezzogiorno su 7 di 8. Senza il Lazio il Centro scende sotto il Nord.
+  verified_on: 2026-09-03
+  recheck_after: 2027-03-01
+  ambito: qualunque dossier con il blocco macroaree, soprattutto famiglie a copertura regionale incompleta
+  limiti: su famiglie con venti regioni piene la fragilità è minore.
+
+- categoria: difetto ricorrente del dossier, media chiamata nazionale
+  apprendimento: >-
+    `dinamica.nazionale.ultimo` coincide con `sintesi.media`: il dossier
+    etichetta come nazionale la media semplice delle regioni disponibili, e chi
+    scrive la prende per un dato Istat nazionale. Verificare l'uguaglianza dei
+    due campi e vietare "in Italia" davanti a quella cifra fa parte del
+    controllo di base. E la cautela va ripetuta in ogni sezione che usa quella
+    media: dichiararla una volta non basta, perché il lettore che salta a una
+    sezione più avanti non l'ha letta.
+  evidenza: >-
+    multiscopo:MULTI_ZONA_CRIMINALITA: i due campi valgono entrambi 9,19. Nella
+    bozza la cautela c'era nella sezione dinamica e mancava nella sezione dei
+    parenti, dove la stessa media tornava a fare la parte del dato italiano.
+    Confermato in codice su ter-167: lab/dossier.py:250-255 costruisce
+    medie_annue con statistics.fmean sui valori regionali dell'anno e ne deriva
+    nazionale, quindi non è più una coincidenza numerica osservata su un
+    dossier ma una proprietà di come il campo viene calcolato.
+  verified_on: 2026-09-03
+  recheck_after: 2027-03-01
+  ambito: tutti i dossier con il blocco dinamica.nazionale
   limiti: >-
-    È una regola su come si nomina il numero, non un difetto del dossier, che
-    quel campo lo calcola per quello che è. Il rischio opposto va sorvegliato:
-    ripetere l'etichetta "media semplice" a ogni occorrenza diventa rumore, e
-    una volta per articolo basta.
+    La costruzione è ora certa per ogni dossier, perché sta nel codice. Resta da
+    sorvegliare il rischio opposto: ripetere l'etichetta "media semplice" a ogni
+    occorrenza diventa rumore. La cautela va dove il lettore incontra la cifra,
+    non a ogni riga.
+
+- categoria: metodo, chiudere una definizione quando il dossier ce l'ha nulla
+  apprendimento: >-
+    Quando il dossier ha la definizione nulla, il registro dei metadati SDMX
+    (dataflow con references=all) è la prima cosa da chiedere: dà nome della
+    codelist, voci sorelle e unità di misura dichiarata. Le dimensioni di
+    scomposizione del DSD sono un indizio sull'unità contata, non una prova:
+    anche una serie che conta persone può scomporsi per numero di componenti o
+    reddito della famiglia. Il denominatore si afferma solo se il registro o un
+    documento Istat lo dichiara (docs/INDICATOR_PAGES.md: non dedurre numeratore
+    o denominatore che la fonte non dà); altrimenti il testo dice "famiglie" o
+    "persone" solo se l'etichetta della serie lo dice, e il limite si dichiara.
+  evidenza: >-
+    multiscopo:MULTI_ZONA_CRIMINALITA, dataflow 33_291_DF_DCCV_PROBLZONRES_2_6:
+    l'etichetta della serie dice famiglie; il DSD da solo non sarebbe bastato.
+  verified_on: 2026-09-03
+  recheck_after: 2027-03-01
+  ambito: qualunque serie Istat SDMX con definizione nulla nel dossier
+  limiti: >-
+    provato una volta, su una serie familiare. Su una serie individuale la
+    lettura simmetrica va verificata prima di fidarsi.
+
+- categoria: punto cieco del blocco fonti
+  apprendimento: >-
+    Una cifra tolta dal corpo per una decisione editoriale sopravvive dentro il
+    testo di una voce di `fonti`, che la pagina rende comunque al lettore.
+    Quando si decide di non accostare due misure, la decisione va applicata
+    anche alle fonti: una voce che non sostiene nessuna affermazione del corpo
+    va tolta o ridotta al nome della pagina, altrimenti riporta davanti al
+    lettore proprio i numeri che si erano rimossi.
+  evidenza: >-
+    multiscopo:MULTI_ZONA_CRIMINALITA: l'accostamento con una seconda misura
+    Istat era stato tolto dal corpo, e la voce di fonti conservava tutte le
+    percentuali, di un anno diverso da quello dell'articolo.
+  verified_on: 2026-09-03
+  recheck_after: 2027-03-01
+  ambito: qualunque articolo in cui una fonte esterna viene ridimensionata in revisione
+  limiti: non è un divieto di citare fonti di contesto, vale quando la voce porta cifre che il corpo ha deciso di non usare.
+```
+
+Ogni pattern va verificato contro la bozza corrente. La memoria può aprire una
+domanda, non chiuderla.
+
+- categoria: causa senza fonte, forma ricorrente
+  apprendimento: >
+    Su un indicatore espresso come quota, la frase che passa dal rapporto allo
+    stock (mercato del lavoro più largo, più posti, più occupati) è una causa
+    senza fonte anche quando nessun verbo causale compare: il denominatore può
+    muoversi da solo. Trattarla come gravità alta finché una fonte non scioglie
+    la composizione. La riparazione è riportare la frase alla quota.
+  evidenza: >
+    ter-13, sezione dinamica: Calabria da 42,09 (2018) a 46,41 (2025), con il
+    contributo del calo della popolazione 15-64 fra le domande rimaste senza
+    fonte nella stessa run.
+  verified_on: 2026-09-03
+  recheck_after: 2027-03-01
+  ambito: indicatori espressi come quota su una popolazione di riferimento
+  limiti: >
+    Osservato su un indicatore in una run. Confermare su un'altra famiglia prima
+    di trattarlo come regola automatica.
+
+- categoria: criterio di gravità sulla scelta dell'angolo
+  apprendimento: >
+    Quando il blocco gruppi del dossier ha coincide_con_macroaree true e una
+    sovrapposizione alta, un angolo della forma "X non è un blocco" è gravità
+    alta: il dossier afferma il contrario e il lettore ricava una conclusione
+    falsa. La struttura interna resta raccontabile, ma come secondo divario
+    dentro il blocco, non come smentita del blocco.
+  evidenza: >
+    ter-13: coincide_con_macroaree true, sovrapposizione 0.8, le ultime quattro
+    regioni tutte del Mezzogiorno senza eccezioni.
+  verified_on: 2026-09-03
+  recheck_after: 2027-03-01
+  ambito: scelta dell'angolo su indicatori con blocco gruppi nel dossier
+  limiti: >
+    Non vale a soglie basse di sovrapposizione, dove l'angolo contro-macroaree è
+    invece la notizia. La soglia esatta non è stata misurata.
 ```
 
 Formato di una voce:
 
 ```yaml
-- categoria:
-  apprendimento:
-  evidenza:
-  verified_on: YYYY-MM-DD
-  recheck_after: YYYY-MM-DD
-  ambito:
-  limiti:
-```
-
-Ogni pattern va verificato contro la bozza corrente. La memoria può aprire una
-domanda, non chiuderla.

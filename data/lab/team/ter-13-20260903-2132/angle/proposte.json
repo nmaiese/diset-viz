@@ -1,0 +1,16 @@
+{
+  "proposte_data_journalist": {
+    "1": {
+      "notizia": "Il divario di lavoro fra le regioni e' molto piu' largo fra le donne che fra gli uomini: in Campania lavorano 33,95 donne su cento in eta' da lavoro contro 67,88 in Trentino Alto Adige, mentre fra gli uomini si va da 59,54 a 77,80.",
+      "meccanismo": "Non esiste fonte verificata (Cnel-Istat non leggibile). Va dichiarato.",
+      "rischi": ["15.34 e 28.62 non stanno nel dossier: restano fuori dal testo", "mai accostare bes-03LAV001-N22 (20-64) a cifre 15-64"]
+    },
+    "2": {
+      "notizia": "La distanza fra le regioni si accorcia, ma in Calabria oggi lavora una quota piu' bassa di quella che lavorava in Liguria nel 2018: 46,41 contro 62,99. Al ritmo osservato il recupero e' cosa di mezzo secolo.",
+      "meccanismo": "Nessuna fonte spiega la convergenza. Svimez e Istat sono contesto, non cause.",
+      "rischi": ["cinquant'anni = estrapolazione lineare, mai previsione", "Calabria e Campania distano 0.26: ultima si', staccata no"]
+    },
+    "preferito": "1"
+  },
+  "vincolo_del_gate_trovato_dal_lead": "lab/controlla.py:302-316 ammette i valori dei parenti SOLO se quel parente e' linkato nel pezzo di prosa in cui la cifra compare. Le cifre di ter-178 e ter-177 richiedono i rispettivi link canonici nella stessa sezione."
+}

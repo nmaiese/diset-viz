@@ -1,5 +1,4 @@
 {
-  "autoMemoryEnabled": true,
   "env": {
     "ANTHROPIC_CUSTOM_MODEL_OPTION": "claude-opus-4-8",
     "ANTHROPIC_CUSTOM_MODEL_OPTION_NAME": "Opus 4.8",
@@ -70,8 +69,8 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/team_monitor.py\" --follow",
-            "async": true,
-            "timeout": 7200
+            "timeout": 7200,
+            "async": true
           }
         ]
       }
@@ -87,6 +86,17 @@
       }
     ]
   },
+  "enabledPlugins": {
+    "motore@platform": true
+  },
+  "extraKnownMarketplaces": {
+    "platform": {
+      "source": {
+        "source": "github",
+        "repo": "nmaiese/platform"
+      }
+    }
+  },
+  "autoMemoryEnabled": true,
   "teammateMode": "in-process"
 }
-

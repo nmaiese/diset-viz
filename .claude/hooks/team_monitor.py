@@ -43,7 +43,7 @@ FASI = {
 }
 PREFISSO = re.compile(
     r"^\[redazione:(?P<ruolo>[a-z0-9-]+):(?P<fase>[a-z0-9-]+)\]\s+"
-    r"(?P<indicatore>(?:ter|bes|ims|eur|dem)-[0-9A-Za-z_.:-]+)\s+-\s+"
+    r"(?P<indicatore>(?:ter|bes|ims|eur|dem|multiscopo)-[0-9A-Za-z_.:-]+)\s+-\s+"
     r"(?P<titolo>.+)$"
 )
 
