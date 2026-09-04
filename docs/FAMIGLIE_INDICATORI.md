@@ -170,31 +170,40 @@ if str(values[positions["SESSO"]] or "").strip() != "Totale":
 
 Verificato scaricando di nuovo lo ZIP: 8.479 righe nel foglio, 4.359 Totale
 + 2.060 Maschi + 2.060 Femmine. Contando solo la presenza dell'id per sesso
-(senza guardare in quali regioni) risultavano 84 triplette; **contando la
+(senza guardare in quali regioni) risultavano 84 triplette; contando la
 copertura per regione (un id conta solo se Totale, Maschi e Femmine sono
 tutti presenti in tutte e 20 le regioni, non solo da qualche parte nel
-file) sono 65**: un indicatore con maschi/femmine solo per l'Italia o
-qualche macro-area, o mancante in alcune regioni, non è una tripletta
-regionale completa anche se l'id compare. Sempre scartata a ogni
-aggiornamento (4.120 righe). 78 indicatori sono Totale-only su tutte le 20
-regioni con zero maschi/femmine in nessuna regione: niente da recuperare
-per quelli. I restanti 10 (153 - 65 - 78) hanno una copertura parziale, da
-guardare caso per caso prima di contarli. Stesso filtro territoriale delle
+file) sembravano 65, poi **`scripts/update_bes_regions.py` scritto per
+davvero (sotto) ne conta 64**: `06POL012` ha una riga per tutte e 20 le
+regioni su ogni sesso, ma almeno un anno con un valore vuoto o un trattino
+invece di un numero, quindi non ha davvero un'osservazione utilizzabile in
+qualche regione anche se la riga esiste. **64 è il numero giusto**, lo
+stesso criterio che `parse_archive` usa già per il Totale (una riga con un
+valore non numerico non conta come copertura). Sempre scartata a ogni
+aggiornamento prima di questa PR (4.120 righe). 78 indicatori sono
+Totale-only su tutte le 20 regioni con zero maschi/femmine in nessuna
+regione: niente da recuperare per quelli. Stesso filtro territoriale delle
 altre due fonti: il file ha più territori delle 20 regioni (Italia,
 macro-aree, le due province autonome separate da Trentino Alto Adige), ne
 teniamo 20.
 
-Verifica riproducibile con `scripts/audit_famiglie_fonti.py`.
+Verifica riproducibile con `scripts/audit_famiglie_fonti.py` (numero
+approssimato, sola lettura) e con `scripts/update_bes_regions.py` stesso
+(numero vero, quello scritto nel manifest).
 
-**Conseguenza**: qui non serve né un parser sul titolo né cambiare una
-chiave di query SDMX. La dimensione è già una colonna nel file che
-scarichiamo: va solo smesso di scartarla in `parse_archive`
-(`scripts/update_bes_regions.py:131-213`), verificando la copertura
-regionale prima di considerare una tripletta completa. È la fonte più
-economica delle tre per una famiglia pilota: 65 famiglie pronte con
-copertura regionale piena, più del doppio delle 30 del catalogo storico,
-zero euristica sul titolo (ma serve comunque il controllo di copertura per
-regione sopra).
+**Fatto**: `scripts/update_bes_regions.py` ora scrive anche
+`app/static/data/Assoluti_BES_Regione_Sesso.csv` (le stesse 12 colonne di
+`Assoluti_BES_Regione.csv` più `Sesso`) e
+`app/static/data/bes_regione_sesso_manifest.csv` (la copertura per
+`Totale`/`Maschi`/`Femmine` separata, con `full_gender_coverage`), da un
+unico download, senza toccare `Assoluti_BES_Regione.csv` né i suoi
+consumatori (`app/bes_data.py`, lo scoring qualità della vita): stesso
+schema di separazione della pipeline provinciale
+(`docs/PROVINCE_PIPELINE.md`, "fase di sola acquisizione"). `parse_archive`
+resta invariata, il suo comportamento è bloccato da
+`tests/unit/test_bes_refresh.py`; la nuova `parse_archive_by_sex` ha i suoi
+test nello stesso file. Collegare il nuovo file alla pagina indicatore e
+al selettore di dimensione resta lavoro del passo (c).
 
 ## Concetti già esistenti, e perché non bastano
 
@@ -219,6 +228,10 @@ Serve un terzo concetto, "famiglia di misura", distinto dagli altri due.
 - Mappatura delle famiglie (catalogo storico): `config/indicator_families.csv`
   (curato), `scripts/generate_indicator_families.py`,
   `tests/unit/test_indicator_families.py`.
+- Dimensione sesso già raccolta (BES): `Assoluti_BES_Regione_Sesso.csv`,
+  `bes_regione_sesso_manifest.csv`, prodotti da
+  `parse_archive_by_sex` in `scripts/update_bes_regions.py`,
+  `tests/unit/test_bes_refresh.py`.
 - Routing e vista: `app/views.py:1145` (rotta `/indicatore/<slug>/<id>`),
   `app/indicator_view.py` (`build_indicator_view`, i "parenti").
 - Contenuto: `content/indicators/<id>.json`, uno per id oggi, sezioni con
@@ -278,14 +291,16 @@ passo (a) li affronta prima di scrivere codice.
    (quale slug/id lo rappresenta?) o un nuovo `content/famiglie/<chiave>.json`
    separato dai file per id, che restano per compatibilità? Tocca anche gli
    URL canonici e i redirect dagli id vecchi.
-4. **Ambito del pilota, da riconsiderare alla luce del punto 1**: BES
-   (sezione 3) ha 65 famiglie con copertura regionale piena su tutte e 20
-   le regioni (contando solo la presenza dell'id, senza il controllo di
-   copertura, sembravano 84: la differenza è il motivo per cui la copertura
-   per regione va sempre verificata, non solo l'esistenza dell'id), più del
-   doppio delle 30 del catalogo storico, ed è la fonte più economica su cui
-   far partire la famiglia pilota (basta smettere di scartare le righe
-   `Maschi`/`Femmine` in `scripts/update_bes_regions.py:151`, verificando
-   la copertura). Il catalogo storico resta un candidato valido (es. la
-   tripletta 345/346/347, occupazione 20-64, che è fra le pagine con più
-   impression), ma non è più l'unico né il più economico.
+4. **Ambito del pilota**: BES (sezione 3) ha **64** indicatori con copertura
+   regionale piena su tutte e 20 le regioni per Totale/Maschi/Femmine (non
+   84: quel numero contava la sola presenza dell'id, non se il valore alle
+   20 regioni fosse un numero vero; non 65: quello contava la presenza
+   della riga anche quando il valore era vuoto o un trattino,
+   `06POL012`). Più del doppio delle 30 famiglie del catalogo storico. La
+   raccolta è già estesa: `scripts/update_bes_regions.py` scrive
+   `Assoluti_BES_Regione_Sesso.csv` e il manifest con
+   `full_gender_coverage` per ognuno dei 64. Il catalogo storico resta un
+   candidato valido (es. la tripletta 345/346/347, occupazione 20-64, che è
+   fra le pagine con più impression), ma non è più l'unico né il più
+   economico: collegare uno dei due alla pagina indicatore (passo c) è
+   quello che resta da decidere.

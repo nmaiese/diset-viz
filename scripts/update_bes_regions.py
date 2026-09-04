@@ -5,6 +5,15 @@ The Istat intermediate BES release carries regional observations that are often
 one year fresher than BES dei Territori.  This importer keeps the same 12-column
 dataset contract and manifest contract already consumed by ``app.bes_data``.
 Only total-sex rows for the 20 regions are retained.
+
+The same workbook already carries a ``SESSO`` column (Totale/Maschi/Femmine)
+that ``parse_archive`` discards: ``parse_archive_by_sex`` below keeps it,
+writing a second, separate dataset+manifest pair
+(``Assoluti_BES_Regione_Sesso.csv`` / ``bes_regione_sesso_manifest.csv``).
+Same "acquisition only" shape as the province pipeline
+(docs/PROVINCE_PIPELINE.md): a new file nothing reads yet, ``app.bes_data``
+and the score untouched. ``parse_archive`` itself is unchanged on purpose,
+its output and behaviour are locked by tests/unit/test_bes_refresh.py.
 """
 
 from __future__ import annotations
@@ -39,11 +48,23 @@ SOURCE_PAGE = (
 FALLBACK_ARTIFACT = "https://www.istat.it/wp-content/uploads/2026/05/APPENDICE-STATISTICA-2.zip"
 OUTPUT = PROJECT_ROOT / "app" / "static" / "data" / "Assoluti_BES_Regione.csv"
 MANIFEST = PROJECT_ROOT / "app" / "static" / "data" / "bes_regione_manifest.csv"
+OUTPUT_SESSO = PROJECT_ROOT / "app" / "static" / "data" / "Assoluti_BES_Regione_Sesso.csv"
+MANIFEST_SESSO = PROJECT_ROOT / "app" / "static" / "data" / "bes_regione_sesso_manifest.csv"
 WORKBOOK_BASENAME = "indicatori_regione_sesso.xlsx"
 MANIFEST_COLUMNS = [
     "id", "name", "domain", "domain_name", "proposed_category",
     "proposed_direction", "unit", "year_min", "year_max", "n_region",
     "coverage", "n_region_latest", "coverage_latest", "source_dataflow",
+]
+SESSO_OUTPUT_COLUMNS = [*OUTPUT_COLUMNS, "Sesso"]
+SESSO_VALUES = ("Totale", "Maschi", "Femmine")
+SESSO_MANIFEST_COLUMNS = [
+    "id", "name", "domain", "domain_name", "proposed_category",
+    "proposed_direction", "unit", "year_min", "year_max",
+    "n_region_totale", "coverage_totale",
+    "n_region_maschi", "coverage_maschi",
+    "n_region_femmine", "coverage_femmine",
+    "full_gender_coverage", "source_dataflow",
 ]
 
 REGION_ALIASES = {
@@ -213,6 +234,107 @@ def parse_archive(archive_bytes):
     return dataset, manifest
 
 
+def parse_archive_by_sex(archive_bytes):
+    """Come ``parse_archive``, ma tiene tutte e tre le righe SESSO invece di
+    scartare Maschi/Femmine. Stesso file scaricato, nessuna rete in più.
+
+    Il manifest riporta la copertura per sesso separatamente
+    (``n_region_<sesso>``/``coverage_<sesso>``), non solo se l'id compare:
+    un id con Maschi/Femmine solo per qualche regione non ha
+    ``full_gender_coverage`` anche se compare nel dataset (lo stesso
+    controllo di ``scripts/audit_famiglie_fonti.py::audit_bes``, qui sul
+    dataset invece che sul foglio grezzo).
+    """
+    workbook = load_workbook(
+        io.BytesIO(_workbook_bytes(archive_bytes)), read_only=True, data_only=True
+    )
+    sheet = workbook.active
+    rows = sheet.iter_rows(values_only=True)
+    header = next(rows)
+    positions = {str(value).strip(): index for index, value in enumerate(header)}
+    required = {"DOMINIO", "CODICE", "INDICATORE", "SESSO", "TERRITORIO", "UNITA_MISURA", "FONTE"}
+    missing = required - set(positions)
+    if missing:
+        raise RuntimeError(f"Missing BES workbook columns: {sorted(missing)}")
+    year_columns = [(index, int(value)) for index, value in enumerate(header) if isinstance(value, int)]
+    if not year_columns:
+        raise RuntimeError("No year columns found in BES workbook")
+
+    dataset = []
+    regions_by_indicator_sex = defaultdict(lambda: defaultdict(set))
+    years_by_indicator = defaultdict(set)
+    metadata = {}
+    for values in rows:
+        sesso = str(values[positions["SESSO"]] or "").strip()
+        if sesso not in SESSO_VALUES:
+            continue
+        territory = _region_name(values[positions["TERRITORIO"]])
+        if territory not in SUPPORTED_REGIONS:
+            continue
+        indicator_id = str(values[positions["CODICE"]] or "").strip()
+        if not indicator_id:
+            continue
+        domain = str(values[positions["DOMINIO"]] or "").strip()
+        name = " ".join(str(values[positions["INDICATORE"]] or "").split())
+        unit = " ".join(str(values[positions["UNITA_MISURA"]] or "").split())
+        source = " ".join(str(values[positions["FONTE"]] or "").split())
+        metadata[indicator_id] = {"domain": domain, "name": name, "unit": unit}
+        for index, year in year_columns:
+            value = _number(values[index])
+            if value is None:
+                continue
+            dataset.append({
+                "idIndicatore": indicator_id,
+                "Territorio": territory,
+                "Tema": domain,
+                "Indicatore": name,
+                "UDM": unit,
+                "Fonte": source or "Istat",
+                "Archivio": "Benessere equo e sostenibile, aggiornamento intermedio 2026",
+                "Anno": str(year),
+                "Livello/Variazione": "Livello",
+                "Dato": _italian_number(value),
+                "Benchmark": "",
+                "Area": "Regione",
+                "Sesso": sesso,
+            })
+            years_by_indicator[indicator_id].add(year)
+            regions_by_indicator_sex[indicator_id][sesso].add(territory)
+
+    if not dataset:
+        raise RuntimeError("No regional BES observations parsed")
+    dataset.sort(key=lambda row: (row["idIndicatore"], row["Sesso"], row["Territorio"], int(row["Anno"])))
+
+    manifest = []
+    for indicator_id, by_sex in regions_by_indicator_sex.items():
+        meta = metadata[indicator_id]
+        coverage = {
+            sesso: round(len(by_sex.get(sesso, set())) / 20, 4)
+            for sesso in SESSO_VALUES
+        }
+        manifest.append({
+            "id": indicator_id,
+            "name": meta["name"],
+            "domain": meta["domain"],
+            "domain_name": meta["domain"],
+            "proposed_category": category_for(meta["domain"], indicator_id) or "",
+            "proposed_direction": direction_for(indicator_id, meta["name"]),
+            "unit": meta["unit"],
+            "year_min": min(years_by_indicator[indicator_id]),
+            "year_max": max(years_by_indicator[indicator_id]),
+            "n_region_totale": len(by_sex.get("Totale", set())),
+            "coverage_totale": coverage["Totale"],
+            "n_region_maschi": len(by_sex.get("Maschi", set())),
+            "coverage_maschi": coverage["Maschi"],
+            "n_region_femmine": len(by_sex.get("Femmine", set())),
+            "coverage_femmine": coverage["Femmine"],
+            "full_gender_coverage": all(coverage[sesso] == 1.0 for sesso in SESSO_VALUES),
+            "source_dataflow": "BES nazionale, appendice statistica regionale",
+        })
+    manifest.sort(key=lambda row: (row["domain"], row["id"]))
+    return dataset, manifest
+
+
 def _write_atomic(rows, columns, output_path):
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -234,6 +356,12 @@ def parse_args():
     parser.add_argument("--artifact-url", default="")
     parser.add_argument("--output", type=Path, default=OUTPUT)
     parser.add_argument("--manifest", type=Path, default=MANIFEST)
+    parser.add_argument("--output-sesso", type=Path, default=OUTPUT_SESSO)
+    parser.add_argument("--manifest-sesso", type=Path, default=MANIFEST_SESSO)
+    parser.add_argument(
+        "--skip-sesso", action="store_true",
+        help="Non scrivere Assoluti_BES_Regione_Sesso.csv / bes_regione_sesso_manifest.csv",
+    )
     return parser.parse_args()
 
 
@@ -260,6 +388,18 @@ def main():
         f"BES source: {artifact_url}\n"
         f"Wrote {len(dataset)} rows and {len(manifest)} indicators; "
         f"{current} reach 2025, {scoreable_current} are current and scoreable."
+    )
+
+    if args.skip_sesso:
+        return
+    dataset_sesso, manifest_sesso = parse_archive_by_sex(archive_bytes)
+    _write_atomic(dataset_sesso, SESSO_OUTPUT_COLUMNS, args.output_sesso)
+    _write_atomic(manifest_sesso, SESSO_MANIFEST_COLUMNS, args.manifest_sesso)
+    full_coverage = sum(1 for row in manifest_sesso if row["full_gender_coverage"])
+    print(
+        f"Wrote {len(dataset_sesso)} rows and {len(manifest_sesso)} indicators "
+        f"with sesso to {args.output_sesso.name}; "
+        f"{full_coverage} with full Totale+Maschi+Femmine coverage on all 20 regions."
     )
 
 
