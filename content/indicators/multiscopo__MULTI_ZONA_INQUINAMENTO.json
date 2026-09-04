@@ -1,0 +1,43 @@
+{
+ "angolo_scelto": "La geografia ovvia sarebbe Nord-Sud, ma le medie di Nord e Mezzogiorno quasi coincidono (11,75% contro 11,64%, appena 0,11 punti di differenza): la vera divisione è nei gruppi che tagliano le ripartizioni di traverso, con la Lombardia isolata al fianco della Sicilia e la Campania fuori scala, la regione dove resta aperta la vicenda della Terra dei Fuochi.",
+ "fonti": [
+  {
+   "testo": "Istat, la riconversione delle rilevazioni da faccia a faccia (CAPI) a telefono e web (CATI/CAWI), avviata nel 2020 per l'emergenza Covid-19 (pagina aggiornata al 1° febbraio 2021)",
+   "url": "https://www.istat.it/it/archivio/239851"
+  },
+  {
+   "testo": "Il Fatto Quotidiano, articolo del 26 giugno 2026 sulla relazione della Commissione parlamentare Ecomafie presentata il 24 giugno 2026 a Casal di Principe, e sull'opacità degli studi ambientali della Regione Campania",
+   "url": "https://www.ilfattoquotidiano.it/2026/06/26/terra-fuochi-commissione-ecomafie-contaminazione-notizie/8429852/"
+  },
+  {
+   "testo": "Camera dei deputati, Servizio Studi, scheda che richiama il rapporto Istisan 15/27 dell'Istituto Superiore di Sanità (progetto SENTIERI) sulla Terra dei Fuochi",
+   "url": "https://www.camera.it/temiap/t/news/post-OCD15-12008"
+  }
+ ],
+ "key": "multiscopo:MULTI_ZONA_INQUINAMENTO",
+ "lead": "In Campania il 23,4% delle famiglie lamenta inquinamento in zona di residenza, il valore più alto fra le regioni nel 2025: non è un divario Nord-Sud, sono i gruppi a tagliarlo di traverso.",
+ "level": "regione",
+ "sections": [
+  {
+   "body": "Nel 2025 la media delle regioni del Nord, un calcolo semplice tra i territori e non pesato per popolazione, è dell'11,75% su sei regioni con un dato, quella del Mezzogiorno dell'11,64% su sette: una differenza di appena 0,11 punti, quasi nulla. Se il tema fosse la solita geografia della disuguaglianza italiana, il racconto finirebbe qui.\n\nInvece la classifica delle 17 regioni con dati non segue le ripartizioni. In basso, tra 5,6% e 9,1%, si trovano Umbria, Calabria, Abruzzo, Basilicata, Marche e Sardegna, un gruppo che mescola Centro e Mezzogiorno. In alto, fra il 16 e il 16,3%, la coppia più sorprendente è quella di Lombardia (16,3%) e Sicilia (16,0%): due regioni agli estremi opposti delle classifiche economiche italiane condividono lo stesso livello di famiglie che lamentano inquinamento, ben oltre gli altri territori del Nord, dove il Veneto si ferma al 9,7% e il Piemonte al 10,2%. In cima, isolate dal resto, ci sono Lazio (17,6%) e Campania: con il 23,4% la quota di famiglie campane che lamenta inquinamento è più di quattro volte quella dell'Umbria, la regione più bassa (5,6%). In pratica, quasi una famiglia campana su quattro lamenta inquinamento nella zona in cui vive.",
+   "h": "Non è una frattura Nord-Sud",
+   "role": "quadro"
+  },
+  {
+   "body": "Nel 2018 tra la regione con meno lamentele e quella con più lamentele correva una distanza di 11,3 punti. Nel 2025 quella distanza è arrivata a 17,8 punti: il divario non si è chiuso, si è allargato.\n\nDopo il minimo toccato nel 2023 (8,76%), la media delle regioni è tornata a salire per due anni di fila. Calcolata sulle stesse diciassette regioni presenti nel 2025, la media era 9,98% nel 2024 e sale a 11,53% nel 2025, un aumento di circa 1,55 punti. Ma dietro la media ci sono percorsi opposti: negli ultimi cinque anni la Sicilia è la regione peggiorata di più, con un aumento di 3,0 punti, mentre la Calabria è quella migliorata di più, con un calo di 6,5 punti.\n\nAlcune regioni hanno vissuto salti bruschi da un anno all'altro. Nel 2020 il Lazio è salito di 8,2 punti in un solo anno, proprio l'anno in cui l'Istat, per l'emergenza Covid-19, ha iniziato a riconvertire le rilevazioni nazionali dalle interviste faccia a faccia alle interviste telefoniche e via web: un cambio di modalità che coincide con il salto del Lazio, senza che i dati possano dire se ne sia la causa. Nello stesso 2020 anche la Campania ha toccato il suo massimo storico, 26,0%, il valore più alto mai registrato nella serie. Nel 2023 l'Emilia-Romagna ha fatto il percorso opposto, con un calo di 7,7 punti in un solo anno, e nel 2024 il Friuli-Venezia Giulia è salito di 10,4 punti, il salto più ampio tra quelli osservati nella serie.",
+   "h": "Un divario che si allarga, non si chiude",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il valore della Campania non è un'anomalia isolata nei numeri. Una scheda del Servizio Studi della Camera dei deputati, che richiama il rapporto Istisan 15/27 dell'Istituto Superiore di Sanità sul progetto di sorveglianza epidemiologica SENTIERI, descrive per i 55 comuni della Terra dei Fuochi, esclusi i due capoluoghi di provincia, nelle province di Napoli e Caserta, un quadro di eccessi di mortalità, di incidenza tumorale e di ricoveri ospedalieri, tra i cui fattori di rischio sospetti o accertati compare l'esposizione a inquinanti da smaltimento illegale di rifiuti.\n\nIl tema resta aperto anche dopo l'ultimo dato disponibile di questo indicatore, il 2025. Il 24 giugno 2026 la Commissione parlamentare Ecomafie ha presentato a Casal di Principe una relazione sulla Terra dei Fuochi. Due giorni dopo, in un articolo del Fatto Quotidiano, un medico di Medici per l'Ambiente Napoli ha scritto che la relazione conferma la contaminazione delle falde acquifere, e ha denunciato che la Regione Campania ha speso oltre 40 milioni di euro in due studi su diossine e Pcb, i progetti Sebiorec e Spes, senza renderne pubblici i risultati. Non è una prova che spiega il 23,4% di famiglie campane che lamentano inquinamento, ma è il contesto, secondo l'articolo, in cui quel numero si colloca.\n\nUn altro dato aiuta a inquadrare il paradosso. Nel 2024 la Campania ha inviato in discarica lo 0% dei suoi [rifiuti urbani](/indicatore/conferimento-dei-rifiuti-urbani-in-discarica/bes-10AMB004), la quota più bassa in Italia, eppure resta la regione dove più famiglie lamentano inquinamento. Non sono in contraddizione: sono due statistiche diverse. La vicenda della Terra dei Fuochi riguarda lo smaltimento illegale di rifiuti, questo dato misura invece il conferimento regolare in discarica dei rifiuti urbani.",
+   "h": "La Campania e il contesto della Terra dei Fuochi",
+   "role": "quadro"
+  },
+  {
+   "body": "Questo indicatore misura la quota di famiglie che lamenta inquinamento nella zona in cui vive, una dichiarazione delle famiglie stesse: non è una misurazione ambientale con centraline o dati oggettivi, e dipende anche da quanto un problema è visibile o discusso pubblicamente in un territorio. Il confronto tra gli anni prima e dopo il 2020 va letto con cautela, perché a partire da quell'anno, per l'emergenza Covid-19, l'Istat ha iniziato a riconvertire le rilevazioni dal faccia a faccia al telefono e al web, e un cambio di questo tipo può influenzare le risposte indipendentemente da un reale peggioramento dell'ambiente. Mancano inoltre diversi anni di dati per Basilicata, Molise e Trentino Alto Adige. La Basilicata ha un buco solo nel 2022 e nel 2023, e nella classifica 2025 citata sopra c'è, con l'8,2%. Molise e Trentino Alto Adige hanno più anni mancanti e restano fuori da quella classifica, insieme alla Valle d'Aosta, che in questa serie non ha mai un valore. Anche le medie di Nord e Mezzogiorno citate sopra sono calcolate sulle sole regioni con un dato nel 2025, sei di otto per il Nord e sette di otto per il Mezzogiorno.",
+   "h": "Che cosa il numero non dice",
+   "role": "limiti"
+  }
+ ],
+ "vintage": 2025
+}
