@@ -87,10 +87,10 @@
     ]
   },
   "enabledPlugins": {
-    "motore@platform": true
+    "motore@platform-locale": true
   },
   "extraKnownMarketplaces": {
-    "platform": {
+    "platform-locale": {
       "source": {
         "source": "directory",
         "path": "/home/user/platform"
