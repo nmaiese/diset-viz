@@ -127,8 +127,8 @@ strutturate, con una risposta in cima, sono quelle che un assistente cita.
   service account per GA4 e Search Console invece funziona. Tutto ciò che
   presuppone `gcloud` da una sessione cloud oggi non gira.
 - **`pid` ha un debito pericoloso**: `scripts/blogger.py aggiorna-post` usa
-  ancora `PATCH`, lo stesso comando che il 2 settembre ha svuotato 224 post su
-  260. La protezione è una riga in `CLAUDE.md`. Il ramo con le pagine hub
+  ancora `PATCH`, lo stesso comando che il 2 settembre ha svuotato 224 post
+  su 260. La protezione è una riga in `CLAUDE.md`. Il ramo con le pagine hub
   della tassonomia è fermo da un mese senza merge. Il branch di default su
   GitHub punta a un ramo `claude/*` e non a `master`.
 
