@@ -92,8 +92,8 @@
   "extraKnownMarketplaces": {
     "platform": {
       "source": {
-        "source": "github",
-        "repo": "nmaiese/platform"
+        "source": "directory",
+        "path": "/home/user/platform"
       }
     }
   },

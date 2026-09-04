@@ -37,8 +37,16 @@ senza che nessuno se ne accorga, e questo progetto lo ha già pagato.
 
 Agent, skill, comandi e hook condivisi **non stanno in questo repo**: vivono nel
 plugin `motore` di `~/dev/platform/plugin/` (una definizione sola per tutti i
-siti), abilitato da `.claude/settings.json` tramite il marketplace locale
-`platform-locale`. Il runtime li espone con il prefisso `motore:`:
+siti). Il marketplace è dichiarato in due posti, con scopi diversi:
+`.claude/settings.json` (tracciato, usato anche dalle sessioni cloud/Routine)
+punta a una sorgente `directory` sul path del clone dell'ambiente in uso — in
+locale su WSL questo viene **sovrascritto** da `.claude/settings.local.json`
+(non tracciato) con il path locale (`/home/nilo/dev/platform`) e con
+`motore@platform` disabilitato a favore di `motore@platform-locale`. Una
+sorgente `github` era stata provata per portabilità il 03/09 ma non si risolve
+in modo affidabile nelle sessioni cloud (le Routine non vedono il plugin
+all'avvio): tornati a `directory` per quel motivo. Il runtime espone il plugin
+con il prefisso `motore:`:
 
 - agent: `motore:lab-dossierista`, `motore:lab-scout`, `motore:lab-scout-europa`,
   `motore:lab-scrittore`, `motore:lab-verificatore`, `motore:lab-pubblicatore`
