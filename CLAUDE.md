@@ -23,6 +23,7 @@ senza che nessuno se ne accorga, e questo progetto lo ha già pagato.
 | **guardare la catena mentre gira**, o dopo: il cruscotto | `lab/cruscotto.py`, [`lab/README.md`](lab/README.md), `.claude/rules/app.md` |
 | **a che punto è la prosa dell'atlante**: lo stato dei 634 indicatori | `app/editorial_state.py` (il criterio, uno solo), `app/indicator_universe.py` (la passata, una sola) |
 | aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
+| **famiglie di indicatori**: stessa misura, dimensioni diverse (genere, età, regione/provincia) | [`docs/FAMIGLIE_INDICATORI.md`](docs/FAMIGLIE_INDICATORI.md) (priorità del piano, Settimana 3-4) |
 | scoperta di indicatori nuovi (gli script esistono, la catena attorno no) | [`docs/archive/DISCOVERY_PIPELINE.md`](docs/archive/DISCOVERY_PIPELINE.md), `scripts/discover_candidates.py` |
 | dati provinciali | [`docs/PROVINCE_PIPELINE.md`](docs/PROVINCE_PIPELINE.md) |
 | freschezza dei dati e monitoraggio delle fonti | [`docs/DATA_FRESHNESS.md`](docs/DATA_FRESHNESS.md), [`docs/SOURCE_MONITORING.md`](docs/SOURCE_MONITORING.md) |
