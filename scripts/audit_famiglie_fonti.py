@@ -31,18 +31,21 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from scripts.update_data import REGION_NAME_MAP, SOURCE_URL, SUPPORTED_REGIONS  # noqa: E402
-from scripts.update_bes_regions import FALLBACK_ARTIFACT as BES_URL  # noqa: E402
+from scripts.update_bes_regions import (  # noqa: E402
+    REGION_ALIASES,
+    discover_artifact_url,
+)
 
 # Columns scripts/update_data.py:convert_row actually reads.
-CATALOGO_COLONNE_USATE = {
+CATALOG_COLUMNS_USED = {
     "COD_INDICATORE", "TITOLO", "SOTTOTITOLO", "ANNO_RIFERIMENTO",
     "UNITA_MISURA", "VALORE", "DESCRIZIONE_RIPARTIZIONE",
     "DESCRIZIONE_TEMA1", "OC_TEMA_SINTETICO", " 1° OBIETTIVO",
 }
 
-TAG_GENERE = "Asse VII - Articolazione di genere."
+GENDER_TAG = "Asse VII - Articolazione di genere."
 
-GENERE_SUFFIX_RE = re.compile(
+GENDER_SUFFIX_RE = re.compile(
     r"""(?:\s*\(\s*(?P<g1>maschi|femmine|totale)\s*\)\s*$
           |\s*[-,]\s*(?P<g2>maschi|femmine|totale)\s*$
           |\s+(?P<g3>maschi|femmine|totale)\s*$)""",
@@ -50,71 +53,77 @@ GENERE_SUFFIX_RE = re.compile(
 )
 
 
-def _scarica(url: str) -> bytes:
+def _download(url: str) -> bytes:
     request = urllib.request.Request(url, headers={"User-Agent": "diset-viz-audit/1.0"})
     with urllib.request.urlopen(request, timeout=120) as response:
         return response.read()
 
 
-def audit_catalogo_storico() -> None:
+def audit_historical_catalog() -> None:
     print("=" * 70)
     print("CATALOGO STORICO (Assoluti_Regione.csv, fonte BDTPS)")
     print("=" * 70)
-    archive = zipfile.ZipFile(io.BytesIO(_scarica(SOURCE_URL)))
+    archive = zipfile.ZipFile(io.BytesIO(_download(SOURCE_URL)))
     csv_names = [n for n in archive.namelist() if n.lower().endswith(".csv")]
     with archive.open(csv_names[0]) as raw:
         text = io.TextIOWrapper(raw, encoding="utf-8-sig", newline="")
         reader = csv.DictReader(text, delimiter=";")
         header = reader.fieldnames or []
-        non_usate = [c for c in header if c not in CATALOGO_COLONNE_USATE]
+        unused_columns = [c for c in header if c not in CATALOG_COLUMNS_USED]
         print(f"\nColonne nel CSV Istat: {len(header)}, lette da convert_row: "
-              f"{len(CATALOGO_COLONNE_USATE)}, mai lette: {len(non_usate)}")
-        print(f"  {non_usate}")
+              f"{len(CATALOG_COLUMNS_USED)}, mai lette: {len(unused_columns)}")
+        print(f"  {unused_columns}")
 
-        ripartizioni = Counter()
-        tema2 = set()
-        genere_ids = set()
-        titolo_per_id = {}
-        n_righe = 0
+        territory_counts = Counter()
+        secondary_themes = set()
+        gender_tagged_ids = set()
+        title_by_id = {}
+        n_rows = 0
         for row in reader:
-            n_righe += 1
-            ripartizioni[row["DESCRIZIONE_RIPARTIZIONE"]] += 1
+            n_rows += 1
+            territory_counts[row["DESCRIZIONE_RIPARTIZIONE"]] += 1
             if row["DESCRIZIONE_TEMA2"].strip():
-                tema2.add(row["DESCRIZIONE_TEMA2"].strip())
-            territorio = REGION_NAME_MAP.get(
+                secondary_themes.add(row["DESCRIZIONE_TEMA2"].strip())
+            territory = REGION_NAME_MAP.get(
                 row["DESCRIZIONE_RIPARTIZIONE"], row["DESCRIZIONE_RIPARTIZIONE"]
             )
-            if territorio in SUPPORTED_REGIONS:
+            if territory in SUPPORTED_REGIONS:
                 iid = row["COD_INDICATORE"].lstrip("0") or "0"
-                titolo_per_id[iid] = row["TITOLO"].strip()
-                if row["DESCRIZIONE_ASSE_QCS"].strip() == TAG_GENERE:
-                    genere_ids.add(iid)
+                title_by_id[iid] = row["TITOLO"].strip()
+                if row["DESCRIZIONE_ASSE_QCS"].strip() == GENDER_TAG:
+                    gender_tagged_ids.add(iid)
 
-    tenute = sum(v for k, v in ripartizioni.items()
-                 if REGION_NAME_MAP.get(k, k) in SUPPORTED_REGIONS)
-    print(f"\nRighe totali: {n_righe}, tenute (20 regioni): {tenute}, "
-          f"scartate per territorio: {n_righe - tenute}")
-    for k, v in sorted(ripartizioni.items(), key=lambda x: -x[1]):
+    kept_rows = sum(v for k, v in territory_counts.items()
+                     if REGION_NAME_MAP.get(k, k) in SUPPORTED_REGIONS)
+    print(f"\nRighe totali: {n_rows}, tenute (20 regioni): {kept_rows}, "
+          f"scartate per territorio: {n_rows - kept_rows}")
+    for k, v in sorted(territory_counts.items(), key=lambda x: -x[1]):
         if REGION_NAME_MAP.get(k, k) not in SUPPORTED_REGIONS:
             print(f"  scartato: {k!r}: {v} righe")
 
     print(f"\nDESCRIZIONE_TEMA2 (seconda classificazione, mai letta): "
-          f"{len(tema2)} valori -> {sorted(tema2)}")
-    print(f"\nIndicatori taggati {TAG_GENERE!r} (ufficiale Istat, mai letto): "
-          f"{len(genere_ids)} su {len(titolo_per_id)}")
+          f"{len(secondary_themes)} valori -> {sorted(secondary_themes)}")
+    print(f"\nIndicatori taggati {GENDER_TAG!r} (ufficiale Istat, mai letto): "
+          f"{len(gender_tagged_ids)} su {len(title_by_id)}")
 
-    regex_mf = set()
-    for iid, titolo in titolo_per_id.items():
-        m = GENERE_SUFFIX_RE.search(titolo)
+    regex_gender_ids = set()
+    for iid, title in title_by_id.items():
+        m = GENDER_SUFFIX_RE.search(title)
         if m:
             g = (m.group("g1") or m.group("g2") or m.group("g3")).lower()
             if g in ("maschi", "femmine"):
-                regex_mf.add(iid)
-    solo_regex = regex_mf - genere_ids
-    solo_tag = genere_ids - regex_mf
-    esito = "combaciano" if not solo_regex and not solo_tag else "DISCREPANZE"
-    print(f"Regex sui titoli vs tag ufficiale: {len(solo_regex)} solo regex, "
-          f"{len(solo_tag)} solo tag -> {esito}")
+                regex_gender_ids.add(iid)
+    regex_only = regex_gender_ids - gender_tagged_ids
+    tag_only = gender_tagged_ids - regex_gender_ids
+    outcome = "combaciano" if not regex_only and not tag_only else "DISCREPANZE"
+    print(f"Regex sui titoli vs tag ufficiale (solo appartenenza, non il "
+          f"valore maschi/femmine: vedi nota sotto): {len(regex_only)} solo "
+          f"regex, {len(tag_only)} solo tag -> {outcome}")
+    print("Nota: DESCRIZIONE_ASSE_QCS ha lo stesso valore per tutti gli "
+          "indicatori taggati: dice che l'id fa parte di una scomposizione "
+          "di genere, non se e' maschi o femmine ne' quale totale gli "
+          "corrisponde. Non sostituisce il parser sul titolo per costruire "
+          "le famiglie, lo conferma come insieme di appartenenza.")
 
 
 def audit_bes() -> None:
@@ -122,45 +131,70 @@ def audit_bes() -> None:
     print("=" * 70)
     print("BES (Assoluti_BES_Regione.csv, fonte Appendice Statistica)")
     print("=" * 70)
-    with zipfile.ZipFile(io.BytesIO(_scarica(BES_URL))) as archive:
+    artifact_url = discover_artifact_url()
+    print(f"\nURL scoperto da discover_artifact_url() (stesso path del "
+          f"convertitore): {artifact_url}")
+    with zipfile.ZipFile(io.BytesIO(_download(artifact_url))) as archive:
         xlsx_names = [n for n in archive.namelist() if n.lower().endswith(".xlsx")]
         print(f"\nFile Excel nello ZIP: {len(xlsx_names)}")
         for n in xlsx_names:
-            usato = "usato" if Path(n).name.lower() == "indicatori_regione_sesso.xlsx" else "mai aperto"
-            print(f"  {n} [{usato}]")
+            used = "usato" if Path(n).name.lower() == "indicatori_regione_sesso.xlsx" else "mai aperto"
+            print(f"  {n} [{used}]")
 
         target = next(n for n in xlsx_names if Path(n).name.lower() == "indicatori_regione_sesso.xlsx")
         with tempfile.NamedTemporaryFile(suffix=".xlsx") as tmp:
             tmp.write(archive.read(target))
             tmp.flush()
-            wb = load_workbook(tmp.name, read_only=True, data_only=True)
-            sheet = wb.active
+            workbook = load_workbook(tmp.name, read_only=True, data_only=True)
+            sheet = workbook.active
             rows = sheet.iter_rows(values_only=True)
             header = next(rows)
             pos = {v: i for i, v in enumerate(header)}
 
-            sesso_counter = Counter()
-            ids_per_sesso = defaultdict(set)
-            territori = set()
+            sex_row_counts = Counter()
+            regions_by_indicator_sex = defaultdict(lambda: defaultdict(set))
+            territories_seen = set()
             for values in rows:
-                sesso = str(values[pos["SESSO"]] or "").strip()
-                sesso_counter[sesso] += 1
-                ids_per_sesso[sesso].add(str(values[pos["CODICE"]] or "").strip())
-                territori.add(str(values[pos["TERRITORIO"]] or "").strip())
-            wb.close()
+                sex = str(values[pos["SESSO"]] or "").strip()
+                indicator_id = str(values[pos["CODICE"]] or "").strip()
+                raw_territory = " ".join(str(values[pos["TERRITORIO"]] or "").split())
+                territories_seen.add(raw_territory)
+                sex_row_counts[sex] += 1
+                territory = REGION_ALIASES.get(raw_territory, raw_territory)
+                if territory in SUPPORTED_REGIONS:
+                    regions_by_indicator_sex[indicator_id][sex].add(territory)
+            workbook.close()
 
-    print(f"\nRighe per SESSO: {dict(sesso_counter)}")
-    tot = ids_per_sesso.get("Totale", set())
-    masch = ids_per_sesso.get("Maschi", set())
-    femm = ids_per_sesso.get("Femmine", set())
-    print(f"Indicatori con tripletta Totale+Maschi+Femmine: {len(tot & masch & femm)}")
-    print(f"Indicatori Totale-only nella fonte: {len(tot - masch - femm)}")
-    print(f"Righe scartate dal filtro 'solo Totale': "
-          f"{sesso_counter.get('Maschi', 0) + sesso_counter.get('Femmine', 0)}")
-    print(f"Territori oltre le 20 regioni (scartati): "
-          f"{sorted(territori - SUPPORTED_REGIONS)}")
+    print(f"\nRighe per SESSO (tutti i territori del file): {dict(sex_row_counts)}")
+
+    complete_triplets = set()
+    for indicator_id, by_sex in regions_by_indicator_sex.items():
+        if all(
+            by_sex.get(sex, set()) == SUPPORTED_REGIONS
+            for sex in ("Totale", "Maschi", "Femmine")
+        ):
+            complete_triplets.add(indicator_id)
+    totale_only_ids = {
+        indicator_id for indicator_id, by_sex in regions_by_indicator_sex.items()
+        if by_sex.get("Totale", set()) == SUPPORTED_REGIONS
+        and not by_sex.get("Maschi") and not by_sex.get("Femmine")
+    }
+    any_gender_ids = {
+        indicator_id for indicator_id, by_sex in regions_by_indicator_sex.items()
+        if by_sex.get("Maschi") or by_sex.get("Femmine")
+    }
+    print(f"Indicatori con Maschi e/o Femmine in almeno una regione: {len(any_gender_ids)}")
+    print(f"Indicatori con tripletta Totale+Maschi+Femmine COMPLETA su tutte "
+          f"e 20 le regioni: {len(complete_triplets)}")
+    print(f"Indicatori Totale-only su tutte le 20 regioni, nessun "
+          f"Maschi/Femmine in nessuna regione: {len(totale_only_ids)}")
+    print(f"Righe scartate dal filtro 'solo Totale' (tutti i territori del "
+          f"file, non solo le 20 regioni): "
+          f"{sex_row_counts.get('Maschi', 0) + sex_row_counts.get('Femmine', 0)}")
+    print(f"Territori nel file oltre le 20 regioni (scartati, dopo alias): "
+          f"{sorted(t for t in territories_seen if REGION_ALIASES.get(t, t) not in SUPPORTED_REGIONS)}")
 
 
 if __name__ == "__main__":
-    audit_catalogo_storico()
+    audit_historical_catalog()
     audit_bes()

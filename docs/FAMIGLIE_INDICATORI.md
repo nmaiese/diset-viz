@@ -59,14 +59,19 @@ della popolazione", "Differenza tra tasso di occupazione maschile e
 femminile", "Imprenditorialità femminile") sono misure diverse, escluse
 correttamente da un parser a suffisso di coda.
 
-**Non serve nemmeno il parser**: il CSV Istat ha 21 colonne, `convert_row`
-ne legge 10. Fra le 11 mai lette, `DESCRIZIONE_ASSE_QCS` contiene il valore
-letterale `"Asse VII - Articolazione di genere."`, che marca ufficialmente
-58 indicatori (su 377 nel sottoinsieme regionale) come scomposti per
-genere. Incrociato con il regex sui titoli: **combaciano al 100%, zero
-discrepanze**. Il campo esiste già nel dato scaricato: per il catalogo
-storico si può leggere `DESCRIZIONE_ASSE_QCS` invece di (o come conferma
-di) un parser sul titolo. Un'altra colonna mai letta, `DESCRIZIONE_TEMA2`,
+**Un campo ufficiale mai letto conferma il parser, non lo sostituisce**: il
+CSV Istat ha 21 colonne, `convert_row` ne legge 10. Fra le 11 mai lette,
+`DESCRIZIONE_ASSE_QCS` contiene il valore letterale `"Asse VII -
+Articolazione di genere."`, che marca ufficialmente 58 indicatori (su 377
+nel sottoinsieme regionale) come scomposti per genere. Incrociato con il
+regex sui titoli: **combaciano al 100%, zero discrepanze** sull'insieme di
+appartenenza. Ma il campo ha lo **stesso valore per tutti e 58**: dice che
+un id fa parte di una scomposizione di genere, non se è maschi o femmine né
+quale totale gli corrisponde. Non basta a costruire le famiglie da solo
+(serve comunque leggere il titolo, o un'altra fonte, per il valore e il
+collegamento fra i tre id): la sua utilità è come controllo di completezza
+sul parser esistente, non come sostituto. Un'altra colonna mai letta,
+`DESCRIZIONE_TEMA2`,
 è una seconda classificazione tematica (11 valori: Città, Dinamiche
 settoriali, Energia, Inclusione sociale, Internazionalizzazione, Istruzione
 e formazione, Legalità e sicurezza, Pubblica Amministrazione, Qualità
@@ -86,9 +91,10 @@ CSV Istat e ristampa questi numeri) e, per le 30 famiglie in dettaglio,
 `analisi/famiglie_conta.py` in `nmaiese/redazione-ai`.
 
 **Conseguenza**: qui la dimensione va letta dal testo del titolo (parser
-euristico) solo come ripiego. La fonte ha già un campo ufficiale
-(`DESCRIZIONE_ASSE_QCS`) che la porta strutturata: non c'è bisogno di
-inferirla dal titolo, va solo letta.
+euristico): resta necessario, `DESCRIZIONE_ASSE_QCS` lo conferma come
+insieme di appartenenza (buon controllo di completezza) ma non porta il
+valore maschi/femmine/totale né il collegamento fra i tre id di una
+famiglia.
 
 ### 2. Le pipeline SDMX (provincia, scoperta di nuovi indicatori)
 
@@ -152,21 +158,32 @@ if str(values[positions["SESSO"]] or "").strip() != "Totale":
 ```
 
 Verificato scaricando di nuovo lo ZIP: 8.479 righe nel foglio, 4.359 Totale
-+ 2.060 Maschi + 2.060 Femmine. **84 indicatori hanno già oggi una
-tripletta regionale completa Totale/Maschi/Femmine**, scartata a ogni
-aggiornamento (4.120 righe). Gli altri 69 indicatori del file sono
-Totale-only anche nella fonte: niente da recuperare per quelli. Stesso
-filtro territoriale delle altre due fonti: il file ha 30 territori (le 20
-regioni più Italia e le macro-aree), ne teniamo 20.
++ 2.060 Maschi + 2.060 Femmine. Contando solo la presenza dell'id per sesso
+(senza guardare in quali regioni) risultavano 84 triplette; **contando la
+copertura per regione (un id conta solo se Totale, Maschi e Femmine sono
+tutti presenti in tutte e 20 le regioni, non solo da qualche parte nel
+file) sono 65**: un indicatore con maschi/femmine solo per l'Italia o
+qualche macro-area, o mancante in alcune regioni, non è una tripletta
+regionale completa anche se l'id compare. Sempre scartata a ogni
+aggiornamento (4.120 righe). 78 indicatori sono Totale-only su tutte le 20
+regioni con zero maschi/femmine in nessuna regione: niente da recuperare
+per quelli. I restanti 10 (153 - 65 - 78) hanno una copertura parziale, da
+guardare caso per caso prima di contarli. Stesso filtro territoriale delle
+altre due fonti: il file ha più territori delle 20 regioni (Italia,
+macro-aree, le due province autonome separate da Trentino Alto Adige), ne
+teniamo 20.
 
 Verifica riproducibile con `scripts/audit_famiglie_fonti.py`.
 
 **Conseguenza**: qui non serve né un parser sul titolo né cambiare una
 chiave di query SDMX. La dimensione è già una colonna nel file che
 scarichiamo: va solo smesso di scartarla in `parse_archive`
-(`scripts/update_bes_regions.py:131-213`). È la fonte più economica delle
-tre per una famiglia pilota: 84 famiglie pronte, più del triplo delle 30
-del catalogo storico, zero euristica.
+(`scripts/update_bes_regions.py:131-213`), verificando la copertura
+regionale prima di considerare una tripletta completa. È la fonte più
+economica delle tre per una famiglia pilota: 65 famiglie pronte con
+copertura regionale piena, più del doppio delle 30 del catalogo storico,
+zero euristica sul titolo (ma serve comunque il controllo di copertura per
+regione sopra).
 
 ## Concetti già esistenti, e perché non bastano
 
@@ -216,17 +233,23 @@ modello attuale, si riscrivono quando la pagina di famiglia è pronta.
 Non ancora risolti, non ancora decisi: la prossima sessione che lavora sul
 passo (a) li affronta prima di scrivere codice.
 
-1. **Affidabilità del parser euristico, risolto il 4 settembre notte**: il
-   regex sui titoli per il catalogo storico combacia al 100% (0 falsi
+1. **Affidabilità del parser euristico, verificata il 4 settembre notte**:
+   il regex sui titoli per il catalogo storico combacia al 100% (0 falsi
    positivi, 0 falsi negativi, su 377 indicatori) con il campo ufficiale
    Istat `DESCRIZIONE_ASSE_QCS = "Asse VII - Articolazione di genere."`,
    presente nel CSV scaricato e mai letto finora (sezione 1). Non è più un
-   punto aperto per il catalogo storico: si usa il campo ufficiale, il regex
-   resta un controllo di coerenza. Per BES (sezione 3) non serve nemmeno
-   quello: la dimensione è già una colonna `SESSO`. Resta aperto solo per
-   `indicatori_eta_sesso.xlsx` e i due file titolo di studio del BES, non
-   ancora guardati in dettaglio, e per quando si estenderà al livello
-   provincia.
+   punto aperto per il catalogo storico nel senso di "quanti falsi
+   positivi/negativi dà": il parser sul titolo resta necessario (il campo
+   ufficiale ha lo stesso valore per tutti i 58 id, non dice maschi o
+   femmine né il collegamento fra i tre id di una famiglia), ma ora ha un
+   controllo di completezza indipendente per verificarlo. Per BES (sezione
+   3) il parser sul titolo non serve: la dimensione è già una colonna
+   `SESSO` con il valore vero (Maschi/Femmine/Totale), ma va incrociata con
+   la copertura per regione, non solo con la presenza dell'id (un id con
+   maschi/femmine solo per l'Italia o qualche regione non è una famiglia
+   completa). Resta aperto per `indicatori_eta_sesso.xlsx` e i due file
+   titolo di studio del BES, non ancora guardati in dettaglio, e per quando
+   si estenderà al livello provincia.
 2. **File generato o curato a mano?** Come `config/theme_categories.csv`
    (curato) o rigenerato a ogni aggiornamento dati (automatico, poi rivisto)?
    I titoli cambiano raramente: probabile che generato-poi-rivisto sia giusto,
@@ -236,10 +259,13 @@ passo (a) li affronta prima di scrivere codice.
    separato dai file per id, che restano per compatibilità? Tocca anche gli
    URL canonici e i redirect dagli id vecchi.
 4. **Ambito del pilota, da riconsiderare alla luce del punto 1**: BES
-   (sezione 3) ha 84 famiglie pronte senza euristica, più del triplo delle
-   30 del catalogo storico, ed è la fonte più economica su cui far partire
-   la famiglia pilota (basta smettere di scartare le righe `Maschi`/
-   `Femmine` in `scripts/update_bes_regions.py:151`). Il catalogo storico
-   resta un candidato valido (es. la tripletta 345/346/347, occupazione
-   20-64, che è fra le pagine con più impression), ma non è più l'unico né
-   il più economico.
+   (sezione 3) ha 65 famiglie con copertura regionale piena su tutte e 20
+   le regioni (contando solo la presenza dell'id, senza il controllo di
+   copertura, sembravano 84: la differenza è il motivo per cui la copertura
+   per regione va sempre verificata, non solo l'esistenza dell'id), più del
+   doppio delle 30 del catalogo storico, ed è la fonte più economica su cui
+   far partire la famiglia pilota (basta smettere di scartare le righe
+   `Maschi`/`Femmine` in `scripts/update_bes_regions.py:151`, verificando
+   la copertura). Il catalogo storico resta un candidato valido (es. la
+   tripletta 345/346/347, occupazione 20-64, che è fra le pagine con più
+   impression), ma non è più l'unico né il più economico.
