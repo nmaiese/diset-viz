@@ -336,14 +336,14 @@ Ogni run è una sessione cloud (Routine o lanciata da te) che esegue nell'ordine
    con il pezzo leggibile nel corpo (non solo il JSON), i rilievi aperti, il
    costo, e il link alla pagina di anteprima. Nessun trailer nei commit.
 7. **Merge**: tu, dal telefono, dall'app GitHub. Se non fai merge in sette
-   giorni la PR resta e `STATO.md` te lo dice.
+   giorni la PR resta e "Oggi" nel Quadro te lo dice.
 8. **Pubblicazione**: per divarioitalia è il merge stesso (Cloud Build
    deploya). Per praticandoildiritto è una Routine che, dopo il merge, fa
    `PUT` del post intero su Blogger e verifica la lunghezza del corpo
    restituito; finché `aggiorna-post` usa `PATCH` non si sblocca.
 
 Costo atteso per pezzo: fra 3 e 6 $, il livello delle run di agosto senza
-plugin. Sopra i 10 $ la run scrive un rilievo in `STATO.md` e non si ripete
+plugin. Sopra i 10 $ la run scrive un rilievo in "Oggi" e non si ripete
 finché non lo leggi.
 
 ### 3.4 Il contratto del pezzo (`REDAZIONE.md`)
