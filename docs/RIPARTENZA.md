@@ -280,7 +280,8 @@ Le credenziali che l'ambiente deve avere e che oggi mancano o sono scadute:
   incolla manuale. Si può rinviare.
 
 Gli ambienti `divarioitalia` e `PID` si archiviano quando l'ultima Routine è
-migrata (fine della settimana 3).
+migrata (fine della settimana 5, §5: spostata dopo le famiglie di
+indicatori).
 
 ### 3.3 La pipeline, una sola, lineare
 
@@ -538,7 +539,75 @@ resta vero.
 **Il tema Blogger** resta manuale, come documenta bene `docs/05`. Non si
 automatizza il pannello con un browser pilotato.
 
-### 4.3 Un terzo sito domani
+### 4.3 Famiglie di indicatori: dimensioni e livelli (nuova priorità, 4/9 sera)
+
+Fino a oggi pomeriggio questo era in "Idee" come priorità di prodotto rinviata
+(§7). Nello ha chiesto di darle priorità sul resto del piano dopo aver letto
+il primo pezzo vero (ter-104): molti indicatori del catalogo esistono già
+divisi in più pagine che raccontano la stessa cosa (totale, maschi, femmine,
+a volte una fascia d'età), e la redazione ne scrive una alla volta senza
+saperlo. Non è un problema di scrittura, è un problema di modello dati che la
+pipeline eredita.
+
+**Due situazioni diverse, verificate sul codice, non un'unica cosa da
+sistemare:**
+
+1. **Il grosso del catalogo storico** (`app/static/data/Assoluti_Regione.csv`,
+   include ter-104): Istat stessa distribuisce l'archivio già spacchettato per
+   dimensione. L'id 345 "Tasso di occupazione 20-64 anni" (totale), 346
+   (maschi), 347 (femmine) sono tre righe CSV separate all'origine, con il
+   sesso scritto nel titolo in chiaro (`scripts/update_data.py` non legge
+   nessun campo sesso/età strutturato, perché non esiste). Qui la dimensione
+   va **letta dal testo del titolo**, un parser euristico da rivedere a mano,
+   non recuperata da una fonte più ricca.
+2. **Le pipeline SDMX più recenti** (provincia, BES, la scoperta di nuovi
+   indicatori): qui il sistema sa già che una serie ha dimensioni sesso, età,
+   livello territoriale. `config/istat_series.yaml` ha un campo
+   `dimension_order` e sceglie oggi solo il codice "totale" (`SESSO=9`,
+   `ETA1=99`, livello regione). I codici delle altre dimensioni sono **già
+   committati e inutilizzati** (`data/provincia/codelist_CL_SEXISTAT1.csv`,
+   `codelist_CL_ITTER107.csv` con la gerarchia regione-provincia). Prendere
+   maschi/femmine o il livello provincia qui è cambiare la chiave della query
+   SDMX già scritta, non costruire qualcosa di nuovo.
+
+Nessun concetto di "famiglia di misura" esiste oggi nel codice: la "famiglia"
+attuale (`app/indicator_universe.py`) è la fonte dati (ter/bes/eur/multiscopo),
+i "parenti" di una pagina sono legati per tema (`app/indicator_view.py`,
+`_theme_siblings`), non per misura condivisa. Serve un terzo concetto,
+distinto dagli altri due.
+
+**Quattro passi, in ordine di quanto è già pronto:**
+
+a. **Mappare le famiglie**: per il catalogo storico, uno script che raggruppa
+   per titolo (regex sui suffissi maschi/femmine/età), prodotto come file
+   curato da rivedere a mano, sullo stesso modello di
+   `config/theme_categories.csv`. Per le serie SDMX la famiglia si ricava già
+   da `config/istat_series.yaml` senza parsing.
+   misura: un file di mappatura con le famiglie note, contato da un test.
+b. **Estendere la raccolta SDMX** alle dimensioni già note e oggi scartate
+   (sesso, dove serve età) e al livello provincia dove i codelist già
+   committati lo permettono.
+   misura: almeno una famiglia pilota con dati completi su tutte le
+   dimensioni note, regione e provincia.
+c. **Ridisegnare la pagina indicatore**: da una pagina per id a una pagina per
+   famiglia con selettore di dimensione e di livello, redirect dagli id
+   vecchi. Tocca `app/views.py`, `app/indicator_view.py`, il frontend.
+   misura: una famiglia pilota online con selettore funzionante.
+d. **Ridisegnare la pipeline della redazione** per scrivere un pezzo per
+   famiglia: `motore dossier` multi-dimensione (tutte le serie della
+   famiglia insieme, non una alla volta), `motore brief` con le domande sul
+   divario fra dimensioni, `motore verifica` che controlla le cifre contro
+   l'unione delle serie della famiglia.
+   misura: un pezzo di famiglia pubblicato che tratta esplicitamente più
+   dimensioni, letto e approvato da Nello.
+
+Non blocca la Settimana 2 in corso: i pezzi sui cinque indicatori restano
+scritti col modello attuale, a un id alla volta. Un pezzo scritto oggi su un
+indicatore che risulterà membro di una famiglia si riscrive quando la pagina
+di famiglia è pronta: costo accettato, non un motivo per fermare la
+produzione adesso.
+
+### 4.4 Un terzo sito domani
 
 Aggiungere un sito costa un file `siti/<nome>.md` e tre funzioni in `motore/`
 (coda, dossier o brief, pubblica). Vecchio Conio, che platform già misura, è
@@ -549,60 +618,76 @@ il candidato naturale: gli articoli sono Markdown in un repo, la pubblicazione
 
 ## 5. Le tappe
 
-Oggi è venerdì 4 settembre. Quattro settimane, e poi due mesi senza toccare la
-struttura.
+Oggi è venerdì 4 settembre. Riordinato la sera del 4/9 per dare priorità alle
+famiglie di indicatori (§4.3): le settimane 3 e 4 originali (pulizia, pid) si
+spostano dopo, e slitta con loro la finestra "non si tocca" e la decisione sul
+terzo sito. È il costo reale della riprioritizzazione, scritto qui invece che
+taciuto.
 
-### Settimana 1, fino all'11 settembre: fermare e fondare
+### Settimana 1, fino all'11 settembre: fermare e fondare — fatta
 
-- Disattivare tutte le Routine tranne "Pezzo del giorno", che passa a un
-  prompt di sei righe senza Gate A (parte dalla coda, apre la PR, si ferma).
-- Creare `redazione` (svuotare `platform` con tag `archivio-2026-09`, o repo
-  nuovo: consiglio il repo nuovo, così la storia di platform resta intatta e
-  il nome smette di promettere un orchestratore).
-- Scrivere `QUADRO.md` a mano la prima volta: "Decisioni" dai tre hub di
-  Drive, "Piano" da questo documento, "Idee" dalle inbox. Da quel giorno è
-  l'unico posto.
-- Scrivere i quattro documenti. `REDAZIONE.md` lo scrivo io, tu lo correggi:
-  è il file che decide la qualità.
-- Portare `lab/dossier.py`, `lab/controlla.py`, `lab/coda.py`, il client
-  Google di pid e `norme/` di platform in `motore/`, spogliati. Meno di 2.000
-  righe in tutto.
-- Ambiente `redazione` con setup script versionato. Consent screen Google in
-  Production e token nuovo (tu, dieci minuti).
-- Confrontare questo piano con i documenti su Drive e correggerlo.
+- Disattivate tutte le Routine (a mano, da Nello: un agente può fermare solo
+  le Routine create da un agente).
+- Creato `redazione` come repo nuovo, `nmaiese/redazione-ai` (§9).
+- `QUADRO.md` scritto, i quattro documenti scritti, `motore/` con coda,
+  dossier, brief, verifica, pubblica, quadro, metriche, norme, pr.
+- Ambiente `redazione` unico con setup script versionato (venv incluso),
+  token Google (Blogger, AdSense) verificati validi, consent screen in
+  Production confermato.
+  misura raggiunta il 4/9: `motore quadro` gira e "Oggi" si rigenera da solo,
+  26 test verdi, i due siti si agganciano in sessione.
 
-### Settimana 2, fino al 18 settembre: la pipeline su divarioitalia
+### Settimana 2, fino al 18 settembre: la pipeline su divarioitalia — in corso
 
-- Brief nuovo, tre agent, `motore verifica`, `motore pr`.
+- Brief nuovo, tre agent, `motore verifica`, `motore pr`: in produzione.
 - Cinque pezzi sui cinque indicatori con più impression (ter-104, ter-281,
-  ter-13, ter-901, ter-12), lanciati a mano, letti da te. Si aggiusta il brief
-  e la skill `voce` finché due pezzi su tre ti convincono alla prima lettura.
-  Questo è l'unico "eval" che resta.
-- Routine "Pezzo divarioitalia" sul nuovo prompt.
+  ter-13, ter-901, ter-12). **ter-104 scritto e pubblicato il 4/9** (PR
+  nmaiese/diset-viz#215, 5,85 $, dieci rilievi gravi risolti dal verificatore
+  in due giri, un rilievo di registro lasciato al merge). Restano quattro
+  pezzi, che Nello sta provando in autonomia con la pipeline attuale mentre
+  si riordina questo piano.
+- Routine "Pezzo divarioitalia" sul nuovo prompt: non ancora attivata.
+- Non si aspetta la Settimana 3 (famiglie) per finire questi cinque: un pezzo
+  scritto ora su un indicatore che risulterà membro di una famiglia si
+  riscrive dopo, costo accettato (§4.3).
 
-### Settimana 3, fino al 25 settembre: lo stato e la pulizia
+### Settimana 3-4, fino al 2 ottobre: famiglie di indicatori (nuova priorità)
+
+I quattro passi del §4.3, nell'ordine lì scritto: mappare le famiglie note
+(catalogo storico per titolo, serie SDMX da config), estendere la raccolta
+SDMX alle dimensioni già note e al livello provincia, ridisegnare la pagina
+indicatore per una famiglia pilota, ridisegnare `dossier`/`brief`/`verifica`
+della redazione per un pezzo di famiglia.
+misura: una famiglia pilota online con selettore di dimensione e livello, un
+pezzo di famiglia pubblicato che tratta esplicitamente più dimensioni, letto
+e approvato da Nello.
+
+### Settimana 5, fino al 9 ottobre: lo stato e la pulizia (ex settimana 3)
 
 - `motore quadro` completo (run, PR, metriche, pubblicati), Routine "Quadro"
   e "Metriche", notifiche push, copia su Drive.
 - Spegnere `/_pipeline`, le tabelle Supabase, il Cloud Run Job `motore-notturno`,
-  gli ambienti `divarioitalia` e `PID`.
+  gli ambienti `divarioitalia` e `PID` (oggi ancora attivi, non toccati).
 - Togliere da `diset-viz` tutto ciò che il §3.1 elenca, in una PR sola,
   con i test del sito ancora verdi.
 
-### Settimana 4, fino al 2 ottobre: praticandoildiritto
+### Settimana 6, fino al 16 ottobre: praticandoildiritto (ex settimana 4)
 
 - `blogger.py` in `PUT` con test. Estensione della tabella di vigenza a sei
   atti. Formato "Modello" nella skill.
 - Tre post aggiornati (procura speciale per querela, opposizione INAIL,
   intimazione testi: i tre con più clic), pubblicati a mano da te.
-- Routine "Pezzo praticandoildiritto" e sblocco.
+- Routine "Pezzo praticandoildiritto" e sblocco. Il consent screen e i token
+  (punto (2) del blocco) sono già a posto dal 4/9: restano (1) il PUT con
+  test e (3) i tre post pubblicati a mano.
 
-### Poi: ottobre e novembre, non si tocca
+### Poi: da metà ottobre a fine dicembre, non si tocca
 
 - Si guardano i clic delle pagine riscritte a 30 giorni, nel report del
   venerdì.
 - Un cambio di prompt al mese al massimo, provato su tre pezzi.
-- A fine novembre si decide sul terzo sito.
+- A fine dicembre si decide sul terzo sito (spostato da fine novembre per lo
+  slittamento delle settimane 3-4).
 
 ---
 
@@ -661,14 +746,18 @@ Dove il piano diverge dalle decisioni scritte nei tre hub, e perché:
 | "Evoluzione del modello di intent come unico intake" | intent come lista a tre stati nella sezione "Idee" del Quadro, senza tipi e senza roadmap generata | 9 intent reali, 5 sono lavoro fatto su platform stessa, 2 sono template non compilati |
 | "Metriche su GCP" (Cloud Run Job, BigQuery) | una Routine e CSV in git | due siti, un numero al giorno per sito |
 
-Le priorità di prodotto scritte nell'hub di Divario Italia e non toccate da
-questo piano, perché non sono la pipeline editoriale: refresh dei dati fuori
-da git, pagina unica per le famiglie di indicatori (genere, età), redesign
-delle pagine chiave, i giochi con account. Vanno nella sezione "Idee" del
-Quadro come idee di prodotto, così stanno nello stesso posto di tutto il
-resto. Una sola avvertenza: le ultime cinque sessioni cloud
-(41-49 $ l'una) sono andate lì, e la settimana 1-4 di questo piano chiede che
-la redazione passi avanti.
+Le priorità di prodotto scritte nell'hub di Divario Italia, inizialmente
+lasciate come idee rinviate perché non sembravano pipeline editoriale: refresh
+dei dati fuori da git, redesign delle pagine chiave, i giochi con account.
+Vanno nella sezione "Idee" del Quadro, e restano rinviate. **Una, "pagina
+unica per le famiglie di indicatori (genere, età)", è stata promossa a
+priorità la sera del 4/9** (§4.3, §5): letto il primo pezzo vero, è risultato
+chiaro che è anche un problema della pipeline editoriale, non solo di
+prodotto, perché la redazione scrive un pezzo alla volta su indicatori che
+sono in realtà la stessa misura vista da un'altra dimensione. Una sola
+avvertenza sul resto: le ultime cinque sessioni cloud (41-49 $ l'una) sono
+andate su idee di prodotto senza produrre nulla, e la redazione deve
+continuare a passare avanti su tutte le altre.
 
 Il portfolio dice anche "far nascere le attività concrete da una priorità o
 idea esplicita, trasformandole poi in issue o intent" e "evitare duplicazione
@@ -734,38 +823,31 @@ appoggia sopra e non aggiunge posti.
 
 ## 9. Che cosa mi serve da te
 
-Aggiornato il 4 settembre pomeriggio, dopo il primo giorno di esecuzione.
+Aggiornato il 4 settembre sera. Da qui in poi lo stato vero vive in
+`QUADRO.md` su `nmaiese/redazione-ai`, non in questo file: quanto segue è
+solo per chi apre questo documento senza passare di là.
 
-1. ~~Una decisione sul gate a monte.~~ **Deciso**: il gate sul brief non
-   esiste più, la coda propone e tu hai il veto sulle idee.
-2. ~~Repo nuovo o `platform` svuotato.~~ **Fatto, con una sorpresa**: questa
-   sessione non può creare repository (permesso negato all'integrazione,
-   non aggirabile) né cancellare centinaia di file uno per uno in modo
-   sensato. Tu hai creato il repo vuoto, ed è nato con il nome
-   **`nmaiese/redazione-ai`** (non "redazione", già preso o riservato).
-   `nmaiese/platform` resta intatto, non toccato: tutta la sua storia
-   (plugin, intent, ledger, evals, 21 agent) resta lì come archivio, senza
-   bisogno di un tag apposito. Nel resto di questo documento e nel §3.1,
-   dove leggi `redazione/` come nome di cartella o di repo, il repo vero è
-   `nmaiese/redazione-ai`.
-3. ~~Team con memoria.~~ **Deciso**: niente team parallelo, ma ricercatore e
-   verificatore hanno memoria di progetto (`.claude/agent-memory/<ruolo>/MEMORIA.md`),
-   propongono candidati, la sessione che guida la run li promuove.
-4. Consent screen Google in Production e un token nuovo per Blogger e AdSense
-   (dieci minuti nella console, una volta): **ancora da fare**, è in "Oggi"
-   nel Quadro.
-5. **Fatto**: repo creato e popolato (`nmaiese/redazione-ai`, 43 file, 26
-   test verdi), `motore dossier`/`brief`/`coda` provati sul serio contro
-   diset-viz e Search Console. **Ancora da fare tu**: le cinque Routine
-   vecchie sono ancora attive. Questa sessione ha provato a disattivarle e
-   ha ricevuto lo stesso rifiuto su tutte e cinque ("creata da http_api, non
-   da un agent: un agent può fermare solo le Routine che ha creato lui"), un
-   limite dell'account, non un errore da correggere. Vanno disattivate a
-   mano dalla pagina Routine, ed è in "Oggi" nel Quadro. Restano della
-   settimana 1: gli agent veri (ricercatore, scrittore, verificatore) non
-   sono ancora stati fatti girare su un pezzo, e il consent screen Google
-   (punto 4).
+1. ~~Gate a monte, repo, team con memoria.~~ **Decisi il 4/9 mattina**: nessun
+   gate sul brief, la coda propone e tu hai il veto sulle idee; repo nuovo
+   `nmaiese/redazione-ai` (non "redazione", già preso), `nmaiese/platform`
+   intatto come storia; niente team parallelo, ricercatore e verificatore
+   hanno memoria di progetto.
+2. ~~Routine vecchie attive.~~ **Fatto**: le hai disattivate tu a mano (un
+   agent può fermare solo le Routine che ha creato lui, limite dell'account).
+3. ~~Consent screen Google e token per Blogger e AdSense.~~ **Fatto**:
+   confermato in Production, i token esistono già e sono validi
+   (`google-check.py` su pid, tutti i servizi OK). Resta solo AdSense di
+   divarioitalia (account separato, `pub-6806451730012282`, token generato il
+   4/9 sera, non ancora usato da nessuno script).
+4. **Fatto**: la pipeline a tre agent ha scritto il primo pezzo vero, ter-104,
+   pubblicato (PR nmaiese/diset-viz#215, mergiata da te lo stesso giorno).
+   Settimana 2 in corso sui quattro pezzi restanti.
+5. **Nuovo, deciso il 4/9 sera**: priorità alle famiglie di indicatori (§4.3),
+   con il piano riordinato di conseguenza (§5). Nessuna decisione aperta al
+   momento: il piano procede su questa base finché non emerge un bivio reale
+   nel disegno delle famiglie (es. quanto fidarsi del parsing euristico dei
+   titoli sul catalogo storico).
 
 Il repo vive qui: **https://github.com/nmaiese/redazione-ai**. `QUADRO.md`
-lì dentro è la vista aggiornata, più di quanto lo sia questo documento da
-adesso in poi.
+lì dentro è la vista aggiornata, sempre più di quanto lo sia questo
+documento.
