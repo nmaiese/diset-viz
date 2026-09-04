@@ -11,13 +11,10 @@ repo di redazione avrà i suoi cinque documenti e questo andrà in archivio.
 Perimetro di ciò che ho letto: i tre repository per intero (con due
 ricognizioni delegate su `platform` e `pid`), lo storico git e delle PR di
 `diset-viz`, le Routine e le sessioni cloud dell'account, GA4 e Search Console
-dei due siti (service account `ga4-mcp`), i due siti live. **Non ho potuto
-leggere la cartella su Google Drive** (`1s-5LUTrOrxhK5U-xH7uXdr_rEtLr2QDJ`):
-il connettore Drive è installato ma non abilitato in questa chat, la cartella
-non è condivisa con link pubblico (rimanda al login), l'API Drive non è
-abilitata sul progetto `nil-automata` e il token utente GCP è scaduto. I tuoi
-documenti vanno confrontati con questo piano prima di eseguirlo, e dove
-divergono vince la tua descrizione. Il §7 dice come sbloccarlo in un minuto.
+dei due siti (service account `ga4-mcp`), i due siti live, e i quattro
+documenti della cartella Drive "Progetti Editoriali" (portfolio, hub di
+Divario Italia, hub di Praticando il Diritto, hub platform, tutti del 4
+settembre). Il confronto con quei documenti sta nel §7.
 
 ---
 
@@ -424,6 +421,19 @@ Tre canali verso il telefono, tutti senza codice nuovo:
 3. **Le notifiche push delle Routine** (l'opzione esiste per le Routine che
    creano una sessione nuova): una riga a fine run, "ter-104: PR aperta, 4,2 $".
 
+**Drive e git, chi possiede che cosa.** La regola che hai scritto nel
+portfolio ("Drive contiene la vista gestionale, GitHub la verità tecnica")
+regge, a patto di dire dove passa il confine. Drive possiede ciò che cambia
+solo quando decidi tu: visione, principi, priorità, decisioni, l'inbox delle
+idee grezze. Sono i tre hub che esistono già, e restano tre documenti. Il
+registro in git possiede ciò che cambia a ogni run: stato, coda, pubblicati,
+lezioni, e le idee **promosse** a lavoro. Le run non scrivono su Drive e tu
+non scrivi lo stato a mano: ogni cosa ha un solo scrittore. L'unico ponte
+è la Routine "Stato", che oltre a `STATO.md` deposita ogni mattina una copia
+del file come documento "Stato" nella cartella Drive, così la vista completa
+sta anche nell'app Drive. Se un'idea nell'inbox di Drive diventa lavoro, la
+riga passa in `IDEE.md`: un movimento a mano, una riga, una volta.
+
 Il cruscotto `/_pipeline` su Supabase, con battito e consuntivo, si spegne: era
 una vista sulle run del workflow, e il workflow non c'è più. Se dopo un mese
 vuoi un grafico dei clic per pagina riscritta, si fa una pagina statica
@@ -437,7 +447,7 @@ Cinque, tutte nell'ambiente `redazione`, tutte con sessione nuova a ogni run:
 | --- | --- | --- |
 | Pezzo divarioitalia | ogni giorno 07:30 | la pipeline del §3.3 su un pezzo dalla coda |
 | Pezzo praticandoildiritto | lun, mer, ven 07:30 | la pipeline su un post da aggiornare (dopo lo sblocco) |
-| Stato | ogni giorno 08:00 | `motore stato`: riscrive `STATO.md` e `PUBBLICATI.md`, push su `redazione/master` (solo `registro/`) |
+| Stato | ogni giorno 08:00 | `motore stato`: riscrive `STATO.md` e `PUBBLICATI.md`, push su `redazione/master` (solo `registro/`), copia di `STATO.md` come documento nella cartella Drive |
 | Metriche | ogni giorno 05:00 | GA4 e Search Console dei due siti in `redazione/dati/metriche/` (CSV, un file al giorno). Sostituisce il Cloud Run Job `motore-notturno` e BigQuery |
 | Settimanale | venerdì 17:00 | un commento su un'issue fissa "Settimana": cosa è uscito, clic prima e dopo, costo, cosa si è fermato. Nessun postmortem, nessun direttore |
 
@@ -590,14 +600,68 @@ struttura.
 
 ---
 
-## 7. Che cosa mi serve da te
+## 7. Il confronto con i documenti su Drive
 
-1. Farmi leggere la cartella Drive, in uno di due modi: abilitare il
-   connettore Google Drive nelle impostazioni connettori di questa chat
-   (il più rapido), oppure abilitare l'API Drive sul progetto `nil-automata`
-   e condividere la cartella in lettura con
-   `ga4-mcp@nil-automata.iam.gserviceaccount.com`. Con uno dei due
-   correggo il piano dove sbaglia e porto i tuoi documenti in `registro/`.
+I quattro documenti sono di stamattina e descrivono l'architettura di oggi
+(platform hub, plugin, intent, canary lite contro team). Le parti di visione
+e di principio coincidono con questo piano quasi parola per parola, e sono il
+motivo per cui il piano è fatto così:
+
+- "L'utente non tecnico deve capire immediatamente cosa misura un
+  indicatore" e "comprensibile prima che tecnico": è il §1.3 e il brief del
+  §3.3.
+- "Usare Search Console e GA4 per scegliere cosa migliorare o pubblicare;
+  evitare una cadenza editoriale scollegata dalla domanda": è la coda del
+  §3.3 e il §1.4. Oggi però le due bande di controllo e i due intent
+  automatici misurano la cadenza.
+- "Nessun sistema parallelo di stato se Git e metriche coprono già il
+  bisogno" e "la piattaforma deve ridurre duplicazione, non spostarla in un
+  altro repository": è il registro del §3.5 e la tabella del §6. Oggi lo
+  stato sta in cinque posti.
+- "Rendere semplice aggiungere un nuovo sito senza copiare agenti o
+  connettori": è il §4.3.
+- "Il corpus in Git è la verità editoriale, Blogger il canale", "preservare
+  prima di modificare", "pubblicazione bloccata finché il PUT non è sicuro":
+  è il §4.2, punto per punto.
+- Per pid, l'idea nell'inbox "template per aggiornare articoli legali con
+  box aggiornato al, fonte normativa e nota sulle modifiche" è il formato
+  "Modello" del §3.4.
+
+Dove il piano diverge dalle decisioni scritte nei tre hub, e perché:
+
+| decisione nell'hub | il piano | perché |
+| --- | --- | --- |
+| "Platform è l'hub condiviso" con "plugin Claude Code con agenti, skill, regole, hook e comandi" | resta un repo condiviso (`redazione`), senza plugin: skill e agent caricati come repo agganciato | il plugin ha rotto le Routine il 4/9 e vive su un setup script non versionato. Il repo condiviso resta, cambia il meccanismo di carico |
+| "Gate umano sul brief e sul merge" | gate sul merge, veto sulla coda | Gate A mai attraversato in due giorni, e ferma la produzione (§8, punto 1) |
+| "Chiudere il confronto lite contro Agent Team con canary comparabili" (P0 di entrambi gli hub) | il confronto non si fa: una pipeline sola a tre agent | il costo è già misurato (14-34 $ contro 4 $) e nessuno dei due runtime produce la prosa che vuoi. Il confronto che conta è tu che leggi cinque pezzi (§5, settimana 2) |
+| "Consolidare il ciclo pianificatore, costruttore, revisore" | non si costruisce | tre agent mai eseguiti, e lo sviluppo lo fai già con sessioni normali |
+| "Evoluzione del modello di intent come unico intake" | intent come lista a tre stati in `IDEE.md`, senza tipi e senza roadmap generata | 9 intent reali, 5 sono lavoro fatto su platform stessa, 2 sono template non compilati |
+| "Metriche su GCP" (Cloud Run Job, BigQuery) | una Routine e CSV in git | due siti, un numero al giorno per sito |
+
+Le priorità di prodotto scritte nell'hub di Divario Italia e non toccate da
+questo piano, perché non sono la pipeline editoriale: refresh dei dati fuori
+da git, pagina unica per le famiglie di indicatori (genere, età), redesign
+delle pagine chiave, i giochi con account. Restano nell'hub su Drive come
+priorità di prodotto. Una sola avvertenza: le ultime cinque sessioni cloud
+(41-49 $ l'una) sono andate lì, e la settimana 1-4 di questo piano chiede che
+la redazione passi avanti.
+
+Il portfolio dice anche "far nascere le attività concrete da una priorità o
+idea esplicita, trasformandole poi in issue o intent". Nel piano la frase
+diventa: un'idea nell'inbox di Drive, una riga in `IDEE.md` quando si decide,
+una PR quando è fatta. Tre passaggi, nessuna issue in mezzo salvo i guasti.
+
+---
+
+## 8. Che cosa mi serve da te
+
+1. Una decisione sul gate a monte. I tuoi hub dicono "brief e merge restano
+   gate umani". Il gate sul brief (Gate A) in due giorni non è mai stato
+   attraversato e domani ferma la Routine. Propongo di rovesciarlo: la coda
+   propone e scrive le idee in `IDEE.md`, la run prende la prima che tu non
+   hai cancellato. Il veto resta tuo, l'attesa no. Se invece vuoi il gate
+   opt-in, la Routine gira solo sui giorni in cui hai spuntato un'idea la
+   sera prima, e lo si scrive così.
 2. Dire se `redazione` è un repo nuovo o `platform` svuotato. Consiglio nuovo.
 3. Consent screen Google in Production e un token nuovo per Blogger e AdSense
    (dieci minuti nella console, una volta).
