@@ -1,0 +1,18 @@
+{
+ "revisore": "data-editor",
+ "verdetto": "da_correggere",
+ "classi_passate": ["cifra", "quantificatore", "direzione", "parente"],
+ "rilievi_alta": [
+  "Angolo: 'stanno una per area' e' un quantificatore falso. Le macroaree del dossier sono tre e la distribuzione reale delle quattro regioni piu' alte e' due nel Mezzogiorno (Campania e Sicilia), una nel Centro (Lazio), una nel Nord (Lombardia).",
+  "Lead: lo stesso quantificatore falso, ripetuto.",
+  "Prima sezione: 'una al Sud, una al Centro, una al Nord e una nelle Isole' inventa una quarta macroarea che il dossier non ha.",
+  "Seconda sezione: 'il Veneto e' a 9,7 e il Piemonte a 10,2, fra i valori piu' bassi della classifica' e' falso. Nel 2025 il Veneto e' settimo e il Piemonte ottavo su diciassette: stanno a meta' classifica. Le piu' basse sono Umbria 5,6, Calabria 6,0, Abruzzo 8,1, Basilicata 8,2, Marche 8,9 e Sardegna 9,1."
+ ],
+ "rilievi_media": [
+  "Sezione dinamica: 'il fondo della classifica si muove poco' confronta solo i due anni estremi. Nei cinque anni osservabili il minimo tocca 4,0 (Friuli-Venezia Giulia nel 2023) e 3,9 (Molise nel 2024), e la regione al fondo cambia ogni anno. E' il livello che resta basso, non la composizione."
+ ],
+ "rilievi_bassa": [
+  "Il dettaglio sulla voce distinta da rumori e criminalita' non sta nel dossier (definizione nulla): va attribuito esplicitamente al registro Istat SDMX."
+ ],
+ "cifre_verificate": "56 cifre controllate dal comando deterministico, 2 non trovate (96 e 30), entrambe di provenienza esterna. Le cifre del parente linkato (0,0 per la Campania e 38,1 per l'Umbria) stanno nel blocco parenti."
+}
