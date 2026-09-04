@@ -584,6 +584,11 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .sibling-nav__link.is-next { text-align: right; }
 .sibling-nav__link.is-disabled { border-style: dashed; opacity: 0.4; pointer-events: none; }
 
+.dimension-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 18px 0; }
+.dimension-nav__label { color: var(--ink-soft); font-size: 13px; }
+.dimension-nav__link { padding: 5px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; }
+.dimension-nav__link:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+
 .viz-stage { min-width: 0; }
 .viz-tabs { display: none; }
 .viz-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "map ranking" "trend trend"; gap: 18px; align-items: start; }
