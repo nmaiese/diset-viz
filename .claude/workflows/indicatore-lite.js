@@ -72,11 +72,11 @@ const PERCORSI = {
           // comandi che verrebbero altrimenti eseguiti sul livello di default:
           // una prosa provinciale verificata contro le cifre regionali e poi
           // scritta come articolo regionale non fa fallire niente.
-          livello: { type: ['string', 'null'] },
+          livello: { anyOf: [{ type: 'string' }, { type: 'null' }] },
           // L'ultimo anno del dato. Viaggia fino agli scout, che cercano su
           // quell'anno invece di dedurlo aprendo il dossier: un agente deve
           // ricevere, non cercare, perché i turni sono il costo.
-          anno: { type: ['number', 'null'] },
+          anno: { anyOf: [{ type: 'number' }, { type: 'null' }] },
           anomalie: { type: 'array', items: { type: 'string' } },
         },
       },
@@ -98,10 +98,10 @@ const CLAIM = {
           claim: { type: 'string' },
           istituzione: { type: 'string' },
           url: { type: 'string' },
-          data_pubblicazione: { type: ['string', 'null'] },
-          territorio: { type: ['string', 'null'] },
-          periodo: { type: ['string', 'null'] },
-          unita: { type: ['string', 'null'] },
+          data_pubblicazione: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+          territorio: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+          periodo: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+          unita: { anyOf: [{ type: 'string' }, { type: 'null' }] },
           citazione: { type: 'string' },
           relation_type: {
             type: 'string',
@@ -111,12 +111,12 @@ const CLAIM = {
           // dicono dove sta l'Italia rispetto ad altri paesi, perché quelli si
           // giudicano su cose che gli altri non hanno (definizione,
           // denominatore, tipo di media, anno che quasi mai coincide).
-          usage: { type: ['string', 'null'], enum: ['external_comparison', null] },
-          confidenza: { type: ['string', 'null'] },
+          usage: { anyOf: [{ type: 'string', enum: ['external_comparison'] }, { type: 'null' }] },
+          confidenza: { anyOf: [{ type: 'string' }, { type: 'null' }] },
         },
       },
     },
-    note: { type: ['string', 'null'] },
+    note: { anyOf: [{ type: 'string' }, { type: 'null' }] },
   },
 }
 
@@ -153,7 +153,7 @@ const BOZZA = {
         properties: { testo: { type: 'string' }, url: { type: 'string' } },
       },
     },
-    correzioni: { type: ['array', 'null'], items: { type: 'string' } },
+    correzioni: { anyOf: [{ type: 'array', items: { type: 'string' } }, { type: 'null' }] },
   },
 }
 
@@ -183,14 +183,14 @@ const VERDETTO = {
           dove: { type: 'string' },
           cosa_dice_il_testo: { type: 'string' },
           cosa_dicono_i_dati: { type: 'string' },
-          gravita: { type: ['string', 'null'] },
+          gravita: { anyOf: [{ type: 'string' }, { type: 'null' }] },
         },
       },
     },
     verificate: { type: 'number' },
     classi_passate: { type: 'array', items: { type: 'string', enum: CLASSI } },
     bloccanti: { type: 'array', items: { type: 'string' } },
-    bozza_salvata: { type: ['string', 'null'] },
+    bozza_salvata: { anyOf: [{ type: 'string' }, { type: 'null' }] },
     // Obbligatoria, e con i campi obbligatori dentro: era `['object', 'null']`
     // con tutto facoltativo, cioè uno schema che permetteva di ometterla, e
     // ometterla valeva come farla coincidere.
@@ -206,7 +206,7 @@ const VERDETTO = {
         fonti: { type: 'number' },
       },
     },
-    note: { type: ['string', 'null'] },
+    note: { anyOf: [{ type: 'string' }, { type: 'null' }] },
   },
 }
 
@@ -287,14 +287,14 @@ const PUBBLICATO = {
   required: ['scritto'],
   properties: {
     scritto: { type: 'boolean' },
-    sovrascritto: { type: ['boolean', 'null'] },
+    sovrascritto: { anyOf: [{ type: 'boolean' }, { type: 'null' }] },
     // `lab.pubblica` stampa anche il vintage di quello che c'era prima. Senza
     // questo campo l'agente lo butta via prima del journal, e il cruscotto
     // puo' dire che una pagina e' stata rifatta ma non quale dato ha coperto:
     // e' la meta' dell'informazione che serve a decidere se e' stato un bene.
-    vintage_precedente: { type: ['string', 'number', 'null'] },
-    percorso: { type: ['string', 'null'] },
-    parole: { type: ['number', 'null'] },
+    vintage_precedente: { anyOf: [{ type: 'string' }, { type: 'number' }, { type: 'null' }] },
+    percorso: { anyOf: [{ type: 'string' }, { type: 'null' }] },
+    parole: { anyOf: [{ type: 'number' }, { type: 'null' }] },
     // L'identita' della prosa scritta su disco, che il sito ricalcola dal file
     // servito per dire se la pagina in linea e' questa o una precedente. Non e'
     // il `digest` di `improntaDi` qui sopra: quello congela la **bozza** prima
@@ -302,7 +302,7 @@ const PUBBLICATO = {
     // pubblicata una bozza diversa da quella verificata. Senza questo campo il
     // cruscotto confronta le sole parole, e due riscritture della stessa
     // lunghezza si leggono `in linea` mentre in produzione c'e' ancora l'altra.
-    impronta_prosa: { type: ['string', 'null'] },
+    impronta_prosa: { anyOf: [{ type: 'string' }, { type: 'null' }] },
     // Quello che i controlli deterministici trovano ancora sul testo scritto.
     // Non ferma piu' la scrittura (fermare all'ultimo passo buttava la run senza
     // riparare niente): dice se il passaggio che doveva chiuderli ha funzionato.
@@ -330,7 +330,7 @@ const PUBBLICATO = {
         },
       },
     },
-    uscita: { type: ['string', 'null'] },
+    uscita: { anyOf: [{ type: 'string' }, { type: 'null' }] },
   },
 }
 
