@@ -1,0 +1,26 @@
+{
+ "proposti_da": "data-journalist",
+ "data": "2026-09-04",
+ "angoli": [
+  {
+   "id": "coppia_di_testa_non_nord_sud",
+   "notizia": "La percezione di inquinamento vicino casa non segue la mappa Nord-Sud: nel 2025 le tre aree sono quasi identiche, mentre Lazio e Campania restano da soli in cima in ogni anno verificabile.",
+   "punto_debole": "Le macroaree sono calcolate solo per il 2025."
+  },
+  {
+   "id": "divario_in_allargamento_a_scosse",
+   "notizia": "La distanza fra la regione piu' alta e la piu' bassa e' piu' ampia oggi che nel 2018, ma e' cresciuta a scatti.",
+   "punto_debole": "La traiettoria non e' monotona e mancano tre anni dalla matrice."
+  }
+ ],
+ "preferito_dal_giornalista": "coppia_di_testa_non_nord_sud",
+ "verifica_del_lead_sulle_macroaree": {
+  "composizione_2025": {"Nord": 6, "Centro": 4, "Mezzogiorno": 7},
+  "tolta_la_regione_piu_estrema": {
+   "Centro senza Lazio": 8.8,
+   "Nord senza Lombardia": 10.84,
+   "Mezzogiorno senza Campania": 9.68
+  },
+  "conclusione": "L'appiattimento delle tre aree e' un artefatto: ogni area e' tenuta su da una regione sola. Quindi non si scrive 'le tre aree si somigliano' come se fosse un fatto stabile. Cio' che resta vero e' che le quattro regioni in cima appartengono ad aree diverse."
+ }
+}

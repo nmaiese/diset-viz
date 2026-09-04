@@ -1,0 +1,29 @@
+{
+ "revisore": "skeptical-editor",
+ "verdetto": "da_correggere",
+ "gravita_alta": 4,
+ "gravita_media": 3,
+ "gravita_bassa": 1,
+ "rilievi_alta": [
+  "Titolo, angolo, lead e prima sezione dicono che le quattro regioni piu' alte stanno 'una per area', e la prima sezione inventa le Isole come quarta area. Le macroaree del dossier sono tre e Campania e Sicilia stanno entrambe nel Mezzogiorno: l'affermazione e' falsa e sostiene la spina dorsale del pezzo.",
+  "L'h 'Il perche' documentato' promette una spiegazione che il corpo poi nega. Nessuna fonte spiega perche' in una regione si dichiari piu' inquinamento: manca la riga onesta che lo dica.",
+  "'il questionario non specifica se si tratti di aria, acqua o altro' afferma una proprieta' della fonte che la prova non sostiene: il registro SDMX non porta il testo del quesito. Un'assenza di prova diventa un fatto, in due sezioni.",
+  "La sezione sul conferimento in discarica costruisce una regolarita' inversa su due sole regioni scelte agli estremi. La regolarita' non esiste: la Sicilia e' alta su entrambi (16,0 e 33,7), la Lombardia e' alta sulle lamentele e bassa sulla discarica (16,3 e 1,9)."
+ ],
+ "rilievi_media": [
+  "Ispra dice 'bacino padano' e il testo lo converte in Veneto e Piemonte, saltando Lombardia ed Emilia-Romagna che stanno nella stessa area e non allentano niente.",
+  "L'h 'Che cosa cambia per chi vive li'' promette la vita delle persone e il corpo parla solo del decreto e dello stanziamento.",
+  "Il testo mostra solo la cima e due valori del fondo: fra le sei regioni piu' basse quattro sono del Mezzogiorno, e senza quel dettaglio la tesi e' piu' forte della prova."
+ ],
+ "rilievi_bassa": [
+  "Il denominatore famiglie viene dall'etichetta della serie, non da una dichiarazione metodologica, e il pezzo lo tratta come acquisito."
+ ],
+ "classi_senza_rilievi": [
+  "termini vietati: nessuna occorrenza",
+  "caratteri vietati: nessuna occorrenza, accenti scritti correttamente",
+  "media semplice: 11,53 non compare, la trappola e' evitata",
+  "quantificatori temporali: 'nei cinque anni osservabili' con gli anni elencati, e le 17 regioni su 20 dichiarate due volte",
+  "causale sul decreto: la non attribuzione e' scritta in chiaro"
+ ],
+ "nota_al_lead": "Se dopo il giro unico di correzione anche una sola gravita' alta resta aperta, il verdetto diventa ferma."
+}

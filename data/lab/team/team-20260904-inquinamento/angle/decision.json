@@ -1,0 +1,49 @@
+{
+ "deciso_da": "editor-in-chief",
+ "data": "2026-09-04",
+ "giro": "uno solo, come vuole il protocollo",
+ "scelto": "A come spina dorsale (la classifica taglia di traverso la geografia), Ispra come sezione del perche', B declassato a un paragrafo di dinamica riscritto come 'la Campania si stacca'",
+ "motivo": "E' l'unica tesi che il dossier sostiene su piu' anni. Regge sulla classifica, non sulle medie di macroarea, che il revisore ha dimostrato fragili. E lascia spazio a una fonte esterna datata e verificata come stringa (Ispra 2024) per il paragrafo sul meccanismo, che e' il vincolo del proprietario.",
+ "scartati": [
+  {
+   "angolo": "il divario Nord-Sud",
+   "prova_che_lo_scarta": "Nella classifica 2025 le quattro regioni piu' alte sono Campania, Lazio, Lombardia e Sicilia: una per ogni area del paese. E i raggruppamenti per valore che il dossier trova non ricalcano le tre aree."
+  },
+  {
+   "angolo": "le tre aree del paese si somigliano (Nord 11,75, Mezzogiorno 11,64, Centro 11,0)",
+   "prova_che_lo_scarta": "Ricalcolo del lead: il Centro sono quattro regioni, il Nord sei su otto, il Mezzogiorno sette su otto. Togliendo la Lombardia il Nord scende a 10,84, togliendo la Campania il Mezzogiorno a 9,68, togliendo il Lazio il Centro a 8,80. L'ordine si ribalta con una regione sola: non e' un fatto, e nessuna cifra di macroarea entra nel pezzo."
+  },
+  {
+   "angolo": "il divario fra la regione piu' alta e la piu' bassa si allarga, da 11,3 a 17,8",
+   "prova_che_lo_scarta": "Sono due regioni sole. Il fondo della classifica e' fermo (Marche 5,2 nel 2018, Umbria 5,6 nel 2025): tutto l'allargamento e' la Campania che si stacca. La tesi giusta e' quella, non un divario."
+  },
+  {
+   "angolo": "Campania 23,4 nel 2025, seconda solo al 26,0 del 2020",
+   "prova_che_lo_scarta": "26,0 e' il massimo storico dell'intera matrice, non della serie campana, e il 2019, il 2020 e il 2021 non sono nella matrice ridotta: il confronto non e' verificabile."
+  },
+  {
+   "angolo": "il decreto Terra dei Fuochi spiega la salita del 2025",
+   "prova_che_lo_scarta": "La fonte lo qualifica come contesto e la data del campo della rilevazione non e' nota: il decreto del 30 luglio 2025 puo' essere posteriore alle interviste. Entra come fatto istituzionale datato, mai come causa."
+  },
+  {
+   "angolo": "gli eccessi di tumori della Terra dei Fuochi",
+   "prova_che_lo_scarta": "Arriva da riprese di stampa di uno studio del 2016, non dall'Istituto Superiore di Sanita' direttamente. Il registro delle fonti secondarie ammette solo istituzioni."
+  }
+ ],
+ "cifre_vietate_perche_non_sono_nel_dossier": [
+  "9,98 (media 2024 ricalcolata sulle 17 regioni del 2025)",
+  "1,55 (variazione annua comparabile)",
+  "12,0 (distanza senza la Campania)",
+  "qualunque media di macroarea"
+ ],
+ "nota": "Sono ricalcoli corretti del revisore, e proprio per questo non si scrivono: il controllo deterministico cerca ogni cifra nel dossier e le segnerebbe non trovate. La conseguenza editoriale e' che la variazione annua nazionale non si racconta affatto.",
+ "condizioni_perche_non_diventi_falso": [
+  "Nessuna cifra di macroarea. La prova e' la classifica.",
+  "Mai 'sempre' o 'da anni': 'nei cinque anni osservabili', dicendo che 2019, 2020 e 2021 mancano.",
+  "17 regioni su 20, senza Valle d'Aosta, Molise e Trentino Alto Adige.",
+  "Mai 'in Italia' davanti a una media delle regioni, in nessuna sezione.",
+  "E' una percezione dichiarata: mai 'l'aria e' piu' inquinata', mai 'sta peggio'.",
+  "Ispra dice 'bacino padano': tradurlo in nomi di regione sarebbe un'inferenza attribuita a Ispra, gravita alta.",
+  "Terra dei Fuochi come fatto datato, mai come causa."
+ ]
+}

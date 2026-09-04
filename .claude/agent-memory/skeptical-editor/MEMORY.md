@@ -129,6 +129,44 @@ giudizi su persone e agenti, segreti, token o dati personali.
   recheck_after: 2027-03-01
   ambito: qualunque articolo in cui una fonte esterna viene ridimensionata in revisione
   limiti: non è un divieto di citare fonti di contesto, vale quando la voce porta cifre che il corpo ha deciso di non usare.
+
+- categoria: difetto ricorrente del dossier, variazione annua su panel mutevole
+  apprendimento: >-
+    `dinamica.delta_1a` e `dinamica.media_per_anno` confrontano medie semplici
+    calcolate su insiemi di regioni diversi da un anno all'altro. Prima di
+    lasciar scrivere una variazione annua, ricalcolare la media dell'anno
+    precedente sulle sole regioni presenti nell'ultimo anno: se la differenza
+    cambia oltre un decimo, la cifra del dossier misura anche la composizione e
+    non solo il fenomeno. La conseguenza editoriale è dura: la cifra corretta
+    non sta nel dossier, quindi il controllo deterministico la segnerebbe non
+    trovata, e l'unica uscita onesta è non raccontare affatto la variazione.
+  evidenza: >-
+    ims-MULTI_ZONA_INQUINAMENTO, 2026-09-04: la media 2024 vale 9,56 su
+    diciannove regioni e 9,98 sulle diciassette del 2025; il delta_1a nazionale
+    passa da 1,97 a 1,55. Ricalcolo rifatto dal lead nella stessa run.
+  verified_on: 2026-09-04
+  recheck_after: 2027-03-01
+  ambito: qualunque dossier con il blocco `buchi` popolato e il blocco dinamica
+  limiti: irrilevante sulle famiglie con copertura piena e stabile.
+
+- categoria: criterio di gravità, angolo sul divario che si allarga
+  apprendimento: >-
+    Il verdetto `convergenza`/`divergenza` poggia sulla differenza fra massimo e
+    minimo, cioè su due territori soli. Rifare il conto senza il territorio
+    estremo: se il verdetto sparisce, l'angolo non è un divario che si allarga
+    ma un territorio che si stacca, ed è gravità alta finché il titolo parla di
+    divario. Controllare anche il fondo della classifica: se il minimo è fermo,
+    tutto il movimento sta da un lato solo.
+  evidenza: >-
+    ims-MULTI_ZONA_INQUINAMENTO: lo spread passa da 11,3 (2018) a 17,8 (2025),
+    ma senza la Campania da 11,3 a 12,0, con il fondo fermo (Marche 5,2 nel
+    2018, Umbria 5,6 nel 2025). Verificato dal lead nella run.
+  verified_on: 2026-09-04
+  recheck_after: 2027-03-01
+  ambito: conferenza d'angolo su qualunque indicatore con il blocco convergenza
+  limiti: >-
+    se il movimento coinvolge più territori ai due capi il verdetto regge e la
+    voce non si applica.
 ```
 
 Ogni pattern va verificato contro la bozza corrente. La memoria può aprire una
