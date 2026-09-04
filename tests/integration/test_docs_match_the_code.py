@@ -16,6 +16,7 @@ minima, ed è la ragione per cui il file non è stato cancellato con il resto: �
 il posto dove si dichiara che cosa esiste.
 """
 
+import json
 import os
 import re
 import unittest
@@ -180,6 +181,48 @@ class IlGateDiPubblicazioneECompleto(unittest.TestCase):
                 self.assertIn(requisito, testo)
         self.assertIn("ritorna exit code 0 anche quando", testo)
         self.assertIn("secondo controllo non è", testo)
+
+
+MARKETPLACE = PLUGIN.parent / ".claude-plugin" / "marketplace.json"
+
+
+@unittest.skipUnless(MARKETPLACE.exists(), "repo platform non presente (MOTORE_PLUGIN_DIR)")
+class IlMarketplaceDelPluginHaUnSoloNome(unittest.TestCase):
+    """Il 03/09 `settings.json` registrava il marketplace come `platform`,
+    ma `platform/.claude-plugin/marketplace.json` si chiama `platform-locale`:
+    con quel nome il plugin non esisteva, e nelle sessioni cloud non si
+    caricava (#206, #208). In locale non si vedeva perché `settings.local.json`
+    aveva già il nome giusto. Il nome è uno, lo decide `marketplace.json`, e
+    `settings.json` e `CLAUDE.md` lo ripetono: qui si controlla che lo
+    ripetano uguale."""
+
+    def setUp(self):
+        self.market = json.loads(MARKETPLACE.read_text(encoding="utf-8"))
+        self.settings = json.loads(
+            (RADICE / ".claude" / "settings.json").read_text(encoding="utf-8")
+        )
+
+    def test_settings_registra_il_marketplace_con_il_suo_nome(self):
+        nome = self.market["name"]
+        self.assertIn(nome, self.settings.get("extraKnownMarketplaces", {}),
+                      f"settings.json non dichiara il marketplace `{nome}`")
+
+    def test_ogni_plugin_abilitato_esiste_con_quel_nome(self):
+        nome = self.market["name"]
+        plugin_esistenti = {p["name"] for p in self.market["plugins"]}
+        for chiave, attivo in self.settings.get("enabledPlugins", {}).items():
+            if not attivo:
+                continue
+            plugin, _, marketplace = chiave.partition("@")
+            with self.subTest(plugin=chiave):
+                self.assertEqual(marketplace, nome,
+                                 f"`{chiave}` punta a un marketplace che non esiste")
+                self.assertIn(plugin, plugin_esistenti)
+
+    def test_claude_md_nomina_il_marketplace_giusto(self):
+        testo = (RADICE / "CLAUDE.md").read_text(encoding="utf-8")
+        self.assertIn(f"`{self.market['name']}`", testo,
+                      "CLAUDE.md non nomina il marketplace con il nome vero")
 
 
 if __name__ == "__main__":
