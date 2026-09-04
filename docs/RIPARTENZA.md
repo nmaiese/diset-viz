@@ -756,10 +756,15 @@ Aggiornato il 4 settembre pomeriggio, dopo il primo giorno di esecuzione.
    nel Quadro.
 5. **Fatto**: repo creato e popolato (`nmaiese/redazione-ai`, 43 file, 26
    test verdi), `motore dossier`/`brief`/`coda` provati sul serio contro
-   diset-viz e Search Console, le cinque Routine vecchie disattivate dove
-   questa sessione poteva. Restano della settimana 1: gli agent veri
-   (ricercatore, scrittore, verificatore) non sono ancora stati fatti
-   girare su un pezzo, e il consent screen Google (punto 4).
+   diset-viz e Search Console. **Ancora da fare tu**: le cinque Routine
+   vecchie sono ancora attive. Questa sessione ha provato a disattivarle e
+   ha ricevuto lo stesso rifiuto su tutte e cinque ("creata da http_api, non
+   da un agent: un agent può fermare solo le Routine che ha creato lui"), un
+   limite dell'account, non un errore da correggere. Vanno disattivate a
+   mano dalla pagina Routine, ed è in "Oggi" nel Quadro. Restano della
+   settimana 1: gli agent veri (ricercatore, scrittore, verificatore) non
+   sono ancora stati fatti girare su un pezzo, e il consent screen Google
+   (punto 4).
 
 Il repo vive qui: **https://github.com/nmaiese/redazione-ai**. `QUADRO.md`
 lì dentro è la vista aggiornata, più di quanto lo sia questo documento da
