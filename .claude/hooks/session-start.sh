@@ -38,6 +38,21 @@ fi
 # Quando il cruscotto verra' rifatto (issue #187) dira' lui di che cosa ha
 # bisogno, invece di ereditare un formato pensato per stadi che non esistono.
 
+# --- Plugin motore: registro popolato prima possibile ------------------------
+# Nelle sessioni cloud la dichiarazione in .claude/settings.json
+# (extraKnownMarketplaces.platform-locale + enabledPlugins) non viene eseguita
+# all'avvio: `claude plugin marketplace list` risulta vuoto (#206, #208).
+# Il rimedio a monte e' il setup script dell'ambiente (claude.ai/code →
+# Environments), che gira prima dell'avvio di Claude Code. Questo blocco e'
+# la rete di sicurezza nel repo: idempotente, e se il setup script ha gia'
+# fatto il lavoro non cambia niente. Se questa sessione NON vede comunque
+# gli agent motore:*, il hook e' arrivato troppo tardi per questo processo:
+# vale per il prossimo.
+if [ -d /home/user/platform ]; then
+  claude plugin marketplace add /home/user/platform >/dev/null 2>&1 || true
+  claude plugin install motore@platform-locale >/dev/null 2>&1 || true
+fi
+
 # --- Python: venv + requirements (critico per test e gunicorn) --------------
 # L'install gira solo quando requirements.txt cambia davvero: l'hash sta in
 # .venv/.requirements.sha256. Prima reinstallava a ogni sessione, cioe' un
