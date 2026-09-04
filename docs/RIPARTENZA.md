@@ -404,7 +404,7 @@ file resta sotto le trecento righe: quando cresce, la parte vecchia va in
 `QUADRO.md`, la prima schermata:
 
 ```
-# Quadro, giovedì 4 settembre 2026, 08:00
+# Quadro, venerdì 4 settembre 2026, 08:00
 
 ## Oggi
 Da fare tu
@@ -549,7 +549,7 @@ il candidato naturale: gli articoli sono Markdown in un repo, la pubblicazione
 
 ## 5. Le tappe
 
-Oggi è giovedì 4 settembre. Quattro settimane, e poi due mesi senza toccare la
+Oggi è venerdì 4 settembre. Quattro settimane, e poi due mesi senza toccare la
 struttura.
 
 ### Settimana 1, fino all'11 settembre: fermare e fondare
