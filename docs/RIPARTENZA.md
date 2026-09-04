@@ -734,15 +734,33 @@ appoggia sopra e non aggiunge posti.
 
 ## 9. Che cosa mi serve da te
 
-1. Una decisione sul gate a monte. I tuoi hub dicono "brief e merge restano
-   gate umani". Il gate sul brief (Gate A) in due giorni non è mai stato
-   attraversato e domani ferma la Routine. Propongo di rovesciarlo: la coda
-   propone e scrive le idee nella sezione "Idee" del Quadro, la run prende
-   la prima che tu non hai cancellato. Il veto resta tuo, l'attesa no. Se invece vuoi il gate
-   opt-in, la Routine gira solo sui giorni in cui hai spuntato un'idea la
-   sera prima, e lo si scrive così.
-2. Dire se `redazione` è un repo nuovo o `platform` svuotato. Consiglio nuovo.
-3. Consent screen Google in Production e un token nuovo per Blogger e AdSense
-   (dieci minuti nella console, una volta).
-4. Un sì sulla settimana 1. Da lì eseguo: repo, documenti, migrazione del
-   codice, ambiente, prime cinque pagine da leggere.
+Aggiornato il 4 settembre pomeriggio, dopo il primo giorno di esecuzione.
+
+1. ~~Una decisione sul gate a monte.~~ **Deciso**: il gate sul brief non
+   esiste più, la coda propone e tu hai il veto sulle idee.
+2. ~~Repo nuovo o `platform` svuotato.~~ **Fatto, con una sorpresa**: questa
+   sessione non può creare repository (permesso negato all'integrazione,
+   non aggirabile) né cancellare centinaia di file uno per uno in modo
+   sensato. Tu hai creato il repo vuoto, ed è nato con il nome
+   **`nmaiese/redazione-ai`** (non "redazione", già preso o riservato).
+   `nmaiese/platform` resta intatto, non toccato: tutta la sua storia
+   (plugin, intent, ledger, evals, 21 agent) resta lì come archivio, senza
+   bisogno di un tag apposito. Nel resto di questo documento e nel §3.1,
+   dove leggi `redazione/` come nome di cartella o di repo, il repo vero è
+   `nmaiese/redazione-ai`.
+3. ~~Team con memoria.~~ **Deciso**: niente team parallelo, ma ricercatore e
+   verificatore hanno memoria di progetto (`.claude/agent-memory/<ruolo>/MEMORIA.md`),
+   propongono candidati, la sessione che guida la run li promuove.
+4. Consent screen Google in Production e un token nuovo per Blogger e AdSense
+   (dieci minuti nella console, una volta): **ancora da fare**, è in "Oggi"
+   nel Quadro.
+5. **Fatto**: repo creato e popolato (`nmaiese/redazione-ai`, 43 file, 26
+   test verdi), `motore dossier`/`brief`/`coda` provati sul serio contro
+   diset-viz e Search Console, le cinque Routine vecchie disattivate dove
+   questa sessione poteva. Restano della settimana 1: gli agent veri
+   (ricercatore, scrittore, verificatore) non sono ancora stati fatti
+   girare su un pezzo, e il consent screen Google (punto 4).
+
+Il repo vive qui: **https://github.com/nmaiese/redazione-ai**. `QUADRO.md`
+lì dentro è la vista aggiornata, più di quanto lo sia questo documento da
+adesso in poi.
