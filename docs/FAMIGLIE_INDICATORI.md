@@ -148,6 +148,17 @@ apre **uno solo**, `indicatori_regione_sesso.xlsx`:
   ripartizione territoriale (macro-aree, non le 20 regioni), mai aperto
 - `Metadati.xlsx`: definizioni testuali dei 153 indicatori, mai aperto
 
+**Non è una famiglia di id da collegare, a differenza della sezione 1**: un
+indicatore BES ha un **unico** `CODICE` (es. `01SAL001`), con `SESSO` come
+colonna della fonte che assume i tre valori sulla stessa riga concettuale,
+non tre id Istat separati come 345/346/347 nel catalogo storico.
+`config/indicator_families.csv` (sotto, punto aperto 2) non copre BES per
+questo: non c'è nulla da collegare, c'è solo uno smettere di scartare una
+colonna nel convertitore, estendendo lo schema di
+`Assoluti_BES_Regione.csv` con una dimensione `sesso` sulla riga esistente.
+È lavoro del passo (b) ("estendere la raccolta"), non del passo (a)
+("mappare le famiglie").
+
 Anche nel file usato la colonna `SESSO` è **già strutturata**
 (`Maschi`/`Femmine`/`Totale`, non testo nel titolo), e
 `scripts/update_bes_regions.py:151` tiene solo le righe `Totale`:
@@ -205,6 +216,9 @@ Serve un terzo concetto, "famiglia di misura", distinto dagli altri due.
 - Dati: `app/data.py`, `scripts/update_data.py`, `scripts/update_bes_regions.py`,
   `config/istat_series.yaml`, `scripts/istat_regional_source.py`, i codelist
   in `data/provincia/`.
+- Mappatura delle famiglie (catalogo storico): `config/indicator_families.csv`
+  (curato), `scripts/generate_indicator_families.py`,
+  `tests/unit/test_indicator_families.py`.
 - Routing e vista: `app/views.py:1145` (rotta `/indicatore/<slug>/<id>`),
   `app/indicator_view.py` (`build_indicator_view`, i "parenti").
 - Contenuto: `content/indicators/<id>.json`, uno per id oggi, sezioni con
@@ -244,16 +258,22 @@ passo (a) li affronta prima di scrivere codice.
    femmine né il collegamento fra i tre id di una famiglia), ma ora ha un
    controllo di completezza indipendente per verificarlo. Per BES (sezione
    3) il parser sul titolo non serve: la dimensione è già una colonna
-   `SESSO` con il valore vero (Maschi/Femmine/Totale), ma va incrociata con
-   la copertura per regione, non solo con la presenza dell'id (un id con
-   maschi/femmine solo per l'Italia o qualche regione non è una famiglia
-   completa). Resta aperto per `indicatori_eta_sesso.xlsx` e i due file
-   titolo di studio del BES, non ancora guardati in dettaglio, e per quando
-   si estenderà al livello provincia.
-2. **File generato o curato a mano?** Come `config/theme_categories.csv`
-   (curato) o rigenerato a ogni aggiornamento dati (automatico, poi rivisto)?
-   I titoli cambiano raramente: probabile che generato-poi-rivisto sia giusto,
-   ma va deciso, non assunto.
+   `SESSO` con il valore vero (Maschi/Femmine/Totale) sullo stesso id, ma va
+   incrociata con la copertura per regione, non solo con la presenza
+   dell'id (un id con maschi/femmine solo per l'Italia o qualche regione
+   non ha la dimensione completa su tutte e 20). Resta aperto per
+   `indicatori_eta_sesso.xlsx` e i due file titolo di studio del BES, non
+   ancora guardati in dettaglio, e per quando si estenderà al livello
+   provincia.
+2. **File generato o curato a mano? Deciso il 4 settembre notte: curato**,
+   come `config/theme_categories.csv`, non rigenerato a ogni aggiornamento
+   dati. Fatto per il catalogo storico: `config/indicator_families.csv` (30
+   famiglie, 89 righe, le stesse verificate in sezione 1), prodotto da
+   `scripts/generate_indicator_families.py` (rilanciato a mano, non parte
+   della pipeline automatica) e controllato da
+   `tests/unit/test_indicator_families.py`. Copre solo il catalogo storico:
+   BES non ha famiglie di id da collegare (sezione 3), quindi non c'è nulla
+   da aggiungere qui per BES.
 3. **Schema del contenuto**: un file per famiglia in `content/indicators/`
    (quale slug/id lo rappresenta?) o un nuovo `content/famiglie/<chiave>.json`
    separato dai file per id, che restano per compatibilità? Tocca anche gli

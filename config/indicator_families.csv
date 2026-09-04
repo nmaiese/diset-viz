@@ -1,0 +1,90 @@
+family_key;source;indicator_id;dimension;value;added_by;added_at;note
+adulti_che_partecipano_all_apprendimento_permanente;territorial;198;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Adulti che partecipano all'apprendimento permanente
+adulti_che_partecipano_all_apprendimento_permanente;territorial;197;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Adulti che partecipano all'apprendimento permanente
+adulti_che_partecipano_all_apprendimento_permanente;territorial;99;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Adulti che partecipano all'apprendimento permanente
+diffusione_della_pratica_sportiva;territorial;206;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Diffusione della pratica sportiva
+diffusione_della_pratica_sportiva;territorial;205;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Diffusione della pratica sportiva
+diffusione_della_pratica_sportiva;territorial;125;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Diffusione della pratica sportiva
+giovani_che_abbandonano_prematuramente_i_percorsi_di_istruzione_e_formazione_professionale;territorial;200;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Giovani che abbandonano prematuramente i percorsi di istruzione e formazione professionale
+giovani_che_abbandonano_prematuramente_i_percorsi_di_istruzione_e_formazione_professionale;territorial;199;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Giovani che abbandonano prematuramente i percorsi di istruzione e formazione professionale
+giovani_che_abbandonano_prematuramente_i_percorsi_di_istruzione_e_formazione_professionale;territorial;102;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Giovani che abbandonano prematuramente i percorsi di istruzione e formazione professionale
+grado_di_soddisfazione_del_servizio_di_trasporto_ferroviario_a_livello_regionale;territorial;210;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale
+grado_di_soddisfazione_del_servizio_di_trasporto_ferroviario_a_livello_regionale;territorial;209;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale
+grado_di_soddisfazione_del_servizio_di_trasporto_ferroviario_a_livello_regionale;territorial;172;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Grado di soddisfazione del servizio di trasporto ferroviario a livello regionale
+incidenza_della_disoccupazione_di_lunga_durata;territorial;180;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Incidenza della disoccupazione di lunga durata
+incidenza_della_disoccupazione_di_lunga_durata;territorial;179;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Incidenza della disoccupazione di lunga durata
+incidenza_della_disoccupazione_di_lunga_durata;territorial;16;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Incidenza della disoccupazione di lunga durata
+indice_di_utilizzazione_del_trasporto_ferroviario_1;territorial;212;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Indice di utilizzazione del trasporto ferroviario (1)
+indice_di_utilizzazione_del_trasporto_ferroviario_1;territorial;211;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Indice di utilizzazione del trasporto ferroviario (1)
+indice_di_utilizzazione_del_trasporto_ferroviario_1;territorial;46;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Indice di utilizzazione del trasporto ferroviario (1)
+laureati_in_scienza_e_tecnologia;territorial;196;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Laureati in scienza e tecnologia
+laureati_in_scienza_e_tecnologia;territorial;194;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Laureati in scienza e tecnologia
+laureati_in_scienza_e_tecnologia;territorial;90;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Laureati in scienza e tecnologia
+livello_di_istruzione_della_popolazione_15_19_anni;territorial;190;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Livello di istruzione della popolazione 15-19 anni
+livello_di_istruzione_della_popolazione_15_19_anni;territorial;189;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Livello di istruzione della popolazione 15-19 anni
+livello_di_istruzione_della_popolazione_15_19_anni;territorial;77;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Livello di istruzione della popolazione 15-19 anni
+minori_a_rischio_di_poverta_o_esclusione_sociale_europa_2030;territorial;363;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Minori a rischio di povertà o esclusione sociale - Europa 2030
+minori_a_rischio_di_poverta_o_esclusione_sociale_europa_2030;territorial;364;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Minori a rischio di povertà o esclusione sociale - Europa 2030
+minori_a_rischio_di_poverta_o_esclusione_sociale_europa_2030;territorial;361;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Minori a rischio di povertà o esclusione sociale - Europa 2030
+minori_in_condizione_di_grave_deprivazione_materiale_e_sociale_europa_2030;territorial;370;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Minori in condizione di grave deprivazione materiale e sociale - Europa 2030
+minori_in_condizione_di_grave_deprivazione_materiale_e_sociale_europa_2030;territorial;369;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Minori in condizione di grave deprivazione materiale e sociale - Europa 2030
+minori_in_condizione_di_grave_deprivazione_materiale_e_sociale_europa_2030;territorial;368;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Minori in condizione di grave deprivazione materiale e sociale - Europa 2030
+non_occupati_che_partecipano_ad_attivita_formative_e_di_istruzione;territorial;188;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Non occupati che partecipano ad attività formative e di istruzione
+non_occupati_che_partecipano_ad_attivita_formative_e_di_istruzione;territorial;187;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Non occupati che partecipano ad attività formative e di istruzione
+non_occupati_che_partecipano_ad_attivita_formative_e_di_istruzione;territorial;67;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Non occupati che partecipano ad attività formative e di istruzione
+occupati_che_partecipano_ad_attivita_formative_e_di_istruzione;territorial;186;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Occupati che partecipano ad attività formative e di istruzione
+occupati_che_partecipano_ad_attivita_formative_e_di_istruzione;territorial;185;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Occupati che partecipano ad attività formative e di istruzione
+occupati_che_partecipano_ad_attivita_formative_e_di_istruzione;territorial;63;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Occupati che partecipano ad attività formative e di istruzione
+persone_a_rischio_di_poverta_o_esclusione_sociale_europa_2030;territorial;360;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Persone a rischio di povertà o esclusione sociale - Europa 2030
+persone_a_rischio_di_poverta_o_esclusione_sociale_europa_2030;territorial;359;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Persone a rischio di povertà o esclusione sociale - Europa 2030
+persone_a_rischio_di_poverta_o_esclusione_sociale_europa_2030;territorial;285;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Persone a rischio di povertà o esclusione sociale - Europa 2030
+persone_in_condizioni_di_grave_deprivazione_materiale_e_sociale_europa_2030;territorial;367;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Persone in condizioni di grave deprivazione materiale e sociale - Europa 2030
+persone_in_condizioni_di_grave_deprivazione_materiale_e_sociale_europa_2030;territorial;366;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Persone in condizioni di grave deprivazione materiale e sociale - Europa 2030
+persone_in_condizioni_di_grave_deprivazione_materiale_e_sociale_europa_2030;territorial;365;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Persone in condizioni di grave deprivazione materiale e sociale - Europa 2030
+popolazione_residente_nei_comuni_rurali;territorial;246;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Popolazione residente nei comuni rurali
+popolazione_residente_nei_comuni_rurali;territorial;247;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Popolazione residente nei comuni rurali
+popolazione_residente_nei_comuni_rurali;territorial;245;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Popolazione residente nei comuni rurali
+specializzazione_produttiva_nei_settori_ad_alta_tecnologia;territorial;421;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Specializzazione produttiva nei settori ad alta tecnologia
+specializzazione_produttiva_nei_settori_ad_alta_tecnologia;territorial;420;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Specializzazione produttiva nei settori ad alta tecnologia
+specializzazione_produttiva_nei_settori_ad_alta_tecnologia;territorial;419;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Specializzazione produttiva nei settori ad alta tecnologia
+speranza_di_vita_alla_nascita;territorial;912;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Speranza di vita alla nascita
+speranza_di_vita_alla_nascita;territorial;911;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Speranza di vita alla nascita
+speranza_di_vita_alla_nascita;territorial;910;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Speranza di vita alla nascita
+tasso_di_attivita_totale_della_popolazione;territorial;203;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di attività totale della popolazione
+tasso_di_attivita_totale_della_popolazione;territorial;213;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di attività totale della popolazione
+tasso_di_disoccupazione;territorial;176;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di disoccupazione
+tasso_di_disoccupazione;territorial;175;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di disoccupazione
+tasso_di_disoccupazione;territorial;12;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso di disoccupazione
+tasso_di_disoccupazione_di_lunga_durata;territorial;184;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di disoccupazione di lunga durata
+tasso_di_disoccupazione_di_lunga_durata;territorial;183;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di disoccupazione di lunga durata
+tasso_di_disoccupazione_di_lunga_durata;territorial;17;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso di disoccupazione di lunga durata
+tasso_di_disoccupazione_giovanile;territorial;174;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di disoccupazione giovanile
+tasso_di_disoccupazione_giovanile;territorial;230;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di disoccupazione giovanile
+tasso_di_disoccupazione_giovanile;territorial;15;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso di disoccupazione giovanile
+tasso_di_istruzione_terziaria_nella_fascia_d_eta_30_34_anni;territorial;342;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di istruzione terziaria nella fascia d'età 30-34 anni
+tasso_di_istruzione_terziaria_nella_fascia_d_eta_30_34_anni;territorial;340;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di istruzione terziaria nella fascia d'età 30-34 anni
+tasso_di_istruzione_terziaria_nella_fascia_d_eta_30_34_anni;territorial;339;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso di istruzione terziaria nella fascia d'età 30-34 anni
+tasso_di_occupazione;territorial;178;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione
+tasso_di_occupazione;territorial;177;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione
+tasso_di_occupazione;territorial;13;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione
+tasso_di_occupazione_20_64_anni;territorial;347;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione 20-64 anni
+tasso_di_occupazione_20_64_anni;territorial;346;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione 20-64 anni
+tasso_di_occupazione_20_64_anni;territorial;345;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione 20-64 anni
+tasso_di_occupazione_della_popolazione_straniera;territorial;482;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione della popolazione straniera
+tasso_di_occupazione_della_popolazione_straniera;territorial;481;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione della popolazione straniera
+tasso_di_occupazione_della_popolazione_straniera;territorial;455;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione della popolazione straniera
+tasso_di_occupazione_giovanile;territorial;476;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione giovanile
+tasso_di_occupazione_giovanile;territorial;475;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione giovanile
+tasso_di_occupazione_giovanile;territorial;407;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione giovanile
+tasso_di_occupazione_over_54;territorial;182;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione over 54
+tasso_di_occupazione_over_54;territorial;181;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione over 54
+tasso_di_occupazione_over_54;territorial;14;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso di occupazione over 54
+tasso_di_partecipazione_nell_istruzione_secondaria_superiore;territorial;192;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso di partecipazione nell'istruzione secondaria superiore
+tasso_di_partecipazione_nell_istruzione_secondaria_superiore;territorial;191;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso di partecipazione nell'istruzione secondaria superiore
+tasso_di_partecipazione_nell_istruzione_secondaria_superiore;territorial;248;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso di partecipazione nell'istruzione secondaria superiore
+tasso_giovani_neet;territorial;478;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Tasso giovani NEET
+tasso_giovani_neet;territorial;477;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Tasso giovani NEET
+tasso_giovani_neet;territorial;408;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Tasso giovani NEET
+utilizzo_di_mezzi_pubblici_di_trasporto_da_parte_di_occupati_studenti_scolari_e_utenti_di_mezzi_pubblici;territorial;208;sesso;femmine;scripts/generate_indicator_families.py;2026-09-04;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici
+utilizzo_di_mezzi_pubblici_di_trasporto_da_parte_di_occupati_studenti_scolari_e_utenti_di_mezzi_pubblici;territorial;207;sesso;maschi;scripts/generate_indicator_families.py;2026-09-04;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici
+utilizzo_di_mezzi_pubblici_di_trasporto_da_parte_di_occupati_studenti_scolari_e_utenti_di_mezzi_pubblici;territorial;129;sesso;totale;scripts/generate_indicator_families.py;2026-09-04;Utilizzo di mezzi pubblici di trasporto da parte di occupati, studenti, scolari e utenti di mezzi pubblici
