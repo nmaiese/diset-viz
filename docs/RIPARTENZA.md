@@ -6,7 +6,14 @@ dice che cosa c'è davvero, perché non produce, e come si riparte da zero con
 una struttura che regge due siti oggi e un terzo domani.
 
 Non è un documento di contratto: è il piano. Quando sarà eseguito, il nuovo
-repo di redazione avrà i suoi cinque documenti e questo andrà in archivio.
+repo di redazione avrà il suo Quadro e i suoi quattro documenti, e questo
+andrà in archivio.
+
+La visione d'insieme in una frase: **un file solo, `QUADRO.md`, è l'unica
+cosa che leggi tu e la prima cosa che legge ogni sessione**. PR, run,
+metriche, idee, piano e decisioni ci confluiscono, e nessuno di quei posti
+va più guardato per sapere a che punto siamo. Il §3.5 lo descrive, il §8
+dice come si costruisce.
 
 Perimetro di ciò che ho letto: i tre repository per intero (con due
 ricognizioni delegate su `platform` e `pid`), lo storico git e delle PR di
@@ -177,12 +184,15 @@ strutturate, con una risposta in cima, sono quelle che un assistente cita.
    attacco, sezioni a scelta, lunghezza a scelta fra 500 e 900 parole.
 5. **Massimo tre agenti per pezzo, due giri di correzione.** Oltre, il pezzo
    si ferma e va nella coda umana con il motivo scritto.
-6. **Lo stato è un file, riscritto a ogni run.** Chi apre `STATO.md` dal
-   telefono vede tutto: cosa è uscito, cosa è in PR, cosa si è fermato e
-   perché, quanto è costato.
-7. **Documentazione: cinque file, mai di più.** Se serve un sesto, uno dei
-   cinque era sbagliato. Il registro (idee, piano, stato, pubblicati,
-   lezioni) non è documentazione: è il prodotto delle run, e lo scrivono loro.
+6. **Un posto solo per guardare: il Quadro.** Un file, `QUADRO.md`,
+   riscritto a ogni run, che chi apre dal telefono legge dall'alto: che cosa
+   devi fare tu, che cosa è successo, il piano, le idee, le decisioni. Ogni
+   altra sorgente (PR, run, metriche, Drive) ci confluisce e non si consulta
+   più direttamente.
+7. **Documentazione: quattro file più il Quadro, mai di più.** Se serve un
+   sesto, uno dei cinque era sbagliato. Il Quadro non è documentazione: è il
+   prodotto delle run e delle tue decisioni, ognuna nella sua sezione, con
+   un solo scrittore per sezione.
 8. **Si misura sul lettore**: clic e impression delle pagine riscritte, prima
    e dopo, a 30 giorni. Non righe di codice, non test, non punteggi interni.
 9. **Il rischio numero uno è la sesta riscrittura.** Il piano si esegue in
@@ -201,12 +211,11 @@ redazione/                       repo nuovo (o platform svuotato e rinominato)
   README.md                      che cos'è, come si lancia una run, come si legge lo stato
   CLAUDE.md                      <= 60 righe: regole assolute e mappa dei cinque file
   REDAZIONE.md                   il contratto del pezzo: brief, voce, guardie, forma
+  QUADRO.md                      LA vista: oggi, piano, idee, decisioni, pubblicati, lezioni
   registro/
-    IDEE.md                      gli intenti: una riga ciascuno, tre stati
-    PIANO.md                     il piano in corso: tappe, date, esito
-    STATO.md                     riscritto da ogni run: la vista unica
-    PUBBLICATI.md                l'indice di tutto ciò che è uscito, per sito, generato
-    LEZIONI.md                   la lista del §1.6, una riga per lezione, con data
+    run/<data>-<sito>-<pezzo>.json   un file per run, scritto dalla run: l'unico log
+    PUBBLICATI.md                l'indice completo di ciò che è uscito, generato
+    metriche/<data>.csv          GA4 e Search Console, un file al giorno
   siti/
     divarioitalia.md             come si sceglie, si calcola, si verifica, si pubblica lì
     praticandoildiritto.md       idem, con le regole del dominio legale
@@ -365,79 +374,89 @@ pavimenti, il lint, la `burstiness`, il conteggio dei tell, la skill
 `scrittura-italiana` da 429 righe più nove reference. Gli esempi in
 `content/esempi/` fanno il lavoro che quelle regole non hanno fatto.
 
-### 3.5 Il registro: intenti, piani, attività, monitoraggio, pubblicati
+### 3.5 Il Quadro: un posto solo per intenti, piano, attività, monitoraggio, pubblicati
 
-Oggi queste cinque cose stanno in cinque posti in tre repo (intent e roadmap
-in platform, PR e cruscotto in diset-viz, i doc `00-stato` in pid, le sessioni
-nell'app). Domani stanno in `redazione/registro/`, cinque file, e le run li
-tengono aggiornati. Tu li leggi dall'app GitHub, in ordine:
+Oggi queste cose stanno in otto posti: gli intent e la roadmap in platform,
+le PR e il cruscotto in diset-viz, le issue, i doc `00-stato` in pid, le
+sessioni nell'app, i quattro hub su Drive, il ledger. Ognuno è parziale, e
+per sapere dove siamo li devi aprire tutti. La causa non è il numero di
+strumenti: è che nessuno era stato dichiarato **il** posto, quindi ogni
+pezzo di lavoro ne ha scelto uno suo.
 
-| file | che cosa contiene | chi lo scrive |
+Domani il posto è uno: `redazione/QUADRO.md`. Non è un cruscotto in più
+accanto agli altri, è ciò che li sostituisce. Sei sezioni, sempre nello
+stesso ordine, ognuna con un solo scrittore:
+
+| sezione | che cosa contiene | chi la scrive |
 | --- | --- | --- |
-| `STATO.md` | la vista unica: da fare tu, ultime run, la settimana, la coda | ogni run, e la Routine "Stato" alle 08:00 |
-| `IDEE.md` | gli intenti, una riga ciascuno: `- [ ] sito, cosa, perché, chi l'ha proposta, data`. Tre stati: idea (casella vuota), in corso (link alla PR), fatto (link alla pagina). La coda ne propone, tu ne aggiungi dal telefono modificando il file | tu, la coda, le run |
-| `PIANO.md` | il piano in corso: questo documento ridotto alle tappe, con data e esito di ognuna. Un piano solo alla volta | tu e la Routine "Settimanale" |
-| `PUBBLICATI.md` | l'indice di tutto ciò che è uscito, per sito: data, pezzo, URL, PR, costo, clic a 30 giorni. Generato dai contenuti dei due siti e da Search Console | la Routine "Stato" |
-| `LEZIONI.md` | una riga per lezione, con data e la run che l'ha pagata | le run quando si fermano, tu |
+| **Oggi** | da fare tu (PR da leggere e mergiare, decisioni aperte, guasti), le ultime dieci run con esito e costo, la settimana in tre righe, la coda dei prossimi cinque | generata da `motore quadro`, a ogni run e alle 08:00 |
+| **Piano** | le tappe di questo piano con data e stato (`fatta`, `in corso`, `saltata: perché`) | tu cambi le tappe, `motore quadro` aggiorna lo stato dalle run |
+| **Idee** | gli intenti, una riga ciascuno, tre stati: `[ ]` idea, `[~]` in corso con link alla PR, `[x]` fatta con link alla pagina | tu aggiungi righe (dall'app GitHub, tre tocchi), la coda ne propone, le run le spuntano |
+| **Decisioni** | visione, principi, decisioni fissate e aperte: i tre hub di Drive distillati in trenta righe, con la data di ogni decisione | solo tu |
+| **Pubblicati** | gli ultimi trenta pezzi per sito con data, PR, costo, clic a 30 giorni. L'indice completo sta in `registro/PUBBLICATI.md` | `motore quadro` |
+| **Lezioni** | una riga per lezione, con data e la run che l'ha pagata | le run quando si fermano, e tu |
 
-Le attività in volo restano dove GitHub le mostra meglio: **una PR per pezzo**,
-con il testo leggibile nel corpo, e **un'issue per ogni run fermata**
-(template già esistente in diset-viz, da spostare qui). `STATO.md` le elenca
-con il link. Non serve un project board, non serve una tabella su Supabase:
-un file per lo stato, una PR per il lavoro, un'issue per il guasto.
+Le sezioni generate stanno fra marcatori (`<!-- generato -->` ... `<!-- fine -->`)
+e il generatore riscrive solo quelle. Le tue sezioni non le tocca mai. Il
+file resta sotto le trecento righe: quando cresce, la parte vecchia va in
+`registro/`, non in una sezione nuova.
 
-`STATO.md`, una schermata:
+`QUADRO.md`, la prima schermata:
 
 ```
-# Redazione, 4 settembre 2026, 08:00
+# Quadro, giovedì 4 settembre 2026, 08:00
 
-## Da fare tu
-- PR diset-viz#213 aperta da 1 giorno: ims-MULTI_ZONA_INQUINAMENTO (2 rilievi media)
-- pid: token Blogger scaduto il 3/9, rifare il consenso
-- IDEE.md: 3 idee proposte dalla coda, da confermare o cancellare
+## Oggi
+Da fare tu
+- [ ] merge PR diset-viz#215, ter-104: livello di istruzione (4,2 $, 1 rilievo media)
+- [ ] pid: token Blogger scaduto il 3/9, rifare il consenso
+- [ ] 3 idee proposte dalla coda qui sotto, da tenere o cancellare
 
-## Ultime run
-| quando | sito | pezzo | esito | costo | PR |
-| 4/9 07:30 | divarioitalia | ter-104 | PR aperta | 4,2 $ | #215 |
-| 3/9 07:30 | divarioitalia | ter-13 | pubblicato | 3,8 $ | #204 |
-| 3/9 07:30 | praticandoildiritto | procura-speciale-querela | fermato: 2 fonti non rispondono | 1,1 $ | issue #7 |
+Ultime run
+| 4/9 07:30 | divarioitalia | ter-104 | PR aperta #215 | 4,2 $ |
+| 3/9 07:30 | divarioitalia | ter-13 | pubblicato | 3,8 $ |
+| 3/9 07:30 | praticandoildiritto | procura-speciale | fermata: 2 fonti non rispondono | 1,1 $ |
 
-## Questa settimana
-- divarioitalia: 4 pubblicati, 1 in PR, 1 fermato. Clic 30 gg: 96 (+12%)
-- praticandoildiritto: 0 pubblicati (bloccato), audit: 83 da rivedere
+Settimana: divarioitalia 4 pubblicati, 1 in PR, 1 fermata, clic 30 gg 96 (+12%).
+praticandoildiritto: bloccato, audit 83 da rivedere.
 
-## Piano: settimana 2 di 4, tappa "cinque pezzi letti da te": 3 su 5
+Coda: ter-281, ter-901, ter-12, ter-17, bes-02IST
 
-## La coda (prossimi 5)
+## Piano: settimana 2 di 4
+- [x] settimana 1, fondare (11/9)
+- [~] settimana 2, cinque pezzi letti da te: 3 su 5
 ...
 ```
 
-Tre canali verso il telefono, tutti senza codice nuovo:
+Che cosa sparisce perché il Quadro lo assorbe:
 
-1. **`registro/`** nell'app GitHub: la vista completa in cinque file, il primo
-   basta quasi sempre.
-2. **Le PR** nell'app GitHub, con il pezzo leggibile nel corpo: il merge è un
-   tocco. Un'idea nuova è una riga in `IDEE.md`, modificabile dall'app.
-3. **Le notifiche push delle Routine** (l'opzione esiste per le Routine che
-   creano una sessione nuova): una riga a fine run, "ter-104: PR aperta, 4,2 $".
+- **le issue**: una run fermata è una riga in "Oggi" con il motivo, non
+  un'issue. Il template "routine fermata" si butta;
+- **i quattro hub su Drive**: la loro parte di visione e decisioni diventa la
+  sezione "Decisioni", scritta una volta e datata. Su Drive resta un solo
+  documento, la copia del Quadro che la Routine delle 08:00 deposita ogni
+  mattina, così lo leggi anche dall'app Drive se preferisci. Drive non è più
+  una sorgente: è uno specchio;
+- **il cruscotto `/_pipeline`**, il ledger, la roadmap generata, gli intent
+  come file;
+- **le PR come posto da guardare**: restano, perché il merge è il tuo gate e
+  l'app GitHub lo fa con un tocco, ma non le cerchi più: "Oggi" te le elenca
+  con una riga di riassunto e il link. Il corpo della PR contiene il pezzo
+  leggibile, così decidi senza aprire il diff;
+- **i riassunti delle sessioni**: ogni sessione, anche quella che apri tu
+  dal telefono per un lavoro qualsiasi, finisce scrivendo una riga in "Oggi"
+  tramite `motore quadro --nota`. `CLAUDE.md` del repo lo chiede in due
+  righe: leggi il Quadro prima di tutto, scrivi nel Quadro prima di chiudere.
 
-**Drive e git, chi possiede che cosa.** La regola che hai scritto nel
-portfolio ("Drive contiene la vista gestionale, GitHub la verità tecnica")
-regge, a patto di dire dove passa il confine. Drive possiede ciò che cambia
-solo quando decidi tu: visione, principi, priorità, decisioni, l'inbox delle
-idee grezze. Sono i tre hub che esistono già, e restano tre documenti. Il
-registro in git possiede ciò che cambia a ogni run: stato, coda, pubblicati,
-lezioni, e le idee **promosse** a lavoro. Le run non scrivono su Drive e tu
-non scrivi lo stato a mano: ogni cosa ha un solo scrittore. L'unico ponte
-è la Routine "Stato", che oltre a `STATO.md` deposita ogni mattina una copia
-del file come documento "Stato" nella cartella Drive, così la vista completa
-sta anche nell'app Drive. Se un'idea nell'inbox di Drive diventa lavoro, la
-riga passa in `IDEE.md`: un movimento a mano, una riga, una volta.
+Il Quadro è anche **il contesto delle sessioni**: `CLAUDE.md` di `redazione`
+dice "leggi `QUADRO.md`" come prima istruzione. Una sessione che apri dal
+telefono con "che cosa c'è da fare?" risponde leggendo lo stesso file che
+leggi tu, e non un router verso quattordici documenti.
 
-Il cruscotto `/_pipeline` su Supabase, con battito e consuntivo, si spegne: era
-una vista sulle run del workflow, e il workflow non c'è più. Se dopo un mese
-vuoi un grafico dei clic per pagina riscritta, si fa una pagina statica
-generata da `motore stato --html` a partire da `PUBBLICATI.md`, non un'app.
+Verso il telefono arrivano quindi tre cose, e sono tutte lo stesso file:
+il Quadro nell'app GitHub (o la sua copia in Drive), le notifiche push delle
+Routine (che citano le prime tre righe di "Oggi"), e le PR da mergiare che
+"Oggi" elenca.
 
 ### 3.6 Le Routine
 
@@ -447,9 +466,9 @@ Cinque, tutte nell'ambiente `redazione`, tutte con sessione nuova a ogni run:
 | --- | --- | --- |
 | Pezzo divarioitalia | ogni giorno 07:30 | la pipeline del §3.3 su un pezzo dalla coda |
 | Pezzo praticandoildiritto | lun, mer, ven 07:30 | la pipeline su un post da aggiornare (dopo lo sblocco) |
-| Stato | ogni giorno 08:00 | `motore stato`: riscrive `STATO.md` e `PUBBLICATI.md`, push su `redazione/master` (solo `registro/`), copia di `STATO.md` come documento nella cartella Drive |
+| Quadro | ogni giorno 08:00 | `motore quadro`: rigenera le sezioni "Oggi", "Pubblicati" e lo stato del piano, push su `redazione/master`, copia del Quadro come documento nella cartella Drive |
 | Metriche | ogni giorno 05:00 | GA4 e Search Console dei due siti in `redazione/dati/metriche/` (CSV, un file al giorno). Sostituisce il Cloud Run Job `motore-notturno` e BigQuery |
-| Settimanale | venerdì 17:00 | un commento su un'issue fissa "Settimana": cosa è uscito, clic prima e dopo, costo, cosa si è fermato. Nessun postmortem, nessun direttore |
+| Settimanale | venerdì 17:00 | tre righe in "Oggi" e una riga per tappa in "Piano": cosa è uscito, clic prima e dopo, costo, cosa si è fermato. Nessun postmortem, nessun direttore |
 
 Le altre nove Routine di oggi si eliminano. Quelle disattivate da agosto pure.
 
@@ -540,7 +559,10 @@ struttura.
 - Creare `redazione` (svuotare `platform` con tag `archivio-2026-09`, o repo
   nuovo: consiglio il repo nuovo, così la storia di platform resta intatta e
   il nome smette di promettere un orchestratore).
-- Scrivere i cinque documenti. `REDAZIONE.md` lo scrivo io, tu lo correggi:
+- Scrivere `QUADRO.md` a mano la prima volta: "Decisioni" dai tre hub di
+  Drive, "Piano" da questo documento, "Idee" dalle inbox. Da quel giorno è
+  l'unico posto.
+- Scrivere i quattro documenti. `REDAZIONE.md` lo scrivo io, tu lo correggi:
   è il file che decide la qualità.
 - Portare `lab/dossier.py`, `lab/controlla.py`, `lab/coda.py`, il client
   Google di pid e `norme/` di platform in `motore/`, spogliati. Meno di 2.000
@@ -560,7 +582,8 @@ struttura.
 
 ### Settimana 3, fino al 25 settembre: lo stato e la pulizia
 
-- `motore stato`, `STATO.md`, Routine "Stato" e "Metriche", notifiche push.
+- `motore quadro` completo (run, PR, metriche, pubblicati), Routine "Quadro"
+  e "Metriche", notifiche push, copia su Drive.
 - Spegnere `/_pipeline`, le tabelle Supabase, il Cloud Run Job `motore-notturno`,
   gli ambienti `divarioitalia` e `PID`.
 - Togliere da `diset-viz` tutto ciò che il §3.1 elenca, in una PR sola,
@@ -589,12 +612,12 @@ struttura.
 | --- | --- | --- |
 | plugin `motore`, marketplace, `sync-rules`, setup script non versionato | `redazione/.claude/` caricato come repo agganciato | ha rotto le Routine il 4/9, e le copie divergono (già successo a `team_monitor.py`) |
 | 21 agent, 13 skill, 8.037 righe di prompt | 3 agent, 3 skill, < 600 righe | 10 agent e 6 skill mai eseguiti |
-| intent a 6 stati e 6 tipi, Gate A, roadmap, ledger, evals, golden, bande | `registro/` (idee a 3 stati, piano, stato, pubblicati, lezioni), coda dai lettori, PR | zero intent approvati, ledger di un giorno, roadmap stantia, 2 bande cieche |
+| intent a 6 stati e 6 tipi, Gate A, roadmap, ledger, evals, golden, bande | `QUADRO.md` (idee a 3 stati, piano, oggi, decisioni, pubblicati, lezioni), coda dai lettori, PR | zero intent approvati, ledger di un giorno, roadmap stantia, 2 bande cieche |
 | `indicatore-lite` (9 agenti) + Agent Team (5 teammate + lead) + memorie | una pipeline lineare a 3 agent | il confronto lite/team non è mai stato misurato; il team costa 2-8 volte tanto |
 | 5 strati di verifica, rubrica a 10 criteri con pavimenti, lint | 3 guardie deterministiche + 1 lettura con gravità | il difetto vero l'ha trovato il sesto strato |
 | `content/STYLE.md` + rubrica + 4 skill di scrittura | `REDAZIONE.md` + `content/esempi/` | sei documenti sulla stessa cosa |
-| cruscotto `/_pipeline`, Supabase, battito, consuntivo, `team_monitor.py` | `STATO.md` + PR + push | guarda run che non esistono più |
-| 14 documenti + 7 rules + archive in diset-viz, 32 + 94 in platform, 18 in pid | 5 in redazione, 1 `CLAUDE.md` per sito | il contesto di ogni sessione |
+| cruscotto `/_pipeline`, Supabase, battito, consuntivo, `team_monitor.py`, issue, hub su Drive | `QUADRO.md` + PR + push | otto posti per uno stato |
+| 14 documenti + 7 rules + archive in diset-viz, 32 + 94 in platform, 18 in pid | 4 in redazione più il Quadro, 1 `CLAUDE.md` per sito | il contesto di ogni sessione |
 | Cloud Run Job + BigQuery per le metriche | una Routine e CSV in git | due siti, due numeri al giorno |
 | 2 ambienti cloud, 9 Routine | 1 ambiente, 5 Routine | |
 
@@ -616,8 +639,8 @@ motivo per cui il piano è fatto così:
   automatici misurano la cadenza.
 - "Nessun sistema parallelo di stato se Git e metriche coprono già il
   bisogno" e "la piattaforma deve ridurre duplicazione, non spostarla in un
-  altro repository": è il registro del §3.5 e la tabella del §6. Oggi lo
-  stato sta in cinque posti.
+  altro repository": è il Quadro del §3.5 e la tabella del §6. Oggi lo
+  stato sta in otto posti.
 - "Rendere semplice aggiungere un nuovo sito senza copiare agenti o
   connettori": è il §4.3.
 - "Il corpus in Git è la verità editoriale, Blogger il canale", "preservare
@@ -632,34 +655,90 @@ Dove il piano diverge dalle decisioni scritte nei tre hub, e perché:
 | decisione nell'hub | il piano | perché |
 | --- | --- | --- |
 | "Platform è l'hub condiviso" con "plugin Claude Code con agenti, skill, regole, hook e comandi" | resta un repo condiviso (`redazione`), senza plugin: skill e agent caricati come repo agganciato | il plugin ha rotto le Routine il 4/9 e vive su un setup script non versionato. Il repo condiviso resta, cambia il meccanismo di carico |
-| "Gate umano sul brief e sul merge" | gate sul merge, veto sulla coda | Gate A mai attraversato in due giorni, e ferma la produzione (§8, punto 1) |
+| "Gate umano sul brief e sul merge" | gate sul merge, veto sulla coda | Gate A mai attraversato in due giorni, e ferma la produzione (§9, punto 1) |
 | "Chiudere il confronto lite contro Agent Team con canary comparabili" (P0 di entrambi gli hub) | il confronto non si fa: una pipeline sola a tre agent | il costo è già misurato (14-34 $ contro 4 $) e nessuno dei due runtime produce la prosa che vuoi. Il confronto che conta è tu che leggi cinque pezzi (§5, settimana 2) |
 | "Consolidare il ciclo pianificatore, costruttore, revisore" | non si costruisce | tre agent mai eseguiti, e lo sviluppo lo fai già con sessioni normali |
-| "Evoluzione del modello di intent come unico intake" | intent come lista a tre stati in `IDEE.md`, senza tipi e senza roadmap generata | 9 intent reali, 5 sono lavoro fatto su platform stessa, 2 sono template non compilati |
+| "Evoluzione del modello di intent come unico intake" | intent come lista a tre stati nella sezione "Idee" del Quadro, senza tipi e senza roadmap generata | 9 intent reali, 5 sono lavoro fatto su platform stessa, 2 sono template non compilati |
 | "Metriche su GCP" (Cloud Run Job, BigQuery) | una Routine e CSV in git | due siti, un numero al giorno per sito |
 
 Le priorità di prodotto scritte nell'hub di Divario Italia e non toccate da
 questo piano, perché non sono la pipeline editoriale: refresh dei dati fuori
 da git, pagina unica per le famiglie di indicatori (genere, età), redesign
-delle pagine chiave, i giochi con account. Restano nell'hub su Drive come
-priorità di prodotto. Una sola avvertenza: le ultime cinque sessioni cloud
+delle pagine chiave, i giochi con account. Vanno nella sezione "Idee" del
+Quadro come idee di prodotto, così stanno nello stesso posto di tutto il
+resto. Una sola avvertenza: le ultime cinque sessioni cloud
 (41-49 $ l'una) sono andate lì, e la settimana 1-4 di questo piano chiede che
 la redazione passi avanti.
 
 Il portfolio dice anche "far nascere le attività concrete da una priorità o
-idea esplicita, trasformandole poi in issue o intent". Nel piano la frase
-diventa: un'idea nell'inbox di Drive, una riga in `IDEE.md` quando si decide,
-una PR quando è fatta. Tre passaggi, nessuna issue in mezzo salvo i guasti.
+idea esplicita, trasformandole poi in issue o intent" e "evitare duplicazione
+tra Drive, issue GitHub e documentazione dei repo". Nel piano le due frasi
+diventano una: un'idea è una riga in "Idee", una PR quando è fatta, e Drive
+è uno specchio del Quadro. Nessuna issue, nessun intent, nessun hub.
 
 ---
 
-## 8. Che cosa mi serve da te
+## 8. Come la realizziamo
+
+Il Quadro non è un'app: è un file Markdown e un comando Python di circa
+trecento righe che lo rigenera. Tutto il resto è disciplina di scrittura,
+imposta da `CLAUDE.md` e non da un hook. Nell'ordine in cui si costruisce:
+
+**1. Il file, a mano, il primo giorno.** Si crea `QUADRO.md` con le sei
+sezioni. "Decisioni" si scrive distillando i tre hub di Drive (che poi si
+chiudono). "Piano" sono le tappe del §5. "Idee" sono le inbox di Drive più
+le priorità di prodotto. "Oggi", "Pubblicati" e "Lezioni" partono con i
+marcatori vuoti. Da quel momento ogni sessione che apri legge questo file
+per prima: `CLAUDE.md` di `redazione` ha tre righe, e la prima è "leggi
+`QUADRO.md`".
+
+**2. Ogni run lascia una traccia sola.** Quando una run finisce, in
+qualunque modo, scrive `registro/run/<data>-<sito>-<pezzo>.json` con:
+esito (`pubblicato`, `pr_aperta`, `fermata`), pezzo, PR, costo, durata,
+rilievi aperti, motivo se fermata. È l'unico log del sistema: niente ledger,
+niente tabella, niente Supabase. Il costo lo legge dal consuntivo della
+sessione (`baseline_tokens.py` sa già farlo, ridotto a una funzione).
+
+**3. `motore quadro` rigenera le sezioni generate.** Legge: i JSON delle
+run, le PR aperte dei tre repo (API GitHub, il token è già nell'ambiente),
+i CSV delle metriche, `content/indicators/` e `content/posts/` dei due siti
+per i pubblicati. Riscrive "Oggi" e "Pubblicati", aggiorna lo stato delle
+tappe in "Piano" (una tappa con la riga `misura: 5 pezzi letti` si segna da
+sola quando le run la raggiungono), spunta in "Idee" le righe la cui PR è
+mergiata. Commit `quadro <data>` e push su `redazione/master`: è l'unico
+push senza PR del sistema, e tocca solo `QUADRO.md` e `registro/`.
+
+**4. Chi scrive dove.** La regola che rende il Quadro affidabile è che ogni
+sezione ha un solo scrittore, e vale anche per le sessioni interattive:
+`motore quadro --nota "testo"` aggiunge una riga a "Oggi" e `CLAUDE.md`
+chiede di usarlo prima di chiudere qualunque sessione. Tu scrivi solo in
+"Decisioni", "Idee" e "Piano", direttamente dall'app GitHub. Nessuno scrive
+su Drive: la copia del Quadro la deposita la Routine.
+
+**5. Le Routine leggono e scrivono lo stesso file.** La Routine "Pezzo"
+parte leggendo la coda dentro "Oggi" e le "Idee" spuntate, e finisce con il
+JSON della run e `motore quadro`. La Routine "Quadro" delle 08:00 fa solo
+il passo 3 più la copia su Drive. La notifica push a fine run cita le prime
+tre righe di "Oggi". Non esiste una Routine che non passi dal Quadro.
+
+**6. Il primo giorno in cui funziona** è quando apri l'app GitHub sul
+telefono, leggi "Oggi", fai merge di una PR dalla riga che te la indica, e
+la mattina dopo la riga è passata in "Pubblicati" senza che nessuno l'abbia
+spostata. È la tappa "fondare" della settimana 1, e si misura così.
+
+Costo di costruzione: `motore quadro` e il JSON delle run sono due giorni
+di lavoro, dentro la settimana 1. Il resto del piano (pipeline, siti) si
+appoggia sopra e non aggiunge posti.
+
+---
+
+## 9. Che cosa mi serve da te
 
 1. Una decisione sul gate a monte. I tuoi hub dicono "brief e merge restano
    gate umani". Il gate sul brief (Gate A) in due giorni non è mai stato
    attraversato e domani ferma la Routine. Propongo di rovesciarlo: la coda
-   propone e scrive le idee in `IDEE.md`, la run prende la prima che tu non
-   hai cancellato. Il veto resta tuo, l'attesa no. Se invece vuoi il gate
+   propone e scrive le idee nella sezione "Idee" del Quadro, la run prende
+   la prima che tu non hai cancellato. Il veto resta tuo, l'attesa no. Se invece vuoi il gate
    opt-in, la Routine gira solo sui giorni in cui hai spuntato un'idea la
    sera prima, e lo si scrive così.
 2. Dire se `redazione` è un repo nuovo o `platform` svuotato. Consiglio nuovo.
