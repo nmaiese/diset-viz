@@ -1,40 +1,50 @@
 {
+ "angolo_scelto": "Il livello di istruzione degli adulti separa le regioni italiane per quasi venti punti fra la prima e l'ultima, e la media scende dal 2018 con la gran parte del calo concentrata negli ultimi due anni.",
  "fonti": [
   {
-   "testo": "Istat, Livelli di istruzione e ritorni occupazionali, Anno 2024 (3 dicembre 2025): la quota di 25-64enni con almeno un titolo secondario superiore passa in Italia dal 63,0% del 2022 al 66,7% del 2024, contro l'80,5% della media Ue27.",
+   "testo": "Istat, Banca dati territoriale per le politiche di sviluppo",
+   "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
+  },
+  {
+   "testo": "Istat, Livelli di istruzione e ritorni occupazionali, anno 2024 (3 dicembre 2025)",
    "url": "https://www.istat.it/comunicato-stampa/livelli-di-istruzione-e-ritorni-occupazionali-anno-2024/"
   },
   {
-   "testo": "Istat, Livelli di istruzione e ritorni occupazionali, Anno 2024, report integrale: il 22,8% dei 18-24enni con genitori aventi al massimo la licenza media ha abbandonato gli studi prima del conseguimento di una qualifica o di un diploma, quota che scende al 5,3% se almeno un genitore ha un titolo secondario superiore.",
-   "url": "https://www.istat.it/wp-content/uploads/2025/12/Report-Livelli-di-istruzione-e-ritorni-occupazionali-Anno-2024.pdf"
+   "testo": "Eurostat, Educational attainment statistics",
+   "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Educational_attainment_statistics"
   }
  ],
  "key": "104",
- "lead": "Quanti adulti si sono fermati alla licenza media dice com'era la scuola quando erano ragazzi, non com'è adesso, e le due mappe hanno smesso di somigliarsi. La Calabria, sesta in Italia per i giovani che oggi lasciano presto gli studi, resta sedicesima per i titoli degli adulti.",
+ "lead": "Nel 2024 in Umbria il 24,3% delle persone fra 25 e 64 anni ha al massimo la licenza media. In Sicilia lo stesso valore è 44,1%. Fra le venti regioni, contate tutte allo stesso modo, la media è 33,0%.",
  "level": "regione",
- "reviewed_at": "2026-07-29",
- "reviewed_vintage": 2024,
+ "scritto_il": "2026-09-04",
  "sections": [
   {
-   "body": "Istat prende i residenti tra i 25 e i 64 anni che hanno conseguito al più un titolo di istruzione secondario inferiore e li divide per tutti i residenti della stessa età, in media d'anno. Le due parole che reggono tutto sono al più: nel numeratore stanno insieme chi ha la licenza media e chi non ha nessun titolo, e basta un diploma perché una persona ne esca. È un tetto, e del tempo passato sui banchi non dice niente.\n\nLa fascia d'età fa un lavoro preciso: sotto i 25 anni il titolo spesso non è definitivo, e a 64 finisce la fascia che le statistiche del lavoro considerano attiva. Resta la dotazione di titoli che il paese ha in età da lavoro adesso.",
-   "h": "Un tetto raggiunto, non gli anni sui banchi",
+   "body": "L'indicatore conta le persone fra 25 e 64 anni che hanno al più un titolo secondario inferiore, cioè la licenza media o niente. Chi ha il diploma non ci finisce dentro, chi ha la laurea nemmeno. Il confine fra i titoli è quello della classificazione internazionale ISCED: i tre gradini più bassi della scala, quelli che Eurostat chiama basso livello di istruzione. La fascia di età, dai 25 ai 64 anni, è invece quella che Istat usa per questo indicatore. I valori regionali arrivano dalla banca dati territoriale dell'Istat per le politiche di sviluppo. Vale la regola opposta al solito: più il numero è basso, meglio sta la regione.",
+   "h": "Che cosa vuol dire fermarsi alla licenza media",
    "role": "definizione"
   },
   {
-   "body": "La graduatoria del 2024 non scende con regolarità. In fondo quattro regioni stanno per conto loro, con più di due adulti su cinque fermi alla licenza media, e tra loro e la Calabria si apre il salto più largo della classifica. La mediana, 31,15, sta quasi due punti sotto la media: è quella coda a tirarla su.\n\nÈ nel mezzo, però, che la geografia attesa si rompe. L'Abruzzo è sesto, davanti a Veneto, Lombardia, Toscana e Piemonte, e la Valle d'Aosta è quindicesima, a poco più di un punto e mezzo dalla Calabria.\n\nIl mercato del lavoro è solo una parte della posta. Nel rapporto Istat sui livelli di istruzione, tra i 18-24enni con i genitori fermi al più alla licenza media quasi uno su quattro ha lasciato la scuola senza qualifica né diploma, contro il 5,3% di chi ha almeno un genitore diplomato. Istat la chiama un'associazione forte e si ferma lì, ma questa quota descrive anche la casa in cui crescono i ragazzi che a scuola ci sono adesso.\n\nIl flusso che rifornisce questo stock ha una serie sua: l'[uscita precoce dal sistema di istruzione e formazione](/indicatore/uscita-precoce-dal-sistema-di-istruzione-e-formazione/bes-02IST005-N22) conta i 18-24enni fermi alla licenza media e fuori da ogni corso, e ordina le regioni quasi come questa. Quasi: nel 2025 la Calabria è sesta su quella scala, dopo aver tagliato più di tredici punti dal 2018, e qui è ancora sedicesima. Vanno di pari passo senza spiegarsi a vicenda, e il reddito dell'area, che spiegherebbe entrambe, non lo misura nessuna.",
-   "h": "Quattro regioni sole in fondo, e la Valle d'Aosta fuori posto",
+   "body": "Nel 2024 l'Umbria è prima con il 24,3%. Dietro ci sono il Lazio con il 25,2%, il Friuli-Venezia Giulia con il 25,4% e il Trentino Alto Adige con il 27,1%. In fondo la Sicilia sta al 44,1%, preceduta dalla Sardegna con il 43,7%, dalla Puglia con il 43,2% e dalla Campania con il 41,7%. In Umbria si è fermato prima del diploma un adulto su quattro, in Sicilia quasi uno su due.\n\nMesse insieme le regioni, nel 2024 il Nord sta al 30,2% e il Mezzogiorno al 38,2%, otto punti più in alto. La linea però non è netta. L'Abruzzo, con il 28,8%, sta davanti alla Lombardia (30,9%) e al Veneto (30,8%). La Valle d'Aosta, con il 37,0%, è quindicesima e sta dietro alla Basilicata (34,2%) e al Molise (31,4%). La geografia spiega molto e non tutto.",
+   "h": "Quasi venti punti fra la prima e l'ultima",
    "role": "quadro"
   },
   {
-   "body": "Dal 2018 al 2022 la media delle venti regioni si è mossa poco, 1,40 punti in quattro anni. Tra il 2022 e il 2024 ne ha persi 3,70, e nell'ultimo passaggio sono scese tutte e venti. L'accelerazione non è solo nostra: sull'Italia intera Istat misura il complemento di questa quota, i 25-64enni con almeno un titolo secondario superiore, salito dal 63,0% del 2022 al 66,7% del 2024, contro l'80,5% della media Ue27. È un aggregato ponderato, non la media semplice di venti valori regionali, ma si muove nella stessa direzione e della stessa misura.\n\nLa distanza tra la prima e l'ultima, invece, è larga nel 2024 quanto nel 2018, a un decimo di punto. La distribuzione è scivolata giù tenendo le stesse distanze, e chi si è mosso meno l'ha pagato: la Toscana ha perso 2,53 punti in sei anni ed è scesa dall'ottavo al dodicesimo posto, il passo indietro più lungo delle venti.",
-   "h": "Il grosso del calo sta negli ultimi due anni",
+   "body": "Al titolo di studio si accompagna una distanza netta nel lavoro. Secondo Istat, nel 2024 chi ha al più un titolo secondario inferiore risulta occupato molto meno di chi ha un diploma, e ancora meno di chi ha una laurea. Lo stesso comunicato aggiunge che nel Mezzogiorno il divario di occupazione è più ampio proprio per chi ha un titolo basso. Il distacco più largo, quindi, si trova nella parte d'Italia dove gli adulti con titolo basso sono di più.\n\nLe stesse due regioni si ritrovano agli estremi in un'altra classifica di questa raccolta, quella sulla [competenza alfabetica non adeguata alla fine delle medie](/indicatore/competenza-alfabetica-non-adeguata-studenti-classi-iii-scuola-secondaria-primo-g/ter-617), misurata sugli studenti un anno dopo i valori sugli adulti di questa pagina: lì la Sicilia è la più alta con il 53,3% e l'Umbria la più bassa con il 32,7%. Le due classifiche coincidono agli estremi, il che non vuol dire che l'una spieghi l'altra. E non coincidono ovunque: la Valle d'Aosta, quindicesima fra gli adulti, è la migliore d'Italia nella [stessa competenza in quinta superiore](/indicatore/competenza-alfabetica-non-adeguata-studenti-classi-v-scuola-secondaria-secondo-g/ter-623), sempre nella rilevazione più recente sugli studenti, con il 34,0% contro il 60,1% della Campania.",
+   "h": "Titolo basso e lavoro, secondo Istat",
+   "role": "quadro"
+  },
+  {
+   "body": "La media delle venti regioni era 38,1% nel 2018, il primo anno disponibile, ed è 33,0% nel 2024. All'inizio scende piano: 37,1% nel 2020 e ancora 37,1% nel 2021, 36,7% nel 2022, cioè un punto e quattro decimi in quattro anni. Poi il passo cambia, con 34,3% nel 2023 e 33,0% nel 2024, un punto e tre decimi in meno nell'ultimo anno. Il calo c'era già prima, ma quasi tre quarti della distanza percorsa dal 2018 stanno in questi due passaggi.\n\nAnche sull'istruzione che continua dopo la scuola la distanza fra regioni resta ampia. Fra le donne che partecipano all'[apprendimento permanente](/indicatore/adulti-che-partecipano-all-apprendimento-permanente-femmine/ter-198), nel 2024 l'Emilia-Romagna arriva al 14,4% e la Sicilia si ferma al 6,4%.",
+   "h": "La discesa parte dal 2018, il grosso arriva dopo il 2022",
    "role": "dinamica"
   },
   {
-   "body": "Un titolo è una soglia amministrativa e dice poco su quello che una persona sa fare. Chi si è fermato alla licenza media e chi non ha alcun titolo pesano uguale nel numeratore, e il fondo della scala resta invisibile. Le competenze l'atlante le misura altrove, con la [competenza numerica non adeguata a fine terza media](/indicatore/competenza-numerica-non-adeguata-studenti-classi-iii-scuola-secondaria-primo-gra/ter-618), che sui ragazzi di oggi trova differenze della stessa forma.\n\nPoi c'è dove una persona vive, che qui pesa più di dove ha studiato: un laureato che emigra migliora il numero della regione che lo accoglie.\n\nL'ordine tra vicini di classifica, infine, è più fragile di quanto sembri: sono stime campionarie, e l'Umbria e il Lazio, che oggi la aprono, nel 2018 stavano nell'ordine inverso. Il resto della materia sta nel tema [istruzione e formazione](/tema/istruzione-e-formazione).",
-   "h": "Che cosa un titolo di studio non registra",
+   "body": "Il numero fotografa gli adulti di oggi, non la scuola di oggi. Dentro il 44,1% della Sicilia ci sono persone che hanno lasciato la scuola quarant'anni fa e persone che l'hanno lasciata l'anno scorso. Un indicatore fatto così si muove piano.\n\nSopra quella soglia l'indicatore non distingue niente. Un diplomato e un dottore di ricerca contano allo stesso modo, quindi una regione con molti diplomati e pochi laureati può sembrare messa bene.\n\nI numeri disponibili vanno dal 2018 al 2024, e non c'è modo di guardare indietro di dieci anni. La media di cui si parla qui tiene ogni regione con lo stesso peso, la Valle d'Aosta come la Lombardia, e non è il valore dell'Italia. Infine, i numeri che Eurostat pubblica sulla stessa classificazione dei titoli riguardano spesso fasce di età diverse, da 25 a 74 anni oppure da 25 a 34 anni, e non si confrontano con questi senza attenzione.",
+   "h": "Dove il numero smette di dire qualcosa",
    "role": "limiti"
   }
  ],
+ "titolo": "Istruzione degli adulti per regione: dall'Umbria alla Sicilia quasi venti punti di distanza",
  "vintage": 2024
 }
