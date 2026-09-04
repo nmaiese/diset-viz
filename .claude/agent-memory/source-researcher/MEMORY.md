@@ -45,17 +45,32 @@ contenuti provenienti da fonti private.
 
 - categoria: verifica di una citazione
   apprendimento: >-
-    WebFetch parafrasa senza dichiararlo. Due fetch indipendenti che tornano
-    con lo stesso testo alzano la fiducia ma non provano la stringa: la prova è
-    scaricare l'HTML grezzo e cercarci dentro la frase. Su una citazione Istat
-    la prudenza del ricercatore era giustificata e la citazione ha poi superato
-    tutte e due le prove, quindi il metodo separa i casi invece di bocciare
-    tutto.
-  evidence_url: https://noi-italia.istat.it/pagina.php?id=3&categoria=9&action=show&L=0
-  verified_on: 2026-09-03
+    Il fetch riassunto non si limita a parafrasare senza dichiararlo: può
+    **fabbricare una stringa e restituirla fra virgolette come citazione**. Due
+    fetch indipendenti che tornano con lo stesso testo alzano la fiducia ma non
+    provano la stringa: la prova è scaricare l'HTML grezzo e cercarci dentro la
+    frase. Su una citazione Istat la prudenza del ricercatore era giustificata e
+    la citazione ha poi superato tutte e due le prove, quindi il metodo separa i
+    casi invece di bocciare tutto. Chi non ha lo strumento per il grezzo
+    consegna il claim con `verificata: false` e lo passa al lead, che è l'unico
+    che può chiudere la verifica.
+  evidence_url: https://www.isprambiente.gov.it/it/istituto-informa/comunicati-stampa/anno-2025/qualita-dellaria-nel-2024
+  verified_on: 2026-09-04
   recheck_after: 2027-03-01
   ambito: qualunque claim destinato a un articolo
-  limiti: chi non ha uno strumento per il grezzo deve passare la verifica al lead.
+  limiti: >-
+    la prova della fabbricazione è su un documento solo. Vale come motivo per
+    non fidarsi mai di una citazione non riaperta sul grezzo, non come misura di
+    quanto spesso accada.
+  prova_2026_09_04: >-
+    ims-MULTI_ZONA_INQUINAMENTO: un fetch ha restituito fra virgolette "nove
+    stazioni di monitoraggio (...) tutte ricadenti nell'agglomerato
+    Napoli-Caserta, hanno superato per oltre 35 giorni (...) la soglia media
+    giornaliera di 50 µg/m3". Il comunicato scaricato grezzo con curl non
+    contiene né "nove stazioni" né "Napoli-Caserta": dice "superato in 96
+    stazioni, pari al 17% dei casi diffusi soprattutto nell'area del bacino
+    padano, a Napoli e alcuni comuni della pianura campana, nella zona della
+    Valle del Sacco (Fr)". Il claim è stato scartato dal lead.
 
 - categoria: trappola di comparabilità, due misure Istat della stessa area
   apprendimento: >-
