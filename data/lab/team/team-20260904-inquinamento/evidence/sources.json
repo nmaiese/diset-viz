@@ -1,0 +1,71 @@
+{
+ "definizione": {
+  "chiusa": "parzialmente",
+  "prova_del_lead": "Il lead ha scaricato il registro SDMX grezzo (9,6 MB) e ci ha cercato le stringhe, invece di fidarsi di un fetch riassunto.",
+  "url": "https://esploradati.istat.it/SDMXWS/rest/dataflow/IT1/33_291_DF_DCCV_PROBLZONRES_2_6/1.0/?detail=Full&references=all",
+  "citazioni_verbatim": [
+   "Codelist CL_PROBL_ZONRES, nome italiano: Presenza di problemi nella zona di residenza",
+   "Code id=1, nome italiano: inquinamento",
+   "Code id=2, nome italiano: rumori",
+   "Code id=3, nome italiano: criminalita'",
+   "Categoria del dataflow, nome italiano: Inquinamento, criminalita' e rumore nella zona in cui si vive"
+  ],
+  "che_cosa_prova": "L'inquinamento e' una voce sola di una batteria di problemi della zona di residenza, e il rumore e' contato a parte. Quindi il dato non e' un indice ambientale composito e non include il rumore.",
+  "che_cosa_non_prova": "Il registro non porta il testo del quesito posto alle famiglie ne' dice quale inquinamento (aria, acqua, odori). Il denominatore 'famiglie' viene dall'etichetta della serie, non da una dichiarazione metodologica: va detto come limite."
+ },
+ "eventi": [
+  {
+   "claim": "Il 30 luglio 2025 il Consiglio dei ministri ha approvato il decreto-legge Terra dei Fuochi, con 15 milioni di euro per il 2025 al Commissario unico per la rimozione dei rifiuti e l'avvio delle bonifiche nei territori colpiti da roghi e traffici illeciti di rifiuti.",
+   "territorio": "Campania",
+   "periodo": "30 luglio 2025",
+   "relazione": "contesto",
+   "istituzione": "Ministero dell'Ambiente e della Sicurezza Energetica",
+   "url": "https://www.mase.gov.it/portale/-/terra-dei-fuochi-pichetto-e-gava-con-dl-si-alza-livello-guardia-contro-i-reati-ambientali-chi-inquina-paga-",
+   "citazione": "Al Commissario unico, il Generale Giuseppe Vadala', e' autorizzata la spesa di 15 milioni di euro per il 2025 per la rimozione dei rifiuti e l'avvio delle attivita' di bonifica",
+   "verificata": true,
+   "come_verificata": "curl del grezzo da parte del lead, stringa cercata nel testo ripulito dai tag. Trovata."
+  }
+ ],
+ "misura_oggettiva": [
+  {
+   "claim": "Nel 2024 il limite giornaliero di PM10 e' stato superato in 96 stazioni, il 17 per cento, concentrate nel bacino padano, a Napoli e in alcuni comuni della pianura campana e nella Valle del Sacco in provincia di Frosinone.",
+   "istituzione": "Ispra",
+   "anno": "2024, pubblicato nel 2025",
+   "url": "https://www.isprambiente.gov.it/it/istituto-informa/comunicati-stampa/anno-2025/qualita-dellaria-nel-2024",
+   "citazione": "e' stato superato in 96 stazioni, pari al 17% dei casi diffusi soprattutto nell'area del bacino padano, a Napoli e alcuni comuni della pianura campana, nella zona della Valle del Sacco (Fr)",
+   "verificata": true,
+   "come_verificata": "curl del grezzo da parte del lead, stringa cercata nel testo ripulito dai tag. Trovata."
+  },
+  {
+   "claim": "Sempre nel 2024 Ispra registra casi isolati di violazione nella Piana Lucchese, a Terni, a Colleferro, nella pianura Venafrana, a Palermo e a Catania.",
+   "istituzione": "Ispra",
+   "anno": "2024, pubblicato nel 2025",
+   "url": "https://www.isprambiente.gov.it/it/istituto-informa/comunicati-stampa/anno-2025/qualita-dellaria-nel-2024",
+   "citazione": "Isolati casi di violazione nella Piana Lucchese, a Terni, Colleferro (Rm), nella pianura Venafrana (Is), a Palermo e Catania.",
+   "verificata": true,
+   "come_verificata": "curl del grezzo, stringa trovata."
+  },
+  {
+   "claim": "Nel 2024 il PM10 segna una riduzione media di circa il 20 per cento rispetto alla media del decennio 2014-2023, e i limiti sul PM2,5 sono rispettati per la prima volta da quando si effettuano i monitoraggi, dal 2007.",
+   "istituzione": "Ispra",
+   "anno": "2024, pubblicato nel 2025",
+   "url": "https://www.isprambiente.gov.it/it/istituto-informa/comunicati-stampa/anno-2025/qualita-dellaria-nel-2024",
+   "citazione": "una riduzione media di circa il 20% rispetto alla media del decennio 2014-2023",
+   "verificata": true,
+   "come_verificata": "curl del grezzo, stringa trovata."
+  }
+ ],
+ "scartate_dal_lead": [
+  {
+   "claim": "Nove stazioni dell'agglomerato Napoli-Caserta oltre 35 giorni di superamento del PM10.",
+   "motivo": "Non esiste nel testo Ispra. Il fetch riassunto l'aveva restituita come citazione fra virgolette: il grezzo scaricato dal lead non contiene ne' 'nove stazioni' ne' 'Napoli-Caserta'. E' una parafrasi presentata come stringa esatta, esattamente il difetto che la memoria del ricercatore descrive."
+  },
+  {
+   "claim": "Eccessi di mortalita' e di tumori pediatrici nei 55 comuni della Terra dei Fuochi, studio SENTIERI dell'Istituto Superiore di Sanita'.",
+   "motivo": "Arriva da due riprese di stampa, non dall'Istituto Superiore di Sanita' direttamente, e i dati sanitari risalgono all'accordo del 2016, nove anni prima della rilevazione. docs/SECONDARY_SOURCES.md ammette solo istituzioni. Fuori."
+  }
+ ],
+ "europa": [],
+ "europa_motivo": "Eurostat ha un indicatore comparabile per definizione (EU-SILC, modulo housing), ma la ricerca non ha portato il valore italiano da fonte europea come stringa verificabile. Senza il numero italiano il confronto non si scrive, anche perche' l'aggregato UE e' ponderato mentre il valore del dossier e' una media semplice.",
+ "memory_candidates_ricevuti": 3
+}

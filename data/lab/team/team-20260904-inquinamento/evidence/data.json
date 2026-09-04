@@ -1,0 +1,32 @@
+{
+ "indicatore": "ims-MULTI_ZONA_INQUINAMENTO",
+ "strutture": [
+  {"id": "top2_lazio_campania", "descrizione": "Lazio e Campania sono le prime due per valore in tutti e 5 gli anni della matrice ridotta (2018, 2022, 2023, 2024, 2025). L'ordine fra loro si alterna: Lazio primo nel 2018, 2023 e 2024; Campania prima nel 2022 e nel 2025.", "regge_su": "5/5 anni verificabili"},
+  {"id": "macroaree_appiattite", "descrizione": "Nel 2025 le tre macroaree sono quasi indistinguibili: Nord 11,75, Mezzogiorno 11,64, Centro 11,0, divario Nord-Mezzogiorno 0,11. I raggruppamenti per valore non coincidono con la geografia (bonta 0,9 contro bonta_delle_macroaree 0,0): la Puglia sta nel gruppo a prevalenza Nord, la Lombardia in quello con la Sicilia.", "regge_su": "1/1 anno (le macroaree sono date solo per il 2025)"},
+  {"id": "divergenza_non_monotona", "descrizione": "Lo spread passa da 11,3 (2018) a 17,8 (2025), verdetto divergenza, ma la traiettoria oscilla: 11,3 (2018), 16,6 (2022), 14,1 (2023), 15,2 (2024), 17,8 (2025). Tutti gli anni dopo il 2018 stanno sopra il 2018, nessuna crescita costante.", "regge_su": "4/4 anni sopra il 2018, non monotona"},
+  {"id": "rotture_verificabili", "descrizione": "Due rotture su quattro sono ricalcolabili dalla matrice: Friuli-Venezia Giulia da 4,0 (2023) a 14,4 (2024), Emilia-Romagna da 16,5 (2022) a 8,8 (2023). Lazio +8,2 e Sardegna +5,4 nel 2020 cadono in un anno assente dalla matrice ridotta e restano solo dichiarate.", "regge_su": "2/4 riverificabili"}
+ ],
+ "limiti": [
+  {"limite": "La Valle d'Aosta manca in tutti gli anni della matrice, non e' un buco parziale come Basilicata, Molise e Trentino Alto Adige.", "gravita": "alta"},
+  {"limite": "Nel 2025 mancano Molise, Trentino Alto Adige e Valle d'Aosta: il quadro copre 17 regioni su 20.", "gravita": "alta"},
+  {"limite": "dinamica.nazionale.ultimo (11,53) coincide con sintesi.media: e' la media semplice delle 17 regioni disponibili, non un dato Istat nazionale ne' una media ponderata. Vietato scrivere 'in Italia' davanti a quella cifra, e la cautela va ripetuta in ogni sezione che la usa.", "gravita": "alta"},
+  {"limite": "definizione e' null: il dossier non porta il testo del quesito ne' la metodologia.", "gravita": "media"},
+  {"limite": "La matrice ridotta copre 5 anni su 8: mancano 2019, 2020 e 2021, che pero' compaiono nel massimo storico e in due rotture. Un confronto 2018-2025 salta tre anni non verificabili.", "gravita": "media"},
+  {"limite": "Il fenomeno e' una percezione dichiarata dalle famiglie, non una misura strumentale: va tenuto distinto dai parenti oggettivi.", "gravita": "media"}
+ ],
+ "trappole": [
+  "Raccontare un divario Nord-Sud: il dato lo smentisce (0,11 punti, bonta delle macroaree 0,0).",
+  "Trattare i quattro gruppi come zone del paese: sono bande di valore.",
+  "Dire che la Campania e' sempre la peggiore: lo e' in 2 anni su 5.",
+  "Scrivere 'in Italia' davanti alla media semplice.",
+  "Presentare un salto di un anno come tendenza.",
+  "Confrontare 2018 e 2025 come se fosse un trend continuo.",
+  "Usare i parenti oggettivi come spiegazione della percezione: nessuna relazione statistica e' calcolata."
+ ],
+ "parenti_utili": [
+  {"codice": "bes-10AMB004", "nome": "Conferimento dei rifiuti urbani in discarica", "percorso_canonico": "/indicatore/conferimento-dei-rifiuti-urbani-in-discarica/bes-10AMB004", "anno_dati": 2024, "cautela": "Fenomeno oggettivo diverso dalla percezione, anno 2024. Nessuna correlazione calcolata: solo stesso tema."},
+  {"codice": "ter-378", "nome": "Consumi di energia coperti da cogenerazione", "percorso_canonico": "/indicatore/consumi-di-energia-coperti-da-cogenerazione/ter-378", "anno_dati": 2024, "cautela": "Contesto tematico, mai spiegazione causale."},
+  {"codice": "bes-10AMB014", "nome": "Aree protette", "percorso_canonico": "/indicatore/aree-protette/bes-10AMB014", "anno_dati": null, "cautela": "Il dossier non porta i valori regione per regione: link tematico, nessun confronto numerico."}
+ ],
+ "sfida_angolo_ovvio": "L'angolo 'il Sud lamenta piu' inquinamento del Nord' e' smentito dal dossier stesso. La struttura vera e' una coppia di testa Lazio-Campania, con le altre quindici regioni compresse in una fascia stretta indipendente dalla macroarea."
+}

@@ -1,0 +1,47 @@
+{
+ "consultata": ["source-researcher", "skeptical-editor"],
+ "candidati": 5,
+ "promossi": 3,
+ "scartati": 2,
+ "decisioni": [
+  {
+   "da": "skeptical-editor",
+   "categoria": "difetto ricorrente del dossier, variazione annua su panel mutevole",
+   "esito": "promosso",
+   "prova_riaperta_dal_lead": "Il lead ha rifatto il conto: la media 2024 sulle sole 17 regioni presenti nel 2025 vale 9,98 contro il 9,56 del dossier calcolato su 19 regioni, e la variazione annua comparabile scende da 1,97 a 1,55.",
+   "perche_dura": "Vale per ogni dossier con buchi per territorio, non per questo indicatore."
+  },
+  {
+   "da": "skeptical-editor",
+   "categoria": "criterio di gravita, angolo sul divario che si allarga",
+   "esito": "promosso",
+   "prova_riaperta_dal_lead": "Senza la Campania la distanza fra la piu' alta e la piu' bassa nel 2025 vale 12,0 contro 11,3 del 2018, e il fondo della classifica e' fermo (Marche 5,2 nel 2018, Umbria 5,6 nel 2025). Il verdetto di divergenza e' una regione sola.",
+   "perche_dura": "Vale per ogni indicatore con il blocco convergenza."
+  },
+  {
+   "da": "source-researcher",
+   "categoria": "verifica di una citazione",
+   "esito": "promosso come emendamento della voce esistente, non come voce nuova",
+   "prova_riaperta_dal_lead": "In questa run un fetch riassunto ha restituito fra virgolette una citazione che nella pagina non esiste: ne' 'nove stazioni' ne' 'Napoli-Caserta' compaiono nel comunicato Ispra scaricato grezzo con curl. La voce esistente diceva che il fetch parafrasa; adesso si sa che puo' fabbricare una stringa e presentarla come citazione.",
+   "perche_dura": "Cambia il metodo di verifica in ogni run, non solo qui."
+  },
+  {
+   "da": "source-researcher",
+   "categoria": "trappola di comparabilita', Terra dei Fuochi",
+   "esito": "scartato",
+   "motivo": "E' una conclusione sul singolo articolo e su una sola regione. La memoria non conserva conclusioni di un pezzo."
+  },
+  {
+   "da": "source-researcher",
+   "categoria": "dati.istat.it restituisce un redirect",
+   "esito": "scartato",
+   "motivo": "Un solo fetch, un solo dataset, e il lead non l'ha riaperto in questa run. Puo' tornare come voce quando qualcuno lo ricontrolla."
+  },
+  {
+   "da": "source-researcher",
+   "categoria": "WebSearch e le date implicite",
+   "esito": "scartato",
+   "motivo": "Un caso solo, e in parte gia' coperto dalla voce sulla verifica delle citazioni. Non abbastanza per una voce propria."
+  }
+ ]
+}

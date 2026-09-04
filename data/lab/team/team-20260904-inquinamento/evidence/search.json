@@ -1,0 +1,50 @@
+{
+ "query_reali_disponibili": false,
+ "nota_lead": "Il db delle metriche non e' versionato: nel clone cloud `motore metrics query` ha restituito lista vuota. Nessuna query reale di Search Console in questa run.",
+ "altre_misure": [
+  {
+   "claim": "Nel 2024 nove stazioni di monitoraggio dell'agglomerato Napoli-Caserta hanno superato per oltre 35 giorni la soglia giornaliera di PM10 di 50 microgrammi per metro cubo, mentre la media annuale resta sotto il limite di 40 su tutta la rete regionale",
+   "istituzione": "Ispra",
+   "anno": "2024",
+   "territorio": "Campania",
+   "url": "https://www.isprambiente.gov.it/it/istituto-informa/comunicati-stampa/anno-2025/qualita-dellaria-nel-2024",
+   "citazione": "nove stazioni di monitoraggio (...) tutte ricadenti nell'agglomerato Napoli-Caserta, hanno superato per oltre 35 giorni nel corso dell'anno la soglia media giornaliera di 50 µg/m3",
+   "verificata": false
+  },
+  {
+   "claim": "Nel 2024 il PM10 ha superato isolatamente il limite giornaliero nella Valle del Sacco e a Colleferro, in Lazio, mentre sul resto del territorio regionale il limite e' rispettato",
+   "istituzione": "Ispra",
+   "anno": "2024",
+   "territorio": "Lazio",
+   "url": "https://www.isprambiente.gov.it/it/istituto-informa/comunicati-stampa/anno-2025/qualita-dellaria-nel-2024",
+   "citazione": "la Valle del Sacco (Fr) e Colleferro (Rm) hanno registrato isolati superamenti del limite giornaliero di PM10",
+   "verificata": false
+  },
+  {
+   "claim": "A livello nazionale nel 2024 i limiti sul PM2,5 sono stati rispettati per la prima volta da quando e' iniziato il monitoraggio, nel 2007; il PM10 mostra una riduzione media di circa il 20 per cento rispetto alla decade 2014-2023",
+   "istituzione": "Ispra",
+   "anno": "2024",
+   "territorio": "Italia",
+   "url": "https://www.isprambiente.gov.it/it/istituto-informa/comunicati-stampa/anno-2025/qualita-dellaria-nel-2024",
+   "citazione": "riduzione media di circa il 20% rispetto alla media del decennio 2014-2023; Rispettati per la prima volta i limiti da quando si effettuano i monitoraggi (dal 2007)",
+   "verificata": true
+  }
+ ],
+ "europa": [],
+ "europa_motivo_se_vuota": "Eurostat ha un indicatore comparabile per definizione (EU-SILC, modulo housing, 'pollution, grime or other environmental problems'), ma la pagina consultata dichiara l'aggregato UE 2023 e alcuni paesi estremi senza il valore italiano. Senza il numero italiano preso dalla fonte europea il confronto non regge, anche perche' l'aggregato UE e' ponderato sulla popolazione mentre il valore del dossier e' la media semplice delle regioni disponibili.",
+ "intento": {
+  "domanda_principale": "Quante famiglie della mia regione si lamentano dell'inquinamento vicino a casa, e questa percezione corrisponde a quello che dicono le misure sull'aria?",
+  "domande_lettore": [
+   "La mia regione e' tra quelle che si lamentano di piu' o di meno?",
+   "Il dato sta aumentando o diminuendo negli ultimi anni?",
+   "Chi si lamenta di piu' ha ragione, cioe' l'aria li' e' davvero piu' inquinata secondo le centraline?",
+   "Perche' regioni vicine hanno percezioni cosi' diverse?"
+  ],
+  "titolo": "Inquinamento vicino casa: Campania al 23%, Umbria al 5,6%",
+  "description": "Il 23,4% delle famiglie campane lamenta inquinamento vicino casa, il doppio della media italiana: i dati ISPRA sull'aria sono d'accordo?"
+ },
+ "rilievi_del_lead": [
+  "La description proposta dice 'media italiana': vietato, la media 11,53 e' la media semplice delle regioni disponibili, non un dato nazionale Istat. Da riscrivere.",
+  "Due claim Ispra su tre sono verificata: false. Solo il claim nazionale 2024 e' verificato come stringa."
+ ]
+}
