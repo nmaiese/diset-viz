@@ -9,9 +9,9 @@ codice il primo solo se toccano `content/`.
 
 ## Passaggio 1 — Cifre e fonti (blocca)
 
-- Ogni numero nel testo esiste nel dossier dell'indicatore o è un
-  `{{fact:id}}` risolto (`motore verifica divarioitalia <codice> --bozza ...`,
-  nel repo della redazione). Una cifra senza anno, un
+- Ogni numero nel testo esiste nel dossier dell'indicatore
+  (`motore verifica divarioitalia <codice> --bozza ...`, nel repo della
+  redazione). Una cifra senza anno, un
   trend nella direzione sbagliata, un confronto fra livelli diversi
   (regione contro provincia) sono `alta`.
 - Ogni fonte esterna ha URL che risponde, data, e dice davvero ciò che il

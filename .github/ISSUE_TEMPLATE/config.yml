@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Una proposta editoriale o di prodotto
-    url: https://github.com/nmaiese/platform/tree/main/docs/intent
-    about: Le idee non sono issue, sono intent in platform/docs/intent (docs/intent/README.md per lo schema). Il Gate A passa da lì.
+    url: https://github.com/nmaiese/redazione-ai/blob/master/QUADRO.md
+    about: Le idee non sono issue, stanno nel Quadro della redazione (sezione Idee). Da li' passa il gate di Nello.

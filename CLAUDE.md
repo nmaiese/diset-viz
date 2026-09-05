@@ -78,7 +78,7 @@ in `content/indicators/` di qui e `motore pr` apre la PR. Il contratto del pezzo
 
 Qui restano solo gli agganci: `content/indicators/` dove i pezzi atterrano,
 `content/STYLE.md` per la voce, e le regole con scope in `.claude/rules/`
-(`app.md`, `data.md`, `editorial.md`, `frontend.md`, e le tre `motore-*.md`).
+(`app.md`, `data.md`, `editorial.md`, `frontend.md`, `python.md`).
 
 ## Comandi
 

@@ -13,7 +13,7 @@ labels: incidente, infra
 
 ## Dove si è fermata
 
-<!-- Il passo: preliminari (plugin, Gate A), dossier, scout, scrittore, verificatore, pubblicatore, push, PR. -->
+<!-- Il passo della catena della redazione: coda, brief, ricercatore, scrittore, verificatore, pubblica, pr. -->
 
 ## Che cosa ha detto
 
