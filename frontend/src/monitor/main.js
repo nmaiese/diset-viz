@@ -585,7 +585,7 @@ function ordina(righe) {
   else if (come === "famiglia") copia.sort((a, b) => a.famiglia_label.localeCompare(b.famiglia_label, "it") || a.nome.localeCompare(b.nome, "it"));
   else if (come === "parole") copia.sort((a, b) => (b.parole || 0) - (a.parole || 0));
   // `coda` e' l'ordine che sceglie la catena: la prima riga qui e' la stessa che
-  // sceglierebbe `lab.dossier --coda 1`. La console e la catena guardano una
+  // sceglierebbe il primo della coda. La console e la catena guardano una
   // classifica sola.
   else copia.sort((a, b) => (b.punteggio || 0) - (a.punteggio || 0) || a.nome.localeCompare(b.nome, "it"));
   return copia;

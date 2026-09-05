@@ -1,17 +1,17 @@
 """Il metro della prosa, per la catena minima. Misura, non ferma.
 
-Sta in `scripts/` e non in `lab/` perche' lo legge anche l'app servita, e `lab/`
+Sta in `scripts/` e non nella redazione perche' lo legge anche l'app servita, e quella
 non entra nell'immagine Docker: il cruscotto deve contare **gli stessi rilievi**
 che la catena stampa in `esito.articoli[].rilievi`, e un secondo metro darebbe
 due numeri per la stessa pagina. Come `scripts/indicator_store.py`, e' stdlib
 puro: non importa `app`, cosi' resta leggibile da un checkout senza venv.
-`bin/py -m lab.lint` resta il modo di chiamarlo a mano.
+`python3 scripts/prose_lint.py` resta il modo di chiamarlo a mano.
 
 Sostituisce la chiamata a `officina/lint.py`, che non era portabile: 870 righe
 che tirano dentro `packs.build`, `scripts.definition_check` e
 `scripts.verification_queue`, cioè mezza catena vecchia sotto un altro nome.
 
-Qui restano solo le regole che servono a questa catena e che `lab.controlla`
+Qui restano solo le regole che servono a questa catena e che `motore verifica`
 non copre già. Le cifre e le fonti le controlla lui, una per una, contro il
 dossier e contro la pagina rifetchata: ripeterle qui con un metro più grossolano
 produceva rilievi falsi. Sui due articoli della lite il lint di officina ha dato
@@ -19,9 +19,9 @@ tre `cifra-falsa` bloccanti, e **tutte e tre erano volatilità**, dette
 correttamente dal testo e accostate al valore della regione nominata accanto.
 
 Nessun rilievo ferma un articolo: chi pubblica li stampa e basta. Cio' che
-ferma sta in `lab.pubblica._valida`, ed è solo ciò che rende la pagina rotta.
+ferma sta in `motore pubblica`, ed è solo ciò che rende la pagina rotta.
 
-    bin/py -m lab.lint data/lab/articoli/13.json
+    python3 scripts/prose_lint.py --show ter-13
 """
 from __future__ import annotations
 

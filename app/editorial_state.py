@@ -1,15 +1,14 @@
 """Lo stato editoriale dell'atlante: che cosa e' scritto, e che cosa manca.
 
-Un criterio solo, e sta qui. Prima viveva in `lab/coda.py`, che decide che cosa
-scrivere adesso, ma `lab/` non entra nell'immagine Docker e il cruscotto deve
-mostrare **la stessa classifica** che sceglie la catena: due punteggi per la
-stessa domanda divergono, e questo progetto ha gia' pagato per una regola
-copiata in due posti. `lab/coda.py` resta la riga di comando e importa da qui.
+Un criterio solo, e sta qui. La coda della redazione (`motore coda` nel repo
+`nmaiese/redazione-ai`) e il cruscotto devono mostrare **la stessa classifica**:
+due punteggi per la stessa domanda divergono, e questo progetto ha gia' pagato
+per una regola copiata in due posti. La redazione importa da qui, non ricalcola.
 
-`COPY lab/` non era la scorciatoia che sembrava: `lab/pubblica.py` scrive dentro
-`content/indicators/`, e spedire nell'immagine che serve il sito un modulo che
-riscrive articoli pubblici e' una superficie che non si ripaga. E `lab/coda.py`
-importa `app.*`, quindi si chiuderebbe un anello.
+Sta nel sito e non nella redazione per due ragioni. Il cruscotto lo serve
+questa app, che non ha la redazione in immagine; e chi calcola lo stato deve
+leggere `app.*` (catalogo, view model), quindi tenerlo di la' chiuderebbe un
+anello di import.
 """
 
 import hashlib
@@ -24,7 +23,7 @@ from scripts.prose_rules import rilievi as rilievi_prosa
 def parole(entry):
     """Le parole di un articolo: lead piu' i corpi delle sezioni.
 
-    Sta qui e non in `lab/pubblica.py` perche' la usano tutti e due, e il
+    Sta qui e non nella redazione perche' la usano tutti e due, e il
     cruscotto confronta il conteggio dell'articolo servito con quello che la run
     ha registrato: se i due conteggi non sono la stessa funzione, il confronto
     misura la differenza fra due definizioni invece che fra due articoli.
@@ -47,8 +46,8 @@ def impronta_prosa(entry):
     certezza `alta` mentre la pagina in produzione era un'altra: una
     pubblicazione in attesa che spariva dalla vista.
 
-    **Non e' l'impronta della bozza** (`lab.controlla.impronta` e la sua gemella
-    JavaScript `improntaDi` in `.claude/workflows/indicatore-lite.js`), che
+    **Non e' l'impronta della bozza** (quella che `motore verifica` calcola
+    sulla bozza nel repo della redazione), che
     congela il testo *prima* che venga scritto e ci mette dentro anche le fonti,
     per accorgersi se e' finita su disco una bozza diversa da quella verificata.
     Due domande diverse, e i nomi restano diversi apposta: li' si chiede se il

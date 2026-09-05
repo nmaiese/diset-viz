@@ -82,8 +82,9 @@ e `vintage`.
 **Un ruolo assente non è una sezione vuota.** Il template lo compone dai dati, e
 la pagina mantiene lo stesso scheletro. È un fallback funzionante, non una pagina
 finita: serve perché il layout sia uniforme su tutti i 621 indicatori mentre solo
-una parte è passata da un editor. Lo stato di ciascuno si legge con
-`.venv/bin/python -m lab.coda`.
+una parte è passata da un editor. Lo stato di ciascuno lo calcola
+`app/editorial_state.py`, ed è quello che legge la coda della redazione
+(`motore coda divarioitalia`, nel repo `redazione-ai`).
 
 Il testo composto **non** viene congelato nel file, di proposito: così non può
 invecchiare in silenzio dietro un aggiornamento dei dati, e la guardia sul
@@ -118,7 +119,7 @@ Le regole, tutte meccaniche:
   su 52 aprivano allo stesso modo: il freno di sicurezza di un rilascio
   graduale era diventato il motivo per cui il rilascio non partiva. Adesso la
   guardia controlla la coerenza di chi opta, non il fatto che qualcuno opti.
-- **Un ruolo assorbito non è un ruolo mancante.** `lab/coda.py` e
+- **Un ruolo assorbito non è un ruolo mancante.** La coda della redazione e
   `scripts/pending_notes.py` contano contro i ruoli emessi, altrimenti chi
   scrive troverebbe per sempre la `definizione` «da scrivere» e la
   riscriverebbe a ogni giro.
@@ -142,16 +143,16 @@ Lo garantisce `ProseStaysOnTheLevelItWasWrittenFor` in `tests/integration/test_i
 
 ## Scrivere un articolo
 
-Si comincia sempre da qui:
+Si comincia sempre da qui, e **non da questo repo**: il dossier e il brief li
+calcola la redazione, in `nmaiese/redazione-ai`.
 
 ```bash
-bin/py -m lab.dossier ter-178          # il pacchetto: cifre, angoli, contesto
-bin/py -m lab.dossier ter-178              # il testo che si mette davanti a chi scrive
+motore brief divarioitalia ter-178   # il testo che si mette davanti a chi scrive
 ```
 
-Non più `scripts/indicator_brief.py`: è stato **assorbito in `packs/`**, che ne
-era la riscrittura, e il file non esiste più. Chi scrive un articolo adesso non
-lancia niente a mano, lo fa il workflow:
+Il dossier (cifre, angoli, contesto) lo costruisce `motore/dossier.py` di quel
+repo e lo scrive qui in `data/lab/dossier/`. Chi scrive un articolo non lancia
+niente a mano da questo repo:
 
 Il pacchetto è per livello, in ogni sua parte: cifre, stato dell'articolo e
 `vintage` richiesto. Chiudendo, stampa il valore che il campo `level` deve avere.
@@ -293,7 +294,7 @@ indicatori è confrontato con una fixture estratta dal codice precedente, e ogni
 pagina viene resa per verificare che non ci siano 500.
 
 Restano **fuori dai test**, e vanno rivisti a mano. Non a memoria, però:
-`bin/py -m lab.coda` cerca esattamente questi pattern e
+`motore coda divarioitalia` cerca esattamente questi pattern e
 mette in fila gli articoli per quanto è probabile che siano sbagliati. Li
 rilegge la redazione, dove chi scrive si rilegge il proprio testo e a valle il
 verificatore indipendente prova a smentirlo.
@@ -301,14 +302,13 @@ verificatore indipendente prova a smentirlo.
 Un articolo firmato porta **due** campi, `reviewed_at` e `reviewed_vintage`, e
 solo con entrambi esce dalla coda. I due campi restano vivi anche adesso che
 nessun agente firma: li scrivevano il revisore e poi il produttore della catena
-ritirata, e oggi la catena di `lab/` riscrive l'articolo intero con `lab.pubblica`. Il
+ritirata, e oggi la redazione riscrive l'articolo intero con `motore pubblica`. Il
 secondo è il `vintage` che chi ha riletto aveva davanti: quando l'articolo si
 aggiorna su un anno nuovo tutte le
 cifre cambiano, i due valori smettono di combaciare e l'articolo **rientra** in
 coda col segnale `rilettura`, che pesa più di ogni segnale di rischio. Gli altri
 marcano una frase che potrebbe essere sbagliata, quello marca un articolo in cui
-non è stato controllato niente. Vedi
-[`lab/README.md`](../lab/README.md).
+non è stato controllato niente.
 
 - le affermazioni universali su un andamento ("è cresciuto ovunque"): il brief
   ha un blocco apposta, `SI MUOVONO CONTROCORRENTE`,
@@ -387,7 +387,7 @@ la cosa sbagliata. Quattro segnali, in ordine di quanto vale fidarsene:
 | `soglia` | una soglia o una classe di età della fonte non compare da nessuna parte nell'articolo |
 | `termini` | l'articolo riprende meno di un terzo delle parole portanti della definizione. È la rete più larga e la più rumorosa, e per questo **non** entra nella coda |
 
-I primi tre diventano il segnale `definizione` di `lab/lint.py`, che
+I primi tre diventano il segnale `definizione` di `scripts/prose_lint.py`, che
 pesa più di ogni altro, `rilettura` compreso. `scoperto` significa che il codice
 non ha trovato una riga nell'archivio federato: non equivale mai a un controllo
 superato e segnala che una fonte nuova o non aggiornata va recuperata.

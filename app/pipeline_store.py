@@ -12,7 +12,7 @@ La regola che governa tutto il file, e l'unica da non rompere:
     e i due insiemi non si toccano mai.
 
 Il battito arriva mentre la run gira, da chi legge i trascritti
-(`lab/cruscotto.py`), e non conosce i token: il workflow non li conosce. Il
+(il poller che stava in `lab/`), e non conosce i token: il workflow non li conosce. Il
 consuntivo arriva a run finita, dalla lettura degli stessi trascritti con
 `scripts/baseline_tokens.py`, e non conosce lo stato vivo. Se le due sorgenti
 scrivessero le stesse colonne, un consuntivo ripetuto o arrivato in ritardo
@@ -277,7 +277,7 @@ def _riga_run(r, agenti, adesso=None):
         "logs": _carica(r.logs, []),
         "agenti": agenti,
         # La lista e il conteggio sono due cose e vogliono due nomi. Erano la
-        # stessa chiave: `lab/cruscotto.py` mandava `len(agenti)` alla colonna
+        # stessa chiave: il poller mandava `len(agenti)` alla colonna
         # `Integer` e la lettura la riscriveva con la lista, quindi il conteggio
         # era irraggiungibile nel JSON e la console stampava
         # `[object Object],[object Object],...` dove voleva un numero.

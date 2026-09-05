@@ -55,8 +55,9 @@ paths:
   una seconda passata sarebbe un secondo picco di memoria, e una seconda regola
   di indicizzabilità è già costata due pagine contate e mai pubblicate.
   **`indicator_view.indexability()` è l'unico proprietario di quella domanda.**
-  `/_pipeline/beat` è la presa: la scrive `lab/cruscotto.py`, che legge i
-  trascritti **di fianco** al workflow. `{"action":"ping"}` risponde con lo stato
+  `/_pipeline/beat` è la presa, e dal 5 settembre 2026 **non la scrive nessuno**:
+  il processo che lo faceva stava in `lab/`, tolto con la catena editoriale.
+  Le rotte restano vive e mostrano le run vecchie. `{"action":"ping"}` risponde con lo stato
   senza scrivere niente, ed è così che si chiede se la presa è viva prima di
   spendere una run: chiederlo con un `run` finto lasciava una run fantasma in
   cima al cruscotto. Un `run_id` fuori dalla forma dichiarata dallo strumento
@@ -66,7 +67,7 @@ paths:
   `Postino` inghiotte il 400. La difesa contro la riga fantasma è il `ping` più
   `battito_fermo`, che toglie dal posto d'onore una run che nessuno rinfresca da
   un quarto d'ora. Il poller riposta la riga di una run **anche quando non è
-  cambiato niente** (`lab.cruscotto.RINFRESCO_BATTITO`): senza, un turno lungo
+  cambiato niente** a intervallo fisso: senza, un turno lungo
   faceva leggere `battito fermo` con il lettore vivo. Nessun agente della catena batte, e
   nessun prompt lo sa: i turni sono il costo, e il monitoraggio non ne aggiunge.
   Il modello dati (`app/pipeline_store.py`) ha una regola sola da non rompere:

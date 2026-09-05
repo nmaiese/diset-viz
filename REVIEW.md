@@ -56,8 +56,8 @@ codice il primo solo se toccano `content/`.
 
 ## Chi esegue
 
-Oggi: Nello a mano, con `motore validate` e `lab.controlla` come primo
-filtro deterministico (il commento automatico di `editoriale.sh`). Prossimo
+Oggi: Nello a mano, con `motore verifica` (nel repo della redazione) come primo
+filtro deterministico. Prossimo
 passo: lo stesso contratto eseguito da un agente su ogni PR (plugin
 `code-review` o `claude-code-action` in CI), così i tre passaggi sono
 identici per tutte le PR e la persona legge solo i finding.

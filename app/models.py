@@ -139,7 +139,7 @@ class PipelineRun(Base):
     """Una run della catena, che adesso vuol dire **un workflow**.
 
     Le colonne stanno in due gruppi che non si toccano mai, ed è la cosa
-    importante di questa tabella. Il **battito** (`lab.cruscotto --segui`, che
+    importante di questa tabella. Il **battito** (il poller che stava in `lab/`, tolto il 5 settembre 2026, che
     legge i trascritti mentre girano) scrive il primo gruppo e non conosce i
     token, perché il workflow non li conosce. Il **consuntivo** (lo stesso
     lettore, quando vede comparire `<runId>.json`) scrive il secondo e non
