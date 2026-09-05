@@ -31,7 +31,6 @@ SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "")
 # (admin API che elimina l'utente su Supabase Auth). Segreto: Secret Manager.
 SUPABASE_SECRET_KEY = os.getenv("SUPABASE_SECRET_KEY", "")
 # La sola mail ammessa alla console di monitoraggio (sostituisce ?token=).
-MONITOR_ADMIN_EMAIL = os.getenv("MONITOR_ADMIN_EMAIL", "maiese.next@gmail.com")
 
 # Segreto del ping di keep-alive (/_keepalive), come gli altri endpoint interni:
 # se impostato, serve l'header X-Keepalive-Key giusto, altrimenti 404. Vuoto =
@@ -46,15 +45,3 @@ ADSENSE_SLOT_BANNER = os.getenv("ADSENSE_SLOT_BANNER", "")
 GOOGLE_SITE_VERIFICATION = os.getenv("GOOGLE_SITE_VERIFICATION", "")
 BING_SITE_VERIFICATION = os.getenv("BING_SITE_VERIFICATION", "")
 
-# Il token del cruscotto interno della catena (/_pipeline). Se impostato, la
-# rotta serve solo con ?token= corrispondente, altrimenti risponde 404 (non
-# rivela di esistere). Vuoto = aperta, per lo sviluppo in locale.
-PIPELINE_TOKEN = os.getenv("PIPELINE_TOKEN", "")
-
-# Il segreto con cui gli agenti della catena inviano i battiti a /_pipeline/beat
-# (il vivo del cruscotto: chi lavora su cosa, e le PR aperte). Il sito lo scrive
-# nel SQLite che Litestream replica su GCS, così il vivo è condiviso fra le
-# macchine senza credenziali GCP sugli agenti. Vuoto = ingest disabilitato
-# (l'endpoint risponde 404, come /_pipeline senza token), che è il default in
-# locale e finché il segreto non è provisionato in Cloud Run e nell'ambiente agenti.
-PIPELINE_INGEST_TOKEN = os.getenv("PIPELINE_INGEST_TOKEN", "")

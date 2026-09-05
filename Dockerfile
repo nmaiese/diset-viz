@@ -43,14 +43,13 @@ COPY scripts/ scripts/
 COPY packs/ packs/
 # `data/corpus/` e' dentro `data/`, che gia' si copia qui sotto: e' li' che
 # stanno le affermazioni da cui le fonti si derivano.
-# `data/` porta la storia committata della catena che la dashboard legge a runtime
-# (`/_pipeline` e `/_pipeline/api/*`): i diari in `data/pipeline/runs/` (senza i
-# quali la cronologia e' vuota e ogni indicatore risulta "in coda"), le verifiche
-# e la scoperta. Il cruscotto ricava `pubblicata` dagli articoli fusi su master,
-# non da un registro di prove di pubblicazione (quel registro e' stato rimosso).
-# Sono ~2 MB di file versionati. L'effimero (cache, battiti, sqlite) e'
-# gitignored, quindi non entra nel context di Cloud Build. `test_app.py` sorveglia
-# che questa COPY resti, perche' e' un buco che si vede solo in produzione.
+# `data/` serve a runtime: `app/publisher.py` legge `data/source_state.json` per
+# la data dell'ultimo aggiornamento delle fonti. Porta anche la storia committata
+# della catena (diari e verifiche in `data/pipeline/`), che dal 5 settembre 2026
+# nessuna rotta legge piu': resta come archivio. Sono ~2 MB di file versionati.
+# L'effimero (cache, sqlite) e' gitignored, quindi non entra nel context di Cloud
+# Build. `test_app.py` sorveglia che questa COPY resti, perche' e' un buco che si
+# vede solo in produzione.
 COPY data/ data/
 COPY run.py .
 COPY --from=frontend-build /build/app/static/dist app/static/dist

@@ -44,4 +44,3 @@ data/eurostat_cache/
 data/pipeline/cruscotto.html
 data/pipeline/.session_meta.json
 data/pipeline/tool_failures.jsonl
-data/pipeline/heartbeats/

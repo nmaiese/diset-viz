@@ -18,9 +18,6 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, "src/main.jsx"),
         game: resolve(__dirname, "src/game/main.jsx"),
-        // Console di monitoraggio (Fase 4): JS puro, solo supabase-js Realtime,
-        // niente React. pipeline_console.html carica dist/assets/monitor.js.
-        monitor: resolve(__dirname, "src/monitor/main.js"),
         // Controllo login/account nel masthead (Fase 5), su ogni pagina SSR.
         // Vanilla, supabase caricato solo se serve. blog_base.html carica
         // dist/assets/site.js.
