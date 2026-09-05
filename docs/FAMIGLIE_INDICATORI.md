@@ -258,11 +258,28 @@ c. **Fatto, con un vincolo diverso da come scritto qui**: non un selettore
    stesso valore per il lettore, zero rischio sulle URL indicizzate. Non
    copre BES (un id, una pagina, nessun altro id da collegare, sezione 3) né
    provincia (passo b non ancora esteso lì).
-d. **Non iniziato.** `motore/dossier.py`, `motore/brief.py`, `motore/verifica.py`
-   in `nmaiese/redazione-ai` non sanno ancora cosa sia una famiglia.
+d. **Fatto, un pilota pubblicato.** `motore/dossier.py` calcola
+   `divario_genere` (maschi meno femmine, regione per regione, stesso anno)
+   dalle varianti già collegate dal passo (a); `motore/brief.py` lo mostra a
+   chi scrive dentro la sezione "parenti" (non una sezione nuova);
+   `motore/verifica.py` verifica ogni cifra del divario come le altre, senza
+   bisogno di un link (è calcolata, non citata). Il pezzo pilota
+   "Tasso di occupazione 20-64 anni" (`content/indicators/345.json`,
+   `nmaiese/diset-viz#218`) tratta esplicitamente le tre dimensioni
+   (totale/maschi/femmine) e la loro relazione territoriale.
 
-Non blocca la Settimana 2 in corso: i pezzi scritti ora restano con il
-modello attuale, si riscrivono quando la pagina di famiglia è pronta.
+**Stato al 5 settembre 2026: pilota chiuso, in produzione.**
+`nmaiese/diset-viz#217` (passi a/b/c) e `nmaiese/diset-viz#218` (passo d,
+il pezzo) sono mersi su `master` da Nello. Verificato rendendo per davvero
+le tre pagine sul `master` mersato: `/indicatore/tasso-di-occupazione-20-64-anni/ter-345`,
+`.../-maschi/ter-346`, `.../-femmine/ter-347` rispondono 200, mostrano tutte
+e tre il blocco "Lo stesso indicatore, per genere", e la 345 porta il pezzo
+pubblicato. La misura di successo della priorità (famiglia pilota online con
+navigazione fra dimensioni, pezzo di famiglia pubblicato su più dimensioni,
+letto e approvato da Nello) è raggiunta.
+
+Non ha bloccato la Settimana 2: i pezzi scritti nel frattempo restano con il
+modello precedente, si riscrivono se e quando conviene.
 
 ### Età: verificata e chiusa come non disponibile a livello regione
 
@@ -330,16 +347,16 @@ passo (a) li affronta prima di scrivere codice.
    (quale slug/id lo rappresenta?) o un nuovo `content/famiglie/<chiave>.json`
    separato dai file per id, che restano per compatibilità? Tocca anche gli
    URL canonici e i redirect dagli id vecchi.
-4. **Ambito del pilota**: BES (sezione 3) ha **64** indicatori con copertura
-   regionale piena su tutte e 20 le regioni per Totale/Maschi/Femmine (non
-   84: quel numero contava la sola presenza dell'id, non se il valore alle
-   20 regioni fosse un numero vero; non 65: quello contava la presenza
-   della riga anche quando il valore era vuoto o un trattino,
-   `06POL012`). Più del doppio delle 30 famiglie del catalogo storico. La
-   raccolta è già estesa: `scripts/update_bes_regions.py` scrive
-   `Assoluti_BES_Regione_Sesso.csv` e il manifest con
-   `full_gender_coverage` per ognuno dei 64. Il catalogo storico resta un
-   candidato valido (es. la tripletta 345/346/347, occupazione 20-64, che è
-   fra le pagine con più impression), ma non è più l'unico né il più
-   economico: collegare uno dei due alla pagina indicatore (passo c) è
-   quello che resta da decidere.
+4. **Ambito del pilota: deciso, catalogo storico.** BES (sezione 3) ha **64**
+   indicatori con copertura regionale piena su tutte e 20 le regioni per
+   Totale/Maschi/Femmine (non 84: quel numero contava la sola presenza
+   dell'id, non se il valore alle 20 regioni fosse un numero vero; non 65:
+   quello contava la presenza della riga anche quando il valore era vuoto o
+   un trattino, `06POL012`). Più del doppio delle 30 famiglie del catalogo
+   storico, e la raccolta resta estesa (`Assoluti_BES_Regione_Sesso.csv` e
+   il manifest con `full_gender_coverage`) per quando servirà. Il pilota
+   effettivo è però la tripletta 345/346/347 del catalogo storico ("Tasso
+   di occupazione 20-64 anni", fra le pagine con più impression): è quella
+   già collegata dalla navigazione in pagina (passo c) e quella del pezzo
+   pubblicato (passo d). BES resta un candidato per un secondo pilota, non
+   ancora collegato né alla pagina né alla redazione.
