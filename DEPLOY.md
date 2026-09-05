@@ -174,9 +174,9 @@ si dovesse rifare da un nuovo progetto Supabase):
    ```
 7. **Console**: `monitor.divarioitalia.it` (domain mapping Cloud Run + DNS) ->
    `/_pipeline/console`, login Google ristretto alla mail admin via RLS.
-8. **Solo dopo** la verifica delle righe: rimuovi Litestream dal `Dockerfile`
-   (stage, binario, `LEADERBOARD_DB`, `LITESTREAM_REPLICA_URL`, `litestream.yml`),
-   e dismetti il bucket GCS.
+8. **Fatto**: Litestream e' stato ritirato con la Fase 4 e non e' piu' nel
+   `Dockerfile`; `litestream.yml` non esiste piu' nel repo. Resta da dismettere il
+   bucket GCS, se non lo si e' gia' fatto.
 
 Le migrazioni successive alla Fase 4 vogliono gli stessi passi 3
 (`DIRECT_URL=... alembic upgrade head`) e 4 (`scripts/supabase_setup.sql`,

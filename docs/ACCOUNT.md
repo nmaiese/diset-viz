@@ -1,9 +1,9 @@
 # Account utente (Supabase) — come funziona davvero
 
 Questo documento possiede il sistema account, rilasciato con la **Fase 5** della
-rifondazione. Sostituisce il piano storico in [`archive/AUTH_SUPABASE.md`](archive/AUTH_SUPABASE.md)
-(che proponeva magic-link + un profilo giocatore su SQLite): quello che gira è
-qui sotto.
+rifondazione. Sostituisce un piano storico (magic-link piu' un profilo giocatore
+su SQLite) che stava in `docs/archive/AUTH_SUPABASE.md`, cancellato il 5 settembre
+2026 con tutta `docs/archive/`: quello che gira è qui sotto.
 
 ## In una riga
 
