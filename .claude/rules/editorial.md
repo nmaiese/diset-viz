@@ -30,6 +30,12 @@ sezione non scritta viene composta dai dati al render. Un articolo dichiara
 `"level"` e viene usato solo a quel livello. Prima di toccare la pagina o il
 view model: [`docs/INDICATOR_PAGES.md`](../../docs/INDICATOR_PAGES.md).
 
+Un file di `content/indicators/` e' JSON, senza frontmatter: il contratto e'
+quello di `scripts/indicator_store.py`, le cifre vengono dal dossier, e `fonti`
+puo' restare vuota quando non c'e' contesto esterno verificabile (non e' un
+difetto, si segnala nella PR). I post del blog, che sono Markdown, portano
+invece le fonti nel frontmatter con `testo` e `url`.
+
 Sempre dal brief deterministico, mai da chiamate API ad hoc:
 
 ```bash
