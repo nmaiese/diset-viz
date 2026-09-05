@@ -8,6 +8,7 @@
       "Bash(git log:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
+      "Bash(git push:*)",
       "Bash(gh pr view:*)",
       "Bash(gh pr checks:*)",
       "Bash(gh pr list:*)"
@@ -52,6 +53,13 @@
           }
         ]
       }
+    ]
+  },
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Committing and pushing directly to the default branch `master` of this repository is intended and approved by the owner, for documentation and agent configuration only: `docs/`, `CLAUDE.md`, `README.md`, `AGENTS.md`, `REVIEW.md`, `DEPLOY.md`, `content/STYLE.md` and `.claude/`. The owner decided on 5 September 2026 that documentation does not go through pull requests, because the merge gate exists to guard what is published and a document is not published. Treat such a push as routine.",
+      "Changes to the code and content of the site itself (`app/`, `frontend/`, `scripts/`, `config/`, `tests/`, `content/indicators/`, `content/posts/`, `migrations/`) still go on a branch and through a pull request: the merge is the human gate, and for divarioitalia the merge is the publication. A direct push of those to `master` is NOT covered by the rule above."
     ]
   },
   "autoMemoryEnabled": true
