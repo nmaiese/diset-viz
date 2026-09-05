@@ -9,9 +9,9 @@ La review segue REVIEW.md. Commit senza trailer Co-Authored-By.
 
 <!-- Una riga: che cosa cambia per chi legge il sito o per chi lavora al repo. -->
 
-## Intent
+## Obiettivo
 
-<!-- `docs/intent/<id>.md` di platform. Obbligatorio per un pezzo (Gate A) e per un cambio di config. -->
+<!-- L'obiettivo del Quadro a cui questa PR risponde, es. div-famiglie. -->
 
 ## Per un pezzo (run:lite, run:team)
 

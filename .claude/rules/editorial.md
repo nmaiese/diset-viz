@@ -15,10 +15,11 @@ usano il percorso canonico (`/indicatore/<slug>/ter-105`), mai
 fallisce su quelli). Il Markdown ha `smarty` spento apposta: `--` e `...`
 restano come sono, tenere pulito il sorgente.
 
-La scala su cui si misura un articolo è
-[`docs/WRITING_RUBRIC.md`](../../docs/WRITING_RUBRIC.md): dieci criteri, sotto
-14 su 20 non è pronto, e i dieci stanno su quattro assi con un pavimento
-ciascuno, dove un asse sotto il pavimento boccia a prescindere dal totale.
+Un articolo non si misura con una rubrica a punti: quella è stata ritirata il
+4 settembre insieme al lint della prosa. Quello che ferma un pezzo sono le tre
+guardie di `motore verifica`, nel repo della redazione: una cifra che non sta
+nel dossier, un link interno che non esiste, una fonte che non risponde. Il
+resto è una lettura, e i rilievi hanno una gravità.
 
 ## Pagine indicatore
 
@@ -32,14 +33,14 @@ view model: [`docs/INDICATOR_PAGES.md`](../../docs/INDICATOR_PAGES.md).
 Sempre dal brief deterministico, mai da chiamate API ad hoc:
 
 ```bash
-bin/py -m lab.dossier ter-178 --stdout                        # tutto su un indicatore
 python3 scripts/definition_check.py --show ter-178      # che cosa conta, per la fonte
-bin/py -m lab.coda                  # che cosa manca a un editor
-python3 scripts/prose_lint.py --summary                 # la prosa, come numero
 ```
+
+Il dossier e la coda stanno nella redazione:
+`motore brief divarioitalia ter-178` e `motore coda divarioitalia`.
 
 La seconda riga è la meno ovvia: confronta la prosa con la **definizione**
 della fonte, non con la serie. Esiste perché rileggere undici articoli contro
 i dati ha trovato zero errori aritmetici e quattro descrizioni sbagliate di
-che cosa l'indicatore conta. Le classi di errore che solo una lettura trova
-stanno nella skill `motore:indicator-review` (nel plugin `motore` di platform).
+che cosa l'indicatore conta. Le classi di errore che solo una lettura
+trova le trova chi rilegge, non uno strumento.

@@ -92,19 +92,15 @@ example, and [`content/STYLE.md`](content/STYLE.md) for the editorial style
 ## Come si lavora con Claude Code
 
 `CLAUDE.md` è il router: dice quale documento possiede ogni argomento e non va
-letto come riassunto. Agent, skill, comandi e hook condivisi vivono nel plugin
-`motore` di `~/dev/platform/plugin/` (abilitato da `.claude/settings.json`) e
-si chiamano con il prefisso `motore:`; in questo repo restano il workflow
-`.claude/workflows/indicatore-lite.js`, il pacchetto `lab/`, le memorie dei
-teammate in `.claude/agent-memory/` e le regole con scope in `.claude/rules/`.
+letto come riassunto. In questo repo stanno gli hook in `.claude/hooks/` e le
+regole con scope in `.claude/rules/`, che si caricano da sole dove si applicano.
 
 - Interprete Python: `bin/py`, sempre (`export DIVARIO_PYTHON=...` se il
   worktree non ha un venv).
-- Articoli indicatore, baseline schedulata: il workflow `indicatore-lite`
-  (`/motore:pezzo divarioitalia <codice>` lo esegue e apre la PR), descritto in
-  [`lab/README.md`](lab/README.md).
-- Articoli indicatore, run presidiata: l'Agent Team, `/redazione-indicatore <codice>`,
-  descritto in [`docs/AGENT_TEAM.md`](docs/AGENT_TEAM.md).
+- **Lo stato del progetto non è qui**: sta in `QUADRO.md` del repo
+  `nmaiese/redazione-ai`, e l'hook di avvio te lo mette in contesto.
+- **Gli articoli indicatore non si scrivono qui**: li scrive la redazione
+  (`nmaiese/redazione-ai`), che pubblica in `content/indicators/` e apre la PR.
 - Prima di commit e push: `bin/py -m unittest discover -s tests -v`.
 
 Public indicator sheets follow [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md):

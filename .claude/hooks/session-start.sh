@@ -25,6 +25,19 @@ cd "${CLAUDE_PROJECT_DIR:-.}"
 # niente che si ripete. Gira anche in locale, che e' dove i guasti succedono.
 python3 scripts/tool_failures.py --breve 2>/dev/null || true
 
+# --- Lo stato: sta nel Quadro, non qui ---------------------------------------
+# Questo repo dice come funziona il sito. A che punto siamo lo dice il Quadro
+# della redazione, che e' un repo a parte: se e' agganciato lo si legge da li',
+# altrimenti si tace. Cosi' una sessione che apre diset-viz non ricostruisce lo
+# stato leggendo docs/, che e' esattamente quello che aveva fatto divergere sei
+# documenti dal Quadro.
+REDAZIONE="${REPO_REDAZIONE:-../redazione-ai}"
+if [ -x "$REDAZIONE/.venv/bin/python" ]; then
+  ( cd "$REDAZIONE" && .venv/bin/python -m motore.cli sessione --avvio ) 2>/dev/null || true
+elif [ -f "$REDAZIONE/QUADRO.md" ]; then
+  echo "Lo stato sta in $REDAZIONE/QUADRO.md (motore non installato: bash $REDAZIONE/ambiente/setup.sh)."
+fi
+
 # Il resto prepara un checkout fresco, e serve solo in remoto: in locale
 # l'utente gestisce il proprio ambiente.
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then

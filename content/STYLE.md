@@ -23,7 +23,7 @@ automatico.
 
 Per il mestiere della lingua (togliere i tic dell'italiano generato, dare voce,
 regolare ritmo e retorica) il progetto adotta la skill esterna
-**`scrittura-italiana`** (`motore:scrittura-italiana`, nel plugin `motore` di platform, CC BY-SA 4.0).
+**`scrittura-italiana`** (CC BY-SA 4.0), quando è disponibile nella sessione.
 Questa guida la **cita**, non la ricopia: le quattro virtù retoriche, le cinque
 varianti del bipolare, l'antilingua e il lessico di plastica vivono nei suoi
 `references/`, e ripeterli qui li manderebbe fuori sincrono.
@@ -35,23 +35,21 @@ regole tipografiche qui sopra li **vietano**: niente `—`, `–`, `;`, `…`,
 virgolette dritte. Quando la skill suggerisce una di quelle forme, si tiene la
 regola di progetto e si scioglie l'inciso con virgole o due frasi. Il conflitto
 è sistematico, non un caso di bordo: sta nel registro esatto in cui vivono le
-nostre pagine. Il cancello deterministico che lo fa rispettare è `lab/lint.py`
-(i caratteri vietati dallo stile) e, nel contatore della skill, il campo
-`vietati` sempre vuoto.
+nostre pagine. Il cancello è la rilettura, più il campo `vietati` sempre vuoto
+nel contatore della skill.
 
 **La precedenza non riguarda solo i caratteri.** La skill consiglia anche di
 variare il ritmo, e qui la varietà è lecita ma non è il metro: il metro è che
-la frase si prenda al primo passaggio (criterio 8 della rubrica, e la sezione
-"Tecniche da giornalista" qui sotto). Quando un suggerimento della skill allunga
+la frase si prenda al primo passaggio (la sezione "Tecniche da giornalista"
+qui sotto). Quando un suggerimento della skill allunga
 una frase o le aggiunge un inciso, vince la leggibilità. Vale anche per due
 metriche del suo contatore: `mente` e `gerundite` possono salire su un testo più
 leggibile, e lì non sono un verdetto. Il campo `vietati` resta l'unico cancello.
 
 Cambiare il prompt di chi scrive per agganciare la skill in rilettura è un
-cambio da misurare su una run prima di tenerlo (obbligo di `CLAUDE.md`): la skill installata è
-**disponibile** nel plugin, ma finché la definizione di `motore:lab-scrittore`
-(`plugin/agents/lab-scrittore.md` di platform) non la richiama il comportamento
-non cambia.
+cambio da misurare su una run prima di tenerlo: chi scrive è l'agent
+`scrittore` del repo `nmaiese/redazione-ai`, e finché la sua definizione non
+richiama la skill il comportamento non cambia.
 
 ## Tono: scrivi come una persona
 
@@ -228,10 +226,9 @@ python3 scripts/prose_lint.py --show <id>   # solo pagine indicatore
 
 Il primo comando deve tornare vuoto. Il secondo elenca i tell di questa guida che
 una regex sa trovare, sull'articolo di un indicatore. Non copre tutto e non
-pretende di farlo: quello che vuole un lettore sta in
-[`docs/WRITING_RUBRIC.md`](../docs/WRITING_RUBRIC.md), i dieci criteri con cui
-si misura un articolo prima di pubblicarlo, su quattro assi con un pavimento
-ciascuno. Per template, frontend e SVG testuali controlla
+pretende di farlo: quello che vuole un lettore lo vede solo chi rilegge, e le
+tre cose che fermano un pezzo sono le guardie di `motore verifica` nel repo
+della redazione. Per template, frontend e SVG testuali controlla
 anche il testo visibile, ma ignora i punti e virgola di CSS, JS, JSON-LD e CSV.
 
 Controlla anche che non ci siano sequenze identiche di H2 tra piu articoli. I

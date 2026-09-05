@@ -23,8 +23,9 @@ the map of which document owns which subject, the commands (starting with
 shell function without the dependencies), and the constraints that are true
 everywhere.
 
-One thing worth stating twice, because it is the fastest way to do damage
-without noticing: the chain that writes the indicator articles is **one
-workflow** (`.claude/workflows/indicatore-lite.js`) over the six `lab-*` agents,
-and it publishes to `content/indicators/`, which is the public site. Its
-contract is [`lab/README.md`](lab/README.md).
+Two things worth stating twice, because they are the fastest way to do damage
+without noticing. The chain that writes the indicator articles does **not** live
+here: it lives in the `nmaiese/redazione-ai` repository, and it publishes to
+`content/indicators/`, which is the public site. And the project state does not
+live here either: it lives in that repository's `QUADRO.md`. No document in this
+repository carries checkboxes, progress or a "next step".

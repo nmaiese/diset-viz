@@ -153,10 +153,6 @@ Non più `scripts/indicator_brief.py`: è stato **assorbito in `packs/`**, che n
 era la riscrittura, e il file non esiste più. Chi scrive un articolo adesso non
 lancia niente a mano, lo fa il workflow:
 
-```bash
-Workflow({scriptPath: ".claude/workflows/indicatore-lite.js", args: ["ter-178"]})
-```
-
 Il pacchetto è per livello, in ogni sua parte: cifre, stato dell'articolo e
 `vintage` richiesto. Chiudendo, stampa il valore che il campo `level` deve avere.
 Prima ignorava il livello nel blocco finale, quindi su `--level provincia`
@@ -180,13 +176,12 @@ probabilità è lo stesso fenomeno misurato due volte. Per ciascun correlato dà
 percorso canonico da linkare e la posizione, su quella scala, delle due regioni
 agli estremi di questa.
 
-Le regole editoriali complete stanno in `content/STYLE.md`, e le classi di
-errore che solo una lettura trova nella skill condivisa
-`motore:indicator-review` del plugin `motore` di platform (i prompt di chi scrive puntano alla
-skill invece di ricopiarla: una regola copiata in due posti va fuori sincrono
-senza che nessuno se ne accorga). La rubrica
-con cui si misura il risultato, dieci criteri e una soglia sotto la quale
-l'articolo non è pronto, sta in [`WRITING_RUBRIC.md`](WRITING_RUBRIC.md). Le fonti secondarie ammesse stanno in
+Le regole editoriali complete stanno in `content/STYLE.md`. Le classi di
+errore che solo una lettura trova non le trova uno strumento: le trova chi
+rilegge. Quello che ferma un pezzo sono le tre guardie di `motore verifica`
+nel repo della redazione, una cifra fuori dal dossier, un link interno
+inesistente, una fonte che non risponde, e non c'è una rubrica a punti. Le
+fonti secondarie ammesse stanno in
 [`SECONDARY_SOURCES.md`](SECONDARY_SOURCES.md), insieme alla trappola che nessuna
 guardia vede: un aggregato nazionale ponderato non è la nostra media semplice
 delle venti regioni.
@@ -300,9 +295,8 @@ pagina viene resa per verificare che non ci siano 500.
 Restano **fuori dai test**, e vanno rivisti a mano. Non a memoria, però:
 `bin/py -m lab.coda` cerca esattamente questi pattern e
 mette in fila gli articoli per quanto è probabile che siano sbagliati. Li
-rilegge la catena di `lab/` (`.claude/workflows/indicatore-lite.js`), che ha assorbito il
-revisore e si rilegge il proprio testo, e a valle il verificatore indipendente
-prova a smentirlo.
+rilegge la redazione, dove chi scrive si rilegge il proprio testo e a valle il
+verificatore indipendente prova a smentirlo.
 
 Un articolo firmato porta **due** campi, `reviewed_at` e `reviewed_vintage`, e
 solo con entrambi esce dalla coda. I due campi restano vivi anche adesso che

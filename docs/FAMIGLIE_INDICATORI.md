@@ -1,10 +1,12 @@
 # Famiglie di indicatori: dimensioni e livelli
 
-Priorità decisa il 4 settembre 2026 sera (Quadro di `redazione-ai`, Decisioni;
-`docs/RIPARTENZA.md` §4.3 e §5). Questo documento raccoglie la ricerca già
-fatta, così una sessione nuova non la rifà da capo: che cosa esiste oggi, che
-cosa manca, dove si tocca. Non è ancora un disegno definitivo: i punti aperti
-sono segnati come tali alla fine.
+Questo documento raccoglie la **ricerca** su come sono fatte le famiglie: che
+cosa esiste oggi, che cosa manca, dove si tocca. Serve perché una sessione nuova
+non la rifaccia da capo.
+
+A che punto siamo non sta qui: sta nel Quadro di `redazione-ai`, obiettivo
+`div-famiglie`. Il primo pilota (il catalogo storico, 345/346/347) è online e
+il suo pezzo è pubblicato.
 
 ## Il problema
 
@@ -240,78 +242,7 @@ Serve un terzo concetto, "famiglia di misura", distinto dagli altri due.
 - Redazione (`nmaiese/redazione-ai`): `motore/dossier.py`, `motore/brief.py`,
   `motore/verifica.py`, `motore/coda.py`, `motore/pubblica.py`.
 
-## I quattro passi (RIPARTENZA.md §4.3), stato al 4 settembre notte
-
-a. **Fatto per il sesso.** `config/indicator_families.csv` (catalogo storico,
-   30 famiglie/89 id) e `Assoluti_BES_Regione_Sesso.csv` (BES, 64 indicatori
-   con copertura piena). **Chiuso come non disponibile per l'età**: nessuna
-   delle fonti già acquisite pubblica età a livello regione (sotto).
-b. Fatto solo per BES/sesso (sopra). Non toccato: livello provincia (per
-   nessuna dimensione), le serie SDMX demografia/multiscopo (sesso o età mai
-   variati).
-c. **Fatto, con un vincolo diverso da come scritto qui**: non un selettore
-   con routing nuovo né redirect dagli id vecchi (Nello, 4/9 sera: "non
-   modifichiamo la struttura delle pagine, url pubblicate, al massimo
-   usiamo canonical"). Realizzato invece come navigazione fra le pagine
-   già pubblicate di una famiglia (`app/indicator_view.py::_dimension_siblings`,
-   il blocco "Lo stesso indicatore, per genere" in `indicator_page.html`):
-   stesso valore per il lettore, zero rischio sulle URL indicizzate. Non
-   copre BES (un id, una pagina, nessun altro id da collegare, sezione 3) né
-   provincia (passo b non ancora esteso lì).
-d. **Fatto, un pilota pubblicato.** `motore/dossier.py` calcola
-   `divario_genere` (maschi meno femmine, regione per regione, stesso anno)
-   dalle varianti già collegate dal passo (a); `motore/brief.py` lo mostra a
-   chi scrive dentro la sezione "parenti" (non una sezione nuova);
-   `motore/verifica.py` verifica ogni cifra del divario come le altre, senza
-   bisogno di un link (è calcolata, non citata). Il pezzo pilota
-   "Tasso di occupazione 20-64 anni" (`content/indicators/345.json`,
-   `nmaiese/diset-viz#218`) tratta esplicitamente le tre dimensioni
-   (totale/maschi/femmine) e la loro relazione territoriale.
-
-**Stato al 5 settembre 2026: pilota chiuso, in produzione.**
-`nmaiese/diset-viz#217` (passi a/b/c) e `nmaiese/diset-viz#218` (passo d,
-il pezzo) sono mersi su `master` da Nello. Verificato rendendo per davvero
-le tre pagine sul `master` mersato: `/indicatore/tasso-di-occupazione-20-64-anni/ter-345`,
-`.../-maschi/ter-346`, `.../-femmine/ter-347` rispondono 200, mostrano tutte
-e tre il blocco "Lo stesso indicatore, per genere", e la 345 porta il pezzo
-pubblicato. La misura di successo della priorità (famiglia pilota online con
-navigazione fra dimensioni, pezzo di famiglia pubblicato su più dimensioni,
-letto e approvato da Nello) è raggiunta.
-
-Non ha bloccato la Settimana 2: i pezzi scritti nel frattempo restano con il
-modello precedente, si riscrivono se e quando conviene.
-
-### Età: verificata e chiusa come non disponibile a livello regione
-
-Cercata con lo stesso rigore del sesso, su tutte e tre le fonti, il 4
-settembre notte:
-
-- **Catalogo storico**: 14 indicatori hanno una fascia d'età nel titolo
-  ("over 54", "20-64 anni", "15-19 anni", ...), ma sono tutti misure a
-  fascia fissa, non famiglie con più fasce alternative. "Tasso di
-  occupazione over 54" e "Tasso di occupazione 20-64 anni" sono due misure
-  diverse, non la stessa misura con un selettore d'età: nessuna famiglia di
-  età da collegare.
-- **BES, i tre file ancora mai aperti**: `indicatori_eta_sesso.xlsx` (153
-  indicatori, fasce ricche) e `indicatori_titolo_di_studio.xlsx` (66) non
-  hanno nessuna colonna territorio, sono a livello Italia.
-  `indicatori_titolo_di_studio_ripartizione.xlsx` (29) ha una colonna
-  territorio, ma con soli 4 valori: Nord, Centro, Mezzogiorno, Italia.
-  Macro-aree, non le 20 regioni del sito. Nessuno dei tre è utilizzabile
-  per la pagina regionale così com'è.
-- **Pipeline SDMX**: nessuna serie ammessa in `config/istat_series.yaml` ha
-  `ETA1` nel proprio `dimension_order` (verificato anche sul fixture del
-  dataflow demografico pilota, che ha solo tre dimensioni: FREQ, REF_AREA,
-  DATA_TYPE). Non c'è età nascosta da recuperare in quello che è già
-  ammesso.
-
-**Conseguenza**: a differenza del sesso (il problema era "lo scartiamo"),
-per l'età il problema è che Istat non lo pubblica a livello regione in
-nessuna fonte già acquisita. Integrarla richiederebbe cercare una fonte
-SDMX regionale con età non ancora ammessa: un lavoro di scoperta diverso,
-più aperto, non ancora iniziato.
-
-## Punti aperti, da decidere nel passo (a)
+## Punti aperti
 
 Non ancora risolti, non ancora decisi: la prossima sessione che lavora sul
 passo (a) li affronta prima di scrivere codice.

@@ -1,10 +1,4 @@
 {
-  "env": {
-    "ANTHROPIC_CUSTOM_MODEL_OPTION": "claude-opus-4-8",
-    "ANTHROPIC_CUSTOM_MODEL_OPTION_NAME": "Opus 4.8",
-    "ANTHROPIC_CUSTOM_MODEL_OPTION_DESCRIPTION": "Claude Opus 4.8",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  },
   "permissions": {
     "allow": [
       "Bash(bin/py:*)",
@@ -58,45 +52,7 @@
           }
         ]
       }
-    ],
-    "TaskCreated": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/team_monitor.py\""
-          },
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/team_monitor.py\" --follow",
-            "timeout": 7200,
-            "async": true
-          }
-        ]
-      }
-    ],
-    "TaskCompleted": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/team_monitor.py\""
-          }
-        ]
-      }
     ]
   },
-  "enabledPlugins": {
-    "motore@platform-locale": true
-  },
-  "extraKnownMarketplaces": {
-    "platform-locale": {
-      "source": {
-        "source": "directory",
-        "path": "/home/user/platform"
-      }
-    }
-  },
-  "autoMemoryEnabled": true,
-  "teammateMode": "in-process"
+  "autoMemoryEnabled": true
 }

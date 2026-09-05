@@ -19,8 +19,8 @@ labels: difetto-pubblicato
 
 ## Perché è passato
 
-<!-- Quale controllo avrebbe dovuto prenderlo (verificatore, lab.controlla, REVIEW.md passaggio N, review Codex) e perché non l'ha fatto. -->
+<!-- Quale controllo avrebbe dovuto prenderlo (verificatore, motore verifica, REVIEW.md passaggio N, review Codex) e perché non l'ha fatto. -->
 
 ## Correzione proposta
 
-<!-- Il testo nuovo. Se il difetto si è già ripetuto: la riga per CLAUDE.md, la rule, o il caso golden per evals/ di platform (regola 6: documentazione sincrona). -->
+<!-- Il testo nuovo. Se il difetto si è già ripetuto: la riga per CLAUDE.md, la rule, o la Lezione nel Quadro. -->

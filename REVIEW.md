@@ -10,8 +10,8 @@ codice il primo solo se toccano `content/`.
 ## Passaggio 1 — Cifre e fonti (blocca)
 
 - Ogni numero nel testo esiste nel dossier dell'indicatore o è un
-  `{{fact:id}}` risolto (`bin/py -m lab.controlla <codice> --bozza ...`,
-  `uv run motore validate <file>` in platform). Una cifra senza anno, un
+  `{{fact:id}}` risolto (`motore verifica divarioitalia <codice> --bozza ...`,
+  nel repo della redazione). Una cifra senza anno, un
   trend nella direzione sbagliata, un confronto fra livelli diversi
   (regione contro provincia) sono `alta`.
 - Ogni fonte esterna ha URL che risponde, data, e dice davvero ciò che il
@@ -22,9 +22,9 @@ codice il primo solo se toccano `content/`.
 
 ## Passaggio 2 — Regole editoriali (blocca sui pavimenti)
 
-- `content/STYLE.md` e la rubrica `docs/WRITING_RUBRIC.md`: dieci criteri su
-  quattro assi, un asse sotto il pavimento boccia (`alta`); sotto 14/20 non
-  è pronto (`alta`).
+- `content/STYLE.md`, e le tre guardie di `motore verifica`: una cifra che non
+  sta nel dossier, un link interno che non esiste, una fonte che non risponde
+  sono `alta` e fermano il pezzo. Non c'è una rubrica a punti.
 - Assoluti: niente em-dash, en-dash, `;`, `…`; nessun termine da statistico
   (bontà del raggruppamento, mediana, spread, coefficiente di variazione,
   quantile, deviazione standard); massimo mille parole; link canonici agli
@@ -37,10 +37,9 @@ codice il primo solo se toccano `content/`.
 ## Passaggio 3 — Igiene e sicurezza (blocca)
 
 - Nessun segreto, token o `.env` nel diff (`alta`).
-- Una PR `automation/*` tocca solo `content/`, `data/lab/`,
-  `.claude/agent-memory/` e l'intent in platform. File di test, hook,
-  rules, `app/` toccati da una run automatica: `alta` (separazione dei
-  poteri, regola 4 di platform).
+- Una PR aperta da una run editoriale tocca solo `content/`. File di test,
+  hook, rules, `app/` toccati da una run automatica: `alta`, e' separazione
+  dei poteri.
 - Commit senza trailer `Co-Authored-By`; branch da `master`, mai su
   `master` (`bassa`, ma si corregge prima del merge).
 - CI verde (`python`, `frontend`): obbligatoria, non è un finding.
@@ -53,8 +52,7 @@ codice il primo solo se toccano `content/`.
 - `bassa`: al massimo cinque per review; oltre, si tacciono.
 - Non si segnalano: formattazione, ordine delle chiavi nei JSON, sinonimi.
 - Un finding che si ripete in due PR diventa una riga in `CLAUDE.md`, una
-  regola in `.claude/rules/`, o un caso in `evals/golden/` di platform
-  (regola 6 di platform: documentazione sincrona).
+  regola in `.claude/rules/`, o una Lezione nel Quadro della redazione.
 
 ## Chi esegue
 

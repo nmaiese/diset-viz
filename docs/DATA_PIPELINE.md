@@ -121,9 +121,8 @@ della categoria, così i link già indicizzati non si perdono.
 ## Scoperta di nuovi indicatori (a monte)
 
 Il passo che *trova* nuovi indicatori presso fonti istituzionali e li mette in
-una coda revisionabile prima di qualsiasi integrazione è descritto in
-[`docs/archive/DISCOVERY_PIPELINE.md`](archive/DISCOVERY_PIPELINE.md) (archiviato:
-gli script restano, la catena di agenti che vi girava attorno no). In breve: il cacciatore
+una coda revisionabile prima di qualsiasi integrazione esiste come script, e la
+catena di agenti che vi girava attorno no. In breve: il cacciatore
 (`scripts/discover_candidates.py`) scrive candidati in
 `data/discovery/candidates.csv`, un umano li approva in PR, e
 `scripts/promote_candidates.py` li porta nel layer esterno con `status=proposed`.

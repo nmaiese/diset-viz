@@ -90,28 +90,6 @@ class PostinoFinto:
         return [p["action"] for p in self.mandati]
 
 
-class MappaDelleFasi(unittest.TestCase):
-    """La stima della fase e' una mappa sola, e deve coprire il workflow vero.
-
-    Dal vivo la fase non esiste (sta in `<runId>.json`, che compare a run
-    finita), quindi si stima dal tipo di agente. Un tipo nuovo senza fase non
-    romperebbe niente in modo visibile: la run comparirebbe sul cruscotto senza
-    fase, e nessuno collegherebbe le due cose. Qui invece fallisce la suite."""
-
-    def test_ogni_agent_type_del_workflow_ha_una_fase(self):
-        percorso = os.path.join(RADICE_REPO, ".claude", "workflows", "indicatore-lite.js")
-        with open(percorso, encoding="utf-8") as handle:
-            sorgente = handle.read()
-        tipi = {cruscotto.tipo_base(t) for t in re.findall(r"agentType:\s*['\"]([^'\"]+)['\"]", sorgente)}
-        self.assertTrue(tipi, "nessun agentType trovato nel workflow: regex da rifare")
-        mancanti = sorted(t for t in tipi if t not in cruscotto.FASE_PER_TIPO)
-        self.assertEqual(mancanti, [], f"tipi senza fase in FASE_PER_TIPO: {mancanti}")
-
-    def test_ogni_fase_stimata_esiste_nell_ordine(self):
-        fuori = sorted(set(cruscotto.FASE_PER_TIPO.values()) - set(cruscotto.ORDINE_FASI))
-        self.assertEqual(fuori, [])
-
-
 class IlVivo(unittest.TestCase):
     """Quello che si legge mentre la run gira, senza `<runId>.json`."""
 
