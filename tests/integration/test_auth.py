@@ -61,18 +61,6 @@ class AuthTokenTest(unittest.TestCase):
         config.SUPABASE_URL = ""
         self.assertIsNone(auth.current_user({"Authorization": "Bearer " + _token()}))
 
-    def test_is_admin_matches_only_the_allowlisted_email(self):
-        saved = config.MONITOR_ADMIN_EMAIL
-        config.MONITOR_ADMIN_EMAIL = "boss@example.com"
-        try:
-            self.assertTrue(auth.is_admin({"id": "1", "email": "boss@example.com"}))
-            self.assertFalse(auth.is_admin({"id": "2", "email": "other@example.com"}))
-            self.assertFalse(auth.is_admin(None))
-        finally:
-            config.MONITOR_ADMIN_EMAIL = saved
-
-
-class AuthMeRouteTest(unittest.TestCase):
     def setUp(self):
         self._saved = (config.SUPABASE_JWT_SECRET, config.SUPABASE_URL, config.LEADERBOARD_DB)
         config.SUPABASE_JWT_SECRET = _SECRET

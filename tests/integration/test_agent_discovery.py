@@ -64,7 +64,7 @@ class AgentDiscoveryTest(unittest.TestCase):
         for operations in document["paths"].values():
             self.assertEqual(set(operations), {"get"})
         serialized = response.get_data(as_text=True)
-        for forbidden in ("leaderboard", "/api/game/", "/api/events", "_pipeline"):
+        for forbidden in ("leaderboard", "/api/game/", "/api/events"):
             self.assertNotIn(forbidden, serialized)
 
     def test_canonical_pages_negotiate_markdown_without_poisoning_html_cache(self):

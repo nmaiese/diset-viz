@@ -1430,9 +1430,7 @@ class LUniversoHaUnProprietarioSolo(unittest.TestCase):
 
         Un test sui numeri totali non li avrebbe nominati, e un totale che torna
         per compensazione e' il modo in cui questa classe di difetto sopravvive
-        a una suite verde. L'incrocio vero (la console contro la sitemap
-        servita) sta in `test_pipeline_monitor.py`, dove c'e' il client
-        autenticato."""
+        a una suite verde."""
         # `dem` è l'acronimo dell'URL, `istat_demografia` la chiave di famiglia:
         # non coincidono, ed è la stessa trappola per cui `ims` non è `multiscopo`.
         from app import indicator_view, sources
@@ -1534,16 +1532,17 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
     def test_the_store_is_the_case_that_made_this_necessary(self):
         self.assertIn("scripts", self._copied_dirs())
 
-    def test_the_pipeline_history_data_is_shipped(self):
-        """La dashboard (`/_pipeline` e `/_pipeline/api/*`) legge a runtime la storia
-        committata sotto `data/`: le prove di pubblicazione, i diari delle run, le
-        verifiche. Senza la COPY nel Dockerfile il server calcola ZERO pubblicati (le
-        prove mancano) e una cronologia vuota (i diari mancano), un guasto che si vede
-        solo in produzione, mai nella suite qui, che gira col repo intero."""
+    def test_the_runtime_data_is_shipped(self):
+        """`app/publisher.py` legge `data/source_state.json` a runtime: senza la COPY
+        nel Dockerfile la data dell'ultimo aggiornamento delle fonti sparisce dalle
+        pagine, un guasto che si vede solo in produzione e mai nella suite qui, che
+        gira col repo intero. Fino al 5/9/2026 questo test difendeva anche il cruscotto
+        `/_pipeline`, tolto con la catena editoriale: la COPY resta necessaria lo
+        stesso, per un motivo diverso."""
         self.assertIn(
             "data", self._copied_dirs(),
-            "il Dockerfile non copia data/: in produzione la dashboard mostra 0 "
-            "pubblicati e cronologia vuota (prove e diari assenti dall'immagine).",
+            "il Dockerfile non copia data/: in produzione publisher.py non trova "
+            "data/source_state.json e la data delle fonti sparisce.",
         )
 
     def test_dockerignore_keeps_runtime_state_out_of_the_image(self):
@@ -1553,8 +1552,7 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
         nickname, preferiti: PII) e l'effimero. Qui si esige che le esclusioni di
         runtime del `.gitignore` siano specchiate nel `.dockerignore`."""
         dockerignore = (self.ROOT / ".dockerignore").read_text(encoding="utf-8").split()
-        for pattern in ("data/*.sqlite3", "data/istat_cache/", "data/eurostat_cache/",
-                        "data/pipeline/heartbeats/"):
+        for pattern in ("data/*.sqlite3", "data/istat_cache/", "data/eurostat_cache/"):
             self.assertIn(
                 pattern, dockerignore,
                 f".dockerignore non esclude {pattern}: un docker build da working tree "

@@ -60,75 +60,23 @@ gcloud run services update diset-viz --region europe-west1 \
 | `LEADERBOARD_DB` | `/data/leaderboard.sqlite3` (default da `Dockerfile`) | Percorso locale del file SQLite nel container. |
 | `LITESTREAM_REPLICA_URL` | `gs://nil-automata-diset-viz-leaderboard/leaderboard` | Destinazione della replica continua Litestream. |
 
-### Cruscotto della catena `/_pipeline`
+### Il cruscotto della catena non c'e' piu'
 
-Il cruscotto guarda **le run di un workflow**, non piu' un indicatore che
-attraversa stadi: la catena editoriale autonoma e' stata
-ritirata, e con lei le tabelle `pipeline_activity`, `pipeline_tokens` e
-`pipeline_outcomes`, che dal 2026-08-08 non esistono piu' (migrazione
-`0008_cruscotto_workflow`). Al loro posto due tabelle su Supabase Postgres:
+Fino al 5 settembre 2026 questo servizio ospitava anche `/_pipeline`, il
+cruscotto della catena editoriale, su `monitor.divarioitalia.it`. La catena vive
+nel repo `redazione-ai` dal 4 settembre, e il processo che scriveva il battito
+(`lab/cruscotto.py`) e' stato tolto con `lab/`: la rotta e' rimasta viva senza
+nessuno che la scrivesse.
 
-- **`pipeline_run`**, una riga per workflow;
-- **`pipeline_agente`**, una riga per agente dentro quel workflow.
+Tolto tutto con la migrazione `0009_via_cruscotto`: le rotte, `app/pipeline_store.py`,
+il bundle `monitor.js`, le due tabelle `pipeline_run` e `pipeline_agente`, la loro
+RLS e la publication Realtime, e le variabili `PIPELINE_TOKEN`,
+`PIPELINE_INGEST_TOKEN`, `PIPELINE_INGEST_URL`, `MONITOR_ADMIN_EMAIL`.
 
-**La regola del modello dati**, da non rompere: il **battito** (che arriva
-mentre la run gira) e il **consuntivo** (che arriva a run finita) scrivono
-colonne **disgiunte**. Vengono da due sorgenti diverse e arrivano in ordine non
-garantito, quindi se scrivessero le stesse colonne la seconda cancellerebbe
-quello che ha detto la prima, proprio sulla run che qualcuno sta guardando. Sta
-in `app/pipeline_store.py`.
-
-**Chi scriveva non esiste piu'.** Il processo che leggeva i trascritti e POSTava
-a `/_pipeline/beat` era `lab/cruscotto.py`, tolto il 5 settembre 2026 insieme a
-tutto `lab/`, perche' la catena editoriale vive ora nel repo `redazione-ai`.
-Quindi oggi la presa e' viva e non la scrive nessuno: le due tabelle restano, le
-rotte rispondono, e il cruscotto mostra le run vecchie.
-
-Spegnerla del tutto vuol dire togliere le rotte `/_pipeline` da `app/views.py`,
-la configurazione da `app/config.py`, `app/pipeline_store.py`, le quattro
-migrazioni e le due tabelle su Supabase. E' un lavoro sull'app viva, non una
-pulizia: sta in `Prossimo` nel Quadro di `redazione-ai`, e aspetta una decisione.
-
-Prima di spendere una run si chiede alla presa se e' viva e se parla il
-protocollo giusto, e lo si chiede con `ping`, che **non scrive niente**:
-
-    curl -s -X POST "$PIPELINE_INGEST_URL/_pipeline/beat" \
-      -H "X-Pipeline-Key: $PIPELINE_INGEST_TOKEN" -H "Content-Type: application/json" \
-      -d '{"action":"ping"}'
-
-Risponde `{"ok": true, "azioni": [...]}`. Un **404** vuol dire segreto sbagliato,
-un **400** che l'immagine servita e' costruita da un master piu' vecchio e non
-conosce le azioni nuove: in quel caso ogni battito si perderebbe. La domanda si
-faceva con un `run` finto, che pero' e' un battito vero e lasciava una run
-fantasma in cima al cruscotto, senza agenti e per sempre in volo.
-
-Chi legge: `monitor.divarioitalia.it/_pipeline/console`. Due percorsi dati, come
-prima: il vivo arriva in push da **Supabase Realtime** letto diritto dal browser
-(filtrato da RLS sulla mail Google, non da un token), e la storia gia' montata
-da `/_pipeline/api/runs` e `/_pipeline/api/indicatori`, fetchate col Bearer del
-login. Il percorso Realtime resta vuoto **senza errore** se RLS e Realtime non
-sono stati applicati (`scripts/supabase_setup.sql`, punto 4 piu' sotto): non
-basta che il lettore scriva.
-
-**Un totale di costo e' un pavimento.** Un trascritto reale ha registrato
-`output_tokens: 2` sulla richiesta che restituiva una bozza intera: il
-trascritto e' incompleto, non lo e' la misura. Le righe portano
-`costo_pavimento`, e la console lo dice invece di mostrare il totale come esatto.
-
-| Variabile | Dove | A cosa serve |
-|---|---|---|
-| `PIPELINE_TOKEN` | env Cloud Run (o Secret Manager) | Se impostata, `/_pipeline` serve solo con `?token=` giusto, altrimenti 404. Vuota = aperta (solo locale). |
-| `PIPELINE_INGEST_TOKEN` | **Secret Manager**, su Cloud Run **e** nell'ambiente agenti `divarioitalia` | Il segreto con cui il poller autenticava il POST (header `X-Pipeline-Key`). Il poller non esiste piu': vuoto = ingest spento (404), ed e' lo stato consigliato. |
-| `PIPELINE_INGEST_URL` | ambiente agenti `divarioitalia` | Dove postare: `https://divarioitalia.it`. Senza, il lettore legge e lo dice nel log invece di girare a vuoto. |
-
-Nessuna credenziale GCP sugli agenti: scrivono solo via l'endpoint.
-
-**Attenzione all'ordine, quando si cambia il cruscotto.** Il lettore puo' girare
-sul ramo di lavoro, ma il POST arriva all'immagine Cloud Run costruita da
-`master`: finche' il codice non e' fuso e ridistribuito, l'ingest nuovo non
-esiste e la run gira lasciando il cruscotto vuoto. La sequenza e': merge su
-`master`, redeploy, `alembic upgrade head`, `scripts/supabase_setup.sql`, poi la
-run.
+**Da fare in produzione**, se non e' gia' stato fatto: `alembic upgrade head`
+per far cadere le due tabelle, togliere quelle quattro variabili da Cloud Run e
+dall'ambiente agenti, e dismettere il domain mapping di
+`monitor.divarioitalia.it`, che adesso non ha piu' una pagina propria.
 
 ### Fase 4 — Backend mutabile su Supabase
 
@@ -144,20 +92,18 @@ si dovesse rifare da un nuovo progetto Supabase):
    `sslmode=require`), `DIRECT_URL` (diretta 5432, per Alembic), `SUPABASE_JWT_SECRET`.
    Collega al servizio con `--update-secrets`, come `SECRET_KEY`.
 2. **Env pubbliche** su Cloud Run: `SUPABASE_URL`, `SUPABASE_ANON_KEY`
-   (`--update-env-vars`). Opzionale `MONITOR_ADMIN_EMAIL` (default già giusto).
-3. **Schema**: `DIRECT_URL=... alembic upgrade head` (crea `scores`,
-   `pipeline_run`, `pipeline_agente`). Da fare una volta a mano, o come step
+   (`--update-env-vars`).
+3. **Schema**: `DIRECT_URL=... alembic upgrade head` (crea `scores` e le tabelle
+   account). Da fare una volta a mano, o come step
    `alembic upgrade head` in `cloudbuild.yaml` prima del deploy (richiede
    `availableSecrets` con `DIRECT_URL`: aggiungerlo solo quando il secret esiste,
    altrimenti il build fallisce). Lo step va **solo sul deploy, mai sul test**:
    se `DATABASE_URL`/`DIRECT_URL` finiscono nell'env dello step di test, la suite
    punterebbe a Postgres e il gate cadrebbe.
-4. **RLS + Realtime**: esegui `scripts/supabase_setup.sql` nel SQL editor del
-   progetto (attiva la RLS, la policy admin sulle tabelle pipeline, la publication
-   Realtime sulle due tabelle del cruscotto). Senza, la console resta vuota
-   **senza errore**. **Questo passo non lo puo' fare un agente**: va incollato a
-   mano nel SQL editor del progetto, e va rifatto ogni volta che le tabelle del
-   cruscotto cambiano nome.
+4. **RLS**: esegui `scripts/supabase_setup.sql` nel SQL editor del progetto
+   (attiva la RLS e le policy per-utente sulle tabelle account e sulla classifica).
+   **Questo passo non lo puo' fare un agente**: va incollato a mano nel SQL editor,
+   e va rifatto ogni volta che una tabella cambia nome.
 5. **Migrazione righe** (PRIMA di togliere Litestream):
    ```bash
    gsutil cp gs://nil-automata-diset-viz-leaderboard/leaderboard <lb>.sqlite3
@@ -172,21 +118,16 @@ si dovesse rifare da un nuovo progetto Supabase):
      --schedule "0 */6 * * *" --uri https://divarioitalia.it/_keepalive --http-method GET \
      --update-headers "X-Keepalive-Key=<KEEPALIVE_TOKEN>"
    ```
-7. **Console**: `monitor.divarioitalia.it` (domain mapping Cloud Run + DNS) ->
-   `/_pipeline/console`, login Google ristretto alla mail admin via RLS.
-8. **Fatto**: Litestream e' stato ritirato con la Fase 4 e non e' piu' nel
+7. **Fatto**: Litestream e' stato ritirato con la Fase 4 e non e' piu' nel
    `Dockerfile`; `litestream.yml` non esiste piu' nel repo. Resta da dismettere il
    bucket GCS, se non lo si e' gia' fatto.
 
 Le migrazioni successive alla Fase 4 vogliono gli stessi passi 3
 (`DIRECT_URL=... alembic upgrade head`) e 4 (`scripts/supabase_setup.sql`,
-idempotente). L'ultima e' `0008_cruscotto_workflow` (2026-08-08): droppa le tre
-tabelle della catena editoriale autonoma ritirata e crea `pipeline_run` e
-`pipeline_agente`. **Il drop e' irreversibile per le righe che c'erano dentro**:
-il `downgrade()` ricrea le tabelle vuote, e sono comunque righe di un modello
-che il cruscotto nuovo non sa leggere. Finche' i due passi non sono rifatti in
-produzione il cruscotto resta vuoto, e senza il passo 4 resta vuoto **senza dare
-errore**.
+idempotente). L'ultima e' `0009_via_cruscotto` (2026-09-05): droppa `pipeline_run`
+e `pipeline_agente`, le due tabelle del cruscotto tolto con la catena editoriale.
+**Il drop e' irreversibile per le righe che c'erano dentro**: il `downgrade()`
+ricrea le tabelle vuote.
 
 | Variabile | Dove | A cosa serve |
 |---|---|---|
@@ -196,7 +137,6 @@ errore**.
 | `SUPABASE_SECRET_KEY` | Secret Manager | Solo per la cancellazione account (admin API Supabase). |
 | `SUPABASE_URL` | env Cloud Run | Progetto Supabase (browser: auth + Realtime). |
 | `SUPABASE_ANON_KEY` | env Cloud Run | Chiave anon pubblica (protetta da RLS). |
-| `MONITOR_ADMIN_EMAIL` | env Cloud Run | Sola mail ammessa alla console. |
 
 Nota (Fase 5): la verifica JWT è **ES256 via JWKS** e richiede `cryptography`
 (in `requirements.txt` come `PyJWT[crypto]`): senza, ogni richiesta autenticata

@@ -1,14 +1,13 @@
 -- Setup Supabase per Divario Italia (Fase 4). Da eseguire UNA volta nel SQL
 -- editor del progetto, DOPO `alembic upgrade head` (che crea le tabelle).
 --
--- Due cose che Alembic non fa e che sono l'unica vera guardia della console:
---   1. Row Level Security: senza, l'anon key leggerebbe tutto. La policy lega la
---      lettura delle tabelle pipeline alla mail dell'admin nel JWT.
---   2. Publication Realtime: senza, la console non riceve mai un tick (nessun
---      errore, resta vuota per sempre).
+-- Row Level Security: senza, l'anon key leggerebbe tutto. Ogni utente vede solo
+-- le proprie righe.
 --
--- L'admin e' cablato qui sotto. Se cambia MONITOR_ADMIN_EMAIL lato app, cambia
--- anche questa mail e ri-esegui le policy.
+-- Il 5 settembre 2026 sono cadute le due tabelle del cruscotto della catena
+-- (`pipeline_run`, `pipeline_agente`, migrazione 0009): con loro se ne sono
+-- andate la policy della mail admin, la publication Realtime e REPLICA IDENTITY,
+-- che esistevano solo per la console.
 
 -- === RLS attiva su tutte le tabelle dell'app ===
 -- Le scritture dell'app passano dalla connection string (ruolo `postgres`,
@@ -17,8 +16,6 @@
 -- difesa in profondita': il confine per-utente vero e' il WHERE auth_id nel
 -- backend. NON contare sulla RLS per le tabelle account.
 ALTER TABLE public.scores          ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.pipeline_run    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.pipeline_agente ENABLE ROW LEVEL SECURITY;
 
 -- Tabelle account (Fase 5): RLS attiva, ogni utente vede/scrive solo le proprie
 -- righe. Il browser non interroga queste tabelle direttamente (passa dal backend);
@@ -69,39 +66,3 @@ CREATE POLICY own_saved_comparisons ON public.saved_comparisons
 -- una policy anon qui e NON contare sulla RLS per proteggere scores: se un domani
 -- l'app girasse con un ruolo senza BYPASSRLS, la classifica tornerebbe vuota in
 -- silenzio (il backend ha un fallback tollerante che maschera il vuoto).
-
--- pipeline_run / pipeline_agente: lettura SOLO per la mail admin. Sono le due
--- tabelle del cruscotto (una run e' un workflow, dentro ci sono i suoi agenti);
--- hanno sostituito pipeline_activity, pipeline_tokens e pipeline_outcomes, che
--- descrivevano la catena editoriale autonoma ritirata.
-DROP POLICY IF EXISTS admin_reads_run ON public.pipeline_run;
-CREATE POLICY admin_reads_run ON public.pipeline_run
-  FOR SELECT TO authenticated
-  USING ( (auth.jwt() ->> 'email') = 'maiese.next@gmail.com' );
-
-DROP POLICY IF EXISTS admin_reads_agente ON public.pipeline_agente;
-CREATE POLICY admin_reads_agente ON public.pipeline_agente
-  FOR SELECT TO authenticated
-  USING ( (auth.jwt() ->> 'email') = 'maiese.next@gmail.com' );
-
--- === Realtime: le due tabelle del cruscotto nella publication ===
--- ALTER PUBLICATION ... ADD TABLE NON e' idempotente: rieseguirlo su una tabella
--- gia' presente solleva duplicate_object e aborta lo script. Lo si avvolge, cosi'
--- l'intero file resta rieseguibile (utile mentre si itera sulla mail della policy).
-DO $$
-BEGIN
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.pipeline_run;
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
-DO $$
-BEGIN
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.pipeline_agente;
-EXCEPTION WHEN duplicate_object THEN NULL;
-END $$;
-
--- Realtime deve poter portare la riga vecchia su UPDATE: qui il percorso di
--- scrittura dominante e' l'aggiornamento (un agente che passa da aperto a
--- chiuso, una run che riceve il consuntivo), e senza la riga vecchia la console
--- non saprebbe che cosa e' cambiato. REPLICA IDENTITY FULL lo garantisce.
-ALTER TABLE public.pipeline_run    REPLICA IDENTITY FULL;
-ALTER TABLE public.pipeline_agente REPLICA IDENTITY FULL;

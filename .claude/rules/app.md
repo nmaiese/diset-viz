@@ -42,39 +42,6 @@ paths:
   sono authed (401 anonimo) e ricavano l'`auth_id` **solo dal JWT verificato**,
   mai dal body: la RLS è difesa in profondità (il backend gira BYPASSRLS), il
   confine è il `WHERE auth_id`. Leggere `docs/ACCOUNT.md` prima di toccarli.
-- `/_pipeline`, `/_pipeline/console` — il cruscotto della catena, su
-  `monitor.divarioitalia.it`, ristretto alla mail admin via RLS. `/_pipeline` è
-  solo la porta e manda alla console: **una vista sola su questo stato**, perché
-  due divergono, e qui sono già divergiute una volta. Tre API:
-  `/_pipeline/api/catalogo` è l'elenco, **tutti e 634 gli indicatori con una
-  pagina** e il loro stato editoriale, una riga per (indicatore, livello) come la
-  coda; `/_pipeline/api/runs` è la vista per workflow; `/_pipeline/api/indicatori`
-  è la storia delle run per indicatore, **derivata** dall'esito e non da una
-  tabella sua. Il criterio editoriale vive in `app/editorial_state.py` e la
-  passata sui 634 in `app/indicator_universe.py`, che serve **anche la sitemap**:
-  una seconda passata sarebbe un secondo picco di memoria, e una seconda regola
-  di indicizzabilità è già costata due pagine contate e mai pubblicate.
-  **`indicator_view.indexability()` è l'unico proprietario di quella domanda.**
-  `/_pipeline/beat` è la presa, e dal 5 settembre 2026 **non la scrive nessuno**:
-  il processo che lo faceva stava in `lab/`, tolto con la catena editoriale.
-  Le rotte restano vive e mostrano le run vecchie. `{"action":"ping"}` risponde con lo stato
-  senza scrivere niente, ed è così che si chiede se la presa è viva prima di
-  spendere una run: chiederlo con un `run` finto lasciava una run fantasma in
-  cima al cruscotto. Un `run_id` fuori dalla forma dichiarata dallo strumento
-  Workflow (`^wf_[a-z0-9-]{6,}$`) è rifiutato con 400, ma **quella forma non
-  separa un runId inventato da uno legale**: stringerla sui campioni visti
-  finora farebbe perdere in silenzio il monitoraggio di una run vera, perché il
-  `Postino` inghiotte il 400. La difesa contro la riga fantasma è il `ping` più
-  `battito_fermo`, che toglie dal posto d'onore una run che nessuno rinfresca da
-  un quarto d'ora. Il poller riposta la riga di una run **anche quando non è
-  cambiato niente** a intervallo fisso: senza, un turno lungo
-  faceva leggere `battito fermo` con il lettore vivo. Nessun agente della catena batte, e
-  nessun prompt lo sa: i turni sono il costo, e il monitoraggio non ne aggiunge.
-  Il modello dati (`app/pipeline_store.py`) ha una regola sola da non rompere:
-  **il battito e il consuntivo scrivono colonne disgiunte**, così la seconda
-  sorgente non riscrive quello che ha detto la prima. E due chiavi per due cose:
-  `agenti` è la lista, `agenti_totali` il conteggio, perché quando erano una sola
-  la console stampava `[object Object]` dove voleva un numero.
 
 Strato dati: `app/data.py` (legge `app/static/data/Assoluti_Regione.csv`).
 Strato blog: `app/blog.py` (legge `content/posts/*.md`).

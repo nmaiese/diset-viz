@@ -98,7 +98,7 @@ fisso che cambia.
 
 Segreti (Secret Manager) su Cloud Run: `SUPABASE_JWT_SECRET` (vuoto -> JWKS, che
 è il caso attuale), `SUPABASE_SECRET_KEY` (solo per la cancellazione account).
-Env pubbliche: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `MONITOR_ADMIN_EMAIL`.
+Env pubbliche: `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
 Le tabelle account si creano con `alembic upgrade head`; la RLS con
 `scripts/supabase_setup.sql`. Dettagli operativi in [`DEPLOY.md`](../DEPLOY.md),
 sezione "Fase 4".

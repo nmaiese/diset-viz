@@ -79,9 +79,3 @@ def current_user(headers):
         return None
     return {"id": claims.get("sub", ""), "email": (claims.get("email") or "").lower()}
 
-
-def is_admin(user):
-    """L'unica mail ammessa alla console di monitoraggio (config, default la mail
-    dell'utente). Il confine vero è la RLS su Postgres: questo è il controllo
-    lato app, in aggiunta, non al posto."""
-    return bool(user) and user.get("email") == config.MONITOR_ADMIN_EMAIL.lower()
