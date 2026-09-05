@@ -18,8 +18,7 @@ La review segue REVIEW.md. Commit senza trailer Co-Authored-By.
 - **Angolo scelto**, e angoli scartati con le prove:
 - **Fonti esterne** (istituzionali, riaperte sul grezzo, con data):
 - **Esito del verificatore / dei revisori**: cifre controllate, smentite, giri di correzione:
-- **Esito di `lab.controlla`**: `non_trovate`, `link_inesistenti`, `bloccanti`, `bozza_salvata`:
-- **Consuntivo memoria** (solo team): consultata, candidati, promossi, scartati:
+- **Esito di `motore verifica`**: `non_trovate`, `link_inesistenti`, `bloccanti`, `bozza_salvata`:
 - **Costo e turni**:
 
 ## Per il codice (umano, config, infra)

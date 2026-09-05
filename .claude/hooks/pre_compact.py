@@ -15,7 +15,7 @@ contro cui `CLAUDE.md` apre: un prompt che ripete un contratto invece di
 puntarlo.
 
 Adesso cita quello che la catena minima lascia davvero su disco: i dossier
-montati, le bozze congelate da `lab.controlla --salva` e gli articoli scritti.
+montati, le bozze congelate da `motore verifica --salva` e gli articoli scritti.
 Sono le tre cose il cui percorso serve per riprendere un giro a metà.
 
 Best effort: stampare meno è sempre meglio che fallire.
@@ -68,9 +68,9 @@ def main():
         if recenti:
             nomi = ", ".join(percorso.name for percorso in recenti)
             lines.append(f"- {etichetta} più di recente ({relativo}): {nomi}")
-    lines.append("- la catena e i suoi comandi: lab/README.md; "
-                 "che cosa conviene scrivere adesso: "
-                 "bin/py -m lab.dossier --coda 5 --freschi 2025")
+    lines.append("- gli articoli non si scrivono qui: la redazione e' il repo "
+                 "nmaiese/redazione-ai (motore coda, motore brief, motore verifica); "
+                 "lo stato del progetto sta nel suo QUADRO.md, non in docs/")
     print("\n".join(lines))
     return 0
 

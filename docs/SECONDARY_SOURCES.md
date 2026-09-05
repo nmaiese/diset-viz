@@ -102,7 +102,7 @@ perché un'attribuzione falsa non diventa vera col tempo. Ma vuol dire che dopo
 ogni modifica a un file di `data/corpus/claims/` si esegue
 
 ```bash
-bin/py -m lab.lint
+python3 scripts/prose_lint.py --summary
 ```
 
 e si riparano gli articoli che il cambio ha reso scoperti. Le chiavi sono un

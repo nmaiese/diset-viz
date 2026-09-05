@@ -677,7 +677,7 @@ def pipeline_console():
 # auth, e servirebbe il dato all'anonimo. Così invece l'auth gira sempre nella
 # view, e solo la lettura si riusa per 30s.
 
-# La forma dell'esito di `.claude/workflows/indicatore-lite.js`: `articoli` per
+# La forma dell'esito che il cruscotto si aspetta da una run: `articoli` per
 # quelli scritti, `fermati` per quelli che non hanno raggiunto il disco. Un
 # indicatore fermato **non è** un guasto, e il cruscotto non deve confonderli.
 def _articoli_da_esito(esito, run):
@@ -820,11 +820,11 @@ def _stato_in_linea(riga, scritture):
     L'immagine servita porta `content/indicators/` **al commit del deploy**,
     mentre `pipeline_run.esito` può contenere un articolo scritto dopo: è
     l'unica differenza vera fra "scritto" e "pubblicato" in questo repo, dove
-    `lab.pubblica` scrive direttamente sulla pagina pubblica e il merge è la
+    `motore pubblica` scrive direttamente sulla pagina pubblica e il merge è la
     pubblicazione.
 
     Si confronta l'**impronta della prosa** (`editorial_state.impronta`, che
-    stampa anche `lab/pubblica.py`): lead più `sections[].{role,h,body}`, la
+    stampa anche `motore pubblica`): lead più `sections[].{role,h,body}`, la
     stessa funzione dalle due parti, perché due definizioni diverse
     misurerebbero la differenza fra le definizioni invece che fra gli articoli.
 
@@ -940,7 +940,7 @@ PIPELINE_AZIONI = ("ping", "run", "agente", "consuntivo")
 
 @app.post("/_pipeline/beat")
 def pipeline_beat_ingest():
-    """La presa del cruscotto: `lab/cruscotto.py` POSTa qui quello che legge.
+    """La presa del cruscotto. Dal 5 settembre 2026 non ci POSTa piu' nessuno:
 
     Non lo POSTa un agente della catena, ed è il punto: il monitoraggio non
     aggiunge un turno a nessuno. Il lettore gira di fianco al workflow, legge i

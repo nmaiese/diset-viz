@@ -62,8 +62,8 @@ gcloud run services update diset-viz --region europe-west1 \
 
 ### Cruscotto della catena `/_pipeline`
 
-Il cruscotto guarda **le run del workflow** (`.claude/workflows/indicatore-lite.js`),
-non piu' un indicatore che attraversa stadi: la catena editoriale autonoma e' stata
+Il cruscotto guarda **le run di un workflow**, non piu' un indicatore che
+attraversa stadi: la catena editoriale autonoma e' stata
 ritirata, e con lei le tabelle `pipeline_activity`, `pipeline_tokens` e
 `pipeline_outcomes`, che dal 2026-08-08 non esistono piu' (migrazione
 `0008_cruscotto_workflow`). Al loro posto due tabelle su Supabase Postgres:
@@ -78,15 +78,16 @@ garantito, quindi se scrivessero le stesse colonne la seconda cancellerebbe
 quello che ha detto la prima, proprio sulla run che qualcuno sta guardando. Sta
 in `app/pipeline_store.py`.
 
-Chi scrive: **`lab/cruscotto.py`**, un processo che gira **di fianco** al
-workflow, legge i trascritti che il runtime scrive comunque e POSTa a
-`/_pipeline/beat`. Nessun agente della catena batte, e nessun prompt lo sa: i
-turni sono il costo di quell'architettura, e il monitoraggio non ne aggiunge.
+**Chi scriveva non esiste piu'.** Il processo che leggeva i trascritti e POSTava
+a `/_pipeline/beat` era `lab/cruscotto.py`, tolto il 5 settembre 2026 insieme a
+tutto `lab/`, perche' la catena editoriale vive ora nel repo `redazione-ai`.
+Quindi oggi la presa e' viva e non la scrive nessuno: le due tabelle restano, le
+rotte rispondono, e il cruscotto mostra le run vecchie.
 
-    bin/py -m lab.cruscotto --segui --per 5400 &   # PRIMA del workflow
-
-Il consuntivo lo posta da se', quando vede comparire
-`<sessione>/workflows/<runId>.json`, che il runtime scrive **solo a run finita**.
+Spegnerla del tutto vuol dire togliere le rotte `/_pipeline` da `app/views.py`,
+la configurazione da `app/config.py`, `app/pipeline_store.py`, le quattro
+migrazioni e le due tabelle su Supabase. E' un lavoro sull'app viva, non una
+pulizia: sta in `Prossimo` nel Quadro di `redazione-ai`, e aspetta una decisione.
 
 Prima di spendere una run si chiede alla presa se e' viva e se parla il
 protocollo giusto, e lo si chiede con `ping`, che **non scrive niente**:
@@ -117,7 +118,7 @@ trascritto e' incompleto, non lo e' la misura. Le righe portano
 | Variabile | Dove | A cosa serve |
 |---|---|---|
 | `PIPELINE_TOKEN` | env Cloud Run (o Secret Manager) | Se impostata, `/_pipeline` serve solo con `?token=` giusto, altrimenti 404. Vuota = aperta (solo locale). |
-| `PIPELINE_INGEST_TOKEN` | **Secret Manager**, su Cloud Run **e** nell'ambiente agenti `divarioitalia` | Il segreto con cui `lab/cruscotto.py` autentica il POST (header `X-Pipeline-Key`). Vuoto = ingest spento (404). |
+| `PIPELINE_INGEST_TOKEN` | **Secret Manager**, su Cloud Run **e** nell'ambiente agenti `divarioitalia` | Il segreto con cui il poller autenticava il POST (header `X-Pipeline-Key`). Il poller non esiste piu': vuoto = ingest spento (404), ed e' lo stato consigliato. |
 | `PIPELINE_INGEST_URL` | ambiente agenti `divarioitalia` | Dove postare: `https://divarioitalia.it`. Senza, il lettore legge e lo dice nel log invece di girare a vuoto. |
 
 Nessuna credenziale GCP sugli agenti: scrivono solo via l'endpoint.
