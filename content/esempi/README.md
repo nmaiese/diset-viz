@@ -51,8 +51,8 @@ convergere su un tono unico.
 ## Che cosa NON sono
 
 **Non sono contenuto pubblicato.** Nessuna rotta li serve, non stanno nella
-sitemap, non sono nel blog. L'app legge `content/posts/`, `content/indicators/`,
-`content/uploads/` e `content/agent-skills/`, mai questa cartella.
+sitemap, non sono nel blog. L'app legge `content/indicators/` e `content/posts/`,
+mai questa cartella.
 
 **Non sono una fonte di dati.** Le cifre che compaiono negli estratti valgono
 per il testo in cui stanno e non si citano mai in un nostro articolo. I numeri

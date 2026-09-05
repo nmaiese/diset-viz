@@ -40,6 +40,7 @@ python3 scripts/promote_candidates.py --offline --dry-run
 python3 scripts/promote_candidates.py --offline
 ```
 
-Vedi [`docs/archive/DISCOVERY_PIPELINE.md`](../../docs/archive/DISCOVERY_PIPELINE.md)
-per l'architettura completa (archiviato: l'agente schedulato che descrive non
-esiste più; oggi l'ammissione è l'agent `motore:admissions` del plugin).
+L'architettura completa stava in `docs/archive/DISCOVERY_PIPELINE.md`, cancellato
+il 5 settembre 2026 con tutta `docs/archive/`: descriveva un agente schedulato e un
+plugin `motore` che non esistono più. Oggi resta quello che si legge qui sopra:
+`scripts/discovery.py` e `scripts/promote_candidates.py`.
