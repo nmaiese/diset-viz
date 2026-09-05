@@ -1,18 +1,55 @@
 {
- "fonti": [],
+ "angolo_scelto": "La classifica dell'occupazione e quella della distanza fra uomini e donne vanno quasi sempre insieme, dove si lavora meno le donne restano molto più indietro, ma non del tutto: l'ultima regione per occupazione non è quella con il divario più ampio.",
+ "costo": 18.43,
+ "fonti": [
+  {
+   "testo": "Svimez, L'Osservatorio per le diseguaglianze di genere Svimez - W20",
+   "url": "https://www.svimez.it/losservatorio-per-le-disuguaglianze-di-genere-svimez-w20/"
+  },
+  {
+   "testo": "Istat, Noi Italia - Mercato del lavoro",
+   "url": "https://noi-italia.istat.it/pagina.php?id=3&categoria=16&action=show&L=0"
+  },
+  {
+   "testo": "Istat, Occupati e disoccupati (dati provvisori) - Dicembre 2025",
+   "url": "https://www.istat.it/comunicato-stampa/occupati-e-disoccupati-dati-provvisori-dicembre-2025/"
+  },
+  {
+   "testo": "Istat, Banca dati territoriale per le politiche di sviluppo",
+   "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
+  }
+ ],
  "key": "345",
- "lead": "Misurato sulla fascia 20-64 anni, quella usata per i confronti europei, il tasso di occupazione italiano sale al 68% in media, dato che esclude i più giovani spesso ancora a scuola. Il divario però resta netto: dal 50,3% della Calabria al 78,8% del Trentino Alto Adige.",
+ "lead": "Nel 2025 lavora il 78,8% delle persone fra 20 e 64 anni in Trentino Alto Adige e il 50,3% in Calabria. La media delle venti regioni è 68,0%. Nessuna regione del Mezzogiorno arriva a quella media, nessuna regione del Nord ci resta sotto.",
+ "level": "regione",
+ "scritto_il": "2026-09-04",
  "sections": [
   {
-   "body": "Cambiare la fascia d'età non cambia la sostanza, ma serve a confrontarsi con l'Europa, dove l'Italia resta stabilmente indietro rispetto alla media dei tassi di occupazione. Le regioni del Nord si allineano ai livelli europei più alti, quelle del Sud restano molto sotto, come se nello stesso Paese convivessero due mercati del lavoro. Recuperare il ritardo nazionale significa soprattutto colmare quello meridionale. L'Italia ha un problema di occupazione o un problema di Mezzogiorno?",
-   "h": null,
+   "body": "Il numero è un rapporto: gli occupati fra 20 e 64 anni divisi per tutte le persone di quella età che vivono nel territorio. Occupato, secondo l'indagine sulle forze di lavoro armonizzata a livello europeo, è chi nella settimana di riferimento ha lavorato almeno un'ora per un compenso in denaro o in natura. Lo è anche chi era assente per ferie, malattia o cassa integrazione, ma ha mantenuto il posto o l'attività autonoma. L'indicatore fa parte del set di indicatori strutturali per la valutazione degli obiettivi europei della strategia Europa 2020, diffusi da Eurostat.",
+   "h": "Chi viene contato come occupato",
+   "role": "definizione"
+  },
+  {
+   "body": "Nel 2025 la classifica si legge quasi per intero sulla carta geografica. Le otto regioni del Nord stanno tutte sopra la media delle venti regioni, e con loro le quattro del Centro. Le otto del Mezzogiorno stanno tutte sotto.\n\nIn cima c'è il Trentino Alto Adige con il 78,8%, poi la Valle d'Aosta con il 77,8% e l'Emilia-Romagna con il 77,0%. In fondo la Calabria con il 50,3%, la Campania con il 50,8% e la Sicilia con il 51,4%. L'Abruzzo, con il 67,2%, è la regione del Mezzogiorno che arriva più vicino alla media.\n\nMettendo insieme le regioni per area, la media delle regioni del Nord è 75,8% e quella delle regioni del Mezzogiorno 57,7%, cioè 18,1 punti di distanza. Sono medie semplici, in cui ogni regione conta uguale: non sono i tassi di occupazione del Nord e del Mezzogiorno che Istat calcola tenendo conto di quante persone ci vivono.",
+   "h": "La classifica, letta dall'alto",
    "role": "quadro"
   },
   {
-   "body": "Adotta la fascia 20-64 per il confronto internazionale, quindi non è direttamente comparabile con l'indicatore 15-64. Resta una misura di quantità, che non dice nulla su stabilità, orari e retribuzione del lavoro contato.",
-   "h": null,
+   "body": "Dentro questa classifica ce n'è una seconda, e le due si somigliano molto. Fra gli uomini il valore più alto nel 2025 è dell'Emilia-Romagna, 84,3%, e il più basso della Calabria, 63,1%. Fra le donne il più alto è della Valle d'Aosta, 74,3%, e il più basso della Campania, 36,8%, poco più di una donna su tre fra i 20 e i 64 anni. Il punto più basso fra le donne, quello della Campania, sta molto sotto il punto più basso fra gli uomini, quello della Calabria.\n\nSe per ogni regione si mette il valore maschile accanto a quello femminile dello stesso anno, nel 2025 la distanza più ampia è in Puglia, 28,7 punti, e la più stretta in Valle d'Aosta, 7,0 punti. Le due classifiche vanno quasi sempre insieme: dove si lavora meno, uomini e donne sono più lontani. Le regioni che chiudono la classifica generale sono anche quelle con la distanza fra i sessi più larga, e la Valle d'Aosta, seconda per occupazione, è la regione dove quella distanza è più corta.\n\nNon del tutto, però. L'ultima regione per occupazione, la Calabria, non è quella con il divario più ampio. Quel primato è della Puglia, 55,2% di occupazione complessiva, diciassettesima. Sotto di lei ci sono Sicilia, Campania e Calabria, dove uomini e donne sono un poco più vicini che in Puglia.\n\nSul Mezzogiorno, Svimez, nel suo osservatorio sulle disuguaglianze di genere, segnala un fatto: lì le donne inattive, quelle che non lavorano e non stanno cercando lavoro, sono più delle donne occupate, e questo indica una fragilità strutturale del mercato del lavoro.\n\nLe due classifiche complete hanno una pagina ciascuna, il [tasso di occupazione maschile](/indicatore/tasso-di-occupazione-20-64-anni-maschi/ter-346) e quello [femminile](/indicatore/tasso-di-occupazione-20-64-anni-femmine/ter-347). La distanza fra i due esiste anche come indicatore per conto suo, che la misura in un altro modo e arriva a valori un poco diversi, nella pagina della [differenza tra tasso di occupazione maschile e femminile](/indicatore/differenza-tra-tasso-di-occupazione-maschile-e-femminile/ter-57).",
+   "h": "Dove si lavora meno, le donne lavorano molto meno",
+   "role": "quadro"
+  },
+  {
+   "body": "Su questo tasso ci sono dati regionali a partire dal 2018. Nel 2018 la media delle venti regioni era 63,1%, nel 2025 è 68,0%: quasi cinque punti in sette anni, con la caduta del 2020 in mezzo, quando la media scese a 62,2%. Fra il 2024 e il 2025 il passo è stato di 0,6 punti.\n\nLa crescita non si è distribuita in parti uguali. Istat, in Noi Italia e sulla stessa fascia 20-64 anni, rileva che nel 2024, rispetto all'anno prima, l'aumento è stato maggiore nel Mezzogiorno, e che gli squilibri territoriali restano comunque significativi. Nel comunicato sugli occupati di dicembre 2025 aggiunge che la crescita rispetto a dodici mesi prima riguarda le donne, mentre fra gli uomini gli occupati diminuiscono. Quel comunicato però misura la fascia 15-64 anni, un conteggio diverso da questo: indica una direzione, non un valore da appoggiare a questa mappa.",
+   "h": "Sette anni, quasi cinque punti",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il 68,0% del 2025 è la media delle venti regioni, non il tasso italiano. Qui il Molise pesa quanto la Lombardia. Il dato nazionale pubblicato da Istat tiene conto di quante persone vivono in ciascun territorio, ed è un altro numero: i due non si scambiano. Lo stesso vale per i valori del Nord e del Mezzogiorno scritti sopra.\n\nPoi c'è il modo di contare. Chi ha lavorato un'ora nella settimana di riferimento è occupato quanto chi ne ha lavorate quaranta, e chi è in cassa integrazione è occupato quanto chi è al lavoro. Il tasso dice quante persone hanno un impiego, non quante ore lavorano né quanto vengono pagate.\n\nInfine, il tasso non distingue chi un lavoro lo sta cercando da chi ha smesso di cercarlo. Due regioni con lo stesso valore possono avere mercati del lavoro molto diversi.",
+   "h": "Dove il numero smette di valere",
    "role": "limiti"
   }
  ],
+ "titolo": "Occupazione 20-64 anni: dal 78,8% del Trentino Alto Adige al 50,3% della Calabria",
  "vintage": 2025
 }
