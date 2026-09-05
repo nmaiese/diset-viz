@@ -417,6 +417,15 @@
   </details>
   {% endif %}
 
+  {% if dimension_siblings %}
+  <nav class="dimension-nav" aria-label="Lo stesso indicatore per genere">
+    <span class="dimension-nav__label">Lo stesso indicatore, per genere:</span>
+    {% for item in dimension_siblings %}
+    <a class="dimension-nav__link" href="{{ item.path }}">{{ item.value_label }}</a>
+    {% endfor %}
+  </nav>
+  {% endif %}
+
   {% if related %}
   <section class="indicator-related">
     <h2>Altri indicatori del tema {{ meta.theme }}</h2>

@@ -1283,6 +1283,7 @@ def _render_indicator(family, raw_id):
         related=view["related"],
         related_posts=posts_for_indicator(meta["id"]),
         siblings=view["siblings"],
+        dimension_siblings=view["dimension_siblings"],
         explore=view["explore"],
         page_article=article,
         page_lead=lead,

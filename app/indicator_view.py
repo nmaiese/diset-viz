@@ -30,7 +30,10 @@ Two consequences worth knowing:
   guessing from the level name.
 """
 
+import csv
 import functools
+from collections import defaultdict
+from pathlib import Path
 
 from app import profiles, seo_policy, sources
 from app.atlas_catalog import get_atlas_indicator, get_atlas_catalog
@@ -124,6 +127,7 @@ def _assemble(meta, levels):
         "default_level": levels[0]["key"],
         "related": related,
         "siblings": siblings,
+        "dimension_siblings": _dimension_siblings(meta["family"], meta["id"]),
         "explore": _explore_payload(meta, levels),
     }
 
@@ -574,6 +578,69 @@ def _theme_siblings(theme):
         ),
         key=lambda item: item["name"].lower(),
     )
+
+
+INDICATOR_FAMILIES_PATH = Path(__file__).resolve().parent.parent / "config" / "indicator_families.csv"
+
+# Ordine di visualizzazione fisso, non alfabetico: il lettore trova sempre
+# Totale per primo, poi Maschi/Femmine nello stesso ordine su ogni pagina.
+DIMENSION_VALUE_ORDER = {"totale": 0, "maschi": 1, "femmine": 2}
+DIMENSION_VALUE_LABELS = {"totale": "Totale", "maschi": "Maschi", "femmine": "Femmine"}
+
+
+@functools.lru_cache(maxsize=1)
+def _indicator_family_members():
+    """{(source, indicator_id): [gli altri membri della stessa famiglia]}.
+
+    Legge config/indicator_families.csv, il file curato del passo (a)
+    (docs/FAMIGLIE_INDICATORI.md): non è rigenerato in automatico, quindi
+    va bene tenerlo in cache per la vita del processo, come _theme_siblings
+    sopra. Copre solo il catalogo storico oggi (source "territorial"): un
+    id non mappato non torna nessun elemento, la sua pagina resta identica
+    a prima.
+    """
+    if not INDICATOR_FAMILIES_PATH.exists():
+        return {}
+    rows_by_family = defaultdict(list)
+    with INDICATOR_FAMILIES_PATH.open(encoding="utf-8", newline="") as handle:
+        for row in csv.DictReader(handle, delimiter=";"):
+            rows_by_family[row["family_key"]].append(row)
+    members = {}
+    for rows in rows_by_family.values():
+        for row in rows:
+            key = (row["source"], row["indicator_id"])
+            members[key] = [other for other in rows if other["indicator_id"] != row["indicator_id"]]
+    return members
+
+
+def _dimension_siblings(family, indicator_id):
+    """Altri valori della stessa misura (es. Maschi/Femmine/Totale), se
+    l'id fa parte di una famiglia mappata.
+
+    Nessun cambio di URL o di routing: ogni membro tiene la propria pagina
+    già pubblicata, questo collega fra loro pagine che esistono già (Nello,
+    4/9: "non modifichiamo la struttura delle pagine, url pubblicate, al
+    massimo usiamo canonical"). Qui non serve nemmeno il canonical: ogni
+    pagina resta indicizzabile secondo la sua stessa regola di sempre,
+    `profiles.is_gender_variant`, invariata.
+    """
+    others = _indicator_family_members().get((family, str(indicator_id)), [])
+    if not others:
+        return []
+    catalog_by_id = {str(item["id"]): item for item in get_atlas_catalog()["indicators"]}
+    siblings = []
+    for row in others:
+        item = catalog_by_id.get(row["indicator_id"])
+        if item is None:
+            continue
+        siblings.append({
+            "id": item["id"],
+            "name": item["name"],
+            "path": item["path"],
+            "value": row["value"],
+            "value_label": DIMENSION_VALUE_LABELS.get(row["value"], row["value"].capitalize()),
+        })
+    return sorted(siblings, key=lambda s: DIMENSION_VALUE_ORDER.get(s["value"], 99))
 
 
 def _explore_payload(meta, levels):

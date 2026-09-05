@@ -148,6 +148,17 @@ apre **uno solo**, `indicatori_regione_sesso.xlsx`:
   ripartizione territoriale (macro-aree, non le 20 regioni), mai aperto
 - `Metadati.xlsx`: definizioni testuali dei 153 indicatori, mai aperto
 
+**Non è una famiglia di id da collegare, a differenza della sezione 1**: un
+indicatore BES ha un **unico** `CODICE` (es. `01SAL001`), con `SESSO` come
+colonna della fonte che assume i tre valori sulla stessa riga concettuale,
+non tre id Istat separati come 345/346/347 nel catalogo storico.
+`config/indicator_families.csv` (sotto, punto aperto 2) non copre BES per
+questo: non c'è nulla da collegare, c'è solo uno smettere di scartare una
+colonna nel convertitore, estendendo lo schema di
+`Assoluti_BES_Regione.csv` con una dimensione `sesso` sulla riga esistente.
+È lavoro del passo (b) ("estendere la raccolta"), non del passo (a)
+("mappare le famiglie").
+
 Anche nel file usato la colonna `SESSO` è **già strutturata**
 (`Maschi`/`Femmine`/`Totale`, non testo nel titolo), e
 `scripts/update_bes_regions.py:151` tiene solo le righe `Totale`:
@@ -159,31 +170,40 @@ if str(values[positions["SESSO"]] or "").strip() != "Totale":
 
 Verificato scaricando di nuovo lo ZIP: 8.479 righe nel foglio, 4.359 Totale
 + 2.060 Maschi + 2.060 Femmine. Contando solo la presenza dell'id per sesso
-(senza guardare in quali regioni) risultavano 84 triplette; **contando la
+(senza guardare in quali regioni) risultavano 84 triplette; contando la
 copertura per regione (un id conta solo se Totale, Maschi e Femmine sono
 tutti presenti in tutte e 20 le regioni, non solo da qualche parte nel
-file) sono 65**: un indicatore con maschi/femmine solo per l'Italia o
-qualche macro-area, o mancante in alcune regioni, non è una tripletta
-regionale completa anche se l'id compare. Sempre scartata a ogni
-aggiornamento (4.120 righe). 78 indicatori sono Totale-only su tutte le 20
-regioni con zero maschi/femmine in nessuna regione: niente da recuperare
-per quelli. I restanti 10 (153 - 65 - 78) hanno una copertura parziale, da
-guardare caso per caso prima di contarli. Stesso filtro territoriale delle
+file) sembravano 65, poi **`scripts/update_bes_regions.py` scritto per
+davvero (sotto) ne conta 64**: `06POL012` ha una riga per tutte e 20 le
+regioni su ogni sesso, ma almeno un anno con un valore vuoto o un trattino
+invece di un numero, quindi non ha davvero un'osservazione utilizzabile in
+qualche regione anche se la riga esiste. **64 è il numero giusto**, lo
+stesso criterio che `parse_archive` usa già per il Totale (una riga con un
+valore non numerico non conta come copertura). Sempre scartata a ogni
+aggiornamento prima di questa PR (4.120 righe). 78 indicatori sono
+Totale-only su tutte le 20 regioni con zero maschi/femmine in nessuna
+regione: niente da recuperare per quelli. Stesso filtro territoriale delle
 altre due fonti: il file ha più territori delle 20 regioni (Italia,
 macro-aree, le due province autonome separate da Trentino Alto Adige), ne
 teniamo 20.
 
-Verifica riproducibile con `scripts/audit_famiglie_fonti.py`.
+Verifica riproducibile con `scripts/audit_famiglie_fonti.py` (numero
+approssimato, sola lettura) e con `scripts/update_bes_regions.py` stesso
+(numero vero, quello scritto nel manifest).
 
-**Conseguenza**: qui non serve né un parser sul titolo né cambiare una
-chiave di query SDMX. La dimensione è già una colonna nel file che
-scarichiamo: va solo smesso di scartarla in `parse_archive`
-(`scripts/update_bes_regions.py:131-213`), verificando la copertura
-regionale prima di considerare una tripletta completa. È la fonte più
-economica delle tre per una famiglia pilota: 65 famiglie pronte con
-copertura regionale piena, più del doppio delle 30 del catalogo storico,
-zero euristica sul titolo (ma serve comunque il controllo di copertura per
-regione sopra).
+**Fatto**: `scripts/update_bes_regions.py` ora scrive anche
+`app/static/data/Assoluti_BES_Regione_Sesso.csv` (le stesse 12 colonne di
+`Assoluti_BES_Regione.csv` più `Sesso`) e
+`app/static/data/bes_regione_sesso_manifest.csv` (la copertura per
+`Totale`/`Maschi`/`Femmine` separata, con `full_gender_coverage`), da un
+unico download, senza toccare `Assoluti_BES_Regione.csv` né i suoi
+consumatori (`app/bes_data.py`, lo scoring qualità della vita): stesso
+schema di separazione della pipeline provinciale
+(`docs/PROVINCE_PIPELINE.md`, "fase di sola acquisizione"). `parse_archive`
+resta invariata, il suo comportamento è bloccato da
+`tests/unit/test_bes_refresh.py`; la nuova `parse_archive_by_sex` ha i suoi
+test nello stesso file. Collegare il nuovo file alla pagina indicatore e
+al selettore di dimensione resta lavoro del passo (c).
 
 ## Concetti già esistenti, e perché non bastano
 
@@ -205,6 +225,13 @@ Serve un terzo concetto, "famiglia di misura", distinto dagli altri due.
 - Dati: `app/data.py`, `scripts/update_data.py`, `scripts/update_bes_regions.py`,
   `config/istat_series.yaml`, `scripts/istat_regional_source.py`, i codelist
   in `data/provincia/`.
+- Mappatura delle famiglie (catalogo storico): `config/indicator_families.csv`
+  (curato), `scripts/generate_indicator_families.py`,
+  `tests/unit/test_indicator_families.py`.
+- Dimensione sesso già raccolta (BES): `Assoluti_BES_Regione_Sesso.csv`,
+  `bes_regione_sesso_manifest.csv`, prodotti da
+  `parse_archive_by_sex` in `scripts/update_bes_regions.py`,
+  `tests/unit/test_bes_refresh.py`.
 - Routing e vista: `app/views.py:1145` (rotta `/indicatore/<slug>/<id>`),
   `app/indicator_view.py` (`build_indicator_view`, i "parenti").
 - Contenuto: `content/indicators/<id>.json`, uno per id oggi, sezioni con
@@ -213,20 +240,59 @@ Serve un terzo concetto, "famiglia di misura", distinto dagli altri due.
 - Redazione (`nmaiese/redazione-ai`): `motore/dossier.py`, `motore/brief.py`,
   `motore/verifica.py`, `motore/coda.py`, `motore/pubblica.py`.
 
-## I quattro passi (RIPARTENZA.md §4.3)
+## I quattro passi (RIPARTENZA.md §4.3), stato al 4 settembre notte
 
-a. Mappare le famiglie: parser euristico sui titoli per il catalogo storico
-   (file curato, sul modello di `config/theme_categories.csv`), lettura
-   diretta da `config/istat_series.yaml` per le serie SDMX.
-b. Estendere la raccolta SDMX alle dimensioni già note e al livello provincia,
-   riusando i codelist già committati.
-c. Ridisegnare la pagina indicatore: una famiglia, un selettore di dimensione
-   e di livello, redirect dagli id vecchi.
-d. Ridisegnare `dossier`/`brief`/`verifica`/`pubblica` della redazione per un
-   pezzo che tratta una famiglia intera.
+a. **Fatto per il sesso.** `config/indicator_families.csv` (catalogo storico,
+   30 famiglie/89 id) e `Assoluti_BES_Regione_Sesso.csv` (BES, 64 indicatori
+   con copertura piena). **Chiuso come non disponibile per l'età**: nessuna
+   delle fonti già acquisite pubblica età a livello regione (sotto).
+b. Fatto solo per BES/sesso (sopra). Non toccato: livello provincia (per
+   nessuna dimensione), le serie SDMX demografia/multiscopo (sesso o età mai
+   variati).
+c. **Fatto, con un vincolo diverso da come scritto qui**: non un selettore
+   con routing nuovo né redirect dagli id vecchi (Nello, 4/9 sera: "non
+   modifichiamo la struttura delle pagine, url pubblicate, al massimo
+   usiamo canonical"). Realizzato invece come navigazione fra le pagine
+   già pubblicate di una famiglia (`app/indicator_view.py::_dimension_siblings`,
+   il blocco "Lo stesso indicatore, per genere" in `indicator_page.html`):
+   stesso valore per il lettore, zero rischio sulle URL indicizzate. Non
+   copre BES (un id, una pagina, nessun altro id da collegare, sezione 3) né
+   provincia (passo b non ancora esteso lì).
+d. **Non iniziato.** `motore/dossier.py`, `motore/brief.py`, `motore/verifica.py`
+   in `nmaiese/redazione-ai` non sanno ancora cosa sia una famiglia.
 
 Non blocca la Settimana 2 in corso: i pezzi scritti ora restano con il
 modello attuale, si riscrivono quando la pagina di famiglia è pronta.
+
+### Età: verificata e chiusa come non disponibile a livello regione
+
+Cercata con lo stesso rigore del sesso, su tutte e tre le fonti, il 4
+settembre notte:
+
+- **Catalogo storico**: 14 indicatori hanno una fascia d'età nel titolo
+  ("over 54", "20-64 anni", "15-19 anni", ...), ma sono tutti misure a
+  fascia fissa, non famiglie con più fasce alternative. "Tasso di
+  occupazione over 54" e "Tasso di occupazione 20-64 anni" sono due misure
+  diverse, non la stessa misura con un selettore d'età: nessuna famiglia di
+  età da collegare.
+- **BES, i tre file ancora mai aperti**: `indicatori_eta_sesso.xlsx` (153
+  indicatori, fasce ricche) e `indicatori_titolo_di_studio.xlsx` (66) non
+  hanno nessuna colonna territorio, sono a livello Italia.
+  `indicatori_titolo_di_studio_ripartizione.xlsx` (29) ha una colonna
+  territorio, ma con soli 4 valori: Nord, Centro, Mezzogiorno, Italia.
+  Macro-aree, non le 20 regioni del sito. Nessuno dei tre è utilizzabile
+  per la pagina regionale così com'è.
+- **Pipeline SDMX**: nessuna serie ammessa in `config/istat_series.yaml` ha
+  `ETA1` nel proprio `dimension_order` (verificato anche sul fixture del
+  dataflow demografico pilota, che ha solo tre dimensioni: FREQ, REF_AREA,
+  DATA_TYPE). Non c'è età nascosta da recuperare in quello che è già
+  ammesso.
+
+**Conseguenza**: a differenza del sesso (il problema era "lo scartiamo"),
+per l'età il problema è che Istat non lo pubblica a livello regione in
+nessuna fonte già acquisita. Integrarla richiederebbe cercare una fonte
+SDMX regionale con età non ancora ammessa: un lavoro di scoperta diverso,
+più aperto, non ancora iniziato.
 
 ## Punti aperti, da decidere nel passo (a)
 
@@ -244,28 +310,36 @@ passo (a) li affronta prima di scrivere codice.
    femmine né il collegamento fra i tre id di una famiglia), ma ora ha un
    controllo di completezza indipendente per verificarlo. Per BES (sezione
    3) il parser sul titolo non serve: la dimensione è già una colonna
-   `SESSO` con il valore vero (Maschi/Femmine/Totale), ma va incrociata con
-   la copertura per regione, non solo con la presenza dell'id (un id con
-   maschi/femmine solo per l'Italia o qualche regione non è una famiglia
-   completa). Resta aperto per `indicatori_eta_sesso.xlsx` e i due file
-   titolo di studio del BES, non ancora guardati in dettaglio, e per quando
-   si estenderà al livello provincia.
-2. **File generato o curato a mano?** Come `config/theme_categories.csv`
-   (curato) o rigenerato a ogni aggiornamento dati (automatico, poi rivisto)?
-   I titoli cambiano raramente: probabile che generato-poi-rivisto sia giusto,
-   ma va deciso, non assunto.
+   `SESSO` con il valore vero (Maschi/Femmine/Totale) sullo stesso id, ma va
+   incrociata con la copertura per regione, non solo con la presenza
+   dell'id (un id con maschi/femmine solo per l'Italia o qualche regione
+   non ha la dimensione completa su tutte e 20). Resta aperto per
+   `indicatori_eta_sesso.xlsx` e i due file titolo di studio del BES, non
+   ancora guardati in dettaglio, e per quando si estenderà al livello
+   provincia.
+2. **File generato o curato a mano? Deciso il 4 settembre notte: curato**,
+   come `config/theme_categories.csv`, non rigenerato a ogni aggiornamento
+   dati. Fatto per il catalogo storico: `config/indicator_families.csv` (30
+   famiglie, 89 righe, le stesse verificate in sezione 1), prodotto da
+   `scripts/generate_indicator_families.py` (rilanciato a mano, non parte
+   della pipeline automatica) e controllato da
+   `tests/unit/test_indicator_families.py`. Copre solo il catalogo storico:
+   BES non ha famiglie di id da collegare (sezione 3), quindi non c'è nulla
+   da aggiungere qui per BES.
 3. **Schema del contenuto**: un file per famiglia in `content/indicators/`
    (quale slug/id lo rappresenta?) o un nuovo `content/famiglie/<chiave>.json`
    separato dai file per id, che restano per compatibilità? Tocca anche gli
    URL canonici e i redirect dagli id vecchi.
-4. **Ambito del pilota, da riconsiderare alla luce del punto 1**: BES
-   (sezione 3) ha 65 famiglie con copertura regionale piena su tutte e 20
-   le regioni (contando solo la presenza dell'id, senza il controllo di
-   copertura, sembravano 84: la differenza è il motivo per cui la copertura
-   per regione va sempre verificata, non solo l'esistenza dell'id), più del
-   doppio delle 30 del catalogo storico, ed è la fonte più economica su cui
-   far partire la famiglia pilota (basta smettere di scartare le righe
-   `Maschi`/`Femmine` in `scripts/update_bes_regions.py:151`, verificando
-   la copertura). Il catalogo storico resta un candidato valido (es. la
-   tripletta 345/346/347, occupazione 20-64, che è fra le pagine con più
-   impression), ma non è più l'unico né il più economico.
+4. **Ambito del pilota**: BES (sezione 3) ha **64** indicatori con copertura
+   regionale piena su tutte e 20 le regioni per Totale/Maschi/Femmine (non
+   84: quel numero contava la sola presenza dell'id, non se il valore alle
+   20 regioni fosse un numero vero; non 65: quello contava la presenza
+   della riga anche quando il valore era vuoto o un trattino,
+   `06POL012`). Più del doppio delle 30 famiglie del catalogo storico. La
+   raccolta è già estesa: `scripts/update_bes_regions.py` scrive
+   `Assoluti_BES_Regione_Sesso.csv` e il manifest con
+   `full_gender_coverage` per ognuno dei 64. Il catalogo storico resta un
+   candidato valido (es. la tripletta 345/346/347, occupazione 20-64, che è
+   fra le pagine con più impression), ma non è più l'unico né il più
+   economico: collegare uno dei due alla pagina indicatore (passo c) è
+   quello che resta da decidere.
