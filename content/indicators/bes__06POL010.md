@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:06POL010"
+vintage: 2022
+---
+
+L'età media dei parlamentari eletti in ciascuna regione va dai 47,4 anni dell'Abruzzo ai 57,3 della Basilicata, con la Valle d'Aosta e il Molise sopra i 55. La media delle regioni è di circa 52 anni. Il Parlamento italiano resta tra i più anziani.
+
+<!-- sezione: quadro -->
+
+Un Parlamento anziano riflette in parte una società che invecchia, ma anche partiti che rinnovano poco la classe dirigente. Le regioni piccole, con pochi eletti, mostrano età più variabili. Il ricambio generazionale in politica è lento, e i giovani restano sottorappresentati rispetto al loro peso nella società. Una politica più giovane guarderebbe più lontano o conta di più l'esperienza?
+
+<!-- sezione: limiti -->
+
+È l'età media degli eletti per regione, un dato sensibile al piccolo numero di seggi di molte regioni. Non dice nulla sul ricambio reale né sulla presenza dei giovani nei ruoli decisionali.

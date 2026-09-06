@@ -1,0 +1,17 @@
+---
+fonti: []
+key: "multiscopo:MULTI_DISAGIO_FACILITA"
+reviewed_at: "2026-07-26"
+reviewed_vintage: 2024
+vintage: 2024
+---
+
+Arrivare a fine mese con facilità è un privilegio di pochi. Ci riesce il 17,7% delle famiglie in Trentino Alto Adige e il 15,6% in Valle d'Aosta, ma solo il 3% in Calabria. La media semplice delle venti regioni è del 9% nel 2024.
+
+<!-- sezione: quadro -->
+
+È l'indicatore rovesciato del disagio economico, e serve a vedere non chi fatica ad arrivare a fine mese ma chi ci arriva con margine. Il vertice è staccato dal resto. Trentino Alto Adige e Valle d'Aosta stanno sopra il 15%, poi si scende di tre punti fino al Veneto e la classifica si comprime, perché dall'Emilia-Romagna al Piemonte dieci regioni stanno dentro poco più di due punti. Dal 2018 la quota cresce quasi ovunque, e l'unico territorio più in basso di allora è il Molise, per un soffio. Cinque regioni non hanno un valore per il 2018, quindi il confronto lungo vale su quindici.
+
+<!-- sezione: limiti -->
+
+È un giudizio soggettivo sulla propria condizione, sensibile alle attese e al tenore di vita di riferimento. Non misura il reddito reale, e la stessa cifra può nascere da situazioni economiche diverse.

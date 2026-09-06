@@ -1,0 +1,17 @@
+---
+fonti:
+  - testo: "Agenzia europea dell'ambiente, Air pollution: nel 2023 Turchia, alcuni Paesi dei Balcani occidentali e l'Italia riportano le concentrazioni di particolato più alte d'Europa."
+    url: "https://www.eea.europa.eu/en/topics/in-depth/air-pollution"
+key: "bes:10AMB020"
+vintage: 2024
+---
+
+L'esposizione al particolato fine PM2.5 oltre i limiti riguarda soprattutto la pianura padana. Il valore è massimo in Veneto, 100, Lombardia, 96, e Friuli-Venezia Giulia, minimo in Sardegna, 4, e Basilicata. La media delle regioni è di circa 65, con un divario molto ampio.
+
+<!-- sezione: quadro -->
+
+Il PM2.5 è tra gli inquinanti più dannosi per la salute, e la sua concentrazione in pianura padana dipende da traffico, industria, riscaldamento e da una conformazione geografica che intrappola l'aria. Non è colpa dei soli residenti, ma la somma di molte pressioni in un bacino chiuso tra le montagne. L'Italia è tra i Paesi europei che segnalano le concentrazioni di particolato più alte. Un problema di clima e geografia si può risolvere solo localmente?
+
+<!-- sezione: limiti -->
+
+Misura l'esposizione al PM2.5 secondo una soglia, non la concentrazione media reale. Riflette geografia e meteo oltre alle emissioni, e non attribuisce l'inquinamento a una singola fonte.

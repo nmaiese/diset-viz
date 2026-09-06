@@ -1,0 +1,54 @@
+---
+fonti:
+  - testo: "Legge 31 luglio 2006, n. 241, Concessione di indulto, in vigore dal 1 agosto 2006. È l'anno in cui la media regionale dell'affollamento tocca il minimo della serie."
+    url: "https://www.gazzettaufficiale.it/eli/id/2006/07/31/006G0260/sg"
+  - testo: "Ministero della Giustizia, statistiche su detenuti presenti e capienza regolamentare degli istituti penitenziari. La nota metodologica spiega che la capienza è calcolata su nove metri quadri per il detenuto singolo più cinque per ogni altro e non tiene conto di situazioni transitorie che riducono i posti davvero disponibili."
+    url: "https://www.giustizia.it/giustizia/it/mg_1_14_1.page?contentId=SST1478510"
+  - testo: "Corte europea dei diritti dell'uomo, Torreggiani e altri c. Italia, 8 gennaio 2013, traduzione del Ministero della Giustizia: violazione dell'articolo 3 della Convenzione, sovraffollamento definito problema strutturale del sistema penitenziario italiano."
+    url: "https://www.giustizia.it/giustizia/it/mg_1_20_1.wp?facetNode_1=1_2%282013%29&facetNode_2=0_8_1_85&previsiousPage=mg_1_20&contentId=SDU810042"
+key: "bes:06POL012"
+level: "regione"
+reviewed_at: "2026-07-26"
+reviewed_vintage: 2024
+vintage: 2024
+---
+
+Le carceri più piene d'Italia non stanno solo al Sud, e sopra il 140% della capienza ci sono Puglia e Friuli-Venezia Giulia insieme a Lombardia e Veneto. Nel 2024 le regioni con più posti regolamentari che detenuti sono tre, e il margine aperto a metà del decennio scorso si sta richiudendo.
+
+<!-- sezione: definizione -->
+## Quanti detenuti per cento posti regolamentari
+
+L'indicatore rapporta le persone detenute negli istituti di pena di una regione ai posti regolamentari di quegli istituti. Cento vuol dire che detenuti e posti si equivalgono, centoquaranta che ogni cento posti ci sono quaranta persone in più.
+
+La capienza è calcolata sulla carta dal Ministero della Giustizia, su un criterio di abitabilità di nove metri quadri per il detenuto singolo e cinque per ogni altro. È una misura di spazio, non di letti utilizzabili, e la distinzione pesa più di quanto sembri.
+
+Il conto segue gli istituti, non le biografie. Una regione sta qui per le carceri che ospita, non per quante condanne escono dai suoi tribunali.
+
+<!-- sezione: quadro -->
+## Perché la Lombardia sta accanto alla Puglia
+
+La graduatoria del 2024 si spezza dopo il quinto posto, dove un gradino di quasi dodici punti separa il Molise dall'Emilia-Romagna. Sotto quel gradino i valori scendono di poco per volta, senza altri stacchi paragonabili, fino alla Toscana. E il gruppo che sta sopra non segue il reddito, perché mette la Lombardia e il Veneto accanto alla Puglia e al Molise.
+
+Il dato dice quanto spazio resta a chi non può andarsene altrove, e non è una questione di gestione interna. Nel 2013 la Corte europea dei diritti dell'uomo ha condannato l'Italia con la sentenza Torreggiani, ha accertato la violazione dell'articolo 3 della Convenzione e ha definito il sovraffollamento un problema strutturale del sistema penitenziario italiano. In diciassette regioni su venti gli istituti tengono più persone dei posti che hanno, e in Puglia il rapporto arriva a quasi tre detenuti ogni due posti. Le tre che restano sotto la capienza sono Trentino Alto Adige, Sardegna e Valle d'Aosta, un elenco che smentisce la frattura abituale.
+
+Nel tema [istituzioni e partecipazione](/tema/istituzioni-e-partecipazione) nessun altro indicatore dispone le regioni in un ordine paragonabile. La [durata dei procedimenti civili](/indicatore/durata-dei-procedimenti-civili/bes-06POL011) disegna la mappa che il lettore si aspetta, con i tempi più lunghi in Basilicata e Calabria, e l'[attività di volontariato](/indicatore/attivita-di-volontariato/bes-05REL006) stacca il Trentino Alto Adige dalla Campania di più di tre volte. L'affollamento no. La Lombardia sta nella metà rapida della giustizia civile ed è seconda per detenuti ogni cento posti, la Basilicata ha i procedimenti più lunghi d'Italia e un affollamento poco sopra la mediana. Le due graduatorie si incontrano solo in Valle d'Aosta e in Trentino Alto Adige, dove i procedimenti sono fra i più rapidi e le carceri fra le meno piene.
+
+<!-- sezione: dinamica -->
+## Dal massimo del 2010 alla risalita che dura da tre anni
+
+Il 2024 accanto al 2004 dà una media regionale più bassa di circa nove punti e mezzo, e cancella quello che è successo in mezzo. Il massimo della serie è il 2010, uno dei tre anni in cui nemmeno una regione stava sotto la capienza. Poi la discesa, fino al 2015, quando nove regioni tornarono ad avere più posti che detenuti.
+
+Un anno rompe lo schema più degli altri. Nel 2006 le regioni con più posti che detenuti furono sedici su venti, non è mai più capitato, e quell'anno coincide con l'indulto entrato in vigore il primo agosto.
+
+Da tre anni il movimento va nella direzione opposta. Dal 2021 al 2024 la media dei venti valori regionali è risalita di quasi quattordici punti, e dal 2023 al 2024 sono aumentate quattordici regioni su venti.
+
+Non si è mosso tutto insieme. Rispetto al 2004 il Trentino Alto Adige ha quarantadue punti in meno e la Toscana trentacinque, mentre sette regioni stanno più in alto di allora, Basilicata e Molise di oltre diciannove punti. La Lombardia, seconda oggi, era già su questi valori vent'anni fa.
+
+<!-- sezione: limiti -->
+## Che cosa non si vede contando i posti
+
+Il denominatore è una capienza sulla carta. Il Ministero della Giustizia avverte che il dato sui posti non tiene conto di situazioni transitorie, quindi una sezione chiusa per lavori continua a valere come disponibile e lì dentro si sta più stretti di quanto si legga qui.
+
+Vale anche il rovescio. Il valore è un aggregato regionale, e un istituto molto oltre la capienza può stare accanto a uno mezzo vuoto senza che il numero lo dica.
+
+Sul resto l'indicatore tace. Non dice quante delle persone dentro siano in attesa di giudizio e quante condannate in via definitiva, né che cosa succeda nelle ore in cui la cella è aperta. Misura una capienza, non una condizione, ed è per questo che non ha un verso, un valore alto descrive un'intensità e non una pagella.

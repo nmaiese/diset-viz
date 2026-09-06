@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:05REL005"
+vintage: 2024
+---
+
+La partecipazione civica e politica, dall'informarsi al discutere di temi pubblici, è più diffusa al Centro-Nord. Riguarda il 66,6% delle persone in Emilia-Romagna e il 65,7% in Trentino Alto Adige, contro il 46,1% della Sicilia. La media delle regioni è del 59,5%, in calo.
+
+<!-- sezione: quadro -->
+
+La partecipazione alla vita pubblica è il cuore del capitale civico, quella cultura della cosa comune più forte nelle regioni con lunga tradizione di associazionismo. Il calo recente, generalizzato, segnala un allontanamento dalla politica che riguarda tutto il Paese. È un indicatore descrittivo, ma tocca la salute stessa della democrazia. Una comunità che partecipa meno è più libera o più fragile?
+
+<!-- sezione: limiti -->
+
+Misura forme dichiarate di partecipazione, dall'informazione al confronto, non l'impegno concreto né la sua qualità. Non distingue la partecipazione costruttiva dallo scontento espresso, che possono convivere.

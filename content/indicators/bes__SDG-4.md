@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:SDG-4"
+vintage: 2023
+---
+
+Gli infermieri, spina dorsale dell'assistenza, sono in media 7,4 ogni mille abitanti, meno che in gran parte d'Europa. Sono di più in Trentino Alto Adige, 9,1, Lazio ed Emilia-Romagna, meno in Campania, 5,4, e Calabria. La media delle regioni è di circa 7,4.
+
+<!-- sezione: quadro -->
+
+La carenza di infermieri è uno dei nodi più seri della sanità italiana, e il divario penalizza proprio il Sud, dove il bisogno è alto. Meno infermieri significa reparti sotto pressione, assistenza domiciliare debole e più carico sulle famiglie. È una professione centrale ma sottopagata e poco attrattiva, che fatica a coprire i vuoti. Un sistema sanitario può reggere senza abbastanza infermieri?
+
+<!-- sezione: limiti -->
+
+Conta gli infermieri per abitante, non la loro distribuzione tra ospedali, territorio e strutture. Non misura i carichi di lavoro reali né la carenza rispetto agli standard assistenziali.

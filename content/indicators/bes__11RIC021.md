@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:11RIC021"
+vintage: 2024
+---
+
+La disponibilità in casa di un computer e di una connessione è meno diffusa dell'uso di internet: in media il 65,6% delle famiglie. Va dal 49,4% della Calabria al 75,4% del Trentino Alto Adige. Qui il divario è più ampio.
+
+<!-- sezione: quadro -->
+
+Molti si connettono ormai solo da smartphone, e infatti l'accesso a un computer resta più basso dell'uso di internet. La differenza conta, dato che studiare, lavorare o usare certi servizi da solo telefono è difficile. Il divario si sposta così dal connettersi all'avere gli strumenti giusti, e penalizza le famiglie più povere. Un Paese che naviga solo da telefono è davvero digitale?
+
+<!-- sezione: limiti -->
+
+Conta il possesso di computer e connessione insieme, senza distinguere strumenti nuovi e obsoleti. Non dice se e come vengano usati, né misura le competenze di chi li possiede.

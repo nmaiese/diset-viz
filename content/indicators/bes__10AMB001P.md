@@ -1,0 +1,48 @@
+---
+fonti:
+  - testo: "Istat, Ambiente urbano anno 2022: definizione del PM10, 264 centraline in cento comuni capoluogo, soglia Oms di 20 microgrammi superata in 84 capoluoghi su 100 e maggiore gravità del problema al Nord"
+    url: "https://www.istat.it/wp-content/uploads/2024/05/REPORT-ambiente-2022.pdf"
+  - testo: "Snpa, PM10 la situazione nel 2023: limite annuale di 40 microgrammi rispettato in tutte le stazioni di misura per la prima volta, limite giornaliero superato in 63 stazioni di cui 47 nel bacino padano"
+    url: "https://www.snpambiente.it/pm10-la-situazione-nel-2023/"
+  - testo: "Istat, Rapporto Bes 2025, capitolo Ambiente: dal 2014 la Commissione europea segnala sforamenti sistematici dei limiti di PM10 e la procedura di infrazione resta aperta"
+    url: "https://www.istat.it/wp-content/uploads/2025/11/10-Ambiente.pdf"
+key: "bes:10AMB001P"
+level: "provincia"
+vintage: 2023
+---
+
+Sul particolato la mappa del divario si rovescia, e la provincia settentrionale tipica respira aria peggiore di quella meridionale. La mediana del Nord sta a 26 microgrammi per metro cubo contro i 23 del Mezzogiorno, e la linea che conta corre lungo il bordo della pianura, non lungo un meridiano.
+
+<!-- sezione: definizione -->
+## Polvere sospesa, contata dove stanno le centraline
+
+Il PM10 è materiale sospeso nell'aria in particelle di diametro fino a dieci millesimi di millimetro, fatto di polvere, fumo e micro gocce di sostanze liquide. Una parte esce dalle sorgenti, a cominciare dal traffico, un'altra si forma in atmosfera per reazione tra altri inquinanti, quindi anche lontano dalle strade.
+
+L'indicatore è la concentrazione media dell'anno rilevata dalla rete fissa di monitoraggio e attribuita alla provincia. La rete sta nei comuni capoluogo e non è fitta, nel 2022 Istat contava 264 centraline per il PM10 in cento capoluoghi. Due riferimenti che la pagina non stampa aiutano a leggerlo: il limite di legge europeo sulla media annua, 40 microgrammi per metro cubo, e la soglia di 20 raccomandata dall'Organizzazione mondiale della sanità.
+
+<!-- sezione: quadro -->
+## Il confine passa per la pianura, non per il meridiano
+
+Delle 92 province misurate nel 2023, 68 stanno sopra quella soglia di 20 e ventiquattro sono a quel livello o sotto. In quel gruppo ci sono anche province piccole e agricole, quindi è l'aria ordinaria della gran parte del Paese. Dal 2014 la Commissione europea contesta all'Italia sforamenti sistematici proprio sul PM10, con una procedura di infrazione ancora aperta.
+
+La provincia mediana del Nord segna 26 microgrammi, quella del Mezzogiorno 23, quella del Centro 22, e sono pochissimi gli indicatori di questo atlante in cui il Settentrione risulta il gruppo messo peggio. Le medie delle tre ripartizioni però quasi si toccano, perché il Mezzogiorno tiene dentro di sé i due estremi della rilevazione. Anche il Nord si spacca al proprio interno, e non per latitudine: Aosta e Verbano-Cusio-Ossola stanno tra i cinque valori più bassi d'Italia, Padova e Torino tra i quattro più alti.
+
+Il disegno che ne esce è quello del rilievo. Le dieci province in cui nessun abitante vive in area a [rischio di frane](/indicatore/popolazione-esposta-al-rischio-di-frane/bes-10AMB011), misurato nel 2020, sono tutte di pianura, e nove di loro segnano almeno 28 microgrammi. La decima è Gorizia, che si ferma a 18. Nessuna delle due cose causa l'altra, è lo stesso terreno letto da due lati, il versante e la conca, e Snpa lo conferma quando osserva che nel 2023 i superamenti del limite giornaliero si addensavano nel bacino padano anche nelle zone pianeggianti suburbane e rurali.
+
+Dentro lo stesso [tema ambientale](/tema/ambiente-ed-energia) le mappe non si somigliano. La [dispersione dalla rete idrica comunale](/indicatore/dispersione-da-rete-idrica-comunale/bes-10AMB003) ordina le province in un modo che con questo non ha quasi niente da spartire, e nel 2022 Milano perdeva il 17,4 per cento dell'acqua immessa in rete pur avendo una delle arie peggiori, Potenza il 67 con una delle migliori.
+
+<!-- sezione: dinamica -->
+## Il tetto non si è abbassato, ha cambiato indirizzo
+
+Il movimento di fondo va in una direzione sola. Nel 2015 quindici province stavano al limite europeo di 40 microgrammi o oltre, oggi ne resta una, e quelle a 20 o meno passano da nove a ventiquattro. Tra 2022 e 2023 il calo tiene su base ampia, con 66 province in discesa e nove in salita sulle 91 confrontabili.
+
+Il massimo della rilevazione è rimasto lo stesso numero e ha cambiato luogo. Nel 2015 valeva 55 e stava a Salerno, nel 2023 vale ancora 55 e sta a Foggia, mentre Salerno è scesa a 20 e ha più che dimezzato la propria concentrazione. Quel 55 pugliese va preso con prudenza, perché arriva dopo un 21 nell'anno precedente ed è l'unico del 2023 oltre il limite europeo, che Snpa ha riferito rispettato in tutte le stazioni italiane per la prima volta.
+
+Non scendono tutte. Dodici province hanno oggi più polveri di otto anni fa, undici nel Centro-Sud e Belluno unica eccezione settentrionale. Grosseto e Caserta salgono di sette microgrammi, Ragusa e Catania di cinque.
+
+<!-- sezione: limiti -->
+## Undici province senza un numero, e cinque sono calabresi
+
+La copertura è il limite più serio, e manca dove il lettore vorrebbe verificare. Nel 2023 hanno un valore 92 province su 103, e le undici assenti sono Imperia, Latina, Isernia, Matera, Nuoro, Oristano e tutte e cinque le province della Calabria. Ogni lettura per ripartizioni poggia quindi, al Sud, su una base più sottile di quanto la mappa lasci credere.
+
+Una media annua non dice poi quanti giorni sono cattivi, e il vincolo che in Italia salta davvero è quello giornaliero, superato nel 2023 in 63 stazioni. Una provincia con molti picchi invernali e una con andamento piatto ricevono qui lo stesso numero. Le centraline, infine, stanno nei capoluoghi, e il valore racconta l'aria della città più di quella della provincia.

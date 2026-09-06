@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:10AMB016"
+vintage: 2024
+---
+
+Il dato BES sull'elettricità da rinnovabili conferma il primato alpino. I consumi sono coperti oltre il 100% in Valle d'Aosta, 328%, e in Trentino Alto Adige, 186%, per via delle esportazioni, contro il 12,4% della Liguria. La media delle regioni è del 66,6%.
+
+<!-- sezione: quadro -->
+
+Nel sistema BES è un indicatore di sostenibilità, e la sua crescita di lungo periodo, più che raddoppiata, è una delle buone notizie ambientali. Ma la media nazionale nasconde due Italie dell'energia, alcune regioni quasi autosufficienti da fonti pulite, altre ancora molto dipendenti dai fossili. La transizione è avviata, ma resta diseguale tra i territori. Quanto è vicina l'Italia a un'elettricità davvero pulita?
+
+<!-- sezione: limiti -->
+
+Coincide con l'indicatore territoriale e ne condivide i limiti, dato che rapporta la produzione al consumo locale e supera il 100% per le regioni esportatrici. Non misura l'intero fabbisogno energetico, ma solo l'elettricità.

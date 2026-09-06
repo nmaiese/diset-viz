@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:09PAE008"
+vintage: 2024
+---
+
+Gli agriturismi, che uniscono campagna e turismo, sono più diffusi dove il paesaggio è una risorsa. Ce ne sono 28,9 ogni cento chilometri quadrati in Trentino Alto Adige e 25,5 in Toscana, contro 1,6 in Valle d'Aosta e 2,2 in Basilicata. La media delle regioni è di circa 8,7.
+
+<!-- sezione: quadro -->
+
+L'agriturismo è un modello che tiene insieme agricoltura, turismo e presidio del territorio, e dà reddito extra alle aziende agricole. La sua diffusione, quasi raddoppiata nel tempo, è più alta dove il paesaggio è famoso e la domanda turistica forte, come in Toscana. È un turismo che, a differenza di altri, resta legato alla terra e ai residenti. Il paesaggio rende di più coltivato o mostrato ai turisti?
+
+<!-- sezione: limiti -->
+
+Conta gli agriturismi per superficie, non la loro dimensione, il fatturato o quanto restino legati all'attività agricola. Alcuni sono ormai strutture ricettive con poca agricoltura reale.

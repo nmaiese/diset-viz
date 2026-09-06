@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:08BSO001"
+vintage: 2025
+---
+
+In Trentino Alto Adige quasi due persone su tre, il 60,9%, si dichiarano soddisfatte della propria vita. In Campania la quota scende al 36%, in Puglia al 41,7%. Nella media delle regioni si ferma attorno al 49%, e la distanza tra la testa e la coda della classifica supera i 24 punti.
+
+<!-- sezione: quadro -->
+
+La mappa della soddisfazione somiglia a quella dei redditi e dei servizi, con il Nord-Est davanti e il Mezzogiorno più indietro, ma qui misuriamo un giudizio, non una condizione. Le persone valutano la propria vita anche in base alle attese, al confronto con chi le circonda, a ciò che considerano normale. Per questo due territori con condizioni simili possono dichiarare soddisfazioni diverse, e un luogo più povero non è sempre meno soddisfatto. Quanto di questo 49% racconta come si sta davvero e quanto come ci si aspetta di stare?
+
+<!-- sezione: limiti -->
+
+È un dato auto-riportato in un singolo momento. Coglie come le persone dicono di sentirsi, non le loro condizioni materiali, e risente dell'umore, delle attese e del modo in cui è posta la domanda. Non distingue le ragioni della soddisfazione.

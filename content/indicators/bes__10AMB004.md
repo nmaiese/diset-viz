@@ -1,0 +1,48 @@
+---
+fonti:
+  - testo: "Commissione europea, direttiva discariche: la discarica è l'opzione meno preferibile della gerarchia dei rifiuti, la quota di rifiuti urbani conferiti deve scendere al 10 per cento entro il 2035 e dal 2030 valgono restrizioni sul conferimento di tutto il rifiuto adatto al riciclo o al recupero di energia"
+    url: "https://environment.ec.europa.eu/topics/waste-and-recycling/landfill-waste_en"
+  - testo: "ISPRA, comunicato sul Rapporto Rifiuti Urbani edizione 2025: nel 2024 i rifiuti urbani smaltiti in discarica sono il 14,8 per cento di quelli prodotti in Italia, oltre 4,4 milioni di tonnellate, ed è stato esportato il 4,3 per cento dei rifiuti prodotti, con Campania, Lazio e Lombardia fra i maggiori esportatori"
+    url: "https://www.isprambiente.gov.it/it/istituto-informa/comunicati-stampa/anno-2025/rifiuti-urbani-nel-2024"
+key: "bes:10AMB004"
+level: "regione"
+reviewed_at: "2026-07-26"
+reviewed_vintage: 2024
+vintage: 2024
+---
+
+Vent'anni fa la discarica era la destinazione ordinaria dei rifiuti urbani italiani, oggi è quel che resta quando tutto il resto ha già preso un'altra strada. Ma quel residuo non si distribuisce lungo la linea Nord-Sud, e non segue nemmeno la raccolta differenziata.
+
+<!-- sezione: definizione -->
+## Una quota calcolata sul rifiuto che la regione produce
+
+Il conto è semplice nella forma. Al numeratore i rifiuti urbani smaltiti in discarica, al denominatore i rifiuti urbani prodotti nella regione. Un valore di 20 dice che venti chili ogni cento hanno chiuso il ciclo sotto terra, senza passare per il riciclo o per il recupero di energia.
+
+Che numeratore e denominatore non descrivano lo stesso rifiuto lo dimostra la serie storica. Tra il 2012 e il 2018 il Molise ha oltrepassato cinque volte quota cento, e un rapporto sopra cento significa che nelle sue discariche è entrato più materiale di quanto la regione ne avesse prodotto. Il rifiuto viaggia, e il confine regionale non lo ferma.
+
+<!-- sezione: quadro -->
+## Un picco solo, e sotto nessuna linea che tenga
+
+La graduatoria del 2024 ha un gradino che si vede da lontano, ed è il primo. Il Molise sta 39,4 punti sopra le Marche, che lo seguono, e da solo alza di oltre tre punti la media delle venti regioni. Poi la scala si spezza una seconda volta, otto regioni fra il 29 e il 43 per cento, un salto di quasi dieci punti, e le undici restanti giù fino allo zero della Campania.
+
+Dentro quei due gruppi la geografia si scompone. In alto stanno le Marche, la Toscana e l'Umbria, in fondo la Campania e il Lazio accanto alla Lombardia e al Trentino Alto Adige, regioni che di solito nessuno mette nella stessa frase. Sei di loro stanno già sotto il tetto che la direttiva europea sulle discariche fissa per il 2035, tre al Nord e tre tra Centro e Sud.
+
+Quel tetto è la posta in gioco. Per la Commissione europea la discarica è l'opzione meno preferibile della gerarchia dei rifiuti, e la direttiva impegna gli Stati membri a portare la quota entro il 10 per cento nel 2035. L'obbligo però è nazionale e si pesa sui volumi, non sui venti valori regionali. Nel 2024 quella quota vale il 14,8 per cento del prodotto, oltre 4,4 milioni di tonnellate, dato ISPRA.
+
+La cosa meno prevedibile è che questa mappa non sia quella della [raccolta differenziata dei rifiuti urbani](/indicatore/raccolta-differenziata-dei-rifiuti-urbani/ter-52), con cui nel 2024 quasi non si sovrappone. In Emilia-Romagna le due combaciano, prima per differenziata e tra le ultime per conferimento. Nelle Marche no, perché differenziano più di due terzi dei propri rifiuti e restano seconde per quota in discarica. Il confondente più ovvio non è il reddito dell'area ma la dotazione di impianti e la strada che il rifiuto prende dopo la raccolta, e questa serie non vede né l'una né l'altra.
+
+<!-- sezione: dinamica -->
+## Vent'anni di discesa, e una regione che risale
+
+Il movimento di fondo va in una direzione sola. Nel 2004 la media delle regioni superava i 65 punti, oggi ne vale poco più di un terzo, e la caduta più profonda è quella del Lazio, sceso di 83,5 punti in vent'anni.
+
+L'eccezione ha un nome solo. Il Molise è l'unica regione che nel 2024 sta più in alto di dove stava nel 2004, e ci è risalito di colpo, con un salto di 15,6 punti in un anno dopo due anni di discesa. In Toscana la quota di oggi supera quella del 2016, ma solo il Molise è tornato sopra il livello di partenza. Nell'ultimo passaggio la media si è spostata di meno di un punto, e quel quasi nulla tiene insieme il balzo molisano e il calo più ampio dell'anno, i 10,3 punti persi dalla Basilicata.
+
+<!-- sezione: limiti -->
+## Dice dove il rifiuto è finito, non dove è andato il resto
+
+L'indicatore misura una destinazione e si ferma lì. Non distingue il rifiuto riciclato da quello bruciato per produrre energia.
+
+Soprattutto, non segue il rifiuto che esce dai confini. Nel 2024 l'Italia ha esportato il 4,3 per cento dei rifiuti urbani prodotti e ISPRA indica Campania, Lazio e Lombardia fra le regioni che ne spediscono di più, cioè tre delle sei che in questa graduatoria stanno più in basso. I due fatti convivono nello stesso anno, e l'indicatore non dice se uno spieghi l'altro.
+
+Resta poi una percentuale, quindi il denominatore conta. I [rifiuti urbani prodotti](/indicatore/rifiuti-urbani-prodotti/bes-10AMB024) ordinano le venti regioni in un modo ancora diverso, con l'Emilia-Romagna prima per chili per abitante e il Molise quasi ultimo. Le altre misure del ciclo dei rifiuti stanno nel [tema Ambiente ed energia](/tema/ambiente-ed-energia).

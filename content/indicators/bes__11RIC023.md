@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:11RIC023"
+vintage: 2025
+---
+
+Vendere online resta raro per le imprese italiane. Lo fa il 30,6% delle aziende in Trentino Alto Adige e il 22,4% in Valle d'Aosta, ma solo il 9,9% in Molise. La media delle regioni è del 16,3%, in forte crescita da una base bassa.
+
+<!-- sezione: quadro -->
+
+Il commercio elettronico verso i clienti finali è la frontiera più avanzata della digitalizzazione d'impresa, e in Italia è ancora agli inizi. Che il Trentino guidi, con il suo turismo, mostra come conti il settore più della semplice tecnologia. La crescita recente è forte, ma i numeri restano piccoli. Le imprese italiane vendono poco online per arretratezza o per il tipo di prodotti?
+
+<!-- sezione: limiti -->
+
+Conta le imprese che vendono via web ai clienti finali, non il peso di quelle vendite sul fatturato. Non include le vendite tramite piattaforme di terzi, che per molte piccole imprese sono il canale principale.

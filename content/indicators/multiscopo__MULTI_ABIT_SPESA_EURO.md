@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "multiscopo:MULTI_ABIT_SPESA_EURO"
+vintage: 2025
+---
+
+Quanto costa tenere la casa cambia molto con il territorio. La spesa media mensile per l'abitazione va dai 244 euro della Calabria ai 426 della Lombardia. La media delle regioni è di circa 331 euro, ed è cresciuta negli ultimi anni.
+
+<!-- sezione: quadro -->
+
+La spesa più alta al Nord riflette prezzi immobiliari e costi dei servizi maggiori, non un tenore di vita per forza migliore. Da sola dice poco: 400 euro pesano diversamente su un reddito alto o basso. Va quindi letta insieme al reddito, per capire quanto l'abitare erode il bilancio familiare. Una casa costosa è un lusso o un costo obbligato di dove si vive?
+
+<!-- sezione: limiti -->
+
+È una media in euro correnti, che non tiene conto del diverso costo della vita né distingue affitto, mutuo e utenze. Non dice quanto pesi sul reddito, il dato che davvero misura lo sforzo delle famiglie.

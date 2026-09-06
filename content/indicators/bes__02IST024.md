@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:02IST024"
+vintage: 2025
+---
+
+Frequentare le biblioteche è raro e concentrato: lo fa il 30,9% delle persone in Trentino Alto Adige e il 29,2% in Valle d'Aosta, contro il 7,6% della Calabria e l'8% di Campania e Basilicata. La media delle regioni è del 14,8%, con un divario di quattro volte.
+
+<!-- sezione: quadro -->
+
+La biblioteca è un servizio culturale pubblico e gratuito, e la sua frequentazione dipende molto da quante ce ne sono e da come funzionano. Il divario enorme mostra dove esiste una rete di biblioteche vive e dove no, un pezzo di welfare culturale spesso trascurato. Dove mancano, la cultura torna a essere solo di chi la può comprare. Una biblioteca in ogni comune è un lusso o un diritto?
+
+<!-- sezione: limiti -->
+
+Conta chi ha frequentato una biblioteca, non l'offerta reale né la qualità dei servizi. Un valore basso può dipendere dall'assenza di biblioteche più che dal disinteresse delle persone.

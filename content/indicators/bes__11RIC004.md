@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:11RIC004"
+vintage: 2022
+---
+
+La versione BES dell'innovazione produttiva mostra quote più alte, con la Calabria sorprendentemente vicina a Lombardia e Piemonte, oltre il 62%, mentre la Valle d'Aosta si ferma al 37,4%. La media delle regioni è del 55,5%. Anche parte del Sud compare in alto.
+
+<!-- sezione: quadro -->
+
+Che la Calabria compaia in alto, accanto alle regioni più industriali, ricorda quanto la definizione di innovazione conti: qui pesano anche i cambiamenti organizzativi e digitali, non solo la ricerca. Il BES lo tratta come descrittivo, senza un verso automatico. È un promemoria utile contro l'idea che il Sud non innovi mai davvero. Innovazione è solo tecnologia o anche organizzazione?
+
+<!-- sezione: limiti -->
+
+Aggrega tipi di innovazione molto diversi, dal prodotto al metodo organizzativo, in un'unica quota. Non ne misura la portata né gli effetti su produttività e occupazione.

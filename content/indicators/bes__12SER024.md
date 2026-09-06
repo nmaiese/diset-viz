@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:12SER024"
+vintage: 2024
+---
+
+Il servizio di raccolta differenziata, nel dato BES, mostra un divario ancora ampio: supera il 90% in Emilia-Romagna, Sardegna e Marche, contro il 33% del Lazio e il 36,6% della Campania. La media delle regioni è del 66,2%, in enorme crescita nel tempo.
+
+<!-- sezione: quadro -->
+
+La differenziata è cresciuta ovunque, ma qui il divario resta più marcato che in altri indicatori ambientali, con il Lazio e la Campania molto indietro nonostante le grandi città. Raccogliere in modo differenziato è un servizio prima che un comportamento, e dipende da come i comuni lo organizzano. Dove il servizio è debole, i cittadini virtuosi non bastano. Riciclare è merito dei cittadini o dei comuni che organizzano la raccolta?
+
+<!-- sezione: limiti -->
+
+Misura quanto rifiuto è raccolto in modo differenziato, non quanto viene poi realmente riciclato. La qualità della raccolta e gli impianti disponibili cambiano molto il risultato finale.

@@ -1,0 +1,17 @@
+---
+fonti: []
+key: "bes:12SER010"
+reviewed_at: "2026-07-26"
+reviewed_vintage: 2024
+vintage: 2024
+---
+
+La soddisfazione per il trasporto pubblico è bassa quasi ovunque. Nel 2024 si dichiara soddisfatto il 24,9% degli utenti, come media semplice delle venti regioni, dal 44,7% del Trentino Alto Adige al 13,6% del Lazio.
+
+<!-- sezione: quadro -->
+
+La graduatoria non segue la mappa del servizio. Le tre regioni che ospitano le maggiori aree metropolitane stanno tutte sotto la media semplice, con il Lazio ultimo al 13,6%, la Campania al 13,8% e la Lombardia al 21,2%. In testa ci sono territori piccoli, in gran parte a statuto speciale, ma non solo, perché l'Abruzzo è terzo con il 35,4%. La media resta quasi tre punti sopra la mediana, segno che a tirarla su sono poche regioni.
+
+<!-- sezione: limiti -->
+
+Rileva la soddisfazione di chi il servizio lo usa, quindi non dice niente di chi ha rinunciato a usarlo per mancanza di alternative. E una risposta soggettiva si misura contro le attese di chi risponde, che non sono le stesse in tutte le regioni, quindi la stessa qualità può produrre giudizi diversi.
