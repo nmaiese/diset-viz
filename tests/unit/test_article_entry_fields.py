@@ -24,13 +24,10 @@ E' il punto: nel gruppo sbagliato non ci finisce per distrazione, perche' per
 metterla fra il contenuto bisogna sapere chi la legge.
 """
 
-import json
 import unittest
-from pathlib import Path
 
 from app import indicator_texts
-
-RADICE = Path(__file__).resolve().parents[2] / "content" / "indicators"
+from scripts import indicator_store
 
 # Rese in pagina. Ognuna ha un lettore: `indicator_texts.build_article` per
 # lead, sections, h1, seo_title, roles_covered e vintage, `visible_sources` per
@@ -66,10 +63,10 @@ NOTE = CONTENUTO | PROVENIENZA
 class LeChiaviDegliArticoliSonoDichiarate(unittest.TestCase):
     def test_nessun_articolo_porta_una_chiave_che_nessuno_ha_dichiarato(self):
         colpevoli = []
-        for percorso in sorted(RADICE.glob("*.json")):
-            voce = json.loads(percorso.read_text(encoding="utf-8"))
+        for chiave_articolo, voce in sorted(indicator_store.load_all().items()):
+            # `load_all` toglie `key`, che il file porta e il modello no.
             for chiave in sorted(set(voce) - NOTE):
-                colpevoli.append(f"{percorso.name}: {chiave}")
+                colpevoli.append(f"{chiave_articolo}: {chiave}")
         self.assertEqual(colpevoli, [], "\n".join(
             ["chiavi che nessuno legge e nessuno ha dichiarato: se e' contenuto va "
              "letta, se e' provenienza va messa in PROVENIENZA di questo test"]

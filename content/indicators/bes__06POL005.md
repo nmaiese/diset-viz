@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:06POL005"
+vintage: 2025
+---
+
+Le forze dell'ordine e i vigili del fuoco sono le istituzioni più fidate: su una scala da zero a dieci raccolgono in media 7,5. Il dato è alto e uniforme, dal 7,8 del Trentino Alto Adige al 7 della Campania. La fiducia qui è larga e stabile.
+
+<!-- sezione: quadro -->
+
+Che polizia, carabinieri e vigili del fuoco godano di così ampia fiducia, ovunque, li rende un raro punto di coesione nazionale in un quadro di sfiducia diffusa. Contano la vicinanza al cittadino e la concretezza del loro servizio, specie nelle emergenze. È il rovescio della fiducia nella politica, e mostra che gli italiani distinguono tra istituzioni. Ci si fida di più di chi protegge o di chi decide?
+
+<!-- sezione: limiti -->
+
+Misura un giudizio medio di fiducia, non l'esperienza diretta con le forze dell'ordine. Un valore alto e generale può nascondere rapporti più difficili in specifici contesti o gruppi sociali.

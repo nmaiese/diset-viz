@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:03LAV005"
+vintage: 2020
+---
+
+Avere un lavoro non basta a garantire un reddito dignitoso. La quota di dipendenti con bassa paga va dal 6,3% del Trentino Alto Adige al 19% della Calabria. La media delle regioni è del 10,7%, con il Sud stabilmente sopra.
+
+<!-- sezione: quadro -->
+
+È l'indicatore dei lavoratori poveri, chi ha un impiego ma guadagna troppo poco per uscire dalla fragilità. Si concentra al Sud, dove al problema di trovare lavoro si somma quello della sua qualità retributiva. La Multiscopo lo tratta come descrittivo, dato che la soglia di bassa paga è convenzionale, ma il fenomeno è concreto. Il lavoro è ancora una garanzia contro la povertà?
+
+<!-- sezione: limiti -->
+
+Definisce la bassa paga con una soglia convenzionale sulla retribuzione oraria, che non tiene conto delle ore lavorate né del reddito familiare complessivo. Non dice se la bassa paga sia temporanea o duratura, né distingue giovani all'inizio e lavoratori adulti.

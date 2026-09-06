@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "multiscopo:MULTI_BMI_SOVRA"
+vintage: 2025
+---
+
+Il sovrappeso, gradino intermedio prima dell'obesità, riguarda in media più di un adulto su tre, il 34,6%. In Campania sale al 40,3%, in Puglia al 39,2%, mentre in Trentino Alto Adige si ferma al 31%. È la fascia più numerosa dell'eccesso di peso.
+
+<!-- sezione: quadro -->
+
+Il sovrappeso è la zona grigia della salute: non ancora una patologia, ma la soglia da cui molti scivolano verso l'obesità. Proprio essendo così diffuso, è anche il terreno dove la prevenzione può incidere di più, con alimentazione e movimento. La solita mappa meridionale si conferma, meno marcata che sull'obesità grave. Vale più agire su chi è già obeso o sulla platea molto più ampia in sovrappeso?
+
+<!-- sezione: limiti -->
+
+Come gli altri indici di peso, dipende da dati dichiarati e dall'indice di massa corporea, che semplifica la realtà. Non dice da quanto tempo una persona è in sovrappeso né se stia peggiorando o migliorando, informazioni decisive per il rischio.

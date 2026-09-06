@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:10AMB026"
+vintage: 2023
+---
+
+I giorni con precipitazioni estremamente intense sono ancora rari ma in aumento. Se ne contano fino a 5 all'anno in Friuli-Venezia Giulia e 2 in Lombardia, mentre in molte regioni restano vicini a zero. La media delle regioni è inferiore a un giorno l'anno.
+
+<!-- sezione: quadro -->
+
+Le piogge estreme, concentrate in poche ore, sono il volto più violento del clima che cambia, e causano alluvioni improvvise anche dove prima erano rare. Numeri così piccoli oscillano molto di anno in anno, ma la tendenza all'aumento è chiara. Bastano pochi eventi estremi a fare danni enormi su un territorio fragile. Ci si prepara a un clima medio o agli estremi che diventano più frequenti?
+
+<!-- sezione: limiti -->
+
+Conta i giorni di pioggia estrema in media, un evento raro e per sua natura molto variabile di anno in anno. Non misura i danni provocati, che dipendono da dove cade la pioggia e da come è difeso il territorio.

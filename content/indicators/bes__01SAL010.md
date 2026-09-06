@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:01SAL010"
+vintage: 2025
+---
+
+Il fumo non segue la solita divisione Nord-Sud. Fuma in media il 20% degli adulti, con l'Umbria in testa, 24,5%, seguita da Sicilia e Basilicata, mentre Trentino Alto Adige e Friuli-Venezia Giulia restano sotto il 18%. Calabria e Nord condividono i valori più bassi.
+
+<!-- sezione: quadro -->
+
+A differenza di peso e sedentarietà, qui non c'è un Sud tutto più esposto: la mappa del fumo è a chiazze, segno di storie regionali diverse tra abitudini, offerta e politiche di prevenzione. Il calo di lungo periodo c'è ma è lento, e il tabacco resta il primo fattore di rischio evitabile per molte malattie. Un tasso corretto per età permette di confrontare popolazioni diverse. Come mai su un rischio così noto le abitudini cambiano tanto piano?
+
+<!-- sezione: limiti -->
+
+Conta chi si dichiara fumatore, senza distinguere l'intensità, dai fumatori occasionali ai forti fumatori, che hanno rischi molto diversi. Non coglie il fumo passivo né le nuove forme di consumo, come le sigarette elettroniche, sempre più diffuse.

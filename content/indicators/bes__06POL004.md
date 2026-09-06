@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:06POL004"
+vintage: 2025
+---
+
+I partiti sono le istituzioni in cui gli italiani credono di meno: la fiducia, su una scala da zero a dieci, vale in media appena 3,4. Le differenze sono minime, dal 3,8 del Trentino Alto Adige al 3 della Sardegna. Il dato è cresciuto dai minimi storici.
+
+<!-- sezione: quadro -->
+
+Un voto medio così basso segnala una crisi profonda della rappresentanza, con i partiti percepiti come lontani e autoreferenziali. È un fenomeno nazionale, quasi identico ovunque, che alimenta astensione, antipolitica e ricambio continuo di sigle. Senza partiti credibili, la democrazia perde i suoi canali di partecipazione organizzata. La sfiducia nei partiti è un giudizio sui partiti o sulla politica in sé?
+
+<!-- sezione: limiti -->
+
+Rileva la fiducia media nei partiti come categoria, non nei singoli o nelle idee. È un giudizio molto sensibile al clima politico, che può cambiare in fretta con gli eventi.

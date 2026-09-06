@@ -236,7 +236,7 @@ Serve un terzo concetto, "famiglia di misura", distinto dagli altri due.
   `tests/unit/test_bes_refresh.py`.
 - Routing e vista: `app/views.py:1145` (rotta `/indicatore/<slug>/<id>`),
   `app/indicator_view.py` (`build_indicator_view`, i "parenti").
-- Contenuto: `content/indicators/<id>.json`, uno per id oggi, sezioni con
+- Contenuto: `content/indicators/<id>.md`, uno per id oggi, sezioni con
   `role` in `{definizione, quadro, dinamica, limiti}`.
 - Frontend: il componente che rende la pagina indicatore (in `frontend/src/`).
 - Redazione (`nmaiese/redazione-ai`): `motore/dossier.py`, `motore/brief.py`,
@@ -275,7 +275,7 @@ passo (a) li affronta prima di scrivere codice.
    BES non ha famiglie di id da collegare (sezione 3), quindi non c'è nulla
    da aggiungere qui per BES.
 3. **Schema del contenuto**: un file per famiglia in `content/indicators/`
-   (quale slug/id lo rappresenta?) o un nuovo `content/famiglie/<chiave>.json`
+   (quale slug/id lo rappresenta?) o un nuovo `content/famiglie/<chiave>.md`
    separato dai file per id, che restano per compatibilità? Tocca anche gli
    URL canonici e i redirect dagli id vecchi.
 4. **Ambito del pilota: deciso, catalogo storico.** BES (sezione 3) ha **64**

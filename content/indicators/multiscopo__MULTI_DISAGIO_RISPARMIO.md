@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "multiscopo:MULTI_DISAGIO_RISPARMIO"
+vintage: 2025
+---
+
+Metà delle famiglie italiane non riesce a mettere da parte nulla. In media non risparmia il 47,5%, ma in Calabria e Sicilia oltre il 61%, contro il 27% del Trentino Alto Adige. Anche nelle regioni migliori, un terzo delle famiglie non risparmia.
+
+<!-- sezione: quadro -->
+
+Il risparmio è la differenza tra sopravvivere e costruire un futuro: chi non riesce a mettere da parte non può assorbire gli shock né investire su casa e figli. Al Sud non risparmiano quasi due famiglie su tre, un dato che frena la mobilità sociale tra generazioni. È in calo, ma resta sopra un quarto delle famiglie anche dove va meglio. Un Paese che non risparmia sta consumando il suo futuro o solo il suo margine?
+
+<!-- sezione: limiti -->
+
+Registra chi dichiara di non riuscire a risparmiare, senza misurare quanto gli altri mettano da parte. Non distingue chi non risparmia per necessità da chi sceglie di spendere tutto, e non coglie il risparmio già accumulato in passato.

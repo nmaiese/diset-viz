@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:02IST004"
+vintage: 2023
+---
+
+Quanti diplomati proseguono all'università varia molto. Ci va il 62,3% in Abruzzo e il 61,1% in Umbria, contro il 38,9% della Campania e, sorprendentemente, il 40,1% del Trentino Alto Adige. La media delle regioni è del 54,6%. Il quadro è a macchia di leopardo.
+
+<!-- sezione: quadro -->
+
+Il basso passaggio del Trentino non è un ritardo, dato che lì molti scelgono l'apprendistato e la formazione professionale, con ottimi sbocchi. Al Sud, invece, il minore passaggio si somma a più abbandono, ed è un segnale di opportunità mancate. Lo stesso numero basso racconta storie opposte a seconda del contesto. Non andare all'università è una scelta o una rinuncia?
+
+<!-- sezione: limiti -->
+
+Misura il passaggio dalla scuola all'università, non la scelta tra atenei o percorsi professionali di pari valore. Non dice quanti completino gli studi terziari, dove i divari si riaprono.

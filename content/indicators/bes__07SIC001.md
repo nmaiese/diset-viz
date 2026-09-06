@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:07SIC001"
+vintage: 2023
+---
+
+Nel sistema BES gli omicidi sono classificati come indicatore descrittivo, senza un verso migliore o peggiore, e il motivo si vede nei numeri. In gran parte delle regioni il tasso è vicino allo zero, con Valle d'Aosta e Molise a quota nulla, e i valori più alti, in Sardegna e Liguria, restano intorno a 1 ogni centomila abitanti.
+
+<!-- sezione: quadro -->
+
+Trattare l'omicidio come dato di contesto, e non come classifica, è una scelta di prudenza statistica: quando gli eventi sono così pochi, ordinare venti regioni dalla migliore alla peggiore darebbe una precisione illusoria. Il valore serve a fotografare un fenomeno ormai raro e in forte calo di lungo periodo, non a stabilire dove si viva più o meno sicuri. La sicurezza reale di un territorio si legge meglio incrociando più reati e la loro percezione. Un singolo tasso così basso informa o inganna?
+
+<!-- sezione: limiti -->
+
+Come dato di contesto non ordina le regioni e va preso come ordine di grandezza, non come graduatoria. Copre i soli omicidi volontari consumati e, vista la rarità, oscilla molto di anno in anno nelle regioni meno popolose.

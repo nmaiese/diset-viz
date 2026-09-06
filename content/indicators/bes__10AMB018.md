@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:10AMB018"
+vintage: 2024
+---
+
+L'impermeabilizzazione del suolo, il consumo di terra sotto cemento e asfalto, è massima nelle regioni più urbanizzate. Copre il 12,2% del territorio in Lombardia, l'11,9% in Veneto e il 10,6% in Campania, contro l'1,6% della Puglia. La media delle regioni è del 6,3%.
+
+<!-- sezione: quadro -->
+
+Il suolo impermeabilizzato non assorbe più l'acqua, aumenta il rischio di alluvioni e si perde per sempre come risorsa agricola e naturale. Si concentra dove città, industria e infrastrutture hanno consumato più terra, in pianura padana e attorno alle grandi aree urbane. È un consumo quasi irreversibile, che continua anche dove la popolazione non cresce. Costruire ancora suolo è sviluppo o debito verso il futuro?
+
+<!-- sezione: limiti -->
+
+Misura la quota di suolo coperto da superfici artificiali, non la qualità del suolo perso né la sua funzione precedente. Non distingue il consumo recente da quello storico, né dice se prosegua o si sia fermato.

@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "multiscopo:MULTI_ABIT_AFFOLLAMENTO"
+vintage: 2025
+---
+
+Quante persone vivono per ogni cento metri quadri di casa? In media 2,4, un dato piuttosto uniforme: si va dai 2,2 di Friuli-Venezia Giulia, Umbria e Molise ai 2,9 della Campania. Il Trentino Alto Adige, pur ricco, è tra i più affollati, a 2,6.
+
+<!-- sezione: quadro -->
+
+L'affollamento intreccia dimensione delle case, numero di componenti e costo degli spazi. Che il Trentino Alto Adige stia in alto ricorda che non è solo un fatto di reddito: contano anche prezzi immobiliari e famiglie più numerose. In Campania si somma invece il peso di case piccole e nuclei ampi. Un dato uniforme nasconde queste storie diverse. Vivere stretti è una questione di soldi o di spazio disponibile?
+
+<!-- sezione: limiti -->
+
+Misura i componenti per cento metri quadri, non la qualità o la funzionalità degli spazi. Non dice se l'affollamento sia scelto o subìto, e una casa piccola ma ben distribuita può risultare più vivibile di una grande mal organizzata.

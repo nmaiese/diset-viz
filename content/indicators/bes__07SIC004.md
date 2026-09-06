@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:07SIC004"
+vintage: 2025
+---
+
+Anche le rapine, nel dato BES, pesano più al Nord. I valori più alti sono in Emilia-Romagna, 1,6 ogni mille abitanti, Lombardia, 1,5, e Liguria, 1,3, mentre Basilicata e Calabria restano a 0,2. Negli ultimi anni il tasso medio è sceso, oggi intorno a 0,8.
+
+<!-- sezione: quadro -->
+
+La rapina è un reato di strada e di flussi, e tende a seguire le città più grandi, i loro trasporti e i loro centri commerciali, dove circolano più persone e più denaro. Per questo compare più al Nord urbano che nel Sud rurale, un'altra smentita della mappa attesa della sicurezza. Il calo recente è coerente con la discesa di lungo periodo dei reati predatori. Resta un reato che spaventa oltre la sua frequenza. Un territorio con più rapine è meno sicuro o solo più affollato?
+
+<!-- sezione: limiti -->
+
+Conta le rapine denunciate ogni mille abitanti residenti e non pesa chi attraversa un territorio senza viverci, come pendolari e turisti. Non distingue la rapina in strada da quella a un esercizio o a un istituto di credito, situazioni molto diverse tra loro.

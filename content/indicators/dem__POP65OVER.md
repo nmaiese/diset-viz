@@ -1,0 +1,42 @@
+---
+fonti:
+  - testo: "Istat, glossario degli indicatori demografici: la popolazione residente per classe di età è calcolata al 1° gennaio di ogni anno sui dati anagrafici comunali."
+    url: "https://demo.istat.it/tavole/?t=indicatori"
+  - testo: "Istat, Indicatori demografici, Anno 2024 (31 marzo 2025)"
+    url: "https://www.istat.it/wp-content/uploads/2025/03/Indicatori_demografici_2024.pdf"
+key: "dem:POP65OVER"
+level: "regione"
+reviewed_at: "2026-08-05"
+reviewed_vintage: 2025
+vintage: 2025
+---
+
+Il Trentino Alto Adige ha la speranza di vita a 65 anni più alta d'Italia, eppure è una delle regioni con meno anziani in proporzione: 22,6% dei residenti, contro il 29,2% della Liguria. Vivere più a lungo e avere una popolazione più anziana sono due fatti diversi, e questo numero misura solo il secondo.
+
+<!-- sezione: definizione -->
+## Una fotografia della struttura, non della salute
+
+Il numero conta quanti residenti hanno 65 anni o più al 1° gennaio, in rapporto al totale della popolazione della regione. È una fotografia della struttura per età, non della salute o della qualità di vita di chi quell'età l'ha raggiunta: dice quanto una popolazione è anziana in senso demografico, non se lo è in buone condizioni.
+
+La quota dipende da tre fattori insieme: quante persone nascono, quante ne arrivano o partono per migrazione, e quanto a lungo vivono le generazioni più vecchie. Una regione può avere un valore alto perché i giovani se ne vanno, perché nascono pochi bambini, o perché gli anziani vivono più a lungo: il numero da solo non distingue tra queste tre storie.
+
+<!-- sezione: quadro -->
+## Dal 21,4% della Campania al 29,2% della Liguria
+
+Nel 2025 la media delle venti regioni è 25,57%, la mediana 25,90%: undici regioni stanno sopra la media, nove sotto. In cima Liguria (29,2%), poi Friuli-Venezia Giulia e Sardegna appaiate al 27,5%, Umbria (27,4%) e Molise (27,3%). In fondo Campania (21,4%), Trentino Alto Adige (22,6%), Sicilia (23,7%), Lombardia e Lazio appaiate al 23,8%.
+
+Lo scarto più netto della classifica cade in cima: dalla Liguria a Friuli-Venezia Giulia e Sardegna, un punto e sette decimi. In fondo la classifica è più fitta: tra Campania e Lazio, quinta dal basso, corrono solo 2,4 punti percentuali.
+
+<!-- sezione: dinamica -->
+## Invecchia tutta Italia, ma non alla stessa velocità
+
+Tra il 2015 e il 2025 la media regionale è salita da 22,49% a 25,57%, oltre tre punti percentuali in un decennio, e in nessuna delle venti regioni la quota è scesa: l'invecchiamento demografico ha proceduto ovunque, senza eccezioni, e nell'ultimo passaggio, dal 2024 al 2025, tutte e venti le regioni sono salite ancora, senza nessuna ferma o in calo.
+
+La velocità però è stata molto diversa. La Sardegna ha guadagnato quasi sei punti percentuali in dieci anni, il salto più ampio delle venti regioni, e nel 2015 partiva sotto la media nazionale: oggi è terza. La Liguria, già la più anziana dieci anni fa, è quella che si è mossa meno, un punto soltanto, restando comunque in testa.
+
+<!-- sezione: limiti -->
+## Invecchiare non è la stessa cosa che vivere più a lungo
+
+Il numero non separa chi invecchia perché vive più a lungo da chi invecchia perché i giovani se ne vanno o nascono meno bambini. Il Trentino Alto Adige, con la [speranza di vita a 65 anni](/indicatore/speranza-di-vita-a-65-anni-maschi-istat-regioni/dem-LIFEEXP65M) più alta d'Italia sia per gli uomini sia per le [donne](/indicatore/speranza-di-vita-a-65-anni-femmine-istat-regioni/dem-LIFEEXP65F), ha una delle quote di anziani più basse: la sua popolazione più giovane nella struttura compensa la sua maggiore longevità nei singoli individui.
+
+Con la [speranza di vita alla nascita dei maschi](/indicatore/speranza-di-vita-alla-nascita-maschi/ter-911) la correlazione di rango è quasi nulla (+0,01 su venti regioni): le due classifiche non si somigliano affatto, prova che la quota di anziani segue soprattutto natalità e migrazioni, non quanto a lungo vive chi ci abita già. Le altre voci demografiche regionali stanno nel tema [Salute, demografia e cura](/tema/salute-demografia-e-cura).

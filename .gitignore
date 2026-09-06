@@ -41,9 +41,10 @@ data/pipeline/.session_meta.json
 # catena editoriale autonoma. Un ignore per un file che nessuno scrive più non
 # fa danno, ma insegna a chi legge il nome di una macchina che non c'è.
 
-# I dossier e le bozze congelate della catena minima: derivati da dati e codice
-# versionati, ricostruibili con un comando. Gli articoli non stanno più qui:
-# `lab.pubblica` scrive in `content/indicators/`, cioè sulla pagina pubblica.
-# `data/lab/articoli/` resta committabile per le prove fatte con `--out`.
+# I dossier e le bozze congelate della catena editoriale: derivati da dati e
+# codice versionati, ricostruibili con un comando. Gli articoli non stanno qui:
+# `motore pubblica` della redazione scrive in `content/indicators/`, cioè sulla
+# pagina pubblica. Restano committabili `data/lab/brief/`, che `motore brief`
+# scrive ed entra nella PR del pezzo, e `data/lab/articoli/` per le prove.
 data/lab/dossier/
 data/lab/bozze/

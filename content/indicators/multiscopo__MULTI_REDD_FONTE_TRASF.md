@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "multiscopo:MULTI_REDD_FONTE_TRASF"
+vintage: 2024
+---
+
+Per molte famiglie la fonte principale di reddito non è il lavoro ma un trasferimento pubblico, pensione o sussidio. Riguarda in media il 41,8% delle famiglie, con punte in Calabria, 49,2%, e Campania, 46,7%, e valori più bassi in Trentino Alto Adige, intorno al 35%.
+
+<!-- sezione: quadro -->
+
+Una quota alta di redditi da trasferimenti riflette due cose intrecciate: una popolazione più anziana, con molte pensioni, e un mercato del lavoro più debole, con più sussidi. Al Sud si sommano entrambe, e la dipendenza dai trasferimenti diventa strutturale. È un indicatore descrittivo, ma dice quanto un territorio si regge sul lavoro e quanto sul sostegno pubblico. Vivere di trasferimenti è una rete di protezione o un segno di fragilità?
+
+<!-- sezione: limiti -->
+
+Somma pensioni e altri trasferimenti in un'unica voce, senza distinguere il reddito da una vita di lavoro da un sussidio assistenziale. Non ne misura l'importo, e una quota alta può nascere da tanti anziani come da tanti disoccupati.

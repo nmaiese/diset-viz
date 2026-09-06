@@ -11,6 +11,12 @@ il travaso non abbia perso niente e che la codifica delle chiavi sia
 reversibile. Una chiave che non torna indietro non è un file mal chiamato, è
 un articolo che sparisce dalla pagina senza che nessun errore lo dica.
 
+Dal 6 settembre 2026 i file sono Markdown, per la seconda metà della stessa
+ragione: un articolo in JSON tiene ogni sezione su una riga sola con gli a capo
+scritti `\n`, e la pull request in cui quel testo va letto non lo mostra. La
+garanzia in più che serve al formato nuovo è il giro completo, `rendi` e poi
+`analizza`, su ogni forma che un'entry vera assume.
+
 Qui c'è solo ciò che gira su file temporanei e costanti. Le due letture dello
 store **committato** stanno in `tests/integration/test_indicator_store_live.py`.
 """
@@ -74,16 +80,16 @@ class TheStoreReadsBackWhatItWrote(unittest.TestCase):
         consumatori devono vedere lo stesso dizionario di prima del travaso, o
         il travaso non sarebbe stato a costo zero per loro."""
         indicator_store.write("920", {"lead": "x"}, root=self.root)
-        on_disk = json.loads((self.root / "920.json").read_text(encoding="utf-8"))
-        self.assertEqual(on_disk["key"], "920")
+        on_disk = (self.root / "920.md").read_text(encoding="utf-8")
+        self.assertIn('key: "920"', on_disk)
         self.assertNotIn("key", indicator_store.read("920", root=self.root))
 
     def test_a_file_filed_under_the_wrong_name_is_refused(self):
         """Il caso peggiore fra quelli possibili: la pagina si renderizza lo
         stesso, con la prosa di un altro indicatore sotto i numeri giusti."""
         indicator_store.write("920", {"lead": "x"}, root=self.root)
-        (self.root / "921.json").write_text(
-            json.dumps({"key": "920", "lead": "x"}), encoding="utf-8")
+        (self.root / "921.md").write_text(
+            indicator_store.rendi("920", {"lead": "x"}), encoding="utf-8")
         with self.assertRaises(indicator_store.StoreError):
             indicator_store.load_all(self.root)
 
@@ -95,8 +101,109 @@ class TheStoreReadsBackWhatItWrote(unittest.TestCase):
         indicator_store.write("bes:10AMB004", {"lead": "b"}, root=self.root)
         self.assertEqual(
             sorted(p.name for p in indicator_store.paths(self.root)),
-            ["920.json", "bes__10AMB004.json"],
+            ["920.md", "bes__10AMB004.md"],
         )
+
+
+class TheMarkdownFormatSurvivesEveryShapeAnArticleTakes(unittest.TestCase):
+    """Il giro completo, `rendi` e poi `analizza`, sulle forme vere.
+
+    Il travaso del 6 settembre 2026 ha girato su tutti e 382 gli articoli
+    committati e li ha riletti identici, ma quella prova è passata: il file
+    JSON di partenza non c'è più. Quello che resta a difendere il formato sono
+    queste forme, che sono tutte quelle che il catalogo conteneva davvero.
+
+    Le due meno ovvie sono il motivo per cui il ruolo sta in un commento e non
+    nel titolo H2: 643 sezioni su 893 non avevano titolo, e sette articoli
+    avevano due sezioni con lo stesso ruolo. Un formato che appendesse il ruolo
+    al titolo avrebbe perso le prime e confuso le seconde.
+    """
+
+    FORME = {
+        "una sezione senza titolo": {
+            "lead": "Il lead.",
+            "sections": [{"role": "quadro", "h": None, "body": "Il corpo."}],
+        },
+        "due sezioni con lo stesso ruolo": {
+            "lead": "Il lead.",
+            "sections": [
+                {"role": "quadro", "h": "Prima", "body": "Una."},
+                {"role": "quadro", "h": "Seconda", "body": "Due."},
+            ],
+        },
+        "un campo di sezione oltre i tre": {
+            "lead": "Il lead.",
+            "sections": [{"role": "dinamica", "h": "Titolo",
+                          "body": "Il corpo.", "claims": ["eurostat-lunga-durata-ciclo"]}],
+        },
+        "un corpo di più paragrafi": {
+            "lead": "Prima riga.\n\nSeconda riga.",
+            "sections": [{"role": "limiti", "h": None, "body": "Uno.\n\nDue.\n\nTre."}],
+        },
+        "niente sezioni": {"lead": "Solo il lead.", "sections": []},
+        "niente lead": {"lead": "", "sections": [
+            {"role": "quadro", "h": "Titolo", "body": "Il corpo."}]},
+        "i campi di frontmatter che un articolo porta": {
+            "lead": "Il lead.", "sections": [],
+            "fonti": [{"testo": "Istat, una fonte: con i due punti",
+                       "url": "https://www.istat.it/x?a=1&b=2"}],
+            "vintage": 2025, "level": "regione", "costo": 4.14,
+            "corpus": [], "roles_covered": ["quadro", "dinamica"],
+            "h1": "Un titolo lungo: con virgolette \"dritte\" dentro",
+        },
+    }
+
+    def test_every_shape_comes_back_identical(self):
+        for nome, entry in self.FORME.items():
+            with self.subTest(forma=nome):
+                testo = indicator_store.rendi("17", entry)
+                letto = indicator_store.analizza(testo, nome)
+                self.assertEqual(letto.pop("key"), "17")
+                self.assertEqual(letto, entry)
+
+    def test_the_prose_is_readable_in_the_file(self):
+        """Tutta la ragione del formato: il testo sta nel file come testo.
+
+        Se un giorno il corpo tornasse a essere serializzato, il diff di una
+        pull request tornerebbe illeggibile e nessun altro test se ne
+        accorgerebbe, perché il giro `rendi`/`analizza` resterebbe verde.
+        """
+        testo = indicator_store.rendi("17", {
+            "lead": "Nel 2025 in Campania il valore è 9,4%.",
+            "sections": [{"role": "quadro", "h": "Nove punti",
+                          "body": "Prima riga.\n\nSeconda riga."}],
+        })
+        self.assertIn("\nNel 2025 in Campania il valore è 9,4%.\n", testo)
+        self.assertIn("\n## Nove punti\n", testo)
+        self.assertIn("\nPrima riga.\n\nSeconda riga.\n", testo)
+        self.assertNotIn("\\n", testo)
+
+    def test_a_text_that_contains_a_marker_is_refused_instead_of_split(self):
+        """Scrittore severo: un corpo che contiene un marcatore tornerebbe
+        indietro spaccato in due sezioni, e la seconda metà comparirebbe sulla
+        pagina sotto un titolo che nessuno ha scritto."""
+        with self.assertRaises(indicator_store.StoreError):
+            indicator_store.rendi("17", {"lead": "x", "sections": [
+                {"role": "quadro", "h": None, "body": "Uno.\n<!-- sezione: limiti -->\nDue."}]})
+
+    def test_a_section_without_a_role_is_refused(self):
+        """Il ruolo è ciò che il renderer legge: una sezione senza ruolo non
+        finirebbe in nessuna pagina, e il file la mostrerebbe lo stesso."""
+        with self.assertRaises(indicator_store.StoreError):
+            indicator_store.rendi("17", {"lead": "x", "sections": [
+                {"role": None, "h": "Titolo", "body": "Il corpo."}]})
+
+    def test_an_untitled_section_whose_body_opens_with_an_h2_is_refused(self):
+        """L'unico modo in cui il formato potrebbe perdere una riga in
+        silenzio: rileggendo, quell'H2 diventerebbe il titolo della sezione."""
+        with self.assertRaises(indicator_store.StoreError):
+            indicator_store.rendi("17", {"lead": "x", "sections": [
+                {"role": "quadro", "h": None, "body": "## Non è un titolo\n\nIl corpo."}]})
+
+    def test_a_file_without_frontmatter_says_so(self):
+        with self.assertRaises(indicator_store.StoreError) as caught:
+            indicator_store.analizza("Solo del testo.\n", "17.md")
+        self.assertIn("frontmatter", str(caught.exception))
 
 
 class TheMigrationLostNothing(unittest.TestCase):
@@ -183,12 +290,12 @@ class OneBrokenArticleCostsOneArticle(unittest.TestCase):
         self.root = Path(self._tmp.name)
         self.addCleanup(self._tmp.cleanup)
         indicator_store.write("920", {"lead": "buono"}, root=self.root)
-        (self.root / "999.json").write_text("{ questo non è json", encoding="utf-8")
+        (self.root / "999.md").write_text("senza frontmatter", encoding="utf-8")
 
     def test_the_strict_read_refuses_and_says_which_file(self):
         with self.assertRaises(indicator_store.StoreError) as caught:
             indicator_store.load_all(self.root)
-        self.assertIn("999.json", str(caught.exception))
+        self.assertIn("999.md", str(caught.exception))
 
     def test_the_lenient_read_keeps_every_other_article(self):
         entries = indicator_store.load_all(self.root, strict=False)

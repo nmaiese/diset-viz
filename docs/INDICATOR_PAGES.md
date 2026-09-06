@@ -28,7 +28,7 @@ il minimo e la media è la duplicazione che questo layout ha eliminato.
 | | proprietario | dove |
 |---|---|---|
 | numeri, aggregati, ordinamenti | `app/indicator_view.py` | cruscotto |
-| prosa scritta | `content/indicators/<chiave>.json` | articolo |
+| prosa scritta | `content/indicators/<chiave>.md` | articolo |
 | prosa composta, quando manca la scritta | `app/templates/_indicator_article.html` | articolo |
 | fonte, copertura, citazione, disclaimer sulla media | template | apparato |
 
@@ -39,9 +39,11 @@ quei calcoli altrove.
 
 ## Dove vive la prosa: un file per articolo
 
-`content/indicators/<chiave>.json`, con i due punti della chiave scritti `__`:
-`bes:10AMB004` sta in `content/indicators/bes__10AMB004.json`. Lo store è
-`scripts/indicator_store.py`, che possiede la codifica e la spiega per intero.
+`content/indicators/<chiave>.md`, con i due punti della chiave scritti `__`:
+`bes:10AMB004` sta in `content/indicators/bes__10AMB004.md`. Un frontmatter con
+i campi, poi il lead, poi le sezioni, ognuna aperta da `<!-- sezione: ruolo -->`
+e con il suo `## titolo`. Lo store è `scripts/indicator_store.py`, che possiede
+il formato e la codifica e li spiega per intero.
 
 Era un JSON unico da 365 voci sotto `app/static/data/`, e il formato costava due
 cose distinte. Scrittore e revisore (due agenti che allora esistevano)
@@ -52,9 +54,16 @@ può risolvere leggendolo. E il diff di una revisione non diceva di quale
 indicatore parlasse, perché la chiave che possiede le righe cambiate poteva
 stare cento righe più su.
 
-Adesso `git log content/indicators/920.json` è la storia editoriale di
+Adesso `git log content/indicators/920.md` è la storia editoriale di
 quella pagina, e due stadi che lavorano su articoli diversi non hanno niente da
 fondere.
+
+Il Markdown è arrivato dopo, il 6 settembre 2026, per la seconda metà della
+stessa ragione. In JSON una sezione sta su una riga sola con gli a capo scritti
+`\n`: la pull request in cui il pezzo va letto prima di pubblicarlo non lo
+mostrava, non lo si poteva commentare riga per riga, e la correzione di una
+parola produceva un hunk che nessuno poteva giudicare. Il merge di quella PR è
+la pubblicazione, quindi è proprio lì che il testo deve essere leggibile.
 
 Quello che **non** è cambiato: una voce vale per un livello territoriale solo, e
 il livello resta un campo dentro la voce. Il modello è ancora una voce per

@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:09PAE001"
+vintage: 2023
+---
+
+Quanto un comune spende per la cultura varia di dieci volte. In Trentino Alto Adige sono 56,7 euro per abitante, in Friuli-Venezia Giulia 45,7, contro i 5,4 della Campania e gli 8,8 del Molise. La media delle regioni è di circa 24 euro pro capite.
+
+<!-- sezione: quadro -->
+
+La spesa comunale per la cultura è una scelta politica prima che una necessità, e il divario riflette risorse dei comuni ma anche priorità diverse. Dove si investe poco, biblioteche, teatri e iniziative pubbliche si diradano, e la cultura diventa un privilegio di chi può pagarla. È un indicatore descrittivo, ma dice quanto il pubblico crede nella cultura come servizio. La cultura è una spesa o un investimento per un territorio?
+
+<!-- sezione: limiti -->
+
+Misura la spesa corrente dei comuni per la cultura, non quella di regioni, Stato o privati, spesso rilevante. Non dice come i fondi siano usati né con quali risultati per i cittadini.

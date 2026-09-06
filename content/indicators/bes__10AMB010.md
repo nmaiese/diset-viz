@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:10AMB010"
+vintage: 2021
+---
+
+Il numero di siti contaminati per mille varia moltissimo, spesso per eredità industriali del passato. È altissimo in Piemonte, 34,7, Friuli-Venezia Giulia, 18,7, e Sardegna, mentre è minimo nelle Marche e in Molise, sotto lo 0,3. La media delle regioni è di circa 5,6.
+
+<!-- sezione: quadro -->
+
+I siti contaminati sono la cicatrice della storia industriale ed estrattiva, e si concentrano dove c'erano fabbriche, miniere e poli chimici, come il Piemonte industriale. Il forte calo recente riflette bonifiche completate e revisioni dei censimenti. È un indicatore descrittivo, ma segnala un debito ambientale che alcune regioni pagano ancora. Il prezzo dell'industria si misura anche in terra da risanare?
+
+<!-- sezione: limiti -->
+
+Conta i siti contaminati per abitante, un dato sensibile a come vengono censiti e classificati. Non dice l'estensione o la pericolosità dei siti, né a che punto sia la loro bonifica.

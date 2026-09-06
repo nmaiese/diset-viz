@@ -1,0 +1,50 @@
+---
+fonti:
+  - testo: "Eurostat, metadati delle statistiche su ricerca e sviluppo: il personale di R&S segue la definizione del Manuale di Frascati e comprende, oltre ai ricercatori, tecnici e personale di supporto. I settori di esecuzione sono quattro: imprese, amministrazioni pubbliche, università e istituzioni private non profit."
+    url: "https://ec.europa.eu/eurostat/cache/metadata/en/rd_esms.htm"
+  - testo: "Eurostat, quota di personale di ricerca e sviluppo sulla popolazione attiva (rd_p_perslf), 2023: in equivalenti a tempo pieno 1,41% in Italia e 1,57% nell'Unione europea a 27 (valore stimato), contando le teste 2,09% in Italia."
+    url: "https://ec.europa.eu/eurostat/databrowser/view/rd_p_perslf/default/table?lang=en"
+key: "eur:rd_p_persreg"
+level: "regione"
+reviewed_at: "2026-08-03"
+reviewed_vintage: 2023
+vintage: 2023
+---
+
+In cinque anni la ricerca italiana non ha cambiato geografia: le stesse nove regioni in testa dal 2019 al 2023, e a cedere è la fascia di mezzo. Il gradino che separa la nona regione dalla decima è più che raddoppiato, e la mediana è scesa mentre la media restava dov'era.
+
+<!-- sezione: definizione -->
+## Il numeratore è in equivalenti a tempo pieno, il denominatore no
+
+Eurostat conta tutto il personale di ricerca e sviluppo, non i soli ricercatori ma anche i tecnici e il personale di supporto, in ogni settore: imprese, amministrazioni pubbliche, università, non profit.
+
+Le due metà del rapporto però si contano in modo diverso. Il numeratore è in equivalenti a tempo pieno, quindi due persone che dedicano alla ricerca metà del proprio orario valgono una unità sola, mentre il denominatore conta le teste della popolazione attiva. Un valore dell'1,00 dice che a ogni cento persone nella forza lavoro corrisponde una unità di lavoro a tempo pieno dedicata alla ricerca, non che una persona su cento faccia il ricercatore.
+
+Eurostat pubblica per il paese tutte e due le letture, e sono lontane: nel 2023 l'Italia sta a 1,41 in equivalenti a tempo pieno e a 2,09 contando le teste. Questa pagina usa la prima.
+
+<!-- sezione: quadro -->
+## Un vertice solo, e un gradino dopo la nona regione
+
+Un sistema di ricerca non si mette in piedi in un anno: è fatto di contratti lunghi e di laboratori. Quanto pesa sulla forza lavoro dice quanta parte del lavoro di una regione produce conoscenza invece di usarla, e in nove regioni su venti resta sotto una unità a tempo pieno ogni cento persone.
+
+La mediana è 1,06, un decimo di punto sotto la media: la distribuzione ha una punta in alto, non un centro largo. L'Emilia-Romagna vale quasi il doppio della regione a metà classifica, e il Lazio, secondo, è già 0,38 punti più giù. Il salto che conta però è un altro: tra la Liguria, nona, e la Campania, decima, ci sono 0,30 punti, e sotto comincia una coda lunga undici regioni. La Campania è l'unica regione del Mezzogiorno che resti sopra l'1,00.
+
+Gli euro e le persone disegnano quasi la stessa mappa: nella [spesa in ricerca e sviluppo sul PIL](/indicatore/spesa-in-ricerca-e-sviluppo-sul-pil-eurostat-nuts2/eur-rd_e_gerdreg) otto delle prime nove regioni sono le stesse di qui. La [spesa pubblica per R&S sul PIL](/indicatore/incidenza-della-spesa-pubblica-per-r-s-sul-pil/ter-92) no, e nel 2022 tiene la Sardegna seconda e la Lombardia diciannovesima. Sono co-occorrenze, non spiegazioni, e il confondente ovvio è il reddito dell'area. L'eccezione è la Campania, decima qui e quarta per spesa pubblica sul PIL.
+
+Il confronto con l'estero chiede l'aggregato giusto, che non è la media delle venti regioni: quella dell'Unione a 27, stimata in 1,57, la superano in cinque.
+
+<!-- sezione: dinamica -->
+## Cinque anni senza un ingresso tra le prime nove
+
+Dal 2019 al 2023 la media delle venti regioni non si muove, ma sotto quella riga ferma non c'è immobilità: dodici regioni chiudono il periodo sopra il livello di partenza e otto sotto.
+
+A non cambiare mai è la composizione della testa: le nove regioni davanti nel 2023 sono le stesse del 2019, e lo erano in ognuno degli anni in mezzo. L'ordine dentro il gruppo invece si è rifatto, con il Piemonte sceso dal secondo al sesto posto. I due movimenti più ampi restano fuori da quel gruppo: la Valle d'Aosta guadagna 0,20 punti e sale dal diciannovesimo posto al sedicesimo, l'Umbria ne perde 0,22 e scivola dal dodicesimo al quattordicesimo.
+
+Ad abbassarsi è il centro: la mediana scende da 1,15 a 1,06, e le tre regioni che nel 2019 stavano appena fuori dai primi nove, Marche, Campania e Umbria, hanno perso terreno.
+
+L'ultimo passaggio, dal 2022 al 2023, sposta poco e quasi tutto nello stesso verso: tredici regioni salgono, sei scendono, una resta ferma, e nessuna cambia di più di 0,07 punti. È in quell'anno di scarti minimi che il gradino tra la nona e la decima si allarga da 0,17 a 0,30 punti, la maggior parte della distanza aperta in cinque anni. Bastano la Liguria che sale di 0,07 e la Campania che scende di 0,06.
+
+<!-- sezione: limiti -->
+## Quanto lavoro, non quali risultati
+
+La quota misura quanto lavoro è dedicato alla ricerca, non che cosa ne esce: due regioni allo stesso valore possono pubblicare e brevettare in modo molto diverso. Somma poi la ricerca pubblica e quella privata, e dove il valore è basso non dice quale delle due manchi. E fotografa chi la ricerca la fa in regione oggi: chi si laurea qui e va a lavorare altrove sparisce dal conto. Il resto del tema sta nell'[hub Ricerca, innovazione e digitale](/tema/ricerca-innovazione-e-digitale).

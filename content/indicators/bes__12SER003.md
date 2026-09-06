@@ -1,0 +1,52 @@
+---
+fonti:
+  - testo: "Istat, Rapporto Bes, capitolo Qualità dei servizi: definizione dell'indicatore, 549 mila anziani assistiti in ADI nel 2023 pari al 3,8% degli over 65 e al 6,3% degli over 75, 51,7% dei medici di base oltre i 1.500 assistiti, dotazione di medici di base per ripartizione, posti letto nei presidi residenziali per regione e 5,5% di over 64 presi in carico sui due canali"
+    url: "https://www.istat.it/wp-content/uploads/2025/11/12-Qualita-dei-servizi.pdf"
+  - testo: "Ministero della Salute, PNRR Missione 6 componente 1, investimento 1.2: circa 3 miliardi per l'assistenza domiciliare e traguardo di almeno altre 842 mila persone over 65 trattate entro il 2026, pari a un incremento del 10% della popolazione anziana"
+    url: "https://www.pnrr.salute.gov.it/it/pnrr-pagina/casa-come-primo-luogo-di-cura-e-telemedicina/"
+key: "bes:12SER003"
+level: "regione"
+reviewed_at: "2026-07-27"
+reviewed_vintage: 2024
+vintage: 2024
+---
+
+Le cure a domicilio per gli anziani sono cresciute in tutte le regioni, ma la mappa che disegnano nel 2024 non è quella del divario tra Nord e Sud. Tre quarti dell'aumento del decennio sono arrivati dopo il 2021, e nella metà bassa della graduatoria stanno le regioni del Nord con i sistemi sanitari più grandi.
+
+<!-- sezione: definizione -->
+## Che cosa conta un anziano trattato in ADI
+
+L'assistenza domiciliare integrata è il pacchetto di prestazioni sanitarie e sociosanitarie che la ASL porta a casa di una persona anziana, in alternativa al ricovero o alla struttura residenziale. L'indicatore conta i residenti di 65 anni e più trattati in ADI nel corso dell'anno e li rapporta a tutta la popolazione anziana, non a quella che avrebbe bisogno di cure. Un valore di 5 vuol dire cinque anziani presi in carico ogni cento over 65 della regione.
+
+Il numeratore viene dal sistema informativo per l'assistenza domiciliare del Ministero della Salute, rielaborato dall'Istat per il rapporto Bes. Conta le persone, non le ore, quindi chi riceve un accesso infermieristico ogni tanto e chi è seguito quasi ogni giorno pesano uguale.
+
+Anche il denominatore fa la sua parte. Il bisogno di cure a casa cresce con l'età, e infatti nel 2023 la quota nazionale arriva al 6,3% tra gli over 75 contro il 3,8% calcolato su tutta la popolazione di 65 anni e più. Una regione con anziani mediamente più giovani parte quindi da un rapporto più basso anche a parità di servizio offerto.
+
+<!-- sezione: quadro -->
+## Una mappa che il divario Nord-Sud non spiega
+
+Curare gli anziani a casa invece che in ospedale è il perno della riforma dell'assistenza territoriale, e il piano nazionale di ripresa ci ha messo circa 3 miliardi per trattare almeno altre 842 mila persone over 65 entro il 2026. Nel 2024 nessuna regione arriva a trattare un anziano su dieci, ma il monitoraggio del piano conta su una base sua e pubblica un'altra cifra, quindi le due non si mettono in fila.
+
+La graduatoria non si spezza nel mezzo. Lo strappo più largo è in cima, un punto e mezzo tra la prima regione e la seconda, e il secondo per ampiezza si apre in fondo, tra Puglia e Calabria. In mezzo le regioni stanno vicine, e a tirare giù la media sono i pochi valori della coda.
+
+La coda non racconta però tutta la storia. Le tre regioni più in basso, Puglia, Calabria e Sardegna, stanno tutte nel Mezzogiorno, ma la metà inferiore della graduatoria è piena di Nord. Sotto la media delle regioni ci sono Lombardia, Piemonte, Emilia-Romagna, Veneto e Trentino Alto Adige, mentre Abruzzo, Basilicata, Sicilia e Campania stanno sopra. Nel Nord l'eccezione è il Friuli-Venezia Giulia, che tra il 2022 e il 2023 ha più che raddoppiato la sua quota, dal 2,0% al 4,3%, e nel 2024 resta sopra la media.
+
+Parte di questa geografia si ritrova rovesciata nei [medici di medicina generale con un numero di assistiti oltre soglia](/indicatore/medici-di-medicina-generale-con-un-numero-di-assistiti-oltre-soglia/bes-12SER027), dove la soglia è il massimale di 1.500 assistiti che l'accordo collettivo nazionale della medicina generale fissa per contratto. Dove più medici di base la superano, gli anziani seguiti a casa tendono a essere una quota più bassa, con una correlazione di rango di -0,60 sui valori regionali. Il Molise sta in cima qui e in fondo là. Resta però una co-occorrenza. Nel 2023 i medici di medicina generale sono 5,8 ogni 10 mila residenti al Nord e 6,9 nel Mezzogiorno, e le due mappe si somigliano abbastanza da non poterle separare con questi dati. L'eccezione conta, perché la Calabria ha una quota di medici oltre soglia molto sotto il 51,7% nazionale e sta in fondo anche qui, appaiata alla Sardegna.
+
+<!-- sezione: dinamica -->
+## Sei anni fermi, poi tre di corsa
+
+Fino al 2021 non era successo quasi niente. Sulle diciannove regioni che hanno la serie intera (la Sardegna entra solo dal 2019) la media passa da 2,28 nel 2015 a 2,89 nel 2021, con un arretramento nell'anno della pandemia. Poi la corsa. I tre anni successivi valgono il triplo dei sei precedenti e portano da soli tre quarti dell'aumento del decennio, gli stessi anni in cui è arrivato il finanziamento nazionale alle cure domiciliari.
+
+Il valore che l'Istat pubblica per l'Italia è ponderato sulla popolazione, quindi non è la media delle venti regioni. Nel 2023 l'Italia sta al 3,8% mentre la media semplice regionale è 4,02, e la distanza si spiega con il peso delle regioni più popolose, che stanno in basso.
+
+Nessuna regione oggi sta sotto il proprio punto di partenza, ma i percorsi non si somigliano. La Valle d'Aosta partiva da una quota sotto l'uno per cento e oggi sta appena sotto la mediana, il salto più grande del gruppo. Il Trentino Alto Adige nel 2015 stava tra i primi cinque, ha guadagnato due decimi di punto in dieci anni ed è scivolato al diciassettesimo posto. Nell'ultimo anno arretrano solo Emilia-Romagna e Trentino Alto Adige, e la Lombardia resta ferma.
+
+<!-- sezione: limiti -->
+## Un canale solo, su due
+
+Questo numero vede un canale solo. L'assistenza domiciliare dei Comuni e il lavoro di cura che le famiglie comprano per conto proprio restano fuori dal conteggio.
+
+Per questo una quota bassa non è, da sola, un servizio peggiore. Il capitolo Bes che pubblica questo indicatore mette accanto i posti letto nei presidi residenziali, e lì l'ordine cambia. Nel 2023 sono 151 ogni 10 mila abitanti nella provincia autonoma di Trento e 19 in Campania, che invece qui sta sopra la media. Casa e struttura rispondono allo stesso bisogno in modi diversi, e la pagina ne misura uno. Sommando i due canali, nel 2023 l'Istat conta il 5,5% degli over 64 presi in carico dai servizi sanitari e sociosanitari.
+
+Neanche la distanza dai servizi si legge qui. Rispetto alla [difficoltà di accesso ad alcuni servizi essenziali](/indicatore/difficolta-di-accesso-ad-alcuni-servizi/bes-12SER004) la geografia non si somiglia, e la correlazione di rango tra i due è praticamente nulla. La Campania, che nel 2024 è seconda in Italia per famiglie che dichiarano molta difficoltà a raggiungere tre o più servizi, sta comunque sopra la media per anziani trattati a casa. Gli altri servizi con cui leggere questo dato stanno nel [tema mobilità e servizi territoriali](/tema/mobilita-e-servizi-territoriali).

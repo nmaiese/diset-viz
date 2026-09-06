@@ -30,11 +30,17 @@ sezione non scritta viene composta dai dati al render. Un articolo dichiara
 `"level"` e viene usato solo a quel livello. Prima di toccare la pagina o il
 view model: [`docs/INDICATOR_PAGES.md`](../../docs/INDICATOR_PAGES.md).
 
-Un file di `content/indicators/` e' JSON, senza frontmatter: il contratto e'
-quello di `scripts/indicator_store.py`, le cifre vengono dal dossier, e `fonti`
-puo' restare vuota quando non c'e' contesto esterno verificabile (non e' un
-difetto, si segnala nella PR). I post del blog, che sono Markdown, portano
-invece le fonti nel frontmatter con `testo` e `url`.
+Un file di `content/indicators/` e' Markdown con frontmatter, come un post del
+blog: i campi in testa (`fonti` con `testo` e `url`, `vintage`, `level`, `h1`,
+`seo_title`), poi il lead, poi le sezioni, ognuna aperta da
+`<!-- sezione: ruolo -->` e col suo `## titolo`. Il contratto e' quello di
+`scripts/indicator_store.py`. Le cifre vengono dal dossier, e `fonti` puo'
+restare vuota quando non c'e' contesto esterno verificabile (non e' un difetto,
+si segnala nella PR).
+
+Il formato e' Markdown perche' la PR e' il momento in cui il pezzo si legge: in
+JSON una sezione stava su una riga sola con gli a capo scritti `\n`, e il diff
+di una correzione non si poteva giudicare.
 
 Sempre dal brief deterministico, mai da chiamate API ad hoc:
 

@@ -1,0 +1,52 @@
+---
+fonti:
+  - testo: "Istat, Migrazioni interne e internazionali della popolazione residente. Anni 2023-2024 (20 giugno 2025)"
+    url: "https://www.istat.it/comunicato-stampa/migrazioni-interne-e-internazionali-della-popolazione-residente-anni-2023-2024/"
+  - testo: "Istat, Indicatori demografici, definizione di tasso migratorio interno"
+    url: "https://demo.istat.it/tavole/?t=indicatori&l=it"
+key: "dem:NMIGRATEIN"
+level: "regione"
+reviewed_at: "2026-08-03"
+reviewed_vintage: 2024
+vintage: 2024
+---
+
+Il saldo migratorio interno non separa il Nord dal Sud, separa sei regioni in perdita pesante da un resto d'Italia quasi tutto in pareggio o in guadagno. Nel 2024 la distanza tra la prima e l'ultima è la più corta dopo quella del 2015, e a chiuderla è stato soprattutto il fondo della classifica.
+
+<!-- sezione: definizione -->
+## Iscritti meno cancellati, e i traslochi che si elidono
+
+Il conto sta tra due registri di anagrafe: chi si iscrive in un comune arrivando da un altro comune italiano e chi si cancella per trasferirsi in un altro comune italiano. La differenza, divisa per la popolazione media residente nell'anno e moltiplicata per mille, è il numero di questa pagina. L'estero non entra nel conto.
+
+Sommando i comuni di una regione i traslochi interni si elidono, perché compaiono da tutte e due le parti, e resta il bilancio degli scambi con le altre regioni. Allargata all'Italia intera la stessa elisione azzera tutto: il paese non guadagna né perde un residente, se lo sposta e basta.
+
+Un decimale per mille sembra poco, ma si somma. Nei dieci saldi annuali dal 2015 al 2024 la Basilicata ha ceduto agli scambi interni l'equivalente di quasi un residente ogni venti, l'Emilia-Romagna ne ha guadagnati poco più di tre ogni cento. È la popolazione su cui una regione dimensiona scuole e servizi, e si sposta a rate.
+
+<!-- sezione: quadro -->
+## Sei regioni staccate, e il Lazio fermo sullo zero
+
+La mediana regionale, +0,75, sta sopra la media, che resta negativa: la regione tipica guadagna residenti, e a tirare in basso l'aggregato è una coda corta e profonda. Vale per tutti e dieci gli anni della serie, non solo per l'ultimo.
+
+Il salto più largo, 2,10 punti, non cade sulla linea Nord-Sud. Cade dopo la Sardegna, che con -0,10 non era mai stata così vicina al pareggio in dieci anni, e apre il gruppo delle sei regioni che perdono più di due residenti ogni mille: Puglia, Sicilia, Campania, Molise, Calabria, Basilicata. Sopra il salto, del Mezzogiorno, restano solo la Sardegna stessa e l'Abruzzo, che con +0,50 chiude in positivo per la prima volta in dieci anni.
+
+Più su la geografia attesa si scompiglia: il Lazio, con +0,10, è tredicesimo, dietro Umbria e Abruzzo, e la regione di Roma è quasi in pareggio.
+
+Accanto ai tassi Istat conta anche le persone. Nel biennio 2023-2024 i trasferimenti dal Mezzogiorno al Centro-Nord sono stati 241 mila contro i 125 mila in senso opposto, una perdita netta di 116 mila residenti. Quasi tre su dieci di quei 241 mila spostamenti sono finiti in Lombardia.
+
+<!-- sezione: dinamica -->
+## Una fisarmonica, e un 2024 richiuso dal fondo
+
+Il decennio non ha una direzione, ha un'oscillazione. La media semplice dei venti valori va da -0,32 nel 2015 a -0,18 nel 2024, ma sotto quella quasi immobilità undici regioni hanno migliorato il saldo, otto lo hanno peggiorato e la Toscana è tornata da dove era partita.
+
+A raccontarlo è la distanza tra la prima e l'ultima: 7,10 punti nel 2015, poi 10,70 nel 2018, 7,60 nel 2021, 9,30 nel 2023 e 7,40 nel 2024, il valore più basso dopo quello di partenza. Non un allargamento seguito da una chiusura, una fisarmonica. In cima non è cambiato niente, l'Emilia-Romagna guida tutti e dieci gli anni, il fondo invece ha cambiato mano: era la Calabria fino al 2019, è la Basilicata da allora.
+
+L'ultimo anno va tenuto distinto. Dal 2023 al 2024 tutte e otto le regioni del Mezzogiorno hanno migliorato il saldo, le nove in calo stanno tutte nel Centro-Nord, e dei 1,90 punti di distanza recuperati 1,30 arrivano dal fondo che risale, il resto dalla cima che scende. Le regioni sopra lo zero salgono a tredici, mai così tante. Un anno però non è un'inversione: la Basilicata, che quel recupero l'ha fatto quasi tutto lei, resta un punto e mezzo sotto il suo 2015.
+
+<!-- sezione: limiti -->
+## Quello che un saldo netto non riesce a dire
+
+Il conto si ferma ai confini nazionali. Per la popolazione che una regione davvero guadagna o perde serve il [saldo migratorio totale](/indicatore/saldo-migratorio-totale/ter-923), che ordina le venti regioni quasi allo stesso modo (rho +0,89) pur comprendendo anche l'estero. Quasi: la Calabria cede qui 4,40 residenti ogni mille e sull'altra scala, nello stesso 2024, resta in guadagno.
+
+È un valore netto e conta solo la residenza registrata: due regioni con lo stesso saldo possono avere dietro flussi opposti, e lo studente fuori sede che tiene la residenza dai genitori non compare.
+
+Chi parte, con quale età e perché il numero non lo dice: dietro un saldo può esserci il lavoro come il reddito dell'area, e questa serie non li distingue. Non è neppure il divario demografico, visto che il [tasso di natalità](/indicatore/tasso-di-natalita-istat-regioni/dem-BIRTHRATE) mette le regioni in un ordine che con questo non c'entra (rho -0,09). Le altre voci demografiche stanno nel tema [Salute, demografia e cura](/tema/salute-demografia-e-cura).

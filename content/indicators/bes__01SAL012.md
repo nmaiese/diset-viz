@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:01SAL012"
+vintage: 2025
+---
+
+La sedentarietà è forse la disuguaglianza di salute più marcata tra le abitudini. In Calabria non pratica alcuna attività fisica il 47,4% delle persone, in Sicilia il 47%, contro il 14,8% del Trentino Alto Adige. Più di tre volte di distanza, con una media delle regioni del 29,7%.
+
+<!-- sezione: quadro -->
+
+Muoversi poco moltiplica il rischio di eccesso di peso, malattie croniche e fragilità, e non a caso la mappa della sedentarietà somiglia a quella dell'obesità. L'attività fisica dipende anche da spazi, impianti, tempo e sicurezza dei luoghi, non solo dalla volontà individuale, e questi mancano più spesso dove il dato è alto. Il valore è in calo, un segnale incoraggiante. Ma quanto della sedentarietà è pigrizia e quanto assenza di occasioni per muoversi?
+
+<!-- sezione: limiti -->
+
+Registra chi dichiara di non praticare sport o attività fisica nel tempo libero, ma non conta il movimento legato al lavoro o agli spostamenti a piedi. Due persone ugualmente attive nella vita quotidiana possono risultare una sedentaria e una no.

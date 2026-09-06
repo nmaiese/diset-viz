@@ -1,0 +1,15 @@
+---
+fonti: []
+key: "bes:03LAV007"
+vintage: 2022
+---
+
+Il lavoro può ferire e uccidere, in modo diseguale. Il tasso di infortuni gravi e mortali va da 8 ogni diecimila occupati in Piemonte a 17,8 in Umbria. La media delle regioni è del 12,4, e la mappa non ricalca quella dell'occupazione.
+
+<!-- sezione: quadro -->
+
+Gli infortuni dipendono soprattutto da come è fatto il lavoro di un territorio: agricoltura, edilizia e manifattura pesante rischiano più dei servizi. Per questo alcune regioni piccole e industriali stanno in alto, e l'indicatore è descrittivo, senza un verso che dipenda dalla virtù di una regione. Il calo di lungo periodo c'è, ma ogni infortunio grave resta un fallimento. Quanti di questi eventi sono davvero incidenti e quanti rischi accettati?
+
+<!-- sezione: limiti -->
+
+Rapporta gli infortuni gravi agli occupati, ma risente della struttura produttiva e della sotto-denuncia in alcuni settori. Non conta gli infortuni lievi né le malattie professionali, che emergono anni dopo e sfuggono a questa misura.
