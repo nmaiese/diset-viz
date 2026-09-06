@@ -1410,6 +1410,14 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .scatter__name { font-family: var(--font-body); font-size: 9.5px; fill: var(--accent); }
 .scatter__axis-name { font-family: var(--font-mono); font-size: 8.5px; fill: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
 .scatter-figure figcaption { color: var(--muted); font-size: 13px; margin-top: 8px; }
+/* Il ritratto di una regione: una riga per indicatore, il punto dove sta fra il
+   minimo e il massimo italiano. Nessun numero, perche' le unita' di sei
+   indicatori non si confrontano: il senso e' la posizione. */
+.portrait { width: 100%; height: auto; display: block; }
+.portrait__track { stroke: var(--line); stroke-width: 3; stroke-linecap: round; }
+.portrait__dot { fill: var(--accent); }
+.portrait__name { font-family: var(--font-body); font-size: 9.5px; fill: var(--ink-soft); }
+.portrait__end { font-family: var(--font-mono); font-size: 8px; fill: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
 
 /* Pagina account (Fase 5.3). Solo site.css (pagina SSR, niente game.css). */
 .account-block { border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 16px 0; }

@@ -10,6 +10,7 @@ marcatore vive dentro il corpo di una sezione, e un errore lì non deve mai
 arrivare in pagina come un commento HTML nudo o come una traccia.
 """
 
+import re
 import unittest
 
 from app import charts
@@ -36,6 +37,42 @@ class Marcatore(unittest.TestCase):
     def test_un_commento_qualsiasi_non_e_un_marcatore(self):
         self.assertEqual(charts.requested("<!-- sezione: quadro -->"), [])
         self.assertEqual(charts.requested("<!-- grafico: torta con=ter-401 -->"), [])
+
+    def test_il_tipo_viaggia_con_la_richiesta(self):
+        corpo = ("<!-- grafico: dispersione con=ter-401 -->\n"
+                 "<!-- grafico: ritratto regione=Sardegna con=ter-401,ter-921 -->")
+        chieste = charts.requested(corpo)
+        self.assertEqual([c["tipo"] for c in chieste], ["dispersione", "ritratto"])
+        self.assertEqual(chieste[1]["regione"], "Sardegna")
+
+
+class Ritratto(unittest.TestCase):
+    """Dove sta una regione fra il minimo e il massimo italiano, su piu' indicatori."""
+
+    def righe(self, quante=4):
+        return [(f"Indicatore {i}", i / max(1, quante - 1)) for i in range(quante)]
+
+    def test_una_riga_per_indicatore(self):
+        disegno = charts.portrait_svg(self.righe(4), "Sardegna")
+        self.assertEqual(disegno.count("portrait__track"), 4)
+        self.assertEqual(disegno.count("portrait__dot"), 4)
+
+    def test_un_solo_indicatore_non_e_un_ritratto(self):
+        self.assertEqual(charts.portrait_svg(self.righe(1), "Sardegna"), "")
+
+    def test_i_due_capi_dicono_solo_la_posizione(self):
+        # Nessun numero: le unita' di sei indicatori non si confrontano.
+        disegno = charts.portrait_svg(self.righe(3), "Sardegna")
+        self.assertIn("il valore più basso d'Italia", disegno)
+        self.assertNotRegex(disegno, r">-?\d+[,.]\d+<")
+
+    def test_la_quota_resta_dentro_la_tela(self):
+        disegno = charts.portrait_svg([("A", -3.0), ("B", 9.0)], "Sardegna")
+        cx = [float(v) for v in re.findall(r'portrait__dot" cx="([\d.]+)"', disegno)]
+        self.assertTrue(all(8.0 <= v <= charts.WIDTH - 8.0 for v in cx), cx)
+
+    def test_svg_nascosto_agli_screen_reader(self):
+        self.assertIn('aria-hidden="true"', charts.portrait_svg(self.righe(3), "Sardegna"))
 
 
 class Disegno(unittest.TestCase):

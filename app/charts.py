@@ -13,9 +13,19 @@ Nel corpo di una sezione dell'articolo, su una riga sua:
     <!-- grafico: dispersione con=dem-BIRTHRATE evidenzia=Sardegna,Lazio
          didascalia="Le due regioni accese non seguono le altre." -->
 
+    <!-- grafico: ritratto regione=Sardegna con=ter-921,bes-12SER026,ter-401
+         didascalia="Dove sta la Sardegna, fra il minimo e il massimo italiano." -->
+
 `con` è il codice dell'altro indicatore come sta nell'URL (`ter-401`,
-`bes-12SER026`, `dem-BIRTHRATE`). `evidenzia` e `didascalia` sono facoltativi.
-Il marcatore resta in italiano perché lo scrive chi redige, dentro il testo.
+`bes-12SER026`, `dem-BIRTHRATE`); nel ritratto è una lista separata da virgole.
+`evidenzia`, `regione` e `didascalia` completano il resto. Il marcatore è in
+italiano perché lo scrive chi redige, dentro il testo.
+
+**Due figure, due lavori diversi.** La dispersione mostra come questo indicatore
+si dispone rispetto a un altro, una regione per punto. Il ritratto mostra dove
+sta **una regione** fra il minimo e il massimo italiano, su piu' indicatori
+insieme: e' il contesto di un posto, che la pagina non da' da nessuna parte
+perche' ogni pagina parla di un indicatore solo.
 
 ## Perché si disegna al render e non si salva
 
@@ -41,7 +51,8 @@ from app import sources
 
 # Il marcatore come lo scrive chi redige: tollerante sugli spazi e sull'a capo,
 # perché lo batte a mano una persona (o un modello) dentro un paragrafo.
-MARKER_RE = re.compile(r"<!--\s*grafico:\s*dispersione\s+(?P<args>[^>]*?)\s*-->", re.IGNORECASE | re.DOTALL)
+MARKER_RE = re.compile(r"<!--\s*grafico:\s*(?P<tipo>dispersione|ritratto)\s+(?P<args>[^>]*?)\s*-->",
+                       re.IGNORECASE | re.DOTALL)
 _ARG_RE = re.compile(r'(\w+)\s*=\s*(?:"([^"]*)"|([^\s"]+))')
 
 # Sotto otto territori in comune una dispersione non si legge: sono otto punti
@@ -65,7 +76,8 @@ def parse_args(text):
 
 def requested(body):
     """Le figure chieste da un corpo di sezione, nell'ordine in cui compaiono."""
-    return [parse_args(match.group("args")) for match in MARKER_RE.finditer(body or "")]
+    return [dict(parse_args(match.group("args")), tipo=match.group("tipo").lower())
+            for match in MARKER_RE.finditer(body or "")]
 
 
 def _values(code, level_key):
@@ -187,6 +199,60 @@ def figure(indicator_id, spec, level_key):
     return f'<figure class="scatter-figure">{drawing}<figcaption>{escape(caption)}</figcaption></figure>'
 
 
+def portrait_svg(rows, region):
+    """Una riga per indicatore: la corsa dal minimo al massimo italiano, e il punto della regione.
+
+    Nessun numero: le unità dei sei indicatori non si confrontano, e il senso
+    della figura è la posizione, non il valore. Ogni riga porta il nome
+    dell'indicatore e i due capi dicono soltanto "il piu' basso" e "il piu'
+    alto", che è tutto quello che una posizione può dire onestamente.
+    """
+    if len(rows) < 2:
+        return ""
+    passo, alto = 26.0, 18.0
+    altezza = alto + passo * len(rows) + 14
+    parts = [f'<svg class="portrait" viewBox="0 0 {WIDTH:.0f} {altezza:.0f}" aria-hidden="true" focusable="false">']
+    for indice, (nome, quota) in enumerate(rows):
+        y = alto + passo * indice
+        x0, x1 = 8.0, WIDTH - 8.0
+        parts.append(f'<text class="portrait__name" x="{x0:.0f}" y="{y - 5:.1f}">{escape(nome)}</text>')
+        parts.append(f'<line class="portrait__track" x1="{x0:.0f}" y1="{y + 4:.1f}" '
+                     f'x2="{x1:.0f}" y2="{y + 4:.1f}"/>')
+        cx = x0 + max(0.0, min(1.0, quota)) * (x1 - x0)
+        parts.append(f'<circle class="portrait__dot" cx="{cx:.1f}" cy="{y + 4:.1f}" r="4"/>')
+    parts.append(f'<text class="portrait__end" x="8" y="{altezza - 3:.0f}">il valore più basso d\'Italia</text>')
+    parts.append(f'<text class="portrait__end" x="{WIDTH - 8:.0f}" y="{altezza - 3:.0f}" '
+                 f'text-anchor="end">il più alto</text>')
+    parts.append("</svg>")
+    return "".join(parts)
+
+
+def portrait(spec, level_key):
+    """Il ritratto di una regione su piu' indicatori, o stringa vuota se non si puo' disegnare."""
+    region = (spec.get("regione") or "").strip()
+    codes = [c.strip() for c in (spec.get("con") or "").split(",") if c.strip()]
+    if not region or len(codes) < 2:
+        return ""
+    rows, named = [], []
+    for code in codes[:8]:
+        meta, values, year = _values(code, level_key)
+        if not values or region not in values or len(values) < MIN_POINTS:
+            continue
+        low, high = min(values.values()), max(values.values())
+        if high == low:
+            continue
+        rows.append((short_name(meta["name"]), (values[region] - low) / (high - low)))
+        named.append(f"{short_name(meta['name'])} ({year})")
+    drawing = portrait_svg(rows, region)
+    if not drawing:
+        return ""
+    written = (spec.get("didascalia") or "").strip()
+    described = (f"Dove sta {region} fra il valore più basso e il più alto d'Italia, "
+                 f"su {len(rows)} indicatori: {', '.join(named)}.")
+    caption = f"{written} {described}".strip() if written else described
+    return f'<figure class="scatter-figure">{drawing}<figcaption>{escape(caption)}</figcaption></figure>'
+
+
 def render(html, indicator_id, level_key):
     """Sostituisce ogni marcatore nell'HTML della sezione con la sua figura.
 
@@ -196,7 +262,10 @@ def render(html, indicator_id, level_key):
     """
     def replace(match):
         try:
-            return figure(indicator_id, parse_args(match.group("args")), level_key)
+            spec = parse_args(match.group("args"))
+            if match.group("tipo").lower() == "ritratto":
+                return portrait(spec, level_key)
+            return figure(indicator_id, spec, level_key)
         except Exception:
             # Una figura non vale la pagina: se qualcosa va storto, sparisce.
             return ""
