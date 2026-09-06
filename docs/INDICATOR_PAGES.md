@@ -150,6 +150,42 @@ vale `regione` quando manca, e viene usata solo lì. Su ogni altro livello la
 pagina ricade sullo scheletro composto, che legge il livello che gli viene dato.
 Lo garantisce `ProseStaysOnTheLevelItWasWrittenFor` in `tests/integration/test_indicator_texts.py`.
 
+## Una figura dentro l'articolo: la dispersione
+
+La regola delle tre zone dice che una cifra si mostra una volta, e per questo
+l'articolo non ha grafici: mappa, classifica e serie storica stanno gia' nel
+cruscotto, e ridisegnarle sotto sarebbe la duplicazione che il layout ha tolto.
+
+C'e' una cosa pero' che il cruscotto non mostra e nessun'altra pagina del sito
+mostra: **come questo indicatore si dispone rispetto a un altro**, una regione
+per punto. Quella figura non ripete niente, quindi puo' stare nel testo. E' la
+sola, e si chiede con un marcatore nel corpo della sezione:
+
+```
+<!-- grafico: dispersione con=dem-BIRTHRATE evidenzia=Sardegna,Lazio
+     didascalia="Le due regioni accese non seguono le altre." -->
+```
+
+`con` e' il codice dell'altro indicatore come sta nell'URL. `evidenzia` accende
+i territori che rompono il disegno, che sono il motivo per cui la figura esiste;
+`didascalia` aggiunge una frase davanti a quella che il sito compone da solo.
+
+**Si disegna al render, mai salvata.** `app/charts.py` rilegge i valori dei due
+indicatori a ogni richiesta, come le sezioni composte del template: un SVG
+congelato nel Markdown mostrerebbe i numeri del giorno in cui e' stato scritto,
+e un aggiornamento della fonte lo lascerebbe indietro in silenzio.
+
+**Una figura che non si puo' disegnare sparisce e il testo resta intero.**
+Indicatore inesistente, dati mancanti, meno di otto territori in comune: il
+marcatore viene tolto e non arriva niente in pagina. Il pezzo va scritto perche'
+regga anche senza. Il rovescio e' che una figura persa non lascia traccia, e per
+questo `motore verifica` della redazione tratta un marcatore che punta a un
+indicatore inesistente come un difetto **bloccante**, non come un rilievo.
+
+L'SVG e' `aria-hidden`: una nuvola di punti non si legge ad alta voce. Il
+contenuto sta nella `<figcaption>`, che nomina i due indicatori, i due anni,
+quante regioni entrano nel confronto e quali sono accese.
+
 ## Scrivere un articolo
 
 Si comincia sempre da qui, e **non da questo repo**: il dossier e il brief li
