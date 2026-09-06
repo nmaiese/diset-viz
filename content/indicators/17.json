@@ -1,18 +1,46 @@
 {
- "fonti": [],
+ "angolo_scelto": "Nel 2025 la disoccupazione di lunga durata separa le regioni italiane per nove punti, dal Trentino Alto Adige alla Campania, e la media delle regioni scende senza interruzioni dal 2022, con il movimento più grande proprio dove il numero era più alto: abbastanza grande da rimescolare il fondo della classifica.",
+ "fonti": [
+  {
+   "testo": "Istat, Banca dati territoriale per le politiche di sviluppo",
+   "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
+  },
+  {
+   "testo": "Istat, Noi Italia 2025, Mercato del lavoro",
+   "url": "https://noi-italia.istat.it/pagina.php?id=3&categoria=16&action=show&L=0"
+  },
+  {
+   "testo": "Istat, Occupati e disoccupati (dati provvisori), dicembre 2025",
+   "url": "https://www.istat.it/comunicato-stampa/occupati-e-disoccupati-dati-provvisori-dicembre-2025/"
+  }
+ ],
+ "h1": "Disoccupazione di lunga durata per regione: nove punti fra la prima e l'ultima, e il calo più forte dov'era più alta",
  "key": "17",
- "lead": "Rapportata a tutte le forze di lavoro, la disoccupazione di lunga durata mostra il divario più estremo del mercato del lavoro. In Campania il 9,4% delle persone attive cerca da oltre un anno, in Trentino Alto Adige solo lo 0,4%: oltre venti volte di distanza. La media delle regioni è del 3,2%.",
+ "lead": "Nel 2025 in Trentino Alto Adige lo 0,4% delle forze di lavoro cerca un impiego da più di un anno. In Campania lo stesso valore è 9,4%. Fra le venti regioni, contate tutte allo stesso modo, la media è 3,2%, ed era 6,5% nel 2018.",
+ "level": "regione",
+ "scritto_il": "2026-09-06",
  "sections": [
   {
-   "body": "Se l'incidenza dice che tipo di disoccupazione prevale, questo tasso ne misura il peso sull'intera forza lavoro, ed è qui che il Sud paga il conto più alto. Un divario di venti volte non ha eguali tra gli indicatori economici, e segnala un nucleo di esclusione radicata più che una difficoltà passeggera. Il calo recente è forte, ma parte da livelli altissimi. Si può parlare di ripresa del lavoro con una disoccupazione così incistata?",
-   "h": null,
+   "body": "L'indicatore conta le persone che cercano lavoro da più di un anno e le mette in rapporto alle forze di lavoro, cioè a chi un lavoro ce l'ha più chi lo sta cercando. Chi cerca da sei mesi non ci finisce dentro. Non ci finisce nemmeno chi ha smesso di cercare: chi non cerca più esce dalle forze di lavoro, e così sparisce sia dalle persone contate sia dal gruppo su cui la quota si calcola. I valori regionali arrivano dalla banca dati territoriale dell'Istat per le politiche di sviluppo e sono medie di tutto l'anno, non fotografie di un mese. Vale la regola opposta al solito: più il numero è basso, meglio sta la regione.",
+   "h": "Chi finisce dentro questo numero",
+   "role": "definizione"
+  },
+  {
+   "body": "Nel 2025 il Trentino Alto Adige sta allo 0,4%, il valore più basso che una regione italiana abbia toccato dal 2018 a oggi. Dietro ci sono la Valle d'Aosta e la Lombardia, tutte e due all'1,2%, poi il Veneto all'1,3% e l'Emilia-Romagna all'1,4%. In fondo la Campania sta al 9,4%, preceduta dalla Sicilia al 7,9%, dalla Puglia al 6,3% e dalla Calabria al 5,7%. In Trentino Alto Adige la disoccupazione lunga riguarda quattro persone ogni mille che stanno sul mercato del lavoro, in Campania quasi una su dieci.\n\nNel 2025 le regioni del Nord stanno in media all'1,5%, quelle del Centro al 2,1%, quelle del Mezzogiorno al 5,5%, quasi quattro punti più in alto del Nord. Sono medie fra le regioni di ogni parte d'Italia, non il valore complessivo di quella parte. La linea però non è netta del tutto: la Basilicata, al 2,8%, sta davanti al Lazio, che è al 2,9%, ed è l'unica regione del Mezzogiorno davanti a una del Centro.\n\nSecondo Istat il peso della disoccupazione lunga non è uguale per tutti: fra i giovani disoccupati, la quota di chi cerca lavoro da almeno un anno è molto più alta nel Mezzogiorno che nel Centro-Nord, e la Calabria è il caso più estremo. Lo stesso conteggio fatto [solo sulle donne](/indicatore/tasso-di-disoccupazione-di-lunga-durata-femmine/ter-184) dà il 10,3% in Campania e lo 0,5% in Trentino Alto Adige, [solo sugli uomini](/indicatore/tasso-di-disoccupazione-di-lunga-durata-maschi/ter-183) l'8,8% in Campania e lo 0,3% in Trentino Alto Adige. Agli estremi le due classifiche danno le stesse due regioni.",
+   "h": "Nove punti fra il Trentino Alto Adige e la Campania",
    "role": "quadro"
   },
   {
-   "body": "Rapporta i disoccupati di lungo periodo alle forze di lavoro, quindi risente anche di quante persone partecipano al mercato. Non distingue chi è vicino a rientrare da chi è fuori da anni, situazioni con bisogni molto diversi.",
-   "h": null,
+   "body": "La media delle regioni era il 6,5% nel 2018 e il 5,9% nel 2019. Poi il 5,0% nel 2020, una risalita al 5,5% nel 2021, e da lì una discesa che non si è più interrotta: 4,7% nel 2022, 4,3% nel 2023, 3,5% nel 2024, 3,2% nel 2025. Dal 2020 al 2025 sono 1,8 punti in meno, tre decimi dei quali nell'ultimo anno.\n\nIl movimento più grande è quello della Calabria, e non è stato regolare. Nel 2018 la Calabria stava al 15,1%, il valore più alto raggiunto da una regione italiana in questi otto anni, ed era ultima. Poi la Calabria è scesa al 12,8% nel 2020 e al 9,5% nel 2022, è risalita all'11,2% nel 2023, ed è tornata giù all'8,6% nel 2024 e al 5,7% nel 2025. Nessuna regione è scesa altrettanto in questi otto anni.\n\nCosì anche l'ordine si è mosso, non solo la distanza fra la prima e l'ultima, che si è accorciata. La Calabria oggi è quartultima, e stanno peggio di lei la Puglia, la Sicilia e la Campania. E non si è mosso solo il fondo: la Liguria è salita dall'undicesimo posto al settimo e la Basilicata dal quattordicesimo al dodicesimo, mentre il Friuli-Venezia Giulia è sceso dal sesto al decimo e il Piemonte dall'ottavo all'undicesimo.\n\nAnche Istat vede lo stesso movimento sul dato nazionale: nella pubblicazione Noi Italia la quota di disoccupati che cerca lavoro da almeno un anno scende nel 2024. Quella misura però è diversa da questa in due cose, perché conta sul totale dei disoccupati e non sulle forze di lavoro, e perché si ferma al 2024 e non arriva al 2025. I due numeri non si confrontano.\n\nNon scende però ovunque. La Puglia era al 5,3% nel 2024 e al 6,3% nel 2025, l'unica regione salita di un punto intero nell'ultimo anno. Si muovono in su di poco anche la Toscana, 0,5 punti, il Veneto 0,4, il Piemonte 0,3, il Friuli-Venezia Giulia e l'Umbria 0,2, e di un soffio la Valle d'Aosta e le Marche.",
+   "h": "La discesa è più forte dove il numero era più alto",
+   "role": "dinamica"
+  },
+  {
+   "body": "Il valore è una media di tutto l'anno. Istat pubblica anche rilevazioni mensili sull'occupazione, che si muovono da un mese all'altro, e non vanno lette accanto a questo numero.\n\nSopra l'anno l'indicatore non distingue niente: chi ha appena superato l'anno di ricerca e chi cerca da anni contano allo stesso modo.\n\nLa media di cui si parla qui tiene ogni regione con lo stesso peso, la Valle d'Aosta come la Lombardia, e non è il valore dell'Italia. I numeri disponibili vanno dal 2018 al 2025, otto rilevazioni senza buchi, e non c'è modo di guardare indietro di dieci anni. Infine il nome inganna: pubblicazioni diverse chiamano disoccupazione di lunga durata misure costruite su denominatori diversi, e i valori non sono intercambiabili.",
+   "h": "Dove il numero smette di dire qualcosa",
    "role": "limiti"
   }
  ],
+ "seo_title": "Disoccupazione di lunga durata per regione",
  "vintage": 2025
 }

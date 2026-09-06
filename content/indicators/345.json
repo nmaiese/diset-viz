@@ -19,6 +19,7 @@
    "url": "https://www.istat.it/sistema-informativo-6/banca-dati-territoriale-per-le-politiche-di-sviluppo/"
   }
  ],
+ "h1": "Occupazione 20-64 anni: dal 78,8% del Trentino Alto Adige al 50,3% della Calabria",
  "key": "345",
  "lead": "Nel 2025 lavora il 78,8% delle persone fra 20 e 64 anni in Trentino Alto Adige e il 50,3% in Calabria. La media delle venti regioni è 68,0%. Nessuna regione del Mezzogiorno arriva a quella media, nessuna regione del Nord ci resta sotto.",
  "level": "regione",
@@ -50,6 +51,6 @@
    "role": "limiti"
   }
  ],
- "titolo": "Occupazione 20-64 anni: dal 78,8% del Trentino Alto Adige al 50,3% della Calabria",
+ "seo_title": "Occupazione 20-64 anni per regione",
  "vintage": 2025
 }

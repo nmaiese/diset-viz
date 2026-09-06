@@ -14,6 +14,7 @@
    "url": "https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Educational_attainment_statistics"
   }
  ],
+ "h1": "Istruzione degli adulti per regione: dall'Umbria alla Sicilia quasi venti punti di distanza",
  "key": "104",
  "lead": "Nel 2024 in Umbria il 24,3% delle persone fra 25 e 64 anni ha al massimo la licenza media. In Sicilia lo stesso valore è 44,1%. Fra le venti regioni, contate tutte allo stesso modo, la media è 33,0%.",
  "level": "regione",
@@ -45,6 +46,6 @@
    "role": "limiti"
   }
  ],
- "titolo": "Istruzione degli adulti per regione: dall'Umbria alla Sicilia quasi venti punti di distanza",
+ "seo_title": "Istruzione degli adulti per regione",
  "vintage": 2024
 }
