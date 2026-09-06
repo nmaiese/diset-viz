@@ -48,3 +48,6 @@ data/pipeline/.session_meta.json
 # scrive ed entra nella PR del pezzo, e `data/lab/articoli/` per le prove.
 data/lab/dossier/
 data/lab/bozze/
+# La narrativa (`motore narrativa`): stessa natura del dossier, derivata dagli
+# stessi dati con una scansione del catalogo, e si rifà con un comando.
+data/lab/narrativa/

@@ -213,6 +213,19 @@ def prose_html(text):
     return _markdown_html(text)
 
 
+@app.template_filter("figures")
+def figures(html, indicator_id, level_key):
+    """Le figure chieste dentro una sezione, disegnate adesso dai dati di adesso.
+
+    Si applica dopo `prose_html`, non prima: il marcatore è un commento HTML e
+    attraversa la conversione Markdown intatto, mentre una `<figure>` inserita
+    prima ne uscirebbe spezzata fra i paragrafi.
+    """
+    from app import charts
+
+    return charts.render(html, indicator_id, level_key)
+
+
 @app.template_filter("sparkline")
 def sparkline(series, width=140, height=36):
     """Inline SVG sparkline for a {year, value} series, server-side.
