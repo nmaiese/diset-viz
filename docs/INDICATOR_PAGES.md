@@ -150,25 +150,74 @@ vale `regione` quando manca, e viene usata solo lì. Su ogni altro livello la
 pagina ricade sullo scheletro composto, che legge il livello che gli viene dato.
 Lo garantisce `ProseStaysOnTheLevelItWasWrittenFor` in `tests/integration/test_indicator_texts.py`.
 
-## Una figura dentro l'articolo: la dispersione
+## La forma libera: un articolo che non fa le quattro fermate
+
+I quattro ruoli sono la forma dei dati, non la forma di un racconto:
+obbligano ogni pezzo a passare dagli stessi quattro titoli nello stesso ordine,
+qualunque cosa i dati abbiano da dire. Una sezione di ruolo **`libera`** porta
+il proprio titolo, sta dove l'autore l'ha messa, e non ha nessuno scheletro
+dietro: la pagina non la compone se manca, perche' una sezione che nessuno ha
+scritto non esiste.
+
+    <!-- sezione: libera -->
+    ## Il seggio non e' la poltrona
+
+Basta una sezione `libera` perche' l'articolo sia **esattamente quello che
+l'autore ha scritto**, nel suo ordine: nessun ruolo si aggiunge, nessuno
+scheletro si compone, e una eventuale `roles_covered` non lo ribalta. La
+definizione la copre il blocco "Come leggere il dato", che la pagina compone
+comunque dai metadati.
+
+Tre conseguenze che vale la pena sapere:
+
+- **L'ancora nasce dal titolo** (`sezione-il-seggio-non-e-la-poltrona`), non
+  dal ruolo: `libera-2` e `libera-3` non dicono niente a chi condivide un link
+  e cambiano appena qualcuno riordina il pezzo.
+- **Una sezione libera senza titolo non arriva in pagina.** La pagina non ha un
+  titolo di scorta da darle e un H2 vuoto e' peggio di una sezione in meno.
+  Lettore tollerante, scrittore severo: il renderer la scarta, `motore verifica`
+  della redazione la rifiuta prima.
+- **La lista di consegna lo sa.** `scripts/pending_notes` rispecchia la regola,
+  quindi un articolo libero risulta completo e il produttore non lo rilancia a
+  ogni giro chiedendo sezioni che quell'articolo ha deciso di non avere.
+
+I trecento articoli a quattro ruoli non cambiano di un pixel: la forma libera
+e' un'aggiunta, non un allentamento.
+
+## Le figure dentro l'articolo
 
 La regola delle tre zone dice che una cifra si mostra una volta, e per questo
 l'articolo non ha grafici: mappa, classifica e serie storica stanno gia' nel
 cruscotto, e ridisegnarle sotto sarebbe la duplicazione che il layout ha tolto.
 
-C'e' una cosa pero' che il cruscotto non mostra e nessun'altra pagina del sito
-mostra: **come questo indicatore si dispone rispetto a un altro**, una regione
-per punto. Quella figura non ripete niente, quindi puo' stare nel testo. E' la
-sola, e si chiede con un marcatore nel corpo della sezione:
+Ci sono pero' due cose che il cruscotto non mostra e che nessun'altra pagina
+del sito mostra. Non ripetono niente, quindi possono stare nel testo, e si
+chiedono con un marcatore nel corpo della sezione.
+
+**La dispersione**: come questo indicatore si dispone rispetto a un altro, una
+regione per punto.
 
 ```
 <!-- grafico: dispersione con=dem-BIRTHRATE evidenzia=Sardegna,Lazio
      didascalia="Le due regioni accese non seguono le altre." -->
 ```
 
-`con` e' il codice dell'altro indicatore come sta nell'URL. `evidenzia` accende
-i territori che rompono il disegno, che sono il motivo per cui la figura esiste;
-`didascalia` aggiunge una frase davanti a quella che il sito compone da solo.
+**Il ritratto**: dove sta **una regione** fra il valore piu' basso e il piu'
+alto d'Italia, su piu' indicatori insieme. E' il contesto di un posto, e la
+pagina non lo da' da nessuna parte perche' ogni pagina parla di un indicatore
+solo. Non porta nessun numero: le unita' di sei indicatori non si confrontano,
+e il senso della figura e' la posizione.
+
+```
+<!-- grafico: ritratto regione=Sardegna con=ter-921,bes-12SER026,ter-401
+     didascalia="Dove sta la Sardegna, e non solo sui figli." -->
+```
+
+`con` e' il codice dell'altro indicatore come sta nell'URL, una lista separata
+da virgole nel ritratto. `evidenzia` accende i territori che rompono il
+disegno, che sono il motivo per cui la dispersione esiste; `regione` dice chi
+si ritrae; `didascalia` aggiunge una frase davanti a quella che il sito compone
+da solo.
 
 **Si disegna al render, mai salvata.** `app/charts.py` rilegge i valori dei due
 indicatori a ogni richiesta, come le sezioni composte del template: un SVG
