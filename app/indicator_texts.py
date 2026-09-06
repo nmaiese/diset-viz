@@ -56,6 +56,18 @@ DEFAULT_HEADINGS = dict(ROLES)
 # in `scripts/practice_timeline`, che decidono se una pratica è completa.
 SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
 
+# La forma libera. Una sezione `libera` porta il proprio titolo, sta dove
+# l'autore l'ha messa e non ha nessuno scheletro dietro: la pagina non la
+# compone se manca, perché una sezione che nessuno ha scritto non esiste.
+#
+# Esiste perché i quattro ruoli sono la forma dei dati, non la forma di un
+# racconto: obbligano ogni pezzo a fare le stesse quattro fermate nello stesso
+# ordine, qualunque cosa i dati abbiano da dire. Un articolo che le usa dichiara
+# con le proprie sezioni e basta, e la definizione la copre il blocco "Come
+# leggere il dato", che la pagina compone comunque dai metadati.
+LIBERA = "libera"
+SCRIVIBILI = frozenset(DEFAULT_HEADINGS) | {LIBERA}
+
 # The level an entry describes when it does not say. Every article written so
 # far is regional, and every family except BES has regions as its only level.
 DEFAULT_LEVEL = "regione"
@@ -100,6 +112,15 @@ def get_text(indicator_id):
     return None
 
 
+def _ancora(heading):
+    """Il titolo di una sezione libera come frammento di URL: "Il seggio non è la poltrona" -> "il-seggio-non-e-la-poltrona"."""
+    import re
+    import unicodedata
+
+    piano = unicodedata.normalize("NFKD", heading or "").encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", piano.lower())).strip("-") or "sezione"
+
+
 def emitted_roles(entry):
     """I ruoli che la pagina rende per questa entry: `roles_covered` normalizzato.
 
@@ -121,6 +142,18 @@ def emitted_roles(entry):
     `scripts/pending_notes.py` e `scripts/verification_queue.py` la rispecchiano
     (sono stdlib puri e non importano `app`), e un test le tiene allineate.
     """
+    # **La forma libera vince su tutto.** Se anche una sola sezione dichiara
+    # `libera`, l'articolo è esattamente quello che l'autore ha scritto, nel suo
+    # ordine: nessun ruolo si aggiunge, nessuno scheletro si compone. Sta prima
+    # di ogni altra normalizzazione perché le altre servono a completare i
+    # quattro ruoli, e qui non c'è niente da completare.
+    if isinstance(entry, dict) and entry.get("sections"):
+        scritte = [section.get("role") for section in entry["sections"]
+                   if isinstance(section, dict) and (section.get("body") or "").strip()
+                   and (section.get("role") != LIBERA or (section.get("h") or "").strip())]
+        if LIBERA in scritte:
+            return [role for role in scritte if role in SCRIVIBILI]
+
     declared = entry.get("roles_covered") if isinstance(entry, dict) else None
     # Un'entry che scrive le proprie sezioni **dichiara con quelle**: elencare i
     # ruoli due volte, una in `sections` e una in `roles_covered`, è un modo
@@ -270,8 +303,15 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
     # nessun comando ha filtrato.
     authored = {}
     for section in entry.get("sections") or []:
-        if section.get("role") in DEFAULT_HEADINGS and (section.get("body") or "").strip():
-            authored.setdefault(section["role"], []).append(section)
+        if section.get("role") not in SCRIVIBILI or not (section.get("body") or "").strip():
+            continue
+        # Una sezione libera senza titolo non è renderizzabile: la pagina non ha
+        # un titolo di scorta da darle, e un H2 vuoto è peggio di una sezione in
+        # meno. Lettore tollerante, scrittore severo: la scarta qui, e chi
+        # pubblica la rifiuta prima.
+        if section["role"] == LIBERA and not (section.get("h") or "").strip():
+            continue
+        authored.setdefault(section["role"], []).append(section)
     role_sequence = emitted_roles(entry)
     sections = []
     # L'ancora è qui e non nel template, dove era `id="sezione-{{ role }}"`: il
@@ -287,10 +327,19 @@ def build_article(indicator_id, level_key=DEFAULT_LEVEL):
         written = coda.pop(0) if coda else None
         heading = (written.get("h") or "").strip() if written else ""
         visti[role] += 1
+        # L'ancora di una sezione libera nasce dal suo titolo, non dal ruolo:
+        # `libera`, `libera-2`, `libera-3` non dicono niente a chi condivide un
+        # link e cambiano appena qualcuno riordina il pezzo.
+        if role == LIBERA:
+            anchor = f"sezione-{_ancora(heading)}"
+            if anchor in {s["anchor"] for s in sections}:
+                anchor = f"{anchor}-{visti[role]}"
+        else:
+            anchor = f"sezione-{role}" if visti[role] == 1 else f"sezione-{role}-{visti[role]}"
         sections.append({
             "role": role,
-            "anchor": f"sezione-{role}" if visti[role] == 1 else f"sezione-{role}-{visti[role]}",
-            "heading": heading or DEFAULT_HEADINGS[role],
+            "anchor": anchor,
+            "heading": heading or DEFAULT_HEADINGS.get(role, ""),
             "body": written["body"].strip() if written else None,
             "authored": written is not None,
         })

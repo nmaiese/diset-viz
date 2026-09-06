@@ -1398,6 +1398,27 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .spark__line { stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
 .spark__dot { fill: var(--accent); }
 
+/* La dispersione dentro l'articolo (app/charts.py): due indicatori, una regione
+   per punto. Non ripete i colori della mappa e della serie storica, che stanno
+   nella stessa pagina: i punti sono inchiostro tenue e l'accento resta al pugno
+   di regioni che rompono il disegno, che e' l'unica cosa che la figura dice. */
+.scatter-figure { margin: 1.6em 0; }
+.scatter { width: 100%; height: auto; display: block; }
+.scatter__axis { stroke: var(--line); stroke-width: 1; }
+.scatter__dot { fill: var(--ink); opacity: 0.42; }
+.scatter__dot.is-on { fill: var(--accent); opacity: 1; }
+.scatter__name { font-family: var(--font-body); font-size: 9.5px; fill: var(--accent); }
+.scatter__axis-name { font-family: var(--font-mono); font-size: 8.5px; fill: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.scatter-figure figcaption { color: var(--muted); font-size: 13px; margin-top: 8px; }
+/* Il ritratto di una regione: una riga per indicatore, il punto dove sta fra il
+   minimo e il massimo italiano. Nessun numero, perche' le unita' di sei
+   indicatori non si confrontano: il senso e' la posizione. */
+.portrait { width: 100%; height: auto; display: block; }
+.portrait__track { stroke: var(--line); stroke-width: 3; stroke-linecap: round; }
+.portrait__dot { fill: var(--accent); }
+.portrait__name { font-family: var(--font-body); font-size: 9.5px; fill: var(--ink-soft); }
+.portrait__end { font-family: var(--font-mono); font-size: 8px; fill: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+
 /* Pagina account (Fase 5.3). Solo site.css (pagina SSR, niente game.css). */
 .account-block { border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin: 16px 0; }
 .account-block h2 { margin: 0 0 10px; font-size: 15px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-soft); }
