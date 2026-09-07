@@ -269,10 +269,33 @@ def leggi_frontmatter(righe: list[str], dove: str) -> dict:
 
 
 def _controlla_testo(testo: str, dove: str) -> str:
-    """Un testo che contiene un marcatore tornerebbe indietro spaccato in due."""
+    """Un testo che tornerebbe indietro diverso da come e' andato.
+
+    Due pericoli diversi, e prima erano trattati come uno solo.
+
+    `<!-- sezione: ... -->` spacca l'articolo ovunque si trovi: rileggendo il
+    file quella riga aprirebbe una sezione nuova, e il testo sotto finirebbe
+    li'. Resta fatale sempre.
+
+    Un marcatore qualsiasi (`<!-- grafico: ... -->`) invece lo mangia soltanto
+    la **testa** di una sezione, perche' `analizza` legge gli extra finche' il
+    corpo non e' cominciato e poi smette. Dentro il corpo e' testo, torna
+    indietro identico, ed e' cosi' che una figura sta dentro un articolo. Il
+    divieto totale di prima rendeva impossibile scriverne una: nessuna figura
+    poteva arrivare in pagina, e il guasto si vedeva solo al momento di
+    pubblicare.
+    """
+    visto_contenuto = dove == "lead"
     for riga in testo.split("\n"):
-        if MARCATORE.match(riga) or EXTRA.match(riga):
-            raise StoreError(f"{dove}: il testo contiene una riga che è un marcatore ({riga!r})")
+        if MARCATORE.match(riga):
+            raise StoreError(f"{dove}: il testo contiene un marcatore di sezione ({riga!r}): "
+                             "rileggendo il file aprirebbe una sezione nuova")
+        if EXTRA.match(riga) and not visto_contenuto:
+            raise StoreError(f"{dove}: {riga!r} apre il corpo, e rileggendo il file "
+                             "verrebbe letto come un campo della sezione invece che come testo. "
+                             "Mettici davanti almeno una riga di testo")
+        if riga.strip():
+            visto_contenuto = True
     return testo
 
 

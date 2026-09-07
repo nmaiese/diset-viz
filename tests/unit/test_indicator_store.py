@@ -321,5 +321,52 @@ class OneBrokenArticleCostsOneArticle(unittest.TestCase):
         self.assertFalse(seen["strict"])
 
 
+class UnaFiguraDentroIlCorpo(unittest.TestCase):
+    """Un marcatore dentro il testo e' testo, e deve tornare indietro identico.
+
+    Il divieto era totale, e rendeva impossibile scrivere una figura in un
+    articolo: `<!-- grafico: ... -->` veniva rifiutato in scrittura, quindi
+    nessuna figura poteva arrivare in pagina e il guasto si vedeva solo al
+    momento di pubblicare. Ma `analizza` legge gli extra **solo finche' il
+    corpo non e' cominciato**: dentro il corpo quella riga e' gia' testo.
+
+    Restano fatali le due cose che spaccherebbero davvero il file: un marcatore
+    di sezione ovunque, e un marcatore qualsiasi in testa a un corpo, dove il
+    parser lo mangerebbe come campo della sezione.
+    """
+
+    def entry(self, body):
+        return {"key": "ter-999", "level": "regione",
+                "sections": [{"role": "libera", "h": "Un titolo", "body": body}]}
+
+    def test_il_giro_completo_non_perde_la_figura(self):
+        body = ("Un paragrafo.\n\n"
+                "<!-- grafico: dispersione con=ter-401 evidenzia=Lazio -->\n\n"
+                "Un altro paragrafo.")
+        tornata = indicator_store.analizza(indicator_store.rendi("ter-999", self.entry(body)), "prova")
+        sezione = tornata["sections"][0]
+        self.assertEqual(sezione["body"], body)
+        self.assertEqual(sorted(sezione), ["body", "h", "role"])
+
+    def test_una_figura_in_testa_al_corpo_si_ferma(self):
+        # Li' il parser la leggerebbe come un campo della sezione, e il testo
+        # perderebbe la riga senza che niente fallisca.
+        with self.assertRaises(indicator_store.StoreError):
+            indicator_store.rendi("ter-999", self.entry("<!-- grafico: dispersione con=ter-401 -->\n\nTesto."))
+
+    def test_un_marcatore_di_sezione_nel_corpo_si_ferma(self):
+        with self.assertRaises(indicator_store.StoreError):
+            indicator_store.rendi("ter-999", self.entry("Testo.\n<!-- sezione: quadro -->"))
+
+    def test_nel_lead_un_marcatore_qualsiasi_resta_testo(self):
+        # Il lead non ha una testa di sezione: `analizza` ci appende ogni riga
+        # senza leggere campi, quindi li' non c'e' niente da mangiare.
+        entry = {"key": "ter-999", "level": "regione",
+                 "lead": "Un attacco.\n\n<!-- grafico: dispersione con=ter-401 -->",
+                 "sections": [{"role": "libera", "h": "T", "body": "Testo."}]}
+        tornata = indicator_store.analizza(indicator_store.rendi("ter-999", entry), "prova")
+        self.assertIn("grafico:", tornata["lead"])
+
+
 if __name__ == "__main__":
     unittest.main()
