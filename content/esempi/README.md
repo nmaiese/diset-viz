@@ -107,10 +107,59 @@ data e URL, il testo verbatim, e una lettura di che cosa lo rende leggibile.
 | [`ilpost-borgo-albergo.md`](ilpost-borgo-albergo.md) | Il Post | il luogo prima della cifra | un territorio estremo che vale la pena nominare |
 | [`youtrend-priorita-lavoro.md`](youtrend-priorita-lavoro.md) | YouTrend | una distribuzione letta cifra per cifra | un `quadro` fatto di percentuali in fila |
 | [`lavoce-decentramento-storico.md`](lavoce-decentramento-storico.md) | lavoce.info | una domanda, poi il tempo che risponde | la `dinamica` su una serie lunga |
+| [`ilpost-redditi-comuni.md`](ilpost-redditi-comuni.md) | Il Post | una classifica spiegata invece che letta | hai davanti la graduatoria intera, cioè quasi sempre |
+| [`ilpost-poverta-assoluta.md`](ilpost-poverta-assoluta.md) | Il Post | denso di cifre e leggibile lo stesso | il pezzo è per forza pieno di numeri |
+
+## I due aggiunti il 7 settembre 2026, e perché proprio quelli
+
+Non a occhio: `motore corpus divarioitalia` aveva appena misurato i 56 articoli
+veri del sito contro questi modelli, e i due buchi erano precisi.
+
+**Il primo è la classifica.** La classifica letta ad alta voce sta nel 44-83%
+dei nostri articoli e nello **zero per cento** di questa cartella: è il difetto
+che ci separa dai modelli più di ogni altro. Mancava però un testo che facesse
+vedere come si fa, perché nessuno dei dieci aveva davanti una graduatoria
+territoriale intera. `ilpost-redditi-comuni.md` ce l'ha, e invece di leggerla
+spiega che cosa la produce.
+
+**Il secondo smentisce una cosa che credevamo.** Per mesi abbiamo pensato che la
+cura per i nostri pezzi fosse togliere numeri. `ilpost-poverta-assoluta.md` pesa
+6,5 cifre ogni cento parole e ha un paragrafo denso su due, cioè più dei nostri
+articoli, e si legge meglio di tutti. La densità è un sintomo, non la malattia:
+quello che cambia è se ogni cifra ha accanto il motivo per cui c'è.
+
+**La concorrenza vera sulle nostre query non è un modello.** Su "pil pro capite
+regioni italiane" e simili, davanti a noi ci sono travel365, gimme5, blog di
+classifiche. Fanno esattamente il difetto che stiamo togliendo, e imitarli
+sarebbe peggiorare. I due testi nuovi vengono da chi compete per l'attenzione
+sugli stessi temi, non per la stessa SERP.
+
+## I link, che avevamo tolto noi
+
+I dieci estratti originali sono stati trascritti **senza i link inline**: zero
+link esterni in dieci testi. Non è come sono i testi veri. L'Openpolis in
+libreria ne ha uno nel primo blocco, il Post ne mette cinque in ottocento
+parole, la lavoce quattro in settecento.
+
+Non è un dettaglio di trascrizione. Questa cartella è il modello, e per mesi ha
+insegnato a chi scrive che una fonte non si linka dentro la prosa: nei nostri
+articoli i link a una fonte nel testo sono **zero** in tutte le generazioni
+tranne una al 6 per cento, mentre l'elenco `fonti` finisce in fondo alla pagina
+dove nessuno arriva. I due estratti nuovi tengono i loro link esattamente dove
+stanno nell'originale, ed è la ragione principale per cui sono qui.
 
 ## Che cosa è stato scartato, e perché
 
 Vale la pena registrarlo, perché il criterio si capisce meglio dagli scarti.
+
+**lavoce.info, "Italia, il paese più frammentato d'Europa" (2019).** Vagliato il
+7 settembre 2026 e scartato. Sui numeri era il migliore dei tre candidati: 1,8
+cifre per cento parole, quattro link nella prosa, zero classifiche lette ad alta
+voce. Ma il registro è quello accademico da cui questo lavoro esiste per uscire:
+"comportando così una netta alterazione nella misura della disuguaglianza
+intra-regionale", più l'indice di Williamson e il coefficiente di variazione nel
+corpo del testo. Il criterio è la lettura al primo passaggio, e i numeri buoni
+non la sostituiscono.
 
 **Istat, Report BesT regionali 2025.** Autorevole e pertinente, e illeggibile:
 32,1 parole per frase, "si caratterizza per la maggioranza di indicatori con
