@@ -83,6 +83,12 @@ ARTICLE_ROLES = ("definizione", "quadro", "dinamica", "limiti")
 # `practice_timeline.reconstruct`, che decide se una pratica è completa.
 SUBSTANTIVE_ROLES = frozenset(("quadro", "dinamica", "limiti"))
 
+# La forma libera: una sezione `libera` porta il proprio titolo e non ha nessuno
+# scheletro dietro. Un articolo che ne contiene almeno una e' quello che
+# l'autore ha scritto, quindi non manca niente: senza questa riga risulterebbe
+# incompleto per sempre e il produttore lo rilancerebbe a ogni giro.
+LIBERA = "libera"
+
 
 def unwritten_roles(entry):
     """The roles of an article that nobody has written yet.
@@ -120,6 +126,13 @@ def emitted_roles(entry):
     ignora, altrimenti resterebbe richiesto per sempre da qualcuno e da nessun
     altro) e i tre sostanziali ci sono comunque.
     """
+    if isinstance(entry, dict) and entry.get("sections"):
+        scritte = [section.get("role") for section in entry["sections"]
+                   if isinstance(section, dict) and (section.get("body") or "").strip()
+                   and (section.get("role") != LIBERA or (section.get("h") or "").strip())]
+        if LIBERA in scritte:
+            return [role for role in scritte if role in set(ARTICLE_ROLES) | {LIBERA}]
+
     declared = entry.get("roles_covered") if isinstance(entry, dict) else None
     # Campo assente e lista vuota non sono la stessa cosa: la seconda è una
     # dichiarazione che non nomina la definizione, quindi la assorbe.
