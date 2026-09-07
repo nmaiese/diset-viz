@@ -1,6 +1,6 @@
 ---
-angolo_scelto: "Da vent'anni la regione dove si fuma di più in Italia sta al Centro, e quasi sempre è la stessa."
-costo: 122.91
+angolo_scelto: "In Italia la regione dove si fuma di più è quasi sempre la stessa, e negli ultimi anni non ha più lasciato la cima."
+costo: 148.01
 fonti:
   - testo: "Usl Umbria 1 e Usl Umbria 2, comunicato congiunto per la Giornata mondiale senza tabacco, 31 maggio 2026"
     url: "https://www.uslumbria1.it/31-maggio-giornata-mondiale-senza-tabacco-aziende-sanitarie-in-campo-per-la-salute-dei-cittadini/"
@@ -8,7 +8,7 @@ fonti:
     url: "https://www.uslumbria2.it/notizie/in-umbria-la-percentuale-piu-alta-di-fumatori"
   - testo: "Istituto superiore di sanità, comunicato stampa n. 30/2024, 30 maggio 2024"
     url: "https://www.iss.it/en/-/comunicato-stampa-n-30/2024-in-italia-fuma-un-adulto-su-4-ma-tra-i-giovani-il-30-usa-almeno-uno-tra-sigaretta-tabacco-riscaldato-o-e-cig-e-raddoppia-il-policonsumo"
-h1: "Fumatori, l'Umbria è quasi sempre in cima da vent'anni"
+h1: "Fumatori, dal 2013 l'Umbria non è più uscita dalle prime posizioni"
 key: "bes:01SAL010"
 level: "regione"
 scritto_il: "2026-09-07"
@@ -16,14 +16,14 @@ seo_title: "Fumatori per regione: Umbria prima 2025"
 vintage: 2025
 ---
 
-Nel 2025 l'Umbria è la regione italiana con la quota di fumatori più alta, 24,5 ogni 100 persone. Quello che la classifica di quest'anno non fa vedere è che quel posto l'Umbria lo occupa, o lo sfiora, da vent'anni.
+Nel 2025 l'Umbria è la regione italiana con la quota di fumatori più alta, 24,5 ogni 100 persone. Quello che la classifica di quest'anno non fa vedere è che l'Umbria in cima ci sta, o ci sta vicino, ogni anno da più di un decennio.
 
 <!-- sezione: libera -->
 ## In cima ci torna quasi sempre la stessa regione
 
-Una graduatoria regionale rifatta ogni anno di solito si rimescola proprio in cima, perché lassù i valori sono vicini e basta uno scarto piccolo per scavalcare qualcuno. Il fumo si comporta in un altro modo. Da quando la misura comincia, nel 2005, l'Umbria è la regione che torna in testa più spesso di ogni altra, e negli anni in cui non è prima resta lì attorno. Il suo punto più basso in vent'anni, 20,8 nel 2020, è comunque più alto della media delle regioni di oggi, che vale 20,0.
+Una graduatoria regionale rifatta ogni anno di solito si rimescola proprio in cima, perché lassù i valori sono vicini e basta uno scarto piccolo per scavalcare qualcuno. Sul fumo si rimescola meno di quanto ci si aspetti, e sempre meno con il passare del tempo. Da quando la misura comincia, nel 2005, l'Umbria è la regione che torna in testa più spesso di ogni altra. Nei primi anni alternava, e tre volte è scivolata fino a metà classifica, l'ultima nel 2012. Dal 2013 in poi non è più uscita dalle prime sei, e più spesso che no è stata fra le prime tre. Il suo punto più basso in vent'anni, 20,8 nel 2020, è comunque più alto della media delle regioni di oggi, che vale 20,0.
 
-Il valore più alto mai toccato da una regione, però, non è umbro: è del Lazio, 27,4 nel 2011, quando la cima era una questione fra quelle due. Poi il Lazio è sceso fino a stare intorno alla media e ci è rimasto, l'Umbria no.
+Il valore più alto mai toccato da una regione, però, non è umbro: è del Lazio, 27,4 nel 2011. Il Lazio però si muove in un altro modo, a picchi e rientri, e in cima ci è tornato ancora nel 2018 e nel 2019. È questa la differenza fra le due: il Lazio in cima ci torna ogni tanto, l'Umbria da un pezzo non se ne va.
 
 <!-- sezione: libera -->
 ## Qui la linea Nord-Sud non aiuta
@@ -50,4 +50,4 @@ Un primato così isolato viene voglia di spiegarlo con il resto delle abitudini:
 
 Su tutte e quattro le righe un valore alto è il risultato peggiore, quindi più il pallino sta a destra più quel comportamento è diffuso. L'Umbria sta in mezzo al gruppo sulla sedentarietà, sull'[alcol](/indicatore/alcol-tassi-standardizzati/bes-01SAL011) e sull'eccesso di peso, e arriva all'estremo su una riga sola.
 
-Fuori da quel gruppo il quadro non peggiora: sull'[adeguata alimentazione](/indicatore/adeguata-alimentazione-tassi-standardizzati/bes-01SAL013) l'Umbria sta fra le regioni messe meglio. Il fumo non arriva insieme a un quadro peggiore su tutto: arriva da solo, e da vent'anni non si sposta.
+Fuori da quel gruppo il quadro non peggiora: sull'[adeguata alimentazione](/indicatore/adeguata-alimentazione-tassi-standardizzati/bes-01SAL013) l'Umbria sta fra le regioni messe meglio. Il fumo non arriva insieme a un quadro peggiore su tutto: arriva da solo, e da un pezzo non si sposta.
