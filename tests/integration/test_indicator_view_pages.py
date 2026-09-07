@@ -19,7 +19,7 @@ import unittest
 from pathlib import Path
 
 from app import app, sources
-from app.indicator_texts import ROLE_ORDER
+from app.indicator_texts import LIBERA, ROLE_ORDER, get_text
 from app.indicator_view import build_indicator_view
 
 from tests.support import family_and_raw
@@ -67,10 +67,25 @@ class EveryIndicatorPageRenders(unittest.TestCase):
         """Ogni ruolo è coperto: da un H2 `sezione-{role}`, oppure, per la sola
         `definizione`, dal blocco "Come leggere il dato" (sezioni variabili). I
         tre ruoli sostanziali restano sempre H2; la definizione può abitare il
-        blocco invece di aprire l'articolo con la metodologia."""
+        blocco invece di aprire l'articolo con la metodologia.
+
+        **Un articolo a sezioni `libera` è l'eccezione, e non è un'omissione.**
+        `emitted_roles()` restituisce i soli ruoli scritti appena una sezione è
+        `libera`, perché quella forma dichiara che la pagina non compone niente
+        dietro: i titoli li sceglie chi scrive e gli H2 portano l'ancora dello
+        slug, non del ruolo. Pretendere lì `sezione-quadro` vorrebbe dire
+        pretendere la forma che quell'articolo ha deliberatamente lasciato.
+        L'invariante che resta, e che questo test continua a difendere, è che la
+        pagina non perda comunque l'apparato: il blocco "Come leggere il dato" e
+        almeno due sezioni d'articolo vere."""
         missing = []
         for indicator_id in self.golden:
             html = self._get(indicator_id).get_data(as_text=True)
+            if self._is_free_form(indicator_id):
+                sezioni = len(re.findall(r'<h2[^>]*id="sezione-', html))
+                if sezioni < 2 or 'id="come-leggere"' not in html:
+                    missing.append((indicator_id, f"libera: {sezioni} sezioni"))
+                continue
             for role in ROLE_ORDER:
                 covered = f'id="sezione-{role}"' in html or (
                     role == "definizione" and 'id="come-leggere"' in html
@@ -78,6 +93,12 @@ class EveryIndicatorPageRenders(unittest.TestCase):
                 if not covered:
                     missing.append((indicator_id, role))
         self.assertEqual(missing, [], f"pages missing an article section: {missing[:10]}")
+
+    def _is_free_form(self, indicator_id):
+        """L'articolo dichiara sezioni libere, quindi la pagina non compone i ruoli."""
+        entry = get_text(indicator_id)
+        sections = (entry or {}).get("sections") or []
+        return any(s.get("role") == LIBERA for s in sections if isinstance(s, dict))
 
     def test_an_opt_in_article_renders_the_come_leggere_block(self):
         """Un articolo che dichiara `roles_covered` senza `definizione` la assorbe
