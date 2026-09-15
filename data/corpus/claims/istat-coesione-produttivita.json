@@ -1,0 +1,23 @@
+{
+  "about": "da quando anche la produttività del lavoro pesa sul divario, e non solo l'occupazione",
+  "chiavi": [
+    "pil",
+    "pil pro capite",
+    "produttività",
+    "divario",
+    "mezzogiorno"
+  ],
+  "fetched_at": "2026-09-15",
+  "id": "istat-coesione-produttivita",
+  "indicators": [
+    "ter:901"
+  ],
+  "language": "it",
+  "quote": "Soltanto nel corso dell'ultimo ciclo di programmazione 2014-2020 è divenuta determinante anche la produttività del lavoro inferiore alla media Ue27 di 9 punti percentuali.",
+  "source_id": "istat-rapporto-annuale",
+  "themes": [
+    "Reddito, inclusione e accessibilità"
+  ],
+  "title": "La politica di coesione e il Mezzogiorno. Vent'anni di mancata convergenza",
+  "url": "https://www.istat.it/it/archivio/285459"
+}
