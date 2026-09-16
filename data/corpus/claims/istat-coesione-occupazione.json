@@ -1,0 +1,23 @@
+{
+  "about": "perché il divario di PIL pro capite delle regioni meno sviluppate non si chiude",
+  "chiavi": [
+    "pil",
+    "pil pro capite",
+    "prodotto interno lordo",
+    "divario",
+    "mezzogiorno"
+  ],
+  "fetched_at": "2026-09-15",
+  "id": "istat-coesione-occupazione",
+  "indicators": [
+    "ter:901"
+  ],
+  "language": "it",
+  "quote": "Il divario crescente in termini di reddito (misurato in Pil pro capite in ppa) fra le regioni italiane economicamente meno avanzate e l'Ue27, è spiegato interamente dal tasso di occupazione, inferiore alla media Ue di ben 20 punti percentuali.",
+  "source_id": "istat-rapporto-annuale",
+  "themes": [
+    "Reddito, inclusione e accessibilità"
+  ],
+  "title": "La politica di coesione e il Mezzogiorno. Vent'anni di mancata convergenza (comunicato stampa, 13 giugno 2023)",
+  "url": "https://www.istat.it/comunicato-stampa/la-politica-di-coesione-e-il-mezzogiorno-ventanni-di-mancata-convergenza/"
+}
