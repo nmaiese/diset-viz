@@ -1,5 +1,6 @@
 <!--
-Etichette (una per asse): chi ha scritto: run:lite | run:team | run:routine | umano
+Etichette (una per asse): chi ha scritto: run:team | run:routine | umano
+                          (run:lite non esiste piu': la catena semplice e' stata cancellata il 18/9/2026)
                           fase: gate-b (pezzo da giudicare) | config | docs | infra
                           esito, se serve: canary | bocciata | corretta-prima-del-merge
 La review segue REVIEW.md. Commit senza trailer Co-Authored-By.
@@ -13,9 +14,10 @@ La review segue REVIEW.md. Commit senza trailer Co-Authored-By.
 
 <!-- L'obiettivo del Quadro a cui questa PR risponde, es. div-famiglie. -->
 
-## Per un pezzo (run:lite, run:team)
+## Per un pezzo (run:team, run:routine)
 
 - **Angolo scelto**, e angoli scartati con le prove:
+- **La scaletta**, e che cosa ha mosso il `redattore` (le porta gia' il corpo della PR):
 - **Fonti esterne** (istituzionali, riaperte sul grezzo, con data):
 - **Esito del verificatore / dei revisori**: cifre controllate, smentite, giri di correzione:
 - **Esito di `motore verifica`**: `non_trovate`, `link_inesistenti`, `bloccanti`, `bozza_salvata`:

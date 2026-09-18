@@ -9,7 +9,7 @@ labels: difetto-pubblicato
 
 - Indicatore (codice e percorso `/indicatore/...`):
 - PR che l'ha pubblicata:
-- Chi l'ha scritta: `run:lite` / `run:team` / `umano`
+- Chi l'ha scritta: `run:team` / `run:routine` / `umano`
 
 ## Il difetto
 
