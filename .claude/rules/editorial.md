@@ -16,10 +16,14 @@ fallisce su quelli). Il Markdown ha `smarty` spento apposta: `--` e `...`
 restano come sono, tenere pulito il sorgente.
 
 Un articolo non si misura con una rubrica a punti: quella è stata ritirata il
-4 settembre insieme al lint della prosa. Quello che ferma un pezzo sono le tre
+4 settembre insieme al lint della prosa. Quello che ferma un pezzo sono le sei
 guardie di `motore verifica`, nel repo della redazione: una cifra che non sta
-nel dossier, un link interno che non esiste, una fonte che non risponde. Il
-resto è una lettura, e i rilievi hanno una gravità.
+nel dossier, un link interno che non esiste, una fonte che non risponde, un
+link a una fonte nella prosa che non sta anche nell'elenco, un'affermazione su
+un insieme che la classifica smentisce, e la media semplice delle regioni
+chiamata media nazionale. Le ultime due bloccano perché sono smentite
+ricalcolabili, non giudizi. Il resto è una lettura, e i rilievi hanno una
+gravità.
 
 ## Pagine indicatore
 
