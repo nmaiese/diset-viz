@@ -8,7 +8,7 @@ Quanta acqua si perde lungo la rete prima di arrivare ai rubinetti è un problem
 
 <!-- sezione: quadro -->
 
-Perdere quasi metà dell'acqua in rete è uno spreco che pesa doppio dove l'acqua scarseggia, come nel Sud siccitoso. Le perdite dipendono da tubature vecchie e da decenni di mancata manutenzione, un debito infrastrutturale accumulato. Con la siccità che avanza, ridurre le perdite vale quanto trovare nuova acqua. Investire nelle reti idriche è meno visibile ma più urgente di nuove opere?
+Perdere quasi metà dell'acqua in rete è uno spreco che pesa doppio dove l'acqua scarseggia, come nel Sud siccitoso. Le perdite dipendono da tubature vecchie e da decenni di mancata manutenzione, un debito infrastrutturale accumulato. Con la siccità che avanza, ridurre le perdite vale quanto trovare nuova acqua.
 
 <!-- sezione: limiti -->
 

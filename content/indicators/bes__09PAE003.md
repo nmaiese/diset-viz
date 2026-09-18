@@ -8,7 +8,7 @@ L'abusivismo edilizio spacca l'Italia in due. In Calabria e Basilicata si contan
 
 <!-- sezione: quadro -->
 
-L'abusivismo è una ferita al paesaggio e alla legalità, e la sua concentrazione al Sud riflette debolezza dei controlli, sanatorie ripetute e bisogno abitativo. Costruire senza regole deturpa le coste, aumenta il rischio idrogeologico e toglie valore ai territori. È un indicatore descrittivo, senza un verso automatico nel sistema, ma il fenomeno che misura è tutt'altro che neutro. Un territorio che si costruisce da sé è più libero o più fragile?
+L'abusivismo è una ferita al paesaggio e alla legalità, e la sua concentrazione al Sud riflette debolezza dei controlli, sanatorie ripetute e bisogno abitativo. Costruire senza regole deturpa le coste, aumenta il rischio idrogeologico e toglie valore ai territori. È un indicatore descrittivo, senza un verso automatico nel sistema, ma il fenomeno che misura è tutt'altro che neutro.
 
 <!-- sezione: limiti -->
 

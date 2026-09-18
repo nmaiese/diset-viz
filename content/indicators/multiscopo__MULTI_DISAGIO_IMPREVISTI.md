@@ -8,7 +8,7 @@ Non riuscire a far fronte a una spesa imprevista è la misura più usata della f
 
 <!-- sezione: quadro -->
 
-Chi non può affrontare una spesa improvvisa, una riparazione, una bolletta straordinaria, vive senza rete: basta un contrattempo per finire nei debiti. Al Sud tocca quasi una famiglia su due, un livello che rende fragili intere comunità, non solo i più poveri. Il calo recente è incoraggiante, ma parte da soglie altissime. Quanto è vicina alla povertà una famiglia che non ha risparmi per un imprevisto?
+Chi non può affrontare una spesa improvvisa, una riparazione, una bolletta straordinaria, vive senza rete: basta un contrattempo per finire nei debiti. Al Sud tocca quasi una famiglia su due, un livello che rende fragili intere comunità, non solo i più poveri. Il calo recente è incoraggiante, ma parte da soglie altissime.
 
 <!-- sezione: limiti -->
 

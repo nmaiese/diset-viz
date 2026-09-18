@@ -8,7 +8,7 @@ Il dato BES sull'elettricità da rinnovabili conferma il primato alpino. I consu
 
 <!-- sezione: quadro -->
 
-Nel sistema BES è un indicatore di sostenibilità, e la sua crescita di lungo periodo, più che raddoppiata, è una delle buone notizie ambientali. Ma la media nazionale nasconde due Italie dell'energia, alcune regioni quasi autosufficienti da fonti pulite, altre ancora molto dipendenti dai fossili. La transizione è avviata, ma resta diseguale tra i territori. Quanto è vicina l'Italia a un'elettricità davvero pulita?
+Nel sistema BES è un indicatore di sostenibilità, e la sua crescita di lungo periodo, più che raddoppiata, è una delle buone notizie ambientali. Ma la media nazionale nasconde due Italie dell'energia, alcune regioni quasi autosufficienti da fonti pulite, altre ancora molto dipendenti dai fossili. La transizione è avviata, ma resta diseguale tra i territori.
 
 <!-- sezione: limiti -->
 

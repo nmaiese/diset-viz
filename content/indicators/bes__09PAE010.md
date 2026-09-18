@@ -8,7 +8,7 @@ L'insoddisfazione per il paesaggio del luogo in cui si vive è più alta al Sud.
 
 <!-- sezione: quadro -->
 
-Il giudizio sul proprio paesaggio unisce bellezza dei luoghi, degrado e cura del territorio, e la mappa ricalca quella dell'abusivismo e dell'incuria urbana. Dove il paesaggio è deturpato o trascurato cresce l'insoddisfazione, che è anche un giudizio sulla qualità della vita. È una percezione, ma nasce da fatti concreti sotto gli occhi di tutti. Un bel paesaggio è un dono della natura o una responsabilità di chi lo abita?
+Il giudizio sul proprio paesaggio unisce bellezza dei luoghi, degrado e cura del territorio, e la mappa ricalca quella dell'abusivismo e dell'incuria urbana. Dove il paesaggio è deturpato o trascurato cresce l'insoddisfazione, che è anche un giudizio sulla qualità della vita. È una percezione, ma nasce da fatti concreti sotto gli occhi di tutti.
 
 <!-- sezione: limiti -->
 

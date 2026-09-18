@@ -8,7 +8,7 @@ Rapportata al reddito, la spesa per la casa racconta lo sforzo reale delle famig
 
 <!-- sezione: quadro -->
 
-Qui la mappa si riequilibra: la Campania, che spende poco in valore assoluto, è tra le regioni dove la casa pesa di più sul reddito, dato che i redditi sono bassi. È la misura più onesta del costo dell'abitare, quella che conta per chi arriva a fine mese. Un peso alto lascia meno spazio a tutto il resto, dal cibo alla salute. Quanto reddito può assorbire la casa prima di diventare un problema?
+Qui la mappa si riequilibra: la Campania, che spende poco in valore assoluto, è tra le regioni dove la casa pesa di più sul reddito, dato che i redditi sono bassi. È la misura più onesta del costo dell'abitare, quella che conta per chi arriva a fine mese. Un peso alto lascia meno spazio a tutto il resto, dal cibo alla salute.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Nel sistema BES il reddito disponibile pro capite misura il benessere economico 
 
 <!-- sezione: quadro -->
 
-Il BES lo classifica come descrittivo, senza un verso automatico, dato che un reddito medio alto non dice come sia distribuito: due regioni con lo stesso valore possono avere una classe media ampia oppure pochi ricchi e molti poveri. Va quindi letto insieme agli indici di disuguaglianza e di povertà, che raccontano l'altra metà della storia. Il reddito medio misura il benessere di una regione o solo la sua media?
+Il BES lo classifica come descrittivo, senza un verso automatico, dato che un reddito medio alto non dice come sia distribuito: due regioni con lo stesso valore possono avere una classe media ampia oppure pochi ricchi e molti poveri. Va quindi letto insieme agli indici di disuguaglianza e di povertà, che raccontano l'altra metà della storia.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Capire il display del contatore elettronico, utile a controllare i consumi, ries
 
 <!-- sezione: quadro -->
 
-Il contatore elettronico permette di monitorare i consumi in tempo reale, ma serve solo a chi sa leggerlo. La comprensione più bassa al Centro-Sud riduce i benefici di uno strumento pensato per l'efficienza. Gli strumenti digitali aiutano solo chi ha le competenze per usarli, e qui torna il divario di alfabetizzazione. La tecnologia riduce le disuguaglianze o ne crea di nuove?
+Il contatore elettronico permette di monitorare i consumi in tempo reale, ma serve solo a chi sa leggerlo. La comprensione più bassa al Centro-Sud riduce i benefici di uno strumento pensato per l'efficienza. Gli strumenti digitali aiutano solo chi ha le competenze per usarli, e qui torna il divario di alfabetizzazione.
 
 <!-- sezione: limiti -->
 

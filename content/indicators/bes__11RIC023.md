@@ -8,7 +8,7 @@ Vendere online resta raro per le imprese italiane. Lo fa il 30,6% delle aziende 
 
 <!-- sezione: quadro -->
 
-Il commercio elettronico verso i clienti finali è la frontiera più avanzata della digitalizzazione d'impresa, e in Italia è ancora agli inizi. Che il Trentino guidi, con il suo turismo, mostra come conti il settore più della semplice tecnologia. La crescita recente è forte, ma i numeri restano piccoli. Le imprese italiane vendono poco online per arretratezza o per il tipo di prodotti?
+Il commercio elettronico verso i clienti finali è la frontiera più avanzata della digitalizzazione d'impresa, e in Italia è ancora agli inizi. Che il Trentino guidi, con il suo turismo, mostra come conti il settore più della semplice tecnologia. La crescita recente è forte, ma i numeri restano piccoli.
 
 <!-- sezione: limiti -->
 

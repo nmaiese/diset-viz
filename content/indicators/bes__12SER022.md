@@ -8,7 +8,7 @@ I posti letto ospedalieri per le specialità ad alta assistenza, come le terapie
 
 <!-- sezione: quadro -->
 
-I posti ad alta assistenza sono la capacità di un sistema sanitario di reggere le emergenze, come ha ricordato la pandemia. Il loro calo di lungo periodo, legato ai tagli e alla riorganizzazione ospedaliera, riduce i margini nei momenti di crisi. Un'alta dotazione può però anche riflettere ospedali piccoli e dispersi, non solo efficienza. Quanti posti servono per essere pronti all'imprevisto?
+I posti ad alta assistenza sono la capacità di un sistema sanitario di reggere le emergenze, come ha ricordato la pandemia. Il loro calo di lungo periodo, legato ai tagli e alla riorganizzazione ospedaliera, riduce i margini nei momenti di crisi. Un'alta dotazione può però anche riflettere ospedali piccoli e dispersi, non solo efficienza.
 
 <!-- sezione: limiti -->
 

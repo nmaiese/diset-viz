@@ -8,7 +8,7 @@ La sedentarietà è forse la disuguaglianza di salute più marcata tra le abitud
 
 <!-- sezione: quadro -->
 
-Muoversi poco moltiplica il rischio di eccesso di peso, malattie croniche e fragilità, e non a caso la mappa della sedentarietà somiglia a quella dell'obesità. L'attività fisica dipende anche da spazi, impianti, tempo e sicurezza dei luoghi, non solo dalla volontà individuale, e questi mancano più spesso dove il dato è alto. Il valore è in calo, un segnale incoraggiante. Ma quanto della sedentarietà è pigrizia e quanto assenza di occasioni per muoversi?
+Muoversi poco moltiplica il rischio di eccesso di peso, malattie croniche e fragilità, e non a caso la mappa della sedentarietà somiglia a quella dell'obesità. L'attività fisica dipende anche da spazi, impianti, tempo e sicurezza dei luoghi, non solo dalla volontà individuale, e questi mancano più spesso dove il dato è alto. Il valore è in calo, un segnale incoraggiante.
 
 <!-- sezione: limiti -->
 

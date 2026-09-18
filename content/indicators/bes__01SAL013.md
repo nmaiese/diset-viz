@@ -8,7 +8,7 @@ Seguire un'alimentazione adeguata secondo i criteri del sistema BES riguarda una
 
 <!-- sezione: quadro -->
 
-C'è un paradosso apparente: le regioni del Sud, patria della dieta mediterranea, segnano i valori più bassi, mentre il Nord-Ovest e le isole guidano. Il criterio BES misura un mix di frutta, verdura e abitudini specifico, che non coincide con l'immagine tradizionale del mangiar sano. Il dato è per giunta in calo, come se il modello alimentare storico si stesse indebolendo proprio dove era più forte. La dieta mediterranea è ancora di casa dove è nata?
+C'è un paradosso apparente: le regioni del Sud, patria della dieta mediterranea, segnano i valori più bassi, mentre il Nord-Ovest e le isole guidano. Il criterio BES misura un mix di frutta, verdura e abitudini specifico, che non coincide con l'immagine tradizionale del mangiar sano. Il dato è per giunta in calo, come se il modello alimentare storico si stesse indebolendo proprio dove era più forte.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Da dove arriva il reddito delle famiglie cambia con il territorio. Vive soprattu
 
 <!-- sezione: quadro -->
 
-Dove prevale il lavoro dipendente c'è in genere un'economia più industriale e strutturata, con redditi più stabili. Al Sud la quota è più bassa, e a compensare sono lavoro autonomo, pensioni e trasferimenti pubblici. Non è un verso migliore o peggiore, ma la fotografia di due modelli economici diversi. Un reddito da stipendio è più sicuro di uno da impresa o da sussidio?
+Dove prevale il lavoro dipendente c'è in genere un'economia più industriale e strutturata, con redditi più stabili. Al Sud la quota è più bassa, e a compensare sono lavoro autonomo, pensioni e trasferimenti pubblici. Non è un verso migliore o peggiore, ma la fotografia di due modelli economici diversi.
 
 <!-- sezione: limiti -->
 

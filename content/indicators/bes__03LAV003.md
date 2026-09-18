@@ -8,7 +8,7 @@ Quanto è facile passare da un lavoro instabile a uno stabile cambia moltissimo 
 
 <!-- sezione: quadro -->
 
-È la misura della mobilità verso la stabilità, la possibilità concreta che un lavoro precario diventi il trampolino verso uno stabile e non una condizione permanente. Al Nord la transizione funziona per quasi un lavoratore su cinque, al Sud per pochi, dove il precariato tende a restare tale. Il calo recente è un segnale da tenere d'occhio. Un contratto a termine è un ponte verso la stabilità o un binario morto?
+È la misura della mobilità verso la stabilità, la possibilità concreta che un lavoro precario diventi il trampolino verso uno stabile e non una condizione permanente. Al Nord la transizione funziona per quasi un lavoratore su cinque, al Sud per pochi, dove il precariato tende a restare tale. Il calo recente è un segnale da tenere d'occhio.
 
 <!-- sezione: limiti -->
 

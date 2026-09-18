@@ -8,7 +8,7 @@ La fiducia negli altri, il credere che la gente sia in generale affidabile, è b
 
 <!-- sezione: quadro -->
 
-La fiducia generalizzata è il collante invisibile che rende possibili cooperazione, scambio e istituzioni funzionanti, e in Italia è tra le più basse d'Europa. Il divario Nord-Sud è netto e stabile, e alcuni studiosi lo legano alla storia civica dei territori. Bassa fiducia significa più diffidenza, più costi di controllo, meno collaborazione. Si può costruire fiducia o è un'eredità che si trasmette nei secoli?
+La fiducia generalizzata è il collante invisibile che rende possibili cooperazione, scambio e istituzioni funzionanti, e in Italia è tra le più basse d'Europa. Il divario Nord-Sud è netto e stabile, e alcuni studiosi lo legano alla storia civica dei territori. Bassa fiducia significa più diffidenza, più costi di controllo, meno collaborazione.
 
 <!-- sezione: limiti -->
 

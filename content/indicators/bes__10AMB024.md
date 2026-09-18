@@ -8,7 +8,7 @@ Quanti rifiuti produce ciascun abitante è la radice del problema. Se ne produco
 
 <!-- sezione: quadro -->
 
-Produrre più rifiuti va spesso insieme a più ricchezza, consumi e turismo, e infatti il Nord e le regioni turistiche stanno in alto. Ridurre i rifiuti alla fonte è l'obiettivo più difficile, dato che tocca modelli di consumo e imballaggi prima che la raccolta. È un indicatore descrittivo, senza un verso automatico, ma meno rifiuti prodotti è quasi sempre meglio. Un territorio più ricco è condannato a produrre più scarti?
+Produrre più rifiuti va spesso insieme a più ricchezza, consumi e turismo, e infatti il Nord e le regioni turistiche stanno in alto. Ridurre i rifiuti alla fonte è l'obiettivo più difficile, dato che tocca modelli di consumo e imballaggi prima che la raccolta. È un indicatore descrittivo, senza un verso automatico, ma meno rifiuti prodotti è quasi sempre meglio.
 
 <!-- sezione: limiti -->
 

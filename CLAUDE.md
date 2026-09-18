@@ -72,9 +72,10 @@ Strato blog: `app/blog.py` (legge `content/posts/*.md`).
 ## Chi scrive gli articoli
 
 Non questo repo. La redazione vive in `nmaiese/redazione-ai`: `motore/` calcola
-il dossier e il brief, tre agent scrivono e verificano, `motore pubblica` scrive
-in `content/indicators/` di qui e `motore pr` apre la PR. Il contratto del pezzo
-è `REDAZIONE.md` di quel repo, le regole del sito `siti/divarioitalia.md`.
+il dossier e il brief, un team di agent in onde scrive, edita e verifica,
+`motore pubblica` scrive in `content/indicators/` di qui e `motore pr` apre la
+PR. Il contratto del pezzo è `REDAZIONE.md` di quel repo, le regole del sito
+`siti/divarioitalia.md`.
 
 Qui restano solo gli agganci: `content/indicators/` dove i pezzi atterrano,
 `content/STYLE.md` per la voce, e le regole con scope in `.claude/rules/`
@@ -121,9 +122,12 @@ Una voce sola per blog e pagine indicatore, posseduta da `content/STYLE.md`.
 Gli assoluti: niente em-dash `—`, niente en-dash `–`, niente `;`, niente `…`;
 solo numeri veri e verificati, mai una fonte inventata; link canonici agli
 indicatori (`/indicatore/<slug>/ter-105`, mai `/?indicator=`). Le guardie che
-fermano un pezzo sono le tre di `motore verifica` nel repo della redazione:
-una cifra che non sta nel dossier, un link interno che non esiste, una fonte che
-non risponde. Non c'è una rubrica a punti e non c'è un lint della prosa.
+fermano un pezzo sono le sei di `motore verifica` nel repo della redazione: una
+cifra che non sta nel dossier, un link interno che non esiste, una fonte che non
+risponde, un link a una fonte nella prosa che non sta anche nell'elenco,
+un'affermazione su un insieme che la classifica smentisce ("nessuna regione
+supera X"), e la media semplice delle regioni chiamata media nazionale. Non c'è
+una rubrica a punti e non c'è un lint della prosa.
 
 ## Dati, leggi [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md)
 

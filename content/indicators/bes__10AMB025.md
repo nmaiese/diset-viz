@@ -8,7 +8,7 @@ L'indice di durata dei periodi di caldo è cresciuto di quasi due terzi negli ul
 
 <!-- sezione: quadro -->
 
-Sorprende che i periodi di caldo prolungato crescano di più al Nord e in montagna, ma è lì che il riscaldamento corre più veloce rispetto al clima di riferimento locale. È uno degli indicatori più diretti del cambiamento climatico, e la sua crescita generalizzata è coerente con l'aumento delle temperature. Il caldo estremo pesa su salute, agricoltura ed energia. Un clima che cambia colpisce prima chi è meno abituato al caldo?
+Sorprende che i periodi di caldo prolungato crescano di più al Nord e in montagna, ma è lì che il riscaldamento corre più veloce rispetto al clima di riferimento locale. È uno degli indicatori più diretti del cambiamento climatico, e la sua crescita generalizzata è coerente con l'aumento delle temperature. Il caldo estremo pesa su salute, agricoltura ed energia.
 
 <!-- sezione: limiti -->
 

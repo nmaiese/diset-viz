@@ -8,7 +8,7 @@ Il numero di siti contaminati per mille varia moltissimo, spesso per eredità in
 
 <!-- sezione: quadro -->
 
-I siti contaminati sono la cicatrice della storia industriale ed estrattiva, e si concentrano dove c'erano fabbriche, miniere e poli chimici, come il Piemonte industriale. Il forte calo recente riflette bonifiche completate e revisioni dei censimenti. È un indicatore descrittivo, ma segnala un debito ambientale che alcune regioni pagano ancora. Il prezzo dell'industria si misura anche in terra da risanare?
+I siti contaminati sono la cicatrice della storia industriale ed estrattiva, e si concentrano dove c'erano fabbriche, miniere e poli chimici, come il Piemonte industriale. Il forte calo recente riflette bonifiche completate e revisioni dei censimenti. È un indicatore descrittivo, ma segnala un debito ambientale che alcune regioni pagano ancora.
 
 <!-- sezione: limiti -->
 

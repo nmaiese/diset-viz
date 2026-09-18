@@ -8,7 +8,7 @@ La soddisfazione per le amicizie segue la stessa mappa di quella familiare, più
 
 <!-- sezione: quadro -->
 
-Le amicizie, come la famiglia, danno più soddisfazione dove il tessuto sociale è più ricco e la vita meno segnata da difficoltà economiche. È un tassello del capitale sociale, quella rete di relazioni che rende le comunità più forti e resilienti. Il divario Nord-Sud qui è meno atteso ma altrettanto netto. Il benessere relazionale è causa o conseguenza del benessere materiale?
+Le amicizie, come la famiglia, danno più soddisfazione dove il tessuto sociale è più ricco e la vita meno segnata da difficoltà economiche. È un tassello del capitale sociale, quella rete di relazioni che rende le comunità più forti e resilienti. Il divario Nord-Sud qui è meno atteso ma altrettanto netto.
 
 <!-- sezione: limiti -->
 

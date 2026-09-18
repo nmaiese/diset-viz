@@ -8,7 +8,7 @@ La soddisfazione per le relazioni familiari, spesso data per scontata al Sud, è
 
 <!-- sezione: quadro -->
 
-Sorprende che la famiglia, tradizionalmente più forte al Sud, generi più soddisfazione dichiarata al Nord. Ma il giudizio è soggettivo e risente delle attese e del contesto generale di benessere, non solo dei legami. Dove la vita è meno precaria, anche le relazioni si vivono con più serenità. La qualità dei legami familiari dipende dai legami o dalla vita attorno a essi?
+Sorprende che la famiglia, tradizionalmente più forte al Sud, generi più soddisfazione dichiarata al Nord. Ma il giudizio è soggettivo e risente delle attese e del contesto generale di benessere, non solo dei legami. Dove la vita è meno precaria, anche le relazioni si vivono con più serenità.
 
 <!-- sezione: limiti -->
 

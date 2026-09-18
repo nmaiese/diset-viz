@@ -8,7 +8,7 @@ Si vive quasi ovunque a lungo, ma non ovunque in salute. Gli anni attesi in buon
 
 <!-- sezione: quadro -->
 
-Se la durata della vita è ormai simile tra Nord e Sud, la qualità di quegli anni no, e proprio qui si annida la disuguaglianza di salute più forte. Contano prevenzione, stili di vita, ambiente e accesso alle cure, che si distribuiscono in modo diseguale. Vivere a lungo ma con più anni di malattia o limitazioni cambia tutto, per le persone e per i servizi che dovranno sostenerle. La vera frattura territoriale è nella lunghezza della vita o nella salute con cui la si attraversa?
+Se la durata della vita è ormai simile tra Nord e Sud, la qualità di quegli anni no, e proprio qui si annida la disuguaglianza di salute più forte. Contano prevenzione, stili di vita, ambiente e accesso alle cure, che si distribuiscono in modo diseguale. Vivere a lungo ma con più anni di malattia o limitazioni cambia tutto, per le persone e per i servizi che dovranno sostenerle.
 
 <!-- sezione: limiti -->
 

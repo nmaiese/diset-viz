@@ -8,7 +8,7 @@ La fiducia nel Parlamento è bassa ovunque: su una scala da zero a dieci vale in
 
 <!-- sezione: quadro -->
 
-Un voto medio sotto la sufficienza racconta un rapporto logorato tra cittadini e istituzione parlamentare, comune a molte democrazie. Le differenze territoriali sono minime, segno che la sfiducia è un fenomeno nazionale, non locale. La lieve ripresa recente va letta con cautela, legata ai cicli politici e all'alternanza dei governi. Una democrazia regge con un Parlamento in cui si crede poco?
+Un voto medio sotto la sufficienza racconta un rapporto logorato tra cittadini e istituzione parlamentare, comune a molte democrazie. Le differenze territoriali sono minime, segno che la sfiducia è un fenomeno nazionale, non locale. La lieve ripresa recente va letta con cautela, legata ai cicli politici e all'alternanza dei governi.
 
 <!-- sezione: limiti -->
 

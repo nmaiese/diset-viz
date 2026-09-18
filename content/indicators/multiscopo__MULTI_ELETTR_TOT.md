@@ -8,7 +8,7 @@ La soddisfazione complessiva per il servizio elettrico è alta ma diseguale. È 
 
 <!-- sezione: quadro -->
 
-La soddisfazione per l'elettricità riflette la qualità reale del servizio, dalle interruzioni alla stabilità, ma anche le attese dei cittadini. Il Sud e le isole, con reti più fragili, sono meno soddisfatti, in linea con i dati oggettivi sulle interruzioni di corrente. È uno dei pochi casi in cui percezione e realtà coincidono. Un servizio essenziale dovrebbe essere ugualmente buono ovunque?
+La soddisfazione per l'elettricità riflette la qualità reale del servizio, dalle interruzioni alla stabilità, ma anche le attese dei cittadini. Il Sud e le isole, con reti più fragili, sono meno soddisfatti, in linea con i dati oggettivi sulle interruzioni di corrente. È uno dei pochi casi in cui percezione e realtà coincidono.
 
 <!-- sezione: limiti -->
 

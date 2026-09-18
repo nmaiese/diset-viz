@@ -8,7 +8,7 @@ I borseggi denunciati sono un fenomeno molto concentrato. Nel Lazio se ne contan
 
 <!-- sezione: quadro -->
 
-Un tasso alto qui segnala soprattutto dove il reato è più frequente, spesso nelle aree urbane più affollate e turistiche, non quanto una regione sia insicura nel complesso. Il borseggio è anche uno dei reati più legati alla propensione a denunciare, dove si segnala di più il numero sale, e la sicurezza percepita può muoversi in modo diverso dal dato registrato. Toscana e Lombardia seguono il Lazio, mentre il Mezzogiorno mostra i valori più bassi. Il numero misura le denunce, non la paura. Quale delle due conta di più per chi ci vive?
+Un tasso alto qui segnala soprattutto dove il reato è più frequente, spesso nelle aree urbane più affollate e turistiche, non quanto una regione sia insicura nel complesso. Il borseggio è anche uno dei reati più legati alla propensione a denunciare, dove si segnala di più il numero sale, e la sicurezza percepita può muoversi in modo diverso dal dato registrato. Toscana e Lombardia seguono il Lazio, mentre il Mezzogiorno mostra i valori più bassi. Il numero misura le denunce, non la paura.
 
 <!-- sezione: limiti -->
 

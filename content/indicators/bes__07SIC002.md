@@ -8,7 +8,7 @@ I furti in abitazione seguono anch'essi una geografia rovesciata. Ne subiscono d
 
 <!-- sezione: quadro -->
 
-Questi furti si concentrano più spesso nei territori con redditi e patrimoni familiari elevati, dove le abitazioni offrono un bottino maggiore. È un capovolgimento utile a smontare l'idea che il Sud sia sempre il luogo più esposto ai reati. Pesano però molto sulla sicurezza percepita, dato che toccano lo spazio più intimo, quello di casa. Il numero conta le abitazioni colpite, non la paura che lasciano dopo. La casa violata spaventa più del furto in sé?
+Questi furti si concentrano più spesso nei territori con redditi e patrimoni familiari elevati, dove le abitazioni offrono un bottino maggiore. È un capovolgimento utile a smontare l'idea che il Sud sia sempre il luogo più esposto ai reati. Pesano però molto sulla sicurezza percepita, dato che toccano lo spazio più intimo, quello di casa. Il numero conta le abitazioni colpite, non la paura che lasciano dopo.
 
 <!-- sezione: limiti -->
 

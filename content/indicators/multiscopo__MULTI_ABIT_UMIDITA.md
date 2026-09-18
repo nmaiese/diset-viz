@@ -8,7 +8,7 @@ Case con problemi di umidità sono più diffuse di quanto si pensi: riguardano i
 
 <!-- sezione: quadro -->
 
-L'umidità è un difetto concreto, che tocca salute e comfort, e la sua mappa non segue la ricchezza: compare più al Nord-Est e nelle isole che nel Sud continentale. Contano clima, età del patrimonio edilizio e manutenzione, non solo il reddito delle famiglie. L'aumento recente merita attenzione, tra edifici che invecchiano e climi che cambiano. La qualità della casa conta meno del semplice possederla?
+L'umidità è un difetto concreto, che tocca salute e comfort, e la sua mappa non segue la ricchezza: compare più al Nord-Est e nelle isole che nel Sud continentale. Contano clima, età del patrimonio edilizio e manutenzione, non solo il reddito delle famiglie. L'aumento recente merita attenzione, tra edifici che invecchiano e climi che cambiano.
 
 <!-- sezione: limiti -->
 

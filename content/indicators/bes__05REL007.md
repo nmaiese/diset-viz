@@ -8,7 +8,7 @@ Sostenere economicamente le associazioni, con donazioni o quote, è più comune 
 
 <!-- sezione: quadro -->
 
-Finanziare le associazioni è un altro segno di capitale civico, e la sua geografia ricalca quella del volontariato, con il Nord-Est in testa. Dipende anche dal reddito disponibile, oltre che dalla cultura del dono, e il calo recente riflette forse la pressione economica sulle famiglie. Le associazioni vivono di questo sostegno diffuso. Il terzo settore regge dove le famiglie hanno più mezzi o più abitudine a donare?
+Finanziare le associazioni è un altro segno di capitale civico, e la sua geografia ricalca quella del volontariato, con il Nord-Est in testa. Dipende anche dal reddito disponibile, oltre che dalla cultura del dono, e il calo recente riflette forse la pressione economica sulle famiglie. Le associazioni vivono di questo sostegno diffuso.
 
 <!-- sezione: limiti -->
 

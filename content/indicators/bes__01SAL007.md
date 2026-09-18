@@ -8,7 +8,7 @@ La mortalità per demenze e malattie del sistema nervoso tra gli anziani è cres
 
 <!-- sezione: quadro -->
 
-L'aumento va letto con cautela: in parte riflette una popolazione sempre più anziana, in parte una migliore capacità di diagnosticare e certificare queste malattie, prima spesso attribuite ad altre cause. Non è quindi solo un peggioramento della salute, ma anche un cambiamento nel modo di misurarla. Resta il segnale di un bisogno di cura di lungo periodo in forte crescita, che grava su famiglie e servizi. Stiamo osservando più malattia o più consapevolezza di una malattia?
+L'aumento va letto con cautela: in parte riflette una popolazione sempre più anziana, in parte una migliore capacità di diagnosticare e certificare queste malattie, prima spesso attribuite ad altre cause. Non è quindi solo un peggioramento della salute, ma anche un cambiamento nel modo di misurarla. Resta il segnale di un bisogno di cura di lungo periodo in forte crescita, che grava su famiglie e servizi.
 
 <!-- sezione: limiti -->
 

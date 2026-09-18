@@ -16,16 +16,26 @@ colpo d'occhio se la fonte serve a questo articolo.
 dove guardare, non che cosa c'è scritto oggi. Una citazione senza URL verificato
 si taglia, e una fonte inventata è l'unico errore da cui non si torna indietro.
 
-## La trappola che passa tutte le guardie
+## La trappola dell'aggregato, e la guardia che adesso la vede
 
 Quasi tutte queste fonti pubblicano **aggregati ponderati**, nazionali o di
 ripartizione. Le nostre pagine calcolano la **media semplice dei valori
-regionali**. Non sono la stessa grandezza, e nessuna guardia della suite se ne
-accorge, perché l'aritmetica delle due cifre è corretta separatamente.
+regionali**. Non sono la stessa grandezza, e l'aritmetica delle due cifre è
+corretta separatamente: per questo fino al 18 settembre 2026 nessuna guardia se
+ne accorgeva, e il 30 giugno 2026 un pezzo sul PIL pro capite chiamava "media
+nazionale", in un bullet, il numero che il bullet precedente chiamava "media
+semplice delle 20 regioni".
 
-Quindi: se citi un dato nazionale, scrivi "dato nazionale <fonte>" e tienilo
-staccato dalla "media semplice delle regioni". Non affiancarli come se uno
-confermasse l'altro, e non usare la nostra media per dire "in Italia".
+**Adesso una guardia di `motore verifica` lo blocca**: la media semplice delle
+regioni non può essere chiamata "media nazionale", "media italiana", "la media
+dell'Italia" o "il dato nazionale". Blocca perché è una smentita ricalcolabile,
+non un giudizio.
+
+Quello che la guardia **non** vede resta tuo: se citi un aggregato ponderato di
+una fonte esterna, scrivi "dato nazionale <fonte>" e tienilo staccato dalla
+"media semplice delle regioni". Non affiancarli come se uno confermasse l'altro.
+La guardia impedisce di dare il nome sbagliato alla nostra media, non di
+accostare due grandezze diverse come se fossero confrontabili.
 
 ## Il registro
 

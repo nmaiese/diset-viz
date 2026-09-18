@@ -8,7 +8,7 @@ Il voto 9 alla propria vita riguarda circa una persona su dieci. In Trentino Alt
 
 <!-- sezione: quadro -->
 
-Insieme al voto 10, questo gradino racconta la fascia dei molto soddisfatti, e qui il Trentino Alto Adige stacca nettamente tutti. La parte alta della scala tende a premiare i territori alpini e del Centro, mentre parte del Mezzogiorno si concentra altrove nella distribuzione. Sono differenze reali, ma pur sempre di giudizio: un 9 e un 8 possono nascere dalla stessa vita e da una diversa indole nel valutarla. Cosa distingue chi sceglie il quasi-massimo da chi si ferma un gradino sotto?
+Insieme al voto 10, questo gradino racconta la fascia dei molto soddisfatti, e qui il Trentino Alto Adige stacca nettamente tutti. La parte alta della scala tende a premiare i territori alpini e del Centro, mentre parte del Mezzogiorno si concentra altrove nella distribuzione. Sono differenze reali, ma pur sempre di giudizio: un 9 e un 8 possono nascere dalla stessa vita e da una diversa indole nel valutarla.
 
 <!-- sezione: limiti -->
 

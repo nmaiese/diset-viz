@@ -8,7 +8,7 @@ I partiti sono le istituzioni in cui gli italiani credono di meno: la fiducia, s
 
 <!-- sezione: quadro -->
 
-Un voto medio così basso segnala una crisi profonda della rappresentanza, con i partiti percepiti come lontani e autoreferenziali. È un fenomeno nazionale, quasi identico ovunque, che alimenta astensione, antipolitica e ricambio continuo di sigle. Senza partiti credibili, la democrazia perde i suoi canali di partecipazione organizzata. La sfiducia nei partiti è un giudizio sui partiti o sulla politica in sé?
+Un voto medio così basso segnala una crisi profonda della rappresentanza, con i partiti percepiti come lontani e autoreferenziali. È un fenomeno nazionale, quasi identico ovunque, che alimenta astensione, antipolitica e ricambio continuo di sigle. Senza partiti credibili, la democrazia perde i suoi canali di partecipazione organizzata.
 
 <!-- sezione: limiti -->
 

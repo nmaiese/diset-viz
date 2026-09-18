@@ -8,7 +8,7 @@ Il voto 7 raccoglie in media il 23,9% delle persone, la seconda risposta più co
 
 <!-- sezione: quadro -->
 
-Sette su dieci è il giudizio dei soddisfatti senza entusiasmo, e proprio per questo è il più equilibrato tra i territori. Curiosamente qui la Campania sta in alto e il Trentino Alto Adige più in basso, l'opposto di quanto accade ai gradini più alti: dove le regioni del Nord si spingono su 8 e 9, quelle del Sud si fermano più spesso sul 7. La soddisfazione media nasce da queste piccole traslazioni. Un 7 diffuso è prudenza, misura o realismo?
+Sette su dieci è il giudizio dei soddisfatti senza entusiasmo, e proprio per questo è il più equilibrato tra i territori. Curiosamente qui la Campania sta in alto e il Trentino Alto Adige più in basso, l'opposto di quanto accade ai gradini più alti: dove le regioni del Nord si spingono su 8 e 9, quelle del Sud si fermano più spesso sul 7. La soddisfazione media nasce da queste piccole traslazioni.
 
 <!-- sezione: limiti -->
 

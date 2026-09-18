@@ -1,9 +1,19 @@
 # Guida di stile per gli articoli di Divario Italia
 
-Questa guida vale per ogni articolo in `content/posts/`. Serve a tenere i testi
-coerenti e a farli sembrare scritti da una persona, non da un bot. Vale sia per
-chi scrive a mano sia per gli agenti AI (Claude, Codex) che pubblicano in
-automatico.
+Questa guida vale per gli articoli del blog, `content/posts/`. Serve a tenere i
+testi coerenti e a farli sembrare scritti da una persona, non da un bot. Vale sia
+per chi scrive a mano sia per gli agenti AI che pubblicano in automatico.
+
+**Le pagine indicatore, `content/indicators/`, non si scrivono da qui.** Il loro
+contratto e' `REDAZIONE.md` del repo `nmaiese/redazione-ai`, e chi scrive carica
+la skill `voce`. Fino al 18 settembre 2026 questa riga diceva "ogni articolo", e
+non era vero da luglio: la produzione si e' spostata sulle pagine indicatore e il
+blog e' fermo.
+
+**Una cosa pero' vale per tutti e due, ed e' la sezione "Tecniche da
+giornalista" qui sotto**, che questo file possiede: erano le regole di
+costruzione migliori del progetto, in un file che nessun agent della redazione
+caricava. Adesso la skill `voce` ne porta la forma corta e rimanda qui.
 
 ## Regole tipografiche (vincolanti)
 
@@ -48,8 +58,9 @@ leggibile, e lì non sono un verdetto. Il campo `vietati` resta l'unico cancello
 
 Cambiare il prompt di chi scrive per agganciare la skill in rilettura è un
 cambio da misurare su una run prima di tenerlo: chi scrive è l'agent
-`scrittore` del repo `nmaiese/redazione-ai`, e finché la sua definizione non
-richiama la skill il comportamento non cambia.
+`narratore` del repo `nmaiese/redazione-ai` (l'agent `scrittore` è stato
+cancellato il 18 settembre 2026 insieme alla catena semplice), e finché la sua
+definizione non richiama la skill il comportamento non cambia.
 
 ## Tono: scrivi come una persona
 
@@ -70,6 +81,11 @@ sceglie **uno** prima di scrivere, quello con la forma di storia più vicina all
 propria, e lo si tiene aperto. Non si mediano: otto registri mescolati fanno
 l'assenza di registro. Le sei mosse qui sotto dicono che cosa cercare in quel
 testo, non lo sostituiscono.
+
+**Questa sezione le possiede.** Chi scrive le pagine indicatore non legge questo
+file: carica la skill `voce` di `nmaiese/redazione-ai`, che ne porta tre in forma
+corta, quella che serve mentre si scrive, e rimanda qui per la versione lunga con
+gli esempi. Se una mossa cambia, cambia qui, e la skill segue.
 
 - **Rispondi a "e allora?".** Ogni pezzo fa un punto, non un inventario. Il
   lettore deve finire sapendo perché quei numeri contano, non solo che forma ha la

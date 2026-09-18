@@ -8,7 +8,7 @@ Nel sistema BES gli omicidi sono classificati come indicatore descrittivo, senza
 
 <!-- sezione: quadro -->
 
-Trattare l'omicidio come dato di contesto, e non come classifica, è una scelta di prudenza statistica: quando gli eventi sono così pochi, ordinare venti regioni dalla migliore alla peggiore darebbe una precisione illusoria. Il valore serve a fotografare un fenomeno ormai raro e in forte calo di lungo periodo, non a stabilire dove si viva più o meno sicuri. La sicurezza reale di un territorio si legge meglio incrociando più reati e la loro percezione. Un singolo tasso così basso informa o inganna?
+Trattare l'omicidio come dato di contesto, e non come classifica, è una scelta di prudenza statistica: quando gli eventi sono così pochi, ordinare venti regioni dalla migliore alla peggiore darebbe una precisione illusoria. Il valore serve a fotografare un fenomeno ormai raro e in forte calo di lungo periodo, non a stabilire dove si viva più o meno sicuri. La sicurezza reale di un territorio si legge meglio incrociando più reati e la loro percezione.
 
 <!-- sezione: limiti -->
 

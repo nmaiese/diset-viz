@@ -8,7 +8,7 @@ La soddisfazione per le informazioni ricevute sul servizio elettrico è la più 
 
 <!-- sezione: quadro -->
 
-Meno di una famiglia su due si dice ben informata sul servizio elettrico, il punto più debole del rapporto tra utenti e fornitori. Una comunicazione carente pesa sulla capacità di gestire consumi, guasti e contratti, e va insieme alla difficoltà di capire la bolletta. In un mercato liberalizzato, l'informazione è la base per scegliere. Un cliente poco informato è un cliente davvero libero?
+Meno di una famiglia su due si dice ben informata sul servizio elettrico, il punto più debole del rapporto tra utenti e fornitori. Una comunicazione carente pesa sulla capacità di gestire consumi, guasti e contratti, e va insieme alla difficoltà di capire la bolletta. In un mercato liberalizzato, l'informazione è la base per scegliere.
 
 <!-- sezione: limiti -->
 
