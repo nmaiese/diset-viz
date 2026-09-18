@@ -1,9 +1,16 @@
 # Guida di stile per gli articoli di Divario Italia
 
-Questa guida vale per ogni articolo in `content/posts/`. Serve a tenere i testi
-coerenti e a farli sembrare scritti da una persona, non da un bot. Vale sia per
-chi scrive a mano sia per gli agenti AI (Claude, Codex) che pubblicano in
-automatico.
+Questa guida vale per gli articoli del blog, `content/posts/`. Serve a tenere i
+testi coerenti e a farli sembrare scritti da una persona, non da un bot. Vale sia
+per chi scrive a mano sia per gli agenti AI che pubblicano in automatico.
+
+**Le pagine indicatore, `content/indicators/`, non si scrivono da qui.** Il loro
+contratto e' `REDAZIONE.md` del repo `nmaiese/redazione-ai`, e chi scrive carica
+la skill `voce`. Fino al 18 settembre 2026 questa riga diceva "ogni articolo", e
+non era vero da luglio: la produzione si e' spostata sulle pagine indicatore, il
+blog e' fermo, e le regole di costruzione migliori del progetto stavano qui, in
+un file che nessun agent della redazione carica. Sono state portate nella skill
+`voce`, che chi scrive legge davvero. Qui restano per il blog.
 
 ## Regole tipografiche (vincolanti)
 

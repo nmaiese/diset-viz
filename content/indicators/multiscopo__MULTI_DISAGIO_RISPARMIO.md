@@ -8,7 +8,7 @@ Metà delle famiglie italiane non riesce a mettere da parte nulla. In media non 
 
 <!-- sezione: quadro -->
 
-Il risparmio è la differenza tra sopravvivere e costruire un futuro: chi non riesce a mettere da parte non può assorbire gli shock né investire su casa e figli. Al Sud non risparmiano quasi due famiglie su tre, un dato che frena la mobilità sociale tra generazioni. È in calo, ma resta sopra un quarto delle famiglie anche dove va meglio. Un Paese che non risparmia sta consumando il suo futuro o solo il suo margine?
+Il risparmio è la differenza tra sopravvivere e costruire un futuro: chi non riesce a mettere da parte non può assorbire gli shock né investire su casa e figli. Al Sud non risparmiano quasi due famiglie su tre, un dato che frena la mobilità sociale tra generazioni. È in calo, ma resta sopra un quarto delle famiglie anche dove va meglio.
 
 <!-- sezione: limiti -->
 

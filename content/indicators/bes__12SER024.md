@@ -8,7 +8,7 @@ Il servizio di raccolta differenziata, nel dato BES, mostra un divario ancora am
 
 <!-- sezione: quadro -->
 
-La differenziata è cresciuta ovunque, ma qui il divario resta più marcato che in altri indicatori ambientali, con il Lazio e la Campania molto indietro nonostante le grandi città. Raccogliere in modo differenziato è un servizio prima che un comportamento, e dipende da come i comuni lo organizzano. Dove il servizio è debole, i cittadini virtuosi non bastano. Riciclare è merito dei cittadini o dei comuni che organizzano la raccolta?
+La differenziata è cresciuta ovunque, ma qui il divario resta più marcato che in altri indicatori ambientali, con il Lazio e la Campania molto indietro nonostante le grandi città. Raccogliere in modo differenziato è un servizio prima che un comportamento, e dipende da come i comuni lo organizzano. Dove il servizio è debole, i cittadini virtuosi non bastano.
 
 <!-- sezione: limiti -->
 

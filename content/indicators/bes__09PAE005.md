@@ -8,7 +8,7 @@ L'erosione dello spazio rurale da abbandono riguarda quanta campagna viene lasci
 
 <!-- sezione: quadro -->
 
-L'abbandono dei campi non è solo un fatto agricolo, dato che cambia il paesaggio, aumenta il rischio di incendi e frane e segna lo spopolamento delle aree interne e montane. Dove l'agricoltura è intensiva e redditizia, come in pianura padana, la terra resta coltivata, dove è marginale viene lasciata. È un indicatore descrittivo, ma racconta territori che si svuotano. Una campagna abbandonata torna natura o diventa degrado?
+L'abbandono dei campi non è solo un fatto agricolo, dato che cambia il paesaggio, aumenta il rischio di incendi e frane e segna lo spopolamento delle aree interne e montane. Dove l'agricoltura è intensiva e redditizia, come in pianura padana, la terra resta coltivata, dove è marginale viene lasciata. È un indicatore descrittivo, ma racconta territori che si svuotano.
 
 <!-- sezione: limiti -->
 

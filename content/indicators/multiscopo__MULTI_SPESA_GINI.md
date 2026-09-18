@@ -8,7 +8,7 @@ Guardando i consumi invece dei redditi, la disuguaglianza cambia mappa. L'indice
 
 <!-- sezione: quadro -->
 
-La disuguaglianza nei consumi è di solito più bassa di quella nei redditi, dato che anche chi guadagna poco deve spendere per vivere, e chi guadagna molto non consuma tutto. Che il Trentino Alto Adige, ricco e con redditi compatti, mostri una spesa diseguale ricorda come reddito e consumo raccontino cose diverse. Misura le distanze nel tenore di vita più che nelle entrate. Conta di più la disuguaglianza di ciò che si guadagna o di ciò che si spende?
+La disuguaglianza nei consumi è di solito più bassa di quella nei redditi, dato che anche chi guadagna poco deve spendere per vivere, e chi guadagna molto non consuma tutto. Che il Trentino Alto Adige, ricco e con redditi compatti, mostri una spesa diseguale ricorda come reddito e consumo raccontino cose diverse. Misura le distanze nel tenore di vita più che nelle entrate.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Gli infermieri, spina dorsale dell'assistenza, sono in media 7,4 ogni mille abit
 
 <!-- sezione: quadro -->
 
-La carenza di infermieri è uno dei nodi più seri della sanità italiana, e il divario penalizza proprio il Sud, dove il bisogno è alto. Meno infermieri significa reparti sotto pressione, assistenza domiciliare debole e più carico sulle famiglie. È una professione centrale ma sottopagata e poco attrattiva, che fatica a coprire i vuoti. Un sistema sanitario può reggere senza abbastanza infermieri?
+La carenza di infermieri è uno dei nodi più seri della sanità italiana, e il divario penalizza proprio il Sud, dove il bisogno è alto. Meno infermieri significa reparti sotto pressione, assistenza domiciliare debole e più carico sulle famiglie. È una professione centrale ma sottopagata e poco attrattiva, che fatica a coprire i vuoti.
 
 <!-- sezione: limiti -->
 

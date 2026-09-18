@@ -10,7 +10,7 @@ Dare alla propria vita il voto zero su dieci è una risposta rara, in quasi tutt
 
 <!-- sezione: quadro -->
 
-La geografia di questo gradino non ricalca la linea Nord-Sud che ordina quasi tutto l'atlante. Le regioni dove la povertà è più diffusa finiscono ai due estremi, la Calabria in cima e la Campania giù in fondo, ferma allo 0,5%, sotto Liguria e Umbria che pure stanno al Centro-Nord. Il voto zero probabilmente dice più di una condizione personale, una salute che cede, un isolamento, uno choc recente, che della ricchezza del posto in cui si vive. È il motivo per cui a muovere questa coda sembra la storia di chi risponde più del territorio in cui abita. Conta di più dove vivi o cosa ti è successo?
+La geografia di questo gradino non ricalca la linea Nord-Sud che ordina quasi tutto l'atlante. Le regioni dove la povertà è più diffusa finiscono ai due estremi, la Calabria in cima e la Campania giù in fondo, ferma allo 0,5%, sotto Liguria e Umbria che pure stanno al Centro-Nord. Il voto zero probabilmente dice più di una condizione personale, una salute che cede, un isolamento, uno choc recente, che della ricchezza del posto in cui si vive. È il motivo per cui a muovere questa coda sembra la storia di chi risponde più del territorio in cui abita.
 
 <!-- sezione: limiti -->
 

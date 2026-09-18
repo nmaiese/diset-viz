@@ -8,7 +8,7 @@ La versione BES dell'innovazione produttiva mostra quote più alte, con la Calab
 
 <!-- sezione: quadro -->
 
-Che la Calabria compaia in alto, accanto alle regioni più industriali, ricorda quanto la definizione di innovazione conti: qui pesano anche i cambiamenti organizzativi e digitali, non solo la ricerca. Il BES lo tratta come descrittivo, senza un verso automatico. È un promemoria utile contro l'idea che il Sud non innovi mai davvero. Innovazione è solo tecnologia o anche organizzazione?
+Che la Calabria compaia in alto, accanto alle regioni più industriali, ricorda quanto la definizione di innovazione conti: qui pesano anche i cambiamenti organizzativi e digitali, non solo la ricerca. Il BES lo tratta come descrittivo, senza un verso automatico. È un promemoria utile contro l'idea che il Sud non innovi mai davvero.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Il numero di medici per abitante è abbastanza uniforme: in media 4,8 ogni mille
 
 <!-- sezione: quadro -->
 
-L'Italia ha molti medici sulla carta, ma mal distribuiti e in via di invecchiamento, con tante uscite per pensione. Il dato alto di Lazio e Liguria riflette poli ospedalieri e universitari, non per forza più medici sul territorio. Il vero problema non è il numero totale ma dove e come sono impiegati, tra ospedali pieni e medicina di base scoperta. Bastano più medici o servono nei posti giusti?
+L'Italia ha molti medici sulla carta, ma mal distribuiti e in via di invecchiamento, con tante uscite per pensione. Il dato alto di Lazio e Liguria riflette poli ospedalieri e universitari, non per forza più medici sul territorio. Il vero problema non è il numero totale ma dove e come sono impiegati, tra ospedali pieni e medicina di base scoperta.
 
 <!-- sezione: limiti -->
 

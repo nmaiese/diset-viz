@@ -8,7 +8,7 @@ Avere un lavoro non basta a garantire un reddito dignitoso. La quota di dipenden
 
 <!-- sezione: quadro -->
 
-È l'indicatore dei lavoratori poveri, chi ha un impiego ma guadagna troppo poco per uscire dalla fragilità. Si concentra al Sud, dove al problema di trovare lavoro si somma quello della sua qualità retributiva. La Multiscopo lo tratta come descrittivo, dato che la soglia di bassa paga è convenzionale, ma il fenomeno è concreto. Il lavoro è ancora una garanzia contro la povertà?
+È l'indicatore dei lavoratori poveri, chi ha un impiego ma guadagna troppo poco per uscire dalla fragilità. Si concentra al Sud, dove al problema di trovare lavoro si somma quello della sua qualità retributiva. La Multiscopo lo tratta come descrittivo, dato che la soglia di bassa paga è convenzionale, ma il fenomeno è concreto.
 
 <!-- sezione: limiti -->
 

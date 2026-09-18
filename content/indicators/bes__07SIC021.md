@@ -8,7 +8,7 @@ Vedere segni di degrado attorno a casa, come vandalismo o spazi abbandonati, è 
 
 <!-- sezione: quadro -->
 
-Il degrado è a metà strada tra un dato oggettivo e una percezione: descrive ciò che le persone vedono nel loro ambiente, e quel disordine visibile alimenta il senso di insicurezza più di molti reati. Si concentra nelle grandi regioni urbane, dove spazi pubblici estesi e alta densità rendono più visibili incuria e abbandono. Agire sull'ambiente fisico è una delle leve più concrete sulla sicurezza percepita. Conta di più il reato o il segnale di trascuratezza che lo evoca?
+Il degrado è a metà strada tra un dato oggettivo e una percezione: descrive ciò che le persone vedono nel loro ambiente, e quel disordine visibile alimenta il senso di insicurezza più di molti reati. Si concentra nelle grandi regioni urbane, dove spazi pubblici estesi e alta densità rendono più visibili incuria e abbandono. Agire sull'ambiente fisico è una delle leve più concrete sulla sicurezza percepita.
 
 <!-- sezione: limiti -->
 

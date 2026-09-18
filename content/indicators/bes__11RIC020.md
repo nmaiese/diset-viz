@@ -8,7 +8,7 @@ Nel sistema BES gli utenti regolari di internet sono in media il 79,9%, con Lomb
 
 <!-- sezione: quadro -->
 
-Il BES lo tratta come descrittivo, dato che l'uso di internet non ha di per sé un verso migliore o peggiore, e va letto insieme a competenze e sicurezza online. La forte crescita di lungo periodo ha reso il collegarsi la norma, ma restano fuori proprio i gruppi più fragili. La misura semplice dell'accesso ha ormai esaurito la sua capacità di raccontare il divario. Cosa conta ora, connettersi o saperlo fare bene?
+Il BES lo tratta come descrittivo, dato che l'uso di internet non ha di per sé un verso migliore o peggiore, e va letto insieme a competenze e sicurezza online. La forte crescita di lungo periodo ha reso il collegarsi la norma, ma restano fuori proprio i gruppi più fragili. La misura semplice dell'accesso ha ormai esaurito la sua capacità di raccontare il divario.
 
 <!-- sezione: limiti -->
 

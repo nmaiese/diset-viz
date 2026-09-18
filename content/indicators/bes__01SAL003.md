@@ -8,7 +8,7 @@ L'indice di salute mentale è uno degli indicatori più uniformi del quadro sani
 
 <!-- sezione: quadro -->
 
-Un punteggio così compresso non significa che il disagio psicologico sia uniforme, ma che questo indice, costruito su alcune domande standardizzate, coglie solo una parte del fenomeno. La salute mentale dipende da relazioni, lavoro, solitudine e accesso ai servizi, dimensioni che una media regionale appiattisce. L'uniformità apparente può nascondere gruppi fragili ovunque, dai giovani agli anziani soli. Un dato piatto è un segnale di equilibrio o solo di uno strumento poco sensibile alle differenze?
+Un punteggio così compresso non significa che il disagio psicologico sia uniforme, ma che questo indice, costruito su alcune domande standardizzate, coglie solo una parte del fenomeno. La salute mentale dipende da relazioni, lavoro, solitudine e accesso ai servizi, dimensioni che una media regionale appiattisce. L'uniformità apparente può nascondere gruppi fragili ovunque, dai giovani agli anziani soli.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ La paura di stare per subire un reato resta rara ma non uniforme, e sale al 5,6%
 
 <!-- sezione: quadro -->
 
-Il calo di questo allarme non è una discesa regolare. Il timore, più raro di una vaga percezione di rischio perché nasce da un episodio vissuto, era salito fino al 5,64% del 2016 prima di crollare a meno della metà. Quel picco cade negli anni in cui la sicurezza teneva banco nel dibattito pubblico, e suggerisce che la paura acuta respiri l'aria del momento più di quanto segua i reati denunciati. Fa eccezione l'Umbria, dove è cresciuta a ogni rilevazione, dal 4,5% del 2009 fino a diventare la più alta d'Italia, controcorrente rispetto a tutte le altre regioni. Quanto di questo allarme nasce da ciò che accade e quanto dal clima che si respira intorno?
+Il calo di questo allarme non è una discesa regolare. Il timore, più raro di una vaga percezione di rischio perché nasce da un episodio vissuto, era salito fino al 5,64% del 2016 prima di crollare a meno della metà. Quel picco cade negli anni in cui la sicurezza teneva banco nel dibattito pubblico, e suggerisce che la paura acuta respiri l'aria del momento più di quanto segua i reati denunciati. Fa eccezione l'Umbria, dove è cresciuta a ogni rilevazione, dal 4,5% del 2009 fino a diventare la più alta d'Italia, controcorrente rispetto a tutte le altre regioni.
 
 <!-- sezione: limiti -->
 

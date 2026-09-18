@@ -8,7 +8,7 @@ La densità di organizzazioni non profit misura quanto è fitto il tessuto assoc
 
 <!-- sezione: quadro -->
 
-Il non profit è l'ossatura organizzata della società civile, dalle associazioni culturali a quelle di cura, e la sua densità dice quanto una comunità sa auto-organizzarsi. Il divario, più che doppio, riflette la solita frattura tra un Nord ricco di reti civiche e un Sud dove prevalgono legami informali. È cresciuto ovunque, segno di una società civile comunque viva. Un territorio con più associazioni è più coeso o solo più formalizzato?
+Il non profit è l'ossatura organizzata della società civile, dalle associazioni culturali a quelle di cura, e la sua densità dice quanto una comunità sa auto-organizzarsi. Il divario, più che doppio, riflette la solita frattura tra un Nord ricco di reti civiche e un Sud dove prevalgono legami informali. È cresciuto ovunque, segno di una società civile comunque viva.
 
 <!-- sezione: limiti -->
 

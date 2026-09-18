@@ -8,7 +8,7 @@ Oltre il sovrappeso c'è l'obesità, che riguarda in media l'11,7% degli adulti.
 
 <!-- sezione: quadro -->
 
-L'obesità è la punta più seria dell'eccesso di peso, quella con le conseguenze sanitarie più pesanti, dal diabete alle malattie cardiovascolari. Che cresca, sia pure lentamente, mentre l'eccesso di peso complessivo resta fermo, suggerisce uno spostamento verso i casi più gravi. La geografia ricalca quella meridionale della prevenzione, ma con differenze meno nette di altri indicatori. Prevenire l'obesità è più una questione sanitaria o sociale?
+L'obesità è la punta più seria dell'eccesso di peso, quella con le conseguenze sanitarie più pesanti, dal diabete alle malattie cardiovascolari. Che cresca, sia pure lentamente, mentre l'eccesso di peso complessivo resta fermo, suggerisce uno spostamento verso i casi più gravi. La geografia ricalca quella meridionale della prevenzione, ma con differenze meno nette di altri indicatori.
 
 <!-- sezione: limiti -->
 

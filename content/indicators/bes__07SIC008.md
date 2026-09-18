@@ -8,7 +8,7 @@ La preoccupazione di subire una violenza sessuale non segue la mappa dei reati. 
 
 <!-- sezione: quadro -->
 
-Qui non misuriamo un reato ma un timore, e i due non coincidono: alcune regioni tra le più sicure per i dati registrati esprimono la preoccupazione più alta. Contano l'informazione, l'attenzione pubblica al tema, il senso di esposizione nello spazio urbano, oltre alla maggiore consapevolezza di un fenomeno a lungo sommerso. È un indicatore descrittivo, senza un verso migliore o peggiore, dato che una preoccupazione più alta può nascere anche da più attenzione. La paura racconta il pericolo o lo sguardo di chi la prova?
+Qui non misuriamo un reato ma un timore, e i due non coincidono: alcune regioni tra le più sicure per i dati registrati esprimono la preoccupazione più alta. Contano l'informazione, l'attenzione pubblica al tema, il senso di esposizione nello spazio urbano, oltre alla maggiore consapevolezza di un fenomeno a lungo sommerso. È un indicatore descrittivo, senza un verso migliore o peggiore, dato che una preoccupazione più alta può nascere anche da più attenzione.
 
 <!-- sezione: limiti -->
 

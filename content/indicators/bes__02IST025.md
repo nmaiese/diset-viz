@@ -8,7 +8,7 @@ Avere almeno le competenze digitali di base è ormai essenziale, ma le ha solo i
 
 <!-- sezione: quadro -->
 
-Le competenze digitali sono la nuova alfabetizzazione, e chi non le ha resta escluso da servizi, lavoro e informazione. Il divario Nord-Sud si somma a quello di età e istruzione, colpendo di più anziani e meno istruiti. A differenza dell'accesso a internet, ormai diffuso, le competenze restano indietro e diseguali. Connettersi è facile, ma saperlo fare bene è ancora un privilegio?
+Le competenze digitali sono la nuova alfabetizzazione, e chi non le ha resta escluso da servizi, lavoro e informazione. Il divario Nord-Sud si somma a quello di età e istruzione, colpendo di più anziani e meno istruiti. A differenza dell'accesso a internet, ormai diffuso, le competenze restano indietro e diseguali.
 
 <!-- sezione: limiti -->
 

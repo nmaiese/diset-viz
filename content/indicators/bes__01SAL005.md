@@ -8,7 +8,7 @@ La mortalità stradale tra i 15 e i 34 anni si è più che dimezzata negli ultim
 
 <!-- sezione: quadro -->
 
-Dietro questo calo ci sono veicoli più sicuri, controlli, campagne e norme, un raro esempio di politica pubblica che sposta i numeri in modo visibile. La geografia residua parla di distanze, tipo di strade e abitudini di mobilità più che di rischio individuale, e la Sardegna, con lunghe percorrenze e trasporto pubblico limitato, sta all'estremo. È un indicatore descrittivo, ma racconta vite giovani spezzate, non solo statistiche. Quanto margine di miglioramento resta dove i numeri sono già bassi?
+Dietro questo calo ci sono veicoli più sicuri, controlli, campagne e norme, un raro esempio di politica pubblica che sposta i numeri in modo visibile. La geografia residua parla di distanze, tipo di strade e abitudini di mobilità più che di rischio individuale, e la Sardegna, con lunghe percorrenze e trasporto pubblico limitato, sta all'estremo. È un indicatore descrittivo, ma racconta vite giovani spezzate, non solo statistiche.
 
 <!-- sezione: limiti -->
 
