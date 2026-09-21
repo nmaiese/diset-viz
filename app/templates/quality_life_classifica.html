@@ -115,8 +115,10 @@
                server-rendered. Ignored where View Transitions aren't supported. #}
             <tr style="view-transition-name: qlrow-{{ row.key }}">
               <td class="num quality-rank">{{ row.rank }}</td>
-              <td>{{ row.name }}{% if row.metro_city %} <span class="quality-metro" title="Città metropolitana">cm</span>{% endif %}</td>
-              {% if is_prov %}<td><small>{{ row.region }}</small></td>{% endif %}
+              {# Il territorio porta al suo profilo. Le province non ne hanno
+                 uno, quindi li' la porta e' la colonna della regione. #}
+              <td>{% if not is_prov %}<a href="/regione/{{ row.key }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}{% if row.metro_city %} <span class="quality-metro" title="Città metropolitana">cm</span>{% endif %}</td>
+              {% if is_prov %}<td><small>{% if region_paths.get(row.region) %}<a href="{{ region_paths[row.region] }}">{{ row.region }}</a>{% else %}{{ row.region }}{% endif %}</small></td>{% endif %}
               <td class="quality-score-cell">
                 <span class="quality-score-bar"><span style="width: {{ row.score | round | int }}%"></span></span>
                 <span class="quality-score">{{ row.score | it_num }}</span>

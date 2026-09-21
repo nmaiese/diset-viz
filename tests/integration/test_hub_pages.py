@@ -561,3 +561,39 @@ class LaPaginaTemaRisponde(unittest.TestCase):
         testo = visible_text(self.html)
         for vietato in FORBIDDEN_CHARS:
             self.assertNotIn(vietato, testo, f"tipografia vietata: {vietato!r}")
+
+
+class LaClassificaQualitaDellaVitaPortaDaQualcheParte(unittest.TestCase):
+    """Venti regioni e 103 province erano testo nudo.
+
+    La pagina sta in posizione 4,1 per "classifica regioni italiane per
+    qualita' della vita" ed era un vicolo cieco: il territorio si leggeva e
+    non si apriva. Le province non hanno un profilo, quindi li' la porta e' la
+    colonna della regione.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        app.config["TESTING"] = True
+        cls.client = app.test_client()
+
+    def test_ogni_regione_in_classifica_apre_il_suo_profilo(self):
+        html = self.client.get("/qualita-della-vita/classifica/regioni").get_data(as_text=True)
+        link = sorted(set(re.findall(r'href="(/regione/[^"]+)"', html)))
+        self.assertEqual(len(link), 20, link)
+        for percorso in link:
+            self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
+
+    def test_le_province_aprono_la_loro_regione(self):
+        html = self.client.get("/qualita-della-vita/classifica/province").get_data(as_text=True)
+        link = sorted(set(re.findall(r'href="(/regione/[^"]+)"', html)))
+        self.assertGreaterEqual(len(link), 18, link)
+        for percorso in link:
+            self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
+
+    def test_un_territorio_senza_profilo_non_prende_un_link_finto(self):
+        """`region_key_for` slugifica qualunque stringa: da "Provincia Autonoma
+        Bolzano" usciva un link a una pagina che non esiste. Si valida contro
+        le regioni vere, non contro il fatto che una chiave sia uscita."""
+        html = self.client.get("/qualita-della-vita/classifica/province").get_data(as_text=True)
+        self.assertNotIn("/regione/provincia-autonoma", html)

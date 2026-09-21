@@ -1396,9 +1396,28 @@ def quality_life_classifica(url_level):
     if not public_matches:
         abort(404)
     canonical = public_matches[0]["loc"]
+    # I territori della classifica erano testo nudo: venti regioni e 103
+    # province su una pagina che sta in posizione 4,1 per "classifica regioni
+    # italiane per qualita' della vita", e non portavano da nessuna parte. Le
+    # province non hanno un profilo, ma la loro regione si', quindi il nome
+    # della regione diventa la porta. Si calcola qui e non nel template perche'
+    # `payload["ranking"]` e' memoizzato: mutarlo avvelenerebbe la cache.
+    # `region_key_for` slugifica qualunque stringa, anche una che non e' una
+    # regione: le province di Bolzano e Trento dichiarano "Provincia Autonoma
+    # Bolzano", da cui usciva un link a una pagina che non esiste. Si valida
+    # contro le regioni vere, non contro il fatto che una chiave sia uscita.
+    region_paths = {}
+    for row in payload["ranking"]:
+        nome = row.get("region")
+        if not nome:
+            continue
+        chiave = profiles.region_key_for(nome)
+        if chiave and profiles.region_name(chiave):
+            region_paths[nome] = f"/regione/{chiave}"
     response = make_response(render_template(
         "quality_life_classifica.html",
         data=payload,
+        region_paths=region_paths,
         quality_map_data=quality_map_data,
         url_level=url_level,
         profiles=qb.get_quality_life_profiles(),
