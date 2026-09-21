@@ -50,7 +50,20 @@
   "dateModified": {{ dataset_updated | tojson }},{% endif %}
   "isBasedOn": {{ (meta.source_data_url or meta.source_url) | tojson }},
   "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni",
-  "variableMeasured": {{ meta.name | tojson }},
+  {# `PropertyValue` invece della stringa nuda: cosi' la grandezza porta con se'
+     l'unita' e l'intervallo osservato, che e' quello che un motore deve sapere
+     per riusare il dato senza aprire la pagina. La stringa diceva solo il nome,
+     cioe' quello che `name` diceva gia' due righe sopra. Minimo e massimo
+     arrivano da `seo_titles.extremes`, gli stessi che finiscono nel titolo:
+     un'unica fonte, o le due cifre divergono. #}
+  "variableMeasured": {
+    "@type": "PropertyValue",
+    "name": {{ meta.name | tojson }},{% if meta.unit %}
+    "unitText": {{ meta.unit | tojson }},{% endif %}{% if estremi.alto %}
+    "minValue": {{ estremi.basso.value }},
+    "maxValue": {{ estremi.alto.value }},{% endif %}
+    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}
+  },
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}
   "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads and level.key == 'regione' %},

@@ -15,6 +15,11 @@
     <meta name="twitter:card" content="summary_large_image">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <script>window.__diSpaPageView = true;</script>
+    {# La navigazione arriva da `app/nav.py`, come `__diInitialView` arriva da
+       qui: la SPA continua a non conoscere nessuna rotta Flask, gliele si
+       passa. Finche' le voci erano scritte a mano in `main.jsx`, dall'atlante
+       non si raggiungevano `/confronto` ne' `/divari-regionali`. #}
+    <script>window.__diNav = {{ nav.for_spa() | tojson }};</script>
     {% set TRACK_SERVER_PAGE_VIEW = false %}
     {% include "_third_party_head.html" %}
     {# Migrato al design system 2026, con lo stesso meccanismo delle pagine

@@ -23,11 +23,15 @@ Le shell della SPA restano fuori dai controlli sul markup del chrome: hanno un
 masthead React proprio, che porta la navigazione dentro l'applicazione senza
 ricaricare. Con le altre pagine devono condividere il design system, non l'HTML.
 """
+import json
 import re
 import unittest
+from pathlib import Path
 
-from app import app
+from app import app, nav
 from app.cache import cache
+
+TEMPLATES = Path(app.root_path) / "templates"
 
 
 # Le shell che montano il bundle dell'atlante. Se se ne aggiunge una terza va
@@ -195,3 +199,101 @@ class DesignSystemMigration(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LaNavigazioneEUnaSola(unittest.TestCase):
+    """Le voci stavano in due posti e divergevano.
+
+    `_ds_header.html` per le pagine Flask, `frontend/src/main.jsx` a mano per la
+    testata React: dall'atlante non si raggiungevano `/confronto` ne'
+    `/divari-regionali`, la qualita' della vita portava all'indice invece che
+    alla classifica, e le stesse sezioni si chiamavano "Quiz Italia" e "Blog"
+    da una parte, "Quiz" e "Storie" dall'altra. Nessuna di queste cose fa
+    fallire niente: si vedono solo aprendo le due testate una accanto all'altra.
+
+    Adesso `app/nav.py` decide e le due superfici disegnano. La SPA continua a
+    non conoscere nessuna rotta Flask: le riceve da `window.__diNav`, lo stesso
+    meccanismo di `__diInitialView`.
+    """
+
+    def setUp(self):
+        self.client = app.test_client()
+        cache.clear()
+
+    def test_ogni_voce_di_menu_porta_a_una_pagina_che_esiste(self):
+        """Una voce rotta non fa fallire niente e la trova solo chi ci clicca."""
+        for percorso in nav.paths():
+            with self.subTest(percorso=percorso):
+                self.assertEqual(self.client.get(percorso).status_code, 200)
+
+    def test_la_testata_flask_non_elenca_voci_per_conto_suo(self):
+        sorgente = (TEMPLATES / "_ds_header.html").read_text(encoding="utf-8")
+        cuciti = re.findall(r'<a href="(/[^"#]*)"', sorgente)
+        # Resta il logo, che porta alla home e non e' una voce di menu.
+        self.assertEqual([h for h in cuciti if h != "/"], [],
+                         "la testata e' tornata a elencare le voci a mano")
+
+    def test_il_bundle_non_manda_da_nessuna_parte_che_il_menu_non_conosca(self):
+        """La barra del telefono mandava a `/qualita-della-vita`, la testata
+        alla classifica: due pagine diverse per la stessa voce a seconda del
+        dispositivo. Le icone restano in JSX, che e' giusto; le destinazioni no.
+
+        Il controllo e' su dove il bundle manda, non sulle stringhe che contiene:
+        vietare le stringhe direbbe rosso anche sul ripiego, che serve e sta li'
+        apposta."""
+        sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
+        noti = set(nav.paths()) | {"/"}
+        for rotta in sorted(set(re.findall(r'href="(/[^"{]*)"', sorgente))):
+            with self.subTest(rotta=rotta):
+                self.assertIn(rotta, noti,
+                              "main.jsx manda a una rotta che app/nav.py non dichiara")
+
+    def test_il_ripiego_del_bundle_non_inventa_rotte(self):
+        sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
+        ripiego = re.search(r"const NAV_RIPIEGO = \{(.*?)\n\};", sorgente, re.S)
+        self.assertIsNotNone(ripiego)
+        for rotta in re.findall(r'path: "([^"]+)"', ripiego.group(1)):
+            with self.subTest(rotta=rotta):
+                self.assertIn(rotta, nav.paths())
+
+    def test_le_shell_passano_la_navigazione_al_bundle(self):
+        atteso = nav.for_spa()
+        for path in SPA_ROUTES:
+            with self.subTest(path=path):
+                risposta = self.client.get(path)
+                self.assertEqual(risposta.status_code, 200, path)
+                html = risposta.get_data(as_text=True)
+                trovato = re.search(r"window\.__diNav = (.*?);\s*(?:</script>|\n)", html, re.S)
+                self.assertIsNotNone(trovato, f"{path}: nessun __diNav")
+                self.assertEqual(json.loads(trovato.group(1)), atteso)
+
+    def test_la_barra_compatta_usa_le_etichette_dell_elenco_lungo(self):
+        """`SPA_MASTHEAD` dichiara quali destinazioni entrano nella barra, non
+        come si chiamano: un'etichetta nuova li' sarebbe un secondo elenco."""
+        per_percorso = {v["path"]: v for v in nav.flat()}
+        for percorso in nav.SPA_MASTHEAD:
+            with self.subTest(percorso=percorso):
+                self.assertIn(percorso, per_percorso,
+                              "la barra promette una destinazione che il menu non ha")
+        for voce in nav.for_spa()["masthead"]:
+            atteso = nav.SHORT.get(voce["path"]) or per_percorso[voce["path"]]["label"]
+            self.assertEqual(voce["label"], atteso)
+
+    def test_il_cassetto_del_telefono_non_perde_voci_per_strada(self):
+        """Sul telefono il cassetto e' l'unica navigazione che si vede.
+
+        `/metodologia` ci compare due volte di proposito, come nella testata:
+        "Metodologia dell'indice" accanto alle classifiche, dove serve a
+        spiegare il punteggio, e "Metodologia" fra le voci generali. Escludendo
+        dal gruppo "Altro" ogni percorso gia' citato nelle tendine, la seconda
+        spariva e la pagina si trovava solo sotto una parola che non la
+        descrive tutta.
+        """
+        html = self.client.get("/").get_data(as_text=True)
+        cassetto = re.search(r'<div class="drawer" id="ds-drawer".*?</header>', html, re.S)
+        self.assertIsNotNone(cassetto)
+        rotte = re.findall(r'href="(/[^"]*)"', cassetto.group(0))
+        for percorso in nav.paths():
+            with self.subTest(percorso=percorso):
+                self.assertIn(percorso, rotte, "il cassetto ha perso una voce")
+        self.assertEqual(rotte.count("/metodologia"), 2)

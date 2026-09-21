@@ -24,6 +24,7 @@
          non c'è un ?view= nella query, così il percorso non finisce mai a
          dire una cosa e la query un'altra. */
       window.__diInitialView = "confronto";
+      window.__diNav = {{ nav.for_spa() | tojson }};
     </script>
     {% set TRACK_SERVER_PAGE_VIEW = false %}
     {% include "_third_party_head.html" %}

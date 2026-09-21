@@ -18,32 +18,26 @@
       <span class="brandword">{{ site_name }}</span>
     </a>
 
+    {# Le voci vengono da `app/nav.py`, non da qui: la testata React dell'atlante
+       legge lo stesso elenco da `window.__diNav`, e finche' erano due liste
+       scritte a mano divergevano. Dall'atlante non si raggiungevano
+       `/confronto` ne' `/divari-regionali`. #}
     <nav class="hdr__nav" aria-label="Navigazione principale">
+      {% for voce in nav.PRIMARY %}
+      {% if voce.group %}
       <details class="navlink" name="hdr-nav">
-        <summary{% if nav_explore %} class="is-active"{% endif %}>Esplora
+        <summary{% if (voce.key == 'esplora' and nav_explore) or (voce.key == 'classifiche' and nav_rank) %} class="is-active"{% endif %}>{{ voce.label }}
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
         <div class="dropdown">
-          <a href="/atlante">Atlante</a>
-          <a href="/regioni">Regioni</a>
-          <a href="/temi">Temi</a>
-          <a href="/confronto">Confronta</a>
-          <a href="/divari-regionali">Divari regionali</a>
+          {% for sotto in voce.group %}<a href="{{ sotto.path }}">{{ sotto.label }}</a>
+          {% endfor %}
         </div>
       </details>
-      <details class="navlink" name="hdr-nav">
-        <summary{% if nav_rank %} class="is-active"{% endif %}>Classifiche
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-        </summary>
-        <div class="dropdown">
-          <a href="/qualita-della-vita/classifica/regioni">Qualità della vita, regioni</a>
-          <a href="/qualita-della-vita/classifica/province">Qualità della vita, province</a>
-          <a href="/metodologia">Metodologia dell'indice</a>
-        </div>
-      </details>
-      <div class="navlink"><a href="/blog"{% if active_nav == 'blog' %} aria-current="page"{% endif %}>Storie</a></div>
-      <div class="navlink"><a href="/quiz"{% if active_nav == 'gioco' %} aria-current="page"{% endif %}>Quiz</a></div>
-      <div class="navlink"><a href="/metodologia"{% if active_nav == 'metodologia' %} aria-current="page"{% endif %}>Metodologia</a></div>
+      {% else %}
+      <div class="navlink"><a href="{{ voce.path }}"{% if active_nav == voce.active %} aria-current="page"{% endif %}>{{ voce.label }}</a></div>
+      {% endif %}
+      {% endfor %}
     </nav>
 
     <div class="hdr__right">
@@ -99,26 +93,22 @@
         </div>
       </div>
       <div class="drawer__group">
-        <h4>Esplora</h4>
-        <a href="/atlante">Atlante</a>
-        <a href="/regioni">Regioni</a>
-        <a href="/temi">Temi</a>
-        <a href="/confronto">Confronta</a>
-        <a href="/divari-regionali">Divari regionali</a>
+        {# Stesse voci della barra, dallo stesso elenco: il cassetto del
+           telefono e' la sola navigazione che quegli utenti vedono, e quando le
+           due liste erano scritte a mano perdeva pezzi per primo. #}
+        <h4>{{ nav.PRIMARY[0].label }}</h4>
+        {% for sotto in nav.PRIMARY[0].group %}<a href="{{ sotto.path }}">{{ sotto.label }}</a>
+        {% endfor %}
       </div>
       <div class="drawer__group">
-        <h4>Classifiche</h4>
-        <a href="/qualita-della-vita/classifica/regioni">Qualità della vita, regioni</a>
-        <a href="/qualita-della-vita/classifica/province">Qualità della vita, province</a>
+        <h4>{{ nav.PRIMARY[1].label }}</h4>
+        {% for sotto in nav.PRIMARY[1].group %}<a href="{{ sotto.path }}">{{ sotto.label }}</a>
+        {% endfor %}
       </div>
       <div class="drawer__group">
         <h4>Altro</h4>
-        <a href="/blog">Storie</a>
-        <a href="/quiz">Quiz</a>
-        <a href="/metodologia">Metodologia e fonti</a>
-        <a href="/catalogo-dati">Catalogo dati</a>
-        <a href="/chi-siamo">Chi siamo</a>
-        <a href="/privacy">Privacy e cookie</a>
+        {% for voce in nav.drawer_other() %}<a href="{{ voce.path }}">{{ voce.label }}</a>
+        {% endfor %}
       </div>
     </div>
   </div>

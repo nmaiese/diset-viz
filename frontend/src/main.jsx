@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import * as d3 from "d3";
 import { AuthControl } from "./shared/AuthControl.jsx";
@@ -511,7 +511,38 @@ function useNavUnderline(navRef, activeKey) {
   return style;
 }
 
+// Le voci arrivano dal server via `window.__diNav`, lo stesso meccanismo di
+// `__diInitialView`: la SPA continua a non conoscere nessuna rotta Flask, e
+// `app/nav.py` resta l'unico posto dove si aggiunge o si rinomina una sezione.
+// Il ripiego copre il caso in cui il bundle giri senza il suo guscio (uno
+// smoke test, una pagina vecchia in cache): meglio una barra ridotta che una
+// testata senza navigazione.
+const NAV_RIPIEGO = {
+  masthead: [
+    { label: "Atlante", path: "/atlante", key: "atlas" },
+    { label: "Regioni", path: "/regioni", key: "regioni" },
+    { label: "Temi", path: "/temi", key: "temi" },
+  ],
+  footer: [],
+};
+
+function readNav() {
+  const dato = typeof window !== "undefined" ? window.__diNav : null;
+  if (!dato || !Array.isArray(dato.masthead) || !dato.masthead.length) return NAV_RIPIEGO;
+  return dato;
+}
+
+// La barra del telefono tiene le sue icone e le sue etichette brevissime, che in
+// `nav.py` non avrebbero senso, ma NON le sue destinazioni: mandava a
+// `/qualita-della-vita` mentre la testata mandava alla classifica, cioe' due
+// pagine diverse per la stessa voce a seconda del dispositivo.
+function navPath(key, ripiego) {
+  const voce = readNav().masthead.find((v) => v.key === key);
+  return (voce && voce.path) || ripiego;
+}
+
 function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
+  const navItems = readNav().masthead;
   const navRef = useRef(null);
   const underlineKey = activeNav === "atlas" || activeNav === "regioni" ? activeNav : null;
   const underlineStyle = useNavUnderline(navRef, underlineKey);
@@ -535,36 +566,28 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
         </a>
         {children}
         <nav id="masthead-nav" className="masthead__links" aria-label="Collegamenti" ref={navRef}>
-          <a
-            href="/atlante"
-            data-nav-key="atlas"
-            className={activeNav === "atlas" ? "is-active" : ""}
-            onClick={(event) => handleLocalNav(event, onNavAtlas)}
-          >
-            Atlante
-          </a>
-          <a
-            href="/regioni"
-            data-nav-key="regioni"
-            className={activeNav === "regioni" ? "is-active" : ""}
-            onClick={(event) => {
-              // Inside the SPA, keep the user in the interactive region mode
-              // instead of loading the server page (which stays for SEO/deep links).
-              handleLocalNav(event, onNavRegioni);
-            }}
-          >
-            Regioni
-          </a>
-          <a href="/temi">Temi</a>
-          <a href="/qualita-della-vita">Qualità della vita</a>
-          <a href="/quiz">Quiz Italia</a>
-          <a href="/metodologia">Metodologia</a>
-          <a href="/blog">Blog</a>
+          {navItems.map((item) => {
+            // Atlante e Regioni restano navigazione interna: fuori la pagina
+            // server esiste ancora per la SEO e per i link diretti, ma dentro
+            // la SPA un ricaricamento perderebbe lo stato della vista.
+            const local = item.key === "atlas" ? onNavAtlas : item.key === "regioni" ? onNavRegioni : null;
+            return (
+              <a
+                key={item.path}
+                href={item.path}
+                data-nav-key={item.key || undefined}
+                className={item.key && activeNav === item.key ? "is-active" : ""}
+                onClick={local ? (event) => handleLocalNav(event, local) : undefined}
+              >
+                {item.label}
+              </a>
+            );
+          })}
           <span className={`nav-underline${underlineStyle.opacity ? " is-visible" : ""}`} style={underlineStyle} aria-hidden="true" />
         </nav>
         <a
           className="masthead__search"
-          href="/atlante"
+          href={navPath("atlas", "/atlante")}
           aria-label="Cerca nell'atlante"
           onClick={(event) => handleLocalNav(event, onNavAtlas)}
         >
@@ -576,7 +599,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
 
       <nav className="tabbar" aria-label="Navigazione principale">
         <a
-          href="/atlante"
+          href={navPath("atlas", "/atlante")}
           className={activeNav === "atlas" ? "tabbar__item is-active" : "tabbar__item"}
           onClick={(event) => handleLocalNav(event, onNavAtlas)}
         >
@@ -584,22 +607,22 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
           <span>Atlante</span>
         </a>
         <a
-          href="/regioni"
+          href={navPath("regioni", "/regioni")}
           className={activeNav === "regioni" ? "tabbar__item is-active" : "tabbar__item"}
           onClick={(event) => handleLocalNav(event, onNavRegioni)}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
           <span>Regioni</span>
         </a>
-        <a href="/qualita-della-vita" className="tabbar__item">
+        <a href={navPath("qualita-della-vita", "/qualita-della-vita")} className="tabbar__item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
           <span>Qualità</span>
         </a>
-        <a href="/quiz" className="tabbar__item">
+        <a href={navPath("gioco", "/quiz")} className="tabbar__item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16"></rect><circle cx="8" cy="8" r="1"></circle><circle cx="16" cy="8" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="8" cy="16" r="1"></circle><circle cx="16" cy="16" r="1"></circle></svg>
           <span>Gioco</span>
         </a>
-        <a href="/blog" className="tabbar__item">
+        <a href={navPath("blog", "/blog")} className="tabbar__item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg>
           <span>Blog</span>
         </a>
@@ -625,7 +648,12 @@ function SiteFooter() {
         , indicatori territoriali per le politiche di sviluppo
       </span>
       <span>
-        <a href="/atlante">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
+        {readNav().footer.map((item, indice) => (
+          <Fragment key={item.path}>
+            {indice > 0 && " · "}
+            <a href={item.path}>{item.label}</a>
+          </Fragment>
+        ))}
       </span>
       {hasConsentPreferences && (
         <button className="privacy-settings-link" type="button" onClick={() => window.diOpenConsentPreferences()}>

@@ -37,6 +37,7 @@ from app import moderation
 from app import public_urls
 from app import publisher
 from app import agent_discovery
+from app import nav
 from app import taxonomy
 from app.taxonomy import DUPLICATE_BES_IDS, PROVINCE_ONLY_TITLE_COLLISIONS
 
@@ -150,6 +151,10 @@ def _inject_license():
         "publisher": publisher.ORGANIZATION,
         "publisher_jsonld": publisher.organization_json(),
         "corrections_url": publisher.CORRECTIONS_URL,
+        # La navigazione sta in `app/nav.py`, e la testata la legge da li' invece
+        # di elencarla. `_ds_header.html` e' incluso da ogni pagina Flask, quindi
+        # il posto giusto e' questo processore, non ogni singola `render_template`.
+        "nav": nav,
     }
 
 
@@ -971,6 +976,12 @@ def _render_indicator(family, raw_id):
         seo_description=seo_description,
         dataset_description=_dataset_description(lead, meta),
         dataset_updated=publisher.dataset_updated(meta["family"]),
+        # Gli stessi estremi che `seo_titles` mette nel titolo, cosi' il
+        # `PropertyValue` del JSON-LD e la SERP non possono dire due cifre
+        # diverse. `extremes` torna `(None, None)` sulle serie `contextual`,
+        # dove il catalogo non espone un massimo e un minimo di proposito, e il
+        # template salta minValue e maxValue.
+        estremi=dict(zip(("alto", "basso"), seo_titles.extremes(meta, level))),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{meta['canonical_path']}",
