@@ -1,5 +1,12 @@
 {% extends "blog_base.html" %}
 {% import "_indicator_article.html" as article %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [
+  {"name": "Home", "path": "/"},
+  {"name": "Temi", "path": "/temi"},
+  {"name": meta.theme, "path": meta.theme_path},
+  {"name": meta.name, "path": canonical | replace(site_url, "")},
+] %}
 {# Migrata al design system 2026: font, token e chrome nuovi. Il grosso
    della pagina si ridipinge da se', perche' le regole di site.css che la
    riguardano sono scritte sui nomi dei token (--ink, --paper, --accent...)
@@ -53,23 +60,12 @@
   ]{% endif %}
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Temi", "item": "{{ site_url }}/temi" },
-    { "@type": "ListItem", "position": 3, "name": {{ meta.theme | tojson }}, "item": "{{ site_url }}{{ meta.theme_path }}" },
-    { "@type": "ListItem", "position": 4, "name": {{ meta.name | tojson }}, "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {% endblock %}
 
 {% block content %}
 <article class="page page-indicator wrap" id="contenuto">
-  <nav class="breadcrumb"><a href="/temi">Temi</a> / <a href="{{ meta.theme_path }}">{{ meta.theme }}</a></nav>
+  {{ breadcrumb.trail(percorso) }}
 
   {# Same catalog search the atlas offered: without JS it submits to /atlante, with JS it
      shows live results linking straight to each indicator's canonical page. #}

@@ -1,4 +1,6 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Metodologia", "path": "/metodologia"}] %}
 {% set active_nav = 'metodologia' %}
 
 {% block title %}Metodologia e fonti | {{ site_name }}{% endblock %}
@@ -21,16 +23,7 @@
   "isAccessibleForFree": true
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Metodologia", "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -68,7 +61,7 @@
 
 {% block content %}
 <article class="page prose-wrap" id="contenuto">
-  <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
+  {{ breadcrumb.trail(percorso) }}
   <h1>Metodologia e fonti</h1>
   <p class="page-lead">Divario Italia usa dati territoriali pubblici per rendere confrontabili regioni, temi e indicatori. Ogni pagina deve permettere di capire che cosa misura il dato, da dove arriva, quale anno copre e quali limiti ha.</p>
 

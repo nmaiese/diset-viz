@@ -4,6 +4,12 @@
 {% set m = data.methodology %}
 {% set is_prov = data.level == 'provincia' %}
 {% set lvl_label = 'province' if is_prov else 'regioni' %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [
+  {"name": "Home", "path": "/"},
+  {"name": "Qualità della vita", "path": "/qualita-della-vita"},
+  {"name": "Classifica " ~ lvl_label, "path": "/qualita-della-vita/classifica/" ~ url_level},
+] %}
 
 {% block title %}Qualità {{ lvl_label }}: {{ p.name }} | {{ site_name }}{% endblock %}
 {% block description %}Classifica della qualità della vita per {{ lvl_label }}: indicatori Istat su scala 0-100, profilo {{ p.name }}, categorie e metodo trasparenti.{% endblock %}
@@ -39,22 +45,12 @@
   ]
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Qualità della vita", "item": "{{ site_url }}/qualita-della-vita" },
-    { "@type": "ListItem", "position": 3, "name": "Classifica {{ lvl_label }}", "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {% endblock %}
 
 {% block content %}
 <article class="page wrap-wide quality-ranking" id="contenuto">
-  <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a></nav>
+  {{ breadcrumb.trail(percorso) }}
 
   <div class="quality-hero-row">
     <div class="quality-hero-row__main">

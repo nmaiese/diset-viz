@@ -1,6 +1,12 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
 {% set active_nav = 'regioni' %}
 {% set p = profile %}
+{% set percorso = [
+  {"name": "Home", "path": "/"},
+  {"name": "Regioni", "path": "/regioni"},
+  {"name": p.region, "path": "/regione/" ~ p.region_key},
+] %}
 
 {# Il titolo porta la posizione media, che e' il numero che la pagina mostra
    gia' in cima ("Media 13ª su 20") e la cosa che chi cerca "molise regioni
@@ -25,17 +31,7 @@
   "keywords": [{{ p.region | tojson }}, "indicatori territoriali", "divario regionale", "Istat"]
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Regioni", "item": "{{ site_url }}/regioni" },
-    { "@type": "ListItem", "position": 3, "name": {{ p.region | tojson }}, "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {# `ItemList` solo adesso che la tabella "Tutti i temi" porta il rango: prima
    sarebbe stato un elenco di nomi senza ordine dichiarato, cioe' dati
    strutturati che promettono piu' di quanto la pagina mostri, che e' la
@@ -72,7 +68,7 @@
 
 {% block content %}
 <article class="page page-region wrap-wide" id="contenuto">
-  <nav class="breadcrumb"><a href="/regioni">Regioni</a></nav>
+  {{ breadcrumb.trail(percorso) }}
 
   {% set has_movement = p.movement_gains or p.movement_losses %}
   <div class="region-hero">

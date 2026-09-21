@@ -1,4 +1,6 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Regioni", "path": "/regioni"}] %}
 {% set active_nav = 'regioni' %}
 
 {# La marca cade qui come sulle schede: diciassette caratteri di un nome che
@@ -21,16 +23,7 @@
   "url": {{ canonical | tojson }}
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Regioni", "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -54,6 +47,7 @@
 
 {% block content %}
 <article class="page page-index wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
   <h1>Le regioni a confronto</h1>
   <p class="page-lead">Venti regioni, venti profili territoriali. Per ognuna trovi i temi in cui emerge o fatica, dove ha recuperato o perso terreno nell'ultimo anno e le regioni dal profilo più simile. Passa il mouse sulla mappa per un'anteprima, clicca per aprire la scheda.</p>
   <p class="page-note"><a href="/atlante?view=regioni">Apri l'atlante interattivo per regione →</a></p>

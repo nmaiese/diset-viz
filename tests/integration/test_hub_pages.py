@@ -668,3 +668,87 @@ class LaPaginaRegioneChiudeLaMaglia(unittest.TestCase):
             "/regione/molise", headers={"Accept": "text/markdown"}).get_data(as_text=True)
         self.assertIn("## Tutti i temi, con la posizione fra le 20 regioni", testo)
         self.assertIn(" su 20 |", testo)
+
+
+class IlPercorsoVisibileEQuelloDichiarato(unittest.TestCase):
+    """`BreadcrumbList` e `<nav>` devono dire la stessa cosa.
+
+    Erano cinque forme scritte a mano in nove template, e i due pezzi stavano a
+    settanta righe di distanza nello stesso file: la scheda indicatore
+    dichiarava Home > Temi > tema > indicatore e a schermo si leggeva
+    "Temi / tema". Il catalogo dati mostrava un percorso e non lo dichiarava,
+    quattro pagine lo dichiaravano e non lo mostravano, e la pagina tema
+    linkava un'ancora di `/temi` che non e' mai esistita.
+
+    Adesso la lista e' una sola per pagina e questi due percorsi ne escono.
+    """
+
+    PAGINE = (
+        "/regioni", "/temi", "/tema/lavoro-e-conciliazione", "/regione/molise",
+        "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita/classifica/regioni",
+        "/divari-regionali", "/quiz", "/quiz/indovina-la-regione", "/metodologia",
+        "/confronto", "/catalogo-dati",
+    )
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def _percorsi(self, path):
+        html = self.client.get(path).get_data(as_text=True)
+        nav = re.search(r'<nav[^>]*aria-label="Percorso".*?</nav>', html, re.S)
+        visibile = None
+        if nav:
+            voci = [unescape(v).strip() for v in re.findall(r">([^<>]+)</(?:a|span)>", nav.group(0))]
+            visibile = [v for v in voci if v and v != "/"]
+        dichiarato = None
+        for blocco in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S):
+            documento = json.loads(blocco)
+            if documento.get("@type") == "BreadcrumbList":
+                dichiarato = [e["name"] for e in documento["itemListElement"]]
+        return visibile, dichiarato
+
+    def test_il_visibile_e_il_dichiarato_coincidono(self):
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                visibile, dichiarato = self._percorsi(path)
+                self.assertIsNotNone(visibile, f"{path}: nessun percorso visibile")
+                self.assertIsNotNone(dichiarato, f"{path}: nessun BreadcrumbList")
+                self.assertEqual(visibile, dichiarato)
+
+    def test_ogni_percorso_parte_da_home_e_finisce_sulla_pagina(self):
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                _, dichiarato = self._percorsi(path)
+                self.assertEqual(dichiarato[0], "Home")
+                self.assertGreaterEqual(len(dichiarato), 2)
+
+    def test_l_ultima_voce_non_e_un_link(self):
+        """Lo schema vuole `item` sull'ultima voce, l'occhio non vuole un link
+        alla pagina su cui si trova gia'."""
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                nav = re.search(r'<nav[^>]*aria-label="Percorso".*?</nav>', html, re.S)
+                self.assertIn('class="breadcrumb__here"', nav.group(0))
+
+    def test_ogni_voce_del_percorso_risponde(self):
+        """Un percorso che porta a un 404 e' peggio di nessun percorso."""
+        for path in self.PAGINE:
+            html = self.client.get(path).get_data(as_text=True)
+            nav = re.search(r'<nav[^>]*aria-label="Percorso".*?</nav>', html, re.S)
+            for href in re.findall(r'href="([^"]+)"', nav.group(0)):
+                with self.subTest(path=path, href=href):
+                    self.assertEqual(self.client.get(href).status_code, 200)
+
+    def test_l_ancora_della_macro_area_esiste_davvero(self):
+        """La pagina tema linkava `/temi#reddito-inclusione-e-accessibilità`,
+        che `/temi` non ha mai emesso: lo slug era calcolato nel template con
+        `lower | replace`, non con `slugify_taxonomy`."""
+        tema = self.client.get("/tema/lavoro-e-conciliazione").get_data(as_text=True)
+        nav = re.search(r'<nav[^>]*aria-label="Percorso".*?</nav>', tema, re.S).group(0)
+        ancore = [h for h in re.findall(r'href="(/temi#[^"]+)"', nav)]
+        self.assertTrue(ancore)
+        temi = self.client.get("/temi").get_data(as_text=True)
+        for ancora in ancore:
+            with self.subTest(ancora=ancora):
+                self.assertIn(f'id="{ancora.split("#", 1)[1]}"', temi)

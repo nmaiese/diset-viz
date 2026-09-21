@@ -1,3 +1,5 @@
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Confronta", "path": "/confronto"}] %}
 <!doctype html>
 <html lang="it">
   <head>
@@ -14,16 +16,7 @@
     <meta property="og:image" content="{{ SITE_URL }}/static/img/og-divario-italia.svg">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ SITE_URL }}/" },
-        { "@type": "ListItem", "position": 2, "name": "Confronta", "item": "{{ SITE_URL }}/confronto" }
-      ]
-    }
-    </script>
+    {{ breadcrumb.jsonld(percorso, SITE_URL) }}
     <script>
       window.__diSpaPageView = true;
       /* La SPA vive su /atlante come stato ?view=..., ma il confronto ha una URL
@@ -61,10 +54,7 @@
     {% if STAGING %}{% include "_staging_banner.html" %}{% endif %}
     <div id="root">
       <main class="spa-seo-fallback">
-        <nav aria-label="Percorso">
-          <a href="/">Home</a>
-          <a href="/confronto" aria-current="page">Confronta</a>
-        </nav>
+        {{ breadcrumb.trail(percorso, "", false) }}
         <h1>Confronta le regioni italiane</h1>
         <p>Scegli due o tre regioni e guarda come si comportano sullo stesso indicatore. Il comparatore mostra il valore dell'ultimo anno, la posizione in classifica e la serie storica delle regioni che hai scelto, con la media semplice delle regioni come riferimento.</p>
         {% if compare_preview %}

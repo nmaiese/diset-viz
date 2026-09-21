@@ -1,8 +1,14 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
 {% set active_nav = 'temi' %}
 {% set p = profile %}
 {% set s = standings %}
 {% set classifica = s.rated and s.rows %}
+{# La macro-area entra nel percorso solo da quando `/temi` ha davvero un'ancora
+   per area: prima il link c'era e non atterrava da nessuna parte. #}
+{% set percorso = ([{"name": "Home", "path": "/"}, {"name": "Temi", "path": "/temi"}]
+  + ([{"name": p.macro_area, "path": macro_area_path}] if macro_area_path else [])
+  + [{"name": p.theme, "path": p.theme_path}]) %}
 
 {# La pagina tema era settanta righe: briciole di pane, un hero con quattro
    conteggi, e poi fino a 58 schede in griglia. Nessuna mappa, nessuna
@@ -30,17 +36,7 @@
   "url": {{ canonical | tojson }}
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Temi", "item": "{{ site_url }}/temi" },
-    { "@type": "ListItem", "position": 3, "name": {{ p.theme | tojson }}, "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {% if classifica %}
 {# Dichiarato solo quando la classifica e' in pagina: `.claude/rules/app.md`
    vuole JSON-LD dove il visibile lo sostiene, e qui il visibile e' la tabella. #}
@@ -63,9 +59,7 @@
 
 {% block content %}
 <article class="page page-theme wrap-wide" id="contenuto">
-  <nav class="breadcrumb">
-    <a href="/temi">Temi</a>{% if p.macro_area %} / <a href="/temi#{{ p.macro_area | lower | replace(' ', '-') | replace(',', '') }}">{{ p.macro_area }}</a>{% endif %}
-  </nav>
+  {{ breadcrumb.trail(percorso) }}
 
   <div class="theme-hero">
     <div class="theme-hero__main">

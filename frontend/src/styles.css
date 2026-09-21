@@ -1418,6 +1418,10 @@ h1, h2, h3 { font-family: var(--font-display); }
 .spa-seo-fallback > p { font-size: 16px; color: var(--ink-soft); margin: 0 0 24px; max-width: 62ch; }
 .spa-seo-fallback nav { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 0 0 32px; }
 .spa-seo-fallback nav a { padding: 7px 14px; border: 1px solid var(--line); border-radius: 0; font-size: 13.5px; font-weight: 600; }
+/* La pagina corrente non e' un link: il macro `_breadcrumb.html` la rende come
+   `span`, qui come dappertutto. Senza questa riga sarebbe l'unica voce del
+   percorso senza pillola, perche' questa pagina non carica `site.css`. */
+.spa-seo-fallback nav .breadcrumb__here { padding: 7px 14px; border: 1px solid var(--line); font-size: 13.5px; font-weight: 600; color: var(--muted); }
 .spa-seo-fallback section { margin: 0 0 24px; }
 .spa-seo-fallback h2 { font-size: 18px; margin: 0 0 12px; }
 .spa-seo-fallback ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }

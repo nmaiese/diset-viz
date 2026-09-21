@@ -1,4 +1,6 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'hub' %}
 
@@ -8,20 +10,12 @@
 {% block head_extra %}
 <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/game.css') }}">
 <script type="module" crossorigin src="{{ asset_url('dist/assets/game.js') }}"></script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Quiz Italia", "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {% endblock %}
 
 {% block content %}
 <article class="page game-page wrap-wide" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
   <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
 
   {% include "_game_subnav.html" %}

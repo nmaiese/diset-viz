@@ -1,4 +1,6 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Temi", "path": "/temi"}] %}
 {% set active_nav = 'temi' %}
 
 {% block title %}I {{ theme_total }} temi dell'atlante, {{ total }} indicatori per regione{% endblock %}
@@ -14,16 +16,7 @@
   "url": {{ canonical | tojson }}
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Temi", "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {# La stessa griglia di schede che si vede qui sotto, macro-area per
    macro-area: l'elenco esiste in pagina, il blocco lo dichiara e basta. #}
 <script type="application/ld+json">
@@ -50,6 +43,7 @@
 
 {% block content %}
 <article class="themes-index" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
   <section class="themes-hero">
     <p class="eyebrow">Temi</p>
     <h1>I temi</h1>

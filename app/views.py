@@ -1070,6 +1070,12 @@ def theme_page(theme_slug):
             [{"region_key": r["region_key"], "value": r["score"]} for r in standings["rows"]]
         ) if standings["rows"] else {},
         featured=_theme_featured(profile),
+        # L'ancora della macro-area, la stessa che usa la home. Il template se la
+        # calcolava da se' con `lower | replace(' ', '-') | replace(',', '')`, che
+        # non e' la regola di `slugify_taxonomy` e puntava a un'ancora che non e'
+        # mai esistita: "Reddito, inclusione e accessibilita'" diventava
+        # `reddito-inclusione-e-accessibilità` con l'accento dentro.
+        macro_area_path=_area_anchor(profile["macro_area"]) if profile.get("macro_area") else None,
         seo_title=_theme_title(profile, standings),
         seo_description=_theme_description(profile, standings),
         site_url=SITE_URL,

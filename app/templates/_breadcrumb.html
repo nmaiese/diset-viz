@@ -1,0 +1,40 @@
+{# Il percorso, una volta sola, per gli occhi e per le macchine.
+
+   C'erano cinque forme sparse in nove template, e su una pagina le due non
+   dicevano la stessa cosa: la scheda indicatore dichiarava in JSON-LD
+   Home > Temi > tema > indicatore, e a schermo si leggeva "Temi / tema". Un
+   `BreadcrumbList` che non corrisponde al percorso visibile e' proprio cio' che
+   Google chiede di non fare, e nessuna prova lo vedeva perche' i due pezzi
+   stavano a settanta righe di distanza nello stesso file.
+
+   Qui la lista e' una sola. `items` e' una sequenza di `{name, path}`, dalla
+   home alla pagina corrente inclusa: l'ultima voce non e' un link a schermo e
+   porta `item` nel JSON-LD, come vuole lo schema. #}
+
+{# `classe` e `separatore` esistono per `/confronto`, che e' il guscio della SPA:
+   non carica `site.css`, quindi `.breadcrumb` non e' definita, e le sue voci
+   sono gia' vestite a pillole da `.spa-seo-fallback nav a`. Senza queste due
+   leve quella pagina resterebbe l'unica col percorso scritto a mano. #}
+{% macro trail(items, classe="breadcrumb", separatore=true) %}
+<nav{{ (' class="' ~ classe ~ '"') | safe if classe }} aria-label="Percorso">
+  {%- for item in items %}
+  {%- if loop.last %}<span class="breadcrumb__here" aria-current="page">{{ item.name }}</span>
+  {%- else %}<a href="{{ item.path }}">{{ item.name }}</a>{% if separatore %} <span aria-hidden="true">/</span>{% endif %}
+  {%- endif %}
+  {%- endfor %}
+</nav>
+{% endmacro %}
+
+{% macro jsonld(items, site_url) %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {%- for item in items %}
+    { "@type": "ListItem", "position": {{ loop.index }}, "name": {{ item.name | tojson }}, "item": {{ (site_url ~ item.path) | tojson }} }{{ "," if not loop.last }}
+    {%- endfor %}
+  ]
+}
+</script>
+{% endmacro %}
