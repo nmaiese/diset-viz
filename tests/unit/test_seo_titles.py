@@ -84,6 +84,33 @@ class TitoloTest(unittest.TestCase):
         self.assertIn(" per provincia", titolo)
         self.assertNotIn(" per regione", titolo)
 
+    def test_la_misura_si_accorcia_solo_a_una_giuntura(self):
+        """Il taglio a caratteri consegnava tronconi, e li faceva collidere.
+
+        "Differenza tra tasso di occupazione maschile e femminile" usciva come
+        "Differenza tra tasso per regione", identico alla scheda del tasso di
+        attivita'. Su 594 schede il taglio a budget ne mutilava 138. Ora o si
+        taglia dove il nome ha una giuntura, o si rinuncia alle cifre.
+        """
+        nome = "Differenza tra tasso di occupazione maschile e femminile"
+        lv = level(best=("Basilicata", 26.3), worst=("Valle d'Aosta", 6.1))
+        titolo = seo_titles.answer_title(meta(name=nome, unit="%"), lv)
+        self.assertNotIn("Differenza tra tasso per", titolo)
+        self.assertIn(nome, titolo)
+
+    def test_una_giuntura_vera_accorcia_e_lascia_spazio_alle_cifre(self):
+        """Dove il nome ha una preposizione la testa regge da sola, e le cifre
+        ci stanno: e' il caso che vale il 71% delle impression."""
+        lv = level(best=("Milano", 34343.0), worst=("Vibo Valentia", 13387.8),
+                   key="provincia", singular="provincia", plural="province",
+                   year_max=2023, territory_total=103)
+        nome = "Retribuzione media annua dei lavoratori dipendenti"
+        titolo = seo_titles.answer_title(meta(name=nome, unit="euro"), lv)
+        self.assertTrue(titolo.startswith("Retribuzione media annua"), titolo)
+        self.assertIn(" per provincia", titolo)
+        self.assertIn("34.343", titolo)
+        self.assertLessEqual(len(titolo), seo_titles.TITLE_MAX)
+
     def test_la_percentuale_si_attacca_al_numero(self):
         lv = level(best=("Trentino Alto Adige", 2.0), worst=("Campania", 13.9))
         titolo = seo_titles.answer_title(meta(name="Tasso di disoccupazione", unit="%"), lv)

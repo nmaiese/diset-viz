@@ -1407,7 +1407,15 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
     # salva, e allargare il vocabolario dei marcatori per due pagine tocca le
     # altre 370. Sono dichiarate, non nascoste: la prova serve a far diventare
     # rossa una collisione **nuova**.
-    COLLISIONI_NOTE = {frozenset({"598", "599"})}
+    # 910 e bes:01SAL001 sono **la stessa serie Istat pubblicata da due
+    # famiglie**: stesso nome, stessi estremi (84,8 e 82,1), stesso anno, e tutte
+    # e due nella sitemap. A tenerne distinti i titoli era solo l'etichetta
+    # dell'unita', "anni" da una parte e "Numero medio di anni" dall'altra, che
+    # `_short_unit` scarta perche' troppo lunga. Quell'unita' e' caduta da sola
+    # quando il sacrificio ha smesso di togliere la coda del livello prima
+    # dell'unita', e ha scoperto il guasto vero: qui non collidono due titoli,
+    # collidono due pagine. Si risolve nel catalogo, non in `seo_titles`.
+    COLLISIONI_NOTE = {frozenset({"598", "599"}), frozenset({"910", "bes:01SAL001"})}
 
     @classmethod
     def setUpClass(cls):

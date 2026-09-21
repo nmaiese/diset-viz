@@ -36,6 +36,25 @@ DESCRIPTION_MAX = 155
 # alle cifre che consegnare un nome mutilato.
 MIN_MEASURE = 20
 
+# Le giunture dove un nome di indicatore si puo' tagliare: davanti a una
+# preposizione cio' che resta e' ancora un sintagma compiuto ("Retribuzione media
+# annua" da "Retribuzione media annua dei lavoratori dipendenti"). Fuori da qui
+# il taglio cade in mezzo a un'espressione e consegna un troncone.
+_JOINTS = frozenset((
+    "di", "del", "dello", "della", "dei", "degli", "delle", "dell'",
+    "da", "dal", "dallo", "dalla", "dai", "dagli", "dalle", "dall'",
+    "a", "al", "allo", "alla", "ai", "agli", "alle", "all'", "ad",
+    "in", "nel", "nello", "nella", "nei", "negli", "nelle", "nell'",
+    "con", "col", "coi", "su", "sul", "sullo", "sulla", "sui", "sugli", "sulle", "sull'",
+    "per", "presso", "secondo", "senza", "sotto", "sopra", "verso",
+))
+
+# Una testa che contiene uno di questi non regge da sola: `che` apre una
+# relativa che vuole il suo predicato, `tra` e `fra` vogliono la coppia. Da li'
+# escono "Famiglie che lamentano" e "Differenza tra tasso", che in SERP valgono
+# meno del nome intero.
+_UNRESOLVED = frozenset(("che", "tra", "fra", "cui"))
+
 
 def _decimals(value):
     """Quante cifre dopo la virgola merita un numero in un titolo.
@@ -144,16 +163,66 @@ def _fit(measure, marker, room):
     Ma `_compact_title` **non rispetta il budget che riceve**: con venti
     caratteri a disposizione restituisce "Retribuzione (Retribuzione media
     annua)", trentanove caratteri e per giunta ridicolo. Il percorso derivato di
-    `indicator_notes` lo avvolge in `_clamp_title`, che taglia e basta. Qui, se
-    sfora, si ripiega su `_truncate_words`, che il budget lo rispetta: si perde
-    la coda che distingue, ma si tiene la coda del livello, che per la ricerca
-    vale di piu' ("stipendi per provincia").
+    `indicator_notes` lo avvolge in `_clamp_title`, che taglia e basta.
+
+    Qui, se sfora, si ripiega su `_shorten_at_joint`, non su `_truncate_words`.
+    `_truncate_words` taglia dove finisce il budget: rispetta il conteggio e
+    sfigura il nome. Su 594 schede ne mutilava 138 e ne faceva collidere parecchie
+    ("Differenza tra tasso per regione" su due pagine diverse, "Famiglie che
+    lamentano per regione" su tre), cioe' proprio il guasto che `_compact_title`
+    esiste per evitare. Quando nemmeno la giuntura basta si torna vuoti, e chi
+    chiama rinuncia alle cifre invece che al nome.
     """
     compact = indicator_notes._compact_title(measure, marker, room)
-    if compact and len(compact) <= room and _whole_words(compact, measure):
+    if compact and len(compact) <= room and _whole_words(compact, measure) and _head_holds(compact):
         return compact
-    trimmed = indicator_notes._truncate_words(measure, room - len(marker))
+    trimmed = _shorten_at_joint(measure, room - len(marker))
     return f"{trimmed}{marker}" if trimmed else ""
+
+
+def _head_holds(compact):
+    """La testa di `testa (coda)` si legge da sola?
+
+    `_compact_title` guarda il budget, non il senso: su "Differenza tra tasso di
+    occupazione maschile e femminile" consegnava "Differenza (maschile e
+    femminile)", dieci caratteri di testa che non dicono di che cosa sia la
+    differenza, e identici a quelli della scheda gemella sul tasso di attivita'.
+    La soglia e' in parole, non in caratteri: `MIN_MEASURE` qui bocciava anche
+    "Famiglie con fonte" (diciotto), cioe' la testa che tiene distinte le tre
+    schede di quella famiglia, ed e' proprio il caso per cui `_compact_title`
+    esiste. Una parola sola non dice mai di che cosa si parla, tre gia' si'.
+    """
+    head = compact.split(" (", 1)[0]
+    words = head.split()
+    if head == compact:
+        return True
+    if len(words) < 2:
+        return False
+    return not any(word.lower().rstrip(",") in _UNRESOLVED for word in words)
+
+
+def _shorten_at_joint(measure, room):
+    """La misura accorciata a una sua giuntura, o stringa vuota.
+
+    Si taglia solo davanti a una preposizione, dove cio' che resta e' ancora un
+    sintagma che si legge da solo, e si tiene la testa piu' lunga che ci sta.
+    Niente scende sotto `MIN_MEASURE`, e una testa che contiene una relativa o un
+    `tra` senza coppia si scarta: meglio il nome intero senza cifre che un
+    troncone con le cifre accanto.
+    """
+    words = (measure or "").split()
+    scelta = ""
+    for index in range(1, len(words)):
+        if words[index].lower().rstrip(",") not in _JOINTS:
+            continue
+        head = " ".join(words[:index]).rstrip(" ,.;:-(")
+        if len(head) < MIN_MEASURE or len(head) > room or len(head) >= len(measure):
+            continue
+        if any(word.lower().rstrip(",") in _UNRESOLVED for word in head.split()):
+            continue
+        if len(head) > len(scelta):
+            scelta = head
+    return scelta
 
 
 def _whole_words(compact, measure):
@@ -179,6 +248,12 @@ def answer_title(meta, level, max_len=TITLE_MAX):
     livello, poi si accorcia la misura, e solo se neanche cosi' ci sta si
     rinuncia alle cifre. La misura non scende sotto `MIN_MEASURE`, perche' un
     nome irriconoscibile non lo clicca nessuno neanche con un numero accanto.
+
+    L'ordine sta scritto qui e non in due cicli annidati: annidandoli l'unita'
+    sopravviveva alla coda del livello, e usciva "Retribuzione media annua, da
+    34.343 a 13.388 euro" invece di "Retribuzione media annua per provincia, da
+    34.343 a 13.388". Dire "euro" accanto a una cifra in euro non aggiunge
+    niente; dire "per provincia" risponde a meta' della domanda.
     """
     measure = indicator_notes._short_name_for_title(meta.get("name") or "")
     if not measure:
@@ -187,17 +262,21 @@ def answer_title(meta, level, max_len=TITLE_MAX):
     tail = _level_tail(level)
     with_unit, without_unit = _figures(meta, level)
 
-    for figures in (with_unit, without_unit, None):
-        for tail_part in (tail, ""):
-            room = max_len - len(tail_part) - len(figures or "")
-            if room - len(marker) < MIN_MEASURE:
-                continue
-            text = _fit(measure, marker, room)
-            if not text:
-                continue
-            candidate = f"{text}{tail_part}{figures or ''}"
-            if len(candidate) <= max_len:
-                return candidate
+    tentativi = (
+        (with_unit, tail), (without_unit, tail),
+        (with_unit, ""), (without_unit, ""),
+        (None, tail), (None, ""),
+    )
+    for figures, tail_part in tentativi:
+        room = max_len - len(tail_part) - len(figures or "")
+        if room - len(marker) < MIN_MEASURE:
+            continue
+        text = _fit(measure, marker, room)
+        if not text:
+            continue
+        candidate = f"{text}{tail_part}{figures or ''}"
+        if len(candidate) <= max_len:
+            return candidate
     return None
 
 

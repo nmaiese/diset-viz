@@ -115,7 +115,7 @@ PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
         {"path": "/openapi.json", "content_type": "application/json", "marker": "\"openapi\"", "kind": "document", "x_robots": "noindex, nofollow, noarchive"},
         {"path": "/.well-known/agent-skills/index.json", "content_type": "application/json", "marker": "\"skills\"", "kind": "document", "x_robots": "noindex, nofollow, noarchive"},
         {"path": "/.well-known/agent-skills/query-divario-italia/SKILL.md", "content_type": "text/markdown", "marker": "# Consultare Divario Italia", "kind": "document", "x_robots": "noindex, nofollow, noarchive"},
-        {"path": "/", "content_type": "text/html", "marker": "Un atlante per leggere l'Italia", "kind": "html", "markdown_marker": "# Divario Italia"},
+        {"path": "/", "content_type": "text/html", "marker": "Indicatore in evidenza", "kind": "html", "markdown_marker": "# Divario Italia"},
         {"path": "/atlante", "content_type": "text/html", "marker": "Atlante degli indicatori territoriali italiani", "kind": "html", "markdown_marker": "# Atlante degli indicatori territoriali italiani"},
         {"path": "/catalogo-dati", "content_type": "text/html", "marker": "Catalogo dati di Divario Italia", "kind": "html", "markdown_marker": "# Catalogo dati di Divario Italia"},
         {"path": "/blog", "content_type": "text/html", "marker": "Analisi brevi e basate sui dati", "kind": "html", "markdown_marker": "# Storie dai dati"},
