@@ -1389,6 +1389,99 @@ class AppSmokeTest(unittest.TestCase):
         self.assertTrue(first_row["Dato"])
 
 
+class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
+    """La catena vera di `seo_titles.page_title`, su tutto il catalogo indicizzabile.
+
+    Il test che c'era sopra esercita `indicator_notes.seo_title` per conto suo,
+    che e' solo l'ultimo anello: da quando la scheda passa da `page_title`,
+    quello non prova piu' cio' che il sito serve davvero.
+
+    Le due collisioni note e il perche' restano scritte qui sotto: una pagina
+    che collide non e' un dettaglio, sono due URL indicizzabili che si
+    presentano a Google con lo stesso titolo.
+    """
+
+    # 598 e 599 differiscono **in mezzo** al nome ("di genere femminile" contro
+    # "in eta' giovanile") e sono `contextual`, quindi non hanno estremi da cui
+    # ricavare cifre che le distinguano. Nessun accorciatore testa-coda le
+    # salva, e allargare il vocabolario dei marcatori per due pagine tocca le
+    # altre 370. Sono dichiarate, non nascoste: la prova serve a far diventare
+    # rossa una collisione **nuova**.
+    COLLISIONI_NOTE = {frozenset({"598", "599"})}
+
+    @classmethod
+    def setUpClass(cls):
+        from app import indicator_universe, indicator_view, indicator_texts, seo_titles
+
+        cls.titoli = {}
+        cls.descrizioni = {}
+        for voce in indicator_universe.indexable_catalog():
+            base = voce["meta"]
+            vista = indicator_view.build_indicator_view(base["family"], str(base["raw_id"]))
+            meta, level = vista["meta"], vista["levels"][0]
+            articolo = indicator_texts.build_article(meta["id"], level["key"])
+            # Le due chiamate sono le stesse che fa `_render_indicator`, incluso
+            # il lead composto come ultima spiaggia: senza quello la descrizione
+            # torna `None` sulle serie `contextual` senza pezzo, e il test
+            # misurerebbe una pagina che il sito non serve.
+            lead = articolo["lead"] or indicator_texts.composed_lead(meta, level)
+            cls.titoli[meta["id"]] = seo_titles.page_title(
+                articolo, meta, level, site_name="Divario Italia")
+            cls.descrizioni[meta["id"]] = seo_titles.page_description(
+                articolo, meta, level, composed=lead)
+
+    def test_nessun_titolo_sfora_il_budget_serp(self):
+        for ind, titolo in self.titoli.items():
+            with self.subTest(indicatore=ind):
+                self.assertTrue(titolo, ind)
+                self.assertLessEqual(len(titolo), 60, f"{ind}: {titolo}")
+                self.assertGreaterEqual(len(titolo), 8, f"{ind}: {titolo}")
+                self.assertEqual(titolo, titolo.strip())
+
+    def test_nessuna_descrizione_sfora_il_budget_serp(self):
+        for ind, descrizione in self.descrizioni.items():
+            with self.subTest(indicatore=ind):
+                self.assertTrue(descrizione, ind)
+                self.assertLessEqual(len(descrizione), 155, f"{ind}: {descrizione}")
+                self.assertTrue(descrizione.rstrip().endswith("."), f"{ind}: {descrizione}")
+
+    def test_due_pagine_indicizzabili_non_hanno_lo_stesso_titolo(self):
+        per_titolo = {}
+        for ind, titolo in self.titoli.items():
+            per_titolo.setdefault(titolo, set()).add(ind)
+        collisioni = {frozenset(ids) for ids in per_titolo.values() if len(ids) > 1}
+        self.assertEqual(collisioni - self.COLLISIONI_NOTE, set())
+
+    def test_la_maggioranza_dei_titoli_porta_una_cifra(self):
+        """E' il punto di tutto il lavoro: un titolo che dice solo il nome della
+        serie non da' un motivo per cliccare. Le pagine senza cifra sono quasi
+        tutte `contextual`, dove il catalogo non espone estremi di proposito."""
+        con_cifra = sum(1 for t in self.titoli.values() if any(c.isdigit() for c in t))
+        self.assertGreaterEqual(con_cifra / len(self.titoli), 0.6)
+
+    def test_nessun_titolo_dice_per_regione_sopra_dati_provinciali(self):
+        """`indicator_notes._TITLE_TAIL` e' fissa: la coda ora segue il livello."""
+        from app import indicator_universe, indicator_view, seo_titles
+
+        for voce in indicator_universe.indexable_catalog():
+            base = voce["meta"]
+            vista = indicator_view.build_indicator_view(base["family"], str(base["raw_id"]))
+            level = vista["levels"][0]
+            if level["key"] != "provincia":
+                continue
+            titolo = seo_titles.answer_title(vista["meta"], level)
+            with self.subTest(indicatore=base["id"]):
+                self.assertNotIn(" per regione", titolo or "")
+
+    def test_niente_caratteri_vietati_in_serp(self):
+        """Gli assoluti di `content/STYLE.md` valgono anche sul testo in SERP."""
+        for ind in self.titoli:
+            for testo in (self.titoli[ind], self.descrizioni[ind]):
+                for vietato in ("—", "–", ";", "…"):
+                    with self.subTest(indicatore=ind, carattere=vietato):
+                        self.assertNotIn(vietato, testo or "")
+
+
 class HardeningTest(unittest.TestCase):
     def test_home_is_actually_cached(self):
         """Con i decorator nell'ordine corretto, il corpo della view / non viene

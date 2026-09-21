@@ -16,6 +16,7 @@ from app import divari
 from app import profiles
 from app import sources
 from app import seo_policy
+from app import seo_titles
 from app import indicator_notes
 from app import indicator_texts
 from app import indicator_universe
@@ -901,9 +902,13 @@ def _render_indicator(family, raw_id):
     # l'articolo non rende come H2 si toglie invece di puntare nel vuoto.
     query_map = _query_map_for_article(level["query_map"], article)
     lead = article["lead"] or indicator_texts.composed_lead(meta, level)
-    # The lead is the SERP description as well as the first thing on the page,
-    # so the two can never describe the indicator differently.
-    seo_description = indicator_notes.meta_description_from_attacco(lead)
+    # Dove il pezzo c'è, la descrizione è il suo attacco e resta la prima cosa
+    # che si legge in pagina: le due non possono dire cose diverse. Dove il
+    # pezzo non c'è, prima usciva il lead composto, che è la formula da cui
+    # nascono descrizioni che non dicono niente ("Esprime in euro la
+    # retribuzione media annua dei lavoratori dipendenti, nel perimetro medio
+    # definito dalla fonte."): lì adesso vanno le cifre.
+    seo_description = seo_titles.page_description(article, meta, level, composed=lead)
 
     explore_state = seo_policy.has_explore_params(request.args)
     noindex = (not meta["indexable"]) or explore_state
@@ -934,20 +939,17 @@ def _render_indicator(family, raw_id):
     else:
         source_qualifier = None
 
-    # Titolo H1 e SERP: autorati se il file dell'articolo li porta, altrimenti il
-    # derivato di oggi (H1 = nome amministrativo, title = boilerplate "per regione").
-    # Un titolo autorato passa comunque dal budget SEO: `authored_seo_title` clampa
-    # a `_TITLE_MAX` come il derivato, non è una scusa per sforare.
+    # Titolo H1 e SERP. L'H1 resta quello autorato o il nome amministrativo; il
+    # `<title>` passa da `seo_titles.page_title`, che prova nell'ordine il
+    # `seo_title` scritto, l'`h1` se ci sta intero, e il titolo-risposta con
+    # l'intervallo dentro. Il perché sta nel docstring di quel modulo: la CTR
+    # è 3,14% su posizioni che ne varrebbero il 4,6%, e il titolo che dice solo
+    # il nome della serie non dà un motivo per cliccare.
     page_h1 = article["h1"] or meta["name"]
-    if article["seo_title"] or article["h1"]:
-        seo_title_value = indicator_notes.authored_seo_title(
-            article["seo_title"] or article["h1"], SITE_NAME,
-            source_qualifier=source_qualifier,
-        )
-    else:
-        seo_title_value = indicator_notes.seo_title(
-            meta["name"], SITE_NAME, source_qualifier=source_qualifier
-        )
+    seo_title_value = seo_titles.page_title(
+        article, meta, level, site_name=SITE_NAME,
+        source_qualifier=source_qualifier,
+    )
 
     response = make_response(render_template(
         "indicator_page.html",
