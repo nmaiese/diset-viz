@@ -467,3 +467,97 @@ class IDatiStrutturatiDegliHub(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LaPaginaTemaRisponde(unittest.TestCase):
+    """La pagina tema era un elenco di link e non prendeva clic.
+
+    Il test guarda cosa riceve chi arriva da una ricerca: una risposta in cima,
+    una classifica con venti link a regioni, gli indicatori in gerarchia invece
+    che in un muro di schede uguali, e un'uscita. Piu' i due temi su cui la
+    classifica non si puo' calcolare, dove la pagina deve **non** fingerla.
+    """
+
+    TEMA = "/tema/lavoro-e-conciliazione"
+
+    @classmethod
+    def setUpClass(cls):
+        app.config["TESTING"] = True
+        cls.client = app.test_client()
+        cls.html = cls.client.get(cls.TEMA).get_data(as_text=True)
+
+    def test_la_classifica_porta_venti_link_a_regione(self):
+        """E' l'equity che prima la pagina non passava a nessuno: venti profili
+        regione erano orfani, e il tema non li nominava."""
+        regioni = sorted(set(re.findall(r'href="(/regione/[^"]+)"', self.html)))
+        self.assertEqual(len(regioni), 20, regioni)
+        for percorso in regioni:
+            self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
+
+    def test_la_mappa_e_colorata_dalla_rampa_del_design_system(self):
+        """Un colore cotto qui non seguirebbe il tema scuro."""
+        fills = re.findall(r'\.theme-map \[data-key="[^"]+"\]\{fill:([^}]+)\}', self.html)
+        self.assertEqual(len(fills), 20, fills)
+        for fill in fills:
+            self.assertRegex(fill.strip(), r"^var\(--seq-[1-6]\)$")
+
+    def test_la_pagina_dichiara_il_metodo_invece_di_nasconderlo(self):
+        testo = visible_text(self.html)
+        self.assertIn("media semplice", testo)
+        self.assertIn("Non è una classifica ufficiale", testo)
+
+    def test_gli_indicatori_in_evidenza_non_sono_varianti_della_stessa_misura(self):
+        """Ordinando per sola solidita' uscivano cinque schede che erano quattro
+        varianti della stessa cosa: tutte complete, tutte aggiornate, tutte che
+        dicono al lettore lo stesso."""
+        from app import atlas_catalog, views
+
+        profilo = atlas_catalog.get_atlas_theme_profile("lavoro-e-conciliazione")
+        scelti = views._theme_featured(profilo)
+        misure = [views._misura_di(i["name"]) for i in scelti]
+        self.assertEqual(len(misure), len(set(misure)), misure)
+
+    def test_c_e_un_uscita_in_fondo(self):
+        """Era l'unica pagina del sito senza blocco finale."""
+        self.assertIn('class="theme-next"', self.html)
+        self.assertIn("indicator-cta", self.html)
+
+    def test_il_titolo_e_la_descrizione_stanno_nel_budget(self):
+        from app import atlas_catalog
+
+        for voce in atlas_catalog.all_atlas_themes_index():
+            html = self.client.get(voce["path"]).get_data(as_text=True)
+            titolo = unescape(re.search(r"<title>(.*?)</title>", html, re.S).group(1)).strip()
+            descrizione = meta_content(html, "description")
+            with self.subTest(tema=voce["theme"]):
+                self.assertLessEqual(len(titolo), 60, titolo)
+                self.assertLessEqual(len(descrizione), 155, descrizione)
+                self.assertGreaterEqual(len(descrizione), 80, descrizione)
+
+    def test_dove_la_classifica_non_si_calcola_la_pagina_non_la_finge(self):
+        from app import atlas_catalog, profiles
+
+        senza = [v for v in atlas_catalog.all_atlas_themes_index()
+                 if not profiles.theme_standings(v["theme"])["rated"]]
+        if not senza:
+            self.skipTest("tutti i temi hanno una classifica")
+        for voce in senza:
+            html = self.client.get(voce["path"]).get_data(as_text=True)
+            with self.subTest(tema=voce["theme"]):
+                self.assertNotIn('class="theme-standings"', html)
+                self.assertNotIn("ItemList", html)
+                self.assertIn("non esce una classifica regionale", visible_text(html))
+
+    def test_la_variante_markdown_porta_la_stessa_risposta(self):
+        """HTML e Markdown sono lo stesso documento alla stessa URL: una
+        variante senza la risposta principale e' un'altra pagina col canonico
+        di questa."""
+        testo = self.client.get(
+            self.TEMA, headers={"Accept": "text/markdown"}).get_data(as_text=True)
+        self.assertIn("## Le regioni su questo tema", testo)
+        self.assertEqual(testo.count("/regione/"), 20)
+
+    def test_la_prosa_visibile_segue_la_guida_di_stile(self):
+        testo = visible_text(self.html)
+        for vietato in FORBIDDEN_CHARS:
+            self.assertNotIn(vietato, testo, f"tipografia vietata: {vietato!r}")

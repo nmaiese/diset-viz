@@ -1039,18 +1039,131 @@ def theme_page(theme_slug):
         abort(404)
     if request.path != profile["theme_path"]:
         return redirect(profile["theme_path"], code=301)
+    # La classifica delle venti regioni sul tema: e' quello che trasforma la
+    # pagina da elenco di link in una pagina che risponde a "dove si sta
+    # meglio". Esce dalla stessa matrice dei percentili che alimenta i profili
+    # regione, letta per tema invece che per regione. Su due temi non esce
+    # (docstring di `theme_standings`): li' la pagina mostra gli indicatori
+    # senza fingere una graduatoria.
+    standings = profiles.theme_standings(profile["theme"])
+    siblings = [
+        t for area in atlas_themes_by_macro_area() if area["macro_area"] == profile["macro_area"]
+        for t in area["themes"] if t["path"] != profile["theme_path"]
+    ]
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
-            agent_discovery.theme_markdown(profile, SITE_URL),
+            agent_discovery.theme_markdown(profile, SITE_URL, standings=standings),
             f"{SITE_URL}{profile['theme_path']}",
         )
     return render_template(
         "theme_page.html",
         profile=profile,
+        standings=standings,
+        siblings=siblings,
+        map_colors=indicator_notes.ds_choropleth_colors(
+            [{"region_key": r["region_key"], "value": r["score"]} for r in standings["rows"]]
+        ) if standings["rows"] else {},
+        featured=_theme_featured(profile),
+        seo_title=_theme_title(profile, standings),
+        seo_description=_theme_description(profile, standings),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{profile['theme_path']}",
     )
+
+
+def _theme_title(profile, standings):
+    """Il `<title>` della pagina tema, dentro i sessanta caratteri.
+
+    "Reddito, inclusione e accessibilita'" da solo ne prende trentacinque, e
+    con " per regione: la classifica 2025" arrivava a sessantasette. La coda
+    " per regione" cade per prima: e' la parte che il resto della frase gia'
+    lascia capire, mentre l'anno e la parola "classifica" sono il motivo per
+    cliccare.
+    """
+    tema = profile["theme"]
+    if standings.get("rated") and standings.get("rows"):
+        coda = f": la classifica {standings['year_max']}"
+        con_livello = f"{tema} per regione{coda}"
+        return con_livello if len(con_livello) <= 60 else f"{tema}{coda}"
+    breve = f"{tema}: {profile['indicator_count']} indicatori per regione"
+    return breve if len(breve) <= 60 else f"{tema}: {profile['indicator_count']} indicatori"
+
+
+def _theme_description(profile, standings):
+    """La descrizione SERP della pagina tema, dentro i 155 caratteri.
+
+    Si compone qui e non nel template perche' i nomi dei temi vanno da "Turismo"
+    a "Reddito, inclusione e accessibilita'" e quelli delle regioni da "Lazio" a
+    "Trentino Alto Adige": scritta in Jinja sforava di diciotto caratteri sul
+    tema piu' lungo, e in un template non si misura niente. La coda si aggiunge
+    solo se avanza spazio.
+    """
+    tema = profile["theme"]
+    if standings.get("rated") and standings.get("rows"):
+        prima, ultima = standings["rows"][0], standings["rows"][-1]
+        testo = (f"{tema}, {standings['year_max']}: in testa {prima['region']}, "
+                 f"in coda {ultima['region']}.")
+        coda = (f" Le {len(standings['rows'])} regioni ordinate su "
+                f"{standings['indicator_count']} indicatori, con mappa e classifica.")
+    else:
+        testo = f"{tema}: {profile['indicator_count']} indicatori Istat per le regioni italiane."
+        coda = " Ogni serie con fonte, classifica e andamento negli anni."
+    return testo + coda if len(testo) + len(coda) <= 155 else testo
+
+
+# Quanti indicatori si mettono in evidenza sulla pagina tema. Cinque perche'
+# sotto la piega ci va comunque l'elenco completo: qui serve un punto di
+# ingresso, non una seconda lista.
+_THEME_FEATURED = 5
+
+
+def _theme_featured(profile):
+    """I pochi indicatori con cui vale la pena aprire un tema.
+
+    Il criterio e' la solidita' del dato, non il gusto: prima quelli completi
+    su tutte le regioni, poi quelli che entrano nel punteggio della qualita'
+    della vita, poi i piu' aggiornati, e a parita' l'ordine alfabetico perche'
+    la pagina non cambi da sola fra due richieste.
+
+    Poi si sfoltisce per **misura**, e questo e' il pezzo che conta. Ordinando
+    solo per solidita', su "Lavoro e conciliazione" uscivano cinque schede che
+    erano quattro varianti della stessa cosa (attivita' maschile e femminile,
+    disoccupazione di lunga durata totale, femmine e maschi): tutte complete,
+    tutte nel punteggio, tutte aggiornate, e tutte che dicono al lettore la
+    stessa cosa. Una vetrina di varianti non e' una vetrina.
+    """
+    visti = set()
+    scelti = []
+    for ind in sorted(
+        profile["indicators"],
+        key=lambda i: (
+            not i.get("complete"),
+            not i.get("quality_life_scored"),
+            -(i.get("year_max") or 0),
+            i["name"],
+        ),
+    ):
+        chiave = _misura_di(ind["name"])
+        if chiave in visti:
+            continue
+        visti.add(chiave)
+        scelti.append(ind)
+        if len(scelti) == _THEME_FEATURED:
+            break
+    return scelti
+
+
+# Le parole che distinguono una variante dalla sua misura, non la misura.
+_DIMENSIONI = ("femmine", "femminile", "maschi", "maschile", "totale", "totali")
+
+
+def _misura_di(nome):
+    """La misura sotto un nome, senza la dimensione che ne fa una variante."""
+    senza_parentesi = re.sub(r"\s*\([^)]*\)", "", nome or "")
+    parole = [w for w in senza_parentesi.lower().split()
+              if w.strip(",.") not in _DIMENSIONI]
+    return " ".join(parole).strip()
 
 
 @app.route("/regioni")

@@ -1,16 +1,31 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'temi' %}
 {% set p = profile %}
+{% set s = standings %}
+{% set classifica = s.rated and s.rows %}
 
-{% block title %}{{ p.theme }} · {{ site_name }}{% endblock %}
-{% block description %}Tutti gli indicatori Istat del tema {{ p.theme }} per le regioni italiane: {{ p.indicator_count }} indicatori con mappe, classifiche e serie storiche.{% endblock %}
+{# La pagina tema era settanta righe: briciole di pane, un hero con quattro
+   conteggi, e poi fino a 58 schede in griglia. Nessuna mappa, nessuna
+   classifica, nessun link a una regione o a un tema vicino, e l'unica pagina
+   del sito senza un blocco finale. Non prendeva clic, ed era giusto cosi':
+   chi cerca "dove si lavora meglio in Italia" non vuole un elenco di link,
+   vuole una risposta.
+
+   Adesso la risposta c'e', e viene dalla stessa matrice che calcola i profili
+   regione, letta per tema. Dove la classifica non si puo' calcolare (due temi
+   oggi, per due motivi dichiarati in `profiles.theme_standings`) la pagina
+   torna a essere l'elenco di prima, invece di fingere una graduatoria. #}
+
+{% block title %}{{ seo_title }}{% endblock %}
+{% block description %}{{ seo_description }}{% endblock %}
 
 {% block head_extra %}
+<link rel="stylesheet" href="{{ asset_url('css/ds/theme.css') }}">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
-  "name": "{{ p.theme }} - indicatori regionali",
+  "name": {{ (p.theme ~ ', gli indicatori regionali') | tojson }},
   "description": {{ ('Indicatori Istat del tema ' ~ p.theme ~ ' per le regioni italiane.') | tojson }},
   "url": {{ canonical | tojson }}
 }
@@ -26,17 +41,42 @@
   ]
 }
 </script>
+{% if classifica %}
+{# Dichiarato solo quando la classifica e' in pagina: `.claude/rules/app.md`
+   vuole JSON-LD dove il visibile lo sostiene, e qui il visibile e' la tabella. #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": {{ (p.theme ~ ', le regioni italiane ordinate') | tojson }},
+  "numberOfItems": {{ s.rows | length }},
+  "itemListOrder": "https://schema.org/ItemListOrderDescending",
+  "itemListElement": [
+    {%- for r in s.rows %}
+    { "@type": "ListItem", "position": {{ r.rank }}, "name": {{ r.region | tojson }}, "url": "{{ site_url }}{{ r.path }}" }{{ "," if not loop.last }}
+    {%- endfor %}
+  ]
+}
+</script>
+{% endif %}
 {% endblock %}
 
 {% block content %}
 <article class="page page-theme wrap-wide" id="contenuto">
-  <nav class="breadcrumb"><a href="/temi">Temi</a>{% if p.macro_area %} / {{ p.macro_area }}{% endif %}</nav>
+  <nav class="breadcrumb">
+    <a href="/temi">Temi</a>{% if p.macro_area %} / <a href="/temi#{{ p.macro_area | lower | replace(' ', '-') | replace(',', '') }}">{{ p.macro_area }}</a>{% endif %}
+  </nav>
 
   <div class="theme-hero">
     <div class="theme-hero__main">
+      {% if classifica %}
+      <h1>{{ p.theme }}: dove le regioni stanno meglio e dove peggio</h1>
+      <p class="page-lead">Su {{ s.indicator_count }} indicatori di {{ p.theme | lower }}, nel {{ s.year_max }} la regione messa meglio è <a href="{{ s.rows[0].path }}">{{ s.rows[0].region }}</a> e quella messa peggio è <a href="{{ s.rows[-1].path }}">{{ s.rows[-1].region }}</a>. {{ p.description }}</p>
+      {% else %}
       <h1>{{ p.theme }}</h1>
       <p class="page-lead">{{ p.description }}</p>
-      <p class="page-intro">In questo tema trovi {{ p.indicator_count }} indicatori{% if p.complete_count %}, di cui {{ p.complete_count }} con dati completi e aggiornati su tutte e 20 le regioni{% endif %}{% if p.quality_life_count %}. {{ p.quality_life_count }} entrano nel punteggio della qualità della vita{% endif %}. Apri una scheda per la classifica aggiornata, oppure esplora mappa e andamento negli anni nell'atlante.</p>
+      <p class="page-intro">Su questo tema non esce una classifica regionale: gli indicatori direzionali con dati completi su tutte e venti le regioni non bastano, e un confronto su copertura parziale direbbe più di quello che i dati sanno. Qui sotto ci sono tutte le serie disponibili.</p>
+      {% endif %}
       <p class="page-note"><strong>Sottotemi delle fonti:</strong> {{ p.source_themes | join(', ') }}.</p>
     </div>
     <div class="panel-card theme-hero__stats">
@@ -44,27 +84,144 @@
       <div class="region-facts">
         <div><small>Indicatori</small><strong>{{ p.indicator_count }}</strong></div>
         <div><small>Completi</small><strong>{{ p.complete_count }}</strong></div>
-        <div><small>Nel score QoL</small><strong>{{ p.quality_life_count }}</strong></div>
-        <div><small>Ultimo aggior.</small><strong>{{ (p.indicators | map(attribute='year_max') | max) if p.indicators else 'n.d.' }}</strong></div>
+        <div><small>Nel punteggio</small><strong>{{ p.quality_life_count }}</strong></div>
+        <div><small>Ultimo anno</small><strong>{{ (p.indicators | map(attribute='year_max') | max) if p.indicators else 'n.d.' }}</strong></div>
       </div>
     </div>
   </div>
 
-  <div class="theme-grid">
-    {% for ind in p.indicators %}
-    <a class="ind-card" href="{{ ind.path }}">
-      <div class="ind-card__head">
-        <h3>{{ ind.name }}</h3>
-        <span class="ind-card__years">{{ ind.year_min }}-{{ ind.year_max }}</span>
-      </div>
-      {% if ind.plain %}<p class="ind-card__plain">{{ ind.plain }}</p>{% endif %}
-      <div class="ind-card__foot">
-        <span class="ind-card__coverage">{{ ind.region_count }} regioni{% if ind.complete %} · completa{% endif %}{% if ind.quality_life_scored %} · qualità della vita{% endif %}</span>
-        <span class="ind-card__go">Apri la scheda →</span>
-      </div>
-    </a>
-    {% endfor %}
-  </div>
+  {% if classifica %}
+  <section class="theme-standings" id="classifica">
+    <h2>Le regioni su {{ p.theme | lower }}, {{ s.year_max }}</h2>
 
+    <div class="theme-standings__grid">
+      <div class="panel-card theme-standings__map">
+        <style>
+          .theme-map .rmap-region { fill: var(--map-missing); }
+          {% for key, color in map_colors.items() %}.theme-map [data-key="{{ key }}"]{fill:{{ color }}}
+          {% endfor %}
+        </style>
+        <div class="indicator-map theme-map">
+          {% include "_italy_map.html" %}
+        </div>
+        {# La frase non dice "piu' scuro" ne' "piu' chiaro": in tema scuro la
+           rampa `--seq-*` e' riscritta al contrario, perche' li' un valore alto
+           deve staccarsi dal fondo invece di sprofondarci. Dire una direzione
+           di luminosita' sarebbe vero su un tema e falso sull'altro. #}
+        <div class="map-legend">
+          <span class="map-legend__scale" aria-hidden="true">
+            {% for step in range(1, 7) %}<span class="map-legend__swatch" style="background: var(--seq-{{ step }})"></span>{% endfor %}
+          </span>
+          <span class="map-legend__note">Il colore va dal punteggio più basso, {{ (s.rows[-1].score * 100) | round | int }} in {{ s.rows[-1].region }}, al più alto, {{ (s.rows[0].score * 100) | round | int }} in {{ s.rows[0].region }}.</span>
+        </div>
+      </div>
+
+      <div class="theme-standings__table">
+        <table class="data-table">
+          <caption class="sr-only">Le {{ s.rows | length }} regioni ordinate sul tema {{ p.theme }}, anno {{ s.year_max }}</caption>
+          <thead>
+            <tr><th class="rank">#</th><th>Regione</th><th class="num">Punteggio</th><th>Il suo indicatore migliore</th></tr>
+          </thead>
+          <tbody>
+            {% for r in s.rows %}
+            <tr>
+              <td class="num rank">{{ r.rank }}</td>
+              <td><a href="{{ r.path }}">{{ r.region }}</a></td>
+              <td class="num">
+                <span class="score-bar"><span style="width: {{ (r.score * 100) | round | int }}%"></span></span>
+                {{ (r.score * 100) | round | int }}
+              </td>
+              <td><a href="{{ r.best_indicator.path }}"><small>{{ r.best_indicator.name }}</small></a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="page-note">Il punteggio è la media semplice dei percentili orientati dei {{ s.indicator_count }} indicatori direzionali del tema, da 0 a 100, dove il verso di ogni indicatore è quello dichiarato nella sua scheda. Non è una classifica ufficiale e non pesa gli indicatori per importanza: dice dove una regione sta, rispetto alle altre, sulle serie che questo tema raccoglie. <a href="/metodologia">Come sono calcolati confronti e medie</a>.</p>
+  </section>
+  {% endif %}
+
+  {% if featured %}
+  <section class="theme-featured">
+    <h2>Gli indicatori da cui partire</h2>
+    <p class="page-intro">Cinque serie complete e aggiornate, per farsi un'idea prima di scendere nell'elenco.</p>
+    <div class="theme-grid">
+      {% for ind in featured %}
+      <a class="ind-card" href="{{ ind.path }}">
+        <div class="ind-card__head">
+          <h3>{{ ind.name }}</h3>
+          <span class="ind-card__years">{{ ind.year_min }}-{{ ind.year_max }}</span>
+        </div>
+        {% if ind.plain %}<p class="ind-card__plain">{{ ind.plain }}</p>{% endif %}
+        <div class="ind-card__foot">
+          <span class="ind-card__coverage">{{ ind.region_count }} regioni{% if ind.complete %} · completa{% endif %}{% if ind.quality_life_scored %} · qualità della vita{% endif %}</span>
+          <span class="ind-card__go">Apri la scheda →</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  {% set featured_paths = featured | map(attribute='path') | list %}
+  {% set resto = p.indicators | rejectattr('path', 'in', featured_paths) | list %}
+  {% if resto %}
+  <section class="theme-all" id="tutti">
+    <h2>Tutti gli indicatori del tema</h2>
+    {# Un elenco, non altre cinquantatre schede: cinque hanno peso, il resto ha
+       un link. Una griglia di 58 schede uguali non e' una gerarchia. #}
+    <ol class="indicator-list theme-list">
+      {% for ind in resto %}
+      {# Tutto dentro l'`<a>`: in `.indicator-list` e' l'ancora a essere il
+         riquadro, e un `<small>` fratello cadeva fuori dalla scheda. #}
+      <li>
+        <a href="{{ ind.path }}">
+          <strong>{{ ind.name }}</strong>
+          <small>{{ ind.year_min }}-{{ ind.year_max }} · {{ ind.region_count }} regioni{% if ind.quality_life_scored %} · qualità della vita{% endif %}</small>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+  {% endif %}
+
+  <section class="theme-next" id="continua">
+    <h2>Continua da qui</h2>
+    <div class="theme-next__grid">
+      {% if classifica %}
+      <div class="panel-card">
+        <p class="section-label">Le regioni agli estremi</p>
+        <ul class="indicator-list">
+          {% for r in s.rows[:3] %}<li><a href="{{ r.path }}">{{ r.region }}</a> <small>{{ r.rank }}ª su {{ s.rows | length }}</small></li>{% endfor %}
+          {% for r in s.rows[-2:] %}<li><a href="{{ r.path }}">{{ r.region }}</a> <small>{{ r.rank }}ª su {{ s.rows | length }}</small></li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% if siblings %}
+      <div class="panel-card">
+        <p class="section-label">Gli altri temi di {{ p.macro_area | lower }}</p>
+        <ul class="indicator-list">
+          {% for t in siblings %}<li><a href="{{ t.path }}">{{ t.theme }}</a> <small>{{ t.indicator_count }} indicatori</small></li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      <div class="panel-card">
+        <p class="section-label">Gli altri modi di guardare</p>
+        <ul class="indicator-list">
+          <li><a href="/regioni">Il profilo di ognuna delle venti regioni</a></li>
+          <li><a href="/confronto">Mettere due o tre territori sullo stesso piano</a></li>
+          <li><a href="/divari-regionali">Quanto pesa davvero il divario Nord-Sud</a></li>
+          <li><a href="/atlante">L'atlante, con mappa e serie storica</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <aside class="indicator-cta">
+    <p>{{ p.indicator_count }} indicatori su {{ p.theme | lower }}, con fonte, serie storica e download aperti.</p>
+    <a class="btn btn--primary" href="/atlante">Aprili nell'atlante</a>
+  </aside>
 </article>
 {% endblock %}

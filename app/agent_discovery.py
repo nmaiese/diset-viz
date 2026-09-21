@@ -586,7 +586,7 @@ def region_markdown(profile, site_url):
     return "\n".join(lines)
 
 
-def theme_markdown(profile, site_url):
+def theme_markdown(profile, site_url, standings=None):
     lines = [
         f"# {profile['theme']}",
         "",
@@ -596,6 +596,29 @@ def theme_markdown(profile, site_url):
         f"Indicatori: {profile['indicator_count']}",
         f"URL canonica: {_absolute(site_url, profile['theme_path'])}",
         "",
+    ]
+    # La classifica sta anche qui, e non per completezza: HTML e Markdown sono
+    # lo stesso documento alla stessa URL, e una variante che non porta la
+    # risposta principale della pagina e' una pagina diversa con lo stesso
+    # canonico.
+    if standings and standings.get("rated") and standings.get("rows"):
+        lines += [
+            f"## Le regioni su questo tema, {standings['year_max']}",
+            "",
+            "Media semplice dei percentili orientati dei "
+            f"{standings['indicator_count']} indicatori direzionali del tema, "
+            "da 0 a 1. Non è una classifica ufficiale.",
+            "",
+            "| # | regione | punteggio |",
+            "| ---: | --- | ---: |",
+        ]
+        for row in standings["rows"]:
+            lines.append(
+                f"| {row['rank']} | [{row['region']}]({_absolute(site_url, row['path'])}) "
+                f"| {row['score']:.2f} |"
+            )
+        lines.append("")
+    lines += [
         "## Indicatori del tema",
         "",
     ]
