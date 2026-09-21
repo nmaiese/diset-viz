@@ -308,6 +308,13 @@ def region_profile(region_key):
             "macro_area": info["macro_area"],
             "path": info["path"],
             "score": round(oriented, 4),
+            # Il percentile **grezzo**, accanto a quello orientato. Servono
+            # tutti e due e non si possono confondere: `score` dice quanto va
+            # bene, `percentile` dice dove sta il valore fra il minimo e il
+            # massimo italiano. Il ritratto ha per assi "il valore piu' basso" e
+            # "il valore piu' alto", quindi su un indicatore `lower_better` un
+            # punteggio orientato metterebbe il punto dalla parte sbagliata.
+            "percentile": round(by_region[region_key], 4),
         }
         scored.append(entry)
         by_theme[info["theme"]].append(entry)
@@ -315,13 +322,22 @@ def region_profile(region_key):
     theme_table = []
     for theme, entries in by_theme.items():
         avg = sum(e["score"] for e in entries) / len(entries)
+        rated = len(entries) >= MIN_THEME_INDICATORS
         theme_table.append({
             "theme": theme,
             "macro_area": entries[0]["macro_area"],
             "theme_path": theme_path(theme),
             "count": len(entries),
             "score": round(avg, 4),
-            "rated": len(entries) >= MIN_THEME_INDICATORS,
+            "rated": rated,
+            # Il rango e' cio' che chiude la maglia fra le due pagine: la pagina
+            # tema dice "su questo tema il Molise e' 17esimo", la pagina regione
+            # non lo diceva, e i due elenchi restavano due elenchi. Viene da
+            # `theme_standings`, memoizzata, quindi un tema si calcola una volta
+            # e lo leggono tutte e venti le regioni. Un tema non classificabile
+            # non ha rango, e la tabella non lo inventa.
+            "rank": theme_rank_of(theme, region_key) if rated else None,
+            "rank_total": len(REGION_ORDER),
         })
     theme_table.sort(key=lambda t: t["score"], reverse=True)
 
@@ -340,6 +356,14 @@ def region_profile(region_key):
     top_excels = [e for e in top_excels if e["score"] >= 0.7][:6]
     top_lags = sorted(scored, key=lambda e: e["score"])
     top_lags = [e for e in top_lags if e["score"] <= 0.3][:6]
+
+    # Il ritratto: tre indicatori dove la regione sta davanti e tre dove sta
+    # indietro, ognuno col suo percentile grezzo. Tre e tre e non i sei migliori,
+    # se no la figura racconta meta' regione. `portrait_svg` vuole coppie
+    # (nome, quota) e torna vuoto sotto le due righe, quindi una regione con un
+    # profilo piatto semplicemente non ha la figura invece di averne una falsa.
+    portrait_rows = [(e["name"], e["percentile"])
+                     for e in (top_excels[:3] + top_lags[:3])]
 
     all_indicators = _region_indicators(region_key)
     moved = [i for i in all_indicators if i["movement"]]
@@ -374,6 +398,7 @@ def region_profile(region_key):
         "themes_weak": themes_weak,
         "top_excels": top_excels,
         "top_lags": top_lags,
+        "portrait_rows": portrait_rows,
         "all_indicators": all_indicators,
         "movement_gains": movement_gains,
         "movement_losses": movement_losses,

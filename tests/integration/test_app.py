@@ -1460,6 +1460,45 @@ class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
         collisioni = {frozenset(ids) for ids in per_titolo.values() if len(ids) > 1}
         self.assertEqual(collisioni - self.COLLISIONI_NOTE, set())
 
+    # Le pagine d'ingresso: le schede le misura `self.titoli`, queste no, e
+    # nessuno le misurava. La home stava a 73 caratteri perche' finiva con
+    # `sources_label`, che si allunga a ogni fonte nuova, e la coda tagliata era
+    # proprio quella che nominava le fonti.
+    HUB = ("/", "/regioni", "/temi", "/qualita-della-vita", "/regione/molise",
+           "/regione/friuli-venezia-giulia", "/tema/lavoro-e-conciliazione",
+           "/divari-regionali", "/blog", "/metodologia", "/catalogo-dati")
+
+    def test_nessun_hub_sfora_il_budget_serp(self):
+        from html import unescape
+
+        client = app.test_client()
+        for path in self.HUB:
+            with self.subTest(path=path):
+                risposta = client.get(path)
+                self.assertEqual(risposta.status_code, 200, path)
+                corpo = risposta.get_data(as_text=True)
+                trovato = re.search(r"<title>(.*?)</title>", corpo, re.S)
+                self.assertIsNotNone(trovato, f"{path} [{risposta.content_type}] {corpo[:200]!r}")
+                titolo = unescape(trovato.group(1).strip())
+                self.assertLessEqual(len(titolo), 60, f"{path}: {titolo}")
+                self.assertTrue(titolo, path)
+
+    def test_ogni_hub_porta_un_numero_tranne_dove_non_ha_senso(self):
+        """Un hub che dice solo di che cosa parla non da' un motivo per
+        cliccare piu' di quanto ne dia la scheda. Blog, metodologia e
+        divari-regionali sono pagine di prosa: li' il numero non c'e'."""
+        from html import unescape
+
+        client = app.test_client()
+        senza_numero = {"/blog", "/metodologia", "/divari-regionali"}
+        for path in self.HUB:
+            if path in senza_numero:
+                continue
+            with self.subTest(path=path):
+                pagina = client.get(path).get_data(as_text=True)
+                titolo = unescape(re.search(r"<title>(.*?)</title>", pagina, re.S).group(1))
+                self.assertTrue(any(c.isdigit() for c in titolo), f"{path}: {titolo}")
+
     def test_la_maggioranza_dei_titoli_porta_una_cifra(self):
         """E' il punto di tutto il lavoro: un titolo che dice solo il nome della
         serie non da' un motivo per cliccare. Le pagine senza cifra sono quasi
@@ -1498,12 +1537,19 @@ class HardeningTest(unittest.TestCase):
         from app import cache
 
         cache.clear()
-        with mock.patch("app.views.render_template", return_value="OK") as rt:
-            client = app.test_client()
-            client.get("/")
-            client.get("/")
-            client.get("/")
-            self.assertEqual(rt.call_count, 1)
+        try:
+            with mock.patch("app.views.render_template", return_value="OK") as rt:
+                client = app.test_client()
+                client.get("/")
+                client.get("/")
+                client.get("/")
+                self.assertEqual(rt.call_count, 1)
+        finally:
+            # La prova funziona proprio perche' la home resta in cache, quindi
+            # esce di qui lasciandoci dentro "OK" al posto della pagina. Finche'
+            # nessuno guardava il corpo di `/` non se ne accorgeva nessuno: la
+            # prima prova che lo guarda riceve due caratteri e nessun `<title>`.
+            cache.clear()
 
     def test_events_rate_limited(self):
         """L'endpoint pubblico /api/events blocca lo spam con 429 oltre la soglia."""

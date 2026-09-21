@@ -1,7 +1,7 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'temi' %}
 
-{% block title %}I temi degli indicatori regionali · {{ site_name }}{% endblock %}
+{% block title %}I {{ theme_total }} temi dell'atlante, {{ total }} indicatori per regione{% endblock %}
 {% block description %}Esplora {{ total }} indicatori Istat per macro-area e tema: lavoro, istruzione, ambiente, salute, trasporti, qualità della vita e divari regionali.{% endblock %}
 
 {% block head_extra %}
@@ -74,7 +74,7 @@
 
   <div id="theme-groups">
     {% for a in areas %}
-    <section class="theme-group" data-area>
+    <section class="theme-group" data-area id="area-{{ a.slug }}">
       <div class="theme-group__head">
         <h2>{{ a.area }}</h2>
         <span class="theme-group__count">{{ a.count }} {{ 'indicatore' if a.count == 1 else 'indicatori' }}</span>

@@ -578,6 +578,20 @@ def region_markdown(profile, site_url):
     lines += ["", "## Indicatori da approfondire", ""]
     for item in (profile.get("top_lags") or [])[:6]:
         lines.append(f"- [{item['name']}]({_absolute(site_url, item['path'])})")
+    # La tabella dei temi col rango sta anche qui: HTML e Markdown sono lo stesso
+    # documento alla stessa URL, e il rango e' cio' che la pagina ha guadagnato.
+    # Senza, la variante per le macchine resta all'elenco di nomi che la versione
+    # visibile ha smesso di essere.
+    con_rango = [t for t in (profile.get("theme_table") or []) if t.get("rank")]
+    if con_rango:
+        lines += ["", f"## Tutti i temi, con la posizione fra le {profile['region_total']} regioni", ""]
+        lines.append(f"| tema | posizione | indicatori |")
+        lines.append("| --- | ---: | ---: |")
+        for item in con_rango:
+            lines.append(
+                f"| [{item['theme']}]({_absolute(site_url, item['theme_path'])}) "
+                f"| {item['rank']} su {item['rank_total']} | {item['count']} |"
+            )
     if profile.get("similar_regions"):
         lines += ["", "## Regioni con un profilo simile", ""]
         for item in profile["similar_regions"]:

@@ -1,7 +1,9 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'regioni' %}
 
-{% block title %}Le regioni italiane a confronto · {{ site_name }}{% endblock %}
+{# La marca cade qui come sulle schede: diciassette caratteri di un nome che
+   nessuno cerca, tolti al numero che da' un motivo per cliccare. #}
+{% block title %}Le {{ regions | length }} regioni italiane a confronto, tema per tema{% endblock %}
 {% block description %}Scegli una regione italiana e scopri il suo profilo sugli indicatori territoriali Istat: punti di forza, debolezze e regioni con un profilo simile.{% endblock %}
 
 {# Questa pagina era l'unico hub del sito senza un solo blocco di dati

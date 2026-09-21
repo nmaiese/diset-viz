@@ -37,6 +37,7 @@ from app import moderation
 from app import public_urls
 from app import publisher
 from app import agent_discovery
+from app import taxonomy
 from app.taxonomy import DUPLICATE_BES_IDS, PROVINCE_ONLY_TITLE_COLLISIONS
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
@@ -1000,9 +1001,14 @@ def region_page(region_key):
             agent_discovery.region_markdown(profile, SITE_URL),
             f"{SITE_URL}/regione/{region_key}",
         )
+    # `charts` si importa qui e non in cima come fa gia' la scheda: il modulo
+    # tira dentro lo strato dati, e in cima chiuderebbe un anello di import.
+    from app import charts
+
     return render_template(
         "region_page.html",
         profile=profile,
+        portrait=charts.portrait_svg(profile["portrait_rows"], profile["region"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/regione/{region_key}",
@@ -1359,6 +1365,14 @@ def quality_life_region_api_legacy(region_key):
     return jsonify(payload) if payload else abort(404)
 
 
+def _quality_life_row_count(level):
+    """Quante righe ha la classifica di quel livello, zero se non c'e' il dato."""
+    if not qb.has_bes_data(level):
+        return 0
+    ranking = qb.build_bes_ranking(level, qb.DEFAULT_PROFILE)
+    return len(ranking["ranking"]) if ranking else 0
+
+
 @app.route("/qualita-della-vita")
 def quality_life_index():
     preview = qb.build_bes_ranking(URL_LEVEL["regioni"], qb.DEFAULT_PROFILE)
@@ -1370,6 +1384,11 @@ def quality_life_index():
         default_profile=qb.DEFAULT_PROFILE,
         preview_rows=preview_rows,
         has_province_data=qb.has_bes_data(URL_LEVEL["province"]),
+        # I due conteggi servono al `<title>`: "20 regioni e 103 province" dice
+        # che cosa si trova, il nome del sito no. La classifica provinciale e'
+        # gia' costruita e memoizzata da `/qualita-della-vita/classifica`.
+        region_total=len(preview["ranking"]) if preview else 0,
+        province_total=_quality_life_row_count(URL_LEVEL["province"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/qualita-della-vita",
@@ -2406,13 +2425,28 @@ def _home_themes_preview():
             continue
         cards.append({
             "area": group["macro_area"],
+            "area_path": _area_anchor(group["macro_area"]),
             "count": group["indicator_count"],
             "theme_count": len(group["themes"]),
-            "themes": [t["theme"] for t in group["themes"][:4]],
+            # Nome **e** percorso: i temi erano `<span>` e la scheda mandava
+            # tutta a `/temi`, quindi la home nominava dodici temi e non ne
+            # linkava nessuno. Adesso ogni nome porta al suo tema, dove la
+            # Fase 2 ha messo mappa e classifica.
+            "themes": [{"theme": t["theme"], "path": t["path"]} for t in group["themes"][:4]],
             "best": best,
             "worst": worst,
         })
     return cards
+
+
+def _area_anchor(macro_area):
+    """Il punto di `/temi` dove comincia una macro-area.
+
+    Le macro-aree non hanno una pagina propria e non devono averla: sono un
+    raggruppamento dei temi, non una tassonomia parallela. Un'ancora pero' serve,
+    se no la scheda della home che dice "Economia e opportunita'" scarica chi
+    clicca in cima a un elenco di dodici aree."""
+    return f"/temi#area-{taxonomy.slugify_taxonomy(macro_area)}"
 
 
 def _themes_index_areas():
@@ -2450,6 +2484,7 @@ def _themes_index_areas():
             })
         areas.append({
             "area": group["macro_area"],
+            "slug": taxonomy.slugify_taxonomy(group["macro_area"]),
             "count": group["indicator_count"],
             "theme_count": len(group["themes"]),
             "themes": themes,

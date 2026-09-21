@@ -4,7 +4,13 @@
 {% set html_title = post.seo_title or post.title %}
 {% set og_image_abs = cover_abs or (site_url ~ '/static/img/og-divario-italia.svg') %}
 
-{% block title %}{{ html_title }} · {{ site_name }}{% endblock %}
+{# La marca non va nel `<title>` del post, per la stessa ragione per cui non va
+   in quello della scheda: diciassette caratteri di un nome che nessuno cerca,
+   in posizione 4-10, tolti al motivo per cliccare. Google il nome del sito lo
+   sintetizza dal nodo `WebSite` della home. Cosi' `seo_title` ha tutti i 60
+   caratteri, e non i 43 che gli restavano. Il budget lo tiene una prova, non un
+   taglio automatico: un titolo troncato a macchina e' peggio di uno corto. #}
+{% block title %}{{ html_title }}{% endblock %}
 {% block description %}{{ post.description }}{% endblock %}
 
 {% block og %}

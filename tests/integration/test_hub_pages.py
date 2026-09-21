@@ -597,3 +597,74 @@ class LaClassificaQualitaDellaVitaPortaDaQualcheParte(unittest.TestCase):
         le regioni vere, non contro il fatto che una chiave sia uscita."""
         html = self.client.get("/qualita-della-vita/classifica/province").get_data(as_text=True)
         self.assertNotIn("/regione/provincia-autonoma", html)
+
+
+class LaPaginaRegioneChiudeLaMaglia(unittest.TestCase):
+    """Tema e regione erano due elenchi che non si nominavano a vicenda.
+
+    La pagina tema dice da tempo "su questo tema il Molise e' 17esimo". La
+    pagina regione elencava i suoi temi con il solo conteggio degli indicatori,
+    quindi il lettore arrivato da un tema non ritrovava il numero da cui veniva,
+    e il collegamento fra le due pagine restava a senso unico.
+    """
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_ogni_tema_classificato_porta_il_suo_rango(self):
+        html = self.client.get("/regione/molise").get_data(as_text=True)
+        self.assertRegex(html, r"\d+ª su 20")
+
+    def test_il_rango_e_lo_stesso_che_dichiara_la_pagina_tema(self):
+        """Due percorsi che calcolano la stessa cosa devono dare lo stesso
+        numero, se no una delle due pagine mente."""
+        from app import profiles
+
+        profilo = profiles.region_profile("molise")
+        for riga in profilo["theme_table"]:
+            if not riga["rank"]:
+                continue
+            with self.subTest(tema=riga["theme"]):
+                classifica = profiles.theme_standings(riga["theme"])
+                atteso = next(r["rank"] for r in classifica["rows"]
+                              if r["region_key"] == "molise")
+                self.assertEqual(riga["rank"], atteso)
+
+    def test_un_tema_che_non_si_classifica_non_si_inventa_una_posizione(self):
+        from app import profiles
+
+        profilo = profiles.region_profile("molise")
+        for riga in profilo["theme_table"]:
+            if not riga["rated"]:
+                self.assertIsNone(riga["rank"], riga["theme"])
+
+    def test_l_itemlist_elenca_solo_i_temi_che_hanno_un_rango(self):
+        html = self.client.get("/regione/molise").get_data(as_text=True)
+        blocchi = [json.loads(b) for b in
+                   re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)]
+        liste = [b for b in blocchi if b.get("@type") == "ItemList"]
+        self.assertEqual(len(liste), 1)
+        from app import profiles
+
+        con_rango = [t for t in profiles.region_profile("molise")["theme_table"] if t["rank"]]
+        self.assertEqual(liste[0]["numberOfItems"], len(con_rango))
+        self.assertEqual(len(liste[0]["itemListElement"]), len(con_rango))
+
+    def test_il_ritratto_usa_il_percentile_grezzo_non_il_punteggio_orientato(self):
+        """La figura ha per assi "il valore piu' basso" e "il valore piu' alto":
+        un punteggio orientato metterebbe il punto dalla parte sbagliata su ogni
+        indicatore dove il valore basso e' quello buono."""
+        from app import profiles
+
+        profilo = profiles.region_profile("molise")
+        per_nome = {e["name"]: e for e in profilo["top_excels"] + profilo["top_lags"]}
+        self.assertTrue(profilo["portrait_rows"])
+        for nome, quota in profilo["portrait_rows"]:
+            with self.subTest(indicatore=nome):
+                self.assertEqual(quota, per_nome[nome]["percentile"])
+
+    def test_il_gemello_markdown_porta_la_stessa_tabella(self):
+        testo = self.client.get(
+            "/regione/molise", headers={"Accept": "text/markdown"}).get_data(as_text=True)
+        self.assertIn("## Tutti i temi, con la posizione fra le 20 regioni", testo)
+        self.assertIn(" su 20 |", testo)

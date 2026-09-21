@@ -3,7 +3,13 @@
 {# Prima pagina migrata al design system 2026: attiva font, token e chrome
    nuovi. Vedi blog_base.html per il meccanismo. #}
 
-{% block title %}{{ site_name }}: l'atlante degli indicatori territoriali {{ sources_label }}{% endblock %}
+{# La marca resta **solo qui**: la home e' la pagina delle ricerche per nome, ed
+   e' il nodo `WebSite` da cui Google prende il nome del sito per tutte le altre.
+   `sources_label` era in fondo e cresce a ogni fonte nuova: con "Istat ed
+   Eurostat" il titolo stava a 73 caratteri, tredici oltre la finestra, e la
+   coda tagliata era proprio quella che nominava le fonti. Un conteggio al suo
+   posto e' piu' corto, non cresce, e dice quanto e' grande l'atlante. #}
+{% block title %}{{ site_name }}: {{ total_indicators }} indicatori territoriali per regione{% endblock %}
 {% block description %}{{ total_indicators }} indicatori {{ sources_label }}, 20 regioni, dal {{ year_min }} al {{ year_max }}. Mappa interattiva, schede regione, confronti, qualità della vita, quiz e storie dai dati.{% endblock %}
 
 {% block head_extra %}
@@ -384,13 +390,13 @@
         <p class="eyebrow">{{ area.area }}</p>
         <p class="meta">{{ area.count }} indicatori · {{ area.theme_count }} {{ area.theme_count | it_plural('tema', 'temi') }}</p>
         <div class="topiclist">
-          {% for theme in area.themes %}<span>{{ theme }}</span>{% endfor %}
+          {% for theme in area.themes %}<a href="{{ theme.path }}">{{ theme.theme }}</a>{% endfor %}
         </div>
         <dl class="topcard__ends">
           <div><dt>In testa</dt><dd>{{ area.best }}</dd></div>
           <div><dt>In coda</dt><dd>{{ area.worst }}</dd></div>
         </dl>
-        <a class="linkcta linkcta--push" href="/temi">Esplora l'area &rarr;</a>
+        <a class="linkcta linkcta--push" href="{{ area.area_path }}">Esplora l'area &rarr;</a>
       </div>
       {% endfor %}
     </div>

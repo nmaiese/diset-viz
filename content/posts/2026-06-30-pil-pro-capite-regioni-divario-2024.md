@@ -1,6 +1,6 @@
 ---
 title: "PIL pro capite per regione: il divario Nord-Sud"
-seo_title: "PIL pro capite per regione"
+seo_title: "PIL pro capite: due volte e mezzo tra la prima e l'ultima"
 slug: pil-pro-capite-regioni-divario-2024
 description: "Nel 2024 il Trentino-Alto Adige produce 54.637 euro di PIL per abitante, la Calabria 21.702. Quasi due volte e mezzo. I dati Istat per regione."
 date: 2026-06-30

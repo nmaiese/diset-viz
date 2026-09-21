@@ -1,7 +1,9 @@
 {% extends "blog_base.html" %}
 {% set active_nav = 'atlas' %}
 
-{% block title %}Catalogo dati | Divario Italia{% endblock %}
+{# Il catalogo e' l'unica pagina il cui contenuto **e'** un conteggio, e il
+   titolo non lo diceva. La marca cade come sugli altri hub. #}
+{% block title %}Catalogo dati: {{ datasets | length }} indicatori territoriali scaricabili{% endblock %}
 {% block description %}{{ catalog_description }}{% endblock %}
 
 {% block head_extra %}
