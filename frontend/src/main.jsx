@@ -72,19 +72,35 @@ const SORTS = [
 const THEME_KEY = "divario-theme";
 
 function readStoredTheme() {
+  // La stessa regola di `_theme_bootstrap.html` e di `ds-chrome.js`: una
+  // scelta esplicita vince, senza scelta decide il sistema. Tre copie della
+  // stessa decisione, e devono restare la stessa.
   try {
-    return localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
+    const scelto = localStorage.getItem(THEME_KEY);
+    if (scelto === "dark" || scelto === "light") return scelto;
   } catch (e) {
     return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
   }
+  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
+  return "light";
 }
 
 function ThemeToggle() {
   const [theme, setTheme] = useState(readStoredTheme);
+  const primoGiro = useRef(true);
 
   useEffect(() => {
     if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
     else document.documentElement.removeAttribute("data-theme");
+    // Si scrive **solo una scelta**, non lo stato di partenza. Questo effetto
+    // gira anche al montaggio, e li' `theme` e' cio' che il sistema ha deciso:
+    // scriverlo trasformava una preferenza in una scelta esplicita, e bastava
+    // passare una volta dall'atlante per restare sul tema chiaro su tutto il
+    // sito, per sempre, senza aver toccato niente.
+    if (primoGiro.current) {
+      primoGiro.current = false;
+      return;
+    }
     try {
       localStorage.setItem(THEME_KEY, theme);
     } catch (e) {}

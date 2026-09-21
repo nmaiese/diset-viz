@@ -52,19 +52,7 @@
     <link rel="stylesheet" href="{{ asset_url('css/site.css') }}">
     <link rel="stylesheet" href="{{ asset_url('css/ds/chrome.css') }}">
     <script src="{{ url_for('static', filename='js/ds-chrome.js') }}" defer></script>
-    {# Il tema scelto va applicato prima del primo paint, altrimenti chi ha il
-       tema scuro vede un lampo di pagina chiara a ogni navigazione. #}
-    <script>
-      // `ds-js` sblocca i controlli che senza JavaScript non farebbero nulla
-      // (il bottone del drawer): senza classe restano nascosti e la
-      // navigazione passa dal footer, che e completo.
-      document.documentElement.classList.add('ds-js');
-      try {
-        if (localStorage.getItem('divario-theme') === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-        }
-      } catch (e) {}
-    </script>
+    {% include "_theme_bootstrap.html" %}
     {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
     <script type="module" crossorigin src="{{ asset_url('dist/assets/site.js') }}"></script>
     {% endif %}

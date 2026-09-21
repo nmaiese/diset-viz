@@ -62,7 +62,12 @@
     "unitText": {{ meta.unit | tojson }},{% endif %}{% if estremi.alto %}
     "minValue": {{ estremi.basso.value }},
     "maxValue": {{ estremi.alto.value }},{% endif %}
-    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}
+    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}{% if meta.archive %},
+    {# "Che cosa misura questa serie" secondo l'istituto: `description` della
+       variabile e' lo slot giusto, e il testo e' lo stesso che la pagina
+       mostra nell'apparato sotto "Definizione della fonte". Nessuna
+       dichiarazione che la pagina visibile non sostenga. #}
+    "description": {{ meta.archive | tojson }}{% endif %}
   },
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}

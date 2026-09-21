@@ -19,11 +19,21 @@
   );
 
   function readTheme() {
+    // La stessa regola di `_theme_bootstrap.html`, e deve restare la stessa:
+    // una scelta esplicita vince, senza scelta decide il sistema. Quando qui
+    // si leggeva solo localStorage, chi aveva il sistema in scuro riceveva una
+    // pagina scura con la luna sul bottone, e il primo clic "passava a scuro"
+    // senza cambiare niente.
     try {
-      return localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
+      var scelto = localStorage.getItem(THEME_KEY);
+      if (scelto === "dark" || scelto === "light") return scelto;
     } catch (e) {
       return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
     }
+    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      return "dark";
+    }
+    return "light";
   }
 
   function paintThemeButtons(theme) {

@@ -1894,5 +1894,134 @@ class NessunaAnteprimaSocialeEUnSvg(unittest.TestCase):
                 self.assertTrue(sorgente.with_suffix(".png").exists(),
                                 f"manca il PNG di {sorgente.name}")
 
+class LaDefinizioneDellaFonteStaInTutteEDueLeForme(unittest.TestCase):
+    """HTML e Markdown sono lo stesso documento alla stessa URL.
+
+    La definizione che ne da' l'istituto (`meta["archive"]`, da
+    `data/definitions/`) la pagina HTML la mostra da sempre nell'apparato. La
+    proiezione markdown no: chi chiedeva `Accept: text/markdown` riceveva la
+    formula che il sito si compone da se' e non la definizione della fonte,
+    cioe' una pagina diversa sotto lo stesso canonico. Copre 346 delle 372
+    schede indicizzabili.
+    """
+
+    SCHEDE = (
+        "/indicatore/pil-pro-capite/ter-901",
+        "/indicatore/numero-medio-di-figli-per-donna/ter-922",
+        "/indicatore/adeguata-alimentazione-tassi-standardizzati/bes-01SAL013",
+    )
+
+    # Una delle 26 scoperte: `data/definitions/` non ha ancora il foglio delle
+    # serie provinciali BES, e li' la pagina deve restare com'era.
+    SENZA_DEFINIZIONE = "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P"
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def _markdown(self, path):
+        return self.client.get(path, headers={"Accept": "text/markdown"}).get_data(as_text=True)
+
+    def test_il_markdown_la_porta(self):
+        for path in self.SCHEDE:
+            with self.subTest(path=path):
+                self.assertIn("## Definizione della fonte", self._markdown(path))
+
+    def test_e_lo_stesso_testo_dell_html(self):
+        for path in self.SCHEDE:
+            with self.subTest(path=path):
+                html = unescape(self.client.get(path).get_data(as_text=True))
+                riga = re.search(r"<dt>Definizione della fonte</dt>\s*<dd>(.*?)<a ", html, re.S)
+                self.assertIsNotNone(riga, f"{path}: l'HTML non la mostra piu'")
+                testo = re.sub(r"<[^>]+>", "", riga.group(1)).strip()
+                self.assertIn(testo, unescape(self._markdown(path)))
+
+    def test_la_dichiara_anche_il_dataset(self):
+        """`variableMeasured.description` e' lo slot per "che cosa misura", e
+        quello che ci sta dentro la pagina lo mostra: nessuna dichiarazione che
+        il visibile non sostenga."""
+        import json
+
+        for path in self.SCHEDE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                for blocco in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S):
+                    documento = json.loads(blocco)
+                    if documento.get("@type") != "Dataset":
+                        continue
+                    descrizione = documento["variableMeasured"].get("description")
+                    self.assertTrue(descrizione)
+                    self.assertIn(descrizione, unescape(html))
+                    break
+                else:
+                    self.fail(f"{path}: nessun Dataset")
+
+    def test_una_scheda_senza_definizione_non_inventa_la_sezione(self):
+        """Le 26 scoperte sono le provinciali BES, dove `data/definitions/` non
+        arriva ancora: li' ne' l'HTML ne' il markdown devono emettere un titolo
+        sopra il vuoto."""
+        html = self.client.get(self.SENZA_DEFINIZIONE).get_data(as_text=True)
+        self.assertNotIn("Definizione della fonte", html)
+        self.assertNotIn("## Definizione della fonte", self._markdown(self.SENZA_DEFINIZIONE))
+
+
+class IlTemaSegueIlSistemaFinoAllaPrimaScelta(unittest.TestCase):
+    """Una regola sola, in tre implementazioni che devono restare d'accordo.
+
+    Prima: `ds-chrome.js`, il bootstrap inline e il toggle React leggevano solo
+    `localStorage`, quindi chi tiene il sistema in scuro riceveva il sito
+    chiaro. Peggio, il toggle React scriveva `localStorage` **al montaggio**:
+    bastava passare una volta da `/atlante` perche' una preferenza di sistema
+    diventasse una scelta esplicita e il sito restasse chiaro per sempre.
+
+    La regola: una scelta esplicita vince, senza scelta decide
+    `prefers-color-scheme`, e si scrive solo quando qualcuno tocca
+    l'interruttore.
+    """
+
+    PAGINE = ("/", "/atlante", "/confronto", "/temi", "/blog",
+              "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita")
+    TEMPLATES = Path(__file__).resolve().parents[2] / "app" / "templates"
+    STATICI = Path(__file__).resolve().parents[2] / "app" / "static"
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_ogni_pagina_decide_il_tema_una_volta_sola(self):
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertEqual(html.count("divario-theme"), 1, path)
+                self.assertIn("prefers-color-scheme", html, path)
+
+    def test_nessun_template_si_riscrive_il_bootstrap(self):
+        """Erano tre copie a mano in app.html, blog_base.html e
+        confronto.html: tre copie della stessa regola vanno fuori sincrono."""
+        for percorso in self.TEMPLATES.glob("*.html"):
+            if percorso.name == "_theme_bootstrap.html":
+                continue
+            with self.subTest(template=percorso.name):
+                self.assertNotIn("divario-theme", percorso.read_text(encoding="utf-8"))
+
+    def test_il_bootstrap_decide_prima_di_dipingere(self):
+        """Applicato dopo il primo paint, chi legge in scuro vede un lampo di
+        pagina chiara a ogni navigazione."""
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertLess(html.index("divario-theme"), html.index("</head>"), path)
+
+    def test_le_altre_due_implementazioni_seguono_la_stessa_regola(self):
+        for percorso in (self.STATICI / "js" / "ds-chrome.js",
+                         Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx"):
+            with self.subTest(file=percorso.name):
+                sorgente = percorso.read_text(encoding="utf-8")
+                self.assertIn("prefers-color-scheme", sorgente)
+
+    def test_il_toggle_react_non_scrive_al_montaggio(self):
+        """La riga che ha congelato il sito sul chiaro: `localStorage.setItem`
+        dentro un effetto che gira anche al primo render."""
+        sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
+        self.assertIn("primoGiro", sorgente)
+
 if __name__ == "__main__":
     unittest.main()

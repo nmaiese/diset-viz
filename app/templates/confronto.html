@@ -51,14 +51,7 @@
     <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
     <script type="module" crossorigin src="{{ asset_url('dist/assets/index.js') }}"></script>
     <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/index.css') }}">
-    <script>
-      document.documentElement.classList.add('ds-js');
-      try {
-        if (localStorage.getItem('divario-theme') === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-        }
-      } catch (e) {}
-    </script>
+    {% include "_theme_bootstrap.html" %}
   </head>
   <body class="ds">
     {% include "_third_party_body.html" %}

@@ -49,17 +49,7 @@
     <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
     <script type="module" crossorigin src="{{ asset_url('dist/assets/index.js') }}"></script>
     <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/index.css') }}">
-    {# Il tema va applicato prima del primo paint, o chi ha il tema scuro vede
-       un lampo di pagina chiara a ogni ingresso nell'atlante. Stessa chiave di
-       localStorage del resto del sito, o i due chrome si contraddirebbero. #}
-    <script>
-      document.documentElement.classList.add('ds-js');
-      try {
-        if (localStorage.getItem('divario-theme') === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
-        }
-      } catch (e) {}
-    </script>
+    {% include "_theme_bootstrap.html" %}
   </head>
   <body class="ds">
     {% include "_third_party_body.html" %}
