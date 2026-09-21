@@ -59,6 +59,19 @@ class DesignSystemMigration(unittest.TestCase):
         self.assertEqual(response.status_code, 200, path)
         return response.get_data(as_text=True)
 
+    def _statico(self, path):
+        """Un file statico, chiuso subito.
+
+        Flask serve i file statici con un wrapper che tiene aperto il
+        descrittore finche' non lo si chiude: senza `close()` la suite lascia
+        dietro di se' un ResourceWarning per ogni font."""
+        response = self.client.get(path)
+        self.assertEqual(response.status_code, 200, path)
+        try:
+            return response.get_data()
+        finally:
+            response.close()
+
     # --- 1. le shell dell'atlante -----------------------------------------
     def test_every_spa_shell_is_migrated_together(self):
         for path in SPA_ROUTES:
@@ -82,12 +95,46 @@ class DesignSystemMigration(unittest.TestCase):
                          "una shell monta l'atlante ma non e' fra quelle sorvegliate")
 
     def test_the_spa_shells_carry_the_2026_fonts(self):
+        """I nomi delle famiglie non stanno piu' nell'HTML.
+
+        Finche' il foglio era la URL di Google, `family=Newsreader` si leggeva
+        nella pagina. Adesso i font sono nostri e le famiglie stanno in
+        `fonts.css`: la pagina dichiara il foglio, e il foglio le famiglie.
+        La prova segue la catena invece di cercare una stringa che il difetto
+        ha semplicemente spostato di file.
+        """
+        css = self._statico("/static/css/fonts.css").decode("utf-8")
+        for famiglia in ("Newsreader", "Public Sans", "Spline Sans Mono"):
+            self.assertIn(f"font-family: '{famiglia}'", css)
+
         for path in SPA_ROUTES:
             with self.subTest(path=path):
                 html = self._html(path)
-                self.assertIn("Newsreader", html)
+                self.assertIn("css/fonts.css", html)
                 self.assertNotIn("family=Archivo", html,
                                  f"{path}: carica ancora i font legacy")
+                self.assertNotIn("fonts.googleapis.com", html,
+                                 f"{path}: torna a un foglio bloccante di terza parte")
+
+    def test_ogni_font_dichiarato_esiste_e_si_scarica_una_volta_sola(self):
+        """Una `src` che punta a un file che non c'e' non fallisce: il browser
+        ripiega sul font di sistema e la pagina rende storta senza che niente lo
+        dica. E un `preload` con una URL diversa da quella del foglio scarica lo
+        stesso font due volte, che e' peggio di non precaricarlo."""
+        css = self._statico("/static/css/fonts.css").decode("utf-8")
+        richiamati = set(re.findall(r"url\(\.\./fonts/([^)]+)\)", css))
+        self.assertTrue(richiamati)
+        for nome in sorted(richiamati):
+            with self.subTest(font=nome):
+                self.assertGreater(len(self._statico(f"/static/fonts/{nome}")), 1000)
+
+        for path in SPA_ROUTES + ("/",):
+            with self.subTest(path=path):
+                html = self._html(path)
+                for href in re.findall(r'<link rel="preload" href="([^"]+)"', html):
+                    self.assertNotIn("?v=", href,
+                                     "il precarico non coincide con la URL del foglio")
+                    self.assertIn(href.rsplit("/", 1)[1], richiamati)
 
     # --- 2. l'opt-in ------------------------------------------------------
     def test_migrated_pages_declare_the_design_system(self):
