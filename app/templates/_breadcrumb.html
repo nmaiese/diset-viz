@@ -15,11 +15,15 @@
    non carica `site.css`, quindi `.breadcrumb` non e' definita, e le sue voci
    sono gia' vestite a pillole da `.spa-seo-fallback nav a`. Senza queste due
    leve quella pagina resterebbe l'unica col percorso scritto a mano. #}
+{# Lo spazio dopo la barra sta **dentro** il blocco `{% if %}`, prima di un
+   `{% endif %}` senza trattino, ed e' voluto: scritto fuori se lo mangia il
+   `{%- endif %}` della riga successiva, e in pagina si legge `Home /Temi`. Con
+   un solo separatore non si nota, con quattro voci si'. #}
 {% macro trail(items, classe="breadcrumb", separatore=true) %}
 <nav{{ (' class="' ~ classe ~ '"') | safe if classe }} aria-label="Percorso">
   {%- for item in items %}
   {%- if loop.last %}<span class="breadcrumb__here" aria-current="page">{{ item.name }}</span>
-  {%- else %}<a href="{{ item.path }}">{{ item.name }}</a>{% if separatore %} <span aria-hidden="true">/</span>{% endif %}
+  {%- else %}<a href="{{ item.path }}">{{ item.name }}</a>{% if separatore %} <span aria-hidden="true">/</span> {% endif %}
   {%- endif %}
   {%- endfor %}
 </nav>

@@ -740,6 +740,32 @@ class IlPercorsoVisibileEQuelloDichiarato(unittest.TestCase):
                 with self.subTest(path=path, href=href):
                     self.assertEqual(self.client.get(href).status_code, 200)
 
+    def test_una_sola_lista_per_pagina(self):
+        """Due `<nav aria-label="Percorso">` sulla stessa pagina sono un percorso
+        doppio a schermo e due punti di riferimento con lo stesso nome per chi
+        naviga con la tastiera. `/divari-regionali` ne aveva due: il macro nuovo
+        sopra il `nav.divari-crumbs` che c'era gia', e si leggevano uno sotto
+        l'altro con due separatori diversi."""
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertEqual(len(re.findall(r'<nav[^>]*aria-label="Percorso"', html)), 1)
+
+    def test_il_separatore_ha_spazio_da_tutte_e_due_le_parti(self):
+        """In pagina si leggeva `Home /Temi /Reddito, inclusione e accessibilita'`.
+
+        Lo spazio prima della barra sta nel markup, quello dopo se lo mangiava
+        il `{%- endif %}` del macro. Non lo vede nessuna delle prove qui sopra,
+        perche' confrontano i nomi dopo aver tolto i tag, ed e' esattamente il
+        tipo di difetto che si vede solo guardando la pagina.
+        """
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                nav = re.search(r'<nav[^>]*aria-label="Percorso".*?</nav>', html, re.S).group(0)
+                self.assertNotIn("</span><a", nav)
+                self.assertNotIn("</span><span", nav)
+
     def test_l_ancora_della_macro_area_esiste_davvero(self):
         """La pagina tema linkava `/temi#reddito-inclusione-e-accessibilità`,
         che `/temi` non ha mai emesso: lo slug era calcolato nel template con

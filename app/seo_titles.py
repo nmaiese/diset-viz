@@ -19,10 +19,20 @@ Non e' un problema di lunghezza. Su sessanta titoli campionati la media e' 54
 caratteri e 54 stanno dentro la finestra: lo spazio c'e' gia', manca il motivo
 per cliccare. Quindi il titolo derivato porta **l'intervallo**, che e' la
 risposta alla domanda che la gente fa davvero ("pil pro capite regioni
-italiane", "pil pro capite calabria"). Copre il 70% delle pagine indicizzabili,
-259 su 372: le altre sono quasi tutte `contextual`, dove il catalogo non espone
-un massimo e un minimo perche' su quelle serie un estremo non vuol dire niente,
-e quella guardia non si aggira dal titolo.
+italiane", "pil pro capite calabria"). Copre il 61% delle pagine
+indicizzabili, 228 su 372, misurato sulla catena vera di `page_title` e non su
+questa funzione da sola. Gli estremi esistono su 273 (73%): le 99 che non li
+hanno sono quasi tutte `contextual`, dove il catalogo non espone un massimo e
+un minimo perche' su quelle serie un estremo non vuol dire niente, e quella
+guardia non si aggira dal titolo. Le altre 45 li hanno e li perdono al budget,
+perche' il nome e' troppo lungo per stare accanto all'intervallo: li' si
+rinuncia alle cifre invece che al nome, ed e' lo scambio giusto. Una forma
+compatta ("9,4-0,4%") ne recupererebbe quattro, che non valgono un secondo
+formato di numero in SERP.
+
+Il 70% che stava scritto qui era il conto fatto prima che `_shorten_at_joint`
+sostituisse il taglio a budget, cioe' prima della correzione raccontata in
+`_fit`.
 """
 from __future__ import annotations
 
