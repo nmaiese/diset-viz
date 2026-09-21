@@ -90,14 +90,21 @@
 
   <div class="profile-quad{{ '' if has_movement else ' profile-quad--two' }}">
     <section class="profile-card profile-strong" id="forza">
-      <h2>Dove eccelle</h2>
+      <h2>Dove va meglio</h2>
+      {# I tre temi migliori ci sono sempre. `netto` distingue un tema davvero
+         sopra la media da uno che e' solo il migliore dei suoi: prima, sotto
+         soglia, la pagina rispondeva "Nessun tema emerge nettamente sopra la
+         media" alla domanda per cui il lettore era venuto. #}
       {% if p.themes_strong %}
       <ul class="theme-chips">
         {% for t in p.themes_strong %}
-        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a></li>
+        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a>{% if not t.netto %} <small>di poco</small>{% endif %}</li>
         {% endfor %}
       </ul>
-      {% else %}<p class="page-note">Nessun tema emerge nettamente sopra la media.</p>{% endif %}
+      {% if not p.themes_strong[0].netto %}
+      <p class="page-note">Nessun tema stacca nettamente la media: questi sono i tre in cui {{ p.region }} se la cava meglio.</p>
+      {% endif %}
+      {% endif %}
       {% if p.top_excels %}
       <ul class="profile-list">
         {% for e in p.top_excels %}
@@ -112,10 +119,13 @@
       {% if p.themes_weak %}
       <ul class="theme-chips">
         {% for t in p.themes_weak %}
-        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a></li>
+        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a>{% if not t.netto %} <small>di poco</small>{% endif %}</li>
         {% endfor %}
       </ul>
-      {% else %}<p class="page-note">Nessun tema emerge nettamente sotto la media.</p>{% endif %}
+      {% if not p.themes_weak[0].netto %}
+      <p class="page-note">Nessun tema resta nettamente sotto la media: questi sono i tre in cui {{ p.region }} fatica di piu'.</p>
+      {% endif %}
+      {% endif %}
       {% if p.top_lags %}
       <ul class="profile-list">
         {% for e in p.top_lags %}
