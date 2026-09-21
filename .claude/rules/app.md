@@ -12,12 +12,25 @@ paths:
 - `/atlante` — l'atlante React/Vite (sorgente in `frontend/`, build in
   `app/static/dist/`), montato da `app/templates/app.html`. Insieme a
   `/confronto` sono le due sole pagine che caricano il bundle della SPA, e si
-  migrano sempre insieme.
+  migrano sempre insieme. **La testata non e' loro**: la rende Flask con
+  `_ds_header.html` sopra `#root`, come su ogni altra pagina, e il body porta
+  `class="ds sitechrome"` perche' `chrome.css` e' scoped sotto quella classe.
+  A React restano la barra del telefono e il pulsante di ritorno. Una testata
+  disegnata dentro la SPA sono due identita' sullo stesso dominio, ed e' gia'
+  successo.
 - `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema.
 - `/regioni`, `/regione/<key>` — l'indice delle regioni e il profilo di una.
+- `/provincia/<key>` — il profilo di una delle 103 province misurate dal BES:
+  posizione, punteggio, le dodici dimensioni, gli indicatori che la tirano su
+  e giu', le vicine in classifica. Non c'e' un indice `/province`: l'indice e'
+  la classifica, `/qualita-della-vita/classifica/province`, e il percorso passa
+  di li'. Il profilo lo monta `app/province_profile.py`, che non calcola niente
+  di nuovo: mette in forma il payload di `quality_life_bes.build_bes_territory`.
 - `/catalogo-dati` — l'elenco piatto di ogni indicatore indicizzabile.
 - `/blog`, `/blog/<slug>` — blog server-rendered (Jinja) dai Markdown in
   `content/posts/`.
+- `/blog/feed.xml` — il feed RSS 2.0 del blog, con `/feed.xml` e `/rss.xml` che
+  ci arrivano con un 301. Le date vanno in RFC 822, non nell'ISO della sitemap.
 - `/qualita-della-vita`, `/classifica`, `/metodologia`, `/province` — pagine
   qualità della vita, regionali e provinciali.
 - `/indicatore/<slug>/<acronimo>-<id>` — ogni indicatore, di ogni famiglia

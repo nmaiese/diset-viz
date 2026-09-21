@@ -778,3 +778,119 @@ class IlPercorsoVisibileEQuelloDichiarato(unittest.TestCase):
         for ancora in ancore:
             with self.subTest(ancora=ancora):
                 self.assertIn(f'id="{ancora.split("#", 1)[1]}"', temi)
+
+
+class LePagineProvincia(unittest.TestCase):
+    """103 province misurate e nessuna con una pagina.
+
+    Il sito le classifica tutte nella qualita' della vita, e il commento che
+    costruisce quella classifica lo diceva: "Le province non hanno un profilo,
+    ma la loro regione si', quindi il nome della regione diventa la porta".
+    Cioe' chi cercava "qualita' della vita provincia di Lecce" arrivava, nel
+    migliore dei casi, su una tabella di 103 righe. Il dato c'era tutto:
+    mancava la superficie.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from app import province_profile
+
+        cls.province = province_profile
+        cls.chiavi = province_profile.chiavi()
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_ce_ne_sono_centotre(self):
+        self.assertEqual(len(self.chiavi), 103)
+
+    def test_rispondono_tutte(self):
+        for chiave in self.chiavi:
+            with self.subTest(provincia=chiave):
+                self.assertEqual(self.client.get(f"/provincia/{chiave}").status_code, 200)
+
+    def test_una_chiave_inventata_fa_404(self):
+        self.assertEqual(self.client.get("/provincia/atlantide").status_code, 404)
+
+    def test_titolo_e_descrizione_stanno_nel_budget(self):
+        """Il nome piu' lungo, "Verbano-Cusio-Ossola", portava il titolo a
+        sessantaquattro: li' cade la coda "per qualita' della vita"."""
+        for chiave in self.chiavi:
+            with self.subTest(provincia=chiave):
+                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                titolo = unescape(re.search(r"<title>(.*?)</title>", html, re.S).group(1))
+                descrizione = unescape(
+                    re.search(r'<meta name="description" content="(.*?)"', html, re.S).group(1))
+                self.assertLessEqual(len(titolo), 60, titolo)
+                self.assertLessEqual(len(descrizione), 160, descrizione)
+                self.assertIn("province", titolo)
+
+    def test_una_sola_intestazione_e_un_canonico_che_punta_a_se(self):
+        for chiave in self.chiavi[:12]:
+            with self.subTest(provincia=chiave):
+                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                self.assertEqual(len(re.findall(r"<h1[^>]*>", html)), 1)
+                canonico = re.search(r'<link rel="canonical" href="([^"]+)"', html).group(1)
+                self.assertTrue(canonico.endswith(f"/provincia/{chiave}"), canonico)
+
+    def test_dichiarano_percorso_e_dataset(self):
+        for chiave in self.chiavi[:12]:
+            with self.subTest(provincia=chiave):
+                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                tipi = [json.loads(b).get("@type")
+                        for b in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)]
+                self.assertIn("BreadcrumbList", tipi)
+                self.assertIn("Dataset", tipi)
+
+    def test_stanno_tutte_in_sitemap(self):
+        sitemap = self.client.get("/sitemap.xml").get_data(as_text=True)
+        for chiave in self.chiavi:
+            with self.subTest(provincia=chiave):
+                self.assertIn(f"/provincia/{chiave}<", sitemap)
+
+    def test_la_classifica_porta_a_ognuna(self):
+        """Le 103 righe erano testo nudo, su una pagina che sta in posizione
+        4,1 per la sua query principale."""
+        html = self.client.get("/qualita-della-vita/classifica/province").get_data(as_text=True)
+        link = set(re.findall(r'href="(/provincia/[a-z0-9-]+)"', html))
+        self.assertEqual(len(link), 103)
+        for percorso in sorted(link)[:10]:
+            with self.subTest(percorso=percorso):
+                self.assertEqual(self.client.get(percorso).status_code, 200)
+
+    def test_la_pagina_porta_alla_sua_regione(self):
+        html = self.client.get("/provincia/lecce").get_data(as_text=True)
+        self.assertIn('href="/regione/puglia"', html)
+
+    def test_bolzano_e_trento_non_inventano_una_regione(self):
+        """Dichiarano "Provincia Autonoma Bolzano", che slugificata darebbe un
+        link a una pagina che non esiste: e' lo stesso controllo della
+        classifica, e per la stessa ragione."""
+        for chiave in ("bolzano", "trento"):
+            with self.subTest(provincia=chiave):
+                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                for percorso in re.findall(r'href="(/regione/[a-z0-9-]+)"', html):
+                    self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
+
+    def test_ogni_link_interno_risponde(self):
+        for chiave in ("lecce", "milano", "trieste"):
+            with self.subTest(provincia=chiave):
+                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                interni = {h for h in re.findall(r'href="(/[a-z0-9/_.-]+)"', html)
+                           if not h.startswith("/static/")}
+                for percorso in interni:
+                    with self.subTest(percorso=percorso):
+                        self.assertIn(self.client.get(percorso).status_code, (200, 301), percorso)
+
+    def test_la_variante_markdown_porta_la_stessa_risposta(self):
+        """HTML e Markdown sono lo stesso documento alla stessa URL: se la
+        variante non porta posizione e punteggio e' una pagina diversa sotto lo
+        stesso canonico."""
+        for chiave in ("lecce", "trieste"):
+            with self.subTest(provincia=chiave):
+                markdown = self.client.get(
+                    f"/provincia/{chiave}", headers={"Accept": "text/markdown"}).get_data(as_text=True)
+                profilo = self.province.profilo(chiave)
+                self.assertIn(str(profilo["rank"]), markdown)
+                self.assertIn(str(profilo["score"]), markdown)
+                self.assertIn("## Le dimensioni", markdown)

@@ -14,6 +14,7 @@ from app.atlas_catalog import (
 )
 from app import divari
 from app import profiles
+from app import province_profile
 from app import sources
 from app import seo_policy
 from app import seo_titles
@@ -1072,6 +1073,87 @@ def region_page(region_key):
     )
 
 
+def _titolo_provincia(profilo):
+    """Il `<title>` di una pagina provincia, dentro i sessanta caratteri.
+
+    "Verbano-Cusio-Ossola" da solo ne prende venti, e la forma piena arrivava a
+    sessantaquattro. Cade la coda "per qualita' della vita", che il resto della
+    frase lascia gia' capire: "53a su 103 province" non si legge in nessun
+    altro modo. Restano il nome, che e' la parola cercata, e la posizione, che
+    e' il motivo per cliccare.
+    """
+    testa = f"{profilo['name']}: {profilo['rank']}ª su {profilo['total']} province"
+    for coda in (" per qualità della vita", ""):
+        if len(testa) + len(coda) <= 60:
+            return testa + coda
+    return testa
+
+
+def _descrizione_provincia(profilo):
+    """La descrizione SERP di una pagina provincia, dentro i 160 caratteri.
+
+    Si compone qui e non nel template per la stessa ragione della pagina tema:
+    i nomi delle dimensioni vanno da "Abitazione" a "Reddito, inclusione e
+    accessibilita'" e in un template non si misura niente. Scritta in Jinja
+    sforava di sei caratteri su Lecce.
+
+    Si sacrifica in ordine: prima cade "peggio su", che e' la meta' meno
+    cercata, poi anche "meglio su". L'apertura con posizione e punteggio sta
+    sempre dentro, perche' e' il motivo per cui la pagina esiste.
+    """
+    testa = (f"Qualità della vita a {profilo['name']}: {profilo['rank']}ª su "
+             f"{profilo['total']} province, punteggio "
+             f"{str(profilo['score']).replace('.', ',')} su 100.")
+    forte = profilo["strongest"][0]["name"].lower() if profilo.get("strongest") else None
+    debole = profilo["weakest"][0]["name"].lower() if profilo.get("weakest") else None
+
+    code = []
+    if forte and debole:
+        code.append(f" Meglio su {forte}, peggio su {debole}. Dati Istat BES.")
+    if forte:
+        code.append(f" Meglio su {forte}. Dati Istat BES.")
+    code.append(" Dati Istat BES.")
+    for coda in code:
+        if len(testa) + len(coda) <= 160:
+            return testa + coda
+    return testa
+
+
+@app.route("/provincia/<province_key>")
+@cache.cached(timeout=300, unless=agent_discovery.prefers_markdown)
+def province_page(province_key):
+    """Il profilo di una provincia.
+
+    Il sito misura 103 province nella classifica della qualita' della vita e
+    nessuna di loro aveva una pagina: chi cercava "qualita' della vita
+    provincia di Lecce" arrivava su una tabella di 103 righe, e da li' poteva
+    solo salire alla regione. Il commento che costruisce quella classifica lo
+    diceva gia': "Le province non hanno un profilo, ma la loro regione si'".
+
+    Il dato c'era tutto, mancava la superficie: `province_profile` non calcola
+    niente di nuovo, mette in forma cio' che `quality_life_bes` gia' produce.
+    """
+    profilo = province_profile.profilo(province_key)
+    if profilo is None:
+        abort(404)
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.province_markdown(
+                profilo, province_profile.vicine(province_key), SITE_URL),
+            f"{SITE_URL}/provincia/{province_key}",
+        )
+    return render_template(
+        "province_page.html",
+        profile=profilo,
+        vicine=province_profile.vicine(province_key),
+        seo_description=_descrizione_provincia(profilo),
+        seo_title=_titolo_provincia(profilo),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/provincia/{province_key}",
+    )
+
+
 @app.route("/api/regions/overview")
 def regions_overview_api():
     """Compact per-region summary for the SPA 'per regioné selection map.
@@ -2053,6 +2135,11 @@ def sitemap():
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
     pages.extend({"loc": item["loc"], "priority": "0.8"} for item in public_urls.quality_life_public_urls())
+    # Le 103 province. La sorgente e' la classifica, non un elenco scritto a
+    # mano: una provincia che entra o esce dal dato non deve lasciare in
+    # sitemap una URL che risponde 404.
+    pages.extend({"loc": f"{SITE_URL}/provincia/{chiave}", "priority": "0.6"}
+                 for chiave in province_profile.chiavi())
     for post in get_posts():
         pages.append({
             "loc": post["url"],

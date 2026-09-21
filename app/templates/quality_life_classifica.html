@@ -111,9 +111,11 @@
                server-rendered. Ignored where View Transitions aren't supported. #}
             <tr style="view-transition-name: qlrow-{{ row.key }}">
               <td class="num quality-rank">{{ row.rank }}</td>
-              {# Il territorio porta al suo profilo. Le province non ne hanno
-                 uno, quindi li' la porta e' la colonna della regione. #}
-              <td>{% if not is_prov %}<a href="/regione/{{ row.key }}">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}{% if row.metro_city %} <span class="quality-metro" title="Città metropolitana">cm</span>{% endif %}</td>
+              {# Il territorio porta al suo profilo, e adesso ce l'hanno tutti:
+                 le 103 province erano testo nudo su una pagina in posizione
+                 4,1 per "classifica regioni italiane per qualita' della vita",
+                 e la sola porta era la colonna della regione. #}
+              <td><a href="{% if is_prov %}/provincia/{% else %}/regione/{% endif %}{{ row.key }}">{{ row.name }}</a>{% if row.metro_city %} <span class="quality-metro" title="Città metropolitana">cm</span>{% endif %}</td>
               {% if is_prov %}<td><small>{% if region_paths.get(row.region) %}<a href="{{ region_paths[row.region] }}">{{ row.region }}</a>{% else %}{{ row.region }}{% endif %}</small></td>{% endif %}
               <td class="quality-score-cell">
                 <span class="quality-score-bar"><span style="width: {{ row.score | round | int }}%"></span></span>

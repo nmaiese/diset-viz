@@ -26,7 +26,7 @@ _MARKDOWN_EXACT_PATHS = {
     "/catalogo-dati",
     "/metodologia",
 }
-_MARKDOWN_PREFIXES = ("/blog/", "/indicatore/", "/regione/", "/tema/")
+_MARKDOWN_PREFIXES = ("/blog/", "/indicatore/", "/provincia/", "/regione/", "/tema/")
 
 
 def markdown_available(path):
@@ -607,6 +607,62 @@ def region_markdown(profile, site_url):
         for item in profile["similar_regions"]:
             lines.append(f"- [{item['region']}]({site_url}/regione/{item['region_key']})")
     lines += ["", f"Metodo: {site_url}/metodologia"]
+    return "\n".join(lines)
+
+
+def province_markdown(profilo, vicine, site_url):
+    """La stessa pagina provincia, per chi chiede `text/markdown`.
+
+    HTML e Markdown sono lo stesso documento alla stessa URL: una variante che
+    non porta la risposta principale della pagina e' una pagina diversa con lo
+    stesso canonico.
+    """
+    lines = [
+        f"# {profilo['name']}, qualita' della vita",
+        "",
+        f"{profilo['name']} e' {profilo['rank']}a su {profilo['total']} province "
+        f"con il profilo {profilo['profile'].get('name', '').lower()}, "
+        f"punteggio {profilo['score']} su 100.",
+        "",
+        f"URL canonica: {_absolute(site_url, profilo['path'])}",
+        "",
+        "## Scheda",
+        "",
+        f"- Posizione: {profilo['rank']} su {profilo['total']}",
+        f"- Punteggio: {profilo['score']} su 100, dove 50 e' la media",
+    ]
+    if profilo.get("region"):
+        regione = profilo["region"]
+        if profilo.get("region_path"):
+            regione = f"[{regione}]({_absolute(site_url, profilo['region_path'])})"
+        lines.append(f"- Regione: {regione}")
+    lines.append(f"- Copertura: {round((profilo.get('coverage') or 0) * 100)}% degli indicatori del punteggio")
+    lines.append(f"- Fonte: {profilo['methodology'].get('source', 'Istat, BES dei Territori')}")
+
+    if profilo.get("categories"):
+        lines += ["", "## Le dimensioni, dalla piu' forte alla piu' debole", "",
+                  "| dimensione | punteggio |", "| --- | ---: |"]
+        for voce in profilo["categories"]:
+            lines.append(f"| {voce['name']} | {voce['score']} |")
+
+    for titolo, elenco in (("Gli indicatori che la tirano su", profilo.get("top_positive")),
+                           ("Gli indicatori che la tirano giu'", profilo.get("top_negative"))):
+        if elenco:
+            lines += ["", f"## {titolo}", ""]
+            for voce in elenco:
+                anno = f" ({voce['year_max']})" if voce.get("year_max") else ""
+                lines.append(f"- [{voce['name']}]({_absolute(site_url, voce['path'])}){anno}")
+
+    if vicine:
+        lines += ["", "## Le province che le stanno intorno in classifica", ""]
+        for voce in vicine:
+            lines.append(f"- {voce['rank']}a [{voce['name']}]({_absolute(site_url, voce['path'])}), {voce['score']}")
+
+    lines += ["", "## Metodo", "",
+              profilo["profile"].get("description", ""),
+              "",
+              f"Classifica completa: {_absolute(site_url, '/qualita-della-vita/classifica/province')}",
+              f"Metodologia: {_absolute(site_url, '/qualita-della-vita/metodologia')}"]
     return "\n".join(lines)
 
 
