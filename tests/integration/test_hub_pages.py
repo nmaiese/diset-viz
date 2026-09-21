@@ -5,6 +5,7 @@ guarda a cosa il lettore e il crawler ricevono davvero da /divari-regionali,
 /confronto, /ricerca e dalla vista provinciale, non a come sono costruite.
 """
 
+import json
 import re
 import unittest
 from html import unescape
@@ -413,6 +414,55 @@ class SitemapTest(unittest.TestCase):
             response = client.get(path)
             self.assertEqual(response.status_code, 200, path)
             self.assertEqual(response.headers["X-Robots-Tag"], INDEX_HEADER, path)
+
+
+class IDatiStrutturatiDegliHub(unittest.TestCase):
+    """Ogni hub dichiara l'elenco che mostra, e ogni URL elencata risponde.
+
+    `/regioni` era l'unico hub del sito senza un solo blocco JSON-LD, mentre la
+    sua `<ol>` delle venti regioni e' esattamente un `ItemList`. La regola di
+    `.claude/rules/app.md` e' che il blocco vale solo dove la pagina visibile
+    lo sostiene, quindi il test guarda tutte e due le cose insieme: il blocco
+    c'e', e le URL che dichiara esistono davvero.
+    """
+
+    HUB = {"/regioni": 20, "/temi": 12}
+
+    @classmethod
+    def setUpClass(cls):
+        app.config["TESTING"] = True
+        cls.client = app.test_client()
+
+    def _blocchi(self, percorso):
+        html = self.client.get(percorso).get_data(as_text=True)
+        return [json.loads(b) for b in re.findall(
+            r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.S)]
+
+    def test_ogni_hub_dichiara_il_suo_elenco(self):
+        for percorso, attesi in self.HUB.items():
+            with self.subTest(percorso=percorso):
+                tipi = {b.get("@type") for b in self._blocchi(percorso)}
+                self.assertIn("ItemList", tipi)
+                self.assertIn("BreadcrumbList", tipi)
+                elenco = next(b for b in self._blocchi(percorso) if b["@type"] == "ItemList")
+                self.assertEqual(len(elenco["itemListElement"]), attesi)
+                self.assertEqual(elenco["numberOfItems"], attesi)
+
+    def test_le_posizioni_sono_progressive_e_senza_buchi(self):
+        for percorso in self.HUB:
+            with self.subTest(percorso=percorso):
+                elenco = next(b for b in self._blocchi(percorso) if b["@type"] == "ItemList")
+                posizioni = [v["position"] for v in elenco["itemListElement"]]
+                self.assertEqual(posizioni, list(range(1, len(posizioni) + 1)))
+
+    def test_ogni_url_elencata_risponde(self):
+        """Un `ItemList` che punta a una pagina che non c'e' e' peggio di niente."""
+        for percorso in self.HUB:
+            elenco = next(b for b in self._blocchi(percorso) if b["@type"] == "ItemList")
+            for voce in elenco["itemListElement"]:
+                rotta = voce["url"].split("divarioitalia.it", 1)[-1]
+                with self.subTest(percorso=percorso, voce=voce["name"]):
+                    self.assertEqual(self.client.get(rotta).status_code, 200, rotta)
 
 
 if __name__ == "__main__":

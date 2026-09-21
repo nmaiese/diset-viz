@@ -4,6 +4,52 @@
 {% block title %}Le regioni italiane a confronto · {{ site_name }}{% endblock %}
 {% block description %}Scegli una regione italiana e scopri il suo profilo sugli indicatori territoriali Istat: punti di forza, debolezze e regioni con un profilo simile.{% endblock %}
 
+{# Questa pagina era l'unico hub del sito senza un solo blocco di dati
+   strutturati. L'`ItemList` non aggiunge niente che non si veda: e' la stessa
+   `<ol class="region-index-list">` qui sotto, nello stesso ordine, che e' la
+   condizione posta da `.claude/rules/app.md` (JSON-LD solo dove la pagina
+   visibile lo sostiene). #}
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Le regioni italiane a confronto",
+  "description": {{ ('Il profilo di ognuna delle venti regioni italiane sugli indicatori territoriali Istat.') | tojson }},
+  "url": {{ canonical | tojson }}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
+    { "@type": "ListItem", "position": 2, "name": "Regioni", "item": {{ canonical | tojson }} }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Le regioni italiane",
+  "numberOfItems": {{ regions | length }},
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {%- for r in regions %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "name": {{ r.region | tojson }},
+      "url": "{{ site_url }}{{ r.path }}"
+    }{{ "," if not loop.last }}
+    {%- endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <article class="page page-index wrap" id="contenuto">
   <h1>Le regioni a confronto</h1>

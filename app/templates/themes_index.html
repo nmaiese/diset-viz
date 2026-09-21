@@ -24,6 +24,28 @@
   ]
 }
 </script>
+{# La stessa griglia di schede che si vede qui sotto, macro-area per
+   macro-area: l'elenco esiste in pagina, il blocco lo dichiara e basta. #}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "I temi degli indicatori territoriali",
+  "numberOfItems": {{ theme_total }},
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {%- set ns = namespace(i=0) %}
+    {%- for a in areas %}{% for t in a.themes %}{% set ns.i = ns.i + 1 %}
+    {
+      "@type": "ListItem",
+      "position": {{ ns.i }},
+      "name": {{ t.theme | tojson }},
+      "url": "{{ site_url }}{{ t.path }}"
+    }{{ "," if not (loop.last and a == areas[-1]) }}
+    {%- endfor %}{% endfor %}
+  ]
+}
+</script>
 {% endblock %}
 
 {% block content %}
