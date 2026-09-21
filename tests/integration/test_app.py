@@ -32,16 +32,29 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://www.iubenda.com", csp)
         self.assertIn("frame-src", csp)
         self.assertIn("https://tpc.googlesyndication.com", csp)
-        self.assertIn(b"Un atlante per leggere l", home.data)
+        # Homepage sul design system 2026: opt-in dei token e del chrome nuovi.
+        self.assertIn(b'<body class="ds sitechrome">', home.data)
+        self.assertIn(b"css/ds/system.css", home.data)
+        self.assertIn(b"css/ds/home.css", home.data)
+        self.assertIn("L'Italia, regione per regione.".encode("utf-8"), home.data)
         self.assertIn(b"/atlante", home.data)
-        self.assertIn(b"Cosa puoi fare qui", home.data)
-        self.assertIn(b'<main class="home-page wrap-wide">', home.data)
-        self.assertIn(b'id="home-map-data"', home.data)
-        # The "Temi e aree" and "Confronta" previews render with real data.
+        self.assertIn(b'<main class="home" id="contenuto">', home.data)
+        # Il masthead legacy non deve sopravvivere accanto a quello nuovo.
+        self.assertNotIn(b'<header class="masthead">', home.data)
+        self.assertIn(b'class="hdr__bar"', home.data)
+        # Ogni modulo si disegna su dati veri, non su segnaposto: la mappa hero
+        # colora venti regioni, temi e confronto hanno righe reali.
+        self.assertIn(b"data-ds-heromap", home.data)
+        self.assertEqual(home.data.count(b".rmap-region[data-key="), 20)
         self.assertIn("Ogni tema è una lente sull'Italia".encode("utf-8"), home.data)
-        self.assertIn(b'class="home-theme-card"', home.data)
-        self.assertIn(b"Metti a paragone regioni", home.data)
-        self.assertIn(b'class="home-cmp-mini"', home.data)
+        self.assertIn(b'class="topcard"', home.data)
+        self.assertIn(b"data-ds-compare", home.data)
+        self.assertIn(b'class="cmprow cmprow--anim"', home.data)
+        self.assertIn(b"data-ds-qol", home.data)
+        # Grafico di confronto e barre della storia sono già disegnati lato
+        # server: senza JavaScript la pagina resta leggibile.
+        self.assertIn(b'class="cmp-line"', home.data)
+        self.assertIn(b'class="minibar__fill"', home.data)
 
         atlante = client.get("/atlante")
         self.assertEqual(atlante.status_code, 200)

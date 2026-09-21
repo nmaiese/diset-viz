@@ -1,0 +1,69 @@
+#!/bin/sh
+# Collega il branch `stage` allo stage: da qui in poi ogni push su `stage`
+# costruisce, deploya e verifica da se'. Si esegue UNA VOLTA.
+#
+#     bin/setup-staging-trigger
+#
+# Poi, per sempre:
+#
+#     git push origin stage
+#
+# Crea un trigger Cloud Build gemello di quello che gia' esiste per `master`,
+# puntato su cloudbuild-staging.yaml. Non tocca il trigger di produzione, non
+# tocca il servizio di produzione, e se il trigger c'e' gia' lo dice e si ferma
+# invece di crearne un secondo che deployerebbe due volte a ogni push.
+set -eu
+
+TRIGGER="${STAGING_TRIGGER:-diset-viz-stage}"
+REGION="${STAGING_TRIGGER_REGION:-global}"
+REPO_OWNER="${STAGING_REPO_OWNER:-nmaiese}"
+REPO_NAME="${STAGING_REPO_NAME:-diset-viz}"
+BRANCH="${STAGING_BRANCH:-stage}"
+
+if ! command -v gcloud >/dev/null 2>&1; then
+    echo "setup-staging-trigger: gcloud non e' installato." >&2
+    echo "  https://cloud.google.com/sdk/docs/install" >&2
+    exit 127
+fi
+
+project=$(gcloud config get-value project 2>/dev/null || true)
+if [ -z "$project" ] || [ "$project" = "(unset)" ]; then
+    echo "setup-staging-trigger: nessun progetto impostato. Esegui:  gcloud config set project IL_TUO_PROGETTO" >&2
+    exit 1
+fi
+
+if gcloud builds triggers describe "$TRIGGER" --region "$REGION" >/dev/null 2>&1; then
+    echo "Il trigger '$TRIGGER' esiste gia': non tocco niente."
+    echo "Per cambiarlo:  gcloud builds triggers delete $TRIGGER --region $REGION"
+    exit 0
+fi
+
+echo "Creo il trigger '$TRIGGER'"
+echo "  progetto: $project"
+echo "  repo:     $REPO_OWNER/$REPO_NAME"
+echo "  branch:   $BRANCH"
+echo "  build:    cloudbuild-staging.yaml"
+echo
+
+# `--repo-name`/`--repo-owner` e' la connessione GitHub classica, la stessa che
+# regge il trigger di master: se master si deploya da sola, questa c'e' gia' e
+# non serve autorizzare niente di nuovo.
+gcloud builds triggers create github \
+    --name "$TRIGGER" \
+    --region "$REGION" \
+    --repo-owner "$REPO_OWNER" \
+    --repo-name "$REPO_NAME" \
+    --branch-pattern "^${BRANCH}\$" \
+    --build-config cloudbuild-staging.yaml \
+    --description "Build, deploy e verifica dello stage a ogni push su $BRANCH"
+
+echo
+echo "Fatto. Da adesso:"
+echo "  git push origin $BRANCH        costruisce, deploya e verifica lo stage"
+echo
+echo "La prima build genera la password e la stampa nel log. Per rileggerla:"
+echo "  gcloud run services describe diset-viz-staging --region europe-west1 \\"
+echo "    --format='value(spec.template.spec.containers[0].env.filter(\"name:STAGING_PASSWORD\").extract(\"value\"))'"
+echo
+echo "Se la build fallisce sul deploy, alla service account di Cloud Build"
+echo "mancano i ruoli: roles/run.admin e roles/iam.serviceAccountUser."

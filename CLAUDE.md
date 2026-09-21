@@ -138,7 +138,26 @@ macro-area, senza che niente fallisca.
 
 - Non rompere `/legacy` né lo schema dati (`tests/integration/test_app.py` guarda entrambi).
 - Tenere intatta la SEO tecnica (la lista è in `.claude/rules/app.md`).
-- Tenere l'identità cartografica: navy `#15233b`, carta `#fbfaf7`, un solo
-  accento `#e4572e`, font Archivo / Inter / Space Mono.
+- **Identità visiva: un sistema solo, ovunque.** Il design system 2026 (carta
+  calda `#f5f3ee`, inchiostro `#18201e`, accento corallo `#e24b3c`, verde-acqua
+  `#0f9e86`, rampa dati sequenziale teal, angoli squadrati, font Newsreader /
+  Public Sans / Spline Sans Mono) è l'identità di tutto il sito, e i suoi token
+  stanno in `app/static/css/ds/system.css`: è l'unico posto dove si cambia un
+  colore, un font o un'ombra. La migrazione è finita, l'identità navy/Archivo
+  non c'è più, e `/legacy` è l'unica pagina rimasta sul suo stile, di proposito.
+  `site.css` sopravvive come **livello componenti**: veste le pagine e non
+  dichiara più un'identità, perché le sue regole leggono gli stessi nomi di
+  token (`--ink`, `--paper`, `--accent`, `--font-display`) che `system.css`
+  definisce. Quel ponte di nomi è come è stata fatta la migrazione, ed è ancora
+  come le componenti prendono i colori.
+  Due regole che si rompono in silenzio. **Mai cuocere un colore** (un esadecimale
+  o un `rgba()`) dentro una regola: `--seq-*` e i neutri vengono ridefiniti sotto
+  `<html data-theme="dark">`, quindi un colore cotto tiene quell'elemento sulla
+  palette chiara mentre la pagina va scura, ed è esattamente così che la testata
+  dell'atlante era rimasta bianca. E **marca, interfaccia e dati restano
+  separati**: il corallo è l'accento dell'interazione, quindi una fila di venti
+  barre di classifica è `--cmp-*` e solo quella in evidenza è corallo; un colore
+  dei dati non porta mai un giudizio, e la rampa della mappa va sempre da chiaro
+  a intenso seguendo la grandezza, qualunque sia il verso dell'indicatore.
 - Non committare segreti (`.gitignore` esclude già `client_secret_*.json`).
 - Messaggi di commit: nessun trailer `Co-Authored-By`.

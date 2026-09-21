@@ -263,11 +263,23 @@ class SearchPageTest(unittest.TestCase):
     def test_site_search_entry_points_lead_to_the_page(self):
         client = app.test_client()
         home = client.get("/").data.decode("utf-8")
-        # Il box di ricerca del masthead, il form del menu mobile e la
-        # SearchAction dello schema puntano tutti alla stessa pagina.
-        self.assertIn('class="masthead__search" href="/ricerca"', home)
-        self.assertIn('<form action="/ricerca" method="get" role="search">', home)
+        # Il campo di ricerca dell'header, quello della barra mobile e la
+        # SearchAction dello schema puntano tutti alla stessa pagina. Sul
+        # chrome 2026 i primi due sono form GET veri, quindi la ricerca
+        # funziona anche senza JavaScript.
+        self.assertIn('class="hdr__search desktop-only" role="search" action="/ricerca"', home)
+        self.assertIn('class="msearch mobile-only" role="search" action="/ricerca"', home)
         self.assertIn("/ricerca?q={search_term_string}", home)
+
+        # E ogni altra pagina ha lo stesso punto di arrivo, perche' ormai
+        # servono tutte lo stesso chrome: il masthead legacy non esiste piu'.
+        blog = client.get("/blog").data.decode("utf-8")
+        self.assertIn('class="hdr__search desktop-only" role="search" action="/ricerca"', blog)
+        self.assertIn('class="msearch mobile-only" role="search" action="/ricerca"', blog)
+        # Il vecchio punto d'ingresso non e' rimasto accanto al nuovo: due
+        # ricerche nella stessa pagina sono due comportamenti da tenere
+        # allineati, ed e' esattamente cio' che la migrazione toglieva.
+        self.assertNotIn('class="masthead__search"', blog)
 
 
 class ProvinceViewTest(unittest.TestCase):
