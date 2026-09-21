@@ -459,7 +459,12 @@ h1, h2, h3 { font-family: var(--font-display); }
 .index-panel { display: grid; gap: 16px; min-width: 0; }
 
 /* ---------- Command bar ---------- */
-.command-bar { display: grid; gap: 12px; }
+/* `min-width: 0` sulla barra e sulle sue righe: un elemento di griglia resta
+   `min-width: auto` e non scende sotto la larghezza del proprio contenuto,
+   quindi la riga dei controlli teneva 382px dentro una colonna di 343 e
+   l'atlante era l'unica pagina che scorreva di lato sul telefono. */
+.command-bar { display: grid; gap: 12px; min-width: 0; }
+.command-bar > * { min-width: 0; }
 
 .search-box {
   display: flex;
@@ -479,6 +484,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 
 .command-bar__controls {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -502,8 +508,14 @@ h1, h2, h3 { font-family: var(--font-display); }
   padding: 11px 38px 11px 13px;
   outline: none;
   min-width: 160px;
+  /* `min-width: 160px` piu' l'etichetta accanto faceva 382px di riga dentro
+     una finestra di 375: il `select` non si lasciava stringere e l'atlante era
+     l'unica pagina del sito che scorreva di lato sul telefono. `max-width`
+     lascia il minimo dove c'e' spazio e lo toglie dove non c'e'. */
+  max-width: 100%;
 }
-.command-bar__controls .select-field { display: inline-flex; align-items: center; gap: 8px; }
+.command-bar__controls .select-field { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.command-bar__controls .select-field select { min-width: 0; flex: 1 1 auto; }
 .command-bar__controls .select-field > span { margin: 0; }
 .select-icon { position: absolute; right: 12px; bottom: 13px; pointer-events: none; color: var(--muted); }
 .command-bar__controls .select-icon { bottom: auto; top: 50%; transform: translateY(-50%); }

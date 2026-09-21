@@ -648,7 +648,13 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
   .profile-quad:not(.profile-quad--two) { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 620px) {
-  .profile-quad { grid-template-columns: 1fr; }
+  /* Il selettore ripete `:not(...)` per una ragione, non per simmetria: la
+     regola a 1180px qui sopra e' `.profile-quad:not(.profile-quad--two)`, che
+     con lo `:not()` vale 0,2,0, mentre un `.profile-quad` nudo vale 0,1,0 e
+     perdeva. Il breakpoint piu' stretto restava senza effetto, e la pagina
+     regione rendeva due colonne dentro 343px di telefono. */
+  .profile-quad,
+  .profile-quad:not(.profile-quad--two) { grid-template-columns: 1fr; }
 }
 .region-movement-note { margin: 0 0 36px; }
 
@@ -724,7 +730,14 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .explorer-field select:focus { outline: none; border-color: var(--accent); }
 .explorer-count { margin: 0; font-size: 13px; color: var(--muted); }
 .explorer-count strong { color: var(--ink); font-family: var(--font-mono); }
-.explorer-table-wrap { overflow-x: auto; }
+/* Una tabella larga scorre dentro il suo contenitore invece di spingere la
+   pagina. Erano tre nomi diversi per la stessa regola, e `/metodologia` non ne
+   aveva nessuno: il nome generico e' `.table-scroll`, gli altri tre restano
+   perche' sono gia' nei template e dicono di quale tabella parlano. */
+.table-scroll,
+.explorer-table-wrap,
+.quality-table-wrap,
+.divari-table-wrap { overflow-x: auto; }
 .explorer-table td:first-child a { color: var(--ink); }
 .explorer-table td:first-child a:hover { color: var(--accent); }
 .explorer-table .explorer-theme { color: var(--muted); font-size: 13px; }
@@ -827,7 +840,12 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .region-index-card:hover { border-color: var(--accent); text-decoration: none; }
 .region-index-card__body { min-width: 0; display: grid; gap: 4px; }
 .region-index-card__body strong { font-family: var(--font-display); font-size: 16px; }
-.region-index-card__themes { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+/* `min-width: 0` sulla riga e sulle sue voci: un elemento flex non scende
+   sotto la propria larghezza di contenuto finche' resta `min-width: auto`, e
+   su "Forte: Sicurezza e legalita'" la riga arrivava a 413px dentro una scheda
+   di 313. Da li' la pagina /regioni sforava di quasi cento pixel sul telefono. */
+.region-index-card__themes { display: flex; flex-wrap: wrap; gap: 4px 12px; min-width: 0; }
+.region-index-card__themes > * { min-width: 0; overflow-wrap: anywhere; }
 .region-index-card__themes em { font-style: normal; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 .region-index-card__themes .is-strong { color: var(--positive-ink); }
 .region-index-card__themes .is-weak { color: var(--accent); }
