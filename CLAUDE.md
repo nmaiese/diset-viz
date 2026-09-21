@@ -51,12 +51,15 @@ direttamente su `master`.
 
 **Divario Italia** (divarioitalia.it) è un atlante Flask + React degli
 indicatori territoriali Istat, più un blog server-rendered per la SEO e una
-sezione qualità della vita per regioni e province. L'atlante sta a `/`
-(sorgente in `frontend/`, build in `app/static/dist/`); ogni indicatore di ogni
-famiglia a `/indicatore/<slug>/<acronimo>-<id>`, servito da **un template su un
-view model**; il blog a `/blog`; l'hub editoriale a `/divari-regionali`; il
-confronto a `/confronto`; la ricerca a `/ricerca`; la dashboard D3 originale a
-`/legacy` (non va rotta); l'API JSON sotto `/api/`. Le verità rotta per rotta
+sezione qualità della vita per regioni e province. A `/` c'è la **home
+server-rendered**, non l'atlante: l'atlante sta a `/atlante` (sorgente in
+`frontend/`, build in `app/static/dist/`) e condivide il bundle solo con
+`/confronto`. Ogni indicatore di ogni famiglia a
+`/indicatore/<slug>/<acronimo>-<id>`, servito da **un template su un view
+model**; i temi a `/temi` e `/tema/<slug>`; le regioni a `/regioni` e
+`/regione/<key>`; il blog a `/blog`; l'hub editoriale a `/divari-regionali`;
+la ricerca a `/ricerca`; la dashboard D3 originale a `/legacy` (non va rotta);
+l'API JSON sotto `/api/`. Le verità rotta per rotta
 (canonico, noindex e perché, che cosa si ricalcola al render) stanno in
 `.claude/rules/app.md`.
 

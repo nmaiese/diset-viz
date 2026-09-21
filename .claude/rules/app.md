@@ -5,7 +5,17 @@ paths:
 
 # Le rotte, e le regole che non si vedono rompendole
 
-- `/` — atlante React/Vite (sorgente in `frontend/`, build in `app/static/dist/`).
+- `/` — la home, **server-rendered** (`app/templates/home.html`): la mappa viva,
+  i quattro percorsi d'ingresso, una storia dai dati, il confronto, i temi, la
+  qualita' della vita, le analisi, i quiz. Non e' l'atlante, e non lo e' piu'
+  da quando la home e' stata rifatta sul design system 2026.
+- `/atlante` — l'atlante React/Vite (sorgente in `frontend/`, build in
+  `app/static/dist/`), montato da `app/templates/app.html`. Insieme a
+  `/confronto` sono le due sole pagine che caricano il bundle della SPA, e si
+  migrano sempre insieme.
+- `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema.
+- `/regioni`, `/regione/<key>` — l'indice delle regioni e il profilo di una.
+- `/catalogo-dati` — l'elenco piatto di ogni indicatore indicizzabile.
 - `/blog`, `/blog/<slug>` — blog server-rendered (Jinja) dai Markdown in
   `content/posts/`.
 - `/qualita-della-vita`, `/classifica`, `/metodologia`, `/province` — pagine
