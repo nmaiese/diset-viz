@@ -21,6 +21,10 @@
   position: sticky; top: 0; z-index: var(--z-sticky);
   background: var(--surface-card);
   border-bottom: 1px solid var(--line);
+  /* La barra in alto e' identica su ogni pagina: il nome la tiene ferma e la
+     fa trasformare da una navigazione all'altra invece di dissolverla insieme
+     al resto. Stava su `.masthead`, che non esiste piu'. */
+  view-transition-name: masthead;
 }
 .sitechrome .hdr__bar {
   display: flex; align-items: center; gap: 14px;

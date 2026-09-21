@@ -9,8 +9,14 @@
  *
  * Non aggiornarli sperando di cambiare l'aspetto dell'atlante, e non fidarti
  * di questi colori quando leggi il resto del file: i colori veri stanno in
- * `app/static/css/ds/system.css`. Spariranno insieme al `:root` di site.css,
- * col commit che migra l'ultima pagina.
+ * `app/static/css/ds/system.css`.
+ *
+ * Restano come ripiego, e restano per scelta: se il foglio del design system
+ * non arriva, l'atlante si vede vecchio invece di vedersi rotto. Perche' il
+ * ripiego non diventi un guasto silenzioso, `tests/unit/test_css_tokens.py`
+ * controlla che il design system ripunti **ogni** nome dichiarato qui, cioe'
+ * che nessuno di questi valori arrivi mai davvero a schermo. L'unica eccezione
+ * e' `--masthead-h`, che e' un'altezza e non un colore.
  */
 :root {
   color-scheme: light;
@@ -117,17 +123,21 @@ h1, h2, h3 { font-family: var(--font-display); }
 
 /* Interruttore del tema, stessa forma dell'`.iconbtn` del chrome del sito
    (ds/chrome.css), perche' e' lo stesso comando in due posti diversi. */
+/* Lo stesso comando dell'`.iconbtn` del chrome Jinja, quindi le stesse misure:
+   44x44 e' il bersaglio tattile del design system (--target-comfortable), e gli
+   angoli sono squadrati. Era 36x36 con raggio 8px, e il bottone che accende il
+   tema scuro si vedeva diverso a seconda che fossi sull'atlante o sul blog. */
 .masthead__theme {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: var(--target-comfortable, 44px);
+  height: var(--target-comfortable, 44px);
   flex: 0 0 auto;
   color: var(--ink-soft);
   background: none;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-0, 0);
   cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }

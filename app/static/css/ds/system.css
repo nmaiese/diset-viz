@@ -5,21 +5,26 @@
  * elevation.css, base.css) into a single file so the browser makes one
  * request instead of walking an @import chain.
  *
- * MIGRATION NOTE — why the file is split in two blocks.
- * The legacy stylesheet (css/site.css) declares its own :root with the SAME
- * names but the OLD values: --paper, --ink, --accent, --line, --font-display,
- * --font-mono, --shadow, --dur, --ease-out and friends. Both stylesheets ship
- * on every page while the migration is in flight, so:
+ * PERCHE' IL FILE E' DIVISO IN DUE BLOCCHI.
+ * Il ponte nasce da una migrazione che adesso e' finita: `site.css` dichiarava
+ * un suo `:root` con gli STESSI nomi e i valori vecchi, e `body.ds`
+ * (specificita' 0,1,1) li ripuntava battendo quel `:root` (0,1,0) qualunque
+ * fosse l'ordine di caricamento.
  *
- *   :root      carries every token whose name does NOT exist in site.css.
- *              Safe to declare globally, nothing old reads them.
- *   body.ds    carries the ~20 names that DO collide. `body.ds` is specificity
- *              (0,1,1) and beats site.css's `:root` (0,1,0) regardless of load
- *              order, so a page that opts in with <body class="ds"> gets the
- *              new palette and type, while every page that has not been
- *              migrated yet keeps its old look untouched.
+ *   :root      i token che nessun altro foglio dichiara. Qui stanno anche il
+ *              movimento e i bersagli tattili, perche' li leggono cose che
+ *              non sono figlie di <body>: `::view-transition-group(root)` e'
+ *              figlio della radice, e da dentro `body.ds` i suoi `var()` non
+ *              risolverebbero.
+ *   body.ds    i nomi che `site.css` e `frontend/src/styles.css` usano nelle
+ *              loro regole. `site.css` non dichiara piu' un'identita', ma le
+ *              sue componenti leggono ancora quei nomi, e il `:root` della SPA
+ *              resta come ripiego per quando questo foglio non arriva.
  *
- * Remove the body.ds block and fold it into :root once site.css is gone.
+ * Quindi il blocco `body.ds` non e' un residuo: e' il modo in cui il livello
+ * componenti prende i colori. Si fonde in `:root` solo il giorno che nessun
+ * foglio dichiara piu' quei nomi per conto suo, e
+ * `tests/unit/test_css_tokens.py` tiene il conto.
  * ========================================================================= */
 
 :root {
@@ -265,9 +270,18 @@
   --logo-mark-min: 20px;
   --logo-gap: 9px;
 
-  /* === MOTION =========================================================== */
+  /* === MOTION ===========================================================
+   * La scala sta qui e non in `body.ds` perche' le view transition la usano:
+   * `::view-transition-group(root)` e' figlio della radice, non di <body>, e
+   * da dentro `body.ds` i suoi `var()` non risolvono. La dissolvenza fra
+   * pagine cadeva a 0s senza che niente fallisse. */
   --dur-instant: 80ms;
+  --dur-fast: 120ms;
+  --dur: 200ms;
   --dur-slow: 320ms;
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* === ELEVATION / Z / TARGETS ========================================== */
   --shadow-tint: 24, 32, 30;
@@ -348,11 +362,8 @@ body.ds {
   --shadow: var(--elev-2);
   --shadow-tooltip: 0 8px 20px rgba(var(--shadow-tint), 0.22);
 
-  --dur-fast: 120ms;
-  --dur: 200ms;
-  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Il movimento non e' piu' qui: sta in `:root`, perche' le view transition
+     lo leggono dalla radice. Vedi la sezione MOTION piu' sopra. */
 }
 
 /* ===========================================================================

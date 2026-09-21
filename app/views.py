@@ -67,7 +67,12 @@ _HOME_STORY_INDICATORS = ("901", "408", "910", "102")
 # something the data supports rather than a placeholder.
 _HOME_COMPARE_INDICATORS = ("901", "408", "910")
 _HOME_COMPARE_REGIONS = ("lombardia", "lazio", "campania")
-_HOME_COMPARE_COLORS = ("var(--ink)", "var(--accent)", "var(--positive-ink)")
+# Palette categorica (--cat-1..3), come la serie storica piu' sotto. Prima erano
+# --ink, --accent e --positive-ink: il colore del testo, la marca e un giudizio.
+# Il primo pesa una regione piu' delle altre, il secondo svaluta l'accento
+# dov'e' l'interazione vera, il terzo dice che la Campania sta "bene". Un colore
+# qui identifica un territorio, non lo giudica.
+_HOME_COMPARE_COLORS = ("var(--cat-1)", "var(--cat-2)", "var(--cat-3)")
 
 # --- Homepage 2026 design system ------------------------------------------
 # The indicator whose regional time series drives the homepage comparison

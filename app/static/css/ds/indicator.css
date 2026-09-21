@@ -8,8 +8,12 @@
  * pochi punti in cui il livello dati del design system dice una cosa diversa
  * dal foglio vecchio.
  *
- * Si carica solo dalla pagina indicatore (`head_extra`), dopo site.css, e vale
- * solo sotto `body.ds`: le pagine non ancora migrate non lo vedono mai. */
+ * Si carica solo dalla pagina indicatore (`head_extra`), dopo site.css.
+ *
+ * Corto perche' la migrazione della pagina indicatore e' stata **solo di
+ * token**: il layout non e' stato toccato, e sotto la piega restano impilati
+ * i blocchi di navigazione che fanno leggere la scheda come un menu. Quello
+ * e' lavoro a se'. */
 
 /* --- la mappa e la sua legenda ------------------------------------------ */
 
