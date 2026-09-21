@@ -44,7 +44,7 @@ from app.taxonomy import DUPLICATE_BES_IDS, PROVINCE_ONLY_TITLE_COLLISIONS
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
-import csv, hmac, io, json, os, re, time, unicodedata
+import csv, datetime, email.utils, hmac, io, json, os, re, time, unicodedata
 import threading
 from functools import lru_cache
 from urllib.parse import quote_plus
@@ -745,6 +745,42 @@ def blog_index():
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/blog",
     )
+
+
+# I nomi con cui il feed viene cercato. `/blog/feed.xml` e' il canonico, gli
+# altri due sono le due forme che chiunque prova per prime, e finche' erano 404
+# il feed non esisteva per chi non leggeva l'HTML.
+@app.route("/feed.xml")
+@app.route("/rss.xml")
+def blog_feed_alias():
+    return redirect("/blog/feed.xml", code=301)
+
+
+@app.route("/blog/feed.xml")
+def blog_feed():
+    """Il feed del blog, RSS 2.0.
+
+    La sitemap dice a un crawler che una pagina esiste, il feed dice a chi gia'
+    segue il sito che ne e' uscita una nuova: aggregatori, newsletter, e le
+    catene che rileggono un sito senza ripassare dall'indice. Le date vanno in
+    RFC 822, che non e' l'ISO della sitemap: un lettore di feed che non sa
+    leggere `pubDate` mette l'articolo in cima per sempre.
+    """
+    posts = get_posts()[:20]
+
+    def rfc822(giorno):
+        # Mezzogiorno UTC, non mezzanotte: il post ha una data e non un orario,
+        # e con mezzanotte un lettore in un fuso a ovest lo data al giorno prima.
+        momento = datetime.datetime.combine(giorno, datetime.time(12, 0),
+                                            tzinfo=datetime.timezone.utc)
+        return email.utils.format_datetime(momento)
+
+    voci = [dict(post, pub_date=rfc822(post["date"])) for post in posts]
+    xml = render_template(
+        "blog_feed.xml", posts=voci, site_url=SITE_URL, site_name=SITE_NAME,
+        updated=rfc822(max(p["date_modified"] for p in posts)) if posts else None,
+    )
+    return Response(xml, mimetype="application/rss+xml")
 
 
 @app.route("/blog/<slug>")

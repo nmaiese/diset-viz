@@ -1934,7 +1934,12 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
             <div className="compare-main">
               <DataCard title="Serie storica" kicker={`${meta.name} · ${meta.unit}`}>
                 <div className="compare-legend">
-                  {seriesList.map((s) => <span key={s.region} className="legend-item"><i style={{ background: s.color }} />{s.region}</span>)}
+                  {/* `borderTopColor` e non `background`: `.legend-item i` ha height 0 e
+                      disegna con `border-top`, quindi un colore dato come sfondo non
+                      dipinge niente e i tre trattini restavano grigi identici, mentre
+                      la tabella qui accanto usava i quadratini colorati. Dalla legenda
+                      non si capiva quale linea fosse quale regione. */}
+                  {seriesList.map((s) => <span key={s.region} className="legend-item"><i style={{ borderTopColor: s.color }} />{s.region}</span>)}
                   <span className="legend-item legend-average"><i />Media delle regioni</span>
                 </div>
                 <CompareTimeline seriesList={seriesList} averageSeries={averageSeries} selectedYear={year} onYear={setYear} unit={meta.unit} />

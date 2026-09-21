@@ -22,7 +22,11 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://www.googletagmanager.com", csp)
         self.assertIn("https://tagmanager.google.com", csp)
         self.assertIn("https://www.google-analytics.com", csp)
-        self.assertIn("https://fonts.googleapis.com", csp)
+        # I font se li serve il sito: su una pagina del design system i due
+        # domini di Google non devono piu' comparire. Restano su /legacy,
+        # che monta Mukta da fonts.googleapis.com e non si tocca.
+        self.assertNotIn("https://fonts.googleapis.com", csp)
+        self.assertNotIn("https://fonts.gstatic.com", csp)
         self.assertIn("https://ssl.gstatic.com", csp)
         self.assertIn("https://www.gstatic.com", csp)
         self.assertIn("https://www.google.it", csp)
@@ -1719,6 +1723,176 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
                 f"potrebbe imbarcare stato di runtime o PII nell'immagine.",
             )
 
+
+class LaCspDeiFontSegueLaPagina(unittest.TestCase):
+    """Da quando i font sono self-hostati, `fonts.googleapis.com` serve a una
+    pagina sola.
+
+    Toglierlo dappertutto romperebbe `/legacy`, che carica Mukta da li' e che
+    CLAUDE.md dice di non rompere: un font che non carica e' un modo di
+    romperla. Quindi la CSP e' la stessa ovunque tranne i due domini dei font,
+    che restano sulle sole rotte legacy.
+    """
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_le_pagine_nuove_non_ammettono_i_font_di_google(self):
+        for path in ("/", "/temi", "/indicatore/pil-pro-capite/ter-901", "/blog"):
+            with self.subTest(path=path):
+                csp = self.client.get(path).headers["Content-Security-Policy"]
+                self.assertNotIn("fonts.googleapis.com", csp)
+                self.assertNotIn("fonts.gstatic.com", csp)
+
+    def test_legacy_li_ammette_ancora(self):
+        for path in ("/legacy", "/legacy-reddito"):
+            with self.subTest(path=path):
+                csp = self.client.get(path).headers["Content-Security-Policy"]
+                self.assertIn("https://fonts.googleapis.com", csp)
+                self.assertIn("https://fonts.gstatic.com", csp)
+
+    def test_il_resto_della_policy_non_cambia_fra_le_due(self):
+        """Solo i font: se un domani la CSP di legacy diverge su altro, e' un
+        buco che nessuno ha deciso di aprire."""
+        nuova = self.client.get("/").headers["Content-Security-Policy"]
+        legacy = self.client.get("/legacy").headers["Content-Security-Policy"]
+        pulita = legacy.replace(" https://fonts.googleapis.com", "").replace(" https://fonts.gstatic.com", "")
+        self.assertEqual(pulita, nuova)
+
+
+class IlFeedDelBlog(unittest.TestCase):
+    """Un feed che nessuno trova non esiste, e prima le tre forme con cui si
+    cerca rispondevano tutte e tre 404."""
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_risponde_come_rss(self):
+        risposta = self.client.get("/blog/feed.xml")
+        self.assertEqual(risposta.status_code, 200)
+        self.assertTrue(risposta.headers["Content-Type"].startswith("application/rss+xml"))
+
+    def test_e_xml_valido_con_un_item_per_post(self):
+        from xml.etree import ElementTree
+        from app.blog import get_posts
+
+        albero = ElementTree.fromstring(self.client.get("/blog/feed.xml").data)
+        voci = albero.findall("./channel/item")
+        self.assertEqual(len(voci), min(len(get_posts()), 20))
+        for voce in voci:
+            with self.subTest(voce=voce.findtext("title")):
+                for campo in ("title", "link", "guid", "pubDate", "description"):
+                    self.assertTrue((voce.findtext(campo) or "").strip(), campo)
+
+    def test_le_date_sono_in_rfc_822(self):
+        """L'ISO della sitemap qui non si legge, e un lettore che non sa
+        interpretare `pubDate` tiene l'articolo in cima per sempre."""
+        import email.utils
+        from xml.etree import ElementTree
+
+        albero = ElementTree.fromstring(self.client.get("/blog/feed.xml").data)
+        for voce in albero.findall("./channel/item"):
+            testo = voce.findtext("pubDate")
+            with self.subTest(pubDate=testo):
+                self.assertIsNotNone(email.utils.parsedate_to_datetime(testo))
+
+    def test_i_link_rispondono(self):
+        from xml.etree import ElementTree
+
+        albero = ElementTree.fromstring(self.client.get("/blog/feed.xml").data)
+        for voce in albero.findall("./channel/item"):
+            percorso = voce.findtext("link").replace("https://divarioitalia.it", "")
+            with self.subTest(percorso=percorso):
+                self.assertEqual(self.client.get(percorso).status_code, 200)
+
+    def test_le_due_forme_abbreviate_ci_portano(self):
+        for path in ("/feed.xml", "/rss.xml"):
+            with self.subTest(path=path):
+                risposta = self.client.get(path)
+                self.assertEqual(risposta.status_code, 301)
+                self.assertTrue(risposta.headers["Location"].endswith("/blog/feed.xml"))
+
+    def test_le_pagine_lo_dichiarano_in_testa(self):
+        for path in ("/blog", "/blog/pil-pro-capite-regioni-divario-2024", "/temi"):
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertIn('type="application/rss+xml"', html)
+                self.assertIn("/blog/feed.xml", html)
+
+class NessunaAnteprimaSocialeEUnSvg(unittest.TestCase):
+    """Un SVG in `og:image` vuol dire nessuna immagine.
+
+    Facebook, LinkedIn, X, WhatsApp e Slack scartano l'SVG e mostrano il link
+    nudo, e `image` dello schema `Article` vuole un raster. Il sito dichiarava
+    `twitter:card=summary_large_image`, cioe' il formato fatto apposta per una
+    figura grande, sopra un file che nessuno di quei lettori apre: ogni
+    condivisione di ogni pagina usciva senza figura.
+    """
+
+    PAGINE = (
+        "/", "/atlante", "/confronto", "/temi", "/regioni",
+        "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita", "/blog",
+        "/divari-regionali", "/catalogo-dati", "/metodologia",
+    )
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def _og_image(self, html):
+        trovato = re.search(r'<meta property="og:image" content="([^"]+)"', html)
+        return trovato.group(1) if trovato else None
+
+    def test_ogni_pagina_ne_dichiara_una_e_non_e_un_svg(self):
+        from app.blog import get_posts
+
+        percorsi = list(self.PAGINE) + [f"/blog/{post['slug']}" for post in get_posts()]
+        for path in percorsi:
+            with self.subTest(path=path):
+                immagine = self._og_image(self.client.get(path).get_data(as_text=True))
+                self.assertIsNotNone(immagine, f"{path}: nessuna og:image")
+                self.assertFalse(immagine.endswith(".svg"), f"{path}: {immagine}")
+
+    def test_il_file_dichiarato_esiste(self):
+        from app.blog import get_posts
+
+        percorsi = list(self.PAGINE) + [f"/blog/{post['slug']}" for post in get_posts()]
+        for path in percorsi:
+            with self.subTest(path=path):
+                immagine = self._og_image(self.client.get(path).get_data(as_text=True))
+                locale = immagine.replace("https://divarioitalia.it", "")
+                self.assertEqual(self.client.get(locale).status_code, 200, locale)
+
+    def test_le_misure_dichiarate_sono_quelle_vere(self):
+        """Dichiararle sbagliate e' peggio che non dichiararle: la scheda si
+        disegna sul rapporto annunciato e poi l'immagine non ci sta. Le tre
+        copertine in JPG sono 1376x768 e infatti non le dichiarano."""
+        from app.blog import get_posts, social_image_size
+
+        for post in get_posts():
+            with self.subTest(post=post["slug"]):
+                html = self.client.get(f"/blog/{post['slug']}").get_data(as_text=True)
+                larghezza = re.search(r'<meta property="og:image:width" content="(\d+)"', html)
+                misura = social_image_size(post["social_image"])
+                if misura is None:
+                    self.assertIsNone(larghezza, post["social_image"])
+                else:
+                    self.assertEqual(int(larghezza.group(1)), misura[0])
+
+    def test_la_copertina_in_pagina_resta_il_vettoriale(self):
+        """Il PNG serve al social, non allo schermo: in pagina l'SVG e' piu'
+        nitido e pesa meno."""
+        html = self.client.get("/blog/pil-pro-capite-regioni-divario-2024").get_data(as_text=True)
+        self.assertIn('src="/static/img/blog/pil-pro-capite.svg"', html)
+
+    def test_ogni_svg_di_copertina_ha_il_suo_png(self):
+        """Se manca, `blog.social_image` ripiega sulla figura del sito e il post
+        perde la sua: si rigenera con scripts/rasterize_og_images.py."""
+        cartella = Path(__file__).resolve().parents[2] / "app" / "static" / "img"
+        sorgenti = [cartella / "og-divario-italia.svg"] + sorted((cartella / "blog").glob("*.svg"))
+        for sorgente in sorgenti:
+            with self.subTest(sorgente=sorgente.name):
+                self.assertTrue(sorgente.with_suffix(".png").exists(),
+                                f"manca il PNG di {sorgente.name}")
 
 if __name__ == "__main__":
     unittest.main()

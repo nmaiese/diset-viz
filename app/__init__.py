@@ -134,12 +134,24 @@ def _supabase_connect_origins():
     return f" https://{host} wss://{host}"
 
 
-def _build_content_security_policy():
+# Le due pagine che caricano ancora un foglio di stile da fonts.googleapis.com,
+# e sono le sole. `/legacy` monta Mukta da li' (`legacy.html`), e la dashboard
+# D3 del 2019 non si tocca: e' un vincolo scritto in CLAUDE.md, e un font che
+# non carica e' un modo di romperla. Tutto il resto del sito si e' self-hostato
+# i font, quindi altrove i due domini di Google non servono piu' a niente e
+# restare in allowlist e' solo superficie in piu'.
+_GOOGLE_FONTS_PATHS = ("/legacy", "/legacy-reddito")
+
+
+def _build_content_security_policy(path=""):
     # Divario Italia usa ancora diversi inline script nei template server-side,
     # quindi una CSP strict a nonce richiederebbe una refactor più ampia.
     # Per ora teniamo una allowlist esplicita che lascia lavorare GTM, GA4,
-    # AdSense, Iubenda, i font Google e Tag Assistant senza blocchi.
+    # AdSense, Iubenda e Tag Assistant senza blocchi.
     supabase = _supabase_connect_origins()
+    font_di_google = path.startswith(_GOOGLE_FONTS_PATHS)
+    stile_google = " https://fonts.googleapis.com" if font_di_google else ""
+    font_google = " https://fonts.gstatic.com" if font_di_google else ""
     return "; ".join(
         [
             "default-src 'self'",
@@ -149,9 +161,9 @@ def _build_content_security_policy():
             "frame-ancestors 'self'",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.googletagmanager.com https://tagmanager.google.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagservices.com https://*.adtrafficquality.google https://ep2.adtrafficquality.google https://embeds.iubenda.com https://cdn.iubenda.com https://cs.iubenda.com https://idb.iubenda.com https://www.iubenda.com https://static.cloudflareinsights.com",
             "script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.googletagmanager.com https://tagmanager.google.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagservices.com https://*.adtrafficquality.google https://ep2.adtrafficquality.google https://embeds.iubenda.com https://cdn.iubenda.com https://cs.iubenda.com https://idb.iubenda.com https://www.iubenda.com https://static.cloudflareinsights.com",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.googletagmanager.com https://tagmanager.google.com https://embeds.iubenda.com https://cdn.iubenda.com https://cs.iubenda.com https://www.iubenda.com",
+            "style-src 'self' 'unsafe-inline'" + stile_google + " https://www.googletagmanager.com https://tagmanager.google.com https://embeds.iubenda.com https://cdn.iubenda.com https://cs.iubenda.com https://www.iubenda.com",
             "img-src 'self' data: blob: https://www.googletagmanager.com https://*.googletagmanager.com https://tagmanager.google.com https://ssl.gstatic.com https://www.gstatic.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://www.google.it https://*.google.it https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://stats.g.doubleclick.net https://*.adtrafficquality.google https://ep1.adtrafficquality.google https://idb.iubenda.com https://*.cloudflareinsights.com",
-            "font-src 'self' data: https://fonts.gstatic.com",
+            "font-src 'self' data:" + font_google,
             "connect-src 'self' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.google.com https://*.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://ad.doubleclick.net https://stats.g.doubleclick.net https://*.adtrafficquality.google https://ep1.adtrafficquality.google https://cdn.iubenda.com https://idb.iubenda.com https://cpl.iubenda.com https://cs.iubenda.com https://embeds.iubenda.com https://static.cloudflareinsights.com" + supabase,
             "frame-src 'self' https://www.googletagmanager.com https://tagmanager.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://tpc.googlesyndication.com https://www.google.com https://*.google.com https://*.googletagmanager.com https://*.adtrafficquality.google https://ep2.adtrafficquality.google https://www.iubenda.com https://*.iubenda.com",
         ]
@@ -162,8 +174,8 @@ def _build_content_security_policy():
 def add_security_headers(response):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-    response.headers["Content-Security-Policy"] = _build_content_security_policy()
     request_path = request.path
+    response.headers["Content-Security-Policy"] = _build_content_security_policy(request_path)
     if config.STAGING:
         # Lo stage è il sito intero su una seconda URL: qui il default-deny va
         # rovesciato, e senza eccezioni. Sovrascrive anche l'`X-Robots-Tag` che

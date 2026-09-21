@@ -604,6 +604,12 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 .indicator-finder__name { color: var(--ink); font-weight: 600; font-size: 14px; }
 .indicator-finder__meta { color: var(--muted); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
 .indicator-finder__empty { padding: 13px; color: var(--muted); font-size: 14px; margin: 0; }
+/* Sotto i 720px la testata porta gia' lo stesso campo, e i due finiscono
+   impilati a centocinquanta pixel di distanza: uno sotto il marchio, l'altro
+   sotto il percorso. Tutti e due mandano a /ricerca, quindi il ridondante e'
+   questo, che sta su una pagina sola. */
+@media (max-width: 720px) { .indicator-finder { display: none; } }
+
 .score-bar { display: inline-block; width: 80px; height: 7px; margin-right: 8px; background: var(--grid); vertical-align: middle; }
 .score-bar > span { display: block; height: 100%; background: var(--cmp-2); transition: transform 520ms cubic-bezier(0.22, 0.61, 0.36, 1); }
 

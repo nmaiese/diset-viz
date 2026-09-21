@@ -1,20 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">Divario Italia</title>
   <desc id="desc">Atlante degli indicatori territoriali italiani</desc>
-  <rect width="1200" height="630" fill="#f6f3ed"/>
-  <rect x="72" y="72" width="1056" height="486" rx="28" fill="#ffffff" stroke="#1d3557" stroke-width="4"/>
+  <!-- Identita' 2026, gli stessi token di app/static/css/ds/system.css: carta
+       #f5f3ee, inchiostro #18201e, corallo #e24b3c, verde acqua #0f9e86, e le
+       tre linee sulla palette categorica (cat 1, 2 e 3), che identifica e non
+       giudica. Angoli squadrati, non arrotondati. I colori sono cotti qui
+       perche' un SVG statico non legge le variabili CSS della pagina: e' la
+       sola eccezione alla regola dei token, e vale solo per questo file e per
+       le copertine del blog.
+       I font sono stack generici e non Newsreader o Public Sans: questo file
+       viene rasterizzato da scripts/rasterize_og_images.py, che risolve i font
+       da fontconfig e non dal sito, quindi un nome che la macchina di build non
+       ha finirebbe comunque su un ripiego. Meglio dichiarare il ripiego. -->
+  <rect width="1200" height="630" fill="#f5f3ee"/>
+  <rect x="72" y="72" width="1056" height="486" fill="#ffffff" stroke="#18201e" stroke-width="3"/>
   <g transform="translate(112 118)">
-    <rect width="112" height="112" rx="16" fill="#1d3557"/>
-    <text x="56" y="72" font-family="Arial, sans-serif" font-size="44" font-weight="700" text-anchor="middle" fill="#ffffff">DI</text>
+    <rect width="112" height="112" fill="#18201e"/>
+    <text x="56" y="74" font-family="Georgia, 'Liberation Serif', serif" font-size="46" font-weight="700" text-anchor="middle" fill="#f5f3ee">DI</text>
   </g>
-  <text x="112" y="300" font-family="Arial, sans-serif" font-size="78" font-weight="700" fill="#111827">Divario Italia</text>
-  <text x="112" y="372" font-family="Arial, sans-serif" font-size="34" fill="#374151">Indicatori territoriali, regioni, temi e serie storiche</text>
-  <g transform="translate(112 430)" fill="none" stroke-width="20" stroke-linecap="round">
-    <path d="M0 58 C90 24 170 92 260 48 S430 14 520 56" stroke="#e63946"/>
-    <path d="M0 108 C90 72 170 132 260 94 S430 72 520 114" stroke="#2a9d8f"/>
-    <path d="M0 158 C90 128 170 166 260 142 S430 124 520 154" stroke="#f4a261"/>
+  <text x="112" y="300" font-family="Georgia, 'Liberation Serif', serif" font-size="78" font-weight="700" fill="#18201e">Divario Italia</text>
+  <text x="112" y="368" font-family="Helvetica, 'Liberation Sans', Arial, sans-serif" font-size="32" fill="#4a514a">Indicatori territoriali, regioni, temi e serie storiche</text>
+  <g transform="translate(112 386)" fill="none" stroke-width="18" stroke-linecap="butt">
+    <path d="M0 58 C90 24 170 92 260 48 S430 14 520 56" stroke="#e24b3c"/>
+    <path d="M0 108 C90 72 170 132 260 94 S430 72 520 114" stroke="#0f9e86"/>
+    <path d="M0 158 C90 128 170 166 260 142 S430 124 520 154" stroke="#2f6fb0"/>
   </g>
-  <g font-family="Arial, sans-serif" font-size="24" fill="#374151">
+  <g font-family="'Courier 10 Pitch', 'Liberation Mono', monospace" font-size="23" fill="#4a514a">
     <text x="760" y="442">Dati Istat</text>
     <text x="760" y="486">Confronti territoriali</text>
     <text x="760" y="530">Metodologia trasparente</text>
