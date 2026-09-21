@@ -376,92 +376,118 @@
     </dl>
 
     <p class="page-note"><a href="/metodologia">Definizioni, confronti e limiti</a>{% if meta.quality_life_scored %} · <a href="/metodologia#qualita-della-vita">Come entra nel punteggio della qualità della vita</a>{% endif %}</p>
-  </section>
 
-  {# Il verso opposto del link che il post dichiara già nel frontmatter. Solo
-     titolo e data: la descrizione di un articolo cita le stesse cifre che il
-     cruscotto stampa qui sopra, e una cifra si mostra una volta sola. #}
-  {% if related_posts %}
-  <section class="indicator-articles">
-    <h2>Abbiamo scritto di questo indicatore</h2>
-    <ul class="indicator-articles__list">
-      {% for post in related_posts %}
-      <li>
-        <a href="/blog/{{ post.slug }}">{{ post.title }}</a>
-        <span>{{ post.date.strftime('%d.%m.%Y') }} · {{ post.read_time }} min di lettura</span>
-      </li>
-      {% endfor %}
-    </ul>
-    <p class="page-note"><a href="/blog">Tutte le analisi del blog →</a></p>
-  </section>
-  {% endif %}
-
-  {% if level.cover_bars %}
-  <details class="indicator-cover-share">
-    <summary>Immagine da condividere</summary>
-    <figure class="indicator-cover">
-      <div class="indicator-cover__card">
-        <div class="indicator-cover__kicker">Divario Italia · dati {{ level.year_max }}</div>
-        <div class="indicator-cover__title">{{ meta.name }}</div>
-        <div class="indicator-cover__subtitle">{{ meta.theme }} · {{ meta.value_unit }}</div>
-        <div class="indicator-cover__bars">
-          {% for bar in level.cover_bars %}
-          <div class="indicator-cover__bar{{ ' is-best' if bar.is_best }}{{ ' is-worst' if bar.is_worst }}">
-            <span class="indicator-cover__bar-name">{{ bar.region }}</span>
-            <span class="indicator-cover__bar-track"><i class="indicator-cover__bar-fill" style="width:{{ bar.width_pct }}%"></i></span>
-            <strong class="indicator-cover__bar-value">{{ bar.value | it_num(2) }}</strong>
+    {# Sta qui e non in fondo alla pagina: e' un artefatto di citazione, come
+       il blocco "Come citare" qui sopra, non una destinazione. In coda faceva
+       numero fra i blocchi di navigazione e non c'entrava con nessuno. #}
+    {% if level.cover_bars %}
+    <details class="indicator-cover-share">
+      <summary>Immagine da condividere</summary>
+      <figure class="indicator-cover">
+        <div class="indicator-cover__card">
+          <div class="indicator-cover__kicker">Divario Italia · dati {{ level.year_max }}</div>
+          <div class="indicator-cover__title">{{ meta.name }}</div>
+          <div class="indicator-cover__subtitle">{{ meta.theme }} · {{ meta.value_unit }}</div>
+          <div class="indicator-cover__bars">
+            {% for bar in level.cover_bars %}
+            <div class="indicator-cover__bar{{ ' is-best' if bar.is_best }}{{ ' is-worst' if bar.is_worst }}">
+              <span class="indicator-cover__bar-name">{{ bar.region }}</span>
+              <span class="indicator-cover__bar-track"><i class="indicator-cover__bar-fill" style="width:{{ bar.width_pct }}%"></i></span>
+              <strong class="indicator-cover__bar-value">{{ bar.value | it_num(2) }}</strong>
+            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
+          <div class="indicator-cover__footer">
+            <span>Fonte: {{ meta.source_label }}</span>
+            <strong>divarioitalia.it</strong>
+          </div>
         </div>
-        <div class="indicator-cover__footer">
-          <span>Fonte: {{ meta.source_label }}</span>
-          <strong>divarioitalia.it</strong>
-        </div>
-      </div>
-      <figcaption>Anteprima dei dati di questo indicatore, generata automaticamente nello stesso formato usato per le condivisioni social.</figcaption>
-    </figure>
-  </details>
-  {% endif %}
-
-  {% if dimension_siblings %}
-  <nav class="dimension-nav" aria-label="Lo stesso indicatore per genere">
-    <span class="dimension-nav__label">Lo stesso indicatore, per genere:</span>
-    {% for item in dimension_siblings %}
-    <a class="dimension-nav__link" href="{{ item.path }}">{{ item.value_label }}</a>
-    {% endfor %}
-  </nav>
-  {% endif %}
-
-  {% if related %}
-  <section class="indicator-related">
-    <h2>Altri indicatori del tema {{ meta.theme }}</h2>
-    <ul class="indicator-related__grid">
-      {% for item in related %}
-      {% if item.direction == 'higher_better' %}{% set dcls = 'up' %}{% set dlabel = 'meglio se alto' %}
-      {% elif item.direction in ('lower_better', 'higher_worse') %}{% set dcls = 'down' %}{% set dlabel = 'meglio se basso' %}
-      {% else %}{% set dcls = 'flat' %}{% set dlabel = 'senza direzione' %}{% endif %}
-      <li class="related-card related-card--{{ dcls }}">
-        <a class="related-card__link" href="{{ item.path }}">
-          <span class="related-card__name">{{ item.name }}</span>
-          <span class="related-card__spark">{{ item.spark | sparkline }}</span>
-          <span class="related-card__foot">
-            {% if item.latest is not none %}<b class="related-card__value">{{ item.latest | it_num(1) }}</b>{% endif %}
-            <small class="related-card__year">dati {{ item.year_max }}</small>
-          </span>
-          <span class="related-card__dir related-card__dir--{{ dcls }}">{{ dlabel }}</span>
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
+        <figcaption>Anteprima dei dati di questo indicatore, generata automaticamente nello stesso formato usato per le condivisioni social.</figcaption>
+      </figure>
+    </details>
+    {% endif %}
   </section>
-  {% endif %}
+  {# ZONA 4, continua da qui.
+     Sotto la piega si impilavano sei blocchi di navigazione consecutivi
+     (articoli, immagine da condividere, dimensioni, correlati, precedente e
+     successivo, richiamo al tema), tre dei quali puntavano tutti allo stesso
+     posto. Sei intestazioni di fila fanno leggere la scheda come un menu, ed
+     e' il motivo per cui non si distingueva da uno.
 
-  {% if siblings.prev or siblings.next %}
-  <nav class="sibling-nav" aria-label="Altri indicatori del tema {{ meta.theme }}">
-    {% if siblings.prev %}<a class="sibling-nav__link is-prev" href="{{ siblings.prev.path }}"><span>← Precedente</span><small>{{ siblings.prev.name }}</small></a>{% else %}<span class="sibling-nav__link is-disabled" aria-hidden="true"></span>{% endif %}
-    {% if siblings.next %}<a class="sibling-nav__link is-next" href="{{ siblings.next.path }}"><span>Successivo →</span><small>{{ siblings.next.name }}</small></a>{% else %}<span class="sibling-nav__link is-disabled" aria-hidden="true"></span>{% endif %}
-  </nav>
-  {% endif %}
+     Adesso sono tre corsie con un'intestazione sola, e non si perde un link:
+     ci sono tutti quelli di prima piu' i due territori agli estremi, che
+     prima la pagina nominava nel cruscotto senza mai portarci. L'immagine da
+     condividere e' risalita nell'apparato, dove sta la citazione: e' un
+     artefatto di citazione, non una destinazione. #}
+  <section class="indicator-next" aria-labelledby="continua-da-qui">
+    <h2 id="continua-da-qui">Continua da qui</h2>
+    <div class="indicator-next__grid">
+
+      <div class="indicator-next__lane">
+        <p class="section-label">Nello stesso tema</p>
+        {% if related %}
+        <ul class="indicator-related__grid indicator-next__related">
+          {% for item in related[:3] %}
+          {% if item.direction == 'higher_better' %}{% set dcls = 'up' %}{% set dlabel = 'meglio se alto' %}
+          {% elif item.direction in ('lower_better', 'higher_worse') %}{% set dcls = 'down' %}{% set dlabel = 'meglio se basso' %}
+          {% else %}{% set dcls = 'flat' %}{% set dlabel = 'senza direzione' %}{% endif %}
+          <li class="related-card related-card--{{ dcls }}">
+            <a class="related-card__link" href="{{ item.path }}">
+              <span class="related-card__name">{{ item.name }}</span>
+              <span class="related-card__spark">{{ item.spark | sparkline }}</span>
+              <span class="related-card__foot">
+                {% if item.latest is not none %}<b class="related-card__value">{{ item.latest | it_num(1) }}</b>{% endif %}
+                <small class="related-card__year">dati {{ item.year_max }}</small>
+              </span>
+              <span class="related-card__dir related-card__dir--{{ dcls }}">{{ dlabel }}</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        <ul class="indicator-next__links">
+          {% if siblings.prev %}<li><a href="{{ siblings.prev.path }}">Precedente: {{ siblings.prev.name }}</a></li>{% endif %}
+          {% if siblings.next %}<li><a href="{{ siblings.next.path }}">Successivo: {{ siblings.next.name }}</a></li>{% endif %}
+          <li><a href="{{ meta.theme_path }}">Tutti gli indicatori di {{ meta.theme | lower }}, con la classifica delle regioni</a></li>
+        </ul>
+      </div>
+
+      <div class="indicator-next__lane">
+        <p class="section-label">Lo stesso dato, altre viste</p>
+        <ul class="indicator-next__links">
+          {% for item in dimension_siblings %}
+          <li><a href="{{ item.path }}">{{ meta.name }}: {{ item.value_label | lower }}</a></li>
+          {% endfor %}
+          {% for other in levels if other.key != level.key %}
+          <li><a href="?livello={{ other.key }}">Gli stessi dati per {{ other.label | lower }}</a></li>
+          {% endfor %}
+          <li><a href="/confronto">Mettere questo indicatore a confronto fra territori</a></li>
+          <li><a href="/atlante">Aprirlo nell'atlante, con mappa e serie storica</a></li>
+        </ul>
+      </div>
+
+      <div class="indicator-next__lane">
+        <p class="section-label">Da leggere</p>
+        <ul class="indicator-next__links">
+          {% for post in related_posts %}
+          <li><a href="/blog/{{ post.slug }}">{{ post.title }}</a> <small>{{ post.date.strftime('%d.%m.%Y') }} · {{ post.read_time }} min</small></li>
+          {% endfor %}
+          {# I due territori agli estremi: la pagina li nomina nel cruscotto e
+             non ci ha mai portato. A livello provincia non c'e' un profilo, e
+             `profile_path` e' vuoto. #}
+          {% if level.profile_path and level.best %}
+          <li><a href="{{ level.profile_path }}{{ level.best.key }}">Il profilo di {{ level.best.name }}, in testa</a></li>
+          {% endif %}
+          {% if level.profile_path and level.worst %}
+          <li><a href="{{ level.profile_path }}{{ level.worst.key }}">Il profilo di {{ level.worst.name }}, in coda</a></li>
+          {% endif %}
+          {% if related_posts %}<li><a href="/blog">Tutte le analisi del blog</a></li>{% endif %}
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
 
   <aside class="indicator-cta">
     <span>

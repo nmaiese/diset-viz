@@ -10,10 +10,9 @@
  *
  * Si carica solo dalla pagina indicatore (`head_extra`), dopo site.css.
  *
- * Corto perche' la migrazione della pagina indicatore e' stata **solo di
- * token**: il layout non e' stato toccato, e sotto la piega restano impilati
- * i blocchi di navigazione che fanno leggere la scheda come un menu. Quello
- * e' lavoro a se'. */
+ * La migrazione al design system aveva toccato **solo i token**, e sotto la
+ * piega restavano sei blocchi di navigazione impilati che facevano leggere la
+ * scheda come un menu. In fondo al file c'e' la zona che li ha sostituiti. */
 
 /* --- la mappa e la sua legenda ------------------------------------------ */
 
@@ -110,4 +109,51 @@ body.ds .freshness-badge.is-fresh,
 body.ds .freshness-badge.is-recent {
   color: var(--success-text);
   border-color: var(--success-text);
+}
+
+/* --- continua da qui ----------------------------------------------------- */
+
+/* Sei blocchi di navigazione impilati facevano leggere la scheda come un menu.
+   Tre corsie sotto un'intestazione sola tengono gli stessi link senza
+   ripetere sei volte "ecco dell'altro". */
+body.ds .indicator-next { margin-top: var(--space-12, 48px); }
+body.ds .indicator-next__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-6, 24px);
+  align-items: start;
+}
+
+/* La prima corsia e' piu' larga perche' porta le schede con la sparkline, le
+   altre due solo elenchi di link. */
+body.ds .indicator-next__lane { min-width: 0; }
+body.ds .indicator-next__lane .section-label { margin: 0 0 var(--space-3, 12px); }
+
+/* Le tre schede correlate stanno in colonna dentro la loro corsia, non piu'
+   in una griglia larga quanto la pagina. */
+body.ds .indicator-next__related {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2, 8px);
+  margin: 0 0 var(--space-3, 12px);
+}
+
+body.ds .indicator-next__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1, 4px);
+}
+body.ds .indicator-next__links li { min-width: 0; }
+body.ds .indicator-next__links a {
+  display: block;
+  padding: var(--space-2, 8px) 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+body.ds .indicator-next__links a:hover { color: var(--accent-text, var(--accent)); text-decoration: none; }
+body.ds .indicator-next__links small { display: block; color: var(--muted); font-family: var(--font-mono); font-size: 11.5px; }
+
+@media (max-width: 960px) {
+  body.ds .indicator-next__grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-8, 32px); }
 }

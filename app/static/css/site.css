@@ -1345,8 +1345,12 @@ h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; line-hei
 }
 
 /* Sparkline SVG server-side: un solo accento, come l'identita' del sito. */
-.spark__line { stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
-.spark__dot { fill: var(--accent); }
+/* La serie di una sparkline e' un dato, non l'accento dell'interfaccia. Erano
+   `var(--accent)`, e nella corsia "Nello stesso tema" si vedevano tre curve
+   coralli che rubavano l'occhio ai link veri. Il design system ha un livello
+   apposta per la serie di contesto, e il corallo resta dove si clicca. */
+.spark__line { stroke: var(--cmp-2); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
+.spark__dot { fill: var(--cmp-2); }
 
 /* La dispersione dentro l'articolo (app/charts.py): due indicatori, una regione
    per punto. Non ripete i colori della mappa e della serie storica, che stanno

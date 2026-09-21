@@ -651,8 +651,12 @@ h1, h2, h3 { font-family: var(--font-display); }
 .index-row:hover .index-row__chevron { color: var(--accent); transform: translateX(2px); }
 
 .spark { width: 150px; height: 40px; display: block; }
-.spark__line { fill: none; stroke: var(--ink-soft); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.spark__dot { fill: var(--ink-soft); }
+/* A riposo la curva era `--ink-soft`, cioe' il colore del testo: e' proprio
+   quello che `.claude/rules/frontend.md` vieta, perche' una serie dipinta col
+   colore del testo pesa quanto il testo che la spiega. Il corallo sul passaggio
+   del mouse invece resta: li' e' uno stato di interazione, non un dato. */
+.spark__line { fill: none; stroke: var(--cmp-2); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.spark__dot { fill: var(--cmp-2); }
 .index-row:hover .spark__line, .index-row:focus-visible .spark__line { stroke: var(--accent); }
 .index-row:hover .spark__dot, .index-row:focus-visible .spark__dot { fill: var(--accent); }
 

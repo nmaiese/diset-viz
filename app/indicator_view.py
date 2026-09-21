@@ -30,6 +30,7 @@ Two consequences worth knowing:
   guessing from the level name.
 """
 
+import re
 import csv
 import functools
 from collections import defaultdict
@@ -559,8 +560,53 @@ def _theme_neighbours(meta):
     index = next((i for i, item in enumerate(siblings) if str(item["id"]) == str(meta["id"])), None)
     prev_item = siblings[index - 1] if index else None
     next_item = siblings[index + 1] if index is not None and index < len(siblings) - 1 else None
-    related = [item for item in siblings if str(item["id"]) != str(meta["id"])][:RELATED_LIMIT]
+    # `siblings` e' in ordine alfabetico, e prev/next restano li': sono una
+    # passeggiata stabile dentro il tema. I correlati no. Prendendo i primi
+    # dell'alfabeto, la scheda del PIL pro capite proponeva "Alunni con
+    # disabilita' (totale)", "motoria" e "uditiva": tre serie dello stesso tema
+    # e senza niente a che vedere con quella che il lettore ha davanti. Si
+    # ordinano per quanto il nome somiglia, che e' il solo segnale di vicinanza
+    # che il catalogo porta gia', e a parita' resta l'alfabeto.
+    others = [item for item in siblings if str(item["id"]) != str(meta["id"])]
+    parole = _content_words(meta["name"])
+    sottotema = meta.get("source_theme")
+    related = sorted(
+        others,
+        key=lambda item: (
+            # Il sottotema della fonte e' un raggruppamento vero, piu' stretto
+            # del tema: dentro "Reddito, inclusione e accessibilita'", che ha
+            # 86 serie, separa il reddito dagli alunni con disabilita'.
+            0 if sottotema and item.get("source_theme") == sottotema else 1,
+            -_word_overlap(parole, _content_words(item["name"])),
+            item["name"].lower(),
+        ),
+    )[:RELATED_LIMIT]
     return related, {"prev": prev_item, "next": next_item}
+
+
+# Parole che compaiono ovunque e non dicono niente sulla vicinanza fra due
+# indicatori: tenerle farebbe somigliare "Tasso di occupazione" a "Tasso di
+# omicidi" piu' di quanto somigli a "Occupati non regolari".
+_PAROLE_VUOTE = frozenset((
+    "di", "del", "della", "dei", "delle", "dello", "degli", "da", "dal",
+    "dalla", "in", "nei", "nelle", "nel", "nella", "a", "al", "alla", "ai",
+    "alle", "e", "ed", "per", "con", "su", "sul", "sulla", "tra", "fra",
+    "il", "lo", "la", "i", "gli", "le", "un", "uno", "una", "che", "non",
+    "totale", "totali", "maschi", "femmine", "anni",
+))
+
+
+def _content_words(name):
+    """Le parole di un nome che portano significato, minuscole e senza simboli."""
+    grezze = re.findall(r"[0-9a-zàèéìòóùü]+", (name or "").lower())
+    return frozenset(w for w in grezze if len(w) > 2 and w not in _PAROLE_VUOTE)
+
+
+def _word_overlap(a, b):
+    """Quante parole di contenuto due nomi hanno in comune, sul totale."""
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
 
 
 @functools.lru_cache(maxsize=16)
@@ -572,6 +618,7 @@ def _theme_siblings(theme):
                 "name": item["name"],
                 "path": item["path"],
                 "direction": (item.get("explain") or {}).get("direction"),
+                "source_theme": item.get("source_theme"),
                 "year_max": item["year_max"],
                 "unit": item.get("unit"),
                 # La sparkline delle card usa la stessa serie (media nazionale
