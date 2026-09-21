@@ -371,7 +371,17 @@ def atlante():
             agent_discovery.atlas_markdown(featured, SITE_URL),
             f"{SITE_URL}/atlante",
         )
-    return render_template('app.html', featured_indicators=featured)
+    # Il percorso e la lista, come su ogni altra pagina d'ingresso. `/atlante`
+    # era indicizzata e in sitemap senza nessun JSON-LD e senza percorso: le
+    # uniche due pagine cosi' erano le due della SPA, e non per una ragione.
+    # La lista dichiara gli stessi indicatori che il guscio server-rendered
+    # mostra gia', quindi non c'e' niente di dichiarato che il visibile non
+    # sostenga.
+    return render_template(
+        'app.html',
+        featured_indicators=featured,
+        percorso=[{"name": "Home", "path": "/"}, {"name": "Atlante", "path": "/atlante"}],
+    )
 
 
 @app.route("/catalogo-dati")

@@ -15,7 +15,11 @@
   <div class="hdr__bar">
     <a class="hdr__brand" href="/" aria-label="DivarioItalia, torna alla home"{% if active_nav == 'home' %} aria-current="page"{% endif %}>
       <img src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="" width="30" height="30">
-      <span class="brandword">{{ site_name }}</span>
+      {# `site_name` lo passano le view che rendono con blog_base, `SITE_NAME` lo
+         mette il context processor su ogni render: serve il secondo perche' su
+         /atlante e /confronto la view non passa il primo, e il marchio usciva
+         senza nome. #}
+      <span class="brandword">{{ site_name or SITE_NAME }}</span>
     </a>
 
     {# Le voci vengono da `app/nav.py`, non da qui: la testata React dell'atlante

@@ -49,16 +49,30 @@
     <link rel="preload" href="{{ url_for('static', filename='fonts/public-sans-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset_url('css/fonts.css') }}">
     <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/ds/chrome.css') }}">
+    {# La testata del design system e' markup statico piu' ds-chrome.js: gira
+       senza React, e va caricata qui come su ogni altra pagina. Prima queste
+       due rotte disegnavano una testata loro, in React, con un marchio
+       diverso, una navigazione piatta e nessuna ricerca: due testate sullo
+       stesso sito, e l'identita' e' una sola (CLAUDE.md). #}
+    <script src="{{ url_for('static', filename='js/ds-chrome.js') }}" defer></script>
     <script type="module" crossorigin src="{{ asset_url('dist/assets/index.js') }}"></script>
     <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/index.css') }}">
     {% include "_theme_bootstrap.html" %}
+    {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
+    {# Riempie #site-auth della testata: senza, il posto del login resta vuoto
+       su queste due rotte e su tutte le altre no. #}
+    <script type="module" crossorigin src="{{ asset_url('dist/assets/site.js') }}"></script>
+    {% endif %}
   </head>
-  <body class="ds">
+  <body class="ds sitechrome">
     {% include "_third_party_body.html" %}
     {# La fascia serve QUI come su ogni altra pagina: senza, /confronto sullo
        stage e' indistinguibile da quella di produzione, che e' esattamente
        l'errore che la fascia esiste per impedire. #}
     {% if STAGING %}{% include "_staging_banner.html" %}{% endif %}
+    {% set active_nav = 'confronto' %}
+    {% include "_ds_header.html" %}
     <div id="root">
       <main class="spa-seo-fallback">
         {{ breadcrumb.trail(percorso, "", false) }}

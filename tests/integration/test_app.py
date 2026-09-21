@@ -2010,18 +2010,78 @@ class IlTemaSegueIlSistemaFinoAllaPrimaScelta(unittest.TestCase):
                 html = self.client.get(path).get_data(as_text=True)
                 self.assertLess(html.index("divario-theme"), html.index("</head>"), path)
 
-    def test_le_altre_due_implementazioni_seguono_la_stessa_regola(self):
-        for percorso in (self.STATICI / "js" / "ds-chrome.js",
-                         Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx"):
-            with self.subTest(file=percorso.name):
-                sorgente = percorso.read_text(encoding="utf-8")
-                self.assertIn("prefers-color-scheme", sorgente)
+    def test_l_altra_implementazione_segue_la_stessa_regola(self):
+        """Ne restano due: il bootstrap inline e `ds-chrome.js`."""
+        sorgente = (self.STATICI / "js" / "ds-chrome.js").read_text(encoding="utf-8")
+        self.assertIn("prefers-color-scheme", sorgente)
 
-    def test_il_toggle_react_non_scrive_al_montaggio(self):
-        """La riga che ha congelato il sito sul chiaro: `localStorage.setItem`
-        dentro un effetto che gira anche al primo render."""
+    def test_la_spa_non_decide_piu_il_tema(self):
+        """C'era una terza implementazione in React, e aveva il difetto
+        peggiore: scriveva `localStorage` dentro un effetto che gira anche al
+        montaggio, quindi passare una volta da /atlante trasformava una
+        preferenza di sistema in una scelta esplicita e teneva il sito chiaro
+        per sempre.
+
+        Esisteva perche' `ds-chrome.js` aggancia i bottoni una volta sola e la
+        testata React montava dopo. Da quando la testata la rende Flask anche
+        su quelle due rotte, il bottone c'e' gia' nell'HTML iniziale e quella
+        ragione non c'e' piu'."""
         sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
-        self.assertIn("primoGiro", sorgente)
+        self.assertNotIn("divario-theme", sorgente)
+        self.assertNotIn("localStorage.setItem(THEME_KEY", sorgente)
+
+class UnaTestataSolaSuTuttoIlSito(unittest.TestCase):
+    """Due testate sullo stesso dominio erano due identita'.
+
+    Le pagine Flask rendevano `_ds_header.html` (marchio senza sottotitolo,
+    tendine Esplora e Classifiche, ricerca in testata, interruttore tondo);
+    `/atlante` e `/confronto` montavano una testata React con marchio corallo e
+    sottotitolo, otto voci piatte, nessuna ricerca e un interruttore quadrato.
+    Le voci venivano gia' dalla stessa lista (`window.__diNav`), il disegno no.
+    Adesso la testata e' una, la rende Flask, e React tiene solo cio' che la
+    testata non puo' sapere: la barra del telefono e il pulsante di ritorno.
+    """
+
+    PAGINE = ("/", "/atlante", "/confronto", "/temi", "/regioni", "/blog",
+              "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita",
+              "/divari-regionali", "/catalogo-dati", "/metodologia", "/quiz")
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_ogni_pagina_ne_rende_una_e_una_sola(self):
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertEqual(html.count('<header class="hdr">'), 1, path)
+                self.assertIn('class="brandword">Divario Italia<', html, path)
+
+    def test_la_spa_non_disegna_piu_la_sua(self):
+        sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
+        self.assertNotIn('className="masthead"', sorgente)
+
+    def test_le_due_rotte_spa_vestono_il_chrome_condiviso(self):
+        """`chrome.css` e' scoped sotto `.sitechrome`: senza quella classe sul
+        body la testata esce senza nessuno stile, ed e' successo."""
+        for path in ("/atlante", "/confronto"):
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertIn('<body class="ds sitechrome">', html)
+                self.assertIn("css/ds/chrome.css", html)
+                self.assertIn("js/ds-chrome.js", html)
+
+    def test_l_atlante_dichiara_percorso_e_lista(self):
+        """Era l'unica pagina indicizzabile e in sitemap senza nessun JSON-LD e
+        senza percorso."""
+        import json
+
+        html = self.client.get("/atlante").get_data(as_text=True)
+        tipi = []
+        for blocco in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S):
+            documento = json.loads(blocco)
+            tipi.append(documento.get("@type"))
+        self.assertIn("BreadcrumbList", tipi)
+        self.assertIn("CollectionPage", tipi)
 
 if __name__ == "__main__":
     unittest.main()

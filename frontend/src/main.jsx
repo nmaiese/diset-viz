@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import * as d3 from "d3";
-import { AuthControl } from "./shared/AuthControl.jsx";
 import { getAccessToken, getUser, isAuthConfigured } from "./shared/supabase.js";
 import {
   AlertTriangle,
@@ -19,9 +18,7 @@ import {
   LineChart,
   MapPinned,
   Minus,
-  Moon,
   Search,
-  Sun,
   TrendingDown,
   TrendingUp,
   Trophy,
@@ -61,66 +58,21 @@ const SORTS = [
 // Sceglie il gradino invece di interpolare: `var()` non si puo' interpolare, e
 // una legenda a sei blocchi netti e' anche piu' onesta di una sfumatura
 // continua, perche' la mappa ha davvero sei livelli e non un continuo.
-// Interruttore del tema, gemello di quello di `_ds_header.html`.
+// Il tema non si decide piu' qui. Lo decidono `_theme_bootstrap.html` prima
+// del primo paint e `ds-chrome.js` al clic, come su ogni altra pagina: da
+// quando la testata la rende Flask anche su queste due rotte, il bottone
+// esiste nell'HTML iniziale e lo script lo aggancia, che era il solo motivo
+// per cui l'atlante aveva un interruttore suo.
 //
-// Esiste in React e non riusa ds-chrome.js perche' quello script lega i bottoni
-// una volta sola all'esecuzione, quando l'atlante non ha ancora montato niente:
-// un bottone renderizzato dopo non verrebbe mai agganciato. Stessa chiave di
-// localStorage e stesso effetto sul DOM, cosi' il tema scelto qui vale su tutto
-// il sito e viceversa. Senza, l'atlante era l'unica pagina che il tema scuro lo
-// subiva e non lo sapeva cambiare.
-const THEME_KEY = "divario-theme";
-
-function readStoredTheme() {
-  // La stessa regola di `_theme_bootstrap.html` e di `ds-chrome.js`: una
-  // scelta esplicita vince, senza scelta decide il sistema. Tre copie della
-  // stessa decisione, e devono restare la stessa.
-  try {
-    const scelto = localStorage.getItem(THEME_KEY);
-    if (scelto === "dark" || scelto === "light") return scelto;
-  } catch (e) {
-    return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
-  }
-  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) return "dark";
-  return "light";
-}
-
-function ThemeToggle() {
-  const [theme, setTheme] = useState(readStoredTheme);
-  const primoGiro = useRef(true);
-
-  useEffect(() => {
-    if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
-    else document.documentElement.removeAttribute("data-theme");
-    // Si scrive **solo una scelta**, non lo stato di partenza. Questo effetto
-    // gira anche al montaggio, e li' `theme` e' cio' che il sistema ha deciso:
-    // scriverlo trasformava una preferenza in una scelta esplicita, e bastava
-    // passare una volta dall'atlante per restare sul tema chiaro su tutto il
-    // sito, per sempre, senza aver toccato niente.
-    if (primoGiro.current) {
-      primoGiro.current = false;
-      return;
-    }
-    try {
-      localStorage.setItem(THEME_KEY, theme);
-    } catch (e) {}
-  }, [theme]);
-
-  const dark = theme === "dark";
-  const label = dark ? "Passa al tema chiaro" : "Passa al tema scuro";
-  return (
-    <button
-      type="button"
-      className="masthead__theme"
-      onClick={() => setTheme(dark ? "light" : "dark")}
-      aria-pressed={dark}
-      aria-label={label}
-      title={label}
-    >
-      {dark ? <Sun size={18} /> : <Moon size={18} />}
-    </button>
-  );
-}
+// E' anche il posto dove stava un difetto vero: l'effetto che applicava il
+// tema scriveva localStorage al montaggio, quindi passare una volta di qui
+// trasformava una preferenza di sistema in una scelta esplicita e teneva il
+// sito chiaro per sempre. Una copia in meno e' una copia che non puo'
+// divergere.
+//
+// La mappa segue il tema da sola: dipinge con `var(--seq-1..6)`, che sono
+// ridefinite sotto `<html data-theme="dark">`, quindi non serve nessun
+// re-render di React quando il tema cambia.
 
 const SEQ_STOPS = ["var(--seq-1)", "var(--seq-2)", "var(--seq-3)", "var(--seq-4)", "var(--seq-5)", "var(--seq-6)"];
 const MAP_RAMP = (t) => SEQ_STOPS[Math.min(SEQ_STOPS.length - 1, Math.max(0, Math.floor(t * SEQ_STOPS.length)))];
@@ -493,40 +445,6 @@ function App() {
 /* Shared chrome                                                       */
 /* ------------------------------------------------------------------ */
 
-// Measures the active masthead link's position/width against the nav container
-// and returns an inline style for the sliding .nav-underline accent, redone on
-// every activeNav change (and on resize, since the layout is fluid).
-function useNavUnderline(navRef, activeKey) {
-  const [style, setStyle] = useState({ opacity: 0 });
-
-  useEffect(() => {
-    const nav = navRef.current;
-    if (!nav || !activeKey) {
-      setStyle({ opacity: 0 });
-      return undefined;
-    }
-    const measure = () => {
-      const link = nav.querySelector(`[data-nav-key="${activeKey}"]`);
-      if (!link) {
-        setStyle({ opacity: 0 });
-        return;
-      }
-      const navRect = nav.getBoundingClientRect();
-      const linkRect = link.getBoundingClientRect();
-      setStyle({
-        opacity: 1,
-        width: `${linkRect.width - 4}px`,
-        transform: `translateX(${linkRect.left - navRect.left + 2}px)`,
-      });
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [navRef, activeKey]);
-
-  return style;
-}
-
 // Le voci arrivano dal server via `window.__diNav`, lo stesso meccanismo di
 // `__diInitialView`: la SPA continua a non conoscere nessuna rotta Flask, e
 // `app/nav.py` resta l'unico posto dove si aggiunge o si rinomina una sezione.
@@ -558,11 +476,20 @@ function navPath(key, ripiego) {
 }
 
 function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
-  const navItems = readNav().masthead;
-  const navRef = useRef(null);
-  const underlineKey = activeNav === "atlas" || activeNav === "regioni" ? activeNav : null;
-  const underlineStyle = useNavUnderline(navRef, underlineKey);
-
+  // La testata non si disegna piu' qui: la rende Flask con `_ds_header.html`,
+  // lo stesso file di ogni altra pagina, sopra `#root`. Prima queste due rotte
+  // avevano una testata loro, con marchio, navigazione, ricerca e interruttore
+  // del tema disegnati in modo diverso dal resto del sito: due identita' sullo
+  // stesso dominio, e CLAUDE.md ne ammette una sola.
+  //
+  // Quel che resta a React e' cio' che la testata SSR non puo' sapere: la
+  // barra del telefono, che evidenzia la vista aperta dentro la SPA, e il
+  // pulsante di ritorno, che dipende da dove si e' entrati.
+  //
+  // `onNavAtlas` e `onNavRegioni` restano nella firma perche' la barra del
+  // telefono li usa ancora per cambiare vista senza ricaricare. Dalla testata
+  // quei due link ora ricaricano la pagina, ed e' corretto: `/atlante` e
+  // `/regioni` sono due pagine vere, non due stati.
   const handleLocalNav = (event, handler) => {
     if (handler && !event.metaKey && !event.ctrlKey && event.button === 0) {
       event.preventDefault();
@@ -572,46 +499,7 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
 
   return (
     <>
-      <header className="masthead">
-        <a className="brand" href="/" aria-label="Divario Italia, home">
-          <img className="brand-mark" src="/static/img/logo-mark.png" alt="" width="38" height="38" />
-          <span className="brand-text">
-            <strong>Divario Italia</strong>
-            <small>Atlante degli indicatori territoriali</small>
-          </span>
-        </a>
-        {children}
-        <nav id="masthead-nav" className="masthead__links" aria-label="Collegamenti" ref={navRef}>
-          {navItems.map((item) => {
-            // Atlante e Regioni restano navigazione interna: fuori la pagina
-            // server esiste ancora per la SEO e per i link diretti, ma dentro
-            // la SPA un ricaricamento perderebbe lo stato della vista.
-            const local = item.key === "atlas" ? onNavAtlas : item.key === "regioni" ? onNavRegioni : null;
-            return (
-              <a
-                key={item.path}
-                href={item.path}
-                data-nav-key={item.key || undefined}
-                className={item.key && activeNav === item.key ? "is-active" : ""}
-                onClick={local ? (event) => handleLocalNav(event, local) : undefined}
-              >
-                {item.label}
-              </a>
-            );
-          })}
-          <span className={`nav-underline${underlineStyle.opacity ? " is-visible" : ""}`} style={underlineStyle} aria-hidden="true" />
-        </nav>
-        <a
-          className="masthead__search"
-          href={navPath("atlas", "/atlante")}
-          aria-label="Cerca nell'atlante"
-          onClick={(event) => handleLocalNav(event, onNavAtlas)}
-        >
-          <Search size={18} />
-        </a>
-        <ThemeToggle />
-        <AuthControl />
-      </header>
+      {children ? <div className="spa-backbar">{children}</div> : null}
 
       <nav className="tabbar" aria-label="Navigazione principale">
         <a
