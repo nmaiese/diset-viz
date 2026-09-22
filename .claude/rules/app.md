@@ -21,12 +21,26 @@ paths:
 - `/temi`, `/tema/<slug>` — l'indice dei temi e la pagina di un tema.
 - `/regioni`, `/regione/<key>` — l'indice delle regioni e il profilo di una.
 - `/provincia/<key>` — il profilo di una delle 103 province misurate dal BES:
-  posizione, punteggio, le dodici dimensioni, gli indicatori che la tirano su
-  e giu', le vicine in classifica. Non c'e' un indice `/province`: l'indice e'
+  posizione, punteggio, le dodici dimensioni, **i valori veri di tutti i 67
+  indicatori** con unita', anno e posizione fra le province, dove e' prima e
+  dove e' ultima fra le province della sua regione, gli indicatori che la
+  tirano su e giu', le vicine in classifica. I valori li legge
+  `province_profile.indicatori`, da `bes_data.get_bes_rows("provincia")`: per
+  un anno la pagina ha mostrato solo punteggi standardizzati, e chi cercava
+  "speranza di vita provincia di Lecce" trovava una pagina senza il numero di
+  anni. Il confronto dentro la regione e' sempre fra province, mai con il
+  valore regionale. Non c'e' un indice `/province`: l'indice e'
   la classifica, `/qualita-della-vita/classifica/province`, e il percorso passa
   di li'. Il profilo lo monta `app/province_profile.py`, che non calcola niente
   di nuovo: mette in forma il payload di `quality_life_bes.build_bes_territory`.
 - `/catalogo-dati` — l'elenco piatto di ogni indicatore indicizzabile.
+- `/chi-siamo`, `/contatti`, `/termini`, `/privacy` — le quattro pagine di
+  fiducia. Stanno nel contratto di `PUBLIC_DISCOVERABILITY_EXPECTATIONS`, dove
+  fino al 22 settembre 2026 non c'erano: l'audit contro produzione non si
+  sarebbe accorto se una fosse tornata 404. L'indirizzo a cui si risponde e il
+  nome della piattaforma dei consensi stanno in `app/publisher.py`, accanto
+  all'identita' che dichiarano, e il `mailto:` va in chiaro: un indirizzo che
+  solo JavaScript sa comporre non e' un contatto.
 - `/blog`, `/blog/<slug>` — blog server-rendered (Jinja) dai Markdown in
   `content/posts/`.
 - `/blog/feed.xml` — il feed RSS 2.0 del blog, con `/feed.xml` e `/rss.xml` che
