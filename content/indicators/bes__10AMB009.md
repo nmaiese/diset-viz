@@ -8,7 +8,7 @@ La soddisfazione per la situazione ambientale del luogo in cui si vive è alta a
 
 <!-- sezione: quadro -->
 
-Il giudizio sull'ambiente unisce natura, pulizia, rifiuti e qualità dell'aria, e premia le regioni alpine, dove il paesaggio è integro e i servizi funzionano. La Campania in fondo sconta l'eredità dei rifiuti e dell'inquinamento urbano. È una percezione, ma nasce da condizioni reali sotto gli occhi di tutti. Un ambiente migliore rende più soddisfatti o ci si abitua a ciò che si ha?
+Il giudizio sull'ambiente unisce natura, pulizia, rifiuti e qualità dell'aria, e premia le regioni alpine, dove il paesaggio è integro e i servizi funzionano. La Campania in fondo sconta l'eredità dei rifiuti e dell'inquinamento urbano. È una percezione, ma nasce da condizioni reali sotto gli occhi di tutti.
 
 <!-- sezione: limiti -->
 

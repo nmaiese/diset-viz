@@ -10,7 +10,7 @@ L'esposizione al particolato fine PM2.5 oltre i limiti riguarda soprattutto la p
 
 <!-- sezione: quadro -->
 
-Il PM2.5 è tra gli inquinanti più dannosi per la salute, e la sua concentrazione in pianura padana dipende da traffico, industria, riscaldamento e da una conformazione geografica che intrappola l'aria. Non è colpa dei soli residenti, ma la somma di molte pressioni in un bacino chiuso tra le montagne. L'Italia è tra i Paesi europei che segnalano le concentrazioni di particolato più alte. Un problema di clima e geografia si può risolvere solo localmente?
+Il PM2.5 è tra gli inquinanti più dannosi per la salute, e la sua concentrazione in pianura padana dipende da traffico, industria, riscaldamento e da una conformazione geografica che intrappola l'aria. Non è colpa dei soli residenti, ma la somma di molte pressioni in un bacino chiuso tra le montagne. L'Italia è tra i Paesi europei che segnalano le concentrazioni di particolato più alte.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Gli agriturismi, che uniscono campagna e turismo, sono più diffusi dove il paes
 
 <!-- sezione: quadro -->
 
-L'agriturismo è un modello che tiene insieme agricoltura, turismo e presidio del territorio, e dà reddito extra alle aziende agricole. La sua diffusione, quasi raddoppiata nel tempo, è più alta dove il paesaggio è famoso e la domanda turistica forte, come in Toscana. È un turismo che, a differenza di altri, resta legato alla terra e ai residenti. Il paesaggio rende di più coltivato o mostrato ai turisti?
+L'agriturismo è un modello che tiene insieme agricoltura, turismo e presidio del territorio, e dà reddito extra alle aziende agricole. La sua diffusione, quasi raddoppiata nel tempo, è più alta dove il paesaggio è famoso e la domanda turistica forte, come in Toscana. È un turismo che, a differenza di altri, resta legato alla terra e ai residenti.
 
 <!-- sezione: limiti -->
 

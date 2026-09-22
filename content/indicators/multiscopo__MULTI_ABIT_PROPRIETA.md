@@ -8,7 +8,7 @@ L'Italia è un Paese di proprietari di casa: in media possiede l'abitazione l'84
 
 <!-- sezione: quadro -->
 
-La casa di proprietà è la principale forma di ricchezza delle famiglie italiane, e le regioni del Sud e le isole, pur più povere di reddito, ne hanno molte. È un patrimonio che protegge, ma anche un capitale immobile, difficile da usare e da lasciare quando il lavoro chiama altrove. Alta proprietà e bassa mobilità spesso vanno insieme. Possedere casa è sempre un vantaggio o a volte un'ancora?
+La casa di proprietà è la principale forma di ricchezza delle famiglie italiane, e le regioni del Sud e le isole, pur più povere di reddito, ne hanno molte. È un patrimonio che protegge, ma anche un capitale immobile, difficile da usare e da lasciare quando il lavoro chiama altrove. Alta proprietà e bassa mobilità spesso vanno insieme.
 
 <!-- sezione: limiti -->
 

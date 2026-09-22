@@ -8,7 +8,7 @@ Per molte famiglie la fonte principale di reddito non è il lavoro ma un trasfer
 
 <!-- sezione: quadro -->
 
-Una quota alta di redditi da trasferimenti riflette due cose intrecciate: una popolazione più anziana, con molte pensioni, e un mercato del lavoro più debole, con più sussidi. Al Sud si sommano entrambe, e la dipendenza dai trasferimenti diventa strutturale. È un indicatore descrittivo, ma dice quanto un territorio si regge sul lavoro e quanto sul sostegno pubblico. Vivere di trasferimenti è una rete di protezione o un segno di fragilità?
+Una quota alta di redditi da trasferimenti riflette due cose intrecciate: una popolazione più anziana, con molte pensioni, e un mercato del lavoro più debole, con più sussidi. Al Sud si sommano entrambe, e la dipendenza dai trasferimenti diventa strutturale. È un indicatore descrittivo, ma dice quanto un territorio si regge sul lavoro e quanto sul sostegno pubblico.
 
 <!-- sezione: limiti -->
 

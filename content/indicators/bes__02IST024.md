@@ -8,7 +8,7 @@ Frequentare le biblioteche è raro e concentrato: lo fa il 30,9% delle persone i
 
 <!-- sezione: quadro -->
 
-La biblioteca è un servizio culturale pubblico e gratuito, e la sua frequentazione dipende molto da quante ce ne sono e da come funzionano. Il divario enorme mostra dove esiste una rete di biblioteche vive e dove no, un pezzo di welfare culturale spesso trascurato. Dove mancano, la cultura torna a essere solo di chi la può comprare. Una biblioteca in ogni comune è un lusso o un diritto?
+La biblioteca è un servizio culturale pubblico e gratuito, e la sua frequentazione dipende molto da quante ce ne sono e da come funzionano. Il divario enorme mostra dove esiste una rete di biblioteche vive e dove no, un pezzo di welfare culturale spesso trascurato. Dove mancano, la cultura torna a essere solo di chi la può comprare.
 
 <!-- sezione: limiti -->
 

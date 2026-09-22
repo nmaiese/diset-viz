@@ -8,7 +8,7 @@ Il voto 6, appena sopra la metà della scala, riguarda in media il 13,8% delle p
 
 <!-- sezione: quadro -->
 
-Questo gradino segna il confine tra la soddisfazione piena e quella tiepida, e qui il Mezzogiorno pesa di più. Non è un voto negativo, è un giudizio prudente, di chi si dice appena soddisfatto. Il fatto che si concentri in alcune regioni del Sud, mentre il Nord si sposta su valori più alti, aiuta a leggere come mai le medie regionali divergano pur restando tutte in area positiva. La differenza tra un 6 e un 8 è nella vita o nel modo di misurarla?
+Questo gradino segna il confine tra la soddisfazione piena e quella tiepida, e qui il Mezzogiorno pesa di più. Non è un voto negativo, è un giudizio prudente, di chi si dice appena soddisfatto. Il fatto che si concentri in alcune regioni del Sud, mentre il Nord si sposta su valori più alti, aiuta a leggere come mai le medie regionali divergano pur restando tutte in area positiva.
 
 <!-- sezione: limiti -->
 

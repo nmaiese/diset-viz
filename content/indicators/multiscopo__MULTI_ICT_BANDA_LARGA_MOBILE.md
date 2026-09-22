@@ -8,7 +8,7 @@ La connessione mobile a banda larga inverte la mappa: è più diffusa al Sud e n
 
 <!-- sezione: quadro -->
 
-L'inversione non è un primato: al Sud si usa di più il mobile proprio dove la rete fissa è più debole, e il telefono diventa la connessione principale invece che complementare. È un ripiego tecnologico, non una scelta di avanguardia. Un accesso solo mobile limita ciò che si può fare, dallo studio al lavoro. Connettersi dal telefono è digitale di serie A o di serie B?
+L'inversione non è un primato: al Sud si usa di più il mobile proprio dove la rete fissa è più debole, e il telefono diventa la connessione principale invece che complementare. È un ripiego tecnologico, non una scelta di avanguardia. Un accesso solo mobile limita ciò che si può fare, dallo studio al lavoro.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Il voto 1 riguarda in media lo 0,4% delle persone, una delle quote più basse de
 
 <!-- sezione: quadro -->
 
-Quasi al fondo della scala restano piccolissime minoranze che danno alla propria vita un giudizio durissimo. Numeri così bassi non permettono classifiche affidabili tra regioni: la distanza tra la prima e l'ultima è fatta di pochi decimi di punto. Il loro valore non è nel confronto territoriale ma nell'esistenza stessa di questa fascia, che nessuna media può assorbire. Sono le persone che gli indicatori di benessere faticano a raggiungere. Ha senso leggere questa coda regione per regione, o va guardata come fenomeno nazionale?
+Quasi al fondo della scala restano piccolissime minoranze che danno alla propria vita un giudizio durissimo. Numeri così bassi non permettono classifiche affidabili tra regioni: la distanza tra la prima e l'ultima è fatta di pochi decimi di punto. Il loro valore non è nel confronto territoriale ma nell'esistenza stessa di questa fascia, che nessuna media può assorbire. Sono le persone che gli indicatori di benessere faticano a raggiungere.
 
 <!-- sezione: limiti -->
 

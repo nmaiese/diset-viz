@@ -8,7 +8,7 @@ La copertura della rete internet ultraveloce è cresciuta enormemente e, sorpren
 
 <!-- sezione: quadro -->
 
-La banda ultraveloce fissa ha ribaltato la geografia del divario digitale, dato che i piani pubblici di cablaggio hanno raggiunto anche il Sud, mentre le aree alpine restano difficili da collegare. È l'infrastruttura di base per lavoro, scuola e servizi online del futuro. Ma copertura non è uso, e serve poi che le famiglie si abbonino. La rete che arriva basta, o conta chi la usa davvero?
+La banda ultraveloce fissa ha ribaltato la geografia del divario digitale, dato che i piani pubblici di cablaggio hanno raggiunto anche il Sud, mentre le aree alpine restano difficili da collegare. È l'infrastruttura di base per lavoro, scuola e servizi online del futuro. Ma copertura non è uso, e serve poi che le famiglie si abbonino.
 
 <!-- sezione: limiti -->
 

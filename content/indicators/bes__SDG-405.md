@@ -8,7 +8,7 @@ I posti letto nelle strutture residenziali socio-assistenziali variano di sette 
 
 <!-- sezione: quadro -->
 
-È la stessa frattura vista per l'assistenza agli anziani, un Nord che offre posti in struttura e un Sud che affida la cura alle famiglie. Con l'invecchiamento, la domanda di posti crescerà ovunque, ma il Sud parte con una dotazione minima. Non è detto che più posti siano meglio, se l'alternativa domiciliare funziona, ma il divario di offerta è enorme. Curare in struttura o a casa è una scelta o una necessità dettata da ciò che c'è?
+È la stessa frattura vista per l'assistenza agli anziani, un Nord che offre posti in struttura e un Sud che affida la cura alle famiglie. Con l'invecchiamento, la domanda di posti crescerà ovunque, ma il Sud parte con una dotazione minima. Non è detto che più posti siano meglio, se l'alternativa domiciliare funziona, ma il divario di offerta è enorme.
 
 <!-- sezione: limiti -->
 

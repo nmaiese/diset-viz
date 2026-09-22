@@ -8,7 +8,7 @@ La partecipazione sociale, la presenza in associazioni e attività collettive, �
 
 <!-- sezione: quadro -->
 
-Partecipare a gruppi, associazioni e attività collettive costruisce relazioni e competenze civiche, ed è un pezzo importante del benessere oltre che della democrazia. La geografia conferma la frattura tra un Nord più associativo e un Sud dove la socialità passa per canali informali. Il lieve calo recente riguarda tutti, in una società più individuale. La vita associata è in ritirata ovunque o solo cambia forma?
+Partecipare a gruppi, associazioni e attività collettive costruisce relazioni e competenze civiche, ed è un pezzo importante del benessere oltre che della democrazia. La geografia conferma la frattura tra un Nord più associativo e un Sud dove la socialità passa per canali informali. Il lieve calo recente riguarda tutti, in una società più individuale.
 
 <!-- sezione: limiti -->
 

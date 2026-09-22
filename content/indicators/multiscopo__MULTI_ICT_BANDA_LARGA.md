@@ -8,7 +8,7 @@ Le famiglie con una connessione a banda larga sono ormai la grande maggioranza: 
 
 <!-- sezione: quadro -->
 
-La banda larga in casa è quasi universale, segno che l'infrastruttura di base ha raggiunto quasi tutti. Ma dietro il dato unico si nascondono tecnologie diverse, dalla fibra veloce alla connessione mobile, più lenta e a consumo, che cambiano cosa si può fare online. L'accesso c'è quasi ovunque, la qualità no. Avere la banda larga significa la stessa cosa ovunque?
+La banda larga in casa è quasi universale, segno che l'infrastruttura di base ha raggiunto quasi tutti. Ma dietro il dato unico si nascondono tecnologie diverse, dalla fibra veloce alla connessione mobile, più lenta e a consumo, che cambiano cosa si può fare online. L'accesso c'è quasi ovunque, la qualità no.
 
 <!-- sezione: limiti -->
 

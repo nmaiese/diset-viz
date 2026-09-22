@@ -8,7 +8,7 @@ La quota di medici di famiglia con troppi assistiti, oltre la soglia di legge, �
 
 <!-- sezione: quadro -->
 
-Un medico con troppi pazienti ha meno tempo per ciascuno, e questo indicatore misura la pressione sulla medicina di base, cresciuta con la carenza di camici bianchi e i pensionamenti. Al Nord, dove mancano più medici, la sovrasaturazione è maggiore, un paradosso rispetto alle risorse. È la porta d'ingresso del sistema sanitario che si ingolfa. Chi cura la medicina di famiglia quando i medici sono troppo pochi?
+Un medico con troppi pazienti ha meno tempo per ciascuno, e questo indicatore misura la pressione sulla medicina di base, cresciuta con la carenza di camici bianchi e i pensionamenti. Al Nord, dove mancano più medici, la sovrasaturazione è maggiore, un paradosso rispetto alle risorse. È la porta d'ingresso del sistema sanitario che si ingolfa.
 
 <!-- sezione: limiti -->
 

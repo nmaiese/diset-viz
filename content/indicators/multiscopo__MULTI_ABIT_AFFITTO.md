@@ -8,7 +8,7 @@ Vivere in affitto è più comune di quanto la retorica della casa di proprietà 
 
 <!-- sezione: quadro -->
 
-L'affitto non ha un verso migliore o peggiore: può segnalare mercati dinamici e mobilità, come nelle grandi città del Nord, oppure fragilità di chi non riesce ad accedere alla proprietà. Che compaiano insieme in testa Campania e Piemonte mostra queste due anime. Per le famiglie a basso reddito l'affitto è spesso la spesa che pesa di più. La casa in affitto è una scelta di flessibilità o un ripiego?
+L'affitto non ha un verso migliore o peggiore: può segnalare mercati dinamici e mobilità, come nelle grandi città del Nord, oppure fragilità di chi non riesce ad accedere alla proprietà. Che compaiano insieme in testa Campania e Piemonte mostra queste due anime. Per le famiglie a basso reddito l'affitto è spesso la spesa che pesa di più.
 
 <!-- sezione: limiti -->
 

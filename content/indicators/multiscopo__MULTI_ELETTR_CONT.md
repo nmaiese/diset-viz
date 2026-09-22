@@ -8,7 +8,7 @@ La soddisfazione per la continuità del servizio elettrico, cioè per l'assenza 
 
 <!-- sezione: quadro -->
 
-Questo giudizio ricalca da vicino i dati oggettivi sulle interruzioni, con il Sud meno soddisfatto, dove il servizio è davvero meno continuo. La netta convergenza tra percezione e realtà rende questo indicatore affidabile. Anche piccole differenze di continuità pesano molto su chi lavora da casa o usa dispositivi medici salvavita. Quanto vale, per una famiglia o un'impresa, un'elettricità che non si interrompe mai?
+Questo giudizio ricalca da vicino i dati oggettivi sulle interruzioni, con il Sud meno soddisfatto, dove il servizio è davvero meno continuo. La netta convergenza tra percezione e realtà rende questo indicatore affidabile. Anche piccole differenze di continuità pesano molto su chi lavora da casa o usa dispositivi medici salvavita.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Gli utenti assidui dei mezzi pubblici, chi li usa più volte a settimana, sono i
 
 <!-- sezione: quadro -->
 
-L'uso abituale dei mezzi pubblici segue la loro disponibilità, e le grandi città con reti forti hanno più utenti fedeli e assidui. È un indicatore descrittivo, ma racconta chi ha davvero un'alternativa all'auto nella vita di tutti i giorni. Dove il servizio è raro, anche chi vorrebbe non può contarci. La scelta del mezzo pubblico è libertà o mancanza di alternative?
+L'uso abituale dei mezzi pubblici segue la loro disponibilità, e le grandi città con reti forti hanno più utenti fedeli e assidui. È un indicatore descrittivo, ma racconta chi ha davvero un'alternativa all'auto nella vita di tutti i giorni. Dove il servizio è raro, anche chi vorrebbe non può contarci.
 
 <!-- sezione: limiti -->
 

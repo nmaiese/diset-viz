@@ -8,7 +8,7 @@ L'età media dei parlamentari eletti in ciascuna regione va dai 47,4 anni dell'A
 
 <!-- sezione: quadro -->
 
-Un Parlamento anziano riflette in parte una società che invecchia, ma anche partiti che rinnovano poco la classe dirigente. Le regioni piccole, con pochi eletti, mostrano età più variabili. Il ricambio generazionale in politica è lento, e i giovani restano sottorappresentati rispetto al loro peso nella società. Una politica più giovane guarderebbe più lontano o conta di più l'esperienza?
+Un Parlamento anziano riflette in parte una società che invecchia, ma anche partiti che rinnovano poco la classe dirigente. Le regioni piccole, con pochi eletti, mostrano età più variabili. Il ricambio generazionale in politica è lento, e i giovani restano sottorappresentati rispetto al loro peso nella società.
 
 <!-- sezione: limiti -->
 

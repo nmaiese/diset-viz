@@ -8,7 +8,7 @@ In Trentino Alto Adige quasi due persone su tre, il 60,9%, si dichiarano soddisf
 
 <!-- sezione: quadro -->
 
-La mappa della soddisfazione somiglia a quella dei redditi e dei servizi, con il Nord-Est davanti e il Mezzogiorno più indietro, ma qui misuriamo un giudizio, non una condizione. Le persone valutano la propria vita anche in base alle attese, al confronto con chi le circonda, a ciò che considerano normale. Per questo due territori con condizioni simili possono dichiarare soddisfazioni diverse, e un luogo più povero non è sempre meno soddisfatto. Quanto di questo 49% racconta come si sta davvero e quanto come ci si aspetta di stare?
+La mappa della soddisfazione somiglia a quella dei redditi e dei servizi, con il Nord-Est davanti e il Mezzogiorno più indietro, ma qui misuriamo un giudizio, non una condizione. Le persone valutano la propria vita anche in base alle attese, al confronto con chi le circonda, a ciò che considerano normale. Per questo due territori con condizioni simili possono dichiarare soddisfazioni diverse, e un luogo più povero non è sempre meno soddisfatto.
 
 <!-- sezione: limiti -->
 

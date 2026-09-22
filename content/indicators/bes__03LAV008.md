@@ -8,7 +8,7 @@ Una parte del lavoro sfugge alle regole. La quota di occupati non regolari va da
 
 <!-- sezione: quadro -->
 
-Il lavoro irregolare è la zona d'ombra del mercato: niente contratto, niente tutele, spesso paghe più basse. Si concentra al Sud e in alcuni settori, dall'agricoltura ai servizi alla persona, dove il confine con il nero è sottile. È un indicatore descrittivo, ma pesa su diritti, gettito e concorrenza tra imprese. Quanta parte del divario di lavoro tra Nord e Sud si nasconde nel sommerso?
+Il lavoro irregolare è la zona d'ombra del mercato: niente contratto, niente tutele, spesso paghe più basse. Si concentra al Sud e in alcuni settori, dall'agricoltura ai servizi alla persona, dove il confine con il nero è sottile. È un indicatore descrittivo, ma pesa su diritti, gettito e concorrenza tra imprese.
 
 <!-- sezione: limiti -->
 

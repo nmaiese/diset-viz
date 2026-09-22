@@ -8,7 +8,7 @@ Il voto 2 è raro, in media lo sceglie lo 0,6% delle persone, e negli ultimi ann
 
 <!-- sezione: quadro -->
 
-Ai piedi della scala le percentuali sono minime e ogni confronto va preso con cautela: differenze di pochi decimi cambiano l'ordine tra le regioni. È una parte della distribuzione preziosa, visto che racconta il disagio profondo, ma proprio per la sua piccolezza è la più esposta al caso. Che qui compaiano regioni del Centro-Nord più che del Sud conferma quanto la soddisfazione dichiarata non ricalchi la geografia economica. Un dato così sottile misura un fenomeno o il rumore attorno a un fenomeno?
+Ai piedi della scala le percentuali sono minime e ogni confronto va preso con cautela: differenze di pochi decimi cambiano l'ordine tra le regioni. È una parte della distribuzione preziosa, visto che racconta il disagio profondo, ma proprio per la sua piccolezza è la più esposta al caso. Che qui compaiano regioni del Centro-Nord più che del Sud conferma quanto la soddisfazione dichiarata non ricalchi la geografia economica.
 
 <!-- sezione: limiti -->
 

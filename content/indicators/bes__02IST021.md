@@ -8,7 +8,7 @@ I laureati in materie scientifiche e tecnologiche, le cosiddette STEM, sono più
 
 <!-- sezione: quadro -->
 
-Il primato del Sud sorprende, ma nasce dal rapporto per abitante, dato che regioni piccole con poche università concentrano i laureati STEM su una popolazione giovane ridotta. Non significa un'economia più tecnologica, dato che molti di questi laureati poi emigrano. Formare competenze scientifiche è prezioso, ma trattenerle lo è ancora di più. Il Sud forma i tecnici che poi arricchiscono il Nord?
+Il primato del Sud sorprende, ma nasce dal rapporto per abitante, dato che regioni piccole con poche università concentrano i laureati STEM su una popolazione giovane ridotta. Non significa un'economia più tecnologica, dato che molti di questi laureati poi emigrano. Formare competenze scientifiche è prezioso, ma trattenerle lo è ancora di più.
 
 <!-- sezione: limiti -->
 

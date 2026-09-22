@@ -8,7 +8,7 @@ Capire la propria bolletta elettrica non è scontato: ci riesce in media solo il
 
 <!-- sezione: quadro -->
 
-Che quattro famiglie su dieci non capiscano la bolletta è un problema di trasparenza, non di rete, e limita la capacità di scegliere l'offerta migliore o di risparmiare. La comprensione più bassa al Centro-Sud si somma ad altri divari di alfabetizzazione, anche digitale. Una bolletta oscura è un ostacolo alla concorrenza tra fornitori. Chi non capisce quanto spende può davvero risparmiare?
+Che quattro famiglie su dieci non capiscano la bolletta è un problema di trasparenza, non di rete, e limita la capacità di scegliere l'offerta migliore o di risparmiare. La comprensione più bassa al Centro-Sud si somma ad altri divari di alfabetizzazione, anche digitale. Una bolletta oscura è un ostacolo alla concorrenza tra fornitori.
 
 <!-- sezione: limiti -->
 

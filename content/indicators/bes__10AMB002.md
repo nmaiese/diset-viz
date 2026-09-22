@@ -8,7 +8,7 @@ Il consumo materiale interno misura in valore assoluto le risorse fisiche usate 
 
 <!-- sezione: quadro -->
 
-Essendo un totale, il dato dice quanto pesano le economie più grandi, non quanto siano efficienti nell'uso delle risorse. Per confrontare i territori servirebbe il consumo per abitante o per unità di PIL, non il valore assoluto. Il suo valore è ricordare la massa fisica di materiali, dal cemento ai combustibili, che ogni economia divora ogni anno. Crescere significa per forza consumare più materia?
+Essendo un totale, il dato dice quanto pesano le economie più grandi, non quanto siano efficienti nell'uso delle risorse. Per confrontare i territori servirebbe il consumo per abitante o per unità di PIL, non il valore assoluto. Il suo valore è ricordare la massa fisica di materiali, dal cemento ai combustibili, che ogni economia divora ogni anno.
 
 <!-- sezione: limiti -->
 

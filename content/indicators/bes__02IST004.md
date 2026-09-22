@@ -8,7 +8,7 @@ Quanti diplomati proseguono all'università varia molto. Ci va il 62,3% in Abruz
 
 <!-- sezione: quadro -->
 
-Il basso passaggio del Trentino non è un ritardo, dato che lì molti scelgono l'apprendistato e la formazione professionale, con ottimi sbocchi. Al Sud, invece, il minore passaggio si somma a più abbandono, ed è un segnale di opportunità mancate. Lo stesso numero basso racconta storie opposte a seconda del contesto. Non andare all'università è una scelta o una rinuncia?
+Il basso passaggio del Trentino non è un ritardo, dato che lì molti scelgono l'apprendistato e la formazione professionale, con ottimi sbocchi. Al Sud, invece, il minore passaggio si somma a più abbandono, ed è un segnale di opportunità mancate. Lo stesso numero basso racconta storie opposte a seconda del contesto.
 
 <!-- sezione: limiti -->
 

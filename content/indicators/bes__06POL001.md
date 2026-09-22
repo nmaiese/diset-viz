@@ -8,7 +8,7 @@ La partecipazione al voto è calata molto e in modo diseguale. È più alta in U
 
 <!-- sezione: quadro -->
 
-L'affluenza al voto è il segno più diretto della salute democratica, e il suo crollo, un terzo in meno in un ventennio, è uno dei dati più preoccupanti del quadro civico. Il divario ricalca la geografia della partecipazione, con il Centro storicamente più affezionato al voto e le isole più disincantate. Meno voto significa istituzioni meno rappresentative. Chi non vota rinuncia o non si sente più rappresentato?
+L'affluenza al voto è il segno più diretto della salute democratica, e il suo crollo, un terzo in meno in un ventennio, è uno dei dati più preoccupanti del quadro civico. Il divario ricalca la geografia della partecipazione, con il Centro storicamente più affezionato al voto e le isole più disincantate. Meno voto significa istituzioni meno rappresentative.
 
 <!-- sezione: limiti -->
 

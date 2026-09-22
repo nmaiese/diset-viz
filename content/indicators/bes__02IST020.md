@@ -8,7 +8,7 @@ L'asilo nido è molto meno diffuso della scuola dell'infanzia: raggiunge in medi
 
 <!-- sezione: quadro -->
 
-Il nido non è solo cura ma educazione precoce, e la sua assenza pesa proprio dove i contesti familiari sono più fragili, come al Sud. La forte crescita avvicina l'Italia agli obiettivi europei, ma il divario resta ampio e parte da lontano. Investire nei primi mille giorni è la politica con il ritorno più alto sul capitale umano. La disuguaglianza di opportunità comincia prima dei tre anni?
+Il nido non è solo cura ma educazione precoce, e la sua assenza pesa proprio dove i contesti familiari sono più fragili, come al Sud. La forte crescita avvicina l'Italia agli obiettivi europei, ma il divario resta ampio e parte da lontano. Investire nei primi mille giorni è la politica con il ritorno più alto sul capitale umano.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Quante famiglie faticano a raggiungere servizi essenziali, dalla farmacia al pro
 
 <!-- sezione: quadro -->
 
-L'accesso ai servizi di base è un diritto che si assottiglia nelle aree interne e montane, dove distanze e trasporti scarsi isolano interi paesi. La difficoltà è più alta al Sud, ma tocca ovunque le zone marginali, spesso invisibili nelle medie regionali. Dove i servizi si allontanano, restare a vivere diventa una scelta faticosa. Il diritto ai servizi essenziali dipende da dove si abita?
+L'accesso ai servizi di base è un diritto che si assottiglia nelle aree interne e montane, dove distanze e trasporti scarsi isolano interi paesi. La difficoltà è più alta al Sud, ma tocca ovunque le zone marginali, spesso invisibili nelle medie regionali. Dove i servizi si allontanano, restare a vivere diventa una scelta faticosa.
 
 <!-- sezione: limiti -->
 

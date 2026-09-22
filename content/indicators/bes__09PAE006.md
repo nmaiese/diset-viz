@@ -8,7 +8,7 @@ La pressione delle attività estrattive, cave e miniere, va da 598 metri cubi pe
 
 <!-- sezione: quadro -->
 
-Estrarre inerti e minerali serve all'edilizia e all'industria, ma consuma suolo, altera il paesaggio e lascia cave spesso non recuperate. La pressione è alta dove c'è più costruzione e industria, cioè soprattutto al Nord. È un indicatore descrittivo, senza un verso automatico, ma segnala un prelievo di risorse non rinnovabili dal territorio. Quanto paesaggio vale il materiale con cui costruiamo?
+Estrarre inerti e minerali serve all'edilizia e all'industria, ma consuma suolo, altera il paesaggio e lascia cave spesso non recuperate. La pressione è alta dove c'è più costruzione e industria, cioè soprattutto al Nord. È un indicatore descrittivo, senza un verso automatico, ma segnala un prelievo di risorse non rinnovabili dal territorio.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Sentirsi al sicuro camminando da soli col buio è più facile lontano dalle gran
 
 <!-- sezione: quadro -->
 
-Le regioni con le grandi aree metropolitane, dove i reati denunciati sono più numerosi, sono anche quelle dove ci si sente meno sicuri al buio: qui percezione e dati registrati vanno nella stessa direzione, al contrario di altri indicatori. La densità urbana, l'illuminazione, la presenza di persone e la conoscenza dei luoghi contano quanto la criminalità effettiva. È l'unico indicatore di quest'area in cui un valore alto è per definizione positivo. Ci si sente sicuri dove c'è meno crimine o dove ci si conosce di più?
+Le regioni con le grandi aree metropolitane, dove i reati denunciati sono più numerosi, sono anche quelle dove ci si sente meno sicuri al buio: qui percezione e dati registrati vanno nella stessa direzione, al contrario di altri indicatori. La densità urbana, l'illuminazione, la presenza di persone e la conoscenza dei luoghi contano quanto la criminalità effettiva. È l'unico indicatore di quest'area in cui un valore alto è per definizione positivo.
 
 <!-- sezione: limiti -->
 

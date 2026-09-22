@@ -8,7 +8,7 @@ Scomponendo la banda larga, quella fissa, di solito più veloce e stabile, è me
 
 <!-- sezione: quadro -->
 
-La connessione fissa è quella che regge lavoro da casa, studio e servizi pesanti, e la sua minore diffusione al Sud segnala un divario di qualità dietro quello, ormai chiuso, di accesso. Dove la fibra manca o costa, le famiglie ripiegano sul mobile. È la vera frattura digitale di oggi, meno visibile ma più profonda. La rete che conta è quella che arriva o quella che regge?
+La connessione fissa è quella che regge lavoro da casa, studio e servizi pesanti, e la sua minore diffusione al Sud segnala un divario di qualità dietro quello, ormai chiuso, di accesso. Dove la fibra manca o costa, le famiglie ripiegano sul mobile. È la vera frattura digitale di oggi, meno visibile ma più profonda.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Quante famiglie giudicano peggiorata la propria situazione economica? In media i
 
 <!-- sezione: quadro -->
 
-È un giudizio soggettivo sul cambiamento, non una misura del livello di reddito, e per questo la mappa sorprende: regioni ricche del Nord avvertono più peggioramento di alcune del Sud. Le famiglie valutano rispetto a ciò che avevano, non su una scala assoluta, quindi chi parte più in alto sente di più le perdite. Il forte calo recente segue il miglioramento del clima economico. La percezione del proprio bilancio segue i fatti o le attese?
+È un giudizio soggettivo sul cambiamento, non una misura del livello di reddito, e per questo la mappa sorprende: regioni ricche del Nord avvertono più peggioramento di alcune del Sud. Le famiglie valutano rispetto a ciò che avevano, non su una scala assoluta, quindi chi parte più in alto sente di più le perdite. Il forte calo recente segue il miglioramento del clima economico.
 
 <!-- sezione: limiti -->
 

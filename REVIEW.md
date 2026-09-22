@@ -17,14 +17,28 @@ codice il primo solo se toccano `content/`.
 - Ogni fonte esterna ha URL che risponde, data, e dice davvero ciò che il
   testo le attribuisce. Una fonte che non regge è `alta`; una fonte senza
   data è `media`.
-- Percezione presentata come fatto, conteggi ("N regioni salgono") non
-  ricalcolati sui dati, parenti di tema descritti in blocco (#203): `alta`.
+- Percezione presentata come fatto, parenti di tema descritti in blocco
+  (#203): `alta`.
+- I conteggi ("N regioni salgono", "nessuna supera X", "solo tre") **li
+  ricalcola una guardia** dal 18 settembre 2026, e una smentita ferma il pezzo
+  prima che tu lo legga. Qui resta da guardare quello che la guardia non vede:
+  un conteggio su un insieme che il dossier non conosce, o su un sottoinsieme
+  che la frase non nomina.
 
 ## Passaggio 2 — Regole editoriali (blocca sui pavimenti)
 
-- `content/STYLE.md`, e le tre guardie di `motore verifica`: una cifra che non
-  sta nel dossier, un link interno che non esiste, una fonte che non risponde
-  sono `alta` e fermano il pezzo. Non c'è una rubrica a punti.
+- `content/STYLE.md`, e le sei guardie di `motore verifica`: una cifra che non
+  sta nel dossier, un link interno che non esiste, una fonte che non risponde,
+  un link a una fonte nella prosa che non sta anche nell'elenco,
+  un'affermazione su un insieme che la classifica smentisce, la media semplice
+  delle regioni chiamata media nazionale. Sono `alta` e fermano il pezzo prima
+  della review. Non c'è una rubrica a punti.
+- **Il filo.** Il corpo della PR porta la scaletta: che cosa doveva portare
+  ogni sezione, e che cosa ha mosso il `redattore`. Leggila prima del pezzo e
+  poi guarda se il pezzo lo fa. Due righe `porta` che dicono la stessa cosa
+  sono due sezioni che ne fanno una: `media`. Una sezione senza passo
+  dichiarato, o una chiusa che dice solo quello che diceva l'attacco: `media`,
+  `alta` se le sezioni scambiabili sono due o più.
 - Assoluti: niente em-dash, en-dash, `;`, `…`; nessun termine da statistico
   (bontà del raggruppamento, mediana, spread, coefficiente di variazione,
   quantile, deviazione standard); massimo mille parole; link canonici agli

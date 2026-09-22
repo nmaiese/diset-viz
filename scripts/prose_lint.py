@@ -1,10 +1,20 @@
-"""The half of the writing rubric a regex can actually check, over every article.
+"""The tells a regex can actually count, over every article.
 
-`docs/WRITING_RUBRIC.md` scores an article on ten criteria. Six of them need a
-reader: whether the lead makes a point, whether one thread runs through the four
-sections, whether a cross-reference earns its place. Four do not, and those four
-are the ones that rot quietly across hundreds of articles, because each instance
-looks like a small stylistic slip and only the count makes it a problem.
+**There is no rubric any more.** `docs/WRITING_RUBRIC.md` scored an article on
+ten criteria and was retired on 2026-09-04 together with the scoring gate; this
+docstring named it until 2026-09-18, pointing at a file that no longer exists.
+What the rubric got right, and what survives it, is the split: some things need
+a reader and some do not.
+
+The ones that need a reader are now the two questions of the `lettore` agent in
+`nmaiese/redazione-ai` (does the piece hold together, is there a sentence you
+pay for twice) and the three moves of the `redattore`. Note that "whether one
+thread runs through the sections" was already on the retired rubric, and losing
+the rubric lost it: it came back on 2026-09-18 as the swap test.
+
+What does not need a reader is this file: tells that rot quietly across hundreds
+of articles, because each instance looks like a small stylistic slip and only
+the count makes it a problem.
 
 So this is not a gate and it does not fail a build. It answers two questions the
 rubric on its own cannot:

@@ -8,7 +8,7 @@ Questo indicatore misura il saldo dei laureati che una regione attira o perde. �
 
 <!-- sezione: quadro -->
 
-È la fotografia della fuga dei cervelli interna: il Sud forma laureati che poi se ne vanno, il Nord li attrae. Ogni giovane qualificato che parte è un investimento pubblico che frutta altrove, e un impoverimento del territorio d'origine. Il fenomeno alimenta il divario che lo genera, in un circolo difficile da rompere. Trattenere i laureati è possibile senza prima creare lavoro per loro?
+È la fotografia della fuga dei cervelli interna: il Sud forma laureati che poi se ne vanno, il Nord li attrae. Ogni giovane qualificato che parte è un investimento pubblico che frutta altrove, e un impoverimento del territorio d'origine. Il fenomeno alimenta il divario che lo genera, in un circolo difficile da rompere.
 
 <!-- sezione: limiti -->
 

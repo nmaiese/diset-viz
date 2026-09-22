@@ -8,7 +8,7 @@ Il voto 3 riguarda in media l'1,2% delle persone e negli ultimi anni è diminuit
 
 <!-- sezione: quadro -->
 
-Siamo nella coda bassa della soddisfazione, quella di chi esprime un giudizio nettamente negativo sulla propria vita. Sono minoranze piccole, ma è la parte della distribuzione che conta di più per capire il disagio, più della soddisfazione media. La geografia qui si mescola, con regioni ricche e povere vicine, segno che l'infelicità dichiarata non segue solo il reddito. Il lieve calo recente è incoraggiante, ma va confermato nel tempo. Quanto pesa questa minoranza in un dato dominato dai soddisfatti?
+Siamo nella coda bassa della soddisfazione, quella di chi esprime un giudizio nettamente negativo sulla propria vita. Sono minoranze piccole, ma è la parte della distribuzione che conta di più per capire il disagio, più della soddisfazione media. La geografia qui si mescola, con regioni ricche e povere vicine, segno che l'infelicità dichiarata non segue solo il reddito. Il lieve calo recente è incoraggiante, ma va confermato nel tempo.
 
 <!-- sezione: limiti -->
 
