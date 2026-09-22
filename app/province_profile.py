@@ -275,11 +275,14 @@ def indicatori(chiave):
             vicini = {k: v for k, v in dati["valori"].items() if k in sorelle}
             if len(vicini) > 1 and chiave in vicini:
                 altri = [v for k, v in vicini.items() if k != chiave]
+                # Niente flag "sopra la media": la pagina mostra il valore e
+                # la media una accanto all'altra, e un booleano che ripete un
+                # confronto gia' visibile e' solo un campo in piu' da tenere
+                # allineato.
                 in_regione = {
                     "posizione": _graduatoria(vicini, info.get("direction"))[chiave],
                     "quante": len(vicini),
                     "media": round(statistics.fmean(altri), 2),
-                    "sopra": valore > statistics.fmean(altri),
                 }
 
         variazione = None

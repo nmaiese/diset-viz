@@ -104,6 +104,11 @@ FOOTER_GROUPS = (
             {"label": "Contatti", "path": "/contatti"},
             {"label": "Metodologia e fonti", "path": "/metodologia"},
             {"label": "Privacy e cookie", "path": "/privacy"},
+            # Stessa pagina, punto diverso. `anchor` sta separata da `path`
+            # perche' `paths()` apre ogni percorso aspettandosi 200, e
+            # "/privacy#cookie" come percorso sarebbe una 404: l'ancora la
+            # legge il browser, non il router.
+            {"label": "Cookie policy", "path": "/privacy", "anchor": "#cookie"},
             {"label": "Termini", "path": "/termini"},
         ),
     },
@@ -116,12 +121,17 @@ def _footer_piatto():
     La barra della SPA e il cassetto del telefono mostrano una riga, non
     quattro colonne: `/metodologia` sta in due colonne con due nomi diversi e
     in una riga sola diventerebbe una ripetizione. Vince il primo nome, che e'
-    quello che la colonna piu' a sinistra ha gia' dato."""
+    quello che la colonna piu' a sinistra ha gia' dato.
+
+    La chiave e' percorso **piu' ancora**: "/privacy" e "/privacy#cookie" sono
+    due destinazioni diverse per chi legge, e deduplicarle sul solo percorso
+    farebbe sparire la seconda."""
     viste, uscita = set(), []
     for gruppo in FOOTER_GROUPS:
         for voce in gruppo["items"]:
-            if voce["path"] not in viste:
-                viste.add(voce["path"])
+            chiave = (voce["path"], voce.get("anchor", ""))
+            if chiave not in viste:
+                viste.add(chiave)
                 uscita.append(voce)
     return tuple(uscita)
 
@@ -178,6 +188,7 @@ def drawer_other():
     return primo_livello + [
         v for v in FOOTER
         if v["path"] not in coperti and v["path"] not in tendine
+        and not v.get("anchor")
     ]
 
 
@@ -220,5 +231,8 @@ def for_spa():
              "key": per_percorso[percorso].get("active", "")}
             for percorso in SPA_MASTHEAD if percorso in per_percorso
         ],
-        "footer": [{"label": v["label"], "path": v["path"]} for v in FOOTER],
+        # Il percorso che la SPA usa come href porta l'ancora, quando c'e':
+        # li' e' un indirizzo, non una rotta da risolvere.
+        "footer": [{"label": v["label"], "path": v["path"] + v.get("anchor", "")}
+                   for v in FOOTER],
     }

@@ -154,6 +154,31 @@ class LaPaginaMostraQuelloCheHa(unittest.TestCase):
                 parole = len(_visibile(self.client.get(f"/provincia/{chiave}").get_data(as_text=True)).split())
                 self.assertGreater(parole, 1200)
 
+    def test_niente_di_quello_che_si_calcola_resta_fuori_dalla_pagina(self):
+        """Tre campi sono stati calcolati a ogni render e non resi da nessuna
+        parte: la media delle altre province della regione, la variazione
+        dall'inizio della serie e il flag di citta' metropolitana. Lavoro fatto
+        centotre volte per niente, e invisibile: nessuna prova guarda cio' che
+        un modulo produce e un template non chiede.
+        """
+        pagina = self.client.get("/provincia/napoli").get_data(as_text=True)
+        testo = _visibile(pagina)
+        profilo = province_profile.profilo("napoli")
+        self.assertTrue(profilo["metro_city"], "Napoli e' citta' metropolitana")
+        self.assertIn("Città metropolitana", testo)
+
+        voci = province_profile.indicatori("napoli")
+        formatta = app.jinja_env.filters["it_num"]
+        con_media = [v for v in voci if v["in_regione"]]
+        self.assertTrue(con_media, "nessun confronto dentro la regione da rendere")
+        for voce in con_media[:5]:
+            with self.subTest(indicatore=voce["name"]):
+                self.assertIn(str(formatta(voce["in_regione"]["media"])), testo)
+
+        con_variazione = [v for v in voci if v["variazione"] is not None]
+        self.assertTrue(con_variazione, "nessuna variazione da rendere")
+        self.assertIn(f"dal {con_variazione[0]['year_from']}", testo)
+
     def test_il_markdown_porta_le_stesse_risposte_dell_html(self):
         """HTML e Markdown sono lo stesso documento alla stessa URL."""
         markdown = self.client.get(

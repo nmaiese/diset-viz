@@ -76,7 +76,7 @@
         {% for colonna in nav.FOOTER_GROUPS %}
         <div>
           <h4>{{ colonna.label }}</h4>
-          {% for voce in colonna['items'] %}<a href="{{ voce.path }}">{{ voce.label }}</a>
+          {% for voce in colonna['items'] %}<a href="{{ voce.path }}{{ voce.anchor or '' }}">{{ voce.label }}</a>
           {% endfor %}
         </div>
         {% endfor %}

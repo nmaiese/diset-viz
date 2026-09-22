@@ -54,7 +54,7 @@
   {{ breadcrumb.trail(percorso) }}
 
   <header class="article-hero">
-    <p class="eyebrow">Qualità della vita{% if p.region %} · {{ p.region }}{% endif %}</p>
+    <p class="eyebrow">Qualità della vita{% if p.region %} · {{ p.region }}{% endif %}{% if p.metro_city %} · Città metropolitana{% endif %}</p>
     <h1>{{ p.name }} è {{ p.rank }}ª su {{ p.total }} province</h1>
     <p class="page-lead">
       Con il profilo {{ p.profile.name | lower }}, {{ p.name }} ottiene {{ p.score | replace('.', ',') }} su 100.
@@ -105,7 +105,7 @@
   {% set temi = indicatori | map(attribute='theme') | unique | sort | list %}
   <section class="profile-explorer" id="explorer" data-region="{{ p.name }}">
     <h2>Tutti gli indicatori misurati a {{ p.name }}</h2>
-    <p class="page-note">I {{ indicatori | length }} indicatori del BES dei Territori con un dato per {{ p.name }}: quanto valgono, in che anno, e in che posizione fra le province che quell'anno hanno un dato (1 è la migliore). Il movimento è di posizione, non di valore, e confronta l'ultimo anno disponibile con quello prima.</p>
+    <p class="page-note">I {{ indicatori | length }} indicatori del BES dei Territori con un dato per {{ p.name }}: quanto valgono, in che anno, e in che posizione fra le province che quell'anno hanno un dato (1 è la migliore). Sotto il valore c'è quanto è cambiato dal primo anno della serie, nella stessa unità. Accanto alla posizione c'è quella fra le province della sua regione, con la media delle altre. Il movimento invece è di posizione, non di valore, e confronta l'ultimo anno disponibile con quello prima.</p>
 
     <div class="explorer-toolbar">
       <div class="macro-pills" role="group" aria-label="Filtra per area">
@@ -151,10 +151,11 @@
             data-rank="{{ i.rank if i.rank is not none else '' }}">
           <td><a href="{{ i.path }}">{{ i.name }}</a></td>
           <td class="explorer-theme">{{ i.theme }}</td>
-          <td class="num">{{ i.value | it_num }} <small>{{ i.unit }} · {{ i.year }}</small></td>
+          <td class="num">{{ i.value | it_num }} <small>{{ i.unit }} · {{ i.year }}</small>
+            {%- if i.variazione is not none %}<small>dal {{ i.year_from }}: {{ '+' if i.variazione > 0 else '' }}{{ i.variazione | it_num }}</small>{% endif %}</td>
           <td class="num">
             <strong>{{ i.rank }}</strong><small>/{{ i.province_count }}</small>
-            {% if i.in_regione %}<small>{{ i.in_regione.posizione }}ª di {{ i.in_regione.quante }} in {{ p.region }}</small>{% endif %}
+            {% if i.in_regione %}<small>{{ i.in_regione.posizione }}ª di {{ i.in_regione.quante }} in {{ p.region }}, media {{ i.in_regione.media | it_num }}</small>{% endif %}
           </td>
           <td class="num">
             {% if i.movement %}<span class="movement-tag {{ 'is-up' if i.movement > 0 else 'is-down' }}">{{ '+' if i.movement > 0 else '' }}{{ i.movement }}</span>
