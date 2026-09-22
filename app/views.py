@@ -14,14 +14,17 @@ from app.atlas_catalog import (
 )
 from app import divari
 from app import profiles
+from app import province_profile
 from app import sources
 from app import seo_policy
+from app import seo_titles
 from app import indicator_notes
 from app import indicator_texts
 from app import indicator_universe
 from app import indicator_view
 from app import editorial_state
 from app import quality_life_bes as qb
+from app.quality_life_config import QUALITY_LIFE_PROFILES
 from app import bes_data
 from app import multiscopo_data
 from app import external_atlas
@@ -35,12 +38,14 @@ from app import moderation
 from app import public_urls
 from app import publisher
 from app import agent_discovery
+from app import nav
+from app import taxonomy
 from app.taxonomy import DUPLICATE_BES_IDS, PROVINCE_ONLY_TITLE_COLLISIONS
 
 from flask import Response, abort, make_response, redirect, render_template, request, send_from_directory, url_for
 from flask.json import jsonify
 
-import csv, hmac, io, json, os, re, time, unicodedata
+import csv, datetime, email.utils, hmac, io, json, os, re, time, unicodedata
 import threading
 from functools import lru_cache
 from urllib.parse import quote_plus
@@ -66,7 +71,33 @@ _HOME_STORY_INDICATORS = ("901", "408", "910", "102")
 # something the data supports rather than a placeholder.
 _HOME_COMPARE_INDICATORS = ("901", "408", "910")
 _HOME_COMPARE_REGIONS = ("lombardia", "lazio", "campania")
-_HOME_COMPARE_COLORS = ("var(--ink)", "var(--accent)", "var(--positive-ink)")
+# Palette categorica (--cat-1..3), come la serie storica piu' sotto. Prima erano
+# --ink, --accent e --positive-ink: il colore del testo, la marca e un giudizio.
+# Il primo pesa una regione piu' delle altre, il secondo svaluta l'accento
+# dov'e' l'interazione vera, il terzo dice che la Campania sta "bene". Un colore
+# qui identifica un territorio, non lo giudica.
+_HOME_COMPARE_COLORS = ("var(--cat-1)", "var(--cat-2)", "var(--cat-3)")
+
+# --- Homepage 2026 design system ------------------------------------------
+# The indicator whose regional time series drives the homepage comparison
+# module, and the regions offered as toggles. Three are selected on load; the
+# module accepts at most three at a time, like /confronto.
+_HOME_SERIES_INDICATOR = "901"
+_HOME_SERIES_CHOICES = (
+    "lombardia", "emilia-romagna", "lazio", "campania", "sicilia", "piemonte",
+)
+_HOME_SERIES_DEFAULT = ("lombardia", "lazio", "campania")
+
+# Categorical data-viz palette (tokens --cat-1..4). Series colours, not brand:
+# a line's colour identifies a region, it does not rate it.
+_HOME_SERIES_COLORS = ("var(--cat-1)", "var(--cat-2)", "var(--cat-3)", "var(--cat-4)")
+
+# Sequential teal ramp of the 2026 design system. Lives in indicator_notes
+# (with the reason it is CSS custom properties and not hex) because the
+# indicator page uses the same one: keeping a second copy here is how a map and
+# its legend start disagreeing. Every page still on the legacy stylesheet keeps
+# the old blue ramp until it is migrated in turn.
+_DS_SEQ_RAMP = indicator_notes.DS_SEQ_RAMP
 
 # Production contract consumed by scripts/audit_public_discoverability.py.  Keep
 # this literal (rather than deriving it inside the audit): app/views.py owns the
@@ -87,7 +118,7 @@ PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
         {"path": "/openapi.json", "content_type": "application/json", "marker": "\"openapi\"", "kind": "document", "x_robots": "noindex, nofollow, noarchive"},
         {"path": "/.well-known/agent-skills/index.json", "content_type": "application/json", "marker": "\"skills\"", "kind": "document", "x_robots": "noindex, nofollow, noarchive"},
         {"path": "/.well-known/agent-skills/query-divario-italia/SKILL.md", "content_type": "text/markdown", "marker": "# Consultare Divario Italia", "kind": "document", "x_robots": "noindex, nofollow, noarchive"},
-        {"path": "/", "content_type": "text/html", "marker": "Un atlante per leggere l'Italia", "kind": "html", "markdown_marker": "# Divario Italia"},
+        {"path": "/", "content_type": "text/html", "marker": "Indicatore in evidenza", "kind": "html", "markdown_marker": "# Divario Italia"},
         {"path": "/atlante", "content_type": "text/html", "marker": "Atlante degli indicatori territoriali italiani", "kind": "html", "markdown_marker": "# Atlante degli indicatori territoriali italiani"},
         {"path": "/catalogo-dati", "content_type": "text/html", "marker": "Catalogo dati di Divario Italia", "kind": "html", "markdown_marker": "# Catalogo dati di Divario Italia"},
         {"path": "/blog", "content_type": "text/html", "marker": "Analisi brevi e basate sui dati", "kind": "html", "markdown_marker": "# Storie dai dati"},
@@ -121,6 +152,10 @@ def _inject_license():
         "publisher": publisher.ORGANIZATION,
         "publisher_jsonld": publisher.organization_json(),
         "corrections_url": publisher.CORRECTIONS_URL,
+        # La navigazione sta in `app/nav.py`, e la testata la legge da li' invece
+        # di elencarla. `_ds_header.html` e' incluso da ogni pagina Flask, quindi
+        # il posto giusto e' questo processore, non ogni singola `render_template`.
+        "nav": nav,
     }
 
 
@@ -303,6 +338,7 @@ def home():
             agent_discovery.home_markdown(summary, featured, recent_posts, SITE_URL),
             f"{SITE_URL}/",
         )
+    themes_preview = _home_themes_preview()
     return render_template(
         "home.html",
         site_url=SITE_URL,
@@ -312,14 +348,18 @@ def home():
         sources_label=summary["institutions_label"],
         year_min=summary["year_min"],
         year_max=summary["year_max"],
-        map_hero=_home_map_hero(),
-        capabilities=_home_capabilities(total_indicators),
-        stories=_home_story_cards(),
-        themes_preview=_home_themes_preview(),
-        compare_preview=_home_compare_preview(),
+        themes_preview=themes_preview,
         qol=_home_qol_preview(),
         quiz_games=_home_quiz_games(),
         posts=recent_posts,
+        # 2026 design system modules
+        hero_map=_home_hero_map(),
+        paths=_home_paths(summary, themes_preview),
+        featured_story=_home_featured_story(),
+        insight_cards=_home_insight_cards(),
+        series_module=_home_series_module(),
+        qol_module=_home_qol_module(),
+        trust_cards=_home_trust_cards(summary),
     )
 
 
@@ -332,7 +372,17 @@ def atlante():
             agent_discovery.atlas_markdown(featured, SITE_URL),
             f"{SITE_URL}/atlante",
         )
-    return render_template('app.html', featured_indicators=featured)
+    # Il percorso e la lista, come su ogni altra pagina d'ingresso. `/atlante`
+    # era indicizzata e in sitemap senza nessun JSON-LD e senza percorso: le
+    # uniche due pagine cosi' erano le due della SPA, e non per una ragione.
+    # La lista dichiara gli stessi indicatori che il guscio server-rendered
+    # mostra gia', quindi non c'e' niente di dichiarato che il visibile non
+    # sostenga.
+    return render_template(
+        'app.html',
+        featured_indicators=featured,
+        percorso=[{"name": "Home", "path": "/"}, {"name": "Atlante", "path": "/atlante"}],
+    )
 
 
 @app.route("/catalogo-dati")
@@ -708,6 +758,42 @@ def blog_index():
     )
 
 
+# I nomi con cui il feed viene cercato. `/blog/feed.xml` e' il canonico, gli
+# altri due sono le due forme che chiunque prova per prime, e finche' erano 404
+# il feed non esisteva per chi non leggeva l'HTML.
+@app.route("/feed.xml")
+@app.route("/rss.xml")
+def blog_feed_alias():
+    return redirect("/blog/feed.xml", code=301)
+
+
+@app.route("/blog/feed.xml")
+def blog_feed():
+    """Il feed del blog, RSS 2.0.
+
+    La sitemap dice a un crawler che una pagina esiste, il feed dice a chi gia'
+    segue il sito che ne e' uscita una nuova: aggregatori, newsletter, e le
+    catene che rileggono un sito senza ripassare dall'indice. Le date vanno in
+    RFC 822, che non e' l'ISO della sitemap: un lettore di feed che non sa
+    leggere `pubDate` mette l'articolo in cima per sempre.
+    """
+    posts = get_posts()[:20]
+
+    def rfc822(giorno):
+        # Mezzogiorno UTC, non mezzanotte: il post ha una data e non un orario,
+        # e con mezzanotte un lettore in un fuso a ovest lo data al giorno prima.
+        momento = datetime.datetime.combine(giorno, datetime.time(12, 0),
+                                            tzinfo=datetime.timezone.utc)
+        return email.utils.format_datetime(momento)
+
+    voci = [dict(post, pub_date=rfc822(post["date"])) for post in posts]
+    xml = render_template(
+        "blog_feed.xml", posts=voci, site_url=SITE_URL, site_name=SITE_NAME,
+        updated=rfc822(max(p["date_modified"] for p in posts)) if posts else None,
+    )
+    return Response(xml, mimetype="application/rss+xml")
+
+
 @app.route("/blog/<slug>")
 def blog_post(slug):
     post = get_post(slug)
@@ -869,9 +955,13 @@ def _render_indicator(family, raw_id):
     # l'articolo non rende come H2 si toglie invece di puntare nel vuoto.
     query_map = _query_map_for_article(level["query_map"], article)
     lead = article["lead"] or indicator_texts.composed_lead(meta, level)
-    # The lead is the SERP description as well as the first thing on the page,
-    # so the two can never describe the indicator differently.
-    seo_description = indicator_notes.meta_description_from_attacco(lead)
+    # Dove il pezzo c'è, la descrizione è il suo attacco e resta la prima cosa
+    # che si legge in pagina: le due non possono dire cose diverse. Dove il
+    # pezzo non c'è, prima usciva il lead composto, che è la formula da cui
+    # nascono descrizioni che non dicono niente ("Esprime in euro la
+    # retribuzione media annua dei lavoratori dipendenti, nel perimetro medio
+    # definito dalla fonte."): lì adesso vanno le cifre.
+    seo_description = seo_titles.page_description(article, meta, level, composed=lead)
 
     explore_state = seo_policy.has_explore_params(request.args)
     noindex = (not meta["indexable"]) or explore_state
@@ -902,20 +992,17 @@ def _render_indicator(family, raw_id):
     else:
         source_qualifier = None
 
-    # Titolo H1 e SERP: autorati se il file dell'articolo li porta, altrimenti il
-    # derivato di oggi (H1 = nome amministrativo, title = boilerplate "per regione").
-    # Un titolo autorato passa comunque dal budget SEO: `authored_seo_title` clampa
-    # a `_TITLE_MAX` come il derivato, non è una scusa per sforare.
+    # Titolo H1 e SERP. L'H1 resta quello autorato o il nome amministrativo; il
+    # `<title>` passa da `seo_titles.page_title`, che prova nell'ordine il
+    # `seo_title` scritto, l'`h1` se ci sta intero, e il titolo-risposta con
+    # l'intervallo dentro. Il perché sta nel docstring di quel modulo: la CTR
+    # è 3,14% su posizioni che ne varrebbero il 4,6%, e il titolo che dice solo
+    # il nome della serie non dà un motivo per cliccare.
     page_h1 = article["h1"] or meta["name"]
-    if article["seo_title"] or article["h1"]:
-        seo_title_value = indicator_notes.authored_seo_title(
-            article["seo_title"] or article["h1"], SITE_NAME,
-            source_qualifier=source_qualifier,
-        )
-    else:
-        seo_title_value = indicator_notes.seo_title(
-            meta["name"], SITE_NAME, source_qualifier=source_qualifier
-        )
+    seo_title_value = seo_titles.page_title(
+        article, meta, level, site_name=SITE_NAME,
+        source_qualifier=source_qualifier,
+    )
 
     response = make_response(render_template(
         "indicator_page.html",
@@ -936,6 +1023,12 @@ def _render_indicator(family, raw_id):
         seo_description=seo_description,
         dataset_description=_dataset_description(lead, meta),
         dataset_updated=publisher.dataset_updated(meta["family"]),
+        # Gli stessi estremi che `seo_titles` mette nel titolo, cosi' il
+        # `PropertyValue` del JSON-LD e la SERP non possono dire due cifre
+        # diverse. `extremes` torna `(None, None)` sulle serie `contextual`,
+        # dove il catalogo non espone un massimo e un minimo di proposito, e il
+        # template salta minValue e maxValue.
+        estremi=dict(zip(("alto", "basso"), seo_titles.extremes(meta, level))),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{meta['canonical_path']}",
@@ -966,12 +1059,98 @@ def region_page(region_key):
             agent_discovery.region_markdown(profile, SITE_URL),
             f"{SITE_URL}/regione/{region_key}",
         )
+    # `charts` si importa qui e non in cima come fa gia' la scheda: il modulo
+    # tira dentro lo strato dati, e in cima chiuderebbe un anello di import.
+    from app import charts
+
     return render_template(
         "region_page.html",
         profile=profile,
+        portrait=charts.portrait_svg(profile["portrait_rows"], profile["region"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/regione/{region_key}",
+    )
+
+
+def _titolo_provincia(profilo):
+    """Il `<title>` di una pagina provincia, dentro i sessanta caratteri.
+
+    "Verbano-Cusio-Ossola" da solo ne prende venti, e la forma piena arrivava a
+    sessantaquattro. Cade la coda "per qualita' della vita", che il resto della
+    frase lascia gia' capire: "53a su 103 province" non si legge in nessun
+    altro modo. Restano il nome, che e' la parola cercata, e la posizione, che
+    e' il motivo per cliccare.
+    """
+    testa = f"{profilo['name']}: {profilo['rank']}ª su {profilo['total']} province"
+    for coda in (" per qualità della vita", ""):
+        if len(testa) + len(coda) <= 60:
+            return testa + coda
+    return testa
+
+
+def _descrizione_provincia(profilo):
+    """La descrizione SERP di una pagina provincia, dentro i 160 caratteri.
+
+    Si compone qui e non nel template per la stessa ragione della pagina tema:
+    i nomi delle dimensioni vanno da "Abitazione" a "Reddito, inclusione e
+    accessibilita'" e in un template non si misura niente. Scritta in Jinja
+    sforava di sei caratteri su Lecce.
+
+    Si sacrifica in ordine: prima cade "peggio su", che e' la meta' meno
+    cercata, poi anche "meglio su". L'apertura con posizione e punteggio sta
+    sempre dentro, perche' e' il motivo per cui la pagina esiste.
+    """
+    testa = (f"Qualità della vita a {profilo['name']}: {profilo['rank']}ª su "
+             f"{profilo['total']} province, punteggio "
+             f"{str(profilo['score']).replace('.', ',')} su 100.")
+    forte = profilo["strongest"][0]["name"].lower() if profilo.get("strongest") else None
+    debole = profilo["weakest"][0]["name"].lower() if profilo.get("weakest") else None
+
+    code = []
+    if forte and debole:
+        code.append(f" Meglio su {forte}, peggio su {debole}. Dati Istat BES.")
+    if forte:
+        code.append(f" Meglio su {forte}. Dati Istat BES.")
+    code.append(" Dati Istat BES.")
+    for coda in code:
+        if len(testa) + len(coda) <= 160:
+            return testa + coda
+    return testa
+
+
+@app.route("/provincia/<province_key>")
+@cache.cached(timeout=300, unless=agent_discovery.prefers_markdown)
+def province_page(province_key):
+    """Il profilo di una provincia.
+
+    Il sito misura 103 province nella classifica della qualita' della vita e
+    nessuna di loro aveva una pagina: chi cercava "qualita' della vita
+    provincia di Lecce" arrivava su una tabella di 103 righe, e da li' poteva
+    solo salire alla regione. Il commento che costruisce quella classifica lo
+    diceva gia': "Le province non hanno un profilo, ma la loro regione si'".
+
+    Il dato c'era tutto, mancava la superficie: `province_profile` non calcola
+    niente di nuovo, mette in forma cio' che `quality_life_bes` gia' produce.
+    """
+    profilo = province_profile.profilo(province_key)
+    if profilo is None:
+        abort(404)
+    if agent_discovery.prefers_markdown():
+        return agent_discovery.markdown_response(
+            agent_discovery.province_markdown(
+                profilo, province_profile.vicine(province_key), SITE_URL),
+            f"{SITE_URL}/provincia/{province_key}",
+        )
+    return render_template(
+        "province_page.html",
+        profile=profilo,
+        vicine=province_profile.vicine(province_key),
+        seo_description=_descrizione_provincia(profilo),
+        seo_title=_titolo_provincia(profilo),
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/provincia/{province_key}",
     )
 
 
@@ -1005,18 +1184,137 @@ def theme_page(theme_slug):
         abort(404)
     if request.path != profile["theme_path"]:
         return redirect(profile["theme_path"], code=301)
+    # La classifica delle venti regioni sul tema: e' quello che trasforma la
+    # pagina da elenco di link in una pagina che risponde a "dove si sta
+    # meglio". Esce dalla stessa matrice dei percentili che alimenta i profili
+    # regione, letta per tema invece che per regione. Su due temi non esce
+    # (docstring di `theme_standings`): li' la pagina mostra gli indicatori
+    # senza fingere una graduatoria.
+    standings = profiles.theme_standings(profile["theme"])
+    siblings = [
+        t for area in atlas_themes_by_macro_area() if area["macro_area"] == profile["macro_area"]
+        for t in area["themes"] if t["path"] != profile["theme_path"]
+    ]
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
-            agent_discovery.theme_markdown(profile, SITE_URL),
+            agent_discovery.theme_markdown(profile, SITE_URL, standings=standings),
             f"{SITE_URL}{profile['theme_path']}",
         )
     return render_template(
         "theme_page.html",
         profile=profile,
+        standings=standings,
+        siblings=siblings,
+        map_colors=indicator_notes.ds_choropleth_colors(
+            [{"region_key": r["region_key"], "value": r["score"]} for r in standings["rows"]]
+        ) if standings["rows"] else {},
+        featured=_theme_featured(profile),
+        # L'ancora della macro-area, la stessa che usa la home. Il template se la
+        # calcolava da se' con `lower | replace(' ', '-') | replace(',', '')`, che
+        # non e' la regola di `slugify_taxonomy` e puntava a un'ancora che non e'
+        # mai esistita: "Reddito, inclusione e accessibilita'" diventava
+        # `reddito-inclusione-e-accessibilità` con l'accento dentro.
+        macro_area_path=_area_anchor(profile["macro_area"]) if profile.get("macro_area") else None,
+        seo_title=_theme_title(profile, standings),
+        seo_description=_theme_description(profile, standings),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}{profile['theme_path']}",
     )
+
+
+def _theme_title(profile, standings):
+    """Il `<title>` della pagina tema, dentro i sessanta caratteri.
+
+    "Reddito, inclusione e accessibilita'" da solo ne prende trentacinque, e
+    con " per regione: la classifica 2025" arrivava a sessantasette. La coda
+    " per regione" cade per prima: e' la parte che il resto della frase gia'
+    lascia capire, mentre l'anno e la parola "classifica" sono il motivo per
+    cliccare.
+    """
+    tema = profile["theme"]
+    if standings.get("rated") and standings.get("rows"):
+        coda = f": la classifica {standings['year_max']}"
+        con_livello = f"{tema} per regione{coda}"
+        return con_livello if len(con_livello) <= 60 else f"{tema}{coda}"
+    breve = f"{tema}: {profile['indicator_count']} indicatori per regione"
+    return breve if len(breve) <= 60 else f"{tema}: {profile['indicator_count']} indicatori"
+
+
+def _theme_description(profile, standings):
+    """La descrizione SERP della pagina tema, dentro i 155 caratteri.
+
+    Si compone qui e non nel template perche' i nomi dei temi vanno da "Turismo"
+    a "Reddito, inclusione e accessibilita'" e quelli delle regioni da "Lazio" a
+    "Trentino Alto Adige": scritta in Jinja sforava di diciotto caratteri sul
+    tema piu' lungo, e in un template non si misura niente. La coda si aggiunge
+    solo se avanza spazio.
+    """
+    tema = profile["theme"]
+    if standings.get("rated") and standings.get("rows"):
+        prima, ultima = standings["rows"][0], standings["rows"][-1]
+        testo = (f"{tema}, {standings['year_max']}: in testa {prima['region']}, "
+                 f"in coda {ultima['region']}.")
+        coda = (f" Le {len(standings['rows'])} regioni ordinate su "
+                f"{standings['indicator_count']} indicatori, con mappa e classifica.")
+    else:
+        testo = f"{tema}: {profile['indicator_count']} indicatori Istat per le regioni italiane."
+        coda = " Ogni serie con fonte, classifica e andamento negli anni."
+    return testo + coda if len(testo) + len(coda) <= 155 else testo
+
+
+# Quanti indicatori si mettono in evidenza sulla pagina tema. Cinque perche'
+# sotto la piega ci va comunque l'elenco completo: qui serve un punto di
+# ingresso, non una seconda lista.
+_THEME_FEATURED = 5
+
+
+def _theme_featured(profile):
+    """I pochi indicatori con cui vale la pena aprire un tema.
+
+    Il criterio e' la solidita' del dato, non il gusto: prima quelli completi
+    su tutte le regioni, poi quelli che entrano nel punteggio della qualita'
+    della vita, poi i piu' aggiornati, e a parita' l'ordine alfabetico perche'
+    la pagina non cambi da sola fra due richieste.
+
+    Poi si sfoltisce per **misura**, e questo e' il pezzo che conta. Ordinando
+    solo per solidita', su "Lavoro e conciliazione" uscivano cinque schede che
+    erano quattro varianti della stessa cosa (attivita' maschile e femminile,
+    disoccupazione di lunga durata totale, femmine e maschi): tutte complete,
+    tutte nel punteggio, tutte aggiornate, e tutte che dicono al lettore la
+    stessa cosa. Una vetrina di varianti non e' una vetrina.
+    """
+    visti = set()
+    scelti = []
+    for ind in sorted(
+        profile["indicators"],
+        key=lambda i: (
+            not i.get("complete"),
+            not i.get("quality_life_scored"),
+            -(i.get("year_max") or 0),
+            i["name"],
+        ),
+    ):
+        chiave = _misura_di(ind["name"])
+        if chiave in visti:
+            continue
+        visti.add(chiave)
+        scelti.append(ind)
+        if len(scelti) == _THEME_FEATURED:
+            break
+    return scelti
+
+
+# Le parole che distinguono una variante dalla sua misura, non la misura.
+_DIMENSIONI = ("femmine", "femminile", "maschi", "maschile", "totale", "totali")
+
+
+def _misura_di(nome):
+    """La misura sotto un nome, senza la dimensione che ne fa una variante."""
+    senza_parentesi = re.sub(r"\s*\([^)]*\)", "", nome or "")
+    parole = [w for w in senza_parentesi.lower().split()
+              if w.strip(",.") not in _DIMENSIONI]
+    return " ".join(parole).strip()
 
 
 @app.route("/regioni")
@@ -1212,6 +1510,14 @@ def quality_life_region_api_legacy(region_key):
     return jsonify(payload) if payload else abort(404)
 
 
+def _quality_life_row_count(level):
+    """Quante righe ha la classifica di quel livello, zero se non c'e' il dato."""
+    if not qb.has_bes_data(level):
+        return 0
+    ranking = qb.build_bes_ranking(level, qb.DEFAULT_PROFILE)
+    return len(ranking["ranking"]) if ranking else 0
+
+
 @app.route("/qualita-della-vita")
 def quality_life_index():
     preview = qb.build_bes_ranking(URL_LEVEL["regioni"], qb.DEFAULT_PROFILE)
@@ -1223,6 +1529,11 @@ def quality_life_index():
         default_profile=qb.DEFAULT_PROFILE,
         preview_rows=preview_rows,
         has_province_data=qb.has_bes_data(URL_LEVEL["province"]),
+        # I due conteggi servono al `<title>`: "20 regioni e 103 province" dice
+        # che cosa si trova, il nome del sito no. La classifica provinciale e'
+        # gia' costruita e memoizzata da `/qualita-della-vita/classifica`.
+        region_total=len(preview["ranking"]) if preview else 0,
+        province_total=_quality_life_row_count(URL_LEVEL["province"]),
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/qualita-della-vita",
@@ -1249,9 +1560,28 @@ def quality_life_classifica(url_level):
     if not public_matches:
         abort(404)
     canonical = public_matches[0]["loc"]
+    # I territori della classifica erano testo nudo: venti regioni e 103
+    # province su una pagina che sta in posizione 4,1 per "classifica regioni
+    # italiane per qualita' della vita", e non portavano da nessuna parte. Le
+    # province non hanno un profilo, ma la loro regione si', quindi il nome
+    # della regione diventa la porta. Si calcola qui e non nel template perche'
+    # `payload["ranking"]` e' memoizzato: mutarlo avvelenerebbe la cache.
+    # `region_key_for` slugifica qualunque stringa, anche una che non e' una
+    # regione: le province di Bolzano e Trento dichiarano "Provincia Autonoma
+    # Bolzano", da cui usciva un link a una pagina che non esiste. Si valida
+    # contro le regioni vere, non contro il fatto che una chiave sia uscita.
+    region_paths = {}
+    for row in payload["ranking"]:
+        nome = row.get("region")
+        if not nome:
+            continue
+        chiave = profiles.region_key_for(nome)
+        if chiave and profiles.region_name(chiave):
+            region_paths[nome] = f"/regione/{chiave}"
     response = make_response(render_template(
         "quality_life_classifica.html",
         data=payload,
+        region_paths=region_paths,
         quality_map_data=quality_map_data,
         url_level=url_level,
         profiles=qb.get_quality_life_profiles(),
@@ -1805,6 +2135,11 @@ def sitemap():
         {"loc": f"{SITE_URL}/privacy", "priority": "0.4"},
     ]
     pages.extend({"loc": item["loc"], "priority": "0.8"} for item in public_urls.quality_life_public_urls())
+    # Le 103 province. La sorgente e' la classifica, non un elenco scritto a
+    # mano: una provincia che entra o esce dal dato non deve lasciare in
+    # sitemap una URL che risponde 404.
+    pages.extend({"loc": f"{SITE_URL}/provincia/{chiave}", "priority": "0.6"}
+                 for chiave in province_profile.chiavi())
     for post in get_posts():
         pages.append({
             "loc": post["url"],
@@ -1891,6 +2226,15 @@ _ROBOTS_DISALLOW_PATHS = ("/api/", "/data", "/legacy", "/legacy-reddito")
 
 @app.route("/robots.txt")
 def robots():
+    if config.STAGING:
+        # Una copia intera del sito su una seconda URL non va scansionata da
+        # nessuno, e il robots.txt di produzione qui direbbe il contrario
+        # (`Allow: /` piu' la sitemap del dominio vero).
+        return Response(
+            "# Ambiente di stage di Divario Italia. Non e' il sito pubblico.\n"
+            "User-agent: *\nDisallow: /\n",
+            mimetype="text/plain",
+        )
     lines = [_ROBOTS_CONTENT_SIGNALS_PREAMBLE, ""]
     # Default group: content signals, then the shared path rules for all crawlers.
     lines += ["User-agent: *", f"Content-Signal: {_ROBOTS_CONTENT_SIGNAL}", "Allow: /"]
@@ -2158,100 +2502,13 @@ def _map_hero(indicator_ids):
         "indicator_path": meta["path"],
         "theme": meta["theme"],
         "year": year,
-        "colors": indicator_notes.region_choropleth_colors(values),
+        # La rampa del design system, come ogni altra mappa del sito da quando
+        # la migrazione e' finita: `_map_panel.html` lo usa la home e lo usa
+        # /divari-regionali, e due mappe della stessa Italia non possono avere
+        # due scale di colore.
+        "colors": indicator_notes.ds_choropleth_colors(values),
         "tooltip_data": tooltip_data,
     }
-
-
-def _home_map_hero():
-    return _map_hero(_HOME_MAP_INDICATORS)
-
-
-def _home_capabilities(total_indicators):
-    return [
-        {
-            "kicker": "Atlante",
-            "title": f"{total_indicators} indicatori esplorabili",
-            "body": "Tutti gli indicatori Istat delle politiche di sviluppo, per tema e completezza.",
-            "href": "/atlante",
-            "cta": "Apri l'atlante",
-        },
-        {
-            "kicker": "Regioni",
-            "title": "Schede regione",
-            "body": "Punti di forza, punti deboli e ranking tematico per tutte le 20 regioni.",
-            "href": "/regioni",
-            "cta": "Sfoglia le regioni",
-        },
-        {
-            "kicker": "Confronta",
-            "title": "Regione contro regione",
-            "body": "Metti a confronto due o tre regioni su qualsiasi indicatore, con mappa e serie storica.",
-            "href": "/confronto",
-            "cta": "Confronta ora",
-        },
-        {
-            "kicker": "Temi",
-            "title": "Aree e temi",
-            "body": "Economia, lavoro, salute, ambiente: ogni tema raccoglie i suoi indicatori in una pagina.",
-            "href": "/temi",
-            "cta": "Scopri i temi",
-        },
-        {
-            "kicker": "Qualità della vita",
-            "title": "Classifica composita",
-            "body": "Un indice sperimentale che unisce salute, lavoro, istruzione e ambiente.",
-            "href": "/qualita-della-vita",
-            "cta": "Vedi la classifica",
-        },
-        {
-            "kicker": "Quiz",
-            "title": "Metti alla prova quello che sai",
-            "body": "Tre giochi rapidi sui dati Istat, con una classifica settimanale.",
-            "href": "/quiz",
-            "cta": "Gioca ora",
-        },
-    ]
-
-
-def _home_story_cards():
-    """Real 'chi guida, chi resta indietrò highlights for the homepage,
-    limited to indicators with a declared higher_better/lower_better
-    direction so the framing is something the data actually supports."""
-    cards = []
-    for indicator_id in _HOME_STORY_INDICATORS:
-        payload = get_atlas_indicator(indicator_id)
-        if payload is None:
-            continue
-        meta = payload["metadata"]
-        year = meta["year_max"]
-        values = get_atlas_indicator_year(indicator_id, year)["values"]
-        direction = (meta.get("explain") or {}).get("direction")
-        ranked = list(reversed(values)) if direction in ("lower_better", "higher_worse") else values
-        best, worst = ranked[0], ranked[-1]
-        unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
-        if direction == "lower_better":
-            note = (
-                f"{worst['region']} resta indietro con {it_num(worst['value'], 2)} {unit}, "
-                f"{best['region']} fa meglio di tutte."
-            )
-        else:
-            note = (
-                f"{best['region']} guida con {it_num(best['value'], 2)} {unit}, "
-                f"{worst['region']} chiude a {it_num(worst['value'], 2)} {unit}."
-            )
-        cards.append({
-            "theme": meta["theme"],
-            "name": meta["name"],
-            "value": it_num(best["value"], 2),
-            "unit": unit,
-            "best_region": best["region"],
-            "year": year,
-            "note": note,
-            "spark_points": indicator_notes.sparkline_points(meta.get("spark") or [], width=84, height=36),
-            "path": profiles.indicator_path(indicator_id, meta["name"]),
-        })
-    return cards
 
 
 def _home_qol_preview():
@@ -2318,13 +2575,28 @@ def _home_themes_preview():
             continue
         cards.append({
             "area": group["macro_area"],
+            "area_path": _area_anchor(group["macro_area"]),
             "count": group["indicator_count"],
             "theme_count": len(group["themes"]),
-            "themes": [t["theme"] for t in group["themes"][:4]],
+            # Nome **e** percorso: i temi erano `<span>` e la scheda mandava
+            # tutta a `/temi`, quindi la home nominava dodici temi e non ne
+            # linkava nessuno. Adesso ogni nome porta al suo tema, dove la
+            # Fase 2 ha messo mappa e classifica.
+            "themes": [{"theme": t["theme"], "path": t["path"]} for t in group["themes"][:4]],
             "best": best,
             "worst": worst,
         })
     return cards
+
+
+def _area_anchor(macro_area):
+    """Il punto di `/temi` dove comincia una macro-area.
+
+    Le macro-aree non hanno una pagina propria e non devono averla: sono un
+    raggruppamento dei temi, non una tassonomia parallela. Un'ancora pero' serve,
+    se no la scheda della home che dice "Economia e opportunita'" scarica chi
+    clicca in cima a un elenco di dodici aree."""
+    return f"/temi#area-{taxonomy.slugify_taxonomy(macro_area)}"
 
 
 def _themes_index_areas():
@@ -2362,6 +2634,7 @@ def _themes_index_areas():
             })
         areas.append({
             "area": group["macro_area"],
+            "slug": taxonomy.slugify_taxonomy(group["macro_area"]),
             "count": group["indicator_count"],
             "theme_count": len(group["themes"]),
             "themes": themes,
@@ -2471,6 +2744,459 @@ def _home_quiz_games():
             "desc": "Cinque regioni da ordinare dal valore più alto al più basso, con credito parziale.",
             "meta": "credito parziale",
             "href": "/quiz/ordina",
+        },
+    ]
+
+
+# ===========================================================================
+# Homepage 2026 — data for the redesigned surface.
+#
+# Every module below reads the real catalog. The design prototype shipped
+# illustrative numbers; nothing here is illustrative, so what the page claims
+# is always what the data says. The legacy _home_* helpers above still serve
+# /divari-regionali and stay untouched.
+# ===========================================================================
+
+
+_ds_ramp_color = indicator_notes.ds_ramp_color
+
+
+_ds_choropleth = indicator_notes.ds_choropleth_colors
+
+
+def _ds_short_value(value, unit):
+    """Compact axis label for the map legend: thousands folded to k."""
+    if value is None:
+        return "n.d."
+    if abs(value) >= 10000:
+        return f"{round(value / 1000)}k"
+    return it_num(value, 0 if abs(value) >= 100 else 1)
+
+
+def _home_hero_map():
+    """The hero choropleth: a curated indicator picker, per-region fills on the
+    2026 sequential ramp, the two extremes the hero calls out, and a readout
+    payload for ds-home.js.
+
+    The chosen indicator lives in ?indicator= and the picker is a plain form,
+    so the hero changes indicator without JavaScript."""
+    by_id = {str(item["id"]): item for item in get_catalog()["indicators"]}
+    options = [
+        {"id": indicator_id, "name": by_id[indicator_id]["name"]}
+        for indicator_id in _HOME_MAP_INDICATORS
+        if indicator_id in by_id
+    ]
+    requested = request.args.get("indicator")
+    selected_id = (
+        requested
+        if requested in _HOME_MAP_INDICATORS and requested in by_id
+        else _HOME_MAP_INDICATORS[0]
+    )
+
+    payload = get_atlas_indicator(selected_id)
+    meta = payload["metadata"]
+    year = meta["year_max"]
+    # already sorted by value, descending
+    values = get_atlas_indicator_year(selected_id, year)["values"]
+    if not values:
+        return None
+
+    explain = meta.get("explain") or {}
+    direction = explain.get("direction")
+    unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+    colors = _ds_choropleth(values)
+
+    # Ranking is oriented by direction (1 = doing best), while high/low stay
+    # purely about the value, matching what the two callouts actually say.
+    ranked = list(reversed(values)) if direction in ("lower_better", "higher_worse") else values
+    rank_by_key = {row["region_key"]: position for position, row in enumerate(ranked, 1)}
+    total = len(ranked)
+
+    readout = {
+        row["region_key"]: {
+            "name": row["region"],
+            "value": it_num(row["value"], 2),
+            "unit": unit,
+            "rank": rank_by_key[row["region_key"]],
+            "total": total,
+        }
+        for row in values
+    }
+
+    def extreme(row, label):
+        return {
+            "key": row["region_key"],
+            "name": row["region"],
+            "value": it_num(row["value"], 2),
+            "color": colors.get(row["region_key"]),
+            "label": label,
+        }
+
+    highest, lowest = values[0], values[-1]
+    return {
+        "options": options,
+        "selected_id": selected_id,
+        "indicator_name": meta["name"],
+        "indicator_path": meta["path"],
+        "theme": meta["theme"],
+        "year": year,
+        "unit": unit,
+        "source_label": meta.get("catalog_family_label"),
+        "direction": direction,
+        "colors": colors,
+        "readout": readout,
+        "high": extreme(highest, "Valore più alto"),
+        "low": extreme(lowest, "Valore più basso"),
+        "scale_low": _ds_short_value(lowest["value"], unit),
+        "scale_high": _ds_short_value(highest["value"], unit),
+        "ramp": list(_DS_SEQ_RAMP[:5]),
+    }
+
+
+def _home_series_module():
+    """The comparison module: one indicator's regional time series, a set of
+    regions to toggle, and the simple mean of the regions as the reference.
+
+    The three default regions are rendered server-side so the chart is already
+    drawn without JavaScript; ds-home.js redraws it when the selection
+    changes."""
+    payload = get_atlas_indicator(_HOME_SERIES_INDICATOR)
+    if payload is None:
+        return None
+    meta = payload["metadata"]
+    unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+
+    by_region = {}
+    for row in payload["series"]:
+        if row.get("value") is None:
+            continue
+        by_region.setdefault(row["region_key"], {})[row["year"]] = row["value"]
+
+    available = [key for key in _HOME_SERIES_CHOICES if key in by_region]
+    if len(available) < 2:
+        return None
+
+    # Only the years every offered region covers, so no line has a hole in it.
+    years = sorted(set.intersection(*(set(by_region[key]) for key in available)))
+    if len(years) < 2:
+        return None
+
+    # The reference is the simple mean of the regions, described as such: it is
+    # not an official national aggregate and must never be labelled as one.
+    all_regions = [key for key in by_region if set(years) <= set(by_region[key])]
+    reference = [
+        sum(by_region[key][year] for key in all_regions) / len(all_regions)
+        for year in years
+    ]
+
+    latest = years[-1]
+    direction = (meta.get("explain") or {}).get("direction")
+    latest_values = get_atlas_indicator_year(_HOME_SERIES_INDICATOR, latest)["values"]
+    ranked = list(reversed(latest_values)) if direction in ("lower_better", "higher_worse") else latest_values
+    rank_by_key = {row["region_key"]: position for position, row in enumerate(ranked, 1)}
+
+    regions = []
+    for index, key in enumerate(available):
+        series = [by_region[key][year] for year in years]
+        regions.append({
+            "key": key,
+            "name": profiles.region_name(key),
+            "color": _HOME_SERIES_COLORS[index % len(_HOME_SERIES_COLORS)],
+            "series": series,
+            "value": it_num(series[-1], 2),
+            "rank": rank_by_key.get(key),
+            "total": len(ranked),
+        })
+
+    defaults = [key for key in _HOME_SERIES_DEFAULT if key in by_region][:3]
+    if not defaults:
+        defaults = [region["key"] for region in regions[:3]]
+
+    initial = _home_series_polylines(regions, reference, defaults)
+    if initial is None:
+        return None
+
+    return {
+        "indicator_name": meta["name"],
+        "indicator_path": meta["path"],
+        "theme": meta["theme"],
+        "unit": unit,
+        "source_label": meta.get("catalog_family_label"),
+        "years": years,
+        "regions": regions,
+        "default_keys": defaults,
+        "initial": initial,
+        "reference": {
+            "label": f"Media semplice delle {len(all_regions)} regioni",
+            "short_label": "Media delle regioni",
+            "series": reference,
+            "value": it_num(reference[-1], 2),
+        },
+    }
+
+
+# Geometria del grafico di confronto. Deve restare identica a quella in
+# static/js/ds-home.js: il server disegna la selezione iniziale e il client
+# ridisegna quando cambia, quindi le due versioni devono sovrapporsi esatte.
+# Il viewBox e volutamente largo (260x60, circa 4.3:1) e il grafico lo rende
+# con il preserveAspectRatio predefinito: con "none" le coordinate venivano
+# schiacciate in orizzontale e i punti finali delle serie uscivano come ellissi.
+_CHART_W, _CHART_H = 260.0, 60.0
+_CHART_PAD_L, _CHART_PAD_R, _CHART_PAD_T, _CHART_PAD_B = 4.0, 30.0, 4.0, 6.0
+
+
+def _home_series_polylines(regions, reference, selected_keys):
+    """Polilinee della selezione iniziale, cosi il grafico e gia disegnato
+    nell'HTML invece di restare un rettangolo vuoto senza JavaScript."""
+    chosen = [region for region in regions if region["key"] in selected_keys]
+    if not chosen or len(reference) < 2:
+        return None
+
+    numbers = [value for region in chosen for value in region["series"]] + list(reference)
+    low, high = min(numbers), max(numbers)
+    span = (high - low) or 1.0
+    last_index = len(reference) - 1
+    plot_w = _CHART_W - _CHART_PAD_L - _CHART_PAD_R
+    plot_h = _CHART_H - _CHART_PAD_T - _CHART_PAD_B
+
+    def position(index, value):
+        x = _CHART_PAD_L + (index / last_index) * plot_w
+        y = _CHART_PAD_T + (1 - (value - low) / span) * plot_h
+        return x, y
+
+    def points(series):
+        return " ".join(
+            "{:.1f},{:.1f}".format(*position(index, value))
+            for index, value in enumerate(series)
+        )
+
+    return {
+        "baseline": {
+            "x1": f"{_CHART_PAD_L:.1f}",
+            "x2": f"{_CHART_W - _CHART_PAD_R:.1f}",
+            "y": f"{_CHART_H - _CHART_PAD_B:.1f}",
+        },
+        "reference": points(reference),
+        "lines": [
+            {
+                "key": region["key"],
+                "name": region["name"],
+                "color": region["color"],
+                "points": points(region["series"]),
+                "end": dict(zip(("x", "y"), (
+                    f"{position(last_index, region['series'][-1])[0]:.1f}",
+                    f"{position(last_index, region['series'][-1])[1]:.1f}",
+                ))),
+            }
+            for region in chosen
+        ],
+    }
+
+
+def _home_qol_module():
+    """Quality-of-life ranking for every published weighting profile, so the
+    homepage can switch profile without a round trip. Each profile carries its
+    own top three, bottom three and score spread: changing the weights changes
+    the answer, which is the point the module is making."""
+    profiles_payload = []
+    for slug, config_entry in QUALITY_LIFE_PROFILES.items():
+        payload = qb.build_bes_ranking("regione", slug)
+        if payload is None:
+            continue
+        ranking = payload["ranking"]
+        if len(ranking) < 6:
+            continue
+        profiles_payload.append({
+            "slug": slug,
+            "name": config_entry["name"],
+            "description": config_entry["description"],
+            "top": [
+                {"rank": row["rank"], "name": row["name"], "score": round(row["score"])}
+                for row in ranking[:3]
+            ],
+            "bottom": [
+                {"rank": row["rank"], "name": row["name"], "score": round(row["score"])}
+                for row in reversed(ranking[-3:])
+            ],
+            "gap": round(ranking[0]["score"] - ranking[-1]["score"]),
+        })
+    if not profiles_payload:
+        return None
+    return {"profiles": profiles_payload, "default_slug": qb.DEFAULT_PROFILE}
+
+
+def _home_featured_story():
+    """The lead data story: the first story indicator, with the two leading
+    regions, the mean of the regions and the two trailing ones as bars, so the
+    spread the headline talks about is visible in one glance."""
+    for indicator_id in _HOME_STORY_INDICATORS:
+        payload = get_atlas_indicator(indicator_id)
+        if payload is None:
+            continue
+        meta = payload["metadata"]
+        year = meta["year_max"]
+        values = get_atlas_indicator_year(indicator_id, year)["values"]
+        if len(values) < 6:
+            continue
+
+        explain = meta.get("explain") or {}
+        direction = explain.get("direction")
+        invert = direction in ("lower_better", "higher_worse")
+        unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+
+        numbers = [row["value"] for row in values]
+        low, high = min(numbers), max(numbers)
+        span = (high - low) or 1.0
+        mean = sum(numbers) / len(numbers)
+
+        def bar(name, value):
+            fraction = (value - low) / span
+            return {
+                "name": name,
+                "value": it_num(value, 2),
+                "pct": max(4, round(fraction * 100)),
+                "color": _ds_ramp_color(fraction),
+            }
+
+        rows = [bar(row["region"], row["value"]) for row in values[:2]]
+        rows.append(bar("Media delle regioni", mean))
+        rows.extend(bar(row["region"], row["value"]) for row in values[-2:])
+
+        ranked = list(reversed(values)) if invert else values
+        best, worst = ranked[0], ranked[-1]
+        return {
+            "theme": meta["theme"],
+            "name": meta["name"],
+            "path": meta["path"],
+            "year": year,
+            "unit": unit,
+            "source_label": meta.get("catalog_family_label"),
+            "rows": rows,
+            "spread": it_num(high - low, 2),
+            "lead_region": best["region"],
+            "lead_value": it_num(best["value"], 2),
+            "lag_region": worst["region"],
+            "lag_value": it_num(worst["value"], 2),
+            "summary": explain.get("plain") or "",
+            "direction_note": (
+                "Per questo indicatore un valore più basso indica una situazione migliore."
+                if invert else
+                "Per questo indicatore un valore più alto indica una situazione migliore."
+                if direction in ("higher_better", "lower_worse") else
+                "Questo indicatore non ha una direzione migliore o peggiore dichiarata."
+            ),
+        }
+    return None
+
+
+def _home_insight_cards():
+    """Two secondary readings under the lead story, built from the remaining
+    story indicators so nothing on the page is written by hand."""
+    cards = []
+    for indicator_id in _HOME_STORY_INDICATORS[1:]:
+        payload = get_atlas_indicator(indicator_id)
+        if payload is None:
+            continue
+        meta = payload["metadata"]
+        year = meta["year_max"]
+        values = get_atlas_indicator_year(indicator_id, year)["values"]
+        if len(values) < 2:
+            continue
+        direction = (meta.get("explain") or {}).get("direction")
+        invert = direction in ("lower_better", "higher_worse")
+        ranked = list(reversed(values)) if invert else values
+        best, worst = ranked[0], ranked[-1]
+        unit = indicator_notes.value_unit_label(meta["name"], meta.get("unit"))
+        cards.append({
+            "theme": meta["theme"],
+            "name": meta["name"],
+            "path": meta["path"],
+            "year": year,
+            "unit": unit,
+            "source_label": meta.get("catalog_family_label"),
+            "lead_region": best["region"],
+            "lead_value": it_num(best["value"], 2),
+            "lag_region": worst["region"],
+            "lag_value": it_num(worst["value"], 2),
+            "summary": (meta.get("explain") or {}).get("plain") or "",
+        })
+        if len(cards) == 2:
+            break
+    return cards
+
+
+def _home_paths(summary, themes_preview):
+    """The four exploration entry points, with the counts each one actually
+    opens onto. A path that cannot state its size is a path nobody trusts."""
+    theme_count = sum(card["theme_count"] for card in themes_preview) if themes_preview else 0
+    area_count = len(themes_preview or [])
+    return [
+        {
+            "eyebrow": "Una regione",
+            "body": "Apri il profilo di un territorio: dove emerge, dove fatica, come si è mosso.",
+            "meta": "20 profili regionali",
+            "href": "/regioni",
+            "cta": "Sfoglia le regioni",
+            "path": "regione",
+        },
+        {
+            "eyebrow": "Un tema",
+            "body": "Economia, lavoro, salute, ambiente e gli altri grandi ambiti territoriali.",
+            "meta": f"{area_count} aree, {theme_count} temi",
+            "href": "/temi",
+            "cta": "Esplora i temi",
+            "path": "tema",
+        },
+        {
+            "eyebrow": "Un confronto",
+            "body": "Metti due o tre territori sullo stesso indicatore e segui la loro evoluzione.",
+            "meta": "Fino a 3 territori",
+            "href": "/confronto",
+            "cta": "Confronta le regioni",
+            "path": "confronto",
+        },
+        {
+            "eyebrow": "Il divario territoriale",
+            "body": "Leggi le differenze tra Nord, Centro e Mezzogiorno oltre le semplificazioni.",
+            "meta": "Nord, Centro, Mezzogiorno",
+            "href": "/divari-regionali",
+            "cta": "Esplora i divari",
+            "path": "divari",
+        },
+    ]
+
+
+def _home_trust_cards(summary):
+    """Sources, updates, method and corrections: the four things a reader has
+    to be able to check before trusting a number on this site."""
+    return [
+        {
+            "kicker": "Fonti",
+            "title": f"{summary['institutions_label']} e altre fonti istituzionali",
+            "body": "Ogni serie riporta l'ente che la produce e l'ultimo anno disponibile.",
+            "href": "/metodologia",
+            "cta": "Tutte le fonti",
+        },
+        {
+            "kicker": "Copertura",
+            "title": f"{summary['total']} indicatori, 20 regioni, dal {summary['year_min']} al {summary['year_max']}",
+            "body": "Il catalogo viene rivisto a ogni nuovo rilascio ufficiale.",
+            "href": "/catalogo-dati",
+            "cta": "Sfoglia il catalogo",
+        },
+        {
+            "kicker": "Metodo",
+            "title": "Definizione, unità, fonte e copertura restano su ogni indicatore",
+            "body": "Le scelte metodologiche sono documentate e citabili.",
+            "href": "/metodologia",
+            "cta": "Consulta la metodologia",
+        },
+        {
+            "kicker": "Correzioni",
+            "title": "Segnala un errore o consulta le correzioni pubblicate",
+            "body": "Le rettifiche restano tracciate e pubbliche.",
+            "href": "/chi-siamo",
+            "cta": "Correzioni e contatti",
         },
     ]
 

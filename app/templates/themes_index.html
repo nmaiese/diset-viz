@@ -1,7 +1,9 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Temi", "path": "/temi"}] %}
 {% set active_nav = 'temi' %}
 
-{% block title %}I temi degli indicatori regionali · {{ site_name }}{% endblock %}
+{% block title %}I {{ theme_total }} temi dell'atlante, {{ total }} indicatori per regione{% endblock %}
 {% block description %}Esplora {{ total }} indicatori Istat per macro-area e tema: lavoro, istruzione, ambiente, salute, trasporti, qualità della vita e divari regionali.{% endblock %}
 
 {% block head_extra %}
@@ -14,20 +16,34 @@
   "url": {{ canonical | tojson }}
 }
 </script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{# La stessa griglia di schede che si vede qui sotto, macro-area per
+   macro-area: l'elenco esiste in pagina, il blocco lo dichiara e basta. #}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
+  "@type": "ItemList",
+  "name": "I temi degli indicatori territoriali",
+  "numberOfItems": {{ theme_total }},
+  "itemListOrder": "https://schema.org/ItemListUnordered",
   "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Temi", "item": {{ canonical | tojson }} }
+    {%- set ns = namespace(i=0) %}
+    {%- for a in areas %}{% for t in a.themes %}{% set ns.i = ns.i + 1 %}
+    {
+      "@type": "ListItem",
+      "position": {{ ns.i }},
+      "name": {{ t.theme | tojson }},
+      "url": "{{ site_url }}{{ t.path }}"
+    }{{ "," if not (loop.last and a == areas[-1]) }}
+    {%- endfor %}{% endfor %}
   ]
 }
 </script>
 {% endblock %}
 
 {% block content %}
-<article class="themes-index">
+<article class="themes-index" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
   <section class="themes-hero">
     <p class="eyebrow">Temi</p>
     <h1>I temi</h1>
@@ -52,7 +68,7 @@
 
   <div id="theme-groups">
     {% for a in areas %}
-    <section class="theme-group" data-area>
+    <section class="theme-group" data-area id="area-{{ a.slug }}">
       <div class="theme-group__head">
         <h2>{{ a.area }}</h2>
         <span class="theme-group__count">{{ a.count }} {{ 'indicatore' if a.count == 1 else 'indicatori' }}</span>

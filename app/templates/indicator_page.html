@@ -1,5 +1,17 @@
 {% extends "blog_base.html" %}
 {% import "_indicator_article.html" as article %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [
+  {"name": "Home", "path": "/"},
+  {"name": "Temi", "path": "/temi"},
+  {"name": meta.theme, "path": meta.theme_path},
+  {"name": meta.name, "path": canonical | replace(site_url, "")},
+] %}
+{# Migrata al design system 2026: font, token e chrome nuovi. Il grosso
+   della pagina si ridipinge da se', perche' le regole di site.css che la
+   riguardano sono scritte sui nomi dei token (--ink, --paper, --accent...)
+   che `body.ds` ripunta sulle primitive nuove. Quello che non bastava sta
+   in css/ds/indicator.css. #}
 
 {# One template for every indicator, whatever the source family, in three zones:
 
@@ -23,6 +35,7 @@
 {% endblock %}
 
 {% block head_extra %}
+<link rel="stylesheet" href="{{ asset_url('css/ds/indicator.css') }}">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -37,7 +50,25 @@
   "dateModified": {{ dataset_updated | tojson }},{% endif %}
   "isBasedOn": {{ (meta.source_data_url or meta.source_url) | tojson }},
   "measurementTechnique": "Ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni",
-  "variableMeasured": {{ meta.name | tojson }},
+  {# `PropertyValue` invece della stringa nuda: cosi' la grandezza porta con se'
+     l'unita' e l'intervallo osservato, che e' quello che un motore deve sapere
+     per riusare il dato senza aprire la pagina. La stringa diceva solo il nome,
+     cioe' quello che `name` diceva gia' due righe sopra. Minimo e massimo
+     arrivano da `seo_titles.extremes`, gli stessi che finiscono nel titolo:
+     un'unica fonte, o le due cifre divergono. #}
+  "variableMeasured": {
+    "@type": "PropertyValue",
+    "name": {{ meta.name | tojson }},{% if meta.unit %}
+    "unitText": {{ meta.unit | tojson }},{% endif %}{% if estremi.alto %}
+    "minValue": {{ estremi.basso.value }},
+    "maxValue": {{ estremi.alto.value }},{% endif %}
+    "measurementTechnique": {{ (meta.source_label or meta.source) | tojson }}{% if meta.archive %},
+    {# "Che cosa misura questa serie" secondo l'istituto: `description` della
+       variabile e' lo slot giusto, e il testo e' lo stesso che la pagina
+       mostra nell'apparato sotto "Definizione della fonte". Nessuna
+       dichiarazione che la pagina visibile non sostenga. #}
+    "description": {{ meta.archive | tojson }}{% endif %}
+  },
   "isAccessibleForFree": true,{% if meta.license_url %}
   "license": {{ meta.license_url | tojson }},{% endif %}
   "keywords": [{{ meta.theme | tojson }}, "regioni italiane", {{ (meta.institution or "Istat") | tojson }}]{% if meta.downloads and level.key == 'regione' %},
@@ -47,30 +78,23 @@
   ]{% endif %}
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Temi", "item": "{{ site_url }}/temi" },
-    { "@type": "ListItem", "position": 3, "name": {{ meta.theme | tojson }}, "item": "{{ site_url }}{{ meta.theme_path }}" },
-    { "@type": "ListItem", "position": 4, "name": {{ meta.name | tojson }}, "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {% endblock %}
 
 {% block content %}
-<article class="page page-indicator wrap">
-  <nav class="breadcrumb"><a href="/temi">Temi</a> / <a href="{{ meta.theme_path }}">{{ meta.theme }}</a></nav>
+<article class="page page-indicator wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
 
   {# Same catalog search the atlas offered: without JS it submits to /atlante, with JS it
      shows live results linking straight to each indicator's canonical page. #}
-  <form class="indicator-finder" data-indicator-search role="search" action="/atlante" method="get" autocomplete="off">
+  {# Senza JavaScript questo form si invia, e mandava a `/atlante`, che di `?q=`
+     non fa niente: chi cercava finiva nell'atlante con la sua domanda persa per
+     strada. `/ricerca` quella domanda la risponde, server-rendered. Con
+     JavaScript i suggerimenti restano quelli di prima e non passano di qui. #}
+  <form class="indicator-finder" data-indicator-search role="search" action="/ricerca" method="get" autocomplete="off">
     <label>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-      <input type="search" name="q" data-search-input placeholder="Cerca un altro indicatore nell'atlante..." aria-label="Cerca un indicatore">
+      <input type="search" name="q" data-search-input placeholder="Cerca un altro indicatore..." aria-label="Cerca un indicatore">
     </label>
     <div class="indicator-finder__results" data-search-results hidden role="listbox" aria-label="Risultati della ricerca"></div>
   </form>
@@ -370,92 +394,118 @@
     </dl>
 
     <p class="page-note"><a href="/metodologia">Definizioni, confronti e limiti</a>{% if meta.quality_life_scored %} · <a href="/metodologia#qualita-della-vita">Come entra nel punteggio della qualità della vita</a>{% endif %}</p>
-  </section>
 
-  {# Il verso opposto del link che il post dichiara già nel frontmatter. Solo
-     titolo e data: la descrizione di un articolo cita le stesse cifre che il
-     cruscotto stampa qui sopra, e una cifra si mostra una volta sola. #}
-  {% if related_posts %}
-  <section class="indicator-articles">
-    <h2>Abbiamo scritto di questo indicatore</h2>
-    <ul class="indicator-articles__list">
-      {% for post in related_posts %}
-      <li>
-        <a href="/blog/{{ post.slug }}">{{ post.title }}</a>
-        <span>{{ post.date.strftime('%d.%m.%Y') }} · {{ post.read_time }} min di lettura</span>
-      </li>
-      {% endfor %}
-    </ul>
-    <p class="page-note"><a href="/blog">Tutte le analisi del blog →</a></p>
-  </section>
-  {% endif %}
-
-  {% if level.cover_bars %}
-  <details class="indicator-cover-share">
-    <summary>Immagine da condividere</summary>
-    <figure class="indicator-cover">
-      <div class="indicator-cover__card">
-        <div class="indicator-cover__kicker">Divario Italia · dati {{ level.year_max }}</div>
-        <div class="indicator-cover__title">{{ meta.name }}</div>
-        <div class="indicator-cover__subtitle">{{ meta.theme }} · {{ meta.value_unit }}</div>
-        <div class="indicator-cover__bars">
-          {% for bar in level.cover_bars %}
-          <div class="indicator-cover__bar{{ ' is-best' if bar.is_best }}{{ ' is-worst' if bar.is_worst }}">
-            <span class="indicator-cover__bar-name">{{ bar.region }}</span>
-            <span class="indicator-cover__bar-track"><i class="indicator-cover__bar-fill" style="width:{{ bar.width_pct }}%"></i></span>
-            <strong class="indicator-cover__bar-value">{{ bar.value | it_num(2) }}</strong>
+    {# Sta qui e non in fondo alla pagina: e' un artefatto di citazione, come
+       il blocco "Come citare" qui sopra, non una destinazione. In coda faceva
+       numero fra i blocchi di navigazione e non c'entrava con nessuno. #}
+    {% if level.cover_bars %}
+    <details class="indicator-cover-share">
+      <summary>Immagine da condividere</summary>
+      <figure class="indicator-cover">
+        <div class="indicator-cover__card">
+          <div class="indicator-cover__kicker">Divario Italia · dati {{ level.year_max }}</div>
+          <div class="indicator-cover__title">{{ meta.name }}</div>
+          <div class="indicator-cover__subtitle">{{ meta.theme }} · {{ meta.value_unit }}</div>
+          <div class="indicator-cover__bars">
+            {% for bar in level.cover_bars %}
+            <div class="indicator-cover__bar{{ ' is-best' if bar.is_best }}{{ ' is-worst' if bar.is_worst }}">
+              <span class="indicator-cover__bar-name">{{ bar.region }}</span>
+              <span class="indicator-cover__bar-track"><i class="indicator-cover__bar-fill" style="width:{{ bar.width_pct }}%"></i></span>
+              <strong class="indicator-cover__bar-value">{{ bar.value | it_num(2) }}</strong>
+            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
+          <div class="indicator-cover__footer">
+            <span>Fonte: {{ meta.source_label }}</span>
+            <strong>divarioitalia.it</strong>
+          </div>
         </div>
-        <div class="indicator-cover__footer">
-          <span>Fonte: {{ meta.source_label }}</span>
-          <strong>divarioitalia.it</strong>
-        </div>
-      </div>
-      <figcaption>Anteprima dei dati di questo indicatore, generata automaticamente nello stesso formato usato per le condivisioni social.</figcaption>
-    </figure>
-  </details>
-  {% endif %}
-
-  {% if dimension_siblings %}
-  <nav class="dimension-nav" aria-label="Lo stesso indicatore per genere">
-    <span class="dimension-nav__label">Lo stesso indicatore, per genere:</span>
-    {% for item in dimension_siblings %}
-    <a class="dimension-nav__link" href="{{ item.path }}">{{ item.value_label }}</a>
-    {% endfor %}
-  </nav>
-  {% endif %}
-
-  {% if related %}
-  <section class="indicator-related">
-    <h2>Altri indicatori del tema {{ meta.theme }}</h2>
-    <ul class="indicator-related__grid">
-      {% for item in related %}
-      {% if item.direction == 'higher_better' %}{% set dcls = 'up' %}{% set dlabel = 'meglio se alto' %}
-      {% elif item.direction in ('lower_better', 'higher_worse') %}{% set dcls = 'down' %}{% set dlabel = 'meglio se basso' %}
-      {% else %}{% set dcls = 'flat' %}{% set dlabel = 'senza direzione' %}{% endif %}
-      <li class="related-card related-card--{{ dcls }}">
-        <a class="related-card__link" href="{{ item.path }}">
-          <span class="related-card__name">{{ item.name }}</span>
-          <span class="related-card__spark">{{ item.spark | sparkline }}</span>
-          <span class="related-card__foot">
-            {% if item.latest is not none %}<b class="related-card__value">{{ item.latest | it_num(1) }}</b>{% endif %}
-            <small class="related-card__year">dati {{ item.year_max }}</small>
-          </span>
-          <span class="related-card__dir related-card__dir--{{ dcls }}">{{ dlabel }}</span>
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
+        <figcaption>Anteprima dei dati di questo indicatore, generata automaticamente nello stesso formato usato per le condivisioni social.</figcaption>
+      </figure>
+    </details>
+    {% endif %}
   </section>
-  {% endif %}
+  {# ZONA 4, continua da qui.
+     Sotto la piega si impilavano sei blocchi di navigazione consecutivi
+     (articoli, immagine da condividere, dimensioni, correlati, precedente e
+     successivo, richiamo al tema), tre dei quali puntavano tutti allo stesso
+     posto. Sei intestazioni di fila fanno leggere la scheda come un menu, ed
+     e' il motivo per cui non si distingueva da uno.
 
-  {% if siblings.prev or siblings.next %}
-  <nav class="sibling-nav" aria-label="Altri indicatori del tema {{ meta.theme }}">
-    {% if siblings.prev %}<a class="sibling-nav__link is-prev" href="{{ siblings.prev.path }}"><span>← Precedente</span><small>{{ siblings.prev.name }}</small></a>{% else %}<span class="sibling-nav__link is-disabled" aria-hidden="true"></span>{% endif %}
-    {% if siblings.next %}<a class="sibling-nav__link is-next" href="{{ siblings.next.path }}"><span>Successivo →</span><small>{{ siblings.next.name }}</small></a>{% else %}<span class="sibling-nav__link is-disabled" aria-hidden="true"></span>{% endif %}
-  </nav>
-  {% endif %}
+     Adesso sono tre corsie con un'intestazione sola, e non si perde un link:
+     ci sono tutti quelli di prima piu' i due territori agli estremi, che
+     prima la pagina nominava nel cruscotto senza mai portarci. L'immagine da
+     condividere e' risalita nell'apparato, dove sta la citazione: e' un
+     artefatto di citazione, non una destinazione. #}
+  <section class="indicator-next" aria-labelledby="continua-da-qui">
+    <h2 id="continua-da-qui">Continua da qui</h2>
+    <div class="indicator-next__grid">
+
+      <div class="indicator-next__lane">
+        <p class="section-label">Nello stesso tema</p>
+        {% if related %}
+        <ul class="indicator-related__grid indicator-next__related">
+          {% for item in related[:3] %}
+          {% if item.direction == 'higher_better' %}{% set dcls = 'up' %}{% set dlabel = 'meglio se alto' %}
+          {% elif item.direction in ('lower_better', 'higher_worse') %}{% set dcls = 'down' %}{% set dlabel = 'meglio se basso' %}
+          {% else %}{% set dcls = 'flat' %}{% set dlabel = 'senza direzione' %}{% endif %}
+          <li class="related-card related-card--{{ dcls }}">
+            <a class="related-card__link" href="{{ item.path }}">
+              <span class="related-card__name">{{ item.name }}</span>
+              <span class="related-card__spark">{{ item.spark | sparkline }}</span>
+              <span class="related-card__foot">
+                {% if item.latest is not none %}<b class="related-card__value">{{ item.latest | it_num(1) }}</b>{% endif %}
+                <small class="related-card__year">dati {{ item.year_max }}</small>
+              </span>
+              <span class="related-card__dir related-card__dir--{{ dcls }}">{{ dlabel }}</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        <ul class="indicator-next__links">
+          {% if siblings.prev %}<li><a href="{{ siblings.prev.path }}">Precedente: {{ siblings.prev.name }}</a></li>{% endif %}
+          {% if siblings.next %}<li><a href="{{ siblings.next.path }}">Successivo: {{ siblings.next.name }}</a></li>{% endif %}
+          <li><a href="{{ meta.theme_path }}">Tutti gli indicatori di {{ meta.theme | lower }}, con la classifica delle regioni</a></li>
+        </ul>
+      </div>
+
+      <div class="indicator-next__lane">
+        <p class="section-label">Lo stesso dato, altre viste</p>
+        <ul class="indicator-next__links">
+          {% for item in dimension_siblings %}
+          <li><a href="{{ item.path }}">{{ meta.name }}: {{ item.value_label | lower }}</a></li>
+          {% endfor %}
+          {% for other in levels if other.key != level.key %}
+          <li><a href="?livello={{ other.key }}">Gli stessi dati per {{ other.label | lower }}</a></li>
+          {% endfor %}
+          <li><a href="/confronto">Mettere questo indicatore a confronto fra territori</a></li>
+          <li><a href="/atlante">Aprirlo nell'atlante, con mappa e serie storica</a></li>
+        </ul>
+      </div>
+
+      <div class="indicator-next__lane">
+        <p class="section-label">Da leggere</p>
+        <ul class="indicator-next__links">
+          {% for post in related_posts %}
+          <li><a href="/blog/{{ post.slug }}">{{ post.title }}</a> <small>{{ post.date.strftime('%d.%m.%Y') }} · {{ post.read_time }} min</small></li>
+          {% endfor %}
+          {# I due territori agli estremi: la pagina li nomina nel cruscotto e
+             non ci ha mai portato. A livello provincia non c'e' un profilo, e
+             `profile_path` e' vuoto. #}
+          {% if level.profile_path and level.best %}
+          <li><a href="{{ level.profile_path }}{{ level.best.key }}">Il profilo di {{ level.best.name }}, in testa</a></li>
+          {% endif %}
+          {% if level.profile_path and level.worst %}
+          <li><a href="{{ level.profile_path }}{{ level.worst.key }}">Il profilo di {{ level.worst.name }}, in coda</a></li>
+          {% endif %}
+          {% if related_posts %}<li><a href="/blog">Tutte le analisi del blog</a></li>{% endif %}
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
 
   <aside class="indicator-cta">
     <span>

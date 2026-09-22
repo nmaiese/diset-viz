@@ -22,7 +22,11 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://www.googletagmanager.com", csp)
         self.assertIn("https://tagmanager.google.com", csp)
         self.assertIn("https://www.google-analytics.com", csp)
-        self.assertIn("https://fonts.googleapis.com", csp)
+        # I font se li serve il sito: su una pagina del design system i due
+        # domini di Google non devono piu' comparire. Restano su /legacy,
+        # che monta Mukta da fonts.googleapis.com e non si tocca.
+        self.assertNotIn("https://fonts.googleapis.com", csp)
+        self.assertNotIn("https://fonts.gstatic.com", csp)
         self.assertIn("https://ssl.gstatic.com", csp)
         self.assertIn("https://www.gstatic.com", csp)
         self.assertIn("https://www.google.it", csp)
@@ -32,16 +36,29 @@ class AppSmokeTest(unittest.TestCase):
         self.assertIn("https://www.iubenda.com", csp)
         self.assertIn("frame-src", csp)
         self.assertIn("https://tpc.googlesyndication.com", csp)
-        self.assertIn(b"Un atlante per leggere l", home.data)
+        # Homepage sul design system 2026: opt-in dei token e del chrome nuovi.
+        self.assertIn(b'<body class="ds sitechrome">', home.data)
+        self.assertIn(b"css/ds/system.css", home.data)
+        self.assertIn(b"css/ds/home.css", home.data)
+        self.assertIn("L'Italia, regione per regione.".encode("utf-8"), home.data)
         self.assertIn(b"/atlante", home.data)
-        self.assertIn(b"Cosa puoi fare qui", home.data)
-        self.assertIn(b'<main class="home-page wrap-wide">', home.data)
-        self.assertIn(b'id="home-map-data"', home.data)
-        # The "Temi e aree" and "Confronta" previews render with real data.
+        self.assertIn(b'<main class="home" id="contenuto">', home.data)
+        # Il masthead legacy non deve sopravvivere accanto a quello nuovo.
+        self.assertNotIn(b'<header class="masthead">', home.data)
+        self.assertIn(b'class="hdr__bar"', home.data)
+        # Ogni modulo si disegna su dati veri, non su segnaposto: la mappa hero
+        # colora venti regioni, temi e confronto hanno righe reali.
+        self.assertIn(b"data-ds-heromap", home.data)
+        self.assertEqual(home.data.count(b".rmap-region[data-key="), 20)
         self.assertIn("Ogni tema è una lente sull'Italia".encode("utf-8"), home.data)
-        self.assertIn(b'class="home-theme-card"', home.data)
-        self.assertIn(b"Metti a paragone regioni", home.data)
-        self.assertIn(b'class="home-cmp-mini"', home.data)
+        self.assertIn(b'class="topcard"', home.data)
+        self.assertIn(b"data-ds-compare", home.data)
+        self.assertIn(b'class="cmprow cmprow--anim"', home.data)
+        self.assertIn(b"data-ds-qol", home.data)
+        # Grafico di confronto e barre della storia sono già disegnati lato
+        # server: senza JavaScript la pagina resta leggibile.
+        self.assertIn(b'class="cmp-line"', home.data)
+        self.assertIn(b'class="minibar__fill"', home.data)
 
         atlante = client.get("/atlante")
         self.assertEqual(atlante.status_code, 200)
@@ -1376,6 +1393,146 @@ class AppSmokeTest(unittest.TestCase):
         self.assertTrue(first_row["Dato"])
 
 
+class ITitoliCheSiLeggonoSuGoogle(unittest.TestCase):
+    """La catena vera di `seo_titles.page_title`, su tutto il catalogo indicizzabile.
+
+    Il test che c'era sopra esercita `indicator_notes.seo_title` per conto suo,
+    che e' solo l'ultimo anello: da quando la scheda passa da `page_title`,
+    quello non prova piu' cio' che il sito serve davvero.
+
+    Le due collisioni note e il perche' restano scritte qui sotto: una pagina
+    che collide non e' un dettaglio, sono due URL indicizzabili che si
+    presentano a Google con lo stesso titolo.
+    """
+
+    # 598 e 599 differiscono **in mezzo** al nome ("di genere femminile" contro
+    # "in eta' giovanile") e sono `contextual`, quindi non hanno estremi da cui
+    # ricavare cifre che le distinguano. Nessun accorciatore testa-coda le
+    # salva, e allargare il vocabolario dei marcatori per due pagine tocca le
+    # altre 370. Sono dichiarate, non nascoste: la prova serve a far diventare
+    # rossa una collisione **nuova**.
+    # 910 e bes:01SAL001 sono **la stessa serie Istat pubblicata da due
+    # famiglie**: stesso nome, stessi estremi (84,8 e 82,1), stesso anno, e tutte
+    # e due nella sitemap. A tenerne distinti i titoli era solo l'etichetta
+    # dell'unita', "anni" da una parte e "Numero medio di anni" dall'altra, che
+    # `_short_unit` scarta perche' troppo lunga. Quell'unita' e' caduta da sola
+    # quando il sacrificio ha smesso di togliere la coda del livello prima
+    # dell'unita', e ha scoperto il guasto vero: qui non collidono due titoli,
+    # collidono due pagine. Si risolve nel catalogo, non in `seo_titles`.
+    COLLISIONI_NOTE = {frozenset({"598", "599"}), frozenset({"910", "bes:01SAL001"})}
+
+    @classmethod
+    def setUpClass(cls):
+        from app import indicator_universe, indicator_view, indicator_texts, seo_titles
+
+        cls.titoli = {}
+        cls.descrizioni = {}
+        for voce in indicator_universe.indexable_catalog():
+            base = voce["meta"]
+            vista = indicator_view.build_indicator_view(base["family"], str(base["raw_id"]))
+            meta, level = vista["meta"], vista["levels"][0]
+            articolo = indicator_texts.build_article(meta["id"], level["key"])
+            # Le due chiamate sono le stesse che fa `_render_indicator`, incluso
+            # il lead composto come ultima spiaggia: senza quello la descrizione
+            # torna `None` sulle serie `contextual` senza pezzo, e il test
+            # misurerebbe una pagina che il sito non serve.
+            lead = articolo["lead"] or indicator_texts.composed_lead(meta, level)
+            cls.titoli[meta["id"]] = seo_titles.page_title(
+                articolo, meta, level, site_name="Divario Italia")
+            cls.descrizioni[meta["id"]] = seo_titles.page_description(
+                articolo, meta, level, composed=lead)
+
+    def test_nessun_titolo_sfora_il_budget_serp(self):
+        for ind, titolo in self.titoli.items():
+            with self.subTest(indicatore=ind):
+                self.assertTrue(titolo, ind)
+                self.assertLessEqual(len(titolo), 60, f"{ind}: {titolo}")
+                self.assertGreaterEqual(len(titolo), 8, f"{ind}: {titolo}")
+                self.assertEqual(titolo, titolo.strip())
+
+    def test_nessuna_descrizione_sfora_il_budget_serp(self):
+        for ind, descrizione in self.descrizioni.items():
+            with self.subTest(indicatore=ind):
+                self.assertTrue(descrizione, ind)
+                self.assertLessEqual(len(descrizione), 155, f"{ind}: {descrizione}")
+                self.assertTrue(descrizione.rstrip().endswith("."), f"{ind}: {descrizione}")
+
+    def test_due_pagine_indicizzabili_non_hanno_lo_stesso_titolo(self):
+        per_titolo = {}
+        for ind, titolo in self.titoli.items():
+            per_titolo.setdefault(titolo, set()).add(ind)
+        collisioni = {frozenset(ids) for ids in per_titolo.values() if len(ids) > 1}
+        self.assertEqual(collisioni - self.COLLISIONI_NOTE, set())
+
+    # Le pagine d'ingresso: le schede le misura `self.titoli`, queste no, e
+    # nessuno le misurava. La home stava a 73 caratteri perche' finiva con
+    # `sources_label`, che si allunga a ogni fonte nuova, e la coda tagliata era
+    # proprio quella che nominava le fonti.
+    HUB = ("/", "/regioni", "/temi", "/qualita-della-vita", "/regione/molise",
+           "/regione/friuli-venezia-giulia", "/tema/lavoro-e-conciliazione",
+           "/divari-regionali", "/blog", "/metodologia", "/catalogo-dati")
+
+    def test_nessun_hub_sfora_il_budget_serp(self):
+        from html import unescape
+
+        client = app.test_client()
+        for path in self.HUB:
+            with self.subTest(path=path):
+                risposta = client.get(path)
+                self.assertEqual(risposta.status_code, 200, path)
+                corpo = risposta.get_data(as_text=True)
+                trovato = re.search(r"<title>(.*?)</title>", corpo, re.S)
+                self.assertIsNotNone(trovato, f"{path} [{risposta.content_type}] {corpo[:200]!r}")
+                titolo = unescape(trovato.group(1).strip())
+                self.assertLessEqual(len(titolo), 60, f"{path}: {titolo}")
+                self.assertTrue(titolo, path)
+
+    def test_ogni_hub_porta_un_numero_tranne_dove_non_ha_senso(self):
+        """Un hub che dice solo di che cosa parla non da' un motivo per
+        cliccare piu' di quanto ne dia la scheda. Blog, metodologia e
+        divari-regionali sono pagine di prosa: li' il numero non c'e'."""
+        from html import unescape
+
+        client = app.test_client()
+        senza_numero = {"/blog", "/metodologia", "/divari-regionali"}
+        for path in self.HUB:
+            if path in senza_numero:
+                continue
+            with self.subTest(path=path):
+                pagina = client.get(path).get_data(as_text=True)
+                titolo = unescape(re.search(r"<title>(.*?)</title>", pagina, re.S).group(1))
+                self.assertTrue(any(c.isdigit() for c in titolo), f"{path}: {titolo}")
+
+    def test_la_maggioranza_dei_titoli_porta_una_cifra(self):
+        """E' il punto di tutto il lavoro: un titolo che dice solo il nome della
+        serie non da' un motivo per cliccare. Le pagine senza cifra sono quasi
+        tutte `contextual`, dove il catalogo non espone estremi di proposito."""
+        con_cifra = sum(1 for t in self.titoli.values() if any(c.isdigit() for c in t))
+        self.assertGreaterEqual(con_cifra / len(self.titoli), 0.6)
+
+    def test_nessun_titolo_dice_per_regione_sopra_dati_provinciali(self):
+        """`indicator_notes._TITLE_TAIL` e' fissa: la coda ora segue il livello."""
+        from app import indicator_universe, indicator_view, seo_titles
+
+        for voce in indicator_universe.indexable_catalog():
+            base = voce["meta"]
+            vista = indicator_view.build_indicator_view(base["family"], str(base["raw_id"]))
+            level = vista["levels"][0]
+            if level["key"] != "provincia":
+                continue
+            titolo = seo_titles.answer_title(vista["meta"], level)
+            with self.subTest(indicatore=base["id"]):
+                self.assertNotIn(" per regione", titolo or "")
+
+    def test_niente_caratteri_vietati_in_serp(self):
+        """Gli assoluti di `content/STYLE.md` valgono anche sul testo in SERP."""
+        for ind in self.titoli:
+            for testo in (self.titoli[ind], self.descrizioni[ind]):
+                for vietato in ("—", "–", ";", "…"):
+                    with self.subTest(indicatore=ind, carattere=vietato):
+                        self.assertNotIn(vietato, testo or "")
+
+
 class HardeningTest(unittest.TestCase):
     def test_home_is_actually_cached(self):
         """Con i decorator nell'ordine corretto, il corpo della view / non viene
@@ -1384,12 +1541,19 @@ class HardeningTest(unittest.TestCase):
         from app import cache
 
         cache.clear()
-        with mock.patch("app.views.render_template", return_value="OK") as rt:
-            client = app.test_client()
-            client.get("/")
-            client.get("/")
-            client.get("/")
-            self.assertEqual(rt.call_count, 1)
+        try:
+            with mock.patch("app.views.render_template", return_value="OK") as rt:
+                client = app.test_client()
+                client.get("/")
+                client.get("/")
+                client.get("/")
+                self.assertEqual(rt.call_count, 1)
+        finally:
+            # La prova funziona proprio perche' la home resta in cache, quindi
+            # esce di qui lasciandoci dentro "OK" al posto della pagina. Finche'
+            # nessuno guardava il corpo di `/` non se ne accorgeva nessuno: la
+            # prima prova che lo guarda riceve due caratteri e nessun `<title>`.
+            cache.clear()
 
     def test_events_rate_limited(self):
         """L'endpoint pubblico /api/events blocca lo spam con 429 oltre la soglia."""
@@ -1559,6 +1723,365 @@ class TheImageShipsEverythingTheAppImports(unittest.TestCase):
                 f"potrebbe imbarcare stato di runtime o PII nell'immagine.",
             )
 
+
+class LaCspDeiFontSegueLaPagina(unittest.TestCase):
+    """Da quando i font sono self-hostati, `fonts.googleapis.com` serve a una
+    pagina sola.
+
+    Toglierlo dappertutto romperebbe `/legacy`, che carica Mukta da li' e che
+    CLAUDE.md dice di non rompere: un font che non carica e' un modo di
+    romperla. Quindi la CSP e' la stessa ovunque tranne i due domini dei font,
+    che restano sulle sole rotte legacy.
+    """
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_le_pagine_nuove_non_ammettono_i_font_di_google(self):
+        for path in ("/", "/temi", "/indicatore/pil-pro-capite/ter-901", "/blog"):
+            with self.subTest(path=path):
+                csp = self.client.get(path).headers["Content-Security-Policy"]
+                self.assertNotIn("fonts.googleapis.com", csp)
+                self.assertNotIn("fonts.gstatic.com", csp)
+
+    def test_legacy_li_ammette_ancora(self):
+        for path in ("/legacy", "/legacy-reddito"):
+            with self.subTest(path=path):
+                csp = self.client.get(path).headers["Content-Security-Policy"]
+                self.assertIn("https://fonts.googleapis.com", csp)
+                self.assertIn("https://fonts.gstatic.com", csp)
+
+    def test_il_resto_della_policy_non_cambia_fra_le_due(self):
+        """Solo i font: se un domani la CSP di legacy diverge su altro, e' un
+        buco che nessuno ha deciso di aprire."""
+        nuova = self.client.get("/").headers["Content-Security-Policy"]
+        legacy = self.client.get("/legacy").headers["Content-Security-Policy"]
+        pulita = legacy.replace(" https://fonts.googleapis.com", "").replace(" https://fonts.gstatic.com", "")
+        self.assertEqual(pulita, nuova)
+
+
+class IlFeedDelBlog(unittest.TestCase):
+    """Un feed che nessuno trova non esiste, e prima le tre forme con cui si
+    cerca rispondevano tutte e tre 404."""
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_risponde_come_rss(self):
+        risposta = self.client.get("/blog/feed.xml")
+        self.assertEqual(risposta.status_code, 200)
+        self.assertTrue(risposta.headers["Content-Type"].startswith("application/rss+xml"))
+
+    def test_e_xml_valido_con_un_item_per_post(self):
+        from xml.etree import ElementTree
+        from app.blog import get_posts
+
+        albero = ElementTree.fromstring(self.client.get("/blog/feed.xml").data)
+        voci = albero.findall("./channel/item")
+        self.assertEqual(len(voci), min(len(get_posts()), 20))
+        for voce in voci:
+            with self.subTest(voce=voce.findtext("title")):
+                for campo in ("title", "link", "guid", "pubDate", "description"):
+                    self.assertTrue((voce.findtext(campo) or "").strip(), campo)
+
+    def test_le_date_sono_in_rfc_822(self):
+        """L'ISO della sitemap qui non si legge, e un lettore che non sa
+        interpretare `pubDate` tiene l'articolo in cima per sempre."""
+        import email.utils
+        from xml.etree import ElementTree
+
+        albero = ElementTree.fromstring(self.client.get("/blog/feed.xml").data)
+        for voce in albero.findall("./channel/item"):
+            testo = voce.findtext("pubDate")
+            with self.subTest(pubDate=testo):
+                self.assertIsNotNone(email.utils.parsedate_to_datetime(testo))
+
+    def test_i_link_rispondono(self):
+        from xml.etree import ElementTree
+
+        albero = ElementTree.fromstring(self.client.get("/blog/feed.xml").data)
+        for voce in albero.findall("./channel/item"):
+            percorso = voce.findtext("link").replace("https://divarioitalia.it", "")
+            with self.subTest(percorso=percorso):
+                self.assertEqual(self.client.get(percorso).status_code, 200)
+
+    def test_le_due_forme_abbreviate_ci_portano(self):
+        for path in ("/feed.xml", "/rss.xml"):
+            with self.subTest(path=path):
+                risposta = self.client.get(path)
+                self.assertEqual(risposta.status_code, 301)
+                self.assertTrue(risposta.headers["Location"].endswith("/blog/feed.xml"))
+
+    def test_le_pagine_lo_dichiarano_in_testa(self):
+        for path in ("/blog", "/blog/pil-pro-capite-regioni-divario-2024", "/temi"):
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertIn('type="application/rss+xml"', html)
+                self.assertIn("/blog/feed.xml", html)
+
+class NessunaAnteprimaSocialeEUnSvg(unittest.TestCase):
+    """Un SVG in `og:image` vuol dire nessuna immagine.
+
+    Facebook, LinkedIn, X, WhatsApp e Slack scartano l'SVG e mostrano il link
+    nudo, e `image` dello schema `Article` vuole un raster. Il sito dichiarava
+    `twitter:card=summary_large_image`, cioe' il formato fatto apposta per una
+    figura grande, sopra un file che nessuno di quei lettori apre: ogni
+    condivisione di ogni pagina usciva senza figura.
+    """
+
+    PAGINE = (
+        "/", "/atlante", "/confronto", "/temi", "/regioni",
+        "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita", "/blog",
+        "/divari-regionali", "/catalogo-dati", "/metodologia",
+    )
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def _og_image(self, html):
+        trovato = re.search(r'<meta property="og:image" content="([^"]+)"', html)
+        return trovato.group(1) if trovato else None
+
+    def test_ogni_pagina_ne_dichiara_una_e_non_e_un_svg(self):
+        from app.blog import get_posts
+
+        percorsi = list(self.PAGINE) + [f"/blog/{post['slug']}" for post in get_posts()]
+        for path in percorsi:
+            with self.subTest(path=path):
+                immagine = self._og_image(self.client.get(path).get_data(as_text=True))
+                self.assertIsNotNone(immagine, f"{path}: nessuna og:image")
+                self.assertFalse(immagine.endswith(".svg"), f"{path}: {immagine}")
+
+    def test_il_file_dichiarato_esiste(self):
+        from app.blog import get_posts
+
+        percorsi = list(self.PAGINE) + [f"/blog/{post['slug']}" for post in get_posts()]
+        for path in percorsi:
+            with self.subTest(path=path):
+                immagine = self._og_image(self.client.get(path).get_data(as_text=True))
+                locale = immagine.replace("https://divarioitalia.it", "")
+                self.assertEqual(self.client.get(locale).status_code, 200, locale)
+
+    def test_le_misure_dichiarate_sono_quelle_vere(self):
+        """Dichiararle sbagliate e' peggio che non dichiararle: la scheda si
+        disegna sul rapporto annunciato e poi l'immagine non ci sta. Le tre
+        copertine in JPG sono 1376x768 e infatti non le dichiarano."""
+        from app.blog import get_posts, social_image_size
+
+        for post in get_posts():
+            with self.subTest(post=post["slug"]):
+                html = self.client.get(f"/blog/{post['slug']}").get_data(as_text=True)
+                larghezza = re.search(r'<meta property="og:image:width" content="(\d+)"', html)
+                misura = social_image_size(post["social_image"])
+                if misura is None:
+                    self.assertIsNone(larghezza, post["social_image"])
+                else:
+                    self.assertEqual(int(larghezza.group(1)), misura[0])
+
+    def test_la_copertina_in_pagina_resta_il_vettoriale(self):
+        """Il PNG serve al social, non allo schermo: in pagina l'SVG e' piu'
+        nitido e pesa meno."""
+        html = self.client.get("/blog/pil-pro-capite-regioni-divario-2024").get_data(as_text=True)
+        self.assertIn('src="/static/img/blog/pil-pro-capite.svg"', html)
+
+    def test_ogni_svg_di_copertina_ha_il_suo_png(self):
+        """Se manca, `blog.social_image` ripiega sulla figura del sito e il post
+        perde la sua: si rigenera con scripts/rasterize_og_images.py."""
+        cartella = Path(__file__).resolve().parents[2] / "app" / "static" / "img"
+        sorgenti = [cartella / "og-divario-italia.svg"] + sorted((cartella / "blog").glob("*.svg"))
+        for sorgente in sorgenti:
+            with self.subTest(sorgente=sorgente.name):
+                self.assertTrue(sorgente.with_suffix(".png").exists(),
+                                f"manca il PNG di {sorgente.name}")
+
+class LaDefinizioneDellaFonteStaInTutteEDueLeForme(unittest.TestCase):
+    """HTML e Markdown sono lo stesso documento alla stessa URL.
+
+    La definizione che ne da' l'istituto (`meta["archive"]`, da
+    `data/definitions/`) la pagina HTML la mostra da sempre nell'apparato. La
+    proiezione markdown no: chi chiedeva `Accept: text/markdown` riceveva la
+    formula che il sito si compone da se' e non la definizione della fonte,
+    cioe' una pagina diversa sotto lo stesso canonico. Copre 346 delle 372
+    schede indicizzabili.
+    """
+
+    SCHEDE = (
+        "/indicatore/pil-pro-capite/ter-901",
+        "/indicatore/numero-medio-di-figli-per-donna/ter-922",
+        "/indicatore/adeguata-alimentazione-tassi-standardizzati/bes-01SAL013",
+    )
+
+    # Una delle 26 scoperte: `data/definitions/` non ha ancora il foglio delle
+    # serie provinciali BES, e li' la pagina deve restare com'era.
+    SENZA_DEFINIZIONE = "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P"
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def _markdown(self, path):
+        return self.client.get(path, headers={"Accept": "text/markdown"}).get_data(as_text=True)
+
+    def test_il_markdown_la_porta(self):
+        for path in self.SCHEDE:
+            with self.subTest(path=path):
+                self.assertIn("## Definizione della fonte", self._markdown(path))
+
+    def test_e_lo_stesso_testo_dell_html(self):
+        for path in self.SCHEDE:
+            with self.subTest(path=path):
+                html = unescape(self.client.get(path).get_data(as_text=True))
+                riga = re.search(r"<dt>Definizione della fonte</dt>\s*<dd>(.*?)<a ", html, re.S)
+                self.assertIsNotNone(riga, f"{path}: l'HTML non la mostra piu'")
+                testo = re.sub(r"<[^>]+>", "", riga.group(1)).strip()
+                self.assertIn(testo, unescape(self._markdown(path)))
+
+    def test_la_dichiara_anche_il_dataset(self):
+        """`variableMeasured.description` e' lo slot per "che cosa misura", e
+        quello che ci sta dentro la pagina lo mostra: nessuna dichiarazione che
+        il visibile non sostenga."""
+        import json
+
+        for path in self.SCHEDE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                for blocco in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S):
+                    documento = json.loads(blocco)
+                    if documento.get("@type") != "Dataset":
+                        continue
+                    descrizione = documento["variableMeasured"].get("description")
+                    self.assertTrue(descrizione)
+                    self.assertIn(descrizione, unescape(html))
+                    break
+                else:
+                    self.fail(f"{path}: nessun Dataset")
+
+    def test_una_scheda_senza_definizione_non_inventa_la_sezione(self):
+        """Le 26 scoperte sono le provinciali BES, dove `data/definitions/` non
+        arriva ancora: li' ne' l'HTML ne' il markdown devono emettere un titolo
+        sopra il vuoto."""
+        html = self.client.get(self.SENZA_DEFINIZIONE).get_data(as_text=True)
+        self.assertNotIn("Definizione della fonte", html)
+        self.assertNotIn("## Definizione della fonte", self._markdown(self.SENZA_DEFINIZIONE))
+
+
+class IlTemaSegueIlSistemaFinoAllaPrimaScelta(unittest.TestCase):
+    """Una regola sola, in tre implementazioni che devono restare d'accordo.
+
+    Prima: `ds-chrome.js`, il bootstrap inline e il toggle React leggevano solo
+    `localStorage`, quindi chi tiene il sistema in scuro riceveva il sito
+    chiaro. Peggio, il toggle React scriveva `localStorage` **al montaggio**:
+    bastava passare una volta da `/atlante` perche' una preferenza di sistema
+    diventasse una scelta esplicita e il sito restasse chiaro per sempre.
+
+    La regola: una scelta esplicita vince, senza scelta decide
+    `prefers-color-scheme`, e si scrive solo quando qualcuno tocca
+    l'interruttore.
+    """
+
+    PAGINE = ("/", "/atlante", "/confronto", "/temi", "/blog",
+              "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita")
+    TEMPLATES = Path(__file__).resolve().parents[2] / "app" / "templates"
+    STATICI = Path(__file__).resolve().parents[2] / "app" / "static"
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_ogni_pagina_decide_il_tema_una_volta_sola(self):
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertEqual(html.count("divario-theme"), 1, path)
+                self.assertIn("prefers-color-scheme", html, path)
+
+    def test_nessun_template_si_riscrive_il_bootstrap(self):
+        """Erano tre copie a mano in app.html, blog_base.html e
+        confronto.html: tre copie della stessa regola vanno fuori sincrono."""
+        for percorso in self.TEMPLATES.glob("*.html"):
+            if percorso.name == "_theme_bootstrap.html":
+                continue
+            with self.subTest(template=percorso.name):
+                self.assertNotIn("divario-theme", percorso.read_text(encoding="utf-8"))
+
+    def test_il_bootstrap_decide_prima_di_dipingere(self):
+        """Applicato dopo il primo paint, chi legge in scuro vede un lampo di
+        pagina chiara a ogni navigazione."""
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertLess(html.index("divario-theme"), html.index("</head>"), path)
+
+    def test_l_altra_implementazione_segue_la_stessa_regola(self):
+        """Ne restano due: il bootstrap inline e `ds-chrome.js`."""
+        sorgente = (self.STATICI / "js" / "ds-chrome.js").read_text(encoding="utf-8")
+        self.assertIn("prefers-color-scheme", sorgente)
+
+    def test_la_spa_non_decide_piu_il_tema(self):
+        """C'era una terza implementazione in React, e aveva il difetto
+        peggiore: scriveva `localStorage` dentro un effetto che gira anche al
+        montaggio, quindi passare una volta da /atlante trasformava una
+        preferenza di sistema in una scelta esplicita e teneva il sito chiaro
+        per sempre.
+
+        Esisteva perche' `ds-chrome.js` aggancia i bottoni una volta sola e la
+        testata React montava dopo. Da quando la testata la rende Flask anche
+        su quelle due rotte, il bottone c'e' gia' nell'HTML iniziale e quella
+        ragione non c'e' piu'."""
+        sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
+        self.assertNotIn("divario-theme", sorgente)
+        self.assertNotIn("localStorage.setItem(THEME_KEY", sorgente)
+
+class UnaTestataSolaSuTuttoIlSito(unittest.TestCase):
+    """Due testate sullo stesso dominio erano due identita'.
+
+    Le pagine Flask rendevano `_ds_header.html` (marchio senza sottotitolo,
+    tendine Esplora e Classifiche, ricerca in testata, interruttore tondo);
+    `/atlante` e `/confronto` montavano una testata React con marchio corallo e
+    sottotitolo, otto voci piatte, nessuna ricerca e un interruttore quadrato.
+    Le voci venivano gia' dalla stessa lista (`window.__diNav`), il disegno no.
+    Adesso la testata e' una, la rende Flask, e React tiene solo cio' che la
+    testata non puo' sapere: la barra del telefono e il pulsante di ritorno.
+    """
+
+    PAGINE = ("/", "/atlante", "/confronto", "/temi", "/regioni", "/blog",
+              "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita",
+              "/divari-regionali", "/catalogo-dati", "/metodologia", "/quiz")
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_ogni_pagina_ne_rende_una_e_una_sola(self):
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertEqual(html.count('<header class="hdr">'), 1, path)
+                self.assertIn('class="brandword">Divario Italia<', html, path)
+
+    def test_la_spa_non_disegna_piu_la_sua(self):
+        sorgente = (Path(__file__).resolve().parents[2] / "frontend" / "src" / "main.jsx").read_text(encoding="utf-8")
+        self.assertNotIn('className="masthead"', sorgente)
+
+    def test_le_due_rotte_spa_vestono_il_chrome_condiviso(self):
+        """`chrome.css` e' scoped sotto `.sitechrome`: senza quella classe sul
+        body la testata esce senza nessuno stile, ed e' successo."""
+        for path in ("/atlante", "/confronto"):
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertIn('<body class="ds sitechrome">', html)
+                self.assertIn("css/ds/chrome.css", html)
+                self.assertIn("js/ds-chrome.js", html)
+
+    def test_l_atlante_dichiara_percorso_e_lista(self):
+        """Era l'unica pagina indicizzabile e in sitemap senza nessun JSON-LD e
+        senza percorso."""
+        import json
+
+        html = self.client.get("/atlante").get_data(as_text=True)
+        tipi = []
+        for blocco in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S):
+            documento = json.loads(blocco)
+            tipi.append(documento.get("@type"))
+        self.assertIn("BreadcrumbList", tipi)
+        self.assertIn("CollectionPage", tipi)
 
 if __name__ == "__main__":
     unittest.main()

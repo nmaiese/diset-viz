@@ -18,6 +18,11 @@ from app.cache import cache
 from app.config import SITE_NAME, SITE_URL
 
 POSTS_DIR = Path(__file__).resolve().parents[1] / "content" / "posts"
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+# La figura di ripiego per chi condivide una pagina senza copertina propria.
+# PNG e non SVG, per la ragione scritta in `social_image`.
+SOCIAL_FALLBACK = "/static/img/og-divario-italia.png"
 
 # How many articles an indicator page lists. Three is the whole point of the
 # widget: enough to show the indicator has been written about, few enough that
@@ -61,6 +66,56 @@ def _excerpt(meta, html):
     if len(text) <= 158:
         return text
     return text[:157].rsplit(" ", 1)[0] + "..."
+
+
+def social_image(cover):
+    """La copertina nella forma che un social sa disegnare, o il ripiego.
+
+    Nessun lettore di anteprime apre un SVG: Facebook, LinkedIn, X, WhatsApp e
+    Slack scartano l'immagine e mostrano il link nudo, e lo stesso vale per
+    `image` dello schema `Article`, dove Google chiede un raster. Le copertine
+    del blog erano tutte SVG, quindi ogni condivisione di ogni post usciva
+    senza figura sotto un `twitter:card=summary_large_image`, cioe' il formato
+    che esiste apposta per mostrarne una grande.
+
+    Il PNG lo scrive `scripts/rasterize_og_images.py` accanto al sorgente e si
+    committa. Qui si guarda se c'e': una copertina nuova senza la sua passata
+    di conversione ripiega sulla figura del sito invece di far uscire una
+    scheda rotta. In pagina la copertina resta l'SVG, che e' la forma giusta
+    per uno schermo.
+    """
+    if not cover:
+        return SOCIAL_FALLBACK
+    if not cover.endswith(".svg"):
+        return cover
+    raster = cover[: -len(".svg")] + ".png"
+    percorso = STATIC_DIR / raster.removeprefix("/static/")
+    return raster if percorso.exists() else SOCIAL_FALLBACK
+
+
+def social_image_size(path):
+    """(larghezza, altezza) di una figura sociale, o None se non si sanno.
+
+    `og:image:width` e `og:image:height` servono a far disegnare la scheda
+    prima che l'immagine sia scaricata, ma dichiararle sbagliate e' peggio che
+    non dichiararle: le tre copertine in JPG sono 1376x768, non 1200x630, e
+    scriverci sopra la misura dei PNG darebbe un ritaglio storto.
+
+    Qui si leggono solo i PNG, dove la misura sta in otto byte a offset 16 e
+    non serve nessuna libreria. Per gli altri formati si torna None e il
+    template non dichiara niente, che e' il comportamento di prima.
+    """
+    if not path or not path.endswith(".png"):
+        return None
+    percorso = STATIC_DIR / path.removeprefix("/static/")
+    try:
+        with percorso.open("rb") as file:
+            testa = file.read(24)
+    except OSError:
+        return None
+    if len(testa) < 24 or testa[:8] != b"\x89PNG\r\n\x1a\n":
+        return None
+    return int.from_bytes(testa[16:20], "big"), int.from_bytes(testa[20:24], "big")
 
 
 def _normalize_indicator(value):
@@ -116,6 +171,10 @@ def _load_post(path):
         "author": (meta.get("author") or SITE_NAME).strip(),
         "cover": meta.get("cover"),
         "cover_alt": meta.get("cover_alt") or title,
+        # La stessa figura in un formato che un social e uno schema sanno
+        # leggere: `cover` resta l'SVG che va in pagina.
+        "social_image": social_image(meta.get("cover")),
+        "social_image_size": social_image_size(social_image(meta.get("cover"))),
         "tags": tags,
         "indicator": _normalize_indicator(meta.get("indicator")),
         "indicator_label": meta.get("indicator_label"),

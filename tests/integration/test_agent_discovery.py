@@ -2,7 +2,7 @@ import hashlib
 import unittest
 
 from app import app, cache
-from app import agent_discovery
+from app import agent_discovery, views
 from app.blog import get_posts
 
 
@@ -160,6 +160,48 @@ class AgentDiscoveryTest(unittest.TestCase):
         self.assertIn("Non chiamare media italiana", text)
         self.assertIn("Non dedurre cause", text)
         self.assertNotIn(artifact_path, self.client.get("/sitemap.xml").get_data(as_text=True))
+
+
+class IlContrattoPubblicoValeAnchePrimaDelDeploy(unittest.TestCase):
+    """`PUBLIC_DISCOVERABILITY_EXPECTATIONS` contro il client di prova.
+
+    `scripts/audit_public_discoverability.py` legge lo stesso contratto ma
+    interroga divarioitalia.it, dove gira il ramo di default: fallisce quando il
+    guasto e' gia' in produzione. Qui i marcatori si controllano sui template di
+    adesso, quindi una pagina riscritta che non dice piu' la frase promessa si
+    ferma prima del merge. E' successo: la home del design system 2026 ha
+    cambiato l'occhiello e il contratto ha continuato a nominare quello vecchio.
+    """
+
+    def setUp(self):
+        cache.cache.clear()
+        self.client = app.test_client()
+        self.contract = views.PUBLIC_DISCOVERABILITY_EXPECTATIONS
+
+    def test_ogni_pagina_del_contratto_rende_il_suo_marcatore(self):
+        for page in self.contract["pages"]:
+            with self.subTest(path=page["path"]):
+                response = self.client.get(page["path"])
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(page["content_type"], response.content_type)
+                self.assertIn(page["marker"], response.get_data(as_text=True))
+
+    def test_ogni_gemello_markdown_rende_il_suo_marcatore(self):
+        for page in self.contract["pages"]:
+            if not page.get("markdown_marker"):
+                continue
+            with self.subTest(path=page["path"]):
+                response = self.client.get(page["path"], headers={"Accept": "text/markdown"})
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue(response.content_type.startswith("text/markdown"))
+                self.assertIn(page["markdown_marker"], response.get_data(as_text=True))
+
+    def test_le_intestazioni_robots_sono_quelle_promesse(self):
+        for page in self.contract["pages"]:
+            with self.subTest(path=page["path"]):
+                response = self.client.get(page["path"])
+                atteso = page.get("x_robots", self.contract["index_header"])
+                self.assertEqual(response.headers.get("X-Robots-Tag"), atteso)
 
 
 if __name__ == "__main__":

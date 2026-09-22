@@ -10,6 +10,7 @@ These tests pin both directions and the guard that keeps the mapping honest.
 
 import re
 import unittest
+from html import unescape
 
 from markupsafe import escape
 
@@ -156,6 +157,60 @@ class IndicatorPageRendersItsArticlesTest(unittest.TestCase):
         response = self.client.get(payload["metadata"]["path"])
         self.assertEqual(response.status_code, 200)
         self.assertNotIn("indicator-articles", response.get_data(as_text=True))
+
+
+class IlPostNonGareggiaConLaSuaScheda(unittest.TestCase):
+    """Due pagine nostre sulla stessa domanda si tolgono i clic a vicenda.
+
+    Gli `seo_title` dei post erano scritti sul termine generico ("PIL pro capite
+    per regione"), lo stesso che la scheda dichiarava: su quella query il sito
+    presentava due pagine e ne perdeva una. La scheda ora risponde con
+    l'intervallo, quindi al post tocca la domanda che l'intervallo non copre,
+    il rapporto e il movimento.
+
+    Il budget: il `<title>` del post non porta piu' la marca, quindi i 60
+    caratteri sono tutti per il titolo. Non c'e' un taglio automatico, perche'
+    un titolo troncato a macchina rende meno di uno scritto corto: lo tiene
+    questa prova.
+    """
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def _titolo(self, path):
+        """Il titolo come lo legge chi cerca, non come sta nel sorgente.
+
+        `&#39;` sono sei caratteri in pagina e uno in SERP: misurare l'HTML
+        bocciava "l'ultima" per un apostrofo.
+        """
+        response = self.client.get(path)
+        self.assertEqual(response.status_code, 200, path)
+        trovato = re.search(r"<title>(.*?)</title>", response.get_data(as_text=True), re.S)
+        self.assertIsNotNone(trovato, path)
+        return unescape(trovato.group(1).strip())
+
+    def test_nessun_titolo_di_post_sfora_il_budget_serp(self):
+        for post in get_posts():
+            with self.subTest(slug=post["slug"]):
+                titolo = self._titolo("/blog/" + post["slug"])
+                self.assertLessEqual(len(titolo), 60, f"{post['slug']}: {titolo}")
+
+    def test_la_marca_non_mangia_il_budget_del_post(self):
+        """Diciassette caratteri di marca erano il 28% della finestra."""
+        post = get_posts()[0]
+        self.assertNotIn("· Divario Italia", self._titolo("/blog/" + post["slug"]))
+
+    def test_nessun_post_ripete_il_titolo_della_sua_scheda(self):
+        collisioni = []
+        for post in get_posts():
+            pagina = self.client.get("/blog/" + post["slug"]).get_data(as_text=True)
+            scheda = re.search(r'href="(/indicatore/[^"]+)"', pagina)
+            if not scheda:
+                continue
+            titolo_post = re.search(r"<title>(.*?)</title>", pagina, re.S).group(1).strip()
+            if titolo_post == self._titolo(scheda.group(1)):
+                collisioni.append((post["slug"], titolo_post))
+        self.assertEqual(collisioni, [])
 
 
 if __name__ == "__main__":

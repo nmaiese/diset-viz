@@ -4,6 +4,12 @@
 {% set m = data.methodology %}
 {% set is_prov = data.level == 'provincia' %}
 {% set lvl_label = 'province' if is_prov else 'regioni' %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [
+  {"name": "Home", "path": "/"},
+  {"name": "Qualità della vita", "path": "/qualita-della-vita"},
+  {"name": "Classifica " ~ lvl_label, "path": "/qualita-della-vita/classifica/" ~ url_level},
+] %}
 
 {% block title %}Qualità {{ lvl_label }}: {{ p.name }} | {{ site_name }}{% endblock %}
 {% block description %}Classifica della qualità della vita per {{ lvl_label }}: indicatori Istat su scala 0-100, profilo {{ p.name }}, categorie e metodo trasparenti.{% endblock %}
@@ -39,22 +45,12 @@
   ]
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Qualità della vita", "item": "{{ site_url }}/qualita-della-vita" },
-    { "@type": "ListItem", "position": 3, "name": "Classifica {{ lvl_label }}", "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {% endblock %}
 
 {% block content %}
-<article class="page wrap-wide quality-ranking">
-  <nav class="breadcrumb"><a href="/qualita-della-vita">Qualità della vita</a></nav>
+<article class="page wrap-wide quality-ranking" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
 
   <div class="quality-hero-row">
     <div class="quality-hero-row__main">
@@ -115,8 +111,12 @@
                server-rendered. Ignored where View Transitions aren't supported. #}
             <tr style="view-transition-name: qlrow-{{ row.key }}">
               <td class="num quality-rank">{{ row.rank }}</td>
-              <td>{{ row.name }}{% if row.metro_city %} <span class="quality-metro" title="Città metropolitana">cm</span>{% endif %}</td>
-              {% if is_prov %}<td><small>{{ row.region }}</small></td>{% endif %}
+              {# Il territorio porta al suo profilo, e adesso ce l'hanno tutti:
+                 le 103 province erano testo nudo su una pagina in posizione
+                 4,1 per "classifica regioni italiane per qualita' della vita",
+                 e la sola porta era la colonna della regione. #}
+              <td><a href="{% if is_prov %}/provincia/{% else %}/regione/{% endif %}{{ row.key }}">{{ row.name }}</a>{% if row.metro_city %} <span class="quality-metro" title="Città metropolitana">cm</span>{% endif %}</td>
+              {% if is_prov %}<td><small>{% if region_paths.get(row.region) %}<a href="{{ region_paths[row.region] }}">{{ row.region }}</a>{% else %}{{ row.region }}{% endif %}</small></td>{% endif %}
               <td class="quality-score-cell">
                 <span class="quality-score-bar"><span style="width: {{ row.score | round | int }}%"></span></span>
                 <span class="quality-score">{{ row.score | it_num }}</span>

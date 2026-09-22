@@ -1,0 +1,143 @@
+{% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set active_nav = 'qualita-della-vita' %}
+{% set p = profile %}
+{% set percorso = [
+  {"name": "Home", "path": "/"},
+  {"name": "Qualità della vita", "path": "/qualita-della-vita"},
+  {"name": "Province", "path": "/qualita-della-vita/classifica/province"},
+  {"name": p.name, "path": p.path},
+] %}
+
+{# Titolo e descrizione li misura la view, come fa la pagina tema: in un
+   template non si conta niente, e tutti e due sforavano il budget su un nome
+   lungo ("Verbano-Cusio-Ossola"). La domanda vera e' "qualita' della vita
+   provincia di X", quindi il nome sta davanti: e' la parola che si scrive. #}
+{% block title %}{{ seo_title }}{% endblock %}
+{# La descrizione la misura la view: qui non si conta niente, e scritta in
+   Jinja sforava di sei caratteri su Lecce. #}
+{% block description %}{{ seo_description }}{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Qualità della vita a {{ p.name }}",
+  "description": {{ ('Punteggio, posizione fra le ' ~ p.total ~ ' province italiane e profilo per dimensione di ' ~ p.name ~ ', dal BES dei Territori di Istat.') | tojson }},
+  "url": {{ canonical | tojson }},
+  "spatialCoverage": { "@type": "Place", "name": {{ p.name | tojson }}{% if p.region %}, "containedInPlace": { "@type": "Place", "name": {{ p.region | tojson }} }{% endif %} },
+  "creator": { "@type": "Organization", "name": "Istat" },
+  "publisher": {{ publisher_jsonld | safe }},
+  "isAccessibleForFree": true,
+  "license": {{ data_license_url | tojson }},
+  "variableMeasured": {
+    "@type": "PropertyValue",
+    "name": "Punteggio qualità della vita, profilo {{ p.profile.name }}",
+    "value": {{ p.score }},
+    "minValue": 0,
+    "maxValue": 100,
+    "measurementTechnique": {{ (p.methodology.source or 'Istat, BES dei Territori') | tojson }}
+  },
+  "keywords": [{{ p.name | tojson }}, "qualità della vita", "province italiane", "Istat"]
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% endblock %}
+
+{% block content %}
+<main class="wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
+
+  <header class="article-hero">
+    <p class="eyebrow">Qualità della vita{% if p.region %} · {{ p.region }}{% endif %}</p>
+    <h1>{{ p.name }} è {{ p.rank }}ª su {{ p.total }} province</h1>
+    <p class="page-lead">
+      Con il profilo {{ p.profile.name | lower }}, {{ p.name }} ottiene {{ p.score | replace('.', ',') }} su 100.
+      {% if p.strongest %}Va meglio su {{ p.strongest[0].name | lower }}{% endif %}{% if p.weakest %} e peggio su {{ p.weakest[0].name | lower }}{% endif %}.
+      {% if p.region_path %}Il profilo della sua regione è in <a href="{{ p.region_path }}">{{ p.region }}</a>.{% endif %}
+    </p>
+  </header>
+
+  <div class="region-facts" aria-label="I numeri di {{ p.name }}">
+    <div><small>Posizione</small><strong>{{ p.rank }}ª / {{ p.total }}</strong></div>
+    <div><small>Punteggio</small><strong>{{ p.score | replace('.', ',') }}</strong></div>
+    {% if p.strongest %}<div><small>Forza</small><strong>{{ p.strongest[0].name }}</strong></div>{% endif %}
+    {% if p.weakest %}<div><small>Debole</small><strong>{{ p.weakest[0].name }}</strong></div>{% endif %}
+  </div>
+
+  {# Le dodici dimensioni, ordinate dal punteggio piu' alto al piu' basso. E'
+     la risposta alla domanda vera della pagina, "in che cosa questa provincia
+     sta bene e in che cosa no", ed e' l'unica tabella qui: piu' di una e si
+     torna all'elenco da cui questa pagina esiste per uscire. #}
+  <section class="panel-card" aria-labelledby="dimensioni">
+    <h2 class="section-label" id="dimensioni">Le dimensioni, dalla più forte alla più debole</h2>
+    <table class="data-table">
+      <thead><tr><th scope="col">Dimensione</th><th scope="col" class="num">Punteggio</th></tr></thead>
+      <tbody>
+        {% for voce in p.categories %}
+        <tr>
+          <th scope="row">{{ voce.name }}</th>
+          <td class="num">
+            <span class="score-bar" aria-hidden="true"><span style="transform: scaleX({{ (voce.score / 100) | round(3) }}); transform-origin: left;"></span></span>
+            {{ voce.score | replace('.', ',') }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="page-note">Punteggi da 0 a 100 sul profilo {{ p.profile.name | lower }}, dove 50 è la media delle {{ p.total }} province. Non è una classifica ufficiale.</p>
+  </section>
+
+  <div class="profile-quad profile-quad--two">
+    <section class="profile-card profile-strong">
+      <h2>Gli indicatori che la tirano su</h2>
+      <ul class="theme-chips">
+        {% for voce in p.top_positive %}
+        <li><a href="{{ voce.path }}">{{ voce.name }}</a>{% if voce.year_max %} <small>{{ voce.year_max }}</small>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    <section class="profile-card profile-weak">
+      <h2>Gli indicatori che la tirano giù</h2>
+      <ul class="theme-chips">
+        {% for voce in p.top_negative %}
+        <li><a href="{{ voce.path }}">{{ voce.name }}</a>{% if voce.year_max %} <small>{{ voce.year_max }}</small>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+
+  {% if vicine %}
+  {# Vicine di punteggio, non di geografia: la pagina risponde a "come sta
+     questa provincia", e li' il confronto utile e' con chi le sta intorno in
+     classifica. La geografia ce l'ha gia' il link alla regione, in cima. #}
+  <section class="panel-card" aria-labelledby="vicine">
+    <h2 class="section-label" id="vicine">Le province che le stanno intorno in classifica</h2>
+    <ul class="theme-chips">
+      {% for voce in vicine %}
+      <li><a href="{{ voce.path }}">{{ voce.rank }}ª {{ voce.name }}</a> <small>{{ voce.score | replace('.', ',') }}</small></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  <section class="indicator-apparatus" id="fonti-verifica">
+    <h2>Fonti e metodo</h2>
+    <dl class="apparatus-specs">
+      <div class="apparatus-specs__row">
+        <dt>Fonte</dt>
+        <dd>{{ p.methodology.source or 'Istat, BES dei Territori' }}</dd>
+      </div>
+      <div class="apparatus-specs__row">
+        <dt>Come è calcolato</dt>
+        <dd>{{ p.profile.description }} I punteggi di dimensione sono standardizzati sulle {{ p.total }} province e mostrati da 0 a 100, dove 50 è la media. La classifica completa è su <a href="/qualita-della-vita/classifica/province">qualità della vita, province</a>, e il metodo per esteso su <a href="/qualita-della-vita/metodologia">metodologia</a>.</dd>
+      </div>
+      <div class="apparatus-specs__row">
+        <dt>Copertura</dt>
+        <dd>{{ (p.coverage * 100) | round | int }}% degli indicatori del punteggio ha un dato per {{ p.name }}.</dd>
+      </div>
+    </dl>
+  </section>
+</main>
+{% endblock %}

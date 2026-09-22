@@ -1,0 +1,36 @@
+{# Il tema, deciso prima del primo paint. Una copia sola.
+
+   Perche' inline e in testa: applicato dopo, chi legge in scuro vede un lampo
+   di pagina chiara a ogni navigazione. Un file esterno arriverebbe troppo
+   tardi anche da cache.
+
+   Perche' un include e non tre copie: lo stesso script stava scritto a mano in
+   `app.html`, `blog_base.html` e `confronto.html`. Tre copie della stessa
+   regola vanno fuori sincrono senza che nessuno se ne accorga, ed e' la cosa
+   che CLAUDE.md dice in testa di non fare. Cambiare come si decide il tema
+   toccando due file su tre lascerebbe l'atlante con un tema e il blog con un
+   altro.
+
+   La regola. Una scelta esplicita vince sempre: l'interruttore scrive `light`
+   o `dark` in `localStorage`, e da quel momento il sistema non conta piu'.
+   Senza una scelta si segue `prefers-color-scheme`, perche' chi tiene il
+   sistema in scuro lo ha gia' detto una volta e non deve ridirlo a ogni sito.
+   `ds-chrome.js` legge la stessa regola in `readTheme()`, o il bottone
+   mostrerebbe la luna su una pagina gia' scura e il primo clic non farebbe
+   niente. #}
+<script>
+  // `ds-js` sblocca i controlli che senza JavaScript non farebbero nulla (il
+  // bottone del drawer): senza classe restano nascosti e la navigazione passa
+  // dal footer, che e completo.
+  document.documentElement.classList.add('ds-js');
+  try {
+    var scelto = null;
+    try { scelto = localStorage.getItem('divario-theme'); } catch (e) {}
+    var scuro = scelto
+      ? scelto === 'dark'
+      : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (scuro) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+  } catch (e) {}
+</script>

@@ -5,6 +5,7 @@ guarda a cosa il lettore e il crawler ricevono davvero da /divari-regionali,
 /confronto, /ricerca e dalla vista provinciale, non a come sono costruite.
 """
 
+import json
 import re
 import unittest
 from html import unescape
@@ -263,11 +264,23 @@ class SearchPageTest(unittest.TestCase):
     def test_site_search_entry_points_lead_to_the_page(self):
         client = app.test_client()
         home = client.get("/").data.decode("utf-8")
-        # Il box di ricerca del masthead, il form del menu mobile e la
-        # SearchAction dello schema puntano tutti alla stessa pagina.
-        self.assertIn('class="masthead__search" href="/ricerca"', home)
-        self.assertIn('<form action="/ricerca" method="get" role="search">', home)
+        # Il campo di ricerca dell'header, quello della barra mobile e la
+        # SearchAction dello schema puntano tutti alla stessa pagina. Sul
+        # chrome 2026 i primi due sono form GET veri, quindi la ricerca
+        # funziona anche senza JavaScript.
+        self.assertIn('class="hdr__search desktop-only" role="search" action="/ricerca"', home)
+        self.assertIn('class="msearch mobile-only" role="search" action="/ricerca"', home)
         self.assertIn("/ricerca?q={search_term_string}", home)
+
+        # E ogni altra pagina ha lo stesso punto di arrivo, perche' ormai
+        # servono tutte lo stesso chrome: il masthead legacy non esiste piu'.
+        blog = client.get("/blog").data.decode("utf-8")
+        self.assertIn('class="hdr__search desktop-only" role="search" action="/ricerca"', blog)
+        self.assertIn('class="msearch mobile-only" role="search" action="/ricerca"', blog)
+        # Il vecchio punto d'ingresso non e' rimasto accanto al nuovo: due
+        # ricerche nella stessa pagina sono due comportamenti da tenere
+        # allineati, ed e' esattamente cio' che la migrazione toglieva.
+        self.assertNotIn('class="masthead__search"', blog)
 
 
 class ProvinceViewTest(unittest.TestCase):
@@ -403,5 +416,481 @@ class SitemapTest(unittest.TestCase):
             self.assertEqual(response.headers["X-Robots-Tag"], INDEX_HEADER, path)
 
 
+class IDatiStrutturatiDegliHub(unittest.TestCase):
+    """Ogni hub dichiara l'elenco che mostra, e ogni URL elencata risponde.
+
+    `/regioni` era l'unico hub del sito senza un solo blocco JSON-LD, mentre la
+    sua `<ol>` delle venti regioni e' esattamente un `ItemList`. La regola di
+    `.claude/rules/app.md` e' che il blocco vale solo dove la pagina visibile
+    lo sostiene, quindi il test guarda tutte e due le cose insieme: il blocco
+    c'e', e le URL che dichiara esistono davvero.
+    """
+
+    HUB = {"/regioni": 20, "/temi": 12}
+
+    @classmethod
+    def setUpClass(cls):
+        app.config["TESTING"] = True
+        cls.client = app.test_client()
+
+    def _blocchi(self, percorso):
+        html = self.client.get(percorso).get_data(as_text=True)
+        return [json.loads(b) for b in re.findall(
+            r'<script type="application/ld\+json">\s*(.*?)\s*</script>', html, re.S)]
+
+    def test_ogni_hub_dichiara_il_suo_elenco(self):
+        for percorso, attesi in self.HUB.items():
+            with self.subTest(percorso=percorso):
+                tipi = {b.get("@type") for b in self._blocchi(percorso)}
+                self.assertIn("ItemList", tipi)
+                self.assertIn("BreadcrumbList", tipi)
+                elenco = next(b for b in self._blocchi(percorso) if b["@type"] == "ItemList")
+                self.assertEqual(len(elenco["itemListElement"]), attesi)
+                self.assertEqual(elenco["numberOfItems"], attesi)
+
+    def test_le_posizioni_sono_progressive_e_senza_buchi(self):
+        for percorso in self.HUB:
+            with self.subTest(percorso=percorso):
+                elenco = next(b for b in self._blocchi(percorso) if b["@type"] == "ItemList")
+                posizioni = [v["position"] for v in elenco["itemListElement"]]
+                self.assertEqual(posizioni, list(range(1, len(posizioni) + 1)))
+
+    def test_ogni_url_elencata_risponde(self):
+        """Un `ItemList` che punta a una pagina che non c'e' e' peggio di niente."""
+        for percorso in self.HUB:
+            elenco = next(b for b in self._blocchi(percorso) if b["@type"] == "ItemList")
+            for voce in elenco["itemListElement"]:
+                rotta = voce["url"].split("divarioitalia.it", 1)[-1]
+                with self.subTest(percorso=percorso, voce=voce["name"]):
+                    self.assertEqual(self.client.get(rotta).status_code, 200, rotta)
+
+
 if __name__ == "__main__":
     unittest.main()
+
+
+class LaPaginaTemaRisponde(unittest.TestCase):
+    """La pagina tema era un elenco di link e non prendeva clic.
+
+    Il test guarda cosa riceve chi arriva da una ricerca: una risposta in cima,
+    una classifica con venti link a regioni, gli indicatori in gerarchia invece
+    che in un muro di schede uguali, e un'uscita. Piu' i due temi su cui la
+    classifica non si puo' calcolare, dove la pagina deve **non** fingerla.
+    """
+
+    TEMA = "/tema/lavoro-e-conciliazione"
+
+    @classmethod
+    def setUpClass(cls):
+        app.config["TESTING"] = True
+        cls.client = app.test_client()
+        cls.html = cls.client.get(cls.TEMA).get_data(as_text=True)
+
+    def test_la_classifica_porta_venti_link_a_regione(self):
+        """E' l'equity che prima la pagina non passava a nessuno: venti profili
+        regione erano orfani, e il tema non li nominava."""
+        regioni = sorted(set(re.findall(r'href="(/regione/[^"]+)"', self.html)))
+        self.assertEqual(len(regioni), 20, regioni)
+        for percorso in regioni:
+            self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
+
+    def test_la_mappa_e_colorata_dalla_rampa_del_design_system(self):
+        """Un colore cotto qui non seguirebbe il tema scuro."""
+        fills = re.findall(r'\.theme-map \[data-key="[^"]+"\]\{fill:([^}]+)\}', self.html)
+        self.assertEqual(len(fills), 20, fills)
+        for fill in fills:
+            self.assertRegex(fill.strip(), r"^var\(--seq-[1-6]\)$")
+
+    def test_la_pagina_dichiara_il_metodo_invece_di_nasconderlo(self):
+        testo = visible_text(self.html)
+        self.assertIn("media semplice", testo)
+        self.assertIn("Non è una classifica ufficiale", testo)
+
+    def test_gli_indicatori_in_evidenza_non_sono_varianti_della_stessa_misura(self):
+        """Ordinando per sola solidita' uscivano cinque schede che erano quattro
+        varianti della stessa cosa: tutte complete, tutte aggiornate, tutte che
+        dicono al lettore lo stesso."""
+        from app import atlas_catalog, views
+
+        profilo = atlas_catalog.get_atlas_theme_profile("lavoro-e-conciliazione")
+        scelti = views._theme_featured(profilo)
+        misure = [views._misura_di(i["name"]) for i in scelti]
+        self.assertEqual(len(misure), len(set(misure)), misure)
+
+    def test_c_e_un_uscita_in_fondo(self):
+        """Era l'unica pagina del sito senza blocco finale."""
+        self.assertIn('class="theme-next"', self.html)
+        self.assertIn("indicator-cta", self.html)
+
+    def test_il_titolo_e_la_descrizione_stanno_nel_budget(self):
+        from app import atlas_catalog
+
+        for voce in atlas_catalog.all_atlas_themes_index():
+            html = self.client.get(voce["path"]).get_data(as_text=True)
+            titolo = unescape(re.search(r"<title>(.*?)</title>", html, re.S).group(1)).strip()
+            descrizione = meta_content(html, "description")
+            with self.subTest(tema=voce["theme"]):
+                self.assertLessEqual(len(titolo), 60, titolo)
+                self.assertLessEqual(len(descrizione), 155, descrizione)
+                self.assertGreaterEqual(len(descrizione), 80, descrizione)
+
+    def test_dove_la_classifica_non_si_calcola_la_pagina_non_la_finge(self):
+        from app import atlas_catalog, profiles
+
+        senza = [v for v in atlas_catalog.all_atlas_themes_index()
+                 if not profiles.theme_standings(v["theme"])["rated"]]
+        if not senza:
+            self.skipTest("tutti i temi hanno una classifica")
+        for voce in senza:
+            html = self.client.get(voce["path"]).get_data(as_text=True)
+            with self.subTest(tema=voce["theme"]):
+                self.assertNotIn('class="theme-standings"', html)
+                self.assertNotIn("ItemList", html)
+                self.assertIn("non esce una classifica regionale", visible_text(html))
+
+    def test_la_variante_markdown_porta_la_stessa_risposta(self):
+        """HTML e Markdown sono lo stesso documento alla stessa URL: una
+        variante senza la risposta principale e' un'altra pagina col canonico
+        di questa."""
+        testo = self.client.get(
+            self.TEMA, headers={"Accept": "text/markdown"}).get_data(as_text=True)
+        self.assertIn("## Le regioni su questo tema", testo)
+        self.assertEqual(testo.count("/regione/"), 20)
+
+    def test_la_prosa_visibile_segue_la_guida_di_stile(self):
+        testo = visible_text(self.html)
+        for vietato in FORBIDDEN_CHARS:
+            self.assertNotIn(vietato, testo, f"tipografia vietata: {vietato!r}")
+
+
+class LaClassificaQualitaDellaVitaPortaDaQualcheParte(unittest.TestCase):
+    """Venti regioni e 103 province erano testo nudo.
+
+    La pagina sta in posizione 4,1 per "classifica regioni italiane per
+    qualita' della vita" ed era un vicolo cieco: il territorio si leggeva e
+    non si apriva. Le province non hanno un profilo, quindi li' la porta e' la
+    colonna della regione.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        app.config["TESTING"] = True
+        cls.client = app.test_client()
+
+    def test_ogni_regione_in_classifica_apre_il_suo_profilo(self):
+        html = self.client.get("/qualita-della-vita/classifica/regioni").get_data(as_text=True)
+        link = sorted(set(re.findall(r'href="(/regione/[^"]+)"', html)))
+        self.assertEqual(len(link), 20, link)
+        for percorso in link:
+            self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
+
+    def test_le_province_aprono_la_loro_regione(self):
+        html = self.client.get("/qualita-della-vita/classifica/province").get_data(as_text=True)
+        link = sorted(set(re.findall(r'href="(/regione/[^"]+)"', html)))
+        self.assertGreaterEqual(len(link), 18, link)
+        for percorso in link:
+            self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
+
+    def test_un_territorio_senza_profilo_non_prende_un_link_finto(self):
+        """`region_key_for` slugifica qualunque stringa: da "Provincia Autonoma
+        Bolzano" usciva un link a una pagina che non esiste. Si valida contro
+        le regioni vere, non contro il fatto che una chiave sia uscita."""
+        html = self.client.get("/qualita-della-vita/classifica/province").get_data(as_text=True)
+        self.assertNotIn("/regione/provincia-autonoma", html)
+
+
+class LaPaginaRegioneChiudeLaMaglia(unittest.TestCase):
+    """Tema e regione erano due elenchi che non si nominavano a vicenda.
+
+    La pagina tema dice da tempo "su questo tema il Molise e' 17esimo". La
+    pagina regione elencava i suoi temi con il solo conteggio degli indicatori,
+    quindi il lettore arrivato da un tema non ritrovava il numero da cui veniva,
+    e il collegamento fra le due pagine restava a senso unico.
+    """
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_ogni_tema_classificato_porta_il_suo_rango(self):
+        html = self.client.get("/regione/molise").get_data(as_text=True)
+        self.assertRegex(html, r"\d+ª su 20")
+
+    def test_il_rango_e_lo_stesso_che_dichiara_la_pagina_tema(self):
+        """Due percorsi che calcolano la stessa cosa devono dare lo stesso
+        numero, se no una delle due pagine mente."""
+        from app import profiles
+
+        profilo = profiles.region_profile("molise")
+        for riga in profilo["theme_table"]:
+            if not riga["rank"]:
+                continue
+            with self.subTest(tema=riga["theme"]):
+                classifica = profiles.theme_standings(riga["theme"])
+                atteso = next(r["rank"] for r in classifica["rows"]
+                              if r["region_key"] == "molise")
+                self.assertEqual(riga["rank"], atteso)
+
+    def test_un_tema_che_non_si_classifica_non_si_inventa_una_posizione(self):
+        from app import profiles
+
+        profilo = profiles.region_profile("molise")
+        for riga in profilo["theme_table"]:
+            if not riga["rated"]:
+                self.assertIsNone(riga["rank"], riga["theme"])
+
+    def test_l_itemlist_elenca_solo_i_temi_che_hanno_un_rango(self):
+        html = self.client.get("/regione/molise").get_data(as_text=True)
+        blocchi = [json.loads(b) for b in
+                   re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)]
+        liste = [b for b in blocchi if b.get("@type") == "ItemList"]
+        self.assertEqual(len(liste), 1)
+        from app import profiles
+
+        con_rango = [t for t in profiles.region_profile("molise")["theme_table"] if t["rank"]]
+        self.assertEqual(liste[0]["numberOfItems"], len(con_rango))
+        self.assertEqual(len(liste[0]["itemListElement"]), len(con_rango))
+
+    def test_il_ritratto_usa_il_percentile_grezzo_non_il_punteggio_orientato(self):
+        """La figura ha per assi "il valore piu' basso" e "il valore piu' alto":
+        un punteggio orientato metterebbe il punto dalla parte sbagliata su ogni
+        indicatore dove il valore basso e' quello buono."""
+        from app import profiles
+
+        profilo = profiles.region_profile("molise")
+        per_nome = {e["name"]: e for e in profilo["top_excels"] + profilo["top_lags"]}
+        self.assertTrue(profilo["portrait_rows"])
+        for nome, quota in profilo["portrait_rows"]:
+            with self.subTest(indicatore=nome):
+                self.assertEqual(quota, per_nome[nome]["percentile"])
+
+    def test_il_gemello_markdown_porta_la_stessa_tabella(self):
+        testo = self.client.get(
+            "/regione/molise", headers={"Accept": "text/markdown"}).get_data(as_text=True)
+        self.assertIn("## Tutti i temi, con la posizione fra le 20 regioni", testo)
+        self.assertIn(" su 20 |", testo)
+
+
+class IlPercorsoVisibileEQuelloDichiarato(unittest.TestCase):
+    """`BreadcrumbList` e `<nav>` devono dire la stessa cosa.
+
+    Erano cinque forme scritte a mano in nove template, e i due pezzi stavano a
+    settanta righe di distanza nello stesso file: la scheda indicatore
+    dichiarava Home > Temi > tema > indicatore e a schermo si leggeva
+    "Temi / tema". Il catalogo dati mostrava un percorso e non lo dichiarava,
+    quattro pagine lo dichiaravano e non lo mostravano, e la pagina tema
+    linkava un'ancora di `/temi` che non e' mai esistita.
+
+    Adesso la lista e' una sola per pagina e questi due percorsi ne escono.
+    """
+
+    PAGINE = (
+        "/regioni", "/temi", "/tema/lavoro-e-conciliazione", "/regione/molise",
+        "/indicatore/pil-pro-capite/ter-901", "/qualita-della-vita/classifica/regioni",
+        "/divari-regionali", "/quiz", "/quiz/indovina-la-regione", "/metodologia",
+        "/confronto", "/catalogo-dati",
+    )
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def _percorsi(self, path):
+        html = self.client.get(path).get_data(as_text=True)
+        nav = re.search(r'<nav[^>]*aria-label="Percorso".*?</nav>', html, re.S)
+        visibile = None
+        if nav:
+            voci = [unescape(v).strip() for v in re.findall(r">([^<>]+)</(?:a|span)>", nav.group(0))]
+            visibile = [v for v in voci if v and v != "/"]
+        dichiarato = None
+        for blocco in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S):
+            documento = json.loads(blocco)
+            if documento.get("@type") == "BreadcrumbList":
+                dichiarato = [e["name"] for e in documento["itemListElement"]]
+        return visibile, dichiarato
+
+    def test_il_visibile_e_il_dichiarato_coincidono(self):
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                visibile, dichiarato = self._percorsi(path)
+                self.assertIsNotNone(visibile, f"{path}: nessun percorso visibile")
+                self.assertIsNotNone(dichiarato, f"{path}: nessun BreadcrumbList")
+                self.assertEqual(visibile, dichiarato)
+
+    def test_ogni_percorso_parte_da_home_e_finisce_sulla_pagina(self):
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                _, dichiarato = self._percorsi(path)
+                self.assertEqual(dichiarato[0], "Home")
+                self.assertGreaterEqual(len(dichiarato), 2)
+
+    def test_l_ultima_voce_non_e_un_link(self):
+        """Lo schema vuole `item` sull'ultima voce, l'occhio non vuole un link
+        alla pagina su cui si trova gia'."""
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                nav = re.search(r'<nav[^>]*aria-label="Percorso".*?</nav>', html, re.S)
+                self.assertIn('class="breadcrumb__here"', nav.group(0))
+
+    def test_ogni_voce_del_percorso_risponde(self):
+        """Un percorso che porta a un 404 e' peggio di nessun percorso."""
+        for path in self.PAGINE:
+            html = self.client.get(path).get_data(as_text=True)
+            nav = re.search(r'<nav[^>]*aria-label="Percorso".*?</nav>', html, re.S)
+            for href in re.findall(r'href="([^"]+)"', nav.group(0)):
+                with self.subTest(path=path, href=href):
+                    self.assertEqual(self.client.get(href).status_code, 200)
+
+    def test_una_sola_lista_per_pagina(self):
+        """Due `<nav aria-label="Percorso">` sulla stessa pagina sono un percorso
+        doppio a schermo e due punti di riferimento con lo stesso nome per chi
+        naviga con la tastiera. `/divari-regionali` ne aveva due: il macro nuovo
+        sopra il `nav.divari-crumbs` che c'era gia', e si leggevano uno sotto
+        l'altro con due separatori diversi."""
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertEqual(len(re.findall(r'<nav[^>]*aria-label="Percorso"', html)), 1)
+
+    def test_il_separatore_ha_spazio_da_tutte_e_due_le_parti(self):
+        """In pagina si leggeva `Home /Temi /Reddito, inclusione e accessibilita'`.
+
+        Lo spazio prima della barra sta nel markup, quello dopo se lo mangiava
+        il `{%- endif %}` del macro. Non lo vede nessuna delle prove qui sopra,
+        perche' confrontano i nomi dopo aver tolto i tag, ed e' esattamente il
+        tipo di difetto che si vede solo guardando la pagina.
+        """
+        for path in self.PAGINE:
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                nav = re.search(r'<nav[^>]*aria-label="Percorso".*?</nav>', html, re.S).group(0)
+                self.assertNotIn("</span><a", nav)
+                self.assertNotIn("</span><span", nav)
+
+    def test_l_ancora_della_macro_area_esiste_davvero(self):
+        """La pagina tema linkava `/temi#reddito-inclusione-e-accessibilità`,
+        che `/temi` non ha mai emesso: lo slug era calcolato nel template con
+        `lower | replace`, non con `slugify_taxonomy`."""
+        tema = self.client.get("/tema/lavoro-e-conciliazione").get_data(as_text=True)
+        nav = re.search(r'<nav[^>]*aria-label="Percorso".*?</nav>', tema, re.S).group(0)
+        ancore = [h for h in re.findall(r'href="(/temi#[^"]+)"', nav)]
+        self.assertTrue(ancore)
+        temi = self.client.get("/temi").get_data(as_text=True)
+        for ancora in ancore:
+            with self.subTest(ancora=ancora):
+                self.assertIn(f'id="{ancora.split("#", 1)[1]}"', temi)
+
+
+class LePagineProvincia(unittest.TestCase):
+    """103 province misurate e nessuna con una pagina.
+
+    Il sito le classifica tutte nella qualita' della vita, e il commento che
+    costruisce quella classifica lo diceva: "Le province non hanno un profilo,
+    ma la loro regione si', quindi il nome della regione diventa la porta".
+    Cioe' chi cercava "qualita' della vita provincia di Lecce" arrivava, nel
+    migliore dei casi, su una tabella di 103 righe. Il dato c'era tutto:
+    mancava la superficie.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from app import province_profile
+
+        cls.province = province_profile
+        cls.chiavi = province_profile.chiavi()
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_ce_ne_sono_centotre(self):
+        self.assertEqual(len(self.chiavi), 103)
+
+    def test_rispondono_tutte(self):
+        for chiave in self.chiavi:
+            with self.subTest(provincia=chiave):
+                self.assertEqual(self.client.get(f"/provincia/{chiave}").status_code, 200)
+
+    def test_una_chiave_inventata_fa_404(self):
+        self.assertEqual(self.client.get("/provincia/atlantide").status_code, 404)
+
+    def test_titolo_e_descrizione_stanno_nel_budget(self):
+        """Il nome piu' lungo, "Verbano-Cusio-Ossola", portava il titolo a
+        sessantaquattro: li' cade la coda "per qualita' della vita"."""
+        for chiave in self.chiavi:
+            with self.subTest(provincia=chiave):
+                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                titolo = unescape(re.search(r"<title>(.*?)</title>", html, re.S).group(1))
+                descrizione = unescape(
+                    re.search(r'<meta name="description" content="(.*?)"', html, re.S).group(1))
+                self.assertLessEqual(len(titolo), 60, titolo)
+                self.assertLessEqual(len(descrizione), 160, descrizione)
+                self.assertIn("province", titolo)
+
+    def test_una_sola_intestazione_e_un_canonico_che_punta_a_se(self):
+        for chiave in self.chiavi[:12]:
+            with self.subTest(provincia=chiave):
+                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                self.assertEqual(len(re.findall(r"<h1[^>]*>", html)), 1)
+                canonico = re.search(r'<link rel="canonical" href="([^"]+)"', html).group(1)
+                self.assertTrue(canonico.endswith(f"/provincia/{chiave}"), canonico)
+
+    def test_dichiarano_percorso_e_dataset(self):
+        for chiave in self.chiavi[:12]:
+            with self.subTest(provincia=chiave):
+                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                tipi = [json.loads(b).get("@type")
+                        for b in re.findall(r'<script type="application/ld\+json">(.*?)</script>', html, re.S)]
+                self.assertIn("BreadcrumbList", tipi)
+                self.assertIn("Dataset", tipi)
+
+    def test_stanno_tutte_in_sitemap(self):
+        sitemap = self.client.get("/sitemap.xml").get_data(as_text=True)
+        for chiave in self.chiavi:
+            with self.subTest(provincia=chiave):
+                self.assertIn(f"/provincia/{chiave}<", sitemap)
+
+    def test_la_classifica_porta_a_ognuna(self):
+        """Le 103 righe erano testo nudo, su una pagina che sta in posizione
+        4,1 per la sua query principale."""
+        html = self.client.get("/qualita-della-vita/classifica/province").get_data(as_text=True)
+        link = set(re.findall(r'href="(/provincia/[a-z0-9-]+)"', html))
+        self.assertEqual(len(link), 103)
+        for percorso in sorted(link)[:10]:
+            with self.subTest(percorso=percorso):
+                self.assertEqual(self.client.get(percorso).status_code, 200)
+
+    def test_la_pagina_porta_alla_sua_regione(self):
+        html = self.client.get("/provincia/lecce").get_data(as_text=True)
+        self.assertIn('href="/regione/puglia"', html)
+
+    def test_bolzano_e_trento_non_inventano_una_regione(self):
+        """Dichiarano "Provincia Autonoma Bolzano", che slugificata darebbe un
+        link a una pagina che non esiste: e' lo stesso controllo della
+        classifica, e per la stessa ragione."""
+        for chiave in ("bolzano", "trento"):
+            with self.subTest(provincia=chiave):
+                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                for percorso in re.findall(r'href="(/regione/[a-z0-9-]+)"', html):
+                    self.assertEqual(self.client.get(percorso).status_code, 200, percorso)
+
+    def test_ogni_link_interno_risponde(self):
+        for chiave in ("lecce", "milano", "trieste"):
+            with self.subTest(provincia=chiave):
+                html = self.client.get(f"/provincia/{chiave}").get_data(as_text=True)
+                interni = {h for h in re.findall(r'href="(/[a-z0-9/_.-]+)"', html)
+                           if not h.startswith("/static/")}
+                for percorso in interni:
+                    with self.subTest(percorso=percorso):
+                        self.assertIn(self.client.get(percorso).status_code, (200, 301), percorso)
+
+    def test_la_variante_markdown_porta_la_stessa_risposta(self):
+        """HTML e Markdown sono lo stesso documento alla stessa URL: se la
+        variante non porta posizione e punteggio e' una pagina diversa sotto lo
+        stesso canonico."""
+        for chiave in ("lecce", "trieste"):
+            with self.subTest(provincia=chiave):
+                markdown = self.client.get(
+                    f"/provincia/{chiave}", headers={"Accept": "text/markdown"}).get_data(as_text=True)
+                profilo = self.province.profilo(chiave)
+                self.assertIn(str(profilo["rank"]), markdown)
+                self.assertIn(str(profilo["score"]), markdown)
+                self.assertIn("## Le dimensioni", markdown)

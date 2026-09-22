@@ -1,4 +1,6 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Quiz Italia", "path": "/quiz"}, {"name": "Ordina le regioni", "path": "/quiz/ordina-le-regioni"}] %}
 {% set active_nav = 'gioco' %}
 {% set game_active = 'order' %}
 
@@ -20,21 +22,12 @@
   "isAccessibleForFree": true
 }
 </script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Quiz Italia", "item": "{{ site_url }}/quiz" },
-    { "@type": "ListItem", "position": 3, "name": "Ordina le regioni", "item": {{ canonical | tojson }} }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
 {% endblock %}
 
 {% block content %}
-<article class="page game-page wrap">
+<article class="page game-page wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
   <nav class="breadcrumb"><a href="/">Divario Italia</a> · <a href="/quiz">Quiz Italia</a></nav>
 
   {% include "_game_subnav.html" %}

@@ -30,6 +30,7 @@ Two consequences worth knowing:
   guessing from the level name.
 """
 
+import re
 import csv
 import functools
 from collections import defaultdict
@@ -46,7 +47,8 @@ from app.indicator_notes import (
     change_unit_label,
     cover_bars,
     is_percentage_unit,
-    region_choropleth_colors,
+    ds_choropleth_colors,
+    DS_SEQ_RAMP,
     trend_framing,
     value_unit_label,
 )
@@ -54,7 +56,14 @@ from app.indicator_notes import (
 # Colour ramp for the choropleth. It used to be declared twice, in the view's
 # explore payload and again in the stylesheet's legend gradient; the page now
 # reads it from here so the map and its legend cannot drift apart.
-MAP_RAMP = {"from": [0xE7, 0xEC, 0xF3], "to": [0x15, 0x23, 0x3B]}
+#
+# Dalla migrazione al design system 2026 e' la rampa teal a sei gradini, e sono
+# nomi di custom property invece che hex: cosi' la mappa segue il tema scuro
+# insieme al resto della pagina. Il JS non interpola piu due estremi, sceglie il
+# gradino (vedi `rampColor` in indicator-explorer.js): stessa scalatura del
+# server, quindi la mappa dipinta a render e quella ridipinta al cambio d'anno
+# non possono divergere.
+MAP_RAMP = list(DS_SEQ_RAMP)
 
 # Territorial levels, in the order the cockpit offers them. `profile_path`
 # is the prefix of the territory's own page, or None when it has none.
@@ -463,7 +472,7 @@ def _build_level(key, series, meta, territory_total, coverage):
         # JavaScript (e un crawler la vede). Media semplice sulle regioni, celle
         # vuote ignorate, come `data.indicator_year_average`.
         "annual_means": _annual_means(matrix),
-        "map_colors": region_choropleth_colors(observations) if conf["has_map"] else None,
+        "map_colors": ds_choropleth_colors(observations) if conf["has_map"] else None,
         "cover_bars": cover_bars(observations, best, worst, meta["scoreable"]) if conf["has_map"] else None,
         "bar_max": max((row["value"] for row in observations), default=0),
     }
@@ -551,8 +560,53 @@ def _theme_neighbours(meta):
     index = next((i for i, item in enumerate(siblings) if str(item["id"]) == str(meta["id"])), None)
     prev_item = siblings[index - 1] if index else None
     next_item = siblings[index + 1] if index is not None and index < len(siblings) - 1 else None
-    related = [item for item in siblings if str(item["id"]) != str(meta["id"])][:RELATED_LIMIT]
+    # `siblings` e' in ordine alfabetico, e prev/next restano li': sono una
+    # passeggiata stabile dentro il tema. I correlati no. Prendendo i primi
+    # dell'alfabeto, la scheda del PIL pro capite proponeva "Alunni con
+    # disabilita' (totale)", "motoria" e "uditiva": tre serie dello stesso tema
+    # e senza niente a che vedere con quella che il lettore ha davanti. Si
+    # ordinano per quanto il nome somiglia, che e' il solo segnale di vicinanza
+    # che il catalogo porta gia', e a parita' resta l'alfabeto.
+    others = [item for item in siblings if str(item["id"]) != str(meta["id"])]
+    parole = _content_words(meta["name"])
+    sottotema = meta.get("source_theme")
+    related = sorted(
+        others,
+        key=lambda item: (
+            # Il sottotema della fonte e' un raggruppamento vero, piu' stretto
+            # del tema: dentro "Reddito, inclusione e accessibilita'", che ha
+            # 86 serie, separa il reddito dagli alunni con disabilita'.
+            0 if sottotema and item.get("source_theme") == sottotema else 1,
+            -_word_overlap(parole, _content_words(item["name"])),
+            item["name"].lower(),
+        ),
+    )[:RELATED_LIMIT]
     return related, {"prev": prev_item, "next": next_item}
+
+
+# Parole che compaiono ovunque e non dicono niente sulla vicinanza fra due
+# indicatori: tenerle farebbe somigliare "Tasso di occupazione" a "Tasso di
+# omicidi" piu' di quanto somigli a "Occupati non regolari".
+_PAROLE_VUOTE = frozenset((
+    "di", "del", "della", "dei", "delle", "dello", "degli", "da", "dal",
+    "dalla", "in", "nei", "nelle", "nel", "nella", "a", "al", "alla", "ai",
+    "alle", "e", "ed", "per", "con", "su", "sul", "sulla", "tra", "fra",
+    "il", "lo", "la", "i", "gli", "le", "un", "uno", "una", "che", "non",
+    "totale", "totali", "maschi", "femmine", "anni",
+))
+
+
+def _content_words(name):
+    """Le parole di un nome che portano significato, minuscole e senza simboli."""
+    grezze = re.findall(r"[0-9a-zàèéìòóùü]+", (name or "").lower())
+    return frozenset(w for w in grezze if len(w) > 2 and w not in _PAROLE_VUOTE)
+
+
+def _word_overlap(a, b):
+    """Quante parole di contenuto due nomi hanno in comune, sul totale."""
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
 
 
 @functools.lru_cache(maxsize=16)
@@ -564,6 +618,7 @@ def _theme_siblings(theme):
                 "name": item["name"],
                 "path": item["path"],
                 "direction": (item.get("explain") or {}).get("direction"),
+                "source_theme": item.get("source_theme"),
                 "year_max": item["year_max"],
                 "unit": item.get("unit"),
                 # La sparkline delle card usa la stessa serie (media nazionale
@@ -656,7 +711,7 @@ def _explore_payload(meta, levels):
         "direction": meta["direction"],
         "higherBetter": meta["direction"] not in ("lower_better", "higher_worse"),
         "scoreable": meta["scoreable"],
-        "ramp": MAP_RAMP,
+        "rampStops": MAP_RAMP,
         "defaultLevel": levels[0]["key"],
         "levels": [
             {

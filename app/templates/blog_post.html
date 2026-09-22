@@ -2,9 +2,19 @@
 {% set active_nav = 'blog' %}
 {% set cover_abs = (site_url ~ post.cover) if post.cover else '' %}
 {% set html_title = post.seo_title or post.title %}
-{% set og_image_abs = cover_abs or (site_url ~ '/static/img/og-divario-italia.svg') %}
+{# `post.social_image` e' la copertina in un formato che un social disegna e che
+   lo schema `Article` accetta: un SVG lo scartano tutti e due, e in `image`
+   Google vuole un raster. `cover_abs` resta l'SVG, che e' cio' che va in
+   pagina. Il ripiego lo sceglie `blog.social_image`, non questo template. #}
+{% set og_image_abs = site_url ~ post.social_image %}
 
-{% block title %}{{ html_title }} · {{ site_name }}{% endblock %}
+{# La marca non va nel `<title>` del post, per la stessa ragione per cui non va
+   in quello della scheda: diciassette caratteri di un nome che nessuno cerca,
+   in posizione 4-10, tolti al motivo per cliccare. Google il nome del sito lo
+   sintetizza dal nodo `WebSite` della home. Cosi' `seo_title` ha tutti i 60
+   caratteri, e non i 43 che gli restavano. Il budget lo tiene una prova, non un
+   taglio automatico: un titolo troncato a macchina e' peggio di uno corto. #}
+{% block title %}{{ html_title }}{% endblock %}
 {% block description %}{{ post.description }}{% endblock %}
 
 {% block og %}
@@ -13,6 +23,11 @@
 <meta property="og:description" content="{{ post.description }}">
 <meta property="og:url" content="{{ canonical }}">
 <meta property="og:image" content="{{ og_image_abs }}">
+{%- if post.social_image_size %}
+<meta property="og:image:width" content="{{ post.social_image_size[0] }}">
+<meta property="og:image:height" content="{{ post.social_image_size[1] }}">
+{%- endif %}
+<meta property="og:image:alt" content="{{ post.cover_alt }}">
 <meta property="article:published_time" content="{{ post.date.isoformat() }}">
 {% for tag in post.tags %}<meta property="article:tag" content="{{ tag }}">{% endfor %}
 {% endblock %}
@@ -24,7 +39,7 @@
   "@type": "Article",
   "headline": {{ post.title | tojson }},
   "description": {{ post.description | tojson }},
-  {% if cover_abs %}"image": [{{ cover_abs | tojson }}],{% endif %}
+  "image": [{{ og_image_abs | tojson }}],
   "datePublished": "{{ post.date.isoformat() }}",
   "dateModified": "{{ post.date_modified.isoformat() }}",
   "author": { "@type": "Organization", "name": {{ post.author | tojson }} },
@@ -53,7 +68,7 @@
 {% endblock %}
 
 {% block content %}
-<article>
+<article id="contenuto">
   <div class="prose-wrap article-hero">
     <nav class="breadcrumb"><a href="/blog">Blog</a> / {% if post.tags %}{{ post.tags[0] }}{% else %}Articolo{% endif %}</nav>
     <h1>{{ post.title }}</h1>

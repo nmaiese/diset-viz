@@ -1,27 +1,18 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Divari regionali", "path": "/divari-regionali"}] %}
 {% set active_nav = 'divari' %}
 
 {% block title %}Divari regionali in Italia: economia, lavoro, salute{% endblock %}
 {% block description %}Quanto distano Nord, Centro e Mezzogiorno su reddito, lavoro e salute: {{ divari.indicator_links }} divari misurati sui dati Istat, regione per regione.{% endblock %}
 
 {% block head_extra %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ SITE_URL }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Divari regionali", "item": "{{ SITE_URL }}/divari-regionali" }
-  ]
-}
-</script>
+{{ breadcrumb.jsonld(percorso, SITE_URL) }}
 {% endblock %}
 
 {% block content %}
-<main class="wrap divari-page">
-  <nav class="divari-crumbs" aria-label="Percorso">
-    <a href="/">Home</a> <span aria-hidden="true">/</span> <span aria-current="page">Divari regionali</span>
-  </nav>
+<main class="wrap divari-page" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
 
   <section class="divari-hero" aria-labelledby="divari-title">
     <p class="eyebrow">Nord, Centro, Mezzogiorno</p>

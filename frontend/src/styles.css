@@ -1,3 +1,23 @@
+/* I token qui sotto sono il RIPIEGO, non la verita'.
+ *
+ * L'atlante e' migrato al design system 2026: `app/templates/app.html` carica
+ * `css/ds/system.css` e mette `class="ds"` sul body, e da li' in poi e'
+ * `body.ds` (specificita' 0,1,1) a ripuntare questi stessi nomi sulle
+ * primitive nuove, battendo questo `:root` (0,1,0) qualunque sia l'ordine di
+ * caricamento. Quindi i valori scritti qui NON sono quelli che vedi nel
+ * browser: sono quelli che vedresti senza il foglio del design system.
+ *
+ * Non aggiornarli sperando di cambiare l'aspetto dell'atlante, e non fidarti
+ * di questi colori quando leggi il resto del file: i colori veri stanno in
+ * `app/static/css/ds/system.css`.
+ *
+ * Restano come ripiego, e restano per scelta: se il foglio del design system
+ * non arriva, l'atlante si vede vecchio invece di vedersi rotto. Perche' il
+ * ripiego non diventi un guasto silenzioso, `tests/unit/test_css_tokens.py`
+ * controlla che il design system ripunti **ogni** nome dichiarato qui, cioe'
+ * che nessuno di questi valori arrivi mai davvero a schermo. L'unica eccezione
+ * e' `--masthead-h`, che e' un'altezza e non un colore.
+ */
 :root {
   color-scheme: light;
   --paper: #fbfaf7;
@@ -91,12 +111,37 @@ h1, h2, h3 { font-family: var(--font-display); }
   align-items: center;
   gap: 16px;
   padding: 14px clamp(16px, 4vw, 48px);
-  background: rgba(251, 250, 247, 0.9);
-  backdrop-filter: blur(14px);
+  /* Superficie piena e non translucida, come il chrome del resto del sito
+     (`.sitechrome .hdr` in ds/chrome.css): la carta cotta come rgba restava
+     chiara nel tema scuro, ed era l'unico pezzo di atlante che non seguiva il
+     tema. */
+  background: var(--panel);
   border-bottom: 1px solid var(--line);
 }
 
 .brand { display: flex; align-items: center; gap: 11px; }
+
+/* Interruttore del tema, stessa forma dell'`.iconbtn` del chrome del sito
+   (ds/chrome.css), perche' e' lo stesso comando in due posti diversi. */
+/* Lo stesso comando dell'`.iconbtn` del chrome Jinja, quindi le stesse misure:
+   44x44 e' il bersaglio tattile del design system (--target-comfortable), e gli
+   angoli sono squadrati. Era 36x36 con raggio 8px, e il bottone che accende il
+   tema scuro si vedeva diverso a seconda che fossi sull'atlante o sul blog. */
+.masthead__theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--target-comfortable, 44px);
+  height: var(--target-comfortable, 44px);
+  flex: 0 0 auto;
+  color: var(--ink-soft);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-0, 0);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.masthead__theme:hover { background: var(--paper); color: var(--ink); }
 
 .brand-mark {
   display: block;
@@ -358,7 +403,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 .macro-tab em { font-style: normal; color: var(--muted); }
 .macro-tab:hover { border-color: var(--accent); color: var(--ink); }
 .macro-tab.is-active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-.macro-tab.is-active em { color: rgba(251, 250, 247, 0.7); }
+.macro-tab.is-active em { color: var(--text-on-inverse); opacity: 0.72; }
 
 /* ---------- Atlas layout ---------- */
 .atlas {
@@ -414,7 +459,12 @@ h1, h2, h3 { font-family: var(--font-display); }
 .index-panel { display: grid; gap: 16px; min-width: 0; }
 
 /* ---------- Command bar ---------- */
-.command-bar { display: grid; gap: 12px; }
+/* `min-width: 0` sulla barra e sulle sue righe: un elemento di griglia resta
+   `min-width: auto` e non scende sotto la larghezza del proprio contenuto,
+   quindi la riga dei controlli teneva 382px dentro una colonna di 343 e
+   l'atlante era l'unica pagina che scorreva di lato sul telefono. */
+.command-bar { display: grid; gap: 12px; min-width: 0; }
+.command-bar > * { min-width: 0; }
 
 .search-box {
   display: flex;
@@ -434,6 +484,7 @@ h1, h2, h3 { font-family: var(--font-display); }
 }
 
 .command-bar__controls {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -457,8 +508,14 @@ h1, h2, h3 { font-family: var(--font-display); }
   padding: 11px 38px 11px 13px;
   outline: none;
   min-width: 160px;
+  /* `min-width: 160px` piu' l'etichetta accanto faceva 382px di riga dentro
+     una finestra di 375: il `select` non si lasciava stringere e l'atlante era
+     l'unica pagina del sito che scorreva di lato sul telefono. `max-width`
+     lascia il minimo dove c'e' spazio e lo toglie dove non c'e'. */
+  max-width: 100%;
 }
-.command-bar__controls .select-field { display: inline-flex; align-items: center; gap: 8px; }
+.command-bar__controls .select-field { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.command-bar__controls .select-field select { min-width: 0; flex: 1 1 auto; }
 .command-bar__controls .select-field > span { margin: 0; }
 .select-icon { position: absolute; right: 12px; bottom: 13px; pointer-events: none; color: var(--muted); }
 .command-bar__controls .select-icon { bottom: auto; top: 50%; transform: translateY(-50%); }
@@ -606,8 +663,12 @@ h1, h2, h3 { font-family: var(--font-display); }
 .index-row:hover .index-row__chevron { color: var(--accent); transform: translateX(2px); }
 
 .spark { width: 150px; height: 40px; display: block; }
-.spark__line { fill: none; stroke: var(--ink-soft); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.spark__dot { fill: var(--ink-soft); }
+/* A riposo la curva era `--ink-soft`, cioe' il colore del testo: e' proprio
+   quello che `.claude/rules/frontend.md` vieta, perche' una serie dipinta col
+   colore del testo pesa quanto il testo che la spiega. Il corallo sul passaggio
+   del mouse invece resta: li' e' uno stato di interazione, non un dato. */
+.spark__line { fill: none; stroke: var(--cmp-2); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.spark__dot { fill: var(--cmp-2); }
 .index-row:hover .spark__line, .index-row:focus-visible .spark__line { stroke: var(--accent); }
 .index-row:hover .spark__dot, .index-row:focus-visible .spark__dot { fill: var(--accent); }
 
@@ -798,7 +859,7 @@ h1, h2, h3 { font-family: var(--font-display); }
    dashboard out of the viewport; width follows the aspect ratio and is centred. */
 .italy-map { display: block; margin: 0 auto; height: clamp(320px, 48vh, 500px); width: auto; max-width: 100%; }
 .italy-map path {
-  stroke: rgba(21, 35, 59, 0.35);
+  stroke: var(--map-region-stroke, rgba(21, 35, 59, 0.35));
   stroke-width: 1;
   transition: fill var(--dur) var(--ease-out), stroke-width 160ms ease;
   outline: none;
@@ -1151,7 +1212,7 @@ h1, h2, h3 { font-family: var(--font-display); }
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   padding: 18px 20px; background: var(--ink); color: var(--paper);
 }
-.region-cta small { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(251, 250, 247, 0.7); }
+.region-cta small { display: block; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-on-inverse); opacity: 0.72; }
 .region-cta strong { display: block; margin-top: 3px; font-size: 15px; }
 .region-cta:hover { background: #0f1a2d; }
 
@@ -1357,6 +1418,10 @@ h1, h2, h3 { font-family: var(--font-display); }
 .spa-seo-fallback > p { font-size: 16px; color: var(--ink-soft); margin: 0 0 24px; max-width: 62ch; }
 .spa-seo-fallback nav { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 0 0 32px; }
 .spa-seo-fallback nav a { padding: 7px 14px; border: 1px solid var(--line); border-radius: 0; font-size: 13.5px; font-weight: 600; }
+/* La pagina corrente non e' un link: il macro `_breadcrumb.html` la rende come
+   `span`, qui come dappertutto. Senza questa riga sarebbe l'unica voce del
+   percorso senza pillola, perche' questa pagina non carica `site.css`. */
+.spa-seo-fallback nav .breadcrumb__here { padding: 7px 14px; border: 1px solid var(--line); font-size: 13.5px; font-weight: 600; color: var(--muted); }
 .spa-seo-fallback section { margin: 0 0 24px; }
 .spa-seo-fallback h2 { font-size: 18px; margin: 0 0 12px; }
 .spa-seo-fallback ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }

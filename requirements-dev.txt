@@ -1,0 +1,9 @@
+# Dipendenze dei soli script di manutenzione, non del processo web.
+#
+# `cairosvg` serve a scripts/rasterize_og_images.py, che converte in PNG le
+# figure di anteprima sociale. La conversione e' un passo manuale e il
+# risultato si committa, quindi il runtime non la vede mai: tenerla in
+# requirements.txt la porterebbe dentro l'immagine Cloud Run per niente.
+#
+#     bin/py -m pip install -r requirements-dev.txt
+cairosvg>=2.7

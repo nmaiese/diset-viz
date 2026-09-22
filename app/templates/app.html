@@ -1,3 +1,4 @@
+{% import "_breadcrumb.html" as breadcrumb %}
 <!doctype html>
 <html lang="it">
   <head>
@@ -5,26 +6,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Divario Italia: Atlante degli indicatori territoriali</title>
     <meta name="description" content="Atlante di indicatori territoriali Istat: confronta regioni, temi, serie storiche e dati sullo sviluppo dei territori italiani.">
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    {% if STAGING %}<meta name="robots" content="noindex, nofollow, noarchive">{% else %}<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">{% endif %}
     <link rel="canonical" href="{{ SITE_URL }}/atlante">
     <meta property="og:title" content="Divario Italia: Atlante degli indicatori territoriali">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ SITE_URL }}/atlante">
     <meta property="og:description" content="Atlante di indicatori territoriali Istat per confrontare regioni, temi e serie storiche.">
-    <meta property="og:image" content="{{ SITE_URL }}/static/img/og-divario-italia.svg">
+    <meta property="og:image" content="{{ SITE_URL }}/static/img/og-divario-italia.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Divario Italia, atlante degli indicatori territoriali">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <script>window.__diSpaPageView = true;</script>
+    {# La navigazione arriva da `app/nav.py`, come `__diInitialView` arriva da
+       qui: la SPA continua a non conoscere nessuna rotta Flask, gliele si
+       passa. Finche' le voci erano scritte a mano in `main.jsx`, dall'atlante
+       non si raggiungevano `/confronto` ne' `/divari-regionali`. #}
+    <script>window.__diNav = {{ nav.for_spa() | tojson }};</script>
     {% set TRACK_SERVER_PAGE_VIEW = false %}
     {% include "_third_party_head.html" %}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+    {# Migrato al design system 2026, con lo stesso meccanismo delle pagine
+       Jinja: `ds/system.css` dichiara le primitive nuove e, sotto `body.ds`,
+       ripunta su di esse i ~20 nomi di token che l'atlante gia' usava
+       (--paper, --ink, --accent, --font-display...). `body.ds` ha specificita'
+       (0,1,1) e batte il `:root` di styles.css qualunque sia l'ordine di
+       caricamento, quindi la SPA si ridipinge senza che il suo foglio cambi
+       riga. Va PRIMA del bundle: cosi' index.css puo' comunque vincere dove
+       serve. #}
+    {# I font arrivano da qui, non da fonts.googleapis.com: un foglio
+       cross-origin bloccante costava tre round trip prima del primo
+       carattere, e Newsreader e' il serif dei titoli, cioe' quasi sempre
+       l'LCP. I due `preload` sono i soli file che una pagina in italiano
+       scarica sempre: latin-ext lo prende solo chi incontra un carattere
+       che lo richiede, e il monospazio non e' nel primo paint.
+   Senza `?v=`, di proposito: `fonts.css` richiama il file per percorso
+   nudo, e un precarico con la marca di versione sarebbe una URL diversa,
+   cioe' lo stesso font scaricato due volte. I file sono immutabili, il
+   nome dice famiglia e sottoinsieme: si sostituiscono rinominandoli. #}
+    <link rel="preload" href="{{ url_for('static', filename='fonts/newsreader-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/public-sans-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ asset_url('css/fonts.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/ds/chrome.css') }}">
+    {# La testata del design system e' markup statico piu' ds-chrome.js: gira
+       senza React, e va caricata qui come su ogni altra pagina. Prima queste
+       due rotte disegnavano una testata loro, in React, con un marchio
+       diverso, una navigazione piatta e nessuna ricerca: due testate sullo
+       stesso sito, e l'identita' e' una sola (CLAUDE.md). #}
+    <script src="{{ url_for('static', filename='js/ds-chrome.js') }}" defer></script>
     <script type="module" crossorigin src="{{ asset_url('dist/assets/index.js') }}"></script>
     <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/index.css') }}">
+    {% include "_theme_bootstrap.html" %}
+    {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
+    {# Riempie #site-auth della testata: senza, il posto del login resta vuoto
+       su queste due rotte e su tutte le altre no. #}
+    <script type="module" crossorigin src="{{ asset_url('dist/assets/site.js') }}"></script>
+    {% endif %}
+    {{ breadcrumb.jsonld(percorso, SITE_URL) }}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Atlante degli indicatori territoriali",
+      "url": "{{ SITE_URL }}/atlante",
+      "inLanguage": "it-IT",
+      "isPartOf": { "@id": "{{ SITE_URL }}/#site" },
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": [{% for item in featured_indicators %}
+          { "@type": "ListItem", "position": {{ loop.index }}, "name": {{ item.name | tojson }}, "url": {{ (SITE_URL ~ item.path) | tojson }} }{{ "," if not loop.last }}{% endfor %}
+        ]
+      }
+    }
+    </script>
   </head>
-  <body>
+  <body class="ds sitechrome">
     {% include "_third_party_body.html" %}
+    {% if STAGING %}{% include "_staging_banner.html" %}{% endif %}
+    {% set active_nav = 'atlas' %}
+    {% include "_ds_header.html" %}
     <div id="root">
       <main class="spa-seo-fallback">
         <h1>Atlante degli indicatori territoriali italiani</h1>

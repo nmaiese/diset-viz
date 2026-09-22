@@ -1,0 +1,79 @@
+/* Pagina tema, design system 2026.
+ *
+ * Foglio di pagina come `ds/home.css` e `ds/indicator.css`: si carica solo da
+ * `theme_page.html`, dopo `site.css`, e veste solo le sezioni che quella
+ * pagina ha guadagnato smettendo di essere un elenco. Tutto il resto (schede
+ * `.ind-card`, tabella `.data-table`, `.panel-card`, `.indicator-list`) e' gia'
+ * in `site.css` e legge i token del design system: qui non si ridefinisce
+ * niente che esista gia'.
+ *
+ * Nessun colore cotto: i neutri e la rampa cambiano sotto
+ * `<html data-theme="dark">`, e un esadecimale scritto qui terrebbe questa
+ * pagina sulla palette chiara mentre il resto va scuro.
+ */
+
+/* --- classifica: mappa e tabella affiancate ----------------------------- */
+
+/* La mappa a sinistra, la classifica a destra, perche' sono due letture della
+   stessa cosa e vanno confrontate con gli occhi, non scorrendo. La mappa e'
+   piu' stretta della tabella: venti righe con quattro colonne hanno bisogno di
+   larghezza, una sagoma dell'Italia no. */
+.theme-standings__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: var(--space-6, 24px);
+  align-items: start;
+  margin: var(--space-4, 16px) 0 var(--space-5, 20px);
+}
+
+.theme-standings__map { padding: var(--space-4, 16px); }
+
+/* Senza questo la sagoma riempie la colonna e spinge la tabella sotto la
+   piega: su un blocco affiancato l'altezza la detta la tabella, non la mappa. */
+.theme-standings__map .indicator-map {
+  border: 0;
+  background: none;
+  padding: 0;
+}
+.theme-standings__map .regions-map { max-height: 440px; }
+.theme-standings__map .map-legend { margin-top: var(--space-3, 12px); }
+
+/* Venti righe stanno in pagina, ma le province no: lo scorrimento orizzontale
+   e' la stessa scelta che fanno `.explorer-table-wrap` e `.quality-table-wrap`. */
+.theme-standings__table { overflow-x: auto; }
+.theme-standings__table .data-table { width: 100%; }
+.theme-standings__table .data-table td a { color: var(--ink); }
+.theme-standings__table .data-table td a:hover { color: var(--accent-text, var(--accent)); }
+.theme-standings__table .data-table small { color: var(--muted); }
+
+@media (max-width: 1080px) {
+  .theme-standings__grid { grid-template-columns: minmax(0, 1fr); }
+  .theme-standings__map .regions-map { max-height: 520px; }
+}
+
+/* --- l'elenco lungo ------------------------------------------------------ */
+
+/* Cinque indicatori hanno una scheda, gli altri cinquantatre hanno un link.
+   Due colonne perche' un elenco di cinquanta voci in colonna singola e' un
+   muro, e `.indicator-list` da sola resta a una. */
+.theme-list {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  counter-reset: none;
+}
+.theme-list li { min-width: 0; }
+.theme-list a { height: 100%; }
+
+/* --- continua da qui ----------------------------------------------------- */
+
+/* Tre colonne di uscite invece dei cinque blocchi impilati che facevano
+   leggere la pagina come un menu. */
+.theme-next { margin-top: var(--space-10, 40px); }
+.theme-next__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-4, 16px);
+  align-items: start;
+}
+.theme-next__grid .panel-card { padding: var(--space-4, 16px); }
+.theme-next__grid .indicator-list { margin: var(--space-2, 8px) 0 0; gap: var(--space-2, 8px); }
+.theme-next__grid .indicator-list a { padding: var(--space-3, 12px) var(--space-4, 16px); }

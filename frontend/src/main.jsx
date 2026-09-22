@@ -1,7 +1,6 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import * as d3 from "d3";
-import { AuthControl } from "./shared/AuthControl.jsx";
 import { getAccessToken, getUser, isAuthConfigured } from "./shared/supabase.js";
 import {
   AlertTriangle,
@@ -49,8 +48,35 @@ const SORTS = [
   { id: "theme", label: "Tema" },
 ];
 
-const MAP_RAMP = (t) => d3.interpolate("#E7ECF3", "#15233B")(t);
-const MISSING_FILL = "#E2E0D8";
+// Rampa sequenziale del design system 2026, a sei gradini. Sono nomi di custom
+// property e non colori: `--seq-1..6` vengono ridefinite sotto
+// <html data-theme="dark">, quindi la mappa segue il tema invece di restare
+// sulla rampa chiara. Sono gli stessi sei gradini che dipinge il server
+// (DS_SEQ_RAMP in app/indicator_notes.py), cosi' l'atlante e la pagina
+// indicatore non mostrano due mappe diverse dello stesso dato.
+//
+// Sceglie il gradino invece di interpolare: `var()` non si puo' interpolare, e
+// una legenda a sei blocchi netti e' anche piu' onesta di una sfumatura
+// continua, perche' la mappa ha davvero sei livelli e non un continuo.
+// Il tema non si decide piu' qui. Lo decidono `_theme_bootstrap.html` prima
+// del primo paint e `ds-chrome.js` al clic, come su ogni altra pagina: da
+// quando la testata la rende Flask anche su queste due rotte, il bottone
+// esiste nell'HTML iniziale e lo script lo aggancia, che era il solo motivo
+// per cui l'atlante aveva un interruttore suo.
+//
+// E' anche il posto dove stava un difetto vero: l'effetto che applicava il
+// tema scriveva localStorage al montaggio, quindi passare una volta di qui
+// trasformava una preferenza di sistema in una scelta esplicita e teneva il
+// sito chiaro per sempre. Una copia in meno e' una copia che non puo'
+// divergere.
+//
+// La mappa segue il tema da sola: dipinge con `var(--seq-1..6)`, che sono
+// ridefinite sotto `<html data-theme="dark">`, quindi non serve nessun
+// re-render di React quando il tema cambia.
+
+const SEQ_STOPS = ["var(--seq-1)", "var(--seq-2)", "var(--seq-3)", "var(--seq-4)", "var(--seq-5)", "var(--seq-6)"];
+const MAP_RAMP = (t) => SEQ_STOPS[Math.min(SEQ_STOPS.length - 1, Math.max(0, Math.floor(t * SEQ_STOPS.length)))];
+const MISSING_FILL = "var(--data-null)";
 
 // Vista da aprire quando la pagina che ha montato il bundle ne ha una sua e la
 // query non dice altro. La imposta il template server (window.__diInitialView in
@@ -419,45 +445,51 @@ function App() {
 /* Shared chrome                                                       */
 /* ------------------------------------------------------------------ */
 
-// Measures the active masthead link's position/width against the nav container
-// and returns an inline style for the sliding .nav-underline accent, redone on
-// every activeNav change (and on resize, since the layout is fluid).
-function useNavUnderline(navRef, activeKey) {
-  const [style, setStyle] = useState({ opacity: 0 });
+// Le voci arrivano dal server via `window.__diNav`, lo stesso meccanismo di
+// `__diInitialView`: la SPA continua a non conoscere nessuna rotta Flask, e
+// `app/nav.py` resta l'unico posto dove si aggiunge o si rinomina una sezione.
+// Il ripiego copre il caso in cui il bundle giri senza il suo guscio (uno
+// smoke test, una pagina vecchia in cache): meglio una barra ridotta che una
+// testata senza navigazione.
+const NAV_RIPIEGO = {
+  masthead: [
+    { label: "Atlante", path: "/atlante", key: "atlas" },
+    { label: "Regioni", path: "/regioni", key: "regioni" },
+    { label: "Temi", path: "/temi", key: "temi" },
+  ],
+  footer: [],
+};
 
-  useEffect(() => {
-    const nav = navRef.current;
-    if (!nav || !activeKey) {
-      setStyle({ opacity: 0 });
-      return undefined;
-    }
-    const measure = () => {
-      const link = nav.querySelector(`[data-nav-key="${activeKey}"]`);
-      if (!link) {
-        setStyle({ opacity: 0 });
-        return;
-      }
-      const navRect = nav.getBoundingClientRect();
-      const linkRect = link.getBoundingClientRect();
-      setStyle({
-        opacity: 1,
-        width: `${linkRect.width - 4}px`,
-        transform: `translateX(${linkRect.left - navRect.left + 2}px)`,
-      });
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [navRef, activeKey]);
+function readNav() {
+  const dato = typeof window !== "undefined" ? window.__diNav : null;
+  if (!dato || !Array.isArray(dato.masthead) || !dato.masthead.length) return NAV_RIPIEGO;
+  return dato;
+}
 
-  return style;
+// La barra del telefono tiene le sue icone e le sue etichette brevissime, che in
+// `nav.py` non avrebbero senso, ma NON le sue destinazioni: mandava a
+// `/qualita-della-vita` mentre la testata mandava alla classifica, cioe' due
+// pagine diverse per la stessa voce a seconda del dispositivo.
+function navPath(key, ripiego) {
+  const voce = readNav().masthead.find((v) => v.key === key);
+  return (voce && voce.path) || ripiego;
 }
 
 function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
-  const navRef = useRef(null);
-  const underlineKey = activeNav === "atlas" || activeNav === "regioni" ? activeNav : null;
-  const underlineStyle = useNavUnderline(navRef, underlineKey);
-
+  // La testata non si disegna piu' qui: la rende Flask con `_ds_header.html`,
+  // lo stesso file di ogni altra pagina, sopra `#root`. Prima queste due rotte
+  // avevano una testata loro, con marchio, navigazione, ricerca e interruttore
+  // del tema disegnati in modo diverso dal resto del sito: due identita' sullo
+  // stesso dominio, e CLAUDE.md ne ammette una sola.
+  //
+  // Quel che resta a React e' cio' che la testata SSR non puo' sapere: la
+  // barra del telefono, che evidenzia la vista aperta dentro la SPA, e il
+  // pulsante di ritorno, che dipende da dove si e' entrati.
+  //
+  // `onNavAtlas` e `onNavRegioni` restano nella firma perche' la barra del
+  // telefono li usa ancora per cambiare vista senza ricaricare. Dalla testata
+  // quei due link ora ricaricano la pagina, ed e' corretto: `/atlante` e
+  // `/regioni` sono due pagine vere, non due stati.
   const handleLocalNav = (event, handler) => {
     if (handler && !event.metaKey && !event.ctrlKey && event.button === 0) {
       event.preventDefault();
@@ -467,57 +499,11 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
 
   return (
     <>
-      <header className="masthead">
-        <a className="brand" href="/" aria-label="Divario Italia, home">
-          <img className="brand-mark" src="/static/img/logo-mark.png" alt="" width="38" height="38" />
-          <span className="brand-text">
-            <strong>Divario Italia</strong>
-            <small>Atlante degli indicatori territoriali</small>
-          </span>
-        </a>
-        {children}
-        <nav id="masthead-nav" className="masthead__links" aria-label="Collegamenti" ref={navRef}>
-          <a
-            href="/atlante"
-            data-nav-key="atlas"
-            className={activeNav === "atlas" ? "is-active" : ""}
-            onClick={(event) => handleLocalNav(event, onNavAtlas)}
-          >
-            Atlante
-          </a>
-          <a
-            href="/regioni"
-            data-nav-key="regioni"
-            className={activeNav === "regioni" ? "is-active" : ""}
-            onClick={(event) => {
-              // Inside the SPA, keep the user in the interactive region mode
-              // instead of loading the server page (which stays for SEO/deep links).
-              handleLocalNav(event, onNavRegioni);
-            }}
-          >
-            Regioni
-          </a>
-          <a href="/temi">Temi</a>
-          <a href="/qualita-della-vita">Qualità della vita</a>
-          <a href="/quiz">Quiz Italia</a>
-          <a href="/metodologia">Metodologia</a>
-          <a href="/blog">Blog</a>
-          <span className={`nav-underline${underlineStyle.opacity ? " is-visible" : ""}`} style={underlineStyle} aria-hidden="true" />
-        </nav>
-        <a
-          className="masthead__search"
-          href="/atlante"
-          aria-label="Cerca nell'atlante"
-          onClick={(event) => handleLocalNav(event, onNavAtlas)}
-        >
-          <Search size={18} />
-        </a>
-        <AuthControl />
-      </header>
+      {children ? <div className="spa-backbar">{children}</div> : null}
 
       <nav className="tabbar" aria-label="Navigazione principale">
         <a
-          href="/atlante"
+          href={navPath("atlas", "/atlante")}
           className={activeNav === "atlas" ? "tabbar__item is-active" : "tabbar__item"}
           onClick={(event) => handleLocalNav(event, onNavAtlas)}
         >
@@ -525,22 +511,22 @@ function SiteHeader({ children, onNavRegioni, onNavAtlas, activeNav }) {
           <span>Atlante</span>
         </a>
         <a
-          href="/regioni"
+          href={navPath("regioni", "/regioni")}
           className={activeNav === "regioni" ? "tabbar__item is-active" : "tabbar__item"}
           onClick={(event) => handleLocalNav(event, onNavRegioni)}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M12 21s7-7.58 7-12A7 7 0 0 0 5 9c0 4.42 7 12 7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
           <span>Regioni</span>
         </a>
-        <a href="/qualita-della-vita" className="tabbar__item">
+        <a href={navPath("qualita-della-vita", "/qualita-della-vita")} className="tabbar__item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
           <span>Qualità</span>
         </a>
-        <a href="/quiz" className="tabbar__item">
+        <a href={navPath("gioco", "/quiz")} className="tabbar__item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16"></rect><circle cx="8" cy="8" r="1"></circle><circle cx="16" cy="8" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="8" cy="16" r="1"></circle><circle cx="16" cy="16" r="1"></circle></svg>
           <span>Gioco</span>
         </a>
-        <a href="/blog" className="tabbar__item">
+        <a href={navPath("blog", "/blog")} className="tabbar__item">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M9 13h6"></path><path d="M9 17h6"></path></svg>
           <span>Blog</span>
         </a>
@@ -566,7 +552,12 @@ function SiteFooter() {
         , indicatori territoriali per le politiche di sviluppo
       </span>
       <span>
-        <a href="/atlante">Atlante</a> · <a href="/regioni">Regioni</a> · <a href="/temi">Temi</a> · <a href="/qualita-della-vita">Qualità della vita</a> · <a href="/quiz">Quiz Italia</a> · <a href="/metodologia">Metodologia</a> · <a href="/blog">Blog</a> · <a href="/privacy">Privacy e cookie</a>
+        {readNav().footer.map((item, indice) => (
+          <Fragment key={item.path}>
+            {indice > 0 && " · "}
+            <a href={item.path}>{item.label}</a>
+          </Fragment>
+        ))}
       </span>
       {hasConsentPreferences && (
         <button className="privacy-settings-link" type="button" onClick={() => window.diOpenConsentPreferences()}>
@@ -1581,7 +1572,12 @@ function MovementList({ items, moveMax, dir, onOpen }) {
 /* Compare (multi-region) view                                        */
 /* ------------------------------------------------------------------ */
 
-const COMPARE_SERIES_COLORS = ["var(--accent)", "var(--ink)", "var(--positive)"];
+// Serie categoriali del design system, ordinate per separazione e sicure per
+// i daltonismi. Erano accento/inchiostro/verde: l'inchiostro e' il colore del
+// TESTO, e una serie dipinta col nero pesa piu' delle altre due senza volerlo
+// dire, mentre il verde diceva "buono" su un grafico dove le tre regioni sono
+// solo tre regioni. Qui il colore identifica una serie e basta.
+const COMPARE_SERIES_COLORS = ["var(--cat-1)", "var(--cat-2)", "var(--cat-3)"];
 const COMPARE_MAX_REGIONS = 3;
 
 function CompareTimeline({ seriesList, averageSeries, selectedYear, onYear, unit }) {
@@ -1842,7 +1838,12 @@ function CompareView({ catalog, mapData, onMode, onOpenRegion }) {
             <div className="compare-main">
               <DataCard title="Serie storica" kicker={`${meta.name} · ${meta.unit}`}>
                 <div className="compare-legend">
-                  {seriesList.map((s) => <span key={s.region} className="legend-item"><i style={{ background: s.color }} />{s.region}</span>)}
+                  {/* `borderTopColor` e non `background`: `.legend-item i` ha height 0 e
+                      disegna con `border-top`, quindi un colore dato come sfondo non
+                      dipinge niente e i tre trattini restavano grigi identici, mentre
+                      la tabella qui accanto usava i quadratini colorati. Dalla legenda
+                      non si capiva quale linea fosse quale regione. */}
+                  {seriesList.map((s) => <span key={s.region} className="legend-item"><i style={{ borderTopColor: s.color }} />{s.region}</span>)}
                   <span className="legend-item legend-average"><i />Media delle regioni</span>
                 </div>
                 <CompareTimeline seriesList={seriesList} averageSeries={averageSeries} selectedYear={year} onYear={setYear} unit={meta.unit} />
@@ -2285,7 +2286,7 @@ function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false
               key={key}
               d={path(feature)}
               className={isSelected ? "is-selected" : ""}
-              fill={neutral ? MISSING_FILL : hasValue ? color(row.value) : MISSING_FILL}
+              style={{ fill: neutral ? MISSING_FILL : hasValue ? color(row.value) : MISSING_FILL }}
               onClick={() => row && onSelect(row.region)}
               onMouseEnter={() => onHover && onHover(row || null)}
               onMouseLeave={() => onHover && onHover(null)}
@@ -2314,8 +2315,10 @@ function ItalyMap({ geo, values, selectedRegion, onSelect, unit, neutral = false
 }
 
 function MapLegend({ min, max, unit }) {
-  const stops = d3.range(0, 1.0001, 0.1);
-  const gradient = `linear-gradient(90deg, ${stops.map((s) => MAP_RAMP(s)).join(", ")})`;
+  const step = 100 / SEQ_STOPS.length;
+  const gradient = `linear-gradient(90deg, ${SEQ_STOPS
+    .map((c, i) => `${c} ${i * step}% ${(i + 1) * step}%`)
+    .join(", ")})`;
   const mid = min + (max - min) / 2;
   // aria-hidden per scelta: la scala colore da sola non aggiunge informazione a
   // chi non vede la mappa, e gli stessi valori stanno in forma testuale nella

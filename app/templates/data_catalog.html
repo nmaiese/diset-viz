@@ -1,16 +1,21 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Atlante", "path": "/atlante"}, {"name": "Catalogo dati", "path": "/catalogo-dati"}] %}
 {% set active_nav = 'atlas' %}
 
-{% block title %}Catalogo dati | Divario Italia{% endblock %}
+{# Il catalogo e' l'unica pagina il cui contenuto **e'** un conteggio, e il
+   titolo non lo diceva. La marca cade come sugli altri hub. #}
+{% block title %}Catalogo dati: {{ datasets | length }} indicatori territoriali scaricabili{% endblock %}
 {% block description %}{{ catalog_description }}{% endblock %}
 
 {% block head_extra %}
+{{ breadcrumb.jsonld(percorso, site_url) }}
 <script type="application/ld+json">{{ catalog_jsonld | tojson }}</script>
 {% endblock %}
 
 {% block content %}
-<main class="page wrap">
-  <nav class="breadcrumb"><a href="/atlante">Atlante</a> / Catalogo dati</nav>
+<main class="page wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
   <h1>Catalogo dati di Divario Italia</h1>
   <p class="page-lead">{{ catalog_description }}</p>
   <p class="page-note">Il catalogo collega {{ datasets | length }} dataset indicizzabili. Ogni scheda dichiara copertura, tecnica di elaborazione, fonte originale ed eventuali formati di download.</p>

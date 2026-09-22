@@ -256,3 +256,80 @@ class EveryIndicatorPageRenders(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LaCodaDellaSchedaNonEUnMenu(unittest.TestCase):
+    """Sotto la piega si impilavano sei blocchi di navigazione consecutivi.
+
+    Articoli, immagine da condividere, dimensioni, correlati, precedente e
+    successivo, richiamo al tema: sei intestazioni di fila, tre delle quali
+    portavano allo stesso posto. Adesso e' una zona sola a tre corsie, e il
+    test guarda che non si sia perso un link e che se ne siano guadagnati due.
+    """
+
+    URL = "/indicatore/pil-pro-capite/ter-901"
+
+    @classmethod
+    def setUpClass(cls):
+        app.config["TESTING"] = True
+        cls.client = app.test_client()
+        cls.html = cls.client.get(cls.URL).get_data(as_text=True)
+
+    def test_c_e_una_zona_sola_con_una_intestazione_sola(self):
+        self.assertEqual(self.html.count('class="indicator-next"'), 1)
+        self.assertEqual(self.html.count('id="continua-da-qui"'), 1)
+        for morto in ('class="indicator-articles"', 'class="sibling-nav"',
+                      'class="dimension-nav"', 'class="indicator-related"'):
+            self.assertNotIn(morto, self.html, morto)
+
+    def test_i_link_di_prima_ci_sono_ancora(self):
+        from app import indicator_view
+
+        vista = indicator_view.build_indicator_view("territorial", "901")
+        self.assertIn(vista["meta"]["theme_path"], self.html)
+        for chiave in ("prev", "next"):
+            voce = vista["siblings"].get(chiave)
+            if voce:
+                self.assertIn(voce["path"], self.html, chiave)
+        for voce in vista["related"][:3]:
+            self.assertIn(voce["path"], self.html, voce["name"])
+
+    def test_i_due_territori_agli_estremi_adesso_si_aprono(self):
+        """La pagina li nominava nel cruscotto e non ci ha mai portato."""
+        from app import indicator_view
+
+        livello = indicator_view.build_indicator_view("territorial", "901")["levels"][0]
+        for estremo in ("best", "worst"):
+            percorso = f"{livello['profile_path']}{livello[estremo]['key']}"
+            self.assertIn(f'href="{percorso}"', self.html, percorso)
+            self.assertEqual(self.client.get(percorso).status_code, 200)
+
+    def test_i_correlati_non_sono_i_primi_dell_alfabeto(self):
+        """Su PIL pro capite uscivano "Alunni con disabilita'" nelle tre
+        varianti: stesso tema, niente a che vedere. Adesso pesa prima il
+        sottotema della fonte, poi quanto il nome somiglia."""
+        from app import indicator_view
+
+        vista = indicator_view.build_indicator_view("territorial", "901")
+        sottotema = vista["meta"].get("source_theme")
+        if not sottotema:
+            self.skipTest("l'indicatore non dichiara un sottotema")
+        primi = vista["related"][:3]
+        self.assertTrue(any(v.get("source_theme") == sottotema for v in primi),
+                        [v["name"] for v in primi])
+
+    def test_l_immagine_da_condividere_sta_nell_apparato(self):
+        """E' un artefatto di citazione, non una destinazione: in coda faceva
+        numero fra i blocchi di navigazione e non c'entrava con nessuno."""
+        apparato = self.html.index('class="indicator-apparatus"')
+        continua = self.html.index('class="indicator-next"')
+        cover = self.html.index('class="indicator-cover-share"')
+        self.assertLess(apparato, cover)
+        self.assertLess(cover, continua)
+
+    def test_a_livello_provincia_non_si_promettono_profili_che_non_esistono(self):
+        html = self.client.get(
+            "/indicatore/retribuzione-media-annua-dei-lavoratori-dipendenti/bes-04BEC002P"
+        ).get_data(as_text=True)
+        self.assertIn('class="indicator-next"', html)
+        self.assertNotIn('href="/provincia/', html)

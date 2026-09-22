@@ -1,3 +1,5 @@
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Confronta", "path": "/confronto"}] %}
 <!doctype html>
 <html lang="it">
   <head>
@@ -5,25 +7,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Confronta le regioni italiane</title>
     <meta name="description" content="Scegli due o tre regioni e mettile a confronto su un indicatore: valore dell'ultimo anno, posizione in classifica e serie storica.">
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    {% if STAGING %}<meta name="robots" content="noindex, nofollow, noarchive">{% else %}<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">{% endif %}
     <link rel="canonical" href="{{ SITE_URL }}/confronto">
     <meta property="og:title" content="Confronta le regioni italiane">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ SITE_URL }}/confronto">
     <meta property="og:description" content="Due o tre regioni, un indicatore alla volta: valori, classifica e serie storica a paragone.">
-    <meta property="og:image" content="{{ SITE_URL }}/static/img/og-divario-italia.svg">
+    <meta property="og:image" content="{{ SITE_URL }}/static/img/og-divario-italia.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Divario Italia, atlante degli indicatori territoriali">
     <meta name="twitter:card" content="summary_large_image">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ SITE_URL }}/" },
-        { "@type": "ListItem", "position": 2, "name": "Confronta", "item": "{{ SITE_URL }}/confronto" }
-      ]
-    }
-    </script>
+    {{ breadcrumb.jsonld(percorso, SITE_URL) }}
     <script>
       window.__diSpaPageView = true;
       /* La SPA vive su /atlante come stato ?view=..., ma il confronto ha una URL
@@ -31,23 +27,55 @@
          non c'è un ?view= nella query, così il percorso non finisce mai a
          dire una cosa e la query un'altra. */
       window.__diInitialView = "confronto";
+      window.__diNav = {{ nav.for_spa() | tojson }};
     </script>
     {% set TRACK_SERVER_PAGE_VIEW = false %}
     {% include "_third_party_head.html" %}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+    {# Stessa migrazione di app.html, e va fatta INSIEME a quella: questa pagina
+       monta lo stesso bundle dell'atlante, quindi se una delle due shell resta
+       senza `ds` la stessa applicazione React si vede in due palette diverse a
+       seconda della URL da cui la si apre. #}
+    {# I font arrivano da qui, non da fonts.googleapis.com: un foglio
+       cross-origin bloccante costava tre round trip prima del primo
+       carattere, e Newsreader e' il serif dei titoli, cioe' quasi sempre
+       l'LCP. I due `preload` sono i soli file che una pagina in italiano
+       scarica sempre: latin-ext lo prende solo chi incontra un carattere
+       che lo richiede, e il monospazio non e' nel primo paint.
+   Senza `?v=`, di proposito: `fonts.css` richiama il file per percorso
+   nudo, e un precarico con la marca di versione sarebbe una URL diversa,
+   cioe' lo stesso font scaricato due volte. I file sono immutabili, il
+   nome dice famiglia e sottoinsieme: si sostituiscono rinominandoli. #}
+    <link rel="preload" href="{{ url_for('static', filename='fonts/newsreader-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/public-sans-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ asset_url('css/fonts.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/ds/system.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/ds/chrome.css') }}">
+    {# La testata del design system e' markup statico piu' ds-chrome.js: gira
+       senza React, e va caricata qui come su ogni altra pagina. Prima queste
+       due rotte disegnavano una testata loro, in React, con un marchio
+       diverso, una navigazione piatta e nessuna ricerca: due testate sullo
+       stesso sito, e l'identita' e' una sola (CLAUDE.md). #}
+    <script src="{{ url_for('static', filename='js/ds-chrome.js') }}" defer></script>
     <script type="module" crossorigin src="{{ asset_url('dist/assets/index.js') }}"></script>
     <link rel="stylesheet" crossorigin href="{{ asset_url('dist/assets/index.css') }}">
+    {% include "_theme_bootstrap.html" %}
+    {% if SUPABASE_URL and SUPABASE_ANON_KEY %}
+    {# Riempie #site-auth della testata: senza, il posto del login resta vuoto
+       su queste due rotte e su tutte le altre no. #}
+    <script type="module" crossorigin src="{{ asset_url('dist/assets/site.js') }}"></script>
+    {% endif %}
   </head>
-  <body>
+  <body class="ds sitechrome">
     {% include "_third_party_body.html" %}
+    {# La fascia serve QUI come su ogni altra pagina: senza, /confronto sullo
+       stage e' indistinguibile da quella di produzione, che e' esattamente
+       l'errore che la fascia esiste per impedire. #}
+    {% if STAGING %}{% include "_staging_banner.html" %}{% endif %}
+    {% set active_nav = 'confronto' %}
+    {% include "_ds_header.html" %}
     <div id="root">
       <main class="spa-seo-fallback">
-        <nav aria-label="Percorso">
-          <a href="/">Home</a>
-          <a href="/confronto" aria-current="page">Confronta</a>
-        </nav>
+        {{ breadcrumb.trail(percorso, "", false) }}
         <h1>Confronta le regioni italiane</h1>
         <p>Scegli due o tre regioni e guarda come si comportano sullo stesso indicatore. Il comparatore mostra il valore dell'ultimo anno, la posizione in classifica e la serie storica delle regioni che hai scelto, con la media semplice delle regioni come riferimento.</p>
         {% if compare_preview %}

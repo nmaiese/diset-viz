@@ -308,6 +308,13 @@ def region_profile(region_key):
             "macro_area": info["macro_area"],
             "path": info["path"],
             "score": round(oriented, 4),
+            # Il percentile **grezzo**, accanto a quello orientato. Servono
+            # tutti e due e non si possono confondere: `score` dice quanto va
+            # bene, `percentile` dice dove sta il valore fra il minimo e il
+            # massimo italiano. Il ritratto ha per assi "il valore piu' basso" e
+            # "il valore piu' alto", quindi su un indicatore `lower_better` un
+            # punteggio orientato metterebbe il punto dalla parte sbagliata.
+            "percentile": round(by_region[region_key], 4),
         }
         scored.append(entry)
         by_theme[info["theme"]].append(entry)
@@ -315,24 +322,48 @@ def region_profile(region_key):
     theme_table = []
     for theme, entries in by_theme.items():
         avg = sum(e["score"] for e in entries) / len(entries)
+        rated = len(entries) >= MIN_THEME_INDICATORS
         theme_table.append({
             "theme": theme,
             "macro_area": entries[0]["macro_area"],
             "theme_path": theme_path(theme),
             "count": len(entries),
             "score": round(avg, 4),
-            "rated": len(entries) >= MIN_THEME_INDICATORS,
+            "rated": rated,
+            # Il rango e' cio' che chiude la maglia fra le due pagine: la pagina
+            # tema dice "su questo tema il Molise e' 17esimo", la pagina regione
+            # non lo diceva, e i due elenchi restavano due elenchi. Viene da
+            # `theme_standings`, memoizzata, quindi un tema si calcola una volta
+            # e lo leggono tutte e venti le regioni. Un tema non classificabile
+            # non ha rango, e la tabella non lo inventa.
+            "rank": theme_rank_of(theme, region_key) if rated else None,
+            "rank_total": len(REGION_ORDER),
         })
     theme_table.sort(key=lambda t: t["score"], reverse=True)
 
+    # Prima erano `score >= 0.6` e `score <= 0.4`, e una regione che non
+    # superava la soglia si vedeva rispondere "Nessun tema emerge nettamente
+    # sopra la media" alla domanda per cui e' venuta: succedeva a 4 regioni su
+    # 20 per i punti di forza e a 6 su 20 per quelli deboli. Adesso i tre
+    # migliori e i tre peggiori ci sono sempre, e l'onesta' passa dalla parola
+    # `netto`, che il template usa per dire "nettamente sopra la media" solo
+    # dove la soglia e' davvero superata.
     rated = [t for t in theme_table if t["rated"]]
-    themes_strong = [t for t in rated if t["score"] >= 0.6][:4]
-    themes_weak = [t for t in reversed(rated) if t["score"] <= 0.4][:4]
+    themes_strong = [{**t, "netto": t["score"] >= 0.6} for t in rated[:3]]
+    themes_weak = [{**t, "netto": t["score"] <= 0.4} for t in list(reversed(rated))[:3]]
 
     top_excels = sorted(scored, key=lambda e: e["score"], reverse=True)
     top_excels = [e for e in top_excels if e["score"] >= 0.7][:6]
     top_lags = sorted(scored, key=lambda e: e["score"])
     top_lags = [e for e in top_lags if e["score"] <= 0.3][:6]
+
+    # Il ritratto: tre indicatori dove la regione sta davanti e tre dove sta
+    # indietro, ognuno col suo percentile grezzo. Tre e tre e non i sei migliori,
+    # se no la figura racconta meta' regione. `portrait_svg` vuole coppie
+    # (nome, quota) e torna vuoto sotto le due righe, quindi una regione con un
+    # profilo piatto semplicemente non ha la figura invece di averne una falsa.
+    portrait_rows = [(e["name"], e["percentile"])
+                     for e in (top_excels[:3] + top_lags[:3])]
 
     all_indicators = _region_indicators(region_key)
     moved = [i for i in all_indicators if i["movement"]]
@@ -367,11 +398,98 @@ def region_profile(region_key):
         "themes_weak": themes_weak,
         "top_excels": top_excels,
         "top_lags": top_lags,
+        "portrait_rows": portrait_rows,
         "all_indicators": all_indicators,
         "movement_gains": movement_gains,
         "movement_losses": movement_losses,
         "similar_regions": similar_regions(region_key),
     }
+
+
+@cache.memoize(timeout=3600)
+def theme_standings(theme):
+    """Le regioni ordinate su un tema: l'inverso di `theme_table`.
+
+    `region_profile` legge la matrice dei percentili **per regione** e ne ricava
+    un punteggio per tema. Qui si legge la stessa matrice **per tema** e se ne
+    ricava un punteggio per regione. Stessa media di percentili orientati,
+    stesso `MIN_THEME_INDICATORS`, stessi limiti: e' l'unica differenza del
+    verso, non un secondo criterio.
+
+    Si calcola in una passata da `_percentile_matrix()` e `_indicator_meta()`,
+    non chiamando venti volte `region_profile`: quella porta `all_indicators`,
+    centinaia di righe per regione, che la cache ripicklerebbe venti volte per
+    ogni pagina tema.
+
+    `rated` e' falso quando il tema non ha abbastanza indicatori direzionali per
+    reggere una classifica: in quel caso le righe ci sono lo stesso, ma la
+    pagina non deve presentarle come una graduatoria. Un tema con due
+    indicatori non ordina venti regioni.
+    """
+    matrix = _percentile_matrix()
+    meta = _indicator_meta()
+
+    ids = [
+        ind_id for ind_id, info in meta.items()
+        if info["theme"] == theme
+        and info["direction"] in SCOREABLE_DIRECTIONS
+        and ind_id in matrix
+    ]
+    if not ids:
+        return {"theme": theme, "theme_path": theme_path(theme), "rated": False,
+                "indicator_count": 0, "year_max": None, "rows": []}
+
+    per_region = defaultdict(list)
+    for ind_id in ids:
+        info = meta[ind_id]
+        for region_key, percentile in matrix[ind_id].items():
+            # `round` qui e non dopo la media: `region_profile` arrotonda il
+            # punteggio di ogni indicatore prima di mediarli, e mediare i valori
+            # pieni dava scarti di 0,0001 su 17 coppie tema/regione. Due
+            # percorsi che calcolano la stessa cosa devono dare lo stesso
+            # numero, anche quando la differenza non si vede in pagina.
+            per_region[region_key].append(
+                (round(_oriented(percentile, info["direction"]), 4), info))
+
+    rows = []
+    for region_key, entries in per_region.items():
+        name = region_name(region_key)
+        if name is None:
+            continue
+        entries.sort(key=lambda pair: pair[0])
+        rows.append({
+            "region": name,
+            "region_key": region_key,
+            "path": f"/regione/{region_key}",
+            "score": round(sum(score for score, _ in entries) / len(entries), 4),
+            "count": len(entries),
+            "best_indicator": {"name": entries[-1][1]["name"], "path": entries[-1][1]["path"]},
+            "worst_indicator": {"name": entries[0][1]["name"], "path": entries[0][1]["path"]},
+        })
+
+    rows.sort(key=lambda row: (-row["score"], row["region_key"]))
+    for position, row in enumerate(rows, start=1):
+        row["rank"] = position
+
+    return {
+        "theme": theme,
+        "theme_path": theme_path(theme),
+        "rated": len(ids) >= MIN_THEME_INDICATORS,
+        "indicator_count": len(ids),
+        "year_max": max((meta[i]["year_max"] for i in ids), default=None),
+        "rows": rows,
+    }
+
+
+def theme_rank_of(theme, region_key):
+    """La posizione di una regione su un tema, o None se il tema non si classifica."""
+    standings = theme_standings(theme)
+    if not standings["rated"]:
+        return None
+    for row in standings["rows"]:
+        if row["region_key"] == region_key:
+            return row["rank"]
+    return None
 
 
 @cache.memoize(timeout=3600)

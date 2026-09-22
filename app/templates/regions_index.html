@@ -1,11 +1,53 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set percorso = [{"name": "Home", "path": "/"}, {"name": "Regioni", "path": "/regioni"}] %}
 {% set active_nav = 'regioni' %}
 
-{% block title %}Le regioni italiane a confronto · {{ site_name }}{% endblock %}
+{# La marca cade qui come sulle schede: diciassette caratteri di un nome che
+   nessuno cerca, tolti al numero che da' un motivo per cliccare. #}
+{% block title %}Le {{ regions | length }} regioni italiane a confronto, tema per tema{% endblock %}
 {% block description %}Scegli una regione italiana e scopri il suo profilo sugli indicatori territoriali Istat: punti di forza, debolezze e regioni con un profilo simile.{% endblock %}
 
+{# Questa pagina era l'unico hub del sito senza un solo blocco di dati
+   strutturati. L'`ItemList` non aggiunge niente che non si veda: e' la stessa
+   `<ol class="region-index-list">` qui sotto, nello stesso ordine, che e' la
+   condizione posta da `.claude/rules/app.md` (JSON-LD solo dove la pagina
+   visibile lo sostiene). #}
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Le regioni italiane a confronto",
+  "description": {{ ('Il profilo di ognuna delle venti regioni italiane sugli indicatori territoriali Istat.') | tojson }},
+  "url": {{ canonical | tojson }}
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Le regioni italiane",
+  "numberOfItems": {{ regions | length }},
+  "itemListOrder": "https://schema.org/ItemListUnordered",
+  "itemListElement": [
+    {%- for r in regions %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "name": {{ r.region | tojson }},
+      "url": "{{ site_url }}{{ r.path }}"
+    }{{ "," if not loop.last }}
+    {%- endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
 {% block content %}
-<article class="page page-index wrap">
+<article class="page page-index wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
   <h1>Le regioni a confronto</h1>
   <p class="page-lead">Venti regioni, venti profili territoriali. Per ognuna trovi i temi in cui emerge o fatica, dove ha recuperato o perso terreno nell'ultimo anno e le regioni dal profilo più simile. Passa il mouse sulla mappa per un'anteprima, clicca per aprire la scheda.</p>
   <p class="page-note"><a href="/atlante?view=regioni">Apri l'atlante interattivo per regione →</a></p>

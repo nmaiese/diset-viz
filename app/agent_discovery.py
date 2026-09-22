@@ -26,7 +26,7 @@ _MARKDOWN_EXACT_PATHS = {
     "/catalogo-dati",
     "/metodologia",
 }
-_MARKDOWN_PREFIXES = ("/blog/", "/indicatore/", "/regione/", "/tema/")
+_MARKDOWN_PREFIXES = ("/blog/", "/indicatore/", "/provincia/", "/regione/", "/tema/")
 
 
 def markdown_available(path):
@@ -481,6 +481,16 @@ def indicator_markdown(meta, level, article, site_url):
         f"- Territori nell'ultimo anno: {len(level['observations'])}",
         f"- Fonte: [{meta.get('source_label') or meta.get('source')}]({meta.get('source_url')})",
     ]
+    # La definizione che ne da' l'istituto (`meta["archive"]`, che arriva da
+    # `data/definitions/`). La pagina HTML la mostra da sempre nell'apparato,
+    # sotto "Definizione della fonte", la proiezione markdown no: e' lo stesso
+    # documento alla stessa URL, quindi o sta in tutte e due o e' una pagina
+    # diversa con lo stesso canonico. Copre 346 delle 372 schede indicizzabili,
+    # ed e' la prima cosa che un agente deve poter citare invece di
+    # parafrasare la formula che il sito si compone da se'.
+    if (meta.get("archive") or "").strip():
+        lines += ["", "## Definizione della fonte", "", meta["archive"].strip(),
+                  "", f"Fonte: [{meta.get('source_label') or meta.get('source')}]({meta.get('source_url')})"]
     if explain.get("plain"):
         lines += ["", "## Che cosa misura", "", explain["plain"]]
     if explain.get("example"):
@@ -578,6 +588,20 @@ def region_markdown(profile, site_url):
     lines += ["", "## Indicatori da approfondire", ""]
     for item in (profile.get("top_lags") or [])[:6]:
         lines.append(f"- [{item['name']}]({_absolute(site_url, item['path'])})")
+    # La tabella dei temi col rango sta anche qui: HTML e Markdown sono lo stesso
+    # documento alla stessa URL, e il rango e' cio' che la pagina ha guadagnato.
+    # Senza, la variante per le macchine resta all'elenco di nomi che la versione
+    # visibile ha smesso di essere.
+    con_rango = [t for t in (profile.get("theme_table") or []) if t.get("rank")]
+    if con_rango:
+        lines += ["", f"## Tutti i temi, con la posizione fra le {profile['region_total']} regioni", ""]
+        lines.append(f"| tema | posizione | indicatori |")
+        lines.append("| --- | ---: | ---: |")
+        for item in con_rango:
+            lines.append(
+                f"| [{item['theme']}]({_absolute(site_url, item['theme_path'])}) "
+                f"| {item['rank']} su {item['rank_total']} | {item['count']} |"
+            )
     if profile.get("similar_regions"):
         lines += ["", "## Regioni con un profilo simile", ""]
         for item in profile["similar_regions"]:
@@ -586,7 +610,63 @@ def region_markdown(profile, site_url):
     return "\n".join(lines)
 
 
-def theme_markdown(profile, site_url):
+def province_markdown(profilo, vicine, site_url):
+    """La stessa pagina provincia, per chi chiede `text/markdown`.
+
+    HTML e Markdown sono lo stesso documento alla stessa URL: una variante che
+    non porta la risposta principale della pagina e' una pagina diversa con lo
+    stesso canonico.
+    """
+    lines = [
+        f"# {profilo['name']}, qualita' della vita",
+        "",
+        f"{profilo['name']} e' {profilo['rank']}a su {profilo['total']} province "
+        f"con il profilo {profilo['profile'].get('name', '').lower()}, "
+        f"punteggio {profilo['score']} su 100.",
+        "",
+        f"URL canonica: {_absolute(site_url, profilo['path'])}",
+        "",
+        "## Scheda",
+        "",
+        f"- Posizione: {profilo['rank']} su {profilo['total']}",
+        f"- Punteggio: {profilo['score']} su 100, dove 50 e' la media",
+    ]
+    if profilo.get("region"):
+        regione = profilo["region"]
+        if profilo.get("region_path"):
+            regione = f"[{regione}]({_absolute(site_url, profilo['region_path'])})"
+        lines.append(f"- Regione: {regione}")
+    lines.append(f"- Copertura: {round((profilo.get('coverage') or 0) * 100)}% degli indicatori del punteggio")
+    lines.append(f"- Fonte: {profilo['methodology'].get('source', 'Istat, BES dei Territori')}")
+
+    if profilo.get("categories"):
+        lines += ["", "## Le dimensioni, dalla piu' forte alla piu' debole", "",
+                  "| dimensione | punteggio |", "| --- | ---: |"]
+        for voce in profilo["categories"]:
+            lines.append(f"| {voce['name']} | {voce['score']} |")
+
+    for titolo, elenco in (("Gli indicatori che la tirano su", profilo.get("top_positive")),
+                           ("Gli indicatori che la tirano giu'", profilo.get("top_negative"))):
+        if elenco:
+            lines += ["", f"## {titolo}", ""]
+            for voce in elenco:
+                anno = f" ({voce['year_max']})" if voce.get("year_max") else ""
+                lines.append(f"- [{voce['name']}]({_absolute(site_url, voce['path'])}){anno}")
+
+    if vicine:
+        lines += ["", "## Le province che le stanno intorno in classifica", ""]
+        for voce in vicine:
+            lines.append(f"- {voce['rank']}a [{voce['name']}]({_absolute(site_url, voce['path'])}), {voce['score']}")
+
+    lines += ["", "## Metodo", "",
+              profilo["profile"].get("description", ""),
+              "",
+              f"Classifica completa: {_absolute(site_url, '/qualita-della-vita/classifica/province')}",
+              f"Metodologia: {_absolute(site_url, '/qualita-della-vita/metodologia')}"]
+    return "\n".join(lines)
+
+
+def theme_markdown(profile, site_url, standings=None):
     lines = [
         f"# {profile['theme']}",
         "",
@@ -596,6 +676,29 @@ def theme_markdown(profile, site_url):
         f"Indicatori: {profile['indicator_count']}",
         f"URL canonica: {_absolute(site_url, profile['theme_path'])}",
         "",
+    ]
+    # La classifica sta anche qui, e non per completezza: HTML e Markdown sono
+    # lo stesso documento alla stessa URL, e una variante che non porta la
+    # risposta principale della pagina e' una pagina diversa con lo stesso
+    # canonico.
+    if standings and standings.get("rated") and standings.get("rows"):
+        lines += [
+            f"## Le regioni su questo tema, {standings['year_max']}",
+            "",
+            "Media semplice dei percentili orientati dei "
+            f"{standings['indicator_count']} indicatori direzionali del tema, "
+            "da 0 a 1. Non è una classifica ufficiale.",
+            "",
+            "| # | regione | punteggio |",
+            "| ---: | --- | ---: |",
+        ]
+        for row in standings["rows"]:
+            lines.append(
+                f"| {row['rank']} | [{row['region']}]({_absolute(site_url, row['path'])}) "
+                f"| {row['score']:.2f} |"
+            )
+        lines.append("")
+    lines += [
         "## Indicatori del tema",
         "",
     ]

@@ -1,8 +1,18 @@
 {% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
 {% set active_nav = 'regioni' %}
 {% set p = profile %}
+{% set percorso = [
+  {"name": "Home", "path": "/"},
+  {"name": "Regioni", "path": "/regioni"},
+  {"name": p.region, "path": "/regione/" ~ p.region_key},
+] %}
 
-{% block title %}{{ p.region }}: profilo regionale · {{ site_name }}{% endblock %}
+{# Il titolo porta la posizione media, che e' il numero che la pagina mostra
+   gia' in cima ("Media 13ª su 20") e la cosa che chi cerca "molise regioni
+   classifica" vuole sapere. Senza posizione media si ripiega sul conteggio
+   degli indicatori, che c'e' sempre. #}
+{% block title %}{% if p.avg_rank %}{{ p.region }}: {{ p.avg_rank }}ª su {{ p.region_total }} regioni, tema per tema{% else %}{{ p.region }}: il profilo su {{ p.all_indicators | length }} indicatori{% endif %}{% endblock %}
 {% block description %}Profilo di {{ p.region }}: temi in cui eccelle, dove resta indietro e le regioni più simili, sugli indicatori territoriali Istat.{% endblock %}
 
 {% block head_extra %}
@@ -21,24 +31,44 @@
   "keywords": [{{ p.region | tojson }}, "indicatori territoriali", "divario regionale", "Istat"]
 }
 </script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{# `ItemList` solo adesso che la tabella "Tutti i temi" porta il rango: prima
+   sarebbe stato un elenco di nomi senza ordine dichiarato, cioe' dati
+   strutturati che promettono piu' di quanto la pagina mostri, che e' la
+   condizione posta da `.claude/rules/app.md`. Entrano i soli temi classificati:
+   un tema sotto i tre indicatori direzionali non ha un rango, e in una lista
+   ordinata sarebbe una posizione inventata. #}
+{% set temi_con_rango = p.theme_table | selectattr('rank') | list %}
+{% if temi_con_rango %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
+  "@type": "ItemList",
+  "name": {{ ('I temi di ' ~ p.region ~ ', dal migliore al peggiore') | tojson }},
+  "description": {{ ('Posizione di ' ~ p.region ~ ' fra le ' ~ p.region_total ~ ' regioni italiane su ciascun tema, per media dei percentili orientati degli indicatori del tema.') | tojson }},
+  "url": {{ canonical | tojson }},
+  "numberOfItems": {{ temi_con_rango | length }},
+  "itemListOrder": "https://schema.org/ItemListOrderAscending",
   "itemListElement": [
-    { "@type": "ListItem", "position": 1, "name": "Home", "item": "{{ site_url }}/" },
-    { "@type": "ListItem", "position": 2, "name": "Regioni", "item": "{{ site_url }}/regioni" },
-    { "@type": "ListItem", "position": 3, "name": {{ p.region | tojson }}, "item": {{ canonical | tojson }} }
+    {% for t in temi_con_rango %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "name": {{ t.theme | tojson }},
+      "url": {{ (site_url ~ t.theme_path) | tojson }}
+    }{{ "," if not loop.last }}
+    {% endfor %}
   ]
 }
 </script>
+{% endif %}
 <script src="{{ url_for('static', filename='js/region-explorer.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/region-animate.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
-<article class="page page-region wrap-wide">
-  <nav class="breadcrumb"><a href="/regioni">Regioni</a></nav>
+<article class="page page-region wrap-wide" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
 
   {% set has_movement = p.movement_gains or p.movement_losses %}
   <div class="region-hero">
@@ -88,16 +118,37 @@
     </div>
   </div>
 
+  {# Il ritratto: tre indicatori dove la regione sta davanti e tre dove sta
+     indietro, ognuno sulla corsa dal minimo al massimo italiano. Risponde alla
+     domanda "dove sta questa regione" prima che il lettore debba leggere due
+     elenchi e tenerli a mente. La figura non porta numeri di proposito: le
+     unita' dei sei indicatori non si confrontano, e la posizione e' tutto cio'
+     che una riga come questa puo' dire onestamente. #}
+  {% if portrait %}
+  <section class="panel-card region-portrait" aria-labelledby="ritratto-titolo">
+    <h2 class="section-label" id="ritratto-titolo">{{ p.region }} sui sei indicatori che la distinguono</h2>
+    {{ portrait | safe }}
+    <p class="page-note">Ogni riga e' un indicatore: la barra va dal valore piu' basso al valore piu' alto fra le {{ p.region_total }} regioni, il punto e' {{ p.region }}. Nessun numero, perche' le sei unita' non si confrontano fra loro.</p>
+  </section>
+  {% endif %}
+
   <div class="profile-quad{{ '' if has_movement else ' profile-quad--two' }}">
     <section class="profile-card profile-strong" id="forza">
-      <h2>Dove eccelle</h2>
+      <h2>Dove va meglio</h2>
+      {# I tre temi migliori ci sono sempre. `netto` distingue un tema davvero
+         sopra la media da uno che e' solo il migliore dei suoi: prima, sotto
+         soglia, la pagina rispondeva "Nessun tema emerge nettamente sopra la
+         media" alla domanda per cui il lettore era venuto. #}
       {% if p.themes_strong %}
       <ul class="theme-chips">
         {% for t in p.themes_strong %}
-        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a></li>
+        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a>{% if not t.netto %} <small>di poco</small>{% endif %}</li>
         {% endfor %}
       </ul>
-      {% else %}<p class="page-note">Nessun tema emerge nettamente sopra la media.</p>{% endif %}
+      {% if not p.themes_strong[0].netto %}
+      <p class="page-note">Nessun tema stacca nettamente la media: questi sono i tre in cui {{ p.region }} se la cava meglio.</p>
+      {% endif %}
+      {% endif %}
       {% if p.top_excels %}
       <ul class="profile-list">
         {% for e in p.top_excels %}
@@ -112,10 +163,13 @@
       {% if p.themes_weak %}
       <ul class="theme-chips">
         {% for t in p.themes_weak %}
-        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a></li>
+        <li><a href="{{ t.theme_path }}">{{ t.theme }}</a>{% if not t.netto %} <small>di poco</small>{% endif %}</li>
         {% endfor %}
       </ul>
-      {% else %}<p class="page-note">Nessun tema emerge nettamente sotto la media.</p>{% endif %}
+      {% if not p.themes_weak[0].netto %}
+      <p class="page-note">Nessun tema resta nettamente sotto la media: questi sono i tre in cui {{ p.region }} fatica di piu'.</p>
+      {% endif %}
+      {% endif %}
       {% if p.top_lags %}
       <ul class="profile-list">
         {% for e in p.top_lags %}
@@ -259,7 +313,7 @@
             {% for t in p.theme_table %}
             <tr class="{{ 'is-unrated' if not t.rated else '' }}">
               <td><a href="{{ t.theme_path }}">{{ t.theme }}</a></td>
-              <td class="num">{{ t.count }}</td>
+              <td class="num">{% if t.rank %}{{ t.rank }}ª su {{ t.rank_total }}{% else %}<span class="muted">{{ t.count }} ind.</span>{% endif %}</td>
             </tr>
             {% endfor %}
           </tbody>

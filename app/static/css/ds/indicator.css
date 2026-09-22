@@ -1,0 +1,159 @@
+/* Pagina indicatore, design system 2026.
+ *
+ * Foglio CORTO apposta. Il grosso della pagina si ridipinge da se': le regole
+ * di site.css che la riguardano sono scritte sui nomi dei token (--ink, --paper,
+ * --accent, --font-display...) e `body.ds` li ripunta sulle primitive nuove.
+ * Qui sta solo quello che quel ponte non poteva raggiungere, cioe' i posti in
+ * cui site.css aveva cotto un colore invece di leggerlo da un token, piu' i
+ * pochi punti in cui il livello dati del design system dice una cosa diversa
+ * dal foglio vecchio.
+ *
+ * Si carica solo dalla pagina indicatore (`head_extra`), dopo site.css.
+ *
+ * La migrazione al design system aveva toccato **solo i token**, e sotto la
+ * piega restavano sei blocchi di navigazione impilati che facevano leggere la
+ * scheda come un menu. In fondo al file c'e' la zona che li ha sostituiti. */
+
+/* --- la mappa e la sua legenda ------------------------------------------ */
+
+/* site.css cuoceva qui i due estremi della rampa blu legacy
+ * (`linear-gradient(90deg, #e7ecf3, #15233b)`), che e' l'identita' vecchia e
+ * per giunta non seguirebbe il tema scuro. La legenda deve mostrare gli STESSI
+ * sei gradini che la mappa dipinge (DS_SEQ_RAMP in app/indicator_notes.py):
+ * gli stop netti, e non una sfumatura continua, sono il punto - una legenda
+ * sfumata su una mappa a gradini promette una precisione che la mappa non ha. */
+body.ds .map-legend__bar {
+  background: linear-gradient(
+    90deg,
+    var(--seq-1) 0 16.666%, var(--seq-2) 16.666% 33.333%,
+    var(--seq-3) 33.333% 50%,  var(--seq-4) 50% 66.666%,
+    var(--seq-5) 66.666% 83.333%, var(--seq-6) 83.333% 100%
+  );
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* Il "dato non disponibile" non e' un valore basso: va detto con un grigio
+ * fuori rampa, altrimenti si legge come il gradino piu' pallido. */
+body.ds .map-legend__swatch {
+  background: var(--data-null);
+  border: 1px solid var(--line-soft);
+  border-radius: 2px;
+}
+
+/* Il confine fra regioni e' il colore della carta, cosi' i gradini restano
+ * separati anche fra due regioni adiacenti dello stesso gradino. */
+body.ds .indicator-map .rmap-region {
+  fill: var(--data-null);
+  stroke: var(--map-stroke);
+  stroke-width: 0.8;
+}
+
+/* La regione in evidenza si riconosce dal contorno, non da un riempimento:
+ * cambiarle il colore la toglierebbe dalla rampa e direbbe un valore falso. */
+body.ds .indicator-map [data-key].is-selected {
+  stroke: var(--data-focus);
+  stroke-width: 2.4;
+  paint-order: stroke;
+}
+
+/* --- la classifica ------------------------------------------------------- */
+
+/* Le barre erano `var(--ink)`, che sotto `body.ds` e' il nero del testo: una
+ * barra di dati dipinta col colore del testo pesa piu' del testo che la
+ * spiega. Il design system ha un livello apposta per la serie di contesto
+ * (--cmp-*), e tiene il corallo per la riga in evidenza. */
+body.ds .ranking-row .bar {
+  background: var(--surface-sunk);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+body.ds .ranking-row .bar i {
+  background: var(--cmp-2);
+}
+
+body.ds .ranking-row.is-active .bar i {
+  background: var(--data-focus);
+}
+
+/* --- la copertina generata ----------------------------------------------- */
+
+/* Stessa ragione delle barre della classifica: la migliore e la peggiore si
+ * distinguono, il resto e' contesto. */
+body.ds .indicator-cover__bar-fill {
+  background: var(--cmp-2);
+}
+
+body.ds .indicator-cover__bar.is-best .indicator-cover__bar-fill {
+  background: var(--data-focus);
+}
+
+body.ds .indicator-cover__bar.is-worst .indicator-cover__bar-fill {
+  background: transparent;
+  border: 2px solid var(--data-focus);
+  box-sizing: border-box;
+}
+
+/* --- la freschezza ------------------------------------------------------- */
+
+/* `#8a6a1f` era cotto in site.css. Il design system ha gia' il giallo di
+ * avviso, che nel tema scuro si schiarisce invece di restare illeggibile. */
+body.ds .freshness-badge.is-dated,
+body.ds .freshness-badge.is-stale {
+  color: var(--warning-text);
+  border-color: var(--warning-text);
+}
+
+body.ds .freshness-badge.is-fresh,
+body.ds .freshness-badge.is-recent {
+  color: var(--success-text);
+  border-color: var(--success-text);
+}
+
+/* --- continua da qui ----------------------------------------------------- */
+
+/* Sei blocchi di navigazione impilati facevano leggere la scheda come un menu.
+   Tre corsie sotto un'intestazione sola tengono gli stessi link senza
+   ripetere sei volte "ecco dell'altro". */
+body.ds .indicator-next { margin-top: var(--space-12, 48px); }
+body.ds .indicator-next__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-6, 24px);
+  align-items: start;
+}
+
+/* La prima corsia e' piu' larga perche' porta le schede con la sparkline, le
+   altre due solo elenchi di link. */
+body.ds .indicator-next__lane { min-width: 0; }
+body.ds .indicator-next__lane .section-label { margin: 0 0 var(--space-3, 12px); }
+
+/* Le tre schede correlate stanno in colonna dentro la loro corsia, non piu'
+   in una griglia larga quanto la pagina. */
+body.ds .indicator-next__related {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2, 8px);
+  margin: 0 0 var(--space-3, 12px);
+}
+
+body.ds .indicator-next__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1, 4px);
+}
+body.ds .indicator-next__links li { min-width: 0; }
+body.ds .indicator-next__links a {
+  display: block;
+  padding: var(--space-2, 8px) 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+body.ds .indicator-next__links a:hover { color: var(--accent-text, var(--accent)); text-decoration: none; }
+body.ds .indicator-next__links small { display: block; color: var(--muted); font-family: var(--font-mono); font-size: 11.5px; }
+
+@media (max-width: 960px) {
+  body.ds .indicator-next__grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-8, 32px); }
+}
