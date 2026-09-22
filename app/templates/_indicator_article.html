@@ -21,36 +21,28 @@
 {%- elif item -%}{{ item.name }}{%- endif -%}
 {%- endmacro %}
 
-{# La dichiarazione di generazione automatica, richiesta dall'articolo 50(4)
-   dell'AI Act, in vigore dal 2 agosto 2026. L'obbligo riguarda chi pubblica un
-   testo "with the purpose of informing the public on matters of public
-   interest", e l'esenzione è **cumulativa**: revisione o controllo editoriale
-   umano E una persona fisica o giuridica che detenga la responsabilità
-   editoriale. Una catena a zero tempo umano per articolo non può invocarla,
-   quindi la dichiarazione non è una scelta.
+{# Come nasce il testo non sta piu' qui dentro.
 
-   Compare **solo se una parte del testo è autorata**, cioè scritta da un
-   modello: le sezioni composte qui dentro sono template deterministici sui
-   dati della fonte e non sono generate nel senso della norma. Dire il
-   contrario sarebbe impreciso in eccesso, che su una pagina di dati pubblici
-   costa fiducia quanto dirlo in difetto.
+   Ci stava come paragrafo in coda all'articolo, e diceva che la scheda era
+   "scritta automaticamente ... e pubblicata senza riscrittura umana". Era
+   vero quando lo abbiamo scritto, perche' allora nessuno leggeva il pezzo
+   prima che uscisse, e serviva all'articolo 50(4) dell'AI Act.
 
-   Sta in fondo all'articolo e non in una policy perché il comma 5 chiede
-   "a clear and distinguishable manner at the latest at the time of the first
-   ... exposure". #}
-{% macro dichiarazione(article) %}
-{% set autorate = article.sections | selectattr('authored') | list %}
-{% if autorate or article.lead %}
-<p class="page-note indicator-article__disclosure">
-  Il testo di questa scheda è scritto automaticamente a partire dai dati della
-  fonte e da citazioni verificate, e pubblicato senza riscrittura umana.
-  I numeri sono ricalcolati dalla fonte a ogni verifica.
-  <a href="/metodologia#come-nasce-il-testo">Come nasce il testo, e chi ne risponde</a>.
-</p>
-{% endif %}
-{% endmacro %}
+   Non lo e' piu': nessuna scheda arriva online senza che una persona approvi
+   la proposta di modifica che la porta, e quella persona risponde di quello
+   che si legge. L'esenzione del comma 4 e' cumulativa e chiede "human review
+   **or editorial control**" piu' qualcuno che detenga la responsabilita'
+   editoriale: il controllo c'e', la responsabilita' e' dichiarata.
 
+   Dove e' finita: nell'apparato di `indicator_page.html`, accanto a "Come e'
+   calcolato", che e' gia' il posto dove la pagina dice come e' fatta. La
+   trasparenza resta e resta su ogni scheda, ma smette di stare dentro il
+   racconto, dove era l'unica frase identica su trecento pagine.
 
+   La distinzione che quel blocco fa, e che va tenuta: le sezioni composte qui
+   sotto sono template deterministici sui dati della fonte e non sono generate
+   nel senso della norma. Dire il contrario sarebbe impreciso in eccesso, che
+   su una pagina di dati pubblici costa fiducia quanto dirlo in difetto. #}
 {% macro body(article, meta, level) %}
 <div class="indicator-article prose">
   {% for section in article.sections %}
@@ -66,7 +58,6 @@
   {% elif section.role == 'limiti' %}{{ limiti(meta, level) }}
   {% endif %}
   {% endfor %}
-  {{ dichiarazione(article) }}
 </div>
 {% endmacro %}
 

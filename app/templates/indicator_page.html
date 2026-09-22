@@ -355,6 +355,20 @@
         <dt>Come è calcolato</dt>
         <dd>La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni.</dd>
       </div>
+      {# Come nasce la scheda. Era un paragrafo in coda all'articolo, dove
+         diceva la stessa frase su trecento pagine dentro il racconto. Qui sta
+         accanto a "Come e' calcolato", che e' il posto in cui questa pagina
+         dichiara come e' fatta, e dice una cosa diversa a seconda di che cosa
+         la scheda porta davvero: un testo scritto da un modello e approvato da
+         una persona, oppure frasi composte dal codice sui dati della fonte.
+         Chiamare generata la seconda sarebbe impreciso in eccesso. #}
+      <div class="apparatus-specs__row">
+        <dt>Come nasce questa scheda</dt>
+        <dd>I dati non sono generati: vengono dalla fonte qui sopra, ripubblicati senza correzioni, e le sintesi del cruscotto sono ricalcolate dal codice a ogni caricamento.
+          {%- if page_article.authored_count or page_article.lead %} Il racconto è scritto con l'aiuto di strumenti automatici a partire da quei dati e da citazioni verificate, e non va online senza l'approvazione di una persona, che ne risponde.
+          {%- else %} Le frasi che accompagnano i numeri sono composte dal codice a partire dai metadati della fonte, quindi non possono invecchiare rispetto ai dati.{% endif %}
+          <a href="/metodologia#come-nasce-il-testo">Come nasce il testo, e chi ne risponde</a>.</dd>
+      </div>
       {% if meta.quality_life_scored %}
       <div class="apparatus-specs__row">
         <dt>Qualità della vita</dt>
