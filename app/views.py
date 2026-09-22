@@ -129,7 +129,11 @@ PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
         # 404 o noindex, ed e' proprio il terzetto che un revisore esterno apre
         # per primo.
         {"path": "/chi-siamo", "content_type": "text/html", "marker": "Responsabilità editoriale", "kind": "html"},
-        {"path": "/contatti", "content_type": "text/html", "marker": "divarioitalia@protonmail.com", "kind": "html"},
+                # Il marcatore e' il `mailto:`, non l'indirizzo nudo. L'indirizzo nudo
+        # sopravvive nel JSON-LD anche quando Cloudflare offusca il link
+        # visibile, quindi cercare quello avrebbe dato verde su una pagina in
+        # cui nessuno riesce piu' a scrivere.
+        {"path": "/contatti", "content_type": "text/html", "marker": "mailto:divarioitalia@protonmail.com", "kind": "html"},
         {"path": "/privacy", "content_type": "text/html", "marker": "Pubblicità", "kind": "html"},
         {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html", "markdown_marker": "# Tasso di turisticità"},
         {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html", "markdown_marker": "# Lombardia: profilo territoriale"},
