@@ -234,12 +234,23 @@ def visible_sources(entry):
     Ora si parlano qui, in un posto solo: ciò che la prosa attribuisce non può
     restare invisibile, perché non c'è un passo umano che lo trascriva.
     """
-    authored = [item for item in (entry.get("fonti") or []) if isinstance(item, dict)]
-    known = {item.get("url") for item in authored}
+    authored = [dict(item) for item in (entry.get("fonti") or []) if isinstance(item, dict)]
+    # Per url, la fonte autorata che quell'url ha gia' portato in elenco. Non un
+    # insieme di url: sull'url che coincide la citazione **vince sull'etichetta**
+    # invece di sparire. La quarta guardia di `motore verifica` impone che ogni
+    # url linkato nella prosa stia anche in `fonti`, quindi l'url di
+    # un'affermazione del corpus citata nel testo ci sta **sempre**, e scartarla
+    # per quello scartava tutte le citazioni di ogni pezzo che le linkava: su
+    # ter-901 in pagina restavano i due titoli e nessuna citazione, mentre
+    # `motore verifica` diceva `spiegazione.zero: false` perche' i claim erano
+    # nell'entry. Il difetto stava nello spazio fra i due controlli.
+    per_url = {}
+    for item in authored:
+        per_url.setdefault(item.get("url"), item)
     registry = context.sources()
     derived = []
     for claim in context.claims():
-        if claim.get("id") not in cited_claims(entry) or claim.get("url") in known:
+        if claim.get("id") not in cited_claims(entry):
             continue
         institution = (registry.get(claim.get("source_id")) or {}).get(
             "institution") or claim.get("source_id") or ""
@@ -252,10 +263,27 @@ def visible_sources(entry):
         # mostrare intera resta l'istituzione con il proprio link, che è la
         # provenienza vera: il lettore la legge alla fonte.
         quote = context.for_quote((claim.get("quote") or "").strip())
-        testo = (f"{institution}. «{quote}»".strip() if quote and context.quotable(quote)
-                 else institution.strip())
-        derived.append({"testo": testo, "url": claim.get("url")})
-        known.add(claim.get("url"))
+        if not (quote and context.quotable(quote)):
+            # Senza una citazione mostrabile non c'e' niente da aggiungere a una
+            # fonte gia' in elenco, e da sola resta l'istituzione con il suo link.
+            if claim.get("url") in per_url:
+                continue
+            voce = {"testo": institution.strip(), "url": claim.get("url")}
+            derived.append(voce)
+            per_url[claim.get("url")] = voce
+            continue
+        gemella = per_url.get(claim.get("url"))
+        if gemella is not None:
+            # L'etichetta autorata dice **quale documento e'** (titolo, data,
+            # anni coperti) e la citazione dice **che cosa quel documento
+            # sostiene**: le due non si sostituiscono, si sommano, e la seconda
+            # e' la sola che il lettore non puo' ricavare dalla pagina.
+            etichetta = (gemella.get("testo") or institution).strip().rstrip(".")
+            gemella["testo"] = f"{etichetta}. «{quote}»"
+            continue
+        voce = {"testo": f"{institution}. «{quote}»".strip(), "url": claim.get("url")}
+        derived.append(voce)
+        per_url[claim.get("url")] = voce
     return authored + derived
 
 
