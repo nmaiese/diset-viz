@@ -43,6 +43,10 @@
 }
 </script>
 {{ breadcrumb.jsonld(percorso, site_url) }}
+{# Lo stesso filtro delle pagine regione, lo stesso file: la tabella e' gia'
+   resa dal server, questo aggiunge solo ricerca, filtri e ordinamento. Uno
+   script per provincia sarebbe un secondo esploratore che diverge dal primo. #}
+<script src="{{ url_for('static', filename='js/region-explorer.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -56,6 +60,7 @@
       Con il profilo {{ p.profile.name | lower }}, {{ p.name }} ottiene {{ p.score | replace('.', ',') }} su 100.
       {% if p.strongest %}Va meglio su {{ p.strongest[0].name | lower }}{% endif %}{% if p.weakest %} e peggio su {{ p.weakest[0].name | lower }}{% endif %}.
       {% if p.region_path %}Il profilo della sua regione è in <a href="{{ p.region_path }}">{{ p.region }}</a>.{% endif %}
+      {% if indicatori %}Più sotto ci sono i valori veri di tutti i {{ indicatori | length }} indicatori misurati qui, con l'anno e la posizione fra le province.{% endif %}
     </p>
   </header>
 
@@ -88,6 +93,137 @@
     </table>
     <p class="page-note">Punteggi da 0 a 100 sul profilo {{ p.profile.name | lower }}, dove 50 è la media delle {{ p.total }} province. Non è una classifica ufficiale.</p>
   </section>
+
+  {% if indicatori %}
+  {# La risposta vera della pagina, e per un anno non c'era.
+     Chi cerca "speranza di vita provincia di Lecce" vuole il numero di anni,
+     e questa pagina mostrava solo punteggi da 0 a 100 standardizzati sulle
+     103 province: dicono dove sta rispetto alle altre, non quanto vale. Il
+     dato era gia' in casa, 479 righe per ogni provincia nel BES dei
+     Territori, e non lo leggeva nessuno. #}
+  {% set aree = indicatori | map(attribute='macro_area') | unique | sort | list %}
+  {% set temi = indicatori | map(attribute='theme') | unique | sort | list %}
+  <section class="profile-explorer" id="explorer" data-region="{{ p.name }}">
+    <h2>Tutti gli indicatori misurati a {{ p.name }}</h2>
+    <p class="page-note">I {{ indicatori | length }} indicatori del BES dei Territori con un dato per {{ p.name }}: quanto valgono, in che anno, e in che posizione fra le province che quell'anno hanno un dato (1 è la migliore). Il movimento è di posizione, non di valore, e confronta l'ultimo anno disponibile con quello prima.</p>
+
+    <div class="explorer-toolbar">
+      <div class="macro-pills" role="group" aria-label="Filtra per area">
+        <button type="button" class="macro-pill is-active" data-macro="">Tutte le aree</button>
+        {% for area in aree %}
+        <button type="button" class="macro-pill" data-macro="{{ area }}">{{ area }}</button>
+        {% endfor %}
+      </div>
+      <div class="explorer-controls">
+        <label class="explorer-search">
+          <input type="search" id="explorer-search" placeholder="Cerca un indicatore..." aria-label="Cerca un indicatore">
+        </label>
+        <label class="explorer-field">
+          <span>Tema</span>
+          <select id="explorer-theme">
+            <option value="">Tutti</option>
+            {% for t in temi %}<option value="{{ t }}">{{ t }}</option>{% endfor %}
+          </select>
+        </label>
+        <label class="explorer-field">
+          <span>Ordina</span>
+          <select id="explorer-sort">
+            <option value="rank">Posizione</option>
+            <option value="movement">Movimento</option>
+            <option value="az">A-Z</option>
+            <option value="theme">Tema</option>
+          </select>
+        </label>
+      </div>
+      <p class="explorer-count"><strong id="explorer-shown">{{ indicatori | length }}</strong> indicatori</p>
+    </div>
+
+    <div class="explorer-table-wrap">
+    <table class="data-table explorer-table" id="explorer-table">
+      <thead><tr>
+        <th>Indicatore</th><th>Tema</th><th class="num">Valore</th>
+        <th class="num">Posizione</th><th class="num">Movimento</th>
+      </tr></thead>
+      <tbody>
+        {% for i in indicatori %}
+        <tr data-name="{{ i.name | lower }}" data-theme="{{ i.theme }}" data-macro="{{ i.macro_area }}"
+            data-movement="{{ i.movement if i.movement is not none else '' }}"
+            data-rank="{{ i.rank if i.rank is not none else '' }}">
+          <td><a href="{{ i.path }}">{{ i.name }}</a></td>
+          <td class="explorer-theme">{{ i.theme }}</td>
+          <td class="num">{{ i.value | it_num }} <small>{{ i.unit }} · {{ i.year }}</small></td>
+          <td class="num">
+            <strong>{{ i.rank }}</strong><small>/{{ i.province_count }}</small>
+            {% if i.in_regione %}<small>{{ i.in_regione.posizione }}ª di {{ i.in_regione.quante }} in {{ p.region }}</small>{% endif %}
+          </td>
+          <td class="num">
+            {% if i.movement %}<span class="movement-tag {{ 'is-up' if i.movement > 0 else 'is-down' }}">{{ '+' if i.movement > 0 else '' }}{{ i.movement }}</span>
+            {% elif i.movement == 0 %}<span class="page-note">=</span>
+            {% else %}<span class="page-note">-</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <p class="explorer-empty" id="explorer-empty" hidden>Nessun indicatore corrisponde ai filtri scelti.</p>
+  </section>
+  {% endif %}
+
+  {% if prime_in_regione or ultime_in_regione %}
+  {# La domanda a cui la classifica nazionale non risponde. Una provincia
+     novantesima su 103 puo' essere la prima della sua regione, e per chi ci
+     vive quella e' l'informazione utile. Il confronto e' fra province della
+     stessa regione, mai con il valore regionale: sono due letture diverse
+     della stessa misura. #}
+  <div class="profile-quad profile-quad--two">
+    <section class="profile-card profile-strong">
+      <h2>Prima della sua regione</h2>
+      {% if prime_in_regione %}
+      <ul class="theme-chips">
+        {% for i in prime_in_regione %}
+        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.value | it_num }} {{ i.unit }}, {{ i.year }}</small></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="page-note">Su nessuno degli indicatori misurati {{ p.name }} è la prima fra le province {{ 'di ' ~ p.region if p.region }}.</p>
+      {% endif %}
+    </section>
+    <section class="profile-card profile-weak">
+      <h2>Ultima della sua regione</h2>
+      {% if ultime_in_regione %}
+      <ul class="theme-chips">
+        {% for i in ultime_in_regione %}
+        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.value | it_num }} {{ i.unit }}, {{ i.year }}</small></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="page-note">Su nessuno degli indicatori misurati {{ p.name }} è l'ultima fra le province {{ 'di ' ~ p.region if p.region }}.</p>
+      {% endif %}
+    </section>
+  </div>
+  {% endif %}
+
+  {% if movimenti_su or movimenti_giu %}
+  <div class="profile-quad profile-quad--two">
+    <section class="profile-card profile-strong">
+      <h2>Dove ha guadagnato posizioni</h2>
+      <ul class="theme-chips">
+        {% for i in movimenti_su %}
+        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>+{{ i.movement }} posizioni, {{ i.rank }}ª nel {{ i.year }}</small></li>
+        {% endfor %}
+      </ul>
+    </section>
+    <section class="profile-card profile-weak">
+      <h2>Dove ne ha perse</h2>
+      <ul class="theme-chips">
+        {% for i in movimenti_giu %}
+        <li><a href="{{ i.path }}">{{ i.name }}</a> <small>{{ i.movement }} posizioni, {{ i.rank }}ª nel {{ i.year }}</small></li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+  {% endif %}
 
   <div class="profile-quad profile-quad--two">
     <section class="profile-card profile-strong">
@@ -137,6 +273,12 @@
         <dt>Copertura</dt>
         <dd>{{ (p.coverage * 100) | round | int }}% degli indicatori del punteggio ha un dato per {{ p.name }}.</dd>
       </div>
+      {% if indicatori %}
+      <div class="apparatus-specs__row">
+        <dt>I valori e le posizioni</dt>
+        <dd>I valori della tabella sono quelli pubblicati dalla fonte, senza riscalature: il punteggio da 0 a 100 delle dimensioni è un'altra cosa e serve solo a mettere in fila le province. Ogni posizione è calcolata fra le province che quell'anno hanno un dato per quell'indicatore, quindi il denominatore cambia da riga a riga, e a pari valore corrisponde pari posizione. Il confronto dentro la regione è fra province della stessa regione, mai con il valore regionale: livello provinciale e livello regionale sono due letture diverse della stessa misura.</dd>
+      </div>
+      {% endif %}
     </dl>
   </section>
 </main>

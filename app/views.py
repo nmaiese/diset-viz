@@ -1162,20 +1162,35 @@ def province_page(province_key):
 
     Il dato c'era tutto, mancava la superficie: `province_profile` non calcola
     niente di nuovo, mette in forma cio' che `quality_life_bes` gia' produce.
+
+    E per un anno la pagina ha mostrato **solo punteggi**, da 0 a 100,
+    standardizzati sulle 103 province. Chi cercava "speranza di vita provincia
+    di Lecce" arrivava su una pagina che non conteneva il numero di anni,
+    mentre il BES dei Territori ne porta 479 righe per ogni provincia.
+    `province_profile.indicatori` legge quelle.
     """
     profilo = province_profile.profilo(province_key)
     if profilo is None:
         abort(404)
+    righe = province_profile.indicatori(province_key)
+    su, giu = province_profile.movimenti(righe)
+    prime, ultime = province_profile.dentro_la_regione(righe)
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
             agent_discovery.province_markdown(
-                profilo, province_profile.vicine(province_key), SITE_URL),
+                profilo, province_profile.vicine(province_key), SITE_URL,
+                indicatori=righe),
             f"{SITE_URL}/provincia/{province_key}",
         )
     return render_template(
         "province_page.html",
         profile=profilo,
         vicine=province_profile.vicine(province_key),
+        indicatori=righe,
+        movimenti_su=su,
+        movimenti_giu=giu,
+        prime_in_regione=prime,
+        ultime_in_regione=ultime,
         seo_description=_descrizione_provincia(profilo),
         seo_title=_titolo_provincia(profilo),
         site_url=SITE_URL,

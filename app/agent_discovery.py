@@ -610,12 +610,14 @@ def region_markdown(profile, site_url):
     return "\n".join(lines)
 
 
-def province_markdown(profilo, vicine, site_url):
+def province_markdown(profilo, vicine, site_url, indicatori=None):
     """La stessa pagina provincia, per chi chiede `text/markdown`.
 
     HTML e Markdown sono lo stesso documento alla stessa URL: una variante che
     non porta la risposta principale della pagina e' una pagina diversa con lo
-    stesso canonico.
+    stesso canonico. Per questo la tabella dei valori veri sta anche qui: da
+    quando c'e', la risposta principale di questa pagina non e' piu' il
+    punteggio ma quanto vale ogni indicatore in questa provincia.
     """
     lines = [
         f"# {profilo['name']}, qualita' della vita",
@@ -652,6 +654,20 @@ def province_markdown(profilo, vicine, site_url):
             for voce in elenco:
                 anno = f" ({voce['year_max']})" if voce.get("year_max") else ""
                 lines.append(f"- [{voce['name']}]({_absolute(site_url, voce['path'])}){anno}")
+
+    if indicatori:
+        lines += ["", f"## Tutti gli indicatori misurati per {profilo['name']}", "",
+                  f"{len(indicatori)} indicatori del BES dei Territori, con il valore "
+                  "vero, l'anno e la posizione fra le province che quell'anno hanno "
+                  "un dato. 1 e' la posizione migliore.",
+                  "",
+                  "| indicatore | valore | anno | posizione |", "| --- | ---: | ---: | ---: |"]
+        for voce in indicatori:
+            unita = f" {voce['unit']}" if voce.get("unit") else ""
+            lines.append(
+                f"| [{voce['name']}]({_absolute(site_url, voce['path'])}) "
+                f"| {voce['value']}{unita} | {voce['year']} "
+                f"| {voce['rank']} su {voce['province_count']} |")
 
     if vicine:
         lines += ["", "## Le province che le stanno intorno in classifica", ""]
