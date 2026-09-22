@@ -1,0 +1,60 @@
+{% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set active_nav = 'progetto' %}
+{% set percorso = [{'name': 'Divario Italia', 'path': '/'}, {'name': 'Termini', 'path': '/termini'}] %}
+
+{% block title %}Termini di uso | {{ site_name }}{% endblock %}
+{% block description %}Condizioni d'uso di Divario Italia: che cosa si può riprendere, con quale licenza, e che cosa questo sito non è.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {{ publisher_jsonld | safe }},
+    {
+      "@type": "WebPage",
+      "name": "Termini di uso",
+      "url": {{ canonical | tojson }},
+      "publisher": { "@id": {{ publisher['@id'] | tojson }} },
+      "isPartOf": { "@type": "WebSite", "url": "{{ site_url }}/" }
+    }
+  ]
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% endblock %}
+
+{% block content %}
+<article class="page prose-wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
+  <h1>Termini di uso</h1>
+  <p class="page-lead">Divario Italia è un sito di consultazione libera. Non serve registrarsi per leggerlo, e non c'è niente a pagamento.</p>
+
+  <section>
+    <h2>Che cosa non è questo sito</h2>
+    <p>Divario Italia non è un'autorità statistica e non sostituisce le pubblicazioni ufficiali delle istituzioni che cita. Ripubblica dati pubblici, ne calcola sintesi dichiarate e li racconta. Per un uso che ha conseguenze, per esempio un atto amministrativo, una tesi o un articolo che deve reggere a una verifica, il riferimento resta la fonte primaria, che ogni scheda indica con il suo collegamento.</p>
+    <p>Niente di quello che si legge qui è un parere professionale, medico, legale o finanziario.</p>
+  </section>
+
+  <section>
+    <h2>I dati</h2>
+    <p>I dati non sono nostri. Vengono dalle istituzioni dichiarate su ogni scheda, in gran parte Istat ed Eurostat, e restano soggetti alla loro licenza, che per i dati pubblicati qui è <a href="{{ data_license_url }}" target="_blank" rel="noopener noreferrer">{{ data_license_label }}</a>. Chi li riprende cita la fonte primaria, non noi.</p>
+  </section>
+
+  <section>
+    <h2>Le elaborazioni, le visualizzazioni e i testi</h2>
+    <p>La selezione degli indicatori, i calcoli derivati, i grafici, le mappe e i testi sono di Divario Italia. Si possono riprendere e citare indicando il sito e la pagina: la forma esatta sta in <a href="/chi-siamo#come-citare">Chi siamo</a>. Quello che chiediamo è di non riprodurre interi blocchi di pagine come se fossero contenuto proprio, e di non presentare una nostra elaborazione come un dato ufficiale della fonte.</p>
+  </section>
+
+  <section>
+    <h2>Disponibilità ed errori</h2>
+    <p>Il sito si aggiorna quando le fonti pubblicano, e non promette di essere raggiungibile senza interruzioni. Un errore in una cifra o in un testo si corregge appena è verificato: <a href="/contatti">come segnalarlo</a>. Non rispondiamo delle decisioni prese sulla base di quello che si legge qui, e una pagina non è una consulenza.</p>
+  </section>
+
+  <section>
+    <h2>Collegamenti esterni e pubblicità</h2>
+    <p>Le pagine rimandano a siti di istituzioni e di altri soggetti, che applicano le proprie regole e le proprie informative. Il sito ospita annunci pubblicitari: che dati vengano trattati per mostrarli, e come si nega il consenso, sta in <a href="/privacy">Privacy e cookie</a>.</p>
+  </section>
+</article>
+{% endblock %}

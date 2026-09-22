@@ -1,28 +1,54 @@
 {% extends "blog_base.html" %}
+{% set active_nav = 'progetto' %}
 
 {% block title %}Privacy e cookie · {{ site_name }}{% endblock %}
-{% block description %}Informazioni su privacy, cookie e Google Analytics per Divario Italia.{% endblock %}
+{% block description %}Chi tratta i dati di Divario Italia, che cosa raccoglie il sito, come funzionano gli annunci pubblicitari e i cookie, e come si nega o si revoca il consenso.{% endblock %}
 
 {% block content %}
 <main class="prose prose-wrap article-hero" id="contenuto">
   <nav class="breadcrumb"><a href="/">Divario Italia</a> / Privacy e cookie</nav>
   <h1>Privacy e cookie</h1>
-  <p>Divario Italia è un progetto informativo basato su dati pubblici Istat. La consultazione del sito e i giochi restano usabili senza registrazione. L'accesso con un account è facoltativo e abilita funzioni personali (preferiti, statistiche e traguardi dei giochi legati al tuo profilo).</p>
+  <p>Divario Italia è un progetto informativo basato su dati pubblici. La consultazione del sito e i giochi restano usabili senza registrazione. L'accesso con un account è facoltativo e abilita funzioni personali (preferiti, statistiche e traguardi dei giochi legati al tuo profilo).</p>
+  <p>Questa pagina dice chi tratta i dati, quali, perché, e come si dice di no.</p>
+
+  <h2>Chi tratta i dati</h2>
+  <p>Il titolare del trattamento è Divario Italia, che pubblica questo sito. Per qualsiasi richiesta sui tuoi dati, compreso l'esercizio dei diritti descritti più sotto, si scrive a <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>. Gli altri recapiti stanno in <a href="/contatti">Contatti</a>.</p>
 
   <h2>Account e accesso con Google</h2>
   <p>Puoi creare un account accedendo con Google. L'autenticazione è gestita da <strong>Supabase</strong> (Supabase Inc.), che agisce come responsabile del trattamento per conto nostro: gestisce l'accesso e conserva i dati dell'account su un database nell'Unione Europea. Con l'accesso trattiamo il tuo <strong>indirizzo email</strong> e un <strong>identificativo utente</strong> (UUID) forniti da Google tramite Supabase, più un <strong>nickname pubblico</strong> che scegli tu. A questo profilo colleghiamo, se le usi, le funzioni account: indicatori preferiti, statistiche e traguardi dei minigiochi, confronti salvati, e i tuoi punteggi in classifica.</p>
   <p>La sessione di accesso è tenuta dal browser (nell'archivio locale del sito, non tramite cookie di profilazione). Non trattiamo password: l'autenticazione avviene presso Google. Puoi uscire in qualsiasi momento dal menu in alto. Puoi <strong>esportare o cancellare</strong> i tuoi dati account dalla pagina del tuo account: la cancellazione elimina le righe collegate e l'utente su Supabase.</p>
+  <p>La base giuridica è il contratto, cioè la fornitura delle funzioni che hai chiesto creando l'account. Senza account nessuno di questi dati esiste.</p>
 
   <h2>Statistiche</h2>
-  <p>Se configurato in produzione, il sito usa Google Analytics 4 per capire quali pagine vengono consultate e migliorare l'esperienza di navigazione. Il caricamento avviene con Consent Mode e resta subordinato alla scelta espressa nel banner cookie.</p>
-  <p>Per misurare il funzionamento dell'atlante raccogliamo anche eventi tecnici first-party, come apertura di un indicatore, cambio anno, cambio regione o filtro usato. Questi eventi non usano cookie, non includono identificatori utente e servono solo in forma operativa e aggregata.</p>
+  <p>In produzione il sito usa Google Analytics 4 per capire quali pagine vengono consultate e migliorare la navigazione. Il caricamento avviene con Consent Mode e resta subordinato alla scelta espressa nel pannello dei consensi. La base giuridica è il consenso.</p>
+  <p>Per misurare il funzionamento dell'atlante raccogliamo anche eventi tecnici di prima parte, come apertura di un indicatore, cambio anno, cambio regione o filtro usato. Questi eventi non usano cookie, non includono identificatori utente e servono solo in forma operativa e aggregata.</p>
+
+  <h2 id="pubblicita">Pubblicità</h2>
+  <p>Il sito ospita annunci pubblicitari, ed è così che si mantiene. Gli annunci sono forniti da <strong>Google</strong> attraverso AdSense, che li carica dal dominio <code>pagead2.googlesyndication.com</code>. Google e i suoi partner possono usare cookie e identificatori per scegliere gli annunci, per misurarne la visualizzazione e per limitare quante volte vedi lo stesso.</p>
+  <p>Gli annunci possono essere <strong>personalizzati</strong> o <strong>non personalizzati</strong>. Personalizzati vuol dire scelti anche in base alla tua attività di navigazione, e succede soltanto se lo consenti. Non personalizzati vuol dire scelti in base al contenuto della pagina e a poco altro, e restano anche quando rifiuti: quella scelta toglie la profilazione, non la pubblicità.</p>
+  <p>Insieme a Google possono trattare dati altri fornitori pubblicitari aderenti al quadro europeo di trasparenza e consenso del settore (il Transparency and Consent Framework di IAB Europe). L'elenco di chi è, finalità per finalità, si legge e si modifica dentro il pannello dei consensi, alla voce dei fornitori.</p>
+  <p><strong>Finché non dai il consenso non partono né profilazione né cookie pubblicitari.</strong> Il sito imposta come stato di partenza, su ogni pagina e prima di qualsiasi altro script, il diniego per l'archiviazione pubblicitaria, per i dati utente a fini pubblicitari e per la personalizzazione, e attiva la riduzione dei dati inviati agli annunci. Questi stati cambiano solo dopo una tua scelta esplicita.</p>
+  <p>Come Google usa i dati raccolti sui siti che ne sono partner è descritto nella sua <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">informativa per i siti partner</a>. La personalizzazione degli annunci si può disattivare per il proprio account Google dalle <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">impostazioni annunci</a>, indipendentemente da questo sito.</p>
+
+  <h2 id="cookie">Cookie e scelta sul consenso</h2>
+  <p>I cookie e le tecnologie simili usate qui si dividono in tre gruppi:</p>
+  <ul>
+    <li><strong>Tecnici</strong>: tengono la sessione di accesso, il tema chiaro o scuro e la tua scelta sul consenso. Servono a far funzionare il sito e non chiedono consenso.</li>
+    <li><strong>Di misurazione</strong>: Google Analytics 4, per contare le pagine viste. Partono solo con il consenso.</li>
+    <li><strong>Pubblicitari</strong>: Google AdSense e i fornitori del quadro europeo di trasparenza e consenso. Partono solo con il consenso, e la personalizzazione è una scelta a parte dalla pubblicità in sé.</li>
+  </ul>
+  <p>Il consenso si accetta, si rifiuta o si modifica dal pannello {{ consent_cmp_name }}, la piattaforma che usiamo per raccoglierlo. La scelta resta salvata nel browser e si può cambiare in qualsiasi momento con il pulsante qui sotto, senza dover ritrovare questa pagina.</p>
+  {% include "_funding_choices_revoke.html" %}
+
+  <h2>I tuoi diritti</h2>
+  <p>Puoi chiedere di accedere ai tuoi dati, di correggerli, di cancellarli, di riceverli in un formato leggibile da una macchina, di limitarne il trattamento e di opporti. Puoi revocare in ogni momento un consenso che hai dato, e la revoca non tocca quello che è successo prima. Per i dati dell'account l'esportazione e la cancellazione si fanno da soli, dalla pagina del proprio account. Per tutto il resto si scrive a <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>.</p>
+  <p>Se pensi che qualcosa non vada puoi rivolgerti al <a href="https://www.garanteprivacy.it/" target="_blank" rel="noopener noreferrer">Garante per la protezione dei dati personali</a>.</p>
+
+  <h2>Per quanto tempo</h2>
+  <p>I dati dell'account restano finché l'account esiste, e spariscono con la cancellazione. I dati di misurazione restano per il periodo di conservazione impostato su Google Analytics 4 e servono solo in forma aggregata. I cookie hanno ciascuno la propria durata, indicata nel pannello dei consensi.</p>
 
   <h2>Contenuti incorporati e link esterni</h2>
-  <p>Alcune pagine possono includere link verso siti esterni, per esempio Istat o repository pubblici. Quei siti applicano le proprie informative.</p>
-
-  <h2>Scelta sul consenso</h2>
-  <p>Puoi accettare, rifiutare o modificare il consenso tramite il pannello privacy gestito da Google. La scelta viene salvata nel browser e può essere aggiornata in qualsiasi momento.</p>
-  {% include "_funding_choices_revoke.html" %}
+  <p>Alcune pagine rimandano a siti esterni, per esempio Istat, Eurostat o archivi pubblici. Quei siti applicano le proprie informative, e questa non vale per loro.</p>
 </main>
 {% endblock %}
 

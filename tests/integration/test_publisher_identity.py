@@ -1,6 +1,7 @@
 import json
 import re
 import unittest
+from pathlib import Path
 
 from app import app, publisher
 
@@ -59,6 +60,73 @@ class PublisherIdentityTest(unittest.TestCase):
         self.assertIn(dataset["dateModified"], visible)
         self.assertEqual(dataset["publisher"], publisher.ORGANIZATION)
         self.assertIn(publisher.CORRECTIONS_URL, visible)
+
+
+class IlContattoEsisteDavvero(unittest.TestCase):
+    """Fino al 22 settembre 2026 il sito non aveva un indirizzo.
+
+    L'unico contatto era un issue tracker, e /chi-siamo lo presentava come "il
+    contatto operativo del progetto". Per chi legge non e' un contatto, e per
+    chi verifica un sito dall'esterno non lo e' affatto: apre /contatti, non
+    trova la pagina, e si ferma li'.
+    """
+
+    def setUp(self):
+        self.client = app.test_client()
+
+    def test_la_pagina_esiste_e_mostra_l_indirizzo_in_chiaro(self):
+        risposta = self.client.get("/contatti")
+        self.assertEqual(risposta.status_code, 200)
+        testo = risposta.get_data(as_text=True)
+        self.assertIn(publisher.CONTACT_EMAIL, testo)
+        self.assertIn(f"mailto:{publisher.CONTACT_EMAIL}", testo,
+                      "l'indirizzo va in un mailto in chiaro, non composto da JavaScript")
+
+    def test_il_dato_strutturato_non_promette_un_recapito_che_la_pagina_non_da(self):
+        """Un `contactPoint` che nomina un indirizzo assente dalla pagina
+        visibile e' la stessa incoerenza fra JSON-LD e testo che il percorso
+        aveva gia' pagato una volta."""
+        contatto = publisher.ORGANIZATION["contactPoint"]
+        self.assertEqual(contatto["email"], publisher.CONTACT_EMAIL)
+        self.assertEqual(contatto["url"], "https://divarioitalia.it/contatti")
+        self.assertIn(contatto["email"], self.client.get("/contatti").get_data(as_text=True))
+
+    def test_sta_in_sitemap_e_nel_piede_di_ogni_guscio(self):
+        self.assertIn("<loc>https://divarioitalia.it/contatti</loc>",
+                      self.client.get("/sitemap.xml").get_data(as_text=True))
+        for percorso in ("/", "/atlante", "/confronto"):
+            with self.subTest(percorso=percorso):
+                html = self.client.get(percorso).get_data(as_text=True)
+                piede = re.search(r"<footer[^>]*>.*</footer>", html, re.S)
+                self.assertIsNotNone(piede, percorso)
+                for atteso in ("/contatti", "/chi-siamo", "/privacy"):
+                    self.assertIn(f'href="{atteso}"', piede.group(0),
+                                  f"{percorso}: il piede visibile non porta a {atteso}")
+
+
+class NessunLinkInternoPortaAUn404(unittest.TestCase):
+    """Il paragrafo "Chi ne risponde" della metodologia linkava `/about`.
+
+    Rotta che non esiste: chi andava a cercare chi risponde del sito trovava
+    una pagina non trovata, e nessuna prova lo vedeva. `nav.paths()` copre solo
+    le voci di menu, e quel link non era una voce di menu.
+    """
+
+    def test_ogni_href_interno_scritto_a_mano_nei_template_risponde(self):
+        client = app.test_client()
+        radice = Path(__file__).resolve().parents[2] / "app" / "templates"
+        visti = {}
+        for template in sorted(radice.rglob("*.html")):
+            for href in re.findall(r'href="(/[^"\s]*)"', template.read_text(encoding="utf-8")):
+                # Solo i percorsi letterali: quelli con Jinja dentro li decide
+                # il render, e li coprono le prove delle pagine che li usano.
+                if "{" in href or href.startswith("//"):
+                    continue
+                visti.setdefault(href.split("#")[0].split("?")[0], template.name)
+        for percorso, dove in sorted(visti.items()):
+            with self.subTest(percorso=percorso, template=dove):
+                self.assertNotEqual(client.get(percorso).status_code, 404,
+                                    f"{dove} manda a {percorso}, che non esiste")
 
 
 if __name__ == "__main__":

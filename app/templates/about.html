@@ -2,7 +2,7 @@
 {% set active_nav = 'progetto' %}
 
 {% block title %}Chi siamo | {{ site_name }}{% endblock %}
-{% block description %}Responsabilità editoriale, verifiche, fonti, correzioni, contatti, proprietà e istruzioni per citare Divario Italia.{% endblock %}
+{% block description %}Responsabilità editoriale, come verifichiamo, come si mantiene il progetto, fonti, correzioni, contatti e istruzioni per citare Divario Italia.{% endblock %}
 
 {% block head_extra %}
 <script type="application/ld+json">
@@ -26,29 +26,48 @@
 <article class="page prose-wrap" id="contenuto">
   <nav class="breadcrumb"><a href="/">Divario Italia</a></nav>
   <h1>Chi siamo</h1>
-  <p class="page-lead">Divario Italia è un progetto editoriale indipendente che rende consultabili e comprensibili dati pubblici sui territori italiani. Divario Italia è l'editore e il proprietario del progetto, delle elaborazioni e delle visualizzazioni, non dei dati originali.</p>
+  <p class="page-lead">Divario Italia è un progetto editoriale indipendente che rende consultabili e comprensibili dati pubblici sui territori italiani. Pubblica dal giugno 2026. Divario Italia è l'editore e il proprietario del progetto, delle elaborazioni e delle visualizzazioni, non dei dati originali.</p>
 
   <section>
     <h2>Responsabilità editoriale</h2>
     <p>Divario Italia sceglie gli indicatori, cura testi, calcoli e visualizzazioni e risponde della loro presentazione. Le istituzioni citate come fonti non partecipano alle scelte editoriali e non approvano le nostre interpretazioni.</p>
+    <p>La responsabilità di quello che si legge è di una persona, non di un sistema. Niente arriva online da solo: ogni pagina nuova e ogni modifica passano da una proposta di modifica che una persona approva, e quella persona risponde del risultato. <a href="/metodologia#come-nasce-il-testo">Come nasce il testo delle schede</a>.</p>
   </section>
+
+  <section>
+    <h2>Come scegliamo di che cosa scrivere</h2>
+    <p>L'atlante prova a coprire tutti gli indicatori territoriali delle fonti che usa, quindi la scelta non è su che cosa entra ma su che cosa si approfondisce per primo. L'ordine lo danno le domande che la gente fa davvero ai motori di ricerca, non quello che ci sembra interessante: si scrive prima sulle pagine che qualcuno sta già cercando e che oggi rispondono male.</p>
+    <p>Una pagina si ferma, e resta senza racconto, quando i dati non reggono la lettura che le si vorrebbe dare: una serie troppo corta, una copertura incompleta, una definizione che cambia negli anni. Meglio una scheda che mostra i numeri e tace, che un testo che spiega più di quanto la fonte permetta.</p>
+  </section>
+
   <section>
     <h2>Come verifichiamo</h2>
     <p>Ogni numero pubblicato deve essere ricostruibile dalla fonte indicata. Controlliamo definizione, unità, periodo, territorio e copertura. Separiamo i valori originali dalle elaborazioni e confrontiamo le variazioni solo su basi territoriali coerenti. I test automatici verificano anche pagine, download e dati strutturati.</p>
     <p><a href="/metodologia">Leggi il metodo completo e i limiti dei confronti</a>.</p>
   </section>
+
   <section>
     <h2>Fonti</h2>
     <p>Il catalogo usa fonti istituzionali dichiarate su ogni scheda, tra cui Istat ed Eurostat. Ogni dataset indica fonte primaria, anni disponibili, licenza e collegamento ai dati originali. Divario Italia non si presenta come autore dei dati raccolti da queste istituzioni.</p>
   </section>
+
+  <section id="come-si-mantiene">
+    <h2>Come si mantiene</h2>
+    <p>Divario Italia si mantiene con la pubblicità. Chi inserisce gli annunci non partecipa alle scelte editoriali, non sa quali pagine stiamo scrivendo e non può chiedere che una sia scritta in un modo o in un altro. Nessuna scheda e nessun articolo sono pagati da qualcuno, e non pubblichiamo contenuti sponsorizzati.</p>
+    <p>Che dati vengano trattati per mostrare gli annunci, e come si nega il consenso, sta in <a href="/privacy#pubblicita">Privacy e cookie</a>.</p>
+  </section>
+
   <section id="correzioni">
     <h2>Correzioni e contatto</h2>
-    <p>Correggiamo gli errori verificati appena possibile. Gli articoli mostrano la data di pubblicazione e quella dell'ultima revisione editoriale. Le schede dati mostrano la data di aggiornamento della fonte quando è disponibile.</p>
-    <p>Per segnalare un errore, <a href="{{ corrections_url }}">apri una segnalazione pubblica</a> indicando URL della pagina, passaggio o valore da controllare e, se possibile, la fonte corretta. Lo stesso percorso è il contatto operativo del progetto.</p>
+    <p>Si scrive a <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>. È l'indirizzo della redazione, e da lì arrivano le risposte. Gli altri modi per raggiungerci stanno in <a href="/contatti">Contatti</a>.</p>
+    <p>Per segnalare un errore indica l'indirizzo della pagina, il passaggio o il valore da controllare e, se possibile, la fonte corretta. Se preferisci che la segnalazione e la risposta restino leggibili da chiunque, puoi <a href="{{ corrections_url }}">aprire una segnalazione pubblica</a>.</p>
+    <p>Una segnalazione di errore ha la precedenza sul resto del lavoro. Una cifra sbagliata si corregge appena è verificata contro la fonte, e non aspetta il giro di aggiornamento successivo. Gli articoli mostrano la data di pubblicazione e quella dell'ultima revisione editoriale. Le schede dati mostrano la data di aggiornamento della fonte quando è disponibile, e quella data si muove da sola quando la fonte pubblica.</p>
   </section>
-  <section>
+
+  <section id="come-citare">
     <h2>Come citare</h2>
     <p>Per una pagina: <strong>Divario Italia, titolo della pagina, data di aggiornamento, URL, data di consultazione.</strong> Per un dato, aggiungi la fonte primaria e l'anno mostrati nella scheda. Esempio: <q>Fonte: Istat, nome indicatore, anno. Elaborazione e visualizzazione: Divario Italia, URL, consultato il giorno mese anno.</q></p>
+    <p>Non serve chiedere il permesso. Le condizioni per intero stanno nei <a href="/termini">termini di uso</a>.</p>
   </section>
 </article>
 {% endblock %}

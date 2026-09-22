@@ -8,6 +8,7 @@
    chiusura con Escape e il tema scuro. #}
 {% set nav_explore = active_nav in ('atlas', 'regioni', 'temi', 'divari', 'confronto') %}
 {% set nav_rank = active_nav == 'qualita-della-vita' %}
+{% set nav_project = active_nav == 'progetto' %}
 
 <a class="skiplink" href="#contenuto">Vai al contenuto</a>
 
@@ -30,7 +31,7 @@
       {% for voce in nav.PRIMARY %}
       {% if voce.group %}
       <details class="navlink" name="hdr-nav">
-        <summary{% if (voce.key == 'esplora' and nav_explore) or (voce.key == 'classifiche' and nav_rank) %} class="is-active"{% endif %}>{{ voce.label }}
+        <summary{% if (voce.key == 'esplora' and nav_explore) or (voce.key == 'classifiche' and nav_rank) or (voce.key == 'progetto' and nav_project) %} class="is-active"{% endif %}>{{ voce.label }}
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
         <div class="dropdown">
@@ -96,19 +97,18 @@
           </button>
         </div>
       </div>
+      {# Stesse voci della barra, dallo stesso elenco: il cassetto del telefono
+         e' la sola navigazione che quegli utenti vedono, e quando le due liste
+         erano scritte a mano perdeva pezzi per primo. Le tendine si ciclano,
+         non si nominano una a una: scritte `PRIMARY[0]` e `PRIMARY[1]`, la
+         terza sarebbe nata invisibile sul telefono. #}
+      {% for tendina in nav.PRIMARY if tendina.group %}
       <div class="drawer__group">
-        {# Stesse voci della barra, dallo stesso elenco: il cassetto del
-           telefono e' la sola navigazione che quegli utenti vedono, e quando le
-           due liste erano scritte a mano perdeva pezzi per primo. #}
-        <h4>{{ nav.PRIMARY[0].label }}</h4>
-        {% for sotto in nav.PRIMARY[0].group %}<a href="{{ sotto.path }}">{{ sotto.label }}</a>
+        <h4>{{ tendina.label }}</h4>
+        {% for sotto in tendina.group %}<a href="{{ sotto.path }}">{{ sotto.label }}</a>
         {% endfor %}
       </div>
-      <div class="drawer__group">
-        <h4>{{ nav.PRIMARY[1].label }}</h4>
-        {% for sotto in nav.PRIMARY[1].group %}<a href="{{ sotto.path }}">{{ sotto.label }}</a>
-        {% endfor %}
-      </div>
+      {% endfor %}
       <div class="drawer__group">
         <h4>Altro</h4>
         {% for voce in nav.drawer_other() %}<a href="{{ voce.path }}">{{ voce.label }}</a>

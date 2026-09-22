@@ -124,6 +124,13 @@ PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
         {"path": "/blog", "content_type": "text/html", "marker": "Analisi brevi e basate sui dati", "kind": "html", "markdown_marker": "# Storie dai dati"},
         {"path": "/blog/pil-pro-capite-regioni-divario-2024", "content_type": "text/html", "marker": "PIL pro capite per regione", "kind": "html", "markdown_marker": "# PIL pro capite per regione"},
         {"path": "/metodologia", "content_type": "text/html", "marker": "Metodologia e fonti", "kind": "html", "markdown_marker": "# Metodologia e fonti"},
+        # Le tre pagine di fiducia. Mancavano da questo contratto, quindi
+        # l'audit contro produzione non si sarebbe accorto se una fosse tornata
+        # 404 o noindex, ed e' proprio il terzetto che un revisore esterno apre
+        # per primo.
+        {"path": "/chi-siamo", "content_type": "text/html", "marker": "Responsabilità editoriale", "kind": "html"},
+        {"path": "/contatti", "content_type": "text/html", "marker": "divarioitalia@protonmail.com", "kind": "html"},
+        {"path": "/privacy", "content_type": "text/html", "marker": "Pubblicità", "kind": "html"},
         {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html", "markdown_marker": "# Tasso di turisticità"},
         {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html", "markdown_marker": "# Lombardia: profilo territoriale"},
         {"path": "/tema/lavoro-e-conciliazione", "content_type": "text/html", "marker": "page-theme", "kind": "html", "markdown_marker": "# Lavoro e conciliazione"},
@@ -152,6 +159,9 @@ def _inject_license():
         "publisher": publisher.ORGANIZATION,
         "publisher_jsonld": publisher.organization_json(),
         "corrections_url": publisher.CORRECTIONS_URL,
+        "contact_email": publisher.CONTACT_EMAIL,
+        "consent_cmp_name": publisher.CONSENT_CMP_NAME,
+        "consent_cmp_url": publisher.CONSENT_CMP_URL,
         # La navigazione sta in `app/nav.py`, e la testata la legge da li' invece
         # di elencarla. `_ds_header.html` e' incluso da ogni pagina Flask, quindi
         # il posto giusto e' questo processore, non ogni singola `render_template`.
@@ -839,6 +849,26 @@ def about():
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/chi-siamo",
+    )
+
+
+@app.route("/contatti")
+def contatti():
+    return render_template(
+        "contatti.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/contatti",
+    )
+
+
+@app.route("/termini")
+def termini():
+    return render_template(
+        "termini.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/termini",
     )
 
 
@@ -2125,6 +2155,8 @@ def sitemap():
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
         {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
         {"loc": f"{SITE_URL}/chi-siamo", "priority": "0.6"},
+        {"loc": f"{SITE_URL}/contatti", "priority": "0.5"},
+        {"loc": f"{SITE_URL}/termini", "priority": "0.3"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
         {"loc": f"{SITE_URL}/quiz", "priority": "0.7"},

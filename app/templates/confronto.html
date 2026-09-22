@@ -124,6 +124,16 @@
         <a href="/metodologia">Metodologia</a>
         <a href="/blog">Blog</a>
       </nav>
+      {# Le tre pagine di fiducia e il pannello dei consensi stavano solo nel
+         cassetto della testata, che si apre con JavaScript: su questa rotta,
+         senza bundle, non si raggiungevano. Questo piede sta fuori da #root,
+         quindi sopravvive al mount di React. #}
+      <nav aria-label="Il progetto">
+        <a href="/chi-siamo">Chi siamo</a>
+        <a href="/contatti">Contatti</a>
+        <a href="/privacy">Privacy e cookie</a>
+      </nav>
+      {% include "_funding_choices_revoke.html" %}
     </footer>
     {# Vedi app.html: copre il fallback SEO finché il bundle non ha dati veri. #}
     <div id="boot-loader" role="presentation">

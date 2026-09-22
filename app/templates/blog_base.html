@@ -70,33 +70,16 @@
        dentro un include non e sovrascrivibile dalle pagine figlie. #}
     <footer class="ftr">
       <div class="ftr__grid">
+        {# Le colonne vengono da `app/nav.py`, come le voci della testata. Erano
+           scritte a mano qui e in fila li', e le due liste divergevano senza
+           che niente fallisse. #}
+        {% for colonna in nav.FOOTER_GROUPS %}
         <div>
-          <h4>Esplora</h4>
-          <a href="/atlante">Atlante</a>
-          <a href="/regioni">Regioni</a>
-          <a href="/temi">Temi</a>
-          <a href="/confronto">Confronta</a>
-          <a href="/divari-regionali">Divari regionali</a>
+          <h4>{{ colonna.label }}</h4>
+          {% for voce in colonna['items'] %}<a href="{{ voce.path }}">{{ voce.label }}</a>
+          {% endfor %}
         </div>
-        <div>
-          <h4>Classifiche</h4>
-          <a href="/qualita-della-vita/classifica/regioni">Qualità della vita, regioni</a>
-          <a href="/qualita-della-vita/classifica/province">Qualità della vita, province</a>
-          <a href="/metodologia">Metodologia della classifica</a>
-        </div>
-        <div>
-          <h4>Contenuti</h4>
-          <a href="/blog">Storie e analisi</a>
-          <a href="/quiz">Quiz</a>
-          <a href="/ricerca">Cerca nel sito</a>
-          <a href="/catalogo-dati">Catalogo dati</a>
-        </div>
-        <div>
-          <h4>Progetto</h4>
-          <a href="/chi-siamo">Chi siamo</a>
-          <a href="/metodologia">Metodologia e fonti</a>
-          <a href="/privacy">Privacy e cookie</a>
-        </div>
+        {% endfor %}
         <div class="ftr__close">
           <a class="hdr__brand" href="/">
             <img src="{{ url_for('static', filename='img/logo-mark.png') }}" alt="" width="26" height="26">

@@ -42,27 +42,91 @@ PRIMARY = (
             {"label": "Metodologia dell'indice", "path": "/metodologia", "active": "metodologia"},
         ),
     },
+    {
+        # Chi siamo, i contatti e l'informativa stavano solo nel pie' di pagina
+        # e nel cassetto del telefono: da un monitor, dalla testata, non si
+        # raggiungevano. Sono le tre pagine che chi vuole sapere con chi ha a
+        # che fare cerca nel menu, non in fondo.
+        "label": "Progetto",
+        "key": "progetto",
+        "group": (
+            {"label": "Chi siamo", "path": "/chi-siamo", "active": "progetto"},
+            {"label": "Contatti", "path": "/contatti", "active": "progetto"},
+            {"label": "Privacy e cookie", "path": "/privacy", "active": "progetto"},
+        ),
+    },
     {"label": "Storie", "path": "/blog", "active": "blog"},
     {"label": "Quiz", "path": "/quiz", "active": "gioco"},
     {"label": "Metodologia", "path": "/metodologia", "active": "metodologia"},
 )
 
-# Il pie' di pagina: piatto, e con le voci di servizio che nella testata non
-# stanno.
-FOOTER = (
-    {"label": "Atlante", "path": "/atlante"},
-    {"label": "Regioni", "path": "/regioni"},
-    {"label": "Temi", "path": "/temi"},
-    {"label": "Confronta", "path": "/confronto"},
-    {"label": "Divari regionali", "path": "/divari-regionali"},
-    {"label": "Qualità della vita", "path": "/qualita-della-vita/classifica/regioni"},
-    {"label": "Quiz", "path": "/quiz"},
-    {"label": "Storie", "path": "/blog"},
-    {"label": "Metodologia", "path": "/metodologia"},
-    {"label": "Catalogo dati", "path": "/catalogo-dati"},
-    {"label": "Chi siamo", "path": "/chi-siamo"},
-    {"label": "Privacy e cookie", "path": "/privacy"},
+# Il pie' di pagina, nelle sue colonne. E' l'elenco che si vede, e da qui si
+# ricava anche quello piatto che leggono il cassetto e la SPA.
+#
+# Era scritto due volte, e questo modulo esiste per non farlo: le colonne
+# stavano a mano in `blog_base.html`, la lista piatta qui sotto, e le due
+# divergevano in silenzio. Aggiungere `/contatti` avrebbe voluto dire
+# ricordarsi di toccarle tutte e due.
+FOOTER_GROUPS = (
+    {
+        "label": "Esplora",
+        "items": (
+            {"label": "Atlante", "path": "/atlante"},
+            {"label": "Regioni", "path": "/regioni"},
+            {"label": "Temi", "path": "/temi"},
+            {"label": "Confronta", "path": "/confronto"},
+            {"label": "Divari regionali", "path": "/divari-regionali"},
+        ),
+    },
+    {
+        "label": "Classifiche",
+        "items": (
+            {"label": "Qualità della vita, regioni",
+             "path": "/qualita-della-vita/classifica/regioni"},
+            {"label": "Qualità della vita, province",
+             "path": "/qualita-della-vita/classifica/province"},
+            {"label": "Metodologia della classifica", "path": "/metodologia"},
+        ),
+    },
+    {
+        "label": "Contenuti",
+        "items": (
+            {"label": "Storie e analisi", "path": "/blog"},
+            {"label": "Quiz", "path": "/quiz"},
+            {"label": "Cerca nel sito", "path": "/ricerca"},
+            {"label": "Catalogo dati", "path": "/catalogo-dati"},
+        ),
+    },
+    {
+        "label": "Progetto",
+        "items": (
+            {"label": "Chi siamo", "path": "/chi-siamo"},
+            {"label": "Contatti", "path": "/contatti"},
+            {"label": "Metodologia e fonti", "path": "/metodologia"},
+            {"label": "Privacy e cookie", "path": "/privacy"},
+            {"label": "Termini", "path": "/termini"},
+        ),
+    },
 )
+
+
+def _footer_piatto():
+    """Le stesse voci in fila, una sola volta per destinazione.
+
+    La barra della SPA e il cassetto del telefono mostrano una riga, non
+    quattro colonne: `/metodologia` sta in due colonne con due nomi diversi e
+    in una riga sola diventerebbe una ripetizione. Vince il primo nome, che e'
+    quello che la colonna piu' a sinistra ha gia' dato."""
+    viste, uscita = set(), []
+    for gruppo in FOOTER_GROUPS:
+        for voce in gruppo["items"]:
+            if voce["path"] not in viste:
+                viste.add(voce["path"])
+                uscita.append(voce)
+    return tuple(uscita)
+
+
+FOOTER = _footer_piatto()
 
 
 # La barra compatta della testata React non puo' portare le undici voci della
@@ -101,9 +165,14 @@ def drawer_other():
     cassetto, perche' quel percorso sta anche fra le classifiche col nome
     "Metodologia dell'indice": sul telefono la voce generale spariva e restava
     solo quella qualificata, cioe' la pagina si trovava solo cercandola sotto
-    una parola che non la descrive tutta. Qui si esclude il gruppo "Esplora" e
-    le classifiche vere, non ogni percorso che compaia li' dentro."""
-    tendine = {v["path"] for gruppo in PRIMARY[:2] for v in gruppo["group"]}
+    una parola che non la descrive tutta. Qui si escludono le voci **delle
+    tendine**, non ogni percorso che compaia li' dentro.
+
+    Le tendine si ricavano da `PRIMARY`, non si contano: erano due, scritte
+    `PRIMARY[:2]`, e quel taglio ha smesso di dire la verita' il giorno in cui
+    ne e' arrivata una terza."""
+    tendine = {v["path"] for gruppo in PRIMARY if gruppo.get("group")
+               for v in gruppo["group"]}
     primo_livello = [v for v in PRIMARY if not v.get("group")]
     coperti = {v["path"] for v in primo_livello}
     return primo_livello + [
