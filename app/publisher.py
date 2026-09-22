@@ -20,6 +20,14 @@ from app.config import SITE_NAME, SITE_URL
 # In pagina va in chiaro, mai offuscato da JavaScript: un indirizzo che solo un
 # browser con JS attivo sa comporre non e' un contatto per chi legge il sito
 # senza, ne' per chi lo controlla dall'esterno.
+#
+# E non basta scriverlo in chiaro. Cloudflare ha Email Address Obfuscation
+# acceso, e riscrive **ogni** `mailto:` in `/cdn-cgi/l/email-protection#<hex>`
+# piu' un testo da decifrare con JavaScript: in produzione la pagina prometteva
+# un contatto e consegnava un blob, mentre in locale era perfetta. Per questo
+# ogni indirizzo in pagina sta fra `<!--email_off-->` e `<!--email_on-->`, la
+# direttiva con cui Cloudflare spegne l'offuscamento su un blocco solo, invece
+# di spegnere Scrape Shield su tutto il sito.
 CONTACT_EMAIL = "divarioitalia@protonmail.com"
 
 # La piattaforma che raccoglie il consenso. Il nome sta qui perche' compare

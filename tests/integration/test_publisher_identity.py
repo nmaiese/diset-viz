@@ -82,6 +82,33 @@ class IlContattoEsisteDavvero(unittest.TestCase):
         self.assertIn(f"mailto:{publisher.CONTACT_EMAIL}", testo,
                       "l'indirizzo va in un mailto in chiaro, non composto da JavaScript")
 
+    def test_ogni_indirizzo_e_al_riparo_dall_offuscamento_di_cloudflare(self):
+        """In locale era perfetto, in produzione era un blob.
+
+        Cloudflare ha Email Address Obfuscation acceso e riscrive ogni
+        `mailto:` in `/cdn-cgi/l/email-protection#<hex>`, con il testo da
+        decifrare in JavaScript. La pagina prometteva un contatto e non ne
+        dava uno a chi legge senza JavaScript, che e' anche chi verifica il
+        sito dall'esterno. `<!--email_off-->` e' la direttiva con cui
+        Cloudflare spegne l'offuscamento su un blocco solo.
+
+        La prova guarda i template e non una pagina resa, perche' qui non si
+        puo' riprodurre: l'offuscamento lo fa Cloudflare, non l'applicazione.
+        Quello che si puo' tenere e' che nessun `mailto:` esca da quel riparo.
+        """
+        radice = Path(__file__).resolve().parents[2] / "app" / "templates"
+        trovati = 0
+        for template in sorted(radice.rglob("*.html")):
+            sorgente = template.read_text(encoding="utf-8")
+            for riga in sorgente.splitlines():
+                if "mailto:" not in riga:
+                    continue
+                trovati += 1
+                with self.subTest(template=template.name, riga=riga.strip()[:60]):
+                    self.assertIn("<!--email_off-->", riga)
+                    self.assertIn("<!--email_on-->", riga)
+        self.assertGreater(trovati, 0, "nessun mailto nei template: la prova non guarda piu' niente")
+
     def test_il_dato_strutturato_non_promette_un_recapito_che_la_pagina_non_da(self):
         """Un `contactPoint` che nomina un indirizzo assente dalla pagina
         visibile e' la stessa incoerenza fra JSON-LD e testo che il percorso
