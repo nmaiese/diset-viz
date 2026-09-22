@@ -8,7 +8,7 @@ La disponibilità in casa di un computer e di una connessione è meno diffusa de
 
 <!-- sezione: quadro -->
 
-Molti si connettono ormai solo da smartphone, e infatti l'accesso a un computer resta più basso dell'uso di internet. La differenza conta, dato che studiare, lavorare o usare certi servizi da solo telefono è difficile. Il divario si sposta così dal connettersi all'avere gli strumenti giusti, e penalizza le famiglie più povere. Un Paese che naviga solo da telefono è davvero digitale?
+Molti si connettono ormai solo da smartphone, e infatti l'accesso a un computer resta più basso dell'uso di internet. La differenza conta, dato che studiare, lavorare o usare certi servizi da solo telefono è difficile. Il divario si sposta così dal connettersi all'avere gli strumenti giusti, e penalizza le famiglie più povere.
 
 <!-- sezione: limiti -->
 

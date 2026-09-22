@@ -8,7 +8,7 @@ Il pessimismo sul futuro è calato molto, quasi dimezzato rispetto a qualche ann
 
 <!-- sezione: quadro -->
 
-Che alcune regioni economicamente solide mostrino più timore del futuro, e alcune del Sud meno, ricorda quanto questi giudizi siano relativi. Le persone valutano il domani rispetto a ciò che hanno e temono di perdere, non su una scala assoluta. Il forte calo del pessimismo va poi letto con prudenza, dato che segue l'umore collettivo e gli eventi recenti più delle condizioni strutturali. Un dato che scende è una buona notizia o il riflesso di aspettative che si sono già abbassate?
+Che alcune regioni economicamente solide mostrino più timore del futuro, e alcune del Sud meno, ricorda quanto questi giudizi siano relativi. Le persone valutano il domani rispetto a ciò che hanno e temono di perdere, non su una scala assoluta. Il forte calo del pessimismo va poi letto con prudenza, dato che segue l'umore collettivo e gli eventi recenti più delle condizioni strutturali.
 
 <!-- sezione: limiti -->
 

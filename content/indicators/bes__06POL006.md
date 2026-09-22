@@ -8,7 +8,7 @@ La presenza femminile in Parlamento varia molto per regione di elezione. Supera 
 
 <!-- sezione: quadro -->
 
-I valori altissimi delle regioni piccole vanno letti con prudenza, dato che con pochi seggi basta una eletta a cambiare di molto la percentuale. Al netto di questo, la rappresentanza femminile è cresciuta molto con le norme sulle quote, pur restando lontana dalla parità. È un indicatore descrittivo di un equilibrio ancora in movimento. Più donne in Parlamento cambia le priorità della politica o solo la sua composizione?
+I valori altissimi delle regioni piccole vanno letti con prudenza, dato che con pochi seggi basta una eletta a cambiare di molto la percentuale. Al netto di questo, la rappresentanza femminile è cresciuta molto con le norme sulle quote, pur restando lontana dalla parità. È un indicatore descrittivo di un equilibrio ancora in movimento.
 
 <!-- sezione: limiti -->
 

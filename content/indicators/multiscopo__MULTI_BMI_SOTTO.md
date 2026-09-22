@@ -8,7 +8,7 @@ All'estremo opposto del peso c'è chi è sottopeso, una minoranza del 3,1% degli
 
 <!-- sezione: quadro -->
 
-Il sottopeso è la faccia dimenticata dei problemi di peso, e non è sempre una buona notizia: può segnalare disturbi alimentari, specie tra i più giovani, o fragilità negli anziani. Che sia più diffuso al Centro-Nord ricorda che ogni estremo dell'indice di massa corporea ha i suoi rischi, non solo l'eccesso. È una minoranza piccola, ma da non confondere con la forma fisica. Essere magri è sempre essere in salute?
+Il sottopeso è la faccia dimenticata dei problemi di peso, e non è sempre una buona notizia: può segnalare disturbi alimentari, specie tra i più giovani, o fragilità negli anziani. Che sia più diffuso al Centro-Nord ricorda che ogni estremo dell'indice di massa corporea ha i suoi rischi, non solo l'eccesso. È una minoranza piccola, ma da non confondere con la forma fisica.
 
 <!-- sezione: limiti -->
 

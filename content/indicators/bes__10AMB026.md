@@ -8,7 +8,7 @@ I giorni con precipitazioni estremamente intense sono ancora rari ma in aumento.
 
 <!-- sezione: quadro -->
 
-Le piogge estreme, concentrate in poche ore, sono il volto più violento del clima che cambia, e causano alluvioni improvvise anche dove prima erano rare. Numeri così piccoli oscillano molto di anno in anno, ma la tendenza all'aumento è chiara. Bastano pochi eventi estremi a fare danni enormi su un territorio fragile. Ci si prepara a un clima medio o agli estremi che diventano più frequenti?
+Le piogge estreme, concentrate in poche ore, sono il volto più violento del clima che cambia, e causano alluvioni improvvise anche dove prima erano rare. Numeri così piccoli oscillano molto di anno in anno, ma la tendenza all'aumento è chiara. Bastano pochi eventi estremi a fare danni enormi su un territorio fragile.
 
 <!-- sezione: limiti -->
 

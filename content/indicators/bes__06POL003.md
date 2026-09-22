@@ -8,7 +8,7 @@ La fiducia nel sistema giudiziario, in media 5 su dieci, mostra una geografia in
 
 <!-- sezione: quadro -->
 
-Che il Sud, dove la giustizia è più lenta, esprima più fiducia del Nord efficiente sorprende, e ricorda che la fiducia non sempre segue le prestazioni oggettive. Contano attese, esperienze dirette e cultura del rapporto con lo Stato. È un raro caso in cui la mappa della fiducia si stacca da quella del funzionamento. La fiducia nella giustizia nasce dai fatti o dalle attese verso di essa?
+Che il Sud, dove la giustizia è più lenta, esprima più fiducia del Nord efficiente sorprende, e ricorda che la fiducia non sempre segue le prestazioni oggettive. Contano attese, esperienze dirette e cultura del rapporto con lo Stato. È un raro caso in cui la mappa della fiducia si stacca da quella del funzionamento.
 
 <!-- sezione: limiti -->
 

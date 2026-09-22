@@ -27,7 +27,7 @@ Il punto di partenza sono **54.637 euro contro 21.702 euro**. Tanto separa il Tr
 
 - Trentino-Alto Adige primo con 54.637 euro di PIL pro capite, Calabria ultima con 21.702.
 - La media semplice delle 20 regioni è circa 35.710 euro, ma poche regioni del Nord la tirano in alto.
-- Tutte e otto le regioni del Mezzogiorno stanno sotto la media nazionale.
+- Tutte e otto le regioni del Mezzogiorno stanno sotto la media delle regioni, e solo l'Abruzzo e la Basilicata superano i 28.000 euro.
 
 ## Dati usati
 
@@ -72,9 +72,11 @@ regioni di ciascun blocco, non pesate per popolazione, ma il rapporto è netto:
 ## Una linea netta tra Nord e Sud
 
 Il dato più chiaro non è la singola regione, ma la separazione. Tutte le regioni
-del Centro-Nord stanno sopra o vicino alla media. Tutte le otto regioni del
-Mezzogiorno stanno sotto, e nessuna supera i 28.000 euro per abitante. Non è una
-sfumatura: è una soglia che divide il Paese in due.
+del Centro-Nord stanno sopra o vicino alla media delle regioni. Tutte le otto
+del Mezzogiorno stanno sotto, e sei delle otto restano sotto i 28.000 euro per
+abitante: sopra quella cifra arrivano solo l'Abruzzo, con 32.109 euro, e la
+Basilicata, con 28.416. Non è una sfumatura, ed è anche il punto in cui la linea
+si vede meno netta di quanto sembri.
 
 > Il PIL pro capite non misura quanto guadagna una famiglia, ma quanta ricchezza
 > un territorio riesce a produrre. È il primo strato del divario, quello da cui

@@ -8,7 +8,7 @@ Rispetto a pochi anni fa gli italiani guardano al futuro con più fiducia: la qu
 
 <!-- sezione: quadro -->
 
-L'ottimismo non segue la solita geografia: Sardegna e Veneto vicine in testa, il Mezzogiorno presente sia in alto sia in basso. Le aspettative sul futuro si muovono con il momento, con il clima economico percepito, con l'età di chi risponde, e cambiano in fretta. Un dato basso ma in crescita può segnalare un recupero di fiducia oppure un punto di partenza molto arretrato. Il valore misura un'attesa, non un esito: chi spera di migliorare non è detto che ci riesca. La fiducia sta anticipando un cambiamento o solo un umore?
+L'ottimismo non segue la solita geografia: Sardegna e Veneto vicine in testa, il Mezzogiorno presente sia in alto sia in basso. Le aspettative sul futuro si muovono con il momento, con il clima economico percepito, con l'età di chi risponde, e cambiano in fretta. Un dato basso ma in crescita può segnalare un recupero di fiducia oppure un punto di partenza molto arretrato. Il valore misura un'attesa, non un esito: chi spera di migliorare non è detto che ci riesca.
 
 <!-- sezione: limiti -->
 

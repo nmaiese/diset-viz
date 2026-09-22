@@ -8,7 +8,7 @@ Anche le rapine, nel dato BES, pesano più al Nord. I valori più alti sono in E
 
 <!-- sezione: quadro -->
 
-La rapina è un reato di strada e di flussi, e tende a seguire le città più grandi, i loro trasporti e i loro centri commerciali, dove circolano più persone e più denaro. Per questo compare più al Nord urbano che nel Sud rurale, un'altra smentita della mappa attesa della sicurezza. Il calo recente è coerente con la discesa di lungo periodo dei reati predatori. Resta un reato che spaventa oltre la sua frequenza. Un territorio con più rapine è meno sicuro o solo più affollato?
+La rapina è un reato di strada e di flussi, e tende a seguire le città più grandi, i loro trasporti e i loro centri commerciali, dove circolano più persone e più denaro. Per questo compare più al Nord urbano che nel Sud rurale, un'altra smentita della mappa attesa della sicurezza. Il calo recente è coerente con la discesa di lungo periodo dei reati predatori. Resta un reato che spaventa oltre la sua frequenza.
 
 <!-- sezione: limiti -->
 

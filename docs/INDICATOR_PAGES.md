@@ -273,13 +273,16 @@ agli estremi di questa.
 
 Le regole editoriali complete stanno in `content/STYLE.md`. Le classi di
 errore che solo una lettura trova non le trova uno strumento: le trova chi
-rilegge. Quello che ferma un pezzo sono le tre guardie di `motore verifica`
-nel repo della redazione, una cifra fuori dal dossier, un link interno
-inesistente, una fonte che non risponde, e non c'è una rubrica a punti. Le
-fonti secondarie ammesse stanno in
-[`SECONDARY_SOURCES.md`](SECONDARY_SOURCES.md), insieme alla trappola che nessuna
-guardia vede: un aggregato nazionale ponderato non è la nostra media semplice
-delle venti regioni.
+rilegge. Quello che ferma un pezzo sono le sei guardie di `motore verifica`
+nel repo della redazione: una cifra fuori dal dossier, un link interno
+inesistente, una fonte che non risponde, un link a una fonte nella prosa che
+non sta anche nell'elenco, un'affermazione su un insieme che la classifica
+smentisce ("nessuna regione supera X"), e la media semplice delle regioni
+chiamata media nazionale. Non c'è una rubrica a punti. Le fonti secondarie
+ammesse stanno in [`SECONDARY_SOURCES.md`](SECONDARY_SOURCES.md), insieme a
+quello che resta da guardare a mano: un aggregato nazionale ponderato non è la
+nostra media semplice delle venti regioni, e le due si possono ancora
+accostare come se fossero confrontabili.
 
 ## Risposte obbligatorie
 

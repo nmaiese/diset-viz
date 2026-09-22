@@ -8,7 +8,7 @@ Il dato BES sui posti-km del trasporto pubblico ricalca lo stesso quadro: 11.104
 
 <!-- sezione: quadro -->
 
-Nel sistema BES è un indicatore di qualità dei servizi, e il suo divario di quattordici volte è tra i più ampi del welfare territoriale. Il trasporto pubblico è la spina dorsale della mobilità sostenibile, ma esiste davvero solo in poche regioni urbane. Il Sud paga un doppio prezzo, meno servizio e più dipendenza dall'auto. Una mobilità pulita è possibile senza un trasporto pubblico diffuso?
+Nel sistema BES è un indicatore di qualità dei servizi, e il suo divario di quattordici volte è tra i più ampi del welfare territoriale. Il trasporto pubblico è la spina dorsale della mobilità sostenibile, ma esiste davvero solo in poche regioni urbane. Il Sud paga un doppio prezzo, meno servizio e più dipendenza dall'auto.
 
 <!-- sezione: limiti -->
 

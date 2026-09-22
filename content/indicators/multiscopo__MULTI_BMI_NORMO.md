@@ -8,7 +8,7 @@ Guardando il rovescio della medaglia, gli adulti normopeso sono in media poco pi
 
 <!-- sezione: quadro -->
 
-Ribaltare l'indicatore aiuta a vedere la posta in gioco: in nessuna regione i normopeso superano di molto la metà, e in quelle del Sud sono già minoranza. Il dato è fermo da anni, il che dice quanto siano radicate abitudini e ambiente alimentare. Leggere il peso normale come traguardo, e non solo l'eccesso come problema, sposta lo sguardo dalla cura alla prevenzione diffusa. Il normopeso è la norma o sta diventando l'eccezione?
+Ribaltare l'indicatore aiuta a vedere la posta in gioco: in nessuna regione i normopeso superano di molto la metà, e in quelle del Sud sono già minoranza. Il dato è fermo da anni, il che dice quanto siano radicate abitudini e ambiente alimentare. Leggere il peso normale come traguardo, e non solo l'eccesso come problema, sposta lo sguardo dalla cura alla prevenzione diffusa.
 
 <!-- sezione: limiti -->
 

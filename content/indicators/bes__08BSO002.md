@@ -8,7 +8,7 @@ La soddisfazione per il tempo libero è alta e piuttosto uniforme. In Trentino A
 
 <!-- sezione: quadro -->
 
-Rispetto alla soddisfazione per la vita nel suo insieme, qui le distanze tra Nord e Sud si accorciano. Il tempo libero intreccia relazioni, clima e abitudini più del solo reddito, e la sua valutazione tende a essere generosa un po' ovunque. Resta comunque un giudizio soggettivo: dichiararsi soddisfatti del proprio tempo libero non dice quanto tempo libero si abbia davvero, né come lo si passi. L'uniformità di questo dato è una risposta o una domanda?
+Rispetto alla soddisfazione per la vita nel suo insieme, qui le distanze tra Nord e Sud si accorciano. Il tempo libero intreccia relazioni, clima e abitudini più del solo reddito, e la sua valutazione tende a essere generosa un po' ovunque. Resta comunque un giudizio soggettivo: dichiararsi soddisfatti del proprio tempo libero non dice quanto tempo libero si abbia davvero, né come lo si passi.
 
 <!-- sezione: limiti -->
 

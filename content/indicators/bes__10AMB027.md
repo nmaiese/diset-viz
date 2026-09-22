@@ -8,7 +8,7 @@ La durata dei periodi senza pioggia, segno di siccità, è più lunga al Sud e n
 
 <!-- sezione: quadro -->
 
-La siccità prolungata mette in crisi agricoltura, riserve idriche ed ecosistemi, e la sua geografia, con il Sud in testa, si somma alla maggiore dispersione delle reti idriche meridionali. È l'altra faccia del clima estremo, opposta alle piogge violente ma altrettanto dannosa. Con l'acqua che scarseggia, ogni goccia persa pesa di più. Il Sud è pronto a un futuro con meno pioggia?
+La siccità prolungata mette in crisi agricoltura, riserve idriche ed ecosistemi, e la sua geografia, con il Sud in testa, si somma alla maggiore dispersione delle reti idriche meridionali. È l'altra faccia del clima estremo, opposta alle piogge violente ma altrettanto dannosa. Con l'acqua che scarseggia, ogni goccia persa pesa di più.
 
 <!-- sezione: limiti -->
 

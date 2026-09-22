@@ -8,7 +8,7 @@ Avere qualcuno su cui contare in caso di bisogno è quasi universale: lo dichiar
 
 <!-- sezione: quadro -->
 
-Che quasi tutti abbiano una rete di sostegno è rassicurante, ma nasconde chi resta solo, spesso anziani e persone fragili invisibili nelle medie. La leggera prevalenza del Nord riflette reti civiche più ampie, oltre alla famiglia. Poter contare su qualcuno è la prima difesa contro le crisi della vita. Un dato così alto racconta la forza dei legami o il rischio di chi resta ai margini?
+Che quasi tutti abbiano una rete di sostegno è rassicurante, ma nasconde chi resta solo, spesso anziani e persone fragili invisibili nelle medie. La leggera prevalenza del Nord riflette reti civiche più ampie, oltre alla famiglia. Poter contare su qualcuno è la prima difesa contro le crisi della vita.
 
 <!-- sezione: limiti -->
 

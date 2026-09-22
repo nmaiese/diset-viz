@@ -8,7 +8,7 @@ Il reddito netto medio delle famiglie va dai 34.700 euro della Calabria ai 55.30
 
 <!-- sezione: quadro -->
 
-La distanza tra reddito medio e mediano è essa stessa una misura di disuguaglianza: dove la media supera di molto la mediana, pochi redditi alti pesano tanto. Il reddito medio è utile per i confronti, ma racconta un'Italia più ricca di quella in cui vive la famiglia tipica. Va quindi letto accanto al mediano e agli indici di disuguaglianza. La media descrive le famiglie o le nasconde dietro un numero?
+La distanza tra reddito medio e mediano è essa stessa una misura di disuguaglianza: dove la media supera di molto la mediana, pochi redditi alti pesano tanto. Il reddito medio è utile per i confronti, ma racconta un'Italia più ricca di quella in cui vive la famiglia tipica. Va quindi letto accanto al mediano e agli indici di disuguaglianza.
 
 <!-- sezione: limiti -->
 

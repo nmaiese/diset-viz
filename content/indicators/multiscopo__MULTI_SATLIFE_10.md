@@ -8,7 +8,7 @@ Al vertice della scala, chi dà alla propria vita il voto pieno di 10 è una min
 
 <!-- sezione: quadro -->
 
-La soddisfazione estrema disegna una mappa diversa da quella dei redditi: alcune regioni del Sud e delle isole guidano, alcune ricche del Centro-Nord seguono. Dare 10 alla propria vita è anche un fatto culturale, un modo di rispondere, non solo la fotografia di condizioni migliori. Questo rung va letto insieme agli altri: da solo dice quante persone scelgono il massimo, non quanto la popolazione stia bene nel complesso. La piena soddisfazione dichiarata misura la vita o il modo di raccontarla?
+La soddisfazione estrema disegna una mappa diversa da quella dei redditi: alcune regioni del Sud e delle isole guidano, alcune ricche del Centro-Nord seguono. Dare 10 alla propria vita è anche un fatto culturale, un modo di rispondere, non solo la fotografia di condizioni migliori. Questo rung va letto insieme agli altri: da solo dice quante persone scelgono il massimo, non quanto la popolazione stia bene nel complesso.
 
 <!-- sezione: limiti -->
 

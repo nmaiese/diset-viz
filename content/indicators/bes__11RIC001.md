@@ -8,7 +8,7 @@ Nel sistema BES l'intensità di ricerca conferma la stessa mappa: dal 2,1% del P
 
 <!-- sezione: quadro -->
 
-Il BES la tratta come descrittiva, senza un verso automatico, dato che un'intensità alta è positiva ma va letta insieme a occupazione e struttura produttiva. Un territorio può investire molto in ricerca e non tradurla in lavoro qualificato, oppure poco ma in modo mirato. La concentrazione resta comunque il tratto dominante della ricerca italiana. La conoscenza si distribuisce o si addensa?
+Il BES la tratta come descrittiva, senza un verso automatico, dato che un'intensità alta è positiva ma va letta insieme a occupazione e struttura produttiva. Un territorio può investire molto in ricerca e non tradurla in lavoro qualificato, oppure poco ma in modo mirato. La concentrazione resta comunque il tratto dominante della ricerca italiana.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Quanto costa tenere la casa cambia molto con il territorio. La spesa media mensi
 
 <!-- sezione: quadro -->
 
-La spesa più alta al Nord riflette prezzi immobiliari e costi dei servizi maggiori, non un tenore di vita per forza migliore. Da sola dice poco: 400 euro pesano diversamente su un reddito alto o basso. Va quindi letta insieme al reddito, per capire quanto l'abitare erode il bilancio familiare. Una casa costosa è un lusso o un costo obbligato di dove si vive?
+La spesa più alta al Nord riflette prezzi immobiliari e costi dei servizi maggiori, non un tenore di vita per forza migliore. Da sola dice poco: 400 euro pesano diversamente su un reddito alto o basso. Va quindi letta insieme al reddito, per capire quanto l'abitare erode il bilancio familiare.
 
 <!-- sezione: limiti -->
 

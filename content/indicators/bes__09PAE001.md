@@ -8,7 +8,7 @@ Quanto un comune spende per la cultura varia di dieci volte. In Trentino Alto Ad
 
 <!-- sezione: quadro -->
 
-La spesa comunale per la cultura è una scelta politica prima che una necessità, e il divario riflette risorse dei comuni ma anche priorità diverse. Dove si investe poco, biblioteche, teatri e iniziative pubbliche si diradano, e la cultura diventa un privilegio di chi può pagarla. È un indicatore descrittivo, ma dice quanto il pubblico crede nella cultura come servizio. La cultura è una spesa o un investimento per un territorio?
+La spesa comunale per la cultura è una scelta politica prima che una necessità, e il divario riflette risorse dei comuni ma anche priorità diverse. Dove si investe poco, biblioteche, teatri e iniziative pubbliche si diradano, e la cultura diventa un privilegio di chi può pagarla. È un indicatore descrittivo, ma dice quanto il pubblico crede nella cultura come servizio.
 
 <!-- sezione: limiti -->
 

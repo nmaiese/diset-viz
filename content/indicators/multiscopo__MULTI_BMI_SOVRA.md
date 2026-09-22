@@ -8,7 +8,7 @@ Il sovrappeso, gradino intermedio prima dell'obesità, riguarda in media più di
 
 <!-- sezione: quadro -->
 
-Il sovrappeso è la zona grigia della salute: non ancora una patologia, ma la soglia da cui molti scivolano verso l'obesità. Proprio essendo così diffuso, è anche il terreno dove la prevenzione può incidere di più, con alimentazione e movimento. La solita mappa meridionale si conferma, meno marcata che sull'obesità grave. Vale più agire su chi è già obeso o sulla platea molto più ampia in sovrappeso?
+Il sovrappeso è la zona grigia della salute: non ancora una patologia, ma la soglia da cui molti scivolano verso l'obesità. Proprio essendo così diffuso, è anche il terreno dove la prevenzione può incidere di più, con alimentazione e movimento. La solita mappa meridionale si conferma, meno marcata che sull'obesità grave.
 
 <!-- sezione: limiti -->
 

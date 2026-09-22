@@ -8,7 +8,7 @@ La percezione del rischio di criminalità nella propria zona è massima nelle re
 
 <!-- sezione: quadro -->
 
-Qui la geografia mescola dati e racconto: le grandi aree metropolitane, che hanno davvero più reati predatori, sono anche quelle dove il timore è più diffuso, ma la percezione amplifica il fenomeno oltre i numeri. Contano la cronaca, la densità, l'esperienza di conoscenti, il passaparola. Il Mezzogiorno interno, con meno reati predatori denunciati, esprime timori più bassi. Sicurezza vissuta e sicurezza misurata qui si sfiorano senza coincidere. Il rischio percepito segue i reati o li precede nell'immaginario?
+Qui la geografia mescola dati e racconto: le grandi aree metropolitane, che hanno davvero più reati predatori, sono anche quelle dove il timore è più diffuso, ma la percezione amplifica il fenomeno oltre i numeri. Contano la cronaca, la densità, l'esperienza di conoscenti, il passaparola. Il Mezzogiorno interno, con meno reati predatori denunciati, esprime timori più bassi. Sicurezza vissuta e sicurezza misurata qui si sfiorano senza coincidere.
 
 <!-- sezione: limiti -->
 

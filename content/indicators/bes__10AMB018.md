@@ -8,7 +8,7 @@ L'impermeabilizzazione del suolo, il consumo di terra sotto cemento e asfalto, �
 
 <!-- sezione: quadro -->
 
-Il suolo impermeabilizzato non assorbe più l'acqua, aumenta il rischio di alluvioni e si perde per sempre come risorsa agricola e naturale. Si concentra dove città, industria e infrastrutture hanno consumato più terra, in pianura padana e attorno alle grandi aree urbane. È un consumo quasi irreversibile, che continua anche dove la popolazione non cresce. Costruire ancora suolo è sviluppo o debito verso il futuro?
+Il suolo impermeabilizzato non assorbe più l'acqua, aumenta il rischio di alluvioni e si perde per sempre come risorsa agricola e naturale. Si concentra dove città, industria e infrastrutture hanno consumato più terra, in pianura padana e attorno alle grandi aree urbane. È un consumo quasi irreversibile, che continua anche dove la popolazione non cresce.
 
 <!-- sezione: limiti -->
 

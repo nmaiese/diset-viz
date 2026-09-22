@@ -8,7 +8,7 @@ Tra gli over 75, la quota che convive con più malattie croniche e gravi limitaz
 
 <!-- sezione: quadro -->
 
-Questo indicatore misura il peso reale della non autosufficienza, quello che ricade su famiglie, badanti e servizi sanitari. Il divario territoriale ricalca quello degli anni vissuti in salute: al Sud si arriva più fragili alla grande vecchiaia, con più bisogni e spesso meno servizi di prossimità. È il rovescio della longevità, il costo nascosto di una popolazione che invecchia. Un Paese che vive a lungo si sta attrezzando per la cura di chi vive a lungo ma male?
+Questo indicatore misura il peso reale della non autosufficienza, quello che ricade su famiglie, badanti e servizi sanitari. Il divario territoriale ricalca quello degli anni vissuti in salute: al Sud si arriva più fragili alla grande vecchiaia, con più bisogni e spesso meno servizi di prossimità. È il rovescio della longevità, il costo nascosto di una popolazione che invecchia.
 
 <!-- sezione: limiti -->
 

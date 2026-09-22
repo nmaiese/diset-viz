@@ -8,7 +8,7 @@ In eccesso di peso è quasi una persona su due, ma con un chiaro gradiente Nord-
 
 <!-- sezione: quadro -->
 
-L'eccesso di peso non è solo un fatto individuale: segue reddito, istruzione e ambiente alimentare, e si concentra dove questi sono più fragili. Il gradiente Nord-Sud che compare qui torna in molti indicatori di salute, dalla sedentarietà all'alimentazione, e disegna una geografia della prevenzione. Il dato è quasi fermo negli ultimi anni, segno che le abitudini cambiano lentamente. Un corpo è la somma di scelte personali o del contesto in cui quelle scelte si fanno?
+L'eccesso di peso non è solo un fatto individuale: segue reddito, istruzione e ambiente alimentare, e si concentra dove questi sono più fragili. Il gradiente Nord-Sud che compare qui torna in molti indicatori di salute, dalla sedentarietà all'alimentazione, e disegna una geografia della prevenzione. Il dato è quasi fermo negli ultimi anni, segno che le abitudini cambiano lentamente.
 
 <!-- sezione: limiti -->
 

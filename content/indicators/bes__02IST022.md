@@ -8,7 +8,7 @@ La partecipazione culturale fuori casa, dal cinema ai musei ai concerti, è più
 
 <!-- sezione: quadro -->
 
-Uscire per cultura dipende da offerta, reddito e abitudini, e la sua geografia ricalca quella dei consumi culturali. Non è un lusso, dato che la partecipazione culturale allarga competenze, relazioni e senso critico, con effetti che durano nel tempo. Il divario culturale si somma a quello economico e li rafforza a vicenda. La cultura è causa o effetto delle disuguaglianze territoriali?
+Uscire per cultura dipende da offerta, reddito e abitudini, e la sua geografia ricalca quella dei consumi culturali. Non è un lusso, dato che la partecipazione culturale allarga competenze, relazioni e senso critico, con effetti che durano nel tempo. Il divario culturale si somma a quello economico e li rafforza a vicenda.
 
 <!-- sezione: limiti -->
 

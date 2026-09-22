@@ -8,7 +8,7 @@ La partecipazione civica e politica, dall'informarsi al discutere di temi pubbli
 
 <!-- sezione: quadro -->
 
-La partecipazione alla vita pubblica è il cuore del capitale civico, quella cultura della cosa comune più forte nelle regioni con lunga tradizione di associazionismo. Il calo recente, generalizzato, segnala un allontanamento dalla politica che riguarda tutto il Paese. È un indicatore descrittivo, ma tocca la salute stessa della democrazia. Una comunità che partecipa meno è più libera o più fragile?
+La partecipazione alla vita pubblica è il cuore del capitale civico, quella cultura della cosa comune più forte nelle regioni con lunga tradizione di associazionismo. Il calo recente, generalizzato, segnala un allontanamento dalla politica che riguarda tutto il Paese. È un indicatore descrittivo, ma tocca la salute stessa della democrazia.
 
 <!-- sezione: limiti -->
 

@@ -8,7 +8,7 @@ Il patrimonio museale è distribuito in modo diseguale. Contando densità e rile
 
 <!-- sezione: quadro -->
 
-La ricchezza museale segue la storia, dato che dove sono passati impero, papato, Rinascimento e grandi corti si addensano musei e collezioni. È un patrimonio enorme, ma concentrato, e gestirlo e tutelarlo costa più di quanto renda in molte aree. Avere musei non basta, servono visitatori e risorse per tenerli aperti. Un grande patrimonio culturale è una rendita o un onere?
+La ricchezza museale segue la storia, dato che dove sono passati impero, papato, Rinascimento e grandi corti si addensano musei e collezioni. È un patrimonio enorme, ma concentrato, e gestirlo e tutelarlo costa più di quanto renda in molte aree. Avere musei non basta, servono visitatori e risorse per tenerli aperti.
 
 <!-- sezione: limiti -->
 

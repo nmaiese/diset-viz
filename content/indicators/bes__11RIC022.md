@@ -8,7 +8,7 @@ Guardando i servizi comunali per le famiglie interamente online, il balzo è anc
 
 <!-- sezione: quadro -->
 
-Rispetto ai servizi interattivi in generale, questi riguardano pratiche familiari concrete, dall'iscrizione a scuola ai certificati, e la loro diffusione più bassa dice quanto resti da fare sui servizi quotidiani. Il divario tra il Nord-Est e il Sud interno è ampio e stabile. La comodità del digitale arriva prima dove i comuni sono più organizzati. Il diritto a un servizio online dipende da dove si vive?
+Rispetto ai servizi interattivi in generale, questi riguardano pratiche familiari concrete, dall'iscrizione a scuola ai certificati, e la loro diffusione più bassa dice quanto resti da fare sui servizi quotidiani. Il divario tra il Nord-Est e il Sud interno è ampio e stabile. La comodità del digitale arriva prima dove i comuni sono più organizzati.
 
 <!-- sezione: limiti -->
 

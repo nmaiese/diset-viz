@@ -8,7 +8,7 @@ Le forze dell'ordine e i vigili del fuoco sono le istituzioni più fidate: su un
 
 <!-- sezione: quadro -->
 
-Che polizia, carabinieri e vigili del fuoco godano di così ampia fiducia, ovunque, li rende un raro punto di coesione nazionale in un quadro di sfiducia diffusa. Contano la vicinanza al cittadino e la concretezza del loro servizio, specie nelle emergenze. È il rovescio della fiducia nella politica, e mostra che gli italiani distinguono tra istituzioni. Ci si fida di più di chi protegge o di chi decide?
+Che polizia, carabinieri e vigili del fuoco godano di così ampia fiducia, ovunque, li rende un raro punto di coesione nazionale in un quadro di sfiducia diffusa. Contano la vicinanza al cittadino e la concretezza del loro servizio, specie nelle emergenze. È il rovescio della fiducia nella politica, e mostra che gli italiani distinguono tra istituzioni.
 
 <!-- sezione: limiti -->
 
