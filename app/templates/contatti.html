@@ -1,0 +1,60 @@
+{% extends "blog_base.html" %}
+{% import "_breadcrumb.html" as breadcrumb %}
+{% set active_nav = 'progetto' %}
+{% set percorso = [{'name': 'Divario Italia', 'path': '/'}, {'name': 'Contatti', 'path': '/contatti'}] %}
+
+{% block title %}Contatti | {{ site_name }}{% endblock %}
+{% block description %}Come scrivere a Divario Italia: segnalare un errore in una scheda, chiedere l'uso dei dati, esercitare i diritti sui dati personali.{% endblock %}
+
+{% block head_extra %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {{ publisher_jsonld | safe }},
+    {
+      "@type": "ContactPage",
+      "name": "Contatti",
+      "url": {{ canonical | tojson }},
+      "publisher": { "@id": {{ publisher['@id'] | tojson }} },
+      "isPartOf": { "@type": "WebSite", "url": "{{ site_url }}/" }
+    }
+  ]
+}
+</script>
+{{ breadcrumb.jsonld(percorso, site_url) }}
+{% endblock %}
+
+{% block content %}
+<article class="page prose-wrap" id="contenuto">
+  {{ breadcrumb.trail(percorso) }}
+  <h1>Contatti</h1>
+  <p class="page-lead">Si scrive a <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>. È l'indirizzo della redazione di Divario Italia, e le risposte arrivano da lì.</p>
+
+  <section>
+    <h2>Per segnalare un errore</h2>
+    <p>È la ragione più utile per scrivere. Indica l'indirizzo della pagina, il passaggio o il valore da controllare e, se ce l'hai, la fonte corretta. Le segnalazioni si leggono tutte, e una cifra sbagliata si corregge appena è verificata.</p>
+    <p>Se preferisci un canale pubblico, dove la segnalazione e la risposta restano visibili a chiunque, puoi <a href="{{ corrections_url }}">aprire una segnalazione aperta</a>. Le due strade portano allo stesso posto, cambia solo chi può leggere.</p>
+  </section>
+
+  <section>
+    <h2>Per usare i dati o i testi</h2>
+    <p>I dati sono pubblici e arrivano dalle istituzioni citate su ogni scheda, con la loro licenza. Le elaborazioni, le visualizzazioni e i testi sono di Divario Italia. Se vuoi riprenderli, in <a href="/chi-siamo#come-citare">Chi siamo</a> c'è la forma con cui chiediamo di citarli, e non serve chiedere il permesso. Scrivi se ti serve un taglio dei dati che il sito non espone, oppure un chiarimento sul metodo.</p>
+  </section>
+
+  <section>
+    <h2>Per i dati personali</h2>
+    <p>Per accedere ai tuoi dati, correggerli, esportarli o cancellarli, scrivi allo stesso indirizzo e indica l'email con cui hai creato l'account. Che cosa trattiamo e perché sta in <a href="/privacy">Privacy e cookie</a>.</p>
+  </section>
+
+  <section>
+    <h2>Per la stampa e per le collaborazioni</h2>
+    <p>Stesso indirizzo. Se scrivi di divari territoriali e ti serve un dato, la serie storica dietro un grafico o una verifica su un numero che hai letto altrove, chiedi pure.</p>
+  </section>
+
+  <section>
+    <h2>Quanto ci mettiamo</h2>
+    <p>Divario Italia è un progetto piccolo. Una segnalazione di errore ha la precedenza su tutto il resto e di solito si guarda entro pochi giorni. Le altre richieste possono richiedere più tempo, ma una risposta arriva sempre.</p>
+  </section>
+</article>
+{% endblock %}

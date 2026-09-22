@@ -16,12 +16,30 @@ due, con due modelli dati diversi, e le pagine sono andate alla deriva.
    e le tre viste (mappa, classifica, serie storica). È l'unica parte interattiva.
 2. **L'articolo.** Quattro sezioni in ordine fisso, un unico blocco di prosa,
    nessuna card o tessera in mezzo ai paragrafi.
-3. **L'apparato.** Fonti, definizione originale, come citare, immagine da
-   condividere, indicatori correlati, percorso.
+3. **L'apparato.** Fonti, definizione originale, perimetro del calcolo, verso
+   dell'indicatore, come nasce il testo, come citare, immagine da condividere,
+   indicatori correlati, percorso.
+
+Fra l'articolo e l'apparato sta il blocco **«Come leggere il dato»**
+(`id="come-leggere"`), reso **sempre** e sempre dopo la narrazione.
 
 La regola che tiene insieme il tutto: **una cifra si mostra una volta**. Il
 cruscotto la mostra, la prosa la interpreta. Un paragrafo che rilegge il massimo,
 il minimo e la media è la duplicazione che questo layout ha eliminato.
+
+E la regola gemella, arrivata il 22 settembre 2026: **il metodo non sta nel
+racconto**. Come si legge il valore, su che perimetro vale il confronto, in che
+verso va la graduatoria, chi scrive il testo: sono frasi che valgono uguali su
+ogni scheda, e dentro l'articolo erano l'unica cosa che un lettore trovava
+identica altrove. Il 42,5% delle parole dell'articolo medio viveva dentro una
+sequenza di otto parole ripetuta su più di cinque pagine, e una sola frase
+stava su 269 pagine su 372. Adesso il metodo vive in «Come leggere il dato» e
+nell'apparato, e il racconto è sceso al 26,8%.
+
+Il numero lo misura `bin/py scripts/duplicazione.py`, che ne stampa **due**:
+solo l'articolo, e articolo più blocco del metodo. Il secondo c'è perché
+altrimenti spostare una frase da una stanza all'altra farebbe scendere la
+misura senza che niente sia cambiato per chi legge.
 
 ## Chi possiede che cosa
 
@@ -31,6 +49,8 @@ il minimo e la media è la duplicazione che questo layout ha eliminato.
 | prosa scritta | `content/indicators/<chiave>.md` | articolo |
 | prosa composta, quando manca la scritta | `app/templates/_indicator_article.html` | articolo |
 | fonte, copertura, citazione, disclaimer sulla media | template | apparato |
+| perimetro del confronto, verso dell'indicatore, come nasce il testo | template | apparato |
+| come si legge il valore (`explain.example`, `scope`, `reading`) | `app/indicator_notes.py` | blocco «Come leggere il dato» |
 
 `app/indicator_view.py` è il modello dati unico. Espone `meta` (tutto ciò che non
 dipende da un territorio) e `levels` (una voce per livello territoriale, ciascuna
@@ -107,11 +127,17 @@ prima che sulla notizia, ed è il difetto che il criterio 8 della rubrica
 (leggibilità) punisce.
 
 Un'entrata può quindi dichiarare `roles_covered`: la lista dei ruoli che scrive
-come `h2`. Se la `definizione` non è fra quelli, non apre più l'articolo, e la
-sua meccanica va nel blocco **«Come leggere il dato»** (`id="come-leggere"`),
-composto server-side dai metadati `explain` e reso **dopo** la narrazione, mai
-prima: il blocco esiste per togliere la contabilità dall'apertura, non per
-rinominarla.
+come `h2`. Se la `definizione` non è fra quelli, non apre più l'articolo.
+
+Il blocco **«Come leggere il dato»** (`id="come-leggere"`) è composto
+server-side dai metadati `explain` e reso **dopo** la narrazione, mai prima: il
+blocco esiste per togliere la contabilità dall'apertura, non per rinominarla.
+Dal 22 settembre 2026 si rende **su ogni scheda**, non solo quando la
+definizione è assorbita, perché è l'unico posto dove `example`, `scope` e
+`reading` vivono: una scheda senza non direbbe più in che verso si legge la sua
+graduatoria. L'unica cosa che dipende ancora da com'è fatta la scheda è
+`explain.plain`, che compare solo quando non lo sta già dando il lead composto
+o una sezione `definizione` scritta.
 
 Le regole, tutte meccaniche:
 

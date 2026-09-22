@@ -324,15 +324,20 @@
   {# ---- Zona 2: l'articolo. Sezioni variabili, una voce sola. ---- #}
   {{ article.body(page_article, meta, level) }}
 
-  {# "Come leggere il dato": appare quando la definizione è assorbita qui invece
-     di aprire l'articolo con la metodologia (sezioni variabili). Sta **dopo** la
-     narrazione, e non è un dettaglio di impaginazione: renderlo prima lasciava
-     al lettore la stessa contabilità in apertura, solo sotto un altro titolo, e
-     lo scopo del blocco è proprio togliergliela di lì. La meccanica si legge
-     quando serve, cioè dopo aver capito che cosa dice il dato.
-     `page_article.lead` è l'attacco autorato, None se composto: è così che il
-     blocco sa se `plain` è già nel lead (eco) o va mostrato. #}
-  {% if page_article.come_leggere %}{{ article.come_leggere(meta, level, page_article.lead is not none) }}{% endif %}
+  {# "Come leggere il dato". Sta **dopo** la narrazione, e non è un dettaglio di
+     impaginazione: renderlo prima lasciava al lettore la stessa contabilità in
+     apertura, solo sotto un altro titolo, e lo scopo del blocco è proprio
+     togliergliela di lì. La meccanica si legge quando serve, cioè dopo aver
+     capito che cosa dice il dato.
+
+     Si rende **sempre**, non solo quando la definizione è assorbita qui: da
+     quando il metodo è uscito dall'articolo, questo riquadro è l'unico posto in
+     cui vive, e una scheda senza non direbbe più in che verso si legge la sua
+     graduatoria. `page_article.lead` è l'attacco autorato, None se composto, e
+     `page_article.come_leggere` è vero quando la definizione non è fra gli H2
+     dell'articolo: la definizione in piano si mostra solo quando non la sta già
+     dando qualcun altro. #}
+  {{ article.come_leggere(meta, level, page_article.lead is not none and page_article.come_leggere) }}
 
   {# ---- Zona 3: l'apparato. Fonti, verifica, condivisione, percorso. ---- #}
   <section class="indicator-apparatus" id="fonti-verifica">
@@ -355,6 +360,42 @@
         <dt>Come è calcolato</dt>
         <dd>La media mostrata nel cruscotto è una sintesi non ponderata dei valori {{ level.singular == 'regione' and 'regionali' or 'provinciali' }}. Dà a ogni territorio lo stesso peso, indipendentemente dalla popolazione, quindi non coincide con un indicatore nazionale calcolato sulle persone. <strong>Tecnica:</strong> ripubblicazione dei valori della fonte con media semplice non ponderata, divario e classifica senza riponderazioni.</dd>
       </div>
+      {# Come nasce la scheda. Era un paragrafo in coda all'articolo, dove
+         diceva la stessa frase su trecento pagine dentro il racconto. Qui sta
+         accanto a "Come e' calcolato", che e' il posto in cui questa pagina
+         dichiara come e' fatta, e dice una cosa diversa a seconda di che cosa
+         la scheda porta davvero: un testo scritto da un modello e approvato da
+         una persona, oppure frasi composte dal codice sui dati della fonte.
+         Chiamare generata la seconda sarebbe impreciso in eccesso. #}
+      <div class="apparatus-specs__row">
+        <dt>Come nasce questa scheda</dt>
+        <dd>I dati non sono generati: vengono dalla fonte qui sopra, ripubblicati senza correzioni, e le sintesi del cruscotto sono ricalcolate dal codice a ogni caricamento.
+          {%- if page_article.authored_count or page_article.lead %} Il racconto è scritto con l'aiuto di strumenti automatici a partire da quei dati e da citazioni verificate, e non va online senza l'approvazione di una persona, che ne risponde.
+          {%- else %} Le frasi che accompagnano i numeri sono composte dal codice a partire dai metadati della fonte, quindi non possono invecchiare rispetto ai dati.{% endif %}
+          <a href="/metodologia#come-nasce-il-testo">Come nasce il testo, e chi ne risponde</a>.</dd>
+      </div>
+      {# Il perimetro del calcolo. Stava dentro la sezione "Come è cambiato nel
+         tempo", ed era la sequenza di otto parole più ripetuta del sito: 269
+         pagine su 372 con la stessa frase dentro il racconto. Dice su quanti
+         territori è calcolato il confronto, non che cosa è successo. #}
+      {% if level.annual_change or level.annual_note %}
+      <div class="apparatus-specs__row">
+        <dt>Che cosa confronta il calcolo</dt>
+        <dd>
+          {%- if level.annual_change %}Il confronto fra {{ level.annual_change.previous_year }} e {{ level.annual_change.year }} usa le {{ level.annual_change.common_count }} {{ level.annual_change.common_count | it_plural(level.singular, level.plural) }} presenti in entrambi gli anni. {% endif %}
+          {%- if level.annual_note %}{{ level.annual_note }} {% endif %}
+          Lo scarto fra il valore più alto e il più basso è una differenza osservata: da solo non dice se sia statisticamente significativa, e non spiega da che cosa dipenda.</dd>
+      </div>
+      {% endif %}
+      {# Il verso e' una proprieta' della misura, non un fatto di questa serie.
+         Stava in fondo alla sezione "Come si distribuisce oggi", uguale su
+         tutte le schede senza direzione. #}
+      {% if not meta.scoreable %}
+      <div class="apparatus-specs__row">
+        <dt>Il verso di questo indicatore</dt>
+        <dd>Questo indicatore non ha una direzione univoca. Un valore alto descrive una maggiore intensità del fenomeno, non un territorio automaticamente migliore o peggiore, quindi la classifica serve a ordinare i dati, non a premiare nessuno.</dd>
+      </div>
+      {% endif %}
       {% if meta.quality_life_scored %}
       <div class="apparatus-specs__row">
         <dt>Qualità della vita</dt>

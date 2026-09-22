@@ -124,6 +124,13 @@ PUBLIC_DISCOVERABILITY_EXPECTATIONS = {
         {"path": "/blog", "content_type": "text/html", "marker": "Analisi brevi e basate sui dati", "kind": "html", "markdown_marker": "# Storie dai dati"},
         {"path": "/blog/pil-pro-capite-regioni-divario-2024", "content_type": "text/html", "marker": "PIL pro capite per regione", "kind": "html", "markdown_marker": "# PIL pro capite per regione"},
         {"path": "/metodologia", "content_type": "text/html", "marker": "Metodologia e fonti", "kind": "html", "markdown_marker": "# Metodologia e fonti"},
+        # Le tre pagine di fiducia. Mancavano da questo contratto, quindi
+        # l'audit contro produzione non si sarebbe accorto se una fosse tornata
+        # 404 o noindex, ed e' proprio il terzetto che un revisore esterno apre
+        # per primo.
+        {"path": "/chi-siamo", "content_type": "text/html", "marker": "Responsabilità editoriale", "kind": "html"},
+        {"path": "/contatti", "content_type": "text/html", "marker": "divarioitalia@protonmail.com", "kind": "html"},
+        {"path": "/privacy", "content_type": "text/html", "marker": "Pubblicità", "kind": "html"},
         {"path": "/indicatore/tasso-di-turisticita/ter-105", "content_type": "text/html", "marker": "page-indicator", "kind": "html", "markdown_marker": "# Tasso di turisticità"},
         {"path": "/regione/lombardia", "content_type": "text/html", "marker": "page-region", "kind": "html", "markdown_marker": "# Lombardia: profilo territoriale"},
         {"path": "/tema/lavoro-e-conciliazione", "content_type": "text/html", "marker": "page-theme", "kind": "html", "markdown_marker": "# Lavoro e conciliazione"},
@@ -152,6 +159,9 @@ def _inject_license():
         "publisher": publisher.ORGANIZATION,
         "publisher_jsonld": publisher.organization_json(),
         "corrections_url": publisher.CORRECTIONS_URL,
+        "contact_email": publisher.CONTACT_EMAIL,
+        "consent_cmp_name": publisher.CONSENT_CMP_NAME,
+        "consent_cmp_url": publisher.CONSENT_CMP_URL,
         # La navigazione sta in `app/nav.py`, e la testata la legge da li' invece
         # di elencarla. `_ds_header.html` e' incluso da ogni pagina Flask, quindi
         # il posto giusto e' questo processore, non ogni singola `render_template`.
@@ -842,6 +852,26 @@ def about():
     )
 
 
+@app.route("/contatti")
+def contatti():
+    return render_template(
+        "contatti.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/contatti",
+    )
+
+
+@app.route("/termini")
+def termini():
+    return render_template(
+        "termini.html",
+        site_url=SITE_URL,
+        site_name=SITE_NAME,
+        canonical=f"{SITE_URL}/termini",
+    )
+
+
 @app.route("/metodologia")
 def methodology():
     if agent_discovery.prefers_markdown():
@@ -1132,20 +1162,35 @@ def province_page(province_key):
 
     Il dato c'era tutto, mancava la superficie: `province_profile` non calcola
     niente di nuovo, mette in forma cio' che `quality_life_bes` gia' produce.
+
+    E per un anno la pagina ha mostrato **solo punteggi**, da 0 a 100,
+    standardizzati sulle 103 province. Chi cercava "speranza di vita provincia
+    di Lecce" arrivava su una pagina che non conteneva il numero di anni,
+    mentre il BES dei Territori ne porta 479 righe per ogni provincia.
+    `province_profile.indicatori` legge quelle.
     """
     profilo = province_profile.profilo(province_key)
     if profilo is None:
         abort(404)
+    righe = province_profile.indicatori(province_key)
+    su, giu = province_profile.movimenti(righe)
+    prime, ultime = province_profile.dentro_la_regione(righe)
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
             agent_discovery.province_markdown(
-                profilo, province_profile.vicine(province_key), SITE_URL),
+                profilo, province_profile.vicine(province_key), SITE_URL,
+                indicatori=righe),
             f"{SITE_URL}/provincia/{province_key}",
         )
     return render_template(
         "province_page.html",
         profile=profilo,
         vicine=province_profile.vicine(province_key),
+        indicatori=righe,
+        movimenti_su=su,
+        movimenti_giu=giu,
+        prime_in_regione=prime,
+        ultime_in_regione=ultime,
         seo_description=_descrizione_provincia(profilo),
         seo_title=_titolo_provincia(profilo),
         site_url=SITE_URL,
@@ -2125,6 +2170,8 @@ def sitemap():
         {"loc": f"{SITE_URL}/blog", "priority": "0.8"},
         {"loc": f"{SITE_URL}/metodologia", "priority": "0.7"},
         {"loc": f"{SITE_URL}/chi-siamo", "priority": "0.6"},
+        {"loc": f"{SITE_URL}/contatti", "priority": "0.5"},
+        {"loc": f"{SITE_URL}/termini", "priority": "0.3"},
         {"loc": f"{SITE_URL}/regioni", "priority": "0.7"},
         {"loc": f"{SITE_URL}/temi", "priority": "0.6"},
         {"loc": f"{SITE_URL}/quiz", "priority": "0.7"},

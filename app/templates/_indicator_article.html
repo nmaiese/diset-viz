@@ -21,36 +21,28 @@
 {%- elif item -%}{{ item.name }}{%- endif -%}
 {%- endmacro %}
 
-{# La dichiarazione di generazione automatica, richiesta dall'articolo 50(4)
-   dell'AI Act, in vigore dal 2 agosto 2026. L'obbligo riguarda chi pubblica un
-   testo "with the purpose of informing the public on matters of public
-   interest", e l'esenzione è **cumulativa**: revisione o controllo editoriale
-   umano E una persona fisica o giuridica che detenga la responsabilità
-   editoriale. Una catena a zero tempo umano per articolo non può invocarla,
-   quindi la dichiarazione non è una scelta.
+{# Come nasce il testo non sta piu' qui dentro.
 
-   Compare **solo se una parte del testo è autorata**, cioè scritta da un
-   modello: le sezioni composte qui dentro sono template deterministici sui
-   dati della fonte e non sono generate nel senso della norma. Dire il
-   contrario sarebbe impreciso in eccesso, che su una pagina di dati pubblici
-   costa fiducia quanto dirlo in difetto.
+   Ci stava come paragrafo in coda all'articolo, e diceva che la scheda era
+   "scritta automaticamente ... e pubblicata senza riscrittura umana". Era
+   vero quando lo abbiamo scritto, perche' allora nessuno leggeva il pezzo
+   prima che uscisse, e serviva all'articolo 50(4) dell'AI Act.
 
-   Sta in fondo all'articolo e non in una policy perché il comma 5 chiede
-   "a clear and distinguishable manner at the latest at the time of the first
-   ... exposure". #}
-{% macro dichiarazione(article) %}
-{% set autorate = article.sections | selectattr('authored') | list %}
-{% if autorate or article.lead %}
-<p class="page-note indicator-article__disclosure">
-  Il testo di questa scheda è scritto automaticamente a partire dai dati della
-  fonte e da citazioni verificate, e pubblicato senza riscrittura umana.
-  I numeri sono ricalcolati dalla fonte a ogni verifica.
-  <a href="/metodologia#come-nasce-il-testo">Come nasce il testo, e chi ne risponde</a>.
-</p>
-{% endif %}
-{% endmacro %}
+   Non lo e' piu': nessuna scheda arriva online senza che una persona approvi
+   la proposta di modifica che la porta, e quella persona risponde di quello
+   che si legge. L'esenzione del comma 4 e' cumulativa e chiede "human review
+   **or editorial control**" piu' qualcuno che detenga la responsabilita'
+   editoriale: il controllo c'e', la responsabilita' e' dichiarata.
 
+   Dove e' finita: nell'apparato di `indicator_page.html`, accanto a "Come e'
+   calcolato", che e' gia' il posto dove la pagina dice come e' fatta. La
+   trasparenza resta e resta su ogni scheda, ma smette di stare dentro il
+   racconto, dove era l'unica frase identica su trecento pagine.
 
+   La distinzione che quel blocco fa, e che va tenuta: le sezioni composte qui
+   sotto sono template deterministici sui dati della fonte e non sono generate
+   nel senso della norma. Dire il contrario sarebbe impreciso in eccesso, che
+   su una pagina di dati pubblici costa fiducia quanto dirlo in difetto. #}
 {% macro body(article, meta, level) %}
 <div class="indicator-article prose">
   {% for section in article.sections %}
@@ -66,22 +58,33 @@
   {% elif section.role == 'limiti' %}{{ limiti(meta, level) }}
   {% endif %}
   {% endfor %}
-  {{ dichiarazione(article) }}
 </div>
 {% endmacro %}
 
 
-{# "Come leggere il dato": dove abita la definizione quando non apre più
-   l'articolo (sezioni variabili). Compone lo stesso `explain` dei metadati che
-   la macro `definizione` componeva, così la meccanica esce dalla narrazione e
-   il lettore trova la storia in apertura. `plain` solo quando il lead è
-   autorato: se il lead è composto viene già da `explain.plain`
-   (`composed_lead`), e ripeterlo qui sarebbe un'eco. #}
-{% macro come_leggere(meta, level, lead_authored) %}
+{# "Come leggere il dato": la meccanica, fuori dalla narrazione.
+
+   Nato come la casa della definizione quando la definizione non apriva piu'
+   l'articolo (sezioni variabili). Adesso e' la casa di **tutta** la parte di
+   metodo: come si legge il valore, su che perimetro vale il confronto, in che
+   verso va ordinata la graduatoria. Sono le frasi che `app/indicator_notes.py`
+   compone dai metadati, e sono poche varianti su centinaia di pagine: dentro
+   l'articolo erano l'unica cosa che un lettore trovava identica altrove.
+
+   Si rende sempre, non solo quando la definizione e' assorbita: il riquadro
+   dice come si legge la pagina, e la pagina si legge allo stesso modo in tutti
+   e due i casi.
+
+   `mostra_plain` e' l'unica cosa che dipende ancora da com'e' fatta la scheda,
+   e ha due motivi. Se il lead e' composto, `plain` e' gia' dentro il lead
+   (`composed_lead`). Se l'articolo ha una sua sezione "definizione" scritta,
+   `plain` la ridice in piano due righe dopo. In tutti e due i casi e' un'eco,
+   e la definizione ufficiale resta comunque nell'apparato. #}
+{% macro come_leggere(meta, level, mostra_plain) %}
 {% set explain = level.explain or meta.explain %}
 <section class="come-leggere" id="come-leggere" aria-label="Come leggere il dato">
   <h2>Come leggere il dato</h2>
-  {% if explain.plain and lead_authored %}<p>{{ explain.plain }}</p>{% endif %}
+  {% if explain.plain and mostra_plain %}<p>{{ explain.plain }}</p>{% endif %}
   {% if explain.example %}<p>{{ explain.example }}</p>{% endif %}
   {% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
   {% if explain.reading %}<p>{{ explain.reading }}</p>{% endif %}
@@ -91,19 +94,26 @@
 
 {% macro definizione(meta, level) %}
 {# Level-scoped: `scope` and `caveat` name the territorial level, so they
-   come from the rendered level, never from meta (which spans all levels). #}
+   come from the rendered level, never from meta (which spans all levels).
+
+   Qui resta **solo** `plain`, che dice che cosa misura questo indicatore.
+   `example`, `scope` e `reading` sono passati al riquadro "Come leggere il
+   dato": spiegano come si legge una graduatoria, non che cosa fa questo
+   numero, e con nove varianti su 634 pagine erano la stessa frase dentro
+   trecento racconti diversi. Una sola di loro stava su 307 pagine. #}
 {% set explain = level.explain or meta.explain %}
 {% if explain.plain %}<p>{{ explain.plain }}</p>{% endif %}
-<p>{{ explain.example }}</p>
-{% if explain.scope %}<p>{{ explain.scope }}</p>{% endif %}
-<p>{{ explain.reading }}</p>
 {% endmacro %}
 
 
 {% macro quadro(meta, level) %}
 {% set stats = level.stats %}
+{# La riserva ("da solo non dice se la differenza sia statisticamente
+   significativa") e' passata all'apparato: vale per ogni scheda allo stesso
+   modo, e ripetuta dentro il racconto era una delle frasi piu' frequenti del
+   sito. Qui resta il fatto, con i due nomi dentro. #}
 {% if level.best and level.worst and stats.gap_abs is not none %}
-<p>Lo scarto tra {{ territory(level, level.best) }} e {{ territory(level, level.worst) }} è quello osservato nell'anno più recente, {{ level.year_max }}. Da solo non dice se la differenza sia statisticamente significativa, e non spiega da che cosa dipenda.</p>
+<p>Lo scarto tra {{ territory(level, level.best) }} e {{ territory(level, level.worst) }} è quello osservato nell'anno più recente, {{ level.year_max }}.</p>
 {% endif %}
 {% if stats.above_avg_count is not none and stats.below_avg_count is not none %}
 <p>La media divide le {{ level.plural }} in due gruppi diseguali, {{ stats.above_avg_count }} sopra e {{ stats.below_avg_count }} sotto.
@@ -112,9 +122,8 @@
 {% elif stats.year_count is not none and stats.year_count < 5 %}
 <p>Con {{ stats.year_count }} {{ stats.year_count | it_plural(level.singular, level.plural) }} a confronto i valori vanno letti come indicazioni di massima. Su così pochi dati mediana e distribuzione non sarebbero significative.</p>
 {% endif %}
-{% if not meta.scoreable %}
-<p>Questo indicatore non ha una direzione univoca. Un valore alto descrive una maggiore intensità del fenomeno, non un territorio automaticamente migliore o peggiore, quindi la classifica qui sopra serve a ordinare i dati, non a premiare nessuno.</p>
-{% endif %}
+{# Il verso dell'indicatore e' una proprieta' della misura, non un fatto di
+   questa serie: sta nell'apparato, riga "Il verso di questo indicatore". #}
 {% endmacro %}
 
 
@@ -145,13 +154,21 @@
       direction is known and the sentence is simply false; on a contextual one the
       "quadro" section already says there is no direction to read. -#}</p>
 {% endif %}
+{# "Il divario tra il valore piu' alto e il piu' basso" apriva questa frase su
+   230 pagine identiche. La distanza e' fra due territori che hanno un nome, e
+   nominarli dice la stessa cosa senza essere la stessa frase. #}
 {% if stats.gap_trend is not none and stats.year_min_gap_abs %}
-<p>{% if stats.gap_trend | abs < 0.01 * (stats.year_min_gap_abs | abs) %}Il divario tra il valore più alto e il più basso è rimasto sostanzialmente stabile nel periodo, quindi le distanze di partenza non si sono ricomposte.
-  {%- elif stats.gap_trend > 0 %}Il divario tra il valore più alto e il più basso si è allargato di {{ stats.gap_trend | it_num(2) }} {{ meta.change_unit }}, quindi i territori non si stanno avvicinando.
-  {%- else %}Il divario tra il valore più alto e il più basso si è ristretto di {{ (stats.gap_trend | abs) | it_num(2) }} {{ meta.change_unit }}, quindi le distanze si sono in parte ricomposte.{% endif %}</p>
+{% set estremi %}{% if level.best and level.worst %}la distanza fra {{ territory(level, level.best) }} e {{ territory(level, level.worst) }}{% else %}la distanza fra il valore più alto e il più basso{% endif %}{% endset %}
+<p>{% if stats.gap_trend | abs < 0.01 * (stats.year_min_gap_abs | abs) %}Dal {{ stats.year_min }} {{ estremi }} è rimasta sostanzialmente la stessa, quindi le distanze di partenza non si sono ricomposte.
+  {%- elif stats.gap_trend > 0 %}Dal {{ stats.year_min }} {{ estremi }} si è allargata di {{ stats.gap_trend | it_num(2) }} {{ meta.change_unit }}, quindi i territori non si stanno avvicinando.
+  {%- else %}Dal {{ stats.year_min }} {{ estremi }} si è ristretta di {{ (stats.gap_trend | abs) | it_num(2) }} {{ meta.change_unit }}, quindi le distanze si sono in parte ricomposte.{% endif %}</p>
 {% endif %}
 {% if annual %}
-<p>Nell'ultimo passaggio disponibile, tra il {{ annual.previous_year }} e il {{ annual.year }}, il valore è diminuito in {{ annual.decrease_count }} {{ annual.decrease_count | it_plural(level.singular, level.plural) }}, è aumentato in {{ annual.increase_count }}{% if annual.stable_count %} ed è rimasto invariato in {{ annual.stable_count }}{% endif %}. Il confronto usa le {{ annual.common_count }} {{ annual.common_count | it_plural(level.singular, level.plural) }} presenti in entrambi gli anni. {{ level.annual_note }}</p>
+{# "Il confronto usa le N regioni presenti in entrambi gli anni" e la nota
+   annuale stavano qui, ed erano la sequenza piu' ripetuta del sito: 269 pagine
+   su 372. Dicono su che perimetro e' calcolato il numero, non che cosa e'
+   successo, e ora stanno nell'apparato. #}
+<p>Nell'ultimo passaggio disponibile, tra il {{ annual.previous_year }} e il {{ annual.year }}, il valore è diminuito in {{ annual.decrease_count }} {{ annual.decrease_count | it_plural(level.singular, level.plural) }}, è aumentato in {{ annual.increase_count }}{% if annual.stable_count %} ed è rimasto invariato in {{ annual.stable_count }}{% endif %}.</p>
 {% endif %}
 {% endif %}
 {% endmacro %}
