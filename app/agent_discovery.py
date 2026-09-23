@@ -270,14 +270,15 @@ def _absolute(site_url, path):
     return path if str(path).startswith(("http://", "https://")) else f"{site_url}{path}"
 
 
-def home_markdown(summary, featured, posts, site_url):
+def home_markdown(summary, featured, posts, site_url, territories=None):
     lines = [
         "# Divario Italia",
         "",
         "> Atlante degli indicatori territoriali italiani, con fonti verificate, serie storiche e download aperti.",
         "",
         f"Il catalogo raccoglie {summary['total']} indicatori di {summary['institutions_label']}, "
-        f"con anni dal {summary['year_min']} al {summary['year_max']}.",
+        f"con anni dal {summary['year_min']} al {summary['year_max']}"
+        + (f", su {territories['regions']} regioni e {territories['provinces']} province." if territories else "."),
         "",
         "## Esplora",
         "",

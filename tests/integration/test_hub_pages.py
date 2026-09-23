@@ -1010,3 +1010,39 @@ class LeProvincePerLeMacchine(unittest.TestCase):
             with self.subTest(domanda=voce["name"]):
                 self.assertIn(voce["name"], visibile)
                 self.assertIn(" ".join(voce["acceptedAnswer"]["text"].split()), visibile)
+
+
+class LaHomePortaAlleProvince(unittest.TestCase):
+    """La home contava "20 regioni" scritto a mano in sei posti, e dalla home
+    non si arrivava a nessuna provincia."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.client = app.test_client()
+        cls.html = cls.client.get("/").get_data(as_text=True)
+
+    def test_la_home_porta_all_indice_e_alle_province(self):
+        self.assertIn('href="/province"', self.html)
+        self.assertRegex(self.html, r'href="/provincia/[a-z0-9-]+"')
+
+    def test_il_modulo_qualita_della_vita_ha_regioni_e_province(self):
+        import html as html_lib
+        import json
+        dati = json.loads(html_lib.unescape(re.search(r"data-profiles='(.*?)'>", self.html, re.DOTALL).group(1)))
+        self.assertEqual(set(dati["levels"]), {"regioni", "province"})
+        for livello, prefisso in (("regioni", "/regione/"), ("province", "/provincia/")):
+            for profilo in dati["levels"][livello]["profiles"]:
+                for riga in profilo["top"] + profilo["bottom"]:
+                    self.assertTrue(riga["path"].startswith(prefisso), riga)
+                    self.assertEqual(self.client.get(riga["path"]).status_code, 200, riga["path"])
+
+    def test_i_conteggi_dei_territori_non_sono_scritti_a_mano(self):
+        from pathlib import Path
+        for nome in ("home.html", "region_page.html"):
+            testo = (Path(app.root_path) / "templates" / nome).read_text(encoding="utf-8")
+            testo = re.sub(r"\{#.*?#\}", "", testo, flags=re.DOTALL)
+            with self.subTest(template=nome):
+                self.assertNotRegex(testo, r"\b(?:20|venti) regioni\b")
+                self.assertNotRegex(testo, r"<strong>20</strong>")
+        from app import province_profile
+        self.assertIn(f"<strong>{province_profile.total()}</strong> province", self.html)

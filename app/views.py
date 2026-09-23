@@ -381,14 +381,19 @@ def home():
     total_indicators = summary["total"]
     featured = _home_featured_indicator_links()
     recent_posts = get_posts()[:3]
+    # I conteggi dei territori si calcolano: "20 regioni" era scritto a mano in
+    # sei posti, e le province non comparivano in nessuno.
+    territories = {"regions": len(profiles.regions_overview()), "provinces": province_profile.total()}
     if agent_discovery.prefers_markdown():
         return agent_discovery.markdown_response(
-            agent_discovery.home_markdown(summary, featured, recent_posts, SITE_URL),
+            agent_discovery.home_markdown(summary, featured, recent_posts, SITE_URL,
+                                          territories=territories),
             f"{SITE_URL}/",
         )
     themes_preview = _home_themes_preview()
     return render_template(
         "home.html",
+        territories=territories,
         site_url=SITE_URL,
         site_name=SITE_NAME,
         canonical=f"{SITE_URL}/",
@@ -397,17 +402,16 @@ def home():
         year_min=summary["year_min"],
         year_max=summary["year_max"],
         themes_preview=themes_preview,
-        qol=_home_qol_preview(),
         quiz_games=_home_quiz_games(),
         posts=recent_posts,
         # 2026 design system modules
         hero_map=_home_hero_map(),
-        paths=_home_paths(summary, themes_preview),
+        paths=_home_paths(summary, themes_preview, territories),
         featured_story=_home_featured_story(),
         insight_cards=_home_insight_cards(),
         series_module=_home_series_module(),
         qol_module=_home_qol_module(),
-        trust_cards=_home_trust_cards(summary),
+        trust_cards=_home_trust_cards(summary, territories),
     )
 
 
@@ -2741,20 +2745,6 @@ def _map_hero(indicator_ids):
     }
 
 
-def _home_qol_preview():
-    payload = qb.build_bes_ranking("regione", qb.DEFAULT_PROFILE)
-    if payload is None:
-        return None
-    ranking = payload["ranking"]
-    return {
-        "top5": ranking[:5],
-        "bottom3": list(reversed(ranking[-3:])),
-        "spread": it_num(ranking[0]["score"] - ranking[-1]["score"]),
-        "leader": ranking[0]["name"],
-        "last": ranking[-1]["name"],
-    }
-
-
 def _region_leaders(matrix, meta, keep):
     """Region in front and region trailing over the mean oriented score across
     the scoreable indicators for which keep(info) is true (best = 1.0). Returns
@@ -3223,36 +3213,59 @@ def _home_series_polylines(regions, reference, selected_keys):
     }
 
 
+def _home_qol_row(row, prefix):
+    return {"rank": row["rank"], "name": row["name"], "score": round(row["score"]),
+            "path": f"{prefix}{row['key']}"}
+
+
 def _home_qol_module():
-    """Quality-of-life ranking for every published weighting profile, so the
-    homepage can switch profile without a round trip. Each profile carries its
-    own top three, bottom three and score spread: changing the weights changes
-    the answer, which is the point the module is making."""
-    profiles_payload = []
-    for slug, config_entry in QUALITY_LIFE_PROFILES.items():
-        payload = qb.build_bes_ranking("regione", slug)
-        if payload is None:
-            continue
-        ranking = payload["ranking"]
-        if len(ranking) < 6:
-            continue
-        profiles_payload.append({
-            "slug": slug,
-            "name": config_entry["name"],
-            "description": config_entry["description"],
-            "top": [
-                {"rank": row["rank"], "name": row["name"], "score": round(row["score"])}
-                for row in ranking[:3]
-            ],
-            "bottom": [
-                {"rank": row["rank"], "name": row["name"], "score": round(row["score"])}
-                for row in reversed(ranking[-3:])
-            ],
-            "gap": round(ranking[0]["score"] - ranking[-1]["score"]),
-        })
-    if not profiles_payload:
+    """Quality-of-life ranking for every published weighting profile, on both
+    levels, so the homepage can switch profile and level without a round trip.
+    Each profile carries its own top three, bottom three and score spread:
+    changing the weights changes the answer, which is the point the module is
+    making.
+
+    Le province stanno accanto alle regioni dal 23/9/2026: il modulo mostrava
+    solo le venti regioni, e dalla home non si arrivava a nessuna provincia.
+    La scelta del livello e' lato client, perche' la home e' in cache con la
+    querystring: un `?livello=` farebbe una copia della pagina per valore.
+    """
+    levels = {}
+    for url_level, level in (("regioni", "regione"), ("province", "provincia")):
+        prefix = "/regione/" if level == "regione" else "/provincia/"
+        profiles_payload = []
+        for slug, config_entry in QUALITY_LIFE_PROFILES.items():
+            payload = qb.build_bes_ranking(level, slug)
+            if payload is None:
+                continue
+            ranking = payload["ranking"]
+            if len(ranking) < 6:
+                continue
+
+            profiles_payload.append({
+                "slug": slug,
+                "name": config_entry["name"],
+                "description": config_entry["description"],
+                "top": [_home_qol_row(row, prefix) for row in ranking[:3]],
+                "bottom": [_home_qol_row(row, prefix) for row in reversed(ranking[-3:])],
+                "gap": round(ranking[0]["score"] - ranking[-1]["score"]),
+            })
+        if profiles_payload:
+            levels[url_level] = {
+                "label": "Regioni" if level == "regione" else "Province",
+                "classifica": f"/qualita-della-vita/classifica/{url_level}",
+                "cta": "Classifica delle regioni" if level == "regione" else "Classifica delle province",
+                "profiles": profiles_payload,
+            }
+    if "regioni" not in levels:
         return None
-    return {"profiles": profiles_payload, "default_slug": qb.DEFAULT_PROFILE}
+    return {
+        "levels": levels,
+        "default_level": "regioni",
+        "default_slug": qb.DEFAULT_PROFILE,
+        # Il template disegna senza JavaScript il livello predefinito.
+        "profiles": levels["regioni"]["profiles"],
+    }
 
 
 def _home_featured_story():
@@ -3355,18 +3368,21 @@ def _home_insight_cards():
     return cards
 
 
-def _home_paths(summary, themes_preview):
+def _home_paths(summary, themes_preview, territories):
     """The four exploration entry points, with the counts each one actually
     opens onto. A path that cannot state its size is a path nobody trusts."""
     theme_count = sum(card["theme_count"] for card in themes_preview) if themes_preview else 0
     area_count = len(themes_preview or [])
     return [
         {
-            "eyebrow": "Una regione",
-            "body": "Apri il profilo di un territorio: dove emerge, dove fatica, come si è mosso.",
-            "meta": "20 profili regionali",
-            "href": "/regioni",
-            "cta": "Sfoglia le regioni",
+            # La prima porta e' il territorio di chi legge, e dal 23/9/2026
+            # arriva fino alla provincia: la regione resta un passo sopra, nella
+            # stessa pagina.
+            "eyebrow": "Il tuo territorio",
+            "body": "Trova la tua provincia o la tua regione: dove emerge, dove fatica, i valori veri di ogni indicatore.",
+            "meta": f"{territories['regions']} regioni, {territories['provinces']} province",
+            "href": "/province",
+            "cta": "Trova la tua provincia",
             "path": "regione",
         },
         {
@@ -3396,7 +3412,7 @@ def _home_paths(summary, themes_preview):
     ]
 
 
-def _home_trust_cards(summary):
+def _home_trust_cards(summary, territories):
     """Sources, updates, method and corrections: the four things a reader has
     to be able to check before trusting a number on this site."""
     return [
@@ -3409,7 +3425,8 @@ def _home_trust_cards(summary):
         },
         {
             "kicker": "Copertura",
-            "title": f"{summary['total']} indicatori, 20 regioni, dal {summary['year_min']} al {summary['year_max']}",
+            "title": (f"{summary['total']} indicatori, {territories['regions']} regioni e "
+                      f"{territories['provinces']} province, dal {summary['year_min']} al {summary['year_max']}"),
             "body": "Il catalogo viene rivisto a ogni nuovo rilascio ufficiale.",
             "href": "/catalogo-dati",
             "cta": "Sfoglia il catalogo",
