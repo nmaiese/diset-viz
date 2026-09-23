@@ -1,0 +1,70 @@
+<svg class="fig" viewBox="0 0 680 572" role="img" aria-labelledby="fig-province-2022-t fig-province-2022-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-province-2022-t">Il rischio più alto non è nelle grandi città</title>
+<desc id="fig-province-2022-d">Le 10 province con il valore piu&#x27; alto e le 10 con il piu&#x27; basso nel 2022: prima Arezzo con 20,3, ultima Verbano-Cusio-Ossola con 4,7.</desc>
+<text class="fig__titolo" x="0" y="20">Il rischio più alto non è nelle grandi città</text>
+<text class="fig__sotto" x="0" y="40">Tasso di infortuni mortali e inabilità permanente, 2022. Le 10 province piu&#x27; alte e le 10 piu&#x27; basse su 103. per 10.000 occupati.</text>
+<text class="fig__nome is-on" x="182" y="74" text-anchor="end">Arezzo</text>
+<rect class="fig__barra is-on" x="190" y="63" width="430.0" height="15"/>
+<text class="fig__valore is-on" x="626.0" y="74">20,3</text>
+<text class="fig__nome is-on" x="182" y="96" text-anchor="end">Potenza</text>
+<rect class="fig__barra is-on" x="190" y="85" width="425.8" height="15"/>
+<text class="fig__valore is-on" x="621.8" y="96">20,1</text>
+<text class="fig__nome" x="182" y="118" text-anchor="end">Massa-Carrara</text>
+<rect class="fig__barra" x="190" y="107" width="419.4" height="15"/>
+<text class="fig__valore" x="615.4" y="118">19,8</text>
+<text class="fig__nome" x="182" y="140" text-anchor="end">Teramo</text>
+<rect class="fig__barra" x="190" y="129" width="396.1" height="15"/>
+<text class="fig__valore" x="592.1" y="140">18,7</text>
+<text class="fig__nome" x="182" y="162" text-anchor="end">Grosseto</text>
+<rect class="fig__barra" x="190" y="151" width="389.8" height="15"/>
+<text class="fig__valore" x="585.8" y="162">18,4</text>
+<text class="fig__nome" x="182" y="184" text-anchor="end">Perugia</text>
+<rect class="fig__barra" x="190" y="173" width="387.6" height="15"/>
+<text class="fig__valore" x="583.6" y="184">18,3</text>
+<text class="fig__nome" x="182" y="206" text-anchor="end">Lucca</text>
+<rect class="fig__barra" x="190" y="195" width="385.5" height="15"/>
+<text class="fig__valore" x="581.5" y="206">18,2</text>
+<text class="fig__nome" x="182" y="228" text-anchor="end">Chieti</text>
+<rect class="fig__barra" x="190" y="217" width="383.4" height="15"/>
+<text class="fig__valore" x="579.4" y="228">18,1</text>
+<text class="fig__nome" x="182" y="250" text-anchor="end">Siena</text>
+<rect class="fig__barra" x="190" y="239" width="377.0" height="15"/>
+<text class="fig__valore" x="573.0" y="250">17,8</text>
+<text class="fig__nome" x="182" y="272" text-anchor="end">Forlì-Cesena</text>
+<rect class="fig__barra" x="190" y="261" width="372.8" height="15"/>
+<text class="fig__valore" x="568.8" y="272">17,6</text>
+<text class="fig__stacco" x="190" y="294">· · ·</text>
+<text class="fig__nome" x="182" y="316" text-anchor="end">Pordenone</text>
+<rect class="fig__barra" x="190" y="305" width="169.5" height="15"/>
+<text class="fig__valore" x="365.5" y="316">8,0</text>
+<text class="fig__nome" x="182" y="338" text-anchor="end">Roma</text>
+<rect class="fig__barra" x="190" y="327" width="150.4" height="15"/>
+<text class="fig__valore" x="346.4" y="338">7,1</text>
+<text class="fig__nome" x="182" y="360" text-anchor="end">Como</text>
+<rect class="fig__barra" x="190" y="349" width="141.9" height="15"/>
+<text class="fig__valore" x="337.9" y="360">6,7</text>
+<text class="fig__nome" x="182" y="382" text-anchor="end">Torino</text>
+<rect class="fig__barra" x="190" y="371" width="139.8" height="15"/>
+<text class="fig__valore" x="335.8" y="382">6,6</text>
+<text class="fig__nome is-on" x="182" y="404" text-anchor="end">Milano</text>
+<rect class="fig__barra is-on" x="190" y="393" width="135.6" height="15"/>
+<text class="fig__valore is-on" x="331.6" y="404">6,4</text>
+<text class="fig__nome" x="182" y="426" text-anchor="end">Biella</text>
+<rect class="fig__barra" x="190" y="415" width="133.4" height="15"/>
+<text class="fig__valore" x="329.4" y="426">6,3</text>
+<text class="fig__nome" x="182" y="448" text-anchor="end">Pavia</text>
+<rect class="fig__barra" x="190" y="437" width="125.0" height="15"/>
+<text class="fig__valore" x="321.0" y="448">5,9</text>
+<text class="fig__nome" x="182" y="470" text-anchor="end">Mantova</text>
+<rect class="fig__barra" x="190" y="459" width="122.9" height="15"/>
+<text class="fig__valore" x="318.9" y="470">5,8</text>
+<text class="fig__nome" x="182" y="492" text-anchor="end">Novara</text>
+<rect class="fig__barra" x="190" y="481" width="101.7" height="15"/>
+<text class="fig__valore" x="297.7" y="492">4,8</text>
+<text class="fig__nome" x="182" y="514" text-anchor="end">Verbano-Cusio-Ossola</text>
+<rect class="fig__barra" x="190" y="503" width="99.6" height="15"/>
+<text class="fig__valore" x="295.6" y="514">4,7</text>
+<line class="fig__rif" x1="451.7" y1="56" x2="451.7" y2="522"/>
+<text class="fig__rif-testo" x="455.7" y="536">media semplice 12,35</text>
+<text class="fig__fonte" x="0" y="566">Fonte: Istat, BES dei Territori. Elaborazione Divario Italia.</text>
+</svg>

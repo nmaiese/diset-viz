@@ -65,6 +65,31 @@
   ]
 }
 </script>
+{% if post.dataset %}{% set ds = post.dataset %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": {{ ds.name | tojson }},
+  "description": {{ ds.description | tojson }},
+  "url": {{ ds.url | tojson }},
+  "license": {{ ds.license | tojson }},
+  "isAccessibleForFree": true,
+  "creator": { "@type": "Organization", "name": {{ ds.creator | tojson }} },
+  "publisher": {{ publisher_jsonld | safe }},
+  {% if ds.method %}"measurementTechnique": {{ ds.method | tojson }},{% endif %}
+  {% if ds.temporal %}"temporalCoverage": {{ ds.temporal | tojson }},{% endif %}
+  "spatialCoverage": { "@type": "Place", "name": {{ ds.spatial | tojson }} },
+  {% if ds.source_url %}"isBasedOn": {{ ds.source_url | tojson }},{% endif %}
+  {% if ds.download_abs %}"distribution": [{
+    "@type": "DataDownload",
+    "encodingFormat": "text/csv",
+    "contentUrl": {{ ds.download_abs | tojson }}
+  }],{% endif %}
+  "subjectOf": { "@type": "Article", "@id": {{ canonical | tojson }} }
+}
+</script>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -84,12 +109,29 @@
   {% if post.cover %}
   <figure class="article-cover prose-wrap">
     <img src="{{ post.cover }}" alt="{{ post.cover_alt }}" width="1200" height="630">
-    {% if post.cover_alt %}<figcaption>{{ post.cover_alt }}</figcaption>{% endif %}
+    {# Una foto con licenza porta la sua attribuzione: autore, licenza, originale.
+       Senza credito la didascalia resta l'alt, come per le copertine disegnate. #}
+    {% if post.cover_credit %}{% set c = post.cover_credit %}
+    <figcaption class="article-cover__credit">{% if post.cover_caption %}{{ post.cover_caption }} {% endif %}Foto: {{ c.autore }}, {% if c.licenza_url %}<a href="{{ c.licenza_url }}" rel="license noopener" target="_blank">{{ c.licenza }}</a>{% else %}{{ c.licenza }}{% endif %}{% if c.fonte_url %}, via <a href="{{ c.fonte_url }}" rel="noopener" target="_blank">{{ c.fonte_nome }}</a>{% endif %}{% if c.modifiche %}. {{ c.modifiche }}{% endif %}.</figcaption>
+    {% elif post.cover_alt %}<figcaption>{{ post.cover_alt }}</figcaption>{% endif %}
   </figure>
   {% endif %}
 
   <div class="prose prose-wrap">
     {{ post.body_html | safe }}
+
+    {% if post.dataset %}
+    <aside class="article-dataset">
+      <h2>I dati di questo articolo</h2>
+      <p>{{ post.dataset.description }}</p>
+      {% if post.dataset.method %}<p><strong>Metodo.</strong> {{ post.dataset.method }}</p>{% endif %}
+      <p>
+        {% if post.dataset.download %}<a href="{{ post.dataset.download }}" download>Scarica i dati (CSV)</a>{% endif %}
+        {% if post.dataset.source_url %} · <a href="{{ post.dataset.source_url }}" rel="noopener" target="_blank">Fonte originale</a>{% endif %}
+        · Licenza <a href="{{ post.dataset.license }}" rel="license noopener" target="_blank">CC BY 4.0</a>
+      </p>
+    </aside>
+    {% endif %}
 
     {% if post.indicator_meta %}
     <section class="article-indicator-explain">

@@ -1,0 +1,32 @@
+<svg class="fig" viewBox="0 0 680 360" role="img" aria-labelledby="fig-posti-letto-2009-2023-t fig-posti-letto-2009-2023-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-posti-letto-2009-2023-t">La distanza nei posti letto non si chiude</title>
+<desc id="fig-posti-letto-2009-2023-d">Centro-Nord: da 88,3 nel 2009 a 96,6 nel 2023; Mezzogiorno: da 48,7 nel 2009 a 48,4 nel 2023</desc>
+<text class="fig__titolo" x="0" y="20">La distanza nei posti letto non si chiude</text>
+<text class="fig__sotto" x="0" y="40">Posti letto nei presidi residenziali socio-assistenziali e socio-sanitari, 2009-2023. Per 10.000 abitanti.</text>
+<line class="fig__griglia" x1="48" y1="290.0" x2="530" y2="290.0"/>
+<text class="fig__asse" x="42" y="294.0" text-anchor="end">35</text>
+<line class="fig__griglia" x1="48" y1="232.5" x2="530" y2="232.5"/>
+<text class="fig__asse" x="42" y="236.5" text-anchor="end">52</text>
+<line class="fig__griglia" x1="48" y1="175.0" x2="530" y2="175.0"/>
+<text class="fig__asse" x="42" y="179.0" text-anchor="end">68</text>
+<line class="fig__griglia" x1="48" y1="117.5" x2="530" y2="117.5"/>
+<text class="fig__asse" x="42" y="121.5" text-anchor="end">85</text>
+<line class="fig__griglia" x1="48" y1="60.0" x2="530" y2="60.0"/>
+<text class="fig__asse" x="42" y="64.0" text-anchor="end">101</text>
+<text class="fig__asse" x="48.0" y="308" text-anchor="middle">2009</text>
+<text class="fig__asse" x="116.9" y="308" text-anchor="middle">2011</text>
+<text class="fig__asse" x="185.7" y="308" text-anchor="middle">2013</text>
+<text class="fig__asse" x="254.6" y="308" text-anchor="middle">2015</text>
+<text class="fig__asse" x="323.4" y="308" text-anchor="middle">2017</text>
+<text class="fig__asse" x="392.3" y="308" text-anchor="middle">2019</text>
+<text class="fig__asse" x="461.1" y="308" text-anchor="middle">2021</text>
+<text class="fig__asse" x="530.0" y="308" text-anchor="middle">2023</text>
+<polyline class="fig__linea fig__linea--cn" points="48.0,104.7 82.4,83.3 116.9,111.3 151.3,117.9 185.7,122.2 220.1,112.0 254.6,112.2 289.0,91.2 323.4,92.4 357.9,86.2 392.3,83.9 426.7,89.3 461.1,86.5 495.6,87.7 530.0,75.9"/>
+<circle class="fig__punto fig__punto--cn" cx="530.0" cy="75.9" r="3.5"/>
+<polyline class="fig__linea fig__linea--mz" points="48.0,242.3 82.4,251.6 116.9,262.0 151.3,274.1 185.7,268.0 220.1,256.4 254.6,263.4 289.0,251.5 323.4,252.8 357.9,245.9 392.3,242.8 426.7,245.0 461.1,246.3 495.6,252.7 530.0,243.4"/>
+<circle class="fig__punto fig__punto--mz" cx="530.0" cy="243.4" r="3.5"/>
+<text class="fig__etichetta fig__etichetta--cn" x="538.0" y="79.9">Centro-Nord 96,61</text>
+<text class="fig__etichetta fig__etichetta--mz" x="538.0" y="247.4">Mezzogiorno 48,38</text>
+<text class="fig__nota" x="0" y="334">Centro-Nord e Mezzogiorno: medie semplici dei territori, non pesate per popolazione.</text>
+<text class="fig__fonte" x="0" y="354">Fonte: Istat, Benessere equo e sostenibile. Elaborazione Divario Italia.</text>
+</svg>

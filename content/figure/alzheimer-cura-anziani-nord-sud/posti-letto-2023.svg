@@ -1,0 +1,69 @@
+<svg class="fig" viewBox="0 0 680 550" role="img" aria-labelledby="fig-posti-letto-2023-t fig-posti-letto-2023-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-posti-letto-2023-t">Fra Trentino e Campania, sette volte i posti letto</title>
+<desc id="fig-posti-letto-2023-d">Classifica di 20 territori nel 2023: primo Trentino Alto Adige con 135,6, ultimo Campania con 19,1.</desc>
+<text class="fig__titolo" x="0" y="20">Fra Trentino e Campania, sette volte i posti letto</text>
+<text class="fig__sotto" x="0" y="40">Posti letto nei presidi residenziali socio-assistenziali e socio-sanitari, 2023. Per 10.000 abitanti.</text>
+<text class="fig__nome is-on" x="182" y="74" text-anchor="end">Trentino Alto Adige</text>
+<rect class="fig__barra is-on" x="190" y="63" width="430.0" height="15"/>
+<text class="fig__valore is-on" x="626.0" y="74">135,6</text>
+<text class="fig__nome" x="182" y="96" text-anchor="end">Friuli-Venezia Giulia</text>
+<rect class="fig__barra" x="190" y="85" width="379.9" height="15"/>
+<text class="fig__valore" x="575.9" y="96">119,8</text>
+<text class="fig__nome" x="182" y="118" text-anchor="end">Piemonte</text>
+<rect class="fig__barra" x="190" y="107" width="373.6" height="15"/>
+<text class="fig__valore" x="569.6" y="118">117,8</text>
+<text class="fig__nome" x="182" y="140" text-anchor="end">Valle d&#x27;Aosta</text>
+<rect class="fig__barra" x="190" y="129" width="364.4" height="15"/>
+<text class="fig__valore" x="560.4" y="140">114,9</text>
+<text class="fig__nome" x="182" y="162" text-anchor="end">Liguria</text>
+<rect class="fig__barra" x="190" y="151" width="355.2" height="15"/>
+<text class="fig__valore" x="551.2" y="162">112,0</text>
+<text class="fig__nome" x="182" y="184" text-anchor="end">Emilia-Romagna</text>
+<rect class="fig__barra" x="190" y="173" width="320.0" height="15"/>
+<text class="fig__valore" x="516.0" y="184">100,9</text>
+<text class="fig__nome" x="182" y="206" text-anchor="end">Veneto</text>
+<rect class="fig__barra" x="190" y="195" width="310.1" height="15"/>
+<text class="fig__valore" x="506.1" y="206">97,8</text>
+<text class="fig__nome" x="182" y="228" text-anchor="end">Lombardia</text>
+<rect class="fig__barra" x="190" y="217" width="274.0" height="15"/>
+<text class="fig__valore" x="470.0" y="228">86,4</text>
+<text class="fig__nome" x="182" y="250" text-anchor="end">Marche</text>
+<rect class="fig__barra" x="190" y="239" width="263.2" height="15"/>
+<text class="fig__valore" x="459.2" y="250">83,0</text>
+<text class="fig__nome" x="182" y="272" text-anchor="end">Basilicata</text>
+<rect class="fig__barra" x="190" y="261" width="252.7" height="15"/>
+<text class="fig__valore" x="448.7" y="272">79,7</text>
+<text class="fig__nome" x="182" y="294" text-anchor="end">Umbria</text>
+<rect class="fig__barra" x="190" y="283" width="239.7" height="15"/>
+<text class="fig__valore" x="435.7" y="294">75,6</text>
+<text class="fig__nome" x="182" y="316" text-anchor="end">Toscana</text>
+<rect class="fig__barra" x="190" y="305" width="223.9" height="15"/>
+<text class="fig__valore" x="419.9" y="316">70,6</text>
+<text class="fig__nome" x="182" y="338" text-anchor="end">Molise</text>
+<rect class="fig__barra" x="190" y="327" width="183.3" height="15"/>
+<text class="fig__valore" x="379.3" y="338">57,8</text>
+<text class="fig__nome" x="182" y="360" text-anchor="end">Sicilia</text>
+<rect class="fig__barra" x="190" y="349" width="171.2" height="15"/>
+<text class="fig__valore" x="367.2" y="360">54,0</text>
+<text class="fig__nome" x="182" y="382" text-anchor="end">Sardegna</text>
+<rect class="fig__barra" x="190" y="371" width="158.6" height="15"/>
+<text class="fig__valore" x="354.6" y="382">50,0</text>
+<text class="fig__nome" x="182" y="404" text-anchor="end">Abruzzo</text>
+<rect class="fig__barra" x="190" y="393" width="145.6" height="15"/>
+<text class="fig__valore" x="341.6" y="404">45,9</text>
+<text class="fig__nome" x="182" y="426" text-anchor="end">Lazio</text>
+<rect class="fig__barra" x="190" y="415" width="142.4" height="15"/>
+<text class="fig__valore" x="338.4" y="426">44,9</text>
+<text class="fig__nome" x="182" y="448" text-anchor="end">Calabria</text>
+<rect class="fig__barra" x="190" y="437" width="129.1" height="15"/>
+<text class="fig__valore" x="325.1" y="448">40,7</text>
+<text class="fig__nome" x="182" y="470" text-anchor="end">Puglia</text>
+<rect class="fig__barra" x="190" y="459" width="126.2" height="15"/>
+<text class="fig__valore" x="322.2" y="470">39,8</text>
+<text class="fig__nome is-on" x="182" y="492" text-anchor="end">Campania</text>
+<rect class="fig__barra is-on" x="190" y="481" width="60.6" height="15"/>
+<text class="fig__valore is-on" x="256.6" y="492">19,1</text>
+<line class="fig__rif" x1="435.2" y1="56" x2="435.2" y2="500"/>
+<text class="fig__rif-testo" x="439.2" y="514">media semplice 77,31</text>
+<text class="fig__fonte" x="0" y="544">Fonte: Istat, Benessere equo e sostenibile. Elaborazione Divario Italia.</text>
+</svg>

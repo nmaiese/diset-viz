@@ -1,0 +1,58 @@
+<svg class="fig" viewBox="0 0 680 484" role="img" aria-labelledby="fig-italiano-province-2024-t fig-italiano-province-2024-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-italiano-province-2024-t">Da Crotone a Sondrio, il doppio degli studenti in difficoltà</title>
+<desc id="fig-italiano-province-2024-d">Le 8 province con il valore piu&#x27; alto e le 8 con il piu&#x27; basso nel 2024: prima Crotone con 57,9, ultima Sondrio con 28,3.</desc>
+<text class="fig__titolo" x="0" y="20">Da Crotone a Sondrio, il doppio degli studenti in difficoltà</text>
+<text class="fig__sotto" x="0" y="40">Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado), 2024. Le 8 province piu&#x27; alte e le 8 piu&#x27; basse su 103. %.</text>
+<text class="fig__nome is-on" x="182" y="74" text-anchor="end">Crotone</text>
+<rect class="fig__barra is-on" x="190" y="63" width="430.0" height="15"/>
+<text class="fig__valore is-on" x="626.0" y="74">57,9</text>
+<text class="fig__nome" x="182" y="96" text-anchor="end">Caltanissetta</text>
+<rect class="fig__barra" x="190" y="85" width="419.6" height="15"/>
+<text class="fig__valore" x="615.6" y="96">56,5</text>
+<text class="fig__nome" x="182" y="118" text-anchor="end">Palermo</text>
+<rect class="fig__barra" x="190" y="107" width="407.7" height="15"/>
+<text class="fig__valore" x="603.7" y="118">54,9</text>
+<text class="fig__nome" x="182" y="140" text-anchor="end">Ragusa</text>
+<rect class="fig__barra" x="190" y="129" width="407.7" height="15"/>
+<text class="fig__valore" x="603.7" y="140">54,9</text>
+<text class="fig__nome" x="182" y="162" text-anchor="end">Enna</text>
+<rect class="fig__barra" x="190" y="151" width="400.3" height="15"/>
+<text class="fig__valore" x="596.3" y="162">53,9</text>
+<text class="fig__nome" x="182" y="184" text-anchor="end">Trapani</text>
+<rect class="fig__barra" x="190" y="173" width="400.3" height="15"/>
+<text class="fig__valore" x="596.3" y="184">53,9</text>
+<text class="fig__nome" x="182" y="206" text-anchor="end">Vibo Valentia</text>
+<rect class="fig__barra" x="190" y="195" width="400.3" height="15"/>
+<text class="fig__valore" x="596.3" y="206">53,9</text>
+<text class="fig__nome" x="182" y="228" text-anchor="end">Agrigento</text>
+<rect class="fig__barra" x="190" y="217" width="396.6" height="15"/>
+<text class="fig__valore" x="592.6" y="228">53,4</text>
+<text class="fig__stacco" x="190" y="250">· · ·</text>
+<text class="fig__nome" x="182" y="272" text-anchor="end">Varese</text>
+<rect class="fig__barra" x="190" y="261" width="238.4" height="15"/>
+<text class="fig__valore" x="434.4" y="272">32,1</text>
+<text class="fig__nome" x="182" y="294" text-anchor="end">Ascoli Piceno</text>
+<rect class="fig__barra" x="190" y="283" width="234.7" height="15"/>
+<text class="fig__valore" x="430.7" y="294">31,6</text>
+<text class="fig__nome" x="182" y="316" text-anchor="end">Macerata</text>
+<rect class="fig__barra" x="190" y="305" width="234.7" height="15"/>
+<text class="fig__valore" x="430.7" y="316">31,6</text>
+<text class="fig__nome" x="182" y="338" text-anchor="end">Como</text>
+<rect class="fig__barra" x="190" y="327" width="223.5" height="15"/>
+<text class="fig__valore" x="419.5" y="338">30,1</text>
+<text class="fig__nome" x="182" y="360" text-anchor="end">Terni</text>
+<rect class="fig__barra" x="190" y="349" width="222.1" height="15"/>
+<text class="fig__valore" x="418.1" y="360">29,9</text>
+<text class="fig__nome" x="182" y="382" text-anchor="end">Lecco</text>
+<rect class="fig__barra" x="190" y="371" width="219.1" height="15"/>
+<text class="fig__valore" x="415.1" y="382">29,5</text>
+<text class="fig__nome" x="182" y="404" text-anchor="end">Belluno</text>
+<rect class="fig__barra" x="190" y="393" width="217.6" height="15"/>
+<text class="fig__valore" x="413.6" y="404">29,3</text>
+<text class="fig__nome is-on" x="182" y="426" text-anchor="end">Sondrio</text>
+<rect class="fig__barra is-on" x="190" y="415" width="210.2" height="15"/>
+<text class="fig__valore is-on" x="406.2" y="426">28,3</text>
+<line class="fig__rif" x1="488.7" y1="56" x2="488.7" y2="434"/>
+<text class="fig__rif-testo" x="492.7" y="448">media semplice 40,22</text>
+<text class="fig__fonte" x="0" y="478">Fonte: Istat, BES dei Territori. Elaborazione Divario Italia.</text>
+</svg>

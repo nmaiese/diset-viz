@@ -36,6 +36,7 @@ direttamente su `master`.
 | una pagina indicatore, la sua prosa, le sue guardie | [`docs/INDICATOR_PAGES.md`](docs/INDICATOR_PAGES.md) |
 | che cosa si può citare in un articolo | [`docs/SECONDARY_SOURCES.md`](docs/SECONDARY_SOURCES.md) |
 | **scrivere un articolo indicatore**: brief, verifica, pubblicazione | il repo `redazione-ai` (`REDAZIONE.md` e `siti/divarioitalia.md`) |
+| **un articolo del blog da un trend di ricerca**: segnali, classifica, dossier, grafici, foto con licenza | [`docs/WORKFLOW_ARTICOLI_TREND.md`](docs/WORKFLOW_ARTICOLI_TREND.md) |
 | aggiungere indicatori, temi o un dataset regionale | [`docs/DATA_PIPELINE.md`](docs/DATA_PIPELINE.md) |
 | **famiglie di indicatori**: stessa misura, dimensioni diverse (genere, età, regione/provincia) | [`docs/FAMIGLIE_INDICATORI.md`](docs/FAMIGLIE_INDICATORI.md) |
 | **a che punto è la prosa dell'atlante**: lo stato dei 634 indicatori | `app/editorial_state.py` (il criterio, uno solo), `app/indicator_universe.py` (la passata, una sola) |

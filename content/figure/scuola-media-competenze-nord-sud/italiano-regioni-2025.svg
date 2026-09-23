@@ -1,0 +1,66 @@
+<svg class="fig" viewBox="0 0 680 528" role="img" aria-labelledby="fig-italiano-regioni-2025-t fig-italiano-regioni-2025-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-italiano-regioni-2025-t">In Sicilia più di uno studente su due sotto la soglia</title>
+<desc id="fig-italiano-regioni-2025-d">Classifica di 19 territori nel 2025: primo Sicilia con 53,3, ultimo Umbria con 32,7.</desc>
+<text class="fig__titolo" x="0" y="20">In Sicilia più di uno studente su due sotto la soglia</text>
+<text class="fig__sotto" x="0" y="40">Competenza alfabetica non adeguata (studenti classi III scuola secondaria primo grado), 2025. Valori percentuali.</text>
+<text class="fig__nome is-on" x="182" y="74" text-anchor="end">Sicilia</text>
+<rect class="fig__barra is-on" x="190" y="63" width="430.0" height="15"/>
+<text class="fig__valore is-on" x="626.0" y="74">53,3</text>
+<text class="fig__nome is-on" x="182" y="96" text-anchor="end">Calabria</text>
+<rect class="fig__barra is-on" x="190" y="85" width="409.8" height="15"/>
+<text class="fig__valore is-on" x="605.8" y="96">50,8</text>
+<text class="fig__nome" x="182" y="118" text-anchor="end">Sardegna</text>
+<rect class="fig__barra" x="190" y="107" width="396.1" height="15"/>
+<text class="fig__valore" x="592.1" y="118">49,1</text>
+<text class="fig__nome" x="182" y="140" text-anchor="end">Campania</text>
+<rect class="fig__barra" x="190" y="129" width="392.1" height="15"/>
+<text class="fig__valore" x="588.1" y="140">48,6</text>
+<text class="fig__nome" x="182" y="162" text-anchor="end">Liguria</text>
+<rect class="fig__barra" x="190" y="151" width="355.0" height="15"/>
+<text class="fig__valore" x="551.0" y="162">44,0</text>
+<text class="fig__nome" x="182" y="184" text-anchor="end">Puglia</text>
+<rect class="fig__barra" x="190" y="173" width="338.0" height="15"/>
+<text class="fig__valore" x="534.0" y="184">41,9</text>
+<text class="fig__nome" x="182" y="206" text-anchor="end">Basilicata</text>
+<rect class="fig__barra" x="190" y="195" width="336.4" height="15"/>
+<text class="fig__valore" x="532.4" y="206">41,7</text>
+<text class="fig__nome" x="182" y="228" text-anchor="end">Emilia-Romagna</text>
+<rect class="fig__barra" x="190" y="217" width="319.5" height="15"/>
+<text class="fig__valore" x="515.5" y="228">39,6</text>
+<text class="fig__nome" x="182" y="250" text-anchor="end">Lazio</text>
+<rect class="fig__barra" x="190" y="239" width="319.5" height="15"/>
+<text class="fig__valore" x="515.5" y="250">39,6</text>
+<text class="fig__nome" x="182" y="272" text-anchor="end">Piemonte</text>
+<rect class="fig__barra" x="190" y="261" width="319.5" height="15"/>
+<text class="fig__valore" x="515.5" y="272">39,6</text>
+<text class="fig__nome" x="182" y="294" text-anchor="end">Toscana</text>
+<rect class="fig__barra" x="190" y="283" width="317.1" height="15"/>
+<text class="fig__valore" x="513.1" y="294">39,3</text>
+<text class="fig__nome" x="182" y="316" text-anchor="end">Molise</text>
+<rect class="fig__barra" x="190" y="305" width="311.4" height="15"/>
+<text class="fig__valore" x="507.4" y="316">38,6</text>
+<text class="fig__nome" x="182" y="338" text-anchor="end">Abruzzo</text>
+<rect class="fig__barra" x="190" y="327" width="300.9" height="15"/>
+<text class="fig__valore" x="496.9" y="338">37,3</text>
+<text class="fig__nome" x="182" y="360" text-anchor="end">Friuli-Venezia Giulia</text>
+<rect class="fig__barra" x="190" y="349" width="296.9" height="15"/>
+<text class="fig__valore" x="492.9" y="360">36,8</text>
+<text class="fig__nome is-on" x="182" y="382" text-anchor="end">Lombardia</text>
+<rect class="fig__barra is-on" x="190" y="371" width="295.3" height="15"/>
+<text class="fig__valore is-on" x="491.3" y="382">36,6</text>
+<text class="fig__nome" x="182" y="404" text-anchor="end">Veneto</text>
+<rect class="fig__barra" x="190" y="393" width="291.2" height="15"/>
+<text class="fig__valore" x="487.2" y="404">36,1</text>
+<text class="fig__nome" x="182" y="426" text-anchor="end">Marche</text>
+<rect class="fig__barra" x="190" y="415" width="283.2" height="15"/>
+<text class="fig__valore" x="479.2" y="426">35,1</text>
+<text class="fig__nome" x="182" y="448" text-anchor="end">Valle d&#x27;Aosta</text>
+<rect class="fig__barra" x="190" y="437" width="275.1" height="15"/>
+<text class="fig__valore" x="471.1" y="448">34,1</text>
+<text class="fig__nome is-on" x="182" y="470" text-anchor="end">Umbria</text>
+<rect class="fig__barra is-on" x="190" y="459" width="263.8" height="15"/>
+<text class="fig__valore is-on" x="459.8" y="470">32,7</text>
+<line class="fig__rif" x1="519.0" y1="56" x2="519.0" y2="478"/>
+<text class="fig__rif-testo" x="523.0" y="492">media semplice 40,78</text>
+<text class="fig__fonte" x="0" y="522">Fonte: Invalsi, Benessere equo e sostenibile. Elaborazione Divario Italia.</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg class="fig" viewBox="0 0 680 360" role="img" aria-labelledby="fig-serie-2004-2024-t fig-serie-2004-2024-d" xmlns="http://www.w3.org/2000/svg">
+<title id="fig-serie-2004-2024-t">In vent&#x27;anni il rischio si è ribaltato fra Nord e Sud</title>
+<desc id="fig-serie-2004-2024-d">Centro-Nord: da 2,0 nel 2004 a 0,6 nel 2024; Mezzogiorno: da 1,5 nel 2004 a 0,8 nel 2024; Sardegna: da 1,7 nel 2004 a 1,3 nel 2024</desc>
+<text class="fig__titolo" x="0" y="20">In vent&#x27;anni il rischio si è ribaltato fra Nord e Sud</text>
+<text class="fig__sotto" x="0" y="40">Mortalità per incidenti stradali (15-34 anni), 2004-2024. Tassi standardizzati per 10.000 residenti.</text>
+<line class="fig__griglia" x1="48" y1="290.0" x2="530" y2="290.0"/>
+<text class="fig__asse" x="42" y="294.0" text-anchor="end">0,3</text>
+<line class="fig__griglia" x1="48" y1="232.5" x2="530" y2="232.5"/>
+<text class="fig__asse" x="42" y="236.5" text-anchor="end">0,9</text>
+<line class="fig__griglia" x1="48" y1="175.0" x2="530" y2="175.0"/>
+<text class="fig__asse" x="42" y="179.0" text-anchor="end">1,4</text>
+<line class="fig__griglia" x1="48" y1="117.5" x2="530" y2="117.5"/>
+<text class="fig__asse" x="42" y="121.5" text-anchor="end">1,9</text>
+<line class="fig__griglia" x1="48" y1="60.0" x2="530" y2="60.0"/>
+<text class="fig__asse" x="42" y="64.0" text-anchor="end">2,4</text>
+<text class="fig__asse" x="48.0" y="308" text-anchor="middle">2004</text>
+<text class="fig__asse" x="96.2" y="308" text-anchor="middle">2006</text>
+<text class="fig__asse" x="144.4" y="308" text-anchor="middle">2008</text>
+<text class="fig__asse" x="192.6" y="308" text-anchor="middle">2010</text>
+<text class="fig__asse" x="240.8" y="308" text-anchor="middle">2012</text>
+<text class="fig__asse" x="289.0" y="308" text-anchor="middle">2014</text>
+<text class="fig__asse" x="337.2" y="308" text-anchor="middle">2016</text>
+<text class="fig__asse" x="385.4" y="308" text-anchor="middle">2018</text>
+<text class="fig__asse" x="433.6" y="308" text-anchor="middle">2020</text>
+<text class="fig__asse" x="481.8" y="308" text-anchor="middle">2022</text>
+<text class="fig__asse" x="530.0" y="308" text-anchor="middle">2024</text>
+<polyline class="fig__linea fig__linea--cn" points="48.0,110.6 72.1,126.1 96.2,139.8 120.3,148.9 144.4,180.9 168.5,193.7 192.6,200.1 216.7,223.8 240.8,225.7 264.9,251.2 289.0,239.4 313.1,243.0 337.2,254.9 361.3,239.4 385.4,253.1 409.5,255.2 433.6,274.1 457.7,265.2 481.8,255.8 505.9,264.9 530.0,263.1"/>
+<circle class="fig__punto fig__punto--cn" cx="530.0" cy="263.1" r="3.5"/>
+<polyline class="fig__linea fig__linea--mz" points="48.0,166.3 72.1,160.8 96.2,151.2 120.3,210.1 144.4,196.4 168.5,215.6 192.6,222.5 216.7,232.0 240.8,241.6 264.9,251.2 289.0,236.2 313.1,258.1 337.2,241.6 361.3,236.2 385.4,251.2 409.5,258.1 433.6,260.8 457.7,244.4 481.8,254.0 505.9,260.8 530.0,237.5"/>
+<circle class="fig__punto fig__punto--mz" cx="530.0" cy="237.5" r="3.5"/>
+<polyline class="fig__linea fig__linea--on" points="48.0,141.6 72.1,152.6 96.2,75.9 120.3,174.5 144.4,174.5 168.5,240.3 192.6,218.3 216.7,218.3 240.8,240.3 264.9,207.4 289.0,240.3 313.1,229.3 337.2,218.3 361.3,229.3 385.4,207.4 409.5,251.2 433.6,229.3 457.7,251.2 481.8,240.3 505.9,240.3 530.0,185.5"/>
+<circle class="fig__punto fig__punto--on" cx="530.0" cy="185.5" r="3.5"/>
+<text class="fig__etichetta fig__etichetta--on" x="538.0" y="189.5">Sardegna 1,3</text>
+<text class="fig__etichetta fig__etichetta--mz" x="538.0" y="241.5">Mezzogiorno 0,82</text>
+<text class="fig__etichetta fig__etichetta--cn" x="538.0" y="267.1">Centro-Nord 0,59</text>
+<text class="fig__nota" x="0" y="334">Centro-Nord e Mezzogiorno: medie semplici dei territori, non pesate per popolazione.</text>
+<text class="fig__fonte" x="0" y="354">Fonte: Istat, Benessere equo e sostenibile. Elaborazione Divario Italia.</text>
+</svg>
