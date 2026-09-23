@@ -19,6 +19,7 @@ from app import sources
 from app import seo_policy
 from app import seo_titles
 from app import indicator_notes
+from app import territory_search
 from app import it_numbers
 from app import indicator_texts
 from app import indicator_universe
@@ -592,12 +593,52 @@ def external_indicator_manifest_api():
 
 @app.route("/api/search")
 def search():
+    query = request.args.get("q", "")
+    theme = request.args.get("theme")
     return jsonify({
-        "results": search_atlas_indicators(
-            query=request.args.get("q", ""),
-            theme=request.args.get("theme"),
-        )
+        "results": _search_indicators(query, theme=theme),
+        # Chiave nuova e additiva: chi legge solo `results` non si accorge di
+        # niente, i suggerimenti della testata la mostrano in cima.
+        "territories": [] if theme else territory_search.search_territories(query),
     })
+
+
+def _search_indicators(query, theme=None, limit=50):
+    """Gli indicatori dell'atlante, piu' gli indicizzabili che l'atlante non ha.
+
+    L'atlante e' regionale: i 26 indicatori BES misurati solo per provincia, che
+    hanno una scheda indicizzabile, non si trovavano ne' dalla testata ne' da
+    /ricerca. Si aggiungono con la stessa forma degli altri, senza togliere
+    niente di quello che la ricerca trovava gia'.
+    """
+    results = search_atlas_indicators(query=query, theme=theme, limit=limit)
+    if len(results) >= limit:
+        return results
+    folded = _search_fold(query)
+    seen = {item["path"] for item in results}
+    for record in _indexable_indicator_catalog():
+        meta = record["meta"]
+        if meta["canonical_path"] in seen or meta.get("raw_id") in DUPLICATE_BES_IDS:
+            continue
+        if theme and meta.get("theme") != theme:
+            continue
+        explain = meta.get("explain") or {}
+        haystack = _search_fold(f"{meta['name']} {meta.get('theme', '')} {explain.get('plain', '')}")
+        if folded and folded not in haystack:
+            continue
+        results.append({
+            "id": meta["id"],
+            "name": meta["name"],
+            "path": meta["canonical_path"],
+            "theme": meta.get("theme") or "",
+            "catalog_family_label": meta.get("family_label") or "",
+            "explain": explain,
+            "year_max": meta.get("year_max"),
+        })
+        seen.add(meta["canonical_path"])
+        if len(results) >= limit:
+            break
+    return results
 
 
 _SEARCH_PAGE_SIZE = 50
@@ -635,7 +676,19 @@ def _search_results(query):
         return []
 
     results = []
-    for item in search_atlas_indicators(query=query, limit=_SEARCH_MAX_RESULTS):
+    for territory in territory_search.search_territories(query, limit=20):
+        results.append({
+            "kind": "territorio",
+            "kind_label": "Regione" if territory["kind"] == "regione" else "Provincia",
+            "title": territory["name"],
+            "url": territory["path"],
+            "summary": "",
+            "meta": territory["context"],
+            # Sopra tutto: chi scrive "Lecce" cerca Lecce, non un indicatore
+            # che la nomina.
+            "rank": 4,
+        })
+    for item in _search_indicators(query, limit=_SEARCH_MAX_RESULTS):
         explain = item.get("explain") or {}
         results.append({
             "kind": "indicatore",
@@ -714,6 +767,7 @@ def ricerca():
         last_index=start + len(visible),
         page_size=_SEARCH_PAGE_SIZE,
         truncated=truncated,
+        territory_count=sum(1 for row in results if row["kind"] == "territorio"),
         indicator_count=sum(1 for row in results if row["kind"] == "indicatore"),
         post_count=sum(1 for row in results if row["kind"] == "articolo"),
         query_param=canonical_query,

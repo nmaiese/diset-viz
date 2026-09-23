@@ -145,7 +145,8 @@ def openapi_document(site_url):
             },
             "/api/search": {
                 "get": {
-                    "summary": "Cerca indicatori per nome, tema o descrizione",
+                    "summary": "Cerca indicatori per nome, tema o descrizione, e territori per nome",
+                    "description": "`results` sono gli indicatori, `territories` le regioni e le province il cui nome risponde alla domanda (anche senza accenti o con \"provincia di\" davanti).",
                     "operationId": "searchIndicators",
                     "parameters": [
                         {

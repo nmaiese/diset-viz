@@ -162,20 +162,36 @@
       input.setAttribute("aria-expanded", "false");
     }
 
-    function renderResults(results, query) {
-      if (!results.length) {
+    function renderResults(results, query, territories) {
+      territories = territories || [];
+      if (!results.length && !territories.length) {
         panel.innerHTML =
-          '<p class="sg__empty">Nessun indicatore trovato. Premi Invio per cercare in tutto il sito.</p>';
+          '<p class="sg__empty">Nessun risultato. Premi Invio per cercare in tutto il sito.</p>';
       } else {
-        var html = '<div class="sg"><div class="sg__label">Indicatori</div>';
-        results.slice(0, 6).forEach(function (item) {
-          html +=
-            '<a class="sg__item" role="option" href="' + item.path + '">' +
-            "<span>" + escapeHtml(item.name) + "</span>" +
-            '<span class="sg__kind">' + escapeHtml(item.theme || "Indicatore") + "</span>" +
-            "</a>";
-        });
-        html += "</div>";
+        var html = "";
+        // I territori in cima: chi scrive "Lecce" cerca Lecce.
+        if (territories.length) {
+          html += '<div class="sg"><div class="sg__label">Territori</div>';
+          territories.slice(0, 4).forEach(function (item) {
+            html +=
+              '<a class="sg__item" role="option" href="' + item.path + '">' +
+              "<span>" + escapeHtml(item.name) + "</span>" +
+              '<span class="sg__kind">' + escapeHtml(item.context || "") + "</span>" +
+              "</a>";
+          });
+          html += "</div>";
+        }
+        if (results.length) {
+          html += '<div class="sg"><div class="sg__label">Indicatori</div>';
+          results.slice(0, territories.length ? 4 : 6).forEach(function (item) {
+            html +=
+              '<a class="sg__item" role="option" href="' + item.path + '">' +
+              "<span>" + escapeHtml(item.name) + "</span>" +
+              '<span class="sg__kind">' + escapeHtml(item.theme || "Indicatore") + "</span>" +
+              "</a>";
+          });
+          html += "</div>";
+        }
         html +=
           '<div class="sg"><a class="sg__item" role="option" href="/ricerca?q=' +
           encodeURIComponent(query) +
@@ -210,7 +226,7 @@
         .then(function (payload) {
           // una risposta in ritardo non deve sovrascrivere una query piu recente
           if (!payload || input.value.trim() !== query) return;
-          renderResults(payload.results || [], query);
+          renderResults(payload.results || [], query, payload.territories || []);
         })
         .catch(function () { hidePanel(); });
     }
