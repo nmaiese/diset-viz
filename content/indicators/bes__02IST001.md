@@ -8,7 +8,7 @@ La scuola dell'infanzia raggiunge quasi tutti: tra i bambini di 4-5 anni la freq
 
 <!-- sezione: quadro -->
 
-La scuola dell'infanzia è quasi universale, e sorprende che il Sud, in ritardo sui nidi, sia invece in testa per i 4-5 anni. È il segno di una tradizione radicata di scuola materna pubblica, che precede l'obbligo. Il BES lo tratta come descrittivo, ma la frequenza precoce aiuta lo sviluppo e riduce i divari di partenza.
+La scuola dell'infanzia è quasi universale, e sorprende che il Sud, in ritardo sui nidi, sia invece in testa per i 4-5 anni. È il segno di una tradizione radicata di scuola materna pubblica, che precede l'obbligo. La frequenza precoce aiuta lo sviluppo e riduce i divari di partenza.
 
 <!-- sezione: limiti -->
 

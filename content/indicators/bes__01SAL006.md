@@ -8,7 +8,7 @@ La mortalità per tumore in età lavorativa, tra i 20 e i 64 anni, è scesa di c
 
 <!-- sezione: quadro -->
 
-A lungo il Nord industriale ha avuto la mortalità oncologica più alta. Oggi la mappa si è in parte rovesciata, con alcune regioni del Sud in testa. Contano prevenzione, screening, stili di vita e accesso tempestivo alle cure, che si distribuiscono in modo diseguale. È un dato descrittivo, ma la parola tumore lo rende tutto fuorché neutro.
+A lungo il Nord industriale ha avuto la mortalità oncologica più alta. Oggi la mappa si è in parte rovesciata, con alcune regioni del Sud in testa. Contano prevenzione, screening, stili di vita e accesso tempestivo alle cure, che si distribuiscono in modo diseguale.
 
 <!-- sezione: limiti -->
 

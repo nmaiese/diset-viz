@@ -8,7 +8,7 @@ La mortalità infantile è oggi bassa in tutta Italia, ma non identica. Va da 1,
 
 <!-- sezione: quadro -->
 
-È uno degli indicatori più delicati, dato che tocca la vita dei più piccoli e la qualità dei percorsi nascita. La Multiscopo lo tratta come descrittivo: gli eventi sono pochi, e nelle regioni piccole basta una manciata di casi a spostare il tasso, come mostra la Valle d'Aosta. Resta però un divario Nord-Sud reale nel lungo periodo, legato a prevenzione, reti ospedaliere e presa in carico della gravidanza. Un numero piccolo che pesa moltissimo va letto sull'orizzonte di più anni.
+È uno degli indicatori più delicati, dato che tocca la vita dei più piccoli e la qualità dei percorsi nascita. Va letto con cautela: gli eventi sono pochi, e nelle regioni piccole basta una manciata di casi a spostare il tasso, come mostra la Valle d'Aosta. Resta però un divario Nord-Sud reale nel lungo periodo, legato a prevenzione, reti ospedaliere e presa in carico della gravidanza. Un numero piccolo che pesa moltissimo va letto sull'orizzonte di più anni.
 
 <!-- sezione: limiti -->
 

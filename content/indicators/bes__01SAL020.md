@@ -8,7 +8,7 @@ La mortalità evitabile, quella che prevenzione e cure tempestive potrebbero rid
 
 <!-- sezione: quadro -->
 
-Se un solo numero dovesse riassumere le disuguaglianze territoriali di salute, sarebbe questo: dice quante morti, in teoria, si sarebbero potute evitare con prevenzione e cure adeguate. Il divario Nord-Sud è netto e stabile, e cala ovunque senza però chiudersi. È un indicatore descrittivo, che non attribuisce responsabilità, ma indica dove il sistema salute rende meno di quanto potrebbe.
+Se un solo numero dovesse riassumere le disuguaglianze territoriali di salute, sarebbe questo: dice quante morti, in teoria, si sarebbero potute evitare con prevenzione e cure adeguate. Il divario Nord-Sud è netto e stabile, e cala ovunque senza però chiudersi. Non attribuisce responsabilità, ma indica dove il sistema salute rende meno di quanto potrebbe.
 
 <!-- sezione: limiti -->
 
